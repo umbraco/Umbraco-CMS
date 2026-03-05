@@ -1,6 +1,6 @@
 import type { UmbMockDocumentModel } from '../data/types/mock-data-set.types.js';
 import { UmbMockEntityTreeManager } from './utils/entity/entity-tree.manager.js';
-import { UmbMockEntityItemManager } from './utils/entity/entity-item.manager.js';
+import { UmbMockEntityVariantItemManager } from './utils/entity/entity-variant-item.manager.js';
 import { UmbMockEntityDetailManager } from './utils/entity/entity-detail.manager.js';
 import { UmbMockEntityVariantUrlManager } from './utils/entity/entity-variant-url.manager.js';
 import { umbDocumentTypeMockDb } from './document-type.db.js';
@@ -23,7 +23,7 @@ import type {
 
 export class UmbDocumentMockDB extends UmbEntityMockDbBase<UmbMockDocumentModel> {
 	tree = new UmbMockEntityTreeManager<UmbMockDocumentModel>(this, treeItemMapper);
-	item = new UmbMockEntityItemManager<UmbMockDocumentModel>(this, itemMapper);
+	item = new UmbMockEntityVariantItemManager<UmbMockDocumentModel>(this, itemMapper);
 	detail = new UmbMockEntityDetailManager<UmbMockDocumentModel>(this, createMockDocumentMapper, detailResponseMapper);
 	recycleBin = new UmbEntityRecycleBin<UmbMockDocumentModel>(this.data, treeItemMapper);
 	publishing = new UmbMockDocumentPublishingManager(this);

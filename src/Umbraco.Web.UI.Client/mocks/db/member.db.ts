@@ -1,7 +1,7 @@
 import { objectArrayFilter, queryFilter } from '../utils.js';
 import type { UmbMockMemberModel } from '../data/types/mock-data-set.types.js';
 import { UmbEntityMockDbBase } from './utils/entity/entity-base.js';
-import { UmbMockEntityItemManager } from './utils/entity/entity-item.manager.js';
+import { UmbMockEntityVariantItemManager } from './utils/entity/entity-variant-item.manager.js';
 import { UmbMockEntityDetailManager } from './utils/entity/entity-detail.manager.js';
 import { umbMemberTypeMockDb } from './member-type.db.js';
 import { UmbMockContentCollectionManager } from './utils/content/content-collection.manager.js';
@@ -33,7 +33,7 @@ const memberQueryFilter = (filterOptions: MemberFilterOptions, item: UmbMockMemb
 	queryFilter(filterOptions.filter, item.username);
 
 class UmbMemberMockDB extends UmbEntityMockDbBase<UmbMockMemberModel> {
-	item = new UmbMockEntityItemManager<UmbMockMemberModel>(this, itemResponseMapper);
+	item = new UmbMockEntityVariantItemManager<UmbMockMemberModel>(this, itemResponseMapper);
 	detail = new UmbMockEntityDetailManager<UmbMockMemberModel>(this, createDetailMockMapper, detailResponseMapper);
 	collection = new UmbMockContentCollectionManager(this, collectionItemResponseMapper);
 

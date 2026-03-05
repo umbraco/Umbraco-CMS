@@ -1,6 +1,6 @@
 import type { UmbMockMediaModel } from '../data/types/mock-data-set.types.js';
 import { UmbMockEntityTreeManager } from './utils/entity/entity-tree.manager.js';
-import { UmbMockEntityItemManager } from './utils/entity/entity-item.manager.js';
+import { UmbMockEntityVariantItemManager } from './utils/entity/entity-variant-item.manager.js';
 import { UmbMockEntityDetailManager } from './utils/entity/entity-detail.manager.js';
 import { UmbMockEntityVariantUrlManager } from './utils/entity/entity-variant-url.manager.js';
 import { umbMediaTypeMockDb } from './media-type.db.js';
@@ -19,7 +19,7 @@ import type {
 
 export class UmbMediaMockDB extends UmbEntityMockDbBase<UmbMockMediaModel> {
 	tree = new UmbMockEntityTreeManager<UmbMockMediaModel>(this, treeItemMapper);
-	item = new UmbMockEntityItemManager<UmbMockMediaModel>(this, itemMapper);
+	item = new UmbMockEntityVariantItemManager<UmbMockMediaModel>(this, itemMapper);
 	detail = new UmbMockEntityDetailManager<UmbMockMediaModel>(this, createMockMediaMapper, detailResponseMapper);
 	recycleBin = new UmbEntityRecycleBin<UmbMockMediaModel>(this.data, treeItemMapper);
 	collection = new UmbMockMediaCollectionManager(this, collectionMapper);

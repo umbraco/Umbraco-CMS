@@ -1,7 +1,7 @@
 import type { UmbMockTemplateModel } from '../data/types/mock-data-set.types.js';
 import { UmbEntityMockDbBase } from './utils/entity/entity-base.js';
 import { UmbMockEntityTreeManager } from './utils/entity/entity-tree.manager.js';
-import { UmbMockEntityItemManager } from './utils/entity/entity-item.manager.js';
+import { UmbMockEntityNamedItemManager } from './utils/entity/entity-named-item.manager.js';
 import { UmbMockTemplateDetailManager } from './template-detail.manager.js';
 import { UmbMockTemplateQueryManager } from './template-query.manager.js';
 import type {
@@ -11,7 +11,7 @@ import type {
 
 class UmbTemplateMockDB extends UmbEntityMockDbBase<UmbMockTemplateModel> {
 	tree = new UmbMockEntityTreeManager<UmbMockTemplateModel>(this, treeItemMapper);
-	item = new UmbMockEntityItemManager<UmbMockTemplateModel>(this, itemMapper);
+	item = new UmbMockEntityNamedItemManager<UmbMockTemplateModel>(this, itemMapper);
 	detail = new UmbMockTemplateDetailManager(this);
 	query = new UmbMockTemplateQueryManager();
 

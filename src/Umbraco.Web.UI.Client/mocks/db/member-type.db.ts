@@ -1,7 +1,7 @@
 import type { UmbMockMemberTypeModel } from '../data/types/mock-data-set.types.js';
 import { UmbEntityMockDbBase } from './utils/entity/entity-base.js';
 import { UmbMockEntityTreeManager } from './utils/entity/entity-tree.manager.js';
-import { UmbMockEntityItemManager } from './utils/entity/entity-item.manager.js';
+import { UmbMockEntityNamedItemManager } from './utils/entity/entity-named-item.manager.js';
 import { UmbMockEntityDetailManager } from './utils/entity/entity-detail.manager.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type {
@@ -12,7 +12,7 @@ import type {
 
 class UmbMemberTypeMockDB extends UmbEntityMockDbBase<UmbMockMemberTypeModel> {
 	tree = new UmbMockEntityTreeManager<UmbMockMemberTypeModel>(this, memberTypeTreeItemMapper);
-	item = new UmbMockEntityItemManager<UmbMockMemberTypeModel>(this, itemResponseMapper);
+	item = new UmbMockEntityNamedItemManager<UmbMockMemberTypeModel>(this, itemResponseMapper);
 	detail = new UmbMockEntityDetailManager<UmbMockMemberTypeModel>(this, createDetailMockMapper, detailResponseMapper);
 
 	constructor(data: Array<UmbMockMemberTypeModel>) {

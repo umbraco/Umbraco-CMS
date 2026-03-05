@@ -3,7 +3,7 @@ import type { UmbMockDataTypeModel } from '../data/types/mock-data-set.types.js'
 import { UmbEntityMockDbBase } from './utils/entity/entity-base.js';
 import { UmbMockEntityFolderManager } from './utils/entity/entity-folder.manager.js';
 import { UmbMockEntityTreeManager } from './utils/entity/entity-tree.manager.js';
-import { UmbMockEntityItemManager } from './utils/entity/entity-item.manager.js';
+import { UmbMockEntityNamedItemManager } from './utils/entity/entity-named-item.manager.js';
 import { UmbMockEntityDetailManager } from './utils/entity/entity-detail.manager.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type {
@@ -33,7 +33,7 @@ const dataQueryFilter = (filterOptions: UmbDataTypeFilterOptions, item: UmbMockD
 class UmbDataTypeMockDB extends UmbEntityMockDbBase<UmbMockDataTypeModel> {
 	tree = new UmbMockEntityTreeManager<UmbMockDataTypeModel>(this, treeItemMapper);
 	folder = new UmbMockEntityFolderManager<UmbMockDataTypeModel>(this, createFolderMockMapper);
-	item = new UmbMockEntityItemManager<UmbMockDataTypeModel>(this, itemResponseMapper);
+	item = new UmbMockEntityNamedItemManager<UmbMockDataTypeModel>(this, itemResponseMapper);
 	detail = new UmbMockEntityDetailManager<UmbMockDataTypeModel>(this, createDetailMockMapper, detailResponseMapper);
 
 	constructor(data: Array<UmbMockDataTypeModel>) {

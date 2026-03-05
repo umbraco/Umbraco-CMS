@@ -2,7 +2,7 @@ import type { UmbMockMediaTypeModel } from '../data/types/mock-data-set.types.js
 import { UmbEntityMockDbBase } from './utils/entity/entity-base.js';
 import { UmbMockEntityFolderManager } from './utils/entity/entity-folder.manager.js';
 import { UmbMockEntityTreeManager } from './utils/entity/entity-tree.manager.js';
-import { UmbMockEntityItemManager } from './utils/entity/entity-item.manager.js';
+import { UmbMockEntityNamedItemManager } from './utils/entity/entity-named-item.manager.js';
 import { UmbMockEntityDetailManager } from './utils/entity/entity-detail.manager.js';
 import { umbDataTypeMockDb } from './data-type.db.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
@@ -21,7 +21,7 @@ import type {
 class UmbMediaTypeMockDB extends UmbEntityMockDbBase<UmbMockMediaTypeModel> {
 	tree = new UmbMockEntityTreeManager<UmbMockMediaTypeModel>(this, mediaTypeTreeItemMapper);
 	folder = new UmbMockEntityFolderManager<UmbMockMediaTypeModel>(this, createMockMediaTypeFolderMapper);
-	item = new UmbMockEntityItemManager<UmbMockMediaTypeModel>(this, mediaTypeItemMapper);
+	item = new UmbMockEntityNamedItemManager<UmbMockMediaTypeModel>(this, mediaTypeItemMapper);
 	detail = new UmbMockEntityDetailManager<UmbMockMediaTypeModel>(
 		this,
 		createMockMediaTypeMapper,
