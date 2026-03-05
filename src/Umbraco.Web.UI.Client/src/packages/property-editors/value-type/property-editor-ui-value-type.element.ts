@@ -20,7 +20,7 @@ export class UmbPropertyEditorUIValueTypeElement extends UmbLitElement implement
 		this._value = value;
 
 		const selected = this._options.filter((option) => {
-			if (this.selectEl && option.value === this.value) this.selectEl.value = this.value as never;
+			if (this.selectEl && option.value === this.value) this.selectEl.value = this.value;
 			return (option.selected = option.value === this.value);
 		});
 		if (selected.length === 0) {
