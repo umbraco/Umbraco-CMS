@@ -10,7 +10,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		alias: 'Umb.WorkspaceInfoApp.Document.History',
 		meta: {
 			auditLogRepositoryAlias: UMB_DOCUMENT_AUDIT_LOG_REPOSITORY_ALIAS,
-			allowedActions: ['Umb.EntityAction.Document.Rollback'],
 		},
 		conditions: [
 			{

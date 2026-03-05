@@ -8,7 +8,6 @@ export type {
 
 export interface MetaWorkspaceInfoAppAuditLogKind extends MetaWorkspaceInfoApp {
 	auditLogRepositoryAlias: string;
-	allowedActions?: Array<string>;
 }
 
 export interface ManifestWorkspaceInfoAppAuditLogKind

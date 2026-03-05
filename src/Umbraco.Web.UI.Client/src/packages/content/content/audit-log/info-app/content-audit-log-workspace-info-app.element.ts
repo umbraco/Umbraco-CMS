@@ -38,6 +38,9 @@ export class UmbContentAuditLogWorkspaceInfoAppElement extends UmbLitElement {
 	private _currentPageNumber = 1;
 
 	@state()
+	private _entityType?: string;
+
+	@state()
 	private _items: Array<UmbAuditLogModel> = [];
 
 	@state()
@@ -99,6 +102,8 @@ export class UmbContentAuditLogWorkspaceInfoAppElement extends UmbLitElement {
 			throw new Error('Workspace entity unique is required');
 		}
 
+		this._entityType = this.#workspaceContext.getEntityType();
+
 		const { data } = await this.#auditLogRepository.requestAuditLog({
 			unique,
 			skip: this.#pagination.getSkip(),
@@ -132,18 +137,17 @@ export class UmbContentAuditLogWorkspaceInfoAppElement extends UmbLitElement {
 	}
 
 	override render() {
-		const allowedActions = this._manifest?.meta.allowedActions;
-
 		return html`
 			<umb-workspace-info-app-layout headline="#general_history">
 				${when(
-					allowedActions?.length,
-					() => html`
+					this._entityType,
+					(entityType) => html`
 						<umb-extension-with-api-slot
 							slot="header-actions"
-							type="entityAction"
-							.filter=${(manifest: ManifestEntityAction) =>
-								allowedActions!.includes(manifest.alias)}></umb-extension-with-api-slot>
+							type="auditLogAction"
+							.apiArgs=${(manifest: ManifestEntityAction) => [manifest]}
+							.filter=${(manifest: ManifestEntityAction) => manifest.forEntityTypes.includes(entityType)}>
+						</umb-extension-with-api-slot>
 					`,
 				)}
 				<div id="content">
