@@ -23,6 +23,8 @@ public static class UmbracoBuilderExtensions
 
         builder.AddDbContextRegistrar<SqliteDbContextServiceRegistrar>();
 
+        builder.AddEFCoreModelCustomizer<SqliteCollationModelCustomizer>();
+
         return builder;
     }
 }
