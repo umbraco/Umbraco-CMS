@@ -864,7 +864,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 	};
 
 	#waitingForReentry = false;
-	#handleDragLeave = (e: MouseEvent) => {
+	#handleDragLeave = (e: DragEvent) => {
 		if (e.clientX <= 0 || e.clientY <= 0 || e.clientX >= window.innerWidth || e.clientY >= window.innerHeight) {
 			this.#waitingForReentry = true;
 		}
