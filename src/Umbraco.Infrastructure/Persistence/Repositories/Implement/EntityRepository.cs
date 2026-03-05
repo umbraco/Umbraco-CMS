@@ -260,13 +260,10 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
         out long totalBefore,
         out long totalAfter)
     {
-        // Ideally we don't want to have to do a second query for the parent ID, but the siblings query is already messy enough
-        // without us also having to do a nested query for the parent ID too.
         Sql<ISqlContext> parentIdQuery = Sql()
             .Select<NodeDto>(x => x.ParentId)
             .From<NodeDto>()
             .Where<NodeDto>(x => x.UniqueId == targetKey);
-        var parentId = Database.ExecuteScalar<int>(parentIdQuery);
 
         Sql<ISqlContext> orderingSql = Sql();
         ApplyOrdering(ref orderingSql, ordering);
@@ -276,9 +273,16 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
         // These row numbers are important, we need them to select the "before" and "after" siblings of the target node.
         Sql<ISqlContext> rowNumberSql = Sql()
             .Select($"ROW_NUMBER() OVER ({orderingSql.SQL}) AS rn")
-            .AndSelect<NodeDto>(n => n.UniqueId)
+
+            // withAlias: false is required here because this subquery is referenced by outer queries using
+            // a table alias (e.g. SELECT [nn].[uniqueId]). Including a column alias (e.g. [uniqueId] AS [uniqueId])
+            // can confuse some database providers (e.g. PostgreSQL) when the outer query refers to the column
+            // by the subquery's table alias rather than the column alias.
+            .AndSelect<NodeDto>(withAlias: false, n => n.UniqueId)
+
             .From<NodeDto>()
-            .Where<NodeDto>(x => x.ParentId == parentId && x.Trashed == isTrashed)
+            .Where<NodeDto>(x => x.Trashed == isTrashed)
+            .WhereIn<NodeDto>(x => x.ParentId, parentIdQuery)
             .WhereIn<NodeDto>(x => x.NodeObjectType, objectTypes);
 
         // Apply the filter if provided.
@@ -319,7 +323,7 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
         totalAfter = GetNumberOfSiblingsOutsideSiblingRange(rowNumberSql, targetRowSql, beforeAfterParameterIndex, afterArgumentsArray, false);
 
         return Sql()
-            .Select(QuoteColumnName("uniqueId"))
+            .Select<NodeDto>("nn", n => n.UniqueId)
             .From().AppendSubQuery(rowNumberSql, "nn")
             .Where($"rn >= ({targetRowSql.SQL}) - @{beforeAfterParameterIndex}", beforeArgumentsArray)
             .Where($"rn <= ({targetRowSql.SQL}) + @{beforeAfterParameterIndex}", afterArgumentsArray)
