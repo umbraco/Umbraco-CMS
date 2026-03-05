@@ -39,9 +39,9 @@ public class RootDynamicRootOriginFinder : IDynamicRootOriginFinder
             return null;
         }
 
+        // when creating new content, CurrentKey will be null - fallback to using ParentKey
         Guid entityKey = query.Context.CurrentKey ?? query.Context.ParentKey;
-        // when creating new content, or accessing the query from within a block, a key will be generated, but the entity will be null - fallback to using ParentKey
-        var entity = _entityService.Get(entityKey) ?? _entityService.Get(query.Context.ParentKey);
+        var entity = _entityService.Get(entityKey);
 
         if (entity is null || _allowedObjectTypes.Contains(entity.NodeObjectType) is false)
         {
