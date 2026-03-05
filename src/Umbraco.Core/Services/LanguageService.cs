@@ -46,51 +46,55 @@ internal sealed class LanguageService : RepositoryService, ILanguageService
     }
 
     /// <inheritdoc />
-    public Task<ILanguage?> GetAsync(string isoCode)
+    public async Task<ILanguage?> GetAsync(string isoCode)
     {
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
-            return Task.FromResult(_languageRepository.GetByIsoCode(isoCode));
+            return await _languageRepository.GetByIsoCodeAsync(isoCode);
         }
     }
 
     /// <inheritdoc />
-    public Task<ILanguage?> GetDefaultLanguageAsync()
+    public async Task<ILanguage?> GetDefaultLanguageAsync()
     {
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
-            return Task.FromResult(_languageRepository.GetByIsoCode(_languageRepository.GetDefaultIsoCode()));
+            return await _languageRepository.GetByIsoCodeAsync(await _languageRepository.GetDefaultIsoCodeAsync());
         }
     }
 
     /// <inheritdoc />
-    public Task<string> GetDefaultIsoCodeAsync()
+    public async Task<string> GetDefaultIsoCodeAsync()
     {
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
-            return Task.FromResult(_languageRepository.GetDefaultIsoCode());
+            return await _languageRepository.GetDefaultIsoCodeAsync();
         }
     }
 
     /// <inheritdoc />
-    public Task<IEnumerable<ILanguage>> GetAllAsync()
+    public async Task<IEnumerable<ILanguage>> GetAllAsync()
     {
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
-            return Task.FromResult(_languageRepository.GetMany());
+            return await _languageRepository.GetAllAsync(CancellationToken.None);
         }
     }
 
     /// <inheritdoc />
-    public Task<string[]> GetIsoCodesByIdsAsync(ICollection<int> ids)
+    public async Task<string[]> GetIsoCodesByIdsAsync(ICollection<int> ids)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete:true);
 
-        return Task.FromResult(_languageRepository.GetIsoCodesByIds(ids, throwOnNotFound: true));
+        return await _languageRepository.GetIsoCodesByIdsAsync(ids, throwOnNotFound: true);
     }
 
     /// <inheritdoc />
-    public async Task<IEnumerable<ILanguage>> GetMultipleAsync(IEnumerable<string> isoCodes) => (await GetAllAsync()).Where(x => isoCodes.Contains(x.IsoCode));
+    public async Task<IEnumerable<ILanguage>> GetMultipleAsync(IEnumerable<string> isoCodes)
+    {
+        IEnumerable<ILanguage> allLanguages = await GetAllAsync();
+        return allLanguages.Where(x => isoCodes.Contains(x.IsoCode));
+    }
 
     /// <inheritdoc />
     public async Task<Attempt<ILanguage, LanguageOperationStatus>> UpdateAsync(ILanguage language, Guid userKey)
@@ -115,9 +119,9 @@ internal sealed class LanguageService : RepositoryService, ILanguageService
 
         return await SaveAsync(
             language,
-            () =>
+            async () =>
             {
-                ILanguage? currentLanguage = _languageRepository.Get(language.Id);
+                ILanguage? currentLanguage = await _languageRepository.GetAsync(language.Id, CancellationToken.None);
                 if (currentLanguage == null)
                 {
                     return LanguageOperationStatus.NotFound;
@@ -146,10 +150,10 @@ internal sealed class LanguageService : RepositoryService, ILanguageService
 
         return await SaveAsync(
             language,
-            () =>
+            async () =>
             {
                 // ensure no duplicates by ISO code
-                if (_languageRepository.GetByIsoCode(language.IsoCode) != null)
+                if (await _languageRepository.GetByIsoCodeAsync(language.IsoCode) != null)
                 {
                     return LanguageOperationStatus.DuplicateIsoCode;
                 }
@@ -169,7 +173,7 @@ internal sealed class LanguageService : RepositoryService, ILanguageService
             // write-lock languages to guard against race conds when dealing with default language
             scope.WriteLock(Constants.Locks.Languages);
 
-            ILanguage? language = _languageRepository.GetByIsoCode(isoCode);
+            ILanguage? language = await _languageRepository.GetByIsoCodeAsync(isoCode);
             if (language == null)
             {
                 return Attempt.FailWithStatus<ILanguage?, LanguageOperationStatus>(LanguageOperationStatus.NotFound, null);
@@ -189,7 +193,7 @@ internal sealed class LanguageService : RepositoryService, ILanguageService
             }
 
             // NOTE: Other than the fall-back language, there aren't any other constraints in the db, so possible references aren't deleted
-            _languageRepository.Delete(language);
+            await _languageRepository.DeleteAsync(language, CancellationToken.None);
 
             scope.Notifications.Publish(
                 new LanguageDeletedNotification(language, eventMessages).WithStateFrom(deletingLanguageNotification));
@@ -202,7 +206,7 @@ internal sealed class LanguageService : RepositoryService, ILanguageService
 
     private async Task<Attempt<ILanguage, LanguageOperationStatus>> SaveAsync(
         ILanguage language,
-        Func<LanguageOperationStatus> operationValidation,
+        Func<Task<LanguageOperationStatus>> operationValidation,
         AuditType auditType,
         string auditMessage,
         Guid userKey)
@@ -222,14 +226,14 @@ internal sealed class LanguageService : RepositoryService, ILanguageService
             // write-lock languages to guard against race conds when dealing with default language
             scope.WriteLock(Constants.Locks.Languages);
 
-            LanguageOperationStatus status = operationValidation();
+            LanguageOperationStatus status = await operationValidation();
             if (status != LanguageOperationStatus.Success)
             {
                 return Attempt.FailWithStatus(status, language);
             }
 
             // validate the fallback language - within write-lock (important!)
-            if (HasInvalidFallbackLanguage(language))
+            if (await HasInvalidFallbackLanguage(language))
             {
                 return Attempt.FailWithStatus(LanguageOperationStatus.InvalidFallback, language);
             }
@@ -242,7 +246,7 @@ internal sealed class LanguageService : RepositoryService, ILanguageService
                 return Attempt.FailWithStatus(LanguageOperationStatus.CancelledByNotification, language);
             }
 
-            _languageRepository.Save(language);
+            await _languageRepository.SaveAsync(language, CancellationToken.None);
             scope.Notifications.Publish(
                 new LanguageSavedNotification(language, eventMessages).WithStateFrom(savingNotification));
 
@@ -261,7 +265,7 @@ internal sealed class LanguageService : RepositoryService, ILanguageService
             entityType,
             message);
 
-    private bool HasInvalidFallbackLanguage(ILanguage language)
+    private async Task<bool> HasInvalidFallbackLanguage(ILanguage language)
     {
         // no fallback language = valid
         if (language.FallbackIsoCode == null)
@@ -270,7 +274,8 @@ internal sealed class LanguageService : RepositoryService, ILanguageService
         }
 
         // does the fallback language actually exist?
-        var languagesByIsoCode = _languageRepository.GetMany().ToDictionary(x => x.IsoCode, x => x, StringComparer.OrdinalIgnoreCase);
+        IEnumerable<ILanguage> allLanguages = await _languageRepository.GetAllAsync(CancellationToken.None);
+        var languagesByIsoCode = allLanguages.ToDictionary(x => x.IsoCode, x => x, StringComparer.OrdinalIgnoreCase);
         if (!languagesByIsoCode.ContainsKey(language.FallbackIsoCode))
         {
             return true;
