@@ -85,8 +85,7 @@ export class UmbMediaDropzoneManager extends UmbDropzoneManager {
 				continue;
 			}
 
-			const mediaTypeUnique = options[0].unique;
-			const mediaTypeName = options[0].name;
+			const { unique: mediaTypeUnique, name: mediaTypeName } = options[0];
 
 			if (!mediaTypeUnique) {
 				throw new Error('Media type unique is not defined');
