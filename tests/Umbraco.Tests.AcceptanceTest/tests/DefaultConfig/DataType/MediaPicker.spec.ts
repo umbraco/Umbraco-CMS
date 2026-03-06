@@ -131,7 +131,7 @@ test('cannot add a media file as start node', {tag: '@release'}, async ({umbraco
   // Arrange
   // Create media
   const mediaName = 'TestStartNodeFile';
-  const mediaId = await umbracoApi.media.createDefaultMediaWithArticle(mediaName);
+  await umbracoApi.media.createDefaultMediaWithArticle(mediaName);
   expect(await umbracoApi.media.doesNameExist(mediaName)).toBeTruthy();
   await umbracoApi.dataType.createDefaultMediaPickerDataType(customDataTypeName);
   await umbracoUi.dataType.goToDataType(customDataTypeName);
