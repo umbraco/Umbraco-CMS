@@ -878,6 +878,7 @@ export default {
 		elements: 'Elements',
 		email: 'Email',
 		error: 'Error',
+		export: 'Export',
 		field: 'Field',
 		fields: 'Fields',
 		fieldFor: 'Field for %0%',
