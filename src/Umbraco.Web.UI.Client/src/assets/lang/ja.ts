@@ -371,7 +371,6 @@ export default {
 		elements: '要素',
 		email: '電子メール',
 		error: 'エラー',
-		export: 'エクスポート',
 		findDocument: '検索',
 		height: '高さ',
 		help: 'ヘルプ',

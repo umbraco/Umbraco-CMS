@@ -32,7 +32,7 @@ export class UmbExportDictionaryModalElement extends UmbModalBaseElement<
 	}
 
 	override render() {
-		return html` <umb-body-layout headline=${this.localize.term('general_export')}>
+		return html` <umb-body-layout headline=${this.localize.term('actions_export')}>
 			<uui-form>
 				<form id="form" name="form" @submit=${this.#handleSubmit}>
 					<uui-form-layout-item>
@@ -42,7 +42,7 @@ export class UmbExportDictionaryModalElement extends UmbModalBaseElement<
 				</form>
 			</uui-form>
 			<uui-button slot="actions" type="button" label=${this.localize.term('general_cancel')} look="secondary" @click=${this.#handleClose}></uui-button>
-			<uui-button slot="actions" type="button" label=${this.localize.term('general_export')} look="primary" @click=${this.#submitForm}></uui-button>
+			<uui-button slot="actions" type="button" label=${this.localize.term('actions_export')} look="primary" @click=${this.#submitForm}></uui-button>
 		</umb-body-layout>`;
 	}
 
