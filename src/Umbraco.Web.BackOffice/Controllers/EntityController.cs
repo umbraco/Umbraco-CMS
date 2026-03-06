@@ -1138,7 +1138,7 @@ public class EntityController : UmbracoAuthorizedJsonController
                 .Select(s => int.Parse(s, CultureInfo.InvariantCulture)).Distinct().ToArray();
 
             var ignoreUserStartNodes =
-                IsDataTypeIgnoringUserStartNodes(queryStrings?.GetValue<Guid?>("dataTypeId"));
+                IsDataTypeIgnoringUserStartNodes(queryStrings?.GetValue<Guid?>("dataTypeKey"));
             if (ignoreUserStartNodes == false)
             {
                 int[]? aids = null;
