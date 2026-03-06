@@ -45,8 +45,24 @@ public class DocumentTypeTreeControllerBase : FolderTreeControllerBase<DocumentT
     /// <param name="entityService">Service used for entity operations such as retrieval and management.</param>
     /// <param name="flagProviders">A collection of providers that supply flags for document types.</param>
     /// <param name="contentTypeService">Service responsible for managing content types.</param>
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
     public DocumentTypeTreeControllerBase(IEntityService entityService, FlagProviderCollection flagProviders, IContentTypeService contentTypeService)
-        : base(entityService, flagProviders) =>
+        : this(
+            entityService,
+            flagProviders,
+            StaticServiceProvider.Instance.GetRequiredService<IEntitySearchService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>(),
+            contentTypeService)
+    {
+    }
+
+    public DocumentTypeTreeControllerBase(
+        IEntityService entityService,
+        FlagProviderCollection flagProviders,
+        IEntitySearchService entitySearchService,
+        IIdKeyMap idKeyMap,
+        IContentTypeService contentTypeService)
+        : base(entityService, flagProviders, entitySearchService, idKeyMap) =>
         _contentTypeService = contentTypeService;
 
     protected override UmbracoObjectTypes ItemObjectType => UmbracoObjectTypes.DocumentType;

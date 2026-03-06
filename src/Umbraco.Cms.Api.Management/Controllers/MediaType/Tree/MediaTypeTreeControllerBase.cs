@@ -46,8 +46,24 @@ public class MediaTypeTreeControllerBase : FolderTreeControllerBase<MediaTypeTre
     /// <param name="entityService">The service used for entity operations.</param>
     /// <param name="flagProviders">A collection of providers that supply flags for entities.</param>
     /// <param name="mediaTypeService">The service used for managing media types.</param>
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
     public MediaTypeTreeControllerBase(IEntityService entityService, FlagProviderCollection flagProviders, IMediaTypeService mediaTypeService)
-        : base(entityService, flagProviders) =>
+        : this(
+            entityService,
+            flagProviders,
+            StaticServiceProvider.Instance.GetRequiredService<IEntitySearchService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>(),
+            mediaTypeService)
+    {
+    }
+
+    public MediaTypeTreeControllerBase(
+        IEntityService entityService,
+        FlagProviderCollection flagProviders,
+        IEntitySearchService entitySearchService,
+        IIdKeyMap idKeyMap,
+        IMediaTypeService mediaTypeService)
+        : base(entityService, flagProviders, entitySearchService, idKeyMap) =>
         _mediaTypeService = mediaTypeService;
 
     protected override UmbracoObjectTypes ItemObjectType => UmbracoObjectTypes.MediaType;

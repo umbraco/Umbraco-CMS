@@ -45,8 +45,24 @@ public class DataTypeTreeControllerBase : FolderTreeControllerBase<DataTypeTreeI
     /// <param name="entityService">Service used for entity operations within the data type tree.</param>
     /// <param name="flagProviders">A collection of providers that supply flags for entities.</param>
     /// <param name="dataTypeService">Service used for managing data types.</param>
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
     public DataTypeTreeControllerBase(IEntityService entityService, FlagProviderCollection flagProviders, IDataTypeService dataTypeService)
-        : base(entityService, flagProviders) =>
+        : this(
+            entityService,
+            flagProviders,
+            StaticServiceProvider.Instance.GetRequiredService<IEntitySearchService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>(),
+            dataTypeService)
+    {
+    }
+
+    public DataTypeTreeControllerBase(
+        IEntityService entityService,
+        FlagProviderCollection flagProviders,
+        IEntitySearchService entitySearchService,
+        IIdKeyMap idKeyMap,
+        IDataTypeService dataTypeService)
+        : base(entityService, flagProviders, entitySearchService, idKeyMap) =>
         _dataTypeService = dataTypeService;
 
     protected override UmbracoObjectTypes ItemObjectType => UmbracoObjectTypes.DataType;

@@ -45,7 +45,10 @@ public class DictionaryTreeControllerBase : NamedEntityTreeControllerBase<NamedE
     /// <param name="entityService">Service for managing entities within the system.</param>
     /// <param name="flagProviders">A collection of providers for entity flags.</param>
     /// <param name="dictionaryItemService">Service for managing dictionary items.</param>
-    public DictionaryTreeControllerBase(IEntityService entityService, FlagProviderCollection flagProviders, IDictionaryItemService dictionaryItemService)
+    public DictionaryTreeControllerBase(
+        IEntityService entityService, 
+        FlagProviderCollection flagProviders, 
+        IDictionaryItemService dictionaryItemService)
         : base(entityService, flagProviders) =>
         DictionaryItemService = dictionaryItemService;
 

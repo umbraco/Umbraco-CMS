@@ -34,7 +34,9 @@ public class MemberGroupTreeControllerBase : NamedEntityTreeControllerBase<Named
     /// </summary>
     /// <param name="entityService">The service used to manage and retrieve entities within the system.</param>
     /// <param name="flagProviders">A collection of providers that supply additional flags or metadata for entities.</param>
-    public MemberGroupTreeControllerBase(IEntityService entityService, FlagProviderCollection flagProviders)
+    public MemberGroupTreeControllerBase(
+        IEntityService entityService, 
+        FlagProviderCollection flagProviders)
         : base(entityService, flagProviders)
     {
     }

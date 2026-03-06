@@ -43,5 +43,10 @@ public enum PartialViewOperationStatus
     /// <summary>
     /// The specified partial view was not found.
     /// </summary>
-    NotFound
+    NotFound,
+
+    /// <summary>
+    /// The operation is not allowed when running in production mode.
+    /// </summary>
+    NotAllowedInProductionMode
 }

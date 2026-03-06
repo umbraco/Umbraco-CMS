@@ -46,6 +46,14 @@ public class TemplateControllerBase : ManagementApiControllerBase
                 .WithTitle("Master template cannot be deleted")
                 .WithDetail("The master templates cannot be deleted. Please ensure the template is not a master template before you delete.")
                 .Build()),
+            TemplateOperationStatus.NotAllowedInProductionMode => BadRequest(problemDetailsBuilder
+                .WithTitle("Not allowed in production mode")
+                .WithDetail("Template modifications are not allowed when running in production mode.")
+                .Build()),
+            TemplateOperationStatus.ContentChangeNotAllowedInProductionMode => BadRequest(problemDetailsBuilder
+                .WithTitle("Content change not allowed in production mode")
+                .WithDetail("Template content changes are not allowed when running in production mode. Metadata updates are permitted.")
+                .Build()),
             _ => StatusCode(StatusCodes.Status500InternalServerError, problemDetailsBuilder
                 .WithTitle("Unknown template operation status.")
                 .Build()),
