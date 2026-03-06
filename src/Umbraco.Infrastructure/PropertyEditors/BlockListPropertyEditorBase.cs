@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Nodes;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Cache.PropertyEditors;
@@ -10,6 +11,7 @@ using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Infrastructure.PropertyEditors;
 using Umbraco.Cms.Infrastructure.PropertyEditors.Validators;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
@@ -17,7 +19,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// <summary>
 /// Abstract base class for block list based editors.
 /// </summary>
-public abstract class BlockListPropertyEditorBase : DataEditor
+public abstract class BlockListPropertyEditorBase : DataEditor, IValueSchemaProvider
 {
     private readonly IBlockValuePropertyIndexValueFactory _blockValuePropertyIndexValueFactory;
     private readonly IJsonSerializer _jsonSerializer;
@@ -35,6 +37,64 @@ public abstract class BlockListPropertyEditorBase : DataEditor
 
     /// <inheritdoc/>
     public override IPropertyIndexValueFactory PropertyIndexValueFactory => _blockValuePropertyIndexValueFactory;
+
+    /// <inheritdoc />
+    public virtual Type? GetValueType(object? configuration) => typeof(string); // JSON string representation
+
+    /// <inheritdoc />
+    public virtual JsonObject? GetValueSchema(object? configuration)
+    {
+        var config = configuration as BlockListConfiguration;
+
+        // Build layout item schema
+        JsonObject layoutItemSchema = BlockJsonSchemaHelper.CreateBaseLayoutItemSchema();
+
+        // Build content and settings data schemas with constraints
+        JsonObject contentDataItemSchema = BlockJsonSchemaHelper.CreateContentDataSchema(config?.Blocks);
+        JsonObject settingsDataItemSchema = BlockJsonSchemaHelper.CreateSettingsDataSchema(config?.Blocks);
+
+        // Build expose schema (BlockList-specific)
+        JsonObject exposeItemSchema = BlockJsonSchemaHelper.CreateExposeItemSchema();
+
+        // Build the main schema
+        JsonObject schema = BlockJsonSchemaHelper.CreateRootSchema();
+        schema["properties"] = new JsonObject
+        {
+            ["layout"] = new JsonObject
+            {
+                ["type"] = "object",
+                ["properties"] = new JsonObject
+                {
+                    [Constants.PropertyEditors.Aliases.BlockList] = new JsonObject
+                    {
+                        ["type"] = "array",
+                        ["items"] = layoutItemSchema,
+                    },
+                },
+            },
+            ["contentData"] = new JsonObject
+            {
+                ["type"] = "array",
+                ["items"] = contentDataItemSchema,
+            },
+            ["settingsData"] = new JsonObject
+            {
+                ["type"] = "array",
+                ["items"] = settingsDataItemSchema,
+            },
+            ["expose"] = new JsonObject
+            {
+                ["type"] = "array",
+                ["items"] = exposeItemSchema,
+            },
+        };
+
+        // Add validation constraints
+        var layoutArray = schema["properties"]!["layout"]!["properties"]![Constants.PropertyEditors.Aliases.BlockList]!.AsObject();
+        BlockJsonSchemaHelper.ApplyValidationConstraints(layoutArray, config?.ValidationLimit.Min, config?.ValidationLimit.Max);
+
+        return schema;
+    }
 
     /// <summary>
     /// Instantiates a new <see cref="BlockEditorDataConverter{BlockListValue, BlockListLayoutItem}"/> for use with the block list editor property value editor.
