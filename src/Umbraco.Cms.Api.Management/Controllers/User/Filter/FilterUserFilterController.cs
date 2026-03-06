@@ -47,6 +47,8 @@ public class FilterUserFilterController : UserFilterControllerBase
     [ProducesResponseType(typeof(PagedViewModel<UserResponseModel>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Gets a filtered collection of users.")]
+    [EndpointDescription("Filters users based on the provided criteria with support for pagination.")]
     public async Task<IActionResult> Filter(
         CancellationToken cancellationToken,
         int skip = 0,

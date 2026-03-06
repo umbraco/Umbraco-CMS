@@ -17,6 +17,7 @@ import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import type { UmbRepositoryItemsStatus } from '@umbraco-cms/backoffice/repository';
 import type { UmbItemModel } from '@umbraco-cms/backoffice/entity-item';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import type { UmbPickerDataSource } from '@umbraco-cms/backoffice/picker-data-source';
 
 @customElement('umb-input-entity-data')
 export class UmbInputEntityDataElement extends UmbFormControlMixin<string | undefined, typeof UmbLitElement>(
@@ -38,11 +39,11 @@ export class UmbInputEntityDataElement extends UmbFormControlMixin<string | unde
 		},
 	});
 
-	public set dataSourceAlias(value: string | undefined) {
-		this.#pickerInputContext.setDataSourceAlias(value);
+	public set dataSourceApi(api: UmbPickerDataSource | undefined) {
+		this.#pickerInputContext.setDataSourceApi(api);
 	}
-	public get dataSourceAlias(): string | undefined {
-		return this.#pickerInputContext.getDataSourceAlias();
+	public get dataSourceApi(): UmbPickerDataSource | undefined {
+		return this.#pickerInputContext.getDataSourceApi();
 	}
 
 	public set dataSourceConfig(config: UmbConfigCollectionModel | undefined) {

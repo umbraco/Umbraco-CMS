@@ -31,6 +31,8 @@ public class DeleteCreatedPackageController : CreatedPackageControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [EndpointSummary("Deletes a package.")]
+    [EndpointDescription("Deletes a package identified by the provided Id.")]
     public async Task<IActionResult> Delete(CancellationToken cancellationToken, Guid id)
     {
         Attempt<PackageDefinition?, PackageOperationStatus> result =

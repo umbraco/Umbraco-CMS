@@ -963,6 +963,7 @@ export default {
 		changePassword: 'パスワードの変更',
 		newPassword: '新パスワード',
 		confirmNewPassword: '新パスワードの確認',
+		confirmPassword: 'パスワードの確認',
 		changePasswordDescription:
 			'Umbracoの管理画面にアクセスするためのパスワードを変更するには、以下のフォームに新しいパスワード入力して「パスワードの変更」ボタンをクリックしてください。',
 		contentChannel: 'コンテントチャンネル',

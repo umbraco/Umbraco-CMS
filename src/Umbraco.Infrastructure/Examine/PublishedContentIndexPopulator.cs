@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Infrastructure.Examine;
 /// </remarks>
 public class PublishedContentIndexPopulator : ContentIndexPopulator
 {
-    [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in V19.")]
+    [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in Umbraco 19.")]
     public PublishedContentIndexPopulator(
         ILogger<PublishedContentIndexPopulator> logger,
         IContentService contentService,

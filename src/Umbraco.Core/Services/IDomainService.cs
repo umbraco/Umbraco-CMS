@@ -26,7 +26,7 @@ public interface IDomainService : IService
     /// </summary>
     /// <param name="domain">The domain to delete.</param>
     /// <returns>An attempt containing the operation result.</returns>
-    [Obsolete($"Please use {nameof(UpdateDomainsAsync)}. Will be removed in V15")]
+    [Obsolete($"Please use {nameof(UpdateDomainsAsync)}. Scheduled for removal in Umbraco 18.")]
     Attempt<OperationResult?> Delete(IDomain domain);
 
     /// <summary>
@@ -48,7 +48,7 @@ public interface IDomainService : IService
     /// </summary>
     /// <param name="includeWildcards">Whether to include wildcard domains.</param>
     /// <returns>A collection of domains.</returns>
-    [Obsolete($"Please use {nameof(GetAllAsync)}. Will be removed in V15")]
+    [Obsolete($"Please use {nameof(GetAllAsync)}. Scheduled for removal in Umbraco 18.")]
     IEnumerable<IDomain> GetAll(bool includeWildcards);
 
     /// <summary>
@@ -57,7 +57,7 @@ public interface IDomainService : IService
     /// <param name="contentId">The content item identifier.</param>
     /// <param name="includeWildcards">Whether to include wildcard domains.</param>
     /// <returns>A collection of domains assigned to the content item.</returns>
-    [Obsolete($"Please use {nameof(GetAssignedDomainsAsync)}. Will be removed in V15")]
+    [Obsolete($"Please use {nameof(GetAssignedDomainsAsync)}. Scheduled for removal in Umbraco 18.")]
     IEnumerable<IDomain> GetAssignedDomains(int contentId, bool includeWildcards);
 
     /// <summary>
@@ -65,7 +65,7 @@ public interface IDomainService : IService
     /// </summary>
     /// <param name="domainEntity">The domain to save.</param>
     /// <returns>An attempt containing the operation result.</returns>
-    [Obsolete($"Please use {nameof(UpdateDomainsAsync)}. Will be removed in V15")]
+    [Obsolete($"Please use {nameof(UpdateDomainsAsync)}. Scheduled for removal in Umbraco 18.")]
     Attempt<OperationResult?> Save(IDomain domainEntity);
 
     /// <summary>
@@ -73,7 +73,7 @@ public interface IDomainService : IService
     /// </summary>
     /// <param name="items">The domains to sort.</param>
     /// <returns>An attempt containing the operation result.</returns>
-    [Obsolete($"Please use {nameof(UpdateDomainsAsync)}. Will be removed in V15")]
+    [Obsolete($"Please use {nameof(UpdateDomainsAsync)}. Scheduled for removal in Umbraco 18.")]
     Attempt<OperationResult?> Sort(IEnumerable<IDomain> items)
         => Attempt.Fail(new OperationResult(OperationResultType.Failed, new EventMessages())); // TODO Remove default implmentation in a future version
 
