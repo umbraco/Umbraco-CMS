@@ -6,6 +6,7 @@
     <!-- Disable compression for static files, because MapStaticAssets() is not used anyway (yet) -->
     <CompressionEnabled>false</CompressionEnabled>
     <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
+    <DefineConstants>$(DefineConstants);UseDocumentedCsp</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup>
