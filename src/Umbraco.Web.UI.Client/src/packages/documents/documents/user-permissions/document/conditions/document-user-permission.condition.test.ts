@@ -10,6 +10,7 @@ import {
 	UMB_DOCUMENT_USER_PERMISSION_CONDITION_ALIAS,
 	UMB_USER_PERMISSION_DOCUMENT_READ,
 } from '@umbraco-cms/backoffice/document';
+import { useMockSet } from '@umbraco-cms/internal/mock-manager';
 
 @customElement('test-controller-host')
 class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {
@@ -40,6 +41,10 @@ class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLEle
 describe('UmbDocumentUserPermissionCondition', () => {
 	let hostElement: UmbTestControllerHostElement;
 	let condition: UmbDocumentUserPermissionCondition;
+
+	before(async () => {
+		await useMockSet('user-permissions');
+	});
 
 	beforeEach(async () => {
 		hostElement = new UmbTestControllerHostElement();
