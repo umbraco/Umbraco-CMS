@@ -155,9 +155,12 @@ public partial class ElementEditingServiceTests
 
         var updatedElement = result.Result.Content;
         Assert.IsNotNull(updatedElement);
-        Assert.AreEqual("Updated Name", updatedElement.Name);
-        Assert.AreEqual("The updated title", updatedElement.GetValue<string>("title"));
-        Assert.AreEqual("The updated text", updatedElement.GetValue<string>("text"));
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual("Updated Name", updatedElement.Name);
+            Assert.AreEqual("The updated title", updatedElement.GetValue<string>("title"));
+            Assert.AreEqual("The updated text", updatedElement.GetValue<string>("text"));
+        });
     }
 
     [Test]
