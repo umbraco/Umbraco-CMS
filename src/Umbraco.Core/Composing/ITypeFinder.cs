@@ -10,9 +10,14 @@ public interface ITypeFinder
     /// <summary>
     ///     Return a list of found local Assemblies that Umbraco should scan for type finding
     /// </summary>
-    /// <value></value>
+    /// <value>The assemblies to scan.</value>
     IEnumerable<Assembly> AssembliesToScan { get; }
 
+    /// <summary>
+    /// Gets a type by its full name.
+    /// </summary>
+    /// <param name="name">The full name of the type to find.</param>
+    /// <returns>The type if found; otherwise, <c>null</c>.</returns>
     Type? GetTypeByName(string name);
 
     /// <summary>

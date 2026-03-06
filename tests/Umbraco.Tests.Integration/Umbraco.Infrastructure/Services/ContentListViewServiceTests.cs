@@ -1,5 +1,6 @@
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Membership;
@@ -13,7 +14,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
 internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsBase
 {
-    private static readonly Guid CustomListViewKey = new("AD8E2AAF-6801-408A-8CCF-EFAC0312729B");
+    private static readonly Guid _customListViewKey = new("AD8E2AAF-6801-408A-8CCF-EFAC0312729B");
 
     private IContentListViewService ContentListViewService => GetRequiredService<IContentListViewService>();
 
@@ -28,8 +29,7 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
     private IUser SuperUser { get; set; }
 
     [SetUp]
-    public async Task Setup()
-        => SuperUser = await GetSuperUser();
+    public async Task SetupSuperUser() => SuperUser = await GetSuperUser();
 
     [Test]
     public async Task Cannot_Get_List_View_Items_Of_Non_Existing_Content()
@@ -61,7 +61,7 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
         // Arrange
         var contentType = ContentTypeBuilder.CreateSimpleContentType();
         contentType.AllowedAsRoot = true;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var createModel = new ContentCreateModel
         {
@@ -294,7 +294,7 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
         var result = await ContentListViewService.GetListViewItemsByKeyAsync(
             SuperUser,
             root.Key,
-            CustomListViewKey,
+            _customListViewKey,
             "updateDate",
             null,
             Direction.Ascending,
@@ -332,7 +332,7 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
         var result = await ContentListViewService.GetListViewItemsByKeyAsync(
             SuperUser,
             root.Key,
-            CustomListViewKey,
+            _customListViewKey,
             "updateDate",
             null,
             Direction.Ascending,
@@ -347,7 +347,7 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
             Assert.AreEqual(ContentCollectionOperationStatus.Success, result.Status);
             Assert.IsNotNull(result.Result);
 
-            await AssertListViewConfiguration(result.Result.ListViewConfiguration, CustomListViewKey);
+            await AssertListViewConfiguration(result.Result.ListViewConfiguration, _customListViewKey);
         });
 
     }
@@ -561,7 +561,7 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
         var result = await ContentListViewService.GetListViewItemsByKeyAsync(
             SuperUser,
             root.Key,
-            CustomListViewKey,
+            _customListViewKey,
             orderByField,
             null,
             orderAscending ? Direction.Ascending : Direction.Descending,
@@ -607,7 +607,7 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
         var result = await ContentListViewService.GetListViewItemsByKeyAsync(
             SuperUser,
             root.Key,
-            CustomListViewKey,
+            _customListViewKey,
             orderByField,
             null,
             Direction.Ascending,
@@ -713,7 +713,7 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
         // Arrange
         var contentType = ContentTypeBuilder.CreateSimpleContentType();
         contentType.AllowedAsRoot = true;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var createModel = new ContentCreateModel
         {
@@ -768,6 +768,73 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
         Assert.AreEqual(0, result.Result.Items.Items.Count());
     }
 
+    [Test]
+    public async Task Can_Only_Get_List_View_Items_That_The_User_Has_Browse_Permission_For()
+    {
+        // Arrange
+        var root = await CreateRootContentWithFiveChildrenAsListViewItems();
+        var children = ContentService.GetPagedChildren(root.Id, 0, 10, out _, null, null, null, true).ToArray();
+        Assert.AreEqual(5, children.Length);
+
+        // Create user group with Browse as default permission, start node = collection root
+        var userGroup = new UserGroupBuilder()
+            .WithAlias("test")
+            .WithName("Test")
+            .WithPermissions(new HashSet<string> { ActionBrowse.ActionLetter })
+            .WithAllowedSections(new[] { "content" })
+            .WithStartContentId(root.Id)
+            .Build();
+        var userGroupCreateResult = await UserGroupService.CreateAsync(userGroup, Constants.Security.SuperUserKey);
+
+        var userCreateModel = new UserCreateModel
+        {
+            UserName = "testUser@mail.com",
+            Email = "testUser@mail.com",
+            Name = "Test user",
+            UserGroupKeys = new HashSet<Guid> { userGroupCreateResult.Result.Key },
+        };
+
+        var userCreateResult = await UserService.CreateAsync(Constants.Security.SuperUserKey, userCreateModel, true);
+
+        // Set explicit permissions on 2 children that do NOT include Browse.
+        // When explicit permissions exist for a group+node, they replace the group's defaults,
+        // so these children will only have Delete permission (no Browse).
+        ContentService.SetPermission(children[3], ActionDelete.ActionLetter, new[] { userGroupCreateResult.Result.Id });
+        ContentService.SetPermission(children[4], ActionDelete.ActionLetter, new[] { userGroupCreateResult.Result.Id });
+
+        // Act
+        var result = await ContentListViewService.GetListViewItemsByKeyAsync(
+            userCreateResult.Result.CreatedUser,
+            root.Key,
+            null,
+            "updateDate",
+            null,
+            Direction.Ascending,
+            null,
+            0,
+            10);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(ContentCollectionOperationStatus.Success, result.Status);
+            Assert.IsNotNull(result.Result);
+        });
+
+        var returnedKeys = result.Result.Items.Items.Select(x => x.Key).ToHashSet();
+
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(3, result.Result.Items.Items.Count());
+            Assert.IsTrue(returnedKeys.Contains(children[0].Key), "Child 1 (with default browse) should be returned");
+            Assert.IsTrue(returnedKeys.Contains(children[1].Key), "Child 2 (with default browse) should be returned");
+            Assert.IsTrue(returnedKeys.Contains(children[2].Key), "Child 3 (with default browse) should be returned");
+            Assert.IsFalse(returnedKeys.Contains(children[3].Key), "Child 4 (browse denied) should be filtered out");
+            Assert.IsFalse(returnedKeys.Contains(children[4].Key), "Child 5 (browse denied) should be filtered out");
+        });
+    }
+
     private async Task<IDataType> CreateCustomListViewDataType(IDictionary<string, object> listViewConfiguration)
     {
         // Overwrite default IncludeProperties added by ListViewConfiguration
@@ -775,7 +842,7 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
 
         var dataType = new DataTypeBuilder()
             .WithId(0)
-            .WithKey(CustomListViewKey)
+            .WithKey(_customListViewKey)
             .WithName("Custom list view")
             .WithDatabaseType(ValueStorageType.Nvarchar)
             .AddEditor()
@@ -832,7 +899,7 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
             .Done()
             .Build();
 
-        ContentTypeService.Save(childContentType);
+        await ContentTypeService.CreateAsync(childContentType, Constants.Security.SuperUserKey);
 
         var contentTypeWithListViewPropertyType = new ContentTypeBuilder()
             .WithAlias("products")
@@ -851,7 +918,7 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
         {
             new ContentTypeSort(childContentType.Key, 1, childContentType.Alias),
         };
-        ContentTypeService.Save(contentTypeWithListViewPropertyType);
+        await ContentTypeService.CreateAsync(contentTypeWithListViewPropertyType, Constants.Security.SuperUserKey);
 
         var rootContentCreateModel = new ContentCreateModel
         {
@@ -890,7 +957,7 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
             .WithAlias("product")
             .WithName("Product")
             .Build();
-        ContentTypeService.Save(childContentType);
+        await ContentTypeService.CreateAsync(childContentType, Constants.Security.SuperUserKey);
 
         var contentTypeWithListView = new ContentTypeBuilder()
             .WithAlias("products")
@@ -904,7 +971,7 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
         {
             new ContentTypeSort(childContentType.Key, 1, childContentType.Alias),
         };
-        ContentTypeService.Save(contentTypeWithListView);
+        await ContentTypeService.CreateAsync(contentTypeWithListView, Constants.Security.SuperUserKey);
 
         var rootContentCreateModel = new ContentCreateModel
         {
@@ -944,7 +1011,7 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
             .WithName("Product")
             .WithContentVariation(ContentVariation.Culture)
             .Build();
-        ContentTypeService.Save(childContentType);
+        await ContentTypeService.CreateAsync(childContentType, Constants.Security.SuperUserKey);
 
         var contentTypeWithListView = new ContentTypeBuilder()
             .WithAlias("products")
@@ -958,7 +1025,7 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
         {
             new ContentTypeSort(childContentType.Key, 1, childContentType.Alias),
         };
-        ContentTypeService.Save(contentTypeWithListView);
+        await ContentTypeService.CreateAsync(contentTypeWithListView, Constants.Security.SuperUserKey);
 
         var rootContentCreateModel = new ContentCreateModel
         {

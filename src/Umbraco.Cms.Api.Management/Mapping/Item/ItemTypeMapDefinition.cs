@@ -1,6 +1,7 @@
 using Umbraco.Cms.Api.Management.ViewModels.DataType.Item;
 using Umbraco.Cms.Api.Management.ViewModels.Dictionary.Item;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentType.Item;
+using Umbraco.Cms.Api.Management.ViewModels.Item;
 using Umbraco.Cms.Api.Management.ViewModels.Language.Item;
 using Umbraco.Cms.Api.Management.ViewModels.MediaType.Item;
 using Umbraco.Cms.Api.Management.ViewModels.MemberGroup.Item;
@@ -33,6 +34,7 @@ public class ItemTypeMapDefinition : IMapDefinition
         mapper.Define<IRelationType, RelationTypeItemResponseModel>((_, _) => new RelationTypeItemResponseModel(), Map);
         mapper.Define<IUserGroup, UserGroupItemResponseModel>((_, _) => new UserGroupItemResponseModel(), Map);
         mapper.Define<IWebhook, WebhookItemResponseModel>((_, _) => new WebhookItemResponseModel(), Map);
+        mapper.Define<IEntitySlim, NamedItemResponseModel>((_, _) => new NamedItemResponseModel(), Map);
     }
 
     // Umbraco.Code.MapAll
@@ -126,5 +128,11 @@ public class ItemTypeMapDefinition : IMapDefinition
         target.Enabled = source.Enabled;
         target.Events = string.Join(",", source.Events);
         target.Types = string.Join(",", source.ContentTypeKeys);
+    }
+
+    private static void Map(IEntitySlim source, NamedItemResponseModel target, MapperContext context)
+    {
+        target.Id = source.Key;
+        target.Name = source.Name ?? string.Empty;
     }
 }

@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -32,10 +33,15 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
 
     private ContentTypeService ContentTypeService => (ContentTypeService)GetRequiredService<IContentTypeService>();
 
+    private IMediaTypeService MediaTypeService => GetRequiredService<IMediaTypeService>();
+
+    private IMemberTypeService MemberTypeService => GetRequiredService<IMemberTypeService>();
+
     protected override void CustomTestSetup(IUmbracoBuilder builder)
     {
         builder.AddNotificationHandler<ContentMovedToRecycleBinNotification, ContentNotificationHandler>();
         builder.AddNotificationHandler<ContentTypeDeletedNotification, ContentTypeNotificationHandler>();
+        builder.AddNotificationHandler<ContentTypeDeletingNotification, ContentTypeDeletingNotificationHandler>();
     }
 
     [Test]
@@ -594,6 +600,34 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
         ContentTypeService.Delete(contentType);
 
         Assert.AreEqual(2, deletedEntities);
+    }
+
+    [Test]
+    public async Task DeleteAsync_Returns_CancelledByNotification_When_Notification_Handler_Cancels()
+    {
+        var template = TemplateBuilder.CreateTextPageTemplate();
+        FileService.SaveTemplate(template);
+
+        var contentType = ContentTypeBuilder.CreateSimpleContentType("page", "Page", defaultTemplateId: template.Id);
+        ContentTypeService.Save(contentType);
+
+        try
+        {
+            // Enable cancellation on the deleting notification handler
+            ContentTypeDeletingNotificationHandler.CancelOperation = true;
+
+            var result = await ContentTypeService.DeleteAsync(contentType.Key, Constants.Security.SuperUserKey);
+
+            Assert.AreEqual(ContentTypeOperationStatus.CancelledByNotification, result);
+
+            // Verify the content type was NOT deleted
+            var stillExists = ContentTypeService.Get(contentType.Id);
+            Assert.IsNotNull(stillExists);
+        }
+        finally
+        {
+            ContentTypeDeletingNotificationHandler.CancelOperation = false;
+        }
     }
 
     [Test]
@@ -2404,6 +2438,31 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
+    public async Task GetAllContentTypeIds_Returns_Ids_Across_Content_Media_And_Member_Types()
+    {
+        // Arrange - Create a content type
+        var contentType = ContentTypeBuilder.CreateBasicContentType("myContentType", "My Content Type");
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+
+        // Create a media type
+        var mediaType = MediaTypeBuilder.CreateSimpleMediaType("myMediaType", "My Media Type");
+        await MediaTypeService.CreateAsync(mediaType, Constants.Security.SuperUserKey);
+
+        // Create a member type
+        var memberType = MemberTypeBuilder.CreateSimpleMemberType("myMemberType", "My Member Type");
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
+
+        // Act - Query for all three aliases
+        var result = ContentTypeService.GetAllContentTypeIds(["myContentType", "myMediaType", "myMemberType"]).ToArray();
+
+        // Assert - Should return IDs from all three type categories
+        Assert.That(result.Length, Is.EqualTo(3));
+        Assert.That(result, Contains.Item(contentType.Id));
+        Assert.That(result, Contains.Item(mediaType.Id));
+        Assert.That(result, Contains.Item(memberType.Id));
+    }
+
+    [Test]
     public async Task GetAllowedParentKeysAsync_ReturnsEmptyCollection_WhenNoParentsAllowChildType()
     {
         // Arrange
@@ -2626,5 +2685,18 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
     {
         public static Action<ContentTypeDeletedNotification> Deleted { get; set; }
         public void Handle(ContentTypeDeletedNotification notification) => Deleted?.Invoke(notification);
+    }
+
+    internal sealed class ContentTypeDeletingNotificationHandler : INotificationHandler<ContentTypeDeletingNotification>
+    {
+        public static bool CancelOperation { get; set; }
+
+        public void Handle(ContentTypeDeletingNotification notification)
+        {
+            if (CancelOperation)
+            {
+                notification.CancelOperation(new EventMessage("Test", "Cancelled by test", EventMessageType.Error));
+            }
+        }
     }
 }

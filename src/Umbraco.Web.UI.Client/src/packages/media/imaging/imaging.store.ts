@@ -68,12 +68,12 @@ export class UmbImagingStore extends UmbContextBase implements UmbApi {
 	}
 
 	/**
-	 * Generates a unique key for the crop based on the width, height and mode.
+	 * Generates a unique key for the crop based on the width, height, mode and format.
 	 * @param {UmbImagingResizeModel} data - The resize configuration
 	 * @returns {string} - The crop key
 	 */
 	#generateCropKey(data?: UmbImagingResizeModel): string {
-		return data ? `${data.width}x${data.height};${data.mode}` : 'generic';
+		return data ? `${data.width}x${data.height};${data.mode};${data.format}` : 'generic';
 	}
 }
 

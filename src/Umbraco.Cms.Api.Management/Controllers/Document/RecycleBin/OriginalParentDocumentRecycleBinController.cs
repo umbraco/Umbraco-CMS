@@ -41,6 +41,8 @@ public class OriginalParentDocumentRecycleBinController : DocumentRecycleBinCont
     [ProducesResponseType(typeof(ReferenceByIdModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [EndpointSummary("Gets the original parent of a document in the recycle bin.")]
+    [EndpointDescription("Gets the original parent location of a document before it was moved to the recycle bin.")]
     public async Task<IActionResult> OriginalParent(CancellationToken cancellationToken, Guid id)
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(

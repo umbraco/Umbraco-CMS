@@ -21,6 +21,16 @@ public class AliasUrlProvider : IUrlProvider
     private readonly UriUtility _uriUtility;
     private RequestHandlerSettings _requestConfig;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="AliasUrlProvider" /> class.
+    /// </summary>
+    /// <param name="requestConfig">The request handler settings.</param>
+    /// <param name="siteDomainMapper">The site domain mapper.</param>
+    /// <param name="uriUtility">The URI utility.</param>
+    /// <param name="publishedValueFallback">The published value fallback.</param>
+    /// <param name="umbracoContextAccessor">The Umbraco context accessor.</param>
+    /// <param name="navigationQueryService">The navigation query service.</param>
+    /// <param name="publishedContentStatusFilteringService">The published content status filtering service.</param>
     public AliasUrlProvider(
         IOptionsMonitor<RequestHandlerSettings> requestConfig,
         ISiteDomainMapper siteDomainMapper,

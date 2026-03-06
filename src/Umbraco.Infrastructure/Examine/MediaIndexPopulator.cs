@@ -21,7 +21,7 @@ public class MediaIndexPopulator : IndexPopulator<IUmbracoContentIndex>
 
     private IndexingSettings _indexingSettings;
 
-    [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in V19.")]
+    [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in Umbraco 19.")]
     public MediaIndexPopulator(ILogger<MediaIndexPopulator> logger, IMediaService mediaService, IValueSetBuilder<IMedia> mediaValueSetBuilder)
         : this(logger, null, mediaService, mediaValueSetBuilder, StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<IndexingSettings>>())
     {
@@ -35,7 +35,7 @@ public class MediaIndexPopulator : IndexPopulator<IUmbracoContentIndex>
     {
     }
 
-    [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in V19.")]
+    [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in Umbraco 19.")]
     public MediaIndexPopulator(ILogger<MediaIndexPopulator> logger, int? parentId, IMediaService mediaService, IValueSetBuilder<IMedia> mediaValueSetBuilder)
         : this(logger, parentId, mediaService, mediaValueSetBuilder, StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<IndexingSettings>>())
     {

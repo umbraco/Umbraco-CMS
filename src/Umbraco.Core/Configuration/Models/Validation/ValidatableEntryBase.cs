@@ -10,6 +10,10 @@ namespace Umbraco.Cms.Core.Configuration.Models.Validation;
 /// </summary>
 public abstract class ValidatableEntryBase
 {
+    /// <summary>
+    ///     Validates the configuration entry using data annotations.
+    /// </summary>
+    /// <returns><c>true</c> if the entry is valid; otherwise, <c>false</c>.</returns>
     internal virtual bool IsValid()
     {
         var ctx = new ValidationContext(this);

@@ -13,6 +13,12 @@ internal sealed class MediaPermissionService : IMediaPermissionService
     private readonly IEntityService _entityService;
     private readonly AppCaches _appCaches;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="MediaPermissionService" /> class.
+    /// </summary>
+    /// <param name="mediaService">The media service.</param>
+    /// <param name="entityService">The entity service.</param>
+    /// <param name="appCaches">The application caches.</param>
     public MediaPermissionService(
         IEntityService entityService,
         AppCaches appCaches)

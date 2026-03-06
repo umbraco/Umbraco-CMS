@@ -30,6 +30,8 @@ public class ByKeyCreatedPackageController : CreatedPackageControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(PackageDefinitionResponseModel), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a package.")]
+    [EndpointDescription("Gets a package identified by the provided Id.")]
     public async Task<IActionResult> ByKey(CancellationToken cancellationToken, Guid id)
     {
         PackageDefinition? package = await _packagingService.GetCreatedPackageByKeyAsync(id);

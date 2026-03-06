@@ -45,6 +45,7 @@ internal abstract class PublishedUrlInfoProviderTestsBase : UmbracoIntegrationTe
 
         mock.Setup(x => x.Content).Returns(serviceProvider.GetRequiredService<IPublishedContentCache>());
         mock.Setup(x => x.CleanedUmbracoUrl).Returns(new Uri("https://localhost:44339"));
+        mock.Setup(x => x.Domains).Returns(serviceProvider.GetRequiredService<IDomainCache>());
 
         return mock.Object;
     }

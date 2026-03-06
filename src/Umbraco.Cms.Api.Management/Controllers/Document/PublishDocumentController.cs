@@ -42,6 +42,8 @@ public class PublishDocumentController : DocumentControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Publishes a document.")]
+    [EndpointDescription("Publishes a document identified by the provided Id.")]
     public async Task<IActionResult> Publish(CancellationToken cancellationToken, Guid id, PublishDocumentRequestModel requestModel)
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
