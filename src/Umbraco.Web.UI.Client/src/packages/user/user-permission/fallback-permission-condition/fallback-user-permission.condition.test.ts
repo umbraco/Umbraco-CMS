@@ -4,8 +4,8 @@ import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controlle
 import { UmbCurrentUserContext, UmbCurrentUserStore } from '@umbraco-cms/backoffice/current-user';
 import { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
 import { UmbFallbackUserPermissionCondition } from './fallback-user-permission.condition';
-import { UMB_USER_PERMISSION_DOCUMENT_READ } from '@umbraco-cms/backoffice/document';
 import { UMB_FALLBACK_USER_PERMISSION_CONDITION_ALIAS } from './constants';
+import { useMockSet } from '@umbraco-cms/internal/mock-manager';
 
 @customElement('test-controller-host')
 class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {
@@ -26,6 +26,10 @@ describe('UmbFallbackUserPermissionCondition', () => {
 	let hostElement: UmbTestControllerHostElement;
 	let condition: UmbFallbackUserPermissionCondition;
 
+	before(async () => {
+		await useMockSet('user-permissions');
+	});
+
 	beforeEach(async () => {
 		hostElement = new UmbTestControllerHostElement();
 		document.body.appendChild(hostElement);
@@ -45,7 +49,7 @@ describe('UmbFallbackUserPermissionCondition', () => {
 				host: hostElement,
 				config: {
 					alias: UMB_FALLBACK_USER_PERMISSION_CONDITION_ALIAS,
-					allOf: [UMB_USER_PERMISSION_DOCUMENT_READ],
+					allOf: ['my-permission'],
 				},
 				onChange: () => {
 					callbackCount++;
@@ -66,7 +70,7 @@ describe('UmbFallbackUserPermissionCondition', () => {
 				host: hostElement,
 				config: {
 					alias: UMB_FALLBACK_USER_PERMISSION_CONDITION_ALIAS,
-					allOf: [UMB_USER_PERMISSION_DOCUMENT_READ, 'non-existing-permission'],
+					allOf: ['my-permission', 'non-existing-permission'],
 				},
 				onChange: () => {
 					callbackCount++;
@@ -94,7 +98,7 @@ describe('UmbFallbackUserPermissionCondition', () => {
 				host: hostElement,
 				config: {
 					alias: UMB_FALLBACK_USER_PERMISSION_CONDITION_ALIAS,
-					oneOf: [UMB_USER_PERMISSION_DOCUMENT_READ, 'non-existing-permission'],
+					oneOf: ['my-permission', 'non-existing-permission'],
 				},
 				onChange: () => {
 					/* The onChange callback is not called when the condition is false, so this should never be called
