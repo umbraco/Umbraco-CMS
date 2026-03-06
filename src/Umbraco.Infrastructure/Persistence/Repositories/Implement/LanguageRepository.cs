@@ -209,6 +209,21 @@ internal sealed class LanguageRepository : AsyncEntityRepositoryBase<int, ILangu
                 .OrderBy(x => x.Id)
                 .ToListAsync();
 
+            // Rebuild the code/id maps so lookups by ISO code or ID work
+            lock (_codeIdMap)
+            {
+                _codeIdMap.Clear();
+                _idCodeMap.Clear();
+                foreach (LanguageDto dto in dtos)
+                {
+                    if (dto.IsoCode != null)
+                    {
+                        _codeIdMap[dto.IsoCode] = dto.Id;
+                        _idCodeMap[dto.Id] = dto.IsoCode;
+                    }
+                }
+            }
+
             return dtos
                 .Select(ConvertFromDto)
                 .WhereNotNull()
@@ -377,7 +392,7 @@ internal sealed class LanguageRepository : AsyncEntityRepositoryBase<int, ILangu
             await db.Language
                 .Where(x => x.FallbackLanguageId == entity.Id)
                 .ExecuteUpdateAsync(setter => setter
-                    .SetProperty(x => x.FallbackLanguageId, (int?)null));
+                    .SetProperty(x => x.FallbackLanguageId, (short?)null));
 
             // delete
             await base.PersistDeletedItemAsync(entity);
@@ -403,13 +418,13 @@ internal sealed class LanguageRepository : AsyncEntityRepositoryBase<int, ILangu
         }
     }
 
-    private int? GetFallbackLanguageId(ILanguage entity)
+    private short? GetFallbackLanguageId(ILanguage entity)
     {
-        int? fallbackLanguageId = null;
+        short? fallbackLanguageId = null;
         if (entity.FallbackIsoCode.IsNullOrWhiteSpace() == false &&
             _codeIdMap.TryGetValue(entity.FallbackIsoCode, out var languageId))
         {
-            fallbackLanguageId = languageId;
+            fallbackLanguageId = (short)languageId;
         }
 
         return fallbackLanguageId;
