@@ -328,7 +328,7 @@ test('can add a media start node to a user group', async ({umbracoApi, umbracoUi
   await umbracoApi.userGroup.createEmptyUserGroup(userGroupName);
   const mediaName = 'TestMedia';
   await umbracoApi.media.ensureNameNotExists(mediaName);
-  const mediaId = await umbracoApi.media.createDefaultMediaFile(mediaName);
+  const mediaId = await umbracoApi.media.createDefaultMediaFolder(mediaName);
   await umbracoUi.userGroup.clickUserGroupsButton();
   await umbracoUi.userGroup.clickUserGroupWithName(userGroupName);
 

@@ -1,6 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System.Threading.Tasks;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Events;
@@ -36,6 +37,7 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
     {
         builder.AddNotificationHandler<ContentMovedToRecycleBinNotification, ContentNotificationHandler>();
         builder.AddNotificationHandler<ContentTypeDeletedNotification, ContentTypeNotificationHandler>();
+        builder.AddNotificationHandler<ContentTypeDeletingNotification, ContentTypeDeletingNotificationHandler>();
     }
 
     [Test]
@@ -594,6 +596,34 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
         ContentTypeService.Delete(contentType);
 
         Assert.AreEqual(2, deletedEntities);
+    }
+
+    [Test]
+    public async Task DeleteAsync_Returns_CancelledByNotification_When_Notification_Handler_Cancels()
+    {
+        var template = TemplateBuilder.CreateTextPageTemplate();
+        FileService.SaveTemplate(template);
+
+        var contentType = ContentTypeBuilder.CreateSimpleContentType("page", "Page", defaultTemplateId: template.Id);
+        ContentTypeService.Save(contentType);
+
+        try
+        {
+            // Enable cancellation on the deleting notification handler
+            ContentTypeDeletingNotificationHandler.CancelOperation = true;
+
+            var result = await ContentTypeService.DeleteAsync(contentType.Key, Constants.Security.SuperUserKey);
+
+            Assert.AreEqual(ContentTypeOperationStatus.CancelledByNotification, result);
+
+            // Verify the content type was NOT deleted
+            var stillExists = ContentTypeService.Get(contentType.Id);
+            Assert.IsNotNull(stillExists);
+        }
+        finally
+        {
+            ContentTypeDeletingNotificationHandler.CancelOperation = false;
+        }
     }
 
     [Test]
@@ -2651,5 +2681,18 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
     {
         public static Action<ContentTypeDeletedNotification> Deleted { get; set; }
         public void Handle(ContentTypeDeletedNotification notification) => Deleted?.Invoke(notification);
+    }
+
+    internal sealed class ContentTypeDeletingNotificationHandler : INotificationHandler<ContentTypeDeletingNotification>
+    {
+        public static bool CancelOperation { get; set; }
+
+        public void Handle(ContentTypeDeletingNotification notification)
+        {
+            if (CancelOperation)
+            {
+                notification.CancelOperation(new EventMessage("Test", "Cancelled by test", EventMessageType.Error));
+            }
+        }
     }
 }

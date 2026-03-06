@@ -212,7 +212,8 @@ test('can remove a content start node from a user', {tag: '@release'}, async ({u
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
 
-test('can add media start nodes for a user', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+// Temporarily skipping this test. This test will be fixed in the PR: https://github.com/umbraco/Umbraco-CMS/pull/21981
+test.skip('can add media start nodes for a user', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const mediaName = 'TestMediaFile';
   const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);

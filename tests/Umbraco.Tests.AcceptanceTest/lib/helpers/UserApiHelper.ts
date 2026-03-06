@@ -303,4 +303,41 @@ export class UserApiHelper {
     const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/filter/user?skip=0&take=100&userGroupIds=' + userGroupIds);
     return await response.json();
   }
+  
+  async doesUserContainElementStartNodeIds(userName: string, elementStartNodeIds: string[]) {
+    const user = await this.getByName(userName);
+    if (!user.elementStartNodeIds || user.elementStartNodeIds.length === 0) {
+      return false;
+    }
+    const elementStartNodeIdsArray = user.elementStartNodeIds.map(elementStartNode => elementStartNode.id);
+    return elementStartNodeIdsArray.every(id => elementStartNodeIds.includes(id));
+  }
+
+  async setUserPermissionsForElement(userName: string, userEmail: string, userPassword: string, userGroupId: string, elementStartNodeIds: string[] = [], hasElementRootAccess = false, uiCulture: string = 'en-us') {
+    let user = await this.getByName(userName);
+
+    // If the user does not exist, create a default user and retrieve the newly created user
+    if (!user) {
+      await this.createDefaultUser(userName, userEmail, [userGroupId]);
+      user = await this.getByName(userName);
+    }
+
+    await this.updatePassword(user.id, userPassword);
+
+    let userSetup = {
+      elementStartNodeIds: [] as { id: string }[],
+      email: user.email,
+      hasElementRootAccess: hasElementRootAccess,
+      languageIsoCode: uiCulture,
+      name: user.name,
+      userGroupIds: [{id: userGroupId}],
+      userName: user.userName,
+    };
+
+    for (const elementStartNodeId of elementStartNodeIds) {
+      userSetup.elementStartNodeIds.push({id: elementStartNodeId});
+    }
+
+    await this.update(user.id, userSetup);
+  }
 }

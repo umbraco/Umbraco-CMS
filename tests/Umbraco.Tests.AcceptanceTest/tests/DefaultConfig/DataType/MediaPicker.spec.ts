@@ -131,7 +131,7 @@ test('can add start node', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   // Create media
   const mediaName = 'TestStartNode';
-  const mediaId = await umbracoApi.media.createDefaultMediaWithArticle(mediaName);
+  const mediaId = await umbracoApi.media.createDefaultMediaFolder(mediaName);
   expect(await umbracoApi.media.doesNameExist(mediaName)).toBeTruthy();
   await umbracoApi.dataType.createDefaultMediaPickerDataType(customDataTypeName);
   await umbracoUi.dataType.goToDataType(customDataTypeName);
