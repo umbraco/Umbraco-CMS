@@ -19,3 +19,17 @@ export const UMB_ELEMENT_PICKER_MODAL = new UmbModalToken<UmbElementPickerModalD
 		},
 	},
 );
+
+export const UMB_ELEMENT_FOLDER_PICKER_MODAL = new UmbModalToken<UmbTreePickerModalData, UmbTreePickerModalValue>(
+	UMB_TREE_PICKER_MODAL_ALIAS,
+	{
+		modal: {
+			type: 'sidebar',
+			size: 'small',
+		},
+		data: {
+			treeAlias: UMB_ELEMENT_TREE_ALIAS,
+			foldersOnly: true,
+		},
+	},
+);
