@@ -59,7 +59,7 @@ internal sealed class LanguageRepository : AsyncEntityRepositoryBase<int, ILangu
             return null;
         }
 
-        await EnsureCacheIsPopulatedAsync();
+        await EnsureMapsPopulatedAsync();
 
         lock (_codeIdMap)
         {
@@ -84,7 +84,7 @@ internal sealed class LanguageRepository : AsyncEntityRepositoryBase<int, ILangu
             return null;
         }
 
-        await EnsureCacheIsPopulatedAsync();
+        await EnsureMapsPopulatedAsync();
 
         lock (_codeIdMap)
         {
@@ -112,8 +112,7 @@ internal sealed class LanguageRepository : AsyncEntityRepositoryBase<int, ILangu
             return isoCodes;
         }
 
-        await EnsureCacheIsPopulatedAsync();
-
+        await EnsureMapsPopulatedAsync();
 
         lock (_codeIdMap)
         {
@@ -168,11 +167,10 @@ internal sealed class LanguageRepository : AsyncEntityRepositoryBase<int, ILangu
     private async Task<ILanguage> GetDefaultAsync()
     {
         // get all cached
-        var languages =
-            (await TypedCachePolicy
-                     ?.GetAllCachedAsync(PerformGetAllAsync)
-                 ! // Try to get all cached non-cloned if using the correct cache policy (not the case in unit tests)
-             ?? await CachePolicy.GetAllAsync(PerformGetAllAsync)).ToList();
+        // Try to get all cached non-cloned if using the correct cache policy (not the case in unit tests)
+        List<ILanguage> languages = TypedCachePolicy is not null
+            ? (await TypedCachePolicy.GetAllCachedAsync(PerformGetAllAsync)).ToList()
+            : (await CachePolicy.GetAllAsync(PerformGetAllAsync)).ToList();
 
         ILanguage? language = languages.FirstOrDefault(x => x.IsDefault);
         if (language != null)
@@ -404,6 +402,25 @@ internal sealed class LanguageRepository : AsyncEntityRepositoryBase<int, ILangu
                 _idCodeMap.Remove(entity.Id);
             }
         });
+
+    /// <summary>
+    /// Ensures the in-memory ISO code/ID maps are populated.
+    /// If the maps already contain data, returns immediately without requiring an EF Core scope.
+    /// This allows NPoco code paths (e.g. ContentBaseFactory) to perform ID/IsoCode lookups
+    /// without needing an ambient EF Core scope.
+    /// </summary>
+    private async Task EnsureMapsPopulatedAsync()
+    {
+        lock (_codeIdMap)
+        {
+            if (_codeIdMap.Count > 0)
+            {
+                return;
+            }
+        }
+
+        await EnsureCacheIsPopulatedAsync();
+    }
 
     private async Task EnsureCacheIsPopulatedAsync()
     {
