@@ -1,6 +1,7 @@
 using System.Data.Common;
 using System.Net.Http.Headers;
 using System.Reflection;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection.Infrastructure;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -60,6 +61,7 @@ using Umbraco.Cms.Web.Common.Repositories;
 using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Cms.Web.Common.Templates;
 using Umbraco.Cms.Web.Common.UmbracoContext;
+using Umbraco.Cms.Web.Common.Authorization;
 using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Extensions;
@@ -71,6 +73,59 @@ namespace Umbraco.Extensions;
 /// </summary>
 public static partial class UmbracoBuilderExtensions
 {
+    /// <summary>
+    /// Adds all core Umbraco services required to run without the backoffice.
+    /// Use this for delivery-only scenarios (Delivery API, Website) without the management backoffice.
+    /// For full Umbraco with backoffice, use <c>AddBackOffice()</c> instead.
+    /// </summary>
+    /// <remarks>
+    /// This method is idempotent - calling it multiple times has no effect after the first call.
+    /// The individual service registration methods are also idempotent, so calling both
+    /// <c>AddBackOffice()</c> and <see cref="AddCore"/> is safe (though not expected).
+    /// </remarks>
+    /// <param name="builder">The Umbraco builder.</param>
+    /// <param name="configureMvc">Optional action to configure the MVC builder.</param>
+    /// <returns>The Umbraco builder.</returns>
+    public static IUmbracoBuilder AddCore(this IUmbracoBuilder builder, Action<IMvcBuilder>? configureMvc = null)
+    {
+        // Idempotency check - safe to call multiple times.
+        if (builder.Services.Any(s => s.ServiceType == typeof(AddCoreMarker)))
+        {
+            return builder;
+        }
+
+        builder.Services.AddSingleton<AddCoreMarker>();
+
+        // Register the feature authorization handler and policy.
+        // This enables the UmbracoFeatureEnabled policy used by Delivery API and other controllers.
+        // Use TryAddEnumerable because IAuthorizationHandler is a multi-registration service -
+        // TryAddSingleton would skip registration if ANY handler exists, not just this specific one.
+        builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IAuthorizationHandler, FeatureAuthorizeHandler>());
+        builder.Services.AddAuthorization(options =>
+        {
+            // Only add the policy if it doesn't already exist.
+            if (options.GetPolicy(AuthorizationPolicies.UmbracoFeatureEnabled) is null)
+            {
+                options.AddPolicy(AuthorizationPolicies.UmbracoFeatureEnabled, policy =>
+                {
+                    policy.Requirements.Add(new FeatureAuthorizeRequirement());
+                });
+            }
+        });
+
+        return builder
+            .AddConfiguration()
+            .AddUmbracoCore()
+            .AddWebComponents()
+            .AddHelpers()
+            .AddUmbracoProfiler()
+            .AddMvcAndRazor(configureMvc)
+            .AddBackgroundJobs()
+            .AddUmbracoHybridCache()
+            .AddDistributedCache()
+            .AddCoreNotifications();
+    }
+
     /// <summary>
     ///     Creates an <see cref="IUmbracoBuilder" /> and registers basic Umbraco services
     /// </summary>
@@ -207,6 +262,10 @@ public static partial class UmbracoBuilderExtensions
 
     public static IUmbracoBuilder AddMvcAndRazor(this IUmbracoBuilder builder, Action<IMvcBuilder>? mvcBuilding = null)
     {
+        // NOTE: AddControllersWithViews() is already idempotent for service registration.
+        // We intentionally do NOT add an idempotency check here because the mvcBuilding callback
+        // may contain important configuration (e.g., Razor runtime compilation) that needs to
+        // be applied even if MVC services were already registered by a previous call.
         // TODO: We need to figure out if we can work around this because calling AddControllersWithViews modifies the global app and order is very important
         // this will directly affect developers who need to call that themselves.
         IMvcBuilder mvcBuilder = builder.Services.AddControllersWithViews();
@@ -334,5 +393,12 @@ public static partial class UmbracoBuilderExtensions
             wrappedHostingSettings,
             wrappedWebRoutingSettings,
             webHostEnvironment);
+    }
+
+    /// <summary>
+    /// Marker class to ensure AddCore is only executed once.
+    /// </summary>
+    private sealed class AddCoreMarker
+    {
     }
 }

@@ -1,9 +1,11 @@
-﻿import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
+import {ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 import {expect} from "@playwright/test";
 
 const contentName = 'TestContent';
 const documentTypeName = 'TestDocumentTypeForContent';
 const customDataTypeName = 'Test RTE Tiptap';
+const manualPropertyName = 'Manual';
+const anchorOrQuerystringPropertyName = 'Anchor or querystring';
 
 test.beforeEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
@@ -72,8 +74,7 @@ test('can embed a video into RTE Tiptap property editor', async ({umbracoApi, um
   expect(contentData.values[0].value.markup).toContain(videoURL);
 });
 
-// TODO: fails due to https://github.com/umbraco/Umbraco-CMS/issues/21044
-test.skip('cannot submit an empty link in RTE Tiptap property editor', async ({umbracoApi, umbracoUi}) => {
+test('cannot submit an empty link in RTE Tiptap property editor', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const iconTitle = 'Link';
   const customDataTypeId = await umbracoApi.dataType.createDefaultTiptapDataType(customDataTypeName);
@@ -92,11 +93,11 @@ test.skip('cannot submit an empty link in RTE Tiptap property editor', async ({u
   await umbracoUi.content.clickAddButton();
 
   // Assert
-  await umbracoUi.content.isTextWithMessageVisible(ConstantHelper.validationMessages.emptyLinkPicker);
+  await umbracoUi.content.doesPropertyWithNameContainValidationMessage(manualPropertyName, ConstantHelper.validationMessages.emptyManualLinkPicker);
+  await umbracoUi.content.doesPropertyWithNameContainValidationMessage(anchorOrQuerystringPropertyName, ConstantHelper.validationMessages.emptyManualLinkPicker);
 });
 
-// TODO: fails due to https://github.com/umbraco/Umbraco-CMS/issues/21044
-test.skip('cannot submit an empty URL with an anchor or querystring in RTE Tiptap property editor', async ({umbracoApi, umbracoUi}) => {
+test('can submit an empty URL with an anchor or querystring in RTE Tiptap property editor', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const iconTitle = 'Link';
   const customDataTypeId = await umbracoApi.dataType.createDefaultTiptapDataType(customDataTypeName);
@@ -112,9 +113,10 @@ test.skip('cannot submit an empty URL with an anchor or querystring in RTE Tipta
   await umbracoUi.content.enterLink('');
   await umbracoUi.content.enterAnchorOrQuerystring('#value');
   await umbracoUi.content.clickAddButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isTextWithMessageVisible(ConstantHelper.validationMessages.emptyLinkPicker);
+  await umbracoUi.content.isErrorNotificationVisible(false);
 });
 
 test('can insert a link to an unpublished document in RTE Tiptap property editor', async ({umbracoApi, umbracoUi}) => {
