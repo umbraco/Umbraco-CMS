@@ -4,6 +4,12 @@ export interface ManifestCollectionActionCreateKind extends ManifestCollectionAc
 	type: 'collectionAction';
 	kind: 'create';
 }
+export interface UmbCollectionCreateOption {
+	alias: string;
+	label: string;
+	icon?: string;
+	href?: string;
+}
 
 declare global {
 	interface UmbExtensionManifestMap {
