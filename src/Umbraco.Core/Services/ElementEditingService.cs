@@ -201,7 +201,7 @@ internal sealed class ElementEditingService
 
         // Only enforce IsElement + AllowedInLibrary on create; updates only need the content type to exist
         if (contentEditingModelBase is ContentCreationModelBase
-            && (contentType.IsElement is false || contentType.AllowedInLibrary is false))
+            && IsAllowedLibraryElement(contentType) is false)
         {
             operationStatus = ContentEditingOperationStatus.NotAllowed;
             return null;
@@ -515,4 +515,7 @@ internal sealed class ElementEditingService
             return ContentEditingOperationStatus.Unknown;
         }
     }
+
+    private static bool IsAllowedLibraryElement(IContentType contentType)
+        => contentType.IsElement && contentType.AllowedInLibrary;
 }
