@@ -53,31 +53,6 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
         _runtimeSettings = runtimeSettings;
     }
 
-    [Obsolete("Use constructor with ILoggerFactory parameter. Scheduled for removal in Umbraco 18.")]
-    public TemplateRepository(
-        IScopeAccessor scopeAccessor,
-        AppCaches cache,
-        ILogger<TemplateRepository> logger,
-        FileSystems fileSystems,
-        IShortStringHelper shortStringHelper,
-        IViewHelper viewHelper,
-        IOptionsMonitor<RuntimeSettings> runtimeSettings,
-        IRepositoryCacheVersionService repositoryCacheVersionService,
-        ICacheSyncService cacheSyncService)
-        : this(
-            scopeAccessor,
-            cache,
-            logger,
-            Microsoft.Extensions.Logging.Abstractions.NullLoggerFactory.Instance,
-            fileSystems,
-            shortStringHelper,
-            viewHelper,
-            runtimeSettings,
-            repositoryCacheVersionService,
-            cacheSyncService)
-    {
-    }
-
     // GUID-based lookups delegate to GetMany() which is served from FullDataSetRepositoryCachePolicy.
     public ITemplate? Get(Guid key) => GetMany().FirstOrDefault(x => x.Key == key);
 

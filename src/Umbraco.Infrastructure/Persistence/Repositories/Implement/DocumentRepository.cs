@@ -1,10 +1,8 @@
 using System.Globalization;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
@@ -75,44 +73,6 @@ internal class DocumentRepository : PublishableContentRepositoryBase<IContent, D
         _appCaches = appCaches;
         _loggerFactory = loggerFactory;
         _scopeAccessor = scopeAccessor;
-    }
-
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
-    public DocumentRepository(
-        IScopeAccessor scopeAccessor,
-        AppCaches appCaches,
-        ILogger<DocumentRepository> logger,
-        ILoggerFactory loggerFactory,
-        IContentTypeRepository contentTypeRepository,
-        ITemplateRepository templateRepository,
-        ITagRepository tagRepository,
-        ILanguageRepository languageRepository,
-        IRelationRepository relationRepository,
-        IRelationTypeRepository relationTypeRepository,
-        PropertyEditorCollection propertyEditors,
-        DataValueReferenceFactoryCollection dataValueReferenceFactories,
-        IDataTypeService dataTypeService,
-        IJsonSerializer serializer,
-        IEventAggregator eventAggregator)
-        : this(
-            scopeAccessor,
-            appCaches,
-            logger,
-            loggerFactory,
-            contentTypeRepository,
-            templateRepository,
-            tagRepository,
-            languageRepository,
-            relationRepository,
-            relationTypeRepository,
-            propertyEditors,
-            dataValueReferenceFactories,
-            dataTypeService,
-            serializer,
-            eventAggregator,
-            StaticServiceProvider.Instance.GetRequiredService<IRepositoryCacheVersionService>(),
-            StaticServiceProvider.Instance.GetRequiredService<ICacheSyncService>())
-    {
     }
 
     protected override DocumentRepository This => this;
