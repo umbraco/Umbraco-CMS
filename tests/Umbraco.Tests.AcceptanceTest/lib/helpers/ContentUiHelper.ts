@@ -187,11 +187,13 @@ export class ContentUiHelper extends UiBaseLocators {
   private readonly confirmToResetBtn: Locator;
   private readonly saveModal: Locator;
   private readonly expandSegmentBtn: Locator;
-  
+  private readonly saveAndPreviewBtn: Locator;
+
   constructor(page: Page) {
     super(page);
     this.saveContentBtn = page.getByTestId('workspace-action:Umb.WorkspaceAction.Document.Save');
     this.saveAndPublishBtn = page.getByTestId('workspace-action:Umb.WorkspaceAction.Document.SaveAndPublish');
+    this.saveAndPreviewBtn = page.getByTestId('workspace-action:Umb.WorkspaceAction.Document.SaveAndPreview');
     this.closeBtn = page.getByRole('button', {name: 'Close', exact: true});
     this.linkPickerModal = page.locator('umb-link-picker-modal');
     this.contentNameTxt = page.locator('#name-input input');
@@ -401,6 +403,10 @@ export class ContentUiHelper extends UiBaseLocators {
   async isSuccessStateVisibleForSaveAndPublishButton (isVisible: boolean = true){
     const saveAndPublishBtn = this.workspaceAction.filter({has: this.saveAndPublishBtn});
     await this.isVisible(saveAndPublishBtn.locator(this.successState), isVisible, ConstantHelper.timeout.long);
+  }
+
+  async clickSaveAndPreviewButton() {
+    await this.click(this.saveAndPreviewBtn);
   }
 
   async clickPublishButton() {
@@ -1771,17 +1777,17 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async clickAddBlockListElementWithName(blockName: string) {
-    const createNewButtonLocator = this.page.getByTestId(`property:${blockName.toLowerCase()}`).getByLabel('Create new');
+    const createNewButtonLocator = this.page.getByTestId(`property:${blockName.toLowerCase()}`).getByLabel('Add content');
     await this.click(createNewButtonLocator);
   }
 
   async isAddBlockListElementWithNameDisabled(blockName: string) {
-    const createNewButtonLocator = this.page.getByTestId(`property:${blockName.toLowerCase()}`).locator('uui-button').filter({hasText: 'Create new'});
+    const createNewButtonLocator = this.page.getByTestId(`property:${blockName.toLowerCase()}`).locator('uui-button').filter({hasText: 'Add content'});
     await expect(createNewButtonLocator).toHaveAttribute('disabled');
   }
 
   async isAddBlockListElementWithNameVisible(blockName: string) {
-    const createNewButtonLocator = this.page.getByTestId(`property:${blockName.toLowerCase()}`).locator('uui-button').filter({hasText: 'Create new'});
+    const createNewButtonLocator = this.page.getByTestId(`property:${blockName.toLowerCase()}`).locator('uui-button').filter({hasText: 'Add content'});
     await this.waitForVisible(createNewButtonLocator);
     await expect(createNewButtonLocator).not.toHaveAttribute('disabled');
   }

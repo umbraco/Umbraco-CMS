@@ -487,7 +487,8 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 				label=${this.localize.term('content_createFromClipboard')}
 				look="placeholder"
 				href=${this.#context.getPathForClipboard(-1) ?? ''}
-				?disabled=${this._isReadOnly}>
+				?disabled=${this._isReadOnly}
+				title=${this.localize.term('general_clipboard')}>
 				<uui-icon name="icon-clipboard-paste"></uui-icon>
 			</uui-button>
 		`;

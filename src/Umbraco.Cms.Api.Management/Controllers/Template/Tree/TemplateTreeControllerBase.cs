@@ -22,7 +22,9 @@ public class TemplateTreeControllerBase : NamedEntityTreeControllerBase<NamedEnt
     {
     }
 
-    public TemplateTreeControllerBase(IEntityService entityService, FlagProviderCollection flagProviders)
+    public TemplateTreeControllerBase(
+        IEntityService entityService,
+        FlagProviderCollection flagProviders)
         : base(entityService, flagProviders)
     {
     }
