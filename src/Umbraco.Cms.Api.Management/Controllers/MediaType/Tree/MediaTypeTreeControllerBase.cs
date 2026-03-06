@@ -22,16 +22,6 @@ public class MediaTypeTreeControllerBase : FolderTreeControllerBase<MediaTypeTre
 {
     private readonly IMediaTypeService _mediaTypeService;
 
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
-    public MediaTypeTreeControllerBase(IEntityService entityService, IMediaTypeService mediaTypeService)
-        : this(
-            entityService,
-            StaticServiceProvider.Instance.GetRequiredService<FlagProviderCollection>(),
-            mediaTypeService)
-    {
-    }
-
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
     public MediaTypeTreeControllerBase(IEntityService entityService, FlagProviderCollection flagProviders, IMediaTypeService mediaTypeService)
         : this(
             entityService,

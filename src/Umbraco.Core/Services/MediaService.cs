@@ -1,7 +1,5 @@
 using System.Globalization;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
@@ -54,7 +52,6 @@ namespace Umbraco.Cms.Core.Services
             IEventMessagesFactory eventMessagesFactory,
             IMediaRepository mediaRepository,
             IAuditService auditService,
-            IAuditRepository auditRepository,   // TODO (V18): Remove this parameter (it's only there to avoid ambiguity with obsolete constructors).
             IMediaTypeRepository mediaTypeRepository,
             IEntityRepository entityRepository,
             IShortStringHelper shortStringHelper,
@@ -72,115 +69,6 @@ namespace Umbraco.Cms.Core.Services
             _userIdKeyResolver = userIdKeyResolver;
             _mediaPathScheme = mediaPathScheme;
             _logger = logger;
-        }
-
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="MediaService"/> class.
-        /// </summary>
-        /// <param name="provider">The <see cref="ICoreScopeProvider"/> for database scope management.</param>
-        /// <param name="mediaFileManager">The <see cref="MediaFileManager"/> for media file operations.</param>
-        /// <param name="loggerFactory">The <see cref="ILoggerFactory"/> for creating loggers.</param>
-        /// <param name="eventMessagesFactory">The <see cref="IEventMessagesFactory"/> for creating event messages.</param>
-        /// <param name="mediaRepository">The <see cref="IMediaRepository"/> for media persistence.</param>
-        /// <param name="auditRepository">The audit repository (obsolete, not used).</param>
-        /// <param name="mediaTypeRepository">The <see cref="IMediaTypeRepository"/> for media type persistence.</param>
-        /// <param name="entityRepository">The <see cref="IEntityRepository"/> for entity operations.</param>
-        /// <param name="shortStringHelper">The <see cref="IShortStringHelper"/> for string operations.</param>
-        /// <param name="userIdKeyResolver">The <see cref="IUserIdKeyResolver"/> for resolving user IDs.</param>
-        [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in Umbraco 18.")]
-        public MediaService(
-            ICoreScopeProvider provider,
-            MediaFileManager mediaFileManager,
-            ILoggerFactory loggerFactory,
-            IEventMessagesFactory eventMessagesFactory,
-            IMediaRepository mediaRepository,
-            IAuditService auditService,
-            IMediaTypeRepository mediaTypeRepository,
-            IEntityRepository entityRepository,
-            IShortStringHelper shortStringHelper,
-            IUserIdKeyResolver userIdKeyResolver)
-            : this(
-                provider,
-                mediaFileManager,
-                loggerFactory,
-                eventMessagesFactory,
-                mediaRepository,
-                auditService,
-                StaticServiceProvider.Instance.GetRequiredService<IAuditRepository>(),
-                mediaTypeRepository,
-                entityRepository,
-                shortStringHelper,
-                userIdKeyResolver,
-                StaticServiceProvider.Instance.GetRequiredService<IMediaPathScheme>(),
-                StaticServiceProvider.Instance.GetRequiredService<ILogger<MediaService>>())
-        {
-        }
-
-        [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in Umbraco 18.")]
-        public MediaService(
-            ICoreScopeProvider provider,
-            MediaFileManager mediaFileManager,
-            ILoggerFactory loggerFactory,
-            IEventMessagesFactory eventMessagesFactory,
-            IMediaRepository mediaRepository,
-            IAuditRepository auditRepository,
-            IMediaTypeRepository mediaTypeRepository,
-            IEntityRepository entityRepository,
-            IShortStringHelper shortStringHelper,
-            IUserIdKeyResolver userIdKeyResolver)
-            : this(
-                provider,
-                mediaFileManager,
-                loggerFactory,
-                eventMessagesFactory,
-                mediaRepository,
-                StaticServiceProvider.Instance.GetRequiredService<IAuditService>(),
-                mediaTypeRepository,
-                entityRepository,
-                shortStringHelper,
-                userIdKeyResolver)
-        {
-        }
-
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="MediaService"/> class.
-        /// </summary>
-        /// <param name="provider">The <see cref="ICoreScopeProvider"/> for database scope management.</param>
-        /// <param name="mediaFileManager">The <see cref="MediaFileManager"/> for media file operations.</param>
-        /// <param name="loggerFactory">The <see cref="ILoggerFactory"/> for creating loggers.</param>
-        /// <param name="eventMessagesFactory">The <see cref="IEventMessagesFactory"/> for creating event messages.</param>
-        /// <param name="mediaRepository">The <see cref="IMediaRepository"/> for media persistence.</param>
-        /// <param name="auditService">The <see cref="IAuditService"/> for audit logging.</param>
-        /// <param name="auditRepository">The audit repository (obsolete, not used).</param>
-        /// <param name="mediaTypeRepository">The <see cref="IMediaTypeRepository"/> for media type persistence.</param>
-        /// <param name="entityRepository">The <see cref="IEntityRepository"/> for entity operations.</param>
-        /// <param name="shortStringHelper">The <see cref="IShortStringHelper"/> for string operations.</param>
-        /// <param name="userIdKeyResolver">The <see cref="IUserIdKeyResolver"/> for resolving user IDs.</param>
-        [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in Umbraco 18.")]
-        public MediaService(
-            ICoreScopeProvider provider,
-            MediaFileManager mediaFileManager,
-            ILoggerFactory loggerFactory,
-            IEventMessagesFactory eventMessagesFactory,
-            IMediaRepository mediaRepository,
-            IAuditService auditService,
-            IAuditRepository auditRepository,
-            IMediaTypeRepository mediaTypeRepository,
-            IEntityRepository entityRepository,
-            IShortStringHelper shortStringHelper,
-            IUserIdKeyResolver userIdKeyResolver)
-            : this(
-                provider,
-                mediaFileManager,
-                loggerFactory,
-                eventMessagesFactory,
-                mediaRepository,
-                auditService,
-                mediaTypeRepository,
-                entityRepository,
-                shortStringHelper,
-                userIdKeyResolver)
-        {
         }
 
         #endregion

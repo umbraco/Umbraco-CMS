@@ -32,30 +32,6 @@ public class MediaMapDefinition : ContentMapDefinition<IMedia, MediaValueRespons
         contentSettings.OnChange(x => _contentSettings = x);
     }
 
-    [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in Umbraco 18.")]
-    public MediaMapDefinition(
-        PropertyEditorCollection propertyEditorCollection,
-        CommonMapper commonMapper,
-        IDataValueEditorFactory dataValueEditorFactory)
-        : this(
-              propertyEditorCollection,
-              commonMapper,
-              dataValueEditorFactory,
-              StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<ContentSettings>>())
-    {
-    }
-
-    [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in Umbraco 18.")]
-    public MediaMapDefinition(
-        PropertyEditorCollection propertyEditorCollection,
-        CommonMapper commonMapper)
-        : this(
-            propertyEditorCollection,
-            commonMapper,
-            StaticServiceProvider.Instance.GetRequiredService<IDataValueEditorFactory>())
-    {
-    }
-
     public void DefineMaps(IUmbracoMapper mapper)
     {
         mapper.Define<IMedia, MediaResponseModel>((_, _) => new MediaResponseModel(), Map);

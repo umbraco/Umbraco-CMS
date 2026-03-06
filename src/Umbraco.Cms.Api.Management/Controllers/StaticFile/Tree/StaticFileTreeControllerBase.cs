@@ -5,7 +5,6 @@ using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Api.Management.Services.FileSystem;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 
 namespace Umbraco.Cms.Api.Management.Controllers.StaticFile.Tree;
@@ -16,14 +15,6 @@ public class StaticFileTreeControllerBase : FileSystemTreeControllerBase
 {
     private readonly IFileSystemTreeService _fileSystemTreeService;
     private static readonly string[] _allowedRootFolders = { $"{Path.DirectorySeparatorChar}App_Plugins", $"{Path.DirectorySeparatorChar}wwwroot" };
-
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
-    public StaticFileTreeControllerBase(IPhysicalFileSystem physicalFileSystem)
-        : base(StaticServiceProvider.Instance.GetRequiredService<IPhysicalFileSystemTreeService>())
-    {
-        FileSystem = physicalFileSystem;
-        _fileSystemTreeService = StaticServiceProvider.Instance.GetRequiredService<IPhysicalFileSystemTreeService>();
-    }
 
     public StaticFileTreeControllerBase(IPhysicalFileSystem physicalFileSystem, IPhysicalFileSystemTreeService fileSystemTreeService)
         : base (fileSystemTreeService)

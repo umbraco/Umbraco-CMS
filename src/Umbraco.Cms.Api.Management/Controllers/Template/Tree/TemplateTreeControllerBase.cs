@@ -16,15 +16,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Template.Tree;
 [Authorize(Policy = AuthorizationPolicies.TreeAccessTemplates)]
 public class TemplateTreeControllerBase : NamedEntityTreeControllerBase<NamedEntityTreeItemResponseModel>
 {
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
-    public TemplateTreeControllerBase(IEntityService entityService)
-        : base(entityService)
-    {
-    }
-
-    public TemplateTreeControllerBase(
-        IEntityService entityService,
-        FlagProviderCollection flagProviders)
+    public TemplateTreeControllerBase(IEntityService entityService, FlagProviderCollection flagProviders)
         : base(entityService, flagProviders)
     {
     }

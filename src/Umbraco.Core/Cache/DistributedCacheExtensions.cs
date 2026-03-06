@@ -264,29 +264,11 @@ public static class DistributedCacheExtensions
     /// </summary>
     /// <param name="dc">The distributed cache.</param>
     /// <param name="members">The members to refresh in cache.</param>
-    [Obsolete("Please use the overload taking all parameters. Scheduled for removal in Umbraco 18.")]
-    public static void RefreshMemberCache(this DistributedCache dc, IEnumerable<IMember> members)
-        => dc.RefreshMemberCache(members, new Dictionary<string, object?>());
-
-    /// <summary>
-    ///     Refreshes the specified members in the distributed cache.
-    /// </summary>
-    /// <param name="dc">The distributed cache.</param>
-    /// <param name="members">The members to refresh in cache.</param>
     /// <param name="state">The notification state.</param>
     public static void RefreshMemberCache(this DistributedCache dc, IEnumerable<IMember> members, IDictionary<string, object?> state)
         => dc.RefreshByPayload(
             MemberCacheRefresher.UniqueId,
             GetPayloads(members, state, false));
-
-    /// <summary>
-    ///     Removes the specified members from the distributed cache.
-    /// </summary>
-    /// <param name="dc">The distributed cache.</param>
-    /// <param name="members">The members to remove from cache.</param>
-    [Obsolete("Please use the overload taking all parameters. Scheduled for removal in Umbraco 18.")]
-    public static void RemoveMemberCache(this DistributedCache dc, IEnumerable<IMember> members)
-        => dc.RemoveMemberCache(members, new Dictionary<string, object?>());
 
     /// <summary>
     ///     Removes the specified members from the distributed cache.

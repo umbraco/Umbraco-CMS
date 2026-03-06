@@ -28,25 +28,6 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
     private readonly IIdKeyMap _idKeyMap;
     private readonly FlagProviderCollection _flagProviderCollection;
 
-    [Obsolete("Please use the controller with all parameters. Scheduled for removal in Umbraco 18")]
-    public DocumentPresentationFactory(
-        IUmbracoMapper umbracoMapper,
-        IDocumentUrlFactory documentUrlFactory,
-        ITemplateService templateService,
-        IPublicAccessService publicAccessService,
-        TimeProvider timeProvider,
-        IIdKeyMap idKeyMap)
-        : this(
-            umbracoMapper,
-            documentUrlFactory,
-            templateService,
-            publicAccessService,
-            timeProvider,
-            idKeyMap,
-            StaticServiceProvider.Instance.GetRequiredService<FlagProviderCollection>())
-    {
-    }
-
     public DocumentPresentationFactory(
         IUmbracoMapper umbracoMapper,
         IDocumentUrlFactory documentUrlFactory,

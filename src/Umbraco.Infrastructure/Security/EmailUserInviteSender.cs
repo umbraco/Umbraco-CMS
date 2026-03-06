@@ -1,11 +1,9 @@
 using System.Globalization;
 using System.Net;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using MimeKit;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mail;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Email;
@@ -21,19 +19,6 @@ public class EmailUserInviteSender : IUserInviteSender
     private readonly ILocalizedTextService _localizedTextService;
     private readonly GlobalSettings _globalSettings;
     private readonly SecuritySettings _securitySettings;
-
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
-    public EmailUserInviteSender(
-        IEmailSender emailSender,
-        ILocalizedTextService localizedTextService,
-        IOptions<GlobalSettings> globalSettings)
-        : this(
-              emailSender,
-              localizedTextService,
-              globalSettings,
-              StaticServiceProvider.Instance.GetRequiredService<IOptions<SecuritySettings>>())
-    {
-    }
 
     public EmailUserInviteSender(
         IEmailSender emailSender,

@@ -64,26 +64,6 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
         _permissionMappers = permissionMappers.ToDictionary(x => x.Context);
     }
 
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
-    public UserGroupRepository(
-        IScopeAccessor scopeAccessor,
-        AppCaches appCaches,
-        ILogger<UserGroupRepository> logger,
-        ILoggerFactory loggerFactory,
-        IShortStringHelper shortStringHelper,
-        IEnumerable<IPermissionMapper> permissionMappers)
-        : this(
-            scopeAccessor,
-            appCaches,
-            logger,
-            loggerFactory,
-            shortStringHelper,
-            permissionMappers,
-            StaticServiceProvider.Instance.GetRequiredService<IRepositoryCacheVersionService>(),
-            StaticServiceProvider.Instance.GetRequiredService<ICacheSyncService>())
-    {
-    }
-
     public IUserGroup? Get(string alias)
     {
         try

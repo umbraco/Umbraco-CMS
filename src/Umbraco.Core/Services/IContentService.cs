@@ -107,15 +107,6 @@ public interface IContentService : IPublishableContentService<IContent>
     /// <returns>The document, or null if not found.</returns>
     IContent? GetById(int id);
 
-    /// <summary>
-    ///     Gets a document.
-    /// </summary>
-    /// <param name="key">The unique identifier of the document.</param>
-    /// <returns>The document, or null if not found.</returns>
-    // TODO (V18): This is already declared on the base type, so for the next major, when we can allow a binary breaking change, we should remove it from here.
-#pragma warning disable CS0108 // Member hides inherited member; missing new keyword
-    IContent? GetById(Guid key);
-#pragma warning restore CS0108 // Member hides inherited member; missing new keyword
 
     /// <summary>
     ///     Gets publish/unpublish schedule for a content node.

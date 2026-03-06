@@ -16,7 +16,6 @@ public class ItemDocumentItemController : DocumentItemControllerBase
     private readonly IEntityService _entityService;
     private readonly IDocumentPresentationFactory _documentPresentationFactory;
 
-    [ActivatorUtilitiesConstructor]
     public ItemDocumentItemController(
         IEntityService entityService,
         IDocumentPresentationFactory documentPresentationFactory)

@@ -61,13 +61,6 @@ public class ConfigurationPresentationFactory : IConfigurationPresentationFactor
             ReservedFieldNames = _reservedFieldNamesService.GetMemberReservedFieldNames(),
         };
 
-    public MediaConfigurationResponseModel CreateMediaConfigurationResponseModel() =>
-        new()
-        {
-            DisableDeleteWhenReferenced = _contentSettings.DisableDeleteWhenReferenced,
-            DisableUnpublishWhenReferenced = _contentSettings.DisableUnpublishWhenReferenced,
-        };
-
     public MediaTypeConfigurationResponseModel CreateMediaTypeConfigurationResponseModel() =>
         new()
         {

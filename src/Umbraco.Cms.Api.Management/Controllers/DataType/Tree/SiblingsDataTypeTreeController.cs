@@ -10,13 +10,6 @@ namespace Umbraco.Cms.Api.Management.Controllers.DataType.Tree;
 
 public class SiblingsDataTypeTreeController : DataTypeTreeControllerBase
 {
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
-    public SiblingsDataTypeTreeController(IEntityService entityService, IDataTypeService dataTypeService)
-        : base(entityService, dataTypeService)
-    {
-    }
-
-    [ActivatorUtilitiesConstructor]
     public SiblingsDataTypeTreeController(IEntityService entityService, FlagProviderCollection flagProviders, IDataTypeService dataTypeService)
         : base(entityService, flagProviders, dataTypeService)
     {

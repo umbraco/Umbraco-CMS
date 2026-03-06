@@ -28,7 +28,6 @@ public class ExecuteTemplateQueryController : TemplateQueryControllerBase
 
     private static readonly string _indent = $"{Environment.NewLine}    ";
 
-    [ActivatorUtilitiesConstructor]
     public ExecuteTemplateQueryController(
         IPublishedContentQuery publishedContentQuery,
         IPublishedValueFallback publishedValueFallback,

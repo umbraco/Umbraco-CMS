@@ -1,6 +1,8 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -37,7 +39,9 @@ internal sealed class DocumentBlueprintRepository : DocumentRepository, IDocumen
         IDataTypeService dataTypeService,
         DataValueReferenceFactoryCollection dataValueReferenceFactories,
         IJsonSerializer serializer,
-        IEventAggregator eventAggregator)
+        IEventAggregator eventAggregator,
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
         : base(
             scopeAccessor,
             appCaches,
@@ -53,7 +57,47 @@ internal sealed class DocumentBlueprintRepository : DocumentRepository, IDocumen
             dataValueReferenceFactories,
             dataTypeService,
             serializer,
-            eventAggregator)
+            eventAggregator,
+            repositoryCacheVersionService,
+            cacheSyncService)
+    {
+    }
+
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 20.")]
+    public DocumentBlueprintRepository(
+        IScopeAccessor scopeAccessor,
+        AppCaches appCaches,
+        ILogger<DocumentBlueprintRepository> logger,
+        ILoggerFactory loggerFactory,
+        IContentTypeRepository contentTypeRepository,
+        ITemplateRepository templateRepository,
+        ITagRepository tagRepository,
+        ILanguageRepository languageRepository,
+        IRelationRepository relationRepository,
+        IRelationTypeRepository relationTypeRepository,
+        PropertyEditorCollection propertyEditorCollection,
+        IDataTypeService dataTypeService,
+        DataValueReferenceFactoryCollection dataValueReferenceFactories,
+        IJsonSerializer serializer,
+        IEventAggregator eventAggregator)
+        : this(
+            scopeAccessor,
+            appCaches,
+            logger,
+            loggerFactory,
+            contentTypeRepository,
+            templateRepository,
+            tagRepository,
+            languageRepository,
+            relationRepository,
+            relationTypeRepository,
+            propertyEditorCollection,
+            dataTypeService,
+            dataValueReferenceFactories,
+            serializer,
+            eventAggregator,
+            StaticServiceProvider.Instance.GetRequiredService<IRepositoryCacheVersionService>(),
+            StaticServiceProvider.Instance.GetRequiredService<ICacheSyncService>())
     {
     }
 

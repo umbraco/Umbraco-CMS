@@ -38,25 +38,11 @@ public interface IDistributedJobRepository
     /// Adds multiple jobs in a single batch operation.
     /// </summary>
     /// <param name="jobs">The jobs to add.</param>
-    void Add(IEnumerable<DistributedBackgroundJobModel> jobs)
-    {
-        // TODO: Delete default implementation in V18
-        foreach (DistributedBackgroundJobModel job in jobs)
-        {
-            Add(job);
-        }
-    }
+    void Add(IEnumerable<DistributedBackgroundJobModel> jobs);
 
     /// <summary>
     /// Deletes multiple jobs in a single batch operation.
     /// </summary>
     /// <param name="jobs">The jobs to delete.</param>
-    void Delete(IEnumerable<DistributedBackgroundJobModel> jobs)
-    {
-        // TODO: Delete default implementation in V18
-        foreach (DistributedBackgroundJobModel job in jobs)
-        {
-            Delete(job);
-        }
-    }
+    void Delete(IEnumerable<DistributedBackgroundJobModel> jobs);
 }

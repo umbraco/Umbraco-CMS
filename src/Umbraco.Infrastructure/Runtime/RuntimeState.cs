@@ -47,34 +47,6 @@ public class RuntimeState : IRuntimeState
     /// <summary>
     /// Initializes a new instance of the <see cref="RuntimeState" /> class.
     /// </summary>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
-    public RuntimeState(
-       IOptions<GlobalSettings> globalSettings,
-       IOptions<UnattendedSettings> unattendedSettings,
-       IUmbracoVersion umbracoVersion,
-       IUmbracoDatabaseFactory databaseFactory,
-       ILogger<RuntimeState> logger,
-       PendingPackageMigrations packageMigrationState,
-       IConflictingRouteService conflictingRouteService,
-       IEnumerable<IDatabaseProviderMetadata> databaseProviderMetadata,
-       IRuntimeModeValidationService runtimeModeValidationService)
-       : this(
-             globalSettings,
-             unattendedSettings,
-             umbracoVersion,
-             databaseFactory,
-             logger,
-             packageMigrationState,
-             conflictingRouteService,
-             databaseProviderMetadata,
-             runtimeModeValidationService,
-             StaticServiceProvider.Instance.GetRequiredService<IDatabaseAvailabilityCheck>())
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="RuntimeState" /> class.
-    /// </summary>
     public RuntimeState(
        IOptions<GlobalSettings> globalSettings,
        IOptions<UnattendedSettings> unattendedSettings,

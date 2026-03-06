@@ -118,14 +118,14 @@ public class DatabaseSchemaCreator
         ILoggerFactory loggerFactory,
         IUmbracoVersion umbracoVersion,
         IEventAggregator eventAggregator,
-        IOptionsMonitor<InstallDefaultDataSettings> defaultDataCreationSettings)
+        IOptionsMonitor<InstallDefaultDataSettings> installDefaultDataSettings)
     {
         _database = database ?? throw new ArgumentNullException(nameof(database));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
         _umbracoVersion = umbracoVersion ?? throw new ArgumentNullException(nameof(umbracoVersion));
         _eventAggregator = eventAggregator;
-        _installDefaultDataSettings = defaultDataCreationSettings;  // TODO (V18): Rename this parameter to installDefaultDataSettings.
+        _installDefaultDataSettings = installDefaultDataSettings;
 
         if (_database.SqlContext?.SqlSyntax == null)
         {

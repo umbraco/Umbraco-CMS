@@ -21,16 +21,6 @@ public class MemberTypeTreeControllerBase : FolderTreeControllerBase<MemberTypeT
 {
     private readonly IMemberTypeService _memberTypeService;
 
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
-    public MemberTypeTreeControllerBase(IEntityService entityService, IMemberTypeService memberTypeService)
-        : this(
-              entityService,
-              StaticServiceProvider.Instance.GetRequiredService<FlagProviderCollection>(),
-              memberTypeService)
-    {
-    }
-
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
     public MemberTypeTreeControllerBase(IEntityService entityService, FlagProviderCollection flagProviders, IMemberTypeService memberTypeService)
         : this(
             entityService,

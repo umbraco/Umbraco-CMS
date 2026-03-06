@@ -87,18 +87,11 @@ public interface ITemplateService : IService
     /// <returns>
     ///     The template created
     /// </returns>
-    async Task<Attempt<ITemplate?, TemplateOperationStatus>> CreateForContentTypeAsync(
+    Task<Attempt<ITemplate?, TemplateOperationStatus>> CreateForContentTypeAsync(
         string name,
         string alias,
         string contentTypeAlias,
-        Guid userKey)
-    {
-        // TODO (V18): Remove default implementation
-        Attempt<ITemplate, TemplateOperationStatus> result = await CreateForContentTypeAsync(contentTypeAlias, name, userKey);
-        return result.Success
-            ? Attempt<ITemplate?, TemplateOperationStatus>.Succeed(result.Status, result.Result)
-            : Attempt<ITemplate?, TemplateOperationStatus>.Fail(result.Status);
-    }
+        Guid userKey);
 
     /// <summary>
     ///     Creates a new template

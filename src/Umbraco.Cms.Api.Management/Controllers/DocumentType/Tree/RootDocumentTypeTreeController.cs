@@ -12,13 +12,6 @@ namespace Umbraco.Cms.Api.Management.Controllers.DocumentType.Tree;
 [ApiVersion("1.0")]
 public class RootDocumentTypeTreeController : DocumentTypeTreeControllerBase
 {
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
-    public RootDocumentTypeTreeController(IEntityService entityService, IContentTypeService contentTypeService)
-        : base(entityService, contentTypeService)
-    {
-    }
-
-    [ActivatorUtilitiesConstructor]
     public RootDocumentTypeTreeController(IEntityService entityService, FlagProviderCollection flagProviders, IContentTypeService contentTypeService)
         : base(entityService, flagProviders, contentTypeService)
     {

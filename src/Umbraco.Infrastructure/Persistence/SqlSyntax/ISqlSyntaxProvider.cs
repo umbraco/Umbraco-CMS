@@ -9,8 +9,6 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 
-// TODO (V18): Remove the default implementations in this interface.
-
 /// <summary>
 ///     Defines an SqlSyntaxProvider.
 /// </summary>
@@ -74,7 +72,7 @@ public interface ISqlSyntaxProvider
 
     string ConvertDecimalToOrderableString { get; }
 
-    string ConvertUniqueIdentifierToString => throw new NotImplementedException();
+    string ConvertUniqueIdentifierToString { get; }
 
     string ConvertIntegerToBoolean(int value);
 
@@ -85,10 +83,9 @@ public interface ISqlSyntaxProvider
 
     string DbProvider { get; }
 
-    IDictionary<Type, IScalarMapper>? ScalarMappers => null;
+    IDictionary<Type, IScalarMapper>? ScalarMappers { get; }
 
-    DatabaseType GetUpdatedDatabaseType(DatabaseType current, string? connectionString) =>
-        current; // Default implementation.
+    DatabaseType GetUpdatedDatabaseType(DatabaseType current, string? connectionString);
 
     string EscapeString(string val);
 
@@ -130,7 +127,7 @@ public interface ISqlSyntaxProvider
     /// A string containing the SQL type cast extension (null type annotation) that represents a null value for type
     /// <typeparamref name="T"/>, or an empty string if no extension is defined.
     /// </returns>
-    string GetNullCastSuffix<T>() => string.Empty;
+    string GetNullCastSuffix<T>();
 
     bool DoesTableExist(IDatabase db, string tableName);
 
@@ -178,7 +175,7 @@ public interface ISqlSyntaxProvider
     /// Determines whether the current database provider supports sequence objects for generating numeric values like PostgreSQL.
     /// </summary>
     /// <returns>true if the provider supports sequences; otherwise, false.</returns>
-    bool SupportsSequences() => false;
+    bool SupportsSequences();
 
     /// <summary>
     /// Alters the database sequences to match the current schema requirements.
@@ -190,7 +187,7 @@ public interface ISqlSyntaxProvider
     /// invoking this method. The default implementation throws <see cref="NotImplementedException"/>.
     /// </remarks>
     /// <param name="database">The database connection to use for altering sequences.</param>
-    void AlterSequences(IUmbracoDatabase database) => throw new NotImplementedException();
+    void AlterSequences(IUmbracoDatabase database);
 
     /// <summary>
     /// Alters the database sequences associated with the specified table for providers that support sequences.
@@ -198,12 +195,11 @@ public interface ISqlSyntaxProvider
     /// <remarks>
     /// This is an optional extension point for SQL providers that support database sequences. Providers that support
     /// sequences should override this method to update sequences associated with the specified table when schema changes
-    /// require it. Callers should typically check <see cref="SupportsSequences"/> before invoking this method. The default
-    /// implementation throws <see cref="NotImplementedException"/>.
+    /// require it. Callers should typically check <see cref="SupportsSequences"/> before invoking this method.
     /// </remarks>
     /// <param name="database">The database connection to use for altering the sequences.</param>
     /// <param name="tableName">The name of the table whose sequences will be altered.</param>
-    void AlterSequences(IUmbracoDatabase database, string tableName) => throw new NotImplementedException();
+    void AlterSequences(IUmbracoDatabase database, string tableName);
 
     IEnumerable<string> GetTablesInSchema(IDatabase db);
 
@@ -255,7 +251,7 @@ public interface ISqlSyntaxProvider
     /// </remarks>
     bool TryGetDefaultConstraint(IDatabase db, string? tableName, string columnName, [MaybeNullWhen(false)] out string constraintName);
 
-    bool DoesPrimaryKeyExist(IDatabase db, string tableName, string primaryKeyName) => throw new NotImplementedException();
+    bool DoesPrimaryKeyExist(IDatabase db, string tableName, string primaryKeyName);
 
     string GetFieldNameForUpdate<TDto>(Expression<Func<TDto, object?>> fieldSelector, string? tableAlias = null);
 
@@ -283,5 +279,5 @@ public interface ISqlSyntaxProvider
     /// <typeparam name="T">type of the entity.</typeparam>
     /// <param name="constraintName">unlimited name.</param>
     /// <returns>truncated name.</returns>
-    string TruncateConstraintName<T>(string constraintName) => constraintName;
+    string TruncateConstraintName<T>(string constraintName);
 }

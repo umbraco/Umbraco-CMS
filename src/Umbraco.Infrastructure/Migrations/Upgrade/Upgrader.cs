@@ -30,13 +30,6 @@ public class Upgrader
     /// </summary>
     public virtual string StateValueKey => Constants.Conventions.Migrations.KeyValuePrefix + Name;
 
-    [Obsolete("Use ExecuteAsync instead. Scheduled for removal in Umbraco 18.")]
-    public ExecutedMigrationPlan Execute(
-        IMigrationPlanExecutor migrationPlanExecutor,
-        ICoreScopeProvider scopeProvider,
-        IKeyValueService keyValueService)
-        => ExecuteAsync(migrationPlanExecutor, scopeProvider, keyValueService).GetAwaiter().GetResult();
-
     /// <summary>
     ///     Executes.
     /// </summary>

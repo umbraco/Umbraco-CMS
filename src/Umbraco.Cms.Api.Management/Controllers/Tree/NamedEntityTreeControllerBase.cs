@@ -10,15 +10,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Tree;
 public abstract class NamedEntityTreeControllerBase<TItem> : EntityTreeControllerBase<TItem>
     where TItem : NamedEntityTreeItemResponseModel, new()
 {
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
-    protected NamedEntityTreeControllerBase(IEntityService entityService)
-        : base(entityService)
-    {
-    }
-
-    protected NamedEntityTreeControllerBase(
-        IEntityService entityService,
-        FlagProviderCollection flagProviders)
+    protected NamedEntityTreeControllerBase(IEntityService entityService, FlagProviderCollection flagProviders)
         : base(entityService, flagProviders)
     {
     }

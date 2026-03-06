@@ -5,7 +5,6 @@ using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
@@ -18,14 +17,6 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
     where TItem : EntityTreeItemResponseModel, new()
 {
     private readonly FlagProviderCollection _flagProviders;
-
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
-    protected EntityTreeControllerBase(IEntityService entityService)
-        : this(
-            entityService,
-            StaticServiceProvider.Instance.GetRequiredService<FlagProviderCollection>())
-    {
-    }
 
     protected EntityTreeControllerBase(IEntityService entityService, FlagProviderCollection flagProviders)
     {

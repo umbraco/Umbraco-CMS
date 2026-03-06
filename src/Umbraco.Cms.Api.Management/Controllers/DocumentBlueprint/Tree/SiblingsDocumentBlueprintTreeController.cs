@@ -11,13 +11,6 @@ namespace Umbraco.Cms.Api.Management.Controllers.DocumentBlueprint.Tree;
 
 public class SiblingsDocumentBlueprintTreeController : DocumentBlueprintTreeControllerBase
 {
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
-    public SiblingsDocumentBlueprintTreeController(IEntityService entityService, IDocumentPresentationFactory documentPresentationFactory)
-        : base(entityService, documentPresentationFactory)
-    {
-    }
-
-    [ActivatorUtilitiesConstructor]
     public SiblingsDocumentBlueprintTreeController(IEntityService entityService, FlagProviderCollection flagProviders, IDocumentPresentationFactory documentPresentationFactory)
         : base(entityService, flagProviders, documentPresentationFactory)
     {

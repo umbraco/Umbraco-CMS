@@ -11,8 +11,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
-// TODO (V18): Fix the typo by renaming this class to ResizeImageUrlFactory (and also the corresponding test class).
-public class ReziseImageUrlFactory : IReziseImageUrlFactory
+public class ResizeImageUrlFactory : IResizeImageUrlFactory
 {
     private readonly IImageUrlGenerator _imageUrlGenerator;
     private readonly ContentSettings _contentSettings;
@@ -21,7 +20,7 @@ public class ReziseImageUrlFactory : IReziseImageUrlFactory
     private readonly IAbsoluteUrlBuilder _absoluteUrlBuilder;
 
     [Obsolete("Use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
-    public ReziseImageUrlFactory(
+    public ResizeImageUrlFactory(
         IImageUrlGenerator imageUrlGenerator,
         IOptions<ContentSettings> contentSettings,
         MediaUrlGeneratorCollection mediaUrlGenerators,
@@ -35,7 +34,7 @@ public class ReziseImageUrlFactory : IReziseImageUrlFactory
     {
     }
 
-    public ReziseImageUrlFactory(
+    public ResizeImageUrlFactory(
         IImageUrlGenerator imageUrlGenerator,
         IOptions<ContentSettings> contentSettings,
         IOptions<ContentImagingSettings> imagingSettings,

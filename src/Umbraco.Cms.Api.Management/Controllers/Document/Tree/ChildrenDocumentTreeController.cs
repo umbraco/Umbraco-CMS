@@ -17,26 +17,6 @@ namespace Umbraco.Cms.Api.Management.Controllers.Document.Tree;
 [ApiVersion("1.0")]
 public class ChildrenDocumentTreeController : DocumentTreeControllerBase
 {
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
-    public ChildrenDocumentTreeController(
-        IEntityService entityService,
-        IUserStartNodeEntitiesService userStartNodeEntitiesService,
-        IDataTypeService dataTypeService,
-        IPublicAccessService publicAccessService,
-        AppCaches appCaches,
-        IBackOfficeSecurityAccessor backofficeSecurityAccessor,
-        IDocumentPresentationFactory documentPresentationFactory)
-        : base(
-            entityService,
-            userStartNodeEntitiesService,
-            dataTypeService,
-            publicAccessService,
-            appCaches,
-            backofficeSecurityAccessor,
-            documentPresentationFactory)
-    {
-    }
-
     [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
     public ChildrenDocumentTreeController(
         IEntityService entityService,

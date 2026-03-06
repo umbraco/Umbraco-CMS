@@ -1,16 +1,13 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Factories;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
-using Umbraco.Cms.Core.Web;
 
 namespace Umbraco.Cms.Infrastructure.Sync;
 
@@ -47,64 +44,6 @@ public class BatchedDatabaseServerMessenger : DatabaseServerMessenger
             machineInfoFactory)
     {
         _requestCache = requestCache;
-    }
-
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 18.")]
-    public BatchedDatabaseServerMessenger(
-        IMainDom mainDom,
-        CacheRefresherCollection cacheRefreshers,
-        ILogger<BatchedDatabaseServerMessenger> logger,
-        ISyncBootStateAccessor syncBootStateAccessor,
-        IHostingEnvironment hostingEnvironment,
-        ICacheInstructionService cacheInstructionService,
-        IJsonSerializer jsonSerializer,
-        IRequestCache requestCache,
-        LastSyncedFileManager lastSyncedFileManager,
-        IOptionsMonitor<GlobalSettings> globalSettings)
-        : this(
-            mainDom,
-            cacheRefreshers,
-            logger,
-            syncBootStateAccessor,
-            hostingEnvironment,
-            cacheInstructionService,
-            jsonSerializer,
-            requestCache,
-            StaticServiceProvider.Instance.GetRequiredService<ILastSyncedManager>(),
-            globalSettings,
-            StaticServiceProvider.Instance.GetRequiredService<IMachineInfoFactory>())
-    {
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="BatchedDatabaseServerMessenger" /> class.
-    /// </summary>
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 18.")]
-    public BatchedDatabaseServerMessenger(
-        IMainDom mainDom,
-        CacheRefresherCollection cacheRefreshers,
-        IServerRoleAccessor serverRoleAccessor,
-        ILogger<BatchedDatabaseServerMessenger> logger,
-        ISyncBootStateAccessor syncBootStateAccessor,
-        IHostingEnvironment hostingEnvironment,
-        ICacheInstructionService cacheInstructionService,
-        IJsonSerializer jsonSerializer,
-        IRequestCache requestCache,
-        IRequestAccessor requestAccessor,
-        LastSyncedFileManager lastSyncedFileManager,
-        IOptionsMonitor<GlobalSettings> globalSettings)
-        : this(
-            mainDom,
-            cacheRefreshers,
-            logger,
-            syncBootStateAccessor,
-            hostingEnvironment,
-            cacheInstructionService,
-            jsonSerializer,
-            requestCache,
-            lastSyncedFileManager,
-            globalSettings)
-    {
     }
 
     /// <inheritdoc />

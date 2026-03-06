@@ -1,6 +1,8 @@
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Mapping.Content;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
 using Umbraco.Cms.Api.Management.ViewModels.Element;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -9,8 +11,16 @@ namespace Umbraco.Cms.Api.Management.Mapping.Element;
 
 public class ElementMapDefinition : ContentMapDefinition<IElement, ElementValueResponseModel, ElementVariantResponseModel>, IMapDefinition
 {
+    [Obsolete("Use non-obsolete constructors instead. Scheduled for removal in Umbraco 20.")]
     public ElementMapDefinition(PropertyEditorCollection propertyEditorCollection)
-        : base(propertyEditorCollection)
+        : this (propertyEditorCollection, StaticServiceProvider.Instance.GetRequiredService<IDataValueEditorFactory>())
+    {
+    }
+
+    public ElementMapDefinition(
+        PropertyEditorCollection propertyEditorCollection,
+        IDataValueEditorFactory dataValueEditorFactory)
+        : base(propertyEditorCollection, dataValueEditorFactory)
     {
     }
 

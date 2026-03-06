@@ -21,16 +21,6 @@ public class DocumentTypeTreeControllerBase : FolderTreeControllerBase<DocumentT
 {
     private readonly IContentTypeService _contentTypeService;
 
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
-    public DocumentTypeTreeControllerBase(IEntityService entityService, IContentTypeService contentTypeService)
-        : this(
-              entityService,
-              StaticServiceProvider.Instance.GetRequiredService<FlagProviderCollection>(),
-              contentTypeService)
-    {
-    }
-
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
     public DocumentTypeTreeControllerBase(IEntityService entityService, FlagProviderCollection flagProviders, IContentTypeService contentTypeService)
         : this(
             entityService,

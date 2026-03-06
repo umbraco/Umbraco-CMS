@@ -12,13 +12,6 @@ namespace Umbraco.Cms.Api.Management.Controllers.MemberType.Tree;
 [ApiVersion("1.0")]
 public class RootMemberTypeTreeController : MemberTypeTreeControllerBase
 {
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
-    public RootMemberTypeTreeController(IEntityService entityService, IMemberTypeService memberTypeService)
-        : base(entityService, memberTypeService)
-    {
-    }
-
-    [ActivatorUtilitiesConstructor]
     public RootMemberTypeTreeController(IEntityService entityService, FlagProviderCollection flagProviders, IMemberTypeService memberTypeService)
         : base(entityService, flagProviders, memberTypeService)
     {
