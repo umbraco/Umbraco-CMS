@@ -4,6 +4,7 @@
 using Microsoft.Extensions.Logging.Abstractions;
 using NPoco;
 using NUnit.Framework;
+using Our.Umbraco.PostgreSql.Services;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
@@ -42,6 +43,10 @@ internal sealed class PopulateSortableValueForDatePropertyDataTest : UmbracoInte
     [Test]
     public async Task Can_Populate_SortableValue_For_Existing_Date_Property_Data()
     {
+        if (SqlContext.SqlSyntax is PostgreSqlSyntaxProvider) {
+            throw new IgnoreException("PostgreSQL is not supported for this test.");
+        }
+
         // Arrange: Create a content type with a DateTimeWithTimeZone property and content with date values.
         var (contentType, contentItems) = await PrepareTestData();
 
@@ -66,6 +71,11 @@ internal sealed class PopulateSortableValueForDatePropertyDataTest : UmbracoInte
     [Test]
     public async Task Migration_Does_Not_Update_Already_Populated_SortableValues()
     {
+        if (SqlContext.SqlSyntax is PostgreSqlSyntaxProvider)
+        {
+            throw new IgnoreException("PostgreSQL is not supported for this test.");
+        }
+
         // Arrange: Create content with date values.
         var (contentType, _) = await PrepareTestData();
 
@@ -204,12 +214,12 @@ internal sealed class PopulateSortableValueForDatePropertyDataTest : UmbracoInte
     {
         using IScope scope = ScopeProvider.CreateScope();
         var sql = $@"
-UPDATE umbracoPropertyData
-SET sortableValue = NULL
-WHERE propertyTypeId IN (
+UPDATE {QTab("umbracoPropertyData")}
+SET {QCol("sortableValue")} = NULL
+WHERE {QCol("propertyTypeId")} IN (
     SELECT id
-    FROM cmsPropertyType
-    WHERE contentTypeId = {contentTypeId}
+    FROM {QCol("cmsPropertyType")}
+    WHERE {QCol("contentTypeId")} = {contentTypeId}
 )";
         await scope.Database.ExecuteAsync(sql);
         scope.Complete();
