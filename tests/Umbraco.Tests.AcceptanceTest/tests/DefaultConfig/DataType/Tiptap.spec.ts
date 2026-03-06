@@ -150,7 +150,7 @@ test('can add image upload folder', {tag: '@smoke'}, async ({umbracoApi, umbraco
 test('cannot select a media file as image upload folder', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const mediaFileName = 'TestMediaFile';
-  const mediaFileId = await umbracoApi.media.createDefaultMediaFile(mediaFileName);
+  await umbracoApi.media.createDefaultMediaFile(mediaFileName);
   await umbracoApi.dataType.createDefaultTiptapDataType(tipTapName);
   await umbracoUi.dataType.goToDataType(tipTapName);
 
