@@ -11,6 +11,9 @@ internal static class TreeBuilderExtensions
     internal static IUmbracoBuilder AddTrees(this IUmbracoBuilder builder)
     {
         builder.Services.AddTransient<IUserStartNodeEntitiesService, UserStartNodeEntitiesService>();
+        builder.Services.AddTransient<IDocumentStartNodeTreeFilterService, DocumentStartNodeTreeFilterService>();
+        builder.Services.AddTransient<IMediaStartNodeTreeFilterService, MediaStartNodeTreeFilterService>();
+        builder.Services.AddTransient<IElementStartNodeTreeFilterService, ElementStartNodeTreeFilterService>();
 
         builder.Services.AddUnique<IPartialViewTreeService, PartialViewTreeService>();
         builder.Services.AddUnique<IScriptTreeService, ScriptTreeService>();

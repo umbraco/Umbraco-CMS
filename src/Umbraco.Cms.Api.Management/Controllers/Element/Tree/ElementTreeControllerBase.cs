@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Controllers.Tree;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.Routing;
@@ -9,6 +10,7 @@ using Umbraco.Cms.Api.Management.Services.PermissionFilter;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Security;
@@ -22,11 +24,23 @@ namespace Umbraco.Cms.Api.Management.Controllers.Element.Tree;
 [Authorize(Policy = AuthorizationPolicies.SectionAccessForElementTree)]
 public class ElementTreeControllerBase : UserStartNodeFolderTreeControllerBase<ElementTreeItemResponseModel>
 {
-    private readonly AppCaches _appCaches;
-    private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly IElementPresentationFactory _elementPresentationFactory;
     private readonly IElementPermissionFilterService _elementPermissionFilterService;
 
+    [ActivatorUtilitiesConstructor]
+    public ElementTreeControllerBase(
+        IEntityService entityService,
+        FlagProviderCollection flagProviders,
+        IElementStartNodeTreeFilterService treeFilterService,
+        IElementPresentationFactory elementPresentationFactory,
+        IElementPermissionFilterService elementPermissionFilterService)
+        : base(entityService, flagProviders, treeFilterService)
+    {
+        _elementPresentationFactory = elementPresentationFactory;
+        _elementPermissionFilterService = elementPermissionFilterService;
+    }
+
+    [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in Umbraco 19.")]
     public ElementTreeControllerBase(
         IEntityService entityService,
         FlagProviderCollection flagProviders,
@@ -36,31 +50,18 @@ public class ElementTreeControllerBase : UserStartNodeFolderTreeControllerBase<E
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
         IElementPresentationFactory elementPresentationFactory,
         IElementPermissionFilterService elementPermissionFilterService)
-        : base(entityService, flagProviders, userStartNodeEntitiesService, dataTypeService)
+        : this(
+              entityService,
+              flagProviders,
+              StaticServiceProvider.Instance.GetRequiredService<IElementStartNodeTreeFilterService>(),
+              elementPresentationFactory,
+              elementPermissionFilterService)
     {
-        _appCaches = appCaches;
-        _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
-        _elementPresentationFactory = elementPresentationFactory;
-        _elementPermissionFilterService = elementPermissionFilterService;
     }
 
     protected override UmbracoObjectTypes ItemObjectType => UmbracoObjectTypes.Element;
 
     protected override UmbracoObjectTypes FolderObjectType => UmbracoObjectTypes.ElementContainer;
-
-    protected override int[] GetUserStartNodeIds()
-        => _backOfficeSecurityAccessor
-               .BackOfficeSecurity?
-               .CurrentUser?
-               .CalculateElementStartNodeIds(EntityService, _appCaches)
-           ?? [];
-
-    protected override string[] GetUserStartNodePaths()
-        => _backOfficeSecurityAccessor
-               .BackOfficeSecurity?
-               .CurrentUser?
-               .GetElementStartNodePaths(EntityService, _appCaches)
-           ?? [];
 
     protected override ElementTreeItemResponseModel MapTreeItemViewModel(Guid? parentKey, IEntitySlim entity)
     {

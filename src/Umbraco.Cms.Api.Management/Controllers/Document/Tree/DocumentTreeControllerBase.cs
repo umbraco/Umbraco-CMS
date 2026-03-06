@@ -26,33 +26,25 @@ namespace Umbraco.Cms.Api.Management.Controllers.Document.Tree;
 public abstract class DocumentTreeControllerBase : UserStartNodeTreeControllerBase<DocumentTreeItemResponseModel>
 {
     private readonly IPublicAccessService _publicAccessService;
-    private readonly AppCaches _appCaches;
-    private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
     private readonly IDocumentPresentationFactory _documentPresentationFactory;
     private readonly IDocumentPermissionFilterService _documentPermissionFilterService;
 
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
+    [ActivatorUtilitiesConstructor]
     protected DocumentTreeControllerBase(
         IEntityService entityService,
-        IUserStartNodeEntitiesService userStartNodeEntitiesService,
-        IDataTypeService dataTypeService,
+        FlagProviderCollection flagProviders,
+        IDocumentStartNodeTreeFilterService treeFilterService,
         IPublicAccessService publicAccessService,
-        AppCaches appCaches,
-        IBackOfficeSecurityAccessor backofficeSecurityAccessor,
-        IDocumentPresentationFactory documentPresentationFactory)
-        : this(
-              entityService,
-              StaticServiceProvider.Instance.GetRequiredService<FlagProviderCollection>(),
-              userStartNodeEntitiesService,
-              dataTypeService,
-              publicAccessService,
-              appCaches,
-              backofficeSecurityAccessor,
-              documentPresentationFactory)
+        IDocumentPresentationFactory documentPresentationFactory,
+        IDocumentPermissionFilterService documentPermissionFilterService)
+        : base(entityService, flagProviders, treeFilterService)
     {
+        _publicAccessService = publicAccessService;
+        _documentPresentationFactory = documentPresentationFactory;
+        _documentPermissionFilterService = documentPermissionFilterService;
     }
 
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
+    [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in Umbraco 19.")]
     protected DocumentTreeControllerBase(
         IEntityService entityService,
         FlagProviderCollection flagProviders,
@@ -65,17 +57,14 @@ public abstract class DocumentTreeControllerBase : UserStartNodeTreeControllerBa
         : this(
               entityService,
               flagProviders,
-              userStartNodeEntitiesService,
-              dataTypeService,
+              StaticServiceProvider.Instance.GetRequiredService<IDocumentStartNodeTreeFilterService>(),
               publicAccessService,
-              appCaches,
-              backofficeSecurityAccessor,
               documentPresentationFactory,
               StaticServiceProvider.Instance.GetRequiredService<IDocumentPermissionFilterService>())
     {
     }
 
-    [ActivatorUtilitiesConstructor]
+    [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in Umbraco 19.")]
     protected DocumentTreeControllerBase(
         IEntityService entityService,
         FlagProviderCollection flagProviders,
@@ -86,13 +75,14 @@ public abstract class DocumentTreeControllerBase : UserStartNodeTreeControllerBa
         IBackOfficeSecurityAccessor backofficeSecurityAccessor,
         IDocumentPresentationFactory documentPresentationFactory,
         IDocumentPermissionFilterService documentPermissionFilterService)
-        : base(entityService, flagProviders, userStartNodeEntitiesService, dataTypeService)
+        : this(
+              entityService,
+              flagProviders,
+              StaticServiceProvider.Instance.GetRequiredService<IDocumentStartNodeTreeFilterService>(),
+              publicAccessService,
+              documentPresentationFactory,
+              documentPermissionFilterService)
     {
-        _publicAccessService = publicAccessService;
-        _appCaches = appCaches;
-        _backofficeSecurityAccessor = backofficeSecurityAccessor;
-        _documentPresentationFactory = documentPresentationFactory;
-        _documentPermissionFilterService = documentPermissionFilterService;
     }
 
     protected override UmbracoObjectTypes ItemObjectType => UmbracoObjectTypes.Document;
@@ -118,22 +108,6 @@ public abstract class DocumentTreeControllerBase : UserStartNodeTreeControllerBa
 
         return responseModel;
     }
-
-    /// <inheritdoc/>
-    protected override int[] GetUserStartNodeIds()
-        => _backofficeSecurityAccessor
-               .BackOfficeSecurity?
-               .CurrentUser?
-               .CalculateContentStartNodeIds(EntityService, _appCaches)
-           ?? Array.Empty<int>();
-
-    /// <inheritdoc/>
-    protected override string[] GetUserStartNodePaths()
-        => _backofficeSecurityAccessor
-               .BackOfficeSecurity?
-               .CurrentUser?
-               .GetContentStartNodePaths(EntityService, _appCaches)
-           ?? Array.Empty<string>();
 
     /// <inheritdoc/>
     protected override Task<(IEntitySlim[] Entities, long TotalItems)> FilterTreeEntities(IEntitySlim[] entities, long totalItems)

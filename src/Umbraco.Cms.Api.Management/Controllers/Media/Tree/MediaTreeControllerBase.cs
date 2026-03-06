@@ -23,30 +23,20 @@ namespace Umbraco.Cms.Api.Management.Controllers.Media.Tree;
 [Authorize(Policy = AuthorizationPolicies.SectionAccessForMediaTree)]
 public class MediaTreeControllerBase : UserStartNodeTreeControllerBase<MediaTreeItemResponseModel>
 {
-    private readonly AppCaches _appCaches;
-    private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
     private readonly IMediaPresentationFactory _mediaPresentationFactory;
 
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
+    [ActivatorUtilitiesConstructor]
     public MediaTreeControllerBase(
         IEntityService entityService,
-        IUserStartNodeEntitiesService userStartNodeEntitiesService,
-        IDataTypeService dataTypeService,
-        AppCaches appCaches,
-        IBackOfficeSecurityAccessor backofficeSecurityAccessor,
+        FlagProviderCollection flagProviders,
+        IMediaStartNodeTreeFilterService treeFilterService,
         IMediaPresentationFactory mediaPresentationFactory)
-        : this(
-              entityService,
-              StaticServiceProvider.Instance.GetRequiredService<FlagProviderCollection>(),
-              userStartNodeEntitiesService,
-              dataTypeService,
-              appCaches,
-              backofficeSecurityAccessor,
-              mediaPresentationFactory)
+        : base(entityService, flagProviders, treeFilterService)
     {
+        _mediaPresentationFactory = mediaPresentationFactory;
     }
 
-    [ActivatorUtilitiesConstructor]
+    [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in Umbraco 19.")]
     public MediaTreeControllerBase(
         IEntityService entityService,
         FlagProviderCollection flagProviders,
@@ -55,11 +45,12 @@ public class MediaTreeControllerBase : UserStartNodeTreeControllerBase<MediaTree
         AppCaches appCaches,
         IBackOfficeSecurityAccessor backofficeSecurityAccessor,
         IMediaPresentationFactory mediaPresentationFactory)
-        : base(entityService, flagProviders, userStartNodeEntitiesService, dataTypeService)
+        : this(
+              entityService,
+              flagProviders,
+              StaticServiceProvider.Instance.GetRequiredService<IMediaStartNodeTreeFilterService>(),
+              mediaPresentationFactory)
     {
-        _appCaches = appCaches;
-        _backofficeSecurityAccessor = backofficeSecurityAccessor;
-        _mediaPresentationFactory = mediaPresentationFactory;
     }
 
     protected override UmbracoObjectTypes ItemObjectType => UmbracoObjectTypes.Media;
@@ -82,18 +73,4 @@ public class MediaTreeControllerBase : UserStartNodeTreeControllerBase<MediaTree
 
         return responseModel;
     }
-
-    protected override int[] GetUserStartNodeIds()
-        => _backofficeSecurityAccessor
-               .BackOfficeSecurity?
-               .CurrentUser?
-               .CalculateMediaStartNodeIds(EntityService, _appCaches)
-           ?? Array.Empty<int>();
-
-    protected override string[] GetUserStartNodePaths()
-        => _backofficeSecurityAccessor
-               .BackOfficeSecurity?
-               .CurrentUser?
-               .GetMediaStartNodePaths(EntityService, _appCaches)
-           ?? Array.Empty<string>();
 }
