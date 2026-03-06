@@ -16,6 +16,11 @@ public static partial class Constants
             ///     Key for current requests body deserialized as JObject.
             /// </summary>
             public const string RequestBodyAsJObject = "RequestBodyAsJObject";
+
+            /// <summary>
+            ///     Key for the CSP nonce value stored per-request.
+            /// </summary>
+            public const string CspNonce = "Umbraco.CspNonce";
         }
     }
 }
