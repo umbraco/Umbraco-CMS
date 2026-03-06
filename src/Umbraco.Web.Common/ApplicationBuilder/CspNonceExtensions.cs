@@ -68,7 +68,7 @@ public static class CspNonceExtensions
     private static void InjectNonceIntoHeader(HttpContext context, CspNonceInjectionOptions options)
     {
         // Skip if the request path doesn't match.
-        if (!options.ShouldApplyToRequest(context))
+        if (options.ShouldApplyToRequest(context) is false)
         {
             return;
         }
