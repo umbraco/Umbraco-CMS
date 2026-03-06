@@ -10,6 +10,9 @@ export interface UmbRestoreFromRecycleBinModalData {
 	itemRepositoryAlias: string;
 	itemDataResolver?: UmbItemDataResolverConstructor;
 	pickerModal: UmbModalToken<UmbPickerModalData<any>, UmbPickerModalValue> | string;
+	destinationItemRepositoryAlias?: string;
+	destinationItemDataResolver?: UmbItemDataResolverConstructor;
+	destinationRootEntityType?: string;
 }
 
 export interface UmbRestoreFromRecycleBinModalValue {
