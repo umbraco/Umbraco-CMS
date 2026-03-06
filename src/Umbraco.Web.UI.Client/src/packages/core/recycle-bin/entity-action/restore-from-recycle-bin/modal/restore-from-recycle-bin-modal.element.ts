@@ -61,27 +61,31 @@ export class UmbRestoreFromRecycleBinModalElement extends UmbModalBaseElement<
 
 			this.#setDestinationValue({
 				unique: null,
-				entityType: this.data?.entityType ?? 'unknown',
+				entityType: this.data?.destinationRootEntityType ?? this.data?.entityType ?? 'unknown',
 			});
 		}
 
 		if (unique) {
-			this._destinationItem = await this.#requestItem(unique);
+			this._destinationItem = await this.#requestDestinationItem(unique);
 			if (!this._destinationItem) throw new Error('Cant find destination item.');
 
-			if (this.data?.itemDataResolver) {
-				const resolver = new this.data.itemDataResolver(this);
-				resolver.setData(this._destinationItem);
-				this._destinationItemName = await resolver.getName();
-			} else {
-				this._destinationItemName = this._destinationItem.name;
-			}
+			this._destinationItemName = await this.#resolveDestinationItemName(this._destinationItem);
 
 			this.#setDestinationValue({
 				unique: this._destinationItem.unique,
 				entityType: this._destinationItem.entityType,
 			});
 		}
+	}
+
+	async #resolveDestinationItemName(item: any): Promise<string> {
+		const resolverCtor = this.data?.destinationItemDataResolver ?? this.data?.itemDataResolver;
+		if (resolverCtor) {
+			const resolver = new resolverCtor(this);
+			resolver.setData(item);
+			return (await resolver.getName()) ?? item.name;
+		}
+		return item.name;
 	}
 
 	async #requestAutomaticRestoreDestination(): Promise<string | null | undefined> {
@@ -110,6 +114,16 @@ export class UmbRestoreFromRecycleBinModalElement extends UmbModalBaseElement<
 		if (!this.data?.itemRepositoryAlias) throw new Error('Cannot restore an item without an item repository alias.');
 
 		const itemRepository = await createExtensionApiByAlias<UmbItemRepository<any>>(this, this.data.itemRepositoryAlias);
+		const { data } = await itemRepository.requestItems([unique]);
+
+		return data?.[0];
+	}
+
+	async #requestDestinationItem(unique: string) {
+		const repoAlias = this.data?.destinationItemRepositoryAlias ?? this.data?.itemRepositoryAlias;
+		if (!repoAlias) throw new Error('Cannot restore an item without an item repository alias.');
+
+		const itemRepository = await createExtensionApiByAlias<UmbItemRepository<any>>(this, repoAlias);
 		const { data } = await itemRepository.requestItems([unique]);
 
 		return data?.[0];

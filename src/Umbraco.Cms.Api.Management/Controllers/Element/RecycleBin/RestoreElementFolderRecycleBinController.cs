@@ -40,6 +40,8 @@ public class RestoreElementFolderRecycleBinController : ElementRecycleBinControl
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [EndpointSummary("Restores an element folder from the recycle bin.")]
+    [EndpointDescription("Restores an element folder from the recycle bin to its original location or a specified parent.")]
     public async Task<IActionResult> RestoreFolder(CancellationToken cancellationToken, Guid id, MoveFolderRequestModel moveFolderRequestModel)
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
