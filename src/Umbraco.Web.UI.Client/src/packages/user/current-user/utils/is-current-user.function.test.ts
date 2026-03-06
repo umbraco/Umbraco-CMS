@@ -5,6 +5,7 @@ import { expect } from '@open-wc/testing';
 import { isCurrentUser } from './is-current-user.function.js';
 import { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
 import { UmbCurrentUserStore } from '../repository/index.js';
+import { useMockSet } from '@umbraco-cms/internal/mock-manager';
 
 @customElement('test-my-controller-host')
 class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {
@@ -25,6 +26,7 @@ describe('isCurrentUser', async () => {
 	let hostElement: UmbTestControllerHostElement;
 
 	before(async () => {
+		await useMockSet('user-permissions');
 		hostElement = new UmbTestControllerHostElement();
 		document.body.appendChild(hostElement);
 		await hostElement.init();
