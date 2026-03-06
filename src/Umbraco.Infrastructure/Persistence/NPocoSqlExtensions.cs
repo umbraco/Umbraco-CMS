@@ -1031,6 +1031,28 @@ namespace Umbraco.Extensions
         }
 
         /// <summary>
+        /// Adds columns to a SELECT Sql statement, optionally including aliases for each field.
+        /// </summary>
+        /// <typeparam name="TDto">The type of the DTO to select.</typeparam>
+        /// <param name="sql">The origin sql.</param>
+        /// <param name="withAlias">Indicates whether to include aliases for the selected fields. The default value is <see langword="true"/>.</param>
+        /// <param name="fields">Expressions indicating the columns to select.</param>
+        /// <returns>The Sql statement.</returns>
+        /// <remarks>
+        /// <para>If <paramref name="fields"/> is empty, all columns are selected.</para>
+        /// </remarks>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="sql"/> is null.</exception>
+        public static Sql<ISqlContext> AndSelect<TDto>(this Sql<ISqlContext> sql, bool withAlias = true, params Expression<Func<TDto, object?>>[] fields)
+        {
+            if (sql == null)
+            {
+                throw new ArgumentNullException(nameof(sql));
+            }
+
+            return sql.Append(", " + string.Join(", ", sql.GetColumns(columnExpressions: fields, withAlias: withAlias)));
+        }
+
+        /// <summary>
         /// Adds columns to a SELECT Sql statement.
         /// </summary>
         /// <typeparam name="TDto">The type of the DTO to select.</typeparam>

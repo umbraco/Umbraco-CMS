@@ -1,31 +1,66 @@
 {
-  "name": "acceptancetest",
-  "private": true,
+  "name": "@umbraco/acceptance-test-helpers",
+  "version": "17.3.0-rc",
+  "description": "Test helpers and builders for making Playwright tests for Umbraco solutions",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist/**/*"
+  ],
   "scripts": {
-    "test": "npx playwright test DefaultConfig",
-    "ui": "npx playwright test --ui DefaultConfig",
+    "build": "tsc -p tsconfig.build.json",
+    "prepack": "npm run build && node cleanse-pkg.js",
+    "test": "npm run build && npx playwright test DefaultConfig",
+    "ui": "npm run build && npx playwright test --ui DefaultConfig",
     "postinstall": "node postinstall.js",
     "config": "node config.js",
-    "testSqlite": "npx playwright test DefaultConfig --grep-invert \"Users\"",
-    "all": "npx playwright test",
+    "testSqlite": "npm run build && npx playwright test DefaultConfig --grep-invert \"Users\"",
+    "all": "npm run build && npx playwright test",
     "createTest": "node createTest.js",
-    "smokeTest": "npx playwright test DefaultConfig --grep \"@smoke\"",
-    "smokeTestSqlite": "npx playwright test DefaultConfig --grep \"@smoke\" --grep-invert \"Users\"",
-    "releaseTest": "npx playwright test DefaultConfig --grep \"@release\"",
-    "testWindows": "npx playwright test DefaultConfig --grep-invert \"RelationType\""
+    "smokeTest": "npm run build && npx playwright test DefaultConfig --grep \"@smoke\"",
+    "smokeTestSqlite": "npm run build && npx playwright test DefaultConfig --grep \"@smoke\" --grep-invert \"Users\"",
+    "releaseTest": "npm run build && npx playwright test DefaultConfig --grep \"@release\"",
+    "testWindows": "npm run build && npx playwright test DefaultConfig --grep-invert \"RelationType\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/umbraco/Umbraco-CMS.git",
+    "directory": "tests/Umbraco.Tests.AcceptanceTest"
+  },
+  "keywords": [
+    "umbraco",
+    "playwright",
+    "helpers",
+    "builders",
+    "models",
+    "acceptance-test",
+    "e2e",
+    "test",
+    "playwright-plugin"
+  ],
+  "author": "Umbraco",
+  "license": "MIT",
+  "dependencies": {
+    "tslib": "^2.6.2"
   },
   "devDependencies": {
     "@playwright/test": "1.56",
     "@types/node": "^20.9.0",
-    "prompt": "^1.2.0", 
-    "tslib": "^2.4.0",
-    "typescript": "^4.8.3"
-  },
-  "dependencies": {
-    "@umbraco/json-models-builders": "^2.0.44",
-    "@umbraco/playwright-testhelpers": "^17.0.36",
-    "camelize": "^1.0.0",
     "dotenv": "^16.3.1",
-    "node-fetch": "^2.6.7"
+    "prompt": "^1.2.0",
+    "typescript": "^5.1.6"
+  },
+  "peerDependencies": {
+    "@playwright/test": ">=1.56"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
   }
 }

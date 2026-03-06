@@ -290,7 +290,17 @@ namespace Umbraco.Cms
                         continue;
                     }
 
-                    List<RefreshInstruction> instructionBatch = GetAllInstructions(jsonInstructions?.RootElement);
+                    // Dispose the JsonDocument once we've extracted instructions from its RootElement.
+                    // Use try/finally to ensure pooled buffers are returned even if retrieving the instructions throws.
+                    List<RefreshInstruction> instructionBatch;
+                    try
+                    {
+                        instructionBatch = GetAllInstructions(jsonInstructions?.RootElement);
+                    }
+                    finally
+                    {
+                        jsonInstructions?.Dispose();
+                    }
 
                     // Process as per-normal.
                     var success = ProcessDatabaseInstructions(cacheRefreshers, instructionBatch, instruction, processed, cancellationToken, ref lastId);

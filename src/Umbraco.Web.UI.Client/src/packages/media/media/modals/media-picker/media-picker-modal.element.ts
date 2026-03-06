@@ -19,7 +19,7 @@ import {
 	state,
 } from '@umbraco-cms/backoffice/external/lit';
 import { debounce, UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
-import { isUmbracoFolder } from '@umbraco-cms/backoffice/media-type';
+import { UmbMediaTypeStructureRepository } from '@umbraco-cms/backoffice/media-type';
 import { UmbPickerModalBaseElement } from '@umbraco-cms/backoffice/picker';
 import { UMB_PROPERTY_TYPE_BASED_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/content';
 import { UMB_VARIANT_CONTEXT } from '@umbraco-cms/backoffice/variant';
@@ -45,6 +45,9 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 	#mediaTreeRepository = new UmbMediaTreeRepository(this);
 	#mediaItemRepository = new UmbMediaItemRepository(this);
 	#mediaSearchProvider = new UmbMediaSearchProvider(this);
+	#mediaTypeStructureRepository = new UmbMediaTypeStructureRepository(this);
+
+	#folderTypeUniques = new Set<string>();
 
 	/* TODO: We currently only rely on the interactionMemory manager in the picker interface which is correctly implemented in the Media Picker
 	Remove this type cast when MediaPicker has implemented the full PickerContext interface */
@@ -142,13 +145,20 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 					name: source.name,
 					unique: source.unique,
 					entityType: source.entityType,
+					mediaType: { unique: source.mediaType.unique },
 				};
 
 				this._searchFrom = { unique: source.unique, entityType: source.entityType };
 			}
 		}
 
+		await this.#loadFolderTypes();
 		this.#loadChildrenOfCurrentMediaItem();
+	}
+
+	async #loadFolderTypes() {
+		const folderTypes = await this.#mediaTypeStructureRepository.requestMediaTypesOfFolders();
+		this.#folderTypeUniques = new Set(folderTypes.map((ft) => ft.unique).filter((u): u is string => u != null));
 	}
 
 	// TODO: move to location manager in context
@@ -234,6 +244,7 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 			name: item.name,
 			unique: item.unique,
 			entityType: item.entityType,
+			mediaType: { unique: item.mediaType.unique },
 		};
 
 		// If the user has navigated into an item, we default to search only within that item.
@@ -349,7 +360,7 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 	}
 
 	#allowNavigateToMedia(item: UmbMediaTreeItemModel | UmbMediaSearchItemModel): boolean {
-		return isUmbracoFolder(item.mediaType.unique) || item.hasChildren;
+		return this.#folderTypeUniques.has(item.mediaType.unique) || item.hasChildren;
 	}
 
 	// TODO: move to search manager in context

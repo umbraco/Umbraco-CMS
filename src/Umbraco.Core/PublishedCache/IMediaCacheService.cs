@@ -94,4 +94,27 @@ public interface IMediaCacheService
     /// <param name="contentType">The published content type to filter by.</param>
     /// <returns>A collection of published media items of the specified type.</returns>
     IEnumerable<IPublishedContent> GetByContentType(IPublishedContentType contentType);
+
+    /// <summary>
+    /// Clears all converted IPublishedContent entries from the in-memory cache,
+    /// without rebuilding the underlying database cache or HybridCache entries.
+    /// </summary>
+    /// <remarks>
+    /// Use this when the published model factory is reset (e.g. InMemoryAuto mode), which
+    /// invalidates all compiled model types and makes cached instances of any type stale.
+    /// </remarks>
+    // TODO (V18): Remove default implementation.
+    void ClearConvertedContentCache() { }
+
+    /// <summary>
+    /// Clears converted IPublishedContent entries for the specified media types from the in-memory cache,
+    /// without rebuilding the underlying database cache or HybridCache entries.
+    /// </summary>
+    /// <remarks>
+    /// Use this when the published model factory is NOT reset (e.g. SourceCodeAuto/SourceCodeManual modes),
+    /// so only the affected media types need their converted cache cleared.
+    /// </remarks>
+    /// <param name="mediaTypeIds">The IDs of the media types whose converted entries should be cleared.</param>
+    // TODO (V18): Remove default implementation.
+    void ClearConvertedContentCache(IReadOnlyCollection<int> mediaTypeIds) { }
 }
