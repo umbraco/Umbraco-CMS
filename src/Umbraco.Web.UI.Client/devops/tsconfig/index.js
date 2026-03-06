@@ -62,6 +62,7 @@ const importmap = createImportMap({
 	rootDir: './src',
 	additionalImports: {
 		'@umbraco-cms/internal/test-utils': './utils/test-utils.ts',
+		'@umbraco-cms/internal/mock-manager': './mocks/mock-manager.ts',
 	},
 	replaceModuleExtensions: true,
 });
