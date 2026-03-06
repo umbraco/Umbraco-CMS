@@ -101,6 +101,8 @@ tools/docfx/
 /tests/Umbraco.Tests.UnitTests/[Uu]mbraco/[Dd]ata/TEMP/
 /BenchmarkDotNet.Artifacts/
 playwright-report
+.playwright-mcp
+.claude/worktrees
 trace.zip
 /tests/Umbraco.Tests.AcceptanceTest/results
 /tests/Umbraco.Tests.AcceptanceTest/dist
