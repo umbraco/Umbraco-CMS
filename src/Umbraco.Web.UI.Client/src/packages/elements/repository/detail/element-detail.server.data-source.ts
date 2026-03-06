@@ -197,6 +197,7 @@ export class UmbElementServerDataSource implements UmbDetailDataSource<UmbElemen
 			documentType: {
 				unique: data.documentType.id,
 				collection: null,
+				icon: data.documentType.icon,
 			},
 			isTrashed: data.isTrashed,
 			flags: data.flags,
