@@ -75,6 +75,11 @@ internal sealed class PropertyDataDto
     [SpecialDbType(SpecialDbTypes.NVARCHARMAX)]
     public string? TextValue { get; set; }
 
+    [Column("sortableValue")]
+    [NullSetting(NullSetting = NullSettings.Null)]
+    [Length(VarcharLength)]
+    public string? SortableValue { get; set; }
+
     [ResultColumn]
     [Reference(ReferenceType.OneToOne, ColumnName = nameof(PropertyTypeId))]
     public PropertyTypeDto? PropertyTypeDto { get; set; }
@@ -125,6 +130,7 @@ internal sealed class PropertyDataDto
             DateValue = DateValue,
             VarcharValue = VarcharValue,
             TextValue = TextValue,
+            SortableValue = SortableValue,
             PropertyTypeDto = PropertyTypeDto,
         };
 
