@@ -25,6 +25,7 @@ export const data: Array<UmbMockUserGroupModel> = [
 			'Umb.Document.Rollback',
 			'Umb.Document.PropertyValue.Read',
 			'Umb.Document.PropertyValue.Write',
+			'my-permission',
 		],
 		permissions: [
 			{
