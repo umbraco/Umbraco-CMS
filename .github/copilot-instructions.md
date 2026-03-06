@@ -1,218 +1,541 @@
-# Umbraco CMS Development Guide
+# Umbraco CMS - Multi-Project Repository
 
-Always reference these instructions first and fallback to search or bash commands only when you encounter unexpected information that does not match the info here.
+Enterprise-grade CMS built on .NET 10.0. This repository contains 21 production projects organized in a layered architecture with clear separation of concerns.
 
-## Working Effectively
+**Repository**: https://github.com/umbraco/Umbraco-CMS
+**License**: MIT
+**Main Branch**: `main`
 
-Bootstrap, build, and test the repository:
+---
 
--   Install .NET SDK (version specified in global.json):
-    -   `curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --version $(jq -r '.sdk.version' global.json)`
-    -   `export PATH="/home/runner/.dotnet:$PATH"`
--   Install Node.js (version specified in src/Umbraco.Web.UI.Client/.nvmrc):
-    -   `curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.0/install.sh | bash`
-    -   `export NVM_DIR="$HOME/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"`
-    -   `nvm install $(cat src/Umbraco.Web.UI.Client/.nvmrc) && nvm use $(cat src/Umbraco.Web.UI.Client/.nvmrc)`
--   Fix shallow clone issue (required for GitVersioning):
-    -   `git fetch --unshallow`
--   Restore packages:
-    -   `dotnet restore` -- takes 50 seconds. NEVER CANCEL. Set timeout to 90+ seconds.
--   Build the solution:
-    -   `dotnet build` -- takes 4.5 minutes. NEVER CANCEL. Set timeout to 10+ minutes.
--   Install and build frontend:
-    -   `cd src/Umbraco.Web.UI.Client`
-    -   `npm ci --no-fund --no-audit --prefer-offline` -- takes 11 seconds.
-    -   `npm run build:for:cms` -- takes 1.25 minutes. NEVER CANCEL. Set timeout to 5+ minutes.
--   Install and build Login
-    -   `cd src/Umbraco.Web.UI.Login`
-    -   `npm ci --no-fund --no-audit --prefer-offline`
-    -   `npm run build`
--   Run the application:
-    -   `cd src/Umbraco.Web.UI`
-    -   `dotnet run --no-build` -- Application runs on https://localhost:44339 and http://localhost:11000
+## 1. Overview
 
-Check out [BUILD.md](./BUILD.md) for more detailed instructions.
+### What This Repository Contains
 
-## Validation
+**21 Production Projects** organized in 3 main categories:
 
--   ALWAYS run through at least one complete end-to-end scenario after making changes.
--   Build and unit tests must pass before committing changes.
--   Frontend build produces output in src/Umbraco.Web.UI.Client/dist-cms/ which gets copied to src/Umbraco.Web.UI/wwwroot/umbraco/backoffice/
--   Always run `dotnet build` and `npm run build:for:cms` before running the application to see your changes.
--   For login-only changes, you can run `npm run build` from src/Umbraco.Web.UI.Login and then `dotnet run --no-build` from src/Umbraco.Web.UI.
--   For frontend-only changes, you can run `npm run dev:server` from src/Umbraco.Web.UI.Client for hot reloading.
--   Frontend changes should be linted using `npm run lint:fix` which uses Eslint.
+1. **Core Architecture** (Domain & Infrastructure)
+   - `Umbraco.Core` - Interface contracts, domain models, notifications
+   - `Umbraco.Infrastructure` - Service implementations, data access, caching
 
-## Testing
+2. **Web & APIs** (Presentation Layer)
+   - `Umbraco.Web.UI` - Main ASP.NET Core web application
+   - `Umbraco.Web.Common` - Shared web functionality, controllers, middleware
+   - `Umbraco.Cms.Api.Management` - Backoffice Management API (REST)
+   - `Umbraco.Cms.Api.Delivery` - Content Delivery API (headless)
+   - `Umbraco.Cms.Api.Common` - Shared API infrastructure
 
-### Unit Tests (.NET)
+3. **Specialized Features** (Pluggable Modules)
+   - Persistence: EF Core (modern), NPoco (legacy) for SQL Server & SQLite
+   - Caching: `PublishedCache.HybridCache` (in-memory + distributed)
+   - Search: `Examine.Lucene` (full-text search)
+   - Imaging: `Imaging.ImageSharp` v1 & v2 (image processing)
+   - Other: Static assets, targets, development tools
 
--   Location: tests/Umbraco.Tests.UnitTests/
--   Run: `dotnet test tests/Umbraco.Tests.UnitTests/Umbraco.Tests.UnitTests.csproj --configuration Release --verbosity minimal`
--   Duration: ~1 minute with 3,343 tests
--   NEVER CANCEL: Set timeout to 5+ minutes
+**6 Test Projects**:
+- `Umbraco.Tests.Common` - Shared test utilities
+- `Umbraco.Tests.UnitTests` - Unit tests
+- `Umbraco.Tests.Integration` - Integration tests
+- `Umbraco.Tests.Benchmarks` - Performance benchmarks
+- `Umbraco.Tests.AcceptanceTest` - E2E tests
+- `Umbraco.Tests.AcceptanceTest.UmbracoProject` - Test instance
 
-### Integration Tests (.NET)
+### Key Technologies
 
--   Location: tests/Umbraco.Tests.Integration/
--   Run: `dotnet test tests/Umbraco.Tests.Integration/Umbraco.Tests.Integration.csproj --configuration Release --verbosity minimal`
--   NEVER CANCEL: Set timeout to 10+ minutes
+- **.NET 10.0** - Target framework for all projects
+- **ASP.NET Core** - Web framework
+- **Entity Framework Core** - Modern ORM
+- **OpenIddict** - OAuth 2.0/OpenID Connect authentication
+- **Swashbuckle** - OpenAPI/Swagger documentation
+- **Lucene.NET** - Full-text search via Examine
+- **ImageSharp** - Image processing
 
-### Frontend Tests
+---
 
--   Location: src/Umbraco.Web.UI.Client/
--   Run: `npm test` (requires `npx playwright install` first)
--   Frontend tests use Web Test Runner with Playwright
+## 2. Repository Structure
 
-### Acceptance Tests (E2E)
-
--   Location: tests/Umbraco.Tests.AcceptanceTest/
--   Requires running Umbraco application and configuration
--   See tests/Umbraco.Tests.AcceptanceTest/README.md for detailed setup (requires `npx playwright install` first)
-
-## Project Structure
-
-The solution contains 30 C# projects organized as follows:
-
-### Main Application Projects
-
--   **Umbraco.Web.UI**: Main web application project (startup project)
--   **Umbraco.Web.UI.Client**: TypeScript frontend (backoffice)
--   **Umbraco.Web.UI.Login**: Separate login screen frontend
--   **Umbraco.Core**: Core domain models and interfaces
--   **Umbraco.Infrastructure**: Data access and infrastructure
--   **Umbraco.Cms**: Main CMS package
-
-### API Projects
-
--   **Umbraco.Cms.Api.Management**: Management API
--   **Umbraco.Cms.Api.Delivery**: Content Delivery API
--   **Umbraco.Cms.Api.Common**: Shared API components
-
-### Persistence Projects
-
--   **Umbraco.Cms.Persistence.SqlServer**: SQL Server support
--   **Umbraco.Cms.Persistence.Sqlite**: SQLite support
--   **Umbraco.Cms.Persistence.EFCore**: Entity Framework Core abstractions
-
-### Test Projects
-
--   **Umbraco.Tests.UnitTests**: Unit tests
--   **Umbraco.Tests.Integration**: Integration tests
--   **Umbraco.Tests.AcceptanceTest**: End-to-end tests with Playwright
--   **Umbraco.Tests.Common**: Shared test utilities
-
-## Common Tasks
-
-### Running Umbraco in Different Modes
-
-**Production Mode (Standard Development)**
-Use this for backend development, testing full builds, or when you don't need hot reloading:
-
-1. Build frontend assets: `cd src/Umbraco.Web.UI.Client && npm run build:for:cms`
-2. Run backend: `cd src/Umbraco.Web.UI && dotnet run --no-build`
-3. Access backoffice: `https://localhost:44339/umbraco`
-4. Application uses compiled frontend from `wwwroot/umbraco/backoffice/`
-
-**Vite Dev Server Mode (Frontend Development with Hot Reload)**
-Use this for frontend-only development with hot module reloading:
-
-1. Configure backend for frontend development - Add to `src/Umbraco.Web.UI/appsettings.json` under `Umbraco:CMS:Security`:
-    ```json
-    "BackOfficeHost": "http://localhost:5173",
-    "AuthorizeCallbackPathName": "/oauth_complete",
-    "AuthorizeCallbackLogoutPathName": "/logout",
-    "AuthorizeCallbackErrorPathName": "/error",
-    "BackOfficeTokenCookie": {
-      "SameSite": "None"
-    }
-    ```
-2. Run backend: `cd src/Umbraco.Web.UI && dotnet run --no-build`
-3. Run frontend dev server: `cd src/Umbraco.Web.UI.Client && npm run dev:server`
-4. Access backoffice: `http://localhost:5173/` (no `/umbraco` prefix)
-5. Changes to TypeScript/Lit files hot reload automatically
-
-**Important:** Remove the `BackOfficeHost` configuration before committing or switching back to production mode.
-
-### Backend-Only Development
-
-For backend-only changes, disable frontend builds:
-
--   Comment out the target named "BuildStaticAssetsPreconditions" in src/Umbraco.Cms.StaticAssets.csproj:
-    ```
-    <!--<Target Name="BuildStaticAssetsPreconditions" BeforeTargets="AssignTargetPaths">
-      [...]
-    </Target>-->
-    ```
--   Remember to uncomment before committing
-
-### Building NuGet Packages
-
-To build custom NuGet packages for testing:
-
-```bash
-dotnet pack -c Release -o Build.Out
-dotnet nuget add source [Path to Build.Out folder] -n MyLocalFeed
+```
+Umbraco-CMS/
+├── src/                                    # 21 production projects
+│   ├── Umbraco.Core/                      # Domain contracts (interfaces only)
+│   │   └── CLAUDE.md                      # ⭐ Core architecture guide
+│   ├── Umbraco.Infrastructure/            # Service implementations
+│   ├── Umbraco.Web.Common/                # Web utilities
+│   ├── Umbraco.Web.UI/                    # Main web application
+│   ├── Umbraco.Cms.Api.Management/        # Management API
+│   ├── Umbraco.Cms.Api.Delivery/          # Delivery API (headless)
+│   ├── Umbraco.Cms.Api.Common/            # Shared API infrastructure
+│   │   └── CLAUDE.md                      # ⭐ API patterns guide
+│   ├── Umbraco.PublishedCache.HybridCache/ # Content caching
+│   ├── Umbraco.Examine.Lucene/            # Search indexing
+│   ├── Umbraco.Cms.Persistence.EFCore/    # EF Core data access
+│   ├── Umbraco.Cms.Persistence.EFCore.Sqlite/
+│   ├── Umbraco.Cms.Persistence.EFCore.SqlServer/
+│   ├── Umbraco.Cms.Persistence.Sqlite/    # Legacy SQLite
+│   ├── Umbraco.Cms.Persistence.SqlServer/ # Legacy SQL Server
+│   ├── Umbraco.Cms.Imaging.ImageSharp/    # Image processing v1
+│   ├── Umbraco.Cms.Imaging.ImageSharp2/   # Image processing v2
+│   ├── Umbraco.Cms.StaticAssets/          # Embedded assets
+│   ├── Umbraco.Cms.DevelopmentMode.Backoffice/
+│   ├── Umbraco.Cms.Targets/               # NuGet targets
+│   └── Umbraco.Cms/                       # Meta-package
+│
+├── tests/                                  # 6 test projects
+│   ├── Umbraco.Tests.Common/
+│   ├── Umbraco.Tests.UnitTests/
+│   ├── Umbraco.Tests.Integration/
+│   ├── Umbraco.Tests.Benchmarks/
+│   ├── Umbraco.Tests.AcceptanceTest/
+│   └── Umbraco.Tests.AcceptanceTest.UmbracoProject/
+│
+├── templates/                              # Project templates
+│   └── Umbraco.Templates/
+│
+├── tools/                                  # Build tools
+│   └── Umbraco.JsonSchema/
+│
+├── umbraco.sln                            # Main solution file
+├── Directory.Build.props                  # Shared build configuration
+├── Directory.Packages.props               # Centralized package versions
+├── .editorconfig                          # Code style
+└── .globalconfig                          # Roslyn analyzers
 ```
 
-### Regenerating Frontend API Types
+### Architecture Layers
 
-When changing Management API:
+**Dependency Flow** (unidirectional, always flows inward):
 
-```bash
-cd src/Umbraco.Web.UI.Client
-npm run generate:server-api-dev
+```
+Web.UI → Web.Common → Infrastructure → Core
+                ↓
+          Api.Management → Api.Common → Infrastructure → Core
+                ↓
+          Api.Delivery → Api.Common → Infrastructure → Core
 ```
 
-Also update OpenApi.json from /umbraco/swagger/management/swagger.json
+**Key Principle**: Core has NO dependencies (pure contracts). Infrastructure implements Core. Web/APIs depend on Infrastructure.
 
-## Database Setup
+### Project Dependencies
 
-Default configuration supports SQLite for development. For production-like testing:
+**Core Layer**:
+- `Umbraco.Core` → No dependencies (only Microsoft.Extensions.*)
 
--   Use SQL Server/LocalDb for better performance
--   Configure connection string in src/Umbraco.Web.UI/appsettings.json
+**Infrastructure Layer**:
+- `Umbraco.Infrastructure` → `Umbraco.Core`
+- `Umbraco.PublishedCache.*` → `Umbraco.Infrastructure`
+- `Umbraco.Examine.Lucene` → `Umbraco.Infrastructure`
+- `Umbraco.Cms.Persistence.*` → `Umbraco.Infrastructure`
 
-## Clean Up / Reset
+**Web Layer**:
+- `Umbraco.Web.Common` → `Umbraco.Infrastructure` + caching + search
+- `Umbraco.Web.UI` → `Umbraco.Web.Common` + all features
 
-To reset development environment:
+**API Layer**:
+- `Umbraco.Cms.Api.Common` → `Umbraco.Web.Common`
+- `Umbraco.Cms.Api.Management` → `Umbraco.Cms.Api.Common`
+- `Umbraco.Cms.Api.Delivery` → `Umbraco.Cms.Api.Common`
 
-```bash
-# Remove configuration and database
-rm src/Umbraco.Web.UI/appsettings.json
-rm -rf src/Umbraco.Web.UI/umbraco/Data
+---
 
-# Full clean (removes all untracked files)
-git clean -xdf .
+## 3. Teamwork & Collaboration
+
+### Branching Strategy
+
+- **Main branch**: `main` (protected)
+- **Branch naming convention**: `v<version>/<type>/<description>`
+
+**Format**: `v{major-version}/{type}/{kebab-case-description}`
+
+**Version**: Read from `version.json` in the repository root. Use the major version number (e.g., `v17` for version 17.x.x).
+
+**Types**:
+| Type | Use Case |
+|------|----------|
+| `feature` | New feature being introduced to the product |
+| `bugfix` | Fix to an existing issue with the product |
+| `qa` | Adding or updating unit, integration, or end-to-end tests |
+| `improvement` | Update to something that already exists but isn't broken (UI finessing, refactoring) |
+| `task` | Update that doesn't directly impact product behavior (dependency updates, build pipeline) |
+
+**Description**: A short, kebab-case description (a few words). This should be prefixed with the GitHub issue number if the update is related to resolving a tracked issue.
+
+**Examples**:
+```
+v17/bugfix/12345-correct-display-of-pending-migrations
+v17/feature/add-webhook-support
+v17/improvement/optimize-content-cache
+v17/qa/add-media-service-tests
+v17/task/update-ef-core-dependency
 ```
 
-## Version Information
+See `.github/CONTRIBUTING.md` for full guidelines.
 
--   Target Framework: .NET (version specified in global.json)
--   Current Version: (specified in version.json)
--   Node.js Requirement: (specified in src/Umbraco.Web.UI.Client/.nvmrc)
--   npm Requirement: Latest compatible version
+### Pull Request Process
 
-## Known Issues
+- **PR Template**: `.github/pull_request_template.md`
+- **Required CI Checks**:
+  - All tests pass
+  - Code formatting (dotnet format)
+  - No build warnings
+- **Merge Strategy**: Squash and merge (via GitHub UI)
+- **Reviews**: Required from code owners
 
--   Build requires full git history (not shallow clone) due to GitVersioning
--   Some NuGet package security warnings are expected (SixLabors.ImageSharp vulnerabilities)
--   Frontend tests require Playwright browser installation: `npx playwright install`
--   Older Node.js versions may show engine compatibility warnings (check .nvmrc for current requirement)
+#### PR Naming Convention
 
-## Timing Expectations
+Use the format: `Area: Description (closes #IssueID)`
 
-**NEVER CANCEL** these operations - they are expected to take time:
+**Examples**:
+| Area | Description | Issue |
+|------|-------------|-------|
+| Relations: | Move persistence of relations from repository into notification handlers | (closes #00000) |
+| Management API: | Correct the population of the parent for sibling items when retrieved under a folder | |
+| Docs: | Updated contributing guidelines to welcome contributions on bugfixes | |
 
-| Operation               | Expected Time | Timeout Setting |
-| ----------------------- | ------------- | --------------- |
-| `dotnet restore`        | 50 seconds    | 90+ seconds     |
-| `dotnet build`          | 4.5 minutes   | 10+ minutes     |
-| `npm ci`                | 11 seconds    | 30+ seconds     |
-| `npm run build:for:cms` | 1.25 minutes  | 5+ minutes      |
-| `npm test`              | 2 minutes     | 5+ minutes      |
-| `npm run lint`          | 1 minute      | 5+ minutes      |
-| Unit tests              | 1 minute      | 5+ minutes      |
-| Integration tests       | Variable      | 10+ minutes     |
+**Area**: The feature or aspect affected (e.g., UFM, TipTap, Docs, Segmentation, Migrations). Helps readers quickly understand what is being changed.
 
-Always wait for commands to complete rather than canceling and retrying.
+**Description Best Practices**:
+- Include the area of change (Relations, Management API, etc.)
+- Describe the change and its impact
+- Be specific, not vague (describe "a golden retriever" not just "a dog")
+
+**Issue Linking**: Add `(closes #IssueID)` to auto-close linked issues on merge.
+
+### Commit Messages
+
+Follow Conventional Commits format:
+```
+<type>(<scope>): <description>
+
+Types: feat, fix, docs, style, refactor, test, chore
+Scope: project name (core, web, api, etc.)
+
+Examples:
+feat(core): add IContentService.GetByIds method
+fix(api): resolve null reference in schema handler
+docs(web): update routing documentation
+```
+
+### Code Owners
+
+Project ownership is distributed across teams. Check individual project directories for ownership.
+
+---
+
+## 4. Architecture Patterns
+
+### Core Architectural Decisions
+
+1. **Layered Architecture with Dependency Inversion**
+   - Core defines contracts (interfaces)
+   - Infrastructure implements contracts
+   - Web/APIs consume implementations via DI
+
+2. **Interface-First Design**
+   - All services defined as interfaces in Core
+   - Enables testing, polymorphism, extensibility
+
+3. **Notification Pattern** (not C# events)
+   - See `/src/Umbraco.Core/CLAUDE.md` → "2. Notification System (Event Handling)"
+
+4. **Composer Pattern** (DI registration)
+   - See `/src/Umbraco.Core/CLAUDE.md` → "3. Composer Pattern (DI Registration)"
+
+5. **Scoping Pattern** (Unit of Work)
+   - See `/src/Umbraco.Core/CLAUDE.md` → "5. Scoping Pattern (Unit of Work)"
+
+6. **Attempt Pattern** (operation results)
+   - `Attempt<TResult, TStatus>` instead of exceptions
+   - Strongly-typed operation status enums
+
+### Key Design Patterns Used
+
+- **Repository Pattern** - Data access abstraction
+- **Unit of Work** - Scoping for transactions
+- **Builder Pattern** - `ProblemDetailsBuilder` for API errors
+- **Strategy Pattern** - OpenAPI handlers (schema ID, operation ID)
+- **Options Pattern** - All configuration via `IOptions<T>`
+- **Factory Pattern** - Content type factories
+- **Mediator Pattern** - Notification aggregator
+
+---
+
+## 5. Avoiding Breaking Changes
+
+No binary breaking changes are allowed within a major version. Three patterns are used:
+
+### 5.1 Obsolete Constructor + StaticServiceProvider
+
+When a public class needs new dependencies, obsolete the existing constructor and add a new one. The old constructor delegates to the new one, resolving missing deps via `StaticServiceProvider`.
+
+```csharp
+[Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
+public MyService(IDependencyA depA)
+    : this(
+        depA,
+        StaticServiceProvider.Instance.GetRequiredService<IDependencyB>())
+{
+}
+
+public MyService(IDependencyA depA, IDependencyB depB)
+{
+    _depA = depA;
+    _depB = depB;
+}
+```
+
+**Examples**:
+- `ContentCollectionPresentationFactory` - added `FlagProviderCollection`
+- `CacheInstructionService` - added `ILastSyncedManager`, `IRepositoryCacheVersionService`
+- `DocumentPresentationFactory` - added `FlagProviderCollection`
+
+**Rules**:
+- Old constructor marked `[Obsolete("... Scheduled for removal in Umbraco {current-major+2}.")]`
+- Old constructor calls new constructor via `: this(...)`
+- Uses `StaticServiceProvider.Instance.GetRequiredService<T>()` for new params only
+- DI registration must use the NEW constructor (old is for external consumers only)
+
+### 5.2 Obsolete Method + New Overload
+
+When a public method signature needs to change, add the new method/overload and obsolete the old. The obsolete method should call the new one with suitable defaults.
+
+```csharp
+[Obsolete("Use the overload taking all parameters. Scheduled for removal in Umbraco 19.")]
+public void DoThing(string name)
+    => DoThing(name, extraParam: null);
+
+public void DoThing(string name, string? extraParam)
+{
+    // Real implementation here
+}
+```
+
+**Rules**:
+- Old method marked `[Obsolete]` with removal schedule
+- DRY: old method calls new method, providing defaults for new parameters
+- All internal callers must be updated to use the new method
+- No callers should remain on the obsolete method within the codebase
+
+### 5.3 Default Interface Implementation
+
+When adding methods to a public interface, provide a default implementation so existing external implementations don't break.
+
+```csharp
+public interface IMyService
+{
+    // Existing method
+    void ExistingMethod();
+
+    // New method with default implementation
+    void NewMethod(string param)
+        => ExistingMethod(); // delegate to existing if possible
+}
+```
+
+**Strategies for the default** (in order of preference):
+1. **Use existing interface methods** to satisfy the contract (even if not optimal)
+2. **Return a sensible default** like empty collection, null, etc.
+3. **Throw `NotImplementedException`** if no reasonable default exists
+
+**Example**: `IContentService.SaveBlueprint` - new overload with `IContent? createdFromContent` has a default impl that calls the old method (ignoring the new param).
+
+**Example**: `IDocumentPresentationFactory.CreateCulturePublishScheduleModels` - full default implementation with logic, uses `StaticServiceProvider` for dependency resolution within the interface.
+
+**Rules**:
+- Add `// TODO (V{next-major}): Remove the default implementation when {obsolete method} is removed.` comment
+- Default impl should be functionally correct even if not optimal
+- If using `StaticServiceProvider` in a default impl, note this is temporary
+
+### 5.4 General Rules
+
+- **Removal policy**: Obsoleted members must remain for at least one full major version before removal. If obsoleted in version N, the earliest removal is version N+2. For example, something obsoleted in v17 is scheduled for removal in v19 (giving the whole of v18 as a deprecation period).
+- All `[Obsolete]` attributes must include **"Scheduled for removal in Umbraco {current+2}"**
+- Read `version.json` to determine the current major version
+- Suppress `CS0618` warnings where obsolete members must call each other:
+  ```csharp
+  #pragma warning disable CS0618 // Type or member is obsolete
+      => OldMethod(param);
+  #pragma warning restore CS0618 // Type or member is obsolete
+  ```
+- Update ALL internal callers to use the new API - no internal code should use obsolete members
+
+---
+
+## 6. Project-Specific Notes
+
+### Centralized Package Management
+
+**All NuGet package versions** are centralized in `Directory.Packages.props`. Individual projects do NOT specify versions.
+
+```xml
+<!-- Individual projects reference WITHOUT version -->
+<PackageReference Include="Swashbuckle.AspNetCore" />
+
+<!-- Versions defined in Directory.Packages.props -->
+<PackageVersion Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+```
+
+### Build Configuration
+
+- `Directory.Build.props` - Shared properties (target framework, company, copyright)
+- `.editorconfig` - Code style rules
+- `.globalconfig` - Roslyn analyzer rules
+
+### Persistence Layer - NPoco and EF Core
+
+The repository contains BOTH (actively supported):
+- **Current**: NPoco-based persistence (`Umbraco.Cms.Persistence.Sqlite`, `Umbraco.Cms.Persistence.SqlServer`) - widely used and fully supported
+- **Future**: EF Core-based persistence (`Umbraco.Cms.Persistence.EFCore.*`) - migration in progress
+
+**Note**: The codebase is actively migrating to EF Core, but NPoco remains the primary persistence layer and is not deprecated. Both are fully supported.
+
+### Authentication: OpenIddict
+
+All APIs use **OpenIddict** (OAuth 2.0/OpenID Connect):
+- Reference tokens (not JWT) for better security
+- **Secure cookie-based token storage** (v17+) - tokens stored in HTTP-only cookies with `__Host-` prefix
+- Tokens are redacted from client-side responses and passed via secure cookies only
+- ASP.NET Core Data Protection for token encryption
+- Configured in `Umbraco.Cms.Api.Common`
+- API requests must include credentials (`credentials: include` for fetch)
+
+**Load Balancing Requirement**: All servers must share the same Data Protection key ring.
+
+### Content Caching Strategy
+
+**HybridCache** (`Umbraco.PublishedCache.HybridCache`):
+- In-memory cache + distributed cache support
+- Published content only (not draft)
+- Invalidated via notifications and cache refreshers
+
+### API Versioning
+
+APIs use `Asp.Versioning.Mvc`:
+- Management API: `/umbraco/management/api/v{version}/*`
+- Delivery API: `/umbraco/delivery/api/v{version}/*`
+- OpenAPI/Swagger docs per version
+
+### Backoffice npm Package Structure
+
+The backoffice (`Umbraco.Web.UI.Client`) is published to npm as **`@umbraco-cms/backoffice`** with a plugin architecture:
+
+#### Architecture Overview
+
+- **Multi-workspace structure**: Subprojects in `src/libs/*`, `src/packages/*`, `src/external/*`
+- **Export model**: All exports defined in root `package.json` → `./exports` field
+- **Importmap-driven runtime**: Dependencies provided at runtime via importmap (single source of truth)
+- **Build-time types**: TypeScript types come from npm peerDependencies
+- **Plugin model**: Developers create plugins that import from `@umbraco-cms/backoffice/*` exports
+
+#### Dependency Hoisting Strategy
+
+When building for npm (`npm pack`), the `cleanse-pkg.js` script hoists subproject dependencies to root `peerDependencies` with intelligent version range conversion:
+
+**Version Range Logic** (uses `semver` package):
+
+1. **Pre-release (0.x.y)**: Convert to explicit range
+   - Input: `^0.85.0` or `0.85.0`
+   - Output: `>=0.85.0 <1.0.0`
+   - Rationale: Pre-release caret only allows patch updates, explicit range allows minor upgrades within 0.x.x
+   - Example: Plugin can use `@hey-api/openapi-ts@0.91.1` while backoffice uses `0.85.0`
+
+2. **Stable with caret (^X.Y.Z where X ≥ 1)**: Keep as-is
+   - Input: `^3.3.1`
+   - Output: `^3.3.1` (unchanged)
+   - Rationale: Caret already implements correct semantics for stable versions
+
+3. **Stable exact versions (X.Y.Z where X ≥ 1)**: Add caret
+   - Input: `3.16.0`
+   - Output: `^3.16.0`
+   - Rationale: Normalizes to conventional semver format
+
+#### Key Dependencies
+
+**Runtime via importmap** (types available from peerDependencies):
+- `lit`, `rxjs`, `@umbraco-ui/uui` - Core framework
+- `monaco-editor`, `@tiptap/*` - Feature-specific editors
+- `@hey-api/openapi-ts` - HTTP client type generation
+
+**Build-time only** (not hoisted):
+- `vite`, `typescript`, `eslint` - Dev tooling
+
+#### Plugin Development Implications
+
+Plugin developers should:
+- **Declare explicit dependencies** in their own `package.json` (avoid relying on transitive deps)
+- **Understand the version ranges**: `>=0.85.0 <1.0.0` means they can use newer pre-release versions
+- **Know that types match npm ranges**, but runtime comes from importmap (managed by backoffice)
+- **When `@hey-api` hits 1.0.0**: Published constraint will automatically become `^1.0.0`
+
+#### Implementation Details
+
+- Script location: `src/Umbraco.Web.UI.Client/devops/publish/cleanse-pkg.js`
+- Runs as `prepack` hook before npm pack
+- Uses `semver.minVersion()` for robust version range parsing
+- Generates single source of truth for importmap versions
+
+### Known Limitations
+
+1. **Circular Dependencies**: Avoided via `Lazy<T>` or event notifications
+2. **Multi-Server**: Requires shared Data Protection key ring and synchronized clocks (NTP)
+3. **Database Support**: SQL Server, SQLite
+
+---
+
+## Quick Reference
+
+### Essential Commands
+
+```bash
+# Build solution
+dotnet build
+
+# Run all tests
+dotnet test
+
+# Run specific test category
+dotnet test --filter "Category=Integration"
+
+# Format code
+dotnet format
+
+# Pack all projects
+dotnet pack -c Release
+```
+
+### Key Projects
+
+| Project | Type | Description |
+|---------|------|-------------|
+| **Umbraco.Core** | Library | Interface contracts and domain models |
+| **Umbraco.Infrastructure** | Library | Service implementations and data access |
+| **Umbraco.Web.UI** | Application | Main web application (Razor/MVC) |
+| **Umbraco.Cms.Api.Management** | Library | Management API (backoffice) |
+| **Umbraco.Cms.Api.Delivery** | Library | Delivery API (headless CMS) |
+| **Umbraco.Cms.Api.Common** | Library | Shared API infrastructure |
+| **Umbraco.PublishedCache.HybridCache** | Library | Published content caching |
+| **Umbraco.Examine.Lucene** | Library | Full-text search indexing |
+
+### Important Files
+
+- **Solution**: `umbraco.sln`
+- **Build Config**: `Directory.Build.props`, `Directory.Packages.props`
+- **Code Style**: `.editorconfig`, `.globalconfig`
+- **Documentation**: `/CLAUDE.md`, `/src/Umbraco.Core/CLAUDE.md`, `/src/Umbraco.Cms.Api.Common/CLAUDE.md`
+
+### Project-Specific Documentation
+
+For detailed information about individual projects, see their CLAUDE.md files:
+- **Core Architecture**: `/src/Umbraco.Core/CLAUDE.md` - Service contracts, notification patterns
+- **API Infrastructure**: `/src/Umbraco.Cms.Api.Common/CLAUDE.md` - OpenAPI, authentication, serialization
+
+### Getting Help
+
+- **Official Docs**: https://docs.umbraco.com/
+- **Contributing Guide**: `.github/CONTRIBUTING.md`
+- **Issues**: https://github.com/umbraco/Umbraco-CMS/issues
+- **Community**: https://forum.umbraco.com/
+- **Releases**: https://releases.umbraco.com/
+
+---
+
+**This repository follows a layered architecture with strict dependency rules. The Core defines contracts, Infrastructure implements them, and Web/APIs consume them. Each layer can be understood independently, but dependencies always flow inward toward Core.**
