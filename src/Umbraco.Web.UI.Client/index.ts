@@ -19,8 +19,11 @@ async function bootstrap() {
 		});
 
 		// Register mock set switcher header app
-		const { manifests } = await import('./mocks/backoffice-extensions/manifests.js');
-		umbExtensionsRegistry.registerMany(manifests);
+		// TODO: implement for the static build too. We need to be able load the mock sets
+		if (import.meta.env.MODE === 'development') {
+			const { manifests } = await import('./mocks/backoffice-extensions/manifests.js');
+			umbExtensionsRegistry.registerMany(manifests);
+		}
 	} else {
 		appElement.serverUrl = import.meta.env.VITE_UMBRACO_API_URL;
 	}
