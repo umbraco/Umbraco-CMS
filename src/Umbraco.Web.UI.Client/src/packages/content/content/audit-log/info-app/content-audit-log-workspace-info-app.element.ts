@@ -1,26 +1,52 @@
-import { UmbDocumentAuditLogRepository } from '../repository/index.js';
-import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../workspace/constants.js';
-import type { UmbDocumentAuditLogModel } from '../types.js';
-import { getDocumentHistoryTagStyleAndText } from './utils.js';
-import { css, customElement, html, nothing, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
+import type { ManifestAuditLogAction } from '../audit-log-action/audit-log-action.extension.js';
+import type { ManifestWorkspaceInfoAppAuditLogKind } from './types.js';
+import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbPaginationManager, UMB_DATE_TIME_FORMAT_OPTIONS } from '@umbraco-cms/backoffice/utils';
+import { UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
 import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbUserItemRepository } from '@umbraco-cms/backoffice/user';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
-import type { ManifestEntityAction } from '@umbraco-cms/backoffice/entity-action';
+import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import type { UmbAuditLogModel, UmbAuditLogRepository } from '@umbraco-cms/backoffice/audit-log';
 import type { UmbUserItemModel } from '@umbraco-cms/backoffice/user';
 import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 
-/**
- * @deprecated Scheduled for removal in Umbraco 19. Replaced by the shared 'auditLog' kind element (UmbContentAuditLogWorkspaceInfoAppElement).
- */
-@customElement('umb-document-history-workspace-info-app')
-export class UmbDocumentHistoryWorkspaceInfoAppElement extends UmbLitElement {
-	#allowedActions = new Set(['Umb.EntityAction.Document.Rollback']);
+const TimeOptions: Intl.DateTimeFormatOptions = {
+	year: 'numeric',
+	month: 'long',
+	day: 'numeric',
+	hour: 'numeric',
+	minute: 'numeric',
+	second: 'numeric',
+};
 
-	#auditLogRepository = new UmbDocumentAuditLogRepository(this);
+@customElement('umb-content-audit-log-workspace-info-app')
+export class UmbContentAuditLogWorkspaceInfoAppElement extends UmbLitElement {
+	@property({ type: Object })
+	private _manifest?: ManifestWorkspaceInfoAppAuditLogKind | undefined;
+	public get manifest(): ManifestWorkspaceInfoAppAuditLogKind | undefined {
+		return this._manifest;
+	}
+	public set manifest(value: ManifestWorkspaceInfoAppAuditLogKind | undefined) {
+		this._manifest = value;
+		this.#init();
+	}
+
+	@state()
+	private _currentPageNumber = 1;
+
+	@state()
+	private _entityType?: string;
+
+	@state()
+	private _items: Array<UmbAuditLogModel> = [];
+
+	@state()
+	private _totalPages = 1;
+
+	#auditLogRepository?: UmbAuditLogRepository;
 
 	#pagination = new UmbPaginationManager();
 
@@ -28,16 +54,7 @@ export class UmbDocumentHistoryWorkspaceInfoAppElement extends UmbLitElement {
 
 	#userMap = new Map<string, UmbUserItemModel>();
 
-	#workspaceContext?: typeof UMB_DOCUMENT_WORKSPACE_CONTEXT.TYPE;
-
-	@state()
-	private _currentPageNumber = 1;
-
-	@state()
-	private _items: Array<UmbDocumentAuditLogModel> = [];
-
-	@state()
-	private _totalPages = 1;
+	#workspaceContext?: typeof UMB_ENTITY_WORKSPACE_CONTEXT.TYPE;
 
 	constructor() {
 		super();
@@ -52,10 +69,23 @@ export class UmbDocumentHistoryWorkspaceInfoAppElement extends UmbLitElement {
 			});
 		});
 
-		this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, (instance) => {
+		this.consumeContext(UMB_ENTITY_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
 			this.#requestAuditLogs();
 		});
+	}
+
+	async #init() {
+		if (!this._manifest) return;
+		const auditLogRepositoryAlias = this._manifest.meta.auditLogRepositoryAlias;
+
+		if (!auditLogRepositoryAlias) {
+			throw new Error('Audit log repository alias is required');
+		}
+
+		this.#auditLogRepository = await createExtensionApiByAlias<UmbAuditLogRepository>(this, auditLogRepositoryAlias);
+
+		this.#requestAuditLogs();
 	}
 
 	#onPageChange(event: UUIPaginationEvent) {
@@ -65,9 +95,14 @@ export class UmbDocumentHistoryWorkspaceInfoAppElement extends UmbLitElement {
 
 	async #requestAuditLogs() {
 		if (!this.#workspaceContext) return;
+		if (!this.#auditLogRepository) return;
 
 		const unique = this.#workspaceContext.getUnique();
-		if (!unique) throw new Error('Document unique is required');
+		if (!unique) {
+			throw new Error('Workspace entity unique is required');
+		}
+
+		this._entityType = this.#workspaceContext.getEntityType();
 
 		const { data } = await this.#auditLogRepository.requestAuditLog({
 			unique,
@@ -104,13 +139,17 @@ export class UmbDocumentHistoryWorkspaceInfoAppElement extends UmbLitElement {
 	override render() {
 		return html`
 			<umb-workspace-info-app-layout headline="#general_history">
-				<umb-extension-with-api-slot
-					slot="header-actions"
-					type="entityAction"
-					.apiArgs=${(manifest: ManifestEntityAction) => [manifest]}
-					.filter=${(manifest: ManifestEntityAction) =>
-						this.#allowedActions.has(manifest.alias)}></umb-extension-with-api-slot>
-
+				${when(
+					this._entityType,
+					(entityType) => html`
+						<umb-extension-with-api-slot
+							slot="header-actions"
+							type="auditLogAction"
+							.apiArgs=${(manifest: ManifestAuditLogAction) => [manifest]}
+							.filter=${(manifest: ManifestAuditLogAction) => manifest.forEntityTypes.includes(entityType)}>
+						</umb-extension-with-api-slot>
+					`,
+				)}
 				<div id="content">
 					${when(
 						this._items,
@@ -130,31 +169,27 @@ export class UmbDocumentHistoryWorkspaceInfoAppElement extends UmbLitElement {
 				${repeat(
 					this._items,
 					(item) => item.timestamp,
-					(item) => {
-						const { text, style } = getDocumentHistoryTagStyleAndText(item.logType);
-						const user = this.#userMap.get(item.user.unique);
-
-						return html`
-							<umb-history-item
-								.name=${user?.name ?? 'Unknown'}
-								.detail=${this.localize.date(item.timestamp, UMB_DATE_TIME_FORMAT_OPTIONS)}>
-								<umb-user-avatar
-									slot="avatar"
-									.name=${user?.name}
-									.kind=${user?.kind}
-									.imgUrls=${user?.avatarUrls ?? []}>
-								</umb-user-avatar>
-								<div class="log-type">
-									<uui-tag look=${style.look} color=${style.color}>
-										${this.localize.term(text.label, item.parameters)}
-									</uui-tag>
-									<span>${this.localize.term(text.desc, item.parameters)}</span>
-								</div>
-							</umb-history-item>
-						`;
-					},
+					(item) => this.#renderHistoryItem(item),
 				)}
 			</umb-history-list>
+		`;
+	}
+
+	#renderHistoryItem(item: UmbAuditLogModel) {
+		const tagData = this.#auditLogRepository?.getTagStyleAndText?.(item.logType);
+		const user = this.#userMap.get(item.user.unique);
+
+		return html`
+			<umb-history-item .name=${user?.name ?? 'Unknown'} .detail=${this.localize.date(item.timestamp, TimeOptions)}>
+				<umb-user-avatar slot="avatar" .name=${user?.name} .kind=${user?.kind} .imgUrls=${user?.avatarUrls ?? []}>
+				</umb-user-avatar>
+				<div class="log-type">
+					<uui-tag look=${tagData?.style.look ?? 'placeholder'} color=${tagData?.style.color ?? 'default'}>
+						${this.localize.term(tagData?.text.label ?? item.logType, item.parameters)}
+					</uui-tag>
+					<span>${this.localize.term(tagData?.text.desc ?? '', item.parameters)}</span>
+				</div>
+			</umb-history-item>
 		`;
 	}
 
@@ -208,10 +243,10 @@ export class UmbDocumentHistoryWorkspaceInfoAppElement extends UmbLitElement {
 	];
 }
 
-export default UmbDocumentHistoryWorkspaceInfoAppElement;
+export { UmbContentAuditLogWorkspaceInfoAppElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-document-history-workspace-info-app': UmbDocumentHistoryWorkspaceInfoAppElement;
+		'umb-content-audit-log-workspace-info-app': UmbContentAuditLogWorkspaceInfoAppElement;
 	}
 }
