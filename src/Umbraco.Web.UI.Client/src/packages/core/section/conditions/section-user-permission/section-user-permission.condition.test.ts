@@ -5,6 +5,7 @@ import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbCurrentUserContext, UmbCurrentUserStore } from '@umbraco-cms/backoffice/current-user';
 import { UmbSectionUserPermissionCondition } from './section-user-permission.condition.js';
 import { UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS } from '../constants.js';
+import { useMockSet } from '@umbraco-cms/internal/mock-manager';
 
 @customElement('test-controller-host')
 class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {
@@ -24,6 +25,10 @@ class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLEle
 describe('UmbSectionUserPermissionCondition', () => {
 	let hostElement: UmbTestControllerHostElement;
 	let condition: UmbSectionUserPermissionCondition;
+
+	before(async () => {
+		await useMockSet('user-permissions');
+	});
 
 	beforeEach(async () => {
 		hostElement = new UmbTestControllerHostElement();
