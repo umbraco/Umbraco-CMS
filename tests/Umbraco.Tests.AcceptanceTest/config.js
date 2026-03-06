@@ -33,7 +33,7 @@ prompt.get(properties, function (error, result) {
   const fileContent = `UMBRACO_USER_LOGIN=${result.username}
 UMBRACO_USER_PASSWORD=${result.password}
 URL=${result.baseUrl || "https://localhost:44339"}
-STORAGE_STAGE_PATH=${__dirname.replace(/\\/g, '/')}/playwright/.auth/user.json
+STORAGE_STATE_PATH=${__dirname.replace(/\\/g, '/')}/playwright/.auth/user.json
 CONSOLE_ERRORS_PATH=${__dirname.replace(/\\/g, '/')}/console-errors.json`;
 
 

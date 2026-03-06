@@ -108,6 +108,26 @@ public partial class StringExtensionsTests
         Assert.AreEqual(expected, result);
     }
 
+    [TestCase("hello", " ", "hello")] // no HTML
+    [TestCase("", " ", "")] // empty string
+    [TestCase("<p>hello</p>", " ", "hello")] // simple tags, trimmed
+    [TestCase("<p>one</p><p>two</p>", " ", "one two")] // multiple tags become single space
+    [TestCase("<br><br><br>", " ", "")] // consecutive tags collapse to single space then trim
+    [TestCase("before<p>middle</p>after", " ", "before middle after")] // text around tags
+    [TestCase("<p>line1\nline2</p>", " ", "line1\nline2")] // preserves newlines in content
+    [TestCase("<p>Hello &amp; World</p>", " ", "Hello &amp; World")] // HTML entities preserved
+    [TestCase("<>", " ", "<>")] // empty angle brackets (not valid HTML tag)
+    [TestCase("5 < 10 > 3", " ", "5 < 10 > 3")] // comparison operators (not tags)
+    [TestCase("<ul><li>item 1</li><li>item 2</li></ul>", " ", "item 1 item 2")] // list items preserve word boundaries
+    [TestCase("<p>one</p><p>two</p>", "--", "one--two")] // multi-char replacement
+    [TestCase("<br><br><br>", "--", "")] // consecutive tags with multi-char replacement collapse then trim
+    [TestCase("<p>one</p><p>two</p><p>three</p>", " - ", "one - two - three")] // multi-char replacement with consecutive tags
+    public void StripHtml_WithReplacement_ReturnsStringWithTagsReplaced(string input, string replacement, string expected)
+    {
+        var result = input.StripHtml(replacement);
+        Assert.AreEqual(expected, result);
+    }
+
     [TestCase("hello", '/', "/hello")] // prepends char
     [TestCase("/hello", '/', "/hello")] // already starts with char
     [TestCase("", '/', "/")] // empty string

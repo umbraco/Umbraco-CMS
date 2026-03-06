@@ -112,14 +112,17 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbModalBaseElement<
 				${repeat(
 					groupItems,
 					(propertyEditorUI) => propertyEditorUI.alias,
-					(propertyEditorUI) => html`
-						<li class="item" ?selected=${this.value.selection.includes(propertyEditorUI.alias)}>
-							<button type="button" @click=${() => this.#handleClick(propertyEditorUI)}>
-								<umb-icon name=${propertyEditorUI.meta.icon} class="icon"></umb-icon>
-								${this.localize.string(propertyEditorUI.meta.label || propertyEditorUI.name)}
-							</button>
-						</li>
-					`,
+					(propertyEditorUI) => {
+						const label = this.localize.string(propertyEditorUI.meta.label || propertyEditorUI.name);
+						return html`
+							<li class="item" ?selected=${this.value.selection.includes(propertyEditorUI.alias)}>
+								<button type="button" @click=${() => this.#handleClick(propertyEditorUI)}>
+									<umb-icon name=${propertyEditorUI.meta.icon} class="icon"></umb-icon>
+									<span class="label" title=${label}>${label}</span>
+								</button>
+							</li>
+						`;
+					},
 				)}
 			</ul>
 		`;
@@ -127,6 +130,11 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbModalBaseElement<
 
 	static override styles = [
 		css`
+			:host {
+				display: block;
+				container-type: inline-size;
+			}
+
 			#filter {
 				width: 100%;
 				margin-bottom: var(--uui-size-space-4);
@@ -141,10 +149,28 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbModalBaseElement<
 
 			#item-grid {
 				display: grid;
-				grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+				grid-template-columns: repeat(3, minmax(0, 1fr));
 				margin: 0;
 				padding: 0;
 				grid-gap: var(--uui-size-space-4);
+			}
+
+			@container (min-width: 560px) {
+				#item-grid {
+					grid-template-columns: repeat(4, minmax(0, 1fr));
+				}
+			}
+
+			@container (min-width: 740px) {
+				#item-grid {
+					grid-template-columns: repeat(5, minmax(0, 1fr));
+				}
+			}
+
+			@container (min-width: 920px) {
+				#item-grid {
+					grid-template-columns: repeat(6, minmax(0, 1fr));
+				}
 			}
 
 			#item-grid .item {
@@ -176,7 +202,7 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbModalBaseElement<
 				display: flex;
 				align-items: center;
 				flex-direction: column;
-				justify-content: center;
+				justify-content: flex-start;
 				font-size: 0.8rem;
 				height: 100%;
 				width: 100%;
@@ -187,6 +213,14 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbModalBaseElement<
 			#item-grid .item .icon {
 				font-size: 2em;
 				margin-bottom: var(--uui-size-space-2);
+			}
+
+			#item-grid .item .label {
+				max-width: 100%;
+				display: -webkit-box;
+				-webkit-line-clamp: 2;
+				-webkit-box-orient: vertical;
+				overflow: hidden;
 			}
 		`,
 	];
