@@ -1,4 +1,4 @@
-import type { UmbMockDataSet } from '../../data/types/mock-data-set.types.js';
+import type { UmbMockDataSet } from '../../data/mock-data-set.types.js';
 import { umbMockDbRegistry } from '../mock-db-registry.js';
 
 export abstract class UmbMockDBBase<T> {

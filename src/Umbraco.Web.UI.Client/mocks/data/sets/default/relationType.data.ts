@@ -1,4 +1,4 @@
-import type { UmbMockRelationTypeModel } from '../../types/mock-data-set.types.js';
+import type { UmbMockRelationTypeModel } from '../../mock-data-set.types.js';
 
 export const data: Array<UmbMockRelationTypeModel> = [
 	{

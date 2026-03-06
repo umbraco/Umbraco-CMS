@@ -1,4 +1,4 @@
-import type { UmbMockDataSet } from './data/types/mock-data-set.types.js';
+import type { UmbMockDataSet } from './data/mock-data-set.types.js';
 import { umbMockDbRegistry } from './db/mock-db-registry.js';
 
 /**

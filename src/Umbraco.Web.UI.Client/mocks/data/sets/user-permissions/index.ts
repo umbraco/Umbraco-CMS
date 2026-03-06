@@ -1,4 +1,4 @@
-import type { UmbMockDataSet } from '../../types/mock-data-set.types.js';
+import type { UmbMockDataSet } from '../../mock-data-set.types.js';
 
 import { data as dataType } from './data-type.data.js';
 import { data as document } from './document.data.js';

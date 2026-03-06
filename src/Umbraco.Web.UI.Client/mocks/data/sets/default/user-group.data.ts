@@ -1,4 +1,4 @@
-import type { UmbMockUserGroupModel } from '../../types/mock-data-set.types.js';
+import type { UmbMockUserGroupModel } from '../../mock-data-set.types.js';
 import { UMB_CONTENT_SECTION_ALIAS } from '@umbraco-cms/backoffice/content';
 import {
 	UMB_USER_PERMISSION_DOCUMENT_CREATE,

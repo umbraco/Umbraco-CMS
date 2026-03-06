@@ -1,4 +1,4 @@
-import type { UmbMockTrackedReferenceItemModel } from '../../types/mock-data-set.types.js';
+import type { UmbMockTrackedReferenceItemModel } from '../../mock-data-set.types.js';
 import type {
 	DefaultReferenceResponseModel,
 	DocumentReferenceResponseModel,

@@ -1,4 +1,4 @@
-import type { UmbMockTemplateModel } from '../../types/mock-data-set.types.js';
+import type { UmbMockTemplateModel } from '../../mock-data-set.types.js';
 import type {
 	TemplateQuerySettingsResponseModel,
 	TemplateQueryResultResponseModel,

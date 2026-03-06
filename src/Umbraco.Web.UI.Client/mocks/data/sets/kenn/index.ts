@@ -1,6 +1,6 @@
 // Kenn mock data set - implements UmbMockDataSet interface
 // Generated from Umbraco SQLite database export
-import type { UmbMockDataSet } from '../../types/mock-data-set.types.js';
+import type { UmbMockDataSet } from '../../mock-data-set.types.js';
 
 // Import all data
 import { data as dataType } from './data-type.data.js';

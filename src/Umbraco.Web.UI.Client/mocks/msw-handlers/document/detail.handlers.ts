@@ -1,5 +1,5 @@
 const { http, HttpResponse } = window.MockServiceWorker;
-import type { UmbMockDocumentModel } from '../../data/types/mock-data-set.types.js';
+import type { UmbMockDocumentModel } from '../../data/mock-data-set.types.js';
 import { umbMockManager } from '../../mock-manager.js';
 import { umbDocumentMockDb } from '../../db/document.db.js';
 import { UMB_SLUG } from './slug.js';

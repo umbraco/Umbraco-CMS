@@ -1,5 +1,5 @@
 import { queryFilter } from '../utils.js';
-import type { UmbMockUserGroupModel } from '../data/types/mock-data-set.types.js';
+import type { UmbMockUserGroupModel } from '../data/mock-data-set.types.js';
 import { UmbEntityMockDbBase } from './utils/entity/entity-base.js';
 import { UmbMockEntityDetailManager } from './utils/entity/entity-detail.manager.js';
 import { UmbMockEntityItemManager } from './utils/entity/entity-item.manager.js';

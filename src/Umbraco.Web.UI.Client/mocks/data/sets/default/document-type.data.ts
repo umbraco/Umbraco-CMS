@@ -1,4 +1,4 @@
-import type { UmbMockDocumentTypeModel } from '../../types/mock-data-set.types.js';
+import type { UmbMockDocumentTypeModel } from '../../mock-data-set.types.js';
 import { CompositionTypeModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 export const data: Array<UmbMockDocumentTypeModel> = [

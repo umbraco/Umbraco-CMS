@@ -1,4 +1,4 @@
-import type { UmbMockPartialViewModel } from '../../types/mock-data-set.types.js';
+import type { UmbMockPartialViewModel } from '../../mock-data-set.types.js';
 import type { PartialViewSnippetResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 export const data: Array<UmbMockPartialViewModel> = [

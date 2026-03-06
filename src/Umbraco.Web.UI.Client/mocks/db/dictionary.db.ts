@@ -1,4 +1,4 @@
-import type { UmbMockDictionaryModel } from '../data/types/mock-data-set.types.js';
+import type { UmbMockDictionaryModel } from '../data/mock-data-set.types.js';
 import { UmbMockEntityTreeManager } from './utils/entity/entity-tree.manager.js';
 import { UmbMockEntityItemManager } from './utils/entity/entity-item.manager.js';
 import { UmbMockEntityDetailManager } from './utils/entity/entity-detail.manager.js';

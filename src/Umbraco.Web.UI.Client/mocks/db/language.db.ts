@@ -1,4 +1,4 @@
-import type { UmbMockLanguageModel } from '../data/types/mock-data-set.types.js';
+import type { UmbMockLanguageModel } from '../data/mock-data-set.types.js';
 import { UmbMockCultureItemManager } from './utils/culture/culture-item.manager.js';
 import { UmbCultureMockDbBase } from './utils/culture/culture-base.js';
 import { UmbMockCultureDetailManager } from './utils/culture/culture-detail.manager.js';

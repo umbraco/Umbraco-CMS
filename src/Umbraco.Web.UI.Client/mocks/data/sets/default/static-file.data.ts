@@ -1,4 +1,4 @@
-import type { UmbMockStaticFileModel } from '../../types/mock-data-set.types.js';
+import type { UmbMockStaticFileModel } from '../../mock-data-set.types.js';
 
 export const data: Array<UmbMockStaticFileModel> = [
 	{

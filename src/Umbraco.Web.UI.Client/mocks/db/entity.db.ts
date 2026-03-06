@@ -1,4 +1,4 @@
-import type { UmbMockDataSet } from '../data/types/mock-data-set.types.js';
+import type { UmbMockDataSet } from '../data/mock-data-set.types.js';
 import { UmbMockDBBase } from './utils/mock-db-base.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 

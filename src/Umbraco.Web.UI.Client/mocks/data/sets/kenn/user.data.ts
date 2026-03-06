@@ -1,4 +1,4 @@
-import type { UmbMockUserModel } from '../../types/mock-data-set.types.js';
+import type { UmbMockUserModel } from '../../mock-data-set.types.js';
 import { UserKindModel, UserStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 // Map string state to enum

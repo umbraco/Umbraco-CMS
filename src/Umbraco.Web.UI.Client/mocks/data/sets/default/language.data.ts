@@ -1,4 +1,4 @@
-import type { UmbMockLanguageModel } from '../../types/mock-data-set.types.js';
+import type { UmbMockLanguageModel } from '../../mock-data-set.types.js';
 
 export const data: Array<UmbMockLanguageModel> = [
 	{

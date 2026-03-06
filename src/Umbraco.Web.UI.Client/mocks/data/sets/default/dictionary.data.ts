@@ -1,4 +1,4 @@
-import type { UmbMockDictionaryModel } from '../../types/mock-data-set.types.js';
+import type { UmbMockDictionaryModel } from '../../mock-data-set.types.js';
 
 export const data: Array<UmbMockDictionaryModel> = [
 	{

@@ -1,4 +1,4 @@
-import type { UmbMockUserGroupModel } from '../../types/mock-data-set.types.js';
+import type { UmbMockUserGroupModel } from '../../mock-data-set.types.js';
 
 export const data: Array<UmbMockUserGroupModel> = [
 	{

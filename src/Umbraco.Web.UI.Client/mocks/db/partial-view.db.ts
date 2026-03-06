@@ -1,4 +1,4 @@
-import type { UmbMockPartialViewModel } from '../data/types/mock-data-set.types.js';
+import type { UmbMockPartialViewModel } from '../data/mock-data-set.types.js';
 import { umbMockManager } from '../mock-manager.js';
 import { UmbFileSystemMockDbBase } from './utils/file-system/file-system-base.js';
 import { UmbMockFileSystemFolderManager } from './utils/file-system/file-system-folder.manager.js';

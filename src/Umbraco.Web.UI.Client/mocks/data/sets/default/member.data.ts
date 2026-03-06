@@ -1,4 +1,4 @@
-import type { UmbMockMemberModel } from '../../types/mock-data-set.types.js';
+import type { UmbMockMemberModel } from '../../mock-data-set.types.js';
 import { MemberKindModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 export const data: Array<UmbMockMemberModel> = [
