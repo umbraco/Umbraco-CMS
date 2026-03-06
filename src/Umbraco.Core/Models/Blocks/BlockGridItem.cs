@@ -24,12 +24,8 @@ namespace Umbraco.Cms.Core.Models.Blocks
         public BlockGridItem(Guid contentKey, IPublishedElement content, Guid? settingsKey, IPublishedElement? settings)
         {
             ContentKey = contentKey;
-            ContentUdi = new GuidUdi(Constants.UdiEntityType.Element, contentKey);
             Content = content ?? throw new ArgumentNullException(nameof(content));
             SettingsKey = settingsKey;
-            SettingsUdi = settingsKey.HasValue
-                ? new GuidUdi(Constants.UdiEntityType.Element, settingsKey.Value)
-                : null;
             Settings = settings;
         }
 
@@ -44,30 +40,12 @@ namespace Umbraco.Cms.Core.Models.Blocks
         public Guid? SettingsKey { get; set; }
 
         /// <summary>
-        /// Gets the content UDI.
-        /// </summary>
-        /// <value>
-        /// The content UDI.
-        /// </value>
-        [Obsolete("Use ContentKey instead. Scheduled for removal in Umbraco 18.")]
-        public Udi ContentUdi { get; }
-
-        /// <summary>
         /// Gets the content.
         /// </summary>
         /// <value>
         /// The content.
         /// </value>
         public IPublishedElement Content { get; }
-
-        /// <summary>
-        /// Gets the settings UDI.
-        /// </summary>
-        /// <value>
-        /// The settings UDI.
-        /// </value>
-        [Obsolete("Use SettingsKey instead. Scheduled for removal in Umbraco 18.")]
-        public Udi? SettingsUdi { get; }
 
         /// <summary>
         /// Gets the settings.

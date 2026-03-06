@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Api.Management.Mapping.Element;
 
 public class ElementMapDefinition : ContentMapDefinition<IElement, ElementValueResponseModel, ElementVariantResponseModel>, IMapDefinition
 {
-    [Obsolete("Use non-obsolete constructors instead. Scheduled for removal in Umbraco 19.")]
+    [Obsolete("Use non-obsolete constructors instead. Scheduled for removal in Umbraco 20.")]
     public ElementMapDefinition(PropertyEditorCollection propertyEditorCollection)
         : this (propertyEditorCollection, StaticServiceProvider.Instance.GetRequiredService<IDataValueEditorFactory>())
     {

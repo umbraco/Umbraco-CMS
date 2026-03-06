@@ -27,7 +27,6 @@ public class BlockItemData
     {
         ContentTypeAlias = contentTypeAlias;
         Key = key;
-        Udi = new GuidUdi(Constants.UdiEntityType.Element, key);
         ContentTypeKey = contentTypeKey;
     }
 
@@ -47,16 +46,6 @@ public class BlockItemData
     /// </remarks>
     [JsonIgnore]
     public string ContentTypeAlias { get; set; } = string.Empty;
-
-    /// <summary>
-    ///     Gets or sets the UDI.
-    /// </summary>
-    /// <value>
-    ///     The UDI.
-    /// </value>
-    [Obsolete("Use Key instead. Scheduled for removal in Umbraco 18.")]
-    [JsonIgnore]
-    public Udi? Udi { get; set; }
 
     /// <summary>
     ///     Gets or sets the key.
