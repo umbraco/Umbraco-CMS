@@ -18,6 +18,7 @@ internal sealed class JsonConfigManipulator : IConfigManipulator
     private const string CmsObjectPath = "Umbraco:CMS";
     private const string GlobalIdPath = $"{CmsObjectPath}:Global:Id";
     private const string DisableRedirectUrlTrackingPath = $"{CmsObjectPath}:WebRouting:DisableRedirectUrlTracking";
+    private const string ImagingHmacSecretKeyPath = $"{CmsObjectPath}:Imaging:HMACSecretKey";
 
     private readonly JsonDocumentOptions _jsonDocumentOptions = new() { CommentHandling = JsonCommentHandling.Skip };
     private readonly IConfiguration _configuration;
@@ -104,6 +105,10 @@ internal sealed class JsonConfigManipulator : IConfigManipulator
     /// <inheritdoc />
     public async Task SetGlobalIdAsync(string id)
         => await CreateOrUpdateConfigValueAsync(GlobalIdPath, id);
+
+    /// <inheritdoc />
+    public async Task SetImagingHmacSecretKeyAsync(string base64Key)
+        => await CreateOrUpdateConfigValueAsync(ImagingHmacSecretKeyPath, base64Key);
 
     /// <summary>
     /// Creates or updates a config value at the specified path.

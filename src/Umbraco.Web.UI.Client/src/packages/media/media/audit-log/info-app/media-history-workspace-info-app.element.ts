@@ -10,6 +10,9 @@ import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbUserItemModel } from '@umbraco-cms/backoffice/user';
 import { UmbUserItemRepository } from '@umbraco-cms/backoffice/user';
 
+/**
+ * @deprecated Scheduled for removal in Umbraco 19. Replaced by the shared 'auditLog' kind element (UmbContentAuditLogWorkspaceInfoAppElement).
+ */
 @customElement('umb-media-history-workspace-info-app')
 export class UmbMediaHistoryWorkspaceInfoAppElement extends UmbLitElement {
 	@state()
