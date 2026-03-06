@@ -7,11 +7,13 @@ import type { EditorState, PluginView } from '@tiptap/pm/state';
 import type { EditorView } from '@tiptap/pm/view';
 import type { UUIPopoverContainerElement } from '@umbraco-cms/backoffice/external/uui';
 
+/** @deprecated No longer used internally. This will be removed in Umbraco 19. [LK] */
 export interface UmbTiptapBubbleMenuElement extends HTMLElement {
 	editor?: Editor;
 	menuAlias?: string;
 }
 
+/** @deprecated No longer used internally. This will be removed in Umbraco 19. [LK] */
 export type UmbTiptapBubbleMenuPluginProps = {
 	unique: string;
 	placement?: UUIPopoverContainerElement['placement'];
@@ -22,8 +24,10 @@ export type UmbTiptapBubbleMenuPluginProps = {
 		| null;
 };
 
+/** @deprecated No longer used internally. This will be removed in Umbraco 19. [LK] */
 export type UmbBubbleMenuOptions = UmbTiptapBubbleMenuPluginProps;
 
+/** @deprecated No longer used internally. This will be removed in Umbraco 19. [LK] */
 export const UmbBubbleMenu = Extension.create<UmbBubbleMenuOptions>({
 	name: 'umbBubbleMenu',
 
@@ -107,6 +111,7 @@ class UmbBubbleMenuPluginView implements PluginView {
 	}
 }
 
+/** @deprecated No longer used internally. This will be removed in Umbraco 19. [LK] */
 export const UmbBubbleMenuPlugin = (editor: Editor, props: UmbTiptapBubbleMenuPluginProps) => {
 	return new Plugin({
 		view(editorView) {

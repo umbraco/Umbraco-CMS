@@ -14,6 +14,9 @@ import type { ManifestEntityAction } from '@umbraco-cms/backoffice/entity-action
 import type { UmbUserItemModel } from '@umbraco-cms/backoffice/user';
 import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 
+/**
+ * @deprecated Scheduled for removal in Umbraco 19. Replaced by the shared 'auditLog' kind element (UmbContentAuditLogWorkspaceInfoAppElement).
+ */
 @customElement('umb-document-history-workspace-info-app')
 export class UmbDocumentHistoryWorkspaceInfoAppElement extends UmbLitElement {
 	#allowedActions = new Set(['Umb.EntityAction.Document.Rollback']);
@@ -63,6 +66,7 @@ export class UmbDocumentHistoryWorkspaceInfoAppElement extends UmbLitElement {
 
 	async #requestAuditLogs() {
 		if (!this.#workspaceContext) return;
+
 		const unique = this.#workspaceContext.getUnique();
 		if (!unique) throw new Error('Document unique is required');
 
@@ -104,6 +108,7 @@ export class UmbDocumentHistoryWorkspaceInfoAppElement extends UmbLitElement {
 				<umb-extension-with-api-slot
 					slot="header-actions"
 					type="entityAction"
+					.apiArgs=${(manifest: ManifestEntityAction) => [manifest]}
 					.filter=${(manifest: ManifestEntityAction) =>
 						this.#allowedActions.has(manifest.alias)}></umb-extension-with-api-slot>
 

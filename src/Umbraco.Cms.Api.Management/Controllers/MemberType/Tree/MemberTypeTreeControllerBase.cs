@@ -30,8 +30,24 @@ public class MemberTypeTreeControllerBase : FolderTreeControllerBase<MemberTypeT
     {
     }
 
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
     public MemberTypeTreeControllerBase(IEntityService entityService, FlagProviderCollection flagProviders, IMemberTypeService memberTypeService)
-        : base(entityService, flagProviders) =>
+        : this(
+            entityService,
+            flagProviders,
+            StaticServiceProvider.Instance.GetRequiredService<IEntitySearchService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>(),
+            memberTypeService)
+    {
+    }
+
+    public MemberTypeTreeControllerBase(
+        IEntityService entityService,
+        FlagProviderCollection flagProviders,
+        IEntitySearchService entitySearchService,
+        IIdKeyMap idKeyMap,
+        IMemberTypeService memberTypeService)
+        : base(entityService, flagProviders, entitySearchService, idKeyMap) =>
         _memberTypeService = memberTypeService;
 
 
