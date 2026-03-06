@@ -1,5 +1,4 @@
 import type { UmbMockDocumentModel } from '../../types/mock-data-set.types.js';
-import { data as permissionsTestData } from './document-permissions-test.data.js';
 import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 export const data: Array<UmbMockDocumentModel> = [
@@ -1350,5 +1349,4 @@ export const data: Array<UmbMockDocumentModel> = [
 		],
 		flags: [],
 	},
-	...permissionsTestData,
 ];

@@ -1,7 +1,7 @@
 import type { UmbMockDocumentModel } from '../../types/mock-data-set.types.js';
 import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 
-const permissionsTestDocument = {
+const baseDocument = {
 	ancestors: [],
 	urls: [
 		{
@@ -28,7 +28,7 @@ const permissionsTestDocument = {
 			publishDate: '2023-02-06T15:32:24.957009',
 			culture: null,
 			segment: null,
-			name: 'Permissions',
+			name: 'Permissions Root',
 			createDate: '2023-02-06T15:32:05.350038',
 			updateDate: '2023-02-06T15:32:24.957009',
 			id: 'permissions',
@@ -39,63 +39,60 @@ const permissionsTestDocument = {
 };
 
 export const data: Array<UmbMockDocumentModel> = [
-	permissionsTestDocument,
+	baseDocument,
 	{
-		...permissionsTestDocument,
+		...baseDocument,
 		ancestors: [{ id: 'permissions-document-id' }],
-		hasChildren: false,
 		id: 'permissions-0-document-id',
 		parent: { id: 'permissions-document-id' },
-		variants: permissionsTestDocument.variants.map((variant) => ({
+		variants: baseDocument.variants.map((variant) => ({
 			...variant,
-			name: 'Permissions 0 - No Access',
+			name: 'No Access Document',
 			id: 'permissions-0',
 		})),
 		flags: [],
 		noAccess: true,
 	},
 	{
-		...permissionsTestDocument,
+		...baseDocument,
 		ancestors: [{ id: 'permissions-0-document-id' }],
-		hasChildren: false,
 		id: 'permissions-0-1-document-id',
 		parent: { id: 'permissions-0-document-id' },
-		variants: permissionsTestDocument.variants.map((variant) => ({
+		variants: baseDocument.variants.map((variant) => ({
 			...variant,
-			name: 'Permissions 0.1 - Has access',
+			name: 'Has Access Document',
 			id: 'permissions-0-1',
 		})),
 		flags: [],
 		noAccess: false,
 	},
 	{
-		...permissionsTestDocument,
+		...baseDocument,
 		ancestors: [{ id: 'permissions-document-id' }],
-		hasChildren: false,
 		id: 'permissions-1-document-id',
 		parent: { id: 'permissions-document-id' },
-		variants: permissionsTestDocument.variants.map((variant) => ({
+		variants: baseDocument.variants.map((variant) => ({
 			...variant,
-			name: 'Permissions 1',
+			name: 'Child Document 1',
 			id: 'permissions-1',
 		})),
 		flags: [],
 	},
 	{
-		...permissionsTestDocument,
+		...baseDocument,
 		ancestors: [{ id: 'permissions-document-id' }],
 		hasChildren: true,
 		id: 'permissions-2-document-id',
 		parent: { id: 'permissions-document-id' },
-		variants: permissionsTestDocument.variants.map((variant) => ({
+		variants: baseDocument.variants.map((variant) => ({
 			...variant,
-			name: 'Permissions 2',
+			name: 'Child Document 2',
 			id: 'permissions-2',
 		})),
 		flags: [],
 	},
 	{
-		...permissionsTestDocument,
+		...baseDocument,
 		ancestors: [{ id: 'permissions-document-id' }, { id: 'permissions-2-document-id' }],
 		hasChildren: true,
 		id: 'permission-2-1-document-id',
@@ -103,52 +100,50 @@ export const data: Array<UmbMockDocumentModel> = [
 		urls: [
 			{
 				culture: null,
-				url: '/permissions-1/permissions-2-1',
+				url: '/permissions-root/child-document-2-1',
 			},
 		],
-		variants: permissionsTestDocument.variants.map((variant) => ({
+		variants: baseDocument.variants.map((variant) => ({
 			...variant,
-			name: 'Permissions 2.1',
+			name: 'Child Document 2.1',
 		})),
 		flags: [],
 	},
 	{
-		...permissionsTestDocument,
+		...baseDocument,
 		ancestors: [{ id: 'permissions-document-id' }, { id: 'permissions-2-document-id' }],
-		hasChildren: false,
 		id: 'permissions-2-2-document-id',
 		parent: { id: 'permissions-2-document-id' },
 		urls: [
 			{
 				culture: null,
-				url: '/permissions-1/permissions-2-2',
+				url: '/permissions-root/child-document-2-2',
 			},
 		],
-		variants: permissionsTestDocument.variants.map((variant) => ({
+		variants: baseDocument.variants.map((variant) => ({
 			...variant,
-			name: 'Permissions 2.2',
+			name: 'Child Document 2.2',
 		})),
 		flags: [],
 	},
 	{
-		...permissionsTestDocument,
+		...baseDocument,
 		ancestors: [
 			{ id: 'permissions-document-id' },
 			{ id: 'permissions-2-document-id' },
 			{ id: 'permissions-2-2-document-id' },
 		],
-		hasChildren: false,
 		id: 'permission-2-2-1-document-id',
 		parent: { id: 'permissions-2-2-document-id' },
 		urls: [
 			{
 				culture: null,
-				url: '/permissions-1/permissions-2-2/permissions-2-2-1',
+				url: '/permissions-root/child-document-2-2/child-document-2-2-1',
 			},
 		],
-		variants: permissionsTestDocument.variants.map((variant) => ({
+		variants: baseDocument.variants.map((variant) => ({
 			...variant,
-			name: 'Permissions 2.2.1',
+			name: 'Child Document 2.2.1',
 		})),
 		flags: [],
 	},

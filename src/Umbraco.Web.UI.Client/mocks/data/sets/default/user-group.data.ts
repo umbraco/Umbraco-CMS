@@ -46,29 +46,7 @@ export const data: Array<UmbMockUserGroupModel> = [
 			UMB_USER_PERMISSION_DOCUMENT_PROPERTY_VALUE_READ,
 			UMB_USER_PERMISSION_DOCUMENT_PROPERTY_VALUE_WRITE,
 		],
-		permissions: [
-			{
-				$type: 'DocumentPermissionPresentationModel',
-				document: {
-					id: 'permissions-document-id',
-				},
-				verbs: ['Umb.Document.Read'],
-			},
-			{
-				$type: 'DocumentPermissionPresentationModel',
-				document: {
-					id: 'permissions-2-document-id',
-				},
-				verbs: ['Umb.Document.Create', 'Umb.Document.Read'],
-			},
-			{
-				$type: 'DocumentPermissionPresentationModel',
-				document: {
-					id: 'permissions-2-2-document-id',
-				},
-				verbs: ['Umb.Document.Delete', 'Umb.Document.Read'],
-			},
-		],
+		permissions: [],
 		sections: [
 			UMB_CONTENT_SECTION_ALIAS,
 			'Umb.Section.Media',
