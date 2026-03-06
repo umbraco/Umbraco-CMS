@@ -31,8 +31,8 @@ export class UmbMemberPickerInputContext extends UmbPickerInputContext<
 			...pickerData,
 		};
 
-		// compose internal allowedContentTypes filter with user-supplied pickableFilter
-		combinedPickerData.pickableFilter = this._composePickableFilters(
+		// combine internal allowedContentTypes filter with user-supplied pickableFilter
+		combinedPickerData.pickableFilter = this._combinePickableFilters(
 			(item) => this.#pickableFilter(item, args?.allowedContentTypes),
 			pickerData?.pickableFilter,
 		);
