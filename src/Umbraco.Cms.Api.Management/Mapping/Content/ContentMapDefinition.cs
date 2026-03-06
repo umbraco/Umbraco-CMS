@@ -25,14 +25,6 @@ public abstract class ContentMapDefinition<TContent, TValueViewModel, TVariantVi
         _dataValueEditorFactory = dataValueEditorFactory;
     }
 
-    [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in Umbraco 18.")]
-    protected ContentMapDefinition(PropertyEditorCollection propertyEditorCollection)
-        : this(
-            propertyEditorCollection,
-            StaticServiceProvider.Instance.GetRequiredService<IDataValueEditorFactory>())
-    {
-    }
-
     protected delegate void ValueViewModelMapping(IDataEditor propertyEditor, TValueViewModel variantViewModel);
 
     protected delegate void VariantViewModelMapping(string? culture, string? segment, TVariantViewModel variantViewModel);

@@ -90,12 +90,6 @@ internal class AddDocumentPropertyPermissions : MigrationBase
         [Index(IndexTypes.UniqueNonClustered, Name = "IX_umbracoUserGroup_userGroupName")]
         public string? Name { get; set; }
 
-        [Column("userGroupDefaultPermissions")]
-        [Length(50)]
-        [NullSetting(NullSetting = NullSettings.Null)]
-        [Obsolete("Is not used anymore. Use UserGroup2PermissionDtos instead. Scheduled for removal in Umbraco 18.")]
-        public string? DefaultPermissions { get; set; }
-
         [Column("createDate")]
         [NullSetting(NullSetting = NullSettings.NotNull)]
         [Constraint(Default = SystemMethods.CurrentUTCDateTime)]

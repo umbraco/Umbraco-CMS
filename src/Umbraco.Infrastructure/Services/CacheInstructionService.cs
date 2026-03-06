@@ -1,11 +1,9 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models;
@@ -32,28 +30,6 @@ namespace Umbraco.Cms
             private readonly IRepositoryCacheVersionService _repositoryCacheVersionService;
             private readonly IProfilingLogger _profilingLogger;
             private readonly Lock _syncLock = new();
-
-            [Obsolete("Use the overload that requires ILastSyncedManager and IRepositoryCacheVersionService. Scheduled for removal in Umbraco 18.")]
-            public CacheInstructionService(
-                ICoreScopeProvider provider,
-                ILoggerFactory loggerFactory,
-                IEventMessagesFactory eventMessagesFactory,
-                ICacheInstructionRepository cacheInstructionRepository,
-                IProfilingLogger profilingLogger,
-                ILogger<CacheInstructionService> logger,
-                IOptions<GlobalSettings> globalSettings)
-                 : this(
-                     provider,
-                     loggerFactory,
-                     eventMessagesFactory,
-                     cacheInstructionRepository,
-                     profilingLogger,
-                     logger,
-                     globalSettings,
-                     StaticServiceProvider.Instance.GetRequiredService<ILastSyncedManager>(),
-                     StaticServiceProvider.Instance.GetRequiredService<IRepositoryCacheVersionService>())
-            {
-            }
 
             public CacheInstructionService(
                 ICoreScopeProvider provider,

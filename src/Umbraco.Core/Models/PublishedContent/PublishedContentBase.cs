@@ -40,39 +40,5 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
 
         /// <inheritdoc />
         public abstract int? TemplateId { get; }
-
-        /// <inheritdoc />
-        [Obsolete("Please use TryGetParentKey() on IDocumentNavigationQueryService or IMediaNavigationQueryService instead. Scheduled for removal in Umbraco 18.")]
-        public abstract IPublishedContent? Parent { get; }
-
-        /// <inheritdoc />
-        [Obsolete("Please use TryGetChildrenKeys() on IDocumentNavigationQueryService or IMediaNavigationQueryService instead. Scheduled for removal in Umbraco 18.")]
-        public virtual IEnumerable<IPublishedContent> Children => GetChildren();
-
-        /// <summary>
-        ///     Gets the children of the current content item.
-        /// </summary>
-        /// <returns>The children of the current content item.</returns>
-        private IEnumerable<IPublishedContent> GetChildren()
-        {
-            INavigationQueryService? navigationQueryService;
-            IPublishedStatusFilteringService? publishedStatusFilteringService;
-
-            switch (ContentType.ItemType)
-            {
-                case PublishedItemType.Content:
-                    navigationQueryService = StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>();
-                    publishedStatusFilteringService = StaticServiceProvider.Instance.GetRequiredService<IPublishedContentStatusFilteringService>();
-                    break;
-                case PublishedItemType.Media:
-                    navigationQueryService = StaticServiceProvider.Instance.GetRequiredService<IMediaNavigationQueryService>();
-                    publishedStatusFilteringService = StaticServiceProvider.Instance.GetRequiredService<IPublishedMediaStatusFilteringService>();
-                    break;
-                default:
-                    throw new NotImplementedException("Level is not implemented for " + ContentType.ItemType);
-            }
-
-            return this.Children(navigationQueryService, publishedStatusFilteringService);
-        }
     }
 }

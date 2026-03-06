@@ -33,35 +33,6 @@ public class SyncBootStateAccessor : ISyncBootStateAccessor
         globalSettings.OnChange(x => _globalSettings = x);
     }
 
-    [Obsolete("Please use the constructor without LastSyncedFileManager. Scheduled for removal in Umbraco 18.")]
-    public SyncBootStateAccessor(
-        ILogger<SyncBootStateAccessor> logger,
-        LastSyncedFileManager lastSyncedFileManager,
-        IOptionsMonitor<GlobalSettings> globalSettings,
-        ICacheInstructionService cacheInstructionService,
-        ILastSyncedManager lastSyncedManager)
-        : this(
-            logger,
-            globalSettings,
-            cacheInstructionService,
-            lastSyncedManager)
-    {
-    }
-
-    [Obsolete("Please use the constructor with ILastSyncedManager. Scheduled for removal in Umbraco 18.")]
-    public SyncBootStateAccessor(
-        ILogger<SyncBootStateAccessor> logger,
-        LastSyncedFileManager lastSyncedFileManager,
-        IOptionsMonitor<GlobalSettings> globalSettings,
-        ICacheInstructionService cacheInstructionService)
-        : this(
-            logger,
-            globalSettings,
-            cacheInstructionService,
-            StaticServiceProvider.Instance.GetRequiredService<ILastSyncedManager>())
-    {
-    }
-
     public SyncBootState GetSyncBootState()
         => LazyInitializer.EnsureInitialized(
             ref _syncBootState,
