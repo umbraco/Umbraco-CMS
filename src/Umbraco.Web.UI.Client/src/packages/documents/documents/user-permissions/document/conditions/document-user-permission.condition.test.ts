@@ -43,7 +43,7 @@ describe('UmbDocumentUserPermissionCondition', () => {
 	let condition: UmbDocumentUserPermissionCondition;
 
 	before(async () => {
-		await useMockSet('user-permissions');
+		await useMockSet('userPermissions');
 	});
 
 	beforeEach(async () => {

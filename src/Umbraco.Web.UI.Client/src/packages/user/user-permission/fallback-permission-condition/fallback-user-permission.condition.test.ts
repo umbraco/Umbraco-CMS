@@ -27,7 +27,7 @@ describe('UmbFallbackUserPermissionCondition', () => {
 	let condition: UmbFallbackUserPermissionCondition;
 
 	before(async () => {
-		await useMockSet('user-permissions');
+		await useMockSet('userPermissions');
 	});
 
 	beforeEach(async () => {

@@ -26,7 +26,7 @@ describe('isCurrentUser', async () => {
 	let hostElement: UmbTestControllerHostElement;
 
 	before(async () => {
-		await useMockSet('user-permissions');
+		await useMockSet('userPermissions');
 		hostElement = new UmbTestControllerHostElement();
 		document.body.appendChild(hostElement);
 		await hostElement.init();

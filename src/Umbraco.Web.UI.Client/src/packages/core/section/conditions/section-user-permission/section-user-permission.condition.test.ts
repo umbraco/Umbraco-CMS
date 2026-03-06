@@ -27,7 +27,7 @@ describe('UmbSectionUserPermissionCondition', () => {
 	let condition: UmbSectionUserPermissionCondition;
 
 	before(async () => {
-		await useMockSet('user-permissions');
+		await useMockSet('userPermissions');
 	});
 
 	beforeEach(async () => {

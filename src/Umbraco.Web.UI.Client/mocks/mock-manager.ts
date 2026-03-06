@@ -13,7 +13,7 @@ class UmbMockManager {
 	#mockSetLoaders: Record<string, () => Promise<UmbMockDataSet>> = {
 		default: () => import('./data/sets/default/index.js') as Promise<UmbMockDataSet>,
 		kenn: () => import('./data/sets/kenn/index.js') as Promise<UmbMockDataSet>,
-		'user-permissions': () => import('./data/sets/user-permissions/index.js') as Promise<UmbMockDataSet>,
+		userPermissions: () => import('./data/sets/user-permissions/index.js') as Promise<UmbMockDataSet>,
 	};
 
 	/**
