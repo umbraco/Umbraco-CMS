@@ -973,18 +973,7 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
         }
 
         // persist the property data
-        IEnumerable<PropertyDataDto> propertyDataDtos = PropertyFactory.BuildDtos(
-            entity.ContentType.Variations,
-            entity.VersionId,
-            entity.PublishedVersionId,
-            entity.Properties,
-            LanguageRepository,
-            out var edited,
-            out HashSet<string>? editedCultures);
-        foreach (PropertyDataDto propertyDataDto in propertyDataDtos)
-        {
-            Database.Insert(propertyDataDto);
-        }
+        InsertPropertyValues(entity, entity.PublishedVersionId, out var edited, out HashSet<string>? editedCultures);
 
         // if !publishing, we may have a new name != current publish name,
         // also impacts 'edited'
