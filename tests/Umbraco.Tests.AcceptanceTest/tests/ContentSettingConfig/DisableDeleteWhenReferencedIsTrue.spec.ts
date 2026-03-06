@@ -19,7 +19,7 @@ const collectionDataTypeName = 'List View - Content';
 const documentPickerName = ['TestPicker', 'DocumentTypeForPicker'];
 const mediaPickerDocumentName = ['MediaTestPicker', 'DocumentTypeForMediaPicker'];
 // Warning message
-const warningMessage = ' cannot be moved to the Recycle Bin because it is referenced by other items.';
+const warningMessage = (itemName) => `${itemName} cannot be moved to the Recycle Bin because it is referenced by other items.`;
 const warningMessageForBulk = (itemCount) => `The selected ${itemCount} cannot be moved to the Recycle Bin because at least one item is referenced by other content.`;
 
 test.beforeEach(async ({umbracoApi, umbracoUi}) => {
@@ -62,10 +62,27 @@ test('can empty recycle bin when trashed item has no references', async ({umbrac
   expect(await umbracoApi.document.doesItemExistInRecycleBin(contentName)).toBeFalsy();
 });
 
-test('can trash a content node without references', async ({umbracoApi, umbracoUi}) => {
+test('can trash an invariant content node without references', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeId);
   await umbracoApi.document.createDocumentWithTextContent(contentName, documentTypeId, contentText, dataTypeName);
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.clickActionsMenuForContent(contentName);
+  await umbracoUi.content.clickTrashActionMenuOption();
+  await umbracoUi.content.clickConfirmTrashButtonAndWaitForContentToBeTrashed();
+
+  // Assert
+  expect(await umbracoApi.document.doesNameExist(contentName)).toBeFalsy();
+  await umbracoUi.content.isItemVisibleInRecycleBin(contentName);
+  expect(await umbracoApi.document.doesItemExistInRecycleBin(contentName)).toBeTruthy();
+});
+
+test('can trash an variant content node without references', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const documentTypeId = await umbracoApi.documentType.createVariantDocumentTypeWithInvariantPropertyEditor(documentTypeName, dataTypeName, dataTypeId);
+  const contentId = await umbracoApi.document.createDocumentWithEnglishCultureAndTextContent(contentName, documentTypeId, contentText, dataTypeName);
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
@@ -96,7 +113,7 @@ test('cannot trash an invariant content node that has references', async ({umbra
   // Assert
   await umbracoUi.content.isConfirmTrashButtonDisabled();
   await umbracoUi.content.doesReferenceHeadlineHaveText(ConstantHelper.trashDeleteDialogMessage.referenceHeadline);
-  await umbracoUi.content.doesModalHaveText(contentName + warningMessage);
+  await umbracoUi.content.doesModalHaveText(warningMessage(contentName));
   await umbracoUi.content.doesReferenceItemsHaveCount(1);
   await umbracoUi.content.isReferenceItemNameVisible(documentPickerName[0]);
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
@@ -119,7 +136,7 @@ test('cannot trash a variant content node that has references', async ({umbracoA
   // Assert
   await umbracoUi.content.isConfirmTrashButtonDisabled();
   await umbracoUi.content.doesReferenceHeadlineHaveText(ConstantHelper.trashDeleteDialogMessage.referenceHeadline);
-  await umbracoUi.content.doesModalHaveText(contentName + warningMessage);
+  await umbracoUi.content.doesModalHaveText(warningMessage(contentName));
   await umbracoUi.content.doesReferenceItemsHaveCount(1);
   await umbracoUi.content.isReferenceItemNameVisible(documentPickerName[0]);
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
@@ -203,7 +220,7 @@ test('cannot trash a parent content node when a child node has references', asyn
 
   // Assert
   await umbracoUi.content.isConfirmTrashButtonDisabled();
-  await umbracoUi.content.doesModalHaveText(contentName + warningMessage);
+  await umbracoUi.content.doesModalHaveText(warningMessage(contentName));
   await umbracoUi.content.doesReferenceHeadlineHaveText(ConstantHelper.trashDeleteDialogMessage.descendingReferenceHeadline);
   await umbracoUi.content.doesReferenceItemsHaveCount(1);
   await umbracoUi.content.isReferenceItemNameVisible(childContentName);
@@ -270,7 +287,7 @@ test('cannot trash a media item that has references', async ({umbracoApi, umbrac
 
   // Assert
   await umbracoUi.media.isConfirmTrashButtonDisabled();
-  await umbracoUi.media.doesModalHaveText(mediaFileName + warningMessage);
+  await umbracoUi.media.doesModalHaveText(warningMessage(mediaFileName));
   await umbracoUi.media.doesReferenceHeadlineHaveText(ConstantHelper.trashDeleteDialogMessage.referenceHeadline);
   await umbracoUi.media.doesReferenceItemsHaveCount(1);
   await umbracoUi.media.isReferenceItemNameVisible(mediaPickerDocumentName[0]);
