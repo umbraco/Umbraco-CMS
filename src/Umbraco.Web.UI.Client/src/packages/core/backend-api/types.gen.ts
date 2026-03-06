@@ -11,6 +11,14 @@ export type AllowedDocumentTypeModel = {
     icon?: string | null;
 };
 
+export type AllowedMediaTypeItemResponseModel = {
+    id: string;
+    flags: Array<FlagModel>;
+    name: string;
+    icon?: string | null;
+    matchedFileExtension: boolean;
+};
+
 export type AllowedMediaTypeModel = {
     id: string;
     name: string;
@@ -1156,6 +1164,31 @@ export type InviteUserRequestModel = {
     message?: string | null;
 };
 
+export type ItemAncestorsResponseModelDocumentItemResponseModel = {
+    id: string;
+    ancestors: Array<DocumentItemResponseModel>;
+};
+
+export type ItemAncestorsResponseModelMediaItemResponseModel = {
+    id: string;
+    ancestors: Array<MediaItemResponseModel>;
+};
+
+export type ItemAncestorsResponseModelMemberItemResponseModel = {
+    id: string;
+    ancestors: Array<MemberItemResponseModel>;
+};
+
+export type ItemAncestorsResponseModelNamedItemResponseModel = {
+    id: string;
+    ancestors: Array<NamedItemResponseModel>;
+};
+
+export type ItemAncestorsResponseModelTemplateItemResponseModel = {
+    id: string;
+    ancestors: Array<TemplateItemResponseModel>;
+};
+
 export type ItemReferenceByIdResponseModel = {
     id: string;
 };
@@ -1667,6 +1700,12 @@ export type NamedEntityTreeItemResponseModel = {
     name: string;
 };
 
+export type NamedItemResponseModel = {
+    id: string;
+    flags: Array<FlagModel>;
+    name: string;
+};
+
 export type NewsDashboardItemResponseModel = {
     priority: string;
     header: string;
@@ -1897,6 +1936,11 @@ export type PagedMemberResponseModel = {
 export type PagedMemberTypeTreeItemResponseModel = {
     total: number;
     items: Array<MemberTypeTreeItemResponseModel>;
+};
+
+export type PagedModelAllowedMediaTypeItemResponseModel = {
+    items: Array<AllowedMediaTypeItemResponseModel>;
+    total: number;
 };
 
 export type PagedModelDataTypeItemResponseModel = {
@@ -2583,6 +2627,12 @@ export type TrackedReferenceMemberTypeModel = {
     alias?: string | null;
     name?: string | null;
 };
+
+export enum TreeItemKindModel {
+    ITEM = 'Item',
+    FOLDER = 'Folder',
+    ALL = 'All'
+}
 
 export type UnknownTypePermissionPresentationModel = {
     $type: string;
@@ -3716,6 +3766,31 @@ export type GetItemDataTypeResponses = {
 
 export type GetItemDataTypeResponse = GetItemDataTypeResponses[keyof GetItemDataTypeResponses];
 
+export type GetItemDataTypeAncestorsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        id?: Array<string>;
+    };
+    url: '/umbraco/management/api/v1/item/data-type/ancestors';
+};
+
+export type GetItemDataTypeAncestorsErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+};
+
+export type GetItemDataTypeAncestorsResponses = {
+    /**
+     * OK
+     */
+    200: Array<ItemAncestorsResponseModelNamedItemResponseModel>;
+};
+
+export type GetItemDataTypeAncestorsResponse = GetItemDataTypeAncestorsResponses[keyof GetItemDataTypeAncestorsResponses];
+
 export type GetItemDataTypeSearchData = {
     body?: never;
     path?: never;
@@ -3834,6 +3909,38 @@ export type GetTreeDataTypeRootResponses = {
 };
 
 export type GetTreeDataTypeRootResponse = GetTreeDataTypeRootResponses[keyof GetTreeDataTypeRootResponses];
+
+export type GetTreeDataTypeSearchData = {
+    body?: never;
+    path?: never;
+    query?: {
+        query?: string;
+        skip?: number;
+        take?: number;
+        itemKind?: TreeItemKindModel;
+    };
+    url: '/umbraco/management/api/v1/tree/data-type/search';
+};
+
+export type GetTreeDataTypeSearchErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type GetTreeDataTypeSearchResponses = {
+    /**
+     * OK
+     */
+    200: PagedDataTypeTreeItemResponseModel;
+};
+
+export type GetTreeDataTypeSearchResponse = GetTreeDataTypeSearchResponses[keyof GetTreeDataTypeSearchResponses];
 
 export type GetTreeDataTypeSiblingsData = {
     body?: never;
@@ -5564,6 +5671,31 @@ export type GetItemDocumentTypeResponses = {
 
 export type GetItemDocumentTypeResponse = GetItemDocumentTypeResponses[keyof GetItemDocumentTypeResponses];
 
+export type GetItemDocumentTypeAncestorsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        id?: Array<string>;
+    };
+    url: '/umbraco/management/api/v1/item/document-type/ancestors';
+};
+
+export type GetItemDocumentTypeAncestorsErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+};
+
+export type GetItemDocumentTypeAncestorsResponses = {
+    /**
+     * OK
+     */
+    200: Array<ItemAncestorsResponseModelNamedItemResponseModel>;
+};
+
+export type GetItemDocumentTypeAncestorsResponse = GetItemDocumentTypeAncestorsResponses[keyof GetItemDocumentTypeAncestorsResponses];
+
 export type GetItemDocumentTypeSearchData = {
     body?: never;
     path?: never;
@@ -5683,6 +5815,38 @@ export type GetTreeDocumentTypeRootResponses = {
 };
 
 export type GetTreeDocumentTypeRootResponse = GetTreeDocumentTypeRootResponses[keyof GetTreeDocumentTypeRootResponses];
+
+export type GetTreeDocumentTypeSearchData = {
+    body?: never;
+    path?: never;
+    query?: {
+        query?: string;
+        skip?: number;
+        take?: number;
+        itemKind?: TreeItemKindModel;
+    };
+    url: '/umbraco/management/api/v1/tree/document-type/search';
+};
+
+export type GetTreeDocumentTypeSearchErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type GetTreeDocumentTypeSearchResponses = {
+    /**
+     * OK
+     */
+    200: PagedDocumentTypeTreeItemResponseModel;
+};
+
+export type GetTreeDocumentTypeSearchResponse = GetTreeDocumentTypeSearchResponses[keyof GetTreeDocumentTypeSearchResponses];
 
 export type GetTreeDocumentTypeSiblingsData = {
     body?: never;
@@ -7044,6 +7208,31 @@ export type GetItemDocumentResponses = {
 };
 
 export type GetItemDocumentResponse = GetItemDocumentResponses[keyof GetItemDocumentResponses];
+
+export type GetItemDocumentAncestorsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        id?: Array<string>;
+    };
+    url: '/umbraco/management/api/v1/item/document/ancestors';
+};
+
+export type GetItemDocumentAncestorsErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+};
+
+export type GetItemDocumentAncestorsResponses = {
+    /**
+     * OK
+     */
+    200: Array<ItemAncestorsResponseModelDocumentItemResponseModel>;
+};
+
+export type GetItemDocumentAncestorsResponse = GetItemDocumentAncestorsResponses[keyof GetItemDocumentAncestorsResponses];
 
 export type GetItemDocumentSearchData = {
     body?: never;
@@ -8556,10 +8745,35 @@ export type GetItemMediaTypeAllowedResponses = {
     /**
      * OK
      */
-    200: PagedModelMediaTypeItemResponseModel;
+    200: PagedModelAllowedMediaTypeItemResponseModel;
 };
 
 export type GetItemMediaTypeAllowedResponse = GetItemMediaTypeAllowedResponses[keyof GetItemMediaTypeAllowedResponses];
+
+export type GetItemMediaTypeAncestorsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        id?: Array<string>;
+    };
+    url: '/umbraco/management/api/v1/item/media-type/ancestors';
+};
+
+export type GetItemMediaTypeAncestorsErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+};
+
+export type GetItemMediaTypeAncestorsResponses = {
+    /**
+     * OK
+     */
+    200: Array<ItemAncestorsResponseModelNamedItemResponseModel>;
+};
+
+export type GetItemMediaTypeAncestorsResponse = GetItemMediaTypeAncestorsResponses[keyof GetItemMediaTypeAncestorsResponses];
 
 export type GetItemMediaTypeFoldersData = {
     body?: never;
@@ -9469,6 +9683,31 @@ export type GetItemMediaResponses = {
 };
 
 export type GetItemMediaResponse = GetItemMediaResponses[keyof GetItemMediaResponses];
+
+export type GetItemMediaAncestorsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        id?: Array<string>;
+    };
+    url: '/umbraco/management/api/v1/item/media/ancestors';
+};
+
+export type GetItemMediaAncestorsErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+};
+
+export type GetItemMediaAncestorsResponses = {
+    /**
+     * OK
+     */
+    200: Array<ItemAncestorsResponseModelMediaItemResponseModel>;
+};
+
+export type GetItemMediaAncestorsResponse = GetItemMediaAncestorsResponses[keyof GetItemMediaAncestorsResponses];
 
 export type GetItemMediaSearchData = {
     body?: never;
@@ -10659,6 +10898,31 @@ export type GetItemMemberTypeResponses = {
 
 export type GetItemMemberTypeResponse = GetItemMemberTypeResponses[keyof GetItemMemberTypeResponses];
 
+export type GetItemMemberTypeAncestorsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        id?: Array<string>;
+    };
+    url: '/umbraco/management/api/v1/item/member-type/ancestors';
+};
+
+export type GetItemMemberTypeAncestorsErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+};
+
+export type GetItemMemberTypeAncestorsResponses = {
+    /**
+     * OK
+     */
+    200: Array<ItemAncestorsResponseModelNamedItemResponseModel>;
+};
+
+export type GetItemMemberTypeAncestorsResponse = GetItemMemberTypeAncestorsResponses[keyof GetItemMemberTypeAncestorsResponses];
+
 export type GetItemMemberTypeSearchData = {
     body?: never;
     path?: never;
@@ -11435,6 +11699,31 @@ export type GetItemMemberResponses = {
 };
 
 export type GetItemMemberResponse = GetItemMemberResponses[keyof GetItemMemberResponses];
+
+export type GetItemMemberAncestorsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        id?: Array<string>;
+    };
+    url: '/umbraco/management/api/v1/item/member/ancestors';
+};
+
+export type GetItemMemberAncestorsErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+};
+
+export type GetItemMemberAncestorsResponses = {
+    /**
+     * OK
+     */
+    200: Array<ItemAncestorsResponseModelMemberItemResponseModel>;
+};
+
+export type GetItemMemberAncestorsResponse = GetItemMemberAncestorsResponses[keyof GetItemMemberAncestorsResponses];
 
 export type GetItemMemberSearchData = {
     body?: never;
@@ -14682,6 +14971,31 @@ export type GetItemTemplateResponses = {
 };
 
 export type GetItemTemplateResponse = GetItemTemplateResponses[keyof GetItemTemplateResponses];
+
+export type GetItemTemplateAncestorsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        id?: Array<string>;
+    };
+    url: '/umbraco/management/api/v1/item/template/ancestors';
+};
+
+export type GetItemTemplateAncestorsErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+};
+
+export type GetItemTemplateAncestorsResponses = {
+    /**
+     * OK
+     */
+    200: Array<ItemAncestorsResponseModelTemplateItemResponseModel>;
+};
+
+export type GetItemTemplateAncestorsResponse = GetItemTemplateAncestorsResponses[keyof GetItemTemplateAncestorsResponses];
 
 export type GetItemTemplateSearchData = {
     body?: never;
