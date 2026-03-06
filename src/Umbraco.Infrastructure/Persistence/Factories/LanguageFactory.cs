@@ -1,6 +1,6 @@
 using System.Globalization;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Factories;
 
@@ -30,7 +30,7 @@ internal static class LanguageFactory
         return lang;
     }
 
-    public static LanguageDto BuildDto(ILanguage entity, int? fallbackLanguageId)
+    public static LanguageDto BuildDto(ILanguage entity, short? fallbackLanguageId)
     {
         ArgumentNullException.ThrowIfNull(entity);
 

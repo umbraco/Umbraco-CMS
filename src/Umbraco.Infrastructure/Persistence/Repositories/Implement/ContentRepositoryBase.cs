@@ -316,7 +316,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                         foreach (IPropertyValue pvalue in property.Values)
                         {
                             IEnumerable<string> tagsValue = property.GetTagsValue(PropertyEditors, DataTypeService, serializer, pvalue.Culture);
-                            var languageId = LanguageRepository.GetIdByIsoCode(pvalue.Culture);
+                            var languageId = LanguageRepository.GetIdByIsoCodeAsync(pvalue.Culture).GetAwaiter().GetResult();
                             IEnumerable<Tag> cultureTags = tagsValue.Select(x => new Tag { Group = tagConfiguration.Group, Text = x, LanguageId = languageId });
                             tags.AddRange(cultureTags);
                         }
@@ -340,7 +340,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     var tags = new List<ITag>();
                     foreach (IPropertyValue pvalue in property.Values)
                     {
-                        var languageId = LanguageRepository.GetIdByIsoCode(pvalue.Culture);
+                        // TODO: Await this properly when adjusting this to our new EF Core approach.
+                        var languageId = LanguageRepository.GetIdByIsoCodeAsync(pvalue.Culture).GetAwaiter().GetResult();
                         tags.AddRange(tagsProvider.GetTags(pvalue.EditedValue, configurationObject, languageId));
                     }
 
@@ -936,7 +937,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     propertyDataDtos.AddRange(propertyDataDtos2);
                 }
 
-                var properties = PropertyFactory.BuildEntities(compositionProperties, propertyDataDtos, temp.PublishedVersionId, LanguageRepository).ToList();
+                // TODO: Await this properly when adjusting this to our new EF Core approach.
+                var properties = PropertyFactory.BuildEntities(compositionProperties, propertyDataDtos, temp.PublishedVersionId, LanguageRepository).GetAwaiter().GetResult().ToList();
 
                 if (result.ContainsKey(temp.VersionId))
                 {

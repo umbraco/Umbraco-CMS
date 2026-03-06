@@ -271,7 +271,7 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
-            return _languageRepository.Get(id);
+            return _languageRepository.GetAsync(id, CancellationToken.None).GetAwaiter().GetResult();
         }
     }
 
@@ -300,7 +300,7 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     {
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
-            return _languageRepository.GetIsoCodeById(id);
+            return _languageRepository.GetIsoCodeByIdAsync(id).GetAwaiter().GetResult();
         }
     }
 
@@ -315,7 +315,7 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     {
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
-            return _languageRepository.GetDefaultId();
+            return _languageRepository.GetDefaultIdAsync().GetAwaiter().GetResult();
         }
     }
 

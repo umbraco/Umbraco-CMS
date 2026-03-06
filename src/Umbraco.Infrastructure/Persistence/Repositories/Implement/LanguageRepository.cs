@@ -1,14 +1,14 @@
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using NPoco;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
-using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Cache;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence.Factories;
-using Umbraco.Cms.Infrastructure.Persistence.Querying;
-using Umbraco.Cms.Infrastructure.Scoping;
+using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.EFCore;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 /// <summary>
 ///     Represents a repository for doing CRUD operations for <see cref="Language" />
 /// </summary>
-internal sealed class LanguageRepository : EntityRepositoryBase<int, ILanguage>, ILanguageRepository
+internal sealed class LanguageRepository : AsyncEntityRepositoryBase<int, ILanguage>, ILanguageRepository
 {
     // We need to lock this dictionary every time we do an operation on it as the languageRepository is registered as a unique implementation
     // It is used to quickly get isoCodes by Id, or the reverse by avoiding (deep)cloning dtos
@@ -24,8 +24,10 @@ internal sealed class LanguageRepository : EntityRepositoryBase<int, ILanguage>,
     private readonly Dictionary<string, int> _codeIdMap = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<int, string> _idCodeMap = new();
 
+    private CancellationToken cancellationToken => CancellationToken.None;
+
     public LanguageRepository(
-        IScopeAccessor scopeAccessor,
+        IEFCoreScopeAccessor<UmbracoDbContext> scopeAccessor,
         AppCaches cache,
         ILogger<LanguageRepository> logger,
         IRepositoryCacheVersionService repositoryCacheVersionService,
@@ -39,25 +41,25 @@ internal sealed class LanguageRepository : EntityRepositoryBase<int, ILanguage>,
     {
     }
 
-    private FullDataSetRepositoryCachePolicy<ILanguage, int>? TypedCachePolicy =>
-        CachePolicy as FullDataSetRepositoryCachePolicy<ILanguage, int>;
+    private AsyncFullDataSetRepositoryCachePolicy<ILanguage, int>? TypedCachePolicy =>
+        CachePolicy as AsyncFullDataSetRepositoryCachePolicy<ILanguage, int>;
 
-    public ILanguage? GetByIsoCode(string isoCode)
+    public async Task<ILanguage?> GetByIsoCodeAsync(string isoCode)
     {
-        EnsureCacheIsPopulated();
+        await EnsureCacheIsPopulatedAsync();
 
-        var id = GetIdByIsoCode(isoCode, false);
-        return id.HasValue ? Get(id.Value) : null;
+        var id = await GetIdByIsoCodeAsync(isoCode, false);
+        return id.HasValue ? await GetAsync(id.Value, cancellationToken) : null;
     }
 
-    public int? GetIdByIsoCode(string? isoCode, bool throwOnNotFound = true)
+    public async Task<int?> GetIdByIsoCodeAsync(string? isoCode, bool throwOnNotFound = true)
     {
         if (isoCode == null)
         {
             return null;
         }
 
-        EnsureCacheIsPopulated();
+        await EnsureMapsPopulatedAsync();
 
         lock (_codeIdMap)
         {
@@ -75,14 +77,14 @@ internal sealed class LanguageRepository : EntityRepositoryBase<int, ILanguage>,
         return null;
     }
 
-    public string? GetIsoCodeById(int? id, bool throwOnNotFound = true)
+    public async Task<string?> GetIsoCodeByIdAsync(int? id, bool throwOnNotFound = true)
     {
         if (id == null)
         {
             return null;
         }
 
-        EnsureCacheIsPopulated();
+        await EnsureMapsPopulatedAsync();
 
         lock (_codeIdMap)
         {
@@ -101,7 +103,7 @@ internal sealed class LanguageRepository : EntityRepositoryBase<int, ILanguage>,
     }
 
     // multi implementation of GetIsoCodeById
-    public string[] GetIsoCodesByIds(ICollection<int> ids, bool throwOnNotFound = true)
+    public async Task<string[]> GetIsoCodesByIdsAsync(ICollection<int> ids, bool throwOnNotFound = true)
     {
         var isoCodes = new string[ids.Count];
 
@@ -110,8 +112,7 @@ internal sealed class LanguageRepository : EntityRepositoryBase<int, ILanguage>,
             return isoCodes;
         }
 
-        EnsureCacheIsPopulated();
-
+        await EnsureMapsPopulatedAsync();
 
         lock (_codeIdMap)
         {
@@ -132,12 +133,21 @@ internal sealed class LanguageRepository : EntityRepositoryBase<int, ILanguage>,
         return isoCodes;
     }
 
-    public string GetDefaultIsoCode() => GetDefault().IsoCode;
+    public async Task<string> GetDefaultIsoCodeAsync()
+    {
+        ILanguage defaultLanguage = await GetDefaultAsync();
+        return defaultLanguage.IsoCode;
+    }
 
-    public int? GetDefaultId() => GetDefault().Id;
+    public async Task<int?> GetDefaultIdAsync()
+    {
+        ILanguage defaultLanguage = await GetDefaultAsync();
+        return defaultLanguage.Id;
+    }
 
-    protected override IRepositoryCachePolicy<ILanguage, int> CreateCachePolicy() =>
-        new FullDataSetRepositoryCachePolicy<ILanguage, int>(GlobalIsolatedCache, ScopeAccessor,  RepositoryCacheVersionService, CacheSyncService, GetEntityId, /*expires:*/ false);
+    protected override IAsyncRepositoryCachePolicy<ILanguage, int> CreateCachePolicy() =>
+        new AsyncFullDataSetRepositoryCachePolicy<ILanguage, int>(GlobalIsolatedCache, ScopeAccessor,
+            RepositoryCacheVersionService, CacheSyncService, GetEntityId, /*expires:*/ false);
 
     private ILanguage ConvertFromDto(LanguageDto dto)
     {
@@ -154,14 +164,13 @@ internal sealed class LanguageRepository : EntityRepositoryBase<int, ILanguage>,
     }
 
     // do NOT leak that language, it's not deep-cloned!
-    private ILanguage GetDefault()
+    private async Task<ILanguage> GetDefaultAsync()
     {
         // get all cached
-        var languages =
-            (TypedCachePolicy
-                 ?.GetAllCached(
-                     PerformGetAll) // Try to get all cached non-cloned if using the correct cache policy (not the case in unit tests)
-             ?? CachePolicy.GetAll(Array.Empty<int>(), PerformGetAll)).ToList();
+        // Try to get all cached non-cloned if using the correct cache policy (not the case in unit tests)
+        List<ILanguage> languages = TypedCachePolicy is not null
+            ? (await TypedCachePolicy.GetAllCachedAsync(PerformGetAllAsync)).ToList()
+            : (await CachePolicy.GetAllAsync(PerformGetAllAsync)).ToList();
 
         ILanguage? language = languages.FirstOrDefault(x => x.IsDefault);
         if (language != null)
@@ -188,258 +197,251 @@ internal sealed class LanguageRepository : EntityRepositoryBase<int, ILanguage>,
 
     #region Overrides of RepositoryBase<int,Language>
 
-    protected override ILanguage? PerformGet(int id) => PerformGetAll([id]).FirstOrDefault();
+    protected override async Task<ILanguage?> PerformGetAsync(int id) =>
+        (await PerformGetManyAsync([id]))?.FirstOrDefault();
 
-    protected override IEnumerable<ILanguage> PerformGetAll(params int[]? ids)
-    {
-        Sql<ISqlContext> sql = GetBaseQuery(false).Where<LanguageDto>(x => x.Id > 0);
-        if (ids?.Any() ?? false)
+    protected override async Task<IEnumerable<ILanguage>?> PerformGetAllAsync() =>
+        await AmbientScope.ExecuteWithContextAsync(async db =>
         {
-            sql.WhereIn<LanguageDto>(x => x.Id, ids);
-        }
+            List<LanguageDto> dtos = await db.Language
+                .OrderBy(x => x.Id)
+                .ToListAsync();
 
-        // this needs to be sorted since that is the way legacy worked - default language is the first one!!
-        // even though legacy didn't sort, it should be by id
-        sql.OrderBy<LanguageDto>(x => x.Id);
-
-        // get languages
-        List<LanguageDto>? languageDtos = Database.Fetch<LanguageDto>(sql) ?? new List<LanguageDto>();
-
-        // initialize the code-id map if we've reloaded the entire set of languages
-        if (ids?.Any() == false)
-        {
+            // Rebuild the code/id maps so lookups by ISO code or ID work
             lock (_codeIdMap)
             {
                 _codeIdMap.Clear();
                 _idCodeMap.Clear();
-                foreach (LanguageDto languageDto in languageDtos)
+                foreach (LanguageDto dto in dtos)
                 {
-                    ArgumentException.ThrowIfNullOrEmpty(languageDto.IsoCode, nameof(LanguageDto.IsoCode));
-                    _codeIdMap[languageDto.IsoCode] = languageDto.Id;
-                    _idCodeMap[languageDto.Id] = languageDto.IsoCode;
+                    if (dto.IsoCode != null)
+                    {
+                        _codeIdMap[dto.IsoCode] = dto.Id;
+                        _idCodeMap[dto.Id] = dto.IsoCode;
+                    }
                 }
             }
+
+            return dtos
+                .Select(ConvertFromDto)
+                .WhereNotNull()
+                .AsEnumerable();
+        });
+
+    protected override async Task<IEnumerable<ILanguage>?> PerformGetManyAsync(int[]? ids)
+    {
+        if (ids is null)
+        {
+            return null;
         }
 
-        var languages = languageDtos.Select(ConvertFromDto).OrderBy(x => x.Id).ToList();
-        return languages;
-    }
-
-    protected override IEnumerable<ILanguage> PerformGetByQuery(IQuery<ILanguage> query)
-    {
-        Sql<ISqlContext> sqlClause = GetBaseQuery(false);
-        var translator = new SqlTranslator<ILanguage>(sqlClause, query);
-        Sql<ISqlContext> sql = translator.Translate();
-        List<LanguageDto>? dtos = Database.Fetch<LanguageDto>(sql);
-        return dtos.Select(ConvertFromDto).ToList();
-    }
-
-    #endregion
-
-    #region Overrides of EntityRepositoryBase<int,Language>
-
-    protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
-    {
-        Sql<ISqlContext> sql = Sql();
-
-        sql = isCount
-            ? sql.SelectCount()
-            : sql.Select<LanguageDto>();
-
-        sql.From<LanguageDto>();
-
-        return sql;
-    }
-
-    protected override string GetBaseWhereClause() => $"{QuoteTableName(Constants.DatabaseSchema.Tables.Language)}.id = @id";
-
-    protected override IEnumerable<string> GetDeleteClauses()
-    {
-        var lIdWhere = $"WHERE {QuoteColumnName("languageId")} = @id";
-        var list = new List<string>
+        return await AmbientScope.ExecuteWithContextAsync(async db =>
         {
-            // NOTE: There is no constraint between the Language and cmsDictionary/cmsLanguageText tables (?)
-            // but we still need to remove them
-            $"DELETE FROM {QuoteName(Constants.DatabaseSchema.Tables.DictionaryValue)} {lIdWhere}",
-            $"DELETE FROM {QuoteName(Constants.DatabaseSchema.Tables.PropertyData)} {lIdWhere}",
-            $"DELETE FROM {QuoteName(Constants.DatabaseSchema.Tables.ContentVersionCultureVariation)} {lIdWhere}",
-            $"DELETE FROM {QuoteName(Constants.DatabaseSchema.Tables.DocumentCultureVariation)} {lIdWhere}",
-            $"DELETE FROM {QuoteName(Constants.DatabaseSchema.Tables.TagRelationship)} WHERE {QuoteColumnName("tagId")} IN (SELECT id FROM {QuoteName(Constants.DatabaseSchema.Tables.Tag)} {lIdWhere})",
-            $"DELETE FROM {QuoteName(Constants.DatabaseSchema.Tables.Tag)} {lIdWhere}",
-            $"DELETE FROM {QuoteName(Constants.DatabaseSchema.Tables.DocumentUrl)} {lIdWhere}",
-            $"DELETE FROM {QuoteName(Constants.DatabaseSchema.Tables.DocumentUrlAlias)} {lIdWhere}",
-            $"DELETE FROM {QuoteName(Constants.DatabaseSchema.Tables.Language)} WHERE id = @id",
-        };
-        return list;
+            List<LanguageDto> dtos = await db.Language
+                .Where(x => ids.Contains(x.Id))
+                .OrderBy(x => x.Id)
+                .ToListAsync();
+
+            return dtos
+                .Select(ConvertFromDto)
+                .WhereNotNull()
+                .AsEnumerable();
+        });
     }
 
     #endregion
 
     #region Unit of Work Implementation
 
-    protected override void PersistNewItem(ILanguage entity)
-    {
-        // validate iso code and culture name
-        if (entity.IsoCode.IsNullOrWhiteSpace() || entity.CultureName.IsNullOrWhiteSpace())
+    /// <inheritdoc/>
+    protected override async Task PersistNewItemAsync(ILanguage entity) =>
+        await AmbientScope.ExecuteWithContextAsync<LanguageDto>(async db =>
         {
-            throw new InvalidOperationException("Cannot save a language without an ISO code and a culture name.");
-        }
+            // validate iso code and culture name
+            if (entity.IsoCode.IsNullOrWhiteSpace() || entity.CultureName.IsNullOrWhiteSpace())
+            {
+                throw new InvalidOperationException("Cannot save a language without an ISO code and a culture name.");
+            }
 
-        EnsureCacheIsPopulated();
+            await EnsureCacheIsPopulatedAsync();
 
-        entity.AddingEntity();
+            entity.AddingEntity();
 
-        // deal with entity becoming the new default entity
-        if (entity.IsDefault)
-        {
-            // set all other entities to non-default
-            // safe (no race cond) because the service locks languages
-            Sql<ISqlContext> setAllDefaultToFalse = Sql()
-                .Update<LanguageDto>(u => u.Set(x => x.IsDefault, false));
-            Database.Execute(setAllDefaultToFalse);
-        }
-
-        // fallback cycles are detected at service level
-
-        // insert
-        LanguageDto dto = LanguageFactory.BuildDto(entity, GetFallbackLanguageId(entity));
-        var id = Convert.ToInt32(Database.Insert(dto));
-        entity.Id = id;
-        entity.ResetDirtyProperties();
-
-        // yes, we want to lock _codeIdMap
-        lock (_codeIdMap)
-        {
-            _codeIdMap[entity.IsoCode] = entity.Id;
-            _idCodeMap[entity.Id] = entity.IsoCode;
-        }
-    }
-
-    protected override void PersistUpdatedItem(ILanguage entity)
-    {
-        // validate iso code and culture name
-        if (entity.IsoCode.IsNullOrWhiteSpace() || entity.CultureName.IsNullOrWhiteSpace())
-        {
-            throw new InvalidOperationException("Cannot save a language without an ISO code and a culture name.");
-        }
-
-        EnsureCacheIsPopulated();
-
-        entity.UpdatingEntity();
-
-        if (entity.IsDefault)
-        {
             // deal with entity becoming the new default entity
+            if (entity.IsDefault)
+            {
+                // set all other entities to non-default
+                // safe (no race cond) because the service locks languages
+                await db.Language
+                    .ExecuteUpdateAsync(
+                        setter => setter
+                        .SetProperty(x => x.IsDefault, false));
+            }
 
-            // set all other entities to non-default
-            // safe (no race cond) because the service locks languages
-            Sql<ISqlContext> setAllDefaultToFalse = Sql()
-                .Update<LanguageDto>(u => u.Set(x => x.IsDefault, false));
-            Database.Execute(setAllDefaultToFalse);
-        }
-        else
+            // fallback cycles are detected at service level
+
+            // insert
+            LanguageDto dto = LanguageFactory.BuildDto(entity, GetFallbackLanguageId(entity));
+            await db.Language.AddAsync(dto);
+            await db.SaveChangesAsync();
+
+            entity.Id = dto.Id;
+            entity.ResetDirtyProperties();
+
+            // yes, we want to lock _codeIdMap
+            lock (_codeIdMap)
+            {
+                _codeIdMap[entity.IsoCode] = entity.Id;
+                _idCodeMap[entity.Id] = entity.IsoCode;
+            }
+        });
+
+    /// <inheritdoc/>
+    protected override async Task PersistUpdatedItemAsync(ILanguage entity) =>
+        await AmbientScope.ExecuteWithContextAsync<LanguageDto>(async db =>
         {
-            // deal with the entity not being default anymore
-            // which is illegal - another entity has to become default
-            Sql<ISqlContext> selectDefaultId = Sql()
-                .Select<LanguageDto>(x => x.Id)
-                .From<LanguageDto>()
-                .Where<LanguageDto>(x => x.IsDefault);
+            // validate iso code and culture name
+            if (entity.IsoCode.IsNullOrWhiteSpace() || entity.CultureName.IsNullOrWhiteSpace())
+            {
+                throw new InvalidOperationException("Cannot save a language without an ISO code and a culture name.");
+            }
 
-            var defaultId = Database.ExecuteScalar<int>(selectDefaultId);
+            await EnsureCacheIsPopulatedAsync();
+
+            entity.UpdatingEntity();
+
+            if (entity.IsDefault)
+            {
+                // deal with entity becoming the new default entity
+
+                // set all other entities to non-default
+                // safe (no race cond) because the service locks languages
+                await db.Language
+                    .ExecuteUpdateAsync(
+                        setter => setter
+                            .SetProperty(x => x.IsDefault, false));
+            }
+            else
+            {
+                var defaultId = await db.Language
+                    .Where(x => x.IsDefault)
+                    .Select(x => x.Id)
+                    .FirstOrDefaultAsync();
+
+                if (entity.Id == defaultId)
+                {
+                    throw new InvalidOperationException(
+                        $"Cannot save the default language ({entity.IsoCode}) as non-default. Make another language the default language instead.");
+                }
+            }
+
+            if (entity.IsPropertyDirty(nameof(ILanguage.IsoCode)))
+            {
+                var countOfSameCode = await db.Language
+                    .CountAsync(x => x.IsoCode == entity.IsoCode && x.Id != entity.Id);
+
+                if (countOfSameCode > 0)
+                {
+                    throw new InvalidOperationException(
+                        $"Cannot update the language to a new culture: {entity.IsoCode} since that culture is already assigned to another language entity.");
+                }
+            }
+
+            // fallback cycles are detected at service level
+
+            // update
+            LanguageDto dto = LanguageFactory.BuildDto(entity, GetFallbackLanguageId(entity));
+            await db.UpsertAsync(dto, () =>
+                db.Language
+                    .Where(x => x.Id == dto.Id)
+                    .ExecuteUpdateAsync(setter => setter
+                        .SetProperty(x => x.IsoCode, dto.IsoCode)
+                        .SetProperty(x => x.CultureName, dto.CultureName)
+                        .SetProperty(x => x.IsDefault, dto.IsDefault)
+                        .SetProperty(x => x.IsMandatory, dto.IsMandatory)
+                        .SetProperty(x => x.FallbackLanguageId, dto.FallbackLanguageId)));
+
+            entity.ResetDirtyProperties();
+
+            // yes, we want to lock _codeIdMap
+            lock (_codeIdMap)
+            {
+                _codeIdMap.RemoveAll(kvp => kvp.Value == entity.Id);
+                _codeIdMap[entity.IsoCode] = entity.Id;
+                _idCodeMap[entity.Id] = entity.IsoCode;
+            }
+        });
+
+    /// <inheritdoc/>
+    protected override async Task PersistDeletedItemAsync(ILanguage entity) =>
+        await AmbientScope.ExecuteWithContextAsync<LanguageDto>(async db =>
+        {
+            var defaultId = await db.Language
+                .Where(x => x.IsDefault)
+                .Select(x => x.Id)
+                .FirstOrDefaultAsync();
+
             if (entity.Id == defaultId)
             {
-                throw new InvalidOperationException(
-                    $"Cannot save the default language ({entity.IsoCode}) as non-default. Make another language the default language instead.");
+                throw new InvalidOperationException($"Cannot delete the default language ({entity.IsoCode}).");
             }
-        }
 
-        if (entity.IsPropertyDirty(nameof(ILanguage.IsoCode)))
-        {
-            // If the iso code is changing, ensure there's not another lang with the same code already assigned
-            Sql<ISqlContext> sameCode = Sql()
-                .SelectCount()
-                .From<LanguageDto>()
-                .Where<LanguageDto>(x => x.IsoCode == entity.IsoCode && x.Id != entity.Id);
+            // We need to remove any references to the language if it's being used as a fall-back from other ones
+            await db.Language
+                .Where(x => x.FallbackLanguageId == entity.Id)
+                .ExecuteUpdateAsync(setter => setter
+                    .SetProperty(x => x.FallbackLanguageId, (short?)null));
 
-            var countOfSameCode = Database.ExecuteScalar<int>(sameCode);
-            if (countOfSameCode > 0)
+            // delete
+            await base.PersistDeletedItemAsync(entity);
+
+            // yes, we want to lock _codeIdMap
+            lock (_codeIdMap)
             {
-                throw new InvalidOperationException(
-                    $"Cannot update the language to a new culture: {entity.IsoCode} since that culture is already assigned to another language entity.");
+                _codeIdMap.RemoveAll(kvp => kvp.Value == entity.Id);
+                _idCodeMap.Remove(entity.Id);
+            }
+        });
+
+    /// <summary>
+    /// Ensures the in-memory ISO code/ID maps are populated.
+    /// If the maps already contain data, returns immediately without requiring an EF Core scope.
+    /// This allows NPoco code paths (e.g. ContentBaseFactory) to perform ID/IsoCode lookups
+    /// without needing an ambient EF Core scope.
+    /// </summary>
+    private async Task EnsureMapsPopulatedAsync()
+    {
+        lock (_codeIdMap)
+        {
+            if (_codeIdMap.Count > 0)
+            {
+                return;
             }
         }
 
-        // fallback cycles are detected at service level
-
-        // update
-        LanguageDto dto = LanguageFactory.BuildDto(entity, GetFallbackLanguageId(entity));
-        Database.Update(dto);
-        entity.ResetDirtyProperties();
-
-        // yes, we want to lock _codeIdMap
-        lock (_codeIdMap)
-        {
-            _codeIdMap.RemoveAll(kvp => kvp.Value == entity.Id);
-            _codeIdMap[entity.IsoCode] = entity.Id;
-            _idCodeMap[entity.Id] = entity.IsoCode;
-        }
+        await EnsureCacheIsPopulatedAsync();
     }
 
-    protected override void PersistDeletedItem(ILanguage entity)
-    {
-        // validate that the entity is not the default language.
-        // safe (no race cond) because the service locks languages
-        Sql<ISqlContext> selectDefaultId = Sql()
-            .Select<LanguageDto>(x => x.Id)
-            .From<LanguageDto>()
-            .Where<LanguageDto>(x => x.IsDefault);
-
-        var defaultId = Database.ExecuteScalar<int>(selectDefaultId);
-        if (entity.Id == defaultId)
-        {
-            throw new InvalidOperationException($"Cannot delete the default language ({entity.IsoCode}).");
-        }
-
-        // We need to remove any references to the language if it's being used as a fall-back from other ones
-        Sql<ISqlContext> clearFallbackLanguage = Sql()
-            .Update<LanguageDto>(u => u
-                .Set(x => x.FallbackLanguageId, null))
-            .Where<LanguageDto>(x => x.FallbackLanguageId == entity.Id);
-
-        Database.Execute(clearFallbackLanguage);
-
-        // delete
-        base.PersistDeletedItem(entity);
-
-        // yes, we want to lock _codeIdMap
-        lock (_codeIdMap)
-        {
-            _codeIdMap.RemoveAll(kvp => kvp.Value == entity.Id);
-            _idCodeMap.Remove(entity.Id);
-        }
-    }
-
-    private void EnsureCacheIsPopulated()
+    private async Task EnsureCacheIsPopulatedAsync()
     {
         // ensure cache is populated, in a non-expensive way
         if (TypedCachePolicy != null)
         {
-            TypedCachePolicy.GetAllCached(PerformGetAll);
+            await TypedCachePolicy.GetAllCachedAsync(PerformGetAllAsync);
         }
         else
         {
-            PerformGetAll(); // We don't have a typed cache (i.e. unit tests) but need to populate the _codeIdMap
+            await PerformGetAllAsync(); // We don't have a typed cache (i.e. unit tests) but need to populate the _codeIdMap
         }
     }
 
-    private int? GetFallbackLanguageId(ILanguage entity)
+    private short? GetFallbackLanguageId(ILanguage entity)
     {
-        int? fallbackLanguageId = null;
+        short? fallbackLanguageId = null;
         if (entity.FallbackIsoCode.IsNullOrWhiteSpace() == false &&
             _codeIdMap.TryGetValue(entity.FallbackIsoCode, out var languageId))
         {
-            fallbackLanguageId = languageId;
+            fallbackLanguageId = (short)languageId;
         }
 
         return fallbackLanguageId;

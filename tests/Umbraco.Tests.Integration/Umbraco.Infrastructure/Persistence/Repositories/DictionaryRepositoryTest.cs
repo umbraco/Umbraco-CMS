@@ -11,6 +11,8 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Tests.Common.Testing;
@@ -49,8 +51,8 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
     {
         // Arrange
         var languageService = GetRequiredService<ILanguageService>();
-        var provider = ScopeProvider;
-        using (provider.CreateScope())
+        var provider = NewScopeProvider;
+        using (var scope = provider.CreateScope())
         {
             var repository = CreateRepository();
             var dictionaryItem = (IDictionaryItem)new DictionaryItem("Testing1235")
@@ -72,6 +74,8 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
             Assert.That(dictionaryItem.Translations.Any(), Is.True);
             Assert.That(dictionaryItem.Translations.Any(x => x == null), Is.False);
             Assert.That(dictionaryItem.Translations.First().Value, Is.EqualTo("Hello world"));
+
+            scope.Complete();
         }
     }
 
@@ -81,6 +85,7 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
         // Arrange
         var languageService = GetRequiredService<ILanguageService>();
         var provider = ScopeProvider;
+        using var efCoreScope = NewScopeProvider.CreateScope();
         using (provider.CreateScope())
         {
             var repository = CreateRepository();
@@ -112,6 +117,7 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
         // Arrange
         var languageService = GetRequiredService<ILanguageService>();
         var provider = ScopeProvider;
+        using var efCoreScope = NewScopeProvider.CreateScope();
         using (provider.CreateScope())
         {
             var repository = CreateRepository();
@@ -142,6 +148,7 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
     {
         // Arrange
         var provider = ScopeProvider;
+        using var efCoreScope = NewScopeProvider.CreateScope();
         using (provider.CreateScope())
         {
             var repository = CreateRepository();
@@ -164,6 +171,7 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
     {
         // Arrange
         var provider = ScopeProvider;
+        using var efCoreScope = NewScopeProvider.CreateScope();
         using (provider.CreateScope())
         {
             var repository = CreateRepository();
@@ -178,6 +186,8 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
             Assert.That(dictionaryItems.Any(x => x == null), Is.False);
             Assert.That(dictionaryItems.Count(), Is.EqualTo(2));
         }
+
+        efCoreScope.Complete();
     }
 
     [Test]
@@ -185,6 +195,7 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
     {
         // Arrange
         var provider = ScopeProvider;
+        using var efCoreScope = NewScopeProvider.CreateScope();
         using (provider.CreateScope())
         {
             var repository = CreateRepository();
@@ -205,6 +216,7 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
     {
         // Arrange
         var provider = ScopeProvider;
+        using var efCoreScope = NewScopeProvider.CreateScope();
         using (provider.CreateScope())
         {
             var repository = CreateRepository();
@@ -225,6 +237,7 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
     {
         // Arrange
         var provider = ScopeProvider;
+        using var efCoreScope = NewScopeProvider.CreateScope();
         using (provider.CreateScope())
         {
             var repository = CreateRepository();
@@ -245,6 +258,7 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
     {
         // Arrange
         var provider = ScopeProvider;
+        using var efCoreScope = NewScopeProvider.CreateScope();
         using (provider.CreateScope())
         {
             var repository = CreateRepository();
@@ -265,6 +279,7 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
     {
         // Arrange
         var provider = ScopeProvider;
+        using var efCoreScope = NewScopeProvider.CreateScope();
         using (provider.CreateScope())
         {
             var repository = CreateRepository();
@@ -276,19 +291,21 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
             // Assert
             Assert.That(result, Is.EqualTo(1));
         }
+
+        efCoreScope.Complete();
     }
 
     [Test]
-    public void Can_Perform_Add_On_DictionaryRepository()
+    public async Task Can_Perform_Add_On_DictionaryRepository()
     {
         // Arrange
-        var provider = ScopeProvider;
+        var provider = NewScopeProvider;
         using (provider.CreateScope())
         {
             var languageRepository = GetRequiredService<ILanguageRepository>();
             var repository = CreateRepository();
 
-            var language = languageRepository.Get(1);
+            var language = await languageRepository.GetAsync(1, CancellationToken.None);
 
             var read = new DictionaryItem("Read");
             var translations = new List<IDictionaryTranslation> { new DictionaryTranslation(language, "Read") };
@@ -309,7 +326,7 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
     public void Can_Perform_Update_On_DictionaryRepository()
     {
         // Arrange
-        var provider = ScopeProvider;
+        var provider = NewScopeProvider;
         using (provider.CreateScope())
         {
             var repository = CreateRepository();
@@ -336,7 +353,7 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
     {
         // Arrange
         var languageService = GetRequiredService<ILanguageService>();
-        var provider = ScopeProvider;
+        var provider = NewScopeProvider;
         using (provider.CreateScope())
         {
             var repository = CreateRepository();
@@ -365,7 +382,7 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
     public void Can_Perform_Delete_On_DictionaryRepository()
     {
         // Arrange
-        var provider = ScopeProvider;
+        var provider = NewScopeProvider;
         using (provider.CreateScope())
         {
             var repository = CreateRepository();
@@ -424,7 +441,7 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
         var cache = AppCaches.Create(Mock.Of<IRequestCache>());
         var repository = CreateRepositoryWithCache(cache);
 
-        using (ScopeProvider.CreateScope())
+        using (NewScopeProvider.CreateScope())
         {
             var dictionaryItem = repository.Get("Read More");
 
@@ -439,7 +456,7 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
             scope.Complete();
         }
 
-        using (ScopeProvider.CreateScope())
+        using (NewScopeProvider.CreateScope())
         {
             var dictionaryItem = repository.Get("Read More");
 
@@ -447,7 +464,7 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
         }
 
         cache.IsolatedCaches.ClearCache<IDictionaryItem>();
-        using (ScopeProvider.CreateScope())
+        using (NewScopeProvider.CreateScope())
         {
             var dictionaryItem = repository.Get("Read More");
 
@@ -461,7 +478,7 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
         var cache = AppCaches.Create(Mock.Of<IRequestCache>());
         var repository = CreateRepositoryWithCache(cache);
 
-        using (ScopeProvider.CreateScope())
+        using (NewScopeProvider.CreateScope())
         {
             var dictionaryItem = repository.Get("Read More Updated");
 
@@ -476,7 +493,7 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
             scope.Complete();
         }
 
-        using (ScopeProvider.CreateScope())
+        using (NewScopeProvider.CreateScope())
         {
             var dictionaryItem = repository.Get("Read More Updated");
 
@@ -484,7 +501,7 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
         }
 
         cache.IsolatedCaches.ClearCache<IDictionaryItem>();
-        using (ScopeProvider.CreateScope())
+        using (NewScopeProvider.CreateScope())
         {
             var dictionaryItem = repository.Get("Read More Updated");
 
@@ -497,7 +514,7 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
     {
         var repository = CreateRepository();
 
-        using (ScopeProvider.CreateScope())
+        using (NewScopeProvider.CreateScope())
         {
             var dictionaryItem = repository.Get("Read More");
 
@@ -511,7 +528,7 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
             scope.Complete();
         }
 
-        using (ScopeProvider.CreateScope())
+        using (NewScopeProvider.CreateScope())
         {
             var dictionaryItem = repository.Get("Read More");
 
@@ -524,7 +541,7 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
     {
         var repository = CreateRepository();
 
-        using (ScopeProvider.CreateScope())
+        using (NewScopeProvider.CreateScope())
         {
             var dictionaryItem = repository.Get("Read More Updated");
 
@@ -538,7 +555,7 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
             scope.Complete();
         }
 
-        using (ScopeProvider.CreateScope())
+        using (NewScopeProvider.CreateScope())
         {
             var dictionaryItem = repository.Get("Read More Updated");
 
@@ -553,7 +570,7 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
         var cache = AppCaches.Create(Mock.Of<IRequestCache>());
         var repository = CreateRepositoryWithCache(cache, enableValueSearch: false);
 
-        using (ScopeProvider.CreateScope())
+        using (NewScopeProvider.CreateScope())
         {
             // Act - Search for "Læs" which only exists in Danish translation value, not in any key
             var results = repository.GetDictionaryItemDescendants(null, "Læs").ToArray();
@@ -570,7 +587,7 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
         var cache = AppCaches.Create(Mock.Of<IRequestCache>());
         var repository = CreateRepositoryWithCache(cache, enableValueSearch: true);
 
-        using (ScopeProvider.CreateScope())
+        using (NewScopeProvider.CreateScope())
         {
             // Act - Search for "Læs" which only exists in Danish translation value, not in any key
             var results = repository.GetDictionaryItemDescendants(null, "Læs").ToArray();
@@ -592,6 +609,7 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
 
     public async Task CreateTestData()
     {
+        using var efCoreScope = NewScopeProvider.CreateScope();
         var languageService = GetRequiredService<ILanguageService>();
         var dictionaryItemService = GetRequiredService<IDictionaryItemService>();
         var language = await languageService.GetAsync("en-US");
@@ -618,5 +636,6 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
                 }
             },
             Constants.Security.SuperUserKey); // Id 2
+        efCoreScope.Complete();
     }
 }

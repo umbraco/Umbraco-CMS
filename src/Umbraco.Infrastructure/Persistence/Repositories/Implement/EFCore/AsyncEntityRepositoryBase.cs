@@ -163,21 +163,21 @@ public abstract class AsyncEntityRepositoryBase<TId, TEntity> : AsyncRepositoryB
     /// <param name="ids">The identifiers to retrieve, or <see langword="null"/> to get all.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The matching entities.</returns>
-    public async Task<IEnumerable<TEntity>> GetManyAsync(TId[]? ids, CancellationToken cancellationToken)
+    public async Task<IEnumerable<TEntity>> GetManyAsync(TId[] ids, CancellationToken cancellationToken)
     {
         // ensure they are de-duplicated, easy win if people don't do this as this can cause many excess queries
-        ids = ids?.Distinct()
+        ids = ids.Distinct()
 
             // don't query by anything that is a default of T (like a zero)
             // TODO: I think we should enabled this in case accidental calls are made to get all with invalid ids
             // .Where(x => Equals(x, default(TId)) == false)
-            .ToArray() ?? [];
+            .ToArray();
 
         // can't query more than 2000 ids at a time... but if someone is really querying 2000+ entities,
         // the additional overhead of fetching them in groups is minimal compared to the lookup time of each group
         if (ids.Length <= Core.Constants.Sql.MaxParameterCount)
         {
-            return await CachePolicy.GetAllAsync(PerformGetAllAsync);
+            return await CachePolicy.GetManyAsync(ids, PerformGetManyAsync, PerformGetAllAsync);
         }
 
         var entities = new List<TEntity>();
@@ -189,6 +189,14 @@ public abstract class AsyncEntityRepositoryBase<TId, TEntity> : AsyncRepositoryB
 
         return entities;
     }
+
+    /// <summary>
+    ///     Gets all entities of type <typeparamref name="TEntity"/>, utilizing the repository cache policy.
+    /// </summary>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>All entities.</returns>
+    public async Task<IEnumerable<TEntity>> GetAllAsync(CancellationToken cancellationToken) =>
+        await CachePolicy.GetAllAsync(PerformGetAllAsync);
 
     /// <summary>
     ///     Returns a value indicating whether an entity with the specified identifier exists.

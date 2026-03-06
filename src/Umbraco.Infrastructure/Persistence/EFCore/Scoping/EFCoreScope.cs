@@ -223,7 +223,10 @@ internal class EFCoreScope<TDbContext> : CoreScope, IEfCoreScope<TDbContext>
         // Check if we are already in a transaction before starting one
         if (_dbContext.Database.CurrentTransaction is null)
         {
-            DbTransaction? transaction = _innerScope?.Database.Transaction;
+            // Walk up to the root scope to find the NPoco inner scope's transaction.
+            // Child scopes have _innerScope = null (only the root has it), but we need
+            // to share the NPoco connection so both ORMs participate in the same transaction.
+            DbTransaction? transaction = FindInnerScopeTransaction();
 
             if (transaction is not null)
             {
@@ -231,7 +234,6 @@ internal class EFCoreScope<TDbContext> : CoreScope, IEfCoreScope<TDbContext>
                 // in the same transaction. Note: SetDbConnection always nulls EF Core's
                 // internal _connectionString field, which we must restore before pool return
                 // (see DisposeEfCoreDatabase).
-                _connectionOverridden = true;
                 _dbContext.Database.SetDbConnection(transaction.Connection);
                 _dbContext.Database.UseTransaction(transaction);
             }
@@ -242,6 +244,27 @@ internal class EFCoreScope<TDbContext> : CoreScope, IEfCoreScope<TDbContext>
 
             Locks.EnsureLocks(InstanceId);
         }
+    }
+
+    /// <summary>
+    /// Walks up to the root scope to find the NPoco inner scope's transaction.
+    /// Also marks the root scope's <c>_connectionOverridden</c> flag so that
+    /// <see cref="DisposeEfCoreDatabase"/> restores the connection string on cleanup.
+    /// </summary>
+    private DbTransaction? FindInnerScopeTransaction()
+    {
+        if (ParentScope is not null)
+        {
+            return ParentScope.FindInnerScopeTransaction();
+        }
+
+        DbTransaction? transaction = _innerScope?.Database.Transaction;
+        if (transaction is not null)
+        {
+            _connectionOverridden = true;
+        }
+
+        return transaction;
     }
 
     private TDbContext FindDbContext()
