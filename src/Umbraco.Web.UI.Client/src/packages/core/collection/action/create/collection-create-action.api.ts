@@ -1,7 +1,7 @@
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbCollectionActionBase } from '../collection-action-base.js';
 import { UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
-import { UmbExtensionApiInitializer, UmbExtensionsApiInitializer } from '@umbraco-cms/backoffice/extension-api';
+import { UmbExtensionsApiInitializer, type UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { ManifestEntityCreateOptionAction } from '@umbraco-cms/backoffice/entity-create-option-action';
 import { UmbArrayState, UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
