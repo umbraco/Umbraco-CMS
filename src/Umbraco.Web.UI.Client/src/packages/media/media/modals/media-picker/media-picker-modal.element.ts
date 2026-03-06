@@ -34,6 +34,7 @@ import {
 	UMB_CLIPBOARD_CONTEXT,
 	UMB_CLIPBOARD_ENTRY_PICKER_MODAL,
 	UmbClipboardCollectionRepository,
+    UmbClipboardContext,
 } from '@umbraco-cms/backoffice/clipboard';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 
@@ -545,7 +546,12 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 
 		if (!selectedUniques.length) return;
 
-		const mediaKeys = await this.#resolveMediaKeysFromClipboard(selectedUniques);
+		const clipboardContext = await this.getContext(UMB_CLIPBOARD_CONTEXT);
+		if (!clipboardContext) {
+			throw new Error('Clipboard context not found');
+		}
+
+		const mediaKeys = await this.#resolveMediaKeysFromClipboard(selectedUniques, clipboardContext);
 		this.#updateSelection(mediaKeys);
 		// Immediately submit the media picker modal so the chosen clipboard items
 		// are applied to the underlying media picker property.
@@ -553,12 +559,7 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 	}
 
 
-	async #resolveMediaKeysFromClipboard(uniques: string[]): Promise<string[]> {
-		const clipboardContext = await this.getContext(UMB_CLIPBOARD_CONTEXT);
-		if (!clipboardContext) {
-			throw new Error('Clipboard context not found');
-		}
-
+	async #resolveMediaKeysFromClipboard(uniques: string[], clipboardContext: UmbClipboardContext): Promise<string[]> {
 		const mediaKeys: string[] = [];
 
 		for (const unique of uniques) {
@@ -570,9 +571,7 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 			if (!mediaPickerValue) continue;
 
 			for (const item of mediaPickerValue) {
-				if (item.mediaKey) {
-					mediaKeys.push(item.mediaKey);
-				}
+				mediaKeys.push(item.mediaKey);
 			}
 		}
 		return mediaKeys;
