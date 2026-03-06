@@ -9,12 +9,14 @@ export class UmbContentRollbackEntityAction extends UmbEntityActionBase<MetaEnti
 	#localize = new UmbLocalizationController(this);
 
 	override async execute() {
-		await umbOpenModal(this, UMB_CONTENT_ROLLBACK_MODAL, {
+		const result = await umbOpenModal(this, UMB_CONTENT_ROLLBACK_MODAL, {
 			data: {
 				rollbackRepositoryAlias: this.args.meta.rollbackRepositoryAlias,
 				detailRepositoryAlias: this.args.meta.detailRepositoryAlias,
 			},
-		});
+		}).catch(() => undefined);
+
+		if (!result) return;
 
 		const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
 		if (!notificationContext) {
