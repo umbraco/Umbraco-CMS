@@ -3,11 +3,11 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registr
 import type { UmbInputManifestElement } from '@umbraco-cms/backoffice/components';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
+import type { UUISelectEvent, UUISelectOption } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('example-manifest-picker-dashboard')
 export class ExampleManifestPickerDashboardElement extends UmbLitElement {
-	#options: Array<Option> = [];
+	#options: Array<UUISelectOption> = [];
 
 	@state()
 	private _selectedExtensionType: string = 'collectionView';

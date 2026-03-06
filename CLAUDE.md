@@ -451,7 +451,7 @@ When building for npm (`npm pack`), the `cleanse-pkg.js` script hoists subprojec
 #### Key Dependencies
 
 **Runtime via importmap** (types available from peerDependencies):
-- `lit`, `rxjs`, `@umbraco-ui/uui` - Core framework
+- `lit`, `rxjs`, `@umbraco-ui/uui` - Core framework (UUI 2.x as of CMS v18)
 - `monaco-editor`, `@tiptap/*` - Feature-specific editors
 - `@hey-api/openapi-ts` - HTTP client type generation
 
