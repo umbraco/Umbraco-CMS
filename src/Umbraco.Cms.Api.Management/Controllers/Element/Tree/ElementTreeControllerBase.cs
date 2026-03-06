@@ -71,7 +71,7 @@ public class ElementTreeControllerBase : UserStartNodeFolderTreeControllerBase<E
             responseModel.HasChildren = false;
             responseModel.CreateDate = elementEntitySlim.CreateDate;
             responseModel.DocumentType = _elementPresentationFactory.CreateDocumentTypeReferenceResponseModel(elementEntitySlim);
-            responseModel.Variants = _elementPresentationFactory.CreateVariantsItemResponseModels(elementEntitySlim);
+            responseModel.Variants = _elementPresentationFactory.CreateVariantsItemResponseModelsAsync(elementEntitySlim).GetAwaiter().GetResult();
         }
 
         return responseModel;

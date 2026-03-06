@@ -17,10 +17,13 @@ public interface IDocumentPresentationFactory
     Task<PublishedDocumentResponseModel> CreatePublishedResponseModelAsync(IContent content);
 
     Task<DocumentResponseModel> CreateResponseModelAsync(IContent content, ContentScheduleCollection schedule);
+
+    [Obsolete("Use CreateItemResponseModelAsync instead. Scheduled for removal in Umbraco 19.")]
     DocumentItemResponseModel CreateItemResponseModel(IDocumentEntitySlim entity);
 
     DocumentBlueprintItemResponseModel CreateBlueprintItemResponseModel(IDocumentEntitySlim entity);
 
+    [Obsolete("Use CreateVariantsItemResponseModelsAsync instead. Scheduled for removal in Umbraco 19.")]
     IEnumerable<DocumentVariantItemResponseModel> CreateVariantsItemResponseModels(IDocumentEntitySlim entity);
 
     DocumentTypeReferenceResponseModel CreateDocumentTypeReferenceResponseModel(IDocumentEntitySlim entity);
@@ -35,11 +38,11 @@ public interface IDocumentPresentationFactory
         {
             if (cultureAndScheduleRequestModel.Schedule is null)
             {
-                model.Add(new CulturePublishScheduleModel
-                {
-                    Culture = cultureAndScheduleRequestModel.Culture
-                              ?? Constants.System.InvariantCulture
-                });
+                model.Add(
+                    new CulturePublishScheduleModel
+                    {
+                        Culture = cultureAndScheduleRequestModel.Culture ?? Constants.System.InvariantCulture,
+                    });
                 continue;
             }
 
@@ -60,17 +63,30 @@ public interface IDocumentPresentationFactory
                 return Attempt.FailWithStatus(ContentPublishingOperationStatus.UnpublishTimeNeedsToBeAfterPublishTime, model);
             }
 
-            model.Add(new CulturePublishScheduleModel
-            {
-                Culture = cultureAndScheduleRequestModel.Culture,
-                Schedule = new ContentScheduleModel
+            model.Add(
+                new CulturePublishScheduleModel
                 {
-                    PublishDate = cultureAndScheduleRequestModel.Schedule.PublishTime,
-                    UnpublishDate = cultureAndScheduleRequestModel.Schedule.UnpublishTime,
-                },
-            });
+                    Culture = cultureAndScheduleRequestModel.Culture,
+                    Schedule = new ContentScheduleModel
+                    {
+                        PublishDate = cultureAndScheduleRequestModel.Schedule.PublishTime,
+                        UnpublishDate = cultureAndScheduleRequestModel.Schedule.UnpublishTime,
+                    },
+                });
         }
 
         return Attempt.SucceedWithStatus(ContentPublishingOperationStatus.Success, model);
     }
+
+    // TODO (V19): Remove the default implementation when CreateItemResponseModel is removed.
+    Task<DocumentItemResponseModel> CreateItemResponseModelAsync(IDocumentEntitySlim entity)
+#pragma warning disable CS0618 // Type or member is obsolete
+        => Task.FromResult(CreateItemResponseModel(entity));
+#pragma warning restore CS0618 // Type or member is obsolete
+
+    // TODO (V19): Remove the default implementation when CreateVariantsItemResponseModels is removed.
+    Task<IEnumerable<DocumentVariantItemResponseModel>> CreateVariantsItemResponseModelsAsync(IDocumentEntitySlim entity)
+#pragma warning disable CS0618 // Type or member is obsolete
+        => Task.FromResult(CreateVariantsItemResponseModels(entity));
+#pragma warning restore CS0618 // Type or member is obsolete
 }

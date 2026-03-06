@@ -53,7 +53,7 @@ const mapper = (item: ElementItemResponseModel): UmbElementItemModel => {
 				culture: variant.culture || null,
 				name: variant.name,
 				state: variant.state,
-				flags: [], //variant.flags,
+				flags: variant.flags,
 				// TODO: [v17] Implement dates when available in the API. [LK]
 				//createDate: new Date(variant.createDate),
 				//updateDate: new Date(variant.updateDate),
