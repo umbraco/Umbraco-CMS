@@ -2132,6 +2132,7 @@ export type PublicAccessResponseModel = {
     errorDocument: ReferenceByIdModel;
     members: Array<MemberItemResponseModel>;
     groups: Array<MemberGroupItemResponseModel>;
+    isProtectedByAncestor: boolean;
 };
 
 export type PublishDocumentRequestModel = {
@@ -6466,7 +6467,9 @@ export type GetDocumentByIdPublicAccessData = {
     path: {
         id: string;
     };
-    query?: never;
+    query?: {
+        includeAncestors?: boolean;
+    };
     url: '/umbraco/management/api/v1/document/{id}/public-access';
 };
 

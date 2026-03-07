@@ -8,4 +8,6 @@ public class PublicAccessResponseModel : PublicAccessBaseModel
     public MemberItemResponseModel[] Members { get; set; } = Array.Empty<MemberItemResponseModel>();
 
     public MemberGroupItemResponseModel[] Groups { get; set; } = Array.Empty<MemberGroupItemResponseModel>();
+
+    public bool IsProtectedByAncestor { get; set; } = false;
 }
