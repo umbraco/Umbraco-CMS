@@ -22,6 +22,18 @@ import {
 	type UmbInteractionMemoryModel,
 } from '@umbraco-cms/backoffice/interaction-memory';
 import { jsonStringComparison } from '@umbraco-cms/backoffice/observable-api';
+import {
+	UMB_CLIPBOARD_PROPERTY_CONTEXT,
+	UmbClipboardCollectionRepository,
+} from '@umbraco-cms/backoffice/clipboard';
+import {
+	UMB_PROPERTY_CONTEXT,
+	UMB_PROPERTY_DATASET_CONTEXT,
+	type UmbPropertyContext,
+	type UmbPropertyDatasetContext,
+} from '@umbraco-cms/backoffice/property';
+import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
+import { UMB_MEDIA_PICKER_CLIPBOARD_ENTRY_VALUE_TYPE } from '../../clipboard/constants.js';
 
 type UmbRichMediaCardModel = {
 	unique: string;
@@ -82,7 +94,7 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 	 * @default
 	 */
 	@property({ type: String, attribute: 'min-message' })
-	minMessage = 'This field need more items';
+	minMessage = 'This field needs more items';
 
 	/**
 	 * This is a maximum amount of selected items in this input.
@@ -99,7 +111,7 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 	 * @attr
 	 * @default
 	 */
-	@property({ type: String, attribute: 'min-message' })
+	@property({ type: String, attribute: 'max-message' })
 	maxMessage = 'This field exceeds the allowed amount of items';
 
 	@property({ type: Array })
@@ -177,6 +189,8 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 	readonly #itemManager = new UmbRepositoryItemsManager<UmbMediaItemModel>(this, UMB_MEDIA_ITEM_REPOSITORY_ALIAS);
 
 	readonly #pickerInputContext = new UmbMediaPickerInputContext(this);
+
+	readonly #clipboardCollectionRepository = new UmbClipboardCollectionRepository(this);
 
 	constructor() {
 		super();
@@ -428,11 +442,94 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 		if (this.readonly) return nothing;
 		return html`
 			<uui-action-bar slot="actions">
+				<uui-button
+					label=${this.localize.term('clipboard_labelForCopyToClipboard')}
+					look="secondary"
+					@click=${() => this.#copyToClipboard(item)}>
+					<uui-icon name="icon-clipboard-copy"></uui-icon>
+				</uui-button>
 				<uui-button label=${this.localize.term('general_remove')} look="secondary" @click=${() => this.#onRemove(item)}>
 					<uui-icon name="icon-trash"></uui-icon>
 				</uui-button>
 			</uui-action-bar>
 		`;
+	}
+
+	async #getCopyContexts(): Promise<{
+		propertyDatasetContext: UmbPropertyDatasetContext | undefined;
+		propertyContext: UmbPropertyContext;
+		clipboardContext: {
+			write(args: {
+				name: string;
+				icon?: string;
+				propertyValue: unknown;
+				propertyEditorUiAlias: string;
+			}): Promise<unknown>;
+		};
+	}> {
+		const propertyDatasetContext = (await this.getContext(UMB_PROPERTY_DATASET_CONTEXT)) as
+			| UmbPropertyDatasetContext
+			| undefined;
+		const propertyContext = (await this.getContext(UMB_PROPERTY_CONTEXT)) as UmbPropertyContext;
+		const clipboardContext = await this.getContext(UMB_CLIPBOARD_PROPERTY_CONTEXT);
+		if (!propertyContext || !clipboardContext) {
+			throw new Error('Could not get required contexts to copy.');
+		}
+		return { propertyDatasetContext, propertyContext, clipboardContext };
+	}
+
+	async #isItemAlreadyInClipboard(mediaKey: string): Promise<boolean> {
+		try {
+			const { data } = await this.#clipboardCollectionRepository.requestCollection({
+				types: [UMB_MEDIA_PICKER_CLIPBOARD_ENTRY_VALUE_TYPE],
+			});
+			const existingEntries = data?.items ?? [];
+			return existingEntries.some((entry) =>
+				entry.values.some(
+					(value) =>
+						value.type === UMB_MEDIA_PICKER_CLIPBOARD_ENTRY_VALUE_TYPE &&
+						Array.isArray(value.value) &&
+						value.value.some((v: { mediaKey?: string }) => v.mediaKey === mediaKey),
+				),
+			);
+		} catch {
+			return false;
+		}
+	}
+
+	#getCopyEntryName(
+		propertyDatasetContext: UmbPropertyDatasetContext | undefined,
+		propertyContext: UmbPropertyContext,
+		itemName: string,
+	): string {
+		const workspaceName = propertyDatasetContext ? this.localize.string(propertyDatasetContext.getName()) : '';
+		const propertyLabel = this.localize.string(propertyContext.getLabel());
+		return workspaceName ? `${workspaceName} - ${propertyLabel} - ${itemName}` : `${propertyLabel} - ${itemName}`;
+	}
+
+	async #copyToClipboard(item: UmbRichMediaCardModel) {
+		const { propertyDatasetContext, propertyContext, clipboardContext } = await this.#getCopyContexts();
+
+		if (await this.#isItemAlreadyInClipboard(item.media)) {
+			const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
+			notificationContext?.peek('positive', {
+				data: { message: this.localize.term('clipboard_copySuccessHeadline') },
+			});
+			return;
+		}
+
+		const matchingEntry = this.value?.find((entry) => entry.mediaKey === item.media);
+		if (!matchingEntry) {
+			throw new Error('Could not find media picker value for item.');
+		}
+
+		const entryName = this.#getCopyEntryName(propertyDatasetContext, propertyContext, item.name);
+		await clipboardContext.write({
+			icon: item.icon,
+			name: entryName,
+			propertyValue: [structuredClone(matchingEntry)],
+			propertyEditorUiAlias: 'Umb.PropertyEditorUi.MediaPicker',
+		});
 	}
 
 	#renderIsTrashed(item: UmbRichMediaCardModel) {

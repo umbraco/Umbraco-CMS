@@ -1,0 +1,2 @@
+export const UMB_MEDIA_PICKER_CLIPBOARD_ENTRY_VALUE_TYPE = 'mediaPicker';
+
