@@ -1,4 +1,5 @@
 import { Editor } from '../../externals.js';
+import { ensureTableSections } from '../../extensions/table/table-html.utils.js';
 import { UmbTiptapRteContext } from '../../contexts/tiptap-rte.context.js';
 import type { AnyExtension } from '../../externals.js';
 import type { UmbTiptapExtensionApi } from '../../extensions/types.js';
@@ -222,6 +223,10 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 				this.dispatchEvent(new UmbChangeEvent());
 			},
 		});
+
+		// Wrap getHTML() so that table output includes proper <thead>/<tbody> sections.
+		const getHTML = this._editor.getHTML.bind(this._editor);
+		this._editor.getHTML = () => ensureTableSections(getHTML());
 
 		this.#context.setEditor(this._editor);
 	}
