@@ -1,35 +1,35 @@
-import { UMB_MEDIA_WORKSPACE_CONTEXT } from '../../workspace/constants.js';
-import type { UmbMediaAuditLogModel } from '../types.js';
-import { UmbMediaAuditLogRepository } from '../repository/index.js';
-import { getMediaHistoryTagStyleAndText } from './utils.js';
-import { css, html, customElement, state, nothing, repeat, when } from '@umbraco-cms/backoffice/external/lit';
+import { UmbDocumentBlueprintAuditLogRepository } from '../repository/document-blueprint-audit-log.repository.js';
+import { UMB_DOCUMENT_BLUEPRINT_WORKSPACE_CONTEXT } from '../../workspace/constants.js';
+import type { UmbDocumentBlueprintAuditLogModel } from '../type.js';
+import { getDocumentBlueprintHistoryTagStyleAndText } from './utils.js';
+import { css, customElement, html, nothing, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbPaginationManager, UMB_DATE_TIME_FORMAT_OPTIONS } from '@umbraco-cms/backoffice/utils';
-import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
-import type { UmbUserItemModel } from '@umbraco-cms/backoffice/user';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbUserItemRepository } from '@umbraco-cms/backoffice/user';
+import type { UmbUserItemModel } from '@umbraco-cms/backoffice/user';
+import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 
-/**
- * @deprecated Scheduled for removal in Umbraco 19. Replaced by the shared 'auditLog' kind element (UmbContentAuditLogWorkspaceInfoAppElement).
- */
-@customElement('umb-media-history-workspace-info-app')
-export class UmbMediaHistoryWorkspaceInfoAppElement extends UmbLitElement {
+@customElement('umb-document-blueprint-history-workspace-info-app')
+export class UmbDocumentBlueprintHistoryWorkspaceInfoAppElement extends UmbLitElement {
+	#auditLogRepository = new UmbDocumentBlueprintAuditLogRepository(this);
+
+	#pagination = new UmbPaginationManager();
+
+	#userItemRepository = new UmbUserItemRepository(this);
+
+	#userMap = new Map<string, UmbUserItemModel>();
+
+	#workspaceContext?: typeof UMB_DOCUMENT_BLUEPRINT_WORKSPACE_CONTEXT.TYPE;
+
 	@state()
 	private _currentPageNumber = 1;
 
 	@state()
-	private _totalPages = 1;
+	private _items: Array<UmbDocumentBlueprintAuditLogModel> = [];
 
 	@state()
-	private _items: Array<UmbMediaAuditLogModel> = [];
-
-	#workspaceContext?: typeof UMB_MEDIA_WORKSPACE_CONTEXT.TYPE;
-	#auditLogRepository = new UmbMediaAuditLogRepository(this);
-	#pagination = new UmbPaginationManager();
-	#userItemRepository = new UmbUserItemRepository(this);
-
-	#userMap = new Map<string, UmbUserItemModel>();
+	private _totalPages = 1;
 
 	constructor() {
 		super();
@@ -38,17 +38,21 @@ export class UmbMediaHistoryWorkspaceInfoAppElement extends UmbLitElement {
 		this.observe(this.#pagination.currentPage, (number) => (this._currentPageNumber = number));
 		this.observe(this.#pagination.totalPages, (number) => (this._totalPages = number));
 
-		this.consumeContext(UMB_MEDIA_WORKSPACE_CONTEXT, (instance) => {
+		this.consumeContext(UMB_DOCUMENT_BLUEPRINT_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
 			this.#requestAuditLogs();
 		});
 	}
 
+	#onPageChange(event: UUIPaginationEvent) {
+		this.#pagination.setCurrentPageNumber(event.target?.current);
+		this.#requestAuditLogs();
+	}
+
 	async #requestAuditLogs() {
 		if (!this.#workspaceContext) return;
-
 		const unique = this.#workspaceContext.getUnique();
-		if (!unique) throw new Error('Media unique is required');
+		if (!unique) return;
 
 		const { data } = await this.#auditLogRepository.requestAuditLog({
 			unique,
@@ -63,24 +67,17 @@ export class UmbMediaHistoryWorkspaceInfoAppElement extends UmbLitElement {
 		}
 	}
 
-	#onPageChange(event: UUIPaginationEvent) {
-		this.#pagination.setCurrentPageNumber(event.target?.current);
-		this.#requestAuditLogs();
-	}
-
 	async #requestAndCacheUserItems() {
 		const allUsers = this._items?.map((item) => item.user.unique).filter(Boolean) as string[];
 		const uniqueUsers = [...new Set(allUsers)];
 		const uncachedUsers = uniqueUsers.filter((unique) => !this.#userMap.has(unique));
 
-		// If there are no uncached user items, we don't need to make a request
 		if (uncachedUsers.length === 0) return;
 
 		const { data: items } = await this.#userItemRepository.requestItems(uncachedUsers);
 
 		if (items) {
 			items.forEach((item) => {
-				// cache the user item
 				this.#userMap.set(item.unique, item);
 				this.requestUpdate('_items');
 			});
@@ -103,56 +100,51 @@ export class UmbMediaHistoryWorkspaceInfoAppElement extends UmbLitElement {
 	}
 
 	#renderHistory() {
-		if (this._items && this._items.length) {
-			return html`
-				<umb-history-list>
-					${repeat(
-						this._items,
-						(item) => item.timestamp,
-						(item) => {
-							const { text, style } = getMediaHistoryTagStyleAndText(item.logType);
-							const user = this.#userMap.get(item.user.unique);
+		if (!this._items?.length) return html`${this.localize.term('content_noItemsToShow')}`;
+		return html`
+			<umb-history-list>
+				${repeat(
+					this._items,
+					(item) => item.timestamp,
+					(item) => {
+						const { text, style } = getDocumentBlueprintHistoryTagStyleAndText(item.logType);
+						const user = this.#userMap.get(item.user.unique);
 
-							return html`<umb-history-item
+						return html`
+							<umb-history-item
 								.name=${user?.name ?? 'Unknown'}
 								.detail=${this.localize.date(item.timestamp, UMB_DATE_TIME_FORMAT_OPTIONS)}>
 								<umb-user-avatar
 									slot="avatar"
 									.name=${user?.name}
 									.kind=${user?.kind}
-									.imgUrls=${user?.avatarUrls ?? []}></umb-user-avatar>
-
-								<span class="log-type">
+									.imgUrls=${user?.avatarUrls ?? []}>
+								</umb-user-avatar>
+								<div class="log-type">
 									<uui-tag look=${style.look} color=${style.color}>
 										${this.localize.term(text.label, item.parameters)}
 									</uui-tag>
-									${this.localize.term(text.desc, item.parameters)}
-								</span>
-							</umb-history-item>`;
-						},
-					)}
-				</umb-history-list>
-			`;
-		} else {
-			return html`${this.localize.term('content_noItemsToShow')}`;
-		}
+									<span>${this.localize.term(text.desc, item.parameters)}</span>
+								</div>
+							</umb-history-item>
+						`;
+					},
+				)}
+			</umb-history-list>
+		`;
 	}
 
 	#renderPagination() {
+		if (this._totalPages <= 1) return nothing;
 		return html`
-			${this._totalPages > 1
-				? html`
-						<uui-pagination
-							class="pagination"
-							.current=${this._currentPageNumber}
-							.total=${this._totalPages}
-							firstlabel=${this.localize.term('general_first')}
-							previouslabel=${this.localize.term('general_previous')}
-							nextlabel=${this.localize.term('general_next')}
-							lastlabel=${this.localize.term('general_last')}
-							@change=${this.#onPageChange}></uui-pagination>
-					`
-				: nothing}
+			<uui-pagination
+				.current=${this._currentPageNumber}
+				.total=${this._totalPages}
+				firstlabel=${this.localize.term('general_first')}
+				previouslabel=${this.localize.term('general_previous')}
+				nextlabel=${this.localize.term('general_next')}
+				lastlabel=${this.localize.term('general_last')}
+				@change=${this.#onPageChange}></uui-pagination>
 		`;
 	}
 
@@ -192,10 +184,10 @@ export class UmbMediaHistoryWorkspaceInfoAppElement extends UmbLitElement {
 	];
 }
 
-export default UmbMediaHistoryWorkspaceInfoAppElement;
+export default UmbDocumentBlueprintHistoryWorkspaceInfoAppElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-media-workspace-view-info-history': UmbMediaHistoryWorkspaceInfoAppElement;
+		'umb-document-blueprint-history-workspace-info-app': UmbDocumentBlueprintHistoryWorkspaceInfoAppElement;
 	}
 }

@@ -1,11 +1,10 @@
 import { UmbDocumentAuditLogRepository } from '../repository/index.js';
 import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../workspace/constants.js';
 import type { UmbDocumentAuditLogModel } from '../types.js';
-import { TimeOptions } from '../../utils.js';
 import { getDocumentHistoryTagStyleAndText } from './utils.js';
 import { css, customElement, html, nothing, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
+import { UmbPaginationManager, UMB_DATE_TIME_FORMAT_OPTIONS } from '@umbraco-cms/backoffice/utils';
 import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbUserItemRepository } from '@umbraco-cms/backoffice/user';
@@ -138,7 +137,7 @@ export class UmbDocumentHistoryWorkspaceInfoAppElement extends UmbLitElement {
 						return html`
 							<umb-history-item
 								.name=${user?.name ?? 'Unknown'}
-								.detail=${this.localize.date(item.timestamp, TimeOptions)}>
+								.detail=${this.localize.date(item.timestamp, UMB_DATE_TIME_FORMAT_OPTIONS)}>
 								<umb-user-avatar
 									slot="avatar"
 									.name=${user?.name}
