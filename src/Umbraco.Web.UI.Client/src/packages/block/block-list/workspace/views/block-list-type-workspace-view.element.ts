@@ -7,6 +7,13 @@ import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace'
 export class UmbBlockListTypeWorkspaceViewSettingsElement extends UmbLitElement implements UmbWorkspaceViewElement {
 	override render() {
 		return html`
+			${this.#renderEditorAppearanceBox()} ${this.#renderDataModelsBox()} ${this.#renderCatalogueAppearanceBox()}
+			${this.#renderAdvancedBox()}
+		`;
+	}
+
+	#renderEditorAppearanceBox() {
+		return html`
 			<uui-box headline=${this.localize.term('blockEditor_headlineEditorAppearance')}>
 				<umb-property
 					label=${this.localize.term('general_label')}
@@ -17,6 +24,11 @@ export class UmbBlockListTypeWorkspaceViewSettingsElement extends UmbLitElement 
 					alias="editorSize"
 					property-editor-ui-alias="Umb.PropertyEditorUi.OverlaySize"></umb-property>
 			</uui-box>
+		`;
+	}
+
+	#renderDataModelsBox() {
+		return html`
 			<uui-box headline=${this.localize.term('blockEditor_headlineDataModels')}>
 				<umb-property
 					label=${this.localize.term('blockEditor_labelContentElementType')}
@@ -48,6 +60,11 @@ export class UmbBlockListTypeWorkspaceViewSettingsElement extends UmbLitElement 
 						},
 					]}></umb-property>
 			</uui-box>
+		`;
+	}
+
+	#renderCatalogueAppearanceBox() {
+		return html`
 			<uui-box headline=${this.localize.term('blockEditor_headlineCatalogueAppearance')}>
 				<umb-property
 					label=${this.localize.term('blockEditor_labelBackgroundColor')}
@@ -68,8 +85,17 @@ export class UmbBlockListTypeWorkspaceViewSettingsElement extends UmbLitElement 
 							alias: 'singleItemMode',
 							value: true,
 						},
+						{
+							alias: 'allowedFileExtensions',
+							value: ['.png', '.jpg', '.jpeg', '.gif', '.webp', '.svg'],
+						},
 					]}></umb-property>
 			</uui-box>
+		`;
+	}
+
+	#renderAdvancedBox() {
+		return html`
 			<uui-box headline=${this.localize.term('blockEditor_headlineAdvanced')}>
 				<umb-property
 					label=${this.localize.term('blockEditor_forceHideContentEditor')}

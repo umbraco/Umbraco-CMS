@@ -7,6 +7,13 @@ import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace'
 export class UmbBlockRteTypeWorkspaceViewSettingsElement extends UmbLitElement implements UmbWorkspaceViewElement {
 	override render() {
 		return html`
+			${this.#renderEditorAppearanceBox()} ${this.#renderDataModelsBox()} ${this.#renderCatalogueAppearanceBox()}
+			${this.#renderAdvancedBox()}
+		`;
+	}
+
+	#renderEditorAppearanceBox() {
+		return html`
 			<uui-box headline="Editor Appearance">
 				<umb-property
 					label="Label"
@@ -21,6 +28,11 @@ export class UmbBlockRteTypeWorkspaceViewSettingsElement extends UmbLitElement i
 					alias="editorSize"
 					property-editor-ui-alias="Umb.PropertyEditorUi.OverlaySize"></umb-property>
 			</uui-box>
+		`;
+	}
+
+	#renderDataModelsBox() {
+		return html`
 			<uui-box headline="Data models">
 				<!-- TODO: implement readonly mode for umb-property -->
 				<umb-property
@@ -53,6 +65,11 @@ export class UmbBlockRteTypeWorkspaceViewSettingsElement extends UmbLitElement i
 						},
 					]}></umb-property>
 			</uui-box>
+		`;
+	}
+
+	#renderCatalogueAppearanceBox() {
+		return html`
 			<uui-box headline="Catalogue appearance">
 				<umb-property
 					label="Background color"
@@ -73,8 +90,17 @@ export class UmbBlockRteTypeWorkspaceViewSettingsElement extends UmbLitElement i
 							alias: 'singleItemMode',
 							value: true,
 						},
+						{
+							alias: 'allowedFileExtensions',
+							value: ['.png', '.jpg', '.jpeg', '.gif', '.webp', '.svg'],
+						},
 					]}></umb-property>
 			</uui-box>
+		`;
+	}
+
+	#renderAdvancedBox() {
+		return html`
 			<uui-box headline=${this.localize.term('blockEditor_headlineAdvanced')}>
 				<umb-property
 					label=${this.localize.term('blockEditor_forceHideContentEditor')}
