@@ -261,6 +261,7 @@ export default {
 		selectContent: 'コンテンツの選択',
 		selectMember: 'メンバーの選択',
 		selectMemberGroup: 'メンバー グループの選択',
+		selectLanguages: '言語の選択',
 		noMacroParams: 'このマクロのパラメーターはありません',
 		externalLoginProviders: '外部ログイン プロバイダー',
 		exceptionDetail: '例外の詳細',
@@ -552,6 +553,7 @@ export default {
 	language: {
 		cultureCode: 'カルチャコード',
 		displayName: 'カルチャ名',
+		noFallbackLanguages: 'フォールバック言語はありません',
 	},
 	lockout: {
 		lockoutWillOccur: '何もしないでいると自動的にログアウトします',
