@@ -23,6 +23,7 @@ import { TemporaryFileStatus } from '@umbraco-cms/backoffice/temporary-file';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
+import { UmbApiError } from '@umbraco-cms/backoffice/resources';
 
 interface UmbMediaTypeOptionsResult {
 	options: Array<UmbAllowedMediaTypeModel>;
@@ -84,7 +85,7 @@ export class UmbMediaDropzoneManager extends UmbDropzoneManager {
 				continue;
 			}
 
-			const mediaTypeUnique = options[0].unique;
+			const { unique: mediaTypeUnique, name: mediaTypeName } = options[0];
 
 			if (!mediaTypeUnique) {
 				throw new Error('Media type unique is not defined');
@@ -92,14 +93,14 @@ export class UmbMediaDropzoneManager extends UmbDropzoneManager {
 
 			// Handle files and folders differently: a file is uploaded as temp then created as a media item, and a folder is created as a media item directly
 			if (item.temporaryFile) {
-				this.#handleFile(item as UmbUploadableFile, mediaTypeUnique);
+				this.#handleFile(item as UmbUploadableFile, mediaTypeUnique, mediaTypeName);
 			} else if (item.folder) {
-				this.#handleFolder(item as UmbUploadableFolder, mediaTypeUnique);
+				this.#handleFolder(item as UmbUploadableFolder, mediaTypeUnique, mediaTypeName);
 			}
 		}
 	}
 
-	async #handleFile(item: UmbUploadableFile, mediaTypeUnique: string) {
+	async #handleFile(item: UmbUploadableFile, mediaTypeUnique: string, mediaTypeName: string) {
 		// Upload the file as a temporary file and update progress.
 		const temporaryFile = await this._tempFileManager.uploadOne(item.temporaryFile);
 
@@ -114,22 +115,43 @@ export class UmbMediaDropzoneManager extends UmbDropzoneManager {
 
 		// Create the media item.
 		const scaffold = await this.#getItemScaffold(item, mediaTypeUnique);
-		const { data } = await this.#mediaDetailRepository.create(scaffold, item.parentUnique);
+		const { data, error } = await this.#mediaDetailRepository.createSilently(scaffold, item.parentUnique);
 
 		if (data) {
 			this._updateStatus(item, UmbFileDropzoneItemStatus.COMPLETE);
+		} else if (UmbApiError.isUmbApiError(error) && error.problemDetails?.status === 400) {
+			// Validation error — show as inline friendly message (same pattern as NOT_ALLOWED).
+			const message = this.#localization.term('media_uploadValidationFailed', mediaTypeName);
+			this._updateStatus(item, UmbFileDropzoneItemStatus.NOT_ALLOWED, message);
 		} else {
+			// Other server error — show ERROR status and a manual toast (auto-toast was suppressed).
 			this._updateStatus(item, UmbFileDropzoneItemStatus.ERROR);
+			if (error) {
+				this.#notificationContext?.peek('danger', {
+					data: { headline: 'An error occurred', message: error.message },
+				});
+			}
 		}
 	}
 
-	async #handleFolder(item: UmbUploadableFolder, mediaTypeUnique: string) {
+	async #handleFolder(item: UmbUploadableFolder, mediaTypeUnique: string, mediaTypeName: string) {
 		const scaffold = await this.#getItemScaffold(item, mediaTypeUnique);
-		const { data } = await this.#mediaDetailRepository.create(scaffold, item.parentUnique);
+		const { data, error } = await this.#mediaDetailRepository.createSilently(scaffold, item.parentUnique);
+
 		if (data) {
 			this._updateStatus(item, UmbFileDropzoneItemStatus.COMPLETE);
+		} else if (UmbApiError.isUmbApiError(error) && error.problemDetails?.status === 400) {
+			// Validation error — show as inline friendly message (same pattern as NOT_ALLOWED).
+			const message = this.#localization.term('media_uploadValidationFailed', mediaTypeName);
+			this._updateStatus(item, UmbFileDropzoneItemStatus.NOT_ALLOWED, message);
 		} else {
+			// Other server error — show ERROR status and a manual toast (auto-toast was suppressed).
 			this._updateStatus(item, UmbFileDropzoneItemStatus.ERROR);
+			if (error) {
+				this.#notificationContext?.peek('danger', {
+					data: { headline: 'An error occurred', message: error.message },
+				});
+			}
 		}
 	}
 
@@ -245,10 +267,12 @@ export class UmbMediaDropzoneManager extends UmbDropzoneManager {
 			return this._updateStatus(item, UmbFileDropzoneItemStatus.CANCELLED);
 		}
 
+		const mediaTypeName = options.find((o) => o.unique === mediaTypeUnique)?.name ?? '';
+
 		if (item.temporaryFile) {
-			this.#handleFile(item as UmbUploadableFile, mediaTypeUnique);
+			this.#handleFile(item as UmbUploadableFile, mediaTypeUnique, mediaTypeName);
 		} else if (item.folder) {
-			this.#handleFolder(item as UmbUploadableFolder, mediaTypeUnique);
+			this.#handleFolder(item as UmbUploadableFolder, mediaTypeUnique, mediaTypeName);
 		}
 	}
 }
