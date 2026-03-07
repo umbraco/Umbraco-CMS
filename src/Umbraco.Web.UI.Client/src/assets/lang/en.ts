@@ -553,7 +553,10 @@ export default {
 		confirmremoveusageof: 'Are you sure you want to remove the usage of <strong>%0%</strong>',
 		confirmlogout: 'Are you sure?',
 		confirmSure: 'Are you sure?',
+		cannotTrashWhenReferenced: (name: string) => `<strong>${name}</strong> cannot be moved to the Recycle Bin because it is referenced by other items.`,
 		confirmTrash: (name: string) => `Are you sure you want to move <strong>${name}</strong> to the Recycle Bin?`,
+		cannotBulkTrashWhenReferenced: (total: number) =>
+			`The selected <strong>${total} ${total === 1 ? 'item' : 'items'}</strong> cannot be moved to the Recycle Bin because at least one item is referenced by other content.`,
 		confirmBulkTrash: (total: number) =>
 			`Are you sure you want to move <strong>${total} ${total === 1 ? 'item' : 'items'}</strong> to the Recycle Bin?`,
 		confirmBulkDelete: (total: number) =>
