@@ -15,6 +15,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Document;
 
+    /// <summary>
+    /// Controller responsible for handling operations related to unpublishing documents in the CMS.
+    /// </summary>
 [ApiVersion("1.0")]
 public class UnpublishDocumentController : DocumentControllerBase
 {
@@ -22,6 +25,12 @@ public class UnpublishDocumentController : DocumentControllerBase
     private readonly IContentPublishingService _contentPublishingService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
+/// <summary>
+/// Initializes a new instance of the <see cref="UnpublishDocumentController"/> class, which handles requests to unpublish documents.
+/// </summary>
+/// <param name="authorizationService">Service used to authorize user actions.</param>
+/// <param name="contentPublishingService">Service responsible for content publishing operations.</param>
+/// <param name="backOfficeSecurityAccessor">Accessor for back office security context.</param>
     public UnpublishDocumentController(
         IAuthorizationService authorizationService,
         IContentPublishingService contentPublishingService,

@@ -9,12 +9,20 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Member.Item;
 
+    /// <summary>
+    /// Provides API endpoints for searching member items within the management interface.
+    /// </summary>
 [ApiVersion("1.0")]
 public class SearchMemberItemController : MemberItemControllerBase
 {
     private readonly IIndexedEntitySearchService _indexedEntitySearchService;
     private readonly IMemberPresentationFactory _memberPresentationFactory;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Controllers.Member.Item.SearchMemberItemController"/> class.
+    /// </summary>
+    /// <param name="indexedEntitySearchService">Service for performing indexed entity search operations.</param>
+    /// <param name="memberPresentationFactory">Factory for creating member presentation models.</param>
     public SearchMemberItemController(IIndexedEntitySearchService indexedEntitySearchService, IMemberPresentationFactory memberPresentationFactory)
     {
         _indexedEntitySearchService = indexedEntitySearchService;

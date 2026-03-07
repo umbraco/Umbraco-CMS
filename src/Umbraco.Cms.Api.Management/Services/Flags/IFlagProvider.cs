@@ -14,10 +14,12 @@ public interface IFlagProvider
     bool CanProvideFlags<TItem>()
         where TItem : IHasFlags;
 
-    /// <summary>
-    /// Populates the provided item view models with flags.
-    /// </summary>
-    /// <typeparam name="TItem">Type of item view model supporting flags.</typeparam>
+/// <summary>
+/// Asynchronously populates the provided item view models with flags.
+/// </summary>
+/// <typeparam name="TItem">The type of item view model supporting flags.</typeparam>
+/// <param name="items">The collection of item view models to populate with flags.</param>
+/// <returns>A task that represents the asynchronous operation.</returns>
     Task PopulateFlagsAsync<TItem>(IEnumerable<TItem> items)
         where TItem : IHasFlags;
 }

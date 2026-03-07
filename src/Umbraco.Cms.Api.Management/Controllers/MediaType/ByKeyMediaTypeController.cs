@@ -9,18 +9,32 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.MediaType;
 
+    /// <summary>
+    /// Provides API endpoints for managing media types using their unique key identifier.
+    /// </summary>
 [ApiVersion("1.0")]
 public class ByKeyMediaTypeController : MediaTypeControllerBase
 {
     private readonly IMediaTypeService _mediaTypeService;
     private readonly IUmbracoMapper _umbracoMapper;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ByKeyMediaTypeController"/> class, which handles operations for media types identified by key.
+    /// </summary>
+    /// <param name="mediaTypeService">Service used to manage media types.</param>
+    /// <param name="umbracoMapper">The mapper used for mapping Umbraco objects.</param>
     public ByKeyMediaTypeController(IMediaTypeService mediaTypeService, IUmbracoMapper umbracoMapper)
     {
         _mediaTypeService = mediaTypeService;
         _umbracoMapper = umbracoMapper;
     }
 
+    /// <summary>
+    /// Retrieves a media type by its unique identifier.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="id">The unique identifier (GUID) of the media type.</param>
+    /// <returns>An <see cref="IActionResult"/> containing the <see cref="MediaTypeResponseModel"/> if found; otherwise, a not found result.</returns>
     [HttpGet("{id:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(MediaTypeResponseModel), StatusCodes.Status200OK)]

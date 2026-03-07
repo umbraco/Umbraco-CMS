@@ -9,6 +9,10 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.MediaType;
 
+    /// <summary>
+    /// Abstract base controller providing common functionality for managing media types in the Umbraco CMS API.
+    /// Intended to be inherited by specific media type management controllers.
+    /// </summary>
 [VersionedApiBackOfficeRoute(Constants.UdiEntityType.MediaType)]
 [ApiExplorerSettings(GroupName = "Media Type")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessMediaOrMediaTypes)]

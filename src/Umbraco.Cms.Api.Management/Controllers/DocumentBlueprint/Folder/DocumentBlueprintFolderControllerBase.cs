@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Core;
@@ -9,6 +9,9 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DocumentBlueprint.Folder;
 
+    /// <summary>
+    /// Serves as the base controller for operations related to managing document blueprint folders in the Umbraco CMS.
+    /// </summary>
 [VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.DocumentBlueprint}/folder")]
 [ApiExplorerSettings(GroupName = "Document Blueprint")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]

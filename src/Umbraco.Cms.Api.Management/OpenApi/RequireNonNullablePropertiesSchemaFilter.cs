@@ -3,6 +3,9 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Umbraco.Cms.Api.Management.OpenApi;
 
+    /// <summary>
+    /// A schema filter for OpenAPI that enforces non-nullable properties to be required in the generated schema.
+    /// </summary>
 public class RequireNonNullablePropertiesSchemaFilter : ISchemaFilter
 {
     /// <summary>

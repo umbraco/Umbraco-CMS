@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Api.Management.ViewModels.Content;
 using Umbraco.Cms.Api.Management.ViewModels.Member;
 using Umbraco.Cms.Api.Management.ViewModels.Member.Item;
@@ -24,6 +24,15 @@ internal sealed class MemberPresentationFactory : IMemberPresentationFactory
     private readonly DeliveryApiSettings _deliveryApiSettings;
     private IEnumerable<Guid>? _clientCredentialsMemberKeys;
 
+/// <summary>
+/// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Factories.MemberPresentationFactory"/> class.
+/// </summary>
+/// <param name="umbracoMapper">The mapper used for mapping objects within Umbraco.</param>
+/// <param name="memberService">Service for managing member entities.</param>
+/// <param name="memberTypeService">Service for managing member types.</param>
+/// <param name="twoFactorLoginService">Service for handling two-factor authentication for members.</param>
+/// <param name="memberGroupService">Service for managing member groups.</param>
+/// <param name="deliveryApiSettings">The configuration options for the Delivery API.</param>
     public MemberPresentationFactory(
         IUmbracoMapper umbracoMapper,
         IMemberService memberService,
@@ -40,6 +49,12 @@ internal sealed class MemberPresentationFactory : IMemberPresentationFactory
         _deliveryApiSettings = deliveryApiSettings.Value;
     }
 
+    /// <summary>
+    /// Asynchronously creates a <see cref="MemberResponseModel"/> for the specified <see cref="IMember"/>, including or excluding sensitive data based on the current user's permissions.
+    /// </summary>
+    /// <param name="member">The member entity to map to a response model.</param>
+    /// <param name="currentUser">The user requesting the data, used to determine access to sensitive information.</param>
+    /// <returns>A task representing the asynchronous operation, with a <see cref="MemberResponseModel"/> as the result.</returns>
     public async Task<MemberResponseModel> CreateResponseModelAsync(IMember member, IUser currentUser)
     {
         MemberResponseModel responseModel = _umbracoMapper.Map<MemberResponseModel>(member)!;
@@ -66,9 +81,19 @@ internal sealed class MemberPresentationFactory : IMemberPresentationFactory
         return memberResponseModels;
     }
 
+    /// <summary>
+    /// Creates a response model for a member item from the given entity.
+    /// </summary>
+    /// <param name="entity">The member entity to create the response model from.</param>
+    /// <returns>A <see cref="MemberItemResponseModel"/> representing the member.</returns>
     public MemberItemResponseModel CreateItemResponseModel(IMemberEntitySlim entity)
         => CreateItemResponseModel<IMemberEntitySlim>(entity);
 
+    /// <summary>
+    /// Creates a response model for a member item based on the given member entity.
+    /// </summary>
+    /// <param name="entity">The member entity to create the response model from.</param>
+    /// <returns>A <see cref="MemberItemResponseModel"/> representing the member.</returns>
     public MemberItemResponseModel CreateItemResponseModel(IMember entity)
         => CreateItemResponseModel<IMember>(entity);
 

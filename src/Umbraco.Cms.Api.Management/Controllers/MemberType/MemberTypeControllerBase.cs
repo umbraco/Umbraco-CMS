@@ -9,6 +9,10 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.MemberType;
 
+    /// <summary>
+    /// Abstract base controller providing common functionality for managing member types via the Umbraco CMS Management API.
+    /// Intended to be inherited by controllers that expose member type management endpoints.
+    /// </summary>
 [VersionedApiBackOfficeRoute(Constants.UdiEntityType.MemberType)]
 [ApiExplorerSettings(GroupName = "Member Type")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessMembersOrMemberTypes)]

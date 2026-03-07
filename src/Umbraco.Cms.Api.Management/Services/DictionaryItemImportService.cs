@@ -1,4 +1,4 @@
-﻿using System.Xml.Linq;
+using System.Xml.Linq;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Api.Management.Services.OperationStatus;
 using Umbraco.Cms.Core;
@@ -23,6 +23,16 @@ internal sealed class DictionaryItemImportService : IDictionaryItemImportService
     private readonly IUserService _userService;
     private readonly IScopeProvider _scopeProvider;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Services.DictionaryItemImportService"/> class,
+    /// which is responsible for importing dictionary items into the Umbraco CMS.
+    /// </summary>
+    /// <param name="dictionaryItemService">Service for managing dictionary items.</param>
+    /// <param name="packageDataInstallation">Service for handling package data installation.</param>
+    /// <param name="logger">The logger used for logging import operations.</param>
+    /// <param name="temporaryFileService">Service for handling temporary files during import.</param>
+    /// <param name="userService">Service for managing user information and permissions.</param>
+    /// <param name="scopeProvider">Provider for managing database transaction scopes.</param>
     public DictionaryItemImportService(
         IDictionaryItemService dictionaryItemService,
         IPackageDataInstallation packageDataInstallation,
@@ -38,6 +48,17 @@ internal sealed class DictionaryItemImportService : IDictionaryItemImportService
         _userService = userService;
         _scopeProvider = scopeProvider;
     }
+
+    /// <summary>
+    /// Asynchronously imports a dictionary item from a temporary UDT (Umbraco Dictionary Translation) file.
+    /// </summary>
+    /// <param name="fileKey">The unique identifier of the temporary UDT file to import.</param>
+    /// <param name="parentKey">The optional unique identifier of the parent dictionary item, if any.</param>
+    /// <param name="userKey">The unique identifier of the user performing the import.</param>
+    /// <returns>
+    /// A <see cref="Task{TResult}"/> representing the asynchronous operation. The result is an <see cref="Attempt{IDictionaryItem?, DictionaryImportOperationStatus}"/>,
+    /// which contains the imported dictionary item (if successful) and the status of the import operation.
+    /// </returns>
 
     public async Task<Attempt<IDictionaryItem?, DictionaryImportOperationStatus>> ImportDictionaryItemFromUdtFileAsync(Guid fileKey, Guid? parentKey, Guid userKey)
     {

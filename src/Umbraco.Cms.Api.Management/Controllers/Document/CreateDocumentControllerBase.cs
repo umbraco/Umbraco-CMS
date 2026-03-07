@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Security.Authorization.Content;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
@@ -9,6 +9,10 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Document;
 
+    /// <summary>
+    /// Serves as the base controller for document creation endpoints in the Umbraco CMS Management API.
+    /// Provides shared functionality for creating documents.
+    /// </summary>
 public abstract class CreateDocumentControllerBase : DocumentControllerBase
 {
     private readonly IAuthorizationService _authorizationService;

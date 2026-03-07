@@ -12,6 +12,9 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DocumentType;
 
+    /// <summary>
+    /// API controller responsible for handling the import of new document types in the Umbraco CMS.
+    /// </summary>
 [ApiVersion("1.0")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
 public class ImportNewDocumentTypeController : DocumentTypeControllerBase
@@ -19,6 +22,11 @@ public class ImportNewDocumentTypeController : DocumentTypeControllerBase
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly IContentTypeImportService _contentTypeImportService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ImportNewDocumentTypeController"/> class.
+    /// </summary>
+    /// <param name="backOfficeSecurityAccessor">Provides access to back office security operations and context.</param>
+    /// <param name="contentTypeImportService">Service responsible for importing content types into the system.</param>
     public ImportNewDocumentTypeController(
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
         IContentTypeImportService contentTypeImportService)
@@ -27,6 +35,14 @@ public class ImportNewDocumentTypeController : DocumentTypeControllerBase
         _contentTypeImportService = contentTypeImportService;
     }
 
+    /// <summary>
+    /// Imports a new document type using the file provided in the request model.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="model">The request model containing the file identifier for the document type to import.</param>
+    /// <returns>
+    /// An <see cref="IActionResult"/> that returns <c>201 Created</c> with the imported document type's key on success, or a <see cref="ProblemDetails"/> result with error details if the import fails.
+    /// </returns>
     [HttpPost("import")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status201Created)]

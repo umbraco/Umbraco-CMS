@@ -17,6 +17,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Template.Query;
 
+    /// <summary>
+    /// Controller that executes template queries in the Umbraco CMS Management API.
+    /// </summary>
 [ApiVersion("1.0")]
 public class ExecuteTemplateQueryController : TemplateQueryControllerBase
 {
@@ -28,6 +31,14 @@ public class ExecuteTemplateQueryController : TemplateQueryControllerBase
 
     private static readonly string _indent = $"{Environment.NewLine}    ";
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Controllers.Template.Query.ExecuteTemplateQueryController"/> class with the specified dependencies.
+    /// </summary>
+    /// <param name="publishedContentQuery">The service used to query published content.</param>
+    /// <param name="publishedValueFallback">The service used to provide fallback values for published content properties.</param>
+    /// <param name="contentTypeService">The service used to manage content types.</param>
+    /// <param name="documentNavigationQueryService">The service used to query document navigation structures.</param>
+    /// <param name="publishedContentStatusFilteringService">The service used to filter published content by status.</param>
     [ActivatorUtilitiesConstructor]
     public ExecuteTemplateQueryController(
         IPublishedContentQuery publishedContentQuery,

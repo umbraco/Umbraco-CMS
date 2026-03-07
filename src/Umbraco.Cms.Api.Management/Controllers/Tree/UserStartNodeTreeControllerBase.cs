@@ -11,6 +11,10 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Tree;
 
+    /// <summary>
+    /// Provides a base controller for managing tree structures representing user start nodes in the Umbraco management API.
+    /// </summary>
+    /// <typeparam name="TItem">The type of the tree item managed by the controller.</typeparam>
 public abstract class UserStartNodeTreeControllerBase<TItem> : EntityTreeControllerBase<TItem>
     where TItem : ContentTreeItemResponseModel, new()
 {

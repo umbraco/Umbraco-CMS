@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Examine;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -9,12 +9,20 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Indexer;
 
+    /// <summary>
+    /// Controller responsible for managing operations related to all indexers in the system.
+    /// </summary>
 [ApiVersion("1.0")]
 public class AllIndexerController : IndexerControllerBase
 {
     private readonly IExamineManager _examineManager;
     private readonly IIndexPresentationFactory _indexPresentationFactory;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Controllers.Indexer.AllIndexerController"/> class.
+    /// </summary>
+    /// <param name="examineManager">The <see cref="IExamineManager"/> used to manage and interact with search indexes.</param>
+    /// <param name="indexPresentationFactory">The <see cref="IIndexPresentationFactory"/> used to create index presentation models.</param>
     public AllIndexerController(
         IExamineManager examineManager,
         IIndexPresentationFactory indexPresentationFactory)

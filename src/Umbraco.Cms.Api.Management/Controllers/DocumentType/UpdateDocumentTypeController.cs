@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -15,6 +15,9 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DocumentType;
 
+/// <summary>
+/// Controller responsible for handling update operations for document types in the management API.
+/// </summary>
 [ApiVersion("1.0")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
 public class UpdateDocumentTypeController : DocumentTypeControllerBase
@@ -24,6 +27,13 @@ public class UpdateDocumentTypeController : DocumentTypeControllerBase
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly IContentTypeService _contentTypeService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UpdateDocumentTypeController"/> class.
+    /// </summary>
+    /// <param name="documentTypeEditingPresentationFactory">Factory for creating document type editing presentations.</param>
+    /// <param name="contentTypeEditingService">Service for editing content types.</param>
+    /// <param name="backOfficeSecurityAccessor">Accessor for the back office security context.</param>
+    /// <param name="contentTypeService">Service for managing content types.</param>
     public UpdateDocumentTypeController(
         IDocumentTypeEditingPresentationFactory documentTypeEditingPresentationFactory,
         IContentTypeEditingService contentTypeEditingService,
@@ -36,6 +46,13 @@ public class UpdateDocumentTypeController : DocumentTypeControllerBase
         _contentTypeService = contentTypeService;
     }
 
+    /// <summary>
+    /// Updates the document type with the specified identifier using the provided request model.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="id">The unique identifier of the document type to update.</param>
+    /// <param name="requestModel">The model containing the updated document type details.</param>
+    /// <returns>An <see cref="IActionResult"/> representing the result of the operation.</returns
     [HttpPut("{id:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]

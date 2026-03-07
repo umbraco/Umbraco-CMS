@@ -11,11 +11,19 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Media.References;
 
+    /// <summary>
+    /// Controller responsible for managing media items that are referenced as descendants.
+    /// </summary>
 [ApiVersion("1.0")]
 public class ReferencedDescendantsMediaController : MediaControllerBase
 {
     private readonly ITrackedReferencesService _trackedReferencesSkipTakeService;
     private readonly IUmbracoMapper _umbracoMapper;
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ReferencedDescendantsMediaController"/> class.
+    /// </summary>
+    /// <param name="trackedReferencesSkipTakeService">Service for retrieving tracked references with skip/take pagination.</param>
+    /// <param name="umbracoMapper">The mapper used to map Umbraco domain models to API models.</param>
     public ReferencedDescendantsMediaController(
         ITrackedReferencesService trackedReferencesSkipTakeService,
         IUmbracoMapper umbracoMapper)
@@ -42,14 +50,18 @@ public class ReferencedDescendantsMediaController : MediaControllerBase
         return pagedViewModel;
     }
 
-    /// <summary>
-    ///     Gets a page list of the child nodes of the current item used in any kind of relation.
-    /// </summary>
-    /// <remarks>
-    ///     Used when deleting and unpublishing a single item to check if this item has any descending items that are in any
-    ///     kind of relation.
-    ///     This is basically finding the descending items which are children in relations.
-    /// </remarks>
+/// <summary>
+///     Gets a paginated list of descendant media items of the specified item that are referenced in any kind of relation.
+/// </summary>
+/// <remarks>
+///     Used when deleting or unpublishing a single media item to check if it has any descendant items that are referenced in any relation.
+///     This operation finds descendant items that are children in relations.
+/// </remarks>
+/// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+/// <param name="id">The unique identifier of the media item whose referenced descendants are to be retrieved.</param>
+/// <param name="skip">The number of items to skip before starting to collect the result set (used for pagination).</param>
+/// <param name="take">The maximum number of items to return (used for pagination).</param>
+/// <returns>A task that represents the asynchronous operation. The task result contains an <see cref="IActionResult"/> with a paginated list of referenced descendant media items.</returns>
     [HttpGet("{id:guid}/referenced-descendants")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<ReferenceByIdModel>), StatusCodes.Status200OK)]

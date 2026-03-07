@@ -7,6 +7,9 @@ using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Api.Management.Controllers.HealthCheck.Group;
 
+    /// <summary>
+    /// Serves as the base controller for managing health check groups in the Umbraco CMS Management API.
+    /// </summary>
 [VersionedApiBackOfficeRoute($"{Constants.HealthChecks.RoutePath.HealthCheck}-group")]
 [ApiExplorerSettings(GroupName = "Health Check")]
 [Authorize(Policy = AuthorizationPolicies.SectionAccessSettings)]

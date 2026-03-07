@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Core;
@@ -16,6 +16,9 @@ namespace Umbraco.Cms.Api.Management.Filters;
 /// </remarks>
 public sealed class AppendEventMessagesAttribute : TypeFilterAttribute
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AppendEventMessagesAttribute"/> class, which is used to append event messages to the HTTP response.
+    /// </summary>
     public AppendEventMessagesAttribute()
         : base(typeof(AppendEventMessagesFilter))
     {
@@ -26,12 +29,23 @@ public sealed class AppendEventMessagesAttribute : TypeFilterAttribute
         private readonly IEventMessagesFactory _eventMessagesFactory;
         private readonly IJsonSerializer _jsonSerializer;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AppendEventMessagesFilter"/> class.
+    /// </summary>
+    /// <param name="eventMessagesFactory">Factory for creating event messages.</param>
+    /// <param name="jsonSerializer">Serializer used for JSON serialization.</param>
         public AppendEventMessagesFilter(IEventMessagesFactory eventMessagesFactory, IJsonSerializer jsonSerializer)
         {
             _eventMessagesFactory = eventMessagesFactory;
             _jsonSerializer = jsonSerializer;
         }
 
+    /// <summary>
+    /// Executes after an action method has completed, and if applicable, appends event messages as a notification header to the HTTP response.
+    /// This is typically used to communicate event-related notifications to the client for non-GET requests.
+    /// If there are no event messages or the request is a GET, no header is added.
+    /// </summary>
+    /// <param name="context">The context for the executed action, providing access to the HTTP request and response.</param>
         public void OnActionExecuted(ActionExecutedContext context)
         {
             if (context.HttpContext.Response is null)
@@ -59,6 +73,10 @@ public sealed class AppendEventMessagesAttribute : TypeFilterAttribute
             context.HttpContext.Response.Headers[Constants.Headers.Notifications] = headerContent;
         }
 
+    /// <summary>
+    /// Method invoked before the action executes, intended to append event messages to the context.
+    /// </summary>
+    /// <param name="context">The context for the action that is executing.</param>
         public void OnActionExecuting(ActionExecutingContext context)
         {
         }

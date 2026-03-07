@@ -4,6 +4,9 @@ using Umbraco.Cms.Api.Management.Routing;
 
 namespace Umbraco.Cms.Api.Management.Controllers.LogViewer.SavedSearch;
 
+    /// <summary>
+    /// Serves as the base controller for operations related to saved search log viewers in the management API.
+    /// </summary>
 [VersionedApiBackOfficeRoute("log-viewer/saved-search")]
 [ApiExplorerSettings(GroupName = "Log Viewer")]
 public class SavedSearchLogViewerControllerBase : LogViewerControllerBase

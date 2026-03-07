@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -13,6 +13,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.User;
 
+    /// <summary>
+    /// API controller responsible for managing calculated start nodes for users in Umbraco CMS.
+    /// </summary>
 [ApiVersion("1.0")]
 public class CalculatedStartNodesUserController : UserControllerBase
 {
@@ -20,6 +23,13 @@ public class CalculatedStartNodesUserController : UserControllerBase
     private readonly IUserService _userService;
     private readonly IUserPresentationFactory _userPresentationFactory;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CalculatedStartNodesUserController"/> class,
+    /// which manages user-related operations involving calculated start nodes.
+    /// </summary>
+    /// <param name="authorizationService">Service used to authorize user access to controller actions.</param>
+    /// <param name="userService">Service for managing user data and operations.</param>
+    /// <param name="userPresentationFactory">Factory for creating user presentation models.</param>
     public CalculatedStartNodesUserController(
         IAuthorizationService authorizationService,
         IUserService userService,

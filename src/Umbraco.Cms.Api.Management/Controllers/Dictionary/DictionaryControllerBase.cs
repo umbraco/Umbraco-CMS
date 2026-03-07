@@ -8,6 +8,9 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Dictionary;
 
+    /// <summary>
+    /// Serves as the base controller for API endpoints that manage dictionary-related operations in the Umbraco CMS.
+    /// </summary>
 [VersionedApiBackOfficeRoute("dictionary")]
 [ApiExplorerSettings(GroupName = "Dictionary")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessDictionary)]

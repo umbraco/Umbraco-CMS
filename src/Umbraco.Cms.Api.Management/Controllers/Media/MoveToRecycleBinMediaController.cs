@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -14,6 +14,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Media;
 
+    /// <summary>
+    /// Controller responsible for moving media items to the recycle bin.
+    /// </summary>
 [ApiVersion("1.0")]
 public class MoveToRecycleBinMediaController : MediaControllerBase
 {
@@ -21,6 +24,12 @@ public class MoveToRecycleBinMediaController : MediaControllerBase
     private readonly IMediaEditingService _mediaEditingService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MoveToRecycleBinMediaController"/> class with the specified services.
+    /// </summary>
+    /// <param name="authorizationService">The <see cref="IAuthorizationService"/> used to authorize media operations.</param>
+    /// <param name="mediaEditingService">The <see cref="IMediaEditingService"/> used for editing media items.</param>
+    /// <param name="backOfficeSecurityAccessor">The <see cref="IBackOfficeSecurityAccessor"/> providing access to back office security context.</param>
     public MoveToRecycleBinMediaController(
         IAuthorizationService authorizationService,
         IMediaEditingService mediaEditingService,

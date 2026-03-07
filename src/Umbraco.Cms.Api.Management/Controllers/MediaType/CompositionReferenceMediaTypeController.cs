@@ -9,12 +9,20 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.MediaType;
 
+    /// <summary>
+    /// Provides API endpoints for managing media types that are used as composition references in the system.
+    /// </summary>
 [ApiVersion("1.0")]
 public class CompositionReferenceMediaTypeController : MediaTypeControllerBase
 {
     private readonly IMediaTypeService _mediaTypeService;
     private readonly IUmbracoMapper _umbracoMapper;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CompositionReferenceMediaTypeController"/> class, which manages media type composition references in the Umbraco CMS API.
+    /// </summary>
+    /// <param name="mediaTypeService">Service used for operations related to media types.</param>
+    /// <param name="umbracoMapper">The mapper used to map between Umbraco domain models and API models.</param>
     public CompositionReferenceMediaTypeController(IMediaTypeService mediaTypeService, IUmbracoMapper umbracoMapper)
     {
         _mediaTypeService = mediaTypeService;

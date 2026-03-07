@@ -7,6 +7,9 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.MemberType.Folder;
 
+    /// <summary>
+    /// API controller responsible for handling requests to update member type folders in the Umbraco CMS.
+    /// </summary>
 [ApiVersion("1.0")]
 public class UpdateMemberTypeFolderController : MemberTypeFolderControllerBase
 {
@@ -17,6 +20,13 @@ public class UpdateMemberTypeFolderController : MemberTypeFolderControllerBase
     {
     }
 
+    /// <summary>
+    /// Updates a member type folder identified by the provided Id with the details from the request model.
+    /// </summary>
+    /// <param name="cancellationToken">The cancellation token to cancel operation.</param>
+    /// <param name="id">The unique identifier of the member type folder to update.</param>
+    /// <param name="updateFolderResponseModel">The model containing updated folder details.</param>
+    /// <returns>An <see cref="IActionResult"/> representing the result of the update operation.</returns>
     [HttpPut("{id:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]

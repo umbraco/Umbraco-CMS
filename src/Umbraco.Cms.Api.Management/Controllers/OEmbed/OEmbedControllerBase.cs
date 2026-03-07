@@ -5,6 +5,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.OEmbed;
 
+    /// <summary>
+    /// Serves as the base controller for handling OEmbed-related API requests in the management interface.
+    /// </summary>
 [VersionedApiBackOfficeRoute("oembed")]
 [ApiExplorerSettings(GroupName = "oEmbed")]
 public abstract class OEmbedControllerBase : ManagementApiControllerBase

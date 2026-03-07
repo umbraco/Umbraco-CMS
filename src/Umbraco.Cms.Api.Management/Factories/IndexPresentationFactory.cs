@@ -1,4 +1,4 @@
-﻿using Examine;
+using Examine;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Api.Management.ViewModels.Indexer;
@@ -9,6 +9,9 @@ using Umbraco.Cms.Infrastructure.Services;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
+    /// <summary>
+    /// Provides methods for creating index presentation models used in the management API.
+    /// </summary>
 public class IndexPresentationFactory : IIndexPresentationFactory
 {
     private readonly IIndexDiagnosticsFactory _indexDiagnosticsFactory;
@@ -16,6 +19,13 @@ public class IndexPresentationFactory : IIndexPresentationFactory
     private readonly IIndexingRebuilderService _indexingRebuilderService;
     private readonly ILogger<IndexPresentationFactory> _logger;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="IndexPresentationFactory"/> class.
+    /// </summary>
+    /// <param name="indexDiagnosticsFactory">Factory used to create index diagnostics instances.</param>
+    /// <param name="indexRebuilder">Service responsible for rebuilding search indexes.</param>
+    /// <param name="indexingRebuilderService">Service that manages indexing rebuild operations.</param>
+    /// <param name="logger">The logger used for logging diagnostic and operational information.</param>
     public IndexPresentationFactory(
         IIndexDiagnosticsFactory indexDiagnosticsFactory,
         IIndexRebuilder indexRebuilder,

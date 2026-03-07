@@ -17,6 +17,9 @@ using Umbraco.Cms.Web.Common.Filters;
 
 namespace Umbraco.Cms.Api.Management.Controllers;
 
+    /// <summary>
+    /// Serves as the base controller for management API endpoints in Umbraco CMS, providing shared functionality and services for derived controllers.
+    /// </summary>
 [ApiController]
 [Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)]
 [Authorize(Policy = AuthorizationPolicies.UmbracoFeatureEnabled)]

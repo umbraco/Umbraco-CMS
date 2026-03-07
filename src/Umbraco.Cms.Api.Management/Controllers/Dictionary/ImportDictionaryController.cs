@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.Builders;
@@ -11,12 +11,20 @@ using Umbraco.Cms.Core.Security;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Dictionary;
 
+    /// <summary>
+    /// Provides API endpoints for importing dictionary items into the Umbraco CMS.
+    /// </summary>
 [ApiVersion("1.0")]
 public class ImportDictionaryController : DictionaryControllerBase
 {
     private readonly IDictionaryItemImportService _dictionaryItemImportService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ImportDictionaryController"/> class, which handles dictionary item import operations in the Umbraco backoffice API.
+    /// </summary>
+    /// <param name="dictionaryItemImportService">Service used to import dictionary items.</param>
+    /// <param name="backOfficeSecurityAccessor">Accessor for back office security context.</param>
     public ImportDictionaryController(
         IDictionaryItemImportService dictionaryItemImportService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
@@ -25,6 +33,15 @@ public class ImportDictionaryController : DictionaryControllerBase
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
+    /// <summary>
+    /// Imports a dictionary from a provided UDT file upload.
+    /// </summary>
+    /// <param name="cancellationToken">A cancellation token that can be used to cancel the import operation.</param>
+    /// <param name="importDictionaryRequestModel">The model containing the uploaded UDT file and optional parent dictionary item information.</param>
+    /// <returns>
+    /// An <see cref="IActionResult"/> indicating the result of the import operation:
+    /// returns <c>201 Created</c> on success, <c>400 Bad Request</c> for invalid file types or content, and <c>404 Not Found</c> if the parent or file is missing.
+    /// </returns>
     [HttpPost("import")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status201Created)]

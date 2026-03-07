@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Extensions;
@@ -12,6 +12,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Script;
 
+/// <summary>
+/// API controller responsible for handling operations related to updating scripts in the system.
+/// </summary>
 [ApiVersion("1.0")]
 public class UpdateScriptController : ScriptControllerBase
 {
@@ -19,6 +22,12 @@ public class UpdateScriptController : ScriptControllerBase
     private readonly IUmbracoMapper _umbracoMapper;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
+/// <summary>
+/// Initializes a new instance of the <see cref="UpdateScriptController"/> class, which handles API requests for updating scripts in Umbraco.
+/// </summary>
+/// <param name="scriptService">Service used for script management operations.</param>
+/// <param name="umbracoMapper">The mapper used to map between Umbraco models and API models.</param>
+/// <param name="backOfficeSecurityAccessor">Provides access to back office security context.</param>
     public UpdateScriptController(
         IScriptService scriptService,
         IUmbracoMapper umbracoMapper,
@@ -29,6 +38,13 @@ public class UpdateScriptController : ScriptControllerBase
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
+    /// <summary>
+    /// Updates an existing script identified by the specified path using the details provided in the request model.
+    /// </summary>
+    /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
+    /// <param name="path">The virtual path identifying the script to update.</param>
+    /// <param name="requestModel">The model containing the updated script content and metadata.</param>
+    /// <returns>An <see cref="IActionResult"/> indicating the outcome of the update operation, including success or relevant error details.</returns
     [HttpPut("{*path}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]

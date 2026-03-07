@@ -70,9 +70,11 @@ internal sealed class ServerEventSender :
     private readonly IServerEventRouter _serverEventRouter;
     private readonly IIdKeyMap _idKeyMap;
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ServerEventSender"/> class.
-    /// </summary>
+/// <summary>
+/// Initializes a new instance of the <see cref="ServerEventSender"/> class.
+/// </summary>
+/// <param name="serverEventRouter">The router responsible for handling server events.</param>
+/// <param name="idKeyMap">The map used to resolve identifier keys.</param>
     public ServerEventSender(IServerEventRouter serverEventRouter, IIdKeyMap idKeyMap)
     {
         _serverEventRouter = serverEventRouter;

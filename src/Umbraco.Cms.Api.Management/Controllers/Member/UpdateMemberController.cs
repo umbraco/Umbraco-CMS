@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Factories;
@@ -11,6 +11,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Member;
 
+    /// <summary>
+    /// API controller responsible for handling operations related to updating members.
+    /// </summary>
 [ApiVersion("1.0")]
 public class UpdateMemberController : MemberControllerBase
 {
@@ -18,6 +21,12 @@ public class UpdateMemberController : MemberControllerBase
     private readonly IMemberEditingPresentationFactory _memberEditingPresentationFactory;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UpdateMemberController"/> class, responsible for handling member update operations in the management API.
+    /// </summary>
+    /// <param name="memberEditingService">Service used to perform member editing operations.</param>
+    /// <param name="memberEditingPresentationFactory">Factory for creating presentation models related to member editing.</param>
+    /// <param name="backOfficeSecurityAccessor">Accessor for back office security context and authentication.</param>
     public UpdateMemberController(
         IMemberEditingService memberEditingService,
         IMemberEditingPresentationFactory memberEditingPresentationFactory,

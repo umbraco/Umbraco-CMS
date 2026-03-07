@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -13,6 +13,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.User;
 
+    /// <summary>
+    /// API controller responsible for handling bulk deletion operations for users in the management section.
+    /// </summary>
 [ApiVersion("1.0")]
 public class BulkDeleteUserController : UserControllerBase
 {
@@ -20,6 +23,12 @@ public class BulkDeleteUserController : UserControllerBase
     private readonly IUserService _userService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="BulkDeleteUserController"/> class.
+    /// </summary>
+    /// <param name="authorizationService">An instance of <see cref="IAuthorizationService"/> used to authorize user actions.</param>
+    /// <param name="userService">An instance of <see cref="IUserService"/> for managing user-related operations.</param>
+    /// <param name="backOfficeSecurityAccessor">An accessor for <see cref="IBackOfficeSecurityAccessor"/> providing back office security context.</param>
     public BulkDeleteUserController(
         IAuthorizationService authorizationService,
         IUserService userService,
@@ -30,6 +39,15 @@ public class BulkDeleteUserController : UserControllerBase
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
+    /// <summary>
+    /// Deletes multiple users specified by their unique identifiers.
+    /// This operation is irreversible.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="model">The request model containing the collection of user IDs to delete.</param>
+    /// <returns>
+    /// An <see cref="IActionResult"/> indicating the outcome of the delete operation: <c>Ok</c> if successful, or an error result if the operation fails.
+    /// </returns>
     [HttpDelete]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]

@@ -10,12 +10,20 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Webhook;
 
+    /// <summary>
+    /// API controller responsible for handling HTTP requests related to the creation of webhooks in the management API.
+    /// </summary>
 [ApiVersion("1.0")]
 public class CreateWebhookController : WebhookControllerBase
 {
     private readonly IWebhookService _webhookService;
     private readonly IWebhookPresentationFactory _webhookPresentationFactory;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CreateWebhookController"/> class, which handles webhook creation operations in the management API.
+    /// </summary>
+    /// <param name="webhookService">Service used to manage webhook logic and persistence.</param>
+    /// <param name="webhookPresentationFactory">Factory for creating webhook presentation models.</param>
     public CreateWebhookController(
         IWebhookService webhookService, IWebhookPresentationFactory webhookPresentationFactory)
     {

@@ -7,13 +7,25 @@ using Umbraco.Cms.Api.Management.ViewModels.Server;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Server;
 
+    /// <summary>
+    /// Provides endpoints for retrieving server status and health information.
+    /// </summary>
 [ApiVersion("1.0")]
 public class StatusServerController : ServerControllerBase
 {
     private readonly IRuntimeState _runtimeState;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="StatusServerController"/> class, using the specified runtime state.
+    /// </summary>
+    /// <param name="runtimeState">An <see cref="IRuntimeState"/> instance representing the current runtime state of the application.</param>
     public StatusServerController(IRuntimeState runtimeState) => _runtimeState = runtimeState;
 
+    /// <summary>
+    /// Retrieves the current operational status of the Umbraco server.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <returns>An <see cref="ActionResult{T}"/> containing a <see cref="ServerStatusResponseModel"/> with the server's status.</returns>
     [AllowAnonymous]
     [HttpGet("status")]
     [MapToApiVersion("1.0")]

@@ -9,15 +9,28 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Template.Tree;
 
+    /// <summary>
+    /// API controller responsible for retrieving and managing child nodes within the template tree structure in Umbraco CMS.
+    /// Provides endpoints for accessing child templates under a specified parent template.
+    /// </summary>
 [ApiVersion("1.0")]
 public class ChildrenTemplateTreeController : TemplateTreeControllerBase
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ChildrenTemplateTreeController"/> class.
+    /// </summary>
+    /// <param name="entityService">The service used to manage and retrieve entities within the controller.</param>
     [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
     public ChildrenTemplateTreeController(IEntityService entityService)
         : base(entityService)
     {
     }
 
+/// <summary>
+/// Initializes a new instance of the <see cref="ChildrenTemplateTreeController"/> class, which manages the retrieval of child template tree items.
+/// </summary>
+/// <param name="entityService">The service used to interact with entities in the system.</param>
+/// <param name="flagProviders">A collection of providers that supply additional flags or metadata for entities.</param>
     [ActivatorUtilitiesConstructor]
     public ChildrenTemplateTreeController(IEntityService entityService, FlagProviderCollection flagProviders)
         : base(entityService, flagProviders)

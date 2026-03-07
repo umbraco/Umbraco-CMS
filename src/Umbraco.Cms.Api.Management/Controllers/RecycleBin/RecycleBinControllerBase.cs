@@ -12,6 +12,10 @@ using Umbraco.Cms.Core.Services.Querying.RecycleBin;
 
 namespace Umbraco.Cms.Api.Management.Controllers.RecycleBin;
 
+    /// <summary>
+    /// Serves as the base controller for handling recycle bin operations on items of type <typeparamref name="TItem"/>.
+    /// Provides common functionality for derived controllers managing deleted items.
+    /// </summary>
 public abstract class RecycleBinControllerBase<TItem> : ContentControllerBase
     where TItem : RecycleBinItemResponseModelBase, new()
 {

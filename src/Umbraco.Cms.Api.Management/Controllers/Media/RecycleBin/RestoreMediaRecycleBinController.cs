@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -16,6 +16,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Media.RecycleBin;
 
+    /// <summary>
+    /// Provides API endpoints for restoring deleted media items from the recycle bin.
+    /// </summary>
 [ApiVersion("1.0")]
 public class RestoreMediaRecycleBinController : MediaRecycleBinControllerBase
 {
@@ -23,6 +26,14 @@ public class RestoreMediaRecycleBinController : MediaRecycleBinControllerBase
     private readonly IMediaEditingService _mediaEditingService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="RestoreMediaRecycleBinController"/> class, which handles restoring media items from the recycle bin.
+    /// </summary>
+    /// <param name="authorizationService">Service used to authorize user actions.</param>
+    /// <param name="mediaEditingService">Service for editing media items.</param>
+    /// <param name="backOfficeSecurityAccessor">Accessor for back office security context.</param>
+    /// <param name="entityService">Service for managing entities within the system.</param>
+    /// <param name="mediaPresentationFactory">Factory for creating media presentation models.</param>
     public RestoreMediaRecycleBinController(
         IAuthorizationService authorizationService,
         IMediaEditingService mediaEditingService,
@@ -36,6 +47,13 @@ public class RestoreMediaRecycleBinController : MediaRecycleBinControllerBase
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
+    /// <summary>
+    /// Restores a media item from the recycle bin to its original location or to a specified parent folder.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="id">The unique identifier of the media item to restore.</param>
+    /// <param name="moveDocumentRequestModel">The request model containing information about the target location for the restored media item.</param>
+    /// <returns>An <see cref="IActionResult"/> representing the result of the restore operation.</returns>
     [HttpPut("{id:guid}/restore")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]

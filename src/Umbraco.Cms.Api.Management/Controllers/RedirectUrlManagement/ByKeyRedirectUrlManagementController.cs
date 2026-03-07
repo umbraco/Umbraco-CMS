@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
@@ -9,12 +9,20 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.RedirectUrlManagement;
 
+    /// <summary>
+    /// Provides API endpoints for managing redirect URLs identified by their unique key.
+    /// </summary>
 [ApiVersion("1.0")]
 public class ByKeyRedirectUrlManagementController : RedirectUrlManagementControllerBase
 {
     private readonly IRedirectUrlService _redirectUrlService;
     private readonly IRedirectUrlPresentationFactory _redirectUrlPresentationFactory;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ByKeyRedirectUrlManagementController"/> class.
+    /// </summary>
+    /// <param name="redirectUrlService">Service used to manage redirect URLs.</param>
+    /// <param name="redirectUrlPresentationFactory">Factory used to create redirect URL presentation models.</param>
     public ByKeyRedirectUrlManagementController(
         IRedirectUrlService redirectUrlService,
         IRedirectUrlPresentationFactory redirectUrlPresentationFactory)
@@ -23,6 +31,16 @@ public class ByKeyRedirectUrlManagementController : RedirectUrlManagementControl
         _redirectUrlPresentationFactory = redirectUrlPresentationFactory;
     }
 
+    /// <summary>
+    /// Gets a paged list of redirect URLs associated with the content item identified by the provided <paramref name="id"/>.
+    /// </summary>
+    /// <param name="cancellationToken">The cancellation token to cancel the operation.</param>
+    /// <param name="id">The unique identifier of the content item for which to retrieve redirect URLs.</param>
+    /// <param name="skip">The number of items to skip in the result set (for paging).</param>
+    /// <param name="take">The number of items to take in the result set (for paging).</param>
+    /// <returns>
+    /// A task that represents the asynchronous operation. The task result contains an <see cref="ActionResult{T}"/> with a <see cref="PagedViewModel{T}"/> of <see cref="RedirectUrlResponseModel"/>.
+    /// </returns>
     [MapToApiVersion("1.0")]
     [HttpGet("{id:guid}")]
     [ProducesResponseType(typeof(PagedViewModel<RedirectUrlResponseModel>), StatusCodes.Status200OK)]

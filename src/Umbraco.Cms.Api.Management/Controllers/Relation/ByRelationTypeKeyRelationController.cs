@@ -11,24 +11,37 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Relation;
 
+/// <summary>
+/// Controller for managing relations filtered by relation type key.
+/// </summary>
 [ApiVersion("1.0")]
 public class ByRelationTypeKeyRelationController : RelationControllerBase
 {
     private readonly IRelationService _relationService;
     private readonly IRelationPresentationFactory _relationPresentationFactory;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ByRelationTypeKeyRelationController"/> class, which manages relations filtered by relation type key.
+    /// </summary>
+    /// <param name="relationService">Service used to manage and query relations.</param>
+    /// <param name="relationPresentationFactory">Factory for creating relation presentation models.</param>
     public ByRelationTypeKeyRelationController(IRelationService relationService, IRelationPresentationFactory relationPresentationFactory)
     {
         _relationService = relationService;
         _relationPresentationFactory = relationPresentationFactory;
     }
 
-    /// <summary>
-    /// Gets a paged list of relations by the unique relation key.
-    /// </summary>
-    /// <remarks>
-    /// Use case: On a relation type page you can see all created relations of this type.
-    /// </remarks>
+/// <summary>
+/// Retrieves a paged list of relations filtered by the specified relation type key.
+/// </summary>
+/// <remarks>
+/// Use case: On a relation type page, you can view all relations that have been created for a particular relation type.
+/// </remarks>
+/// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+/// <param name="id">The unique identifier (key) of the relation type to filter relations by.</param>
+/// <param name="skip">The number of items to skip before starting to collect the result set.</param>
+/// <param name="take">The maximum number of items to return in the result set.</param>
+/// <returns>A task representing the asynchronous operation. The task result contains an <see cref="IActionResult"/> with a paged list of <see cref="RelationResponseModel"/> objects.</returns>
     [HttpGet("type/{id:guid}", Name = "GetRelationByRelationTypeId")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<RelationResponseModel>), StatusCodes.Status200OK)]

@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -11,12 +11,20 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.User.ClientCredentials;
 
+    /// <summary>
+    /// Controller responsible for handling the deletion of client credentials associated with a user.
+    /// </summary>
 [ApiVersion("1.0")]
 public class DeleteClientCredentialsUserController : ClientCredentialsUserControllerBase
 {
     private readonly IBackOfficeUserClientCredentialsManager _backOfficeUserClientCredentialsManager;
     private readonly IAuthorizationService _authorizationService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DeleteClientCredentialsUserController"/> class.
+    /// </summary>
+    /// <param name="backOfficeUserClientCredentialsManager">Manages client credentials for back office users.</param>
+    /// <param name="authorizationService">Performs authorization and permission checks.</param>
     public DeleteClientCredentialsUserController(
         IBackOfficeUserClientCredentialsManager backOfficeUserClientCredentialsManager,
         IAuthorizationService authorizationService)
@@ -25,6 +33,13 @@ public class DeleteClientCredentialsUserController : ClientCredentialsUserContro
         _authorizationService = authorizationService;
     }
 
+    /// <summary>
+    /// Deletes the client credentials associated with the specified client ID for a given user.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="id">The unique identifier of the user whose client credentials are to be deleted.</param>
+    /// <param name="clientId">The client ID of the credentials to delete.</param>
+    /// <returns>An <see cref="IActionResult"/> representing the result of the delete operation.</returns>
     [HttpDelete("{id:guid}/client-credentials/{clientId}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]

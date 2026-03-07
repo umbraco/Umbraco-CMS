@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -16,6 +16,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Dictionary;
 
+/// <summary>
+/// API controller responsible for handling requests to update dictionary items in the Umbraco CMS management interface.
+/// </summary>
 [ApiVersion("1.0")]
 public class UpdateDictionaryController : DictionaryControllerBase
 {
@@ -24,6 +27,13 @@ public class UpdateDictionaryController : DictionaryControllerBase
     private readonly IDictionaryPresentationFactory _dictionaryPresentationFactory;
     private readonly IAuthorizationService _authorizationService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UpdateDictionaryController"/> class, which handles API requests for updating dictionary items in Umbraco.
+    /// </summary>
+    /// <param name="dictionaryItemService">Service for managing dictionary items.</param>
+    /// <param name="backOfficeSecurityAccessor">Accessor for back office security context.</param>
+    /// <param name="dictionaryPresentationFactory">Factory for creating dictionary item presentation models.</param>
+    /// <param name="authorizationService">Service for handling authorization checks.</param>
     public UpdateDictionaryController(
         IDictionaryItemService dictionaryItemService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
@@ -36,6 +46,13 @@ public class UpdateDictionaryController : DictionaryControllerBase
         _authorizationService = authorizationService;
     }
 
+    /// <summary>
+    /// Updates an existing dictionary item with the specified identifier using the provided details.
+    /// </summary>
+    /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
+    /// <param name="id">The unique identifier of the dictionary item to update.</param>
+    /// <param name="updateDictionaryItemRequestModel">The model containing the updated dictionary item details.</param>
+    /// <returns>An <see cref="IActionResult"/> representing the result of the update operation.</returns
     [HttpPut($"{{{nameof(id)}:guid}}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]

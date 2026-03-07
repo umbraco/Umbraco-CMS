@@ -25,6 +25,22 @@ public class BackOfficeSignInManager : UmbracoSignInManager<BackOfficeIdentityUs
     private readonly GlobalSettings _globalSettings;
     private readonly BackOfficeUserManager _userManager;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Security.BackOfficeSignInManager"/> class.
+    /// </summary>
+    /// <param name="userManager">The <see cref="BackOfficeUserManager"/> responsible for managing back office users.</param>
+    /// <param name="contextAccessor">The <see cref="IHttpContextAccessor"/> used to access the current HTTP context.</param>
+    /// <param name="externalLogins">The <see cref="IBackOfficeExternalLoginProviders"/> for handling external login providers.</param>
+    /// <param name="claimsFactory">The <see cref="IUserClaimsPrincipalFactory{BackOfficeIdentityUser}"/> for creating claims principals.</param>
+    /// <param name="optionsAccessor">The <see cref="IOptions{IdentityOptions}"/> accessor for identity options.</param>
+    /// <param name="globalSettings">The <see cref="IOptions{GlobalSettings}"/> accessor for global settings.</param>
+    /// <param name="logger">The <see cref="ILogger{SignInManager{BackOfficeIdentityUser}}"/> instance for logging.</param>
+    /// <param name="schemes">The <see cref="IAuthenticationSchemeProvider"/> for authentication schemes.</param>
+    /// <param name="confirmation">The <see cref="IUserConfirmation{BackOfficeIdentityUser}"/> service for user confirmation.</param>
+    /// <param name="eventAggregator">The <see cref="IEventAggregator"/> for publishing and subscribing to events.</param>
+    /// <param name="securitySettings">The <see cref="IOptions{SecuritySettings}"/> accessor for security settings.</param>
+    /// <param name="backOfficeAuthenticationTypeSettings">The <see cref="IOptions{BackOfficeAuthenticationTypeSettings}"/> accessor for back office authentication type settings.</param>
+    /// <param name="requestCache">The <see cref="IRequestCache"/> for caching request data.</param>
     public BackOfficeSignInManager(
         BackOfficeUserManager userManager,
         IHttpContextAccessor contextAccessor,
@@ -119,6 +135,10 @@ public class BackOfficeSignInManager : UmbracoSignInManager<BackOfficeIdentityUs
         return properties;
     }
 
+    /// <summary>
+    /// Gets the external authentication schemes available for back office sign-in.
+    /// </summary>
+    /// <returns>A task that represents the asynchronous operation. The task result contains a collection of external authentication schemes.</returns>
     public override Task<IEnumerable<AuthenticationScheme>> GetExternalAuthenticationSchemesAsync() =>
         // TODO: We can filter these so that they only include the back office ones.
         // That can be done by either checking the scheme (maybe) or comparing it to what we have registered in the collection of BackOfficeExternalLoginProvider

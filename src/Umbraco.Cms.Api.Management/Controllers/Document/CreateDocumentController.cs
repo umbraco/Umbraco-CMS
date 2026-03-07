@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -12,6 +12,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Document;
 
+    /// <summary>
+    /// API controller responsible for handling operations related to the creation of content documents in the Umbraco CMS.
+    /// </summary>
 [ApiVersion("1.0")]
 public class CreateDocumentController : CreateDocumentControllerBase
 {
@@ -19,6 +22,13 @@ public class CreateDocumentController : CreateDocumentControllerBase
     private readonly IContentEditingService _contentEditingService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CreateDocumentController"/> class.
+    /// </summary>
+    /// <param name="authorizationService">Service used to authorize access to document creation operations.</param>
+    /// <param name="documentEditingPresentationFactory">Factory for creating document editing presentation models.</param>
+    /// <param name="contentEditingService">Service responsible for content editing functionality.</param>
+    /// <param name="backOfficeSecurityAccessor">Accessor for back office security context.</param>
     public CreateDocumentController(
         IAuthorizationService authorizationService,
         IDocumentEditingPresentationFactory documentEditingPresentationFactory,
@@ -31,6 +41,12 @@ public class CreateDocumentController : CreateDocumentControllerBase
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
+    /// <summary>
+    /// Creates a new document using the specified request model.
+    /// </summary>
+    /// <param name="cancellationToken">Token to monitor for cancellation requests.</param>
+    /// <param name="requestModel">The details of the document to create.</param>
+    /// <returns>An <see cref="IActionResult"/> representing the result of the operation.</returns>
     [HttpPost]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status201Created)]

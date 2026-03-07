@@ -29,6 +29,9 @@ using SignInResult = Microsoft.AspNetCore.Mvc.SignInResult;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Security;
 
+/// <summary>
+/// Provides endpoints for managing security-related operations in the back office.
+/// </summary>
 [ApiVersion("1.0")]
 [VersionedApiBackOfficeRoute(Common.Security.Paths.BackOfficeApi.EndpointTemplate)]
 [ApiExplorerSettings(IgnoreApi = true)]
@@ -50,6 +53,18 @@ public class BackOfficeController : SecurityControllerBase
     private const string RedirectStatusParameter = "status";
     private const string RedirectErrorCodeParameter = "errorCode";
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="BackOfficeController"/> class.
+    /// </summary>
+    /// <param name="httpContextAccessor">Provides access to the current HTTP context.</param>
+    /// <param name="backOfficeSignInManager">Manages sign-in operations for back office users.</param>
+    /// <param name="backOfficeUserManager">Manages back office user accounts.</param>
+    /// <param name="securitySettings">The security settings for the back office.</param>
+    /// <param name="logger">The logger used for logging information and errors.</param>
+    /// <param name="backOfficeTwoFactorOptions">Options for back office two-factor authentication.</param>
+    /// <param name="userTwoFactorLoginService">Service for handling user two-factor login operations.</param>
+    /// <param name="externalLoginService">Service for managing external logins in the back office.</param>
+    /// <param name="backOfficeUserClientCredentialsManager">Manages client credentials for back office users.</param>
     public BackOfficeController(
         IHttpContextAccessor httpContextAccessor,
         IBackOfficeSignInManager backOfficeSignInManager,
@@ -72,6 +87,20 @@ public class BackOfficeController : SecurityControllerBase
         _backOfficeUserClientCredentialsManager = backOfficeUserClientCredentialsManager;
     }
 
+    /// <summary>
+    /// Authenticates a backoffice user with the provided credentials and returns the result of the login attempt.
+    /// </summary>
+    /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
+    /// <param name="model">The login request model containing the user's credentials.</param>
+    /// <returns>
+    /// An <see cref="IActionResult"/> indicating the result of the login attempt:
+    /// <list type="bullet">
+    /// <item><description>200 OK if authentication succeeds.</description></item>
+    /// <item><description>401 Unauthorized if credentials are invalid.</description></item>
+    /// <item><description>402 PaymentRequired if two-factor authentication is required.</description></item>
+    /// <item><description>403 Forbidden if the user is not allowed or is locked out.</description></item>
+    /// </list>
+    /// </returns>
     [HttpPost("login")]
     [EndpointSummary("Authenticates a user.")]
     [EndpointDescription("Authenticates a user with the provided credentials and returns authentication tokens.")]
@@ -140,6 +169,20 @@ public class BackOfficeController : SecurityControllerBase
         return Ok();
     }
 
+    /// <summary>
+    /// Verifies the two-factor authentication (2FA) code submitted by the user during the sign-in process.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="model">An instance of <see cref="Verify2FACodeModel"/> containing the 2FA provider, code, and related options.</param>
+    /// <returns>
+    /// An <see cref="IActionResult"/> indicating the result of the verification:
+    /// <list type="bullet">
+    /// <item><description><c>200 OK</c> if the code is valid.</description></item>
+    /// <item><description><c>400 Bad Request</c> if the code is invalid or the model state is invalid.</description></item>
+    /// <item><description><c>401 Unauthorized</c> if no user is found for verification.</description></item>
+    /// <item><description><c>403 Forbidden</c> if the user is locked out or not allowed to sign in.</description></item>
+    /// </list>
+    /// </returns>
     [AllowAnonymous]
     [HttpPost("verify-2fa")]
     [EndpointSummary("Verifies two-factor authentication.")]
@@ -186,6 +229,14 @@ public class BackOfficeController : SecurityControllerBase
             .Build());
     }
 
+    /// <summary>
+    /// Handles authorization requests for the backoffice by validating and processing OAuth authorization requests.
+    /// Returns an error if the request context is invalid or if the client is not permitted.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <returns>
+    /// A task representing the asynchronous operation. The result contains an <see cref="IActionResult"/> indicating the outcome of the authorization request, including possible error responses for invalid contexts or unauthorized clients.
+    /// </returns>
     [AllowAnonymous]
     [HttpGet("authorize")]
     [EndpointSummary("Authorizes the current request.")]
@@ -218,6 +269,13 @@ public class BackOfficeController : SecurityControllerBase
             ? await AuthorizeInternal(request)
             : await AuthorizeExternal(request);
     }
+    /// <summary>
+    /// Issues or refreshes access tokens for authenticated users via supported OpenID Connect grant types.
+    /// </summary>
+    /// <remarks>
+    /// Supports authorization code, refresh token, and client credentials grant types. Returns an error if the request is invalid or the user cannot be found.
+    /// </remarks>
+    /// <returns>An <see cref="IActionResult"/> representing the result of the token issuance or refresh process, including error details if applicable.</returns>
 
     [AllowAnonymous]
     [HttpPost("token")]
@@ -278,6 +336,11 @@ public class BackOfficeController : SecurityControllerBase
         });
     }
 
+    /// <summary>
+    /// Signs out the currently authenticated user and ends their session.
+    /// </summary>
+    /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
+    /// <returns>A task that represents the asynchronous sign-out operation. The task result contains an <see cref="IActionResult"/> that redirects the user agent to the post logout URI.</returns>
     [AllowAnonymous]
     [HttpGet("signout")]
     [EndpointSummary("Signs out the current user.")]
@@ -304,6 +367,14 @@ public class BackOfficeController : SecurityControllerBase
 
     // Creates and retains a short lived secret to use in the link-login
     // endpoint because we can not protect that method with a bearer token for reasons explained there
+    /// <summary>
+    /// Generates a short-lived secret key for use in the link login endpoint, allowing external login providers to securely link accounts without requiring a bearer token.
+    /// </summary>
+    /// <param name="provider">The scheme name of the external login provider for which to generate the secret key.</param>
+    /// <returns>
+    /// An <see cref="IActionResult"/> containing the generated secret key as a <see cref="Guid"/>,
+    /// or an error response if the provider is invalid or the operation is unauthorized.
+    /// </returns>
     [HttpGet("link-login-key")]
     [EndpointSummary("Generates a link login key.")]
     [EndpointDescription("Generates a short-lived secret key for use in the link login endpoint.")]
@@ -403,6 +474,13 @@ public class BackOfficeController : SecurityControllerBase
             => CallbackErrorRedirectWithStatus("external-login-callback", status, handleResult.Result);
     }
 
+    /// <summary>
+    /// Unlinks an external login provider from the current user's account.
+    /// </summary>
+    /// <param name="unlinkLoginRequestModel">The request model containing the external login provider and provider key to unlink.</param>
+    /// <returns>
+    /// An <see cref="IActionResult"/> indicating the result of the unlink operation. Returns <c>200 OK</c> if successful, or an appropriate error response if the operation fails (e.g., <c>400 Bad Request</c>, <c>401 Unauthorized</c>, or <c>500 Internal Server Error</c>).
+    /// </returns>
     [HttpPost("unlink-login")]
     [EndpointSummary("Unlinks an external login provider.")]
     [EndpointDescription("Unlinks an external login provider from the current user's account.")]

@@ -8,15 +8,27 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Template.Tree;
 
+    /// <summary>
+    /// API controller responsible for retrieving and managing ancestor nodes in the template tree structure within the Umbraco CMS.
+    /// </summary>
 [ApiVersion("1.0")]
 public class AncestorsTemplateTreeController : TemplateTreeControllerBase
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AncestorsTemplateTreeController"/> class.
+    /// </summary>
+    /// <param name="entityService">The <see cref="IEntityService"/> used to perform entity operations.</param>
     [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
     public AncestorsTemplateTreeController(IEntityService entityService)
         : base(entityService)
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AncestorsTemplateTreeController"/> class, which handles operations related to retrieving ancestor template tree nodes.
+    /// </summary>
+    /// <param name="entityService">The service used to manage and retrieve entities.</param>
+    /// <param name="flagProviders">A collection of providers used to supply additional flags or metadata for entities.</param>
     [ActivatorUtilitiesConstructor]
     public AncestorsTemplateTreeController(IEntityService entityService, FlagProviderCollection flagProviders)
         : base(entityService, flagProviders)

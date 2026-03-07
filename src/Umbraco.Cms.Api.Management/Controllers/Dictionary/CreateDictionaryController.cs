@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -15,6 +15,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Dictionary;
 
+    /// <summary>
+    /// API controller responsible for handling requests to create new dictionary items in Umbraco CMS.
+    /// </summary>
 [ApiVersion("1.0")]
 public class CreateDictionaryController : DictionaryControllerBase
 {
@@ -23,6 +26,14 @@ public class CreateDictionaryController : DictionaryControllerBase
     private readonly IDictionaryPresentationFactory _dictionaryPresentationFactory;
     private readonly IAuthorizationService _authorizationService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Controllers.Dictionary.CreateDictionaryController"/> class,
+    /// providing dependencies required for managing dictionary items in the Umbraco back office API.
+    /// </summary>
+    /// <param name="dictionaryItemService">Service for managing dictionary items.</param>
+    /// <param name="backOfficeSecurityAccessor">Accessor for back office security context.</param>
+    /// <param name="dictionaryPresentationFactory">Factory for creating dictionary presentation models.</param>
+    /// <param name="authorizationService">Service for handling authorization checks.</param>
     public CreateDictionaryController(
         IDictionaryItemService dictionaryItemService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
@@ -35,6 +46,12 @@ public class CreateDictionaryController : DictionaryControllerBase
         _authorizationService = authorizationService;
     }
 
+    /// <summary>
+    /// Creates a new dictionary item using the details provided in the request model.
+    /// </summary>
+    /// <param name="cancellationToken">Token to monitor for cancellation requests.</param>
+    /// <param name="createDictionaryItemRequestModel">The model containing the details of the dictionary item to create, including translations.</param>
+    /// <returns>An <see cref="IActionResult"/> indicating the result of the create operation, including possible status codes for success or failure.</returns>
     [HttpPost]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status201Created)]

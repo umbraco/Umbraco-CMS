@@ -40,9 +40,20 @@ public class UserPresentationFactory : IUserPresentationFactory
     private readonly SecuritySettings _securitySettings;
     private readonly Dictionary<Type, IPermissionPresentationMapper> _permissionPresentationMappersByType;
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="UserPresentationFactory"/> class.
-    /// </summary>
+/// <summary>
+/// Initializes a new instance of the <see cref="UserPresentationFactory"/> class.
+/// </summary>
+/// <param name="entityService">Service for accessing and managing entities.</param>
+/// <param name="appCaches">Provides application-level caching functionality.</param>
+/// <param name="mediaFileManager">Manages media file storage and retrieval.</param>
+/// <param name="imageUrlGenerator">Generates URLs for images.</param>
+/// <param name="userGroupPresentationFactory">Factory for creating user group presentation models.</param>
+/// <param name="absoluteUrlBuilder">Builds absolute URLs for resources.</param>
+/// <param name="emailSender">Handles sending emails.</param>
+/// <param name="passwordConfigurationPresentationFactory">Factory for password configuration presentation models.</param>
+/// <param name="securitySettings">Provides access to security-related configuration settings.</param>
+/// <param name="externalLoginProviders">Manages back office external login providers.</param>
+/// <param name="permissionPresentationMappers">Collection of mappers for permission presentation models.</param>
     public UserPresentationFactory(
         IEntityService entityService,
         AppCaches appCaches,

@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Factories;
@@ -13,6 +13,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.User;
 
+    /// <summary>
+    /// API controller responsible for handling operations related to the creation of users in the management interface.
+    /// </summary>
 [ApiVersion("1.0")]
 public class CreateUserController : UserControllerBase
 {
@@ -20,6 +23,12 @@ public class CreateUserController : UserControllerBase
     private readonly IUserPresentationFactory _presentationFactory;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Controllers.User.CreateUserController"/> class, which handles API requests for creating users in the Umbraco backoffice.
+    /// </summary>
+    /// <param name="userService">Service used to manage user operations.</param>
+    /// <param name="presentationFactory">Factory for creating user presentation models.</param>
+    /// <param name="backOfficeSecurityAccessor">Accessor for backoffice security context.</param>
     public CreateUserController(
         IUserService userService,
         IUserPresentationFactory presentationFactory,

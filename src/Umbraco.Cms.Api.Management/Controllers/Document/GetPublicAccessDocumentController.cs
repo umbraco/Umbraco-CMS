@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -15,6 +15,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Document;
 
+/// <summary>
+/// Controller responsible for handling API requests to retrieve documents with public access settings.
+/// </summary>
 [ApiVersion("1.0")]
 public class GetPublicAccessDocumentController : DocumentControllerBase
 {
@@ -22,6 +25,12 @@ public class GetPublicAccessDocumentController : DocumentControllerBase
     private readonly IPublicAccessService _publicAccessService;
     private readonly IPublicAccessPresentationFactory _publicAccessPresentationFactory;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="GetPublicAccessDocumentController"/> class.
+    /// </summary>
+    /// <param name="authorizationService">Service used to authorize access to resources.</param>
+    /// <param name="publicAccessService">Service for managing public access rules for documents.</param>
+    /// <param name="publicAccessPresentationFactory">Factory for creating presentation models for public access data.</param>
     public GetPublicAccessDocumentController(
         IAuthorizationService authorizationService,
         IPublicAccessService publicAccessService,
@@ -32,6 +41,12 @@ public class GetPublicAccessDocumentController : DocumentControllerBase
         _publicAccessPresentationFactory = publicAccessPresentationFactory;
     }
 
+    /// <summary>
+    /// Retrieves the public access protection settings for the specified document.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="id">The unique identifier of the document whose public access settings are to be retrieved.</param>
+    /// <returns>An <see cref="IActionResult"/> containing the public access settings if found; otherwise, an error result.</returns>
     [MapToApiVersion("1.0")]
     [HttpGet("{id:guid}/public-access")]
     [ProducesResponseType(typeof(PublicAccessResponseModel), StatusCodes.Status200OK)]

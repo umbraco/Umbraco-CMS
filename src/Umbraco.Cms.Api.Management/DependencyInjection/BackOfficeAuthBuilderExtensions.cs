@@ -15,8 +15,16 @@ using Umbraco.Cms.Web.Common.ApplicationBuilder;
 
 namespace Umbraco.Cms.Api.Management.DependencyInjection;
 
+/// <summary>
+/// Provides extension methods for configuring back office authentication services.
+/// </summary>
 public static class BackOfficeAuthBuilderExtensions
 {
+    /// <summary>
+    /// Configures and adds the necessary authentication services for the Umbraco back office to the specified builder.
+    /// </summary>
+    /// <param name="builder">The <see cref="IUmbracoBuilder"/> to which back office authentication services will be added.</param>
+    /// <returns>The same <see cref="IUmbracoBuilder"/> instance with back office authentication configured.</returns>
     public static IUmbracoBuilder AddBackOfficeAuthentication(this IUmbracoBuilder builder)
     {
         builder
@@ -27,6 +35,12 @@ public static class BackOfficeAuthBuilderExtensions
         return builder;
     }
 
+    /// <summary>
+    /// Registers handlers with the back-office authentication builder to automatically revoke user authentication tokens
+    /// when certain user-related events occur, such as saving, deleting, or successful login of a user.
+    /// </summary>
+    /// <param name="builder">The <see cref="IUmbracoBuilder"/> to configure with token revocation handlers.</param>
+    /// <returns>The configured <see cref="IUmbracoBuilder"/> instance.</returns>
     public static IUmbracoBuilder AddTokenRevocation(this IUmbracoBuilder builder)
     {
         builder.AddNotificationAsyncHandler<UserSavedNotification, RevokeUserAuthenticationTokensNotificationHandler>();
@@ -109,6 +123,8 @@ public static class BackOfficeAuthBuilderExtensions
 
 internal sealed class BackofficePipelineFilter : UmbracoPipelineFilter
 {
+    /// <summary>Initializes a new instance of the <see cref="BackofficePipelineFilter"/> class.</summary>
+    /// <param name="name">The name of the pipeline filter.</param>
     public BackofficePipelineFilter(string name)
         : base(name)
         => PrePipeline = builder => builder.UseMiddleware<BackOfficeAuthorizationInitializationMiddleware>();

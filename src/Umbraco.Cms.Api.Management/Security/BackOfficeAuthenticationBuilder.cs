@@ -15,6 +15,11 @@ public class BackOfficeAuthenticationBuilder : AuthenticationBuilder
 {
     private readonly Action<BackOfficeExternalLoginProviderOptions> _loginProviderOptions;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="BackOfficeAuthenticationBuilder"/> class.
+    /// </summary>
+    /// <param name="services">The <see cref="IServiceCollection"/> to which authentication services will be added.</param>
+    /// <param name="loginProviderOptions">An optional action to configure external login provider options.</param>
     public BackOfficeAuthenticationBuilder(
         IServiceCollection services,
         Action<BackOfficeExternalLoginProviderOptions>? loginProviderOptions = null)
@@ -22,6 +27,11 @@ public class BackOfficeAuthenticationBuilder : AuthenticationBuilder
         => _loginProviderOptions = loginProviderOptions ?? (x => { });
 
     // TODO (V18): Change the return value to be not nullable and remove the NotNullIfNotNull attribute.
+    /// <summary>
+    /// Returns the specified authentication scheme prefixed with the back office external authentication type prefix.
+    /// </summary>
+    /// <param name="scheme">The authentication scheme to prefix.</param>
+    /// <returns>The prefixed scheme, or <c>null</c> if <paramref name="scheme"/> is <c>null</c>.</returns>
     [return: NotNullIfNotNull(nameof(scheme))]
     public static string? SchemeForBackOffice(string scheme)
         => scheme?.EnsureStartsWith(Constants.Security.BackOfficeExternalAuthenticationTypePrefix);
@@ -67,6 +77,13 @@ public class BackOfficeAuthenticationBuilder : AuthenticationBuilder
     internal sealed class EnsureBackOfficeScheme<TOptions> : IPostConfigureOptions<TOptions>
         where TOptions : RemoteAuthenticationOptions
     {
+    /// <summary>
+    /// Post-configures the specified options instance for a given authentication scheme name.
+    /// If the scheme name indicates a backoffice authentication scheme, sets the <c>SignInScheme</c> property
+    /// to the backoffice external authentication type. This ensures the configuration is only applied to backoffice schemes.
+    /// </summary>
+    /// <param name="name">The name of the authentication scheme to configure.</param>
+    /// <param name="options">The options instance to configure. If the scheme is a backoffice scheme, its <c>SignInScheme</c> will be set.</param>
         public void PostConfigure(string? name, TOptions options)
         {
             // ensure logic only applies to backoffice authentication schemes

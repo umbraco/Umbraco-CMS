@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -12,12 +12,20 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.User.ClientCredentials;
 
+    /// <summary>
+    /// Controller responsible for handling the creation of users with client credentials.
+    /// </summary>
 [ApiVersion("1.0")]
 public class CreateClientCredentialsUserController : ClientCredentialsUserControllerBase
 {
     private readonly IBackOfficeUserClientCredentialsManager _backOfficeUserClientCredentialsManager;
     private readonly IAuthorizationService _authorizationService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CreateClientCredentialsUserController"/> class.
+    /// </summary>
+    /// <param name="backOfficeUserClientCredentialsManager">Manages client credentials for back office users.</param>
+    /// <param name="authorizationService">Performs authorization and permission checks.</param>
     public CreateClientCredentialsUserController(
         IBackOfficeUserClientCredentialsManager backOfficeUserClientCredentialsManager,
         IAuthorizationService authorizationService)

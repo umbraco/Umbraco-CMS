@@ -14,6 +14,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Document;
 
+    /// <summary>
+    /// Provides API endpoints for validating the creation of new documents in the system.
+    /// </summary>
 [ApiVersion("1.0")]
 public class ValidateCreateDocumentController : CreateDocumentControllerBase
 {
@@ -21,6 +24,13 @@ public class ValidateCreateDocumentController : CreateDocumentControllerBase
     private readonly IContentEditingService _contentEditingService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ValidateCreateDocumentController"/> class.
+    /// </summary>
+    /// <param name="authorizationService">Service used to authorize user actions for document creation.</param>
+    /// <param name="documentEditingPresentationFactory">Factory for creating presentation models for document editing.</param>
+    /// <param name="contentEditingService">Service that handles the logic for editing content.</param>
+    /// <param name="backOfficeSecurityAccessor">Accessor for back office security context and user information.</param>
     public ValidateCreateDocumentController(
         IAuthorizationService authorizationService,
         IDocumentEditingPresentationFactory documentEditingPresentationFactory,

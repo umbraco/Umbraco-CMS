@@ -7,12 +7,20 @@ using Umbraco.Cms.Api.Management.ViewModels.Indexer;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Indexer;
 
+    /// <summary>
+    /// API controller responsible for providing detailed information and operations for a specific indexer in the management system.
+    /// </summary>
 [ApiVersion("1.0")]
 public class DetailsIndexerController : IndexerControllerBase
 {
     private readonly IIndexPresentationFactory _indexPresentationFactory;
     private readonly IExamineManager _examineManager;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DetailsIndexerController"/> class.
+    /// </summary>
+    /// <param name="indexPresentationFactory">Factory used to create index presentation models.</param>
+    /// <param name="examineManager">The <see cref="IExamineManager"/> instance used for managing indexers.</param>
     public DetailsIndexerController(
         IIndexPresentationFactory indexPresentationFactory,
         IExamineManager examineManager)

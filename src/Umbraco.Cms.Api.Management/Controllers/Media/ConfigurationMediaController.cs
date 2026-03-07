@@ -6,6 +6,9 @@ using Umbraco.Cms.Api.Management.ViewModels.Media;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Media;
 
+/// <summary>
+/// Provides API endpoints for managing media configuration settings.
+/// </summary>
 [ApiVersion("1.0")]
 [Obsolete("No longer used. Scheduled for removal in Umbraco 18.")]
 public class ConfigurationMediaController : MediaControllerBase
@@ -13,6 +16,10 @@ public class ConfigurationMediaController : MediaControllerBase
     private readonly IConfigurationPresentationFactory _configurationPresentationFactory;
 
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ConfigurationMediaController"/> class.
+    /// </summary>
+    /// <param name="configurationPresentationFactory">An instance of <see cref="IConfigurationPresentationFactory"/> used to create configuration presentations for media.</param>
     public ConfigurationMediaController(IConfigurationPresentationFactory configurationPresentationFactory)
         => _configurationPresentationFactory = configurationPresentationFactory;
 

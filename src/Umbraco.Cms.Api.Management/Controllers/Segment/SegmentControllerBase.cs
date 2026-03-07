@@ -5,6 +5,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Segment;
 
+    /// <summary>
+    /// Serves as the base controller for API endpoints that manage segment-related operations in the Umbraco CMS.
+    /// </summary>
 [VersionedApiBackOfficeRoute("segment")]
 [ApiExplorerSettings(GroupName = "Segment")]
 public abstract class SegmentControllerBase : ManagementApiControllerBase

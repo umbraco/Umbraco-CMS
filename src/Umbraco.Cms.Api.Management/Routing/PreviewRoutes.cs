@@ -14,9 +14,17 @@ public sealed class PreviewRoutes : IAreaRoutes
 {
     private readonly IRuntimeState _runtimeState;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Routing.PreviewRoutes"/> class, configuring preview routing based on the application's runtime state.
+    /// </summary>
+    /// <param name="runtimeState">An instance representing the current runtime state of the Umbraco application.</param>
     public PreviewRoutes(IRuntimeState runtimeState)
         => _runtimeState = runtimeState;
 
+    /// <summary>
+    /// Creates the preview routes on the specified endpoint route builder.
+    /// </summary>
+    /// <param name="endpoints">The endpoint route builder to add routes to.</param>
     public void CreateRoutes(IEndpointRouteBuilder endpoints)
     {
         if (_runtimeState.Level is RuntimeLevel.Install or RuntimeLevel.Upgrade or RuntimeLevel.Run)

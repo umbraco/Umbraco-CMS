@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Filters;
@@ -9,6 +9,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Install;
 
+    /// <summary>
+    /// Serves as the base class for controllers that handle installation-related API endpoints in Umbraco CMS.
+    /// </summary>
 [AllowAnonymous]
 [VersionedApiBackOfficeRoute("install")]
 [ApiExplorerSettings(GroupName = "Install")]

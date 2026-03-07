@@ -1,5 +1,8 @@
-﻿namespace Umbraco.Cms.Api.Management.ViewModels.UserGroup;
+namespace Umbraco.Cms.Api.Management.ViewModels.UserGroup;
 
+/// <summary>
+/// Represents a data transfer object containing information about a user group returned by the API.
+/// </summary>
 public class UserGroupResponseModel : UserGroupBase
 {
     /// <summary>

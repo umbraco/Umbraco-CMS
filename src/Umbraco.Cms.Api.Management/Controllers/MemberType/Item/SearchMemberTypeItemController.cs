@@ -9,6 +9,9 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.MemberType.Item;
 
+    /// <summary>
+    /// Provides API endpoints for searching member type items in the management interface.
+    /// </summary>
 [ApiVersion("1.0")]
 public class SearchMemberTypeItemController : MemberTypeItemControllerBase
 {
@@ -16,6 +19,12 @@ public class SearchMemberTypeItemController : MemberTypeItemControllerBase
     private readonly IMemberTypeService _memberTypeService;
     private readonly IUmbracoMapper _mapper;
 
+/// <summary>
+/// Initializes a new instance of the <see cref="SearchMemberTypeItemController"/> class, which handles search operations for member type items.
+/// </summary>
+/// <param name="entitySearchService">Service used to perform entity search operations.</param>
+/// <param name="memberTypeService">Service used to manage member types.</param>
+/// <param name="mapper">The Umbraco mapper used for mapping entities to models.</param>
     public SearchMemberTypeItemController(IEntitySearchService entitySearchService, IMemberTypeService memberTypeService, IUmbracoMapper mapper)
     {
         _entitySearchService = entitySearchService;

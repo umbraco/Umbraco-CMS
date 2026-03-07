@@ -11,11 +11,18 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Package.Created;
 
+    /// <summary>
+    /// Controller responsible for handling requests to download packages that have been created.
+    /// </summary>
 [ApiVersion("1.0")]
 public class DownloadCreatedPackageController : CreatedPackageControllerBase
 {
     private readonly IPackagingService _packagingService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DownloadCreatedPackageController"/> class with the specified packaging service.
+    /// </summary>
+    /// <param name="packagingService">The service used to perform package-related operations.</param>
     public DownloadCreatedPackageController(IPackagingService packagingService) => _packagingService = packagingService;
 
     /// <summary>

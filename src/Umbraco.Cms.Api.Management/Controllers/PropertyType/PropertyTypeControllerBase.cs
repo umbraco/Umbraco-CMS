@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Routing;
@@ -7,6 +7,10 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.PropertyType;
 
+    /// <summary>
+    /// Abstract base controller providing common functionality for managing property types in the Umbraco CMS API.
+    /// Intended to be inherited by specific property type management controllers.
+    /// </summary>
 [VersionedApiBackOfficeRoute("property-type")]
 [ApiExplorerSettings(GroupName = "Property Type")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]

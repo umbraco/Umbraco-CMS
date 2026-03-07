@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.Builders;
@@ -9,6 +9,10 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.RelationType;
 
+    /// <summary>
+    /// Serves as the base controller for managing relation types in the Umbraco CMS Management API.
+    /// Provides shared functionality for relation type operations used by derived controllers.
+    /// </summary>
 [VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.RelationType}")]
 [ApiExplorerSettings(GroupName = "Relation Type")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessRelationTypes)]

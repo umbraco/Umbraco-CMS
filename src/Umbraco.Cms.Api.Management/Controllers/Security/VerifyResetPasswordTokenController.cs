@@ -12,18 +12,34 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Security;
 
+    /// <summary>
+    /// Provides API endpoints for verifying reset password tokens as part of the security workflow.
+    /// </summary>
 [ApiVersion("1.0")]
 public class VerifyResetPasswordTokenController : SecurityControllerBase
 {
     private readonly IUserService _userService;
     private readonly IPasswordConfigurationPresentationFactory _passwordConfigurationPresentationFactory;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="VerifyResetPasswordTokenController"/> class.
+    /// </summary>
+    /// <param name="userService">Service used for user management operations.</param>
+    /// <param name="passwordConfigurationPresentationFactory">Factory for creating password configuration presentation models.</param>
     public VerifyResetPasswordTokenController(IUserService userService, IPasswordConfigurationPresentationFactory passwordConfigurationPresentationFactory)
     {
         _userService = userService;
         _passwordConfigurationPresentationFactory = passwordConfigurationPresentationFactory;
     }
 
+    /// <summary>
+    /// Verifies whether the provided password reset token is valid for the specified user.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="model">The request model containing the user identifier and the reset token to verify.</param>
+    /// <returns>
+    /// An <see cref="IActionResult"/> containing a <see cref="VerifyResetPasswordResponseModel"/> if verification succeeds, or an error response if it fails.
+    /// </returns>
     [AllowAnonymous]
     [HttpPost("forgot-password/verify")]
     [MapToApiVersion("1.0")]

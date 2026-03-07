@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -13,6 +13,9 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Language;
 
+/// <summary>
+/// API controller responsible for handling operations related to the creation of languages (locales) in the Umbraco CMS management interface.
+/// </summary>
 [ApiVersion("1.0")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessLanguages)]
 public class CreateLanguageController : LanguageControllerBase
@@ -21,6 +24,12 @@ public class CreateLanguageController : LanguageControllerBase
     private readonly IUmbracoMapper _umbracoMapper;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Controllers.Language.CreateLanguageController"/> class.
+    /// </summary>
+    /// <param name="languageService">The service used to manage languages.</param>
+    /// <param name="umbracoMapper">The mapper used for Umbraco object mapping.</param>
+    /// <param name="backOfficeSecurityAccessor">Provides access to back office security features.</param>
     public CreateLanguageController(
         ILanguageService languageService,
         IUmbracoMapper umbracoMapper,
@@ -31,6 +40,19 @@ public class CreateLanguageController : LanguageControllerBase
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
+    /// <summary>
+    /// Handles HTTP POST requests to create a new language in the system using the specified configuration.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="createLanguageRequestModel">The request model containing the configuration for the new language.</param>
+    /// <returns>
+    /// An <see cref="IActionResult"/> representing the result of the create operation:
+    /// <list type="bullet">
+    /// <item><description><c>201 Created</c> if the language was successfully created.</description></item>
+    /// <item><description><c>400 Bad Request</c> if the request model is invalid.</description></item>
+    /// <item><description><c>404 Not Found</c> if a related resource could not be found.</description></item>
+    /// </list>
+    /// </returns>
     [HttpPost]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
