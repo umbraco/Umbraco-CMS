@@ -1,6 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System.Diagnostics;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
@@ -131,6 +132,7 @@ public abstract class RecurringHostedServiceBase : IHostedService, IDisposable
     /// <param name="state">The task state.</param>
     public virtual async void ExecuteAsync(object? state)
     {
+        var sw = Stopwatch.StartNew();
         try
         {
             // First, stop the timer, we do not want tasks to execute in parallel
@@ -149,16 +151,37 @@ public abstract class RecurringHostedServiceBase : IHostedService, IDisposable
         }
         finally
         {
-            // Resume now that the task is complete - Note we use period in both because we don't want to execute again after the delay.
-            // So first execution is after _delay, and the we wait _period between each
-            _timer?.Change(_period, _period);
+            sw.Stop();
+
+            // Subtract elapsed time to prevent period drift; clamp to zero if execution exceeded the period.
+            TimeSpan remaining = ComputeNextDelay(_period, sw.Elapsed);
+            _timer?.Change(remaining, _period);
         }
     }
 
     public abstract Task PerformExecuteAsync(object? state);
 
     /// <summary>
-    ///     Change the period between operations.
+    /// Computes the delay before the next execution, subtracting the elapsed execution time from the period to prevent drift.
+    /// Clamps to <see cref="TimeSpan.Zero" /> if execution exceeded the period.
+    /// </summary>
+    /// <param name="period">The configured period between executions.</param>
+    /// <param name="elapsed">The elapsed time of the current execution.</param>
+    /// <returns>
+    /// The remaining time before the next execution should start.
+    /// </returns>
+    /// <remarks>
+    /// Internal to expose for unit tests.
+    /// </remarks>
+    internal static TimeSpan ComputeNextDelay(TimeSpan period, TimeSpan elapsed)
+    {
+        TimeSpan remaining = period - elapsed;
+
+        return remaining < TimeSpan.Zero ? TimeSpan.Zero : remaining;
+    }
+
+    /// <summary>
+    /// Change the period between operations.
     /// </summary>
     /// <param name="newPeriod">The new period between tasks</param>
     protected void ChangePeriod(TimeSpan newPeriod) => _period = newPeriod;
