@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Infrastructure.PropertyEditors.NotificationHandlers;
 /// <summary>
 /// Provides a base class for all notification handlers relating to file uploads in property editors.
 /// </summary>
-internal abstract class FileUploadNotificationHandlerBase
+public abstract class FileUploadNotificationHandlerBase
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="FileUploadNotificationHandlerBase"/> class.
@@ -55,7 +55,7 @@ internal abstract class FileUploadNotificationHandlerBase
     /// <returns>
     ///     <c>true</c> if the specified property is an upload field; otherwise, <c>false</c>.
     /// </returns>
-    protected static bool IsUploadFieldPropertyType(IPropertyType propertyType)
+    protected virtual bool IsUploadFieldPropertyType(IPropertyType propertyType)
         => propertyType.PropertyEditorAlias == Constants.PropertyEditors.Aliases.UploadField;
 
     /// <summary>

@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Infrastructure.PropertyEditors;
 /// <summary>
 /// Handles the parsing of raw values to <see cref="FileUploadValue"/> objects.
 /// </summary>
-internal sealed class FileUploadValueParser
+public sealed class FileUploadValueParser
 {
     private readonly IJsonSerializer _jsonSerializer;
 
