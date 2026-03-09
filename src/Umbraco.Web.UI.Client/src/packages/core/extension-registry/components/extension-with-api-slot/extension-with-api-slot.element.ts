@@ -101,6 +101,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 export class UmbExtensionWithApiSlotElement extends UmbLitElement {
 	#attached = false;
 	#extensionsController?: UmbExtensionsElementAndApiInitializer;
+	#disconnectTimeoutId?: number;
 
 	@state()
 	private _permitted?: Array<UmbExtensionElementAndApiInitializer>;
@@ -337,12 +338,34 @@ export class UmbExtensionWithApiSlotElement extends UmbLitElement {
 	override connectedCallback(): void {
 		super.connectedCallback();
 		this.#attached = true;
+		// Cancel any pending destruction if we're being reconnected (e.g., during a DOM move/sort)
+		if (this.#disconnectTimeoutId !== undefined) {
+			cancelAnimationFrame(this.#disconnectTimeoutId);
+			this.#disconnectTimeoutId = undefined;
+			// Only skip re-initialization if the controller still exists
+			if (this.#extensionsController) {
+				return;
+			}
+		}
 		this.#observeExtensions();
 	}
 	override disconnectedCallback(): void {
 		this.#attached = false;
-		this.#extensionsController?.destroy();
-		this.#extensionsController = undefined;
+		// Clear any existing pending frame request (defensive cleanup)
+		if (this.#disconnectTimeoutId !== undefined) {
+			cancelAnimationFrame(this.#disconnectTimeoutId);
+		}
+		// Defer destruction to allow for reconnection during DOM moves/sorting
+		// If reconnected before the next frame, the destruction is cancelled
+		this.#disconnectTimeoutId = requestAnimationFrame(() => {
+			this.#disconnectTimeoutId = undefined;
+			// Only destroy if still detached
+			if (!this.#attached) {
+				//this.#removeEventListenersFromExtensionElement();
+				this.#extensionsController?.destroy();
+				this.#extensionsController = undefined;
+			}
+		});
 		super.disconnectedCallback();
 	}
 
