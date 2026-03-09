@@ -1,5 +1,6 @@
 import type { UmbLinkPickerLink } from '../../link-picker-modal/types.js';
 import { UMB_LINK_PICKER_MODAL } from '../../link-picker-modal/link-picker-modal.token.js';
+import type { UmbLinkPickerDocumentLinksConfig } from '../../link-picker-modal/link-picker-modal.token.js';
 import {
 	css,
 	customElement,
@@ -98,6 +99,9 @@ export class UmbInputMultiUrlElement extends UmbFormControlMixin<string, typeof 
 	 */
 	@property({ type: Boolean, attribute: 'hide-anchor' })
 	hideAnchor?: boolean;
+
+	@property({ type: Object, attribute: false })
+	documentLinksConfig?: UmbLinkPickerDocumentLinksConfig;
 
 	/**
 	 * @type {UUIModalSidebarSize}
@@ -215,6 +219,7 @@ export class UmbInputMultiUrlElement extends UmbFormControlMixin<string, typeof 
 						isNew: index === null,
 						config: {
 							hideAnchor: this.hideAnchor,
+							documentLinksConfig: this.documentLinksConfig,
 						},
 					},
 					value: {

@@ -1,7 +1,8 @@
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface UmbDocumentLinkPickerModalData {}
+export interface UmbDocumentLinkPickerModalData {
+	allowCultureSpecificLinks?: boolean;
+}
 
 export type UmbDocumentLinkPickerModalValue = {
 	unique: string;

@@ -271,7 +271,9 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 	}
 
 	async #triggerDocumentLinkPicker() {
-		const value = await umbOpenModal(this, UMB_DOCUMENT_LINK_PICKER_MODAL, {});
+		const value = await umbOpenModal(this, UMB_DOCUMENT_LINK_PICKER_MODAL, {
+			data: { allowCultureSpecificLinks: this._config.documentLinksConfig?.allowCultureSpecificLinks },
+		});
 
 		// If a culture is selected for the document, we need to set the variant context to make sure we get the correct name and url for the document.
 		// This will make a local variant context for the link picker when a Document with a culture is selected,
