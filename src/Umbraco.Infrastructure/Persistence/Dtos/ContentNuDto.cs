@@ -13,9 +13,6 @@ public class ContentNuDto
     public const string TableName = Constants.DatabaseSchema.Tables.NodeData;
     public const string NodeIdColumnName = Constants.DatabaseSchema.Columns.NodeIdName;
 
-    [Obsolete("Use NodeIdColumnName instead. Scheduled for removal in Umbraco 18.")]
-    public const string PrimaryKeyColumnName = NodeIdColumnName;
-
     private const string PublishedColumnName = "published";
     private const string RvColumnName = "rv";
     private const string DataRawColumnName = "dataRaw";
