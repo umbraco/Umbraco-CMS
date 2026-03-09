@@ -156,6 +156,9 @@ public class UmbracoPlan : MigrationPlan
         To<V_17_3_0.RetrustForeignKeyAndCheckConstraints>("{0638E0E0-D914-4ACA-8A4B-9551A3AAB91F}");
         To<V_17_3_0.RebuildHybridCache>("{E4A7C2D1-5F38-4B96-A1D3-8E2F6C9B0A74}");
         To<V_17_3_0.OptimizeInvariantUrlRecords>("{B8C9D0E1-F2A3-4B5C-8D7E-9F0A1B2C3D4E}");
+        To<V_17_3_0.AddSortableValueToPropertyData>("{9DBDB5CD-8679-4BB0-BF83-E8D508073CE0}");
+        To<V_17_3_0.PopulateSortableValueForDatePropertyData>("{6748CB56-CC16-49F0-BA91-B8ECE31BF456}");
+
 
         // To 18.0.0
         // TODO (V18): Enable on 18 branch
