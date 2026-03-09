@@ -1,3 +1,7 @@
+#if UseDocumentedCsp
+using Umbraco.Cms.Web.UI.Extensions;
+#endif
+
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.CreateUmbracoBuilder()
@@ -10,6 +14,10 @@ builder.CreateUmbracoBuilder()
     .Build();
 
 WebApplication app = builder.Build();
+
+#if UseDocumentedCsp
+app.UseDocumentedContentSecurityPolicy();
+#endif
 
 await app.BootUmbracoAsync();
 
