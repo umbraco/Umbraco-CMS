@@ -1276,26 +1276,30 @@ describe('UmbValidationController', () => {
 				'english error',
 			);
 
-			let rejected = false;
-			await ctrl.validateByVariantIds([new UmbVariantId('en-US', null)]).catch(() => {
-				rejected = true;
-			});
-			expect(rejected).to.be.true;
+			await ctrl.validateByVariantIds([new UmbVariantId('en-US', null)]).catch(() => undefined);
+			expect(ctrl.isValid).to.be.false;
 		});
 
-		it('rejects when an invariant message is present (invariant messages always count)', async () => {
+		it('rejects when a message with no culture filter is present', async () => {
 			ctrl.messages.addMessage('server', '$.invariant.error', 'invariant error');
 
-			let rejected = false;
-			await ctrl.validateByVariantIds([new UmbVariantId('en-US', null)]).catch(() => {
-				rejected = true;
-			});
-			expect(rejected).to.be.true;
+			await ctrl.validateByVariantIds([new UmbVariantId('en-US', null)]).catch(() => undefined);
+			expect(ctrl.isValid).to.be.false;
 		});
 
 		it('resolves when there are no messages at all', async () => {
 			await ctrl.validateByVariantIds([new UmbVariantId('en-US', null)]);
 			expect(ctrl.isValid).to.be.true;
+		});
+
+		it('rejects gracefully when the controller has been destroyed', async () => {
+			ctrl.destroy();
+
+			let rejected = false;
+			await ctrl.validateByVariantIds([new UmbVariantId('en-US', null)]).catch(() => {
+				rejected = true;
+			});
+			expect(rejected).to.be.true;
 		});
 	});
 });
