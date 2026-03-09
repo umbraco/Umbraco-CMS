@@ -115,7 +115,7 @@ export class UmbMediaServerDataSource extends UmbControllerBase implements UmbDe
 	 * @returns {*}
 	 * @memberof UmbMediaServerDataSource
 	 */
-	async create(model: UmbMediaDetailModel, parentUnique: string | null = null) {
+	async create(model: UmbMediaDetailModel, parentUnique: string | null = null, disableNotifications = false) {
 		if (!model) throw new Error('Media is missing');
 		if (!model.unique) throw new Error('Media unique is missing');
 
@@ -137,6 +137,7 @@ export class UmbMediaServerDataSource extends UmbControllerBase implements UmbDe
 			MediaService.postMedia({
 				body,
 			}),
+			{ disableNotifications },
 		);
 
 		if (data && typeof data === 'string') {
