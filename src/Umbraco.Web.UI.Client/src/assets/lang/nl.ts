@@ -332,7 +332,7 @@ export default {
 	media: {
 		clickToUpload: 'Klik om te uploaden',
 		orClickHereToUpload: 'Of klik hier om bestanden te kiezen',
-		disallowedFileType: 'Kan dit bestand niet uploaden, het heeft niet het juiste bestandstype.',
+		disallowedFileType: 'Kan dit bestand niet uploaden, het heeft niet het juiste bestandstype',
 		maxFileSize: 'Maximale bestandsgrootte is',
 		mediaRoot: 'Media root',
 		moveToSameFolderFailed: 'De bovenliggende map en de doelmap kunnen niet hetzelfde zijn',
@@ -340,6 +340,8 @@ export default {
 		renameFolderFailed: 'Kan de map met id %0% niet hernoemen',
 		dragAndDropYourFilesIntoTheArea: 'Sleep en zet je bestand(en) neer in dit gebied',
 		uploadNotAllowed: 'Upload is niet toegelaten in deze locatie.',
+		uploadValidationFailed: (mediaTypeName: string) =>
+			`Het mediatype ${mediaTypeName} heeft een of meer vereiste eigenschappen. Het moet afzonderlijk worden geüpload via het menu 'Maken'`,
 		fileSecurityValidationFailure: 'Een of meerdere veiligheid validaties zijn gefaald voor het bestand',
 	},
 	member: {
@@ -1185,6 +1187,7 @@ export default {
 		tab: 'Tab',
 		tabname: 'Tab titel',
 		tabs: 'Tabs',
+		changeIcon: 'Pictogram wijzigen',
 		contentTypeEnabled: 'Basis inhoudstype ingeschakeld',
 		contentTypeUses: 'Dit inhoudstype gebruikt',
 		noPropertiesDefinedOnTab:
