@@ -17,6 +17,11 @@ export interface UmbValidator extends EventTarget {
 	validateByVariantIds?: (variantIds: Array<UmbVariantId>) => Promise<void>;
 
 	/**
+	 * Returns the variant ID that this validator is scoped to, if any.
+	 */
+	getVariantId?(): UmbVariantId | undefined;
+
+	/**
 	 * Reset the validator to its initial state.
 	 */
 	reset(): void;

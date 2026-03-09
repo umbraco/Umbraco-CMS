@@ -411,8 +411,8 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 
 		const matchingValidators = this.#validators.filter((v) => {
 			// If the validator has no variantId, then we always include it:
-			if ((v as any).getVariantId === undefined) return true;
-			const vVariantId: UmbVariantId | undefined = (v as any).getVariantId();
+			if (v.getVariantId === undefined) return true;
+			const vVariantId = v.getVariantId();
 			if (vVariantId === undefined) return true;
 			return variantIds.some((variantId) => variantId.equal(vVariantId));
 		});
