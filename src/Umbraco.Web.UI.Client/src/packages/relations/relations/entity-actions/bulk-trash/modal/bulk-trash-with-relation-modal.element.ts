@@ -13,11 +13,9 @@ import {
 	nothing,
 	unsafeHTML,
 } from '@umbraco-cms/backoffice/external/lit';
-import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
-import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 @customElement('umb-bulk-trash-with-relation-confirm-modal')
@@ -43,12 +41,9 @@ export class UmbBulkTrashWithRelationConfirmModalElement extends UmbModalBaseEle
 	async #initData() {
 		if (!this.data) return;
 
-		// DisableDeleteWhenReferenced is a global content setting (shared by documents
-		// and media), so we fetch it from the document configuration endpoint.
-		// If the setting is off (or the fetch fails), allow trashing immediately.
+		// If disableDeleteWhenReferenced is not set, allow trashing immediately.
 		// Otherwise stay in loading state until the references component reports totals.
-		const { data } = await tryExecute(this, DocumentService.getDocumentConfiguration());
-		if (!data?.disableDeleteWhenReferenced) {
+		if (!this.data.disableDeleteWhenReferenced) {
 			this._canTrash = true;
 		}
 

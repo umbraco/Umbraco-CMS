@@ -19,7 +19,6 @@ public interface IConfigurationPresentationFactory
     MemberTypeConfigurationResponseModel CreateMemberTypeConfigurationResponseModel()
         => throw new NotImplementedException();
 
-    [Obsolete("No longer used. Scheduled for removal in Umbraco 18.")]
     MediaConfigurationResponseModel CreateMediaConfigurationResponseModel();
 
     MediaTypeConfigurationResponseModel CreateMediaTypeConfigurationResponseModel()
