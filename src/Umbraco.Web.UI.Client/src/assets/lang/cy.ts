@@ -354,6 +354,8 @@ export default {
 		renameFolderFailed: "Methwyd ailenwi'r ffolder gyda id %0%",
 		dragAndDropYourFilesIntoTheArea: "Llusgo a gollwng eich ffeil(iau) i mewn i'r ardal",
 		uploadNotAllowed: 'Ni chaniateir llwytho i fyny yn y lleoliad hwn.',
+		uploadValidationFailed: (mediaTypeName: string) =>
+			`Mae gan y math cyfryngau ${mediaTypeName} un neu fwy o briodweddau gofynnol. Bydd angen ei huwchlwytho'n unigol drwy'r ddewislen 'Creu'`,
 		disallowedMediaType: "Ni ellir lanlwytho'r ffeil yma, ni chaniateir y math cyfrwng gydag alias '%0%' yma",
 		invalidFileName: "Ni ellir lanlwytho'r ffeil yma, nid oes ganddi enw ffeil dilys",
 		fileSecurityValidationFailure: 'Mae un neu fwy o ddilysiadau diogelwch ffeil wedi methu',

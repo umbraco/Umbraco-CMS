@@ -391,6 +391,8 @@ export default {
 		fileSecurityValidationFailure: 'Uma ou mais validações de segurança de ficheiros falharam',
 		moveToSameFolderFailed: 'As pastas pai e destino não podem ser as mesmas',
 		uploadNotAllowed: 'O carregamento não é permitido nesta localização.',
+		uploadValidationFailed: (mediaTypeName: string) =>
+			`O tipo de multimédia ${mediaTypeName} tem uma ou mais propriedades obrigatórias. Terá de ser carregado individualmente através do menu 'Criar'`,
 	},
 	member: {
 		'2fa': 'Autenticação de Dois Fatores',
