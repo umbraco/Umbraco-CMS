@@ -213,8 +213,9 @@ export abstract class UmbBlockManagerContext<
 			structuresToInit.push({ structure, unique });
 		}
 
-		// Now perform async initialization
-		this.#initializeStructures(structuresToInit);
+		// Now perform async initialization — push the promise synchronously so
+		// contentTypesLoaded (Promise.all(#contentTypeRequests)) properly waits.
+		this.#contentTypeRequests.push(this.#initializeStructures(structuresToInit));
 	}
 
 	async #initializeStructures(
@@ -236,19 +237,19 @@ export abstract class UmbBlockManagerContext<
 		}
 
 		// Initialize each structure with pre-fetched data or fall back to individual loading
+		const initPromises: Array<Promise<unknown>> = [];
 		for (const { structure, unique } of structuresToInit) {
 			const contentType = contentTypesMap.get(unique);
 
 			if (contentType) {
 				// Use pre-fetched data directly via setType to avoid re-fetching
-				const initPromise = structure.setType(contentType);
-				this.#contentTypeRequests.push(initPromise);
+				initPromises.push(structure.setType(contentType));
 			} else {
 				// Fallback to individual load if not in bulk response
-				const initPromise = structure.loadType(unique);
-				this.#contentTypeRequests.push(initPromise);
+				initPromises.push(structure.loadType(unique));
 			}
 		}
+		await Promise.all(initPromises);
 	}
 
 	getStructure(unique: string) {
