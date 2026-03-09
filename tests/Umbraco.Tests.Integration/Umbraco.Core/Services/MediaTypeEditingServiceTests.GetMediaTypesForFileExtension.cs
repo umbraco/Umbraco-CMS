@@ -104,4 +104,18 @@ internal sealed partial class MediaTypeEditingServiceTests
         Assert.AreEqual(3, result.Total);
         Assert.AreEqual(1, result.Items.Count());
     }
+
+    [Test]
+#pragma warning disable CS0618 // Type or member is obsolete
+    public async Task GetMediaTypesForFileExtension_Excludes_Fallbacks_When_Specific_Match_Exists()
+    {
+        // The obsolete GetMediaTypesForFileExtensionAsync should preserve its original behavior:
+        // only return fallback types (like File) when there are NO specific extension matches.
+        // For .pdf, Article is a specific match, so File should NOT be returned.
+        var result = await MediaTypeEditingService.GetMediaTypesForFileExtensionAsync("pdf", 0, 100);
+
+        Assert.AreEqual(1, result.Total);
+        Assert.AreEqual(Constants.Conventions.MediaTypes.ArticleAlias, result.Items.First().Alias);
+    }
+#pragma warning restore CS0618 // Type or member is obsolete
 }
