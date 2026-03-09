@@ -277,10 +277,10 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 		// This will make a local variant context for the link picker when a Document with a culture is selected,
 		// and will inherit the values from the parent context (if any), but will override the culture with the one selected for the document.
 		if (value.culture) {
-			this.#variantContext.setCulture(value.culture);
+			await this.#variantContext.setCulture(value.culture);
 		}
 
-		this.#pickerSelect('document', value.unique, value.culture);
+		await this.#pickerSelect('document', value.unique, value.culture);
 	}
 
 	#triggerMediaPicker() {
