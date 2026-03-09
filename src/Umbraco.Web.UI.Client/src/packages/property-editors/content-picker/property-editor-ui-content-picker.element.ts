@@ -17,7 +17,8 @@ import type {
 	UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
-import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import { UMB_CONTENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content';
+import type { UmbSubmittableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 
 // import of local component
 import './components/input-content/index.js';
@@ -151,15 +152,19 @@ export class UmbPropertyEditorUIContentPickerElement
 		if (this._rootUnique) return;
 		if (!this.#dynamicRoot) return;
 
-		const workspaceContext = await this.getContext(UMB_ENTITY_WORKSPACE_CONTEXT);
-		const unique = workspaceContext?.getUnique() ?? null;
+		// Use passContextAliasMatches to skip past block element workspaces and find the document workspace.
+		const workspaceContext = await this.getContext(UMB_CONTENT_WORKSPACE_CONTEXT, {
+			passContextAliasMatches: true,
+		}).catch(() => undefined);
 
 		// For new documents, the unique is a client-generated GUID that doesn't exist in the DB.
 		// The backend expects null for CurrentKey when creating new content and falls back to ParentKey.
 		const isNew =
-			workspaceContext && 'getIsNew' in workspaceContext
-				? (workspaceContext as unknown as { getIsNew(): boolean | undefined }).getIsNew() === true
-				: false;
+			workspaceContext &&
+			'getIsNew' in workspaceContext &&
+			(workspaceContext as UmbSubmittableWorkspaceContext).getIsNew() === true;
+
+		const unique = isNew ? null : (workspaceContext?.getUnique() ?? null);
 
 		// Use parent entity context to get the parent unique. Its observable starts as undefined,
 		// so asPromise() properly waits for the async structure loading to complete.
@@ -167,7 +172,7 @@ export class UmbPropertyEditorUIContentPickerElement
 		const parent = await this.observe(parentContext?.parent, () => {})?.asPromise();
 		const parentUnique = parent?.unique ?? null;
 
-		const result = await this.#dynamicRootRepository.requestRoot(this.#dynamicRoot, isNew ? null : unique, parentUnique);
+		const result = await this.#dynamicRootRepository.requestRoot(this.#dynamicRoot, unique, parentUnique);
 		if (result && result.length > 0) {
 			this._rootUnique = result[0];
 		}
