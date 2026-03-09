@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using OpenIddict.Server;
 using Umbraco.Cms.Api.Common.DependencyInjection;
@@ -8,6 +9,7 @@ using Umbraco.Cms.Api.Management.Handlers;
 using Umbraco.Cms.Api.Management.Middleware;
 using Umbraco.Cms.Api.Management.Security;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Infrastructure.Security;
@@ -64,7 +66,8 @@ public static class BackOfficeAuthBuilderExtensions
             // Add a cookie scheme that can be used for authenticating backoffice users outside the scope of the backoffice.
             .AddCookie(Constants.Security.BackOfficeExposedAuthenticationType, options =>
             {
-                options.Cookie.Name = Constants.Security.BackOfficeExposedCookieName;
+                SecuritySettings? securitySettings = builder.Config.GetSection(Constants.Configuration.ConfigSecurity).Get<SecuritySettings>();
+                options.Cookie.Name = string.IsNullOrWhiteSpace(securitySettings?.AuthCookieName) ? Constants.Security.BackOfficeExposedCookieName : $"{securitySettings.AuthCookieName}_EXPOSED";
                 options.Cookie.HttpOnly = true;
                 options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
                 options.SlidingExpiration = true;
