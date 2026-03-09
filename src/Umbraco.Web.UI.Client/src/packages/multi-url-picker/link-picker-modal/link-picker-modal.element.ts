@@ -169,7 +169,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 	async #onPickerSelection(event: UmbInputPickerEvent, type: 'document' | 'media') {
 		const unique = event.target.value;
 		const culture = event.target.culture;
-		this.#pickerSelect(type, unique, culture);
+		await this.#pickerSelect(type, unique, culture);
 	}
 
 	async #pickerSelect(type: 'document' | 'media', unique?: string, culture?: string) {
