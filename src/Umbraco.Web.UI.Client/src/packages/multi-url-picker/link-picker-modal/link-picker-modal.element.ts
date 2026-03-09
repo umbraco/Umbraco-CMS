@@ -64,9 +64,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 		});
 	}
 
-	override connectedCallback() {
-		super.connectedCallback();
-
+	override async firstUpdated() {
 		if (this.data?.config) {
 			this._config = this.data.config;
 		}
@@ -79,10 +77,6 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 			});
 		}
 
-		this.populateLinkUrl();
-	}
-
-	override firstUpdated() {
 		const type = this.value.link?.type;
 		const unique = this.value.link?.unique;
 		const culture = this.value.link?.culture;
@@ -92,8 +86,10 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 		}
 
 		if (type === 'document' && culture) {
-			this.#variantContext.setCulture(culture);
+			await this.#variantContext.setCulture(culture);
 		}
+
+		this.populateLinkUrl();
 	}
 
 	async populateLinkUrl() {
