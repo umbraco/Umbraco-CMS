@@ -127,6 +127,43 @@ public partial class ElementEditingServiceTests
     }
 
     [Test]
+    public async Task Can_Update_Element_After_ContentType_Disallowed_From_Library()
+    {
+        var elementType = await CreateInvariantElementType();
+        var element = await CreateInvariantElement(contentTypeKey: elementType.Key);
+
+        // Disallow the content type from the library after the element has been created
+        elementType.AllowedInLibrary = false;
+        await ContentTypeService.UpdateAsync(elementType, Constants.Security.SuperUserKey);
+
+        var updateModel = new ElementUpdateModel
+        {
+            Variants =
+            [
+                new VariantModel { Name = "Updated Name" }
+            ],
+            Properties =
+            [
+                new PropertyValueModel { Alias = "title", Value = "The updated title" },
+                new PropertyValueModel { Alias = "text", Value = "The updated text" }
+            ],
+        };
+
+        var result = await ElementEditingService.UpdateAsync(element.Key, updateModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+
+        var updatedElement = result.Result.Content;
+        Assert.IsNotNull(updatedElement);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual("Updated Name", updatedElement.Name);
+            Assert.AreEqual("The updated title", updatedElement.GetValue<string>("title"));
+            Assert.AreEqual("The updated text", updatedElement.GetValue<string>("text"));
+        });
+    }
+
+    [Test]
     public async Task Can_Update_Culture_And_Segment_Variant()
     {
         var element = await CreateCultureAndSegmentVariantElement();
