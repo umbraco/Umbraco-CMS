@@ -130,7 +130,7 @@ internal sealed class RedirectTracker : IRedirectTracker
     /// <returns>The route with the domain path prefix removed, or the original route if no domain is found.</returns>
     private string GetPathRelativeToDomain(string route, int domainRootId, string culture)
     {
-        IEnumerable<Domain> domains = _domainCache.GetAssigned(domainRootId, false);
+        Domain[] domains = _domainCache.GetAssigned(domainRootId, false).ToArray();
         Domain? domain = domains
             .FirstOrDefault(d => d.IsWildcard is false &&
                                  d.Culture is not null &&
