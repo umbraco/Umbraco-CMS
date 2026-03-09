@@ -19,6 +19,10 @@ export const manifests: Array<UmbExtensionManifest> = [
 		kind: 'select',
 		alias: 'Example.Collection.SelectFilter',
 		name: 'Example Collection Select Filter',
+		meta: {
+			label: 'Status',
+			filterKey: 'status',
+		},
 		conditions: [
 			{
 				alias: UMB_COLLECTION_ALIAS_CONDITION,

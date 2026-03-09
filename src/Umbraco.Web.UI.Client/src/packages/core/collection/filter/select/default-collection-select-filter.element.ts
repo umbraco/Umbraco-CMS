@@ -1,10 +1,28 @@
 import type { UmbCollectionFilterApi } from '../collection-filter-api.interface.js';
-import { css, customElement, html, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, repeat, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { ManifestCollectionFilter } from '../collection-filter.extension.js';
 
 @customElement('umb-default-collection-select-filter')
 export class UmbDefaultCollectionSelectFilterElement extends UmbLitElement {
 	#api?: UmbCollectionFilterApi;
+
+	public get api(): UmbCollectionFilterApi | undefined {
+		return this.#api;
+	}
+	public set api(value: UmbCollectionFilterApi | undefined) {
+		this.#api = value;
+		this.observe(
+			this.#api?.selection,
+			(selection) => {
+				this._selected = selection?.[0];
+			},
+			'umbApiSelectionObserver',
+		);
+	}
+
+	@property({ attribute: false })
+	public manifest?: ManifestCollectionFilter;
 
 	@state()
 	private _options = [
@@ -19,13 +37,14 @@ export class UmbDefaultCollectionSelectFilterElement extends UmbLitElement {
 	#onSelect(event: Event) {
 		const target = event.target as HTMLInputElement;
 		this._selected = target.value;
+		this.#api?.setSelection([target.value]);
 	}
 
 	protected override render() {
 		return html`
 			<div class="filter">
-				<span class="label">Filter:</span>
-				<uui-combobox @change=${this.#onSelect} placeholder="Placeholder">
+				<span class="label">${this.manifest?.meta?.label ?? 'Filter'}:</span>
+				<uui-combobox value=${this._selected ?? ''} @change=${this.#onSelect} placeholder="Placeholder">
 					<uui-combobox-list>
 						${repeat(
 							this._options,
