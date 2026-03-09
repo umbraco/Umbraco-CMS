@@ -42,10 +42,9 @@ public class RuntimeStateExtensionsTests
         Assert.That(state.UmbracoCanBoot(), Is.True);
     }
 
-    [TestCase(RuntimeLevel.BootFailed)]
-    public void UmbracoCanBoot_WhenLevelIsBootFailed_ReturnsFalse(RuntimeLevel level)
+    public void UmbracoCanBoot_WhenLevelIsBootFailed_ReturnsFalse()
     {
-        var state = MockState(level);
+        var state = MockState(RuntimeLevel.BootFailed);
         Assert.That(state.UmbracoCanBoot(), Is.False);
     }
 
