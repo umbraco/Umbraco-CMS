@@ -71,18 +71,6 @@ public interface IContentService : IPublishableContentService<IContent>
         => throw new NotImplementedException();
 
     /// <summary>
-    ///     (Deprecated) Creates a new content item from a blueprint.
-    /// </summary>
-    /// <param name="blueprint">The blueprint to create content from.</param>
-    /// <param name="name">The name for the new content.</param>
-    /// <param name="userId">The identifier of the user performing the action.</param>
-    /// <returns>The created content.</returns>
-    /// <remarks>If creating content from a blueprint, use <see cref="IContentBlueprintEditingService.GetScaffoldedAsync"/>
-    /// instead. If creating a blueprint from content use <see cref="CreateBlueprintFromContent"/> instead.</remarks>
-    [Obsolete("Use IContentBlueprintEditingService.GetScaffoldedAsync() instead. Scheduled for removal in Umbraco 18.")]
-    IContent CreateContentFromBlueprint(IContent blueprint, string name, int userId = Constants.Security.SuperUserId);
-
-    /// <summary>
     ///     Deletes blueprints for a content type.
     /// </summary>
     /// <param name="contentTypeId">The content type identifier.</param>

@@ -4,7 +4,6 @@ using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Exceptions;
-using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Querying;
@@ -68,124 +67,6 @@ namespace Umbraco.Cms.Core.Services.Implement
             _userIdKeyResolver = StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>();
         }
 
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="DataTypeService" /> class.
-        /// </summary>
-        /// <param name="provider">The core scope provider.</param>
-        /// <param name="loggerFactory">The logger factory.</param>
-        /// <param name="eventMessagesFactory">The event messages factory.</param>
-        /// <param name="dataTypeRepository">The data type repository.</param>
-        /// <param name="auditRepository">The audit repository (obsolete).</param>
-        /// <param name="contentTypeRepository">The content type repository.</param>
-        /// <param name="mediaTypeRepository">The media type repository.</param>
-        /// <param name="memberTypeRepository">The member type repository.</param>
-        /// <param name="idKeyMap">The ID key map.</param>
-        [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 18.")]
-        public DataTypeService(
-            ICoreScopeProvider provider,
-            ILoggerFactory loggerFactory,
-            IEventMessagesFactory eventMessagesFactory,
-            IDataTypeRepository dataTypeRepository,
-            IAuditRepository auditRepository,
-            IContentTypeRepository contentTypeRepository,
-            IMediaTypeRepository mediaTypeRepository,
-            IMemberTypeRepository memberTypeRepository,
-            Lazy<IIdKeyMap> idKeyMap)
-            : this(
-                provider,
-                loggerFactory,
-                eventMessagesFactory,
-                dataTypeRepository,
-                StaticServiceProvider.Instance.GetRequiredService<IAuditService>(),
-                contentTypeRepository,
-                mediaTypeRepository,
-                memberTypeRepository,
-                idKeyMap)
-        {
-        }
-
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="DataTypeService" /> class.
-        /// </summary>
-        /// <param name="provider">The core scope provider.</param>
-        /// <param name="loggerFactory">The logger factory.</param>
-        /// <param name="eventMessagesFactory">The event messages factory.</param>
-        /// <param name="dataTypeRepository">The data type repository.</param>
-        /// <param name="dataValueEditorFactory">The data value editor factory (obsolete).</param>
-        /// <param name="auditRepository">The audit repository (obsolete).</param>
-        /// <param name="contentTypeRepository">The content type repository.</param>
-        /// <param name="mediaTypeRepository">The media type repository.</param>
-        /// <param name="memberTypeRepository">The member type repository.</param>
-        /// <param name="ioHelper">The IO helper (obsolete).</param>
-        /// <param name="idKeyMap">The ID key map.</param>
-        [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 18.")]
-        public DataTypeService(
-            ICoreScopeProvider provider,
-            ILoggerFactory loggerFactory,
-            IEventMessagesFactory eventMessagesFactory,
-            IDataTypeRepository dataTypeRepository,
-            IDataValueEditorFactory dataValueEditorFactory,
-            IAuditRepository auditRepository,
-            IContentTypeRepository contentTypeRepository,
-            IMediaTypeRepository mediaTypeRepository,
-            IMemberTypeRepository memberTypeRepository,
-            IIOHelper ioHelper,
-            Lazy<IIdKeyMap> idKeyMap)
-            : this(
-                provider,
-                loggerFactory,
-                eventMessagesFactory,
-                dataTypeRepository,
-                StaticServiceProvider.Instance.GetRequiredService<IAuditService>(),
-                contentTypeRepository,
-                mediaTypeRepository,
-                memberTypeRepository,
-                idKeyMap)
-        {
-        }
-
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="DataTypeService" /> class.
-        /// </summary>
-        /// <param name="provider">The core scope provider.</param>
-        /// <param name="loggerFactory">The logger factory.</param>
-        /// <param name="eventMessagesFactory">The event messages factory.</param>
-        /// <param name="dataTypeRepository">The data type repository.</param>
-        /// <param name="dataValueEditorFactory">The data value editor factory (obsolete).</param>
-        /// <param name="auditRepository">The audit repository (obsolete).</param>
-        /// <param name="auditService">The audit service.</param>
-        /// <param name="contentTypeRepository">The content type repository.</param>
-        /// <param name="mediaTypeRepository">The media type repository.</param>
-        /// <param name="memberTypeRepository">The member type repository.</param>
-        /// <param name="ioHelper">The IO helper (obsolete).</param>
-        /// <param name="idKeyMap">The ID key map.</param>
-        [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 18.")]
-        public DataTypeService(
-            ICoreScopeProvider provider,
-            ILoggerFactory loggerFactory,
-            IEventMessagesFactory eventMessagesFactory,
-            IDataTypeRepository dataTypeRepository,
-            IDataValueEditorFactory dataValueEditorFactory,
-            IAuditRepository auditRepository,
-            IAuditService auditService,
-            IContentTypeRepository contentTypeRepository,
-            IMediaTypeRepository mediaTypeRepository,
-            IMemberTypeRepository memberTypeRepository,
-            IIOHelper ioHelper,
-            Lazy<IIdKeyMap> idKeyMap)
-            : this(
-                provider,
-                loggerFactory,
-                eventMessagesFactory,
-                dataTypeRepository,
-                auditService,
-                contentTypeRepository,
-                mediaTypeRepository,
-                memberTypeRepository,
-                idKeyMap)
-        {
-        }
-
         #region Containers
 
         /// <summary>
@@ -234,15 +115,6 @@ namespace Umbraco.Cms.Core.Services.Implement
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
             return _dataTypeContainerRepository.Get(containerId);
         }
-
-        /// <summary>
-        ///     Gets a container by its unique key.
-        /// </summary>
-        /// <param name="containerId">The container unique key.</param>
-        /// <returns>The container, or null if not found.</returns>
-        [Obsolete($"Please use {nameof(IDataTypeContainerService)} for all data type container operations. Scheduled for removal in Umbraco 18.")]
-        public EntityContainer? GetContainer(Guid containerId)
-            => _dataTypeContainerService.GetAsync(containerId).GetAwaiter().GetResult();
 
         /// <summary>
         ///     Gets containers by name and level.
@@ -394,15 +266,6 @@ namespace Umbraco.Cms.Core.Services.Implement
         }
 
         #endregion
-
-        /// <summary>
-        /// Gets a <see cref="IDataType"/> by its Name
-        /// </summary>
-        /// <param name="name">Name of the <see cref="IDataType"/></param>
-        /// <returns><see cref="IDataType"/></returns>
-        [Obsolete("Please use GetAsync. Scheduled for removal in Umbraco 18.")]
-        public IDataType? GetDataType(string name)
-            => GetAsync(name).GetAwaiter().GetResult();
 
         /// <inheritdoc />
         public Task<IDataType?> GetAsync(string name)

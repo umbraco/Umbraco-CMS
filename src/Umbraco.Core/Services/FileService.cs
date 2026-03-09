@@ -171,17 +171,6 @@ public class FileService : RepositoryService, IFileService
     }
 
     #region Stylesheets
-
-    /// <inheritdoc />
-    [Obsolete("Please use IStylesheetService for stylesheet operations. Scheduled for removal in Umbraco 18.")]
-    public IEnumerable<IStylesheet> GetStylesheets(params string[] paths)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return _stylesheetRepository.GetMany(paths);
-        }
-    }
-
     /// <summary>
     ///     Records an audit entry synchronously.
     /// </summary>
@@ -249,105 +238,9 @@ public class FileService : RepositoryService, IFileService
             scope.Complete();
         }
     }
-
-    /// <inheritdoc />
-    [Obsolete("Please use IStylesheetService for stylesheet operations. Scheduled for removal in Umbraco 18.")]
-    public void DeleteStylesheet(string path, int? userId)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            IStylesheet? stylesheet = _stylesheetRepository.Get(path);
-            if (stylesheet == null)
-            {
-                scope.Complete();
-                return;
-            }
-
-            EventMessages eventMessages = EventMessagesFactory.Get();
-            var deletingNotification = new StylesheetDeletingNotification(stylesheet, eventMessages);
-            if (scope.Notifications.PublishCancelable(deletingNotification))
-            {
-                scope.Complete();
-                return; // causes rollback
-            }
-
-            userId ??= Constants.Security.SuperUserId;
-            _stylesheetRepository.Delete(stylesheet);
-
-            scope.Notifications.Publish(
-                new StylesheetDeletedNotification(stylesheet, eventMessages).WithStateFrom(deletingNotification));
-            Audit(AuditType.Delete, userId.Value, -1, "Stylesheet");
-
-            scope.Complete();
-        }
-    }
-
-    /// <inheritdoc />
-    [Obsolete("Please use IStylesheetService for stylesheet operations. Scheduled for removal in Umbraco 18.")]
-    public void CreateStyleSheetFolder(string folderPath)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            _stylesheetRepository.AddFolder(folderPath);
-            scope.Complete();
-        }
-    }
-
-    /// <inheritdoc />
-    [Obsolete("Please use IStylesheetFolderService for stylesheet folder operations. Scheduled for removal in Umbraco 18.")]
-    public void DeleteStyleSheetFolder(string folderPath)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            _stylesheetRepository.DeleteFolder(folderPath);
-            scope.Complete();
-        }
-    }
-
-    /// <inheritdoc />
-    [Obsolete("Please use IStylesheetService for stylesheet operations. Scheduled for removal in Umbraco 18.")]
-    public Stream GetStylesheetFileContentStream(string filepath)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return _stylesheetRepository.GetFileContentStream(filepath);
-        }
-    }
-
-    /// <inheritdoc />
-    [Obsolete("Please use IStylesheetService for stylesheet operations. Scheduled for removal in Umbraco 18.")]
-    public void SetStylesheetFileContent(string filepath, Stream content)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            _stylesheetRepository.SetFileContent(filepath, content);
-            scope.Complete();
-        }
-    }
-
-    /// <inheritdoc />
-    [Obsolete("Please use IStylesheetService for stylesheet operations. Scheduled for removal in Umbraco 18.")]
-    public long GetStylesheetFileSize(string filepath)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return _stylesheetRepository.GetFileSize(filepath);
-        }
-    }
-
     #endregion
 
     #region Scripts
-
-    /// <inheritdoc />
-    [Obsolete("Please use IScriptService for script operations. Scheduled for removal in Umbraco 18.")]
-    public IEnumerable<IScript> GetScripts(params string[] names)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return _scriptRepository.GetMany(names);
-        }
-    }
 
     /// <inheritdoc />
     [Obsolete("Please use IScriptService for script operations. Scheduled for removal in Umbraco 18.")]
@@ -391,91 +284,6 @@ public class FileService : RepositoryService, IFileService
             scope.Complete();
         }
     }
-
-    /// <inheritdoc />
-    [Obsolete("Please use IScriptService for script operations. Scheduled for removal in Umbraco 18.")]
-    public void DeleteScript(string path, int? userId = null)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            IScript? script = _scriptRepository.Get(path);
-            if (script == null)
-            {
-                scope.Complete();
-                return;
-            }
-
-            EventMessages eventMessages = EventMessagesFactory.Get();
-            var deletingNotification = new ScriptDeletingNotification(script, eventMessages);
-            if (scope.Notifications.PublishCancelable(deletingNotification))
-            {
-                scope.Complete();
-                return;
-            }
-
-            userId ??= Constants.Security.SuperUserId;
-            _scriptRepository.Delete(script);
-            scope.Notifications.Publish(
-                new ScriptDeletedNotification(script, eventMessages).WithStateFrom(deletingNotification));
-
-            Audit(AuditType.Delete, userId.Value, -1, "Script");
-            scope.Complete();
-        }
-    }
-
-    /// <inheritdoc />
-    [Obsolete("Please use IScriptFolderService for script folder operations. Scheduled for removal in Umbraco 18.")]
-    public void CreateScriptFolder(string folderPath)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            _scriptRepository.AddFolder(folderPath);
-            scope.Complete();
-        }
-    }
-
-    /// <inheritdoc />
-    [Obsolete("Please use IScriptFolderService for script folder operations. Scheduled for removal in Umbraco 18.")]
-    public void DeleteScriptFolder(string folderPath)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            _scriptRepository.DeleteFolder(folderPath);
-            scope.Complete();
-        }
-    }
-
-    /// <inheritdoc />
-    [Obsolete("Please use IScriptService for script operations. Scheduled for removal in Umbraco 18.")]
-    public Stream GetScriptFileContentStream(string filepath)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return _scriptRepository.GetFileContentStream(filepath);
-        }
-    }
-
-    /// <inheritdoc />
-    [Obsolete("Please use IScriptService for script operations. Scheduled for removal in Umbraco 18.")]
-    public void SetScriptFileContent(string filepath, Stream content)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            _scriptRepository.SetFileContent(filepath, content);
-            scope.Complete();
-        }
-    }
-
-    /// <inheritdoc />
-    [Obsolete("Please use IScriptService for script operations. Scheduled for removal in Umbraco 18.")]
-    public long GetScriptFileSize(string filepath)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return _scriptRepository.GetFileSize(filepath);
-        }
-    }
-
     #endregion
 
     #region Templates
@@ -686,27 +494,6 @@ public class FileService : RepositoryService, IFileService
     #region Partial Views
 
     /// <inheritdoc />
-    [Obsolete("Please use IPartialViewFolderService for partial view folder operations. Scheduled for removal in Umbraco 18.")]
-    public void DeletePartialViewFolder(string folderPath)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            _partialViewRepository.DeleteFolder(folderPath);
-            scope.Complete();
-        }
-    }
-
-    /// <inheritdoc />
-    [Obsolete("Please use IPartialViewService for partial view operations. Scheduled for removal in Umbraco 18.")]
-    public IEnumerable<IPartialView> GetPartialViews(params string[] names)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return _partialViewRepository.GetMany(names);
-        }
-    }
-
-    /// <inheritdoc />
     [Obsolete("Please use IPartialViewService for partial view operations. Scheduled for removal in Umbraco 18.")]
     public IPartialView? GetPartialView(string path)
     {
@@ -714,62 +501,6 @@ public class FileService : RepositoryService, IFileService
         {
             return _partialViewRepository.Get(path);
         }
-    }
-
-    /// <inheritdoc />
-    [Obsolete("Please use IPartialViewService for partial view operations. Scheduled for removal in Umbraco 18.")]
-    public Attempt<IPartialView?> CreatePartialView(IPartialView partialView, string? snippetName = null, int? userId = Constants.Security.SuperUserId)
-    {
-        string? partialViewContent = null;
-        if (snippetName.IsNullOrWhiteSpace() == false)
-        {
-            // create the file
-            Attempt<string> snippetPathAttempt = TryGetSnippetPath(snippetName);
-            if (snippetPathAttempt.Success == false)
-            {
-                throw new InvalidOperationException("Could not load snippet with name " + snippetName);
-            }
-
-            using (var snippetFile = new StreamReader(File.OpenRead(snippetPathAttempt.Result!)))
-            {
-                var snippetContent = snippetFile.ReadToEnd().Trim();
-
-                // strip the @inherits if it's there
-                snippetContent = StripPartialViewHeader(snippetContent);
-
-                // Update Model.Content. to be Model. when used as PartialView
-                snippetContent = snippetContent.Replace("Model.Content.", "Model.");
-
-                partialViewContent = $"{PartialViewHeader}{Environment.NewLine}{snippetContent}";
-            }
-        }
-
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            EventMessages eventMessages = EventMessagesFactory.Get();
-            var creatingNotification = new PartialViewCreatingNotification(partialView, eventMessages);
-            if (scope.Notifications.PublishCancelable(creatingNotification))
-            {
-                scope.Complete();
-                return Attempt<IPartialView?>.Fail();
-            }
-
-            if (partialViewContent != null)
-            {
-                partialView.Content = partialViewContent;
-            }
-
-            _partialViewRepository.Save(partialView);
-
-            scope.Notifications.Publish(
-                new PartialViewCreatedNotification(partialView, eventMessages).WithStateFrom(creatingNotification));
-
-            Audit(AuditType.Save, userId!.Value, -1, Constants.UdiEntityType.PartialView);
-
-            scope.Complete();
-        }
-
-        return Attempt<IPartialView?>.Succeed(partialView);
     }
 
     /// <inheritdoc />
@@ -798,113 +529,6 @@ public class FileService : RepositoryService, IFileService
 
         return Attempt.Succeed(partialView);
     }
-
-    /// <inheritdoc />
-    [Obsolete("Please use IPartialViewService for partial view operations. Scheduled for removal in Umbraco 18.")]
-    public bool DeletePartialView(string path, int? userId = null)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            IPartialView? partialView = _partialViewRepository.Get(path);
-            if (partialView == null)
-            {
-                scope.Complete();
-                return true;
-            }
-
-            EventMessages eventMessages = EventMessagesFactory.Get();
-            var deletingNotification = new PartialViewDeletingNotification(partialView, eventMessages);
-            if (scope.Notifications.PublishCancelable(deletingNotification))
-            {
-                scope.Complete();
-                return false;
-            }
-
-            userId ??= Constants.Security.SuperUserId;
-            _partialViewRepository.Delete(partialView);
-            scope.Notifications.Publish(
-                new PartialViewDeletedNotification(partialView, eventMessages).WithStateFrom(deletingNotification));
-            Audit(AuditType.Delete, userId.Value, -1, Constants.UdiEntityType.PartialView);
-
-            scope.Complete();
-        }
-
-        return true;
-    }
-
-    /// <inheritdoc />
-    [Obsolete("Please use IPartialViewFolderService for partial view folder operations. Scheduled for removal in Umbraco 18.")]
-    public void CreatePartialViewFolder(string folderPath)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            _partialViewRepository.AddFolder(folderPath);
-            scope.Complete();
-        }
-    }
-
-    /// <summary>
-    ///     Strips the @inherits directive header from partial view contents.
-    /// </summary>
-    /// <param name="contents">The partial view content.</param>
-    /// <returns>The content with the header stripped.</returns>
-    internal string StripPartialViewHeader(string contents)
-    {
-        var headerMatch = new Regex("^@inherits\\s+?.*$", RegexOptions.Multiline);
-        return headerMatch.Replace(contents, string.Empty);
-    }
-
-    /// <summary>
-    ///     Attempts to get the file system path to a snippet file.
-    /// </summary>
-    /// <param name="fileName">The name of the snippet file.</param>
-    /// <returns>An <see cref="Attempt{T}" /> containing the path if found; otherwise, a failed attempt.</returns>
-    internal Attempt<string> TryGetSnippetPath(string? fileName)
-    {
-        if (fileName?.EndsWith(".cshtml") == false)
-        {
-            fileName += ".cshtml";
-        }
-
-        var snippetPath =
-            _hostingEnvironment.MapPathContentRoot(
-                $"{Constants.SystemDirectories.Umbraco}/PartialViewMacros/Templates/{fileName}");
-        return File.Exists(snippetPath)
-            ? Attempt<string>.Succeed(snippetPath)
-            : Attempt<string>.Fail();
-    }
-
-    /// <inheritdoc />
-    [Obsolete("Please use IPartialViewService for partial view operations. Scheduled for removal in Umbraco 18.")]
-    public Stream GetPartialViewFileContentStream(string filepath)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return _partialViewRepository.GetFileContentStream(filepath);
-        }
-    }
-
-    /// <inheritdoc />
-    [Obsolete("Please use IPartialViewService for partial view operations. Scheduled for removal in Umbraco 18.")]
-    public void SetPartialViewFileContent(string filepath, Stream content)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            _partialViewRepository.SetFileContent(filepath, content);
-            scope.Complete();
-        }
-    }
-
-    /// <inheritdoc />
-    [Obsolete("Please use IPartialViewService for partial view operations. Scheduled for removal in Umbraco 18.")]
-    public long GetPartialViewFileSize(string filepath)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return _partialViewRepository.GetFileSize(filepath);
-        }
-    }
-
     #endregion
 
     // TODO: Method to change name and/or alias of view template

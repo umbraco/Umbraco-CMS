@@ -58,14 +58,6 @@ public interface IDataTypeService : IService
     EntityContainer? GetContainer(int containerId);
 
     /// <summary>
-    ///     Gets a container by its unique key.
-    /// </summary>
-    /// <param name="containerId">The container unique key.</param>
-    /// <returns>The container, or null if not found.</returns>
-    [Obsolete("Please use IDataTypeContainerService for all data type container operations. Scheduled for removal in Umbraco 18.")]
-    EntityContainer? GetContainer(Guid containerId);
-
-    /// <summary>
     ///     Gets containers by name and level.
     /// </summary>
     /// <param name="folderName">The container name.</param>
@@ -111,16 +103,6 @@ public interface IDataTypeService : IService
         int id,
         string name,
         int userId = Constants.Security.SuperUserId);
-
-    /// <summary>
-    ///     Gets a <see cref="IDataType" /> by its Name
-    /// </summary>
-    /// <param name="name">Name of the <see cref="IDataType" /></param>
-    /// <returns>
-    ///     <see cref="IDataType" />
-    /// </returns>
-    [Obsolete("Please use GetAsync. Scheduled for removal in Umbraco 18.")]
-    IDataType? GetDataType(string name);
 
     /// <summary>
     ///     Gets a <see cref="IDataType" /> by its Id
