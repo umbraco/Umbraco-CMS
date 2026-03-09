@@ -19,4 +19,14 @@ public class BackOfficeTokenCookieSettings
     /// </remarks>
     [DefaultValue(StaticSameSite)]
     public string SameSite { get; set; } = StaticSameSite;
+
+    /// <summary>
+    ///     Gets or sets the name of the site, used to create a unique cookie name for the BackOffice token cookies.
+    ///     Use this to avoid conflicts when running multiple Umbraco sites on the same domain.
+    ///     The site name will be appended to the cookie name, separated by a hyphen. For example, if the site name is "siteA", the cookie names will be "__Host-umbAccessToken-siteA", "__Host-umbRefreshToken-siteA", and "umbPkceCode-siteA".
+    ///     If the site name is empty, the cookie names will be "__Host-umbAccessToken", "__Host-umbRefreshToken", and "umbPkceCode".
+    /// </summary>
+    /// <example>"-siteA" leads to "__Host-umbAccessToken-siteA", "__Host-umbRefreshToken-siteA", and "umbPkceCode-siteA".</example>
+    [DefaultValue("")]
+    public string SiteName { get; set; } = string.Empty;
 }
