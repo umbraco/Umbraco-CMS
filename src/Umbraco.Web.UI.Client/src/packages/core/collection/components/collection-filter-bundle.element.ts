@@ -5,8 +5,9 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 export class UmbCollectionFilterBundleElement extends UmbLitElement {
 	override render() {
 		return html`
-			<uui-button compact popovertarget="collection-filter-bundle-popover" label="Filters">
-				<umb-icon name="icon-filter"></umb-icon>
+			<uui-button compact popovertarget="collection-filter-bundle-popover" label="Filters" look="outline">
+				<umb-icon name="icon-equalizer"></umb-icon>
+				Filters
 			</uui-button>
 			<uui-popover-container id="collection-filter-bundle-popover" placement="bottom-end">
 				<umb-popover-layout>

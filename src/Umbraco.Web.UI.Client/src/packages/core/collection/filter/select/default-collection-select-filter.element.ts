@@ -1,5 +1,5 @@
 import type { UmbCollectionFilterApi } from '../collection-filter-api.interface.js';
-import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-default-collection-select-filter')
@@ -16,31 +16,27 @@ export class UmbDefaultCollectionSelectFilterElement extends UmbLitElement {
 	@state()
 	private _selected?: string;
 
-	#onSelect(value: string) {
-		this._selected = value;
-		this.#api?.setSelection([value]);
+	#onSelect(event: Event) {
+		const target = event.target as HTMLInputElement;
+		this._selected = target.value;
 	}
 
 	protected override render() {
 		return html`
-			<span class="label">Filter Name:</span>
-			<uui-button popovertarget="collection-select-filter-popover" label="Select" compact>
-				${this._selected ?? 'Select'}
-			</uui-button>
-			<uui-popover-container id="collection-select-filter-popover" placement="bottom">
-				<umb-popover-layout>
-					<div class="filter-dropdown">
-						${this._options.map(
+			<div class="filter">
+				<span class="label">Filter:</span>
+				<uui-combobox @change=${this.#onSelect} placeholder="Placeholder">
+					<uui-combobox-list>
+						${repeat(
+							this._options,
+							(option) => option.value,
 							(option) => html`
-								<uui-menu-item
-									label=${option.label}
-									@click-label=${() => this.#onSelect(option.value)}
-									?active=${this._selected === option.value}></uui-menu-item>
+								<uui-combobox-list-option value=${option.value}> ${option.label} </uui-combobox-list-option>
 							`,
 						)}
-					</div>
-				</umb-popover-layout>
-			</uui-popover-container>
+					</uui-combobox-list>
+				</uui-combobox>
+			</div>
 		`;
 	}
 
@@ -52,19 +48,14 @@ export class UmbDefaultCollectionSelectFilterElement extends UmbLitElement {
 				border-top: 1px solid var(--uui-color-border);
 				padding-top: var(--uui-size-space-5);
 			}
-			.filter-dropdown {
+			.filter {
 				display: flex;
-				gap: var(--uui-size-space-3);
 				flex-direction: column;
-				padding: var(--uui-size-space-3);
+				gap: var(--uui-size-space-2);
 			}
 			.label {
 				font-weight: 600;
 				font-size: var(--uui-size-4);
-			}
-			:host(:not(:first-of-type)) {
-				border-top: 1px solid var(--uui-color-border);
-				padding-top: var(--uui-size-space-5);
 			}
 		`,
 	];

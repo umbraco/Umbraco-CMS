@@ -25,21 +25,23 @@ export class UmbDefaultCollectionMultiSelectFilterElement extends UmbLitElement 
 
 	protected override render() {
 		return html`
-			<span class="label">Filter Name</span>
-			<uui-button popovertarget="collection-multi-select-filter-popover" label="Multi Select" compact>
-				${this._selection.length ? this._selection.join(', ') : 'Multi Select'}
-			</uui-button>
-			<uui-popover-container id="collection-multi-select-filter-popover" placement="bottom">
-				<umb-popover-layout>
-					<div class="filter-dropdown">
-						${this._options.map(
-							(option) => html`
-								<uui-checkbox label=${option.label} value=${option.value} @change=${this.#onChange}></uui-checkbox>
-							`,
-						)}
-					</div>
-				</umb-popover-layout>
-			</uui-popover-container>
+			<div class="filter">
+				<span class="label">Filter Name</span>
+				<uui-button popovertarget="collection-multi-select-filter-popover" label="Multi Select" compact>
+					${this._selection.length ? this._selection.join(', ') : 'Multi Select'}
+				</uui-button>
+				<uui-popover-container id="collection-multi-select-filter-popover" placement="bottom">
+					<umb-popover-layout>
+						<div class="filter-dropdown">
+							${this._options.map(
+								(option) => html`
+									<uui-checkbox label=${option.label} value=${option.value} @change=${this.#onChange}></uui-checkbox>
+								`,
+							)}
+						</div>
+					</umb-popover-layout>
+				</uui-popover-container>
+			</div>
 		`;
 	}
 
@@ -50,6 +52,11 @@ export class UmbDefaultCollectionMultiSelectFilterElement extends UmbLitElement 
 				width: 100%;
 				border-top: 1px solid var(--uui-color-border);
 				padding-top: var(--uui-size-space-5);
+			}
+			.filter {
+				display: flex;
+				flex-direction: column;
+				gap: var(--uui-size-space-2);
 			}
 			.filter-dropdown {
 				display: flex;
