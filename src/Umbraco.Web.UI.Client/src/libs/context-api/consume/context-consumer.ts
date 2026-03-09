@@ -27,7 +27,8 @@ export class UmbContextConsumer<
 > {
 	protected _retrieveHost: HostElementMethod;
 
-	#raf?: number;
+	#requestRaf?: number;
+	#disconnectRaf?: number;
 	#skipHost?: boolean;
 	#stopAtContextMatch = true;
 	#callback?: UmbContextCallback<ResultType>;
@@ -187,8 +188,8 @@ export class UmbContextConsumer<
 	 * @description Request the context from the host element.
 	 */
 	public request(): void {
-		if (this.#raf !== undefined) {
-			cancelAnimationFrame(this.#raf);
+		if (this.#requestRaf !== undefined) {
+			cancelAnimationFrame(this.#requestRaf);
 		}
 
 		const hostElement = this._retrieveHost();
@@ -208,25 +209,36 @@ export class UmbContextConsumer<
 		(this.#skipHost ? hostElement?.parentNode : hostElement)?.dispatchEvent(event);
 
 		if (this.#promiseResolver && this.#promiseOptions?.preventTimeout !== true) {
-			this.#raf = requestAnimationFrame(() => {
+			this.#requestRaf = requestAnimationFrame(() => {
 				// For unproviding, then setInstance to undefined here. [NL]
 				this.#rejectPromise();
-				this.#raf = undefined;
+				this.#requestRaf = undefined;
 			});
 		}
 	}
 
 	public hostConnected(): void {
+		if (this.#disconnectRaf !== undefined) {
+			cancelAnimationFrame(this.#disconnectRaf);
+			this.#disconnectRaf = undefined;
+		}
 		this.#setupCurrentTarget();
 		this.request();
 	}
 
 	public hostDisconnected(): void {
-		if (this.#raf !== undefined) {
-			cancelAnimationFrame(this.#raf);
-			this.#raf = undefined;
+		if (this.#requestRaf !== undefined) {
+			cancelAnimationFrame(this.#requestRaf);
+			this.#requestRaf = undefined;
 		}
+		if (this.#disconnectRaf !== undefined) {
+			cancelAnimationFrame(this.#disconnectRaf);
+		}
+		this.#disconnectRaf = requestAnimationFrame(this.#handleDisconnect);
+	}
 
+	#handleDisconnect = () => {
+		this.#disconnectRaf = undefined;
 		this.#unprovide();
 		if (this.#promiseRejecter) {
 			const hostElement = this._retrieveHost();
@@ -239,13 +251,13 @@ export class UmbContextConsumer<
 		this.#promiseResolver = undefined;
 		this.#promiseRejecter = undefined;
 
-		this.#dismentalCurrentTarget();
+		this.#dismantleCurrentTarget();
 		this.#currentTarget = window;
-	}
+	};
 
 	#currentTarget: EventTarget = window;
 	#setCurrentTarget(target: EventTarget | undefined) {
-		this.#dismentalCurrentTarget();
+		this.#dismantleCurrentTarget();
 		this.#currentTarget = target ?? window;
 		this.#setupCurrentTarget();
 	}
@@ -256,7 +268,7 @@ export class UmbContextConsumer<
 		this.#currentTarget.addEventListener(UMB_CONTEXT_UNPROVIDED_EVENT_TYPE, this.#onUnprovided);
 	}
 
-	#dismentalCurrentTarget() {
+	#dismantleCurrentTarget() {
 		if (this.#currentTarget) {
 			this.#currentTarget.removeEventListener(UMB_CONTEXT_PROVIDE_EVENT_TYPE, this.#onProvide);
 			this.#currentTarget.removeEventListener(UMB_CONTEXT_UNPROVIDED_EVENT_TYPE, this.#onUnprovided);
@@ -289,7 +301,13 @@ export class UmbContextConsumer<
 	}
 
 	public destroy(): void {
-		this.hostDisconnected();
+		if (this.#requestRaf !== undefined) {
+			cancelAnimationFrame(this.#requestRaf);
+		}
+		if (this.#disconnectRaf !== undefined) {
+			cancelAnimationFrame(this.#disconnectRaf);
+		}
+		this.#handleDisconnect();
 		this._retrieveHost = undefined as any;
 		this.#callback = undefined;
 		this.#promise = undefined;
