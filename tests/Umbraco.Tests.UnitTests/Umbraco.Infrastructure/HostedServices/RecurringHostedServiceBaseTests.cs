@@ -102,4 +102,125 @@ public class RecurringHostedServiceBaseTests
 
         Assert.AreEqual(TimeSpan.Zero, result);
     }
+
+    [Test]
+    public async Task Loop_Executes_Periodically_And_Respects_Cancellation()
+    {
+        var executionCount = 0;
+        var sut = new TestRecurringHostedService(
+            period: TimeSpan.FromMilliseconds(50),
+            delay: TimeSpan.Zero,
+            onExecute: _ => { Interlocked.Increment(ref executionCount); return Task.CompletedTask; });
+
+        using var cts = new CancellationTokenSource();
+        await sut.StartAsync(cts.Token);
+
+        // Wait long enough for multiple executions
+        await Task.Delay(300);
+        cts.Cancel();
+        await sut.StopAsync(CancellationToken.None);
+
+        Assert.GreaterOrEqual(executionCount, 2, "Should have executed multiple times");
+    }
+
+    [Test]
+    public async Task TriggerExecution_Causes_Immediate_Execution()
+    {
+        var executionCount = 0;
+        var sut = new TestRecurringHostedService(
+            period: TimeSpan.FromSeconds(30),
+            delay: TimeSpan.Zero,
+            onExecute: _ => { Interlocked.Increment(ref executionCount); return Task.CompletedTask; });
+
+        using var cts = new CancellationTokenSource();
+        await sut.StartAsync(cts.Token);
+
+        // Wait for first execution
+        await Task.Delay(100);
+        var countAfterFirst = executionCount;
+        Assert.AreEqual(1, countAfterFirst, "Should have executed once initially");
+
+        // Trigger early execution (period is 30s, so without trigger we wouldn't get another)
+        sut.PublicTriggerExecution();
+        await Task.Delay(100);
+
+        Assert.AreEqual(2, executionCount, "Should have executed again after trigger");
+
+        cts.Cancel();
+        await sut.StopAsync(CancellationToken.None);
+    }
+
+    [Test]
+    public async Task Exception_In_PerformExecuteAsync_Does_Not_Kill_Loop()
+    {
+        var executionCount = 0;
+        var sut = new TestRecurringHostedService(
+            period: TimeSpan.FromMilliseconds(50),
+            delay: TimeSpan.Zero,
+            onExecute: _ =>
+            {
+                Interlocked.Increment(ref executionCount);
+                if (executionCount == 1)
+                {
+                    throw new InvalidOperationException("Test exception");
+                }
+                return Task.CompletedTask;
+            });
+
+        using var cts = new CancellationTokenSource();
+        await sut.StartAsync(cts.Token);
+
+        await Task.Delay(300);
+        cts.Cancel();
+        await sut.StopAsync(CancellationToken.None);
+
+        Assert.GreaterOrEqual(executionCount, 2, "Loop should continue after exception");
+    }
+
+    [Test]
+    public async Task ChangePeriod_Wakes_Loop_With_New_Period()
+    {
+        var executionCount = 0;
+        var sut = new TestRecurringHostedService(
+            period: TimeSpan.FromSeconds(30),
+            delay: TimeSpan.Zero,
+            onExecute: _ => { Interlocked.Increment(ref executionCount); return Task.CompletedTask; });
+
+        using var cts = new CancellationTokenSource();
+        await sut.StartAsync(cts.Token);
+
+        // Wait for first execution
+        await Task.Delay(100);
+        Assert.AreEqual(1, executionCount);
+
+        // Change period to something short — this should also trigger immediate execution
+        sut.PublicChangePeriod(TimeSpan.FromMilliseconds(50));
+        await Task.Delay(200);
+
+        Assert.GreaterOrEqual(executionCount, 2, "ChangePeriod should wake the loop");
+
+        cts.Cancel();
+        await sut.StopAsync(CancellationToken.None);
+    }
+
+    /// <summary>
+    /// A concrete test subclass that overrides the new PerformExecuteAsync(CancellationToken).
+    /// </summary>
+    private class TestRecurringHostedService : RecurringHostedServiceBase
+    {
+        private readonly Func<CancellationToken, Task> _onExecute;
+
+        public TestRecurringHostedService(TimeSpan period, TimeSpan delay, Func<CancellationToken, Task> onExecute)
+            : base(null, period, delay)
+        {
+            _onExecute = onExecute;
+        }
+
+        public override Task PerformExecuteAsync(CancellationToken stoppingToken)
+            => _onExecute(stoppingToken);
+
+        public void PublicTriggerExecution() => TriggerExecution();
+
+        public void PublicChangePeriod(TimeSpan newPeriod) => ChangePeriod(newPeriod);
+    }
 }

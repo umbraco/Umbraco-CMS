@@ -1,30 +1,62 @@
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Infrastructure.BackgroundJobs;
+
 /// <summary>
-///     A recurring background job
+/// A recurring background job.
 /// </summary>
 public interface IRecurringBackgroundJob
 {
-    static readonly TimeSpan DefaultDelay = System.TimeSpan.FromMinutes(3);
-    static readonly ServerRole[] DefaultServerRoles = new[] { ServerRole.Single, ServerRole.SchedulingPublisher };
+    static readonly TimeSpan DefaultDelay = TimeSpan.FromMinutes(3);
+    static readonly ServerRole[] DefaultServerRoles = [ServerRole.Single, ServerRole.SchedulingPublisher];
 
     /// <summary>
     /// Timespan representing how often the task should recur.
     /// </summary>
+    /// <value>
+    /// The period.
+    /// </value>
     TimeSpan Period { get; }
 
     /// <summary>
-    /// Timespan representing the initial delay after application start-up before the first run of the task
-    /// occurs.
+    /// Timespan representing the initial delay after application start-up before the first run of the task occurs.
     /// </summary>
-    TimeSpan Delay { get => DefaultDelay; }
+    /// <value>
+    /// The delay.
+    /// </value>
+    TimeSpan Delay => DefaultDelay;
 
-    ServerRole[] ServerRoles { get => DefaultServerRoles; }
+    /// <summary>
+    /// Gets the server roles the task executes on.
+    /// </summary>
+    /// <value>
+    /// The server roles.
+    /// </value>
+    ServerRole[] ServerRoles => DefaultServerRoles;
 
+    /// <summary>
+    /// This event should be raised when the <see cref="Period" /> property changes to notify the background job manager to update the schedule for this job.
+    /// </summary>
     event EventHandler PeriodChanged;
 
+    /// <summary>
+    /// Runs the background job.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
+    [Obsolete("Use RunJobAsync(CancellationToken) instead. This method will be removed in Umbraco 19.")]
     Task RunJobAsync();
-}
 
+    /// <summary>
+    /// Runs the background job with cancellation support.
+    /// </summary>
+    /// <param name="cancellationToken">A cancellation token that is signaled when the host is shutting down.</param>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
+    Task RunJobAsync(CancellationToken cancellationToken)
+#pragma warning disable CS0618 // Type or member is obsolete
+        => RunJobAsync(); // TODO (V19): Remove the default implementation when RunJobAsync() is removed
+#pragma warning restore CS0618 // Type or member is obsolete
+}
