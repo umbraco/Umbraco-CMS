@@ -145,7 +145,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 		}
 
 		this.#partialUpdateLink({
-			name: name ?? this.value.link.name,
+			name: this.#userEditedTitle ? this.value.link.name : (name ?? ''),
 			type: 'external',
 			url,
 		});
