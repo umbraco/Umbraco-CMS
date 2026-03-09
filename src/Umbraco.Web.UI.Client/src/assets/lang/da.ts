@@ -405,6 +405,8 @@ export default {
 			'Træk dine filer ind i dropzonen for, at uploade dem til\n      mediebiblioteket.\n    ',
 		fileSecurityValidationFailure: 'En eller flere fil-sikkerhedsvalideringer er fejlet',
 		uploadNotAllowed: 'Upload er ikke tiladt på denne lokation',
+		uploadValidationFailed: (mediaTypeName: string) =>
+			`Medietypen ${mediaTypeName} har en eller flere påkrævede egenskaber. Det skal uploades individuelt via menuen 'Opret'`,
 	},
 	member: {
 		createNewMember: 'Opret et nyt medlem',
@@ -1441,6 +1443,7 @@ export default {
 		tabs: 'Faneblade',
 		createMatchingTemplate: 'Opret tilsvarende skabelon',
 		addIcon: 'Tilføj ikon',
+		changeIcon: 'Skift ikon',
 		contentTypeEnabled: 'Master Content Type enabled',
 		contentTypeUses: 'This Content Type uses',
 		noPropertiesDefinedOnTab:

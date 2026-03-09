@@ -378,6 +378,8 @@ export default {
 		renameFolderFailed: 'Das Verzeichnis mit Id %0% konnte nicht umbenannt werden',
 		dragAndDropYourFilesIntoTheArea: 'Wählen Sie Dateien aus und ziehen Sie diese in diesen Bereich',
 		uploadNotAllowed: 'Hochladen ist in diesem Bereich nicht erlaubt.',
+		uploadValidationFailed: (mediaTypeName: string) =>
+			`Der Medientyp ${mediaTypeName} hat eine oder mehrere erforderliche Eigenschaften. Er muss einzeln über das Menü 'Erstellen' hochgeladen werden`,
 	},
 	member: {
 		createNewMember: 'Neues Mitglied anlegen',
@@ -1297,6 +1299,7 @@ export default {
 		tab: 'Registerkarte',
 		tabname: 'Registerkartenbeschriftung',
 		tabs: 'Registerkarten',
+		changeIcon: 'Symbol ändern',
 		contentTypeEnabled: 'Masterdokumenttyp aktiviert',
 		contentTypeUses: 'Dieser Dokumenttyp verwendet',
 		noPropertiesDefinedOnTab:

@@ -312,7 +312,7 @@ export default {
 	media: {
 		clickToUpload: 'Cliquez pour télécharger',
 		orClickHereToUpload: 'ou cliquez ici pour choisir un fichier',
-		disallowedFileType: "Ce fichier ne peut pas ête chargé, il n'est pas d'un type de fichier autorisé.",
+		disallowedFileType: "Ce fichier ne peut pas ête chargé, il n'est pas d'un type de fichier autorisé",
 		invalidFileName: "Ce fichier ne peut pas être chargé, le nom du fichier n'est pas valide",
 		maxFileSize: 'La taille maximum de fichier est',
 		mediaRoot: 'Racine du média',
@@ -1142,6 +1142,7 @@ export default {
 		tab: 'Onglet',
 		tabname: "Titre de l'onglet",
 		tabs: 'Onglets',
+		changeIcon: "Changer l'icône",
 		contentTypeEnabled: 'Type de contenu de base activé',
 		contentTypeUses: 'Ce type de contenu utilise',
 		noPropertiesDefinedOnTab:
