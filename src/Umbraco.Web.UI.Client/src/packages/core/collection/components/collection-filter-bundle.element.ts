@@ -11,7 +11,9 @@ export class UmbCollectionFilterBundleElement extends UmbLitElement {
 			<uui-popover-container id="collection-filter-bundle-popover" placement="bottom-end">
 				<umb-popover-layout>
 					<div class="filter-dropdown">
+						<span class="heading">Filters:</span>
 						<umb-extension-with-api-slot type="collectionFilter"></umb-extension-with-api-slot>
+						<uui-button look="primary" label="Apply"></uui-button>
 					</div>
 				</umb-popover-layout>
 			</uui-popover-container>
@@ -25,7 +27,15 @@ export class UmbCollectionFilterBundleElement extends UmbLitElement {
 			}
 
 			.filter-dropdown {
-				padding: var(--uui-size-space-3);
+				display: flex;
+				flex-direction: column;
+				gap: var(--uui-size-space-5);
+				padding: var(--uui-size-space-5);
+				min-width: 250px;
+			}
+			.heading {
+				font-weight: 700;
+				font-size: var(--uui-type-default-size);
 			}
 		`,
 	];

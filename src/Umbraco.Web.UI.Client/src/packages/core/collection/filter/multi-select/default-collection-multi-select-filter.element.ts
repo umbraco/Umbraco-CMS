@@ -8,6 +8,8 @@ export class UmbDefaultCollectionMultiSelectFilterElement extends UmbLitElement 
 		{ label: 'Option A', value: 'optionA' },
 		{ label: 'Option B', value: 'optionB' },
 		{ label: 'Option C', value: 'optionC' },
+		{ label: 'Option D', value: 'optionD' },
+		{ label: 'Option E', value: 'optionE' },
 	];
 
 	@state()
@@ -23,6 +25,7 @@ export class UmbDefaultCollectionMultiSelectFilterElement extends UmbLitElement 
 
 	protected override render() {
 		return html`
+			<span class="label">Filter Name</span>
 			<uui-button popovertarget="collection-multi-select-filter-popover" label="Multi Select" compact>
 				${this._selection.length ? this._selection.join(', ') : 'Multi Select'}
 			</uui-button>
@@ -42,11 +45,25 @@ export class UmbDefaultCollectionMultiSelectFilterElement extends UmbLitElement 
 
 	static override styles = [
 		css`
+			:host {
+				display: block;
+				width: 100%;
+				border-top: 1px solid var(--uui-color-border);
+				padding-top: var(--uui-size-space-5);
+			}
 			.filter-dropdown {
 				display: flex;
 				gap: var(--uui-size-space-3);
 				flex-direction: column;
 				padding: var(--uui-size-space-3);
+			}
+			.label {
+				font-weight: 600;
+				font-size: var(--uui-size-4);
+			}
+			:host(:not(:first-of-type)) {
+				border-top: 1px solid var(--uui-color-border);
+				padding-top: var(--uui-size-space-5);
 			}
 		`,
 	];

@@ -23,6 +23,7 @@ export class UmbDefaultCollectionSelectFilterElement extends UmbLitElement {
 
 	protected override render() {
 		return html`
+			<span class="label">Filter Name:</span>
 			<uui-button popovertarget="collection-select-filter-popover" label="Select" compact>
 				${this._selected ?? 'Select'}
 			</uui-button>
@@ -45,11 +46,25 @@ export class UmbDefaultCollectionSelectFilterElement extends UmbLitElement {
 
 	static override styles = [
 		css`
+			:host {
+				display: block;
+				width: 100%;
+				border-top: 1px solid var(--uui-color-border);
+				padding-top: var(--uui-size-space-5);
+			}
 			.filter-dropdown {
 				display: flex;
 				gap: var(--uui-size-space-3);
 				flex-direction: column;
 				padding: var(--uui-size-space-3);
+			}
+			.label {
+				font-weight: 600;
+				font-size: var(--uui-size-4);
+			}
+			:host(:not(:first-of-type)) {
+				border-top: 1px solid var(--uui-color-border);
+				padding-top: var(--uui-size-space-5);
 			}
 		`,
 	];
