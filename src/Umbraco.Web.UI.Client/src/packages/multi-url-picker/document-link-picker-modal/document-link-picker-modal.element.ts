@@ -139,7 +139,7 @@ export class UmbDocumentLinkPickerModalElement extends UmbModalBaseElement<
 	async #onLanguageSelectionChange(event: Event) {
 		const target = event.target as any;
 		const value = target?.value as string;
-		this.#pickerContext.setCulture(!value || value === EMPTY_VALUE ? null : value);
+		await this.#pickerContext.setCulture(!value || value === EMPTY_VALUE ? null : value);
 	}
 
 	static override styles = [
