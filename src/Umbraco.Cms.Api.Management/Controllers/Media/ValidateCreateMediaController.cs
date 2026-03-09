@@ -32,6 +32,8 @@ public class ValidateCreateMediaController : CreateMediaControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Validates creating a media item.")]
+    [EndpointDescription("Validates the request model for creating a new media item without actually creating it.")]
     public async Task<IActionResult> Validate(CancellationToken cancellationToken, CreateMediaRequestModel requestModel)
         => await HandleRequest(requestModel.Parent?.Id, async () =>
         {

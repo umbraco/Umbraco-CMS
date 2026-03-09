@@ -147,6 +147,7 @@ namespace Umbraco.Cms.Core.Routing
             return url?.Url?.ToString() ?? "#"; // legacy wants this
         }
 
+        /// <inheritdoc />
         public string GetUrlFromRoute(int id, string? route, string? culture)
         {
             IUmbracoContext umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();

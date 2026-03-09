@@ -6,9 +6,21 @@ using Umbraco.Cms.Core.IO;
 
 namespace Umbraco.Cms.Core.Scoping;
 
+/// <summary>
+///     Represents a core scope that manages transactional operations, caching, locking, and notifications.
+/// </summary>
+/// <remarks>
+///     <para>Scopes can be nested; a child scope must be completed before its parent.</para>
+///     <para>The scope manages file system scoping, isolated caches, and notification publishing.</para>
+/// </remarks>
 public class CoreScope : ICoreScope
 {
-    // TODO (V18): Rename to _completed to comply with SA1306 (field names should begin with lowercase), or consider converting to a property.
+    /// <summary>
+    ///     Indicates whether the scope has been completed.
+    /// </summary>
+    /// <remarks>
+    ///     TODO (V18): Rename to _completed to comply with SA1306 (field names should begin with lowercase), or consider converting to a property.
+    /// </remarks>
     protected bool? Completed;
     private ICompletable? _scopedFileSystem;
     private IScopedNotificationPublisher? _notificationPublisher;
@@ -21,6 +33,16 @@ public class CoreScope : ICoreScope
 
     private bool _disposed;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="CoreScope"/> class as a root scope.
+    /// </summary>
+    /// <param name="distributedLockingMechanismFactory">The factory for creating distributed locking mechanisms.</param>
+    /// <param name="loggerFactory">The logger factory for creating loggers.</param>
+    /// <param name="scopedFileSystem">The file systems to potentially scope.</param>
+    /// <param name="eventAggregator">The event aggregator for publishing notifications.</param>
+    /// <param name="repositoryCacheMode">The repository cache mode for this scope.</param>
+    /// <param name="shouldScopeFileSystems">A value indicating whether to scope the file systems.</param>
+    /// <param name="notificationPublisher">An optional scoped notification publisher.</param>
     protected CoreScope(
         IDistributedLockingMechanismFactory distributedLockingMechanismFactory,
         ILoggerFactory loggerFactory,
@@ -46,6 +68,22 @@ public class CoreScope : ICoreScope
         }
     }
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="CoreScope"/> class with an optional parent scope.
+    /// </summary>
+    /// <param name="parentScope">The parent scope, or <c>null</c> if this is a root scope.</param>
+    /// <param name="distributedLockingMechanismFactory">The factory for creating distributed locking mechanisms.</param>
+    /// <param name="loggerFactory">The logger factory for creating loggers.</param>
+    /// <param name="scopedFileSystem">The file systems to potentially scope.</param>
+    /// <param name="eventAggregator">The event aggregator for publishing notifications.</param>
+    /// <param name="repositoryCacheMode">The repository cache mode for this scope.</param>
+    /// <param name="shouldScopeFileSystems">A value indicating whether to scope the file systems.</param>
+    /// <param name="notificationPublisher">An optional scoped notification publisher.</param>
+    /// <exception cref="ArgumentException">
+    ///     Thrown when the repository cache mode is lower than the parent's mode,
+    ///     when a notification publisher is specified on a nested scope,
+    ///     or when the file system scoping differs from the parent.
+    /// </exception>
     protected CoreScope(
         ICoreScope? parentScope,
         IDistributedLockingMechanismFactory distributedLockingMechanismFactory,
@@ -104,8 +142,12 @@ public class CoreScope : ICoreScope
         }
     }
 
+    /// <summary>
+    ///     Gets the parent scope as a <see cref="CoreScope"/>.
+    /// </summary>
     private CoreScope? ParentScope => (CoreScope?)_parentScope;
 
+    /// <inheritdoc />
     public int Depth
     {
         get
@@ -119,12 +161,16 @@ public class CoreScope : ICoreScope
         }
     }
 
+    /// <inheritdoc />
     public Guid InstanceId { get; }
 
+    /// <inheritdoc />
     public int CreatedThreadId { get; }
 
+    /// <inheritdoc />
     public ILockingMechanism Locks { get; }
 
+    /// <inheritdoc />
     public IScopedNotificationPublisher Notifications
     {
         get
@@ -139,6 +185,7 @@ public class CoreScope : ICoreScope
         }
     }
 
+    /// <inheritdoc />
     public RepositoryCacheMode RepositoryCacheMode
     {
         get
@@ -152,6 +199,7 @@ public class CoreScope : ICoreScope
         }
     }
 
+    /// <inheritdoc />
     public IsolatedCaches IsolatedCaches
     {
         get
@@ -165,6 +213,9 @@ public class CoreScope : ICoreScope
         }
     }
 
+    /// <summary>
+    ///     Gets a value indicating whether file systems are scoped for this scope.
+    /// </summary>
     public bool ScopedFileSystems
     {
         get
@@ -192,22 +243,33 @@ public class CoreScope : ICoreScope
         return Completed.Value;
     }
 
+    /// <inheritdoc />
     public void ReadLock(params int[] lockIds) => Locks.ReadLock(InstanceId, null, lockIds);
 
+    /// <inheritdoc />
     public void WriteLock(params int[] lockIds) => Locks.WriteLock(InstanceId, null, lockIds);
 
+    /// <inheritdoc />
     public void WriteLock(TimeSpan timeout, int lockId) => Locks.ReadLock(InstanceId, timeout, lockId);
 
+    /// <inheritdoc />
     public void ReadLock(TimeSpan timeout, int lockId) => Locks.WriteLock(InstanceId, timeout, lockId);
 
+    /// <inheritdoc />
     public void EagerWriteLock(params int[] lockIds) => Locks.EagerWriteLock(InstanceId, null, lockIds);
 
+    /// <inheritdoc />
     public void EagerWriteLock(TimeSpan timeout, int lockId) => Locks.EagerWriteLock(InstanceId, timeout, lockId);
 
+    /// <inheritdoc />
     public void EagerReadLock(TimeSpan timeout, int lockId) => Locks.EagerReadLock(InstanceId, timeout, lockId);
 
+    /// <inheritdoc />
     public void EagerReadLock(params int[] lockIds) => Locks.EagerReadLock(InstanceId, TimeSpan.Zero, lockIds);
 
+    /// <summary>
+    ///     Disposes the scope, handling file systems, notifications, and parent scope completion.
+    /// </summary>
     public virtual void Dispose()
     {
         if (ParentScope is null)
@@ -223,6 +285,10 @@ public class CoreScope : ICoreScope
         _disposed = true;
     }
 
+    /// <summary>
+    ///     Called when a child scope has completed, to update the parent's completion status.
+    /// </summary>
+    /// <param name="completed">A value indicating whether the child completed successfully.</param>
     protected void ChildCompleted(bool? completed)
     {
         // if child did not complete we cannot complete
@@ -232,6 +298,9 @@ public class CoreScope : ICoreScope
         }
     }
 
+    /// <summary>
+    ///     Handles the completion and disposal of scoped file systems.
+    /// </summary>
     protected void HandleScopedFileSystems()
     {
         if (_shouldScopeFileSystems == true)
@@ -246,15 +315,29 @@ public class CoreScope : ICoreScope
         }
     }
 
+    /// <summary>
+    ///     Sets the parent scope for this scope.
+    /// </summary>
+    /// <param name="coreScope">The parent scope to set.</param>
     protected void SetParentScope(ICoreScope coreScope)
     {
         _parentScope = coreScope;
     }
 
+    /// <summary>
+    ///     Gets a value indicating whether this scope has a parent scope.
+    /// </summary>
     protected bool HasParentScope => _parentScope is not null;
 
+    /// <summary>
+    ///     Handles the scoped notifications when the scope exits.
+    /// </summary>
     protected void HandleScopedNotifications() => _notificationPublisher?.ScopeExit(Completed.HasValue && Completed.Value);
 
+    /// <summary>
+    ///     Ensures that this scope and all ancestor scopes have not been disposed.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">Thrown when the scope has already been disposed.</exception>
     private void EnsureNotDisposed()
     {
         // We can't be disposed
@@ -270,6 +353,10 @@ public class CoreScope : ICoreScope
         ParentScope?.EnsureNotDisposed();
     }
 
+    /// <summary>
+    ///     Resolves the locking mechanism, traversing up the parent chain if necessary.
+    /// </summary>
+    /// <returns>The locking mechanism for this scope hierarchy.</returns>
     private ILockingMechanism ResolveLockingMechanism() =>
         ParentScope is not null ? ParentScope.ResolveLockingMechanism() : Locks;
 }

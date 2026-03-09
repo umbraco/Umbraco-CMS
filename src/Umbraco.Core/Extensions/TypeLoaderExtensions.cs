@@ -8,6 +8,9 @@ using Umbraco.Cms.Core.PropertyEditors;
 
 namespace Umbraco.Extensions;
 
+/// <summary>
+/// Provides extension methods for <see cref="TypeLoader"/>.
+/// </summary>
 public static class TypeLoaderExtensions
 {
     /// <summary>

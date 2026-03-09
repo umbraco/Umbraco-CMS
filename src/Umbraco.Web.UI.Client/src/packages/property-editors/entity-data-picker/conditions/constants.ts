@@ -1,0 +1,2 @@
+export const UMB_ENTITY_DATA_PICKER_SUPPORTS_TEXT_FILTER_CONDITION_ALIAS =
+	'Umb.Condition.EntityDataPicker.SupportsTextFilter';

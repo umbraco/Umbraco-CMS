@@ -31,6 +31,8 @@ public class AllSinkLevelLogViewerController : LogViewerControllerBase
     [HttpGet("level")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<LoggerResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a collection of log sink levels.")]
+    [EndpointDescription("Gets a collection of configured log sinks with their minimum log levels.")]
     public Task<ActionResult<PagedViewModel<LoggerResponseModel>>> AllLogLevels(
         CancellationToken cancellationToken,
         int skip = 0,

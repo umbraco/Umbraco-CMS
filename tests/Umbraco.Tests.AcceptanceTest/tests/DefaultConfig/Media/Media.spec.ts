@@ -1,4 +1,4 @@
-import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
+import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 import {expect} from '@playwright/test';
 
 const mediaFileName = 'TestMediaFile';
@@ -72,7 +72,7 @@ for (const mediaFileType of mediaFileTypes) {
     if (mediaFileType.fileName === 'Image') {
       await umbracoUi.media.isImageCropperFieldVisible();
     } else {
-      await umbracoUi.media.isInputUploadFieldVisible();
+      await umbracoUi.media.doesInputUploadFileHaveName(mediaFileType.filePath);
     }
     const mediaId = await umbracoUi.media.clickSaveButtonAndWaitForMediaToBeCreated();
 
@@ -158,7 +158,7 @@ test('can search for a media file', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.media.goToSection(ConstantHelper.sections.media);
 
   // Act
-  await umbracoUi.media.searchForMediaItemByName(secondMediaFile);
+  await umbracoUi.media.searchByKeywordInCollection(secondMediaFile);
 
   // Assert
   await umbracoUi.media.doesMediaCardsContainAmount(1);

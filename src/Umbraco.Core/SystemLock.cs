@@ -1,22 +1,28 @@
-﻿using System.Runtime.ConstrainedExecution;
+using System.Runtime.ConstrainedExecution;
 
 namespace Umbraco.Cms.Core;
 
-// https://devblogs.microsoft.com/pfxteam/building-async-coordination-primitives-part-6-asynclock/
-//
-// notes:
-// - this is NOT a reader/writer lock
-// - this is NOT a recursive lock
-//
-// using a named Semaphore here and not a Mutex because mutexes have thread
-// affinity which does not work with async situations
-//
-// it is important that managed code properly release the Semaphore before
-// going down else it will maintain the lock - however note that when the
-// whole process (w3wp.exe) goes down and all handles to the Semaphore have
-// been closed, the Semaphore system object is destroyed - so in any case
-// an iisreset should clean up everything
-//
+/// <summary>
+///     Provides a synchronization lock that can be either local (anonymous) or system-wide (named).
+/// </summary>
+/// <remarks>
+///     <para>
+///         This is NOT a reader/writer lock and is NOT a recursive lock.
+///     </para>
+///     <para>
+///         Uses a named Semaphore instead of a Mutex because mutexes have thread affinity
+///         which does not work with async situations.
+///     </para>
+///     <para>
+///         It is important that managed code properly releases the Semaphore before going down,
+///         otherwise it will maintain the lock. However, when the whole process (w3wp.exe) goes
+///         down and all handles to the Semaphore have been closed, the Semaphore system object
+///         is destroyed - so an iisreset should clean up everything.
+///     </para>
+///     <para>
+///         See https://devblogs.microsoft.com/pfxteam/building-async-coordination-primitives-part-6-asynclock/
+///     </para>
+/// </remarks>
 public class SystemLock
 {
     private readonly IDisposable? _releaser;
@@ -24,11 +30,18 @@ public class SystemLock
     private readonly SemaphoreSlim? _semaphore;
     private readonly Semaphore? _semaphore2;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="SystemLock" /> class with an anonymous (local) semaphore.
+    /// </summary>
     public SystemLock()
         : this(null)
     {
     }
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="SystemLock" /> class.
+    /// </summary>
+    /// <param name="name">The name of the system-wide semaphore, or null for an anonymous local semaphore.</param>
     public SystemLock(string? name)
     {
         // WaitOne() waits until count > 0 then decrements count
@@ -53,6 +66,10 @@ public class SystemLock
         }
     }
 
+    /// <summary>
+    ///     Acquires the lock, blocking until the lock is available.
+    /// </summary>
+    /// <returns>An <see cref="IDisposable" /> that releases the lock when disposed.</returns>
     public IDisposable? Lock()
     {
         if (_semaphore != null)
@@ -74,6 +91,12 @@ public class SystemLock
             ? _releaser // (IDisposable)new SemaphoreSlimReleaser(_semaphore)
             : new NamedSemaphoreReleaser(_semaphore2);
 
+    /// <summary>
+    ///     Acquires the lock, blocking until the lock is available or the timeout expires.
+    /// </summary>
+    /// <param name="millisecondsTimeout">The maximum time in milliseconds to wait for the lock.</param>
+    /// <returns>An <see cref="IDisposable" /> that releases the lock when disposed.</returns>
+    /// <exception cref="TimeoutException">The lock could not be acquired within the timeout period.</exception>
     public IDisposable? Lock(int millisecondsTimeout)
     {
         var entered = _semaphore != null

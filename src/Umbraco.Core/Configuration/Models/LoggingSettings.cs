@@ -12,9 +12,24 @@ namespace Umbraco.Cms.Core.Configuration.Models;
 [UmbracoOptions(Constants.Configuration.ConfigLogging)]
 public class LoggingSettings
 {
+    /// <summary>
+    ///     The default maximum age for log files.
+    /// </summary>
     internal const string StaticMaxLogAge = "1.00:00:00"; // TimeSpan.FromHours(24);
+
+    /// <summary>
+    ///     The default directory for log files.
+    /// </summary>
     internal const string StaticDirectory = Constants.SystemDirectories.LogFiles;
+
+    /// <summary>
+    ///     The default file name format for log files.
+    /// </summary>
     internal const string StaticFileNameFormat = LoggingConfiguration.DefaultLogFileNameFormat;
+
+    /// <summary>
+    ///     The default file name format arguments for log files.
+    /// </summary>
     internal const string StaticFileNameFormatArguments = "MachineName";
 
     /// <summary>

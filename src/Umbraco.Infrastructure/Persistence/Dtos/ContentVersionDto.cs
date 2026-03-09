@@ -13,8 +13,6 @@ public class ContentVersionDto
     public const string TableName = Constants.DatabaseSchema.Tables.ContentVersion;
     public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
 
-    internal const string ReferenceColumnName = "NodeId"; // should be ContentTypeDto.NodeIdColumnName, but for database compatibility we keep it like this
-
     private const string UserIdColumnName = "userId";
     private const string VersionDateColumnName = "versionDate";
     private const string CurrentColumnName = "current";
@@ -57,7 +55,7 @@ public class ContentVersionDto
     public string? Text { get; set; }
 
     [ResultColumn]
-    [Reference(ReferenceType.OneToOne, ColumnName = ReferenceColumnName, ReferenceMemberName = ContentDto.ReferenceMemberName)]
+    [Reference(ReferenceType.OneToOne, ColumnName = nameof(NodeId), ReferenceMemberName = nameof(ContentDto.NodeId))]
     public ContentDto? ContentDto { get; set; }
 
     [Column(PreventCleanupColumnName)]
