@@ -20,6 +20,8 @@ import type {
 	UmbDefaultCollectionContext,
 	UmbEntityCollectionItemElement,
 } from '@umbraco-cms/backoffice/collection';
+import { UmbEntityContentTypeEntityContext } from '@umbraco-cms/backoffice/content-type';
+import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/document-type';
 import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UUIInterfaceColor } from '@umbraco-cms/backoffice/external/uui';
 import { fromCamelCase } from '@umbraco-cms/backoffice/utils';
@@ -27,6 +29,7 @@ import { fromCamelCase } from '@umbraco-cms/backoffice/utils';
 @customElement('umb-document-collection-item-card')
 export class UmbDocumentCollectionItemCardElement extends UmbLitElement implements UmbEntityCollectionItemElement {
 	#item?: UmbDocumentCollectionItemModel | undefined;
+	#entityContentTypeContext = new UmbEntityContentTypeEntityContext(this);
 	#resolver = new UmbDocumentItemDataResolver(this);
 
 	@property({ type: Object })
@@ -36,6 +39,11 @@ export class UmbDocumentCollectionItemCardElement extends UmbLitElement implemen
 	public set item(value: UmbDocumentCollectionItemModel | undefined) {
 		this.#item = value;
 		this.#resolver.setData(value);
+
+		const documentTypeUnique = value?.documentType.unique;
+
+		this.#entityContentTypeContext.setEntityType(documentTypeUnique ? UMB_DOCUMENT_TYPE_ENTITY_TYPE : undefined);
+		this.#entityContentTypeContext.setUnique(documentTypeUnique);
 	}
 
 	@property({ type: Boolean })
