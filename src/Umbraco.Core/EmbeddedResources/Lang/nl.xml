@@ -88,7 +88,7 @@
     is uitgevoerd op pagina '%2%'
     door gebruiker '%3%'.
 
-    Ga naar http://%4%/#/content/content/edit/%5% om dit te bewerken.
+    Ga naar http://%4%/section/content/workspace/document/edit/%5% om dit te bewerken.
 
     Een prettige dag!
 
@@ -104,7 +104,7 @@
 	  </p>
 		  <div class="buttons">
 				<br />
-				<a class="buttonEdit" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EDIT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp;
+				<a class="buttonEdit" href="http://%4%/section/content/workspace/document/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EDIT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp;
 				<br />
 		  </div>
 		  <p>
@@ -116,7 +116,7 @@
 
 		  <div class="buttons">
 				<br />
-				<a class="buttonEdit" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EDIT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp;
+				<a class="buttonEdit" href="http://%4%/section/content/workspace/document/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EDIT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp;
 				<br />
 		  </div>
 

@@ -55,7 +55,7 @@
       ページ '%2%' 上のタスク'%1%'から
       自動的にメールします。
 
-      編集はこちらから: http://%4%/#/content/content/edit/%5%
+      編集はこちらから: http://%4%/section/content/workspace/document/edit/%5%
 
       早々
 
@@ -66,7 +66,7 @@
 			<p>ユーザー <strong>'%3%'</strong> によりページ <a href="http://%4%/actions/preview.aspx?id=%5%"><strong>'%2%'</strong></a> 上のタスク <strong>'%1%'</strong> から自動的にメールします。</p>
 			<div style="margin: 8px 0; padding: 8px; display: block;">
 				<br />
-				<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;編集&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp;
+				<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/section/content/workspace/document/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;編集&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp;
 				<br />
 		  </div>
 		  <p>
@@ -78,7 +78,7 @@
 
 		  <div style="margin: 8px 0; padding: 8px; display: block;">
 				<br />
-				<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;編集&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp;
+				<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/section/content/workspace/document/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;編集&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp;
 				<br />
 		  </div>
 
