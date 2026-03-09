@@ -419,7 +419,7 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 		const resultsStatus = await this.#executeValidators(matchingValidators, variantIds);
 
 		// We need to ask again for messages, as they might have been added during the validation process. [NL]
-		const messages = this.messages.getMessages();
+		const messages = this.messages?.getMessages() ?? [];
 		const hasMessages =
 			messages.filter((msg) => variantIds.some((variantId) => filterMsgByVariantId(msg, variantId))).length > 0;
 
