@@ -161,7 +161,6 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		await this.#documentWorkspaceContext.runMandatoryValidationForSaveData(saveData);
 		await this.#documentWorkspaceContext.askServerToValidate(saveData, variantIds);
 
-		// TODO: Only validate the specified selection.. [NL]
 		return this.#documentWorkspaceContext.validateVariantsAndSubmit(
 			variantIds,
 			async () => {
@@ -358,7 +357,6 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		await this.#documentWorkspaceContext.runMandatoryValidationForSaveData(saveData, variantIds);
 		await this.#documentWorkspaceContext.askServerToValidate(saveData, variantIds);
 
-		// TODO: Only validate the specified selection.. [NL]
 		return this.#documentWorkspaceContext.validateVariantsAndSubmit(
 			variantIds,
 			async () => {
