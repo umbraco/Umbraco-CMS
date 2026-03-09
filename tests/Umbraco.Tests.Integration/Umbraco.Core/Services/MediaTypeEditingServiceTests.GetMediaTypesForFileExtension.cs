@@ -24,7 +24,7 @@ internal sealed partial class MediaTypeEditingServiceTests
     {
         var result = await MediaTypeEditingService.GetMediaTypesForFileExtensionWithMatchInfoAsync(fileExtension, 0, 100);
 
-        // Should contain the specific match and the File fallback
+        // Should contain the specific match and the File fallback.
         Assert.IsTrue(result.Total >= 2);
 
         MediaTypeFileExtensionMatchResult specific = result.Items.First(r => r.MediaType.Alias == expectedMediaTypeAlias);
@@ -71,7 +71,7 @@ internal sealed partial class MediaTypeEditingServiceTests
 
         var result = await MediaTypeEditingService.GetMediaTypesForFileExtensionWithMatchInfoAsync("jpg", 0, 100);
 
-        // Should have Image (specific), Article (specific), File (fallback)
+        // Should have Image (specific), Article (specific), File (fallback).
         Assert.AreEqual(3, result.Total);
 
         MediaTypeFileExtensionMatchResult image = result.Items.First(r => r.MediaType.Alias == Constants.Conventions.MediaTypes.Image);
@@ -87,7 +87,7 @@ internal sealed partial class MediaTypeEditingServiceTests
     [Test]
     public async Task Supports_Skip_Take_With_Match_Info()
     {
-        // Configure Article to also accept .jpg so we have 3 results: Image, Article, File
+        // Configure Article to also accept .jpg so we have 3 results: Image, Article, File.
         var mediaType = MediaTypeService.Get(Constants.Conventions.MediaTypes.ArticleAlias)!;
         var uploadPropertyType = mediaType.PropertyTypes.Single(pt => pt.Alias == Constants.Conventions.Media.File);
 
@@ -96,13 +96,18 @@ internal sealed partial class MediaTypeEditingServiceTests
         dataType.ConfigurationData["fileExtensions"] = new[] { "pdf", "jpg" };
         await dataTypeService.UpdateAsync(dataType, Constants.Security.SuperUserKey);
 
+        // First page: should be a specific match.
         var result = await MediaTypeEditingService.GetMediaTypesForFileExtensionWithMatchInfoAsync("jpg", 0, 1);
         Assert.AreEqual(3, result.Total);
         Assert.AreEqual(1, result.Items.Count());
+        Assert.IsTrue(result.Items.First().IsSpecificMatch);
 
+        // Last page: should be the File fallback (specific matches come before fallbacks).
         result = await MediaTypeEditingService.GetMediaTypesForFileExtensionWithMatchInfoAsync("jpg", 2, 1);
         Assert.AreEqual(3, result.Total);
         Assert.AreEqual(1, result.Items.Count());
+        Assert.AreEqual(Constants.Conventions.MediaTypes.File, result.Items.First().MediaType.Alias);
+        Assert.IsFalse(result.Items.First().IsSpecificMatch);
     }
 
     [Test]
