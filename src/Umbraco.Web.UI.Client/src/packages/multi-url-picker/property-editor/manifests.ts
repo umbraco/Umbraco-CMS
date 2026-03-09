@@ -28,8 +28,8 @@ export const manifests = [
 					},
 					{
 						alias: 'allowCultureSpecificDocumentLinks',
-						label: 'Allow culture specific document links',
-						description: 'Selecting this allows the user to pick a specific culture when linking to a document.',
+						label: '#linkPicker_configCultureSpecificDocumentLinksLabel',
+						description: '{#linkPicker_configCultureSpecificDocumentLinksDescription}',
 						propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
 					},
 				],
