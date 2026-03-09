@@ -1236,18 +1236,16 @@ export class UiBaseLocators extends BasePage {
     await this.click(this.mediaCardItems.filter({hasText: name}));
   }
 
-  async selectMediaWithName(mediaName: string, isForce: boolean = false) {
+  async selectMediaWithName(mediaName: string) {
     const mediaLocator = this.mediaCardItems.filter({hasText: mediaName});
     await this.waitForVisible(mediaLocator);
-    // Using direct click with position option (not supported by BasePage.click)
-    await mediaLocator.click({position: {x: 0.5, y: 0.5}, force: isForce});
+    await this.click(mediaLocator.locator('#select-checkbox'), {force: true});
   }
 
   async selectMediaWithTestId(mediaKey: string) {
-    const locator = this.page.getByTestId('media:' + mediaKey);
-    await this.waitForVisible(locator);
-    // Using direct click with position option (not supported by BasePage.click)
-    await locator.click({position: {x: 0.5, y: 0.5}});
+    const mediaLocator = this.page.getByTestId('media:' + mediaKey);
+    await this.waitForVisible(mediaLocator);
+    await this.click(mediaLocator.locator('#select-checkbox'), {force: true});
   }
 
   async clickMediaPickerModalSubmitButton() {
@@ -1619,5 +1617,10 @@ export class UiBaseLocators extends BasePage {
     await this.enterText(this.searchTxt, keyword);
     await this.pressKey(this.searchTxt, 'Enter');
     await this.page.waitForTimeout(ConstantHelper.wait.medium);
+  }
+
+  async isSelectCheckboxVisibleForMediaName(mediaName: string, isVisible: boolean = true) {
+    const selectCheckboxLocator = this.mediaCardItems.filter({hasText: mediaName}).locator('#select-checkbox');
+    await this.isVisible(selectCheckboxLocator, isVisible);
   }
 }
