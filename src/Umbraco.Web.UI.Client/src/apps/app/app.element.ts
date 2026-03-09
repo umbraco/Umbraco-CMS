@@ -1,7 +1,8 @@
 import { onInit } from '../../packages/core/entry-point.js';
-import type { UmbAppErrorElement } from './app-error.element.js';
+import { UmbAppErrorElement } from './app-error.element.js';
 import { UmbAppAuthController } from './app-auth.controller.js';
-import type { UmbAppOauthElement } from './app-oauth.element.js';
+import { UmbAppAuthElement } from './app-auth.element.js';
+import { UmbAppOauthElement } from './app-oauth.element.js';
 import { UmbNetworkConnectionStatusManager } from './network-connection-status.manager.js';
 import type { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 import { UmbAuthContext } from '@umbraco-cms/backoffice/auth';
@@ -18,13 +19,12 @@ import {
 	UmbAppEntryPointExtensionInitializer,
 	umbExtensionsRegistry,
 } from '@umbraco-cms/backoffice/extension-registry';
-import { filter, first, firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
+import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { hasOwnOpener, redirectToStoredPath } from '@umbraco-cms/backoffice/utils';
 import { umbHttpClient } from '@umbraco-cms/backoffice/http-client';
 import { UmbViewContext } from '@umbraco-cms/backoffice/view';
 
 import './app-logo.element.js';
-import './app-oauth.element.js';
 
 @customElement('umb-app')
 export class UmbAppElement extends UmbLitElement {
@@ -59,7 +59,7 @@ export class UmbAppElement extends UmbLitElement {
 	private _routes: UmbRoute[] = [
 		{
 			path: 'error',
-			component: () => import('./app-error.element.js'),
+			component: UmbAppErrorElement,
 		},
 		{
 			path: 'install',
@@ -67,7 +67,7 @@ export class UmbAppElement extends UmbLitElement {
 		},
 		{
 			path: 'oauth_complete',
-			component: () => import('./app-oauth.element.js'),
+			component: UmbAppOauthElement,
 			setup: async (component) => {
 				if (!this.#authContext) {
 					(component as UmbAppOauthElement).failure = true;
@@ -125,20 +125,9 @@ export class UmbAppElement extends UmbLitElement {
 		},
 		{
 			path: 'logout',
-			resolve: () => {
+			component: UmbAppAuthElement,
+			setup: () => {
 				this.#authContext?.clearTokenStorage();
-				this.#authController.makeAuthorizationRequest('loggedOut');
-
-				// Listen for the user to be authorized
-				this.#authContext?.isAuthorized
-					.pipe(
-						filter((x) => !!x),
-						first(),
-					)
-					.subscribe(() => {
-						// Redirect to the root
-						history.replaceState(null, '', '');
-					});
 			},
 		},
 		{
