@@ -5,12 +5,15 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbEntityCollectionItemElement } from '@umbraco-cms/backoffice/collection';
 import { UmbFileDropzoneItemStatus } from '@umbraco-cms/backoffice/dropzone';
+import { UMB_MEDIA_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/media-type';
+import { UmbEntityContentTypeEntityContext } from '@umbraco-cms/backoffice/content-type';
 
 import '@umbraco-cms/backoffice/imaging';
 
 @customElement('umb-media-collection-item-card')
 export class UmbMediaCollectionItemCardElement extends UmbLitElement implements UmbEntityCollectionItemElement {
 	#item?: UmbMediaCollectionItemModel | undefined;
+	#entityContentTypeContext = new UmbEntityContentTypeEntityContext(this);
 
 	@property({ type: Object })
 	public get item(): UmbMediaCollectionItemModel | undefined {
@@ -18,6 +21,11 @@ export class UmbMediaCollectionItemCardElement extends UmbLitElement implements 
 	}
 	public set item(value: UmbMediaCollectionItemModel | undefined) {
 		this.#item = value;
+
+		const mediaTypeUnique = value?.mediaType?.unique;
+
+		this.#entityContentTypeContext.setEntityType(mediaTypeUnique ? UMB_MEDIA_TYPE_ENTITY_TYPE : undefined);
+		this.#entityContentTypeContext.setUnique(mediaTypeUnique);
 	}
 
 	@property({ type: Boolean })

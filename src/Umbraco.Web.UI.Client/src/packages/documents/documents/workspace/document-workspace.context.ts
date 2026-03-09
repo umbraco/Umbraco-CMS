@@ -22,6 +22,8 @@ import { umbPeekError } from '@umbraco-cms/backoffice/notification';
 import { UmbContentDetailWorkspaceContextBase } from '@umbraco-cms/backoffice/content';
 import { UmbDeprecation, type UmbVariantGuardRule } from '@umbraco-cms/backoffice/utils';
 import { UmbDocumentBlueprintDetailRepository } from '@umbraco-cms/backoffice/document-blueprint';
+import { UmbEntityContentTypeEntityContext } from '@umbraco-cms/backoffice/content-type';
+import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/document-type';
 import {
 	UmbEntityRestoredFromRecycleBinEvent,
 	UmbEntityTrashedEvent,
@@ -67,6 +69,7 @@ export class UmbDocumentWorkspaceContext
 	readonly templateId = this._data.createObservablePartOfCurrent((data) => data?.template?.unique || null);
 
 	#isTrashedContext = new UmbIsTrashedEntityContext(this);
+	#entityContentTypeContext = new UmbEntityContentTypeEntityContext(this);
 	#documentSegmentRepository = new UmbDocumentSegmentRepository(this);
 	#actionEventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
 	#localize = new UmbLocalizationController(this);
@@ -122,6 +125,8 @@ export class UmbDocumentWorkspaceContext
 		this.observe(
 			this.contentTypeUnique,
 			(unique) => {
+				this.#entityContentTypeContext.setEntityType(unique ? UMB_DOCUMENT_TYPE_ENTITY_TYPE : undefined);
+				this.#entityContentTypeContext.setUnique(unique ?? undefined);
 				if (unique) {
 					this.structure.loadType(unique);
 				}
