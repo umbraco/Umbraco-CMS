@@ -26,4 +26,16 @@ export const manifests: Array<UmbExtensionManifest> = [
 			},
 		],
 	},
+	{
+		type: 'collectionFilter',
+		kind: 'multiSelect',
+		alias: 'Example.Collection.MultiSelectFilter',
+		name: 'Example Collection Multi Select Filter',
+		conditions: [
+			{
+				alias: UMB_COLLECTION_ALIAS_CONDITION,
+				match: EXAMPLE_COLLECTION_ALIAS,
+			},
+		],
+	},
 ];
