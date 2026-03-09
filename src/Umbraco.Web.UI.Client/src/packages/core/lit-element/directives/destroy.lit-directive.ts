@@ -5,6 +5,7 @@ import { AsyncDirective, directive, nothing, type ElementPart } from '@umbraco-c
  */
 class UmbDestroyDirective extends AsyncDirective {
 	#el?: HTMLElement & { destroy: () => void };
+	#rafId?: number;
 
 	override render() {
 		return nothing;
@@ -16,13 +17,26 @@ class UmbDestroyDirective extends AsyncDirective {
 	}
 
 	override disconnected() {
-		if (this.#el) {
-			this.#el.destroy();
+		if (this.#rafId !== undefined) {
+			cancelAnimationFrame(this.#rafId);
 		}
-		this.#el = undefined;
+		this.#rafId = requestAnimationFrame(this.#handleDisconnect);
 	}
 
-	//override reconnected() {}
+	#handleDisconnect = () => {
+		this.#rafId = undefined;
+		if (this.#el) {
+			this.#el.destroy();
+			this.#el = undefined;
+		}
+	};
+
+	override reconnected() {
+		if (this.#rafId !== undefined) {
+			cancelAnimationFrame(this.#rafId);
+			this.#rafId = undefined;
+		}
+	}
 }
 
 /**
