@@ -14,7 +14,8 @@ export class UmbCollectionToolbarElement extends UmbLitElement {
 	}
 
 	#renderFilterExtensions() {
-		return html`<umb-extension-with-api-slot single type="collectionTextFilter"></umb-extension-with-api-slot>`;
+		return html`<umb-extension-with-api-slot single type="collectionTextFilter"></umb-extension-with-api-slot>
+			<umb-collection-filter-bundle></umb-collection-filter-bundle>`;
 	}
 
 	static override styles = [
