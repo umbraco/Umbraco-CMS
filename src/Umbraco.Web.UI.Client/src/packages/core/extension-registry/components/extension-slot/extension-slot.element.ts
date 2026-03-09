@@ -272,17 +272,16 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 
 	override connectedCallback(): void {
 		super.connectedCallback();
+		this.#attached = true;
 		// Cancel any pending destruction if we're being reconnected (e.g., during a DOM move/sort)
 		if (this.#disconnectTimeoutId !== undefined) {
 			cancelAnimationFrame(this.#disconnectTimeoutId);
 			this.#disconnectTimeoutId = undefined;
 			// Only skip re-initialization if the controller still exists
 			if (this.#extensionsController) {
-				this.#attached = true;
 				return;
 			}
 		}
-		this.#attached = true;
 		this.#observeExtensions();
 	}
 	override disconnectedCallback(): void {
