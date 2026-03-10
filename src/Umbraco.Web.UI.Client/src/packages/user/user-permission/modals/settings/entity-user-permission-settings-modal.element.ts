@@ -43,7 +43,7 @@ export class UmbEntityUserPermissionSettingsModalElement extends UmbModalBaseEle
 
 	override render() {
 		return html`
-			<umb-body-layout headline=${this._headline}>
+			<umb-body-layout headline=${this.localize.string(this._headline)}>
 				<uui-box>
 					${this._entityType
 						? html` <umb-input-entity-user-permission
@@ -53,7 +53,7 @@ export class UmbEntityUserPermissionSettingsModalElement extends UmbModalBaseEle
 						: nothing}
 				</uui-box>
 
-				<uui-button slot="actions" id="cancel" label=${this.localize.term('general_cancel')} @click="${this._rejectModal}">Cancel</uui-button>
+				<uui-button slot="actions" id="cancel" label=${this.localize.term('general_cancel')} @click="${this._rejectModal}"></uui-button>
 				<uui-button
 					slot="actions"
 					id="confirm"
