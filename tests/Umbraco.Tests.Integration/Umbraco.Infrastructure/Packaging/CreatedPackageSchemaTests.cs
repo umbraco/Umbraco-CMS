@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Tests.Common.Testing;

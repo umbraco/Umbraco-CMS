@@ -4,12 +4,12 @@ using Examine;
 using Examine.Search;
 using Moq;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Infrastructure;
-using Umbraco.Cms.Infrastructure.Examine;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure;
 
