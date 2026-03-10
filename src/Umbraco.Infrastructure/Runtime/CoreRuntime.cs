@@ -113,11 +113,16 @@ public class CoreRuntime : IRuntime
             return;
         }
 
-        IApplicationShutdownRegistry hostingEnvironmentLifetime = _applicationShutdownRegistry;
-        if (hostingEnvironmentLifetime == null)
+        if (State.Level == RuntimeLevel.Upgrading)
         {
-            throw new InvalidOperationException($"An instance of {typeof(IApplicationShutdownRegistry)} could not be resolved from the container, ensure that one if registered in your runtime before calling {nameof(IRuntime)}.{nameof(StartAsync)}");
+            // Unattended upgrade: the database factory is already configured for upgrade.
+            // The UnattendedUpgradeBackgroundService will run the migration sequence once the
+            // HTTP server has started, allowing liveness probes to respond immediately.
+            return;
         }
+
+        IApplicationShutdownRegistry hostingEnvironmentLifetime = _applicationShutdownRegistry
+            ?? throw new InvalidOperationException($"An instance of {typeof(IApplicationShutdownRegistry)} could not be resolved from the container, ensure that one if registered in your runtime before calling {nameof(IRuntime)}.{nameof(StartAsync)}");
 
         var premigrationUpgradeNotification = new RuntimePremigrationsUpgradeNotification();
         await _eventAggregator.PublishAsync(premigrationUpgradeNotification, cancellationToken);
@@ -139,7 +144,6 @@ public class CoreRuntime : IRuntime
                 break;
         }
 
-        //
         var postRuntimePremigrationsUpgradeNotification = new PostRuntimePremigrationsUpgradeNotification();
         await _eventAggregator.PublishAsync(postRuntimePremigrationsUpgradeNotification, cancellationToken);
 
@@ -221,7 +225,7 @@ public class CoreRuntime : IRuntime
                 _logger.LogDebug("Runtime level: {RuntimeLevel} - {RuntimeLevelReason}", State.Level, State.Reason);
             }
 
-            if (State.Level == RuntimeLevel.Upgrade)
+            if (State.Level is RuntimeLevel.Upgrade or RuntimeLevel.Upgrading)
             {
                 if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
                 {
