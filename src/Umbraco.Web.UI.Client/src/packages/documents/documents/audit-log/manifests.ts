@@ -1,4 +1,4 @@
 import { manifests as infoAppManifests } from './info-app/manifests.js';
-import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
+import { manifests as repositoryManifests } from './repository/manifests.js';
 
-export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [...infoAppManifests];
+export const manifests: Array<UmbExtensionManifest> = [...infoAppManifests, ...repositoryManifests];

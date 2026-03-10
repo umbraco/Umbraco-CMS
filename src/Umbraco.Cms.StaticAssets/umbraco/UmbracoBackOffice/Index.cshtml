@@ -12,6 +12,8 @@
 @inject IJsonSerializer JsonSerializer
 @inject IProfilerHtml ProfilerHtml
 @inject IOptions<GlobalSettings> GlobalSettings
+@inject Umbraco.Cms.Core.Security.ICspNonceService CspNonceService
+@addTagHelper Umbraco.Cms.Web.Common.TagHelpers.CspNonceTagHelper, Umbraco.Cms.Web.Common
 @{
     bool.TryParse(Context.Request.Query["umbDebug"], out var isDebug);
     var backOfficePath = BackOfficePathGenerator.BackOfficePath;
@@ -32,8 +34,8 @@
 
     <link rel="stylesheet" href="@backOfficeAssetsPath/css/umb-css.css" />
     <link rel="stylesheet" href="@backOfficeAssetsPath/css/uui-css.css" />
-    @await Html.BackOfficeImportMapScriptAsync(JsonSerializer, BackOfficePathGenerator, PackageManifestService)
-    <script type="module" src="@backOfficeAssetsPath/apps/app/app.element.js"></script>
+    @await Html.BackOfficeImportMapScriptAsync(JsonSerializer, BackOfficePathGenerator, PackageManifestService, CspNonceService)
+    <script type="module" src="@backOfficeAssetsPath/apps/app/app.element.js" asp-csp-nonce></script>
 </head>
 
 <body class="uui-font uui-text" style="margin: 0; padding: 0; overflow: hidden">
