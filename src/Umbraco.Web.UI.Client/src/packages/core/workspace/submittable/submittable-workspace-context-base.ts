@@ -94,7 +94,7 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 		);
 	}
 
-	protected async _validateAndLog(): Promise<void> {
+	protected _validateAndLog = async (): Promise<void> => {
 		await this.validate().catch(async () => {
 			// TODO: Implement developer-mode logging here. [NL]
 			console.warn(
@@ -103,9 +103,14 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 			);
 			return Promise.reject();
 		});
+	};
+
+	public validateAndSubmit(onValid: () => Promise<void>, onInvalid: (reason?: any) => Promise<void>): Promise<void> {
+		return this._validateByAndSubmit(this._validateAndLog, onValid, onInvalid);
 	}
 
-	public async validateAndSubmit(
+	protected async _validateByAndSubmit(
+		validationMethod: () => Promise<unknown>,
 		onValid: () => Promise<void>,
 		onInvalid: (reason?: any) => Promise<void>,
 	): Promise<void> {
@@ -116,7 +121,7 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 			this.#submitResolve = resolve;
 			this.#submitReject = reject;
 		});
-		this._validateAndLog().then(
+		validationMethod().then(
 			async () => {
 				onValid().then(this.#completeSubmit, this.#rejectSubmit);
 			},

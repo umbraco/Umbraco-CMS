@@ -125,4 +125,9 @@ public enum ContentTypeOperationStatus
     /// </summary>
     InvalidTemplateAlias,
     NotImplemented,
+
+    /// <summary>
+    ///     Element types cannot vary by segment.
+    /// </summary>
+    InvalidSegmentVariationForElementType,
 }
