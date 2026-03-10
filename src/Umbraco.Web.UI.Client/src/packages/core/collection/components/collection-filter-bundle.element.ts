@@ -14,7 +14,6 @@ export class UmbCollectionFilterBundleElement extends UmbLitElement {
 					<div class="filter-dropdown">
 						<span class="heading">Filters:</span>
 						<umb-extension-with-api-slot type="collectionFilter"></umb-extension-with-api-slot>
-						<uui-button look="primary" label="Apply"></uui-button>
 					</div>
 				</umb-popover-layout>
 			</uui-popover-container>

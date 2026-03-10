@@ -13,7 +13,7 @@ export class UmbDefaultCollectionSelectFilterElement extends UmbLitElement {
 	public set api(value: UmbCollectionFilterApi | undefined) {
 		this.#api = value;
 		this.observe(
-			this.#api?.selection,
+			this.#api?.value,
 			(selection) => {
 				this._selected = selection?.[0];
 			},
@@ -37,7 +37,7 @@ export class UmbDefaultCollectionSelectFilterElement extends UmbLitElement {
 	#onSelect(event: Event) {
 		const target = event.target as HTMLInputElement;
 		this._selected = target.value;
-		this.#api?.setSelection([target.value]);
+		this.#api?.setValue([target.value]);
 	}
 
 	protected override render() {

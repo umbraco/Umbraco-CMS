@@ -4,9 +4,9 @@ import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 
 export class UmbDefaultCollectionMultiSelectFilterApi extends UmbControllerBase implements UmbCollectionFilterApi {
 	#selection = new UmbArrayState<string>([], (x) => x);
-	public readonly selection = this.#selection.asObservable();
+	public readonly value = this.#selection.asObservable();
 
-	public setSelection(values: Array<string>) {
+	public setValue(values: Array<string>) {
 		this.#selection.setValue(values);
 	}
 }
