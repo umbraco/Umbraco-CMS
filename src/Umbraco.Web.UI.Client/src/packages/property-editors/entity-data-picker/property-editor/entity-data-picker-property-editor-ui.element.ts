@@ -1,5 +1,6 @@
 import type { UmbInputEntityDataElement } from '../input/input-entity-data.element.js';
 import type { UmbEntityDataPickerPropertyEditorValue } from './types.js';
+import type { UmbEntityDataPickerPickerViewsConfigurationPropertyValue } from './config/picker-views/types.js';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
@@ -67,6 +68,9 @@ export class UmbEntityDataPickerPropertyEditorUIElement
 	@state()
 	private _dataSourceApi?: UmbPickerDataSource;
 
+	@state()
+	private _pickerViews?: UmbEntityDataPickerPickerViewsConfigurationPropertyValue;
+
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		this.#propertyEditorConfigCollection = config;
 
@@ -77,6 +81,8 @@ export class UmbEntityDataPickerPropertyEditorUIElement
 		this._minMessage = `${this.localize.term('validation_minCount')} ${this._min} ${this.localize.term('validation_items')}`;
 		this._maxMessage = `${this.localize.term('validation_maxCount')} ${this._max} ${this.localize.term('validation_itemsSelected')}`;
 
+		this._pickerViews =
+			config?.getValueByAlias<UmbEntityDataPickerPickerViewsConfigurationPropertyValue>('pickerViews');
 		this.#extractDataSourceConfig();
 	}
 
@@ -166,6 +172,7 @@ export class UmbEntityDataPickerPropertyEditorUIElement
 			.selection=${this.value?.ids ?? []}
 			.dataSourceApi=${this._dataSourceApi}
 			.dataSourceConfig=${this._dataSourceConfig}
+			.pickerViews=${this._pickerViews}
 			.min=${this._min}
 			.min-message=${this._minMessage}
 			.max=${this._max}
