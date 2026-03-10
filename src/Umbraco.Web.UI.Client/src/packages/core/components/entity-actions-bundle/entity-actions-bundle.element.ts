@@ -120,12 +120,14 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 			'entityAction',
 			(ext) => ext.forEntityTypes.includes(this.#entityType!),
 			async (actions) => {
-				this._numberOfActions = actions.length;
+				const oldNumberOfActions = this._numberOfActions;
 				const oldFirstManifest = this._firstActionManifest;
+				this._numberOfActions = actions.length;
 				this._firstActionManifest =
 					this._numberOfActions > 0 ? (actions[0].manifest as ManifestEntityActionDefaultKind) : undefined;
 				await this.#createFirstActionApi();
 				this.requestUpdate('_firstActionManifest', oldFirstManifest);
+				this.requestUpdate('_numberOfActions', oldNumberOfActions);
 			},
 			'umbEntityActionsObserver',
 		);
