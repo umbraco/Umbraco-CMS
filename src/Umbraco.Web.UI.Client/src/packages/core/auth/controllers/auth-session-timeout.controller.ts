@@ -71,8 +71,8 @@ export class UmbAuthSessionTimeoutController extends UmbControllerBase {
 			return;
 		}
 
-		// Adaptive buffer: 25% of session, clamped to [5s, 60s]
-		const buffer = Math.max(5, Math.min(60, Math.floor(secondsUntilExpiry * 0.25)));
+		// Adaptive buffer: If less than one minutes, set it to 15s, otherwise 25% of session, clamped to [5s, 60s]
+		const buffer = secondsUntilExpiry <= 60 ? 15 : Math.max(5, Math.min(60, Math.floor(secondsUntilExpiry * 0.25)));
 		const secondsUntilWarning = secondsUntilExpiry - buffer;
 
 		if (secondsUntilWarning <= 0) {
