@@ -174,7 +174,7 @@ export class UmbInputMultiUrlElement extends UmbFormControlMixin<string, typeof 
 		this.addValidator(
 			'valueMissing',
 			() => this.requiredMessage,
-			() => !this.readonly && this.required && (!this.value || this.value === ''),
+			() => !this.readonly && this.required && this.urls.length === 0,
 		);
 
 		this.addValidator(
@@ -347,6 +347,7 @@ export class UmbInputMultiUrlElement extends UmbFormControlMixin<string, typeof 
 	}
 
 	#dispatchChangeEvent() {
+		super.value = this.#urls.map((x) => x.url).join(',');
 		this.requestUpdate();
 		this.dispatchEvent(new UmbChangeEvent());
 	}

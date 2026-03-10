@@ -10,13 +10,13 @@ internal static class EmailMessageExtensions
     {
         var fromEmail = string.IsNullOrEmpty(mailMessage.From) ? configuredFromAddress : mailMessage.From;
 
-        if (!InternetAddress.TryParse(fromEmail, out InternetAddress fromAddress))
+        if (InternetAddress.TryParse(fromEmail, out InternetAddress? fromAddress) is false)
         {
             throw new ArgumentException(
                 $"Email could not be sent.  Could not parse from address {fromEmail} as a valid email address.");
         }
 
-        var messageToSend = new MimeMessage { From = { fromAddress }, Subject = mailMessage.Subject };
+        var messageToSend = new MimeMessage { From = { fromAddress }, Subject = mailMessage.Subject ?? string.Empty };
 
         AddAddresses(messageToSend, mailMessage.To, x => x.To, true);
         AddAddresses(messageToSend, mailMessage.Cc, x => x.Cc);
@@ -45,7 +45,7 @@ internal static class EmailMessageExtensions
         else
         {
             messageToSend.Body =
-                new TextPart(mailMessage.IsBodyHtml ? TextFormat.Html : TextFormat.Plain) { Text = mailMessage.Body };
+                new TextPart(mailMessage.IsBodyHtml ? TextFormat.Html : TextFormat.Plain) { Text = mailMessage.Body ?? string.Empty };
         }
 
         return messageToSend;
@@ -78,7 +78,7 @@ internal static class EmailMessageExtensions
         {
             foreach (var address in addresses)
             {
-                if (InternetAddress.TryParse(address, out InternetAddress internetAddress))
+                if (InternetAddress.TryParse(address, out InternetAddress? internetAddress))
                 {
                     addressListGetter(message).Add(internetAddress);
                     foundValid = true;
@@ -94,12 +94,10 @@ internal static class EmailMessageExtensions
 
     private static NotificationEmailAddress? ToNotificationAddress(string? address)
     {
-        if (InternetAddress.TryParse(address, out InternetAddress internetAddress))
+        if (InternetAddress.TryParse(address, out InternetAddress? internetAddress) &&
+            internetAddress is MailboxAddress mailboxAddress)
         {
-            if (internetAddress is MailboxAddress mailboxAddress)
-            {
-                return new NotificationEmailAddress(mailboxAddress.Address, internetAddress.Name);
-            }
+            return new NotificationEmailAddress(mailboxAddress.Address, internetAddress.Name ?? string.Empty);
         }
 
         return null;

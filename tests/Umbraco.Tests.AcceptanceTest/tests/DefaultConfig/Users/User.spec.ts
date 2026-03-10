@@ -212,84 +212,127 @@ test('can remove a content start node from a user', {tag: '@release'}, async ({u
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
 
-// Temporarily skipping this test. This test will be fixed in the PR: https://github.com/umbraco/Umbraco-CMS/pull/21981
-test.skip('can add media start nodes for a user', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+test('cannot add a media file as a media start node to a user', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const mediaName = 'TestMediaFile';
   const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
   await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
   await umbracoApi.media.ensureNameNotExists(mediaName);
-  const mediaId = await umbracoApi.media.createDefaultMediaFile(mediaName);
+  await umbracoApi.media.createDefaultMediaFile(mediaName);
   await umbracoUi.user.goToUserWithName(nameOfTheUser);
 
   // Act
   await umbracoUi.user.clickChooseMediaStartNodeButton();
-  await umbracoUi.user.selectMediaWithName(mediaName);
-  await umbracoUi.user.clickChooseModalButton();
-  await umbracoUi.user.clickSaveButtonAndWaitForUserToBeUpdated();
 
   // Assert
-  expect(await umbracoApi.user.doesUserContainMediaStartNodeIds(nameOfTheUser, [mediaId])).toBeTruthy();
+  await umbracoUi.user.isMediaCardItemWithNameDisabled(mediaName);
+  await umbracoUi.user.isSelectCheckboxVisibleForMediaName(mediaName, false);
 
   // Clean
   await umbracoApi.media.ensureNameNotExists(mediaName);
 });
 
-test('can add multiple media start nodes for a user', async ({umbracoApi, umbracoUi}) => {
+test('can add a media folder as a media start node to a user', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
+  const mediaFolderName = 'TestMediaFolder';
   const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
-  const userId = await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
-  const mediaName = 'TestMediaFile';
-  const secondMediaName = 'SecondMediaFile';
-  await umbracoApi.media.ensureNameNotExists(mediaName);
-  await umbracoApi.media.ensureNameNotExists(secondMediaName);
-  const firstMediaId = await umbracoApi.media.createDefaultMediaFile(mediaName);
-  const secondMediaId = await umbracoApi.media.createDefaultMediaFile(secondMediaName);
-  // Adds the media start node to the user
-  const userData = await umbracoApi.user.getByName(nameOfTheUser);
-  userData.mediaStartNodeIds.push({id: firstMediaId});
-  await umbracoApi.user.update(userId, userData);
-  expect(await umbracoApi.user.doesUserContainMediaStartNodeIds(nameOfTheUser, [firstMediaId])).toBeTruthy();
+  await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
+  await umbracoApi.media.ensureNameNotExists(mediaFolderName);
+  const mediaFolderId = await umbracoApi.media.createDefaultMediaFolder(mediaFolderName);
   await umbracoUi.user.goToUserWithName(nameOfTheUser);
 
   // Act
   await umbracoUi.user.clickChooseMediaStartNodeButton();
-  await umbracoUi.user.selectMediaWithName(secondMediaName);
+  await umbracoUi.user.selectMediaWithName(mediaFolderName);
   await umbracoUi.user.clickChooseModalButton();
   await umbracoUi.user.clickSaveButtonAndWaitForUserToBeUpdated();
 
   // Assert
-  expect(await umbracoApi.user.doesUserContainMediaStartNodeIds(nameOfTheUser, [firstMediaId, secondMediaId])).toBeTruthy();
+  expect(await umbracoApi.user.doesUserContainMediaStartNodeIds(nameOfTheUser, [mediaFolderId])).toBeTruthy();
 
   // Clean
-  await umbracoApi.media.ensureNameNotExists(mediaName);
-  await umbracoApi.media.ensureNameNotExists(secondMediaName);
+  await umbracoApi.media.ensureNameNotExists(mediaFolderName);
 });
 
-test('can remove a media start node from a user', async ({umbracoApi, umbracoUi}) => {
+test('can add multiple media start nodes to a user', async ({umbracoApi, umbracoUi}) => {
   // Arrange
+  const mediaFolderName = 'TestMediaFolder';
+  const secondMediaFolderName = 'SecondMediaFolder';
   const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
   const userId = await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
-  const mediaName = 'TestMediaFile';
-  await umbracoApi.media.ensureNameNotExists(mediaName);
-  const mediaId = await umbracoApi.media.createDefaultMediaFile(mediaName);
-  // Adds the media start node to the user
+  await umbracoApi.media.ensureNameNotExists(mediaFolderName);
+  await umbracoApi.media.ensureNameNotExists(secondMediaFolderName);
+  const mediaFolderId = await umbracoApi.media.createDefaultMediaFolder(mediaFolderName);
+  // Adds the first media start node to the user
   const userData = await umbracoApi.user.getByName(nameOfTheUser);
-  userData.mediaStartNodeIds.push({id: mediaId});
+  userData.mediaStartNodeIds.push({id: mediaFolderId});
   await umbracoApi.user.update(userId, userData);
-  expect(await umbracoApi.user.doesUserContainMediaStartNodeIds(nameOfTheUser, [mediaId])).toBeTruthy();
+  const secondMediaFolderId = await umbracoApi.media.createDefaultMediaFolder(secondMediaFolderName);
   await umbracoUi.user.goToUserWithName(nameOfTheUser);
 
   // Act
-  await umbracoUi.user.clickRemoveButtonForMediaNodeWithName(mediaName);
+  await umbracoUi.user.clickChooseMediaStartNodeButton();
+  await umbracoUi.user.selectMediaWithName(secondMediaFolderName);
+  await umbracoUi.user.clickChooseModalButton();
+  await umbracoUi.user.clickSaveButtonAndWaitForUserToBeUpdated();
+
+  // Assert
+  expect(await umbracoApi.user.doesUserContainMediaStartNodeIds(nameOfTheUser, [mediaFolderId, secondMediaFolderId])).toBeTruthy();
+
+  // Clean
+  await umbracoApi.media.ensureNameNotExists(mediaFolderName);
+  await umbracoApi.media.ensureNameNotExists(secondMediaFolderName);
+});
+
+test('can remove a media folder start node from a user', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const mediaFolderName = 'TestMediaFolder';
+  const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
+  const userId = await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
+  await umbracoApi.media.ensureNameNotExists(mediaFolderName);
+  const mediaFolderId = await umbracoApi.media.createDefaultMediaFolder(mediaFolderName);
+  // Adds the media start node to the user
+  const userData = await umbracoApi.user.getByName(nameOfTheUser);
+  userData.mediaStartNodeIds.push({id: mediaFolderId});
+  await umbracoApi.user.update(userId, userData);
+  expect(await umbracoApi.user.doesUserContainMediaStartNodeIds(nameOfTheUser, [mediaFolderId])).toBeTruthy();
+  await umbracoUi.user.goToUserWithName(nameOfTheUser);
+
+  // Act
+  await umbracoUi.user.clickRemoveButtonForMediaNodeWithName(mediaFolderName);
   await umbracoUi.user.clickConfirmRemoveButton();
   await umbracoUi.user.clickSaveButtonAndWaitForUserToBeUpdated();
 
   // Assert
-  expect(await umbracoApi.user.doesUserContainMediaStartNodeIds(nameOfTheUser, [mediaId])).toBeFalsy();
+  expect(await umbracoApi.user.doesUserContainMediaStartNodeIds(nameOfTheUser, [mediaFolderId])).toBeFalsy();
 
   // Clean
-  await umbracoApi.media.ensureNameNotExists(mediaName);
+  await umbracoApi.media.ensureNameNotExists(mediaFolderName);
+});
+
+test('can add a nested media folder as a media start node to a user', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const parentFolderName = 'ParentMediaFolder';
+  const childFolderName = 'ChildMediaFolder';
+  const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
+  await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
+  await umbracoApi.media.ensureNameNotExists(parentFolderName);
+  const parentFolderId = await umbracoApi.media.createDefaultMediaFolder(parentFolderName);
+  const childFolderId = await umbracoApi.media.createDefaultMediaFolderAndParentId(childFolderName, parentFolderId);
+  await umbracoUi.user.goToUserWithName(nameOfTheUser);
+
+  // Act
+  await umbracoUi.user.clickChooseMediaStartNodeButton();
+  await umbracoUi.user.clickMediaWithName(parentFolderName);
+  await umbracoUi.user.selectMediaWithName(childFolderName);
+  await umbracoUi.user.clickChooseModalButton();
+  await umbracoUi.user.clickSaveButtonAndWaitForUserToBeUpdated();
+
+  // Assert
+  expect(await umbracoApi.user.doesUserContainMediaStartNodeIds(nameOfTheUser, [childFolderId])).toBeTruthy();
+
+  // Clean
+  await umbracoApi.media.ensureNameNotExists(parentFolderName);
 });
 
 test('can allow access to all documents for a user', async ({umbracoApi, umbracoUi}) => {
@@ -355,23 +398,23 @@ test('can see if the user has the correct access based on media start nodes', as
   // Arrange
   const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
   const userId = await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
-  const mediaName = 'TestMediaFile';
-  await umbracoApi.media.ensureNameNotExists(mediaName);
-  const mediaId = await umbracoApi.media.createDefaultMediaFile(mediaName);
+  const mediaFolderName = 'TestMediaFolder';
+  await umbracoApi.media.ensureNameNotExists(mediaFolderName);
+  const mediaFolderId = await umbracoApi.media.createDefaultMediaFolder(mediaFolderName);
   // Adds the media start node to the user
   const userData = await umbracoApi.user.getByName(nameOfTheUser);
-  userData.mediaStartNodeIds.push({id: mediaId});
+  userData.mediaStartNodeIds.push({id: mediaFolderId});
   await umbracoApi.user.update(userId, userData);
-  expect(await umbracoApi.user.doesUserContainMediaStartNodeIds(nameOfTheUser, [mediaId])).toBeTruthy();
+  expect(await umbracoApi.user.doesUserContainMediaStartNodeIds(nameOfTheUser, [mediaFolderId])).toBeTruthy();
 
   // Act
   await umbracoUi.user.goToUserWithName(nameOfTheUser);
 
   // Assert
-  await umbracoUi.user.doesUserHaveAccessToMediaNode(mediaName);
+  await umbracoUi.user.doesUserHaveAccessToMediaNode(mediaFolderName);
 
   // Clean
-  await umbracoApi.media.ensureNameNotExists(mediaName);
+  await umbracoApi.media.ensureNameNotExists(mediaFolderName);
 });
 
 test('can change password for a user', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {

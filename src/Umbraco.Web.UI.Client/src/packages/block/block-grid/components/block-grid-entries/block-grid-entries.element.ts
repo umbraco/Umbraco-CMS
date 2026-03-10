@@ -400,9 +400,9 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 			<div class="umb-block-grid__layout-container" data-area-length=${this._layoutEntries.length}>
 				${repeat(
 					this._layoutEntries,
-					(layout, index) => `${index}_${layout.contentKey}`,
-					(layout, index) => html`
-						<umb-block-grid-entry
+					(layout) => layout.contentKey,
+					(layout, index) =>
+						html`<umb-block-grid-entry
 							class="umb-block-grid__layout-item"
 							index=${index}
 							.contentKey=${layout.contentKey}
