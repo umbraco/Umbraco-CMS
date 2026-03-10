@@ -818,6 +818,28 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
+    public async Task Can_Get_All_Members_Paged_With_Non_Zero_Skip()
+    {
+        IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
+        var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10);
+        MemberService.Save(members);
+
+        var found = MemberService.GetAll(
+            skip: 2,
+            take: 2,
+            out var totalRecs,
+            "username",
+            Direction.Ascending,
+            memberType.Alias);
+
+        Assert.AreEqual(2, found.Count());
+        Assert.AreEqual(10, totalRecs);
+        Assert.AreEqual("test2", found.First().Username);
+        Assert.AreEqual("test3", found.Last().Username);
+    }
+
+    [Test]
     public async Task Find_By_Name_Starts_With()
     {
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
