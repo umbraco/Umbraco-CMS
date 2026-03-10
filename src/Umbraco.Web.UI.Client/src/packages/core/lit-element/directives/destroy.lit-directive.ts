@@ -5,7 +5,7 @@ import { AsyncDirective, directive, nothing, type ElementPart } from '@umbraco-c
  */
 class UmbDestroyDirective extends AsyncDirective {
 	#el?: HTMLElement & { destroy: () => void };
-	#rafId?: number;
+	#disconnectAC?: AbortController;
 
 	override render() {
 		return nothing;
@@ -17,24 +17,23 @@ class UmbDestroyDirective extends AsyncDirective {
 	}
 
 	override disconnected() {
-		if (this.#rafId !== undefined) {
-			cancelAnimationFrame(this.#rafId);
-		}
-		this.#rafId = requestAnimationFrame(this.#handleDisconnect);
+		this.#disconnectAC?.abort();
+		const abortController = (this.#disconnectAC = new AbortController());
+		queueMicrotask(() => {
+			if (!abortController.signal.aborted) {
+				this.#disconnectAC = undefined;
+				if (this.#el) {
+					this.#el.destroy();
+					this.#el = undefined;
+				}
+			}
+		});
 	}
 
-	#handleDisconnect = () => {
-		this.#rafId = undefined;
-		if (this.#el) {
-			this.#el.destroy();
-			this.#el = undefined;
-		}
-	};
-
 	override reconnected() {
-		if (this.#rafId !== undefined) {
-			cancelAnimationFrame(this.#rafId);
-			this.#rafId = undefined;
+		if (this.#disconnectAC) {
+			this.#disconnectAC.abort();
+			this.#disconnectAC = undefined;
 		}
 	}
 }

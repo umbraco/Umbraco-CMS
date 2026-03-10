@@ -1,5 +1,6 @@
 import { UmbModalBaseElement } from '../../modal/index.js';
 import type { UmbModalAppAuthConfig, UmbModalAppAuthValue } from './umb-app-auth-modal.token.js';
+import { UMB_AUTH_CONTEXT } from '../auth.context.token.js';
 import { customElement, html } from '@umbraco-cms/backoffice/external/lit';
 
 import '../components/umb-auth-view.element.js';
@@ -10,6 +11,16 @@ export class UmbAppAuthModalElement extends UmbModalBaseElement<UmbModalAppAuthC
 		this.value = { success: true };
 		this._submitModal();
 	};
+
+	override connectedCallback() {
+		super.connectedCallback();
+		// Close this modal when another tab restores the session via BroadcastChannel.
+		this.consumeContext(UMB_AUTH_CONTEXT, (ctx) => {
+			this.observe(ctx?.isAuthorized, (isAuthorized) => {
+				if (isAuthorized) this.#onSuccess();
+			});
+		});
+	}
 
 	override render() {
 		return html`<umb-auth-view

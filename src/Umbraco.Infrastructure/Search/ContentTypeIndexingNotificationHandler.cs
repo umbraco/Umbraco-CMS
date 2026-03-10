@@ -144,12 +144,14 @@ public sealed class ContentTypeIndexingNotificationHandler : INotificationHandle
             while (page * pageSize < total)
             {
                 IEnumerable<IMember> memberToRefresh = _memberService.GetAll(
-                    page * pageSize,
+                    page,
                     pageSize,
                     out total,
                     "LoginName",
                     Direction.Ascending,
-                    memberType.Alias);
+                    true,
+                    memberType.Alias,
+                    string.Empty);
 
                 foreach (IMember c in memberToRefresh)
                 {
