@@ -255,7 +255,7 @@ export class UmbAppElement extends UmbLitElement {
 
 			case RuntimeLevelModel.UPGRADING:
 				this.#errorPage(
-					'An automatic upgrade is currently in progress. The back office will be available once the upgrade has completed.',
+					'An automatic upgrade is currently in progress. The backoffice will be available once the upgrade has completed.',
 					undefined,
 					{ headline: 'Website is Under Maintenance', hideBackButton: true },
 				);
