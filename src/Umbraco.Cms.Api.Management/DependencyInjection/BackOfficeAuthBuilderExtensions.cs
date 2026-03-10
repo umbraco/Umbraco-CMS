@@ -64,14 +64,7 @@ public static class BackOfficeAuthBuilderExtensions
             })
 
             // Add a cookie scheme that can be used for authenticating backoffice users outside the scope of the backoffice.
-            .AddCookie(Constants.Security.BackOfficeExposedAuthenticationType, options =>
-            {
-                SecuritySettings? securitySettings = builder.Config.GetSection(Constants.Configuration.ConfigSecurity).Get<SecuritySettings>();
-                options.Cookie.Name = string.IsNullOrWhiteSpace(securitySettings?.AuthCookieName) ? Constants.Security.BackOfficeExposedCookieName : $"{securitySettings.AuthCookieName}_EXPOSED";
-                options.Cookie.HttpOnly = true;
-                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-                options.SlidingExpiration = true;
-            })
+            .AddCookie(Constants.Security.BackOfficeExposedAuthenticationType)
 
             // Although we don't natively support this, we add it anyways so that if end-users implement the required logic
             // they don't have to worry about manually adding this scheme or modifying the sign in manager
@@ -104,6 +97,7 @@ public static class BackOfficeAuthBuilderExtensions
 
         builder.Services.AddScoped<BackOfficeSecurityStampValidator>();
         builder.Services.ConfigureOptions<ConfigureBackOfficeCookieOptions>();
+        builder.Services.ConfigureOptions<ConfigureBackOfficeExposedCookieOptions>();
         builder.Services.ConfigureOptions<ConfigureBackOfficeSecurityStampValidatorOptions>();
 
         return builder;
