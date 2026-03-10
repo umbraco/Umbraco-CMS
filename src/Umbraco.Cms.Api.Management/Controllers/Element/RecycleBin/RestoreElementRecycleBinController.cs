@@ -40,6 +40,8 @@ public class RestoreElementRecycleBinController : ElementRecycleBinControllerBas
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [EndpointSummary("Restores an element from the recycle bin.")]
+    [EndpointDescription("Restores an element from the recycle bin to its original location or a specified parent.")]
     public async Task<IActionResult> Restore(CancellationToken cancellationToken, Guid id, MoveElementRequestModel moveElementRequestModel)
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(

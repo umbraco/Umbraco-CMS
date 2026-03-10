@@ -14,7 +14,7 @@ export interface UmbImageCropperEditorModalValue {
 	key: string;
 	unique: string;
 	crops: Array<UmbImageCropperCrop>;
-	focalPoint: { left: number; top: number };
+	focalPoint: { left: number; top: number } | null;
 }
 
 export const UMB_IMAGE_CROPPER_EDITOR_MODAL = new UmbModalToken<
