@@ -258,7 +258,7 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 	}
 
 	/**
-	 * Listen for authorization signal to retry GET-requests that received a 401 Unauthorized response.
+	 * Listen for authorization state to retry GET-requests that received a 401 Unauthorized response.
 	 * This will retry all pending requests that received a 401 Unauthorized response after re-authentication.
 	 * It will also notify the user about non-GET requests that received a 401 Unauthorized response.
 	 * @internal
@@ -266,8 +266,13 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 	handleUnauthorizedAuthRetry() {
 		this.consumeContext(UMB_AUTH_CONTEXT, (context) => {
 			this.observe(
-				context?.authorizationSignal,
-				() => {
+				context?.isAuthorized,
+				(isAuthorized) => {
+					// Only retry when transitioning to authorized (i.e. re-authentication completed)
+					if (!isAuthorized) return;
+					// Skip if there are no pending requests to retry
+					if (this.#pending401Requests.length === 0 && this.#nonGet401Requests.length === 0) return;
+
 					console.log('[Interceptor] 401 Unauthorized - re-authentication completed');
 
 					// On auth, retry all pending requests

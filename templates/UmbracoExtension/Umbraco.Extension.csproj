@@ -18,9 +18,19 @@
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
+  <!--#if (UseCPM) -->
+  <!-- Central package management - no versions -->
   <ItemGroup>
-    <PackageReference Include="Umbraco.Cms.Web.Website" Version="UMBRACO_VERSION_FROM_TEMPLATE" />
-    <PackageReference Include="Umbraco.Cms.Web.Common" Version="UMBRACO_VERSION_FROM_TEMPLATE" />
+    <PackageReference Include="Umbraco.Cms.Api.Common" />
+    <PackageReference Include="Umbraco.Cms.Api.Management" />
+    <PackageReference Include="Umbraco.Cms.Web.Common" />
+    <PackageReference Include="Umbraco.Cms.Web.Website" />
+  </ItemGroup>
+  <!--#endif -->
+
+  <!--#if (!UseCPM) -->
+  <!-- Per-project - with versions -->
+  <ItemGroup>
     <PackageReference Include="Umbraco.Cms.Api.Common" Version="UMBRACO_VERSION_FROM_TEMPLATE" />
     <PackageReference Include="Umbraco.Cms.Api.Management" Version="UMBRACO_VERSION_FROM_TEMPLATE" />
 
@@ -36,10 +46,13 @@
       use their types directly - only Swashbuckle/OpenApi types are referenced in the composer.
     -->
     <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.4" />
+    <PackageReference Include="Umbraco.Cms.Web.Common" Version="UMBRACO_VERSION_FROM_TEMPLATE" />
+    <PackageReference Include="Umbraco.Cms.Web.Website" Version="UMBRACO_VERSION_FROM_TEMPLATE" />
   </ItemGroup>
+  <!--#endif -->
 
   <ItemGroup>
-    <!-- Dont include the client folder as part of packaging nuget build -->
+    <!-- Don't include the client folder as part of packaging nuget build -->
     <Content Remove="Client\**" />
 
     <!-- However make the Umbraco-package.json included for dotnet pack or nuget package and visible to the solution -->

@@ -12,6 +12,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		meta: {
 			label: 'Member Types',
 			searchProviderAlias: UMB_MEMBER_TYPE_SEARCH_PROVIDER_ALIAS,
+			sectionAlias: UMB_SETTINGS_SECTION_ALIAS,
 		},
 		conditions: [
 			{

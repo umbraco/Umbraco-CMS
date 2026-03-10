@@ -21,7 +21,9 @@ export default {
 		delete: '削除',
 		disable: '無効',
 		emptyrecyclebin: 'ごみ箱を空にする',
+		export: 'エクスポート',
 		exportDocumentType: 'ドキュメントタイプの書出',
+		import: 'インポート',
 		importdocumenttype: 'ドキュメントタイプの読込',
 		importPackage: 'パッケージの読み込み',
 		liveEdit: 'ライブ編集',
@@ -212,6 +214,7 @@ export default {
 		cut: '切り取り',
 		editDictionary: 'ディクショナリのアイテムの編集',
 		editLanguage: '言語の編集',
+		includeDescendants: '子孫項目を含める',
 		insertAnchor: 'アンカーの挿入',
 		insertCharacter: '文字の挿入',
 		insertgraphicheadline: 'ヘッドライン画像の挿入',
@@ -258,6 +261,7 @@ export default {
 		selectContent: 'コンテンツの選択',
 		selectMember: 'メンバーの選択',
 		selectMemberGroup: 'メンバー グループの選択',
+		selectLanguages: '言語の選択',
 		noMacroParams: 'このマクロのパラメーターはありません',
 		externalLoginProviders: '外部ログイン プロバイダー',
 		exceptionDetail: '例外の詳細',
@@ -549,6 +553,7 @@ export default {
 	language: {
 		cultureCode: 'カルチャコード',
 		displayName: 'カルチャ名',
+		noFallbackLanguages: 'フォールバック言語はありません',
 	},
 	lockout: {
 		lockoutWillOccur: '何もしないでいると自動的にログアウトします',
