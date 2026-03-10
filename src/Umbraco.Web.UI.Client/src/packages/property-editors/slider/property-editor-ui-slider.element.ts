@@ -93,6 +93,9 @@ export class UmbPropertyEditorUISliderElement
 	@state()
 	private _max = 100;
 
+	@state()
+	private _minimumRange = 0;
+
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
 
@@ -110,6 +113,7 @@ export class UmbPropertyEditorUISliderElement
 
 		this._min = this.#parseNumber(config.getValueByAlias('minVal')) || 0;
 		this._max = this.#parseNumber(config.getValueByAlias('maxVal')) || 100;
+		this._minimumRange = this.#parseNumber(config.getValueByAlias('minimumRange')) || 0;
 
 		if (this._min === this._max) {
 			this._max = this._min + 100;
@@ -161,6 +165,7 @@ export class UmbPropertyEditorUISliderElement
 				.step=${this._step}
 				.min=${this._min}
 				.max=${this._max}
+				.minGap=${this._minimumRange}
 				?enable-range=${this._enableRange}
 				@change=${this.#onChange}
 				?readonly=${this.readonly}

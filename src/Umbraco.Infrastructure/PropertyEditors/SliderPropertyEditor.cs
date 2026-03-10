@@ -144,6 +144,11 @@ public class SliderPropertyEditor : DataEditor
             protected const string ConfigurationKeyEnableRangeValue = "enableRange";
 
             /// <summary>
+            /// The configuration key for the minimum range value.
+            /// </summary>
+            protected const string ConfigurationKeyMinimumRangeValue = "minimumRange";
+
+            /// <summary>
             /// Initializes a new instance of the <see cref="SliderPropertyConfigurationValidatorBase"/> class.
             /// </summary>
             protected SliderPropertyConfigurationValidatorBase(ILocalizedTextService localizedTextService) => LocalizedTextService = localizedTextService;
@@ -222,6 +227,13 @@ public class SliderPropertyEditor : DataEditor
                 {
                     yield return new ValidationResult(
                         LocalizedTextService.Localize("validation", "invalidRange", [sliderRange.ToString()]),
+                        ["value"]);
+                }
+
+                if (sliderConfiguration.EnableRange && sliderRange.To >= sliderRange.From && (sliderRange.To - sliderRange.From) < sliderConfiguration.MinimumRange)
+                {
+                    yield return new ValidationResult(
+                        LocalizedTextService.Localize("validation", "minimumRange", [sliderRange.ToString(), sliderConfiguration.MinimumRange.ToString()]),
                         ["value"]);
                 }
             }

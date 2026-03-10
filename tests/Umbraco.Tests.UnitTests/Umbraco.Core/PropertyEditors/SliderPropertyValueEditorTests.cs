@@ -271,7 +271,54 @@ public class SliderPropertyValueEditorTests
         return CreateValueEditor().ToEditor(property.Object);
     }
 
-    private static SliderPropertyEditor.SliderPropertyValueEditor CreateValueEditor(bool enableRange = true, decimal step = 0.2m)
+    [TestCase(1.1, 1.1, 0, true)]
+    [TestCase(1.1, 1.1, 0.1, false)]
+    [TestCase(1.1, 1.3, 0.4, false)]
+    [TestCase(1.1, 1.5, 0.4, true)]
+    [TestCase(1.1, 1.9, 0.2, true)]
+    public void Validates_Minimum_Range_When_Range_Enabled(decimal from, decimal to, decimal minimumRange, bool expectedSuccess)
+    {
+        var value = new JsonObject
+        {
+            { "from", from },
+            { "to", to },
+        };
+        var editor = CreateValueEditor(minimumRange: minimumRange);
+        var result = editor.Validate(value, false, null, PropertyValidationContext.Empty());
+        if (expectedSuccess)
+        {
+            Assert.IsEmpty(result);
+        }
+        else
+        {
+            Assert.AreEqual(1, result.Count());
+
+            var validationResult = result.First();
+            Assert.AreEqual("validation_minimumRange", validationResult.ErrorMessage);
+        }
+    }
+
+    [TestCase(1.3, 1.3, 0.2, true)]
+    public void Minimum_Range_Not_Applied_When_Range_Disabled(decimal from, decimal to, decimal minimumRange, bool expectedSuccess)
+    {
+        var value = new JsonObject
+        {
+            { "from", from },
+            { "to", to },
+        };
+        var editor = CreateValueEditor(enableRange: false, minimumRange: minimumRange);
+        var result = editor.Validate(value, false, null, PropertyValidationContext.Empty());
+        if (expectedSuccess)
+        {
+            Assert.IsEmpty(result);
+        }
+        else
+        {
+            Assert.IsNotEmpty(result);
+        }
+    }
+
+    private static SliderPropertyEditor.SliderPropertyValueEditor CreateValueEditor(bool enableRange = true, decimal step = 0.2m, decimal minimumRange = 0m)
     {
         var localizedTextServiceMock = new Mock<ILocalizedTextService>();
         localizedTextServiceMock.Setup(x => x.Localize(
@@ -292,7 +339,8 @@ public class SliderPropertyValueEditorTests
                 EnableRange = enableRange,
                 MinimumValue = 1.1m,
                 MaximumValue = 1.9m,
-                Step = step
+                Step = step,
+                MinimumRange = minimumRange,
             },
         };
     }
