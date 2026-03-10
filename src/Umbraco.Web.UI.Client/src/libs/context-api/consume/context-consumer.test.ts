@@ -293,6 +293,104 @@ describe('UmbContextConsumer', () => {
 		});
 	});
 
+	describe('Deferred disconnect lifecycle', () => {
+		let element: HTMLElement;
+		beforeEach(() => {
+			element = document.createElement('div');
+			document.body.appendChild(element);
+		});
+		afterEach(() => {
+			document.body.removeChild(element);
+		});
+
+		it('forgets received instance one JS cycle after hostDisconnected', async () => {
+			const provider = new UmbContextProvider(document.body, testContextAlias, new UmbTestContextConsumerClass());
+			provider.hostConnected();
+
+			let receivedInstance: UmbTestContextConsumerClass | undefined;
+			const localConsumer = new UmbContextConsumer<UmbTestContextConsumerClass>(
+				element,
+				testContextAlias,
+				(_instance) => {
+					receivedInstance = _instance;
+				},
+			);
+			localConsumer.hostConnected();
+
+			// Instance should be set immediately after connecting
+			expect(receivedInstance).to.not.be.undefined;
+			expect(receivedInstance?.prop).to.eq('value from provider');
+
+			// Disconnect the consumer
+			localConsumer.hostDisconnected();
+
+			// Instance should still be set synchronously (deferred cleanup hasn't run yet)
+			expect(localConsumer.instance).to.not.be.undefined;
+
+			// After one microtask, the instance should be cleared
+			await Promise.resolve();
+			expect(localConsumer.instance).to.be.undefined;
+			expect(receivedInstance).to.be.undefined;
+
+			provider.hostDisconnected();
+		});
+
+		it('preserves instance when reconnected before deferred disconnect runs', async () => {
+			const provider = new UmbContextProvider(document.body, testContextAlias, new UmbTestContextConsumerClass());
+			provider.hostConnected();
+
+			let callbackCount = 0;
+			let lastInstance: UmbTestContextConsumerClass | undefined;
+			const localConsumer = new UmbContextConsumer<UmbTestContextConsumerClass>(
+				element,
+				testContextAlias,
+				(_instance) => {
+					callbackCount++;
+					lastInstance = _instance;
+				},
+			);
+			localConsumer.hostConnected();
+
+			expect(callbackCount).to.eq(1);
+			expect(lastInstance?.prop).to.eq('value from provider');
+
+			// Disconnect and immediately reconnect (simulating a DOM move)
+			localConsumer.hostDisconnected();
+			localConsumer.hostConnected();
+
+			// Wait for the deferred disconnect to have run (it should have been cancelled)
+			await Promise.resolve();
+
+			// Instance should still be set — the deferred disconnect was cancelled
+			expect(localConsumer.instance).to.not.be.undefined;
+			expect(localConsumer.instance?.prop).to.eq('value from provider');
+
+			localConsumer.hostDisconnected();
+			await Promise.resolve();
+			provider.hostDisconnected();
+		});
+
+		it('rejects pending promise after deferred disconnect completes', async () => {
+			const localConsumer = new UmbContextConsumer<UmbTestContextConsumerClass>(element, testContextAlias);
+			localConsumer.hostConnected();
+
+			const promise = localConsumer.asPromise({ preventTimeout: true });
+
+			localConsumer.hostDisconnected();
+
+			// After one microtask, the deferred disconnect should reject the promise
+			await promise.then(
+				() => {
+					expect.fail('Promise should not resolve');
+				},
+				(reason) => {
+					expect(reason).to.be.a('string');
+					expect(reason).to.include('host was disconnected');
+				},
+			);
+		});
+	});
+
 	describe('Implementation with discriminator method', () => {
 		let element: HTMLElement;
 		beforeEach(() => {
