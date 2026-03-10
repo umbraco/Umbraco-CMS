@@ -28,7 +28,7 @@ export class UmbContextConsumer<
 	protected _retrieveHost: HostElementMethod;
 
 	#requestRaf?: number;
-	#disconnectRaf?: number;
+	#disconnectAC?: AbortController;
 	#skipHost?: boolean;
 	#stopAtContextMatch = true;
 	#callback?: UmbContextCallback<ResultType>;
@@ -218,9 +218,9 @@ export class UmbContextConsumer<
 	}
 
 	public hostConnected(): void {
-		if (this.#disconnectRaf !== undefined) {
-			cancelAnimationFrame(this.#disconnectRaf);
-			this.#disconnectRaf = undefined;
+		if (this.#disconnectAC) {
+			this.#disconnectAC.abort();
+			this.#disconnectAC = undefined;
 		}
 		this.#setupCurrentTarget();
 		this.request();
@@ -231,14 +231,17 @@ export class UmbContextConsumer<
 			cancelAnimationFrame(this.#requestRaf);
 			this.#requestRaf = undefined;
 		}
-		if (this.#disconnectRaf !== undefined) {
-			cancelAnimationFrame(this.#disconnectRaf);
-		}
-		this.#disconnectRaf = requestAnimationFrame(this.#handleDisconnect);
+		this.#disconnectAC?.abort();
+		const abortController = (this.#disconnectAC = new AbortController());
+		Promise.resolve().then(() => {
+			if (!abortController.signal.aborted) {
+				this.#handleDisconnect();
+			}
+		});
 	}
 
-	#handleDisconnect = () => {
-		this.#disconnectRaf = undefined;
+	#handleDisconnect() {
+		this.#disconnectAC = undefined;
 		this.#unprovide();
 		if (this.#promiseRejecter) {
 			const hostElement = this._retrieveHost();
@@ -253,7 +256,7 @@ export class UmbContextConsumer<
 
 		this.#dismantleCurrentTarget();
 		this.#currentTarget = window;
-	};
+	}
 
 	#currentTarget: EventTarget = window;
 	#setCurrentTarget(target: EventTarget | undefined) {
@@ -304,9 +307,8 @@ export class UmbContextConsumer<
 		if (this.#requestRaf !== undefined) {
 			cancelAnimationFrame(this.#requestRaf);
 		}
-		if (this.#disconnectRaf !== undefined) {
-			cancelAnimationFrame(this.#disconnectRaf);
-		}
+		this.#disconnectAC?.abort();
+		this.#disconnectAC = undefined;
 		this.#handleDisconnect();
 		this._retrieveHost = undefined as any;
 		this.#callback = undefined;
