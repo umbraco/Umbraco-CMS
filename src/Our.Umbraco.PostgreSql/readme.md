@@ -18,7 +18,7 @@ If you are curios about the progress, please have a look into my fork of Umbraco
 
 
 
-## Install PostggreSQL Database
+## Install PostgreSQL Database
 1. Download and install PostgreSQL (version 16, 17 or 18) from the [official website](https://www.postgresql.org/download/) or especially for [Windwos](https://www.postgresql.org/download/windows/).
 1. Create a new database for Umbraco using the PostgreSQL command line or a GUI tool like pgAdmin. Follow my [tutorial video](https://youtu.be/6ruTSbTdzSk).
 1. Start debugging this solution [F5]
