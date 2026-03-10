@@ -21,6 +21,7 @@ interface HistoryData {
 /**
  * @description Helper function to get look and color for uui-tag and localization keys for the label and description.
  * @param type AuditTypeModel
+ * @deprecated Scheduled for removal in Umbraco 19. Use the audit log repository's getTagStyleAndText() method instead.
  */
 export function getMediaHistoryTagStyleAndText(type: UmbMediaAuditLogType): HistoryData {
 	switch (type) {

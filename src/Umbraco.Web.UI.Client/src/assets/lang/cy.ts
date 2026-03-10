@@ -354,6 +354,8 @@ export default {
 		renameFolderFailed: "Methwyd ailenwi'r ffolder gyda id %0%",
 		dragAndDropYourFilesIntoTheArea: "Llusgo a gollwng eich ffeil(iau) i mewn i'r ardal",
 		uploadNotAllowed: 'Ni chaniateir llwytho i fyny yn y lleoliad hwn.',
+		uploadValidationFailed: (mediaTypeName: string) =>
+			`Mae gan y math cyfryngau ${mediaTypeName} un neu fwy o briodweddau gofynnol. Bydd angen ei huwchlwytho'n unigol drwy'r ddewislen 'Creu'`,
 		disallowedMediaType: "Ni ellir lanlwytho'r ffeil yma, ni chaniateir y math cyfrwng gydag alias '%0%' yma",
 		invalidFileName: "Ni ellir lanlwytho'r ffeil yma, nid oes ganddi enw ffeil dilys",
 		fileSecurityValidationFailure: 'Mae un neu fwy o ddilysiadau diogelwch ffeil wedi methu',
@@ -1862,6 +1864,7 @@ export default {
 		noLockouts: 'ddim wedi cloi allan',
 		noPasswordChange: "Nid yw'r cyfrinair wedi'i newid",
 		confirmNewPassword: 'Cadarnhau cyfrinair newydd',
+		confirmPassword: 'Cadarnhau cyfrinair',
 		changePasswordDescription:
 			"Gallwch newid eich cyfrinair i gyrchu Swyddfa Gefn Umbracogan lenwi allan y ffurflen isod a chlicio'r botwm 'Newid Cyfrinair'",
 		contentChannel: 'Sianel Gynnwys',

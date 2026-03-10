@@ -235,6 +235,7 @@ export class UmbUserGroupDetailsWorkspaceViewElement extends UmbLitElement imple
 							<umb-input-media
 								slot="editor"
 								max="1"
+								folder-filter="foldersOnly"
 								.selection=${this._mediaStartNode?.unique ? [this._mediaStartNode.unique] : []}
 								@change=${this.#onMediaStartNodeChange}></umb-input-media>
 						`
