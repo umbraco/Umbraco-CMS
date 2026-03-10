@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Tests.Common.Builders;
+using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 
@@ -146,6 +147,7 @@ internal sealed class DataTypeServiceTests : UmbracoIntegrationTest
         var dataTypeDefinitions = await DataTypeService.GetByEditorAliasAsync(Constants.PropertyEditors.Aliases.RichText);
         var template = TemplateBuilder.CreateTextPageTemplate();
         await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+
         var doctype =
             ContentTypeBuilder.CreateSimpleContentType("umbTextpage", "Textpage", defaultTemplateId: template.Id);
         await ContentTypeService.CreateAsync(doctype, Constants.Security.SuperUserKey);
@@ -487,6 +489,43 @@ internal sealed class DataTypeServiceTests : UmbracoIntegrationTest
         Assert.AreEqual(mediaType.Key, secondResult.ContentTypeKey);
         Assert.AreEqual("bodyText", secondResult.NodeAlias);
         Assert.AreEqual("Body text", secondResult.NodeName);
+    }
+
+    [Test]
+    public async Task DataTypeService_Can_Get_ListView_References()
+    {
+        // Arrange - Create a custom list view data type
+        var customListViewKey = Guid.NewGuid();
+        IDataType customListView = new DataType(
+            GetRequiredService<PropertyEditorCollection>()[Constants.PropertyEditors.Aliases.ListView],
+            ConfigurationEditorJsonSerializer)
+        {
+            Key = customListViewKey,
+            Name = "Custom List View For Test",
+            DatabaseType = ValueStorageType.Nvarchar
+        };
+        var createResult = await DataTypeService.CreateAsync(customListView, Constants.Security.SuperUserKey);
+        Assert.IsTrue(createResult.Success);
+
+        // Create a document type that uses this list view as its collection
+        IContentType documentTypeWithListView = new ContentTypeBuilder()
+            .WithAlias("listViewContainer")
+            .WithName("List View Container")
+            .WithIsContainer(customListViewKey)
+            .Build();
+        await ContentTypeService.CreateAsync(documentTypeWithListView, Constants.Security.SuperUserKey);
+
+        // Act - Get references for the custom list view
+        PagedModel<RelationItemModel> result = await DataTypeService.GetPagedRelationsAsync(customListViewKey, 0, 10);
+
+        // Assert - The document type should be listed as a reference
+        Assert.AreEqual(1, result.Total);
+
+        RelationItemModel listViewReference = result.Items.First();
+        Assert.AreEqual("listViewContainer", listViewReference.ContentTypeAlias);
+        Assert.AreEqual("List View Container", listViewReference.ContentTypeName);
+        Assert.AreEqual(documentTypeWithListView.Key, listViewReference.ContentTypeKey);
+        Assert.AreEqual("Custom List View For Test", listViewReference.NodeName);
     }
 
     [Test]

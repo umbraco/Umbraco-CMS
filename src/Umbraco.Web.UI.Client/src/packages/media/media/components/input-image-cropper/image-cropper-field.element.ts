@@ -18,13 +18,12 @@ export class UmbInputImageCropperFieldElement extends UmbLitElement {
 	set value(value) {
 		if (!value) {
 			this.crops = [];
-			this.focalPoint = { left: 0.5, top: 0.5 };
+			this.focalPoint = null;
 			this.src = '';
 			this.#value = undefined;
 		} else {
 			this.crops = [...value.crops];
-			// TODO: This is a temporary solution to make sure we have a focal point
-			this.focalPoint = value.focalPoint || { left: 0.5, top: 0.5 };
+			this.focalPoint = value.focalPoint ?? null;
 			this.src = value.src;
 			this.#value = value;
 		}
@@ -61,7 +60,7 @@ export class UmbInputImageCropperFieldElement extends UmbLitElement {
 	fileDataUrl?: string;
 
 	@state()
-	focalPoint: UmbImageCropperFocalPoint = { left: 0.5, top: 0.5 };
+	focalPoint: UmbImageCropperFocalPoint = null;
 
 	@property({ type: Boolean })
 	hideFocalPoint = false;
@@ -139,7 +138,7 @@ export class UmbInputImageCropperFieldElement extends UmbLitElement {
 	}
 
 	protected onResetFocalPoint = () => {
-		this.focalPoint = { left: 0.5, top: 0.5 };
+		this.focalPoint = null;
 		this.#updateValue();
 	};
 
@@ -178,7 +177,7 @@ export class UmbInputImageCropperFieldElement extends UmbLitElement {
 		return html`
 			<slot name="actions"></slot>
 			${when(
-				!this.hideFocalPoint && this.focalPoint.left !== 0.5 && this.focalPoint.top !== 0.5,
+				!this.hideFocalPoint && this.focalPoint && (this.focalPoint.left !== 0.5 || this.focalPoint.top !== 0.5),
 				() => html`
 					<uui-button compact label=${this.localize.term('content_resetFocalPoint')} @click=${this.onResetFocalPoint}>
 						<uui-icon name="icon-axis-rotation"></uui-icon>
