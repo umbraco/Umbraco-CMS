@@ -49,7 +49,7 @@ export class UmbLanguagePickerModalElement extends UmbModalBaseElement<
 	}
 
 	override render() {
-		return html`<umb-body-layout headline="Select languages">
+		return html`<umb-body-layout headline=${this.localize.term('defaultdialogs_selectLanguages')}>
 			<uui-box>
 				${this.#filteredLanguages.length > 0
 					? repeat(
@@ -71,8 +71,8 @@ export class UmbLanguagePickerModalElement extends UmbModalBaseElement<
 						</umb-localize>`}
 			</uui-box>
 			<div slot="actions">
-				<uui-button label="Close" @click=${this.#close}></uui-button>
-				<uui-button label="Submit" look="primary" color="positive" @click=${this.#submit}></uui-button>
+				<uui-button label=${this.localize.term('general_close')} @click=${this.#close}></uui-button>
+				<uui-button label=${this.localize.term('general_submit')} look="primary" color="positive" @click=${this.#submit}></uui-button>
 			</div>
 		</umb-body-layout> `;
 	}

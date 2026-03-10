@@ -18,6 +18,8 @@ public class ChildrenMemberTypeTreeController : MemberTypeTreeControllerBase
     [HttpGet("children")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<MemberTypeTreeItemResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a collection of member type tree child items.")]
+    [EndpointDescription("Gets a paginated collection of member type tree items that are children of the provided parent Id.")]
     public async Task<ActionResult<PagedViewModel<MemberTypeTreeItemResponseModel>>> Children(
         CancellationToken cancellationToken,
         Guid parentId,

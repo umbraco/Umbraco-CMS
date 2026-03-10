@@ -14,6 +14,12 @@ public class ComponentCollection : BuilderCollectionBase<IAsyncComponent>
     private readonly IProfilingLogger _profilingLogger;
     private readonly ILogger<ComponentCollection> _logger;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ComponentCollection" /> class.
+    /// </summary>
+    /// <param name="items">A factory function that provides the component items.</param>
+    /// <param name="profilingLogger">The profiling logger for timing component operations.</param>
+    /// <param name="logger">The logger for recording component lifecycle events.</param>
     public ComponentCollection(Func<IEnumerable<IAsyncComponent>> items, IProfilingLogger profilingLogger, ILogger<ComponentCollection> logger)
         : base(items)
     {
@@ -21,6 +27,12 @@ public class ComponentCollection : BuilderCollectionBase<IAsyncComponent>
         _logger = logger;
     }
 
+    /// <summary>
+    /// Initializes all components in the collection.
+    /// </summary>
+    /// <param name="isRestarting">If set to <c>true</c> indicates Umbraco is restarting.</param>
+    /// <param name="cancellationToken">The cancellation token. Cancellation indicates that the start process has been aborted.</param>
+    /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
     public async Task InitializeAsync(bool isRestarting, CancellationToken cancellationToken)
     {
         using (_profilingLogger.IsEnabled(Logging.LogLevel.Debug) is false
@@ -41,6 +53,12 @@ public class ComponentCollection : BuilderCollectionBase<IAsyncComponent>
         }
     }
 
+    /// <summary>
+    /// Terminates all components in the collection in reverse order.
+    /// </summary>
+    /// <param name="isRestarting">If set to <c>true</c> indicates Umbraco is restarting.</param>
+    /// <param name="cancellationToken">The cancellation token. Cancellation indicates that the shutdown process should no longer be graceful.</param>
+    /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
     public async Task TerminateAsync(bool isRestarting, CancellationToken cancellationToken)
     {
         using (!_profilingLogger.IsEnabled(Logging.LogLevel.Debug)

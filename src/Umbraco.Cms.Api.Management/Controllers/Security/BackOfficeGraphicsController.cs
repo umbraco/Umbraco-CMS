@@ -36,26 +36,36 @@ public class BackOfficeGraphicsController : Controller
     }
 
     [HttpGet("login-background", Name = LoginBackGroundRouteName)]
+    [EndpointSummary("Gets the login background image.")]
+    [EndpointDescription("Gets the custom login background image if configured.")]
     [AllowAnonymous]
     [MapToApiVersion("1.0")]
     public IActionResult LoginBackground() => HandleFileRequest(_contentSettings.Value.LoginBackgroundImage);
 
     [HttpGet("logo", Name = LogoRouteName)]
+    [EndpointSummary("Gets the login logo image.")]
+    [EndpointDescription("Gets the custom login logo image if configured.")]
     [AllowAnonymous]
     [MapToApiVersion("1.0")]
     public IActionResult Logo() => HandleFileRequest(_contentSettings.Value.BackOfficeLogo);
 
     [HttpGet("logo-alternative", Name = LogoAlternativeRouteName)]
+    [EndpointSummary("Gets the login logo image.")]
+    [EndpointDescription("Gets the custom login logo image if configured.")]
     [AllowAnonymous]
     [MapToApiVersion("1.0")]
     public IActionResult LogoAlternative() => HandleFileRequest(_contentSettings.Value.BackOfficeLogoAlternative);
 
     [HttpGet("login-logo", Name = LoginLogoRouteName)]
+    [EndpointSummary("Gets the login logo image.")]
+    [EndpointDescription("Gets the custom login logo image if configured.")]
     [AllowAnonymous]
     [MapToApiVersion("1.0")]
     public IActionResult LoginLogo() => HandleFileRequest(_contentSettings.Value.LoginLogoImage);
 
     [HttpGet("login-logo-alternative", Name = LoginLogoAlternativeRouteName)]
+    [EndpointSummary("Gets the alternative login logo image.")]
+    [EndpointDescription("Gets the custom alternative login logo image if configured.")]
     [AllowAnonymous]
     [MapToApiVersion("1.0")]
     public IActionResult LoginLogoAlternative() => HandleFileRequest(_contentSettings.Value.LoginLogoImageAlternative);

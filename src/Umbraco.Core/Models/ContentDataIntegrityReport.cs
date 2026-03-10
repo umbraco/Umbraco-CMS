@@ -1,10 +1,20 @@
 namespace Umbraco.Cms.Core.Models;
 
+/// <summary>
+///     Represents a report of data integrity issues detected in content data.
+/// </summary>
 public class ContentDataIntegrityReport
 {
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="ContentDataIntegrityReport" /> class.
+    /// </summary>
+    /// <param name="detectedIssues">A dictionary of detected issues keyed by content ID.</param>
     public ContentDataIntegrityReport(IReadOnlyDictionary<int, ContentDataIntegrityReportEntry> detectedIssues) =>
         DetectedIssues = detectedIssues;
 
+    /// <summary>
+    ///     Defines the types of data integrity issues that can be detected.
+    /// </summary>
     public enum IssueType
     {
         /// <summary>
@@ -33,10 +43,19 @@ public class ContentDataIntegrityReport
         InvalidPathByParentId,
     }
 
+    /// <summary>
+    ///     Gets a value indicating whether all detected issues have been resolved or no issues were found.
+    /// </summary>
     public bool Ok => DetectedIssues.Count == 0 || DetectedIssues.Count == DetectedIssues.Values.Count(x => x.Fixed);
 
+    /// <summary>
+    ///     Gets a dictionary of all detected data integrity issues keyed by content ID.
+    /// </summary>
     public IReadOnlyDictionary<int, ContentDataIntegrityReportEntry> DetectedIssues { get; }
 
+    /// <summary>
+    ///     Gets a dictionary of issues that have been successfully fixed, keyed by content ID.
+    /// </summary>
     public IReadOnlyDictionary<int, ContentDataIntegrityReportEntry> FixedIssues
         => DetectedIssues.Where(x => x.Value.Fixed).ToDictionary(x => x.Key, x => x.Value);
 }

@@ -51,6 +51,10 @@ tools/docfx/
 /build/csharp-docs/api/
 /build/csharp-docs/_site/
 
+# Local config
+.claude/settings.local.json
+.env.local
+
 # Build
 /build.out/
 /build.tmp/
@@ -99,6 +103,7 @@ tools/docfx/
 playwright-report
 trace.zip
 /tests/Umbraco.Tests.AcceptanceTest/results
+/tests/Umbraco.Tests.AcceptanceTest/dist
 
 # Ignore auto-generated schema
 /src/Umbraco.Cms.Targets/tasks/

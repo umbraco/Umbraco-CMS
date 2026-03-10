@@ -305,14 +305,7 @@ export abstract class UmbTreeItemElementBase<
 	#renderActions() {
 		if (this.hideActions) return nothing;
 		if (!this.#api || !this._item) return nothing;
-		return html`
-			<umb-entity-actions-bundle
-				slot="actions"
-				.entityType=${this.#api.entityType}
-				.unique=${this.#api.unique}
-				.label=${this._label}>
-			</umb-entity-actions-bundle>
-		`;
+		return html`<umb-entity-actions-bundle slot="actions" .label=${this._label}> </umb-entity-actions-bundle>`;
 	}
 
 	#renderChildItems() {
@@ -363,14 +356,20 @@ export abstract class UmbTreeItemElementBase<
 				--umb-sign-bundle-bg: var(--uui-color-surface-emphasis);
 			}
 
-			uui-menu-item[active],
-			uui-menu-item[selected] {
+			uui-menu-item[active] {
 				--umb-sign-bundle-bg: var(--uui-color-current);
 			}
 
-			uui-menu-item[selected]:hover,
 			uui-menu-item[active]:hover {
 				--umb-sign-bundle-bg: var(--uui-color-current-emphasis);
+			}
+
+			uui-menu-item[selected] {
+				--umb-sign-bundle-bg: var(--uui-color-selected);
+			}
+
+			uui-menu-item[selected]:hover {
+				--umb-sign-bundle-bg: var(--uui-color-selected-emphasis);
 			}
 
 			#label {

@@ -41,9 +41,14 @@ public enum OperationResultType : byte
     NoOperation = Failed | 6, // TODO: shouldn't it be a success?
 
     /// <summary>
-    ///     The operation could not complete due to duplicate key detection
+    ///     The operation could not complete due to duplicate key detection.
     /// </summary>
-    FailedDuplicateKey = Failed | 7
+    FailedDuplicateKey = Failed | 7,
+
+    /// <summary>
+    ///     The operation could not complete due to invalid key detection.
+    /// </summary>
+    FailedInvalidKey = Failed | 8
 
     // TODO: In the future, we might need to add more operations statuses, potentially like 'FailedByPermissions', etc...
 }

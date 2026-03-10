@@ -86,7 +86,7 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 				? this.localize.string(this.manifest?.meta.label)
 				: this.localize.term('general_create')) +
 			' ' +
-			item.name;
+			this.localize.string(item.name);
 
 		return html`
 			<uui-button color="default" href=${this.#getCreateUrl(item)} label=${label} look="outline"></uui-button>
@@ -114,7 +114,7 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 						${map(
 							this._allowedDocumentTypes,
 							(item) => html`
-								<uui-menu-item label=${item.name} href=${this.#getCreateUrl(item)}>
+								<uui-menu-item label=${this.localize.string(item.name)} href=${this.#getCreateUrl(item)}>
 									<umb-icon slot="icon" name=${item.icon ?? 'icon-document'}></umb-icon>
 								</uui-menu-item>
 							`,

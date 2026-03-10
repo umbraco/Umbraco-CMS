@@ -18,7 +18,7 @@ public interface IBlockReference
     /// <value>
     ///     The content UDI.
     /// </value>
-    [Obsolete("Use ContentKey instead. Will be removed in V18.")]
+    [Obsolete("Use ContentKey instead. Scheduled for removal in Umbraco 18.")]
     Udi ContentUdi { get; }
 
     /// <summary>

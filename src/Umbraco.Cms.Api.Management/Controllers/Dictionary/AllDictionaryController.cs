@@ -25,6 +25,8 @@ public class AllDictionaryController : DictionaryControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<DictionaryOverviewResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a paginated collection of dictionary items.")]
+    [EndpointDescription("Gets a paginated collection of dictionary items with optional filtering by name.")]
     public async Task<ActionResult<PagedViewModel<DictionaryOverviewResponseModel>>> All(
         CancellationToken cancellationToken,
         string? filter = null,

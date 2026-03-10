@@ -823,7 +823,8 @@ export default {
 		reset: 'Återställ',
 	},
 	rollback: {
-		diffHelp: '<del>Röd text</del> kommer att tas bort i den valda versionen, <ins>grön text</ins> kommer att läggas till.',
+		diffHelp:
+			'<del>Röd text</del> kommer att tas bort i den valda versionen, <ins>grön text</ins> kommer att läggas till.',
 		showDiff: 'Visa skillnader mellan nuvarande (utkast) version och vald version.',
 		documentRolledBack: 'Dokumentet har återgått till en tidigare version',
 		htmlHelp:
@@ -1074,6 +1075,7 @@ export default {
 		changePassword: 'Ändra lösenord',
 		changePhoto: 'Ändra bild',
 		confirmNewPassword: 'Bekräfta det nya lösenordet',
+		confirmPassword: 'Bekräfta lösenord',
 		changePasswordDescription:
 			'Du kan byta ditt lösenord för Umbraco backoffice genom att fylla i nedanstående formulär och klicka på knappen "Ändra lösenord".',
 		contentChannel: 'Innehållskanal',

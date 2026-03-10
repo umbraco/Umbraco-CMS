@@ -13,6 +13,7 @@ import {
 	css,
 	nothing,
 	type PropertyValueMap,
+	ifDefined,
 } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type {
@@ -92,7 +93,7 @@ export class UmbPropertyEditorUIBlockSingleElement
 	}
 
 	@state()
-	private _createButtonLabel = this.localize.term('content_createEmpty');
+	private _createButtonLabel = this.localize.term('blockEditor_addBlock');
 
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
@@ -264,7 +265,11 @@ export class UmbPropertyEditorUIBlockSingleElement
 		this.addValidator(
 			'valueMissing',
 			() => this.mandatoryMessage ?? UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
-			() => !!this.mandatory && this.#entriesContext.getLength() === 0,
+			() => {
+				if (!this.mandatory || this.readonly) return false;
+				const count = this.value?.layout?.[UMB_BLOCK_SINGLE_PROPERTY_EDITOR_SCHEMA_ALIAS]?.length ?? 0;
+				return count === 0;
+			},
 		);
 
 		this.observe(
@@ -413,20 +418,28 @@ export class UmbPropertyEditorUIBlockSingleElement
 	}
 
 	#renderCreateButton() {
-		let createPath: string | undefined;
-		if (this._blocks?.length === 1) {
-			const elementKey = this._blocks[0].contentElementTypeKey;
-			createPath =
-				this._catalogueRouteBuilder?.({ view: 'create', index: -1 }) + 'modal/umb-modal-workspace/create/' + elementKey;
-		} else {
-			createPath = this._catalogueRouteBuilder?.({ view: 'create', index: -1 });
-		}
+		const createPath = this.#entriesContext.getPathForCreateBlock(-1);
 		return html`
 			<uui-button
 				look="placeholder"
 				label=${this._createButtonLabel}
-				href=${createPath ?? ''}
-				?disabled=${this.readonly}></uui-button>
+				href=${ifDefined(createPath)}
+				?disabled=${this.readonly}
+				@click=${async () => {
+					// If no path, then we can conclude there is not modal flow for the user to follow, instead we will just insert the Block: [NL]
+					if (createPath === undefined) {
+						if (!this._blocks || this._blocks.length === 0) {
+							throw new Error('No block types are configured for this Block List property editor');
+						}
+						const originData = { index: -1 };
+						const created = await this.#entriesContext.create(this._blocks[0].contentElementTypeKey, {}, originData);
+						if (created) {
+							this.#entriesContext.insert(created.layout, created.content, created.settings, originData);
+						} else {
+							throw new Error('Failed to create block');
+						}
+					}
+				}}></uui-button>
 		`;
 	}
 
@@ -446,18 +459,8 @@ export class UmbPropertyEditorUIBlockSingleElement
 		UmbTextStyles,
 
 		css`
-			:host {
-				display: grid;
-				gap: 1px;
-			}
-			> div {
-				display: flex;
-				flex-direction: column;
-				align-items: stretch;
-			}
-
 			uui-button-group {
-				padding-top: 1px;
+				margin-top: 1px;
 				display: grid;
 				grid-template-columns: 1fr auto;
 			}

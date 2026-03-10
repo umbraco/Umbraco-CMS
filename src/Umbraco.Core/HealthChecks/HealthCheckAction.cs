@@ -2,6 +2,9 @@ using System.Runtime.Serialization;
 
 namespace Umbraco.Cms.Core.HealthChecks;
 
+/// <summary>
+///     Represents an action that can be taken to rectify a health check issue.
+/// </summary>
 [DataContract(Name = "healthCheckAction", Namespace = "")]
 public class HealthCheckAction
 {
@@ -51,6 +54,9 @@ public class HealthCheckAction
     [DataMember(Name = "actionParameters")]
     public Dictionary<string, object>? ActionParameters { get; set; }
 
+    /// <summary>
+    ///     Gets or sets the name of the action - this is used to name the fix button.
+    /// </summary>
     public string? Name
     {
         get => _name;

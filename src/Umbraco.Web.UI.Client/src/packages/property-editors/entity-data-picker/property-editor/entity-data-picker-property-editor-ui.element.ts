@@ -1,5 +1,6 @@
 import type { UmbInputEntityDataElement } from '../input/input-entity-data.element.js';
 import type { UmbEntityDataPickerPropertyEditorValue } from './types.js';
+import type { UmbEntityDataPickerPickerViewsConfigurationPropertyValue } from './config/picker-views/types.js';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
@@ -13,8 +14,8 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registr
 import type { ManifestPropertyEditorDataSource } from '@umbraco-cms/backoffice/property-editor-data-source';
 import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
 
-// import of local component
-import '../input/input-entity-data.element.js';
+import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbPickerDataSource } from '@umbraco-cms/backoffice/picker-data-source';
 
 @customElement('umb-entity-data-picker-property-editor-ui')
 export class UmbEntityDataPickerPropertyEditorUIElement
@@ -36,6 +37,7 @@ export class UmbEntityDataPickerPropertyEditorUIElement
 	}
 	public set dataSourceAlias(value: string | undefined) {
 		this._dataSourceAlias = value;
+		this.#createDataSourceApi(this._dataSourceAlias);
 		this.#extractDataSourceConfig();
 	}
 
@@ -63,6 +65,12 @@ export class UmbEntityDataPickerPropertyEditorUIElement
 	@state()
 	private _dataSourceConfig?: UmbConfigCollectionModel;
 
+	@state()
+	private _dataSourceApi?: UmbPickerDataSource;
+
+	@state()
+	private _pickerViews?: UmbEntityDataPickerPickerViewsConfigurationPropertyValue;
+
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		this.#propertyEditorConfigCollection = config;
 
@@ -73,10 +81,13 @@ export class UmbEntityDataPickerPropertyEditorUIElement
 		this._minMessage = `${this.localize.term('validation_minCount')} ${this._min} ${this.localize.term('validation_items')}`;
 		this._maxMessage = `${this.localize.term('validation_maxCount')} ${this._max} ${this.localize.term('validation_itemsSelected')}`;
 
-		this._dataSourceConfig = this.#extractDataSourceConfig();
+		this._pickerViews =
+			config?.getValueByAlias<UmbEntityDataPickerPickerViewsConfigurationPropertyValue>('pickerViews');
+		this.#extractDataSourceConfig();
 	}
 
 	#propertyEditorConfigCollection?: UmbPropertyEditorConfigCollection;
+	#dataSourceApiInitializer?: UmbExtensionApiInitializer<ManifestPropertyEditorDataSource>;
 
 	#extractDataSourceConfig() {
 		if (!this._dataSourceAlias || !this.#propertyEditorConfigCollection) {
@@ -97,14 +108,35 @@ export class UmbEntityDataPickerPropertyEditorUIElement
 			aliases?.includes(configEntry.alias),
 		);
 
-		const dataSourceConfig: UmbConfigCollectionModel | undefined = configAliasMatch?.map((configEntry) => {
+		this._dataSourceConfig = configAliasMatch?.map((configEntry) => {
 			return {
 				alias: configEntry.alias,
 				value: configEntry.value,
 			};
 		});
+	}
 
-		return dataSourceConfig;
+	#createDataSourceApi(dataSourceAlias: string | undefined) {
+		if (!dataSourceAlias) {
+			this._dataSourceApi = undefined;
+			this.#dataSourceApiInitializer?.destroy();
+			this.#dataSourceApiInitializer = undefined;
+			return;
+		}
+
+		this.#dataSourceApiInitializer = new UmbExtensionApiInitializer<
+			ManifestPropertyEditorDataSource,
+			UmbExtensionApiInitializer<ManifestPropertyEditorDataSource>,
+			UmbPickerDataSource
+		>(this, umbExtensionsRegistry, dataSourceAlias, [this], (permitted, ctrl) => {
+			if (!permitted) {
+				// TODO: clean up if not permitted
+				return;
+			}
+
+			// TODO: Check if it is a picker data source
+			this._dataSourceApi = ctrl.api as UmbPickerDataSource;
+		});
 	}
 
 	override focus() {
@@ -138,8 +170,9 @@ export class UmbEntityDataPickerPropertyEditorUIElement
 	override render() {
 		return html`<umb-input-entity-data
 			.selection=${this.value?.ids ?? []}
-			.dataSourceAlias="${this._dataSourceAlias}"
+			.dataSourceApi=${this._dataSourceApi}
 			.dataSourceConfig=${this._dataSourceConfig}
+			.pickerViews=${this._pickerViews}
 			.min=${this._min}
 			.min-message=${this._minMessage}
 			.max=${this._max}

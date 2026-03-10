@@ -927,10 +927,9 @@ internal sealed class DatabaseDataCreator
 
     private void CreateNodeDataForMediaTypes()
     {
-        var folderUniqueId = new Guid("f38bd2d7-65d0-48e6-95dc-87ce06ec2d3d");
         ConditionalInsert(
             Constants.Configuration.NamedOptions.InstallDefaultData.MediaTypes,
-            folderUniqueId.ToString(),
+            Constants.MediaTypes.Guids.Folder,
             new NodeDto
             {
                 NodeId = 1031,
@@ -940,7 +939,7 @@ internal sealed class DatabaseDataCreator
                 Level = 1,
                 Path = "-1,1031",
                 SortOrder = 2,
-                UniqueId = folderUniqueId,
+                UniqueId = Constants.MediaTypes.Guids.FolderGuid,
                 Text = Constants.Conventions.MediaTypes.Folder,
                 NodeObjectType = Constants.ObjectTypes.MediaType,
                 CreateDate = DateTime.UtcNow,
@@ -1113,6 +1112,7 @@ internal sealed class DatabaseDataCreator
         _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.DocumentUrls, Name = "DocumentUrls" });
         _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.DistributedJobs, Name = "DistributedJobs" });
         _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.CacheVersion, Name = "CacheVersion" });
+        _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.DocumentUrlAliases, Name = "DocumentUrlAliases" });
     }
 
     private void CreateContentTypeData()

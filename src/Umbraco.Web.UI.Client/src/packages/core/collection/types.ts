@@ -23,6 +23,8 @@ export interface UmbCollectionConfiguration {
 	pageSize?: number;
 	noItemsLabel?: string;
 	userDefinedProperties?: Array<UmbCollectionColumnConfiguration>;
+	selectionConfiguration?: UmbCollectionSelectionConfiguration;
+	bulkActionConfiguration?: UmbCollectionBulkActionConfiguration;
 }
 
 export interface UmbCollectionColumnConfiguration {
@@ -35,14 +37,20 @@ export interface UmbCollectionColumnConfiguration {
 
 export interface UmbCollectionLayoutConfiguration {
 	icon?: string;
-	name: string;
+	name?: string;
 	collectionView: string;
 }
 
 export type UmbCollectionSelectionConfiguration = {
 	multiple?: boolean;
 	selectable?: boolean;
-	selection?: Array<string | null>;
+	selectOnly?: boolean;
+	selection?: Array<UmbCollectionItemModel['unique']>;
+	selectableFilter?(item: UmbCollectionItemModel): boolean;
+};
+
+export type UmbCollectionBulkActionConfiguration = {
+	enabled?: boolean;
 };
 
 export interface UmbCollectionContext {

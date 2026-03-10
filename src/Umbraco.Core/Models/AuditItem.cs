@@ -2,6 +2,9 @@ using Umbraco.Cms.Core.Models.Entities;
 
 namespace Umbraco.Cms.Core.Models;
 
+/// <summary>
+///     Represents an audit log entry.
+/// </summary>
 public sealed class AuditItem : EntityBase, IAuditItem
 {
     /// <summary>

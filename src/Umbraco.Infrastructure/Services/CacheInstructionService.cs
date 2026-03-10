@@ -33,7 +33,7 @@ namespace Umbraco.Cms
             private readonly IProfilingLogger _profilingLogger;
             private readonly Lock _syncLock = new();
 
-            [Obsolete("Use the overload that requires ILastSyncedManager and IRepositoryCacheVersionService. Scheduled for removal in V18.")]
+            [Obsolete("Use the overload that requires ILastSyncedManager and IRepositoryCacheVersionService. Scheduled for removal in Umbraco 18.")]
             public CacheInstructionService(
                 ICoreScopeProvider provider,
                 ILoggerFactory loggerFactory,
@@ -147,7 +147,7 @@ namespace Umbraco.Cms
                 }
             }
 
-            [Obsolete("Use non obsolete version instead, scheduled for removal in V18.")]
+            [Obsolete("Please use ProcessAllInstructions instead. Scheduled for removal in Umbraco 19.")]
             public ProcessInstructionsResult ProcessInstructions(
                 CacheRefresherCollection cacheRefreshers,
                 CancellationToken cancellationToken,
@@ -176,9 +176,10 @@ namespace Umbraco.Cms
                     {
                         _repositoryCacheVersionService.SetCachesSyncedAsync();
                         var lastId = _lastSyncedManager.GetLastSyncedExternalAsync().GetAwaiter().GetResult() ?? 0;
+                        var previousLastId = lastId;
                         var numberOfInstructionsProcessed = ProcessDatabaseInstructions(cacheRefreshers, cancellationToken, localIdentity, ref lastId);
 
-                        if (numberOfInstructionsProcessed > 0)
+                        if (lastId > 0 && lastId != previousLastId)
                         {
                             _lastSyncedManager.SaveLastSyncedExternalAsync(lastId).GetAwaiter().GetResult();
                             _lastSyncedManager.SaveLastSyncedInternalAsync(lastId).GetAwaiter().GetResult();
@@ -203,9 +204,10 @@ namespace Umbraco.Cms
                     {
                         _repositoryCacheVersionService.SetCachesSyncedAsync();
                         var lastId = _lastSyncedManager.GetLastSyncedInternalAsync().GetAwaiter().GetResult() ?? 0;
+                        var previousLastId = lastId;
                         var numberOfInstructionsProcessed = ProcessDatabaseInstructions(cacheRefreshers, cancellationToken, localIdentity, ref lastId);
 
-                        if (numberOfInstructionsProcessed > 0)
+                        if (lastId > 0 && lastId != previousLastId)
                         {
                             _lastSyncedManager.SaveLastSyncedInternalAsync(lastId).GetAwaiter().GetResult();
                         }
@@ -288,7 +290,17 @@ namespace Umbraco.Cms
                         continue;
                     }
 
-                    List<RefreshInstruction> instructionBatch = GetAllInstructions(jsonInstructions?.RootElement);
+                    // Dispose the JsonDocument once we've extracted instructions from its RootElement.
+                    // Use try/finally to ensure pooled buffers are returned even if retrieving the instructions throws.
+                    List<RefreshInstruction> instructionBatch;
+                    try
+                    {
+                        instructionBatch = GetAllInstructions(jsonInstructions?.RootElement);
+                    }
+                    finally
+                    {
+                        jsonInstructions?.Dispose();
+                    }
 
                     // Process as per-normal.
                     var success = ProcessDatabaseInstructions(cacheRefreshers, instructionBatch, instruction, processed, cancellationToken, ref lastId);

@@ -23,15 +23,12 @@ export class UmbRefCollectionViewElement extends UmbCollectionViewElementBase {
 		return html`<umb-entity-collection-item-ref
 			.item=${item}
 			href=${href ?? nothing}
-			?selectable=${this._selectable}
-			?select-only=${this._selection.length > 0}
+			?selectable=${this._isSelectableItem(item)}
+			?select-only=${this._selectOnly}
 			?selected=${this._isSelectedItem(item.unique)}
 			@selected=${() => this._selectItem(item.unique)}
 			@deselected=${() => this._deselectItem(item.unique)}>
-			<umb-entity-actions-bundle
-				slot="actions"
-				.entityType=${item.entityType}
-				.unique=${item.unique}></umb-entity-actions-bundle>
+			<umb-entity-actions-bundle slot="actions"></umb-entity-actions-bundle>
 		</umb-entity-collection-item-ref>`;
 	}
 
@@ -41,6 +38,14 @@ export class UmbRefCollectionViewElement extends UmbCollectionViewElementBase {
 			:host {
 				display: flex;
 				flex-direction: column;
+			}
+
+			umb-entity-collection-item-ref {
+				margin-bottom: var(--uui-size-4);
+
+				&:last-of-type {
+					margin-bottom: 0;
+				}
 			}
 		`,
 	];

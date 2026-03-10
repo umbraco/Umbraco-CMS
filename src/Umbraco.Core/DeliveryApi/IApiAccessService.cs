@@ -1,5 +1,8 @@
-﻿namespace Umbraco.Cms.Core.DeliveryApi;
+namespace Umbraco.Cms.Core.DeliveryApi;
 
+/// <summary>
+///     Defines a service that determines access permissions for the Delivery API.
+/// </summary>
 public interface IApiAccessService
 {
     /// <summary>

@@ -1,14 +1,24 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 
 namespace Umbraco.Cms.Core;
 
-
+/// <summary>
+///     Default implementation of <see cref="IFireAndForgetRunner" /> that runs tasks on background threads.
+/// </summary>
+/// <remarks>
+///     This implementation suppresses the execution context flow to prevent AsyncLocal values from leaking to child threads.
+/// </remarks>
 public class FireAndForgetRunner : IFireAndForgetRunner
 {
     private readonly ILogger<FireAndForgetRunner> _logger;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="FireAndForgetRunner" /> class.
+    /// </summary>
+    /// <param name="logger">The logger for recording exceptions from background tasks.</param>
     public FireAndForgetRunner(ILogger<FireAndForgetRunner> logger) => _logger = logger;
 
+    /// <inheritdoc />
     public void RunFireAndForget(Func<Task> task) => ExecuteBackgroundTask(task);
 
     private Task ExecuteBackgroundTask(Func<Task> fn)

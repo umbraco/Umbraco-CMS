@@ -5,7 +5,6 @@ import type {
 	UmbLinkPickerModalValue,
 } from './link-picker-modal.token.js';
 import { css, customElement, html, nothing, query, state, when } from '@umbraco-cms/backoffice/external/lit';
-import { isUmbracoFolder, UmbMediaTypeStructureRepository } from '@umbraco-cms/backoffice/media-type';
 import {
 	umbBindToValidation,
 	UmbObserveValidationStateController,
@@ -29,11 +28,9 @@ type UmbInputPickerEvent = CustomEvent & { target: { value?: string } };
 @customElement('umb-link-picker-modal')
 export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPickerModalData, UmbLinkPickerModalValue> {
 	#propertyLayoutOrientation: 'horizontal' | 'vertical' = 'vertical';
+	#userEditedTitle = false;
 
 	#validationContext = new UmbValidationContext(this);
-
-	@state()
-	private _allowedMediaTypeUniques?: Array<string>;
 
 	@state()
 	private _config: UmbLinkPickerConfig = {
@@ -73,16 +70,9 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 			});
 		}
 
-		this.#getMediaTypes();
-		this.populateLinkUrl();
-	}
+		this.#userEditedTitle = !!this.value.link.name;
 
-	async #getMediaTypes() {
-		// Get all the media types, excluding the folders, so that files are selectable media items.
-		const mediaTypeStructureRepository = new UmbMediaTypeStructureRepository(this);
-		const { data: mediaTypes } = await mediaTypeStructureRepository.requestAllowedChildrenOf(null, null);
-		this._allowedMediaTypeUniques =
-			(mediaTypes?.items.map((x) => x.unique).filter((x) => x && !isUmbracoFolder(x)) as Array<string>) ?? [];
+		this.populateLinkUrl();
 	}
 
 	async populateLinkUrl() {
@@ -130,7 +120,9 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 	}
 
 	#onLinkTitleInput(event: UUIInputEvent) {
-		this.#partialUpdateLink({ name: event.target.value as string });
+		const name = event.target.value as string;
+		this.#userEditedTitle = !!name;
+		this.#partialUpdateLink({ name });
 	}
 
 	#onLinkTargetInput(event: UUIBooleanInputEvent) {
@@ -140,8 +132,8 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 	#onLinkUrlInput(event: UUIInputEvent) {
 		const url = event.target.value as string;
 
-		let name;
-		if (url && !this.value.link.name) {
+		let name: string | undefined;
+		if (url && !this.#userEditedTitle) {
 			if (URL.canParse(url)) {
 				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 				// @ts-ignore
@@ -153,7 +145,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 		}
 
 		this.#partialUpdateLink({
-			name: this.value.link.name || name,
+			name: this.#userEditedTitle ? this.value.link.name : (name ?? ''),
 			type: 'external',
 			url,
 		});
@@ -199,7 +191,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 
 		const link = {
 			icon,
-			name: name || this.value.link.name,
+			name: this.#userEditedTitle ? this.value.link.name : (name || this.value.link.name),
 			type: unique ? type : undefined,
 			unique,
 			url: url ?? this.value.link.url,
@@ -353,7 +345,6 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 				label=${this.localize.term('general_media')}>
 				<umb-input-media
 					slot="editor"
-					.allowedContentTypeIds=${this._allowedMediaTypeUniques}
 					.max=${1}
 					.value=${this.value.link.unique && this.value.link.type === 'media' ? this.value.link.unique : ''}
 					@change=${(e: UmbInputPickerEvent) => this.#onPickerSelection(e, 'media')}></umb-input-media>
@@ -431,7 +422,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 					label=${this.localize.term('defaultdialogs_nodeNameLinkPicker')}
 					placeholder=${this.localize.term('defaultdialogs_nodeNameLinkPicker')}
 					.value=${this.value.link.name ?? ''}
-					@change=${this.#onLinkTitleInput}>
+					@input=${this.#onLinkTitleInput}>
 				</uui-input>
 			</umb-property-layout>
 		`;

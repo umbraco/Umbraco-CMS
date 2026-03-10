@@ -1,4 +1,4 @@
-import {ConstantHelper, NotificationConstantHelper, test} from "@umbraco/playwright-testhelpers";
+import {ConstantHelper, NotificationConstantHelper, test} from "@umbraco/acceptance-test-helpers";
 import {expect} from "@playwright/test";
 
 // Document Type
@@ -25,7 +25,6 @@ const documentBlueprintName = 'TestBlueprintName';
 
 // User
 const testUser = ConstantHelper.testUserCredentials;
-let testUserCookieAndToken = {cookie: "", accessToken: "", refreshToken: ""};
 
 // User Group
 const userGroupName = 'TestUserGroup';
@@ -48,7 +47,7 @@ test.beforeEach(async ({umbracoApi}) => {
 
 test.afterEach(async ({umbracoApi}) => {
   // Ensure we are logged in to admin
-  await umbracoApi.loginToAdminUser(testUserCookieAndToken.cookie, testUserCookieAndToken.accessToken, testUserCookieAndToken.refreshToken);
+  await umbracoApi.loginToAdminUser();
   await umbracoApi.document.ensureNameNotExists(firstDocumentName);
   await umbracoApi.document.ensureNameNotExists(secondDocumentName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
@@ -58,12 +57,11 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.language.ensureIsoCodeNotExists('da');
 });
 
-// Skip this test due to this issue: https://github.com/umbraco/Umbraco-CMS/issues/20505
-test.skip('can read a specific document with read permission enabled', async ({umbracoApi, umbracoUi}) => {
+test('can read a specific document with read permission enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithReadPermissionForSpecificDocument(userGroupName, firstDocumentId);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
   await umbracoUi.userGroup.goToSection(ConstantHelper.sections.content, false);
 
@@ -72,15 +70,14 @@ test.skip('can read a specific document with read permission enabled', async ({u
 
   // Assert
   await umbracoUi.content.doesDocumentHaveName(firstDocumentName);
-  await umbracoUi.content.goToContentWithName(secondDocumentName);
-  await umbracoUi.content.doesDocumentWorkspaceHaveText('Not found');
+  await umbracoUi.content.isTreeItemVisible(secondDocumentName, false);
 });
 
 test('can create document blueprint for a specific document with create document blueprint permission enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithCreateDocumentBlueprintPermissionForSpecificDocument(userGroupName, firstDocumentId);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
 
@@ -92,14 +89,14 @@ test('can create document blueprint for a specific document with create document
 
   // Assert
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.documentBlueprintCreated);
-  await umbracoUi.content.isActionsMenuForNameVisible(secondDocumentName, false);
+  await umbracoUi.content.isTreeItemVisible(secondDocumentName, false);
 });
 
 test('can delete a specific content with delete permission enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithDeletePermissionForSpecificDocument(userGroupName, firstDocumentId);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
 
@@ -109,14 +106,14 @@ test('can delete a specific content with delete permission enabled', async ({umb
   await umbracoUi.content.clickConfirmTrashButtonAndWaitForContentToBeTrashed();
 
   // Assert
-  await umbracoUi.content.isActionsMenuForNameVisible(secondDocumentName, false);
+  await umbracoUi.content.isTreeItemVisible(secondDocumentName, false);
 });
 
 test('can create content from a specific content with create permission enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithCreatePermissionForSpecificDocument(userGroupName, firstDocumentId);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
 
@@ -125,14 +122,14 @@ test('can create content from a specific content with create permission enabled'
 
   // Assert
   await umbracoUi.content.isPermissionInActionsMenuVisible('Create…');
-  await umbracoUi.content.isActionsMenuForNameVisible(secondDocumentName, false);
+  await umbracoUi.content.isTreeItemVisible(secondDocumentName, false);
 });
 
 test('can publish a specific content with publish permission enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithPublishPermissionForSpecificDocument(userGroupName, firstDocumentId);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
 
@@ -143,7 +140,7 @@ test('can publish a specific content with publish permission enabled', async ({u
 
   // Assert
   expect(await umbracoApi.document.isDocumentPublished(firstDocumentId)).toBeTruthy();
-  await umbracoUi.content.isActionsMenuForNameVisible(secondDocumentName, false);
+  await umbracoUi.content.isTreeItemVisible(secondDocumentName, false);
 });
 
 test('can unpublish a specific content with unpublish permission enabled', async ({umbracoApi, umbracoUi}) => {
@@ -154,7 +151,7 @@ test('can unpublish a specific content with unpublish permission enabled', async
   expect(await umbracoApi.document.isDocumentPublished(secondDocumentId)).toBeTruthy();
   userGroupId = await umbracoApi.userGroup.createUserGroupWithUnpublishPermissionForSpecificDocument(userGroupName, firstDocumentId);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
 
@@ -166,14 +163,14 @@ test('can unpublish a specific content with unpublish permission enabled', async
   // Assert
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.unpublished);
   expect(await umbracoApi.document.isDocumentPublished(firstDocumentId)).toBeFalsy();
-  await umbracoUi.content.isActionsMenuForNameVisible(secondDocumentName, false);
+  await umbracoUi.content.isTreeItemVisible(secondDocumentName, false);
 });
 
 test('can update a specific content with update permission enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithUpdatePermissionForSpecificDocument(userGroupName, firstDocumentId);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
 
@@ -194,7 +191,7 @@ test('can duplicate a specific content with duplicate permission enabled', async
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithDuplicatePermissionForSpecificDocument(userGroupName, firstDocumentId);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
 
@@ -207,31 +204,23 @@ test('can duplicate a specific content with duplicate permission enabled', async
 
   // Assert
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.duplicated);
-  await umbracoUi.content.clickActionsMenuForContent(secondDocumentName);
-  await umbracoUi.content.isPermissionInActionsMenuVisible('Duplicate to…', false);
+  await umbracoUi.content.isTreeItemVisible(secondDocumentName, false);
 });
 
 test('can move a specific content with move to permission enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const moveToDocumentName = 'MoveToDocument';
-  await umbracoApi.document.createDefaultDocumentWithParent(childDocumentName, childDocumentTypeId, firstDocumentId);
-  await umbracoApi.document.createDocumentWithTextContent(moveToDocumentName, documentTypeId, documentText, dataTypeName);
   userGroupId = await umbracoApi.userGroup.createUserGroupWithMoveToPermissionForSpecificDocument(userGroupName, firstDocumentId);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
 
   // Act
-  await umbracoUi.content.openContentCaretButtonForName(firstDocumentName);
-  await umbracoUi.content.clickActionsMenuForContent(childDocumentName);
-  await umbracoUi.content.clickMoveToActionMenuOption();
-  await umbracoUi.content.moveToContentWithName([], moveToDocumentName);
+  await umbracoUi.content.clickActionsMenuForContent(firstDocumentName);
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.moved);
-  await umbracoUi.content.clickActionsMenuForContent(secondDocumentName);
-  await umbracoUi.content.isPermissionInActionsMenuVisible('Move to…', false);
+  await umbracoUi.content.isPermissionInActionsMenuVisible('Move to…');
+  await umbracoUi.content.isTreeItemVisible(secondDocumentName, false);
 });
 
 test('can sort children with sort children permission enabled', async ({umbracoApi, umbracoUi}) => {
@@ -239,7 +228,7 @@ test('can sort children with sort children permission enabled', async ({umbracoA
   await umbracoApi.document.createDefaultDocumentWithParent(childDocumentName, childDocumentTypeId, firstDocumentId);
   userGroupId = await umbracoApi.userGroup.createUserGroupWithSortChildrenPermissionForSpecificDocument(userGroupName, firstDocumentId);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
 
@@ -248,7 +237,7 @@ test('can sort children with sort children permission enabled', async ({umbracoA
 
   // Assert
   await umbracoUi.content.isPermissionInActionsMenuVisible('Sort children…');
-  await umbracoUi.content.isActionsMenuForNameVisible(secondDocumentName, false);
+  await umbracoUi.content.isTreeItemVisible(secondDocumentName, false);
 });
 
 test('can set culture and hostnames for a specific content with culture and hostnames permission enabled', async ({umbracoApi, umbracoUi}) => {
@@ -257,7 +246,7 @@ test('can set culture and hostnames for a specific content with culture and host
   const languageName = 'Danish';
   userGroupId = await umbracoApi.userGroup.createUserGroupWithCultureAndHostnamesPermissionForSpecificDocument(userGroupName, firstDocumentId);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
 
@@ -274,7 +263,7 @@ test('can set culture and hostnames for a specific content with culture and host
   const domains = await umbracoApi.document.getDomains(document.id);
   expect(domains.domains[0].domainName).toEqual(domainName);
   expect(domains.domains[0].isoCode).toEqual('da');
-  await umbracoUi.content.isActionsMenuForNameVisible(secondDocumentName, false);
+  await umbracoUi.content.isTreeItemVisible(secondDocumentName, false);
 });
 
 test('can set public access for a specific content with public access permission enabled', async ({umbracoApi, umbracoUi}) => {
@@ -284,7 +273,7 @@ test('can set public access for a specific content with public access permission
   await umbracoApi.memberGroup.ensureNameNotExists(testMemberGroup);
   await umbracoApi.memberGroup.create(testMemberGroup);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
 
@@ -295,7 +284,7 @@ test('can set public access for a specific content with public access permission
 
   // Assert
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.publicAccessSettingCreated);
-  await umbracoUi.content.isActionsMenuForNameVisible(secondDocumentName, false);
+  await umbracoUi.content.isTreeItemVisible(secondDocumentName, false);
 
   // Clean
   await umbracoApi.memberGroup.ensureNameNotExists(testMemberGroup);
@@ -311,7 +300,7 @@ test('can rollback a specific content with rollback permission enabled', async (
   await umbracoApi.document.update(firstDocumentId, contentData);
   await umbracoApi.document.publish(firstDocumentId);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
 
@@ -325,5 +314,5 @@ test('can rollback a specific content with rollback permission enabled', async (
   await umbracoUi.content.isSuccessNotificationVisible();
   await umbracoUi.content.goToContentWithName(firstDocumentName);
   await umbracoUi.content.doesDocumentPropertyHaveValue(dataTypeName, documentText);
-  await umbracoUi.content.isActionsMenuForNameVisible(secondDocumentName, false);
+  await umbracoUi.content.isTreeItemVisible(secondDocumentName, false);
 });

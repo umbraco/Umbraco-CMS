@@ -69,17 +69,27 @@ public class AppCaches : IDisposable
     /// </remarks>
     public IsolatedCaches IsolatedCaches { get; }
 
+    /// <summary>
+    ///     Creates a new instance of <see cref="AppCaches" /> with the specified request cache.
+    /// </summary>
+    /// <param name="requestCache">The request cache to use.</param>
+    /// <returns>A new <see cref="AppCaches" /> instance.</returns>
     public static AppCaches Create(IRequestCache requestCache) =>
         new(
             new DeepCloneAppCache(new ObjectCacheAppCache()),
             requestCache,
             new IsolatedCaches(type => new DeepCloneAppCache(new ObjectCacheAppCache())));
 
+    /// <inheritdoc />
     public void Dispose() =>
 
         // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
         Dispose(true);
 
+    /// <summary>
+    ///     Releases the unmanaged resources used by the <see cref="AppCaches" /> and optionally releases the managed resources.
+    /// </summary>
+    /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
     protected virtual void Dispose(bool disposing)
     {
         if (!_disposedValue)

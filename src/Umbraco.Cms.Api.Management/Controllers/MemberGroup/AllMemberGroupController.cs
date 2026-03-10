@@ -24,12 +24,14 @@ public class AllMemberGroupController : MemberGroupControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<MemberGroupResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a paginated collection of member groups.")]
+    [EndpointDescription("Gets a paginated collection of all member groups.")]
     public async Task<ActionResult<PagedViewModel<MemberGroupResponseModel>>> All(
         CancellationToken cancellationToken,
         int skip = 0,
         int take = 100)
     {
-        IMemberGroup[] memberGroups = (await _memberGroupService.GetAllAsync()).ToArray();
+        IMemberGroup[] memberGroups = (await _memberGroupService.GetAllAsync()).OrderBy(g => g.Name).ToArray();
         var viewModel = new PagedViewModel<MemberGroupResponseModel>
         {
             Total = memberGroups.Length,

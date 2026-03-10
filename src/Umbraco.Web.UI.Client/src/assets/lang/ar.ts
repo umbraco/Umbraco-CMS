@@ -340,6 +340,8 @@ export default {
 		renameFolderFailed: 'فشل في إعادة تسمية المجلد بالمعرف %0%',
 		dragAndDropYourFilesIntoTheArea: 'اسحب وأفلت ملفاتك في المنطقة',
 		uploadNotAllowed: 'التحميل غير مسموح به في هذا الموقع',
+		uploadValidationFailed: (mediaTypeName: string) =>
+			`نوع الوسائط ${mediaTypeName} يحتوي على خاصية مطلوبة أو أكثر. ستحتاج إلى تحميله بشكل فردي عبر قائمة 'إنشاء'`,
 	},
 	member: {
 		createNewMember: 'إنشاء عضو جديد',
@@ -1787,6 +1789,7 @@ export default {
 		noLockouts: 'لم يتم قفله',
 		noPasswordChange: 'لم يتم تغيير كلمة المرور',
 		confirmNewPassword: 'تأكيد كلمة المرور الجديدة',
+		confirmPassword: 'تأكيد كلمة المرور',
 		changePasswordDescription:
 			"يمكنك تغيير كلمة مرورك للوصول إلى واجهة Umbraco من خلال ملء النموذج أدناه والنقر على زر 'تغيير كلمة المرور'",
 		contentChannel: 'قناة المحتوى',

@@ -13,8 +13,15 @@ using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Cms.Api.Common.OpenApi;
 
+/// <summary>
+///     Pipeline filter that configures Swagger/OpenAPI endpoints for Umbraco APIs.
+/// </summary>
 public class SwaggerRouteTemplatePipelineFilter : UmbracoPipelineFilter
 {
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="SwaggerRouteTemplatePipelineFilter"/> class.
+    /// </summary>
+    /// <param name="name">The name of the pipeline filter.</param>
     public SwaggerRouteTemplatePipelineFilter(string name)
         : base(name)
         => PostPipeline = PostPipelineAction;
@@ -36,15 +43,36 @@ public class SwaggerRouteTemplatePipelineFilter : UmbracoPipelineFilter
         applicationBuilder.UseSwaggerUI(swaggerUiOptions => SwaggerUiConfiguration(swaggerUiOptions, swaggerGenOptions.Value, applicationBuilder));
     }
 
+    /// <summary>
+    ///     Determines whether Swagger is enabled for the application.
+    /// </summary>
+    /// <param name="applicationBuilder">The application builder.</param>
+    /// <returns><c>true</c> if Swagger is enabled; otherwise, <c>false</c>.</returns>
     protected virtual bool SwaggerIsEnabled(IApplicationBuilder applicationBuilder)
         => applicationBuilder.ApplicationServices.GetRequiredService<IWebHostEnvironment>().IsProduction() is false;
 
+    /// <summary>
+    ///     Gets the route template for Swagger JSON endpoints.
+    /// </summary>
+    /// <param name="applicationBuilder">The application builder.</param>
+    /// <returns>The Swagger route template.</returns>
     protected virtual string SwaggerRouteTemplate(IApplicationBuilder applicationBuilder)
         => $"{GetBackOfficePath(applicationBuilder).TrimStart(Constants.CharArrays.ForwardSlash)}/swagger/{{documentName}}/swagger.json";
 
+    /// <summary>
+    ///     Gets the route prefix for the Swagger UI.
+    /// </summary>
+    /// <param name="applicationBuilder">The application builder.</param>
+    /// <returns>The Swagger UI route prefix.</returns>
     protected virtual string SwaggerUiRoutePrefix(IApplicationBuilder applicationBuilder)
         => $"{GetBackOfficePath(applicationBuilder).TrimStart(Constants.CharArrays.ForwardSlash)}/swagger";
 
+    /// <summary>
+    ///     Configures the Swagger UI options.
+    /// </summary>
+    /// <param name="swaggerUiOptions">The Swagger UI options to configure.</param>
+    /// <param name="swaggerGenOptions">The Swagger generation options.</param>
+    /// <param name="applicationBuilder">The application builder.</param>
     protected virtual void SwaggerUiConfiguration(
         SwaggerUIOptions swaggerUiOptions,
         SwaggerGenOptions swaggerGenOptions,

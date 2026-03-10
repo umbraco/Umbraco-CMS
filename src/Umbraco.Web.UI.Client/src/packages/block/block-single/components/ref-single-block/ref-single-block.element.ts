@@ -29,7 +29,10 @@ export class UmbRefSingleBlockElement extends UmbLitElement {
 	override render() {
 		const blockValue = { ...this.content, $settings: this.settings };
 		return html`
-			<uui-ref-node standalone href=${(this.config?.showContentEdit ? this.config?.editContentPath : undefined) ?? ''}>
+			<uui-ref-node
+				standalone
+				.readonly=${!(this.config?.showContentEdit ?? false)}
+				.href=${this.config?.showContentEdit ? this.config?.editContentPath : undefined}>
 				<umb-icon slot="icon" .name=${this.icon}></umb-icon>
 				<umb-ufm-render slot="name" inline .markdown=${this.label} .value=${blockValue}></umb-ufm-render>
 				${when(
