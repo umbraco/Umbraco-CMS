@@ -9,9 +9,16 @@ using Umbraco.Cms.Api.Management.ViewModels.Server;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Web.Common.Controllers;
+
 namespace Umbraco.Cms.Api.Management.Controllers.Server;
 
 [ApiVersion("1.0")]
+
+// The backoffice shell reads /server/configuration during its initial connection to determine
+// settings such as whether local login is allowed. This endpoint must be reachable during an
+// unattended upgrade, so the maintenance filter is explicitly bypassed.
+[SkipMaintenanceModeFilter]
 public class ConfigurationServerController : ServerControllerBase
 {
     private readonly SecuritySettings _securitySettings;
