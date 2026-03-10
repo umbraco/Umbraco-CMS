@@ -23,7 +23,7 @@ export async function tryXhrRequest<T>(
 	const promise = createXhrRequest<T>({
 		...options,
 		baseUrl: config.baseUrl,
-		token: () => (typeof config.auth === 'function' ? config.auth({ type: 'http', scheme: 'bearer' }) : config.auth),
+		token: '[redacted]',
 	});
 	const controller = new UmbTryExecuteController(host, promise);
 	const response = await controller.tryExecute(options);

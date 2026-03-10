@@ -165,6 +165,10 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	// @ts-ignore
 	// TODO: fix type error
 	public readonly variantOptions;
+
+	async getVariantOptions(): Promise<Array<VariantOptionModelType>> {
+		return firstValueFrom(this.variantOptions);
+	}
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	protected _variantOptionsFilter = (variantOption: VariantOptionModelType) => true;
 
@@ -716,7 +720,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	async #ensureVariantsExistsForProperty(variantId: UmbVariantId, entry: UmbElementValueModel) {
 		// TODO: Implement queueing of these operations to ensure this does not execute too often. [NL]
 
-		const cultureOptions = await firstValueFrom(this.variantOptions);
+		const cultureOptions = await this.getVariantOptions();
 		let valueVariantIds: Array<UmbVariantId> = [];
 
 		// Find inner values to determine if any of this holds variants that needs to be created.
@@ -781,7 +785,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		options: VariantOptionModelType[];
 		selected: string[];
 	}> {
-		const options = (await firstValueFrom(this.variantOptions)).filter((option) => option.segment === null);
+		const options = (await this.getVariantOptions()).filter((option) => option.segment === null);
 
 		const activeVariants = this.splitView.getActiveVariants();
 		const activeVariantIds = activeVariants.map((activeVariant) => UmbVariantId.Create(activeVariant));
@@ -961,7 +965,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		await this.runMandatoryValidationForSaveData(saveData, variantIds);
 		if (this.#validateOnSubmit) {
 			await this.askServerToValidate(saveData, variantIds);
-			const valid = await this._validateAndLog().then(
+			const valid = await this._validateVariantsAndLog(variantIds).then(
 				() => true,
 				() => false,
 			);
@@ -973,6 +977,65 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		} else {
 			await this.performCreateOrUpdate(variantIds, saveData);
 		}
+	}
+
+	public validateVariantsAndSubmit(
+		variantIds: Array<UmbVariantId>,
+		onValid: () => Promise<void>,
+		onInvalid: (reason?: any) => Promise<void>,
+	): Promise<void> {
+		return this._validateByAndSubmit(() => this._validateVariantsAndLog(variantIds), onValid, onInvalid);
+	}
+
+	protected async _validateVariantsAndLog(variantIds?: Array<UmbVariantId>): Promise<void> {
+		// Make sure that each variant-id for a given culture, has gotten all the valid segment variant-ids present too. See variant-options for which are available. [NL]
+		if (variantIds && this.getVariesBySegment()) {
+			const variantOptions = await this.getVariantOptions();
+			const expandedVariantIds: Array<UmbVariantId> = [];
+
+			for (const variantId of variantIds) {
+				// If a culture variant without segment, add all segment variants for that culture:
+				if (variantId.culture !== null && variantId.segment === null) {
+					for (const option of variantOptions) {
+						if (option.culture === variantId.culture) {
+							expandedVariantIds.push(UmbVariantId.Create(option));
+						}
+					}
+				} else {
+					expandedVariantIds.push(variantId);
+				}
+			}
+
+			variantIds = expandedVariantIds;
+		}
+
+		await this.#validateByVariantIds(variantIds).catch(async () => {
+			// TODO: Implement developer-mode logging here. [NL]
+			console.warn(
+				'Validation failed because of these validation messages still begin present: ',
+				this.validationContext.messages.getMessages(),
+			);
+			return Promise.reject();
+		});
+	}
+
+	/**
+	 * If a Workspace has multiple validation contexts, then this method can be overwritten to return the correct one.
+	 * @param {Array<UmbVariantId> | undefined} variantIds Optional array of variantIds to filter which contexts to validate.
+	 * @returns {Promise<Array<void>>} Promise that resolves to void when the validation is complete.
+	 */
+	async #validateByVariantIds(variantIds?: Array<UmbVariantId>): Promise<void> {
+		// If variantIds are provided, we only validate the contexts matching those variantIds, or those without a variantId.
+		if (variantIds) {
+			if (variantIds.length === 0) {
+				console.warn(
+					'Workspace Context: validate called with an empty array of variantIds, only validation-contexts with no variantId will be validated.',
+				);
+			}
+			return await this.validationContext.validateByVariantIds(variantIds);
+		}
+
+		return await (super.validate() as unknown as Promise<void>);
 	}
 
 	/**
