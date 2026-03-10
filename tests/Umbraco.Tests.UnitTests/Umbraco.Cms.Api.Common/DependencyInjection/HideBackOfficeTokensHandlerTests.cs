@@ -46,7 +46,7 @@ internal class HideBackOfficeTokensHandlerTests
         public Mock<IDataProtector> DataProtector { get; } = new();
 
 #pragma warning disable CS0618 // Type or member is obsolete
-        private BackOfficeTokenCookieSettings BackOfficeTokenCookieSettings { get; set; } = new();
+        public BackOfficeTokenCookieSettings BackOfficeTokenCookieSettings { get; set; } = new();
 #pragma warning restore CS0618 // Type or member is obsolete
 
         public GlobalSettings GlobalSettings { get; set; } = new();
@@ -213,6 +213,27 @@ internal class HideBackOfficeTokensHandlerTests
         }
     }
 
+    [Test]
+    public async Task ApplyTokenResponse_CookieSiteNamePostfix()
+    {
+        // Arrange
+        var setup = new TestSetup();
+        setup.BackOfficeTokenCookieSettings.SiteName = "-test-site-name";
+        setup.GlobalSettings.UseHttps = false;
+        setup.SetupHttpContext(isHttps: false);
+
+        var context = CreateApplyTokenResponseContext(Constants.OAuthClientIds.BackOffice, AccessTokenValue, RefreshTokenValue);
+
+        // Act
+        await setup.Sut.HandleAsync(context);
+
+        // Assert
+        Assert.IsFalse(setup.ResponseCookies.ContainsKey(AccessTokenCookieName));
+        Assert.IsFalse(setup.ResponseCookies.ContainsKey(RefreshTokenCookieName));
+        Assert.IsTrue(setup.ResponseCookies.ContainsKey($"{AccessTokenCookieName}-test-site-name"));
+        Assert.IsTrue(setup.ResponseCookies.ContainsKey($"{RefreshTokenCookieName}-test-site-name"));
+    }
+
     #endregion
 
     #region ApplyAuthorizationResponseContext Handler Tests
@@ -276,6 +297,25 @@ internal class HideBackOfficeTokensHandlerTests
         {
             Assert.IsFalse(setup.ResponseCookies.ContainsKey($"{SecureCookiePrefix}{PkceCodeCookieName}"));
         }
+    }
+
+    [Test]
+    public async Task ApplyAuthorizationResponse_CookieSiteNamePostfix()
+    {
+        // Arrange
+        var setup = new TestSetup();
+        setup.BackOfficeTokenCookieSettings.SiteName = "-test-site-name";
+        setup.GlobalSettings.UseHttps = false;
+        setup.SetupHttpContext(isHttps: false);
+
+        var context = CreateApplyAuthorizationResponseContext(Constants.OAuthClientIds.BackOffice, PkceCodeValue);
+
+        // Act
+        await setup.Sut.HandleAsync(context);
+
+        // Assert
+        Assert.IsFalse(setup.ResponseCookies.ContainsKey(PkceCodeCookieName));
+        Assert.IsTrue(setup.ResponseCookies.ContainsKey($"{PkceCodeCookieName}-test-site-name"));
     }
 
     #endregion

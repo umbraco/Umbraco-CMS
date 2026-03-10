@@ -1,7 +1,7 @@
 import {ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 
 const testUser = ConstantHelper.testUserCredentials;
-let testUserCookieAndToken = {cookie: "", accessToken: "", refreshToken: ""};
+
 
 const userGroupName = 'TestUserGroup';
 let userGroupId = null;
@@ -14,14 +14,14 @@ test.beforeEach(async ({umbracoApi}) => {
 
 test.afterEach(async ({umbracoApi}) => {
   // Ensure we are logged in to admin
-  await umbracoApi.loginToAdminUser(testUserCookieAndToken.cookie, testUserCookieAndToken.accessToken, testUserCookieAndToken.refreshToken);
+  await umbracoApi.loginToAdminUser();
   await umbracoApi.userGroup.ensureNameNotExists(userGroupName);
 });
 
 test('can see correct translation for content in english', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId, [], true, [], false, 'en-us');
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
 
   // Act
   await umbracoUi.goToBackOffice();
@@ -33,7 +33,7 @@ test('can see correct translation for content in english', async ({umbracoApi, u
 test('can see correct translation for content in danish', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId, [], true, [], false, 'da-dk');
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
 
   // Act
   await umbracoUi.goToBackOffice();
