@@ -107,6 +107,45 @@ public class RedirectTrackerTests : UmbracoIntegrationTestWithContent
         Assert.AreEqual("/old-route", redirect.Url);
     }
 
+    [Test]
+    public void Can_Store_Old_Route_With_Domain_Path_Does_Not_Duplicate_Segment()
+    {
+        Dictionary<(int ContentId, string Culture), (Guid ContentKey, string OldRoute)> dict = [];
+
+        // Domain configured as "example.com/en/" — GetUrl returns "/en/new-route"
+        var redirectTracker = CreateRedirectTracker(assignDomain: true, domainName: "example.com/en/", relativeUrl: "/en/new-route");
+
+        redirectTracker.StoreOldRoute(_testPage, dict);
+
+        Assert.AreEqual(1, dict.Count);
+        var key = dict.Keys.First();
+        Assert.AreEqual(_testPage.Key, dict[key].ContentKey);
+
+        // The stored route should strip the domain path "/en" so the result is "{rootId}/new-route", NOT "{rootId}/en/new-route"
+        Assert.AreEqual($"{_rootPage.Id}/new-route", dict[key].OldRoute);
+    }
+
+    [Test]
+    public void Create_Redirects_With_Domain_Path_Skips_When_Route_Unchanged()
+    {
+        // oldRoute matches the correctly computed newRoute (domain path stripped).
+        // Without the fix, newRoute would be "{rootId}/en/new-route" (duplicated), causing a
+        // spurious redirect even though the URL hasn't actually changed.
+        IDictionary<(int ContentId, string Culture), (Guid ContentKey, string OldRoute)> dict =
+            new Dictionary<(int ContentId, string Culture), (Guid ContentKey, string OldRoute)>
+            {
+                [(_testPage.Id, "en")] = (_testPage.Key, $"{_rootPage.Id}/new-route"),
+            };
+
+        // Domain configured as "example.com/en/" — GetUrl returns "/en/new-route"
+        var redirectTracker = CreateRedirectTracker(assignDomain: true, domainName: "example.com/en/", relativeUrl: "/en/new-route");
+
+        redirectTracker.CreateRedirects(dict);
+
+        var redirects = RedirectUrlService.GetContentRedirectUrls(_testPage.Key);
+        Assert.AreEqual(0, redirects.Count());
+    }
+
     private RedirectUrlRepository CreateRedirectUrlRepository() =>
         new(
             (IScopeAccessor)ScopeProvider,
@@ -115,7 +154,7 @@ public class RedirectTrackerTests : UmbracoIntegrationTestWithContent
             Mock.Of<IRepositoryCacheVersionService>(),
             Mock.Of<ICacheSyncService>());
 
-    private IRedirectTracker CreateRedirectTracker(bool assignDomain = false)
+    private IRedirectTracker CreateRedirectTracker(bool assignDomain = false, string? domainName = null, string? relativeUrl = null)
     {
         var contentType = new Mock<IPublishedContentType>();
         contentType.SetupGet(c => c.Variations).Returns(ContentVariation.Nothing);
@@ -150,7 +189,7 @@ public class RedirectTrackerTests : UmbracoIntegrationTestWithContent
         IPublishedUrlProvider publishedUrlProvider = Mock.Of<IPublishedUrlProvider>();
         Mock.Get(publishedUrlProvider)
             .Setup(x => x.GetUrl(_testPage.Key, UrlMode.Relative, "en", null))
-            .Returns("/new-route");
+            .Returns(relativeUrl ?? "/new-route");
 
         IDocumentNavigationQueryService documentNavigationQueryService = Mock.Of<IDocumentNavigationQueryService>();
         IEnumerable<Guid> ancestorKeys = [_rootPage.Key];
@@ -170,6 +209,15 @@ public class RedirectTrackerTests : UmbracoIntegrationTestWithContent
         Mock.Get(domainCache)
             .Setup(x => x.HasAssigned(_rootPage.Id, It.IsAny<bool>()))
             .Returns(assignDomain);
+
+        if (assignDomain)
+        {
+            var effectiveDomainName = domainName ?? "example.com";
+            var domains = new[] { new Domain(1, effectiveDomainName, _rootPage.Id, "en", false, 0) };
+            Mock.Get(domainCache)
+                .Setup(x => x.GetAssigned(_rootPage.Id, false))
+                .Returns(domains);
+        }
 
         return new RedirectTracker(
             GetRequiredService<ILanguageService>(),

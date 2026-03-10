@@ -4,7 +4,7 @@ import { UmbBlockGridEntryContext } from './block-grid-entry.context.js';
 import { css, customElement, html, nothing, property, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
 import { UmbDataPathBlockElementDataQuery } from '@umbraco-cms/backoffice/block';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { umbDestroyOnDisconnect, UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbObserveValidationStateController } from '@umbraco-cms/backoffice/validation';
 import { UUIBlinkAnimationValue, UUIBlinkKeyframes } from '@umbraco-cms/backoffice/external/uui';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
@@ -505,10 +505,10 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 				class="umb-block-grid__block--view"
 				.config=${this._blockViewProps.config}
 				.content=${this._blockViewProps.content}
-				.settings=${this._blockViewProps.settings}>
+				.settings=${this._blockViewProps.settings}
+				${umbDestroyOnDisconnect()}>
 			</umb-block-grid-block-unsupported>
 		`;
-		//TODO: investigate if we should have ${umbDestroyOnDisconnect()} here. Note how it works for drag n' drop in grid between areas and areas-root. [NL]
 	}
 
 	#renderInlineBlock() {
@@ -521,10 +521,10 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 				.unpublished=${!this._exposed}
 				.config=${this._blockViewProps.config}
 				.content=${this._blockViewProps.content}
-				.settings=${this._blockViewProps.settings}>
+				.settings=${this._blockViewProps.settings}
+				${umbDestroyOnDisconnect()}>
 			</umb-block-grid-block-inline>
 		`;
-		//TODO: investigate if we should have ${umbDestroyOnDisconnect()} here. Note how it works for drag n' drop in grid between areas and areas-root. [NL]
 	}
 
 	#renderRefBlock() {
@@ -537,10 +537,10 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 				.unpublished=${!this._exposed}
 				.config=${this._blockViewProps.config}
 				.content=${this._blockViewProps.content}
-				.settings=${this._blockViewProps.settings}>
+				.settings=${this._blockViewProps.settings}
+				${umbDestroyOnDisconnect()}>
 			</umb-block-grid-block>
 		`;
-		//TODO: investigate if we should have ${umbDestroyOnDisconnect()} here. Note how it works for drag n' drop in grid between areas and areas-root. [NL]
 	}
 
 	#renderCreateBeforeInlineButton() {
@@ -652,7 +652,11 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	#renderDeleteAction() {
 		if (this._isReadOnly) return nothing;
 		return html`
-			<uui-button label="delete" look="secondary" @click=${() => this.#context.requestDelete()} title=${this.localize.term('general_delete')}>
+			<uui-button
+				label="delete"
+				look="secondary"
+				@click=${() => this.#context.requestDelete()}
+				title=${this.localize.term('general_delete')}>
 				<uui-icon name="icon-remove"></uui-icon>
 			</uui-button>
 		`;
