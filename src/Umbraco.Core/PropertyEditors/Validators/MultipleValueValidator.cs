@@ -17,15 +17,6 @@ public class MultipleValueValidator : IValueValidator
     /// <summary>
     /// Initializes a new instance of the <see cref="MultipleValueValidator"/> class.
     /// </summary>
-    [Obsolete("Please use the constructor that takes all parameters. Scheduled for removal in Umbraco 17.")]
-    public MultipleValueValidator()
-        : this(StaticServiceProvider.Instance.GetRequiredService<ILocalizedTextService>())
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="MultipleValueValidator"/> class.
-    /// </summary>
     public MultipleValueValidator(ILocalizedTextService localizedTextService) => _localizedTextService = localizedTextService;
 
     /// <inheritdoc/>

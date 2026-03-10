@@ -11,6 +11,9 @@ namespace Umbraco.Cms.Core.Models;
 [DataContract(IsReference = true)]
 public class MemberType : ContentTypeCompositionBase, IMemberType
 {
+    /// <summary>
+    ///     Constant indicating that member types do not support publishing.
+    /// </summary>
     public const bool SupportsPublishingConst = false;
     private readonly IShortStringHelper _shortStringHelper;
 
@@ -22,6 +25,11 @@ public class MemberType : ContentTypeCompositionBase, IMemberType
     // Dictionary is divided into string: PropertyTypeAlias, Tuple: MemberCanEdit, VisibleOnProfile, PropertyTypeId
     private string _alias = string.Empty;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="MemberType" /> class with the specified parent ID.
+    /// </summary>
+    /// <param name="shortStringHelper">The short string helper.</param>
+    /// <param name="parentId">The identifier of the parent content type.</param>
     public MemberType(IShortStringHelper shortStringHelper, int parentId)
         : base(shortStringHelper, parentId)
     {
@@ -29,6 +37,11 @@ public class MemberType : ContentTypeCompositionBase, IMemberType
         _memberTypePropertyTypes = new Dictionary<string, MemberTypePropertyProfileAccess>();
     }
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="MemberType" /> class with a parent content type.
+    /// </summary>
+    /// <param name="shortStringHelper">The short string helper.</param>
+    /// <param name="parent">The parent content type composition.</param>
     public MemberType(IShortStringHelper shortStringHelper, IContentTypeComposition parent)
         : this(
         shortStringHelper,
@@ -37,6 +50,12 @@ public class MemberType : ContentTypeCompositionBase, IMemberType
     {
     }
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="MemberType" /> class with a parent content type and alias.
+    /// </summary>
+    /// <param name="shortStringHelper">The short string helper.</param>
+    /// <param name="parent">The parent content type composition.</param>
+    /// <param name="alias">The alias for the member type.</param>
     public MemberType(IShortStringHelper shortStringHelper, IContentTypeComposition parent, string alias)
         : base(shortStringHelper, parent, alias)
     {
@@ -47,6 +66,14 @@ public class MemberType : ContentTypeCompositionBase, IMemberType
     /// <inheritdoc />
     public override bool SupportsPublishing => SupportsPublishingConst;
 
+    /// <summary>
+    ///     Gets or sets the content variation mode. Always returns <see cref="ContentVariation.Nothing"/> for members.
+    /// </summary>
+    /// <remarks>
+    ///     Although technically possible, variations on members don't make much sense
+    ///     and therefore are disabled. They are fully supported at service level, though,
+    ///     but not at published snapshot level.
+    /// </remarks>
     public override ContentVariation Variations
     {
         // note: although technically possible, variations on members don't make much sense

@@ -103,8 +103,12 @@ export class UmbModalRouteRegistrationController<
 
 		this.#init = this.consumeContext(UMB_ROUTE_CONTEXT, (_routeContext) => {
 			this.#routeContext = _routeContext;
-			this.#registerModal().catch(() => undefined);
-		}).asPromise({ preventTimeout: true });
+			if (this.#routeContext) {
+				this.#registerModal().catch(() => undefined);
+			}
+		})
+			.asPromise({ preventTimeout: true })
+			.catch(() => undefined);
 	}
 
 	/**
@@ -176,7 +180,7 @@ export class UmbModalRouteRegistrationController<
 		if (oldValue === value) return;
 
 		this.#uniquePaths.set(identifier, value);
-		this.#registerModal().catch(() => undefined);
+		this.#registerModal();
 	}
 	getUniquePathValue(identifier: string): string | undefined {
 		return this.#uniquePaths.get(identifier);
@@ -234,7 +238,7 @@ export class UmbModalRouteRegistrationController<
 	override hostConnected() {
 		super.hostConnected();
 		if (!this.#modalRegistrationContext) {
-			this.#registerModal().catch(() => undefined);
+			this.#registerModal();
 		}
 	}
 	override hostDisconnected(): void {

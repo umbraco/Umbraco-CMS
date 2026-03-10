@@ -357,6 +357,8 @@ export default {
 		renameFolderFailed: 'Impossibile rinominare la cartella con id %0%',
 		dragAndDropYourFilesIntoTheArea: "Trascina e rilascia i tuoi file nell'area",
 		uploadNotAllowed: 'Il caricamento non è consentito in questa posizione.',
+		uploadValidationFailed: (mediaTypeName: string) =>
+			`Il tipo di media ${mediaTypeName} ha una o più proprietà richieste. Dovrà essere caricato singolarmente tramite il menu 'Crea'`,
 	},
 	member: {
 		createNewMember: 'Crea un nuovo membro',
@@ -850,7 +852,18 @@ export default {
 		avatar: 'Avatar per',
 	},
 	colors: {
+		black: 'Nero',
 		blue: 'Blu',
+		brown: 'Marrone',
+		cyan: 'Ciano',
+		green: 'Verde',
+		lightBlue: 'Azzurro',
+		pink: 'Rosa',
+		red: 'Rosso',
+		text: 'Nero',
+		yellow: 'Giallo',
+		white: 'Bianco',
+		grey: 'Grigio',
 	},
 	shortcuts: {
 		addGroup: 'Aggiungi gruppo',
@@ -1210,7 +1223,8 @@ export default {
 		changes: 'Modifiche',
 		headline: 'Seleziona una versione da confrontare con la versione corrente',
 		diffHelp:
-			'Qui vengono mostrate le differenze tra la versione corrente e la versione selezionata<br />Il testo <del>in rosso</del> non verrà mostrato nella versione selezionata, <ins>quello in verde verrà aggiunto</ins>',
+			'<del>Il testo rosso</del> verrà rimosso nella versione selezionata, <ins>il testo verde</ins> verrà aggiunto.',
+		showDiff: 'Mostra le differenze tra la versione corrente (bozza) e la versione selezionata.',
 		documentRolledBack: 'Il documento è stato riportato alla versione scelta.',
 		htmlHelp:
 			'Qui viene mostrata la versione selezionata in formato html, se vuoi vedere contemporaneamente le differenze tra le due versioni, usa la modalità diff view',
@@ -1231,12 +1245,6 @@ export default {
 		translation: 'Traduzione',
 		users: 'Utenti',
 	},
-	help: {
-		tours: 'Tours',
-		theBestUmbracoVideoTutorials: 'I migliori video tutorial su Umbraco',
-		umbracoForum: 'Visita our.umbraco.com',
-		umbracoTv: 'Visita umbraco.tv',
-	},
 	settings: {
 		defaulttemplate: 'Template di base',
 		importDocumentTypeHelp:
@@ -1255,6 +1263,7 @@ export default {
 			'Non ci sono proprietà definite per questa tab. Clicca sul link "aggiungi una nuova proprietà" in cima per creare una nuova proprietà.',
 		createMatchingTemplate: 'Crea un template corrispondente',
 		addIcon: 'Aggiungi icona',
+		changeIcon: 'Cambia icona',
 	},
 	sort: {
 		sortOrder: 'Ordinamento',
@@ -1733,6 +1742,7 @@ export default {
 		noLockouts: 'non è stato bloccato',
 		noPasswordChange: 'La password non è stata modificata',
 		confirmNewPassword: 'Conferma la nuova password',
+		confirmPassword: 'Conferma password',
 		changePasswordDescription:
 			"È possibile modificare la password di accesso al backoffice Umbraco compilando il form sottostante e clicca sul pulsante 'Modifica password'",
 		contentChannel: 'Contenuto del canale',
@@ -2126,14 +2136,10 @@ export default {
 		savedSearches: 'Ricerche salvate',
 		saveSearch: 'Salva ricerca',
 		saveSearchDescription: 'Inserisci un nome descrittivo per la tua query di ricerca',
-		filterSearch: 'Filtra la ricerca',
-		totalItems: 'Risultati totali',
 		timestamp: 'Timestamp',
 		level: 'Livello',
 		machine: 'Macchina',
 		message: 'Messaggio',
-		exception: 'Exception',
-		properties: 'Proprietà',
 		searchWithGoogle: 'Ricerca con Google',
 		searchThisMessageWithGoogle: 'Ricerca questo messaggio con Google',
 		searchWithBing: 'Ricerca con Bing',
@@ -2148,21 +2154,9 @@ export default {
 		searchUmbracoIssues: 'Ricerca tra i problemi di Umbraco',
 		searchUmbracoIssuesOnGithub: 'Ricerca tra i problemi di Umbraco su GitHub',
 		deleteThisSearch: 'Elimina questa ricerca',
-		findLogsWithRequestId: 'Trova log con Request ID',
-		findLogsWithNamespace: 'Trova log con Namespace',
-		findLogsWithMachineName: 'Trova log con Machine Name',
-		open: 'Apri',
 		polling: 'Polling',
-		every2: 'Ogni 2 secondi',
-		every5: 'Ogni 5 secondi',
-		every10: 'Ogni 10 secondi',
-		every20: 'Ogni 20 secondi',
-		every30: 'Ogni 30 secondi',
-		pollingEvery2: 'Polling ogni 2s',
-		pollingEvery5: 'Polling ogni 5s',
-		pollingEvery10: 'Polling ogni 10s',
-		pollingEvery20: 'Polling ogni 20s',
-		pollingEvery30: 'Polling ogni 30s',
+		pollingInterval: (seconds: number) => `Ogni ${seconds} secondi`,
+		pollingActive: (seconds: number) => `Polling ogni ${seconds}s`,
 	},
 	clipboard: {
 		labelForCopyAllEntries: 'Copia %0%',
@@ -2203,28 +2197,6 @@ export default {
 			'\n            <p>\n                Non dovresti mai lasciare che un sito di produzione venga eseguito in modalità debug. La modalità di debug viene disattivata impostando <strong>debug="false"</strong> nell\'elemento <strong>&lt;compilation /&gt;</strong> nel file web.config.\n            </p>\n        ',
 		profilerEnabledDescription:
 			'\n            <p>\n                Umbraco attualmente non viene eseguito in modalità debug, quindi non è possibile utilizzare il profiler integrato. Questo è come dovrebbe essere per un sito produttivo.\n            </p>\n            <p>\n                La modalità di debug viene attivata impostando <strong>debug="true"</strong> nell\'elemento <strong>&lt;compilation /&gt;</strong> in web.config.\n            </p>\n        ',
-	},
-	settingsDashboardVideos: {
-		trainingHeadline: 'Ore di videoallenamenti su Umbraco sono a solo un click da te',
-		trainingDescription:
-			'\n        <p>Vuoi padroneggiare Umbraco? Dedica un paio di minuti all\'apprendimento di alcune best practice guardando uno di questi video sull\'utilizzo di Umbraco. Visita <a href="https://umbraco.tv" target="_blank" rel="noopener">umbraco.tv</a> per altri video su Umbraco</p>\n    ',
-		getStarted: 'Per iniziare',
-	},
-	settingsDashboard: {
-		start: 'Inizia da qui!',
-		startDescription:
-			'Questa sezione contiene gli elementi costitutivi del tuo sito Umbraco. Segui i collegamenti sottostanti per saperne di più su come lavorare con gli elementi nella sezione Impostazioni',
-		more: 'Scopri di più',
-		bulletPointOne:
-			'\n            Maggiori informazioni su come lavorare con gli elementi in Impostazioni <a class="btn-link -underline" href="https://docs.umbraco.com/umbraco-cms/fundamentals/backoffice/sections/" target="_blank" rel="noopener">nella documentazione</a> di Our Umbraco\n        ',
-		bulletPointTwo:
-			'\n            Fai una domanda nel <a class="btn-link -underline" href="https://our.umbraco.com/forum" target="_blank" rel="noopener">Community Forum</a>\n        ',
-		bulletPointThree:
-			'\n            Guarda i nostri <a class="btn-link -underline" href="https://umbraco.tv" target="_blank" rel="noopener">video tutorial</a> (alcuni sono gratuiti, altri richiedono un abbonamento)\n        ',
-		bulletPointFour:
-			'\n            Scopri di più sui nostri <a class="btn-link -underline" href="https://umbraco.com/products/" target="_blank" rel="noopener">strumenti per aumentare la produttività e il supporto commerciale</a>\n        ',
-		bulletPointFive:
-			'\n            Scopri di più sulle opportunità di <a class="btn-link -underline" href="https://umbraco.com/training/" target="_blank" rel="noopener">certificazione</a>\n        ',
 	},
 	startupDashboard: {
 		fallbackHeadline: "Benvenuto nell'amichevole CMS",

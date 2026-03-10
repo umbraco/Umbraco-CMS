@@ -260,7 +260,7 @@ public static class DictionaryExtensions
     /// </summary>
     /// <param name="d"></param>
     /// <returns></returns>
-    public static string ToQueryString(this IDictionary<string, object> d)
+    public static string ToQueryString(this IDictionary<string, object?> d)
     {
         if (!d.Any())
         {
@@ -268,7 +268,7 @@ public static class DictionaryExtensions
         }
 
         var builder = new StringBuilder();
-        foreach (KeyValuePair<string, object> i in d)
+        foreach (KeyValuePair<string, object?> i in d)
         {
             builder.Append(WebUtility.UrlEncode(i.Key));
             builder.Append('=');
@@ -306,6 +306,16 @@ public static class DictionaryExtensions
             : defaultValue;
     }
 
+    /// <summary>
+    /// Asynchronously converts an enumerable to a dictionary using an async value selector.
+    /// </summary>
+    /// <typeparam name="TInput">The type of the input elements.</typeparam>
+    /// <typeparam name="TKey">The type of the dictionary keys.</typeparam>
+    /// <typeparam name="TValue">The type of the dictionary values.</typeparam>
+    /// <param name="enumerable">The source enumerable.</param>
+    /// <param name="syncKeySelector">A function to extract the key from each element.</param>
+    /// <param name="asyncValueSelector">An async function to extract the value from each element.</param>
+    /// <returns>A task that represents the asynchronous operation, containing the resulting dictionary.</returns>
     public static async Task<Dictionary<TKey, TValue>> ToDictionaryAsync<TInput, TKey, TValue>(
         this IEnumerable<TInput> enumerable,
         Func<TInput, TKey> syncKeySelector,

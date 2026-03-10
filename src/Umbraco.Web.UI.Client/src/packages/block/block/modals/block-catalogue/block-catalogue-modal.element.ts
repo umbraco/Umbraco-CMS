@@ -104,7 +104,11 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 
 		const lookup = items.reduce(
 			(acc, item) => {
-				acc[item.unique] = item;
+				acc[item.unique] = {
+					...item,
+					name: this.localize.string(item.name),
+					description: this.localize.string(item.description),
+				};
 				return acc;
 			},
 			{} as { [key: string]: UmbDocumentTypeItemModel },
@@ -118,7 +122,7 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 		const noGroupBlocks = blocks.filter((block) => !blockGroups.find((group) => group.key === block.groupKey));
 
 		const grouped = blockGroups.map((group) => ({
-			name: group.name,
+			name: this.localize.string(group.name),
 			blocks: blocks.filter((block) => block.groupKey === group.key),
 		}));
 
@@ -194,11 +198,9 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 
 	#renderClipboard() {
 		return html`
-			<uui-box>
-				<umb-clipboard-entry-picker
-					.config=${{ multiple: true, asyncFilter: this.data?.clipboardFilter }}
-					@selection-change=${this.#onClipboardPickerSelectionChange}></umb-clipboard-entry-picker>
-			</uui-box>
+			<umb-clipboard-entry-picker
+				.config=${{ multiple: true, asyncFilter: this.data?.clipboardFilter }}
+				@selection-change=${this.#onClipboardPickerSelectionChange}></umb-clipboard-entry-picker>
 		`;
 	}
 
@@ -246,8 +248,8 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 		return html`
 			<uui-card-block-type
 				href=${ifDefined(href)}
-				name=${this.localize.string(block.name)}
-				description=${this.localize.string(block.description)}
+				name=${block.name}
+				description=${ifDefined(block.description)}
 				.background=${block.backgroundColor}
 				@open=${() => this.#chooseBlock(block.contentElementTypeKey)}>
 				${when(

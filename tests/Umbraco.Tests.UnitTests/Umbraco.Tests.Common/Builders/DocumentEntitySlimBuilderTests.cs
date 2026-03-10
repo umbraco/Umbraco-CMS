@@ -27,8 +27,8 @@ public class DocumentEntitySlimBuilderTests
         const string testContentTypeIcon = "icon";
         const string testContentTypeThumbnail = "thumb";
         var testKey = Guid.NewGuid();
-        var testCreateDate = DateTime.Now.AddHours(-1);
-        var testUpdateDate = DateTime.Now;
+        var testCreateDate = DateTime.UtcNow.AddHours(-1);
+        var testUpdateDate = DateTime.UtcNow;
 
         var builder = new DocumentEntitySlimBuilder();
 

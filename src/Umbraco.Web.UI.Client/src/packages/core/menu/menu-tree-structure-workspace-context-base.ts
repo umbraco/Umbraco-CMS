@@ -35,6 +35,7 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContex
 	#ancestorContext = new UmbAncestorsEntityContext(this);
 	#sectionSidebarMenuContext?: typeof UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT.TYPE;
 	#isModalContext: boolean = false;
+	#isNew: boolean | undefined = undefined;
 
 	constructor(host: UmbControllerHost, args: UmbMenuTreeStructureWorkspaceContextBaseArgs) {
 		super(host, UMB_MENU_STRUCTURE_WORKSPACE_CONTEXT);
@@ -52,15 +53,27 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContex
 
 		this.consumeContext(UMB_SUBMITTABLE_TREE_ENTITY_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
-			this.observe(this.#workspaceContext?.unique, (value) => {
-				if (!value) return;
-				this.#requestStructure();
-			});
+			this.observe(
+				this.#workspaceContext?.unique,
+				(value) => {
+					if (!value) return;
+					this.#requestStructure();
+				},
+				'observeUnique',
+			);
 
-			this.observe(this.#workspaceContext?.isNew, (value) => {
-				if (value === undefined) return;
-				this.#requestStructure();
-			});
+			this.observe(
+				this.#workspaceContext?.isNew,
+				(value) => {
+					// Workspace has changed from new to existing
+					if (value === false && this.#isNew === true) {
+						// TODO: We do not need to request here as we already know the structure and unique
+						this.#requestStructure();
+					}
+					this.#isNew = value;
+				},
+				'observeIsNew',
+			);
 		});
 	}
 

@@ -124,18 +124,23 @@ public class DeepCloneAppCache : IAppPolicyCache, IDisposable
     /// <inheritdoc />
     public void ClearByRegex(string regex) => InnerCache.ClearByRegex(regex);
 
+    /// <inheritdoc />
     public void Dispose() =>
 
         // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
         Dispose(true);
 
+    /// <summary>
+    ///     Releases unmanaged and - optionally - managed resources.
+    /// </summary>
+    /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
     protected virtual void Dispose(bool disposing)
     {
         if (!_disposedValue)
         {
             if (disposing)
             {
-                InnerCache.DisposeIfDisposable();
+                (InnerCache as IDisposable)?.Dispose();
             }
 
             _disposedValue = true;

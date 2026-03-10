@@ -252,6 +252,78 @@ internal sealed class MediaTypeServiceTests : UmbracoIntegrationTest
         Assert.Throws<InvalidOperationException>(() => mediaType.Alias += "_updated");
     }
 
+    [Test]
+    public async Task GetAllowedParentsAsync_ReturnsEmptyCollection_WhenNoParentsAllowChildType()
+    {
+        // Arrange
+        var childMediaType = MediaTypeBuilder.CreateSimpleMediaType("child", "Child");
+        MediaTypeService.Save(childMediaType);
+
+        var parentMediaType = MediaTypeBuilder.CreateSimpleMediaType("parent", "Parent");
+
+        // Parent does not allow child as a child type
+        MediaTypeService.Save(parentMediaType);
+
+        // Act
+        var result = await MediaTypeService.GetAllowedParentKeysAsync(childMediaType.Key);
+
+        // Assert
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.Not.Null);
+        Assert.That(result.Result, Is.Empty);
+    }
+
+    [Test]
+    public async Task GetAllowedParentsAsync_ReturnsParentKeys_WhenParentsAllowChildType()
+    {
+        // Arrange
+        var childMediaType = MediaTypeBuilder.CreateSimpleMediaType("child", "Child");
+        MediaTypeService.Save(childMediaType);
+
+        var parentMediaType1 = MediaTypeBuilder.CreateSimpleMediaType("parent1", "Parent1");
+        parentMediaType1.AllowedContentTypes = new[]
+        {
+            new ContentTypeSort(childMediaType.Key, 0, childMediaType.Alias)
+        };
+        MediaTypeService.Save(parentMediaType1);
+
+        var parentMediaType2 = MediaTypeBuilder.CreateSimpleMediaType("parent2", "Parent2", null, true);
+        parentMediaType2.AllowedContentTypes = new[]
+        {
+            new ContentTypeSort(childMediaType.Key, 0, childMediaType.Alias)
+        };
+        MediaTypeService.Save(parentMediaType2);
+
+        // A parent that does NOT allow the child type
+        var unrelatedParentMediaType = MediaTypeBuilder.CreateSimpleMediaType("unrelated", "Unrelated", null, true);
+        MediaTypeService.Save(unrelatedParentMediaType);
+
+        // Act
+        var result = await MediaTypeService.GetAllowedParentKeysAsync(childMediaType.Key);
+
+        // Assert
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result, Is.Not.Null);
+        var parentKeys = result.Result!.ToList();
+        Assert.That(parentKeys.Count, Is.EqualTo(2));
+        Assert.That(parentKeys, Does.Contain(parentMediaType1.Key));
+        Assert.That(parentKeys, Does.Contain(parentMediaType2.Key));
+        Assert.That(parentKeys, Does.Not.Contain(unrelatedParentMediaType.Key));
+    }
+
+    [Test]
+    public async Task GetAllowedParentsAsync_ReturnsSuccessFalse_WhenMediaTypeDoesNotExist()
+    {
+        // Arrange
+        var nonExistentKey = Guid.NewGuid();
+
+        // Act
+        var result = await MediaTypeService.GetAllowedParentKeysAsync(nonExistentKey);
+
+        // Assert
+        Assert.That(result.Success, Is.False);
+    }
+
     internal sealed class ContentNotificationHandler :
         INotificationHandler<MediaMovedToRecycleBinNotification>
     {

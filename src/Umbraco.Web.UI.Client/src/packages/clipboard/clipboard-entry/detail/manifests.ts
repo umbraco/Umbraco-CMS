@@ -1,6 +1,7 @@
 import { UMB_CLIPBOARD_ENTRY_ENTITY_TYPE } from '../entity.js';
 import { UMB_CLIPBOARD_ENTRY_ITEM_REPOSITORY_ALIAS } from '../item/index.js';
 import { UMB_CLIPBOARD_ENTRY_DETAIL_REPOSITORY_ALIAS, UMB_CLIPBOARD_ENTRY_DETAIL_STORE_ALIAS } from './constants.js';
+import { UmbClipboardEntryDetailStore } from './clipboard-entry-detail.store.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -13,7 +14,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'store',
 		alias: UMB_CLIPBOARD_ENTRY_DETAIL_STORE_ALIAS,
 		name: 'Clipboard Detail Store',
-		api: () => import('./clipboard-entry-detail.store.js'),
+		api: UmbClipboardEntryDetailStore,
 	},
 	{
 		type: 'entityAction',

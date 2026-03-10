@@ -17,7 +17,7 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 		],
 		meta: {
 			icon: 'icon-add',
-			label: '#actions_create',
+			label: '#actions_createFor',
 			additionalOptions: true,
 			headline: '#create_createUnder #treeHeaders_documentTypes',
 		},

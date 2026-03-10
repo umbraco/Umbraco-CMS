@@ -1,4 +1,3 @@
-import { UMB_DOCUMENT_COLLECTION_CONTEXT } from '../document-collection.context-token.js';
 import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../workspace/constants.js';
 import { UMB_CREATE_DOCUMENT_WORKSPACE_PATH_PATTERN } from '../../paths.js';
 import { UMB_DOCUMENT_ENTITY_TYPE, UMB_DOCUMENT_ROOT_ENTITY_TYPE } from '../../entity.js';
@@ -8,15 +7,11 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { ManifestCollectionAction } from '@umbraco-cms/backoffice/collection';
 import type { UmbAllowedDocumentTypeModel } from '@umbraco-cms/backoffice/document-type';
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
-import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 
 @customElement('umb-create-document-collection-action')
 export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 	@state()
 	private _allowedDocumentTypes: Array<UmbAllowedDocumentTypeModel> = [];
-
-	@state()
-	private _workspacePathBuilder?: UmbModalRouteBuilder;
 
 	@state()
 	private _documentUnique?: UmbEntityUnique;
@@ -43,12 +38,6 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 				this._documentTypeUnique = documentTypeUnique;
 			});
 		});
-
-		this.consumeContext(UMB_DOCUMENT_COLLECTION_CONTEXT, (collectionContext) => {
-			this.observe(collectionContext?.workspacePathBuilder, (builder) => {
-				this._workspacePathBuilder = builder;
-			});
-		});
 	}
 
 	override async firstUpdated() {
@@ -73,14 +62,14 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 	}
 
 	#getCreateUrl(item: UmbAllowedDocumentTypeModel) {
-		return item.unique && this._workspacePathBuilder
-			? this._workspacePathBuilder({ entityType: UMB_DOCUMENT_ENTITY_TYPE }) +
-					UMB_CREATE_DOCUMENT_WORKSPACE_PATH_PATTERN.generateLocal({
-						parentEntityType: this._documentUnique ? UMB_DOCUMENT_ENTITY_TYPE : UMB_DOCUMENT_ROOT_ENTITY_TYPE,
-						parentUnique: this._documentUnique ?? 'null',
-						documentTypeUnique: item.unique,
-					})
-			: '';
+		if (!item.unique) {
+			throw new Error('Item unique is missing');
+		}
+		return UMB_CREATE_DOCUMENT_WORKSPACE_PATH_PATTERN.generateAbsolute({
+			parentEntityType: this._documentUnique ? UMB_DOCUMENT_ENTITY_TYPE : UMB_DOCUMENT_ROOT_ENTITY_TYPE,
+			parentUnique: this._documentUnique ?? 'null',
+			documentTypeUnique: item.unique,
+		});
 	}
 
 	override render() {
@@ -97,7 +86,7 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 				? this.localize.string(this.manifest?.meta.label)
 				: this.localize.term('general_create')) +
 			' ' +
-			item.name;
+			this.localize.string(item.name);
 
 		return html`
 			<uui-button color="default" href=${this.#getCreateUrl(item)} label=${label} look="outline"></uui-button>
@@ -125,7 +114,7 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 						${map(
 							this._allowedDocumentTypes,
 							(item) => html`
-								<uui-menu-item label=${item.name} href=${this.#getCreateUrl(item)}>
+								<uui-menu-item label=${this.localize.string(item.name)} href=${this.#getCreateUrl(item)}>
 									<umb-icon slot="icon" name=${item.icon ?? 'icon-document'}></umb-icon>
 								</uui-menu-item>
 							`,

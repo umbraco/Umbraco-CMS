@@ -168,10 +168,42 @@ public interface IFileSystem
     /// <param name="copy">A value indicating whether to move (default) or copy.</param>
     void AddFile(string path, string physicalPath, bool overrideIfExists = true, bool copy = false);
 
+    /// <summary>
+    /// Moves a file from the specified source path to the specified target path.
+    /// </summary>
+    /// <param name="source">The path of the file or directory to move.</param>
+    /// <param name="target">The destination path where the file or directory will be moved.</param>
+    /// <param name="overrideIfExists">A value indicating what to do if the file already exists.</param>
+    void MoveFile(string source, string target, bool overrideIfExists = true)
+    {
+        // Provide a default implementation for implementations of IFileSystem that do not implement this method.
+        if (FileExists(source) is false)
+        {
+            throw new FileNotFoundException($"File at path '{source}' could not be found.");
+        }
+
+        if (FileExists(target))
+        {
+            if (overrideIfExists)
+            {
+                DeleteFile(target);
+            }
+            else
+            {
+                throw new IOException($"A file at path '{target}' already exists.");
+            }
+        }
+
+        using (Stream sourceStream = OpenFile(source))
+        {
+            AddFile(target, sourceStream);
+        }
+
+        DeleteFile(source);
+    }
+
     // TODO: implement these
     //
     // void CreateDirectory(string path);
     //
-    //// move or rename, directory or file
-    // void Move(string source, string target);
 }

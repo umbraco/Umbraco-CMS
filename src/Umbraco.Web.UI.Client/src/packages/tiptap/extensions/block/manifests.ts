@@ -6,7 +6,7 @@ export const manifests: Array<ManifestTiptapExtension | ManifestTiptapToolbarExt
 		type: 'tiptapExtension',
 		alias: 'Umb.Tiptap.Block',
 		name: 'Block Tiptap Extension',
-		api: () => import('./block.tipap-api.js'),
+		api: () => import('./block.tiptap-api.js'),
 		meta: {
 			icon: 'icon-plugin',
 			label: 'Block',

@@ -312,7 +312,7 @@ export default {
 	media: {
 		clickToUpload: 'Cliquez pour télécharger',
 		orClickHereToUpload: 'ou cliquez ici pour choisir un fichier',
-		disallowedFileType: "Ce fichier ne peut pas ête chargé, il n'est pas d'un type de fichier autorisé.",
+		disallowedFileType: "Ce fichier ne peut pas ête chargé, il n'est pas d'un type de fichier autorisé",
 		invalidFileName: "Ce fichier ne peut pas être chargé, le nom du fichier n'est pas valide",
 		maxFileSize: 'La taille maximum de fichier est',
 		mediaRoot: 'Racine du média',
@@ -673,6 +673,7 @@ export default {
 		design: 'Design',
 		dictionary: 'Dictionnaire',
 		dimensions: 'Dimensions',
+		dividerPosition: (value: string | number) => `Séparateur à ${value}%`,
 		down: 'Bas',
 		download: 'Télécharger',
 		edit: 'Editer',
@@ -1103,7 +1104,8 @@ export default {
 	rollback: {
 		headline: 'Sélectionnez une version à comparer avec la version actuelle',
 		diffHelp:
-			"Ceci affiche les différences entre la version actuelle et la version choisie<br />Le texte en <del>Rouge</del> signifie qu'il a été supprimé de la version choisie, <ins>vert signifie ajouté</ins>",
+			'<del>Le texte rouge</del> sera supprimé dans la version sélectionnée, <ins>le texte vert</ins> sera ajouté.',
+		showDiff: 'Afficher les différences entre la version actuelle (brouillon) et la version sélectionnée.',
 		documentRolledBack: 'Le document a été restauré à une version antérieure',
 		htmlHelp:
 			'Ceci affiche la version choisie en tant que HTML, si vous souhaitez voir les différences entre les deux versions en même temps, utilisez la vue différentielle',
@@ -1128,9 +1130,6 @@ export default {
 		translation: 'Traduction',
 		users: 'Utilisateurs',
 	},
-	help: {
-		theBestUmbracoVideoTutorials: 'Les meilleurs tutoriels vidéo Umbraco',
-	},
 	settings: {
 		defaulttemplate: 'Modèle par défaut',
 		importDocumentTypeHelp:
@@ -1143,6 +1142,7 @@ export default {
 		tab: 'Onglet',
 		tabname: "Titre de l'onglet",
 		tabs: 'Onglets',
+		changeIcon: "Changer l'icône",
 		contentTypeEnabled: 'Type de contenu de base activé',
 		contentTypeUses: 'Ce type de contenu utilise',
 		noPropertiesDefinedOnTab:
@@ -1614,6 +1614,7 @@ export default {
 		noLockouts: "n'a pas été bloqué",
 		noPasswordChange: "Le mot de passe n'a pas été modifié",
 		confirmNewPassword: 'Confirmez votre nouveau mot de passe',
+		confirmPassword: 'Confirmer le mot de passe',
 		changePasswordDescription:
 			'Vous pouvez changer votre mot de passe d\'accès au backoffice Umbraco en remplissant le formulaire ci-dessous puis en cliquant sur le bouton "Changer le mot de passe"',
 		contentChannel: 'Canal de contenu',
@@ -1889,13 +1890,10 @@ export default {
 		selectAllLogLevelFilters: 'Tout sélectionner',
 		deselectAllLogLevelFilters: 'Tout déselectionner',
 		savedSearches: 'Recherches sauvegardées',
-		totalItems: "Nombre total d'éléments",
 		timestamp: 'Date',
 		level: 'Niveau',
 		machine: 'Machine',
 		message: 'Message',
-		exception: 'Exception',
-		properties: 'Propriétés',
 		searchWithGoogle: 'Chercher avec Google',
 		searchThisMessageWithGoogle: 'Chercher ce message avec Google',
 		searchWithBing: 'Chercher avec Bing',
@@ -1909,10 +1907,6 @@ export default {
 		searchUmbracoIssues: 'Chercher dans les Umbraco Issues',
 		searchUmbracoIssuesOnGithub: 'Chercher dans les Umbraco Issues sur Github',
 		deleteThisSearch: 'Supprimer cette recherche',
-		findLogsWithRequestId: 'Trouver les Logs avec la Request ID',
-		findLogsWithNamespace: 'Trouver les Logs avec le Namespace',
-		findLogsWithMachineName: 'Trouver les logs avec le Nom de Machine',
-		open: 'Ouvrir',
 	},
 	clipboard: {
 		labelForCopyAllEntries: 'Copier %0%',
@@ -1945,28 +1939,6 @@ export default {
 			"\n                <p>\n\t\t\t\t   Umbraco est actuellement exécuté en mode debug. Cela signifie que vous pouvez utiliser le profileur de performances intégré pour évaluer les performance lors du rendu des pages.\n                </p>\n                <p>\n                    Si vous souhaitez activer le profileur pour le rendu d'une page spécifique, ajoutez simplement <strong>umbDebug=true</strong> au querystring lorsque vous demandez la page.\n                </p>\n                <p>\n                    Si vous souhaitez que le profileur soit activé par défaut pour tous les rendus de pages, vous pouvez utiliser le bouton bascule ci-dessous.\n\t\t\t\t\tCela créera un cookie dans votre browser, qui activera alors le profileur automatiquement.\n                    En d'autres termes, le profileur ne sera activé par défaut que dans <em>votre</em> browser - pas celui des autres.\n                </p>\n        ",
 		activateByDefault: 'Activer le profileur par défaut',
 		reminder: 'Rappel amical',
-	},
-	settingsDashboardVideos: {
-		trainingHeadline: "Des heures de vidéos de formation Umbraco ne sont qu'à un clic d'ici",
-		trainingDescription:
-			'\n        <p>Vous voulez maîtriser Umbraco? Passez quelques minutes à apprendre certaines des meilleures pratiques en regardant une de ces vidéos à propos de l\'utilisation d\'Umbraco. Et visitez <a href="http://umbraco.tv" target="_blank" rel="noopener">umbraco.tv</a> pour encore plus de vidéos Umbraco</p>\n    ',
-		getStarted: 'Pour démarrer',
-	},
-	settingsDashboard: {
-		start: 'Commencer ici',
-		startDescription:
-			"Cette section contient les blocs fondamentaux pour votre site Umbraco. Suivez les liens ci-dessous pour en apprendre d'avantage sur la façon de travailler avec les éléments de la section Settings",
-		more: 'En savoir plus',
-		bulletPointOne:
-			'\n            Lisez-en plus sur la façon de travailler avec les éléments dans la section Settings <a class="btn-link -underline" href="https://docs.umbraco.com/umbraco-cms/fundamentals/backoffice/sections/" target="_blank" rel="noopener">dans la section Documentation</a> de Our Umbraco\n        ',
-		bulletPointTwo:
-			'\n            Posez une question dans le <a class="btn-link -underline" href="https://our.umbraco.com/forum" target="_blank" rel="noopener">Community Forum</a>\n        ',
-		bulletPointThree:
-			'\n            Regardez nos <a class="btn-link -underline" href="https://umbraco.tv" target="_blank" rel="noopener">tutoriels vidéos</a> (certains sont gratuits, certains nécessitent un abonnement)\n        ',
-		bulletPointFour:
-			'\n            Découvrez nos <a class="btn-link -underline" href="https://umbraco.com/products/" target="_blank" rel="noopener">outils d\'amélioration de productivité et notre support commercial</a>\n        ',
-		bulletPointFive:
-			'\n            Découvrez nos possibilités de <a class="btn-link -underline" href="https://umbraco.com/training/" target="_blank" rel="noopener">formations et certifications</a>\n        ',
 	},
 	treeSearch: {
 		searchResult: 'élément retrouvé',

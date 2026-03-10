@@ -1,4 +1,4 @@
-const { rest } = window.MockServiceWorker;
+const { http, HttpResponse } = window.MockServiceWorker;
 
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 import {
@@ -12,14 +12,10 @@ test.describe('installer tests', () => {
 	test.beforeEach(async ({ page, worker }) => {
 		await worker.use(
 			// Override the server status to be "must-install"
-			rest.get(umbracoPath('/server/status'), (_req, res, ctx) => {
-				return res(
-					// Respond with a 200 status code
-					ctx.status(200),
-					ctx.json<ServerStatusResponseModel>({
-						serverStatus: RuntimeLevelModel.INSTALL,
-					}),
-				);
+			http.get(umbracoPath('/server/status'), () => {
+				return HttpResponse.json<ServerStatusResponseModel>({
+					serverStatus: RuntimeLevelModel.INSTALL,
+				});
 			}),
 		);
 
@@ -62,18 +58,17 @@ test.describe('installer tests', () => {
 		test('installer fails', async ({ page, worker }) => {
 			await worker.use(
 				// Override the server status to be "must-install"
-				rest.post(umbracoPath('/install/setup'), (_req, res, ctx) => {
-					return res(
-						// Respond with a 200 status code
-						ctx.status(400),
-						ctx.json<ProblemDetails>({
+				http.post(umbracoPath('/install/setup'), () => {
+					return HttpResponse.json<ProblemDetails>(
+						{
 							status: 400,
 							type: 'validation',
 							detail: 'Something went wrong',
 							errors: {
 								databaseName: ['The database name is required'],
 							},
-						}),
+						},
+						{ status: 400 },
 					);
 				}),
 			);

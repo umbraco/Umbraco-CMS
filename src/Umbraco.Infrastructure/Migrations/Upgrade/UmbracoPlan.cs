@@ -77,7 +77,15 @@ public class UmbracoPlan : MigrationPlan
         To<V_14_0_0.MigrateDataTypeConfigurations>("{1539A010-2EB5-4163-8518-4AE2AA98AFC6}");
         To<NoopMigration>("{C567DE81-DF92-4B99-BEA8-CD34EF99DA5D}");
         To<V_14_0_0.DeleteMacroTables>("{0D82C836-96DD-480D-A924-7964E458BD34}");
+
+        // MoveDocumentBlueprintsToFolders uses IContentService which loads content through the
+        // repository layer. PropertyDataDto now maps the sortableValue column (added in v17.3),
+        // so the column must exist before NPoco tries to query it. The migration checks whether
+        // the column already exists (via GetColumnsInSchema) before adding it, so the v17.3
+        // instance below will be a no-op.
+        To<V_17_3_0.AddSortableValueToPropertyData>("{A1B2C3D4-E5F6-4A7B-8C9D-0E1F2A3B4C5D}");
         To<V_14_0_0.MoveDocumentBlueprintsToFolders>("{1A0FBC8A-6FC6-456C-805C-B94816B2E570}");
+
         To<NoopMigration>("{302DE171-6D83-4B6B-B3C0-AC8808A16CA1}");
         To<V_14_0_0.MigrateUserGroup2PermissionPermissionColumnType>("{8184E61D-ECBA-4AAA-B61B-D7A82EB82EB7}");
         To<V_14_0_0.MigrateNotificationCharsToStrings>("{E261BF01-2C7F-4544-BAE7-49D545B21D68}");
@@ -127,5 +135,41 @@ public class UmbracoPlan : MigrationPlan
         // To 16.3.0
         To<V_16_3_0.AddRichTextEditorCapabilities>("{A917FCBC-C378-4A08-A36C-220C581A6581}");
         To<V_16_3_0.MigrateMediaTypeLabelProperties>("{FB7073AF-DFAF-4AC1-800D-91F9BD5B5238}");
+
+        // To 16.4.0
+        To<V_16_4_0.CreateMissingTabs>("{6A7D3B80-8B64-4E41-A7C0-02EC39336E97}");
+
+        // To 17.0.0
+        To<V_17_0_0.AddGuidsToAuditEntries>("{17D5F6CA-CEB8-462A-AF86-4B9C3BF91CF1}");
+        To<V_17_0_0.MigrateCheckboxListDataTypesAndPropertyData>("{EB1E50B7-CD5E-4B6B-B307-36237DD2C506}");
+        To<V_17_0_0.SetDateDefaultsToUtcNow>("{1847C7FF-B021-44EB-BEB0-A77A4376A6F2}");
+        To<V_17_0_0.MigrateSystemDatesToUtc>("{7208B20D-6BFC-472E-9374-85EEA817B27D}");
+        To<V_17_0_0.AddDistributedJobLock>("{263075BF-F18A-480D-92B4-4947D2EAB772}");
+        To<V_17_0_0.AddLastSyncedTable>("26179D88-58CE-4C92-B4A4-3CBA6E7188AC");
+        To<V_17_0_0.EnsureDefaultMediaFolderHasDefaultCollection>("{8B2C830A-4FFB-4433-8337-8649B0BF52C8}");
+        To<V_17_0_0.InvalidateBackofficeUserAccess>("{1C38D589-26BB-4A46-9ABE-E4A0DF548A87}");
+
+        // To 17.0.1
+        To<V_17_0_1.EnsureUmbracoPropertyDataColumnCasing>("{BE5CA411-E12D-4455-A59E-F12A669E5363}");
+
+        // To 17.1.0
+        To<V_17_1_0.ChangeValidationRegExpToNvarcharMax>("{1CE2E78B-E736-45D8-97A2-CE3EF2F31BCD}");
+
+        // To 17.2.0
+        To<V_17_2_0.AddDescriptionToUserGroup>("{F1A2B3C4-D5E6-4789-ABCD-1234567890AB}");
+        To<V_17_2_0.AddDocumentUrlAlias>("{A7B8C9D0-E1F2-4A5B-8C7D-9E0F1A2B3C4D}");
+
+        // To 17.3.0
+        To<V_17_3_0.IncreaseSizeOfLongRunningOperationTypeColumn>("{B2F4A1C3-8D5E-4F6A-9B7C-3E1D2A4F5B6C}");
+        To<V_17_3_0.RetrustForeignKeyAndCheckConstraints>("{0638E0E0-D914-4ACA-8A4B-9551A3AAB91F}");
+        To<V_17_3_0.RebuildHybridCache>("{E4A7C2D1-5F38-4B96-A1D3-8E2F6C9B0A74}");
+        To<V_17_3_0.OptimizeInvariantUrlRecords>("{B8C9D0E1-F2A3-4B5C-8D7E-9F0A1B2C3D4E}");
+        To<V_17_3_0.AddSortableValueToPropertyData>("{9DBDB5CD-8679-4BB0-BF83-E8D508073CE0}");
+        To<V_17_3_0.PopulateSortableValueForDatePropertyData>("{6748CB56-CC16-49F0-BA91-B8ECE31BF456}");
+
+
+        // To 18.0.0
+        // TODO (V18): Enable on 18 branch
+        //// To<V_18_0_0.MigrateSingleBlockList>("{74332C49-B279-4945-8943-F8F00B1F5949}");
     }
 }

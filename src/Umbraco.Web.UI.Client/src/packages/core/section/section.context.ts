@@ -5,9 +5,10 @@ import { UmbExtensionsApiInitializer } from '@umbraco-cms/backoffice/extension-a
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbViewContext } from '@umbraco-cms/backoffice/view';
+import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-export class UmbSectionContext extends UmbContextBase {
+export class UmbSectionContext extends UmbContextBase implements UmbApi {
 	#manifestAlias = new UmbStringState<string | undefined>(undefined);
 	#manifestPathname = new UmbStringState<string | undefined>(undefined);
 	#manifestLabel = new UmbStringState<string | undefined>(undefined);
@@ -24,13 +25,20 @@ export class UmbSectionContext extends UmbContextBase {
 		this.#createSectionContextExtensions();
 	}
 
-	public setManifest(manifest?: ManifestSection) {
+	public set manifest(manifest: ManifestSection | undefined) {
+		this._manifest = manifest;
+
 		this.#manifestAlias.setValue(manifest?.alias);
 		this.#manifestPathname.setValue(manifest?.meta?.pathname);
+
 		const sectionLabel = manifest ? manifest.meta?.label || manifest.name : undefined;
 		this.#manifestLabel.setValue(sectionLabel);
 		this.#viewContext.setTitle(sectionLabel);
 	}
+	public get manifest(): ManifestSection | undefined {
+		return this._manifest;
+	}
+	private _manifest?: ManifestSection | undefined;
 
 	getPathname() {
 		return this.#manifestPathname.getValue();
@@ -50,3 +58,5 @@ export class UmbSectionContext extends UmbContextBase {
 		);
 	}
 }
+
+export default UmbSectionContext;

@@ -1,5 +1,5 @@
 import { UmbTiptapExtensionApiBase } from '../tiptap-extension-api-base.js';
-import { Strike } from '@umbraco-cms/backoffice/external/tiptap';
+import { Strike } from '../../externals.js';
 
 export default class UmbTiptapStrikeExtensionApi extends UmbTiptapExtensionApiBase {
 	getTiptapExtensions = () => [Strike];

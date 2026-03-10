@@ -7,19 +7,21 @@ namespace Umbraco.Cms.Infrastructure.Installer.Steps;
 
 public class RegisterInstallCompleteStep : StepBase, IInstallStep, IUpgradeStep
 {
-    private readonly InstallHelper _installHelper;
+    [Obsolete("Please use the constructor without parameters. Scheduled for removal in Umbraco 19.")]
+    public RegisterInstallCompleteStep(InstallHelper installHelper)
+        : this()
+    {
+    }
 
-    public RegisterInstallCompleteStep(InstallHelper installHelper) => _installHelper = installHelper;
+    public RegisterInstallCompleteStep()
+    {
+    }
 
     public Task<Attempt<InstallationResult>> ExecuteAsync(InstallData _) => Execute();
 
     public Task<Attempt<InstallationResult>> ExecuteAsync() => Execute();
 
-    private async Task<Attempt<InstallationResult>> Execute()
-    {
-        await _installHelper.SetInstallStatusAsync(true, string.Empty);
-        return Success();
-    }
+    private Task<Attempt<InstallationResult>> Execute() => Task.FromResult(Success());
 
     public Task<bool> RequiresExecutionAsync(InstallData _) => ShouldExecute();
 

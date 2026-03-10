@@ -13,7 +13,7 @@ Please verify your API responses still work as expect.
 We recommend using regular ASP.NET Core ApiControllers for your APIs so that OpenAPI specifications are generated.
 Read more about this here: https://learn.microsoft.com/en-us/aspnet/core/web-api/
 
-UmbracoAPIController will be removed in Umbraco 15.
+UmbracoAPIController will be removed in Umbraco 18.
 """)]
 public abstract class UmbracoApiController : UmbracoApiControllerBase, IDiscoverable
 {

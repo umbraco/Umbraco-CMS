@@ -54,9 +54,11 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 	private _propertyEditorSchemaAlias?: string;
 
 	@state()
-	private _isUnsupported?: boolean;
+	private _propertyEditorDataSourceAlias?: string;
 
 	@state()
+	private _isUnsupported?: boolean;
+
 	private _dataTypeValues?: UmbPropertyEditorConfig;
 
 	private _dataTypeDetailRepository = new UmbDataTypeDetailRepository(this);
@@ -89,6 +91,7 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 					this._dataTypeValues = dataType?.values;
 					this._propertyEditorUiAlias = dataType?.editorUiAlias || undefined;
 					this._propertyEditorSchemaAlias = dataType?.editorAlias || undefined;
+					this._propertyEditorDataSourceAlias = dataType?.editorDataSourceAlias || undefined;
 					this._checkSchemaSupport();
 
 					// If there is no UI, we will look up the Property editor model to find the default UI alias:
@@ -128,6 +131,7 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 				.description=${this._property.description ?? undefined}
 				.appearance=${this._property.appearance}
 				property-editor-ui-alias=${ifDefined(this._propertyEditorUiAlias)}
+				property-editor-data-source-alias=${ifDefined(this._propertyEditorDataSourceAlias)}
 				.config=${this._dataTypeValues}
 				.validation=${this._property.validation}
 				?readonly=${this.readonly}>

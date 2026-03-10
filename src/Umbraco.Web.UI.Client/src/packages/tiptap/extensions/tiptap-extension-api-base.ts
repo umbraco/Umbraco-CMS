@@ -1,7 +1,7 @@
+import type { Editor, Extension, Mark, Node } from '../externals.js';
 import type { ManifestTiptapExtension, UmbTiptapExtensionApi, UmbTiptapExtensionArgs } from './types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
-import type { Editor, Extension, Mark, Node } from '@umbraco-cms/backoffice/external/tiptap';
 
 export abstract class UmbTiptapExtensionApiBase extends UmbControllerBase implements UmbTiptapExtensionApi {
 	/**

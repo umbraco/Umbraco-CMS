@@ -1,5 +1,5 @@
 import { UmbTiptapExtensionApiBase } from '../tiptap-extension-api-base.js';
-import { Underline } from '@umbraco-cms/backoffice/external/tiptap';
+import { Underline } from '../../externals.js';
 
 export default class UmbTiptapUnderlineExtensionApi extends UmbTiptapExtensionApiBase {
 	getTiptapExtensions = () => [Underline];

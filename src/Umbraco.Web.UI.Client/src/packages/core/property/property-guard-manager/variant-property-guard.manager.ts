@@ -50,55 +50,55 @@ function findRule(
 export class UmbVariantPropertyGuardManager extends UmbGuardManagerBase<UmbVariantPropertyGuardRule> {
 	/**
 	 * Checks if the variant and propertyType is permitted.
-	 * @param {UmbVariantId} variantId - The variant id to check.
+	 * @param {UmbVariantId} propertyVariantId - The variant id to check.
 	 * @param {UmbReferenceByUnique} propertyType - The property type to check.
 	 * @param {UmbVariantId} datasetVariantId - The dataset variant id to check.
 	 * @returns {Observable<boolean>} - Returns an observable that emits true if the variant and propertyType is permitted, false otherwise.
 	 * @memberof UmbVariantPropertyGuardManager
 	 */
 	isPermittedForVariantAndProperty(
-		variantId: UmbVariantId,
+		propertyVariantId: UmbVariantId,
 		propertyType: UmbReferenceByUnique,
 		datasetVariantId: UmbVariantId,
 	): Observable<boolean> {
 		return this._rules.asObservablePart((rules) =>
-			this.#resolvePermission(rules, variantId, propertyType, datasetVariantId),
+			this.#resolvePermission(rules, propertyVariantId, propertyType, datasetVariantId),
 		);
 	}
 
 	/**
 	 * Checks if the variant and propertyType is permitted.
-	 * @param {UmbVariantId} variantId - The variant id to check.
+	 * @param {UmbVariantId} propertyVariantId - The variant id to check.
 	 * @param {UmbReferenceByUnique} propertyType - The property type to check.
 	 * @param {UmbVariantId} datasetVariantId - The dataset variant id to check.
 	 * @returns {boolean} - Returns true if the variant and propertyType is permitted, false otherwise.
 	 * @memberof UmbVariantPropertyGuardManager
 	 */
 	getIsPermittedForVariantAndProperty(
-		variantId: UmbVariantId,
+		propertyVariantId: UmbVariantId,
 		propertyType: UmbReferenceByUnique,
 		datasetVariantId: UmbVariantId,
 	): boolean {
-		return this.#resolvePermission(this._rules.getValue(), variantId, propertyType, datasetVariantId);
+		return this.#resolvePermission(this._rules.getValue(), propertyVariantId, propertyType, datasetVariantId);
 	}
 
 	#resolvePermission(
 		rules: UmbVariantPropertyGuardRule[],
-		variantId: UmbVariantId,
+		propertyVariantId: UmbVariantId,
 		propertyType: UmbReferenceByUnique,
 		datasetVariantId: UmbVariantId,
 	) {
 		if (
 			rules
 				.filter((x) => x.permitted === false)
-				.some((rule) => findRule(rule, variantId, propertyType, datasetVariantId))
+				.some((rule) => findRule(rule, propertyVariantId, propertyType, datasetVariantId))
 		) {
 			return false;
 		}
 		if (
 			rules
 				.filter((x) => x.permitted === true)
-				.some((rule) => findRule(rule, variantId, propertyType, datasetVariantId))
+				.some((rule) => findRule(rule, propertyVariantId, propertyType, datasetVariantId))
 		) {
 			return true;
 		}

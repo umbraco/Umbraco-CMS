@@ -20,10 +20,9 @@ import {
 	type UmbElementPropertyDataOwner,
 } from '@umbraco-cms/backoffice/content';
 import { UmbReadOnlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
-
 import { UmbDataTypeItemRepositoryManager } from '@umbraco-cms/backoffice/data-type';
 import { UmbVariantPropertyGuardManager } from '@umbraco-cms/backoffice/property';
-import { UmbHintContext, type UmbVariantHint } from '@umbraco-cms/backoffice/hint';
+import { UmbViewContext } from '@umbraco-cms/backoffice/view';
 
 export class UmbBlockElementManager<LayoutDataType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel>
 	extends UmbControllerBase
@@ -67,7 +66,7 @@ export class UmbBlockElementManager<LayoutDataType extends UmbBlockLayoutBaseMod
 
 	readonly validation = new UmbValidationController(this);
 
-	readonly hints;
+	readonly view;
 
 	constructor(
 		host: UmbBlockWorkspaceContext<LayoutDataType>,
@@ -76,11 +75,14 @@ export class UmbBlockElementManager<LayoutDataType extends UmbBlockLayoutBaseMod
 	) {
 		super(host);
 
-		this.hints = new UmbHintContext<UmbVariantHint>(this, { viewAlias: workspaceViewAlias });
-		this.hints.inherit();
-		new UmbContentValidationToHintsManager<UmbContentTypeModel>(this, this.structure, this.validation, this.hints, [
-			workspaceViewAlias,
-		]);
+		this.view = new UmbViewContext(this, workspaceViewAlias);
+		new UmbContentValidationToHintsManager<UmbContentTypeModel>(
+			this,
+			this.structure,
+			this.validation,
+			this.view.hints,
+			[],
+		);
 
 		// Ugly, but we just inherit these from the workspace context: [NL]
 		this.name = host.name;
@@ -265,7 +267,7 @@ export class UmbBlockElementManager<LayoutDataType extends UmbBlockLayoutBaseMod
 		// Provide Validation Context for this view:
 		this.validation.provideAt(host);
 
-		this.hints.provideAt(host);
+		this.view.provideAt(host);
 	}
 
 	public override destroy(): void {

@@ -1,14 +1,4 @@
-import {
-	css,
-	customElement,
-	html,
-	ifDefined,
-	nothing,
-	property,
-	state,
-	repeat,
-	when,
-} from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, property, state, repeat, when } from '@umbraco-cms/backoffice/external/lit';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
@@ -166,7 +156,7 @@ export class UmbPropertyEditorUiTiptapExtensionsConfigurationElement
 							${repeat(
 								group.extensions,
 								(item) => html`
-									<li title=${ifDefined(item.description)}>
+									<li title=${item.description ?? item.alias}>
 										<uui-checkbox
 											label=${this.localize.string(item.label)}
 											value=${item.alias}

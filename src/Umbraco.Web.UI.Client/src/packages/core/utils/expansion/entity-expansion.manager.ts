@@ -32,6 +32,18 @@ export class UmbEntityExpansionManager<
 	}
 
 	/**
+	 * Observe the expansion entry for a specific entity
+	 * @param {EntryModelType} entity The entity to observe
+	 * @returns {Observable<EntryModelType | undefined>} An observable of the expansion entry
+	 * @memberof UmbEntityExpansionManager
+	 */
+	entry(entity: EntryModelType): Observable<EntryModelType | undefined> {
+		return this._expansion.asObservablePart((entries) =>
+			entries?.find((entry) => entry.entityType === entity.entityType && entry.unique === entity.unique),
+		);
+	}
+
+	/**
 	 * Sets the expansion state
 	 * @param {UmbEntityExpansionModel<EntryModelType> | undefined} expansion The expansion state
 	 * @memberof UmbEntityExpansionManager
@@ -115,5 +127,16 @@ export class UmbEntityExpansionManager<
 	public async collapseAll(): Promise<void> {
 		this._expansion.setValue([]);
 		this.getHostElement()?.dispatchEvent(new UmbExpansionChangeEvent());
+	}
+
+	/**
+	 * Gets an item from the expansion state
+	 * @param {EntryModelType} entity The entity to get
+	 * @returns {*}  {(Promise<UmbEntityExpansionEntryModel | undefined>)}
+	 * @memberof UmbEntityExpansionManager
+	 */
+	public async getItem(entity: EntryModelType): Promise<EntryModelType | undefined> {
+		const expansion = this._expansion.getValue();
+		return expansion.find((x) => x.entityType === entity.entityType && x.unique === entity.unique);
 	}
 }

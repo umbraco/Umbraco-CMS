@@ -5,12 +5,15 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 
-[TableName(Constants.DatabaseSchema.Tables.Webhook)]
-[PrimaryKey("id")]
+[TableName(TableName)]
+[PrimaryKey(PrimaryKeyColumnName, AutoIncrement = true)]
 [ExplicitColumns]
 internal sealed class WebhookDto
 {
-    [Column("id")]
+    public const string TableName = Constants.DatabaseSchema.Tables.Webhook;
+    public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
+
+    [Column(PrimaryKeyColumnName)]
     [PrimaryKeyColumn(AutoIncrement = true)]
     public int Id { get; set; }
 
@@ -45,6 +48,6 @@ internal sealed class WebhookDto
 
     [ResultColumn]
     [Reference(ReferenceType.Many, ReferenceMemberName = nameof(Webhook2HeadersDto.WebhookId))]
-    public List<Webhook2ContentTypeKeysDto> Webhook2Headers { get; set; } = new();
+    public List<Webhook2HeadersDto> Webhook2Headers { get; set; } = new();
 }
 

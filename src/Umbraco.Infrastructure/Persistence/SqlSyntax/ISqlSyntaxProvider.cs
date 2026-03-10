@@ -9,8 +9,10 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 
+// TODO (V18): Remove the default implementations in this interface.
+
 /// <summary>
-///     Defines an SqlSyntaxProvider
+///     Defines an SqlSyntaxProvider.
 /// </summary>
 public interface ISqlSyntaxProvider
 {
@@ -74,6 +76,8 @@ public interface ISqlSyntaxProvider
 
     string ConvertUniqueIdentifierToString => throw new NotImplementedException();
 
+    string ConvertIntegerToBoolean(int value);
+
     /// <summary>
     ///     Returns the default isolation level for the database
     /// </summary>
@@ -90,19 +94,43 @@ public interface ISqlSyntaxProvider
 
     string GetWildcardPlaceholder();
 
+    /// <summary>
+    /// This ensures that GetWildcardPlaceholder() character is surronded by '' when used inside a LIKE statement. E.g. in WhereLike() extension and the defaultConcat is used.
+    /// </summary>
+    /// <param name="concatDefault">When provided this overides the GetWildcardPlaceholder() default.</param>
+    /// <returns></returns>
+    string GetWildcardConcat(string concatDefault = "");
+
     string GetStringColumnEqualComparison(string column, int paramIndex, TextColumnType columnType);
 
     string GetStringColumnWildcardComparison(string column, int paramIndex, TextColumnType columnType);
 
     string GetConcat(params string[] args);
 
-    string GetColumn(DatabaseType dbType, string tableName, string columnName, string columnAlias, string? referenceName = null, bool forInsert = false);
+    string GetColumn(DatabaseType dbType, string tableName, string columnName, string? columnAlias, string? referenceName = null, bool forInsert = false);
 
     string GetQuotedTableName(string? tableName);
 
     string GetQuotedColumnName(string? columnName);
 
+    string OrderByGuid(string tableName, string columnName);
+
     string GetQuotedName(string? name);
+
+    /// <summary>
+    /// Gets the SQL type cast extension (null type annotation) associated with a null value for the specified type parameter.
+    /// </summary>
+    /// <remarks>
+    /// This method is useful when generating SQL queries that require explicit type casting of NULL values,
+    /// such as in PostgreSQL. The returned string can be used directly in SQL statements for type-safe
+    /// comparisons or assignments (for example, <c>::integer</c> or <c>::text</c>).
+    /// </remarks>
+    /// <typeparam name="T">The type for which to retrieve the SQL null type annotation.</typeparam>
+    /// <returns>
+    /// A string containing the SQL type cast extension (null type annotation) that represents a null value for type
+    /// <typeparamref name="T"/>, or an empty string if no extension is defined.
+    /// </returns>
+    string GetNullCastSuffix<T>() => string.Empty;
 
     bool DoesTableExist(IDatabase db, string tableName);
 
@@ -136,6 +164,8 @@ public interface ISqlSyntaxProvider
 
     string FormatTableRename(string? oldName, string? newName);
 
+    string ColumnWithAlias(string tableNameOrAlias, string columnName, string columnAlias = "");
+
     void HandleCreateTable(IDatabase database, TableDefinition tableDefinition, bool skipKeysAndIndexes = false);
 
     Sql<ISqlContext> SelectTop(Sql<ISqlContext> sql, int top);
@@ -143,6 +173,37 @@ public interface ISqlSyntaxProvider
     bool SupportsClustered();
 
     bool SupportsIdentityInsert();
+
+    /// <summary>
+    /// Determines whether the current database provider supports sequence objects for generating numeric values like PostgreSQL.
+    /// </summary>
+    /// <returns>true if the provider supports sequences; otherwise, false.</returns>
+    bool SupportsSequences() => false;
+
+    /// <summary>
+    /// Alters the database sequences to match the current schema requirements.
+    /// </summary>
+    /// <remarks>
+    /// This is an optional extension point for SQL providers that support database sequences. Providers that support
+    /// sequences should override this method and implement any required changes when schema updates (for example, after
+    /// a migration) require sequence adjustments. Callers should typically check <see cref="SupportsSequences"/> before
+    /// invoking this method. The default implementation throws <see cref="NotImplementedException"/>.
+    /// </remarks>
+    /// <param name="database">The database connection to use for altering sequences.</param>
+    void AlterSequences(IUmbracoDatabase database) => throw new NotImplementedException();
+
+    /// <summary>
+    /// Alters the database sequences associated with the specified table for providers that support sequences.
+    /// </summary>
+    /// <remarks>
+    /// This is an optional extension point for SQL providers that support database sequences. Providers that support
+    /// sequences should override this method to update sequences associated with the specified table when schema changes
+    /// require it. Callers should typically check <see cref="SupportsSequences"/> before invoking this method. The default
+    /// implementation throws <see cref="NotImplementedException"/>.
+    /// </remarks>
+    /// <param name="database">The database connection to use for altering the sequences.</param>
+    /// <param name="tableName">The name of the table whose sequences will be altered.</param>
+    void AlterSequences(IUmbracoDatabase database, string tableName) => throw new NotImplementedException();
 
     IEnumerable<string> GetTablesInSchema(IDatabase db);
 
@@ -215,4 +276,12 @@ public interface ISqlSyntaxProvider
         Sql<ISqlContext> sql,
         Func<Sql<ISqlContext>, Sql<ISqlContext>> nestedJoin,
         string? alias = null);
+
+    /// <summary>
+    /// Some databases have a maximum length for constraint names, this method truncates the name if necessary.
+    /// </summary>
+    /// <typeparam name="T">type of the entity.</typeparam>
+    /// <param name="constraintName">unlimited name.</param>
+    /// <returns>truncated name.</returns>
+    string TruncateConstraintName<T>(string constraintName) => constraintName;
 }

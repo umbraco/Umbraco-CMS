@@ -3,6 +3,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.IO.MediaPathSchemes;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Strings;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.IO.MediaPathSchemes;
@@ -15,7 +16,8 @@ public class UniqueMediaPathSchemeTests
         Mock.Of<IMediaPathScheme>(),
         Mock.Of<ILogger<MediaFileManager>>(),
         Mock.Of<IShortStringHelper>(),
-        Mock.Of<IServiceProvider>());
+        Mock.Of<IServiceProvider>(),
+        Mock.Of<Lazy<ICoreScopeProvider>>());
 
     [Test]
     public void GetFilePath_Creates_ExpectedPath()

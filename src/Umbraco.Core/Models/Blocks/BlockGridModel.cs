@@ -19,7 +19,7 @@ public class BlockGridModel : BlockModelCollection<BlockGridItem>
     /// <value>
     /// The empty <see cref="BlockGridModel" />.
     /// </value>
-    public static BlockGridModel Empty { get; } = new BlockGridModel();
+    public static new BlockGridModel Empty { get; } = new BlockGridModel();
 
     /// <summary>
     /// Prevents a default instance of the <see cref="BlockGridModel" /> class from being created.

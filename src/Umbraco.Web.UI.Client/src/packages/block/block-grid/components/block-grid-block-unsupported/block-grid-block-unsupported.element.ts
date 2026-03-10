@@ -31,18 +31,17 @@ export class UmbBlockGridBlockUnsupportedElement extends UmbLitElement {
 	}
 
 	#renderInside() {
-		return html`<div id="inside" draggable="false">
-			${this.localize.term('blockEditor_unsupportedBlockDescription')}
-			<umb-block-grid-areas-container slot="areas"></umb-block-grid-areas-container>
-		</div>`;
+		return html`
+			<div id="inside" draggable="false">
+				${this.localize.term('blockEditor_unsupportedBlockDescription')}
+				<umb-block-grid-areas-container slot="areas"></umb-block-grid-areas-container>
+			</div>
+		`;
 	}
 
 	static override styles = [
 		UmbTextStyles,
 		css`
-			umb-block-grid-areas-container {
-				margin-top: calc(var(--uui-size-2) + 1px);
-			}
 			umb-block-grid-areas-container::part(area) {
 				margin: var(--uui-size-2);
 			}
@@ -56,6 +55,7 @@ export class UmbBlockGridBlockUnsupportedElement extends UmbLitElement {
 				position: relative;
 				display: block;
 				width: 100%;
+				margin-bottom: 1px;
 
 				box-sizing: border-box;
 				border-radius: var(--uui-border-radius);

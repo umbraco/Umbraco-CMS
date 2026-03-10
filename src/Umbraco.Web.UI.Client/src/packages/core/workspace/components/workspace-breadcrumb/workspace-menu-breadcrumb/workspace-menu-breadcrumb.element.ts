@@ -1,4 +1,5 @@
 import { UMB_WORKSPACE_CONTEXT } from '../../../workspace.context-token.js';
+import { UMB_WORKSPACE_EDIT_PATH_PATTERN } from '../../../paths.js';
 import { css, customElement, html, ifDefined, map, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -77,8 +78,16 @@ export class UmbWorkspaceBreadcrumbElement extends UmbLitElement {
 	}
 
 	#getHref(structureItem: UmbStructureItemModel) {
-		if (structureItem.isFolder) return undefined;
-		return `section/${this.#sectionContext?.getPathname()}/workspace/${structureItem.entityType}/edit/${structureItem.unique}`;
+		if (structureItem.isFolder || !structureItem.unique) return undefined;
+
+		const sectionName = this.#sectionContext?.getPathname();
+		if (!sectionName) return undefined;
+
+		return UMB_WORKSPACE_EDIT_PATH_PATTERN.generateAbsolute({
+			sectionName,
+			entityType: structureItem.entityType,
+			unique: structureItem.unique,
+		});
 	}
 
 	override render() {

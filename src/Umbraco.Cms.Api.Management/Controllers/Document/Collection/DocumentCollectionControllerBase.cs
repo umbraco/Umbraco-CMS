@@ -23,12 +23,6 @@ public abstract class DocumentCollectionControllerBase : ContentCollectionContro
     {
     }
 
-    [Obsolete("Please use the constructor with all parameters. Scheduled to be removed in V18")]
-    protected DocumentCollectionControllerBase(IUmbracoMapper mapper)
-        : base(mapper)
-    {
-    }
-
     protected IActionResult CollectionOperationStatusResult(ContentCollectionOperationStatus status)
         => ContentCollectionOperationStatusResult(status, "document");
 }

@@ -28,7 +28,7 @@ export class UmbInputDocumentGranularUserPermissionElement extends UUIFormContro
 	}
 
 	@property({ type: Array, attribute: false })
-	fallbackPermissions: Array<string> = [];
+	public fallbackPermissions: Array<string> = [];
 
 	@state()
 	private _items?: Array<UmbDocumentItemModel>;
@@ -50,7 +50,13 @@ export class UmbInputDocumentGranularUserPermissionElement extends UUIFormContro
 
 	async #observePickedDocuments(uniques: Array<string>) {
 		const { asObservable } = await this.#documentItemRepository.requestItems(uniques);
-		this.observe(asObservable?.(), (items) => (this._items = items), 'observeItems');
+		this.observe(
+			asObservable?.(),
+			(items) => {
+				this._items = items;
+			},
+			'observeItems',
+		);
 	}
 
 	async #editGranularPermission(item: UmbDocumentItemModel) {
@@ -129,7 +135,6 @@ export class UmbInputDocumentGranularUserPermissionElement extends UUIFormContro
 		const value = allowedVerbs.length > 0 ? { allowedVerbs } : undefined;
 		this.#entityUserPermissionModalContext = this.#modalManagerContext?.open(this, UMB_ENTITY_USER_PERMISSION_MODAL, {
 			data: {
-				unique: item.unique,
 				entityType: item.entityType,
 				headline,
 				preset: {

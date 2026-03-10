@@ -5,6 +5,9 @@ using Umbraco.Cms.Core.Models.Entities;
 
 namespace Umbraco.Extensions;
 
+/// <summary>
+///     Provides extension methods for <see cref="IEntity" />.
+/// </summary>
 public static class EntityExtensions
 {
     /// <summary>
@@ -12,7 +15,7 @@ public static class EntityExtensions
     /// </summary>
     public static void UpdatingEntity(this IEntity entity)
     {
-        DateTime now = DateTime.Now;
+        DateTime now = DateTime.UtcNow;
 
         if (entity.CreateDate == default)
         {
@@ -32,7 +35,7 @@ public static class EntityExtensions
     /// </summary>
     public static void AddingEntity(this IEntity entity)
     {
-        DateTime now = DateTime.Now;
+        DateTime now = DateTime.UtcNow;
         var canBeDirty = entity as ICanBeDirty;
 
         // set the create and update dates, if not already set

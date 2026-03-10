@@ -3,14 +3,9 @@
 
 using HtmlAgilityPack;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Exceptions;
-using Umbraco.Cms.Core.Hosting;
-using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
@@ -18,7 +13,6 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Models.TemporaryFile;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
@@ -37,48 +31,6 @@ public sealed class RichTextEditorPastedImages
     private readonly IEntityService _entityService;
     private readonly AppCaches _appCaches;
     private readonly IUserService _userService;
-
-    [Obsolete("Please use the non-obsolete constructor. Will be removed in V17.")]
-    public RichTextEditorPastedImages(
-        IUmbracoContextAccessor umbracoContextAccessor,
-        ILogger<RichTextEditorPastedImages> logger,
-        IHostingEnvironment hostingEnvironment,
-        IMediaService mediaService,
-        IContentTypeBaseServiceProvider contentTypeBaseServiceProvider,
-        MediaFileManager mediaFileManager,
-        MediaUrlGeneratorCollection mediaUrlGenerators,
-        IShortStringHelper shortStringHelper,
-        IPublishedUrlProvider publishedUrlProvider,
-        ITemporaryFileService temporaryFileService,
-        IScopeProvider scopeProvider,
-        IMediaImportService mediaImportService,
-        IImageUrlGenerator imageUrlGenerator,
-        IOptions<ContentSettings> contentSettings,
-        IEntityService entityService,
-        AppCaches appCaches)
-        : this(umbracoContextAccessor, publishedUrlProvider, temporaryFileService, scopeProvider, mediaImportService, imageUrlGenerator, entityService, appCaches)
-    {
-    }
-
-    [Obsolete("Please use the non-obsolete constructor. Will be removed in V17.")]
-    public RichTextEditorPastedImages(
-        IUmbracoContextAccessor umbracoContextAccessor,
-        IPublishedUrlProvider publishedUrlProvider,
-        ITemporaryFileService temporaryFileService,
-        IScopeProvider scopeProvider,
-        IMediaImportService mediaImportService,
-        IImageUrlGenerator imageUrlGenerator)
-        : this(
-            umbracoContextAccessor,
-            publishedUrlProvider,
-            temporaryFileService,
-            scopeProvider,
-            mediaImportService,
-            imageUrlGenerator,
-            StaticServiceProvider.Instance.GetRequiredService<IEntityService>(),
-            StaticServiceProvider.Instance.GetRequiredService<AppCaches>())
-    {
-    }
 
     public RichTextEditorPastedImages(
         IUmbracoContextAccessor umbracoContextAccessor,

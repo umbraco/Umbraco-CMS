@@ -1,5 +1,3 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
@@ -7,18 +5,25 @@ using Umbraco.Cms.Core.Serialization;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+///     Provides functionality for managing webhook requests.
+/// </summary>
+/// <remarks>
+///     Webhook requests are queued when events occur and are processed asynchronously
+///     to send HTTP callbacks to configured webhook endpoints.
+/// </remarks>
 public class WebhookRequestService : IWebhookRequestService
 {
     private readonly ICoreScopeProvider _coreScopeProvider;
     private readonly IWebhookRequestRepository _webhookRequestRepository;
     private readonly IWebhookJsonSerializer _webhookJsonSerializer;
 
-    [Obsolete("This constructor is obsolete and will be removed in future versions. Scheduled for removal in V17")]
-    public WebhookRequestService(ICoreScopeProvider coreScopeProvider, IWebhookRequestRepository webhookRequestRepository, IJsonSerializer jsonSerializer)
-    : this (coreScopeProvider, webhookRequestRepository, StaticServiceProvider.Instance.GetRequiredService<IWebhookJsonSerializer>())
-    {
-    }
-
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="WebhookRequestService" /> class.
+    /// </summary>
+    /// <param name="coreScopeProvider">The scope provider for unit of work operations.</param>
+    /// <param name="webhookRequestRepository">The repository for webhook request data access.</param>
+    /// <param name="webhookJsonSerializer">The serializer for converting payloads to JSON.</param>
     public WebhookRequestService(ICoreScopeProvider coreScopeProvider, IWebhookRequestRepository webhookRequestRepository, IWebhookJsonSerializer webhookJsonSerializer)
     {
         _coreScopeProvider = coreScopeProvider;
@@ -26,6 +31,7 @@ public class WebhookRequestService : IWebhookRequestService
         _webhookJsonSerializer = webhookJsonSerializer;
     }
 
+    /// <inheritdoc />
     public async Task<WebhookRequest> CreateAsync(Guid webhookKey, string eventAlias, object? payload)
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
@@ -44,6 +50,7 @@ public class WebhookRequestService : IWebhookRequestService
         return webhookRequest;
     }
 
+    /// <inheritdoc />
     public Task<IEnumerable<WebhookRequest>> GetAllAsync()
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
@@ -52,6 +59,7 @@ public class WebhookRequestService : IWebhookRequestService
         return webhookRequests;
     }
 
+    /// <inheritdoc />
     public async Task DeleteAsync(WebhookRequest webhookRequest)
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
@@ -60,6 +68,7 @@ public class WebhookRequestService : IWebhookRequestService
         scope.Complete();
     }
 
+    /// <inheritdoc />
     public async Task<WebhookRequest> UpdateAsync(WebhookRequest webhookRequest)
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();

@@ -25,7 +25,7 @@ public static class InstallerBuilderExtensions
 
         builder.AddInstallSteps();
         services.AddTransient<IInstallService, InstallService>();
-        builder.AddNotificationAsyncHandler<UnattendedInstallNotification, CreateUnattendedUserNotificationHandler>();
+        builder.AddNotificationAsyncHandler<UnattendedInstallNotification, PostUnattendedInstallNotificationHandler>();
         builder.WithCollectionBuilder<MapDefinitionCollectionBuilder>().Add<InstallerViewModelsMapDefinition>();
 
         return builder;
@@ -47,6 +47,7 @@ public static class InstallerBuilderExtensions
         builder.InstallSteps()
             .Append<FilePermissionsStep>()
             .Append<TelemetryIdentifierStep>()
+            .Append<HmacSecretKeyStep>()
             .Append<DatabaseConfigureStep>()
             .Append<DatabaseInstallStep>()
             .Append<DatabaseUpgradeStep>()

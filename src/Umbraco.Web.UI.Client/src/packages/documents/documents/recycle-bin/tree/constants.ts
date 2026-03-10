@@ -6,3 +6,5 @@ export const UMB_DOCUMENT_RECYCLE_BIN_TREE_STORE_ALIAS = 'Umb.Store.Document.Rec
 export const UMB_DOCUMENT_RECYCLE_BIN_TREE_ALIAS = 'Umb.Tree.Document.RecycleBin';
 
 export { UMB_DOCUMENT_RECYCLE_BIN_TREE_STORE_CONTEXT } from './data/document-recycle-bin-tree.store.context-token.js';
+
+export * from './tree-item-children/constants.js';

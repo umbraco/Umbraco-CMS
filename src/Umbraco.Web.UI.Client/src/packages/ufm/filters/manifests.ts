@@ -29,12 +29,28 @@ export const manifests: Array<ManifestUfmFilter> = [
 		api: () => import('./strip-html.filter.js'),
 		meta: { alias: 'strip-html' },
 	},
+	// TODO: Remove in V18 - replaced by camelCase alias below for UFMJS compatibility
+	{
+		type: 'ufmFilter',
+		alias: 'Umb.Filter.StripHtmlCamelCase',
+		name: 'Strip HTML UFM Filter (camelCase)',
+		api: () => import('./strip-html.filter.js'),
+		meta: { alias: 'stripHtml' },
+	},
 	{
 		type: 'ufmFilter',
 		alias: 'Umb.Filter.TitleCase',
 		name: 'Title Case UFM Filter',
 		api: () => import('./title-case.filter.js'),
 		meta: { alias: 'title-case' },
+	},
+	// TODO: Remove in V18 - replaced by camelCase alias below for UFMJS compatibility
+	{
+		type: 'ufmFilter',
+		alias: 'Umb.Filter.TitleCaseCamelCase',
+		name: 'Title Case UFM Filter (camelCase)',
+		api: () => import('./title-case.filter.js'),
+		meta: { alias: 'titleCase' },
 	},
 	{
 		type: 'ufmFilter',
@@ -56,5 +72,13 @@ export const manifests: Array<ManifestUfmFilter> = [
 		name: 'Word Limit UFM Filter',
 		api: () => import('./word-limit.filter.js'),
 		meta: { alias: 'word-limit' },
+	},
+	// TODO: Remove in V18 - replaced by camelCase alias below for UFMJS compatibility
+	{
+		type: 'ufmFilter',
+		alias: 'Umb.Filter.WordLimitCamelCase',
+		name: 'Word Limit UFM Filter (camelCase)',
+		api: () => import('./word-limit.filter.js'),
+		meta: { alias: 'wordLimit' },
 	},
 ];

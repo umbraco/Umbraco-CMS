@@ -18,6 +18,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		kind: 'deleteWithRelation',
 		forEntityTypes: [UMB_MEDIA_ENTITY_TYPE],
 		meta: {
+			icon: 'icon-trash-empty',
 			itemRepositoryAlias: UMB_MEDIA_ITEM_REPOSITORY_ALIAS,
 			detailRepositoryAlias: UMB_MEDIA_DETAIL_REPOSITORY_ALIAS,
 			referenceRepositoryAlias: UMB_MEDIA_REFERENCE_REPOSITORY_ALIAS,

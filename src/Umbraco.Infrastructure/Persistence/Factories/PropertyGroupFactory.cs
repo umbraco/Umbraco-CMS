@@ -1,4 +1,5 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Extensions;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Extensions;
 
@@ -24,7 +25,8 @@ internal static class PropertyGroupFactory
         }
 
         dto.PropertyTypeDtos = propertyGroup.PropertyTypes
-            ?.Select(propertyType => BuildPropertyTypeDto(propertyGroup.Id, propertyType, contentTypeId)).ToList();
+            ?.Select(propertyType => BuildPropertyTypeDto(propertyGroup.Id, propertyType, contentTypeId)).ToList()
+            ?? [];
 
         return dto;
     }
@@ -129,8 +131,8 @@ internal static class PropertyGroupFactory
                         propertyType.ValidationRegExp = typeDto.ValidationRegExp;
                         propertyType.ValidationRegExpMessage = typeDto.ValidationRegExpMessage;
                         propertyType.PropertyGroupId = new Lazy<int>(() => tempGroupDto.Id);
-                        propertyType.CreateDate = createDate;
-                        propertyType.UpdateDate = updateDate;
+                        propertyType.CreateDate = createDate.EnsureUtc();
+                        propertyType.UpdateDate = updateDate.EnsureUtc();
                         propertyType.Variations = (ContentVariation)typeDto.Variations;
 
                         // reset dirty initial properties (U4-1946)

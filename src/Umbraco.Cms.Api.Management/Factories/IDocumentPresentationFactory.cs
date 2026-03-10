@@ -14,17 +14,9 @@ namespace Umbraco.Cms.Api.Management.Factories;
 
 public interface IDocumentPresentationFactory
 {
-    [Obsolete("Schedule for removal in v17")]
-    Task<DocumentResponseModel> CreateResponseModelAsync(IContent content);
-
     Task<PublishedDocumentResponseModel> CreatePublishedResponseModelAsync(IContent content);
 
-    Task<DocumentResponseModel> CreateResponseModelAsync(IContent content, ContentScheduleCollection schedule)
-#pragma warning disable CS0618 // Type or member is obsolete
-        // Remove when obsolete CreateResponseModelAsync is removed
-        => CreateResponseModelAsync(content);
-#pragma warning restore CS0618 // Type or member is obsolete
-
+    Task<DocumentResponseModel> CreateResponseModelAsync(IContent content, ContentScheduleCollection schedule);
     DocumentItemResponseModel CreateItemResponseModel(IDocumentEntitySlim entity);
 
     DocumentBlueprintItemResponseModel CreateBlueprintItemResponseModel(IDocumentEntitySlim entity);
@@ -32,9 +24,6 @@ public interface IDocumentPresentationFactory
     IEnumerable<DocumentVariantItemResponseModel> CreateVariantsItemResponseModels(IDocumentEntitySlim entity);
 
     DocumentTypeReferenceResponseModel CreateDocumentTypeReferenceResponseModel(IDocumentEntitySlim entity);
-
-    [Obsolete("Use CreateCulturePublishScheduleModels instead. Scheduled for removal in v17")]
-    Attempt<CultureAndScheduleModel, ContentPublishingOperationStatus> CreateCultureAndScheduleModel(PublishDocumentRequestModel requestModel);
 
     Attempt<List<CulturePublishScheduleModel>, ContentPublishingOperationStatus> CreateCulturePublishScheduleModels(
         PublishDocumentRequestModel requestModel)

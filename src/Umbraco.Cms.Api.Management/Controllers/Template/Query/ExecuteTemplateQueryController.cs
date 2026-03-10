@@ -43,44 +43,11 @@ public class ExecuteTemplateQueryController : TemplateQueryControllerBase
         _publishedContentStatusFilteringService = publishedContentStatusFilteringService;
     }
 
-    [Obsolete("Please use the non-obsolete constructor. Will be removed in V17.")]
-    public ExecuteTemplateQueryController(
-        IPublishedContentQuery publishedContentQuery,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedValueFallback publishedValueFallback,
-        IContentTypeService contentTypeService,
-        IPublishedContentCache contentCache,
-        IDocumentNavigationQueryService documentNavigationQueryService,
-        IPublishedContentStatusFilteringService publishedContentStatusFilteringService)
-        : this(
-            publishedContentQuery,
-            publishedValueFallback,
-            contentTypeService,
-            documentNavigationQueryService,
-            publishedContentStatusFilteringService)
-    {
-    }
-
-    [Obsolete("Please use the non-obsolete constructor. Will be removed in V17.")]
-    public ExecuteTemplateQueryController(
-        IPublishedContentQuery publishedContentQuery,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedValueFallback publishedValueFallback,
-        IContentTypeService contentTypeService,
-        IPublishedContentCache contentCache,
-        IDocumentNavigationQueryService documentNavigationQueryService)
-        : this(
-            publishedContentQuery,
-            publishedValueFallback,
-            contentTypeService,
-            documentNavigationQueryService,
-            StaticServiceProvider.Instance.GetRequiredService<IPublishedContentStatusFilteringService>())
-    {
-    }
-
     [HttpPost("execute")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(TemplateQueryResultResponseModel), StatusCodes.Status200OK)]
+    [EndpointSummary("Executes a template query.")]
+    [EndpointDescription("Executes a template query with the provided parameters and returns the matching content results with execution metrics.")]
     public Task<ActionResult<TemplateQueryResultResponseModel>> Execute(
         CancellationToken cancellationToken,
         TemplateQueryExecuteModel query)

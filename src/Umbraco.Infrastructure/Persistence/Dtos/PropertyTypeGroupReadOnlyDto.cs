@@ -3,12 +3,16 @@ using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
-[TableName(Constants.DatabaseSchema.Tables.PropertyTypeGroup)]
-[PrimaryKey("id", AutoIncrement = true)]
+[Obsolete("This class is unused in Umbraco. Scheduled for removal in Umbraco 19.")]
+[TableName(TableName)]
+[PrimaryKey(PrimaryKeyColumnName, AutoIncrement = true)]
 [ExplicitColumns]
 internal sealed class PropertyTypeGroupReadOnlyDto
 {
-    [Column("PropertyTypeGroupId")]
+    public const string TableName = Constants.DatabaseSchema.Tables.PropertyTypeGroup;
+    public const string PrimaryKeyColumnName = "PropertyTypeGroupId";
+
+    [Column(PrimaryKeyColumnName)]
     public int? Id { get; set; }
 
     [Column("PropertyGroupName")]

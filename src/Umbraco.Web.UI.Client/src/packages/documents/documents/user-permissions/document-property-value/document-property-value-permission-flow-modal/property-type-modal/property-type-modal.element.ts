@@ -95,7 +95,7 @@ export class UmbDocumentPropertyValueUserPermissionFlowPropertyTypeModalElement 
 			});
 			this._submitModal();
 		} catch (error) {
-			console.log(error);
+			console.error(error);
 		}
 	}
 
@@ -108,7 +108,7 @@ export class UmbDocumentPropertyValueUserPermissionFlowPropertyTypeModalElement 
 							(item) => item.unique,
 							(item) => html`
 								<uui-ref-node
-									name=${item.name ?? ''}
+									name=${this.localize.string(item.name ?? '')}
 									detail=${this.#getItemDetail(item)}
 									?selectable=${this._pickableFilter(item)}
 									select-only

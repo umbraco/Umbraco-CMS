@@ -18,6 +18,7 @@ public class CheckHealthCheckGroupController : HealthCheckGroupControllerBase
     /// <summary>
     ///     Check all health checks in the group with a given group name.
     /// </summary>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <param name="name">The name of the group.</param>
     /// <remarks>The health check result(s) will be included as part of the health checks.</remarks>
     /// <returns>The health check group or not found result.</returns>
@@ -25,6 +26,8 @@ public class CheckHealthCheckGroupController : HealthCheckGroupControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(HealthCheckGroupWithResultResponseModel), StatusCodes.Status200OK)]
+    [EndpointSummary("Executes all health checks in a group.")]
+    [EndpointDescription("Runs all health checks in the group identified by the provided name and returns the results.")]
     public async Task<IActionResult> ByNameWithResult(
         CancellationToken cancellationToken,
         string name)

@@ -142,6 +142,21 @@ export abstract class UmbContentTypeWorkspaceContextBase<
 		return response;
 	}
 
+	/**
+	 * Reload the workspace data
+	 * @returns { Promise<void> } The promise of the reload
+	 */
+	override async reload(): Promise<void> {
+		const unique = this.getUnique();
+		if (!unique) throw new Error('Unique is not set');
+
+		const data = await this.structure.reload();
+		if (data) {
+			this._data.setPersisted(data);
+			this._data.setCurrent(data);
+		}
+	}
+
 	#onDetailStoreChange(entity: DetailModelType | undefined) {
 		if (!entity) {
 			this._data.clear();
@@ -158,7 +173,9 @@ export abstract class UmbContentTypeWorkspaceContextBase<
 		try {
 			await this.structure.create(parent?.unique);
 
-			this._data.setPersisted(this.structure.getOwnerContentType());
+			const savedData = this.structure.getOwnerContentType();
+			this._data.setPersisted(savedData);
+			this._data.setCurrent(savedData);
 
 			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 			if (!eventContext) {
@@ -184,7 +201,9 @@ export abstract class UmbContentTypeWorkspaceContextBase<
 		try {
 			await this.structure.save();
 
-			this._data.setPersisted(this.structure.getOwnerContentType());
+			const savedData = this.structure.getOwnerContentType();
+			this._data.setPersisted(savedData);
+			this._data.setCurrent(savedData);
 
 			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 			if (!eventContext) {

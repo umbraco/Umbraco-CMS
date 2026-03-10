@@ -6,6 +6,7 @@ import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import type { UmbRepositoryItemsStatus } from '@umbraco-cms/backoffice/repository';
 
 @customElement('umb-input-language')
 export class UmbInputLanguageElement extends UUIFormControlMixin(UmbLitElement, '') {
@@ -17,7 +18,7 @@ export class UmbInputLanguageElement extends UUIFormControlMixin(UmbLitElement, 
 			return modelEntry;
 		},
 		identifier: 'Umb.SorterIdentifier.InputLanguage',
-		itemSelector: 'uui-ref-node',
+		itemSelector: 'umb-entity-item-ref',
 		containerSelector: 'uui-ref-list',
 		onChange: ({ model }) => {
 			this.selection = model;
@@ -115,6 +116,9 @@ export class UmbInputLanguageElement extends UUIFormControlMixin(UmbLitElement, 
 	@state()
 	private _items: Array<UmbLanguageItemModel> = [];
 
+	@state()
+	private _statuses?: Array<UmbRepositoryItemsStatus>;
+
 	#pickerContext = new UmbLanguagePickerInputContext(this);
 
 	constructor() {
@@ -134,6 +138,7 @@ export class UmbInputLanguageElement extends UUIFormControlMixin(UmbLitElement, 
 
 		this.observe(this.#pickerContext.selection, (selection) => (this.value = selection.join(',')), '_observeSelection');
 		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems), '_observerItems');
+		this.observe(this.#pickerContext.statuses, (statuses) => (this._statuses = statuses), '_observeStatuses');
 	}
 
 	protected override getFormElement() {
@@ -147,8 +152,8 @@ export class UmbInputLanguageElement extends UUIFormControlMixin(UmbLitElement, 
 		});
 	}
 
-	#onRemove(item: UmbLanguageItemModel) {
-		this.#pickerContext.requestRemoveItem(item.unique);
+	#onRemove(unique: string) {
+		this.#pickerContext.requestRemoveItem(unique);
 	}
 
 	override render() {
@@ -167,29 +172,38 @@ export class UmbInputLanguageElement extends UUIFormControlMixin(UmbLitElement, 
 	}
 
 	#renderItems() {
-		if (!this._items) return;
+		if (!this._statuses) return;
 		return html`
 			<uui-ref-list>
 				${repeat(
-					this._items,
-					(item) => item.unique,
-					(item) =>
-						html`<umb-entity-item-ref
-							id=${item.unique}
-							.item=${item}
-							?readonly=${this.readonly}
-							?standalone=${this.max === 1}>
-							${when(
-								!this.readonly,
-								() => html`
-									<uui-action-bar slot="actions">
-										<uui-button
-											label=${this.localize.term('general_remove')}
-											@click=${() => this.#onRemove(item)}></uui-button>
-									</uui-action-bar>
-								`,
-							)}
-						</umb-entity-item-ref>`,
+					this._statuses,
+					(status) => status.unique,
+					(status) => {
+						const unique = status.unique;
+						const item = this._items?.find((x) => x.unique === unique);
+						const isError = status.state.type === 'error';
+						return html`
+							<umb-entity-item-ref
+								id=${unique}
+								.item=${item}
+								?error=${isError}
+								.errorMessage=${status.state.error}
+								.errorDetail=${isError ? unique : undefined}
+								?readonly=${this.readonly}
+								?standalone=${this.max === 1}>
+								${when(
+									!this.readonly,
+									() => html`
+										<uui-action-bar slot="actions">
+											<uui-button
+												label=${this.localize.term('general_remove')}
+												@click=${() => this.#onRemove(unique)}></uui-button>
+										</uui-action-bar>
+									`,
+								)}
+							</umb-entity-item-ref>
+						`;
+					},
 				)}
 			</uui-ref-list>
 		`;

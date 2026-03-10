@@ -1,5 +1,11 @@
-﻿namespace Umbraco.Cms.Core.Actions;
+namespace Umbraco.Cms.Core.Actions;
 
+/// <summary>
+///     Represents the action that allows writing document property values.
+/// </summary>
+/// <remarks>
+///     This action is used for permission control when modifying property values on documents.
+/// </remarks>
 public class ActionDocumentPropertyWrite : IAction
 {
     /// <inheritdoc cref="IAction.ActionLetter" />
@@ -19,11 +25,5 @@ public class ActionDocumentPropertyWrite : IAction
 
     /// <inheritdoc />
     public bool CanBePermissionAssigned => true;
-
-    /// <inheritdoc />
-    public string Icon => string.Empty;
-
-    /// <inheritdoc />
-    public string Category => Constants.Conventions.PermissionCategories.OtherCategory;
 }
 

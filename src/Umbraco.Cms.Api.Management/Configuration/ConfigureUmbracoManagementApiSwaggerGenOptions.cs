@@ -1,8 +1,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
-using Umbraco.Cms.Api.Common.OpenApi;
+using Umbraco.Cms.Api.Common.Security;
 using Umbraco.Cms.Api.Common.Serialization;
 using Umbraco.Cms.Api.Management.DependencyInjection;
 using Umbraco.Cms.Api.Management.OpenApi;
@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Api.Management.Configuration;
 
 public class ConfigureUmbracoManagementApiSwaggerGenOptions : IConfigureOptions<SwaggerGenOptions>
 {
-    private IUmbracoJsonTypeInfoResolver _umbracoJsonTypeInfoResolver;
+    private readonly IUmbracoJsonTypeInfoResolver _umbracoJsonTypeInfoResolver;
 
     public ConfigureUmbracoManagementApiSwaggerGenOptions(IUmbracoJsonTypeInfoResolver umbracoJsonTypeInfoResolver)
     {
@@ -20,7 +20,6 @@ public class ConfigureUmbracoManagementApiSwaggerGenOptions : IConfigureOptions<
 
     public void Configure(SwaggerGenOptions swaggerGenOptions)
     {
-
         swaggerGenOptions.SwaggerDoc(
             ManagementApiConfiguration.ApiName,
             new OpenApiInfo
@@ -51,10 +50,10 @@ public class ConfigureUmbracoManagementApiSwaggerGenOptions : IConfigureOptions<
                      AuthorizationCode = new OpenApiOAuthFlow
                      {
                          AuthorizationUrl =
-                             new Uri(Common.Security.Paths.BackOfficeApi.AuthorizationEndpoint, UriKind.Relative),
-                         TokenUrl = new Uri(Common.Security.Paths.BackOfficeApi.TokenEndpoint, UriKind.Relative)
-                     }
-                 }
+                             new Uri(Paths.BackOfficeApi.AuthorizationEndpoint, UriKind.Relative),
+                         TokenUrl = new Uri(Paths.BackOfficeApi.TokenEndpoint, UriKind.Relative),
+                     },
+                 },
              });
 
         // Sets Security requirement on backoffice apis

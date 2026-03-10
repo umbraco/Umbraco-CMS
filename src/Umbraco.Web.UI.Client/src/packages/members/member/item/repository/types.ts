@@ -19,12 +19,3 @@ export interface UmbMemberItemVariantModel {
 	name: string;
 	culture: string | null;
 }
-
-/**
- * @deprecated Deprecated in favor of UmbMemberItemVariantModel. Will be removed in v17.0.0
- * @interface UmbMemberVariantItemModel
- */
-export interface UmbMemberVariantItemModel {
-	name: string;
-	culture: string | null;
-}

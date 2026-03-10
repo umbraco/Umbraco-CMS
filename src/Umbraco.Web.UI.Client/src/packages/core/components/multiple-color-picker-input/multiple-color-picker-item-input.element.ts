@@ -22,12 +22,12 @@ import type { UUIColorPickerElement, UUIInputElement, UUIInputEvent } from '@umb
 export class UmbMultipleColorPickerItemInputElement extends UUIFormControlMixin(UmbLitElement, '') {
 	@property({ type: String })
 	public override set value(value: string) {
+		this._valueHex = this.#expandHex(value);
+
 		if (value.startsWith('#')) {
-			this._valueHex = value;
 			super.value = value.substring(1);
 		} else {
 			super.value = value;
-			this._valueHex = `#${value}`;
 		}
 	}
 	public override get value() {
@@ -66,6 +66,20 @@ export class UmbMultipleColorPickerItemInputElement extends UUIFormControlMixin(
 
 	@property({ type: Boolean })
 	showLabels = false;
+
+	#expandHex(hex: string) {
+		hex = hex.replace(/^#/, '');
+
+		// If it's 3-digit, expand it
+		if (hex.length === 3) {
+			hex = hex
+				.split('')
+				.map((ch) => ch + ch)
+				.join('');
+		}
+
+		return `#${hex}`;
+	}
 
 	async #onDelete() {
 		await umbConfirmModal(this, {
@@ -149,7 +163,7 @@ export class UmbMultipleColorPickerItemInputElement extends UUIFormControlMixin(
 		return html`
 			<umb-form-validation-message id="validation-message" @invalid=${this.#onInvalid} @valid=${this.#onValid}>
 				<div id="item">
-					${this.disabled || this.readonly ? nothing : html`<uui-icon name="icon-grip"></uui-icon>`}
+					${this.disabled || this.readonly ? nothing : html`<uui-icon name="icon-grip" class="handle"></uui-icon>`}
 					<div class="color-wrapper">
 						<uui-input
 							id="input"
@@ -167,7 +181,12 @@ export class UmbMultipleColorPickerItemInputElement extends UUIFormControlMixin(
 								value=${this._valueHex}
 								@click=${this.#onColorClick}></uui-color-swatch>
 						</uui-input>
-						<input aria-hidden="${true}" type="color" id="color" value=${this.value} @change=${this.#onColorChange} />
+						<input
+							type="color"
+							id="color"
+							value=${this._valueHex}
+							aria-hidden="${true}"
+							@change=${this.#onColorChange} />
 					</div>
 					${when(
 						this.showLabels,
@@ -248,6 +267,14 @@ export class UmbMultipleColorPickerItemInputElement extends UUIFormControlMixin(
 				padding: 0;
 				margin: 0;
 				position: absolute;
+			}
+
+			.handle {
+				cursor: grab;
+			}
+
+			.handle:active {
+				cursor: grabbing;
 			}
 		`,
 	];

@@ -29,7 +29,8 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 	override render() {
 		if (!this.items?.length) return nothing;
 
-		return html`<uui-button
+		return html`
+			<uui-button
 				id="popover-trigger"
 				popovertarget="workspace-action-popover"
 				look="${this.look}"
@@ -52,7 +53,8 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 						)}
 					</uui-scroll-container>
 				</umb-popover-layout>
-			</uui-popover-container>`;
+			</uui-popover-container>
+		`;
 	}
 
 	static override styles = [

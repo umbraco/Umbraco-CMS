@@ -41,6 +41,8 @@ export class UmbDocumentSearchServerDataSource
 					query: args.query,
 					trashed: args.includeTrashed,
 					dataTypeId: args.dataTypeUnique,
+					skip: args.paging?.skip,
+					take: args.paging?.take,
 				},
 			}),
 		);
@@ -55,7 +57,7 @@ export class UmbDocumentSearchServerDataSource
 					},
 					entityType: UMB_DOCUMENT_ENTITY_TYPE,
 					hasChildren: item.hasChildren,
-					href: '/section/content/workspace/document/edit/' + item.id,
+					href: 'section/content/workspace/document/edit/' + item.id,
 					isProtected: item.isProtected,
 					isTrashed: item.isTrashed,
 					name: item.variants[0]?.name, // TODO: this is not correct. We need to get it from the variants. This is a temp solution.
@@ -66,8 +68,10 @@ export class UmbDocumentSearchServerDataSource
 							culture: variant.culture || null,
 							name: variant.name,
 							state: variant.state,
+							flags: variant.flags,
 						};
 					}),
+					flags: item.flags,
 				};
 			});
 

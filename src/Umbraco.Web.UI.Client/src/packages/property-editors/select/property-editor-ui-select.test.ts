@@ -9,7 +9,7 @@ import {
 	getSelectElement,
 	getSelectedValue,
 	verifySelectValueAndDOM,
-	SINGLE_SELECT_TEST_DATA
+	SINGLE_SELECT_TEST_DATA,
 } from '../utils/property-editor-test-utils.js';
 
 describe('UmbPropertyEditorUISelectElement', () => {
@@ -18,8 +18,6 @@ describe('UmbPropertyEditorUISelectElement', () => {
 	beforeEach(async () => {
 		element = await fixture(html`<umb-property-editor-ui-select></umb-property-editor-ui-select>`);
 	});
-
-
 
 	it('is defined with its own instance', () => {
 		expect(element).to.be.instanceOf(UmbPropertyEditorUISelectElement);

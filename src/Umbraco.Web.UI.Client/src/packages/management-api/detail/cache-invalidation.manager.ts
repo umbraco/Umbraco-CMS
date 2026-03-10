@@ -7,11 +7,13 @@ import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 export interface UmbManagementApiDetailDataInvalidationManagerArgs<DetailResponseModelType> {
 	dataCache: UmbManagementApiDetailDataCache<DetailResponseModelType>;
 	eventSources: Array<string>;
+	eventTypes?: Array<string>;
 }
 
 export class UmbManagementApiDetailDataCacheInvalidationManager<DetailResponseModelType> extends UmbControllerBase {
 	protected _dataCache: UmbManagementApiDetailDataCache<DetailResponseModelType>;
 	#eventSources: Array<string>;
+	#eventTypes: Array<string>;
 	#serverEventContext?: typeof UMB_MANAGEMENT_API_SERVER_EVENT_CONTEXT.TYPE;
 
 	constructor(
@@ -22,6 +24,7 @@ export class UmbManagementApiDetailDataCacheInvalidationManager<DetailResponseMo
 		{
 			this._dataCache = args.dataCache;
 			this.#eventSources = args.eventSources;
+			this.#eventTypes = args.eventTypes ?? ['Updated', 'Deleted'];
 
 			this.consumeContext(UMB_MANAGEMENT_API_SERVER_EVENT_CONTEXT, (context) => {
 				this.#serverEventContext = context;
@@ -42,7 +45,7 @@ export class UmbManagementApiDetailDataCacheInvalidationManager<DetailResponseMo
 
 	#observeServerEvents() {
 		this.observe(
-			this.#serverEventContext?.byEventSourcesAndEventTypes(this.#eventSources, ['Updated', 'Deleted']),
+			this.#serverEventContext?.byEventSourcesAndEventTypes(this.#eventSources, this.#eventTypes),
 			(event) => {
 				if (!event) return;
 				this._onServerEvent(event);

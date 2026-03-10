@@ -18,6 +18,7 @@ export default {
 		changeDataType: 'Datentyp ändern',
 		copy: 'Kopieren',
 		create: 'Neu',
+		createFor: (name: string) => (name ? `Neu erstellen für ${name}` : 'Neu'),
 		export: 'Exportieren',
 		createPackage: 'Neues Paket',
 		createGroup: 'Neue Gruppe',
@@ -63,6 +64,7 @@ export default {
 		unlock: 'Freigeben',
 		createblueprint: 'Inhaltsvorlage anlegen',
 		resendInvite: 'Einladung erneut versenden',
+		viewActionsFor: (name: string) => (name ? `Aktionen anzeigen für ${name}` : 'Aktionen anzeigen'),
 	},
 	actionCategories: {
 		content: 'Inhalt',
@@ -376,6 +378,8 @@ export default {
 		renameFolderFailed: 'Das Verzeichnis mit Id %0% konnte nicht umbenannt werden',
 		dragAndDropYourFilesIntoTheArea: 'Wählen Sie Dateien aus und ziehen Sie diese in diesen Bereich',
 		uploadNotAllowed: 'Hochladen ist in diesem Bereich nicht erlaubt.',
+		uploadValidationFailed: (mediaTypeName: string) =>
+			`Der Medientyp ${mediaTypeName} hat eine oder mehrere erforderliche Eigenschaften. Er muss einzeln über das Menü 'Erstellen' hochgeladen werden`,
 	},
 	member: {
 		createNewMember: 'Neues Mitglied anlegen',
@@ -770,6 +774,7 @@ export default {
 		design: 'Design',
 		dictionary: 'Wörterbuch',
 		dimensions: 'Abmessungen',
+		dividerPosition: (value: string | number) => `Trenner bei ${value}%`,
 		discard: 'Verwerfen',
 		down: 'nach unten',
 		download: 'Herunterladen',
@@ -897,10 +902,20 @@ export default {
 		header: 'Kopf',
 		systemField: 'System Feld',
 		lastUpdated: 'Zuletzt geändert',
-		newVersionAvailable: 'Neue Version verfügbar',
 	},
 	colors: {
+		black: 'Schwarz',
 		blue: 'Blau',
+		brown: 'Braun',
+		cyan: 'Cyan',
+		green: 'Grün',
+		lightBlue: 'Hellblau',
+		pink: 'Pink',
+		red: 'Rot',
+		text: 'Schwarz',
+		yellow: 'Gelb',
+		white: 'Weiß',
+		grey: 'Grau',
 	},
 	shortcuts: {
 		addTab: 'Tab hinzufügen',
@@ -1245,7 +1260,8 @@ export default {
 		headline: 'Wählen Sie eine Version, um diese mit der aktuellen zu vergleichen',
 		currentVersion: 'Aktuelle Version',
 		diffHelp:
-			'Zeigt die Unterschiede zwischen der aktuellen und der ausgewählten Version an.<br />Text in <del>rot</del> fehlen in der ausgewählten Version, <ins>grün</ins> markierter Text wurde hinzugefügt.',
+			'<del>Roter Text</del> wird in der ausgewählten Version entfernt, <ins>grüner Text</ins> wird hinzugefügt.',
+		showDiff: 'Unterschiede zwischen der aktuellen Version und der ausgewählten Version anzeigen.',
 		noDiff: 'Keine Unterschiede zwischen den beiden Versionen gefunden.',
 		documentRolledBack: 'Dokument wurde zurückgesetzt',
 		htmlHelp:
@@ -1271,14 +1287,6 @@ export default {
 		translation: 'Übersetzung',
 		users: 'Benutzer',
 	},
-	help: {
-		tours: 'Touren',
-		theBestUmbracoVideoTutorials: 'Die besten Umbraco-Video-Tutorials',
-		umbracoForum: 'Besuche our.umbraco.com',
-		umbracoTv: 'Besuche umbraco.tv',
-		umbracoLearningBase: 'Schaue gratis Tutorials',
-		umbracoLearningBaseDescription: 'von Umbraco Learning Base',
-	},
 	settings: {
 		defaulttemplate: 'Standardvorlage',
 		importDocumentTypeHelp:
@@ -1291,6 +1299,7 @@ export default {
 		tab: 'Registerkarte',
 		tabname: 'Registerkartenbeschriftung',
 		tabs: 'Registerkarten',
+		changeIcon: 'Symbol ändern',
 		contentTypeEnabled: 'Masterdokumenttyp aktiviert',
 		contentTypeUses: 'Dieser Dokumenttyp verwendet',
 		noPropertiesDefinedOnTab:
@@ -1735,6 +1744,7 @@ export default {
 		noLockouts: 'wurde nicht ausgeschlossen',
 		noPasswordChange: 'Das Kennwort wurde nicht geändert',
 		confirmNewPassword: 'Neues Kennwort (Bestätigung)',
+		confirmPassword: 'Kennwort bestätigen',
 		changePasswordDescription:
 			"Sie können Ihr Kennwort für den Zugriff auf den Umbraco-Verwaltungsbereich ändern, indem Sie das nachfolgende Formular ausfüllen und auf 'Kennwort ändern' klicken",
 		contentChannel: 'Schnittstelle für externe Editoren',
@@ -1925,7 +1935,8 @@ export default {
 		emptyDictionaryTree: 'Das Wörterbuch ist leer',
 	},
 	textbox: {
-		characters_left: 'Buchstaben verbleiben',
+		characters_left: '<strong>%0%</strong> Zeichen verbleiben.',
+		characters_exceed: 'Maximal %0% Zeichen, <strong>%1%</strong> zu viele.',
 	},
 	recycleBin: {
 		contentTrashed: 'Inhalt mit Id = {0} des Oberknotens mit Id = {1} wurde verworfen',

@@ -1,4 +1,4 @@
-﻿import {ConstantHelper, test, AliasHelper} from '@umbraco/playwright-testhelpers';
+import {ConstantHelper, test, AliasHelper} from '@umbraco/acceptance-test-helpers';
 import {expect} from "@playwright/test";
 
 const contentName = 'TestContent';
@@ -22,7 +22,6 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
 
-// TODO: Investigate pipeline flakiness for this test. Reapply '@smoke' tag once the issue is resolved.
 test('can create content with the image cropper data type', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedState = 'Draft';
@@ -36,10 +35,12 @@ test('can create content with the image cropper data type', async ({umbracoApi, 
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
   await umbracoUi.content.uploadFile(imageFilePath);
-  await umbracoUi.content.clickSaveButton();
+  // Wait for the upload to complete
+  await umbracoUi.content.isInputDropzoneVisible(false);
+  await umbracoUi.content.isImageCropperFieldVisible();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeCreated();
 
   // Assert
-  await umbracoUi.content.waitForContentToBeCreated();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
@@ -60,10 +61,12 @@ test('can publish content with the image cropper data type', {tag: '@smoke'}, as
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.uploadFile(imageFilePath);
-  await umbracoUi.content.clickSaveAndPublishButton();
+  // Wait for the upload to complete
+  await umbracoUi.content.isInputDropzoneVisible(false);
+  await umbracoUi.content.isImageCropperFieldVisible();
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
@@ -87,10 +90,12 @@ test('can create content with the custom image cropper data type', {tag: '@smoke
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.uploadFile(imageFilePath);
-  await umbracoUi.content.clickSaveAndPublishButton();
+  // Wait for the upload to complete
+  await umbracoUi.content.isInputDropzoneVisible(false);
+  await umbracoUi.content.isImageCropperFieldVisible();
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(customDataTypeName));

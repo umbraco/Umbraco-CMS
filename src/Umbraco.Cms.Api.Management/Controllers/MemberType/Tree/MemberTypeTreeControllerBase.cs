@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.MemberType.Tree;
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Tree}/{Constants.UdiEntityType.MemberType}")]
 [ApiExplorerSettings(GroupName = "Member Type")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessMembersOrMemberTypes)]
-public class MemberTypeTreeControllerBase : NamedEntityTreeControllerBase<MemberTypeTreeItemResponseModel>
+public class MemberTypeTreeControllerBase : FolderTreeControllerBase<MemberTypeTreeItemResponseModel>
 {
     private readonly IMemberTypeService _memberTypeService;
 
@@ -30,12 +30,30 @@ public class MemberTypeTreeControllerBase : NamedEntityTreeControllerBase<Member
     {
     }
 
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
     public MemberTypeTreeControllerBase(IEntityService entityService, FlagProviderCollection flagProviders, IMemberTypeService memberTypeService)
-        : base(entityService, flagProviders) =>
+        : this(
+            entityService,
+            flagProviders,
+            StaticServiceProvider.Instance.GetRequiredService<IEntitySearchService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>(),
+            memberTypeService)
+    {
+    }
+
+    public MemberTypeTreeControllerBase(
+        IEntityService entityService,
+        FlagProviderCollection flagProviders,
+        IEntitySearchService entitySearchService,
+        IIdKeyMap idKeyMap,
+        IMemberTypeService memberTypeService)
+        : base(entityService, flagProviders, entitySearchService, idKeyMap) =>
         _memberTypeService = memberTypeService;
 
 
     protected override UmbracoObjectTypes ItemObjectType => UmbracoObjectTypes.MemberType;
+
+    protected override UmbracoObjectTypes FolderObjectType => UmbracoObjectTypes.MemberTypeContainer;
 
     protected override MemberTypeTreeItemResponseModel[] MapTreeItemViewModels(Guid? parentKey, IEntitySlim[] entities)
     {

@@ -1,4 +1,5 @@
 import './components/index.js';
+import './workspace/index.js';
 
 export * from './components/index.js';
 export * from './constants.js';

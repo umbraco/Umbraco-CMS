@@ -1,22 +1,24 @@
-import { UMB_WORKSPACE_CONTENT_TYPE_ALIAS_CONDITION_ALIAS } from '@umbraco-cms/backoffice/content-type';
+import { UMB_ENTITY_CONTENT_TYPE_UNIQUE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/content-type';
+import { UMB_DOCUMENT_ENTITY_TYPE } from '@umbraco-cms/backoffice/document';
 
-const workspace: UmbExtensionManifest = {
-	type: 'workspaceView',
-	alias: 'Example.WorkspaceView.EntityContentTypeCondition',
-	name: 'Example Workspace View With Entity Content Type Condition',
-	element: () => import('./workspace-view.element.js'),
-	meta: {
-		icon: 'icon-bus',
-		label: 'Conditional',
-		pathname: 'conditional',
-	},
-	conditions: [
-		{
-			alias: UMB_WORKSPACE_CONTENT_TYPE_ALIAS_CONDITION_ALIAS,
-			//match : 'blogPost'
-			oneOf: ['blogPost', 'mediaType1'],
+export const manifests = [
+	{
+		type: 'entityAction',
+		kind: 'default',
+		alias: 'Example.EntityAction.EntityContentTypeUniqueCondition',
+		name: 'Example Entity Action With Entity Content Type Unique Condition',
+		api: () => import('./unique-condition-entity-action.js'),
+		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
+		meta: {
+			icon: 'icon-science',
+			label: 'Conditional (Content Type Unique)',
 		},
-	],
-};
-
-export const manifests = [workspace];
+		conditions: [
+			{
+				alias: UMB_ENTITY_CONTENT_TYPE_UNIQUE_CONDITION_ALIAS,
+				match: '6bcb87dc-76b4-4ef7-9139-5750fd10d4ff',
+				//oneOf: ['6bcb87dc-76b4-4ef7-9139-5750fd10d4ff'], // Example uniques
+			},
+		],
+	},
+];

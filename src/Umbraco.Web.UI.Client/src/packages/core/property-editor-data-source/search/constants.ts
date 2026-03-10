@@ -1,0 +1,1 @@
+export const UMB_PROPERTY_EDITOR_DATA_SOURCE_SEARCH_PROVIDER_ALIAS = 'Umb.SearchProvider.PropertyEditorDataSource';

@@ -31,6 +31,7 @@ export class UmbTiptapStatusbarConfigurationContext extends UmbContextBase {
 			const _extensions = extensions
 				.sort((a, b) => a.alias.localeCompare(b.alias))
 				.map((ext) => ({
+					kind: 'default',
 					alias: ext.alias,
 					label: ext.meta.label,
 					icon: ext.meta.icon,
@@ -75,8 +76,8 @@ export class UmbTiptapStatusbarConfigurationContext extends UmbContextBase {
 			.filter((ext) => ext.alias?.toLowerCase().includes(query) || ext.label?.toLowerCase().includes(query));
 	}
 
-	public getExtensionByAlias(alias: string): UmbTiptapStatusbarExtension | undefined {
-		return this.#lookup?.get(alias);
+	public getExtensionByAlias(alias: string): UmbTiptapStatusbarExtension {
+		return this.#lookup?.get(alias) ?? { label: '', alias, icon: '', kind: 'unknown' };
 	}
 
 	public isExtensionEnabled(alias: string): boolean {

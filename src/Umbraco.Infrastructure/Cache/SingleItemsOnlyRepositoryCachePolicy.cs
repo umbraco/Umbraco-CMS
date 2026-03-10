@@ -1,6 +1,8 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Infrastructure.Scoping;
 
@@ -21,8 +23,29 @@ namespace Umbraco.Cms.Core.Cache;
 internal sealed class SingleItemsOnlyRepositoryCachePolicy<TEntity, TId> : DefaultRepositoryCachePolicy<TEntity, TId>
     where TEntity : class, IEntity
 {
+    public SingleItemsOnlyRepositoryCachePolicy(
+        IAppPolicyCache cache,
+        IScopeAccessor scopeAccessor,
+        RepositoryCachePolicyOptions options,
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
+        : base(
+            cache,
+            scopeAccessor,
+            options,
+            repositoryCacheVersionService,
+            cacheSyncService)
+    {
+    }
+
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
     public SingleItemsOnlyRepositoryCachePolicy(IAppPolicyCache cache, IScopeAccessor scopeAccessor, RepositoryCachePolicyOptions options)
-        : base(cache, scopeAccessor, options)
+        : this(
+            cache,
+            scopeAccessor,
+            options,
+            StaticServiceProvider.Instance.GetRequiredService<IRepositoryCacheVersionService>(),
+            StaticServiceProvider.Instance.GetRequiredService<ICacheSyncService>())
     {
     }
 

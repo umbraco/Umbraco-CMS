@@ -1,11 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Threading;
 using Microsoft.Extensions.Primitives;
 using NUnit.Framework;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -32,30 +28,23 @@ public class ObjectExtensionsTests
     private CultureInfo _savedCulture;
 
     [Test]
+    public void Can_Create_Enumerable_Of_One()
+    {
+        var input = "hello";
+#pragma warning disable CS0618 // Type or member is obsolete
+        var result = input.AsEnumerableOfOne<string>();
+#pragma warning restore CS0618 // Type or member is obsolete
+        Assert.AreEqual(1, result.Count());
+        Assert.AreEqual("hello", result.First());
+    }
+
+    [Test]
     public void Can_Convert_List_To_Enumerable()
     {
         var list = new List<string> { "hello", "world", "awesome" };
         var result = list.TryConvertTo<IEnumerable<string>>();
         Assert.IsTrue(result.Success);
         Assert.AreEqual(3, result.Result.Count());
-    }
-
-    [Test]
-    public void ObjectExtensions_Object_To_Dictionary()
-    {
-        // Arrange
-        var obj = new { Key1 = "value1", Key2 = "value2", Key3 = "value3" };
-
-        // Act
-        var d = obj.ToDictionary<string>();
-
-        // Assert
-        Assert.IsTrue(d.Keys.Contains("Key1"));
-        Assert.IsTrue(d.Keys.Contains("Key2"));
-        Assert.IsTrue(d.Keys.Contains("Key3"));
-        Assert.AreEqual(d["Key1"], "value1");
-        Assert.AreEqual(d["Key2"], "value2");
-        Assert.AreEqual(d["Key3"], "value3");
     }
 
     [Test]

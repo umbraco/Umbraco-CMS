@@ -47,6 +47,9 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 	@property({ type: Boolean, attribute: false })
 	foldersOnly?: boolean = false;
 
+	@property({ type: Boolean, attribute: false })
+	isMenu?: boolean = false;
+
 	@property({ attribute: false })
 	selectableFilter: (item: UmbTreeItemModelBase) => boolean = () => true;
 
@@ -66,13 +69,32 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 	private _currentPage = 1;
 
 	@state()
-	private _totalPages = 1;
+	private _hasPreviousItems = false;
+
+	@state()
+	private _hasNextItems = false;
+
+	@state()
+	private _isLoadingPrevChildren = false;
+
+	@state()
+	private _isLoadingNextChildren = false;
 
 	#observeData() {
 		this.observe(this._api?.treeRoot, (treeRoot) => (this._treeRoot = treeRoot));
 		this.observe(this._api?.rootItems, (rootItems) => (this._rootItems = rootItems ?? []));
 		this.observe(this._api?.pagination.currentPage, (value) => (this._currentPage = value ?? 1));
-		this.observe(this._api?.pagination.totalPages, (value) => (this._totalPages = value ?? 1));
+		this.observe(this._api?.isLoadingPrevChildren, (value) => (this._isLoadingPrevChildren = value ?? false));
+		this.observe(this._api?.isLoadingNextChildren, (value) => (this._isLoadingNextChildren = value ?? false));
+
+		this.observe(
+			this._api?.targetPagination?.totalPrevItems,
+			(value) => (this._hasPreviousItems = value ? value > 0 : false),
+		);
+		this.observe(
+			this._api?.targetPagination?.totalNextItems,
+			(value) => (this._hasNextItems = value ? value > 0 : false),
+		);
 	}
 
 	protected override async updated(
@@ -126,6 +148,17 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 		return this._api?.expansion.getExpansion();
 	}
 
+	#onLoadPrev(event: any) {
+		event.stopPropagation();
+		this._api?.loadPrevItems?.();
+	}
+
+	#onLoadNext(event: any) {
+		event.stopPropagation();
+		const next = (this._currentPage = this._currentPage + 1);
+		this._api?.pagination.setCurrentPageNumber(next);
+	}
+
 	override render() {
 		return html` ${this.#renderTreeRoot()} ${this.#renderRootItems()}`;
 	}
@@ -135,7 +168,11 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 		return html`
 			<umb-tree-item
 				.entityType=${this._treeRoot.entityType}
-				.props=${{ hideActions: this.hideTreeItemActions, item: this._treeRoot }}></umb-tree-item>
+				.props=${{
+					hideActions: this.hideTreeItemActions,
+					item: this._treeRoot,
+					isMenu: this.isMenu,
+				}}></umb-tree-item>
 		`;
 	}
 
@@ -143,34 +180,35 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 		// only show the root items directly if the tree root is hidden
 		if (this.hideTreeRoot === true) {
 			return html`
+				${this.#renderLoadPrevButton()}
 				${repeat(
 					this._rootItems,
 					(item, index) => item.name + '___' + index,
 					(item) => html`
 						<umb-tree-item
 							.entityType=${item.entityType}
-							.props=${{ hideActions: this.hideTreeItemActions, item }}></umb-tree-item>
+							.props=${{ hideActions: this.hideTreeItemActions, item, isMenu: this.isMenu }}></umb-tree-item>
 					`,
 				)}
-				${this.#renderPaging()}
+				${this.#renderLoadNextButton()}
 			`;
 		} else {
 			return nothing;
 		}
 	}
 
-	#onLoadMoreClick = (event: any) => {
-		event.stopPropagation();
-		const next = (this._currentPage = this._currentPage + 1);
-		this._api?.pagination.setCurrentPageNumber(next);
-	};
+	#renderLoadPrevButton() {
+		if (!this._hasPreviousItems) return nothing;
+		return html`<umb-tree-load-prev-button
+			@click=${this.#onLoadPrev}
+			.loading=${this._isLoadingPrevChildren}></umb-tree-load-prev-button>`;
+	}
 
-	#renderPaging() {
-		if (this._totalPages <= 1 || this._currentPage === this._totalPages) {
-			return nothing;
-		}
-
-		return html` <umb-tree-load-more-button @click=${this.#onLoadMoreClick}></umb-tree-load-more-button> `;
+	#renderLoadNextButton() {
+		if (!this._hasNextItems) return nothing;
+		return html`<umb-tree-load-more-button
+			@click=${this.#onLoadNext}
+			.loading=${this._isLoadingNextChildren}></umb-tree-load-more-button> `;
 	}
 
 	static override styles = css`

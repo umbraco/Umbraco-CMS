@@ -1,25 +1,30 @@
 import type { UmbBlockGridEntryElement } from '../block-grid-entry/block-grid-entry.element.js';
-import type { UmbBlockGridLayoutModel } from '../../types.js';
+import type { UmbBlockGridLayoutModel, UmbBlockGridTypeModel } from '../../types.js';
+import type { UmbBlockGridWorkspaceOriginData } from '../../workspace/block-grid-workspace.modal-token.js';
 import { UmbBlockGridEntriesContext } from './block-grid-entries.context.js';
+import {
+	css,
+	customElement,
+	html,
+	ifDefined,
+	nothing,
+	property,
+	repeat,
+	state,
+	when,
+} from '@umbraco-cms/backoffice/external/lit';
 import {
 	getAccumulatedValueOfIndex,
 	getInterpolatedIndexOfPositionInWeightMap,
 	isWithinRect,
 } from '@umbraco-cms/backoffice/utils';
+import { UmbFormControlMixin, UmbFormControlValidator } from '@umbraco-cms/backoffice/validation';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { html, customElement, state, repeat, css, property, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import {
-	UmbSorterController,
-	type UmbSorterConfig,
-	type UmbSorterResolvePlacementArgs,
-} from '@umbraco-cms/backoffice/sorter';
-import {
-	UmbFormControlMixin,
-	UmbFormControlValidator,
-	type UmbFormControlValidatorConfig,
-} from '@umbraco-cms/backoffice/validation';
+import type { UmbFormControlValidatorConfig } from '@umbraco-cms/backoffice/validation';
 import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
+import type { UmbSorterConfig, UmbSorterResolvePlacementArgs } from '@umbraco-cms/backoffice/sorter';
 
 /**
  * Notice this utility method is not really shareable with others as it also takes areas into account. [NL]
@@ -123,7 +128,6 @@ const SORTER_CONFIG: UmbSorterConfig<UmbBlockGridLayoutModel, UmbBlockGridEntryE
  */
 @customElement('umb-block-grid-entries')
 export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElement) {
-	//
 	#sorter = new UmbSorterController<UmbBlockGridLayoutModel, UmbBlockGridEntryElement>(this, {
 		...SORTER_CONFIG,
 		onStart: () => {
@@ -181,22 +185,25 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 	private _areaKey?: string | null;
 
 	@state()
-	private _canCreate?: boolean;
-
-	@state()
-	private _createLabel?: string;
+	private _allowedBlockTypes?: UmbBlockGridTypeModel[];
 
 	@state()
 	private _configCreateLabel?: string;
 
 	@state()
-	private _styleElement?: HTMLLinkElement;
+	private _createLabel?: string;
+
+	@state()
+	private _isReadOnly: boolean = false;
 
 	@state()
 	private _layoutEntries: Array<UmbBlockGridLayoutModel> = [];
 
 	@state()
-	private _isReadOnly: boolean = false;
+	private _limitMax?: number;
+
+	@state()
+	private _styleElement?: HTMLLinkElement;
 
 	constructor() {
 		super();
@@ -212,10 +219,10 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 			null,
 		);
 		this.observe(
-			this.#context.amountOfAllowedBlockTypes,
-			(length) => {
-				this._canCreate = length > 0;
-				if (length === 1) {
+			this.#context.allowedBlockTypes,
+			(allowedBlockTypes) => {
+				this._allowedBlockTypes = allowedBlockTypes;
+				if (allowedBlockTypes.length === 1) {
 					this.observe(
 						this.#context.firstAllowedBlockTypeName(),
 						(firstAllowedName) => {
@@ -294,6 +301,7 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 	}
 
 	async #setupRangeValidation(rangeLimit: UmbNumberRangeValueType | undefined) {
+		this._limitMax = rangeLimit?.max;
 		if (this.#rangeUnderflowValidator) {
 			this.removeValidator(this.#rangeUnderflowValidator);
 			this.#rangeUnderflowValidator = undefined;
@@ -392,30 +400,36 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 			<div class="umb-block-grid__layout-container" data-area-length=${this._layoutEntries.length}>
 				${repeat(
 					this._layoutEntries,
-					(x) => x.contentKey,
-					(layoutEntry, index) =>
+					(layout) => layout.contentKey,
+					(layout, index) =>
 						html`<umb-block-grid-entry
 							class="umb-block-grid__layout-item"
 							index=${index}
-							.contentKey=${layoutEntry.contentKey}
-							.layout=${layoutEntry}>
-						</umb-block-grid-entry>`,
+							.contentKey=${layout.contentKey}
+							.layout=${layout}>
+						</umb-block-grid-entry>
+					`,
 				)}
 			</div>
-			${this._canCreate ? this.#renderCreateButtonGroup() : nothing}
-			${this._areaKey ? html` <uui-form-validation-message .for=${this}></uui-form-validation-message>` : nothing}
+			${when(this._allowedBlockTypes && this._allowedBlockTypes.length > 0, () => this.#renderCreateButtonGroup())}
+			${when(this._areaKey, () => html`<uui-form-validation-message .for=${this}></uui-form-validation-message>`)}
 		`;
 	}
 
 	#renderCreateButtonGroup() {
+		if (this._limitMax === 1 && this._layoutEntries.length > 0) return nothing;
 		if (this._areaKey === null || this._layoutEntries.length === 0) {
-			return html` <uui-button-group id="createButton">
-				${this.#renderCreateButton()} ${this.#renderPasteButton()}
-			</uui-button-group>`;
+			return html`
+				<uui-button-group id="createButton">
+					${this.#renderCreateButton()} ${this.#renderPasteButton()}
+				</uui-button-group>
+			`;
 		} else if (this._isReadOnly === false) {
-			return html`<uui-button-inline-create
-				href=${this.#context.getPathForCreateBlock(-1) ?? ''}
-				label=${this.localize.term('blockEditor_addBlock')}></uui-button-inline-create> `;
+			return html`
+				<uui-button-inline-create
+					href=${this.#context.getPathForCreateBlock(-1) ?? ''}
+					label=${this.localize.term('blockEditor_addBlock')}></uui-button-inline-create>
+			`;
 		} else {
 			return nothing;
 		}
@@ -423,13 +437,43 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 
 	#renderCreateButton() {
 		if (this._isReadOnly && this._layoutEntries.length > 0) return nothing;
+		const createPath = this.#context.getPathForCreateBlock(-1);
 
 		return html`
 			<uui-button
 				look="placeholder"
 				color=${this.pristine === false && this.validity.valid === false ? 'invalid' : 'default'}
 				label=${this._configCreateLabel ?? this._createLabel ?? ''}
-				href=${this.#context.getPathForCreateBlock(-1) ?? ''}
+				href=${ifDefined(createPath)}
+				@click=${async () => {
+					// If no path, then we can conclude there is not modal flow for the user to follow, instead we will just insert the Block: [NL]
+					if (createPath === undefined) {
+						if (!this._allowedBlockTypes || this._allowedBlockTypes.length === 0) {
+							throw new Error('No block types are configured for this Block List property editor');
+						}
+						const areaKey = this._areaKey;
+						const parentUnique = this.#context.getParentUnique();
+						if (areaKey === undefined || parentUnique === undefined) {
+							throw new Error('Cannot create block without a defined areaKey and parentUnique');
+						}
+						const originData: UmbBlockGridWorkspaceOriginData = {
+							index: -1,
+							areaKey: areaKey ?? undefined,
+							parentUnique: parentUnique,
+						};
+						const created = await this.#context.create(
+							this._allowedBlockTypes[0].contentElementTypeKey,
+							// We can parse an empty object, cause the rest will be filled in by others.
+							{} as any,
+							originData,
+						);
+						if (created) {
+							this.#context.insert(created.layout, created.content, created.settings, originData);
+						} else {
+							throw new Error('Failed to create block');
+						}
+					}
+				}}
 				?disabled=${this._isReadOnly}></uui-button>
 		`;
 	}
@@ -443,7 +487,8 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 				label=${this.localize.term('content_createFromClipboard')}
 				look="placeholder"
 				href=${this.#context.getPathForClipboard(-1) ?? ''}
-				?disabled=${this._isReadOnly}>
+				?disabled=${this._isReadOnly}
+				title=${this.localize.term('general_clipboard')}>
 				<uui-icon name="icon-clipboard-paste"></uui-icon>
 			</uui-button>
 		`;
@@ -455,7 +500,6 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 			:host {
 				position: relative;
 				display: grid;
-				gap: 1px;
 			}
 			:host([disallow-drop])::before {
 				content: '';
@@ -484,6 +528,7 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 			}
 
 			#createButton {
+				margin-top: 1px;
 				grid-template-columns: 1fr auto;
 				display: grid;
 			}

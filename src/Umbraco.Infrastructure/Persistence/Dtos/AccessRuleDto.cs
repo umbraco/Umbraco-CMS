@@ -5,31 +5,39 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
-[TableName(Constants.DatabaseSchema.Tables.AccessRule)]
-[PrimaryKey("id", AutoIncrement = false)]
+[TableName(TableName)]
+[PrimaryKey(PrimaryKeyColumnName, AutoIncrement = false)]
 [ExplicitColumns]
 internal sealed class AccessRuleDto
 {
-    [Column("id")]
+    public const string TableName = Constants.DatabaseSchema.Tables.AccessRule;
+    public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
+
+    private const string AccessIdColumnName = "accessId";
+
+    private const string RuleValueColumnName = "ruleValue";
+    private const string RuleTypeColumnName = "ruleType";
+
+    [Column(PrimaryKeyColumnName)]
     [PrimaryKeyColumn(Name = "PK_umbracoAccessRule", AutoIncrement = false)]
     public Guid Id { get; set; }
 
-    [Column("accessId")]
+    [Column(AccessIdColumnName)]
     [ForeignKey(typeof(AccessDto), Name = "FK_umbracoAccessRule_umbracoAccess_id")]
     public Guid AccessId { get; set; }
 
-    [Column("ruleValue")]
-    [Index(IndexTypes.UniqueNonClustered, ForColumns = "ruleValue,ruleType,accessId", Name = "IX_umbracoAccessRule")]
+    [Column(RuleValueColumnName)]
+    [Index(IndexTypes.UniqueNonClustered, ForColumns = $"{RuleValueColumnName},{RuleTypeColumnName},{AccessIdColumnName}", Name = "IX_umbracoAccessRule")]
     public string? RuleValue { get; set; }
 
-    [Column("ruleType")]
+    [Column(RuleTypeColumnName)]
     public string? RuleType { get; set; }
 
-    [Column("createDate", ForceToUtc = false)]
-    [Constraint(Default = SystemMethods.CurrentDateTime)]
+    [Column("createDate")]
+    [Constraint(Default = SystemMethods.CurrentUTCDateTime)]
     public DateTime CreateDate { get; set; }
 
-    [Column("updateDate", ForceToUtc = false)]
-    [Constraint(Default = SystemMethods.CurrentDateTime)]
+    [Column("updateDate")]
+    [Constraint(Default = SystemMethods.CurrentUTCDateTime)]
     public DateTime UpdateDate { get; set; }
 }

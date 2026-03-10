@@ -27,6 +27,7 @@ public class AllMessageTemplateLogViewerController : LogViewerControllerBase
     /// <summary>
     ///     Gets a paginated list of all log message templates for a specific date range.
     /// </summary>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <param name="skip">The amount of items to skip.</param>
     /// <param name="take">The amount of items to take.</param>
     /// <param name="startDate">The start date for the date range (can be null).</param>
@@ -36,6 +37,8 @@ public class AllMessageTemplateLogViewerController : LogViewerControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(PagedViewModel<LogTemplateResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a collection of log message templates.")]
+    [EndpointDescription("Gets a paginated collection of unique message templates found in the logs.")]
     public async Task<IActionResult> AllMessageTemplates(
         CancellationToken cancellationToken,
         int skip = 0,

@@ -1,4 +1,5 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Extensions;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
@@ -28,8 +29,11 @@ internal static class TemplateFactory
 
     #region Implementation of IEntityFactory<ITemplate,TemplateDto>
 
-    public static Template BuildEntity(IShortStringHelper shortStringHelper, TemplateDto dto,
-        IEnumerable<IUmbracoEntity> childDefinitions, Func<File, string?> getFileContent)
+    public static Template BuildEntity(
+        IShortStringHelper shortStringHelper,
+        TemplateDto dto,
+        IEnumerable<IUmbracoEntity> childDefinitions,
+        Func<File, string?> getFileContent)
     {
         var template = new Template(shortStringHelper, dto.NodeDto.Text, dto.Alias, getFileContent);
 
@@ -37,7 +41,7 @@ internal static class TemplateFactory
         {
             template.DisableChangeTracking();
 
-            template.CreateDate = dto.NodeDto.CreateDate;
+            template.CreateDate = dto.NodeDto.CreateDate.EnsureUtc();
             template.Id = dto.NodeId;
             template.Key = dto.NodeDto.UniqueId;
             template.Path = dto.NodeDto.Path;

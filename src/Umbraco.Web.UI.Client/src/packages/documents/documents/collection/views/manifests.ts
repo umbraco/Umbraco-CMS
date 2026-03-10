@@ -4,15 +4,10 @@ import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collecti
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'collectionView',
+		kind: 'card',
 		alias: UMB_DOCUMENT_GRID_COLLECTION_VIEW_ALIAS,
 		name: 'Document Grid Collection View',
-		element: () => import('./grid/document-grid-collection-view.element.js'),
 		weight: 200,
-		meta: {
-			label: 'Grid',
-			icon: 'icon-grid',
-			pathName: 'grid',
-		},
 		conditions: [
 			{
 				alias: UMB_COLLECTION_ALIAS_CONDITION,
@@ -28,7 +23,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		weight: 300,
 		meta: {
 			label: 'Table',
-			icon: 'icon-list',
+			icon: 'icon-table',
 			pathName: 'table',
 		},
 		conditions: [

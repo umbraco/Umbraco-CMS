@@ -1,9 +1,8 @@
 import { UmbTiptapExtensionApiBase } from '../tiptap-extension-api-base.js';
+import { UmbImage } from './image.tiptap-extension.js';
 import { css } from '@umbraco-cms/backoffice/external/lit';
-import { UmbImage } from '@umbraco-cms/backoffice/external/tiptap';
 
 export default class UmbTiptapImageExtensionApi extends UmbTiptapExtensionApiBase {
-	// eslint-disable-next-line @typescript-eslint/no-deprecated
 	getTiptapExtensions = () => [UmbImage.configure({ inline: true })];
 
 	override getStyles = () => css`

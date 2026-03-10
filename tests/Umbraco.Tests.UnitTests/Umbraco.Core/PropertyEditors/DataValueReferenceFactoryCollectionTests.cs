@@ -41,7 +41,8 @@ public class DataValueReferenceFactoryCollectionTests
                  Mock.Of<IDataTypeConfigurationCache>(),
                  Mock.Of<ILocalizedTextService>(),
                  Mock.Of<IMediaTypeService>(),
-                 Mock.Of<IMediaNavigationQueryService>()));
+                 Mock.Of<IMediaNavigationQueryService>(),
+                 AppCaches.Disabled));
 
     private IIOHelper IOHelper { get; } = Mock.Of<IIOHelper>();
 

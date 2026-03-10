@@ -16,7 +16,7 @@ import { umbExtensionsRegistry } from '../src/packages/core/extension-registry';
 import { UmbIconRegistry } from '../src/packages/core/icon-registry/icon.registry';
 import { UmbLitElement } from '../src/packages/core/lit-element';
 import { umbLocalizationRegistry } from '../src/packages/core/localization';
-import customElementManifests from '../dist-cms/custom-elements.json';
+import customElementManifests from '../custom-elements.json';
 import icons from '../src/packages/core/icon-registry/icons';
 
 import '../src/libs/context-api/provide/context-provider.element';
@@ -47,7 +47,7 @@ import { manifests as propertyEditorManifests } from '../src/packages/property-e
 import { manifests as publishCacheManifests } from '../src/packages/publish-cache/manifests';
 import { manifests as relationsManifests } from '../src/packages/relations/manifests';
 import { manifests as rteManifests } from '../src/packages/rte/manifests';
-import { manifests as searchManifests } from '../src/packages/search/manifests';
+import { manifests as searchManifests } from '../src/packages/core/search/manifests';
 import { manifests as segmentManifests } from '../src/packages/segment/manifests';
 import { manifests as settingsManifests } from '../src/packages/settings/manifests';
 import { manifests as staticFileManifests } from '../src/packages/static-file/manifests';
@@ -190,19 +190,25 @@ export const parameters = {
 		},
 	},
 	backgrounds: {
-		default: 'Greyish',
-		values: [
-			{
+        options: {
+            greyish: {
 				name: 'Greyish',
 				value: '#F3F3F5',
 			},
-			{
+
+            white: {
 				name: 'White',
 				value: '#ffffff',
-			},
-		],
-	},
+			}
+        }
+    },
 };
 
 setCustomElements(customElementManifests);
 export const tags = ['autodocs'];
+
+export const initialGlobals = {
+    backgrounds: {
+        value: 'greyish'
+    }
+};

@@ -9,7 +9,7 @@ const distAssets = '../../../dist-cms';
 rmSync(dist, { recursive: true, force: true });
 
 // copy fonts
-cpSync('../../../node_modules/monaco-editor/min/vs/base/browser/ui/codicons', `${distAssets}/assets/fonts`, {
+cpSync('../../../node_modules/monaco-editor/esm/vs/base/browser/ui/codicons', `${distAssets}/assets/fonts`, {
 	recursive: true,
 });
 

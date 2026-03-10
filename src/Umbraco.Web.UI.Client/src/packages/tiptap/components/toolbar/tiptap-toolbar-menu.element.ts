@@ -1,3 +1,4 @@
+import type { Editor } from '../../externals.js';
 import type {
 	ManifestTiptapToolbarExtensionMenuKind,
 	MetaTiptapToolbarMenuItem,
@@ -6,7 +7,6 @@ import type {
 import type { UmbCascadingMenuItem } from '../cascading-menu-popover/cascading-menu-popover.element.js';
 import { css, customElement, html, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';
 import type { ManifestMenu } from '@umbraco-cms/backoffice/menu';
 
 import '../cascading-menu-popover/cascading-menu-popover.element.js';
@@ -50,7 +50,7 @@ export class UmbTiptapToolbarMenuElement extends UmbLitElement {
 	}
 
 	async #setMenu() {
-		const items = this.#manifest?.items ?? this.#manifest?.meta.items;
+		const items = this.#manifest?.items;
 		if (!items) return;
 		this.#menu = await this.#getMenuItems(items);
 	}
@@ -94,11 +94,11 @@ export class UmbTiptapToolbarMenuElement extends UmbLitElement {
 		}
 
 		return {
-			icon: item.appearance?.icon ?? item.icon,
+			icon: item.appearance?.icon,
 			items,
 			label: item.label,
 			menu: item.menu,
-			style: item.appearance?.style ?? item.style,
+			style: item.appearance?.style,
 			separatorAfter: item.separatorAfter,
 			element,
 			isActive: () => this.api?.isActive(this.editor, item),

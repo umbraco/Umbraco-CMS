@@ -32,11 +32,6 @@ export class UmbSettingsWelcomeDashboardElement extends UmbLitElement {
 							href="https://forum.umbraco.com/"
 							label=${this.localize.term('settingsDashboard_goForum')}
 							target="_blank"></uui-button>
-						<uui-button
-							look="outline"
-							href="https://discord.umbraco.com"
-							label=${this.localize.term('settingsDashboard_chatWithCommunity')}
-							target="_blank"></uui-button>
 					</div>
 				</uui-box>
 

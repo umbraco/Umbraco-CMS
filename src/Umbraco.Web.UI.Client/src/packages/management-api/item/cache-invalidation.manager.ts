@@ -7,11 +7,13 @@ import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 export interface UmbManagementApiItemDataInvalidationManagerArgs<ItemResponseModelType> {
 	dataCache: UmbManagementApiItemDataCache<ItemResponseModelType>;
 	eventSources: Array<string>;
+	eventTypes?: Array<string>;
 }
 
 export class UmbManagementApiItemDataCacheInvalidationManager<ItemResponseModelType> extends UmbControllerBase {
 	protected _dataCache: UmbManagementApiItemDataCache<ItemResponseModelType>;
 	#eventSources: Array<string>;
+	#eventTypes: Array<string>;
 	#serverEventContext?: typeof UMB_MANAGEMENT_API_SERVER_EVENT_CONTEXT.TYPE;
 
 	constructor(host: UmbControllerHost, args: UmbManagementApiItemDataInvalidationManagerArgs<ItemResponseModelType>) {
@@ -19,6 +21,7 @@ export class UmbManagementApiItemDataCacheInvalidationManager<ItemResponseModelT
 		{
 			this._dataCache = args.dataCache;
 			this.#eventSources = args.eventSources;
+			this.#eventTypes = args.eventTypes ?? ['Updated', 'Deleted'];
 
 			this.consumeContext(UMB_MANAGEMENT_API_SERVER_EVENT_CONTEXT, (context) => {
 				this.#serverEventContext = context;
@@ -40,7 +43,7 @@ export class UmbManagementApiItemDataCacheInvalidationManager<ItemResponseModelT
 	#observeServerEvents() {
 		// Invalidate cache entries when entities are updated or deleted
 		this.observe(
-			this.#serverEventContext?.byEventSourcesAndEventTypes(this.#eventSources, ['Updated', 'Deleted']),
+			this.#serverEventContext?.byEventSourcesAndEventTypes(this.#eventSources, this.#eventTypes),
 			(event) => {
 				if (!event) return;
 				this._onServerEvent(event);

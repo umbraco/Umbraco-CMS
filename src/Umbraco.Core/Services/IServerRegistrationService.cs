@@ -3,6 +3,9 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+///     Provides operations for managing server registrations in a load-balanced environment.
+/// </summary>
 public interface IServerRegistrationService
 {
     /// <summary>
@@ -35,7 +38,7 @@ public interface IServerRegistrationService
     ///     <paramref name="refresh" /> parameter to force a cache refresh and reload active servers
     ///     from the database.
     /// </remarks>
-    IEnumerable<IServerRegistration>? GetActiveServers(bool refresh = false);
+    IEnumerable<IServerRegistration> GetActiveServers(bool refresh = false);
 
     /// <summary>
     ///     Return all servers (active and inactive).

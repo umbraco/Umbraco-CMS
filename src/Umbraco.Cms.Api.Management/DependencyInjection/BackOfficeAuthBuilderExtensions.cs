@@ -1,11 +1,15 @@
-﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using OpenIddict.Server;
 using Umbraco.Cms.Api.Common.DependencyInjection;
 using Umbraco.Cms.Api.Management.Configuration;
 using Umbraco.Cms.Api.Management.Handlers;
 using Umbraco.Cms.Api.Management.Middleware;
 using Umbraco.Cms.Api.Management.Security;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Infrastructure.Security;
@@ -50,6 +54,7 @@ public static class BackOfficeAuthBuilderExtensions
     {
         builder.Services
             .AddAuthentication()
+
             // Add our custom schemes which are cookie handlers
             .AddCookie(Constants.Security.BackOfficeAuthenticationType)
             .AddCookie(Constants.Security.BackOfficeExternalAuthenticationType, o =>
@@ -57,6 +62,9 @@ public static class BackOfficeAuthBuilderExtensions
                 o.Cookie.Name = Constants.Security.BackOfficeExternalAuthenticationType;
                 o.ExpireTimeSpan = TimeSpan.FromMinutes(5);
             })
+
+            // Add a cookie scheme that can be used for authenticating backoffice users outside the scope of the backoffice.
+            .AddCookie(Constants.Security.BackOfficeExposedAuthenticationType)
 
             // Although we don't natively support this, we add it anyways so that if end-users implement the required logic
             // they don't have to worry about manually adding this scheme or modifying the sign in manager
@@ -71,8 +79,25 @@ public static class BackOfficeAuthBuilderExtensions
                 o.ExpireTimeSpan = TimeSpan.FromMinutes(5);
             });
 
+        // Add OpnIddict server event handler to refresh the cookie that exposes the backoffice authentication outside the scope of the backoffice.
+        builder.Services.AddSingleton<ExposeBackOfficeAuthenticationOpenIddictServerEventsHandler>();
+        builder.Services.Configure<OpenIddictServerOptions>(options =>
+        {
+            options.Handlers.Add(
+                OpenIddictServerHandlerDescriptor
+                    .CreateBuilder<OpenIddictServerEvents.GenerateTokenContext>()
+                    .UseSingletonHandler<ExposeBackOfficeAuthenticationOpenIddictServerEventsHandler>()
+                    .Build());
+            options.Handlers.Add(
+                OpenIddictServerHandlerDescriptor
+                    .CreateBuilder<OpenIddictServerEvents.ApplyRevocationResponseContext>()
+                    .UseSingletonHandler<ExposeBackOfficeAuthenticationOpenIddictServerEventsHandler>()
+                    .Build());
+        });
+
         builder.Services.AddScoped<BackOfficeSecurityStampValidator>();
         builder.Services.ConfigureOptions<ConfigureBackOfficeCookieOptions>();
+        builder.Services.ConfigureOptions<ConfigureBackOfficeExposedCookieOptions>();
         builder.Services.ConfigureOptions<ConfigureBackOfficeSecurityStampValidatorOptions>();
 
         return builder;

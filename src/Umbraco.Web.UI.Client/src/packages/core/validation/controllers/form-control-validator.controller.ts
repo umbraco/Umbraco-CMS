@@ -61,7 +61,8 @@ export class UmbFormControlValidator extends UmbControllerBase implements UmbVal
 	#setValid = this.#setIsValid.bind(this, true);
 
 	validate(): Promise<void> {
-		this.#isValid = this.#control.checkValidity();
+		const isValid = this.#control.checkValidity();
+		this.#setIsValid(isValid);
 		return this.#isValid ? Promise.resolve() : Promise.reject();
 	}
 

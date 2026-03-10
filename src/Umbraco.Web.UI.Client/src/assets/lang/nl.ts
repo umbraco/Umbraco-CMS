@@ -332,7 +332,7 @@ export default {
 	media: {
 		clickToUpload: 'Klik om te uploaden',
 		orClickHereToUpload: 'Of klik hier om bestanden te kiezen',
-		disallowedFileType: 'Kan dit bestand niet uploaden, het heeft niet het juiste bestandstype.',
+		disallowedFileType: 'Kan dit bestand niet uploaden, het heeft niet het juiste bestandstype',
 		maxFileSize: 'Maximale bestandsgrootte is',
 		mediaRoot: 'Media root',
 		moveToSameFolderFailed: 'De bovenliggende map en de doelmap kunnen niet hetzelfde zijn',
@@ -340,6 +340,8 @@ export default {
 		renameFolderFailed: 'Kan de map met id %0% niet hernoemen',
 		dragAndDropYourFilesIntoTheArea: 'Sleep en zet je bestand(en) neer in dit gebied',
 		uploadNotAllowed: 'Upload is niet toegelaten in deze locatie.',
+		uploadValidationFailed: (mediaTypeName: string) =>
+			`Het mediatype ${mediaTypeName} heeft een of meer vereiste eigenschappen. Het moet afzonderlijk worden geüpload via het menu 'Maken'`,
 		fileSecurityValidationFailure: 'Een of meerdere veiligheid validaties zijn gefaald voor het bestand',
 	},
 	member: {
@@ -688,6 +690,7 @@ export default {
 		design: 'Ontwerp',
 		dictionary: 'Woordenboek',
 		dimensions: 'Afmetingen',
+		dividerPosition: (value: string | number) => `Verdeler op ${value}%`,
 		discard: 'Gooi weg',
 		down: 'Omlaag',
 		download: 'Download',
@@ -1146,7 +1149,8 @@ export default {
 		headline: 'Selecteer een versie om te vergelijken met de huidige versie',
 		currentVersion: 'Huidige versie',
 		diffHelp:
-			'Hier worden de verschillen getoond tussen de huidige en de geselecteerde versie<br /><del>Rode</del> tekst wordt niet getoond in de geselecteerde versie, <ins>groen betekent toegevoegd</ins>',
+			'<del>Rode tekst</del> wordt verwijderd in de geselecteerde versie, <ins>groene tekst</ins> wordt toegevoegd.',
+		showDiff: 'Toon verschillen tussen de huidige (concept) versie en de geselecteerde versie.',
 		documentRolledBack: 'Document is teruggezet',
 		htmlHelp:
 			'Hiermee wordt de geselecteerde versie als html getoond, als u de verschillen tussen de twee\n      versies tegelijk wilt zien, gebruik dan de diff view\n    ',
@@ -1171,12 +1175,6 @@ export default {
 		translation: 'Vertaling',
 		users: 'Gebruikers',
 	},
-	help: {
-		tours: 'Rondleidingen',
-		theBestUmbracoVideoTutorials: 'De beste Umbraco video tutorials',
-		umbracoForum: 'Bezoek our.umbraco.com',
-		umbracoTv: 'Bezoek umbraco.tv',
-	},
 	settings: {
 		defaulttemplate: 'Standaard template',
 		importDocumentTypeHelp:
@@ -1189,6 +1187,7 @@ export default {
 		tab: 'Tab',
 		tabname: 'Tab titel',
 		tabs: 'Tabs',
+		changeIcon: 'Pictogram wijzigen',
 		contentTypeEnabled: 'Basis inhoudstype ingeschakeld',
 		contentTypeUses: 'Dit inhoudstype gebruikt',
 		noPropertiesDefinedOnTab:
@@ -1678,6 +1677,7 @@ export default {
 		noLockouts: 'is niet gedeblokkeerd',
 		noPasswordChange: 'Het wachtwoord is niet gewijzigd',
 		confirmNewPassword: 'Bevestig nieuw wachtwoord',
+		confirmPassword: 'Bevestig wachtwoord',
 		changePasswordDescription:
 			"Je kunt je wachtwoord veranderen door onderstaand formulier in te vullen en\n      op de knop 'Verander wachtwoord' te klikken\n    ",
 		contentChannel: 'Inhoudskanaal',
@@ -1983,14 +1983,10 @@ export default {
 		savedSearches: 'Opgeslagen Zoekopdrachten',
 		saveSearch: 'Zoekopdracht opslaan',
 		saveSearchDescription: 'Enter a friendly name for your search query',
-		filterSearch: 'Zoekopdracht filteren',
-		totalItems: 'Aantal items',
 		timestamp: 'Tijdstempel',
 		level: 'Niveau',
 		machine: 'Machine',
 		message: 'Bericht',
-		exception: 'Uitzondering',
-		properties: 'Eigenschappen',
 		searchWithGoogle: 'Zoeken Met Google',
 		searchThisMessageWithGoogle: 'Dit bericht met Google opzoeken',
 		searchWithBing: 'Zoeken Met Bing',
@@ -2004,21 +2000,9 @@ export default {
 		searchUmbracoIssues: 'Umbraco Issues doorzoeken',
 		searchUmbracoIssuesOnGithub: 'Umbraco Issues op Github doorzoeken',
 		deleteThisSearch: 'Zoekopdracht verwijderen',
-		findLogsWithRequestId: 'Logs met Request ID zoeken',
-		findLogsWithNamespace: 'Logs met Namespace zoeken',
-		findLogsWithMachineName: 'Logs met Machine Naam zoeken',
-		open: 'Openen',
 		polling: 'Peilen',
-		every2: 'Elke 2 seconden',
-		every5: 'Elke 5 seconden',
-		every10: 'Elke 10 seconden',
-		every20: 'Elke 20 seconden',
-		every30: 'Elke 30 seconden',
-		pollingEvery2: 'Elke 2s peilen',
-		pollingEvery5: 'Elke 5s peilen',
-		pollingEvery10: 'Elke 10s peilen',
-		pollingEvery20: 'Elke 20s peilen',
-		pollingEvery30: 'Elke 30s peilen',
+		pollingInterval: (seconds: number) => `Elke ${seconds} seconden`,
+		pollingActive: (seconds: number) => `Elke ${seconds}s peilen`,
 	},
 	clipboard: {
 		labelForCopyAllEntries: 'Kopieer %0%',
@@ -2053,28 +2037,6 @@ export default {
 			"\n              <p>\n                  Umbraco wordt uitgevoerd in de foutopsporingsmodus. Dit betekent dat u de ingebouwde prestatieprofiler kunt gebruiken om de prestaties te beoordelen bij het renderen van pagina's.\n              </p>\n              <p>\n                  Als je de profiler voor een specifieke paginaweergave wilt activeren, voeg je <strong>umbDebug=true</strong> toe aan de querystring wanneer je de pagina opvraagt.\n              </p>\n              <p>\n                  Als je wil dat de profiler standaard wordt geactiveerd voor alle paginaweergaven, kun je de onderstaande schakelaar gebruiken.\n                  Het plaatst een cookie in je browser, die vervolgens de profiler automatisch activeert.\n                  Met andere woorden, de profiler zal alleen voor <em>jouw</em> browser actief zijn, niet voor andere bezoekers.\n              </p>\n      ",
 		activateByDefault: 'Activeer de profiler standaard',
 		reminder: 'Vriendelijke herinnering',
-	},
-	settingsDashboardVideos: {
-		trainingHeadline: "Je bent slechts een klik verwijderd van uren aan Umbraco trainingvideo's.",
-		trainingDescription:
-			'\n        <p>Wil je Umbraco onder de knie krijgen? Besteed een paar minuten aan het leren van enkele best practices door een van deze video\'s over het gebruik van Umbraco te bekijken. Bezoek <a href="https://umbraco.tv" target="_blank" rel="noopener">umbraco.tv</a> voor meer Umbraco videos</p>\n    ',
-		getStarted: 'Om je op weg te helpen',
-	},
-	settingsDashboard: {
-		start: 'Start hier',
-		startDescription:
-			'Deze sectie bevat de bouwstenen voor jouw Umbraco-site. Volg de onderstaande links\n      voor meer informatie over het werken met de items in de sectie Instellingen\n    ',
-		more: 'Meer te weten komen',
-		bulletPointOne:
-			'\n            Lees meer over het werken met de items in de sectie Instellingen <a class="btn-link -underline" href="https://docs.umbraco.com/umbraco-cms/fundamentals/backoffice/sections/" target="_blank" rel="noopener">in het Documentatiegedeelte</a> van Our Umbraco\n        ',
-		bulletPointTwo:
-			'\n            Stel een vraag op het <a class="btn-link -underline" href="https://our.umbraco.com/forum" target="_blank" rel="noopener">Community Forum</a>\n        ',
-		bulletPointThree:
-			'\n            Bekijk onze <a class="btn-link -underline" href="https://umbraco.tv" target="_blank" rel="noopener">instructievideo\'s</a> (sommige zijn gratis, andere vereisen een abonnement)\n        ',
-		bulletPointFour:
-			'\n            Lees meer over onze <a class="btn-link -underline" href="https://umbraco.com/products/" target="_blank" rel="noopener">productiviteitsverhogende programma\'s en commerciële ondersteuning</a>\n        ',
-		bulletPointFive:
-			'\n            Lees meer over real-life <a class="btn-link -underline" href="https://umbraco.com/training/" target="_blank" rel="noopener">training en certificering</a> opportuniteiten\n        ',
 	},
 	startupDashboard: {
 		fallbackHeadline: 'Welkom bij Het Vriendelijke CMS',

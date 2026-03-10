@@ -1,30 +1,29 @@
 import type { UmbDocumentCollectionItemModel } from '../../../types.js';
 import { UmbAncestorsEntityContext } from '@umbraco-cms/backoffice/entity';
-import { html, nothing, customElement, property } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, html, nothing, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-document-entity-actions-table-column-view')
 export class UmbDocumentEntityActionsTableColumnViewElement extends UmbLitElement {
-	@property({ attribute: false })
-	public get value(): UmbDocumentCollectionItemModel | undefined {
-		return this._value;
-	}
-	public set value(value: UmbDocumentCollectionItemModel | undefined) {
-		this._value = value;
-		this.#ancestorContext.setAncestors(this._value?.ancestors ?? []);
-	}
-
-	private _value?: UmbDocumentCollectionItemModel | undefined;
-
 	#ancestorContext = new UmbAncestorsEntityContext(this);
 
+	@property({ attribute: false })
+	public set value(value: UmbDocumentCollectionItemModel) {
+		this.#value = value;
+		this.#ancestorContext.setAncestors(this.#value?.ancestors ?? []);
+	}
+	public get value(): UmbDocumentCollectionItemModel | undefined {
+		return this.#value;
+	}
+	#value?: UmbDocumentCollectionItemModel | undefined;
+
 	override render() {
-		if (!this._value) return nothing;
+		if (!this.#value) return nothing;
 
 		// TODO: Missing name to parse on
 		return html`
 			<umb-entity-actions-table-column-view
-				.value=${{ unique: this._value.unique, entityType: this._value.entityType }}>
+				.value=${{ unique: this.#value.unique, entityType: this.#value.entityType }}>
 			</umb-entity-actions-table-column-view>
 		`;
 	}
@@ -32,6 +31,6 @@ export class UmbDocumentEntityActionsTableColumnViewElement extends UmbLitElemen
 
 declare global {
 	interface HTMLElementTagNameMap {
-		['umb-document-entity-actions-table-column-view']: UmbDocumentEntityActionsTableColumnViewElement;
+		'umb-document-entity-actions-table-column-view': UmbDocumentEntityActionsTableColumnViewElement;
 	}
 }

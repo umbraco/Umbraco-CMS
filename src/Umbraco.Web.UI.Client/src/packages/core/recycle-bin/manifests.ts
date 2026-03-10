@@ -1,3 +1,4 @@
+import { manifests as collectionActionManifests } from './collection-action/manifests.js';
 import { manifests as conditionManifests } from './conditions/manifests.js';
 import { manifests as emptyRecycleBinEntityActionManifests } from './entity-action/empty-recycle-bin/manifests.js';
 import { manifests as restoreFromRecycleBinEntityActionManifests } from './entity-action/restore-from-recycle-bin/manifests.js';
@@ -8,6 +9,7 @@ import { manifests as treeManifests } from './tree/manifests.js';
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
+	...collectionActionManifests,
 	...conditionManifests,
 	...emptyRecycleBinEntityActionManifests,
 	...restoreFromRecycleBinEntityActionManifests,

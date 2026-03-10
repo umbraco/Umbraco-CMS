@@ -20,8 +20,9 @@ using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
+using Umbraco.Cms.Core.HostedServices;
 using Umbraco.Cms.Infrastructure.Examine;
-using Umbraco.Cms.Infrastructure.HostedServices;
+using Umbraco.Cms.Infrastructure.Services;
 using Umbraco.Cms.Infrastructure.PublishedCache;
 using Umbraco.Cms.Persistence.EFCore.Locking;
 using Umbraco.Cms.Persistence.EFCore.Scoping;
@@ -125,17 +126,14 @@ public static class UmbracoBuilderExtensions
 
                 if (!currFolder.Exists)
                 {
-                    currFolder = new DirectoryInfo(Path.GetTempPath());
+                    // When Umbraco.Integration.Tests is installed in a "consumer" Umbraco site, the src/tests path might not be there.
+                    // This replaces the folder reference with an empty folder under temp
+                    // such that the LocalizedTextServiceFileSources don't blow up from directory not found,
+                    // or reading random xml files from the base temp folder.
+                    var tempPath = Path.GetTempPath();
+                    currFolder = new DirectoryInfo(Path.GetFullPath("Umbraco.Integration.Tests.Fake.SrcRoot", tempPath));
+                    currFolder.Create();
                 }
-
-                var uiProject = currFolder.GetDirectories("Umbraco.Web.UI", SearchOption.TopDirectoryOnly).FirstOrDefault();
-                if (uiProject == null)
-                {
-                    uiProject = new DirectoryInfo(Path.Combine(Path.GetTempPath(), "Umbraco.Web.UI"));
-                    uiProject.Create();
-                }
-
-                var mainLangFolder = new DirectoryInfo(Path.Combine(uiProject.FullName, Constants.System.DefaultUmbracoPath.TrimStart(Constants.CharArrays.TildeForwardSlash), "config", "lang"));
 
                 return new LocalizedTextServiceFileSources(
                     loggerFactory.CreateLogger<LocalizedTextServiceFileSources>(),

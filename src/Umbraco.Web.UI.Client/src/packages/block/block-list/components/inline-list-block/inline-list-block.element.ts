@@ -1,5 +1,10 @@
 import { UMB_BLOCK_LIST_ENTRY_CONTEXT } from '../../context/index.js';
-import { UMB_BLOCK_WORKSPACE_ALIAS } from '@umbraco-cms/backoffice/block';
+import type { UmbBlockListLayoutModel, UmbBlockListWorkspaceOriginData } from '../../index.js';
+import {
+	UMB_BLOCK_MANAGER_CONTEXT,
+	UMB_BLOCK_WORKSPACE_ALIAS,
+	UmbBlockInsertedEvent,
+} from '@umbraco-cms/backoffice/block';
 import { css, customElement, html, nothing, property, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbExtensionApiInitializer, UmbExtensionsApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -10,6 +15,8 @@ import type { UmbApiConstructorArgumentsMethodType } from '@umbraco-cms/backoffi
 import type { UmbBlockDataType, UMB_BLOCK_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/block';
 
 import '../../../block/workspace/views/edit/block-workspace-view-edit-content-no-router.element.js';
+import { UmbContextBoundary } from '@umbraco-cms/backoffice/context-api';
+import { UMB_VIEW_CONTEXT } from '@umbraco-cms/backoffice/view';
 
 const apiArgsCreator: UmbApiConstructorArgumentsMethodType<unknown> = (manifest: unknown) => {
 	return [{ manifest }];
@@ -20,6 +27,7 @@ const apiArgsCreator: UmbApiConstructorArgumentsMethodType<unknown> = (manifest:
  */
 @customElement('umb-inline-list-block')
 export class UmbInlineListBlockElement extends UmbLitElement {
+	#manager?: typeof UMB_BLOCK_MANAGER_CONTEXT.TYPE;
 	#blockContext?: typeof UMB_BLOCK_LIST_ENTRY_CONTEXT.TYPE;
 	#workspaceContext?: typeof UMB_BLOCK_WORKSPACE_CONTEXT.TYPE;
 	#contentKey?: string;
@@ -29,6 +37,9 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 
 	@property({ type: String, reflect: false })
 	icon?: string;
+
+	@property({ type: Number, attribute: false })
+	index?: number;
 
 	@property({ type: Boolean, reflect: true })
 	unpublished?: boolean;
@@ -66,6 +77,17 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 			);
 		});
 
+		this.consumeContext(UMB_BLOCK_MANAGER_CONTEXT, (manager) => {
+			if (this.#manager) {
+				this.#manager.removeEventListener(UmbBlockInsertedEvent.TYPE, this.#onBlockInserted);
+			}
+			this.#manager = manager;
+			this.#manager?.addEventListener(UmbBlockInsertedEvent.TYPE, this.#onBlockInserted);
+		});
+
+		// Block the access to the View Context for this inline block workspace: [NL]
+		new UmbContextBoundary(this, UMB_VIEW_CONTEXT);
+
 		new UmbExtensionApiInitializer(
 			this,
 			umbExtensionsRegistry,
@@ -76,6 +98,10 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 				if (permitted && context) {
 					this.#workspaceContext = context;
 					this.#workspaceContext.establishLiveSync();
+					// Avoid view context becoming active: [NL]
+					// in this case its not a routable workspace and we do not want it to become an active view, appending shortcuts or setting browser title. (maybe this code needs to be more explicit. Like a inlineMode()?) [NL]
+					this.#workspaceContext.view.destroy();
+					this.#workspaceContext.autoReportValidation();
 					this.#load();
 
 					this.observe(
@@ -123,6 +149,13 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 		this.#workspaceContext.load(this.#contentKey);
 	}
 
+	#onBlockInserted = (event: Event) => {
+		const blockEvent = event as UmbBlockInsertedEvent<UmbBlockListLayoutModel, UmbBlockListWorkspaceOriginData>;
+		if (blockEvent.detail.layout.contentKey === this.#contentKey) {
+			this._isOpen = true;
+		}
+	};
+
 	#expose = () => {
 		this.#workspaceContext?.expose();
 	};
@@ -153,7 +186,7 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 	}
 
 	#renderBlockInfo() {
-		const blockValue = { ...this.content, $settings: this.settings };
+		const blockValue = { ...this.content, $settings: this.settings, $index: this.index };
 		return html`
 			<span id="content">
 				<span id="icon">
@@ -194,6 +227,7 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 				position: relative;
 				display: block;
 				width: 100%;
+				margin-bottom: 1px;
 
 				box-sizing: border-box;
 				border-radius: var(--uui-border-radius);
@@ -287,10 +321,6 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 				justify-content: center;
 				height: 100%;
 				padding-left: var(--uui-size-2, 6px);
-			}
-
-			#name {
-				font-weight: 700;
 			}
 
 			uui-tag {

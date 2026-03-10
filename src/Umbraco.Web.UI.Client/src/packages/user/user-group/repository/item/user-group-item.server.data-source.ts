@@ -1,3 +1,4 @@
+import { UMB_USER_GROUP_ENTITY_TYPE } from '../../entity.js';
 import type { UmbUserGroupItemModel } from './types.js';
 import { UmbManagementApiUserGroupItemDataRequestManager } from './user-group-item.server.request-manager.js';
 import type { UserGroupItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
@@ -37,6 +38,7 @@ export class UmbUserGroupItemServerDataSource extends UmbItemServerDataSourceBas
 
 const mapper = (item: UserGroupItemResponseModel): UmbUserGroupItemModel => {
 	return {
+		entityType: UMB_USER_GROUP_ENTITY_TYPE,
 		unique: item.id,
 		name: item.name,
 		icon: item.icon || null,

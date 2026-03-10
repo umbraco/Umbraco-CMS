@@ -9,13 +9,14 @@ using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Tests.Common.Builders;
+using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
 /// <summary>
-///     Tests covering the DataTypeService
+///     Tests covering the DataTypeService.
 /// </summary>
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
@@ -31,7 +32,7 @@ internal sealed class DataTypeServiceTests : UmbracoIntegrationTest
 
     private IMediaTypeService MediaTypeService => GetRequiredService<IMediaTypeService>();
 
-    private IFileService FileService => GetRequiredService<IFileService>();
+    private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
 
     private IConfigurationEditorJsonSerializer ConfigurationEditorJsonSerializer =>
         GetRequiredService<IConfigurationEditorJsonSerializer>();
@@ -145,10 +146,11 @@ internal sealed class DataTypeServiceTests : UmbracoIntegrationTest
         // Arrange
         var dataTypeDefinitions = await DataTypeService.GetByEditorAliasAsync(Constants.PropertyEditors.Aliases.RichText);
         var template = TemplateBuilder.CreateTextPageTemplate();
-        FileService.SaveTemplate(template);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+
         var doctype =
             ContentTypeBuilder.CreateSimpleContentType("umbTextpage", "Textpage", defaultTemplateId: template.Id);
-        ContentTypeService.Save(doctype);
+        await ContentTypeService.CreateAsync(doctype, Constants.Security.SuperUserKey);
 
         // validate the assumptions used for assertions later in this test
         var contentType = ContentTypeService.Get(doctype.Id);
@@ -406,7 +408,9 @@ internal sealed class DataTypeServiceTests : UmbracoIntegrationTest
             };
 
         // Act & Assert
+#pragma warning disable CS0618 // Type or member is obsolete
         Assert.Throws<ArgumentException>(() => DataTypeService.Save(dataTypeDefinition));
+#pragma warning restore CS0618 // Type or member is obsolete
     }
 
     [Test]
@@ -454,10 +458,10 @@ internal sealed class DataTypeServiceTests : UmbracoIntegrationTest
         IEnumerable<IDataType> dataTypeDefinitions = await DataTypeService.GetByEditorAliasAsync(Constants.PropertyEditors.Aliases.RichText);
 
         IContentType documentType = ContentTypeBuilder.CreateSimpleContentType("umbTextpage", "Text Page");
-        ContentTypeService.Save(documentType);
+        await ContentTypeService.CreateAsync(documentType, Constants.Security.SuperUserKey);
 
         IMediaType mediaType = MediaTypeBuilder.CreateSimpleMediaType("umbMediaItem", "Media Item");
-        MediaTypeService.Save(mediaType);
+        await MediaTypeService.CreateAsync(mediaType, Constants.Security.SuperUserKey);
 
         documentType = ContentTypeService.Get(documentType.Id);
         Assert.IsNotNull(documentType.PropertyTypes.SingleOrDefault(pt => pt.PropertyEditorAlias is Constants.PropertyEditors.Aliases.RichText));
@@ -485,6 +489,43 @@ internal sealed class DataTypeServiceTests : UmbracoIntegrationTest
         Assert.AreEqual(mediaType.Key, secondResult.ContentTypeKey);
         Assert.AreEqual("bodyText", secondResult.NodeAlias);
         Assert.AreEqual("Body text", secondResult.NodeName);
+    }
+
+    [Test]
+    public async Task DataTypeService_Can_Get_ListView_References()
+    {
+        // Arrange - Create a custom list view data type
+        var customListViewKey = Guid.NewGuid();
+        IDataType customListView = new DataType(
+            GetRequiredService<PropertyEditorCollection>()[Constants.PropertyEditors.Aliases.ListView],
+            ConfigurationEditorJsonSerializer)
+        {
+            Key = customListViewKey,
+            Name = "Custom List View For Test",
+            DatabaseType = ValueStorageType.Nvarchar
+        };
+        var createResult = await DataTypeService.CreateAsync(customListView, Constants.Security.SuperUserKey);
+        Assert.IsTrue(createResult.Success);
+
+        // Create a document type that uses this list view as its collection
+        IContentType documentTypeWithListView = new ContentTypeBuilder()
+            .WithAlias("listViewContainer")
+            .WithName("List View Container")
+            .WithIsContainer(customListViewKey)
+            .Build();
+        await ContentTypeService.CreateAsync(documentTypeWithListView, Constants.Security.SuperUserKey);
+
+        // Act - Get references for the custom list view
+        PagedModel<RelationItemModel> result = await DataTypeService.GetPagedRelationsAsync(customListViewKey, 0, 10);
+
+        // Assert - The document type should be listed as a reference
+        Assert.AreEqual(1, result.Total);
+
+        RelationItemModel listViewReference = result.Items.First();
+        Assert.AreEqual("listViewContainer", listViewReference.ContentTypeAlias);
+        Assert.AreEqual("List View Container", listViewReference.ContentTypeName);
+        Assert.AreEqual(documentTypeWithListView.Key, listViewReference.ContentTypeKey);
+        Assert.AreEqual("Custom List View For Test", listViewReference.NodeName);
     }
 
     [Test]

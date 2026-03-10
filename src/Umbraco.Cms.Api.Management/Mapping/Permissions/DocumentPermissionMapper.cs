@@ -25,17 +25,6 @@ public class DocumentPermissionMapper : IPermissionPresentationMapper, IPermissi
     /// <summary>
     /// Initializes a new instance of the <see cref="DocumentPermissionMapper"/> class.
     /// </summary>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 17.")]
-    public DocumentPermissionMapper()
-        : this(
-              StaticServiceProvider.Instance.GetRequiredService<Lazy<IEntityService>>(),
-              StaticServiceProvider.Instance.GetRequiredService<Lazy<IUserService>>())
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="DocumentPermissionMapper"/> class.
-    /// </summary>
     public DocumentPermissionMapper(Lazy<IEntityService> entityService, Lazy<IUserService> userService)
     {
         _entityService = entityService;

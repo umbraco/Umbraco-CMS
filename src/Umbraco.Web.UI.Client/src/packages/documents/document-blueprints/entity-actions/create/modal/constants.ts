@@ -14,7 +14,6 @@ export const UMB_DOCUMENT_BLUEPRINT_OPTIONS_CREATE_MODAL = new UmbModalToken<
 	UmbDocumentBlueprintOptionsCreateModalValue
 >('Umb.Modal.DocumentBlueprintOptionsCreate', {
 	modal: {
-		type: 'sidebar',
-		size: 'small',
+		type: 'dialog',
 	},
 });

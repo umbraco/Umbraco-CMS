@@ -1,3 +1,4 @@
+export * from './context-provide.decorator.js';
 export * from './context-boundary.js';
 export * from './context-boundary.controller.js';
 export * from './context-provide.event.js';

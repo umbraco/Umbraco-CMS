@@ -204,27 +204,15 @@ export class UmbInputBlockTypeElement<
 				opacity: 0.5;
 			}
 
+			uui-action-bar {
+				--uui-button-background-color: var(--uui-color-surface);
+				--uui-button-background-color-hover: var(--uui-color-surface);
+			}
+
 			#add-button {
 				text-align: center;
 				min-height: 150px;
 				height: 100%;
-			}
-
-			uui-icon {
-				display: block;
-				margin: 0 auto;
-			}
-
-			uui-input {
-				border: none;
-				margin: var(--uui-size-space-6) 0 var(--uui-size-space-4);
-			}
-
-			uui-input:hover uui-button {
-				opacity: 1;
-			}
-			uui-input uui-button {
-				opacity: 0;
 			}
 		`,
 	];

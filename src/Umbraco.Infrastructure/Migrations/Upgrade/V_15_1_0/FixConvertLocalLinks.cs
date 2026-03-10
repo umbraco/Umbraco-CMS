@@ -157,7 +157,9 @@ public class FixConvertLocalLinks : MigrationBase
                 progress++;
                 if (progress % 100 == 0)
                 {
-                    _logger.LogInformation("  - finíshed {progress} of {total} properties", progress,
+                    _logger.LogInformation(
+                        "  - finíshed {progress} of {total} properties",
+                        progress,
                         updateBatch.Count);
                 }
 
@@ -227,8 +229,11 @@ public class FixConvertLocalLinks : MigrationBase
         return true;
     }
 
-    private bool ProcessPropertyDataDto(PropertyDataDto propertyDataDto, IPropertyType propertyType,
-        IDictionary<int, ILanguage> languagesById, IDataValueEditor valueEditor)
+    private bool ProcessPropertyDataDto(
+        PropertyDataDto propertyDataDto,
+        IPropertyType propertyType,
+        IDictionary<int, ILanguage> languagesById,
+        IDataValueEditor valueEditor)
     {
         // NOTE: some old property data DTOs can have variance defined, even if the property type no longer varies
         var culture = propertyType.VariesByCulture()

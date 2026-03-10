@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.Media.Item;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
@@ -30,7 +31,7 @@ public class SearchMediaItemController : MediaItemControllerBase
         _dataTypeService = dataTypeService;
     }
 
-    [Obsolete("Use the non-obsolete constructor instead, will be removed in Umbraco 18.")]
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 18.")]
     public SearchMediaItemController(
         IIndexedEntitySearchService indexedEntitySearchService,
         IMediaPresentationFactory mediaPresentationFactory)
@@ -66,6 +67,8 @@ public class SearchMediaItemController : MediaItemControllerBase
     [HttpGet("search")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedModel<MediaItemResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Searches media items.")]
+    [EndpointDescription("Searches media items by the provided query with pagination support.")]
     public async Task<IActionResult> SearchFromParentWithAllowedTypes(
         CancellationToken cancellationToken,
         string query,
@@ -77,6 +80,13 @@ public class SearchMediaItemController : MediaItemControllerBase
         [FromQuery] IEnumerable<Guid>? allowedMediaTypes = null,
         Guid? dataTypeId = null)
     {
+        // We always want to include folders in the search results (aligns with behaviour in Umbraco 13, and allows folders
+        // to be selected to find the selectable items inside).
+        if (allowedMediaTypes is not null && allowedMediaTypes.Contains(Constants.MediaTypes.Guids.FolderGuid) is false)
+        {
+            allowedMediaTypes = [.. allowedMediaTypes, Constants.MediaTypes.Guids.FolderGuid];
+        }
+
         var ignoreUserStartNodes = await IgnoreUserStartNodes(dataTypeId);
         PagedModel<IEntitySlim> searchResult = await _indexedEntitySearchService.SearchAsync(
             UmbracoObjectTypes.Media,

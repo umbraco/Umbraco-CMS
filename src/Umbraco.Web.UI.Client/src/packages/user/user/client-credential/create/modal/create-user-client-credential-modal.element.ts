@@ -9,9 +9,8 @@ import { css, html, customElement, query } from '@umbraco-cms/backoffice/externa
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 
-const elementName = 'umb-create-user-client-credential-modal';
-@customElement(elementName)
-export class UmbCreateUserModalElement extends UmbModalBaseElement<
+@customElement('umb-create-user-client-credential-modal')
+export class UmbCreateUserClientCredentialModalElement extends UmbModalBaseElement<
 	UmbCreateUserClientCredentialModalData,
 	UmbCreateUserClientCredentialModalValue
 > {
@@ -123,10 +122,10 @@ export class UmbCreateUserModalElement extends UmbModalBaseElement<
 	];
 }
 
-export { UmbCreateUserModalElement as element };
+export { UmbCreateUserClientCredentialModalElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbCreateUserModalElement;
+		'umb-create-user-client-credential-modal': UmbCreateUserClientCredentialModalElement;
 	}
 }

@@ -42,7 +42,7 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 	@state()
 	private _groupId?: string;
 
-	@state()
+	@property({ type: Boolean, reflect: true, attribute: 'has-owner-container' })
 	private _hasOwnerContainer?: boolean;
 
 	// attrbute is used by Sorter Controller in parent scope.
@@ -157,6 +157,7 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 					<uui-input
 						id="group-name"
 						label=${this.localize.term('contentTypeEditor_group')}
+						data-mark="input:group-name"
 						placeholder=${this.localize.term('placeholders_entername')}
 						.value=${this._group!.name}
 						?disabled=${!this._hasOwnerContainer}
@@ -199,6 +200,7 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 						<uui-input
 							type="number"
 							label=${this.localize.term('sort_sortOrder')}
+							data-mark="input:sort-order"
 							.value=${this.group!.sortOrder.toString()}
 							?disabled=${!this._hasOwnerContainer}
 							@change=${(e: UUIInputEvent) =>
@@ -273,12 +275,11 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 				display: flex;
 				align-items: center;
 				justify-content: space-between;
-				cursor: grab;
 				padding: var(--uui-size-space-4) var(--uui-size-space-5);
 			}
 
-			:host([inherited]) div[slot='header'] {
-				cursor: default;
+			:host([has-owner-container]) div[slot='header'] {
+				cursor: grab;
 			}
 
 			div[slot='header'] > div {

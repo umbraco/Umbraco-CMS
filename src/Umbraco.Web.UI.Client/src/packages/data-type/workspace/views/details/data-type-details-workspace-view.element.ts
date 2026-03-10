@@ -1,25 +1,34 @@
 import { UMB_DATA_TYPE_WORKSPACE_CONTEXT } from '../../data-type-workspace.context-token.js';
 import { css, customElement, html, nothing, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UMB_MISSING_PROPERTY_EDITOR_UI_ALIAS } from '@umbraco-cms/backoffice/property-editor';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
-import { UMB_PROPERTY_EDITOR_UI_PICKER_MODAL } from '@umbraco-cms/backoffice/property-editor';
-import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
 import { umbBindToValidation } from '@umbraco-cms/backoffice/validation';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
 
 @customElement('umb-data-type-details-workspace-view')
 export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement implements UmbWorkspaceViewElement {
 	@state()
-	private _propertyEditorUiIcon?: string | null = null;
+	private _propertyEditorUiIcon?: string;
 
 	@state()
-	private _propertyEditorUiName?: string | null = null;
+	private _propertyEditorUiName?: string;
 
 	@state()
-	private _propertyEditorUiAlias?: string | null = null;
+	private _propertyEditorUiAlias?: string;
 
 	@state()
-	private _propertyEditorSchemaAlias?: string | null = null;
+	private _propertyEditorSchemaAlias?: string;
+
+	@state()
+	private _propertyEditorDataSourceAlias?: string | null = null;
+
+	@state()
+	private _supportsDataSource = false;
+
+	@state()
+	private _supportedDataSourceTypes: Array<string> = [];
 
 	#workspaceContext?: typeof UMB_DATA_TYPE_WORKSPACE_CONTEXT.TYPE;
 
@@ -38,101 +47,98 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement im
 		}
 
 		this.observe(this.#workspaceContext.propertyEditorUiAlias, (value) => {
-			this._propertyEditorUiAlias = value;
+			this._propertyEditorUiAlias = value ?? undefined;
+			this.#observePropertyEditorUIManifest();
 		});
 
 		this.observe(this.#workspaceContext.propertyEditorSchemaAlias, (value) => {
-			this._propertyEditorSchemaAlias = value;
+			this._propertyEditorSchemaAlias = value ?? undefined;
 		});
 
 		this.observe(this.#workspaceContext.propertyEditorUiName, (value) => {
-			this._propertyEditorUiName = value;
+			this._propertyEditorUiName = value ?? undefined;
 		});
 
 		this.observe(this.#workspaceContext.propertyEditorUiIcon, (value) => {
-			this._propertyEditorUiIcon = value;
+			this._propertyEditorUiIcon = value ?? undefined;
+		});
+
+		this.observe(this.#workspaceContext.propertyEditorDataSourceAlias, (value) => {
+			this._propertyEditorDataSourceAlias = value;
 		});
 	}
 
-	async #openPropertyEditorUIPicker() {
-		const value = await umbOpenModal(this, UMB_PROPERTY_EDITOR_UI_PICKER_MODAL, {
-			value: {
-				selection: this._propertyEditorUiAlias ? [this._propertyEditorUiAlias] : [],
-			},
-		}).catch(() => undefined);
+	#observePropertyEditorUIManifest() {
+		if (!this._propertyEditorUiAlias) return;
 
-		if (value) {
-			this.#workspaceContext?.setPropertyEditorUiAlias(value.selection[0]);
-		}
+		this.observe(umbExtensionsRegistry.byTypeAndAlias('propertyEditorUi', this._propertyEditorUiAlias), (manifest) => {
+			this._supportsDataSource = manifest?.meta?.supportsDataSource?.enabled ?? false;
+			this._supportedDataSourceTypes = manifest?.meta?.supportsDataSource?.forDataSourceTypes ?? [];
+		});
+	}
+
+	#onDataSourceChange(event: CustomEvent) {
+		const value = (event.target as HTMLInputElement).value;
+		this.#workspaceContext?.setPropertyEditorDataSourceAlias(value || undefined);
 	}
 
 	override render() {
 		return html`
 			<uui-box>
-				${this._propertyEditorUiAlias && this._propertyEditorSchemaAlias
-					? this.#renderPropertyEditorReference()
-					: this.#renderChooseButton()}
+				<umb-property-layout
+					data-mark="property:editorUiAlias"
+					label="Property Editor"
+					description=${this.localize.term('propertyEditorPicker_title')}
+					mandatory>
+					<umb-data-type-details-workspace-property-editor-picker
+						slot="editor"
+						.propertyEditorUiName=${this._propertyEditorUiName}
+						.propertyEditorUiAlias=${this._propertyEditorUiAlias}
+						.propertyEditorUiIcon=${this._propertyEditorUiIcon}
+						.propertyEditorSchemaAlias=${this._propertyEditorSchemaAlias}
+						${umbBindToValidation(this, '$.editorUiAlias', this._propertyEditorUiAlias)}>
+					</umb-data-type-details-workspace-property-editor-picker>
+				</umb-property-layout>
+				${this.#renderDataSourceInput()}
 			</uui-box>
 			${this.#renderSettings()}
 		`;
 	}
 
-	#renderSettings() {
-		if (!this._propertyEditorUiAlias || !this._propertyEditorSchemaAlias) return nothing;
-		return html`
-			<uui-box headline=${this.localize.term('general_settings')}>
-				<umb-property-editor-config></umb-property-editor-config>
-			</uui-box>
-		`;
-	}
+	#renderDataSourceInput() {
+		if (!this._supportsDataSource) return nothing;
 
-	// Notice, we have implemented a property-layout for each states of the property editor ui picker, in this way the validation message gets removed once the choose-button is gone. (As we are missing ability to detect if elements got removed from DOM)[NL]
-	#renderChooseButton() {
 		return html`
-			<umb-property-layout
-				data-mark="property:editorUiAlias"
-				label="Property Editor"
-				description=${this.localize.term('propertyEditorPicker_title')}
-				mandatory>
-				<uui-button
+			<umb-property-layout label="Data Source" mandatory>
+				<umb-input-property-editor-data-source
+					.value=${this._propertyEditorDataSourceAlias || ''}
+					.dataSourceTypes=${this._supportedDataSourceTypes}
 					slot="editor"
-					id="btn-add"
-					label=${this.localize.term('propertyEditorPicker_title')}
-					look="placeholder"
-					color="default"
+					max="1"
+					@change=${this.#onDataSourceChange}
 					required
-					${umbBindToValidation(this)}
-					@click=${this.#openPropertyEditorUIPicker}></uui-button>
+					${umbBindToValidation(
+						this,
+						'$.editorDataSourceAlias',
+						this._propertyEditorDataSourceAlias,
+					)}></umb-input-property-editor-data-source>
 			</umb-property-layout>
 		`;
 	}
 
-	#renderPropertyEditorReference() {
-		if (!this._propertyEditorUiAlias || !this._propertyEditorSchemaAlias) return nothing;
-		return html`
-			<umb-property-layout
-				data-mark="property:editorUiAlias"
-				label="Property Editor"
-				description=${this.localize.term('propertyEditorPicker_title')}
-				mandatory>
-				<umb-ref-property-editor-ui
-					slot="editor"
-					name=${this._propertyEditorUiName ?? ''}
-					alias=${this._propertyEditorUiAlias}
-					property-editor-schema-alias=${this._propertyEditorSchemaAlias}
-					standalone
-					@open=${this.#openPropertyEditorUIPicker}>
-					${this._propertyEditorUiIcon
-						? html`<umb-icon name=${this._propertyEditorUiIcon} slot="icon"></umb-icon>`
-						: nothing}
-					<uui-action-bar slot="actions">
-						<uui-button
-							label=${this.localize.term('general_change')}
-							@click=${this.#openPropertyEditorUIPicker}></uui-button>
-					</uui-action-bar>
-				</umb-ref-property-editor-ui>
-			</umb-property-layout>
-		`;
+	#renderSettings() {
+		if (
+			!this._propertyEditorUiAlias ||
+			!this._propertyEditorUiName ||
+			!this._propertyEditorSchemaAlias ||
+			this._propertyEditorUiAlias === UMB_MISSING_PROPERTY_EDITOR_UI_ALIAS
+		) {
+			return nothing;
+		}
+
+		return html` <uui-box headline=${this.localize.term('general_settings')}>
+			<umb-property-editor-config></umb-property-editor-config>
+		</uui-box>`;
 	}
 
 	static override styles = [

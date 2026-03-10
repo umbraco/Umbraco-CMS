@@ -22,23 +22,6 @@ public interface ICookieManager
     /// </summary>
     /// <param name="cookieName">The cookie name.</param>
     /// <param name="value">The cookie value.</param>
-    [Obsolete("Use overload with the httpOnly parameter instead. Scheduled for removal in V16.")]
-    void SetCookieValue(string cookieName, string value) => SetCookieValue(cookieName, value, false);
-
-    /// <summary>
-    /// Sets the value of a cookie with the specified name.
-    /// </summary>
-    /// <param name="cookieName">The cookie name.</param>
-    /// <param name="value">The cookie value.</param>
-    /// <param name="httpOnly">Indicates whether the created cookie should be marked as HTTP only.</param>
-    [Obsolete("Use overload with the secure and sameSiteMode parameters instead. Scheduled for removal in V17.")]
-    void SetCookieValue(string cookieName, string value, bool httpOnly);
-
-    /// <summary>
-    /// Sets the value of a cookie with the specified name.
-    /// </summary>
-    /// <param name="cookieName">The cookie name.</param>
-    /// <param name="value">The cookie value.</param>
     /// <param name="httpOnly">Indicates whether the created cookie should be marked as HTTP only.</param>
     /// <param name="secure">Indicates whether the created cookie should be marked as secure.</param>
     /// <param name="sameSiteMode">Indicates the created cookie's same site status.</param>
@@ -48,10 +31,7 @@ public interface ICookieManager
     /// This hasn't been used as the parameter directly to avoid a dependency on Microsoft.AspNetCore.Http in
     /// the core project.
     /// </remarks>
-    void SetCookieValue(string cookieName, string value, bool httpOnly, bool secure, string sameSiteMode)
-#pragma warning disable CS0618 // Type or member is obsolete
-        => SetCookieValue(cookieName, value, httpOnly);
-#pragma warning restore CS0618 // Type or member is obsolete
+    void SetCookieValue(string cookieName, string value, bool httpOnly, bool secure, string sameSiteMode);
 
     /// <summary>
     /// Determines whether a cookie with the specified name exists.

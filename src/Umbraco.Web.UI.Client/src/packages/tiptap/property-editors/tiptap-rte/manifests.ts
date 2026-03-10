@@ -1,13 +1,14 @@
+import { UMB_TIPTAP_PROPERTY_EDITOR_UI_ALIAS } from './constants.js';
 import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/property-editor';
 
 export const manifests: Array<ManifestPropertyEditorUi> = [
 	{
 		type: 'propertyEditorUi',
-		alias: 'Umb.PropertyEditorUi.Tiptap',
+		alias: UMB_TIPTAP_PROPERTY_EDITOR_UI_ALIAS,
 		name: 'Rich Text Editor [Tiptap] Property Editor UI',
 		element: () => import('./property-editor-ui-tiptap.element.js'),
 		meta: {
-			label: 'Rich Text Editor [Tiptap]',
+			label: '#rte_label',
 			propertyEditorSchemaAlias: 'Umbraco.RichText',
 			icon: 'icon-browser-window',
 			group: 'richContent',

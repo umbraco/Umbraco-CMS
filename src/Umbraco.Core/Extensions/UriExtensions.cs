@@ -181,7 +181,7 @@ public static class UriExtensions
     public static Uri WithoutPort(this Uri uri) =>
         new Uri(uri.GetComponents(UriComponents.AbsoluteUri & ~UriComponents.Port, UriFormat.UriEscaped));
 
-    private static string? GetSafeQuery(this Uri uri)
+    private static string GetSafeQuery(this Uri uri)
     {
         if (uri.IsAbsoluteUri)
         {
@@ -196,6 +196,14 @@ public static class UriExtensions
 
         return new string(query);
     }
+
+    /// <summary>
+    ///     Gets the file extension from a URI, without the leading dot, in lowercase.
+    /// </summary>
+    /// <param name="uri">The uri.</param>
+    /// <returns>The file extension (e.g. "jpg"), or an empty string if there is no extension.</returns>
+    public static string GetFileExtension(this Uri uri)
+        => Path.GetExtension(uri.GetSafeAbsolutePath()).TrimStart('.').ToLowerInvariant();
 
     /// <summary>
     ///     Replaces the host of a uri.

@@ -8,6 +8,7 @@ import {
 	UMB_DOCUMENT_BLUEPRINT_TREE_REPOSITORY_ALIAS,
 	UMB_DOCUMENT_BLUEPRINT_TREE_STORE_ALIAS,
 } from './constants.js';
+import { UmbDocumentBlueprintTreeStore } from './document-blueprint-tree.store.js';
 import { manifests as folderManifests } from './folder/manifests.js';
 import { manifests as reloadManifests } from './reload-tree-item-children/manifests.js';
 
@@ -22,7 +23,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'treeStore',
 		alias: UMB_DOCUMENT_BLUEPRINT_TREE_STORE_ALIAS,
 		name: 'Document Blueprint Tree Store',
-		api: () => import('./document-blueprint-tree.store.js'),
+		api: UmbDocumentBlueprintTreeStore,
 	},
 	{
 		type: 'tree',

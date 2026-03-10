@@ -22,20 +22,47 @@ internal sealed class CacheInstructionRepository : ICacheInstructionRepository
     /// <inheritdoc />
     public int CountAll()
     {
-        Sql<ISqlContext>? sql = AmbientScope?.SqlContext.Sql().Select("COUNT(*)")
+        if (AmbientScope is null)
+        {
+            return 0;
+        }
+
+        Sql<ISqlContext>? sql = AmbientScope.SqlContext.Sql().SelectCount()
             .From<CacheInstructionDto>();
 
-        return AmbientScope?.Database.ExecuteScalar<int>(sql) ?? 0;
+        return AmbientScope.Database.ExecuteScalar<int>(sql);
     }
 
     /// <inheritdoc />
-    public int CountPendingInstructions(int lastId) =>
-        AmbientScope?.Database.ExecuteScalar<int>(
-            "SELECT SUM(instructionCount) FROM umbracoCacheInstruction WHERE id > @lastId", new { lastId }) ?? 0;
+    public int CountPendingInstructions(int lastId)
+    {
+        if (AmbientScope is null)
+        {
+            return 0;
+        }
+
+        Sql<ISqlContext>? sql = AmbientScope.SqlContext.Sql()
+            .SelectSum<CacheInstructionDto>(c => c.InstructionCount)
+            .From<CacheInstructionDto>()
+            .Where<CacheInstructionDto>(dto => dto.Id > lastId);
+
+        return AmbientScope.Database.ExecuteScalar<int>(sql);
+    }
 
     /// <inheritdoc />
-    public int GetMaxId() =>
-        AmbientScope?.Database.ExecuteScalar<int>("SELECT MAX(id) FROM umbracoCacheInstruction") ?? 0;
+    public int GetMaxId()
+    {
+        if (AmbientScope is null)
+        {
+            return 0;
+        }
+
+        Sql<ISqlContext> sql = AmbientScope.SqlContext.Sql()
+            .SelectMax<CacheInstructionDto>(c => c.Id)
+            .From<CacheInstructionDto>();
+
+        return AmbientScope.Database.ExecuteScalar<int>(sql);
+    }
 
     /// <inheritdoc />
     public bool Exists(int id) => AmbientScope?.Database.Exists<CacheInstructionDto>(id) ?? false;
@@ -50,24 +77,41 @@ internal sealed class CacheInstructionRepository : ICacheInstructionRepository
     /// <inheritdoc />
     public IEnumerable<CacheInstruction> GetPendingInstructions(int lastId, int maxNumberToRetrieve)
     {
-        Sql<ISqlContext>? sql = AmbientScope?.SqlContext.Sql().SelectAll()
+        if (AmbientScope is null)
+        {
+            return [];
+        }
+
+        Sql<ISqlContext> sql = AmbientScope.SqlContext.Sql().SelectAll()
             .From<CacheInstructionDto>()
             .Where<CacheInstructionDto>(dto => dto.Id > lastId)
             .OrderBy<CacheInstructionDto>(dto => dto.Id);
-        Sql<ISqlContext>? topSql = sql?.SelectTop(maxNumberToRetrieve);
-        return AmbientScope?.Database.Fetch<CacheInstructionDto>(topSql).Select(CacheInstructionFactory.BuildEntity) ??
-               Array.Empty<CacheInstruction>();
+        Sql<ISqlContext> topSql = sql.SelectTop(maxNumberToRetrieve);
+        return AmbientScope.Database.Fetch<CacheInstructionDto>(topSql).Select(CacheInstructionFactory.BuildEntity);
     }
 
     /// <inheritdoc />
     public void DeleteInstructionsOlderThan(DateTime pruneDate)
     {
+        if (AmbientScope is null)
+        {
+            return;
+        }
+
         // Using 2 queries is faster than convoluted joins.
-        var maxId = AmbientScope?.Database.ExecuteScalar<int>("SELECT MAX(id) FROM umbracoCacheInstruction;");
-        Sql deleteSql =
-            new Sql().Append(
-                @"DELETE FROM umbracoCacheInstruction WHERE utcStamp < @pruneDate AND id < @maxId",
-                new { pruneDate, maxId });
-        AmbientScope?.Database.Execute(deleteSql);
+        Sql<ISqlContext> sql = AmbientScope.SqlContext.Sql()
+            .SelectMax<CacheInstructionDto>(c => c.Id)
+            .From<CacheInstructionDto>();
+        var maxId = AmbientScope.Database.ExecuteScalar<int>(sql);
+        if (maxId == 0)
+        {
+            return; // No instructions to delete.
+        }
+
+        Sql<ISqlContext>? deleteSql = AmbientScope.SqlContext.Sql()
+            .Delete<CacheInstructionDto>()
+            .Where<CacheInstructionDto>(dto => dto.UtcStamp < pruneDate && dto.Id < maxId);
+
+        AmbientScope.Database.Execute(deleteSql);
     }
 }

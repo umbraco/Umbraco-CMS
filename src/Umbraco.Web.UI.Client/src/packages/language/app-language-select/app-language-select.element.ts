@@ -234,6 +234,7 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 				justify-content: space-between;
 				cursor: pointer;
 				font-family: inherit;
+				box-sizing: border-box;
 			}
 
 			#toggle:hover {

@@ -34,14 +34,14 @@ public class StaticFileTreeControllerBase : FileSystemTreeControllerBase
 
     protected override IFileSystem FileSystem { get; }
 
-    protected string[] GetDirectories(string path) =>
+    protected override string[] GetDirectories(string path) =>
         IsTreeRootPath(path)
             ? _allowedRootFolders
             : IsAllowedPath(path)
                 ? _fileSystemTreeService.GetDirectories(path)
                 : Array.Empty<string>();
 
-    protected string[] GetFiles(string path)
+    protected override string[] GetFiles(string path)
         => IsTreeRootPath(path) || IsAllowedPath(path) == false
             ? Array.Empty<string>()
             : _fileSystemTreeService.GetFiles(path);

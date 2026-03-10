@@ -1,4 +1,4 @@
-﻿import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
+import {ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 
 const documentTypeName = "DocumentType";
 const contentName = "Content";
@@ -30,9 +30,9 @@ test('can schedule publish after unselecting all languages', async ({umbracoUi})
   await umbracoUi.content.enterContentName('Tester');
   await umbracoUi.content.clickViewMoreOptionsButton();
   await umbracoUi.content.clickSchedulePublishButton();
-  await umbracoUi.waitForTimeout(500);
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   await umbracoUi.content.clickSelectAllCheckbox();
-  await umbracoUi.waitForTimeout(500);
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   await umbracoUi.content.clickSelectAllCheckbox();
   await umbracoUi.content.clickSchedulePublishLanguageButton(languageName);
 

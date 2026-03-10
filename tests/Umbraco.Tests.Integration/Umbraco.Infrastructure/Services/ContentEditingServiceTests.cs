@@ -16,16 +16,16 @@ public partial class ContentEditingServiceTests : ContentEditingServiceTestsBase
     [SetUp]
     public void Setup() => ContentRepositoryBase.ThrowOnWarning = true;
 
-    public void Relate(IContent parent, IContent child)
+    public void Relate(IContent parent, IContent child, string relationTypeAlias = Constants.Conventions.RelationTypes.RelatedDocumentAlias)
     {
-        var relatedContentRelType = RelationService.GetRelationTypeByAlias(Constants.Conventions.RelationTypes.RelatedDocumentAlias);
+        var relatedContentRelType = RelationService.GetRelationTypeByAlias(relationTypeAlias);
 
         var relation = RelationService.Relate(parent.Id, child.Id, relatedContentRelType);
         RelationService.Save(relation);
     }
 
     protected override void CustomTestSetup(IUmbracoBuilder builder)
-        => builder.AddNotificationHandler<ContentCopiedNotification, RelateOnCopyNotificationHandler>();
+        => builder.AddNotificationAsyncHandler<ContentCopiedNotification, RelateOnCopyNotificationHandler>();
 
     private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
 

@@ -47,13 +47,20 @@ export class UmbBadgeElement extends LitElement {
 		css`
 			:host {
 				position: absolute;
-				anchor-name: --umb-badge-anchor;
 				/** because inset has no effect on uui-badge in this case, we then apply it here: */
 				inset: var(--uui-badge-inset, -8px -8px auto auto);
 			}
 
+			:host([inline-mode]) {
+				position: relative;
+				margin-left: 12px;
+			}
+
 			@supports (position-anchor: --my-name) {
-				uui-badge {
+				:host(:not([inline-mode])) {
+					anchor-name: --umb-badge-anchor;
+				}
+				:host(:not([inline-mode])) uui-badge {
 					position: fixed;
 					position-anchor: --umb-badge-anchor;
 					z-index: 1;

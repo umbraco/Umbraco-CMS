@@ -29,6 +29,7 @@ export class UmbUserGroupWorkspaceContext
 	readonly mediaRootAccess = this._data.createObservablePartOfCurrent((data) => data?.mediaRootAccess || false);
 	readonly fallbackPermissions = this._data.createObservablePartOfCurrent((data) => data?.fallbackPermissions || []);
 	readonly permissions = this._data.createObservablePartOfCurrent((data) => data?.permissions || []);
+	readonly description = this._data.createObservablePartOfCurrent((data) => data?.description || '');
 
 	constructor(host: UmbControllerHost) {
 		super(host, {
@@ -98,6 +99,15 @@ export class UmbUserGroupWorkspaceContext
 	 */
 	setFallbackPermissions(fallbackPermissions: Array<string>) {
 		this._data.updateCurrent({ fallbackPermissions });
+	}
+
+	/**
+	 * Sets the description
+	 * @param {string} description - The description
+	 * @memberof UmbUserGroupWorkspaceContext
+	 */
+	setDescription(description: string) {
+		this._data.updateCurrent({ description });
 	}
 }
 

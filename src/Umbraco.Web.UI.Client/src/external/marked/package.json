@@ -6,6 +6,6 @@
 		"build": "vite build"
 	},
 	"dependencies": {
-		"marked": "^15.0.9"
+		"marked": "^17.0.1"
 	}
 }

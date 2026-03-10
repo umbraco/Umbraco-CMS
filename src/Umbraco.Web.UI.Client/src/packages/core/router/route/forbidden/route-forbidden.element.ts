@@ -38,7 +38,7 @@ export class UmbRouteForbiddenElement extends UmbLitElement {
 				align-items: center;
 				height: 100%;
 				opacity: 0;
-				animation: fadeIn 2s 2s forwards;
+				animation: fadeIn 2s 0s forwards;
 			}
 
 			@keyframes fadeIn {

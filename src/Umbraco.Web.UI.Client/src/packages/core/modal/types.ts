@@ -1,5 +1,6 @@
 import type { ElementLoaderProperty } from '@umbraco-cms/backoffice/extension-api';
 import type { UUIModalElement, UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
+import type { UmbSearchResultItemModel } from '@umbraco-cms/backoffice/search';
 
 export type * from './extensions/types.js';
 
@@ -10,9 +11,13 @@ export interface UmbPickerModalData<ItemType> {
 	search?: UmbPickerModalSearchConfig;
 }
 
-export interface UmbPickerModalSearchConfig<QueryParamsType = Record<string, unknown>> {
+export interface UmbPickerModalSearchConfig<
+	QueryParamsType = Record<string, unknown>,
+	SearchResultItemType extends UmbSearchResultItemModel = UmbSearchResultItemModel,
+> {
 	providerAlias: string;
 	queryParams?: QueryParamsType;
+	pickableFilter?: (item: SearchResultItemType) => boolean;
 }
 
 export interface UmbPickerModalValue {

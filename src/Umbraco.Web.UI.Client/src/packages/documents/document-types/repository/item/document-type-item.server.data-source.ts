@@ -38,9 +38,9 @@ const mapper = (item: DocumentTypeItemResponseModel): UmbDocumentTypeItemModel =
 	return {
 		entityType: UMB_DOCUMENT_TYPE_ENTITY_TYPE,
 		isElement: item.isElement,
-		icon: item.icon,
+		icon: item.icon ?? undefined,
 		unique: item.id,
 		name: item.name,
-		description: item.description,
+		description: item.description ?? undefined,
 	};
 };

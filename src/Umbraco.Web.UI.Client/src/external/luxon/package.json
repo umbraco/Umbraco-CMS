@@ -1,0 +1,14 @@
+{
+	"name": "@umbraco-backoffice/external-luxon",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"build": "vite build"
+	},
+	"dependencies": {
+		"luxon": "^3.7.2"
+	},
+	"devDependencies": {
+		"@types/luxon": "^3.7.1"
+	}
+}

@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.HostedServices;
 
 namespace Umbraco.Cms.Infrastructure.HostedServices;
 

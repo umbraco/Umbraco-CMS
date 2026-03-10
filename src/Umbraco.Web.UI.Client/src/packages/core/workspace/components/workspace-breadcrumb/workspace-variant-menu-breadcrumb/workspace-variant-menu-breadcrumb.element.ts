@@ -6,9 +6,13 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
 import { UMB_MENU_VARIANT_STRUCTURE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/menu';
-import { UMB_SECTION_CONTEXT } from '@umbraco-cms/backoffice/section';
 import type { UmbAppLanguageContext } from '@umbraco-cms/backoffice/language';
 import type { UmbVariantStructureItemModel } from '@umbraco-cms/backoffice/menu';
+
+const observeDefaultLanguageSymbol = Symbol();
+const observeCurrentLanguageSymbol = Symbol();
+const observeWorkspaceActiveVariantSymbol = Symbol();
+const observeWorkspaceNameSymbol = Symbol();
 
 @customElement('umb-workspace-variant-menu-breadcrumb')
 export class UmbWorkspaceVariantMenuBreadcrumbElement extends UmbLitElement {
@@ -24,21 +28,32 @@ export class UmbWorkspaceVariantMenuBreadcrumbElement extends UmbLitElement {
 	@state()
 	private _appDefaultCulture?: string;
 
-	#sectionContext?: typeof UMB_SECTION_CONTEXT.TYPE;
+	@state()
+	private _appCurrentCulture?: string;
+
 	#workspaceContext?: UmbVariantDatasetWorkspaceContext;
 	#appLanguageContext?: UmbAppLanguageContext;
-	#structureContext?: typeof UMB_MENU_VARIANT_STRUCTURE_WORKSPACE_CONTEXT.TYPE;
+	#menuStructureContext?: typeof UMB_MENU_VARIANT_STRUCTURE_WORKSPACE_CONTEXT.TYPE;
 
 	constructor() {
 		super();
 
 		this.consumeContext(UMB_APP_LANGUAGE_CONTEXT, (instance) => {
 			this.#appLanguageContext = instance;
-			this.#observeDefaultCulture();
-		});
-
-		this.consumeContext(UMB_SECTION_CONTEXT, (instance) => {
-			this.#sectionContext = instance;
+			this.observe(
+				this.#appLanguageContext?.appDefaultLanguage,
+				(value) => {
+					this._appDefaultCulture = value?.unique;
+				},
+				observeDefaultLanguageSymbol,
+			);
+			this.observe(
+				this.#appLanguageContext?.appLanguageCulture,
+				(value) => {
+					this._appCurrentCulture = value;
+				},
+				observeCurrentLanguageSymbol,
+			);
 		});
 
 		this.consumeContext(UMB_VARIANT_WORKSPACE_CONTEXT, (instance) => {
@@ -50,15 +65,15 @@ export class UmbWorkspaceVariantMenuBreadcrumbElement extends UmbLitElement {
 
 		this.consumeContext(UMB_MENU_VARIANT_STRUCTURE_WORKSPACE_CONTEXT, (instance) => {
 			if (!instance) return;
-			this.#structureContext = instance;
+			this.#menuStructureContext = instance;
 			this.#observeStructure();
 		});
 	}
 
 	#observeStructure() {
-		if (!this.#structureContext || !this.#workspaceContext) return;
+		if (!this.#menuStructureContext || !this.#workspaceContext) return;
 
-		this.observe(this.#structureContext.structure, (value) => {
+		this.observe(this.#menuStructureContext.structure, (value) => {
 			if (!this.#workspaceContext) return;
 			const unique = this.#workspaceContext.getUnique();
 			// exclude the current unique from the structure. We append this with an observer of the name
@@ -66,22 +81,15 @@ export class UmbWorkspaceVariantMenuBreadcrumbElement extends UmbLitElement {
 		});
 	}
 
-	#observeDefaultCulture() {
-		this.observe(this.#appLanguageContext?.appDefaultLanguage, (value) => {
-			this._appDefaultCulture = value?.unique;
-		});
-	}
-
 	#observeWorkspaceActiveVariant() {
 		this.observe(
-			this.#workspaceContext?.splitView.activeVariantsInfo,
-			(value) => {
-				if (!value) return;
-				this._workspaceActiveVariantId = UmbVariantId.Create(value[0]);
+			this.#workspaceContext?.splitView.firstActiveVariantInfo,
+			(variantInfo) => {
+				if (!variantInfo) return;
+				this._workspaceActiveVariantId = UmbVariantId.Create(variantInfo);
 				this.#observeActiveVariantName();
 			},
-
-			'breadcrumbWorkspaceActiveVariantObserver',
+			observeWorkspaceActiveVariantSymbol,
 		);
 	}
 
@@ -89,7 +97,7 @@ export class UmbWorkspaceVariantMenuBreadcrumbElement extends UmbLitElement {
 		this.observe(
 			this.#workspaceContext?.name(this._workspaceActiveVariantId),
 			(value) => (this._name = value || ''),
-			'breadcrumbWorkspaceNameObserver',
+			observeWorkspaceNameSymbol,
 		);
 	}
 
@@ -103,20 +111,42 @@ export class UmbWorkspaceVariantMenuBreadcrumbElement extends UmbLitElement {
 			}
 		}
 
-		// If the active workspace is invariant, we will try to find the variant that matches the app default culture.
-		const variant = structureItem.variants.find((variant) => variant.culture === this._appDefaultCulture);
+		// Next try to find the variant that matches the current app culture.
+		const variant = structureItem.variants.find(
+			(variant) => variant.culture === this._appCurrentCulture && variant.segment === null,
+		);
 		if (variant) {
+			if (this._workspaceActiveVariantId?.isInvariant()) {
+				// If the active variant is invariant, we return the default name as the name without parentheses.
+				// Cause it is the name, not an inherited/borrowed name. [NL]
+				return variant.name;
+			}
 			return `(${variant.name})`;
 		}
 
-		// If an active variant can not be found, then we fallback to the first variant name or a generic "unknown" label.
-		return structureItem.variants?.[0]?.name ?? '(#general_unknown)';
+		// Next try to find the variant that matches the app default culture.
+		const defaultVariant = structureItem.variants.find(
+			(variant) => variant.culture === this._appDefaultCulture && variant.segment === null,
+		);
+		if (defaultVariant) {
+			return `(${defaultVariant.name})`;
+		}
+
+		// Next try to find the invariant variant name.
+		const invariantVariant = structureItem.variants.find(
+			(variant) => variant.culture === null && variant.segment === null,
+		);
+		if (invariantVariant) {
+			return invariantVariant.name;
+		}
+
+		// Last return the name of the first variant in the list.
+		const lastResort = structureItem.variants?.[0]?.name;
+		return lastResort ? `(${lastResort})` : '(#general_unknown)';
 	}
 
-	#getHref(structureItem: any) {
-		if (structureItem.isFolder) return undefined;
-		const workspaceBasePath = `section/${this.#sectionContext?.getPathname()}/workspace/${structureItem.entityType}/edit`;
-		return `${workspaceBasePath}/${structureItem.unique}/${this._workspaceActiveVariantId?.culture}`;
+	#getHref(structureItem: UmbVariantStructureItemModel) {
+		return this.#menuStructureContext?.getItemHref(structureItem);
 	}
 
 	override render() {

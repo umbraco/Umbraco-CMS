@@ -116,7 +116,7 @@ public partial class UserStartNodeEntitiesServiceTests : UmbracoIntegrationTest
         return contentStartNodeIds;
     }
 
-    private async Task<User> CreateUser(int[] startNodeIds)
+    private async Task<Core.Models.Membership.User> CreateUser(int[] startNodeIds)
     {
         var user = new UserBuilder()
             .WithName(Guid.NewGuid().ToString("N"))

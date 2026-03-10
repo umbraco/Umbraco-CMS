@@ -133,6 +133,10 @@ public class AspNetCoreHostingEnvironment : IHostingEnvironment
     }
 
     /// <inheritdoc />
+    public string TemporaryFileUploadPath => _hostingSettings.CurrentValue.TemporaryFileUploadLocation
+                                             ?? Path.Combine(MapPathContentRoot(Core.Constants.SystemDirectories.TempData), "TemporaryFile");
+
+    /// <inheritdoc />
     public string MapPathWebRoot(string path) => _webHostEnvironment.MapPathWebRoot(path);
 
     /// <inheritdoc />

@@ -1,4 +1,4 @@
-import {AliasHelper, ConstantHelper, test} from '@umbraco/playwright-testhelpers';
+import {AliasHelper, ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 
 // DocumentType
 const documentTypeName = 'TestDocumentType';
@@ -68,10 +68,9 @@ test('can copy and paste a single block into the same document and group', async
   await umbracoUi.content.clickPasteFromClipboardButtonForProperty(groupName, blockListDataTypeName);
   await umbracoUi.content.selectClipboardEntryWithName(contentName, blockListDataTypeName, elementTypeName);
   await umbracoUi.content.clickSubmitButton();
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   // Original block
   await umbracoUi.content.goToBlockListBlockWithName(groupName, blockListDataTypeName, elementTypeName, 0);
   await umbracoUi.content.doesBlockEditorBlockWithNameContainValue(elementGroupName, elementPropertyName, ConstantHelper.inputTypes.tipTap, blockPropertyValue);
@@ -93,10 +92,9 @@ test('can copy and paste a single block into the same document but different gro
   await umbracoUi.content.clickPasteFromClipboardButtonForProperty(secondGroupName, secondBlockListPropertyName);
   await umbracoUi.content.selectClipboardEntryWithName(contentName, blockListDataTypeName, elementTypeName);
   await umbracoUi.content.clickSubmitButton();
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   // Original block
   await umbracoUi.content.goToBlockListBlockWithName(groupName, blockListDataTypeName, elementTypeName, 0);
   await umbracoUi.content.doesBlockEditorBlockWithNameContainValue(elementGroupName, elementPropertyName, ConstantHelper.inputTypes.tipTap, blockPropertyValue);
@@ -122,10 +120,9 @@ test('can copy and paste a single block into another document', async ({umbracoA
   await umbracoUi.content.clickPasteFromClipboardButtonForProperty(groupName, blockListDataTypeName);
   await umbracoUi.content.selectClipboardEntryWithName(contentName, blockListDataTypeName, elementTypeName);
   await umbracoUi.content.clickSubmitButton();
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   // Copied block
   await umbracoUi.content.goToBlockListBlockWithName(groupName, blockListDataTypeName, elementTypeName, 0);
   await umbracoUi.content.doesBlockEditorBlockWithNameContainValue(elementGroupName, elementPropertyName, ConstantHelper.inputTypes.tipTap, blockPropertyValue);
@@ -147,10 +144,9 @@ test('can copy and paste multiple blocks into the same document and group', {tag
   await umbracoUi.content.clickPasteFromClipboardButtonForProperty(groupName, blockListDataTypeName);
   await umbracoUi.content.selectClipboardEntriesWithName(contentName, blockListDataTypeName);
   await umbracoUi.content.clickSubmitButton();
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   // Original blocks
   await umbracoUi.content.goToBlockListBlockWithName(groupName, blockListDataTypeName, elementTypeName, 0);
   await umbracoUi.content.doesBlockEditorBlockWithNameContainValue(elementGroupName, elementPropertyName, ConstantHelper.inputTypes.tipTap, blockPropertyValue);
@@ -179,10 +175,9 @@ test('can copy and paste multiple blocks into the same document but different gr
   await umbracoUi.content.clickPasteFromClipboardButtonForProperty(secondGroupName, secondBlockListPropertyName);
   await umbracoUi.content.selectClipboardEntriesWithName(contentName, blockListDataTypeName);
   await umbracoUi.content.clickSubmitButton();
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   // Original blocks
   await umbracoUi.content.goToBlockListBlockWithName(groupName, blockListDataTypeName, elementTypeName, 0);
   await umbracoUi.content.doesBlockEditorBlockWithNameContainValue(elementGroupName, elementPropertyName, ConstantHelper.inputTypes.tipTap, blockPropertyValue);
@@ -215,10 +210,9 @@ test('can copy and paste multiple blocks into another document', async ({umbraco
   await umbracoUi.content.clickPasteFromClipboardButtonForProperty(groupName, blockListDataTypeName);
   await umbracoUi.content.selectClipboardEntriesWithName(contentName, blockListDataTypeName);
   await umbracoUi.content.clickSubmitButton();
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   // Copied blocks
   await umbracoUi.content.goToBlockListBlockWithName(groupName, blockListDataTypeName, elementTypeName, 0);
   await umbracoUi.content.doesBlockEditorBlockWithNameContainValue(elementGroupName, elementPropertyName, ConstantHelper.inputTypes.tipTap, blockPropertyValue);
@@ -262,10 +256,9 @@ test('can replace multiple blocks', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.goToBlockListBlockWithName(groupName, blockListDataTypeName, elementTypeName, 0);
   await umbracoUi.content.doesBlockEditorBlockWithNameContainValue(elementGroupName, elementPropertyName, ConstantHelper.inputTypes.tipTap, blockPropertyValue);
   await umbracoUi.content.clickCreateModalButton();
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   await umbracoUi.content.doesBlockListPropertyHaveBlockAmount(groupName, blockListDataTypeName, 1);
 });
 
@@ -284,10 +277,9 @@ test('can copy block from a block list to a block grid',  async ({umbracoApi, um
   await umbracoUi.content.clickPasteFromClipboardButtonForProperty(blockGridGroupName, blockGridDataTypeName);
   await umbracoUi.content.selectClipboardEntryWithName(contentName, blockListDataTypeName, elementTypeName);
   await umbracoUi.content.clickSubmitButton();
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   // Original blocks
   // Block List
   await umbracoUi.content.goToBlockListBlockWithName(groupName, blockListDataTypeName, elementTypeName, 0);
@@ -326,7 +318,7 @@ test('can not copy a block from a block list to a block grid without allowed blo
   await umbracoUi.content.doesClipboardContainCopiedBlocksCount(0);
   await umbracoUi.content.clickCloseButton();
 
-  await umbracoUi.waitForTimeout(500);
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   // Checks if the block is visible in the blockGrid
   await umbracoUi.content.clickPasteFromClipboardButtonForProperty(groupName, blockListDataTypeName);
   await umbracoUi.content.doesClipboardContainCopiedBlocksCount(1);

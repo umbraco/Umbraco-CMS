@@ -21,5 +21,7 @@ public class ByKeyMediaTypeFolderController : MediaTypeFolderControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(FolderResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Gets a media type folder.")]
+    [EndpointDescription("Gets a media type folder identified by the provided Id.")]
     public async Task<IActionResult> ByKey(CancellationToken cancellationToken, Guid id) => await GetFolderAsync(id);
 }

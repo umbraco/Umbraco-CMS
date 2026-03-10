@@ -41,6 +41,10 @@ public abstract class DocumentTypeControllerBase : ManagementApiControllerBase
                     .WithTitle("Invalid property type alias")
                     .WithDetail("One or more property type aliases are invalid")
                     .Build()),
+                ContentTypeOperationStatus.InvalidTemplateAlias => new BadRequestObjectResult(problemDetailsBuilder
+                    .WithTitle("Invalid template alias")
+                    .WithDetail("The specified template alias is invalid")
+                    .Build()),
                 ContentTypeOperationStatus.PropertyTypeAliasCannotEqualContentTypeAlias => new BadRequestObjectResult(problemDetailsBuilder
                     .WithTitle("Invalid property type alias")
                     .WithDetail("The property type alias cannot be the same as the content type alias")
@@ -109,6 +113,10 @@ public abstract class DocumentTypeControllerBase : ManagementApiControllerBase
                 ContentTypeOperationStatus.InvalidElementFlagComparedToParent => new BadRequestObjectResult(problemDetailsBuilder
                     .WithTitle("Invalid IsElement flag")
                     .WithDetail("Can not create a documentType with inheritance composition where the parent and the new type's IsElement flag are different.")
+                    .Build()),
+                ContentTypeOperationStatus.InvalidSegmentVariationForElementType => new BadRequestObjectResult(problemDetailsBuilder
+                    .WithTitle("Invalid segment variation")
+                    .WithDetail("Element types cannot vary by segment.")
                     .Build()),
                 _ => new ObjectResult("Unknown content type operation status") { StatusCode = StatusCodes.Status500InternalServerError },
             });

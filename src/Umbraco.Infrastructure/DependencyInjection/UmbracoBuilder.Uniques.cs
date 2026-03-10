@@ -195,7 +195,7 @@ public static partial class UmbracoBuilderExtensions
     /// </summary>
     /// <typeparam name="T">The type of the log viewer.</typeparam>
     /// <param name="builder">The builder.</param>
-    [Obsolete("No longer used. Scheduled removal in Umbraco 18.")]
+    [Obsolete("No longer used. Scheduled for removal in Umbraco 18.")]
     public static IUmbracoBuilder SetLogViewer<T>(this IUmbracoBuilder builder)
         where T : class, ILogViewer
     {
@@ -208,7 +208,7 @@ public static partial class UmbracoBuilderExtensions
     /// </summary>
     /// <param name="builder">The builder.</param>
     /// <param name="factory">A function creating a log viewer.</param>
-    [Obsolete("No longer used. Scheduled removal in Umbraco 18.")]
+    [Obsolete("No longer used. Scheduled for removal in Umbraco 18.")]
     public static IUmbracoBuilder SetLogViewer(this IUmbracoBuilder builder, Func<IServiceProvider, ILogViewer> factory)
     {
         builder.Services.AddUnique(factory);
@@ -220,7 +220,7 @@ public static partial class UmbracoBuilderExtensions
     /// </summary>
     /// <param name="builder">A builder.</param>
     /// <param name="viewer">A log viewer.</param>
-    [Obsolete("No longer used. Scheduled removal in Umbraco 18.")]
+    [Obsolete("No longer used. Scheduled for removal in Umbraco 18.")]
     public static IUmbracoBuilder SetLogViewer(this IUmbracoBuilder builder, ILogViewer viewer)
     {
         builder.Services.AddUnique(viewer);

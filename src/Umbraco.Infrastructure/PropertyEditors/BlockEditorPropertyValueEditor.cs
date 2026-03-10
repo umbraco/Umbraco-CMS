@@ -30,34 +30,6 @@ public abstract class BlockEditorPropertyValueEditor<TValue, TLayout> : BlockVal
     /// <summary>
     /// Initializes a new instance of the <see cref="BlockEditorPropertyValueEditor{TValue, TLayout}"/> class.
     /// </summary>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
-    protected BlockEditorPropertyValueEditor(
-        PropertyEditorCollection propertyEditors,
-        DataValueReferenceFactoryCollection dataValueReferenceFactories,
-        IDataTypeConfigurationCache dataTypeConfigurationCache,
-        IShortStringHelper shortStringHelper,
-        IJsonSerializer jsonSerializer,
-        BlockEditorVarianceHandler blockEditorVarianceHandler,
-        ILanguageService languageService,
-        IIOHelper ioHelper,
-        DataEditorAttribute attribute)
-        : this(
-              propertyEditors,
-              dataValueReferenceFactories,
-              dataTypeConfigurationCache,
-              shortStringHelper,
-              jsonSerializer,
-              blockEditorVarianceHandler,
-              languageService,
-              ioHelper,
-              attribute,
-              StaticServiceProvider.Instance.GetRequiredService<ILogger>())
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="BlockEditorPropertyValueEditor{TValue, TLayout}"/> class.
-    /// </summary>
     protected BlockEditorPropertyValueEditor(
         PropertyEditorCollection propertyEditors,
         DataValueReferenceFactoryCollection dataValueReferenceFactories,
@@ -135,6 +107,8 @@ public abstract class BlockEditorPropertyValueEditor<TValue, TLayout> : BlockVal
         BlockEditorData<TValue, TLayout>? currentBlockEditorData = SafeParseBlockEditorData(currentValue);
         BlockEditorData<TValue, TLayout>? blockEditorData = SafeParseBlockEditorData(editorValue.Value);
 
+        CacheReferencedEntities(blockEditorData);
+
         // We can skip MapBlockValueFromEditor if both editorValue and currentValue values are empty.
         if (IsBlockEditorDataEmpty(currentBlockEditorData) && IsBlockEditorDataEmpty(blockEditorData))
         {
@@ -148,6 +122,7 @@ public abstract class BlockEditorPropertyValueEditor<TValue, TLayout> : BlockVal
             return null;
         }
 
+        SortBlockItemValuesByCulture(blockEditorData.BlockValue);
         return JsonSerializer.Serialize(blockEditorData.BlockValue);
     }
 

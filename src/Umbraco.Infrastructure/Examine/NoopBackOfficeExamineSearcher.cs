@@ -11,6 +11,8 @@ public class NoopBackOfficeExamineSearcher : IBackOfficeExamineSearcher
         int pageSize,
         long pageIndex,
         out long totalFound,
+        string[]? contentTypeAliases,
+        bool? trashed,
         string? searchFrom = null,
         bool ignoreUserStartNodes = false)
     {

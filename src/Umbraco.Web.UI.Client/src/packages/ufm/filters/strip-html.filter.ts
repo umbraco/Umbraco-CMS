@@ -13,3 +13,4 @@ class UmbUfmStripHtmlFilterApi extends UmbUfmFilterBase {
 }
 
 export { UmbUfmStripHtmlFilterApi as api };
+export { UmbUfmStripHtmlFilterApi };

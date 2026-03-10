@@ -1,4 +1,4 @@
-import UmbCurrentUserConfigRepository from '../../repository/config/current-user-config.repository.js';
+import { UmbCurrentUserConfigRepository } from '@umbraco-cms/backoffice/current-user';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbConditionConfigBase } from '@umbraco-cms/backoffice/extension-api';
 import { UmbConditionBase } from '@umbraco-cms/backoffice/extension-registry';

@@ -1,9 +1,13 @@
+using System.Diagnostics.CodeAnalysis;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+///     Provides operations for managing user notifications related to content changes.
+/// </summary>
 public interface INotificationService : IService
 {
     /// <summary>
@@ -82,11 +86,12 @@ public interface INotificationService : IService
     IEnumerable<Notification>? SetNotifications(IUser? user, IEntity entity, string[] actions);
 
     /// <summary>
-    ///     Creates a new notification
+    /// Tries to create a new notification.
     /// </summary>
-    /// <param name="user"></param>
-    /// <param name="entity"></param>
+    /// <param name="user">The user.</param>
+    /// <param name="entity">The entity.</param>
     /// <param name="action">The action letter - note: this is a string for future compatibility</param>
-    /// <returns></returns>
-    Notification CreateNotification(IUser user, IEntity entity, string action);
+    /// <param name="notification">The created notification.</param>
+    /// <inheritdoc/>
+    bool TryCreateNotification(IUser user, IEntity entity, string action, [NotNullWhen(true)] out Notification? notification);
 }

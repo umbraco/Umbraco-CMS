@@ -1,3 +1,4 @@
+import { UMB_STATIC_FILE_ENTITY_TYPE } from '../../entity.js';
 import type { UmbStaticFileItemModel } from './types.js';
 import { UmbManagementApiStaticFileItemDataRequestManager } from './static-file-item.server.request-manager.js';
 import { UmbItemServerDataSourceBase } from '@umbraco-cms/backoffice/repository';
@@ -41,6 +42,7 @@ export class UmbStaticFileItemServerDataSource extends UmbItemServerDataSourceBa
 const mapper = (item: StaticFileItemResponseModel): UmbStaticFileItemModel => {
 	const serializer = new UmbServerFilePathUniqueSerializer();
 	return {
+		entityType: UMB_STATIC_FILE_ENTITY_TYPE,
 		isFolder: item.isFolder,
 		name: item.name,
 		parentUnique: item.parent ? serializer.toUnique(item.parent.path) : null,

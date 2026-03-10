@@ -16,12 +16,14 @@ public abstract class FileSystemTreeServiceTestsBase : UmbracoIntegrationTest
 
     protected IFileSystem TestFileSystem { get; private set; }
 
+    protected abstract string FileExtension { get; set; }
+
     protected abstract string FileSystemPath { get; }
 
     protected IHostingEnvironment HostingEnvironment => GetRequiredService<IHostingEnvironment>();
 
     [SetUp]
-    public void SetUpFileSystem()
+    public virtual void SetUpFileSystem()
     {
         TestFileSystem = new PhysicalFileSystem(IOHelper, HostingEnvironment, LoggerFactory.CreateLogger<PhysicalFileSystem>(), HostingEnvironment.MapPathWebRoot(FileSystemPath), HostingEnvironment.ToAbsolute(FileSystemPath));
 
@@ -34,21 +36,23 @@ public abstract class FileSystemTreeServiceTestsBase : UmbracoIntegrationTest
             GetStylesheetsFileSystem(),
             GetScriptsFileSystem(),
             null);
+
+        CreateFiles();
+    }
+
+    protected virtual void CreateFiles()
+    {
         for (int i = 0; i < 10; i++)
         {
-            using var stream = CreateStream(Path.Join("tests"));
-            TestFileSystem.AddFile($"file{i}", stream);
+            using var stream = CreateStream();
+            TestFileSystem.AddFile($"file{i}{FileExtension}", stream);
         }
     }
 
-    private static Stream CreateStream(string contents = null)
+    protected static Stream CreateStream(string contents = null)
     {
-        if (string.IsNullOrEmpty(contents))
-        {
-            contents = "/* test */";
-        }
-
-        var bytes = Encoding.UTF8.GetBytes(contents);
+        const string DefaultFileContent = "/* test */";
+        var bytes = Encoding.UTF8.GetBytes(contents ?? DefaultFileContent);
         return new MemoryStream(bytes);
     }
 
@@ -59,7 +63,7 @@ public abstract class FileSystemTreeServiceTestsBase : UmbracoIntegrationTest
     protected virtual IFileSystem? GetScriptsFileSystem() => null;
 
     [TearDown]
-    public void TearDownFileSystem()
+    public virtual void TearDownFileSystem()
     {
         Purge(TestFileSystem, string.Empty);
         FileSystems = null;
@@ -70,14 +74,28 @@ public abstract class FileSystemTreeServiceTestsBase : UmbracoIntegrationTest
         var files = fs.GetFiles(path, "*");
         foreach (var file in files)
         {
-            fs.DeleteFile(file);
+            try
+            {
+                fs.DeleteFile(file);
+            }
+            catch (IOException)
+            {
+                // Ignore locked files during cleanup
+            }
         }
 
         var dirs = fs.GetDirectories(path);
         foreach (var dir in dirs)
         {
             Purge(fs, dir);
-            fs.DeleteDirectory(dir);
+            try
+            {
+                fs.DeleteDirectory(dir);
+            }
+            catch (IOException)
+            {
+                // Ignore locked directories during cleanup
+            }
         }
     }
 }

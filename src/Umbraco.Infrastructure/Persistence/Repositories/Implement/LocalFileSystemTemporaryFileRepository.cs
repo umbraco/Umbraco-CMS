@@ -27,7 +27,7 @@ internal sealed class LocalFileSystemTemporaryFileRepository : ITemporaryFileRep
 
     private DirectoryInfo GetRootDirectory()
     {
-        var path = Path.Combine(_hostingEnvironment.LocalTempPath, "TemporaryFile");
+        var path = _hostingEnvironment.TemporaryFileUploadPath;
 
         if (!Directory.Exists(path))
         {

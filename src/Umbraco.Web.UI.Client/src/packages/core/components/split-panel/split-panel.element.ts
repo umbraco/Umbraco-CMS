@@ -1,6 +1,6 @@
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import {
 	type PropertyValueMap,
-	LitElement,
 	css,
 	customElement,
 	html,
@@ -23,7 +23,7 @@ import { clamp } from '@umbraco-cms/backoffice/utils';
  * @cssprop --umb-split-panel-divider-color - Color of the divider.
  */
 @customElement('umb-split-panel')
-export class UmbSplitPanelElement extends LitElement {
+export class UmbSplitPanelElement extends UmbLitElement {
 	@query('#main') mainElement!: HTMLElement;
 	@query('#divider-touch-area') dividerTouchAreaElement!: HTMLElement;
 	@query('#divider') dividerElement!: HTMLElement;
@@ -95,6 +95,12 @@ export class UmbSplitPanelElement extends LitElement {
 		const localPos = clamp(pos, 0, width);
 		const percentagePos = (localPos / width) * 100;
 		this.position = percentagePos + '%';
+
+		// Update ARIA value for divider
+		const formatted = percentagePos.toFixed(0);
+		const ariaText = this.localize?.term('general_dividerPosition', [formatted]) ?? `Divider at ${formatted}%`;
+
+		this.dividerTouchAreaElement.setAttribute('aria-valuetext', ariaText);
 	}
 
 	#updateSplit() {
@@ -264,7 +270,7 @@ export class UmbSplitPanelElement extends LitElement {
 			--umb-split-panel-initial-position: 50%;
 			--umb-split-panel-start-min-width: 0;
 			--umb-split-panel-end-min-width: 0;
-			--umb-split-panel-divider-touch-area-width: 20px;
+			--umb-split-panel-divider-touch-area-width: 12px;
 			--umb-split-panel-divider-width: 1px;
 			--umb-split-panel-divider-color: transparent;
 			--umb-split-panel-slot-overflow: hidden;
@@ -291,10 +297,9 @@ export class UmbSplitPanelElement extends LitElement {
 		#divider-touch-area {
 			position: absolute;
 			top: 0;
-			left: 5px;
+			left: -1px;
 			height: 100%;
 			width: var(--umb-split-panel-divider-touch-area-width);
-			transform: translateX(-50%);
 			cursor: col-resize;
 		}
 		/* Do we want a line that shows the divider? */

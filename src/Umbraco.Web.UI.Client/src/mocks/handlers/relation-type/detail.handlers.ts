@@ -1,4 +1,4 @@
-const { rest } = window.MockServiceWorker;
+const { http, HttpResponse } = window.MockServiceWorker;
 import { umbRelationTypeMockDb } from '../../data/relation-type/relationType.db.js';
 import { UMB_SLUG } from './slug.js';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
@@ -8,25 +8,25 @@ import type {
 } from '@umbraco-cms/backoffice/external/backend-api';
 
 export const detailHandlers = [
-	rest.get(umbracoPath(`${UMB_SLUG}`), (req, res, ctx) => {
-		const skipParam = req.url.searchParams.get('skip');
+	http.get(umbracoPath(`${UMB_SLUG}`), ({ request }) => {
+		const skipParam = new URL(request.url).searchParams.get('skip');
 		const skip = skipParam ? Number.parseInt(skipParam) : undefined;
-		const takeParam = req.url.searchParams.get('take');
+		const takeParam = new URL(request.url).searchParams.get('take');
 		const take = takeParam ? Number.parseInt(takeParam) : undefined;
 
 		const response = umbRelationTypeMockDb.get({ skip, take });
 
-		return res(ctx.status(200), ctx.json<GetRelationTypeResponse>(response));
+		return HttpResponse.json<GetRelationTypeResponse>(response);
 	}),
 
-	rest.get(umbracoPath(`${UMB_SLUG}/:id`), (req, res, ctx) => {
-		const id = req.params.id as string;
-		if (!id) return res(ctx.status(400));
+	http.get(umbracoPath(`${UMB_SLUG}/:id`), ({ params }) => {
+		const id = params.id as string;
+		if (!id) return new HttpResponse(null, { status: 400 });
 		if (id === 'forbidden') {
 			// Simulate a forbidden response
-			return res(ctx.status(403));
+			return new HttpResponse(null, { status: 403 });
 		}
 		const response = umbRelationTypeMockDb.detail.read(id);
-		return res(ctx.status(200), ctx.json<GetRelationTypeByIdResponse>(response));
+		return HttpResponse.json<GetRelationTypeByIdResponse>(response);
 	}),
 ];

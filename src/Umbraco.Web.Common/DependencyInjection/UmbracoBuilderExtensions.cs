@@ -1,13 +1,11 @@
 using System.Data.Common;
 using System.Net.Http.Headers;
 using System.Reflection;
-using System.Runtime.CompilerServices;
-using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection.Infrastructure;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
-using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -31,25 +29,23 @@ using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Preview;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Core.Web;
-using Umbraco.Cms.Infrastructure.BackgroundJobs;
-using Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
-using Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs.ServerRegistration;
 using Umbraco.Cms.Infrastructure.DependencyInjection;
-using Umbraco.Cms.Infrastructure.HostedServices;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 using Umbraco.Cms.Web.Common;
 using Umbraco.Cms.Web.Common.ApplicationModels;
 using Umbraco.Cms.Web.Common.AspNetCore;
+using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Cms.Web.Common.Blocks;
+using Umbraco.Cms.Web.Common.Cache;
 using Umbraco.Cms.Web.Common.Configuration;
 using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Cms.Web.Common.FileProviders;
+using Umbraco.Cms.Web.Common.HealthChecks;
 using Umbraco.Cms.Web.Common.Helpers;
 using Umbraco.Cms.Web.Common.Localization;
 using Umbraco.Cms.Web.Common.Middleware;
@@ -72,6 +68,59 @@ namespace Umbraco.Extensions;
 /// </summary>
 public static partial class UmbracoBuilderExtensions
 {
+    /// <summary>
+    /// Adds all core Umbraco services required to run without the backoffice.
+    /// Use this for delivery-only scenarios (Delivery API, Website) without the management backoffice.
+    /// For full Umbraco with backoffice, use <c>AddBackOffice()</c> instead.
+    /// </summary>
+    /// <remarks>
+    /// This method is idempotent - calling it multiple times has no effect after the first call.
+    /// The individual service registration methods are also idempotent, so calling both
+    /// <c>AddBackOffice()</c> and <see cref="AddCore"/> is safe (though not expected).
+    /// </remarks>
+    /// <param name="builder">The Umbraco builder.</param>
+    /// <param name="configureMvc">Optional action to configure the MVC builder.</param>
+    /// <returns>The Umbraco builder.</returns>
+    public static IUmbracoBuilder AddCore(this IUmbracoBuilder builder, Action<IMvcBuilder>? configureMvc = null)
+    {
+        // Idempotency check - safe to call multiple times.
+        if (builder.Services.Any(s => s.ServiceType == typeof(AddCoreMarker)))
+        {
+            return builder;
+        }
+
+        builder.Services.AddSingleton<AddCoreMarker>();
+
+        // Register the feature authorization handler and policy.
+        // This enables the UmbracoFeatureEnabled policy used by Delivery API and other controllers.
+        // Use TryAddEnumerable because IAuthorizationHandler is a multi-registration service -
+        // TryAddSingleton would skip registration if ANY handler exists, not just this specific one.
+        builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IAuthorizationHandler, FeatureAuthorizeHandler>());
+        builder.Services.AddAuthorization(options =>
+        {
+            // Only add the policy if it doesn't already exist.
+            if (options.GetPolicy(AuthorizationPolicies.UmbracoFeatureEnabled) is null)
+            {
+                options.AddPolicy(AuthorizationPolicies.UmbracoFeatureEnabled, policy =>
+                {
+                    policy.Requirements.Add(new FeatureAuthorizeRequirement());
+                });
+            }
+        });
+
+        return builder
+            .AddConfiguration()
+            .AddUmbracoCore()
+            .AddWebComponents()
+            .AddHelpers()
+            .AddUmbracoProfiler()
+            .AddMvcAndRazor(configureMvc)
+            .AddBackgroundJobs()
+            .AddUmbracoHybridCache()
+            .AddDistributedCache()
+            .AddCoreNotifications();
+    }
+
     /// <summary>
     ///     Creates an <see cref="IUmbracoBuilder" /> and registers basic Umbraco services
     /// </summary>
@@ -104,6 +153,7 @@ public static partial class UmbracoBuilderExtensions
         // is just based on AsyncLocal, see https://github.com/dotnet/aspnetcore/blob/main/src/Http/Http/src/HttpContextAccessor.cs
         IHttpContextAccessor httpContextAccessor = new HttpContextAccessor();
         services.AddSingleton(httpContextAccessor);
+        services.AddUnique<IRepositoryCacheVersionAccessor, RepositoryCacheVersionAccessor>();
 
         var requestCache = new HttpContextRequestAppCache(httpContextAccessor);
         var appCaches = AppCaches.Create(requestCache);
@@ -173,35 +223,6 @@ public static partial class UmbracoBuilderExtensions
     }
 
     /// <summary>
-    ///     Add Umbraco recurring background jobs
-    /// </summary>
-    public static IUmbracoBuilder AddRecurringBackgroundJobs(this IUmbracoBuilder builder)
-    {
-        // Add background jobs
-        builder.Services.AddRecurringBackgroundJob<HealthCheckNotifierJob>();
-        builder.Services.AddRecurringBackgroundJob<LogScrubberJob>();
-        builder.Services.AddRecurringBackgroundJob<ContentVersionCleanupJob>();
-        builder.Services.AddRecurringBackgroundJob<ScheduledPublishingJob>();
-        builder.Services.AddRecurringBackgroundJob<TempFileCleanupJob>();
-        builder.Services.AddRecurringBackgroundJob<TemporaryFileCleanupJob>();
-        builder.Services.AddRecurringBackgroundJob<InstructionProcessJob>();
-        builder.Services.AddRecurringBackgroundJob<TouchServerJob>();
-        builder.Services.AddRecurringBackgroundJob<WebhookFiring>();
-        builder.Services.AddRecurringBackgroundJob<WebhookLoggingCleanup>();
-        builder.Services.AddRecurringBackgroundJob<ReportSiteJob>();
-        builder.Services.AddRecurringBackgroundJob<CacheInstructionsPruningJob>();
-        builder.Services.AddRecurringBackgroundJob<LongRunningOperationsCleanupJob>();
-
-        builder.Services.AddSingleton(RecurringBackgroundJobHostedService.CreateHostedServiceFactory);
-        builder.Services.AddHostedService<RecurringBackgroundJobHostedServiceRunner>();
-        builder.Services.AddHostedService<QueuedHostedService>();
-        builder.AddNotificationAsyncHandler<PostRuntimePremigrationsUpgradeNotification, NavigationInitializationNotificationHandler>();
-        builder.AddNotificationAsyncHandler<PostRuntimePremigrationsUpgradeNotification, PublishStatusInitializationNotificationHandler>();
-
-        return builder;
-    }
-
-    /// <summary>
     ///     Adds the Umbraco request profiler
     /// </summary>
     public static IUmbracoBuilder AddUmbracoProfiler(this IUmbracoBuilder builder)
@@ -236,14 +257,13 @@ public static partial class UmbracoBuilderExtensions
 
     public static IUmbracoBuilder AddMvcAndRazor(this IUmbracoBuilder builder, Action<IMvcBuilder>? mvcBuilding = null)
     {
+        // NOTE: AddControllersWithViews() is already idempotent for service registration.
+        // We intentionally do NOT add an idempotency check here because the mvcBuilding callback
+        // may contain important configuration (e.g., Razor runtime compilation) that needs to
+        // be applied even if MVC services were already registered by a previous call.
         // TODO: We need to figure out if we can work around this because calling AddControllersWithViews modifies the global app and order is very important
         // this will directly affect developers who need to call that themselves.
         IMvcBuilder mvcBuilder = builder.Services.AddControllersWithViews();
-
-        if (builder.Config.GetRuntimeMode() != RuntimeMode.Production)
-        {
-            mvcBuilder.AddRazorRuntimeCompilation();
-        }
 
         mvcBuilding?.Invoke(mvcBuilder);
 
@@ -281,6 +301,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddUnique<IPasswordHasher, AspNetCorePasswordHasher>();
 
         builder.Services.AddUnique<ICookieManager, AspNetCoreCookieManager>();
+        builder.Services.AddUnique<ICspNonceService, AspNetCoreCspNonceService>();
         builder.Services.AddTransient<IIpResolver, AspNetCoreIpResolver>();
         builder.Services.AddUnique<IUserAgentProvider, AspNetCoreUserAgentProvider>();
 
@@ -304,6 +325,10 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<PreviewAuthenticationMiddleware>();
         builder.Services.AddSingleton<UmbracoRequestMiddleware>();
         builder.Services.AddSingleton<BootFailedMiddleware>();
+        builder.Services.AddSingleton<ProtectRecycleBinMediaMiddleware>();
+
+        builder.Services.AddHealthChecks()
+            .AddCheck<UmbracoReadinessHealthCheck>("umbraco-ready", tags: [UmbracoReadinessHealthCheck.ReadyTag]);
 
         builder.Services.AddUnique<ITemplateRenderer, TemplateRenderer>();
         builder.Services.AddUnique<IPublicAccessChecker, PublicAccessChecker>();
@@ -367,5 +392,12 @@ public static partial class UmbracoBuilderExtensions
             wrappedHostingSettings,
             wrappedWebRoutingSettings,
             webHostEnvironment);
+    }
+
+    /// <summary>
+    /// Marker class to ensure AddCore is only executed once.
+    /// </summary>
+    private sealed class AddCoreMarker
+    {
     }
 }

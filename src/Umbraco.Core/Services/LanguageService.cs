@@ -1,4 +1,3 @@
-using System.Globalization;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
@@ -10,25 +9,38 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+///     Service for managing languages in Umbraco, including CRUD operations and validation.
+/// </summary>
 internal sealed class LanguageService : RepositoryService, ILanguageService
 {
     private readonly ILanguageRepository _languageRepository;
-    private readonly IAuditRepository _auditRepository;
+    private readonly IAuditService _auditService;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
     private readonly IIsoCodeValidator _isoCodeValidator;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="LanguageService" /> class.
+    /// </summary>
+    /// <param name="provider">The core scope provider.</param>
+    /// <param name="loggerFactory">The logger factory.</param>
+    /// <param name="eventMessagesFactory">The event messages factory.</param>
+    /// <param name="languageRepository">The language repository.</param>
+    /// <param name="auditService">The audit service.</param>
+    /// <param name="userIdKeyResolver">The user ID key resolver.</param>
+    /// <param name="isoCodeValidator">The ISO code validator.</param>
     public LanguageService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
         IEventMessagesFactory eventMessagesFactory,
         ILanguageRepository languageRepository,
-        IAuditRepository auditRepository,
+        IAuditService auditService,
         IUserIdKeyResolver userIdKeyResolver,
         IIsoCodeValidator isoCodeValidator)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _languageRepository = languageRepository;
-        _auditRepository = auditRepository;
+        _auditService = auditService;
         _userIdKeyResolver = userIdKeyResolver;
         _isoCodeValidator = isoCodeValidator;
     }
@@ -69,6 +81,7 @@ internal sealed class LanguageService : RepositoryService, ILanguageService
         }
     }
 
+    /// <inheritdoc />
     public Task<string[]> GetIsoCodesByIdsAsync(ICollection<int> ids)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete:true);
@@ -76,6 +89,7 @@ internal sealed class LanguageService : RepositoryService, ILanguageService
         return Task.FromResult(_languageRepository.GetIsoCodesByIds(ids, throwOnNotFound: true));
     }
 
+    /// <inheritdoc />
     public async Task<IEnumerable<ILanguage>> GetMultipleAsync(IEnumerable<string> isoCodes) => (await GetAllAsync()).Where(x => isoCodes.Contains(x.IsoCode));
 
     /// <inheritdoc />
@@ -96,8 +110,7 @@ internal sealed class LanguageService : RepositoryService, ILanguageService
 
         if (language.UpdateDate == default)
         {
-            // TODO (V17): To align with updates of system dates, this needs to change to DateTime.UtcNow.
-            language.UpdateDate = DateTime.Now;
+            language.UpdateDate = DateTime.UtcNow;
         }
 
         return await SaveAsync(
@@ -181,8 +194,7 @@ internal sealed class LanguageService : RepositoryService, ILanguageService
             scope.Notifications.Publish(
                 new LanguageDeletedNotification(language, eventMessages).WithStateFrom(deletingLanguageNotification));
 
-            var currentUserId = await _userIdKeyResolver.GetAsync(userKey);
-            Audit(AuditType.Delete, "Delete Language", currentUserId, language.Id, UmbracoObjectTypes.Language.GetName());
+            await AuditAsync(AuditType.Delete, "Delete Language", userKey, language.Id, UmbracoObjectTypes.Language.GetName());
             scope.Complete();
             return Attempt.SucceedWithStatus<ILanguage?, LanguageOperationStatus>(LanguageOperationStatus.Success, language);
         }
@@ -234,16 +246,20 @@ internal sealed class LanguageService : RepositoryService, ILanguageService
             scope.Notifications.Publish(
                 new LanguageSavedNotification(language, eventMessages).WithStateFrom(savingNotification));
 
-            var currentUserId = await _userIdKeyResolver.GetAsync(userKey);
-            Audit(auditType, auditMessage, currentUserId, language.Id, UmbracoObjectTypes.Language.GetName());
+            await AuditAsync(auditType, auditMessage, userKey, language.Id, UmbracoObjectTypes.Language.GetName());
 
             scope.Complete();
             return Attempt.SucceedWithStatus(LanguageOperationStatus.Success, language);
         }
     }
 
-    private void Audit(AuditType type, string message, int userId, int objectId, string? entityType) =>
-        _auditRepository.Save(new AuditItem(objectId, type, userId, entityType, message));
+    private async Task AuditAsync(AuditType type, string message, Guid userKey, int objectId, string? entityType) =>
+        await _auditService.AddAsync(
+            type,
+            userKey,
+            objectId,
+            entityType,
+            message);
 
     private bool HasInvalidFallbackLanguage(ILanguage language)
     {

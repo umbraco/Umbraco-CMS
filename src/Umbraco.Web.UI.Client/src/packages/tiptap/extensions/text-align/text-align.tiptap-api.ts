@@ -1,5 +1,5 @@
 import { UmbTiptapExtensionApiBase } from '../tiptap-extension-api-base.js';
-import { TextAlign } from '@umbraco-cms/backoffice/external/tiptap';
+import { TextAlign } from '../../externals.js';
 
 export default class UmbTiptapTextAlignExtensionApi extends UmbTiptapExtensionApiBase {
 	getTiptapExtensions = () => [

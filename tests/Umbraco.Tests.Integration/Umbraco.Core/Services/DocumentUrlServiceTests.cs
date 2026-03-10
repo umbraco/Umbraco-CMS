@@ -1,11 +1,16 @@
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Notifications;
+using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Tests.Common.Builders;
+using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping;
@@ -19,9 +24,17 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
     private const string SubSubPage2Key = "48AE405E-5142-4EBE-929F-55EB616F51F2";
     private const string SubSubPage3Key = "AACF2979-3F53-4184-B071-BA34D3338497";
 
-    protected IDocumentUrlService DocumentUrlService => GetRequiredService<IDocumentUrlService>();
+    private IDocumentUrlService DocumentUrlService => GetRequiredService<IDocumentUrlService>();
 
-    protected ILanguageService LanguageService => GetRequiredService<ILanguageService>();
+    private ILanguageService LanguageService => GetRequiredService<ILanguageService>();
+
+    private IDomainService DomainService => GetRequiredService<IDomainService>();
+
+    private IDocumentUrlRepository DocumentUrlRepository => GetRequiredService<IDocumentUrlRepository>();
+
+    private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
+
+    private ICoreScopeProvider CoreScopeProvider => GetRequiredService<ICoreScopeProvider>();
 
     protected override void CustomTestSetup(IUmbracoBuilder builder)
     {
@@ -89,6 +102,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
         DocumentUrlService.InitAsync(false, CancellationToken.None).GetAwaiter().GetResult();
         base.Setup();
     }
+
     //
     // [Test]
     // [LongRunning]
@@ -148,6 +162,64 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
         Assert.IsNull(actual);
     }
 
+    [TestCase("/", ExpectedResult = TextpageKey)]
+    [TestCase("/text-page-1", ExpectedResult = SubPageKey)]
+    public string? GetDocumentKeyByUri_Without_Domains_Returns_Expected_DocumentKey(string path)
+    {
+        ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
+
+        var uri = new Uri("http://example.com" + path);
+        return DocumentUrlService.GetDocumentKeyByUri(uri, false)?.ToString()?.ToUpper();
+    }
+
+    private const string VariantRootPageKey = "1D3283C7-64FD-4F4D-A741-442BDA487B71";
+    private const string VariantChildPageKey = "1D3283C7-64FD-4F4D-A741-442BDA487B72";
+
+    [TestCase("/", "/en", "http://example.com/en/", ExpectedResult = VariantRootPageKey)]
+    [TestCase("/child-page", "/en", "http://example.com/en/", ExpectedResult = VariantChildPageKey)]
+    [TestCase("/", "example.com", "http://example.com/", ExpectedResult = VariantRootPageKey)]
+    [TestCase("/child-page", "example.com", "http://example.com/", ExpectedResult = VariantChildPageKey)]
+    public async Task<string?> GetDocumentKeyByUri_With_Domains_Returns_Expected_DocumentKey(string path, string domain, string rootUrl)
+    {
+        var template = TemplateBuilder.CreateTextPageTemplate("variantPageTemplate", "Variant Page Template");
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+
+        var contentType = new ContentTypeBuilder()
+            .WithAlias("variantPage")
+            .WithName("Variant Page")
+            .WithContentVariation(ContentVariation.Culture)
+            .WithAllowAsRoot(true)
+            .WithDefaultTemplateId(template.Id)
+            .Build();
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+
+        var rootPage = new ContentBuilder()
+            .WithKey(Guid.Parse(VariantRootPageKey))
+            .WithContentType(contentType)
+            .WithCultureName("en-US", $"Root Page")
+            .Build();
+        var childPage = new ContentBuilder()
+            .WithKey(Guid.Parse(VariantChildPageKey))
+            .WithContentType(contentType)
+            .WithCultureName("en-US", $"Child Page")
+            .WithParent(rootPage)
+            .Build();
+        ContentService.Save(rootPage, -1);
+        ContentService.Save(childPage, -1);
+        ContentService.PublishBranch(rootPage, PublishBranchFilter.IncludeUnpublished, ["*"]);
+
+        var updateDomainResult = await DomainService.UpdateDomainsAsync(
+            rootPage.Key,
+            new DomainsUpdateModel
+            {
+                Domains = [new DomainModel { DomainName = domain, IsoCode = "en-US" }],
+            });
+        Assert.IsTrue(updateDomainResult.Success);
+
+        var uri = new Uri(rootUrl + path);
+        return DocumentUrlService.GetDocumentKeyByUri(uri, false)?.ToString()?.ToUpper();
+    }
+
     [TestCase("/", "en-US", true, ExpectedResult = TextpageKey)]
     [TestCase("/text-page-1", "en-US", true, ExpectedResult = SubPageKey)]
     [TestCase("/text-page-1-custom", "en-US", true, ExpectedResult = SubPageKey)] // Uses the segment registered by the custom IIUrlSegmentProvider that allows for more than one segment per document.
@@ -160,7 +232,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
     [TestCase("/text-page-2", "en-US", false, ExpectedResult = null)]
     [TestCase("/text-page-2-custom", "en-US", false, ExpectedResult = SubPage2Key)] // Uses the segment registered by the custom IIUrlSegmentProvider that does not allow for more than one segment per document.
     [TestCase("/text-page-3", "en-US", false, ExpectedResult = SubPage3Key)]
-    public string? GetDocumentKeyByRoute_Returns_Expected_Route(string route, string isoCode, bool loadDraft)
+    public string? GetDocumentKeyByRoute_Returns_Expected_DocumentKey(string route, string isoCode, bool loadDraft)
     {
         if (loadDraft is false)
         {
@@ -295,6 +367,175 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
     }
 
 
+    [Test]
+    public async Task CreateOrUpdateUrlSegmentsWithDescendantsAsync_Does_Not_Throw_When_Content_Does_Not_Exist()
+    {
+        // Arrange - use a random key that doesn't exist
+        var nonExistentKey = Guid.NewGuid();
+
+        // Act & Assert - should not throw, just return gracefully
+        Assert.DoesNotThrowAsync(async () =>
+            await DocumentUrlService.CreateOrUpdateUrlSegmentsWithDescendantsAsync(nonExistentKey));
+    }
+
+    [Test]
+    public async Task CreateOrUpdateUrlSegmentsAsync_Does_Not_Throw_When_Content_Does_Not_Exist()
+    {
+        // Arrange - use a random key that doesn't exist
+        var nonExistentKey = Guid.NewGuid();
+
+        // Act & Assert - should not throw, just return gracefully
+        Assert.DoesNotThrowAsync(async () =>
+            await DocumentUrlService.CreateOrUpdateUrlSegmentsAsync(nonExistentKey));
+    }
+
+    [Test]
+    public async Task GetUrlSegment_CultureVariantContent_WithInvariantUrlName_UsesUrlName()
+    {
+        // Arrange - create a culture-variant content type with an invariant umbracoUrlName property
+        // (simulates umbracoUrlName coming from a composition that does not vary by culture)
+        var template = TemplateBuilder.CreateTextPageTemplate("variantWithUrlNameTemplate", "Variant With UrlName Template");
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+
+        var contentType = new ContentTypeBuilder()
+            .WithAlias("variantWithUrlName")
+            .WithName("Variant With UrlName")
+            .WithContentVariation(ContentVariation.Culture)
+            .WithAllowAsRoot(true)
+            .WithDefaultTemplateId(template.Id)
+            .AddPropertyGroup()
+                .WithAlias("content")
+                .WithName("Content")
+                .WithSortOrder(1)
+                .WithSupportsPublishing(true)
+                .AddPropertyType()
+                    .WithAlias(Constants.Conventions.Content.UrlName)
+                    .WithName("Url Name")
+                    .WithVariations(ContentVariation.Nothing)
+                    .WithSortOrder(1)
+                    .Done()
+                .Done()
+            .Build();
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+
+        var content = new ContentBuilder()
+            .WithContentType(contentType)
+            .WithCultureName("en-US", "My English Page")
+            .Build();
+
+        content.SetValue(Constants.Conventions.Content.UrlName, "custom-url");
+        ContentService.Save(content);
+        ContentService.Publish(content, ["en-US"]);
+
+        // Act
+        var urlSegment = DocumentUrlService.GetUrlSegment(content.Key, "en-US", false);
+
+        // Assert - should use the invariant umbracoUrlName, not the culture name
+        Assert.That(urlSegment, Is.EqualTo("custom-url"));
+    }
+
+    [Test]
+    public async Task GetUrlSegment_CultureVariantContent_WithCultureVariantUrlName_ResolvesPerCulture()
+    {
+        // Arrange - create a second language
+        var danishLanguage = new LanguageBuilder()
+            .WithCultureInfo("da-DK")
+            .Build();
+        await LanguageService.CreateAsync(danishLanguage, Constants.Security.SuperUserKey);
+
+        // Create a culture-variant content type with a culture-variant umbracoUrlName property
+        var template = TemplateBuilder.CreateTextPageTemplate("variantPerCultureTemplate", "Variant Per Culture Template");
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+
+        var contentType = new ContentTypeBuilder()
+            .WithAlias("variantPerCulture")
+            .WithName("Variant Per Culture")
+            .WithContentVariation(ContentVariation.Culture)
+            .WithAllowAsRoot(true)
+            .WithDefaultTemplateId(template.Id)
+            .AddPropertyGroup()
+                .WithAlias("content")
+                .WithName("Content")
+                .WithSortOrder(1)
+                .WithSupportsPublishing(true)
+                .AddPropertyType()
+                    .WithAlias(Constants.Conventions.Content.UrlName)
+                    .WithName("Url Name")
+                    .WithVariations(ContentVariation.Culture)
+                    .WithSortOrder(1)
+                    .Done()
+                .Done()
+            .Build();
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+
+        var content = new ContentBuilder()
+            .WithContentType(contentType)
+            .WithCultureName("en-US", "My English Page")
+            .WithCultureName("da-DK", "Min Danske Side")
+            .Build();
+
+        content.SetValue(Constants.Conventions.Content.UrlName, "english-custom-url", culture: "en-US");
+        content.SetValue(Constants.Conventions.Content.UrlName, "dansk-custom-url", culture: "da-DK");
+        ContentService.Save(content);
+        ContentService.Publish(content, ["en-US", "da-DK"]);
+
+        // Act
+        var englishSegment = DocumentUrlService.GetUrlSegment(content.Key, "en-US", false);
+        var danishSegment = DocumentUrlService.GetUrlSegment(content.Key, "da-DK", false);
+
+        // Assert - each culture should resolve its own umbracoUrlName value
+        Assert.Multiple(() =>
+        {
+            Assert.That(englishSegment, Is.EqualTo("english-custom-url"));
+            Assert.That(danishSegment, Is.EqualTo("dansk-custom-url"));
+        });
+    }
+
+    [Test]
+    public async Task GetUrlSegment_CultureVariantContent_WithEmptyUrlName_FallsBackToContentName()
+    {
+        // Arrange - create a culture-variant content type with an invariant umbracoUrlName property
+        var template = TemplateBuilder.CreateTextPageTemplate("emptyUrlNameTemplate", "Empty UrlName Template");
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+
+        var contentType = new ContentTypeBuilder()
+            .WithAlias("emptyUrlName")
+            .WithName("Empty UrlName")
+            .WithContentVariation(ContentVariation.Culture)
+            .WithAllowAsRoot(true)
+            .WithDefaultTemplateId(template.Id)
+            .AddPropertyGroup()
+                .WithAlias("content")
+                .WithName("Content")
+                .WithSortOrder(1)
+                .WithSupportsPublishing(true)
+                .AddPropertyType()
+                    .WithAlias(Constants.Conventions.Content.UrlName)
+                    .WithName("Url Name")
+                    .WithVariations(ContentVariation.Nothing)
+                    .WithSortOrder(1)
+                    .Done()
+                .Done()
+            .Build();
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+
+        var content = new ContentBuilder()
+            .WithContentType(contentType)
+            .WithCultureName("en-US", "My Fallback Page Name")
+            .Build();
+
+        // Set umbracoUrlName to empty string
+        content.SetValue(Constants.Conventions.Content.UrlName, string.Empty);
+        ContentService.Save(content);
+        ContentService.Publish(content, ["en-US"]);
+
+        // Act
+        var urlSegment = DocumentUrlService.GetUrlSegment(content.Key, "en-US", false);
+
+        // Assert - should fall back to the culture name since umbracoUrlName is empty
+        Assert.That(urlSegment, Is.EqualTo("my-fallback-page-name"));
+    }
+
     //TODO test cases:
     // - Find the root, when a domain is set
     // - Find a nested child, when a domain is set
@@ -307,4 +548,181 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
     // - Find a nested child of item in the root bottom when no domain is set and hideTopLevelNodeFromPath is false
 
     // - All of the above when having Constants.Conventions.Content.UrlName set to a value
+
+    #region Invariant vs Variant Content Tests
+
+    [Test]
+    public async Task GetUrlSegment_For_Invariant_Content_Works_With_Any_Culture()
+    {
+        // Arrange - add second language
+        var frenchLanguage = new LanguageBuilder().WithCultureInfo("fr-FR").Build();
+        await LanguageService.CreateAsync(frenchLanguage, Constants.Security.SuperUserKey);
+
+        // Publish the content
+        ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
+
+        // Act - query with French culture for invariant content (stored with NULL languageId)
+        var urlSegment = DocumentUrlService.GetUrlSegment(Subpage.Key, "fr-FR", false);
+
+        // Assert - should find invariant content even though queried with non-default culture
+        Assert.That(urlSegment, Is.EqualTo("text-page-1-custom"), "Invariant content URL segment should be accessible with any culture");
+    }
+
+    [Test]
+    public async Task GetDocumentKeyByRoute_For_Invariant_Content_Works_With_Any_Culture()
+    {
+        // Arrange - add second language
+        var frenchLanguage = new LanguageBuilder().WithCultureInfo("fr-FR").Build();
+        await LanguageService.CreateAsync(frenchLanguage, Constants.Security.SuperUserKey);
+
+        // Publish the content
+        ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
+
+        // Act - query with French culture for invariant content (stored with NULL languageId)
+        var documentKey = DocumentUrlService.GetDocumentKeyByRoute("/text-page-1-custom", "fr-FR", null, false);
+
+        // Assert - should find invariant content even though queried with non-default culture
+        Assert.That(documentKey, Is.EqualTo(Subpage.Key), "Invariant content should be found by route with any culture");
+    }
+
+    [Test]
+    public async Task Invariant_Content_Stores_Null_LanguageId_In_Database()
+    {
+        // Arrange - publish content to create URL records
+        ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
+
+        // Act - check stored URL segments in database
+        List<PublishedDocumentUrlSegment> storedSegments;
+        using (CoreScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            storedSegments = DocumentUrlRepository.GetAll()
+                .Where(s => s.DocumentKey == Subpage.Key)
+                .ToList();
+        }
+
+        // Assert - invariant content should have NULL languageId (not a language-specific ID)
+        Assert.That(storedSegments, Has.Count.GreaterThan(0), "Should have stored URL segments");
+
+        foreach (var segment in storedSegments)
+        {
+            Assert.That(segment.NullableLanguageId, Is.Null, "Invariant content should have NULL LanguageId in database");
+        }
+    }
+
+    [Test]
+    public async Task Changing_ContentType_From_Invariant_To_Variant_Updates_Url_LanguageIds()
+    {
+        // Arrange - add second language
+        var frenchLanguage = new LanguageBuilder().WithCultureInfo("fr-FR").Build();
+        await LanguageService.CreateAsync(frenchLanguage, Constants.Security.SuperUserKey);
+
+        var defaultLanguage = await LanguageService.GetDefaultLanguageAsync();
+
+        // Publish invariant content
+        ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
+
+        // Verify URLs are stored with NULL languageId (invariant)
+        List<PublishedDocumentUrlSegment> segmentsBefore;
+        using (CoreScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            segmentsBefore = DocumentUrlRepository.GetAll()
+                .Where(s => s.DocumentKey == Subpage.Key && s.IsDraft == false)
+                .ToList();
+        }
+
+        Assert.That(segmentsBefore, Has.Count.GreaterThan(0), "Should have URL segments before change");
+        Assert.That(segmentsBefore.All(s => s.NullableLanguageId == null), Is.True, "All segments should have NULL languageId before change");
+
+        // Act - change content type from invariant to variant
+        ContentType.Variations = ContentVariation.Culture;
+        await ContentTypeService.UpdateAsync(ContentType, Constants.Security.SuperUserKey);
+
+        // Reload content from database to pick up the new content type variation
+        var subpage = ContentService.GetById(Subpage.Key)!;
+
+        // Update content to have culture-specific names (required for variant content)
+        subpage.SetCultureName("Text Page 1", defaultLanguage!.IsoCode);
+        ContentService.Save(subpage, -1);
+        ContentService.Publish(subpage, [defaultLanguage.IsoCode]);
+
+        // Assert - URLs should now be stored with specific languageId
+        List<PublishedDocumentUrlSegment> segmentsAfter;
+        using (CoreScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            segmentsAfter = DocumentUrlRepository.GetAll()
+                .Where(s => s.DocumentKey == Subpage.Key && s.IsDraft == false)
+                .ToList();
+        }
+
+        Assert.That(segmentsAfter, Has.Count.GreaterThan(0), "Should have URL segments after change");
+        Assert.That(segmentsAfter.All(s => s.NullableLanguageId != null), Is.True, "All segments should have specific languageId after change to variant");
+        Assert.That(segmentsAfter.Any(s => s.NullableLanguageId == defaultLanguage.Id), Is.True, "Should have segment for default language");
+    }
+
+    [Test]
+    public async Task Changing_ContentType_From_Variant_To_Invariant_Updates_Url_LanguageIds()
+    {
+        // Arrange - add second language
+        var frenchLanguage = new LanguageBuilder().WithCultureInfo("fr-FR").Build();
+        await LanguageService.CreateAsync(frenchLanguage, Constants.Security.SuperUserKey);
+
+        var defaultLanguage = await LanguageService.GetDefaultLanguageAsync();
+
+        // Publish invariant content first
+        ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
+
+        // Verify invariant URLs are stored with NULL languageId
+        List<PublishedDocumentUrlSegment> invariantSegments;
+        using (CoreScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            invariantSegments = DocumentUrlRepository.GetAll()
+                .Where(s => s.DocumentKey == Subpage.Key && s.IsDraft == false)
+                .ToList();
+        }
+
+        Assert.That(invariantSegments, Has.Count.GreaterThan(0), "Should have invariant URL segments");
+        Assert.That(invariantSegments.All(s => s.NullableLanguageId == null), Is.True, "Invariant segments should have NULL languageId");
+
+        // Change content type to variant
+        ContentType.Variations = ContentVariation.Culture;
+        await ContentTypeService.UpdateAsync(ContentType, Constants.Security.SuperUserKey);
+
+        // Reload content from database to pick up the new content type variation
+        var subpage = ContentService.GetById(Subpage.Key)!;
+
+        // Update content with culture-specific name and republish as variant
+        subpage.SetCultureName("Text Page 1", defaultLanguage!.IsoCode);
+        ContentService.Save(subpage, -1);
+        ContentService.Publish(subpage, [defaultLanguage.IsoCode]);
+
+        // Verify URLs are stored with specific languageId (variant)
+        List<PublishedDocumentUrlSegment> variantSegments;
+        using (CoreScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            variantSegments = DocumentUrlRepository.GetAll()
+                .Where(s => s.DocumentKey == Subpage.Key && s.IsDraft == false)
+                .ToList();
+        }
+
+        Assert.That(variantSegments, Has.Count.GreaterThan(0), "Should have variant URL segments after change to variant");
+        Assert.That(variantSegments.All(s => s.NullableLanguageId != null), Is.True, "All segments should have specific languageId after change to variant");
+
+        // Act - change content type from variant to invariant
+        ContentType.Variations = ContentVariation.Nothing;
+        await ContentTypeService.UpdateAsync(ContentType, Constants.Security.SuperUserKey);
+
+        // Assert - URLs should now be stored with NULL languageId
+        List<PublishedDocumentUrlSegment> segmentsAfter;
+        using (CoreScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            segmentsAfter = DocumentUrlRepository.GetAll()
+                .Where(s => s.DocumentKey == Subpage.Key && s.IsDraft == false)
+                .ToList();
+        }
+
+        Assert.That(segmentsAfter, Has.Count.GreaterThan(0), "Should have URL segments after change to invariant");
+        Assert.That(segmentsAfter.All(s => s.NullableLanguageId == null), Is.True, "All segments should have NULL languageId after change to invariant");
+    }
+
+    #endregion
 }

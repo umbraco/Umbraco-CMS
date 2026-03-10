@@ -1,5 +1,5 @@
 import type { UmbMediaCardItemModel } from '../../types.js';
-import { UmbMediaPickerInputContext } from './input-media.context.js';
+import { UmbMediaPickerFolderFilter, UmbMediaPickerInputContext } from './input-media.context.js';
 import {
 	css,
 	customElement,
@@ -111,10 +111,13 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 	}
 
 	@property({ type: Array })
-	allowedContentTypeIds?: Array<string> | undefined;
+	allowedContentTypeIds?: Array<string>;
 
 	@property({ type: Boolean, attribute: 'include-trashed' })
 	includeTrashed = false;
+
+	@property({ type: String, attribute: 'folder-filter' })
+	folderFilter: UmbMediaPickerFolderFilter = UmbMediaPickerFolderFilter.FILES_ONLY;
 
 	@property({ type: Object, attribute: false })
 	startNode?: UmbTreeStartNode;
@@ -206,12 +209,12 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 		this.addValidator(
 			'rangeUnderflow',
 			() => this.minMessage,
-			() => !!this.min && this.selection.length < this.min,
+			() => !this.readonly && !!this.min && this.selection.length < this.min,
 		);
 		this.addValidator(
 			'rangeOverflow',
 			() => this.maxMessage,
-			() => !!this.max && this.selection.length > this.max,
+			() => !this.readonly && !!this.max && this.selection.length > this.max,
 		);
 	}
 
@@ -227,6 +230,7 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 					entityType: UMB_MEDIA_TYPE_ENTITY_TYPE,
 				})),
 				includeTrashed: this.includeTrashed,
+				folderFilter: this.folderFilter,
 			},
 		);
 	}
@@ -275,6 +279,7 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 		const href = this.readonly ? undefined : `${this._editMediaPath}edit/${item.unique}`;
 		return html`
 			<uui-card-media
+				title=${ifDefined(item.name === null ? undefined : item.name)}
 				name=${ifDefined(item.name === null ? undefined : item.name)}
 				data-mark="${item.entityType}:${item.unique}"
 				href="${ifDefined(href)}"

@@ -10,4 +10,10 @@ public interface IJsonCacheRefresher : ICacheRefresher
     /// </summary>
     /// <param name="json"></param>
     void Refresh(string json);
+
+    /// <summary>
+    /// Refreshes internal (isolated) caches by a json payload.
+    /// </summary>
+    /// <param name="json">The json payload.</param>
+    void RefreshInternal(string json) => Refresh(json);
 }

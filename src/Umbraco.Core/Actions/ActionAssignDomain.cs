@@ -21,12 +21,6 @@ public class ActionAssignDomain : IAction
     public string Alias => ActionAlias;
 
     /// <inheritdoc />
-    public string Category => Constants.Conventions.PermissionCategories.AdministrationCategory;
-
-    /// <inheritdoc />
-    public string Icon => "icon-home";
-
-    /// <inheritdoc />
     public bool ShowInNotifier => false;
 
     /// <inheritdoc />

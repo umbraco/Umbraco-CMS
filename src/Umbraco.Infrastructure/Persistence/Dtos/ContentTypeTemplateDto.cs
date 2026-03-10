@@ -4,19 +4,23 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
-[TableName(Constants.DatabaseSchema.Tables.DocumentType)]
-[PrimaryKey("contentTypeNodeId", AutoIncrement = false)]
+[TableName(TableName)]
+[PrimaryKey([ContentTypeNodeIdColumnName, TemplateNodeIdColumnName], AutoIncrement = false)]
 [ExplicitColumns]
 internal sealed class ContentTypeTemplateDto
 {
-    [Column("contentTypeNodeId")]
-    [PrimaryKeyColumn(AutoIncrement = false, Name = "PK_cmsDocumentType", OnColumns = "contentTypeNodeId, templateNodeId")]
-    [ForeignKey(typeof(ContentTypeDto), Column = "nodeId")]
+    public const string TableName = Constants.DatabaseSchema.Tables.DocumentType;
+    public const string TemplateNodeIdColumnName = "templateNodeId";
+    public const string ContentTypeNodeIdColumnName = "contentTypeNodeId";
+
+    [Column(ContentTypeNodeIdColumnName)]
+    [PrimaryKeyColumn(AutoIncrement = false, Name = "PK_cmsDocumentType", OnColumns = $"{ContentTypeNodeIdColumnName}, {TemplateNodeIdColumnName}")]
+    [ForeignKey(typeof(ContentTypeDto), Column = ContentTypeDto.NodeIdColumnName)]
     [ForeignKey(typeof(NodeDto))]
     public int ContentTypeNodeId { get; set; }
 
-    [Column("templateNodeId")]
-    [ForeignKey(typeof(TemplateDto), Column = "nodeId")]
+    [Column(TemplateNodeIdColumnName)]
+    [ForeignKey(typeof(TemplateDto), Column = TemplateDto.NodeIdColumnName)]
     public int TemplateNodeId { get; set; }
 
     [Column("IsDefault")]

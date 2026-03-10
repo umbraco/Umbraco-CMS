@@ -28,7 +28,7 @@ public class ContentCultureInfosBuilder : ChildBuilderBase<ContentCultureInfosCo
     {
         var name = Name ?? Guid.NewGuid().ToString();
         var cultureIso = _cultureIso ?? "en-us";
-        var date = Date ?? DateTime.Now;
+        var date = Date ?? DateTime.UtcNow;
 
         return new ContentCultureInfos(cultureIso) { Name = name, Date = date };
     }

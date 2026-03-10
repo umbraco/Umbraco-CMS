@@ -2,10 +2,12 @@
 // See LICENSE for more details.
 
 using System.Diagnostics;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Dictionary;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
@@ -253,7 +255,9 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
             if (i % 2 == 0)
             {
                 var contentSchedule =
-                    ContentScheduleCollection.CreateWithEntry(alternatingCulture, now.AddSeconds(5),
+                    ContentScheduleCollection.CreateWithEntry(
+                        alternatingCulture,
+                        now.AddSeconds(5),
                         null); // release in 5 seconds
                 var r = ContentService.Save(c, contentSchedule: contentSchedule);
                 Assert.IsTrue(r.Success, r.Result.ToString());
@@ -266,7 +270,9 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
                 var r = ContentService.Publish(c, c.AvailableCultures.ToArray());
 
                 var contentSchedule =
-                    ContentScheduleCollection.CreateWithEntry(alternatingCulture, null,
+                    ContentScheduleCollection.CreateWithEntry(
+                        alternatingCulture,
+                        null,
                         now.AddSeconds(5)); // expire in 5 seconds
                 ContentService.PersistContentSchedule(c, contentSchedule);
 
@@ -679,12 +685,35 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
 
         // Act
         Thread.Sleep(new TimeSpan(0, 0, 0, 2));
-        var contents = ContentService.GetContentForExpiration(DateTime.Now).ToList();
+        var contents = ContentService.GetContentForExpiration(DateTime.UtcNow).ToList();
 
         // Assert
         Assert.That(contents, Is.Not.Null);
         Assert.That(contents.Any(), Is.True);
         Assert.That(contents.Count(), Is.EqualTo(1));
+    }
+
+    [Test]
+    [Obsolete("As this is testing an obsolete method, it will be removed when that the method is deleted. Scheduled for removal in Umbraco 19.")]
+    public void Can_Get_Content_Schedules_By_Ids()
+    {
+        // Arrange
+        var root = ContentService.GetById(Textpage.Id);
+        ContentService.Publish(root!, root!.AvailableCultures.ToArray());
+        var content = ContentService.GetById(Subpage.Id);
+        var contentSchedule = ContentScheduleCollection.CreateWithEntry(DateTime.UtcNow.AddDays(1), null);
+        ContentService.PersistContentSchedule(content!, contentSchedule);
+        ContentService.Publish(content, content.AvailableCultures.ToArray());
+
+        // Act
+#pragma warning disable CS0618 // Type or member is obsolete
+        var keys = ContentService.GetContentSchedulesByIds([Textpage.Key, Subpage.Key, Subpage2.Key]).ToList();
+#pragma warning restore CS0618 // Type or member is obsolete
+
+        // Assert
+        Assert.AreEqual(1, keys.Count);
+        Assert.AreEqual(keys[0].Key, Subpage.Id);
+        Assert.AreEqual(keys[0].Value.First().Id, contentSchedule.FullSchedule.First().Id);
     }
 
     [Test]
@@ -699,12 +728,12 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         ContentService.Publish(content, content.AvailableCultures.ToArray());
 
         // Act
-        var keys = ContentService.GetContentSchedulesByIds([Textpage.Key, Subpage.Key, Subpage2.Key]).ToList();
+        var results = ContentService.GetContentSchedulesByKeys([Textpage.Key, Subpage.Key, Subpage2.Key]).ToList();
 
         // Assert
-        Assert.AreEqual(1, keys.Count);
-        Assert.AreEqual(keys[0].Key, Subpage.Id);
-        Assert.AreEqual(keys[0].Value.First().Id, contentSchedule.FullSchedule.First().Id);
+        Assert.AreEqual(1, results.Count);
+        Assert.AreEqual(Subpage.Key, results[0].Key);
+        Assert.AreEqual(contentSchedule.FullSchedule.First().Id, results[0].Value.First().Id);
     }
 
     [Test]
@@ -712,10 +741,10 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
     {
         // Arrange
         // Act
-        var contents = ContentService.GetContentForRelease(DateTime.Now).ToList();
+        var contents = ContentService.GetContentForRelease(DateTime.UtcNow).ToList();
 
         // Assert
-        Assert.That(DateTime.Now.AddMinutes(-5) <= DateTime.Now);
+        Assert.That(DateTime.UtcNow.AddMinutes(-5) <= DateTime.UtcNow);
         Assert.That(contents, Is.Not.Null);
         Assert.That(contents.Any(), Is.True);
         Assert.That(contents.Count(), Is.EqualTo(1));
@@ -785,7 +814,9 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
     [LongRunning]
     public void Can_Publish_Culture_After_Last_Culture_Unpublished()
     {
-        var content = CreateEnglishAndFrenchDocument(out var langUk, out var langFr,
+        var content = CreateEnglishAndFrenchDocument(
+            out var langUk,
+            out var langFr,
             out var contentType);
 
         ContentService.Save(content);
@@ -825,7 +856,9 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
     [Test]
     public void Unpublish_All_Cultures_Has_Unpublished_State()
     {
-        var content = CreateEnglishAndFrenchDocument(out var langUk, out var langFr,
+        var content = CreateEnglishAndFrenchDocument(
+            out var langUk,
+            out var langFr,
             out var contentType);
 
         var saved = ContentService.Save(content);
@@ -914,7 +947,9 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
     [Test]
     public void Unpublishing_Already_Unpublished_Culture()
     {
-        var content = CreateEnglishAndFrenchDocument(out var langUk, out var langFr,
+        var content = CreateEnglishAndFrenchDocument(
+            out var langUk,
+            out var langFr,
             out var contentType);
 
         var saved = ContentService.Save(content);
@@ -952,7 +987,9 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
     [Test]
     public void Publishing_No_Cultures_Still_Saves()
     {
-        var content = CreateEnglishAndFrenchDocument(out var langUk, out var langFr,
+        var content = CreateEnglishAndFrenchDocument(
+            out var langUk,
+            out var langFr,
             out var contentType);
 
         var saved = ContentService.Save(content);
@@ -1037,7 +1074,7 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
-    public void Can_Publish_Content_Variation_And_Detect_Changed_Cultures()
+    public async Task Can_Publish_Content_Variation_And_Detect_Changed_Cultures()
     {
         CreateEnglishAndFrenchDocumentType(out var langUk, out var langFr, out var contentType);
 
@@ -1047,7 +1084,7 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         var published = ContentService.Publish(content, new[] { langFr.IsoCode });
 
         // audit log will only show that french was published
-        var lastLog = AuditService.GetLogs(content.Id).Last();
+        var lastLog = (await AuditService.GetItemsByEntityAsync(content.Id, 0, 1)).Items.First();
         Assert.AreEqual("Published languages: fr-FR", lastLog.Comment);
 
         // re-get
@@ -1057,7 +1094,7 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         published = ContentService.Publish(content, new[] { langUk.IsoCode });
 
         // audit log will only show that english was published
-        lastLog = AuditService.GetLogs(content.Id).Last();
+        lastLog = (await AuditService.GetItemsByEntityAsync(content.Id, 0, 1)).Items.First();
         Assert.AreEqual("Published languages: en-GB", lastLog.Comment);
     }
 
@@ -1094,7 +1131,7 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         var unpublished = ContentService.Unpublish(content, langFr.IsoCode);
 
         // audit log will only show that french was unpublished
-        var lastLog = AuditService.GetLogs(content.Id).Last();
+        var lastLog = (await AuditService.GetItemsByEntityAsync(content.Id, 0, 1)).Items.First();
         Assert.AreEqual("Unpublished languages: fr-FR", lastLog.Comment);
 
         // re-get
@@ -1103,7 +1140,7 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         unpublished = ContentService.Unpublish(content, langGb.IsoCode);
 
         // audit log will only show that english was published
-        var logs = AuditService.GetLogs(content.Id).ToList();
+        var logs = (await AuditService.GetItemsByEntityAsync(content.Id, 0, int.MaxValue, Direction.Ascending)).Items.ToList();
         Assert.AreEqual("Unpublished languages: en-GB", logs[^2].Comment);
         Assert.AreEqual("Unpublished (mandatory language unpublished)", logs[^1].Comment);
     }
@@ -1236,8 +1273,8 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         ContentService.Save(content);
 
         Assert.Throws<ArgumentNullException>(() => ContentService.Publish(content, null!));
-        Assert.Throws<ArgumentException>(() => ContentService.Publish(content, new string[] { null }));
-        Assert.Throws<ArgumentException>(() => ContentService.Publish(content, new[] { "*", null }));
+        Assert.Throws<ArgumentException>(() => ContentService.Publish(content, new string[] { null! }));
+        Assert.Throws<ArgumentException>(() => ContentService.Publish(content, new[] { "*", null! }));
         Assert.Throws<ArgumentException>(() => ContentService.Publish(content, new[] { "en-US" }));
         Assert.Throws<ArgumentException>(() => ContentService.Publish(content, new[] { "en-US", "*" }));
     }
@@ -1248,8 +1285,11 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         var template = TemplateBuilder.CreateTextPageTemplate();
         FileService.SaveTemplate(template);
 
-        var contentType = ContentTypeBuilder.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type",
-            mandatoryProperties: true, defaultTemplateId: template.Id);
+        var contentType = ContentTypeBuilder.CreateSimpleContentType(
+            "umbMandatory",
+            "Mandatory Doc Type",
+            mandatoryProperties: true,
+            defaultTemplateId: template.Id);
         ContentTypeService.Save(contentType);
 
         var parentId = Textpage.Id;
@@ -1269,8 +1309,10 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         Assert.IsFalse(content.HasIdentity);
 
         // content cannot publish values because they are invalid
-        var propertyValidationService = new PropertyValidationService(PropertyEditorCollection, DataTypeService, LocalizedTextService, ValueEditorCache, Mock.Of<ICultureDictionary>());
-        var isValid = propertyValidationService.IsPropertyDataValid(content, out var invalidProperties,
+        var propertyValidationService = new PropertyValidationService(PropertyEditorCollection, DataTypeService, LocalizedTextService, ValueEditorCache, Mock.Of<ICultureDictionary>(), Mock.Of<ILanguageService>(), Mock.Of<IOptions<ContentSettings>>());
+        var isValid = propertyValidationService.IsPropertyDataValid(
+            content,
+            out var invalidProperties,
             CultureImpact.Invariant);
         Assert.IsFalse(isValid);
         Assert.IsNotEmpty(invalidProperties);
@@ -1309,7 +1351,7 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         content.SetCultureName("name-fr", langFr.IsoCode);
         content.SetCultureName("name-da", langDa.IsoCode);
 
-        content.PublishCulture(CultureImpact.Explicit(langFr.IsoCode, langFr.IsDefault), DateTime.Now, PropertyEditorCollection);
+        content.PublishCulture(CultureImpact.Explicit(langFr.IsoCode, langFr.IsDefault), DateTime.UtcNow, PropertyEditorCollection);
         var result = ContentService.CommitDocumentChanges(content);
         Assert.IsTrue(result.Success);
         content = ContentService.GetById(content.Id);
@@ -1317,7 +1359,7 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         Assert.IsFalse(content.IsCulturePublished(langDa.IsoCode));
 
         content.UnpublishCulture(langFr.IsoCode);
-        content.PublishCulture(CultureImpact.Explicit(langDa.IsoCode, langDa.IsDefault), DateTime.Now, PropertyEditorCollection);
+        content.PublishCulture(CultureImpact.Explicit(langDa.IsoCode, langDa.IsDefault), DateTime.UtcNow, PropertyEditorCollection);
 
         result = ContentService.CommitDocumentChanges(content);
         Assert.IsTrue(result.Success);
@@ -1390,8 +1432,14 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         Assert.IsTrue(parent.Published);
 
         var
-            children = ContentService.GetPagedChildren(parentId, 0, 500,
-                out var totalChildren); // we only want the first so page size, etc.. is abitrary
+            children = ContentService.GetPagedChildren(
+                parentId,
+                0,
+                500,
+                out var totalChildren,
+                propertyAliases: null,
+                filter: null,
+                ordering: null); // we only want the first so page size, etc.. is abitrary
 
         // children are published including ... that was released 5 mins ago
         Assert.IsTrue(children.First(x => x.Id == Subpage.Id).Published);
@@ -2067,12 +2115,18 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         content1.PropertyValues(obj);
         content1.ResetDirtyProperties(false);
         ContentService.Save(content1);
-        Assert.IsTrue(ContentService.Publish(content1, content1.AvailableCultures.ToArray(), userId: -1).Success);
+        Assert.IsTrue(ContentService.Publish(
+            content1,
+            content1.AvailableCultures.ToArray(),
+            userId: -1).Success);
         var content2 = ContentBuilder.CreateBasicContent(contentType);
         content2.PropertyValues(obj);
         content2.ResetDirtyProperties(false);
         ContentService.Save(content2);
-        Assert.IsTrue(ContentService.Publish(content2, content2.AvailableCultures.ToArray(), userId: -1).Success);
+        Assert.IsTrue(ContentService.Publish(
+            content2,
+            content2.AvailableCultures.ToArray(),
+            userId: -1).Success);
 
         var editorGroup = await UserGroupService.GetAsync(Constants.Security.EditorGroupKey);
         editorGroup.StartContentId = content1.Id;
@@ -2082,17 +2136,26 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         admin.StartContentIds = new[] { content1.Id };
         UserService.Save(admin);
 
-        RelationService.Save(new RelationType("test", "test", false, Constants.ObjectTypes.Document,
-            Constants.ObjectTypes.Document, false));
+        RelationService.Save(new RelationType(
+            "test",
+            "test",
+            false,
+            Constants.ObjectTypes.Document,
+            Constants.ObjectTypes.Document,
+            false));
         Assert.IsNotNull(RelationService.Relate(content1, content2, "test"));
 
-        PublicAccessService.Save(new PublicAccessEntry(content1, content2, content2,
+        PublicAccessService.Save(new PublicAccessEntry(
+            content1,
+            content2,
+            content2,
             new List<PublicAccessRule> { new() { RuleType = "test", RuleValue = "test" } }));
         Assert.IsTrue(PublicAccessService.AddRule(content1, "test2", "test2").Success);
 
         var user = await UserService.GetAsync(Constants.Security.SuperUserKey);
         var userGroup = await UserGroupService.GetAsync(user.Groups.First().Alias);
-        Assert.IsNotNull(NotificationService.CreateNotification(user, content1, "X"));
+        NotificationService.TryCreateNotification(user, content1, "X", out Notification? notification);
+        Assert.IsNotNull(notification);
 
         ContentService.SetPermission(content1, "A", new[] { userGroup.Id });
         var updateDomainResult = await DomainService.UpdateDomainsAsync(
@@ -2219,7 +2282,7 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         Assert.AreEqual(3, ContentService.CountChildren(copy.Id));
 
         var child = ContentService.GetById(Subpage.Id);
-        var childCopy = ContentService.GetPagedChildren(copy.Id, 0, 500, out var total).First();
+        var childCopy = ContentService.GetPagedChildren(copy.Id, 0, 500, out var total, propertyAliases: null, filter: null, ordering: null).First();
         Assert.AreEqual(childCopy.Name, child.Name);
         Assert.AreNotEqual(childCopy.Id, child.Id);
         Assert.AreNotEqual(childCopy.Key, child.Key);
@@ -2254,13 +2317,19 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         var template = TemplateBuilder.CreateTextPageTemplate();
         FileService.SaveTemplate(template);
         var contentType =
-            ContentTypeBuilder.CreateSimpleTagsContentType("umbTagsPage", "TagsPage",
+            ContentTypeBuilder.CreateSimpleTagsContentType(
+                "umbTagsPage",
+                "TagsPage",
                 defaultTemplateId: template.Id);
         contentType.Key = new Guid("78D96D30-1354-4A1E-8450-377764200C58");
         ContentTypeService.Save(contentType);
 
         var content = ContentBuilder.CreateSimpleContent(contentType, "Simple Tags Page");
-        content.AssignTags(PropertyEditorCollection, DataTypeService, Serializer, propAlias,
+        content.AssignTags(
+            PropertyEditorCollection,
+            DataTypeService,
+            Serializer,
+            propAlias,
             new[] { "hello", "world" });
         ContentService.Save(content);
 
@@ -2732,6 +2801,9 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         Assert.That(sut.GetValue<string>("multiUrlPicker"),
             Is.EqualTo("[{\"name\":\"https://test.com\",\"url\":\"https://test.com\"}]"));
         Assert.That(sut.GetValue<string>("tags"), Is.EqualTo("this,is,tags"));
+        Assert.That(
+            sut.GetValue<string>("dateTimeWithTimeZone"),
+            Is.EqualTo("{\"date\":\"2025-01-22T18:33:01.0000000+01:00\",\"timeZone\":\"Europe/Copenhagen\"}"));
     }
 
     [Test]
@@ -2769,10 +2841,10 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
             ContentService.Save(c1);
         }
 
-        var entities = ContentService.GetPagedChildren(Constants.System.Root, 0, 6, out var total).ToArray();
+        var entities = ContentService.GetPagedChildren(Constants.System.Root, 0, 6, out var total, propertyAliases: null, filter: null, ordering: null).ToArray();
         Assert.That(entities.Length, Is.EqualTo(6));
         Assert.That(total, Is.EqualTo(10));
-        entities = ContentService.GetPagedChildren(Constants.System.Root, 1, 6, out total).ToArray();
+        entities = ContentService.GetPagedChildren(Constants.System.Root, 1, 6, out total, propertyAliases: null, filter: null, ordering: null).ToArray();
         Assert.That(entities.Length, Is.EqualTo(4));
         Assert.That(total, Is.EqualTo(10));
     }
@@ -2807,20 +2879,186 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         }
 
         // children in root including the folder - not the descendants in the folder
-        var entities = ContentService.GetPagedChildren(Constants.System.Root, 0, 6, out var total).ToArray();
+        var entities = ContentService.GetPagedChildren(Constants.System.Root, 0, 6, out var total, propertyAliases: null, filter: null, ordering: null).ToArray();
         Assert.That(entities.Length, Is.EqualTo(6));
         Assert.That(total, Is.EqualTo(10));
-        entities = ContentService.GetPagedChildren(Constants.System.Root, 1, 6, out total).ToArray();
+        entities = ContentService.GetPagedChildren(Constants.System.Root, 1, 6, out total, propertyAliases: null, filter: null, ordering: null).ToArray();
         Assert.That(entities.Length, Is.EqualTo(4));
         Assert.That(total, Is.EqualTo(10));
 
         // children in folder
-        entities = ContentService.GetPagedChildren(willHaveChildren.Id, 0, 6, out total).ToArray();
+        entities = ContentService.GetPagedChildren(willHaveChildren.Id, 0, 6, out total, propertyAliases: null, filter: null, ordering: null).ToArray();
         Assert.That(entities.Length, Is.EqualTo(6));
         Assert.That(total, Is.EqualTo(10));
-        entities = ContentService.GetPagedChildren(willHaveChildren.Id, 1, 6, out total).ToArray();
+        entities = ContentService.GetPagedChildren(willHaveChildren.Id, 1, 6, out total, propertyAliases: null, filter: null, ordering: null).ToArray();
         Assert.That(entities.Length, Is.EqualTo(4));
         Assert.That(total, Is.EqualTo(10));
+    }
+
+    [Test]
+    public void GetPagedChildren_With_Null_PropertyAliases_Returns_All_Properties()
+    {
+        // Arrange
+        var parentId = CreateContentWithChildForGetPagedChildrenParameterTests();
+
+        // Act - null propertyAliases should load all properties
+        var retrievedChild = GetSingleChildWithPropertyAliases(parentId, propertyAliases: null);
+
+        // Assert - All properties should have their values loaded
+        Assert.That(retrievedChild.Properties["title"]?.GetValue(), Is.Not.Null);
+        Assert.That(retrievedChild.Properties["bodyText"]?.GetValue(), Is.Not.Null);
+        Assert.That(retrievedChild.Properties["author"]?.GetValue(), Is.Not.Null);
+    }
+
+    [Test]
+    public void GetPagedChildren_With_Empty_PropertyAliases_Returns_No_Property_Values()
+    {
+        // Arrange
+        var parentId = CreateContentWithChildForGetPagedChildrenParameterTests();
+
+        // Act - empty propertyAliases should load no custom properties
+        var retrievedChild = GetSingleChildWithPropertyAliases(parentId, propertyAliases: []);
+
+        // Assert - Properties should not be present when propertyAliases is empty
+        Assert.That(retrievedChild.Properties.Contains("title"), Is.False, "title property should not be present");
+        Assert.That(retrievedChild.Properties.Contains("bodyText"), Is.False, "bodyText property should not be present");
+        Assert.That(retrievedChild.Properties.Contains("author"), Is.False, "author property should not be present");
+    }
+
+    [Test]
+    public void GetPagedChildren_With_Single_PropertyAlias_Returns_Only_That_Property()
+    {
+        // Arrange
+        var parentId = CreateContentWithChildForGetPagedChildrenParameterTests();
+
+        // Act - only "title" should be loaded
+        var retrievedChild = GetSingleChildWithPropertyAliases(parentId, propertyAliases: ["title"]);
+
+        // Assert - Only "title" property should have its value loaded
+        Assert.That(retrievedChild.Properties["title"]?.GetValue(), Is.Not.Null);
+        Assert.That(retrievedChild.Properties["bodyText"]?.GetValue(), Is.Null);
+        Assert.That(retrievedChild.Properties["author"]?.GetValue(), Is.Null);
+    }
+
+    [Test]
+    public void GetPagedChildren_With_Multiple_PropertyAliases_Returns_Only_Those_Properties()
+    {
+        // Arrange
+        var parentId = CreateContentWithChildForGetPagedChildrenParameterTests();
+
+        // Act - "title" and "author" should be loaded, but not "bodyText"
+        var retrievedChild = GetSingleChildWithPropertyAliases(parentId, propertyAliases: ["title", "author"]);
+
+        // Assert - Only "title" and "author" properties should have values loaded
+        Assert.That(retrievedChild.Properties["title"]?.GetValue(), Is.Not.Null);
+        Assert.That(retrievedChild.Properties["author"]?.GetValue(), Is.Not.Null);
+        Assert.That(retrievedChild.Properties["bodyText"]?.GetValue(), Is.Null);
+    }
+
+    [Test]
+    public void GetPagedChildren_With_NonExistent_PropertyAlias_Returns_No_Properties()
+    {
+        // Arrange
+        var parentId = CreateContentWithChildForGetPagedChildrenParameterTests();
+
+        // Act - non-existent property alias should result in no property values
+        var retrievedChild = GetSingleChildWithPropertyAliases(parentId, propertyAliases: ["nonExistentProperty"]);
+
+        // Assert - No property values should be loaded since the alias doesn't exist
+        Assert.That(retrievedChild.Properties["title"]?.GetValue(), Is.Null);
+        Assert.That(retrievedChild.Properties["bodyText"]?.GetValue(), Is.Null);
+        Assert.That(retrievedChild.Properties["author"]?.GetValue(), Is.Null);
+        Assert.That(retrievedChild.Properties.Contains("nonExistentProperty"), Is.False);
+    }
+
+    [Test]
+    public void GetPagedChildren_With_LoadTemplates_True_Loads_Template()
+    {
+        // Arrange
+        var parentId = CreateContentWithChildForGetPagedChildrenParameterTests();
+
+        // Act - loadTemplates: true (default) should load templates
+        var retrievedChild = GetSingleChildWithLoadTemplates(parentId, loadTemplates: true);
+
+        // Assert - Template should be loaded
+        Assert.That(retrievedChild.TemplateId, Is.Not.Null);
+    }
+
+    [Test]
+    public void GetPagedChildren_With_LoadTemplates_False_Does_Not_Load_Template()
+    {
+        // Arrange
+        var parentId = CreateContentWithChildForGetPagedChildrenParameterTests();
+
+        // Act - loadTemplates: false should not load templates
+        var retrievedChild = GetSingleChildWithLoadTemplates(parentId, loadTemplates: false);
+
+        // Assert - Template should not be loaded
+        Assert.That(retrievedChild.TemplateId, Is.Null);
+    }
+
+    [Test]
+    public void GetPagedChildren_Default_LoadTemplates_Loads_Template()
+    {
+        // Arrange
+        var parentId = CreateContentWithChildForGetPagedChildrenParameterTests();
+
+        // Act - default (no loadTemplates specified) should load templates (backwards compatible)
+        var children = ContentService.GetPagedChildren(parentId, 0, 10, out var total, propertyAliases: null, filter: null, ordering: null).ToArray();
+
+        Assert.That(children.Length, Is.EqualTo(1));
+
+        // Assert - Template should be loaded by default
+        Assert.That(children[0].TemplateId, Is.Not.Null);
+    }
+
+    /// <summary>
+    /// Creates a content type with properties (title, bodyText, author) and a parent with one child.
+    /// Returns the parent ID for use in GetPagedChildren tests.
+    /// </summary>
+    private int CreateContentWithChildForGetPagedChildrenParameterTests()
+    {
+        var template = TemplateBuilder.CreateTextPageTemplate();
+        FileService.SaveTemplate(template);
+
+        var contentType = ContentTypeBuilder.CreateSimpleContentType(defaultTemplateId: template.Id);
+        ContentTypeService.Save(contentType);
+
+        var parent = ContentBuilder.CreateSimpleContent(contentType);
+        ContentService.Save(parent);
+
+        var child = ContentBuilder.CreateSimpleContent(contentType, "Child", parent.Id);
+        ContentService.Save(child);
+
+        return parent.Id;
+    }
+
+    /// <summary>
+    /// Gets the single child of the parent using GetPagedChildren with the specified propertyAliases.
+    /// Asserts that exactly one child is returned.
+    /// </summary>
+    private IContent GetSingleChildWithPropertyAliases(int parentId, string[]? propertyAliases)
+    {
+        var children = ContentService.GetPagedChildren(parentId, 0, 10, out var total, propertyAliases, filter: null, ordering: null).ToArray();
+
+        Assert.That(children.Length, Is.EqualTo(1));
+        Assert.That(total, Is.EqualTo(1));
+
+        return children[0];
+    }
+
+    /// <summary>
+    /// Gets the single child of the parent using GetPagedChildren with the specified loadTemplates parameter.
+    /// Asserts that exactly one child is returned.
+    /// </summary>
+    private IContent GetSingleChildWithLoadTemplates(int parentId, bool loadTemplates)
+    {
+        var children = ContentService.GetPagedChildren(parentId, 0, 10, out var total, propertyAliases: null, filter: null, ordering: null, loadTemplates: loadTemplates).ToArray();
+
+        Assert.That(children.Length, Is.EqualTo(1));
+        Assert.That(total, Is.EqualTo(1));
+
+        return children[0];
     }
 
     [Test]
@@ -2972,8 +3210,11 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
 
         var contentType = ContentTypeService.Get("umbTextpage");
         contentType.Variations = ContentVariation.Culture;
-        contentType.AddPropertyType(new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox,
-            ValueStorageType.Nvarchar, "prop")
+        contentType.AddPropertyType(new PropertyType(
+            ShortStringHelper,
+            Constants.PropertyEditors.Aliases.TextBox,
+            ValueStorageType.Nvarchar,
+            "prop")
         { Variations = ContentVariation.Culture });
         ContentTypeService.Save(contentType);
 
@@ -3080,7 +3321,7 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         }
 
         // get all
-        var list = ContentService.GetPagedChildren(Constants.System.Root, 0, 100, out var total).ToList();
+        var list = ContentService.GetPagedChildren(Constants.System.Root, 0, 100, out var total, propertyAliases: null, filter: null, ordering: null).ToList();
 
         Console.WriteLine("ALL");
         WriteList(list);
@@ -3097,6 +3338,7 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
             0,
             100,
             out total,
+            propertyAliases: null,
             sqlContext.Query<IContent>().Where(x => x.Name.Contains("contentX")),
             Ordering.By("name", culture: langFr.IsoCode)).ToList();
 
@@ -3109,6 +3351,7 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
             0,
             100,
             out total,
+            propertyAliases: null,
             sqlContext.Query<IContent>().Where(x => x.Name.Contains("contentX")),
             Ordering.By("name", culture: langDa.IsoCode)).ToList();
 
@@ -3124,6 +3367,7 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
             0,
             100,
             out total,
+            propertyAliases: null,
             sqlContext.Query<IContent>().Where(x => x.Name.Contains("contentA")),
             Ordering.By("name", culture: langFr.IsoCode)).ToList();
 
@@ -3143,6 +3387,7 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
             0,
             100,
             out total,
+            propertyAliases: null,
             sqlContext.Query<IContent>().Where(x => x.Name.Contains("contentA")),
             Ordering.By("name", Direction.Descending, langFr.IsoCode)).ToList();
 
@@ -3162,8 +3407,13 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
     {
         foreach (var content in list)
         {
-            Console.WriteLine("[{0}] {1} {2} {3} {4}", content.Id, content.Name, content.GetCultureName("en-GB"),
-                content.GetCultureName("fr-FR"), content.GetCultureName("da-DK"));
+            Console.WriteLine(
+                "[{0}] {1} {2} {3} {4}",
+                content.Id,
+                content.Name,
+                content.GetCultureName("en-GB"),
+                content.GetCultureName("fr-FR"),
+                content.GetCultureName("da-DK"));
         }
 
         Console.WriteLine("-");
@@ -3196,8 +3446,11 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
 
         var contentType = ContentTypeService.Get("umbTextpage");
         contentType.Variations = ContentVariation.Culture;
-        contentType.AddPropertyType(new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox,
-            ValueStorageType.Nvarchar, "prop")
+        contentType.AddPropertyType(new PropertyType(
+            ShortStringHelper,
+            Constants.PropertyEditors.Aliases.TextBox,
+            ValueStorageType.Nvarchar,
+            "prop")
         { Variations = ContentVariation.Culture });
 
         // TODO: add test w/ an invariant prop
@@ -3238,15 +3491,31 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         Assert.IsNull(content2.GetPublishName(langUk.IsoCode));
 
         // only fr and uk have a name, and are available
-        AssertPerCulture(content, (x, c) => x.IsCultureAvailable(c), (langFr, true), (langUk, true),
+        AssertPerCulture(
+            content,
+            (x, c) => x.IsCultureAvailable(c),
+            (langFr, true),
+            (langUk, true),
             (langDe, false));
-        AssertPerCulture(content2, (x, c) => x.IsCultureAvailable(c), (langFr, true), (langUk, true),
+        AssertPerCulture(
+            content2,
+            (x, c) => x.IsCultureAvailable(c),
+            (langFr, true),
+            (langUk, true),
             (langDe, false));
 
         // nothing has been published yet
-        AssertPerCulture(content, (x, c) => x.IsCulturePublished(c), (langFr, false), (langUk, false),
+        AssertPerCulture(
+            content,
+            (x, c) => x.IsCulturePublished(c),
+            (langFr, false),
+            (langUk, false),
             (langDe, false));
-        AssertPerCulture(content2, (x, c) => x.IsCulturePublished(c), (langFr, false), (langUk, false),
+        AssertPerCulture(
+            content2,
+            (x, c) => x.IsCulturePublished(c),
+            (langFr, false),
+            (langUk, false),
             (langDe, false));
 
         // not published => must be edited, if available
@@ -3279,26 +3548,56 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         Assert.AreEqual("value-uk1", content2.GetValue("prop", langUk.IsoCode, published: true));
 
         // no change
-        AssertPerCulture(content, (x, c) => x.IsCultureAvailable(c), (langFr, true), (langUk, true),
+        AssertPerCulture(
+            content,
+            (x, c) => x.IsCultureAvailable(c),
+            (langFr, true),
+            (langUk, true),
             (langDe, false));
-        AssertPerCulture(content2, (x, c) => x.IsCultureAvailable(c), (langFr, true), (langUk, true),
+        AssertPerCulture(
+            content2,
+            (x, c) => x.IsCultureAvailable(c),
+            (langFr, true),
+            (langUk, true),
             (langDe, false));
 
         // fr and uk have been published now
-        AssertPerCulture(content, (x, c) => x.IsCulturePublished(c), (langFr, true), (langUk, true),
+        AssertPerCulture(
+            content,
+            (x, c) => x.IsCulturePublished(c),
+            (langFr, true),
+            (langUk, true),
             (langDe, false));
-        AssertPerCulture(content2, (x, c) => x.IsCulturePublished(c), (langFr, true), (langUk, true),
+        AssertPerCulture(
+            content2,
+            (x, c) => x.IsCulturePublished(c),
+            (langFr, true),
+            (langUk, true),
             (langDe, false));
 
         // fr and uk, published without changes, not edited
-        AssertPerCulture(content, (x, c) => x.IsCultureEdited(c), (langFr, false), (langUk, false),
+        AssertPerCulture(
+            content,
+            (x, c) => x.IsCultureEdited(c),
+            (langFr, false),
+            (langUk, false),
             (langDe, false));
-        AssertPerCulture(content2, (x, c) => x.IsCultureEdited(c), (langFr, false), (langUk, false),
+        AssertPerCulture(
+            content2,
+            (x, c) => x.IsCultureEdited(c),
+            (langFr, false),
+            (langUk, false),
             (langDe, false));
 
-        AssertPerCulture(content, (x, c) => x.GetPublishDate(c) == DateTime.MinValue, (langFr, false),
+        AssertPerCulture(
+            content,
+            (x, c) => x.GetPublishDate(c) == DateTime.MinValue,
+            (langFr, false),
             (langUk, false)); // DE would throw
-        AssertPerCulture(content2, (x, c) => x.GetPublishDate(c) == DateTime.MinValue, (langFr, false),
+        AssertPerCulture(
+            content2,
+            (x, c) => x.GetPublishDate(c) == DateTime.MinValue,
+            (langFr, false),
             (langUk, false)); // DE would throw
 
         // note that content and content2 culture published dates might be slightly different due to roundtrip to database
@@ -3340,24 +3639,46 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         Assert.AreEqual("value-uk1", content2.GetValue("prop", langUk.IsoCode, published: true));
 
         // no change
-        AssertPerCulture(content, (x, c) => x.IsCultureAvailable(c), (langFr, true), (langUk, true),
+        AssertPerCulture(
+            content,
+            (x, c) => x.IsCultureAvailable(c),
+            (langFr, true),
+            (langUk, true),
             (langDe, false));
-        AssertPerCulture(content2, (x, c) => x.IsCultureAvailable(c), (langFr, true), (langUk, true),
+        AssertPerCulture(
+            content2,
+            (x, c) => x.IsCultureAvailable(c),
+            (langFr, true),
+            (langUk, true),
             (langDe, false));
 
         // no change
-        AssertPerCulture(content, (x, c) => x.IsCulturePublished(c), (langFr, true), (langUk, true),
+        AssertPerCulture(
+            content,
+            (x, c) => x.IsCulturePublished(c),
+            (langFr, true),
+            (langUk, true),
             (langDe, false));
-        AssertPerCulture(content2, (x, c) => x.IsCulturePublished(c), (langFr, true), (langUk, true),
+        AssertPerCulture(
+            content2,
+            (x, c) => x.IsCulturePublished(c),
+            (langFr, true),
+            (langUk, true),
             (langDe, false));
 
         // we have changed values so now fr and uk are edited
         AssertPerCulture(content, (x, c) => x.IsCultureEdited(c), (langFr, true), (langUk, true), (langDe, false));
         AssertPerCulture(content2, (x, c) => x.IsCultureEdited(c), (langFr, true), (langUk, true), (langDe, false));
 
-        AssertPerCulture(content, (x, c) => x.GetPublishDate(c) == DateTime.MinValue, (langFr, false),
+        AssertPerCulture(
+            content,
+            (x, c) => x.GetPublishDate(c) == DateTime.MinValue,
+            (langFr, false),
             (langUk, false)); // DE would throw
-        AssertPerCulture(content2, (x, c) => x.GetPublishDate(c) == DateTime.MinValue, (langFr, false),
+        AssertPerCulture(
+            content2,
+            (x, c) => x.GetPublishDate(c) == DateTime.MinValue,
+            (langFr, false),
             (langUk, false)); // DE would throw
 
         // Act
@@ -3386,24 +3707,44 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         Assert.IsTrue(content.IsCulturePublished(langUk.IsoCode));
 
         // no change
-        AssertPerCulture(content, (x, c) => x.IsCultureAvailable(c), (langFr, true), (langUk, true),
+        AssertPerCulture(
+            content,
+            (x, c) => x.IsCultureAvailable(c),
+            (langFr, true),
+            (langUk, true),
             (langDe, false));
-        AssertPerCulture(content2, (x, c) => x.IsCultureAvailable(c), (langFr, true), (langUk, true),
+        AssertPerCulture(
+            content2,
+            (x, c) => x.IsCultureAvailable(c),
+            (langFr, true),
+            (langUk, true),
             (langDe, false));
 
         // fr is not published anymore
-        AssertPerCulture(content, (x, c) => x.IsCulturePublished(c), (langFr, false), (langUk, true),
+        AssertPerCulture(
+            content,
+            (x, c) => x.IsCulturePublished(c),
+            (langFr, false),
+            (langUk, true),
             (langDe, false));
-        AssertPerCulture(content2, (x, c) => x.IsCulturePublished(c), (langFr, false), (langUk, true),
+        AssertPerCulture(
+            content2,
+            (x, c) => x.IsCulturePublished(c),
+            (langFr, false),
+            (langUk, true),
             (langDe, false));
 
         // and so, fr has to be edited
         AssertPerCulture(content, (x, c) => x.IsCultureEdited(c), (langFr, true), (langUk, true), (langDe, false));
         AssertPerCulture(content2, (x, c) => x.IsCultureEdited(c), (langFr, true), (langUk, true), (langDe, false));
 
-        AssertPerCulture(content, (x, c) => x.GetPublishDate(c) == DateTime.MinValue,
+        AssertPerCulture(
+            content,
+            (x, c) => x.GetPublishDate(c) == DateTime.MinValue,
             (langUk, false)); // FR, DE would throw
-        AssertPerCulture(content2, (x, c) => x.GetPublishDate(c) == DateTime.MinValue,
+        AssertPerCulture(
+            content2,
+            (x, c) => x.GetPublishDate(c) == DateTime.MinValue,
             (langUk, false)); // FR, DE would throw
 
         // Act
@@ -3433,13 +3774,22 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         Assert.AreEqual("value-fr2", content2.GetValue("prop", langFr.IsoCode));
         Assert.AreEqual("value-uk2", content2.GetValue("prop", langUk.IsoCode));
         Assert.IsNull(content2.GetValue("prop", langFr.IsoCode, published: true));
-        Assert.AreEqual("value-uk1",
+        Assert.AreEqual(
+            "value-uk1",
             content2.GetValue("prop", langUk.IsoCode, published: true)); // has value, see note above
 
         // no change
-        AssertPerCulture(content, (x, c) => x.IsCultureAvailable(c), (langFr, true), (langUk, true),
+        AssertPerCulture(
+            content,
+            (x, c) => x.IsCultureAvailable(c),
+            (langFr, true),
+            (langUk, true),
             (langDe, false));
-        AssertPerCulture(content2, (x, c) => x.IsCultureAvailable(c), (langFr, true), (langUk, true),
+        AssertPerCulture(
+            content2,
+            (x, c) => x.IsCultureAvailable(c),
+            (langFr, true),
+            (langUk, true),
             (langDe, false));
 
         // Everything should be unpublished
@@ -3459,25 +3809,54 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         content2 = ContentService.GetById(content.Id);
 
         // no change
-        AssertPerCulture(content, (x, c) => x.IsCultureAvailable(c), (langFr, true), (langUk, true),
+        AssertPerCulture(
+            content,
+            (x, c) => x.IsCultureAvailable(c),
+            (langFr, true),
+            (langUk, true),
             (langDe, false));
-        AssertPerCulture(content2, (x, c) => x.IsCultureAvailable(c), (langFr, true), (langUk, true),
+        AssertPerCulture(
+            content2,
+            (x, c) => x.IsCultureAvailable(c),
+            (langFr, true),
+            (langUk, true),
             (langDe, false));
 
         // no change
-        AssertPerCulture(content, (x, c) => x.IsCulturePublished(c), (langFr, false), (langUk, true),
+        AssertPerCulture(
+            content,
+            (x, c) => x.IsCulturePublished(c),
+            (langFr, false),
+            (langUk, true),
             (langDe, false));
-        AssertPerCulture(content2, (x, c) => x.IsCulturePublished(c), (langFr, false), (langUk, true),
+        AssertPerCulture(
+            content2,
+            (x, c) => x.IsCulturePublished(c),
+            (langFr, false),
+            (langUk, true),
             (langDe, false));
 
         // now, uk is no more edited
-        AssertPerCulture(content, (x, c) => x.IsCultureEdited(c), (langFr, true), (langUk, false), (langDe, false));
-        AssertPerCulture(content2, (x, c) => x.IsCultureEdited(c), (langFr, true), (langUk, false),
+        AssertPerCulture(
+            content,
+            (x, c) => x.IsCultureEdited(c),
+            (langFr, true),
+            (langUk, false),
+            (langDe, false));
+        AssertPerCulture(
+            content2,
+            (x, c) => x.IsCultureEdited(c),
+            (langFr, true),
+            (langUk, false),
             (langDe, false));
 
-        AssertPerCulture(content, (x, c) => x.GetPublishDate(c) == DateTime.MinValue,
+        AssertPerCulture(
+            content,
+            (x, c) => x.GetPublishDate(c) == DateTime.MinValue,
             (langUk, false)); // FR, DE would throw
-        AssertPerCulture(content2, (x, c) => x.GetPublishDate(c) == DateTime.MinValue,
+        AssertPerCulture(
+            content2,
+            (x, c) => x.GetPublishDate(c) == DateTime.MinValue,
             (langUk, false)); // FR, DE would throw
 
         // Act
@@ -3566,13 +3945,17 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         Assert.AreEqual(langEn.IsoCode, content.PublishedCultures.First());
     }
 
-    private void AssertPerCulture<T>(IContent item, Func<IContent, string, T> getter,
+    private void AssertPerCulture<T>(
+        IContent item,
+        Func<IContent, string, T> getter,
         params (ILanguage Language, bool Result)[] testCases)
     {
         foreach (var testCase in testCases)
         {
             var value = getter(item, testCase.Language.IsoCode);
-            Assert.AreEqual(testCase.Result, value,
+            Assert.AreEqual(
+                testCase.Result,
+                value,
                 $"Expected {testCase.Result} and got {value} for culture {testCase.Language.IsoCode}.");
         }
     }
@@ -3603,7 +3986,9 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         var list = new List<IContent>();
         for (var i = 0; i < depth; i++)
         {
-            var c = ContentBuilder.CreateSimpleContent(contentType, "Hierarchy Simple Text Subpage " + i,
+            var c = ContentBuilder.CreateSimpleContent(
+                contentType,
+                "Hierarchy Simple Text Subpage " + i,
                 content);
             list.Add(c);
 
@@ -3613,7 +3998,9 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         return list;
     }
 
-    private void CreateEnglishAndFrenchDocumentType(out Language langUk, out Language langFr,
+    private void CreateEnglishAndFrenchDocumentType(
+        out Language langUk,
+        out Language langFr,
         out ContentType contentType)
     {
         langUk = (Language)new LanguageBuilder()
@@ -3631,7 +4018,9 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         ContentTypeService.Save(contentType);
     }
 
-    private IContent CreateEnglishAndFrenchDocument(out Language langUk, out Language langFr,
+    private IContent CreateEnglishAndFrenchDocument(
+        out Language langUk,
+        out Language langFr,
         out ContentType contentType)
     {
         CreateEnglishAndFrenchDocumentType(out langUk, out langFr, out contentType);

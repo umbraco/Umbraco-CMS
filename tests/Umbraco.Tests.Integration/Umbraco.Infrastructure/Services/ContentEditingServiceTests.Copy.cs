@@ -112,7 +112,7 @@ public partial class ContentEditingServiceTests
             Assert.AreNotEqual(root1.Key, copiedRoot.Key);
             Assert.AreEqual(root1.Name, copiedRoot.Name);
 
-            var copiedChildren = ContentService.GetPagedChildren(copiedRoot.Id, 0, 100, out var total).ToArray();
+            var copiedChildren = ContentService.GetPagedChildren(copiedRoot.Id, 0, 100, out var total, propertyAliases: null, filter: null, ordering: null).ToArray();
 
             if (includeDescendants)
             {
@@ -179,7 +179,7 @@ public partial class ContentEditingServiceTests
             Assert.IsTrue(copiedRoot.HasIdentity);
             Assert.AreNotEqual(root.Key, copiedRoot.Key);
             Assert.AreEqual(root.Name, copiedRoot.Name);
-            var copiedChildren = ContentService.GetPagedChildren(copiedRoot.Id, 0, 100, out var total).ToArray();
+            var copiedChildren = ContentService.GetPagedChildren(copiedRoot.Id, 0, 100, out var total, propertyAliases: null, filter: null, ordering: null).ToArray();
 
             if (includeDescendants)
             {
@@ -221,7 +221,7 @@ public partial class ContentEditingServiceTests
             Assert.IsTrue(copiedRoot.HasIdentity);
             Assert.AreNotEqual(root.Key, copiedRoot.Key);
             Assert.AreEqual(root.Name, copiedRoot.Name);
-            var copiedChildren = ContentService.GetPagedChildren(copiedRoot.Id, 0, 100, out var total).ToArray();
+            var copiedChildren = ContentService.GetPagedChildren(copiedRoot.Id, 0, 100, out var total, propertyAliases: null, filter: null, ordering: null).ToArray();
 
             if (includeDescendants)
             {

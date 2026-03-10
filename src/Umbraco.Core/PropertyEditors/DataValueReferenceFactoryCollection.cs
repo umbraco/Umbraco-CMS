@@ -1,7 +1,5 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Composing;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
 
@@ -16,17 +14,6 @@ public class DataValueReferenceFactoryCollection : BuilderCollectionBase<IDataVa
     // by property editors and instead just use the already built in IDataValueReferenceFactory and/or refactor that into a more normal collection
 
     private readonly ILogger<DataValueReferenceFactoryCollection> _logger;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="DataValueReferenceFactoryCollection" /> class.
-    /// </summary>
-    /// <param name="items">The items.</param>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 17.")]
-    public DataValueReferenceFactoryCollection(Func<IEnumerable<IDataValueReferenceFactory>> items)
-        : this(
-              items,
-              StaticServiceProvider.Instance.GetRequiredService<ILogger<DataValueReferenceFactoryCollection>>())
-    { }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DataValueReferenceFactoryCollection" /> class.
@@ -160,16 +147,10 @@ public class DataValueReferenceFactoryCollection : BuilderCollectionBase<IDataVa
     }
 
     /// <summary>
-    /// Gets all relation type aliases that are automatically tracked.
+    /// Gets all automatic relation type aliases for all property editors.
     /// </summary>
-    /// <param name="propertyEditors">The property editors.</param>
-    /// <returns>
-    /// All relation type aliases that are automatically tracked.
-    /// </returns>
-    [Obsolete("Use GetAllAutomaticRelationTypesAliases. This will be removed in Umbraco 15.")]
-    public ISet<string> GetAutomaticRelationTypesAliases(PropertyEditorCollection propertyEditors) =>
-        GetAllAutomaticRelationTypesAliases(propertyEditors);
-
+    /// <param name="propertyEditors">The property editors collection.</param>
+    /// <returns>A set of automatic relation type aliases.</returns>
     public ISet<string> GetAllAutomaticRelationTypesAliases(PropertyEditorCollection propertyEditors)
     {
         // Always add default automatic relation types

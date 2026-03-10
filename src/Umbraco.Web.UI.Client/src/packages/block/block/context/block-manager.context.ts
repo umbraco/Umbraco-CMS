@@ -1,5 +1,6 @@
 import type { UmbBlockWorkspaceOriginData } from '../workspace/index.js';
 import type { UmbBlockLayoutBaseModel, UmbBlockDataModel, UmbBlockExposeModel } from '../types.js';
+import { UmbBlockInsertedEvent } from '../events/block-inserted.event.js';
 import { UMB_BLOCK_MANAGER_CONTEXT } from './block-manager.context-token.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -243,20 +244,57 @@ export abstract class UmbBlockManagerContext<
 	settingsOf(key: string) {
 		return this.#settings.asObservablePart((source) => source.find((x) => x.key === key));
 	}
+
 	currentExposeOf(contentKey: string) {
-		const variantId = this.getVariantId();
-		if (!variantId) return;
 		return mergeObservables(
 			[this.#exposes.asObservablePart((source) => source.filter((x) => x.contentKey === contentKey)), this.variantId],
-			([exposes, variantId]) => (variantId ? exposes.find((x) => variantId.compare(x)) : undefined),
+			([exposes, variantId]) => {
+				if (!variantId) {
+					return undefined;
+				}
+
+				const contentTypeKey = this.getContentTypeKeyOfContentKey(contentKey);
+				if (!contentTypeKey) {
+					return false;
+				}
+				const contentStructure = this.getStructure(contentTypeKey);
+				if (!contentStructure) {
+					throw new Error(`Cannot lookup expose of block, missing content structure for ${contentTypeKey}`);
+				}
+
+				const varyByCulture = contentStructure.getVariesByCulture();
+				const varyBySegment = contentStructure.getVariesBySegment();
+				const blockVariantId = variantId.toVariant(varyByCulture, varyBySegment);
+
+				return exposes.find((x) => blockVariantId.compare(x));
+			},
 		);
 	}
 
 	hasExposeOf(contentKey: string, variantId: UmbVariantId) {
 		if (!variantId) return;
-		return this.#exposes.asObservablePart((source) =>
-			source.some((x) => x.contentKey === contentKey && variantId.compare(x)),
-		);
+
+		const contentTypeKey = this.getContentTypeKeyOfContentKey(contentKey);
+		if (!contentTypeKey) {
+			// Not created yet and therefor not exposed.
+			// (This currently does not give any trouble,
+			// but this is not returning a observable,
+			// meaning one trying to observe this would
+			// not be updated when it is exposed. But it
+			// is not a problem currently. [NL])
+			return;
+		}
+		const contentStructure = this.getStructure(contentTypeKey);
+		if (!contentStructure) {
+			throw new Error(`Cannot lookup expose of block, missing content structure for ${contentTypeKey}`);
+		}
+		const varyByCulture = contentStructure.getVariesByCulture();
+		const varyBySegment = contentStructure.getVariesBySegment();
+		const blockVariantId = variantId.toVariant(varyByCulture, varyBySegment);
+
+		return this.#exposes.asObservablePart((exposes) => {
+			return exposes.some((x) => x.contentKey === contentKey && blockVariantId.compare(x));
+		});
 	}
 
 	getBlockTypeOf(contentTypeKey: string) {
@@ -269,7 +307,7 @@ export abstract class UmbBlockManagerContext<
 		return this.#settings.value.find((x) => x.key === settingsKey);
 	}
 	// originData param is used by some implementations. [NL] should be here, do not remove it.
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+
 	setOneLayout(layoutData: BlockLayoutType, _originData?: BlockOriginDataType) {
 		this._layouts.appendOne(layoutData);
 	}
@@ -324,18 +362,6 @@ export abstract class UmbBlockManagerContext<
 			(source) => source.find((x) => x.key === key)?.values?.find((values) => values.alias === propertyAlias)?.value,
 		);
 	}
-
-	/**
-	 * @deprecated Use `createWithPresets` instead. Which is Async. Will be removed in v.17
-	 * @param contentElementTypeKey
-	 * @param partialLayoutEntry
-	 * @param originData
-	 */
-	abstract create(
-		contentElementTypeKey: string,
-		partialLayoutEntry?: Omit<BlockLayoutType, 'contentKey'>,
-		originData?: BlockOriginDataType,
-	): never;
 
 	abstract createWithPresets(
 		contentElementTypeKey: string,
@@ -471,7 +497,7 @@ export abstract class UmbBlockManagerContext<
 		layoutEntry: BlockLayoutType,
 		content: UmbBlockDataModel,
 		settings: UmbBlockDataModel | undefined,
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+
 		_originData: BlockOriginDataType,
 	) {
 		// Create content entry:
@@ -488,6 +514,17 @@ export abstract class UmbBlockManagerContext<
 
 		// Expose inserted block:
 		this.#setInitialBlockExpose(content);
+	}
+
+	protected async notifyBlockInserted(layoutEntry: BlockLayoutType, originData: BlockOriginDataType) {
+		// Await one rendering frame, to make sure new Block has been rendered at the time of the Event firing. [NL]
+		await new Promise((resolve) => requestAnimationFrame(() => resolve(true)));
+		this.dispatchEvent(
+			new UmbBlockInsertedEvent({
+				originData,
+				layout: layoutEntry,
+			}),
+		);
 	}
 
 	async #setInitialBlockExpose(content: UmbBlockDataModel) {

@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Umbraco.Cms.Api.Common.Security;
 using Umbraco.Cms.Api.Delivery.Controllers.Content;
@@ -35,23 +35,9 @@ public class ConfigureUmbracoMemberAuthenticationDeliveryApiSwaggerGenOptions : 
                 return;
             }
 
-            operation.Security = new List<OpenApiSecurityRequirement>
-            {
-                new OpenApiSecurityRequirement
-                {
-                    {
-                        new OpenApiSecurityScheme
-                        {
-                            Reference = new OpenApiReference
-                            {
-                                Type = ReferenceType.SecurityScheme,
-                                Id = AuthSchemeName,
-                            }
-                        },
-                        []
-                    }
-                }
-            };
+            var schemaRef = new OpenApiSecuritySchemeReference(AuthSchemeName, context.Document);
+            operation.Security ??= new List<OpenApiSecurityRequirement>();
+            operation.Security.Add(new OpenApiSecurityRequirement { [schemaRef] = [] });
         }
 
         public void Apply(OpenApiDocument swaggerDoc, DocumentFilterContext context)
@@ -61,7 +47,7 @@ public class ConfigureUmbracoMemberAuthenticationDeliveryApiSwaggerGenOptions : 
                 return;
             }
 
-            swaggerDoc.Components.SecuritySchemes.Add(
+            swaggerDoc.AddComponent(
                 AuthSchemeName,
                 new OpenApiSecurityScheme
                 {
@@ -74,9 +60,9 @@ public class ConfigureUmbracoMemberAuthenticationDeliveryApiSwaggerGenOptions : 
                         AuthorizationCode = new OpenApiOAuthFlow
                         {
                             AuthorizationUrl = new Uri(Paths.MemberApi.AuthorizationEndpoint, UriKind.Relative),
-                            TokenUrl = new Uri(Paths.MemberApi.TokenEndpoint, UriKind.Relative)
-                        }
-                    }
+                            TokenUrl = new Uri(Paths.MemberApi.TokenEndpoint, UriKind.Relative),
+                        },
+                    },
                 });
         }
     }

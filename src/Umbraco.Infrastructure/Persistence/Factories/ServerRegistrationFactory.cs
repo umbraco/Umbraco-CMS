@@ -1,3 +1,4 @@
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
@@ -7,7 +8,7 @@ internal static class ServerRegistrationFactory
 {
     public static ServerRegistration BuildEntity(ServerRegistrationDto dto)
     {
-        var model = new ServerRegistration(dto.Id, dto.ServerAddress, dto.ServerIdentity, dto.DateRegistered, dto.DateAccessed, dto.IsActive, dto.IsSchedulingPublisher);
+        var model = new ServerRegistration(dto.Id, dto.ServerAddress, dto.ServerIdentity, dto.DateRegistered.EnsureUtc(), dto.DateAccessed.EnsureUtc(), dto.IsActive, dto.IsSchedulingPublisher);
 
         // reset dirty initial properties (U4-1946)
         model.ResetDirtyProperties(false);

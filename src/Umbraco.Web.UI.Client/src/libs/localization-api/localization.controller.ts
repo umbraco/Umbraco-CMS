@@ -110,32 +110,40 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 	}
 
 	/**
-	 * Outputs a translated term.
-	 * @param {string} key - the localization key, the indicator of what localization entry you want to retrieve.
-	 * @param {...any} args - the arguments to parse for this localization entry.
-	 * @returns {string} - the translated term as a string.
+	 * Looks up a localization entry for the given key.
+	 * Searches in order: primary (regional) → secondary (language) → fallback (en).
+	 * Also tracks the key usage for reactive updates.
+	 * @param {string} key - the localization key to look up.
+	 * @returns {any} - the localization entry (string or function), or null if not found.
 	 */
-	term<K extends keyof LocalizationSetType>(key: K, ...args: FunctionParams<LocalizationSetType[K]>): string {
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	#lookupTerm<K extends keyof LocalizationSetType>(key: K): any {
 		if (!this.#usedKeys.includes(key)) {
 			this.#usedKeys.push(key);
 		}
 
 		const { primary, secondary } = this.#getLocalizationData(this.lang());
 
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		let term: any;
-
 		// Look for a matching term using regionCode, code, then the fallback
 		if (primary?.[key]) {
-			term = primary[key];
+			return primary[key];
 		} else if (secondary?.[key]) {
-			term = secondary[key];
+			return secondary[key];
 		} else if (umbLocalizationManager.fallback?.[key]) {
-			term = umbLocalizationManager.fallback[key];
-		} else {
-			return String(key);
+			return umbLocalizationManager.fallback[key];
 		}
 
+		return null;
+	}
+
+	/**
+	 * Processes a localization entry (string or function) with the provided arguments.
+	 * @param {any} term - the localization entry to process.
+	 * @param {unknown[]} args - the arguments to apply to the term.
+	 * @returns {string} - the processed term as a string.
+	 */
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	#processTerm(term: any, args: unknown[]): string {
 		if (typeof term === 'function') {
 			return term(...args) as string;
 		}
@@ -143,14 +151,75 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 		if (typeof term === 'string') {
 			if (args.length) {
 				// Replace placeholders of format "%index%" and "{index}" with provided values
-				term = term.replace(/(%(\d+)%|\{(\d+)\})/g, (match, _p1, p2, p3): string => {
+				return term.replace(/(%(\d+)%|\{(\d+)\})/g, (match, _p1, p2, p3): string => {
 					const index = p2 || p3;
 					return typeof args[index] !== 'undefined' ? String(args[index]) : match;
 				});
 			}
 		}
 
-		return term;
+		return String(term);
+	}
+
+	/**
+	 * Outputs a translated term.
+	 * @param {string} key - the localization key, the indicator of what localization entry you want to retrieve.
+	 * @param {unknown[]} args - the arguments to parse for this localization entry.
+	 * @returns {string} - the translated term as a string.
+	 * @example
+	 * Retrieving a term without any arguments:
+	 * ```ts
+	 * this.localize.term('area_term');
+	 * ```
+	 * Retrieving a term with arguments:
+	 * ```ts
+	 * this.localize.term('general_greeting', ['John']);
+	 * ```
+	 */
+	term<K extends keyof LocalizationSetType>(key: K, ...args: FunctionParams<LocalizationSetType[K]>): string {
+		const term = this.#lookupTerm(key);
+
+		if (term === null) {
+			return String(key);
+		}
+
+		return this.#processTerm(term, args);
+	}
+
+	/**
+	 * Returns the localized term for the given key, or the default value if not found.
+	 * This method follows the same resolution order as term() (primary → secondary → fallback),
+	 * but returns the provided defaultValue instead of the key when no translation is found.
+	 * @param {string} key - the localization key, the indicator of what localization entry you want to retrieve.
+	 * @param {string | null} defaultValue - the value to return if the key is not found in any localization set.
+	 * @param {unknown[]} args - the arguments to parse for this localization entry.
+	 * @returns {string | null} - the translated term or the default value.
+	 * @example
+	 * Retrieving a term with fallback:
+	 * ```ts
+	 * this.localize.termOrDefault('general_close', 'X');
+	 * ```
+	 * Retrieving a term with fallback and arguments:
+	 * ```ts
+	 * this.localize.termOrDefault('general_greeting', 'Hello!', userName);
+	 * ```
+	 * Retrieving a term with null as fallback:
+	 * ```ts
+	 * this.localize.termOrDefault('general_close', null);
+	 * ```
+	 */
+	termOrDefault<K extends keyof LocalizationSetType, D extends string | null>(
+		key: K,
+		defaultValue: D,
+		...args: FunctionParams<LocalizationSetType[K]>
+	): string | D {
+		const term = this.#lookupTerm(key);
+
+		if (term === null) {
+			return defaultValue;
+		}
+
+		return this.#processTerm(term, args);
 	}
 
 	/**
@@ -241,16 +310,15 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 		return new Intl.ListFormat(this.lang(), options).format(values);
 	}
 
-	// TODO: for V.16 we should set type to be string | undefined. [NL]
 	/**
 	 * Translates a string containing one or more terms. The terms should be prefixed with a `#` character.
 	 * If the term is found in the localization set, it will be replaced with the localized term.
 	 * If the term is not found, the original term will be returned.
-	 * @param {string | null | undefined} text The text to translate.
-	 * @param {...any} args The arguments to parse for this localization entry.
+	 * @param {string | undefined} text The text to translate.
+	 * @param {unknown[]} args The arguments to parse for this localization entry.
 	 * @returns {string} The translated text.
 	 */
-	string(text: string | null | undefined, ...args: any): string {
+	string(text: string | undefined, ...args: unknown[]): string {
 		if (typeof text !== 'string') {
 			return '';
 		}
@@ -259,16 +327,16 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 		const regex = /#\w+/g;
 
 		const localizedText = text.replace(regex, (match: string) => {
-			const key = match.slice(1);
-			if (!this.#usedKeys.includes(key)) {
-				this.#usedKeys.push(key);
+			const key = match.slice(1) as keyof LocalizationSetType;
+
+			const term = this.#lookupTerm(key);
+
+			// we didn't find a localized string, so we return the original string with the #
+			if (term === null) {
+				return match;
 			}
 
-			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-			// @ts-ignore
-			const localized = this.term(key, ...args);
-			// we didn't find a localized string, so we return the original string with the #
-			return localized === key ? match : localized;
+			return this.#processTerm(term, args);
 		});
 
 		return localizedText;

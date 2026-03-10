@@ -19,8 +19,8 @@ public class TemplateBuilderTests
         const string testAlias = "test";
         const string testName = "Test";
         var testKey = Guid.NewGuid();
-        var testCreateDate = DateTime.Now.AddHours(-1);
-        var testUpdateDate = DateTime.Now;
+        var testCreateDate = DateTime.UtcNow.AddHours(-1);
+        var testUpdateDate = DateTime.UtcNow;
         const string testPath = "-1,3";
         const string testContent = "blah";
         const string testMasterTemplateAlias = "master";

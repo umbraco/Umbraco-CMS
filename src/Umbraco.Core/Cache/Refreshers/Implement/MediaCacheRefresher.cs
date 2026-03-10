@@ -13,6 +13,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Cache;
 
+/// <summary>
+///     Cache refresher for media caches.
+/// </summary>
 public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRefresherNotification, MediaCacheRefresher.JsonPayload>
 {
     private readonly IIdKeyMap _idKeyMap;
@@ -22,31 +25,19 @@ public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRe
     private readonly IMediaCacheService _mediaCacheService;
     private readonly ICacheManager _cacheManager;
 
-    [Obsolete("Use the constructor with ICacheManager instead, scheduled for removal in V17.")]
-    public MediaCacheRefresher(
-        AppCaches appCaches,
-        IJsonSerializer serializer,
-        IIdKeyMap idKeyMap,
-        IEventAggregator eventAggregator,
-        ICacheRefresherNotificationFactory factory,
-        IMediaNavigationQueryService mediaNavigationQueryService,
-        IMediaNavigationManagementService mediaNavigationManagementService,
-        IMediaService mediaService,
-        IMediaCacheService mediaCacheService)
-        : this(
-            appCaches,
-            serializer,
-            idKeyMap,
-            eventAggregator,
-            factory,
-            mediaNavigationQueryService,
-            mediaNavigationManagementService,
-            mediaService,
-            mediaCacheService,
-            StaticServiceProvider.Instance.GetRequiredService<ICacheManager>())
-    {
-    }
-
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="MediaCacheRefresher" /> class.
+    /// </summary>
+    /// <param name="appCaches">The application caches.</param>
+    /// <param name="serializer">The JSON serializer.</param>
+    /// <param name="idKeyMap">The ID-key mapping service.</param>
+    /// <param name="eventAggregator">The event aggregator.</param>
+    /// <param name="factory">The cache refresher notification factory.</param>
+    /// <param name="mediaNavigationQueryService">The media navigation query service.</param>
+    /// <param name="mediaNavigationManagementService">The media navigation management service.</param>
+    /// <param name="mediaService">The media service.</param>
+    /// <param name="mediaCacheService">The media cache service.</param>
+    /// <param name="cacheManager">The cache manager.</param>
     public MediaCacheRefresher(
         AppCaches appCaches,
         IJsonSerializer serializer,
@@ -72,14 +63,27 @@ public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRe
 
     #region Indirect
 
+    /// <summary>
+    ///     Refreshes media type caches by clearing all cached media.
+    /// </summary>
+    /// <param name="appCaches">The application caches.</param>
     public static void RefreshMediaTypes(AppCaches appCaches) => appCaches.IsolatedCaches.ClearCache<IMedia>();
 
     #endregion
 
     #region Json
 
+    /// <summary>
+    ///     Represents the JSON payload for media cache refresh operations.
+    /// </summary>
     public class JsonPayload
     {
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="JsonPayload" /> class.
+        /// </summary>
+        /// <param name="id">The identifier of the media item.</param>
+        /// <param name="key">The unique key of the media item.</param>
+        /// <param name="changeTypes">The types of changes that occurred.</param>
         public JsonPayload(int id, Guid? key, TreeChangeTypes changeTypes)
         {
             Id = id;
@@ -87,10 +91,19 @@ public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRe
             ChangeTypes = changeTypes;
         }
 
+        /// <summary>
+        ///     Gets the identifier of the media item.
+        /// </summary>
         public int Id { get; }
 
+        /// <summary>
+        ///     Gets the unique key of the media item.
+        /// </summary>
         public Guid? Key { get; }
 
+        /// <summary>
+        ///     Gets the types of changes that occurred.
+        /// </summary>
         public TreeChangeTypes ChangeTypes { get; }
     }
 
@@ -98,23 +111,24 @@ public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRe
 
     #region Define
 
+    /// <summary>
+    ///     The unique identifier for this cache refresher.
+    /// </summary>
     public static readonly Guid UniqueId = Guid.Parse("B29286DD-2D40-4DDB-B325-681226589FEC");
 
+    /// <inheritdoc />
     public override Guid RefresherUniqueId => UniqueId;
 
+    /// <inheritdoc />
     public override string Name => "Media Cache Refresher";
 
     #endregion
 
     #region Refresher
 
-    public override void Refresh(JsonPayload[]? payloads)
+    /// <inheritdoc />
+    public override void RefreshInternal(JsonPayload[] payloads)
     {
-        if (payloads == null)
-        {
-            return;
-        }
-
         // actions that always need to happen
         AppCaches.RuntimeCache.ClearByKey(CacheKeys.MediaRecycleBinCacheKey);
         Attempt<IAppPolicyCache?> mediaCache = AppCaches.IsolatedCaches.Get<IMedia>();
@@ -133,22 +147,39 @@ public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRe
                 _idKeyMap.ClearCache(payload.Id);
             }
 
-            if (mediaCache.Success)
+            if (mediaCache.Success is false || mediaCache.Result is null)
             {
-                // repository cache
-                // it *was* done for each pathId but really that does not make sense
-                // only need to do it for the current media
-                mediaCache.Result?.Clear(RepositoryCacheKeys.GetKey<IMedia, int>(payload.Id));
-                mediaCache.Result?.Clear(RepositoryCacheKeys.GetKey<IMedia, Guid?>(payload.Key));
-
-                // remove those that are in the branch
-                if (payload.ChangeTypes.HasTypesAny(TreeChangeTypes.RefreshBranch | TreeChangeTypes.Remove))
-                {
-                    var pathid = "," + payload.Id + ",";
-                    mediaCache.Result?.ClearOfType<IMedia>((_, v) => v.Path?.Contains(pathid) ?? false);
-                }
+                continue;
             }
 
+            // repository cache
+            // it *was* done for each pathId but really that does not make sense
+            // only need to do it for the current media
+            mediaCache.Result.Clear(RepositoryCacheKeys.GetKey<IMedia, int>(payload.Id));
+            // GUID-keyed read repository uses a separate "uRepoGuid_" prefix
+            mediaCache.Result.Clear(RepositoryCacheKeys.GetGuidKey<IMedia>(payload.Key.GetValueOrDefault()));
+
+            // remove those that are in the branch
+            if (payload.ChangeTypes.HasTypesAny(TreeChangeTypes.RefreshBranch | TreeChangeTypes.Remove))
+            {
+                var pathid = "," + payload.Id + ",";
+                mediaCache.Result.ClearOfType<IMedia>((_, v) => v.Path?.Contains(pathid) ?? false);
+            }
+        }
+
+        base.RefreshInternal(payloads);
+    }
+
+    /// <inheritdoc />
+    public override void Refresh(JsonPayload[]? payloads)
+    {
+        if (payloads is null)
+        {
+            return;
+        }
+
+        foreach (JsonPayload payload in payloads)
+        {
             HandleMemoryCache(payload);
             HandleNavigation(payload);
         }
@@ -209,8 +240,8 @@ public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRe
 
         if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshAll))
         {
-            _mediaNavigationManagementService.RebuildAsync();
-            _mediaNavigationManagementService.RebuildBinAsync();
+            _mediaNavigationManagementService.RebuildAsync().GetAwaiter().GetResult();
+            _mediaNavigationManagementService.RebuildBinAsync().GetAwaiter().GetResult();
         }
 
         if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshNode))
@@ -299,12 +330,17 @@ public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRe
 
     // these events should never trigger
     // everything should be JSON
+
+    /// <inheritdoc />
     public override void RefreshAll() => throw new NotSupportedException();
 
+    /// <inheritdoc />
     public override void Refresh(int id) => throw new NotSupportedException();
 
+    /// <inheritdoc />
     public override void Refresh(Guid id) => throw new NotSupportedException();
 
+    /// <inheritdoc />
     public override void Remove(int id) => throw new NotSupportedException();
 
     #endregion

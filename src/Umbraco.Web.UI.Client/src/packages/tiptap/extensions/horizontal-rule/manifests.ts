@@ -16,6 +16,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		alias: 'Umb.Tiptap.Toolbar.HorizontalRule',
 		name: 'Horizontal Rule Tiptap Toolbar Extension',
 		api: () => import('./horizontal-rule.tiptap-toolbar-api.js'),
+		forExtensions: ['Umb.Tiptap.HorizontalRule'],
 		meta: {
 			alias: 'horizontalRule',
 			icon: 'icon-horizontal-rule',

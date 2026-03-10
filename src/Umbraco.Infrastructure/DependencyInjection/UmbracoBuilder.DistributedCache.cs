@@ -1,7 +1,15 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Factories;
+using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Notifications;
+using Umbraco.Cms.Core.Runtime;
+using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Infrastructure.Sync;
 using Umbraco.Extensions;
@@ -24,8 +32,19 @@ public static partial class UmbracoBuilderExtensions
     {
         builder.Services.AddSingleton<LastSyncedFileManager>();
         builder.Services.AddSingleton<ISyncBootStateAccessor, SyncBootStateAccessor>();
-        builder.SetServerMessenger<BatchedDatabaseServerMessenger>();
-builder.AddNotificationHandler<UmbracoApplicationStartingNotification, DatabaseServerMessengerNotificationHandler>();
+        builder.SetServerMessenger(factory => new BatchedDatabaseServerMessenger(
+            factory.GetRequiredService<IMainDom>(),
+            factory.GetRequiredService<CacheRefresherCollection>(),
+            factory.GetRequiredService<ILogger<BatchedDatabaseServerMessenger>>(),
+            factory.GetRequiredService<ISyncBootStateAccessor>(),
+            factory.GetRequiredService<IHostingEnvironment>(),
+            factory.GetRequiredService<ICacheInstructionService>(),
+            factory.GetRequiredService<IJsonSerializer>(),
+            factory.GetRequiredService<IRequestCache>(),
+            factory.GetRequiredService<ILastSyncedManager>(),
+            factory.GetRequiredService<IOptionsMonitor<GlobalSettings>>(),
+            factory.GetRequiredService<IMachineInfoFactory>()));
+        builder.AddNotificationHandler<UmbracoApplicationStartingNotification, DatabaseServerMessengerNotificationHandler>();
         builder.AddNotificationHandler<UmbracoRequestEndNotification, DatabaseServerMessengerNotificationHandler>();
         return builder;
     }

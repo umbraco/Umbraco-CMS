@@ -218,7 +218,8 @@ internal class MediaPicker3ValueEditorValidationTests
             Mock.Of<IDataTypeConfigurationCache>(),
             Mock.Of<ILocalizedTextService>(),
             mediaTypeServiceMock.Object,
-            mediaNavigationQueryServiceMock.Object)
+            mediaNavigationQueryServiceMock.Object,
+            AppCaches.Disabled)
         {
             ConfigurationObject = new MediaPicker3Configuration()
         };

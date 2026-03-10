@@ -70,6 +70,7 @@ export class UmbMenuItemTreeDefaultElement extends UmbLitElement implements UmbM
 								multiple: false,
 							},
 							expansion: this._menuItemExpansion,
+							isMenu: true,
 						}}
 						@expansion-entry-expanded=${this.#onExpansionChange}
 						@expansion-entry-collapsed=${this.#onExpansionChange}></umb-tree>

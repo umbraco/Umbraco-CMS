@@ -25,6 +25,7 @@ const modalData: UmbDocumentUnpublishModalData = {
 				segment: null,
 				scheduledPublishDate: null,
 				scheduledUnpublishDate: null,
+				flags: [],
 			},
 			language: {
 				entityType: 'language',
@@ -49,6 +50,7 @@ const modalData: UmbDocumentUnpublishModalData = {
 				updateDate: null,
 				scheduledPublishDate: null,
 				scheduledUnpublishDate: null,
+				flags: [],
 			},
 			language: {
 				entityType: 'language',
@@ -73,6 +75,7 @@ const modalData: UmbDocumentUnpublishModalData = {
 				segment: null,
 				scheduledPublishDate: null,
 				scheduledUnpublishDate: null,
+				flags: [],
 			},
 			language: {
 				entityType: 'language',
@@ -124,6 +127,7 @@ this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (modalManager) => {
 						publishDate: null,
 						updateDate: null,
 						segment: null,
+						flags: []
 					},
 					language: {
 						entityType: 'language',
@@ -146,6 +150,7 @@ this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (modalManager) => {
 						publishDate: null,
 						updateDate: null,
 						segment: null,
+						flags: []
 					},
 					language: {
 						entityType: 'language',

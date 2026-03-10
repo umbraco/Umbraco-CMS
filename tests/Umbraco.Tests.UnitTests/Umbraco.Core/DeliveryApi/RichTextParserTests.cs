@@ -3,6 +3,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -19,7 +20,9 @@ public class RichTextParserTests : PropertyValueConverterTests
 {
     private readonly Guid _contentKey = Guid.NewGuid();
     private readonly Guid _contentRootKey = Guid.NewGuid();
+    private readonly string _contentType = "contentType";
     private readonly Guid _mediaKey = Guid.NewGuid();
+    private readonly string _mediaType = Constants.Conventions.MediaTypes.Image;
 
     [Test]
     public void ParseElement_DocumentElementIsCalledRoot()
@@ -141,14 +144,21 @@ public class RichTextParserTests : PropertyValueConverterTests
         var link = element.Elements.OfType<RichTextGenericElement>().Single().Elements.Single() as RichTextGenericElement;
         Assert.IsNotNull(link);
         Assert.AreEqual("a", link.Tag);
-        Assert.AreEqual(1, link.Attributes.Count);
-        Assert.AreEqual("route", link.Attributes.First().Key);
-        var route = link.Attributes.First().Value as IApiContentRoute;
+        Assert.AreEqual(4, link.Attributes.Count);
+        Assert.IsNotNull(link.Attributes["route"]);
+        var route = link.Attributes["route"] as IApiContentRoute;
         Assert.IsNotNull(route);
         Assert.AreEqual("/some-content-path", route.Path);
         Assert.AreEqual(postfix.NullOrWhiteSpaceAsNull(), route.QueryString);
         Assert.AreEqual(_contentRootKey, route.StartItem.Id);
         Assert.AreEqual("the-root-path", route.StartItem.Path);
+
+        Assert.IsNotNull(link.Attributes["destinationId"]);
+        Assert.IsNotNull(link.Attributes["destinationType"]);
+        Assert.IsNotNull(link.Attributes["linkType"]);
+        Assert.AreEqual(_contentKey, Guid.Parse((link.Attributes["destinationId"] as string)!));
+        Assert.AreEqual(_contentType, link.Attributes["destinationType"]);
+        Assert.AreEqual(nameof(LinkType.Content), link.Attributes["linkType"]);
     }
 
     [Test]
@@ -161,9 +171,16 @@ public class RichTextParserTests : PropertyValueConverterTests
         var link = element.Elements.OfType<RichTextGenericElement>().Single().Elements.Single() as RichTextGenericElement;
         Assert.IsNotNull(link);
         Assert.AreEqual("a", link.Tag);
-        Assert.AreEqual(1, link.Attributes.Count);
+        Assert.AreEqual(4, link.Attributes.Count);
         Assert.AreEqual("href", link.Attributes.First().Key);
         Assert.AreEqual("/some-media-url", link.Attributes.First().Value);
+
+        Assert.IsNotNull(link.Attributes["destinationId"]);
+        Assert.IsNotNull(link.Attributes["destinationType"]);
+        Assert.IsNotNull(link.Attributes["linkType"]);
+        Assert.AreEqual(_mediaKey, Guid.Parse((link.Attributes["destinationId"] as string)!));
+        Assert.AreEqual(_mediaType, link.Attributes["destinationType"]);
+        Assert.AreEqual(nameof(LinkType.Media), link.Attributes["linkType"]);
     }
 
     [Test]
@@ -179,6 +196,10 @@ public class RichTextParserTests : PropertyValueConverterTests
         Assert.AreEqual(1, link.Attributes.Count);
         Assert.AreEqual("href", link.Attributes.First().Key);
         Assert.AreEqual("https://some.where/else/", link.Attributes.First().Value);
+
+        Assert.IsFalse(link.Attributes.TryGetValue("destinationId", out _));
+        Assert.IsFalse(link.Attributes.TryGetValue("destinationType", out _));
+        Assert.IsFalse(link.Attributes.TryGetValue("linkType", out _));
     }
 
     [TestCase("#some-anchor")]
@@ -195,6 +216,10 @@ public class RichTextParserTests : PropertyValueConverterTests
         Assert.AreEqual(1, link.Attributes.Count);
         Assert.AreEqual("href", link.Attributes.First().Key);
         Assert.AreEqual($"https://some.where/else/{postfix}", link.Attributes.First().Value);
+
+        Assert.IsFalse(link.Attributes.TryGetValue("destinationId", out _));
+        Assert.IsFalse(link.Attributes.TryGetValue("destinationType", out _));
+        Assert.IsFalse(link.Attributes.TryGetValue("linkType", out _));
     }
 
     [Test]
@@ -210,6 +235,10 @@ public class RichTextParserTests : PropertyValueConverterTests
         var textElement = link.Elements.Single() as RichTextTextElement;
         Assert.IsNotNull(textElement);
         Assert.AreEqual("This is the link text", textElement.Text);
+
+        Assert.IsFalse(link.Attributes.TryGetValue("destinationId", out _));
+        Assert.IsFalse(link.Attributes.TryGetValue("destinationType", out _));
+        Assert.IsFalse(link.Attributes.TryGetValue("linkType", out _));
     }
 
     [TestCase("{localLink:umb://document/fe5bf80d37db4373adb9b206896b4a3b}")]
@@ -239,6 +268,10 @@ public class RichTextParserTests : PropertyValueConverterTests
         Assert.AreEqual(1, link.Attributes.Count);
         Assert.AreEqual("src", link.Attributes.First().Key);
         Assert.AreEqual("/some-media-url", link.Attributes.First().Value);
+
+        Assert.IsFalse(link.Attributes.TryGetValue("destinationId", out _));
+        Assert.IsFalse(link.Attributes.TryGetValue("destinationType", out _));
+        Assert.IsFalse(link.Attributes.TryGetValue("linkType", out _));
     }
 
     [Test]
@@ -254,6 +287,10 @@ public class RichTextParserTests : PropertyValueConverterTests
         Assert.AreEqual(1, link.Attributes.Count);
         Assert.AreEqual("src", link.Attributes.First().Key);
         Assert.AreEqual("https://some.where/something.png?rmode=max&amp;width=500", link.Attributes.First().Value);
+
+        Assert.IsFalse(link.Attributes.TryGetValue("destinationId", out _));
+        Assert.IsFalse(link.Attributes.TryGetValue("destinationType", out _));
+        Assert.IsFalse(link.Attributes.TryGetValue("linkType", out _));
     }
 
     [Test]
@@ -482,8 +519,11 @@ public class RichTextParserTests : PropertyValueConverterTests
 
         var result = parser.Parse($"<p><a href=\"/{{localLink:{_contentKey:N}}}\" type=\"document\"></a></p>");
         Assert.IsTrue(result.Contains("href=\"/some-content-path\""));
+        Assert.IsTrue(result.Contains($"data-destination-id=\"{_contentKey:D}\""));
+        Assert.IsTrue(result.Contains($"data-destination-type=\"{_contentType}\""));
         Assert.IsTrue(result.Contains("data-start-item-path=\"the-root-path\""));
         Assert.IsTrue(result.Contains($"data-start-item-id=\"{_contentRootKey:D}\""));
+        Assert.IsTrue(result.Contains($"data-link-type=\"{LinkType.Content}\""));
     }
 
     [Test]
@@ -493,8 +533,11 @@ public class RichTextParserTests : PropertyValueConverterTests
 
         var result = parser.Parse($"<p><a href=\"/{{localLink:umb://document/{_contentKey:N}}}\"></a></p>");
         Assert.IsTrue(result.Contains("href=\"/some-content-path\""));
+        Assert.IsTrue(result.Contains($"data-destination-id=\"{_contentKey:D}\""));
+        Assert.IsTrue(result.Contains($"data-destination-type=\"{_contentType}\""));
         Assert.IsTrue(result.Contains("data-start-item-path=\"the-root-path\""));
         Assert.IsTrue(result.Contains($"data-start-item-id=\"{_contentRootKey:D}\""));
+        Assert.IsTrue(result.Contains($"data-link-type=\"{LinkType.Content}\""));
     }
 
     [TestCase("#some-anchor")]
@@ -507,8 +550,11 @@ public class RichTextParserTests : PropertyValueConverterTests
 
         var result = parser.Parse($"<p><a href=\"/{{localLink:{_contentKey:N}}}{postfix}\" type=\"document\"></a></p>");
         Assert.IsTrue(result.Contains($"href=\"/some-content-path{postfix}\""));
+        Assert.IsTrue(result.Contains($"data-destination-id=\"{_contentKey:D}\""));
+        Assert.IsTrue(result.Contains($"data-destination-type=\"{_contentType}\""));
         Assert.IsTrue(result.Contains("data-start-item-path=\"the-root-path\""));
         Assert.IsTrue(result.Contains($"data-start-item-id=\"{_contentRootKey:D}\""));
+        Assert.IsTrue(result.Contains($"data-link-type=\"{LinkType.Content}\""));
     }
 
     [TestCase("#some-anchor")]
@@ -521,8 +567,11 @@ public class RichTextParserTests : PropertyValueConverterTests
 
         var result = parser.Parse($"<p><a href=\"/{{localLink:umb://document/{_contentKey:N}}}{postfix}\"></a></p>");
         Assert.IsTrue(result.Contains($"href=\"/some-content-path{postfix}\""));
+        Assert.IsTrue(result.Contains($"data-destination-id=\"{_contentKey:D}\""));
+        Assert.IsTrue(result.Contains($"data-destination-type=\"{_contentType}\""));
         Assert.IsTrue(result.Contains("data-start-item-path=\"the-root-path\""));
         Assert.IsTrue(result.Contains($"data-start-item-id=\"{_contentRootKey:D}\""));
+        Assert.IsTrue(result.Contains($"data-link-type=\"{LinkType.Content}\""));
     }
 
     [Test]
@@ -532,6 +581,9 @@ public class RichTextParserTests : PropertyValueConverterTests
 
         var result = parser.Parse($"<p><a href=\"/{{localLink:umb://media/{_mediaKey:N}}}\"></a></p>");
         Assert.IsTrue(result.Contains("href=\"/some-media-url\""));
+        Assert.IsTrue(result.Contains($"data-destination-id=\"{_mediaKey:D}\""));
+        Assert.IsTrue(result.Contains($"data-destination-type=\"{_mediaType}\""));
+        Assert.IsTrue(result.Contains($"data-link-type=\"{LinkType.Media}\""));
     }
 
     [TestCase("{localLink:umb://document/fe5bf80d37db4373adb9b206896b4a3b}")]
@@ -564,6 +616,9 @@ public class RichTextParserTests : PropertyValueConverterTests
         var result = parser.Parse($"<p><img src=\"/media/whatever/something.png?rmode=max&amp;width=500\" data-udi=\"umb://media/{_mediaKey:N}\"></p>");
         Assert.IsTrue(result.Contains("src=\"/some-media-url?rmode=max&amp;width=500\""));
         Assert.IsFalse(result.Contains("data-udi"));
+        Assert.IsFalse(result.Contains("data-destination-id"));
+        Assert.IsFalse(result.Contains("data-destination-type"));
+        Assert.IsFalse(result.Contains("data-link-type"));
     }
 
     [Test]
@@ -574,6 +629,9 @@ public class RichTextParserTests : PropertyValueConverterTests
         var result = parser.Parse($"<p><img src=\"/media/whatever/something.png?rmode=max&amp;width=500\" data-udi=\"umb://media/{_mediaKey:N}\"></p>");
         Assert.IsTrue(result.Contains("src=\"/some-media-url?rmode=max&amp;width=500\""));
         Assert.IsFalse(result.Contains("data-udi"));
+        Assert.IsFalse(result.Contains("data-destination-id"));
+        Assert.IsFalse(result.Contains("data-destination-type"));
+        Assert.IsFalse(result.Contains("data-link-type"));
     }
 
     [Test]
@@ -639,10 +697,12 @@ public class RichTextParserTests : PropertyValueConverterTests
         var contentMock = new Mock<IPublishedContent>();
         contentMock.SetupGet(m => m.Key).Returns(_contentKey);
         contentMock.SetupGet(m => m.ItemType).Returns(PublishedItemType.Content);
+        contentMock.SetupGet(m => m.ContentType.Alias).Returns(_contentType);
 
         var mediaMock = new Mock<IPublishedContent>();
         mediaMock.SetupGet(m => m.Key).Returns(_mediaKey);
         mediaMock.SetupGet(m => m.ItemType).Returns(PublishedItemType.Media);
+        mediaMock.SetupGet(m => m.ContentType.Alias).Returns(_mediaType);
 
         var contentCacheMock = new Mock<IPublishedContentCache>();
         contentCacheMock.Setup(m => m.GetById(_contentKey)).Returns(contentMock.Object);

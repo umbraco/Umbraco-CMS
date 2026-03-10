@@ -16,8 +16,8 @@ public class EmailUserForgotPasswordSender : IUserForgotPasswordSender
 {
     private readonly IEmailSender _emailSender;
     private readonly ILocalizedTextService _localizedTextService;
-    private GlobalSettings _globalSettings;
-    private SecuritySettings _securitySettings;
+    private readonly GlobalSettings _globalSettings;
+    private readonly SecuritySettings _securitySettings;
 
     public EmailUserForgotPasswordSender(
         IEmailSender emailSender,
@@ -29,9 +29,6 @@ public class EmailUserForgotPasswordSender : IUserForgotPasswordSender
         _localizedTextService = localizedTextService;
         _globalSettings = globalSettings.CurrentValue;
         _securitySettings = securitySettings.CurrentValue;
-
-        globalSettings.OnChange(settings => _globalSettings = settings);
-        securitySettings.OnChange(settings => _securitySettings = settings);
     }
 
     public async Task SendForgotPassword(UserForgotPasswordMessage messageModel)
@@ -68,7 +65,7 @@ public class EmailUserForgotPasswordSender : IUserForgotPasswordSender
 
         var message = new EmailMessage(senderEmail, address.ToString(), emailSubject, emailBody, true);
 
-        await _emailSender.SendAsync(message, Constants.Web.EmailTypes.PasswordReset, true);
+        await _emailSender.SendAsync(message, Constants.Web.EmailTypes.PasswordReset, true, _securitySettings.PasswordResetEmailExpiry);
     }
 
     public bool CanSend() => _securitySettings.AllowPasswordReset && _emailSender.CanSendRequiredEmail();

@@ -17,14 +17,27 @@ namespace Umbraco.Cms.Core.Models;
 public class PropertyTypeCollection : KeyedCollection<string, IPropertyType>, INotifyCollectionChanged, IDeepCloneable,
     ICollection<IPropertyType>
 {
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="PropertyTypeCollection" /> class.
+    /// </summary>
+    /// <param name="supportsPublishing">A value indicating whether the property types in this collection support publishing.</param>
     public PropertyTypeCollection(bool supportsPublishing) => SupportsPublishing = supportsPublishing;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="PropertyTypeCollection" /> class with initial property types.
+    /// </summary>
+    /// <param name="supportsPublishing">A value indicating whether the property types in this collection support publishing.</param>
+    /// <param name="properties">The initial property types to add to the collection.</param>
     public PropertyTypeCollection(bool supportsPublishing, IEnumerable<IPropertyType> properties)
         : this(supportsPublishing) =>
         Reset(properties);
 
+    /// <inheritdoc />
     public event NotifyCollectionChangedEventHandler? CollectionChanged;
 
+    /// <summary>
+    ///     Gets a value indicating whether the property types in this collection support publishing.
+    /// </summary>
     public bool SupportsPublishing { get; }
 
     // This baseclass calling is needed, else compiler will complain about nullability
@@ -32,8 +45,15 @@ public class PropertyTypeCollection : KeyedCollection<string, IPropertyType>, IN
     /// <inheritdoc />
     public bool IsReadOnly => false;
 
-    // 'new' keyword is required! we can explicitly implement ICollection<IPropertyType>.Add BUT since normally a concrete PropertyType type
-    // is passed in, the explicit implementation doesn't get called, this ensures it does get called.
+    /// <summary>
+    ///     Adds a property type to the collection.
+    /// </summary>
+    /// <param name="item">The property type to add.</param>
+    /// <remarks>
+    ///     The 'new' keyword is required because we can explicitly implement <see cref="ICollection{T}.Add" />,
+    ///     but since normally a concrete PropertyType type is passed in, the explicit implementation doesn't get called.
+    ///     This ensures it does get called.
+    /// </remarks>
     public new void Add(IPropertyType item)
     {
         item.SupportsPublishing = SupportsPublishing;
@@ -62,6 +82,7 @@ public class PropertyTypeCollection : KeyedCollection<string, IPropertyType>, IN
         base.Add(item);
     }
 
+    /// <inheritdoc />
     public object DeepClone()
     {
         var clone = new PropertyTypeCollection(SupportsPublishing);
@@ -100,6 +121,7 @@ public class PropertyTypeCollection : KeyedCollection<string, IPropertyType>, IN
         }
     }
 
+    /// <inheritdoc />
     protected override void SetItem(int index, IPropertyType item)
     {
         item.SupportsPublishing = SupportsPublishing;
@@ -109,6 +131,7 @@ public class PropertyTypeCollection : KeyedCollection<string, IPropertyType>, IN
         item.PropertyChanged += Item_PropertyChanged;
     }
 
+    /// <inheritdoc />
     protected override void RemoveItem(int index)
     {
         IPropertyType removed = this[index];
@@ -117,6 +140,7 @@ public class PropertyTypeCollection : KeyedCollection<string, IPropertyType>, IN
         OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, removed));
     }
 
+    /// <inheritdoc />
     protected override void InsertItem(int index, IPropertyType item)
     {
         item.SupportsPublishing = SupportsPublishing;
@@ -125,6 +149,7 @@ public class PropertyTypeCollection : KeyedCollection<string, IPropertyType>, IN
         item.PropertyChanged += Item_PropertyChanged;
     }
 
+    /// <inheritdoc />
     protected override void ClearItems()
     {
         base.ClearItems();
@@ -148,6 +173,11 @@ public class PropertyTypeCollection : KeyedCollection<string, IPropertyType>, IN
             new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, propType, propType));
     }
 
+    /// <summary>
+    ///     Removes the property type with the specified alias from the collection.
+    /// </summary>
+    /// <param name="propertyTypeAlias">The alias of the property type to remove.</param>
+    /// <returns><c>true</c> if the property type was found and removed; otherwise, <c>false</c>.</returns>
     public bool RemoveItem(string propertyTypeAlias)
     {
         var key = IndexOfKey(propertyTypeAlias);
@@ -159,6 +189,11 @@ public class PropertyTypeCollection : KeyedCollection<string, IPropertyType>, IN
         return key != -1;
     }
 
+    /// <summary>
+    ///     Gets the index of the property type with the specified alias.
+    /// </summary>
+    /// <param name="key">The alias to search for.</param>
+    /// <returns>The zero-based index of the property type, or -1 if not found.</returns>
     public int IndexOfKey(string key)
     {
         for (var i = 0; i < Count; i++)
@@ -177,8 +212,13 @@ public class PropertyTypeCollection : KeyedCollection<string, IPropertyType>, IN
     /// </summary>
     public void ClearCollectionChangedEvents() => CollectionChanged = null;
 
+    /// <inheritdoc />
     protected override string GetKeyForItem(IPropertyType item) => item.Alias;
 
+    /// <summary>
+    ///     Raises the <see cref="CollectionChanged" /> event.
+    /// </summary>
+    /// <param name="args">The event arguments.</param>
     protected virtual void OnCollectionChanged(NotifyCollectionChangedEventArgs args) =>
         CollectionChanged?.Invoke(this, args);
 }

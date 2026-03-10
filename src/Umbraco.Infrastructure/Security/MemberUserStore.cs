@@ -36,7 +36,6 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
     /// <param name="externalLoginService">The external login service</param>
     /// <param name="twoFactorLoginService">The two factor login service</param>
     /// <param name="memberCache"></param>
-    [ActivatorUtilitiesConstructor]
     public MemberUserStore(
         IMemberService memberService,
         IUmbracoMapper mapper,
@@ -245,7 +244,7 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
 
     private static bool UpdatingOnlyLoginProperties(IReadOnlyList<string> propertiesUpdated)
     {
-        string[] loginPropertyUpdates = [nameof(MemberIdentityUser.LastLoginDateUtc), nameof(MemberIdentityUser.SecurityStamp)];
+        string[] loginPropertyUpdates = [nameof(MemberIdentityUser.LastLoginDate), nameof(MemberIdentityUser.SecurityStamp)];
         return (propertiesUpdated.Count == 2 && propertiesUpdated.ContainsAll(loginPropertyUpdates)) ||
                (propertiesUpdated.Count == 1 && propertiesUpdated.ContainsAny(loginPropertyUpdates));
     }
@@ -299,13 +298,13 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
 
     public IPublishedContent? GetPublishedMember(MemberIdentityUser? user)
     {
-        if (user == null)
+        if (user is null)
         {
             return null;
         }
 
         IMember? member = _memberService.GetById(user.Key);
-        if (member == null)
+        if (member is null)
         {
             return null;
         }
@@ -388,7 +387,9 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
     }
 
     /// <inheritdoc />
-    public override Task AddLoginAsync(MemberIdentityUser user, UserLoginInfo login,
+    public override Task AddLoginAsync(
+        MemberIdentityUser user,
+        UserLoginInfo login,
         CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -429,7 +430,10 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
     }
 
     /// <inheritdoc />
-    public override Task RemoveLoginAsync(MemberIdentityUser user, string loginProvider, string providerKey,
+    public override Task RemoveLoginAsync(
+        MemberIdentityUser user,
+        string loginProvider,
+        string providerKey,
         CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -492,7 +496,9 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
     /// <summary>
     ///     Returns true if a user is in the role
     /// </summary>
-    public override Task<bool> IsInRoleAsync(MemberIdentityUser user, string roleName,
+    public override Task<bool> IsInRoleAsync(
+        MemberIdentityUser user,
+        string roleName,
         CancellationToken cancellationToken = default)
     {
         EnsureRoles(user);
@@ -659,7 +665,10 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
     ///     tracking ORMs like EFCore.
     /// </remarks>
     /// <inheritdoc />
-    public override Task<string?> GetTokenAsync(MemberIdentityUser user, string loginProvider, string name,
+    public override Task<string?> GetTokenAsync(
+        MemberIdentityUser user,
+        string loginProvider,
+        string name,
         CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -698,7 +707,9 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
     }
 
     /// <inheritdoc />
-    protected override async Task<IdentityUserRole<string>?> FindUserRoleAsync(string userId, string roleId,
+    protected override async Task<IdentityUserRole<string>?> FindUserRoleAsync(
+        string userId,
+        string roleId,
         CancellationToken cancellationToken)
     {
         MemberIdentityUser? user = await FindUserAsync(userId, cancellationToken);
@@ -728,27 +739,23 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
         updateRoles = false;
 
         // don't assign anything if nothing has changed as this will trigger the track changes of the model
-        if (identityUser.IsPropertyDirty(nameof(MemberIdentityUser.LastLoginDateUtc))
-            || (member.LastLoginDate != default && identityUser.LastLoginDateUtc.HasValue == false)
-            || (identityUser.LastLoginDateUtc.HasValue &&
-                member.LastLoginDate?.ToUniversalTime() != identityUser.LastLoginDateUtc.Value))
+        if (identityUser.IsPropertyDirty(nameof(MemberIdentityUser.LastLoginDate))
+            || (member.LastLoginDate != default && identityUser.LastLoginDate.HasValue == false)
+            || (identityUser.LastLoginDate.HasValue &&
+                member.LastLoginDate?.ToUniversalTime() != identityUser.LastLoginDate.Value))
         {
-            updatedProperties.Add(nameof(MemberIdentityUser.LastLoginDateUtc));
+            updatedProperties.Add(nameof(MemberIdentityUser.LastLoginDate));
 
-            // if the LastLoginDate is being set to MinValue, don't convert it ToLocalTime
-            DateTime dt = identityUser.LastLoginDateUtc == DateTime.MinValue
-                ? DateTime.MinValue
-                : identityUser.LastLoginDateUtc?.ToLocalTime() ?? DateTime.MinValue;
-            member.LastLoginDate = dt;
+            member.LastLoginDate = identityUser.LastLoginDate;
         }
 
-        if (identityUser.IsPropertyDirty(nameof(MemberIdentityUser.LastPasswordChangeDateUtc))
-            || (member.LastPasswordChangeDate != default && identityUser.LastPasswordChangeDateUtc.HasValue == false)
-            || (identityUser.LastPasswordChangeDateUtc.HasValue && member.LastPasswordChangeDate?.ToUniversalTime() !=
-                identityUser.LastPasswordChangeDateUtc.Value))
+        if (identityUser.IsPropertyDirty(nameof(MemberIdentityUser.LastPasswordChangeDate))
+            || (member.LastPasswordChangeDate != default && identityUser.LastPasswordChangeDate.HasValue == false)
+            || (identityUser.LastPasswordChangeDate.HasValue && member.LastPasswordChangeDate?.ToUniversalTime() !=
+                identityUser.LastPasswordChangeDate.Value))
         {
-            updatedProperties.Add(nameof(MemberIdentityUser.LastPasswordChangeDateUtc));
-            member.LastPasswordChangeDate = identityUser.LastPasswordChangeDateUtc?.ToLocalTime() ?? DateTime.Now;
+            updatedProperties.Add(nameof(MemberIdentityUser.LastPasswordChangeDate));
+            member.LastPasswordChangeDate = identityUser.LastPasswordChangeDate ?? DateTime.UtcNow;
         }
 
         if (identityUser.IsPropertyDirty(nameof(MemberIdentityUser.Comments))
@@ -765,7 +772,7 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
                 identityUser.EmailConfirmed))
         {
             updatedProperties.Add(nameof(MemberIdentityUser.EmailConfirmed));
-            member.EmailConfirmedDate = identityUser.EmailConfirmed ? DateTime.Now : null;
+            member.EmailConfirmedDate = identityUser.EmailConfirmed ? DateTime.UtcNow : null;
         }
 
         if (identityUser.IsPropertyDirty(nameof(MemberIdentityUser.Name))
@@ -797,7 +804,7 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
             if (member.IsLockedOut)
             {
                 // need to set the last lockout date
-                member.LastLockoutDate = DateTime.Now;
+                member.LastLockoutDate = DateTime.UtcNow;
             }
         }
 

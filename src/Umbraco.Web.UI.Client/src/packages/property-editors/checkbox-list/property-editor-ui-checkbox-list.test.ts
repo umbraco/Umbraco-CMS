@@ -1,14 +1,14 @@
 import { UmbPropertyEditorUICheckboxListElement } from './property-editor-ui-checkbox-list.element.js';
 import { expect, fixture, html } from '@open-wc/testing';
 import { type UmbTestRunnerWindow, defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
-import { 
-	setupBasicStringConfig, 
-	setupObjectConfig, 
+import {
+	setupBasicStringConfig,
+	setupObjectConfig,
 	setupEmptyConfig,
 	getCheckboxListElement,
 	getCheckboxSelection,
 	verifyMultiSelectValueAndDOM,
-	MULTI_SELECT_TEST_DATA
+	MULTI_SELECT_TEST_DATA,
 } from '../utils/property-editor-test-utils.js';
 
 describe('UmbPropertyEditorUICheckboxListElement', () => {
@@ -23,14 +23,14 @@ describe('UmbPropertyEditorUICheckboxListElement', () => {
 		const checkboxListInput = getCheckboxListElement(element);
 		const checkboxElements = checkboxListInput?.shadowRoot?.querySelectorAll('uui-checkbox') || [];
 		const checkedValues: string[] = [];
-		
+
 		checkboxElements.forEach((checkbox: Element) => {
 			const uuiCheckbox = checkbox as any;
 			if (uuiCheckbox.checked) {
 				checkedValues.push(uuiCheckbox.value);
 			}
 		});
-		
+
 		return checkedValues;
 	}
 
@@ -121,7 +121,7 @@ describe('UmbPropertyEditorUICheckboxListElement', () => {
 	describe('configuration handling', () => {
 		it('should handle string array configuration', async () => {
 			setupBasicStringConfig(element, ['Option1', 'Option2', 'Option3']);
-			
+
 			element.value = ['Option1', 'Option3'];
 			await element.updateComplete;
 
@@ -130,7 +130,7 @@ describe('UmbPropertyEditorUICheckboxListElement', () => {
 
 		it('should handle object array configuration', async () => {
 			setupObjectConfig(element);
-			
+
 			element.value = ['red', 'blue'];
 			await element.updateComplete;
 
@@ -139,7 +139,7 @@ describe('UmbPropertyEditorUICheckboxListElement', () => {
 
 		it('should handle empty configuration gracefully', async () => {
 			setupEmptyConfig(element);
-			
+
 			element.value = ['test'];
 			await element.updateComplete;
 

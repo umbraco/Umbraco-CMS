@@ -27,9 +27,15 @@ public class RootMemberTypeTreeController : MemberTypeTreeControllerBase
     [HttpGet("root")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<MemberTypeTreeItemResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a collection of member type items from the root of the tree.")]
+    [EndpointDescription("Gets a paginated collection of member type items from the root of the tree with optional filtering.")]
     public async Task<ActionResult<PagedViewModel<MemberTypeTreeItemResponseModel>>> Root(
         CancellationToken cancellationToken,
         int skip = 0,
-        int take = 100)
-        => await GetRoot(skip, take);
+        int take = 100,
+        bool foldersOnly = false)
+    {
+        RenderFoldersOnly(foldersOnly);
+        return await GetRoot(skip, take);
+    }
 }

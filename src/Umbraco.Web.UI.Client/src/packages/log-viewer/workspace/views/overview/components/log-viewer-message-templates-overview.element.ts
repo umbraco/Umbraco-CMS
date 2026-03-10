@@ -1,10 +1,10 @@
-import type { UmbLogViewerWorkspaceContext } from '../../../logviewer-workspace.context.js';
 import { UMB_APP_LOG_VIEWER_CONTEXT } from '../../../logviewer-workspace.context-token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { LogTemplateResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
+import { consumeContext } from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-log-viewer-message-templates-overview')
 export class UmbLogViewerMessageTemplatesOverviewElement extends UmbLitElement {
@@ -17,19 +17,20 @@ export class UmbLogViewerMessageTemplatesOverviewElement extends UmbLitElement {
 	@state()
 	private _messageTemplates: Array<LogTemplateResponseModel> = [];
 
-	#logViewerContext?: UmbLogViewerWorkspaceContext;
-	constructor() {
-		super();
-		this.consumeContext(UMB_APP_LOG_VIEWER_CONTEXT, (instance) => {
-			this.#logViewerContext = instance;
-			this.#logViewerContext?.getMessageTemplates(0, this.#itemsPerPage);
-			this.#observeStuff();
-		});
+	#logViewerContext?: typeof UMB_APP_LOG_VIEWER_CONTEXT.TYPE;
+
+	@consumeContext({ context: UMB_APP_LOG_VIEWER_CONTEXT })
+	private set _logViewerContext(value) {
+		this.#logViewerContext = value;
+		this.#getMessageTemplates();
+		this.#observeStuff();
+	}
+	private get _logViewerContext() {
+		return this.#logViewerContext;
 	}
 
 	#observeStuff() {
-		if (!this.#logViewerContext) return;
-		this.observe(this.#logViewerContext.messageTemplates, (templates) => {
+		this.observe(this._logViewerContext?.messageTemplates, (templates) => {
 			this._messageTemplates = templates?.items ?? [];
 			this._total = templates?.total ?? 0;
 		});
@@ -37,7 +38,7 @@ export class UmbLogViewerMessageTemplatesOverviewElement extends UmbLitElement {
 
 	#getMessageTemplates() {
 		const skip = this.#currentPage * this.#itemsPerPage - this.#itemsPerPage;
-		this.#logViewerContext?.getMessageTemplates(skip, this.#itemsPerPage);
+		this._logViewerContext?.getMessageTemplates(skip, this.#itemsPerPage);
 	}
 
 	#onChangePage(event: UUIPaginationEvent) {
@@ -47,8 +48,8 @@ export class UmbLogViewerMessageTemplatesOverviewElement extends UmbLitElement {
 
 	override render() {
 		return html`
-			<uui-box headline="Common Log Messages" id="saved-searches">
-				<p style="font-style: italic;">Total Unique Message types: ${this._total}</p>
+			<uui-box headline=${this.localize.term('logViewer_commonLogMessages')} id="saved-searches">
+				<p style="font-style: italic;">${this.localize.term('logViewer_totalUniqueMessageTypes', this._total)}</p>
 
 				<uui-table>
 					${this._messageTemplates

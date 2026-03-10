@@ -13,15 +13,6 @@ export class UmbValidationContext extends UmbValidationController {
 		this.provideContext(UMB_VALIDATION_CONTEXT, this);
 	}
 
-	/**
-	 * Provides the validation context to the current host, if not already provided to a different host.
-	 * @deprecated No need to provide, this happens automatically. (Do notice this was necessary in 14.3.-rc, but removed in 14.3 release)
-	 * @returns instance {UmbValidationController} - Returns it self.
-	 */
-	provide(): UmbValidationController {
-		return this;
-	}
-
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	override provideAt(controllerHost: UmbClassInterface): void {
 		throw new Error(

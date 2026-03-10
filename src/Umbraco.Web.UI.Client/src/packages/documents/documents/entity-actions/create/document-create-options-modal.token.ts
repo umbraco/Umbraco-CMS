@@ -16,7 +16,6 @@ export const UMB_DOCUMENT_CREATE_OPTIONS_MODAL = new UmbModalToken<
 	UmbDocumentCreateOptionsModalValue
 >('Umb.Modal.Document.CreateOptions', {
 	modal: {
-		type: 'sidebar',
-		size: 'small',
+		type: 'dialog',
 	},
 });

@@ -1,4 +1,5 @@
 import { UMB_DOCUMENT_URL_REPOSITORY_ALIAS, UMB_DOCUMENT_URL_STORE_ALIAS } from './constants.js';
+import { UmbDocumentUrlStore } from './document-url.store.js';
 import type { ManifestItemStore, ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
 
 const urlRepository: ManifestRepository = {
@@ -12,7 +13,7 @@ const urlStore: ManifestItemStore = {
 	type: 'itemStore',
 	alias: UMB_DOCUMENT_URL_STORE_ALIAS,
 	name: 'Document Url Store',
-	api: () => import('./document-url.store.js'),
+	api: UmbDocumentUrlStore,
 };
 
 export const manifests = [urlRepository, urlStore];

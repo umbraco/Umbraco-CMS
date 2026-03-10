@@ -32,28 +32,20 @@
           "condition": "(!Docker)",
           "exclude": [
             "Dockerfile",
-            ".dockerignore"
+            ".dockerignore",
+            "entrypoint.sh"
+          ]
+        },
+        {
+          "condition": "(!UseCPM)",
+          "exclude": [
+            "Directory.Packages.props"
           ]
         }
       ]
     }
   ],
   "symbols": {
-    "Framework": {
-      "displayName": "Framework",
-      "description": "The target framework for the project.",
-      "type": "parameter",
-      "datatype": "choice",
-      "choices": [
-        {
-          "displayName": ".NET 9.0",
-          "description": "Target net9.0",
-          "choice": "net9.0"
-        }
-      ],
-      "defaultValue": "net9.0",
-      "replaces": "net9.0"
-    },
     "UmbracoRelease": {
       "displayName": "Umbraco Version",
       "description": "The Umbraco release to use, either latest or latest long term supported",
@@ -73,16 +65,7 @@
       ],
       "isRequired": false
     },
-    "UmbracoVersion": {
-      "displayName": "Custom Version",
-      "description": "The selected custom version of Umbraco, this is obsoleted, and will be removed in a future version of the template.",
-      "type": "parameter",
-      "datatype": "string",
-      "defaultValue": "null",
-      "replaces": "CUSTOM_VERSION",
-      "isRequired": false
-    },
-    "FinalVersion" : {
+    "FinalVersion": {
       "type": "generated",
       "generator": "switch",
       "datatype": "text",
@@ -98,17 +81,39 @@
           },
           {
             "condition": "(UmbracoRelease == 'LTS')",
-            "value": "13.10.1"
+            "value": "17.*"
           }
         ]
       }
     },
-    "DotnetVersion":
-    {
+    "PackageManagement": {
+      "type": "parameter",
+      "datatype": "choice",
+      "defaultValue": "Central",
+      "displayName": "Package Version Management",
+      "description": "Choose how to manage NuGet package versions",
+      "choices": [
+        {
+          "choice": "Central",
+          "displayName": "Central package management",
+          "description": "Use Directory.Packages.props (recommended for new standalone projects)"
+        },
+        {
+          "choice": "PerProject",
+          "displayName": "Per project",
+          "description": "Use versions in .csproj (recommended when adding to existing projects)"
+        }
+      ]
+    },
+    "UseCPM": {
+      "type": "computed",
+      "value": "(PackageManagement == \"Central\")"
+    },
+    "DotnetVersion": {
       "type": "generated",
       "generator": "switch",
       "datatype": "text",
-      "description": "Used to calculate the dotnet version to use, for latest we want to use dotnet 9 and for LTS we want to use dotnet 8",
+      "description": "Used to calculate the dotnet version to use, for latest we want to use dotnet 10 and for LTS we want to use dotnet 10",
       "replaces": "DOTNET_VERSION_FROM_TEMPLATE",
       "parameters": {
         "evaluator": "C++",
@@ -116,11 +121,11 @@
         "cases": [
           {
             "condition": "(UmbracoRelease == 'Latest')",
-            "value": "net9.0"
+            "value": "net10.0"
           },
           {
             "condition": "(UmbracoRelease == 'LTS')",
-            "value": "net8.0"
+            "value": "net10.0"
           }
         ]
       }
@@ -299,6 +304,33 @@
         ]
       },
       "replaces": "UNATTENDED_USER_PASSWORD_FROM_TEMPLATE"
+    },
+    "UnattendedTelemetryLevel": {
+      "displayName": "Unattended telemetry level",
+      "description": "Specifies the level of telemetry information the installation will report.",
+      "type": "parameter",
+      "datatype": "choice",
+      "defaultValue": "Detailed",
+      "choices": [
+        {
+          "choice": "Minimal",
+          "description": "Minimal information"
+        },
+        {
+          "choice": "Basic",
+          "description": "Basic information"
+        },
+        {
+          "choice": "Detailed",
+          "description": "Detailed information"
+        }
+      ],
+      "forms": {
+        "global": [
+          "jsonEncode"
+        ]
+      },
+      "replaces": "UNATTENDED_TELEMETRY_LEVEL_FROM_TEMPLATE"
     },
     "UsingUnattenedInstall": {
       "type": "computed",

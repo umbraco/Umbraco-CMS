@@ -25,12 +25,15 @@ public class ByNameHealthCheckGroupController : HealthCheckGroupControllerBase
     /// <summary>
     ///     Gets a health check group with all its health checks by a group name.
     /// </summary>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <param name="name">The name of the group.</param>
     /// <returns>The health check group or not found result.</returns>
     [HttpGet("{name}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(HealthCheckGroupPresentationModel), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a health check group by name.")]
+    [EndpointDescription("Gets a health check group and all its associated health checks identified by the provided group name.")]
     public Task<IActionResult> ByName(
         CancellationToken cancellationToken,
         string name)

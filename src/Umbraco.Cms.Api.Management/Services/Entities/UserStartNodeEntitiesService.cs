@@ -11,21 +11,21 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Services.Entities;
 
+/// <summary>
+/// Provides functionality for retrieving user start node entities with access information.
+/// </summary>
 public class UserStartNodeEntitiesService : IUserStartNodeEntitiesService
 {
     private readonly IEntityService _entityService;
     private readonly ICoreScopeProvider _scopeProvider;
     private readonly IIdKeyMap _idKeyMap;
 
-    [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in V17.")]
-    public UserStartNodeEntitiesService(IEntityService entityService)
-        : this(
-            entityService,
-            StaticServiceProvider.Instance.GetRequiredService<ICoreScopeProvider>(),
-            StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>())
-    {
-    }
-
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UserStartNodeEntitiesService"/> class.
+    /// </summary>
+    /// <param name="entityService">The entity service.</param>
+    /// <param name="scopeProvider">The core scope provider.</param>
+    /// <param name="idKeyMap">The ID to key mapping service.</param>
     public UserStartNodeEntitiesService(IEntityService entityService, ICoreScopeProvider scopeProvider, IIdKeyMap idKeyMap)
     {
         _entityService = entityService;
@@ -96,10 +96,12 @@ public class UserStartNodeEntitiesService : IUserStartNodeEntitiesService
             return ChildUserAccessEntities(children, userStartNodePaths);
         }
 
-        int[] allowedChildIds = GetAllowedIds(userStartNodePaths, parentId);
+        // Need to use a List here because the expression tree cannot convert an array when used in Contains.
+        // See ExpressionTests.Sql_In().
+        List<int> allowedChildIds = GetAllowedIds(userStartNodePaths, parentId);
 
-        totalItems = allowedChildIds.Length;
-        if (allowedChildIds.Length == 0)
+        totalItems = allowedChildIds.Count;
+        if (allowedChildIds.Count == 0)
         {
             // The requested parent is outside the scope of any user start nodes.
             return [];
@@ -111,7 +113,7 @@ public class UserStartNodeEntitiesService : IUserStartNodeEntitiesService
         return ChildUserAccessEntities(children, userStartNodePaths);
     }
 
-    private static int[] GetAllowedIds(string[] userStartNodePaths, int parentId)
+    private static List<int> GetAllowedIds(string[] userStartNodePaths, int parentId)
     {
         // If one or more of the user start nodes are descendants of the requested parent, find the "next child IDs" in those user start node paths
         // that are the final entries in the path.
@@ -121,7 +123,7 @@ public class UserStartNodeEntitiesService : IUserStartNodeEntitiesService
             .Where(ids => ids.Contains(parentId))
             .Select(ids => ids[ids.IndexOf(parentId) + 1]) // Given the previous checks, the parent ID can never be the last in the user start node path, so this is safe
             .Distinct()
-            .ToArray();
+            .ToList();
     }
 
     /// <inheritdoc />
@@ -140,7 +142,8 @@ public class UserStartNodeEntitiesService : IUserStartNodeEntitiesService
             }
 
             // is ancestor of a start node?
-            if (userStartNodePaths.Any(path => path.StartsWith(child.Path)))
+            // Note: Add trailing comma to prevent false matches (e.g., path "-1,100" should not match "-1,1001")
+            if (userStartNodePaths.Any(path => path.StartsWith($"{child.Path},")))
             {
                 return new UserAccessEntity(child, false);
             }
@@ -157,8 +160,7 @@ public class UserStartNodeEntitiesService : IUserStartNodeEntitiesService
         int after,
         Ordering ordering,
         out long totalBefore,
-        out long totalAfter
-        )
+        out long totalAfter)
     {
         Attempt<int> targetIdAttempt = _idKeyMap.GetIdForKey(targetKey, umbracoObjectType);
         if (targetIdAttempt.Success is false)
@@ -194,9 +196,9 @@ public class UserStartNodeEntitiesService : IUserStartNodeEntitiesService
             return ChildUserAccessEntities(siblings, userStartNodePaths);
         }
 
-        int[] allowedSiblingIds = GetAllowedIds(userStartNodePaths, targetParent.Id);
+        List<int> allowedSiblingIds = GetAllowedIds(userStartNodePaths, targetParent.Id);
 
-        if (allowedSiblingIds.Length == 0)
+        if (allowedSiblingIds.Count == 0)
         {
             // The requested target is outside the scope of any user start nodes.
             totalBefore = 0;
@@ -219,5 +221,7 @@ public class UserStartNodeEntitiesService : IUserStartNodeEntitiesService
         => entities.Select(entity => new UserAccessEntity(entity, IsDescendantOrSelf(entity, userStartNodePaths))).ToArray();
 
     private static bool IsDescendantOrSelf(IEntitySlim child, string[] userStartNodePaths)
-        => userStartNodePaths.Any(path => child.Path.StartsWith(path));
+        // Note: Add trailing commas to both paths to prevent false matches (e.g., path "-1,100" should not match "-1,1001")
+        // This matches the pattern used in lines 92 and 192 of this file
+        => userStartNodePaths.Any(path => $"{child.Path},".StartsWith($"{path},"));
 }

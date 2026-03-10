@@ -1,3 +1,5 @@
+import { UmbTemplateItemStore } from './template-item.store.js';
+
 export const UMB_TEMPLATE_ITEM_REPOSITORY_ALIAS = 'Umb.Repository.TemplateItem';
 export const UMB_TEMPLATE_STORE_ALIAS = 'Umb.Store.TemplateItem';
 
@@ -12,6 +14,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'itemStore',
 		alias: UMB_TEMPLATE_STORE_ALIAS,
 		name: 'Template Item Store',
-		api: () => import('./template-item.store.js'),
+		api: UmbTemplateItemStore,
 	},
 ];

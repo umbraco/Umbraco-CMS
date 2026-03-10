@@ -239,7 +239,7 @@ export abstract class UmbBlockEntryContext<
 		await this.#settingsStructurePromise;
 		return mergeObservables(
 			[
-				this.#content.asObservablePart((data) => data?.values?.filter((x) => x?.alias === propertyAlias)),
+				this.#settings.asObservablePart((data) => data?.values?.filter((x) => x?.alias === propertyAlias)),
 				await this.propertyVariantId(this.#settingsStructure!, propertyAlias),
 			],
 			([propertyValues, propertyVariantId]) => {
@@ -714,7 +714,7 @@ export abstract class UmbBlockEntryContext<
 		this.observe(
 			this._manager?.hasExposeOf(this.#contentKey, variantId),
 			(hasExpose) => {
-				this.#hasExpose.setValue(hasExpose);
+				this.#hasExpose.setValue(hasExpose ?? false);
 			},
 			'observeExpose',
 		);

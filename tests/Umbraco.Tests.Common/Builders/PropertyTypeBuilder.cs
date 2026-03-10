@@ -178,8 +178,8 @@ public class PropertyTypeBuilder<TParent>
         var valueStorageType = _valueStorageType ?? ValueStorageType.Nvarchar;
         var name = _name ?? Guid.NewGuid().ToString();
         var alias = _alias ?? name.ToCamelCase();
-        var createDate = _createDate ?? DateTime.Now;
-        var updateDate = _updateDate ?? DateTime.Now;
+        var createDate = _createDate ?? DateTime.UtcNow;
+        var updateDate = _updateDate ?? DateTime.UtcNow;
         var sortOrder = _sortOrder ?? 0;
         var dataTypeId = _dataTypeId ?? -88;
         var dataTypeKey = _dataTypeKey ?? Guid.Empty;

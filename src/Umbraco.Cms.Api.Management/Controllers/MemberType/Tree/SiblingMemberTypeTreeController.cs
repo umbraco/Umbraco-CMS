@@ -1,5 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
@@ -9,20 +10,30 @@ namespace Umbraco.Cms.Api.Management.Controllers.MemberType.Tree;
 
 public class SiblingMemberTypeTreeController : MemberTypeTreeControllerBase
 {
-    public SiblingMemberTypeTreeController(
-        IEntityService entityService,
-        FlagProviderCollection flagProviders,
-        IMemberTypeService memberTypeService)
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
+    public SiblingMemberTypeTreeController(IEntityService entityService, IMemberTypeService memberTypeService)
+        : base(entityService, memberTypeService)
+    {
+    }
+
+    [ActivatorUtilitiesConstructor]
+    public SiblingMemberTypeTreeController(IEntityService entityService, FlagProviderCollection flagProviders, IMemberTypeService memberTypeService)
         : base(entityService, flagProviders, memberTypeService)
     {
     }
 
     [HttpGet("siblings")]
     [ProducesResponseType(typeof(SubsetViewModel<MemberTypeTreeItemResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets sibling member types in the tree.")]
+    [EndpointDescription("Gets a collection of member type tree items that are siblings of the provided Id.")]
     public async Task<ActionResult<SubsetViewModel<MemberTypeTreeItemResponseModel>>> Siblings(
         CancellationToken cancellationToken,
         Guid target,
         int before,
-        int after)
-        => await GetSiblings(target, before, after);
+        int after,
+        bool foldersOnly = false)
+    {
+        RenderFoldersOnly(foldersOnly);
+        return await GetSiblings(target, before, after);
+    }
 }

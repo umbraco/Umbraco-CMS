@@ -19,12 +19,15 @@ public class CreateSavedSearchLogViewerController : SavedSearchLogViewerControll
     /// <summary>
     ///     Creates a saved log search.
     /// </summary>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <param name="savedSearch">The log search to be saved.</param>
     /// <returns>The location of the saved log search after the creation.</returns>
     [HttpPost]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status201Created)]
+    [EndpointSummary("Creates a saved log search.")]
+    [EndpointDescription("Creates a new saved log search with the provided name and query configuration.")]
     public async Task<IActionResult> Create(CancellationToken cancellationToken, SavedLogSearchRequestModel savedSearch)
     {
         Attempt<ILogViewerQuery?, LogViewerOperationStatus> result =

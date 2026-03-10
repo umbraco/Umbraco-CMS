@@ -103,7 +103,6 @@ export class UmbEntityReferencesWorkspaceInfoAppElement extends UmbLitElement {
 	}
 
 	override render() {
-		if (!this._items?.length) return nothing;
 		return html`
 			<umb-workspace-info-app-layout headline="#references_labelUsedByItems">
 				<div id="content">${this.#renderItems()} ${this.#renderReferencePagination()}</div>
@@ -112,7 +111,10 @@ export class UmbEntityReferencesWorkspaceInfoAppElement extends UmbLitElement {
 	}
 
 	#renderItems() {
-		if (!this._items) return;
+		if (!this._items) return nothing;
+		if (this._items.length === 0) {
+			return html`<umb-localize class="noItems" key="references_itemHasNoReferences"></umb-localize>`;
+		}
 		return html`
 			<uui-ref-list>
 				${repeat(
@@ -148,6 +150,11 @@ export class UmbEntityReferencesWorkspaceInfoAppElement extends UmbLitElement {
 		css`
 			:host {
 				display: contents;
+			}
+
+			.noItems {
+				display: block;
+				margin: var(--uui-size-space-2);
 			}
 
 			#content {

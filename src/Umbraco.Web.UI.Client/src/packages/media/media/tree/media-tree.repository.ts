@@ -1,5 +1,5 @@
 import { UMB_MEDIA_ROOT_ENTITY_TYPE } from '../entity.js';
-import { UmbMediaTreeServerDataSource } from './media-tree.server.data-source.js';
+import { UmbMediaTreeServerDataSource } from './server-data-source/media-tree.server.data-source.js';
 import type {
 	UmbMediaTreeChildrenOfRequestArgs,
 	UmbMediaTreeItemModel,

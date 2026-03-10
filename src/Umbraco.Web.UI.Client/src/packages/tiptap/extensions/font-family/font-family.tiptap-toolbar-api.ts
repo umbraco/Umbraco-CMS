@@ -1,6 +1,6 @@
 import { UmbTiptapToolbarElementApiBase } from '../tiptap-toolbar-element-api-base.js';
+import type { Editor } from '../../externals.js';
 import type { MetaTiptapToolbarMenuItem } from '../types.js';
-import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';
 
 export default class UmbTiptapToolbarFontFamilyExtensionApi extends UmbTiptapToolbarElementApiBase {
 	override isActive(editor?: Editor, item?: MetaTiptapToolbarMenuItem) {

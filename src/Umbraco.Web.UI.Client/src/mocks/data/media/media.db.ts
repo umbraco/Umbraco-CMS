@@ -80,7 +80,6 @@ const createMockMediaMapper = (request: CreateMediaRequestModel): UmbMockMediaMo
 				publishDate: null,
 			};
 		}),
-		urls: [],
 		flags: [],
 	};
 };
@@ -90,7 +89,6 @@ const detailResponseMapper = (model: UmbMockMediaModel): MediaResponseModel => {
 		mediaType: model.mediaType,
 		id: model.id,
 		isTrashed: model.isTrashed,
-		urls: model.urls,
 		values: model.values,
 		variants: model.variants,
 		flags: model.flags,

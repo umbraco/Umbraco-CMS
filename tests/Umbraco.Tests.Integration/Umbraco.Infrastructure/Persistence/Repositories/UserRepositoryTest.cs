@@ -57,7 +57,9 @@ internal sealed class UserRepositoryTest : UmbracoIntegrationTest
             Options.Create(new UserPasswordConfigurationSettings()),
             new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory()),
             mockRuntimeState.Object,
-            PermissionMappers);
+            Mock.Of<IRepositoryCacheVersionService>(),
+            PermissionMappers,
+            Mock.Of<ICacheSyncService>());
         return repository;
     }
 
@@ -164,7 +166,9 @@ internal sealed class UserRepositoryTest : UmbracoIntegrationTest
                 Options.Create(new UserPasswordConfigurationSettings()),
                 new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory()),
                 mockRuntimeState.Object,
-                PermissionMappers);
+                Mock.Of<IRepositoryCacheVersionService>(),
+                PermissionMappers,
+                Mock.Of<ICacheSyncService>());
 
             repository2.Delete(user);
 
@@ -378,6 +382,107 @@ internal sealed class UserRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
+    public void Can_Get_Paged_Results_Filtered_By_User_State()
+    {
+        ICoreScopeProvider provider = ScopeProvider;
+        using (var scope = provider.CreateCoreScope())
+        {
+            var repository = CreateRepository(provider);
+
+            // Create users in different states:
+            // Active: IsApproved = true, IsLockedOut = false, LastLoginDate != null
+            var activeUser = new UserBuilder()
+                .WithoutIdentity()
+                .WithName("ActiveUser")
+                .WithLogin("ActiveUser", "password123")
+                .WithEmail("active@test.com")
+                .WithIsApproved(true)
+                .WithIsLockedOut(false)
+                .WithLastLoginDate(DateTime.UtcNow.AddDays(-1))
+                .Build();
+            repository.Save(activeUser);
+
+            // Disabled: IsApproved = false
+            var disabledUser = new UserBuilder()
+                .WithoutIdentity()
+                .WithName("DisabledUser")
+                .WithLogin("DisabledUser", "password123")
+                .WithEmail("disabled@test.com")
+                .WithIsApproved(false)
+                .WithIsLockedOut(false)
+                .Build();
+            repository.Save(disabledUser);
+
+            // LockedOut: IsLockedOut = true
+            var lockedOutUser = new UserBuilder()
+                .WithoutIdentity()
+                .WithName("LockedOutUser")
+                .WithLogin("LockedOutUser", "password123")
+                .WithEmail("lockedout@test.com")
+                .WithIsApproved(true)
+                .WithIsLockedOut(true)
+                .WithLastLoginDate(DateTime.UtcNow.AddDays(-1))
+                .Build();
+            repository.Save(lockedOutUser);
+
+            // Test filtering by Active state - should only return the active user.
+            var activeResults = repository.GetPagedResultsByQuery(
+                null,
+                0,
+                10,
+                out var activeTotal,
+                user => user.Id,
+                Direction.Ascending,
+                userState: new[] { UserState.Active }).ToArray();
+
+            Assert.AreEqual(1, activeTotal);
+            Assert.AreEqual(1, activeResults.Length);
+            Assert.AreEqual("ActiveUser", activeResults[0].Name);
+
+            // Test filtering by Disabled state - should only return the disabled user.
+            var disabledResults = repository.GetPagedResultsByQuery(
+                null,
+                0,
+                10,
+                out var disabledTotal,
+                user => user.Id,
+                Direction.Ascending,
+                userState: new[] { UserState.Disabled }).ToArray();
+
+            Assert.AreEqual(1, disabledTotal);
+            Assert.AreEqual(1, disabledResults.Length);
+            Assert.AreEqual("DisabledUser", disabledResults[0].Name);
+
+            // Test filtering by LockedOut state - should only return the locked out user.
+            var lockedOutResults = repository.GetPagedResultsByQuery(
+                null,
+                0,
+                10,
+                out var lockedOutTotal,
+                user => user.Id,
+                Direction.Ascending,
+                userState: new[] { UserState.LockedOut }).ToArray();
+
+            Assert.AreEqual(1, lockedOutTotal);
+            Assert.AreEqual(1, lockedOutResults.Length);
+            Assert.AreEqual("LockedOutUser", lockedOutResults[0].Name);
+
+            // Test filtering by multiple states (Active OR Disabled).
+            var multiStateResults = repository.GetPagedResultsByQuery(
+                null,
+                0,
+                10,
+                out var multiStateTotal,
+                user => user.Id,
+                Direction.Ascending,
+                userState: new[] { UserState.Active, UserState.Disabled }).ToArray();
+
+            Assert.AreEqual(2, multiStateTotal);
+            Assert.AreEqual(2, multiStateResults.Length);
+        }
+    }
+
+    [Test]
     public void Can_Invalidate_SecurityStamp_On_Username_Change()
     {
         // Arrange
@@ -425,7 +530,7 @@ internal sealed class UserRepositoryTest : UmbracoIntegrationTest
 
             // manually update this record to be in the past
             ScopeAccessor.AmbientScope.Database.Execute(ScopeAccessor.AmbientScope.SqlContext.Sql()
-                .Update<UserLoginDto>(u => u.Set(x => x.LoggedOutUtc, DateTime.UtcNow.AddDays(-100)))
+                .Update<UserLoginDto>(u => u.Set(x => x.LoggedOut, DateTime.UtcNow.AddDays(-100)))
                 .Where<UserLoginDto>(x => x.SessionId == sessionId));
 
             var isValid = repository.ValidateLoginSession(user.Id, sessionId);

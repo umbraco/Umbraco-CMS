@@ -12,27 +12,106 @@ namespace Umbraco.Cms.Core.Configuration.Models;
 [UmbracoOptions(Constants.Configuration.ConfigSecurity)]
 public class SecuritySettings
 {
+    /// <summary>
+    ///     The default value for bypassing two-factor authentication for external member logins.
+    /// </summary>
     internal const bool StaticMemberBypassTwoFactorForExternalLogins = true;
+
+    /// <summary>
+    ///     The default value for bypassing two-factor authentication for external user logins.
+    /// </summary>
     internal const bool StaticUserBypassTwoFactorForExternalLogins = true;
+
+    /// <summary>
+    ///     The default value for keeping users logged in.
+    /// </summary>
     internal const bool StaticKeepUserLoggedIn = false;
+
+    /// <summary>
+    ///     The default value for hiding disabled users in the back-office.
+    /// </summary>
     internal const bool StaticHideDisabledUsersInBackOffice = false;
+
+    /// <summary>
+    ///     The default value for allowing password reset.
+    /// </summary>
     internal const bool StaticAllowPasswordReset = true;
+
+    /// <summary>
+    ///     The default value for allowing edit of invariant properties from non-default language.
+    /// </summary>
     internal const bool StaticAllowEditInvariantFromNonDefault = false;
+
+    /// <summary>
+    ///     The default value for allowing concurrent logins.
+    /// </summary>
     internal const bool StaticAllowConcurrentLogins = false;
+
+    /// <summary>
+    ///     The default authentication cookie name.
+    /// </summary>
     internal const string StaticAuthCookieName = "UMB_UCONTEXT";
+
+    /// <summary>
+    ///     The default value for using email as username.
+    /// </summary>
     internal const bool StaticUsernameIsEmail = true;
+
+    /// <summary>
+    ///     The default value for requiring unique email for members.
+    /// </summary>
     internal const bool StaticMemberRequireUniqueEmail = true;
 
+    /// <summary>
+    ///     The default set of allowed characters for usernames.
+    /// </summary>
     internal const string StaticAllowedUserNameCharacters =
         "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+\\";
 
+    /// <summary>
+    ///     The default member lockout time in minutes.
+    /// </summary>
     internal const int StaticMemberDefaultLockoutTimeInMinutes = 30 * 24 * 60;
+
+    /// <summary>
+    ///     The default user lockout time in minutes.
+    /// </summary>
     internal const int StaticUserDefaultLockoutTimeInMinutes = 30 * 24 * 60;
+
+    /// <summary>
+    ///     The default duration in milliseconds for failed login attempts.
+    /// </summary>
     internal const long StaticUserDefaultFailedLoginDurationInMilliseconds = 1000;
+
+    /// <summary>
+    ///     The minimum duration in milliseconds for failed login attempts.
+    /// </summary>
     internal const long StaticUserMinimumFailedLoginDurationInMilliseconds = 250;
+
+    /// <summary>
+    ///     The default path for the authorization callback.
+    /// </summary>
     internal const string StaticAuthorizeCallbackPathName = "/umbraco/oauth_complete";
+
+    /// <summary>
+    ///     The default path for the authorization callback logout.
+    /// </summary>
     internal const string StaticAuthorizeCallbackLogoutPathName = "/umbraco/logout";
+
+    /// <summary>
+    ///     The default path for the authorization callback error.
+    /// </summary>
     internal const string StaticAuthorizeCallbackErrorPathName = "/umbraco/error";
+
+    /// <summary>
+    ///     The default expiry time for password reset emails.
+    /// </summary>
+    internal const string StaticPasswordResetEmailExpiry = "01:00:00";
+
+    /// <summary>
+    ///     The default expiry time for user invite emails.
+    /// </summary>
+    internal const string StaticUserInviteEmailExpiry = "3.00:00:00";
 
     /// <summary>
     ///     Gets or sets a value indicating whether to keep the user logged in.
@@ -114,6 +193,28 @@ public class SecuritySettings
     public bool AllowConcurrentLogins { get; set; } = StaticAllowConcurrentLogins;
 
     /// <summary>
+    ///     Gets or sets a value indicating whether to allow concurrent logins for backoffice users.
+    ///     When <c>null</c> (default), the value of <see cref="AllowConcurrentLogins"/> is used.
+    /// </summary>
+    public bool? UserAllowConcurrentLogins { get; set; }
+
+    /// <summary>
+    ///     Gets or sets a value indicating whether to allow concurrent logins for members.
+    ///     When <c>null</c> (default), the value of <see cref="AllowConcurrentLogins"/> is used.
+    /// </summary>
+    public bool? MemberAllowConcurrentLogins { get; set; }
+
+    /// <summary>
+    ///     Gets the effective concurrent login setting for backoffice users.
+    /// </summary>
+    public bool GetUserAllowConcurrentLogins() => UserAllowConcurrentLogins ?? AllowConcurrentLogins;
+
+    /// <summary>
+    ///     Gets the effective concurrent login setting for members.
+    /// </summary>
+    public bool GetMemberAllowConcurrentLogins() => MemberAllowConcurrentLogins ?? AllowConcurrentLogins;
+
+    /// <summary>
     /// Gets or sets the default duration (in milliseconds) of failed login attempts.
     /// </summary>
     /// <value>
@@ -159,4 +260,51 @@ public class SecuritySettings
     /// </summary>
     [DefaultValue(StaticAuthorizeCallbackErrorPathName)]
     public string AuthorizeCallbackErrorPathName { get; set; } = StaticAuthorizeCallbackErrorPathName;
+
+    /// <summary>
+    ///     Gets or sets the expiry time for password reset emails.
+    /// </summary>
+    [DefaultValue(StaticPasswordResetEmailExpiry)]
+    public TimeSpan PasswordResetEmailExpiry { get; set; } = TimeSpan.Parse(StaticPasswordResetEmailExpiry);
+
+    /// <summary>
+    ///     Gets or sets the expiry time for user invite emails.
+    /// </summary>
+    [DefaultValue(StaticUserInviteEmailExpiry)]
+    public TimeSpan UserInviteEmailExpiry { get; set; } = TimeSpan.Parse(StaticUserInviteEmailExpiry);
+
+    /// <summary>
+    ///     Gets or sets the password configuration settings for users.
+    /// </summary>
+    /// <remarks>
+    ///     This property exists to enable IntelliSense/autocomplete in appsettings.json
+    ///     for the <c>Umbraco:CMS:Security:UserPassword</c> configuration section.
+    ///     <para>
+    ///         Do not use this property to read password configuration at runtime.
+    ///         Inject <see cref="IOptions{UserPasswordConfigurationSettings}"/> directly instead,
+    ///         as that is the canonical registration used by all consumers.
+    ///     </para>
+    ///     <para>
+    ///         TODO (V18): Remove the standalone <see cref="UserPasswordConfigurationSettings"/>
+    ///         registration and consolidate all consumers to use this property.
+    ///     </para>
+    /// </remarks>
+    public UserPasswordConfigurationSettings UserPassword { get; set; } = new();
+
+    /// <summary>
+    ///     Gets or sets the password configuration settings for members.
+    /// </summary>
+    /// <remarks>
+    ///     This property exists to enable IntelliSense/autocomplete in appsettings.json
+    ///     for the <c>Umbraco:CMS:Security:MemberPassword</c> configuration section.
+    ///     <para>
+    ///         Do not use this property to read password configuration at runtime.
+    ///         Inject <see cref="IOptions{MemberPasswordConfigurationSettings}"/> directly instead,
+    ///         as that is the canonical registration used by all consumers.
+    ///     </para>
+    ///     <para>
+    ///         TODO (V18): Remove the standalone <see cref="MemberPasswordConfigurationSettings"/>
+    ///         registration and consolidate all consumers to use this property.
+    ///     </para>
+    public MemberPasswordConfigurationSettings MemberPassword { get; set; } = new();
 }

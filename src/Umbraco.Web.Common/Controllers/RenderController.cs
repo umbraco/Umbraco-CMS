@@ -112,7 +112,7 @@ public class RenderController : UmbracoPageController, IRenderController
     /// </remarks>
     protected override IActionResult CurrentTemplate<T>(T model)
     {
-        if (EnsurePhsyicalViewExists(UmbracoRouteValues.TemplateName) == false)
+        if (EnsurePhysicalViewExists(UmbracoRouteValues.TemplateName) == false)
         {
             // no physical template file was found
             return new PublishedContentNotFoundResult(UmbracoContext);

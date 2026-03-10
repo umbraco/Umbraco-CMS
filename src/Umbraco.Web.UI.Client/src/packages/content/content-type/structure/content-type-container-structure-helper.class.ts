@@ -39,7 +39,7 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 		return this.#legacyMergedChildContainers.asObservable();
 	}
 
-	#childContainersMerged = new UmbArrayState<UmbPropertyTypeContainerMergedModel>([], (x) => x.path);
+	#childContainersMerged = new UmbArrayState<UmbPropertyTypeContainerMergedModel>([], (x) => x.key);
 	public readonly childContainers = this.#childContainersMerged.asObservable();
 
 	// Owner containers are containers owned by the owner Content Type (The specific one up for editing)
@@ -59,7 +59,7 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 		this.#legacyMergedChildContainers.sortBy((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
 	}
 
-	// TODO: Implement UmbDeprecated and Obsolete this from v.17 [NL]
+	// TODO: Implement UmbDeprecation and Obsolete this from v.17 [NL]
 	#legacyMergeLogic = false;
 	#startLegacy() {
 		if (this.#legacyMergeLogic) return;

@@ -23,12 +23,15 @@ public class ByNameSavedSearchLogViewerController : SavedSearchLogViewerControll
     /// <summary>
     ///     Gets a saved log search by name.
     /// </summary>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <param name="name">The name of the saved log search.</param>
     /// <returns>The saved log search or not found result.</returns>
     [HttpGet("{name}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(SavedLogSearchResponseModel), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a saved log search by name.")]
+    [EndpointDescription("Gets a saved log search identified by the provided name.")]
     public async Task<IActionResult> ByName(
         CancellationToken cancellationToken,
         string name)

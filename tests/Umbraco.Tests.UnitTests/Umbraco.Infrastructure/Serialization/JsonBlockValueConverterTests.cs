@@ -470,4 +470,42 @@ public class JsonBlockValueConverterTests
         var serializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
         Assert.DoesNotThrow(() => serializer.Deserialize<BlockListValue>(json));
     }
+
+    /// <summary>
+    /// Test case that verifies the fix for https://github.com/umbraco/Umbraco-CMS/issues/20409.
+    /// </summary>
+    [Test]
+    public void Can_Deserialize_BlockGrid_With_Blocks_Using_Values_As_Property_Alias()
+    {
+        // Create a serialized BlockGridValue in Umbraco 13 format that has a block with a property alias "values".
+        var serialized = @"{
+   ""layout"":{
+      ""Umbraco.BlockList"":[
+         {
+            ""contentUdi"":""umb://element/6ad18441631140d48515ea0fc5b00425""
+         }
+      ]
+   },
+   ""contentData"":[
+      {
+         ""contentTypeKey"":""a1d1123c-289b-4a05-b33f-9f06cb723da1"",
+         ""udi"":""umb://element/6ad18441631140d48515ea0fc5b00425"",
+         ""text"":""Text"",
+         ""values"":""Values""
+      }
+   ],
+   ""settingsData"":[
+   ]
+}";
+
+        var serializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
+        var deserialized = serializer.Deserialize<BlockGridValue>(serialized);
+
+        Assert.IsNotNull(deserialized);
+
+        Assert.AreEqual(1, deserialized.ContentData.Count);
+        Assert.AreEqual(2, deserialized.ContentData[0].RawPropertyValues.Count);
+        Assert.AreEqual("Text", deserialized.ContentData[0].RawPropertyValues["text"]);
+        Assert.AreEqual("Values", deserialized.ContentData[0].RawPropertyValues["values"]);
+    }
 }

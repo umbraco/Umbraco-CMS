@@ -12,8 +12,8 @@ export class UmbImagingThumbnailElement extends UmbLitElement {
 	 * The unique identifier for the media item.
 	 * @description This is also known as the media key and is used to fetch the resource.
 	 */
-	@property()
-	unique = '';
+	@property({ type: String })
+	unique?: string;
 
 	/**
 	 * The width of the thumbnail in pixels.
@@ -34,19 +34,26 @@ export class UmbImagingThumbnailElement extends UmbLitElement {
 	 * @description The mode determines how the image is cropped.
 	 * @enum {UmbImagingCropMode}
 	 */
-	@property()
+	@property({ type: String })
 	mode: UmbImagingCropMode = UmbImagingCropMode.MIN;
+
+	/**
+	 * The output format of the thumbnail.
+	 * @description The format to convert the image to. If not specified, the backend automatically determines the best format based on the source file type.
+	 */
+	@property({ type: String })
+	format?: string;
 
 	/**
 	 * The alt text for the thumbnail.
 	 */
-	@property()
+	@property({ type: String })
 	alt = '';
 
 	/**
 	 * The fallback icon for the thumbnail.
 	 */
-	@property()
+	@property({ type: String })
 	icon = 'icon-picture';
 
 	/**
@@ -54,11 +61,17 @@ export class UmbImagingThumbnailElement extends UmbLitElement {
 	 * @enum {'lazy' | 'eager'}
 	 * @default 'lazy'
 	 */
-	@property()
+	@property({ type: String })
 	loading: (typeof HTMLImageElement)['prototype']['loading'] = 'lazy';
 
+	/**
+	 * External loading state (e.g., when parent is waiting for metadata)
+	 */
+	@property({ type: Boolean, reflect: false, attribute: 'external-loading' })
+	externalLoading = false;
+
 	@state()
-	private _isLoading = true;
+	private _isLoading = false;
 
 	@state()
 	private _thumbnailUrl = '';
@@ -69,7 +82,7 @@ export class UmbImagingThumbnailElement extends UmbLitElement {
 
 	override render() {
 		return when(
-			this._isLoading,
+			this.externalLoading || this._isLoading,
 			() => this.#renderLoading(),
 			() => this.#renderThumbnail(),
 		);
@@ -114,7 +127,7 @@ export class UmbImagingThumbnailElement extends UmbLitElement {
 	}
 
 	#renderLoading() {
-		return html`<div id="loader"><uui-loader></uui-loader></div>`;
+		return html`<uui-loader-circle id="loader"></uui-loader-circle>`;
 	}
 
 	#renderThumbnail() {
@@ -133,6 +146,7 @@ export class UmbImagingThumbnailElement extends UmbLitElement {
 			height: this.height,
 			width: this.width,
 			mode: this.mode,
+			format: this.format,
 		});
 
 		this._thumbnailUrl = data?.[0]?.url ?? '';
@@ -154,18 +168,16 @@ export class UmbImagingThumbnailElement extends UmbLitElement {
 			}
 
 			#loader {
-				display: flex;
-				justify-content: center;
-				align-items: center;
-				height: 100%;
-				width: 100%;
+				font-size: 2em;
+				margin-bottom: 1em;
 			}
 
 			#figure {
 				display: block;
 				width: 100%;
 				height: 100%;
-				object-fit: cover;
+				object-fit: contain;
+				object-position: center;
 
 				background-image: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" fill-opacity=".1"><path d="M50 0h50v50H50zM0 50h50v50H0z"/></svg>');
 				background-size: 10px 10px;

@@ -23,12 +23,15 @@ public class ByKeyCreatedPackageController : CreatedPackageControllerBase
     /// <summary>
     ///     Gets a package by id.
     /// </summary>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <param name="id">The id of the package.</param>
     /// <returns>The package or not found result.</returns>
     [HttpGet("{id:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(PackageDefinitionResponseModel), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a package.")]
+    [EndpointDescription("Gets a package identified by the provided Id.")]
     public async Task<IActionResult> ByKey(CancellationToken cancellationToken, Guid id)
     {
         PackageDefinition? package = await _packagingService.GetCreatedPackageByKeyAsync(id);

@@ -32,14 +32,18 @@ export class UmbMediaTypeSearchServerDataSource implements UmbSearchDataSource<U
 		const { data, error } = await tryExecute(
 			this.#host,
 			MediaTypeService.getItemMediaTypeSearch({
-				query: { query: args.query },
+				query: {
+					query: args.query,
+					skip: args.paging?.skip,
+					take: args.paging?.take,
+				},
 			}),
 		);
 
 		if (data) {
 			const mappedItems: Array<UmbMediaTypeSearchItemModel> = data.items.map((item) => {
 				return {
-					href: '/section/settings/workspace/media-type/edit/' + item.id,
+					href: 'section/settings/workspace/media-type/edit/' + item.id,
 					entityType: UMB_MEDIA_TYPE_ENTITY_TYPE,
 					unique: item.id,
 					name: item.name,

@@ -1,8 +1,8 @@
+import type { Editor } from '../../externals.js';
 import { UmbTiptapToolbarElementApiBase } from '../tiptap-toolbar-element-api-base.js';
-import { umbEmbeddedMedia } from '@umbraco-cms/backoffice/external/tiptap';
+import { umbEmbeddedMedia } from './embedded-media.tiptap-extension.js';
 import { UMB_EMBEDDED_MEDIA_MODAL } from '@umbraco-cms/backoffice/embedded-media';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
-import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';
 
 export default class UmbTiptapToolbarEmbeddedMediaExtensionApi extends UmbTiptapToolbarElementApiBase {
 	override async execute(editor?: Editor) {

@@ -15,7 +15,7 @@ export const manifest: UmbExtensionManifestKind = {
 		forEntityTypes: [],
 		meta: {
 			icon: 'icon-add',
-			label: '#actions_create',
+			label: '#actions_createFor',
 			additionalOptions: true,
 		},
 	},

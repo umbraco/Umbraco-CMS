@@ -124,7 +124,7 @@ internal class ContentVersionCleanupServiceTest
         // # Act
         var report = sut.PerformContentVersionCleanup(aDateTime);
 
-        Debug.Assert(someHistoricVersions.Count > 1);
+        Debug.Assert(someHistoricVersions.Count > 1, "Test requires more than one historic version.");
 
         Assert.Multiple(() =>
         {
@@ -161,7 +161,7 @@ internal class ContentVersionCleanupServiceTest
         // # Act
         sut.PerformContentVersionCleanup(aDateTime);
 
-        Debug.Assert(someHistoricVersions.Any());
+        Debug.Assert(someHistoricVersions.Any(), "Test requires at least one historic version.");
 
         var expectedId = filteredSet.First().VersionId;
 

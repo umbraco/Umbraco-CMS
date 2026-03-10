@@ -36,6 +36,7 @@ using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Core.Web;
@@ -63,6 +64,7 @@ using Umbraco.Cms.Infrastructure.Security;
 using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Cms.Infrastructure.Services.Implement;
 using Umbraco.Extensions;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using IScopeProvider = Umbraco.Cms.Infrastructure.Scoping.IScopeProvider;
 
 namespace Umbraco.Cms.Infrastructure.DependencyInjection;
@@ -90,6 +92,7 @@ public static partial class UmbracoBuilderExtensions
         builder.AddNotificationAsyncHandler<RuntimeUnattendedInstallNotification, UnattendedInstaller>();
         builder.AddNotificationAsyncHandler<RuntimeUnattendedUpgradeNotification, UnattendedUpgrader>();
         builder.AddNotificationAsyncHandler<RuntimePremigrationsUpgradeNotification, PremigrationUpgrader>();
+        builder.Services.AddHostedService<UnattendedUpgradeBackgroundService>();
 
         // Database availability check.
         builder.Services.AddUnique<IDatabaseAvailabilityCheck, DefaultDatabaseAvailabilityCheck>();
@@ -173,7 +176,7 @@ public static partial class UmbracoBuilderExtensions
             .Remove<SimpleRichTextValueConverter>();
 
         // register *all* checks, except those marked [HideFromTypeFinder] of course
-        builder.Services.AddSingleton<IMarkdownToHtmlConverter, MarkdownToHtmlConverter>();
+        builder.Services.AddSingleton<Core.HealthChecks.NotificationMethods.IMarkdownToHtmlConverter, MarkdownToHtmlConverter>();
 
         builder.Services.AddSingleton<IContentLastChanceFinder, ContentFinderByConfigured404>();
 
@@ -207,7 +210,9 @@ public static partial class UmbracoBuilderExtensions
                 factory.GetRequiredService<IVariationContextAccessor>(),
                 factory.GetRequiredService<IExamineManager>(),
                 factory.GetRequiredService<IPublishedContentCache>(),
-                factory.GetRequiredService<IPublishedMediaCache>());
+                factory.GetRequiredService<IPublishedMediaCache>(),
+                factory.GetRequiredService<IDocumentNavigationQueryService>(),
+                factory.GetRequiredService<IMediaNavigationQueryService>());
         });
 
         // register accessors for cultures
@@ -235,9 +240,6 @@ public static partial class UmbracoBuilderExtensions
         // We can simplify this registration once the obsolete IBackgroundTaskQueue is removed.
         builder.Services.AddSingleton<HostedServices.BackgroundTaskQueue>();
         builder.Services.AddSingleton<IBackgroundTaskQueue>(s => s.GetRequiredService<HostedServices.BackgroundTaskQueue>());
-#pragma warning disable CS0618 // Type or member is obsolete
-        builder.Services.AddSingleton<HostedServices.IBackgroundTaskQueue>(s => s.GetRequiredService<HostedServices.BackgroundTaskQueue>());
-#pragma warning restore CS0618 // Type or member is obsolete
 
         builder.Services.AddTransient<IFireAndForgetRunner, FireAndForgetRunner>();
 
@@ -248,6 +250,18 @@ public static partial class UmbracoBuilderExtensions
 
         builder.Services.AddUnique<IPasswordChanger<BackOfficeIdentityUser>, PasswordChanger<BackOfficeIdentityUser>>();
         builder.Services.AddUnique<IPasswordChanger<MemberIdentityUser>, PasswordChanger<MemberIdentityUser>>();
+
+        // Register default local login setting provider (allows local login by default).
+        // This will be replaced by the backoffice implementation when AddBackOffice() is called.
+        builder.Services.TryAddSingleton<ILocalLoginSettingProvider, NoopLocalLoginSettingProvider>();
+
+        // Register default conflicting route service (no conflicts when backoffice not enabled).
+        // This will be replaced by the backoffice implementation when AddBackOffice() is called.
+        builder.Services.TryAddSingleton<IConflictingRouteService, NoopConflictingRouteService>();
+
+        // Register URL assembler (needed by DefaultMediaUrlProvider).
+        builder.Services.TryAddTransient<IUrlAssembler, DefaultUrlAssembler>();
+
         builder.Services.AddTransient<IMemberEditingService, MemberEditingService>();
 
         builder.Services.AddSingleton<IBlockEditorElementTypeCache, BlockEditorElementTypeCache>();
@@ -264,6 +278,10 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IBlockValuePropertyIndexValueFactory, BlockValuePropertyIndexValueFactory>();
         builder.Services.AddSingleton<ITagPropertyIndexValueFactory, TagPropertyIndexValueFactory>();
         builder.Services.AddSingleton<IRichTextPropertyIndexValueFactory, RichTextPropertyIndexValueFactory>();
+        builder.Services.AddSingleton<IDateOnlyPropertyIndexValueFactory, DateOnlyPropertyIndexValueFactory>();
+        builder.Services.AddSingleton<ITimeOnlyPropertyIndexValueFactory, TimeOnlyPropertyIndexValueFactory>();
+        builder.Services.AddSingleton<IDateTimeUnspecifiedPropertyIndexValueFactory, DateTimeUnspecifiedPropertyIndexValueFactory>();
+        builder.Services.AddSingleton<IDateTimeWithTimeZonePropertyIndexValueFactory, DateTimeWithTimeZonePropertyIndexValueFactory>();
 
         return builder;
     }
@@ -318,7 +336,8 @@ public static partial class UmbracoBuilderExtensions
                 default:
                     return new FileSystemMainDomLock(
                         loggerFactory.CreateLogger<FileSystemMainDomLock>(),
-                        mainDomKeyGenerator, hostingEnvironment,
+                        mainDomKeyGenerator,
+                        hostingEnvironment,
                         factory.GetRequiredService<IOptionsMonitor<GlobalSettings>>());
             }
         });
@@ -344,11 +363,11 @@ public static partial class UmbracoBuilderExtensions
 
         // add handlers for building content relations
         builder
-            .AddNotificationHandler<ContentCopiedNotification, RelateOnCopyNotificationHandler>()
+            .AddNotificationAsyncHandler<ContentCopiedNotification, RelateOnCopyNotificationHandler>()
             .AddNotificationHandler<ContentMovedNotification, RelateOnTrashNotificationHandler>()
-            .AddNotificationHandler<ContentMovedToRecycleBinNotification, RelateOnTrashNotificationHandler>()
+            .AddNotificationAsyncHandler<ContentMovedToRecycleBinNotification, RelateOnTrashNotificationHandler>()
             .AddNotificationHandler<MediaMovedNotification, RelateOnTrashNotificationHandler>()
-            .AddNotificationHandler<MediaMovedToRecycleBinNotification, RelateOnTrashNotificationHandler>();
+            .AddNotificationAsyncHandler<MediaMovedToRecycleBinNotification, RelateOnTrashNotificationHandler>();
 
         // add notification handlers for property editors
         builder
@@ -367,12 +386,16 @@ public static partial class UmbracoBuilderExtensions
             .AddNotificationHandler<ContentDeletedNotification, FileUploadContentDeletedNotificationHandler>()
             .AddNotificationHandler<ContentDeletedBlueprintNotification, FileUploadContentDeletedNotificationHandler>()
             .AddNotificationHandler<MediaDeletedNotification, FileUploadContentDeletedNotificationHandler>()
+            .AddNotificationHandler<MediaMovedToRecycleBinNotification, FileUploadContentDeletedNotificationHandler>()
+            .AddNotificationHandler<MediaMovedNotification, FileUploadContentDeletedNotificationHandler>()
             .AddNotificationHandler<MemberDeletedNotification, FileUploadContentDeletedNotificationHandler>()
             .AddNotificationHandler<MediaSavingNotification, FileUploadMediaSavingNotificationHandler>()
             .AddNotificationHandler<ContentCopiedNotification, ImageCropperPropertyEditor>()
             .AddNotificationHandler<ContentDeletedNotification, ImageCropperPropertyEditor>()
             .AddNotificationHandler<MediaDeletedNotification, ImageCropperPropertyEditor>()
             .AddNotificationHandler<MediaSavingNotification, ImageCropperPropertyEditor>()
+            .AddNotificationHandler<MediaMovedToRecycleBinNotification, ImageCropperPropertyEditor>()
+            .AddNotificationHandler<MediaMovedNotification, ImageCropperPropertyEditor>()
             .AddNotificationHandler<MemberDeletedNotification, ImageCropperPropertyEditor>()
             .AddNotificationHandler<ContentTypeCacheRefresherNotification, ConstructorCacheClearNotificationHandler>()
             .AddNotificationHandler<DataTypeCacheRefresherNotification, ConstructorCacheClearNotificationHandler>();
@@ -417,15 +440,15 @@ public static partial class UmbracoBuilderExtensions
 
         // add notification handlers for auditing
         builder
-            .AddNotificationHandler<MemberSavedNotification, AuditNotificationsHandler>()
-            .AddNotificationHandler<MemberDeletedNotification, AuditNotificationsHandler>()
-            .AddNotificationHandler<AssignedMemberRolesNotification, AuditNotificationsHandler>()
-            .AddNotificationHandler<RemovedMemberRolesNotification, AuditNotificationsHandler>()
-            .AddNotificationHandler<ExportedMemberNotification, AuditNotificationsHandler>()
-            .AddNotificationHandler<UserSavedNotification, AuditNotificationsHandler>()
-            .AddNotificationHandler<UserDeletedNotification, AuditNotificationsHandler>()
-            .AddNotificationHandler<UserGroupWithUsersSavedNotification, AuditNotificationsHandler>()
-            .AddNotificationHandler<AssignedUserGroupPermissionsNotification, AuditNotificationsHandler>();
+            .AddNotificationAsyncHandler<MemberSavedNotification, AuditNotificationsHandler>()
+            .AddNotificationAsyncHandler<MemberDeletedNotification, AuditNotificationsHandler>()
+            .AddNotificationAsyncHandler<AssignedMemberRolesNotification, AuditNotificationsHandler>()
+            .AddNotificationAsyncHandler<RemovedMemberRolesNotification, AuditNotificationsHandler>()
+            .AddNotificationAsyncHandler<ExportedMemberNotification, AuditNotificationsHandler>()
+            .AddNotificationAsyncHandler<UserSavedNotification, AuditNotificationsHandler>()
+            .AddNotificationAsyncHandler<UserDeletedNotification, AuditNotificationsHandler>()
+            .AddNotificationAsyncHandler<UserGroupWithUsersSavedNotification, AuditNotificationsHandler>()
+            .AddNotificationAsyncHandler<AssignedUserGroupPermissionsNotification, AuditNotificationsHandler>();
 
         // Handlers for publish warnings
         builder.AddNotificationHandler<ContentPublishedNotification, AddDomainWarningsWhenPublishingNotificationHandler>();
