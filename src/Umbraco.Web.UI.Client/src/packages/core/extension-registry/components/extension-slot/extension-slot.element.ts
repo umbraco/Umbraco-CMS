@@ -292,7 +292,7 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 		// Defer destruction to allow for reconnection during DOM moves/sorting
 		// If reconnected before the microtask resolves, the AbortController cancels the callback
 		const abortController = (this.#disconnectAC = new AbortController());
-		Promise.resolve().then(() => {
+		queueMicrotask(() => {
 			if (!abortController.signal.aborted) {
 				this.#disconnectAC = undefined;
 				this.#removeEventListenersFromExtensionElement();

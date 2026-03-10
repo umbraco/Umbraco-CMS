@@ -241,7 +241,7 @@ export class UmbContextConsumer<
 		this.#currentScope = window;
 
 		const abortController = (this.#disconnectAC = new AbortController());
-		Promise.resolve().then(() => {
+		queueMicrotask(() => {
 			if (!abortController.signal.aborted) {
 				this.#handleDisconnect();
 			}

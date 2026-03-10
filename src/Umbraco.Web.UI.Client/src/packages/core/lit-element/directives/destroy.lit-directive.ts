@@ -19,7 +19,7 @@ class UmbDestroyDirective extends AsyncDirective {
 	override disconnected() {
 		this.#disconnectAC?.abort();
 		const abortController = (this.#disconnectAC = new AbortController());
-		Promise.resolve().then(() => {
+		queueMicrotask(() => {
 			if (!abortController.signal.aborted) {
 				this.#disconnectAC = undefined;
 				if (this.#el) {
