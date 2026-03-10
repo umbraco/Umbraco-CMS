@@ -80,8 +80,9 @@ public class UmbracoPlan : MigrationPlan
 
         // MoveDocumentBlueprintsToFolders uses IContentService which loads content through the
         // repository layer. PropertyDataDto now maps the sortableValue column (added in v17.3),
-        // so the column must exist before NPoco tries to query it. This migration is idempotent
-        // (checks ColumnExists), so if and when the v17.3 instance below runs it will be a no-op.
+        // so the column must exist before NPoco tries to query it. The migration checks whether
+        // the column already exists (via GetColumnsInSchema) before adding it, so the v17.3
+        // instance below will be a no-op.
         To<V_17_3_0.AddSortableValueToPropertyData>("{A1B2C3D4-E5F6-4A7B-8C9D-0E1F2A3B4C5D}");
         To<V_14_0_0.MoveDocumentBlueprintsToFolders>("{1A0FBC8A-6FC6-456C-805C-B94816B2E570}");
 
