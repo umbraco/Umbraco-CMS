@@ -91,11 +91,12 @@ export class UmbMediaDropzoneManager extends UmbDropzoneManager {
 				throw new Error('Media type unique is not defined');
 			}
 
-			// Handle files and folders differently: a file is uploaded as temp then created as a media item, and a folder is created as a media item directly
+			// Handle files and folders differently: a file is uploaded as temp then created as a media item, and a folder is created as a media item directly.
+			// Awaiting ensures parent folders exist on the server before their children are processed.
 			if (item.temporaryFile) {
-				this.#handleFile(item as UmbUploadableFile, mediaTypeUnique, mediaTypeName);
+				await this.#handleFile(item as UmbUploadableFile, mediaTypeUnique, mediaTypeName);
 			} else if (item.folder) {
-				this.#handleFolder(item as UmbUploadableFolder, mediaTypeUnique, mediaTypeName);
+				await this.#handleFolder(item as UmbUploadableFolder, mediaTypeUnique, mediaTypeName);
 			}
 		}
 	}
@@ -270,9 +271,9 @@ export class UmbMediaDropzoneManager extends UmbDropzoneManager {
 		const mediaTypeName = options.find((o) => o.unique === mediaTypeUnique)?.name ?? '';
 
 		if (item.temporaryFile) {
-			this.#handleFile(item as UmbUploadableFile, mediaTypeUnique, mediaTypeName);
+			await this.#handleFile(item as UmbUploadableFile, mediaTypeUnique, mediaTypeName);
 		} else if (item.folder) {
-			this.#handleFolder(item as UmbUploadableFolder, mediaTypeUnique, mediaTypeName);
+			await this.#handleFolder(item as UmbUploadableFolder, mediaTypeUnique, mediaTypeName);
 		}
 	}
 }

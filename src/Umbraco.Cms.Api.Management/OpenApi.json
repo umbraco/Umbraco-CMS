@@ -48706,6 +48706,7 @@
           "Boot",
           "Install",
           "Upgrade",
+          "Upgrading",
           "Run",
           "BootFailed"
         ],

@@ -77,7 +77,15 @@ public class UmbracoPlan : MigrationPlan
         To<V_14_0_0.MigrateDataTypeConfigurations>("{1539A010-2EB5-4163-8518-4AE2AA98AFC6}");
         To<NoopMigration>("{C567DE81-DF92-4B99-BEA8-CD34EF99DA5D}");
         To<V_14_0_0.DeleteMacroTables>("{0D82C836-96DD-480D-A924-7964E458BD34}");
+
+        // MoveDocumentBlueprintsToFolders uses IContentService which loads content through the
+        // repository layer. PropertyDataDto now maps the sortableValue column (added in v17.3),
+        // so the column must exist before NPoco tries to query it. The migration checks whether
+        // the column already exists (via GetColumnsInSchema) before adding it, so the v17.3
+        // instance below will be a no-op.
+        To<V_17_3_0.AddSortableValueToPropertyData>("{A1B2C3D4-E5F6-4A7B-8C9D-0E1F2A3B4C5D}");
         To<V_14_0_0.MoveDocumentBlueprintsToFolders>("{1A0FBC8A-6FC6-456C-805C-B94816B2E570}");
+
         To<NoopMigration>("{302DE171-6D83-4B6B-B3C0-AC8808A16CA1}");
         To<V_14_0_0.MigrateUserGroup2PermissionPermissionColumnType>("{8184E61D-ECBA-4AAA-B61B-D7A82EB82EB7}");
         To<V_14_0_0.MigrateNotificationCharsToStrings>("{E261BF01-2C7F-4544-BAE7-49D545B21D68}");

@@ -6,7 +6,7 @@ import type { UmbOpenApiConfiguration } from './models/openApiConfiguration.js';
 import type { ManifestAuthProvider } from './auth-provider.extension.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
-import { UmbApiInterceptorController } from '@umbraco-cms/backoffice/resources';
+import { UmbApiInterceptorController, UMB_AUTH_SIGNALER_CONTEXT } from '@umbraco-cms/backoffice/resources';
 import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import {
 	ReplaySubject,
@@ -31,7 +31,7 @@ const TOKEN_EXPIRY_MULTIPLIER = 4;
 export interface UmbAuthSession {
 	/** When the access token expires (issuedAt + expiresIn). Used to decide when to refresh. */
 	accessTokenExpiresAt: number;
-	/** When the full session expires (issuedAt + expiresIn * MULTIPLIER). Used by the worker for timeout UI. */
+	/** When the full session expires (issuedAt + expiresIn * MULTIPLIER). Used for timeout UI. */
 	expiresAt: number;
 }
 
@@ -182,10 +182,12 @@ export class UmbAuthContext extends UmbContextBase {
 					location.href = this.#postLogoutRedirectUri;
 					break;
 				case 'sessionRequest': {
-					// Another tab is asking for the current session state (e.g. new tab opening)
-					const session = this.#session.getValue();
-					if (session) {
-						this.#channel.postMessage({ type: 'sessionResponse', session });
+					// Another tab is asking for the current session state (e.g. new tab opening).
+					// Only share the session if it is still valid — an expired session would cause
+					// the recipient (e.g. a popup) to believe it is already authorized and skip
+					// the authorization code exchange.
+					if (this.isSessionValid()) {
+						this.#channel.postMessage({ type: 'sessionResponse', session: this.#session.getValue()! });
 					}
 					break;
 				}
@@ -196,6 +198,15 @@ export class UmbAuthContext extends UmbContextBase {
 			// Start the session timeout controller
 			new UmbAuthSessionTimeoutController(this);
 		}
+
+		// When an HTTP interceptor is active it registers an UmbAuthSignalerContext on the host.
+		// Consume it to keep authorization state in sync and to react to timeout requests.
+		this.consumeContext(UMB_AUTH_SIGNALER_CONTEXT, (signaler) => {
+			// Keep the signaler's authorization state in sync with ours
+			this.observe(this.isAuthorized, (isAuthorized) => signaler?.setAuthorized(isAuthorized ?? false));
+			// React to timeout requests from the interceptor
+			this.observe(signaler?.timeoutRequest, () => this.timeOut());
+		});
 	}
 
 	override destroy(): void {
@@ -424,6 +435,7 @@ export class UmbAuthContext extends UmbContextBase {
 				'Use configureClient for @hey-api/openapi-ts clients or getOpenApiConfiguration for manual fetch calls. With cookie-based auth this always returns "[redacted]".',
 			removeInVersion: '19.0.0',
 		}).warn();
+		await this.validateToken();
 		return '[redacted]';
 	}
 
@@ -445,6 +457,7 @@ export class UmbAuthContext extends UmbContextBase {
 		// Fallback for environments without Web Locks (some enterprise/kiosk browsers)
 		if (!navigator.locks) {
 			console.warn('[UmbAuth] navigator.locks is not available — token refresh coordination disabled.');
+			if (this.#isAccessTokenValid()) return true;
 			const response = await this.#client.refreshToken();
 			if (response) {
 				this.#updateSession(response.expiresIn, response.issuedAt);
@@ -462,7 +475,7 @@ export class UmbAuthContext extends UmbContextBase {
 		const sessionBefore = this.#session.getValue();
 
 		return navigator.locks.request('umb:token-refresh', async () => {
-			if (this.#session.getValue() !== sessionBefore && this.isSessionValid()) return true;
+			if (this.#session.getValue() !== sessionBefore && this.#isAccessTokenValid()) return true;
 
 			const response = await this.#client.refreshToken();
 			if (response) {
@@ -480,6 +493,11 @@ export class UmbAuthContext extends UmbContextBase {
 	isSessionValid(): boolean {
 		const session = this.#session.getValue();
 		return !!session && session.expiresAt > Math.floor(Date.now() / 1000);
+	}
+
+	#isAccessTokenValid(): boolean {
+		const session = this.#session.getValue();
+		return !!session && session.accessTokenExpiresAt > Math.floor(Date.now() / 1000);
 	}
 
 	/**
@@ -587,7 +605,10 @@ export class UmbAuthContext extends UmbContextBase {
 		client.setConfig({
 			baseUrl: this.#serverUrl,
 			credentials: 'include',
-			auth: () => '[redacted]',
+			auth: async () => {
+				await this.validateToken();
+				return '[redacted]';
+			},
 		});
 
 		// Controller self-registers on the host element via UmbControllerBase constructor,
