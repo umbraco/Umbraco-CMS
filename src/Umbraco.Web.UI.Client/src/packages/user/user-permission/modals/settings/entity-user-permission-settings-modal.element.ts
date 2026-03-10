@@ -20,7 +20,7 @@ export class UmbEntityUserPermissionSettingsModalElement extends UmbModalBaseEle
 	}
 
 	@state()
-	private _headline: string = this.localize.term('actions_setPermissions');
+	private _headline: string = '#actions_setPermissions';
 
 	@state()
 	private _entityType?: string;
