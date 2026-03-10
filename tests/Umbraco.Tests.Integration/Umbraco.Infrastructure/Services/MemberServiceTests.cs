@@ -1521,4 +1521,64 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
             CollectionAssert.AreEquivalent(new [] { memberA.Key, memberB.Key, memberC.Key }, members.Select(m => m.Key).ToArray());
         });
     }
+
+    [Test]
+    public async Task Can_FilterAsync_With_All_Sort_Fields_And_Directions()
+    {
+        // Create two member types with distinct names for sorting.
+        IMemberType alphaType = MemberTypeBuilder.CreateSimpleMemberType("alphaType", "Alpha Type");
+        await MemberTypeService.CreateAsync(alphaType, Constants.Security.SuperUserKey);
+
+        IMemberType betaType = MemberTypeBuilder.CreateSimpleMemberType("betaType", "Beta Type");
+        await MemberTypeService.CreateAsync(betaType, Constants.Security.SuperUserKey);
+
+        // Create 3 members with deliberately different sort orders across fields:
+        // - name: Alice < Bob < Charlie
+        // - username: user_alice (Bob) < user_bob (Charlie) < user_charlie (Alice)
+        // - email: anna (Bob) < mike (Alice) < zara (Charlie)
+        // - memberType: Alpha (Alice, Bob) before Beta (Charlie)
+        IMember member1 = MemberBuilder.CreateSimpleMember(betaType, "Charlie", "zara@test.com", "pass", "user_bob");
+        MemberService.Save(member1);
+
+        IMember member2 = MemberBuilder.CreateSimpleMember(alphaType, "Alice", "mike@test.com", "pass", "user_charlie");
+        MemberService.Save(member2);
+
+        IMember member3 = MemberBuilder.CreateSimpleMember(alphaType, "Bob", "anna@test.com", "pass", "user_alice");
+        MemberService.Save(member3);
+
+        var filter = new MemberFilter();
+
+        // Sort by name ascending: Alice, Bob, Charlie
+        var result = await MemberService.FilterAsync(filter, "name", Direction.Ascending, skip: 0, take: 10);
+        Assert.AreEqual(3, result.Total);
+        Assert.AreEqual(new[] { "Alice", "Bob", "Charlie" }, result.Items.Select(m => m.Name).ToArray());
+
+        // Sort by name descending: Charlie, Bob, Alice
+        result = await MemberService.FilterAsync(filter, "name", Direction.Descending, skip: 0, take: 10);
+        Assert.AreEqual(new[] { "Charlie", "Bob", "Alice" }, result.Items.Select(m => m.Name).ToArray());
+
+        // Sort by username ascending: user_alice (Bob), user_bob (Charlie), user_charlie (Alice)
+        result = await MemberService.FilterAsync(filter, "username", Direction.Ascending, skip: 0, take: 10);
+        Assert.AreEqual(new[] { "Bob", "Charlie", "Alice" }, result.Items.Select(m => m.Name).ToArray());
+
+        // Sort by username descending: user_charlie (Alice), user_bob (Charlie), user_alice (Bob)
+        result = await MemberService.FilterAsync(filter, "username", Direction.Descending, skip: 0, take: 10);
+        Assert.AreEqual(new[] { "Alice", "Charlie", "Bob" }, result.Items.Select(m => m.Name).ToArray());
+
+        // Sort by email ascending: anna (Bob), mike (Alice), zara (Charlie)
+        result = await MemberService.FilterAsync(filter, "email", Direction.Ascending, skip: 0, take: 10);
+        Assert.AreEqual(new[] { "Bob", "Alice", "Charlie" }, result.Items.Select(m => m.Name).ToArray());
+
+        // Sort by email descending: zara (Charlie), mike (Alice), anna (Bob)
+        result = await MemberService.FilterAsync(filter, "email", Direction.Descending, skip: 0, take: 10);
+        Assert.AreEqual(new[] { "Charlie", "Alice", "Bob" }, result.Items.Select(m => m.Name).ToArray());
+
+        // Sort by memberType ascending: Alpha (Alice, Bob) before Beta (Charlie), secondary sort by name ascending
+        result = await MemberService.FilterAsync(filter, "memberType", Direction.Ascending, skip: 0, take: 10);
+        Assert.AreEqual(new[] { "Alice", "Bob", "Charlie" }, result.Items.Select(m => m.Name).ToArray());
+
+        // Sort by memberType descending: Beta (Charlie) before Alpha (Alice, Bob), secondary sort by name descending
+        result = await MemberService.FilterAsync(filter, "memberType", Direction.Descending, skip: 0, take: 10);
+        Assert.AreEqual(new[] { "Charlie", "Bob", "Alice" }, result.Items.Select(m => m.Name).ToArray());
+    }
 }

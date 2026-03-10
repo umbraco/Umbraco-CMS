@@ -1,4 +1,4 @@
-import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
+import {ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 
 const azureEmail = process.env.AZUREADB2CTESTUSEREMAIL;
 const azurePassword = process.env.AZUREADB2CTESTUSERPASSWORD;

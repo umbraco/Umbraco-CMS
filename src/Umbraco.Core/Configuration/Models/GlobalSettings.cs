@@ -94,6 +94,11 @@ public class GlobalSettings
     /// </summary>
     internal const int StaticMainDomReleaseSignalPollingInterval = 2000;
 
+    /// <summary>
+    ///     The default value for the <see cref="MainDomAcquisitionTimeout" /> setting.
+    /// </summary>
+    internal const string StaticMainDomAcquisitionTimeout = "00:00:40";
+
     private const bool StaticForceCombineUrlPathLeftToRight = true;
     private const bool StaticShowMaintenancePageWhenInUpgradeState = true;
 
@@ -213,6 +218,15 @@ public class GlobalSettings
     /// </remarks>
     [DefaultValue(StaticMainDomReleaseSignalPollingInterval)]
     public int MainDomReleaseSignalPollingInterval { get; set; } = StaticMainDomReleaseSignalPollingInterval;
+
+    /// <summary>
+    ///     Gets or sets a value representing the maximum time to wait whilst attempting to acquire MainDom status.
+    /// </summary>
+    /// <remarks>
+    ///     The default value is 40 seconds.
+    /// </remarks>
+    [DefaultValue(StaticMainDomAcquisitionTimeout)]
+    public TimeSpan MainDomAcquisitionTimeout { get; set; } = TimeSpan.Parse(StaticMainDomAcquisitionTimeout);
 
     /// <summary>
     ///     Gets or sets the telemetry ID.
