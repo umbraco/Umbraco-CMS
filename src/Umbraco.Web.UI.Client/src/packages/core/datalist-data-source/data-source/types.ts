@@ -33,7 +33,9 @@ export interface UmbDatalistDataSource<ItemType extends UmbDatalistItemModel = U
 	/** Request a paginated list of available options, with optional text filter. */
 	requestOptions(args: UmbDatalistRequestArgs): Promise<UmbDatalistResponse<ItemType>>;
 	/** Resolve specific items by their unique values. */
-	requestItems(uniques: Array<string>): Promise<{ data?: Array<ItemType> }>;
+	requestItems(
+		uniques: Array<string>,
+	): Promise<{ data?: Array<ItemType>; asObservable?: () => Observable<Array<ItemType>> | undefined }>;
 	setConfig?(config: UmbConfigCollectionModel | undefined): void;
 	getConfig?(): UmbConfigCollectionModel | undefined;
 	/** Feature toggles for the datalist data source. Each feature is individually observable. */

@@ -7,6 +7,8 @@ import type {
 	UmbDatalistRequestArgs,
 	UmbDatalistResponse,
 } from '@umbraco-cms/backoffice/datalist-data-source';
+import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
+import { map } from '@umbraco-cms/backoffice/external/rxjs';
 
 export class UmbUserGroupDatalistDataSource extends UmbControllerBase implements UmbDatalistDataSource {
 	#userGroupCollectionRepository: UmbUserGroupCollectionRepository;
@@ -42,21 +44,27 @@ export class UmbUserGroupDatalistDataSource extends UmbControllerBase implements
 		};
 	}
 
-	async requestItems(uniques: Array<string>): Promise<{ data?: Array<UmbDatalistItemModel> }> {
-		const { data, error } = await this.#userGroupItemRepository.requestItems(uniques);
+	async requestItems(uniques: Array<string>): Promise<{
+		data?: Array<UmbDatalistItemModel>;
+		asObservable?: () => Observable<Array<UmbDatalistItemModel>> | undefined;
+	}> {
+		const { data, error, asObservable } = await this.#userGroupItemRepository.requestItems(uniques);
 
 		if (error || !data) {
 			return { data: undefined };
 		}
 
-		const items = data.map((group) => ({
+		const mapItem = (group: (typeof data)[0]): UmbDatalistItemModel => ({
 			unique: group.unique,
 			entityType: group.entityType,
 			name: group.name,
 			icon: group.icon ?? undefined,
-		}));
+		});
 
-		return { data: items };
+		return {
+			data: data.map(mapItem),
+			asObservable: asObservable ? () => asObservable()?.pipe(map((items) => items.map(mapItem))) : undefined,
+		};
 	}
 }
 

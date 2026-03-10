@@ -7,12 +7,17 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
 import type { UmbDatalistItemModel } from '@umbraco-cms/backoffice/datalist-data-source';
 
+const ObserveValueItems = Symbol();
+
 export class UmbUserGroupCollectionFilterApi extends UmbControllerBase implements UmbCollectionFilterApi {
 	#value = new UmbArrayState<string>([], (x) => x);
 	public readonly value = this.#value.asObservable();
 
 	#options = new UmbArrayState<UmbSelectOption>([], (x) => x);
 	public readonly options = this.#options.asObservable();
+
+	#valueItems = new UmbArrayState<UmbDatalistItemModel>([], (x) => x.unique);
+	public readonly valueItems = this.#valueItems.asObservable();
 
 	#collectionContext?: typeof UMB_USER_COLLECTION_CONTEXT.TYPE;
 	#datalistDataSource = new UmbUserGroupDatalistDataSource(this);
@@ -42,11 +47,22 @@ export class UmbUserGroupCollectionFilterApi extends UmbControllerBase implement
 	public setValue(values: Array<string>) {
 		this.#value.setValue(values);
 		this.#collectionContext?.setUserGroupFilter(values);
+		this.#requestValueItems(values);
 	}
 
-	public async requestItems(uniques: Array<string>): Promise<Array<UmbDatalistItemModel>> {
-		const { data } = await this.#datalistDataSource.requestItems(uniques);
-		return data ?? [];
+	async #requestValueItems(uniques: Array<string>) {
+		if (uniques.length === 0) {
+			this.#valueItems.setValue([]);
+			return;
+		}
+
+		const { data, asObservable } = await this.#datalistDataSource.requestItems(uniques);
+
+		if (asObservable) {
+			this.observe(asObservable(), (items) => this.#valueItems.setValue(items), ObserveValueItems);
+		} else if (data) {
+			this.#valueItems.setValue(data);
+		}
 	}
 
 	async #requestOptions() {

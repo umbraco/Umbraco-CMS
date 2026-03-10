@@ -4,6 +4,7 @@ import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 import type { ManifestCollectionFilter, UmbSelectOption } from '@umbraco-cms/backoffice/collection';
+import type { UmbDatalistItemModel } from '@umbraco-cms/backoffice/datalist-data-source';
 
 @customElement('umb-user-group-collection-filter')
 export class UmbUserGroupCollectionFilterElement extends UmbLitElement {
@@ -16,7 +17,7 @@ export class UmbUserGroupCollectionFilterElement extends UmbLitElement {
 	private _value: Array<string> = [];
 
 	@state()
-	private _valueLabels: Map<string, string> = new Map();
+	private _valueItems: Array<UmbDatalistItemModel> = [];
 
 	@state()
 	private _hasMore = false;
@@ -28,10 +29,8 @@ export class UmbUserGroupCollectionFilterElement extends UmbLitElement {
 	public set api(api: UmbUserGroupCollectionFilterApi | undefined) {
 		this._api = api;
 		this.observe(api?.options, (options) => (this._options = options ?? []));
-		this.observe(api?.value, (value) => {
-			this._value = value ?? [];
-			this.#resolveValueLabels();
-		});
+		this.observe(api?.value, (value) => (this._value = value ?? []));
+		this.observe(api?.valueItems, (items) => (this._valueItems = items ?? []));
 
 		if (api) {
 			this.observe(
@@ -41,23 +40,6 @@ export class UmbUserGroupCollectionFilterElement extends UmbLitElement {
 		}
 
 		this._api?.loadOptions();
-	}
-
-	async #resolveValueLabels() {
-		if (!this._api || this._value.length === 0) {
-			this._valueLabels = new Map();
-			return;
-		}
-
-		const unresolvedUniques = this._value.filter((unique) => !this._valueLabels.has(unique));
-		if (unresolvedUniques.length === 0) return;
-
-		const items = await this._api.requestItems(unresolvedUniques);
-		const updatedLabels = new Map(this._valueLabels);
-		for (const item of items) {
-			updatedLabels.set(item.unique, item.name ?? item.unique);
-		}
-		this._valueLabels = updatedLabels;
 	}
 
 	#onChange(event: Event) {
@@ -84,7 +66,11 @@ export class UmbUserGroupCollectionFilterElement extends UmbLitElement {
 		const length = this._value.length;
 		const max = 2;
 		if (length === 0) return this.localize.term('general_all');
-		const labels = this._value.slice(0, max).map((unique) => this._valueLabels.get(unique) ?? unique);
+
+		const labels = this._value
+			.slice(0, max)
+			.map((unique) => this._valueItems.find((i) => i.unique === unique)?.name ?? unique);
+
 		return labels.join(', ') + (length > max ? ' + ' + (length - max) : '');
 	}
 
