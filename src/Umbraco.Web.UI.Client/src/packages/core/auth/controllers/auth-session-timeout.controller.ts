@@ -135,6 +135,9 @@ export class UmbAuthSessionTimeoutController extends UmbControllerBase {
 					onContinue: () => {
 						this.#tryValidateToken();
 					},
+					onExpired: () => {
+						this.#host.timeOut();
+					},
 				},
 			});
 			await modal?.onSubmit();
