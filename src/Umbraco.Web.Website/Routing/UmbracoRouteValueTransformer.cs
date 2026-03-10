@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Routing;
@@ -122,6 +123,14 @@ public class UmbracoRouteValueTransformer : DynamicRouteValueTransformer
     {
         // will be null for any client side requests like JS, etc...
         if (!_umbracoContextAccessor.TryGetUmbracoContext(out IUmbracoContext? umbracoContext))
+        {
+            return null!;
+        }
+
+        // During a background unattended upgrade, content services are not yet initialized.
+        // Return null so the dynamic route is removed from candidates, leaving any static routes
+        // (e.g. surface controllers) to be matched and handled by their own action filters.
+        if (_runtime.Level == RuntimeLevel.Upgrading)
         {
             return null!;
         }

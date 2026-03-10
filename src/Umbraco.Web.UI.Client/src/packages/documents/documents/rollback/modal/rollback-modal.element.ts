@@ -26,6 +26,7 @@ type DocumentVersion = {
 	preventCleanup: boolean;
 };
 
+/** @deprecated Use `umb-content-rollback-modal` from `@umbraco-cms/backoffice/content` instead. Scheduled for removal in Umbraco 19. */
 @customElement('umb-rollback-modal')
 export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModalData, UmbRollbackModalValue> {
 	@state()
