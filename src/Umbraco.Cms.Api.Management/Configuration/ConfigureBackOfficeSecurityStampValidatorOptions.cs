@@ -23,6 +23,6 @@ public class ConfigureBackOfficeSecurityStampValidatorOptions : IConfigureOption
     public void Configure(BackOfficeSecurityStampValidatorOptions options)
     {
         options.TimeProvider = _timeProvider;
-        ConfigureSecurityStampOptions.ConfigureOptions(options, _securitySettings);
+        ConfigureSecurityStampOptions.ConfigureOptions(options, _securitySettings.GetUserAllowConcurrentLogins());
     }
 }
