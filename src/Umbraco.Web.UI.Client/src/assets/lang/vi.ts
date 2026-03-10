@@ -401,6 +401,8 @@ export default {
 		fileSecurityValidationFailure: 'Một hoặc nhiều xác thực bảo mật tệp đã thất bại',
 		moveToSameFolderFailed: 'Thư mục cha và thư mục đích không thể giống nhau',
 		uploadNotAllowed: 'Tải lên không được phép ở vị trí này.',
+		uploadValidationFailed: (mediaTypeName: string) =>
+			`Loại phương tiện ${mediaTypeName} có một hoặc nhiều thuộc tính bắt buộc. Nó sẽ cần được tải lên riêng lẻ thông qua menu 'Tạo'`,
 	},
 	member: {
 		'2fa': 'Xác thực hai yếu tố',
@@ -2019,6 +2021,7 @@ export default {
 		noLockouts: 'không bị khóa',
 		noPasswordChange: 'Mật khẩu chưa được thay đổi',
 		confirmNewPassword: 'Xác nhận mật khẩu mới',
+		confirmPassword: 'Xác nhận mật khẩu',
 		changePasswordDescription:
 			"Bạn có thể thay đổi mật khẩu của mình để truy cập vào Umbraco backoffice bằng cách điền vào mẫu dưới đây và nhấp vào nút 'Đổi mật khẩu'",
 		contentChannel: 'Kênh nội dung',

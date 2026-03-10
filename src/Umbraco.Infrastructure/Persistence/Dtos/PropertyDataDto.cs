@@ -17,8 +17,6 @@ internal sealed class PropertyDataDto
     public const int VarcharLength = 512;
     public const int SegmentLength = 256;
 
-    internal const string ReferenceColumnName = "PropertyTypeId"; // should be PropertyTypeId, but for database compatibility we keep it like this
-
     private const string LanguageIdColumnName = "languageId";
     private const string SegmentColumnName = "segment";
 
@@ -77,8 +75,13 @@ internal sealed class PropertyDataDto
     [SpecialDbType(SpecialDbTypes.NVARCHARMAX)]
     public string? TextValue { get; set; }
 
+    [Column("sortableValue")]
+    [NullSetting(NullSetting = NullSettings.Null)]
+    [Length(VarcharLength)]
+    public string? SortableValue { get; set; }
+
     [ResultColumn]
-    [Reference(ReferenceType.OneToOne, ColumnName = ReferenceColumnName)]
+    [Reference(ReferenceType.OneToOne, ColumnName = nameof(PropertyTypeId))]
     public PropertyTypeDto? PropertyTypeDto { get; set; }
 
     [Ignore]
@@ -127,6 +130,7 @@ internal sealed class PropertyDataDto
             DateValue = DateValue,
             VarcharValue = VarcharValue,
             TextValue = TextValue,
+            SortableValue = SortableValue,
             PropertyTypeDto = PropertyTypeDto,
         };
 

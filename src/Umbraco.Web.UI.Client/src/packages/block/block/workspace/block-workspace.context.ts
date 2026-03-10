@@ -84,6 +84,9 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 
 		window.addEventListener('willchangestate', this.#onWillNavigate);
 
+		this.content.view.inheritFrom(this.view);
+		this.settings.view.inheritFrom(this.view);
+
 		this.addValidationContext(this.content.validation);
 		this.addValidationContext(this.settings.validation);
 
@@ -209,8 +212,12 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 					};
 
 					this.readOnlyGuard?.addRule(rule);
+					this.content.propertyWriteGuard.addRule({ unique, permitted: false });
+					this.settings.propertyWriteGuard.addRule({ unique, permitted: false });
 				} else {
 					this.readOnlyGuard?.removeRule(unique);
+					this.content.propertyWriteGuard.removeRule(unique);
+					this.settings.propertyWriteGuard.removeRule(unique);
 				}
 			},
 			'observeIsReadOnly',

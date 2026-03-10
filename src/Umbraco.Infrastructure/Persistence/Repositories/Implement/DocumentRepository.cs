@@ -1088,18 +1088,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         }
 
         // persist the property data
-        IEnumerable<PropertyDataDto> propertyDataDtos = PropertyFactory.BuildDtos(
-            entity.ContentType.Variations,
-            entity.VersionId,
-            entity.PublishedVersionId,
-            entity.Properties,
-            LanguageRepository,
-            out var edited,
-            out HashSet<string>? editedCultures);
-        foreach (PropertyDataDto propertyDataDto in propertyDataDtos)
-        {
-            Database.Insert(propertyDataDto);
-        }
+        InsertPropertyValues(entity, entity.PublishedVersionId, out var edited, out var editedCultures);
 
         // if !publishing, we may have a new name != current publish name,
         // also impacts 'edited'
@@ -1434,7 +1423,8 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         // We need to flush the isolated cache by key explicitly here.
         // The ContentCacheRefresher does the same thing, but by the time it's invoked, custom notification handlers
         // might have already consumed the cached version (which at this point is the previous version).
-        IsolatedCache.ClearByKey(RepositoryCacheKeys.GetKey<IContent, Guid>(entity.Key));
+        // GUID-keyed read repository uses a separate "uRepoGuid_" prefix.
+        IsolatedCache.Clear(RepositoryCacheKeys.GetGuidKey<IContent>(entity.Key));
 
         // troubleshooting
         //if (Database.ExecuteScalar<int>($"SELECT COUNT(*) FROM {Constants.DatabaseSchema.Tables.DocumentVersion} JOIN {Constants.DatabaseSchema.Tables.ContentVersion} ON {Constants.DatabaseSchema.Tables.DocumentVersion}.id={Constants.DatabaseSchema.Tables.ContentVersion}.id WHERE published=1 AND nodeId=" + content.Id) > 1)
@@ -1691,7 +1681,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         if (entity.HasIdentity)
         {
             var cacheKey = GetCacheKey(entity.Id);
-            IsolatedCache.Insert(cacheKey, () => entity, TimeSpan.FromMinutes(5), true);
+            IsolatedCache.Insert(cacheKey, () => entity, RepositoryCacheConstants.DefaultCacheDuration, true);
         }
     }
 
@@ -1730,6 +1720,16 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
                 repositoryCacheVersionService,
                 cacheSyncService) =>
             _outerRepo = outerRepo;
+
+        // Use a GUID-specific cache policy with a distinct prefix ("uRepoGuid_IContent_")
+        // so that GUID-keyed cache entries don't interfere with the parent int-keyed repository's
+        // prefix-based search and count validation in DefaultRepositoryCachePolicy.
+        protected override IRepositoryCachePolicy<IContent, Guid> CreateCachePolicy()
+            => new GuidReadRepositoryCachePolicy<IContent>(
+                GlobalIsolatedCache,
+                ScopeAccessor,
+                RepositoryCacheVersionService,
+                CacheSyncService);
 
         protected override IContent? PerformGet(Guid id)
         {
@@ -1795,7 +1795,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
             if (entity.HasIdentity)
             {
                 var cacheKey = GetCacheKey(entity.Key);
-                IsolatedCache.Insert(cacheKey, () => entity, TimeSpan.FromMinutes(5), true);
+                IsolatedCache.Insert(cacheKey, () => entity, RepositoryCacheConstants.DefaultCacheDuration, true);
             }
         }
 
@@ -1811,7 +1811,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
             }
         }
 
-        private static string GetCacheKey(Guid key) => RepositoryCacheKeys.GetKey<IContent>() + key;
+        private static string GetCacheKey(Guid key) => GuidReadRepositoryCachePolicy<IContent>.GetCacheKey(key);
     }
 
     #endregion
@@ -1879,12 +1879,19 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
     /// <inheritdoc />
     public IDictionary<int, IEnumerable<ContentSchedule>> GetContentSchedulesByIds(int[] documentIds)
     {
-        Sql<ISqlContext> sql = Sql()
-            .Select<ContentScheduleDto>()
-            .From<ContentScheduleDto>()
-            .WhereIn<ContentScheduleDto>(contentScheduleDto => contentScheduleDto.NodeId, documentIds);
+        var contentScheduleDtos = documentIds
+            .Distinct()
+            .InGroupsOf(Constants.Sql.MaxParameterCount)
+            .SelectMany(group =>
+            {
+                Sql<ISqlContext> sql = Sql()
+                    .Select<ContentScheduleDto>()
+                    .From<ContentScheduleDto>()
+                    .WhereIn<ContentScheduleDto>(contentScheduleDto => contentScheduleDto.NodeId, group);
 
-        List<ContentScheduleDto>? contentScheduleDtos = Database.Fetch<ContentScheduleDto>(sql);
+                return Database.Fetch<ContentScheduleDto>(sql);
+            })
+            .ToList();
 
         IDictionary<int, IEnumerable<ContentSchedule>> dictionary = contentScheduleDtos
             .GroupBy(contentSchedule => contentSchedule.NodeId)

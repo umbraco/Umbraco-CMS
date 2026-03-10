@@ -75,7 +75,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="memberGroupRepository">The repository for member group data access.</param>
         /// <param name="auditRepository">The repository for audit data access (obsolete).</param>
         /// <param name="idKeyMap">The lazy-loaded service for mapping between IDs and keys.</param>
-        [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
+        [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
         public MemberService(
             ICoreScopeProvider provider,
             ILoggerFactory loggerFactory,
@@ -114,7 +114,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="auditRepository">The repository for audit data access (obsolete).</param>
         /// <param name="idKeyMap">The lazy-loaded service for mapping between IDs and keys.</param>
         /// <param name="userIdKeyResolver">The resolver for user ID to key mapping.</param>
-        [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
+        [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
         public MemberService(
             ICoreScopeProvider provider,
             ILoggerFactory loggerFactory,
@@ -463,8 +463,11 @@ namespace Umbraco.Cms.Core.Services
             string orderBy,
             Direction orderDirection,
             string? memberTypeAlias = null,
-            string filter = "") =>
-            GetAll(skip, take, out totalRecords, orderBy, orderDirection, true, memberTypeAlias, filter);
+            string filter = "")
+        {
+            PaginationHelper.ConvertSkipTakeToPaging(skip, take, out long pageIndex, out int pageSize);
+            return GetAll(pageIndex, pageSize, out totalRecords, orderBy, orderDirection, true, memberTypeAlias, filter);
+        }
 
         /// <inheritdoc />
         public IEnumerable<IMember> GetAll(
@@ -482,7 +485,7 @@ namespace Umbraco.Cms.Core.Services
             IQuery<IMember>? query1 = memberTypeAlias == null ? null : Query<IMember>()?.Where(x => x.ContentTypeAlias == memberTypeAlias);
             int.TryParse(filter, out int filterAsIntId);//considering id,key & name as filter param
             Guid.TryParse(filter, out Guid filterAsGuid);
-            IQuery<IMember>? query2 = filter == null ? null : Query<IMember>()?.Where(x => (x.Name != null && x.Name.Contains(filter)) || x.Username.Contains(filter) || x.Email.Contains(filter) || x.Id == filterAsIntId || x.Key ==  filterAsGuid );
+            IQuery<IMember>? query2 = string.IsNullOrWhiteSpace(filter) ? null : Query<IMember>()?.Where(x => (x.Name != null && x.Name.Contains(filter)) || x.Username.Contains(filter) || x.Email.Contains(filter) || x.Id == filterAsIntId || x.Key ==  filterAsGuid );
             return _memberRepository.GetPage(query1, pageIndex, pageSize, out totalRecords, propertyAliases: null, query2, Ordering.By(orderBy, orderDirection, isCustomField: !orderBySystemField));
         }
 

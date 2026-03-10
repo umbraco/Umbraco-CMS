@@ -13,6 +13,7 @@ using Umbraco.Cms.Core.Features;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Cms.Web.Common.Filters;
 
 namespace Umbraco.Cms.Api.Management.Controllers;
@@ -25,6 +26,7 @@ namespace Umbraco.Cms.Api.Management.Controllers;
 [AppendEventMessages]
 [DisableBrowserCache]
 [Produces("application/json")]
+[MaintenanceModeActionFilter]
 public abstract class ManagementApiControllerBase : Controller, IUmbracoFeature
 {
     protected IActionResult CreatedAtId<T>(Expression<Func<T, string>> action, Guid id)

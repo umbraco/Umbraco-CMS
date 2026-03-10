@@ -83,7 +83,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
     /// <param name="eventAggregator">The event aggregator.</param>
     /// <param name="userIdKeyResolver">The user ID key resolver.</param>
     /// <param name="contentTypeFilters">The content type filter collection.</param>
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
     protected ContentTypeServiceBase(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -408,6 +408,13 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
             {
                 // add that one, as a main change
                 AddChange(changes, contentType, ContentTypeChangeTypes.RefreshMain);
+
+                // Add VariationChanged flag if content type variation changed.
+                // This is used by DocumentUrlService to rebuild URL cache with correct languageId.
+                if (hasContentTypeVariationChanged)
+                {
+                    AddChange(changes, contentType, ContentTypeChangeTypes.VariationChanged);
+                }
 
                 if (hasPropertyMainImpact)
                 {
@@ -884,7 +891,15 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
             return ContentTypeOperationStatus.NotAllowed;
         }
 
-        Delete(item, performingUserId);
+        EventMessages eventMessages = EventMessagesFactory.Get();
+        DeletingNotification<TItem> deletingNotification = GetDeletingNotification(item, eventMessages);
+        if (await scope.Notifications.PublishCancelableAsync(deletingNotification))
+        {
+            scope.Complete();
+            return ContentTypeOperationStatus.CancelledByNotification;
+        }
+
+        PerformDelete(scope, item, deletingNotification, eventMessages, performingUserId);
 
         scope.Complete();
         return ContentTypeOperationStatus.Success;
@@ -908,58 +923,58 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
                 return;
             }
 
-            scope.WriteLock(WriteLockIds);
+            PerformDelete(scope, item, deletingNotification, eventMessages, userId);
 
-            // all descendants are going to be deleted
-            TItem[] descendantsAndSelf = GetDescendants(item.Id, true)
-                .ToArray();
-            TItem[] deleted = descendantsAndSelf;
-
-            // all impacted (through composition) probably lose some properties
-            // don't try to be too clever here, just report them all
-            // do this before anything is deleted
-            TItem[] changed = descendantsAndSelf.SelectMany(xx => GetComposedOf(xx.Id))
-                .Distinct()
-                .Except(descendantsAndSelf)
-                .ToArray();
-
-            // delete content
-            DeleteItemsOfTypes(descendantsAndSelf.Select(x => x.Id));
-
-            // Next find all other document types that have a reference to this content type
-            IEnumerable<TItem> referenceToAllowedContentTypes = GetAll().Where(q => q.AllowedContentTypes?.Any(p => p.Key == item.Key) ?? false);
-            foreach (TItem reference in referenceToAllowedContentTypes)
-            {
-                reference.AllowedContentTypes = reference.AllowedContentTypes?.Where(p => p.Key != item.Key);
-                var changedRef = new List<ContentTypeChange<TItem>>() { new ContentTypeChange<TItem>(reference, ContentTypeChangeTypes.RefreshMain) };
-                // Fire change event
-                scope.Notifications.Publish(GetContentTypeChangedNotification(changedRef, eventMessages));
-            }
-
-            // finally delete the content type
-            // - recursively deletes all descendants
-            // - deletes all associated property data
-            //  (contents of any descendant type have been deleted but
-            //   contents of any composed (impacted) type remain but
-            //   need to have their property data cleared)
-            Repository.Delete(item);
-
-            ContentTypeChange<TItem>[] changes = descendantsAndSelf.Select(x => new ContentTypeChange<TItem>(x, ContentTypeChangeTypes.Remove))
-                .Concat(changed.Select(x => new ContentTypeChange<TItem>(x, ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RefreshOther)))
-                .ToArray();
-
-            // Publish this in scope, see comment at GetContentTypeRefreshedNotification for more info.
-            _eventAggregator.Publish(GetContentTypeRefreshedNotification(changes, eventMessages));
-
-            scope.Notifications.Publish(GetContentTypeChangedNotification(changes, eventMessages));
-
-            DeletedNotification<TItem> deletedNotification = GetDeletedNotification(deleted.DistinctBy(x => x.Id), eventMessages);
-            deletedNotification.WithStateFrom(deletingNotification);
-            scope.Notifications.Publish(deletedNotification);
-
-            Audit(AuditType.Delete, userId, item.Id);
             scope.Complete();
         }
+    }
+
+    private void PerformDelete(ICoreScope scope, TItem item, DeletingNotification<TItem> deletingNotification, EventMessages eventMessages, int userId)
+    {
+        scope.WriteLock(WriteLockIds);
+
+        TItem[] descendantsAndSelf = GetDescendants(item.Id, true).ToArray();
+
+        // all impacted (through composition) probably lose some properties
+        // don't try to be too clever here, just report them all
+        // do this before anything is deleted
+        TItem[] changed = descendantsAndSelf.SelectMany(xx => GetComposedOf(xx.Id))
+            .Distinct()
+            .Except(descendantsAndSelf)
+            .ToArray();
+
+        DeleteItemsOfTypes(descendantsAndSelf.Select(x => x.Id));
+
+        // remove references to this content type from other content types
+        IEnumerable<TItem> referenceToAllowedContentTypes = GetAll().Where(q => q.AllowedContentTypes?.Any(p => p.Key == item.Key) ?? false);
+        foreach (TItem reference in referenceToAllowedContentTypes)
+        {
+            reference.AllowedContentTypes = reference.AllowedContentTypes?.Where(p => p.Key != item.Key);
+            var changedRef = new List<ContentTypeChange<TItem>>() { new ContentTypeChange<TItem>(reference, ContentTypeChangeTypes.RefreshMain) };
+            scope.Notifications.Publish(GetContentTypeChangedNotification(changedRef, eventMessages));
+        }
+
+        // finally delete the content type
+        // - recursively deletes all descendants
+        // - deletes all associated property data
+        //  (contents of any descendant type have been deleted but
+        //   contents of any composed (impacted) type remain but
+        //   need to have their property data cleared)
+        Repository.Delete(item);
+
+        ContentTypeChange<TItem>[] changes = descendantsAndSelf.Select(x => new ContentTypeChange<TItem>(x, ContentTypeChangeTypes.Remove))
+            .Concat(changed.Select(x => new ContentTypeChange<TItem>(x, ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RefreshOther)))
+            .ToArray();
+
+        // Publish this in scope, see comment at GetContentTypeRefreshedNotification for more info.
+        _eventAggregator.Publish(GetContentTypeRefreshedNotification(changes, eventMessages));
+        scope.Notifications.Publish(GetContentTypeChangedNotification(changes, eventMessages));
+
+        DeletedNotification<TItem> deletedNotification = GetDeletedNotification(descendantsAndSelf.DistinctBy(x => x.Id), eventMessages);
+        deletedNotification.WithStateFrom(deletingNotification);
+        scope.Notifications.Publish(deletedNotification);
+
+        Audit(AuditType.Delete, userId, item.Id);
     }
 
     /// <inheritdoc />
@@ -1048,7 +1063,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
     /// <param name="name">The name for the new content type.</param>
     /// <param name="parentId">The parent identifier for the new content type. Use -1 for root.</param>
     /// <returns>The newly created content type copy.</returns>
-    [Obsolete("Please use CopyAsync. Will be removed in V15.")]
+    [Obsolete("Please use CopyAsync. Scheduled for removal in Umbraco 18.")]
     public TItem Copy(TItem original, string alias, string name, int parentId = -1)
     {
         TItem? parent = null;
@@ -1071,7 +1086,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
     /// <param name="name">The name for the new content type.</param>
     /// <param name="parent">The parent content type for the new content type. Use null for root.</param>
     /// <returns>The newly created content type copy.</returns>
-    [Obsolete("Please use CopyAsync. Will be removed in V15.")]
+    [Obsolete("Please use CopyAsync. Scheduled for removal in Umbraco 18.")]
     public TItem Copy(TItem original, string alias, string name, TItem? parent)
     {
         if (original == null)
@@ -1132,7 +1147,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
     /// <param name="copying">The content type to copy.</param>
     /// <param name="containerId">The identifier of the target container. Use -1 for root.</param>
     /// <returns>An attempt result containing the operation status and the copied content type.</returns>
-    [Obsolete("Please use CopyAsync. Will be removed in V16.")]
+    [Obsolete("Please use CopyAsync. Scheduled for removal in Umbraco 18.")]
     public Attempt<OperationResult<MoveOperationStatusType, TItem>?> Copy(TItem copying, int containerId)
     {
         EventMessages eventMessages = EventMessagesFactory.Get();
@@ -1270,7 +1285,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
     /// <param name="moving">The content type to move.</param>
     /// <param name="containerId">The identifier of the target container. Use -1 for root.</param>
     /// <returns>An attempt result containing the operation status.</returns>
-    [Obsolete("Please use MoveAsync. Will be removed in V16.")]
+    [Obsolete("Please use MoveAsync. Scheduled for removal in Umbraco 18.")]
     public Attempt<OperationResult<MoveOperationStatusType>?> Move(TItem moving, int containerId)
     {
         EventMessages eventMessages = EventMessagesFactory.Get();
@@ -1467,7 +1482,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
     /// <param name="name">The name of the container.</param>
     /// <param name="userId">The identifier of the user creating the container.</param>
     /// <returns>An attempt result containing the operation status and the created container.</returns>
-    [Obsolete($"Please use {nameof(IContentTypeContainerService)} or {nameof(IMediaTypeContainerService)} for all content or media type container operations. Will be removed in V16.")]
+    [Obsolete($"Please use {nameof(IContentTypeContainerService)} or {nameof(IMediaTypeContainerService)} for all content or media type container operations. Scheduled for removal in Umbraco 18.")]
     public Attempt<OperationResult<OperationResultType, EntityContainer>?> CreateContainer(int parentId, Guid key, string name, int userId = Constants.Security.SuperUserId)
     {
         EventMessages eventMessages = EventMessagesFactory.Get();
@@ -1514,7 +1529,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
     /// <param name="container">The container to save.</param>
     /// <param name="userId">The identifier of the user saving the container.</param>
     /// <returns>An attempt result containing the operation status.</returns>
-    [Obsolete($"Please use {nameof(IContentTypeContainerService)} or {nameof(IMediaTypeContainerService)} for all content or media type container operations. Will be removed in V16.")]
+    [Obsolete($"Please use {nameof(IContentTypeContainerService)} or {nameof(IMediaTypeContainerService)} for all content or media type container operations. Scheduled for removal in Umbraco 18.")]
     public Attempt<OperationResult?> SaveContainer(EntityContainer container, int userId = Constants.Security.SuperUserId)
     {
         EventMessages eventMessages = EventMessagesFactory.Get();
@@ -1561,7 +1576,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
     /// </summary>
     /// <param name="containerId">The integer identifier of the container.</param>
     /// <returns>The entity container if found; otherwise, null.</returns>
-    [Obsolete($"Please use {nameof(IContentTypeContainerService)} or {nameof(IMediaTypeContainerService)} for all content or media type container operations. Will be removed in V16.")]
+    [Obsolete($"Please use {nameof(IContentTypeContainerService)} or {nameof(IMediaTypeContainerService)} for all content or media type container operations. Scheduled for removal in Umbraco 18.")]
     public EntityContainer? GetContainer(int containerId)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
@@ -1575,7 +1590,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
     /// </summary>
     /// <param name="containerId">The GUID identifier of the container.</param>
     /// <returns>The entity container if found; otherwise, null.</returns>
-    [Obsolete($"Please use {nameof(IContentTypeContainerService)} or {nameof(IMediaTypeContainerService)} for all content or media type container operations. Will be removed in V16.")]
+    [Obsolete($"Please use {nameof(IContentTypeContainerService)} or {nameof(IMediaTypeContainerService)} for all content or media type container operations. Scheduled for removal in Umbraco 18.")]
     public EntityContainer? GetContainer(Guid containerId)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
@@ -1589,7 +1604,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
     /// </summary>
     /// <param name="containerIds">The array of container identifiers.</param>
     /// <returns>A collection of entity containers.</returns>
-    [Obsolete($"Please use {nameof(IContentTypeContainerService)} or {nameof(IMediaTypeContainerService)} for all content or media type container operations. Will be removed in V16.")]
+    [Obsolete($"Please use {nameof(IContentTypeContainerService)} or {nameof(IMediaTypeContainerService)} for all content or media type container operations. Scheduled for removal in Umbraco 18.")]
     public IEnumerable<EntityContainer> GetContainers(int[] containerIds)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
@@ -1603,7 +1618,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
     /// </summary>
     /// <param name="item">The content type item to get ancestor containers for.</param>
     /// <returns>A collection of ancestor entity containers.</returns>
-    [Obsolete($"Please use {nameof(IContentTypeContainerService)} or {nameof(IMediaTypeContainerService)} for all content or media type container operations. Will be removed in V16.")]
+    [Obsolete($"Please use {nameof(IContentTypeContainerService)} or {nameof(IMediaTypeContainerService)} for all content or media type container operations. Scheduled for removal in Umbraco 18.")]
     public IEnumerable<EntityContainer> GetContainers(TItem item)
     {
         var ancestorIds = item.Path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries)
@@ -1620,7 +1635,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
     /// <param name="name">The name of the containers to find.</param>
     /// <param name="level">The level of the containers in the hierarchy.</param>
     /// <returns>A collection of entity containers matching the criteria.</returns>
-    [Obsolete($"Please use {nameof(IContentTypeContainerService)} or {nameof(IMediaTypeContainerService)} for all content or media type container operations. Will be removed in V16.")]
+    [Obsolete($"Please use {nameof(IContentTypeContainerService)} or {nameof(IMediaTypeContainerService)} for all content or media type container operations. Scheduled for removal in Umbraco 18.")]
     public IEnumerable<EntityContainer> GetContainers(string name, int level)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
@@ -1635,7 +1650,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
     /// <param name="containerId">The identifier of the container to delete.</param>
     /// <param name="userId">The identifier of the user deleting the container.</param>
     /// <returns>An attempt result containing the operation status.</returns>
-    [Obsolete($"Please use {nameof(IContentTypeContainerService)} or {nameof(IMediaTypeContainerService)} for all content or media type container operations. Will be removed in V16.")]
+    [Obsolete($"Please use {nameof(IContentTypeContainerService)} or {nameof(IMediaTypeContainerService)} for all content or media type container operations. Scheduled for removal in Umbraco 18.")]
     public Attempt<OperationResult?> DeleteContainer(int containerId, int userId = Constants.Security.SuperUserId)
     {
         EventMessages eventMessages = EventMessagesFactory.Get();
@@ -1682,7 +1697,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
     /// <param name="name">The new name for the container.</param>
     /// <param name="userId">The identifier of the user renaming the container.</param>
     /// <returns>An attempt result containing the operation status and the renamed container.</returns>
-    [Obsolete($"Please use {nameof(IContentTypeContainerService)} or {nameof(IMediaTypeContainerService)} for all content or media type container operations. Will be removed in V16.")]
+    [Obsolete($"Please use {nameof(IContentTypeContainerService)} or {nameof(IMediaTypeContainerService)} for all content or media type container operations. Scheduled for removal in Umbraco 18.")]
     public Attempt<OperationResult<OperationResultType, EntityContainer>?> RenameContainer(int id, string name, int userId = Constants.Security.SuperUserId)
     {
         EventMessages eventMessages = EventMessagesFactory.Get();

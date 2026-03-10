@@ -122,7 +122,7 @@ public class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository,
     /// <param name="eventAggregator">The event aggregator.</param>
     /// <param name="userIdKeyResolver">The user ID key resolver.</param>
     /// <param name="contentTypeFilters">The content type filter collection.</param>
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
     public ContentTypeService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -166,7 +166,7 @@ public class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository,
     /// <param name="eventAggregator">The event aggregator.</param>
     /// <param name="userIdKeyResolver">The user ID key resolver.</param>
     /// <param name="contentTypeFilters">The content type filter collection.</param>
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
     public ContentTypeService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -212,7 +212,7 @@ public class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository,
     /// <param name="userIdKeyResolver">The user ID key resolver.</param>
     /// <param name="contentTypeFilters">The content type filter collection.</param>
     /// <param name="templateService">The template service.</param>
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
     public ContentTypeService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,

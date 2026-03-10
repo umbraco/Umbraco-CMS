@@ -22,7 +22,9 @@ public class MemberGroupTreeControllerBase : NamedEntityTreeControllerBase<Named
     {
     }
 
-    public MemberGroupTreeControllerBase(IEntityService entityService, FlagProviderCollection flagProviders)
+    public MemberGroupTreeControllerBase(
+        IEntityService entityService,
+        FlagProviderCollection flagProviders)
         : base(entityService, flagProviders)
     {
     }

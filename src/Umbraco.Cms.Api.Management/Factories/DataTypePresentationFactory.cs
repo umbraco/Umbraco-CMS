@@ -47,12 +47,13 @@ public class DataTypePresentationFactory : IDataTypePresentationFactory
         }
 
         DateTime createDate = _timeProvider.GetLocalNow().DateTime;
+        IDictionary<string, object> configurationData = MapConfigurationData(requestModel, editor);
         var dataType = new DataType(editor, _configurationEditorJsonSerializer)
         {
             Name = requestModel.Name,
             EditorUiAlias = requestModel.EditorUiAlias,
-            DatabaseType = GetEditorValueStorageType(editor),
-            ConfigurationData = MapConfigurationData(requestModel, editor),
+            DatabaseType = GetEditorValueStorageType(editor, configurationData),
+            ConfigurationData = configurationData,
             ParentId = parentAttempt.Result,
             CreateDate = createDate,
             UpdateDate = createDate,
@@ -97,18 +98,27 @@ public class DataTypePresentationFactory : IDataTypePresentationFactory
 
         IDataType dataType = (IDataType)current.DeepClone();
 
+        IDictionary<string, object> configurationData = MapConfigurationData(requestModel, editor);
         dataType.Name = requestModel.Name;
         dataType.Editor = editor;
         dataType.EditorUiAlias = requestModel.EditorUiAlias;
-        dataType.DatabaseType = GetEditorValueStorageType(editor);
-        dataType.ConfigurationData = MapConfigurationData(requestModel, editor);
+        dataType.DatabaseType = GetEditorValueStorageType(editor, configurationData);
+        dataType.ConfigurationData = configurationData;
 
         return Task.FromResult(Attempt.SucceedWithStatus<IDataType, DataTypeOperationStatus>(DataTypeOperationStatus.Success, dataType));
     }
 
 
-    private ValueStorageType GetEditorValueStorageType(IDataEditor editor)
+    private ValueStorageType GetEditorValueStorageType(IDataEditor editor, IDictionary<string, object> configurationData)
     {
+        var configurationObject = editor.GetConfigurationEditor()
+            .ToConfigurationObject(configurationData, _configurationEditorJsonSerializer);
+
+        if (configurationObject is IConfigureValueType configureValueType)
+        {
+            return ValueTypes.ToStorageType(configureValueType.ValueType);
+        }
+
         var valueType = editor.GetValueEditor().ValueType;
         return ValueTypes.ToStorageType(valueType);
     }

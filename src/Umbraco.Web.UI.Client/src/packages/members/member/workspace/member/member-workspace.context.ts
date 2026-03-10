@@ -9,7 +9,11 @@ import {
 	UMB_MEMBER_WORKSPACE_VIEW_MEMBER_ALIAS,
 	UMB_MEMBER_DETAIL_MODEL_VARIANT_SCAFFOLD,
 } from './constants.js';
-import { UmbMemberTypeDetailRepository, type UmbMemberTypeDetailModel } from '@umbraco-cms/backoffice/member-type';
+import {
+	UMB_MEMBER_TYPE_ENTITY_TYPE,
+	UmbMemberTypeDetailRepository,
+	type UmbMemberTypeDetailModel,
+} from '@umbraco-cms/backoffice/member-type';
 import {
 	UmbWorkspaceIsNewRedirectController,
 	UmbWorkspaceIsNewRedirectControllerAlias,
@@ -20,6 +24,7 @@ import { UmbContentDetailWorkspaceContextBase, type UmbContentWorkspaceContext }
 import { ensurePathEndsWithSlash } from '@umbraco-cms/backoffice/utils';
 import { UmbValueValidator } from '@umbraco-cms/backoffice/validation';
 import type { UmbValueValidatorArgs } from '@umbraco-cms/backoffice/validation';
+import { UmbEntityContentTypeEntityContext } from '@umbraco-cms/backoffice/content-type';
 
 type ContentModel = UmbMemberDetailModel;
 type ContentTypeModel = UmbMemberTypeDetailModel;
@@ -36,6 +41,8 @@ export class UmbMemberWorkspaceContext
 	readonly contentTypeUnique = this._data.createObservablePartOfCurrent((data) => data?.memberType.unique);
 	readonly contentTypeIcon = this._data.createObservablePartOfCurrent((data) => data?.memberType.icon);
 	readonly kind = this._data.createObservablePartOfCurrent((data) => data?.kind);
+
+	#entityContentTypeContext = new UmbEntityContentTypeEntityContext(this);
 	readonly createDate = this._data.createObservablePartOfCurrent((data) => data?.variants[0].createDate);
 	readonly updateDate = this._data.createObservablePartOfCurrent((data) => data?.variants[0].updateDate);
 
@@ -53,6 +60,8 @@ export class UmbMemberWorkspaceContext
 		this.observe(
 			this.contentTypeUnique,
 			(unique) => {
+				this.#entityContentTypeContext.setEntityType(unique ? UMB_MEMBER_TYPE_ENTITY_TYPE : undefined);
+				this.#entityContentTypeContext.setUnique(unique ?? undefined);
 				if (unique) {
 					this.structure.loadType(unique);
 				}
