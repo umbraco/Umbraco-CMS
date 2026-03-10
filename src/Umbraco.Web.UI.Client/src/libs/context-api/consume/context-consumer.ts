@@ -27,6 +27,7 @@ export class UmbContextConsumer<
 > {
 	protected _retrieveHost: HostElementMethod;
 
+	#attached = false;
 	#requestRaf?: number;
 	#disconnectAC?: AbortController;
 	#skipHost?: boolean;
@@ -218,21 +219,24 @@ export class UmbContextConsumer<
 	}
 
 	public hostConnected(): void {
+		this.#attached = true;
 		if (this.#disconnectAC) {
 			this.#disconnectAC.abort();
 			this.#disconnectAC = undefined;
 		}
-		this.#setupCurrentScope();
+
+		this.#setCurrentScope(window);
 		this.request();
 	}
 
 	public hostDisconnected(): void {
+		if (!this.#attached) return;
+		this.#attached = false;
 		if (this.#requestRaf !== undefined) {
 			cancelAnimationFrame(this.#requestRaf);
 			this.#requestRaf = undefined;
 		}
 		this.#disconnectAC?.abort();
-
 		this.#dismantleCurrentScope();
 		this.#currentScope = window;
 
@@ -260,19 +264,19 @@ export class UmbContextConsumer<
 	}
 
 	// The current scope of which is being listened to for context providing/unproviding, this is usually the host element or the provided context's host element. [NL]
-	#currentScope: EventTarget = window;
+	#currentScope?: EventTarget;
 	#setCurrentScope(scope: EventTarget | undefined) {
-		this.#dismantleCurrentScope();
-		this.#currentScope = scope ?? window;
-		this.#setupCurrentScope();
+		if (this.#currentScope !== scope) {
+			this.#dismantleCurrentScope();
+			this.#currentScope = scope ?? window;
+			// Setup the scope event listening:
+			this.#currentScope!.addEventListener(UMB_CONTEXT_PROVIDE_EVENT_TYPE, this.#onProvide);
+			// TODO: consider not listening if it does not have a Context....
+			this.#currentScope!.addEventListener(UMB_CONTEXT_UNPROVIDED_EVENT_TYPE, this.#onUnprovided);
+		}
 	}
 
-	#setupCurrentScope() {
-		this.#currentScope.addEventListener(UMB_CONTEXT_PROVIDE_EVENT_TYPE, this.#onProvide);
-		// TODO: consider not listening if it does not have a Context....
-		this.#currentScope.addEventListener(UMB_CONTEXT_UNPROVIDED_EVENT_TYPE, this.#onUnprovided);
-	}
-
+	// dismantle the current scope event listening:
 	#dismantleCurrentScope() {
 		if (this.#currentScope) {
 			this.#currentScope.removeEventListener(UMB_CONTEXT_PROVIDE_EVENT_TYPE, this.#onProvide);
@@ -294,6 +298,7 @@ export class UmbContextConsumer<
 		if (!isUmbContextUnprovidedEventType(event)) return;
 
 		if (this.#contextAlias === event.contextAlias && event.instance === this.#instance) {
+			this.#setCurrentScope(window);
 			this.#unprovide();
 		}
 	};
@@ -311,13 +316,12 @@ export class UmbContextConsumer<
 		}
 		this.#disconnectAC?.abort();
 		this.#disconnectAC = undefined;
+		this.#dismantleCurrentScope();
 		this.#handleDisconnect();
+		this.#currentScope = undefined;
 		this._retrieveHost = undefined as any;
+		this.#attached = false;
 		this.#callback = undefined;
-		this.#promise = undefined;
-		this.#promiseOptions = undefined;
-		this.#promiseResolver = undefined;
-		this.#promiseRejecter = undefined;
 		this.#instance = undefined;
 		this.#discriminator = undefined;
 	}
