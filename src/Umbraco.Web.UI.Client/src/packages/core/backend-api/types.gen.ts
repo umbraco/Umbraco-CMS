@@ -2253,7 +2253,6 @@ export enum RuntimeLevelModel {
     INSTALL = 'Install',
     UPGRADE = 'Upgrade',
     UPGRADING = 'Upgrading',
-    UPGRADE_FAILED = 'UpgradeFailed',
     RUN = 'Run',
     BOOT_FAILED = 'BootFailed'
 }
