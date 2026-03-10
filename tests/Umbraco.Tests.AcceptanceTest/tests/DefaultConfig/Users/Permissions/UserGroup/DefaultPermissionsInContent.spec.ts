@@ -25,7 +25,6 @@ const documentBlueprintName = 'TestBlueprintName';
 
 // User
 const testUser = ConstantHelper.testUserCredentials;
-let testUserCookieAndToken = {cookie: "", accessToken: "", refreshToken: ""};
 
 // User Group
 const userGroupName = 'TestUserGroup';
@@ -48,7 +47,7 @@ test.beforeEach(async ({umbracoApi}) => {
 
 test.afterEach(async ({umbracoApi}) => {
   // Ensure we are logged in to admin
-  await umbracoApi.loginToAdminUser(testUserCookieAndToken.cookie, testUserCookieAndToken.accessToken, testUserCookieAndToken.refreshToken);
+  await umbracoApi.loginToAdminUser();
   await umbracoApi.documentType.ensureNameNotExists(rootDocumentTypeName);
   await umbracoApi.documentType.ensureNameNotExists(childDocumentTypeOneName);
   await umbracoApi.documentType.ensureNameNotExists(childDocumentTypeTwoName);
@@ -60,7 +59,7 @@ test('can read content node with permission enabled', {tag: '@release'}, async (
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithReadPermission(userGroupName);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
   await umbracoUi.userGroup.goToSection(ConstantHelper.sections.content, false);
 
@@ -76,7 +75,7 @@ test.skip('can not read content node with permission disabled', async ({umbracoA
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithReadPermission(userGroupName, false);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
   await umbracoUi.userGroup.goToSection(ConstantHelper.sections.content, false);
 
@@ -91,7 +90,7 @@ test('can create document blueprint with permission enabled', {tag: '@release'},
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithCreateDocumentBlueprintPermission(userGroupName);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
 
@@ -109,7 +108,7 @@ test('can not create document blueprint with permission disabled', async ({umbra
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithCreateDocumentBlueprintPermission(userGroupName, false);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
 
   // Act
@@ -123,7 +122,7 @@ test('can delete content with delete permission enabled', {tag: '@release'}, asy
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithDeleteDocumentPermission(userGroupName);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
 
@@ -140,7 +139,7 @@ test('can not delete content with delete permission disabled', async ({umbracoAp
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithDeleteDocumentPermission(userGroupName, false);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
 
   // Act
@@ -155,7 +154,7 @@ test('can empty recycle bin with delete permission enabled', {tag: '@release'}, 
   await umbracoApi.document.moveToRecycleBin(rootDocumentId);
   userGroupId = await umbracoApi.userGroup.createUserGroupWithDeleteDocumentPermission(userGroupName);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
 
@@ -174,7 +173,7 @@ test('can not empty recycle bin with delete permission disabled', async ({umbrac
   await umbracoApi.document.moveToRecycleBin(rootDocumentId);
   userGroupId = await umbracoApi.userGroup.createUserGroupWithDeleteDocumentPermission(userGroupName, false);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
 
   // Act
@@ -188,7 +187,7 @@ test('can create content with create permission enabled', {tag: '@release'}, asy
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithCreateDocumentPermission(userGroupName);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
 
@@ -208,7 +207,7 @@ test('can not create content with create permission disabled', async ({umbracoAp
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithCreateDocumentPermission(userGroupName, false);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
 
   // Act
@@ -223,7 +222,7 @@ test('can set up notifications with notification permission enabled', async ({um
   const notificationActionIds = ['Umb.Document.Delete', 'Umb.Document.Publish'];
   userGroupId = await umbracoApi.userGroup.createUserGroupWithNotificationsPermission(userGroupName);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
 
   // Act
@@ -244,7 +243,7 @@ test('can not set up notifications with notification permission disabled', async
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithNotificationsPermission(userGroupName, false);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
 
   // Act
@@ -258,7 +257,7 @@ test('can publish content with publish permission enabled', {tag: '@release'}, a
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithPublishPermission(userGroupName);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
 
@@ -276,7 +275,7 @@ test('can not publish content with publish permission disabled', async ({umbraco
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithPublishPermission(userGroupName, false);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
 
   // Act
@@ -291,7 +290,7 @@ test.skip('can set permissions with set permissions permission enabled', async (
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithSetPermissionsPermission(userGroupName);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
 
@@ -308,7 +307,7 @@ test.skip('can not set permissions with set permissions permission disabled', as
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithSetPermissionsPermission(userGroupName, false);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
 
   // Act
@@ -324,7 +323,7 @@ test('can unpublish content with unpublish permission enabled', {tag: '@release'
   expect(await umbracoApi.document.isDocumentPublished(rootDocumentId)).toBeTruthy();
   userGroupId = await umbracoApi.userGroup.createUserGroupWithUnpublishPermission(userGroupName);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
 
@@ -344,7 +343,7 @@ test('can not unpublish content with unpublish permission disabled', async ({umb
   expect(await umbracoApi.document.isDocumentPublished(rootDocumentId)).toBeTruthy();
   userGroupId = await umbracoApi.userGroup.createUserGroupWithUnpublishPermission(userGroupName, false);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
 
   // Act
@@ -358,7 +357,7 @@ test('can update content with update permission enabled', {tag: '@release'}, asy
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithUpdatePermission(userGroupName);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
 
@@ -377,7 +376,7 @@ test('can not update content with update permission disabled', async ({umbracoAp
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithUpdatePermission(userGroupName, false);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
 
   // Act
@@ -394,7 +393,7 @@ test('can duplicate content with duplicate permission enabled', {tag: '@release'
   const duplicatedContentName = rootDocumentName + ' (1)';
   userGroupId = await umbracoApi.userGroup.createUserGroupWithDuplicatePermission(userGroupName);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
 
@@ -420,7 +419,7 @@ test('can not duplicate content with duplicate permission disabled', async ({umb
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithDuplicatePermission(userGroupName, false);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
 
   // Act
@@ -436,7 +435,7 @@ test('can move content with move to permission enabled', {tag: '@release'}, asyn
   const moveToDocumentId = await umbracoApi.document.createDocumentWithTextContent(moveToDocumentName, rootDocumentTypeId, documentText, dataTypeName);
   userGroupId = await umbracoApi.userGroup.createUserGroupWithMoveToPermission(userGroupName, true);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
 
@@ -464,7 +463,7 @@ test('can not move content with move to permission disabled', async ({umbracoApi
   await umbracoApi.document.createDocumentWithTextContent(moveToDocumentName, rootDocumentTypeId, documentText, dataTypeName);
   userGroupId = await umbracoApi.userGroup.createUserGroupWithMoveToPermission(userGroupName, false);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
 
   // Act
@@ -480,7 +479,7 @@ test('can sort children with sort children permission enabled', {tag: '@release'
   await umbracoApi.document.createDefaultDocumentWithParent(childDocumentTwoName, childDocumentTypeId, rootDocumentId);
   userGroupId = await umbracoApi.userGroup.createUserGroupWithSortChildrenPermission(userGroupName);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
 
@@ -503,7 +502,7 @@ test('can not sort children with sort children permission disabled', async ({umb
   await umbracoApi.document.createDefaultDocumentWithParent(childDocumentTwoName, childDocumentTypeId, rootDocumentId);
   userGroupId = await umbracoApi.userGroup.createUserGroupWithSortChildrenPermission(userGroupName, false);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
 
   // Act
@@ -518,7 +517,7 @@ test('can set culture and hostnames with culture and hostnames permission enable
   const domainName = '/domain';
   userGroupId = await umbracoApi.userGroup.createUserGroupWithCultureAndHostnamesPermission(userGroupName);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
 
@@ -540,7 +539,7 @@ test('can not set culture and hostnames with culture and hostnames permission di
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithCultureAndHostnamesPermission(userGroupName, false);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
 
   // Act
@@ -557,7 +556,7 @@ test('can set public access with public access permission enabled', async ({umbr
   await umbracoApi.memberGroup.ensureNameNotExists(testMemberGroup);
   await umbracoApi.memberGroup.create(testMemberGroup)
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
 
@@ -574,7 +573,7 @@ test('can not set public access with public access permission disabled', async (
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithPublicAccessPermission(userGroupName, false);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
 
   // Act
@@ -594,7 +593,7 @@ test('can rollback content with rollback permission enabled', {tag: '@release'},
   await umbracoApi.document.update(rootDocumentId, content);
   await umbracoApi.document.publish(rootDocumentId);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
 
@@ -616,7 +615,7 @@ test('can not rollback content with rollback permission disabled', async ({umbra
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithRollbackPermission(userGroupName, false);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
 
   // Act
@@ -630,7 +629,7 @@ test('can not see delete button in content for userGroup with delete permission 
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithDeletePermissionAndCreatePermission(userGroupName, false, true);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
 
   // Act
@@ -647,7 +646,7 @@ test('can create and update content with permission enabled', {tag: '@release'},
   const updatedDocumentName = testDocumentName + ' Updated';
   userGroupId = await umbracoApi.userGroup.createUserGroupWithCreateAndUpdateDocumentPermission(userGroupName);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
 

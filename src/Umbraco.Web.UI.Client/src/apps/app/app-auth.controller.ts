@@ -1,9 +1,10 @@
-import { UMB_AUTH_CONTEXT, UMB_MODAL_APP_AUTH, type UmbUserLoginState } from '@umbraco-cms/backoffice/auth';
+import { UMB_AUTH_CONTEXT, UMB_MODAL_APP_AUTH } from '@umbraco-cms/backoffice/auth';
+import type { UmbUserLoginState } from '@umbraco-cms/backoffice/auth';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { umbOpenModal, UmbPersistentModalDialogElement } from '@umbraco-cms/backoffice/modal';
 import { setStoredPath } from '@umbraco-cms/backoffice/utils';
 
 export class UmbAppAuthController extends UmbControllerBase {
@@ -121,30 +122,18 @@ export class UmbAppAuthController extends UmbControllerBase {
 		}
 
 		// Show the provider selection screen
-		const authModalKey = 'umbAuthModal';
-		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		if (!modalManager) {
-			throw new Error('[Fatal] Modal manager is not available');
-		}
+		const selected = await umbOpenModal(this._host, UMB_MODAL_APP_AUTH, {
+			data: {
+				userLoginState,
+			},
+			modal: {
+				type: 'custom',
+				element: UmbPersistentModalDialogElement,
+				backdropBackground: 'var(--umb-auth-backdrop, var(--uui-color-surface))',
+			},
+		}).catch(() => undefined);
 
-		const selected = await modalManager
-			.open(this._host, UMB_MODAL_APP_AUTH, {
-				data: {
-					userLoginState,
-				},
-				modal: {
-					key: authModalKey,
-					backdropBackground: 'var(--umb-auth-backdrop, var(--uui-color-surface))',
-				},
-			})
-			.onSubmit()
-			.catch(() => undefined);
-
-		if (!selected?.success) {
-			return false;
-		}
-
-		return true;
+		return selected?.success ?? false;
 	}
 
 	#updateState() {

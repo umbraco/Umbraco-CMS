@@ -420,6 +420,8 @@ export default {
 		fileSecurityValidationFailure: 'One or more file security validations have failed',
 		moveToSameFolderFailed: 'Parent and destination folders cannot be the same',
 		uploadNotAllowed: 'Upload is not allowed in this location.',
+		uploadValidationFailed: (mediaTypeName: string) =>
+			`The ${mediaTypeName} media type has one or more required properties. It will need to be uploaded individually via the 'Create' menu`,
 	},
 	member: {
 		'2fa': 'Two-Factor Authentication',

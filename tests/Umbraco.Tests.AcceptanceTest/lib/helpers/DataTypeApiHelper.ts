@@ -1312,6 +1312,17 @@ export class DataTypeApiHelper {
     return await this.save(dataType);
   }
   
+  async createTiptapDataTypeWithMediaFolder(name: string, mediaFolderId: string) {
+    await this.ensureNameNotExists(name);
+
+    const dataType = new TiptapDataTypeBuilder()
+      .withName(name)
+      .withMediaFolderParentId(mediaFolderId)
+      .build();
+
+    return await this.save(dataType);
+  }
+
   async createTipTapDataTypeWithABlock(name: string, contentElementTypeKey: string) {
     await this.ensureNameNotExists(name);
 
