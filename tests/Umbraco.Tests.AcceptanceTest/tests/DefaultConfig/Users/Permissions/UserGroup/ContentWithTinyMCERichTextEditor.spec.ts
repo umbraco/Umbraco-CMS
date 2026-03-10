@@ -2,7 +2,6 @@ import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/accepta
 import {expect} from "@playwright/test";
 
 const testUser = ConstantHelper.testUserCredentials;
-let testUserCookieAndToken = {cookie: "", accessToken: "", refreshToken: ""};
 
 let userGroupId = null;
 
@@ -23,7 +22,7 @@ test.beforeEach(async ({umbracoApi}) => {
 
 test.afterEach(async ({umbracoApi}) => {
   // Ensure we are logged in to admin
-  await umbracoApi.loginToAdminUser(testUserCookieAndToken.cookie, testUserCookieAndToken.accessToken, testUserCookieAndToken.refreshToken);
+  await umbracoApi.loginToAdminUser();
   await umbracoApi.stylesheet.ensureNameNotExists(stylesheetName);
   await umbracoApi.dataType.ensureNameNotExists(richTextEditorName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
@@ -32,7 +31,7 @@ test.afterEach(async ({umbracoApi}) => {
 test('can create content with a rich text editor that has a stylesheet', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
 

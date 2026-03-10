@@ -6,6 +6,7 @@
     <!-- Disable compression for static files, because MapStaticAssets() is not used anyway (yet) -->
     <CompressionEnabled>false</CompressionEnabled>
     <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
+    <DefineConstants>$(DefineConstants);UseDocumentedCsp</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -25,7 +26,7 @@
 
   <ItemGroup>
     <!-- Add design/build time support for EF Core migrations -->
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" PrivateAssets="all" Version="10.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" PrivateAssets="all" Version="10.0.3" />
     <!--
     Added the following direct dependency due to Microsoft.EntityFrameworkCore.Design having a dependency on an insecure version.
     Review for removal when Microsoft.EntityFrameworkCore.Design is updated to a newer version.

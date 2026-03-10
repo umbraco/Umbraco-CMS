@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels;
@@ -138,16 +139,38 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
     {
         IEntitySlim[] ancestorEntities = await GetAncestorEntitiesAsync(descendantKey, includeSelf);
 
+        // All ancestors should be present in the collection, but we defensively use
+        // SingleOrDefault to handle potential data inconsistencies (e.g. after upgrades).
+        List<int>? missingParentIds = null;
         TItem[] treeItemViewModels = ancestorEntities
             .Select(ancestor =>
             {
                 IEntitySlim? parent = ancestor.ParentId > 0
-                    ? ancestorEntities.Single(a => a.Id == ancestor.ParentId)
+                    ? ancestorEntities.SingleOrDefault(a => a.Id == ancestor.ParentId)
                     : null;
+
+                if (ancestor.ParentId > 0 && parent is null)
+                {
+                    missingParentIds ??= [];
+                    missingParentIds.Add(ancestor.ParentId);
+                }
 
                 return MapTreeItemViewModel(parent?.Key, ancestor);
             })
             .ToArray();
+
+        if (missingParentIds is not null)
+        {
+            // Will use the static logger factory here, given this is an exception case and to avoid having to
+            // make widespread changes to support logging in the base controller.
+            ILogger logger = StaticApplicationLogging.CreateLogger<EntityTreeControllerBase<TItem>>();
+            logger.LogWarning(
+                "Ancestor(s) with ID(s) {MissingAncestorIds} not found in the ancestors collection for descendant {DescendantKey}. "
+                + "This indicates a data integrity issue in the entity path; consider running the database integrity health check "
+                + "and/or moving the entity to another location and back to rebuild its path.",
+                missingParentIds,
+                descendantKey);
+        }
 
         await PopulateFlags(treeItemViewModels);
 

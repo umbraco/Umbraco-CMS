@@ -5,6 +5,7 @@ import { AsyncDirective, directive, nothing, type ElementPart } from '@umbraco-c
  */
 class UmbDestroyDirective extends AsyncDirective {
 	#el?: HTMLElement & { destroy: () => void };
+	#disconnectAC?: AbortController;
 
 	override render() {
 		return nothing;
@@ -16,13 +17,25 @@ class UmbDestroyDirective extends AsyncDirective {
 	}
 
 	override disconnected() {
-		if (this.#el) {
-			this.#el.destroy();
-		}
-		this.#el = undefined;
+		this.#disconnectAC?.abort();
+		const abortController = (this.#disconnectAC = new AbortController());
+		queueMicrotask(() => {
+			if (!abortController.signal.aborted) {
+				this.#disconnectAC = undefined;
+				if (this.#el) {
+					this.#el.destroy();
+					this.#el = undefined;
+				}
+			}
+		});
 	}
 
-	//override reconnected() {}
+	override reconnected() {
+		if (this.#disconnectAC) {
+			this.#disconnectAC.abort();
+			this.#disconnectAC = undefined;
+		}
+	}
 }
 
 /**

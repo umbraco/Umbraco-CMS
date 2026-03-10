@@ -144,7 +144,7 @@ test('can create content with the media link', async ({umbracoApi, umbracoUi}) =
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickAddMultiURLPickerButton();
   await umbracoUi.content.clickMediaLinkButton();
-  await umbracoUi.content.selectMediaWithName(mediaFileName, true);
+  await umbracoUi.content.selectMediaWithName(mediaFileName);
   await umbracoUi.content.clickChooseModalButton();
   await umbracoUi.content.clickLinkPickerAddButton();
   await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
@@ -178,7 +178,7 @@ test('can add multiple links in the content', {tag: '@release'}, async ({umbraco
   // Add media link
   await umbracoUi.content.clickAddMultiURLPickerButton();
   await umbracoUi.content.clickMediaLinkButton();
-  await umbracoUi.content.selectMediaWithName(mediaFileName, true);
+  await umbracoUi.content.selectMediaWithName(mediaFileName);
   await umbracoUi.content.clickChooseModalButton();
   await umbracoUi.content.clickLinkPickerAddButton();
   await umbracoUi.waitForTimeout(500); // Wait for the media link to be added
@@ -386,6 +386,62 @@ test('can create content with target toggle enabled to open link in new window',
   // Assert
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].value[0].target).toEqual('_blank');
+});
+
+test('cannot select a media folder as a media link', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  const mediaFolderName = 'TestMediaFolder';
+  await umbracoApi.media.ensureNameNotExists(mediaFolderName);
+  await umbracoApi.media.createDefaultMediaFolder(mediaFolderName);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickAddMultiURLPickerButton();
+  await umbracoUi.content.clickMediaLinkButton();
+
+  // Assert
+  await umbracoUi.content.isSelectCheckboxVisibleForMediaName(mediaFolderName, false);
+
+  // Clean
+  await umbracoApi.media.ensureNameNotExists(mediaFolderName);
+});
+
+test('can select a media file inside a folder as a media link', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  const mediaFolderName = 'TestMediaFolder';
+  const mediaFileName = 'TestMediaFileInFolder';
+  await umbracoApi.media.ensureNameNotExists(mediaFolderName);
+  await umbracoApi.media.ensureNameNotExists(mediaFileName);
+  const mediaFolderId = await umbracoApi.media.createDefaultMediaFolder(mediaFolderName);
+  const mediaFileId = await umbracoApi.media.createDefaultMediaWithImageAndParentId(mediaFileName, mediaFolderId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickAddMultiURLPickerButton();
+  await umbracoUi.content.clickMediaLinkButton();
+  await umbracoUi.content.clickMediaWithName(mediaFolderName);
+  await umbracoUi.content.selectMediaWithName(mediaFileName);
+  await umbracoUi.content.clickChooseModalButton();
+  await umbracoUi.content.clickLinkPickerAddButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
+
+  // Assert
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
+  expect(contentData.values[0].value.length).toBe(1);
+  expect(contentData.values[0].value[0].type).toEqual('media');
+  expect(contentData.values[0].value[0].unique).toEqual(mediaFileId);
+  expect(contentData.values[0].value[0].name).toEqual(mediaFileName);
+
+  // Clean
+  await umbracoApi.media.ensureNameNotExists(mediaFolderName);
+  await umbracoApi.media.ensureNameNotExists(mediaFileName);
 });
 
 test.describe('manual tab validation tests', () => {
