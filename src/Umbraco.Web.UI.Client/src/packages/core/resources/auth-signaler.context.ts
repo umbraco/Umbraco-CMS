@@ -7,9 +7,9 @@ import { Subject } from '@umbraco-cms/backoffice/external/rxjs';
 export const UMB_AUTH_SIGNALER_CONTEXT = new UmbContextToken<UmbAuthSignalerContext>('UmbAuthSignalerContext');
 
 /**
- * A lightweight context provided by the auth package and consumed by the resources package.
- * Acts as a bridge so that resource-layer concerns (e.g. HTTP interceptors) can react to
- * authentication state without taking a direct dependency on the auth package.
+ * A lightweight bridge context owned by {@link UmbApiInterceptorController} (resources package)
+ * and consumed by the auth package. Allows resource-layer concerns (e.g. HTTP interceptors) to
+ * signal authentication state without creating a circular dependency on the auth package.
  */
 export class UmbAuthSignalerContext extends UmbContextBase {
 	#isAuthorized = new UmbBooleanState(false);

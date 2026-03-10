@@ -260,9 +260,9 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 	}
 
 	/**
-	 * Consumes the auth signaler context and listens for authorization state to retry GET-requests
-	 * that received a 401 Unauthorized response. Also notifies the user about non-GET requests
-	 * that received a 401 Unauthorized response after re-authentication completes.
+	 * Observes the auth signaler's authorization state to retry GET-requests that received a 401
+	 * Unauthorized response. Also notifies the user about non-GET requests that received a 401
+	 * Unauthorized response after re-authentication completes.
 	 * @internal
 	 */
 	handleUnauthorizedAuthRetry() {
