@@ -129,7 +129,7 @@ test('can add an available block', async ({umbracoApi, umbracoUi}) => {
   await umbracoApi.documentType.ensureNameNotExists(elementTypeName);
 });
 
-test('can add image upload folder', async ({umbracoApi, umbracoUi}) => {
+test('can add image upload folder', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const mediaFolderName = 'TestMediaFolder';
   const mediaFolderId = await umbracoApi.media.createDefaultMediaFolder(mediaFolderName);
@@ -145,6 +145,88 @@ test('can add image upload folder', async ({umbracoApi, umbracoUi}) => {
 
   // Clean
   await umbracoApi.media.ensureNameNotExists(mediaFolderName);
+});
+
+test('cannot select a media file as image upload folder', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const mediaFileName = 'TestMediaFile';
+  await umbracoApi.media.createDefaultMediaFile(mediaFileName);
+  await umbracoApi.dataType.createDefaultTiptapDataType(tipTapName);
+  await umbracoUi.dataType.goToDataType(tipTapName);
+
+  // Act
+  await umbracoUi.dataType.clickChooseWithPlusButton();
+
+  // Assert
+  await umbracoUi.dataType.isMediaCardItemWithNameDisabled(mediaFileName);
+  await umbracoUi.dataType.isSelectCheckboxVisibleForMediaName(mediaFileName, false);
+
+  // Clean
+  await umbracoApi.media.ensureNameNotExists(mediaFileName);
+});
+
+test('can remove image upload folder', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const mediaFolderName = 'TestMediaFolder';
+  const mediaFolderId = await umbracoApi.media.createDefaultMediaFolder(mediaFolderName);
+  await umbracoApi.dataType.createTiptapDataTypeWithMediaFolder(tipTapName, mediaFolderId);
+  await umbracoUi.dataType.goToDataType(tipTapName);
+
+  // Act
+  await umbracoUi.dataType.removeImageUploadFolder(mediaFolderName);
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
+
+  // Assert
+  expect(await umbracoApi.dataType.doesDataTypeHaveValue(tipTapName, 'mediaParentId', mediaFolderId)).toBeFalsy();
+
+  // Clean
+  await umbracoApi.media.ensureNameNotExists(mediaFolderName);
+});
+
+test('can update image upload folder', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const firstFolderName = 'FirstMediaFolder';
+  const secondFolderName = 'SecondMediaFolder';
+  const firstFolderId = await umbracoApi.media.createDefaultMediaFolder(firstFolderName);
+  const secondFolderId = await umbracoApi.media.createDefaultMediaFolder(secondFolderName);
+  await umbracoApi.dataType.createTiptapDataTypeWithMediaFolder(tipTapName, firstFolderId);
+  await umbracoUi.dataType.goToDataType(tipTapName);
+
+  // Act
+  await umbracoUi.dataType.removeImageUploadFolder(firstFolderName);
+  await umbracoUi.dataType.addImageUploadFolder(secondFolderName);
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
+
+  // Assert
+  expect(await umbracoApi.dataType.doesDataTypeHaveValue(tipTapName, 'mediaParentId', secondFolderId)).toBeTruthy();
+  expect(await umbracoApi.dataType.doesDataTypeHaveValue(tipTapName, 'mediaParentId', firstFolderId)).toBeFalsy();
+
+  // Clean
+  await umbracoApi.media.ensureNameNotExists(firstFolderName);
+  await umbracoApi.media.ensureNameNotExists(secondFolderName);
+});
+
+test('can add a nested media folder as image upload folder', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const parentFolderName = 'ParentMediaFolder';
+  const childFolderName = 'ChildMediaFolder';
+  const parentFolderId = await umbracoApi.media.createDefaultMediaFolder(parentFolderName);
+  const childFolderId = await umbracoApi.media.createDefaultMediaFolderAndParentId(childFolderName, parentFolderId);
+  await umbracoApi.dataType.createDefaultTiptapDataType(tipTapName);
+  await umbracoUi.dataType.goToDataType(tipTapName);
+
+  // Act
+  await umbracoUi.dataType.clickChooseWithPlusButton();
+  await umbracoUi.dataType.clickMediaWithName(parentFolderName);
+  await umbracoUi.dataType.selectMediaWithName(childFolderName);
+  await umbracoUi.dataType.clickChooseModalButton();
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
+
+  // Assert
+  expect(await umbracoApi.dataType.doesDataTypeHaveValue(tipTapName, 'mediaParentId', childFolderId)).toBeTruthy();
+
+  // Clean
+  await umbracoApi.media.ensureNameNotExists(parentFolderName);
 });
 
 test('can enable ignore user start nodes', async ({umbracoApi, umbracoUi}) => {
