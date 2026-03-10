@@ -1,11 +1,14 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Controllers.UserGroup;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Api.Management.ViewModels.User;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Security.Authorization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -25,16 +28,33 @@ public class UpdateUserGroupsUserController : UserGroupControllerBase
 {
     private readonly IAuthorizationService _authorizationService;
     private readonly IUserGroupService _userGroupService;
+    private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
-    public UpdateUserGroupsUserController(IAuthorizationService authorizationService, IUserGroupService userGroupService)
+    [ActivatorUtilitiesConstructor]
+    public UpdateUserGroupsUserController(
+        IAuthorizationService authorizationService,
+        IUserGroupService userGroupService,
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
     {
         _authorizationService = authorizationService;
         _userGroupService = userGroupService;
+        _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
+    }
+
+    [Obsolete("Please use the constructor accepting all parameters. Scheduled for removal in Umbraco 19.")]
+    public UpdateUserGroupsUserController(IAuthorizationService authorizationService, IUserGroupService userGroupService)
+        : this(
+            authorizationService,
+            userGroupService,
+            StaticServiceProvider.Instance.GetRequiredService<IBackOfficeSecurityAccessor>())
+    {
     }
 
     [HttpPost("set-user-groups")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [EndpointSummary("Updates user group assignments.")]
+    [EndpointDescription("Updates the user group assignments for the specified users.")]
     public async Task<IActionResult> UpdateUserGroups(
         CancellationToken cancellationToken,
         UpdateUserGroupsOnUserRequestModel requestModel)
@@ -51,7 +71,8 @@ public class UpdateUserGroupsUserController : UserGroupControllerBase
 
         Attempt<UserGroupOperationStatus> result = await _userGroupService.UpdateUserGroupsOnUsersAsync(
             requestModel.UserGroupIds.Select(x => x.Id).ToHashSet(),
-            requestModel.UserIds.Select(x => x.Id).ToHashSet());
+            requestModel.UserIds.Select(x => x.Id).ToHashSet(),
+            CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Success
             ? Ok()

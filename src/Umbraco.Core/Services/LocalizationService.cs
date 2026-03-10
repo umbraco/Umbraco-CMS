@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Core.Services;
 ///     Represents the Localization Service, which is an easy access to operations involving <see cref="Language" /> and
 ///     <see cref="DictionaryItem" />
 /// </summary>
-[Obsolete("Please use ILanguageService and IDictionaryItemService for localization. Will be removed in V15.")]
+[Obsolete("Please use ILanguageService and IDictionaryItemService for localization. Scheduled for removal in Umbraco 18.")]
 internal class LocalizationService : RepositoryService, ILocalizationService
 {
     private readonly IDictionaryRepository _dictionaryRepository;
@@ -31,7 +31,7 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     /// <param name="eventMessagesFactory">The event messages factory.</param>
     /// <param name="dictionaryRepository">The dictionary repository.</param>
     /// <param name="languageRepository">The language repository.</param>
-    [Obsolete("Please use constructor with language, dictionary and user services. Will be removed in V15")]
+    [Obsolete("Please use constructor with language, dictionary and user services. Scheduled for removal in Umbraco 18.")]
     public LocalizationService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -61,7 +61,7 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     /// <param name="languageService">The language service.</param>
     /// <param name="dictionaryItemService">The dictionary item service.</param>
     /// <param name="userIdKeyResolver">The user ID key resolver.</param>
-    [Obsolete("Please use ILanguageService and IDictionaryItemService for localization. Will be removed in V15.")]
+    [Obsolete("Please use ILanguageService and IDictionaryItemService for localization. Scheduled for removal in Umbraco 18.")]
     public LocalizationService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -90,7 +90,7 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     /// <remarks>
     ///     This does not save the item, that needs to be done explicitly
     /// </remarks>
-    [Obsolete("Please use IDictionaryItemService for dictionary item operations. Will be removed in V15.")]
+    [Obsolete("Please use IDictionaryItemService for dictionary item operations. Scheduled for removal in Umbraco 18.")]
     public void AddOrUpdateDictionaryValue(IDictionaryItem item, ILanguage? language, string value)
     {
         if (item == null)
@@ -113,7 +113,7 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     /// <param name="parentId"></param>
     /// <param name="defaultValue"></param>
     /// <returns></returns>
-    [Obsolete("Please use IDictionaryItemService for dictionary item operations. Will be removed in V15.")]
+    [Obsolete("Please use IDictionaryItemService for dictionary item operations. Scheduled for removal in Umbraco 18.")]
     public IDictionaryItem CreateDictionaryItemWithIdentity(string key, Guid? parentId, string? defaultValue = null)
     {
         IEnumerable<IDictionaryTranslation> translations = defaultValue.IsNullOrWhiteSpace()
@@ -139,7 +139,7 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     /// <returns>
     ///     <see cref="IDictionaryItem" />
     /// </returns>
-    [Obsolete("Please use IDictionaryItemService for dictionary item operations. Will be removed in V15.")]
+    [Obsolete("Please use IDictionaryItemService for dictionary item operations. Scheduled for removal in Umbraco 18.")]
     public IDictionaryItem? GetDictionaryItemById(int id)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -155,7 +155,7 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     /// <returns>
     ///     <see cref="DictionaryItem" />
     /// </returns>
-    [Obsolete("Please use IDictionaryItemService for dictionary item operations. Will be removed in V15.")]
+    [Obsolete("Please use IDictionaryItemService for dictionary item operations. Scheduled for removal in Umbraco 18.")]
     public IDictionaryItem? GetDictionaryItemById(Guid id)
         => _dictionaryItemService.GetAsync(id).GetAwaiter().GetResult();
 
@@ -166,7 +166,7 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     /// <returns>
     ///     A collection of <see cref="IDictionaryItem" />
     /// </returns>
-    [Obsolete("Please use IDictionaryItemService for dictionary item operations. Will be removed in V15.")]
+    [Obsolete("Please use IDictionaryItemService for dictionary item operations. Scheduled for removal in Umbraco 18.")]
     public IEnumerable<IDictionaryItem> GetDictionaryItemsByIds(params Guid[] ids)
         => _dictionaryItemService.GetManyAsync(ids).GetAwaiter().GetResult();
 
@@ -177,7 +177,7 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     /// <returns>
     ///     <see cref="IDictionaryItem" />
     /// </returns>
-    [Obsolete("Please use IDictionaryItemService for dictionary item operations. Will be removed in V15.")]
+    [Obsolete("Please use IDictionaryItemService for dictionary item operations. Scheduled for removal in Umbraco 18.")]
     public IDictionaryItem? GetDictionaryItemByKey(string key)
         => _dictionaryItemService.GetAsync(key).GetAwaiter().GetResult();
 
@@ -188,7 +188,7 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     /// <returns>
     ///     A collection of <see cref="IDictionaryItem" />
     /// </returns>
-    [Obsolete("Please use IDictionaryItemService for dictionary item operations. Will be removed in V15.")]
+    [Obsolete("Please use IDictionaryItemService for dictionary item operations. Scheduled for removal in Umbraco 18.")]
     public IEnumerable<IDictionaryItem> GetDictionaryItemsByKeys(params string[] keys)
         => _dictionaryItemService.GetManyAsync(keys).GetAwaiter().GetResult();
 
@@ -197,7 +197,7 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     /// </summary>
     /// <param name="parentId">Id of the parent</param>
     /// <returns>An enumerable list of <see cref="IDictionaryItem"/> objects</returns>
-    [Obsolete("Please use IDictionaryItemService for dictionary item operations. Will be removed in V15.")]
+    [Obsolete("Please use IDictionaryItemService for dictionary item operations. Scheduled for removal in Umbraco 18.")]
     public IEnumerable<IDictionaryItem> GetDictionaryItemChildren(Guid parentId)
         => _dictionaryItemService.GetChildrenAsync(parentId).GetAwaiter().GetResult();
 
@@ -206,7 +206,7 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     /// </summary>
     /// <param name="parentId">Id of the parent, null will return all dictionary items</param>
     /// <returns>An enumerable list of <see cref="IDictionaryItem" /> objects</returns>
-    [Obsolete("Please use IDictionaryItemService for dictionary item operations. Will be removed in V15.")]
+    [Obsolete("Please use IDictionaryItemService for dictionary item operations. Scheduled for removal in Umbraco 18.")]
     public IEnumerable<IDictionaryItem> GetDictionaryItemDescendants(Guid? parentId)
         => _dictionaryItemService.GetDescendantsAsync(parentId).GetAwaiter().GetResult();
 
@@ -214,7 +214,7 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     /// Gets the root/top <see cref="IDictionaryItem"/> objects
     /// </summary>
     /// <returns>An enumerable list of <see cref="IDictionaryItem"/> objects</returns>
-    [Obsolete("Please use IDictionaryItemService for dictionary item operations. Will be removed in V15.")]
+    [Obsolete("Please use IDictionaryItemService for dictionary item operations. Scheduled for removal in Umbraco 18.")]
     public IEnumerable<IDictionaryItem> GetRootDictionaryItems()
         => _dictionaryItemService.GetAtRootAsync().GetAwaiter().GetResult();
 
@@ -223,7 +223,7 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     /// </summary>
     /// <param name="key">Key of the <see cref="IDictionaryItem" /></param>
     /// <returns>True if a <see cref="IDictionaryItem" /> exists, otherwise false</returns>
-    [Obsolete("Please use IDictionaryItemService for dictionary item operations. Will be removed in V15.")]
+    [Obsolete("Please use IDictionaryItemService for dictionary item operations. Scheduled for removal in Umbraco 18.")]
     public bool DictionaryItemExists(string key)
         => _dictionaryItemService.ExistsAsync(key).GetAwaiter().GetResult();
 
@@ -232,7 +232,7 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     /// </summary>
     /// <param name="dictionaryItem"><see cref="IDictionaryItem" /> to save</param>
     /// <param name="userId">Optional id of the user saving the dictionary item</param>
-    [Obsolete("Please use IDictionaryItemService for dictionary item operations. Will be removed in V15.")]
+    [Obsolete("Please use IDictionaryItemService for dictionary item operations. Scheduled for removal in Umbraco 18.")]
     public void Save(IDictionaryItem dictionaryItem, int userId = Constants.Security.SuperUserId)
     {
         Guid currentUserKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult();
@@ -252,7 +252,7 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     /// </summary>
     /// <param name="dictionaryItem"><see cref="IDictionaryItem" /> to delete</param>
     /// <param name="userId">Optional id of the user deleting the dictionary item</param>
-    [Obsolete("Please use IDictionaryItemService for dictionary item operations. Will be removed in V15.")]
+    [Obsolete("Please use IDictionaryItemService for dictionary item operations. Scheduled for removal in Umbraco 18.")]
     public void Delete(IDictionaryItem dictionaryItem, int userId = Constants.Security.SuperUserId)
     {
         Guid currentUserKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult();
@@ -266,7 +266,7 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     /// <returns>
     ///     <see cref="Language" />
     /// </returns>
-    [Obsolete("Please use ILanguageService for language operations. Will be removed in V15.")]
+    [Obsolete("Please use ILanguageService for language operations. Scheduled for removal in Umbraco 18.")]
     public ILanguage? GetLanguageById(int id)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -282,7 +282,7 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     /// <returns>
     ///     <see cref="Language" />
     /// </returns>
-    [Obsolete("Please use ILanguageService for language operations. Will be removed in V15.")]
+    [Obsolete("Please use ILanguageService for language operations. Scheduled for removal in Umbraco 18.")]
     public ILanguage? GetLanguageByIsoCode(string? isoCode)
     {
         ArgumentException.ThrowIfNullOrEmpty(isoCode);
@@ -290,12 +290,12 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     }
 
     /// <inheritdoc />
-    [Obsolete("Please use ILanguageService for language operations. Will be removed in V15.")]
+    [Obsolete("Please use ILanguageService for language operations. Scheduled for removal in Umbraco 18.")]
     public int? GetLanguageIdByIsoCode(string isoCode)
         => _languageService.GetAsync(isoCode).GetAwaiter().GetResult()?.Id;
 
     /// <inheritdoc />
-    [Obsolete("Please use ILanguageService for language operations. Will be removed in V15.")]
+    [Obsolete("Please use ILanguageService for language operations. Scheduled for removal in Umbraco 18.")]
     public string? GetLanguageIsoCodeById(int id)
     {
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -305,12 +305,12 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     }
 
     /// <inheritdoc />
-    [Obsolete("Please use ILanguageService for language operations. Will be removed in V15.")]
+    [Obsolete("Please use ILanguageService for language operations. Scheduled for removal in Umbraco 18.")]
     public string GetDefaultLanguageIsoCode()
         => _languageService.GetDefaultIsoCodeAsync().GetAwaiter().GetResult();
 
     /// <inheritdoc />
-    [Obsolete("Please use ILanguageService for language operations. Will be removed in V15.")]
+    [Obsolete("Please use ILanguageService for language operations. Scheduled for removal in Umbraco 18.")]
     public int? GetDefaultLanguageId()
     {
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -323,7 +323,7 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     ///     Gets all available languages
     /// </summary>
     /// <returns>An enumerable list of <see cref="ILanguage" /> objects</returns>
-    [Obsolete("Please use ILanguageService for language operations. Will be removed in V15.")]
+    [Obsolete("Please use ILanguageService for language operations. Scheduled for removal in Umbraco 18.")]
     public IEnumerable<ILanguage> GetAllLanguages()
         => _languageService.GetAllAsync().GetAwaiter().GetResult();
 
@@ -332,7 +332,7 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     /// </summary>
     /// <param name="language"><see cref="ILanguage" /> to save</param>
     /// <param name="userId">Optional id of the user saving the language</param>
-    [Obsolete("Please use ILanguageService for language operations. Will be removed in V15.")]
+    [Obsolete("Please use ILanguageService for language operations. Scheduled for removal in Umbraco 18.")]
     public void Save(ILanguage language, int userId = Constants.Security.SuperUserId)
     {
         Guid currentUserKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult();
@@ -352,7 +352,7 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     /// </summary>
     /// <param name="language"><see cref="ILanguage" /> to delete</param>
     /// <param name="userId">Optional id of the user deleting the language</param>
-    [Obsolete("Please use ILanguageService for language operations. Will be removed in V15.")]
+    [Obsolete("Please use ILanguageService for language operations. Scheduled for removal in Umbraco 18.")]
     public void Delete(ILanguage language, int userId = Constants.Security.SuperUserId)
     {
         Guid currentUserKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult();
@@ -363,7 +363,7 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     /// Gets the dictionary item key map containing all dictionary item keys and their corresponding GUIDs.
     /// </summary>
     /// <returns>A dictionary mapping dictionary item keys to their GUIDs.</returns>
-    [Obsolete("Please use IDictionaryItemService for dictionary item operations. Will be removed in V15.")]
+    [Obsolete("Please use IDictionaryItemService for dictionary item operations. Scheduled for removal in Umbraco 18.")]
     public Dictionary<string, Guid> GetDictionaryItemKeyMap()
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))

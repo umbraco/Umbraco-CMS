@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.Services.Flags;
-using Umbraco.Cms.Api.Management.ViewModels.Document.Item;
 using Umbraco.Cms.Api.Management.ViewModels.Media.Item;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
@@ -41,6 +40,8 @@ public class ItemMediaItemController : MediaItemControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<MediaItemResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a collection of media items.")]
+    [EndpointDescription("Gets a collection of media items identified by the provided Ids.")]
     public async Task<IActionResult> Item(
         CancellationToken cancellationToken,
         [FromQuery(Name = "id")] HashSet<Guid> ids)
@@ -62,7 +63,7 @@ public class ItemMediaItemController : MediaItemControllerBase
 
     private async Task PopulateFlags(IEnumerable<MediaItemResponseModel> itemViewModels)
     {
-        foreach (IFlagProvider signProvider in _flagProviders.Where(x => x.CanProvideFlags<DocumentItemResponseModel>()))
+        foreach (IFlagProvider signProvider in _flagProviders.Where(x => x.CanProvideFlags<MediaItemResponseModel>()))
         {
             await signProvider.PopulateFlagsAsync(itemViewModels);
         }

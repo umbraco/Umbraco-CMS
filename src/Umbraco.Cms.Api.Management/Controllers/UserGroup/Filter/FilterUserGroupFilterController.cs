@@ -35,6 +35,8 @@ public class FilterUserGroupFilterController : UserGroupFilterControllerBase
     [ProducesResponseType(typeof(PagedViewModel<UserGroupResponseModel>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Gets a filtered collection of user groups.")]
+    [EndpointDescription("Filters user groups based on the provided criteria with support for pagination.")]
     public async Task<IActionResult> Filter(
         CancellationToken cancellationToken,
         int skip = 0,

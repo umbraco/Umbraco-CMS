@@ -90,7 +90,7 @@ public static partial class Constants
         /// <summary>
         ///     The default folder where Umbraco log files are stored
         /// </summary>
-        [Obsolete("Use LoggingSettings.GetLoggingDirectory() instead, will be removed in Umbraco 13.")]
+        [Obsolete("Use LoggingSettings.GetLoggingDirectory() instead. Scheduled for removal in Umbraco 18.")]
         public const string LogFiles = Umbraco + "/Logs";
     }
 }

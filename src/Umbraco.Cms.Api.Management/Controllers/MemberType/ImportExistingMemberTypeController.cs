@@ -32,6 +32,8 @@ public class ImportExistingMemberTypeController : MemberTypeControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [EndpointSummary("Imports a member type.")]
+    [EndpointDescription("Imports a member type from the provided file upload.")]
     public async Task<IActionResult> Import(
         CancellationToken cancellationToken,
         Guid id,

@@ -87,7 +87,7 @@ public abstract class DateTimePropertyEditorBase : DataEditor, IValueSchemaProvi
     /// Provides a data value editor for date and time properties, supporting conversion between editor values and
     /// persisted values for date/time property editors.
     /// </summary>
-    internal class DateTimeDataValueEditor : DataValueEditor
+    internal class DateTimeDataValueEditor : DataValueEditor, IDataValueSortable
     {
         private readonly IJsonSerializer _jsonSerializer;
         private readonly ILogger<DateTimeDataValueEditor> _logger;
@@ -169,6 +169,24 @@ public abstract class DateTimePropertyEditorBase : DataEditor, IValueSchemaProvi
                 Date = _mappingFunc(dateTimeDto),
                 TimeZone = dateTimeDto.TimeZone,
             };
+        }
+
+        /// <inheritdoc />
+        public string? GetSortableValue(object? value, object? dataTypeConfiguration)
+        {
+            if (value is not string jsonValue || string.IsNullOrWhiteSpace(jsonValue))
+            {
+                return null;
+            }
+
+            if (DateTimePropertyEditorHelper.TryParseToIntermediateValue(jsonValue, _jsonSerializer, _logger, out DateTimeValueConverterBase.DateTimeDto? dto) is false || dto is null)
+            {
+                return null;
+            }
+
+            // UTC-normalized ISO 8601 format for consistent lexicographic sorting
+            // The "O" format specifier produces: yyyy-MM-ddTHH:mm:ss.fffffffZ
+            return dto.Date.ToUniversalTime().ToString("O", CultureInfo.InvariantCulture);
         }
 
         /// <summary>

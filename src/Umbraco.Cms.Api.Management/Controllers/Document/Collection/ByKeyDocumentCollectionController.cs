@@ -37,7 +37,7 @@ public class ByKeyDocumentCollectionController : DocumentCollectionControllerBas
         _documentCollectionPresentationFactory = documentCollectionPresentationFactory;
     }
 
-    [Obsolete("Please use the constructor with all parameters. Scheduled to be removed in V18")]
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
     public ByKeyDocumentCollectionController(
         IContentListViewService contentListViewService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
@@ -57,6 +57,8 @@ public class ByKeyDocumentCollectionController : DocumentCollectionControllerBas
     [ProducesResponseType(typeof(PagedViewModel<DocumentCollectionResponseModel>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Gets a document collection.")]
+    [EndpointDescription("Gets a document collection identified by the provided Id.")]
     public async Task<IActionResult> ByKey(
         CancellationToken cancellationToken,
         Guid id,

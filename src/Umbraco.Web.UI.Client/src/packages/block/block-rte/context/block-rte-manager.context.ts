@@ -76,8 +76,8 @@ export class UmbBlockRteManagerContext<
 		originData: UmbBlockRteWorkspaceOriginData,
 	) {
 		this._layouts.appendOne(layoutEntry);
-
 		this.insertBlockData(layoutEntry, content, settings, originData);
+		this.notifyBlockInserted(layoutEntry, originData);
 
 		return true;
 	}

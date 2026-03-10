@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Core.Models.Blocks
         /// <exception cref="ArgumentNullException">contentUdi
         /// or
         /// content</exception>
-        [Obsolete("Use constructor that accepts GUIDs instead. Will be removed in V18.")]
+        [Obsolete("Use constructor that accepts GUIDs instead. Scheduled for removal in Umbraco 18.")]
         public BlockGridItem(Udi contentUdi, IPublishedElement content, Udi settingsUdi, IPublishedElement settings)
             : this(
                 (contentUdi as GuidUdi)?.Guid ?? throw new ArgumentException(nameof(contentUdi)),
@@ -69,7 +69,7 @@ namespace Umbraco.Cms.Core.Models.Blocks
         /// <value>
         /// The content UDI.
         /// </value>
-        [Obsolete("Use ContentKey instead. Will be removed in V18.")]
+        [Obsolete("Use ContentKey instead. Scheduled for removal in Umbraco 18.")]
         public Udi ContentUdi { get; }
 
         /// <summary>
@@ -86,7 +86,7 @@ namespace Umbraco.Cms.Core.Models.Blocks
         /// <value>
         /// The settings UDI.
         /// </value>
-        [Obsolete("Use SettingsKey instead. Will be removed in V18.")]
+        [Obsolete("Use SettingsKey instead. Scheduled for removal in Umbraco 18.")]
         public Udi? SettingsUdi { get; }
 
         /// <summary>
@@ -137,7 +137,7 @@ namespace Umbraco.Cms.Core.Models.Blocks
         /// <param name="content">The content.</param>
         /// <param name="settingsUdi">The settings UDI.</param>
         /// <param name="settings">The settings.</param>
-        [Obsolete("Use constructor that accepts GUIDs instead. Will be removed in V18.")]
+        [Obsolete("Use constructor that accepts GUIDs instead. Scheduled for removal in Umbraco 18.")]
         public BlockGridItem(Udi contentUdi, T content, Udi settingsUdi, IPublishedElement settings)
             : base(contentUdi, content, settingsUdi, settings)
         {
@@ -182,7 +182,7 @@ namespace Umbraco.Cms.Core.Models.Blocks
         /// <param name="content">The content.</param>
         /// <param name="settingsUdi">The settings udi.</param>
         /// <param name="settings">The settings.</param>
-        [Obsolete("Use constructor that accepts GUIDs instead. Will be removed in V18.")]
+        [Obsolete("Use constructor that accepts GUIDs instead. Scheduled for removal in Umbraco 18.")]
         public BlockGridItem(Udi contentUdi, TContent content, Udi settingsUdi, TSettings settings)
             : base(contentUdi, content, settingsUdi, settings)
         {
