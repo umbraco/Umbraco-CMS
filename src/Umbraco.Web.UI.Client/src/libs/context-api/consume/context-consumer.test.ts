@@ -586,26 +586,57 @@ describe('UmbContextConsumer', () => {
 			providerB.hostDisconnected();
 		});
 
-		it('asPromise resolves on reconnect after disconnect when provider appears', async () => {
-			const localConsumer = new UmbContextConsumer<UmbTestContextConsumerClass>(element, testContextAlias);
+		/**
+		 * Regression test: after a full disconnect cycle (deferred disconnect completes),
+		 * hostDisconnected() dismantles the scope listeners and assigns #currentScope = window
+		 * directly (bypassing #setCurrentScope). On the next hostConnected(), #setCurrentScope(window)
+		 * becomes a no-op because #currentScope already equals window, leaving the consumer without
+		 * provide/unprovide listeners. A provider connecting after reconnect goes undetected.
+		 */
+		it('detects provider that connects after consumer reconnects following a full disconnect cycle', async () => {
+			const providerA = new UmbContextProvider(document.body, testContextAlias, new UmbTestContextConsumerClass());
+			providerA.hostConnected();
+
+			let lastInstance: UmbTestContextConsumerClass | undefined;
+			const localConsumer = new UmbContextConsumer<UmbTestContextConsumerClass>(
+				element,
+				testContextAlias,
+				(_instance) => {
+					lastInstance = _instance;
+				},
+			);
 			localConsumer.hostConnected();
 
-			// Disconnect before any provider is available — let deferred disconnect complete
+			// Consumer has context from provider A
+			expect(lastInstance?.prop).to.eq('value from provider');
+
+			// Full disconnect cycle: disconnect consumer AND provider, let deferred disconnect complete
+			providerA.hostDisconnected();
 			localConsumer.hostDisconnected();
 			await Promise.resolve();
 
-			// Provider appears while consumer is disconnected
-			const provider = new UmbContextProvider(document.body, testContextAlias, new UmbTestContextConsumerClass());
-			provider.hostConnected();
+			expect(lastInstance).to.be.undefined;
 
-			// Reconnect — consumer should find the provider and resolve the promise
+			// Consumer reconnects — no provider available yet
 			localConsumer.hostConnected();
-			const instance = await localConsumer.asPromise();
-			expect(instance?.prop).to.eq('value from provider');
 
-			localConsumer.hostDisconnected();
-			await Promise.resolve();
-			provider.hostDisconnected();
+			// request() runs synchronously during hostConnected but finds no provider
+			expect(lastInstance).to.be.undefined;
+
+			// Now a NEW provider appears AFTER the consumer has reconnected.
+			// This relies on the provide event listener being active on window.
+			const instanceB = new UmbTestContextConsumerClass();
+			instanceB.prop = 'value from provider B';
+			const providerB = new UmbContextProvider(document.body, testContextAlias, instanceB);
+			providerB.hostConnected();
+
+			// Consumer should detect provider B via the provide event and call request() again
+			try {
+				expect(lastInstance?.prop).to.eq('value from provider B');
+			} finally {
+				providerB.hostDisconnected();
+				localConsumer.destroy();
+			}
 		});
 	});
 

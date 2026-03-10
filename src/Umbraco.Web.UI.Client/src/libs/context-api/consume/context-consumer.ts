@@ -237,8 +237,7 @@ export class UmbContextConsumer<
 			this.#requestRaf = undefined;
 		}
 		this.#disconnectAC?.abort();
-		this.#dismantleCurrentScope();
-		this.#currentScope = window;
+		this.#setCurrentScope(undefined);
 
 		const abortController = (this.#disconnectAC = new AbortController());
 		queueMicrotask(() => {
@@ -268,11 +267,11 @@ export class UmbContextConsumer<
 	#setCurrentScope(scope: EventTarget | undefined) {
 		if (this.#currentScope !== scope) {
 			this.#dismantleCurrentScope();
-			this.#currentScope = scope ?? window;
+			this.#currentScope = scope;
 			// Setup the scope event listening:
-			this.#currentScope!.addEventListener(UMB_CONTEXT_PROVIDE_EVENT_TYPE, this.#onProvide);
+			this.#currentScope?.addEventListener(UMB_CONTEXT_PROVIDE_EVENT_TYPE, this.#onProvide);
 			// TODO: consider not listening if it does not have a Context....
-			this.#currentScope!.addEventListener(UMB_CONTEXT_UNPROVIDED_EVENT_TYPE, this.#onUnprovided);
+			this.#currentScope?.addEventListener(UMB_CONTEXT_UNPROVIDED_EVENT_TYPE, this.#onUnprovided);
 		}
 	}
 
