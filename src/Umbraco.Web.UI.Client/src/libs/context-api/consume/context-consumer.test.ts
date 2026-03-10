@@ -389,6 +389,224 @@ describe('UmbContextConsumer', () => {
 				},
 			);
 		});
+
+		it('survives multiple rapid disconnect/reconnect cycles', async () => {
+			const provider = new UmbContextProvider(document.body, testContextAlias, new UmbTestContextConsumerClass());
+			provider.hostConnected();
+
+			const localConsumer = new UmbContextConsumer<UmbTestContextConsumerClass>(element, testContextAlias, () => {});
+			localConsumer.hostConnected();
+
+			expect(localConsumer.instance?.prop).to.eq('value from provider');
+
+			// Rapid disconnect/reconnect cycles
+			localConsumer.hostDisconnected();
+			localConsumer.hostConnected();
+			localConsumer.hostDisconnected();
+			localConsumer.hostConnected();
+			localConsumer.hostDisconnected();
+			localConsumer.hostConnected();
+
+			// Let all pending microtasks resolve
+			await Promise.resolve();
+
+			// Instance should still be intact after all the thrashing
+			expect(localConsumer.instance).to.not.be.undefined;
+			expect(localConsumer.instance?.prop).to.eq('value from provider');
+
+			localConsumer.hostDisconnected();
+			await Promise.resolve();
+			provider.hostDisconnected();
+		});
+
+		it('does not call unprovide callback twice when hostDisconnected is called twice', async () => {
+			const provider = new UmbContextProvider(document.body, testContextAlias, new UmbTestContextConsumerClass());
+			provider.hostConnected();
+
+			let undefinedCallCount = 0;
+			const localConsumer = new UmbContextConsumer<UmbTestContextConsumerClass>(
+				element,
+				testContextAlias,
+				(_instance) => {
+					if (_instance === undefined) {
+						undefinedCallCount++;
+					}
+				},
+			);
+			localConsumer.hostConnected();
+
+			// Call hostDisconnected twice without reconnecting
+			localConsumer.hostDisconnected();
+			localConsumer.hostDisconnected();
+
+			// Let deferred disconnects resolve
+			await Promise.resolve();
+
+			// Should only have received undefined once, not twice
+			expect(undefinedCallCount).to.eq(1);
+
+			provider.hostDisconnected();
+		});
+
+		it('handles provider disconnecting while consumer deferred disconnect is pending', async () => {
+			const provider = new UmbContextProvider(document.body, testContextAlias, new UmbTestContextConsumerClass());
+			provider.hostConnected();
+
+			let lastInstance: UmbTestContextConsumerClass | undefined;
+			const localConsumer = new UmbContextConsumer<UmbTestContextConsumerClass>(
+				element,
+				testContextAlias,
+				(_instance) => {
+					lastInstance = _instance;
+				},
+			);
+			localConsumer.hostConnected();
+
+			expect(lastInstance?.prop).to.eq('value from provider');
+
+			// Both disconnect in the same synchronous block
+			localConsumer.hostDisconnected();
+			provider.hostDisconnected();
+
+			// Let microtasks resolve
+			await Promise.resolve();
+
+			expect(localConsumer.instance).to.be.undefined;
+		});
+
+		it('destroy cancels pending deferred disconnect', async () => {
+			const provider = new UmbContextProvider(document.body, testContextAlias, new UmbTestContextConsumerClass());
+			provider.hostConnected();
+
+			let undefinedCallCount = 0;
+			const localConsumer = new UmbContextConsumer<UmbTestContextConsumerClass>(
+				element,
+				testContextAlias,
+				(_instance) => {
+					if (_instance === undefined) {
+						undefinedCallCount++;
+					}
+				},
+			);
+			localConsumer.hostConnected();
+
+			// Disconnect then immediately destroy
+			localConsumer.hostDisconnected();
+			localConsumer.destroy();
+
+			const countAfterDestroy = undefinedCallCount;
+
+			// Let deferred disconnect microtask resolve
+			await Promise.resolve();
+
+			// The deferred disconnect should not have fired a second callback after destroy
+			expect(undefinedCallCount).to.eq(countAfterDestroy);
+
+			provider.hostDisconnected();
+		});
+
+		it('reconnect picks up a new provider after disconnect', async () => {
+			const providerA = new UmbContextProvider(document.body, testContextAlias, new UmbTestContextConsumerClass());
+			providerA.hostConnected();
+
+			let lastInstance: UmbTestContextConsumerClass | UmbTestAlternativeContextConsumerClass | undefined;
+			const localConsumer = new UmbContextConsumer(
+				element,
+				testContextAlias,
+				(_instance: UmbTestContextConsumerClass | UmbTestAlternativeContextConsumerClass | undefined) => {
+					lastInstance = _instance;
+				},
+			);
+			localConsumer.hostConnected();
+
+			expect((lastInstance as UmbTestContextConsumerClass)?.prop).to.eq('value from provider');
+
+			// Disconnect consumer and let deferred disconnect complete
+			localConsumer.hostDisconnected();
+			await Promise.resolve();
+
+			expect(lastInstance).to.be.undefined;
+
+			// Swap providers while consumer is disconnected
+			providerA.hostDisconnected();
+			const providerB = new UmbContextProvider(
+				document.body,
+				testContextAlias,
+				new UmbTestAlternativeContextConsumerClass(),
+			);
+			providerB.hostConnected();
+
+			// Reconnect — should pick up providerB
+			localConsumer.hostConnected();
+
+			expect((lastInstance as UmbTestAlternativeContextConsumerClass)?.alternativeProp).to.eq(
+				'value from alternative provider',
+			);
+
+			localConsumer.hostDisconnected();
+			await Promise.resolve();
+			providerB.hostDisconnected();
+		});
+
+		it('callback receives undefined then new instance when provider swaps', async () => {
+			const instanceA = new UmbTestContextConsumerClass();
+			const providerA = new UmbContextProvider(document.body, testContextAlias, instanceA);
+			providerA.hostConnected();
+
+			const receivedInstances: Array<UmbTestContextConsumerClass | undefined> = [];
+			const localConsumer = new UmbContextConsumer<UmbTestContextConsumerClass>(
+				element,
+				testContextAlias,
+				(_instance) => {
+					receivedInstances.push(_instance);
+				},
+			);
+			localConsumer.hostConnected();
+
+			expect(receivedInstances).to.have.length(1);
+			expect(receivedInstances[0]?.prop).to.eq('value from provider');
+
+			// Provider A disconnects — consumer should get undefined via unprovide event
+			providerA.hostDisconnected();
+
+			expect(receivedInstances).to.have.length(2);
+			expect(receivedInstances[1]).to.be.undefined;
+
+			// Provider B connects — consumer should pick it up via provide event
+			const instanceB = new UmbTestContextConsumerClass();
+			instanceB.prop = 'value from provider B';
+			const providerB = new UmbContextProvider(document.body, testContextAlias, instanceB);
+			providerB.hostConnected();
+
+			expect(receivedInstances).to.have.length(3);
+			expect(receivedInstances[2]?.prop).to.eq('value from provider B');
+
+			localConsumer.hostDisconnected();
+			await Promise.resolve();
+			providerB.hostDisconnected();
+		});
+
+		it('asPromise resolves on reconnect after disconnect when provider appears', async () => {
+			const localConsumer = new UmbContextConsumer<UmbTestContextConsumerClass>(element, testContextAlias);
+			localConsumer.hostConnected();
+
+			// Disconnect before any provider is available — let deferred disconnect complete
+			localConsumer.hostDisconnected();
+			await Promise.resolve();
+
+			// Provider appears while consumer is disconnected
+			const provider = new UmbContextProvider(document.body, testContextAlias, new UmbTestContextConsumerClass());
+			provider.hostConnected();
+
+			// Reconnect — consumer should find the provider and resolve the promise
+			localConsumer.hostConnected();
+			const instance = await localConsumer.asPromise();
+			expect(instance?.prop).to.eq('value from provider');
+
+			localConsumer.hostDisconnected();
+			await Promise.resolve();
+			provider.hostDisconnected();
+		});
 	});
 
 	describe('Implementation with discriminator method', () => {
