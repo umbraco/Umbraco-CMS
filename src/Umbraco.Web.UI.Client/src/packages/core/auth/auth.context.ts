@@ -182,10 +182,12 @@ export class UmbAuthContext extends UmbContextBase {
 					location.href = this.#postLogoutRedirectUri;
 					break;
 				case 'sessionRequest': {
-					// Another tab is asking for the current session state (e.g. new tab opening)
-					const session = this.#session.getValue();
-					if (session) {
-						this.#channel.postMessage({ type: 'sessionResponse', session });
+					// Another tab is asking for the current session state (e.g. new tab opening).
+					// Only share the session if it is still valid — an expired session would cause
+					// the recipient (e.g. a popup) to believe it is already authorized and skip
+					// the authorization code exchange.
+					if (this.isSessionValid()) {
+						this.#channel.postMessage({ type: 'sessionResponse', session: this.#session.getValue()! });
 					}
 					break;
 				}
