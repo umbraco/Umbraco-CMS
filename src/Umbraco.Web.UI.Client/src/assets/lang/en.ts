@@ -2893,9 +2893,8 @@ export default {
 		resetUrlLabel: 'Reset',
 		selectLanguageHint: 'Select the language for the link',
 		selectLanguageDefault: "Viewer's language",
-		configCultureSpecificDocumentLinksLabel: 'Allow culture specific document links',
-		configCultureSpecificDocumentLinksDescription:
-			'Selecting this allows the user to pick a specific culture when linking to a document.',
+		configCultureSpecificDocumentLinksLabel: 'Culture-specific document links',
+		configCultureSpecificDocumentLinksDescription: 'Enable specifying a culture when linking to documents.',
 	},
 	missingEditor: {
 		title: 'This property type is no longer available.',
