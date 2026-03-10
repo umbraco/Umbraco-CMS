@@ -12,6 +12,6 @@ export const UMB_PROPERTY_EDITOR_UI_PICKER_MODAL = new UmbModalToken<
 >('Umb.Modal.PropertyEditorUiPicker', {
 	modal: {
 		type: 'sidebar',
-		size: 'small',
+		size: 'medium',
 	},
 });
