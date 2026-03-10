@@ -25,8 +25,8 @@ public class ConfigureMemberSecurityStampValidatorOptions : IConfigureOptions<Me
         TimeSpan originalInterval = options.ValidationInterval;
 
         // Apply the shared configuration (claim merging, etc.) which also sets
-        // ValidationInterval to TimeSpan.Zero when AllowConcurrentLogins is false.
-        ConfigureSecurityStampOptions.ConfigureOptions(options, _securitySettings);
+        // ValidationInterval to TimeSpan.Zero when concurrent logins are disallowed.
+        ConfigureSecurityStampOptions.ConfigureOptions(options, _securitySettings.GetMemberAllowConcurrentLogins());
 
         // Override the validation interval for members, but only when the original value
         // was the framework default (30 minutes). If a developer has explicitly customized
@@ -35,7 +35,7 @@ public class ConfigureMemberSecurityStampValidatorOptions : IConfigureOptions<Me
         // silently re-authenticate within any non-zero window. Members authenticate directly
         // via cookies with no silent re-authentication mechanism, so a short interval is
         // sufficient and avoids a per-request DB lookup on every authenticated page load.
-        if (_securitySettings.AllowConcurrentLogins is false
+        if (_securitySettings.GetMemberAllowConcurrentLogins() is false
             && originalInterval == DefaultInterval)
         {
             options.ValidationInterval = MemberValidationInterval;

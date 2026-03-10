@@ -75,4 +75,52 @@ public class ConfigureMemberSecurityStampValidatorOptionsTests
 
         Assert.That(options.OnRefreshingPrincipal, Is.Not.Null);
     }
+
+    [Test]
+    public void MemberAllowConcurrentLogins_False_Overrides_Global_True()
+    {
+        var securitySettings = new SecuritySettings
+        {
+            AllowConcurrentLogins = true,
+            MemberAllowConcurrentLogins = false,
+        };
+        var sut = new ConfigureMemberSecurityStampValidatorOptions(Options.Create(securitySettings));
+        var options = new MemberSecurityStampValidatorOptions();
+
+        sut.Configure(options);
+
+        Assert.That(options.ValidationInterval, Is.EqualTo(_expectedMemberInterval));
+    }
+
+    [Test]
+    public void MemberAllowConcurrentLogins_True_Overrides_Global_False()
+    {
+        var securitySettings = new SecuritySettings
+        {
+            AllowConcurrentLogins = false,
+            MemberAllowConcurrentLogins = true,
+        };
+        var sut = new ConfigureMemberSecurityStampValidatorOptions(Options.Create(securitySettings));
+        var options = new MemberSecurityStampValidatorOptions();
+
+        sut.Configure(options);
+
+        Assert.That(options.ValidationInterval, Is.EqualTo(_defaultInterval));
+    }
+
+    [Test]
+    public void MemberAllowConcurrentLogins_Null_Falls_Back_To_Global()
+    {
+        var securitySettings = new SecuritySettings
+        {
+            AllowConcurrentLogins = false,
+            MemberAllowConcurrentLogins = null,
+        };
+        var sut = new ConfigureMemberSecurityStampValidatorOptions(Options.Create(securitySettings));
+        var options = new MemberSecurityStampValidatorOptions();
+
+        sut.Configure(options);
+
+        Assert.That(options.ValidationInterval, Is.EqualTo(_expectedMemberInterval));
+    }
 }
