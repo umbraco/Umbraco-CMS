@@ -37,6 +37,8 @@
     <PackageVersion Include="System.Linq.Async" Version="7.0.0" />
     <PackageVersion Include="Npgsql" Version="10.0.1" />
     <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0" />
+    <PackageVersion Include="Umbraco.Cms.Infrastructure" Version="17.3.0--rc.preview.225.gde851f8" />
+    <PackageVersion Include="Umbraco.Cms.Persistence.EFCore" Version="17.3.0--rc.preview.225.gde851f8" />
   </ItemGroup>
   <!-- Umbraco packages -->
   <ItemGroup>
