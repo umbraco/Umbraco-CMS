@@ -20,7 +20,7 @@ import {
 	umbExtensionsRegistry,
 } from '@umbraco-cms/backoffice/extension-registry';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
-import { hasOwnOpener, redirectToStoredPath } from '@umbraco-cms/backoffice/utils';
+import { redirectToStoredPath } from '@umbraco-cms/backoffice/utils';
 import { umbHttpClient } from '@umbraco-cms/backoffice/http-client';
 import { UmbViewContext } from '@umbraco-cms/backoffice/view';
 
@@ -98,10 +98,6 @@ export class UmbAppElement extends UmbLitElement {
 						redirectToStoredPath(this.backofficePath, true);
 						return;
 					}
-
-					// If this is a popup window, the parent will handle navigation.
-					// The BroadcastChannel message already notified the parent.
-					if (hasOwnOpener(this.backofficePath)) return;
 
 					// For redirect flows (no popup), navigate to the stored path.
 					// Use force=true for a full page navigation so the new page
@@ -229,6 +225,12 @@ export class UmbAppElement extends UmbLitElement {
 		if (!this.#authContext) {
 			throw new Error('[Fatal] AuthContext requested before it was initialized');
 		}
+
+		// Popup windows are used exclusively for the auth code exchange flow.
+		// Attempting a silent token refresh here would set isAuthorized=true and cause
+		// the oauth_complete handler to redirect the popup to the backoffice instead of
+		// completing the code exchange. The code exchange sets fresh cookies itself.
+		if (window.opener) return;
 
 		// Auth context configures umbHttpClient in its constructor, so we only need to set initial state
 		await this.#authContext.setInitialState();
