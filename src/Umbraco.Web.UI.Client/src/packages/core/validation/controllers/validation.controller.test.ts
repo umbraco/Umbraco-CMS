@@ -1256,4 +1256,50 @@ describe('UmbValidationController', () => {
 			grandchild2.destroy();
 		});
 	});
+
+	describe('validateByVariantIds', () => {
+		it('resolves when no messages match the given culture variant', async () => {
+			ctrl.messages.addMessage(
+				'server',
+				"$.values[?(@.alias == 'my-property' && @.culture == 'da' && @.segment == null)].value",
+				'danish error',
+			);
+
+			await ctrl.validateByVariantIds([new UmbVariantId('en-US', null)]);
+			expect(ctrl.isValid).to.be.true;
+		});
+
+		it('rejects when a message matches the given culture variant', async () => {
+			ctrl.messages.addMessage(
+				'server',
+				"$.values[?(@.alias == 'my-property' && @.culture == 'en-US' && @.segment == null)].value",
+				'english error',
+			);
+
+			await ctrl.validateByVariantIds([new UmbVariantId('en-US', null)]).catch(() => undefined);
+			expect(ctrl.isValid).to.be.false;
+		});
+
+		it('rejects when a message with no culture filter is present', async () => {
+			ctrl.messages.addMessage('server', '$.invariant.error', 'invariant error');
+
+			await ctrl.validateByVariantIds([new UmbVariantId('en-US', null)]).catch(() => undefined);
+			expect(ctrl.isValid).to.be.false;
+		});
+
+		it('resolves when there are no messages at all', async () => {
+			await ctrl.validateByVariantIds([new UmbVariantId('en-US', null)]);
+			expect(ctrl.isValid).to.be.true;
+		});
+
+		it('rejects gracefully when the controller has been destroyed', async () => {
+			ctrl.destroy();
+
+			let rejected = false;
+			await ctrl.validateByVariantIds([new UmbVariantId('en-US', null)]).catch(() => {
+				rejected = true;
+			});
+			expect(rejected).to.be.true;
+		});
+	});
 });

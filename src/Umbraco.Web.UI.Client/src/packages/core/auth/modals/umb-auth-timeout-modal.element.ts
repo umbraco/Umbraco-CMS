@@ -31,7 +31,11 @@ export class UmbAuthTimeoutModalElement extends UmbModalBaseElement<UmbModalAuth
 				this._remainingTimeInSeconds--;
 			} else {
 				clearInterval(this.#interval);
-				this.#handleLogout();
+				// Timer expired — notify the controller so it can call timeOut() and
+				// open the re-auth popup. Submit (not reject) so the catch block is
+				// not triggered.
+				this.data?.onExpired?.();
+				this.modalContext?.submit();
 			}
 		}, 1000);
 	}

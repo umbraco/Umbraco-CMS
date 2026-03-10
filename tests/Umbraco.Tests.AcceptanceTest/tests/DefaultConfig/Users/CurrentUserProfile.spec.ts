@@ -1,11 +1,10 @@
 import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 
 const userPassword = '0123456789';
-let testUserCookieAndToken = {cookie: "", accessToken: "", refreshToken: ""};
 
 test.afterEach(async ({umbracoApi}) => {
   // Ensure we are logged in to admin
-  await umbracoApi.loginToAdminUser(testUserCookieAndToken.cookie, testUserCookieAndToken.accessToken, testUserCookieAndToken.refreshToken);
+  await umbracoApi.loginToAdminUser();
 });
 
 const userGroups = ['Administrators', 'Editors', 'Sensitive data', 'Translators', 'Writers'];
@@ -19,7 +18,7 @@ for (const userGroup of userGroups) {
     const userGroupData = await umbracoApi.userGroup.getByName(userGroup);
     const userId = await umbracoApi.user.createDefaultUser(userName, userEmail, [userGroupData.id]);
     await umbracoApi.user.updatePassword(userId, userPassword);
-    testUserCookieAndToken = await umbracoApi.user.loginToUser(userName, userEmail, userPassword);
+    await umbracoApi.user.loginToUser(userName, userEmail, userPassword);
     await umbracoUi.goToBackOffice();
     await umbracoUi.currentUserProfile.isBackOfficeMainVisible();
     await umbracoUi.waitForTimeout(ConstantHelper.wait.medium); // Wait to ensure the UI is fully loaded
