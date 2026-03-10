@@ -3,7 +3,17 @@ import { UmbBlockListEntriesContext } from '../../context/block-list-entries.con
 import type { UmbBlockListLayoutModel, UmbBlockListValueModel } from '../../types.js';
 import type { UmbBlockListEntryElement } from '../../components/block-list-entry/index.js';
 import { UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS } from './constants.js';
-import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import { UmbLitElement, umbDestroyOnDisconnect } from '@umbraco-cms/backoffice/lit-element';
+import {
+	html,
+	customElement,
+	property,
+	state,
+	repeat,
+	css,
+	nothing,
+	ifDefined,
+} from '@umbraco-cms/backoffice/external/lit';
 import { debounceTime } from '@umbraco-cms/backoffice/external/rxjs';
 import {
 	extractJsonQueryProps,
@@ -12,7 +22,6 @@ import {
 	UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
 } from '@umbraco-cms/backoffice/validation';
 import { jsonStringComparison, observeMultiple } from '@umbraco-cms/backoffice/observable-api';
-import { umbDestroyOnDisconnect, UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import { UMB_CONTENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content';
@@ -63,6 +72,11 @@ export class UmbPropertyEditorUIBlockListElement
 
 		if (!value) {
 			super.value = undefined;
+			// Clear manager state so blocks are actually removed
+			this.#managerContext.setLayouts([]);
+			this.#managerContext.setContents([]);
+			this.#managerContext.setSettings([]);
+			this.#managerContext.setExposes([]);
 			return;
 		}
 
@@ -83,7 +97,7 @@ export class UmbPropertyEditorUIBlockListElement
 	}
 
 	@state()
-	private _createButtonLabel = this.localize.term('content_createEmpty');
+	private _createButtonLabel = this.localize.term('blockEditor_addBlock');
 
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
@@ -392,7 +406,7 @@ export class UmbPropertyEditorUIBlockListElement
 			${this.#renderSortModeToolbar()}
 			${repeat(
 				this._layouts,
-				(layout, index) => `${index}_${layout.contentKey}`,
+				(layout) => layout.contentKey,
 				(layout, index) => html`
 					${this.#renderInlineCreateButton(index)}
 					<umb-block-list-entry
@@ -414,30 +428,53 @@ export class UmbPropertyEditorUIBlockListElement
 
 	#renderInlineCreateButton(index: number) {
 		if (this.readonly) return nothing;
+		const createPath = this.#entriesContext.getPathForCreateBlock(index);
 		return html`
 			<uui-button-inline-create
 				label=${this._createButtonLabel}
-				href=${this._catalogueRouteBuilder?.({ view: 'create', index: index }) ?? ''}>
+				href=${ifDefined(createPath)}
+				@click=${() => {
+					// If no path, then we can conclude there is not modal flow for the user to follow, instead we will just insert the Block: [NL]
+					if (createPath === undefined) {
+						this.#handleCreateWithNoCreatePath(index);
+					}
+				}}>
 			</uui-button-inline-create>
 		`;
 	}
 
 	#renderCreateButton() {
-		let createPath: string | undefined;
-		if (this._blocks?.length === 1) {
-			const elementKey = this._blocks[0].contentElementTypeKey;
-			createPath =
-				this._catalogueRouteBuilder?.({ view: 'create', index: -1 }) + 'modal/umb-modal-workspace/create/' + elementKey;
-		} else {
-			createPath = this._catalogueRouteBuilder?.({ view: 'create', index: -1 });
-		}
+		if (!this._catalogueRouteBuilder) return nothing;
+		const createPath = this.#entriesContext.getPathForCreateBlock(-1);
 		return html`
 			<uui-button
 				look="placeholder"
-				label=${this._createButtonLabel}
-				href=${createPath ?? ''}
-				?disabled=${this.readonly}></uui-button>
+				.label=${this._createButtonLabel}
+				href=${ifDefined(createPath)}
+				?disabled=${this.readonly}
+				@click=${() => {
+					// If no path, then we can conclude there is not modal flow for the user to follow, instead we will just insert the Block: [NL]
+					if (createPath === undefined) {
+						this.#handleCreateWithNoCreatePath();
+					}
+				}}></uui-button>
 		`;
+	}
+
+	async #handleCreateWithNoCreatePath(index?: number) {
+		if (!this._blocks || this._blocks.length === 0) {
+			throw new Error('No block types are configured for this Block List property editor');
+		}
+		if (index === undefined) {
+			index = -1;
+		}
+		const originData = { index };
+		const created = await this.#entriesContext.create(this._blocks[0].contentElementTypeKey, {}, originData);
+		if (created) {
+			this.#entriesContext.insert(created.layout, created.content, created.settings, originData);
+		} else {
+			throw new Error('Failed to create block');
+		}
 	}
 
 	#renderPasteButton() {
@@ -446,7 +483,8 @@ export class UmbPropertyEditorUIBlockListElement
 				label=${this.localize.term('content_createFromClipboard')}
 				look="placeholder"
 				href=${this._catalogueRouteBuilder?.({ view: 'clipboard', index: -1 }) ?? ''}
-				?disabled=${this.readonly}>
+				?disabled=${this.readonly}
+				title=${this.localize.term('general_clipboard')}>
 				<uui-icon name="icon-clipboard-paste"></uui-icon>
 			</uui-button>
 		`;
@@ -459,19 +497,8 @@ export class UmbPropertyEditorUIBlockListElement
 
 	static override readonly styles = [
 		css`
-			:host {
-				display: grid;
-				align-content: start;
-				gap: 1px;
-			}
-			> div {
-				display: flex;
-				flex-direction: column;
-				align-items: stretch;
-			}
-
 			uui-button-group {
-				padding-top: 1px;
+				margin-top: 1px;
 				display: grid;
 				grid-template-columns: 1fr auto;
 			}

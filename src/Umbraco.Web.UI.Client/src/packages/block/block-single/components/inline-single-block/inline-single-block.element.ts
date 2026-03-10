@@ -76,6 +76,7 @@ export class UmbInlineSingleBlockElement extends UmbLitElement {
 				if (permitted && context) {
 					this.#workspaceContext = context;
 					this.#workspaceContext.establishLiveSync();
+					this.#workspaceContext.autoReportValidation();
 					this.#load();
 
 					this.observe(

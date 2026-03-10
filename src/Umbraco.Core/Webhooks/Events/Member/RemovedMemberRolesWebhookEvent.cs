@@ -7,11 +7,22 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events;
 
+/// <summary>
+/// Webhook event that fires when member roles are removed.
+/// </summary>
 [WebhookEvent("Member Roles Removed")]
 public class RemovedMemberRolesWebhookEvent : WebhookEventBase<RemovedMemberRolesNotification>
 {
     private readonly IIdKeyMap _idKeyMap;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="RemovedMemberRolesWebhookEvent"/> class.
+    /// </summary>
+    /// <param name="webhookFiringService">The webhook firing service.</param>
+    /// <param name="webHookService">The webhook service.</param>
+    /// <param name="webhookSettings">The webhook settings.</param>
+    /// <param name="serverRoleAccessor">The server role accessor.</param>
+    /// <param name="idKeyMap">The ID to key mapping service.</param>
     public RemovedMemberRolesWebhookEvent(
         IWebhookFiringService webhookFiringService,
         IWebhookService webHookService,
@@ -23,8 +34,10 @@ public class RemovedMemberRolesWebhookEvent : WebhookEventBase<RemovedMemberRole
         _idKeyMap = idKeyMap;
     }
 
+    /// <inheritdoc />
     public override string Alias => Constants.WebhookEvents.Aliases.RemovedMemberRoles;
 
+    /// <inheritdoc />
     public override object ConvertNotificationToRequestPayload(RemovedMemberRolesNotification notification)
         => new
         {

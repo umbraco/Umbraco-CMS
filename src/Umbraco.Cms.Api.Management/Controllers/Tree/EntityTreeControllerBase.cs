@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels;
@@ -10,6 +11,7 @@ using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Tree;
 
@@ -21,8 +23,8 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
     [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
     protected EntityTreeControllerBase(IEntityService entityService)
         : this(
-              entityService,
-              StaticServiceProvider.Instance.GetRequiredService<FlagProviderCollection>())
+            entityService,
+            StaticServiceProvider.Instance.GetRequiredService<FlagProviderCollection>())
     {
     }
 
@@ -44,7 +46,7 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
 
         (rootEntities, totalItems) = await FilterTreeEntities(rootEntities, totalItems);
 
-        TItem[] treeItemViewModels = MapTreeItemViewModels(null, rootEntities);
+        TItem[] treeItemViewModels = MapTreeItemViewModels((Guid?)null, rootEntities);
 
         await PopulateFlags(treeItemViewModels);
 
@@ -100,7 +102,9 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
     /// Override this method to implement custom filtering logic for tree entities. The default
     /// implementation returns the input array and total items unchanged.
     /// </remarks>
-    protected virtual Task<(IEntitySlim[] Entities, long TotalItems)> FilterTreeEntities(IEntitySlim[] entities, long totalItems)
+    protected virtual Task<(IEntitySlim[] Entities, long TotalItems)> FilterTreeEntities(
+        IEntitySlim[] entities,
+        long totalItems)
         => Task.FromResult((entities, totalItems));
 
     /// <summary>
@@ -115,7 +119,11 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
     /// Override this method to implement custom filtering logic for sibling tree entities. The default
     /// implementation returns the input array and totals unchanged.
     /// </remarks>
-    protected virtual Task<(IEntitySlim[] Entities, long TotalBefore, long TotalAfter)> FilterTreeEntities(Guid targetKey, IEntitySlim[] entities, long totalBefore, long totalAfter)
+    protected virtual Task<(IEntitySlim[] Entities, long TotalBefore, long TotalAfter)> FilterTreeEntities(
+        Guid targetKey,
+        IEntitySlim[] entities,
+        long totalBefore,
+        long totalAfter)
         => Task.FromResult((entities, totalBefore, totalAfter));
 
     /// <summary>
@@ -126,20 +134,43 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
             ? EntityService.GetKey(entity.ParentId, ItemObjectType).Result
             : Constants.System.RootKey;
 
-    protected virtual async Task<ActionResult<IEnumerable<TItem>>> GetAncestors(Guid descendantKey, bool includeSelf = true)
+    protected virtual async Task<ActionResult<IEnumerable<TItem>>> GetAncestors(Guid descendantKey,
+        bool includeSelf = true)
     {
         IEntitySlim[] ancestorEntities = await GetAncestorEntitiesAsync(descendantKey, includeSelf);
 
+        // All ancestors should be present in the collection, but we defensively use
+        // SingleOrDefault to handle potential data inconsistencies (e.g. after upgrades).
+        List<int>? missingParentIds = null;
         TItem[] treeItemViewModels = ancestorEntities
             .Select(ancestor =>
             {
                 IEntitySlim? parent = ancestor.ParentId > 0
-                    ? ancestorEntities.Single(a => a.Id == ancestor.ParentId)
+                    ? ancestorEntities.SingleOrDefault(a => a.Id == ancestor.ParentId)
                     : null;
+
+                if (ancestor.ParentId > 0 && parent is null)
+                {
+                    missingParentIds ??= [];
+                    missingParentIds.Add(ancestor.ParentId);
+                }
 
                 return MapTreeItemViewModel(parent?.Key, ancestor);
             })
             .ToArray();
+
+        if (missingParentIds is not null)
+        {
+            // Will use the static logger factory here, given this is an exception case and to avoid having to
+            // make widespread changes to support logging in the base controller.
+            ILogger logger = StaticApplicationLogging.CreateLogger<EntityTreeControllerBase<TItem>>();
+            logger.LogWarning(
+                "Ancestor(s) with ID(s) {MissingAncestorIds} not found in the ancestors collection for descendant {DescendantKey}. "
+                + "This indicates a data integrity issue in the entity path; consider running the database integrity health check "
+                + "and/or moving the entity to another location and back to rebuild its path.",
+                missingParentIds,
+                descendantKey);
+        }
 
         await PopulateFlags(treeItemViewModels);
 
@@ -187,7 +218,12 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
                 ordering: ItemOrdering)
             .ToArray();
 
-    protected virtual IEntitySlim[] GetSiblingEntities(Guid target, int before, int after, out long totalBefore, out long totalAfter) =>
+    protected virtual IEntitySlim[] GetSiblingEntities(
+        Guid target,
+        int before,
+        int after,
+        out long totalBefore,
+        out long totalAfter) =>
         EntityService
             .GetSiblings(
                 target,
@@ -197,7 +233,7 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
                 out totalBefore,
                 out totalAfter,
                 ordering: ItemOrdering)
-        .ToArray();
+            .ToArray();
 
     protected virtual TItem[] MapTreeItemViewModels(Guid? parentKey, IEntitySlim[] entities)
         => entities.Select(entity => MapTreeItemViewModel(parentKey, entity)).ToArray();
@@ -216,11 +252,8 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
         {
             Id = entity.Key,
             HasChildren = entity.HasChildren,
-            Parent = parentKey.HasValue
-                ? new ReferenceByIdModel
-                {
-                    Id = parentKey.Value,
-                }
+            Parent = parentKey.HasValue && parentKey.Value != Guid.Empty
+                ? new ReferenceByIdModel { Id = parentKey.Value, }
                 : null,
         };
 
@@ -230,6 +263,9 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
     protected PagedViewModel<TItem> PagedViewModel(IEnumerable<TItem> treeItemViewModels, long totalItems)
         => new() { Total = totalItems, Items = treeItemViewModels };
 
-    protected SubsetViewModel<TItem> SubsetViewModel(IEnumerable<TItem> treeItemViewModels, long totalBefore, long totalAfter)
+    protected SubsetViewModel<TItem> SubsetViewModel(
+        IEnumerable<TItem> treeItemViewModels,
+        long totalBefore,
+        long totalAfter)
         => new() { TotalBefore = totalBefore, TotalAfter = totalAfter, Items = treeItemViewModels };
 }

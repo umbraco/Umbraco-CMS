@@ -54,21 +54,29 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.DependencyInjection
 {
+    /// <summary>
+    ///     The default implementation of <see cref="IUmbracoBuilder" /> used to configure Umbraco services and dependencies.
+    /// </summary>
     public class UmbracoBuilder : IUmbracoBuilder
     {
         private readonly Dictionary<Type, ICollectionBuilder> _builders = new Dictionary<Type, ICollectionBuilder>();
 
+        /// <inheritdoc />
         public IServiceCollection Services { get; }
 
+        /// <inheritdoc />
         public IConfiguration Config { get; }
 
+        /// <inheritdoc />
         public TypeLoader TypeLoader { get; }
 
         /// <inheritdoc />
         public ILoggerFactory BuilderLoggerFactory { get; }
 
+        /// <inheritdoc />
         public IProfiler Profiler { get; }
 
+        /// <inheritdoc />
         public AppCaches AppCaches { get; }
 
         /// <summary>
@@ -133,6 +141,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             return builder;
         }
 
+        /// <inheritdoc />
         public void Build()
         {
             foreach (ICollectionBuilder builder in _builders.Values)
@@ -143,6 +152,9 @@ namespace Umbraco.Cms.Core.DependencyInjection
             _builders.Clear();
         }
 
+        /// <summary>
+        ///     Adds all core Umbraco services to the service collection.
+        /// </summary>
         private void AddCoreServices()
         {
             Services.AddSingleton(AppCaches);
@@ -270,6 +282,9 @@ namespace Umbraco.Cms.Core.DependencyInjection
 
             // Register telemetry service used to gather data about installed packages
             Services.AddUnique<ISiteIdentifierService, SiteIdentifierService>();
+
+            // Register HMAC secret key service for imaging URL authentication
+            Services.AddUnique<IHmacSecretKeyService, HmacSecretKeyService>();
             Services.AddUnique<ITelemetryService, TelemetryService>();
 
             Services.AddUnique<IKeyValueService, KeyValueService>();
@@ -316,11 +331,11 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IContentTypeEditingService, ContentTypeEditingService>();
             Services.AddUnique<IMediaTypeEditingService, MediaTypeEditingService>();
             Services.AddUnique<IFileService, FileService>();
-            Services.AddUnique<ITemplateService, TemplateService>();
+            Services.AddUnique<ITemplateService>(sp => ActivatorUtilities.CreateInstance<TemplateService>(sp));
             Services.AddUnique<IScriptService, ScriptService>();
             Services.AddUnique<IStylesheetService, StylesheetService>();
             Services.AddUnique<IStylesheetFolderService, StylesheetFolderService>();
-            Services.AddUnique<IPartialViewService, PartialViewService>();
+            Services.AddUnique<IPartialViewService>(sp => ActivatorUtilities.CreateInstance<PartialViewService>(sp));
             Services.AddUnique<IScriptFolderService, ScriptFolderService>();
             Services.AddUnique<IPartialViewFolderService, PartialViewFolderService>();
             Services.AddUnique<ITemporaryFileService, TemporaryFileService>();
@@ -441,6 +456,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddNotificationAsyncHandler<UmbracoApplicationStartingNotification, DocumentUrlServiceInitializerNotificationHandler>();
             Services.AddUnique<IDocumentUrlAliasService, DocumentUrlAliasService>();
             Services.AddNotificationAsyncHandler<UmbracoApplicationStartingNotification, DocumentUrlAliasServiceInitializerNotificationHandler>();
+            Services.AddNotificationAsyncHandler<ContentTypeChangedNotification, DocumentUrlServiceContentTypeChangedNotificationHandler>();
         }
     }
 }

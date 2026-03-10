@@ -33,6 +33,8 @@ public class PublishDocumentWithDescendantsResultController : DocumentController
     [ProducesResponseType(typeof(PublishWithDescendantsResultModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Gets the result of publishing a document with descendants.")]
+    [EndpointDescription("Gets the status and result of a publish with descendants operation.")]
     public async Task<IActionResult> PublishWithDescendantsResult(CancellationToken cancellationToken, Guid id, Guid taskId)
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(

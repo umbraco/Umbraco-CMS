@@ -10,6 +10,9 @@ using Umbraco.Cms.Core.Web;
 
 namespace Umbraco.Extensions;
 
+/// <summary>
+///     Provides extension methods for URL generation and retrieval operations on content.
+/// </summary>
 public static class UrlProviderExtensions
 {
     private const string UrlProviderAlias = Constants.UrlProviders.Content;

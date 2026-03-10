@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Core.Models.Blocks
         /// <exception cref="ArgumentNullException">contentUdi
         /// or
         /// content</exception>
-        [Obsolete("Use constructor that accepts GUIDs instead. Will be removed in V18.")]
+        [Obsolete("Use constructor that accepts GUIDs instead. Scheduled for removal in Umbraco 18.")]
         public BlockGridItem(Udi contentUdi, IPublishedElement content, Udi settingsUdi, IPublishedElement settings)
             : this(
                 (contentUdi as GuidUdi)?.Guid ?? throw new ArgumentException(nameof(contentUdi)),
@@ -33,6 +33,14 @@ namespace Umbraco.Cms.Core.Models.Blocks
         {
         }
 
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="BlockGridItem" /> class.
+        /// </summary>
+        /// <param name="contentKey">The content key.</param>
+        /// <param name="content">The content.</param>
+        /// <param name="settingsKey">The settings key.</param>
+        /// <param name="settings">The settings.</param>
+        /// <exception cref="ArgumentNullException">Thrown when content is null.</exception>
         public BlockGridItem(Guid contentKey, IPublishedElement content, Guid? settingsKey, IPublishedElement? settings)
         {
             ContentKey = contentKey;
@@ -61,7 +69,7 @@ namespace Umbraco.Cms.Core.Models.Blocks
         /// <value>
         /// The content UDI.
         /// </value>
-        [Obsolete("Use ContentKey instead. Will be removed in V18.")]
+        [Obsolete("Use ContentKey instead. Scheduled for removal in Umbraco 18.")]
         public Udi ContentUdi { get; }
 
         /// <summary>
@@ -78,7 +86,7 @@ namespace Umbraco.Cms.Core.Models.Blocks
         /// <value>
         /// The settings UDI.
         /// </value>
-        [Obsolete("Use SettingsKey instead. Will be removed in V18.")]
+        [Obsolete("Use SettingsKey instead. Scheduled for removal in Umbraco 18.")]
         public Udi? SettingsUdi { get; }
 
         /// <summary>
@@ -129,13 +137,20 @@ namespace Umbraco.Cms.Core.Models.Blocks
         /// <param name="content">The content.</param>
         /// <param name="settingsUdi">The settings UDI.</param>
         /// <param name="settings">The settings.</param>
-        [Obsolete("Use constructor that accepts GUIDs instead. Will be removed in V18.")]
+        [Obsolete("Use constructor that accepts GUIDs instead. Scheduled for removal in Umbraco 18.")]
         public BlockGridItem(Udi contentUdi, T content, Udi settingsUdi, IPublishedElement settings)
             : base(contentUdi, content, settingsUdi, settings)
         {
             Content = content;
         }
 
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="BlockGridItem{T}" /> class.
+        /// </summary>
+        /// <param name="contentKey">The content key.</param>
+        /// <param name="content">The content.</param>
+        /// <param name="settingsKey">The settings key.</param>
+        /// <param name="settings">The settings.</param>
         public BlockGridItem(Guid contentKey, T content, Guid? settingsKey, IPublishedElement? settings)
             : base(contentKey, content, settingsKey, settings)
         {
@@ -167,13 +182,20 @@ namespace Umbraco.Cms.Core.Models.Blocks
         /// <param name="content">The content.</param>
         /// <param name="settingsUdi">The settings udi.</param>
         /// <param name="settings">The settings.</param>
-        [Obsolete("Use constructor that accepts GUIDs instead. Will be removed in V18.")]
+        [Obsolete("Use constructor that accepts GUIDs instead. Scheduled for removal in Umbraco 18.")]
         public BlockGridItem(Udi contentUdi, TContent content, Udi settingsUdi, TSettings settings)
             : base(contentUdi, content, settingsUdi, settings)
         {
             Settings = settings;
         }
 
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="BlockGridItem{TContent, TSettings}" /> class.
+        /// </summary>
+        /// <param name="contentKey">The content key.</param>
+        /// <param name="content">The content.</param>
+        /// <param name="settingsKey">The settings key.</param>
+        /// <param name="settings">The settings.</param>
         public BlockGridItem(Guid contentKey, TContent content, Guid? settingsKey, TSettings? settings)
             : base(contentKey, content, settingsKey, settings)
         {

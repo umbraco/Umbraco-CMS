@@ -33,6 +33,12 @@ public enum RuntimeLevel
     Upgrade = 3,
 
     /// <summary>
+    ///     The runtime is running an unattended upgrade as a background task.
+    ///     The HTTP server is up and responding to health probes and maintenance-page requests.
+    /// </summary>
+    Upgrading = 4,
+
+    /// <summary>
     ///     The runtime has detected an up-to-date Umbraco install and is running.
     /// </summary>
     Run = 100,

@@ -18,6 +18,9 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 	@property()
 	value = '';
 
+	@property({ type: Boolean, reflect: true })
+	disabled = false;
+
 	@property({ type: Boolean })
 	hidePartialViews = false;
 
@@ -127,6 +130,7 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 			<uui-button-group>
 				<uui-button
 					look="secondary"
+					?disabled=${this.disabled}
 					@click=${this.#openTemplatingItemPickerModal}
 					label=${this.localize.term('template_insert')}>
 					<uui-icon name="icon-add"></uui-icon>${this.localize.term('template_insert')}
@@ -134,6 +138,7 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 				<umb-dropdown
 					look="secondary"
 					compact
+					?disabled=${this.disabled}
 					placement="bottom-end"
 					id="insert-button"
 					label=${this.localize.term('template_insert')}>
