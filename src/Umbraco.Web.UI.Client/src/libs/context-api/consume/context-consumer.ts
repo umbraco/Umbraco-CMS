@@ -122,7 +122,7 @@ export class UmbContextConsumer<
 
 	protected async setInstance(instance: ResultType): Promise<void> {
 		this.#instance = instance;
-		this.#setCurrentTarget(instance.getHostElement());
+		this.#setCurrentScope(instance.getHostElement());
 		await this.#callback?.(instance); // Resolve callback first as it might perform something you like completed before resolving the promise, as the promise might be used to determine when things are ready/initiated [NL]
 		this.#resolvePromise();
 	}
@@ -222,7 +222,7 @@ export class UmbContextConsumer<
 			this.#disconnectAC.abort();
 			this.#disconnectAC = undefined;
 		}
-		this.#setupCurrentTarget();
+		this.#setupCurrentScope();
 		this.request();
 	}
 
@@ -232,6 +232,10 @@ export class UmbContextConsumer<
 			this.#requestRaf = undefined;
 		}
 		this.#disconnectAC?.abort();
+
+		this.#dismantleCurrentScope();
+		this.#currentScope = window;
+
 		const abortController = (this.#disconnectAC = new AbortController());
 		Promise.resolve().then(() => {
 			if (!abortController.signal.aborted) {
@@ -253,28 +257,26 @@ export class UmbContextConsumer<
 		this.#promiseOptions = undefined;
 		this.#promiseResolver = undefined;
 		this.#promiseRejecter = undefined;
-
-		this.#dismantleCurrentTarget();
-		this.#currentTarget = window;
 	}
 
-	#currentTarget: EventTarget = window;
-	#setCurrentTarget(target: EventTarget | undefined) {
-		this.#dismantleCurrentTarget();
-		this.#currentTarget = target ?? window;
-		this.#setupCurrentTarget();
+	// The current scope of which is being listened to for context providing/unproviding, this is usually the host element or the provided context's host element. [NL]
+	#currentScope: EventTarget = window;
+	#setCurrentScope(scope: EventTarget | undefined) {
+		this.#dismantleCurrentScope();
+		this.#currentScope = scope ?? window;
+		this.#setupCurrentScope();
 	}
 
-	#setupCurrentTarget() {
-		this.#currentTarget.addEventListener(UMB_CONTEXT_PROVIDE_EVENT_TYPE, this.#onProvide);
+	#setupCurrentScope() {
+		this.#currentScope.addEventListener(UMB_CONTEXT_PROVIDE_EVENT_TYPE, this.#onProvide);
 		// TODO: consider not listening if it does not have a Context....
-		this.#currentTarget.addEventListener(UMB_CONTEXT_UNPROVIDED_EVENT_TYPE, this.#onUnprovided);
+		this.#currentScope.addEventListener(UMB_CONTEXT_UNPROVIDED_EVENT_TYPE, this.#onUnprovided);
 	}
 
-	#dismantleCurrentTarget() {
-		if (this.#currentTarget) {
-			this.#currentTarget.removeEventListener(UMB_CONTEXT_PROVIDE_EVENT_TYPE, this.#onProvide);
-			this.#currentTarget.removeEventListener(UMB_CONTEXT_UNPROVIDED_EVENT_TYPE, this.#onUnprovided);
+	#dismantleCurrentScope() {
+		if (this.#currentScope) {
+			this.#currentScope.removeEventListener(UMB_CONTEXT_PROVIDE_EVENT_TYPE, this.#onProvide);
+			this.#currentScope.removeEventListener(UMB_CONTEXT_UNPROVIDED_EVENT_TYPE, this.#onUnprovided);
 		}
 	}
 
