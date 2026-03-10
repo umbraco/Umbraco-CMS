@@ -2,7 +2,7 @@ import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/accepta
 import {expect} from '@playwright/test';
 
 const elementName = 'TestElementForRecycleBin';
-const elementFolderName = 'TestElementFolderForRecycleBin5';
+const elementFolderName = 'TestElementFolderForRecycleBin';
 const elementTypeName = 'TestElementTypeForRecycleBin';
 const dataTypeName = 'Textstring';
 let elementTypeId = '';
@@ -58,8 +58,8 @@ test('can trash an element folder with children', async ({umbracoApi, umbracoUi}
   await umbracoUi.library.isElementInTreeVisible(elementFolderName, false);
 });
 
-// Currently it returns an error when trying to empty the recycle bin
-test.fixme('can empty recycle bin', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+// Currently this test fails due to the issue: an 500 error is thrown when trying to empty the recycle bin 
+test('can empty recycle bin', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const elementId = await umbracoApi.element.createDefaultElement(elementName, elementTypeId);
   await umbracoApi.element.moveToRecycleBin(elementId);
@@ -100,6 +100,7 @@ test('can see trashed element folder in recycle bin', async ({umbracoApi, umbrac
   await umbracoUi.library.isItemVisibleInRecycleBin(elementFolderName);
 });
 
+// Currently this test fails due to the issue: an 500 error is thrown when performance this action
 test('can delete element from recycle bin', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const elementId = await umbracoApi.element.createDefaultElement(elementName, elementTypeId);
@@ -116,6 +117,7 @@ test('can delete element from recycle bin', async ({umbracoApi, umbracoUi}) => {
   expect(await umbracoApi.element.doesItemExistInRecycleBin(elementName)).toBeFalsy();
 });
 
+// Currently this test fails due to the issue: an 500 error is thrown when performance this action
 test('can delete element folder from recycle bin', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const elementFolderId = await umbracoApi.element.createDefaultElementFolder(elementFolderName);
@@ -132,6 +134,7 @@ test('can delete element folder from recycle bin', async ({umbracoApi, umbracoUi
   expect(await umbracoApi.element.doesItemExistInRecycleBin(elementFolderName)).toBeFalsy();
 });
 
+// Currently this test fails due to the issue: an 500 error is thrown when performance this action
 test('can delete element folder with children from recycle bin', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const folderId = await umbracoApi.element.createDefaultElementFolder(elementFolderName);
@@ -150,6 +153,7 @@ test('can delete element folder with children from recycle bin', async ({umbraco
   expect(await umbracoApi.element.doesNameExist(elementName)).toBeFalsy();
 });
 
+// Currently this test fails due to the issue: an 500 error is thrown when performance this action
 test('can delete child element from recycle bin', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const folderId = await umbracoApi.element.createDefaultElementFolder(elementFolderName);
@@ -211,6 +215,7 @@ test('can restore element folder from recycle bin', async ({umbracoApi, umbracoU
   await umbracoUi.library.isElementInTreeVisible(elementFolderName);
 });
 
+// Currently this test fails due to the wrong restore message being shown
 test('can restore child element from recycle bin back to its parent folder', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const folderId = await umbracoApi.element.createDefaultElementFolder(elementFolderName);
