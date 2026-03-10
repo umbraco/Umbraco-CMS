@@ -19,7 +19,7 @@ import {
 import { firstValueFrom, map } from '@umbraco-cms/backoffice/external/rxjs';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
-import { UmbDataTypeDetailRepository, UmbDataTypeItemRepositoryManager } from '@umbraco-cms/backoffice/data-type';
+import { UmbDataTypeItemRepositoryManager } from '@umbraco-cms/backoffice/data-type';
 import { UmbReadOnlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
 import { UmbEntityDetailWorkspaceContextBase, UmbWorkspaceSplitViewManager } from '@umbraco-cms/backoffice/workspace';
 import {
@@ -435,18 +435,15 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			this._segments.setValue([]);
 		}
 
-		const repo = new UmbDataTypeDetailRepository(this);
-
 		const propertyTypes = await this.structure.getContentTypeProperties();
 		const contentTypeVariesByCulture = this.structure.getVariesByCulture();
 		const contentTypeVariesBySegment = this.structure.getVariesBySegment();
 		const valueDefinitions = await Promise.all(
 			propertyTypes.map(async (property) => {
-				const dataType = (await repo.requestByUnique(property.dataType.unique)).data;
-				// This means if its not loaded this will never resolve and the error below will never happen.
-				if (!dataType) {
-					throw new Error(`DataType of "${property.dataType.unique}" not found.`);
-				}
+				// Use the structure manager's bulk-loaded data type details instead of individual requests.
+				const dataType = await this.observe(
+					this.structure.contentTypeDataTypeDetailOf(property.dataType.unique),
+				).asPromise();
 				if (!dataType.editorUiAlias) {
 					throw new Error(`DataType of "${property.dataType.unique}" did not have a editorUiAlias.`);
 				}
