@@ -253,6 +253,14 @@ export class UmbAppElement extends UmbLitElement {
 				history.replaceState(null, '', 'upgrade');
 				break;
 
+			case RuntimeLevelModel.UPGRADING:
+				this.#errorPage(
+					'An automatic upgrade is currently in progress. The backoffice will be available once the upgrade has completed.',
+					undefined,
+					{ headline: 'Website is Under Maintenance', hideBackButton: true },
+				);
+				break;
+
 			case RuntimeLevelModel.BOOT_FAILED:
 				this.#errorPage('The Umbraco server failed to boot');
 				break;
@@ -280,7 +288,7 @@ export class UmbAppElement extends UmbLitElement {
 		return () => this.#authController.isAuthorized() ?? false;
 	}
 
-	#errorPage(errorMsg: string, error?: unknown) {
+	#errorPage(errorMsg: string, error?: unknown, options?: { headline?: string; hideBackButton?: boolean }) {
 		// Redirect to the error page
 		this._routes = [
 			{
@@ -289,6 +297,8 @@ export class UmbAppElement extends UmbLitElement {
 				setup: (component) => {
 					(component as UmbAppErrorElement).errorMessage = errorMsg;
 					(component as UmbAppErrorElement).error = error;
+					if (options?.headline) (component as UmbAppErrorElement).errorHeadline = options.headline;
+					if (options?.hideBackButton) (component as UmbAppErrorElement).hideBackButton = true;
 				},
 			},
 		];
