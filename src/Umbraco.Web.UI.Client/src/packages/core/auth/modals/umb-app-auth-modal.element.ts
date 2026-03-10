@@ -16,7 +16,7 @@ export class UmbAppAuthModalElement extends UmbModalBaseElement<UmbModalAppAuthC
 		super.connectedCallback();
 		// Close this modal when another tab restores the session via BroadcastChannel.
 		this.consumeContext(UMB_AUTH_CONTEXT, (ctx) => {
-			this.observe(ctx.isAuthorized, (isAuthorized) => {
+			this.observe(ctx?.isAuthorized, (isAuthorized) => {
 				if (isAuthorized) this.#onSuccess();
 			});
 		});
