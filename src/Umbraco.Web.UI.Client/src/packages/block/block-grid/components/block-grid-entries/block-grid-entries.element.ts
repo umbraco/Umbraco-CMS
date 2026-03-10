@@ -400,9 +400,9 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 			<div class="umb-block-grid__layout-container" data-area-length=${this._layoutEntries.length}>
 				${repeat(
 					this._layoutEntries,
-					(layout, index) => `${index}_${layout.contentKey}`,
-					(layout, index) => html`
-						<umb-block-grid-entry
+					(layout) => layout.contentKey,
+					(layout, index) =>
+						html`<umb-block-grid-entry
 							class="umb-block-grid__layout-item"
 							index=${index}
 							.contentKey=${layout.contentKey}
@@ -487,7 +487,8 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 				label=${this.localize.term('content_createFromClipboard')}
 				look="placeholder"
 				href=${this.#context.getPathForClipboard(-1) ?? ''}
-				?disabled=${this._isReadOnly}>
+				?disabled=${this._isReadOnly}
+				title=${this.localize.term('general_clipboard')}>
 				<uui-icon name="icon-clipboard-paste"></uui-icon>
 			</uui-button>
 		`;
