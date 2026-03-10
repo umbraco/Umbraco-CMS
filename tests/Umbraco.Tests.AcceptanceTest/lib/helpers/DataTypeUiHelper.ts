@@ -441,7 +441,7 @@ export class DataTypeUiHelper extends UiBaseLocators {
   }
 
   async addMediaStartNode(mediaName: string) {
-    await this.click(this.mediaCardItems.filter({hasText: mediaName}));
+    await this.selectMediaWithName(mediaName);
     await this.clickChooseModalButton();
   }
 
@@ -731,6 +731,11 @@ export class DataTypeUiHelper extends UiBaseLocators {
     await this.clickChooseWithPlusButton();
     await this.selectMediaWithName(mediaFolderName);
     await this.clickChooseModalButton();
+  }
+
+  async removeImageUploadFolder(mediaFolderName: string) {
+    await this.click(this.page.locator(`uui-card-media[name="${mediaFolderName}"]`).locator('[label="Remove"]'));
+    await this.click(this.confirmToRemoveBtn);
   }
 
   async clickAddWithPlusButton() {

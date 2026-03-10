@@ -8,6 +8,7 @@ using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services.AuthorizationStatus;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
@@ -229,10 +230,26 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
         return Attempt.Succeed(UserGroupOperationStatus.Success);
     }
 
+    // TODO (V19): Collapse the following three methods into a single one, once the obsolete overload
+    // of UpdateUserGroupsOnUsersAsync is removed from the interface.
+
     /// <inheritdoc />
-    public async Task<Attempt<UserGroupOperationStatus>> UpdateUserGroupsOnUsersAsync(
+    public Task<Attempt<UserGroupOperationStatus>> UpdateUserGroupsOnUsersAsync(
         ISet<Guid> userGroupKeys,
         ISet<Guid> userKeys)
+        => UpdateUserGroupsOnUsersInternalAsync(userGroupKeys, userKeys, performingUserKey: null);
+
+    /// <inheritdoc />
+    public Task<Attempt<UserGroupOperationStatus>> UpdateUserGroupsOnUsersAsync(
+        ISet<Guid> userGroupKeys,
+        ISet<Guid> userKeys,
+        Guid performingUserKey)
+        => UpdateUserGroupsOnUsersInternalAsync(userGroupKeys, userKeys, performingUserKey);
+
+    private async Task<Attempt<UserGroupOperationStatus>> UpdateUserGroupsOnUsersInternalAsync(
+        ISet<Guid> userGroupKeys,
+        ISet<Guid> userKeys,
+        Guid? performingUserKey)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
@@ -241,6 +258,40 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
         IReadOnlyUserGroup[] userGroups = (await GetAsync(userGroupKeys))
             .Select(x => x.ToReadOnlyGroup())
             .ToArray();
+
+        // Authorize the performing user if provided.
+        if (performingUserKey.HasValue)
+        {
+            IUser? performingUser = await _userService.GetAsync(performingUserKey.Value);
+            if (performingUser is null)
+            {
+                scope.Complete();
+                return Attempt.Fail(UserGroupOperationStatus.MissingUser);
+            }
+
+            if (performingUser.IsAdmin() is false)
+            {
+                string[] performingUserGroupAliases = performingUser.Groups.Select(g => g.Alias).ToArray();
+                string[] requestedGroupAliases = userGroups.Select(g => g.Alias).ToArray();
+
+                foreach (IUser user in users)
+                {
+                    IEnumerable<string> existingGroupAliases = user.Groups.Select(g => g.Alias);
+
+                    IReadOnlyList<string> unauthorized = UserGroupAssignmentAuthorization
+                        .GetUnauthorizedGroupAssignments(performingUserGroupAliases, requestedGroupAliases, existingGroupAliases);
+
+                    if (unauthorized.Count > 0)
+                    {
+                        _logger.LogInformation(
+                            "The performing user is not allowed to assign user group(s) '{GroupAliases}' because they do not belong to them.",
+                            string.Join(", ", unauthorized));
+                        scope.Complete();
+                        return Attempt.Fail(UserGroupOperationStatus.Unauthorized);
+                    }
+                }
+            }
+        }
 
         // This means that we're potentially de-admining a user, which might cause the admin group to be empty.
         if (userGroupKeys.Contains(Constants.Security.AdminGroupKey) is false)
