@@ -6,7 +6,7 @@ import type { UmbOpenApiConfiguration } from './models/openApiConfiguration.js';
 import type { ManifestAuthProvider } from './auth-provider.extension.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
-import { UmbApiInterceptorController } from '@umbraco-cms/backoffice/resources';
+import { UmbApiInterceptorController, UMB_AUTH_SIGNALER_CONTEXT } from '@umbraco-cms/backoffice/resources';
 import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import {
 	ReplaySubject,
@@ -196,6 +196,15 @@ export class UmbAuthContext extends UmbContextBase {
 			// Start the session timeout controller
 			new UmbAuthSessionTimeoutController(this);
 		}
+
+		// When an HTTP interceptor is active it registers an UmbAuthSignalerContext on the host.
+		// Consume it to keep authorization state in sync and to react to timeout requests.
+		this.consumeContext(UMB_AUTH_SIGNALER_CONTEXT, (signaler) => {
+			// Keep the signaler's authorization state in sync with ours
+			this.observe(this.isAuthorized, (isAuthorized) => signaler?.setAuthorized(isAuthorized ?? false));
+			// React to timeout requests from the interceptor
+			this.observe(signaler?.timeoutRequest, () => this.timeOut());
+		});
 	}
 
 	override destroy(): void {
