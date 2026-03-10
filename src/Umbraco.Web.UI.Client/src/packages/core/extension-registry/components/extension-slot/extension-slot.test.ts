@@ -159,4 +159,105 @@ describe('UmbExtensionSlotElement', () => {
 			expect(element.shadowRoot!.childElementCount).to.be.equal(1);
 		});
 	});
+
+	describe('deferred destruction pattern', () => {
+		beforeEach(async () => {
+			umbExtensionsRegistry.register({
+				type: 'dashboard',
+				alias: 'unit-test-ext-slot-deferred-manifest',
+				name: 'unit-test-deferred-extension',
+				elementName: 'umb-test-extension-slot-manifest-element',
+				weight: 200,
+				meta: {
+					pathname: 'test/test',
+				},
+			});
+		});
+
+		afterEach(async () => {
+			umbExtensionsRegistry.unregister('unit-test-ext-slot-deferred-manifest');
+		});
+
+		it('preserves extension when moved in DOM (simulating drag-and-drop)', async () => {
+			const container = await fixture(html`<div></div>`) as HTMLDivElement;
+			element = document.createElement('umb-extension-slot') as UmbExtensionSlotElement;
+			element.type = 'dashboard';
+			element.filter = (x: ManifestDashboard) => x.alias === 'unit-test-ext-slot-deferred-manifest';
+
+			container.appendChild(element);
+			await sleep(20);
+
+			// Get reference to the rendered extension element
+			const originalExtensionElement = element.shadowRoot!.firstElementChild;
+			expect(originalExtensionElement).to.be.instanceOf(UmbTestExtensionSlotManifestElement);
+
+			// Simulate DOM move: remove and immediately re-add (like during sorting)
+			container.removeChild(element);
+			container.appendChild(element);
+
+			// Wait for the deferred timeout to pass
+			await sleep(20);
+
+			// Extension should still exist and be the same instance (not recreated)
+			const extensionAfterMove = element.shadowRoot!.firstElementChild;
+			expect(extensionAfterMove).to.be.instanceOf(UmbTestExtensionSlotManifestElement);
+			expect(extensionAfterMove).to.equal(originalExtensionElement);
+		});
+
+		it('properly destroys and reinitializes extension after permanent removal', async () => {
+			const container = await fixture(html`<div></div>`) as HTMLDivElement;
+			element = document.createElement('umb-extension-slot') as UmbExtensionSlotElement;
+			element.type = 'dashboard';
+			element.filter = (x: ManifestDashboard) => x.alias === 'unit-test-ext-slot-deferred-manifest';
+
+			container.appendChild(element);
+			await sleep(20);
+
+			// Verify extension is rendered
+			const originalExtensionElement = element.shadowRoot!.firstElementChild;
+			expect(originalExtensionElement).to.be.instanceOf(UmbTestExtensionSlotManifestElement);
+
+			// Permanently remove from DOM
+			container.removeChild(element);
+
+			// Wait for deferred destruction to complete (controller should be destroyed)
+			await sleep(20);
+
+			// Re-add the element to DOM - it should reinitialize with a fresh controller
+			container.appendChild(element);
+			await sleep(20);
+
+			// Extension should be a NEW instance (not the same as before destruction)
+			const newExtensionElement = element.shadowRoot!.firstElementChild;
+			expect(newExtensionElement).to.be.instanceOf(UmbTestExtensionSlotManifestElement);
+			expect(newExtensionElement).to.not.equal(originalExtensionElement);
+		});
+
+		it('cancels pending destruction timeout when reconnected', async () => {
+			const container = await fixture(html`<div></div>`) as HTMLDivElement;
+			element = document.createElement('umb-extension-slot') as UmbExtensionSlotElement;
+			element.type = 'dashboard';
+			element.filter = (x: ManifestDashboard) => x.alias === 'unit-test-ext-slot-deferred-manifest';
+
+			container.appendChild(element);
+			await sleep(20);
+
+			const originalExtensionElement = element.shadowRoot!.firstElementChild;
+			expect(originalExtensionElement).to.be.instanceOf(UmbTestExtensionSlotManifestElement);
+
+			// Disconnect (starts destruction timeout)
+			container.removeChild(element);
+
+			// Immediately reconnect (should cancel the destruction timeout)
+			container.appendChild(element);
+
+			// Wait longer than the timeout would need
+			await sleep(20);
+
+			// Extension should still exist and be the same instance
+			const extensionAfterReconnect = element.shadowRoot!.firstElementChild;
+			expect(extensionAfterReconnect).to.be.instanceOf(UmbTestExtensionSlotManifestElement);
+			expect(extensionAfterReconnect).to.equal(originalExtensionElement);
+		});
+	});
 });

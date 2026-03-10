@@ -236,8 +236,8 @@ describe('UmbEntityCollectionItemElementBase', () => {
 			const context = await component.getContext(UMB_ENTITY_CONTEXT);
 
 			// The inner context should reflect the item, not the outer ancestor.
-			expect(context.getEntityType()).to.equal('inner-entity');
-			expect(context.getUnique()).to.equal('inner-unique');
+			expect(context?.getEntityType()).to.equal('inner-entity');
+			expect(context?.getUnique()).to.equal('inner-unique');
 		});
 	});
 
