@@ -7,7 +7,7 @@ import type { ManifestCollectionFilter } from '../collection-filter.extension.js
 
 export class UmbDefaultCollectionSelectFilterApi extends UmbControllerBase implements UmbCollectionFilterApi {
 	#selection = new UmbArrayState<string>([], (x) => x);
-	public readonly selection = this.#selection.asObservable();
+	public readonly value = this.#selection.asObservable();
 
 	#collectionContext?: typeof UMB_COLLECTION_CONTEXT.TYPE;
 
@@ -31,7 +31,7 @@ export class UmbDefaultCollectionSelectFilterApi extends UmbControllerBase imple
 		});
 	}
 
-	public setSelection(values: Array<string>) {
+	public setValue(values: Array<string>) {
 		this.#selection.setValue(values);
 		const filterKey = this.manifest?.meta?.filterKey;
 		if (filterKey) {
