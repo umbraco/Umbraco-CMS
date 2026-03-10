@@ -2,12 +2,10 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Extensions;
 
@@ -21,7 +19,6 @@ public abstract class UmbracoSignInManager<TUser> : SignInManager<TUser>
     where TUser : UmbracoIdentityUser
 {
     private readonly IRequestCache _requestCache;
-    private SecuritySettings _securitySettings;
 
     // borrowed from https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Core/src/SignInManager.cs
     protected const string UmbracoSignInMgrLoginProviderKey = "LoginProvider";
@@ -42,8 +39,15 @@ public abstract class UmbracoSignInManager<TUser> : SignInManager<TUser>
         : base(userManager, contextAccessor, claimsFactory, optionsAccessor, logger, schemes, confirmation)
     {
         _requestCache = requestCache;
-        _securitySettings = securitySettingsOptions.Value;
+        SecuritySettings = securitySettingsOptions.Value;
     }
+
+    /// <summary>
+    /// Gets the <see cref="SecuritySettings"/>.
+    /// </summary>
+    protected SecuritySettings SecuritySettings { get; }
+
+    protected virtual bool AllowConcurrentLoginsEnabled => SecuritySettings.AllowConcurrentLogins;
 
     protected abstract string AuthenticationType { get; }
 
@@ -360,7 +364,7 @@ public abstract class UmbracoSignInManager<TUser> : SignInManager<TUser>
 
             await UserManager.UpdateAsync(user);
 
-            if (_securitySettings.AllowConcurrentLogins is false)
+            if (AllowConcurrentLoginsEnabled is false)
             {
 
                 if (_requestCache.Get("SecurityStampUpdated") is null)
