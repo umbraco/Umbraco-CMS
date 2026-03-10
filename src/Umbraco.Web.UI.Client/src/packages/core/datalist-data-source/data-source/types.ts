@@ -1,11 +1,11 @@
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbConfigCollectionModel } from '@umbraco-cms/backoffice/utils';
 
-export interface UmbDatalistItemModel {
+export interface UmbDatalistItemModel extends UmbEntityModel {
 	unique: string;
-	entityType: string;
-	name: string;
+	name?: string;
 	icon?: string;
 }
 
