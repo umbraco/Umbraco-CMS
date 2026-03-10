@@ -1,5 +1,6 @@
 export * from './api-interceptor.controller.js';
 export * from './apiTypeValidators.function.js';
+export * from './auth-signaler.context.js';
 export * from './extractUmbColorVariable.function.js';
 export * from './extractUmbNotificationColor.function.js';
 export * from './isUmbNotifications.function.js';
