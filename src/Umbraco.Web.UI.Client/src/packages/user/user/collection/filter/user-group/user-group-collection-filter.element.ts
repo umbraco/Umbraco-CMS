@@ -1,8 +1,9 @@
-import { css, customElement, html, ifDefined, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbUserGroupCollectionFilterApi } from './user-group-collection-filter.api.js';
+import { css, customElement, html, ifDefined, nothing, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 import type { ManifestCollectionFilter, UmbSelectOption } from '@umbraco-cms/backoffice/collection';
-import type { UmbUserGroupCollectionFilterApi } from './user-group-collection-filter.api';
 
 @customElement('umb-user-group-collection-filter')
 export class UmbUserGroupCollectionFilterElement extends UmbLitElement {
@@ -14,6 +15,12 @@ export class UmbUserGroupCollectionFilterElement extends UmbLitElement {
 	@state()
 	private _value: Array<string> = [];
 
+	@state()
+	private _valueLabels: Map<string, string> = new Map();
+
+	@state()
+	private _hasMore = false;
+
 	private _api?: UmbUserGroupCollectionFilterApi | undefined;
 	public get api(): UmbUserGroupCollectionFilterApi | undefined {
 		return this._api;
@@ -21,7 +28,36 @@ export class UmbUserGroupCollectionFilterElement extends UmbLitElement {
 	public set api(api: UmbUserGroupCollectionFilterApi | undefined) {
 		this._api = api;
 		this.observe(api?.options, (options) => (this._options = options ?? []));
-		this.observe(api?.value, (value) => (this._value = value ?? []));
+		this.observe(api?.value, (value) => {
+			this._value = value ?? [];
+			this.#resolveValueLabels();
+		});
+
+		if (api) {
+			this.observe(
+				observeMultiple([api.pagination.currentPage, api.pagination.totalPages]),
+				([currentPage, totalPages]) => (this._hasMore = currentPage < totalPages),
+			);
+		}
+
+		this._api?.loadOptions();
+	}
+
+	async #resolveValueLabels() {
+		if (!this._api || this._value.length === 0) {
+			this._valueLabels = new Map();
+			return;
+		}
+
+		const unresolvedUniques = this._value.filter((unique) => !this._valueLabels.has(unique));
+		if (unresolvedUniques.length === 0) return;
+
+		const items = await this._api.requestItems(unresolvedUniques);
+		const updatedLabels = new Map(this._valueLabels);
+		for (const item of items) {
+			updatedLabels.set(item.unique, item.name ?? item.unique);
+		}
+		this._valueLabels = updatedLabels;
 	}
 
 	#onChange(event: Event) {
@@ -40,16 +76,16 @@ export class UmbUserGroupCollectionFilterElement extends UmbLitElement {
 		this._api?.setValue(value);
 	}
 
+	#onLoadMore() {
+		this._api?.loadMoreOptions();
+	}
+
 	#getUserGroupFilterLabel() {
 		const length = this._value.length;
 		const max = 2;
-		//TODO: Temp solution to limit the amount of states shown
-		return length === 0
-			? this.localize.term('general_all')
-			: this._value
-					.slice(0, max)
-					.map((group) => group)
-					.join(', ') + (length > max ? ' + ' + (length - max) : '');
+		if (length === 0) return this.localize.term('general_all');
+		const labels = this._value.slice(0, max).map((unique) => this._valueLabels.get(unique) ?? unique);
+		return labels.join(', ') + (length > max ? ' + ' + (length - max) : '');
 	}
 
 	protected override render() {
@@ -72,6 +108,11 @@ export class UmbUserGroupCollectionFilterElement extends UmbLitElement {
 										@change=${this.#onChange}></uui-checkbox>
 								`,
 							)}
+							${this._hasMore
+								? html`<uui-button label=${this.localize.term('general_loadMore')} @click=${this.#onLoadMore} compact>
+										${this.localize.term('general_loadMore')}
+									</uui-button>`
+								: nothing}
 						</div>
 					</umb-popover-layout>
 				</uui-popover-container>
