@@ -32,6 +32,8 @@ public class GetDocumentPermissionsCurrentUserController : CurrentUserController
     [HttpGet("permissions/document")]
     [ProducesResponseType(typeof(IEnumerable<UserPermissionsResponseModel>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Gets document permissions for the current user.")]
+    [EndpointDescription("Gets the document permissions for the currently authenticated user.")]
     public async Task<IActionResult> GetPermissions(
         CancellationToken cancellationToken,
         [FromQuery(Name = "id")] HashSet<Guid> ids)

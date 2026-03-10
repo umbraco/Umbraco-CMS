@@ -182,9 +182,17 @@ export class UmbBlockGridEntriesContext
 				const config = propertyContext.getConfig() as UmbBlockGridPropertyEditorConfig;
 				const valueResolver = new UmbClipboardPastePropertyValueTranslatorValueResolver(this);
 
+				const blockTypes = this.#allowedBlockTypes.getValue();
+				/*
+				modal size logic:
+				If more than 8 block types, medium modal, more than 12 large modal:
+				*/
+				const modalSize = blockTypes.length > 12 ? 'large' : blockTypes.length > 8 ? 'medium' : 'small';
+
 				return {
+					modal: { size: modalSize },
 					data: {
-						blocks: this.#allowedBlockTypes.getValue(),
+						blocks: blockTypes,
 						blockGroups: this._manager.getBlockGroups() ?? [],
 						openClipboard: routingInfo.view === 'clipboard',
 						clipboardFilter: async (clipboardEntryDetail) => {
@@ -218,6 +226,7 @@ export class UmbBlockGridEntriesContext
 							areaKey: this.#areaKey,
 							parentUnique: this.#parentUnique,
 						} as UmbBlockGridWorkspaceOriginData,
+						// TODO: Check if we use this for anything. I think its not possible to configure inline editing for block grid? [NL]
 						createBlockInWorkspace: this._manager.getInlineEditingMode() === false,
 					},
 				};
@@ -432,7 +441,23 @@ export class UmbBlockGridEntriesContext
 	}
 
 	getPathForCreateBlock(index: number) {
-		return this._catalogueRouteBuilderState.getValue()?.({ view: 'create', index: index });
+		const pathBuilder = this._catalogueRouteBuilderState.getValue();
+		if (!pathBuilder) return undefined;
+
+		const blockTypes = this.#allowedBlockTypes.getValue();
+		if (blockTypes?.length === 1) {
+			const elementKey = blockTypes[0].contentElementTypeKey;
+
+			if (!this._manager) return undefined;
+			// does the Block have any Content properties?
+			const contentTypeKey = this._manager.getContentTypeKeyOfContentKey(elementKey);
+			if (contentTypeKey && this._manager.getContentTypeHasProperties(contentTypeKey) === false) {
+				return undefined;
+			}
+			return pathBuilder({ view: 'create', index: index }) + 'modal/umb-modal-workspace/create/' + elementKey;
+		}
+
+		return pathBuilder({ view: 'create', index: index });
 	}
 
 	getPathForClipboard(index: number) {
@@ -613,6 +638,10 @@ export class UmbBlockGridEntriesContext
 
 		this.#invalidBlockTypeLimits = areaType.specifiedAllowance
 			.map((rule) => {
+				if (!this._manager) {
+					// There is no manager at this point so we cannot validate, this is properly in a very early or a deconstruction phase.
+					return undefined;
+				}
 				const minAllowed = rule.minAllowed || 0;
 				const maxAllowed = rule.maxAllowed || 0;
 
@@ -620,7 +649,7 @@ export class UmbBlockGridEntriesContext
 				if (rule.groupKey) {
 					const groupElementTypeKeys =
 						this._manager
-							?.getBlockTypes()
+							.getBlockTypes()
 							.filter((blockType) => blockType.groupKey === rule.groupKey && blockType.allowInAreas === true)
 							.map((x) => x.contentElementTypeKey) ?? [];
 					const groupAmount = layoutEntries.filter((entry) => {
@@ -631,7 +660,7 @@ export class UmbBlockGridEntriesContext
 					if (groupAmount < minAllowed || (maxAllowed > 0 && groupAmount > maxAllowed)) {
 						return {
 							groupKey: rule.groupKey,
-							name: this._manager!.getBlockGroupName(rule.groupKey) ?? '?',
+							name: this._manager.getBlockGroupName(rule.groupKey) ?? '?',
 							amount: groupAmount,
 							minRequirement: minAllowed,
 							maxRequirement: maxAllowed,
@@ -648,7 +677,7 @@ export class UmbBlockGridEntriesContext
 					if (amount < minAllowed || (maxAllowed > 0 ? amount > maxAllowed : false)) {
 						return {
 							key: rule.elementTypeKey,
-							name: this._manager!.getContentTypeNameOf(rule.elementTypeKey) ?? '?',
+							name: this._manager.getContentTypeNameOf(rule.elementTypeKey) ?? '?',
 							amount: amount,
 							minRequirement: minAllowed,
 							maxRequirement: maxAllowed,

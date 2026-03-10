@@ -3,6 +3,7 @@ import { UMB_DOCUMENT_PICKER_MODAL, UMB_DOCUMENT_SEARCH_PROVIDER_ALIAS } from '.
 import type { UmbDocumentItemModel } from '../../item/types.js';
 import { UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS } from '../../item/constants.js';
 import type { UmbDocumentTreeItemModel } from '../../tree/types.js';
+import { isDocumentTreeItem } from '../../tree/utils.js';
 import { UmbDocumentItemDataResolver } from '../../item/index.js';
 import { UmbPickerInputContext } from '@umbraco-cms/backoffice/picker-input';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -32,8 +33,11 @@ export class UmbDocumentPickerInputContext extends UmbPickerInputContext<
 			...pickerData,
 		};
 
-		// transform allowedContentTypes to a pickable filter
-		combinedPickerData.pickableFilter = (item) => this.#pickableFilter(item, args?.allowedContentTypes);
+		// combine internal allowedContentTypes filter with user-supplied pickableFilter
+		combinedPickerData.pickableFilter = this._combinePickableFilters(
+			(item) => this.#pickableFilter(item, args?.allowedContentTypes),
+			pickerData?.pickableFilter,
+		);
 
 		// set default search data
 		if (!pickerData?.search) {
@@ -67,9 +71,13 @@ export class UmbDocumentPickerInputContext extends UmbPickerInputContext<
 	}
 
 	#pickableFilter = (
-		item: UmbDocumentItemModel,
+		item: UmbDocumentItemModel | UmbDocumentTreeItemModel,
 		allowedContentTypes?: Array<{ unique: string; entityType: UmbDocumentTypeEntityType }>,
 	): boolean => {
+		// Check if the user has no access to this item (tree items only)
+		if (isDocumentTreeItem(item) && item.noAccess) {
+			return false;
+		}
 		if (allowedContentTypes && allowedContentTypes.length > 0) {
 			return allowedContentTypes
 				.map((contentTypeReference) => contentTypeReference.unique)

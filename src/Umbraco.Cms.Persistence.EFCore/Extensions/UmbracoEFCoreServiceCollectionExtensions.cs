@@ -10,8 +10,17 @@ using Umbraco.Cms.Persistence.EFCore.Scoping;
 
 namespace Umbraco.Extensions;
 
+/// <summary>
+/// Provides extension methods for registering EF Core services with Umbraco.
+/// </summary>
 public static class UmbracoEFCoreServiceCollectionExtensions
 {
+    /// <summary>
+    /// Delegate for configuring EF Core options with provider information.
+    /// </summary>
+    /// <param name="options">The DbContext options builder.</param>
+    /// <param name="providerName">The database provider name.</param>
+    /// <param name="connectionString">The connection string.</param>
     public delegate void DefaultEFCoreOptionsAction(DbContextOptionsBuilder options, string? providerName, string? connectionString);
 
     /// <summary>
@@ -75,10 +84,10 @@ public static class UmbracoEFCoreServiceCollectionExtensions
     /// <summary>
     /// Sets the database provider. I.E UseSqlite or UseSqlServer based on the provider name.
     /// </summary>
-    /// <param name="builder"></param>
-    /// <param name="providerName"></param>
-    /// <param name="connectionString"></param>
-    /// <exception cref="InvalidDataException"></exception>
+    /// <param name="builder">The DbContext options builder.</param>
+    /// <param name="providerName">The database provider name.</param>
+    /// <param name="connectionString">The connection string.</param>
+    /// <exception cref="InvalidDataException">Thrown when the provider is not supported.</exception>
     /// <remarks>
     /// Only supports the databases normally supported in Umbraco.
     /// </remarks>
@@ -101,8 +110,8 @@ public static class UmbracoEFCoreServiceCollectionExtensions
     /// <summary>
     /// Sets the database provider to use based on the Umbraco connection string.
     /// </summary>
-    /// <param name="builder"></param>
-    /// <param name="serviceProvider"></param>
+    /// <param name="builder">The DbContext options builder.</param>
+    /// <param name="serviceProvider">The service provider to resolve connection string settings from.</param>
     public static void UseUmbracoDatabaseProvider(this DbContextOptionsBuilder builder, IServiceProvider serviceProvider)
     {
         ConnectionStrings connectionStrings = serviceProvider.GetRequiredService<IOptionsMonitor<ConnectionStrings>>().CurrentValue;

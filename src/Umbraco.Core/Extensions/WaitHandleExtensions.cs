@@ -3,12 +3,21 @@
 
 namespace Umbraco.Extensions;
 
+/// <summary>
+/// Provides extension methods for <see cref="WaitHandle"/>.
+/// </summary>
 public static class WaitHandleExtensions
 {
-    // http://stackoverflow.com/questions/25382583/waiting-on-a-named-semaphore-with-waitone100-vs-waitone0-task-delay100
-    // http://blog.nerdbank.net/2011/07/c-await-for-waithandle.html
-    // F# has a AwaitWaitHandle method that accepts a time out... and seems pretty complex...
-    // version below should be OK
+    /// <summary>
+    /// Asynchronously waits for the wait handle to be signaled.
+    /// </summary>
+    /// <param name="handle">The wait handle to wait on.</param>
+    /// <param name="millisecondsTimeout">The timeout in milliseconds. Defaults to <see cref="Timeout.Infinite"/>.</param>
+    /// <returns>A task that completes when the wait handle is signaled or the timeout elapses.</returns>
+    /// <remarks>
+    /// Based on http://stackoverflow.com/questions/25382583/waiting-on-a-named-semaphore-with-waitone100-vs-waitone0-task-delay100
+    /// and http://blog.nerdbank.net/2011/07/c-await-for-waithandle.html.
+    /// </remarks>
     public static Task WaitOneAsync(this WaitHandle handle, int millisecondsTimeout = Timeout.Infinite)
     {
         var tcs = new TaskCompletionSource<object?>();

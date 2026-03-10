@@ -6,13 +6,32 @@ using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Notifications;
 
+/// <summary>
+///     Notification published before public access entries are saved.
+/// </summary>
+/// <remarks>
+///     This notification is cancelable, allowing handlers to prevent the save operation
+///     by setting <see cref="ICancelableNotification.Cancel"/> to <c>true</c>.
+/// </remarks>
 public sealed class PublicAccessEntrySavingNotification : SavingNotification<PublicAccessEntry>
 {
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="PublicAccessEntrySavingNotification"/> class
+    ///     with a single entry.
+    /// </summary>
+    /// <param name="target">The public access entry being saved.</param>
+    /// <param name="messages">The event messages collection.</param>
     public PublicAccessEntrySavingNotification(PublicAccessEntry target, EventMessages messages)
         : base(target, messages)
     {
     }
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="PublicAccessEntrySavingNotification"/> class
+    ///     with multiple entries.
+    /// </summary>
+    /// <param name="target">The public access entries being saved.</param>
+    /// <param name="messages">The event messages collection.</param>
     public PublicAccessEntrySavingNotification(IEnumerable<PublicAccessEntry> target, EventMessages messages)
         : base(target, messages)
     {

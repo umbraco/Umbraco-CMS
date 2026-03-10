@@ -161,8 +161,8 @@ public class MemberPasswordHasher : UmbracoPasswordHasher<MemberIdentityUser>
     private static string DecryptLegacyPassword(string encryptedPassword, SymmetricAlgorithm algorithm)
     {
         using var memoryStream = new MemoryStream();
-        ICryptoTransform cryptoTransform = algorithm.CreateDecryptor();
-        var cryptoStream = new CryptoStream(memoryStream, cryptoTransform, CryptoStreamMode.Write);
+        using ICryptoTransform cryptoTransform = algorithm.CreateDecryptor();
+        using var cryptoStream = new CryptoStream(memoryStream, cryptoTransform, CryptoStreamMode.Write);
         var buf = Convert.FromBase64String(encryptedPassword);
         cryptoStream.Write(buf, 0, 32);
         cryptoStream.FlushFinalBlock();

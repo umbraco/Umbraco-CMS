@@ -18,6 +18,7 @@ export interface UmbTableItem {
 	icon?: string | null;
 	entityType?: string;
 	data: Array<UmbTableItemData>;
+	selectable?: boolean;
 }
 
 export interface UmbTableItemData {
@@ -33,6 +34,7 @@ export interface UmbTableColumn {
 	allowSorting?: boolean;
 	align?: 'left' | 'center' | 'right';
 	labelTemplate?: string;
+	clipText?: boolean;
 }
 
 export interface UmbTableColumnLayoutElement extends HTMLElement {
@@ -43,18 +45,34 @@ export interface UmbTableColumnLayoutElement extends HTMLElement {
 
 export interface UmbTableConfig {
 	allowSelection: boolean;
+	selectOnly?: boolean;
+	allowSelectAll?: boolean;
 	hideIcon?: boolean;
 }
 
 export class UmbTableSelectedEvent extends Event {
-	public constructor() {
+	#itemId: string | undefined;
+
+	public constructor(args?: { itemId?: string }) {
 		super('selected', { bubbles: true, composed: true });
+		this.#itemId = args?.itemId;
+	}
+
+	public getItemId() {
+		return this.#itemId;
 	}
 }
 
 export class UmbTableDeselectedEvent extends Event {
-	public constructor() {
+	#itemId: string | undefined;
+
+	public constructor(args?: { itemId: string }) {
 		super('deselected', { bubbles: true, composed: true });
+		this.#itemId = args?.itemId;
+	}
+
+	public getItemId() {
+		return this.#itemId;
 	}
 }
 
@@ -118,6 +136,7 @@ export class UmbTableElement extends UmbLitElement {
 	@property({ type: Object, attribute: false })
 	public config: UmbTableConfig = {
 		allowSelection: false,
+		selectOnly: false,
 		hideIcon: false,
 	};
 
@@ -193,12 +212,16 @@ export class UmbTableElement extends UmbLitElement {
 		return this.selection.includes(key);
 	}
 
+	#isSelectableItem(item: UmbTableItem) {
+		return item.selectable !== false;
+	}
+
 	private _handleRowCheckboxChange(event: Event, item: UmbTableItem) {
 		const checkboxElement = event.target as HTMLInputElement;
 		if (checkboxElement.checked) {
-			this._selectRow(item.id);
+			this._selectRow(item);
 		} else {
-			this._deselectRow(item.id);
+			this._deselectRow(item);
 		}
 	}
 
@@ -218,27 +241,40 @@ export class UmbTableElement extends UmbLitElement {
 	}
 
 	private _selectAllRows() {
-		this.selection = this.items.map((item: UmbTableItem) => item.id);
+		if (this.config.allowSelectAll === false) {
+			throw new Error('Select all is not allowed in the current table configuration.');
+		}
+
+		this.selection = this.items.filter((item) => this.#isSelectableItem(item)).map((item) => item.id);
 		this._selectionMode = true;
 		this.dispatchEvent(new UmbTableSelectedEvent());
 	}
 
 	private _deselectAllRows() {
+		if (this.config.allowSelectAll === false) {
+			throw new Error('Select all is not allowed in the current table configuration.');
+		}
+
 		this.selection = [];
 		this._selectionMode = false;
 		this.dispatchEvent(new UmbTableDeselectedEvent());
 	}
 
-	private _selectRow(key: string) {
-		this.selection = [...this.selection, key];
+	private _selectRow(item: UmbTableItem) {
+		const isSelectble = this.#isSelectableItem(item);
+		if (!isSelectble) {
+			throw new Error(`Item with id ${item.id} is not selectable.`);
+		}
+
+		this.selection = [...this.selection, item.id];
 		this._selectionMode = this.selection.length > 0;
-		this.dispatchEvent(new UmbTableSelectedEvent());
+		this.dispatchEvent(new UmbTableSelectedEvent({ itemId: item.id }));
 	}
 
-	private _deselectRow(key: string) {
-		this.selection = this.selection.filter((selectionKey) => selectionKey !== key);
+	private _deselectRow(item: UmbTableItem) {
+		this.selection = this.selection.filter((selectionKey) => selectionKey !== item.id);
 		this._selectionMode = this.selection.length > 0;
-		this.dispatchEvent(new UmbTableDeselectedEvent());
+		this.dispatchEvent(new UmbTableDeselectedEvent({ itemId: item.id }));
 	}
 
 	override render() {
@@ -281,7 +317,7 @@ export class UmbTableElement extends UmbLitElement {
 		return html`
 			<uui-table-head-cell style="--uui-table-cell-padding: 0; text-align: center;">
 				${when(
-					this.config.allowSelection,
+					this.config.allowSelection && this.config.allowSelectAll !== false,
 					() => html`
 						<uui-checkbox
 							aria-label=${this.localize.term('general_selectAll')}
@@ -295,14 +331,15 @@ export class UmbTableElement extends UmbLitElement {
 	}
 
 	private _renderRow = (item: UmbTableItem) => {
+		const isItemSelectable = this.#isSelectableItem(item);
 		return html`
 			<uui-table-row
 				data-sortable-id=${item.id}
-				?selectable=${this.config.allowSelection && !this._sortable}
-				?select-only=${this._selectionMode}
+				?selectable=${this.config.allowSelection && !this._sortable && isItemSelectable}
+				?select-only=${this._selectionMode || this.config.selectOnly}
 				?selected=${this._isSelected(item.id)}
-				@selected=${() => this._selectRow(item.id)}
-				@deselected=${() => this._deselectRow(item.id)}>
+				@selected=${() => this._selectRow(item)}
+				@deselected=${() => this._deselectRow(item)}>
 				${this._renderRowCheckboxCell(item)} ${this.columns.map((column) => this._renderRowCell(column, item))}
 			</uui-table-row>
 		`;
@@ -319,11 +356,13 @@ export class UmbTableElement extends UmbLitElement {
 
 		if (this.config.hideIcon && !this.config.allowSelection) return;
 
+		const isItemSelectable = this.#isSelectableItem(item);
+
 		return html`
 			<uui-table-cell style="text-align: center;">
 				${when(!this.config.hideIcon, () => html`<umb-icon name="${ifDefined(item.icon ?? undefined)}"></umb-icon>`)}
 				${when(
-					this.config.allowSelection,
+					this.config.allowSelection && isItemSelectable,
 					() => html`
 						<uui-checkbox
 							aria-label=${this.localize.term('buttons_select')}
@@ -339,7 +378,9 @@ export class UmbTableElement extends UmbLitElement {
 	private _renderRowCell(column: UmbTableColumn, item: UmbTableItem) {
 		return html`
 			<uui-table-cell
-				style="--uui-table-cell-padding: 0 var(--uui-size-5); text-align:${column.align ?? 'left'}; width: ${column.width || 'auto'};">
+				style="--uui-table-cell-padding: 0 var(--uui-size-5); text-align:${column.align ?? 'left'}; width: ${column.width || 'auto'};"
+				?clip-text=${column.clipText}
+				>
 					${this._renderCellContent(column, item)}
 			</uui-table-cell>
 		</uui-table-cell>

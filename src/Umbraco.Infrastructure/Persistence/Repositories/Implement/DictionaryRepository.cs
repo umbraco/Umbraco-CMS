@@ -1,9 +1,9 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Persistence.Querying;
@@ -23,6 +23,7 @@ internal sealed class DictionaryRepository : EntityRepositoryBase<int, IDictiona
 {
     private readonly ILoggerFactory _loggerFactory;
     private readonly ILanguageRepository _languageRepository;
+    private readonly IOptionsMonitor<DictionarySettings> _dictionarySettings;
 
     private string QuotedColumn(string columnName) => $"{QuoteTableName(DictionaryDto.TableName)}.{QuoteColumnName(columnName)}";
 
@@ -33,11 +34,13 @@ internal sealed class DictionaryRepository : EntityRepositoryBase<int, IDictiona
         ILoggerFactory loggerFactory,
         ILanguageRepository languageRepository,
         IRepositoryCacheVersionService repositoryCacheVersionService,
-        ICacheSyncService cacheSyncService)
+        ICacheSyncService cacheSyncService,
+        IOptionsMonitor<DictionarySettings> dictionarySettings)
         : base(scopeAccessor, cache, logger, repositoryCacheVersionService, cacheSyncService)
     {
         _loggerFactory = loggerFactory;
         _languageRepository = languageRepository;
+        _dictionarySettings = dictionarySettings;
     }
 
     public IDictionaryItem? Get(Guid uniqueId)
@@ -110,11 +113,7 @@ internal sealed class DictionaryRepository : EntityRepositoryBase<int, IDictiona
                         .Where<DictionaryDto>(x => x.Parent != null)
                         .WhereIn<DictionaryDto>(x => x.Parent, group);
 
-                    if (filter.IsNullOrWhiteSpace() is false)
-                    {
-                        sql.Where<DictionaryDto>(x => x.Key.StartsWith(filter));
-                    }
-
+                    ApplyFilterToQuery(sql, filter);
                     sql.OrderBy<DictionaryDto>(x => x.UniqueId);
 
                     return Database
@@ -128,10 +127,7 @@ internal sealed class DictionaryRepository : EntityRepositoryBase<int, IDictiona
             Sql<ISqlContext> sql = GetBaseQuery(false)
                 .Where<DictionaryDto>(x => x.PrimaryKey > 0);
 
-            if (filter.IsNullOrWhiteSpace() is false)
-            {
-                sql.Where<DictionaryDto>(x => x.Key.StartsWith(filter));
-            }
+            ApplyFilterToQuery(sql, filter);
 
             return Database
                 .FetchOneToMany<DictionaryDto>(x => x.LanguageTextDtos, sql)
@@ -145,6 +141,35 @@ internal sealed class DictionaryRepository : EntityRepositoryBase<int, IDictiona
 
         // we're loading all descendants into memory, sometimes recursively... so we have to order them in memory too
         string DictionaryItemOrdering(IDictionaryItem item) => item.ItemKey;
+    }
+
+    /// <summary>
+    ///     Applies the filter condition to the SQL query based on configuration settings.
+    /// </summary>
+    /// <param name="sql">The SQL query to modify.</param>
+    /// <param name="filter">The filter string to apply, or null if no filter should be applied.</param>
+    private void ApplyFilterToQuery(Sql<ISqlContext> sql, string? filter)
+    {
+        if (filter.IsNullOrWhiteSpace())
+        {
+            return;
+        }
+
+        if (_dictionarySettings.CurrentValue.EnableValueSearch)
+        {
+            // Search in both keys and values
+            // Use a subquery to find dictionary items that have matching translations
+            // Then fetch ALL translations for those items
+            sql.Where(
+                $"({QuotedColumn("key")} LIKE @0 OR {QuotedColumn("id")} IN (SELECT DISTINCT {QuoteColumnName("UniqueId")} FROM {QuoteTableName(LanguageTextDto.TableName)} WHERE {QuoteColumnName("value")} LIKE @1))",
+                $"{filter}%",
+                $"%{filter}%");
+        }
+        else
+        {
+            // Search only in keys
+            sql.Where<DictionaryDto>(x => x.Key.StartsWith(filter));
+        }
     }
 
     protected override IRepositoryCachePolicy<IDictionaryItem, int> CreateCachePolicy()

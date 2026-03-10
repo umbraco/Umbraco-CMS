@@ -30,6 +30,7 @@ internal static class UserGroupFactory
             userGroup.StartMediaId = dto.StartMediaId;
             userGroup.Permissions = dto.UserGroup2PermissionDtos.Select(x => x.Permission).ToHashSet();
             userGroup.HasAccessToAllLanguages = dto.HasAccessToAllLanguages;
+            userGroup.Description = dto.Description;
             if (dto.UserGroup2AppDtos != null)
             {
                 foreach (UserGroup2AppDto app in dto.UserGroup2AppDtos)
@@ -84,6 +85,7 @@ internal static class UserGroupFactory
             Key = entity.Key,
             Alias = entity.Alias,
             Name = entity.Name,
+            Description = entity.Description,
             UserGroup2AppDtos = new List<UserGroup2AppDto>(),
             CreateDate = entity.CreateDate,
             UpdateDate = entity.UpdateDate,

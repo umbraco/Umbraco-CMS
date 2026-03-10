@@ -9,7 +9,8 @@ namespace Umbraco.Cms.Tests.Integration.ManagementApi;
 public abstract class ManagementApiUserGroupTestBase<T> : ManagementApiTest<T>
     where T : ManagementApiControllerBase
 {
-    protected string UserEmail = "test@umbraco.com";
+    protected virtual string UserEmail => "test@umbraco.com";
+
     protected const string UserPassword = "1234567890";
 
     protected override Expression<Func<T, object>> MethodSelector { get; set; }

@@ -719,7 +719,8 @@ public class ContentNavigationServiceBaseTests
     }
 
     [Test]
-    [TestCase("E48DD82A-7059-418E-9B82-CDD5205796CF",
+    [TestCase(
+        "E48DD82A-7059-418E-9B82-CDD5205796CF",
         8)] // Root - Child 1, Grandchild 1, Grandchild 2, Child 2, Grandchild 3, Great-grandchild 1, Child 3, Grandchild 4
     [TestCase("C6173927-0C59-4778-825D-D7B9F45D8DDE", 2)] // Child 1 - Grandchild 1, Grandchild 2
     [TestCase("E856AC03-C23E-4F63-9AA9-681B42A58573", 0)] // Grandchild 1
@@ -897,8 +898,7 @@ public class ContentNavigationServiceBaseTests
     [TestCase("E48DD82A-7059-418E-9B82-CDD5205796CF", new string[0])] // Root
     [TestCase("C6173927-0C59-4778-825D-D7B9F45D8DDE", new[] { "E48DD82A-7059-418E-9B82-CDD5205796CF" })] // Child 1
     [TestCase("E856AC03-C23E-4F63-9AA9-681B42A58573", new[] { "C6173927-0C59-4778-825D-D7B9F45D8DDE", "E48DD82A-7059-418E-9B82-CDD5205796CF" })] // Grandchild 1
-    [TestCase("56E29EA9-E224-4210-A59F-7C2C5C0C5CC7", new[] { "D63C1621-C74A-4106-8587-817DEE5FB732", "60E0E5C4-084E-4144-A560-7393BEAD2E96", "E48DD82A-7059-418E-9B82-CDD5205796CF",
-        })] // Great-grandchild 1
+    [TestCase("56E29EA9-E224-4210-A59F-7C2C5C0C5CC7", new[] { "D63C1621-C74A-4106-8587-817DEE5FB732", "60E0E5C4-084E-4144-A560-7393BEAD2E96", "E48DD82A-7059-418E-9B82-CDD5205796CF" })] // Great-grandchild 1
     public void Can_Get_Ancestors_From_Existing_Content_Key_In_Correct_Order_Of_Creation(Guid childKey, string[] ancestors)
     {
         // Arrange

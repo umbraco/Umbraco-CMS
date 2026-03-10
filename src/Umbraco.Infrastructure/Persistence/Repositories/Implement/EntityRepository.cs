@@ -260,13 +260,10 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
         out long totalBefore,
         out long totalAfter)
     {
-        // Ideally we don't want to have to do a second query for the parent ID, but the siblings query is already messy enough
-        // without us also having to do a nested query for the parent ID too.
         Sql<ISqlContext> parentIdQuery = Sql()
             .Select<NodeDto>(x => x.ParentId)
             .From<NodeDto>()
             .Where<NodeDto>(x => x.UniqueId == targetKey);
-        var parentId = Database.ExecuteScalar<int>(parentIdQuery);
 
         Sql<ISqlContext> orderingSql = Sql();
         ApplyOrdering(ref orderingSql, ordering);
@@ -276,9 +273,16 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
         // These row numbers are important, we need them to select the "before" and "after" siblings of the target node.
         Sql<ISqlContext> rowNumberSql = Sql()
             .Select($"ROW_NUMBER() OVER ({orderingSql.SQL}) AS rn")
-            .AndSelect<NodeDto>(n => n.UniqueId)
+
+            // withAlias: false is required here because this subquery is referenced by outer queries using
+            // a table alias (e.g. SELECT [nn].[uniqueId]). Including a column alias (e.g. [uniqueId] AS [uniqueId])
+            // can confuse some database providers (e.g. PostgreSQL) when the outer query refers to the column
+            // by the subquery's table alias rather than the column alias.
+            .AndSelect<NodeDto>(withAlias: false, n => n.UniqueId)
+
             .From<NodeDto>()
-            .Where<NodeDto>(x => x.ParentId == parentId && x.Trashed == isTrashed)
+            .Where<NodeDto>(x => x.Trashed == isTrashed)
+            .WhereIn<NodeDto>(x => x.ParentId, parentIdQuery)
             .WhereIn<NodeDto>(x => x.NodeObjectType, objectTypes);
 
         // Apply the filter if provided.
@@ -294,12 +298,15 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
         // the final query for before and after positions will increase. So we need to calculate the offset based on the provided values.
         int beforeAfterParameterIndexOffset = GetBeforeAfterParameterOffset(objectTypes, filter);
 
+        // use all lower case alias names to avoid sql syntax issues
+        string targetAlias = "target";
+
         // Find the specific row number of the target node.
         // We need this to determine the bounds of the row numbers to select.
         Sql<ISqlContext> targetRowSql = Sql()
             .Select("rn")
-            .From().AppendSubQuery(rowNumberSql, "Target")
-            .Where<NodeDto>(x => x.UniqueId == targetKey, "Target");
+            .From().AppendSubQuery(rowNumberSql, targetAlias)
+            .Where<NodeDto>(x => x.UniqueId == targetKey, targetAlias);
 
         // We have to reuse the target row sql arguments, however, we also need to add the "before" and "after" values to the arguments.
         // If we try to do this directly in the params array it'll consider the initial argument array as a single argument.
@@ -316,8 +323,8 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
         totalAfter = GetNumberOfSiblingsOutsideSiblingRange(rowNumberSql, targetRowSql, beforeAfterParameterIndex, afterArgumentsArray, false);
 
         return Sql()
-            .Select("UniqueId")
-            .From().AppendSubQuery(rowNumberSql, "NumberedNodes")
+            .Select<NodeDto>("nn", n => n.UniqueId)
+            .From().AppendSubQuery(rowNumberSql, "nn")
             .Where($"rn >= ({targetRowSql.SQL}) - @{beforeAfterParameterIndex}", beforeArgumentsArray)
             .Where($"rn <= ({targetRowSql.SQL}) + @{beforeAfterParameterIndex}", afterArgumentsArray)
             .OrderBy("rn");
@@ -355,9 +362,9 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
     {
         Sql<ISqlContext>? sql = Sql()
             .SelectCount()
-            .From().AppendSubQuery(rowNumberSql, "NumberedNodes")
+            .From().AppendSubQuery(rowNumberSql, "nn")
             .Where($"rn {(getBefore ? "<" : ">")} ({targetRowSql.SQL}) {(getBefore ? "-" : "+")} @{parameterIndex}", arguments);
-        return Database.ExecuteScalar<long>(sql);
+        return Database.FirstOrDefault<long>(sql);
     }
 
 
@@ -459,7 +466,10 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
     private IEnumerable<TreeEntityPath> PerformGetAllPaths(Guid objectType, Action<Sql<ISqlContext>>? filter = null)
     {
         // NodeId is named Id on TreeEntityPath = use an alias
-        Sql<ISqlContext> sql = Sql().Select<NodeDto>(x => Alias(x.NodeId, nameof(TreeEntityPath.Id)), x => x.Path)
+        Sql<ISqlContext> sql = Sql().Select<NodeDto>(
+                x => Alias(x.NodeId, nameof(TreeEntityPath.Id)),
+                x => x.Path,
+                x => Alias(x.UniqueId, nameof(TreeEntityPath.Key)))
             .From<NodeDto>().Where<NodeDto>(x => x.NodeObjectType == objectType);
         filter?.Invoke(sql);
         return Database.Fetch<TreeEntityPath>(sql);
@@ -495,14 +505,14 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
     {
         Sql<ISqlContext> sql = Sql().Select<NodeDto>(x => x.NodeObjectType).From<NodeDto>()
             .Where<NodeDto>(x => x.NodeId == id);
-        return ObjectTypes.GetUmbracoObjectType(Database.ExecuteScalar<Guid>(sql));
+        return ObjectTypes.GetUmbracoObjectType(Database.First<Guid>(sql));
     }
 
     public UmbracoObjectTypes GetObjectType(Guid key)
     {
         Sql<ISqlContext> sql = Sql().Select<NodeDto>(x => x.NodeObjectType).From<NodeDto>()
             .Where<NodeDto>(x => x.UniqueId == key);
-        return ObjectTypes.GetUmbracoObjectType(Database.ExecuteScalar<Guid>(sql));
+        return ObjectTypes.GetUmbracoObjectType(Database.First<Guid>(sql));
     }
 
     public int ReserveId(Guid key)
@@ -969,11 +979,13 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
                     orderBy = SqlSyntax.GetQuotedColumn(NodeDto.TableName, "path");
                     break;
                 case "NODEID":
-                    orderBy = runner.OrderBy;
+                    orderBy = SqlSyntax.GetQuotedColumn(NodeDto.TableName, "id");
                     orderingIncludesNodeId = true;
                     break;
                 default:
-                    orderBy = QuoteColumnName(runner.OrderBy) ?? string.Empty;
+                    orderBy = runner.OrderBy != null
+                        ? SqlSyntax.GetQuotedColumn(NodeDto.TableName, runner.OrderBy)
+                        : string.Empty;
                     break;
             }
 

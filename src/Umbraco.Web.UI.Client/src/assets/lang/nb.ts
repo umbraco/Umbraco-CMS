@@ -818,8 +818,8 @@ export default {
 		reset: 'Nullstill',
 	},
 	rollback: {
-		diffHelp:
-			'Dette viser forskjellene mellom den gjeldende og den valgte versjonen<br /><del>Rød</del> tekst vil ikke bli vist i den valgte versjonen. , <ins>grønn betyr lagt til</ins>',
+		diffHelp: '<del>Rød tekst</del> vil bli fjernet i den valgte versjonen, <ins>grønn tekst</ins> vil bli lagt til.',
+		showDiff: 'Vis forskjeller mellom gjeldende (utkast) versjon og valgt versjon.',
 		documentRolledBack: 'Dokumentet er tilbakeført til en tidligere versjon',
 		htmlHelp:
 			'Dette viser den valgte versjonen som HTML, bruk avviksvisningen hvis du ønsker å se forksjellene mellom to versjoner samtidig.',
@@ -1068,6 +1068,7 @@ export default {
 		changePassword: 'Bytt passord',
 		newPassword: 'Nytt passord',
 		confirmNewPassword: 'Bekreft nytt passord',
+		confirmPassword: 'Bekreft passord',
 		changePasswordDescription:
 			'Du kan endre passordet til Umbraco ved å fylle ut skjemaet under og klikke "Bytt passord" knappen.',
 		contentChannel: 'Innholdskanal',

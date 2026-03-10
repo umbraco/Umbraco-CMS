@@ -6,11 +6,13 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 [TableName(TableName)]
-[PrimaryKey("id", AutoIncrement = true)]
+[PrimaryKey(PrimaryKeyColumnName, AutoIncrement = true)]
 [ExplicitColumns]
 public class UserDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.User;
+    public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
+    public const string KeyColumnName = "key";
 
     public UserDto()
     {
@@ -18,7 +20,7 @@ public class UserDto
         UserStartNodeDtos = new HashSet<UserStartNodeDto>();
     }
 
-    [Column("id")]
+    [Column(PrimaryKeyColumnName)]
     [PrimaryKeyColumn(Name = "PK_user")]
     public int Id { get; set; }
 
@@ -26,7 +28,7 @@ public class UserDto
     [Constraint(Default = "0")]
     public bool Disabled { get; set; }
 
-    [Column("key")]
+    [Column(KeyColumnName)]
     [NullSetting(NullSetting = NullSettings.NotNull)]
     [Constraint(Default = SystemMethods.NewGuid)]
     [Index(IndexTypes.UniqueNonClustered, Name = "IX_umbracoUser_userKey")]
@@ -117,10 +119,10 @@ public class UserDto
     public string? Avatar { get; set; }
 
     [ResultColumn]
-    [Reference(ReferenceType.Many, ReferenceMemberName = "UserId")]
+    [Reference(ReferenceType.Many, ReferenceMemberName = nameof(User2UserGroupDto.UserId))]
     public List<UserGroupDto> UserGroupDtos { get; set; }
 
     [ResultColumn]
-    [Reference(ReferenceType.Many, ReferenceMemberName = "UserId")]
+    [Reference(ReferenceType.Many, ReferenceMemberName = nameof(UserStartNodeDto.UserId))]
     public HashSet<UserStartNodeDto> UserStartNodeDtos { get; set; }
 }

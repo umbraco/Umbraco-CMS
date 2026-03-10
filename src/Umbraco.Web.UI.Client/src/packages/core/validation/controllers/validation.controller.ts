@@ -11,6 +11,31 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 const Regex = /@\.culture == ('[^']*'|null) *&& *@\.segment == ('[^']*'|null)/g;
 
 /**
+ * Filters a validation message by a given variantId.
+ * @param {UmbValidationMessage} msg - The validation message to filter.
+ * @param {UmbVariantId} variantId - The variantId to filter by.
+ * @returns {boolean} True if the message matches the variantId, false otherwise.
+ */
+function filterMsgByVariantId(msg: UmbValidationMessage, variantId: UmbVariantId) {
+	// Regex that finds all the @.culture == and @.segment == in the path.
+	const variantMatches = [...msg.path.matchAll(Regex)];
+
+	// if not cultures, then we like to keep it:
+	if (variantMatches.length === 0) return true;
+
+	return (
+		// Find any bad matches:
+		!variantMatches.some((match) => {
+			const culture = match[1] === 'null' ? null : match[1].substring(1, match[1].length - 1);
+			const segment = match[2] === 'null' ? null : match[2].substring(1, match[2].length - 1);
+
+			const result = (culture !== null && culture !== variantId.culture) || segment !== variantId.segment;
+			return result;
+		})
+	);
+}
+
+/**
  * Validation Context is the core of Validation.
  * It hosts Validators that has to validate for the context to be valid.
  * It can also be used as a Validator as part of a parent Validation Context.
@@ -30,8 +55,8 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 
 	#parent?: UmbValidationController;
 	#sync?: boolean;
-	#parentMessages?: Array<UmbValidationMessage>;
-	#localMessages?: Array<UmbValidationMessage>;
+	#latestParentMessages?: Array<UmbValidationMessage>;
+	#latestLocalMessages?: Array<UmbValidationMessage>;
 	#baseDataPath?: string;
 
 	#variantId?: UmbVariantId;
@@ -45,28 +70,8 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 
 	setVariantId(variantId: UmbVariantId): void {
 		this.#variantId = variantId;
-		// @.culture == null && @.segment == null
-		this.messages?.filter((msg) => {
-			// Figure out how many times '@.culture ==' is present in the path:
-			//const cultureMatches = (msg.path.match(/@\.culture ==/g) || []);
-			// I like a Regex that finds all the @.culture == and @.segment == in the path. they are adjacent. and I like to know the value following '== '
-			const variantMatches = [...msg.path.matchAll(Regex)];
-
-			// if not cultures, then we like to keep it:
-			if (variantMatches.length === 0) return true;
-
-			return (
-				// Find any bad matches:
-				!variantMatches.some((match) => {
-					const culture = match[1] === 'null' ? null : match[1].substring(1, match[1].length - 1);
-					const segment = match[2] === 'null' ? null : match[2].substring(1, match[2].length - 1);
-
-					const result =
-						(culture !== null && culture !== this.#variantId!.culture) || segment !== this.#variantId!.segment;
-					return result;
-				})
-			);
-		});
+		// Setup a filter that will run when messages are added:
+		this.messages?.filter((msg) => filterMsgByVariantId(msg, this.#variantId!));
 	}
 
 	getVariantId(): UmbVariantId | undefined {
@@ -157,13 +162,9 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 	 * @param {string} dataPath - The data path to bind this validation context to.
 	 */
 	inheritFrom(parent: UmbValidationController | undefined, dataPath: string): void {
-		if (this.#parent) {
-			this.#parent.removeValidator(this);
-		}
+		if (this.#parent === parent && this.#baseDataPath === dataPath) return;
+		this.#stopInheritance();
 		this.#parent = parent;
-
-		this.messages.clear();
-		this.#localMessages = undefined;
 
 		this.#baseDataPath = dataPath;
 		this.#readyToSync();
@@ -176,12 +177,11 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 					return;
 				}
 				this.messages.initiateChange();
-				if (this.#parentMessages) {
+				if (this.#latestParentMessages) {
 					// Remove the local messages that does not exist in the parent anymore:
-					const toRemove = this.#parentMessages.filter((msg) => !msgs.find((m) => m.key === msg.key));
+					const toRemove = this.#latestParentMessages.filter((msg) => !msgs.find((m) => m.key === msg.key));
 					this.messages.removeMessageByKeys(toRemove.map((msg) => msg.key));
 				}
-				this.#parentMessages = msgs;
 				if (this.#baseDataPath === '$') {
 					this.messages.addMessageObjects(msgs);
 				} else {
@@ -196,8 +196,8 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 						this.messages.addMessage(msg.type, path, msg.body, msg.key);
 					});
 				}
-
-				this.#localMessages = this.messages.getNotFilteredMessages();
+				this.#latestParentMessages = msgs;
+				this.#latestLocalMessages = this.messages.getNotFilteredMessages();
 				this.messages.finishChange();
 			},
 			'observeParentMessages',
@@ -205,14 +205,16 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 	}
 
 	#stopInheritance(): void {
-		this.removeUmbControllerByAlias('observeTranslationData');
 		this.removeUmbControllerByAlias('observeParentMessages');
 
 		if (this.#parent) {
 			this.#parent.removeValidator(this);
 		}
+		// If set to 'autoReport'/#sync, the call to `clear()` will trigger the sync observation and clean up its messages from the parent validation context. [NL]
 		this.messages.clear();
-		this.#localMessages = undefined;
+		this.#latestLocalMessages = undefined;
+		this.#latestParentMessages = undefined;
+		this.#parent = undefined;
 	}
 
 	#readyToSync() {
@@ -253,9 +255,9 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 
 		this.#parent!.messages.initiateChange();
 
-		if (this.#localMessages) {
+		if (this.#latestLocalMessages) {
 			// Remove the parent messages that does not exist locally anymore:
-			const toRemove = this.#localMessages.filter((msg) => !msgs.find((m) => m.key === msg.key));
+			const toRemove = this.#latestLocalMessages.filter((msg) => !msgs.find((m) => m.key === msg.key));
 			this.#parent!.messages.removeMessageByKeys(toRemove.map((msg) => msg.key));
 		}
 
@@ -268,11 +270,11 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 				if (path === undefined) {
 					throw new Error('Path was not transformed correctly and can therefor not be synced with parent messages.');
 				}
-				// Notice, the parent message uses the same key. [NL]
 				this.#parent!.messages.addMessage(msg.type, path, msg.body, msg.key);
 			});
 		}
 
+		this.#latestLocalMessages = msgs;
 		this.#parent!.messages.finishChange();
 	};
 
@@ -338,15 +340,16 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 	async validate(): Promise<void> {
 		this.#validationMode = true;
 
-		const resultsStatus =
-			this.#validators.length === 0
-				? true
-				: await Promise.all(this.#validators.map((v) => v.validate())).then(
-						() => true,
-						() => false,
-					);
+		const resultsStatus = await this.#executeValidators(this.#validators);
 
-		if (this.#validators.length === 0 && resultsStatus === false) {
+		// We need to ask again for messages, as they might have been added during the validation process. [NL]
+		const hasMessages = this.messages?.getHasAnyMessages() ?? false;
+
+		return this.#handleValidationResult(this.#validators, resultsStatus, hasMessages);
+	}
+
+	#handleValidationResult(validators: UmbValidator[], resultsStatus: boolean, hasMessages: boolean): Promise<void> {
+		if (validators.length === 0 && resultsStatus === false) {
 			throw new Error('No validators to validate, but validation failed');
 		}
 
@@ -354,9 +357,6 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 			// This Context has been destroyed while is was validating, so we should not continue. [NL]
 			return Promise.reject();
 		}
-
-		// We need to ask again for messages, as they might have been added during the validation process. [NL]
-		const hasMessages = this.messages.getHasAnyMessages();
 
 		// If we have any messages then we are not valid, otherwise lets check the validation results: [NL]
 		// This enables us to keep client validations though UI is not present anymore — because the client validations got defined as messages. [NL]
@@ -366,7 +366,7 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 
 		if (isValid === false) {
 			if (hasMessages === false && resultsStatus === false) {
-				const notValidValidators = this.#validators.filter((v) => v.isValid === false);
+				const notValidValidators = validators.filter((v) => v.isValid === false);
 				console.warn(
 					`Missing validation messages to represent why a child validation context is invalid.
 					This could be because the Validator does not have a 'data-path' and therefore not able to set a message to the Validation Context.
@@ -380,6 +380,50 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 		}
 
 		return Promise.resolve();
+	}
+
+	async #executeValidators(validators: UmbValidator[], variantIds?: Array<UmbVariantId>): Promise<boolean> {
+		if (validators.length === 0) {
+			return true;
+		}
+
+		return Promise.all(
+			validators.map((v) => {
+				if (variantIds && v.validateByVariantIds !== undefined) {
+					return v.validateByVariantIds(variantIds);
+				}
+				return v.validate();
+			}),
+		).then(
+			() => true,
+			() => false,
+		);
+	}
+
+	/**
+	 * Validate this context, by a given set of VariantIDs.
+	 * Notice its a recursive check meaning sub validation contexts also validates their validators, but only for validators matching the given variantIds.
+	 * @param {Array<UmbVariantId>} variantIds - The variantIds to validate by.
+	 * @returns {Promise<boolean>} - Returns a promise that resolves to true if the validation succeeded.
+	 */
+	async validateByVariantIds(variantIds: Array<UmbVariantId>): Promise<void> {
+		this.#validationMode = true;
+
+		const matchingValidators = this.#validators.filter((v) => {
+			// If the validator has no variantId, then we always include it:
+			if (v.getVariantId === undefined) return true;
+			const vVariantId = v.getVariantId();
+			if (vVariantId === undefined) return true;
+			return variantIds.some((variantId) => variantId.equal(vVariantId));
+		});
+		const resultsStatus = await this.#executeValidators(matchingValidators, variantIds);
+
+		// We need to ask again for messages, as they might have been added during the validation process. [NL]
+		const messages = this.messages?.getMessages() ?? [];
+		const hasMessages =
+			messages.filter((msg) => variantIds.some((variantId) => filterMsgByVariantId(msg, variantId))).length > 0;
+
+		return this.#handleValidationResult(matchingValidators, resultsStatus, hasMessages);
 	}
 
 	/**
@@ -423,8 +467,8 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 		if (this.#parent) {
 			this.#parent.removeValidator(this);
 		}
-		this.#localMessages = undefined;
-		this.#parentMessages = undefined;
+		this.#latestLocalMessages = undefined;
+		this.#latestParentMessages = undefined;
 		this.#parent = undefined;
 	}
 }

@@ -20,6 +20,7 @@ export default {
 		chooseWhereToCopy: 'Choose where to copy',
 		chooseWhereToImport: 'Choose where to import',
 		chooseWhereToMove: 'Choose where to move',
+		clear: 'Clear',
 		copy: 'Duplicate',
 		copyTo: 'Duplicate to',
 		create: 'Create',
@@ -238,6 +239,7 @@ export default {
 	},
 	content: {
 		isPublished: 'Is Published',
+		unpublishedChanges: 'Unpublished changes',
 		about: 'About this page',
 		alias: 'Alias',
 		alternativeTextHelp: '(how would you describe the picture over the phone)',
@@ -275,6 +277,7 @@ export default {
 		getUrlException: 'Could not get the URL',
 		routeError: 'This document is published but its URL would collide with content %0%',
 		routeErrorCannotRoute: 'This document is published but its URL cannot be routed',
+		protected: 'Protected',
 		publish: 'Publish',
 		published: 'Published',
 		publishedPendingChanges: 'Published (pending changes)',
@@ -287,6 +290,7 @@ export default {
 		releaseDate: 'Publish at',
 		unpublishDate: 'Unpublish at',
 		removeDate: 'Clear date',
+		scheduledPublishing: 'Scheduled publishing',
 		setDate: 'Set date',
 		sortDone: 'Sort order is updated',
 		sortHelp:
@@ -399,6 +403,12 @@ export default {
 		clickToUpload: 'Click to upload',
 		orClickHereToUpload: 'or click here to choose files',
 		disallowedFileType: 'Cannot upload this file, it does not have an approved file type',
+		disallowedFileExtension: (extension: string) =>
+			`Cannot upload .${extension} files as no media type supports this file type`,
+		disallowedMediaTypeNotAllowedHere: (extension: string, mediaTypeName: string) =>
+			`Cannot upload .${extension} files here as the associated ${mediaTypeName} media type is not allowed at this location`,
+		disallowedMediaTypesNotAllowedHere: (extension: string, mediaTypeNames: string) =>
+			`Cannot upload .${extension} files here as the associated media types (${mediaTypeNames}) are not allowed at this location`,
 		disallowedMediaType: "Cannot upload this file, the media type with alias '%0%' is not allowed here",
 		invalidFileName: 'Cannot upload this file, it does not have a valid file name',
 		invalidFileSize: 'Cannot upload this file, it is too large',
@@ -410,6 +420,8 @@ export default {
 		fileSecurityValidationFailure: 'One or more file security validations have failed',
 		moveToSameFolderFailed: 'Parent and destination folders cannot be the same',
 		uploadNotAllowed: 'Upload is not allowed in this location.',
+		uploadValidationFailed: (mediaTypeName: string) =>
+			`The ${mediaTypeName} media type has one or more required properties. It will need to be uploaded individually via the 'Create' menu`,
 	},
 	member: {
 		'2fa': 'Two-Factor Authentication',
@@ -860,6 +872,7 @@ export default {
 		dividerPosition: (value: string | number) => `Divider at ${value}%`,
 		discard: 'Discard',
 		document: 'Document',
+		documentCount: (count: number) => (count === 1 ? '1 document' : `${count} documents`),
 		down: 'Down',
 		download: 'Download',
 		edit: 'Edit',
@@ -1340,6 +1353,8 @@ export default {
 		configurationTitle: 'Dynamic Root Query',
 		pickDynamicRootOriginTitle: 'Pick origin',
 		pickDynamicRootOriginDesc: 'Define the origin for your Dynamic Root Query',
+		originContentRootTitle: 'Content Root',
+		originContentRootDesc: 'Root of the content tree',
 		originRootTitle: 'Root',
 		originRootDesc: 'Root node of this editing session',
 		originParentTitle: 'Parent',
@@ -1411,9 +1426,9 @@ export default {
 		changes: 'Changes',
 		created: 'Created',
 		currentVersion: 'Current version',
-		diffHelp:
-			'This shows the differences between the current (draft) version and the selected version<br /><del>Red text</del> will be removed in the selected version, <ins>green text</ins> will be added',
-		noDiff: 'There are no differences between the current (draft) version and the selected version',
+		showDiff: 'Show differences between the current (draft) version and the selected version.',
+		diffHelp: '<del>Red text</del> will be removed in the selected version, <ins>green text</ins> will be added.',
+		noDiff: 'There are no differences between the current (draft) version and the selected version.',
 		documentRolledBack: 'Document has been rolled back',
 		headline: 'Select a version to compare with the current version',
 		htmlHelp:
@@ -1451,6 +1466,7 @@ export default {
 		tab: 'Tab',
 		tabname: 'Tab Title',
 		tabs: 'Tabs',
+		changeIcon: 'Change icon',
 		contentTypeEnabled: 'Master Content Type enabled',
 		contentTypeUses: 'This Content Type uses',
 		noPropertiesDefinedOnTab:
@@ -1609,6 +1625,7 @@ export default {
 		tabRules: 'Editor',
 	},
 	template: {
+		productionMode: 'Production Mode',
 		runtimeModeProduction: 'Content is not editable when using runtime mode <code>Production</code>.',
 		deleteByIdFailed: 'Failed to delete template with ID %0%',
 		edittemplate: 'Edit template',
@@ -2041,6 +2058,7 @@ export default {
 		noLockouts: "hasn't been locked out",
 		noPasswordChange: "The password hasn't been changed",
 		confirmNewPassword: 'Confirm new password',
+		confirmPassword: 'Confirm password',
 		changePasswordDescription:
 			"You can change your password for accessing the Umbraco backoffice by filling out the form below and click the 'Change Password' button",
 		contentChannel: 'Content Channel',
@@ -2145,7 +2163,7 @@ export default {
 		userNotInGroup: "The user is not in group '%0%'",
 		userPermissions: 'User permissions',
 		usergroup: 'User group',
-		usergroups: 'User groups',
+		usergroups: 'User Groups',
 		userInvited: 'has been invited',
 		userInvitedSuccessHelp: 'An invitation has been sent to the new user with details about how to log in to Umbraco.',
 		userinviteWelcomeMessage:

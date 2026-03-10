@@ -1,4 +1,4 @@
-﻿using System.Data;
+using System.Data;
 using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
@@ -6,15 +6,21 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 
-[TableName(Constants.DatabaseSchema.Tables.Webhook2ContentTypeKeys)]
+[TableName(TableName)]
+[PrimaryKey([WebhookIdColumnName, ContentTypeKeyColumnName], AutoIncrement = false)]
 [ExplicitColumns]
 public class Webhook2ContentTypeKeysDto
 {
-    [Column("webhookId")]
-    [PrimaryKeyColumn(AutoIncrement = false, Name = "PK_webhookEntityKey2Webhook", OnColumns = "webhookId, entityKey")]
+    public const string TableName = Constants.DatabaseSchema.Tables.Webhook2ContentTypeKeys;
+
+    private const string WebhookIdColumnName = "webhookId";
+    private const string ContentTypeKeyColumnName = "entityKey";
+
+    [Column(WebhookIdColumnName)]
+    [PrimaryKeyColumn(AutoIncrement = false, Name = "PK_webhookEntityKey2Webhook", OnColumns = $"{WebhookIdColumnName}, {ContentTypeKeyColumnName}")]
     [ForeignKey(typeof(WebhookDto), OnDelete = Rule.Cascade)]
     public int WebhookId { get; set; }
 
-    [Column("entityKey")]
+    [Column(ContentTypeKeyColumnName)]
     public Guid ContentTypeKey { get; set; }
 }

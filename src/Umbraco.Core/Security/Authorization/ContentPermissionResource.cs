@@ -3,7 +3,7 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Core.Security.Authorization;
 
 /// <summary>
-///     A resource used for the <see cref="ContentPermissionHandler" />.
+///     A resource used for the ContentPermissionHandler authorization handler.
 /// </summary>
 public class ContentPermissionResource : IPermissionResource
 {
@@ -244,7 +244,8 @@ public class ContentPermissionResource : IPermissionResource
     public Guid? ParentKeyForBranch { get; }
 
     /// <summary>
-    /// All the cultures need to be accessible when evaluating
+    ///     Gets the cultures to check for access.
     /// </summary>
+    /// <remarks>All the cultures need to be accessible when evaluating.</remarks>
     public ISet<string>? CulturesToCheck { get; }
 }

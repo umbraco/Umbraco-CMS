@@ -116,7 +116,7 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 	}
 
 	@property({ type: Array })
-	allowedContentTypeIds?: string[] | undefined;
+	allowedContentTypeIds?: string[];
 
 	@property({ type: Object, attribute: false })
 	startNode?: UmbTreeStartNode;
@@ -372,6 +372,7 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 		return html`<umb-dropzone-media
 			id="dropzone"
 			?multiple=${this.multiple}
+			.parentUnique=${this.startNode?.unique ?? null}
 			@change=${this.#onUploadCompleted}></umb-dropzone-media>`;
 	}
 
@@ -411,7 +412,7 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 		const href = this.readonly ? undefined : this._routeBuilder?.({ key: item.unique });
 
 		return html`
-			<uui-card-media id=${item.unique} name=${item.name} .href=${href} ?readonly=${this.readonly}>
+			<uui-card-media id=${item.unique} title=${item.name} name=${item.name} .href=${href} ?readonly=${this.readonly}>
 				<umb-imaging-thumbnail
 					.unique=${item.media}
 					.alt=${item.name}

@@ -1,10 +1,19 @@
 namespace Umbraco.Cms.Core.DeliveryApi;
 
+/// <summary>
+///     Specifies that the property should be included in the Delivery API response based on API version constraints.
+/// </summary>
 [AttributeUsage(AttributeTargets.Property)]
 public class IncludeInApiVersionAttribute : Attribute
 {
+    /// <summary>
+    ///     Gets the minimum API version (inclusive) for which the property should be included, or <c>null</c> if no minimum is specified.
+    /// </summary>
     public int? MinVersion { get; }
 
+    /// <summary>
+    ///     Gets the maximum API version (inclusive) for which the property should be included, or <c>null</c> if no maximum is specified.
+    /// </summary>
     public int? MaxVersion { get; }
 
     /// <summary>

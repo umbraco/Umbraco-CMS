@@ -5,23 +5,25 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 [TableName(TableName)]
-[PrimaryKey("pk")]
+[PrimaryKey(PrimaryKeyColumnName)]
 [ExplicitColumns]
 public class DictionaryDto // public as required to be accessible from Deploy for the RepairDictionaryIdsWorkItem.
 {
     public const string TableName = Constants.DatabaseSchema.Tables.DictionaryEntry;
+    public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNamePk;
+    public const string UniqueIdColumnName = "id"; // More commonly we use `uniqueId` for `uniqueidentifer` database fields, but it's correct for this table to use "id", as that's the name the field was given for this table when it was added.
 
-    [Column("pk")]
+    [Column(PrimaryKeyColumnName)]
     [PrimaryKeyColumn]
     public int PrimaryKey { get; set; }
 
-    [Column("id")]
+    [Column(UniqueIdColumnName)]
     [Index(IndexTypes.UniqueNonClustered)]
     public Guid UniqueId { get; set; }
 
     [Column("parent")]
     [NullSetting(NullSetting = NullSettings.Null)]
-    [ForeignKey(typeof(DictionaryDto), Column = "id")]
+    [ForeignKey(typeof(DictionaryDto), Column = UniqueIdColumnName)]
     [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_Parent")]
     public Guid? Parent { get; set; }
 
@@ -31,6 +33,6 @@ public class DictionaryDto // public as required to be accessible from Deploy fo
     public string Key { get; set; } = null!;
 
     [ResultColumn]
-    [Reference(ReferenceType.Many, ColumnName = "UniqueId", ReferenceMemberName = "UniqueId")]
+    [Reference(ReferenceType.Many, ColumnName = nameof(UniqueId), ReferenceMemberName = nameof(LanguageTextDto.UniqueId))]
     public List<LanguageTextDto> LanguageTextDtos { get; set; } = [];
 }

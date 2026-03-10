@@ -1,12 +1,14 @@
 import type { UmbFocalPointModel } from '../../types.js';
 import type { UmbImageCropperFocalPoint } from './types.js';
 import { UmbFocalPointChangeEvent } from './focalpoint-change.event.js';
+import { isCentered } from './utils.js';
 import { drag } from '@umbraco-cms/backoffice/external/uui';
 import { clamp } from '@umbraco-cms/backoffice/utils';
 import {
 	css,
 	customElement,
 	classMap,
+	eventOptions,
 	ifDefined,
 	html,
 	nothing,
@@ -126,7 +128,7 @@ export class UmbImageCropperFocusSetterElement extends UmbLitElement {
 	#isCentered(focalPoint: UmbImageCropperFocalPoint) {
 		if (!this.focalPoint) return;
 
-		return focalPoint.left === 0.5 && focalPoint.top === 0.5;
+		return isCentered(focalPoint);
 	}
 
 	#resetCoords() {
@@ -137,7 +139,8 @@ export class UmbImageCropperFocusSetterElement extends UmbLitElement {
 		this._coords.y = this.imageElement.clientHeight / 2;
 	}
 
-	#handleGridDrag(event: PointerEvent) {
+	@eventOptions({ passive: false })
+	private _handleGridDrag(event: PointerEvent) {
 		if (this.disabled || this.hideFocalPoint) return;
 		if (event.button !== 0) {
 			// This is not a primary mouse button click, so lets not do anything.
@@ -238,8 +241,8 @@ export class UmbImageCropperFocusSetterElement extends UmbLitElement {
 			<div
 				id="wrapper"
 				@click=${this.#changeFocalPoint}
-				@mousedown=${this.#handleGridDrag}
-				@touchstart=${this.#handleGridDrag}>
+				@mousedown=${this._handleGridDrag}
+				@touchstart=${this._handleGridDrag}>
 				<img id="image" @keydown=${() => nothing} src=${this.src} alt="" />
 				<span
 					id="focal-point"

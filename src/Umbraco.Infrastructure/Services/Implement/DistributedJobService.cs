@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
@@ -23,7 +23,7 @@ public class DistributedJobService : IDistributedJobService
     /// <summary>
     /// Initializes a new instance of the <see cref="DistributedJobService"/> class.
     /// </summary>
-    [Obsolete("Use the constructor that accepts IOptions<DistributedJobSettings>. Scheduled for removal in V18.")]
+    [Obsolete("Use the constructor that accepts IOptions<DistributedJobSettings>. Scheduled for removal in Umbraco 18.")]
     public DistributedJobService(
         ICoreScopeProvider coreScopeProvider,
         IDistributedJobRepository distributedJobRepository,
@@ -69,12 +69,14 @@ public class DistributedJobService : IDistributedJobService
         if (job is null)
         {
             // No runnable jobs for now.
+            scope.Complete();
             return null;
         }
 
         job.LastAttemptedRun = DateTime.UtcNow;
         job.IsRunning = true;
         _distributedJobRepository.Update(job);
+        scope.Complete();
 
         IDistributedBackgroundJob? distributedJob = _distributedBackgroundJobs.FirstOrDefault(x => x.Name == job.Name);
 
@@ -82,8 +84,10 @@ public class DistributedJobService : IDistributedJobService
         {
             _logger.LogWarning("Could not find a distributed job with the name '{JobName}'", job.Name);
         }
-
-        scope.Complete();
+        else
+        {
+            _logger.LogDebug("Running distributed job with the name '{JobName}'", job.Name);
+        }
 
         return distributedJob;
     }

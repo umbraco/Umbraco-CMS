@@ -6,17 +6,25 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.IO;
 
+/// <summary>
+/// Provides base implementation for IO helper operations.
+/// </summary>
 public abstract class IOHelper : IIOHelper
 {
     private readonly IHostingEnvironment _hostingEnvironment;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="IOHelper"/> class.
+    /// </summary>
+    /// <param name="hostingEnvironment">The hosting environment.</param>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="hostingEnvironment"/> is null.</exception>
     public IOHelper(IHostingEnvironment hostingEnvironment) => _hostingEnvironment =
         hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
 
     // static compiled regex for faster performance
     // private static readonly Regex ResolveUrlPattern = new Regex("(=[\"\']?)(\\W?\\~(?:.(?![\"\']?\\s+(?:\\S+)=|[>\"\']))+.)[\"\']?", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
 
-    // helper to try and match the old path to a new virtual one
+    /// <inheritdoc />
     public string FindFile(string virtualPath)
     {
         var retval = virtualPath;
@@ -36,6 +44,7 @@ public abstract class IOHelper : IIOHelper
     }
 
     // TODO: This is the same as IHostingEnvironment.ToAbsolute - marked as obsolete in IIOHelper for now
+    /// <inheritdoc />
     public string ResolveUrl(string virtualPath)
     {
         if (string.IsNullOrWhiteSpace(virtualPath))
@@ -46,6 +55,7 @@ public abstract class IOHelper : IIOHelper
         return _hostingEnvironment.ToAbsolute(virtualPath);
     }
 
+    /// <inheritdoc />
     public string MapPath(string path)
     {
         if (path == null)
@@ -142,8 +152,10 @@ public abstract class IOHelper : IIOHelper
         return ext != null && validFileExtensions.Contains(ext.TrimStart(Constants.CharArrays.Period));
     }
 
+    /// <inheritdoc />
     public abstract bool PathStartsWith(string path, string root, params char[] separators);
 
+    /// <inheritdoc />
     public void EnsurePathExists(string path)
     {
         var absolutePath = MapPath(path);

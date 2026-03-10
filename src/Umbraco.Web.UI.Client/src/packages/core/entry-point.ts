@@ -1,21 +1,25 @@
 import { manifests as coreManifests } from './manifests.js';
-import { UMB_AUTH_CONTEXT } from './auth/auth.context.token.js';
-import { UmbActionEventContext } from './action/action-event.context.js';
-import { UmbBackofficeNotificationContainerElement, UmbBackofficeModalContainerElement } from './components/index.js';
-import { UmbInteractionMemoryContext } from './interaction-memory/index.js';
+import { UmbActionEventContext } from '@umbraco-cms/backoffice/action';
+import {
+	UmbBackofficeNotificationContainerElement,
+	UmbBackofficeModalContainerElement,
+} from '@umbraco-cms/backoffice/components';
+import { UmbInteractionMemoryContext } from '@umbraco-cms/backoffice/interaction-memory';
+import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 import { UmbExtensionsApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
 import type { UmbEntryPointOnInit } from '@umbraco-cms/backoffice/extension-api';
 
-import './collection/global-components.js';
-import './entity-item/global-components.js';
-import './entity-sign/components/index.js';
-import './extension-registry/components/index.js';
-import './menu/components/index.js';
-import './property-action/components/index.js';
-import './property-editor-data-source/global-components.js';
-import './property-sort-mode/global-components/index.js';
+// Ensure the load of some package for their global components(Which are exported as part of the import-map, those where it's not have deep imports here):
+import '@umbraco-cms/backoffice/collection';
+import '@umbraco-cms/backoffice/entity-sign';
+import '@umbraco-cms/backoffice/extension-registry';
+import '@umbraco-cms/backoffice/menu';
+import '@umbraco-cms/backoffice/property-action';
+import '@umbraco-cms/backoffice/property-editor-data-source';
+import '@umbraco-cms/backoffice/property-sort-mode';
+import '@umbraco-cms/backoffice/entity-item';
 
 export const onInit: UmbEntryPointOnInit = (host, extensionRegistry) => {
 	new UmbExtensionsApiInitializer(host, extensionRegistry, 'globalContext', [host]);

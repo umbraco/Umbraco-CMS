@@ -1182,9 +1182,9 @@ export default {
 		changes: 'Promjene',
 		created: 'Kreirano',
 		currentVersion: 'Trenutna verzija',
-		diffHelp:
-			'Ovo pokazuje razlike između trenutne verzije (nacrta) i odabrane verzije<br /><del>Crveni tekst</del> će biti uklonjen u odabranoj verziji, <ins>zeleni tekst</ins> će biti dodan',
-		noDiff: 'Nema razlike između trenutne verzije (nacrta) i odabrane verzije',
+		diffHelp: '<del>Crveni tekst</del> će biti uklonjen u odabranoj verziji, <ins>zeleni tekst</ins> će biti dodan.',
+		showDiff: 'Prikaži razlike između trenutne (nacrt) verzije i odabrane verzije.',
+		noDiff: 'Nema razlike između trenutne verzije (nacrta) i odabrane verzije.',
 		documentRolledBack: 'Dokument je vraćen',
 		headline: 'Odaberite verziju koju želite usporediti sa trenutnom verzijom',
 		htmlHelp:
@@ -1701,6 +1701,7 @@ export default {
 		noLockouts: 'nije zaključan',
 		noPasswordChange: 'Lozinka nije promijenjena',
 		confirmNewPassword: 'Potvrdite novu lozinku',
+		confirmPassword: 'Potvrdi lozinku',
 		changePasswordDescription:
 			"Možete promijeniti lozinku za pristup Umbraco backofficeu popunjavanjem\n       izađite iz donjeg obrasca i kliknite na dugme 'Promijeni lozinku'\n    ",
 		contentChannel: 'Kanal sadržaja',

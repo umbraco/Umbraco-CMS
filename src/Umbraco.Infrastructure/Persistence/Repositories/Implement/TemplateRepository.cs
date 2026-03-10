@@ -8,6 +8,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Strings;
@@ -32,6 +33,7 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
         IScopeAccessor scopeAccessor,
         AppCaches cache,
         ILogger<TemplateRepository> logger,
+        ILoggerFactory loggerFactory,
         FileSystems fileSystems,
         IShortStringHelper shortStringHelper,
         IViewHelper viewHelper,
@@ -49,6 +51,57 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
         _viewsFileSystem = fileSystems.MvcViewsFileSystem;
         _viewHelper = viewHelper;
         _runtimeSettings = runtimeSettings;
+    }
+
+    [Obsolete("Use constructor with ILoggerFactory parameter. Scheduled for removal in Umbraco 18.")]
+    public TemplateRepository(
+        IScopeAccessor scopeAccessor,
+        AppCaches cache,
+        ILogger<TemplateRepository> logger,
+        FileSystems fileSystems,
+        IShortStringHelper shortStringHelper,
+        IViewHelper viewHelper,
+        IOptionsMonitor<RuntimeSettings> runtimeSettings,
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
+        : this(
+            scopeAccessor,
+            cache,
+            logger,
+            Microsoft.Extensions.Logging.Abstractions.NullLoggerFactory.Instance,
+            fileSystems,
+            shortStringHelper,
+            viewHelper,
+            runtimeSettings,
+            repositoryCacheVersionService,
+            cacheSyncService)
+    {
+    }
+
+    // GUID-based lookups delegate to GetMany() which is served from FullDataSetRepositoryCachePolicy.
+    public ITemplate? Get(Guid key) => GetMany().FirstOrDefault(x => x.Key == key);
+
+    IEnumerable<ITemplate> IReadRepository<Guid, ITemplate>.GetMany(params Guid[]? keys)
+    {
+        IEnumerable<ITemplate> all = GetMany();
+        return keys?.Length > 0 ? all.Where(x => keys.Contains(x.Key)).ToArray() : all;
+    }
+
+    public bool Exists(Guid id) => GetMany().Any(x => x.Key == id);
+
+    public override void Save(ITemplate entity)
+    {
+        base.Save(entity);
+
+        // Force population of the full dataset cache so subsequent lookups don't hit the database.
+        // TemplateRepository uses FullDataSetRepositoryCachePolicy which caches all templates together.
+        // GUID-based lookups also use this cache via GetMany().
+        GetMany();
+    }
+
+    public override void Delete(ITemplate entity)
+    {
+        base.Delete(entity);
     }
 
     public Stream GetFileContentStream(string filepath)
@@ -311,9 +364,13 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
 
     #region Overrides of RepositoryBase<int,ITemplate>
 
-    protected override ITemplate? PerformGet(int id) =>
+    protected override ITemplate? PerformGet(int id)
+    {
         //use the underlying GetAll which will force cache all templates
-        GetMany().FirstOrDefault(x => x.Id == id);
+        ITemplate? template = GetMany().FirstOrDefault(x => x.Id == id);
+
+        return template;
+    }
 
     protected override IEnumerable<ITemplate> PerformGetAll(params int[]? ids)
     {
@@ -342,7 +399,9 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
                 : dtos.Select(x => new EntitySlim { Id = x.NodeId, ParentId = x.NodeDto.ParentId, Name = x.Alias }))
             .ToArray();
 
-        return dtos.Select(d => MapFromDto(d, childIds));
+        ITemplate[] templates = dtos.Select(d => MapFromDto(d, childIds)).ToArray();
+
+        return templates;
     }
 
     protected override IEnumerable<ITemplate> PerformGetByQuery(IQuery<ITemplate> query)

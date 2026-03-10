@@ -51,9 +51,9 @@ export const handlers = [
 		});
 	}),
 
-	http.post(umbracoPath('/package/created'), async ({ request }) => {
+	http.post<object, CreatePackageRequestModel>(umbracoPath('/package/created'), async ({ request }) => {
 		//save
-		const data: CreatePackageRequestModel = await request.json();
+		const data = await request.json();
 		const newPackage: PackageDefinitionResponseModel = { ...data, id: UmbId.new(), packagePath: '' };
 		packageArray.push(newPackage);
 		return HttpResponse.json<PackageDefinitionResponseModel>(newPackage);
@@ -68,9 +68,9 @@ export const handlers = [
 		return HttpResponse.json<PackageDefinitionResponseModel>(found);
 	}),
 
-	http.put(umbracoPath('/package/created/:id'), async ({ request }) => {
+	http.put<object, PackageDefinitionResponseModel>(umbracoPath('/package/created/:id'), async ({ request }) => {
 		//update
-		const data: PackageDefinitionResponseModel = await request.json();
+		const data = await request.json();
 		if (!data.id) return;
 		const index = packageArray.findIndex((x) => x.id === data.id);
 		packageArray[index] = data;

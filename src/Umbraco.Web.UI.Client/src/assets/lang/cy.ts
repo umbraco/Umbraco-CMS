@@ -354,6 +354,8 @@ export default {
 		renameFolderFailed: "Methwyd ailenwi'r ffolder gyda id %0%",
 		dragAndDropYourFilesIntoTheArea: "Llusgo a gollwng eich ffeil(iau) i mewn i'r ardal",
 		uploadNotAllowed: 'Ni chaniateir llwytho i fyny yn y lleoliad hwn.',
+		uploadValidationFailed: (mediaTypeName: string) =>
+			`Mae gan y math cyfryngau ${mediaTypeName} un neu fwy o briodweddau gofynnol. Bydd angen ei huwchlwytho'n unigol drwy'r ddewislen 'Creu'`,
 		disallowedMediaType: "Ni ellir lanlwytho'r ffeil yma, ni chaniateir y math cyfrwng gydag alias '%0%' yma",
 		invalidFileName: "Ni ellir lanlwytho'r ffeil yma, nid oes ganddi enw ffeil dilys",
 		fileSecurityValidationFailure: 'Mae un neu fwy o ddilysiadau diogelwch ffeil wedi methu',
@@ -1278,7 +1280,8 @@ export default {
 		headline: 'Dewis fersiwn i gymharu efo fersiwn bresennol',
 		changes: 'Newidiadau',
 		diffHelp:
-			"May hyn yn dangos y gwahaniaeth rhwng y fersiwn bresennol ac y fersiwn dewiswyd<br />Ni fydd testun <del>coch</del> yn cael ei ddangos yn y fersiwn dewiswyd. , <ins>mae gwyrdd yn golygu wedi'i ychwanegu</ins>",
+			'Bydd <del>testun coch</del> yn cael ei dynnu yn y fersiwn a ddewiswyd, bydd <ins>testun gwyrdd</ins> yn cael ei ychwanegu.',
+		showDiff: "Dangos gwahaniaethau rhwng y fersiwn (drafft) gyfredol a'r fersiwn a ddewiswyd.",
 		documentRolledBack: "Dogfen wedi'i rolio yn ôl",
 		htmlHelp:
 			'Mae hyn yn dangos y fersiwn dewiswyd ar ffurf HTML, os hoffwch weld y gwahaniaeth rhwng 2 fersiwn ar yr un pryd, defnyddiwch y wedd gwahaniaethol',
@@ -1291,7 +1294,7 @@ export default {
 		currentPublishedVersion: 'Fersiwn cyhoeddedig cyfredol',
 		created: 'Wedi creu',
 		currentVersion: 'Fersiwn gyfredol',
-		noDiff: "Nid oes unrhyw wahaniaethau rhwng y fersiwn (drafft) gyfredol a'r fersiwn a ddewiswyd",
+		noDiff: "Nid oes unrhyw wahaniaethau rhwng y fersiwn (drafft) gyfredol a'r fersiwn a ddewiswyd.",
 	},
 	scripts: {
 		editscript: 'Golygu ffeil sgript',
@@ -1861,6 +1864,7 @@ export default {
 		noLockouts: 'ddim wedi cloi allan',
 		noPasswordChange: "Nid yw'r cyfrinair wedi'i newid",
 		confirmNewPassword: 'Cadarnhau cyfrinair newydd',
+		confirmPassword: 'Cadarnhau cyfrinair',
 		changePasswordDescription:
 			"Gallwch newid eich cyfrinair i gyrchu Swyddfa Gefn Umbracogan lenwi allan y ffurflen isod a chlicio'r botwm 'Newid Cyfrinair'",
 		contentChannel: 'Sianel Gynnwys',
@@ -2104,7 +2108,7 @@ export default {
 		emptyDictionaryTree: 'Dim eitemau Geiriadur i ddewis ohonynt',
 	},
 	textbox: {
-		characters_left: 'o nodau ar ôl',
+		characters_left: '<strong>%0%</strong> o nodau ar ôl.',
 		characters_exceed: 'Uchafswm o %0% nodau cyfrannol, <strong>%1%</strong> gormod.',
 	},
 	recycleBin: {

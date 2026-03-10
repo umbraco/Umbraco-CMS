@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.Services.Entities;
 using Umbraco.Cms.Api.Management.Services.Flags;
+using Umbraco.Cms.Api.Management.Services.PermissionFilter;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Security;
@@ -35,7 +36,7 @@ public class AncestorsDocumentTreeController : DocumentTreeControllerBase
     {
     }
 
-    [ActivatorUtilitiesConstructor]
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
     public AncestorsDocumentTreeController(
         IEntityService entityService,
         FlagProviderCollection flagProviders,
@@ -57,9 +58,35 @@ public class AncestorsDocumentTreeController : DocumentTreeControllerBase
     {
     }
 
+    [ActivatorUtilitiesConstructor]
+    public AncestorsDocumentTreeController(
+        IEntityService entityService,
+        FlagProviderCollection flagProviders,
+        IUserStartNodeEntitiesService userStartNodeEntitiesService,
+        IDataTypeService dataTypeService,
+        IPublicAccessService publicAccessService,
+        AppCaches appCaches,
+        IBackOfficeSecurityAccessor backofficeSecurityAccessor,
+        IDocumentPresentationFactory documentPresentationFactory,
+        IDocumentPermissionFilterService documentPermissionFilterService)
+        : base(
+            entityService,
+            flagProviders,
+            userStartNodeEntitiesService,
+            dataTypeService,
+            publicAccessService,
+            appCaches,
+            backofficeSecurityAccessor,
+            documentPresentationFactory,
+            documentPermissionFilterService)
+    {
+    }
+
     [HttpGet("ancestors")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<DocumentTreeItemResponseModel>), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a collection of ancestor document items.")]
+    [EndpointDescription("Gets a collection of document items that are ancestors to the provided Id.")]
     public async Task<ActionResult<IEnumerable<DocumentTreeItemResponseModel>>> Ancestors(CancellationToken cancellationToken, Guid descendantId)
         => await GetAncestors(descendantId);
 }

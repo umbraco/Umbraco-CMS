@@ -1,23 +1,27 @@
-import type { JsLoaderProperty } from '../types/utils.js';
+import type { JsLoaderPromise } from '../types/utils.js';
 
 /**
  *
  * @param property
  */
-export async function loadManifestPlainJs<JsType>(property: JsLoaderProperty<JsType>): Promise<JsType | undefined> {
-	const propType = typeof property;
-	if (propType === 'function') {
-		// Promise function
-		const result = await (property as Exclude<typeof property, string>)();
+export async function loadManifestPlainJs<JsType>(
+	property: string | JsLoaderPromise<JsType> | JsType,
+): Promise<JsType | undefined> {
+	if (typeof property === 'function') {
+		// Promise function (dynamic import)
+		const result = await (property as JsLoaderPromise<JsType>)();
 		if (typeof result === 'object' && result != null) {
 			return result;
 		}
-	} else if (propType === 'string') {
+	} else if (typeof property === 'string') {
 		// Import string
-		const result = await (import(/* @vite-ignore */ property as string) as unknown as JsType);
+		const result = await (import(/* @vite-ignore */ property) as unknown as JsType);
 		if (typeof result === 'object' && result != null) {
 			return result;
 		}
+	} else if (typeof property === 'object' && property != null) {
+		// Already resolved module object (statically imported)
+		return property;
 	}
 	return undefined;
 }

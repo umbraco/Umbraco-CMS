@@ -12,7 +12,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		weight: 500,
 		meta: {
 			iconName: 'icon-time',
-			label: 'Scheduled publishing',
+			label: '#content_scheduledPublishing',
 			iconColorAlias: 'green',
 		},
 	},

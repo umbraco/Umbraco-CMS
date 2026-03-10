@@ -56,8 +56,7 @@ public class DataValueEditorReuseTests
                 Mock.Of<IPropertyValidationService>(),
                 blockVarianceHandler,
                 Mock.Of<ILanguageService>(),
-                Mock.Of<IIOHelper>()
-                ));
+                Mock.Of<IIOHelper>()));
     }
 
     [Test]
