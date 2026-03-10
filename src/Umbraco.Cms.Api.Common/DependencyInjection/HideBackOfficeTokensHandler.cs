@@ -35,9 +35,9 @@ internal sealed class HideBackOfficeTokensHandler
     // The __Host- prefix enforces secure cookies at browser level (requires Secure, Path=/, no Domain).
     // For local development over HTTP, we use a simpler prefix to avoid browser rejection.
     private const string SecureCookiePrefix = "__Host-";
-    private const string AccessTokenCookieName = "umbAccessToken";
-    private const string RefreshTokenCookieName = "umbRefreshToken";
-    private const string PkceCodeCookieName = "umbPkceCode";
+    private readonly string _accessTokenCookieName = "umbAccessToken";
+    private readonly string _refreshTokenCookieName = "umbRefreshToken";
+    private readonly string _pkceCodeCookieName = "umbPkceCode";
 
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IDataProtectionProvider _dataProtectionProvider;
@@ -65,6 +65,10 @@ internal sealed class HideBackOfficeTokensHandler
         _dataProtectionProvider = dataProtectionProvider;
         _backOfficeTokenCookieSettings = backOfficeTokenCookieSettings.Value;
         _globalSettings = globalSettings.Value;
+
+        _accessTokenCookieName += _backOfficeTokenCookieSettings.SiteName;
+        _refreshTokenCookieName += _backOfficeTokenCookieSettings.SiteName;
+        _pkceCodeCookieName += _backOfficeTokenCookieSettings.SiteName;
     }
 
     /// <summary>
@@ -84,13 +88,13 @@ internal sealed class HideBackOfficeTokensHandler
 
         if (context.Response.AccessToken is not null)
         {
-            SetCookie(httpContext, AccessTokenCookieName, context.Response.AccessToken);
+            SetCookie(httpContext, _accessTokenCookieName, context.Response.AccessToken);
             context.Response.AccessToken = RedactedTokenValue;
         }
 
         if (context.Response.RefreshToken is not null)
         {
-            SetCookie(httpContext, RefreshTokenCookieName, context.Response.RefreshToken);
+            SetCookie(httpContext, _refreshTokenCookieName, context.Response.RefreshToken);
             context.Response.RefreshToken = RedactedTokenValue;
         }
 
@@ -112,7 +116,7 @@ internal sealed class HideBackOfficeTokensHandler
 
         if (context.Response.Code is not null)
         {
-            SetCookie(GetHttpContext(), PkceCodeCookieName, context.Response.Code);
+            SetCookie(GetHttpContext(), _pkceCodeCookieName, context.Response.Code);
             context.Response.Code = RedactedTokenValue;
         }
 
@@ -134,12 +138,12 @@ internal sealed class HideBackOfficeTokensHandler
 
         // Handle when the PKCE code is being exchanged for an access token.
         if (context.Request.Code == RedactedTokenValue
-            && TryGetCookie(httpContext, PkceCodeCookieName, out var code))
+            && TryGetCookie(httpContext, _pkceCodeCookieName, out var code))
         {
             context.Request.Code = code;
 
             // We won't need the PKCE cookie after this, let's remove it.
-            RemoveCookie(httpContext, PkceCodeCookieName);
+            RemoveCookie(httpContext, _pkceCodeCookieName);
         }
         else
         {
@@ -150,7 +154,7 @@ internal sealed class HideBackOfficeTokensHandler
 
         // Handle when a refresh token is being exchanged for a new access token.
         if (context.Request.RefreshToken == RedactedTokenValue
-            && TryGetCookie(httpContext, RefreshTokenCookieName, out var refreshToken))
+            && TryGetCookie(httpContext, _refreshTokenCookieName, out var refreshToken))
         {
             context.Request.RefreshToken = refreshToken;
         }
@@ -180,8 +184,8 @@ internal sealed class HideBackOfficeTokensHandler
 
         // Determine which cookie to read based on the token type hint.
         var cookieName = context.Request.TokenTypeHint == OpenIddictConstants.TokenTypeHints.RefreshToken
-            ? RefreshTokenCookieName
-            : AccessTokenCookieName;
+            ? _refreshTokenCookieName
+            : _accessTokenCookieName;
 
         if (context.Request.Token == RedactedTokenValue
             && TryGetCookie(httpContext, cookieName, out var token))
@@ -210,7 +214,7 @@ internal sealed class HideBackOfficeTokensHandler
             return ValueTask.CompletedTask;
         }
 
-        if (TryGetCookie(GetHttpContext(), AccessTokenCookieName, out var accessToken))
+        if (TryGetCookie(GetHttpContext(), _accessTokenCookieName, out var accessToken))
         {
             context.AccessToken = accessToken;
         }
@@ -230,8 +234,8 @@ internal sealed class HideBackOfficeTokensHandler
             return;
         }
 
-        RemoveCookie(httpContext, AccessTokenCookieName);
-        RemoveCookie(httpContext, RefreshTokenCookieName);
+        RemoveCookie(httpContext, _accessTokenCookieName);
+        RemoveCookie(httpContext, _refreshTokenCookieName);
     }
 
     private HttpContext GetHttpContext()

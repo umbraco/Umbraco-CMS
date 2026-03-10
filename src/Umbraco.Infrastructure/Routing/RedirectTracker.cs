@@ -3,7 +3,6 @@ using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
@@ -19,6 +18,8 @@ namespace Umbraco.Cms.Infrastructure.Routing;
 /// </summary>
 internal sealed class RedirectTracker : IRedirectTracker
 {
+    private static readonly Uri _placeholderUri = new("http://localhost");
+
     private readonly ILanguageService _languageService;
     private readonly IRedirectUrlService _redirectUrlService;
     private readonly IPublishedContentCache _contentCache;
@@ -118,7 +119,34 @@ internal sealed class RedirectTracker : IRedirectTracker
     private string GetUrl(Guid contentKey, string languageIsoCode) =>
         _publishedUrlProvider.GetUrl(contentKey, UrlMode.Relative, languageIsoCode).TrimEnd(Constants.CharArrays.ForwardSlash);
 
-    private static void StoreRoute(
+    /// <summary>
+    /// Strips the domain's path prefix from a relative URL so that the route stored for redirect
+    /// lookup matches the format expected by <see cref="DomainUtilities.PathRelativeToDomain"/>.
+    /// For example, given domain <c>example.com/en/</c> and route <c>/en/page</c>, returns <c>/page</c>.
+    /// </summary>
+    /// <param name="route">The relative URL (may include the domain path prefix).</param>
+    /// <param name="domainRootId">The content node ID that has a domain assigned.</param>
+    /// <param name="culture">The culture used to select the matching domain.</param>
+    /// <returns>The route with the domain path prefix removed, or the original route if no domain is found.</returns>
+    private string GetPathRelativeToDomain(string route, int domainRootId, string culture)
+    {
+        Domain[] domains = _domainCache.GetAssigned(domainRootId, false).ToArray();
+        Domain? domain = domains
+            .FirstOrDefault(d => d.IsWildcard is false &&
+                                 d.Culture is not null &&
+                                 d.Culture.Equals(culture, StringComparison.InvariantCultureIgnoreCase))
+            ?? domains.FirstOrDefault(d => d.IsWildcard is false);
+
+        if (domain is null)
+        {
+            return route;
+        }
+
+        Uri domainUri = DomainUtilities.ParseUriFromDomainName(domain.Name, _placeholderUri);
+        return DomainUtilities.PathRelativeToDomain(domainUri, route);
+    }
+
+    private void StoreRoute(
         Dictionary<(int ContentId, string Culture), (Guid ContentKey, string OldRoute)> oldRoutes,
         IPublishedContent publishedContent,
         string culture,
@@ -128,6 +156,7 @@ internal sealed class RedirectTracker : IRedirectTracker
         // Prepend the Id of the node with the associated domain to the route if there is one assigned.
         if (domainRootId > 0)
         {
+            route = GetPathRelativeToDomain(route, domainRootId, culture);
             route = domainRootId + route;
         }
 
@@ -157,6 +186,7 @@ internal sealed class RedirectTracker : IRedirectTracker
                 // Prepend the Id of the node with the associated domain to the route if there is one assigned.
                 if (TryGetNodeIdWithAssignedDomain(entityContent, out int domainRootId))
                 {
+                    newRoute = GetPathRelativeToDomain(newRoute, domainRootId, culture);
                     newRoute = domainRootId + newRoute;
                 }
 
