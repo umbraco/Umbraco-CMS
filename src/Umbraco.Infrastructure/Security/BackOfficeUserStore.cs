@@ -370,7 +370,7 @@ public class BackOfficeUserStore :
     }
 
     private bool IsUpgrading =>
-        _runtimeState.Level == RuntimeLevel.Install || _runtimeState.Level == RuntimeLevel.Upgrade;
+        _runtimeState.Level == RuntimeLevel.Install || _runtimeState.Level == RuntimeLevel.Upgrade || _runtimeState.Level == RuntimeLevel.Upgrading;
 
     /// <inheritdoc />
     public override Task<IdentityResult> UpdateAsync(
