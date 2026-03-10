@@ -113,7 +113,7 @@ export class UmbPropertyEditorUISliderElement
 
 		this._min = this.#parseNumber(config.getValueByAlias('minVal')) || 0;
 		this._max = this.#parseNumber(config.getValueByAlias('maxVal')) || 100;
-		this._minimumRange = this.#parseNumber(config.getValueByAlias('minimumRange')) || 0;
+		this._minimumRange = Math.max(this.#parseNumber(config.getValueByAlias('minimumRange')) || 0, 0);
 
 		if (this._min === this._max) {
 			this._max = this._min + 100;

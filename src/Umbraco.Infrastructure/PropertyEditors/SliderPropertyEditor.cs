@@ -233,7 +233,7 @@ public class SliderPropertyEditor : DataEditor
                 if (sliderConfiguration.EnableRange && sliderRange.To >= sliderRange.From && (sliderRange.To - sliderRange.From) < sliderConfiguration.MinimumRange)
                 {
                     yield return new ValidationResult(
-                        LocalizedTextService.Localize("validation", "minimumRange", [sliderRange.ToString(), sliderConfiguration.MinimumRange.ToString()]),
+                        LocalizedTextService.Localize("validation", "minimumRange", [sliderRange.ToString(), sliderConfiguration.MinimumRange.ToString(CultureInfo.InvariantCulture)]),
                         ["value"]);
                 }
             }
@@ -268,14 +268,14 @@ public class SliderPropertyEditor : DataEditor
                 if (sliderRange.From < sliderConfiguration.MinimumValue)
                 {
                     yield return new ValidationResult(
-                        LocalizedTextService.Localize("validation", "outOfRangeMinimum", [sliderRange.From.ToString(), sliderConfiguration.MinimumValue.ToString()]),
+                        LocalizedTextService.Localize("validation", "outOfRangeMinimum", [sliderRange.From.ToString(CultureInfo.InvariantCulture), sliderConfiguration.MinimumValue.ToString(CultureInfo.InvariantCulture)]),
                         ["value"]);
                 }
 
                 if (sliderConfiguration.MaximumValue != 0 && sliderRange.To > sliderConfiguration.MaximumValue)
                 {
                     yield return new ValidationResult(
-                        LocalizedTextService.Localize("validation", "outOfRangeMaximum", [sliderRange.To.ToString(), sliderConfiguration.MaximumValue.ToString()]),
+                        LocalizedTextService.Localize("validation", "outOfRangeMaximum", [sliderRange.To.ToString(CultureInfo.InvariantCulture), sliderConfiguration.MaximumValue.ToString(CultureInfo.InvariantCulture)]),
                         ["value"]);
                 }
             }
@@ -311,7 +311,7 @@ public class SliderPropertyEditor : DataEditor
                     ValidationHelper.IsValueValidForStep(sliderRange.To, sliderConfiguration.MinimumValue, sliderConfiguration.Step) is false)
                 {
                     yield return new ValidationResult(
-                        LocalizedTextService.Localize("validation", "invalidStep", [sliderRange.ToString(), sliderConfiguration.Step.ToString(), sliderConfiguration.MinimumValue.ToString()]),
+                        LocalizedTextService.Localize("validation", "invalidStep", [sliderRange.ToString(), sliderConfiguration.Step.ToString(CultureInfo.InvariantCulture), sliderConfiguration.MinimumValue.ToString(CultureInfo.InvariantCulture)]),
                         ["value"]);
                 }
             }
