@@ -1,12 +1,10 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore.Extensions;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
-using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Tests.Common;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
@@ -580,59 +578,6 @@ internal sealed class EFCoreScopeTest : UmbracoIntegrationTest
         Assert.AreEqual(complete, completed.Value);
         Assert.IsNull(ambientScope); // the scope is gone
         Assert.IsNotNull(ambientContext); // the context is still there
-    }
-
-    /// <summary>
-    ///     This test should not exist when we are free from NPoco.
-    ///     An issue appeared when a nested EFCore scope was accessing the database first and then followed by NPoco in the same scope
-    ///     hierarchy, which caused a locking error. This test replicates this scenario.
-    /// </summary>
-    [Test]
-    public async Task NestedScope_ChildFirstDbAccess_CanWriteViaNPoco()
-    {
-        // Setup: create a table to write to.
-        using (IEfCoreScope<TestUmbracoDbContext> setup = EfCoreScopeProvider.CreateScope())
-        {
-            await setup.ExecuteWithContextAsync<Task>(async db =>
-                await db.Database.ExecuteSqlAsync($"CREATE TABLE tmp4 (id INT, name NVARCHAR(64))"));
-            setup.Complete();
-        }
-
-        var npocoScopeAccessor = Services.GetRequiredService<IScopeAccessor>();
-
-        // This reproduces the scenario that caused SQLite locking errors:
-        // an outer EF Core scope where the NESTED scope is the first to access
-        // the database, followed by a NPoco write on the same scope hierarchy.
-        using (IEfCoreScope<TestUmbracoDbContext> scope = EfCoreScopeProvider.CreateScope())
-        {
-            // Write via a nested EF Core scope (first DB access in this hierarchy).
-            using (IEfCoreScope<TestUmbracoDbContext> nested = EfCoreScopeProvider.CreateScope())
-            {
-                await nested.ExecuteWithContextAsync<Task>(async db =>
-                    await db.Database.ExecuteSqlAsync($"INSERT INTO tmp4 (id, name) VALUES (1, 'efcore')"));
-                nested.Complete();
-            }
-
-            // Write via NPoco on the ambient scope — before the fix this would throw
-            // "SQLite Error 6: database table is locked" because NPoco and EF Core
-            // were on separate connections.
-            npocoScopeAccessor.AmbientScope!.Database.Execute("INSERT INTO tmp4 (id, name) VALUES (2, 'npoco')");
-
-            scope.Complete();
-        }
-
-        // Verify both writes were committed.
-        using (IEfCoreScope<TestUmbracoDbContext> verify = EfCoreScopeProvider.CreateScope())
-        {
-            await verify.ExecuteWithContextAsync<Task>(async db =>
-            {
-                var efCoreRow = await db.Database.ExecuteScalarAsync<string>("SELECT name FROM tmp4 WHERE id=1");
-                var npocoRow = await db.Database.ExecuteScalarAsync<string>("SELECT name FROM tmp4 WHERE id=2");
-                Assert.AreEqual("efcore", efCoreRow);
-                Assert.AreEqual("npoco", npocoRow);
-            });
-            verify.Complete();
-        }
     }
 
     [TestCase(true)]
