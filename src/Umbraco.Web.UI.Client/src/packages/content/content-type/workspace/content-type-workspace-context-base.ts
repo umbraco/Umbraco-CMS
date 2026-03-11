@@ -43,7 +43,6 @@ export abstract class UmbContentTypeWorkspaceContextBase<
 	public readonly icon: Observable<string | undefined>;
 
 	public readonly allowedAtRoot: Observable<boolean | undefined>;
-	public readonly allowedInLibrary: Observable<boolean | undefined>;
 	public readonly variesByCulture: Observable<boolean | undefined>;
 	public readonly variesBySegment: Observable<boolean | undefined>;
 	public readonly isElement: Observable<boolean | undefined>;
@@ -63,7 +62,6 @@ export abstract class UmbContentTypeWorkspaceContextBase<
 		this.description = this.structure.ownerContentTypeObservablePart((data) => data?.description);
 		this.icon = this.structure.ownerContentTypeObservablePart((data) => data?.icon);
 		this.allowedAtRoot = this.structure.ownerContentTypeObservablePart((data) => data?.allowedAtRoot);
-		this.allowedInLibrary = this.structure.ownerContentTypeObservablePart((data) => data?.allowedInLibrary);
 		this.variesByCulture = this.structure.ownerContentTypeObservablePart((data) => data?.variesByCulture);
 		this.variesBySegment = this.structure.ownerContentTypeObservablePart((data) => data?.variesBySegment);
 		this.isElement = this.structure.ownerContentTypeObservablePart((data) => data?.isElement);

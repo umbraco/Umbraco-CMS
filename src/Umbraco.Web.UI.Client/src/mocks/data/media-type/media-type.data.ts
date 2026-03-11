@@ -4,12 +4,12 @@ import type {
 	MediaTypeTreeItemResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 
-export type UmbMockMediaTypeModel = MediaTypeResponseModel &
+export type UmbMockMediaTypeModel = Omit<MediaTypeResponseModel, 'allowedInLibrary'> &
 	MediaTypeTreeItemResponseModel &
 	MediaTypeItemResponseModel;
 
 export type UmbMockMediaTypeUnionModel =
-	| MediaTypeResponseModel
+	| Omit<MediaTypeResponseModel, 'allowedInLibrary'>
 	| MediaTypeTreeItemResponseModel
 	| MediaTypeItemResponseModel;
 
@@ -94,7 +94,6 @@ export const data: Array<UmbMockMediaTypeModel> = [
 			},
 		],
 		allowedAsRoot: true,
-		allowedInLibrary: false,
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
@@ -147,7 +146,6 @@ export const data: Array<UmbMockMediaTypeModel> = [
 			},
 		],
 		allowedAsRoot: true,
-		allowedInLibrary: false,
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
@@ -200,7 +198,6 @@ export const data: Array<UmbMockMediaTypeModel> = [
 			},
 		],
 		allowedAsRoot: true,
-		allowedInLibrary: false,
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
@@ -253,7 +250,6 @@ export const data: Array<UmbMockMediaTypeModel> = [
 			},
 		],
 		allowedAsRoot: true,
-		allowedInLibrary: false,
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
@@ -306,7 +302,6 @@ export const data: Array<UmbMockMediaTypeModel> = [
 			},
 		],
 		allowedAsRoot: true,
-		allowedInLibrary: false,
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
@@ -359,7 +354,6 @@ export const data: Array<UmbMockMediaTypeModel> = [
 			},
 		],
 		allowedAsRoot: true,
-		allowedInLibrary: false,
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
