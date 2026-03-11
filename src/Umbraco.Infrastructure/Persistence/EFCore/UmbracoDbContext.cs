@@ -54,8 +54,6 @@ public class UmbracoDbContext : DbContext
 
     public required DbSet<KeyValueDto> KeyValue { get; set; }
 
-    public required DbSet<LanguageDto> Language { get; set; }
-
     private static DbContextOptions<UmbracoDbContext> ConfigureOptions(DbContextOptions<UmbracoDbContext> options)
     {
         var coreExtensions = options.FindExtension<Microsoft.EntityFrameworkCore.Infrastructure.CoreOptionsExtension>();
