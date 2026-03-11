@@ -47,7 +47,6 @@ public class SqlServerMigrationProvider : IMigrationProvider
             EFCoreMigration.AddWebhookDto => typeof(Migrations.AddWebhookDto),
             EFCoreMigration.AddLastSyncedDto => typeof(Migrations.AddLastSyncedDto),
             EFCoreMigration.AddKeyValueDto => typeof(Migrations.AddKeyValueDto),
-            EFCoreMigration.AddLanguageDto => typeof(Migrations.AddLanguageDto),
             _ => throw new ArgumentOutOfRangeException(nameof(migration), $@"Not expected migration value: {migration}")
         };
 }
