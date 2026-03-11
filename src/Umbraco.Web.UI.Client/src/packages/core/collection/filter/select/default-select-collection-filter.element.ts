@@ -3,8 +3,8 @@ import { css, customElement, html, repeat, property, state } from '@umbraco-cms/
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { ManifestCollectionFilter } from '../collection-filter.extension.js';
 
-@customElement('umb-default-collection-select-filter')
-export class UmbDefaultCollectionSelectFilterElement extends UmbLitElement {
+@customElement('umb-default-select-collection-filter')
+export class UmbDefaultSelectCollectionFilterElement extends UmbLitElement {
 	#api?: UmbCollectionFilterApi;
 
 	public get api(): UmbCollectionFilterApi | undefined {
@@ -80,10 +80,10 @@ export class UmbDefaultCollectionSelectFilterElement extends UmbLitElement {
 	];
 }
 
-export { UmbDefaultCollectionSelectFilterElement as element };
+export { UmbDefaultSelectCollectionFilterElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-default-collection-select-filter': UmbDefaultCollectionSelectFilterElement;
+		'umb-default-select-collection-filter': UmbDefaultSelectCollectionFilterElement;
 	}
 }

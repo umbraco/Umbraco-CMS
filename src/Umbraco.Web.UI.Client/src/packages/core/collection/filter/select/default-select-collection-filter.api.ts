@@ -5,7 +5,7 @@ import { UMB_COLLECTION_CONTEXT } from '../../default/index.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { ManifestCollectionFilter } from '../collection-filter.extension.js';
 
-export class UmbDefaultCollectionSelectFilterApi extends UmbControllerBase implements UmbCollectionFilterApi {
+export class UmbDefaultSelectCollectionFilterApi extends UmbControllerBase implements UmbCollectionFilterApi {
 	#selection = new UmbArrayState<string>([], (x) => x);
 	public readonly value = this.#selection.asObservable();
 
@@ -40,4 +40,4 @@ export class UmbDefaultCollectionSelectFilterApi extends UmbControllerBase imple
 	}
 }
 
-export { UmbDefaultCollectionSelectFilterApi as api };
+export { UmbDefaultSelectCollectionFilterApi as api };

@@ -1,8 +1,8 @@
 import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
-@customElement('umb-default-collection-multi-select-filter')
-export class UmbDefaultCollectionMultiSelectFilterElement extends UmbLitElement {
+@customElement('umb-default-multi-select-collection-filter')
+export class UmbDefaultMultiSelectFilterCollectionElement extends UmbLitElement {
 	@state()
 	private _options = [
 		{ label: 'Option A', value: 'optionA' },
@@ -76,10 +76,10 @@ export class UmbDefaultCollectionMultiSelectFilterElement extends UmbLitElement 
 	];
 }
 
-export { UmbDefaultCollectionMultiSelectFilterElement as element };
+export { UmbDefaultMultiSelectFilterCollectionElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-default-collection-multi-select-filter': UmbDefaultCollectionMultiSelectFilterElement;
+		'umb-default-multi-select-collection-filter': UmbDefaultMultiSelectFilterCollectionElement;
 	}
 }
