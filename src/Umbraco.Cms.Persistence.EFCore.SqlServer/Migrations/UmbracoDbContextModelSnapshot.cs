@@ -302,7 +302,7 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                         .HasColumnType("nvarchar(100)")
                         .HasColumnName("languageCultureName");
 
-                    b.Property<short?>("FallbackLanguageId")
+                    b.Property<int?>("FallbackLanguageId")
                         .HasColumnType("smallint")
                         .HasColumnName("fallbackLanguageId");
 

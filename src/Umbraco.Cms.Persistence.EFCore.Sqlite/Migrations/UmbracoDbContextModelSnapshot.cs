@@ -290,7 +290,7 @@ namespace Umbraco.Cms.Persistence.EFCore.Sqlite.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnName("languageCultureName");
 
-                    b.Property<short?>("FallbackLanguageId")
+                    b.Property<int?>("FallbackLanguageId")
                         .HasColumnType("INTEGER")
                         .HasColumnName("fallbackLanguageId");
 

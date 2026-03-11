@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Collections;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Infrastructure.Cache;
@@ -420,6 +421,54 @@ internal sealed class LanguageRepository : AsyncEntityRepositoryBase<int, ILangu
         }
 
         await EnsureCacheIsPopulatedAsync();
+
+        // Try to populate maps from cached entities (no scope needed).
+        if (TryPopulateMapsFromCache())
+        {
+            return;
+        }
+
+        // Fall back to loading from DB, which requires an EF Core scope.
+        // When called from NPoco code paths (e.g. ContentBaseFactory.BuildScheduleDto),
+        // no EF Core scope exists. In that case, skip loading - callers use throwOnNotFound=false.
+        if (ScopeAccessor.AmbientScope is not null)
+        {
+            await EnsureCacheIsPopulatedAsync();
+        }
+    }
+
+    /// <summary>
+    /// Attempts to rebuild the in-memory maps from cached <see cref="ILanguage"/> entities
+    /// without requiring a database round-trip or an ambient EF Core scope.
+    /// </summary>
+    private bool TryPopulateMapsFromCache()
+    {
+        DeepCloneableList<ILanguage>? cached = GlobalIsolatedCache
+            .GetCacheItem<DeepCloneableList<ILanguage>>(RepositoryCacheKeys.GetKey<ILanguage>());
+
+        if (cached is null || cached.Count == 0)
+        {
+            return false;
+        }
+
+        lock (_codeIdMap)
+        {
+            if (_codeIdMap.Count > 0)
+            {
+                return true;
+            }
+
+            foreach (ILanguage language in cached)
+            {
+                if (language.IsoCode is not null)
+                {
+                    _codeIdMap[language.IsoCode] = language.Id;
+                    _idCodeMap[language.Id] = language.IsoCode;
+                }
+            }
+        }
+
+        return _codeIdMap.Count > 0;
     }
 
     private async Task EnsureCacheIsPopulatedAsync()

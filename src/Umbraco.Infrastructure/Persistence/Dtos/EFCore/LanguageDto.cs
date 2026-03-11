@@ -41,7 +41,7 @@ public class LanguageDto
     /// <summary>
     ///     Gets or sets the identifier of a fallback language.
     /// </summary>
-    public short? FallbackLanguageId { get; set; }
+    public int? FallbackLanguageId { get; set; }
 
     /// <summary>
     ///     Gets or sets the fallback language navigation property.
