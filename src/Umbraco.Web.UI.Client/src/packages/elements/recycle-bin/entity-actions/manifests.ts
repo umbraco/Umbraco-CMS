@@ -90,7 +90,7 @@ const folderActions: Array<UmbExtensionManifest> = [
 	{
 		type: 'entityAction',
 		kind: 'trashFolder',
-		alias: 'Umb.EntityAction.Element.Folder.Trash',
+		alias: 'Umb.EntityAction.ElementFolder.Trash',
 		name: 'Trash Element Folder Entity Action',
 		forEntityTypes: [UMB_ELEMENT_FOLDER_ENTITY_TYPE],
 		meta: {
@@ -108,7 +108,7 @@ const folderActions: Array<UmbExtensionManifest> = [
 	{
 		type: 'entityAction',
 		kind: 'restoreFromRecycleBin',
-		alias: 'Umb.EntityAction.Element.Folder.RecycleBin.Restore',
+		alias: 'Umb.EntityAction.ElementFolder.RecycleBin.Restore',
 		name: 'Restore Element Folder From Recycle Bin Entity Action',
 		forEntityTypes: [UMB_ELEMENT_FOLDER_ENTITY_TYPE],
 		meta: {
