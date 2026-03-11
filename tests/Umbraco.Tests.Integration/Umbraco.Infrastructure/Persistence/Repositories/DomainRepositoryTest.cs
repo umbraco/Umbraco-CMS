@@ -40,34 +40,31 @@ internal sealed class DomainRepositoryTest : UmbracoIntegrationTest
     private int CreateTestData(string isoName, out ContentType ct)
     {
         var provider = ScopeProvider;
-        using var efCoreScope = NewScopeProvider.CreateScope();
         using (var scope = provider.CreateScope())
         {
             var lang = new Language(isoName, isoName);
-            LanguageRepository.SaveAsync(lang, CancellationToken.None).GetAwaiter().GetResult();
+            LanguageRepository.Save(lang);
 
             ct = ContentTypeBuilder.CreateBasicContentType("test", "Test");
             ContentTypeRepository.Save(ct);
             var content = new Content("test", -1, ct) { CreatorId = 0, WriterId = 0 };
             DocumentRepository.Save(content);
             scope.Complete();
-            efCoreScope.Complete();
             return content.Id;
         }
     }
 
     [Test]
-    public async Task Can_Create_And_Get_By_Id()
+    public void Can_Create_And_Get_By_Id()
     {
         var contentId = CreateTestData("en-AU", out var ct);
 
         var provider = ScopeProvider;
-        using var efCoreScope = NewScopeProvider.CreateScope();
         using (var scope = provider.CreateScope())
         {
             var repo = CreateRepository(provider);
 
-            var lang = await LanguageRepository.GetByIsoCodeAsync("en-AU");
+            var lang = LanguageRepository.GetByIsoCode("en-AU");
             var content = DocumentRepository.Get(contentId);
 
             var domain = (IDomain)new UmbracoDomain("test.com") { RootContentId = content.Id, LanguageId = lang.Id };
@@ -114,17 +111,16 @@ internal sealed class DomainRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Cant_Create_Duplicate_Domain_Name()
+    public void Cant_Create_Duplicate_Domain_Name()
     {
         var contentId = CreateTestData("en-AU", out var ct);
 
         var provider = ScopeProvider;
-        using var efCoreScope = NewScopeProvider.CreateScope();
         using (var scope = provider.CreateScope())
         {
             var repo = CreateRepository(provider);
 
-            var lang = await LanguageRepository.GetByIsoCodeAsync("en-AU");
+            var lang = LanguageRepository.GetByIsoCode("en-AU");
             var content = DocumentRepository.Get(contentId);
 
             var domain1 = (IDomain)new UmbracoDomain("test.com") { RootContentId = content.Id, LanguageId = lang.Id };
@@ -137,17 +133,16 @@ internal sealed class DomainRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Can_Delete()
+    public void Can_Delete()
     {
         var contentId = CreateTestData("en-AU", out var ct);
 
         var provider = ScopeProvider;
-        using var efCoreScope = NewScopeProvider.CreateScope();
         using (var scope = provider.CreateScope())
         {
             var repo = CreateRepository(provider);
 
-            var lang = await LanguageRepository.GetByIsoCodeAsync("en-AU");
+            var lang = LanguageRepository.GetByIsoCode("en-AU");
             var content = DocumentRepository.Get(contentId);
 
             var domain = (IDomain)new UmbracoDomain("test.com") { RootContentId = content.Id, LanguageId = lang.Id };
@@ -163,12 +158,11 @@ internal sealed class DomainRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Can_Update()
+    public void Can_Update()
     {
         var contentId1 = CreateTestData("en-AU", out var ct);
 
         var provider = ScopeProvider;
-        using var efCoreScope = NewScopeProvider.CreateScope();
         using (var scope = provider.CreateScope())
         {
             var repo = CreateRepository(provider);
@@ -176,10 +170,10 @@ internal sealed class DomainRepositoryTest : UmbracoIntegrationTest
             var content1 = DocumentRepository.Get(contentId1);
 
             // more test data
-            var lang1 = await LanguageRepository.GetByIsoCodeAsync("en-AU");
+            var lang1 = LanguageRepository.GetByIsoCode("en-AU");
             var globalSettings = new GlobalSettings();
             var lang2 = new Language("es", "Spanish");
-            await LanguageRepository.SaveAsync(lang2, CancellationToken.None);
+            LanguageRepository.Save(lang2);
             var content2 = new Content("test", -1, ct) { CreatorId = 0, WriterId = 0 };
             DocumentRepository.Save(content2);
 
@@ -205,17 +199,16 @@ internal sealed class DomainRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Exists()
+    public void Exists()
     {
         var contentId = CreateTestData("en-AU", out var ct);
 
         var provider = ScopeProvider;
-        using var efCoreScope = NewScopeProvider.CreateScope();
         using (var scope = provider.CreateScope())
         {
             var repo = CreateRepository(provider);
 
-            var lang = await LanguageRepository.GetByIsoCodeAsync("en-AU");
+            var lang = LanguageRepository.GetByIsoCode("en-AU");
             var content = DocumentRepository.Get(contentId);
 
             for (var i = 0; i < 10; i++)
@@ -232,17 +225,16 @@ internal sealed class DomainRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Get_By_Name()
+    public void Get_By_Name()
     {
         var contentId = CreateTestData("en-AU", out var ct);
 
         var provider = ScopeProvider;
-        using var efCoreScope = NewScopeProvider.CreateScope();
         using (var scope = provider.CreateScope())
         {
             var repo = CreateRepository(provider);
 
-            var lang = await LanguageRepository.GetByIsoCodeAsync("en-AU");
+            var lang = LanguageRepository.GetByIsoCode("en-AU");
             var content = DocumentRepository.Get(contentId);
 
             for (var i = 0; i < 10; i++)
@@ -259,17 +251,16 @@ internal sealed class DomainRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Get_All()
+    public void Get_All()
     {
         var contentId = CreateTestData("en-AU", out var ct);
 
         var provider = ScopeProvider;
-        using var efCoreScope = NewScopeProvider.CreateScope();
         using (var scope = provider.CreateScope())
         {
             var repo = CreateRepository(provider);
 
-            var lang = await LanguageRepository.GetByIsoCodeAsync("en-AU");
+            var lang = LanguageRepository.GetByIsoCode("en-AU");
             var content = DocumentRepository.Get(contentId);
 
             for (var i = 0; i < 10; i++)
@@ -286,17 +277,16 @@ internal sealed class DomainRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Get_All_Ids()
+    public void Get_All_Ids()
     {
         var contentId = CreateTestData("en-AU", out var ct);
 
         var provider = ScopeProvider;
-        using var efCoreScope = NewScopeProvider.CreateScope();
         using (var scope = provider.CreateScope())
         {
             var repo = CreateRepository(provider);
 
-            var lang = await LanguageRepository.GetByIsoCodeAsync("en-AU");
+            var lang = LanguageRepository.GetByIsoCode("en-AU");
             var content = DocumentRepository.Get(contentId);
 
             var ids = new List<int>();
@@ -315,17 +305,16 @@ internal sealed class DomainRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Get_All_Without_Wildcards()
+    public void Get_All_Without_Wildcards()
     {
         var contentId = CreateTestData("en-AU", out var ct);
 
         var provider = ScopeProvider;
-        using var efCoreScope = NewScopeProvider.CreateScope();
         using (var scope = provider.CreateScope())
         {
             var repo = CreateRepository(provider);
 
-            var lang = await LanguageRepository.GetByIsoCodeAsync("en-AU");
+            var lang = LanguageRepository.GetByIsoCode("en-AU");
             var content = DocumentRepository.Get(contentId);
 
             for (var i = 0; i < 10; i++)
@@ -345,19 +334,18 @@ internal sealed class DomainRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Get_All_For_Content()
+    public void Get_All_For_Content()
     {
         var contentId = CreateTestData("en-AU", out var ct);
 
         var provider = ScopeProvider;
-        using var efCoreScope = NewScopeProvider.CreateScope();
         using (var scope = provider.CreateScope())
         {
             var repo = CreateRepository(provider);
 
             var contentItems = new List<IContent>();
 
-            var lang = await LanguageRepository.GetByIsoCodeAsync("en-AU");
+            var lang = LanguageRepository.GetByIsoCode("en-AU");
             contentItems.Add(DocumentRepository.Get(contentId));
 
             // more test data (3 content items total)
@@ -390,19 +378,18 @@ internal sealed class DomainRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Get_All_For_Content_Without_Wildcards()
+    public void Get_All_For_Content_Without_Wildcards()
     {
         var contentId = CreateTestData("en-AU", out var ct);
 
         var provider = ScopeProvider;
-        using var efCoreScope = NewScopeProvider.CreateScope();
         using (var scope = provider.CreateScope())
         {
             var repo = CreateRepository(provider);
 
             var contentItems = new List<IContent>();
 
-            var lang = await LanguageRepository.GetByIsoCodeAsync("en-AU");
+            var lang = LanguageRepository.GetByIsoCode("en-AU");
             contentItems.Add(DocumentRepository.Get(contentId));
 
             // more test data (3 content items total)
