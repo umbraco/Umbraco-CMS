@@ -25,7 +25,7 @@ internal static class WebApplicationExtensions
                 $"img-src 'self' data: news-dashboard.umbraco.com; " +
                 $"connect-src 'self'; " +
                 $"font-src 'self'; " +
-                $"frame-src 'self'");
+                $"frame-src 'self' marketplace.umbraco.com");
 
             await next();
         });
