@@ -41,13 +41,10 @@ internal sealed class DocumentEditingPresentationFactory : ContentEditingPresent
 
     public async Task<UpdateDocumentRequestModel> CreateUpdateRequestModelAsync(IContent content)
     {
-        // Map values (similar to ContentMapDefinition.MapValueViewModels)
-        var values = MapValuesToRequestModel(content.Properties);
+        DocumentValueModel[] values = MapValuesToRequestModel(content.Properties);
 
-        // Map variants (culture/segment with name)
-        var variants = MapVariantsToRequestModel(content);
+        DocumentVariantRequestModel[] variants = MapVariantsToRequestModel(content);
 
-        // Map template
         Guid? templateKey = content.TemplateId.HasValue
             ? (await _templateService.GetAsync(content.TemplateId.Value))?.Key
             : null;
@@ -56,7 +53,7 @@ internal sealed class DocumentEditingPresentationFactory : ContentEditingPresent
         {
             Values = values,
             Variants = variants,
-            Template = templateKey.HasValue ? new ReferenceByIdModel { Id = templateKey.Value } : null
+            Template = templateKey.HasValue ? new ReferenceByIdModel { Id = templateKey.Value } : null,
         };
     }
 
