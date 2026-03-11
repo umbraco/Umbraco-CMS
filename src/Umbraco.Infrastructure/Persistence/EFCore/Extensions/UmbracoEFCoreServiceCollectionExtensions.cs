@@ -4,6 +4,7 @@ using Microsoft.Extensions.Options;
 using Serilog;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.EFCore.Extensions;
@@ -51,7 +52,11 @@ public static class UmbracoEFCoreServiceCollectionExtensions
         services.AddTransient(services => services.GetRequiredService<IDbContextFactory<T>>().CreateDbContext());
 
         services.AddUnique<IAmbientEFCoreScopeStack<T>, AmbientEFCoreScopeStack<T>>();
-        services.AddUnique<IEFCoreScopeAccessor<T>, EFCoreScopeAccessor<T>>();
+        services.AddUnique<IEFCoreScopeAccessor<T>>(sp =>
+            new EFCoreScopeAccessor<T>(
+                sp.GetRequiredService<IAmbientEFCoreScopeStack<T>>(),
+                sp.GetRequiredService<IAmbientScopeStack>(),
+                new Lazy<IEFCoreScopeProvider<T>>(sp.GetRequiredService<IEFCoreScopeProvider<T>>)));
         services.AddUnique<IEFCoreScopeProvider<T>, EFCoreScopeProvider<T>>();
 
         DbContextRegistration registration = services.GetDbContextRegistration();

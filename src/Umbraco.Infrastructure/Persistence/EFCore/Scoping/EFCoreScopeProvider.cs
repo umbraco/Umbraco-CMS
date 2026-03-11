@@ -218,6 +218,37 @@ internal sealed class EFCoreScopeProvider<TDbContext> : IEFCoreScopeProvider<TDb
     }
 
     /// <summary>
+    /// Creates a bridged EF Core scope, that has the existing NPoco scope as a parent.
+    /// This is used by <see cref="EFCoreScopeAccessor{TDbContext}"/> to create an EF Core
+    /// scope when NPoco tries to do operations in EF Core repositories.
+    ///
+    /// The Bridged scope does not know when the NPoco scope is completed so its "manually" cleaned
+    ///  up in the <see cref="EFCoreScopeAccessor{TDbContext}"/>
+    /// </summary>
+    /// <param name="existingNPocoScope">The existing ambient NPoco scope.</param>
+    /// <returns>The created bridge scope which is pushed onto the stack.</returns>
+    internal IEfCoreScope<TDbContext> CreateBridgeScope(IScope existingNPocoScope)
+    {
+        var bridgeScope = new EFCoreScope<TDbContext>(
+            existingNPocoScope,
+            _distributedLockingMechanismFactory,
+            _loggerFactory,
+            _efCoreScopeAccessor,
+            _fileSystems,
+            this,
+            null,
+            _eventAggregator,
+            _dbContextFactory)
+        {
+            IsBridgeScope = true,
+            BridgedScope = existingNPocoScope,
+        };
+
+        _ambientEfCoreScopeStack.Push(bridgeScope);
+        return bridgeScope;
+    }
+
+    /// <summary>
     /// Removes the current ambient scope from the stack.
     /// </summary>
     public void PopAmbientScope() => _ambientEfCoreScopeStack.Pop();

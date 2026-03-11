@@ -28,6 +28,18 @@ internal class EFCoreScope<TDbContext> : CoreScope, IEfCoreScope<TDbContext>
     private bool _connectionOverridden;
 
     /// <summary>
+    /// Gets or sets. This indicates if the scope is bridged.
+    /// </summary>
+    internal bool IsBridgeScope { get; init; }
+
+    /// <summary>
+    /// Gets or sets. Bridged scopes are the scopes that our EF Core Scopes derive from.
+    /// Since we are migrating from NPoco to EFCore we need a way to handle NPoco scopes in
+    /// EF Core contexts. So a bridged scope is created, it is essentially a child of the NPoco scope.
+    /// </summary>
+    internal IScope? BridgedScope { get; init; }
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="EFCoreScope{TDbContext}"/> class.
     /// </summary>
     /// <param name="distributedLockingMechanismFactory">The distributed locking mechanism factory.</param>
@@ -171,6 +183,15 @@ internal class EFCoreScope<TDbContext> : CoreScope, IEfCoreScope<TDbContext>
     /// <inheritdoc />
     public override void Dispose()
     {
+        if (IsBridgeScope)
+        {
+            // Bridge scopes are the EF Core "child" of NPoco scopes so just pop from the EF Core stack
+            // and clean up (happens in scope accessor). Don't check ambient scope, don't touch the inner NPoco scope.
+            _efCoreScopeProvider.PopAmbientScope();
+            _disposed = true;
+            return;
+        }
+
         if (this != _efCoreScopeAccessor.AmbientScope)
         {
             var failedMessage =

@@ -1,31 +1,97 @@
 using Microsoft.EntityFrameworkCore;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Infrastructure.Scoping;
 using CoreEFCoreScopeAccessor = Umbraco.Cms.Core.Scoping.EFCore.IScopeAccessor;
+using IScope = Umbraco.Cms.Infrastructure.Scoping.IScope;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
 
 /// <summary>
 /// Provides access to the current ambient EF Core scope.
+/// When no EF Core scope exists but an NPoco scope is active, automatically creates
+/// an EF Core bridge scope to allow EF Core repositories to participate in the NPoco transaction.
 /// </summary>
 /// <typeparam name="TDbContext">The type of DbContext.</typeparam>
 internal sealed class EFCoreScopeAccessor<TDbContext> : IEFCoreScopeAccessor<TDbContext> where TDbContext : DbContext
 {
     private readonly IAmbientEFCoreScopeStack<TDbContext> _ambientEfCoreScopeStack;
 
+    // TODO: Remove bridge scope support when NPoco migration is complete
+    private readonly IAmbientScopeStack _ambientScopeStack;
+    private readonly Lazy<IEFCoreScopeProvider<TDbContext>> _efCoreScopeProvider;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="EFCoreScopeAccessor{TDbContext}"/> class.
     /// </summary>
     /// <param name="ambientEfCoreScopeStack">The ambient scope stack.</param>
-    public EFCoreScopeAccessor(IAmbientEFCoreScopeStack<TDbContext> ambientEfCoreScopeStack) => _ambientEfCoreScopeStack = ambientEfCoreScopeStack;
+    /// <param name="ambientScopeStack">The NPoco ambient scope stack, used to detect active NPoco scopes.</param>
+    /// <param name="efCoreScopeProvider">
+    /// Lazy provider to avoid circular dependencies (EFCoreScopeProvider depends on EFCoreScopeAccessor).
+    /// Used to auto-create EF Core scopes when only an NPoco scope exists.
+    /// </param>
+    public EFCoreScopeAccessor(
+        IAmbientEFCoreScopeStack<TDbContext> ambientEfCoreScopeStack,
+        IAmbientScopeStack ambientScopeStack,
+        Lazy<IEFCoreScopeProvider<TDbContext>> efCoreScopeProvider)
+    {
+        _ambientEfCoreScopeStack = ambientEfCoreScopeStack;
+        _ambientScopeStack = ambientScopeStack;
+        _efCoreScopeProvider = efCoreScopeProvider;
+    }
 
     /// <summary>
     /// Gets the current ambient scope as a concrete EFCoreScope instance.
     /// </summary>
-    public EFCoreScope<TDbContext>? AmbientScope => (EFCoreScope<TDbContext>?)_ambientEfCoreScopeStack.AmbientScope;
+    public EFCoreScope<TDbContext>? AmbientScope => (EFCoreScope<TDbContext>?)GetOrCreateAmbientScope();
 
     /// <inheritdoc />
-    IEfCoreScope<TDbContext>? IEFCoreScopeAccessor<TDbContext>.AmbientScope => _ambientEfCoreScopeStack.AmbientScope;
+    IEfCoreScope<TDbContext>? IEFCoreScopeAccessor<TDbContext>.AmbientScope => GetOrCreateAmbientScope();
 
     /// <inheritdoc />
-    ICoreScope? CoreEFCoreScopeAccessor.AmbientScope => _ambientEfCoreScopeStack.AmbientScope;
+    ICoreScope? CoreEFCoreScopeAccessor.AmbientScope => GetOrCreateAmbientScope();
+
+    /// <summary>
+    /// Returns the existing ambient EF Core scope, or creates a bridge scope if an NPoco scope is active.
+    /// The bridge scope wraps an existing NPoco scope without owning it, this forces us to clean up the scope manually
+    /// here, since the bridge scope won't know if the NPoco scope was completed.
+    ///
+    /// This is temporary and should be removed when all repositories are migrated to EF Core.
+    /// </summary>
+    private IEfCoreScope<TDbContext>? GetOrCreateAmbientScope()
+    {
+        IEfCoreScope<TDbContext>? scope = _ambientEfCoreScopeStack.AmbientScope;
+
+        if (scope is not null)
+        {
+            if (scope is not EFCoreScope<TDbContext> { IsBridgeScope: true } bridgeScope)
+            {
+                return scope;
+            }
+
+            // If the scope exists on the stack we validate if its the bridged scope.
+            IScope? currentScope = _ambientScopeStack.AmbientScope;
+            if (currentScope is not null && ReferenceEquals(currentScope, bridgeScope.BridgedScope))
+            {
+                return scope;
+            }
+
+            // Bridged scope might be stale because its NPoco scope was disposed, so we clean it up here.
+            bridgeScope.Complete();
+            bridgeScope.Dispose();
+
+            if (currentScope is null)
+            {
+                return null;
+            }
+        }
+
+        // No EF Core scope on the stack. If an NPoco scope exists create a bridge scope
+        if (_ambientScopeStack.AmbientScope is IScope npocoScope)
+        {
+            return ((EFCoreScopeProvider<TDbContext>)_efCoreScopeProvider.Value)
+                .CreateBridgeScope(npocoScope);
+        }
+
+        return null;
+    }
 }
