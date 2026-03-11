@@ -4,10 +4,16 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Api.Management.ViewModels.Server;
+using Umbraco.Cms.Web.Common.Controllers;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Server;
 
 [ApiVersion("1.0")]
+
+// The backoffice shell reads /server/status to detect RuntimeLevel.Upgrading and show the
+// "automatic upgrade in progress" modal. This endpoint must be reachable during an unattended
+// upgrade, so the maintenance filter is explicitly bypassed.
+[SkipMaintenanceModeFilter]
 public class StatusServerController : ServerControllerBase
 {
     private readonly IRuntimeState _runtimeState;

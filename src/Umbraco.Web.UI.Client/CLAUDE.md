@@ -70,6 +70,7 @@ See **[Commands](./docs/commands.md)** for all available commands.
 | Testing (specific file) | `npm test -- --files "src/packages/path/to/file.test.ts"` |
 | Build | `npm run build` |
 | Lint | `npm run lint:fix` |
+| Circular dep check | `npm run check:circular` |
 
 ---
 
