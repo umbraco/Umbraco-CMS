@@ -6,6 +6,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'collectionFilter',
 		alias: 'Umb.CollectionFilter.UserState',
 		name: 'User State Collection Filter',
+		weight: 200,
 		element: () => import('./user-state-collection-filter.element.js'),
 		api: () => import('./user-state-collection-filter.api.js'),
 		meta: {

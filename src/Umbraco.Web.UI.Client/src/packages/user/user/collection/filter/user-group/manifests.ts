@@ -6,6 +6,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'collectionFilter',
 		alias: 'Umb.CollectionFilter.UserGroup',
 		name: 'User Group Collection Filter',
+		weight: 100,
 		element: () => import('./user-group-collection-filter.element.js'),
 		api: () => import('./user-group-collection-filter.api.js'),
 		meta: {
