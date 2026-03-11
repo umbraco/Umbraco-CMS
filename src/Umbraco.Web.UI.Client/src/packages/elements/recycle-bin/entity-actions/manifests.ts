@@ -1,3 +1,4 @@
+import { UmbElementFolderItemDataResolver } from '../../folder/data-resolver/element-folder-item-data-resolver.js';
 import { UmbElementItemDataResolver } from '../../item/data-resolver/element-item-data-resolver.js';
 import {
 	UMB_ELEMENT_DETAIL_REPOSITORY_ALIAS,
@@ -73,6 +74,7 @@ const elementActions: Array<UmbExtensionManifest> = [
 		meta: {
 			destinationItemRepositoryAlias: UMB_ELEMENT_FOLDER_ITEM_REPOSITORY_ALIAS,
 			destinationRootEntityType: UMB_ELEMENT_ROOT_ENTITY_TYPE,
+			destinationItemDataResolver: UmbElementFolderItemDataResolver,
 			itemRepositoryAlias: UMB_ELEMENT_ITEM_REPOSITORY_ALIAS,
 			itemDataResolver: UmbElementItemDataResolver,
 			pickerModal: UMB_ELEMENT_FOLDER_PICKER_MODAL,
@@ -113,7 +115,9 @@ const folderActions: Array<UmbExtensionManifest> = [
 		forEntityTypes: [UMB_ELEMENT_FOLDER_ENTITY_TYPE],
 		meta: {
 			destinationRootEntityType: UMB_ELEMENT_ROOT_ENTITY_TYPE,
+			destinationItemDataResolver: UmbElementFolderItemDataResolver,
 			itemRepositoryAlias: UMB_ELEMENT_FOLDER_ITEM_REPOSITORY_ALIAS,
+			itemDataResolver: UmbElementFolderItemDataResolver,
 			pickerModal: UMB_ELEMENT_FOLDER_PICKER_MODAL,
 			recycleBinRepositoryAlias: UMB_ELEMENT_FOLDER_RECYCLE_BIN_REPOSITORY_ALIAS,
 		},
