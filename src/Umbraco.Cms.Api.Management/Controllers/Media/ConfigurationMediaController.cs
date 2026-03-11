@@ -7,7 +7,6 @@ using Umbraco.Cms.Api.Management.ViewModels.Media;
 namespace Umbraco.Cms.Api.Management.Controllers.Media;
 
 [ApiVersion("1.0")]
-[Obsolete("No longer used. Scheduled for removal in Umbraco 18.")]
 public class ConfigurationMediaController : MediaControllerBase
 {
     private readonly IConfigurationPresentationFactory _configurationPresentationFactory;
