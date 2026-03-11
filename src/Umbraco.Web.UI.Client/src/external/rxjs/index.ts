@@ -24,4 +24,5 @@ export {
 	delay,
 	throttleTime,
 	auditTime,
+	defer,
 } from 'rxjs';

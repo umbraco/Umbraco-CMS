@@ -1,9 +1,9 @@
 import { extractUmbNotificationColor } from './extractUmbNotificationColor.function.js';
 import { isUmbNotifications, UMB_NOTIFICATION_HEADER } from './isUmbNotifications.function.js';
 import { isProblemDetailsLike } from './apiTypeValidators.function.js';
+import { UmbAuthSignalerContext } from './auth-signaler.context.js';
 import type { UmbProblemDetails } from './types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 import type { UmbNotificationColor } from '@umbraco-cms/backoffice/notification';
 import type { umbHttpClient } from '@umbraco-cms/backoffice/http-client';
 
@@ -31,6 +31,9 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 	 */
 	#nonGet401Requests: Array<{ request: Request; requestConfig: unknown }> = [];
 
+	/** Registered on the host so auth context can consume it to bridge authorization state. */
+	#signaler = new UmbAuthSignalerContext(this._host);
+
 	/**
 	 * Binds the default interceptors to the client.
 	 * This includes the auth response interceptor, the error interceptor and the umb-notifications interceptor.
@@ -48,7 +51,7 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 	}
 
 	/**
-	 * Interceptor which checks responses for 401 errors and lets the UmbAuthContext know the user is timed out.
+	 * Interceptor which checks responses for 401 errors and signals the auth layer to show the login UI.
 	 * @param {umbHttpClient} client The OpenAPI client to add the interceptor to. It can be any client supporting Response and Request interceptors.
 	 * @internal
 	 */
@@ -68,16 +71,15 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 
 			const newResponse = this.#createResponse(problemDetails, response);
 
-			const authContext = await this.getContext(UMB_AUTH_CONTEXT, { preventTimeout: true });
-			if (!authContext) throw new Error('Could not get the auth context');
+			const signaler = this.#signaler;
 
 			// Only retry for GET requests
 			if (request.method !== 'GET') {
 				// Collect info for later notification
 				this.#nonGet401Requests.push({ request, requestConfig });
 
-				// Show login overlay (only once per burst, as before)
-				authContext.timeOut();
+				// Signal the auth layer to show the login UI
+				signaler.requestTimeout();
 				return newResponse;
 			}
 
@@ -109,8 +111,8 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 					retries,
 				});
 
-				// Show login overlay
-				authContext.timeOut();
+				// Signal the auth layer to show the login UI
+				signaler.requestTimeout();
 
 				console.log(
 					'[Interceptor] 401 Unauthorized - queuing request for re-authentication and have tried',
@@ -258,48 +260,46 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 	}
 
 	/**
-	 * Listen for authorization state to retry GET-requests that received a 401 Unauthorized response.
-	 * This will retry all pending requests that received a 401 Unauthorized response after re-authentication.
-	 * It will also notify the user about non-GET requests that received a 401 Unauthorized response.
+	 * Observes the auth signaler's authorization state to retry GET-requests that received a 401
+	 * Unauthorized response. Also notifies the user about non-GET requests that received a 401
+	 * Unauthorized response after re-authentication completes.
 	 * @internal
 	 */
 	handleUnauthorizedAuthRetry() {
-		this.consumeContext(UMB_AUTH_CONTEXT, (context) => {
-			this.observe(
-				context?.isAuthorized,
-				(isAuthorized) => {
-					// Only retry when transitioning to authorized (i.e. re-authentication completed)
-					if (!isAuthorized) return;
-					// Skip if there are no pending requests to retry
-					if (this.#pending401Requests.length === 0 && this.#nonGet401Requests.length === 0) return;
+		this.observe(
+			this.#signaler.isAuthorized,
+			(isAuthorized) => {
+				// Only retry when transitioning to authorized (i.e. re-authentication completed)
+				if (!isAuthorized) return;
+				// Skip if there are no pending requests to retry
+				if (this.#pending401Requests.length === 0 && this.#nonGet401Requests.length === 0) return;
 
-					console.log('[Interceptor] 401 Unauthorized - re-authentication completed');
+				console.log('[Interceptor] 401 Unauthorized - re-authentication completed');
 
-					// On auth, retry all pending requests
-					const requests = this.#pending401Requests.splice(0, this.#pending401Requests.length);
-					requests.forEach((req) => {
-						console.log('[Interceptor] 401 Unauthorized - retrying request after re-authentication', req.requestConfig);
-						req.retry().then(req.resolve).catch(req.reject);
+				// On auth, retry all pending requests
+				const requests = this.#pending401Requests.splice(0, this.#pending401Requests.length);
+				requests.forEach((req) => {
+					console.log('[Interceptor] 401 Unauthorized - retrying request after re-authentication', req.requestConfig);
+					req.retry().then(req.resolve).catch(req.reject);
+				});
+
+				// Notify about non-GET 401s after successful re-auth
+				if (this.#nonGet401Requests.length > 0) {
+					const errors: Record<string, string> = {};
+					this.#nonGet401Requests.forEach((req) => {
+						errors[`${req.request.method} ${req.request.url}`] = `Request failed with 401 Unauthorized.`;
 					});
-
-					// Notify about non-GET 401s after successful re-auth
-					if (this.#nonGet401Requests.length > 0) {
-						const errors: Record<string, string> = {};
-						this.#nonGet401Requests.forEach((req) => {
-							errors[`${req.request.method} ${req.request.url}`] = `Request failed with 401 Unauthorized.`;
-						});
-						this.#peekError(
-							'Some actions were not completed',
-							'Some actions could not be completed because your session expired. Please try again.',
-							errors,
-							'warning',
-						);
-						this.#nonGet401Requests.length = 0; // Clear after notifying
-					}
-				},
-				'_authClearNonGet401Requests',
-			);
-		});
+					this.#peekError(
+						'Some actions were not completed',
+						'Some actions could not be completed because your session expired. Please try again.',
+						errors,
+						'warning',
+					);
+					this.#nonGet401Requests.length = 0; // Clear after notifying
+				}
+			},
+			'_authClearNonGet401Requests',
+		);
 	}
 
 	/**
@@ -333,10 +333,10 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 
 	/**
 	 * Helper to show a notification error.
-	 * @param headline
-	 * @param message
-	 * @param details
-	 * @param color
+	 * @param {string} headline The headline of the error notification.
+	 * @param {string} message The message of the error notification.
+	 * @param {unknown} details Additional details to show in the notification.
+	 * @param {UmbNotificationColor} [color] The color of the notification.
 	 */
 	async #peekError(headline: string, message: string, details: unknown, color?: UmbNotificationColor) {
 		// Store the host for usage in the following async context

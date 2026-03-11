@@ -192,7 +192,7 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference, I
                 {
                     if (dto.Udi.EntityType == Constants.UdiEntityType.Document)
                     {
-                        url =  _publishedUrlProvider.GetUrl(dto.Udi.Guid, UrlMode.Relative, culture);
+                        url = _publishedUrlProvider.GetUrl(dto.Udi.Guid, UrlMode.Relative, dto.Culture ?? culture);
                         IContent? c = GetAndCacheContentById(dto.Udi.Guid, _appCaches.RequestCache, _contentService);
 
                         if (c is not null)
@@ -229,6 +229,7 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference, I
                     : dto.Udi.EntityType,
                     Unique = dto.Udi?.Guid,
                     Url = url ?? string.Empty,
+                    Culture = dto.Culture
                 });
             }
 
@@ -268,6 +269,7 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference, I
                     Target = link.Target,
                     Udi = TypeIsUdiBased(link) ? new GuidUdi(link.Type!, link.Unique!.Value) : null,
                     Url = TypeIsExternal(link) ? link.Url : null, // only save the URL for external links
+                    Culture = link.Culture,
                 }));
         }
         catch (Exception ex)
@@ -309,6 +311,9 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference, I
 
         [DataMember(Name = "queryString")]
         public string? QueryString { get; set; }
+
+        [DataMember(Name = "culture")]
+        public string? Culture { get; set; }
     }
 
     internal sealed class MinMaxValidator : ITypedJsonValidator<LinkDisplay[], MultiUrlPickerConfiguration>
