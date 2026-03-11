@@ -1,8 +1,10 @@
-import { css, customElement, html, ifDefined, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbUserGroupCollectionFilterApi } from './user-group-collection-filter.api.js';
+import { css, customElement, html, ifDefined, nothing, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 import type { ManifestCollectionFilter, UmbSelectOption } from '@umbraco-cms/backoffice/collection';
-import type { UmbUserGroupCollectionFilterApi } from './user-group-collection-filter.api';
+import type { UmbDatalistItemModel } from '@umbraco-cms/backoffice/datalist-data-source';
 
 @customElement('umb-user-group-collection-filter')
 export class UmbUserGroupCollectionFilterElement extends UmbLitElement {
@@ -14,6 +16,12 @@ export class UmbUserGroupCollectionFilterElement extends UmbLitElement {
 	@state()
 	private _value: Array<string> = [];
 
+	@state()
+	private _valueItems: Array<UmbDatalistItemModel> = [];
+
+	@state()
+	private _hasMore = false;
+
 	private _api?: UmbUserGroupCollectionFilterApi | undefined;
 	public get api(): UmbUserGroupCollectionFilterApi | undefined {
 		return this._api;
@@ -22,6 +30,16 @@ export class UmbUserGroupCollectionFilterElement extends UmbLitElement {
 		this._api = api;
 		this.observe(api?.options, (options) => (this._options = options ?? []));
 		this.observe(api?.value, (value) => (this._value = value ?? []));
+		this.observe(api?.valueItems, (items) => (this._valueItems = items ?? []));
+
+		if (api) {
+			this.observe(
+				observeMultiple([api.pagination.currentPage, api.pagination.totalPages]),
+				([currentPage, totalPages]) => (this._hasMore = currentPage < totalPages),
+			);
+		}
+
+		this._api?.loadOptions();
 	}
 
 	#onChange(event: Event) {
@@ -40,16 +58,20 @@ export class UmbUserGroupCollectionFilterElement extends UmbLitElement {
 		this._api?.setValue(value);
 	}
 
+	#onLoadMore() {
+		this._api?.loadMoreOptions();
+	}
+
 	#getUserGroupFilterLabel() {
 		const length = this._value.length;
 		const max = 2;
-		//TODO: Temp solution to limit the amount of states shown
-		return length === 0
-			? this.localize.term('general_all')
-			: this._value
-					.slice(0, max)
-					.map((group) => group)
-					.join(', ') + (length > max ? ' + ' + (length - max) : '');
+		if (length === 0) return this.localize.term('general_all');
+
+		const labels = this._value
+			.slice(0, max)
+			.map((unique) => this._valueItems.find((i) => i.unique === unique)?.name ?? unique);
+
+		return labels.join(', ') + (length > max ? ' + ' + (length - max) : '');
 	}
 
 	protected override render() {
@@ -72,6 +94,11 @@ export class UmbUserGroupCollectionFilterElement extends UmbLitElement {
 										@change=${this.#onChange}></uui-checkbox>
 								`,
 							)}
+							${this._hasMore
+								? html`<uui-button label=${this.localize.term('general_loadMore')} @click=${this.#onLoadMore} compact>
+										${this.localize.term('general_loadMore')}
+									</uui-button>`
+								: nothing}
 						</div>
 					</umb-popover-layout>
 				</uui-popover-container>
