@@ -10,7 +10,6 @@ import { setStoredPath } from '@umbraco-cms/backoffice/utils';
 export class UmbAppAuthController extends UmbControllerBase {
 	#retrievedModal: Promise<unknown>;
 	#authContext?: typeof UMB_AUTH_CONTEXT.TYPE;
-	#isFirstCheck = true;
 
 	constructor(host: UmbControllerHost) {
 		super(host);
@@ -33,6 +32,7 @@ export class UmbAppAuthController extends UmbControllerBase {
 	/**
 	 * Checks if the user is authorized.
 	 * If not, the authorization flow is started.
+	 * Session verification is handled by setInitialState() before the router evaluates guards.
 	 */
 	async isAuthorized(): Promise<boolean> {
 		await this.#retrievedModal.catch(() => undefined);
@@ -40,21 +40,8 @@ export class UmbAppAuthController extends UmbControllerBase {
 			throw new Error('[Fatal] Auth context is not available');
 		}
 
-		const isAuthorized = this.#authContext.getIsAuthorized();
-
-		if (isAuthorized) {
-			// If this is the first time we are checking the authorization state (i.e. on first load), we need to make sure
-			// that the token is still valid. If it is not, we need to start the authorization flow.
-			// If the token is still valid, we can return true.
-			if (this.#isFirstCheck) {
-				this.#isFirstCheck = false;
-				const isValid = await this.#authContext.validateToken();
-				if (isValid) {
-					return true;
-				}
-			} else {
-				return true;
-			}
+		if (this.#authContext.getIsAuthorized()) {
+			return true;
 		}
 
 		// Make a request to the auth server to start the auth flow
