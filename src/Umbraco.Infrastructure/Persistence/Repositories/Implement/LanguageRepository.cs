@@ -1,10 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Collections;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.Cache;
@@ -54,10 +52,6 @@ internal sealed class LanguageRepository : AsyncEntityRepositoryBase<int, ILangu
 
     private AsyncFullDataSetRepositoryCachePolicy<ILanguage, int>? TypedCachePolicy =>
         CachePolicy as AsyncFullDataSetRepositoryCachePolicy<ILanguage, int>;
-
-    // The base class GetEntityId casts entity.Key (Guid) to TId, which fails when TId is int.
-    // Language entities use int IDs, so we override to return entity.Id directly.
-    protected override int GetEntityId(ILanguage entity) => entity.Id;
 
     public async Task<ILanguage?> GetByIsoCodeAsync(string isoCode)
     {
@@ -407,9 +401,6 @@ internal sealed class LanguageRepository : AsyncEntityRepositoryBase<int, ILangu
                 .ExecuteUpdateAsync(setter => setter
                     .SetProperty(x => x.FallbackLanguageId, (int?)null));
 
-            await DeleteReferences(entity.Id, db);
-
-            // delete the language itself
             await db.Language
                 .Where(x => x.Id == entity.Id)
                 .ExecuteDeleteAsync();
@@ -485,42 +476,15 @@ internal sealed class LanguageRepository : AsyncEntityRepositoryBase<int, ILangu
 
     private async Task EnsureCacheIsPopulatedAsync()
     {
-        // Create a scope if none exists (handles NPoco code paths calling into this EF Core repository).
-        // This is temporary, and should be removed when this repository is no longer called from NPoco contexts.
-        ICoreScope? scope = null;
-        if (ScopeAccessor.AmbientScope is null)
+        // ensure cache is populated, in a non-expensive way
+        if (TypedCachePolicy != null)
         {
-            scope = _efCoreScopeProvider.CreateScope();
+            await TypedCachePolicy.GetAllCachedAsync(PerformGetAllAsync);
         }
-
-        try
+        else
         {
-            if (TypedCachePolicy != null)
-            {
-                await TypedCachePolicy.GetAllCachedAsync(PerformGetAllAsync);
-            }
-            else
-            {
-                await PerformGetAllAsync();
-            }
-
-            scope?.Complete();
+            await PerformGetAllAsync(); // We don't have a typed cache (i.e. unit tests) but need to populate the _codeIdMap
         }
-        finally
-        {
-            scope?.Dispose();
-        }
-
-        // This is the "Old" implementation, when this repository is not called from Npoco contexts anymore, use this implementation.
-        // // ensure cache is populated, in a non-expensive way
-        // if (TypedCachePolicy != null)
-        // {
-        //     await TypedCachePolicy.GetAllCachedAsync(PerformGetAllAsync);
-        // }
-        // else
-        // {
-        //     await PerformGetAllAsync(); // We don't have a typed cache (i.e. unit tests) but need to populate the _codeIdMap
-        // }
     }
 
     private int? GetFallbackLanguageId(ILanguage entity)
@@ -533,31 +497,6 @@ internal sealed class LanguageRepository : AsyncEntityRepositoryBase<int, ILangu
         }
 
         return fallbackLanguageId;
-    }
-
-    /// <summary>
-    /// Clean up all referencing tables before deleting the language.
-    /// These tables have FKs to the Language table without cascade delete.
-    /// When these tables get migrated to EF Core, they should use OnDelete(DeleteBehavior.Cascade) instead.
-    ///
-    /// This solution is temporary, and should be removed when this repository is no longer called from NPoco contexts.
-    /// </summary>
-    private async Task DeleteReferences(int id, UmbracoDbContext db)
-    {
-        async Task DeleteByLanguageId(string tableName) =>
-            await db.Database.ExecuteSqlRawAsync($"DELETE FROM \"{tableName}\" WHERE \"languageId\" = {{0}}", id);
-
-        await DeleteByLanguageId(Constants.DatabaseSchema.Tables.DictionaryValue);
-        await DeleteByLanguageId(Constants.DatabaseSchema.Tables.PropertyData);
-        await DeleteByLanguageId(Constants.DatabaseSchema.Tables.ContentVersionCultureVariation);
-        await DeleteByLanguageId(Constants.DatabaseSchema.Tables.DocumentCultureVariation);
-        await DeleteByLanguageId(Constants.DatabaseSchema.Tables.ElementCultureVariation);
-        await DeleteByLanguageId(Constants.DatabaseSchema.Tables.ContentSchedule);
-        await db.Database.ExecuteSqlRawAsync($"DELETE FROM \"{Constants.DatabaseSchema.Tables.TagRelationship}\" WHERE \"tagId\" IN (SELECT id FROM \"{Constants.DatabaseSchema.Tables.Tag}\" WHERE \"languageId\" = {{0}})", id);
-        await DeleteByLanguageId(Constants.DatabaseSchema.Tables.Tag);
-        await DeleteByLanguageId(Constants.DatabaseSchema.Tables.DocumentUrl);
-        await DeleteByLanguageId(Constants.DatabaseSchema.Tables.DocumentUrlAlias);
-        await DeleteByLanguageId(Constants.DatabaseSchema.Tables.UserGroup2Language);
     }
 
     /// <summary>
@@ -576,26 +515,6 @@ internal sealed class LanguageRepository : AsyncEntityRepositoryBase<int, ILangu
 
         using ICoreScope scope = _efCoreScopeProvider.CreateScope();
         var result = await AmbientScope.ExecuteWithContextAsync(method);
-        scope.Complete();
-        return result;
-    }
-
-    /// <summary>
-    /// Explicit interface implementation that ensures an ambient EF Core scope exists before
-    /// accessing the base class's CachePolicy (which requires AmbientScope).
-    /// This handles calls from NPoco code paths that lack an EF Core scope.
-    ///
-    /// This solution is temporary, and should be removed when this repository is no longer called from NPoco contexts.
-    /// </summary>
-    async Task<IEnumerable<ILanguage>> IAsyncReadRepository<int, ILanguage>.GetAllAsync(CancellationToken cancellationToken)
-    {
-        if (ScopeAccessor.AmbientScope is not null)
-        {
-            return await CachePolicy.GetAllAsync(PerformGetAllAsync);
-        }
-
-        using ICoreScope scope = _efCoreScopeProvider.CreateScope();
-        var result = await CachePolicy.GetAllAsync(PerformGetAllAsync);
         scope.Complete();
         return result;
     }

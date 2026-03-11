@@ -165,11 +165,6 @@ public abstract class AsyncEntityRepositoryBase<TId, TEntity> : AsyncRepositoryB
     /// <returns>The matching entities.</returns>
     public async Task<IEnumerable<TEntity>> GetManyAsync(TId[] ids, CancellationToken cancellationToken)
     {
-        if (ids is null)
-        {
-            return await GetAllAsync(cancellationToken);
-        }
-
         // ensure they are de-duplicated, easy win if people don't do this as this can cause many excess queries
         ids = ids.Distinct()
 
