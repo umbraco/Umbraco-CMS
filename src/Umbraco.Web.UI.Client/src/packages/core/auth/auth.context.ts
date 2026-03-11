@@ -494,12 +494,7 @@ export class UmbAuthContext extends UmbContextBase {
 
 			const response = await this.#client.refreshToken();
 			if (response) {
-				this.#inSessionUpdateCallback = true;
-				try {
-					this.#updateSession(response.expiresIn, response.issuedAt);
-				} finally {
-					this.#inSessionUpdateCallback = false;
-				}
+				this.#updateSession(response.expiresIn, response.issuedAt);
 				return true;
 			}
 			return false;
@@ -755,14 +750,23 @@ export class UmbAuthContext extends UmbContextBase {
 	/**
 	 * Sets the in-memory session state without broadcasting.
 	 * Use when the caller handles broadcasting separately (e.g. completeAuthorizationRequest).
+	 *
+	 * Sets #inSessionUpdateCallback around the setValue calls to prevent re-entrant /token
+	 * requests triggered by session$ observers firing synchronously (e.g. keepUserLoggedIn=true
+	 * with a short expiresIn causes #onSessionExpiring to fire immediately).
 	 */
 	#setSessionLocally(expiresIn: number, issuedAt: number) {
 		const accessTokenExpiresAt = issuedAt + expiresIn;
 		// The access_token lives for 1/4 of the refresh_token lifetime.
 		// Multiply to get the full session expiry.
 		const expiresAt = issuedAt + expiresIn * TOKEN_EXPIRY_MULTIPLIER;
-		this.#session.setValue({ accessTokenExpiresAt, expiresAt });
-		this.#isAuthorized.setValue(true);
+		this.#inSessionUpdateCallback = true;
+		try {
+			this.#session.setValue({ accessTokenExpiresAt, expiresAt });
+			this.#isAuthorized.setValue(true);
+		} finally {
+			this.#inSessionUpdateCallback = false;
+		}
 	}
 
 	/**
