@@ -18,13 +18,7 @@ public class CoreScope : ICoreScope
     /// <summary>
     ///     Gets or sets a value indicating whether the scope has been completed.
     /// </summary>
-    protected bool? Completed
-    {
-        get => _completed;
-        set => _completed = value;
-    }
-
-    private bool? _completed;
+    protected bool? Completed { get; set; }
     private ICompletable? _scopedFileSystem;
     private IScopedNotificationPublisher? _notificationPublisher;
     private IsolatedCaches? _isolatedCaches;
@@ -238,12 +232,12 @@ public class CoreScope : ICoreScope
     /// <returns>A value indicating whether the scope is completed or not.</returns>
     public bool Complete()
     {
-        if (_completed.HasValue == false)
+        if (Completed.HasValue == false)
         {
-            _completed = true;
+            Completed = true;
         }
 
-        return _completed.Value;
+        return Completed.Value;
     }
 
     /// <inheritdoc />
@@ -282,7 +276,7 @@ public class CoreScope : ICoreScope
         }
         else
         {
-            ParentScope.ChildCompleted(_completed);
+            ParentScope.ChildCompleted(Completed);
         }
 
         _disposed = true;
@@ -297,7 +291,7 @@ public class CoreScope : ICoreScope
         // if child did not complete we cannot complete
         if (completed.HasValue == false || completed.Value == false)
         {
-            _completed = false;
+            Completed = false;
         }
     }
 
@@ -308,7 +302,7 @@ public class CoreScope : ICoreScope
     {
         if (_shouldScopeFileSystems == true)
         {
-            if (_completed.HasValue && _completed.Value)
+            if (Completed.HasValue && Completed.Value)
             {
                 _scopedFileSystem?.Complete();
             }
@@ -335,7 +329,7 @@ public class CoreScope : ICoreScope
     /// <summary>
     ///     Handles the scoped notifications when the scope exits.
     /// </summary>
-    protected void HandleScopedNotifications() => _notificationPublisher?.ScopeExit(_completed.HasValue && _completed.Value);
+    protected void HandleScopedNotifications() => _notificationPublisher?.ScopeExit(Completed.HasValue && Completed.Value);
 
     /// <summary>
     ///     Ensures that this scope and all ancestor scopes have not been disposed.

@@ -248,14 +248,7 @@ public class ContentRouteBuilderTests : DeliveryApiTests
         navigationQueryServiceMock.Setup(x=>x.TryGetAncestorsKeys(childKey, out ancestorsKeys)).Returns(true);
 
         // yes... actually testing the mock setup here. but it's important for the rest of the tests that this behave correct, so we better test it.
-        var documentUrlServiceMock = new Mock<IDocumentUrlService>();
-        documentUrlServiceMock
-            .Setup(s => s.GetUrlSegment(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<bool>()))
-            .Returns((Guid key, string culture, bool isDraft) =>
-            {
-                var c = contentCache.GetById(false, key);
-                return c?.Cultures?.TryGetValue(culture, out var info) == true ? info.UrlSegment : c?.UrlSegment;
-            });
+        var documentUrlServiceMock = CreateDocumentUrlServiceMock(contentCache);
         var publishedUrlProvider = SetupPublishedUrlProvider(hideTopLevelNodeFromPath, contentCache, navigationQueryServiceMock.Object, documentUrlServiceMock.Object);
         Assert.AreEqual(hideTopLevelNodeFromPath ? "/" : "/the-root", publishedUrlProvider.GetUrl(root));
         Assert.AreEqual(hideTopLevelNodeFromPath ? "/the-child" : "/the-root/the-child", publishedUrlProvider.GetUrl(child));
@@ -468,14 +461,7 @@ public class ContentRouteBuilderTests : DeliveryApiTests
         requestPreviewServiceMock.Setup(m => m.IsPreview()).Returns(isPreview);
 
         contentCache ??= CreatePublishedContentCache();
-        var documentUrlServiceMock = new Mock<IDocumentUrlService>();
-        documentUrlServiceMock
-            .Setup(s => s.GetUrlSegment(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<bool>()))
-            .Returns((Guid key, string culture, bool isDraft) =>
-            {
-                var c = contentCache.GetById(false, key);
-                return c?.Cultures?.TryGetValue(culture, out var info) == true ? info.UrlSegment : c?.UrlSegment;
-            });
+        var documentUrlServiceMock = CreateDocumentUrlServiceMock(contentCache);
         apiContentPathProvider ??= SetupApiContentPathProvider(hideTopLevelNodeFromPath, contentCache, navigationQueryService, documentUrlServiceMock.Object);
 
         return CreateContentRouteBuilder(
@@ -511,6 +497,19 @@ public class ContentRouteBuilderTests : DeliveryApiTests
             documentUrlService: documentUrlServiceMock.Object);
 
         return builder.Build(content);
+    }
+
+    private static Mock<IDocumentUrlService> CreateDocumentUrlServiceMock(IPublishedContentCache contentCache)
+    {
+        var documentUrlServiceMock = new Mock<IDocumentUrlService>();
+        documentUrlServiceMock
+            .Setup(s => s.GetUrlSegment(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<bool>()))
+            .Returns((Guid key, string culture, bool isDraft) =>
+            {
+                var c = contentCache.GetById(false, key);
+                return c?.Cultures?.TryGetValue(culture, out var info) == true ? info.UrlSegment : c?.UrlSegment;
+            });
+        return documentUrlServiceMock;
     }
 
     private IPublishedContentCache CreatePublishedContentCache()
