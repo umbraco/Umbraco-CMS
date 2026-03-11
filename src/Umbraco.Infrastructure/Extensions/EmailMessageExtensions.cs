@@ -10,7 +10,7 @@ internal static class EmailMessageExtensions
     {
         var fromEmail = string.IsNullOrEmpty(mailMessage.From) ? configuredFromAddress : mailMessage.From;
 
-        if (!InternetAddress.TryParse(fromEmail, out InternetAddress? fromAddress))
+        if (InternetAddress.TryParse(fromEmail, out InternetAddress? fromAddress) is false)
         {
             throw new ArgumentException(
                 $"Email could not be sent.  Could not parse from address {fromEmail} as a valid email address.");
@@ -94,12 +94,10 @@ internal static class EmailMessageExtensions
 
     private static NotificationEmailAddress? ToNotificationAddress(string? address)
     {
-        if (InternetAddress.TryParse(address, out InternetAddress? internetAddress))
+        if (InternetAddress.TryParse(address, out InternetAddress? internetAddress) &&
+            internetAddress is MailboxAddress mailboxAddress)
         {
-            if (internetAddress is MailboxAddress mailboxAddress)
-            {
-                return new NotificationEmailAddress(mailboxAddress.Address, internetAddress.Name ?? string.Empty);
-            }
+            return new NotificationEmailAddress(mailboxAddress.Address, internetAddress.Name ?? string.Empty);
         }
 
         return null;
