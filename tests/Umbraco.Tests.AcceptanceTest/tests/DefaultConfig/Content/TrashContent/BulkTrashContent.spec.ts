@@ -1,13 +1,20 @@
 import {ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 import {expect} from "@playwright/test";
 
-let collectionId = '';
+// Content
 const contentName = 'TestContent';
-const documentTypeName = 'TestDocumentTypeForContent';
-const childDocumentTypeName = 'TestChildDocumentType';
 const firstChildContentName = 'First Child Content';
 const secondChildContentName = 'Second Child Content';
+let contentId = '';
+// Document Types
+const documentTypeName = 'TestDocumentTypeForContent';
+const childDocumentTypeName = 'TestChildDocumentType';
+let documentTypeId = '';
+let childDocumentTypeId = '';
+// Data Type
 const collectionDataTypeName = 'List View - Content';
+let collectionId = '';
+// Document Picker
 const referenceHeadline = ConstantHelper.trashDeleteDialogMessage.bulkReferenceHeadline;
 const documentPickerName = ['TestPicker', 'DocumentTypeForPicker'];
 
@@ -16,6 +23,9 @@ test.beforeEach(async ({umbracoApi}) => {
   await umbracoApi.document.ensureNameNotExists(contentName);
   const collectionDataTypeData = await umbracoApi.dataType.getByName(collectionDataTypeName);
   collectionId = collectionDataTypeData.id;
+  childDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentType(childDocumentTypeName);
+  documentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNodeAndCollectionId(documentTypeName, childDocumentTypeId, collectionId);
+  contentId = await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
 });
 
 test.afterEach(async ({umbracoApi}) => {
@@ -27,9 +37,6 @@ test.afterEach(async ({umbracoApi}) => {
 
 test('can bulk trash content nodes without a relation in list view', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const childDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentType(childDocumentTypeName);
-  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNodeAndCollectionId(documentTypeName, childDocumentTypeId, collectionId);
-  const contentId = await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   await umbracoApi.document.createDefaultDocumentWithParent(firstChildContentName, childDocumentTypeId, contentId);
   await umbracoApi.document.createDefaultDocumentWithParent(secondChildContentName, childDocumentTypeId, contentId);
   await umbracoUi.goToBackOffice();
@@ -56,9 +63,6 @@ test('can bulk trash content nodes without a relation in list view', async ({umb
 
 test('can bulk trash content nodes with a relation in list view', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const childDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentType(childDocumentTypeName);
-  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNodeAndCollectionId(documentTypeName, childDocumentTypeId, collectionId);
-  const contentId = await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   await umbracoApi.document.publish(contentId);
   const firstChildContentId = await umbracoApi.document.createDefaultDocumentWithParent(firstChildContentName, childDocumentTypeId, contentId);
   await umbracoApi.document.publish(firstChildContentId);
@@ -94,9 +98,6 @@ test('can bulk trash content nodes with a relation in list view', async ({umbrac
 
 test('can bulk trash content nodes without a relation in grid view', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const childDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentType(childDocumentTypeName);
-  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNodeAndCollectionId(documentTypeName, childDocumentTypeId, collectionId);
-  const contentId = await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   await umbracoApi.document.createDefaultDocumentWithParent(firstChildContentName, childDocumentTypeId, contentId);
   await umbracoApi.document.createDefaultDocumentWithParent(secondChildContentName, childDocumentTypeId, contentId);
   await umbracoUi.goToBackOffice();
@@ -122,9 +123,6 @@ test('can bulk trash content nodes without a relation in grid view', async ({umb
 
 test('can bulk trash content nodes with a relation in grid view', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const childDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentType(childDocumentTypeName);
-  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNodeAndCollectionId(documentTypeName, childDocumentTypeId, collectionId);
-  const contentId = await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   await umbracoApi.document.publish(contentId);
   const firstChildContentId = await umbracoApi.document.createDefaultDocumentWithParent(firstChildContentName, childDocumentTypeId, contentId);
   await umbracoApi.document.publish(firstChildContentId);

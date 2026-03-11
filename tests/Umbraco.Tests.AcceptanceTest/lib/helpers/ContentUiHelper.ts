@@ -397,6 +397,7 @@ export class ContentUiHelper extends UiBaseLocators {
     // Card Collection View
     this.cardCollectionView = page.locator('umb-card-collection-view');
     this.cardContentNode = this.cardCollectionView.locator('uui-card-content-node');
+    // Public Access
     this.containerSetupBtn = this.container.getByLabel('Setup');
   }
 
