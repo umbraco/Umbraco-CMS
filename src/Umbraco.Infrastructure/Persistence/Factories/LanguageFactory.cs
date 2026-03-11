@@ -30,7 +30,7 @@ internal static class LanguageFactory
         return lang;
     }
 
-    public static LanguageDto BuildDto(ILanguage entity, int? fallbackLanguageId)
+    public static LanguageDto BuildDto(ILanguage entity, short? fallbackLanguageId)
     {
         ArgumentNullException.ThrowIfNull(entity);
 
@@ -45,7 +45,7 @@ internal static class LanguageFactory
 
         if (entity.HasIdentity)
         {
-            dto.Id = entity.Id;
+            dto.Id = (short)entity.Id;
         }
 
         return dto;

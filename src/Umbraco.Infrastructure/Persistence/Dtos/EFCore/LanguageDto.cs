@@ -16,7 +16,7 @@ public class LanguageDto
     /// <summary>
     ///     Gets or sets the identifier of the language.
     /// </summary>
-    public int Id { get; set; }
+    public short Id { get; set; }
 
     /// <summary>
     ///     Gets or sets the ISO code of the language.
