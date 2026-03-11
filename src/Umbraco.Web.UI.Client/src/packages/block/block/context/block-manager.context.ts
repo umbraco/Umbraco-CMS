@@ -177,25 +177,79 @@ export abstract class UmbBlockManagerContext<
 		this.observe(
 			this.blockTypes,
 			(blockTypes) => {
-				blockTypes.forEach((x) => {
-					this.#ensureContentType(x.contentElementTypeKey);
-					if (x.settingsElementTypeKey) {
-						this.#ensureContentType(x.settingsElementTypeKey);
-					}
-				});
+				this.#ensureContentTypes(blockTypes);
 			},
 			null,
 		);
 	}
 
-	async #ensureContentType(unique: string) {
-		if (this.#structures.find((x) => x.getOwnerContentTypeUnique() === unique)) return;
+	#ensureContentTypes(blockTypes: Array<BlockType>) {
+		// Collect all unique content type keys
+		const allUniques = new Set<string>();
+		blockTypes.forEach((x) => {
+			allUniques.add(x.contentElementTypeKey);
+			if (x.settingsElementTypeKey) {
+				allUniques.add(x.settingsElementTypeKey);
+			}
+		});
 
-		// Lets try to go with the UmbContentTypeModel, to make this as compatible with other ContentTypes as possible, but maybe if off with this as Blocks are always based on ElementTypes.. [NL]
-		const structure = new UmbContentTypeStructureManager<UmbContentTypeModel>(this, this.#contentTypeRepository);
-		const initialRequest = structure.loadType(unique);
-		this.#contentTypeRequests.push(initialRequest);
-		this.#structures.push(structure);
+		// Filter out already loaded types
+		const uniquesToFetch = [...allUniques].filter(
+			(unique) => !this.#structures.find((x) => x.getOwnerContentTypeUnique() === unique),
+		);
+
+		if (uniquesToFetch.length === 0) return;
+
+		// IMPORTANT: Create and register all structure managers SYNCHRONOUSLY first
+		// This ensures getStructure() can find them immediately, before any async operations
+		const structuresToInit: Array<{ structure: UmbContentTypeStructureManager<UmbContentTypeModel>; unique: string }> =
+			[];
+
+		for (const unique of uniquesToFetch) {
+			const structure = new UmbContentTypeStructureManager<UmbContentTypeModel>(this, this.#contentTypeRepository);
+			// Set the unique synchronously so getStructure() can find it immediately
+			structure.setOwnerContentTypeUnique(unique);
+			this.#structures.push(structure);
+			structuresToInit.push({ structure, unique });
+		}
+
+		// Now perform async initialization — push the promise synchronously so
+		// contentTypesLoaded (Promise.all(#contentTypeRequests)) properly waits.
+		this.#contentTypeRequests.push(this.#initializeStructures(structuresToInit));
+	}
+
+	async #initializeStructures(
+		structuresToInit: Array<{ structure: UmbContentTypeStructureManager<UmbContentTypeModel>; unique: string }>,
+	) {
+		const uniques = structuresToInit.map((x) => x.unique);
+
+		// Bulk fetch all content types if supported
+		const contentTypesMap = new Map<string, UmbContentTypeModel>();
+
+		if (this.#contentTypeRepository.requestByUniques) {
+			const { error, data } = await this.#contentTypeRepository.requestByUniques(uniques);
+			if (error || !data) {
+				throw error?.message ?? 'Repository could not request Content Types by Uniques.';
+			}
+			if (data) {
+				data.forEach((item) => contentTypesMap.set(item.unique, item));
+			}
+		}
+
+		// Initialize each structure with pre-fetched data or fall back to individual loading
+		const initPromises: Array<Promise<unknown>> = [];
+		for (const { structure, unique } of structuresToInit) {
+			const contentType = contentTypesMap.get(unique);
+
+			if (contentType) {
+				// Use pre-fetched data directly via setType to avoid re-fetching
+				initPromises.push(structure.setType(contentType));
+			} else {
+				// Fallback to individual load if not in bulk response
+				initPromises.push(structure.loadType(unique));
+			}
+		}
+		await Promise.all(initPromises);
 	}
 
 	getStructure(unique: string) {
