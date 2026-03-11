@@ -55,8 +55,8 @@ public abstract class ContentControllerBase : ManagementApiControllerBase
                 .Build()),
             ContentEditingOperationStatus.PropertyTypeCultureVarianceMismatch => BadRequest(problemDetailsBuilder
                 .WithTitle("Property type culture variance mismatch")
-                .WithDetail("One or more property values have a culture that does not match the property type's culture variance. "
-                    + "This can happen when a property is inherited from a variant composition on an invariant content type.")
+                .WithDetail("One or more property values specify a culture for an invariant property, or are missing a culture for a culture-variant property. "
+                    + "This can happen when a property is inherited from a variant composition on an invariant content type, which downgrades it to invariant.")
                 .Build()),
             ContentEditingOperationStatus.PropertyTypeSegmentVarianceMismatch => BadRequest(problemDetailsBuilder
                 .WithTitle("Property type segment variance mismatch")

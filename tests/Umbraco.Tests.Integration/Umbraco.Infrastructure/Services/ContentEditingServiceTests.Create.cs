@@ -531,12 +531,7 @@ public partial class ContentEditingServiceTests
                 new PropertyValueModel
                 {
                     Alias = "title",
-                    Value = "The title value"
-                },
-                new PropertyValueModel
-                {
-                    Alias = "bodyText",
-                    Value = "The body text value",
+                    Value = "The title value",
                     Culture = "en-US"
                 }
             ]
@@ -570,12 +565,7 @@ public partial class ContentEditingServiceTests
                 new PropertyValueModel
                 {
                     Alias = "title",
-                    Value = "The title value"
-                },
-                new PropertyValueModel
-                {
-                    Alias = "bodyText",
-                    Value = "The body text value",
+                    Value = "The title value",
                     Segment = "segment"
                 }
             ]
