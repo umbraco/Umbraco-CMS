@@ -4,9 +4,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Collections;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Repositories;
-using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.Cache;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore;
@@ -28,11 +26,6 @@ internal sealed class LanguageRepository : AsyncEntityRepositoryBase<int, ILangu
     private readonly Dictionary<string, int> _codeIdMap = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<int, string> _idCodeMap = new();
 
-    // Used to create an EF Core scope on-the-fly when called from NPoco code paths
-    // that only create ICoreScopeProvider scopes.
-    // This is a temporary workaround until all services are migrated to use EF Core provider.
-    private readonly IEFCoreScopeProvider<UmbracoDbContext> _efCoreScopeProvider;
-
     private CancellationToken cancellationToken => CancellationToken.None;
 
     public LanguageRepository(
@@ -40,8 +33,7 @@ internal sealed class LanguageRepository : AsyncEntityRepositoryBase<int, ILangu
         AppCaches cache,
         ILogger<LanguageRepository> logger,
         IRepositoryCacheVersionService repositoryCacheVersionService,
-        ICacheSyncService cacheSyncService,
-        IEFCoreScopeProvider<UmbracoDbContext> efCoreScopeProvider)
+        ICacheSyncService cacheSyncService)
         : base(
             scopeAccessor,
             cache,
@@ -49,7 +41,6 @@ internal sealed class LanguageRepository : AsyncEntityRepositoryBase<int, ILangu
             repositoryCacheVersionService,
             cacheSyncService)
     {
-        _efCoreScopeProvider = efCoreScopeProvider;
     }
 
     private AsyncFullDataSetRepositoryCachePolicy<ILanguage, int>? TypedCachePolicy =>
@@ -216,7 +207,7 @@ internal sealed class LanguageRepository : AsyncEntityRepositoryBase<int, ILangu
         (await PerformGetManyAsync([id]))?.FirstOrDefault();
 
     protected override async Task<IEnumerable<ILanguage>?> PerformGetAllAsync() =>
-        await ExecuteWithContextAsync(async db =>
+        await AmbientScope.ExecuteWithContextAsync(async db =>
         {
             List<LanguageDto> dtos = await db.Language
                 .OrderBy(x => x.Id)
@@ -250,7 +241,7 @@ internal sealed class LanguageRepository : AsyncEntityRepositoryBase<int, ILangu
             return null;
         }
 
-        return await ExecuteWithContextAsync(async db =>
+        return await AmbientScope.ExecuteWithContextAsync(async db =>
         {
             List<LanguageDto> dtos = await db.Language
                 .Where(x => ids.Contains(x.Id))
@@ -485,42 +476,15 @@ internal sealed class LanguageRepository : AsyncEntityRepositoryBase<int, ILangu
 
     private async Task EnsureCacheIsPopulatedAsync()
     {
-        // Create a scope if none exists (handles NPoco code paths calling into this EF Core repository).
-        // This is temporary, and should be removed when this repository is no longer called from NPoco contexts.
-        ICoreScope? scope = null;
-        if (ScopeAccessor.AmbientScope is null)
+        // ensure cache is populated, in a non-expensive way
+        if (TypedCachePolicy != null)
         {
-            scope = _efCoreScopeProvider.CreateScope();
+            await TypedCachePolicy.GetAllCachedAsync(PerformGetAllAsync);
         }
-
-        try
+        else
         {
-            if (TypedCachePolicy != null)
-            {
-                await TypedCachePolicy.GetAllCachedAsync(PerformGetAllAsync);
-            }
-            else
-            {
-                await PerformGetAllAsync();
-            }
-
-            scope?.Complete();
+            await PerformGetAllAsync(); // We don't have a typed cache (i.e. unit tests) but need to populate the _codeIdMap
         }
-        finally
-        {
-            scope?.Dispose();
-        }
-
-        // This is the "Old" implementation, when this repository is not called from Npoco contexts anymore, use this implementation.
-        // // ensure cache is populated, in a non-expensive way
-        // if (TypedCachePolicy != null)
-        // {
-        //     await TypedCachePolicy.GetAllCachedAsync(PerformGetAllAsync);
-        // }
-        // else
-        // {
-        //     await PerformGetAllAsync(); // We don't have a typed cache (i.e. unit tests) but need to populate the _codeIdMap
-        // }
     }
 
     private int? GetFallbackLanguageId(ILanguage entity)
@@ -558,46 +522,6 @@ internal sealed class LanguageRepository : AsyncEntityRepositoryBase<int, ILangu
         await DeleteByLanguageId(Constants.DatabaseSchema.Tables.DocumentUrl);
         await DeleteByLanguageId(Constants.DatabaseSchema.Tables.DocumentUrlAlias);
         await DeleteByLanguageId(Constants.DatabaseSchema.Tables.UserGroup2Language);
-    }
-
-    /// <summary>
-    /// Executes a database operation using the ambient EF Core scope if available,
-    /// or creates a temporary scope if none exists. This handles the case where
-    /// the repository is called from NPoco code paths that only create ICoreScopeProvider scopes and not EF Core scopes.
-    ///
-    /// This solution is temporary, and should be removed when this repository is no longer called from NPoco contexts.
-    /// </summary>
-    private async Task<T> ExecuteWithContextAsync<T>(Func<UmbracoDbContext, Task<T>> method)
-    {
-        if (ScopeAccessor.AmbientScope is not null)
-        {
-            return await AmbientScope.ExecuteWithContextAsync(method);
-        }
-
-        using ICoreScope scope = _efCoreScopeProvider.CreateScope();
-        var result = await AmbientScope.ExecuteWithContextAsync(method);
-        scope.Complete();
-        return result;
-    }
-
-    /// <summary>
-    /// Explicit interface implementation that ensures an ambient EF Core scope exists before
-    /// accessing the base class's CachePolicy (which requires AmbientScope).
-    /// This handles calls from NPoco code paths that lack an EF Core scope.
-    ///
-    /// This solution is temporary, and should be removed when this repository is no longer called from NPoco contexts.
-    /// </summary>
-    async Task<IEnumerable<ILanguage>> IAsyncReadRepository<int, ILanguage>.GetAllAsync(CancellationToken cancellationToken)
-    {
-        if (ScopeAccessor.AmbientScope is not null)
-        {
-            return await CachePolicy.GetAllAsync(PerformGetAllAsync);
-        }
-
-        using ICoreScope scope = _efCoreScopeProvider.CreateScope();
-        var result = await CachePolicy.GetAllAsync(PerformGetAllAsync);
-        scope.Complete();
-        return result;
     }
 
     #endregion
