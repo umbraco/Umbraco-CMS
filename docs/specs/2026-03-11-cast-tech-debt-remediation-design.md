@@ -29,14 +29,43 @@
 
 ## 3. Violation Categories
 
-Four CAST-aligned categories are measured, matching common CAST findings:
+Fifteen CAST-aligned categories are measured across four groups. All are detectable via grep or file-level analysis — no external linters required.
 
-| Category | Rule | Rationale |
-|---|---|---|
-| **Long lines** | > 120 characters | Reduces readability, increases horizontal scrolling |
-| **Magic numbers** | Numeric literals inline, excluding 0, 1, -1 | Obscures intent, makes changes error-prone |
-| **Magic strings** | Non-empty string literals appearing 2+ times in the same file, excluding attribute arguments, log messages, and exception messages | Duplication and fragility |
-| **Short identifiers** | 1–2 character names, excluding: loop counters in `for`/`foreach` initializers, catch-clause variables, lambda/arrow-function parameters, and generic type parameters (applies to both C# and TypeScript) | Harms comprehension and searchability |
+### 3.1 Style & Readability
+
+| Category | Rule | Rationale | Applies To |
+|---|---|---|---|
+| **Long lines** | > 120 characters | Reduces readability, increases horizontal scrolling | C#, TypeScript |
+| **Magic numbers** | Numeric literals inline, excluding 0, 1, -1 | Obscures intent, makes changes error-prone | C#, TypeScript |
+| **Magic strings** | Non-empty string literals appearing 2+ times in the same file, excluding attribute arguments, log messages, and exception messages | Duplication and fragility | C#, TypeScript |
+| **Short identifiers** | 1–2 character names, excluding: loop counters in `for`/`foreach` initializers, catch-clause variables, lambda/arrow-function parameters, and generic type parameters | Harms comprehension and searchability | C#, TypeScript |
+| **Commented-out code** | Blocks of 3+ consecutive `//`-prefixed lines containing code-like tokens (`;`, `{`, `}`) | Dead code adds noise and confusion | C#, TypeScript |
+
+### 3.2 Structural Complexity
+
+| Category | Rule | Rationale | Applies To |
+|---|---|---|---|
+| **Method length** | Methods/functions > 30 lines | Long methods violate single-responsibility and are hard to test | C#, TypeScript |
+| **Too many parameters** | Methods/functions with > 4 parameters | High parameter counts signal missing abstractions | C#, TypeScript |
+| **Deep nesting** | Code indented > 4 levels | Deeply nested logic is hard to follow and test | C#, TypeScript |
+| **High cyclomatic complexity** | Methods with > 10 control-flow keywords (`if`, `else`, `switch`, `case`, `for`, `foreach`, `while`, `catch`) | High complexity correlates with defect density | C#, TypeScript |
+| **Copy-paste blocks** | 5+ consecutive identical lines appearing in 2+ files within the same module (detected via sliding-window hash comparison) | Duplicated logic means bug fixes must be applied in multiple places | C#, TypeScript |
+
+### 3.3 Error Handling
+
+| Category | Rule | Rationale | Applies To |
+|---|---|---|---|
+| **Empty catch blocks** | `catch` block body contains no statements | Silently swallows exceptions, making failures invisible | C#, TypeScript |
+| **Catching generic Exception** | `catch (Exception` without a more specific type | Catches unintended exceptions, masks bugs | C# |
+| **String concat in loops** | `+=` on a string variable inside a `for`/`foreach`/`while` block | O(n²) allocations; use `StringBuilder` or `string.Join` | C# |
+
+### 3.4 TypeScript-Specific
+
+| Category | Rule | Rationale | Applies To |
+|---|---|---|---|
+| **`any` type usage** | Explicit `any` type annotation | Defeats TypeScript's type safety | TypeScript |
+| **Missing return types** | Exported functions without a return type annotation | Reduces API clarity and type inference reliability | TypeScript |
+| **Debug statements** | `console.log` or `console.error` in source files | Debug output left in production code | TypeScript |
 
 ---
 
@@ -48,10 +77,22 @@ Weights per violation type:
 
 | Category | Weight |
 |---|---|
+| High cyclomatic complexity | 3 |
+| Copy-paste blocks | 3 |
+| Empty catch blocks | 3 |
 | Magic numbers | 3 |
 | Magic strings | 3 |
+| Catching generic Exception | 2 |
+| String concat in loops | 2 |
+| Method length | 2 |
+| Too many parameters | 2 |
+| Deep nesting | 2 |
 | Short identifiers | 2 |
+| `any` type usage | 2 |
 | Long lines | 1 |
+| Commented-out code | 1 |
+| Missing return types | 1 |
+| Debug statements | 1 |
 
 Score is clamped to [0, 100]. Higher is better.
 
@@ -79,7 +120,7 @@ Structure:
 
 1. **Executive summary** — overall score, total violations by category, LOC scanned
 2. **By-language breakdown** — C# score, TypeScript score, violation tables
-3. **By-project table** — columns: Project, LOC, Long Lines, Magic Numbers, Magic Strings, Short IDs, Score
+3. **By-project table** — columns: Project, LOC, Score, and a violation count per category (15 columns total)
 4. **Top 10 worst files per language** — file path (relative), score, top violation category
 5. **Methodology note** — explains scoring formula and exclusions
 
@@ -105,12 +146,15 @@ Claude produces a grouped remediation plan for the chosen module. Each group is 
 
 ### Groups (in order)
 
-| Group | Violation Category | Branch Name |
+Groups are ordered highest-weight violations first to maximize early score improvement.
+
+| Group | Violation Categories | Branch Name |
 |---|---|---|
-| 1 | Magic numbers → named constants | `v17/improvement/cast-magic-numbers` |
-| 2 | Magic strings → constants | `v17/improvement/cast-magic-strings` |
-| 3 | Short identifiers → descriptive names | `v17/improvement/cast-short-identifiers` |
-| 4 | Long lines → reformatted for readability | `v17/improvement/cast-long-lines` |
+| 1 | High cyclomatic complexity, method length, deep nesting, too many parameters, copy-paste blocks | `v17/improvement/cast-structural-complexity` |
+| 2 | Empty catch blocks, catching generic Exception, string concat in loops | `v17/improvement/cast-error-handling` |
+| 3 | Magic numbers, magic strings | `v17/improvement/cast-magic-values` |
+| 4 | Short identifiers, long lines, commented-out code | `v17/improvement/cast-style` |
+| 5 | TypeScript: `any` types, missing return types, debug statements | `v17/improvement/cast-typescript` |
 
 The plan lists specific files and the changes needed in each, so execution is mechanical and reviewable.
 
@@ -130,7 +174,7 @@ For each group, in order:
 
 ### 8.1 Delta Report: `docs/quality/cast-assessment-group-<N>-<category>.md`
 
-Where `<N>` is the group number (1–4) and `<category>` is the kebab-case category name (e.g., `cast-assessment-group-1-magic-numbers.md`).
+Where `<N>` is the group number (1–5) and `<category>` is the kebab-case category name matching the branch suffix (e.g., `cast-assessment-group-1-structural-complexity.md`).
 
 Structure:
 - Violations before vs. after (table)
@@ -145,7 +189,7 @@ Structure:
 - No external linters, CAST tooling, or CI integration required
 - No remediation of test files
 - No changes to generated code
-- No architectural refactoring — only the four targeted violation categories
+- No architectural refactoring — only the fifteen targeted violation categories
 - No changes outside the chosen module
 
 ---
