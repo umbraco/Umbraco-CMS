@@ -5,15 +5,13 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
 internal static class LanguageRepositoryExtensions
 {
-    public static async Task<bool> IsDefault(this ILanguageRepository repo, string? culture)
+    public static bool IsDefault(this ILanguageRepository repo, string? culture)
     {
         if (culture == null || culture == "*")
         {
             return false;
         }
 
-        var defaultIso = await repo.GetDefaultIsoCodeAsync();
-
-        return defaultIso.InvariantEquals(culture);
+        return repo.GetDefaultIsoCode().InvariantEquals(culture);
     }
 }

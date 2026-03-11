@@ -283,7 +283,7 @@ internal sealed class ContentBaseFactory
                     Action = x.Action.ToString(),
                     Date = x.Date,
                     NodeId = entity.Id,
-                    LanguageId = languageRepository.GetIdByIsoCodeAsync(x.Culture, false).GetAwaiter().GetResult(),
+                    LanguageId = languageRepository.GetIdByIsoCode(x.Culture, false),
                     Id = x.Id,
                 }));
 

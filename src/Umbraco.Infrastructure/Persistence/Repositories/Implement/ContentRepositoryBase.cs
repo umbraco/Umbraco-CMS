@@ -316,7 +316,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                         foreach (IPropertyValue pvalue in property.Values)
                         {
                             IEnumerable<string> tagsValue = property.GetTagsValue(PropertyEditors, DataTypeService, serializer, pvalue.Culture);
-                            var languageId = LanguageRepository.GetIdByIsoCodeAsync(pvalue.Culture).GetAwaiter().GetResult();
+                            var languageId = LanguageRepository.GetIdByIsoCode(pvalue.Culture);
                             IEnumerable<Tag> cultureTags = tagsValue.Select(x => new Tag { Group = tagConfiguration.Group, Text = x, LanguageId = languageId });
                             tags.AddRange(cultureTags);
                         }
@@ -340,8 +340,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     var tags = new List<ITag>();
                     foreach (IPropertyValue pvalue in property.Values)
                     {
-                        // TODO: Await this properly when adjusting this to our new EF Core approach.
-                        var languageId = LanguageRepository.GetIdByIsoCodeAsync(pvalue.Culture).GetAwaiter().GetResult();
+                        var languageId = LanguageRepository.GetIdByIsoCode(pvalue.Culture);
                         tags.AddRange(tagsProvider.GetTags(pvalue.EditedValue, configurationObject, languageId));
                     }
 
@@ -937,8 +936,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     propertyDataDtos.AddRange(propertyDataDtos2);
                 }
 
-                // TODO: Await this properly when adjusting this to our new EF Core approach.
-                var properties = PropertyFactory.BuildEntities(compositionProperties, propertyDataDtos, temp.PublishedVersionId, LanguageRepository).GetAwaiter().GetResult().ToList();
+                var properties = PropertyFactory.BuildEntities(compositionProperties, propertyDataDtos, temp.PublishedVersionId, LanguageRepository).ToList();
 
                 if (result.ContainsKey(temp.VersionId))
                 {

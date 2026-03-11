@@ -876,8 +876,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
                 return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, content);
             }
 
-            // TODO: Await this properly when adjusting this service to our new EF Core approach.
-            var allLangs = _languageRepository.GetAllAsync(CancellationToken.None).GetAwaiter().GetResult().ToList();
+            var allLangs = _languageRepository.GetMany().ToList();
 
             PublishResult result = CommitDocumentChangesInternal(scope, content, evtMsgs, allLangs, savingNotification.State, userId);
             scope.Complete();
@@ -945,8 +944,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
         string? defaultCulture;
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
-            // TODO: Await this properly when adjusting this service to our new EF Core approach.
-            defaultCulture = _languageRepository.GetDefaultIsoCodeAsync().GetAwaiter().GetResult();
+            defaultCulture = _languageRepository.GetDefaultIsoCode();
             scope.Complete();
         }
 
@@ -1034,8 +1032,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
         {
             scope.WriteLock(Constants.Locks.ContentTree);
 
-            // TODO: Await this properly when adjusting this service to our new EF Core approach.
-            var allLangs = _languageRepository.GetAllAsync(CancellationToken.None).GetAwaiter().GetResult().ToList();
+            var allLangs = _languageRepository.GetMany().ToList();
 
             if (!document.HasIdentity)
             {
@@ -2116,9 +2113,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
         {
             cultures = blueprint.CultureInfos.Values.Select(x => x.Culture);
             using ICoreScope scope = ScopeProvider.CreateCoreScope();
-
-            // TODO: Await this properly when adjusting this service to our new EF Core approach.
-            if (blueprint.CultureInfos.TryGetValue(_languageRepository.GetDefaultIsoCodeAsync().GetAwaiter().GetResult(), out ContentCultureInfos defaultCulture))
+            if (blueprint.CultureInfos.TryGetValue(_languageRepository.GetDefaultIsoCode(), out ContentCultureInfos defaultCulture))
             {
                 defaultCulture.Name = name;
             }

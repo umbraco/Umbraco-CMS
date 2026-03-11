@@ -701,8 +701,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         {
             scope.WriteLock(WriteLockIds);
 
-            // TODO: Await this properly when adjusting this service to our new EF Core approach.
-            var allLangs = _languageRepository.GetAllAsync(CancellationToken.None).GetAwaiter().GetResult().ToList();
+            var allLangs = _languageRepository.GetMany().ToList();
 
             // this will create the correct culture impact even if culture is * or null
             IEnumerable<CultureImpact?> impacts =
@@ -772,8 +771,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         {
             scope.WriteLock(WriteLockIds);
 
-            // TODO: Await this properly when adjusting this service to our new EF Core approach.
-            var allLangs = _languageRepository.GetAllAsync(CancellationToken.None).GetAwaiter().GetResult().ToList();
+            var allLangs = _languageRepository.GetMany().ToList();
 
             SavingNotification<TContent> savingNotification = SavingNotification(content, evtMsgs);
             if (scope.Notifications.PublishCancelable(savingNotification))
@@ -823,8 +821,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
     /// <inheritdoc />
     public IEnumerable<PublishResult> PerformScheduledPublish(DateTime date)
     {
-        // TODO: Await this properly when adjusting this service to our new EF Core approach.
-        var allLangs = new Lazy<List<ILanguage>>(() => _languageRepository.GetAllAsync(CancellationToken.None).GetAwaiter().GetResult().ToList());
+        var allLangs = new Lazy<List<ILanguage>>(() => _languageRepository.GetMany().ToList());
         EventMessages evtMsgs = EventMessagesFactory.Get();
         var results = new List<PublishResult>();
 
@@ -1552,9 +1549,8 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
             parameters);
     }
 
-    // TODO: Await this properly when adjusting this service to our new EF Core approach.
     protected string GetLanguageDetailsForAuditEntry(IEnumerable<string> affectedCultures)
-        => GetLanguageDetailsForAuditEntry(_languageRepository.GetAllAsync(CancellationToken.None).GetAwaiter().GetResult(), affectedCultures);
+        => GetLanguageDetailsForAuditEntry(_languageRepository.GetMany(), affectedCultures);
 
     protected static string GetLanguageDetailsForAuditEntry(IEnumerable<ILanguage> languages, IEnumerable<string> affectedCultures)
     {
