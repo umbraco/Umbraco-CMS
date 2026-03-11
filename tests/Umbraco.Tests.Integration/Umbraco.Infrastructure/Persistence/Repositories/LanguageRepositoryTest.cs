@@ -344,7 +344,7 @@ internal sealed class LanguageRepositoryTest : UmbracoIntegrationTest
         }
     }
 
-    private LanguageRepository CreateRepository() => new(GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>(), AppCaches.Disabled, LoggerFactory.CreateLogger<LanguageRepository>(), Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
+    private LanguageRepository CreateRepository() => new(GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>(), AppCaches.Disabled, LoggerFactory.CreateLogger<LanguageRepository>(), Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>(), GetRequiredService<IEFCoreScopeProvider<UmbracoDbContext>>());
 
     private async Task CreateTestData()
     {
