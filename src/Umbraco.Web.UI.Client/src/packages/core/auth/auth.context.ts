@@ -435,19 +435,18 @@ export class UmbAuthContext extends UmbContextBase {
 				'Use configureClient for @hey-api/openapi-ts clients or getOpenApiConfiguration for manual fetch calls. With cookie-based auth this always returns "[redacted]".',
 			removeInVersion: '19.0.0',
 		}).warn();
-		if (!this.#isAccessTokenValid()) {
-			await this.validateToken();
-		} else {
-			await this.#waitForOngoingRefresh();
-		}
+		await this.#ensureTokenReady();
 		return '[redacted]';
 	}
 
 	/**
-	 * Validates the token against the server and returns true if the token is valid.
-	 * Uses Web Locks to prevent concurrent refresh requests across tabs.
+	 * Forces a token refresh against the server (calls `/token`) and returns true if successful.
+	 * Use this when you need to unconditionally refresh — e.g. session timeout keep-alive.
+	 * For per-request token handling, prefer {@link configureClient} which skips the network
+	 * call when the access token is still valid.
+	 * Uses Web Locks to deduplicate concurrent refresh requests across tabs.
 	 * @memberof UmbAuthContext
-	 * @returns True if the token is valid, otherwise false
+	 * @returns True if the refresh succeeded, otherwise false
 	 */
 	async validateToken(): Promise<boolean> {
 		return this.#isBypassed || this.makeRefreshTokenRequest();
@@ -499,17 +498,29 @@ export class UmbAuthContext extends UmbContextBase {
 		return !!session && session.expiresAt > Math.floor(Date.now() / 1000);
 	}
 
+	/**
+	 * Local-only check — no network call.
+	 * Returns true if the cached access token has not yet reached its expiry timestamp.
+	 * Does NOT check the refresh token or server state.
+	 */
 	#isAccessTokenValid(): boolean {
 		const session = this.#session.getValue();
 		return !!session && session.accessTokenExpiresAt > Math.floor(Date.now() / 1000);
 	}
 
 	/**
-	 * Waits for any ongoing cross-tab token refresh to complete without performing a refresh itself.
-	 * Prevents sending requests with an access token that is about to be revoked by a proactive
-	 * refresh in another tab (keepUserLoggedIn), which would cause OpenIddict ID2019 errors.
+	 * Gate for per-request token handling.
+	 * - If the access token is expired: calls {@link validateToken} to refresh it (network call).
+	 * - If the access token is still valid but another tab holds the `umb:token-refresh` lock:
+	 *   waits for that refresh to finish before returning, so the request is sent with the
+	 *   latest cookie and not the token that is about to be revoked (prevents ID2019 errors).
+	 * - Otherwise: returns immediately with no network call.
 	 */
-	async #waitForOngoingRefresh(): Promise<void> {
+	async #ensureTokenReady(): Promise<void> {
+		if (!this.#isAccessTokenValid()) {
+			await this.validateToken();
+			return;
+		}
 		if (!navigator.locks) return;
 		const state = await navigator.locks.query();
 		if (state.held?.some((l) => l.name === 'umb:token-refresh')) {
@@ -627,11 +638,7 @@ export class UmbAuthContext extends UmbContextBase {
 			baseUrl: this.#serverUrl,
 			credentials: 'include',
 			auth: async () => {
-				if (!this.#isAccessTokenValid()) {
-					await this.validateToken();
-				} else {
-					await this.#waitForOngoingRefresh();
-				}
+				await this.#ensureTokenReady();
 				return '[redacted]';
 			},
 		});
