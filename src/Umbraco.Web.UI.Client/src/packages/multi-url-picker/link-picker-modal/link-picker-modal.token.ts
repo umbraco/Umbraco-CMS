@@ -10,9 +10,14 @@ export interface UmbLinkPickerModalData {
 
 export type UmbLinkPickerModalValue = { link: UmbLinkPickerLink };
 
+export interface UmbLinkPickerDocumentLinksConfig {
+	allowCultureSpecificLinks?: boolean;
+}
+
 export interface UmbLinkPickerConfig {
 	hideAnchor?: boolean;
 	hideTarget?: boolean;
+	documentLinksConfig?: UmbLinkPickerDocumentLinksConfig;
 }
 
 export const UMB_LINK_PICKER_MODAL = new UmbModalToken<UmbLinkPickerModalData, UmbLinkPickerModalValue>(
