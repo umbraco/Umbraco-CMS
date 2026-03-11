@@ -11,15 +11,15 @@ namespace Umbraco.Cms.Core.Models.PublishedContent;
 /// </summary>
 public class PublishedValueFallback : IPublishedValueFallback
 {
-    private readonly ILocalizationService? _localizationService;
+    private readonly ILanguageService _languageService;
     private readonly IVariationContextAccessor _variationContextAccessor;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="PublishedValueFallback" /> class.
     /// </summary>
-    public PublishedValueFallback(ServiceContext serviceContext, IVariationContextAccessor variationContextAccessor)
+    public PublishedValueFallback(ILanguageService languageService, IVariationContextAccessor variationContextAccessor)
     {
-        _localizationService = serviceContext.LocalizationService;
+        _languageService = languageService;
         _variationContextAccessor = variationContextAccessor;
     }
 
@@ -289,7 +289,7 @@ public class PublishedValueFallback : IPublishedValueFallback
 
         var visited = new HashSet<string>();
 
-        ILanguage? language = culture is not null ? _localizationService?.GetLanguageByIsoCode(culture) : null;
+        ILanguage? language = culture is not null ? _languageService.GetAsync(culture).GetAwaiter().GetResult() : null;
         if (language == null)
         {
             return false;
@@ -310,7 +310,7 @@ public class PublishedValueFallback : IPublishedValueFallback
 
             visited.Add(language2IsoCode);
 
-            ILanguage? language2 = _localizationService?.GetLanguageByIsoCode(language2IsoCode);
+            ILanguage? language2 = _languageService.GetAsync(language2IsoCode).GetAwaiter().GetResult();
             if (language2 == null)
             {
                 return false;
@@ -357,7 +357,7 @@ public class PublishedValueFallback : IPublishedValueFallback
             return false;
         }
 
-        var defaultCulture = _localizationService?.GetDefaultLanguageIsoCode();
+        var defaultCulture = _languageService.GetDefaultIsoCodeAsync().GetAwaiter().GetResult();
         if (defaultCulture.IsNullOrWhiteSpace())
         {
             return false;
