@@ -89,7 +89,7 @@ public static class TestHelper
     public static Lazy<ISqlContext> GetMockSqlContext()
     {
         var sqlContext = Mock.Of<ISqlContext>();
-        var syntax = new PostgreSqlSyntaxProvider(Options.Create(new PostgreSqlOptions()));
+        var syntax = new PostgreSqlSyntaxProvider(Options.Create(new PostgreSqlOptions()), Mock.Of<IPackagesService>());
         Mock.Get(sqlContext).Setup(x => x.SqlSyntax).Returns(syntax);
         return new Lazy<ISqlContext>(() => sqlContext);
     }

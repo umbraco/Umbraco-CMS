@@ -39,7 +39,7 @@ public abstract class BaseUsingPostgreSqlSyntax
         var pocoMappers = new MapperCollection { new NullableDateMapper() };
         var pocoDataFactory =
             new FluentPocoDataFactory((type, iPocoDataFactory) => new PocoDataBuilder(type, pocoMappers).Init(), pocoMappers);
-        var sqlSyntax = new PostgreSqlSyntaxProvider(Options.Create(new PostgreSqlOptions()));
+        var sqlSyntax = new PostgreSqlSyntaxProvider(Options.Create(new PostgreSqlOptions()), Mock.Of<IPackagesService>());
         SqlContext = new SqlContext(sqlSyntax, DatabaseType.SqlServer2012, pocoDataFactory, factory.GetRequiredService<IMapperCollection>());
         Mappers = factory.GetRequiredService<IMapperCollection>();
     }

@@ -23,7 +23,7 @@ public class NPocoSqlTemplateTests
     public void SqlTemplates()
     {
         var sqlContext = new SqlContext(
-            new PostgreSqlSyntaxProvider(Options.Create(new PostgreSqlOptions())),
+            new PostgreSqlSyntaxProvider(Options.Create(new PostgreSqlOptions()), Mock.Of<IPackagesService>()),
             DatabaseType.SqlServer2012,
             Mock.Of<IPocoDataFactory>());
         var sqlTemplates = new SqlTemplates(sqlContext);
@@ -52,7 +52,7 @@ public class NPocoSqlTemplateTests
             mappers);
 
         var sqlContext = new SqlContext(
-            new PostgreSqlSyntaxProvider(Options.Create(new PostgreSqlOptions())),
+            new PostgreSqlSyntaxProvider(Options.Create(new PostgreSqlOptions()), Mock.Of<IPackagesService>()),
             DatabaseType.SQLCe,
             factory);
         var sqlTemplates = new SqlTemplates(sqlContext);
