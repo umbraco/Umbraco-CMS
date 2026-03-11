@@ -188,6 +188,9 @@ export class ContentUiHelper extends UiBaseLocators {
   private readonly saveModal: Locator;
   private readonly expandSegmentBtn: Locator;
   private readonly saveAndPreviewBtn: Locator;
+  private readonly manualLinkRemoveBtn: Locator;
+  private readonly cardCollectionView: Locator;
+  private readonly cardContentNode: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -387,8 +390,12 @@ export class ContentUiHelper extends UiBaseLocators {
     this.linkPickerCloseBtn = this.linkPickerModal.getByRole('button', {name: 'Close', exact: true});
     this.linkPickerTargetToggle = this.linkPickerModal.locator('[label="Opens the link in a new window or tab"]').locator('#toggle');
     this.confirmToResetBtn = page.locator('#confirm').getByLabel('Reset', {exact: true});
+    this.manualLinkRemoveBtn = page.locator('[label="Manual"]').getByLabel('Remove', {exact: true});
     // Segment
     this.expandSegmentBtn = page.locator('.expand-area uui-button');
+    // Card Collection View
+    this.cardCollectionView = page.locator('umb-card-collection-view');
+    this.cardContentNode = this.cardCollectionView.locator('uui-card-content-node');
   }
 
   async enterContentName(name: string) {
@@ -1193,6 +1200,10 @@ export class ContentUiHelper extends UiBaseLocators {
     await this.click(this.linkToManualBtn);
   }
 
+  async clickManualLinkRemoveButton() {
+    await this.click(this.manualLinkRemoveBtn);
+  }
+
   // Block Grid - Block List
   async clickAddBlockElementButton() {
     await this.click(this.addBlockElementBtn);
@@ -1878,5 +1889,19 @@ export class ContentUiHelper extends UiBaseLocators {
 
   async doesTextAreaHaveExpectedValue(expectedValue: string) {
     await this.hasValue(this.textAreaTxt, expectedValue);
+  }
+
+  async isContentWithNameVisibleInGrid(contentName: string, isVisible: boolean = true) {
+    await this.isVisible(this.cardContentNode.filter({hasText: contentName}), isVisible);
+  }
+
+  async clickContentCardWithName(name: string) {
+    await this.click(this.cardContentNode.filter({hasText: name}).locator('#name'));
+  }
+
+  async selectContentCardWithName(contentName: string) {
+    const contentLocator = this.cardContentNode.filter({hasText: contentName});
+    await this.waitForVisible(contentLocator);
+    await this.click(contentLocator.locator('#select-checkbox'), {force: true});
   }
 }
