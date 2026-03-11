@@ -2863,5 +2863,9 @@ export default {
 		resetUrlHeadline: 'Nulstil URL?',
 		resetUrlMessage: 'Er du sikker på, at du vil nulstille denne URL?',
 		resetUrlLabel: 'Nulstil',
+		selectLanguageHint: 'Vælg sprog for linket',
+		selectLanguageDefault: 'Auto (besøgendes sprog)',
+		configCultureSpecificDocumentLinksLabel: 'Kulturspecifikke dokumentlinks',
+		configCultureSpecificDocumentLinksDescription: 'Tillad brugeren at vælge specifik kultur for dokumenter.',
 	},
 } as UmbLocalizationDictionary;
