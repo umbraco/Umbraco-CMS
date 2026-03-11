@@ -172,13 +172,12 @@ internal sealed class LanguageService : AsyncRepositoryService, ILanguageService
     /// <inheritdoc />
     public async Task<Attempt<ILanguage?, LanguageOperationStatus>> DeleteAsync(string isoCode, Guid userKey)
     {
-        ILanguage? language;
         using (ICoreScope scope = _scopeProvider.CreateScope())
         {
             // write-lock languages to guard against race conds when dealing with default language
             scope.WriteLock(Constants.Locks.Languages);
 
-            language = await _languageRepository.GetByIsoCodeAsync(isoCode);
+            ILanguage? language = await _languageRepository.GetByIsoCodeAsync(isoCode);
             if (language == null)
             {
                 return Attempt.FailWithStatus<ILanguage?, LanguageOperationStatus>(LanguageOperationStatus.NotFound, null);
@@ -203,12 +202,10 @@ internal sealed class LanguageService : AsyncRepositoryService, ILanguageService
             scope.Notifications.Publish(
                 new LanguageDeletedNotification(language, eventMessages).WithStateFrom(deletingLanguageNotification));
 
+            await AuditAsync(AuditType.Delete, "Delete Language", userKey, language.Id, UmbracoObjectTypes.Language.GetName());
             scope.Complete();
+            return Attempt.SucceedWithStatus<ILanguage?, LanguageOperationStatus>(LanguageOperationStatus.Success, language);
         }
-
-        await AuditAsync(AuditType.Delete, "Delete Language", userKey, language.Id, UmbracoObjectTypes.Language.GetName());
-
-        return Attempt.SucceedWithStatus<ILanguage?, LanguageOperationStatus>(LanguageOperationStatus.Success, language);
     }
 
     private async Task<Attempt<ILanguage, LanguageOperationStatus>> SaveAsync(
@@ -260,9 +257,8 @@ internal sealed class LanguageService : AsyncRepositoryService, ILanguageService
             await AuditAsync(auditType, auditMessage, userKey, language.Id, UmbracoObjectTypes.Language.GetName());
 
             scope.Complete();
+            return Attempt.SucceedWithStatus(LanguageOperationStatus.Success, language);
         }
-
-        return Attempt.SucceedWithStatus(LanguageOperationStatus.Success, language);
     }
 
     private async Task AuditAsync(AuditType type, string message, Guid userKey, int objectId, string? entityType) =>
