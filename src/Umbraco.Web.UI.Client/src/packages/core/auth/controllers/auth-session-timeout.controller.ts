@@ -71,8 +71,8 @@ export class UmbAuthSessionTimeoutController extends UmbControllerBase {
 			return;
 		}
 
-		// Adaptive buffer: 25% of session, clamped to [5s, 60s]
-		const buffer = Math.max(5, Math.min(60, Math.floor(secondsUntilExpiry * 0.25)));
+		// Adaptive buffer: If less than one minutes, set it to 15s, otherwise 25% of session, clamped to [5s, 60s]
+		const buffer = secondsUntilExpiry <= 60 ? 15 : Math.max(5, Math.min(60, Math.floor(secondsUntilExpiry * 0.25)));
 		const secondsUntilWarning = secondsUntilExpiry - buffer;
 
 		if (secondsUntilWarning <= 0) {
@@ -108,37 +108,8 @@ export class UmbAuthSessionTimeoutController extends UmbControllerBase {
 			return;
 		}
 
-		// Show timeout modal — only one tab via Web Lock leader election
-		await this.#showTimeoutModalAsLeader(secondsRemaining);
-	}
-
-	/**
-	 * Uses a Web Lock to ensure only one tab shows the timeout modal.
-	 * Non-leader tabs set a fallback timeout for when the session fully expires.
-	 */
-	async #showTimeoutModalAsLeader(secondsRemaining: number) {
-		// Fallback for environments without Web Locks — every tab shows the modal
-		if (!navigator.locks) {
-			await this.#openTimeoutModal(secondsRemaining);
-			return;
-		}
-
-		const acquired = await navigator.locks.request('umb:timeout-modal', { ifAvailable: true }, async (lock) => {
-			if (!lock) return false;
-			// We're the leader — show the modal. Lock is held until the modal closes.
-			await this.#openTimeoutModal(secondsRemaining);
-			return true;
-		});
-
-		if (!acquired) {
-			// Another tab is showing the modal. Set a fallback for full expiry.
-			// Cleared by #clearScheduledCheck when the leader broadcasts a sessionUpdate.
-			this.#timeoutId = setTimeout(() => {
-				if (!this.#host.isSessionValid()) {
-					this.#host.timeOut();
-				}
-			}, secondsRemaining * 1000);
-		}
+		// Show timeout modal
+		await this.#openTimeoutModal(secondsRemaining);
 	}
 
 	async #closeTimeoutModal() {
@@ -163,6 +134,9 @@ export class UmbAuthSessionTimeoutController extends UmbControllerBase {
 					},
 					onContinue: () => {
 						this.#tryValidateToken();
+					},
+					onExpired: () => {
+						this.#host.timeOut();
 					},
 				},
 			});

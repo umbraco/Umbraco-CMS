@@ -1,7 +1,8 @@
 import { onInit } from '../../packages/core/entry-point.js';
-import type { UmbAppErrorElement } from './app-error.element.js';
+import { UmbAppErrorElement } from './app-error.element.js';
 import { UmbAppAuthController } from './app-auth.controller.js';
-import type { UmbAppOauthElement } from './app-oauth.element.js';
+import { UmbAppAuthElement } from './app-auth.element.js';
+import { UmbAppOauthElement } from './app-oauth.element.js';
 import { UmbNetworkConnectionStatusManager } from './network-connection-status.manager.js';
 import type { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 import { UmbAuthContext } from '@umbraco-cms/backoffice/auth';
@@ -18,13 +19,12 @@ import {
 	UmbAppEntryPointExtensionInitializer,
 	umbExtensionsRegistry,
 } from '@umbraco-cms/backoffice/extension-registry';
-import { filter, first, firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
-import { hasOwnOpener, redirectToStoredPath } from '@umbraco-cms/backoffice/utils';
+import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
+import { redirectToStoredPath } from '@umbraco-cms/backoffice/utils';
 import { umbHttpClient } from '@umbraco-cms/backoffice/http-client';
 import { UmbViewContext } from '@umbraco-cms/backoffice/view';
 
 import './app-logo.element.js';
-import './app-oauth.element.js';
 
 @customElement('umb-app')
 export class UmbAppElement extends UmbLitElement {
@@ -59,7 +59,7 @@ export class UmbAppElement extends UmbLitElement {
 	private _routes: UmbRoute[] = [
 		{
 			path: 'error',
-			component: () => import('./app-error.element.js'),
+			component: UmbAppErrorElement,
 		},
 		{
 			path: 'install',
@@ -67,7 +67,7 @@ export class UmbAppElement extends UmbLitElement {
 		},
 		{
 			path: 'oauth_complete',
-			component: () => import('./app-oauth.element.js'),
+			component: UmbAppOauthElement,
 			setup: async (component) => {
 				if (!this.#authContext) {
 					(component as UmbAppOauthElement).failure = true;
@@ -99,10 +99,6 @@ export class UmbAppElement extends UmbLitElement {
 						return;
 					}
 
-					// If this is a popup window, the parent will handle navigation.
-					// The BroadcastChannel message already notified the parent.
-					if (hasOwnOpener(this.backofficePath)) return;
-
 					// For redirect flows (no popup), navigate to the stored path.
 					// Use force=true for a full page navigation so the new page
 					// runs setInitialState() with the fresh httpOnly cookies.
@@ -125,20 +121,9 @@ export class UmbAppElement extends UmbLitElement {
 		},
 		{
 			path: 'logout',
-			resolve: () => {
+			component: UmbAppAuthElement,
+			setup: () => {
 				this.#authContext?.clearTokenStorage();
-				this.#authController.makeAuthorizationRequest('loggedOut');
-
-				// Listen for the user to be authorized
-				this.#authContext?.isAuthorized
-					.pipe(
-						filter((x) => !!x),
-						first(),
-					)
-					.subscribe(() => {
-						// Redirect to the root
-						history.replaceState(null, '', '');
-					});
 			},
 		},
 		{
@@ -241,6 +226,14 @@ export class UmbAppElement extends UmbLitElement {
 			throw new Error('[Fatal] AuthContext requested before it was initialized');
 		}
 
+		// The oauth_complete popup must not call setInitialState(): a successful silent
+		// refresh would set isAuthorized=true and cause the oauth_complete handler to
+		// redirect the popup to the backoffice instead of completing the code exchange.
+		// Other windows opened via window.open() (e.g. the preview window) DO need
+		// setInitialState() so they can restore the session from a peer tab.
+		const pathname = pathWithoutBasePath({ start: true, end: false });
+		if (window.opener && pathname === '/oauth_complete') return;
+
 		// Auth context configures umbHttpClient in its constructor, so we only need to set initial state
 		await this.#authContext.setInitialState();
 	}
@@ -262,6 +255,14 @@ export class UmbAppElement extends UmbLitElement {
 
 			case RuntimeLevelModel.UPGRADE:
 				history.replaceState(null, '', 'upgrade');
+				break;
+
+			case RuntimeLevelModel.UPGRADING:
+				this.#errorPage(
+					'An automatic upgrade is currently in progress. The backoffice will be available once the upgrade has completed.',
+					undefined,
+					{ headline: 'Website is Under Maintenance', hideBackButton: true },
+				);
 				break;
 
 			case RuntimeLevelModel.BOOT_FAILED:
@@ -291,7 +292,7 @@ export class UmbAppElement extends UmbLitElement {
 		return () => this.#authController.isAuthorized() ?? false;
 	}
 
-	#errorPage(errorMsg: string, error?: unknown) {
+	#errorPage(errorMsg: string, error?: unknown, options?: { headline?: string; hideBackButton?: boolean }) {
 		// Redirect to the error page
 		this._routes = [
 			{
@@ -300,6 +301,8 @@ export class UmbAppElement extends UmbLitElement {
 				setup: (component) => {
 					(component as UmbAppErrorElement).errorMessage = errorMsg;
 					(component as UmbAppErrorElement).error = error;
+					if (options?.headline) (component as UmbAppErrorElement).errorHeadline = options.headline;
+					if (options?.hideBackButton) (component as UmbAppErrorElement).hideBackButton = true;
 				},
 			},
 		];

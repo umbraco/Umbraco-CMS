@@ -70,7 +70,7 @@ internal sealed class RevokeUserAuthenticationTokensNotificationHandler :
 
     public async Task HandleAsync(UserLoginSuccessNotification notification, CancellationToken cancellationToken)
     {
-        if (_securitySettings.AllowConcurrentLogins is false)
+        if (_securitySettings.GetUserAllowConcurrentLogins() is false)
         {
             var userId = notification.AffectedUserId;
             IUser? user = userId is not null ? await FindUserFromString(userId) : null;
