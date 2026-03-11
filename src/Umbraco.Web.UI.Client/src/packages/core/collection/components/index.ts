@@ -7,6 +7,7 @@ import './collection-toolbar.element.js';
 import './collection-view-bundle.element.js';
 import './pagination/collection-pagination.element.js';
 import './collection-filter-bundle.element.js';
+import './collection-active-filters.element.js';
 
 export * from './collection-action-bundle.element.js';
 export * from './collection-filter-field.element.js';
@@ -15,3 +16,4 @@ export * from './collection-toolbar.element.js';
 export * from './collection-view-bundle.element.js';
 export * from './pagination/collection-pagination.element.js';
 export * from './collection-filter-bundle.element.js';
+export * from './collection-active-filters.element.js';

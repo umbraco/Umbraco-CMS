@@ -4,6 +4,7 @@ import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import {
 	UMB_COLLECTION_CONTEXT,
+	type ManifestCollectionFilter,
 	type UmbCollectionFilterApi,
 	type UmbSelectOption,
 } from '@umbraco-cms/backoffice/collection';
@@ -18,6 +19,7 @@ export class UmbExtensionCollectionFilterApi extends UmbControllerBase implement
 	public readonly options = this.#options.asObservable();
 
 	#collectionContext?: typeof UMB_COLLECTION_CONTEXT.TYPE;
+	public manifest?: ManifestCollectionFilter;
 
 	constructor(host: UmbControllerHost) {
 		super(host);
@@ -29,15 +31,26 @@ export class UmbExtensionCollectionFilterApi extends UmbControllerBase implement
 		this.observe(umbExtensionsRegistry.extensions, (extensions) => {
 			const types = [...new Set(extensions.map((x) => x.type))];
 			const options = types.sort().map((x) => ({ label: fromCamelCase(x), value: x }));
-			this.#options.setValue([{ label: 'All', value: 'all' }, ...options]);
+			this.#options.setValue([...options]);
 		});
 	}
 
-	public setValue(values: Array<string>) {
-		const filtered = values.filter((v) => v !== 'all' && v !== '');
-		console.log('filtered values:', filtered);
+	public async setValue(values: Array<string>) {
+		const filtered = values.filter((v) => v !== '');
 		this.#value.setValue(values);
-		this.#collectionContext?.setFilter({ extensionTypes: filtered } as any);
+		const alias = this.manifest?.alias;
+		if (alias) {
+			if (filtered.length === 0) {
+				await this.#collectionContext?.filtering.removeFilter(alias);
+				this.#collectionContext?.loadCollection();
+			} else {
+				await this.#collectionContext?.filtering.setFilter({
+					alias,
+					value: filtered,
+				});
+				this.#collectionContext?.loadCollection();
+			}
+		}
 	}
 }
 

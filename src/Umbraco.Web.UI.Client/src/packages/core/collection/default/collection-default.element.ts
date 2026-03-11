@@ -101,8 +101,10 @@ export class UmbCollectionDefaultElement extends UmbLitElement {
 		return this._routes
 			? html`
 					<umb-body-layout header-transparent class=${this._hasItems ? 'has-items' : ''}>
+						${this.renderToolbar()}
+						<umb-collection-active-filters></umb-collection-active-filters>
 						<umb-router-slot id="router" .routes=${this._routes}></umb-router-slot>
-						${this.renderToolbar()} ${this._hasItems ? this.#renderContent() : this.#renderEmptyState()}
+						${this._hasItems ? this.#renderContent() : this.#renderEmptyState()}
 					</umb-body-layout>
 				`
 			: nothing;
