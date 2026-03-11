@@ -435,7 +435,9 @@ export class UmbAuthContext extends UmbContextBase {
 				'Use configureClient for @hey-api/openapi-ts clients or getOpenApiConfiguration for manual fetch calls. With cookie-based auth this always returns "[redacted]".',
 			removeInVersion: '19.0.0',
 		}).warn();
-		await this.validateToken();
+		if (!this.#isAccessTokenValid()) {
+			await this.validateToken();
+		}
 		return '[redacted]';
 	}
 
@@ -606,7 +608,9 @@ export class UmbAuthContext extends UmbContextBase {
 			baseUrl: this.#serverUrl,
 			credentials: 'include',
 			auth: async () => {
-				await this.validateToken();
+				if (!this.#isAccessTokenValid()) {
+					await this.validateToken();
+				}
 				return '[redacted]';
 			},
 		});
