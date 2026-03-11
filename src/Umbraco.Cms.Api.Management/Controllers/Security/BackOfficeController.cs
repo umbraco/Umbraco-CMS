@@ -302,7 +302,14 @@ public class BackOfficeController : SecurityControllerBase
         // redirect the user there directly so the external provider can complete its own logout flow.
         if (signOutResult.SignOutRedirectUrl.IsNullOrWhiteSpace() is false)
         {
-            return Redirect(signOutResult.SignOutRedirectUrl!);
+            if (Uri.TryCreate(signOutResult.SignOutRedirectUrl, UriKind.Absolute, out Uri? redirectUri) is false
+                || redirectUri.Scheme != Uri.UriSchemeHttps)
+            {
+                throw new InvalidOperationException(
+                    $"SignOutRedirectUrl must be an absolute HTTPS URL, but found: {signOutResult.SignOutRedirectUrl}");
+            }
+
+            return Redirect(redirectUri.ToString());
         }
 
         // Returning a SignOutResult will ask OpenIddict to redirect the user agent
