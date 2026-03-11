@@ -158,7 +158,7 @@
       byla provedena na stránce '%2%'
       uživatelem '%3%'
 
-      Přejděte na http://%4%/#/content/content/edit/%5% pro editování.
+      Přejděte na http://%4%/section/content/workspace/document/edit/%5% pro editování.
 
       Mějte hezký den!
 
@@ -168,12 +168,12 @@
     <key alias="mailBodyHtml"><![CDATA[<p>Ahoj %0%</p>
 
           <p>Toto je automatická zpráva informující Vás, že úloha <strong>'%1%'</strong>
-          byla provedena na stránce <a href="http://%4%/#/content/content/edit/%5%"><strong>'%2%'</strong></a>
+          byla provedena na stránce <a href="http://%4%/section/content/workspace/document/edit/%5%"><strong>'%2%'</strong></a>
           uživatelem <strong>'%3%'</strong>
       </p>
           <div style="margin: 8px 0; padding: 8px; display: block;">
                 <br />
-                <a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EDITOVAT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp;
+                <a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/section/content/workspace/document/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EDITOVAT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp;
                 <br />
           </div>
           <p>
@@ -185,7 +185,7 @@
 
           <div style="margin: 8px 0; padding: 8px; display: block;">
                 <br />
-                <a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EDITOVAT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp;
+                <a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/section/content/workspace/document/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EDITOVAT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp;
                 <br />
           </div>
 
