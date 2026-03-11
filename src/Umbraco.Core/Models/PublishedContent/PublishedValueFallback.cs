@@ -11,15 +11,15 @@ namespace Umbraco.Cms.Core.Models.PublishedContent;
 /// </summary>
 public class PublishedValueFallback : IPublishedValueFallback
 {
-    private readonly ILanguageService _languageService;
+    private readonly ILocalizationService? _localizationService;
     private readonly IVariationContextAccessor _variationContextAccessor;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="PublishedValueFallback" /> class.
     /// </summary>
-    public PublishedValueFallback(ILanguageService languageService, IVariationContextAccessor variationContextAccessor)
+    public PublishedValueFallback(ServiceContext serviceContext, IVariationContextAccessor variationContextAccessor)
     {
-        _languageService = languageService;
+        _localizationService = serviceContext.LocalizationService;
         _variationContextAccessor = variationContextAccessor;
     }
 
@@ -289,7 +289,7 @@ public class PublishedValueFallback : IPublishedValueFallback
 
         var visited = new HashSet<string>();
 
-        ILanguage? language = culture is not null ? _languageService.GetAsync(culture).GetAwaiter().GetResult() : null;
+        ILanguage? language = culture is not null ? _localizationService?.GetLanguageByIsoCode(culture) : null;
         if (language == null)
         {
             return false;
@@ -310,7 +310,7 @@ public class PublishedValueFallback : IPublishedValueFallback
 
             visited.Add(language2IsoCode);
 
-            ILanguage? language2 = _languageService.GetAsync(language2IsoCode).GetAwaiter().GetResult();
+            ILanguage? language2 = _localizationService?.GetLanguageByIsoCode(language2IsoCode);
             if (language2 == null)
             {
                 return false;
@@ -357,7 +357,7 @@ public class PublishedValueFallback : IPublishedValueFallback
             return false;
         }
 
-        var defaultCulture = _languageService.GetDefaultIsoCodeAsync().GetAwaiter().GetResult();
+        var defaultCulture = _localizationService?.GetDefaultLanguageIsoCode();
         if (defaultCulture.IsNullOrWhiteSpace())
         {
             return false;
