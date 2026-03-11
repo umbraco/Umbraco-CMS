@@ -64,9 +64,6 @@ export class UmbDefaultCollectionContext<
 	protected _filter = new UmbObjectState<FilterModelType | object>({});
 	public readonly filter = this._filter.asObservable();
 
-	public readonly filtering = new UmbCollectionFilterManager(this);
-	public readonly activeFilters = this.filtering.activeFilters;
-
 	protected _selectOnly = new UmbBooleanState(undefined);
 	public readonly selectOnly = this._selectOnly.asObservable();
 
@@ -83,6 +80,7 @@ export class UmbDefaultCollectionContext<
 	public readonly selection = new UmbCollectionSelectionManager(this);
 	public readonly view = new UmbCollectionViewManager(this);
 	public readonly bulkAction = new UmbCollectionBulkActionManager(this);
+	public readonly filtering = new UmbCollectionFilterManager(this);
 
 	#defaultViewAlias: string;
 	#defaultFilter: Partial<FilterModelType>;
