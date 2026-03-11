@@ -6,7 +6,7 @@
     <IncludeSymbols>false</IncludeSymbols>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Our.Umbraco.PostgreSql\Our.Umbraco.PostgreSql.csproj" />
+    <ProjectReference Include="..\..\..\Pck\PostgreSqlForUmbraco\Our.Umbraco.PostgreSql\Our.Umbraco.PostgreSql\Our.Umbraco.PostgreSql.csproj" />
     <ProjectReference Include="..\Umbraco.Cms.Targets\Umbraco.Cms.Targets.csproj" />
     <ProjectReference Include="..\Umbraco.Cms.Imaging.ImageSharp\Umbraco.Cms.Imaging.ImageSharp.csproj" />
     <ProjectReference Include="..\Umbraco.Cms.Persistence.Sqlite\Umbraco.Cms.Persistence.Sqlite.csproj" />
