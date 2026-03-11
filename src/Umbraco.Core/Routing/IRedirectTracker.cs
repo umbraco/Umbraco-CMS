@@ -22,7 +22,10 @@ namespace Umbraco.Cms.Core.Routing
         /// <param name="oldRoutes">The dictionary of routes for population.</param>
         /// <param name="isMove">Whether this is a move operation (always traverses descendants) or a publish (skips if URL segment unchanged).</param>
         // TODO (V19): Remove the default implementation when the obsolete overload is removed.
-        void StoreOldRoute(IContent entity, Dictionary<(int ContentId, string Culture), (Guid ContentKey, string OldRoute)> oldRoutes, bool isMove)
+        void StoreOldRoute(
+            IContent entity,
+            Dictionary<(int ContentId, string Culture), (Guid ContentKey, string OldRoute)> oldRoutes,
+            bool isMove)
 #pragma warning disable CS0618 // Type or member is obsolete
             => StoreOldRoute(entity, oldRoutes);
 #pragma warning restore CS0618 // Type or member is obsolete

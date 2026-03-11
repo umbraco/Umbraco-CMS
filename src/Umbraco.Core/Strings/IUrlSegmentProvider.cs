@@ -68,4 +68,23 @@ public interface IUrlSegmentProvider
             GetUrlSegment(content, published: false, culture),
             currentPublishedSegment,
             StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// Determines whether changes to the given content item may affect URL segments of its
+    /// descendant content items. Used by redirect tracking to decide whether descendant
+    /// traversal can be skipped when the content item's own URL segment is unchanged.
+    /// </summary>
+    /// <param name="content">The content item being published.</param>
+    /// <returns>
+    /// <c>true</c> if this provider may compute descendant segments based on data from this
+    /// content item; <c>false</c> if this provider only uses each content item's own data.
+    /// </returns>
+    /// <remarks>
+    /// The default is <c>false</c>, meaning this provider derives segments solely from the
+    /// content item itself (e.g. its Name or properties). Custom providers that read ancestor
+    /// properties to compute descendant segments should override this — either returning
+    /// <c>true</c> unconditionally, or using logic (e.g. checking the content type or whether
+    /// relevant properties have changed) to limit the impact to affected subtrees.
+    /// </remarks>
+    bool MayAffectDescendantSegments(IContentBase content) => false;
 }
