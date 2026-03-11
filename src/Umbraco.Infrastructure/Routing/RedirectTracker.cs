@@ -66,7 +66,10 @@ internal sealed class RedirectTracker : IRedirectTracker
         => StoreOldRoute(entity, oldRoutes, isMove: true);
 
     /// <inheritdoc/>
-    public void StoreOldRoute(IContent entity, Dictionary<(int ContentId, string Culture), (Guid ContentKey, string OldRoute)> oldRoutes, bool isMove)
+    public void StoreOldRoute(
+        IContent entity,
+        Dictionary<(int ContentId, string Culture), (Guid ContentKey, string OldRoute)> oldRoutes,
+        bool isMove)
     {
         IPublishedContent? entityContent = _contentCache.GetById(entity.Id);
         if (entityContent is null)
@@ -82,11 +85,13 @@ internal sealed class RedirectTracker : IRedirectTracker
             return;
         }
 
-        // For publishes (not moves), check if URL segment actually changed.
-        // If the segment is unchanged, no descendant URLs can have changed, so we don't need to traverse and store routes for
-        // this entity or its descendants.
+        // For publishes (not moves), check if URL segment actually changed and whether any provider
+        // derives descendant segments from this content's data.
+        // If the segment is unchanged and no provider affects descendants, we don't need to traverse.
         // For moves, we have to assume all descendant URLs may have changed since the parent path is part of the URL.
-        if (isMove is false && HasUrlSegmentChanged(entity, entityContent) is false)
+        if (isMove is false
+            && HasUrlSegmentChanged(entity, entityContent) is false
+            && HasProviderAffectingDescendantSegments(entity) is false)
         {
             return;
         }
@@ -103,6 +108,7 @@ internal sealed class RedirectTracker : IRedirectTracker
 
         foreach (IPublishedContent publishedContent in entityContent.DescendantsOrSelf(_navigationQueryService, _publishedContentStatusFilteringService))
         {
+
             // If this entity defines specific cultures, use those instead of the default ones
             IEnumerable<string> cultures = publishedContent.Cultures.Any() ? publishedContent.Cultures.Keys : defaultCultures.Value;
 
@@ -183,6 +189,19 @@ internal sealed class RedirectTracker : IRedirectTracker
 
             // No fallback is needed here: if no registered provider produces a segment, then none would have produced
             // one at publish time either, so there is no change.
+        }
+
+        return false;
+    }
+
+    private bool HasProviderAffectingDescendantSegments(IContent entity)
+    {
+        foreach (IUrlSegmentProvider provider in _urlSegmentProviders)
+        {
+            if (provider.MayAffectDescendantSegments(entity))
+            {
+                return true;
+            }
         }
 
         return false;

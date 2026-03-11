@@ -326,6 +326,31 @@ public class RedirectTrackerTests : UmbracoIntegrationTestWithContent
         Assert.IsTrue(dict.Count > 0);
     }
 
+    /// <summary>
+    /// Verifies that when an <see cref="IUrlSegmentProvider"/> reports that changes to the
+    /// published content may affect descendant URL segments (via <see cref="IUrlSegmentProvider.MayAffectDescendantSegments"/>),
+    /// descendant traversal occurs even though the content's own URL segment is unchanged.
+    /// This supports custom providers that derive descendant segments from ancestor properties.
+    /// </summary>
+    [Test]
+    public void Provider_Affecting_Descendants_Forces_Traversal_Despite_Unchanged_Segment()
+    {
+        Dictionary<(int ContentId, string Culture), (Guid ContentKey, string OldRoute)> dict = [];
+
+        var redirectTracker = CreateRedirectTracker(new RedirectTrackerSetupOptions
+        {
+            IncludeChild = true,
+            CurrentPublishedSegment = "test-page",
+            NewSegment = "test-page",
+            DocumentUrlServiceInitialized = true,
+            MayAffectDescendantSegments = true,
+        });
+
+        redirectTracker.StoreOldRoute(_testPage, dict, isMove: false);
+
+        Assert.IsTrue(dict.Count > 0);
+    }
+
     private RedirectUrlRepository CreateRedirectUrlRepository() =>
         new(
             (IScopeAccessor)ScopeProvider,
@@ -502,6 +527,9 @@ public class RedirectTrackerTests : UmbracoIntegrationTestWithContent
             }
 
             urlSegmentProvider.SetupGet(x => x.AllowAdditionalSegments).Returns(false);
+            urlSegmentProvider
+                .Setup(x => x.MayAffectDescendantSegments(It.IsAny<IContentBase>()))
+                .Returns(options.MayAffectDescendantSegments);
             urlSegmentProviders = new UrlSegmentProviderCollection(() => [urlSegmentProvider.Object]);
         }
         else
@@ -616,5 +644,13 @@ public class RedirectTrackerTests : UmbracoIntegrationTestWithContent
         /// descendant traversal regardless of segment changes.
         /// </summary>
         public bool DocumentUrlServiceInitialized { get; init; }
+
+        /// <summary>
+        /// Gets an explicit return value for <see cref="IUrlSegmentProvider.MayAffectDescendantSegments"/>.
+        /// When <c>true</c>, the provider signals that changes to this content may affect descendant
+        /// segments, forcing descendant traversal even if the content's own segment is unchanged.
+        /// Defaults to <c>false</c>.
+        /// </summary>
+        public bool MayAffectDescendantSegments { get; init; }
     }
 }
