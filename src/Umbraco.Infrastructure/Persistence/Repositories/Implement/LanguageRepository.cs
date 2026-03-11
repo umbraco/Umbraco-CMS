@@ -6,11 +6,9 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
-using Umbraco.Cms.Infrastructure.Persistence.EFCore;
-using Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence.Factories;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
-using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.EFCore;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
@@ -18,7 +16,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 /// <summary>
 ///     Represents a repository for doing CRUD operations for <see cref="Language" />
 /// </summary>
-internal sealed class LanguageRepository : AsyncEntityRepositoryBase<int, ILanguage>, ILanguageRepository
+internal sealed class LanguageRepository : EntityRepositoryBase<int, ILanguage>, ILanguageRepository
 {
     // We need to lock this dictionary every time we do an operation on it as the languageRepository is registered as a unique implementation
     // It is used to quickly get isoCodes by Id, or the reverse by avoiding (deep)cloning dtos
@@ -27,7 +25,7 @@ internal sealed class LanguageRepository : AsyncEntityRepositoryBase<int, ILangu
     private readonly Dictionary<int, string> _idCodeMap = new();
 
     public LanguageRepository(
-        IEFCoreScopeAccessor<UmbracoDbContext> scopeAccessor,
+        IScopeAccessor scopeAccessor,
         AppCaches cache,
         ILogger<LanguageRepository> logger,
         IRepositoryCacheVersionService repositoryCacheVersionService,
@@ -44,22 +42,22 @@ internal sealed class LanguageRepository : AsyncEntityRepositoryBase<int, ILangu
     private FullDataSetRepositoryCachePolicy<ILanguage, int>? TypedCachePolicy =>
         CachePolicy as FullDataSetRepositoryCachePolicy<ILanguage, int>;
 
-    public async Task<ILanguage?> GetByIsoCodeAsync(string isoCode)
+    public ILanguage? GetByIsoCode(string isoCode)
     {
-        await EnsureCacheIsPopulatedAsync();
+        EnsureCacheIsPopulated();
 
-        var id = await GetIdByIsoCodeAsync(isoCode, false);
-        return id.HasValue ? GetAsync(id.Value) : null;
+        var id = GetIdByIsoCode(isoCode, false);
+        return id.HasValue ? Get(id.Value) : null;
     }
 
-    public async Task<int?> GetIdByIsoCodeAsync(string? isoCode, bool throwOnNotFound = true)
+    public int? GetIdByIsoCode(string? isoCode, bool throwOnNotFound = true)
     {
         if (isoCode == null)
         {
             return null;
         }
 
-        await EnsureCacheIsPopulatedAsync();
+        EnsureCacheIsPopulated();
 
         lock (_codeIdMap)
         {
@@ -77,14 +75,14 @@ internal sealed class LanguageRepository : AsyncEntityRepositoryBase<int, ILangu
         return null;
     }
 
-    public async Task<string?> GetIsoCodeByIdAsync(int? id, bool throwOnNotFound = true)
+    public string? GetIsoCodeById(int? id, bool throwOnNotFound = true)
     {
         if (id == null)
         {
             return null;
         }
 
-        await EnsureCacheIsPopulatedAsync();
+        EnsureCacheIsPopulated();
 
         lock (_codeIdMap)
         {
@@ -103,7 +101,7 @@ internal sealed class LanguageRepository : AsyncEntityRepositoryBase<int, ILangu
     }
 
     // multi implementation of GetIsoCodeById
-    public async Task<string[]> GetIsoCodesByIdsAsync(ICollection<int> ids, bool throwOnNotFound = true)
+    public string[] GetIsoCodesByIds(ICollection<int> ids, bool throwOnNotFound = true)
     {
         var isoCodes = new string[ids.Count];
 
@@ -112,7 +110,7 @@ internal sealed class LanguageRepository : AsyncEntityRepositoryBase<int, ILangu
             return isoCodes;
         }
 
-        await EnsureCacheIsPopulatedAsync();
+        EnsureCacheIsPopulated();
 
 
         lock (_codeIdMap)
@@ -134,22 +132,14 @@ internal sealed class LanguageRepository : AsyncEntityRepositoryBase<int, ILangu
         return isoCodes;
     }
 
-    public async Task<string> GetDefaultIsoCodeAsync()
-    {
-        ILanguage defaultLanguage = await GetDefaultAsync();
-        return defaultLanguage.IsoCode;
-    }
+    public string GetDefaultIsoCode() => GetDefault().IsoCode;
 
-    public async Task<int?> GetDefaultIdAsync()
-    {
-        ILanguage defaultLanguage = await GetDefaultAsync();
-        return defaultLanguage.Id;
-    }
+    public int? GetDefaultId() => GetDefault().Id;
 
-    protected override IAsyncRepositoryCachePolicy<ILanguage, int> CreateCachePolicy() =>
+    protected override IRepositoryCachePolicy<ILanguage, int> CreateCachePolicy() =>
         new FullDataSetRepositoryCachePolicy<ILanguage, int>(GlobalIsolatedCache, ScopeAccessor,  RepositoryCacheVersionService, CacheSyncService, GetEntityId, /*expires:*/ false);
 
-    private async Task<ILanguage> ConvertFromDtoAsync(LanguageDto dto)
+    private ILanguage ConvertFromDto(LanguageDto dto)
     {
         lock (_codeIdMap)
         {
@@ -164,14 +154,14 @@ internal sealed class LanguageRepository : AsyncEntityRepositoryBase<int, ILangu
     }
 
     // do NOT leak that language, it's not deep-cloned!
-    private async Task<ILanguage> GetDefaultAsync()
+    private ILanguage GetDefault()
     {
         // get all cached
         var languages =
             (TypedCachePolicy
                  ?.GetAllCached(
                      PerformGetAll) // Try to get all cached non-cloned if using the correct cache policy (not the case in unit tests)
-             ?? await CachePolicy.GetAllAsync(Array.Empty<int>(), PerformGetAll)).ToList();
+             ?? CachePolicy.GetAll(Array.Empty<int>(), PerformGetAll)).ToList();
 
         ILanguage? language = languages.FirstOrDefault(x => x.IsDefault);
         if (language != null)
@@ -198,9 +188,9 @@ internal sealed class LanguageRepository : AsyncEntityRepositoryBase<int, ILangu
 
     #region Overrides of RepositoryBase<int,Language>
 
-    protected override async Task<ILanguage?> PerformGetAsync(int id) => PerformGetAll([id]).FirstOrDefault();
+    protected override ILanguage? PerformGet(int id) => PerformGetAll([id]).FirstOrDefault();
 
-    protected override async Task<IEnumerable<ILanguage>> PerformGetAll(params int[]? ids)
+    protected override IEnumerable<ILanguage> PerformGetAll(params int[]? ids)
     {
         Sql<ISqlContext> sql = GetBaseQuery(false).Where<LanguageDto>(x => x.Id > 0);
         if (ids?.Any() ?? false)
@@ -231,7 +221,7 @@ internal sealed class LanguageRepository : AsyncEntityRepositoryBase<int, ILangu
             }
         }
 
-        var languages = languageDtos.Select(ConvertFromDtoAsync).OrderBy(x => x.Id).ToList();
+        var languages = languageDtos.Select(ConvertFromDto).OrderBy(x => x.Id).ToList();
         return languages;
     }
 
@@ -430,7 +420,7 @@ internal sealed class LanguageRepository : AsyncEntityRepositoryBase<int, ILangu
         }
     }
 
-    private async Task EnsureCacheIsPopulatedAsync()
+    private void EnsureCacheIsPopulated()
     {
         // ensure cache is populated, in a non-expensive way
         if (TypedCachePolicy != null)

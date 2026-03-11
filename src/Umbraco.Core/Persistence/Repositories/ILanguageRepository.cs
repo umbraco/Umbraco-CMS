@@ -12,7 +12,7 @@ public interface ILanguageRepository : IReadWriteQueryRepository<int, ILanguage>
     /// </summary>
     /// <param name="isoCode">The ISO code of the language.</param>
     /// <returns>The language if found; otherwise, <c>null</c>.</returns>
-    Task<ILanguage?> GetByIsoCodeAsync(string isoCode);
+    ILanguage? GetByIsoCode(string isoCode);
 
     /// <summary>
     ///     Gets a language identifier from its ISO code.
@@ -20,7 +20,7 @@ public interface ILanguageRepository : IReadWriteQueryRepository<int, ILanguage>
     /// <remarks>
     ///     <para>This can be optimized and bypass all deep cloning.</para>
     /// </remarks>
-    Task<int?> GetIdByIsoCodeAsync(string? isoCode, bool throwOnNotFound = true);
+    int? GetIdByIsoCode(string? isoCode, bool throwOnNotFound = true);
 
     /// <summary>
     ///     Gets a language ISO code from its identifier.
@@ -28,7 +28,7 @@ public interface ILanguageRepository : IReadWriteQueryRepository<int, ILanguage>
     /// <remarks>
     ///     <para>This can be optimized and bypass all deep cloning.</para>
     /// </remarks>
-    Task<string?> GetIsoCodeByIdAsync(int? id, bool throwOnNotFound = true);
+    string? GetIsoCodeById(int? id, bool throwOnNotFound = true);
 
     /// <summary>
     ///     Gets the default language ISO code.
@@ -36,7 +36,7 @@ public interface ILanguageRepository : IReadWriteQueryRepository<int, ILanguage>
     /// <remarks>
     ///     <para>This can be optimized and bypass all deep cloning.</para>
     /// </remarks>
-    Task<string> GetDefaultIsoCodeAsync();
+    string GetDefaultIsoCode();
 
     /// <summary>
     ///     Gets the default language identifier.
@@ -44,7 +44,7 @@ public interface ILanguageRepository : IReadWriteQueryRepository<int, ILanguage>
     /// <remarks>
     ///     <para>This can be optimized and bypass all deep cloning.</para>
     /// </remarks>
-    Task<int?> GetDefaultIdAsync();
+    int? GetDefaultId();
 
     /// <summary>
     ///     Gets multiple language ISO codes from the provided Ids.
@@ -52,5 +52,5 @@ public interface ILanguageRepository : IReadWriteQueryRepository<int, ILanguage>
     /// <param name="ids">The language Ids.</param>
     /// <param name="throwOnNotFound">Indicates whether to throw an exception if the provided Id is not found as a language.</param>
     /// <returns></returns>
-    Task<string[]> GetIsoCodesByIdsAsync(ICollection<int> ids, bool throwOnNotFound = true);
+    string[] GetIsoCodesByIds(ICollection<int> ids, bool throwOnNotFound = true);
 }
