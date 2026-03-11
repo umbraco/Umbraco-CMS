@@ -191,6 +191,7 @@ export class ContentUiHelper extends UiBaseLocators {
   private readonly manualLinkRemoveBtn: Locator;
   private readonly cardCollectionView: Locator;
   private readonly cardContentNode: Locator;
+  private readonly containerSetupBtn: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -396,6 +397,7 @@ export class ContentUiHelper extends UiBaseLocators {
     // Card Collection View
     this.cardCollectionView = page.locator('umb-card-collection-view');
     this.cardContentNode = this.cardCollectionView.locator('uui-card-content-node');
+    this.containerSetupBtn = this.container.getByLabel('Setup');
   }
 
   async enterContentName(name: string) {
@@ -1149,7 +1151,7 @@ export class ContentUiHelper extends UiBaseLocators {
     await this.click(this.selectErrorPageDocument);
     await this.click(this.container.getByLabel(documentName, {exact: true}));
     await this.clickChooseModalButton();
-    await this.click(this.containerSaveBtn);
+    await this.click(this.containerSetupBtn);
   }
 
   async sortChildrenDragAndDrop(dragFromSelector: Locator, dragToSelector: Locator, verticalOffset: number = 0, horizontalOffset: number = 0, steps: number = 5) {
