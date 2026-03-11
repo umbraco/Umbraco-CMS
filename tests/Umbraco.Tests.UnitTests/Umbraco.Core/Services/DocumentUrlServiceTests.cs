@@ -212,7 +212,8 @@ public class DocumentUrlServiceTests
     /// </summary>
     private static (DocumentUrlService Service, Mock<IDocumentUrlRepository> Repository) CreateDocumentUrlServiceWithMocks(
         UrlSegmentProviderCollection urlSegmentProviderCollection,
-        IEnumerable<ILanguage> languages)
+        IEnumerable<ILanguage> languages,
+        IDocumentNavigationQueryService? documentNavigationQueryService = null)
     {
         var loggerMock = Mock.Of<ILogger<DocumentUrlService>>();
         var documentUrlRepositoryMock = new Mock<IDocumentUrlRepository>();
@@ -226,7 +227,6 @@ public class DocumentUrlServiceTests
 
         var keyValueServiceMock = Mock.Of<IKeyValueService>();
         var idKeyMapMock = Mock.Of<IIdKeyMap>();
-        var documentNavigationQueryServiceMock = Mock.Of<IDocumentNavigationQueryService>();
         var publishStatusQueryServiceMock = Mock.Of<IPublishStatusQueryService>();
         var domainCacheServiceMock = Mock.Of<IDomainCacheService>();
         var defaultCultureAccessorMock = Mock.Of<IDefaultCultureAccessor>();
@@ -260,7 +260,7 @@ public class DocumentUrlServiceTests
             languageServiceMock.Object,
             keyValueServiceMock,
             idKeyMapMock,
-            documentNavigationQueryServiceMock,
+            documentNavigationQueryService ?? Mock.Of<IDocumentNavigationQueryService>(),
             publishStatusQueryServiceMock,
             domainCacheServiceMock,
             defaultCultureAccessorMock);
@@ -544,6 +544,227 @@ public class DocumentUrlServiceTests
         // Assert - trashed content should not have any segments saved (cache is cleared instead)
         // The repository.Save is still called but with no segments that should be cached
         repositoryMock.Verify(x => x.Save(It.IsAny<IEnumerable<PublishedDocumentUrlSegment>>()), Times.Never);
+    }
+
+    #endregion
+
+    #region URL Segment Collision Resolution Tests
+
+    /// <summary>
+    /// Creates a URL segment provider that returns different segments based on document key.
+    /// </summary>
+    private static IUrlSegmentProvider CreatePerDocumentSegmentProvider(Dictionary<Guid, string> keyToSegment)
+    {
+        var providerMock = new Mock<IUrlSegmentProvider>();
+        providerMock.Setup(x => x.GetUrlSegment(It.IsAny<IContentBase>(), It.IsAny<bool>(), It.IsAny<string?>()))
+            .Returns<IContentBase, bool, string?>((content, _, _) =>
+                keyToSegment.TryGetValue(content.Key, out var segment) ? segment : "default-segment");
+        providerMock.Setup(x => x.AllowAdditionalSegments).Returns(false);
+        return providerMock.Object;
+    }
+
+    [Test]
+    public async Task CreateOrUpdateUrlSegmentsAsync_SiblingsWithIdenticalSegments_AppendsNumericSuffix()
+    {
+        // Arrange - two sibling documents that produce the same URL segment
+        // (simulates names like "Title" and "Title." which both produce segment "title")
+        var languages = new List<ILanguage> { CreateMockLanguage(1, "en-US") };
+        var documentKey1 = Guid.NewGuid();
+        var documentKey2 = Guid.NewGuid();
+
+        var keyToSegment = new Dictionary<Guid, string>
+        {
+            { documentKey1, "title" },
+            { documentKey2, "title" }, // Same segment - collision!
+        };
+        var urlSegmentProvider = CreatePerDocumentSegmentProvider(keyToSegment);
+        var urlSegmentProviderCollection = new UrlSegmentProviderCollection(() => [urlSegmentProvider]);
+
+        // Set up navigation: both documents are siblings (same parent)
+        var navMock = new Mock<IDocumentNavigationQueryService>();
+        IEnumerable<Guid> siblingsOf1 = new[] { documentKey2 };
+        IEnumerable<Guid> siblingsOf2 = new[] { documentKey1 };
+        navMock.Setup(x => x.TryGetSiblingsKeys(documentKey1, out siblingsOf1)).Returns(true);
+        navMock.Setup(x => x.TryGetSiblingsKeys(documentKey2, out siblingsOf2)).Returns(true);
+
+        var (service, repositoryMock) = CreateDocumentUrlServiceWithMocks(
+            urlSegmentProviderCollection, languages, navMock.Object);
+
+        var content1 = CreateMockContent(documentKey1, variesByCulture: false, isPublished: true);
+        var content2 = CreateMockContent(documentKey2, variesByCulture: false, isPublished: true);
+
+        List<PublishedDocumentUrlSegment>? savedSegments = null;
+        repositoryMock.Setup(x => x.Save(It.IsAny<IEnumerable<PublishedDocumentUrlSegment>>()))
+            .Callback<IEnumerable<PublishedDocumentUrlSegment>>(segments => savedSegments = segments.ToList());
+
+        // Act - process both documents together (batch)
+        await service.CreateOrUpdateUrlSegmentsAsync([content1.Object, content2.Object]);
+
+        // Assert
+        Assert.That(savedSegments, Is.Not.Null);
+
+        var primarySegments = savedSegments!
+            .Where(s => s.IsPrimary)
+            .Select(s => s.UrlSegment)
+            .Distinct()
+            .OrderBy(s => s)
+            .ToList();
+
+        Assert.That(primarySegments, Has.Count.EqualTo(2), "Should have 2 distinct primary segments (published + draft for 2 docs)");
+        Assert.That(primarySegments, Does.Contain("title"), "First document should keep the original segment");
+        Assert.That(primarySegments, Does.Contain("title-2"), "Second document should get a suffixed segment");
+    }
+
+    [Test]
+    public async Task CreateOrUpdateUrlSegmentsAsync_SiblingsWithDifferentSegments_NoSuffixAppended()
+    {
+        // Arrange - two sibling documents with different URL segments
+        var languages = new List<ILanguage> { CreateMockLanguage(1, "en-US") };
+        var documentKey1 = Guid.NewGuid();
+        var documentKey2 = Guid.NewGuid();
+
+        var keyToSegment = new Dictionary<Guid, string>
+        {
+            { documentKey1, "first-title" },
+            { documentKey2, "second-title" }, // Different segment - no collision
+        };
+        var urlSegmentProvider = CreatePerDocumentSegmentProvider(keyToSegment);
+        var urlSegmentProviderCollection = new UrlSegmentProviderCollection(() => [urlSegmentProvider]);
+
+        var navMock = new Mock<IDocumentNavigationQueryService>();
+        IEnumerable<Guid> siblingsOf1 = new[] { documentKey2 };
+        IEnumerable<Guid> siblingsOf2 = new[] { documentKey1 };
+        navMock.Setup(x => x.TryGetSiblingsKeys(documentKey1, out siblingsOf1)).Returns(true);
+        navMock.Setup(x => x.TryGetSiblingsKeys(documentKey2, out siblingsOf2)).Returns(true);
+
+        var (service, repositoryMock) = CreateDocumentUrlServiceWithMocks(
+            urlSegmentProviderCollection, languages, navMock.Object);
+
+        var content1 = CreateMockContent(documentKey1, variesByCulture: false, isPublished: true);
+        var content2 = CreateMockContent(documentKey2, variesByCulture: false, isPublished: true);
+
+        List<PublishedDocumentUrlSegment>? savedSegments = null;
+        repositoryMock.Setup(x => x.Save(It.IsAny<IEnumerable<PublishedDocumentUrlSegment>>()))
+            .Callback<IEnumerable<PublishedDocumentUrlSegment>>(segments => savedSegments = segments.ToList());
+
+        // Act
+        await service.CreateOrUpdateUrlSegmentsAsync([content1.Object, content2.Object]);
+
+        // Assert
+        Assert.That(savedSegments, Is.Not.Null);
+
+        var primarySegments = savedSegments!
+            .Where(s => s.IsPrimary)
+            .Select(s => s.UrlSegment)
+            .Distinct()
+            .ToList();
+
+        Assert.That(primarySegments, Does.Contain("first-title"));
+        Assert.That(primarySegments, Does.Contain("second-title"));
+        Assert.That(primarySegments.Any(s => s.Contains("-2")), Is.False, "No suffix should be appended when segments are different");
+    }
+
+    [Test]
+    public async Task CreateOrUpdateUrlSegmentsAsync_ThreeSiblingsWithSameSegment_AppendsIncrementingSuffixes()
+    {
+        // Arrange - three sibling documents with identical URL segments
+        var languages = new List<ILanguage> { CreateMockLanguage(1, "en-US") };
+        var documentKey1 = Guid.NewGuid();
+        var documentKey2 = Guid.NewGuid();
+        var documentKey3 = Guid.NewGuid();
+
+        var keyToSegment = new Dictionary<Guid, string>
+        {
+            { documentKey1, "news" },
+            { documentKey2, "news" },
+            { documentKey3, "news" },
+        };
+        var urlSegmentProvider = CreatePerDocumentSegmentProvider(keyToSegment);
+        var urlSegmentProviderCollection = new UrlSegmentProviderCollection(() => [urlSegmentProvider]);
+
+        var navMock = new Mock<IDocumentNavigationQueryService>();
+        IEnumerable<Guid> siblingsOf1 = new[] { documentKey2, documentKey3 };
+        IEnumerable<Guid> siblingsOf2 = new[] { documentKey1, documentKey3 };
+        IEnumerable<Guid> siblingsOf3 = new[] { documentKey1, documentKey2 };
+        navMock.Setup(x => x.TryGetSiblingsKeys(documentKey1, out siblingsOf1)).Returns(true);
+        navMock.Setup(x => x.TryGetSiblingsKeys(documentKey2, out siblingsOf2)).Returns(true);
+        navMock.Setup(x => x.TryGetSiblingsKeys(documentKey3, out siblingsOf3)).Returns(true);
+
+        var (service, repositoryMock) = CreateDocumentUrlServiceWithMocks(
+            urlSegmentProviderCollection, languages, navMock.Object);
+
+        var content1 = CreateMockContent(documentKey1, variesByCulture: false, isPublished: true);
+        var content2 = CreateMockContent(documentKey2, variesByCulture: false, isPublished: true);
+        var content3 = CreateMockContent(documentKey3, variesByCulture: false, isPublished: true);
+
+        List<PublishedDocumentUrlSegment>? savedSegments = null;
+        repositoryMock.Setup(x => x.Save(It.IsAny<IEnumerable<PublishedDocumentUrlSegment>>()))
+            .Callback<IEnumerable<PublishedDocumentUrlSegment>>(segments => savedSegments = segments.ToList());
+
+        // Act
+        await service.CreateOrUpdateUrlSegmentsAsync([content1.Object, content2.Object, content3.Object]);
+
+        // Assert
+        Assert.That(savedSegments, Is.Not.Null);
+
+        var primarySegments = savedSegments!
+            .Where(s => s.IsPrimary)
+            .Select(s => s.UrlSegment)
+            .Distinct()
+            .OrderBy(s => s)
+            .ToList();
+
+        Assert.That(primarySegments, Does.Contain("news"), "First document should keep the original segment");
+        Assert.That(primarySegments, Does.Contain("news-2"), "Second document should get '-2' suffix");
+        Assert.That(primarySegments, Does.Contain("news-3"), "Third document should get '-3' suffix");
+    }
+
+    [Test]
+    public async Task CreateOrUpdateUrlSegmentsAsync_NonSiblingsWithSameSegment_NoSuffixAppended()
+    {
+        // Arrange - two documents with the same URL segment but NOT siblings (different parents)
+        var languages = new List<ILanguage> { CreateMockLanguage(1, "en-US") };
+        var documentKey1 = Guid.NewGuid();
+        var documentKey2 = Guid.NewGuid();
+
+        var keyToSegment = new Dictionary<Guid, string>
+        {
+            { documentKey1, "title" },
+            { documentKey2, "title" },
+        };
+        var urlSegmentProvider = CreatePerDocumentSegmentProvider(keyToSegment);
+        var urlSegmentProviderCollection = new UrlSegmentProviderCollection(() => [urlSegmentProvider]);
+
+        // Navigation: documents are NOT siblings (TryGetSiblingsKeys returns empty for each)
+        var navMock = new Mock<IDocumentNavigationQueryService>();
+        IEnumerable<Guid> emptyKeys = Array.Empty<Guid>();
+        navMock.Setup(x => x.TryGetSiblingsKeys(documentKey1, out emptyKeys)).Returns(true);
+        navMock.Setup(x => x.TryGetSiblingsKeys(documentKey2, out emptyKeys)).Returns(true);
+
+        var (service, repositoryMock) = CreateDocumentUrlServiceWithMocks(
+            urlSegmentProviderCollection, languages, navMock.Object);
+
+        var content1 = CreateMockContent(documentKey1, variesByCulture: false, isPublished: true);
+        var content2 = CreateMockContent(documentKey2, variesByCulture: false, isPublished: true);
+
+        List<PublishedDocumentUrlSegment>? savedSegments = null;
+        repositoryMock.Setup(x => x.Save(It.IsAny<IEnumerable<PublishedDocumentUrlSegment>>()))
+            .Callback<IEnumerable<PublishedDocumentUrlSegment>>(segments => savedSegments = segments.ToList());
+
+        // Act
+        await service.CreateOrUpdateUrlSegmentsAsync([content1.Object, content2.Object]);
+
+        // Assert
+        Assert.That(savedSegments, Is.Not.Null);
+
+        var primarySegments = savedSegments!
+            .Where(s => s.IsPrimary)
+            .Select(s => s.UrlSegment)
+            .Distinct()
+            .ToList();
+
+        Assert.That(primarySegments, Has.Count.EqualTo(1), "Both should have 'title' since they're not siblings");
+        Assert.That(primarySegments[0], Is.EqualTo("title"));
     }
 
     #endregion
