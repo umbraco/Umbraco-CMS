@@ -45,7 +45,27 @@ public interface IUrlSegmentProvider
     /// </remarks>
     string? GetUrlSegment(IContentBase content, bool published, string? culture = null) => GetUrlSegment(content, culture);
 
-    // TODO: For the 301 tracking, we need to add another extended interface to this so that
-    // the RedirectTrackingEventHandler can ask the IUrlSegmentProvider if the URL is changing.
-    // Currently the way it works is very hacky, see notes in: RedirectTrackingEventHandler.ContentService_Publishing
+    /// <summary>
+    /// Determines whether the URL segment for the given content has changed compared to the
+    /// currently published segment. Used by redirect tracking to avoid unnecessary descendant
+    /// traversal when URL segments haven't changed.
+    /// </summary>
+    /// <param name="content">The content being published (carries new property values).</param>
+    /// <param name="currentPublishedSegment">The currently published URL segment (from IDocumentUrlService).</param>
+    /// <param name="culture">The culture.</param>
+    /// <returns>True if the segment has changed, false otherwise.</returns>
+    /// <remarks>
+    /// The default implementation computes the new URL segment via <see cref="GetUrlSegment(IContentBase, bool, string?)"/>
+    /// using draft values (<c>published: false</c>) and compares it to <paramref name="currentPublishedSegment"/>.
+    /// Draft values are used because this method is called during publishing, before the new values are committed
+    /// as published — so the draft values represent what the segment <em>will</em> be after publishing.
+    /// This is intentionally a permanent default so that custom providers automatically get correct change detection
+    /// without additional implementation.
+    /// Override only if you need custom change detection logic (e.g., URL segments derived from external state).
+    /// </remarks>
+    bool HasUrlSegmentChanged(IContentBase content, string? currentPublishedSegment, string? culture)
+        => !string.Equals(
+            GetUrlSegment(content, published: false, culture),
+            currentPublishedSegment,
+            StringComparison.OrdinalIgnoreCase);
 }

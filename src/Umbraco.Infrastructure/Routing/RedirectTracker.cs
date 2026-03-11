@@ -8,6 +8,7 @@ using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Navigation;
+using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Routing;
@@ -28,6 +29,8 @@ internal sealed class RedirectTracker : IRedirectTracker
     private readonly IPublishedUrlProvider _publishedUrlProvider;
     private readonly IPublishedContentStatusFilteringService _publishedContentStatusFilteringService;
     private readonly IDomainCache _domainCache;
+    private readonly UrlSegmentProviderCollection _urlSegmentProviders;
+    private readonly IDocumentUrlService _documentUrlService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RedirectTracker"/> class.
@@ -40,7 +43,9 @@ internal sealed class RedirectTracker : IRedirectTracker
         ILogger<RedirectTracker> logger,
         IPublishedUrlProvider publishedUrlProvider,
         IPublishedContentStatusFilteringService publishedContentStatusFilteringService,
-        IDomainCache domainCache)
+        IDomainCache domainCache,
+        UrlSegmentProviderCollection urlSegmentProviders,
+        IDocumentUrlService documentUrlService)
     {
         _languageService = languageService;
         _redirectUrlService = redirectUrlService;
@@ -50,13 +55,38 @@ internal sealed class RedirectTracker : IRedirectTracker
         _publishedUrlProvider = publishedUrlProvider;
         _publishedContentStatusFilteringService = publishedContentStatusFilteringService;
         _domainCache = domainCache;
+        _urlSegmentProviders = urlSegmentProviders;
+        _documentUrlService = documentUrlService;
     }
 
     /// <inheritdoc/>
+#pragma warning disable CS0618 // Type or member is obsolete
     public void StoreOldRoute(IContent entity, Dictionary<(int ContentId, string Culture), (Guid ContentKey, string OldRoute)> oldRoutes)
+#pragma warning restore CS0618 // Type or member is obsolete
+        => StoreOldRoute(entity, oldRoutes, isMove: true);
+
+    /// <inheritdoc/>
+    public void StoreOldRoute(IContent entity, Dictionary<(int ContentId, string Culture), (Guid ContentKey, string OldRoute)> oldRoutes, bool isMove)
     {
         IPublishedContent? entityContent = _contentCache.GetById(entity.Id);
         if (entityContent is null)
+        {
+            return;
+        }
+
+        // If this entity was already processed by an ancestor's traversal in this batch,
+        // all its descendants will also have been processed — skip entirely to avoid redundant
+        // cache lookups, segment checks, and navigation queries.
+        if (oldRoutes.Keys.Any(k => k.ContentId == entityContent.Id))
+        {
+            return;
+        }
+
+        // For publishes (not moves), check if URL segment actually changed.
+        // If the segment is unchanged, no descendant URLs can have changed, so we don't need to traverse and store routes for
+        // this entity or its descendants.
+        // For moves, we have to assume all descendant URLs may have changed since the parent path is part of the URL.
+        if (isMove is false && HasUrlSegmentChanged(entity, entityContent) is false)
         {
             return;
         }
@@ -104,6 +134,58 @@ internal sealed class RedirectTracker : IRedirectTracker
                 }
             }
         }
+    }
+
+    private bool HasUrlSegmentChanged(IContent entity, IPublishedContent publishedContent)
+    {
+        // During upgrades, the document URL service is not initialized (see DocumentUrlServiceInitializerNotificationHandler).
+        // If a migration triggers content publishing before initialization, fall back to full traversal.
+        if (_documentUrlService.IsInitialized is false)
+        {
+            return true;
+        }
+
+        // Determine cultures to check.
+        IEnumerable<string> cultures = publishedContent.Cultures.Any()
+            ? publishedContent.Cultures.Keys
+            : [string.Empty];
+
+        foreach (var culture in cultures)
+        {
+            var currentPublishedSegment = _documentUrlService.GetUrlSegment(entity.Key, culture, isDraft: false);
+
+            // If the current published segment couldn't be retrieved (e.g. content being published
+            // for the first time), we can't confirm the segment is unchanged — fall back to full traversal.
+            if (currentPublishedSegment is null)
+            {
+                return true;
+            }
+
+            // Ask the provider chain whether the segment has changed.
+            foreach (IUrlSegmentProvider provider in _urlSegmentProviders)
+            {
+                // Skip providers that don't produce a segment for this content/culture.
+                if (string.IsNullOrEmpty(provider.GetUrlSegment(entity, published: false, culture)))
+                {
+                    continue;
+                }
+
+                if (provider.HasUrlSegmentChanged(entity, currentPublishedSegment, culture))
+                {
+                    return true;
+                }
+
+                if (provider.AllowAdditionalSegments is false)
+                {
+                    break;
+                }
+            }
+
+            // No fallback is needed here: if no registered provider produces a segment, then none would have produced
+            // one at publish time either, so there is no change.
+        }
+
+        return false;
     }
 
     private bool TryGetNodeIdWithAssignedDomain(IPublishedContent entityContent, out int domainRootId)
