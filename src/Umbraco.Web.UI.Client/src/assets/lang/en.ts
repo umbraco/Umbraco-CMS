@@ -420,6 +420,8 @@ export default {
 		fileSecurityValidationFailure: 'One or more file security validations have failed',
 		moveToSameFolderFailed: 'Parent and destination folders cannot be the same',
 		uploadNotAllowed: 'Upload is not allowed in this location.',
+		uploadValidationFailed: (mediaTypeName: string) =>
+			`The ${mediaTypeName} media type has one or more required properties. It will need to be uploaded individually via the 'Create' menu`,
 	},
 	member: {
 		'2fa': 'Two-Factor Authentication',
@@ -1301,6 +1303,11 @@ export default {
 		paSelectMembers: 'Select the members who have access to the page <strong>%0%</strong>',
 		paMembers: 'Specific members protection',
 		paMembersHelp: 'If you wish to grant access to specific members',
+		paProtectedByAncestor: 'Public Access settings are inherited from an ancestor page.',
+		psHeadlineSetup: 'Setup Public Access',
+		psHeadlineEdit: 'Edit Public Access',
+		psActionSetup: 'Setup',
+		psActionEdit: 'Edit',
 	},
 	publish: {
 		contentPublishedFailedIsTrashed: '%0% could not be published because the item is in the recycle bin.',
@@ -2889,6 +2896,10 @@ export default {
 		resetUrlHeadline: 'Reset URL?',
 		resetUrlMessage: 'Are you sure you want to reset this URL?',
 		resetUrlLabel: 'Reset',
+		selectLanguageHint: 'Choose a language for the link',
+		selectLanguageDefault: "Auto (visitor's language)",
+		configCultureSpecificDocumentLinksLabel: 'Culture-specific document links',
+		configCultureSpecificDocumentLinksDescription: 'Enable specifying a culture when linking to documents.',
 	},
 	missingEditor: {
 		title: 'This property type is no longer available.',

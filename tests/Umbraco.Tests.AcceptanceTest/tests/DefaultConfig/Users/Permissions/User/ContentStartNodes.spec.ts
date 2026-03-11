@@ -2,7 +2,6 @@ import {expect} from "@playwright/test";
 import {ConstantHelper, test} from "@umbraco/acceptance-test-helpers";
 
 const testUser = ConstantHelper.testUserCredentials;
-let testUserCookieAndToken = { cookie: "", accessToken: "", refreshToken: "" };
 
 const userGroupName = "TestUserGroup";
 let userGroupId = null;
@@ -61,11 +60,7 @@ test.beforeEach(async ({ umbracoApi }) => {
 
 test.afterEach(async ({ umbracoApi }) => {
   // Ensure we are logged in to admin
-  await umbracoApi.loginToAdminUser(
-    testUserCookieAndToken.cookie,
-    testUserCookieAndToken.accessToken,
-    testUserCookieAndToken.refreshToken
-  );
+  await umbracoApi.loginToAdminUser();
   await umbracoApi.documentType.ensureNameNotExists(rootDocumentTypeName);
   await umbracoApi.documentType.ensureNameNotExists(childDocumentTypeOneName);
   await umbracoApi.documentType.ensureNameNotExists(childDocumentTypeTwoName);
@@ -84,7 +79,7 @@ test("can see root start node and children", async ({
     userGroupId,
     [rootDocumentId]
   );
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(
+  await umbracoApi.user.loginToUser(
     testUser.name,
     testUser.email,
     testUser.password
@@ -119,7 +114,7 @@ test("can see parent of start node but not access it", async ({
     userGroupId,
     [childDocumentOneId]
   );
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(
+  await umbracoApi.user.loginToUser(
     testUser.name,
     testUser.email,
     testUser.password
@@ -167,7 +162,7 @@ test("see no-access view when deep-linking to restricted document", async ({
     userGroupId,
     [childDocumentOneId]
   );
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(
+  await umbracoApi.user.loginToUser(
     testUser.name,
     testUser.email,
     testUser.password
@@ -197,7 +192,7 @@ test("can not see any content when no start nodes specified", async ({
     testUser.password,
     userGroupId
   );
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(
+  await umbracoApi.user.loginToUser(
     testUser.name,
     testUser.email,
     testUser.password
