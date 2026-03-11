@@ -73,6 +73,7 @@ const createMockDocumentTypeFolderMapper = (request: CreateFolderRequestModel): 
 		},
 		flags: [],
 		noAccess: false,
+		allowedInLibrary: false,
 	};
 };
 
@@ -102,6 +103,7 @@ const createMockDocumentTypeMapper = (request: CreateDocumentTypeRequestModel): 
 		},
 		flags: [],
 		noAccess: false,
+		allowedInLibrary: request.allowedInLibrary,
 	};
 };
 
@@ -123,6 +125,7 @@ const documentTypeDetailMapper = (item: UmbMockDocumentTypeModel): DocumentTypeR
 		allowedTemplates: item.allowedTemplates,
 		cleanup: item.cleanup,
 		collection: item.collection,
+		allowedInLibrary: item.allowedInLibrary,
 	};
 };
 
@@ -148,6 +151,7 @@ const documentTypeItemMapper = (item: UmbMockDocumentTypeModel): DocumentTypeIte
 		isElement: item.isElement,
 		description: item.description ?? undefined,
 		flags: item.flags,
+		allowedInLibrary: item.allowedInLibrary,
 	};
 };
 

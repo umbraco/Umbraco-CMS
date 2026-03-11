@@ -286,7 +286,7 @@ export class ContentUiHelper extends UiBaseLocators {
     this.duplicateBtn = page.getByLabel('Duplicate', {exact: true});
     this.contentTreeRefreshBtn = page.locator('#header').getByLabel('#actions_refreshNode');
     this.sortChildrenBtn = page.getByRole('button', {name: 'Sort children'});
-    this.rollbackBtn = page.getByRole('button', { name: 'Rollback…' });
+    this.rollbackBtn = this.documentWorkspace.getByRole('button', { name: /^Rollback(…)?$/ });
     this.rollbackContainerBtn = this.container.getByLabel('Rollback');
     this.publicAccessBtn = page.getByRole('button', {name: 'Public Access'});
     this.uuiCheckbox = page.locator('uui-checkbox');
@@ -356,7 +356,7 @@ export class ContentUiHelper extends UiBaseLocators {
     this.removeAt = this.generalItem.filter({hasText: 'Remove at'}).locator('umb-localize-date');
     this.selectAllCheckbox = this.documentScheduleModal.locator('[label="Select all"]');
     this.confirmToPublishBtn = page.locator('umb-document-publish-modal').getByLabel('Publish');
-    // Publish with descendants 
+    // Publish with descendants
     this.documentPublishWithDescendantsModal = page.locator('umb-document-publish-with-descendants-modal');
     this.publishWithDescendantsBtn = this.workspaceActionMenuItem.getByLabel('Publish with descendants', {exact: true});
     this.includeUnpublishedDescendantsToggle = this.documentPublishWithDescendantsModal.locator('#includeUnpublishedDescendants');
@@ -495,6 +495,7 @@ export class ContentUiHelper extends UiBaseLocators {
 
   // Info Tab
   async clickInfoTab() {
+    await this.waitForNavigation();
     await this.click(this.infoTab);
   }
 
@@ -873,7 +874,7 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async isDocumentTypeNameVisible(contentName: string, isVisible: boolean = true) {
-    return await this.isVisible(this.sidebarModal.getByText(contentName), isVisible); 
+    return await this.isVisible(this.sidebarModal.getByText(contentName), isVisible);
   }
 
   async doesModalHaveText(text: string) {
@@ -1073,7 +1074,7 @@ export class ContentUiHelper extends UiBaseLocators {
   async enterDocumentBlueprintName(name: string) {
     await this.enterText(this.documentBlueprintModalEnterNameTxt, name);
   }
-  
+
   async clickSaveDocumentBlueprintButton() {
     await this.click(this.documentBlueprintSaveBtn);
   }
@@ -1112,7 +1113,7 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async clickRollbackButton() {
-    await this.click(this.rollbackBtn);
+    await this.click(this.rollbackBtn, {force: true});
   }
 
   async clickRollbackContainerButton() {
@@ -1468,11 +1469,11 @@ export class ContentUiHelper extends UiBaseLocators {
   async enterRTETipTapEditor(value: string) {
     await this.enterText(this.tipTapEditor, value);
   }
-  
+
   async typeRTETipTapEditorValue(value: string, toClearFirst = false) {
     await this.typeText(this.tipTapEditor, value, {clearFirst: toClearFirst});
   }
-  
+
   async clickCreateBlockModalButtonAndWaitForModalToClose() {
     await this.click(this.modalCreateBtn);
     await this.waitForHidden(this.backofficeModalContainer);
@@ -1684,7 +1685,7 @@ export class ContentUiHelper extends UiBaseLocators {
     await this.enterText(this.memberPickerSearchTxt, keyword);
     await this.pressKey(this.memberPickerSearchTxt, 'Enter');
   }
-  
+
   async isContentNameReadOnly() {
     await expect(this.contentNameTxt).toHaveAttribute('readonly');
   }
@@ -1714,11 +1715,11 @@ export class ContentUiHelper extends UiBaseLocators {
     const actionLocator = this.propertyActionMenu.locator(`umb-property-action uui-menu-item[label="${name}"]`);
     await this.click(actionLocator);
   }
-  
+
   async isContentWithNameVisibleInList(contentName: string, isVisible: boolean = true) {
     await this.isVisible(this.documentTableColumnName.filter({hasText: contentName}), isVisible);
   }
-  
+
   async selectDocumentBlueprintWithName(blueprintName: string) {
     const blueprintLocator = this.documentCreateOptionsModal.locator('uui-menu-item', {hasText: blueprintName});
     await this.click(blueprintLocator);
@@ -1757,7 +1758,7 @@ export class ContentUiHelper extends UiBaseLocators {
     await this.clickChooseContainerButton();
     await this.page.waitForTimeout(500);
   }
-  
+
   async isChooseButtonVisible(isVisible: boolean = true) {
     await this.isVisible(this.chooseBtn, isVisible);
   }

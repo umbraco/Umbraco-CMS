@@ -34,13 +34,14 @@ export class UmbDocumentPublicAccessServerDataSource {
 	/**
 	 * Fetches the Public Access for the given Document unique
 	 * @param {string} unique
+	 * @param {boolean} includeAncestors - Whether to include ancestor Public Access settings in the response
 	 * @memberof UmbDocumentPublicAccessServerDataSource
 	 */
-	async read(unique: string) {
+	async read(unique: string, includeAncestors: boolean) {
 		if (!unique) throw new Error('unique is missing');
 		// NOTE: The entity will not be present, when fetching Public Access for a descendant of a protected Document.
 		//       This is a perfectly valid scenario, which is handled in the view. In other words, just use tryExecute here.
-		return tryExecute(this.#host, DocumentService.getDocumentByIdPublicAccess({ path: { id: unique } }));
+		return tryExecute(this.#host, DocumentService.getDocumentByIdPublicAccess({ path: { id: unique }, query: { includeAncestors } }));
 	}
 
 	/**
