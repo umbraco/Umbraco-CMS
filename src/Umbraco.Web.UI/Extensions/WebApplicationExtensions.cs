@@ -1,3 +1,4 @@
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Security;
 
 namespace Umbraco.Cms.Web.UI.Extensions;
@@ -25,7 +26,7 @@ internal static class WebApplicationExtensions
                 $"img-src 'self' data: news-dashboard.umbraco.com; " +
                 $"connect-src 'self'; " +
                 $"font-src 'self'; " +
-                $"frame-src 'self' marketplace.umbraco.com");
+                $"frame-src 'self' {Constants.Marketplace.Url}");
 
             await next();
         });
