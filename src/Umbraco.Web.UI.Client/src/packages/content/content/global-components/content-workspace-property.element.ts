@@ -1,6 +1,7 @@
 import { UMB_CONTENT_WORKSPACE_CONTEXT } from '../constants.js';
 import { html, customElement, property, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
+import type { UmbDataTypeDetailModel } from '@umbraco-cms/backoffice/data-type';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_VARIANT_CONTEXT, UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbDataPathPropertyValueQuery } from '@umbraco-cms/backoffice/validation';
@@ -36,6 +37,9 @@ export class UmbContentWorkspacePropertyElement extends UmbLitElement {
 
 	@state()
 	private _propertyType?: UmbPropertyTypeModel;
+
+	@state()
+	private _dataTypeDetail?: UmbDataTypeDetailModel;
 
 	@state()
 	private _hasAccessToSensitiveData = false;
@@ -82,6 +86,19 @@ export class UmbContentWorkspacePropertyElement extends UmbLitElement {
 
 	override willUpdate(changedProperties: Map<string, any>) {
 		super.willUpdate(changedProperties);
+		if (changedProperties.has('_propertyType') || changedProperties.has('_workspaceContext')) {
+			const dataTypeUnique = this._propertyType?.dataType.unique;
+			if (dataTypeUnique && this._workspaceContext) {
+				this.observe(
+					this._workspaceContext.structure.contentTypeDataTypeDetailOf(dataTypeUnique),
+					(detail) => {
+						this._dataTypeDetail = detail;
+					},
+					'observeDataTypeDetail',
+				);
+			}
+		}
+
 		if (
 			changedProperties.has('_propertyType') ||
 			changedProperties.has('_datasetVariantId') ||
@@ -132,6 +149,7 @@ export class UmbContentWorkspacePropertyElement extends UmbLitElement {
 		return html`<umb-property-type-based-property
 			data-path=${this._dataPath}
 			.property=${this._propertyType}
+			.dataTypeDetail=${this._dataTypeDetail}
 			?readonly=${!this._writeable}></umb-property-type-based-property>`;
 	}
 }
