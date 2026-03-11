@@ -391,7 +391,7 @@ internal sealed class LanguageRepository : AsyncEntityRepositoryBase<int, ILangu
             await db.Language
                 .Where(x => x.FallbackLanguageId == entity.Id)
                 .ExecuteUpdateAsync(setter => setter
-                    .SetProperty(x => x.FallbackLanguageId, (short?)null));
+                    .SetProperty(x => x.FallbackLanguageId, (int?)null));
 
             // delete
             await base.PersistDeletedItemAsync(entity);
@@ -484,13 +484,13 @@ internal sealed class LanguageRepository : AsyncEntityRepositoryBase<int, ILangu
         }
     }
 
-    private short? GetFallbackLanguageId(ILanguage entity)
+    private int? GetFallbackLanguageId(ILanguage entity)
     {
-        short? fallbackLanguageId = null;
+        int? fallbackLanguageId = null;
         if (entity.FallbackIsoCode.IsNullOrWhiteSpace() == false &&
             _codeIdMap.TryGetValue(entity.FallbackIsoCode, out var languageId))
         {
-            fallbackLanguageId = (short)languageId;
+            fallbackLanguageId = languageId;
         }
 
         return fallbackLanguageId;

@@ -280,7 +280,7 @@ namespace Umbraco.Cms.Persistence.EFCore.Sqlite.Migrations
 
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.LanguageDto", b =>
                 {
-                    b.Property<short>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER")
                         .HasColumnName("id");

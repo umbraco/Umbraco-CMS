@@ -290,12 +290,12 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
 
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.LanguageDto", b =>
                 {
-                    b.Property<short>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("smallint")
+                        .HasColumnType("int")
                         .HasColumnName("id");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<short>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("CultureName")
                         .HasMaxLength(100)
@@ -303,7 +303,7 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                         .HasColumnName("languageCultureName");
 
                     b.Property<int?>("FallbackLanguageId")
-                        .HasColumnType("smallint")
+                        .HasColumnType("int")
                         .HasColumnName("fallbackLanguageId");
 
                     b.Property<bool>("IsDefault")
