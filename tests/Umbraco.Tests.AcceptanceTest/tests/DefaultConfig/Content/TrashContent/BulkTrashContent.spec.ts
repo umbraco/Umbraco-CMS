@@ -136,7 +136,6 @@ test('can bulk trash content nodes with a relation in grid view', async ({umbrac
 
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.content.changeToListView();
   await umbracoUi.content.selectContentCardWithName(firstChildContentName);
   await umbracoUi.content.selectContentCardWithName(secondChildContentName);
   await umbracoUi.content.clickTrashSelectedListItems();
