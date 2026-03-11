@@ -1,7 +1,7 @@
 using NUnit.Framework;
-using Umbraco.Cms.Core.PropertyEditors.Patching;
+using Umbraco.Cms.Api.Management.Patching;
 
-namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors.Patching;
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Management.Patching;
 
 [TestFixture]
 public class PatchPathParserTests

@@ -1,8 +1,8 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Api.Management.ViewModels.Patching;
 
-namespace Umbraco.Cms.Core.PropertyEditors.Patching;
+namespace Umbraco.Cms.Api.Management.Patching;
 
 /// <summary>
 /// Applies patch operations to JSON documents using Umbraco's custom path syntax.

@@ -1,6 +1,6 @@
 using System.Text.Json.Nodes;
 
-namespace Umbraco.Cms.Core.PropertyEditors.Patching;
+namespace Umbraco.Cms.Api.Management.Patching;
 
 /// <summary>
 /// The result of resolving a patch path against a JSON document.

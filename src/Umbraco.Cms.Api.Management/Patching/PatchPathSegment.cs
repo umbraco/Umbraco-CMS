@@ -1,4 +1,4 @@
-namespace Umbraco.Cms.Core.PropertyEditors.Patching;
+namespace Umbraco.Cms.Api.Management.Patching;
 
 /// <summary>
 /// Represents a single segment in a patch path expression.

@@ -1,9 +1,9 @@
 using System.Text.Json;
 using NUnit.Framework;
-using Umbraco.Cms.Core.Models.ContentEditing;
-using Umbraco.Cms.Core.PropertyEditors.Patching;
+using Umbraco.Cms.Api.Management.Patching;
+using Umbraco.Cms.Api.Management.ViewModels.Patching;
 
-namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors.Patching;
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Management.Patching;
 
 [TestFixture]
 public class PatchEngineTests

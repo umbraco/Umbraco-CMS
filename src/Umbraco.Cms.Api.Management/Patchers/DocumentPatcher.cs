@@ -1,10 +1,10 @@
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.OperationStatus;
+using Umbraco.Cms.Api.Management.Patching;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
+using Umbraco.Cms.Api.Management.ViewModels.Patching;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.ContentEditing;
-using Umbraco.Cms.Core.PropertyEditors.Patching;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 
