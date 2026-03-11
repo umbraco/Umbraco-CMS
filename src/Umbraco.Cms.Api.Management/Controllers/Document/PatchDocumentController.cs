@@ -49,7 +49,6 @@ public class PatchDocumentController : PatchDocumentControllerBase
         PatchDocumentRequestModel requestModel)
         => await HandleRequest(id, requestModel, async () =>
         {
-            // Map request model to domain model
             ContentPatchModel patchModel = _presentationFactory.MapPatchModel(requestModel);
 
             // Apply PATCH operations to create an update request model
