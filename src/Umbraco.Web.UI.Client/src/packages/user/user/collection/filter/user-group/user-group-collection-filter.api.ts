@@ -14,11 +14,11 @@ import type { UmbDatalistItemModel } from '@umbraco-cms/backoffice/datalist-data
 const ObserveValueItems = Symbol();
 
 export class UmbUserGroupCollectionFilterApi extends UmbControllerBase implements UmbCollectionFilterApi {
-	#value = new UmbArrayState<string>([], (x) => x);
-	public readonly value = this.#value.asObservable();
-
 	#options = new UmbArrayState<UmbSelectOption>([], (x) => x);
 	public readonly options = this.#options.asObservable();
+
+	#value = new UmbArrayState<string>([], (x) => x);
+	public readonly value = this.#value.asObservable();
 
 	#valueItems = new UmbArrayState<UmbDatalistItemModel>([], (x) => x.unique);
 	public readonly valueItems = this.#valueItems.asObservable();
@@ -31,7 +31,7 @@ export class UmbUserGroupCollectionFilterApi extends UmbControllerBase implement
 
 	constructor(host: UmbControllerHost) {
 		super(host);
-		this.pagination.setPageSize(20);
+		this.pagination.setPageSize(100);
 
 		this.consumeContext(UMB_COLLECTION_CONTEXT, (instance) => {
 			this.#collectionContext = instance;
