@@ -58,6 +58,43 @@ internal sealed class DocumentEditingPresentationFactory : ContentEditingPresent
         };
     }
 
+    public ContentPatchModel MapPatchModel(PatchDocumentRequestModel requestModel)
+    {
+        PatchOperationModel[] operations = requestModel.Operations.Select(op => new PatchOperationModel
+        {
+            Op = MapOperationType(op.Op),
+            Path = op.Path,
+            Value = op.Value,
+        }).ToArray();
+
+        var paths = operations.Select(o => o.Path).ToArray();
+
+        var affectedCultures = paths
+            .SelectMany(PatchPathParser.ExtractCultures)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+
+        var affectedSegments = paths
+            .SelectMany(PatchPathParser.ExtractSegments)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+
+        return new ContentPatchModel
+        {
+            Operations = operations,
+            AffectedCultures = affectedCultures,
+            AffectedSegments = affectedSegments,
+        };
+    }
+
+    public ValidateContentUpdateModel MapValidateUpdateModel(ValidateUpdateDocumentRequestModel requestModel)
+    {
+        ValidateContentUpdateModel model = MapUpdateContentModel<ValidateContentUpdateModel>(requestModel);
+        model.Cultures = requestModel.Cultures;
+
+        return model;
+    }
+
     private DocumentValueModel[] MapValuesToRequestModel(IPropertyCollection properties)
     {
         Dictionary<string, IDataEditor> missingPropertyEditors = [];
@@ -90,6 +127,7 @@ internal sealed class DocumentEditingPresentationFactory : ContentEditingPresent
     {
         IPropertyValue[] propertyValues = content.Properties.SelectMany(propertyCollection => propertyCollection.Values).ToArray();
         var cultures = content.AvailableCultures.DefaultIfEmpty(null).ToArray();
+
         // The default segment (null) must always be included
         var segments = propertyValues.Select(property => property.Segment).Union([null]).Distinct().ToArray();
 
@@ -103,53 +141,14 @@ internal sealed class DocumentEditingPresentationFactory : ContentEditingPresent
             .ToArray();
     }
 
-    public ContentPatchModel MapPatchModel(PatchDocumentRequestModel requestModel)
-    {
-        var operations = requestModel.Operations.Select(op => new PatchOperationModel
-        {
-            Op = MapOperationType(op.Op),
-            Path = op.Path,
-            Value = op.Value
-        }).ToArray();
-
-        var paths = operations.Select(o => o.Path).ToArray();
-
-        var affectedCultures = paths
-            .SelectMany(PatchPathParser.ExtractCultures)
-            .Distinct(StringComparer.OrdinalIgnoreCase)
-            .ToArray();
-
-        var affectedSegments = paths
-            .SelectMany(PatchPathParser.ExtractSegments)
-            .Distinct(StringComparer.OrdinalIgnoreCase)
-            .ToArray();
-
-        return new ContentPatchModel
-        {
-            Operations = operations,
-            AffectedCultures = affectedCultures,
-            AffectedSegments = affectedSegments
-        };
-    }
-
-    private static PatchOperationType MapOperationType(string op)
-    {
-        return op.ToLowerInvariant() switch
+    private static PatchOperationType MapOperationType(string op) =>
+        op.ToLowerInvariant() switch
         {
             "replace" => PatchOperationType.Replace,
             "add" => PatchOperationType.Add,
             "remove" => PatchOperationType.Remove,
-            _ => throw new ArgumentException($"Unsupported operation type: {op}", nameof(op))
+            _ => throw new ArgumentException($"Unsupported operation type: {op}", nameof(op)),
         };
-    }
-
-    public ValidateContentUpdateModel MapValidateUpdateModel(ValidateUpdateDocumentRequestModel requestModel)
-    {
-        ValidateContentUpdateModel model = MapUpdateContentModel<ValidateContentUpdateModel>(requestModel);
-        model.Cultures = requestModel.Cultures;
-
-        return model;
-    }
 
     private TUpdateModel MapUpdateContentModel<TUpdateModel>(UpdateDocumentRequestModel requestModel)
         where TUpdateModel : ContentUpdateModel, new()
