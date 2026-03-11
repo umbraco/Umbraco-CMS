@@ -1,6 +1,5 @@
+import { UMB_COLLECTION_CONTEXT } from '../default/index.js';
 import { css, customElement, html, nothing, repeat, state } from '@umbraco-cms/backoffice/external/lit';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbExtensionsElementAndApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-collection-filter-bundle')
@@ -8,19 +7,23 @@ export class UmbCollectionFilterBundleElement extends UmbLitElement {
 	@state()
 	private _filters: Array<any> = [];
 
+	@state()
+	private _totalActiveFilters = 0;
+
 	constructor() {
 		super();
 
-		new UmbExtensionsElementAndApiInitializer(
-			this,
-			umbExtensionsRegistry,
-			'collectionFilter',
-			(manifest) => [{ meta: manifest.meta }],
-			undefined,
-			(filters) => {
+		this.consumeContext(UMB_COLLECTION_CONTEXT, (context) => {
+			if (!context) return;
+
+			this.observe(context.filtering.availableFilters, (filters) => {
 				this._filters = filters;
-			},
-		);
+			});
+
+			this.observe(context.filtering.totalActiveFilters, (total) => {
+				this._totalActiveFilters = total ?? 0;
+			});
+		});
 	}
 
 	override render() {
@@ -29,7 +32,7 @@ export class UmbCollectionFilterBundleElement extends UmbLitElement {
 		return html`
 			<uui-button compact popovertarget="collection-filter-bundle-popover" label="Filters" look="outline">
 				<umb-icon name="icon-equalizer"></umb-icon>
-				Filters
+				Filters ${this._totalActiveFilters > 0 ? html`<uui-badge>${this._totalActiveFilters}</uui-badge>` : nothing}
 			</uui-button>
 			<uui-popover-container id="collection-filter-bundle-popover" placement="bottom-end">
 				<umb-popover-layout>

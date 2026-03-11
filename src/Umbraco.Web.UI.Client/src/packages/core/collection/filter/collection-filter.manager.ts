@@ -1,0 +1,78 @@
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import { UmbExtensionsElementAndApiInitializer } from '@umbraco-cms/backoffice/extension-api';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbArrayState, UmbBasicState } from '@umbraco-cms/backoffice/observable-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+
+export interface UmbCollectionActiveFilterModel {
+	alias: string;
+	value: any;
+}
+
+export class UmbCollectionFilterManager extends UmbControllerBase {
+	#availableFilters = new UmbBasicState<any>([]);
+	public readonly availableFilters = this.#availableFilters.asObservable();
+
+	#activeFilters = new UmbArrayState<UmbCollectionActiveFilterModel>([], (x) => x.alias);
+	public readonly activeFilters = this.#activeFilters.asObservable();
+	public readonly totalActiveFilters = this.#activeFilters.asObservablePart((filters) => filters.length);
+
+	constructor(host: UmbControllerHost) {
+		super(host);
+
+		new UmbExtensionsElementAndApiInitializer(
+			this,
+			umbExtensionsRegistry,
+			'collectionFilter',
+			(manifest) => [{ meta: manifest.meta }],
+			undefined,
+			(filters) => {
+				// TODO: Do we need another model than the initilizer?
+				this.#availableFilters.setValue(filters);
+			},
+		);
+	}
+
+	#getFilterKeyByAlias(alias: string): string | undefined {
+		const available = this.#availableFilters.getValue();
+		const filter = available.find((f: any) => f.manifest?.alias === alias);
+		return filter?.manifest?.meta?.filterKey;
+	}
+
+	/**
+	 * Apply a filter value. Tracks the filter as active using the manifest alias as identifier.
+	 * @param {UmbCollectionActiveFilterModel} filter
+	 * @param filter.alias The manifest alias used as the unique identifier.
+	 * @param filter.value The filter value.
+	 */
+	public async setFilter(filter: UmbCollectionActiveFilterModel): Promise<void> {
+		if (this.#activeFilters.getHasOne(filter.alias)) {
+			this.#activeFilters.updateOne(filter.alias, filter);
+		} else {
+			this.#activeFilters.append([filter]);
+		}
+	}
+
+	/**
+	 * Remove an active filter by its manifest alias.
+	 * @param {string} alias The manifest alias of the filter to remove.
+	 */
+	public async removeFilter(alias: string): Promise<void> {
+		this.#activeFilters.remove([alias]);
+	}
+
+	/**
+	 * Get all active filter values as a flat object keyed by filterKey, to merge into request args.
+	 * @returns {Record<string, any>}
+	 */
+	public async getFilterArgs(): Promise<Record<string, any>> {
+		const args: Record<string, any> = {};
+		for (const filter of this.#activeFilters.getValue()) {
+			const filterKey = this.#getFilterKeyByAlias(filter.alias);
+			if (filterKey) {
+				args[filterKey] = filter.value;
+			}
+		}
+		return args;
+	}
+}

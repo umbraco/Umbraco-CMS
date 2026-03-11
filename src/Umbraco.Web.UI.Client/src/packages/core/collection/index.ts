@@ -15,6 +15,7 @@ export * from './workspace-view/index.js';
 
 export * from './default/collection-default.context.js';
 export * from './default/collection-default.context-token.js';
+export * from './filter/collection-filter.manager.js';
 export type * from './collection-filter-model.interface.js';
 export type * from './types.js';
 

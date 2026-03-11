@@ -9,8 +9,8 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 		manifest: {
 			type: 'collectionFilter',
 			kind: 'multiSelect',
-			element: () => import('./default-collection-multi-select-filter.element.js'),
-			api: () => import('./default-collection-multi-select-filter.api.js'),
+			element: () => import('./default-multi-select-collection-filter.element.js'),
+			api: () => import('./default-multi-select-collection-filter.api.js'),
 		},
 	},
 ];

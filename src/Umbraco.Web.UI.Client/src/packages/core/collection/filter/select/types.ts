@@ -1,2 +1,2 @@
-export type { UmbDefaultCollectionSelectFilterElement } from './default-collection-select-filter.element.js';
-export type { UmbDefaultCollectionSelectFilterApi } from './default-collection-select-filter.api.js';
+export type { UmbDefaultSelectCollectionFilterElement as UmbDefaultCollectionSelectFilterElement } from './default-select-collection-filter.element.js';
+export type { UmbDefaultSelectCollectionFilterApi as UmbDefaultCollectionSelectFilterApi } from './default-select-collection-filter.api.js';

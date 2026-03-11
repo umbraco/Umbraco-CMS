@@ -1,7 +1,11 @@
-import { UMB_USER_COLLECTION_CONTEXT } from '../../user-collection.context-token.js';
 import { UmbUserGroupDatalistDataSource } from './user-group-datalist-data-source.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import type { UmbCollectionFilterApi, UmbSelectOption } from '@umbraco-cms/backoffice/collection';
+import {
+	UMB_COLLECTION_CONTEXT,
+	type ManifestCollectionFilter,
+	type UmbCollectionFilterApi,
+	type UmbSelectOption,
+} from '@umbraco-cms/backoffice/collection';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
@@ -19,15 +23,17 @@ export class UmbUserGroupCollectionFilterApi extends UmbControllerBase implement
 	#valueItems = new UmbArrayState<UmbDatalistItemModel>([], (x) => x.unique);
 	public readonly valueItems = this.#valueItems.asObservable();
 
-	#collectionContext?: typeof UMB_USER_COLLECTION_CONTEXT.TYPE;
+	#collectionContext?: typeof UMB_COLLECTION_CONTEXT.TYPE;
 	#datalistDataSource = new UmbUserGroupDatalistDataSource(this);
 	public readonly pagination = new UmbPaginationManager();
+
+	public manifest?: ManifestCollectionFilter;
 
 	constructor(host: UmbControllerHost) {
 		super(host);
 		this.pagination.setPageSize(20);
 
-		this.consumeContext(UMB_USER_COLLECTION_CONTEXT, (instance) => {
+		this.consumeContext(UMB_COLLECTION_CONTEXT, (instance) => {
 			this.#collectionContext = instance;
 		});
 	}
@@ -44,10 +50,23 @@ export class UmbUserGroupCollectionFilterApi extends UmbControllerBase implement
 		}
 	}
 
-	public setValue(values: Array<string>) {
+	public async setValue(values: Array<string>) {
 		this.#value.setValue(values);
-		this.#collectionContext?.setUserGroupFilter(values);
 		this.#requestValueItems(values);
+
+		const alias = this.manifest?.alias;
+		if (alias) {
+			if (values.length === 0) {
+				await this.#collectionContext?.filtering.removeFilter(alias);
+				this.#collectionContext?.loadCollection();
+			} else {
+				await this.#collectionContext?.filtering.setFilter({
+					alias,
+					value: values,
+				});
+				this.#collectionContext?.loadCollection();
+			}
+		}
 	}
 
 	async #requestValueItems(uniques: Array<string>) {

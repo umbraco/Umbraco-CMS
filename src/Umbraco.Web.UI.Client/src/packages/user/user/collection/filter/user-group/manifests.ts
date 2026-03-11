@@ -10,7 +10,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		api: () => import('./user-group-collection-filter.api.js'),
 		meta: {
 			label: 'Groups',
-			filterKey: 'groups',
+			filterKey: 'userGroupIds',
 		},
 		conditions: [
 			{
