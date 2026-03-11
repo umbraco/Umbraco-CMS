@@ -30,6 +30,13 @@ export class UmbUserStateCollectionFilterApi extends UmbControllerBase implement
 
 		this.consumeContext(UMB_COLLECTION_CONTEXT, (instance) => {
 			this.#collectionContext = instance;
+
+			this.observe(instance?.filtering.activeFilters, (activeFilters) => {
+				const alias = this.manifest?.alias;
+				if (alias && !activeFilters?.find((f) => f.alias === alias)) {
+					this.#value.setValue([]);
+				}
+			});
 		});
 	}
 
