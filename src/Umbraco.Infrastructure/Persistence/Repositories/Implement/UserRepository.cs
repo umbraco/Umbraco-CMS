@@ -160,7 +160,7 @@ internal sealed class UserRepository : EntityRepositoryBase<Guid, IUser>, IUserR
 
     private IUser? GetUpgradeUserWith(Action<Sql<ISqlContext>> with)
     {
-        if (_runtimeState.Level != RuntimeLevel.Upgrade)
+        if (_runtimeState.Level is not RuntimeLevel.Upgrade and not RuntimeLevel.Upgrading)
         {
             return null;
         }
@@ -438,7 +438,7 @@ SELECT 4 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName}
         catch (DbException)
         {
             // ignore doing upgrade, as we know the Key potentially do not exists
-            if (_runtimeState.Level != RuntimeLevel.Upgrade)
+            if (_runtimeState.Level is not RuntimeLevel.Upgrade and not RuntimeLevel.Upgrading)
             {
                 throw;
             }

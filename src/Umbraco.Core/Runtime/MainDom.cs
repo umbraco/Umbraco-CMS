@@ -1,5 +1,9 @@
 using System.Security.Cryptography;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Extensions;
 
@@ -32,7 +36,7 @@ namespace Umbraco.Cms.Core.Runtime
         // actions to run before releasing the main domain
         private readonly List<KeyValuePair<int, Action>> _callbacks = new();
 
-        private const int LockTimeoutMilliseconds = 40000; // 40 seconds
+        private readonly int _lockTimeoutMilliseconds;
 
         private Task? _listenTask;
         private Task? _listenCompleteTask;
@@ -46,10 +50,26 @@ namespace Umbraco.Cms.Core.Runtime
         /// </summary>
         /// <param name="logger">The logger instance.</param>
         /// <param name="systemLock">The distributed lock implementation.</param>
+        [Obsolete("Use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
         public MainDom(ILogger<MainDom> logger, IMainDomLock systemLock)
+            : this(logger, systemLock, StaticServiceProvider.Instance.GetRequiredService<IOptions<GlobalSettings>>())
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MainDom"/> class.
+        /// </summary>
+        /// <param name="logger">The logger instance.</param>
+        /// <param name="systemLock">The distributed lock implementation.</param>
+        /// <param name="globalSettings">The global settings.</param>
+        public MainDom(ILogger<MainDom> logger, IMainDomLock systemLock, IOptions<GlobalSettings> globalSettings)
         {
             _logger = logger;
             _mainDomLock = systemLock;
+
+            // This would have to be configured as > 24 days to overflow, so it's not going to be a problem in
+            // practice, but just to be safe we'll clamp it to int.MaxValue.
+            _lockTimeoutMilliseconds = (int)Math.Clamp(globalSettings.Value.MainDomAcquisitionTimeout.TotalMilliseconds, 0, int.MaxValue);
         }
 
         #endregion
@@ -168,7 +188,7 @@ namespace Umbraco.Cms.Core.Runtime
             var acquired = false;
             try
             {
-                acquired = _mainDomLock.AcquireLockAsync(LockTimeoutMilliseconds).GetAwaiter().GetResult();
+                acquired = _mainDomLock.AcquireLockAsync(_lockTimeoutMilliseconds).GetAwaiter().GetResult();
             }
             catch (Exception ex)
             {
