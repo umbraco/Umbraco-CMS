@@ -10,6 +10,7 @@ import type { UmbCollectionFilterModel } from '../collection-filter-model.interf
 import type { UmbCollectionRepository } from '../repository/collection-repository.interface.js';
 import type { ManifestCollection } from '../extensions/types.js';
 import { UmbCollectionBulkActionManager } from '../bulk-action/collection-bulk-action.manager.js';
+import { UmbCollectionFilterManager } from '../filter/collection-filter.manager.js';
 import { UmbCollectionSelectionManager } from '../selection/collection-selection.manager.js';
 import { UMB_COLLECTION_CONTEXT } from './collection-default.context-token.js';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -62,6 +63,9 @@ export class UmbDefaultCollectionContext<
 
 	protected _filter = new UmbObjectState<FilterModelType | object>({});
 	public readonly filter = this._filter.asObservable();
+
+	public readonly filtering = new UmbCollectionFilterManager(this);
+	public readonly activeFilters = this.filtering.activeFilters;
 
 	protected _selectOnly = new UmbBooleanState(undefined);
 	public readonly selectOnly = this._selectOnly.asObservable();
@@ -314,7 +318,8 @@ export class UmbDefaultCollectionContext<
 
 		this._loading.setValue(true);
 
-		const filter = this._filter.getValue();
+		const filterArgs = await this.filtering.getFilterArgs();
+		const filter = { ...this._filter.getValue(), ...filterArgs };
 		const { data } = await this._repository.requestCollection(filter);
 
 		if (data) {
