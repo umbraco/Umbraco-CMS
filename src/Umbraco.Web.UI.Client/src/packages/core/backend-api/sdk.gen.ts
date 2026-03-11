@@ -190,6 +190,19 @@ export class DataTypeService {
         });
     }
     
+    public static getDataTypeBatch<ThrowOnError extends boolean = true>(options?: Options<GetDataTypeBatchData, ThrowOnError>) {
+        return (options?.client ?? client).get<GetDataTypeBatchResponses, GetDataTypeBatchErrors, ThrowOnError>({
+            security: [
+                {
+                    scheme: 'bearer',
+                    type: 'http'
+                }
+            ],
+            url: '/umbraco/management/api/v1/data-type/batch',
+            ...options
+        });
+    }
+    
     /**
      * Gets the data type configuration.
      * Gets the configuration settings for data types.
@@ -1234,6 +1247,19 @@ export class DocumentTypeService {
                 'Content-Type': 'application/json',
                 ...options?.headers
             }
+        });
+    }
+    
+    public static getDocumentTypeBatch<ThrowOnError extends boolean = true>(options?: Options<GetDocumentTypeBatchData, ThrowOnError>) {
+        return (options?.client ?? client).get<GetDocumentTypeBatchResponses, GetDocumentTypeBatchErrors, ThrowOnError>({
+            security: [
+                {
+                    scheme: 'bearer',
+                    type: 'http'
+                }
+            ],
+            url: '/umbraco/management/api/v1/document-type/batch',
+            ...options
         });
     }
     
@@ -3357,6 +3383,19 @@ export class MediaTypeService {
         });
     }
     
+    public static getMediaTypeBatch<ThrowOnError extends boolean = true>(options?: Options<GetMediaTypeBatchData, ThrowOnError>) {
+        return (options?.client ?? client).get<GetMediaTypeBatchResponses, GetMediaTypeBatchErrors, ThrowOnError>({
+            security: [
+                {
+                    scheme: 'bearer',
+                    type: 'http'
+                }
+            ],
+            url: '/umbraco/management/api/v1/media-type/batch',
+            ...options
+        });
+    }
+    
     /**
      * Gets the media type configuration.
      * Gets the configuration settings for media types.
@@ -4470,6 +4509,19 @@ export class MemberTypeService {
                 'Content-Type': 'application/json',
                 ...options?.headers
             }
+        });
+    }
+    
+    public static getMemberTypeBatch<ThrowOnError extends boolean = true>(options?: Options<GetMemberTypeBatchData, ThrowOnError>) {
+        return (options?.client ?? client).get<GetMemberTypeBatchResponses, GetMemberTypeBatchErrors, ThrowOnError>({
+            security: [
+                {
+                    scheme: 'bearer',
+                    type: 'http'
+                }
+            ],
+            url: '/umbraco/management/api/v1/member-type/batch',
+            ...options
         });
     }
     
