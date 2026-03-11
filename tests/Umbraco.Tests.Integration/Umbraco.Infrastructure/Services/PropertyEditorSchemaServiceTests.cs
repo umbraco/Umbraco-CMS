@@ -94,12 +94,12 @@ internal sealed class PropertyEditorSchemaServiceTests : UmbracoIntegrationTest
     [Test]
     public async Task GetSchemaAsync_Returns_SchemaNotSupported_For_Editor_Without_Schema()
     {
-        // Arrange - Label editor doesn't implement IValueSchemaProvider
+        // Arrange - Void editor doesn't implement IValueSchemaProvider
         var dataType = new DataType(
-            new LabelPropertyEditor(DataValueEditorFactory, IOHelper),
+            new VoidEditor(DataValueEditorFactory),
             ConfigurationEditorJsonSerializer)
         {
-            Name = "Test Label GetSchemaAsync",
+            Name = "Test Void GetSchemaAsync",
             DatabaseType = ValueStorageType.Nvarchar,
         };
         var createResult = await DataTypeService.CreateAsync(dataType, Constants.Security.SuperUserKey);
