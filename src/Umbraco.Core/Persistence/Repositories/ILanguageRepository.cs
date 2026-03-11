@@ -5,7 +5,7 @@ namespace Umbraco.Cms.Core.Persistence.Repositories;
 /// <summary>
 ///     Represents a repository for <see cref="ILanguage" /> entities.
 /// </summary>
-public interface ILanguageRepository : IAsyncReadWriteRepository<int, ILanguage>
+public interface ILanguageRepository : IReadWriteQueryRepository<int, ILanguage>
 {
     /// <summary>
     ///     Gets a language by its ISO code.
