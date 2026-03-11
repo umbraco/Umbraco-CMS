@@ -5,7 +5,8 @@ using Umbraco.Cms.Api.Management.ViewModels.Patching;
 namespace Umbraco.Cms.Api.Management.Patching;
 
 /// <summary>
-/// Applies patch operations to JSON documents using Umbraco's custom path syntax.
+/// Applies patch operations to JSON documents using Umbraco's custom path syntax based on Json pointer
+/// augmented with array filtering to support culture/segment and keyed items.
 /// </summary>
 public static class PatchEngine
 {
@@ -92,7 +93,6 @@ public static class PatchEngine
     {
         if (target.IsAppend)
         {
-            // Append to end of array
             if (target.Parent is JsonArray appendArray)
             {
                 appendArray.Add(valueNode?.DeepClone());

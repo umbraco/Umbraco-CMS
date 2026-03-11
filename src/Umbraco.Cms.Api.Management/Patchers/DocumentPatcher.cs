@@ -11,7 +11,7 @@ using Umbraco.Cms.Core.Services;
 namespace Umbraco.Cms.Api.Management.Patchers;
 
 /// <summary>
-/// Applies patch operations with Umbraco's custom path syntax to documents, converting them to update models.
+/// Applies patch operations with Umbraco's custom path syntax to document update models.
 /// </summary>
 public class DocumentPatcher
 {
