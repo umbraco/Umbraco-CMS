@@ -437,6 +437,8 @@ export class UmbAuthContext extends UmbContextBase {
 		}).warn();
 		if (!this.#isAccessTokenValid()) {
 			await this.validateToken();
+		} else {
+			await this.#waitForOngoingRefresh();
 		}
 		return '[redacted]';
 	}
@@ -500,6 +502,23 @@ export class UmbAuthContext extends UmbContextBase {
 	#isAccessTokenValid(): boolean {
 		const session = this.#session.getValue();
 		return !!session && session.accessTokenExpiresAt > Math.floor(Date.now() / 1000);
+	}
+
+	/**
+	 * Waits for any ongoing cross-tab token refresh to complete without performing a refresh itself.
+	 * Prevents sending requests with an access token that is about to be revoked by a proactive
+	 * refresh in another tab (keepUserLoggedIn), which would cause OpenIddict ID2019 errors.
+	 */
+	async #waitForOngoingRefresh(): Promise<void> {
+		if (!navigator.locks) return;
+		const state = await navigator.locks.query();
+		if (state.held?.some((l) => l.name === 'umb:token-refresh')) {
+			// A refresh is in progress in another tab — queue behind it so we send
+			// requests with the new cookie rather than the soon-to-be-revoked one.
+			await navigator.locks.request('umb:token-refresh', async () => {
+				// No-op: we only need to wait for the ongoing refresh to finish.
+			});
+		}
 	}
 
 	/**
@@ -610,6 +629,8 @@ export class UmbAuthContext extends UmbContextBase {
 			auth: async () => {
 				if (!this.#isAccessTokenValid()) {
 					await this.validateToken();
+				} else {
+					await this.#waitForOngoingRefresh();
 				}
 				return '[redacted]';
 			},
