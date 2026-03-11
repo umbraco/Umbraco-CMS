@@ -12,7 +12,6 @@
     <PackageVersion Include="System.Data.Odbc" Version="10.0.3" />
     <PackageVersion Include="System.Data.OleDb" Version="10.0.3" />
     <PackageVersion Include="System.Reflection.Emit" Version="4.7.0" />
-    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="5.0.0" />
   </ItemGroup>
   <ItemGroup>
     <!-- Third-party packages -->
