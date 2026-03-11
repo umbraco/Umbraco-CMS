@@ -51,6 +51,12 @@ export class UmbAuthContext extends UmbContextBase {
 	#session = new UmbObjectState<UmbAuthSession | undefined>(undefined);
 	readonly session$ = this.#session.asObservable();
 
+	// True only during the synchronous #updateSession() call inside the lock callback.
+	// Prevents re-entrant /token calls when session$ observers fire synchronously
+	// (e.g. keepUserLoggedIn=true with short expiresIn triggers #onSessionExpiring
+	// from inside the lock, capturing sessionBefore = newSession so the guard can't help).
+	#inSessionUpdateCallback = false;
+
 	// Cross-tab coordination
 	#channel: BroadcastChannel;
 
@@ -477,12 +483,23 @@ export class UmbAuthContext extends UmbContextBase {
 		// would incorrectly skip the refresh when the session is still technically valid.
 		const sessionBefore = this.#session.getValue();
 
+		// Guard against re-entrant calls: if session$ fired synchronously from inside
+		// a lock callback (via #updateSession → observer → keepUserLoggedIn proactive refresh),
+		// sessionBefore would equal the already-updated session so the reference check below
+		// can't help. Return true immediately — the lock holder already refreshed.
+		if (this.#inSessionUpdateCallback) return true;
+
 		return navigator.locks.request('umb:token-refresh', async () => {
 			if (this.#session.getValue() !== sessionBefore && this.#isAccessTokenValid()) return true;
 
 			const response = await this.#client.refreshToken();
 			if (response) {
-				this.#updateSession(response.expiresIn, response.issuedAt);
+				this.#inSessionUpdateCallback = true;
+				try {
+					this.#updateSession(response.expiresIn, response.issuedAt);
+				} finally {
+					this.#inSessionUpdateCallback = false;
+				}
 				return true;
 			}
 			return false;
