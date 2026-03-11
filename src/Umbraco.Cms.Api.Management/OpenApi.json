@@ -903,12 +903,15 @@
         "tags": [
           "Data Type"
         ],
+        "summary": "Gets multiple data types.",
+        "description": "Gets multiple data types identified by the provided Ids.",
         "operationId": "GetDataTypeBatch",
         "parameters": [
           {
             "name": "id",
             "in": "query",
             "schema": {
+              "uniqueItems": true,
               "type": "array",
               "items": {
                 "type": "string",
@@ -6237,12 +6240,15 @@
         "tags": [
           "Document Type"
         ],
+        "summary": "Gets multiple document types.",
+        "description": "Gets multiple document types identified by the provided Ids.",
         "operationId": "GetDocumentTypeBatch",
         "parameters": [
           {
             "name": "id",
             "in": "query",
             "schema": {
+              "uniqueItems": true,
               "type": "array",
               "items": {
                 "type": "string",
@@ -14954,7 +14960,7 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/PagedModelMediaTypeItemResponseModel"
+                      "$ref": "#/components/schemas/PagedModelAllowedMediaTypeItemResponseModel"
                     }
                   ]
                 }
@@ -16471,12 +16477,15 @@
         "tags": [
           "Media Type"
         ],
+        "summary": "Gets multiple media types.",
+        "description": "Gets multiple media types identified by the provided Ids.",
         "operationId": "GetMediaTypeBatch",
         "parameters": [
           {
             "name": "id",
             "in": "query",
             "schema": {
+              "uniqueItems": true,
               "type": "array",
               "items": {
                 "type": "string",
@@ -22050,12 +22059,15 @@
         "tags": [
           "Member Type"
         ],
+        "summary": "Gets multiple member types.",
+        "description": "Gets multiple member types identified by the provided Ids.",
         "operationId": "GetMemberTypeBatch",
         "parameters": [
           {
             "name": "id",
             "in": "query",
             "schema": {
+              "uniqueItems": true,
               "type": "array",
               "items": {
                 "type": "string",
@@ -38621,6 +38633,42 @@
         },
         "additionalProperties": false
       },
+      "AllowedMediaTypeItemResponseModel": {
+        "required": [
+          "flags",
+          "id",
+          "matchedFileExtension",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "flags": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/FlagModel"
+                }
+              ]
+            }
+          },
+          "name": {
+            "type": "string"
+          },
+          "icon": {
+            "type": "string",
+            "nullable": true
+          },
+          "matchedFileExtension": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
       "AllowedMediaTypeModel": {
         "required": [
           "id",
@@ -47208,6 +47256,30 @@
                 }
               ]
             }
+          }
+        },
+        "additionalProperties": false
+      },
+      "PagedModelAllowedMediaTypeItemResponseModel": {
+        "required": [
+          "items",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/AllowedMediaTypeItemResponseModel"
+                }
+              ]
+            }
+          },
+          "total": {
+            "type": "integer",
+            "format": "int64"
           }
         },
         "additionalProperties": false
