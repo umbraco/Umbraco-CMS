@@ -66,6 +66,16 @@ public enum ContentEditingOperationStatus
     PropertyTypeNotFound,
 
     /// <summary>
+    ///     One or more property values have a culture variance that does not match the property type's culture variance.
+    /// </summary>
+    PropertyTypeCultureVarianceMismatch,
+
+    /// <summary>
+    ///     One or more property values have a segment variance that does not match the property type's segment variance.
+    /// </summary>
+    PropertyTypeSegmentVarianceMismatch,
+
+    /// <summary>
     ///     The content item is in the recycle bin and cannot be edited.
     /// </summary>
     InTrash,
