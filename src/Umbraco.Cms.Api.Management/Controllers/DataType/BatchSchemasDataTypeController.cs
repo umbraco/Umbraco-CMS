@@ -13,15 +13,15 @@ namespace Umbraco.Cms.Api.Management.Controllers.DataType;
 /// Controller for retrieving multiple data type value schemas in a single request.
 /// </summary>
 [ApiVersion("1.0")]
-public class SchemasDataTypeController : DataTypeControllerBase
+public class BatchSchemasDataTypeController : DataTypeControllerBase
 {
     private readonly IPropertyEditorSchemaService _schemaService;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="SchemasDataTypeController"/> class.
+    /// Initializes a new instance of the <see cref="BatchSchemasDataTypeController"/> class.
     /// </summary>
     /// <param name="schemaService">The property editor schema service.</param>
-    public SchemasDataTypeController(IPropertyEditorSchemaService schemaService)
+    public BatchSchemasDataTypeController(IPropertyEditorSchemaService schemaService)
         => _schemaService = schemaService;
 
     /// <summary>
@@ -34,7 +34,7 @@ public class SchemasDataTypeController : DataTypeControllerBase
     /// Returns schema information for property editors that implement <c>IValueSchemaProvider</c>.
     /// Each item includes an error field if the schema could not be retrieved (e.g., data type not found or schema not supported).
     /// </remarks>
-    [HttpGet("schema")]
+    [HttpGet("schemas/batch")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(FetchResponseModel<DataTypeSchemaItemResponseModel>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetSchemas(
