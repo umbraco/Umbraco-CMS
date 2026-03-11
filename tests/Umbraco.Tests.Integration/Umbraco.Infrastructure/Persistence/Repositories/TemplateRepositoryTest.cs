@@ -496,7 +496,7 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
     {
         // Arrange
         var newProvider = NewScopeProvider;
-        var newScopeAccessor = (IEFCoreScopeAccessor<UmbracoDbContext>)newProvider;
+        var newScopeAccessor = GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>();
         var provider = ScopeProvider;
         var scopeAccessor = (IScopeAccessor)provider;
         var dataTypeService = GetRequiredService<IDataTypeService>();
