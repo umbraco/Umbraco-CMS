@@ -2323,7 +2323,7 @@ export default {
 		openBackofficeSearch: 'Åben backoffice søgning',
 		openCloseBackofficeHelp: 'Åben/Luk backoffice hjælp',
 		openCloseBackofficeProfileOptions: 'Åben/Luk dine profil indstillinger',
-		profileOptions: 'Profil indstillinger',
+		profileOptions: 'Brugerprofil for %0% (%1%)',
 		assignDomainDescription: 'Tilføj domæne på %0%',
 		createDescription: 'Opret ny node under %0%',
 		protectDescription: 'Opsæt offentlig adgang på %0%',

@@ -2368,7 +2368,7 @@ export default {
 		openBackofficeSearch: 'Mở tìm kiếm backoffice',
 		openCloseBackofficeHelp: 'Mở/Đóng trợ giúp backoffice',
 		openCloseBackofficeProfileOptions: 'Mở/Đóng tùy chọn hồ sơ của bạn',
-		profileOptions: 'Tùy chọn hồ sơ',
+		profileOptions: 'Hồ sơ người dùng cho %0% (%1%)',
 		assignDomainDescription: 'Thiết lập Ngôn ngữ và Tên miền cho %0%',
 		createDescription: 'Tạo nút mới dưới %0%',
 		protectDescription: 'Thiết lập hạn chế truy cập trên %0%',

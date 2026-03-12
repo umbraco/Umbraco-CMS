@@ -2413,7 +2413,7 @@ export default {
 		openBackofficeSearch: 'Open backoffice search',
 		openCloseBackofficeHelp: 'Open/Close backoffice help',
 		openCloseBackofficeProfileOptions: 'Open/Close your profile options',
-		profileOptions: 'Profile options',
+		profileOptions: 'User profile for %0% (%1%)',
 		assignDomainDescription: 'Setup Culture and Hostnames for %0%',
 		createDescription: 'Create new node under %0%',
 		protectDescription: 'Setup access restrictions on %0%',
