@@ -35,14 +35,22 @@ export class UmbUserGroupCollectionFilterApi extends UmbControllerBase implement
 
 		this.consumeContext(UMB_COLLECTION_CONTEXT, (instance) => {
 			this.#collectionContext = instance;
-
-			this.observe(instance?.filtering.activeFilters, (activeFilters) => {
-				const alias = this.manifest?.alias;
-				if (alias && !activeFilters?.find((f) => f.alias === alias)) {
-					this.#value.setValue([]);
-				}
-			});
+			this.#observeFilterValue();
 		});
+	}
+
+	#observeFilterValue() {
+		const alias = this.manifest?.alias;
+		if (!alias) return;
+		this.observe(
+			this.#collectionContext?.filtering.filterValueByAlias(alias),
+			(activeFilter) => {
+				const values = activeFilter ? activeFilter.value : [];
+				this.#value.setValue(values);
+				this.#requestValueItems(values);
+			},
+			'umbFilterValueObserver',
+		);
 	}
 
 	public loadOptions() {
@@ -57,23 +65,17 @@ export class UmbUserGroupCollectionFilterApi extends UmbControllerBase implement
 		}
 	}
 
-	public async setValue(values: Array<string>) {
-		this.#value.setValue(values);
-		this.#requestValueItems(values);
-
+	public setValue(values: Array<string>) {
 		const alias = this.manifest?.alias;
-		if (alias) {
-			if (values.length === 0) {
-				await this.#collectionContext?.filtering.removeFilter(alias);
-				this.#collectionContext?.loadCollection();
-			} else {
-				await this.#collectionContext?.filtering.setFilter({
-					alias,
-					value: values,
-				});
-				this.#collectionContext?.loadCollection();
-			}
+		if (!alias) return;
+
+		if (values.length === 0) {
+			this.#collectionContext?.filtering.clearFilter(alias);
+		} else {
+			this.#collectionContext?.filtering.setFilter({ alias, value: values });
 		}
+
+		this.#collectionContext?.loadCollection();
 	}
 
 	async #requestValueItems(uniques: Array<string>) {
