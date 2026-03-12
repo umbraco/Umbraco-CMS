@@ -38,11 +38,7 @@ public sealed class RelateOnTrashNotificationHandler :
     /// </summary>
     /// <param name="relationService">Service used to manage relations between entities.</param>
     /// <param name="entityService">Service used to manage entities within Umbraco.</param>
-    /// <param name="textService">Service for retrieving localized text resources.</param>
-    /// <param name="auditService">Service for logging audit events.</param>
     /// <param name="scopeProvider">Provider for managing database scopes.</param>
-    /// <param name="backOfficeSecurityAccessor">Accessor for back office security context.</param>
-    /// <param name="userIdKeyResolver">Resolves user ID keys for operations.</param>
     public RelateOnTrashNotificationHandler(
         IRelationService relationService,
         IEntityService entityService,
@@ -268,8 +264,3 @@ public sealed class RelateOnTrashNotificationHandler :
         scope.Complete();
     }
 }
-
-    /// <summary>
-    /// Handles a <see cref="MediaMovedToRecycleBinNotification"/> by removing relations when media is moved to the recycle bin.
-    /// </summary>
-    /// <param name="notification">The notification containing information about the media items that were moved to the recycle bin.</param>

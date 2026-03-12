@@ -77,12 +77,10 @@ internal sealed class ContentBaseFactory
 
     /// <summary>
     ///     Constructs an Element item entity from the provided data transfer object (DTO) and content type.
-
     /// </summary>
     /// <param name="dto">The <see cref="ElementDto"/> containing the data for the element.</param>
     /// <param name="contentType">The <see cref="IContentType"/> representing the type of the element, or <c>null</c> if not specified.</param>
     /// <returns>A <see cref="IElement"/> entity built from the specified DTO and content type.</returns>
-
     // TODO ELEMENTS: refactor and reuse code from BuildEntity(DocumentDto dto, IContentType? contentType)
     public static IElement BuildEntity(ElementDto dto, IContentType? contentType)
     {

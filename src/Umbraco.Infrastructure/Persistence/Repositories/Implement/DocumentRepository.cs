@@ -237,27 +237,9 @@ internal class DocumentRepository : PublishableContentRepositoryBase<IContent, D
 
     protected override IContent BuildEntity(DocumentDto entityDto, IContentType? contentType)
         => ContentBaseFactory.BuildEntity(entityDto, contentType);
-        /// <summary>
-        /// Gets or sets the culture identifier (e.g., language or locale) associated with this content variation.
-        /// </summary>
-
-        /// <summary>
-        /// Gets or sets the display name associated with this content variation.
-        /// </summary>
-
-        /// <summary>
-        /// Gets or sets the date and time associated with this content variation, such as its creation or last modification.
-        /// </summary>
 
     protected override void OnUowRefreshedEntity(IContent entity)
         => OnUowRefreshedEntity(new ContentRefreshNotification(entity, new EventMessages()));
-        /// <summary>
-        /// Gets or sets the culture identifier (e.g., language or locale) associated with this document variation.
-        /// </summary>
-
-        /// <summary>
-        /// Gets or sets a value indicating whether the document variation has been edited.
-        /// </summary>
 
     #region Repository Base
 
@@ -291,19 +273,12 @@ internal class DocumentRepository : PublishableContentRepositoryBase<IContent, D
             $@"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.DocumentUrlAlias)} WHERE {uniqueId} IN
               (SELECT {uniqueId} FROM {umbracoNode} WHERE id = @id)",
         ];
-
-
     }
 
     #endregion
 
     #region Content Repository
 
-    /// <summary>
-    /// Counts the number of published documents, optionally filtered by content type alias.
-    /// </summary>
-    /// <param name="contentTypeAlias">The alias of the content type to filter by. If null or empty, counts all published documents.</param>
-    /// <returns>The count of published documents matching the criteria.</returns>
     /// <summary>
     /// Replaces all existing content permissions with the specified permission set for the relevant entities.
     /// </summary>
@@ -378,11 +353,9 @@ internal class DocumentRepository : PublishableContentRepositoryBase<IContent, D
     public override int RecycleBinId => Constants.System.RecycleBinContent;
 
     /// <summary>
-    /// Gets the identifier for the cache key for ths content Recycle Bin.
+    /// Gets the identifier for the cache key for the content Recycle Bin.
     /// </summary>
     protected override string RecycleBinCacheKey => CacheKeys.ContentRecycleBinCacheKey;
-
-
 
     #endregion
 }

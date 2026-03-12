@@ -650,9 +650,9 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
     }
 
     /// <summary>
-    /// Gets the Umbraco object type for the entity with the specified integer ID.
+    /// Gets the Umbraco object type for the entity with the specified unique key.
     /// </summary>
-    /// <param name="id">The unique integer identifier (ID) of the entity.</param>
+    /// <param name="key">The unique identifier (GUID) of the entity.</param>
     /// <returns>The <see cref="UmbracoObjectTypes"/> value representing the object's type.</returns>
     public UmbracoObjectTypes GetObjectType(Guid key)
     {
