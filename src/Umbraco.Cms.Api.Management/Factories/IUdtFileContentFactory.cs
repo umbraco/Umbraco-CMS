@@ -4,8 +4,8 @@ using Umbraco.Cms.Core.Models;
 namespace Umbraco.Cms.Api.Management.Factories;
 
 /// <summary>
-/// Defines a factory interface for creating file content related to User-Defined Tables (UDT).
-/// Implementations of this interface are responsible for generating or retrieving UDT file data.
+/// Defines a factory interface for creating Umbraco Data Transfer (UDT) file content.
+/// Implementations of this interface are responsible for generating UDT file data for content type export.
 /// </summary>
 public interface IUdtFileContentFactory
 {

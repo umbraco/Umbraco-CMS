@@ -5,7 +5,7 @@ using Umbraco.Cms.Core.Mapping;
 namespace Umbraco.Cms.Api.Management.DependencyInjection;
 
 /// <summary>
-/// Provides extension methods for the <see cref="TagBuilder"/> class, used within Umbraco dependency injection scenarios.
+/// Provides extension methods for <see cref="IUmbracoBuilder"/> to register tag-related services.
 /// </summary>
 public static class TagBuilderExtensions
 {

@@ -3,13 +3,13 @@ using System.Xml.Linq;
 namespace Umbraco.Cms.Api.Management.Models;
 
 /// <summary>
-/// Represents the data required to upload a file to a User Defined Table (UDT) in Umbraco CMS.
+/// Represents the data required to upload an Umbraco Data Transfer (UDT) file.
 /// This model is typically used to handle file upload requests via the management API.
 /// </summary>
 public class UdtFileUpload
 {
     /// <summary>
-    /// Gets or sets the XML content of the uploaded UDT (User Defined Table) file.
+    /// Gets or sets the XML content of the uploaded UDT file.
     /// </summary>
     public required XDocument Content { get; set; }
 

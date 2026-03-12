@@ -83,9 +83,9 @@ internal sealed class RevokeUserAuthenticationTokensNotificationHandler :
     }
 
     /// <summary>
-    /// Handles a <see cref="UserSavedNotification"/> by revoking authentication tokens for users who have been locked out or are no longer approved.
+    /// Handles a <see cref="UserLoginSuccessNotification"/> by revoking existing authentication tokens when concurrent logins are not allowed.
     /// </summary>
-    /// <param name="notification">The notification containing the saved user entities.</param>
+    /// <param name="notification">The notification containing information about the successful login.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A task that represents the asynchronous operation.</returns>
     public async Task HandleAsync(UserLoginSuccessNotification notification, CancellationToken cancellationToken)

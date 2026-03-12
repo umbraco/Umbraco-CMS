@@ -25,7 +25,7 @@ namespace Umbraco.Extensions
             => builder.WithCollectionBuilder<FlagProviderCollectionBuilder>();
 
 /// <summary>
-/// Gets the flag providers collection builder.
+/// Gets the sign providers collection builder.
 /// </summary>
 /// <param name="builder">The Umbraco builder instance.</param>
 /// <returns>The <see cref="FlagProviderCollectionBuilder"/> instance.</returns>
