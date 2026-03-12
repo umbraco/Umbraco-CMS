@@ -4,4 +4,5 @@ import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 
 export interface UmbMenuStructureWorkspaceContext extends UmbContext {
 	structure: Observable<UmbStructureItemModel[]>;
+	getItemHref(structureItem: UmbStructureItemModel): string | undefined;
 }
