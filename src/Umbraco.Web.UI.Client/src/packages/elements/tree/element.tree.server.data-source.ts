@@ -1,6 +1,7 @@
 import { UMB_ELEMENT_ENTITY_TYPE, UMB_ELEMENT_ROOT_ENTITY_TYPE, UMB_ELEMENT_FOLDER_ENTITY_TYPE } from '../entity.js';
 import type { UmbElementTreeItemModel } from '../types.js';
 import { UmbManagementApiElementTreeDataRequestManager } from './element-tree.server.request-manager.js';
+import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { ElementTreeItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type {
@@ -65,7 +66,7 @@ export class UmbElementTreeServerDataSource
 			name: item.name,
 			entityType: item.isFolder ? UMB_ELEMENT_FOLDER_ENTITY_TYPE : UMB_ELEMENT_ENTITY_TYPE,
 			hasChildren: item.hasChildren,
-			isTrashed: false, //item.isTrashed,
+			isTrashed: false,
 			isFolder: item.isFolder,
 			documentType: {
 				unique: item.documentType?.id ?? '',
@@ -74,15 +75,15 @@ export class UmbElementTreeServerDataSource
 			},
 			icon: item.isFolder ? 'icon-folder' : (item.documentType?.icon ?? 'icon-document'),
 			createDate: item.createDate,
-			variants: item.variants.map((variant) => {
-				return {
-					name: variant.name,
-					culture: variant.culture || null,
-					segment: null, // TODO: add segment to the backend API?
-					state: variant.state,
-					flags: [], //variant.flags,
-				};
-			}),
+			variants: item.isFolder
+				? [{ name: item.name, culture: null, segment: null, state: DocumentVariantStateModel.PUBLISHED }]
+				: item.variants.map((variant) => ({
+						name: variant.name,
+						culture: variant.culture || null,
+						segment: null, // TODO: add segment to the backend API?
+						state: variant.state,
+						flags: [], //variant.flags,
+					})),
 		};
 	}
 }
