@@ -4,9 +4,9 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.ServerEvents.Authorizers;
 
-    /// <summary>
-    /// Provides authorization logic for stylesheet-related server events in the Umbraco CMS API.
-    /// </summary>
+/// <summary>
+/// Provides authorization logic for stylesheet-related server events in the Umbraco CMS API.
+/// </summary>
 public class StylesheetEventAuthorizer : EventSourcePolicyAuthorizer
 {
     /// <summary>

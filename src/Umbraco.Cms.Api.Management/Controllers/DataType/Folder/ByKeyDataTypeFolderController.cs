@@ -7,9 +7,9 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DataType.Folder;
 
-    /// <summary>
-    /// Controller for managing data type folders by their unique key.
-    /// </summary>
+/// <summary>
+/// Controller for managing data type folders by their unique key.
+/// </summary>
 [ApiVersion("1.0")]
 public class ByKeyDataTypeFolderController : DataTypeFolderControllerBase
 {

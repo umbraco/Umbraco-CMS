@@ -9,9 +9,9 @@ using Umbraco.Cms.Infrastructure.Services;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
-    /// <summary>
-    /// Provides methods for creating index presentation models used in the management API.
-    /// </summary>
+/// <summary>
+/// Provides methods for creating index presentation models used in the management API.
+/// </summary>
 public class IndexPresentationFactory : IIndexPresentationFactory
 {
     private readonly IIndexDiagnosticsFactory _indexDiagnosticsFactory;

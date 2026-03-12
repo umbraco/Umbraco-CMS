@@ -8,10 +8,10 @@ using Umbraco.Cms.Core.Security;
 
 namespace Umbraco.Cms.Api.Management.Filters;
 
-    /// <summary>
-    /// An attribute that enforces a requirement for the current user to have access permissions to the root node of a specified tree structure within the Umbraco backoffice.
-    /// Apply this attribute to controller actions or controllers to restrict access to users with root-level permissions for the relevant tree.
-    /// </summary>
+/// <summary>
+/// An attribute that enforces a requirement for the current user to have access permissions to the root node of a specified tree structure within the Umbraco backoffice.
+/// Apply this attribute to controller actions or controllers to restrict access to users with root-level permissions for the relevant tree.
+/// </summary>
 public abstract class RequireTreeRootAccessAttribute : ActionFilterAttribute
 {
     /// <summary>

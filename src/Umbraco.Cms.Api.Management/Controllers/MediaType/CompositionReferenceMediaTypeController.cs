@@ -9,9 +9,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.MediaType;
 
-    /// <summary>
-    /// Provides API endpoints for managing media types that are used as composition references in the system.
-    /// </summary>
+/// <summary>
+/// Provides API endpoints for managing media types that are used as composition references in the system.
+/// </summary>
 [ApiVersion("1.0")]
 public class CompositionReferenceMediaTypeController : MediaTypeControllerBase
 {

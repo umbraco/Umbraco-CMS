@@ -9,10 +9,10 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.MemberGroup;
 
-    /// <summary>
-    /// API controller responsible for managing operations related to all member groups.
-    /// Provides endpoints for retrieving, creating, updating, and deleting member groups.
-    /// </summary>
+/// <summary>
+/// API controller responsible for managing operations related to all member groups.
+/// Provides endpoints for retrieving, creating, updating, and deleting member groups.
+/// </summary>
 [ApiVersion("1.0")]
 public class AllMemberGroupController : MemberGroupControllerBase
 {

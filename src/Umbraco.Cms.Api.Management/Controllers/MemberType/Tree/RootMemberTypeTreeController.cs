@@ -9,10 +9,10 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.MemberType.Tree;
 
-    /// <summary>
-    /// API controller that handles operations related to the root node of the member type tree structure in Umbraco CMS management.
-    /// Provides endpoints for retrieving and managing the root of the member type hierarchy.
-    /// </summary>
+/// <summary>
+/// API controller that handles operations related to the root node of the member type tree structure in Umbraco CMS management.
+/// Provides endpoints for retrieving and managing the root of the member type hierarchy.
+/// </summary>
 [ApiVersion("1.0")]
 public class RootMemberTypeTreeController : MemberTypeTreeControllerBase
 {

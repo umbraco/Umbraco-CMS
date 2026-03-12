@@ -10,9 +10,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Webhook;
 
-    /// <summary>
-    /// API controller responsible for handling HTTP requests related to the creation of webhooks in the management API.
-    /// </summary>
+/// <summary>
+/// API controller responsible for handling HTTP requests related to the creation of webhooks in the management API.
+/// </summary>
 [ApiVersion("1.0")]
 public class CreateWebhookController : WebhookControllerBase
 {

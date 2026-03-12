@@ -7,9 +7,9 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Profiling;
 
-    /// <summary>
-    /// Serves as the base controller for API endpoints related to profiling management.
-    /// </summary>
+/// <summary>
+/// Serves as the base controller for API endpoints related to profiling management.
+/// </summary>
 [VersionedApiBackOfficeRoute("profiling")]
 [ApiExplorerSettings(GroupName = "Profiling")]
 [Authorize(Policy = AuthorizationPolicies.SectionAccessSettings)]

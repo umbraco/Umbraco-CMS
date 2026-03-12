@@ -14,9 +14,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Media;
 
-    /// <summary>
-    /// Controller responsible for moving media items to the recycle bin.
-    /// </summary>
+/// <summary>
+/// Controller responsible for moving media items to the recycle bin.
+/// </summary>
 [ApiVersion("1.0")]
 public class MoveToRecycleBinMediaController : MediaControllerBase
 {

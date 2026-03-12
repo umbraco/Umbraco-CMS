@@ -8,9 +8,9 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Language.Item;
 
-    /// <summary>
-    /// Provides API endpoints for managing individual language items within the Umbraco CMS.
-    /// </summary>
+/// <summary>
+/// Provides API endpoints for managing individual language items within the Umbraco CMS.
+/// </summary>
 [ApiVersion("1.0")]
 public class ItemLanguageItemController : LanguageItemControllerBase
 {

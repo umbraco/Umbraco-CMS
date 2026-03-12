@@ -16,9 +16,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Document;
 
-    /// <summary>
-    /// Controller responsible for publishing a document and all of its descendant documents in the content tree.
-    /// </summary>
+/// <summary>
+/// Controller responsible for publishing a document and all of its descendant documents in the content tree.
+/// </summary>
 [ApiVersion("1.0")]
 public class PublishDocumentWithDescendantsController : DocumentControllerBase
 {

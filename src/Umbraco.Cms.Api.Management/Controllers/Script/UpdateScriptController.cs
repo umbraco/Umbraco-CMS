@@ -22,12 +22,12 @@ public class UpdateScriptController : ScriptControllerBase
     private readonly IUmbracoMapper _umbracoMapper;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
-/// <summary>
-/// Initializes a new instance of the <see cref="UpdateScriptController"/> class, which handles API requests for updating scripts in Umbraco.
-/// </summary>
-/// <param name="scriptService">Service used for script management operations.</param>
-/// <param name="umbracoMapper">The mapper used to map between Umbraco models and API models.</param>
-/// <param name="backOfficeSecurityAccessor">Provides access to back office security context.</param>
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UpdateScriptController"/> class, which handles API requests for updating scripts in Umbraco.
+    /// </summary>
+    /// <param name="scriptService">Service used for script management operations.</param>
+    /// <param name="umbracoMapper">The mapper used to map between Umbraco models and API models.</param>
+    /// <param name="backOfficeSecurityAccessor">Provides access to back office security context.</param>
     public UpdateScriptController(
         IScriptService scriptService,
         IUmbracoMapper umbracoMapper,

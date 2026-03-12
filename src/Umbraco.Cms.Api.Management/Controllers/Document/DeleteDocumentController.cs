@@ -15,9 +15,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Document;
 
-    /// <summary>
-    /// API controller responsible for handling requests to delete documents in the Umbraco CMS.
-    /// </summary>
+/// <summary>
+/// API controller responsible for handling requests to delete documents in the Umbraco CMS.
+/// </summary>
 [ApiVersion("1.0")]
 public class DeleteDocumentController : DocumentControllerBase
 {

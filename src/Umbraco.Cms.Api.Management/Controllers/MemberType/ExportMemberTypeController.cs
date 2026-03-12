@@ -10,9 +10,9 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.MemberType;
 
-    /// <summary>
-    /// API controller responsible for exporting member types in Umbraco CMS.
-    /// </summary>
+/// <summary>
+/// API controller responsible for exporting member types in Umbraco CMS.
+/// </summary>
 [ApiVersion("1.0")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessMemberTypes)]
 public class ExportMemberTypeController : MemberTypeControllerBase

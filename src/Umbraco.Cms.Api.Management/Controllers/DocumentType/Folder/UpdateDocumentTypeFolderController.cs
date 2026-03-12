@@ -7,9 +7,9 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DocumentType.Folder;
 
-    /// <summary>
-    /// Controller responsible for handling HTTP requests related to updating document type folders in the Umbraco CMS.
-    /// </summary>
+/// <summary>
+/// Controller responsible for handling HTTP requests related to updating document type folders in the Umbraco CMS.
+/// </summary>
 [ApiVersion("1.0")]
 public class UpdateDocumentTypeFolderController : DocumentTypeFolderControllerBase
 {

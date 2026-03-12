@@ -12,9 +12,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Media;
 
-    /// <summary>
-    /// Controller responsible for handling API operations related to the creation of media items.
-    /// </summary>
+/// <summary>
+/// Controller responsible for handling API operations related to the creation of media items.
+/// </summary>
 [ApiVersion("1.0")]
 public class CreateMediaController : CreateMediaControllerBase
 {

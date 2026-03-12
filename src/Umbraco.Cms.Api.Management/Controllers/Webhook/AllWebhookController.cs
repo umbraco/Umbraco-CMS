@@ -9,21 +9,21 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Webhook;
 
-    /// <summary>
-    /// Controller responsible for managing webhook operations in the management API.
-    /// Provides endpoints to create, update, delete, and retrieve webhooks.
-    /// </summary>
+/// <summary>
+/// Controller responsible for managing webhook operations in the management API.
+/// Provides endpoints to create, update, delete, and retrieve webhooks.
+/// </summary>
 [ApiVersion("1.0")]
 public class AllWebhookController : WebhookControllerBase
 {
     private readonly IWebhookService _webhookService;
     private readonly IWebhookPresentationFactory _webhookPresentationFactory;
 
-/// <summary>
-/// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Controllers.Webhook.AllWebhookController"/> class.
-/// </summary>
-/// <param name="webhookService">Service used to manage webhooks.</param>
-/// <param name="webhookPresentationFactory">Factory for creating webhook presentation models.</param>
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Controllers.Webhook.AllWebhookController"/> class.
+    /// </summary>
+    /// <param name="webhookService">Service used to manage webhooks.</param>
+    /// <param name="webhookPresentationFactory">Factory for creating webhook presentation models.</param>
     public AllWebhookController(IWebhookService webhookService, IWebhookPresentationFactory webhookPresentationFactory)
     {
         _webhookService = webhookService;

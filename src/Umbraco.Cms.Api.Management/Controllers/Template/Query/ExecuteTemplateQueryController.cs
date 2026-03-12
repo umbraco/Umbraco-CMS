@@ -17,9 +17,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Template.Query;
 
-    /// <summary>
-    /// Controller that executes template queries in the Umbraco CMS Management API.
-    /// </summary>
+/// <summary>
+/// Controller that executes template queries in the Umbraco CMS Management API.
+/// </summary>
 [ApiVersion("1.0")]
 public class ExecuteTemplateQueryController : TemplateQueryControllerBase
 {

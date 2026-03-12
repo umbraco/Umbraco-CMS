@@ -5,9 +5,9 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Telemetry;
 
-    /// <summary>
-    /// Serves as the base class for controllers that handle telemetry-related API endpoints in the management area.
-    /// </summary>
+/// <summary>
+/// Serves as the base class for controllers that handle telemetry-related API endpoints in the management area.
+/// </summary>
 [VersionedApiBackOfficeRoute("telemetry")]
 [ApiExplorerSettings(GroupName = "Telemetry")]
 [Authorize(Policy = AuthorizationPolicies.SectionAccessSettings)]

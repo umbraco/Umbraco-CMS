@@ -8,9 +8,9 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DocumentType.Tree;
 
-    /// <summary>
-    /// Provides API endpoints for retrieving and managing sibling document types in the document type tree.
-    /// </summary>
+/// <summary>
+/// Provides API endpoints for retrieving and managing sibling document types in the document type tree.
+/// </summary>
 public class SiblingsDocumentTypeTreeController : DocumentTypeTreeControllerBase
 {
     /// <summary>

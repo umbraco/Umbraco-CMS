@@ -1,8 +1,8 @@
 namespace Umbraco.Cms.Api.Management.ViewModels.TrackedReferences;
 
-    /// <summary>
-    /// Represents a response model containing information about a media item referenced in tracked references.
-    /// </summary>
+/// <summary>
+/// Represents a response model containing information about a media item referenced in tracked references.
+/// </summary>
 public class MediaReferenceResponseModel : ReferenceResponseModel
 {
     /// <summary>

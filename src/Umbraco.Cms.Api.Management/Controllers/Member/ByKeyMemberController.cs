@@ -9,10 +9,10 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Member;
 
-    /// <summary>
-    /// Controller responsible for managing member entities identified by their unique key.
-    /// Provides endpoints for operations on a specific member.
-    /// </summary>
+/// <summary>
+/// Controller responsible for managing member entities identified by their unique key.
+/// Provides endpoints for operations on a specific member.
+/// </summary>
 [ApiVersion("1.0")]
 public class ByKeyMemberController : MemberControllerBase
 {

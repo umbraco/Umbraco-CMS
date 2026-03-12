@@ -9,9 +9,9 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Media.RecycleBin;
 
-    /// <summary>
-    /// Provides API endpoints for retrieving information about media items that reference items in the media recycle bin.
-    /// </summary>
+/// <summary>
+/// Provides API endpoints for retrieving information about media items that reference items in the media recycle bin.
+/// </summary>
 [ApiVersion("1.0")]
 public class ReferencedByMediaRecycleBinController : MediaRecycleBinControllerBase
 {

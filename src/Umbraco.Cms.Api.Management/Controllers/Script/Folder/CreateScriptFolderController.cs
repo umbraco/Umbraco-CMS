@@ -11,9 +11,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Script.Folder;
 
-    /// <summary>
-    /// API controller for creating script folders in Umbraco CMS.
-    /// </summary>
+/// <summary>
+/// API controller for creating script folders in Umbraco CMS.
+/// </summary>
 [ApiVersion("1.0")]
 public class CreateScriptFolderController : ScriptFolderControllerBase
 {

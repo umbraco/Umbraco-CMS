@@ -13,9 +13,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Media;
 
-    /// <summary>
-    /// Provides API endpoints for managing media items identified by their unique key.
-    /// </summary>
+/// <summary>
+/// Provides API endpoints for managing media items identified by their unique key.
+/// </summary>
 [ApiVersion("1.0")]
 public class ByKeyMediaController : MediaControllerBase
 {

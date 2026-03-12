@@ -8,9 +8,9 @@ using Umbraco.Cms.Web.Common.Controllers;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Server;
 
-    /// <summary>
-    /// Provides endpoints for retrieving server status and health information.
-    /// </summary>
+/// <summary>
+/// Provides endpoints for retrieving server status and health information.
+/// </summary>
 [ApiVersion("1.0")]
 
 // The backoffice shell reads /server/status to detect RuntimeLevel.Upgrading and show the

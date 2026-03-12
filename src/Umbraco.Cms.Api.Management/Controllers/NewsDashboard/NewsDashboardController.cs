@@ -5,9 +5,9 @@ using Umbraco.Cms.Api.Management.ViewModels.NewsDashboard;
 
 namespace Umbraco.Cms.Api.Management.Controllers.NewsDashboard;
 
-    /// <summary>
-    /// Provides API endpoints for managing and retrieving information for the News Dashboard in Umbraco CMS.
-    /// </summary>
+/// <summary>
+/// Provides API endpoints for managing and retrieving information for the News Dashboard in Umbraco CMS.
+/// </summary>
 public class NewsDashboardController : NewsDashboardControllerBase
 {
     private readonly INewsDashboardService _newsDashboardService;

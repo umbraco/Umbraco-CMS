@@ -13,9 +13,9 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Media.Tree;
 
-    /// <summary>
-    /// Provides API endpoints for managing and retrieving the root of the media tree in Umbraco CMS.
-    /// </summary>
+/// <summary>
+/// Provides API endpoints for managing and retrieving the root of the media tree in Umbraco CMS.
+/// </summary>
 [ApiVersion("1.0")]
 public class RootMediaTreeController : MediaTreeControllerBase
 {

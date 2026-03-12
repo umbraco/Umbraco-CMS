@@ -14,9 +14,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.User.Current;
 
-    /// <summary>
-    /// Controller responsible for retrieving information about the currently authenticated user.
-    /// </summary>
+/// <summary>
+/// Controller responsible for retrieving information about the currently authenticated user.
+/// </summary>
 [ApiVersion("1.0")]
 public class GetCurrentUserController : CurrentUserControllerBase
 {

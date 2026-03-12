@@ -11,9 +11,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.User.ClientCredentials;
 
-    /// <summary>
-    /// Controller responsible for handling the deletion of client credentials associated with a user.
-    /// </summary>
+/// <summary>
+/// Controller responsible for handling the deletion of client credentials associated with a user.
+/// </summary>
 [ApiVersion("1.0")]
 public class DeleteClientCredentialsUserController : ClientCredentialsUserControllerBase
 {

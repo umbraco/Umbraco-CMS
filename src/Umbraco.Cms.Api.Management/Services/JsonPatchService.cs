@@ -6,9 +6,9 @@ using Umbraco.Cms.Core.Serialization;
 
 namespace Umbraco.Cms.Api.Management.Services;
 
-    /// <summary>
-    /// Provides functionality to apply and manage JSON Patch operations on resources.
-    /// </summary>
+/// <summary>
+/// Provides functionality to apply and manage JSON Patch operations on resources.
+/// </summary>
 public class JsonPatchService : IJsonPatchService
 {
     private readonly IJsonSerializer _jsonSerializer;

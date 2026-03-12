@@ -13,9 +13,9 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Segment;
 
-    /// <summary>
-    /// API controller responsible for managing and retrieving all content segments within the system.
-    /// </summary>
+/// <summary>
+/// API controller responsible for managing and retrieving all content segments within the system.
+/// </summary>
 [ApiVersion("1.0")]
 public class AllSegmentController : SegmentControllerBase
 {

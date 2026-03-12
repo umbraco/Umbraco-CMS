@@ -29,9 +29,9 @@ public class CultureAndScheduleRequestModel
 }
 
 
-    /// <summary>
-    /// Request model for scheduling the publication of a document.
-    /// </summary>
+/// <summary>
+/// Request model for scheduling the publication of a document.
+/// </summary>
 public class ScheduleRequestModel
 {
     /// <summary>Gets or sets the scheduled publish time for the document.</summary>

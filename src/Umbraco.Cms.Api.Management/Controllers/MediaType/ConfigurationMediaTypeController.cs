@@ -8,9 +8,9 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.MediaType;
 
-    /// <summary>
-    /// Provides API endpoints for managing media type configurations.
-    /// </summary>
+/// <summary>
+/// Provides API endpoints for managing media type configurations.
+/// </summary>
 [ApiVersion("1.0")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessMediaTypes)]
 public class ConfigurationMediaTypeController : MediaTypeControllerBase

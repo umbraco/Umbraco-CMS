@@ -8,9 +8,9 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.MemberType.Tree;
 
-    /// <summary>
-    /// Controller responsible for handling API operations related to retrieving sibling member types within the member type tree structure.
-    /// </summary>
+/// <summary>
+/// Controller responsible for handling API operations related to retrieving sibling member types within the member type tree structure.
+/// </summary>
 public class SiblingMemberTypeTreeController : MemberTypeTreeControllerBase
 {
     /// <summary>

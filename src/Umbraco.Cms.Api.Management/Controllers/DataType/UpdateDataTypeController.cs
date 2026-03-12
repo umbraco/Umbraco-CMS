@@ -13,9 +13,9 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DataType;
 
-    /// <summary>
-    /// API controller responsible for handling requests to update data types in the Umbraco CMS management interface.
-    /// </summary>
+/// <summary>
+/// API controller responsible for handling requests to update data types in the Umbraco CMS management interface.
+/// </summary>
 [ApiVersion("1.0")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessDataTypes)]
 public class UpdateDataTypeController : DataTypeControllerBase

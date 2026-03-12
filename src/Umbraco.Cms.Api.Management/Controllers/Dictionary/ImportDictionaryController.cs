@@ -11,9 +11,9 @@ using Umbraco.Cms.Core.Security;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Dictionary;
 
-    /// <summary>
-    /// Provides API endpoints for importing dictionary items into the Umbraco CMS.
-    /// </summary>
+/// <summary>
+/// Provides API endpoints for importing dictionary items into the Umbraco CMS.
+/// </summary>
 [ApiVersion("1.0")]
 public class ImportDictionaryController : DictionaryControllerBase
 {

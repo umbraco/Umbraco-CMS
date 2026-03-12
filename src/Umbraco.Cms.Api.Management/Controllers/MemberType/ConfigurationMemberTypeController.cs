@@ -8,9 +8,9 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.MemberType;
 
-    /// <summary>
-    /// Provides API endpoints for managing the configuration of member types in the Umbraco CMS.
-    /// </summary>
+/// <summary>
+/// Provides API endpoints for managing the configuration of member types in the Umbraco CMS.
+/// </summary>
 [ApiVersion("1.0")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessMemberTypes)]
 public class ConfigurationMemberTypeController : MemberTypeControllerBase

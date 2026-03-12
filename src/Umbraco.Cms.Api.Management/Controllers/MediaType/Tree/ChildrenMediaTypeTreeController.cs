@@ -9,10 +9,10 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.MediaType.Tree;
 
-    /// <summary>
-    /// Controller responsible for managing tree operations involving the children of media types in the Umbraco CMS.
-    /// Provides endpoints for retrieving and interacting with child media type nodes within the media type tree structure.
-    /// </summary>
+/// <summary>
+/// Controller responsible for managing tree operations involving the children of media types in the Umbraco CMS.
+/// Provides endpoints for retrieving and interacting with child media type nodes within the media type tree structure.
+/// </summary>
 [ApiVersion("1.0")]
 public class ChildrenMediaTypeTreeController : MediaTypeTreeControllerBase
 {

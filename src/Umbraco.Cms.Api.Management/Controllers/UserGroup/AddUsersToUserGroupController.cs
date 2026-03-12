@@ -18,9 +18,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.UserGroup;
 
-    /// <summary>
-    /// API controller responsible for handling requests to add users to a specified user group.
-    /// </summary>
+/// <summary>
+/// API controller responsible for handling requests to add users to a specified user group.
+/// </summary>
 [ApiVersion("1.0")]
 public class AddUsersToUserGroupController : UserGroupControllerBase
 {

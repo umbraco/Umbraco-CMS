@@ -11,9 +11,9 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DocumentBlueprint;
 
-    /// <summary>
-    /// API controller responsible for handling requests to delete document blueprints in the Umbraco CMS.
-    /// </summary>
+/// <summary>
+/// API controller responsible for handling requests to delete document blueprints in the Umbraco CMS.
+/// </summary>
 [ApiVersion("1.0")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
 public class DeleteDocumentBlueprintController : DocumentBlueprintControllerBase

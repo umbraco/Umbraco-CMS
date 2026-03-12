@@ -9,9 +9,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.User.Current;
 
-    /// <summary>
-    /// Controller for enabling two-factor authentication providers for the current user.
-    /// </summary>
+/// <summary>
+/// Controller for enabling two-factor authentication providers for the current user.
+/// </summary>
 [ApiVersion("1.0")]
 public class EnableTwoFactorProviderCurrentUserController : CurrentUserControllerBase
 {

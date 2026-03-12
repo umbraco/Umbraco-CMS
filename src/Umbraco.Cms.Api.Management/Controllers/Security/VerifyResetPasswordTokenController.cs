@@ -12,9 +12,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Security;
 
-    /// <summary>
-    /// Provides API endpoints for verifying reset password tokens as part of the security workflow.
-    /// </summary>
+/// <summary>
+/// Provides API endpoints for verifying reset password tokens as part of the security workflow.
+/// </summary>
 [ApiVersion("1.0")]
 public class VerifyResetPasswordTokenController : SecurityControllerBase
 {

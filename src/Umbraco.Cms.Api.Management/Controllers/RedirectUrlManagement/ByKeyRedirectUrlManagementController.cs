@@ -9,9 +9,9 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.RedirectUrlManagement;
 
-    /// <summary>
-    /// Provides API endpoints for managing redirect URLs identified by their unique key.
-    /// </summary>
+/// <summary>
+/// Provides API endpoints for managing redirect URLs identified by their unique key.
+/// </summary>
 [ApiVersion("1.0")]
 public class ByKeyRedirectUrlManagementController : RedirectUrlManagementControllerBase
 {

@@ -7,9 +7,9 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.MemberType.Folder;
 
-    /// <summary>
-    /// API controller responsible for handling requests to update member type folders in the Umbraco CMS.
-    /// </summary>
+/// <summary>
+/// API controller responsible for handling requests to update member type folders in the Umbraco CMS.
+/// </summary>
 [ApiVersion("1.0")]
 public class UpdateMemberTypeFolderController : MemberTypeFolderControllerBase
 {

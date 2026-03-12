@@ -9,9 +9,9 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Script;
 
-    /// <summary>
-    /// Serves as the base controller for handling script-related operations in the Umbraco CMS Management API.
-    /// </summary>
+/// <summary>
+/// Serves as the base controller for handling script-related operations in the Umbraco CMS Management API.
+/// </summary>
 [VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.Script}")]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Script))]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessScripts)]

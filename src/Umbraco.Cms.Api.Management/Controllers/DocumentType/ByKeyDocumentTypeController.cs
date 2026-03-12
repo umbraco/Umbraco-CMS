@@ -9,9 +9,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DocumentType;
 
-    /// <summary>
-    /// Controller for operations on document types identified by their unique key.
-    /// </summary>
+/// <summary>
+/// Controller for operations on document types identified by their unique key.
+/// </summary>
 [ApiVersion("1.0")]
 public class ByKeyDocumentTypeController : DocumentTypeControllerBase
 {

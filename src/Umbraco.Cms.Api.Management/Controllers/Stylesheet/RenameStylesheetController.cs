@@ -14,9 +14,9 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Stylesheet;
 
-    /// <summary>
-    /// Provides API endpoints for renaming stylesheet resources in the Umbraco CMS.
-    /// </summary>
+/// <summary>
+/// Provides API endpoints for renaming stylesheet resources in the Umbraco CMS.
+/// </summary>
 [ApiVersion("1.0")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessStylesheets)]
 public class RenameStylesheetController : StylesheetControllerBase

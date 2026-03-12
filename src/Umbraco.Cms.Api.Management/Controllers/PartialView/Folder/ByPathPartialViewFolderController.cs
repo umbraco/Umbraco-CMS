@@ -10,9 +10,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.PartialView.Folder;
 
-    /// <summary>
-    /// Provides API endpoints for managing partial view folders in Umbraco by their specified path.
-    /// </summary>
+/// <summary>
+/// Provides API endpoints for managing partial view folders in Umbraco by their specified path.
+/// </summary>
 [ApiVersion("1.0")]
 public class ByPathPartialViewFolderController : PartialViewFolderControllerBase
 {

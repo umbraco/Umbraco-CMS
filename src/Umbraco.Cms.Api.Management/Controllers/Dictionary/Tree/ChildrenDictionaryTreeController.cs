@@ -16,11 +16,11 @@ namespace Umbraco.Cms.Api.Management.Controllers.Dictionary.Tree;
 [ApiVersion("1.0")]
 public class ChildrenDictionaryTreeController : DictionaryTreeControllerBase
 {
-/// <summary>
-/// Initializes a new instance of the <see cref="ChildrenDictionaryTreeController"/> class.
-/// </summary>
-/// <param name="entityService">Service used for managing and retrieving entities within the system.</param>
-/// <param name="dictionaryItemService">Service used for managing dictionary items.</param>
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ChildrenDictionaryTreeController"/> class.
+    /// </summary>
+    /// <param name="entityService">Service used for managing and retrieving entities within the system.</param>
+    /// <param name="dictionaryItemService">Service used for managing dictionary items.</param>
     [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
     public ChildrenDictionaryTreeController(IEntityService entityService, IDictionaryItemService dictionaryItemService)
         : base(entityService, dictionaryItemService)

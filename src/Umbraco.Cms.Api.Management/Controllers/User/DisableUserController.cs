@@ -13,9 +13,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.User;
 
-    /// <summary>
-    /// Controller responsible for handling operations that disable user accounts.
-    /// </summary>
+/// <summary>
+/// Controller responsible for handling operations that disable user accounts.
+/// </summary>
 [ApiVersion("1.0")]
 public class DisableUserController : UserControllerBase
 {

@@ -57,12 +57,12 @@ public static class SectionMapper
 
     private sealed class SectionMapping
     {
-    /// <summary>Gets or sets the alias of the section mapping.</summary>
+        /// <summary>Gets or sets the alias of the section mapping.</summary>
         public required string Alias { get; init; }
 
-    /// <summary>
-    /// Gets or sets the name of the section.
-    /// </summary>
+        /// <summary>
+        /// Gets or sets the name of the section.
+        /// </summary>
         public required string Name { get; init; }
     }
 }

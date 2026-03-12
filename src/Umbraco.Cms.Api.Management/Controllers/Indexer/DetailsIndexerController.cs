@@ -7,9 +7,9 @@ using Umbraco.Cms.Api.Management.ViewModels.Indexer;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Indexer;
 
-    /// <summary>
-    /// API controller responsible for providing detailed information and operations for a specific indexer in the management system.
-    /// </summary>
+/// <summary>
+/// API controller responsible for providing detailed information and operations for a specific indexer in the management system.
+/// </summary>
 [ApiVersion("1.0")]
 public class DetailsIndexerController : IndexerControllerBase
 {

@@ -9,9 +9,9 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.LogViewer.SavedSearch;
 
-    /// <summary>
-    /// API controller for managing and retrieving all saved searches in the log viewer.
-    /// </summary>
+/// <summary>
+/// API controller for managing and retrieving all saved searches in the log viewer.
+/// </summary>
 [ApiVersion("1.0")]
 public class AllSavedSearchLogViewerController : SavedSearchLogViewerControllerBase
 {

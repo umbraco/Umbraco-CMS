@@ -9,9 +9,9 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Webhook.Logs;
 
-    /// <summary>
-    /// Controller for retrieving and managing all webhook logs.
-    /// </summary>
+/// <summary>
+/// Controller for retrieving and managing all webhook logs.
+/// </summary>
 [ApiVersion("1.0")]
 public class AllWebhookLogController : WebhookLogControllerBase
 {

@@ -63,18 +63,18 @@ public class ReferencedByMediaController : MediaControllerBase
         return pagedViewModel;
     }
 
-/// <summary>
-///     Retrieves a paginated list of items that reference the specified media item.
-/// </summary>
-/// <remarks>
-///     Used by info tabs on content, media, etc., and during the delete and unpublish operations for single items.
-///     This method essentially finds parent items in relations.
-/// </remarks>
-/// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
-/// <param name="id">The unique identifier of the media item to find references for.</param>
-/// <param name="skip">The number of items to skip before starting to collect the result set (for pagination).</param>
-/// <param name="take">The number of items to return in the result set (for pagination).</param>
-/// <returns>A task that represents the asynchronous operation. The task result contains an <see cref="IActionResult"/> with a paginated list of references to the specified media item.</returns>
+    /// <summary>
+    ///     Retrieves a paginated list of items that reference the specified media item.
+    /// </summary>
+    /// <remarks>
+    ///     Used by info tabs on content, media, etc., and during the delete and unpublish operations for single items.
+    ///     This method essentially finds parent items in relations.
+    /// </remarks>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="id">The unique identifier of the media item to find references for.</param>
+    /// <param name="skip">The number of items to skip before starting to collect the result set (for pagination).</param>
+    /// <param name="take">The number of items to return in the result set (for pagination).</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains an <see cref="IActionResult"/> with a paginated list of references to the specified media item.</returns>
     [HttpGet("{id:guid}/referenced-by")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<IReferenceResponseModel>), StatusCodes.Status200OK)]

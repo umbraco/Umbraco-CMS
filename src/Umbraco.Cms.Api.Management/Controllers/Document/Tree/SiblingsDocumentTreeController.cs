@@ -14,9 +14,9 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Document.Tree;
 
-    /// <summary>
-    /// API controller responsible for managing and retrieving sibling documents within the content tree.
-    /// </summary>
+/// <summary>
+/// API controller responsible for managing and retrieving sibling documents within the content tree.
+/// </summary>
 [ApiVersion("1.0")]
 public class SiblingsDocumentTreeController : DocumentTreeControllerBase
 {

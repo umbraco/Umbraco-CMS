@@ -13,9 +13,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.User;
 
-    /// <summary>
-    /// API controller responsible for managing calculated start nodes for users in Umbraco CMS.
-    /// </summary>
+/// <summary>
+/// API controller responsible for managing calculated start nodes for users in Umbraco CMS.
+/// </summary>
 [ApiVersion("1.0")]
 public class CalculatedStartNodesUserController : UserControllerBase
 {

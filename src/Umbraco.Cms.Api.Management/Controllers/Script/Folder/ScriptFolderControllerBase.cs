@@ -8,10 +8,10 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Script.Folder;
 
-    /// <summary>
-    /// Serves as the base controller for operations related to script folder management in the Umbraco CMS Management API.
-    /// Provides common functionality for derived controllers handling script folder endpoints.
-    /// </summary>
+/// <summary>
+/// Serves as the base controller for operations related to script folder management in the Umbraco CMS Management API.
+/// Provides common functionality for derived controllers handling script folder endpoints.
+/// </summary>
 [VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.Script}/folder")]
 [ApiExplorerSettings(GroupName = "Script")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessScripts)]

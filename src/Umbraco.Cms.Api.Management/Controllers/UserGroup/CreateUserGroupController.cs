@@ -11,9 +11,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.UserGroup;
 
-    /// <summary>
-    /// API controller responsible for handling HTTP requests related to the creation of user groups in the management section.
-    /// </summary>
+/// <summary>
+/// API controller responsible for handling HTTP requests related to the creation of user groups in the management section.
+/// </summary>
 [ApiVersion("1.0")]
 public class CreateUserGroupController : UserGroupControllerBase
 {

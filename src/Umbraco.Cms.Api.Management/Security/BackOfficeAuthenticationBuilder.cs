@@ -77,13 +77,13 @@ public class BackOfficeAuthenticationBuilder : AuthenticationBuilder
     internal sealed class EnsureBackOfficeScheme<TOptions> : IPostConfigureOptions<TOptions>
         where TOptions : RemoteAuthenticationOptions
     {
-    /// <summary>
-    /// Post-configures the specified options instance for a given authentication scheme name.
-    /// If the scheme name indicates a backoffice authentication scheme, sets the <c>SignInScheme</c> property
-    /// to the backoffice external authentication type. This ensures the configuration is only applied to backoffice schemes.
-    /// </summary>
-    /// <param name="name">The name of the authentication scheme to configure.</param>
-    /// <param name="options">The options instance to configure. If the scheme is a backoffice scheme, its <c>SignInScheme</c> will be set.</param>
+        /// <summary>
+        /// Post-configures the specified options instance for a given authentication scheme name.
+        /// If the scheme name indicates a backoffice authentication scheme, sets the <c>SignInScheme</c> property
+        /// to the backoffice external authentication type. This ensures the configuration is only applied to backoffice schemes.
+        /// </summary>
+        /// <param name="name">The name of the authentication scheme to configure.</param>
+        /// <param name="options">The options instance to configure. If the scheme is a backoffice scheme, its <c>SignInScheme</c> will be set.</param>
         public void PostConfigure(string? name, TOptions options)
         {
             // ensure logic only applies to backoffice authentication schemes

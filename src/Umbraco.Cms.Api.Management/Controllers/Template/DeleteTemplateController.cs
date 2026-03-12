@@ -9,9 +9,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Template;
 
-    /// <summary>
-    /// Controller responsible for handling requests to delete templates.
-    /// </summary>
+/// <summary>
+/// Controller responsible for handling requests to delete templates.
+/// </summary>
 [ApiVersion("1.0")]
 public class DeleteTemplateController : TemplateControllerBase
 {

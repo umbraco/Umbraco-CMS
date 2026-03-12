@@ -7,10 +7,10 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Filters;
 
-    /// <summary>
-    /// Indicates that the decorated controller or action method requires the application to be at a specific runtime level in order to execute.
-    /// Use this attribute to restrict access based on the current runtime state of the Umbraco application.
-    /// </summary>
+/// <summary>
+/// Indicates that the decorated controller or action method requires the application to be at a specific runtime level in order to execute.
+/// Use this attribute to restrict access based on the current runtime state of the Umbraco application.
+/// </summary>
 public class RequireRuntimeLevelAttribute : ActionFilterAttribute
 {
     private readonly RuntimeLevel _requiredRuntimeLevel;

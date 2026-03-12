@@ -10,10 +10,10 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Webhook;
 
-    /// <summary>
-    /// Controller responsible for handling HTTP requests related to updating webhooks.
-    /// Provides endpoints for modifying existing webhook configurations.
-    /// </summary>
+/// <summary>
+/// Controller responsible for handling HTTP requests related to updating webhooks.
+/// Provides endpoints for modifying existing webhook configurations.
+/// </summary>
 [ApiVersion("1.0")]
 public class UpdateWebhookController : WebhookControllerBase
 {

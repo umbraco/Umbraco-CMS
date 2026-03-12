@@ -8,9 +8,9 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.PartialView;
 
-    /// <summary>
-    /// Serves as the base controller for managing partial views in the Umbraco CMS API, providing shared functionality for partial view operations.
-    /// </summary>
+/// <summary>
+/// Serves as the base controller for managing partial views in the Umbraco CMS API, providing shared functionality for partial view operations.
+/// </summary>
 [VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.PartialView}")]
 [ApiExplorerSettings(GroupName = "Partial View")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessPartialViews)]

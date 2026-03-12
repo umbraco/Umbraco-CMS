@@ -14,10 +14,10 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DocumentType.Tree;
 
-    /// <summary>
-    /// Serves as the base controller for implementing document type tree operations in the management API.
-    /// Provides common functionality for controllers that expose document type tree structures.
-    /// </summary>
+/// <summary>
+/// Serves as the base controller for implementing document type tree operations in the management API.
+/// Provides common functionality for controllers that expose document type tree structures.
+/// </summary>
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Tree}/{Constants.UdiEntityType.DocumentType}")]
 [ApiExplorerSettings(GroupName = "Document Type")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]

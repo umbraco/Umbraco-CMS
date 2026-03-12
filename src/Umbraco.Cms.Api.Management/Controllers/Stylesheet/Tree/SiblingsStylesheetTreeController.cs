@@ -26,11 +26,11 @@ public class SiblingsStylesheetTreeController : StylesheetTreeControllerBase
     {
     }
 
-/// <summary>
-/// Initializes a new instance of the <see cref="SiblingsStylesheetTreeController"/> class.
-/// </summary>
-/// <param name="styleSheetTreeService">Service for managing stylesheet tree operations.</param>
-/// <param name="fileSystems">Provides access to the file systems used by the controller.</param>
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SiblingsStylesheetTreeController"/> class.
+    /// </summary>
+    /// <param name="styleSheetTreeService">Service for managing stylesheet tree operations.</param>
+    /// <param name="fileSystems">Provides access to the file systems used by the controller.</param>
     [Obsolete("Please use the constructor taking all parameters. Scheduled to be removed in Umbraco 19.")]
     public SiblingsStylesheetTreeController(IStyleSheetTreeService styleSheetTreeService, FileSystems fileSystems)
         : base(styleSheetTreeService, fileSystems)

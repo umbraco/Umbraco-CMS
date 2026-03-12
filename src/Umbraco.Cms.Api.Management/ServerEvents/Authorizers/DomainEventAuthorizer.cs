@@ -4,9 +4,9 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.ServerEvents.Authorizers;
 
-    /// <summary>
-    /// Provides authorization logic for handling domain events in the server events system.
-    /// </summary>
+/// <summary>
+/// Provides authorization logic for handling domain events in the server events system.
+/// </summary>
 public class DomainEventAuthorizer : EventSourcePolicyAuthorizer
 {
     /// <summary>

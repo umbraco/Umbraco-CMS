@@ -11,9 +11,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Media;
 
-    /// <summary>
-    /// Provides API endpoints for validating updates to media entities in the system.
-    /// </summary>
+/// <summary>
+/// Provides API endpoints for validating updates to media entities in the system.
+/// </summary>
 [ApiVersion("1.0")]
 public class ValidateUpdateMediaController : UpdateMediaControllerBase
 {

@@ -12,9 +12,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Document;
 
-    /// <summary>
-    /// API controller responsible for handling operations related to the creation of content documents in the Umbraco CMS.
-    /// </summary>
+/// <summary>
+/// API controller responsible for handling operations related to the creation of content documents in the Umbraco CMS.
+/// </summary>
 [ApiVersion("1.0")]
 public class CreateDocumentController : CreateDocumentControllerBase
 {

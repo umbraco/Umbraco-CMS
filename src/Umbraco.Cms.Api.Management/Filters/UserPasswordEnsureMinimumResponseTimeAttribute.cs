@@ -16,10 +16,10 @@ internal sealed class UserPasswordEnsureMinimumResponseTimeAttribute : TypeFilte
 
     private sealed class UserPasswordEnsureMinimumResponseTimeFilter : EnsureMinimumResponseTimeFilter
     {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="UserPasswordEnsureMinimumResponseTimeFilter"/> class with the specified user password configuration settings.
-    /// </summary>
-    /// <param name="options">The options containing user password configuration settings.</param>
+        /// <summary>
+        /// Initializes a new instance of the <see cref="UserPasswordEnsureMinimumResponseTimeFilter"/> class with the specified user password configuration settings.
+        /// </summary>
+        /// <param name="options">The options containing user password configuration settings.</param>
         public UserPasswordEnsureMinimumResponseTimeFilter(IOptions<UserPasswordConfigurationSettings> options)
             : base(options.Value.MinimumResponseTime)
         {

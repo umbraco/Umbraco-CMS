@@ -13,9 +13,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Media.Item;
 
-    /// <summary>
-    /// Provides API endpoints for searching and retrieving media items.
-    /// </summary>
+/// <summary>
+/// Provides API endpoints for searching and retrieving media items.
+/// </summary>
 [ApiVersion("1.0")]
 public class SearchMediaItemController : MediaItemControllerBase
 {

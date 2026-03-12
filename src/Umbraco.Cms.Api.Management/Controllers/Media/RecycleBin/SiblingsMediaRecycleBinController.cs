@@ -8,9 +8,9 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Media.RecycleBin;
 
-    /// <summary>
-    /// Controller responsible for handling operations related to sibling media items within the recycle bin.
-    /// </summary>
+/// <summary>
+/// Controller responsible for handling operations related to sibling media items within the recycle bin.
+/// </summary>
 [ApiVersion("1.0")]
 public class SiblingsMediaRecycleBinController : MediaRecycleBinControllerBase
 {

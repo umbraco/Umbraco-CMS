@@ -3,9 +3,9 @@ using Umbraco.Cms.Api.Management.ViewModels.Item;
 
 namespace Umbraco.Cms.Api.Management.ViewModels.RecycleBin;
 
-    /// <summary>
-    /// Represents the base response model for an item in the recycle bin.
-    /// </summary>
+/// <summary>
+/// Represents the base response model for an item in the recycle bin.
+/// </summary>
 public abstract class RecycleBinItemResponseModelBase
 {
     /// <summary>

@@ -9,9 +9,9 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Stylesheet;
 
-    /// <summary>
-    /// Provides API endpoints for managing stylesheets identified by their path.
-    /// </summary>
+/// <summary>
+/// Provides API endpoints for managing stylesheets identified by their path.
+/// </summary>
 [ApiVersion("1.0")]
 public class ByPathStylesheetController : StylesheetControllerBase
 {

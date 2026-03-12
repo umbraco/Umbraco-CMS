@@ -1,8 +1,8 @@
 namespace Umbraco.Cms.Api.Management.ViewModels.TrackedReferences;
 
-    /// <summary>
-    /// Represents the response model containing information about a property type reference within a media type.
-    /// </summary>
+/// <summary>
+/// Represents the response model containing information about a property type reference within a media type.
+/// </summary>
 public class MediaTypePropertyTypeReferenceResponseModel : ContentTypePropertyTypeReferenceResponseModel
 {
     /// <summary>

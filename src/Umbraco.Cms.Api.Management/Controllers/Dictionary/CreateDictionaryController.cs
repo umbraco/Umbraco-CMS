@@ -15,9 +15,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Dictionary;
 
-    /// <summary>
-    /// API controller responsible for handling requests to create new dictionary items in Umbraco CMS.
-    /// </summary>
+/// <summary>
+/// API controller responsible for handling requests to create new dictionary items in Umbraco CMS.
+/// </summary>
 [ApiVersion("1.0")]
 public class CreateDictionaryController : DictionaryControllerBase
 {

@@ -9,9 +9,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.User.ClientCredentials;
 
-    /// <summary>
-    /// Controller responsible for retrieving all users authenticated via client credentials.
-    /// </summary>
+/// <summary>
+/// Controller responsible for retrieving all users authenticated via client credentials.
+/// </summary>
 [ApiVersion("1.0")]
 public class GetAllClientCredentialsUserController : ClientCredentialsUserControllerBase
 {

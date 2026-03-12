@@ -12,9 +12,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.User.ClientCredentials;
 
-    /// <summary>
-    /// Controller responsible for handling the creation of users with client credentials.
-    /// </summary>
+/// <summary>
+/// Controller responsible for handling the creation of users with client credentials.
+/// </summary>
 [ApiVersion("1.0")]
 public class CreateClientCredentialsUserController : ClientCredentialsUserControllerBase
 {

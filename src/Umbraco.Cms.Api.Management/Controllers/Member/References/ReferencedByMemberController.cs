@@ -11,9 +11,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Member.References;
 
-    /// <summary>
-    /// Controller responsible for handling API requests related to entities that reference a specific member.
-    /// </summary>
+/// <summary>
+/// Controller responsible for handling API requests related to entities that reference a specific member.
+/// </summary>
 [ApiVersion("1.0")]
 public class ReferencedByMemberController : MemberControllerBase
 {
@@ -63,18 +63,18 @@ public class ReferencedByMemberController : MemberControllerBase
         return pagedViewModel;
     }
 
-/// <summary>
-///     Retrieves a paginated list of items that reference the specified member, allowing you to see where the member is being used.
-/// </summary>
-/// <remarks>
-///     Used by info tabs on content, media, etc., and for the delete and unpublish operations of single items.
-///     This method essentially finds parent items in relations.
-/// </remarks>
-/// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
-/// <param name="id">The unique identifier of the member for which to find referencing items.</param>
-/// <param name="skip">The number of items to skip when paginating results.</param>
-/// <param name="take">The maximum number of items to return in the paginated result.</param>
-/// <returns>A task that represents the asynchronous operation. The task result contains an <see cref="IActionResult"/> with a paged list of references to the specified member.</returns>
+    /// <summary>
+    ///     Retrieves a paginated list of items that reference the specified member, allowing you to see where the member is being used.
+    /// </summary>
+    /// <remarks>
+    ///     Used by info tabs on content, media, etc., and for the delete and unpublish operations of single items.
+    ///     This method essentially finds parent items in relations.
+    /// </remarks>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="id">The unique identifier of the member for which to find referencing items.</param>
+    /// <param name="skip">The number of items to skip when paginating results.</param>
+    /// <param name="take">The maximum number of items to return in the paginated result.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains an <see cref="IActionResult"/> with a paged list of references to the specified member.</returns>
     [HttpGet("{id:guid}/referenced-by")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<IReferenceResponseModel>), StatusCodes.Status200OK)]

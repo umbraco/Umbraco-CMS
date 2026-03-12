@@ -4,9 +4,9 @@ using Umbraco.Cms.Core.Models.TemporaryFile;
 
 namespace Umbraco.Cms.Api.Management.Mapping.TemporaryFile;
 
-    /// <summary>
-    /// Defines the mapping configuration between domain models and view models for temporary files in the API.
-    /// </summary>
+/// <summary>
+/// Defines the mapping configuration between domain models and view models for temporary files in the API.
+/// </summary>
 public class TemporaryFileViewModelsMapDefinition : IMapDefinition
 {
     /// <summary>

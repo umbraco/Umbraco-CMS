@@ -12,9 +12,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.PartialView;
 
-    /// <summary>
-    /// Handles requests to rename partial views.
-    /// </summary>
+/// <summary>
+/// Handles requests to rename partial views.
+/// </summary>
 [ApiVersion("1.0")]
 public class RenamePartialViewController : PartialViewControllerBase
 {

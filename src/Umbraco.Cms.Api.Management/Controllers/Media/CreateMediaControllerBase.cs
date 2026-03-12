@@ -7,10 +7,10 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Media;
 
-    /// <summary>
-    /// Serves as the base controller for creating media items in the Umbraco CMS API.
-    /// Intended to be inherited by controllers that handle media creation operations.
-    /// </summary>
+/// <summary>
+/// Serves as the base controller for creating media items in the Umbraco CMS API.
+/// Intended to be inherited by controllers that handle media creation operations.
+/// </summary>
 public class CreateMediaControllerBase : MediaControllerBase
 {
     private readonly IAuthorizationService _authorizationService;

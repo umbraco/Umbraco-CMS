@@ -8,10 +8,10 @@ using Umbraco.Cms.Api.Management.ViewModels.Dictionary;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Dictionary;
 
-    /// <summary>
-    /// API controller for managing Umbraco dictionary items by their unique key.
-    /// Provides endpoints for retrieving, updating, and deleting dictionary entries identified by key.
-    /// </summary>
+/// <summary>
+/// API controller for managing Umbraco dictionary items by their unique key.
+/// Provides endpoints for retrieving, updating, and deleting dictionary entries identified by key.
+/// </summary>
 [ApiVersion("1.0")]
 public class ByKeyDictionaryController : DictionaryControllerBase
 {

@@ -10,9 +10,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.LogViewer;
 
-    /// <summary>
-    /// Provides API endpoints for retrieving log level counts in the log viewer.
-    /// </summary>
+/// <summary>
+/// Provides API endpoints for retrieving log level counts in the log viewer.
+/// </summary>
 [ApiVersion("1.0")]
 public class LogLevelCountLogViewerController : LogViewerControllerBase
 {

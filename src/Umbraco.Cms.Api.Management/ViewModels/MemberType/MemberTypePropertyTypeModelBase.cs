@@ -2,9 +2,9 @@ using Umbraco.Cms.Api.Management.ViewModels.ContentType;
 
 namespace Umbraco.Cms.Api.Management.ViewModels.MemberType;
 
-    /// <summary>
-    /// Represents the base model for defining property types on a member type.
-    /// </summary>
+/// <summary>
+/// Represents the base model for defining property types on a member type.
+/// </summary>
 public abstract class MemberTypePropertyTypeModelBase : PropertyTypeModelBase
 {
     /// <summary>

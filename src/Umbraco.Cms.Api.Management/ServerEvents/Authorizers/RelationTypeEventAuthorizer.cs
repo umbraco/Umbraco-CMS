@@ -4,9 +4,9 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.ServerEvents.Authorizers;
 
-    /// <summary>
-    /// Provides authorization logic for server events that pertain to relation types.
-    /// </summary>
+/// <summary>
+/// Provides authorization logic for server events that pertain to relation types.
+/// </summary>
 public class RelationTypeEventAuthorizer : EventSourcePolicyAuthorizer
 {
     /// <summary>

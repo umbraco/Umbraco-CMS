@@ -12,9 +12,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.User;
 
-    /// <summary>
-    /// API controller responsible for managing operations related to the deletion of users.
-    /// </summary>
+/// <summary>
+/// API controller responsible for managing operations related to the deletion of users.
+/// </summary>
 [ApiVersion("1.0")]
 public class DeleteUserController : UserControllerBase
 {

@@ -9,10 +9,10 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Document;
 
-    /// <summary>
-    /// Serves as the base controller for document creation endpoints in the Umbraco CMS Management API.
-    /// Provides shared functionality for creating documents.
-    /// </summary>
+/// <summary>
+/// Serves as the base controller for document creation endpoints in the Umbraco CMS Management API.
+/// Provides shared functionality for creating documents.
+/// </summary>
 public abstract class CreateDocumentControllerBase : DocumentControllerBase
 {
     private readonly IAuthorizationService _authorizationService;

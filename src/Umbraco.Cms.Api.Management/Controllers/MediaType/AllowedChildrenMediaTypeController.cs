@@ -11,9 +11,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.MediaType;
 
-    /// <summary>
-    /// Controller responsible for managing the allowed child media types for a given media type.
-    /// </summary>
+/// <summary>
+/// Controller responsible for managing the allowed child media types for a given media type.
+/// </summary>
 [ApiVersion("1.0")]
 public class AllowedChildrenMediaTypeController : MediaTypeControllerBase
 {

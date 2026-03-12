@@ -11,9 +11,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Package.Created;
 
-    /// <summary>
-    /// Controller responsible for handling requests to download packages that have been created.
-    /// </summary>
+/// <summary>
+/// Controller responsible for handling requests to download packages that have been created.
+/// </summary>
 [ApiVersion("1.0")]
 public class DownloadCreatedPackageController : CreatedPackageControllerBase
 {

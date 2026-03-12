@@ -8,10 +8,10 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Document.RecycleBin;
 
-    /// <summary>
-    /// Controller responsible for managing recycle bin operations related to documents that share the same parent (siblings) within the content tree.
-    /// Provides endpoints for restoring or permanently deleting sibling documents from the recycle bin.
-    /// </summary>
+/// <summary>
+/// Controller responsible for managing recycle bin operations related to documents that share the same parent (siblings) within the content tree.
+/// Provides endpoints for restoring or permanently deleting sibling documents from the recycle bin.
+/// </summary>
 [ApiVersion("1.0")]
 public class SiblingsDocumentRecycleBinController : DocumentRecycleBinControllerBase
 {

@@ -8,10 +8,10 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Template;
 
-    /// <summary>
-    /// API controller responsible for managing template resources identified by their unique key.
-    /// Provides endpoints for operations such as retrieval, update, and deletion of templates.
-    /// </summary>
+/// <summary>
+/// API controller responsible for managing template resources identified by their unique key.
+/// Provides endpoints for operations such as retrieval, update, and deletion of templates.
+/// </summary>
 [ApiVersion("1.0")]
 public class ByKeyTemplateController : TemplateControllerBase
 {

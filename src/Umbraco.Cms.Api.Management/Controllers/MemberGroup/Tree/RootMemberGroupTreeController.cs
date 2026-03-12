@@ -9,9 +9,9 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Umbraco.Cms.Api.Management.Controllers.MemberGroup.Tree;
 
-    /// <summary>
-    /// Controller responsible for handling operations related to the root of the member group tree in the management API.
-    /// </summary>
+/// <summary>
+/// Controller responsible for handling operations related to the root of the member group tree in the management API.
+/// </summary>
 [ApiVersion("1.0")]
 public class RootMemberGroupTreeController : MemberGroupTreeControllerBase
 {

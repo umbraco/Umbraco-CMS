@@ -23,12 +23,12 @@ public class ByKeyPublishedDocumentController : DocumentControllerBase
     private readonly IContentEditingService _contentEditingService;
     private readonly IDocumentPresentationFactory _documentPresentationFactory;
 
-/// <summary>
-/// Initializes a new instance of the <see cref="ByKeyPublishedDocumentController"/> class, which handles published document operations by key.
-/// </summary>
-/// <param name="authorizationService">Service used to authorize access to document operations.</param>
-/// <param name="contentEditingService">Service used for editing content.</param>
-/// <param name="documentPresentationFactory">Factory for creating document presentation models.</param>
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ByKeyPublishedDocumentController"/> class, which handles published document operations by key.
+    /// </summary>
+    /// <param name="authorizationService">Service used to authorize access to document operations.</param>
+    /// <param name="contentEditingService">Service used for editing content.</param>
+    /// <param name="documentPresentationFactory">Factory for creating document presentation models.</param>
     public ByKeyPublishedDocumentController(
         IAuthorizationService authorizationService,
         IContentEditingService contentEditingService,

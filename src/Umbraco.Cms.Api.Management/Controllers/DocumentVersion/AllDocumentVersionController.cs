@@ -12,9 +12,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DocumentVersion;
 
-    /// <summary>
-    /// API controller responsible for managing and providing access to all versions of documents within the system.
-    /// </summary>
+/// <summary>
+/// API controller responsible for managing and providing access to all versions of documents within the system.
+/// </summary>
 [ApiVersion("1.0")]
 public class AllDocumentVersionController : DocumentVersionControllerBase
 {

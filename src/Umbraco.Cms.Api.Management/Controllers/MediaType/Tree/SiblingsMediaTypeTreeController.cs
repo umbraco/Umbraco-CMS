@@ -8,9 +8,9 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.MediaType.Tree;
 
-    /// <summary>
-    /// API controller responsible for handling operations related to the siblings of a media type in the media type tree.
-    /// </summary>
+/// <summary>
+/// API controller responsible for handling operations related to the siblings of a media type in the media type tree.
+/// </summary>
 public class SiblingsMediaTypeTreeController : MediaTypeTreeControllerBase
 {
     /// <summary>

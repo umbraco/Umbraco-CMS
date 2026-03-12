@@ -9,9 +9,9 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Member.Item;
 
-    /// <summary>
-    /// Provides API endpoints for searching member items within the management interface.
-    /// </summary>
+/// <summary>
+/// Provides API endpoints for searching member items within the management interface.
+/// </summary>
 [ApiVersion("1.0")]
 public class SearchMemberItemController : MemberItemControllerBase
 {

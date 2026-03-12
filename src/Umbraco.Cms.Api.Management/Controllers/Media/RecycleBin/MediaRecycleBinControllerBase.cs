@@ -13,9 +13,9 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Media.RecycleBin;
 
-    /// <summary>
-    /// Serves as the base controller for operations related to the media recycle bin in the Umbraco CMS.
-    /// </summary>
+/// <summary>
+/// Serves as the base controller for operations related to the media recycle bin in the Umbraco CMS.
+/// </summary>
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.RecycleBin}/{Constants.UdiEntityType.Media}")]
 [RequireMediaTreeRootAccess]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Media))]

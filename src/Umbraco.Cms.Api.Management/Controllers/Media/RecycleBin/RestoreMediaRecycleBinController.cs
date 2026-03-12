@@ -16,9 +16,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Media.RecycleBin;
 
-    /// <summary>
-    /// Provides API endpoints for restoring deleted media items from the recycle bin.
-    /// </summary>
+/// <summary>
+/// Provides API endpoints for restoring deleted media items from the recycle bin.
+/// </summary>
 [ApiVersion("1.0")]
 public class RestoreMediaRecycleBinController : MediaRecycleBinControllerBase
 {

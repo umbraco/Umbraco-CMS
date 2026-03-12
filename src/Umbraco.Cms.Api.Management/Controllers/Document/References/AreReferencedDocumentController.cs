@@ -30,18 +30,18 @@ public class AreReferencedDocumentController : DocumentControllerBase
         _umbracoMapper = umbracoMapper;
     }
 
-/// <summary>
-///     Gets a paged list of items that reference the specified documents via any kind of relation.
-/// </summary>
-/// <remarks>
-///     Used when bulk deleting content/media and bulk unpublishing content (delete and unpublish on List view).
-///     This is essentially finding the children in relations where the selected documents are referenced.
-/// </remarks>
-/// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
-/// <param name="ids">The set of document IDs to find referencing items for.</param>
-/// <param name="skip">The number of items to skip when paging results.</param>
-/// <param name="take">The maximum number of items to return in the result set.</param>
-/// <returns>A paged list of items that reference the specified documents.</returns>
+    /// <summary>
+    ///     Gets a paged list of items that reference the specified documents via any kind of relation.
+    /// </summary>
+    /// <remarks>
+    ///     Used when bulk deleting content/media and bulk unpublishing content (delete and unpublish on List view).
+    ///     This is essentially finding the children in relations where the selected documents are referenced.
+    /// </remarks>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="ids">The set of document IDs to find referencing items for.</param>
+    /// <param name="skip">The number of items to skip when paging results.</param>
+    /// <param name="take">The maximum number of items to return in the result set.</param>
+    /// <returns>A paged list of items that reference the specified documents.</returns>
     [HttpGet("are-referenced")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<ReferenceByIdModel>), StatusCodes.Status200OK)]

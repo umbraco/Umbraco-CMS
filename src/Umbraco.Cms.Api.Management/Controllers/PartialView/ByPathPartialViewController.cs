@@ -9,9 +9,9 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.PartialView;
 
-    /// <summary>
-    /// Controller for managing partial views identified by their path.
-    /// </summary>
+/// <summary>
+/// Controller for managing partial views identified by their path.
+/// </summary>
 [ApiVersion("1.0")]
 public class ByPathPartialViewController : PartialViewControllerBase
 {

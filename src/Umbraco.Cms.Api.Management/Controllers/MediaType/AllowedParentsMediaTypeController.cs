@@ -9,9 +9,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.MediaType;
 
-    /// <summary>
-    /// Provides API endpoints for managing the allowed parent media types of a media type.
-    /// </summary>
+/// <summary>
+/// Provides API endpoints for managing the allowed parent media types of a media type.
+/// </summary>
 [ApiVersion("1.0")]
 public class AllowedParentsMediaTypeController : MediaTypeControllerBase
 {

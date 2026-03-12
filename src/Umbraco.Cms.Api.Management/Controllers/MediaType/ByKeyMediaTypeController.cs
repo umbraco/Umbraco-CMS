@@ -9,9 +9,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.MediaType;
 
-    /// <summary>
-    /// Provides API endpoints for managing media types using their unique key identifier.
-    /// </summary>
+/// <summary>
+/// Provides API endpoints for managing media types using their unique key identifier.
+/// </summary>
 [ApiVersion("1.0")]
 public class ByKeyMediaTypeController : MediaTypeControllerBase
 {

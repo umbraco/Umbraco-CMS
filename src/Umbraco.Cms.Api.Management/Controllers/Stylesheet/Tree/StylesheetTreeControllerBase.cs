@@ -29,11 +29,11 @@ public class StylesheetTreeControllerBase : FileSystemTreeControllerBase
     }
 
     // FileSystem is required therefore, we can't remove it without some wizadry. When obsoletion is due, remove this.
-/// <summary>
-/// Initializes a new instance of the <see cref="StylesheetTreeControllerBase"/> class with the specified stylesheet tree service and file systems.
-/// </summary>
-/// <param name="styleSheetTreeService">The service used to manage and retrieve stylesheet tree data.</param>
-/// <param name="fileSystems">The file systems abstraction used for file operations related to stylesheets.</param>
+    /// <summary>
+    /// Initializes a new instance of the <see cref="StylesheetTreeControllerBase"/> class with the specified stylesheet tree service and file systems.
+    /// </summary>
+    /// <param name="styleSheetTreeService">The service used to manage and retrieve stylesheet tree data.</param>
+    /// <param name="fileSystems">The file systems abstraction used for file operations related to stylesheets.</param>
     [Obsolete("Please use the constructor taking all parameters. Scheduled to be removed in Umbraco 19.")]
     public StylesheetTreeControllerBase(IStyleSheetTreeService styleSheetTreeService, FileSystems fileSystems)
         : base(styleSheetTreeService)

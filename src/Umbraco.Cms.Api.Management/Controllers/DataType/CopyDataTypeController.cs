@@ -22,11 +22,11 @@ public class CopyDataTypeController : DataTypeControllerBase
     private readonly IDataTypeService _dataTypeService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
-/// <summary>
-/// Initializes a new instance of the <see cref="CopyDataTypeController"/> class.
-/// </summary>
-/// <param name="dataTypeService">An instance of <see cref="IDataTypeService"/> used to manage data types.</param>
-/// <param name="backOfficeSecurityAccessor">An instance of <see cref="IBackOfficeSecurityAccessor"/> used to access back office security information.</param>
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CopyDataTypeController"/> class.
+    /// </summary>
+    /// <param name="dataTypeService">An instance of <see cref="IDataTypeService"/> used to manage data types.</param>
+    /// <param name="backOfficeSecurityAccessor">An instance of <see cref="IBackOfficeSecurityAccessor"/> used to access back office security information.</param>
     public CopyDataTypeController(IDataTypeService dataTypeService, IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
     {
         _dataTypeService = dataTypeService;

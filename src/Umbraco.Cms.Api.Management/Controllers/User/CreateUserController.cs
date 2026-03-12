@@ -13,9 +13,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.User;
 
-    /// <summary>
-    /// API controller responsible for handling operations related to the creation of users in the management interface.
-    /// </summary>
+/// <summary>
+/// API controller responsible for handling operations related to the creation of users in the management interface.
+/// </summary>
 [ApiVersion("1.0")]
 public class CreateUserController : UserControllerBase
 {

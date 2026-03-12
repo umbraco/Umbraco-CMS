@@ -26,12 +26,12 @@ public class CopyDocumentController : DocumentControllerBase
     private readonly IContentEditingService _contentEditingService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
-/// <summary>
-/// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Controllers.Document.CopyDocumentController"/> class, which handles document copy operations in the management API.
-/// </summary>
-/// <param name="authorizationService">Service used to authorize user actions.</param>
-/// <param name="contentEditingService">Service for editing and managing content.</param>
-/// <param name="backOfficeSecurityAccessor">Accessor for back office security context.</param>
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Controllers.Document.CopyDocumentController"/> class, which handles document copy operations in the management API.
+    /// </summary>
+    /// <param name="authorizationService">Service used to authorize user actions.</param>
+    /// <param name="contentEditingService">Service for editing and managing content.</param>
+    /// <param name="backOfficeSecurityAccessor">Accessor for back office security context.</param>
     public CopyDocumentController(
         IAuthorizationService authorizationService,
         IContentEditingService contentEditingService,

@@ -22,12 +22,12 @@ public class CreatePartialViewController : PartialViewControllerBase
     private readonly IUmbracoMapper _umbracoMapper;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
-/// <summary>
-/// Initializes a new instance of the <see cref="CreatePartialViewController"/> class with the specified services.
-/// </summary>
-/// <param name="partialViewService">The service used to manage partial views.</param>
-/// <param name="umbracoMapper">The mapper used for Umbraco model mapping.</param>
-/// <param name="backOfficeSecurityAccessor">Provides access to back office security information.</param>
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CreatePartialViewController"/> class with the specified services.
+    /// </summary>
+    /// <param name="partialViewService">The service used to manage partial views.</param>
+    /// <param name="umbracoMapper">The mapper used for Umbraco model mapping.</param>
+    /// <param name="backOfficeSecurityAccessor">Provides access to back office security information.</param>
     public CreatePartialViewController(
         IPartialViewService partialViewService,
         IUmbracoMapper umbracoMapper,

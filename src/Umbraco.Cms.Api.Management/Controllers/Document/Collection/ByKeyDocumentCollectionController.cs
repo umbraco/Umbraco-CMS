@@ -16,9 +16,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Document.Collection;
 
-    /// <summary>
-    /// Controller responsible for managing collections of documents identified by their unique key.
-    /// </summary>
+/// <summary>
+/// Controller responsible for managing collections of documents identified by their unique key.
+/// </summary>
 [ApiVersion("1.0")]
 public class ByKeyDocumentCollectionController : DocumentCollectionControllerBase
 {

@@ -9,9 +9,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Indexer;
 
-    /// <summary>
-    /// Controller responsible for managing operations related to all indexers in the system.
-    /// </summary>
+/// <summary>
+/// Controller responsible for managing operations related to all indexers in the system.
+/// </summary>
 [ApiVersion("1.0")]
 public class AllIndexerController : IndexerControllerBase
 {

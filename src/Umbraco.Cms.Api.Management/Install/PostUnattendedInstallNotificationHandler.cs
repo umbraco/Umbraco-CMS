@@ -13,9 +13,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Install;
 
-    /// <summary>
-    /// Handles notifications that are triggered after the completion of an unattended installation process.
-    /// </summary>
+/// <summary>
+/// Handles notifications that are triggered after the completion of an unattended installation process.
+/// </summary>
 public class PostUnattendedInstallNotificationHandler : INotificationAsyncHandler<UnattendedInstallNotification>
 {
     private readonly IServiceScopeFactory _serviceScopeFactory;
@@ -68,13 +68,13 @@ public class PostUnattendedInstallNotificationHandler : INotificationAsyncHandle
         _hmacSecretKeyService = hmacSecretKeyService;
     }
 
-/// <summary>
-/// Handles the <see cref="UnattendedInstallNotification"/> event, which is fired after a successful unattended install.
-/// This method creates the user and sets the telemetry level based on the 'Unattended' settings.
-/// </summary>
-/// <param name="notification">The notification containing information about the unattended install.</param>
-/// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
-/// <returns>A task that represents the asynchronous operation.</returns>
+    /// <summary>
+    /// Handles the <see cref="UnattendedInstallNotification"/> event, which is fired after a successful unattended install.
+    /// This method creates the user and sets the telemetry level based on the 'Unattended' settings.
+    /// </summary>
+    /// <param name="notification">The notification containing information about the unattended install.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
     public async Task HandleAsync(UnattendedInstallNotification notification, CancellationToken cancellationToken)
     {
         UnattendedSettings? unattendedSettings = _unattendedSettings.Value;

@@ -9,9 +9,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Webhook;
 
-    /// <summary>
-    /// Controller for managing webhooks by their unique key.
-    /// </summary>
+/// <summary>
+/// Controller for managing webhooks by their unique key.
+/// </summary>
 [ApiVersion("1.0")]
 public class ByKeyWebhookController : WebhookControllerBase
 {

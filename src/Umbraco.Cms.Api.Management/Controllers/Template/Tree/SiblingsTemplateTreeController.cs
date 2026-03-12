@@ -8,10 +8,10 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Template.Tree;
 
-    /// <summary>
-    /// API controller for retrieving and managing sibling templates within the template tree structure in Umbraco CMS.
-    /// Provides endpoints related to the organization and navigation of template siblings.
-    /// </summary>
+/// <summary>
+/// API controller for retrieving and managing sibling templates within the template tree structure in Umbraco CMS.
+/// Provides endpoints related to the organization and navigation of template siblings.
+/// </summary>
 public class SiblingsTemplateTreeController : TemplateTreeControllerBase
 {
     /// <summary>

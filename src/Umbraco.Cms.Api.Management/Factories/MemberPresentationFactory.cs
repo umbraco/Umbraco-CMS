@@ -24,15 +24,15 @@ internal sealed class MemberPresentationFactory : IMemberPresentationFactory
     private readonly DeliveryApiSettings _deliveryApiSettings;
     private IEnumerable<Guid>? _clientCredentialsMemberKeys;
 
-/// <summary>
-/// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Factories.MemberPresentationFactory"/> class.
-/// </summary>
-/// <param name="umbracoMapper">The mapper used for mapping objects within Umbraco.</param>
-/// <param name="memberService">Service for managing member entities.</param>
-/// <param name="memberTypeService">Service for managing member types.</param>
-/// <param name="twoFactorLoginService">Service for handling two-factor authentication for members.</param>
-/// <param name="memberGroupService">Service for managing member groups.</param>
-/// <param name="deliveryApiSettings">The configuration options for the Delivery API.</param>
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Factories.MemberPresentationFactory"/> class.
+    /// </summary>
+    /// <param name="umbracoMapper">The mapper used for mapping objects within Umbraco.</param>
+    /// <param name="memberService">Service for managing member entities.</param>
+    /// <param name="memberTypeService">Service for managing member types.</param>
+    /// <param name="twoFactorLoginService">Service for handling two-factor authentication for members.</param>
+    /// <param name="memberGroupService">Service for managing member groups.</param>
+    /// <param name="deliveryApiSettings">The configuration options for the Delivery API.</param>
     public MemberPresentationFactory(
         IUmbracoMapper umbracoMapper,
         IMemberService memberService,

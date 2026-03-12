@@ -10,9 +10,9 @@ using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Dictionary;
 
-    /// <summary>
-    /// API controller responsible for retrieving and managing all dictionary items within the Umbraco CMS.
-    /// </summary>
+/// <summary>
+/// API controller responsible for retrieving and managing all dictionary items within the Umbraco CMS.
+/// </summary>
 [ApiVersion("1.0")]
 public class AllDictionaryController : DictionaryControllerBase
 {

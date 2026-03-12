@@ -1,8 +1,8 @@
 namespace Umbraco.Cms.Api.Management.ViewModels.UserGroup.Permissions;
 
-    /// <summary>
-    /// Represents the presentation model for a user group permission of an unknown or unsupported type.
-    /// </summary>
+/// <summary>
+/// Represents the presentation model for a user group permission of an unknown or unsupported type.
+/// </summary>
 public class UnknownTypePermissionPresentationModel : IPermissionPresentationModel
 {
     /// <summary>

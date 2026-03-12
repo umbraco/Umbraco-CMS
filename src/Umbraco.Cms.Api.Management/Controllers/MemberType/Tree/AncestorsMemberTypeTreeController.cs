@@ -7,9 +7,9 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.MemberType.Tree;
 
-    /// <summary>
-    /// Controller responsible for handling operations related to the ancestor tree structure of member types in the management API.
-    /// </summary>
+/// <summary>
+/// Controller responsible for handling operations related to the ancestor tree structure of member types in the management API.
+/// </summary>
 [ApiVersion("1.0")]
 public class AncestorsMemberTypeTreeController : MemberTypeTreeControllerBase
 {

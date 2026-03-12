@@ -8,9 +8,9 @@ using Umbraco.Cms.Core.IO;
 
 namespace Umbraco.Cms.Api.Management.Controllers.PartialView.Tree;
 
-    /// <summary>
-    /// Controller responsible for retrieving and managing the ancestor hierarchy of partial views in the tree structure.
-    /// </summary>
+/// <summary>
+/// Controller responsible for retrieving and managing the ancestor hierarchy of partial views in the tree structure.
+/// </summary>
 [ApiVersion("1.0")]
 public class AncestorsPartialViewTreeController : PartialViewTreeControllerBase
 {

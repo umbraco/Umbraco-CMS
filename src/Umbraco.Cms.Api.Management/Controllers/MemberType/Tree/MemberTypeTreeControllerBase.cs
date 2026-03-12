@@ -14,10 +14,10 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.MemberType.Tree;
 
-    /// <summary>
-    /// Serves as the abstract base controller for handling API operations related to the member type tree structure in the management section.
-    /// Provides common functionality for derived controllers managing member type trees.
-    /// </summary>
+/// <summary>
+/// Serves as the abstract base controller for handling API operations related to the member type tree structure in the management section.
+/// Provides common functionality for derived controllers managing member type trees.
+/// </summary>
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Tree}/{Constants.UdiEntityType.MemberType}")]
 [ApiExplorerSettings(GroupName = "Member Type")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessMembersOrMemberTypes)]

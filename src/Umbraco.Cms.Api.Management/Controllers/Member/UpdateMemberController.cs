@@ -11,9 +11,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Member;
 
-    /// <summary>
-    /// API controller responsible for handling operations related to updating members.
-    /// </summary>
+/// <summary>
+/// API controller responsible for handling operations related to updating members.
+/// </summary>
 [ApiVersion("1.0")]
 public class UpdateMemberController : MemberControllerBase
 {

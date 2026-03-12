@@ -9,10 +9,10 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.PartialView.Tree;
 
-    /// <summary>
-    /// Serves as the base controller for managing partial view trees in the Umbraco CMS API.
-    /// Provides shared functionality for partial view tree operations.
-    /// </summary>
+/// <summary>
+/// Serves as the base controller for managing partial view trees in the Umbraco CMS API.
+/// Provides shared functionality for partial view tree operations.
+/// </summary>
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Tree}/{Constants.UdiEntityType.PartialView}")]
 [ApiExplorerSettings(GroupName = "Partial View")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessPartialViews)]

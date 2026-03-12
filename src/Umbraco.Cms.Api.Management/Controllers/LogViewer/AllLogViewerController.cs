@@ -13,9 +13,9 @@ using LogLevel = Umbraco.Cms.Core.Logging.LogLevel;
 
 namespace Umbraco.Cms.Api.Management.Controllers.LogViewer;
 
-    /// <summary>
-    /// Provides API endpoints for viewing and managing all log entries within the Umbraco CMS.
-    /// </summary>
+/// <summary>
+/// Provides API endpoints for viewing and managing all log entries within the Umbraco CMS.
+/// </summary>
 [ApiVersion("1.0")]
 public class AllLogViewerController : LogViewerControllerBase
 {

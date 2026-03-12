@@ -10,9 +10,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Install;
 
-    /// <summary>
-    /// Controller responsible for managing the setup and installation process of Umbraco CMS via the API.
-    /// </summary>
+/// <summary>
+/// Controller responsible for managing the setup and installation process of Umbraco CMS via the API.
+/// </summary>
 [ApiVersion("1.0")]
 public class SetupInstallController : InstallControllerBase
 {

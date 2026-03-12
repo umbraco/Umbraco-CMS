@@ -9,10 +9,10 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DocumentType;
 
-    /// <summary>
-    /// Serves as the base controller for API endpoints that manage document types in the Umbraco CMS.
-    /// Provides common functionality and contracts for derived document type controllers.
-    /// </summary>
+/// <summary>
+/// Serves as the base controller for API endpoints that manage document types in the Umbraco CMS.
+/// Provides common functionality and contracts for derived document type controllers.
+/// </summary>
 [VersionedApiBackOfficeRoute(Constants.UdiEntityType.DocumentType)]
 [ApiExplorerSettings(GroupName = "Document Type")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentsOrDocumentTypes)]

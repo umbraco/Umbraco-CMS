@@ -1,8 +1,8 @@
 namespace Umbraco.Cms.Api.Management.ViewModels.Security;
 
-    /// <summary>
-    /// Represents the response returned after verifying a password reset request.
-    /// </summary>
+/// <summary>
+/// Represents the response returned after verifying a password reset request.
+/// </summary>
 public class VerifyResetPasswordResponseModel
 {
     /// <summary>

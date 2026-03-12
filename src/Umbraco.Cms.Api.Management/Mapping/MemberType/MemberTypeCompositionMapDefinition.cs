@@ -4,9 +4,9 @@ using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Api.Management.Mapping.MemberType;
 
-    /// <summary>
-    /// Provides mapping configuration for composing member types within the Umbraco CMS management API.
-    /// </summary>
+/// <summary>
+/// Provides mapping configuration for composing member types within the Umbraco CMS management API.
+/// </summary>
 public class MemberTypeCompositionMapDefinition : IMapDefinition
 {
     /// <summary>

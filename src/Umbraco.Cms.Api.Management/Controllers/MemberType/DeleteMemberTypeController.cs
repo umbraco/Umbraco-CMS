@@ -19,11 +19,11 @@ public class DeleteMemberTypeController : MemberTypeControllerBase
     private readonly IMemberTypeService _memberTypeService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
-/// <summary>
-/// Initializes a new instance of the <see cref="DeleteMemberTypeController"/> class, which handles API requests for deleting member types.
-/// </summary>
-/// <param name="memberTypeService">Service used to manage member type operations.</param>
-/// <param name="backOfficeSecurityAccessor">Accessor for back office security context.</param>
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DeleteMemberTypeController"/> class, which handles API requests for deleting member types.
+    /// </summary>
+    /// <param name="memberTypeService">Service used to manage member type operations.</param>
+    /// <param name="backOfficeSecurityAccessor">Accessor for back office security context.</param>
     public DeleteMemberTypeController(IMemberTypeService memberTypeService, IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
     {
         _memberTypeService = memberTypeService;

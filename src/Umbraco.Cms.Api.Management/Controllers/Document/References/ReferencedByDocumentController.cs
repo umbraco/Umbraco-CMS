@@ -11,9 +11,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Document.References;
 
-    /// <summary>
-    /// Controller responsible for handling requests related to documents that reference a specified document.
-    /// </summary>
+/// <summary>
+/// Controller responsible for handling requests related to documents that reference a specified document.
+/// </summary>
 [ApiVersion("1.0")]
 public class ReferencedByDocumentController : DocumentControllerBase
 {
@@ -66,18 +66,18 @@ public class ReferencedByDocumentController : DocumentControllerBase
         return pagedViewModel;
     }
 
-/// <summary>
-///     Gets a paged list of tracked references for the specified document, so you can see where a document is being used.
-/// </summary>
-/// <remarks>
-///     Used by info tabs on content, media, etc., and for the delete and unpublish operations of single items.
-///     This essentially finds parent items in relations.
-/// </remarks>
-/// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
-/// <param name="id">The unique identifier of the document to retrieve references for.</param>
-/// <param name="skip">The number of items to skip when paginating results.</param>
-/// <param name="take">The maximum number of items to return in the paged result.</param>
-/// <returns>A task that represents the asynchronous operation. The result contains an <see cref="IActionResult"/> with a paged list of items referencing the specified document.</returns>
+    /// <summary>
+    ///     Gets a paged list of tracked references for the specified document, so you can see where a document is being used.
+    /// </summary>
+    /// <remarks>
+    ///     Used by info tabs on content, media, etc., and for the delete and unpublish operations of single items.
+    ///     This essentially finds parent items in relations.
+    /// </remarks>
+    /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
+    /// <param name="id">The unique identifier of the document to retrieve references for.</param>
+    /// <param name="skip">The number of items to skip when paginating results.</param>
+    /// <param name="take">The maximum number of items to return in the paged result.</param>
+    /// <returns>A task that represents the asynchronous operation. The result contains an <see cref="IActionResult"/> with a paged list of items referencing the specified document.</returns>
     [HttpGet("{id:guid}/referenced-by")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<IReferenceResponseModel>), StatusCodes.Status200OK)]

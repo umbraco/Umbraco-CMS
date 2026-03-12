@@ -10,10 +10,10 @@ using Umbraco.Cms.Core.IO;
 
 namespace Umbraco.Cms.Api.Management.Controllers.StaticFile.Tree;
 
-    /// <summary>
-    /// Serves as the base controller for handling operations related to static file trees in the Umbraco CMS Management API.
-    /// Provides common functionality for derived controllers managing static files.
-    /// </summary>
+/// <summary>
+/// Serves as the base controller for handling operations related to static file trees in the Umbraco CMS Management API.
+/// Provides common functionality for derived controllers managing static files.
+/// </summary>
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Tree}/static-file")]
 [ApiExplorerSettings(GroupName = "Static File")]
 public class StaticFileTreeControllerBase : FileSystemTreeControllerBase

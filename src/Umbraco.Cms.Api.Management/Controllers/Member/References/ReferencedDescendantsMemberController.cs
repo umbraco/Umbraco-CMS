@@ -62,18 +62,18 @@ public class ReferencedDescendantsMemberController : MemberControllerBase
         return pagedViewModel;
     }
 
-/// <summary>
-///     Retrieves a paginated list of descendant member nodes of the specified member that are referenced in any relation.
-/// </summary>
-/// <remarks>
-///     This method is typically used when deleting or unpublishing a member to determine if it has any descendant members that participate as children in any kind of relation.
-///     It identifies descendant members that are referenced in relations, helping to ensure referential integrity before performing destructive operations.
-/// </remarks>
-/// <param name="cancellationToken">The cancellation token to observe while waiting for the task to complete.</param>
-/// <param name="id">The unique identifier of the member whose referenced descendants are to be retrieved.</param>
-/// <param name="skip">The number of items to skip before starting to collect the result set.</param>
-/// <param name="take">The maximum number of items to return.</param>
-/// <returns>A paginated collection of referenced descendant members.</returns>
+    /// <summary>
+    ///     Retrieves a paginated list of descendant member nodes of the specified member that are referenced in any relation.
+    /// </summary>
+    /// <remarks>
+    ///     This method is typically used when deleting or unpublishing a member to determine if it has any descendant members that participate as children in any kind of relation.
+    ///     It identifies descendant members that are referenced in relations, helping to ensure referential integrity before performing destructive operations.
+    /// </remarks>
+    /// <param name="cancellationToken">The cancellation token to observe while waiting for the task to complete.</param>
+    /// <param name="id">The unique identifier of the member whose referenced descendants are to be retrieved.</param>
+    /// <param name="skip">The number of items to skip before starting to collect the result set.</param>
+    /// <param name="take">The maximum number of items to return.</param>
+    /// <returns>A paginated collection of referenced descendant members.</returns>
     [HttpGet("{id:guid}/referenced-descendants")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<ReferenceByIdModel>), StatusCodes.Status200OK)]

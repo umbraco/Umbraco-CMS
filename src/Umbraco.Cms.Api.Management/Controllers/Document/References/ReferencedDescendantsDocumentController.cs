@@ -62,18 +62,18 @@ public class ReferencedDescendantsDocumentController : DocumentControllerBase
         return pagedViewModel;
     }
 
-/// <summary>
-///     Gets a paged list of descendant nodes of the specified item that are involved in any kind of relation.
-/// </summary>
-/// <remarks>
-///     Used when deleting or unpublishing a single item to check if it has any descendant items that participate in any relation.
-///     This method identifies descendant items that are children in relations.
-/// </remarks>
-/// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
-/// <param name="id">The unique identifier of the item whose referenced descendants are being retrieved.</param>
-/// <param name="skip">The number of items to skip when paginating results.</param>
-/// <param name="take">The maximum number of items to return in the paginated result.</param>
-/// <returns>A task representing the asynchronous operation. The task result contains an <see cref="IActionResult"/> with a paged list of referenced descendant documents.</returns>
+    /// <summary>
+    ///     Gets a paged list of descendant nodes of the specified item that are involved in any kind of relation.
+    /// </summary>
+    /// <remarks>
+    ///     Used when deleting or unpublishing a single item to check if it has any descendant items that participate in any relation.
+    ///     This method identifies descendant items that are children in relations.
+    /// </remarks>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="id">The unique identifier of the item whose referenced descendants are being retrieved.</param>
+    /// <param name="skip">The number of items to skip when paginating results.</param>
+    /// <param name="take">The maximum number of items to return in the paginated result.</param>
+    /// <returns>A task representing the asynchronous operation. The task result contains an <see cref="IActionResult"/> with a paged list of referenced descendant documents.</returns>
     [HttpGet("{id:guid}/referenced-descendants")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<ReferenceByIdModel>), StatusCodes.Status200OK)]

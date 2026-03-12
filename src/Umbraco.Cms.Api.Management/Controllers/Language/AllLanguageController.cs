@@ -9,9 +9,9 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Language;
 
-    /// <summary>
-    /// API controller responsible for handling operations related to all languages within the management interface.
-    /// </summary>
+/// <summary>
+/// API controller responsible for handling operations related to all languages within the management interface.
+/// </summary>
 [ApiVersion("1.0")]
 public class AllLanguageController : LanguageControllerBase
 {

@@ -9,9 +9,9 @@ using Umbraco.Cms.Api.Management.Services.Flags;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DataType.Tree;
 
-    /// <summary>
-    /// API controller responsible for handling operations related to the root of the data type tree in Umbraco.
-    /// </summary>
+/// <summary>
+/// API controller responsible for handling operations related to the root of the data type tree in Umbraco.
+/// </summary>
 [ApiVersion("1.0")]
 public class RootDataTypeTreeController : DataTypeTreeControllerBase
 {

@@ -12,9 +12,9 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DocumentType;
 
-    /// <summary>
-    /// API controller responsible for handling the import of new document types in the Umbraco CMS.
-    /// </summary>
+/// <summary>
+/// API controller responsible for handling the import of new document types in the Umbraco CMS.
+/// </summary>
 [ApiVersion("1.0")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
 public class ImportNewDocumentTypeController : DocumentTypeControllerBase

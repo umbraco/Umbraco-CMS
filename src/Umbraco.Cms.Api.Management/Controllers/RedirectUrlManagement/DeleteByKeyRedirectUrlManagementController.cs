@@ -14,10 +14,10 @@ public class DeleteByKeyRedirectUrlManagementController : RedirectUrlManagementC
 {
     private readonly IRedirectUrlService _redirectUrlService;
 
-/// <summary>
-/// Initializes a new instance of the <see cref="DeleteByKeyRedirectUrlManagementController"/> class with the specified redirect URL service.
-/// </summary>
-/// <param name="redirectUrlService">An instance of <see cref="IRedirectUrlService"/> used to manage redirect URLs.</param>
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DeleteByKeyRedirectUrlManagementController"/> class with the specified redirect URL service.
+    /// </summary>
+    /// <param name="redirectUrlService">An instance of <see cref="IRedirectUrlService"/> used to manage redirect URLs.</param>
     public DeleteByKeyRedirectUrlManagementController(IRedirectUrlService redirectUrlService)
     {
         _redirectUrlService = redirectUrlService;

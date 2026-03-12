@@ -13,9 +13,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.User;
 
-    /// <summary>
-    /// API controller responsible for handling bulk deletion operations for users in the management section.
-    /// </summary>
+/// <summary>
+/// API controller responsible for handling bulk deletion operations for users in the management section.
+/// </summary>
 [ApiVersion("1.0")]
 public class BulkDeleteUserController : UserControllerBase
 {

@@ -8,9 +8,9 @@ using Umbraco.Cms.Api.Management.ViewModels.Document.RecycleBin;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Document.RecycleBin;
 
-    /// <summary>
-    /// Controller responsible for managing operations related to the child documents within the recycle bin.
-    /// </summary>
+/// <summary>
+/// Controller responsible for managing operations related to the child documents within the recycle bin.
+/// </summary>
 [ApiVersion("1.0")]
 public class ChildrenDocumentRecycleBinController : DocumentRecycleBinControllerBase
 {

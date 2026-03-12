@@ -8,9 +8,9 @@ using Umbraco.Cms.Core.Services.ContentTypeEditing;
 
 namespace Umbraco.Cms.Api.Management.Controllers.MediaType.Item;
 
-    /// <summary>
-    /// Provides API endpoints for managing media type items within folders.
-    /// </summary>
+/// <summary>
+/// Provides API endpoints for managing media type items within folders.
+/// </summary>
 [ApiVersion("1.0")]
 public class FolderMediaTypeItemController : MediaTypeItemControllerBase
 {

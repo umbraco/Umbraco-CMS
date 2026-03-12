@@ -8,9 +8,9 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Template.Tree;
 
-    /// <summary>
-    /// API controller responsible for retrieving and managing ancestor nodes in the template tree structure within the Umbraco CMS.
-    /// </summary>
+/// <summary>
+/// API controller responsible for retrieving and managing ancestor nodes in the template tree structure within the Umbraco CMS.
+/// </summary>
 [ApiVersion("1.0")]
 public class AncestorsTemplateTreeController : TemplateTreeControllerBase
 {
