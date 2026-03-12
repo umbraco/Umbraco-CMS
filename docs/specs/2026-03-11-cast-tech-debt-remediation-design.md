@@ -29,7 +29,7 @@
 
 ## 3. Violation Categories
 
-Fifteen CAST-aligned categories are measured across four groups. All are detectable via grep or file-level analysis — no external linters required.
+Seventeen CAST-aligned categories are measured across four groups. All are detectable via grep or file-level analysis — no external linters required.
 
 ### 3.1 Style & Readability
 
@@ -50,6 +50,7 @@ Fifteen CAST-aligned categories are measured across four groups. All are detecta
 | **Deep nesting** | Code indented > 4 levels | Deeply nested logic is hard to follow and test | C#, TypeScript |
 | **High cyclomatic complexity** | Methods with > 10 control-flow keywords (`if`, `else`, `switch`, `case`, `for`, `foreach`, `while`, `catch`) | High complexity correlates with defect density | C#, TypeScript |
 | **Copy-paste blocks** | 5+ consecutive identical lines appearing in 2+ files within the same module (detected via sliding-window hash comparison) | Duplicated logic means bug fixes must be applied in multiple places | C#, TypeScript |
+| **God classes** | A single class file exceeding 500 LOC | Signals a class handling too many responsibilities, making it hard to test, maintain, and extend | C#, TypeScript |
 
 ### 3.3 Error Handling
 
@@ -66,6 +67,7 @@ Fifteen CAST-aligned categories are measured across four groups. All are detecta
 | **`any` type usage** | Explicit `any` type annotation | Defeats TypeScript's type safety | TypeScript |
 | **Missing return types** | Exported functions without a return type annotation | Reduces API clarity and type inference reliability | TypeScript |
 | **Debug statements** | `console.log` or `console.error` in source files | Debug output left in production code | TypeScript |
+| **Missing semicolons** | Statements not terminated with `;` | Inconsistent style; relies on ASI which can cause subtle bugs in edge cases | TypeScript |
 
 ---
 
@@ -84,6 +86,7 @@ Weights per violation type:
 | Magic strings | 3 |
 | Catching generic Exception | 2 |
 | String concat in loops | 2 |
+| God classes | 2 |
 | Method length | 2 |
 | Too many parameters | 2 |
 | Deep nesting | 2 |
@@ -93,6 +96,7 @@ Weights per violation type:
 | Commented-out code | 1 |
 | Missing return types | 1 |
 | Debug statements | 1 |
+| Missing semicolons | 1 |
 
 Score is clamped to [0, 100]. Higher is better.
 
@@ -120,7 +124,7 @@ Structure:
 
 1. **Executive summary** — overall score, total violations by category, LOC scanned
 2. **By-language breakdown** — C# score, TypeScript score, violation tables
-3. **By-project table** — columns: Project, LOC, Score, and a violation count per category (15 columns total)
+3. **By-project table** — columns: Project, LOC, Score, and a violation count per category (17 columns total)
 4. **Top 10 worst files per language** — file path (relative), score, top violation category
 5. **Methodology note** — explains scoring formula and exclusions
 
@@ -150,11 +154,11 @@ Groups are ordered highest-weight violations first to maximize early score impro
 
 | Group | Violation Categories | Branch Name |
 |---|---|---|
-| 1 | High cyclomatic complexity, method length, deep nesting, too many parameters, copy-paste blocks | `v17/improvement/cast-structural-complexity` |
+| 1 | High cyclomatic complexity, method length, deep nesting, too many parameters, copy-paste blocks, God classes | `v17/improvement/cast-structural-complexity` |
 | 2 | Empty catch blocks, catching generic Exception, string concat in loops | `v17/improvement/cast-error-handling` |
 | 3 | Magic numbers, magic strings | `v17/improvement/cast-magic-values` |
 | 4 | Short identifiers, long lines, commented-out code | `v17/improvement/cast-style` |
-| 5 | TypeScript: `any` types, missing return types, debug statements | `v17/improvement/cast-typescript` |
+| 5 | TypeScript: `any` types, missing return types, debug statements, missing semicolons | `v17/improvement/cast-typescript` |
 
 The plan lists specific files and the changes needed in each, so execution is mechanical and reviewable.
 
@@ -189,7 +193,7 @@ Structure:
 - No external linters, CAST tooling, or CI integration required
 - No remediation of test files
 - No changes to generated code
-- No architectural refactoring — only the fifteen targeted violation categories
+- No architectural refactoring — only the seventeen targeted violation categories
 - No changes outside the chosen module
 
 ---
