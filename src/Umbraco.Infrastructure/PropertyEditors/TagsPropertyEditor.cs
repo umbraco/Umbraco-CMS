@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Nodes;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
@@ -22,7 +23,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     Constants.PropertyEditors.Aliases.Tags,
     ValueEditorIsReusable = true,
     ValueType = ValueTypes.Text)]
-public class TagsPropertyEditor : DataEditor
+public class TagsPropertyEditor : DataEditor, IValueSchemaProvider
 {
     private readonly ITagPropertyIndexValueFactory _tagPropertyIndexValueFactory;
     private readonly IIOHelper _ioHelper;
@@ -47,6 +48,21 @@ public class TagsPropertyEditor : DataEditor
     /// Gets the <see cref="IPropertyIndexValueFactory"/> used to index values for the tags property editor.
     /// </summary>
     public override IPropertyIndexValueFactory PropertyIndexValueFactory => _tagPropertyIndexValueFactory;
+
+    /// <inheritdoc />
+    public Type? GetValueType(object? configuration) => typeof(IEnumerable<string>);
+
+    /// <inheritdoc />
+    public JsonObject? GetValueSchema(object? configuration) => new()
+    {
+        ["$schema"] = "https://json-schema.org/draft/2020-12/schema",
+        ["type"] = new JsonArray("array", "null"),
+        ["items"] = new JsonObject
+        {
+            ["type"] = "string",
+        },
+        ["description"] = "Array of tag values",
+    };
 
 
     protected override IDataValueEditor CreateValueEditor() =>

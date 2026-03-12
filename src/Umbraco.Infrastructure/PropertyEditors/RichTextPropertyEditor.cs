@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Nodes;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Cache.PropertyEditors;
@@ -17,6 +18,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Infrastructure.Extensions;
+using Umbraco.Cms.Infrastructure.PropertyEditors;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
@@ -28,7 +30,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     Constants.PropertyEditors.Aliases.RichText,
     ValueType = ValueTypes.Text,
     ValueEditorIsReusable = true)]
-public class RichTextPropertyEditor : DataEditor
+public class RichTextPropertyEditor : DataEditor, IValueSchemaProvider
 {
     private readonly IIOHelper _ioHelper;
     private readonly IRichTextPropertyIndexValueFactory _richTextPropertyIndexValueFactory;
@@ -64,6 +66,75 @@ public class RichTextPropertyEditor : DataEditor
     /// Gets a value indicating whether this property editor supports configurable elements. Always returns <c>true</c> for the rich text property editor.
     /// </summary>
     public override bool SupportsConfigurableElements => true;
+
+    /// <inheritdoc />
+    public Type? GetValueType(object? configuration) => typeof(RichTextEditorValue);
+
+    /// <inheritdoc />
+    public JsonObject? GetValueSchema(object? configuration)
+    {
+        var config = configuration as RichTextConfiguration;
+
+        // Build schemas using helper
+        JsonObject layoutItemSchema = BlockJsonSchemaHelper.CreateBaseLayoutItemSchema();
+        JsonObject contentDataItemSchema = BlockJsonSchemaHelper.CreateContentDataSchema(config?.Blocks);
+        JsonObject settingsDataItemSchema = BlockJsonSchemaHelper.CreateSettingsDataSchema(config?.Blocks);
+        JsonObject exposeItemSchema = BlockJsonSchemaHelper.CreateExposeItemSchema();
+
+        // Build blocks schema
+        var blocksSchema = new JsonObject
+        {
+            ["type"] = new JsonArray("object", "null"),
+            ["properties"] = new JsonObject
+            {
+                ["layout"] = new JsonObject
+                {
+                    ["type"] = "object",
+                    ["properties"] = new JsonObject
+                    {
+                        [Constants.PropertyEditors.Aliases.RichText] = new JsonObject
+                        {
+                            ["type"] = "array",
+                            ["items"] = layoutItemSchema,
+                        },
+                    },
+                },
+                ["contentData"] = new JsonObject
+                {
+                    ["type"] = "array",
+                    ["items"] = contentDataItemSchema,
+                },
+                ["settingsData"] = new JsonObject
+                {
+                    ["type"] = "array",
+                    ["items"] = settingsDataItemSchema,
+                },
+                ["expose"] = new JsonObject
+                {
+                    ["type"] = "array",
+                    ["items"] = exposeItemSchema,
+                },
+            },
+        };
+
+        // Build main schema
+        return new JsonObject
+        {
+            ["$schema"] = "https://json-schema.org/draft/2020-12/schema",
+            ["type"] = new JsonArray("object", "null"),
+            ["properties"] = new JsonObject
+            {
+                ["markup"] = new JsonObject
+                {
+                    ["type"] = "string",
+                    ["description"] = "HTML markup content",
+                },
+                ["blocks"] = blocksSchema,
+            },
+            ["required"] = new JsonArray("markup"),
+            ["description"] = "Rich text editor value with HTML markup and optional blocks",
+        };
+    }
 
     /// <inheritdoc />
     public override bool CanMergePartialPropertyValues(IPropertyType propertyType) => propertyType.VariesByCulture() is false;

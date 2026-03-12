@@ -1,6 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System.Text.Json.Nodes;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors.Validators;
 using Umbraco.Cms.Core.Services;
@@ -13,7 +14,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 [DataEditor(
     Constants.PropertyEditors.Aliases.EmailAddress,
     ValueEditorIsReusable = true)]
-public class EmailAddressPropertyEditor : DataEditor
+public class EmailAddressPropertyEditor : DataEditor, IValueSchemaProvider
 {
     private readonly ILocalizedTextService _localizedTextService;
 
@@ -28,6 +29,18 @@ public class EmailAddressPropertyEditor : DataEditor
         SupportsReadOnly = true;
         _localizedTextService = localizedTextService;
     }
+
+    /// <inheritdoc />
+    public Type? GetValueType(object? configuration) => typeof(string);
+
+    /// <inheritdoc />
+    public JsonObject? GetValueSchema(object? configuration) => new()
+    {
+        ["$schema"] = "https://json-schema.org/draft/2020-12/schema",
+        ["type"] = new JsonArray("string", "null"),
+        ["format"] = "email",
+        ["description"] = "Email address",
+    };
 
     /// <inheritdoc/>
     protected override IDataValueEditor CreateValueEditor()
