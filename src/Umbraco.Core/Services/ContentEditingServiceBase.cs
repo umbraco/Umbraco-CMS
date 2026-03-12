@@ -265,7 +265,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
                 userKey,
                 ContentTrashStatusRequirement.MustNotBeTrashed,
                 MoveToRecycleBin,
-                ContentSettings.DisableUnpublishWhenReferenced,
+                ContentSettings.DisableDeleteWhenReferenced,
                 ContentEditingOperationStatus.CannotMoveToRecycleBinWhenReferenced);
 
     /// <summary>
