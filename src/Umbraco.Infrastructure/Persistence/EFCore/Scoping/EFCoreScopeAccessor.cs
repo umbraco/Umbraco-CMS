@@ -52,8 +52,8 @@ internal sealed class EFCoreScopeAccessor<TDbContext> : IEFCoreScopeAccessor<TDb
 
     /// <summary>
     /// Returns the existing ambient EF Core scope, or creates a bridge scope if an NPoco scope is active.
-    /// The bridge scope wraps an existing NPoco scope without owning it, this forces us to clean up the scope manually
-    /// here, since the bridge scope won't know if the NPoco scope was completed.
+    /// Bridge scopes are automatically cleaned up via the NPoco scope context's Enlist mechanism,
+    /// so no manual stale-scope detection is needed here.
     ///
     /// This is temporary and should be removed when all repositories are migrated to EF Core.
     /// </summary>
@@ -63,26 +63,14 @@ internal sealed class EFCoreScopeAccessor<TDbContext> : IEFCoreScopeAccessor<TDb
 
         if (scope is not null)
         {
-            if (scope is not EFCoreScope<TDbContext> { IsBridgeScope: true } bridgeScope)
-            {
-                return scope;
-            }
+            return scope;
+        }
 
-            // If the scope exists on the stack we validate if its the bridged scope.
-            IScope? currentScope = _ambientScopeStack.AmbientScope;
-            if (currentScope is not null && ReferenceEquals(currentScope, bridgeScope.BridgedScope))
-            {
-                return scope;
-            }
-
-            // Bridged scope might be stale because its NPoco scope was disposed, so we clean it up here.
-            bridgeScope.Complete();
-            bridgeScope.Dispose();
-
-            if (currentScope is null)
-            {
-                return null;
-            }
+        // If an EF Core scope context is still active but no scope exists,
+        // the scope was popped but the context hasn't been popped yet. So we dont create a bridge.
+        if (_efCoreScopeProvider.Value.AmbientScopeContext is not null)
+        {
+            return null;
         }
 
         // No EF Core scope on the stack. If an NPoco scope exists create a bridge scope

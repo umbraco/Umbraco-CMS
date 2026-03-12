@@ -188,6 +188,7 @@ internal class EFCoreScope<TDbContext> : CoreScope, IEfCoreScope<TDbContext>
             // Bridge scopes are the EF Core "child" of NPoco scopes so just pop from the EF Core stack
             // and clean up (happens in scope accessor). Don't check ambient scope, don't touch the inner NPoco scope.
             _efCoreScopeProvider.PopAmbientScope();
+            DisposeEfCoreDatabase();
             _disposed = true;
             return;
         }

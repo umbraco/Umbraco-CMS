@@ -245,6 +245,12 @@ internal sealed class EFCoreScopeProvider<TDbContext> : IEFCoreScopeProvider<TDb
         };
 
         _ambientEfCoreScopeStack.Push(bridgeScope);
+        bridgeScope.Complete();
+
+        _scopeProvider.Context!.Enlist(
+            bridgeScope.InstanceId.ToString(),
+            _ => bridgeScope.Dispose());
+
         return bridgeScope;
     }
 
