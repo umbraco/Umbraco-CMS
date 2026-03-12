@@ -1499,7 +1499,7 @@ export class UiBaseLocators extends BasePage {
 
   // Loader Methods
   async waitUntilUiLoaderIsNoLongerVisible() {
-    await this.waitForHidden(this.uiLoader, 10000);
+    await this.waitForHidden(this.uiLoader, ConstantHelper.timeout.navigation);
   }
 
   // Dashboard Methods
