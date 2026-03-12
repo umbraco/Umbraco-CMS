@@ -69,10 +69,7 @@ export class UmbCollectionActiveFiltersElement extends UmbLitElement {
 	}
 
 	#onClearAllFilters() {
-		if (!this._activeFilters) return;
-		for (const filter of this._activeFilters) {
-			this.#collectionContext?.filtering.removeFilter(filter.alias);
-		}
+		this.#collectionContext?.filtering.clearAllFilters();
 		this.#collectionContext?.loadCollection();
 	}
 

@@ -2,6 +2,7 @@ import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbExtensionsElementAndApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbArrayState, UmbBasicState } from '@umbraco-cms/backoffice/observable-api';
+import type { Observable } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export interface UmbCollectionActiveFilterModel {
@@ -45,7 +46,7 @@ export class UmbCollectionFilterManager extends UmbControllerBase {
 	 * @param filter.alias The manifest alias used as the unique identifier.
 	 * @param filter.value The filter value.
 	 */
-	public async setFilter(filter: UmbCollectionActiveFilterModel): Promise<void> {
+	public setFilter(filter: UmbCollectionActiveFilterModel): void {
 		if (this.#activeFilters.getHasOne(filter.alias)) {
 			this.#activeFilters.updateOne(filter.alias, filter);
 		} else {
@@ -54,11 +55,27 @@ export class UmbCollectionFilterManager extends UmbControllerBase {
 	}
 
 	/**
-	 * Remove an active filter by its manifest alias.
-	 * @param {string} alias The manifest alias of the filter to remove.
+	 * Observable for the active filter value by its manifest alias.
+	 * @param {string} alias The manifest alias of the filter to observe.
+	 * @returns {Observable<UmbCollectionActiveFilterModel | undefined>} The active filter model, or undefined if not active.
 	 */
-	public async removeFilter(alias: string): Promise<void> {
+	public filterValueByAlias(alias: string): Observable<UmbCollectionActiveFilterModel | undefined> {
+		return this.#activeFilters.asObservablePart((filters) => filters.find((f) => f.alias === alias));
+	}
+
+	/**
+	 * Clear an active filter by its manifest alias.
+	 * @param {string} alias The manifest alias of the filter to clear.
+	 */
+	public clearFilter(alias: string): void {
 		this.#activeFilters.remove([alias]);
+	}
+
+	/**
+	 * Clear all active filters.
+	 */
+	public clearAllFilters(): void {
+		this.#activeFilters.setValue([]);
 	}
 
 	/**
