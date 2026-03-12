@@ -4,14 +4,14 @@ import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import {
 	UMB_COLLECTION_CONTEXT,
-	type ManifestCollectionFilter,
-	type UmbCollectionFilterApi,
+	type ManifestCollectionFacetFilter,
+	type UmbCollectionFacetFilterApi,
 	type UmbSelectOption,
 } from '@umbraco-cms/backoffice/collection';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { fromCamelCase } from '@umbraco-cms/backoffice/utils';
 
-export class UmbExtensionCollectionFilterApi extends UmbControllerBase implements UmbCollectionFilterApi {
+export class UmbExtensionCollectionFilterApi extends UmbControllerBase implements UmbCollectionFacetFilterApi {
 	#value = new UmbArrayState<string>([], (x) => x);
 	public readonly value = this.#value.asObservable();
 
@@ -19,7 +19,7 @@ export class UmbExtensionCollectionFilterApi extends UmbControllerBase implement
 	public readonly options = this.#options.asObservable();
 
 	#collectionContext?: typeof UMB_COLLECTION_CONTEXT.TYPE;
-	public manifest?: ManifestCollectionFilter;
+	public manifest?: ManifestCollectionFacetFilter;
 
 	constructor(host: UmbControllerHost) {
 		super(host);

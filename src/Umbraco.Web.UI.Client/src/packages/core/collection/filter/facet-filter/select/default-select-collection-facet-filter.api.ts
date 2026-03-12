@@ -1,11 +1,11 @@
-import type { UmbCollectionFilterApi, UmbSelectOption } from '../collection-filter-api.interface.js';
+import type { UmbCollectionFacetFilterApi, UmbSelectOption } from '../collection-facet-filter-api.interface.js';
+import { UMB_COLLECTION_CONTEXT } from '../../../default/index.js';
+import type { ManifestCollectionFacetFilter } from '../collection-facet-filter.extension.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
-import { UMB_COLLECTION_CONTEXT } from '../../default/index.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { ManifestCollectionFilter } from '../collection-filter.extension.js';
 
-export class UmbDefaultSelectCollectionFilterApi extends UmbControllerBase implements UmbCollectionFilterApi {
+export class UmbDefaultSelectCollectionFacetFilterApi extends UmbControllerBase implements UmbCollectionFacetFilterApi {
 	#value = new UmbArrayState<string>([], (x) => x);
 	public readonly value = this.#value.asObservable();
 
@@ -14,7 +14,7 @@ export class UmbDefaultSelectCollectionFilterApi extends UmbControllerBase imple
 
 	#collectionContext?: typeof UMB_COLLECTION_CONTEXT.TYPE;
 
-	public manifest?: ManifestCollectionFilter;
+	public manifest?: ManifestCollectionFacetFilter;
 
 	constructor(host: UmbControllerHost) {
 		super(host);
@@ -43,4 +43,4 @@ export class UmbDefaultSelectCollectionFilterApi extends UmbControllerBase imple
 	}
 }
 
-export { UmbDefaultSelectCollectionFilterApi as api };
+export { UmbDefaultSelectCollectionFacetFilterApi as api };

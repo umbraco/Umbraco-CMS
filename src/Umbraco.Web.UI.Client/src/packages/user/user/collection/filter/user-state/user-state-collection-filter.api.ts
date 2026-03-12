@@ -2,15 +2,15 @@ import { UmbUserStateFilter } from '../../utils/index.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import {
 	UMB_COLLECTION_CONTEXT,
-	type ManifestCollectionFilter,
-	type UmbCollectionFilterApi,
+	type ManifestCollectionFacetFilter,
+	type UmbCollectionFacetFilterApi,
 	type UmbSelectOption,
 } from '@umbraco-cms/backoffice/collection';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbDatalistItemModel } from '@umbraco-cms/backoffice/datalist-data-source';
 
-export class UmbUserStateCollectionFilterApi extends UmbControllerBase implements UmbCollectionFilterApi {
+export class UmbUserStateCollectionFilterApi extends UmbControllerBase implements UmbCollectionFacetFilterApi {
 	#value = new UmbArrayState<string>([], (x) => x);
 	public readonly value = this.#value.asObservable();
 
@@ -22,7 +22,7 @@ export class UmbUserStateCollectionFilterApi extends UmbControllerBase implement
 
 	#collectionContext?: typeof UMB_COLLECTION_CONTEXT.TYPE;
 
-	public manifest?: ManifestCollectionFilter;
+	public manifest?: ManifestCollectionFacetFilter;
 
 	constructor(host: UmbControllerHost) {
 		super(host);

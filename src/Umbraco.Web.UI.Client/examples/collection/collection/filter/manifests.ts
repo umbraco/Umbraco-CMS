@@ -15,7 +15,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		],
 	},
 	{
-		type: 'collectionFilter',
+		type: 'collectionFacetFilter',
 		kind: 'select',
 		alias: 'Example.Collection.SelectFilter',
 		name: 'Example Collection Select Filter',
@@ -31,7 +31,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		],
 	},
 	{
-		type: 'collectionFilter',
+		type: 'collectionFacetFilter',
 		kind: 'multiSelect',
 		alias: 'Example.Collection.MultiSelectFilter',
 		name: 'Example Collection Multi Select Filter',

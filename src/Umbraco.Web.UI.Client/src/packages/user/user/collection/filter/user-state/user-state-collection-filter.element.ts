@@ -1,12 +1,12 @@
 import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { ManifestCollectionFilter, UmbSelectOption } from '@umbraco-cms/backoffice/collection';
+import type { ManifestCollectionFacetFilter, UmbSelectOption } from '@umbraco-cms/backoffice/collection';
 import { type UmbUserStateFilterType } from '../../utils';
 import type { UmbUserStateCollectionFilterApi } from './user-state-collection-filter.api';
 
 @customElement('umb-user-state-collection-filter')
 export class UmbUserStateCollectionFilterElement extends UmbLitElement {
-	public manifest?: ManifestCollectionFilter;
+	public manifest?: ManifestCollectionFacetFilter;
 
 	@state()
 	private _options: Array<UmbSelectOption> = [];

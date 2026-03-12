@@ -10,7 +10,7 @@ import type { UmbCollectionFilterModel } from '../collection-filter-model.interf
 import type { UmbCollectionRepository } from '../repository/collection-repository.interface.js';
 import type { ManifestCollection } from '../extensions/types.js';
 import { UmbCollectionBulkActionManager } from '../bulk-action/collection-bulk-action.manager.js';
-import { UmbCollectionFilterManager } from '../filter/collection-filter.manager.js';
+import { UmbCollectionFacetFilterManager } from '../filter/facet-filter/collection-facet-filter.manager.js';
 import { UmbCollectionSelectionManager } from '../selection/collection-selection.manager.js';
 import { UMB_COLLECTION_CONTEXT } from './collection-default.context-token.js';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -80,7 +80,7 @@ export class UmbDefaultCollectionContext<
 	public readonly selection = new UmbCollectionSelectionManager(this);
 	public readonly view = new UmbCollectionViewManager(this);
 	public readonly bulkAction = new UmbCollectionBulkActionManager(this);
-	public readonly filtering = new UmbCollectionFilterManager(this);
+	public readonly filtering = new UmbCollectionFacetFilterManager(this);
 
 	#defaultViewAlias: string;
 	#defaultFilter: Partial<FilterModelType>;

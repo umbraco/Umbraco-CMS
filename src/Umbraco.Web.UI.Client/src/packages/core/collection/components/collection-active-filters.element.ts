@@ -1,5 +1,5 @@
 import { UMB_COLLECTION_CONTEXT } from '../default/index.js';
-import type { UmbCollectionActiveFilterModel } from '../filter/collection-filter.manager.js';
+import type { UmbActiveCollectionFacetFilterModel } from '../filter/facet-filter/collection-facet-filter.manager.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -10,7 +10,7 @@ export class UmbCollectionActiveFiltersElement extends UmbLitElement {
 	#collectionContext?: typeof UMB_COLLECTION_CONTEXT.TYPE;
 
 	@state()
-	private _activeFilters?: Array<UmbCollectionActiveFilterModel> = [];
+	private _activeFilters?: Array<UmbActiveCollectionFacetFilterModel> = [];
 
 	#filterLabelsMap = new Map<string, string>();
 
@@ -26,7 +26,7 @@ export class UmbCollectionActiveFiltersElement extends UmbLitElement {
 
 				this.observe(
 					umbExtensionsRegistry.byTypeAndAliases(
-						'collectionFilter',
+						'collectionFacetFilter',
 						activeFilters.map((x) => x.alias),
 					),
 					(extensions) => {
@@ -62,7 +62,7 @@ export class UmbCollectionActiveFiltersElement extends UmbLitElement {
 		`;
 	}
 
-	#renderActiveFilterItem(activeFilter: UmbCollectionActiveFilterModel) {
+	#renderActiveFilterItem(activeFilter: UmbActiveCollectionFacetFilterModel) {
 		const label = this.#filterLabelsMap.get(activeFilter.alias) ?? activeFilter.alias;
 		const value = Array.isArray(activeFilter.value) ? activeFilter.value.join(', ') : activeFilter.value;
 		return html` <span class="active-filter-item"> <strong>${label}:</strong> ${value} </span> `;

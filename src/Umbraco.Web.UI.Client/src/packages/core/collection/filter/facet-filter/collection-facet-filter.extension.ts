@@ -1,18 +1,19 @@
 import type { ManifestElementAndApi, ManifestWithDynamicConditions } from '@umbraco-cms/backoffice/extension-api';
 
-export interface MetaCollectionFilter {
+export interface MetaCollectionFacetFilter {
 	label: string;
 	filterKey: string;
 }
-export interface ManifestCollectionFilter
+
+export interface ManifestCollectionFacetFilter
 	extends ManifestElementAndApi<any, any>,
 		ManifestWithDynamicConditions<UmbExtensionConditionConfig> {
-	type: 'collectionFilter';
-	meta: MetaCollectionFilter;
+	type: 'collectionFacetFilter';
+	meta: MetaCollectionFacetFilter;
 }
 
 declare global {
 	interface UmbExtensionManifestMap {
-		umbCollectionFilter: ManifestCollectionFilter;
+		umbCollectionFacetFilter: ManifestCollectionFacetFilter;
 	}
 }

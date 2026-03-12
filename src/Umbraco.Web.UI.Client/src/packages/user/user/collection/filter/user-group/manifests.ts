@@ -3,8 +3,8 @@ import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collecti
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
-		type: 'collectionFilter',
-		alias: 'Umb.CollectionFilter.UserGroup',
+		type: 'collectionFacetFilter',
+		alias: 'Umb.CollectionFacetFilter.UserGroup',
 		name: 'User Group Collection Filter',
 		weight: 100,
 		element: () => import('./user-group-collection-filter.element.js'),

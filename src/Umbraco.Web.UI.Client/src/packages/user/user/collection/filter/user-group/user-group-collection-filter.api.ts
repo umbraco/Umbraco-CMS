@@ -2,8 +2,8 @@ import { UmbUserGroupDatalistDataSource } from './user-group-datalist-data-sourc
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import {
 	UMB_COLLECTION_CONTEXT,
-	type ManifestCollectionFilter,
-	type UmbCollectionFilterApi,
+	type ManifestCollectionFacetFilter,
+	type UmbCollectionFacetFilterApi,
 	type UmbSelectOption,
 } from '@umbraco-cms/backoffice/collection';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
@@ -13,7 +13,7 @@ import type { UmbDatalistItemModel } from '@umbraco-cms/backoffice/datalist-data
 
 const ObserveValueItems = Symbol();
 
-export class UmbUserGroupCollectionFilterApi extends UmbControllerBase implements UmbCollectionFilterApi {
+export class UmbUserGroupCollectionFilterApi extends UmbControllerBase implements UmbCollectionFacetFilterApi {
 	#options = new UmbArrayState<UmbSelectOption>([], (x) => x);
 	public readonly options = this.#options.asObservable();
 
@@ -27,7 +27,7 @@ export class UmbUserGroupCollectionFilterApi extends UmbControllerBase implement
 	#datalistDataSource = new UmbUserGroupDatalistDataSource(this);
 	public readonly pagination = new UmbPaginationManager();
 
-	public manifest?: ManifestCollectionFilter;
+	public manifest?: ManifestCollectionFacetFilter;
 
 	constructor(host: UmbControllerHost) {
 		super(host);

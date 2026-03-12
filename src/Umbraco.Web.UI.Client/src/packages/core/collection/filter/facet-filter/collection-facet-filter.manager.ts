@@ -5,16 +5,16 @@ import { UmbArrayState, UmbBasicState } from '@umbraco-cms/backoffice/observable
 import type { Observable } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-export interface UmbCollectionActiveFilterModel {
+export interface UmbActiveCollectionFacetFilterModel {
 	alias: string;
 	value: any;
 }
 
-export class UmbCollectionFilterManager extends UmbControllerBase {
+export class UmbCollectionFacetFilterManager extends UmbControllerBase {
 	#availableFilters = new UmbBasicState<any>([]);
 	public readonly availableFilters = this.#availableFilters.asObservable();
 
-	#activeFilters = new UmbArrayState<UmbCollectionActiveFilterModel>([], (x) => x.alias);
+	#activeFilters = new UmbArrayState<UmbActiveCollectionFacetFilterModel>([], (x) => x.alias);
 	public readonly activeFilters = this.#activeFilters.asObservable();
 	public readonly totalActiveFilters = this.#activeFilters.asObservablePart((filters) => filters.length);
 
@@ -24,7 +24,7 @@ export class UmbCollectionFilterManager extends UmbControllerBase {
 		new UmbExtensionsElementAndApiInitializer(
 			this,
 			umbExtensionsRegistry,
-			'collectionFilter',
+			'collectionFacetFilter',
 			(manifest) => [{ meta: manifest.meta }],
 			undefined,
 			(filters) => {
@@ -42,11 +42,11 @@ export class UmbCollectionFilterManager extends UmbControllerBase {
 
 	/**
 	 * Apply a filter value. Tracks the filter as active using the manifest alias as identifier.
-	 * @param {UmbCollectionActiveFilterModel} filter
+	 * @param {UmbActiveCollectionFacetFilterModel} filter
 	 * @param filter.alias The manifest alias used as the unique identifier.
 	 * @param filter.value The filter value.
 	 */
-	public setFilter(filter: UmbCollectionActiveFilterModel): void {
+	public setFilter(filter: UmbActiveCollectionFacetFilterModel): void {
 		if (this.#activeFilters.getHasOne(filter.alias)) {
 			this.#activeFilters.updateOne(filter.alias, filter);
 		} else {
@@ -57,9 +57,9 @@ export class UmbCollectionFilterManager extends UmbControllerBase {
 	/**
 	 * Observable for the active filter value by its manifest alias.
 	 * @param {string} alias The manifest alias of the filter to observe.
-	 * @returns {Observable<UmbCollectionActiveFilterModel | undefined>} The active filter model, or undefined if not active.
+	 * @returns {Observable<UmbActiveCollectionFacetFilterModel | undefined>} The active filter model, or undefined if not active.
 	 */
-	public filterValueByAlias(alias: string): Observable<UmbCollectionActiveFilterModel | undefined> {
+	public filterValueByAlias(alias: string): Observable<UmbActiveCollectionFacetFilterModel | undefined> {
 		return this.#activeFilters.asObservablePart((filters) => filters.find((f) => f.alias === alias));
 	}
 

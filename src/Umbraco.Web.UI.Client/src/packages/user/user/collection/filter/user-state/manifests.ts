@@ -3,8 +3,8 @@ import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collecti
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
-		type: 'collectionFilter',
-		alias: 'Umb.CollectionFilter.UserState',
+		type: 'collectionFacetFilter',
+		alias: 'Umb.CollectionFacetFilter.UserState',
 		name: 'User State Collection Filter',
 		weight: 200,
 		element: () => import('./user-state-collection-filter.element.js'),

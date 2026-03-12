@@ -3,12 +3,12 @@ import { css, customElement, html, ifDefined, nothing, repeat, state } from '@um
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
-import type { ManifestCollectionFilter, UmbSelectOption } from '@umbraco-cms/backoffice/collection';
+import type { ManifestCollectionFacetFilter, UmbSelectOption } from '@umbraco-cms/backoffice/collection';
 import type { UmbDatalistItemModel } from '@umbraco-cms/backoffice/datalist-data-source';
 
 @customElement('umb-user-group-collection-filter')
 export class UmbUserGroupCollectionFilterElement extends UmbLitElement {
-	public manifest?: ManifestCollectionFilter;
+	public manifest?: ManifestCollectionFacetFilter;
 
 	@state()
 	private _options: Array<UmbSelectOption> = [];

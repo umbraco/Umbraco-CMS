@@ -1,16 +1,16 @@
-import type { UmbCollectionFilterApi } from '../collection-filter-api.interface.js';
+import type { UmbCollectionFacetFilterApi } from '../collection-facet-filter-api.interface.js';
+import type { ManifestCollectionFacetFilter } from '../collection-facet-filter.extension.js';
 import { css, customElement, html, repeat, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { ManifestCollectionFilter } from '../collection-filter.extension.js';
 
-@customElement('umb-default-select-collection-filter')
-export class UmbDefaultSelectCollectionFilterElement extends UmbLitElement {
-	#api?: UmbCollectionFilterApi;
+@customElement('umb-default-select-collection-facet-filter')
+export class UmbDefaultSelectCollectionFacetFilterElement extends UmbLitElement {
+	#api?: UmbCollectionFacetFilterApi;
 
-	public get api(): UmbCollectionFilterApi | undefined {
+	public get api(): UmbCollectionFacetFilterApi | undefined {
 		return this.#api;
 	}
-	public set api(value: UmbCollectionFilterApi | undefined) {
+	public set api(value: UmbCollectionFacetFilterApi | undefined) {
 		this.#api = value;
 		this.observe(
 			this.#api?.value,
@@ -22,7 +22,7 @@ export class UmbDefaultSelectCollectionFilterElement extends UmbLitElement {
 	}
 
 	@property({ attribute: false })
-	public manifest?: ManifestCollectionFilter;
+	public manifest?: ManifestCollectionFacetFilter;
 
 	@state()
 	private _options = [
@@ -80,10 +80,10 @@ export class UmbDefaultSelectCollectionFilterElement extends UmbLitElement {
 	];
 }
 
-export { UmbDefaultSelectCollectionFilterElement as element };
+export { UmbDefaultSelectCollectionFacetFilterElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-default-select-collection-filter': UmbDefaultSelectCollectionFilterElement;
+		'umb-default-select-collection-facet-filter': UmbDefaultSelectCollectionFacetFilterElement;
 	}
 }
