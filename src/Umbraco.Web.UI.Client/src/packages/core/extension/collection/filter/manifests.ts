@@ -1,5 +1,5 @@
-import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
 import { UmbExtensionCollectionDatalistDataSource } from './extension-collection-datalist-data-source.js';
+import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{

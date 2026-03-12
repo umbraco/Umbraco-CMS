@@ -1,19 +1,16 @@
-import type { UmbCollectionFacetFilterApi, UmbSelectOption } from '../collection-facet-filter-api.interface.js';
-import { UMB_COLLECTION_CONTEXT } from '../../../default/collection-default.context-token.js';
+import { UMB_COLLECTION_CONTEXT } from '../../../default/index.js';
 import type { ManifestCollectionFacetFilter } from '../collection-facet-filter.extension.js';
+import type { UmbSelectOption, MetaCollectionFacetFilterSelect } from './types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbDatalistDataSource, UmbDatalistItemModel } from '@umbraco-cms/backoffice/datalist-data-source';
-import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
 
 const ObserveValueItems = Symbol();
 
-export class UmbDefaultMultiSelectCollectionFacetFilterApi
-	extends UmbControllerBase
-	implements UmbCollectionFacetFilterApi
-{
-	#options = new UmbArrayState<UmbSelectOption>([], (x) => x);
+export class UmbSelectCollectionFacetFilterApi extends UmbControllerBase {
+	#options = new UmbArrayState<UmbSelectOption>([], (x) => x.value);
 	public readonly options = this.#options.asObservable();
 
 	#value = new UmbArrayState<string>([], (x) => x);
@@ -26,15 +23,15 @@ export class UmbDefaultMultiSelectCollectionFacetFilterApi
 	#datalistDataSource?: UmbDatalistDataSource;
 	public readonly pagination = new UmbPaginationManager();
 
-	private _manifest?: ManifestCollectionFacetFilter | undefined;
+	#manifest?: ManifestCollectionFacetFilter | undefined;
 	public get manifest(): ManifestCollectionFacetFilter | undefined {
-		return this._manifest;
+		return this.#manifest;
 	}
 	public set manifest(manifest: ManifestCollectionFacetFilter | undefined) {
-		this._manifest = manifest;
-
-		if (manifest) {
-			this.#datalistDataSource = new manifest.meta.datalistDataSource(this);
+		this.#manifest = manifest;
+		const meta = manifest?.meta as MetaCollectionFacetFilterSelect | undefined;
+		if (meta?.datalistDataSource) {
+			this.#datalistDataSource = new meta.datalistDataSource(this);
 		}
 	}
 
@@ -49,7 +46,7 @@ export class UmbDefaultMultiSelectCollectionFacetFilterApi
 	}
 
 	#observeFilterValue() {
-		const alias = this.manifest?.alias;
+		const alias = this.#manifest?.alias;
 		if (!alias) return;
 		this.observe(
 			this.#collectionContext?.filtering.filterValueByAlias(alias),
@@ -75,13 +72,14 @@ export class UmbDefaultMultiSelectCollectionFacetFilterApi
 	}
 
 	public setValue(values: Array<string>) {
-		const alias = this.manifest?.alias;
+		const filtered = values.filter((v) => v !== '');
+		const alias = this.#manifest?.alias;
 		if (!alias) return;
 
-		if (values.length === 0) {
+		if (filtered.length === 0) {
 			this.#collectionContext?.filtering.clearFilter(alias);
 		} else {
-			this.#collectionContext?.filtering.setFilter({ alias, value: values });
+			this.#collectionContext?.filtering.setFilter({ alias, value: filtered });
 		}
 
 		this.#collectionContext?.loadCollection();
@@ -109,7 +107,7 @@ export class UmbDefaultMultiSelectCollectionFacetFilterApi
 		});
 
 		if (data) {
-			const newOptions = data.items.map((item: any) => ({
+			const newOptions = data.items.map((item) => ({
 				label: item.name ?? '',
 				value: item.unique,
 			}));
@@ -127,4 +125,4 @@ export class UmbDefaultMultiSelectCollectionFacetFilterApi
 	}
 }
 
-export { UmbDefaultMultiSelectCollectionFacetFilterApi as api };
+export { UmbSelectCollectionFacetFilterApi as api };

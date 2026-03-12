@@ -5,13 +5,14 @@ import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collecti
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'collectionFacetFilter',
-		kind: 'multiSelect',
+		kind: 'select',
 		alias: 'Umb.CollectionFacetFilter.UserState',
 		name: 'User State Collection Filter',
 		weight: 200,
 		meta: {
 			label: 'Status',
 			filterKey: 'userStates',
+			multiple: true,
 			datalistDataSource: UmbUserStateDatalistDataSource,
 		},
 		conditions: [

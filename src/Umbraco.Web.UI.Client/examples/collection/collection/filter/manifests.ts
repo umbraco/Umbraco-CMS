@@ -32,9 +32,14 @@ export const manifests: Array<UmbExtensionManifest> = [
 	},
 	{
 		type: 'collectionFacetFilter',
-		kind: 'multiSelect',
+		kind: 'select',
 		alias: 'Example.Collection.MultiSelectFilter',
 		name: 'Example Collection Multi Select Filter',
+		meta: {
+			label: 'Tags',
+			filterKey: 'tags',
+			multiple: true,
+		},
 		conditions: [
 			{
 				alias: UMB_COLLECTION_ALIAS_CONDITION,

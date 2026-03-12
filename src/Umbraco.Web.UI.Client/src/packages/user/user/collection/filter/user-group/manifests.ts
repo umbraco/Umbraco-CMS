@@ -5,13 +5,14 @@ import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collecti
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'collectionFacetFilter',
-		kind: 'multiSelect',
+		kind: 'select',
 		alias: 'Umb.CollectionFacetFilter.UserGroup',
 		name: 'User Group Collection Filter',
 		weight: 100,
 		meta: {
 			label: 'Groups',
 			filterKey: 'userGroupIds',
+			multiple: true,
 			datalistDataSource: UmbUserGroupDatalistDataSource,
 		},
 		conditions: [

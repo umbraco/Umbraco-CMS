@@ -9,8 +9,8 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 		manifest: {
 			type: 'collectionFacetFilter',
 			kind: 'select',
-			element: () => import('./default-select-collection-facet-filter.element.js'),
-			api: () => import('./default-select-collection-facet-filter.api.js'),
+			element: () => import('./select-collection-facet-filter.element.js'),
+			api: () => import('./select-collection-facet-filter.api.js'),
 		},
 	},
 ];
