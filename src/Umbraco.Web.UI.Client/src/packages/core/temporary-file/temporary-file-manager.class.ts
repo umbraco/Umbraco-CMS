@@ -135,9 +135,12 @@ export class UmbTemporaryFileManager<
 			]),
 		).asPromise();
 
+		const allowedLower = allowedExtensions?.map((x) => x.toLowerCase());
+		const disallowedLower = disallowedExtensions?.map((x) => x.toLowerCase());
+
 		if (
-			(allowedExtensions?.length && !allowedExtensions.includes(fileExtension)) ||
-			(disallowedExtensions?.length && disallowedExtensions.includes(fileExtension))
+			(allowedLower?.length && !allowedLower.includes(fileExtension)) ||
+			(disallowedLower?.length && disallowedLower.includes(fileExtension))
 		) {
 			this.#notificationContext?.peek('warning', {
 				data: {
