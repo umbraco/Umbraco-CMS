@@ -11,7 +11,7 @@ public class UnknownTypePermissionPresentationModel : IPermissionPresentationMod
     public required ISet<string> Verbs { get; set; }
 
     /// <summary>
-    /// The context in which the unknown type permission applies.
+    /// Gets or sets the context in which the unknown type permission applies.
     /// </summary>
     public required string Context { get; set; }
 }

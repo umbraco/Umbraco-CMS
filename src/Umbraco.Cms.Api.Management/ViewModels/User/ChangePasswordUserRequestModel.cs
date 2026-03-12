@@ -6,7 +6,7 @@ namespace Umbraco.Cms.Api.Management.ViewModels.User;
 public class ChangePasswordUserRequestModel
 {
     /// <summary>
-    /// The new password.
+    /// Gets or sets the new password.
     /// </summary>
     public required string NewPassword { get; set; }
 }
