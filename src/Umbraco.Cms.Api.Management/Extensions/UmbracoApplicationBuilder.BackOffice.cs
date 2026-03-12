@@ -14,8 +14,8 @@ public static partial class UmbracoApplicationBuilderExtensions
     /// <summary>
     ///     Adds all required middleware to run the back office
     /// </summary>
-    /// <param name="builder"></param>
-    /// <returns></returns>
+    /// <param name="builder">The Umbraco application builder context.</param>
+    /// <returns>The builder for chaining.</returns>
     public static IUmbracoApplicationBuilderContext UseBackOffice(this IUmbracoApplicationBuilderContext builder)
     {
         builder.AppBuilder.UseMiddleware<BackOfficeExternalLoginProviderErrorMiddleware>();

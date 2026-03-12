@@ -33,6 +33,18 @@ internal sealed class DataTypeRepository : EntityRepositoryBase<int, IDataType>,
     private readonly IDataValueEditorFactory _dataValueEditorFactory;
     private readonly DataTypeByGuidReadRepository _dataTypeByGuidReadRepository;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DataTypeRepository"/> class.
+    /// </summary>
+    /// <param name="scopeAccessor">Provides access to the current database scope for repository operations.</param>
+    /// <param name="cache">The application-level caches used for storing and retrieving cached data.</param>
+    /// <param name="editors">A collection of property editors available for data types.</param>
+    /// <param name="logger">The logger instance used for logging repository events.</param>
+    /// <param name="loggerFactory">The factory for creating logger instances.</param>
+    /// <param name="serializer">Serializes and deserializes configuration editor JSON data.</param>
+    /// <param name="repositoryCacheVersionService">Service for managing repository cache versioning.</param>
+    /// <param name="cacheSyncService">Service for synchronizing cache across distributed environments.</param>
+    /// <param name="dataValueEditorFactory">Factory for creating data value editors for property editors.</param>
     public DataTypeRepository(
         IScopeAccessor scopeAccessor,
         AppCaches cache,
@@ -66,12 +78,26 @@ internal sealed class DataTypeRepository : EntityRepositoryBase<int, IDataType>,
 
     private Guid NodeObjectTypeId => Constants.ObjectTypes.DataType;
 
+    /// <summary>
+    /// Gets the data type with the specified key.
+    /// </summary>
+    /// <param name="key">The unique identifier of the data type.</param>
+    /// <returns>The data type if found; otherwise, null.</returns>
     public IDataType? Get(Guid key) => _dataTypeByGuidReadRepository.Get(key);
 
     IEnumerable<IDataType> IReadRepository<Guid, IDataType>.GetMany(params Guid[]? keys) => _dataTypeByGuidReadRepository.GetMany(keys);
 
+    /// <summary>
+    /// Determines whether a data type with the specified unique identifier exists.
+    /// </summary>
+    /// <param name="id">The unique identifier of the data type.</param>
+    /// <returns>True if the data type exists; otherwise, false.</returns>
     public bool Exists(Guid id) => _dataTypeByGuidReadRepository.Exists(id);
 
+    /// <summary>
+    /// Saves the specified data type entity and updates the GUID cache to optimize subsequent lookups.
+    /// </summary>
+    /// <param name="entity">The data type entity to save.</param>
     public override void Save(IDataType entity)
     {
         base.Save(entity);
@@ -80,6 +106,10 @@ internal sealed class DataTypeRepository : EntityRepositoryBase<int, IDataType>,
         _dataTypeByGuidReadRepository.PopulateCacheByKey(entity);
     }
 
+    /// <summary>
+    /// Deletes the specified data type entity and clears the related GUID cache to prevent stale data on subsequent lookups.
+    /// </summary>
+    /// <param name="entity">The data type entity to delete.</param>
     public override void Delete(IDataType entity)
     {
         base.Delete(entity);
@@ -88,6 +118,14 @@ internal sealed class DataTypeRepository : EntityRepositoryBase<int, IDataType>,
         _dataTypeByGuidReadRepository.ClearCacheByKey(entity.Key);
     }
 
+    /// <summary>
+    /// Moves the specified data type to a new container, updating its parent and path, as well as those of all its descendants.
+    /// </summary>
+    /// <param name="toMove">The data type to move.</param>
+    /// <param name="container">The target container to move the data type into, or <c>null</c> to move to the root.</param>
+    /// <returns>
+    /// An enumerable of <see cref="MoveEventInfo{IDataType}"/> objects representing the moved data type and all its descendants, including their original and new paths.
+    /// </returns>
     public IEnumerable<MoveEventInfo<IDataType>> Move(IDataType toMove, EntityContainer? container)
     {
         var parentId = -1;
@@ -142,6 +180,14 @@ internal sealed class DataTypeRepository : EntityRepositoryBase<int, IDataType>,
         return moveInfo;
     }
 
+    /// <summary>
+    /// Finds all usages of the data type with the specified ID across content types.
+    /// </summary>
+    /// <param name="id">The ID of the data type to search for.</param>
+    /// <returns>
+    /// A read-only dictionary where each key is a <see cref="Udi"/> representing a content type,
+    /// and each value is a collection of property type aliases within that content type that use the specified data type.
+    /// </returns>
     public IReadOnlyDictionary<Udi, IEnumerable<string>> FindUsages(int id)
     {
         if (id == default)
@@ -168,6 +214,15 @@ internal sealed class DataTypeRepository : EntityRepositoryBase<int, IDataType>,
             x => (IEnumerable<string>)x.PropertyTypes.Select(p => p.Alias).ToList());
     }
 
+    /// <summary>
+    /// Finds all usages of a ListView data type by its identifier.
+    /// </summary>
+    /// <param name="id">The identifier of the ListView data type to search for.</param>
+    /// <returns>
+    /// A read-only dictionary mapping the <see cref="Udi"/> of each content type that uses the specified ListView data type
+    /// to a collection of usage names (typically the ListView aliases or names).
+    /// If no usages are found, returns an empty dictionary.
+    /// </returns>
     public IReadOnlyDictionary<Udi, IEnumerable<string>> FindListViewUsages(int id)
     {
         var usages = new Dictionary<Udi, IEnumerable<string>>();
@@ -236,6 +291,9 @@ internal sealed class DataTypeRepository : EntityRepositoryBase<int, IDataType>,
     [TableName(Constants.DatabaseSchema.Tables.ContentType)]
     private sealed class ContentTypeReferenceDto : ContentTypeDto
     {
+        /// <summary>
+        /// Gets the collection of property type references that belong to this content type reference.
+        /// </summary>
         [ResultColumn]
         [Reference(ReferenceType.Many)]
         public List<PropertyTypeReferenceDto> PropertyTypes { get; } = null!;
@@ -244,9 +302,15 @@ internal sealed class DataTypeRepository : EntityRepositoryBase<int, IDataType>,
     [TableName(Constants.DatabaseSchema.Tables.PropertyType)]
     private sealed class PropertyTypeReferenceDto
     {
+        /// <summary>
+        /// Gets or sets the alias of the property type reference.
+        /// </summary>
         [Column("ptAlias")]
         public string? Alias { get; set; }
 
+        /// <summary>
+        /// Gets or sets the name associated with the property type reference.
+        /// </summary>
         [Column("ptName")]
         public string? Name { get; set; }
     }
@@ -508,6 +572,15 @@ internal sealed class DataTypeRepository : EntityRepositoryBase<int, IDataType>,
     {
         private readonly DataTypeRepository _outerRepo;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DataTypeByGuidReadRepository"/> class.
+        /// </summary>
+        /// <param name="outerRepo">The parent <see cref="DataTypeRepository"/> instance used for data type operations.</param>
+        /// <param name="scopeAccessor">Provides access to the current database scope.</param>
+        /// <param name="cache">The application-level caches for storing and retrieving data.</param>
+        /// <param name="logger">The logger used for logging repository operations.</param>
+        /// <param name="repositoryCacheVersionService">Service for managing repository cache versions.</param>
+        /// <param name="cacheSyncService">Service for synchronizing cache across distributed environments.</param>
         public DataTypeByGuidReadRepository(
             DataTypeRepository outerRepo,
             IScopeAccessor scopeAccessor,
@@ -603,9 +676,10 @@ internal sealed class DataTypeRepository : EntityRepositoryBase<int, IDataType>,
             throw new InvalidOperationException("This method won't be implemented.");
 
         /// <summary>
-        /// Populates the GUID-keyed cache with the given entity.
-        /// This allows entities retrieved by int ID to also be cached for GUID lookups.
+        /// Adds the specified data type entity to the cache using its GUID as the key.
+        /// This ensures that entities retrieved by integer ID are also available for GUID-based lookups.
         /// </summary>
+        /// <param name="entity">The data type entity to cache by its GUID key.</param>
         public void PopulateCacheByKey(IDataType entity)
         {
             if (entity.HasIdentity)
@@ -616,9 +690,10 @@ internal sealed class DataTypeRepository : EntityRepositoryBase<int, IDataType>,
         }
 
         /// <summary>
-        /// Populates the GUID-keyed cache with the given entities.
-        /// This allows entities retrieved by int ID to also be cached for GUID lookups.
+        /// Populates the GUID-keyed cache with the specified collection of entities.
+        /// This enables entities retrieved by integer ID to also be cached for GUID-based lookups.
         /// </summary>
+        /// <param name="entities">The collection of <see cref="IDataType"/> entities to cache by GUID key.</param>
         public void PopulateCacheByKey(IEnumerable<IDataType> entities)
         {
             foreach (IDataType entity in entities)
@@ -631,6 +706,7 @@ internal sealed class DataTypeRepository : EntityRepositoryBase<int, IDataType>,
         /// Clears the GUID-keyed cache entry for the given key.
         /// This ensures deleted entities are not returned from the cache.
         /// </summary>
+        /// <param name="key">The GUID key of the cache entry to clear.</param>
         public void ClearCacheByKey(Guid key)
         {
             var cacheKey = GetCacheKey(key);

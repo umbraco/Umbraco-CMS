@@ -11,7 +11,9 @@ public interface IAlterTableBuilder : IFluentBuilder
     IAlterTableColumnTypeBuilder AddColumn(string name);
 
     /// <summary>
-    ///     Specifies a column to alter.
+    ///     Begins the process of altering the definition of a specified column in the table.
     /// </summary>
+    /// <param name="name">The name of the column to alter.</param>
+    /// <returns>An <see cref="IAlterTableColumnTypeBuilder"/> that allows further specification of the new column type and properties.</returns>
     IAlterTableColumnTypeBuilder AlterColumn(string name);
 }

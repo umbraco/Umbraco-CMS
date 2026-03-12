@@ -162,9 +162,15 @@ internal sealed class ContentRelationsUpdate :
 
     private sealed class NodeIdKey
     {
+        /// <summary>
+        /// Gets or sets the unique identifier for the node.
+        /// </summary>
         [Column("id")]
         public int NodeId { get; set; }
 
+        /// <summary>
+        /// Gets or sets the unique GUID that identifies the node in the database.
+        /// </summary>
         [Column("uniqueId")]
         public Guid UniqueId { get; set; }
     }

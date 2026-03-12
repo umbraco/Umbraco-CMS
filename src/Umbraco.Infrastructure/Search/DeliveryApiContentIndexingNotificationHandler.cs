@@ -19,6 +19,12 @@ internal sealed class DeliveryApiContentIndexingNotificationHandler :
     private readonly ILogger<DeliveryApiContentIndexingNotificationHandler> _logger;
     private readonly DeliveryApiSettings _deliveryApiSettings;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DeliveryApiContentIndexingNotificationHandler"/> class, which handles notifications related to content indexing for the Delivery API.
+    /// </summary>
+    /// <param name="deliveryApiIndexingHandler">An instance responsible for handling Delivery API content indexing operations.</param>
+    /// <param name="logger">The logger used for logging events and errors related to content indexing notifications.</param>
+    /// <param name="deliveryApiSettings">The monitor providing access to current Delivery API settings.</param>
     public DeliveryApiContentIndexingNotificationHandler(
         IDeliveryApiIndexingHandler deliveryApiIndexingHandler,
         ILogger<DeliveryApiContentIndexingNotificationHandler> logger,
@@ -29,6 +35,11 @@ internal sealed class DeliveryApiContentIndexingNotificationHandler :
         _deliveryApiSettings = deliveryApiSettings.CurrentValue;
     }
 
+    /// <summary>
+    /// Handles a <see cref="ContentCacheRefresherNotification"/> by extracting content change information
+    /// and delegating the changes to the delivery API indexing handler for processing.
+    /// </summary>
+    /// <param name="notification">The notification containing information about content cache changes.</param>
     public void Handle(ContentCacheRefresherNotification notification)
     {
         if (NotificationHandlingIsDisabled())
@@ -45,6 +56,11 @@ internal sealed class DeliveryApiContentIndexingNotificationHandler :
         _deliveryApiIndexingHandler.HandleContentChanges(changesById);
     }
 
+    /// <summary>
+    /// Handles a <see cref="ContentCacheRefresherNotification"/> by processing its payloads and forwarding content change information
+    /// to the delivery API indexing handler for further processing.
+    /// </summary>
+    /// <param name="notification">The content cache refresher notification containing information about content changes.</param>
     public void Handle(ContentTypeCacheRefresherNotification notification)
     {
         if (NotificationHandlingIsDisabled())
@@ -61,6 +77,10 @@ internal sealed class DeliveryApiContentIndexingNotificationHandler :
         _deliveryApiIndexingHandler.HandleContentTypeChanges(contentTypeChangesById);
     }
 
+    /// <summary>
+    /// Handles a <see cref="PublicAccessCacheRefresherNotification"/> by extracting content change payloads and passing them to the delivery API indexing handler for processing.
+    /// </summary>
+    /// <param name="notification">The notification containing information about content cache changes.</param>
     public void Handle(PublicAccessCacheRefresherNotification notification)
         => _deliveryApiIndexingHandler.HandlePublicAccessChanges();
 

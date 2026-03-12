@@ -10,6 +10,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_14_0_0;
 
+/// <summary>
+/// Represents a migration that adds list view keys to document types in the database schema during the upgrade to version 14.0.0.
+/// </summary>
 public class AddListViewKeysToDocumentTypes : UnscopedMigrationBase
 {
     private readonly IScopeProvider _scopeProvider;
@@ -158,49 +161,79 @@ public class AddListViewKeysToDocumentTypes : UnscopedMigrationBase
         public const string TableName = Constants.DatabaseSchema.Tables.ContentType;
         private string? _alias;
 
+        /// <summary>
+        /// Gets or sets the primary key value for this content type record.
+        /// </summary>
         [Column("pk")]
         [PrimaryKeyColumn(IdentitySeed = 700)]
         public int PrimaryKey { get; set; }
 
+        /// <summary>
+        /// Gets or sets the unique identifier of the node associated with this content type.
+        /// </summary>
         [Column("nodeId")]
         [ForeignKey(typeof(NodeDto))]
         [Index(IndexTypes.UniqueNonClustered, Name = "IX_cmsContentType")]
         public int NodeId { get; set; }
 
+        /// <summary>
+        /// Gets or sets the alias of the content type.
+        /// </summary>
         [Column("alias")]
         [NullSetting(NullSetting = NullSettings.Null)]
         public string? Alias { get => _alias; set => _alias = value == null ? null : string.Intern(value); }
 
+        /// <summary>
+        /// Gets or sets the icon associated with the content type.
+        /// </summary>
         [Column("icon")]
         [Index(IndexTypes.NonClustered)]
         [NullSetting(NullSetting = NullSettings.Null)]
         public string? Icon { get; set; }
 
+        /// <summary>Gets or sets the thumbnail image file name associated with the content type.</summary>
         [Column("thumbnail")]
         [Constraint(Default = "folder.png")]
         public string? Thumbnail { get; set; }
 
+        /// <summary>
+        /// Gets or sets the textual description associated with the content type.
+        /// </summary>
         [Column("description")]
         [NullSetting(NullSetting = NullSettings.Null)]
         [Length(1500)]
         public string? Description { get; set; }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether this content type is configured as a container, enabling list view functionality for its children.
+        /// </summary>
         [Column("isContainer")]
         [Constraint(Default = "0")]
         public bool IsContainer { get; set; }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether this content type is an element type.
+        /// </summary>
         [Column("isElement")]
         [Constraint(Default = "0")]
         public bool IsElement { get; set; }
 
+        /// <summary>Gets or sets a value indicating whether this content type is allowed at the root of the content tree.</summary>
         [Column("allowAtRoot")]
         [Constraint(Default = "0")]
         public bool AllowAtRoot { get; set; }
 
+        /// <summary>
+        /// Gets or sets the variation flags for the content type, indicating how the content type supports culture or segment variations.
+        /// The value corresponds to the <c>ContentVariation</c> enum.
+        /// </summary>
         [Column("variations")]
         [Constraint(Default = "1" /*ContentVariation.InvariantNeutral*/)]
         public byte Variations { get; set; }
 
+        /// <summary>
+        /// Gets or sets the <see cref="NodeDto"/> entity associated with this content type.
+        /// </summary>
         [ResultColumn]
         [Reference(ReferenceType.OneToOne, ColumnName = "NodeId")]
         public NodeDto NodeDto { get; set; } = null!;

@@ -44,9 +44,9 @@ internal sealed class BackOfficeSecureDataFormat : ISecureDataFormat<Authenticat
     /// <summary>
     ///     Un-protects the cookie
     /// </summary>
-    /// <param name="protectedText"></param>
-    /// <param name="purpose"></param>
-    /// <returns></returns>
+    /// <param name="protectedText">The protected cookie text to unprotect.</param>
+    /// <param name="purpose">The purpose string used for protection.</param>
+    /// <returns>The authentication ticket, or null if unprotection fails.</returns>
     public AuthenticationTicket? Unprotect(string? protectedText, string? purpose)
     {
         AuthenticationTicket? decrypt;

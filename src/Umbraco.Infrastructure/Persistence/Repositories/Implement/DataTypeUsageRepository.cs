@@ -6,15 +6,27 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
+/// <summary>
+/// Repository responsible for querying and managing information about where data types are used within the Umbraco persistence layer.
+/// </summary>
 public class DataTypeUsageRepository : IDataTypeUsageRepository
 {
     private readonly IScopeAccessor _scopeAccessor;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DataTypeUsageRepository"/> class, which is responsible for managing data type usage information in the persistence layer.
+    /// </summary>
+    /// <param name="scopeAccessor">An accessor for the current database scope, used to manage database transactions and context.</param>
     public DataTypeUsageRepository(IScopeAccessor scopeAccessor)
     {
         _scopeAccessor = scopeAccessor;
     }
 
+    /// <summary>
+    /// Determines whether there are any saved values associated with the specified data type key.
+    /// </summary>
+    /// <param name="dataTypeKey">The unique identifier of the data type to check for saved values.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains true if saved values exist; otherwise, false.</returns>
     public Task<bool> HasSavedValuesAsync(Guid dataTypeKey)
     {
         IUmbracoDatabase? database = _scopeAccessor.AmbientScope?.Database;
