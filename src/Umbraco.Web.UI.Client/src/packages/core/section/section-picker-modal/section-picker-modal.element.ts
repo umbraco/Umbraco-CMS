@@ -45,7 +45,9 @@ export class UmbSectionPickerModalElement extends UmbModalBaseElement<
 		return html`
 			<umb-body-layout headline="Select sections">
 				<uui-box>
-					${this._sections.map(
+					${[...this._sections]
+					.sort((a, b) => this.localize.string(a.meta.label).localeCompare(this.localize.string(b.meta.label)))
+					.map(
 						(item) => html`
 							<uui-menu-item
 								label=${this.localize.string(item.meta.label)}
