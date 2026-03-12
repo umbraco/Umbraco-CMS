@@ -151,6 +151,9 @@ internal sealed class ContentTypeJsonSchemaService : IContentTypeJsonSchemaServi
         IDataType[] dataTypes = (await _dataTypeService.GetAllAsync(propertyTypes.Select(propertyType => propertyType.DataTypeKey).Distinct()
             .ToArray())).ToArray();
 
+        // Index by key for O(1) lookup
+        Dictionary<Guid, IDataType> dataTypesByKey = dataTypes.ToDictionary(dt => dt.Key);
+
         // Build x-umbraco-properties metadata
         var propertiesMetadata = new JsonObject();
         foreach (IPropertyType propertyType in propertyTypes)
@@ -159,7 +162,7 @@ internal sealed class ContentTypeJsonSchemaService : IContentTypeJsonSchemaServi
             {
                 ["dataTypeId"] = propertyType.DataTypeKey.ToString(),
                 ["editorAlias"] = propertyType.PropertyEditorAlias,
-                ["editorUiAlias"] = dataTypes.FirstOrDefault(datatype => datatype.Key == propertyType.DataTypeKey)?.EditorUiAlias,
+                ["editorUiAlias"] = dataTypesByKey.GetValueOrDefault(propertyType.DataTypeKey)?.EditorUiAlias,
                 ["mandatory"] = propertyType.Mandatory,
                 ["variations"] = propertyType.Variations.ToString(),
             };
