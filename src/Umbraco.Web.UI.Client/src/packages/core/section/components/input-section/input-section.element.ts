@@ -99,9 +99,7 @@ export class UmbInputSectionElement extends UmbFormControlMixin<string | undefin
 	}
 
 	override render() {
-		const sortedItems = [...(this._items ?? [])].sort((a, b) =>
-			this.localize.string(a.meta.label).localeCompare(this.localize.string(b.meta.label)),
-		);
+		const sortedItems = [...(this._items ?? [])].sort((a, b) => (b.weight ?? 0) - (a.weight ?? 0));
 		return html`
 			<uui-ref-list>${sortedItems.map((item) => this._renderItem(item))}</uui-ref-list>
 			<uui-button
