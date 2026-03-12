@@ -48,6 +48,8 @@ public class BackOfficeSignInManager : UmbracoSignInManager<BackOfficeIdentityUs
         _globalSettings = globalSettings.Value;
     }
 
+    protected override bool AllowConcurrentLoginsEnabled => SecuritySettings.GetUserAllowConcurrentLogins();
+
     protected override string AuthenticationType => _backOfficeAuthenticationTypeSettings.Value.AuthenticationType;
 
     protected override string ExternalAuthenticationType => _backOfficeAuthenticationTypeSettings.Value.ExternalAuthenticationType;

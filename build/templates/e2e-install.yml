@@ -29,7 +29,7 @@ steps:
       "UMBRACO_USER_LOGIN=${{ parameters.PlaywrightUserEmail }}
       UMBRACO_USER_PASSWORD=${{ parameters.PlaywrightPassword }}
       URL=${{ parameters.ASPNETCORE_URLS }}
-      STORAGE_STAGE_PATH=$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/playwright/.auth/user.json
+      STORAGE_STATE_PATH=$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/playwright/.auth/user.json
       CONSOLE_ERRORS_PATH=$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/console-errors.json" | Out-File .env
     displayName: Generate .env
     workingDirectory: $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest
@@ -47,3 +47,7 @@ steps:
   - script: npm ci --no-fund --no-audit --prefer-offline
     workingDirectory: $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest
     displayName: Restore NPM packages
+
+  - script: npm run build
+    workingDirectory: $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest
+    displayName: Build test helpers

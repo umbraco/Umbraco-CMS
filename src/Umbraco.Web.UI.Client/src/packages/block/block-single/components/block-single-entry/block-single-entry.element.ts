@@ -358,7 +358,7 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 
 	#extensionSlotRenderMethod = (ext: UmbExtensionElementInitializer<ManifestBlockEditorCustomView>) => {
 		ext.component?.setAttribute('part', 'component');
-		if (this._exposed) {
+		if (this._exposed || this._isReadOnly) {
 			return ext.component;
 		} else {
 			return html`<div style="min-height: var(--uui-size-16);">
@@ -441,6 +441,7 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 	}
 
 	#renderEditContentAction() {
+		if (this._isReadOnly) return nothing;
 		return this._showContentEdit && this._workspaceEditContentPath
 			? html`<uui-button
 					label="edit"
@@ -463,6 +464,7 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 	}
 
 	#renderEditSettingsAction() {
+		if (this._isReadOnly) return nothing;
 		return html`
 			${this._hasSettings && this._workspaceEditSettingsPath
 				? html`<uui-button

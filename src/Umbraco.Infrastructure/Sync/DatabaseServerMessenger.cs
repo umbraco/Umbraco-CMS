@@ -346,6 +346,7 @@ public abstract class DatabaseServerMessenger : ServerMessengerBase, IDisposable
             if (disposing)
             {
                 _syncIdle.Dispose();
+                _cancellationTokenSource.Dispose();
             }
 
             _disposedValue = true;

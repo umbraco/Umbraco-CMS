@@ -156,6 +156,11 @@ internal sealed class ApiRichTextElementParser : ApiRichTextParserBase, IApiRich
             type = "unknown";
         }
 
+        // Extract culture from attributes if present
+        var culture = attributes.TryGetValue("data-culture", out object? cultureAttribute)
+            ? cultureAttribute?.ToString()
+            : null;
+
         ReplaceLocalLinks(
             contentCache,
             mediaCache,
@@ -176,7 +181,8 @@ internal sealed class ApiRichTextElementParser : ApiRichTextParserBase, IApiRich
                 attributes["linkType"] = nameof(LinkType.Media);
                 attributes["href"] = url;
             },
-            () => attributes.Remove("href"));
+            () => attributes.Remove("href"),
+            culture);
     }
 
     private void ReplaceLocalImages(IPublishedMediaCache mediaCache, string tag, Dictionary<string, object> attributes)

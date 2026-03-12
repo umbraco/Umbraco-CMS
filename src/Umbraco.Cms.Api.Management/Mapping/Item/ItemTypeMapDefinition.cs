@@ -1,6 +1,7 @@
 using Umbraco.Cms.Api.Management.ViewModels.DataType.Item;
 using Umbraco.Cms.Api.Management.ViewModels.Dictionary.Item;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentType.Item;
+using Umbraco.Cms.Api.Management.ViewModels.Item;
 using Umbraco.Cms.Api.Management.ViewModels.Language.Item;
 using Umbraco.Cms.Api.Management.ViewModels.MediaType.Item;
 using Umbraco.Cms.Api.Management.ViewModels.MemberGroup.Item;
@@ -12,6 +13,7 @@ using Umbraco.Cms.Api.Management.ViewModels.UserGroup.Item;
 using Umbraco.Cms.Api.Management.ViewModels.Webhook.Item;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentTypeEditing;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Extensions;
@@ -27,12 +29,14 @@ public class ItemTypeMapDefinition : IMapDefinition
         mapper.Define<IDictionaryItem, DictionaryItemItemResponseModel>((_, _) => new DictionaryItemItemResponseModel(), Map);
         mapper.Define<IContentType, DocumentTypeItemResponseModel>((_, _) => new DocumentTypeItemResponseModel(), Map);
         mapper.Define<IMediaType, MediaTypeItemResponseModel>((_, _) => new MediaTypeItemResponseModel(), Map);
+        mapper.Define<MediaTypeFileExtensionMatchResult, AllowedMediaTypeItemResponseModel>((_, _) => new AllowedMediaTypeItemResponseModel(), Map);
         mapper.Define<IEntitySlim, MemberGroupItemResponseModel>((_, _) => new MemberGroupItemResponseModel(), Map);
         mapper.Define<ITemplate, TemplateItemResponseModel>((_, _) => new TemplateItemResponseModel { Alias = string.Empty }, Map);
         mapper.Define<IMemberType, MemberTypeItemResponseModel>((_, _) => new MemberTypeItemResponseModel(), Map);
         mapper.Define<IRelationType, RelationTypeItemResponseModel>((_, _) => new RelationTypeItemResponseModel(), Map);
         mapper.Define<IUserGroup, UserGroupItemResponseModel>((_, _) => new UserGroupItemResponseModel(), Map);
         mapper.Define<IWebhook, WebhookItemResponseModel>((_, _) => new WebhookItemResponseModel(), Map);
+        mapper.Define<IEntitySlim, NamedItemResponseModel>((_, _) => new NamedItemResponseModel(), Map);
     }
 
     // Umbraco.Code.MapAll
@@ -75,6 +79,13 @@ public class ItemTypeMapDefinition : IMapDefinition
         target.Name = source.Name ?? string.Empty;
         target.Id = source.Key;
         target.Icon = source.Icon;
+    }
+
+    // Umbraco.Code.MapAll -Flags -Icon -Id -Name
+    private static void Map(MediaTypeFileExtensionMatchResult source, AllowedMediaTypeItemResponseModel target, MapperContext context)
+    {
+        Map(source.MediaType, target, context);
+        target.MatchedFileExtension = source.IsSpecificMatch;
     }
 
     // Umbraco.Code.MapAll -Flags
@@ -126,5 +137,11 @@ public class ItemTypeMapDefinition : IMapDefinition
         target.Enabled = source.Enabled;
         target.Events = string.Join(",", source.Events);
         target.Types = string.Join(",", source.ContentTypeKeys);
+    }
+
+    private static void Map(IEntitySlim source, NamedItemResponseModel target, MapperContext context)
+    {
+        target.Id = source.Key;
+        target.Name = source.Name ?? string.Empty;
     }
 }

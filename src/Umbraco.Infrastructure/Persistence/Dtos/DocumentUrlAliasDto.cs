@@ -31,8 +31,9 @@ internal class DocumentUrlAliasDto
     /// Gets or sets the identifier of the language associated with this document URL alias.
     /// </summary>
     [Column("languageId")]
+    [NullSetting(NullSetting = NullSettings.Null)]
     [ForeignKey(typeof(LanguageDto))]
-    public int LanguageId { get; set; }
+    public int? LanguageId { get; set; }
 
     /// <summary>
     /// Gets or sets the alias string that represents an alternative URL for the document.

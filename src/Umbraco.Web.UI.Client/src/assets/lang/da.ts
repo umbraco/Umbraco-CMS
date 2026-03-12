@@ -405,6 +405,8 @@ export default {
 			'Træk dine filer ind i dropzonen for, at uploade dem til\n      mediebiblioteket.\n    ',
 		fileSecurityValidationFailure: 'En eller flere fil-sikkerhedsvalideringer er fejlet',
 		uploadNotAllowed: 'Upload er ikke tiladt på denne lokation',
+		uploadValidationFailed: (mediaTypeName: string) =>
+			`Medietypen ${mediaTypeName} har en eller flere påkrævede egenskaber. Det skal uploades individuelt via menuen 'Opret'`,
 	},
 	member: {
 		createNewMember: 'Opret et nyt medlem',
@@ -638,7 +640,10 @@ export default {
 		seeErrorDialogHeadline: 'Fejl detaljer',
 		selectEvent: 'Vælg begivenhed',
 		editWebhook: 'Rediger webhook',
+		cannotTrashWhenReferenced: (name: string) => `<strong>${name}</strong> kan ikke flyttes til papirkurven, fordi det refereres af andre elementer.`,
 		confirmTrash: (name: string) => `Er du sikker på, at du vil flytte <strong>${name}</strong> til papirkurven?`,
+		cannotBulkTrashWhenReferenced: (total: number) =>
+			`De valgte <strong>${total} ${total === 1 ? 'element' : 'elementer'}</strong> kan ikke flyttes til papirkurven, fordi mindst \u00e9t element refereres af andet indhold.`,
 		confirmBulkTrash: (total: number) =>
 			`Er du sikker på, at du vil flytte <strong>${total} ${total === 1 ? 'element' : 'elementer'}</strong> til papirkurven?`,
 		confirmBulkDelete: (total: number) =>
@@ -1441,6 +1446,7 @@ export default {
 		tabs: 'Faneblade',
 		createMatchingTemplate: 'Opret tilsvarende skabelon',
 		addIcon: 'Tilføj ikon',
+		changeIcon: 'Skift ikon',
 		contentTypeEnabled: 'Master Content Type enabled',
 		contentTypeUses: 'This Content Type uses',
 		noPropertiesDefinedOnTab:
@@ -2860,5 +2866,9 @@ export default {
 		resetUrlHeadline: 'Nulstil URL?',
 		resetUrlMessage: 'Er du sikker på, at du vil nulstille denne URL?',
 		resetUrlLabel: 'Nulstil',
+		selectLanguageHint: 'Vælg sprog for linket',
+		selectLanguageDefault: 'Auto (besøgendes sprog)',
+		configCultureSpecificDocumentLinksLabel: 'Kulturspecifikke dokumentlinks',
+		configCultureSpecificDocumentLinksDescription: 'Tillad brugeren at vælge specifik kultur for dokumenter.',
 	},
 } as UmbLocalizationDictionary;

@@ -168,7 +168,7 @@ public class MultiUrlPickerValueConverter : PropertyValueConverterBase, IDeliver
                         dto.Name = content.Name;
                     }
 
-                    url = content.Url(_publishedUrlProvider);
+                    url = content.Url(_publishedUrlProvider, dto.Culture);
                 }
 
                 links.Add(
@@ -244,7 +244,7 @@ public class MultiUrlPickerValueConverter : PropertyValueConverterBase, IDeliver
                 case Constants.UdiEntityType.Document:
                     IPublishedContent? content = _contentCache.GetById(item.Udi.Guid);
                     IApiContentRoute? route = content != null
-                        ? _apiContentRouteBuilder.Build(content)
+                        ? _apiContentRouteBuilder.Build(content, item.Culture)
                         : null;
                     return content == null || route == null
                         ? null
@@ -254,7 +254,8 @@ public class MultiUrlPickerValueConverter : PropertyValueConverterBase, IDeliver
                             item.Target,
                             content.Key,
                             content.ContentType.Alias,
-                            route);
+                            route,
+                            item.Culture);
                 case Constants.UdiEntityType.Media:
                     IPublishedContent? media = _mediaCache.GetById(item.Udi.Guid);
                     return media == null

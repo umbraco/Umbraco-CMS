@@ -3,16 +3,50 @@ import { css, customElement, html, ifDefined, nothing, property, state } from '@
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbExtensionsManifestInitializer, createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbEntityAction, ManifestEntityActionDefaultKind } from '@umbraco-cms/backoffice/entity-action';
+import { UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
+import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
+
+const umbEntityActionsBundleDeprecation = new UmbDeprecation({
+	deprecated: 'The `entityType` and `unique` properties on `<umb-entity-actions-bundle>`.',
+	removeInVersion: '19',
+	solution: 'Provide the entity type and unique via the UMB_ENTITY_CONTEXT context instead.',
+});
 
 @customElement('umb-entity-actions-bundle')
 export class UmbEntityActionsBundleElement extends UmbLitElement {
+	/**
+	 * @deprecated Provide through the UMB_ENTITY_CONTEXT context instead. Will be removed in Umbraco 19.
+	 * @returns {string | undefined} The entity type.
+	 */
 	@property({ type: String, attribute: 'entity-type' })
-	entityType?: string;
+	get entityType(): string | undefined {
+		return this.#entityType;
+	}
+	set entityType(value: string | undefined) {
+		if (value === this.#entityType) return;
+		umbEntityActionsBundleDeprecation.warn();
+		this.#entityType = value;
+		this.#ensureFallbackEntityContext().setEntityType(value);
+		this.#requestObserveEntityActions();
+	}
 
+	/**
+	 * @deprecated Provide through the UMB_ENTITY_CONTEXT context instead. Will be removed in Umbraco 19.
+	 * @returns {string | null | undefined} The unique key.
+	 */
 	@property({ type: String })
-	unique?: string | null;
+	get unique(): string | null | undefined {
+		return this.#unique;
+	}
+	set unique(value: string | null | undefined) {
+		if (value === this.#unique) return;
+		umbEntityActionsBundleDeprecation.warn();
+		this.#unique = value;
+		this.#ensureFallbackEntityContext().setUnique(value ?? null);
+		this.#requestObserveEntityActions();
+	}
 
 	@property({ type: String })
 	public label?: string;
@@ -29,13 +63,23 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 	@state()
 	private _firstActionHref?: string;
 
-	// TODO: Ideally this is provided on a higher level, as in the Tree-item, Workspace, Collection-Row, etc [NL]
-	#entityContext = new UmbEntityContext(this);
+	#entityType?: string;
+	#unique?: string | null;
+	#fallbackEntityContext?: UmbEntityContext;
 	#inViewport = false;
 	#observingEntityActions = false;
 
 	constructor() {
 		super();
+
+		this.consumeContext(UMB_ENTITY_CONTEXT, (context) => {
+			if (!context) return;
+			this.observe(observeMultiple([context.entityType, context.unique]), ([entityType, unique]) => {
+				this.#entityType = entityType ?? undefined;
+				this.#unique = unique;
+				this.#requestObserveEntityActions();
+			});
+		});
 
 		// Only observe entity actions when the element is in the viewport
 		const observer = new IntersectionObserver(
@@ -43,7 +87,7 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 				entries.forEach((entry) => {
 					if (entry.isIntersecting) {
 						this.#inViewport = true;
-						this.#observeEntityActions();
+						this.#requestObserveEntityActions();
 					}
 				});
 			},
@@ -56,17 +100,17 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 		observer.observe(this);
 	}
 
-	protected override updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
-		if (_changedProperties.has('entityType') && _changedProperties.has('unique')) {
-			this.#entityContext.setEntityType(this.entityType);
-			this.#entityContext.setUnique(this.unique ?? null);
-			this.#observeEntityActions();
+	// TODO: v19 remove when fallback context is no longer needed
+	#ensureFallbackEntityContext(): UmbEntityContext {
+		if (!this.#fallbackEntityContext) {
+			this.#fallbackEntityContext = new UmbEntityContext(this);
 		}
+		return this.#fallbackEntityContext;
 	}
 
-	#observeEntityActions() {
-		if (!this.entityType) return;
-		if (this.unique === undefined) return;
+	#requestObserveEntityActions() {
+		if (!this.#entityType) return;
+		if (this.#unique === undefined) return;
 		if (!this.#inViewport) return; // Only observe if the element is in the viewport
 		if (this.#observingEntityActions) return;
 
@@ -74,7 +118,7 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 			this,
 			umbExtensionsRegistry,
 			'entityAction',
-			(ext) => ext.forEntityTypes.includes(this.entityType!),
+			(ext) => ext.forEntityTypes.includes(this.#entityType!),
 			async (actions) => {
 				this._numberOfActions = actions.length;
 				const oldFirstManifest = this._firstActionManifest;
@@ -93,7 +137,7 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 		if (!this._firstActionManifest) return;
 		const oldFirstApi = this._firstActionApi;
 		this._firstActionApi = await createExtensionApi(this, this._firstActionManifest, [
-			{ unique: this.unique, entityType: this.entityType, meta: this._firstActionManifest.meta },
+			{ unique: this.#unique, entityType: this.#entityType, meta: this._firstActionManifest.meta },
 		]);
 		if (this._firstActionApi) {
 			(this._firstActionApi as any).manifest = this._firstActionManifest;

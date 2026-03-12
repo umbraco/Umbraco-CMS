@@ -107,6 +107,14 @@ internal sealed class PropertyDataDto
     public string? TextValue { get; set; }
 
     /// <summary>
+    /// Gets or sets the sortable value associated with the property data in the database.
+    /// </summary>
+    [Column("sortableValue")]
+    [NullSetting(NullSetting = NullSettings.Null)]
+    [Length(VarcharLength)]
+    public string? SortableValue { get; set; }
+
+    /// <summary>
     /// Gets or sets the <see cref="PropertyTypeDto"/> associated with this property data, representing the definition of the property type.
     /// </summary>
     [ResultColumn]
@@ -167,6 +175,7 @@ internal sealed class PropertyDataDto
             DateValue = DateValue,
             VarcharValue = VarcharValue,
             TextValue = TextValue,
+            SortableValue = SortableValue,
             PropertyTypeDto = PropertyTypeDto,
         };
 
