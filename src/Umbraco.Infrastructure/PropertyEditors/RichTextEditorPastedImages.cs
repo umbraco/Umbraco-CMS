@@ -20,7 +20,7 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Core.PropertyEditors;
 
 /// <summary>
-/// Provides configuration options for managing how images pasted into the rich text editor are handled.
+/// Processes images pasted into the rich text editor by finding temporary image references in HTML and persisting them to the media library.
 /// </summary>
 public sealed class RichTextEditorPastedImages
 {

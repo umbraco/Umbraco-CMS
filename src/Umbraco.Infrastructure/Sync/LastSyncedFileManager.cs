@@ -5,7 +5,7 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Infrastructure.Sync;
 
 /// <summary>
-/// Provides functionality for tracking the most recently synchronized files in the Umbraco CMS infrastructure.
+/// Provides functionality for tracking the last synchronized cache instruction ID, persisted to a file on disk.
 /// </summary>
 [Obsolete("Use the LastSyncedManager class instead. Scheduled for removal in Umbraco 18.")]
 public sealed class LastSyncedFileManager

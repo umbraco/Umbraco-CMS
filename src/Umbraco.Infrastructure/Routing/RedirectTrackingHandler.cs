@@ -50,9 +50,9 @@ public sealed class RedirectTrackingHandler :
     public void Handle(ContentMovedNotification notification) => CreateRedirectsForOldRoutes(notification);
 
     /// <summary>
-    /// Handles the content moved notification by creating redirects for old routes when content is moved.
+    /// Handles a <see cref="ContentMovingNotification"/> by storing the old routes of the content being moved, so that redirects can be created after the move completes.
     /// </summary>
-    /// <param name="notification">The notification containing information about the moved content.</param>
+    /// <param name="notification">The notification containing information about the content being moved.</param>
     public void Handle(ContentMovingNotification notification) =>
         StoreOldRoutes(notification.MoveInfoCollection.Select(m => m.Entity), notification);
 
@@ -63,9 +63,9 @@ public sealed class RedirectTrackingHandler :
     public void Handle(ContentPublishedNotification notification) => CreateRedirectsForOldRoutes(notification);
 
     /// <summary>
-    /// Handles the content moved notification to create redirects for old routes when content is moved.
+    /// Handles a <see cref="ContentPublishingNotification"/> by storing the old routes of the content being published, so that redirects can be created after publishing completes.
     /// </summary>
-    /// <param name="notification">The content moved notification.</param>
+    /// <param name="notification">The notification containing information about the content being published.</param>
     public void Handle(ContentPublishingNotification notification) =>
         StoreOldRoutes(notification.PublishedEntities, notification);
 

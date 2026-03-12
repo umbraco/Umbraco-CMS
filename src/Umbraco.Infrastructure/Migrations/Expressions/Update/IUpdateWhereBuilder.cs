@@ -8,9 +8,9 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Update;
 public interface IUpdateWhereBuilder
 {
     /// <summary>
-    ///     Specifies the data to update for the selected rows.
+    ///     Specifies the filter conditions to determine which rows are affected by the update.
     /// </summary>
-    /// <param name="dataAsAnonymousType">An anonymous type object containing the column values to update.</param>
+    /// <param name="dataAsAnonymousType">An anonymous type object containing the column names and values to match against.</param>
     /// <returns>An <see cref="IExecutableBuilder"/> that can be used to execute the update operation.</returns>
     IExecutableBuilder Where(object dataAsAnonymousType);
 

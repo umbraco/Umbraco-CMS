@@ -23,8 +23,7 @@ public class TouchServerJob : IRecurringBackgroundJob
     public TimeSpan Period { get; private set; }
 
     /// <summary>
-    /// Gets the fixed delay interval of 15 seconds between executions of the touch server job.
-    /// This interval determines how often the server registration is updated.
+    /// Gets the initial delay of 15 seconds after application start-up before the first execution of the touch server job.
     /// </summary>
     public TimeSpan Delay { get => TimeSpan.FromSeconds(15); }
 

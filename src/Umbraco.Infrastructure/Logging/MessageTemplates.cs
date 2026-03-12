@@ -5,7 +5,7 @@ using Serilog.Parsing;
 namespace Umbraco.Cms.Core.Logging;
 
 /// <summary>
-/// Contains a set of predefined message templates used throughout the application for consistent logging.
+/// Provides rendering functionality for message templates using Serilog's template engine.
 /// </summary>
 public class MessageTemplates : IMessageTemplates
 {

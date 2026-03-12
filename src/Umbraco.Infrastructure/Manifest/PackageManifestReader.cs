@@ -18,7 +18,7 @@ internal class PackageManifestReader : IPackageManifestReader
     private readonly ILogger<PackageManifestReader> _logger;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Manifest.PackageManifestReader"/> class.
+    /// Initializes a new instance of the <see cref="PackageManifestReader"/> class.
     /// </summary>
     /// <param name="appPluginsPath">The absolute or relative path to the application's plugins directory.</param>
     /// <param name="packageManifestFileProviderFactory">A factory responsible for creating file providers to access package manifest files.</param>
@@ -37,10 +37,10 @@ internal class PackageManifestReader : IPackageManifestReader
     }
 
     /// <summary>
-    /// Asynchronously reads all package manifests from the configured file provider and returns a collection of <see cref="Umbraco.Cms.Infrastructure.Manifest.PackageManifest"/> instances.
+    /// Asynchronously reads all package manifests from the configured file provider and returns a collection of <see cref="PackageManifest"/> instances.
     /// </summary>
     /// <returns>
-    /// A task that represents the asynchronous operation. The task result contains an enumerable of <see cref="Umbraco.Cms.Infrastructure.Manifest.PackageManifest"/> objects.
+    /// A task that represents the asynchronous operation. The task result contains an enumerable of <see cref="PackageManifest"/> objects.
     /// </returns>
     /// <exception cref="System.ArgumentNullException">Thrown if the file provider cannot be created.</exception>
     public async Task<IEnumerable<PackageManifest>> ReadPackageManifestsAsync()

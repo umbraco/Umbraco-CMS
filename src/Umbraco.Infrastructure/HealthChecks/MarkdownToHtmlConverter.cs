@@ -16,7 +16,7 @@ public class MarkdownToHtmlConverter : IMarkdownToHtmlConverter
     /// Initializes a new instance of the <see cref="MarkdownToHtmlConverter"/> class,
     /// using the specified markdown to HTML converter implementation.
     /// </summary>
-    /// <param name="markdownToHtmlConverter">An implementation of <see cref="IMarkdownToHtmlConverter"/> used to convert markdown content to HTML.</param>
+    /// <param name="markdownToHtmlConverter">An implementation of <see cref="Core.Strings.IMarkdownToHtmlConverter"/> used to convert markdown content to HTML.</param>
     public MarkdownToHtmlConverter(Core.Strings.IMarkdownToHtmlConverter markdownToHtmlConverter) => _markdownToHtmlConverter = markdownToHtmlConverter;
 
     /// <summary>

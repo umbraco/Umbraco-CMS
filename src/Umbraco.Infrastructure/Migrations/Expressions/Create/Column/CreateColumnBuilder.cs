@@ -227,7 +227,7 @@ public class CreateColumnBuilder : ExpressionBuilderBase<CreateColumnExpression,
     }
 
     /// <summary>
-    /// Specifies a foreign key constraint for the column referencing the given primary table and column.
+    /// Marks the current column as a foreign key.
     /// </summary>
     /// <returns>An object for configuring cascade options on the foreign key constraint.</returns>
     public ICreateColumnOptionForeignKeyCascadeBuilder ForeignKey()

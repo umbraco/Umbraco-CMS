@@ -188,7 +188,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
         /// <param name="eventAggregator">Aggregates and dispatches domain events within the scope.</param>
         /// <param name="logger">Logger instance for logging scope-related operations.</param>
         /// <param name="fileSystems">Provides access to the file systems used by Umbraco.</param>
-        /// <param name="parent">The parent scope, if this is a nested scope; otherwise, <c>null</c>.</param>
+        /// <param name="parent">The parent scope for this nested scope.</param>
         /// <param name="isolationLevel">The transaction isolation level to use for this scope.</param>
         /// <param name="repositoryCacheMode">The caching mode for repository operations within the scope.</param>
         /// <param name="eventDispatcher">Optional event dispatcher for handling domain events.</param>

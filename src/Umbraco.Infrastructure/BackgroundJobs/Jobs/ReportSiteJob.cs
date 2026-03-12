@@ -20,7 +20,7 @@ public class ReportSiteJob : IRecurringBackgroundJob
     public TimeSpan Period => TimeSpan.FromDays(1);
 
     /// <summary>
-    /// Gets the time interval to wait between executions of the <see cref="ReportSiteJob"/>.
+    /// Gets the initial delay after application start-up before the first execution of the <see cref="ReportSiteJob"/>.
     /// The delay is set to 5 minutes.
     /// </summary>
     public TimeSpan Delay => TimeSpan.FromMinutes(5);

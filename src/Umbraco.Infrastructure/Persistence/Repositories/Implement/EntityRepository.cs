@@ -446,11 +446,11 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
             : PerformGetAll(objectType);
 
     /// <summary>
-    /// Gets all entities of the specified object type, optionally filtered by the provided integer IDs.
+    /// Gets all entities of the specified object type, optionally filtered by the provided keys.
     /// </summary>
     /// <param name="objectType">The unique identifier of the object type to retrieve entities for.</param>
-    /// <param name="ids">An optional array of integer IDs to filter the entities. If not provided, all entities of the specified type are returned.</param>
-    /// <returns>An enumerable collection of entities matching the specified criteria.</returns
+    /// <param name="keys">An optional array of entity keys (GUIDs) to filter the entities. If not provided, all entities of the specified type are returned.</param>
+    /// <returns>An enumerable collection of entities matching the specified criteria.</returns>
     public IEnumerable<IEntitySlim> GetAll(Guid objectType, params Guid[] keys) =>
         keys.Length > 0
             ? PerformGetAll(objectType, sql => sql.WhereIn<NodeDto>(x => x.UniqueId, keys.Distinct()))
@@ -514,10 +514,10 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
             : PerformGetAllPaths(objectType);
 
     /// <summary>
-    /// Gets all paths for entities of the specified object type, optionally filtered by the provided entity IDs.
+    /// Gets all paths for entities of the specified object type, optionally filtered by the provided keys.
     /// </summary>
     /// <param name="objectType">The unique identifier of the object type.</param>
-    /// <param name="ids">Optional array of entity IDs to filter the paths. If not provided, paths for all entities of the specified type are returned.</param>
+    /// <param name="keys">Optional array of entity keys (GUIDs) to filter the paths. If not provided, paths for all entities of the specified type are returned.</param>
     /// <returns>An enumerable of <see cref="Umbraco.Cms.Core.Models.TreeEntityPath"/> representing the entity paths.</returns>
     public IEnumerable<TreeEntityPath> GetAllPaths(Guid objectType, params Guid[] keys) =>
         keys.Any()
@@ -586,9 +586,9 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
     }
 
     /// <summary>
-    /// Gets the Umbraco object type for the entity with the specified integer ID.
+    /// Gets the Umbraco object type for the entity with the specified key.
     /// </summary>
-    /// <param name="id">The unique integer identifier (ID) of the entity.</param>
+    /// <param name="key">The unique identifier (GUID) of the entity.</param>
     /// <returns>The <see cref="UmbracoObjectTypes"/> value representing the object's type.</returns>
     public UmbracoObjectTypes GetObjectType(Guid key)
     {

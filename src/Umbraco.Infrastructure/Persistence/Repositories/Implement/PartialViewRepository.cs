@@ -19,10 +19,7 @@ internal sealed class PartialViewRepository : FileRepository<string, IPartialVie
     /// Initializes a new instance of the <see cref="PartialViewRepository"/> class.
     /// </summary>
     /// <param name="fileSystems">An instance of <see cref="FileSystems"/> that provides access to the file systems used by the repository.</param>
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="PartialViewRepository"/> class.
-    /// </summary>
+    /// <param name="runtimeSettings">The runtime settings options monitor.</param>
     public PartialViewRepository(FileSystems fileSystems, IOptionsMonitor<RuntimeSettings> runtimeSettings)
         : base(fileSystems.PartialViewsFileSystem) => _runtimeSettings = runtimeSettings;
 

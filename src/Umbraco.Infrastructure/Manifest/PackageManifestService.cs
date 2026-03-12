@@ -35,7 +35,7 @@ internal sealed class PackageManifestService : IPackageManifestService
     /// The cache duration depends on the runtime mode: 30 days in production, 10 seconds otherwise.
     /// </summary>
     /// <returns>
-    /// A task that represents the asynchronous operation. The task result contains an <see cref="IEnumerable{T}"/> of <see cref="Umbraco.Cms.Infrastructure.Manifest.PackageManifest"/> instances.
+    /// A task that represents the asynchronous operation. The task result contains an <see cref="IEnumerable{T}"/> of <see cref="PackageManifest"/> instances.
     /// </returns>
     public async Task<IEnumerable<PackageManifest>> GetAllPackageManifestsAsync()
         => await _cache.GetCacheItemAsync(
@@ -65,7 +65,7 @@ internal sealed class PackageManifestService : IPackageManifestService
     /// <summary>
     /// Asynchronously retrieves all private package manifests, i.e., manifests that do not allow public access.
     /// </summary>
-    /// <returns>A task representing the asynchronous operation, with a result of an enumerable collection of private <see cref="Umbraco.Cms.Infrastructure.Manifest.PackageManifest"/> instances.</returns>
+    /// <returns>A task representing the asynchronous operation, with a result of an enumerable collection of private <see cref="PackageManifest"/> instances.</returns>
     public async Task<IEnumerable<PackageManifest>> GetPrivatePackageManifestsAsync()
         => (await GetAllPackageManifestsAsync()).Where(manifest => manifest.AllowPublicAccess == false);
 
@@ -73,7 +73,7 @@ internal sealed class PackageManifestService : IPackageManifestService
     /// Asynchronously retrieves and combines the import maps from all available package manifests.
     /// </summary>
     /// <returns>
-    /// A task representing the asynchronous operation. The task result contains a <see cref="Umbraco.Cms.Infrastructure.Manifest.PackageManifestImportmap"/> instance
+    /// A task representing the asynchronous operation. The task result contains a <see cref="PackageManifestImportmap"/> instance
     /// that merges the <c>imports</c> and <c>scopes</c> from all non-null import maps found in the loaded package manifests.
     /// </returns>
     public async Task<PackageManifestImportmap> GetPackageManifestImportmapAsync()

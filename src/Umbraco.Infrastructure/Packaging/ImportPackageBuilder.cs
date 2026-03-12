@@ -20,7 +20,7 @@ internal sealed class ImportPackageBuilder : ExpressionBuilderBase<ImportPackage
     /// <param name="packagingService">An instance of <see cref="IPackagingService"/> used for package operations.</param>
     /// <param name="mediaService">An instance of <see cref="IMediaService"/> for managing media items.</param>
     /// <param name="mediaFileManager">The <see cref="MediaFileManager"/> responsible for handling media files.</param>
-    /// <param name="mediaUrlGenerators">A collection of <see cref="MediaUrlGenerator"/> used to generate media URLs.</param>
+    /// <param name="mediaUrlGenerators">A <see cref="MediaUrlGeneratorCollection"/> used to generate media URLs.</param>
     /// <param name="shortStringHelper">The <see cref="IShortStringHelper"/> used for string manipulation and formatting.</param>
     /// <param name="contentTypeBaseServiceProvider">The <see cref="IContentTypeBaseServiceProvider"/> for accessing content type services.</param>
     /// <param name="context">The <see cref="IMigrationContext"/> providing context for the migration process.</param>
