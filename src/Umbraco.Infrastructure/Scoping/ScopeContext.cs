@@ -174,7 +174,7 @@ _enlisted ??= new Dictionary<string, IEnlistedObject>();
 
         /// <summary>
         /// Gets the priority value that determines the order in which the enlisted object is processed.
-        /// Higher priority objects may be processed before lower priority ones.
+        /// Lower values indicate higher priority and are processed first.
         /// </summary>
         public int Priority { get; }
 

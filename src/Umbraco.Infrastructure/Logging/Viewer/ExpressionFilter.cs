@@ -64,7 +64,6 @@ internal sealed class ExpressionFilter : ILogFilter
     /// </summary>
     /// <param name="e">The <see cref="LogEvent"/> to evaluate.</param>
     /// <returns><c>true</c> if the log event passes the filter; otherwise, <c>false</c>.</returns>
-
     public bool TakeLogEvent(LogEvent e) => _filter == null || _filter(e);
 
     private static Func<LogEvent, bool>? PerformMessageLikeFilter(string filterExpression, SerilogLegacyNameResolver serilogLegacyNameResolver)

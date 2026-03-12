@@ -236,7 +236,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
         }
 
         /// <summary>
-        /// Gets a value indicating whether this scope was created by <see cref="CreateDetachedScope"/>, making it detachable.
+        /// Gets a value indicating whether this scope was created by <see cref="ScopeProvider.CreateDetachedScope"/>, making it detachable.
         /// </summary>
         /// <remarks>
         /// a value indicating whether the scope is detachable

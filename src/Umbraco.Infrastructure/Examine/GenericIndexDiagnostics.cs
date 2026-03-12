@@ -26,13 +26,11 @@ public class GenericIndexDiagnostics : IIndexDiagnostics
     /// <summary>
     /// Gets the count of documents in the index.
     /// </summary>
-    /// <remarks>unknown</remarks>
     public int DocumentCount => -1;
 
     /// <summary>
     /// Gets the count of fields in the generic index. Returns -1 if unknown.
     /// </summary>
-    /// <remarks>unknown</remarks>
     public int FieldCount => -1;
 
     /// <summary>

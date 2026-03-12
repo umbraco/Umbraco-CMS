@@ -86,9 +86,9 @@ public sealed class OutOfDateModelsStatus : INotificationHandler<ContentTypeCach
     public void Handle(ContentTypeCacheRefresherNotification notification) => Write();
 
     /// <summary>
-    /// Handles a <see cref="ContentTypeCacheRefresherNotification"/> by updating the out-of-date models status.
+    /// Handles a <see cref="DataTypeCacheRefresherNotification"/> by updating the out-of-date models status.
     /// </summary>
-    /// <param name="notification">The content type cache refresher notification to handle.</param>
+    /// <param name="notification">The data type cache refresher notification to handle.</param>
     public void Handle(DataTypeCacheRefresherNotification notification) => Write();
 
     /// <summary>

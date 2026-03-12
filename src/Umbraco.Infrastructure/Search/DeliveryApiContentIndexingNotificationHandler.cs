@@ -57,10 +57,10 @@ internal sealed class DeliveryApiContentIndexingNotificationHandler :
     }
 
     /// <summary>
-    /// Handles a <see cref="ContentCacheRefresherNotification"/> by processing its payloads and forwarding content change information
+    /// Handles a <see cref="ContentTypeCacheRefresherNotification"/> by processing its payloads and forwarding content type change information
     /// to the delivery API indexing handler for further processing.
     /// </summary>
-    /// <param name="notification">The content cache refresher notification containing information about content changes.</param>
+    /// <param name="notification">The content type cache refresher notification containing information about content type changes.</param>
     public void Handle(ContentTypeCacheRefresherNotification notification)
     {
         if (NotificationHandlingIsDisabled())
@@ -78,7 +78,7 @@ internal sealed class DeliveryApiContentIndexingNotificationHandler :
     }
 
     /// <summary>
-    /// Handles a <see cref="PublicAccessCacheRefresherNotification"/> by extracting content change payloads and passing them to the delivery API indexing handler for processing.
+    /// Handles a <see cref="PublicAccessCacheRefresherNotification"/> by notifying the delivery API indexing handler of public access changes.
     /// </summary>
     /// <param name="notification">The notification containing information about content cache changes.</param>
     public void Handle(PublicAccessCacheRefresherNotification notification)

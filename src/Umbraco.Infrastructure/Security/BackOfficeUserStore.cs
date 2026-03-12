@@ -315,11 +315,11 @@ public class BackOfficeUserStore :
     }
 
     /// <summary>
-    /// Asynchronously retrieves the users with the specified IDs.
+    /// Asynchronously retrieves the users with the specified keys.
     /// </summary>
-    /// <param name="ids">An array of user IDs to retrieve. If <c>null</c> or empty, an empty collection is returned.</param>
+    /// <param name="keys">An array of user keys to retrieve. If <c>null</c> or empty, an empty collection is returned.</param>
     /// <returns>
-    /// A task that represents the asynchronous operation. The task result contains an <see cref="IEnumerable{IUser}"/> of users matching the specified IDs.
+    /// A task that represents the asynchronous operation. The task result contains an <see cref="IEnumerable{IUser}"/> of users matching the specified keys.
     /// </returns>
     public Task<IEnumerable<IUser>> GetUsersAsync(params Guid[]? keys)
     {

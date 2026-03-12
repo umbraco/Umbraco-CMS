@@ -161,8 +161,8 @@ public sealed class RelateOnTrashNotificationHandler :
     }
 
     /// <summary>
-    /// Handles a notification when content is moved to the recycle bin by removing any parent-child relations
-    /// of type 'Relate Parent Document On Delete' for the affected content items.
+    /// Handles a notification when content is moved to the recycle bin by creating parent-child relations
+    /// of type 'Relate Parent Document On Delete' to remember the original parent for potential restore.
     /// </summary>
     /// <param name="notification">The notification containing details about the content items that have been moved to the recycle bin.</param>
     [Obsolete("Use the INotificationAsyncHandler.HandleAsync implementation instead. Scheduled for removal in Umbraco 19.")]
@@ -170,9 +170,9 @@ public sealed class RelateOnTrashNotificationHandler :
         => HandleAsync(notification, CancellationToken.None).GetAwaiter().GetResult();
 
     /// <summary>
-    /// Handles a <see cref="ContentMovedNotification"/> by removing parent-child relations for content items that have been moved to the recycle bin.
+    /// Handles a <see cref="MediaMovedNotification"/> by removing parent-child relations for media items that have been moved out of the recycle bin.
     /// </summary>
-    /// <param name="notification">The notification containing information about the moved content items.</param>
+    /// <param name="notification">The notification containing information about the moved media items.</param>
     public void Handle(MediaMovedNotification notification)
     {
         foreach (MoveEventInfo<IMedia> item in notification.MoveInfoCollection.Where(x =>

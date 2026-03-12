@@ -29,9 +29,9 @@ public class ConfigurePropertySettingsOptions :
     }
 
     /// <summary>
-    /// Configures the specified <see cref="ContentPropertySettings"/> by adding reserved field names derived from the property and method names of <see cref="IPublishedContent"/>.
+    /// Configures the specified <see cref="MemberPropertySettings"/> by adding reserved field names derived from the property and method names of <see cref="IPublishedMember"/>.
     /// </summary>
-    /// <param name="options">The <see cref="ContentPropertySettings"/> instance to configure.</param>
+    /// <param name="options">The <see cref="MemberPropertySettings"/> instance to configure.</param>
     public void Configure(MemberPropertySettings options)
     {
         var reservedProperties = typeof(IPublishedMember).GetPublicProperties().Select(x => x.Name).ToHashSet();
@@ -41,9 +41,9 @@ public class ConfigurePropertySettingsOptions :
     }
 
     /// <summary>
-    /// Configures the specified <see cref="ContentPropertySettings" /> by adding reserved field names derived from the property and method names of <see cref="IPublishedContent" />.
+    /// Configures the specified <see cref="MediaPropertySettings" /> by adding reserved field names derived from the property and method names of <see cref="IPublishedContent" />.
     /// </summary>
-    /// <param name="options">The <see cref="ContentPropertySettings" /> instance to configure.</param>
+    /// <param name="options">The <see cref="MediaPropertySettings" /> instance to configure.</param>
     public void Configure(MediaPropertySettings options)
     {
         var reservedProperties = typeof(IPublishedContent).GetPublicProperties().Select(x => x.Name).ToHashSet();

@@ -138,7 +138,7 @@ public class BackOfficeIdentityUser : UmbracoIdentityUser
     /// <param name="email">The email address for the user. This can be null, but must be set before persisting the user.</param>
     /// <param name="culture">The culture assigned to the user. Cannot be null or whitespace.</param>
     /// <param name="name">The display name of the user. Optional.</param>
-    /// <param name="id">The unique identifier for the user. Optional; if not provided, a new one will be generated.</param>
+    /// <param name="id">The unique identifier for the user. Optional; if not provided, the key defaults to <see cref="Guid.Empty"/>.</param>
     /// <param name="kind">The kind of user. Optional; defaults to <see cref="UserKind.Default"/>.</param>
     /// <returns>A new instance of <see cref="BackOfficeIdentityUser"/> without an identity.</returns>
     public static BackOfficeIdentityUser CreateNew(GlobalSettings globalSettings, string? username, string email, string culture, string? name = null, Guid? id = null, UserKind kind = UserKind.Default)

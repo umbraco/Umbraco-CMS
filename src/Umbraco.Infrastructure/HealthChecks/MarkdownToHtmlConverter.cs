@@ -13,7 +13,7 @@ public class MarkdownToHtmlConverter : IMarkdownToHtmlConverter
     private readonly Core.Strings.IMarkdownToHtmlConverter _markdownToHtmlConverter;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.HealthChecks.MarkdownToHtmlConverter"/> class,
+    /// Initializes a new instance of the <see cref="MarkdownToHtmlConverter"/> class,
     /// using the specified markdown to HTML converter implementation.
     /// </summary>
     /// <param name="markdownToHtmlConverter">An implementation of <see cref="IMarkdownToHtmlConverter"/> used to convert markdown content to HTML.</param>

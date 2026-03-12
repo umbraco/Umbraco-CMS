@@ -9,13 +9,13 @@ namespace Umbraco.Cms.Infrastructure.DeliveryApi;
 /// </summary>
 public interface IApiMediaWithCropsBuilder
 {
-    /// <summary>Builds an <see cref="Umbraco.Cms.Infrastructure.DeliveryApi.IApiMediaWithCrops"/> instance from the specified <see cref="Umbraco.Cms.Core.Models.MediaWithCrops"/> media.</summary>
+    /// <summary>Builds an <see cref="IApiMediaWithCrops"/> instance from the specified <see cref="Umbraco.Cms.Core.Models.MediaWithCrops"/> media.</summary>
     /// <param name="media">The media with crops to build from.</param>
-    /// <returns>An <see cref="Umbraco.Cms.Infrastructure.DeliveryApi.IApiMediaWithCrops"/> representing the built media with crops.</returns>
+    /// <returns>An <see cref="IApiMediaWithCrops"/> representing the built media with crops.</returns>
     IApiMediaWithCrops Build(MediaWithCrops media);
 
-    /// <summary>Builds an <see cref="Umbraco.Cms.Infrastructure.DeliveryApi.IApiMediaWithCrops"/> instance from the specified <see cref="Umbraco.Cms.Core.Models.IPublishedContent"/> media.</summary>
+    /// <summary>Builds an <see cref="IApiMediaWithCrops"/> instance from the specified <see cref="Umbraco.Cms.Core.Models.IPublishedContent"/> media.</summary>
     /// <param name="media">The published media content to build from.</param>
-    /// <returns>An <see cref="Umbraco.Cms.Infrastructure.DeliveryApi.IApiMediaWithCrops"/> representing the built media with crops.</returns>
+    /// <returns>An <see cref="IApiMediaWithCrops"/> representing the built media with crops.</returns>
     IApiMediaWithCrops Build(IPublishedContent media);
 }

@@ -27,6 +27,9 @@ public interface IRecurringBackgroundJob
     /// </summary>
     ServerRole[] ServerRoles { get => DefaultServerRoles; }
 
+    /// <summary>
+    /// Occurs when the <see cref="Period"/> value has changed.
+    /// </summary>
     event EventHandler PeriodChanged;
 
     /// <summary>

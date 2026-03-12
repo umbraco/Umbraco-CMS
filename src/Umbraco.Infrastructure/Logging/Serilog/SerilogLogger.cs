@@ -1,9 +1,5 @@
-using Microsoft.Extensions.Configuration;
 using Serilog;
 using Serilog.Events;
-using Umbraco.Cms.Core.Hosting;
-using Umbraco.Cms.Infrastructure.Logging.Serilog;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Logging.Serilog;
 
@@ -107,7 +103,6 @@ public class SerilogLogger : IDisposable
     /// <param name="reporting">The <see cref="Type"/> that is reporting the fatal error.</param>
     /// <param name="messageTemplate">A message template describing the fatal error, which can include placeholders for property values.</param>
     /// <param name="propertyValues">An array of property values to format into the message template.</param>
-
     public void Fatal(Type reporting, string messageTemplate, params object[] propertyValues) =>
         LoggerFor(reporting).Fatal(messageTemplate, propertyValues);
 
@@ -141,7 +136,6 @@ public class SerilogLogger : IDisposable
     /// </summary>
     /// <param name="reporting">The <see cref="Type"/> representing the component reporting the error.</param>
     /// <param name="exception">The <see cref="Exception"/> instance to log.</param>
-    /// <param name="message">The error message describing the context of the exception.</param>
     public void Error(Type reporting, Exception exception)
     {
         ILogger logger = LoggerFor(reporting);
@@ -157,11 +151,11 @@ public class SerilogLogger : IDisposable
     public void Error(Type reporting, string message) => LoggerFor(reporting).Error(message);
 
     /// <summary>
-    /// Logs an error message for the specified reporting type, including an exception and a message.
+    /// Logs an error message for the specified reporting type using the provided message template and property values.
     /// </summary>
     /// <param name="reporting">The <see cref="Type"/> that is reporting the error.</param>
-    /// <param name="exception">The <see cref="Exception"/> associated with the error.</param>
-    /// <param name="message">The error message to log.</param>
+    /// <param name="messageTemplate">A message template describing the error, which can include placeholders for property values.</param>
+    /// <param name="propertyValues">An array of property values to format into the message template.</param>
     public void Error(Type reporting, string messageTemplate, params object[] propertyValues) =>
         LoggerFor(reporting).Error(messageTemplate, propertyValues);
 

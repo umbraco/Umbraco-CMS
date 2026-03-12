@@ -68,7 +68,7 @@ public class CreateColumnBuilder : ExpressionBuilderBase<CreateColumnExpression,
     }
 
     /// <summary>
-    /// Configures the column as an identity column, meaning its value will be automatically generated and incremented by the database.
+    /// Marks the column as indexed. This method delegates to <see cref="Indexed()"/>.
     /// </summary>
     /// <returns>An <see cref="Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.Column.ICreateColumnOptionBuilder" /> that can be used to further configure the column.</returns>
     public ICreateColumnOptionBuilder Identity() => Indexed(null);

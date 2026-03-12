@@ -40,7 +40,7 @@ public interface IContentValueSetValidator : IValueSetValidator
     /// </summary>
     /// <param name="path">The content path to check.</param>
     /// <param name="category">The content category to check.</param>
-    /// <returns><c>true</c> if the path and category represent a recycle bin; otherwise, <c>false</c>.</returns>
+    /// <returns><c>true</c> if the path is valid (not in the recycle bin); otherwise, <c>false</c>.</returns>
     bool ValidateRecycleBin(string path, string category);
 
     /// <summary>
@@ -48,6 +48,6 @@ public interface IContentValueSetValidator : IValueSetValidator
     /// </summary>
     /// <param name="path">The path of the content to check.</param>
     /// <param name="category">The category of the content to check.</param>
-    /// <returns><c>true</c> if the content is considered protected; otherwise, <c>false</c>.</returns>
+    /// <returns><c>true</c> if the content passes protection validation (is not protected or protection checks do not apply); otherwise, <c>false</c>.</returns>
     bool ValidateProtectedContent(string path, string category);
 }

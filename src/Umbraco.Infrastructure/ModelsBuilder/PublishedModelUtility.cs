@@ -28,11 +28,6 @@ public static class PublishedModelUtility
     /// <summary>
     /// Retrieves the published content type from the specified content type cache using the given item type and alias.
     /// </summary>
-    /// <remarks>
-    /// var contentType = PublishedContentType.Get(itemType, alias);
-    /// // etc...
-    /// }
-    /// </remarks>
     /// <param name="contentTypeCache">The cache from which to retrieve the published content type.</param>
     /// <param name="itemType">The type of published item (e.g., Content, Media, Member, or Element).</param>
     /// <param name="alias">The alias identifying the content type.</param>

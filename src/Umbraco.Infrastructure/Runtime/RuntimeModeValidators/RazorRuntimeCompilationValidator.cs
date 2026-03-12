@@ -9,9 +9,8 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Infrastructure.Runtime.RuntimeModeValidators;
 
 /// <summary>
-/// Validates whether Razor runtime compilation is enabled in the current runtime mode.
-/// Ensures that Razor runtime compilation is only used in appropriate environments, such as development,
-/// and not in production for security and performance reasons.
+/// Validates that the InMemoryAuto ModelsBuilder mode has the required
+/// <c>Umbraco.Cms.DevelopmentMode.Backoffice</c> package installed.
 /// </summary>
 public class RazorRuntimeCompilationValidator : INotificationHandler<UmbracoApplicationStartedNotification>
 {
