@@ -52,7 +52,7 @@ public class UpdateDocumentTypeController : DocumentTypeControllerBase
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <param name="id">The unique identifier of the document type to update.</param>
     /// <param name="requestModel">The model containing the updated document type details.</param>
-    /// <returns>An <see cref="IActionResult"/> representing the result of the operation.</returns
+    /// <returns>An <see cref="IActionResult"/> representing the result of the operation.</returns>
     [HttpPut("{id:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]

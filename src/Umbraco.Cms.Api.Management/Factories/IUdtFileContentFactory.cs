@@ -13,7 +13,7 @@ public interface IUdtFileContentFactory
     /// Creates a <see cref="FileContentResult"/> for the specified <see cref="IContentType"/>.
     /// </summary>
     /// <param name="contentType">The content type for which to generate the file content result.</param>
-    /// <returns>A <see cref="FileContentResult"/> representing the generated file content for the given content type.</returns
+    /// <returns>A <see cref="FileContentResult"/> representing the generated file content for the given content type.</returns>
     FileContentResult Create(IContentType contentType);
 
     FileContentResult Create(IMediaType mediaType);

@@ -44,7 +44,7 @@ public class UpdateScriptController : ScriptControllerBase
     /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
     /// <param name="path">The virtual path identifying the script to update.</param>
     /// <param name="requestModel">The model containing the updated script content and metadata.</param>
-    /// <returns>An <see cref="IActionResult"/> indicating the outcome of the update operation, including success or relevant error details.</returns
+    /// <returns>An <see cref="IActionResult"/> indicating the outcome of the update operation, including success or relevant error details.</returns>
     [HttpPut("{*path}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]

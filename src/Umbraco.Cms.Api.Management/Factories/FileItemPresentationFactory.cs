@@ -32,7 +32,7 @@ public class FileItemPresentationFactory : IFileItemPresentationFactory
     /// Creates a collection of <see cref="PartialViewItemResponseModel"/> instances for the specified file or folder paths.
     /// </summary>
     /// <param name="paths">A collection of file or folder paths to generate response models for.</param>
-    /// <returns>An <see cref="IEnumerable{PartialViewItemResponseModel}"/> representing the items at the specified paths.</returns
+    /// <returns>An <see cref="IEnumerable{PartialViewItemResponseModel}"/> representing the items at the specified paths.</returns>
     public IEnumerable<PartialViewItemResponseModel> CreatePartialViewItemResponseModels(IEnumerable<string> paths)
         => CreateItemResponseModels<PartialViewItemResponseModel>(
             paths,

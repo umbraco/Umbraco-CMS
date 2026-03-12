@@ -37,7 +37,7 @@ public class UdtFileContentFactory : IUdtFileContentFactory
     /// Creates a <see cref="FileContentResult"/> from the specified content type by serializing it to XML.
     /// </summary>
     /// <param name="contentType">The content type to serialize and create the file content from.</param>
-    /// <returns>A <see cref="FileContentResult"/> representing the serialized content type as a file.</returns
+    /// <returns>A <see cref="FileContentResult"/> representing the serialized content type as a file.</returns>
     public FileContentResult Create(IMediaType mediaType)
     {
         XElement xml = _entityXmlSerializer.Serialize(mediaType);

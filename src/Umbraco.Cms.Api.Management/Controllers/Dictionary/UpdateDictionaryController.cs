@@ -52,7 +52,7 @@ public class UpdateDictionaryController : DictionaryControllerBase
     /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
     /// <param name="id">The unique identifier of the dictionary item to update.</param>
     /// <param name="updateDictionaryItemRequestModel">The model containing the updated dictionary item details.</param>
-    /// <returns>An <see cref="IActionResult"/> representing the result of the update operation.</returns
+    /// <returns>An <see cref="IActionResult"/> representing the result of the update operation.</returns>
     [HttpPut($"{{{nameof(id)}:guid}}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
