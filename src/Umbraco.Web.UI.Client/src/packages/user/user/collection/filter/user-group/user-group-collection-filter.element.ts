@@ -91,7 +91,8 @@ export class UmbUserGroupCollectionFilterElement extends UmbLitElement {
 									<uui-checkbox
 										label=${ifDefined(group.label)}
 										value=${ifDefined(group.value)}
-										@change=${this.#onChange}></uui-checkbox>
+										@change=${this.#onChange}
+										.checked=${this._value.includes(group.value)}></uui-checkbox>
 								`,
 							)}
 							${this._hasMore

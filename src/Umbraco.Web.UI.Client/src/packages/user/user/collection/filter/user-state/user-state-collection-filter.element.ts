@@ -12,15 +12,16 @@ export class UmbUserStateCollectionFilterElement extends UmbLitElement {
 	private _options: Array<UmbSelectOption> = [];
 
 	@state()
-	private _value: Array<UmbUserStateFilterType> = [];
+	private _value: Array<string> = [];
 
 	private _api?: UmbUserStateCollectionFilterApi | undefined;
 	public get api(): UmbUserStateCollectionFilterApi | undefined {
 		return this._api;
 	}
-	public set api(value: UmbUserStateCollectionFilterApi | undefined) {
-		this._api = value;
-		this.observe(value?.options, (options) => (this._options = options ?? []));
+	public set api(api: UmbUserStateCollectionFilterApi | undefined) {
+		this._api = api;
+		this.observe(api?.options, (options) => (this._options = options ?? []));
+		this.observe(api?.value, (value) => (this._value = value ?? []));
 	}
 
 	#onChange(event: Event) {
@@ -61,7 +62,8 @@ export class UmbUserStateCollectionFilterElement extends UmbLitElement {
 										label=${this.localize.term('user_state' + option.value)}
 										@change=${this.#onChange}
 										name="state"
-										value=${option.value}></uui-checkbox>`,
+										value=${option.value}
+										.checked=${this._value.includes(option.value)}></uui-checkbox>`,
 							)}
 						</div>
 					</umb-popover-layout>
