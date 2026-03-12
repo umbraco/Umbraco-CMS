@@ -3,6 +3,7 @@
 
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
+using System.Text.Json.Nodes;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
@@ -21,7 +22,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// <summary>
 /// Provides base functionality for date time property editors that store their value as a JSON string with timezone information.
 /// </summary>
-public abstract class DateTimePropertyEditorBase : DataEditor
+public abstract class DateTimePropertyEditorBase : DataEditor, IValueSchemaProvider
 {
     private readonly IIOHelper _ioHelper;
     private readonly IPropertyIndexValueFactory _propertyIndexValueFactory;
@@ -39,6 +40,30 @@ public abstract class DateTimePropertyEditorBase : DataEditor
         _propertyIndexValueFactory = propertyIndexValueFactory;
         SupportsReadOnly = true;
     }
+
+    /// <inheritdoc />
+    public Type? GetValueType(object? configuration) => typeof(DateTimeEditorValue);
+
+    /// <inheritdoc />
+    public JsonObject? GetValueSchema(object? configuration) => new()
+    {
+        ["$schema"] = "https://json-schema.org/draft/2020-12/schema",
+        ["type"] = new JsonArray("object", "null"),
+        ["properties"] = new JsonObject
+        {
+            ["date"] = new JsonObject
+            {
+                ["type"] = new JsonArray("string", "null"),
+                ["description"] = "ISO 8601 date-time string",
+            },
+            ["timeZone"] = new JsonObject
+            {
+                ["type"] = new JsonArray("string", "null"),
+                ["description"] = "IANA timezone identifier (e.g., 'Europe/London')",
+            },
+        },
+        ["description"] = "Date/time value with optional timezone",
+    };
 
     /// <inheritdoc />
     protected override IConfigurationEditor CreateConfigurationEditor() =>
