@@ -2,6 +2,9 @@ using Umbraco.Cms.Core.IO;
 
 namespace Umbraco.Cms.Api.Management.Services.FileSystem;
 
+/// <summary>
+/// Provides functionality for managing and navigating the physical file system as a tree structure.
+/// </summary>
 public class PhysicalFileSystemTreeService : FileSystemTreeServiceBase, IPhysicalFileSystemTreeService
 {
     private static readonly string[] _allowedRootFolders = { $"{Path.DirectorySeparatorChar}App_Plugins", $"{Path.DirectorySeparatorChar}wwwroot" };
@@ -10,6 +13,10 @@ public class PhysicalFileSystemTreeService : FileSystemTreeServiceBase, IPhysica
 
     protected override IFileSystem FileSystem => _physicalFileSystem;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PhysicalFileSystemTreeService"/> class with the specified physical file system.
+    /// </summary>
+    /// <param name="physicalFileSystem">The <see cref="IPhysicalFileSystem"/> instance to be used by the service.</param>
     public PhysicalFileSystemTreeService(IPhysicalFileSystem physicalFileSystem) =>
         _physicalFileSystem = physicalFileSystem;
 

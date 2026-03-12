@@ -13,6 +13,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.User.Filter;
 
+/// <summary>
+/// API controller for managing and applying user filters within the Umbraco CMS management interface.
+/// </summary>
 [ApiVersion("1.0")]
 public class FilterUserFilterController : UserFilterControllerBase
 {
@@ -20,6 +23,12 @@ public class FilterUserFilterController : UserFilterControllerBase
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly IUserPresentationFactory _userPresentationFactory;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="FilterUserFilterController"/> class, which handles user filtering operations in the management API.
+    /// </summary>
+    /// <param name="userService">Service used to manage and retrieve user information.</param>
+    /// <param name="backOfficeSecurityAccessor">Provides access to back office security context and operations.</param>
+    /// <param name="userPresentationFactory">Factory responsible for creating user presentation models.</param>
     public FilterUserFilterController(
         IUserService userService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,

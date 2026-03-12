@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Install;
 using Umbraco.Cms.Api.Management.Mapping.Installer;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -13,6 +13,9 @@ using Umbraco.Cms.Infrastructure.Installer.Steps;
 
 namespace Umbraco.Cms.Api.Management.DependencyInjection;
 
+/// <summary>
+/// Provides extension methods for configuring and installing Umbraco CMS API management services.
+/// </summary>
 public static class InstallerBuilderExtensions
 {
     internal static IUmbracoBuilder AddInstaller(this IUmbracoBuilder builder)
@@ -58,6 +61,11 @@ public static class InstallerBuilderExtensions
         return builder;
     }
 
+    /// <summary>
+    /// Registers and configures a collection builder for custom install steps in the Umbraco installation process.
+    /// </summary>
+    /// <param name="builder">The <see cref="IUmbracoBuilder"/> to which the install steps will be added.</param>
+    /// <returns>The <see cref="NewInstallStepCollectionBuilder"/> instance for configuring install steps.</returns>
     public static NewInstallStepCollectionBuilder InstallSteps(this IUmbracoBuilder builder)
         => builder.WithCollectionBuilder<NewInstallStepCollectionBuilder>();
 
@@ -74,6 +82,9 @@ public static class InstallerBuilderExtensions
         return builder;
     }
 
+    /// <summary>Gets the upgrade steps collection builder from the Umbraco builder.</summary>
+    /// <param name="builder">The Umbraco builder to extend.</param>
+    /// <returns>An <see cref="UpgradeStepCollectionBuilder"/> instance for configuring upgrade steps.</returns>
     public static UpgradeStepCollectionBuilder UpgradeSteps(this IUmbracoBuilder builder)
         => builder.WithCollectionBuilder<UpgradeStepCollectionBuilder>();
 }
