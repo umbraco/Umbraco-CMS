@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Infrastructure.PropertyEditors;
 /// <summary>
 /// Helper class for building JSON schemas for block-based property editors.
 /// </summary>
-internal sealed static class BlockJsonSchemaHelper
+internal static class BlockJsonSchemaHelper
 {
     /// <summary>
     /// Creates the base block item data schema used by all block editors.
