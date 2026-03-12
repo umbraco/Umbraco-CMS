@@ -93,17 +93,17 @@ export class UmbDefaultMultiSelectCollectionFacetFilterApi
 			return;
 		}
 
-		const { data, asObservable } = await this.#datalistDataSource.requestItems(uniques);
+		const { data, asObservable } = await this.#datalistDataSource!.requestItems(uniques);
 
 		if (asObservable) {
-			this.observe(asObservable(), (items) => this.#valueItems.setValue(items), ObserveValueItems);
+			this.observe(asObservable(), (items) => this.#valueItems.setValue(items ?? []), ObserveValueItems);
 		} else if (data) {
 			this.#valueItems.setValue(data);
 		}
 	}
 
 	async #requestOptions() {
-		const { data } = await this.#datalistDataSource.requestOptions({
+		const { data } = await this.#datalistDataSource!.requestOptions({
 			skip: this.pagination.getSkip(),
 			take: this.pagination.getPageSize(),
 		});
