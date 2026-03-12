@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Nodes;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Cache.PropertyEditors;
@@ -13,6 +14,7 @@ using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Infrastructure.PropertyEditors;
 using Umbraco.Extensions;
 using BlockGridAreaConfiguration = Umbraco.Cms.Core.PropertyEditors.BlockGridConfiguration.BlockGridAreaConfiguration;
 
@@ -21,7 +23,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// <summary>
 /// Abstract base class for block grid based editors.
 /// </summary>
-public abstract class BlockGridPropertyEditorBase : DataEditor
+public abstract class BlockGridPropertyEditorBase : DataEditor, IValueSchemaProvider
 {
     private readonly IBlockValuePropertyIndexValueFactory _blockValuePropertyIndexValueFactory;
 
@@ -34,6 +36,87 @@ public abstract class BlockGridPropertyEditorBase : DataEditor
 
     public override IPropertyIndexValueFactory PropertyIndexValueFactory => _blockValuePropertyIndexValueFactory;
 
+    /// <inheritdoc />
+    public virtual Type? GetValueType(object? configuration) => typeof(string); // JSON string representation
+
+    /// <inheritdoc />
+    public virtual JsonObject? GetValueSchema(object? configuration)
+    {
+        var config = configuration as BlockGridConfiguration;
+
+        // Build area item schema (BlockGrid-specific)
+        var areaItemSchema = new JsonObject
+        {
+            ["type"] = "object",
+            ["properties"] = new JsonObject
+            {
+                ["key"] = new JsonObject { ["type"] = "string", ["format"] = "uuid", ["pattern"] = ValueSchemaPatterns.Uuid },
+                ["items"] = new JsonObject
+                {
+                    ["type"] = "array",
+                    ["items"] = new JsonObject { ["$ref"] = "#/$defs/layoutItem" },
+                },
+            },
+        };
+
+        // Build layout item schema (BlockGrid-specific - with columnSpan, rowSpan, areas)
+        JsonObject layoutItemSchema = BlockJsonSchemaHelper.CreateBaseLayoutItemSchema();
+        layoutItemSchema["properties"]!.AsObject()["columnSpan"] = new JsonObject { ["type"] = "integer", ["minimum"] = 1 };
+        layoutItemSchema["properties"]!.AsObject()["rowSpan"] = new JsonObject { ["type"] = "integer", ["minimum"] = 1 };
+        layoutItemSchema["properties"]!.AsObject()["areas"] = new JsonObject
+        {
+            ["type"] = "array",
+            ["items"] = areaItemSchema,
+        };
+
+        // Build content and settings data schemas with constraints
+        JsonObject contentDataItemSchema = BlockJsonSchemaHelper.CreateContentDataSchema(config?.Blocks);
+        JsonObject settingsDataItemSchema = BlockJsonSchemaHelper.CreateSettingsDataSchema(config?.Blocks);
+
+        // Build the main schema
+        JsonObject schema = BlockJsonSchemaHelper.CreateRootSchema();
+        schema["$defs"] = new JsonObject
+        {
+            ["layoutItem"] = layoutItemSchema,
+        };
+        schema["properties"] = new JsonObject
+        {
+            ["layout"] = new JsonObject
+            {
+                ["type"] = "object",
+                ["properties"] = new JsonObject
+                {
+                    [Constants.PropertyEditors.Aliases.BlockGrid] = new JsonObject
+                    {
+                        ["type"] = "array",
+                        ["items"] = new JsonObject { ["$ref"] = "#/$defs/layoutItem" },
+                    },
+                },
+            },
+            ["contentData"] = new JsonObject
+            {
+                ["type"] = "array",
+                ["items"] = contentDataItemSchema,
+            },
+            ["settingsData"] = new JsonObject
+            {
+                ["type"] = "array",
+                ["items"] = settingsDataItemSchema,
+            },
+        };
+
+        // Add grid columns constraint from configuration (BlockGrid-specific)
+        if (config?.GridColumns is int gridColumns && gridColumns > 0)
+        {
+            layoutItemSchema["properties"]!["columnSpan"]!.AsObject()["maximum"] = gridColumns;
+        }
+
+        // Add validation constraints
+        var layoutArray = schema["properties"]!["layout"]!["properties"]![Constants.PropertyEditors.Aliases.BlockGrid]!.AsObject();
+        BlockJsonSchemaHelper.ApplyValidationConstraints(layoutArray, config?.ValidationLimit?.Min, config?.ValidationLimit?.Max);
+
+        return schema;
+    }
 
     #region Value Editor
 
