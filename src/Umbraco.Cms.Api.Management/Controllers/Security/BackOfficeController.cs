@@ -21,6 +21,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Cms.Infrastructure.Security;
 using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Extensions;
@@ -353,12 +354,26 @@ public class BackOfficeController : SecurityControllerBase
         var userId = cookieAuthResult.Principal?.Identity?.GetUserId();
 
         await _backOfficeSignInManager.SignOutAsync();
-        _backOfficeUserManager.NotifyLogoutSuccess(cookieAuthResult.Principal ?? User, userId);
+        SignOutSuccessResult signOutResult = _backOfficeUserManager.NotifyLogoutSuccess(cookieAuthResult.Principal ?? User, userId);
 
         _logger.LogInformation(
             "User {UserName} from IP address {RemoteIpAddress} has logged out",
             userName ?? "UNKNOWN",
             HttpContext.Connection.RemoteIpAddress);
+
+        // If SignOutRedirectUrl has been set (e.g. by an external OIDC provider logout handler),
+        // redirect the user there directly so the external provider can complete its own logout flow.
+        if (signOutResult.SignOutRedirectUrl.IsNullOrWhiteSpace() is false)
+        {
+            if (Uri.TryCreate(signOutResult.SignOutRedirectUrl, UriKind.Absolute, out Uri? redirectUri) is false
+                || redirectUri.Scheme != Uri.UriSchemeHttps)
+            {
+                throw new InvalidOperationException(
+                    $"SignOutRedirectUrl must be an absolute HTTPS URL, but found: {signOutResult.SignOutRedirectUrl}");
+            }
+
+            return Redirect(redirectUri.ToString());
+        }
 
         // Returning a SignOutResult will ask OpenIddict to redirect the user agent
         // to the post_logout_redirect_uri specified by the client application.

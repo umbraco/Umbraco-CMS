@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Api.Management.ViewModels.NewsDashboard;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -79,7 +80,7 @@ public class NewsDashboardService : INewsDashboardService
     /// <inheritdoc />
     public async Task<NewsDashboardResponseModel> GetItemsAsync()
     {
-        const string BaseUrl = "https://news-dashboard.umbraco.com";
+        const string BaseUrl = Constants.NewsDashboard.Url;
         const string Path = "/api/News";
 
         var version = _umbracoVersion.SemanticVersion.ToSemanticStringWithoutBuild();

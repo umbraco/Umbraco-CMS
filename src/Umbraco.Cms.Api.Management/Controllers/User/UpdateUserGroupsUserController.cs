@@ -2,10 +2,13 @@ using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Controllers.UserGroup;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Api.Management.ViewModels.User;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Security.Authorization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -14,13 +17,15 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.User;
 
-// This controller is a bit of a weird case, for all intents and purposes this should be a UserGroupController
-// It uses the UserGroupService to manipulate the members of a user group, however, from the frontend perspective it is a user(s) operation
-// In order to not have to re-implement all the UserGroupOperationStatusResults this controller inherits from UserGroupControllerBase
-// But manually specifies its route and APIExplorerSettings to be under users.
-    /// <summary>
-    /// Controller responsible for updating the user groups assigned to a specific user.
-    /// </summary>
+/// <summary>
+/// Controller responsible for updating the user groups assigned to a specific user.
+/// </summary>
+/// <remarks>
+/// This controller is a bit of a weird case, for all intents and purposes this should be a UserGroupController
+/// It uses the UserGroupService to manipulate the members of a user group, however, from the frontend perspective it is a user(s) operation
+/// In order to not have to re-implement all the UserGroupOperationStatusResults this controller inherits from UserGroupControllerBase
+/// But manually specifies its route and APIExplorerSettings to be under users.
+/// </remarks>
 [ApiVersion("1.0")]
 [VersionedApiBackOfficeRoute("user")]
 [ApiExplorerSettings(GroupName = "User")]
@@ -28,16 +33,31 @@ public class UpdateUserGroupsUserController : UserGroupControllerBase
 {
     private readonly IAuthorizationService _authorizationService;
     private readonly IUserGroupService _userGroupService;
+    private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="UpdateUserGroupsUserController"/> class, which manages updating user groups for users.
     /// </summary>
     /// <param name="authorizationService">Service used to authorize user group update operations.</param>
     /// <param name="userGroupService">Service used to manage user group data and operations.</param>
-    public UpdateUserGroupsUserController(IAuthorizationService authorizationService, IUserGroupService userGroupService)
+    [ActivatorUtilitiesConstructor]
+    public UpdateUserGroupsUserController(
+        IAuthorizationService authorizationService,
+        IUserGroupService userGroupService,
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
     {
         _authorizationService = authorizationService;
         _userGroupService = userGroupService;
+        _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
+    }
+
+    [Obsolete("Please use the constructor accepting all parameters. Scheduled for removal in Umbraco 19.")]
+    public UpdateUserGroupsUserController(IAuthorizationService authorizationService, IUserGroupService userGroupService)
+        : this(
+            authorizationService,
+            userGroupService,
+            StaticServiceProvider.Instance.GetRequiredService<IBackOfficeSecurityAccessor>())
+    {
     }
 
     /// <summary>
@@ -69,7 +89,8 @@ public class UpdateUserGroupsUserController : UserGroupControllerBase
 
         Attempt<UserGroupOperationStatus> result = await _userGroupService.UpdateUserGroupsOnUsersAsync(
             requestModel.UserGroupIds.Select(x => x.Id).ToHashSet(),
-            requestModel.UserIds.Select(x => x.Id).ToHashSet());
+            requestModel.UserIds.Select(x => x.Id).ToHashSet(),
+            CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Success
             ? Ok()

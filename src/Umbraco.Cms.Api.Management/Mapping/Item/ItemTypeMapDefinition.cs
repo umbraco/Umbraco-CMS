@@ -13,6 +13,7 @@ using Umbraco.Cms.Api.Management.ViewModels.UserGroup.Item;
 using Umbraco.Cms.Api.Management.ViewModels.Webhook.Item;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentTypeEditing;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Extensions;
@@ -38,6 +39,7 @@ public class ItemTypeMapDefinition : IMapDefinition
         mapper.Define<IDictionaryItem, DictionaryItemItemResponseModel>((_, _) => new DictionaryItemItemResponseModel(), Map);
         mapper.Define<IContentType, DocumentTypeItemResponseModel>((_, _) => new DocumentTypeItemResponseModel(), Map);
         mapper.Define<IMediaType, MediaTypeItemResponseModel>((_, _) => new MediaTypeItemResponseModel(), Map);
+        mapper.Define<MediaTypeFileExtensionMatchResult, AllowedMediaTypeItemResponseModel>((_, _) => new AllowedMediaTypeItemResponseModel(), Map);
         mapper.Define<IEntitySlim, MemberGroupItemResponseModel>((_, _) => new MemberGroupItemResponseModel(), Map);
         mapper.Define<ITemplate, TemplateItemResponseModel>((_, _) => new TemplateItemResponseModel { Alias = string.Empty }, Map);
         mapper.Define<IMemberType, MemberTypeItemResponseModel>((_, _) => new MemberTypeItemResponseModel(), Map);
@@ -87,6 +89,13 @@ public class ItemTypeMapDefinition : IMapDefinition
         target.Name = source.Name ?? string.Empty;
         target.Id = source.Key;
         target.Icon = source.Icon;
+    }
+
+    // Umbraco.Code.MapAll -Flags -Icon -Id -Name
+    private static void Map(MediaTypeFileExtensionMatchResult source, AllowedMediaTypeItemResponseModel target, MapperContext context)
+    {
+        Map(source.MediaType, target, context);
+        target.MatchedFileExtension = source.IsSpecificMatch;
     }
 
     // Umbraco.Code.MapAll -Flags

@@ -53,7 +53,7 @@ public class GetPublicAccessDocumentController : DocumentControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [EndpointSummary("Gets public access rules for a document.")]
     [EndpointDescription("Gets the public access protection settings for the document identified by the provided Id.")]
-    public async Task<IActionResult> GetPublicAccess(CancellationToken cancellationToken, Guid id)
+    public async Task<IActionResult> GetPublicAccess(CancellationToken cancellationToken, Guid id, [FromQuery] bool includeAncestors = false)
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,
@@ -65,8 +65,12 @@ public class GetPublicAccessDocumentController : DocumentControllerBase
             return Forbidden();
         }
 
+        // Get the public access entry for the specified content ID.
+        // If requested, include ancestors in the lookup allowing for easier management of public access rules in the UI.
         Attempt<PublicAccessEntry?, PublicAccessOperationStatus> accessAttempt =
-            await _publicAccessService.GetEntryByContentKeyWithoutAncestorsAsync(id);
+            includeAncestors
+                ? await _publicAccessService.GetEntryByContentKeyAsync(id)
+                : await _publicAccessService.GetEntryByContentKeyWithoutAncestorsAsync(id);
 
         if (accessAttempt.Success is false || accessAttempt.Result is null)
         {
@@ -74,7 +78,7 @@ public class GetPublicAccessDocumentController : DocumentControllerBase
         }
 
         Attempt<PublicAccessResponseModel?, PublicAccessOperationStatus> responseModelAttempt =
-            _publicAccessPresentationFactory.CreatePublicAccessResponseModel(accessAttempt.Result);
+            _publicAccessPresentationFactory.CreatePublicAccessResponseModel(accessAttempt.Result, id);
 
         if (responseModelAttempt.Success is false)
         {

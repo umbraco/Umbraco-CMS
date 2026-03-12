@@ -10,7 +10,6 @@ namespace Umbraco.Cms.Api.Management.Controllers.Media;
 /// Provides API endpoints for managing media configuration settings.
 /// </summary>
 [ApiVersion("1.0")]
-[Obsolete("No longer used. Scheduled for removal in Umbraco 18.")]
 public class ConfigurationMediaController : MediaControllerBase
 {
     private readonly IConfigurationPresentationFactory _configurationPresentationFactory;

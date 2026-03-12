@@ -1,38 +1,57 @@
 using Asp.Versioning;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Actions;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Security.Authorization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Document;
 
-    /// <summary>
-    /// Controller for updating domains associated with documents.
-    /// </summary>
+/// <summary>
+/// Controller for updating domains associated with documents.
+/// </summary>
 [ApiVersion("1.0")]
 public class UpdateDomainsController : DocumentControllerBase
 {
+    private readonly IAuthorizationService _authorizationService;
     private readonly IDomainService _domainService;
     private readonly IUmbracoMapper _umbracoMapper;
     private readonly IDomainPresentationFactory _domainPresentationFactory;
 
+    [ActivatorUtilitiesConstructor]
     /// <summary>
     /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Controllers.Document.UpdateDomainsController"/> class.
     /// </summary>
     /// <param name="domainService">Service used to manage domain entities within the Umbraco CMS.</param>
     /// <param name="umbracoMapper">The mapper responsible for converting between Umbraco domain models and API models.</param>
     /// <param name="domainPresentationFactory">Factory for creating presentation models for domains.</param>
-    public UpdateDomainsController(IDomainService domainService, IUmbracoMapper umbracoMapper, IDomainPresentationFactory domainPresentationFactory)
+    public UpdateDomainsController(IAuthorizationService authorizationService, IDomainService domainService, IUmbracoMapper umbracoMapper, IDomainPresentationFactory domainPresentationFactory)
     {
+        _authorizationService = authorizationService;
         _domainService = domainService;
         _umbracoMapper = umbracoMapper;
         _domainPresentationFactory = domainPresentationFactory;
+    }
+
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
+    public UpdateDomainsController(IDomainService domainService, IUmbracoMapper umbracoMapper, IDomainPresentationFactory domainPresentationFactory)
+        : this(
+            StaticServiceProvider.Instance.GetRequiredService<IAuthorizationService>(),
+            domainService,
+            umbracoMapper,
+            domainPresentationFactory)
+    {
     }
 
     /// <summary>
@@ -55,6 +74,16 @@ public class UpdateDomainsController : DocumentControllerBase
         Guid id,
         UpdateDomainsRequestModel updateModel)
     {
+        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
+            User,
+            ContentPermissionResource.WithKeys(ActionAssignDomain.ActionLetter, id),
+            AuthorizationPolicies.ContentPermissionByResource);
+
+        if (!authorizationResult.Succeeded)
+        {
+            return Forbidden();
+        }
+
         DomainsUpdateModel domainsUpdateModel = _umbracoMapper.Map<DomainsUpdateModel>(updateModel)!;
 
         Attempt<DomainUpdateResult, DomainOperationStatus> result = await _domainService.UpdateDomainsAsync(id, domainsUpdateModel);

@@ -17,4 +17,6 @@ public class PublicAccessResponseModel : PublicAccessBaseModel
     /// Gets or sets the collection of member group items associated with the public access response.
     /// </summary>
     public MemberGroupItemResponseModel[] Groups { get; set; } = Array.Empty<MemberGroupItemResponseModel>();
+
+    public bool IsProtectedByAncestor { get; set; } = false;
 }

@@ -42,7 +42,6 @@ public interface IConfigurationPresentationFactory
     /// Creates a media configuration response model.
     /// </summary>
     /// <returns>A <see cref="Umbraco.Cms.Api.Management.Models.MediaConfigurationResponseModel"/> representing the media configuration.</returns>
-    [Obsolete("No longer used. Scheduled for removal in Umbraco 18.")]
     MediaConfigurationResponseModel CreateMediaConfigurationResponseModel();
 
     /// <summary>

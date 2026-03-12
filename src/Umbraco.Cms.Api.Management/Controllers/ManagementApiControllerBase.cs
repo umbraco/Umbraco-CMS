@@ -10,9 +10,11 @@ using Umbraco.Cms.Api.Management.DependencyInjection;
 using Umbraco.Cms.Api.Management.Filters;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Features;
+using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Cms.Web.Common.Filters;
 
 namespace Umbraco.Cms.Api.Management.Controllers;
@@ -28,6 +30,7 @@ namespace Umbraco.Cms.Api.Management.Controllers;
 [AppendEventMessages]
 [DisableBrowserCache]
 [Produces("application/json")]
+[MaintenanceModeActionFilter]
 public abstract class ManagementApiControllerBase : Controller, IUmbracoFeature
 {
     protected IActionResult CreatedAtId<T>(Expression<Func<T, string>> action, Guid id)
@@ -77,4 +80,15 @@ public abstract class ManagementApiControllerBase : Controller, IUmbracoFeature
             Status = StatusCodes.Status400BadRequest,
             Type = "Error",
         });
+
+    /// <summary>
+    /// Orders entities to match the order of the requested IDs.
+    /// </summary>
+    /// <typeparam name="TEntity">The entity type.</typeparam>
+    /// <param name="entities">The entities to order.</param>
+    /// <param name="requestedIds">The requested IDs in the desired order.</param>
+    /// <returns>A list of entities ordered by the requested IDs.</returns>
+    protected static List<TEntity> OrderByRequestedIds<TEntity>(IEnumerable<TEntity> entities, Guid[] requestedIds)
+        where TEntity : IEntity
+        => entities.OrderBy(e => Array.IndexOf(requestedIds, e.Key)).ToList();
 }
