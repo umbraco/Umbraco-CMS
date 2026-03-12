@@ -3,7 +3,7 @@ import { UMB_COLLECTION_CONTEXT } from '../../../default/collection-default.cont
 import type { ManifestCollectionFacetFilter } from '../collection-facet-filter.extension.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbDatalistItemModel } from '@umbraco-cms/backoffice/datalist-data-source';
+import type { UmbDatalistDataSource, UmbDatalistItemModel } from '@umbraco-cms/backoffice/datalist-data-source';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
 
@@ -23,10 +23,20 @@ export class UmbDefaultMultiSelectCollectionFacetFilterApi
 	public readonly valueItems = this.#valueItems.asObservable();
 
 	#collectionContext?: typeof UMB_COLLECTION_CONTEXT.TYPE;
-	#datalistDataSource = new UmbUserGroupDatalistDataSource(this);
+	#datalistDataSource?: UmbDatalistDataSource;
 	public readonly pagination = new UmbPaginationManager();
 
-	public manifest?: ManifestCollectionFacetFilter;
+	private _manifest?: ManifestCollectionFacetFilter | undefined;
+	public get manifest(): ManifestCollectionFacetFilter | undefined {
+		return this._manifest;
+	}
+	public set manifest(manifest: ManifestCollectionFacetFilter | undefined) {
+		this._manifest = manifest;
+
+		if (manifest) {
+			this.#datalistDataSource = new manifest.meta.datalistDataSource(this);
+		}
+	}
 
 	constructor(host: UmbControllerHost) {
 		super(host);

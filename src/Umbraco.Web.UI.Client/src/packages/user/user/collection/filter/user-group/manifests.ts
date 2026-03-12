@@ -1,17 +1,18 @@
 import { UMB_USER_COLLECTION_ALIAS } from '../../constants.js';
+import { UmbUserGroupDatalistDataSource } from './user-group-datalist-data-source.js';
 import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'collectionFacetFilter',
+		kind: 'multiSelect',
 		alias: 'Umb.CollectionFacetFilter.UserGroup',
 		name: 'User Group Collection Filter',
 		weight: 100,
-		element: () => import('./user-group-collection-filter.element.js'),
-		api: () => import('./user-group-collection-filter.api.js'),
 		meta: {
 			label: 'Groups',
 			filterKey: 'userGroupIds',
+			datalistDataSource: UmbUserGroupDatalistDataSource,
 		},
 		conditions: [
 			{
