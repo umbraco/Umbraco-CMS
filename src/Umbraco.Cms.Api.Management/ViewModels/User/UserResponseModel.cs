@@ -47,7 +47,7 @@ public class UserResponseModel : UserPresentationBase
     /// </summary>
     public bool HasElementRootAccess { get; set; }
 
-        /// <summary>
+    /// <summary>
     /// Gets or sets a collection of URLs pointing to the user's avatar images.
     /// </summary>
     public IEnumerable<string> AvatarUrls { get; set; } = Enumerable.Empty<string>();

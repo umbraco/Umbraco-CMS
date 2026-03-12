@@ -80,7 +80,7 @@ public class UserGroupBase
     public bool MediaRootAccess { get; init; }
 
     /// <summary>
-    /// The key of the element that should act as root node for the user group.
+    /// Gets or sets the key of the element that should act as root node for the user group.
     /// <remarks>
     /// This can be overwritten by a different user group if a user is a member of multiple groups
     /// </remarks>
@@ -88,7 +88,7 @@ public class UserGroupBase
     public ReferenceByIdModel? ElementStartNode { get; init; }
 
     /// <summary>
-    /// If the group should have access to the element root.
+    /// Gets or sets a value indicating whether the group should have access to the element root.
     /// <remarks>
     /// This will be ignored if an explicit start node has been specified in <see cref="ElementStartNode"/>.
     /// </remarks>

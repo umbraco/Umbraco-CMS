@@ -43,11 +43,13 @@ public class CurrentUserResponseModel : UserPresentationBase
     public required ISet<ReferenceByIdModel> ElementStartNodeIds { get; init; } = new HashSet<ReferenceByIdModel>();
 
     /// <summary>
-    /// Gets or sets the collection of URLs representing the current user's avatars, which may include multiple sizes or formats.
+    /// Gets or sets a value indicating whether the current user has access to the element root.
     /// </summary>
-
     public required bool HasElementRootAccess { get; init; }
 
+    /// <summary>
+    /// Gets or sets the collection of URLs representing the current user's avatars, which may include multiple sizes or formats.
+    /// </summary>
     public required IEnumerable<string> AvatarUrls { get; init; } = Enumerable.Empty<string>();
 
     /// <summary>

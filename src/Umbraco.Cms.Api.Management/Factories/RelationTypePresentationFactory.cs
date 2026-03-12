@@ -64,7 +64,6 @@ public class RelationTypePresentationFactory : IRelationTypePresentationFactory
     {
     }
 
-
     /// <inheritdoc />
     public Task<IEnumerable<IReferenceResponseModel>> CreateReferenceResponseModelsAsync(
         IEnumerable<RelationItemModel> relationItemModels)

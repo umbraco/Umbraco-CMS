@@ -23,7 +23,7 @@ public class DocumentTypeItemResponseModel : NamedItemResponseModelBase
     public string? Icon { get; set; }
 
     /// <summary>
-    /// The description of the document type.
+    /// Gets or sets the description of the document type.
     /// </summary>
     public string? Description { get; set; }
 }

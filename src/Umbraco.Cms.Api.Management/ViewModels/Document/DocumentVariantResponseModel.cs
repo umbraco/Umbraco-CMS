@@ -7,16 +7,6 @@ namespace Umbraco.Cms.Api.Management.ViewModels.Document;
 /// </summary>
 public class DocumentVariantResponseModel : PublishableVariantResponseModelBase, IHasFlags
 {
-    /// <summary>
-    /// Gets or sets the workflow or publication state of the document variant.
-    /// </summary>
-    /// <summary>
-    /// Gets or sets the publish date of the document variant.
-    /// </summary>
-    /// <summary>Gets or sets the scheduled publish date for the document variant.</summary>
-    /// <summary>
-    /// Gets or sets the scheduled date and time when the document variant will be unpublished.
-    /// </summary>
     private readonly List<FlagModel> _flags = [];
 
     /// <summary>
