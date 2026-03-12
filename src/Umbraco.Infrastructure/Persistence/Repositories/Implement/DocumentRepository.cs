@@ -33,6 +33,27 @@ internal class DocumentRepository : PublishableContentRepositoryBase<IContent, D
     private readonly ITemplateRepository _templateRepository;
     private PermissionRepository<IContent>? _permissionRepository;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DocumentRepository"/> class with the specified dependencies.
+    /// This constructor sets up the repository for managing document entities in the persistence layer.
+    /// </summary>
+    /// <param name="scopeAccessor">Provides access to the current database scope for transactional operations.</param>
+    /// <param name="appCaches">The application-level cache helpers for performance optimization.</param>
+    /// <param name="logger">The logger instance for logging repository operations.</param>
+    /// <param name="loggerFactory">Factory for creating logger instances.</param>
+    /// <param name="contentTypeRepository">Repository for accessing content type definitions.</param>
+    /// <param name="templateRepository">Repository for accessing template entities.</param>
+    /// <param name="tagRepository">Repository for managing tags associated with documents.</param>
+    /// <param name="languageRepository">Repository for managing language entities.</param>
+    /// <param name="relationRepository">Repository for managing entity relations.</param>
+    /// <param name="relationTypeRepository">Repository for managing relation types.</param>
+    /// <param name="propertyEditors">Collection of property editors used for document properties.</param>
+    /// <param name="dataValueReferenceFactories">Collection of factories for resolving data value references.</param>
+    /// <param name="dataTypeService">Service for managing data types.</param>
+    /// <param name="serializer">JSON serializer for serializing and deserializing data.</param>
+    /// <param name="eventAggregator">Publishes and subscribes to domain events.</param>
+    /// <param name="repositoryCacheVersionService">Service for managing repository cache versions.</param>
+    /// <param name="cacheSyncService">Service for synchronizing cache across distributed environments.</param>
     public DocumentRepository(
         IScopeAccessor scopeAccessor,
         AppCaches appCaches,
@@ -77,6 +98,24 @@ internal class DocumentRepository : PublishableContentRepositoryBase<IContent, D
         _scopeAccessor = scopeAccessor;
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.DocumentRepository"/> class.
+    /// </summary>
+    /// <param name="scopeAccessor">Provides access to the current database scope for repository operations.</param>
+    /// <param name="appCaches">The application-level caches used for optimizing data retrieval.</param>
+    /// <param name="logger">The logger instance for logging repository events and errors.</param>
+    /// <param name="loggerFactory">Factory for creating logger instances.</param>
+    /// <param name="contentTypeRepository">Repository for accessing content type definitions.</param>
+    /// <param name="templateRepository">Repository for accessing template entities.</param>
+    /// <param name="tagRepository">Repository for managing content tags.</param>
+    /// <param name="languageRepository">Repository for accessing language information.</param>
+    /// <param name="relationRepository">Repository for managing entity relations.</param>
+    /// <param name="relationTypeRepository">Repository for managing relation types.</param>
+    /// <param name="propertyEditors">Collection of property editors used for content properties.</param>
+    /// <param name="dataValueReferenceFactories">Collection of factories for resolving data value references.</param>
+    /// <param name="dataTypeService">Service for managing data types.</param>
+    /// <param name="serializer">JSON serializer for serializing and deserializing data.</param>
+    /// <param name="eventAggregator">Publishes and subscribes to domain events.</param>
     [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
     public DocumentRepository(
         IScopeAccessor scopeAccessor,
@@ -198,9 +237,27 @@ internal class DocumentRepository : PublishableContentRepositoryBase<IContent, D
 
     protected override IContent BuildEntity(DocumentDto entityDto, IContentType? contentType)
         => ContentBaseFactory.BuildEntity(entityDto, contentType);
+        /// <summary>
+        /// Gets or sets the culture identifier (e.g., language or locale) associated with this content variation.
+        /// </summary>
+
+        /// <summary>
+        /// Gets or sets the display name associated with this content variation.
+        /// </summary>
+
+        /// <summary>
+        /// Gets or sets the date and time associated with this content variation, such as its creation or last modification.
+        /// </summary>
 
     protected override void OnUowRefreshedEntity(IContent entity)
         => OnUowRefreshedEntity(new ContentRefreshNotification(entity, new EventMessages()));
+        /// <summary>
+        /// Gets or sets the culture identifier (e.g., language or locale) associated with this document variation.
+        /// </summary>
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the document variation has been edited.
+        /// </summary>
 
     #region Repository Base
 
@@ -235,12 +292,22 @@ internal class DocumentRepository : PublishableContentRepositoryBase<IContent, D
               (SELECT {uniqueId} FROM {umbracoNode} WHERE id = @id)",
         ];
 
+
     }
 
     #endregion
 
     #region Content Repository
 
+    /// <summary>
+    /// Counts the number of published documents, optionally filtered by content type alias.
+    /// </summary>
+    /// <param name="contentTypeAlias">The alias of the content type to filter by. If null or empty, counts all published documents.</param>
+    /// <returns>The count of published documents matching the criteria.</returns>
+    /// <summary>
+    /// Replaces all existing content permissions with the specified permission set for the relevant entities.
+    /// </summary>
+    /// <param name="permissionSet">The permission set to apply to the entities.</param>
     public void ReplaceContentPermissions(EntityPermissionSet permissionSet) =>
         PermissionRepository.ReplaceEntityPermissions(permissionSet);
 
@@ -253,6 +320,11 @@ internal class DocumentRepository : PublishableContentRepositoryBase<IContent, D
     public void AssignEntityPermission(IContent entity, string permission, IEnumerable<int> groupIds) =>
         PermissionRepository.AssignEntityPermission(entity, permission, groupIds);
 
+    /// <summary>
+    /// Retrieves the collection of permissions assigned to the specified entity.
+    /// </summary>
+    /// <param name="entityId">The unique identifier of the entity for which to retrieve permissions.</param>
+    /// <returns>An <see cref="EntityPermissionCollection"/> containing the permissions associated with the entity.</returns>
     public EntityPermissionCollection GetPermissionsForEntity(int entityId) =>
         PermissionRepository.GetPermissionsForEntity(entityId);
 
@@ -262,6 +334,13 @@ internal class DocumentRepository : PublishableContentRepositoryBase<IContent, D
     /// <param name="permission"></param>
     public void AddOrUpdatePermissions(ContentPermissionSet permission) => PermissionRepository.Save(permission);
 
+    /// <summary>
+    /// Determines whether the specified content item and all its ancestors in the content path are published.
+    /// </summary>
+    /// <param name="content">The content item to check.</param>
+    /// <returns>
+    /// True if the content item and every node in its path (from the root to itself) are published; otherwise, false.
+    /// </returns>
     public bool IsPathPublished(IContent? content)
     {
         // fail fast
@@ -293,9 +372,17 @@ internal class DocumentRepository : PublishableContentRepositoryBase<IContent, D
 
     #region Recycle Bin
 
+    /// <summary>
+    /// Gets the identifier for the content Recycle Bin in Umbraco.
+    /// </summary>
     public override int RecycleBinId => Constants.System.RecycleBinContent;
 
+    /// <summary>
+    /// Gets the identifier for the cache key for ths content Recycle Bin.
+    /// </summary>
     protected override string RecycleBinCacheKey => CacheKeys.ContentRecycleBinCacheKey;
+
+
 
     #endregion
 }

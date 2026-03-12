@@ -155,6 +155,11 @@ public abstract class RecurringHostedServiceBase : IHostedService, IDisposable
         }
     }
 
+    /// <summary>
+    /// Executes the core logic of the recurring hosted service asynchronously.
+    /// </summary>
+    /// <param name="state">An optional object containing state information for the execution.</param>
+    /// <returns>A <see cref="Task"/> that represents the asynchronous execution of the recurring task.</returns>
     public abstract Task PerformExecuteAsync(object? state);
 
     /// <summary>

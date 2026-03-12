@@ -99,6 +99,7 @@ public class ColorPickerPropertyEditor : DataEditor, IValueSchemaProvider
             /// <summary>
             /// Initializes a new instance of the <see cref="ConfiguredColorValidator"/> class.
             /// </summary>
+            /// <param name="localizedTextService">The service used for retrieving localized text resources.</param>
             public ConfiguredColorValidator(ILocalizedTextService localizedTextService) => _localizedTextService = localizedTextService;
 
             /// <inheritdoc/>

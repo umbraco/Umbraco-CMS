@@ -31,6 +31,17 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
     private readonly UserGroupWithUsersRepository _userGroupWithUsersRepository;
     private readonly IDictionary<string, IPermissionMapper> _permissionMappers;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UserGroupRepository"/> class.
+    /// </summary>
+    /// <param name="scopeAccessor">Provides access to the current database scope.</param>
+    /// <param name="appCaches">Provides application-level caching services.</param>
+    /// <param name="logger">The logger used for logging repository operations.</param>
+    /// <param name="loggerFactory">Factory for creating logger instances.</param>
+    /// <param name="shortStringHelper">Helper for handling short string operations.</param>
+    /// <param name="permissionMappers">A collection of permission mappers for user group permissions.</param>
+    /// <param name="repositoryCacheVersionService">Service for managing repository cache versions.</param>
+    /// <param name="cacheSyncService">Service for synchronizing cache across distributed environments.</param>
     public UserGroupRepository(
         IScopeAccessor scopeAccessor,
         AppCaches appCaches,
@@ -64,6 +75,15 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
         _permissionMappers = permissionMappers.ToDictionary(x => x.Context);
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UserGroupRepository"/> class, which manages user group persistence operations.
+    /// </summary>
+    /// <param name="scopeAccessor">Provides access to the current database scope.</param>
+    /// <param name="appCaches">The application-level caches used for caching data.</param>
+    /// <param name="logger">The logger instance for logging repository operations.</param>
+    /// <param name="loggerFactory">The factory used to create logger instances.</param>
+    /// <param name="shortStringHelper">Helper for processing and manipulating short strings.</param>
+    /// <param name="permissionMappers">A collection of permission mappers used to map permissions for user groups.</param>
     [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
     public UserGroupRepository(
         IScopeAccessor scopeAccessor,
@@ -84,6 +104,13 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
     {
     }
 
+    /// <summary>
+    /// Retrieves a user group by its alias.
+    /// </summary>
+    /// <param name="alias">The alias of the user group to retrieve.</param>
+    /// <returns>
+    /// The <see cref="IUserGroup"/> that matches the specified alias, or <c>null</c> if no such group exists.
+    /// </returns>
     public IUserGroup? Get(string alias)
     {
         try
@@ -114,6 +141,11 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
         }
     }
 
+    /// <summary>
+    /// Gets the user groups that are assigned to the specified section alias.
+    /// </summary>
+    /// <param name="sectionAlias">The alias of the section to filter user groups by.</param>
+    /// <returns>An enumerable collection of user groups assigned to the specified section.</returns>
     public IEnumerable<IUserGroup> GetGroupsAssignedToSection(string sectionAlias)
     {
         // Here we're building up a query that looks like this, a sub query is required because the resulting structure
@@ -127,26 +159,34 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
         return Database.Fetch<UserGroupDto>(sql).Select(x => UserGroupFactory.BuildEntity(_shortStringHelper, x, _permissionMappers));
     }
 
+    /// <summary>
+    /// Adds a new user group or updates an existing one, and associates the specified users with the group.
+    /// </summary>
+    /// <param name="userGroup">The user group to add or update.</param>
+    /// <param name="userIds">An optional array of user IDs to associate with the group. If <c>null</c>, no user associations are changed.</param>
     public void AddOrUpdateGroupWithUsers(IUserGroup userGroup, int[]? userIds) =>
         _userGroupWithUsersRepository.Save(new UserGroupWithUsers(userGroup, userIds));
 
     /// <summary>
-    ///     Gets explicitly defined permissions for the group for specified entities
+    ///     Gets explicitly defined permissions for the specified user groups and entities.
     /// </summary>
-    /// <param name="groupIds"></param>
-    /// <param name="entityIds">Array of entity Ids, if empty will return permissions for the group for all entities</param>
+    /// <param name="groupIds">An array of user group IDs to retrieve permissions for.</param>
+    /// <param name="entityIds">An array of entity IDs. If empty, returns permissions for the groups for all entities.</param>
+    /// <returns>The collection of permissions explicitly defined for the specified groups and entities.</returns>
     public EntityPermissionCollection GetPermissions(int[] groupIds, params int[] entityIds) =>
         _permissionRepository.GetPermissionsForEntities(groupIds, entityIds);
 
     /// <summary>
-    ///     Gets explicit and default permissions (if requested) permissions for the group for specified entities
+    ///     Retrieves the permissions assigned to the specified user groups for the given entities, including explicit permissions and, if requested, default permissions when explicit ones are not set.
     /// </summary>
-    /// <param name="groups"></param>
+    /// <param name="groups">The user groups for which to retrieve permissions.</param>
     /// <param name="fallbackToDefaultPermissions">
-    ///     If true will include the group's default permissions if no permissions are
-    ///     explicitly assigned
+    ///     If <c>true</c>, includes the group's default permissions for entities where no explicit permissions are assigned.
     /// </param>
-    /// <param name="nodeIds">Array of entity Ids, if empty will return permissions for the group for all entities</param>
+    /// <param name="nodeIds">An array of entity IDs to retrieve permissions for. If empty, permissions for all entities accessible by the group(s) are returned.</param>
+    /// <returns>
+    ///     An <see cref="EntityPermissionCollection"/> containing the permissions for the specified groups and entities.
+    /// </returns>
     public EntityPermissionCollection GetPermissions(IReadOnlyUserGroup[]? groups, bool fallbackToDefaultPermissions, params int[] nodeIds)
     {
         if (groups == null)
@@ -211,6 +251,9 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
     public void AssignGroupPermission(int groupId, string permission, params int[] entityIds) =>
         _permissionRepository.AssignPermission(groupId, permission, entityIds);
 
+    /// <summary>Gets the cache key for a user group by its alias.</summary>
+    /// <param name="alias">The alias of the user group.</param>
+    /// <returns>The cache key string for the specified user group alias.</returns>
     public static string GetByAliasCacheKey(string alias) => CacheKeys.UserGroupGetByAliasCacheKeyPrefix + alias;
 
     /// <summary>
@@ -218,16 +261,30 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
     /// </summary>
     private sealed class UserGroupWithUsers : EntityBase
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="UserGroupWithUsers"/> class with the specified user group and associated user IDs.
+        /// </summary>
+        /// <param name="userGroup">The <see cref="IUserGroup"/> instance representing the user group.</param>
+        /// <param name="userIds">An array of user IDs associated with the user group, or <c>null</c> if there are no associated users.</param>
         public UserGroupWithUsers(IUserGroup userGroup, int[]? userIds)
         {
             UserGroup = userGroup;
             UserIds = userIds;
         }
 
+        /// <summary>
+        /// Gets a value indicating whether the associated user group has an identity assigned.
+        /// </summary>
         public override bool HasIdentity => UserGroup.HasIdentity;
 
+        /// <summary>
+        /// Gets the associated user group for this <see cref="UserGroupWithUsers"/> instance.
+        /// </summary>
         public IUserGroup UserGroup { get; }
 
+        /// <summary>
+        /// Gets the IDs of the users associated with the user group.
+        /// </summary>
         public int[]? UserIds { get; }
     }
 
@@ -238,6 +295,15 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
     {
         private readonly UserGroupRepository _userGroupRepo;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="UserGroupWithUsersRepository"/> class.
+        /// </summary>
+        /// <param name="userGroupRepo">The <see cref="UserGroupRepository"/> used for user group data operations.</param>
+        /// <param name="scopeAccessor">The <see cref="IScopeAccessor"/> for managing database scopes.</param>
+        /// <param name="cache">The <see cref="AppCaches"/> instance for application-level caching.</param>
+        /// <param name="logger">The <see cref="ILogger{UserGroupWithUsersRepository}"/> instance for logging.</param>
+        /// <param name="repositoryCacheVersionService">The <see cref="IRepositoryCacheVersionService"/> for cache versioning.</param>
+        /// <param name="cacheSyncService">The <see cref="ICacheSyncService"/> for synchronizing cache across servers.</param>
         public UserGroupWithUsersRepository(
             UserGroupRepository userGroupRepo,
             IScopeAccessor scopeAccessor,

@@ -14,9 +14,9 @@ public class BackOfficeExternalLoginsBuilder
     /// <summary>
     ///     Add a back office login provider with options
     /// </summary>
-    /// <param name="loginProviderOptions"></param>
-    /// <param name="build"></param>
-    /// <returns></returns>
+    /// <param name="loginProviderOptions">Optional configuration for the login provider.</param>
+    /// <param name="build">The builder action to configure the authentication scheme.</param>
+    /// <returns>The builder for chaining.</returns>
     public BackOfficeExternalLoginsBuilder AddBackOfficeLogin(
         Action<BackOfficeAuthenticationBuilder> build,
         Action<BackOfficeExternalLoginProviderOptions>? loginProviderOptions = null)
