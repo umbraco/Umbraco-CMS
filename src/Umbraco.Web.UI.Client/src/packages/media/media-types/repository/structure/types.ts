@@ -6,6 +6,7 @@ export interface UmbAllowedMediaTypeModel extends UmbEntityModel {
 	name: string;
 	description: string | null;
 	icon: string | null;
+	matchedFileExtension?: boolean;
 }
 
 export interface UmbMediaTypeStructureDataSource extends UmbContentTypeStructureDataSource<UmbAllowedMediaTypeModel> {

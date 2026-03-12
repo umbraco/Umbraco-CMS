@@ -24,7 +24,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     Constants.PropertyEditors.Aliases.MultiNodeTreePicker,
     ValueType = ValueTypes.Text,
     ValueEditorIsReusable = true)]
-public class MultiNodeTreePickerPropertyEditor : DataEditor
+public class MultiNodeTreePickerPropertyEditor : DataEditor, IValueSchemaProvider
 {
     private readonly IIOHelper _ioHelper;
 
@@ -36,6 +36,57 @@ public class MultiNodeTreePickerPropertyEditor : DataEditor
     {
         _ioHelper = ioHelper;
         SupportsReadOnly = true;
+    }
+
+    /// <inheritdoc />
+    public Type? GetValueType(object? configuration) => typeof(MultiNodeTreePickerPropertyValueEditor.EditorEntityReference[]);
+
+    /// <inheritdoc />
+    public JsonObject? GetValueSchema(object? configuration)
+    {
+        var schema = new JsonObject
+        {
+            ["$schema"] = "https://json-schema.org/draft/2020-12/schema",
+            ["type"] = new JsonArray("array", "null"),
+            ["items"] = new JsonObject
+            {
+                ["type"] = "object",
+                ["properties"] = new JsonObject
+                {
+                    ["type"] = new JsonObject
+                    {
+                        ["type"] = "string",
+                        ["enum"] = new JsonArray("content", "media", "member"),
+                        ["description"] = "Entity type (content, media, or member)",
+                    },
+                    ["unique"] = new JsonObject
+                    {
+                        ["type"] = "string",
+                        ["format"] = "uuid",
+                        ["pattern"] = ValueSchemaPatterns.Uuid,
+                        ["description"] = "GUID of the selected entity",
+                    },
+                },
+                ["required"] = new JsonArray("type", "unique"),
+            },
+            ["description"] = "Array of selected entity references",
+        };
+
+        // Add minItems/maxItems from configuration if available
+        if (configuration is MultiNodePickerConfiguration pickerConfig)
+        {
+            if (pickerConfig.MinNumber > 0)
+            {
+                schema["minItems"] = pickerConfig.MinNumber;
+            }
+
+            if (pickerConfig.MaxNumber > 0)
+            {
+                schema["maxItems"] = pickerConfig.MaxNumber;
+            }
+        }
+
+        return schema;
     }
 
     /// <inheritdoc/>

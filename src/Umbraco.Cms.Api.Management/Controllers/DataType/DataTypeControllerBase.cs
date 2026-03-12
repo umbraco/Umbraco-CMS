@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.Builders;
@@ -54,6 +54,21 @@ public abstract class DataTypeControllerBase : ManagementApiControllerBase
         });
 
     protected IActionResult DataTypeNotFound() => OperationStatusResult(DataTypeOperationStatus.NotFound, DataTypeNotFound);
+
+    protected IActionResult PropertyEditorSchemaOperationStatusResult(PropertyEditorSchemaOperationStatus status) =>
+        OperationStatusResult(status, problemDetailsBuilder => status switch
+        {
+            PropertyEditorSchemaOperationStatus.DataTypeNotFound => NotFound(problemDetailsBuilder
+                .WithTitle("The data type could not be found")
+                .Build()),
+            PropertyEditorSchemaOperationStatus.SchemaNotSupported => NotFound(problemDetailsBuilder
+                .WithTitle("Schema not supported")
+                .WithDetail("The property editor for this data type does not support schema information.")
+                .Build()),
+            _ => StatusCode(StatusCodes.Status500InternalServerError, problemDetailsBuilder
+                .WithTitle("Unknown property editor schema operation status.")
+                .Build()),
+        });
 
     private IActionResult DataTypeNotFound(ProblemDetailsBuilder problemDetailsBuilder)
         => NotFound(problemDetailsBuilder
