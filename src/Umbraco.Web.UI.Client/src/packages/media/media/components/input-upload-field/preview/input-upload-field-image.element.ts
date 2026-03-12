@@ -24,9 +24,12 @@ export default class UmbInputUploadFieldImageElement extends UmbLitElement imple
 			}
 
 			img {
+				display: block;
 				object-fit: contain;
 				width: auto;
-				height: 100%;
+				height: auto;
+				max-width: 100%;
+				max-height: 400px;
 				background-color: #fff;
 				background-image: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" fill-opacity=".1"><path d="M50 0h50v50H50zM0 50h50v50H0z"/></svg>');
 				background-repeat: repeat;
