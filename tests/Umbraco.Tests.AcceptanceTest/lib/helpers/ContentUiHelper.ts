@@ -889,10 +889,6 @@ export class ContentUiHelper extends UiBaseLocators {
     return await this.isVisible(this.sidebarModal.getByText(contentName), isVisible);
   }
 
-  async doesModalHaveText(text: string) {
-    await this.containsText(this.openedModal, text);
-  }
-
   // Collection tab
   async isTabNameVisible(tabName: string) {
     return await this.isVisible(this.tabItems.filter({hasText: tabName}));

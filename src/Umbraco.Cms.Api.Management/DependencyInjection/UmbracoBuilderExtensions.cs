@@ -21,6 +21,7 @@ public static partial class UmbracoBuilderExtensions
         IServiceCollection services = builder.Services;
         builder.Services.AddSingleton<BackOfficeAreaRoutes>();
         builder.Services.AddSingleton<BackOfficeExternalLoginProviderErrorMiddleware>();
+        builder.Services.AddSingleton<IManagementApiRouteBuilder, ManagementApiRouteBuilder>();
         builder.Services.AddUnique<IConflictingRouteService, ConflictingRouteService>();
         builder.AddUmbracoApiOpenApiUI();
 
