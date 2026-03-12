@@ -1,4 +1,4 @@
-﻿using Examine;
+using Examine;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Api.Management.ViewModels.Indexer;
@@ -36,7 +36,7 @@ public class IndexPresentationFactory : IIndexPresentationFactory
     /// <inheritdoc />
     public async Task<IndexResponseModel> CreateAsync(IIndex index)
     {
-        var isCorrupt = !TryGetSearcherName(index, out var searcherName);
+        var isCorrupt = !TryGetIndexMetric(index, idx => idx.Searcher.Name, index.Name, "searcher name", "Could not determine searcher name because of error.", out string searcherName);
 
         if (await _indexingRebuilderService.IsRebuildingAsync(index.Name))
         {
@@ -72,12 +72,12 @@ public class IndexPresentationFactory : IIndexPresentationFactory
             }
         }
 
-        if (TryGetDocumentCount(indexDiag, index, out var documentCount) is false)
+        if (TryGetIndexMetric(indexDiag, diag => diag.GetDocumentCount(), index.Name, "document count", 0L, out long documentCount) is false)
         {
             isCorrupt = true;
         }
 
-        if (TryGetFieldNameCount(indexDiag, index, out var fieldNameCount) is false)
+        if (TryGetIndexMetric(indexDiag, diag => diag.GetFieldNames().Count(), index.Name, "field name count", 0, out int fieldNameCount) is false)
         {
             isCorrupt = true;
         }
@@ -102,47 +102,23 @@ public class IndexPresentationFactory : IIndexPresentationFactory
         return indexerModel;
     }
 
-    private bool TryGetSearcherName(IIndex index, out string name)
+    private bool TryGetIndexMetric<TSource, TResult>(
+        TSource source,
+        Func<TSource, TResult> getMetric,
+        string indexName,
+        string metricName,
+        TResult errorDefault,
+        out TResult result)
     {
         try
         {
-            name = index.Searcher.Name;
+            result = getMetric(source);
             return true;
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "An error occured trying to get the searcher name of index {IndexName}", index.Name);
-            name = "Could not determine searcher name because of error.";
-            return false;
-        }
-    }
-
-    private bool TryGetDocumentCount(IIndexDiagnostics indexDiag, IIndex index, out long documentCount)
-    {
-        try
-        {
-            documentCount = indexDiag.GetDocumentCount();
-            return true;
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e, "An error occured trying to get the document count of index {IndexName}", index.Name);
-            documentCount = 0;
-            return false;
-        }
-    }
-
-    private bool TryGetFieldNameCount(IIndexDiagnostics indexDiag, IIndex index, out int fieldNameCount)
-    {
-        try
-        {
-            fieldNameCount = indexDiag.GetFieldNames().Count();
-            return true;
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e, "An error occured trying to get the field name count of index {IndexName}", index.Name);
-            fieldNameCount = 0;
+            _logger.LogError(e, "An error occured trying to get the {MetricName} of index {IndexName}", metricName, indexName);
+            result = errorDefault;
             return false;
         }
     }

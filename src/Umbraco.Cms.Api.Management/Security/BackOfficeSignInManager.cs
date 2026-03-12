@@ -74,20 +74,17 @@ public class BackOfficeSignInManager : UmbracoSignInManager<BackOfficeIdentityUs
             ?.ExternalLoginProvider?.Options?.AutoLinkOptions;
         BackOfficeIdentityUser? user =
             await UserManager.FindByLoginAsync(loginInfo.LoginProvider, loginInfo.ProviderKey);
+
         if (user == null)
         {
             // user doesn't exist so see if we can auto link
             return await AutoLinkAndSignInExternalAccount(loginInfo, autoLinkOptions);
         }
 
-        if (autoLinkOptions != null && autoLinkOptions.OnExternalLogin != null)
+        if (autoLinkOptions?.OnExternalLogin != null && !autoLinkOptions.OnExternalLogin(user, loginInfo))
         {
-            var shouldSignIn = autoLinkOptions.OnExternalLogin(user, loginInfo);
-            if (shouldSignIn == false)
-            {
-                LogFailedExternalLogin(loginInfo, user);
-                return ExternalLoginSignInResult.NotAllowed;
-            }
+            LogFailedExternalLogin(loginInfo, user);
+            return ExternalLoginSignInResult.NotAllowed;
         }
 
         SignInResult? error = await PreSignInCheck(user);
@@ -189,35 +186,51 @@ public class BackOfficeSignInManager : UmbracoSignInManager<BackOfficeIdentityUs
         BackOfficeIdentityUser? autoLinkUser = await UserManager.FindByEmailAsync(email!);
         if (autoLinkUser != null)
         {
-            try
-            {
-                //call the callback if one is assigned
-                autoLinkOptions.OnAutoLinking?.Invoke(autoLinkUser, loginInfo);
-            }
-            catch (Exception ex)
-            {
-                Logger.LogError(ex, "Could not link login provider {LoginProvider}.", loginInfo.LoginProvider);
-                return AutoLinkSignInResult.FailedException(ex.Message);
-            }
-
-            var shouldLinkUser = autoLinkOptions.OnExternalLogin == null ||
-                                 autoLinkOptions.OnExternalLogin(autoLinkUser, loginInfo);
-            if (shouldLinkUser)
-            {
-                return await LinkUser(autoLinkUser, loginInfo);
-            }
-
-            LogFailedExternalLogin(loginInfo, autoLinkUser);
-            return ExternalLoginSignInResult.NotAllowed;
+            return await AutoLinkExistingUserAsync(autoLinkUser, loginInfo, autoLinkOptions);
         }
 
+        return await AutoLinkNewUserAsync(email!, loginInfo, autoLinkOptions);
+    }
+
+    private async Task<SignInResult> AutoLinkExistingUserAsync(
+        BackOfficeIdentityUser autoLinkUser,
+        ExternalLoginInfo loginInfo,
+        ExternalSignInAutoLinkOptions autoLinkOptions)
+    {
+        try
+        {
+            //call the callback if one is assigned
+            autoLinkOptions.OnAutoLinking?.Invoke(autoLinkUser, loginInfo);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Could not link login provider {LoginProvider}.", loginInfo.LoginProvider);
+            return AutoLinkSignInResult.FailedException(ex.Message);
+        }
+
+        var shouldLinkUser = autoLinkOptions.OnExternalLogin == null ||
+                             autoLinkOptions.OnExternalLogin(autoLinkUser, loginInfo);
+        if (shouldLinkUser)
+        {
+            return await LinkUser(autoLinkUser, loginInfo);
+        }
+
+        LogFailedExternalLogin(loginInfo, autoLinkUser);
+        return ExternalLoginSignInResult.NotAllowed;
+    }
+
+    private async Task<SignInResult> AutoLinkNewUserAsync(
+        string email,
+        ExternalLoginInfo loginInfo,
+        ExternalSignInAutoLinkOptions autoLinkOptions)
+    {
         var name = loginInfo.Principal?.Identity?.Name;
         if (name.IsNullOrWhiteSpace())
         {
             throw new InvalidOperationException("The Name value cannot be null");
         }
 
-        autoLinkUser = BackOfficeIdentityUser.CreateNew(_globalSettings, email, email!, autoLinkOptions.GetUserAutoLinkCulture(_globalSettings), name);
+        BackOfficeIdentityUser autoLinkUser = BackOfficeIdentityUser.CreateNew(_globalSettings, email, email!, autoLinkOptions.GetUserAutoLinkCulture(_globalSettings), name);
 
         foreach (var userGroup in autoLinkOptions.DefaultUserGroups)
         {
@@ -243,17 +256,15 @@ public class BackOfficeSignInManager : UmbracoSignInManager<BackOfficeIdentityUs
                 userCreationResult.Errors.Select(x => x.Description).ToList());
         }
 
+        var shouldLinkUser = autoLinkOptions.OnExternalLogin == null ||
+                             autoLinkOptions.OnExternalLogin(autoLinkUser, loginInfo);
+        if (shouldLinkUser)
         {
-            var shouldLinkUser = autoLinkOptions.OnExternalLogin == null ||
-                                 autoLinkOptions.OnExternalLogin(autoLinkUser, loginInfo);
-            if (shouldLinkUser)
-            {
-                return await LinkUser(autoLinkUser, loginInfo);
-            }
-
-            LogFailedExternalLogin(loginInfo, autoLinkUser);
-            return ExternalLoginSignInResult.NotAllowed;
+            return await LinkUser(autoLinkUser, loginInfo);
         }
+
+        LogFailedExternalLogin(loginInfo, autoLinkUser);
+        return ExternalLoginSignInResult.NotAllowed;
     }
 
     private async Task<SignInResult> LinkUser(BackOfficeIdentityUser autoLinkUser, ExternalLoginInfo loginInfo)

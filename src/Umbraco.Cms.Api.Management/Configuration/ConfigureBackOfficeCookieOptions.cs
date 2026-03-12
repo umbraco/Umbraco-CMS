@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection;
@@ -21,6 +21,9 @@ namespace Umbraco.Cms.Api.Management.Configuration;
 /// </summary>
 public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAuthenticationOptions>
 {
+    private const string DataProtectorPurpose = "Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationMiddleware";
+    private const string XhrHeaderValue = "XMLHttpRequest";
+
     private readonly IDataProtectionProvider _dataProtection;
     private readonly GlobalSettings _globalSettings;
     private readonly IIpResolver _ipResolver;
@@ -91,7 +94,7 @@ public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAut
         // NOTE: This is borrowed directly from aspnetcore source
         // Note: the purpose for the data protector must remain fixed for interop to work.
         IDataProtector dataProtector = options.DataProtectionProvider.CreateProtector(
-            "Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationMiddleware",
+            DataProtectorPurpose,
             Constants.Security.BackOfficeAuthenticationType,
             "v2");
         var ticketDataFormat = new TicketDataFormat(dataProtector);
@@ -107,161 +110,173 @@ public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAut
             // It would be possible to re-use the default behavior if any of these need to be set but that must be taken into account else
             // our back office requests will not function correctly. For now we don't need to set/configure any of these callbacks because
             // the defaults work fine with our setup.
-            OnValidatePrincipal = async ctx =>
-            {
-                // We need to resolve the BackOfficeSecurityStampValidator per request as a requirement (even in aspnetcore they do this)
-                BackOfficeSecurityStampValidator securityStampValidator =
-                    ctx.HttpContext.RequestServices.GetRequiredService<BackOfficeSecurityStampValidator>();
-
-                // Same goes for the signinmanager
-                IBackOfficeSignInManager signInManager =
-                    ctx.HttpContext.RequestServices.GetRequiredService<IBackOfficeSignInManager>();
-
-                ClaimsIdentity? backOfficeIdentity = ctx.Principal?.GetUmbracoIdentity();
-                if (backOfficeIdentity == null)
-                {
-                    ctx.RejectPrincipal();
-                    await signInManager.SignOutAsync();
-                }
-
-                // ensure the thread culture is set
-                backOfficeIdentity?.EnsureCulture();
-
-                EnsureTicketRenewalIfKeepUserLoggedIn(ctx);
-
-                // add or update a claim to track when the cookie expires, we use this to track time remaining
-                backOfficeIdentity?.AddOrUpdateClaim(new Claim(
-                    Constants.Security.TicketExpiresClaimType,
-                    ctx.Properties.ExpiresUtc!.Value.ToString("o"),
-                    ClaimValueTypes.DateTime,
-                    Constants.Security.BackOfficeAuthenticationType,
-                    Constants.Security.BackOfficeAuthenticationType,
-                    backOfficeIdentity));
-
-                await securityStampValidator.ValidateAsync(ctx);
-
-                // Only reset timestamps when a renewal was already triggered (by the SecurityStampValidator
-                // or by EnsureTicketRenewalIfKeepUserLoggedIn above).
-                // When the SecurityStampValidator refreshes the principal, it sets ShouldRenew but updates
-                // IssuedUtc without updating ExpiresUtc, causing the effective cookie lifetime to shrink
-                // with each validation. The manual reset here fixes that drift.
-                // IMPORTANT: Do NOT unconditionally set ShouldRenew or reset IssuedUtc - doing so prevents
-                // the SecurityStampValidator from ever exceeding its ValidationInterval during active use,
-                // which breaks AllowConcurrentLogins enforcement.
-                if (ctx.ShouldRenew)
-                {
-                    DateTimeOffset now = _timeProvider.GetUtcNow();
-                    ctx.Properties.IssuedUtc = now;
-                    ctx.Properties.ExpiresUtc = now.Add(_globalSettings.TimeOut);
-                }
-            },
-            OnSigningIn = ctx =>
-            {
-                // occurs when sign in is successful but before the ticket is written to the outbound cookie
-                ClaimsIdentity? backOfficeIdentity = ctx.Principal?.GetUmbracoIdentity();
-                if (backOfficeIdentity != null)
-                {
-                    // generate a session id and assign it
-                    // create a session token - if we are configured and not in an upgrade state then use the db, otherwise just generate one
-                    Guid session = _runtimeState.Level == RuntimeLevel.Run
-                        ? _userService.CreateLoginSession(
-                            backOfficeIdentity.GetId()!.Value,
-                            _ipResolver.GetCurrentRequestIpAddress())
-                        : Guid.NewGuid();
-
-                    // add our session claim
-                    backOfficeIdentity.AddClaim(new Claim(
-                        Constants.Security.SessionIdClaimType,
-                        session.ToString(),
-                        ClaimValueTypes.String,
-                        Constants.Security.BackOfficeAuthenticationType,
-                        Constants.Security.BackOfficeAuthenticationType,
-                        backOfficeIdentity));
-
-                    // since it is a cookie-based authentication add that claim
-                    backOfficeIdentity.AddClaim(new Claim(
-                        ClaimTypes.CookiePath,
-                        "/",
-                        ClaimValueTypes.String,
-                        Constants.Security.BackOfficeAuthenticationType,
-                        Constants.Security.BackOfficeAuthenticationType,
-                        backOfficeIdentity));
-                }
-
-                return Task.CompletedTask;
-            },
-            OnSignedIn = ctx =>
-            {
-                // occurs when sign in is successful and after the ticket is written to the outbound cookie
-
-                // When we are signed in with the cookie, assign the principal to the current HttpContext
-                ctx.HttpContext.SetPrincipalForRequest(ctx.Principal);
-
-                return Task.CompletedTask;
-            },
-            OnSigningOut = ctx =>
-            {
-                // Clear the user's session on sign out
-                if (ctx.HttpContext?.User?.Identity != null)
-                {
-                    var claimsIdentity = ctx.HttpContext.User.Identity as ClaimsIdentity;
-                    var sessionId = claimsIdentity?.FindFirstValue(Constants.Security.SessionIdClaimType);
-                    if (sessionId.IsNullOrWhiteSpace() == false && Guid.TryParse(sessionId, out Guid guidSession))
-                    {
-                        _userService.ClearLoginSession(guidSession);
-                    }
-                }
-
-                // Remove all of our cookies
-                var cookies = new[]
-                {
-                    _securitySettings.AuthCookieName,
-                    Constants.Web.PreviewCookieName, Constants.Security.BackOfficeExternalCookieName,
-                    Constants.Web.CsrfValidationCookieName
-                };
-                foreach (var cookie in cookies)
-                {
-                    ctx.Options.CookieManager.DeleteCookie(ctx.HttpContext!, cookie, new CookieOptions { Path = "/" });
-                }
-
-                return Task.CompletedTask;
-            },
+            OnValidatePrincipal = HandleValidatePrincipalAsync,
+            OnSigningIn = HandleSigningInAsync,
+            OnSignedIn = HandleSignedInAsync,
+            OnSigningOut = HandleSigningOutAsync,
             // FIXME: We want to change this over to using an attribute on the backoffice controllers
             // See this for more: https://github.com/dotnet/aspnetcore/issues/63093#issuecomment-3201530217
-            OnRedirectToLogin = context =>
-            {
-                if (IsXhr(context.Request))
-                {
-                    context.Response.Headers.Location = context.RedirectUri;
-                    context.Response.StatusCode = 401;
-                }
-                else
-                {
-                    context.Response.Redirect(context.RedirectUri);
-                }
-
-                return Task.CompletedTask;
-            },
-            OnRedirectToAccessDenied = context =>
-            {
-                if (IsXhr(context.Request))
-                {
-                    context.Response.Headers.Location = context.RedirectUri;
-                    context.Response.StatusCode = 403;
-                }
-                else
-                {
-                    context.Response.Redirect(context.RedirectUri);
-                }
-
-                return Task.CompletedTask;
-            },
+            OnRedirectToLogin = HandleRedirectToLoginAsync,
+            OnRedirectToAccessDenied = HandleRedirectToAccessDeniedAsync,
         };
     }
 
+    private async Task HandleValidatePrincipalAsync(CookieValidatePrincipalContext ctx)
+    {
+        // We need to resolve the BackOfficeSecurityStampValidator per request as a requirement (even in aspnetcore they do this)
+        BackOfficeSecurityStampValidator securityStampValidator =
+            ctx.HttpContext.RequestServices.GetRequiredService<BackOfficeSecurityStampValidator>();
+
+        // Same goes for the signinmanager
+        IBackOfficeSignInManager signInManager =
+            ctx.HttpContext.RequestServices.GetRequiredService<IBackOfficeSignInManager>();
+
+        ClaimsIdentity? backOfficeIdentity = ctx.Principal?.GetUmbracoIdentity();
+        if (backOfficeIdentity == null)
+        {
+            ctx.RejectPrincipal();
+            await signInManager.SignOutAsync();
+        }
+
+        // ensure the thread culture is set
+        backOfficeIdentity?.EnsureCulture();
+
+        EnsureTicketRenewalIfKeepUserLoggedIn(ctx);
+
+        // add or update a claim to track when the cookie expires, we use this to track time remaining
+        backOfficeIdentity?.AddOrUpdateClaim(new Claim(
+            Constants.Security.TicketExpiresClaimType,
+            ctx.Properties.ExpiresUtc!.Value.ToString("o"),
+            ClaimValueTypes.DateTime,
+            Constants.Security.BackOfficeAuthenticationType,
+            Constants.Security.BackOfficeAuthenticationType,
+            backOfficeIdentity));
+
+        await securityStampValidator.ValidateAsync(ctx);
+
+        // Only reset timestamps when a renewal was already triggered (by the SecurityStampValidator
+        // or by EnsureTicketRenewalIfKeepUserLoggedIn above).
+        // When the SecurityStampValidator refreshes the principal, it sets ShouldRenew but updates
+        // IssuedUtc without updating ExpiresUtc, causing the effective cookie lifetime to shrink
+        // with each validation. The manual reset here fixes that drift.
+        // IMPORTANT: Do NOT unconditionally set ShouldRenew or reset IssuedUtc - doing so prevents
+        // the SecurityStampValidator from ever exceeding its ValidationInterval during active use,
+        // which breaks AllowConcurrentLogins enforcement.
+        if (ctx.ShouldRenew)
+        {
+            DateTimeOffset now = _timeProvider.GetUtcNow();
+            ctx.Properties.IssuedUtc = now;
+            ctx.Properties.ExpiresUtc = now.Add(_globalSettings.TimeOut);
+        }
+    }
+
+    private Task HandleSigningInAsync(CookieSigningInContext ctx)
+    {
+        // occurs when sign in is successful but before the ticket is written to the outbound cookie
+        ClaimsIdentity? backOfficeIdentity = ctx.Principal?.GetUmbracoIdentity();
+        if (backOfficeIdentity != null)
+        {
+            // generate a session id and assign it
+            // create a session token - if we are configured and not in an upgrade state then use the db, otherwise just generate one
+            Guid session = _runtimeState.Level == RuntimeLevel.Run
+                ? _userService.CreateLoginSession(
+                    backOfficeIdentity.GetId()!.Value,
+                    _ipResolver.GetCurrentRequestIpAddress())
+                : Guid.NewGuid();
+
+            // add our session claim
+            backOfficeIdentity.AddClaim(new Claim(
+                Constants.Security.SessionIdClaimType,
+                session.ToString(),
+                ClaimValueTypes.String,
+                Constants.Security.BackOfficeAuthenticationType,
+                Constants.Security.BackOfficeAuthenticationType,
+                backOfficeIdentity));
+
+            // since it is a cookie-based authentication add that claim
+            backOfficeIdentity.AddClaim(new Claim(
+                ClaimTypes.CookiePath,
+                "/",
+                ClaimValueTypes.String,
+                Constants.Security.BackOfficeAuthenticationType,
+                Constants.Security.BackOfficeAuthenticationType,
+                backOfficeIdentity));
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private Task HandleSignedInAsync(CookieSignedInContext ctx)
+    {
+        // occurs when sign in is successful and after the ticket is written to the outbound cookie
+
+        // When we are signed in with the cookie, assign the principal to the current HttpContext
+        ctx.HttpContext.SetPrincipalForRequest(ctx.Principal);
+
+        return Task.CompletedTask;
+    }
+
+    private Task HandleSigningOutAsync(CookieSigningOutContext ctx)
+    {
+        // Clear the user's session on sign out
+        if (ctx.HttpContext?.User?.Identity != null)
+        {
+            var claimsIdentity = ctx.HttpContext.User.Identity as ClaimsIdentity;
+            var sessionId = claimsIdentity?.FindFirstValue(Constants.Security.SessionIdClaimType);
+            if (sessionId.IsNullOrWhiteSpace() == false && Guid.TryParse(sessionId, out Guid guidSession))
+            {
+                _userService.ClearLoginSession(guidSession);
+            }
+        }
+
+        // Remove all of our cookies
+        var cookies = new[]
+        {
+            _securitySettings.AuthCookieName,
+            Constants.Web.PreviewCookieName, Constants.Security.BackOfficeExternalCookieName,
+            Constants.Web.CsrfValidationCookieName
+        };
+        foreach (var cookie in cookies)
+        {
+            ctx.Options.CookieManager.DeleteCookie(ctx.HttpContext!, cookie, new CookieOptions { Path = "/" });
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private Task HandleRedirectToLoginAsync(RedirectContext<CookieAuthenticationOptions> context)
+    {
+        if (IsXhr(context.Request))
+        {
+            context.Response.Headers.Location = context.RedirectUri;
+            context.Response.StatusCode = 401;
+        }
+        else
+        {
+            context.Response.Redirect(context.RedirectUri);
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private Task HandleRedirectToAccessDeniedAsync(RedirectContext<CookieAuthenticationOptions> context)
+    {
+        if (IsXhr(context.Request))
+        {
+            context.Response.Headers.Location = context.RedirectUri;
+            context.Response.StatusCode = 403;
+        }
+        else
+        {
+            context.Response.Redirect(context.RedirectUri);
+        }
+
+        return Task.CompletedTask;
+    }
+
     private bool IsXhr(HttpRequest request) =>
-        string.Equals(request.Query[HeaderNames.XRequestedWith], "XMLHttpRequest", StringComparison.Ordinal) ||
-        string.Equals(request.Headers.XRequestedWith, "XMLHttpRequest", StringComparison.Ordinal);
+        string.Equals(request.Query[HeaderNames.XRequestedWith], XhrHeaderValue, StringComparison.Ordinal) ||
+        string.Equals(request.Headers.XRequestedWith, XhrHeaderValue, StringComparison.Ordinal);
 
     /// <summary>
     ///     Ensures the ticket is renewed if the <see cref="SecuritySettings.KeepUserLoggedIn" /> is set to true
