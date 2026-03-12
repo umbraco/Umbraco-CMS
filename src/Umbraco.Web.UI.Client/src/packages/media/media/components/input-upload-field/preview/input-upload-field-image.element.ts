@@ -18,7 +18,6 @@ export default class UmbInputUploadFieldImageElement extends UmbLitElement imple
 			:host {
 				position: relative;
 				min-height: 240px;
-				max-height: 400px;
 				width: fit-content;
 				max-width: 100%;
 			}
