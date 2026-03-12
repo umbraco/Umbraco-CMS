@@ -9,6 +9,10 @@ public class BackOfficeExternalLoginsBuilder
 {
     private readonly IServiceCollection _services;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="BackOfficeExternalLoginsBuilder"/> class for configuring external login providers in the backoffice.
+    /// </summary>
+    /// <param name="services">The <see cref="IServiceCollection"/> to which external login services will be added.</param>
     public BackOfficeExternalLoginsBuilder(IServiceCollection services) => _services = services;
 
     /// <summary>

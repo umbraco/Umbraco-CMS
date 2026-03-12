@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -10,14 +10,27 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Security;
 
+/// <summary>
+/// Provides default actions for managing back office security within the Umbraco CMS.
+/// </summary>
 public class BackOfficeDefaultController : Controller
 {
     private readonly IRuntime _umbracoRuntime;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="BackOfficeDefaultController"/> class.
+    /// </summary>
+    /// <param name="umbracoRuntime">An instance of <see cref="IRuntime"/> representing the Umbraco runtime environment.</param>
     [ActivatorUtilitiesConstructor]
     public BackOfficeDefaultController(IRuntime umbracoRuntime)
         => _umbracoRuntime = umbracoRuntime;
 
+    /// <summary>
+    /// Retrieves the default configuration and settings for the Umbraco back office.
+    /// This endpoint also ensures authentication is attempted, redirecting unauthenticated users to the login page.
+    /// </summary>
+    /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
+    /// <returns>An <see cref="IActionResult"/> representing the result of the action, which is typically the default back office view or a redirect to login if authentication fails.</returns>
     [HttpGet]
     [AllowAnonymous]
     [EndpointSummary("Gets the back office default configuration.")]

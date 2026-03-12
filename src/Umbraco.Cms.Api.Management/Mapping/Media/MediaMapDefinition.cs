@@ -15,11 +15,21 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Mapping.Media;
 
+/// <summary>
+/// Defines the mapping configuration for media entities within the Umbraco CMS API management layer.
+/// </summary>
 public class MediaMapDefinition : ContentMapDefinition<IMedia, MediaValueResponseModel, MediaVariantResponseModel>, IMapDefinition
 {
     private readonly CommonMapper _commonMapper;
     private ContentSettings _contentSettings;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Mapping.Media.MediaMapDefinition"/> class with the specified dependencies.
+    /// </summary>
+    /// <param name="propertyEditorCollection">The <see cref="PropertyEditorCollection"/> containing available property editors.</param>
+    /// <param name="commonMapper">The <see cref="CommonMapper"/> instance used for common mapping operations.</param>
+    /// <param name="dataValueEditorFactory">The <see cref="IDataValueEditorFactory"/> used to create data value editors.</param>
+    /// <param name="contentSettings">The <see cref="IOptionsMonitor{ContentSettings}"/> providing access to content settings options.</param>
     public MediaMapDefinition(
         PropertyEditorCollection propertyEditorCollection,
         CommonMapper commonMapper,
@@ -32,6 +42,12 @@ public class MediaMapDefinition : ContentMapDefinition<IMedia, MediaValueRespons
         contentSettings.OnChange(x => _contentSettings = x);
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MediaMapDefinition"/> class.
+    /// </summary>
+    /// <param name="propertyEditorCollection">A collection containing the available property editors.</param>
+    /// <param name="commonMapper">An instance of <see cref="CommonMapper"/> used for common mapping operations.</param>
+    /// <param name="dataValueEditorFactory">A factory for creating data value editors.</param>
     [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in Umbraco 18.")]
     public MediaMapDefinition(
         PropertyEditorCollection propertyEditorCollection,
@@ -45,6 +61,11 @@ public class MediaMapDefinition : ContentMapDefinition<IMedia, MediaValueRespons
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Mapping.Media.MediaMapDefinition"/> class.
+    /// </summary>
+    /// <param name="propertyEditorCollection">A collection containing the property editors used for mapping media properties.</param>
+    /// <param name="commonMapper">An instance of <see cref="CommonMapper"/> used for common mapping operations.</param>
     [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in Umbraco 18.")]
     public MediaMapDefinition(
         PropertyEditorCollection propertyEditorCollection,
@@ -56,6 +77,10 @@ public class MediaMapDefinition : ContentMapDefinition<IMedia, MediaValueRespons
     {
     }
 
+    /// <summary>
+    /// Configures the object mappings for media entities, defining how <see cref="IMedia"/> instances are mapped to <see cref="MediaResponseModel"/> and <see cref="MediaCollectionResponseModel"/>.
+    /// </summary>
+    /// <param name="mapper">The <see cref="IUmbracoMapper"/> instance used to register the mappings.</param>
     public void DefineMaps(IUmbracoMapper mapper)
     {
         mapper.Define<IMedia, MediaResponseModel>((_, _) => new MediaResponseModel(), Map);

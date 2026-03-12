@@ -11,6 +11,9 @@ using Umbraco.Cms.Web.Common.Hosting;
 
 namespace Umbraco.Cms.Api.Management.Extensions;
 
+/// <summary>
+/// Provides extension methods for <see cref="HtmlHelper"/> related to Umbraco back office functionality.
+/// </summary>
 public static class HtmlHelperBackOfficeExtensions
 {
     /// <summary>
@@ -21,6 +24,10 @@ public static class HtmlHelperBackOfficeExtensions
     ///     It will also replace the /umbraco/backoffice path with the correct path for the BackOffice assets.
     ///     When a CSP nonce is available, it will be added to the script tag.
     /// </remarks>
+    /// <param name="html">The HTML helper instance.</param>
+    /// <param name="jsonSerializer">The JSON serializer used to serialize the package imports.</param>
+    /// <param name="backOfficePathGenerator">The path generator for BackOffice assets and cache busting.</param>
+    /// <param name="packageManifestService">The service to retrieve package manifest import maps.</param>
     /// <returns>A <see cref="Task"/> containing the html content for the BackOffice import map.</returns>
     public static async Task<IHtmlContent> BackOfficeImportMapScriptAsync(
         this IHtmlHelper html,

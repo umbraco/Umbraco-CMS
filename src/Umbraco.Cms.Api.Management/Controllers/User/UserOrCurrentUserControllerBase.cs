@@ -5,6 +5,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.User;
 
+/// <summary>
+/// Serves as a base controller for API endpoints that operate on either a specified user or the current user.
+/// </summary>
 [ApiExplorerSettings(GroupName = "User")]
 public abstract class UserOrCurrentUserControllerBase : ManagementApiControllerBase
 {

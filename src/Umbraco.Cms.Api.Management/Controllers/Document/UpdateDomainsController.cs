@@ -18,6 +18,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Document;
 
+/// <summary>
+/// Controller for updating domains associated with documents.
+/// </summary>
 [ApiVersion("1.0")]
 public class UpdateDomainsController : DocumentControllerBase
 {
@@ -27,6 +30,12 @@ public class UpdateDomainsController : DocumentControllerBase
     private readonly IDomainPresentationFactory _domainPresentationFactory;
 
     [ActivatorUtilitiesConstructor]
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Controllers.Document.UpdateDomainsController"/> class.
+    /// </summary>
+    /// <param name="domainService">Service used to manage domain entities within the Umbraco CMS.</param>
+    /// <param name="umbracoMapper">The mapper responsible for converting between Umbraco domain models and API models.</param>
+    /// <param name="domainPresentationFactory">Factory for creating presentation models for domains.</param>
     public UpdateDomainsController(IAuthorizationService authorizationService, IDomainService domainService, IUmbracoMapper umbracoMapper, IDomainPresentationFactory domainPresentationFactory)
     {
         _authorizationService = authorizationService;
@@ -45,6 +54,13 @@ public class UpdateDomainsController : DocumentControllerBase
     {
     }
 
+    /// <summary>
+    /// Updates the domains assigned to the specified document.
+    /// </summary>
+    /// <param name="cancellationToken">Token to monitor for cancellation requests.</param>
+    /// <param name="id">The unique identifier of the document whose domains will be updated.</param>
+    /// <param name="updateModel">The model containing the new domain assignment details.</param>
+    /// <returns>An <see cref="IActionResult"/> representing the result of the operation.</returns>
     [MapToApiVersion("1.0")]
     [HttpPut("{id:guid}/domains")]
     [ProducesResponseType(StatusCodes.Status200OK)]
