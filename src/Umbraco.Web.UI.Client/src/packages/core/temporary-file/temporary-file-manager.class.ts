@@ -126,7 +126,7 @@ export class UmbTemporaryFileManager<
 			}
 		}
 
-		const fileExtension = getFileExtension(item.file.name) ?? '';
+		const fileExtension = (getFileExtension(item.file.name) ?? '').toLowerCase();
 
 		const [allowedExtensions, disallowedExtensions] = await this.observe(
 			observeMultiple([
