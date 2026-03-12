@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Infrastructure.PropertyEditors.NotificationHandlers;
 /// <summary>
 /// Implements a notification handler that processes file uploads media is saved, completing properties on the media item.
 /// </summary>
-internal sealed class FileUploadMediaSavingNotificationHandler : FileUploadNotificationHandlerBase, INotificationHandler<MediaSavingNotification>
+public class FileUploadMediaSavingNotificationHandler : FileUploadNotificationHandlerBase, INotificationHandler<MediaSavingNotification>
 {
     private readonly IOptionsMonitor<ContentSettings> _contentSettings;
     private readonly UploadAutoFillProperties _uploadAutoFillProperties;
