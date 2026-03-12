@@ -9,14 +9,14 @@ import { UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
 
 const ObserveValueItems = Symbol();
 export class UmbDefaultSelectCollectionFacetFilterApi extends UmbControllerBase implements UmbCollectionFacetFilterApi {
+	#options = new UmbArrayState<UmbSelectOption>([], (x) => x.value);
+	public readonly options = this.#options.asObservable();
+
 	#value = new UmbArrayState<string>([], (x) => x);
 	public readonly value = this.#value.asObservable();
 
 	#valueItems = new UmbArrayState<UmbDatalistItemModel>([], (x) => x.unique);
 	public readonly valueItems = this.#valueItems.asObservable();
-
-	#options = new UmbArrayState<UmbSelectOption>([], (x) => x.value);
-	public readonly options = this.#options.asObservable();
 
 	#collectionContext?: typeof UMB_COLLECTION_CONTEXT.TYPE;
 	#datalistDataSource?: UmbDatalistDataSource;
