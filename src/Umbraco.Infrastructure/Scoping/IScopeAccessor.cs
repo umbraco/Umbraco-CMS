@@ -1,5 +1,8 @@
 namespace Umbraco.Cms.Infrastructure.Scoping;
 
+/// <summary>
+/// Defines a mechanism to access the current <see cref="IScope"/>, which manages the unit of work and transactions within the application.
+/// </summary>
 public interface IScopeAccessor
 {
     /// <summary>

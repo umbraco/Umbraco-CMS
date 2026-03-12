@@ -16,6 +16,15 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 /// </summary>
 internal class EntityContainerRepository : EntityRepositoryBase<int, EntityContainer>, IEntityContainerRepository
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="EntityContainerRepository"/> class.
+    /// </summary>
+    /// <param name="scopeAccessor">Provides access to the current database scope.</param>
+    /// <param name="cache">The application-level caches used for storing and retrieving cached data.</param>
+    /// <param name="logger">The logger used for logging repository operations and errors.</param>
+    /// <param name="containerObjectType">The unique identifier (<see cref="Guid"/>) for the container object type managed by this repository.</param>
+    /// <param name="repositoryCacheVersionService">Service for managing cache versioning within the repository.</param>
+    /// <param name="cacheSyncService">Service responsible for synchronizing cache across distributed environments.</param>
     public EntityContainerRepository(
         IScopeAccessor scopeAccessor,
         AppCaches cache,
@@ -47,7 +56,12 @@ internal class EntityContainerRepository : EntityRepositoryBase<int, EntityConta
 
     protected Guid NodeObjectTypeId { get; }
 
-    // temp - so we don't have to implement GetByQuery
+    /// <summary>
+    /// Retrieves an <see cref="Umbraco.Cms.Core.Models.EntityContainer"/> by its unique identifier.
+    /// </summary>
+    /// <remarks>temp - so we don't have to implement GetByQuery</remarks>
+    /// <param name="id">The unique identifier of the entity container.</param>
+    /// <returns>The corresponding <see cref="Umbraco.Cms.Core.Models.EntityContainer"/> if found; otherwise, <c>null</c>.</returns>
     public EntityContainer? Get(Guid id)
     {
         Sql<ISqlContext> sql = GetBaseQuery(false).Where<NodeDto>(c => c.UniqueId == id);
@@ -56,6 +70,12 @@ internal class EntityContainerRepository : EntityRepositoryBase<int, EntityConta
         return nodeDto == null ? null : CreateEntity(nodeDto);
     }
 
+    /// <summary>
+    /// Retrieves all <see cref="Umbraco.Cms.Core.Models.EntityContainer"/> instances that match the specified <paramref name="name"/> and <paramref name="level"/>.
+    /// </summary>
+    /// <param name="name">The name to filter entity containers by. Only containers with this name will be returned.</param>
+    /// <param name="level">The hierarchical level to filter entity containers by. Only containers at this level will be returned.</param>
+    /// <returns>An <see cref="IEnumerable{T}"/> of <see cref="Umbraco.Cms.Core.Models.EntityContainer"/> objects that match the specified criteria.</returns>
     public IEnumerable<EntityContainer> Get(string name, int level)
     {
         Sql<ISqlContext> sql = GetBaseQuery(false)
@@ -149,6 +169,12 @@ internal class EntityContainerRepository : EntityRepositoryBase<int, EntityConta
 
     protected override IEnumerable<string> GetDeleteClauses() => throw new NotImplementedException();
 
+    /// <summary>
+    /// Determines whether there is a duplicate entity container name under the specified parent.
+    /// </summary>
+    /// <param name="parentKey">The unique identifier of the parent container.</param>
+    /// <param name="name">The name to check for duplicates.</param>
+    /// <returns>True if a duplicate name exists under the parent; otherwise, false.</returns>
     public bool HasDuplicateName(Guid parentKey, string name)
     {
         NodeDto? nodeDto = Database.FirstOrDefault<NodeDto>(Sql().SelectAll()
@@ -162,6 +188,12 @@ internal class EntityContainerRepository : EntityRepositoryBase<int, EntityConta
         return nodeDto is not null;
     }
 
+    /// <summary>
+    /// Determines whether an entity container with the specified <paramref name="name"/> exists under the parent container identified by <paramref name="parentKey"/>.
+    /// </summary>
+    /// <param name="parentKey">The unique identifier (GUID) of the parent container.</param>
+    /// <param name="name">The name to check for duplicates within the parent container.</param>
+    /// <returns><c>true</c> if a container with the same name exists under the specified parent; otherwise, <c>false</c>.</returns>
     public bool HasDuplicateName(int parentId, string name)
     {
         NodeDto? nodeDto = Database.FirstOrDefault<NodeDto>(Sql().SelectAll()

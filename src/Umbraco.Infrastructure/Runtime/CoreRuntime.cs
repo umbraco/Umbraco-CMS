@@ -35,8 +35,20 @@ public class CoreRuntime : IRuntime
     private CancellationToken _cancellationToken;
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="CoreRuntime" /> class.
+    ///     Initializes a new instance of the <see cref="CoreRuntime" /> class, which manages the core runtime lifecycle and services for Umbraco.
     /// </summary>
+    /// <param name="state">The current runtime state of the Umbraco application.</param>
+    /// <param name="loggerFactory">The factory used to create logger instances for diagnostic and operational logging.</param>
+    /// <param name="components">The collection of components to be managed by the runtime.</param>
+    /// <param name="applicationShutdownRegistry">The registry used to track and manage application shutdown events.</param>
+    /// <param name="profilingLogger">The logger used for profiling and performance diagnostics.</param>
+    /// <param name="mainDom">The MainDom instance responsible for ensuring a single active Umbraco process.</param>
+    /// <param name="databaseFactory">The factory for creating and managing Umbraco database connections.</param>
+    /// <param name="eventAggregator">The event aggregator for publishing and subscribing to application events.</param>
+    /// <param name="hostingEnvironment">The hosting environment abstraction for accessing environment-specific information.</param>
+    /// <param name="umbracoVersion">The current version information for the Umbraco application.</param>
+    /// <param name="serviceProvider">The service provider for resolving application services.</param>
+    /// <param name="hostApplicationLifetime">The interface for managing application lifetime events, such as startup and shutdown.</param>
     public CoreRuntime(
         IRuntimeState state,
         ILoggerFactory loggerFactory,

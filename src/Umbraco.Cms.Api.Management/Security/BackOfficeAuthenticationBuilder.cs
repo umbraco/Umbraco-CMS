@@ -31,10 +31,10 @@ public class BackOfficeAuthenticationBuilder : AuthenticationBuilder
     /// </summary>
     /// <typeparam name="TOptions"></typeparam>
     /// <typeparam name="THandler"></typeparam>
-    /// <param name="authenticationScheme"></param>
-    /// <param name="displayName"></param>
-    /// <param name="configureOptions"></param>
-    /// <returns></returns>
+    /// <param name="authenticationScheme">The authentication scheme name.</param>
+    /// <param name="displayName">The display name for the scheme.</param>
+    /// <param name="configureOptions">Optional configuration for the scheme options.</param>
+    /// <returns>The authentication builder for chaining.</returns>
     public override AuthenticationBuilder AddRemoteScheme<TOptions, THandler>(
         string authenticationScheme,
         string? displayName,

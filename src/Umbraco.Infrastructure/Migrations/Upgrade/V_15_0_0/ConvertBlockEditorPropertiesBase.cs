@@ -15,6 +15,10 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_15_0_0;
 
+/// <summary>
+/// Serves as the base class for migration steps that convert block editor properties
+/// as part of the upgrade process to Umbraco version 15.0.0.
+/// </summary>
 [Obsolete("Scheduled for removal in Umbraco 18.")]
 public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
 {
@@ -41,6 +45,17 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
         HandleAsError
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ConvertBlockEditorPropertiesBase"/> class with the specified services and context required for migration operations.
+    /// </summary>
+    /// <param name="context">The migration context providing information and state for the migration process.</param>
+    /// <param name="logger">The logger used to record migration events and errors.</param>
+    /// <param name="contentTypeService">Service for managing content types.</param>
+    /// <param name="dataTypeService">Service for managing data types.</param>
+    /// <param name="jsonSerializer">The serializer used for handling JSON data.</param>
+    /// <param name="umbracoContextFactory">Factory for creating Umbraco context instances.</param>
+    /// <param name="languageService">Service for managing languages.</param>
+    /// <param name="coreScopeProvider">Provider for managing database transaction scopes.</param>
     public ConvertBlockEditorPropertiesBase(
         IMigrationContext context,
         ILogger<ConvertBlockEditorPropertiesBase> logger,

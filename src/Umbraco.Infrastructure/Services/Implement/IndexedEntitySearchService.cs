@@ -1,4 +1,4 @@
-﻿using Examine;
+using Examine;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -18,6 +18,11 @@ internal sealed class IndexedEntitySearchService : IIndexedEntitySearchService
     private readonly IMediaTypeService _mediaTypeService;
     private readonly IMemberTypeService _memberTypeService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="IndexedEntitySearchService"/> class.
+    /// </summary>
+    /// <param name="backOfficeExamineSearcher">The searcher used to query the back office Examine index.</param>
+    /// <param name="entityService">The service used to retrieve and manage Umbraco entities.</param>
     public IndexedEntitySearchService(IBackOfficeExamineSearcher backOfficeExamineSearcher, IEntityService entityService)
         : this(
             backOfficeExamineSearcher,
@@ -28,6 +33,14 @@ internal sealed class IndexedEntitySearchService : IIndexedEntitySearchService
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="IndexedEntitySearchService"/> class, which provides search functionality for indexed entities in the back office.
+    /// </summary>
+    /// <param name="backOfficeExamineSearcher">The searcher used to query the back office Examine index.</param>
+    /// <param name="entityService">Service for managing and retrieving entities.</param>
+    /// <param name="contentTypeService">Service for managing content types.</param>
+    /// <param name="mediaTypeService">Service for managing media types.</param>
+    /// <param name="memberTypeService">Service for managing member types.</param>
     public IndexedEntitySearchService(
         IBackOfficeExamineSearcher backOfficeExamineSearcher,
         IEntityService entityService,
@@ -42,6 +55,21 @@ internal sealed class IndexedEntitySearchService : IIndexedEntitySearchService
         _memberTypeService = memberTypeService;
     }
 
+    /// <summary>
+    /// Asynchronously searches for entities of the specified Umbraco object type using the provided query and optional filters.
+    /// </summary>
+    /// <param name="objectType">The type of Umbraco object to search for (Document, Media, or Member).</param>
+    /// <param name="query">The search query string to use for matching entities.</param>
+    /// <param name="parentId">An optional parent entity ID to restrict the search to descendants of a specific parent.</param>
+    /// <param name="contentTypeIds">An optional collection of content type IDs to filter the search results by specific content types.</param>
+    /// <param name="trashed">An optional flag indicating whether to include only trashed, only non-trashed, or all entities.</param>
+    /// <param name="culture">An optional culture code to filter results by culture-specific content.</param>
+    /// <param name="skip">The number of items to skip before starting to collect the result set (used for paging).</param>
+    /// <param name="take">The maximum number of items to return in the result set (used for paging).</param>
+    /// <param name="ignoreUserStartNodes">If true, ignores user start nodes when performing the search.</param>
+    /// <returns>
+    /// A task representing the asynchronous operation. The task result contains a <see cref="PagedModel{IEntitySlim}"/> with the matching entities and the total result count.
+    /// </returns>
     public Task<PagedModel<IEntitySlim>> SearchAsync(
         UmbracoObjectTypes objectType,
         string query,

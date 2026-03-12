@@ -29,6 +29,12 @@ public sealed class OutOfDateModelsStatus : INotificationHandler<ContentTypeCach
         config.OnChange(x => _config = x);
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="OutOfDateModelsStatus"/> class.
+    /// </summary>
+    /// <param name="config">The options monitor for <see cref="ModelsBuilderSettings"/>.</param>
+    /// <param name="hostingEnvironment">The legacy ASP.NET hosting environment.</param>
+    /// <param name="hostEnvironment">The generic .NET host environment.</param>
     public OutOfDateModelsStatus(
         IOptionsMonitor<ModelsBuilderSettings> config,
         IHostingEnvironment hostingEnvironment,
@@ -39,6 +45,11 @@ public sealed class OutOfDateModelsStatus : INotificationHandler<ContentTypeCach
         config.OnChange(x => _config = x);
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="OutOfDateModelsStatus"/> class with the specified configuration and host environment.
+    /// </summary>
+    /// <param name="config">An <see cref="IOptionsMonitor{ModelsBuilderSettings}"/> instance that provides access to ModelsBuilder settings.</param>
+    /// <param name="hostEnvironment">An <see cref="IHostEnvironment"/> instance representing the current hosting environment.</param>
     public OutOfDateModelsStatus(IOptionsMonitor<ModelsBuilderSettings> config, IHostEnvironment hostEnvironment)
     {
         _config = config.CurrentValue;
@@ -68,10 +79,21 @@ public sealed class OutOfDateModelsStatus : INotificationHandler<ContentTypeCach
         }
     }
 
+    /// <summary>
+    /// Handles the <see cref="ContentTypeCacheRefresherNotification"/> by updating the out-of-date models status.
+    /// </summary>
+    /// <param name="notification">The notification indicating that the content type cache has been refreshed.</param>
     public void Handle(ContentTypeCacheRefresherNotification notification) => Write();
 
+    /// <summary>
+    /// Handles a <see cref="ContentTypeCacheRefresherNotification"/> by updating the out-of-date models status.
+    /// </summary>
+    /// <param name="notification">The content type cache refresher notification to handle.</param>
     public void Handle(DataTypeCacheRefresherNotification notification) => Write();
 
+    /// <summary>
+    /// Clears the out-of-date models flag by deleting the flag file, if it exists. This indicates that the models are no longer considered out-of-date.
+    /// </summary>
     public void Clear()
     {
         if (_config.FlagOutOfDateModels == false)
