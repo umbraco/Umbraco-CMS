@@ -6,17 +6,28 @@ using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.KeysAndIndexes;
 
+/// <summary>
+/// Provides a fluent builder for defining keys and indexes as part of database migration expressions in Umbraco.
+/// </summary>
 public class CreateKeysAndIndexesBuilder : IExecutableBuilder
 {
     private readonly IMigrationContext _context;
     private readonly DatabaseType[] _supportedDatabaseTypes;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CreateKeysAndIndexesBuilder"/> class for creating keys and indexes during a migration.
+    /// </summary>
+    /// <param name="context">The migration context in which the builder operates.</param>
+    /// <param name="supportedDatabaseTypes">An array of <see cref="DatabaseType"/> values specifying the database types supported by this builder.</param>
     public CreateKeysAndIndexesBuilder(IMigrationContext context, params DatabaseType[] supportedDatabaseTypes)
     {
         _context = context;
         _supportedDatabaseTypes = supportedDatabaseTypes;
     }
 
+    /// <summary>
+    /// Gets or sets the type of the data transfer object (DTO) used by this builder.
+    /// </summary>
     public Type? TypeOfDto { get; set; }
 
     /// <inheritdoc />

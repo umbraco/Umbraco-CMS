@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using System.Text;
 using NPoco;
 using Umbraco.Cms.Core;
@@ -8,8 +8,15 @@ using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_13_5_0;
 
+/// <summary>
+/// Represents a migration that alters the database schema by changing the type of the RedirectUrl column to <c>nvarchar(max)</c>.
+/// </summary>
 public class ChangeRedirectUrlToNvarcharMax : MigrationBase
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ChangeRedirectUrlToNvarcharMax"/> class with the specified migration context.
+    /// </summary>
+    /// <param name="context">The <see cref="IMigrationContext"/> to use for the migration.</param>
     public ChangeRedirectUrlToNvarcharMax(IMigrationContext context) : base(context)
     {
     }

@@ -11,10 +11,18 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Create;
 
+/// <summary>
+/// Provides a fluent interface for building and executing create expressions as part of database migrations.
+/// Used to define new database schema elements such as tables or columns during a migration.
+/// </summary>
 public class CreateBuilder : ICreateBuilder
 {
     private readonly IMigrationContext _context;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.CreateBuilder"/> class.
+    /// </summary>
+    /// <param name="context">The migration context used for the creation operation.</param>
     public CreateBuilder(IMigrationContext context) =>
         _context = context ?? throw new ArgumentNullException(nameof(context));
 

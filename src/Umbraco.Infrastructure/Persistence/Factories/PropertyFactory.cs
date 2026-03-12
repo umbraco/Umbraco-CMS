@@ -9,6 +9,17 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories;
 
 internal static class PropertyFactory
 {
+    /// <summary>
+    /// Builds a collection of <see cref="IProperty"/> entities by matching the provided property types with their corresponding property data.
+    /// </summary>
+    /// <param name="propertyTypes">An array of property types to build properties for. If null, an empty collection is returned.</param>
+    /// <param name="dtos">A read-only collection of <see cref="PropertyDataDto"/> objects containing property data for all property types.</param>
+    /// <param name="publishedVersionId">The identifier of the published version, used to determine which property values are considered published.</param>
+    /// <param name="languageRepository">The language repository used to resolve language ISO codes from language IDs in the property data.</param>
+    /// <returns>
+    /// An enumerable collection of <see cref="IProperty"/> entities, each constructed from the matching property type and its associated data.
+    /// If <paramref name="propertyTypes"/> is null, returns an empty collection.
+    /// </returns>
     public static IEnumerable<IProperty> BuildEntities(IPropertyType[]? propertyTypes, IReadOnlyCollection<PropertyDataDto> dtos, int publishedVersionId, ILanguageRepository languageRepository)
     {
         var properties = new List<IProperty>();
