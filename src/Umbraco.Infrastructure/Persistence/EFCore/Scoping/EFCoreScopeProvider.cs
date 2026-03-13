@@ -167,6 +167,14 @@ internal sealed class EFCoreScopeProvider<TDbContext> : IEFCoreScopeProvider<TDb
     }
 
 
+    /// <summary>
+    /// Gets the number of scope contexts this provider has pushed that have not yet been popped.
+    /// This is only used to distinguish the amount of EFCore scopes on a stack versus NPoco scopes.
+    ///
+    /// This solution is temporary and should be removed when migration to EFCore is complete.
+    /// </summary>
+    internal int ScopeContextDepth { get; private set; }
+
     /// <inheritdoc />
     public IScopeContext? AmbientScopeContext => _ambientEfCoreScopeContextStack.AmbientContext;
 
@@ -241,7 +249,6 @@ internal sealed class EFCoreScopeProvider<TDbContext> : IEFCoreScopeProvider<TDb
             _dbContextFactory)
         {
             IsBridgeScope = true,
-            BridgedScope = existingNPocoScope,
         };
 
         _ambientEfCoreScopeStack.Push(bridgeScope);
@@ -270,13 +277,19 @@ internal sealed class EFCoreScopeProvider<TDbContext> : IEFCoreScopeProvider<TDb
         {
             throw new ArgumentNullException(nameof(scopeContext));
         }
+
+        ScopeContextDepth++;
         _ambientEfCoreScopeContextStack.Push(scopeContext);
     }
 
     /// <summary>
     /// Removes the current scope context from the ambient scope context stack.
     /// </summary>
-    public void PopAmbientScopeContext() => _ambientEfCoreScopeContextStack.Pop();
+    public void PopAmbientScopeContext()
+    {
+        ScopeContextDepth--;
+        _ambientEfCoreScopeContextStack.Pop();
+    }
 
     /// <inheritdoc />
     ICoreScope CoreEFCoreScopeProvider.CreateScope(RepositoryCacheMode repositoryCacheMode, bool? scopeFileSystems)

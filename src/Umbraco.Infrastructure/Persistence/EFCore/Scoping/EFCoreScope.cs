@@ -33,13 +33,6 @@ internal class EFCoreScope<TDbContext> : CoreScope, IEfCoreScope<TDbContext>
     internal bool IsBridgeScope { get; init; }
 
     /// <summary>
-    /// Gets or sets. Bridged scopes are the scopes that our EF Core Scopes derive from.
-    /// Since we are migrating from NPoco to EFCore we need a way to handle NPoco scopes in
-    /// EF Core contexts. So a bridged scope is created, it is essentially a child of the NPoco scope.
-    /// </summary>
-    internal IScope? BridgedScope { get; init; }
-
-    /// <summary>
     /// Initializes a new instance of the <see cref="EFCoreScope{TDbContext}"/> class.
     /// </summary>
     /// <param name="distributedLockingMechanismFactory">The distributed locking mechanism factory.</param>
@@ -219,7 +212,6 @@ internal class EFCoreScope<TDbContext> : CoreScope, IEfCoreScope<TDbContext>
 #pragma warning restore SA1100 // Do not prefix calls with base unless local implementation exists
 
         _efCoreScopeProvider.PopAmbientScope();
-
         HandleScopeContext();
         base.Dispose();
 

@@ -66,9 +66,8 @@ internal sealed class EFCoreScopeAccessor<TDbContext> : IEFCoreScopeAccessor<TDb
             return scope;
         }
 
-        // If an EF Core scope context is still active but no scope exists,
-        // the scope was popped but the context hasn't been popped yet. So we dont create a bridge.
-        if (_efCoreScopeProvider.Value.AmbientScopeContext is not null)
+        var provider = (EFCoreScopeProvider<TDbContext>)_efCoreScopeProvider.Value;
+        if (provider.ScopeContextDepth > 0)
         {
             return null;
         }
