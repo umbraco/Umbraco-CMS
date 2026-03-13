@@ -14,5 +14,6 @@ test('can update value of activate the profiler by default', async ({umbracoUi})
   await umbracoUi.profiling.isActivateProfilerByDefaultToggleChecked(true);
   await umbracoUi.profiling.goToSection(ConstantHelper.sections.settings);
   await umbracoUi.profiling.clickProfilingTab();
+  await umbracoUi.waitForTimeout(ConstantHelper.timeout.short); // Wait for the toggle state to be updated
   await umbracoUi.profiling.isActivateProfilerByDefaultToggleChecked(true);
 });
