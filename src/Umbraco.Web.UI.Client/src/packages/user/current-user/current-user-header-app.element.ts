@@ -42,7 +42,7 @@ export class UmbCurrentUserHeaderAppElement extends UmbHeaderAppButtonElement {
 		const userInitials = this._currentUser?.name ? getInitials(this._currentUser.name) : '';
 		const accessibleLabel = this._currentUser?.name
 			? this.localize.term('visuallyHiddenTexts_profileOptions', this._currentUser.name, userInitials)
-			: this.localize.term('visuallyHiddenTexts_profileOptions');
+			: this.localize.term('visuallyHiddenTexts_profileOptionsDefault');
 
 		return html`
 			<uui-button

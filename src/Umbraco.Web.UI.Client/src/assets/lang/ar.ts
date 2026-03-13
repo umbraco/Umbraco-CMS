@@ -2103,6 +2103,7 @@ export default {
 		openCloseBackofficeHelp: 'فتح/إغلاق مساعدة المكتب الخلفي',
 		openCloseBackofficeProfileOptions: 'فتح/إغلاق خيارات ملفك الشخصي',
 		profileOptions: 'ملف المستخدم الشخصي لـ %0% (%1%)',
+		profileOptionsDefault: 'ملف المستخدم الشخصي',
 		assignDomainDescription: 'إعداد الثقافة وأسماء النطاقات لـ %0%',
 		createDescription: 'إنشاء عقدة جديدة تحت %0%',
 		protectDescription: 'إعداد قيود الوصول على %0%',

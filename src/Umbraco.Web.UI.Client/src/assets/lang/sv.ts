@@ -280,6 +280,7 @@ export default {
 		openCloseBackofficeHelp: 'Öppna/stäng hjälpfunktion',
 		openCloseBackofficeProfileOptions: 'Öppna/stäng personliga inställningar',
 		profileOptions: 'Användarprofil för %0% (%1%)',
+		profileOptionsDefault: 'Användarprofil',
 		assignDomainDescription: 'Redigera språk och värdnamn för %0%',
 		createDescription: 'Skapa en ny nod under %0%',
 		protectDescription: 'Ändra behörigheter för %0%',

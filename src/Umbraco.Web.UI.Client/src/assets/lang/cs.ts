@@ -1810,6 +1810,7 @@ export default {
 		openCloseBackofficeHelp: 'Otevřít/zavřít nápovědu backoffice',
 		openCloseBackofficeProfileOptions: 'Otevřít/zavřít možnosti vašeho profilu',
 		profileOptions: 'Profil uživatele pro %0% (%1%)',
+		profileOptionsDefault: 'Profil uživatele',
 		openContextMenu: 'Otevřít kontextové menu pro',
 		currentLanguage: 'Aktuální jazyk',
 		switchLanguage: 'Přepnout jazyk na',

@@ -2167,6 +2167,7 @@ export default {
 		openCloseBackofficeHelp: 'Agor/Cau cymorth swyddfa gefn',
 		openCloseBackofficeProfileOptions: 'Agor/Cau eich opsiynau proffil',
 		profileOptions: 'Proffil defnyddiwr ar gyfer %0% (%1%)',
+		profileOptionsDefault: 'Proffil defnyddiwr',
 		assignDomainDescription: 'Sefydli Diwylliannau ac Enwau Gwesteia am %0%',
 		createDescription: 'Creu nod newydd o dan %0%',
 		protectDescription: 'Sefydli Mynediad Cyhoeddus ar %0%',

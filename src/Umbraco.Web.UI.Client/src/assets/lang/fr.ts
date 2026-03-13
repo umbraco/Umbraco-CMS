@@ -1864,6 +1864,7 @@ export default {
 		openCloseBackofficeHelp: "Ouvrir/Fermer l'aide backoffice",
 		openCloseBackofficeProfileOptions: 'Ouvrir/Fermer vos options de profil',
 		profileOptions: 'Profil utilisateur pour %0% (%1%)',
+		profileOptionsDefault: 'Profil utilisateur',
 		openContextMenu: 'Ouvrir le menu de contexte pour',
 		currentLanguage: 'Langue actuelle',
 		switchLanguage: 'Changer la langue vers',

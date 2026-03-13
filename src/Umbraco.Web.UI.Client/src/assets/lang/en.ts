@@ -2414,6 +2414,7 @@ export default {
 		openCloseBackofficeHelp: 'Open/Close backoffice help',
 		openCloseBackofficeProfileOptions: 'Open/Close your profile options',
 		profileOptions: 'User profile for %0% (%1%)',
+		profileOptionsDefault: 'User profile',
 		assignDomainDescription: 'Setup Culture and Hostnames for %0%',
 		createDescription: 'Create new node under %0%',
 		protectDescription: 'Setup access restrictions on %0%',

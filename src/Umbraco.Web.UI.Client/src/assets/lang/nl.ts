@@ -1936,6 +1936,7 @@ export default {
 		openCloseBackofficeHelp: 'Backoffice help openen/sluiten',
 		openCloseBackofficeProfileOptions: 'Jouw profiel opties openen/sluiten',
 		profileOptions: 'Gebruikersprofiel voor %0% (%1%)',
+		profileOptionsDefault: 'Gebruikersprofiel',
 		assignDomainDescription: 'Cultuur en Hostnamen instellen voor %0%',
 		createDescription: 'Nieuwe node aanmaken onder %0%',
 		protectDescription: 'Openbare toegang instellen op %0%',
