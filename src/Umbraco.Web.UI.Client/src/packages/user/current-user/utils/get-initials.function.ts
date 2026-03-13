@@ -4,7 +4,7 @@
  * @returns The initials in uppercase
  */
 export function getInitials(name: string): string {
-	if (!name || typeof name !== 'string') {
+	if (!name) {
 		return '';
 	}
 
