@@ -109,7 +109,7 @@ export class UmbPropertyEditorUINumberElement
 				label=${ifDefined(this._label)}
 				min=${ifDefined(this._min)}
 				max=${ifDefined(this._max)}
-				step=${ifDefined(this._step)}
+				step=${this._step ?? 0.000001 /* Default: 6 decimal places, matching the precision available for persistance */}
 				value=${this.value?.toString() ?? ''}
 				.placeholder=${this._placeholder ?? ''}
 				.requiredMessage=${this.mandatoryMessage}

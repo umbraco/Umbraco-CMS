@@ -205,6 +205,45 @@ public class DecimalPropertyValueEditorTests
         }
     }
 
+    [TestCase(1.123456, true)] // 6 decimal places - matches DB DECIMAL(38,6)
+    [TestCase(1.1234567, false)] // 7 decimal places - exceeds DB precision
+    [TestCase(1.5, true)]
+    public void Validates_Step_Defaults_To_Six_Decimal_Places_When_Not_Configured(object value, bool expectedSuccess)
+    {
+        var editor = CreateValueEditor(step: null);
+        var result = editor.Validate(value, false, null, PropertyValidationContext.Empty());
+        if (expectedSuccess)
+        {
+            Assert.IsEmpty(result);
+        }
+        else
+        {
+            Assert.AreEqual(1, result.Count());
+
+            var validationResult = result.First();
+            Assert.AreEqual("validation_invalidStep", validationResult.ErrorMessage);
+        }
+    }
+
+    [TestCase(1.5, true)]
+    [TestCase(1.1234567, false)]
+    public void Validates_Step_Defaults_When_Neither_Min_Nor_Step_Configured(object value, bool expectedSuccess)
+    {
+        var editor = CreateValueEditor(min: null, step: null);
+        var result = editor.Validate(value, false, null, PropertyValidationContext.Empty());
+        if (expectedSuccess)
+        {
+            Assert.IsEmpty(result);
+        }
+        else
+        {
+            Assert.AreEqual(1, result.Count());
+
+            var validationResult = result.First();
+            Assert.AreEqual("validation_invalidStep", validationResult.ErrorMessage);
+        }
+    }
+
     private static object? FromEditor(object? value)
         => CreateValueEditor().FromEditor(new ContentPropertyData(value, null), null);
 
@@ -218,7 +257,7 @@ public class DecimalPropertyValueEditorTests
         return CreateValueEditor().ToEditor(property.Object);
     }
 
-    private static DecimalPropertyEditor.DecimalPropertyValueEditor CreateValueEditor(double min = 1.1, double max = 1.9, double step = 0.2)
+    private static DecimalPropertyEditor.DecimalPropertyValueEditor CreateValueEditor(double? min = 1.1, double? max = 1.9, double? step = 0.2)
     {
         var localizedTextServiceMock = new Mock<ILocalizedTextService>();
         localizedTextServiceMock.Setup(x => x.Localize(
@@ -231,31 +270,40 @@ public class DecimalPropertyValueEditorTests
         // When configuration is populated from the deserialized JSON, whole number values are deserialized as integers.
         // So we want to replicate that in our tests.
         var configuration = new Dictionary<string, object>();
-        if (min % 1 == 0)
+        if (min.HasValue)
         {
-            configuration.Add("min", (int)min);
-        }
-        else
-        {
-            configuration.Add("min", min);
-        }
-
-        if (max % 1 == 0)
-        {
-            configuration.Add("max", (int)max);
-        }
-        else
-        {
-            configuration.Add("max", max);
+            if (min.Value % 1 == 0)
+            {
+                configuration.Add("min", (int)min.Value);
+            }
+            else
+            {
+                configuration.Add("min", min.Value);
+            }
         }
 
-        if (step % 1 == 0)
+        if (max.HasValue)
         {
-            configuration.Add("step", (int)step);
+            if (max.Value % 1 == 0)
+            {
+                configuration.Add("max", (int)max.Value);
+            }
+            else
+            {
+                configuration.Add("max", max.Value);
+            }
         }
-        else
+
+        if (step.HasValue)
         {
-            configuration.Add("step", step);
+            if (step.Value % 1 == 0)
+            {
+                configuration.Add("step", (int)step.Value);
+            }
+            else
+            {
+                configuration.Add("step", step.Value);
+            }
         }
 
         return new DecimalPropertyEditor.DecimalPropertyValueEditor(
