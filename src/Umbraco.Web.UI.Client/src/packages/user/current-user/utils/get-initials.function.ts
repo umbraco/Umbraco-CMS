@@ -2,6 +2,8 @@
  * Extracts the first and last initial from a user's name
  * @param name - The user's full name
  * @returns The initials in uppercase
+ *
+ * @note Similar logic exists in the UUI avatar component but is duplicated here.
  */
 export function getInitials(name: string): string {
 	if (!name) {
