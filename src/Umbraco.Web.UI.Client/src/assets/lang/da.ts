@@ -640,7 +640,10 @@ export default {
 		seeErrorDialogHeadline: 'Fejl detaljer',
 		selectEvent: 'Vælg begivenhed',
 		editWebhook: 'Rediger webhook',
+		cannotTrashWhenReferenced: (name: string) => `<strong>${name}</strong> kan ikke flyttes til papirkurven, fordi det refereres af andre elementer.`,
 		confirmTrash: (name: string) => `Er du sikker på, at du vil flytte <strong>${name}</strong> til papirkurven?`,
+		cannotBulkTrashWhenReferenced: (total: number) =>
+			`De valgte <strong>${total} ${total === 1 ? 'element' : 'elementer'}</strong> kan ikke flyttes til papirkurven, fordi mindst \u00e9t element refereres af andet indhold.`,
 		confirmBulkTrash: (total: number) =>
 			`Er du sikker på, at du vil flytte <strong>${total} ${total === 1 ? 'element' : 'elementer'}</strong> til papirkurven?`,
 		confirmBulkDelete: (total: number) =>
@@ -2863,5 +2866,9 @@ export default {
 		resetUrlHeadline: 'Nulstil URL?',
 		resetUrlMessage: 'Er du sikker på, at du vil nulstille denne URL?',
 		resetUrlLabel: 'Nulstil',
+		selectLanguageHint: 'Vælg sprog for linket',
+		selectLanguageDefault: 'Auto (besøgendes sprog)',
+		configCultureSpecificDocumentLinksLabel: 'Kulturspecifikke dokumentlinks',
+		configCultureSpecificDocumentLinksDescription: 'Tillad brugeren at vælge specifik kultur for dokumenter.',
 	},
 } as UmbLocalizationDictionary;

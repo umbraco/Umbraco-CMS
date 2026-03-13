@@ -51,6 +51,12 @@ export class UmbAuthContext extends UmbContextBase {
 	#session = new UmbObjectState<UmbAuthSession | undefined>(undefined);
 	readonly session$ = this.#session.asObservable();
 
+	// True only during the synchronous #updateSession() call inside the lock callback.
+	// Prevents re-entrant /token calls when session$ observers fire synchronously
+	// (e.g. keepUserLoggedIn=true with short expiresIn triggers #onSessionExpiring
+	// from inside the lock, capturing sessionBefore = newSession so the guard can't help).
+	#inSessionUpdateCallback = false;
+
 	// Cross-tab coordination
 	#channel: BroadcastChannel;
 
@@ -435,15 +441,18 @@ export class UmbAuthContext extends UmbContextBase {
 				'Use configureClient for @hey-api/openapi-ts clients or getOpenApiConfiguration for manual fetch calls. With cookie-based auth this always returns "[redacted]".',
 			removeInVersion: '19.0.0',
 		}).warn();
-		await this.validateToken();
+		await this.#ensureTokenReady();
 		return '[redacted]';
 	}
 
 	/**
-	 * Validates the token against the server and returns true if the token is valid.
-	 * Uses Web Locks to prevent concurrent refresh requests across tabs.
+	 * Forces a token refresh against the server (calls `/token`) and returns true if successful.
+	 * Use this when you need to unconditionally refresh — e.g. session timeout keep-alive.
+	 * For per-request token handling, prefer {@link configureClient} which skips the network
+	 * call when the access token is still valid.
+	 * Uses Web Locks to deduplicate concurrent refresh requests across tabs.
 	 * @memberof UmbAuthContext
-	 * @returns True if the token is valid, otherwise false
+	 * @returns True if the refresh succeeded, otherwise false
 	 */
 	async validateToken(): Promise<boolean> {
 		return this.#isBypassed || this.makeRefreshTokenRequest();
@@ -474,6 +483,12 @@ export class UmbAuthContext extends UmbContextBase {
 		// would incorrectly skip the refresh when the session is still technically valid.
 		const sessionBefore = this.#session.getValue();
 
+		// Guard against re-entrant calls: if session$ fired synchronously from inside
+		// a lock callback (via #updateSession → observer → keepUserLoggedIn proactive refresh),
+		// sessionBefore would equal the already-updated session so the reference check below
+		// can't help. Return true immediately — the lock holder already refreshed.
+		if (this.#inSessionUpdateCallback) return true;
+
 		return navigator.locks.request('umb:token-refresh', async () => {
 			if (this.#session.getValue() !== sessionBefore && this.#isAccessTokenValid()) return true;
 
@@ -495,9 +510,38 @@ export class UmbAuthContext extends UmbContextBase {
 		return !!session && session.expiresAt > Math.floor(Date.now() / 1000);
 	}
 
+	/**
+	 * Local-only check — no network call.
+	 * Returns true if the cached access token has not yet reached its expiry timestamp.
+	 * Does NOT check the refresh token or server state.
+	 */
 	#isAccessTokenValid(): boolean {
 		const session = this.#session.getValue();
 		return !!session && session.accessTokenExpiresAt > Math.floor(Date.now() / 1000);
+	}
+
+	/**
+	 * Gate for per-request token handling.
+	 * - If the access token is expired: calls {@link validateToken} to refresh it (network call).
+	 * - If the access token is still valid but another tab holds the `umb:token-refresh` lock:
+	 *   waits for that refresh to finish before returning, so the request is sent with the
+	 *   latest cookie and not the token that is about to be revoked (prevents ID2019 errors).
+	 * - Otherwise: returns immediately with no network call.
+	 */
+	async #ensureTokenReady(): Promise<void> {
+		if (!this.#isAccessTokenValid()) {
+			await this.validateToken();
+			return;
+		}
+		if (!navigator.locks) return;
+		const state = await navigator.locks.query();
+		if (state.held?.some((l) => l.name === 'umb:token-refresh')) {
+			// A refresh is in progress in another tab — queue behind it so we send
+			// requests with the new cookie rather than the soon-to-be-revoked one.
+			await navigator.locks.request('umb:token-refresh', async () => {
+				// No-op: we only need to wait for the ongoing refresh to finish.
+			});
+		}
 	}
 
 	/**
@@ -606,7 +650,7 @@ export class UmbAuthContext extends UmbContextBase {
 			baseUrl: this.#serverUrl,
 			credentials: 'include',
 			auth: async () => {
-				await this.validateToken();
+				await this.#ensureTokenReady();
 				return '[redacted]';
 			},
 		});
@@ -706,14 +750,23 @@ export class UmbAuthContext extends UmbContextBase {
 	/**
 	 * Sets the in-memory session state without broadcasting.
 	 * Use when the caller handles broadcasting separately (e.g. completeAuthorizationRequest).
+	 *
+	 * Sets #inSessionUpdateCallback around the setValue calls to prevent re-entrant /token
+	 * requests triggered by session$ observers firing synchronously (e.g. keepUserLoggedIn=true
+	 * with a short expiresIn causes #onSessionExpiring to fire immediately).
 	 */
 	#setSessionLocally(expiresIn: number, issuedAt: number) {
 		const accessTokenExpiresAt = issuedAt + expiresIn;
 		// The access_token lives for 1/4 of the refresh_token lifetime.
 		// Multiply to get the full session expiry.
 		const expiresAt = issuedAt + expiresIn * TOKEN_EXPIRY_MULTIPLIER;
-		this.#session.setValue({ accessTokenExpiresAt, expiresAt });
-		this.#isAuthorized.setValue(true);
+		this.#inSessionUpdateCallback = true;
+		try {
+			this.#session.setValue({ accessTokenExpiresAt, expiresAt });
+			this.#isAuthorized.setValue(true);
+		} finally {
+			this.#inSessionUpdateCallback = false;
+		}
 	}
 
 	/**

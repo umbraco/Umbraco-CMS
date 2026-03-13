@@ -13,14 +13,25 @@ using Umbraco.Cms.Api.Management.ViewModels.UserGroup.Item;
 using Umbraco.Cms.Api.Management.ViewModels.Webhook.Item;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentTypeEditing;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Mapping.Item;
 
+/// <summary>
+/// Provides mapping configuration for item types in the Umbraco CMS Management API.
+/// </summary>
 public class ItemTypeMapDefinition : IMapDefinition
 {
+    /// <summary>
+    /// Configures the object mappings between various Umbraco item types and their corresponding response models.
+    /// This method registers the mapping definitions for languages, data types, dictionary items, content types, media types,
+    /// member groups, templates, member types, relation types, user groups, and webhooks, enabling the mapper to convert
+    /// domain entities to their API response representations.
+    /// </summary>
+    /// <param name="mapper">The <see cref="IUmbracoMapper"/> instance used to define the mappings.</param>
     public void DefineMaps(IUmbracoMapper mapper)
     {
         mapper.Define<ILanguage, LanguageItemResponseModel>((_, _) => new LanguageItemResponseModel(), Map);
@@ -28,6 +39,7 @@ public class ItemTypeMapDefinition : IMapDefinition
         mapper.Define<IDictionaryItem, DictionaryItemItemResponseModel>((_, _) => new DictionaryItemItemResponseModel(), Map);
         mapper.Define<IContentType, DocumentTypeItemResponseModel>((_, _) => new DocumentTypeItemResponseModel(), Map);
         mapper.Define<IMediaType, MediaTypeItemResponseModel>((_, _) => new MediaTypeItemResponseModel(), Map);
+        mapper.Define<MediaTypeFileExtensionMatchResult, AllowedMediaTypeItemResponseModel>((_, _) => new AllowedMediaTypeItemResponseModel(), Map);
         mapper.Define<IEntitySlim, MemberGroupItemResponseModel>((_, _) => new MemberGroupItemResponseModel(), Map);
         mapper.Define<ITemplate, TemplateItemResponseModel>((_, _) => new TemplateItemResponseModel { Alias = string.Empty }, Map);
         mapper.Define<IMemberType, MemberTypeItemResponseModel>((_, _) => new MemberTypeItemResponseModel(), Map);
@@ -77,6 +89,13 @@ public class ItemTypeMapDefinition : IMapDefinition
         target.Name = source.Name ?? string.Empty;
         target.Id = source.Key;
         target.Icon = source.Icon;
+    }
+
+    // Umbraco.Code.MapAll -Flags -Icon -Id -Name
+    private static void Map(MediaTypeFileExtensionMatchResult source, AllowedMediaTypeItemResponseModel target, MapperContext context)
+    {
+        Map(source.MediaType, target, context);
+        target.MatchedFileExtension = source.IsSpecificMatch;
     }
 
     // Umbraco.Code.MapAll -Flags

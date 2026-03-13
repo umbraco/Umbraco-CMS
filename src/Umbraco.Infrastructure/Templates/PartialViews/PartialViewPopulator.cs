@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using System.Text;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
@@ -11,13 +11,24 @@ internal sealed class PartialViewPopulator : IPartialViewPopulator
 {
     private readonly IFileService _fileService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PartialViewPopulator"/> class with the specified file service.
+    /// </summary>
+    /// <param name="fileService">The <see cref="IFileService"/> used to perform file operations for partial views.</param>
     public PartialViewPopulator(IFileService fileService)
     {
         _fileService = fileService;
     }
 
+    /// <summary>
+    /// Gets the core assembly containing the Constants type.
+    /// </summary>
+    /// <returns>The core assembly.</returns>
     public Assembly GetCoreAssembly() => typeof(Constants).Assembly;
 
+    /// <summary>
+    /// Gets the base path to the embedded resources containing core partial views in Umbraco.
+    /// </summary>
     public string CoreEmbeddedPath => "Umbraco.Cms.Core.EmbeddedResources";
 
     /// <inheritdoc/>

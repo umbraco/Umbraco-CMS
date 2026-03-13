@@ -14,6 +14,14 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
 internal sealed class TwoFactorLoginRepository : EntityRepositoryBase<int, ITwoFactorLogin>, ITwoFactorLoginRepository
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="TwoFactorLoginRepository"/> class.
+    /// </summary>
+    /// <param name="scopeAccessor">Provides access to the database scope for transactional operations.</param>
+    /// <param name="cache">The application-level caches used for performance optimization.</param>
+    /// <param name="logger">The logger used for logging repository operations.</param>
+    /// <param name="repositoryCacheVersionService">Service for managing repository cache versions.</param>
+    /// <param name="cacheSyncService">Service for synchronizing cache across distributed environments.</param>
     public TwoFactorLoginRepository(
         IScopeAccessor scopeAccessor,
         AppCaches cache,
@@ -29,9 +37,20 @@ internal sealed class TwoFactorLoginRepository : EntityRepositoryBase<int, ITwoF
     {
     }
 
+    /// <summary>
+    /// Asynchronously deletes all two-factor login records associated with the specified user or member key.
+    /// </summary>
+    /// <param name="userOrMemberKey">The unique identifier of the user or member whose two-factor logins will be deleted.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result is <c>true</c> if any logins were deleted; otherwise, <c>false</c>.</returns>
     public async Task<bool> DeleteUserLoginsAsync(Guid userOrMemberKey) =>
         await DeleteUserLoginsAsync(userOrMemberKey, null);
 
+    /// <summary>
+    /// Deletes the two-factor login records for a specified user or member.
+    /// </summary>
+    /// <param name="userOrMemberKey">The unique identifier of the user or member.</param>
+    /// <param name="providerName">The name of the two-factor login provider. If null, all providers are deleted.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains true if the deletion was successful; otherwise, false.</returns>
     public async Task<bool> DeleteUserLoginsAsync(Guid userOrMemberKey, string? providerName)
     {
         Sql<ISqlContext> sql = Sql()
@@ -49,6 +68,13 @@ internal sealed class TwoFactorLoginRepository : EntityRepositoryBase<int, ITwoF
         return deletedRows > 0;
     }
 
+    /// <summary>
+    /// Asynchronously retrieves all two-factor login entries associated with the specified user or member key.
+    /// </summary>
+    /// <param name="userOrMemberKey">The unique identifier (GUID) of the user or member whose two-factor login entries are to be retrieved.</param>
+    /// <returns>
+    /// A task representing the asynchronous operation. The task result contains a collection of <see cref="ITwoFactorLogin"/> entries associated with the specified key.
+    /// </returns>
     public async Task<IEnumerable<ITwoFactorLogin>> GetByUserOrMemberKeyAsync(Guid userOrMemberKey)
     {
         Sql<ISqlContext> sql = Sql()
