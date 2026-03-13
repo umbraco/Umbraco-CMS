@@ -1,4 +1,5 @@
 import { manifests as memberTypeFilterManifests } from './member-type/manifests.js';
+import { manifests as memberGroupFilterManifests } from './member-group/manifests.js';
 import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
 
 export const manifests: Array<UmbExtensionManifest> = [
@@ -15,4 +16,5 @@ export const manifests: Array<UmbExtensionManifest> = [
 		],
 	},
 	...memberTypeFilterManifests,
+	...memberGroupFilterManifests,
 ];

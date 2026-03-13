@@ -35,6 +35,7 @@ export class UmbMemberCollectionServerDataSource implements UmbCollectionDataSou
 	async getCollection(filter: UmbMemberCollectionFilterModel) {
 		const query = {
 			memberTypeId: filter.memberTypeId,
+			memberGroupName: filter.memberGroupName,
 			filter: filter.filter,
 			orderBy: filter.orderBy ?? 'username',
 			orderDirection:
