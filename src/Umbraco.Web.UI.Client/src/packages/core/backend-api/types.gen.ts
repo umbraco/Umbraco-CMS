@@ -11,6 +11,14 @@ export type AllowedDocumentTypeModel = {
     icon?: string | null;
 };
 
+export type AllowedMediaTypeItemResponseModel = {
+    id: string;
+    flags: Array<FlagModel>;
+    name: string;
+    icon?: string | null;
+    matchedFileExtension: boolean;
+};
+
 export type AllowedMediaTypeModel = {
     id: string;
     name: string;
@@ -2140,6 +2148,11 @@ export type PagedMemberResponseModel = {
 export type PagedMemberTypeTreeItemResponseModel = {
     total: number;
     items: Array<MemberTypeTreeItemResponseModel>;
+};
+
+export type PagedModelAllowedMediaTypeItemResponseModel = {
+    items: Array<AllowedMediaTypeItemResponseModel>;
+    total: number;
 };
 
 export type PagedModelDataTypeItemResponseModel = {
@@ -10570,7 +10583,7 @@ export type GetItemMediaTypeAllowedResponses = {
     /**
      * OK
      */
-    200: PagedModelMediaTypeItemResponseModel;
+    200: PagedModelAllowedMediaTypeItemResponseModel;
 };
 
 export type GetItemMediaTypeAllowedResponse = GetItemMediaTypeAllowedResponses[keyof GetItemMediaTypeAllowedResponses];

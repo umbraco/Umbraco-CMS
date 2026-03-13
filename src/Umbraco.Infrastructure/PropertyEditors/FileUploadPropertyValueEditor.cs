@@ -43,6 +43,15 @@ internal sealed class FileUploadPropertyValueEditor : DataValueEditor, IDisposab
     /// <summary>
     /// Initializes a new instance of the <see cref="FileUploadPropertyValueEditor"/> class.
     /// </summary>
+    /// <param name="attribute">The attribute that defines metadata for the data editor.</param>
+    /// <param name="mediaFileManager">Handles media file operations such as upload and retrieval.</param>
+    /// <param name="shortStringHelper">Provides utilities for working with short strings and string manipulation.</param>
+    /// <param name="contentSettings">Monitors and provides access to content-related configuration settings.</param>
+    /// <param name="jsonSerializer">Serializes and deserializes objects to and from JSON format.</param>
+    /// <param name="ioHelper">Assists with input/output operations and file system access.</param>
+    /// <param name="temporaryFileService">Manages temporary files used during file upload processes.</param>
+    /// <param name="scopeProvider">Provides database scope management for transactional operations.</param>
+    /// <param name="fileStreamSecurityValidator">Validates file streams for security during upload and access.</param>
     public FileUploadPropertyValueEditor(
         DataEditorAttribute attribute,
         MediaFileManager mediaFileManager,
@@ -226,5 +235,8 @@ internal sealed class FileUploadPropertyValueEditor : DataValueEditor, IDisposab
         return _mediaFileManager.GetMediaPath(file.FileName, contentKey, propertyTypeKey);
     }
 
+    /// <summary>
+    /// Releases the managed resources used by the <see cref="FileUploadPropertyValueEditor"/>, including any active subscriptions.
+    /// </summary>
     public void Dispose() => _contentSettingsChangeSubscription?.Dispose();
 }

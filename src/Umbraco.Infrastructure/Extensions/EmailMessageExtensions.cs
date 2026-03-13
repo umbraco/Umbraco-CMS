@@ -6,6 +6,15 @@ namespace Umbraco.Cms.Infrastructure.Extensions;
 
 internal static class EmailMessageExtensions
 {
+    /// <summary>
+    /// Converts an <see cref="EmailMessage"/> to a <see cref="MimeMessage"/>, including all recipients, subject, body, and attachments.
+    /// If the <paramref name="mailMessage"/> does not specify a From address, the <paramref name="configuredFromAddress"/> is used as the sender.
+    /// </summary>
+    /// <param name="mailMessage">The email message to convert.</param>
+    /// <param name="configuredFromAddress">The default sender address to use if <paramref name="mailMessage"/> does not specify one.</param>
+    /// <returns>
+    /// A <see cref="MimeMessage"/> representing the converted email message, including all recipients, subject, body (as HTML or plain text), and any attachments.
+    /// </returns>
     public static MimeMessage ToMimeMessage(this EmailMessage mailMessage, string configuredFromAddress)
     {
         var fromEmail = string.IsNullOrEmpty(mailMessage.From) ? configuredFromAddress : mailMessage.From;
@@ -51,6 +60,15 @@ internal static class EmailMessageExtensions
         return messageToSend;
     }
 
+    /// <summary>
+    /// Converts an <see cref="EmailMessage"/> to a <see cref="NotificationEmailModel"/>.
+    /// If the <paramref name="emailMessage"/>'s from address is not set or is empty, the <paramref name="configuredFromAddress"/> is used as the sender address.
+    /// </summary>
+    /// <param name="emailMessage">The email message to convert.</param>
+    /// <param name="configuredFromAddress">The fallback sender address to use if the email message's from address is not specified.</param>
+    /// <returns>
+    /// A <see cref="NotificationEmailModel"/> representing the notification email, with all recipients, subject, body, attachments, and sender address appropriately set.
+    /// </returns>
     public static NotificationEmailModel ToNotificationEmail(
         this EmailMessage emailMessage,
         string? configuredFromAddress)

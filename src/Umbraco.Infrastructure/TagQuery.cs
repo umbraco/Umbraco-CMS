@@ -16,8 +16,11 @@ public class TagQuery : ITagQuery
     private readonly ITagService _tagService;
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="TagQuery" /> class.
+    /// Initializes a new instance of the <see cref="TagQuery" /> class.
     /// </summary>
+    /// <param name="tagService">The service used to manage and query tags.</param>
+    /// <param name="contentQuery">The service used to query published content.</param>
+    /// <param name="mapper">The mapper used for mapping Umbraco objects.</param>
     public TagQuery(ITagService tagService, IPublishedContentQuery contentQuery, IUmbracoMapper mapper)
     {
         _tagService = tagService ?? throw new ArgumentNullException(nameof(tagService));

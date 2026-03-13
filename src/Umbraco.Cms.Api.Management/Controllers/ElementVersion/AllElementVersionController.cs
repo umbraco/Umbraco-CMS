@@ -12,12 +12,20 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.ElementVersion;
 
+/// <summary>
+/// API controller responsible for retrieving all versions of a specific element.
+/// </summary>
 [ApiVersion("1.0")]
 public class AllElementVersionController : ElementVersionControllerBase
 {
     private readonly IElementVersionService _elementVersionService;
     private readonly IElementVersionPresentationFactory _elementVersionPresentationFactory;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AllElementVersionController"/> class.
+    /// </summary>
+    /// <param name="elementVersionService">Service for managing element versions.</param>
+    /// <param name="elementVersionPresentationFactory">Factory for creating element version presentation models.</param>
     public AllElementVersionController(
         IElementVersionService elementVersionService,
         IElementVersionPresentationFactory elementVersionPresentationFactory)
@@ -26,6 +34,15 @@ public class AllElementVersionController : ElementVersionControllerBase
         _elementVersionPresentationFactory = elementVersionPresentationFactory;
     }
 
+    /// <summary>
+    /// Gets a paginated collection of versions for a specific element.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="elementId">The unique identifier of the element to retrieve versions for.</param>
+    /// <param name="culture">Optional culture filter for variant elements.</param>
+    /// <param name="skip">The number of items to skip for pagination.</param>
+    /// <param name="take">The number of items to return for pagination.</param>
+    /// <returns>An <see cref="IActionResult"/> containing a paginated collection of element versions.</returns>
     [MapToApiVersion("1.0")]
     [HttpGet]
     [ProducesResponseType(typeof(PagedViewModel<ElementVersionItemResponseModel>), StatusCodes.Status200OK)]

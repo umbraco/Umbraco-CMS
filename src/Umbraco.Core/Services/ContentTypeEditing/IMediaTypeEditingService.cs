@@ -64,7 +64,42 @@ public interface IMediaTypeEditingService
     ///     This method checks media types with an <c>umbracoFile</c> property and filters based on
     ///     the configured allowed file extensions in the file upload data type configuration.
     /// </remarks>
+    [Obsolete("Use GetMediaTypesForFileExtensionWithMatchInfoAsync instead. Scheduled for removal in Umbraco 19.")]
     Task<PagedModel<IMediaType>> GetMediaTypesForFileExtensionAsync(string fileExtension, int skip, int take);
+
+    /// <summary>
+    ///     Gets media types that support a specific file extension, including information about
+    ///     whether each match is a specific extension match or a catch-all fallback.
+    /// </summary>
+    /// <param name="fileExtension">The file extension to filter by (with or without the leading period).</param>
+    /// <param name="skip">The number of items to skip for pagination.</param>
+    /// <param name="take">The number of items to return for pagination.</param>
+    /// <returns>
+    ///     A <see cref="PagedModel{T}"/> containing <see cref="MediaTypeFileExtensionMatchResult"/> items
+    ///     indicating which media types can handle the specified file extension and whether each is a
+    ///     specific or fallback match.
+    /// </returns>
+    /// <remarks>
+    ///     Unlike <c>GetMediaTypesForFileExtensionAsync</c>, this method always includes catch-all media types
+    ///     (those with no extension restrictions) alongside specific extension matches.
+    /// </remarks>
+    // TODO (V18): Remove the default implementation.
+    async Task<PagedModel<MediaTypeFileExtensionMatchResult>> GetMediaTypesForFileExtensionWithMatchInfoAsync(string fileExtension, int skip, int take)
+    {
+#pragma warning disable CS0618 // Type or member is obsolete
+        PagedModel<IMediaType> result = await GetMediaTypesForFileExtensionAsync(fileExtension, skip, take);
+#pragma warning restore CS0618 // Type or member is obsolete
+        return new PagedModel<MediaTypeFileExtensionMatchResult>
+        {
+            Items = result.Items
+                .Select(mt => new MediaTypeFileExtensionMatchResult
+                {
+                    MediaType = mt,
+                    IsSpecificMatch = true,
+                }),
+            Total = result.Total,
+        };
+    }
 
     /// <summary>
     ///     Gets media types that are considered folder types.

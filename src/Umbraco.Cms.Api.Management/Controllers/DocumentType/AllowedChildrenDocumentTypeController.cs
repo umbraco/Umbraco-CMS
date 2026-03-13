@@ -11,18 +11,35 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DocumentType;
 
+/// <summary>
+/// Controller responsible for managing the allowed child document types for a given document type.
+/// </summary>
 [ApiVersion("1.0")]
 public class AllowedChildrenDocumentTypeController : DocumentTypeControllerBase
 {
     private readonly IContentTypeService _contentTypeService;
     private readonly IUmbracoMapper _umbracoMapper;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AllowedChildrenDocumentTypeController"/> class.
+    /// </summary>
+    /// <param name="contentTypeService">Service used to manage content types within the controller.</param>
+    /// <param name="umbracoMapper">The mapper used to map Umbraco objects to API models.</param>
     public AllowedChildrenDocumentTypeController(IContentTypeService contentTypeService, IUmbracoMapper umbracoMapper)
     {
         _contentTypeService = contentTypeService;
         _umbracoMapper = umbracoMapper;
     }
 
+    /// <summary>
+    /// Retrieves a paged list of document types that can be created as children of the specified parent document type.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="id">The unique identifier (key) of the parent document type.</param>
+    /// <param name="parentContentKey">An optional key of the parent content item to further filter allowed children.</param>
+    /// <param name="skip">The number of items to skip before starting to collect the result set.</param>
+    /// <param name="take">The maximum number of items to return.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains an <see cref="IActionResult"/> with a <see cref="PagedViewModel{AllowedDocumentType}"/> of allowed child document types.</returns>
     [HttpGet("{id:guid}/allowed-children")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<AllowedDocumentType>), StatusCodes.Status200OK)]

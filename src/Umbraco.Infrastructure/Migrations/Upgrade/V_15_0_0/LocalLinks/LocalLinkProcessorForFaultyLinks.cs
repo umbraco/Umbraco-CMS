@@ -5,6 +5,9 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_15_0_0.LocalLinks;
 
+/// <summary>
+/// Processes faulty local links detected during the upgrade to Umbraco version 15.0.0.
+/// </summary>
 [Obsolete("Scheduled for removal in Umbraco 18.")]
 public class LocalLinkProcessorForFaultyLinks
 {
@@ -17,6 +20,11 @@ public class LocalLinkProcessorForFaultyLinks
         @"<a (?<faultyHref>href=['""] ?(?<typeAttribute> type=*?['""][^'""]*?['""] )?(?<localLink>\/{localLink:[a-fA-F0-9-]+}['""])).*?>",
         RegexOptions.IgnoreCase | RegexOptions.Singleline);
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="LocalLinkProcessorForFaultyLinks"/> class.
+    /// </summary>
+    /// <param name="idKeyMap">Provides the mapping between IDs and keys for link processing.</param>
+    /// <param name="localLinkProcessors">The collection of typed local link processors to use.</param>
     public LocalLinkProcessorForFaultyLinks(
         IIdKeyMap idKeyMap,
         IEnumerable<ITypedLocalLinkProcessor> localLinkProcessors)
@@ -25,6 +33,10 @@ public class LocalLinkProcessorForFaultyLinks
         _localLinkProcessors = localLinkProcessors;
     }
 
+    /// <summary>
+    /// Returns the property editor aliases supported by the local link processors.
+    /// </summary>
+    /// <returns>An enumerable collection of supported property editor aliases.</returns>
     public IEnumerable<string> GetSupportedPropertyEditorAliases() =>
         _localLinkProcessors.SelectMany(p => p.PropertyEditorAliases);
 
@@ -36,6 +48,11 @@ public class LocalLinkProcessorForFaultyLinks
         return processor is not null && processor.Process.Invoke(editorValue, ProcessToEditorValue, ProcessStringValue);
     }
 
+    /// <summary>
+    /// Scans the input string for local link tags with misplaced or swapped attributes and corrects them to the expected format.
+    /// </summary>
+    /// <param name="input">The input string potentially containing local link tags with incorrect attribute placement.</param>
+    /// <returns>The input string with all faulty local link tags corrected to the proper attribute order.</returns>
     public string ProcessStringValue(string input)
     {
         MatchCollection faultyTags = FaultyHrefPattern.Matches(input);

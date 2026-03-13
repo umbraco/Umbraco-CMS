@@ -14,6 +14,11 @@ internal sealed class PocoToSqlExpressionVisitor<TDto> : ExpressionVisitorBase
     private readonly string? _alias;
     private readonly PocoData _pd;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PocoToSqlExpressionVisitor{TDto}"/> class for translating POCO queries to SQL expressions.
+    /// </summary>
+    /// <param name="sqlContext">The <see cref="ISqlContext"/> used for SQL query generation and context.</param>
+    /// <param name="alias">An optional alias for the SQL table associated with <typeparamref name="TDto"/>.</param>
     public PocoToSqlExpressionVisitor(ISqlContext sqlContext, string? alias)
         : base(sqlContext.SqlSyntax)
     {
@@ -122,6 +127,12 @@ internal sealed class PocoToSqlExpressionVisitor<TDto1, TDto2> : ExpressionVisit
     private string? _parameterName1;
     private string? _parameterName2;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PocoToSqlExpressionVisitor{TDto1, TDto2}"/> class with the specified SQL context and table aliases.
+    /// </summary>
+    /// <param name="sqlContext">The <see cref="ISqlContext"/> used for SQL query generation.</param>
+    /// <param name="alias1">The table alias to use for the first DTO (<typeparamref name="TDto1"/>).</param>
+    /// <param name="alias2">The table alias to use for the second DTO (<typeparamref name="TDto2"/>).</param>
     public PocoToSqlExpressionVisitor(ISqlContext sqlContext, string? alias1, string? alias2)
         : base(sqlContext.SqlSyntax)
     {
@@ -224,6 +235,13 @@ internal sealed class PocoToSqlExpressionVisitor<TDto1, TDto2, TDto3> : Expressi
     private string? _parameterName2;
     private string? _parameterName3;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Persistence.Querying.PocoToSqlExpressionVisitor{TDto1, TDto2, TDto3}"/> class, which is used to translate POCO expressions into SQL queries for three related DTO types.
+    /// </summary>
+    /// <param name="sqlContext">The SQL context used for building queries.</param>
+    /// <param name="alias1">The table alias to use for the first DTO type (<typeparamref name="TDto1"/>).</param>
+    /// <param name="alias2">The table alias to use for the second DTO type (<typeparamref name="TDto2"/>).</param>
+    /// <param name="alias3">The table alias to use for the third DTO type (<typeparamref name="TDto3"/>).</param>
     public PocoToSqlExpressionVisitor(ISqlContext sqlContext, string? alias1, string? alias2, string? alias3)
         : base(sqlContext.SqlSyntax)
     {
