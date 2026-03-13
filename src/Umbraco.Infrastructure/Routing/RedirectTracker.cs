@@ -89,9 +89,7 @@ internal sealed class RedirectTracker : IRedirectTracker
         // derives descendant segments from this content's data.
         // If the segment is unchanged and no provider affects descendants, we don't need to traverse.
         // For moves, we have to assume all descendant URLs may have changed since the parent path is part of the URL.
-        if (isMove is false
-            && HasUrlSegmentChanged(entity, entityContent) is false
-            && HasProviderAffectingDescendantSegments(entity) is false)
+        if (ShouldIgnoreForOldRouteStorage(entity, isMove, entityContent))
         {
             return;
         }
@@ -142,6 +140,11 @@ internal sealed class RedirectTracker : IRedirectTracker
         }
     }
 
+    private bool ShouldIgnoreForOldRouteStorage(IContent entity, bool isMove, IPublishedContent entityContent) =>
+        isMove is false &&
+            HasUrlSegmentChanged(entity, entityContent) is false &&
+            HasProviderAffectingDescendantSegments(entity) is false;
+
     private bool HasUrlSegmentChanged(IContent entity, IPublishedContent publishedContent)
     {
         // During upgrades, the document URL service is not initialized (see DocumentUrlServiceInitializerNotificationHandler).
@@ -151,46 +154,52 @@ internal sealed class RedirectTracker : IRedirectTracker
             return true;
         }
 
-        // Determine cultures to check.
-        IEnumerable<string> cultures = publishedContent.Cultures.Any()
-            ? publishedContent.Cultures.Keys
-            : [string.Empty];
-
-        foreach (var culture in cultures)
+        foreach (var culture in GetCultures(publishedContent))
         {
             var currentPublishedSegment = _documentUrlService.GetUrlSegment(entity.Key, culture, isDraft: false);
 
-            // If the current published segment couldn't be retrieved (e.g. content being published
-            // for the first time), we can't confirm the segment is unchanged — fall back to full traversal.
-            if (currentPublishedSegment is null)
+            // In the unexpected case that the current published segment couldn't be retrieved (e.g. cache inconsistency),
+            // we can't confirm the segment is unchanged — fall back to full traversal.
+            // Otherwise, if the provider(s) that contribute to the segment detect a change, we need to traverse since the
+            // URL of the current node and all descendents has changed.
+            if (currentPublishedSegment is null || HasProviderDetectedSegmentChange(entity, currentPublishedSegment, culture))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static IEnumerable<string> GetCultures(IPublishedContent publishedContent) =>
+        publishedContent.Cultures.Any()
+            ? publishedContent.Cultures.Keys
+            : [string.Empty];
+
+    private bool HasProviderDetectedSegmentChange(IContent entity, string currentPublishedSegment, string culture)
+    {
+        // Check each provider to see if any detect a change in the URL segment for this content and culture.
+        foreach (IUrlSegmentProvider provider in _urlSegmentProviders)
+        {
+            // Skip providers that don't produce a segment for this content/culture.
+            if (string.IsNullOrEmpty(provider.GetUrlSegment(entity, published: false, culture)))
+            {
+                continue;
+            }
+
+            if (provider.HasUrlSegmentChanged(entity, currentPublishedSegment, culture))
             {
                 return true;
             }
 
-            // Ask the provider chain whether the segment has changed.
-            foreach (IUrlSegmentProvider provider in _urlSegmentProviders)
+            // This provider handled the segment — don't check further providers unless it allows additional segments.
+            if (provider.AllowAdditionalSegments is false)
             {
-                // Skip providers that don't produce a segment for this content/culture.
-                if (string.IsNullOrEmpty(provider.GetUrlSegment(entity, published: false, culture)))
-                {
-                    continue;
-                }
-
-                if (provider.HasUrlSegmentChanged(entity, currentPublishedSegment, culture))
-                {
-                    return true;
-                }
-
-                if (provider.AllowAdditionalSegments is false)
-                {
-                    break;
-                }
+                return false;
             }
-
-            // No fallback is needed here: if no registered provider produces a segment, then none would have produced
-            // one at publish time either, so there is no change.
         }
 
+        // No provider produced a segment, so none would have at publish time either — no change.
         return false;
     }
 
