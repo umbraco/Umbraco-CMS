@@ -41,6 +41,7 @@ public abstract class FolderTreeControllerBase<TItem> : NamedEntityTreeControlle
         }
     }
 
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
     protected FolderTreeControllerBase(IEntityService entityService, FlagProviderCollection flagProviders)
         : this(
             entityService,
