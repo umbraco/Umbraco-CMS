@@ -368,9 +368,9 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
     /// After the fix, write locks are acquired before publishing notifications, so the deadlock cannot occur.
     /// </remarks>
     [Test]
-    [Timeout(10000)]
+    [CancelAfter(10000)]
     [ConfigureBuilder(ActionName = nameof(ConfigureConcurrencyTest))]
-    public async Task Parallel_Media_Save_Does_Not_Deadlock_When_Notification_Handler_Acquires_Read_Lock()
+    public async Task Parallel_Media_Save_Does_Not_Deadlock_When_Notification_Handler_Acquires_Read_Lock(CancellationToken cancellationToken)
     {
         // Arrange
         var mediaType = MediaTypeBuilder.CreateSimpleMediaType("testMedia", "Test Media");
@@ -395,8 +395,13 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
         {
             try
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 media.Name += " Updated";
                 MediaService.Save(media);
+            }
+            catch (OperationCanceledException)
+            {
+                throw; // NUnit handle timeout
             }
             catch (Exception ex)
             {
@@ -429,9 +434,9 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
     /// Verifies that parallel media deletes don't deadlock when a notification handler is registered.
     /// </summary>
     [Test]
-    [Timeout(10000)]
+    [CancelAfter(10000)]
     [ConfigureBuilder(ActionName = nameof(ConfigureConcurrencyTest))]
-    public async Task Parallel_Media_Delete_Does_Not_Deadlock()
+    public async Task Parallel_Media_Delete_Does_Not_Deadlock(CancellationToken cancellationToken)
     {
         // Arrange
         var mediaType = MediaTypeBuilder.CreateSimpleMediaType("testMedia", "Test Media");
@@ -469,7 +474,15 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
             return Task.CompletedTask;
         })).ToList();
 
-        await Task.WhenAll(tasks);
+        var allTasks = Task.WhenAll(tasks);
+        var completed = await Task.WhenAny(allTasks, Task.Delay(10000, cancellationToken));
+
+        if (completed != allTasks)
+        {
+            Assert.Fail("Parallel deletes timed out after 10 seconds — possible deadlock.");
+        }
+
+        await allTasks;
 
         // Assert
         Assert.IsEmpty(

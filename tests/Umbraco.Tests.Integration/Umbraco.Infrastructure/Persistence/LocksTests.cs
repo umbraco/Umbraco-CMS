@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -16,10 +14,11 @@ using Umbraco.Cms.Tests.Integration.Testing;
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence;
 
 [TestFixture]
-[Timeout(60000)]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Logger = UmbracoTestOptions.Logger.Console)]
 internal sealed class LocksTests : UmbracoIntegrationTest
 {
+    private static readonly TimeSpan SafeTimeout = TimeSpan.FromSeconds(60);
+
     [SetUp]
     public void SetUp()
     {
@@ -78,7 +77,7 @@ internal sealed class LocksTests : UmbracoIntegrationTest
                             }
                         }
 
-                        m1.Wait();
+                        Assert.That(m1.Wait(SafeTimeout), Is.True, "Timed out waiting for all threads to enter.");
                         lock (locker)
                         {
                             acquired--;
@@ -103,14 +102,15 @@ internal sealed class LocksTests : UmbracoIntegrationTest
             }
         }
 
-        m2.Wait();
+        Assert.That(m2.Wait(SafeTimeout), Is.True, "Timed out waiting for all threads to acquire locks.");
+
         // all threads have locked in parallel
         var maxAcquired = acquired;
         m1.Set();
 
         foreach (var thread in threads)
         {
-            thread.Join();
+            Assert.That(thread.Join(SafeTimeout), Is.True, "Thread did not complete in time.");
         }
 
         Assert.AreEqual(threadCount, maxAcquired);
@@ -220,14 +220,20 @@ internal sealed class LocksTests : UmbracoIntegrationTest
                             }
                         }
 
-                        ms[ic].WaitOne();
+                        if (!ms[ic].WaitOne(SafeTimeout))
+                        {
+                            return;
+                        }
                         scope.EagerWriteLock(Constants.Locks.Servers);
                         lock (locker)
                         {
                             acquired++;
                         }
 
-                        ms[ic].WaitOne();
+                        if (!ms[ic].WaitOne(SafeTimeout))
+                        {
+                            return;
+                        }
                         lock (locker)
                         {
                             acquired--;
@@ -273,7 +279,7 @@ internal sealed class LocksTests : UmbracoIntegrationTest
 
         foreach (var thread in threads)
         {
-            thread.Join();
+            Assert.That(thread.Join(SafeTimeout), Is.True, "Thread did not complete in time.");
         }
 
         Assert.AreEqual(0, acquired);
@@ -313,8 +319,8 @@ internal sealed class LocksTests : UmbracoIntegrationTest
 
         ev2.Set();
 
-        thread1.Join();
-        thread2.Join();
+        Assert.That(thread1.Join(SafeTimeout), Is.True, "Thread1 did not complete in time.");
+        Assert.That(thread2.Join(SafeTimeout), Is.True, "Thread2 did not complete in time.");
 
         //Assert.IsNotNull(e1);
         if (e1 != null)
@@ -346,7 +352,10 @@ internal sealed class LocksTests : UmbracoIntegrationTest
         {
             try
             {
-                otherEv.WaitOne();
+                if (!otherEv.WaitOne(SafeTimeout))
+                {
+                    return;
+                }
                 Console.WriteLine($"[{id1}] WAIT {id1}");
                 scope.EagerWriteLock(id1);
                 Console.WriteLine($"[{id1}] GRANT {id1}");
@@ -355,7 +364,10 @@ internal sealed class LocksTests : UmbracoIntegrationTest
 
                 if (id1 == 1)
                 {
-                    otherEv.WaitOne();
+                    if (!otherEv.WaitOne(SafeTimeout))
+                    {
+                        return;
+                    }
                 }
                 else
                 {
@@ -407,8 +419,8 @@ internal sealed class LocksTests : UmbracoIntegrationTest
 
         ev2.Set();
 
-        thread1.Join();
-        thread2.Join();
+        Assert.That(thread1.Join(SafeTimeout), Is.True, "Thread1 did not complete in time.");
+        Assert.That(thread2.Join(SafeTimeout), Is.True, "Thread2 did not complete in time.");
 
         Assert.IsNull(e1);
         Assert.IsNull(e2);
@@ -436,7 +448,8 @@ internal sealed class LocksTests : UmbracoIntegrationTest
 
                 _ = scope.Database; // Begin transaction
                 Interlocked.Increment(ref counter);
-                gate.Wait();
+                Assert.That(gate.Wait(SafeTimeout), Is.True, "Timed out waiting for gate.");
+
 
                 logger.LogInformation("t1 - Attempting to acquire write lock");
                 // This will acquire right away
@@ -455,7 +468,7 @@ internal sealed class LocksTests : UmbracoIntegrationTest
 
                 _ = scope.Database; // Begin transaction
                 Interlocked.Increment(ref counter);
-                gate.Wait();
+                Assert.That(gate.Wait(SafeTimeout), Is.True, "Timed out waiting for gate.");
                 Thread.Sleep(100); // Let other transaction obtain write lock first.
 
                 logger.LogInformation("t2 - Attempting to acquire read lock");
@@ -475,7 +488,7 @@ internal sealed class LocksTests : UmbracoIntegrationTest
             }
 
             gate.Set();
-            Task.WaitAll(t1, t2);
+            Assert.That(Task.WaitAll(new[] { t1, t2 }, SafeTimeout), Is.True, "Tasks did not complete in time.");
         }
     }
 
@@ -495,7 +508,7 @@ internal sealed class LocksTests : UmbracoIntegrationTest
 
                 _ = scope.Database; // Begin transaction
                 Interlocked.Increment(ref counter);
-                gate.Wait();
+                Assert.That(gate.Wait(SafeTimeout), Is.True, "Timed out waiting for gate.");
 
                 logger.LogInformation("t1 - Attempting to acquire write lock");
                 Assert.DoesNotThrow(() =>
@@ -518,7 +531,7 @@ internal sealed class LocksTests : UmbracoIntegrationTest
 
                 _ = scope.Database; // Begin transaction
                 Interlocked.Increment(ref counter);
-                gate.Wait();
+                Assert.That(gate.Wait(SafeTimeout), Is.True, "Timed out waiting for gate.");
                 Thread.Sleep(100); // Let other transaction obtain write lock first.
 
                 logger.LogInformation("t2 - Attempting to acquire write lock");
@@ -543,7 +556,7 @@ internal sealed class LocksTests : UmbracoIntegrationTest
             }
 
             gate.Set();
-            Task.WaitAll(t1, t2);
+            Assert.That(Task.WaitAll(new[] { t1, t2 }, SafeTimeout), Is.True, "Tasks did not complete in time.");
         }
     }
 
@@ -614,7 +627,7 @@ internal sealed class LocksTests : UmbracoIntegrationTest
                 }
             });
 
-            Task.WaitAll(t1, t2, t3);
+            Assert.That(Task.WaitAll(new[] { t1, t2, t3 }, SafeTimeout), Is.True, "Tasks did not complete in time.");
         }
 
         Assert.AreEqual(3, locksCompleted);
@@ -643,13 +656,19 @@ internal sealed class LocksTests : UmbracoIntegrationTest
         {
             try
             {
-                otherEv.WaitOne();
+                if (!otherEv.WaitOne(SafeTimeout))
+                {
+                    return;
+                }
                 Console.WriteLine($"[{id}] WAIT {id}");
                 scope.EagerWriteLock(id);
                 Console.WriteLine($"[{id}] GRANT {id}");
                 WriteLocks(ScopeAccessor.AmbientScope.Database);
                 myEv.Set();
-                otherEv.WaitOne();
+                if (!otherEv.WaitOne(SafeTimeout))
+                {
+                    return;
+                }
             }
             catch (Exception e)
             {
