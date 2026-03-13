@@ -44,7 +44,7 @@ export class DocumentApiHelper {
       segment: variant.segment,
       name: variant.name
     }));
-    
+
     const updateData = {
       values: document.values,
       variants: variantsData,
@@ -104,7 +104,7 @@ export class DocumentApiHelper {
       }
       if (child.hasChildren) {
         const result = await this.recurseChildren(name, child.id, toDelete);
-        if (result) { 
+        if (result) {
           return result;
         }
       }
@@ -124,7 +124,7 @@ export class DocumentApiHelper {
       }
       if (document.hasChildren) {
         const result = await this.recurseChildren(name, document.id, false);
-        if (result) { 
+        if (result) {
           return result;
         }
       }
@@ -304,7 +304,7 @@ export class DocumentApiHelper {
         .withValue(memberId)
         .done()
       .build();
-      
+
     return await this.create(document);
   }
 
@@ -321,7 +321,7 @@ export class DocumentApiHelper {
         .withValue(tagsName)
         .done()
       .build();
-    
+
     return await this.create(document);
   }
 
@@ -343,7 +343,7 @@ export class DocumentApiHelper {
           .done()
         .done()
       .build();
-      
+
     return await this.create(document);
   }
 
@@ -356,7 +356,7 @@ export class DocumentApiHelper {
   async updateDomains(id: string, domains) {
     return await this.api.put(this.api.baseUrl + '/umbraco/management/api/v1/document/' + id + '/domains', domains);
   }
-  
+
   // Image Media Picker
   async createDocumentWithImageMediaPicker(documentName: string, documentTypeId: string, propertyAlias: string, mediaKey: string, focalPoint: {left: number, top: number} = {left: 0, top: 0}) {
     await this.ensureNameNotExists(documentName);
@@ -377,7 +377,7 @@ export class DocumentApiHelper {
 
     return await this.create(document);
   }
-  
+
   async doesImageMediaPickerContainImage(id: string, propertyAlias: string, mediaKey: string) {
     const contentData = await this.getByName(id);
     return contentData.values.some(value =>
@@ -552,7 +552,7 @@ export class DocumentApiHelper {
     await this.publish(documentId, publishData);
     return documentId;
   }
-  
+
   async isDocumentPublished(id: string) {
     const document = await this.get(id);
     return document.variants[0].state === 'Published';
@@ -595,7 +595,7 @@ export class DocumentApiHelper {
     // Create document type
     let documentTypeId = await this.api.documentType.createDocumentTypeWithPropertyEditorAndAllowedTemplate(documentTypeName, dataTypeId, propertyName, templateId);
     documentTypeId = documentTypeId === undefined ? '' : documentTypeId;
-    await this.ensureNameNotExists(documentName);   
+    await this.ensureNameNotExists(documentName);
 
     const document = new DocumentBuilder()
       .withDocumentTypeId(documentTypeId)
@@ -652,7 +652,7 @@ export class DocumentApiHelper {
     // Create document type
     let documentTypeId = await this.api.documentType.createDocumentTypeWithPropertyEditorAndAllowedTemplate(documentTypeName, dataTypeId, propertyName, templateId);
     documentTypeId = documentTypeId === undefined ? '' : documentTypeId;
-    await this.ensureNameNotExists(documentName);   
+    await this.ensureNameNotExists(documentName);
 
     const document = new DocumentBuilder()
       .withDocumentTypeId(documentTypeId)
@@ -686,7 +686,7 @@ export class DocumentApiHelper {
     // Create document type
     let documentTypeId = await this.api.documentType.createDocumentTypeWithPropertyEditorAndAllowedTemplate(documentTypeName, dataTypeId, propertyName, templateId);
     documentTypeId = documentTypeId === undefined ? '' : documentTypeId;
-    await this.ensureNameNotExists(documentName);   
+    await this.ensureNameNotExists(documentName);
 
     const document = new DocumentBuilder()
       .withDocumentTypeId(documentTypeId)
@@ -720,7 +720,7 @@ export class DocumentApiHelper {
     // Create document type
     let documentTypeId = await this.api.documentType.createDocumentTypeWithPropertyEditorAndAllowedTemplate(documentTypeName, dataTypeId, propertyName, templateId);
     documentTypeId = documentTypeId === undefined ? '' : documentTypeId;
-    await this.ensureNameNotExists(documentName);   
+    await this.ensureNameNotExists(documentName);
 
     const document = new DocumentBuilder()
       .withDocumentTypeId(documentTypeId)
@@ -810,7 +810,7 @@ export class DocumentApiHelper {
           .done()
         .done()
       .build();
-      
+
     return await this.create(document);
   }
 
@@ -946,7 +946,7 @@ export class DocumentApiHelper {
           .done()
         .done()
       .build();
-    
+
     return await this.create(document);
   }
 
@@ -999,7 +999,7 @@ export class DocumentApiHelper {
           .done()
         .done()
       .build();
-    
+
     return await this.create(document);
   }
 
@@ -1013,7 +1013,7 @@ export class DocumentApiHelper {
     } else {
       documentTypeId = await this.api.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, blockListDataTypeName, blockListDataTypeId, groupName) || '';
     }
-    
+
     await this.ensureNameNotExists(documentName);
 
     const document = new DocumentBuilder()
@@ -1042,7 +1042,7 @@ export class DocumentApiHelper {
           .done()
         .done()
       .build();
-    
+
     return await this.create(document);
   }
 
@@ -1074,7 +1074,7 @@ export class DocumentApiHelper {
           .done()
         .done()
       .build();
-      
+
     return await this.create(document);
   }
 
@@ -1114,7 +1114,7 @@ export class DocumentApiHelper {
 
     return await this.create(document);
   }
-  
+
   async createDefaultDocumentWithABlockListEditorAndBlockWithTwoValues(documentName: string, documentTypeName: string, blockListDataTypeName: string, elementTypeId: string, elementTypePropertyAlias: string, elementTypePropertyValue: string, elementTypePropertyEditorAlias: string, groupName: string = 'TestGroup', secondElementTypePropertyValue: string, templateId?: string) {
     const crypto = require('crypto');
     const blockContentKey = crypto.randomUUID();
@@ -1122,7 +1122,7 @@ export class DocumentApiHelper {
     const blockListDataTypeId = await this.api.dataType.createBlockListDataTypeWithABlock(blockListDataTypeName, elementTypeId) || '';
     let documentTypeId: string;
     if (templateId) {
-      documentTypeId = await this.api.documentType.createDocumentTypeWithPropertyEditorAndAllowedTemplate(documentTypeName, blockListDataTypeId, blockListDataTypeName, templateId) || '';  
+      documentTypeId = await this.api.documentType.createDocumentTypeWithPropertyEditorAndAllowedTemplate(documentTypeName, blockListDataTypeId, blockListDataTypeName, templateId) || '';
     } else {
       documentTypeId = await this.api.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, blockListDataTypeName, blockListDataTypeId, groupName) || '';
     }
@@ -1169,7 +1169,7 @@ export class DocumentApiHelper {
           .done()
         .done()
       .build();
-    
+
     return await this.create(document);
   }
 
@@ -1222,7 +1222,7 @@ export class DocumentApiHelper {
           .done()
         .done()
       .build();
-    
+
     return await this.create(document);
   }
 
@@ -1281,7 +1281,7 @@ export class DocumentApiHelper {
         .done()
       .done()
       .build();
-    
+
     return await this.create(document);
   }
 
@@ -1340,10 +1340,10 @@ export class DocumentApiHelper {
           .done()
         .done()
       .build();
-    
+
     return await this.create(document);
   }
-  
+
   async createDocumentWithABlockGridEditorWithABlockThatContainsABlockInAnArea(documentName: string, documentTypeId: string, blockGridDataTypeName: string, firstElementTypeKey: string, areaKey: string, secondElementTypeKey: string, elementTypePropertyAlias: string, elementTypePropertyValue: string, elementTypePropertyEditorAlias: string) {
     const crypto = require('crypto');
     const firstBlockContentKey = crypto.randomUUID();
@@ -1421,11 +1421,11 @@ export class DocumentApiHelper {
         .withIsoCode(secondIsoCode)
         .done()
       .build();
-    
+
     await this.updateDomains(contentId, domainData);
     return contentId;
   }
-  
+
   async doesTipTapDataTypeWithNameContainBlockWithValue(documentName: string, dataTypeAlias: string, elementTypeId: string, elementTypeDataTypeAlias: string, blockValue: string) {
     const document = await this.getByName(documentName);
     const tipTapDataType = document.values.find(value => value.alias === dataTypeAlias);
@@ -1442,7 +1442,7 @@ export class DocumentApiHelper {
         }
       ]
     };
-    
+
     return await this.publish(id, publishScheduleData);
   }
 
@@ -1484,7 +1484,7 @@ export class DocumentApiHelper {
 
     return await this.create(document);
   }
-  
+
   async doesBlockGridContainBlocksWithDataElementKeyInAreaWithKey(documentName: string, blockGridAlias:string ,blockContentKey: string, areaKey: string, blocksInAreas: string[]) {
     const document = await this.getByName(documentName);
     const documentValues = document.values.find(value => value.alias === blockGridAlias);
@@ -1492,7 +1492,7 @@ export class DocumentApiHelper {
     const area = parentBlock.areas.find(value => value.key === areaKey);
     return area.items.map(value => value.contentKey).every(value => blocksInAreas.includes(value));
   }
-  
+
   async emptyRecycleBin() {
     return await this.api.delete(this.api.baseUrl + '/umbraco/management/api/v1/recycle-bin/document');
   }
@@ -1531,7 +1531,7 @@ export class DocumentApiHelper {
         .done()
       .build();
     const contentId = await this.create(document) || '';
-    
+
     const domainData = new DocumentDomainBuilder()
       .addDomain()
         .withDomainName(firstDomainName)
@@ -1556,7 +1556,7 @@ export class DocumentApiHelper {
     // Create document type
     let documentTypeId = await this.api.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, multiURLPickerDataTypeName, dataTypeData.id);
     documentTypeId = documentTypeId === undefined ? '' : documentTypeId;
-    await this.ensureNameNotExists(documentName);   
+    await this.ensureNameNotExists(documentName);
 
     const document = new DocumentBuilder()
       .withDocumentTypeId(documentTypeId)
@@ -1588,7 +1588,7 @@ export class DocumentApiHelper {
     // Create document type
     let documentTypeId = await this.api.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, multiURLPickerDataTypeName, dataTypeData.id);
     documentTypeId = documentTypeId === undefined ? '' : documentTypeId;
-    await this.ensureNameNotExists(documentName);   
+    await this.ensureNameNotExists(documentName);
 
     const document = new DocumentBuilder()
       .withDocumentTypeId(documentTypeId)
@@ -1641,7 +1641,7 @@ export class DocumentApiHelper {
         .withDomainName(domain.domainName)
         .withIsoCode(domain.isoCode)
         .done();
-    } 
+    }
     const domainData = domainDataBuilder.build();
     return await this.updateDomains(documentId, domainData);
   }
@@ -1697,7 +1697,7 @@ export class DocumentApiHelper {
         .withValue(value.value)
         .withCulture(value.culture)
         .withEditorAlias(editorAlias);
-      if (value.segment) {
+      if (value.segment !== null) {
         valueBuilder.withSegment(value.segment);
       }
       valueBuilder.done();
@@ -1722,7 +1722,7 @@ export class DocumentApiHelper {
         .withAlias(alias)
         .withValue(value.value)
         .withEditorAlias(editorAlias);
-      if (value.segment) {
+      if (value.segment !== null) {
         valueBuilder.withSegment(value.segment);
       }
       valueBuilder.done();
@@ -1730,5 +1730,12 @@ export class DocumentApiHelper {
 
     const document = documentBuilder.build();
     return await this.create(document);
+  }
+
+  async getValuesByCultureAndSegmentForDocument(documentName: string, culturesAndSegments: {culture: string | null, segment: string | null}[]) {
+    const documentData = await this.getByName(documentName);
+    return culturesAndSegments.map(cs =>
+      documentData.values.find(v => v.culture === cs.culture && v.segment === cs.segment)
+    );
   }
 }
