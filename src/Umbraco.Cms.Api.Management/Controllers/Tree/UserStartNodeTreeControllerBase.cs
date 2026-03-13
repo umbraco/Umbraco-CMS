@@ -4,7 +4,6 @@ using Umbraco.Cms.Api.Management.Services.Entities;
 using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
@@ -25,19 +24,6 @@ public abstract class UserStartNodeTreeControllerBase<TItem> : EntityTreeControl
     private string[]? _userStartNodePaths;
     private Dictionary<Guid, bool> _accessMap = new();
     private Guid? _dataTypeKey;
-
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
-    protected UserStartNodeTreeControllerBase(
-        IEntityService entityService,
-        IUserStartNodeEntitiesService userStartNodeEntitiesService,
-        IDataTypeService dataTypeService)
-        : this(
-              entityService,
-              StaticServiceProvider.Instance.GetRequiredService<FlagProviderCollection>(),
-              userStartNodeEntitiesService,
-              dataTypeService)
-    {
-    }
 
     protected UserStartNodeTreeControllerBase(
         IEntityService entityService,

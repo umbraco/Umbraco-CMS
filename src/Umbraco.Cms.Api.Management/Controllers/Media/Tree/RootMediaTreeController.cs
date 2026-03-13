@@ -1,7 +1,6 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.Services.Entities;
@@ -20,27 +19,6 @@ namespace Umbraco.Cms.Api.Management.Controllers.Media.Tree;
 public class RootMediaTreeController : MediaTreeControllerBase
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="RootMediaTreeController"/> class, which manages the root of the media tree in the Umbraco backoffice API.
-    /// </summary>
-    /// <param name="entityService">Service for managing and retrieving entities in the system.</param>
-    /// <param name="userStartNodeEntitiesService">Service for resolving user-specific start nodes for entities.</param>
-    /// <param name="dataTypeService">Service for accessing and managing data types.</param>
-    /// <param name="appCaches">Provides access to application-level caches.</param>
-    /// <param name="backofficeSecurityAccessor">Accessor for backoffice security context and authentication.</param>
-    /// <param name="mediaPresentationFactory">Factory for creating media presentation models.</param>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
-    public RootMediaTreeController(
-        IEntityService entityService,
-        IUserStartNodeEntitiesService userStartNodeEntitiesService,
-        IDataTypeService dataTypeService,
-        AppCaches appCaches,
-        IBackOfficeSecurityAccessor backofficeSecurityAccessor,
-        IMediaPresentationFactory mediaPresentationFactory)
-        : base(entityService, userStartNodeEntitiesService, dataTypeService, appCaches, backofficeSecurityAccessor, mediaPresentationFactory)
-    {
-    }
-
-    /// <summary>
     /// Initializes a new instance of the <see cref="RootMediaTreeController"/> class.
     /// </summary>
     /// <param name="entityService">Service for managing and retrieving entities in the system.</param>
@@ -50,7 +28,6 @@ public class RootMediaTreeController : MediaTreeControllerBase
     /// <param name="appCaches">Provides access to application-level caches.</param>
     /// <param name="backofficeSecurityAccessor">Accessor for backoffice security context and operations.</param>
     /// <param name="mediaPresentationFactory">Factory for creating media presentation models.</param>
-    [ActivatorUtilitiesConstructor]
     public RootMediaTreeController(
         IEntityService entityService,
         FlagProviderCollection flagProviders,

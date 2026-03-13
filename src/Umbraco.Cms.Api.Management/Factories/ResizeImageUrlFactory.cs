@@ -11,11 +11,10 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
-// TODO (V18): Fix the typo by renaming this class to ResizeImageUrlFactory (and also the corresponding test class).
 /// <summary>
 /// Provides methods for generating URLs for resized images.
 /// </summary>
-public class ReziseImageUrlFactory : IReziseImageUrlFactory
+public class ResizeImageUrlFactory : IResizeImageUrlFactory
 {
     private readonly IImageUrlGenerator _imageUrlGenerator;
     private readonly ContentSettings _contentSettings;
@@ -31,7 +30,7 @@ public class ReziseImageUrlFactory : IReziseImageUrlFactory
     /// <param name="mediaUrlGenerators">A collection of media URL generators.</param>
     /// <param name="absoluteUrlBuilder">The service used to build absolute URLs.</param>
     [Obsolete("Use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
-    public ReziseImageUrlFactory(
+    public ResizeImageUrlFactory(
         IImageUrlGenerator imageUrlGenerator,
         IOptions<ContentSettings> contentSettings,
         MediaUrlGeneratorCollection mediaUrlGenerators,
@@ -46,14 +45,14 @@ public class ReziseImageUrlFactory : IReziseImageUrlFactory
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Factories.ReziseImageUrlFactory"/> class.
+    /// Initializes a new instance of the <see cref="ResizeImageUrlFactory"/> class.
     /// </summary>
     /// <param name="imageUrlGenerator">The service used to generate image URLs.</param>
     /// <param name="contentSettings">The options for content settings.</param>
     /// <param name="imagingSettings">The options for content imaging settings.</param>
     /// <param name="mediaUrlGenerators">A collection of media URL generators.</param>
     /// <param name="absoluteUrlBuilder">The service used to build absolute URLs.</param>
-    public ReziseImageUrlFactory(
+    public ResizeImageUrlFactory(
         IImageUrlGenerator imageUrlGenerator,
         IOptions<ContentSettings> contentSettings,
         IOptions<ContentImagingSettings> imagingSettings,

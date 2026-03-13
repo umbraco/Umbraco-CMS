@@ -28,20 +28,6 @@ public class DocumentTypeTreeControllerBase : FolderTreeControllerBase<DocumentT
     /// <summary>
     /// Initializes a new instance of the <see cref="DocumentTypeTreeControllerBase"/> class.
     /// </summary>
-    /// <param name="entityService">Service used for managing and retrieving entities within the Umbraco CMS.</param>
-    /// <param name="contentTypeService">Service used for managing and retrieving content types (document types) within the Umbraco CMS.</param>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
-    public DocumentTypeTreeControllerBase(IEntityService entityService, IContentTypeService contentTypeService)
-        : this(
-              entityService,
-              StaticServiceProvider.Instance.GetRequiredService<FlagProviderCollection>(),
-              contentTypeService)
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="DocumentTypeTreeControllerBase"/> class.
-    /// </summary>
     /// <param name="entityService">Service used for entity operations such as retrieval and management.</param>
     /// <param name="flagProviders">A collection of providers that supply flags for document types.</param>
     /// <param name="contentTypeService">Service responsible for managing content types.</param>

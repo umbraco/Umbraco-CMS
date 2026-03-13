@@ -110,17 +110,6 @@ internal class AddDocumentPropertyPermissions : MigrationBase
         public string? Name { get; set; }
 
         /// <summary>
-        /// Gets or sets the default permissions for the user group.
-        /// This property is obsolete and no longer used. Use <see cref="UserGroup2PermissionDtos"/> instead.
-        /// Scheduled for removal in Umbraco 18.
-        /// </summary>
-        [Column("userGroupDefaultPermissions")]
-        [Length(50)]
-        [NullSetting(NullSetting = NullSettings.Null)]
-        [Obsolete("Is not used anymore. Use UserGroup2PermissionDtos instead. Scheduled for removal in Umbraco 18.")]
-        public string? DefaultPermissions { get; set; }
-
-        /// <summary>
         /// Gets or sets the date and time when the user group was created.
         /// </summary>
         [Column("createDate")]

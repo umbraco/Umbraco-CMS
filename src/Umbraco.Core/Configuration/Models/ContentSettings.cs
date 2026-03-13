@@ -165,13 +165,6 @@ public class ContentSettings
     public string BackOfficeLogoAlternative { get; set; } = StaticBackOfficeLogoAlternative;
 
     /// <summary>
-    ///     Gets or sets a value indicating whether to hide the backoffice umbraco logo or not.
-    /// </summary>
-    [DefaultValue(StaticHideBackOfficeLogo)]
-    [Obsolete("This setting is no longer used. An alternative BackOffice logo can be set using the BackOfficeLogo setting. Scheduled for removal in Umbraco 18.")]
-    public bool HideBackOfficeLogo { get; set; } = StaticHideBackOfficeLogo;
-
-    /// <summary>
     ///     Gets or sets a value indicating whether to disable the deletion of items referenced by other items.
     /// </summary>
     [DefaultValue(StaticDisableDeleteWhenReferenced)]

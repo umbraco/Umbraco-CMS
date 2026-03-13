@@ -1,8 +1,6 @@
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.ServerEvents;
 using Umbraco.Cms.Core.ServerEvents;
 using Umbraco.Cms.Core.Services;
@@ -16,23 +14,6 @@ internal sealed class ServerEventRouter : IServerEventRouter
     private readonly IUserConnectionManager _connectionManager;
     private readonly IRuntimeState _runtimeState;
     private readonly ILogger<ServerEventRouter> _logger;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ServerEventRouter"/> class.
-    /// </summary>
-    /// <param name="eventHub">The SignalR hub context used for sending server events to connected clients.</param>
-    /// <param name="connectionManager">The manager responsible for tracking user connections.</param>
-    [Obsolete("Please use the constructor that takes all parameters. Scheduled for removal in Umbraco 18.")]
-    public ServerEventRouter(
-        IHubContext<ServerEventHub, IServerEventHub> eventHub,
-        IUserConnectionManager connectionManager)
-        : this(
-            eventHub,
-            connectionManager,
-            StaticServiceProvider.Instance.GetRequiredService<IRuntimeState>(),
-            StaticServiceProvider.Instance.GetRequiredService<ILogger<ServerEventRouter>>())
-    {
-    }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ServerEventRouter"/> class.

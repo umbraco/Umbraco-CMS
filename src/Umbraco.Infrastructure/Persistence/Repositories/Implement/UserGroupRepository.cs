@@ -1,10 +1,6 @@
-using System.Collections;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NPoco;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
@@ -73,35 +69,6 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
             repositoryCacheVersionService,
             cacheSyncService);
         _permissionMappers = permissionMappers.ToDictionary(x => x.Context);
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="UserGroupRepository"/> class, which manages user group persistence operations.
-    /// </summary>
-    /// <param name="scopeAccessor">Provides access to the current database scope.</param>
-    /// <param name="appCaches">The application-level caches used for caching data.</param>
-    /// <param name="logger">The logger instance for logging repository operations.</param>
-    /// <param name="loggerFactory">The factory used to create logger instances.</param>
-    /// <param name="shortStringHelper">Helper for processing and manipulating short strings.</param>
-    /// <param name="permissionMappers">A collection of permission mappers used to map permissions for user groups.</param>
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
-    public UserGroupRepository(
-        IScopeAccessor scopeAccessor,
-        AppCaches appCaches,
-        ILogger<UserGroupRepository> logger,
-        ILoggerFactory loggerFactory,
-        IShortStringHelper shortStringHelper,
-        IEnumerable<IPermissionMapper> permissionMappers)
-        : this(
-            scopeAccessor,
-            appCaches,
-            logger,
-            loggerFactory,
-            shortStringHelper,
-            permissionMappers,
-            StaticServiceProvider.Instance.GetRequiredService<IRepositoryCacheVersionService>(),
-            StaticServiceProvider.Instance.GetRequiredService<ICacheSyncService>())
-    {
     }
 
     /// <summary>

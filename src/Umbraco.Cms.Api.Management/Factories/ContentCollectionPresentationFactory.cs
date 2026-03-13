@@ -1,7 +1,5 @@
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Content;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
@@ -33,25 +31,6 @@ public abstract class ContentCollectionPresentationFactory<TContent, TCollection
         _mapper = mapper;
         _flagProviderCollection = flagProviderCollection;
         _userService = userService;
-    }
-
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
-    protected ContentCollectionPresentationFactory(
-        IUmbracoMapper mapper,
-        FlagProviderCollection flagProviderCollection)
-        : this(
-            mapper,
-            flagProviderCollection,
-            StaticServiceProvider.Instance.GetRequiredService<IUserService>())
-    {
-    }
-
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
-    protected ContentCollectionPresentationFactory(IUmbracoMapper mapper)
-        : this(
-            mapper,
-            StaticServiceProvider.Instance.GetRequiredService<FlagProviderCollection>())
-    {
     }
 
     /// <summary>

@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Item;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
@@ -28,7 +27,6 @@ public class SearchDocumentItemController : DocumentItemControllerBase
     /// <param name="indexedEntitySearchService">Service for searching indexed entities.</param>
     /// <param name="documentPresentationFactory">Factory for creating document presentation models.</param>
     /// <param name="dataTypeService">Service for managing data types.</param>
-    [ActivatorUtilitiesConstructor]
     public SearchDocumentItemController(
         IIndexedEntitySearchService indexedEntitySearchService,
         IDocumentPresentationFactory documentPresentationFactory,
@@ -38,56 +36,6 @@ public class SearchDocumentItemController : DocumentItemControllerBase
         _documentPresentationFactory = documentPresentationFactory;
         _dataTypeService = dataTypeService;
     }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="SearchDocumentItemController"/> class.
-    /// </summary>
-    /// <param name="indexedEntitySearchService">The service used to perform searches on indexed entities. This dependency is injected.</param>
-    /// <param name="documentPresentationFactory">The factory responsible for creating document presentation models. This dependency is injected.</param>
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 18.")]
-    public SearchDocumentItemController(
-        IIndexedEntitySearchService indexedEntitySearchService,
-        IDocumentPresentationFactory documentPresentationFactory)
-        : this(
-            indexedEntitySearchService,
-            documentPresentationFactory,
-            StaticServiceProvider.Instance.GetRequiredService<IDataTypeService>())
-    {
-    }
-
-    /// <summary>
-    /// Searches for document items, including those in the recycle bin, using the specified query and filters.
-    /// </summary>
-    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
-    /// <param name="query">The search query string.</param>
-    /// <param name="trashed">If set, filters results to include only trashed items, only non-trashed items, or both (when null).</param>
-    /// <param name="culture">An optional culture code to filter search results.</param>
-    /// <param name="skip">The number of items to skip (for pagination).</param>
-    /// <param name="take">The maximum number of items to return (for pagination).</param>
-    /// <param name="parentId">An optional parent ID to filter results by parent.</param>
-    /// <param name="allowedDocumentTypes">An optional list of allowed document type IDs to filter results.</param>
-    /// <returns>A task representing the asynchronous operation, with an action result containing the search results.</returns>
-    [Obsolete("Please use the overload taking all parameters. Scheduled for removal in Umbraco 18.")]
-    [ApiExplorerSettings(IgnoreApi = true)]
-    public async Task<IActionResult> SearchWithTrashed(
-        CancellationToken cancellationToken,
-        string query,
-        bool? trashed = null,
-        string? culture = null,
-        int skip = 0,
-        int take = 100,
-        Guid? parentId = null,
-        [FromQuery] IEnumerable<Guid>? allowedDocumentTypes = null)
-        => await SearchWithTrashed(
-            cancellationToken,
-            query,
-            trashed,
-            culture,
-            skip,
-            take,
-            parentId,
-            allowedDocumentTypes,
-            null);
 
     /// <summary>
     /// Searches for document items, including those in the recycle bin, based on the specified query and filters.

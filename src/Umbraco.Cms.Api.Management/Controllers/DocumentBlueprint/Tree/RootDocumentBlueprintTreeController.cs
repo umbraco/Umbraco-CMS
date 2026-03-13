@@ -1,7 +1,6 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.Services.Flags;
@@ -18,23 +17,11 @@ namespace Umbraco.Cms.Api.Management.Controllers.DocumentBlueprint.Tree;
 public class RootDocumentBlueprintTreeController : DocumentBlueprintTreeControllerBase
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="RootDocumentBlueprintTreeController"/> class, which manages the tree structure for root document blueprints.
-    /// </summary>
-    /// <param name="entityService">The service used to manage and retrieve entities within the system.</param>
-    /// <param name="documentPresentationFactory">The factory responsible for creating document presentation models.</param>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
-    public RootDocumentBlueprintTreeController(IEntityService entityService, IDocumentPresentationFactory documentPresentationFactory)
-        : base(entityService, documentPresentationFactory)
-    {
-    }
-
-    /// <summary>
     /// Initializes a new instance of the <see cref="RootDocumentBlueprintTreeController"/> class.
     /// </summary>
     /// <param name="entityService">Service used for entity operations within the document blueprint tree.</param>
     /// <param name="flagProviders">A collection of providers that supply flags for document blueprints.</param>
     /// <param name="documentPresentationFactory">Factory responsible for creating document presentation models.</param>
-    [ActivatorUtilitiesConstructor]
     public RootDocumentBlueprintTreeController(IEntityService entityService, FlagProviderCollection flagProviders, IDocumentPresentationFactory documentPresentationFactory)
         : base(entityService, flagProviders, documentPresentationFactory)
     {

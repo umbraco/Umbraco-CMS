@@ -1,7 +1,6 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
@@ -19,21 +18,9 @@ public class RootMemberTypeTreeController : MemberTypeTreeControllerBase
     /// <summary>
     /// Initializes a new instance of the <see cref="RootMemberTypeTreeController"/> class.
     /// </summary>
-    /// <param name="entityService">Service used for operations on entities within Umbraco.</param>
-    /// <param name="memberTypeService">Service used for managing member types in Umbraco.</param>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
-    public RootMemberTypeTreeController(IEntityService entityService, IMemberTypeService memberTypeService)
-        : base(entityService, memberTypeService)
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="RootMemberTypeTreeController"/> class.
-    /// </summary>
     /// <param name="entityService">Service used for entity operations within the Umbraco CMS.</param>
     /// <param name="flagProviders">A collection of providers that supply flags for tree nodes.</param>
     /// <param name="memberTypeService">Service for managing member types in the Umbraco CMS.</param>
-    [ActivatorUtilitiesConstructor]
     public RootMemberTypeTreeController(IEntityService entityService, FlagProviderCollection flagProviders, IMemberTypeService memberTypeService)
         : base(entityService, flagProviders, memberTypeService)
     {

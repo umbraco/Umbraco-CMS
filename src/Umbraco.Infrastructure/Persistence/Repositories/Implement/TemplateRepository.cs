@@ -68,43 +68,6 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="TemplateRepository"/> class, which manages persistence and retrieval of template entities.
-    /// </summary>
-    /// <param name="scopeAccessor">Provides access to the current database scope for transactional operations.</param>
-    /// <param name="cache">The application-level caches used for optimizing data retrieval.</param>
-    /// <param name="logger">The logger used for logging repository operations and errors.</param>
-    /// <param name="fileSystems">Abstraction for accessing file systems related to templates.</param>
-    /// <param name="shortStringHelper">Helper for generating and manipulating short strings, such as aliases.</param>
-    /// <param name="viewHelper">Helper for working with template views.</param>
-    /// <param name="runtimeSettings">Monitors runtime configuration settings relevant to templates.</param>
-    /// <param name="repositoryCacheVersionService">Service for managing cache versioning within the repository.</param>
-    /// <param name="cacheSyncService">Service for synchronizing cache across distributed environments.</param>
-    [Obsolete("Use constructor with ILoggerFactory parameter. Scheduled for removal in Umbraco 18.")]
-    public TemplateRepository(
-        IScopeAccessor scopeAccessor,
-        AppCaches cache,
-        ILogger<TemplateRepository> logger,
-        FileSystems fileSystems,
-        IShortStringHelper shortStringHelper,
-        IViewHelper viewHelper,
-        IOptionsMonitor<RuntimeSettings> runtimeSettings,
-        IRepositoryCacheVersionService repositoryCacheVersionService,
-        ICacheSyncService cacheSyncService)
-        : this(
-            scopeAccessor,
-            cache,
-            logger,
-            Microsoft.Extensions.Logging.Abstractions.NullLoggerFactory.Instance,
-            fileSystems,
-            shortStringHelper,
-            viewHelper,
-            runtimeSettings,
-            repositoryCacheVersionService,
-            cacheSyncService)
-    {
-    }
-
-    /// <summary>
     /// Gets the template with the specified unique identifier.
     /// </summary>
     /// <param name="key">The unique identifier of the template.</param>

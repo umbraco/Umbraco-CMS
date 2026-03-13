@@ -34,35 +34,6 @@ public class DocumentCollectionPresentationFactory : ContentCollectionPresentati
         _entityService = entityService;
     }
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Factories.DocumentCollectionPresentationFactory"/> class.
-    /// </summary>
-    /// <param name="mapper">The Umbraco mapper used for mapping between different object models.</param>
-    /// <param name="flagProviders">A collection of providers that supply flags for document collections.</param>
-    /// <param name="publicAccessService">Service for managing public access to documents.</param>
-    /// <param name="entityService">Service for interacting with Umbraco entities.</param>
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
-    public DocumentCollectionPresentationFactory(IUmbracoMapper mapper, FlagProviderCollection flagProviders, IPublicAccessService publicAccessService, IEntityService entityService)
-        : base(mapper, flagProviders)
-    {
-        _publicAccessService = publicAccessService;
-        _entityService = entityService;
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Factories.DocumentCollectionPresentationFactory"/> class.
-    /// </summary>
-    /// <param name="mapper">The Umbraco object-to-object mapper used for mapping between models.</param>
-    /// <param name="publicAccessService">Service for managing public access permissions on content.</param>
-    /// <param name="entityService">Service for interacting with Umbraco entities.</param>
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
-    public DocumentCollectionPresentationFactory(IUmbracoMapper mapper, IPublicAccessService publicAccessService, IEntityService entityService)
-        : base(mapper)
-    {
-        _publicAccessService = publicAccessService;
-        _entityService = entityService;
-    }
-
     /// <inheritdoc/>
     protected override Task SetUnmappedProperties(ListViewPagedModel<IContent> contentCollection, List<DocumentCollectionResponseModel> collectionResponseModels)
     {

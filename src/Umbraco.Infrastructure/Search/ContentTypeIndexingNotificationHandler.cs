@@ -1,9 +1,7 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
@@ -27,32 +25,6 @@ public sealed class ContentTypeIndexingNotificationHandler : INotificationHandle
     private readonly IPublishStatusQueryService _publishStatusQueryService;
     private readonly IUmbracoIndexingHandler _umbracoIndexingHandler;
     private readonly IOptionsMonitor<IndexingSettings> _indexingSettings;
-
-    [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in Umbraco 18.")]
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ContentTypeIndexingNotificationHandler"/> class.
-    /// </summary>
-    /// <param name="umbracoIndexingHandler">The handler responsible for managing Umbraco content indexing operations.</param>
-    /// <param name="contentService">Service used to manage and query content items.</param>
-    /// <param name="memberService">Service used to manage and query member entities.</param>
-    /// <param name="mediaService">Service used to manage and query media items.</param>
-    /// <param name="memberTypeService">Service used to manage and query member types.</param>
-    public ContentTypeIndexingNotificationHandler(
-        IUmbracoIndexingHandler umbracoIndexingHandler,
-        IContentService contentService,
-        IMemberService memberService,
-        IMediaService mediaService,
-        IMemberTypeService memberTypeService)
-        : this(
-            umbracoIndexingHandler,
-            contentService,
-            memberService,
-            mediaService,
-            memberTypeService,
-            StaticServiceProvider.Instance.GetRequiredService<IPublishStatusQueryService>(),
-            StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<IndexingSettings>>())
-    {
-    }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ContentTypeIndexingNotificationHandler"/> class.

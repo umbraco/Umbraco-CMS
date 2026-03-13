@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.Services.Entities;
@@ -19,27 +18,6 @@ namespace Umbraco.Cms.Api.Management.Controllers.Media.Tree;
 public class SiblingsMediaTreeController : MediaTreeControllerBase
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="SiblingsMediaTreeController"/> class, responsible for handling API requests related to sibling media items in the media tree.
-    /// </summary>
-    /// <param name="entityService">Service used for entity operations such as retrieval and manipulation.</param>
-    /// <param name="userStartNodeEntitiesService">Service that provides access to user start nodes for entity filtering and permissions.</param>
-    /// <param name="dataTypeService">Service for managing and retrieving data type definitions.</param>
-    /// <param name="appCaches">Provides access to application-level caches for performance optimization.</param>
-    /// <param name="backofficeSecurityAccessor">Accessor for backoffice security context, used for authorization and user information.</param>
-    /// <param name="mediaPresentationFactory">Factory for creating media presentation models for API responses.</param>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
-    public SiblingsMediaTreeController(
-        IEntityService entityService,
-        IUserStartNodeEntitiesService userStartNodeEntitiesService,
-        IDataTypeService dataTypeService,
-        AppCaches appCaches,
-        IBackOfficeSecurityAccessor backofficeSecurityAccessor,
-        IMediaPresentationFactory mediaPresentationFactory)
-        : base(entityService, userStartNodeEntitiesService, dataTypeService, appCaches, backofficeSecurityAccessor, mediaPresentationFactory)
-    {
-    }
-
-    /// <summary>
     /// Initializes a new instance of the <see cref="SiblingsMediaTreeController"/> class, which manages operations related to sibling media items in the media tree.
     /// </summary>
     /// <param name="entityService">Service for accessing and managing entities within the Umbraco CMS.</param>
@@ -49,7 +27,6 @@ public class SiblingsMediaTreeController : MediaTreeControllerBase
     /// <param name="appCaches">Provides access to application-level caches for performance optimization.</param>
     /// <param name="backofficeSecurityAccessor">Accessor for back office security context, used for authorization and user information.</param>
     /// <param name="mediaPresentationFactory">Factory for creating media presentation models for API responses.</param>
-    [ActivatorUtilitiesConstructor]
     public SiblingsMediaTreeController(
         IEntityService entityService,
         FlagProviderCollection flagProviders,

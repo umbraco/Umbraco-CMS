@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
-using System.Diagnostics.CodeAnalysis;
 using Umbraco.Cms.Core;
 using Umbraco.Extensions;
 
@@ -26,15 +25,8 @@ public class BackOfficeAuthenticationBuilder : AuthenticationBuilder
         : base(services)
         => _loginProviderOptions = loginProviderOptions ?? (x => { });
 
-    // TODO (V18): Change the return value to be not nullable and remove the NotNullIfNotNull attribute.
-    /// <summary>
-    /// Returns the specified authentication scheme prefixed with the back office external authentication type prefix.
-    /// </summary>
-    /// <param name="scheme">The authentication scheme to prefix.</param>
-    /// <returns>The prefixed scheme, or <c>null</c> if <paramref name="scheme"/> is <c>null</c>.</returns>
-    [return: NotNullIfNotNull(nameof(scheme))]
-    public static string? SchemeForBackOffice(string scheme)
-        => scheme?.EnsureStartsWith(Constants.Security.BackOfficeExternalAuthenticationTypePrefix);
+    public static string SchemeForBackOffice(string scheme)
+        => scheme.EnsureStartsWith(Constants.Security.BackOfficeExternalAuthenticationTypePrefix);
 
     /// <summary>
     ///     Overridden to track the final authenticationScheme being registered for the external login

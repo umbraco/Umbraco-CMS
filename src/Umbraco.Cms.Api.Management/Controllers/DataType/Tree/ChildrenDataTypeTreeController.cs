@@ -15,24 +15,6 @@ namespace Umbraco.Cms.Api.Management.Controllers.DataType.Tree;
 [ApiVersion("1.0")]
 public class ChildrenDataTypeTreeController : DataTypeTreeControllerBase
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ChildrenDataTypeTreeController"/> class.
-    /// </summary>
-    /// <param name="entityService">Service used for managing and retrieving entities within the system.</param>
-    /// <param name="dataTypeService">Service used for managing and retrieving data types.</param>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
-    public ChildrenDataTypeTreeController(IEntityService entityService, IDataTypeService dataTypeService)
-        : base(entityService, dataTypeService)
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ChildrenDataTypeTreeController"/> class.
-    /// </summary>
-    /// <param name="entityService">Service used for managing and retrieving entities within the system.</param>
-    /// <param name="flagProviders">A collection of providers that supply additional flags or metadata for entities.</param>
-    /// <param name="dataTypeService">Service responsible for operations related to data types.</param>
-    [ActivatorUtilitiesConstructor]
     public ChildrenDataTypeTreeController(IEntityService entityService, FlagProviderCollection flagProviders, IDataTypeService dataTypeService)
         : base(entityService, flagProviders, dataTypeService)
     {

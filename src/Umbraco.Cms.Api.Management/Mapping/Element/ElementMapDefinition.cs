@@ -1,6 +1,8 @@
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Mapping.Content;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
 using Umbraco.Cms.Api.Management.ViewModels.Element;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -12,12 +14,10 @@ namespace Umbraco.Cms.Api.Management.Mapping.Element;
 /// </summary>
 public class ElementMapDefinition : ContentMapDefinition<IElement, ElementValueResponseModel, ElementVariantResponseModel>, IMapDefinition
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ElementMapDefinition"/> class.
-    /// </summary>
-    /// <param name="propertyEditorCollection">A collection containing all available property editors used for mapping element properties.</param>
-    public ElementMapDefinition(PropertyEditorCollection propertyEditorCollection)
-        : base(propertyEditorCollection)
+    public ElementMapDefinition(
+        PropertyEditorCollection propertyEditorCollection,
+        IDataValueEditorFactory dataValueEditorFactory)
+        : base(propertyEditorCollection, dataValueEditorFactory)
     {
     }
 
