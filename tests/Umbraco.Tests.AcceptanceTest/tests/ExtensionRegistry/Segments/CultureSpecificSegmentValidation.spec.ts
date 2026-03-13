@@ -12,8 +12,6 @@ let documentTypeId = '';
 const dataTypeName = 'Textstring';
 
 test.beforeEach(async ({umbracoApi, umbracoUi}) => {
-  await umbracoApi.document.ensureNameNotExists(contentName);
-  await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   await umbracoApi.language.createDanishLanguage();
   await umbracoApi.language.createFrenchLanguage();
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
@@ -33,18 +31,19 @@ test('can save content in culture without culture-specific segment', async ({umb
   // Arrange
   await umbracoApi.document.createDocumentWithEnglishCultureAndTextContent(contentName, documentTypeId, 'English default', dataTypeName, true);
   await umbracoUi.content.goToContentWithName(contentName);
+
+  // Act
   await umbracoUi.content.clickSelectVariantButton();
   await umbracoUi.content.clickVariantAddModeButtonForLanguageName('Danish');
   await umbracoUi.content.enterContentName(contentName);
-
-  // Act
   await umbracoUi.content.enterTextstring('Danish default');
   await umbracoUi.content.clickSaveButtonForContent();
   await umbracoUi.content.clickSaveModalButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  const contentData = await umbracoApi.document.getByName(contentName);
-  const daDefault = contentData.values.find(v => v.culture === 'da' && v.segment === null);
+  const [daDefault] = await umbracoApi.document.getValuesByCultureAndSegmentForDocument(contentName, [
+    {culture: 'da', segment: null},
+  ]);
   expect(daDefault).toBeTruthy();
   expect(daDefault.value).toBe('Danish default');
 });

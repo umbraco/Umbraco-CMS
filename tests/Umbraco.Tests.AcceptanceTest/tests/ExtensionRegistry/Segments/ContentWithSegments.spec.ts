@@ -17,7 +17,7 @@ const defaultSegmentValue = 'Default segment value';
 const vipSegmentValue = 'VIP segment value';
 const updatedVipSegmentValue = 'Updated VIP segment value';
 
-test.describe('Content with culture and segment variations', () => {
+test.describe('content with culture and segment variations', () => {
   test.beforeEach(async ({umbracoApi, umbracoUi}) => {
     await umbracoApi.document.ensureNameNotExists(contentName);
     await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
@@ -65,9 +65,10 @@ test.describe('Content with culture and segment variations', () => {
     await umbracoUi.content.clickSaveModalButtonAndWaitForContentToBeUpdated();
 
     // Assert
-    const contentData = await umbracoApi.document.getByName(contentName);
-    const defaultValue = contentData.values.find(v => v.culture === 'en-US' && v.segment === null);
-    const vipValue = contentData.values.find(v => v.culture === 'en-US' && v.segment === vipMemberSegmentAlias);
+    const [defaultValue, vipValue] = await umbracoApi.document.getValuesByCultureAndSegmentForDocument(contentName, [
+      {culture: 'en-US', segment: null},
+      {culture: 'en-US', segment: vipMemberSegmentAlias},
+    ]);
     expect(defaultValue).toBeTruthy();
     expect(defaultValue.value).toBe(defaultSegmentValue);
     expect(vipValue).toBeTruthy();
@@ -92,8 +93,9 @@ test.describe('Content with culture and segment variations', () => {
     await umbracoUi.content.clickSaveModalButtonAndWaitForContentToBeUpdated();
 
     // Assert
-    const contentData = await umbracoApi.document.getByName(contentName);
-    const vipValue = contentData.values.find(v => v.culture === 'en-US' && v.segment === vipMemberSegmentAlias);
+    const [vipValue] = await umbracoApi.document.getValuesByCultureAndSegmentForDocument(contentName, [
+      {culture: 'en-US', segment: vipMemberSegmentAlias},
+    ]);
     expect(vipValue).toBeTruthy();
     expect(vipValue.value).toBe(updatedVipSegmentValue);
   });
@@ -123,11 +125,12 @@ test.describe('Content with culture and segment variations', () => {
     await umbracoUi.content.clickSaveModalButtonAndWaitForContentToBeUpdated();
 
     // Assert
-    const contentData = await umbracoApi.document.getByName(contentName);
-    const enDefault = contentData.values.find(v => v.culture === 'en-US' && v.segment === null);
-    const enVip = contentData.values.find(v => v.culture === 'en-US' && v.segment === vipMemberSegmentAlias);
-    const daDefault = contentData.values.find(v => v.culture === 'da' && v.segment === null);
-    const daVip = contentData.values.find(v => v.culture === 'da' && v.segment === vipMemberSegmentAlias);
+    const [enDefault, enVip, daDefault, daVip] = await umbracoApi.document.getValuesByCultureAndSegmentForDocument(contentName, [
+      {culture: 'en-US', segment: null},
+      {culture: 'en-US', segment: vipMemberSegmentAlias},
+      {culture: 'da', segment: null},
+      {culture: 'da', segment: vipMemberSegmentAlias},
+    ]);
     expect(enDefault).toBeTruthy();
     expect(enDefault.value).toBe('English default');
     expect(enVip).toBeTruthy();
@@ -139,7 +142,7 @@ test.describe('Content with culture and segment variations', () => {
   });
 });
 
-test.describe('Content with segment-only variations', () => {
+test.describe('content with segment-only variations', () => {
   test.beforeEach(async ({umbracoApi, umbracoUi}) => {
     await umbracoApi.document.ensureNameNotExists(contentName);
     await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
@@ -182,9 +185,10 @@ test.describe('Content with segment-only variations', () => {
     await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
     // Assert
-    const contentData = await umbracoApi.document.getByName(contentName);
-    const defaultValue = contentData.values.find(v => v.segment === null);
-    const vipValue = contentData.values.find(v => v.segment === vipMemberSegmentAlias);
+    const [defaultValue, vipValue] = await umbracoApi.document.getValuesByCultureAndSegmentForDocument(contentName, [
+      {culture: null, segment: null},
+      {culture: null, segment: vipMemberSegmentAlias},
+    ]);
     expect(defaultValue).toBeTruthy();
     expect(defaultValue.value).toBe(defaultSegmentValue);
     expect(vipValue).toBeTruthy();
@@ -212,8 +216,9 @@ test.describe('Content with segment-only variations', () => {
     await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
     // Assert
-    const contentData = await umbracoApi.document.getByName(contentName);
-    const vipValue = contentData.values.find(v => v.segment === vipMemberSegmentAlias);
+    const [vipValue] = await umbracoApi.document.getValuesByCultureAndSegmentForDocument(contentName, [
+      {culture: null, segment: vipMemberSegmentAlias},
+    ]);
     expect(vipValue).toBeTruthy();
     expect(vipValue.value).toBe(updatedVipSegmentValue);
   });
