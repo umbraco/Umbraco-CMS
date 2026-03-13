@@ -296,7 +296,7 @@ internal class EFCoreScope<TDbContext> : CoreScope, IEfCoreScope<TDbContext>
                 }
                 catch
                 {
-                    // Best-effort cleanup — ensure context is still disposed below
+                    // Best-effort cleanup — ensure context is still disposed below.
                 }
 
                 _dbContext?.Dispose();
