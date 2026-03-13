@@ -167,8 +167,9 @@ test('can create content with block grid area with min allowed', async ({umbraco
   await umbracoUi.content.clickSelectBlockElementWithName(firstElementTypeName);
   await umbracoUi.content.clickLinkWithName(areaCreateLabel);
   await umbracoUi.content.clickSelectBlockElementInAreaWithName(secondElementTypeName);
-  await umbracoUi.content.isTextWithExactNameVisible('Minimum 2 entries, requires 1 more.');
+  //await umbracoUi.content.isTextWithExactNameVisible('Minimum 2 entries, requires 1 more.');
   await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.isTextWithExactNameVisible('Minimum 2 entries, requires 1 more.');
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
   await umbracoUi.content.clickInlineAddToAreaButton(firstElementTypeName, firstAreaName, 0, 1);
   await umbracoUi.content.clickSelectBlockElementInAreaWithName(secondElementTypeName);
@@ -201,8 +202,8 @@ test('can create content with block grid area with max allowed', async ({umbraco
   await umbracoUi.content.clickSelectBlockElementWithName(firstElementTypeName);
   await umbracoUi.content.clickLinkWithName(areaCreateLabel);
   await umbracoUi.content.clickSelectBlockElementInAreaWithName(secondElementTypeName);
-  await umbracoUi.content.isTextWithExactNameVisible('Maximum 0 entries, you have entered 1 too many.');
   await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.isTextWithExactNameVisible('Maximum 0 entries, you have entered 1 too many.');
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
   await umbracoUi.content.removeBlockFromArea(firstElementTypeName, firstAreaName, secondElementTypeName);
   await umbracoUi.content.clickConfirmToDeleteButton();

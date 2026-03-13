@@ -157,6 +157,7 @@ test('cannot add number of block element greater than the maximum amount', {tag:
   await umbracoUi.content.clickAddBlockElementButton();
   await umbracoUi.content.clickBlockElementWithName(elementTypeName);
   await umbracoUi.content.clickCreateModalButton();
+  await umbracoUi.content.clickSaveButton()
 
   // Assert
   await umbracoUi.content.doesFormValidationMessageContainText('Maximum 0 entries, you have entered 1 too many.');
