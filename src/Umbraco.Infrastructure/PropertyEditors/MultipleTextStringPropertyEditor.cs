@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Nodes;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
@@ -22,7 +23,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     Constants.PropertyEditors.Aliases.MultipleTextstring,
     ValueType = ValueTypes.Text,
     ValueEditorIsReusable = true)]
-public class MultipleTextStringPropertyEditor : DataEditor
+public class MultipleTextStringPropertyEditor : DataEditor, IValueSchemaProvider
 {
     private readonly IIOHelper _ioHelper;
 
@@ -34,6 +35,40 @@ public class MultipleTextStringPropertyEditor : DataEditor
     {
         _ioHelper = ioHelper;
         SupportsReadOnly = true;
+    }
+
+    /// <inheritdoc />
+    public Type? GetValueType(object? configuration) => typeof(IEnumerable<string>);
+
+    /// <inheritdoc />
+    public JsonObject? GetValueSchema(object? configuration)
+    {
+        var schema = new JsonObject
+        {
+            ["$schema"] = "https://json-schema.org/draft/2020-12/schema",
+            ["type"] = new JsonArray("array", "null"),
+            ["items"] = new JsonObject
+            {
+                ["type"] = "string",
+            },
+            ["description"] = "Array of text strings",
+        };
+
+        // Add min/max items from configuration if available
+        if (configuration is MultipleTextStringConfiguration textStringConfig)
+        {
+            if (textStringConfig.Min > 0)
+            {
+                schema["minItems"] = textStringConfig.Min;
+            }
+
+            if (textStringConfig.Max > 0)
+            {
+                schema["maxItems"] = textStringConfig.Max;
+            }
+        }
+
+        return schema;
     }
 
     /// <inheritdoc />

@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.ViewModels.UserData;
@@ -11,6 +11,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.UserData;
 
+/// <summary>
+/// API controller responsible for handling operations related to the creation of user data.
+/// </summary>
 [ApiVersion("1.0")]
 public class CreateUserDataController : UserDataControllerBase
 {
@@ -18,6 +21,12 @@ public class CreateUserDataController : UserDataControllerBase
     private readonly IUserDataService _userDataService;
     private readonly IUmbracoMapper _umbracoMapper;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CreateUserDataController"/> class, responsible for handling user data creation operations in the management API.
+    /// </summary>
+    /// <param name="backOfficeSecurityAccessor">Provides access to back office security features for authentication and authorization.</param>
+    /// <param name="userDataService">Service used to manage and persist user data.</param>
+    /// <param name="umbracoMapper">The mapper used to convert between Umbraco domain models and API models.</param>
     public CreateUserDataController(
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
         IUserDataService userDataService,
@@ -28,6 +37,15 @@ public class CreateUserDataController : UserDataControllerBase
         _umbracoMapper = umbracoMapper;
     }
 
+    /// <summary>
+    /// Creates user-specific data for the currently authenticated user using the provided key and value.
+    /// </summary>
+    /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the operation.</param>
+    /// <param name="model">A <see cref="CreateUserDataRequestModel"/> containing the key and value to associate with the current user.</param>
+    /// <returns>
+    /// An <see cref="IActionResult"/> that represents the result of the create operation.
+    /// Returns <c>201 Created</c> with the created resource location on success, <c>400 Bad Request</c> if the request is invalid, or <c>404 Not Found</c> if the user cannot be found.
+    /// </returns>
     [HttpPost]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status201Created)]

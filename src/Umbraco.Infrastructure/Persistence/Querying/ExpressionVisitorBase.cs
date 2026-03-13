@@ -145,6 +145,11 @@ internal abstract class ExpressionVisitorBase
         return cachedExpression.VisitResult;
     }
 
+    /// <summary>
+    /// Gets the quoted version of the specified table name.
+    /// </summary>
+    /// <param name="tableName">The name of the table to quote.</param>
+    /// <returns>The quoted table name.</returns>
     public virtual string GetQuotedTableName(string tableName)
         => GetQuotedName(tableName);
 
@@ -778,12 +783,26 @@ internal abstract class ExpressionVisitorBase
         }
     }
 
+    /// <summary>Gets the quoted version of the specified column name.</summary>
+    /// <param name="columnName">The name of the column to quote.</param>
+    /// <returns>The quoted column name.</returns>
     public virtual string GetQuotedColumnName(string columnName)
         => GetQuotedName(columnName);
 
+    /// <summary>
+    /// Returns the specified name surrounded by double quotes, unless the visitor has already processed (visited) the name.
+    /// </summary>
+    /// <param name="name">The name to be quoted.</param>
+    /// <returns>The name surrounded by double quotes if it has not been visited; otherwise, returns the original name.</returns>
     public virtual string GetQuotedName(string name)
         => Visited ? name : "\"" + name + "\"";
 
+    /// <summary>
+    /// Escapes the specified parameter value using the provided SQL syntax provider.
+    /// </summary>
+    /// <param name="paramValue">The value to escape. If <c>null</c>, an empty string is returned.</param>
+    /// <param name="sqlSyntax">The SQL syntax provider used to escape the value.</param>
+    /// <returns>The escaped string representation of <paramref name="paramValue"/>, or an empty string if <paramref name="paramValue"/> is <c>null</c>.</returns>
     public virtual string EscapeParam(object paramValue, ISqlSyntaxProvider sqlSyntax) => paramValue == null ? string.Empty : sqlSyntax.EscapeString(paramValue.ToString()!);
 
     protected string HandleStringComparison(string col, string val, string verb, TextColumnType columnType)

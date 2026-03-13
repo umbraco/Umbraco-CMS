@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -14,6 +14,9 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Stylesheet;
 
+/// <summary>
+/// API controller responsible for handling requests to create new stylesheet resources in the system.
+/// </summary>
 [ApiVersion("1.0")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessStylesheets)]
 public class CreateStylesheetController : StylesheetControllerBase
@@ -22,6 +25,12 @@ public class CreateStylesheetController : StylesheetControllerBase
     private readonly IUmbracoMapper _umbracoMapper;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CreateStylesheetController"/> class.
+    /// </summary>
+    /// <param name="stylesheetService">Service used to manage and manipulate stylesheet entities.</param>
+    /// <param name="umbracoMapper">The mapper used for converting between domain and API models in Umbraco.</param>
+    /// <param name="backOfficeSecurityAccessor">Provides access to back office security features and context.</param>
     public CreateStylesheetController(
         IStylesheetService stylesheetService,
         IUmbracoMapper umbracoMapper,

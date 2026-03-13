@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -17,6 +17,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Document;
 
+/// <summary>
+/// Provides API endpoints for publishing documents within the Umbraco CMS.
+/// </summary>
 [ApiVersion("1.0")]
 public class PublishDocumentController : DocumentControllerBase
 {
@@ -25,6 +28,13 @@ public class PublishDocumentController : DocumentControllerBase
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly IDocumentPresentationFactory _documentPresentationFactory;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PublishDocumentController"/> class.
+    /// </summary>
+    /// <param name="authorizationService">Service used to authorize user actions.</param>
+    /// <param name="contentPublishingService">Service responsible for publishing content.</param>
+    /// <param name="backOfficeSecurityAccessor">Accessor for back office security context.</param>
+    /// <param name="documentPresentationFactory">Factory for creating document presentation models.</param>
     public PublishDocumentController(
         IAuthorizationService authorizationService,
         IContentPublishingService contentPublishingService,
@@ -37,6 +47,20 @@ public class PublishDocumentController : DocumentControllerBase
         _documentPresentationFactory = documentPresentationFactory;
     }
 
+    /// <summary>
+    /// Publishes the specified document by its unique identifier, using the provided publish schedule and related data.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="id">The unique identifier (GUID) of the document to be published.</param>
+    /// <param name="requestModel">The request model containing publish schedules, cultures, and other publishing options.</param>
+    /// <returns>
+    /// An <see cref="IActionResult"/> representing the result of the publish operation:
+    /// <list type="bullet">
+    /// <item><description><c>200 OK</c> if the document was published successfully.</description></item>
+    /// <item><description><c>400 Bad Request</c> if the request is invalid or publishing fails due to validation errors.</description></item>
+    /// <item><description><c>404 Not Found</c> if the document does not exist.</description></item>
+    /// </list>
+    /// </returns>
     [HttpPut("{id:guid}/publish")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]

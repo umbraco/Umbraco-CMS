@@ -19,6 +19,10 @@ public class HttpSessionIdEnricher : ILogEventEnricher
 
     private readonly ISessionIdResolver _sessionIdResolver;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="HttpSessionIdEnricher"/> class, which enriches Serilog log events with the current HTTP session ID.
+    /// </summary>
+    /// <param name="sessionIdResolver">An implementation used to resolve the current HTTP session ID for log enrichment.</param>
     public HttpSessionIdEnricher(ISessionIdResolver sessionIdResolver) => _sessionIdResolver = sessionIdResolver;
 
     /// <summary>

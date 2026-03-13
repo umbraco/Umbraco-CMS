@@ -6,6 +6,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 [AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
 public class IndexAttribute : Attribute
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="IndexAttribute"/> class using the specified index type.
+    /// </summary>
+    /// <param name="indexType">The index type to apply.</param>
     public IndexAttribute(IndexTypes indexType) => IndexType = indexType;
 
     /// <summary>
@@ -15,7 +19,7 @@ public class IndexAttribute : Attribute
     ///     Overrides default naming of indexes:
     ///     IX_tableName
     /// </remarks>
-    public string? Name { get; set; } // Overrides default naming of indexes: IX_tableName
+    public string? Name { get; set; }
 
     /// <summary>
     ///     Gets or sets the type of index to create

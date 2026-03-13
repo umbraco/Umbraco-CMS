@@ -9,6 +9,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 [AttributeUsage(AttributeTargets.Property)]
 public class PrimaryKeyColumnAttribute : Attribute
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PrimaryKeyColumnAttribute"/> class, which marks a property as the primary key column in a database table.
+    /// </summary>
     public PrimaryKeyColumnAttribute()
     {
         Clustered = true;

@@ -11,6 +11,9 @@ using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Help;
 
+/// <summary>
+/// Provides endpoints for help-related API requests in the management area.
+/// </summary>
 [Obsolete("This is no longer used. Scheduled for removal in Umbraco 19.")]
 [ApiVersion("1.0")]
 public class GetHelpController : HelpControllerBase
@@ -19,6 +22,12 @@ public class GetHelpController : HelpControllerBase
     private readonly IJsonSerializer _jsonSerializer;
     private readonly HelpPageSettings _helpPageSettings;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Controllers.Help.GetHelpController"/> class.
+    /// </summary>
+    /// <param name="helpPageSettings">The <see cref="IOptionsMonitor{HelpPageSettings}"/> providing the help page settings.</param>
+    /// <param name="logger">The <see cref="ILogger{GetHelpController}"/> instance for logging.</param>
+    /// <param name="jsonSerializer">The <see cref="IJsonSerializer"/> used for JSON serialization.</param>
     public GetHelpController(
         IOptionsMonitor<HelpPageSettings> helpPageSettings,
         ILogger<GetHelpController> logger,
@@ -29,6 +38,16 @@ public class GetHelpController : HelpControllerBase
         _helpPageSettings = helpPageSettings.CurrentValue;
     }
 
+    /// <summary>
+    /// Retrieves help information and documentation resources for a specified section (and optionally tree) of the Umbraco back office.
+    /// </summary>
+    /// <param name="cancellationToken">A token to observe while waiting for the task to complete.</param>
+    /// <param name="section">The alias of the section for which to retrieve help information.</param>
+    /// <param name="tree">The optional alias of the tree within the section to filter help information.</param>
+    /// <param name="skip">The number of items to skip before returning results (for paging).</param>
+    /// <param name="take">The maximum number of items to return (for paging).</param>
+    /// <param name="baseUrl">The base URL used to fetch help documentation resources. Defaults to the official Umbraco documentation site.</param>
+    /// <returns>A task representing the asynchronous operation. The result contains an <see cref="IActionResult"/> with a paged list of help information or an error response.</returns>
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]

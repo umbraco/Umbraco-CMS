@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.ViewModels.Content;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
@@ -8,6 +8,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Mapping.Content;
 
+/// <summary>
+/// Provides mapping configuration between content types, value view models, and variant view models in the Umbraco CMS management API.
+/// </summary>
 public abstract class ContentMapDefinition<TContent, TValueViewModel, TVariantViewModel>
     where TContent : IContentBase
     where TValueViewModel : ValueResponseModelBase, new()

@@ -87,23 +87,46 @@ internal sealed class MediaTypeEditingService : ContentTypeEditingServiceBase<IM
         await FindAvailableCompositionsAsync(key, currentCompositeKeys, currentPropertyAliases);
 
     /// <inheritdoc />
+#pragma warning disable CS0618 // Type or member is obsolete
     public async Task<PagedModel<IMediaType>> GetMediaTypesForFileExtensionAsync(string fileExtension, int skip, int take)
+    {
+        // Delegate to the non-obsolete method to get the full list of matches with their match info.
+        PagedModel<MediaTypeFileExtensionMatchResult> result = await GetMediaTypesForFileExtensionWithMatchInfoAsync(fileExtension, 0, int.MaxValue);
+
+        // Preserve original behavior from before obsoletion: only include fallbacks when there are no specific matches.
+        var hasSpecificMatches = result.Items.Any(r => r.IsSpecificMatch);
+        IMediaType[] filtered = result.Items
+            .Where(r => r.IsSpecificMatch || hasSpecificMatches is false)
+            .Select(r => r.MediaType)
+            .ToArray();
+
+        return new PagedModel<IMediaType>
+        {
+            Items = filtered.Skip(skip).Take(take),
+            Total = filtered.Length,
+        };
+    }
+#pragma warning restore CS0618 // Type or member is obsolete
+
+    /// <inheritdoc />
+    public async Task<PagedModel<MediaTypeFileExtensionMatchResult>> GetMediaTypesForFileExtensionWithMatchInfoAsync(string fileExtension, int skip, int take)
     {
         fileExtension = fileExtension.TrimStart(Constants.CharArrays.Period);
 
         IMediaType[] candidateMediaTypes = _mediaTypeService.GetAll().Where(mt => mt.CompositionPropertyTypes.Any(pt => pt.Alias == Constants.Conventions.Media.File)).ToArray();
-        var allowedMediaTypes = new List<IMediaType>();
+        var results = new List<MediaTypeFileExtensionMatchResult>();
 
         // is this an image format supported by the image cropper?
         if (_imageUrlGenerator.IsSupportedImageFormat(fileExtension))
         {
             // yes - add all media types with an image cropper "file" property
-            allowedMediaTypes.AddRange(candidateMediaTypes
+            results.AddRange(candidateMediaTypes
                 .Where(mt => mt.CompositionPropertyTypes.Any(propertyType => propertyType is
                 {
                     Alias: Constants.Conventions.Media.File,
                     PropertyEditorAlias: Constants.PropertyEditors.Aliases.ImageCropper
-                })));
+                }))
+                .Select(mt => new MediaTypeFileExtensionMatchResult { MediaType = mt, IsSpecificMatch = true }));
         }
 
         // find media types that have an explicit allow-list of file extensions
@@ -111,24 +134,26 @@ internal sealed class MediaTypeEditingService : ContentTypeEditingServiceBase<IM
         IDictionary<IMediaType, IEnumerable<string>> allowedFileExtensionsByMediaType = await FetchAllowedFileExtensionsByMediaTypeAsync(candidateMediaTypes);
 
         // add all media types where the file extension is explicitly allowed
-        allowedMediaTypes.AddRange(allowedFileExtensionsByMediaType
+        var specificMatches = allowedFileExtensionsByMediaType
             .Where(kvp => kvp.Value.Contains(fileExtension))
-            .Select(kvp => kvp.Key));
+            .Select(kvp => kvp.Key)
+            .ToArray();
 
-        // if we at this point have no allowed media types, add all media types that allow any file extension
-        if (allowedMediaTypes.Any() is false)
-        {
-            allowedMediaTypes.AddRange(allowedFileExtensionsByMediaType
-                .Where(kvp => kvp.Value.Any() is false)
-                .Select(kvp => kvp.Key));
-        }
+        results.AddRange(specificMatches
+            .Select(mt => new MediaTypeFileExtensionMatchResult { MediaType = mt, IsSpecificMatch = true }));
 
-        return new PagedModel<IMediaType>()
+        // always add all media types that allow any file extension (catch-all/fallback types),
+        // excluding those already added as specific matches
+        var alreadyIncluded = new HashSet<int>(results.Select(r => r.MediaType.Id));
+        results.AddRange(allowedFileExtensionsByMediaType
+            .Where(kvp => kvp.Value.Any() is false && alreadyIncluded.Contains(kvp.Key.Id) is false)
+            .Select(kvp => new MediaTypeFileExtensionMatchResult { MediaType = kvp.Key, IsSpecificMatch = false }));
+
+        return new PagedModel<MediaTypeFileExtensionMatchResult>
         {
-            Items = allowedMediaTypes.Skip(skip).Take(take),
-            Total = allowedMediaTypes.Count
+            Items = results.Skip(skip).Take(take),
+            Total = results.Count,
         };
-
     }
 
     /// <inheritdoc />

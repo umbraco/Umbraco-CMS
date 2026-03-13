@@ -14,6 +14,11 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// </remarks>
 public class ValueListConfigurationEditor : ConfigurationEditor<ValueListConfiguration>
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ValueListConfigurationEditor"/> class.
+    /// </summary>
+    /// <param name="ioHelper">An <see cref="IIOHelper"/> instance used for file and path operations.</param>
+    /// <param name="configurationEditorJsonSerializer">An <see cref="IConfigurationEditorJsonSerializer"/> used to serialize and deserialize configuration editor values as JSON.</param>
     public ValueListConfigurationEditor(IIOHelper ioHelper, IConfigurationEditorJsonSerializer configurationEditorJsonSerializer)
         : base(ioHelper)
     {

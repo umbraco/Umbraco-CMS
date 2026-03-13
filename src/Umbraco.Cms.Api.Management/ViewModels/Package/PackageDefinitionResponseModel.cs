@@ -2,6 +2,9 @@ using System.ComponentModel;
 
 namespace Umbraco.Cms.Api.Management.ViewModels.Package;
 
+/// <summary>
+/// Represents a response model containing details of a package definition returned by the API.
+/// </summary>
 public class PackageDefinitionResponseModel : PackageModelBase
 {
     /// <summary>
