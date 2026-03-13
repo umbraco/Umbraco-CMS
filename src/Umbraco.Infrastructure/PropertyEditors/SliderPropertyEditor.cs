@@ -282,12 +282,24 @@ public class SliderPropertyEditor : DataEditor, IValueSchemaProvider
                         ["value"]);
                 }
 
-                if (sliderConfiguration.EnableRange && sliderRange.To >= sliderRange.From && (sliderRange.To - sliderRange.From) < sliderConfiguration.MinimumRange)
+                if (IsRangeSpanBelowMinimum(sliderConfiguration, sliderRange, out var effectiveMinimumRange))
                 {
                     yield return new ValidationResult(
-                        LocalizedTextService.Localize("validation", "minimumRange", [sliderRange.ToString(), sliderConfiguration.MinimumRange.ToString(CultureInfo.InvariantCulture)]),
+                        LocalizedTextService.Localize("validation", "minimumRange", [sliderRange.ToString(), effectiveMinimumRange.ToString(CultureInfo.InvariantCulture)]),
                         ["value"]);
                 }
+            }
+
+            /// <summary>
+            /// Checks whether the span between the range values is below the configured minimum range.
+            /// Negative minimumRange values are clamped to zero (treated as "no minimum range").
+            /// </summary>
+            private static bool IsRangeSpanBelowMinimum(SliderConfiguration configuration, SliderRange range, out decimal effectiveMinimumRange)
+            {
+                effectiveMinimumRange = Math.Max(configuration.MinimumRange, 0);
+                return configuration.EnableRange &&
+                    range.To >= range.From &&
+                    (range.To - range.From) < effectiveMinimumRange;
             }
         }
 

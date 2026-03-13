@@ -276,6 +276,8 @@ public class SliderPropertyValueEditorTests
     [TestCase(1.1, 1.3, 0.4, false)]
     [TestCase(1.1, 1.5, 0.4, true)]
     [TestCase(1.1, 1.9, 0.2, true)]
+    [TestCase(1.1, 1.1, -1, true)] // Negative minimumRange treated as 0
+    [TestCase(1.1, 1.3, -0.5, true)] // Negative minimumRange treated as 0
     public void Validates_Minimum_Range_When_Range_Enabled(decimal from, decimal to, decimal minimumRange, bool expectedSuccess)
     {
         var value = new JsonObject
