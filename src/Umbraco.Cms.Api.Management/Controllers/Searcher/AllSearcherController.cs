@@ -8,11 +8,19 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Searcher;
 
+/// <summary>
+/// Controller responsible for handling search operations across all searchable entities in the management API.
+/// Provides endpoints to perform searches spanning multiple entity types.
+/// </summary>
 [ApiVersion("1.0")]
 public class AllSearcherController : SearcherControllerBase
 {
     private readonly IExamineManager _examineManager;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AllSearcherController"/> class, providing access to search functionality via the specified <see cref="IExamineManager"/>.
+    /// </summary>
+    /// <param name="examineManager">The <see cref="IExamineManager"/> instance used to manage and perform search operations.</param>
     public AllSearcherController(IExamineManager examineManager) => _examineManager = examineManager;
 
     /// <summary>

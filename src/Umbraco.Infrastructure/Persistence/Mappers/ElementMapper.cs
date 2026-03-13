@@ -11,11 +11,17 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Mappers;
 [MapperFor(typeof(IElement))]
 public sealed class ElementMapper : BaseMapper
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ElementMapper"/> class.
+    /// </summary>
+    /// <param name="sqlContext">The lazily-initialized SQL context used for building SQL expressions.</param>
+    /// <param name="maps">The mapper configuration store that holds the property-to-column mappings.</param>
     public ElementMapper(Lazy<ISqlContext> sqlContext, MapperConfigurationStore maps)
         : base(sqlContext, maps)
     {
     }
 
+    /// <inheritdoc />
     protected override void DefineMaps()
     {
         DefineMap<Element, NodeDto>(nameof(Element.Id), nameof(NodeDto.NodeId));

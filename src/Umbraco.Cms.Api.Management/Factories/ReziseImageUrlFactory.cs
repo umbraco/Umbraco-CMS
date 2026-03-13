@@ -12,6 +12,9 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Api.Management.Factories;
 
 // TODO (V18): Fix the typo by renaming this class to ResizeImageUrlFactory (and also the corresponding test class).
+/// <summary>
+/// Provides methods for generating URLs for resized images.
+/// </summary>
 public class ReziseImageUrlFactory : IReziseImageUrlFactory
 {
     private readonly IImageUrlGenerator _imageUrlGenerator;
@@ -20,6 +23,13 @@ public class ReziseImageUrlFactory : IReziseImageUrlFactory
     private readonly MediaUrlGeneratorCollection _mediaUrlGenerators;
     private readonly IAbsoluteUrlBuilder _absoluteUrlBuilder;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Factories.ReziseImageUrlFactory"/> class.
+    /// </summary>
+    /// <param name="imageUrlGenerator">The service used to generate image URLs.</param>
+    /// <param name="contentSettings">The options containing content settings configuration.</param>
+    /// <param name="mediaUrlGenerators">A collection of media URL generators.</param>
+    /// <param name="absoluteUrlBuilder">The service used to build absolute URLs.</param>
     [Obsolete("Use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
     public ReziseImageUrlFactory(
         IImageUrlGenerator imageUrlGenerator,
@@ -35,6 +45,14 @@ public class ReziseImageUrlFactory : IReziseImageUrlFactory
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Factories.ReziseImageUrlFactory"/> class.
+    /// </summary>
+    /// <param name="imageUrlGenerator">The service used to generate image URLs.</param>
+    /// <param name="contentSettings">The options for content settings.</param>
+    /// <param name="imagingSettings">The options for content imaging settings.</param>
+    /// <param name="mediaUrlGenerators">A collection of media URL generators.</param>
+    /// <param name="absoluteUrlBuilder">The service used to build absolute URLs.</param>
     public ReziseImageUrlFactory(
         IImageUrlGenerator imageUrlGenerator,
         IOptions<ContentSettings> contentSettings,

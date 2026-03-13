@@ -10,6 +10,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Mappers;
 [MapperFor(typeof(PropertyType))]
 public sealed class PropertyTypeMapper : BaseMapper
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PropertyTypeMapper"/> class.
+    /// </summary>
+    /// <param name="sqlContext">A lazily-initialized <see cref="ISqlContext"/> used for database operations.</param>
+    /// <param name="maps">The <see cref="MapperConfigurationStore"/> containing mapping configurations.</param>
     public PropertyTypeMapper(Lazy<ISqlContext> sqlContext, MapperConfigurationStore maps)
         : base(sqlContext, maps)
     {
