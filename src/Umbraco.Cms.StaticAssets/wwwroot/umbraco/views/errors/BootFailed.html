@@ -7,7 +7,12 @@
 
     <title>Boot Failed</title>
 
-    <link rel="stylesheet" href="/umbraco/website/nonodes.css" />
+    <!--
+        The {{pathBase}} placeholder is replaced by BootFailedMiddleware
+        with the request's PathBase, so asset URLs resolve correctly when
+        Umbraco is hosted under a virtual directory.
+    -->
+    <link rel="stylesheet" href="{{pathBase}}/umbraco/website/nonodes.css" />
     <style type="text/css">
         body {
             color: initial;
