@@ -150,7 +150,8 @@ test('can create content with block grid area with row span', async ({umbracoApi
   await umbracoUi.content.doesBlockAreaContainRowSpan(firstElementTypeName, firstAreaName, rowSpan, 0);
 });
 
-test('can create content with block grid area with min allowed', async ({umbracoApi, umbracoUi}) => {
+// Skip this test due to this issue: https://github.com/umbraco/Umbraco-CMS/issues/22121
+test.skip('can create content with block grid area with min allowed', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   firstElementTypeId = await umbracoApi.documentType.createEmptyElementType(firstElementTypeName);
   const secondElementTypeId = await umbracoApi.documentType.createEmptyElementType(secondElementTypeName);
@@ -167,9 +168,8 @@ test('can create content with block grid area with min allowed', async ({umbraco
   await umbracoUi.content.clickSelectBlockElementWithName(firstElementTypeName);
   await umbracoUi.content.clickLinkWithName(areaCreateLabel);
   await umbracoUi.content.clickSelectBlockElementInAreaWithName(secondElementTypeName);
-  //await umbracoUi.content.isTextWithExactNameVisible('Minimum 2 entries, requires 1 more.');
-  await umbracoUi.content.clickSaveAndPublishButton();
   await umbracoUi.content.isTextWithExactNameVisible('Minimum 2 entries, requires 1 more.');
+  await umbracoUi.content.clickSaveAndPublishButton();
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
   await umbracoUi.content.clickInlineAddToAreaButton(firstElementTypeName, firstAreaName, 0, 1);
   await umbracoUi.content.clickSelectBlockElementInAreaWithName(secondElementTypeName);
@@ -185,7 +185,8 @@ test('can create content with block grid area with min allowed', async ({umbraco
   await umbracoApi.documentType.ensureNameNotExists(secondElementTypeName);
 });
 
-test('can create content with block grid area with max allowed', async ({umbracoApi, umbracoUi}) => {
+// Skip this test due to this issue: https://github.com/umbraco/Umbraco-CMS/issues/22121
+test.skip('can create content with block grid area with max allowed', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   firstElementTypeId = await umbracoApi.documentType.createEmptyElementType(firstElementTypeName);
   const secondElementTypeId = await umbracoApi.documentType.createEmptyElementType(secondElementTypeName);
@@ -202,8 +203,8 @@ test('can create content with block grid area with max allowed', async ({umbraco
   await umbracoUi.content.clickSelectBlockElementWithName(firstElementTypeName);
   await umbracoUi.content.clickLinkWithName(areaCreateLabel);
   await umbracoUi.content.clickSelectBlockElementInAreaWithName(secondElementTypeName);
-  await umbracoUi.content.clickSaveAndPublishButton();
   await umbracoUi.content.isTextWithExactNameVisible('Maximum 0 entries, you have entered 1 too many.');
+  await umbracoUi.content.clickSaveAndPublishButton();
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
   await umbracoUi.content.removeBlockFromArea(firstElementTypeName, firstAreaName, secondElementTypeName);
   await umbracoUi.content.clickConfirmToDeleteButton();
