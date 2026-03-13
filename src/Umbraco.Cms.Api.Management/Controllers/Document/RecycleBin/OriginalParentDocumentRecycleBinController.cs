@@ -17,6 +17,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Document.RecycleBin;
 
+/// <summary>
+/// Controller responsible for managing operations related to the recycle bin for original parent documents in the CMS.
+/// </summary>
 [ApiVersion("1.0")]
 public class OriginalParentDocumentRecycleBinController : DocumentRecycleBinControllerBase
 {
@@ -24,6 +27,14 @@ public class OriginalParentDocumentRecycleBinController : DocumentRecycleBinCont
     private readonly IDocumentPresentationFactory _documentPresentationFactory;
     private readonly IDocumentRecycleBinQueryService _documentRecycleBinQueryService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="OriginalParentDocumentRecycleBinController"/> class.
+    /// Handles operations related to retrieving the original parent of documents in the recycle bin.
+    /// </summary>
+    /// <param name="entityService">The service used for entity operations.</param>
+    /// <param name="authorizationService">The service used to authorize user actions.</param>
+    /// <param name="documentPresentationFactory">The factory for creating document presentation models.</param>
+    /// <param name="documentRecycleBinQueryService">The service for querying the document recycle bin.</param>
     public OriginalParentDocumentRecycleBinController(
         IEntityService entityService,
         IAuthorizationService authorizationService,
@@ -36,6 +47,14 @@ public class OriginalParentDocumentRecycleBinController : DocumentRecycleBinCont
         _documentRecycleBinQueryService = documentRecycleBinQueryService;
     }
 
+    /// <summary>
+    /// Retrieves the original parent of a document before it was moved to the recycle bin.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="id">The unique identifier of the document.</param>
+    /// <returns>
+    /// An <see cref="IActionResult"/> containing a <see cref="ReferenceByIdModel"/> for the original parent, or <c>null</c> if the parent is the root.
+    /// </returns>
     [HttpGet("{id:guid}/original-parent")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ReferenceByIdModel), StatusCodes.Status200OK)]

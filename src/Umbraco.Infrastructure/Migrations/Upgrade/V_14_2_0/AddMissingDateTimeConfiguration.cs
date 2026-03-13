@@ -1,4 +1,4 @@
-﻿using NPoco;
+using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Infrastructure.Persistence;
@@ -7,10 +7,18 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_14_2_0;
 
+/// <summary>
+/// Migration step that ensures any missing DateTime configuration settings are added during the upgrade to version 14.2.0.
+/// </summary>
 public class AddMissingDateTimeConfiguration : MigrationBase
 {
     private readonly IConfigurationEditorJsonSerializer _configurationEditorJsonSerializer;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AddMissingDateTimeConfiguration"/> class with the specified migration context and configuration editor JSON serializer.
+    /// </summary>
+    /// <param name="context">The <see cref="IMigrationContext"/> to use for the migration.</param>
+    /// <param name="configurationEditorJsonSerializer">The <see cref="IConfigurationEditorJsonSerializer"/> used to serialize configuration editors.</param>
     public AddMissingDateTimeConfiguration(IMigrationContext context, IConfigurationEditorJsonSerializer configurationEditorJsonSerializer)
         : base(context)
         => _configurationEditorJsonSerializer = configurationEditorJsonSerializer;

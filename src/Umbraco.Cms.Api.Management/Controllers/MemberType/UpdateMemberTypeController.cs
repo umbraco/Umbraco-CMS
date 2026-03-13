@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -15,6 +15,9 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.MemberType;
 
+/// <summary>
+/// API controller responsible for handling HTTP requests to update member types in the system.
+/// </summary>
 [ApiVersion("1.0")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessMemberTypes)]
 public class UpdateMemberTypeController : MemberTypeControllerBase
@@ -24,6 +27,13 @@ public class UpdateMemberTypeController : MemberTypeControllerBase
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly IMemberTypeService _memberTypeService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UpdateMemberTypeController"/> class.
+    /// </summary>
+    /// <param name="memberTypeEditingPresentationFactory">Factory for creating member type editing presentation models.</param>
+    /// <param name="memberTypeEditingService">Service for handling member type editing operations.</param>
+    /// <param name="backOfficeSecurityAccessor">Accessor for back office security context.</param>
+    /// <param name="memberTypeService">Service for managing member types.</param>
     public UpdateMemberTypeController(
         IMemberTypeEditingPresentationFactory memberTypeEditingPresentationFactory,
         IMemberTypeEditingService memberTypeEditingService,
@@ -36,6 +46,20 @@ public class UpdateMemberTypeController : MemberTypeControllerBase
         _memberTypeService = memberTypeService;
     }
 
+    /// <summary>
+    /// Asynchronously updates the member type identified by the specified <paramref name="id"/> using the details provided in the <paramref name="requestModel"/>.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="id">The unique identifier (GUID) of the member type to update.</param>
+    /// <param name="requestModel">The model containing the updated member type details.</param>
+    /// <returns>
+    /// An <see cref="IActionResult"/> indicating the result of the operation:
+    /// <list type="bullet">
+    /// <item><description><c>200 OK</c> if the update was successful.</description></item>
+    /// <item><description><c>400 Bad Request</c> if the request model is invalid.</description></item>
+    /// <item><description><c>404 Not Found</c> if a member type with the specified <paramref name="id"/> does not exist.</description></item>
+    /// </list>
+    /// </returns>
     [HttpPut("{id:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]

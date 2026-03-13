@@ -11,6 +11,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Mappers;
 [MapperFor(typeof(UserGroup))]
 public sealed class UserGroupMapper : BaseMapper
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UserGroupMapper"/> class.
+    /// </summary>
+    /// <param name="sqlContext">The lazy-loaded <see cref="ISqlContext"/> used for database operations.</param>
+    /// <param name="maps">The <see cref="MapperConfigurationStore"/> containing mapper configurations.</param>
     public UserGroupMapper(Lazy<ISqlContext> sqlContext, MapperConfigurationStore maps)
         : base(sqlContext, maps)
     {
