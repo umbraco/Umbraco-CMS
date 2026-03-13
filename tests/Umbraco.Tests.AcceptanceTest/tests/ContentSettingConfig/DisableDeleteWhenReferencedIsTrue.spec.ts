@@ -158,8 +158,8 @@ test('cannot bulk trash content nodes when at least one has references', async (
 
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.content.selectContentWithNameInListView(firstChildContentName);
-  await umbracoUi.content.selectContentWithNameInListView(secondChildContentName);
+  await umbracoUi.content.selectContentCardWithName(firstChildContentName);
+  await umbracoUi.content.selectContentCardWithName(secondChildContentName);
   await umbracoUi.content.clickTrashSelectedListItems();
 
   // Assert
@@ -185,8 +185,8 @@ test('can bulk trash content nodes when none have references', async ({umbracoAp
 
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.content.selectContentWithNameInListView(firstChildContentName);
-  await umbracoUi.content.selectContentWithNameInListView(secondChildContentName);
+  await umbracoUi.content.selectContentCardWithName(firstChildContentName);
+  await umbracoUi.content.selectContentCardWithName(secondChildContentName);
   await umbracoUi.content.clickTrashSelectedListItems();
   await umbracoUi.content.clickConfirmTrashButtonAndWaitForContentToBeTrashed();
 
