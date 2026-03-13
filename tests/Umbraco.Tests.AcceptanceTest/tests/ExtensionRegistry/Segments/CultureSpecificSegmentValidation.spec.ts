@@ -10,6 +10,9 @@ const documentTypeName = 'TestSegmentValidationDocType';
 let documentTypeId = '';
 // DataType
 const dataTypeName = 'Textstring';
+// Test Values
+const englishDefaultValue = 'English default';
+const danishDefaultValue = 'Danish default';
 
 test.beforeEach(async ({umbracoApi, umbracoUi}) => {
   await umbracoApi.language.createDanishLanguage();
@@ -29,14 +32,14 @@ test.afterEach(async ({umbracoApi}) => {
 
 test('can save content in culture without culture-specific segment', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  await umbracoApi.document.createDocumentWithEnglishCultureAndTextContent(contentName, documentTypeId, 'English default', dataTypeName, true);
+  await umbracoApi.document.createDocumentWithEnglishCultureAndTextContent(contentName, documentTypeId, englishDefaultValue, dataTypeName, true);
   await umbracoUi.content.goToContentWithName(contentName);
 
   // Act
   await umbracoUi.content.clickSelectVariantButton();
   await umbracoUi.content.clickVariantAddModeButtonForLanguageName('Danish');
   await umbracoUi.content.enterContentName(contentName);
-  await umbracoUi.content.enterTextstring('Danish default');
+  await umbracoUi.content.enterTextstring(danishDefaultValue);
   await umbracoUi.content.clickSaveButtonForContent();
   await umbracoUi.content.clickSaveModalButtonAndWaitForContentToBeUpdated();
 
@@ -45,12 +48,12 @@ test('can save content in culture without culture-specific segment', async ({umb
     {culture: 'da', segment: null},
   ]);
   expect(daDefault).toBeTruthy();
-  expect(daDefault.value).toBe('Danish default');
+  expect(daDefault.value).toBe(danishDefaultValue);
 });
 
 test('can publish content in culture without culture-specific segment', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  await umbracoApi.document.createDocumentWithEnglishCultureAndTextContent(contentName, documentTypeId, 'English default', dataTypeName, true);
+  await umbracoApi.document.createDocumentWithEnglishCultureAndTextContent(contentName, documentTypeId, englishDefaultValue, dataTypeName, true);
   await umbracoUi.content.goToContentWithName(contentName);
 
   // Act

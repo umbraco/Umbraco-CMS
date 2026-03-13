@@ -16,6 +16,10 @@ const vipMemberSegmentAlias = 'vip-members';
 const defaultSegmentValue = 'Default segment value';
 const vipSegmentValue = 'VIP segment value';
 const updatedVipSegmentValue = 'Updated VIP segment value';
+const englishDefaultValue = 'English default';
+const englishVipValue = 'English VIP';
+const danishDefaultValue = 'Danish default';
+const danishVipValue = 'Danish VIP';
 
 test.describe('content with culture and segment variations', () => {
   test.beforeEach(async ({umbracoApi, umbracoUi}) => {
@@ -109,9 +113,9 @@ test.describe('content with culture and segment variations', () => {
       editorAlias,
       ['en-US', 'da'],
       [
-        {value: 'English default', culture: 'en-US', segment: null},
-        {value: 'English VIP', culture: 'en-US', segment: vipMemberSegmentAlias},
-        {value: 'Danish default', culture: 'da', segment: null},
+        {value: englishDefaultValue, culture: 'en-US', segment: null},
+        {value: englishVipValue, culture: 'en-US', segment: vipMemberSegmentAlias},
+        {value: danishDefaultValue, culture: 'da', segment: null},
       ]
     );
     await umbracoUi.content.goToContentWithName(contentName);
@@ -120,7 +124,7 @@ test.describe('content with culture and segment variations', () => {
     await umbracoUi.content.clickSelectVariantButton();
     await umbracoUi.content.clickExpandSegmentButton('Danish');
     await umbracoUi.content.clickSegmentVariantButton(vipMemberSegment);
-    await umbracoUi.content.enterTextstring('Danish VIP');
+    await umbracoUi.content.enterTextstring(danishVipValue);
     await umbracoUi.content.clickSaveButtonForContent();
     await umbracoUi.content.clickSaveModalButtonAndWaitForContentToBeUpdated();
 
@@ -132,13 +136,13 @@ test.describe('content with culture and segment variations', () => {
       {culture: 'da', segment: vipMemberSegmentAlias},
     ]);
     expect(enDefault).toBeTruthy();
-    expect(enDefault.value).toBe('English default');
+    expect(enDefault.value).toBe(englishDefaultValue);
     expect(enVip).toBeTruthy();
-    expect(enVip.value).toBe('English VIP');
+    expect(enVip.value).toBe(englishVipValue);
     expect(daDefault).toBeTruthy();
-    expect(daDefault.value).toBe('Danish default');
+    expect(daDefault.value).toBe(danishDefaultValue);
     expect(daVip).toBeTruthy();
-    expect(daVip.value).toBe('Danish VIP');
+    expect(daVip.value).toBe(danishVipValue);
   });
 });
 
