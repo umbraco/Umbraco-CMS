@@ -41,16 +41,6 @@ public class UpdateNotificationsController : DocumentControllerBase
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
-    public UpdateNotificationsController(IContentEditingService contentEditingService, INotificationService notificationService, IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
-        : this(
-            StaticServiceProvider.Instance.GetRequiredService<IAuthorizationService>(),
-            contentEditingService,
-            notificationService,
-            backOfficeSecurityAccessor)
-    {
-    }
-
     /// <summary>
     /// Updates the notification subscriptions for the current user on the specified document.
     /// </summary>

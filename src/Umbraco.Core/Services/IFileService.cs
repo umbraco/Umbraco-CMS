@@ -96,21 +96,6 @@ public interface IFileService : IService
     void SaveTemplate(ITemplate template, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
-    ///     Creates a template for a content type
-    /// </summary>
-    /// <param name="contentTypeAlias"></param>
-    /// <param name="contentTypeName"></param>
-    /// <param name="userId"></param>
-    /// <returns>
-    ///     The template created
-    /// </returns>
-    [Obsolete("Please use ITemplateService for template operations. Scheduled for removal in Umbraco 18.")]
-    Attempt<OperationResult<OperationResultType, ITemplate>?> CreateTemplateForContentType(
-        string contentTypeAlias,
-        string? contentTypeName,
-        int userId = Constants.Security.SuperUserId);
-
-    /// <summary>
     ///     Creates a new template with identity, setting the content if a view exists in the filesystem.
     /// </summary>
     /// <param name="name">The name of the template.</param>
@@ -129,36 +114,4 @@ public interface IFileService : IService
     /// <param name="userId">Optional id of the user deleting the template</param>
     [Obsolete("Please use ITemplateService for template operations. Scheduled for removal in Umbraco 18.")]
     void DeleteTemplate(string alias, int userId = Constants.Security.SuperUserId);
-
-    /// <summary>
-    ///     Saves a collection of <see cref="Template" /> objects
-    /// </summary>
-    /// <param name="templates">List of <see cref="Template" /> to save</param>
-    /// <param name="userId">Optional id of the user</param>
-    [Obsolete("Please use ITemplateService for template operations. Scheduled for removal in Umbraco 18.")]
-    void SaveTemplate(IEnumerable<ITemplate> templates, int userId = Constants.Security.SuperUserId);
-
-    /// <summary>
-    ///     Gets the content of a template as a stream.
-    /// </summary>
-    /// <param name="filepath">The filesystem path to the template.</param>
-    /// <returns>The content of the template.</returns>
-    [Obsolete("Please use ITemplateService for template operations. Scheduled for removal in Umbraco 18.")]
-    Stream GetTemplateFileContentStream(string filepath);
-
-    /// <summary>
-    ///     Sets the content of a template.
-    /// </summary>
-    /// <param name="filepath">The filesystem path to the template.</param>
-    /// <param name="content">The content of the template.</param>
-    [Obsolete("Please use ITemplateService for template operations. Scheduled for removal in Umbraco 18.")]
-    void SetTemplateFileContent(string filepath, Stream content);
-
-    /// <summary>
-    ///     Gets the size of a template.
-    /// </summary>
-    /// <param name="filepath">The filesystem path to the template.</param>
-    /// <returns>The size of the template.</returns>
-    [Obsolete("Please use ITemplateService for template operations. Scheduled for removal in Umbraco 18.")]
-    long GetTemplateFileSize(string filepath);
 }

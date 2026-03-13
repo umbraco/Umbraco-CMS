@@ -287,36 +287,6 @@ public class FileService : RepositoryService, IFileService
     #endregion
 
     #region Templates
-
-    /// <summary>
-    ///     Creates a template for a content type
-    /// </summary>
-    /// <param name="contentTypeAlias"></param>
-    /// <param name="contentTypeName"></param>
-    /// <param name="userId"></param>
-    /// <returns>
-    ///     The template created
-    /// </returns>
-    [Obsolete("Please use ITemplateService for template operations. Scheduled for removal in Umbraco 18.")]
-    public Attempt<OperationResult<OperationResultType, ITemplate>?> CreateTemplateForContentType(
-        string contentTypeAlias, string? contentTypeName, int userId = Constants.Security.SuperUserId)
-    {
-        // mimic old service behavior
-        if (contentTypeAlias.Length > 255)
-        {
-            throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
-        }
-
-        Guid currentUserKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult();
-        Attempt<ITemplate, TemplateOperationStatus> result = _templateService.CreateForContentTypeAsync(contentTypeAlias, contentTypeName, currentUserKey).GetAwaiter().GetResult();
-
-        // mimic old service behavior
-        EventMessages eventMessages = EventMessagesFactory.Get();
-        return result.Success
-            ? OperationResult.Attempt.Succeed(OperationResultType.Success, eventMessages, result.Result)
-            : OperationResult.Attempt.Succeed(OperationResultType.Failed, eventMessages, result.Result);
-    }
-
     /// <summary>
     ///     Create a new template, setting the content if a view exists in the filesystem
     /// </summary>
@@ -431,38 +401,6 @@ public class FileService : RepositoryService, IFileService
     }
 
     /// <summary>
-    ///     Saves a collection of <see cref="Template" /> objects
-    /// </summary>
-    /// <param name="templates">List of <see cref="Template" /> to save</param>
-    /// <param name="userId">Optional id of the user</param>
-    [Obsolete("Please use ITemplateService for template operations. Scheduled for removal in Umbraco 18.")]
-    public void SaveTemplate(IEnumerable<ITemplate> templates, int userId = Constants.Security.SuperUserId)
-    {
-        ITemplate[] templatesA = templates.ToArray();
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            EventMessages eventMessages = EventMessagesFactory.Get();
-            var savingNotification = new TemplateSavingNotification(templatesA, eventMessages);
-            if (scope.Notifications.PublishCancelable(savingNotification))
-            {
-                scope.Complete();
-                return;
-            }
-
-            foreach (ITemplate template in templatesA)
-            {
-                _templateRepository.Save(template);
-            }
-
-            scope.Notifications.Publish(
-                new TemplateSavedNotification(templatesA, eventMessages).WithStateFrom(savingNotification));
-
-            Audit(AuditType.Save, userId, -1, UmbracoObjectTypes.Template.GetName());
-            scope.Complete();
-        }
-    }
-
-    /// <summary>
     ///     Deletes a template by its alias
     /// </summary>
     /// <param name="alias">Alias of the <see cref="ITemplate" /> to delete</param>
@@ -473,22 +411,6 @@ public class FileService : RepositoryService, IFileService
         Guid currentUserKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult();
         _templateService.DeleteAsync(alias, currentUserKey).GetAwaiter().GetResult();
     }
-
-    /// <inheritdoc />
-    [Obsolete("Please use ITemplateService for template operations. Scheduled for removal in Umbraco 18.")]
-    public Stream GetTemplateFileContentStream(string filepath)
-        => _templateService.GetFileContentStreamAsync(filepath).GetAwaiter().GetResult();
-
-    /// <inheritdoc />
-    [Obsolete("Please use ITemplateService for template operations. Scheduled for removal in Umbraco 18.")]
-    public void SetTemplateFileContent(string filepath, Stream content)
-        => _templateService.SetFileContentAsync(filepath, content).GetAwaiter().GetResult();
-
-    /// <inheritdoc />
-    [Obsolete("Please use ITemplateService for template operations. Scheduled for removal in Umbraco 18.")]
-    public long GetTemplateFileSize(string filepath)
-        => _templateService.GetFileSizeAsync(filepath).GetAwaiter().GetResult();
-
     #endregion
 
     #region Partial Views

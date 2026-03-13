@@ -54,32 +54,6 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     }
 
     /// <summary>
-    ///     Adds or updates a translation for a dictionary item and language
-    /// </summary>
-    /// <param name="item"></param>
-    /// <param name="language"></param>
-    /// <param name="value"></param>
-    /// <returns></returns>
-    /// <remarks>
-    ///     This does not save the item, that needs to be done explicitly
-    /// </remarks>
-    [Obsolete("Please use IDictionaryItemService for dictionary item operations. Scheduled for removal in Umbraco 18.")]
-    public void AddOrUpdateDictionaryValue(IDictionaryItem item, ILanguage? language, string value)
-    {
-        if (item == null)
-        {
-            throw new ArgumentNullException(nameof(item));
-        }
-
-        if (language == null)
-        {
-            throw new ArgumentNullException(nameof(language));
-        }
-
-        item.AddOrUpdateDictionaryValue(language, value);
-    }
-
-    /// <summary>
     ///     Creates and saves a new dictionary item and assigns a value to all languages if defaultValue is specified.
     /// </summary>
     /// <param name="key"></param>
@@ -269,28 +243,8 @@ internal class LocalizationService : RepositoryService, ILocalizationService
 
     /// <inheritdoc />
     [Obsolete("Please use ILanguageService for language operations. Scheduled for removal in Umbraco 18.")]
-    public string? GetLanguageIsoCodeById(int id)
-    {
-        using (ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return _languageRepository.GetIsoCodeById(id);
-        }
-    }
-
-    /// <inheritdoc />
-    [Obsolete("Please use ILanguageService for language operations. Scheduled for removal in Umbraco 18.")]
     public string GetDefaultLanguageIsoCode()
         => _languageService.GetDefaultIsoCodeAsync().GetAwaiter().GetResult();
-
-    /// <inheritdoc />
-    [Obsolete("Please use ILanguageService for language operations. Scheduled for removal in Umbraco 18.")]
-    public int? GetDefaultLanguageId()
-    {
-        using (ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return _languageRepository.GetDefaultId();
-        }
-    }
 
     /// <summary>
     ///     Gets all available languages
@@ -330,18 +284,5 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     {
         Guid currentUserKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult();
         _languageService.DeleteAsync(language.IsoCode, currentUserKey).GetAwaiter().GetResult();
-    }
-
-    /// <summary>
-    /// Gets the dictionary item key map containing all dictionary item keys and their corresponding GUIDs.
-    /// </summary>
-    /// <returns>A dictionary mapping dictionary item keys to their GUIDs.</returns>
-    [Obsolete("Please use IDictionaryItemService for dictionary item operations. Scheduled for removal in Umbraco 18.")]
-    public Dictionary<string, Guid> GetDictionaryItemKeyMap()
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return _dictionaryRepository.GetDictionaryItemKeyMap();
-        }
     }
 }
