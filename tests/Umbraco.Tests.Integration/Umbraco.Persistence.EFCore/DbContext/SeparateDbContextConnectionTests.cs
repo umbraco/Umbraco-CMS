@@ -15,6 +15,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Persistence.EFCore.DbContext;
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Logger = UmbracoTestOptions.Logger.Console)]
 public class SeparateDbContextConnectionTests : UmbracoIntegrationTest
 {
+    private static readonly string DbFilePath =
+        Path.Combine(Path.GetTempPath(), $"separate-test-{Guid.NewGuid():N}.db");
+
     private IEFCoreScopeProvider<SeparateDbContext> EfCoreScopeProvider =>
         GetRequiredService<IEFCoreScopeProvider<SeparateDbContext>>();
 
@@ -23,9 +26,18 @@ public class SeparateDbContextConnectionTests : UmbracoIntegrationTest
         builder.Services.AddUmbracoDbContext<SeparateDbContext>(
             (_, options, _, _) =>
             {
-                options.UseSqlite("Data Source=separate-test.db");
+                options.UseSqlite($"Data Source={DbFilePath}");
             },
             shareUmbracoConnection: false);
+    }
+
+    [OneTimeTearDown]
+    public void CleanUp()
+    {
+        if (File.Exists(DbFilePath))
+        {
+            File.Delete(DbFilePath);
+        }
     }
 
     /// <summary>
@@ -43,7 +55,7 @@ public class SeparateDbContextConnectionTests : UmbracoIntegrationTest
         await scope.ExecuteWithContextAsync<Task>(async db =>
         {
             var connectionString = db.Database.GetConnectionString();
-            Assert.That(connectionString, Does.Contain("separate-test.db"),
+            Assert.That(connectionString, Does.Contain(DbFilePath),
                 "The DbContext should use its own configured connection string, " +
                 "not the Umbraco main database connection.");
         });

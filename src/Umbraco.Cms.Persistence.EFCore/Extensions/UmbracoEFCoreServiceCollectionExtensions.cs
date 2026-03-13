@@ -47,7 +47,7 @@ public static class UmbracoEFCoreServiceCollectionExtensions
 #pragma warning disable CS0618 // Type or member is obsolete
         return AddUmbracoDbContext<T>(
             services,
-            (IServiceProvider provider, DbContextOptionsBuilder optionsBuilder, string? providerName, string? connectionString) =>
+            (IServiceProvider provider, DbContextOptionsBuilder optionsBuilder, string? connectionString, string? providerName) =>
             {
                 ConnectionStrings connectionStrings = GetConnectionStringAndProviderName(provider);
                 optionsAction?.Invoke(optionsBuilder, connectionStrings.ConnectionString, connectionStrings.ProviderName, provider);
@@ -95,7 +95,7 @@ public static class UmbracoEFCoreServiceCollectionExtensions
     {
         return AddUmbracoDbContext<T>(
             services,
-            (IServiceProvider provider, DbContextOptionsBuilder optionsBuilder, string? providerName, string? connectionString) =>
+            (IServiceProvider provider, DbContextOptionsBuilder optionsBuilder, string? connectionString, string? providerName) =>
             {
                 ConnectionStrings connectionStrings = GetConnectionStringAndProviderName(provider);
                 optionsAction?.Invoke(optionsBuilder, connectionStrings.ConnectionString, connectionStrings.ProviderName, provider);
