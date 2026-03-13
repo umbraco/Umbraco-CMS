@@ -1,21 +1,35 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DocumentType.Tree;
 
+/// <summary>
+/// Controller responsible for handling operations related to the ancestors tree of document types in the management API.
+/// </summary>
 [ApiVersion("1.0")]
 public class AncestorsDocumentTypeTreeController : DocumentTypeTreeControllerBase
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AncestorsDocumentTypeTreeController"/> class, which manages operations related to ancestor document types in the tree structure.
+    /// </summary>
+    /// <param name="entityService">Service used for entity operations within the Umbraco CMS.</param>
+    /// <param name="flagProviders">A collection of flag providers used to determine additional metadata or state for entities.</param>
+    /// <param name="contentTypeService">Service used for managing content types in the CMS.</param>
     public AncestorsDocumentTypeTreeController(IEntityService entityService, FlagProviderCollection flagProviders, IContentTypeService contentTypeService)
         : base(entityService, flagProviders, contentTypeService)
     {
     }
 
+    /// <summary>
+    /// Asynchronously retrieves the ancestor document type items for the specified descendant document type ID.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="descendantId">The unique identifier of the descendant document type whose ancestors are to be retrieved.</param>
+    /// <returns>An <see cref="ActionResult{T}"/> containing a collection of <see cref="DocumentTypeTreeItemResponseModel"/> representing the ancestor document types.</returns>
     [HttpGet("ancestors")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<DocumentTypeTreeItemResponseModel>), StatusCodes.Status200OK)]

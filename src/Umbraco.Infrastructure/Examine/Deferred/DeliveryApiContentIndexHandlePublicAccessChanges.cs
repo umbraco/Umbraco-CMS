@@ -18,6 +18,17 @@ internal sealed class DeliveryApiContentIndexHandlePublicAccessChanges : Deliver
     private readonly IContentService _contentService;
     private readonly IDeliveryApiContentIndexValueSetBuilder _deliveryApiContentIndexValueSetBuilder;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DeliveryApiContentIndexHandlePublicAccessChanges"/> class,
+    /// which handles updates to the Delivery API content index in response to changes in public access settings.
+    /// </summary>
+    /// <param name="publicAccessService">Service for managing and querying public access rules for content.</param>
+    /// <param name="deliveryApiIndexingHandler">Handler responsible for managing Delivery API content indexing operations.</param>
+    /// <param name="contentService">Service for accessing and managing Umbraco content items.</param>
+    /// <param name="deliveryApiContentIndexValueSetBuilder">Builder for creating value sets used in Delivery API content indexing.</param>
+    /// <param name="deliveryApiContentIndexHelper">Helper providing utility methods for Delivery API content indexing.</param>
+    /// <param name="deliveryApiSettings">Configuration settings for the Delivery API.</param>
+    /// <param name="backgroundTaskQueue">Queue for scheduling background tasks related to indexing operations.</param>
     public DeliveryApiContentIndexHandlePublicAccessChanges(
         IPublicAccessService publicAccessService,
         DeliveryApiIndexingHandler deliveryApiIndexingHandler,
@@ -36,10 +47,18 @@ internal sealed class DeliveryApiContentIndexHandlePublicAccessChanges : Deliver
         _backgroundTaskQueue = backgroundTaskQueue;
     }
 
-    // NOTE: at the time of implementing this, the distributed notifications for public access changes only ever
-    //       sends out "refresh all" notifications, which means we can't be clever about minimizing the work
-    //       effort to handle public access changes. instead we have to grab all protected content definitions
-    //       and handle every last one with every notification.
+    /// <summary>
+    /// Handles changes to public access for content in the delivery API index.
+    /// Queues a background task to update or remove protected content in the index
+    /// according to the current member authorization settings, ensuring the index reflects
+    /// the latest access rules.
+    /// </summary>
+    /// <remarks>
+    /// NOTE: at the time of implementing this, the distributed notifications for public access changes only ever
+    /// sends out "refresh all" notifications, which means we can't be clever about minimizing the work
+    /// effort to handle public access changes. instead we have to grab all protected content definitions
+    /// and handle every last one with every notification.
+    /// </remarks>
     public void Execute() => _backgroundTaskQueue.QueueBackgroundWorkItem(_ =>
     {
         IIndex index = _deliveryApiIndexingHandler.GetIndex() ??

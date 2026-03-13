@@ -14,6 +14,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Element;
 
+/// <summary>
+/// API controller responsible for handling move operations on elements in the Umbraco CMS.
+/// </summary>
 [ApiVersion("1.0")]
 public class MoveElementController : ElementControllerBase
 {
@@ -21,6 +24,12 @@ public class MoveElementController : ElementControllerBase
     private readonly IElementEditingService _elementEditingService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MoveElementController"/> class.
+    /// </summary>
+    /// <param name="authorizationService">Service used to authorize element move operations.</param>
+    /// <param name="elementEditingService">Service responsible for element editing operations.</param>
+    /// <param name="backOfficeSecurityAccessor">Accessor for back office security context.</param>
     public MoveElementController(
         IAuthorizationService authorizationService,
         IElementEditingService elementEditingService,
@@ -31,6 +40,13 @@ public class MoveElementController : ElementControllerBase
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
+    /// <summary>
+    /// Moves an element identified by the specified unique identifier to a different location.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="id">The unique identifier of the element to move.</param>
+    /// <param name="moveElementRequestModel">The model containing the target location for the move.</param>
+    /// <returns>An <see cref="IActionResult"/> representing the outcome of the move operation.</returns>
     [HttpPut("{id:guid}/move")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]

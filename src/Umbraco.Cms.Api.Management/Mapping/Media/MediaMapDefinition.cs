@@ -1,11 +1,9 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Api.Management.Mapping.Content;
 using Umbraco.Cms.Api.Management.ViewModels.Media;
 using Umbraco.Cms.Api.Management.ViewModels.Media.Collection;
 using Umbraco.Cms.Api.Management.ViewModels.MediaType;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Mapping;
@@ -15,11 +13,21 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Mapping.Media;
 
+/// <summary>
+/// Defines the mapping configuration for media entities within the Umbraco CMS API management layer.
+/// </summary>
 public class MediaMapDefinition : ContentMapDefinition<IMedia, MediaValueResponseModel, MediaVariantResponseModel>, IMapDefinition
 {
     private readonly CommonMapper _commonMapper;
     private ContentSettings _contentSettings;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Mapping.Media.MediaMapDefinition"/> class with the specified dependencies.
+    /// </summary>
+    /// <param name="propertyEditorCollection">The <see cref="PropertyEditorCollection"/> containing available property editors.</param>
+    /// <param name="commonMapper">The <see cref="CommonMapper"/> instance used for common mapping operations.</param>
+    /// <param name="dataValueEditorFactory">The <see cref="IDataValueEditorFactory"/> used to create data value editors.</param>
+    /// <param name="contentSettings">The <see cref="IOptionsMonitor{ContentSettings}"/> providing access to content settings options.</param>
     public MediaMapDefinition(
         PropertyEditorCollection propertyEditorCollection,
         CommonMapper commonMapper,
@@ -32,6 +40,10 @@ public class MediaMapDefinition : ContentMapDefinition<IMedia, MediaValueRespons
         contentSettings.OnChange(x => _contentSettings = x);
     }
 
+    /// <summary>
+    /// Configures the object mappings for media entities, defining how <see cref="IMedia"/> instances are mapped to <see cref="MediaResponseModel"/> and <see cref="MediaCollectionResponseModel"/>.
+    /// </summary>
+    /// <param name="mapper">The <see cref="IUmbracoMapper"/> instance used to register the mappings.</param>
     public void DefineMaps(IUmbracoMapper mapper)
     {
         mapper.Define<IMedia, MediaResponseModel>((_, _) => new MediaResponseModel(), Map);

@@ -1,24 +1,29 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.Package;
-using Umbraco.Cms.Core.DependencyInjection;
-using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Package;
 
+/// <summary>
+/// Controller for retrieving the migration status of all packages.
+/// </summary>
 [ApiVersion("1.0")]
 public class AllMigrationStatusPackageController : PackageControllerBase
 {
     private readonly IPackagingService _packagingService;
     private readonly IPackagePresentationFactory _packagePresentationFactory;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AllMigrationStatusPackageController"/> class, which handles migration status operations for packages.
+    /// </summary>
+    /// <param name="packagingService">Service used for package-related operations.</param>
+    /// <param name="packagePresentationFactory">Factory for creating package presentation models.</param>
     public AllMigrationStatusPackageController(IPackagingService packagingService, IPackagePresentationFactory packagePresentationFactory)
     {
         _packagingService = packagingService;

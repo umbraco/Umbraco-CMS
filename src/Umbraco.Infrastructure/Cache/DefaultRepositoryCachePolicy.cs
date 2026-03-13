@@ -27,6 +27,14 @@ public class DefaultRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyB
     private static readonly TEntity[] _emptyEntities = new TEntity[0]; // const
     private readonly RepositoryCachePolicyOptions _options;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DefaultRepositoryCachePolicy{TEntity, TId}"/> class.
+    /// </summary>
+    /// <param name="cache">The application-level policy cache used for storing repository items.</param>
+    /// <param name="scopeAccessor">Provides access to the current scope.</param>
+    /// <param name="options">The options that configure repository cache policy behavior.</param>
+    /// <param name="repositoryCacheVersionService">Service for managing repository cache versions.</param>
+    /// <param name="cacheSyncService">Service responsible for synchronizing cache across instances.</param>
     public DefaultRepositoryCachePolicy(
         IAppPolicyCache cache,
         IScopeAccessor scopeAccessor,

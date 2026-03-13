@@ -11,8 +11,9 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade;
 public class Upgrader
 {
     /// <summary>
-    ///     Initializes a new instance of the <see ref="Upgrader" /> class.
+    ///     Initializes a new instance of the <see cref="Upgrader" /> class with the specified migration plan.
     /// </summary>
+    /// <param name="plan">The <see cref="MigrationPlan"/> to use for the upgrade process.</param>
     public Upgrader(MigrationPlan plan) => Plan = plan;
 
     /// <summary>
@@ -31,11 +32,12 @@ public class Upgrader
     public virtual string StateValueKey => Constants.Conventions.Migrations.KeyValuePrefix + Name;
 
     /// <summary>
-    ///     Executes.
+    ///     Executes the migration plan asynchronously using the specified executor, scope provider, and key-value service.
     /// </summary>
-    /// <param name="migrationPlanExecutor"></param>
-    /// <param name="scopeProvider">A scope provider.</param>
-    /// <param name="keyValueService">A key-value service.</param>
+    /// <param name="migrationPlanExecutor">The executor responsible for running the migration plan.</param>
+    /// <param name="scopeProvider">The provider used to manage database transaction scopes.</param>
+    /// <param name="keyValueService">The service used to persist and retrieve key-value pairs for migration state tracking.</param>
+    /// <returns>A task that represents the asynchronous operation, containing the result of the executed migration plan.</returns>
     public async Task<ExecutedMigrationPlan> ExecuteAsync(
         IMigrationPlanExecutor migrationPlanExecutor,
         ICoreScopeProvider scopeProvider,

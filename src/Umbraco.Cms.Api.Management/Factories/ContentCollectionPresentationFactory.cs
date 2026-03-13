@@ -1,7 +1,5 @@
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Content;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
@@ -11,6 +9,10 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
+/// <summary>
+/// Provides a factory for creating presentation models for collections of content items.
+/// This factory is generic and supports various content, collection response, value response, and variant response types.
+/// </summary>
 public abstract class ContentCollectionPresentationFactory<TContent, TCollectionResponseModel, TValueResponseModelBase, TVariantResponseModel>
     where TContent : class, IContentBase
     where TCollectionResponseModel : ContentResponseModelBase<TValueResponseModelBase, TVariantResponseModel>
@@ -31,6 +33,11 @@ public abstract class ContentCollectionPresentationFactory<TContent, TCollection
         _userService = userService;
     }
 
+    /// <summary>
+    /// Asynchronously creates a list of collection response models from the specified paged content collection.
+    /// </summary>
+    /// <param name="contentCollection">The paged model containing the content items and configuration used to generate the collection response models.</param>
+    /// <returns>A task representing the asynchronous operation. The task result contains a list of <typeparamref name="TCollectionResponseModel"/> instances representing the collection items.</returns>
     public async Task<List<TCollectionResponseModel>> CreateCollectionModelAsync(ListViewPagedModel<TContent> contentCollection)
     {
         PagedModel<TContent> collectionItemsResult = contentCollection.Items;

@@ -1,10 +1,8 @@
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Mapping.Content;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Collection;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentBlueprint;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Mapping;
@@ -13,10 +11,19 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Mapping.Document;
 
+/// <summary>
+/// Provides mapping configuration for documents in the Umbraco CMS API management layer.
+/// </summary>
 public class DocumentMapDefinition : ContentMapDefinition<IContent, DocumentValueResponseModel, DocumentVariantResponseModel>, IMapDefinition
 {
     private readonly CommonMapper _commonMapper;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DocumentMapDefinition"/> class, used for mapping document entities in the Umbraco CMS API management layer.
+    /// </summary>
+    /// <param name="propertyEditorCollection">A collection containing all available property editors used for mapping document properties.</param>
+    /// <param name="commonMapper">An instance of <see cref="CommonMapper"/> used for shared mapping logic.</param>
+    /// <param name="dataValueEditorFactory">A factory for creating data value editors required during the mapping process.</param>
     public DocumentMapDefinition(
         PropertyEditorCollection propertyEditorCollection,
         CommonMapper commonMapper,
@@ -24,6 +31,13 @@ public class DocumentMapDefinition : ContentMapDefinition<IContent, DocumentValu
         : base(propertyEditorCollection, dataValueEditorFactory)
         => _commonMapper = commonMapper;
 
+    /// <summary>
+    /// Configures the object mappings for document-related models in the Umbraco CMS API.
+    /// This method registers mappings between <see cref="IContent"/> and various document response models,
+    /// as well as between <see cref="ContentScheduleCollection"/> and <see cref="DocumentResponseModel"/>,
+    /// using the provided <paramref name="mapper"/>.
+    /// </summary>
+    /// <param name="mapper">The <see cref="IUmbracoMapper"/> instance used to define the mappings.</param>
     public void DefineMaps(IUmbracoMapper mapper)
     {
         mapper.Define<IContent, DocumentResponseModel>((_, _) => new DocumentResponseModel(), Map);

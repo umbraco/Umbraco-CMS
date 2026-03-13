@@ -11,10 +11,13 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Dictionary.Tree;
 
+/// <summary>
+/// Controller for managing the root of the dictionary tree in the Umbraco CMS Management API.
+/// </summary>
 [ApiVersion("1.0")]
 public class RootDictionaryTreeController : DictionaryTreeControllerBase
 {
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 20.")]
     public RootDictionaryTreeController(IEntityService entityService, IDictionaryItemService dictionaryItemService)
         : this(
               entityService,
@@ -23,12 +26,28 @@ public class RootDictionaryTreeController : DictionaryTreeControllerBase
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="RootDictionaryTreeController"/> class, which manages the root nodes of the dictionary tree in the Umbraco management API.
+    /// </summary>
+    /// <param name="entityService">Service for managing entities within Umbraco.</param>
+    /// <param name="flagProviders">A collection of providers that supply flags for entities.</param>
+    /// <param name="dictionaryItemService">Service for managing dictionary items.</param>
     [ActivatorUtilitiesConstructor]
     public RootDictionaryTreeController(IEntityService entityService, FlagProviderCollection flagProviders, IDictionaryItemService dictionaryItemService)
         : base(entityService, flagProviders, dictionaryItemService)
     {
     }
 
+    /// <summary>
+    /// Retrieves a paginated collection of dictionary items from the root of the dictionary tree.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="skip">The number of items to skip for pagination. Defaults to 0.</param>
+    /// <param name="take">The maximum number of items to return for pagination. Defaults to 100.</param>
+    /// <returns>
+    /// An <see cref="ActionResult{T}"/> containing a <see cref="PagedViewModel{NamedEntityTreeItemResponseModel}"/>,
+    /// which represents the paginated dictionary items from the root of the tree.
+    /// </returns>
     [HttpGet("root")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<NamedEntityTreeItemResponseModel>), StatusCodes.Status200OK)]

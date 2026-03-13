@@ -1,7 +1,6 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
@@ -9,6 +8,9 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.MediaType.Tree;
 
+/// <summary>
+/// Controller responsible for handling operations at the root of the media type tree in the Umbraco CMS Management API.
+/// </summary>
 [ApiVersion("1.0")]
 public class RootMediaTypeTreeController : MediaTypeTreeControllerBase
 {

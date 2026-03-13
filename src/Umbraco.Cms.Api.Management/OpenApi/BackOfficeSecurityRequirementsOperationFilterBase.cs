@@ -7,6 +7,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.OpenApi;
 
+/// <summary>
+/// Serves as a base class for filters that apply back office security requirements to OpenAPI operations.
+/// </summary>
 public abstract class BackOfficeSecurityRequirementsOperationFilterBase : IOperationFilter
 {
     protected abstract string ApiName { get; }

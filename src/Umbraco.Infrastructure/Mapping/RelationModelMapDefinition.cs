@@ -4,8 +4,15 @@ using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
 namespace Umbraco.Cms.Infrastructure.Mapping;
 
+/// <summary>
+/// Provides mapping configuration for the <see cref="RelationModel"/> entity within the Umbraco infrastructure.
+/// </summary>
 public class RelationModelMapDefinition : IMapDefinition
 {
+    /// <summary>
+    /// Configures object-object mappings for relation models within Umbraco, specifically defining how <see cref="RelationItemDto"/> instances are mapped to <see cref="RelationItemModel"/>.
+    /// </summary>
+    /// <param name="mapper">The Umbraco mapper used to register the mapping definitions.</param>
     public void DefineMaps(IUmbracoMapper mapper)
     {
         mapper.Define<RelationItemDto, RelationItemModel>((source, context) => new RelationItemModel(), Map);

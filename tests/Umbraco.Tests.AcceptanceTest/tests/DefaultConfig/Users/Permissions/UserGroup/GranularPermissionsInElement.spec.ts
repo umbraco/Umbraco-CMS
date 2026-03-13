@@ -17,7 +17,6 @@ const elementText = 'This is test element text';
 
 // User
 const testUser = ConstantHelper.testUserCredentials;
-let testUserCookieAndToken = {cookie: "", accessToken: "", refreshToken: ""};
 
 // User Group
 const userGroupName = 'TestUserGroup';
@@ -37,7 +36,7 @@ test.beforeEach(async ({umbracoApi}) => {
 
 test.afterEach(async ({umbracoApi}) => {
   //Ensure we are logged in to admin
-  await umbracoApi.loginToAdminUser(testUserCookieAndToken.cookie, testUserCookieAndToken.accessToken, testUserCookieAndToken.refreshToken);
+  await umbracoApi.loginToAdminUser();
   await umbracoApi.element.ensureNameNotExists(firstElementName);
   await umbracoApi.element.ensureNameNotExists(secondElementName);
   await umbracoApi.documentType.ensureNameNotExists(elementTypeName);
@@ -49,7 +48,7 @@ test.fixme('can read a specific element with read permission enabled', async ({u
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithReadPermissionForSpecificElement(userGroupName, firstElementId);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
   await umbracoUi.userGroup.goToSection(ConstantHelper.sections.library, false);
 
@@ -67,7 +66,7 @@ test.fixme('can trash a specific element with delete permission enabled', async 
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithDeletePermissionForSpecificElement(userGroupName, firstElementId);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
   await umbracoUi.library.goToSection(ConstantHelper.sections.library, false);
 
@@ -84,7 +83,7 @@ test('can publish a specific element with publish permission enabled', async ({u
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithPublishPermissionForSpecificElement(userGroupName, firstElementId);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
   await umbracoUi.library.goToSection(ConstantHelper.sections.library, false);
 
@@ -106,7 +105,7 @@ test('can unpublish a specific element with unpublish permission enabled', async
   expect(await umbracoApi.element.isElementPublished(secondElementId)).toBeTruthy();
   userGroupId = await umbracoApi.userGroup.createUserGroupWithUnpublishPermissionForSpecificElement(userGroupName, firstElementId);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
   await umbracoUi.library.goToSection(ConstantHelper.sections.library, false);
 
@@ -126,7 +125,7 @@ test.fixme('can update a specific element with update permission enabled', async
   const newElementName = 'UpdatedElement';
   userGroupId = await umbracoApi.userGroup.createUserGroupWithUpdatePermissionForSpecificElement(userGroupName, firstElementId);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
   await umbracoUi.library.goToSection(ConstantHelper.sections.library, false);
 
@@ -151,7 +150,7 @@ test.fixme('can duplicate a specific element with duplicate permission enabled',
   const duplicatedElementName = firstElementName + ' (1)';
   userGroupId = await umbracoApi.userGroup.createUserGroupWithDuplicatePermissionForSpecificElement(userGroupName, firstElementId);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
   await umbracoUi.library.goToSection(ConstantHelper.sections.library, false);
 
@@ -176,7 +175,7 @@ test('can move a specific element with move permission enabled', async ({umbraco
   const elementFolderId = await umbracoApi.element.createDefaultElementFolder(elementFolderName);
   userGroupId = await umbracoApi.userGroup.createUserGroupWithMovePermissionForSpecificElement(userGroupName, firstElementId);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
   await umbracoUi.library.goToSection(ConstantHelper.sections.library, false);
 
@@ -209,7 +208,7 @@ test.fixme('can rollback a specific element with rollback permission enabled', a
   await umbracoApi.element.update(firstElementId, element);
   await umbracoApi.element.publish(firstElementId);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
   await umbracoUi.library.goToSection(ConstantHelper.sections.library, false);
 
@@ -234,7 +233,7 @@ test.fixme('can create element from a specific element with create permission en
   const newElementName = 'NewElement';
   userGroupId = await umbracoApi.userGroup.createUserGroupWithCreatePermissionForSpecificElement(userGroupName, firstElementId);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
   await umbracoUi.library.goToSection(ConstantHelper.sections.library, false);
 

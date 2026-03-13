@@ -13,6 +13,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Security;
 
+/// <summary>
+/// Provides functionality to send email invitations to users, typically for onboarding or granting access to the system.
+/// </summary>
 public class EmailUserInviteSender : IUserInviteSender
 {
     private readonly IEmailSender _emailSender;
@@ -20,6 +23,13 @@ public class EmailUserInviteSender : IUserInviteSender
     private readonly GlobalSettings _globalSettings;
     private readonly SecuritySettings _securitySettings;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Security.EmailUserInviteSender"/> class with the specified dependencies.
+    /// </summary>
+    /// <param name="emailSender">The service used to send emails.</param>
+    /// <param name="localizedTextService">The service used for retrieving localized text.</param>
+    /// <param name="globalSettings">The global settings options.</param>
+    /// <param name="securitySettings">The security settings options.</param>
     public EmailUserInviteSender(
         IEmailSender emailSender,
         ILocalizedTextService localizedTextService,
@@ -32,6 +42,11 @@ public class EmailUserInviteSender : IUserInviteSender
         _securitySettings = securitySettings.Value;
     }
 
+    /// <summary>
+    /// Asynchronously sends an invitation email to a user using the details provided in the <paramref name="invite"/> parameter.
+    /// </summary>
+    /// <param name="invite">A <see cref="UserInvitationMessage"/> containing the recipient, sender, invitation message, and invitation URI.</param>
+    /// <returns>A <see cref="Task"/> representing the asynchronous operation of sending the invitation email.</returns>
     public async Task InviteUser(UserInvitationMessage invite)
     {
         CultureInfo recipientCulture = UmbracoUserExtensions.GetUserCulture(
@@ -73,5 +88,9 @@ public class EmailUserInviteSender : IUserInviteSender
         await _emailSender.SendAsync(message, Constants.Web.EmailTypes.UserInvite, true, _securitySettings.UserInviteEmailExpiry);
     }
 
+    /// <summary>
+    /// Determines whether the system can send user invite emails.
+    /// </summary>
+    /// <returns><c>true</c> if invites can be sent; otherwise, <c>false</c>.</returns>
     public bool CanSendInvites() => _emailSender.CanSendRequiredEmail();
 }

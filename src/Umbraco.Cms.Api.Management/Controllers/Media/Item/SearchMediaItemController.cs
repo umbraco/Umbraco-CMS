@@ -1,11 +1,9 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.Media.Item;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
@@ -13,6 +11,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Media.Item;
 
+/// <summary>
+/// Provides API endpoints for searching and retrieving media items.
+/// </summary>
 [ApiVersion("1.0")]
 public class SearchMediaItemController : MediaItemControllerBase
 {
@@ -20,6 +21,12 @@ public class SearchMediaItemController : MediaItemControllerBase
     private readonly IMediaPresentationFactory _mediaPresentationFactory;
     private readonly IDataTypeService _dataTypeService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SearchMediaItemController"/> class, which handles search operations for media items.
+    /// </summary>
+    /// <param name="indexedEntitySearchService">Service used to perform indexed searches on entities.</param>
+    /// <param name="mediaPresentationFactory">Factory for creating media presentation models.</param>
+    /// <param name="dataTypeService">Service for accessing data type information.</param>
     public SearchMediaItemController(
         IIndexedEntitySearchService indexedEntitySearchService,
         IMediaPresentationFactory mediaPresentationFactory,
@@ -30,6 +37,18 @@ public class SearchMediaItemController : MediaItemControllerBase
         _dataTypeService = dataTypeService;
     }
 
+    /// <summary>
+    /// Searches for media items under a specified parent node, filtered by allowed media types.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="query">The search query string.</param>
+    /// <param name="trashed">If set, specifies whether to include trashed items in the search.</param>
+    /// <param name="culture">The culture to filter the search by, if any.</param>
+    /// <param name="skip">The number of items to skip (for paging).</param>
+    /// <param name="take">The maximum number of items to return (for paging).</param>
+    /// <param name="parentId">The ID of the parent node to search under, if specified.</param>
+    /// <param name="allowedMediaTypes">A list of allowed media type IDs to filter the results, if specified.</param>
+    /// <returns>An <see cref="IActionResult"/> containing the filtered search results.</returns>
     [HttpGet("search")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedModel<MediaItemResponseModel>), StatusCodes.Status200OK)]

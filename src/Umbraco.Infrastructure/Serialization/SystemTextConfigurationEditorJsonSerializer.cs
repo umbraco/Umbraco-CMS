@@ -1,8 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
-using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 
@@ -16,6 +14,7 @@ public sealed class SystemTextConfigurationEditorJsonSerializer : SystemTextJson
     /// <summary>
     /// Initializes a new instance of the <see cref="SystemTextConfigurationEditorJsonSerializer" /> class.
     /// </summary>
+    /// <param name="jsonSerializerEncoderFactory">Factory used to create JSON serializer encoders.</param>
     public SystemTextConfigurationEditorJsonSerializer(IJsonSerializerEncoderFactory jsonSerializerEncoderFactory)
         : base(jsonSerializerEncoderFactory)
         => _jsonSerializerOptions = new JsonSerializerOptions()

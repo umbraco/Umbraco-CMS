@@ -8,6 +8,9 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DataType.Tree;
 
+/// <summary>
+/// Controller responsible for handling operations related to the ancestors tree structure of data types.
+/// </summary>
 [ApiVersion("1.0")]
 public class AncestorsDataTypeTreeController : DataTypeTreeControllerBase
 {

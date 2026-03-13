@@ -6,6 +6,10 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
+/// <summary>
+/// Provides validation logic for files uploaded temporarily via property editors in Umbraco.
+/// Ensures that uploaded files meet required criteria before being processed or stored permanently.
+/// </summary>
 public class TemporaryFileUploadValidator : IValueValidator
 {
     private readonly GetContentSettings _getContentSettings;
@@ -21,6 +25,13 @@ public class TemporaryFileUploadValidator : IValueValidator
 
     public delegate bool ValidateFileType(string extension, object? dataTypeConfiguration);
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="TemporaryFileUploadValidator"/> class.
+    /// </summary>
+    /// <param name="getContentSettings">A delegate of type <see cref="GetContentSettings"/> used to retrieve content settings.</param>
+    /// <param name="parseTemporaryFileKey">A delegate of type <see cref="ParseTemporaryFileKey"/> used to parse the temporary file key.</param>
+    /// <param name="getTemporaryFileModel">A delegate of type <see cref="GetTemporaryFileModel"/> used to retrieve the temporary file model.</param>
+    /// <param name="validateFileType">An optional delegate of type <see cref="ValidateFileType"/> used to validate the file type. If <c>null</c>, file type validation is not performed.</param>
     public TemporaryFileUploadValidator(
         GetContentSettings getContentSettings,
         ParseTemporaryFileKey parseTemporaryFileKey,
@@ -33,6 +44,16 @@ public class TemporaryFileUploadValidator : IValueValidator
         _validateFileType = validateFileType;
     }
 
+    /// <summary>
+    /// Validates a temporary file upload by checking if the file exists and whether its type is allowed based on the provided configuration.
+    /// </summary>
+    /// <param name="value">The value representing the temporary file key, typically a <see cref="Guid"/> or string convertible to a GUID.</param>
+    /// <param name="valueType">The type of the value, if specified; may be used for additional validation logic.</param>
+    /// <param name="dataTypeConfiguration">The configuration object for the data type, used to determine allowed file types.</param>
+    /// <param name="validationContext">The context for property validation, providing additional information about the validation request.</param>
+    /// <returns>
+    /// An <see cref="IEnumerable{ValidationResult}"/> containing validation errors if the file does not exist or its type is not allowed; otherwise, an empty sequence.
+    /// </returns>
     public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration, PropertyValidationContext validationContext)
     {
         Guid? temporaryFileKey = _parseTemporaryFileKey(value);

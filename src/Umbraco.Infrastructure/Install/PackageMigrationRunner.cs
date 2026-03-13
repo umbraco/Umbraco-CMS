@@ -30,6 +30,17 @@ public class PackageMigrationRunner
     private readonly IProfilingLogger _profilingLogger;
     private readonly ICoreScopeProvider _scopeProvider;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PackageMigrationRunner"/> class, responsible for running package migrations during installation or upgrade.
+    /// </summary>
+    /// <param name="profilingLogger">The logger used for profiling and diagnostic output during migration execution.</param>
+    /// <param name="scopeProvider">Provides database transaction scopes for migration operations.</param>
+    /// <param name="pendingPackageMigrations">Tracks and manages migrations that are pending execution for installed packages.</param>
+    /// <param name="packageMigrationPlans">A collection of migration plans that define the steps required for package upgrades or installations.</param>
+    /// <param name="migrationPlanExecutor">Executes the defined migration plans.</param>
+    /// <param name="keyValueService">Service for storing and retrieving key-value pairs, often used for migration state tracking.</param>
+    /// <param name="eventAggregator">Publishes and subscribes to events related to migration progress and completion.</param>
+    /// <param name="logger">A typed logger instance for logging migration runner activity.</param>
     public PackageMigrationRunner(
         IProfilingLogger profilingLogger,
         ICoreScopeProvider scopeProvider,
@@ -69,8 +80,12 @@ public class PackageMigrationRunner
     }
 
     /// <summary>
-    ///     Checks if all executed package migrations succeeded for a package.
+    ///     Runs any pending migrations for the specified package and checks if all executed package migrations succeeded.
     /// </summary>
+    /// <param name="packageName">The name of the package to run migrations for.</param>
+    /// <returns>
+    ///     A <see cref="Task"/> representing the asynchronous operation, containing an <see cref="Attempt{TResult, TStatus}"/> where <c>TResult</c> is a <see cref="bool"/> indicating success or failure, and <c>TStatus</c> is a <see cref="PackageMigrationOperationStatus"/> describing the result of the migration operation.
+    /// </returns>
     public async Task<Attempt<bool, PackageMigrationOperationStatus>> RunPendingPackageMigrations(string packageName)
     {
         // Check if there are any migrations (note that the key for _packageMigrationPlans is the migration plan name, not the package name).

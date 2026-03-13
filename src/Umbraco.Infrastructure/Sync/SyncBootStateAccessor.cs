@@ -1,13 +1,14 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Infrastructure.Sync;
 
+/// <summary>
+/// Provides access to the current synchronization boot state of the application.
+/// </summary>
 public class SyncBootStateAccessor : ISyncBootStateAccessor
 {
     private readonly ICacheInstructionService _cacheInstructionService;
@@ -19,6 +20,13 @@ public class SyncBootStateAccessor : ISyncBootStateAccessor
     private object? _syncBootStateLock;
     private bool _syncBootStateReady;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SyncBootStateAccessor"/> class.
+    /// </summary>
+    /// <param name="logger">The <see cref="ILogger{SyncBootStateAccessor}"/> used for logging operations.</param>
+    /// <param name="globalSettings">The <see cref="IOptionsMonitor{GlobalSettings}"/> providing access to global settings.</param>
+    /// <param name="cacheInstructionService">The <see cref="ICacheInstructionService"/> responsible for cache synchronization instructions.</param>
+    /// <param name="lastSyncedManager">The <see cref="ILastSyncedManager"/> managing the last synchronization state.</param>
     public SyncBootStateAccessor(
         ILogger<SyncBootStateAccessor> logger,
         IOptionsMonitor<GlobalSettings> globalSettings,
@@ -33,6 +41,10 @@ public class SyncBootStateAccessor : ISyncBootStateAccessor
         globalSettings.OnChange(x => _globalSettings = x);
     }
 
+    /// <summary>
+    /// Returns the current synchronization boot state, initializing it if it has not already been created.
+    /// </summary>
+    /// <returns>The <see cref="Umbraco.Cms.Infrastructure.Sync.SyncBootState"/> representing the current synchronization boot state.</returns>
     public SyncBootState GetSyncBootState()
         => LazyInitializer.EnsureInitialized(
             ref _syncBootState,

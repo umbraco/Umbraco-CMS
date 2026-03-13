@@ -18,6 +18,20 @@ public class BatchedDatabaseServerMessenger : DatabaseServerMessenger
 {
     private readonly IRequestCache _requestCache;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="BatchedDatabaseServerMessenger"/> class.
+    /// </summary>
+    /// <param name="mainDom">The <see cref="IMainDom"/> instance managing main domain locking.</param>
+    /// <param name="cacheRefreshers">A collection of cache refresher implementations used to synchronize cache across servers.</param>
+    /// <param name="logger">The logger used for diagnostic and operational logging.</param>
+    /// <param name="syncBootStateAccessor">Accessor for the synchronization boot state.</param>
+    /// <param name="hostingEnvironment">Provides information about the hosting environment.</param>
+    /// <param name="cacheInstructionService">Service for managing cache instructions in the database.</param>
+    /// <param name="jsonSerializer">The serializer used for JSON operations.</param>
+    /// <param name="requestCache">Request-scoped cache for storing temporary data.</param>
+    /// <param name="lastSyncedManager">Manages the state of the last synchronization operation.</param>
+    /// <param name="globalSettings">Monitors and provides access to global settings.</param>
+    /// <param name="machineInfoFactory">Factory for creating machine information instances.</param>
     public BatchedDatabaseServerMessenger(
         IMainDom mainDom,
         CacheRefresherCollection cacheRefreshers,

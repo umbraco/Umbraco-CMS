@@ -12,6 +12,10 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Dictionary.Tree;
 
+/// <summary>
+/// Serves as the base controller for operations related to dictionary tree structures in the Umbraco CMS Management API.
+/// Provides common functionality for derived controllers managing dictionary items in a hierarchical format.
+/// </summary>
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Tree}/dictionary")]
 [ApiExplorerSettings(GroupName = "Dictionary")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessDictionaryOrTemplates)]
@@ -20,8 +24,8 @@ namespace Umbraco.Cms.Api.Management.Controllers.Dictionary.Tree;
 public class DictionaryTreeControllerBase : NamedEntityTreeControllerBase<NamedEntityTreeItemResponseModel>
 {
     public DictionaryTreeControllerBase(
-        IEntityService entityService,
-        FlagProviderCollection flagProviders,
+        IEntityService entityService, 
+        FlagProviderCollection flagProviders, 
         IDictionaryItemService dictionaryItemService)
         : base(entityService, flagProviders) =>
         DictionaryItemService = dictionaryItemService;

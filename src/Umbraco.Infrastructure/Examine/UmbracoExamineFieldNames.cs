@@ -2,6 +2,9 @@ using Examine;
 
 namespace Umbraco.Cms.Infrastructure.Examine;
 
+/// <summary>
+/// Provides constant field names used by Umbraco for indexing and searching content with Examine.
+/// </summary>
 public static class UmbracoExamineFieldNames
 {
     /// <summary>

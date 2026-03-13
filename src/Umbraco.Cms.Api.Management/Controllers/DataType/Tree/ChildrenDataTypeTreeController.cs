@@ -9,6 +9,9 @@ using Umbraco.Cms.Api.Management.Services.Flags;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DataType.Tree;
 
+/// <summary>
+/// Controller responsible for handling operations related to the child nodes of the data type tree in the management API.
+/// </summary>
 [ApiVersion("1.0")]
 public class ChildrenDataTypeTreeController : DataTypeTreeControllerBase
 {
@@ -17,6 +20,15 @@ public class ChildrenDataTypeTreeController : DataTypeTreeControllerBase
     {
     }
 
+    /// <summary>
+    /// Retrieves a paginated collection of data type tree items that are children of the specified parent ID.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="parentId">The unique identifier of the parent data type tree item whose children are to be retrieved.</param>
+    /// <param name="skip">The number of items to skip before starting to collect the result set (used for pagination).</param>
+    /// <param name="take">The maximum number of items to return (used for pagination).</param>
+    /// <param name="foldersOnly">If set to <c>true</c>, only folder items will be included in the results.</param>
+    /// <returns>A <see cref="PagedViewModel{T}"/> containing <see cref="DataTypeTreeItemResponseModel"/> instances representing the child items.</returns>
     [HttpGet("children")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<DataTypeTreeItemResponseModel>), StatusCodes.Status200OK)]
