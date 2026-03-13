@@ -8,6 +8,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Content;
 
+/// <summary>
+/// Serves as the base controller for content management operations in the Umbraco CMS API, providing shared functionality for content-related controllers.
+/// </summary>
 public abstract class ContentControllerBase : ManagementApiControllerBase
 {
     protected IActionResult ContentEditingOperationStatusResult(ContentEditingOperationStatus status)

@@ -12,12 +12,23 @@ internal sealed class BackOfficeSecureDataFormat : ISecureDataFormat<Authenticat
     private readonly TimeSpan _loginTimeout;
     private readonly ISecureDataFormat<AuthenticationTicket> _ticketDataFormat;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="BackOfficeSecureDataFormat"/> class with the specified login timeout and authentication ticket data format.
+    /// </summary>
+    /// <param name="loginTimeout">The duration for which a login session remains valid.</param>
+    /// <param name="ticketDataFormat">The secure data format used to serialize and deserialize authentication tickets.</param>
     public BackOfficeSecureDataFormat(TimeSpan loginTimeout, ISecureDataFormat<AuthenticationTicket> ticketDataFormat)
     {
         _loginTimeout = loginTimeout;
         _ticketDataFormat = ticketDataFormat ?? throw new ArgumentNullException(nameof(ticketDataFormat));
     }
 
+    /// <summary>
+    /// Protects the specified authentication ticket by creating a secured, serialized string representation.
+    /// </summary>
+    /// <param name="data">The authentication ticket to protect.</param>
+    /// <param name="purpose">An optional purpose string that can be used to provide additional context for the protection operation.</param>
+    /// <returns>A protected string that represents the secured authentication ticket.</returns>
     public string Protect(AuthenticationTicket data, string? purpose)
     {
         // create a new ticket based on the passed in tickets details, however, we'll adjust the expires utc based on the specified timeout mins
@@ -36,9 +47,20 @@ internal sealed class BackOfficeSecureDataFormat : ISecureDataFormat<Authenticat
         return _ticketDataFormat.Protect(ticket);
     }
 
+    /// <summary>
+    /// Protects the specified authentication ticket by creating a secured string representation.
+    /// The method may adjust the ticket's expiration time based on the configured login timeout before protecting it.
+    /// </summary>
+    /// <param name="data">The authentication ticket to protect.</param>
+    /// <returns>A protected string representing the authentication ticket.</returns>
     public string Protect(AuthenticationTicket data) => Protect(data, string.Empty);
 
 
+    /// <summary>
+    /// Unprotects the specified protected text and returns the corresponding <see cref="AuthenticationTicket"/>.
+    /// </summary>
+    /// <param name="protectedText">The protected text to unprotect.</param>
+    /// <returns>The <see cref="AuthenticationTicket"/> if unprotection is successful; otherwise, null.</returns>
     public AuthenticationTicket? Unprotect(string? protectedText) => Unprotect(protectedText, string.Empty);
 
     /// <summary>

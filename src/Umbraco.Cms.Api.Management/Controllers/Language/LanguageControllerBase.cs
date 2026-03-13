@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Api.Management.Routing;
@@ -7,6 +7,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Language;
 
+/// <summary>
+/// Serves as the base controller for API endpoints that manage language-related operations in the Umbraco CMS.
+/// </summary>
 [VersionedApiBackOfficeRoute(Constants.UdiEntityType.Language)]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Language))]
 public abstract class LanguageControllerBase : ManagementApiControllerBase

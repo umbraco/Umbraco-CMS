@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -16,6 +16,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.User;
 
+/// <summary>
+/// API controller responsible for handling operations related to updating user information in the management system.
+/// </summary>
 [ApiVersion("1.0")]
 public class UpdateUserController : UserControllerBase
 {
@@ -24,6 +27,13 @@ public class UpdateUserController : UserControllerBase
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly IAuthorizationService _authorizationService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UpdateUserController"/> class, which manages user update operations in the Umbraco backoffice API.
+    /// </summary>
+    /// <param name="userService">Service for managing user data and operations.</param>
+    /// <param name="userPresentationFactory">Factory for creating user presentation models.</param>
+    /// <param name="backOfficeSecurityAccessor">Accessor for back office security context.</param>
+    /// <param name="authorizationService">Service for handling authorization checks.</param>
     public UpdateUserController(
         IUserService userService,
         IUserPresentationFactory userPresentationFactory,
@@ -36,6 +46,13 @@ public class UpdateUserController : UserControllerBase
         _authorizationService = authorizationService;
     }
 
+    /// <summary>
+    /// Updates the specified user with new details provided in the request model.
+    /// </summary>
+    /// <param name="cancellationToken">Token to monitor for cancellation requests.</param>
+    /// <param name="id">The unique identifier of the user to update.</param>
+    /// <param name="model">The request model containing updated user information.</param>
+    /// <returns>An <see cref="IActionResult"/> indicating the outcome of the update operation.</returns>
     [HttpPut("{id:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
