@@ -217,7 +217,10 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 				console.error('contentError', [error.message, error.cause]);
 			},
 			onUpdate: ({ editor }) => {
-				this.#value = editor.getHTML();
+				// Strip trailing empty paragraphs added by the TrailingNode extension.
+				// These are needed for editing (cursor positioning after block elements)
+				// but should not be persisted in the markup output.
+				this.#value = editor.getHTML().replace(/(<p><\/p>)+$/, '');
 				this._runValidators();
 				this.dispatchEvent(new UmbChangeEvent());
 			},

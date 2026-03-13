@@ -10,10 +10,14 @@ export default class UmbTiptapToolbarSourceEditorExtensionApi extends UmbTiptapT
 	override async execute(editor?: Editor) {
 		if (!editor) return;
 
+		// Strip trailing empty paragraphs added by the TrailingNode extension,
+		// so the source view reflects the actual persisted markup.
+		const content = editor.getHTML().replace(/(<p><\/p>)+$/, '');
+
 		const data = await umbOpenModal(this, UMB_CODE_EDITOR_MODAL, {
 			data: {
 				headline: this.#localize.term('tiptap_sourceCodeEdit'),
-				content: editor?.getHTML() ?? '',
+				content,
 				language: 'html',
 				formatOnLoad: true,
 			},
