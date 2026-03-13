@@ -16,21 +16,34 @@ internal sealed class TagDto
     private const string GroupColumnName = "group";
     private const string TextColumnName = "tag";
 
+    /// <summary>
+    /// Gets or sets the unique identifier for the tag.
+    /// </summary>
     [Column(PrimaryKeyColumnName)]
     [PrimaryKeyColumn]
     public int Id { get; set; }
 
+    /// <summary>
+    /// Gets or sets the name of the group to which the tag belongs.
+    /// This is used to categorize tags within the system.
+    /// </summary>
     [Column(GroupColumnName)]
     [Length(100)]
     [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_languageId_group", ForColumns = $"{LanguageIdColumnName},{GroupColumnName}", IncludeColumns = $"{PrimaryKeyColumnName},{TextColumnName}")]
     public string Group { get; set; } = null!;
 
+    /// <summary>
+    /// Gets or sets the language identifier associated with the tag.
+    /// </summary>
     [Column(LanguageIdColumnName)]
     [ForeignKey(typeof(LanguageDto))]
     [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_LanguageId")]
     [NullSetting(NullSetting = NullSettings.Null)]
     public int? LanguageId { get; set; }
 
+    /// <summary>
+    /// Gets or sets the text value of the tag.
+    /// </summary>
     [Column(TextColumnName)]
     [Length(200)]
     [Index(IndexTypes.UniqueNonClustered, ForColumns = $"{GroupColumnName},{TextColumnName},{LanguageIdColumnName}", Name = "IX_cmsTags")]
@@ -40,7 +53,10 @@ internal sealed class TagDto
     // [Length(301)] // de-normalized "{group}/{tag}"
     // public string Key { get; set; }
 
-    // queries result column
+    /// <summary>
+    /// Gets or sets the count of nodes associated with the tag.
+    /// </summary>
+    /// <remarks>queries result column</remarks>
     [ResultColumn("NodeCount")]
     public int NodeCount { get; set; }
 }

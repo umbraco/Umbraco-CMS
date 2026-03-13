@@ -25,6 +25,19 @@ internal sealed class MemberTypeRepository : ContentTypeRepositoryBase<IMemberTy
     private readonly IRepositoryCacheVersionService _repositoryCacheVersionService;
     private readonly ICacheSyncService _cacheSyncService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.MemberTypeRepository"/> class,
+    /// which is responsible for managing member type persistence in the Umbraco CMS.
+    /// </summary>
+    /// <param name="scopeAccessor">Provides access to the current database scope for transactional operations.</param>
+    /// <param name="cache">The application-level caches used for optimizing repository operations.</param>
+    /// <param name="logger">The logger used for logging repository activity and errors.</param>
+    /// <param name="commonRepository">A repository for common content type operations shared across repositories.</param>
+    /// <param name="languageRepository">Repository for accessing language information.</param>
+    /// <param name="shortStringHelper">Helper for generating and manipulating short strings, such as aliases.</param>
+    /// <param name="repositoryCacheVersionService">Service for managing cache versioning within the repository.</param>
+    /// <param name="idKeyMap">Maps between integer IDs and GUID keys for entities.</param>
+    /// <param name="cacheSyncService">Service for synchronizing cache across distributed environments.</param>
     public MemberTypeRepository(
         IScopeAccessor scopeAccessor,
         AppCaches cache,

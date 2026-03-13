@@ -11,12 +11,20 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Element.References;
 
+/// <summary>
+/// API controller responsible for retrieving tracked references for a specific element.
+/// </summary>
 [ApiVersion("1.0")]
 public class ReferencedByElementController : ElementControllerBase
 {
     private readonly ITrackedReferencesService _trackedReferencesService;
     private readonly IRelationTypePresentationFactory _relationTypePresentationFactory;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ReferencedByElementController"/> class.
+    /// </summary>
+    /// <param name="trackedReferencesService">Service for tracking content references.</param>
+    /// <param name="relationTypePresentationFactory">Factory for creating relation type presentation models.</param>
     public ReferencedByElementController(
         ITrackedReferencesService trackedReferencesService,
         IRelationTypePresentationFactory relationTypePresentationFactory)

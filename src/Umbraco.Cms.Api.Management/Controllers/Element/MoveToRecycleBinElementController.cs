@@ -13,6 +13,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Element;
 
+/// <summary>
+/// API controller responsible for handling move-to-recycle-bin operations on elements in the Umbraco CMS.
+/// </summary>
 [ApiVersion("1.0")]
 public class MoveToRecycleBinElementController : ElementControllerBase
 {
@@ -20,6 +23,12 @@ public class MoveToRecycleBinElementController : ElementControllerBase
     private readonly IElementEditingService _elementEditingService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MoveToRecycleBinElementController"/> class.
+    /// </summary>
+    /// <param name="authorizationService">Service used to authorize recycle bin operations.</param>
+    /// <param name="elementEditingService">Service responsible for element editing operations.</param>
+    /// <param name="backOfficeSecurityAccessor">Accessor for back office security context.</param>
     public MoveToRecycleBinElementController(
         IAuthorizationService authorizationService,
         IElementEditingService elementEditingService,
@@ -30,6 +39,12 @@ public class MoveToRecycleBinElementController : ElementControllerBase
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
+    /// <summary>
+    /// Moves an element identified by the specified unique identifier to the recycle bin.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="id">The unique identifier of the element to move to the recycle bin.</param>
+    /// <returns>An <see cref="IActionResult"/> representing the outcome of the operation.</returns>
     [HttpPut("{id:guid}/move-to-recycle-bin")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]

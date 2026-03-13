@@ -11,6 +11,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Mappers;
 [MapperFor(typeof(IMemberType))]
 public sealed class MemberTypeMapper : BaseMapper
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MemberTypeMapper"/> class.
+    /// </summary>
+    /// <param name="sqlContext">A lazily-initialized <see cref="ISqlContext"/> providing SQL context for mapping operations.</param>
+    /// <param name="maps">The <see cref="MapperConfigurationStore"/> containing configuration for entity mappers.</param>
     public MemberTypeMapper(Lazy<ISqlContext> sqlContext, MapperConfigurationStore maps)
         : base(sqlContext, maps)
     {

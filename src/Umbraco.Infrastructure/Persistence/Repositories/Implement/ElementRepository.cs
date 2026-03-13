@@ -21,27 +21,24 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 internal class ElementRepository : PublishableContentRepositoryBase<IElement, ElementRepository, ElementDto, ElementVersionDto, ElementCultureVariationDto>, IElementRepository
 {
     /// <summary>
-    ///     Constructor
+    /// Initializes a new instance of the <see cref="ElementRepository"/> class.
     /// </summary>
-    /// <param name="scopeAccessor"></param>
-    /// <param name="appCaches"></param>
-    /// <param name="logger"></param>
-    /// <param name="loggerFactory"></param>
-    /// <param name="contentTypeRepository"></param>
-    /// <param name="tagRepository"></param>
-    /// <param name="languageRepository"></param>
-    /// <param name="relationRepository"></param>
-    /// <param name="relationTypeRepository"></param>
-    /// <param name="dataValueReferenceFactories"></param>
-    /// <param name="dataTypeService"></param>
-    /// <param name="serializer"></param>
-    /// <param name="eventAggregator"></param>
-    /// <param name="propertyEditors">
-    ///     Lazy property value collection - must be lazy because we have a circular dependency since some property editors
-    ///     require services, yet these services require property editors
-    /// </param>
-    /// <param name="repositoryCacheVersionService"></param>
-    /// <param name="cacheSyncService"></param>
+    /// <param name="scopeAccessor">Provides access to the current database scope for transactional operations.</param>
+    /// <param name="appCaches">The application-level cache helpers for performance optimization.</param>
+    /// <param name="logger">The logger instance for logging repository operations.</param>
+    /// <param name="loggerFactory">Factory for creating logger instances.</param>
+    /// <param name="contentTypeRepository">Repository for accessing content type definitions.</param>
+    /// <param name="tagRepository">Repository for managing tags associated with elements.</param>
+    /// <param name="languageRepository">Repository for managing language entities.</param>
+    /// <param name="relationRepository">Repository for managing entity relations.</param>
+    /// <param name="relationTypeRepository">Repository for managing relation types.</param>
+    /// <param name="propertyEditors">Collection of property editors used for element properties.</param>
+    /// <param name="dataValueReferenceFactories">Collection of factories for resolving data value references.</param>
+    /// <param name="dataTypeService">Service for managing data types.</param>
+    /// <param name="serializer">JSON serializer for serializing and deserializing data.</param>
+    /// <param name="eventAggregator">Publishes and subscribes to domain events.</param>
+    /// <param name="repositoryCacheVersionService">Service for managing repository cache versions.</param>
+    /// <param name="cacheSyncService">Service for synchronizing cache across distributed environments.</param>
     public ElementRepository(
         IScopeAccessor scopeAccessor,
         AppCaches appCaches,
@@ -114,7 +111,12 @@ internal class ElementRepository : PublishableContentRepositoryBase<IElement, El
 
     #region Content Repository
 
-    // NOTE: Elements cannot have unpublished parents
+    /// <summary>
+    /// Determines whether the specified element and all its ancestors in the content path are published.
+    /// Elements cannot have unpublished parents, so this simply checks the element itself.
+    /// </summary>
+    /// <param name="content">The element to check.</param>
+    /// <returns><c>true</c> if the element is not trashed and is published; otherwise, <c>false</c>.</returns>
     public bool IsPathPublished(IElement? content)
         => content is { Trashed: false, Published: true };
 
@@ -122,9 +124,14 @@ internal class ElementRepository : PublishableContentRepositoryBase<IElement, El
 
     #region Recycle Bin
 
-
+    /// <summary>
+    /// Gets the identifier for the element Recycle Bin in Umbraco.
+    /// </summary>
     public override int RecycleBinId => Constants.System.RecycleBinElement;
 
+    /// <summary>
+    /// Gets the cache key for the element Recycle Bin.
+    /// </summary>
     protected override string RecycleBinCacheKey => CacheKeys.ElementRecycleBinCacheKey;
 
     #endregion

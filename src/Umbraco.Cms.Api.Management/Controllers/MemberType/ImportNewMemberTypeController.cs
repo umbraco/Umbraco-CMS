@@ -12,6 +12,9 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.MemberType;
 
+/// <summary>
+/// Provides API endpoints for importing new member types into the system.
+/// </summary>
 [ApiVersion("1.0")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessMemberTypes)]
 public class ImportNewMemberTypeController : MemberTypeControllerBase
@@ -19,6 +22,11 @@ public class ImportNewMemberTypeController : MemberTypeControllerBase
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly IMemberTypeImportService _memberTypeImportService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ImportNewMemberTypeController"/> class, used to handle import operations for member types.
+    /// </summary>
+    /// <param name="backOfficeSecurityAccessor">Provides access to back office security features.</param>
+    /// <param name="memberTypeImportService">Service responsible for importing member types.</param>
     public ImportNewMemberTypeController(
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
         IMemberTypeImportService memberTypeImportService)
@@ -27,6 +35,14 @@ public class ImportNewMemberTypeController : MemberTypeControllerBase
         _memberTypeImportService = memberTypeImportService;
     }
 
+    /// <summary>
+    /// Imports a new member type from a file provided in the request model.
+    /// </summary>
+    /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete.</param>
+    /// <param name="model">The <see cref="ImportMemberTypeRequestModel"/> containing the file information for the member type to import.</param>
+    /// <returns>
+    /// An <see cref="IActionResult"/> that returns <c>201 Created</c> with the imported member type's key on success, or a <c>400 Bad Request</c> or <c>404 Not Found</c> with problem details if the import fails.
+    /// </returns>
     [HttpPost("import")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status201Created)]

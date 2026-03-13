@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Nodes;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Cache.PropertyEditors;
@@ -17,6 +18,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Infrastructure.Extensions;
+using Umbraco.Cms.Infrastructure.PropertyEditors;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
@@ -28,7 +30,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     Constants.PropertyEditors.Aliases.RichText,
     ValueType = ValueTypes.Text,
     ValueEditorIsReusable = true)]
-public class RichTextPropertyEditor : DataEditor
+public class RichTextPropertyEditor : DataEditor, IValueSchemaProvider
 {
     private readonly IIOHelper _ioHelper;
     private readonly IRichTextPropertyIndexValueFactory _richTextPropertyIndexValueFactory;
@@ -36,8 +38,11 @@ public class RichTextPropertyEditor : DataEditor
     /// <summary>
     /// Initializes a new instance of the <see cref="RichTextPropertyEditor"/> class.
     /// </summary>
+    /// <param name="dataValueEditorFactory">Factory used to create data value editors for property values.</param>
+    /// <param name="ioHelper">Helper for IO operations, such as resolving file paths.</param>
+    /// <param name="richTextPropertyIndexValueFactory">Factory for creating index values specific to rich text properties.</param>
     /// <remarks>
-    /// The constructor will setup the property editor based on the attribute if one is found.
+    /// The constructor will set up the property editor based on the attribute if one is found.
     /// </remarks>
     public RichTextPropertyEditor(
         IDataValueEditorFactory dataValueEditorFactory,
@@ -51,9 +56,85 @@ public class RichTextPropertyEditor : DataEditor
         SupportsReadOnly = true;
     }
 
+    /// <summary>
+    /// Gets the <see cref="IPropertyIndexValueFactory"/> instance used to generate index values for properties edited with the rich text property editor.
+    /// This factory is used to extract and format property values for search indexing.
+    /// </summary>
     public override IPropertyIndexValueFactory PropertyIndexValueFactory => _richTextPropertyIndexValueFactory;
 
+    /// <summary>
+    /// Gets a value indicating whether this property editor supports configurable elements. Always returns <c>true</c> for the rich text property editor.
+    /// </summary>
     public override bool SupportsConfigurableElements => true;
+
+    /// <inheritdoc />
+    public Type? GetValueType(object? configuration) => typeof(RichTextEditorValue);
+
+    /// <inheritdoc />
+    public JsonObject? GetValueSchema(object? configuration)
+    {
+        var config = configuration as RichTextConfiguration;
+
+        // Build schemas using helper
+        JsonObject layoutItemSchema = BlockJsonSchemaHelper.CreateBaseLayoutItemSchema();
+        JsonObject contentDataItemSchema = BlockJsonSchemaHelper.CreateContentDataSchema(config?.Blocks);
+        JsonObject settingsDataItemSchema = BlockJsonSchemaHelper.CreateSettingsDataSchema(config?.Blocks);
+        JsonObject exposeItemSchema = BlockJsonSchemaHelper.CreateExposeItemSchema();
+
+        // Build blocks schema
+        var blocksSchema = new JsonObject
+        {
+            ["type"] = new JsonArray("object", "null"),
+            ["properties"] = new JsonObject
+            {
+                ["layout"] = new JsonObject
+                {
+                    ["type"] = "object",
+                    ["properties"] = new JsonObject
+                    {
+                        [Constants.PropertyEditors.Aliases.RichText] = new JsonObject
+                        {
+                            ["type"] = "array",
+                            ["items"] = layoutItemSchema,
+                        },
+                    },
+                },
+                ["contentData"] = new JsonObject
+                {
+                    ["type"] = "array",
+                    ["items"] = contentDataItemSchema,
+                },
+                ["settingsData"] = new JsonObject
+                {
+                    ["type"] = "array",
+                    ["items"] = settingsDataItemSchema,
+                },
+                ["expose"] = new JsonObject
+                {
+                    ["type"] = "array",
+                    ["items"] = exposeItemSchema,
+                },
+            },
+        };
+
+        // Build main schema
+        return new JsonObject
+        {
+            ["$schema"] = "https://json-schema.org/draft/2020-12/schema",
+            ["type"] = new JsonArray("object", "null"),
+            ["properties"] = new JsonObject
+            {
+                ["markup"] = new JsonObject
+                {
+                    ["type"] = "string",
+                    ["description"] = "HTML markup content",
+                },
+                ["blocks"] = blocksSchema,
+            },
+            ["required"] = new JsonArray("markup"),
+            ["description"] = "Rich text editor value with HTML markup and optional blocks",
+        };
+    }
 
     /// <inheritdoc />
     public override bool CanMergePartialPropertyValues(IPropertyType propertyType) => propertyType.VariesByCulture() is false;
@@ -65,6 +146,14 @@ public class RichTextPropertyEditor : DataEditor
         return valueEditor.MergePartialPropertyValueForCulture(sourceValue, targetValue, culture);
     }
 
+    /// <summary>
+    /// Merges the variant and invariant property values based on the specified parameters.
+    /// </summary>
+    /// <param name="sourceValue">The source value to merge from.</param>
+    /// <param name="targetValue">The target value to merge into.</param>
+    /// <param name="canUpdateInvariantData">Indicates whether the invariant data can be updated.</param>
+    /// <param name="allowedCultures">A set of cultures allowed for the merge operation.</param>
+    /// <returns>The merged property value.</returns>
     public override object? MergeVariantInvariantPropertyValue(
         object? sourceValue,
         object? targetValue,
@@ -102,6 +191,28 @@ public class RichTextPropertyEditor : DataEditor
         private readonly ILogger<RichTextPropertyValueEditor> _logger;
         private readonly IBlockEditorElementTypeCache _elementTypeCache;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RichTextPropertyValueEditor"/> class.
+        /// </summary>
+        /// <param name="attribute">The data editor attribute that defines metadata for the editor.</param>
+        /// <param name="propertyEditors">A collection of available property editors.</param>
+        /// <param name="dataTypeReadCache">The cache for data type configuration.</param>
+        /// <param name="logger">The logger used for diagnostic and error messages.</param>
+        /// <param name="backOfficeSecurityAccessor">Provides access to back office security context.</param>
+        /// <param name="shortStringHelper">Helper for short string operations.</param>
+        /// <param name="imageSourceParser">Parses image sources in HTML content.</param>
+        /// <param name="localLinkParser">Parses local links in HTML content.</param>
+        /// <param name="pastedImages">Handles pasted images in the rich text editor.</param>
+        /// <param name="jsonSerializer">Serializes and deserializes JSON data.</param>
+        /// <param name="htmlSanitizer">Sanitizes HTML content for security.</param>
+        /// <param name="elementTypeCache">Caches block editor element types.</param>
+        /// <param name="propertyValidationService">Service for property validation logic.</param>
+        /// <param name="dataValueReferenceFactoryCollection">A collection of factories for data value references.</param>
+        /// <param name="richTextRequiredValidator">Validator for required rich text fields.</param>
+        /// <param name="richTextRegexValidator">Validator for rich text fields using regular expressions.</param>
+        /// <param name="blockEditorVarianceHandler">Handles variance logic for block editors.</param>
+        /// <param name="languageService">Provides language and localization services.</param>
+        /// <param name="ioHelper">Helper for IO operations.</param>
         public RichTextPropertyValueEditor(
             DataEditorAttribute attribute,
             PropertyEditorCollection propertyEditors,
@@ -139,8 +250,14 @@ public class RichTextPropertyEditor : DataEditor
             Validators.Add(new RichTextEditorBlockValidator(propertyValidationService, BlockEditorValues, elementTypeCache, jsonSerializer, logger));
         }
 
+        /// <summary>
+        /// Gets the <see cref="IValueRequiredValidator"/> instance used to determine whether a value is required for the rich text property editor.
+        /// </summary>
         public override IValueRequiredValidator RequiredValidator => _richTextRequiredValidator;
 
+        /// <summary>
+        /// Gets the regular expression-based format validator used to validate rich text property values in the editor.
+        /// </summary>
         public override IValueFormatValidator FormatValidator => _richTextRegexValidator;
 
         protected override RichTextBlockValue CreateWithLayout(IEnumerable<RichTextBlockLayoutItem> layout) => new(layout);
@@ -170,8 +287,8 @@ public class RichTextPropertyEditor : DataEditor
         /// <summary>
         ///     Resolve references from <see cref="IDataValueEditor" /> values
         /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
+        /// <param name="value">The rich text editor value to resolve references from.</param>
+        /// <returns>The entity references found in the value.</returns>
         public override IEnumerable<UmbracoEntityReference> GetReferences(object? value)
         {
             if (TryParseEditorValue(value, out RichTextEditorValue? richTextEditorValue) is false)
@@ -205,6 +322,15 @@ public class RichTextPropertyEditor : DataEditor
             return references;
         }
 
+        /// <summary>
+        /// Extracts tags from the provided rich text editor value, if any are present.
+        /// </summary>
+        /// <param name="value">The value from the rich text editor to extract tags from. If the value is null or cannot be parsed, no tags are returned.</param>
+        /// <param name="dataTypeConfiguration">The data type configuration associated with the value. This parameter may influence tag extraction depending on configuration.</param>
+        /// <param name="languageId">The optional language identifier used for localization of tags, if applicable.</param>
+        /// <returns>
+        /// An <see cref="IEnumerable{ITag}"/> containing the tags extracted from the value, or an empty enumerable if no tags are found or the value is invalid.
+        /// </returns>
         public override IEnumerable<ITag> GetTags(object? value, object? dataTypeConfiguration, int? languageId)
         {
             if (TryParseEditorValue(value, out RichTextEditorValue? richTextEditorValue) is false || richTextEditorValue.Blocks is null)
@@ -222,11 +348,12 @@ public class RichTextPropertyEditor : DataEditor
         }
 
         /// <summary>
-        ///     Format the data for the editor
+        ///     Converts the property value to a format suitable for the rich text editor, applying culture and segment if specified.
         /// </summary>
-        /// <param name="property"></param>
-        /// <param name="culture"></param>
-        /// <param name="segment"></param>
+        /// <param name="property">The property whose value will be formatted for the editor.</param>
+        /// <param name="culture">The culture to use when retrieving the property value, or <c>null</c> for the default culture.</param>
+        /// <param name="segment">The segment to use when retrieving the property value, or <c>null</c> for the default segment.</param>
+        /// <returns>The formatted value for the editor, or <c>null</c> if parsing fails.</returns>
         public override object? ToEditor(IProperty property, string? culture = null, string? segment = null)
         {
             var value = property.GetValue(culture, segment);
@@ -244,9 +371,9 @@ public class RichTextPropertyEditor : DataEditor
         /// <summary>
         ///     Format the data for persistence
         /// </summary>
-        /// <param name="editorValue"></param>
-        /// <param name="currentValue"></param>
-        /// <returns></returns>
+        /// <param name="editorValue">The value from the editor.</param>
+        /// <param name="currentValue">The current property value.</param>
+        /// <returns>The formatted value for persistence.</returns>
         public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
         {
             // See note on BlockEditorPropertyValueEditor.FromEditor for why we can't return early with only a null or empty editorValue.
@@ -288,6 +415,10 @@ public class RichTextPropertyEditor : DataEditor
             return RichTextPropertyEditorHelper.SerializeRichTextEditorValue(cleanedUpRichTextEditorValue, _jsonSerializer);
         }
 
+        /// <summary>
+        /// Returns the element type keys configured in the rich text editor's block configuration.
+        /// </summary>
+        /// <returns>An enumerable of <see cref="Guid"/> values representing the configured element type keys.</returns>
         public override IEnumerable<Guid> ConfiguredElementTypeKeys()
         {
             var configuration = ConfigurationObject as RichTextConfiguration;

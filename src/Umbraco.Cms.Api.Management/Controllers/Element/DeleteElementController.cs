@@ -14,6 +14,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Element;
 
+/// <summary>
+/// API controller responsible for handling requests to delete elements in the Umbraco CMS.
+/// </summary>
 [ApiVersion("1.0")]
 public class DeleteElementController : ElementControllerBase
 {
@@ -21,6 +24,12 @@ public class DeleteElementController : ElementControllerBase
     private readonly IElementEditingService _elementEditingService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DeleteElementController"/> class.
+    /// </summary>
+    /// <param name="authorizationService">An <see cref="IAuthorizationService"/> used to authorize element deletion requests.</param>
+    /// <param name="elementEditingService">An <see cref="IElementEditingService"/> used to perform element editing operations.</param>
+    /// <param name="backOfficeSecurityAccessor">An <see cref="IBackOfficeSecurityAccessor"/> providing access to back office security information.</param>
     public DeleteElementController(
         IAuthorizationService authorizationService,
         IElementEditingService elementEditingService,
@@ -31,6 +40,12 @@ public class DeleteElementController : ElementControllerBase
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
+    /// <summary>
+    /// Deletes the element with the specified unique identifier.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="id">The unique identifier (GUID) of the element to delete.</param>
+    /// <returns>An <see cref="IActionResult"/> indicating the outcome of the delete operation.</returns>
     [HttpDelete("{id:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
