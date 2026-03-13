@@ -31,6 +31,13 @@ public class ContentIndexPopulator : IndexPopulator<IUmbracoContentIndex>
     /// </summary>
     private IQuery<IContent>? _publishedQuery;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ContentIndexPopulator"/> class, which is responsible for populating the content index in Examine.
+    /// </summary>
+    /// <param name="logger">The logger used for logging diagnostic and error information.</param>
+    /// <param name="contentService">The service used to access and manage Umbraco content items.</param>
+    /// <param name="umbracoDatabaseFactory">The factory for creating Umbraco database connections.</param>
+    /// <param name="contentValueSetBuilder">The builder used to create value sets for content indexing.</param>
     [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in Umbraco 19.")]
     public ContentIndexPopulator(
         ILogger<ContentIndexPopulator> logger,
@@ -42,8 +49,13 @@ public class ContentIndexPopulator : IndexPopulator<IUmbracoContentIndex>
     }
 
     /// <summary>
-    ///     Default constructor to lookup all content data
+    ///     Initializes a new instance of the <see cref="ContentIndexPopulator"/> class, used to populate the content index with all content data.
     /// </summary>
+    /// <param name="logger">The logger instance used for diagnostic and error logging.</param>
+    /// <param name="contentService">The service used to access and manage content items.</param>
+    /// <param name="umbracoDatabaseFactory">The factory for creating Umbraco database connections.</param>
+    /// <param name="contentValueSetBuilder">Builds value sets for content items to be indexed.</param>
+    /// <param name="indexingSettings">The monitor providing indexing configuration settings.</param>
     public ContentIndexPopulator(
         ILogger<ContentIndexPopulator> logger,
         IContentService contentService,
@@ -54,6 +66,15 @@ public class ContentIndexPopulator : IndexPopulator<IUmbracoContentIndex>
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ContentIndexPopulator"/> class.
+    /// </summary>
+    /// <param name="logger">The logger used for diagnostic and operational messages.</param>
+    /// <param name="publishedValuesOnly">If set to <c>true</c>, only published content values are indexed.</param>
+    /// <param name="parentId">An optional parent content ID to restrict indexing to its descendants, or <c>null</c> for all content.</param>
+    /// <param name="contentService">Service for accessing and managing content items.</param>
+    /// <param name="umbracoDatabaseFactory">Factory for obtaining Umbraco database connections.</param>
+    /// <param name="contentValueSetBuilder">Builds value sets for content items to be indexed.</param>
     [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in Umbraco 19.")]
     public ContentIndexPopulator(
         ILogger<ContentIndexPopulator> logger,
@@ -67,8 +88,15 @@ public class ContentIndexPopulator : IndexPopulator<IUmbracoContentIndex>
     }
 
     /// <summary>
-    ///     Optional constructor allowing specifying custom query parameters
+    /// Initializes a new instance of the <see cref="ContentIndexPopulator"/> class with custom query parameters.
     /// </summary>
+    /// <param name="logger">The logger used for diagnostic and error messages.</param>
+    /// <param name="publishedValuesOnly">If true, only published content values are indexed.</param>
+    /// <param name="parentId">An optional parent content ID to restrict indexing to a subtree.</param>
+    /// <param name="contentService">The service used to access content items.</param>
+    /// <param name="umbracoDatabaseFactory">The factory for obtaining Umbraco database connections.</param>
+    /// <param name="contentValueSetBuilder">Builds value sets for content items to be indexed.</param>
+    /// <param name="indexingSettings">Monitors configuration settings for indexing.</param>
     public ContentIndexPopulator(
         ILogger<ContentIndexPopulator> logger,
         bool publishedValuesOnly,
@@ -95,6 +123,11 @@ public class ContentIndexPopulator : IndexPopulator<IUmbracoContentIndex>
     private IQuery<IContent> PublishedQuery => _publishedQuery ??=
         _umbracoDatabaseFactory.SqlContext.Query<IContent>().Where(x => x.Published);
 
+    /// <summary>
+    /// Determines whether the specified content index is registered for population.
+    /// </summary>
+    /// <param name="index">The content index to check.</param>
+    /// <returns><c>true</c> if the content index is registered; otherwise, <c>false</c>.</returns>
     public override bool IsRegistered(IUmbracoContentIndex index) =>
 
         // check if it should populate based on published values

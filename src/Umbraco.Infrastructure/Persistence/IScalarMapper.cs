@@ -6,7 +6,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence;
 public interface IScalarMapper
 {
     /// <summary>
-    ///     Performs a mapping operation for a scalar value.
+    ///     Maps the specified scalar value to a corresponding object representation.
     /// </summary>
+    /// <param name="value">The scalar value to map.</param>
+    /// <returns>The mapped object.</returns>
     object Map(object value);
 }

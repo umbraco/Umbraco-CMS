@@ -1,5 +1,8 @@
 namespace Umbraco.Cms.Api.Management.ViewModels.HealthCheck;
 
+/// <summary>
+/// Represents a view model containing information about a health check in the Umbraco CMS management API.
+/// </summary>
 public class HealthCheckViewModel : HealthCheckModelBase
 {
     /// <summary>

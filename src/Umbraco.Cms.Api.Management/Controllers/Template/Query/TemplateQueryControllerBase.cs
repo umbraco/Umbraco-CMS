@@ -1,10 +1,13 @@
-﻿using Umbraco.Cms.Api.Management.Routing;
+using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Api.Management.ViewModels.Template.Query;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.TemplateQuery;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Template.Query;
 
+/// <summary>
+/// Serves as the base controller for template query operations in the Umbraco CMS Management API.
+/// </summary>
 [VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.Template}/query")]
 public abstract class TemplateQueryControllerBase : TemplateControllerBase
 {

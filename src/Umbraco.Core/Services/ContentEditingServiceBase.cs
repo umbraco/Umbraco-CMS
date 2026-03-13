@@ -265,7 +265,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
                 userKey,
                 ContentTrashStatusRequirement.MustNotBeTrashed,
                 MoveToRecycleBin,
-                ContentSettings.DisableUnpublishWhenReferenced,
+                ContentSettings.DisableDeleteWhenReferenced,
                 ContentEditingOperationStatus.CannotMoveToRecycleBinWhenReferenced);
 
     /// <summary>
@@ -520,15 +520,25 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
             return null;
         }
 
-        // verify that all properties match their respective property type culture and segment variance - i.e. no culture invariant properties that should have been culture variant
+        // verify that all properties match their respective property type culture variance
         if (propertyValuesAndVariance.Any(pv =>
             {
                 IPropertyType propertyType = propertyTypesByAlias[pv.PropertyValue.Alias];
-                return (propertyType.VariesByCulture() != pv.VariesByCulture)
-                       || (propertyType.VariesBySegment() is false && pv.VariesBySegment);
+                return propertyType.VariesByCulture() != pv.VariesByCulture;
             }))
         {
-            operationStatus = ContentEditingOperationStatus.PropertyTypeNotFound;
+            operationStatus = ContentEditingOperationStatus.PropertyTypeCultureVarianceMismatch;
+            return null;
+        }
+
+        // verify that all properties match their respective property type segment variance
+        if (propertyValuesAndVariance.Any(pv =>
+            {
+                IPropertyType propertyType = propertyTypesByAlias[pv.PropertyValue.Alias];
+                return propertyType.VariesBySegment() is false && pv.VariesBySegment;
+            }))
+        {
+            operationStatus = ContentEditingOperationStatus.PropertyTypeSegmentVarianceMismatch;
             return null;
         }
 

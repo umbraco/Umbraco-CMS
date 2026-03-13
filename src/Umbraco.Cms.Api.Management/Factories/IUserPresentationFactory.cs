@@ -56,8 +56,10 @@ public interface IUserPresentationFactory
     /// </summary>
     UserItemResponseModel CreateItemResponseModel(IUser user);
 
-    /// <summary>
-    /// Creates a calculated user start nodes response model based on the provided user.
-    /// </summary>
+/// <summary>
+/// Asynchronously creates a response model containing the calculated start nodes for the specified user.
+/// </summary>
+/// <param name="user">The user for whom to calculate start nodes.</param>
+/// <returns>A task representing the asynchronous operation. The task result contains the calculated user start nodes response model.</returns>
     Task<CalculatedUserStartNodesResponseModel> CreateCalculatedUserStartNodesResponseModelAsync(IUser user);
 }

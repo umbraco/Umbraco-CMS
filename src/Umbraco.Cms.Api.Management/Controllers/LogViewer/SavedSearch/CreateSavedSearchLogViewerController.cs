@@ -9,11 +9,18 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.LogViewer.SavedSearch;
 
+/// <summary>
+/// Controller responsible for handling the creation of saved search entries in the log viewer.
+/// </summary>
 [ApiVersion("1.0")]
 public class CreateSavedSearchLogViewerController : SavedSearchLogViewerControllerBase
 {
     private readonly ILogViewerService _logViewerService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CreateSavedSearchLogViewerController"/> class with the specified log viewer service.
+    /// </summary>
+    /// <param name="logViewerService">An instance of <see cref="ILogViewerService"/> used to manage log viewing operations.</param>
     public CreateSavedSearchLogViewerController(ILogViewerService logViewerService) => _logViewerService = logViewerService;
 
     /// <summary>
