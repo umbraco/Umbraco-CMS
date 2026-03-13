@@ -31,7 +31,9 @@ public static class UmbracoEFCoreServiceCollectionExtensions
         this IServiceCollection services,
         Action<DbContextOptionsBuilder>? optionsAction = null)
         where T : DbContext
+#pragma warning disable CS0618 // Type or member is obsolete
         => AddUmbracoDbContext<T>(services, (sp, optionsBuilder, connectionString, providerName) => optionsAction?.Invoke(optionsBuilder));
+#pragma warning restore CS0618 // Type or member is obsolete
 
     /// <summary>
     /// Adds a EFCore DbContext with all the services needed to integrate with Umbraco scopes.
@@ -61,7 +63,9 @@ public static class UmbracoEFCoreServiceCollectionExtensions
         this IServiceCollection services,
         Action<IServiceProvider, DbContextOptionsBuilder>? optionsAction = null)
         where T : DbContext
+#pragma warning disable CS0618 // Type or member is obsolete
         => AddUmbracoDbContext<T>(services, (sp, optionsBuilder, connectionString, providerName) => optionsAction?.Invoke(sp, optionsBuilder));
+#pragma warning restore CS0618 // Type or member is obsolete
 
     /// <summary>
     /// Adds a EFCore DbContext with all the services needed to integrate with Umbraco scopes.
