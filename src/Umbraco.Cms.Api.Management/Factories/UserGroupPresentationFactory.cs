@@ -21,6 +21,14 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
     private readonly IPermissionPresentationFactory _permissionPresentationFactory;
     private readonly ILogger<UserGroupPresentationFactory> _logger;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UserGroupPresentationFactory"/> class.
+    /// </summary>
+    /// <param name="entityService">Service for managing Umbraco entities.</param>
+    /// <param name="shortStringHelper">Helper for string manipulation and formatting.</param>
+    /// <param name="languageService">Service providing localization and language support.</param>
+    /// <param name="permissionPresentationFactory">Factory for creating permission presentation models.</param>
+    /// <param name="logger">Logger for diagnostic and operational messages.</param>
     public UserGroupPresentationFactory(
         IEntityService entityService,
         IShortStringHelper shortStringHelper,

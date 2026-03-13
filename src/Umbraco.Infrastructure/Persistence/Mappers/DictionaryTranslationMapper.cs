@@ -11,6 +11,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Mappers;
 [MapperFor(typeof(IDictionaryTranslation))]
 public sealed class DictionaryTranslationMapper : BaseMapper
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DictionaryTranslationMapper"/> class.
+    /// </summary>
+    /// <param name="sqlContext">The lazy-loaded SQL context for database operations.</param>
+    /// <param name="maps">The configuration store for mapper settings.</param>
     public DictionaryTranslationMapper(Lazy<ISqlContext> sqlContext, MapperConfigurationStore maps)
         : base(sqlContext, maps)
     {

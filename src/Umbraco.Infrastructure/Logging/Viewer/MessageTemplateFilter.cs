@@ -6,6 +6,13 @@ internal sealed class MessageTemplateFilter : ILogFilter
 {
     public readonly Dictionary<string, int> Counts = new();
 
+    /// <summary>
+    /// Evaluates the specified log event, updates the internal count for its message template, and determines whether it should be taken.
+    /// </summary>
+    /// <param name="e">The log event to evaluate.</param>
+    /// <returns>
+    /// Always returns <c>false</c>, indicating that the log event should not be taken, but updates the count for the event's message template.
+    /// </returns>
     public bool TakeLogEvent(LogEvent e)
     {
         var templateText = e.MessageTemplate.Text;

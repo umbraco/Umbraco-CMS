@@ -9,6 +9,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Search;
 
+/// <summary>
+/// Handles notifications that are triggered during the content indexing process in the Umbraco CMS infrastructure.
+/// </summary>
 public sealed class ContentIndexingNotificationHandler :
     INotificationHandler<ContentCacheRefresherNotification>,
     INotificationHandler<PublicAccessCacheRefresherNotification>
@@ -16,6 +19,11 @@ public sealed class ContentIndexingNotificationHandler :
     private readonly IContentService _contentService;
     private readonly IUmbracoIndexingHandler _umbracoIndexingHandler;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ContentIndexingNotificationHandler"/> class, which handles notifications related to content indexing.
+    /// </summary>
+    /// <param name="umbracoIndexingHandler">An instance responsible for handling Umbraco indexing operations.</param>
+    /// <param name="contentService">The service used to manage and interact with content items.</param>
     public ContentIndexingNotificationHandler(
         IUmbracoIndexingHandler umbracoIndexingHandler,
         IContentService contentService)
@@ -28,7 +36,7 @@ public sealed class ContentIndexingNotificationHandler :
     /// <summary>
     ///     Updates indexes based on content changes
     /// </summary>
-    /// <param name="args"></param>
+    /// <param name="args">The content cache refresher notification.</param>
     public void Handle(ContentCacheRefresherNotification args)
     {
         if (!_umbracoIndexingHandler.Enabled)
@@ -163,6 +171,10 @@ public sealed class ContentIndexingNotificationHandler :
         }
     }
 
+    /// <summary>
+    /// Handles a <see cref="PublicAccessCacheRefresherNotification"/> to update content indexes when the public access cache changes.
+    /// </summary>
+    /// <param name="notification">The notification containing details about the public access cache refresh event.</param>
     public void Handle(PublicAccessCacheRefresherNotification notification)
         => _umbracoIndexingHandler.RemoveProtectedContent();
 }

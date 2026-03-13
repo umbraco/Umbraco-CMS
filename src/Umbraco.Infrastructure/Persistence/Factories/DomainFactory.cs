@@ -10,6 +10,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories;
 
 internal static class DomainFactory
 {
+    /// <summary>
+    /// Creates an <see cref="Umbraco.Cms.Core.Models.IDomain"/> entity from the specified <see cref="Umbraco.Cms.Infrastructure.Persistence.Dtos.DomainDto"/>.
+    /// </summary>
+    /// <param name="dto">The <see cref="Umbraco.Cms.Infrastructure.Persistence.Dtos.DomainDto"/> containing the domain data to map.</param>
+    /// <returns>An <see cref="Umbraco.Cms.Core.Models.IDomain"/> instance representing the mapped domain.</returns>
     public static IDomain BuildEntity(DomainDto dto)
     {
         var domain = new UmbracoDomain(dto.DomainName, dto.IsoCode)
@@ -26,6 +31,11 @@ internal static class DomainFactory
         return domain;
     }
 
+    /// <summary>
+    /// Builds a <see cref="DomainDto"/> from the given <see cref="IDomain"/> entity.
+    /// </summary>
+    /// <param name="entity">The domain entity to convert to a DTO.</param>
+    /// <returns>A <see cref="DomainDto"/> representing the provided domain entity.</returns>
     public static DomainDto BuildDto(IDomain entity)
     {
         var dto = new DomainDto

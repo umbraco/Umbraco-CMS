@@ -8,10 +8,18 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
+/// <summary>
+/// Represents a repository responsible for managing and persisting content navigation structures within the Umbraco CMS.
+/// This includes operations related to retrieving, storing, and updating navigation data for content items.
+/// </summary>
 public class ContentNavigationRepository : INavigationRepository
 {
     private readonly IScopeAccessor _scopeAccessor;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ContentNavigationRepository"/> class, which provides methods for content navigation persistence.
+    /// </summary>
+    /// <param name="scopeAccessor">An accessor for the current database scope, used to manage transactional operations within the repository.</param>
     public ContentNavigationRepository(IScopeAccessor scopeAccessor)
         => _scopeAccessor = scopeAccessor;
 
