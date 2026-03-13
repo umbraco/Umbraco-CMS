@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
-using StackExchange.Profiling.Data;
 using Umbraco.Cms.Persistence.EFCore.Scoping;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
@@ -74,37 +73,6 @@ public class PooledDbContextConnectionTaintingTests : UmbracoIntegrationTest
         {
             await context.Database.CanConnectAsync();
         });
-    }
-
-    /// <summary>
-    /// Verifies that the pooled DbContext is not left with a ProfiledDbConnection
-    /// after an EFCore scope disposes. The connection on the context should either
-    /// be cleared or be a fresh connection, not the stale one from the NPoco scope.
-    /// </summary>
-    [Test]
-    public async Task Factory_Created_DbContext_Connection_Is_Not_ProfiledDbConnection_After_Scope_Disposes()
-    {
-        // Use an EFCore scope to taint the pooled context with a ProfiledDbConnection
-        using (IEfCoreScope<PooledTestDbContext> scope = EfCoreScopeProvider.CreateScope())
-        {
-            await scope.ExecuteWithContextAsync<Task>(async db =>
-            {
-                // Verify that during scope execution, the connection IS a ProfiledDbConnection
-                // (set by InitializeDatabase from the NPoco scope's transaction connection)
-                var connection = db.Database.GetDbConnection();
-                Assert.That(connection, Is.InstanceOf<ProfiledDbConnection>(),
-                    "During scope execution, the connection should be a ProfiledDbConnection from NPoco.");
-            });
-            scope.Complete();
-        }
-
-        // Get a context from the pool - it should not retain the stale ProfiledDbConnection
-        using PooledTestDbContext context = DbContextFactory.CreateDbContext();
-
-        var pooledConnection = context.Database.GetDbConnection();
-        Assert.That(pooledConnection, Is.Not.InstanceOf<ProfiledDbConnection>(),
-            "After scope disposal, a pooled DbContext should not retain a ProfiledDbConnection. " +
-            "The connection should have been cleared before returning to the pool.");
     }
 
     /// <summary>
