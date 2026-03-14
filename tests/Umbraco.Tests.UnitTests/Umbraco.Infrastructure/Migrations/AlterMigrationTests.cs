@@ -1,4 +1,4 @@
-// Copyright (c) Umbraco.
+﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.Diagnostics;
@@ -12,9 +12,9 @@ using Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations.Stubs;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations;
 
-    /// <summary>
-    /// Contains unit tests for verifying the behavior of database schema alterations in migrations.
-    /// </summary>
+/// <summary>
+/// Contains unit tests for verifying the behavior of database schema alterations in migrations.
+/// </summary>
 [TestFixture]
 public class AlterMigrationTests
 {

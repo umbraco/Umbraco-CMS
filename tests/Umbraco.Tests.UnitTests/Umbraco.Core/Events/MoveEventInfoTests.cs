@@ -1,12 +1,12 @@
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using Umbraco.Cms.Core.Events;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Events;
 
-    /// <summary>
-    /// Contains unit tests for the <see cref="MoveEventInfo"/> class in the Umbraco.Core.Events namespace.
-    /// These tests verify the behavior and functionality of MoveEventInfo.
-    /// </summary>
+/// <summary>
+/// Contains unit tests for the <see cref="MoveEventInfo"/> class in the Umbraco.Core.Events namespace.
+/// These tests verify the behavior and functionality of MoveEventInfo.
+/// </summary>
 public class MoveEventInfoTests
 {
     [TestCase("", "path", false)]

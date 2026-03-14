@@ -1,4 +1,4 @@
-// Copyright (c) Umbraco.
+﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.Text.Json;
@@ -9,9 +9,9 @@ using Umbraco.Cms.Tests.Common.Builders.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models;
 
-    /// <summary>
-    /// Contains unit tests for the <see cref="RelationType"/> model in the Umbraco Core.
-    /// </summary>
+/// <summary>
+/// Contains unit tests for the <see cref="RelationType"/> model in the Umbraco Core.
+/// </summary>
 [TestFixture]
 public class RelationTypeTests
 {

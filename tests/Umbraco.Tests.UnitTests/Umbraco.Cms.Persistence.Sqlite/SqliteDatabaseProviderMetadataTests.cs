@@ -1,12 +1,12 @@
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using Umbraco.Cms.Core.Install.Models;
 using Umbraco.Cms.Persistence.Sqlite.Services;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Persistence.Sqlite;
 
-    /// <summary>
-    /// Contains unit tests for the <see cref="SqliteDatabaseProviderMetadata"/> class to verify its behavior and functionality.
-    /// </summary>
+/// <summary>
+/// Contains unit tests for the <see cref="SqliteDatabaseProviderMetadata"/> class to verify its behavior and functionality.
+/// </summary>
 [TestFixture]
 public class SqliteDatabaseProviderMetadataTests
 {

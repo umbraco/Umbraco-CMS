@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
@@ -9,10 +9,10 @@ using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Routing;
 
-    /// <summary>
-    /// Contains unit tests for verifying the behavior and correctness of the <see cref="UmbracoRequestPaths"/> class in the Umbraco CMS routing system.
-    /// These tests ensure that request path handling and related logic function as expected.
-    /// </summary>
+/// <summary>
+/// Contains unit tests for verifying the behavior and correctness of the <see cref="UmbracoRequestPaths"/> class in the Umbraco CMS routing system.
+/// These tests ensure that request path handling and related logic function as expected.
+/// </summary>
 [TestFixture]
 public class UmbracoRequestPathsTests
 {

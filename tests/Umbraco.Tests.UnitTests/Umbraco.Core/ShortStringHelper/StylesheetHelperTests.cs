@@ -1,4 +1,4 @@
-// Copyright (c) Umbraco.
+﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.Linq;
@@ -9,9 +9,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.ShortStringHelper;
 
-    /// <summary>
-    /// Contains unit tests for the <see cref="StylesheetHelper"/> class, which is part of the ShortStringHelper functionality in Umbraco.
-    /// </summary>
+/// <summary>
+/// Contains unit tests for the <see cref="StylesheetHelper"/> class, which is part of the ShortStringHelper functionality in Umbraco.
+/// </summary>
 [TestFixture]
 public class StylesheetHelperTests
 {

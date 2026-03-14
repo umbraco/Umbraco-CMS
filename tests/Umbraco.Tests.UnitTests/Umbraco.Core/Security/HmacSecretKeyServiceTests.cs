@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
@@ -9,9 +9,9 @@ using Umbraco.Cms.Core.Security;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Security;
 
-    /// <summary>
-    /// Contains unit tests for the <see cref="HmacSecretKeyService"/> class, verifying its functionality and behavior.
-    /// </summary>
+/// <summary>
+/// Contains unit tests for the <see cref="HmacSecretKeyService"/> class, verifying its functionality and behavior.
+/// </summary>
 [TestFixture]
 public class HmacSecretKeyServiceTests
 {

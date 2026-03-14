@@ -1,4 +1,4 @@
-// Copyright (c) Umbraco.
+﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.Data;
@@ -20,9 +20,9 @@ using Umbraco.Cms.Infrastructure.HostedServices;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.BackgroundJobs.Jobs;
 
-    /// <summary>
-    /// Contains unit tests for the <see cref="ScheduledPublishingJob"/> class, verifying its scheduled publishing functionality.
-    /// </summary>
+/// <summary>
+/// Contains unit tests for the <see cref="ScheduledPublishingJob"/> class, verifying its scheduled publishing functionality.
+/// </summary>
 [TestFixture]
 public class ScheduledPublishingJobTests
 {

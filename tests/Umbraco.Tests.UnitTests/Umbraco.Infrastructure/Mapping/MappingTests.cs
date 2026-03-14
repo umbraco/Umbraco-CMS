@@ -1,4 +1,4 @@
-// Copyright (c) Umbraco.
+﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.Collections.Generic;
@@ -18,9 +18,9 @@ using PropertyCollection = Umbraco.Cms.Core.Models.PropertyCollection;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Mapping;
 
-    /// <summary>
-    /// Contains unit tests for verifying the mapping configurations and behaviors in the Umbraco infrastructure.
-    /// </summary>
+/// <summary>
+/// Contains unit tests for verifying the mapping configurations and behaviors in the Umbraco infrastructure.
+/// </summary>
 [TestFixture]
 public class MappingTests
 {

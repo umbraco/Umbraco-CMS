@@ -1,4 +1,4 @@
-using Moq;
+﻿using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Models;
@@ -9,9 +9,9 @@ using Umbraco.Cms.Core.Telemetry;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Telemetry;
 
-    /// <summary>
-    /// Provides unit tests for verifying the behavior of the <see cref="TelemetryService"/> class in Umbraco CMS.
-    /// </summary>
+/// <summary>
+/// Provides unit tests for verifying the behavior of the <see cref="TelemetryService"/> class in Umbraco CMS.
+/// </summary>
 [TestFixture]
 public class TelemetryServiceTests
 {

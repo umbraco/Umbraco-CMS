@@ -1,4 +1,4 @@
-// Copyright (c) Umbraco.
+﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.Collections.Generic;
@@ -10,9 +10,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.ShortStringHelper;
 
-    /// <summary>
-    /// Contains unit tests for the <see cref="DefaultShortStringHelper"/> class, verifying its behavior and functionality.
-    /// </summary>
+/// <summary>
+/// Contains unit tests for the <see cref="DefaultShortStringHelper"/> class, verifying its behavior and functionality.
+/// </summary>
 [TestFixture]
 public class DefaultShortStringHelperTests
 {

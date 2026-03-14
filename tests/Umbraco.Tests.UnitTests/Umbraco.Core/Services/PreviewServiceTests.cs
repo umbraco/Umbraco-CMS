@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
@@ -12,9 +12,9 @@ using Umbraco.Cms.Tests.Common.Builders.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Services;
 
-    /// <summary>
-    /// Contains unit tests that verify the functionality of the <see cref="PreviewService"/> class.
-    /// </summary>
+/// <summary>
+/// Contains unit tests that verify the functionality of the <see cref="PreviewService"/> class.
+/// </summary>
 [TestFixture]
 public class PreviewServiceTests
 {

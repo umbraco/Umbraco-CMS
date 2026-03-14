@@ -1,11 +1,11 @@
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using Umbraco.Cms.Core.Logging;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Logging;
 
-    /// <summary>
-    /// Contains unit tests for the <see cref="LoggingConfiguration"/> class to verify its behavior and configuration logic.
-    /// </summary>
+/// <summary>
+/// Contains unit tests for the <see cref="LoggingConfiguration"/> class to verify its behavior and configuration logic.
+/// </summary>
 [TestFixture]
 public class LoggingConfigurationTests
 {

@@ -1,4 +1,4 @@
-// Copyright (c) Umbraco.
+﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.Diagnostics;
@@ -9,9 +9,9 @@ using Umbraco.Cms.Tests.Common.Builders;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models;
 
-    /// <summary>
-    /// Contains unit tests for the <see cref="Umbraco.Core.Models.Stylesheet"/> class, verifying its behavior and functionality.
-    /// </summary>
+/// <summary>
+/// Contains unit tests for the <see cref="Umbraco.Core.Models.Stylesheet"/> class, verifying its behavior and functionality.
+/// </summary>
 [TestFixture]
 public class StylesheetTests
 {

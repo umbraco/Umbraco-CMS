@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Logging.Abstractions;
+﻿using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Install.Models;
@@ -7,9 +7,9 @@ using Umbraco.Cms.Persistence.SqlServer.Services;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Persistence;
 
-    /// <summary>
-    /// Unit tests for the <see cref="DefaultDatabaseAvailabilityCheck"/> class.
-    /// </summary>
+/// <summary>
+/// Unit tests for the <see cref="DefaultDatabaseAvailabilityCheck"/> class.
+/// </summary>
 [TestFixture]
 public class DefaultDatabaseAvailabilityCheckTests
 {

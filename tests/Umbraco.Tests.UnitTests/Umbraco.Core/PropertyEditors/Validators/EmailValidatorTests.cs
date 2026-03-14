@@ -1,4 +1,4 @@
-// Copyright (c) Umbraco.
+﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.Globalization;
@@ -11,9 +11,9 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors.Validators;
 
-    /// <summary>
-    /// Unit tests for the EmailValidator class.
-    /// </summary>
+/// <summary>
+/// Unit tests for the EmailValidator class.
+/// </summary>
 [TestFixture]
 public class EmailValidatorTests
 {

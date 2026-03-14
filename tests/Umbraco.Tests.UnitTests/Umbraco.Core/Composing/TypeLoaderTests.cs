@@ -1,4 +1,4 @@
-// Copyright (c) Umbraco.
+﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.Collections.Generic;
@@ -20,9 +20,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Composing;
 
-    /// <summary>
-    /// Contains unit tests for the <see cref="TypeLoader"/> class.
-    /// </summary>
+/// <summary>
+/// Contains unit tests for the <see cref="TypeLoader"/> class.
+/// </summary>
 [TestFixture]
 public class TypeLoaderTests
 {

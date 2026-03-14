@@ -1,4 +1,4 @@
-// Copyright (c) Umbraco.
+﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.Diagnostics;
@@ -9,9 +9,9 @@ using Umbraco.Cms.Tests.Common.Builders.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models;
 
-    /// <summary>
-    /// Contains unit tests for verifying the behavior of the <see cref="DocumentEntity"/> class in the Umbraco CMS core models.
-    /// </summary>
+/// <summary>
+/// Contains unit tests for verifying the behavior of the <see cref="DocumentEntity"/> class in the Umbraco CMS core models.
+/// </summary>
 [TestFixture]
 public class DocumentEntityTests
 {

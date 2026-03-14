@@ -1,4 +1,4 @@
-// Copyright (c) Umbraco.
+﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.Diagnostics;
@@ -12,9 +12,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Persistence.NPocoTests;
 
-    /// <summary>
-    /// Contains unit tests for NPoco SQL functionality within Umbraco's persistence infrastructure.
-    /// </summary>
+/// <summary>
+/// Contains unit tests for NPoco SQL functionality within Umbraco's persistence infrastructure.
+/// </summary>
 [TestFixture]
 public class NPocoSqlTests : BaseUsingSqlSyntax
 {

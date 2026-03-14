@@ -1,4 +1,4 @@
-// Copyright (c) Umbraco.
+﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.Diagnostics;
@@ -19,9 +19,9 @@ using Umbraco.Cms.Tests.UnitTests.TestHelpers.Objects;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Templates;
 
-    /// <summary>
-    /// Unit tests for the HtmlImageSourceParser class.
-    /// </summary>
+/// <summary>
+/// Unit tests for the HtmlImageSourceParser class.
+/// </summary>
 [TestFixture]
 public class HtmlImageSourceParserTests
 {

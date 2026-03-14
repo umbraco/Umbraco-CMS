@@ -1,4 +1,4 @@
-using System.Linq;
+﻿using System.Linq;
 using System.Net;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -9,9 +9,9 @@ using Umbraco.Cms.Web.Common.Mvc;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Services;
 
-    /// <summary>
-    /// Contains unit tests for the <see cref="BasicAuthService"/> class, verifying its authentication logic and related functionality.
-    /// </summary>
+/// <summary>
+/// Contains unit tests for the <see cref="BasicAuthService"/> class, verifying its authentication logic and related functionality.
+/// </summary>
 [TestFixture]
 public class BasicAuthServiceTests
 {

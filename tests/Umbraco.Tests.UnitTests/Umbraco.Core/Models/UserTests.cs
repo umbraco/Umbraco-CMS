@@ -1,4 +1,4 @@
-// Copyright (c) Umbraco.
+﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.Diagnostics;
@@ -10,9 +10,9 @@ using Umbraco.Cms.Tests.Common.Builders.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models;
 
-    /// <summary>
-    /// Unit tests for the <see cref="global::Umbraco.Core.Models.User"/> class.
-    /// </summary>
+/// <summary>
+/// Unit tests for the <see cref="global::Umbraco.Core.Models.User"/> class.
+/// </summary>
 [TestFixture]
 public class UserTests
 {

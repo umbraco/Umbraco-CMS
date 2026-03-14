@@ -1,4 +1,4 @@
-// Copyright (c) Umbraco.
+﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.Text.Json;
@@ -9,9 +9,9 @@ using Umbraco.Cms.Tests.Common.Builders.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Models;
 
-    /// <summary>
-    /// Contains unit tests for the <see cref="DataType"/> model within the Umbraco CMS infrastructure layer.
-    /// </summary>
+/// <summary>
+/// Contains unit tests for the <see cref="DataType"/> model within the Umbraco CMS infrastructure layer.
+/// </summary>
 [TestFixture]
 public class DataTypeTests
 {

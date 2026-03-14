@@ -1,4 +1,4 @@
-// Copyright (c) Umbraco.
+﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.Collections.Generic;
@@ -15,9 +15,9 @@ using Umbraco.Cms.Tests.UnitTests.TestHelpers;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Composing;
 
-    /// <summary>
-    /// Provides a base class for unit tests related to composition in Umbraco Core, offering common setup and utilities for composing tests.
-    /// </summary>
+/// <summary>
+/// Provides a base class for unit tests related to composition in Umbraco Core, offering common setup and utilities for composing tests.
+/// </summary>
 public abstract class ComposingTestBase
 {
     protected TypeLoader TypeLoader { get; private set; }

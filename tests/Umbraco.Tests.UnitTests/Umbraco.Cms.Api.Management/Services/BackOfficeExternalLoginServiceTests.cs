@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authentication;
+﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
 using Moq;
@@ -12,9 +12,9 @@ using Umbraco.Cms.Web.Common.Security;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Management.Services;
 
-    /// <summary>
-    /// Contains unit tests for the <see cref="BackOfficeExternalLoginService"/> class, verifying its authentication and login-related functionality in the backoffice context.
-    /// </summary>
+/// <summary>
+/// Contains unit tests for the <see cref="BackOfficeExternalLoginService"/> class, verifying its authentication and login-related functionality in the backoffice context.
+/// </summary>
 [TestFixture]
 public partial class BackOfficeExternalLoginServiceTests
 {

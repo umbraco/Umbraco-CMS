@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -19,9 +19,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Routing;
 
-    /// <summary>
-    /// Contains unit tests for the <see cref="PublishedRouter"/> class, verifying routing functionality in Umbraco CMS.
-    /// </summary>
+/// <summary>
+/// Contains unit tests for the <see cref="PublishedRouter"/> class, verifying routing functionality in Umbraco CMS.
+/// </summary>
 [TestFixture]
 public class PublishedRouterTests
 {

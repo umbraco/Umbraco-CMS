@@ -1,4 +1,4 @@
-using Moq;
+﻿using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
@@ -6,10 +6,10 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.DeliveryApi;
 
-    /// <summary>
-    /// Contains unit tests for the <see cref="ApiMediaBuilder"/> class within the Delivery API of Umbraco CMS.
-    /// These tests verify the functionality and behavior of media building operations.
-    /// </summary>
+/// <summary>
+/// Contains unit tests for the <see cref="ApiMediaBuilder"/> class within the Delivery API of Umbraco CMS.
+/// These tests verify the functionality and behavior of media building operations.
+/// </summary>
 [TestFixture]
 public class MediaBuilderTests : DeliveryApiTests
 {

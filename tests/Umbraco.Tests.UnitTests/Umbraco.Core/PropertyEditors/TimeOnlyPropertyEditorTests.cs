@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using System.Text.Json.Nodes;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -18,9 +18,9 @@ using Umbraco.Cms.Infrastructure.Serialization;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 
-    /// <summary>
-    /// Unit tests for the <see cref="TimeOnlyPropertyEditor"/> class.
-    /// </summary>
+/// <summary>
+/// Unit tests for the <see cref="TimeOnlyPropertyEditor"/> class.
+/// </summary>
 [TestFixture]
 public class TimeOnlyPropertyEditorTests
 {

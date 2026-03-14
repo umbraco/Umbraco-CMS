@@ -1,13 +1,13 @@
-using Moq;
+﻿using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Extensions;
 
-    /// <summary>
-    /// Contains unit tests for methods in the <see cref="ContentExtensions"/> class.
-    /// </summary>
+/// <summary>
+/// Contains unit tests for methods in the <see cref="ContentExtensions"/> class.
+/// </summary>
 public partial class ContentExtensionsTests
 {
     /// <summary>

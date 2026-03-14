@@ -1,13 +1,13 @@
-using Moq;
+﻿using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.DeliveryApi;
 
-    /// <summary>
-    /// Contains unit tests for the <see cref="ApiDocumentUrlService"/> class.
-    /// </summary>
+/// <summary>
+/// Contains unit tests for the <see cref="ApiDocumentUrlService"/> class.
+/// </summary>
 [TestFixture]
 public class ApiDocumentUrlServiceTests
 {

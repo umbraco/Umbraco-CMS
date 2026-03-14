@@ -1,13 +1,13 @@
-using Moq;
+﻿using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Extensions;
 
-    /// <summary>
-    /// Contains unit tests for the HtmlEncodedStringExtensions class, which provides extension methods for HTML-encoded strings.
-    /// </summary>
+/// <summary>
+/// Contains unit tests for the HtmlEncodedStringExtensions class, which provides extension methods for HTML-encoded strings.
+/// </summary>
 [TestFixture]
 public class HtmlEncodedStringExtensionsTests
 {

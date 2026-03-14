@@ -9,9 +9,9 @@ using Umbraco.Cms.Core.PropertyEditors.Validators;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors.Validators;
 
-    /// <summary>
-    /// Contains unit tests for the <see cref="RequiredValidator"/> class, verifying its validation logic and behavior.
-    /// </summary>
+/// <summary>
+/// Contains unit tests for the <see cref="RequiredValidator"/> class, verifying its validation logic and behavior.
+/// </summary>
 [TestFixture]
 public class RequiredValidatorTests
 {

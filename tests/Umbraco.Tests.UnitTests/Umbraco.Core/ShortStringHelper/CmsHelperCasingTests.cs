@@ -1,4 +1,4 @@
-// Copyright (c) Umbraco.
+﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using Microsoft.Extensions.Options;
@@ -9,9 +9,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.ShortStringHelper;
 
-    /// <summary>
-    /// Provides unit tests to verify the casing behavior of methods in the <see cref="CmsHelper"/> class.
-    /// </summary>
+/// <summary>
+/// Provides unit tests to verify the casing behavior of methods in the <see cref="CmsHelper"/> class.
+/// </summary>
 [TestFixture]
 public class CmsHelperCasingTests
 {

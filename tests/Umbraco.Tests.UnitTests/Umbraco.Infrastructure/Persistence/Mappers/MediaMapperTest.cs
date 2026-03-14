@@ -1,4 +1,4 @@
-// Copyright (c) Umbraco.
+﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using NUnit.Framework;
@@ -9,9 +9,9 @@ using MediaModel = Umbraco.Cms.Core.Models.Media;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Persistence.Mappers;
 
-    /// <summary>
-    /// Contains unit tests for the <see cref="MediaMapper"/> class, verifying its mapping functionality within the persistence layer.
-    /// </summary>
+/// <summary>
+/// Contains unit tests for the <see cref="MediaMapper"/> class, verifying its mapping functionality within the persistence layer.
+/// </summary>
 [TestFixture]
 public class MediaMapperTest
 {

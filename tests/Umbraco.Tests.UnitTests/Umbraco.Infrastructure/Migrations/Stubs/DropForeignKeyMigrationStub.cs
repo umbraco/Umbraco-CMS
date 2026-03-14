@@ -1,13 +1,13 @@
-// Copyright (c) Umbraco.
+﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using Umbraco.Cms.Infrastructure.Migrations;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations.Stubs;
 
-    /// <summary>
-    /// Represents a stub migration class used in unit tests for simulating the dropping of foreign keys.
-    /// </summary>
+/// <summary>
+/// Represents a stub migration class used in unit tests for simulating the dropping of foreign keys.
+/// </summary>
 public class DropForeignKeyMigrationStub : MigrationBase
 {
     /// <summary>

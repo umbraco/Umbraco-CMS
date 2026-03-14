@@ -1,4 +1,4 @@
-// Copyright (c) Umbraco.
+﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.Diagnostics;
@@ -11,9 +11,9 @@ using Umbraco.Cms.Tests.UnitTests.Umbraco.Core.ShortStringHelper;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models;
 
-    /// <summary>
-    /// Unit tests for the <see cref="global::Umbraco.Core.Models.UserGroup"/> class.
-    /// </summary>
+/// <summary>
+/// Unit tests for the <see cref="global::Umbraco.Core.Models.UserGroup"/> class.
+/// </summary>
 [TestFixture]
 public class UserGroupTests
 {

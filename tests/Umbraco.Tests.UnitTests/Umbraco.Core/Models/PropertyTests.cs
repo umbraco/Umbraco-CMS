@@ -1,4 +1,4 @@
-// Copyright (c) Umbraco.
+﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.Linq;
@@ -9,9 +9,9 @@ using Umbraco.Cms.Tests.Common.Builders.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models;
 
-    /// <summary>
-    /// Contains unit tests for the <see cref="Property"/> model in <c>Umbraco.Core.Models</c>.
-    /// </summary>
+/// <summary>
+/// Contains unit tests for the <see cref="Property"/> model in <c>Umbraco.Core.Models</c>.
+/// </summary>
 [TestFixture]
 public class PropertyTests
 {
