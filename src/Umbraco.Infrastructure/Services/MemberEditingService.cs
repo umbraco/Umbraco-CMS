@@ -12,6 +12,10 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+/// Provides services for validating, creating, updating, and deleting members, including support for member data
+/// validation, password management, role assignment, and two-factor authentication operations.
+/// </summary>
 internal sealed class MemberEditingService : IMemberEditingService
 {
     private readonly IMemberService _memberService;
@@ -23,6 +27,7 @@ internal sealed class MemberEditingService : IMemberEditingService
     private readonly ILogger<MemberEditingService> _logger;
     private readonly IMemberGroupService _memberGroupService;
     private readonly SecuritySettings _securitySettings;
+    private readonly IExternalMemberService _externalMemberService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="MemberEditingService"/> class.
@@ -36,6 +41,7 @@ internal sealed class MemberEditingService : IMemberEditingService
     /// <param name="logger">The <see cref="ILogger{MemberEditingService}"/> for logging.</param>
     /// <param name="memberGroupService">The <see cref="IMemberGroupService"/> for managing member groups.</param>
     /// <param name="securitySettings">The <see cref="IOptions{SecuritySettings}"/> containing security configuration.</param>
+    /// <param name="externalMemberService">The <see cref="IExternalMemberService"/> for cross-store uniqueness validation.</param>
     public MemberEditingService(
         IMemberService memberService,
         IMemberTypeService memberTypeService,
@@ -45,7 +51,8 @@ internal sealed class MemberEditingService : IMemberEditingService
         IPasswordChanger<MemberIdentityUser> passwordChanger,
         ILogger<MemberEditingService> logger,
         IMemberGroupService memberGroupService,
-        IOptions<SecuritySettings> securitySettings)
+        IOptions<SecuritySettings> securitySettings,
+        IExternalMemberService externalMemberService)
     {
         _memberService = memberService;
         _memberTypeService = memberTypeService;
@@ -56,6 +63,7 @@ internal sealed class MemberEditingService : IMemberEditingService
         _logger = logger;
         _memberGroupService = memberGroupService;
         _securitySettings = securitySettings.Value;
+        _externalMemberService = externalMemberService;
     }
 
     /// <summary>
@@ -388,10 +396,24 @@ internal sealed class MemberEditingService : IMemberEditingService
             return MemberEditingOperationStatus.DuplicateUsername;
         }
 
+        // Cross-store uniqueness: also check external members for duplicate username.
+        ExternalMemberIdentity? externalByUsername = await _externalMemberService.GetByUsernameAsync(model.Username);
+        if (externalByUsername is not null && externalByUsername.Key != memberKey)
+        {
+            return MemberEditingOperationStatus.DuplicateUsername;
+        }
+
         if (_securitySettings.MemberRequireUniqueEmail)
         {
             IMember? byEmail = _memberService.GetByEmail(model.Email);
             if (byEmail is not null && byEmail.Key != memberKey)
+            {
+                return MemberEditingOperationStatus.DuplicateEmail;
+            }
+
+            // Cross-store uniqueness: also check external members for duplicate email.
+            ExternalMemberIdentity? externalByEmail = await _externalMemberService.GetByEmailAsync(model.Email);
+            if (externalByEmail is not null && externalByEmail.Key != memberKey)
             {
                 return MemberEditingOperationStatus.DuplicateEmail;
             }

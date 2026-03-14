@@ -57,7 +57,8 @@ public class MemberManagerTests
             new IdentityErrorDescriber(),
             Mock.Of<IExternalLoginWithKeyService>(),
             Mock.Of<ITwoFactorLoginService>(),
-            Mock.Of<IPublishedMemberCache>());
+            Mock.Of<IPublishedMemberCache>(),
+            Mock.Of<IExternalMemberService>());
 
         _mockIdentityOptions = new Mock<IOptions<IdentityOptions>>();
         var idOptions = new IdentityOptions { Lockout = { AllowedForNewUsers = false } };
