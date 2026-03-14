@@ -1,4 +1,4 @@
-﻿using Moq;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Delivery.Querying.Selectors;
 using Umbraco.Cms.Core.DeliveryApi;
@@ -7,9 +7,16 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.DeliveryApi.Selectors;
 
+/// <summary>
+/// Contains unit tests for the <see cref="DescendantsSelector"/> class in the Delivery API selectors, verifying its behavior and functionality.
+/// </summary>
 [TestFixture]
 public class DescendantsSelectorTests
 {
+    /// <summary>
+    /// Tests that the selector option can be built correctly for a given path.
+    /// </summary>
+    /// <param name="documentStartNodeId">The optional start node ID for the document.</param>
     [TestCase(null)]
     [TestCase(1234)]
     public void Can_Build_Selector_Option_For_Path(int? documentStartNodeId)
@@ -39,6 +46,9 @@ public class DescendantsSelectorTests
         Assert.AreEqual(documentKey.ToString("D"), result.Values[0]);
     }
 
+    /// <summary>
+    /// Tests that the DescendantsSelector can build a selector option correctly when given an ID.
+    /// </summary>
     [Test]
     public void Can_Build_Selector_Option_For_Id()
     {

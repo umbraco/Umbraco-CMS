@@ -14,16 +14,30 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.ShortStringHelper;
 
+/// <summary>
+/// Unit tests for the extension methods of the StringExtensions class in the ShortStringHelper namespace.
+/// </summary>
 [TestFixture]
 public class StringExtensionsTests
 {
     private readonly IShortStringHelper _mockShortStringHelper = new MockShortStringHelper();
 
+    /// <summary>
+    /// Verifies that the <c>ToFriendlyName</c> extension method correctly converts an input string into a human-friendly name format.
+    /// </summary>
+    /// <param name="first">The original input string to be converted.</param>
+    /// <param name="second">The expected result after conversion to a friendly name.</param>
     [TestCase("hello-world.png", "Hello World")]
     [TestCase("hello-world .png", "Hello World")]
     [TestCase("_hello-world __1.png", "Hello World 1")]
     public void To_Friendly_Name(string first, string second) => Assert.AreEqual(first.ToFriendlyName(), second);
 
+    /// <summary>
+    /// Verifies that the String.ToGuid() extension method produces equal GUIDs for identical strings and different GUIDs for different strings.
+    /// </summary>
+    /// <param name="first">The first string to convert to a GUID.</param>
+    /// <param name="second">The second string to convert to a GUID.</param>
+    /// <param name="result">True if the GUIDs generated from <paramref name="first"/> and <paramref name="second"/> are expected to be equal; otherwise, false.</param>
     [TestCase("hello", "world", false)]
     [TestCase("hello", "hello", true)]
     [TestCase("hellohellohellohellohellohellohello", "hellohellohellohellohellohellohelloo", false)]
@@ -42,6 +56,11 @@ public class StringExtensionsTests
         Assert.AreEqual(result, first.ToGuid() == second.ToGuid());
     }
 
+    /// <summary>
+    /// Verifies that the <see cref="StringExtensions.StripFileExtension(string)"/> extension method correctly removes the file extension from a given string.
+    /// </summary>
+    /// <param name="input">A string that may contain a file extension.</param>
+    /// <param name="result">The expected string after removing the file extension from <paramref name="input"/>.</param>
     [TestCase("hello.txt", "hello")]
     [TestCase("this.is.a.Txt", "this.is.a")]
     [TestCase("this.is.not.a. Txt", "this.is.not.a. Txt")]
@@ -52,6 +71,11 @@ public class StringExtensionsTests
         Assert.AreEqual(stripped, result);
     }
 
+    /// <summary>
+    /// Verifies that the <c>GetFileExtension</c> extension method returns the expected file extension for a variety of file path and URL inputs.
+    /// </summary>
+    /// <param name="input">A string representing a file path or URL to extract the extension from.</param>
+    /// <param name="result">The expected file extension, including the leading dot (e.g., ".txt"), or an empty string if no extension is present.</param>
     [TestCase("../wtf.js?x=wtf", ".js")]
     [TestCase(".htaccess", ".htaccess")]
     [TestCase("path/to/file/image.png", ".png")]
@@ -70,6 +94,11 @@ public class StringExtensionsTests
         Assert.AreEqual(result, extension);
     }
 
+    /// <summary>
+    /// Verifies that the <c>CleanForXss</c> extension method properly sanitizes input strings to remove or neutralize potential XSS (Cross-Site Scripting) content.
+    /// </summary>
+    /// <param name="input">The potentially unsafe input string to be sanitized.</param>
+    /// <param name="result">The expected sanitized output string after cleaning.</param>
     [TestCase("'+alert(1234)+'", "+alert1234+")]
     [TestCase("'+alert(56+78)+'", "+alert56+78+")]
     [TestCase("{{file}}", "file")]
@@ -93,6 +122,15 @@ public class StringExtensionsTests
         Assert.AreEqual(shouldBe, trimmed);
     }
 
+    /// <summary>
+    /// Verifies that the <c>TrimStart</c> extension method correctly removes the specified substring from the start of the input string, if present.
+    /// </summary>
+    /// <param name="input">The original string to be trimmed.</param>
+    /// <param name="forTrimming">The substring to remove from the start of <paramref name="input"/>.</param>
+    /// <param name="shouldBe">The expected string result after trimming.</param>
+    /// <remarks>
+    /// This test checks various cases where the substring to trim is present at the start of the input string.
+    /// </remarks>
     [TestCase("Hello this is my string", "hello", " this is my string")]
     [TestCase("Hello this is my string", "Hello this", " is my string")]
     [TestCase("Hello this is my string", "Hello this is my ", "string")]
@@ -103,6 +141,14 @@ public class StringExtensionsTests
         Assert.AreEqual(shouldBe, trimmed);
     }
 
+    /// <summary>
+    /// Verifies that the Replace extension method correctly replaces all occurrences of a specified substring in the input string with a new substring, using the provided <see cref="StringComparison"/> option.
+    /// </summary>
+    /// <param name="input">The original string on which to perform the replacement.</param>
+    /// <param name="oldString">The substring to search for and replace.</param>
+    /// <param name="newString">The substring to insert in place of <paramref name="oldString"/>.</param>
+    /// <param name="shouldBe">The expected result string after performing the replacement.</param>
+    /// <param name="stringComparison">The <see cref="StringComparison"/> option that determines how <paramref name="oldString"/> is matched within <paramref name="input"/>.</param>
     [TestCase(
         "Hello this is my string",
         "hello",
@@ -146,6 +192,11 @@ public class StringExtensionsTests
         Assert.AreEqual(shouldBe, replaced);
     }
 
+    /// <summary>
+    /// Tests the ToFirstUpper extension method to ensure it converts the first character of the string to uppercase.
+    /// </summary>
+    /// <param name="input">The input string to convert.</param>
+    /// <param name="expected">The expected result after conversion.</param>
     [TestCase(null, null)]
     [TestCase("", "")]
     [TestCase("x", "X")]
@@ -168,6 +219,13 @@ public class StringExtensionsTests
         Assert.AreEqual(expected, output);
     }
 
+    /// <summary>
+    /// Unit test for verifying that the <c>ContainsAny</c> string extension method correctly determines whether the specified <paramref name="haystack"/> contains any of the provided <paramref name="needles"/>, using the given <paramref name="comparison"/> type.
+    /// </summary>
+    /// <param name="haystack">The string to search within.</param>
+    /// <param name="needles">The collection of strings to search for in the haystack.</param>
+    /// <param name="comparison">The type of string comparison to use when searching.</param>
+    /// <param name="expected">The expected result indicating whether any needle is found in the haystack.</param>
     [TestCase("pineapple", new[] { "banana", "apple", "blueberry", "strawberry" }, StringComparison.CurrentCulture, true)]
     [TestCase("PINEAPPLE", new[] { "banana", "apple", "blueberry", "strawberry" }, StringComparison.CurrentCulture, false)]
     [TestCase("pineapple", new[] { "banana", "Apple", "blueberry", "strawberry" }, StringComparison.CurrentCulture, false)]
@@ -181,6 +239,11 @@ public class StringExtensionsTests
         Assert.AreEqual(expected, output);
     }
 
+    /// <summary>
+    /// Verifies that the <see cref="StringExtensions.IsNullOrWhiteSpace(string)"/> method correctly determines whether the specified <paramref name="value"/> is null, empty, or consists only of white-space characters.
+    /// </summary>
+    /// <param name="value">The string to evaluate.</param>
+    /// <param name="expected">True if <paramref name="value"/> is expected to be null, empty, or only white-space; otherwise, false.</param>
     [TestCase("", true)]
     [TestCase(" ", true)]
     [TestCase("\r\n\r\n", true)]
@@ -205,6 +268,11 @@ public class StringExtensionsTests
         Assert.AreEqual(expected, result);
     }
 
+    /// <summary>
+    /// Tests that a string can be correctly URL token encoded and then decoded back to its original value.
+    /// </summary>
+    /// <param name="value">The input string to encode and decode.</param>
+    /// <param name="expected">The expected result of encoding <paramref name="value"/> as a URL token.</param>
     [TestCase("hello", "aGVsbG8")]
     [TestCase("tad", "dGFk")]
     [TestCase("AmqGr+Fd!~ééé", "QW1xR3IrRmQhfsOpw6nDqQ")]
@@ -224,6 +292,10 @@ public class StringExtensionsTests
 
     // note: here we just ensure that the proper helper gets called properly
     // but the "legacy" tests have moved to the legacy helper tests
+    /// <summary>
+    /// Tests that the <c>ToUrlSegment</c> extension method calls the provided short string helper correctly
+    /// and returns the expected URL alias output.
+    /// </summary>
     [Test]
     public void ToUrlAlias()
     {
@@ -231,6 +303,9 @@ public class StringExtensionsTests
         Assert.AreEqual("URL-SEGMENT::JUST-ANYTHING", output);
     }
 
+    /// <summary>
+    /// Tests the FormatUrl extension method to ensure it formats the URL segment correctly.
+    /// </summary>
     [Test]
     public void FormatUrl()
     {
@@ -238,6 +313,10 @@ public class StringExtensionsTests
         Assert.AreEqual("URL-SEGMENT::JUST-ANYTHING", output);
     }
 
+    /// <summary>
+    /// Unit test for the <see cref="ToSafeAlias"/> extension method, verifying that it correctly converts a string to a safe Umbraco alias using the provided short string helper.
+    /// Ensures that the output matches the expected safe alias format for a sample input.
+    /// </summary>
     [Test]
     public void ToUmbracoAlias()
     {
@@ -245,6 +324,10 @@ public class StringExtensionsTests
         Assert.AreEqual("SAFE-ALIAS::JUST-ANYTHING", output);
     }
 
+    /// <summary>
+    /// Unit test for the ToSafeAlias extension method, verifying that it returns the expected safe alias string for a given input.
+    /// Ensures that "JUST-ANYTHING" is converted to "SAFE-ALIAS::JUST-ANYTHING".
+    /// </summary>
     [Test]
     public void ToSafeAlias()
     {
@@ -252,6 +335,10 @@ public class StringExtensionsTests
         Assert.AreEqual("SAFE-ALIAS::JUST-ANYTHING", output);
     }
 
+    /// <summary>
+    /// Verifies that the <c>ToSafeAlias</c> method correctly generates a safe alias when provided with a culture parameter.
+    /// Ensures the output matches the expected format for the given input string and culture context.
+    /// </summary>
     [Test]
     public void ToSafeAliasWithCulture()
     {
@@ -259,6 +346,10 @@ public class StringExtensionsTests
         Assert.AreEqual("SAFE-ALIAS-CULTURE::JUST-ANYTHING", output);
     }
 
+    /// <summary>
+    /// Tests that the <c>ToUrlSegment</c> extension method correctly converts a string to its expected URL segment format using a mocked short string helper.
+    /// Verifies that the output matches the expected value for a sample input.
+    /// </summary>
     [Test]
     public void ToUrlSegment()
     {
@@ -266,6 +357,10 @@ public class StringExtensionsTests
         Assert.AreEqual("URL-SEGMENT::JUST-ANYTHING", output);
     }
 
+    /// <summary>
+    /// Verifies that the <c>ToUrlSegment</c> extension method correctly generates a URL segment when provided with a culture parameter.
+    /// Ensures the output matches the expected format for culture-specific URL segments.
+    /// </summary>
     [Test]
     public void ToUrlSegmentWithCulture()
     {
@@ -273,6 +368,9 @@ public class StringExtensionsTests
         Assert.AreEqual("URL-SEGMENT-CULTURE::JUST-ANYTHING", output);
     }
 
+    /// <summary>
+    /// Verifies that the <c>ToSafeFileName</c> extension method returns the expected safe file name output for a given input string.
+    /// </summary>
     [Test]
     public void ToSafeFileName()
     {
@@ -280,6 +378,11 @@ public class StringExtensionsTests
         Assert.AreEqual("SAFE-FILE-NAME::JUST-ANYTHING", output);
     }
 
+    /// <summary>
+    /// Tests that the <c>ToSafeFileName</c> extension method correctly applies culture-specific logic
+    /// when generating a safe file name from a string, using a mocked short string helper.
+    /// Verifies that the output matches the expected culture-specific safe file name format.
+    /// </summary>
     [Test]
     public void ToSafeFileNameWithCulture()
     {
@@ -287,6 +390,9 @@ public class StringExtensionsTests
         Assert.AreEqual("SAFE-FILE-NAME-CULTURE::JUST-ANYTHING", output);
     }
 
+    /// <summary>
+    /// Verifies that the ConvertCase test correctly checks the ToCleanString extension method with the Unchanged CleanStringType, asserting the expected cleaned string output.
+    /// </summary>
     [Test]
     public void ConvertCase()
     {
@@ -294,6 +400,9 @@ public class StringExtensionsTests
         Assert.AreEqual("CLEAN-STRING-A::JUST-ANYTHING", output);
     }
 
+    /// <summary>
+    /// Tests that the <c>SplitPascalCasing</c> extension method correctly splits a Pascal-cased string using the provided short string helper.
+    /// </summary>
     [Test]
     public void SplitPascalCasing()
     {
@@ -301,6 +410,10 @@ public class StringExtensionsTests
         Assert.AreEqual("SPLIT-PASCAL-CASING::JUST-ANYTHING", output);
     }
 
+    /// <summary>
+    /// Verifies that the <c>ReplaceMany</c> extension method correctly replaces multiple substrings in an input string using a provided character replacement map.
+    /// This test ensures that special characters and substrings are replaced according to the specified dictionary.
+    /// </summary>
     [Test] // can't do cases with an IDictionary
     public void ReplaceManyWithCharMap()
     {
@@ -326,6 +439,13 @@ public class StringExtensionsTests
         Assert.AreEqual(expected, output);
     }
 
+    /// <summary>
+    /// Tests the ReplaceFirst extension method to ensure it correctly replaces the first occurrence of a specified substring.
+    /// </summary>
+    /// <param name="input">The original string to perform the replacement on.</param>
+    /// <param name="search">The substring to find and replace.</param>
+    /// <param name="replacement">The string to replace the first occurrence of the search string with.</param>
+    /// <param name="expected">The expected result after replacement.</param>
     [TestCase("test to test", "test", "release", "release to test")]
     [TestCase("nothing to do", "test", "release", "nothing to do")]
     public void ReplaceFirst(string input, string search, string replacement, string expected)
@@ -334,6 +454,18 @@ public class StringExtensionsTests
         Assert.AreEqual(expected, output);
     }
 
+    /// <summary>
+    /// Unit test for the <c>IsFullPath</c> extension method, verifying that it correctly identifies whether a given string represents a full file path on both Windows and Linux platforms.
+    /// <para>
+    /// The test covers various scenarios, including:
+    /// <list type="bullet">
+    /// <item>Valid full paths on Windows (e.g., <c>C:\dir\file.ext</c>, UNC paths)</item>
+    /// <item>Valid full paths on Linux (e.g., <c>/some/file</c>)</item>
+    /// <item>Strings that are not full paths on either platform</item>
+    /// <item>Invalid or empty path strings</item>
+    /// </list>
+    /// </para>
+    /// </summary>
     [Test]
     public void IsFullPath()
     {
@@ -365,6 +497,11 @@ public class StringExtensionsTests
         TryIsFullPath("   ", false, false); // technically, a valid filename on Linux
     }
 
+    /// <summary>
+    /// Unit test for the <see cref="StringExtensions.IsEmail"/> extension method, verifying whether the specified string is correctly identified as a valid email address.
+    /// </summary>
+    /// <param name="email">The input string to evaluate as an email address.</param>
+    /// <param name="isEmail">The expected result: <c>true</c> if the input should be recognized as a valid email address; otherwise, <c>false</c>.</param>
     [TestCase("test@test.com", true)]
     [TestCase("test@test", true)]
     [TestCase("testtest.com", false)]
@@ -389,6 +526,11 @@ public class StringExtensionsTests
         }
     }
 
+    /// <summary>
+    /// Verifies that <c>GetIdsFromPathReversed</c> returns a comma-separated string of IDs in reverse order from the input string, skipping any invalid or non-numeric IDs.
+    /// </summary>
+    /// <param name="input">The input string containing comma-separated IDs, which may include invalid entries.</param>
+    /// <param name="expected">The expected output string of valid IDs in reverse order, separated by commas.</param>
     [TestCase(null, "")]
     [TestCase("", "")]
     [TestCase("1,2,3,4,5", "5,4,3,2,1")]
@@ -399,6 +541,11 @@ public class StringExtensionsTests
         Assert.AreEqual(expected, string.Join(",", ids));
     }
 
+    /// <summary>
+    /// Unit test for the <see cref="StringExtensions.EnsureCultureCode(string?)"/> extension method, verifying that it returns the expected normalized culture code for a given input.
+    /// </summary>
+    /// <param name="culture">The input culture code to normalize. Can be null, empty, or a specific culture code string.</param>
+    /// <param name="expected">The expected normalized culture code result.</param>
     [TestCase(null, null)]
     [TestCase("", "")]
     [TestCase("*", "*")]
@@ -408,6 +555,9 @@ public class StringExtensionsTests
     [TestCase("en-gb", "en-GB")]
     public void EnsureCultureCode_ReturnsExpectedResult(string? culture, string? expected) => Assert.AreEqual(expected, culture.EnsureCultureCode());
 
+    /// <summary>
+    /// Tests that EnsureCultureCode throws a CultureNotFoundException when given an unrecognised culture code.
+    /// </summary>
     [Test]
     [Platform(Include = "Win")]
     public void EnsureCultureCode_ThrowsOnUnrecognisedCode() => Assert.Throws<CultureNotFoundException>(() => "xxx-xxx".EnsureCultureCode());

@@ -26,6 +26,9 @@ using Umbraco.Cms.Web.Common.Security;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Management.Configuration;
 
+/// <summary>
+/// Contains unit tests for the <c>ConfigureBackOfficeCookieOptions</c> class, verifying the configuration of back office cookie options in Umbraco CMS.
+/// </summary>
 [TestFixture]
 public class ConfigureBackOfficeCookieOptionsTests
 {
@@ -36,6 +39,9 @@ public class ConfigureBackOfficeCookieOptionsTests
     private Mock<BackOfficeSecurityStampValidator> _mockStampValidator = null!;
     private Mock<IBackOfficeSignInManager> _mockSignInManager = null!;
 
+    /// <summary>
+    /// Sets up the test environment before each test is run.
+    /// </summary>
     [SetUp]
     public void SetUp()
     {
@@ -47,6 +53,10 @@ public class ConfigureBackOfficeCookieOptionsTests
         _mockStampValidator = CreateMockStampValidator();
     }
 
+    /// <summary>
+    /// Tests that the IssuedUtc property is not reset when no renewal is triggered during principal validation.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task OnValidatePrincipal_IssuedUtc_Not_Reset_When_No_Renewal_Triggered()
     {
@@ -73,6 +83,10 @@ public class ConfigureBackOfficeCookieOptionsTests
         });
     }
 
+    /// <summary>
+    /// Tests that the timestamps on the principal are reset when the validator triggers a renewal.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task OnValidatePrincipal_Timestamps_Reset_When_Validator_Triggers_Renewal()
     {
@@ -100,6 +114,10 @@ public class ConfigureBackOfficeCookieOptionsTests
         });
     }
 
+    /// <summary>
+    /// Tests that the timestamps on the authentication cookie are reset when KeepUserLoggedIn is true and the renewal conditions are met.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task OnValidatePrincipal_Timestamps_Reset_When_KeepUserLoggedIn_Triggers_Renewal()
     {
@@ -131,6 +149,12 @@ public class ConfigureBackOfficeCookieOptionsTests
         });
     }
 
+    /// <summary>
+    /// Tests that the principal validation does not renew the authentication cookie
+    /// when the "KeepUserLoggedIn" setting is true but the remaining time on the cookie
+    /// is greater than the elapsed time since it was issued.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task OnValidatePrincipal_No_Renewal_When_KeepUserLoggedIn_But_TimeRemaining_Greater_Than_TimeElapsed()
     {

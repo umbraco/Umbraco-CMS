@@ -8,9 +8,15 @@ using Umbraco.Cms.Core.Configuration.Models.Validation;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Configuration.Models.Validation
 {
+/// <summary>
+/// Contains unit tests for validating content settings using the <see cref="ContentSettingsValidator"/> class.
+/// </summary>
     [TestFixture]
     public class ContentSettingsValidatorTests
     {
+    /// <summary>
+    /// Tests that the ContentSettingsValidator returns success for a valid configuration.
+    /// </summary>
         [Test]
         public void Returns_Success_ForValid_Configuration()
         {
@@ -20,6 +26,9 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Configuration.Models.Validati
             Assert.True(result.Succeeded);
         }
 
+    /// <summary>
+    /// Tests that the ContentSettingsValidator fails validation when the Error404Collection contains an entry with an empty culture.
+    /// </summary>
         [Test]
         public void Returns_Fail_For_Configuration_With_Invalid_Error404Collection_Due_To_Empty_Culture()
         {
@@ -29,6 +38,9 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Configuration.Models.Validati
             Assert.False(result.Succeeded);
         }
 
+    /// <summary>
+    /// Tests that the validator returns a failure result when the configuration contains an invalid AutoFillImageProperties collection.
+    /// </summary>
         [Test]
         public void Returns_Fail_For_Configuration_With_Invalid_AutoFillImageProperties_Collection()
         {

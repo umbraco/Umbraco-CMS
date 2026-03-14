@@ -11,9 +11,17 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors.Validators;
 
+    /// <summary>
+    /// Unit tests for the EmailValidator class.
+    /// </summary>
 [TestFixture]
 public class EmailValidatorTests
 {
+    /// <summary>
+    /// Tests the email validator to ensure it correctly determines whether a given email address is valid.
+    /// </summary>
+    /// <param name="email">The email address to validate. Can be <c>null</c>, empty, or a string value.</param>
+    /// <param name="expectedSuccess">True if the email is expected to be considered valid; otherwise, false.</param>
     [TestCase(null, true)]
     [TestCase("", true)]
     [TestCase(" ", false)]

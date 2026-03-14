@@ -1,13 +1,19 @@
-﻿using Moq;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.DeliveryApi;
 
+    /// <summary>
+    /// Contains unit tests for the <see cref="ApiDocumentUrlService"/> class.
+    /// </summary>
 [TestFixture]
 public class ApiDocumentUrlServiceTests
 {
+    /// <summary>
+    /// Tests that the ApiDocumentUrlService can resolve a document key when a start node is specified in the route.
+    /// </summary>
     [Test]
     public void Can_Resolve_Document_Key_With_Start_Node()
     {
@@ -26,6 +32,9 @@ public class ApiDocumentUrlServiceTests
         Assert.AreEqual(documentKey, result);
     }
 
+    /// <summary>
+    /// Tests that the ApiDocumentUrlService can resolve a document key without specifying a start node.
+    /// </summary>
     [Test]
     public void Can_Resolve_Document_Key_Without_Start_Node()
     {

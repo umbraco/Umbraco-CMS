@@ -12,6 +12,9 @@ using Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.BackgroundJobs.Jobs
 {
+    /// <summary>
+    /// Contains unit tests that verify the behavior of the <see cref="TempFileCleanupJob"/> class.
+    /// </summary>
     [TestFixture]
     public class TempFileCleanupJobTests
     {
@@ -19,6 +22,10 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.BackgroundJobs.Jobs
         private readonly string _testPath = Path.Combine(TestContext.CurrentContext.TestDirectory.Split("bin")[0], "App_Data", "TEMP");
 
 
+    /// <summary>
+    /// Tests that the TempFileCleanupJob executes and cleans up files as expected.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
         [Test]
         public async Task Executes_And_Cleans_Files()
         {

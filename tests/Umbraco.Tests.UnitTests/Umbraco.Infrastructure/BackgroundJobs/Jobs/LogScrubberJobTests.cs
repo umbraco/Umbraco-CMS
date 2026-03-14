@@ -15,6 +15,10 @@ using Umbraco.Cms.Tests.Common;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.BackgroundJobs.Jobs;
 
+/// <summary>
+/// Contains unit tests for the <see cref="LogScrubberJob"/> background job in Umbraco.
+/// These tests verify the correct behavior and functionality of the log scrubbing process.
+/// </summary>
 [TestFixture]
 public class LogScrubberJobTests
 {
@@ -22,6 +26,10 @@ public class LogScrubberJobTests
 
     private const int MaxLogAgeInMinutes = 60;
 
+    /// <summary>
+    /// Tests that the LogScrubberJob executes and successfully scrubs logs.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task Executes_And_Scrubs_Logs()
     {

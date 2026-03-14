@@ -19,6 +19,11 @@ namespace Umbraco.Cms.Tests.UnitTests.AutoFixture.Customizations;
 
 internal sealed class UmbracoCustomizations : ICustomization
 {
+    /// <summary>
+    /// Applies a set of Umbraco-specific customizations to the provided AutoFixture <see cref="IFixture"/> instance.
+    /// This includes configuring mock objects, constructor selection, and default values for various Umbraco types to facilitate unit testing.
+    /// </summary>
+    /// <param name="fixture">The <see cref="IFixture"/> instance to customize for Umbraco unit tests.</param>
     public void Customize(IFixture fixture)
     {
         fixture.Customize<BackOfficeIdentityUser>(

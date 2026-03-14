@@ -12,6 +12,9 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Management.Factories;
 
+/// <summary>
+/// Contains unit tests for the <see cref="DocumentCollectionPresentationFactory"/> class, verifying its behavior and functionality.
+/// </summary>
 [TestFixture]
 public class DocumentCollectionPresentationFactoryTests
 {
@@ -21,6 +24,9 @@ public class DocumentCollectionPresentationFactoryTests
     private Mock<IUserService> _userService = null!;
     private DocumentCollectionPresentationFactory _factory = null!;
 
+    /// <summary>
+    /// Sets up the test environment before each test is run.
+    /// </summary>
     [SetUp]
     public void SetUp()
     {
@@ -41,6 +47,12 @@ public class DocumentCollectionPresentationFactoryTests
             _userService.Object);
     }
 
+    /// <summary>
+    /// Verifies that the <c>IsProtected</c> property is set correctly on document collection response models
+    /// when public access entries are retrieved in a single batched <c>GetAll</c> call, rather than per item.
+    /// Ensures that protected ancestors are detected efficiently for each content item in the collection.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task SetUnmappedProperties_Sets_IsProtected_Via_Batched_GetAll()
     {
@@ -100,6 +112,10 @@ public class DocumentCollectionPresentationFactoryTests
         Assert.AreEqual(ancestorKey, result[2].Ancestors.First().Id);
     }
 
+    /// <summary>
+    /// Tests that SetUnmappedProperties correctly handles the case when there are no public access entries.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task SetUnmappedProperties_Handles_No_Public_Access_Entries()
     {
@@ -140,6 +156,10 @@ public class DocumentCollectionPresentationFactoryTests
         Assert.IsFalse(result[1].IsProtected);
     }
 
+    /// <summary>
+    /// Verifies that <c>SetUnmappedProperties</c> skips response model items that do not have a corresponding content item, ensuring their properties remain unchanged.
+    /// </summary>
+    /// <returns>A <see cref="Task"/> representing the asynchronous test operation.</returns>
     [Test]
     public async Task SetUnmappedProperties_Skips_Items_With_No_Matching_Content()
     {
@@ -179,6 +199,10 @@ public class DocumentCollectionPresentationFactoryTests
         Assert.IsFalse(result[1].IsProtected, "Orphan item should remain default (not protected)");
     }
 
+    /// <summary>
+    /// Verifies that the protection status is detected when the content item's own node is protected.
+    /// </summary>
+    /// <returns>A <see cref="Task"/> representing the asynchronous test operation.</returns>
     [Test]
     public async Task SetUnmappedProperties_Detects_Protection_On_Content_Item_Itself()
     {
@@ -214,6 +238,11 @@ public class DocumentCollectionPresentationFactoryTests
         Assert.IsTrue(result[0].IsProtected, "Content should be protected when its own node is the protected node");
     }
 
+    /// <summary>
+    /// Verifies that <c>SetUnmappedProperties</c> computes ancestor information only once for sibling items in a document collection.
+    /// Ensures that the ancestor computation is not redundantly performed for each sibling, but shared among them, improving performance.
+    /// </summary>
+    /// <returns>A <see cref="Task"/> representing the asynchronous test operation.</returns>
     [Test]
     public async Task SetUnmappedProperties_Computes_Ancestors_Once_For_Siblings()
     {
@@ -260,6 +289,11 @@ public class DocumentCollectionPresentationFactoryTests
         Assert.AreEqual(ancestorKey, result[2].Ancestors.First().Id);
     }
 
+    /// <summary>
+    /// Verifies that <see cref="ContentCollectionPresentationFactory{IContent, DocumentCollectionResponseModel, DocumentValueResponseModel, DocumentVariantResponseModel}.CreateCollectionModelAsync(ListViewPagedModel{IContent})"/> resolves user names in batch when handling multiple content items.
+    /// Ensures that user information is fetched in a single call for all unique user IDs, and that per-item user profile resolution is not performed.
+    /// </summary>
+    /// <returns>A <see cref="Task"/> representing the asynchronous test operation.</returns>
     [Test]
     public async Task CreateCollectionModelAsync_Batch_Resolves_User_Names()
     {

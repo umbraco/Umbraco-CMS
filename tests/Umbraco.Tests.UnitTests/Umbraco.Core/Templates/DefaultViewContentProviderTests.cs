@@ -6,6 +6,9 @@ using Umbraco.Cms.Core.IO;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Templates;
 
+/// <summary>
+/// Contains unit tests for the <see cref="DefaultViewContentProvider"/> class.
+/// </summary>
 [TestFixture]
 public class DefaultViewContentProviderTests
 {
@@ -24,6 +27,10 @@ public class DefaultViewContentProviderTests
             FixView(view));
     }
 
+    /// <summary>
+    /// Verifies that <see cref="DefaultViewContentProvider.GetDefaultFileContent"/> returns the expected default layout content
+    /// when provided with a layout name. Ensures the generated view includes the correct layout directive referencing the specified layout file.
+    /// </summary>
     [Test]
     public void Layout()
     {
@@ -37,6 +44,11 @@ public class DefaultViewContentProviderTests
             FixView(view));
     }
 
+    /// <summary>
+    /// Verifies that <see cref="DefaultViewContentProvider.GetDefaultFileContent"/> generates the expected view content
+    /// when provided with a specific model class name.
+    /// Ensures the generated view inherits from <c>UmbracoViewPage&lt;ClassName&gt;</c> and sets <c>Layout</c> to <c>null</c>.
+    /// </summary>
     [Test]
     public void ClassName()
     {
@@ -50,6 +62,9 @@ public class DefaultViewContentProviderTests
             FixView(view));
     }
 
+    /// <summary>
+    /// Tests that the default view content provider generates the expected content when a model namespace is provided.
+    /// </summary>
     [Test]
     public void Namespace()
     {
@@ -63,6 +78,9 @@ public class DefaultViewContentProviderTests
             FixView(view));
     }
 
+    /// <summary>
+    /// Tests that the default view content includes the correct class name and namespace.
+    /// </summary>
     [Test]
     public void ClassNameAndNamespace()
     {
@@ -77,6 +95,9 @@ public class DefaultViewContentProviderTests
             FixView(view));
     }
 
+    /// <summary>
+    /// Tests that the default view content includes the correct class name, namespace, and alias.
+    /// </summary>
     [Test]
     public void ClassNameAndNamespaceAndAlias()
     {
@@ -94,6 +115,9 @@ public class DefaultViewContentProviderTests
             FixView(view));
     }
 
+    /// <summary>
+    /// Tests that the default view content provider generates the expected combined view content.
+    /// </summary>
     [Test]
     public void Combined()
     {

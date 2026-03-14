@@ -8,9 +8,15 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Services;
 
+/// <summary>
+/// Contains unit tests for verifying the functionality of the <see cref="OEmbedService"/> class.
+/// </summary>
 [TestFixture]
 public class OEmbedServiceTests
 {
+    /// <summary>
+    /// Tests that MatchesUrlScheme returns true when the URL matches the given pattern.
+    /// </summary>
     [Test]
     public void MatchesUrlScheme_WithMatchingPattern_ReturnsTrue()
     {
@@ -21,6 +27,9 @@ public class OEmbedServiceTests
         Assert.That(result, Is.True);
     }
 
+    /// <summary>
+    /// Tests that MatchesUrlScheme returns false when the URL does not match the given pattern.
+    /// </summary>
     [Test]
     public void MatchesUrlScheme_WithNonMatchingPattern_ReturnsFalse()
     {
@@ -31,6 +40,9 @@ public class OEmbedServiceTests
         Assert.That(result, Is.False);
     }
 
+    /// <summary>
+    /// Tests that MatchesUrlScheme returns true if any of the multiple provided patterns match the URL.
+    /// </summary>
     [Test]
     public void MatchesUrlScheme_WithMultiplePatterns_ReturnsTrueIfAnyMatches()
     {
@@ -46,6 +58,9 @@ public class OEmbedServiceTests
         Assert.That(result, Is.True);
     }
 
+    /// <summary>
+    /// Tests that MatchesUrlScheme returns false when given empty patterns.
+    /// </summary>
     [Test]
     public void MatchesUrlScheme_WithEmptyPatterns_ReturnsFalse()
     {
@@ -56,6 +71,9 @@ public class OEmbedServiceTests
         Assert.That(result, Is.False);
     }
 
+    /// <summary>
+    /// Tests that the MatchesUrlScheme method correctly matches URL schemes in a case-insensitive manner.
+    /// </summary>
     [Test]
     public void MatchesUrlScheme_IsCaseInsensitive()
     {
@@ -66,6 +84,9 @@ public class OEmbedServiceTests
         Assert.That(result, Is.True);
     }
 
+    /// <summary>
+    /// Tests that caching does not affect the results of MatchesUrlScheme.
+    /// </summary>
     [Test]
     public void MatchesUrlScheme_CachingDoesNotAffectResults()
     {
@@ -81,6 +102,10 @@ public class OEmbedServiceTests
         Assert.That(result3, Is.False);
     }
 
+    /// <summary>
+    /// Tests that GetMarkupAsync returns a result indicating no supported provider when the URL does not match any known provider.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task GetMarkupAsync_WithNoMatchingProvider_ReturnsNoSupportedProvider()
     {
@@ -96,6 +121,10 @@ public class OEmbedServiceTests
         Assert.That(result.Status, Is.EqualTo(OEmbedOperationStatus.NoSupportedProvider));
     }
 
+    /// <summary>
+    /// Tests that GetMarkupAsync returns a successful result when a matching provider is found.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task GetMarkupAsync_WithMatchingProvider_ReturnsSuccess()
     {
@@ -116,6 +145,10 @@ public class OEmbedServiceTests
         Assert.That(result.Result, Is.EqualTo(expectedMarkup));
     }
 
+    /// <summary>
+    /// Tests that GetMarkupAsync returns a result indicating the provider returned an invalid result when the provider returns null.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task GetMarkupAsync_WhenProviderReturnsNull_ReturnsProviderReturnedInvalidResult()
     {
@@ -134,6 +167,10 @@ public class OEmbedServiceTests
         Assert.That(result.Status, Is.EqualTo(OEmbedOperationStatus.ProviderReturnedInvalidResult));
     }
 
+    /// <summary>
+    /// Tests that GetMarkupAsync returns an unexpected exception status when the provider throws an exception.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task GetMarkupAsync_WhenProviderThrows_ReturnsUnexpectedException()
     {
@@ -152,6 +189,10 @@ public class OEmbedServiceTests
         Assert.That(result.Status, Is.EqualTo(OEmbedOperationStatus.UnexpectedException));
     }
 
+    /// <summary>
+    /// Tests that when multiple providers are available, the correct provider is selected based on the URL.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task GetMarkupAsync_WithMultipleProviders_SelectsCorrectProvider()
     {
@@ -178,6 +219,10 @@ public class OEmbedServiceTests
         Assert.That(result.Result, Is.EqualTo(vimeoMarkup));
     }
 
+    /// <summary>
+    /// Tests that the GetMarkupAsync method passes the specified width and height dimensions to the embed provider.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task GetMarkupAsync_PassesDimensionsToProvider()
     {
@@ -192,11 +237,13 @@ public class OEmbedServiceTests
         await service.GetMarkupAsync(new Uri("https://example.com/video/123"), 1920, 1080, CancellationToken.None);
 
         // Assert
-        providerMock.Verify(p => p.GetMarkupAsync(
-            "https://example.com/video/123",
-            1920,
-            1080,
-            It.IsAny<CancellationToken>()), Times.Once);
+        providerMock.Verify(
+            p => p.GetMarkupAsync(
+                "https://example.com/video/123",
+                1920,
+                1080,
+                It.IsAny<CancellationToken>()),
+            Times.Once);
     }
 
     private static OEmbedService CreateService(params IEmbedProvider[] providers)

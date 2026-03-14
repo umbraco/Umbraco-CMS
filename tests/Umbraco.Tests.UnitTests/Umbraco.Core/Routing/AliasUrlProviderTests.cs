@@ -13,6 +13,9 @@ using Umbraco.Cms.Core.Web;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Routing;
 
+/// <summary>
+/// Contains unit tests for the <see cref="AliasUrlProvider"/> class in the Umbraco CMS routing system.
+/// </summary>
 [TestFixture]
 public class AliasUrlProviderTests
 {
@@ -22,24 +25,54 @@ public class AliasUrlProviderTests
 
     private sealed class TestContext
     {
+    /// <summary>
+    /// Gets the mock for the Umbraco context accessor.
+    /// </summary>
         public Mock<IUmbracoContextAccessor> UmbracoContextAccessor { get; } = new();
 
+    /// <summary>
+    /// Gets the mock instance of <see cref="Umbraco.Cms.Core.Web.IUmbracoContext"/> used for testing.
+    /// </summary>
         public Mock<IUmbracoContext> UmbracoContext { get; } = new();
 
+    /// <summary>
+    /// Gets the mock instance of <see cref="Umbraco.Cms.Core.Routing.IPublishedContentCache"/> used for testing.
+    /// </summary>
         public Mock<IPublishedContentCache> PublishedContentCache { get; } = new();
 
+    /// <summary>
+    /// Gets the mock instance of the domain cache used for testing.
+    /// </summary>
         public Mock<IDomainCache> DomainCache { get; } = new();
 
+    /// <summary>
+    /// Gets the mock instance of <see cref="ISiteDomainMapper"/> used in the test context.
+    /// </summary>
         public Mock<ISiteDomainMapper> SiteDomainMapper { get; } = new();
 
+    /// <summary>
+    /// Gets the mock instance of <see cref="IDocumentNavigationQueryService"/> used for testing.
+    /// </summary>
         public Mock<IDocumentNavigationQueryService> NavigationQueryService { get; } = new();
 
+    /// <summary>
+    /// Gets the mock instance of <see cref="Umbraco.Cms.Core.Routing.IPublishedContentStatusFilteringService"/> used for status filtering in tests.
+    /// </summary>
         public Mock<IPublishedContentStatusFilteringService> StatusFilteringService { get; } = new();
 
+    /// <summary>
+    /// Gets the mock for the IPublishedValueFallback used in the test context.
+    /// </summary>
         public Mock<IPublishedValueFallback> PublishedValueFallback { get; } = new();
 
+    /// <summary>
+    /// Gets or sets the request handler settings for the test context.
+    /// </summary>
         public RequestHandlerSettings RequestConfig { get; set; } = new() { AddTrailingSlash = true };
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="TestContext"/> class used for setting up test dependencies and context in <see cref="AliasUrlProviderTests"/>.
+    /// </summary>
         public TestContext()
         {
             // Wire up UmbracoContext
@@ -61,6 +94,10 @@ public class AliasUrlProviderTests
                 .Returns(true);
         }
 
+    /// <summary>
+    /// Creates an instance of <see cref="AliasUrlProvider"/> configured with mocked dependencies.
+    /// </summary>
+    /// <returns>An <see cref="AliasUrlProvider"/> instance.</returns>
         public AliasUrlProvider CreateProvider()
         {
             var hostingEnv = new Mock<IHostingEnvironment>();
@@ -80,6 +117,14 @@ public class AliasUrlProviderTests
                 StatusFilteringService.Object);
         }
 
+    /// <summary>
+    /// Sets up a mocked IPublishedContent node with the specified parameters.
+    /// </summary>
+    /// <param name="nodeId">The ID of the node to setup.</param>
+    /// <param name="aliasValue">The alias value to assign to the node's UrlAlias property, or null if none.</param>
+    /// <param name="variesByCulture">Indicates if the alias property varies by culture.</param>
+    /// <param name="hasProperty">Indicates if the node has the UrlAlias property.</param>
+    /// <returns>A mock of IPublishedContent configured according to the parameters.</returns>
         public Mock<IPublishedContent> SetupNode(
             int nodeId,
             string? aliasValue,
@@ -170,6 +215,12 @@ public class AliasUrlProviderTests
             return node;
         }
 
+    /// <summary>
+    /// Configures the test context to associate the specified node with the given domains and URIs.
+    /// Sets up the domain cache and site domain mapper mocks to return the provided domain and URI mappings for the node.
+    /// </summary>
+    /// <param name="nodeId">The ID of the node for which to set up domains.</param>
+    /// <param name="domainAndUris">An array of <see cref="DomainAndUri"/> objects representing the domains and their associated URIs and cultures.</param>
         public void SetupDomainsForNode(int nodeId, params DomainAndUri[] domainAndUris)
         {
             // Return domains from GetAssigned so DomainsForNode doesn't return null
@@ -188,6 +239,9 @@ public class AliasUrlProviderTests
         }
     }
 
+    /// <summary>
+    /// Tests that the alias URL provider returns an empty collection when the node is not found.
+    /// </summary>
     [Test]
     public void ReturnsEmpty_WhenNodeNotFound()
     {
@@ -199,6 +253,9 @@ public class AliasUrlProviderTests
         Assert.That(result, Is.Empty);
     }
 
+    /// <summary>
+    /// Tests that the provider returns an empty collection when the node does not have a URL alias property.
+    /// </summary>
     [Test]
     public void ReturnsEmpty_WhenNodeHasNoUrlAliasProperty()
     {
@@ -210,6 +267,9 @@ public class AliasUrlProviderTests
         Assert.That(result, Is.Empty);
     }
 
+    /// <summary>
+    /// Tests that the provider returns an empty collection when the property varies by culture and there are no domains.
+    /// </summary>
     [Test]
     public void ReturnsEmpty_WhenPropertyVariesByCulture_AndNoDomains()
     {
@@ -221,6 +281,9 @@ public class AliasUrlProviderTests
         Assert.That(result, Is.Empty);
     }
 
+    /// <summary>
+    /// Tests that the provider returns an empty collection when the alias value is null.
+    /// </summary>
     [Test]
     public void ReturnsEmpty_WhenAliasValueIsNull()
     {
@@ -232,6 +295,9 @@ public class AliasUrlProviderTests
         Assert.That(result, Is.Empty);
     }
 
+    /// <summary>
+    /// Tests that when there is no domain configured, the provider returns the correct URL for a relative alias.
+    /// </summary>
     [Test]
     public void NoDomain_ReturnsUrl_ForRelativeAlias()
     {
@@ -245,6 +311,9 @@ public class AliasUrlProviderTests
         Assert.That(result[0].Culture, Is.Null);
     }
 
+    /// <summary>
+    /// Tests that when no domain is set, the URL returned for an alias with a leading slash is correct.
+    /// </summary>
     [Test]
     public void NoDomain_ReturnsUrl_ForAliasWithLeadingSlash()
     {
@@ -257,6 +326,9 @@ public class AliasUrlProviderTests
         Assert.That(result[0].Url!.ToString(), Is.EqualTo("/my-alias/"));
     }
 
+    /// <summary>
+    /// Tests that when no domain is set, the URL returned for an absolute path alias is correct.
+    /// </summary>
     [Test]
     public void NoDomain_ReturnsUrl_ForAbsolutePathAlias()
     {
@@ -269,6 +341,9 @@ public class AliasUrlProviderTests
         Assert.That(result[0].Url!.ToString(), Is.EqualTo("/some/deep/path/"));
     }
 
+    /// <summary>
+    /// Tests that when no domain is specified, multiple URLs are returned for comma separated aliases.
+    /// </summary>
     [Test]
     public void NoDomain_ReturnsMultipleUrls_ForCommaSeparatedAliases()
     {
@@ -282,6 +357,9 @@ public class AliasUrlProviderTests
         Assert.That(result[1].Url!.ToString(), Is.EqualTo("/alias2/"));
     }
 
+    /// <summary>
+    /// Tests that when no domain is specified, duplicate aliases are deduplicated correctly.
+    /// </summary>
     [Test]
     public void NoDomain_DeduplicatesAliases()
     {
@@ -294,6 +372,10 @@ public class AliasUrlProviderTests
         Assert.That(result[0].Url!.ToString(), Is.EqualTo("/same/"));
     }
 
+    /// <summary>
+    /// Tests that when there is no domain and the trailing slash setting is disabled,
+    /// the alias URL is generated without a trailing slash.
+    /// </summary>
     [Test]
     public void NoDomain_NoTrailingSlash_WhenSettingDisabled()
     {
@@ -309,6 +391,9 @@ public class AliasUrlProviderTests
         Assert.That(result[0].Url!.ToString(), Is.EqualTo("/my-alias"));
     }
 
+    /// <summary>
+    /// Tests that the URL provider returns the correct URL when a relative alias is used with a domain.
+    /// </summary>
     [Test]
     public void WithDomain_ReturnsUrl_ForRelativeAlias()
     {
@@ -326,6 +411,9 @@ public class AliasUrlProviderTests
         Assert.That(result[0].Url!.ToString(), Is.EqualTo("http://example.com/my-alias/"));
     }
 
+    /// <summary>
+    /// Tests that when an alias with a leading slash is used with a domain, the returned URL is correctly formatted without double slashes.
+    /// </summary>
     [Test]
     public void WithDomain_ReturnsUrl_ForAliasWithLeadingSlash()
     {
@@ -345,6 +433,10 @@ public class AliasUrlProviderTests
         Assert.That(result[0].Url!.ToString(), Is.EqualTo("http://example.com/my-alias/"));
     }
 
+    /// <summary>
+    /// Tests that when a domain is configured for a culture that is not published on the node,
+    /// the alias URL provider skips that culture and does not return URLs for it.
+    /// </summary>
     [Test]
     public void WithDomain_SkipsCultureNotPublished()
     {
@@ -370,6 +462,10 @@ public class AliasUrlProviderTests
         Assert.That(result, Is.Empty);
     }
 
+    /// <summary>
+    /// Tests that when a domain is set up for a node with a culture alias,
+    /// the URL provider returns the correct culture and URL information.
+    /// </summary>
     [Test]
     public void WithDomain_ReturnsCultureOnUrlInfo()
     {

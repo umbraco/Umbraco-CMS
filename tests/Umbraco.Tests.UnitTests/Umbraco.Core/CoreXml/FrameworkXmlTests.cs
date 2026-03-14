@@ -6,6 +6,9 @@ using NUnit.Framework;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.CoreXml;
 
+/// <summary>
+/// Unit tests for the Umbraco Core XML framework functionality.
+/// </summary>
 [TestFixture]
 public class FrameworkXmlTests
 {
@@ -30,6 +33,10 @@ public class FrameworkXmlTests
     //
     // What is the impact on memory?
     // What happens for non-xslt macros?
+    /// <summary>
+    /// Tests that importing a node clones the imported node rather than referencing the original.
+    /// This ensures that the imported node is a deep clone and independent of the source node.
+    /// </summary>
     [Test]
     public void ImportNodeClonesImportedNode()
     {
@@ -59,6 +66,15 @@ public class FrameworkXmlTests
     // the result depends on what the xslt engine is doing at the moment = unpredictable.
     //
     // What happens for non-xslt macros?
+    /// <summary>
+    /// Tests the behavior of removing the current XML node while navigating with an XPathNavigator.
+    /// Verifies that after removal, the navigator operates on an isolated fragment rooted at the removed node,
+    /// and navigation methods behave as expected in this scenario.
+    /// </summary>
+    /// <remarks>
+    /// This test demonstrates potential unpredictable behavior when the underlying XmlDocument is modified during navigation,
+    /// which is relevant for XSLT macros and other XML processing scenarios.
+    /// </remarks>
     [Test]
     public void CanRemoveCurrentNodeAndNavigate()
     {
@@ -97,6 +113,10 @@ public class FrameworkXmlTests
         Assert.AreEqual("item2", nav1.Name);
     }
 
+    /// <summary>
+    /// Tests that a path node can be removed from an XmlDocument and that the XPathNavigator
+    /// correctly navigates the isolated fragment rooted at the removed node.
+    /// </summary>
     [Test]
     public void CanRemovePathNodeAndNavigate()
     {
@@ -134,6 +154,10 @@ public class FrameworkXmlTests
         Assert.AreEqual("item2", nav1.Name);
     }
 
+    /// <summary>
+    /// Tests that removing a node from the XML document updates the navigator correctly,
+    /// allowing navigation to continue without errors and reflecting the updated document structure.
+    /// </summary>
     [Test]
     public void CanRemoveOutOfPathNodeAndNavigate()
     {
@@ -173,6 +197,13 @@ public class FrameworkXmlTests
     // on what the xslt engine is doing at the moment = unpredictable.
     //
     // What happens for non-xslt macros?
+    /// <summary>
+    /// Tests that removing a node from an XmlDocument while iterating over nodes
+    /// results in expected behavior regarding cached and updated node counts.
+    /// </summary>
+    /// <remarks>
+    /// Demonstrates that an XmlNodeIterator may cache counts and not reflect changes immediately.
+    /// </remarks>
     [Test]
     public void CanRemoveNodeAndIterate()
     {
@@ -204,6 +235,11 @@ public class FrameworkXmlTests
         Assert.AreEqual(5, count);
     }
 
+    /// <summary>
+    /// Verifies that the bug in older .NET frameworks, where reusing an <see cref="System.Xml.XPath.XPathExpression"/> across multiple iterations caused conflicts between iterators, has been fixed.
+    /// This test ensures that selecting nodes with the same compiled XPath expression in nested iterators does not interfere with each other's state.
+    /// See: http://bytes.com/topic/net/answers/177129-reusing-xpathexpression-multiple-iterations
+    /// </summary>
     [Test]
     public void OldFrameworkXPathBugIsFixed()
     {

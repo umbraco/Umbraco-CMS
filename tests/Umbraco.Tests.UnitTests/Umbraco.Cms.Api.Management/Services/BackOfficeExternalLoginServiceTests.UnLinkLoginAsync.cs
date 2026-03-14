@@ -12,8 +12,23 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Management.Services;
 
+/// <summary>
+/// Unit tests for the BackOfficeExternalLoginService.
+/// </summary>
 public partial class BackOfficeExternalLoginServiceTests
 {
+    /// <summary>
+    /// Verifies that <c>UnLinkLoginAsync</c> returns the expected <see cref="ExternalLoginOperationStatus"/> for various input scenarios.
+    /// </summary>
+    /// <param name="expectedResult">The expected status result of the unlink operation.</param>
+    /// <param name="claimsPrincipalHasIdentity">Whether the claims principal has an identity.</param>
+    /// <param name="backOfficeManagerCanFindUser">Whether the back office manager can find the user.</param>
+    /// <param name="authenticationSchemeCanBeFound">Whether the authentication scheme can be found.</param>
+    /// <param name="authenticationOptionsCanBeFound">Whether the authentication options can be found.</param>
+    /// <param name="manualLinkingIsEnabled">Whether manual linking is enabled.</param>
+    /// <param name="userHasMatchingLoginConfigured">Whether the user has a matching login configured.</param>
+    /// <param name="removeLoginPasses">Whether the remove login operation succeeds.</param>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [TestCase(ExternalLoginOperationStatus.Success, true, true, true, true, true, true, true)]
     [TestCase(ExternalLoginOperationStatus.IdentityNotFound, false, true, true, true, true, true, true)]
     [TestCase(ExternalLoginOperationStatus.UserNotFound, true, false, true, true, true, true, true)]

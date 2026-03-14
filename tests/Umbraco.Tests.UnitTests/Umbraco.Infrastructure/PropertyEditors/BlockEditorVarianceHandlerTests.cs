@@ -8,11 +8,18 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PropertyEditors;
 
+/// <summary>
+/// Contains unit tests for the <see cref="BlockEditorVarianceHandler"/> class, verifying its behavior and functionality.
+/// </summary>
 [TestFixture]
 public class BlockEditorVarianceHandlerTests
 {
     private record BlockPropertyValueConfig(string Alias, string? Culture, string? Segment, object? Value);
 
+    /// <summary>
+    /// Tests that the default culture is assigned when culture variance is enabled.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task AlignedPropertyVarianceAsync_Assigns_Default_Culture_When_Culture_Variance_Is_Enabled()
     {
@@ -24,6 +31,10 @@ public class BlockEditorVarianceHandlerTests
         Assert.AreEqual("da-DK", result.Culture);
     }
 
+    /// <summary>
+    /// Tests that the default culture is removed when culture variance is disabled.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task AlignedPropertyVarianceAsync_Removes_Default_Culture_When_Culture_Variance_Is_Disabled()
     {
@@ -35,6 +46,10 @@ public class BlockEditorVarianceHandlerTests
         Assert.IsNull(result.Culture);
     }
 
+    /// <summary>
+    /// Tests that the aligned property variance async method ignores non-default culture values when culture variance is disabled.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task AlignedPropertyVarianceAsync_Ignores_NonDefault_Culture_When_Culture_Variance_Is_Disabled()
     {
@@ -45,6 +60,10 @@ public class BlockEditorVarianceHandlerTests
         Assert.IsNull(result);
     }
 
+    /// <summary>
+    /// Tests that AlignedExposeVarianceAsync returns an empty result when there are no matching variations.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task AlignedExposeVarianceAsync_Returns_Empty_When_No_Matching_Variations()
     {
@@ -60,6 +79,10 @@ public class BlockEditorVarianceHandlerTests
         Assert.IsEmpty(result);
     }
 
+    /// <summary>
+    /// Tests that the AlignedExposeVarianceAsync method assigns the default culture when variations are invariant.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task AlignedExposeVarianceAsync_Assigns_Default_Culture_When_Variations_Are_Invariant()
     {
@@ -80,6 +103,10 @@ public class BlockEditorVarianceHandlerTests
         });
     }
 
+    /// <summary>
+    /// Tests that AlignedExposeVarianceAsync removes the default culture when the expected variation is invariant.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task AlignedExposeVarianceAsync_Removes_Default_Culture_When_Expected_Invariant()
     {
@@ -100,6 +127,10 @@ public class BlockEditorVarianceHandlerTests
         });
     }
 
+    /// <summary>
+    /// Tests that AlignedExposeVarianceAsync filters out non-default culture values when the expected variation is invariant.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task AlignedExposeVarianceAsync_Filters_NonDefault_Culture_When_Expected_Invariant()
     {
@@ -124,6 +155,10 @@ public class BlockEditorVarianceHandlerTests
         });
     }
 
+    /// <summary>
+    /// Tests that <see cref="AlignedExposeVarianceAsync_Returns_Unchanged_When_Already_Variant"/> returns unchanged when the block value is already variant.
+    /// </summary>
+    /// <returns>A <see cref="Task"/> representing the asynchronous test operation.</returns>
     [Test]
     public async Task AlignedExposeVarianceAsync_Returns_Unchanged_When_Already_Variant()
     {
@@ -144,6 +179,10 @@ public class BlockEditorVarianceHandlerTests
         });
     }
 
+    /// <summary>
+    /// Tests that AlignedExposeVarianceAsync returns unchanged variance when the block value is already invariant.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task AlignedExposeVarianceAsync_Returns_Unchanged_When_Already_Invariant()
     {
@@ -164,6 +203,10 @@ public class BlockEditorVarianceHandlerTests
         });
     }
 
+    /// <summary>
+    /// Tests that AlignedExposeVarianceAsync preserves the segment value when assigning culture.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task AlignedExposeVarianceAsync_Preserves_Segment_When_Assigning_Culture()
     {
@@ -184,6 +227,9 @@ public class BlockEditorVarianceHandlerTests
         });
     }
 
+    /// <summary>
+    /// Tests that the AlignExposeVariance method correctly aligns the invariance of block editor values.
+    /// </summary>
     [Test]
     public void AlignExposeVariance_Can_Align_Invariance()
     {
@@ -198,6 +244,9 @@ public class BlockEditorVarianceHandlerTests
         Assert.AreEqual(null, blockValue.Expose.First().Culture);
     }
 
+    /// <summary>
+    /// Tests that the variance alignment and exposure for block editor values works correctly.
+    /// </summary>
     [Test]
     public void AlignExposeVariance_Can_Align_Variance()
     {
@@ -217,6 +266,9 @@ public class BlockEditorVarianceHandlerTests
         });
     }
 
+    /// <summary>
+    /// Tests that the AlignExposeVariance method can handle a variant element type when all block values are invariant.
+    /// </summary>
     [Test]
     public void AlignExposeVariance_Can_Handle_Variant_Element_Type_With_All_Invariant_Block_Values()
     {
@@ -231,6 +283,10 @@ public class BlockEditorVarianceHandlerTests
         Assert.AreEqual("da-DK", blockValue.Expose.First().Culture);
     }
 
+    /// <summary>
+    /// Tests that AlignPropertyVarianceAsync removes non-default culture values when the content variation is set to Nothing.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task AlignPropertyVarianceAsync_Removes_NonDefault_Culture_Values()
     {
@@ -245,6 +301,9 @@ public class BlockEditorVarianceHandlerTests
         });
     }
 
+    /// <summary>
+    /// Tests that the AlignExposeVariance method removes exposed keys from the block value when those keys are not present in the content data.
+    /// </summary>
     [Test]
     public void AlignExposeVariance_Removes_Exposed_Keys_When_Not_In_ContentData()
     {
@@ -258,6 +317,9 @@ public class BlockEditorVarianceHandlerTests
         Assert.IsEmpty(blockValue.Expose);
     }
 
+    /// <summary>
+    /// Tests that AlignExposeVariance correctly deduplicates expose entries.
+    /// </summary>
     [Test]
     public void AlignExposeVariance_Deduplicates_Expose_Entries()
     {
@@ -274,6 +336,9 @@ public class BlockEditorVarianceHandlerTests
         Assert.AreEqual(1, blockValue.Expose.Count);
     }
 
+    /// <summary>
+    /// Tests that AlignExposeVariance skips processing when the element type is not found.
+    /// </summary>
     [Test]
     public void AlignExposeVariance_Skips_When_ElementType_Not_Found()
     {
@@ -291,6 +356,9 @@ public class BlockEditorVarianceHandlerTests
         });
     }
 
+    /// <summary>
+    /// Tests that AlignExposeVariance correctly handles multiple content data items with different cultures.
+    /// </summary>
     [Test]
     public void AlignExposeVariance_Handles_Multiple_ContentData_Items()
     {

@@ -13,11 +13,19 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Services;
 
+/// <summary>
+/// Contains unit tests for the extension methods of the <see cref="ContentTypeService"/> class.
+/// </summary>
 [TestFixture]
 public class ContentTypeServiceExtensionsTests
 {
     private IShortStringHelper ShortStringHelper => new DefaultShortStringHelper(new DefaultShortStringHelperConfig());
 
+    /// <summary>
+    /// Verifies that <c>GetAvailableCompositeContentTypes</c> returns only composite content types
+    /// that do not overlap with the specified content type or property type aliases.
+    /// Ensures that the resulting set excludes types with duplicate property aliases or explicitly excluded types.
+    /// </summary>
     [Test]
     public void GetAvailableCompositeContentTypes_No_Overlap_By_Content_Type_And_Property_Type_Alias()
     {
@@ -66,6 +74,10 @@ public class ContentTypeServiceExtensionsTests
         Assert.AreEqual(ct4.Id, availableTypes.ElementAt(0).Id);
     }
 
+    /// <summary>
+    /// Tests that GetAvailableCompositeContentTypes correctly filters out composite content types
+    /// that have overlapping property type aliases, ensuring no overlap by property type alias.
+    /// </summary>
     [Test]
     public void GetAvailableCompositeContentTypes_No_Overlap_By_Property_Type_Alias()
     {
@@ -111,6 +123,11 @@ public class ContentTypeServiceExtensionsTests
         Assert.AreEqual(ct4.Id, availableTypes.ElementAt(0).Id);
     }
 
+    /// <summary>
+    /// Verifies that <c>GetAvailableCompositeContentTypes</c> returns only composite content types
+    /// whose aliases do not overlap with the excluded aliases, ensuring excluded content types are not present in the results.
+    /// This test specifically checks that when a content type alias is excluded, it does not appear in the available composite content types.
+    /// </summary>
     [Test]
     public void GetAvailableCompositeContentTypes_No_Overlap_By_Content_Type()
     {
@@ -155,6 +172,9 @@ public class ContentTypeServiceExtensionsTests
         Assert.AreEqual(ct4.Id, availableTypes.ElementAt(0).Id);
     }
 
+    /// <summary>
+    /// Tests that the GetAvailableCompositeContentTypes method does not include the content type itself in the available composite types.
+    /// </summary>
     [Test]
     public void GetAvailableCompositeContentTypes_Not_Itself()
     {
@@ -178,6 +198,9 @@ public class ContentTypeServiceExtensionsTests
     }
 
     // This shows that a nested comp is not allowed
+    /// <summary>
+    /// Tests that no available composite content types are returned if the content type is already a composition by its parent.
+    /// </summary>
     [Test]
     public void GetAvailableCompositeContentTypes_No_Results_If_Already_A_Composition_By_Parent()
     {
@@ -198,6 +221,10 @@ public class ContentTypeServiceExtensionsTests
     }
 
     // This shows that a nested comp is not allowed
+    /// <summary>
+    /// Verifies that <c>GetAvailableCompositeContentTypes</c> returns no results when the specified content type is already part of a composition,
+    /// ensuring that nested compositions are not allowed.
+    /// </summary>
     [Test]
     public void GetAvailableCompositeContentTypes_No_Results_If_Already_A_Composition()
     {
@@ -219,6 +246,9 @@ public class ContentTypeServiceExtensionsTests
         Assert.AreEqual(0, availableTypes.Count());
     }
 
+/// <summary>
+/// Verifies that <c>GetAvailableCompositeContentTypes</c> excludes content types that are already composed within other content types, ensuring only directly available composite types are returned.
+/// </summary>
     [Test]
     public void GetAvailableCompositeContentTypes_Do_Not_Include_Other_Composed_Types()
     {
@@ -242,6 +272,9 @@ public class ContentTypeServiceExtensionsTests
         Assert.AreEqual(ct3.Id, availableTypes.Single().Id);
     }
 
+    /// <summary>
+    /// Tests that the GetAvailableCompositeContentTypes method includes direct composed types.
+    /// </summary>
     [Test]
     public void GetAvailableCompositeContentTypes_Include_Direct_Composed_Types()
     {
@@ -266,6 +299,9 @@ public class ContentTypeServiceExtensionsTests
         Assert.AreEqual(ct3.Id, availableTypes.ElementAt(1).Id);
     }
 
+    /// <summary>
+    /// Tests that GetAvailableCompositeContentTypes includes indirect composed types when specified.
+    /// </summary>
     [Test]
     public void GetAvailableCompositeContentTypes_Include_Indirect_Composed_Types()
     {

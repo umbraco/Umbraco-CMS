@@ -5,6 +5,9 @@ using AutoFixture.NUnit3;
 
 namespace Umbraco.Cms.Tests.UnitTests.AutoFixture;
 
+/// <summary>
+/// An AutoFixture attribute that integrates with Moq to enable automatic creation and injection of mock objects for unit tests.
+/// </summary>
 [AttributeUsage(AttributeTargets.Method | AttributeTargets.Constructor)]
 public class AutoMoqDataAttribute : AutoDataAttribute
 {

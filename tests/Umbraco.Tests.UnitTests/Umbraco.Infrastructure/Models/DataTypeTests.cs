@@ -9,14 +9,25 @@ using Umbraco.Cms.Tests.Common.Builders.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Models;
 
+    /// <summary>
+    /// Contains unit tests for the <see cref="DataType"/> model within the Umbraco CMS infrastructure layer.
+    /// </summary>
 [TestFixture]
 public class DataTypeTests
 {
+    /// <summary>
+    /// Sets up the test environment before each test.
+    /// </summary>
     [SetUp]
     public void SetUp() => _builder = new DataTypeBuilder();
 
     private DataTypeBuilder _builder;
 
+    /// <summary>
+    /// Verifies that a <see cref="DataType"/> instance can be deep cloned, ensuring that
+    /// the clone is a separate object with all property values equal to the original.
+    /// The test checks both individual properties and uses reflection to confirm all properties match.
+    /// </summary>
     [Test]
     public void Can_Deep_Clone()
     {
@@ -49,6 +60,9 @@ public class DataTypeTests
         }
     }
 
+    /// <summary>
+    /// Tests that the data type can be serialized without throwing an error.
+    /// </summary>
     [Test]
     public void Can_Serialize_Without_Error()
     {

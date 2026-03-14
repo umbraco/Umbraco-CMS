@@ -1,4 +1,4 @@
-﻿using Moq;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -8,6 +8,9 @@ using Umbraco.Cms.Tests.Common;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Manifest;
 
+/// <summary>
+/// Contains unit tests for the <see cref="PackageManifestService"/> class.
+/// </summary>
 [TestFixture]
 public class PackageManifestServiceTests
 {
@@ -15,6 +18,10 @@ public class PackageManifestServiceTests
     private Mock<IPackageManifestReader> _readerMock;
     private IAppPolicyCache _runtimeCache;
 
+    /// <summary>
+    /// Initializes mocks and dependencies required for each test in <see cref="PackageManifestServiceTests"/>.
+    /// Sets up the <see cref="PackageManifestService"/> instance and configures the mock <see cref="IPackageManifestReader"/>.
+    /// </summary>
     [SetUp]
     public void SetUp()
     {
@@ -38,6 +45,10 @@ public class PackageManifestServiceTests
             new TestOptionsMonitor<RuntimeSettings>(new RuntimeSettings { Mode = RuntimeMode.Production }));
     }
 
+    /// <summary>
+    /// Tests that package manifests are cached and the underlying reader is called only once.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task Caches_PackageManifests()
     {
@@ -53,6 +64,10 @@ public class PackageManifestServiceTests
         _readerMock.Verify(r => r.ReadPackageManifestsAsync(), Times.Exactly(1));
     }
 
+    /// <summary>
+    /// Tests that the package manifest is reloaded after the cache is cleared.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task Reloads_PackageManifest_After_Cache_Clear()
     {
@@ -71,6 +86,11 @@ public class PackageManifestServiceTests
         _readerMock.Verify(r => r.ReadPackageManifestsAsync(), Times.Exactly(3));
     }
 
+    /// <summary>
+    /// Verifies that the <see cref="PackageManifestService"/> correctly retrieves public package manifests
+    /// and that the count of public and all manifests matches expectations.
+    /// </summary>
+    /// <returns>A <see cref="Task"/> representing the asynchronous test operation.</returns>
     [Test]
     public async Task Supports_Public_PackageManifests()
     {
@@ -81,6 +101,11 @@ public class PackageManifestServiceTests
         Assert.AreEqual(2, result.Count());
     }
 
+    /// <summary>
+    /// Verifies that the package manifest service correctly retrieves private package manifests
+    /// and distinguishes them from all available package manifests.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task Supports_Private_PackageManifests()
     {

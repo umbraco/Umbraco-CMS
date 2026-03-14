@@ -14,9 +14,16 @@ using Umbraco.Cms.Tests.Common.Builders.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Security;
 
+/// <summary>
+/// Contains unit tests that verify the behavior of content permissions in the Umbraco CMS core security module.
+/// </summary>
 [TestFixture]
 public class ContentPermissionsTests
 {
+    /// <summary>
+    /// Verifies that access is granted to a user when the content's path matches the expected value.
+    /// Ensures that ContentPermissions.CheckPermissions returns Granted for valid paths.
+    /// </summary>
     [Test]
     public void Access_Allowed_By_Path()
     {
@@ -41,6 +48,9 @@ public class ContentPermissionsTests
         Assert.AreEqual(ContentPermissions.ContentAccess.Granted, result);
     }
 
+    /// <summary>
+    /// Tests that the CheckPermissions method returns NotFound when no content is found.
+    /// </summary>
     [Test]
     public void No_Content_Found()
     {
@@ -68,6 +78,9 @@ public class ContentPermissionsTests
         Assert.AreEqual(ContentPermissions.ContentAccess.NotFound, result);
     }
 
+    /// <summary>
+    /// Tests that content access is denied when the user has no permissions by the content path.
+    /// </summary>
     [Test]
     public void No_Access_By_Path()
     {
@@ -97,6 +110,9 @@ public class ContentPermissionsTests
         Assert.AreEqual(ContentPermissions.ContentAccess.Denied, result);
     }
 
+    /// <summary>
+    /// Tests that access is denied when the user does not have the required permission.
+    /// </summary>
     [Test]
     public void No_Access_By_Permission()
     {
@@ -124,6 +140,9 @@ public class ContentPermissionsTests
         Assert.AreEqual(ContentPermissions.ContentAccess.Denied, result);
     }
 
+    /// <summary>
+    /// Tests that access is allowed when the user has the required permission.
+    /// </summary>
     [Test]
     public void Access_Allowed_By_Permission()
     {
@@ -151,6 +170,9 @@ public class ContentPermissionsTests
         Assert.AreEqual(ContentPermissions.ContentAccess.Granted, result);
     }
 
+    /// <summary>
+    /// Tests that access to the root content item by path is granted.
+    /// </summary>
     [Test]
     public void Access_To_Root_By_Path()
     {
@@ -171,6 +193,10 @@ public class ContentPermissionsTests
         Assert.AreEqual(ContentPermissions.ContentAccess.Granted, result);
     }
 
+    /// <summary>
+    /// Verifies that a user is granted access to the recycle bin when checking permissions by its path identifier.
+    /// This test ensures that the <see cref="ContentPermissions.CheckPermissions"/> method returns <c>Granted</c> for the recycle bin node.
+    /// </summary>
     [Test]
     public void Access_To_Recycle_Bin_By_Path()
     {
@@ -191,6 +217,9 @@ public class ContentPermissionsTests
         Assert.AreEqual(ContentPermissions.ContentAccess.Granted, result);
     }
 
+    /// <summary>
+    /// Tests that a user has no access to the recycle bin when checked by path.
+    /// </summary>
     [Test]
     public void No_Access_To_Recycle_Bin_By_Path()
     {
@@ -213,6 +242,9 @@ public class ContentPermissionsTests
         Assert.AreEqual(ContentPermissions.ContentAccess.Denied, result);
     }
 
+    /// <summary>
+    /// Tests that access to the root content item by path is denied.
+    /// </summary>
     [Test]
     public void No_Access_To_Root_By_Path()
     {
@@ -236,6 +268,9 @@ public class ContentPermissionsTests
         Assert.AreEqual(ContentPermissions.ContentAccess.Denied, result);
     }
 
+    /// <summary>
+    /// Tests that access to the root content node is granted based on the specified permission.
+    /// </summary>
     [Test]
     public void Access_To_Root_By_Permission()
     {
@@ -260,6 +295,9 @@ public class ContentPermissionsTests
         Assert.AreEqual(ContentPermissions.ContentAccess.Granted, result);
     }
 
+    /// <summary>
+    /// Tests that access to the root content is denied when the user does not have the required permission.
+    /// </summary>
     [Test]
     public void No_Access_To_Root_By_Permission()
     {
@@ -284,6 +322,9 @@ public class ContentPermissionsTests
         Assert.AreEqual(ContentPermissions.ContentAccess.Denied, result);
     }
 
+    /// <summary>
+    /// Tests that access to the recycle bin is granted based on the appropriate permission.
+    /// </summary>
     [Test]
     public void Access_To_Recycle_Bin_By_Permission()
     {
@@ -309,6 +350,9 @@ public class ContentPermissionsTests
         Assert.AreEqual(ContentPermissions.ContentAccess.Granted, result);
     }
 
+    /// <summary>
+    /// Tests that access to the recycle bin is denied when the user lacks the required permission.
+    /// </summary>
     [Test]
     public void No_Access_To_Recycle_Bin_By_Permission()
     {

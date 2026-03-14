@@ -8,12 +8,18 @@ using Umbraco.Cms.Infrastructure.Serialization;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PropertyEditors;
 
+/// <summary>
+/// Contains unit tests for the <see cref="TimeOnlyPropertyIndexValueFactory"/> class, verifying its behavior and functionality.
+/// </summary>
 [TestFixture]
 [TestOf(typeof(TimeOnlyPropertyIndexValueFactory))]
 public class TimeOnlyPropertyIndexValueFactoryTests
 {
     private static readonly IJsonSerializer _jsonSerializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
 
+    /// <summary>
+    /// Tests that GetIndexValues returns empty values when the property value is null.
+    /// </summary>
     [Test]
     public void GetIndexValues_ReturnsEmptyValues_ForNullPropertyValue()
     {
@@ -39,6 +45,10 @@ public class TimeOnlyPropertyIndexValueFactoryTests
         Assert.IsEmpty(indexValue.Values);
     }
 
+    /// <summary>
+    /// Verifies that <c>GetIndexValues</c> returns the expected formatted time string ("HH:mm:ss")
+    /// after converting the provided date and time zone information to UTC, ensuring correct time zone handling.
+    /// </summary>
     [Test]
     public void GetIndexValues_ReturnsFormattedDateTime()
     {

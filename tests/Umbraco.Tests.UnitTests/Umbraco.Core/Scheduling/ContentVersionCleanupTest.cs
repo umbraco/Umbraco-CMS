@@ -18,6 +18,16 @@ namespace Umbraco.Tests.Scheduling;
 [TestFixture]
 internal class ContentVersionCleanupTest
 {
+    /// <summary>
+    /// Verifies that when content version cleanup is disabled, the cleanup service is not invoked and the job is scheduled to repeat.
+    /// </summary>
+    /// <param name="settings">Mock options monitor for <see cref="ContentSettings"/>.</param>
+    /// <param name="mainDom">Mock implementation of <see cref="IMainDom"/>.</param>
+    /// <param name="serverRoleAccessor">Mock implementation of <see cref="IServerRoleAccessor"/>.</param>
+    /// <param name="runtimeState">Mock implementation of <see cref="IRuntimeState"/>.</param>
+    /// <param name="cleanupService">Mock implementation of <see cref="IContentVersionService"/>.</param>
+    /// <param name="sut">The <see cref="ContentVersionCleanupJob"/> instance under test.</param>
+    /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
     [Test]
     [AutoMoqData]
     public async Task ContentVersionCleanup_WhenNotEnabled_DoesNotCleanupWillRepeat(
@@ -41,6 +51,16 @@ internal class ContentVersionCleanupTest
         cleanupService.Verify(x => x.PerformContentVersionCleanup(It.IsAny<DateTime>()), Times.Never);
     }
 
+    /// <summary>
+    /// Verifies that when content version cleanup is enabled in the settings, the <see cref="IContentVersionService"/> is invoked by the <see cref="ContentVersionCleanupJob"/>.
+    /// </summary>
+    /// <param name="settings">A frozen mock of <see cref="IOptionsMonitor{ContentSettings}"/> providing content settings.</param>
+    /// <param name="mainDom">A frozen mock of <see cref="IMainDom"/> indicating main domain status.</param>
+    /// <param name="serverRoleAccessor">A frozen mock of <see cref="IServerRoleAccessor"/> providing the current server role.</param>
+    /// <param name="runtimeState">A frozen mock of <see cref="IRuntimeState"/> providing the current runtime state.</param>
+    /// <param name="cleanupService">A frozen mock of <see cref="IContentVersionService"/> used to verify cleanup invocation.</param>
+    /// <param name="sut">The <see cref="ContentVersionCleanupJob"/> instance under test.</param>
+    /// <returns>A <see cref="Task"/> representing the asynchronous test operation.</returns>
     [Test]
     [AutoMoqData]
     public async Task ContentVersionCleanup_Enabled_DelegatesToCleanupService(

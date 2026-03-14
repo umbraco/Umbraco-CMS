@@ -15,6 +15,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.DeliveryApi;
 
+/// <summary>
+/// Contains unit tests for the <see cref="RichTextParser"/> class within the Delivery API, verifying its parsing functionality and behavior.
+/// </summary>
 [TestFixture]
 public class RichTextParserTests : PropertyValueConverterTests
 {
@@ -24,6 +27,9 @@ public class RichTextParserTests : PropertyValueConverterTests
     private readonly Guid _mediaKey = Guid.NewGuid();
     private readonly string _mediaType = Constants.Conventions.MediaTypes.Image;
 
+    /// <summary>
+    /// Tests that the document element parsed is called "#root".
+    /// </summary>
     [Test]
     public void ParseElement_DocumentElementIsCalledRoot()
     {
@@ -34,6 +40,9 @@ public class RichTextParserTests : PropertyValueConverterTests
         Assert.AreEqual("#root", element.Tag);
     }
 
+    /// <summary>
+    /// Tests that parsing a simple paragraph results in a single text element inside a paragraph element.
+    /// </summary>
     [Test]
     public void ParseElement_SimpleParagraphHasSingleTextElement()
     {
@@ -50,6 +59,9 @@ public class RichTextParserTests : PropertyValueConverterTests
         Assert.AreEqual("Some text paragraph", textElement.Text);
     }
 
+    /// <summary>
+    /// Tests that parsing a paragraph element with line breaks wraps the text and line breaks correctly in elements.
+    /// </summary>
     [Test]
     public void ParseElement_ParagraphWithLineBreaksWrapsTextInElements()
     {
@@ -98,6 +110,9 @@ public class RichTextParserTests : PropertyValueConverterTests
         }
     }
 
+    /// <summary>
+    /// Tests that data attributes in parsed elements are correctly sanitized by removing the "data-" prefix.
+    /// </summary>
     [Test]
     public void ParseElement_DataAttributesAreSanitized()
     {
@@ -116,6 +131,9 @@ public class RichTextParserTests : PropertyValueConverterTests
         Assert.AreEqual("Text in a data-something SPAN", textElement.Text);
     }
 
+    /// <summary>
+    /// Tests that data attributes do not overwrite existing attributes when parsing elements.
+    /// </summary>
     [Test]
     public void ParseElement_DataAttributesDoNotOverwriteExistingAttributes()
     {
@@ -131,6 +149,10 @@ public class RichTextParserTests : PropertyValueConverterTests
         Assert.AreEqual("the original something", span.Attributes.First().Value);
     }
 
+    /// <summary>
+    /// Verifies that the rich text parser can correctly parse a content link element, including handling an optional postfix appended to the URL.
+    /// </summary>
+    /// <param name="postfix">An optional string appended to the content link URL, such as an anchor (e.g., <c>#some-anchor</c>) or query string (e.g., <c>?something=true</c>).</param>
     [TestCase(null)]
     [TestCase("")]
     [TestCase("#some-anchor")]
@@ -161,6 +183,9 @@ public class RichTextParserTests : PropertyValueConverterTests
         Assert.AreEqual(nameof(LinkType.Content), link.Attributes["linkType"]);
     }
 
+    /// <summary>
+    /// Tests that the parser can correctly parse a media link element from rich text HTML.
+    /// </summary>
     [Test]
     public void ParseElement_CanParseMediaLink()
     {
@@ -183,6 +208,9 @@ public class RichTextParserTests : PropertyValueConverterTests
         Assert.AreEqual(nameof(LinkType.Media), link.Attributes["linkType"]);
     }
 
+    /// <summary>
+    /// Tests that the parser can correctly handle a non-local link element.
+    /// </summary>
     [Test]
     public void ParseElement_CanHandleNonLocalLink()
     {
@@ -202,6 +230,10 @@ public class RichTextParserTests : PropertyValueConverterTests
         Assert.IsFalse(link.Attributes.TryGetValue("linkType", out _));
     }
 
+    /// <summary>
+    /// Tests that the parser can handle non-local links with a postfix such as an anchor or query string.
+    /// </summary>
+    /// <param name="postfix">The postfix string to append to the link URL.</param>
     [TestCase("#some-anchor")]
     [TestCase("?something=true")]
     public void ParseElement_CanHandleNonLocalLink_WithPostfix(string postfix)
@@ -222,6 +254,9 @@ public class RichTextParserTests : PropertyValueConverterTests
         Assert.IsFalse(link.Attributes.TryGetValue("linkType", out _));
     }
 
+    /// <summary>
+    /// Tests that the link text inside an anchor tag is correctly wrapped in a text element when parsed.
+    /// </summary>
     [Test]
     public void ParseElement_LinkTextIsWrappedInTextElement()
     {
@@ -241,6 +276,11 @@ public class RichTextParserTests : PropertyValueConverterTests
         Assert.IsFalse(link.Attributes.TryGetValue("linkType", out _));
     }
 
+    /// <summary>
+    /// Verifies that when parsing an anchor element with an invalid local link in the <paramref name="href" /> attribute,
+    /// the resulting link element has no attributes, indicating the link is empty or unresolved.
+    /// </summary>
+    /// <param name="href">A string representing the local link format to be tested as the href attribute value.</param>
     [TestCase("{localLink:umb://document/fe5bf80d37db4373adb9b206896b4a3b}")]
     [TestCase("{localLink:umb://media/03b9a8721c4749a9a7026033ec78d860}")]
     public void ParseElement_InvalidLocalLinkYieldsEmptyLink(string href)
@@ -255,6 +295,9 @@ public class RichTextParserTests : PropertyValueConverterTests
         Assert.IsEmpty(link.Attributes);
     }
 
+    /// <summary>
+    /// Tests that the parser can correctly parse a media image element from rich text.
+    /// </summary>
     [Test]
     public void ParseElement_CanParseMediaImage()
     {
@@ -274,6 +317,9 @@ public class RichTextParserTests : PropertyValueConverterTests
         Assert.IsFalse(link.Attributes.TryGetValue("linkType", out _));
     }
 
+    /// <summary>
+    /// Tests that the parser can correctly handle an image element with a non-local source URL.
+    /// </summary>
     [Test]
     public void ParseElement_CanHandleNonLocalImage()
     {
@@ -293,6 +339,9 @@ public class RichTextParserTests : PropertyValueConverterTests
         Assert.IsFalse(link.Attributes.TryGetValue("linkType", out _));
     }
 
+    /// <summary>
+    /// Tests that the parser correctly removes HTML comments from the parsed elements.
+    /// </summary>
     [Test]
     public void ParseElement_RemovesComments()
     {
@@ -309,6 +358,11 @@ public class RichTextParserTests : PropertyValueConverterTests
         Assert.AreEqual("some more text", textElements.Last().Text);
     }
 
+    /// <summary>
+    /// Verifies that the rich text parser correctly cleans up block elements, ensuring that both inline and block variants are handled appropriately.
+    /// This includes checking that the block element is parsed, its attributes are set as expected, and it contains no child elements.
+    /// </summary>
+    /// <param name="inlineBlock">If set to <c>true</c>, tests an inline block element; otherwise, tests a standard block element.</param>
     [TestCase(true)]
     [TestCase(false)]
     public void ParseElement_CleansUpBlocks(bool inlineBlock)
@@ -330,6 +384,10 @@ public class RichTextParserTests : PropertyValueConverterTests
         Assert.IsEmpty(block.Elements);
     }
 
+    /// <summary>
+    /// Verifies that parsing a rich text element containing block elements correctly appends the expected blocks to the resulting rich text structure.
+    /// </summary>
+    /// <param name="inlineBlock">If set to <c>true</c>, tests parsing of inline block elements; otherwise, tests block-level elements.</param>
     [TestCase(true)]
     [TestCase(false)]
     public void ParseElement_AppendsBlocks(bool inlineBlock)
@@ -384,6 +442,9 @@ public class RichTextParserTests : PropertyValueConverterTests
         Assert.AreEqual(789, block2.Settings.Properties["number"]);
     }
 
+    /// <summary>
+    /// Tests that the parser can correctly handle mixed inline and block level blocks within the rich text content.
+    /// </summary>
     [Test]
     public void ParseElement_CanHandleMixedInlineAndBlockLevelBlocks()
     {
@@ -417,6 +478,9 @@ public class RichTextParserTests : PropertyValueConverterTests
 
     private const string TestParagraph = "What follows from <strong>here</strong> <em>is</em> <a href=\"#\">just</a> a bunch of text.";
 
+    /// <summary>
+    /// Tests that the parser can correctly handle whitespace around inline elements.
+    /// </summary>
     [Test]
     public void ParseElement_CanHandleWhitespaceAroundInlineElemements()
     {
@@ -455,6 +519,11 @@ public class RichTextParserTests : PropertyValueConverterTests
         AssertTestParagraph(cellElement);
     }
 
+    /// <summary>
+    /// Tests that the parser removes new line characters around HTML content elements.
+    /// </summary>
+    /// <param name="numberOfNewLineCharacters">The number of new line characters to test with.</param>
+    /// <param name="newlineCharacter">The new line character(s) to test with.</param>
     [TestCase(1, "\n")]
     [TestCase(2, "\n")]
     [TestCase(1, "\r")]
@@ -512,6 +581,9 @@ public class RichTextParserTests : PropertyValueConverterTests
         AssertNextChildElementIsText(" a bunch of text.");
     }
 
+    /// <summary>
+    /// Tests that the rich text parser can correctly parse a content link markup.
+    /// </summary>
     [Test]
     public void ParseMarkup_CanParseContentLink()
     {
@@ -526,6 +598,9 @@ public class RichTextParserTests : PropertyValueConverterTests
         Assert.IsTrue(result.Contains($"data-link-type=\"{LinkType.Content}\""));
     }
 
+    /// <summary>
+    /// Tests that the parser can correctly parse legacy content links in markup.
+    /// </summary>
     [Test]
     public void ParseMarkup_CanParseLegacyContentLink()
     {
@@ -540,6 +615,10 @@ public class RichTextParserTests : PropertyValueConverterTests
         Assert.IsTrue(result.Contains($"data-link-type=\"{LinkType.Content}\""));
     }
 
+    /// <summary>
+    /// Tests that the markup parser can correctly parse content links with various postfixes.
+    /// </summary>
+    /// <param name="postfix">The postfix string to append to the content link.</param>
     [TestCase("#some-anchor")]
     [TestCase("?something=true")]
     [TestCase("#!some-hashbang")]
@@ -557,6 +636,10 @@ public class RichTextParserTests : PropertyValueConverterTests
         Assert.IsTrue(result.Contains($"data-link-type=\"{LinkType.Content}\""));
     }
 
+    /// <summary>
+    /// Tests that the parser can correctly parse legacy content links with various postfixes.
+    /// </summary>
+    /// <param name="postfix">The postfix string to append to the legacy content link.</param>
     [TestCase("#some-anchor")]
     [TestCase("?something=true")]
     [TestCase("#!some-hashbang")]
@@ -574,6 +657,9 @@ public class RichTextParserTests : PropertyValueConverterTests
         Assert.IsTrue(result.Contains($"data-link-type=\"{LinkType.Content}\""));
     }
 
+    /// <summary>
+    /// Tests that the markup parser can correctly parse media links.
+    /// </summary>
     [Test]
     public void ParseMarkup_CanParseMediaLink()
     {
@@ -586,6 +672,9 @@ public class RichTextParserTests : PropertyValueConverterTests
         Assert.IsTrue(result.Contains($"data-link-type=\"{LinkType.Media}\""));
     }
 
+    /// <summary>
+    /// Verifies that parsing markup containing an invalid local link results in an empty anchor element.
+    /// </summary>
     [TestCase("{localLink:umb://document/fe5bf80d37db4373adb9b206896b4a3b}")]
     [TestCase("{localLink:umb://media/03b9a8721c4749a9a7026033ec78d860}")]
     public void ParseMarkup_InvalidLocalLinkYieldsEmptyLink(string href)
@@ -596,6 +685,10 @@ public class RichTextParserTests : PropertyValueConverterTests
         Assert.AreEqual($"<p><a></a></p>", result);
     }
 
+    /// <summary>
+    /// Tests that the parser can handle non-local references in the provided HTML markup.
+    /// </summary>
+    /// <param name="html">The HTML markup containing non-local references to parse.</param>
     [TestCase("<p><a href=\"https://some.where/else/\"></a></p>")]
     [TestCase("<p><a href=\"https://some.where/else/#some-anchor\"></a></p>")]
     [TestCase("<p><a href=\"https://some.where/else/?something=true\"></a></p>")]
@@ -608,6 +701,9 @@ public class RichTextParserTests : PropertyValueConverterTests
         Assert.AreEqual(html, result);
     }
 
+    /// <summary>
+    /// Tests that the rich text parser can correctly parse media images and replace the src attribute while removing data attributes.
+    /// </summary>
     [Test]
     public void ParseMarkup_CanParseMediaImage()
     {
@@ -621,6 +717,9 @@ public class RichTextParserTests : PropertyValueConverterTests
         Assert.IsFalse(result.Contains("data-link-type"));
     }
 
+    /// <summary>
+    /// Verifies that the rich text markup parser removes media-related data caption attributes (such as data-udi, data-destination-id, data-destination-type, and data-link-type) from image elements in the parsed markup.
+    /// </summary>
     [Test]
     public void ParseMarkup_RemovesMediaDataCaption()
     {
@@ -634,6 +733,9 @@ public class RichTextParserTests : PropertyValueConverterTests
         Assert.IsFalse(result.Contains("data-link-type"));
     }
 
+    /// <summary>
+    /// Tests that data attributes are retained when parsing markup.
+    /// </summary>
     [Test]
     public void ParseMarkup_DataAttributesAreRetained()
     {
@@ -644,6 +746,12 @@ public class RichTextParserTests : PropertyValueConverterTests
         Assert.AreEqual(html, result);
     }
 
+    /// <summary>
+    /// Tests that the markup parser correctly cleans up block elements in rich text content.
+    /// Specifically, verifies that both inline and block variants of custom block elements are processed,
+    /// ensuring placeholder comments are removed and data attributes are updated as expected.
+    /// </summary>
+    /// <param name="inlineBlock">If true, tests the inline variant of the block element; otherwise, tests the block variant.</param>
     [TestCase(true)]
     [TestCase(false)]
     public void ParseMarkup_CleansUpBlocks(bool inlineBlock)
@@ -656,6 +764,9 @@ public class RichTextParserTests : PropertyValueConverterTests
         Assert.AreEqual($"<p><{tagName} data-content-id=\"{id:D}\"></{tagName}></p>", result);
     }
 
+    /// <summary>
+    /// Tests that the parser can handle mixed inline and block level blocks in the markup.
+    /// </summary>
     [Test]
     public void ParseMarkup_CanHandleMixedInlineAndBlockLevelBlocks()
     {

@@ -6,11 +6,19 @@ using Umbraco.Cms.Core.Configuration;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Configuration;
 
+/// <summary>
+/// Contains unit tests for the <see cref="NCronTabParser"/> class in the Umbraco Core Configuration namespace.
+/// </summary>
 [TestFixture]
 public class NCronTabParserTests
 {
     private ICronTabParser Sut => new NCronTabParser();
 
+    /// <summary>
+    /// Determines whether the specified cron tab expression is valid.
+    /// </summary>
+    /// <param name="input">The cron tab expression to validate.</param>
+    /// <returns><c>true</c> if the cron tab expression is valid; otherwise, <c>false</c>.</returns>
     [TestCase("", ExpectedResult = false)]
     [TestCase("* * * * 1", ExpectedResult = true)]
     [TestCase("* * * * * 1", ExpectedResult = false)]

@@ -7,6 +7,9 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Management.Services.Flags;
 [TestFixture]
 internal class HasPendingChangesFlagProviderTests
 {
+    /// <summary>
+    /// Tests that HasPendingChangesFlagProvider can provide flags for variant item responses.
+    /// </summary>
     [Test]
     public void HasPendingChangesFlagProvider_Can_Provide_Variant_Item_Flags()
     {
@@ -14,6 +17,9 @@ internal class HasPendingChangesFlagProviderTests
         Assert.IsTrue(sut.CanProvideFlags<DocumentVariantItemResponseModel>());
     }
 
+    /// <summary>
+    /// Tests that HasPendingChangesFlagProvider can provide variant flags.
+    /// </summary>
     [Test]
     public void HasPendingChangesFlagProvider_Can_Provide_Variant_Flags()
     {
@@ -21,6 +27,11 @@ internal class HasPendingChangesFlagProviderTests
         Assert.IsTrue(sut.CanProvideFlags<DocumentVariantResponseModel>());
     }
 
+    /// <summary>
+    /// Verifies that <see cref="HasPendingChangesFlagProvider"/> correctly adds the "Umb.PendingChanges" flag to document variant items
+    /// that are in the <see cref="DocumentVariantState.PublishedPendingChanges"/> state, and does not add flags to variants in the <see cref="DocumentVariantState.Published"/> state.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task HasPendingChangesFlagProvider_Should_Populate_Variant_Item_Flags()
     {

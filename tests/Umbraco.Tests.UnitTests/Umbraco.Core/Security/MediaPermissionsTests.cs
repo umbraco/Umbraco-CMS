@@ -14,9 +14,15 @@ using Umbraco.Cms.Tests.Common.Builders.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Security;
 
+/// <summary>
+/// Contains unit tests for verifying media permissions functionality.
+/// </summary>
 [TestFixture]
 public class MediaPermissionsTests
 {
+    /// <summary>
+    /// Tests that access is allowed for a user based on the media path.
+    /// </summary>
     [Test]
     public void Access_Allowed_By_Path()
     {
@@ -39,6 +45,9 @@ public class MediaPermissionsTests
         Assert.AreEqual(MediaPermissions.MediaAccess.Granted, result);
     }
 
+    /// <summary>
+    /// Tests that the CheckPermissions method returns NotFound when no media is found.
+    /// </summary>
     [Test]
     public void Returns_Not_Found_When_No_Media_Found()
     {
@@ -59,6 +68,9 @@ public class MediaPermissionsTests
         Assert.AreEqual(MediaPermissions.MediaAccess.NotFound, result);
     }
 
+    /// <summary>
+    /// Tests that access is denied when the user does not have permission by media path.
+    /// </summary>
     [Test]
     public void No_Access_By_Path()
     {
@@ -83,6 +95,9 @@ public class MediaPermissionsTests
         Assert.AreEqual(MediaPermissions.MediaAccess.Denied, result);
     }
 
+    /// <summary>
+    /// Tests that access to the root media item by path is granted.
+    /// </summary>
     [Test]
     public void Access_To_Root_By_Path()
     {
@@ -101,6 +116,9 @@ public class MediaPermissionsTests
         Assert.AreEqual(MediaPermissions.MediaAccess.Granted, result);
     }
 
+    /// <summary>
+    /// Tests that a user has no access to the root media item when checked by path.
+    /// </summary>
     [Test]
     public void No_Access_To_Root_By_Path()
     {
@@ -121,6 +139,9 @@ public class MediaPermissionsTests
         Assert.AreEqual(MediaPermissions.MediaAccess.Denied, result);
     }
 
+    /// <summary>
+    /// Tests that access to the Recycle Bin by path is granted.
+    /// </summary>
     [Test]
     public void Access_To_Recycle_Bin_By_Path()
     {
@@ -139,6 +160,9 @@ public class MediaPermissionsTests
         Assert.AreEqual(MediaPermissions.MediaAccess.Granted, result);
     }
 
+    /// <summary>
+    /// Tests that a user has no access to the recycle bin when checked by path.
+    /// </summary>
     [Test]
     public void No_Access_To_Recycle_Bin_By_Path()
     {

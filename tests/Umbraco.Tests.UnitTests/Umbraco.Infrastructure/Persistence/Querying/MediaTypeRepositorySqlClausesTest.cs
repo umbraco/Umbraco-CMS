@@ -11,9 +11,15 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Persistence.Querying;
 
+/// <summary>
+/// Tests for the SQL clauses used by the MediaType repository.
+/// </summary>
 [TestFixture]
 public class MediaTypeRepositorySqlClausesTest : BaseUsingSqlSyntax
 {
+    /// <summary>
+    /// Tests that the base SQL clause for media type repository is correctly constructed.
+    /// </summary>
     [Test]
     public void Can_Verify_Base_Clause()
     {

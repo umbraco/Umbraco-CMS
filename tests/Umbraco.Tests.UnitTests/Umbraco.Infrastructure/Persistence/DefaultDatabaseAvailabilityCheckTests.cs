@@ -7,9 +7,15 @@ using Umbraco.Cms.Persistence.SqlServer.Services;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Persistence;
 
+    /// <summary>
+    /// Unit tests for the <see cref="DefaultDatabaseAvailabilityCheck"/> class.
+    /// </summary>
 [TestFixture]
 public class DefaultDatabaseAvailabilityCheckTests
 {
+    /// <summary>
+    /// Tests that IsDatabaseAvailable returns false when the database is unavailable.
+    /// </summary>
     [Test]
     public void IsDatabaseAvailable_WithDatabaseUnavailable_ReturnsFalse()
     {
@@ -23,6 +29,9 @@ public class DefaultDatabaseAvailabilityCheckTests
         Assert.IsFalse(result);
     }
 
+    /// <summary>
+    /// Tests that IsDatabaseAvailable returns true when the database is immediately available.
+    /// </summary>
     [Test]
     public void IsDatabaseAvailable_WithDatabaseImmediatelyAvailable_ReturnsTrue()
     {
@@ -36,6 +45,11 @@ public class DefaultDatabaseAvailabilityCheckTests
         Assert.IsTrue(result);
     }
 
+    /// <summary>
+    /// Verifies that the database availability check returns the expected result when the database becomes available on a specific attempt after several failed attempts.
+    /// </summary>
+    /// <param name="attemptsUntilConnection">The number of attempts before the database connection succeeds (all previous attempts fail).</param>
+    /// <param name="expectedResult">The expected result indicating whether the database is considered available.</param>
     [TestCase(5, true)]
     [TestCase(6, false)]
     public void IsDatabaseAvailable_WithDatabaseImmediatelyAvailableAfterMultipleAttempts_ReturnsExpectedResult(int attemptsUntilConnection, bool expectedResult)

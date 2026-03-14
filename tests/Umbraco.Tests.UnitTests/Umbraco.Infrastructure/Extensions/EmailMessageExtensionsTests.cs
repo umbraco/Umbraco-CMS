@@ -11,11 +11,17 @@ using Umbraco.Cms.Infrastructure.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Extensions;
 
+/// <summary>
+/// Contains unit tests for the <see cref="EmailMessageExtensions"/> class, verifying its extension methods for email message handling.
+/// </summary>
 [TestFixture]
 public class EmailMessageExtensionsTests
 {
     private const string ConfiguredSender = "noreply@umbraco.com";
 
+    /// <summary>
+    /// Tests that a MimeMessage can be constructed correctly from a simple EmailMessage.
+    /// </summary>
     [Test]
     public void Can_Construct_MimeMessage_From_Simple_EmailMessage()
     {
@@ -37,6 +43,9 @@ public class EmailMessageExtensionsTests
         Assert.AreEqual(body, result.HtmlBody);
     }
 
+    /// <summary>
+    /// Tests that a MimeMessage can be correctly constructed from a full EmailMessage including all fields and attachments.
+    /// </summary>
     [Test]
     public void Can_Construct_MimeMessage_From_Full_EmailMessage()
     {
@@ -75,6 +84,9 @@ public class EmailMessageExtensionsTests
         Assert.AreEqual(1, result.Attachments.Count());
     }
 
+    /// <summary>
+    /// Tests that a MimeMessage can be constructed correctly from an EmailMessage with a configured sender.
+    /// </summary>
     [Test]
     public void Can_Construct_MimeMessage_With_ConfiguredSender()
     {
@@ -95,6 +107,9 @@ public class EmailMessageExtensionsTests
         Assert.AreEqual(body, result.HtmlBody);
     }
 
+    /// <summary>
+    /// Tests that a NotificationEmailModel can be correctly constructed from a simple EmailMessage.
+    /// </summary>
     [Test]
     public void Can_Construct_NotificationEmailModel_From_Simple_MailMessage()
     {
@@ -118,6 +133,10 @@ public class EmailMessageExtensionsTests
         Assert.IsFalse(result.HasAttachments);
     }
 
+    /// <summary>
+    /// Tests that a NotificationEmailModel can be constructed correctly from a simple EmailMessage
+    /// when a configured sender is provided.
+    /// </summary>
     [Test]
     public void Can_Construct_NotificationEmailModel_From_Simple_MailMessage_With_Configured_Sender()
     {
@@ -140,6 +159,10 @@ public class EmailMessageExtensionsTests
         Assert.IsFalse(result.HasAttachments);
     }
 
+    /// <summary>
+    /// Tests that a NotificationEmailModel can be constructed correctly from a simple EmailMessage
+    /// containing display names in the from and to addresses.
+    /// </summary>
     [Test]
     public void Can_Construct_NotificationEmailModel_From_Simple_MailMessage_With_DisplayName()
     {
@@ -163,6 +186,10 @@ public class EmailMessageExtensionsTests
         Assert.IsFalse(result.HasAttachments);
     }
 
+    /// <summary>
+    /// Verifies that a <see cref="NotificationEmailModel"/> is correctly constructed from a fully populated <see cref="EmailMessage"/>,
+    /// including all address fields, subject, body, and attachments.
+    /// </summary>
     [Test]
     public void Can_Construct_NotificationEmailModel_From_Full_EmailMessage()
     {

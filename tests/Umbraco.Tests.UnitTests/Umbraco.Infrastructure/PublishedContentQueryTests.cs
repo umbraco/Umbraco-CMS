@@ -103,6 +103,9 @@ internal sealed class PublishedContentQueryTests
         return searchResult.Object;
     }
 
+    /// <summary>
+    /// Tests that the constructor of <see cref="PublishedContentQuery"/> throws an <see cref="ArgumentNullException"/> when the variation context accessor is null.
+    /// </summary>
     [Test]
     public void Constructor_WithNullVariationContextAccessor_Throws()
     {
@@ -115,6 +118,9 @@ internal sealed class PublishedContentQueryTests
             Mock.Of<IMediaNavigationQueryService>()));
     }
 
+    /// <summary>
+    /// Tests that the constructor throws an <see cref="ArgumentNullException"/> when the ExamineManager parameter is null.
+    /// </summary>
     [Test]
     public void Constructor_WithNullExamineManager_Throws()
     {
@@ -127,6 +133,10 @@ internal sealed class PublishedContentQueryTests
             Mock.Of<IMediaNavigationQueryService>()));
     }
 
+    /// <summary>
+    /// Verifies that the various overloads of the <c>Content</c> method in <see cref="PublishedContentQuery"/> return the expected <see cref="IPublishedContent"/> instance or null, depending on the input type and value.
+    /// This includes overloads accepting IDs, GUIDs, UDIs, and object types, as well as handling invalid or null inputs.
+    /// </summary>
     [Test]
     public void Content_Overloads_ReturnExpectedContent()
     {

@@ -10,9 +10,16 @@ using Umbraco.Cms.Infrastructure.Services;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Management.Factories;
 
+/// <summary>
+/// Contains unit tests for verifying the behavior of the <see cref="IndexPresentationFactory"/> class in the Umbraco CMS API Management context.
+/// </summary>
 [TestFixture]
 public class IndexPresentationFactoryTests
 {
+    /// <summary>
+    /// Tests that the CreateAsync method sets the HealthStatus message correctly when diagnostics report a failure.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task Create_Should_Set_HealthStatusMessage_On_Diagnostics_Failure()
     {

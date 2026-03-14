@@ -12,9 +12,15 @@ using Umbraco.Cms.Tests.Common;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.DeliveryApi;
 
+/// <summary>
+/// Contains unit tests for the <see cref="ApiContentBuilder"/> class within the Delivery API of Umbraco CMS.
+/// </summary>
 [TestFixture]
 public class ContentBuilderTests : DeliveryApiTests
 {
+    /// <summary>
+    /// Tests that the ContentBuilder correctly maps content data and properties.
+    /// </summary>
     [Test]
     public void ContentBuilder_MapsContentDataAndPropertiesCorrectly()
     {
@@ -99,6 +105,9 @@ public class ContentBuilderTests : DeliveryApiTests
         Assert.AreEqual(DateTime.Parse(expectedUpdateDate), result.UpdateDate);
     }
 
+    /// <summary>
+    /// Tests that the content builder can customize the content name in the delivery API output.
+    /// </summary>
     [Test]
     public void ContentBuilder_CanCustomizeContentNameInDeliveryApiOutput()
     {
@@ -124,6 +133,9 @@ public class ContentBuilderTests : DeliveryApiTests
         Assert.AreEqual("Custom name for: The page", result.Name);
     }
 
+    /// <summary>
+    /// Tests that the ContentBuilder returns null when the content is unroutable.
+    /// </summary>
     [Test]
     public void ContentBuilder_ReturnsNullForUnRoutableContent()
     {

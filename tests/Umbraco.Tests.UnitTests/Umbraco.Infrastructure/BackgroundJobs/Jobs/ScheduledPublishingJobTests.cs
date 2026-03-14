@@ -20,12 +20,19 @@ using Umbraco.Cms.Infrastructure.HostedServices;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.BackgroundJobs.Jobs;
 
+    /// <summary>
+    /// Contains unit tests for the <see cref="ScheduledPublishingJob"/> class, verifying its scheduled publishing functionality.
+    /// </summary>
 [TestFixture]
 public class ScheduledPublishingJobTests
 {
     private Mock<IContentService> _mockContentService;
     private Mock<ILogger<ScheduledPublishingJob>> _mockLogger;
 
+    /// <summary>
+    /// Tests that the scheduled publishing job does not execute when it is not enabled.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task Does_Not_Execute_When_Not_Enabled()
     {
@@ -34,6 +41,10 @@ public class ScheduledPublishingJobTests
         VerifyScheduledPublishingNotPerformed();
     }
 
+    /// <summary>
+    /// Tests that the scheduled publishing job executes and performs scheduled publishing.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task Executes_And_Performs_Scheduled_Publishing()
     {

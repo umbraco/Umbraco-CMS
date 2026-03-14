@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.SignalR;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
@@ -10,9 +10,16 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Management.ServerEvents;
 
+/// <summary>
+/// Contains unit tests for the <see cref="ServerEventRouter"/> class within the Umbraco CMS API Management ServerEvents.
+/// </summary>
 [TestFixture]
 public class ServerEventRouterTests
 {
+    /// <summary>
+    /// Tests that the RouteEventAsync method routes events to the correct event source group.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task RouteEventRoutesToEventSourceGroup()
     {
@@ -32,6 +39,10 @@ public class ServerEventRouterTests
         mocks.HubMock.Verify(x => x.notify(serverEvent), Times.Once);
     }
 
+    /// <summary>
+    /// Tests that the RouteEventAsync method does not route the event when the runtime state is not in the Run state.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task RouteEventDoesNotRouteWhenNotInRunState()
     {
@@ -50,6 +61,10 @@ public class ServerEventRouterTests
         mocks.HubMock.Verify(x => x.notify(serverEvent), Times.Never);
     }
 
+    /// <summary>
+    /// Verifies that <see cref="ServerEventRouter.NotifyUserAsync"/> only notifies the user identified by the specified user key, and does not notify other users.
+    /// </summary>
+    /// <returns>A <see cref="Task"/> representing the asynchronous test operation.</returns>
     [Test]
     public async Task NotifyUserOnlyNotifiesSpecificUser()
     {
@@ -87,6 +102,11 @@ public class ServerEventRouterTests
         mocks.HubMock.Verify(x => x.notify(serverEvent), Times.Once());
     }
 
+    /// <summary>
+    /// Verifies that <see cref="ServerEventRouter.NotifyUserAsync"/> does not attempt to notify a user if that user has no active connections.
+    /// Ensures that notification logic is only triggered when the target user has at least one existing connection.
+    /// </summary>
+    /// <returns>A <see cref="Task"/> representing the asynchronous test operation.</returns>
     [Test]
     public async Task NotifyUserOnlyActsIfConnectionsExist()
     {
@@ -117,6 +137,10 @@ public class ServerEventRouterTests
         mocks.HubMock.Verify(x => x.notify(serverEvent), Times.Never());
     }
 
+    /// <summary>
+    /// Tests that NotifyUserAsync does not send notifications when the runtime state is not in the Run state.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
     [Test]
     public async Task NotifyUserDoesNotNotifyWhenNotInRunState()
     {

@@ -11,6 +11,9 @@ using Umbraco.Cms.Core.PropertyEditors;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Management.Factories;
 
+/// <summary>
+/// Contains unit tests for the <see cref="ReziseImageUrlFactory"/> class, verifying its image URL resizing functionality.
+/// </summary>
 [TestFixture]
 public class ReziseImageUrlFactoryTests
 {
@@ -38,6 +41,11 @@ public class ReziseImageUrlFactoryTests
         Assert.That(urlInfo!.Url, Does.Contain($"format={expectedFormat}"));
     }
 
+    /// <summary>
+    /// Verifies that when creating URL sets for images with true image formats, the resulting URLs do not include a format parameter.
+    /// This ensures that the original image format is preserved in the generated URLs.
+    /// </summary>
+    /// <param name="mediaPath">The media path of the image being tested.</param>
     [TestCase("/media/image.jpg", Description = "JPG should keep original format")]
     [TestCase("/media/image.jpeg", Description = "JPEG should keep original format")]
     [TestCase("/media/image.png", Description = "PNG should keep original format")]
@@ -65,6 +73,11 @@ public class ReziseImageUrlFactoryTests
         Assert.That(urlInfo!.Url, Does.Not.Contain("format="));
     }
 
+    /// <summary>
+    /// Tests that when an explicit image format is requested, the created URL sets honor the requested format.
+    /// </summary>
+    /// <param name="mediaPath">The media path of the image.</param>
+    /// <param name="requestedFormat">The explicitly requested image format.</param>
     [TestCase("/media/document.pdf", "png", Description = "Explicitly requested PNG format overrides automatic WebP")]
     [TestCase("/media/image.jpg", "webp", Description = "Explicitly requested WebP format is honored for JPG")]
     [TestCase("/media/image.png", "jpg", Description = "Explicitly requested JPG format is honored for PNG")]
@@ -85,6 +98,11 @@ public class ReziseImageUrlFactoryTests
         Assert.That(urlInfo!.Url, Does.Contain($"format={requestedFormat}"));
     }
 
+    /// <summary>
+    /// Tests that CreateUrlSets correctly handles URLs with query strings by stripping the query string
+    /// before extracting the extension, ensuring that files like PDFs are processed and converted to WebP format,
+    /// while preserving the original query string in the output URL.
+    /// </summary>
     [Test]
     public void CreateUrlSets_UrlWithQueryString_HandlesCorrectly()
     {
@@ -108,6 +126,9 @@ public class ReziseImageUrlFactoryTests
         Assert.That(urlInfo.Url, Does.Contain("v=123"));
     }
 
+    /// <summary>
+    /// Tests that CreateUrlSets returns an empty UrlInfos collection when the media URL has no file extension.
+    /// </summary>
     [Test]
     public void CreateUrlSets_UrlWithoutExtension_ReturnsEmpty()
     {
@@ -126,6 +147,9 @@ public class ReziseImageUrlFactoryTests
         Assert.That(result[0].UrlInfos, Is.Empty);
     }
 
+    /// <summary>
+    /// Tests that creating URL sets for an SVG image returns the original URL without any resizing parameters.
+    /// </summary>
     [Test]
     public void CreateUrlSets_SvgImage_ReturnsOriginalUrlWithoutResizing()
     {
@@ -149,6 +173,11 @@ public class ReziseImageUrlFactoryTests
         Assert.That(urlInfo.Url, Does.Not.Contain("format="));
     }
 
+    /// <summary>
+    /// Tests that the CreateUrlSets method respects the configured custom image file types.
+    /// Specifically, it verifies that images with file types included in the custom configuration
+    /// do not get the format parameter appended, while those not included do.
+    /// </summary>
     [Test]
     public void CreateUrlSets_CustomImageFileTypes_RespectsConfiguration()
     {
@@ -174,6 +203,9 @@ public class ReziseImageUrlFactoryTests
         Assert.That(jpgUrl, Does.Not.Contain("format="));
     }
 
+    /// <summary>
+    /// Tests that CreateUrlSets returns an empty UrlInfos collection when the file type is unsupported.
+    /// </summary>
     [Test]
     public void CreateUrlSets_UnsupportedFileType_ReturnsEmpty()
     {
@@ -191,6 +223,10 @@ public class ReziseImageUrlFactoryTests
         Assert.That(result[0].UrlInfos, Is.Empty);
     }
 
+    /// <summary>
+    /// Tests that CreateUrlSets correctly processes multiple media items,
+    /// ensuring that the URLs are generated with the expected format parameters.
+    /// </summary>
     [Test]
     public void CreateUrlSets_MultipleMediaItems_ProcessesAllCorrectly()
     {
@@ -215,6 +251,9 @@ public class ReziseImageUrlFactoryTests
         Assert.That(jpgUrl, Does.Not.Contain("format="));
     }
 
+    /// <summary>
+    /// Tests that the CreateUrlSets method applies the specified width and height from ImageResizeOptions to the generated URLs.
+    /// </summary>
     [Test]
     public void CreateUrlSets_ImageResizeOptions_AppliesWidthAndHeight()
     {
@@ -234,6 +273,9 @@ public class ReziseImageUrlFactoryTests
         Assert.That(urlInfo.Url, Does.Contain("height=300"));
     }
 
+    /// <summary>
+    /// Tests that the CreateUrlSets method applies the specified ImageResizeOptions mode correctly.
+    /// </summary>
     [Test]
     public void CreateUrlSets_ImageResizeOptionsWithMode_AppliesMode()
     {
@@ -396,6 +438,13 @@ public class ReziseImageUrlFactoryTests
 
     private class StubMediaUrlGenerator : IMediaUrlGenerator
     {
+    /// <summary>
+    /// Attempts to get the media path from the given value.
+    /// </summary>
+    /// <param name="propertyEditorAlias">The alias of the property editor.</param>
+    /// <param name="value">The value to extract the media path from.</param>
+    /// <param name="mediaPath">When this method returns, contains the media path if found; otherwise, null.</param>
+    /// <returns>True if the media path was successfully retrieved; otherwise, false.</returns>
         public bool TryGetMediaPath(string? propertyEditorAlias, object? value, out string? mediaPath)
         {
             if (value is string stringValue && !string.IsNullOrEmpty(stringValue))

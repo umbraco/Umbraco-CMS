@@ -6,9 +6,17 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Extensions;
 
+/// <summary>
+/// Unit tests for the StringExtensions class focusing on culture-specific behaviors.
+/// </summary>
 [TestFixture]
 public partial class StringExtensionsTests
 {
+    /// <summary>
+    /// Unit test that verifies whether the <see cref="char"/> extension method <c>IsLowerCase</c> returns the expected result for a variety of characters.
+    /// </summary>
+    /// <param name="ch">The character to test.</param>
+    /// <param name="expected">The expected boolean result indicating if the character is considered lowercase by <c>IsLowerCase</c>.</param>
     [TestCase('a', true)]
     [TestCase('z', true)]
     [TestCase('m', true)]
@@ -43,6 +51,12 @@ public partial class StringExtensionsTests
         Assert.AreEqual(expected, result);
     }
 
+    /// <summary>
+    /// Unit test for the <see cref="StringExtensions.IsUpperCase(char)"/> extension method.
+    /// Verifies that the method correctly determines whether the specified <paramref name="ch"/> character is uppercase, and that the result matches the <paramref name="expected"/> value.
+    /// </summary>
+    /// <param name="ch">The character to test for uppercase status.</param>
+    /// <param name="expected">The expected result indicating whether <paramref name="ch"/> is uppercase.</param>
     [TestCase('A', true)]
     [TestCase('Z', true)]
     [TestCase('M', true)]

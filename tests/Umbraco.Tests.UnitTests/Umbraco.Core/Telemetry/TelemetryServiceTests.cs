@@ -9,9 +9,16 @@ using Umbraco.Cms.Core.Telemetry;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Telemetry;
 
+    /// <summary>
+    /// Provides unit tests for verifying the behavior of the <see cref="TelemetryService"/> class in Umbraco CMS.
+    /// </summary>
 [TestFixture]
 public class TelemetryServiceTests
 {
+    /// <summary>
+    /// Verifies that <see cref="TelemetryService"/> calls <c>TryGetOrCreateSiteIdentifier</c> on the <see cref="ISiteIdentifierService"/> when obtaining telemetry report data.
+    /// </summary>
+    /// <returns>A <see cref="Task"/> representing the asynchronous test operation.</returns>
     [Test]
     public async Task UsesGetOrCreateSiteId()
     {
@@ -30,6 +37,10 @@ public class TelemetryServiceTests
         siteIdentifierServiceMock.Verify(x => x.TryGetOrCreateSiteIdentifier(out guid), Times.Once);
     }
 
+    /// <summary>
+    /// Tests that the telemetry service skips processing if it cannot get or create an ID.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task SkipsIfCantGetOrCreateId()
     {
@@ -45,6 +56,10 @@ public class TelemetryServiceTests
         Assert.IsNull(result);
     }
 
+    /// <summary>
+    /// Tests that the semantic version returned does not include the build metadata.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task ReturnsSemanticVersionWithoutBuild()
     {
@@ -65,6 +80,11 @@ public class TelemetryServiceTests
         Assert.AreEqual("9.1.1-rc", result.Version);
     }
 
+    /// <summary>
+    /// Verifies that the <see cref="TelemetryService"/> correctly gathers telemetry information for installed packages.
+    /// Ensures that packages with and without version or ID information are handled as expected in the telemetry report.
+    /// </summary>
+    /// <returns>A <see cref="Task"/> representing the asynchronous test operation.</returns>
     [Test]
     public async Task CanGatherPackageTelemetry()
     {
@@ -106,6 +126,11 @@ public class TelemetryServiceTests
         });
     }
 
+    /// <summary>
+    /// Tests that the telemetry service respects the AllowPackageTelemetry flag on installed packages.
+    /// Only packages with AllowPackageTelemetry set to true should be included in the telemetry report.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task RespectsAllowPackageTelemetry()
     {

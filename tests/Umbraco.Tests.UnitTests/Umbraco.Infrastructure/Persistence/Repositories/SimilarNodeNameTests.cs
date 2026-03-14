@@ -9,6 +9,9 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Persistence.Reposit
 [TestFixture]
 internal sealed class SimilarNodeNameTests
 {
+    /// <summary>
+    /// Tests that the name is correctly suffixed when a duplicate name exists.
+    /// </summary>
     public void Name_Is_Suffixed()
     {
         SimilarNodeName[] names = { new SimilarNodeName { Id = 1, Name = "Zulu" } };
@@ -17,6 +20,9 @@ internal sealed class SimilarNodeNameTests
         Assert.AreEqual("Zulu (1)", res);
     }
 
+    /// <summary>
+    /// Tests that suffixed names are incremented correctly to ensure uniqueness.
+    /// </summary>
     [Test]
     public void Suffixed_Name_Is_Incremented()
     {
@@ -30,6 +36,9 @@ internal sealed class SimilarNodeNameTests
         Assert.AreEqual("Kilo (2)", res);
     }
 
+    /// <summary>
+    /// Tests that a lower number suffix is correctly inserted when generating a unique name.
+    /// </summary>
     [Test]
     public void Lower_Number_Suffix_Is_Inserted()
     {
@@ -57,6 +66,10 @@ internal sealed class SimilarNodeNameTests
         Assert.AreEqual(expected, res);
     }
 
+    /// <summary>
+    /// Tests that when an empty list of similar node names is provided,
+    /// the original name remains unchanged.
+    /// </summary>
     [Test]
     public void Empty_List_Causes_Unchanged_Name()
     {
@@ -67,6 +80,12 @@ internal sealed class SimilarNodeNameTests
         Assert.AreEqual("Charlie", res);
     }
 
+    /// <summary>
+    /// Tests that an empty or null node name is correctly suffixed to ensure uniqueness.
+    /// </summary>
+    /// <param name="nodeId">The ID of the node.</param>
+    /// <param name="nodeName">The name of the node, which may be empty or null.</param>
+    /// <param name="expected">The expected unique name result after suffixing.</param>
     [Test]
     [TestCase(0, "", " (1)")]
     [TestCase(0, null, " (1)")]
@@ -79,6 +98,9 @@ internal sealed class SimilarNodeNameTests
         Assert.AreEqual(expected, res);
     }
 
+    /// <summary>
+    /// Tests that when the matching node ID is provided, the name remains unchanged.
+    /// </summary>
     [Test]
     public void Matching_NoedId_Causes_No_Change()
     {
@@ -93,6 +115,9 @@ internal sealed class SimilarNodeNameTests
         Assert.AreEqual("Kilo (1)", res);
     }
 
+    /// <summary>
+    /// Tests that extra multi-suffixed names are ignored when generating a unique name.
+    /// </summary>
     [Test]
     public void Extra_MultiSuffixed_Name_Is_Ignored()
     {
@@ -110,6 +135,9 @@ internal sealed class SimilarNodeNameTests
         Assert.AreEqual("Test (3)", res);
     }
 
+    /// <summary>
+    /// Tests that a matched name is correctly suffixed to ensure uniqueness.
+    /// </summary>
     [Test]
     public void Matched_Name_Is_Suffixed()
     {
@@ -120,6 +148,9 @@ internal sealed class SimilarNodeNameTests
         Assert.AreEqual("Test (1)", res);
     }
 
+    /// <summary>
+    /// Tests that a multi-suffixed name is correctly incremented to ensure uniqueness.
+    /// </summary>
     [Test]
     public void MultiSuffixed_Name_Is_Icremented()
     {
@@ -136,6 +167,9 @@ internal sealed class SimilarNodeNameTests
         Assert.AreEqual("Test (1) (2)", res);
     }
 
+    /// <summary>
+    /// Tests that a suffixed name causes a secondary suffix to be appended to ensure uniqueness.
+    /// </summary>
     [Test]
     public void Suffixed_Name_Causes_Secondary_Suffix()
     {
@@ -145,6 +179,11 @@ internal sealed class SimilarNodeNameTests
         Assert.AreEqual("Alpha (1) (1)", res);
     }
 
+    /// <summary>
+    /// Verifies that when generating a unique node name, any suffix containing a non-positive number (such as 0 or negative values) is ignored for uniqueness purposes, and a new positive numeric suffix is appended instead.
+    /// </summary>
+    /// <param name="suffix">The input node name containing a non-positive numeric suffix.</param>
+    /// <param name="expected">The expected unique node name result after processing.</param>
     [TestCase("Test (0)", "Test (0) (1)")]
     [TestCase("Test (-1)", "Test (-1) (1)")]
     [TestCase("Test (1) (-1)", "Test (1) (-1) (1)")]
@@ -156,6 +195,9 @@ internal sealed class SimilarNodeNameTests
         Assert.AreEqual(expected, res);
     }
 
+    /// <summary>
+    /// Tests that the method correctly handles many similar node names and generates a unique name.
+    /// </summary>
     [Test]
     public void Handles_Many_Similar_Names()
     {

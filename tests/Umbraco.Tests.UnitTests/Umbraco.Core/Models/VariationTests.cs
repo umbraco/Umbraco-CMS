@@ -22,11 +22,17 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models;
 
+/// <summary>
+/// Contains unit tests for variation functionality in the Umbraco Core Models.
+/// </summary>
 [TestFixture]
 public class VariationTests
 {
     private readonly PropertyEditorCollection _propertyEditorCollection = new (new DataEditorCollection(() => []));
 
+    /// <summary>
+    /// Runs validation tests for content variations, checking culture and segment variations and wildcard handling.
+    /// </summary>
     [Test]
     public void ValidateVariationTests()
     {
@@ -154,6 +160,9 @@ public class VariationTests
     private static void Assert4A(ContentVariation variation, string culture, string segment, bool expectedResult) =>
         Assert4B(variation, culture, segment, expectedResult, expectedResult, expectedResult, expectedResult);
 
+    /// <summary>
+    /// Tests the behavior of the Property class with different variations and publishing states.
+    /// </summary>
     [Test]
     public void PropertyTests()
     {
@@ -251,6 +260,11 @@ public class VariationTests
         Assert.IsNull(prop.GetValue(published: true));
     }
 
+    /// <summary>
+    /// Tests the behavior of content names with culture variations.
+    /// Verifies that setting and getting culture-specific names works correctly,
+    /// including handling of unsupported variations and dictionary of culture infos.
+    /// </summary>
     [Test]
     public void ContentNames()
     {
@@ -292,6 +306,13 @@ public class VariationTests
         Assert.AreEqual("name-uk", content.CultureInfos[langUk].Name);
     }
 
+    /// <summary>
+    /// Verifies the behavior of content property values during publishing and editing
+    /// for both invariant and culture-variant content types. Tests include setting,
+    /// publishing, unpublishing, and copying property values, as well as handling
+    /// culture-specific variations and ensuring correct value retrieval for edited
+    /// and published states.
+    /// </summary>
     [Test]
     public void ContentPublishValues()
     {
@@ -407,6 +428,14 @@ public class VariationTests
         Assert.AreEqual("c", content.GetValue("prop", langFr, published: true));
     }
 
+    /// <summary>
+    /// Tests publishing content with a content type that has both culture-variant and invariant mandatory properties.
+    /// The test verifies that publishing enforces mandatory property validation correctly for both property types:
+    /// - Ensures that publishing fails if a mandatory culture-variant property is missing for the target culture.
+    /// - Ensures that publishing fails if a mandatory invariant property is missing, and describes how invariant validation depends on published state and default language.
+    /// - Confirms that publishing succeeds once all mandatory properties are set.
+    /// Also checks that property values are correctly stored and retrievable after publishing.
+    /// </summary>
     [Test]
     public void ContentPublishValuesWithMixedPropertyTypeVariations()
     {
@@ -461,6 +490,11 @@ public class VariationTests
         Assert.AreEqual("x", content.GetValue("prop2", published: true));
     }
 
+    /// <summary>
+    /// Tests the behavior of publishing content items with culture-specific variations.
+    /// Verifies that content properties and names must be set per culture before publishing,
+    /// and checks the availability, published state, and publish metadata for each culture.
+    /// </summary>
     [Test]
     public void ContentPublishVariations()
     {
@@ -524,6 +558,12 @@ public class VariationTests
         // see: ContentServiceTests.Can_SaveRead_Variations
     }
 
+    /// <summary>
+    /// Unit test verifying the <c>IsDirty</c> behavior for property and content instances,
+    /// including how value changes and variations affect their dirty state.
+    /// Ensures that setting values marks the property and content as dirty,
+    /// and checks the state of published and unpublished values.
+    /// </summary>
     [Test]
     public void IsDirtyTests()
     {
@@ -553,6 +593,9 @@ public class VariationTests
         //// how can we tell which variation was dirty?
     }
 
+    /// <summary>
+    /// Tests the validation behavior of properties with different settings.
+    /// </summary>
     [Test]
     public void ValidationTests()
     {
@@ -580,6 +623,12 @@ public class VariationTests
         prop.PublishValues();
     }
 
+    /// <summary>
+    /// Tests the validation behavior of a property with no value, depending on whether it varies by culture and/or segment.
+    /// Ensures that non-mandatory properties without a value are considered valid, while mandatory properties without a value are not, across all variation combinations.
+    /// </summary>
+    /// <param name="variesByCulture">If set to <c>true</c>, the property varies by culture; otherwise, it does not.</param>
+    /// <param name="variesBySegment">If set to <c>true</c>, the property varies by segment; otherwise, it does not.</param>
     [TestCase(true, true)]
     [TestCase(true, false)]
     [TestCase(false, true)]

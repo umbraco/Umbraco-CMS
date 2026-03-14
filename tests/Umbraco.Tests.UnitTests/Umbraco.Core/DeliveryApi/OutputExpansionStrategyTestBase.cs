@@ -22,6 +22,9 @@ public abstract class OutputExpansionStrategyTestBase : PropertyValueConverterTe
     private IPublishedContentType _elementType;
     private IPublishedContentType _mediaType;
 
+    /// <summary>
+    /// Sets up mock content types for testing output expansion strategies.
+    /// </summary>
     [SetUp]
     public void SetUp()
     {
@@ -39,6 +42,9 @@ public abstract class OutputExpansionStrategyTestBase : PropertyValueConverterTe
         _mediaType = mediaType.Object;
     }
 
+    /// <summary>
+    /// Tests that the output expansion strategy does not expand any properties by default.
+    /// </summary>
     [Test]
     public void OutputExpansionStrategy_ExpandsNothingByDefault()
     {
@@ -65,6 +71,9 @@ public abstract class OutputExpansionStrategyTestBase : PropertyValueConverterTe
         Assert.IsEmpty(contentPickerOutput.Properties);
     }
 
+    /// <summary>
+    /// Tests that the output expansion strategy can selectively expand specific content properties.
+    /// </summary>
     [Test]
     public void OutputExpansionStrategy_CanExpandSpecificContent()
     {
@@ -97,6 +106,12 @@ public abstract class OutputExpansionStrategyTestBase : PropertyValueConverterTe
         Assert.AreEqual(78, contentPickerTwoOutput.Properties["numberTwo"]);
     }
 
+    /// <summary>
+    /// Verifies that the output expansion strategy can correctly expand specific media properties
+    /// depending on the media picker version used. Ensures that the correct properties are expanded
+    /// for each media picker and that the output matches the expected structure.
+    /// </summary>
+    /// <param name="mediaPicker3">If set to <c>true</c>, uses media picker version 3; otherwise, uses the previous version.</param>
     [TestCase(false)]
     [TestCase(true)]
     public void OutputExpansionStrategy_CanExpandSpecificMedia(bool mediaPicker3)
@@ -138,6 +153,10 @@ public abstract class OutputExpansionStrategyTestBase : PropertyValueConverterTe
         Assert.AreEqual(78, mediaPickerTwoOutput.Properties["numberTwo"]);
     }
 
+    /// <summary>
+    /// Tests that the output expansion strategy correctly expands all content properties, including verifying that content picker properties
+    /// are expanded into their respective <see cref="ApiContent"/> representations with the expected property values.
+    /// </summary>
     [Test]
     public void OutputExpansionStrategy_CanExpandAllContent()
     {
@@ -172,6 +191,12 @@ public abstract class OutputExpansionStrategyTestBase : PropertyValueConverterTe
         Assert.AreEqual(78, contentPickerTwoOutput.Properties["numberTwo"]);
     }
 
+    /// <summary>
+    /// Verifies that the output expansion strategy does not expand the properties of a nested content picker.
+    /// Ensures that when a content picker property contains another content picker as a nested property, only the root content picker's properties are expanded, and the nested picker's properties remain unexpanded.
+    /// </summary>
+    /// <param name="rootPropertyTypeAlias">The alias of the root content picker property to test.</param>
+    /// <param name="nestedPropertyTypeAlias">The alias of the nested content picker property to test.</param>
     [TestCase("contentPicker", "contentPicker")]
     [TestCase("rootPicker", "nestedPicker")]
     public void OutputExpansionStrategy_DoesNotExpandNestedContentPicker(string rootPropertyTypeAlias, string nestedPropertyTypeAlias)
@@ -203,6 +228,10 @@ public abstract class OutputExpansionStrategyTestBase : PropertyValueConverterTe
         Assert.IsEmpty(nestedContentPickerOutput.Properties);
     }
 
+    /// <summary>
+    /// Verifies that the output expansion strategy does not expand element properties by default.
+    /// This test ensures that when building API content, element properties are not expanded unless explicitly configured.
+    /// </summary>
     [Test]
     public void OutputExpansionStrategy_DoesNotExpandElementsByDefault()
     {
@@ -254,6 +283,9 @@ public abstract class OutputExpansionStrategyTestBase : PropertyValueConverterTe
         }
     }
 
+    /// <summary>
+    /// Tests that mapping content properties throws an ArgumentException when an invalid item type is used.
+    /// </summary>
     [Test]
     public void OutputExpansionStrategy_MappingContent_ThrowsOnInvalidItemType()
     {
@@ -266,6 +298,9 @@ public abstract class OutputExpansionStrategyTestBase : PropertyValueConverterTe
         Assert.Throws<ArgumentException>(() => outputExpansionStrategy.MapContentProperties(PublishedMedia));
     }
 
+    /// <summary>
+    /// Tests that mapping media properties with an invalid item type throws an ArgumentException.
+    /// </summary>
     [Test]
     public void OutputExpansionStrategy_MappingMedia_ThrowsOnInvalidItemType()
     {

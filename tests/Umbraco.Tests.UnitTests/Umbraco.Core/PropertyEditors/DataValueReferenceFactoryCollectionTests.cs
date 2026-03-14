@@ -22,6 +22,9 @@ using static Umbraco.Cms.Core.Models.Property;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 
+/// <summary>
+/// Unit tests for the DataValueReferenceFactoryCollection class.
+/// </summary>
 [TestFixture]
 public class DataValueReferenceFactoryCollectionTests
 {
@@ -48,6 +51,10 @@ public class DataValueReferenceFactoryCollectionTests
 
     private IShortStringHelper ShortStringHelper { get; } = Mock.Of<IShortStringHelper>();
 
+    /// <summary>
+    /// Verifies that <c>GetAllReferences</c> returns all expected unique references for all property value variants (culture and segment) when using an <see cref="IDataValueReferenceFactory"/>.
+    /// Ensures that only values with a culture are included and that duplicate references are not returned.
+    /// </summary>
     [Test]
     public void GetAllReferences_All_Variants_With_IDataValueReferenceFactory()
     {
@@ -92,6 +99,11 @@ public class DataValueReferenceFactoryCollectionTests
         Assert.AreEqual(trackedUdi3, result.ElementAt(1).Udi.ToString());
     }
 
+    /// <summary>
+    /// Verifies that <c>GetAllReferences</c> returns all unique references for all property value variants
+    /// (culture and segment) when the property editor implements <see cref="IDataValueReference"/>.
+    /// Ensures that only references from variants with a culture are included and that duplicates are excluded.
+    /// </summary>
     [Test]
     public void GetAllReferences_All_Variants_With_IDataValueReference_Editor()
     {
@@ -136,6 +148,9 @@ public class DataValueReferenceFactoryCollectionTests
         Assert.AreEqual(trackedUdi3, result.ElementAt(1).Udi.ToString());
     }
 
+    /// <summary>
+    /// Tests that GetAllReferences returns only invariant references when using an IDataValueReference editor.
+    /// </summary>
     [Test]
     public void GetAllReferences_Invariant_With_IDataValueReference_Editor()
     {
@@ -180,6 +195,9 @@ public class DataValueReferenceFactoryCollectionTests
         Assert.AreEqual(trackedUdi4, result.ElementAt(1).Udi.ToString());
     }
 
+    /// <summary>
+    /// Tests that the collection of automatic relation type aliases contains the default set.
+    /// </summary>
     [Test]
     public void GetAutomaticRelationTypesAliases_ContainsDefault()
     {
@@ -192,6 +210,9 @@ public class DataValueReferenceFactoryCollectionTests
         CollectionAssert.AreEquivalent(expected, result, "Result does not contain the expected relation type aliases.");
     }
 
+    /// <summary>
+    /// Tests that the collection of automatic relation type aliases contains a custom alias.
+    /// </summary>
     [Test]
     public void GetAutomaticRelationTypesAliases_ContainsCustom()
     {
@@ -209,12 +230,28 @@ public class DataValueReferenceFactoryCollectionTests
 
     private class TestDataValueReferenceFactory : IDataValueReferenceFactory
     {
+    /// <summary>
+    /// Creates and returns a new instance of <see cref="TestMediaDataValueReference"/>, which implements <see cref="IDataValueReference"/>.
+    /// </summary>
+    /// <returns>
+    /// An <see cref="IDataValueReference"/> representing a test media data value reference.
+    /// </returns>
         public IDataValueReference GetDataValueReference() => new TestMediaDataValueReference();
 
+    /// <summary>
+    /// Determines whether the specified data editor is supported by this factory.
+    /// </summary>
+    /// <param name="dataEditor">The data editor to check.</param>
+    /// <returns><c>true</c> if the factory supports the specified data editor; otherwise, <c>false</c>.</returns>
         public bool IsForEditor(IDataEditor dataEditor) => dataEditor.Alias == Constants.PropertyEditors.Aliases.Label;
 
         private class TestMediaDataValueReference : IDataValueReference
         {
+    /// <summary>
+    /// Gets the Umbraco entity references from the provided value.
+    /// </summary>
+    /// <param name="value">The value to extract references from.</param>
+    /// <returns>An enumerable of UmbracoEntityReference instances found in the value.</returns>
             public IEnumerable<UmbracoEntityReference> GetReferences(object value)
             {
                 // This is the same as the media picker, it will just try to parse the value directly as a UDI.
@@ -231,6 +268,10 @@ public class DataValueReferenceFactoryCollectionTests
                 }
             }
 
+    /// <summary>
+    /// Gets the aliases of automatic relation types.
+    /// </summary>
+    /// <returns>An enumerable of string aliases representing automatic relation types.</returns>
             public IEnumerable<string> GetAutomaticRelationTypesAliases() => new[]
             {
                 "umbTest",

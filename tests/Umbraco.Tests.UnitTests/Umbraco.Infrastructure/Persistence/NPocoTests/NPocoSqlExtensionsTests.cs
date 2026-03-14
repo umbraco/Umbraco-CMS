@@ -13,9 +13,16 @@ using static Umbraco.Cms.Core.Persistence.SqlExtensionsStatics;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Persistence.NPocoTests;
 
+/// <summary>
+/// Contains unit tests for the NPoco SQL extension methods in the Umbraco CMS infrastructure.
+/// </summary>
 [TestFixture]
 public class NPocoSqlExtensionsTests : BaseUsingSqlSyntax
 {
+    /// <summary>
+    /// Verifies that NPoco generates correct SQL for various where clause scenarios involving nullable and non-nullable values.
+    /// Tests include comparisons with null, constants, variables, and the use of SqlNullableEquals, ensuring correct SQL output for each case.
+    /// </summary>
     [Test]
     public void WhereTest()
     {
@@ -92,6 +99,10 @@ public class NPocoSqlExtensionsTests : BaseUsingSqlSyntax
             sql.SQL);
     }
 
+    /// <summary>
+    /// Tests the <c>SqlNullableEquals</c> extension method for nullable integers.
+    /// Verifies that the method correctly determines equality when both values are null, when one is null, and when both have values.
+    /// </summary>
     [Test]
     public void SqlNullableEqualsTest()
     {
@@ -106,6 +117,9 @@ public class NPocoSqlExtensionsTests : BaseUsingSqlSyntax
         Assert.IsFalse(a.SqlNullableEquals(b, -1));
     }
 
+    /// <summary>
+    /// Tests the WhereIn extension method for SQL queries with value fields.
+    /// </summary>
     [Test]
     public void WhereInValueFieldTest()
     {
@@ -116,6 +130,9 @@ public class NPocoSqlExtensionsTests : BaseUsingSqlSyntax
         Assert.AreEqual("SELECT *\nFROM [umbracoNode]\nWHERE ([umbracoNode].[id] IN (@0,@1,@2))", sql.SQL);
     }
 
+    /// <summary>
+    /// Tests the WhereIn extension method for object fields in NPoco SQL queries.
+    /// </summary>
     [Test]
     public void WhereInObjectFieldTest()
     {
@@ -126,6 +143,9 @@ public class NPocoSqlExtensionsTests : BaseUsingSqlSyntax
         Assert.AreEqual("SELECT *\nFROM [umbracoNode]\nWHERE ([umbracoNode].[text] IN (@0,@1,@2))", sql.SQL);
     }
 
+    /// <summary>
+    /// Tests that the WhereLike extension method generates a parameterized SQL LIKE query.
+    /// </summary>
     [Test]
     public void WhereLike_Uses_Parameterized_Query()
     {
@@ -142,6 +162,9 @@ public class NPocoSqlExtensionsTests : BaseUsingSqlSyntax
         Assert.AreEqual("%test%", sql.Arguments[0]);
     }
 
+    /// <summary>
+    /// Tests various Select methods of NPoco SQL extensions to ensure correct SQL generation.
+    /// </summary>
     [Test]
     public void SelectTests()
     {
@@ -206,6 +229,11 @@ INNER JOIN [dto2] ON [dto1].[id] = [dto2].[dto1id]".NoCrLf(),
             sql.SQL.NoCrLf());
     }
 
+    /// <summary>
+    /// Verifies the SQL generation behavior of the Select and AndSelect extension methods
+    /// for NPoco, both with and without column aliases. Ensures that multiple selects and
+    /// aliasing produce the expected SQL output.
+    /// </summary>
     [Test]
     public void SelectAliasTests()
     {
@@ -228,6 +256,14 @@ INNER JOIN [dto2] ON [dto1].[id] = [dto2].[dto1id]".NoCrLf(),
         Assert.AreEqual("SELECT [dto1].[id] AS [Id] , [dto2].[id] AS [id2]".NoCrLf(), sql.SQL.NoCrLf());
     }
 
+    /// <summary>
+    /// Tests the <c>AndSelect</c> extension method for SQL query generation with and without column aliasing.
+    /// Verifies that:
+    /// <list type="bullet">
+    /// <item>By default and when <c>withAlias</c> is true, column aliases are included in the generated SQL.</item>
+    /// <item>When <c>withAlias</c> is false, columns are selected without aliases, including when selecting multiple fields.</item>
+    /// </list>
+    /// </summary>
     [Test]
     public void AndSelectWithAliasTests()
     {
@@ -256,6 +292,9 @@ INNER JOIN [dto2] ON [dto1].[id] = [dto2].[dto1id]".NoCrLf(),
         Assert.AreEqual("SELECT [dto1].[id] AS [Id] , [dto2].[id], [dto2].[name]".NoCrLf(), sql.SQL.NoCrLf());
     }
 
+    /// <summary>
+    /// Verifies that the Update extension method for NPoco SQL queries correctly constructs an update statement for the DataTypeDto entity.
+    /// </summary>
     [Test]
     public void UpdateTests()
     {
@@ -264,56 +303,101 @@ INNER JOIN [dto2] ON [dto1].[id] = [dto2].[dto1id]".NoCrLf(),
             .Where<DataTypeDto>(x => x.EditorAlias == "Umbraco.ColorPickerAlias");
     }
 
+    /// <summary>
+    /// Represents a simple data transfer object used in NPoco SQL extension tests.
+    /// </summary>
     [TableName("dto1")]
     [PrimaryKey("id", AutoIncrement = false)]
     [ExplicitColumns]
     public class Dto1
     {
+        /// <summary>
+        /// Gets or sets the identifier.
+        /// </summary>
         [Column("id")]
         public int Id { get; set; }
 
+        /// <summary>
+        /// Gets or sets the name.
+        /// </summary>
         [Column("name")]
         public string Name { get; set; }
 
+        /// <summary>
+        /// Gets or sets the value.
+        /// </summary>
         [Column("value")]
         public int Value { get; set; }
 
+    /// <summary>
+    /// Represents the Dto2 nested class within Dto1.
+    /// </summary>
         [Reference]
         public Dto2 Dto2 { get; set; }
 
+        /// <summary>
+        /// Gets or sets the list of Dto2 objects associated with this Dto1.
+        /// </summary>
         [Reference]
         public List<Dto2> Dto2s { get; set; }
     }
 
+    /// <summary>
+    /// Data transfer object (DTO) used in NPoco SQL extension unit tests.
+    /// </summary>
     [TableName("dto2")]
     [PrimaryKey("id", AutoIncrement = false)]
     [ExplicitColumns]
     public class Dto2
     {
+    /// <summary>
+    /// Gets or sets the identifier.
+    /// </summary>
         [Column("id")]
         public int Id { get; set; }
 
+        /// <summary>
+        /// Gets or sets the Dto1 identifier.
+        /// </summary>
         [Column("dto1id")]
         public int Dto1Id { get; set; }
 
+        /// <summary>
+        /// Gets or sets the name.
+        /// </summary>
         [Column("name")]
         public string Name { get; set; }
 
+    /// <summary>
+    /// Gets or sets the Dto3 reference.
+    /// </summary>
         [Reference]
         public Dto3 Dto3 { get; set; }
     }
 
+    /// <summary>
+    /// Data transfer object (DTO) used specifically for testing NPoco SQL extension methods in unit tests.
+    /// </summary>
     [TableName("dto3")]
     [PrimaryKey("id", AutoIncrement = false)]
     [ExplicitColumns]
     public class Dto3
     {
+        /// <summary>
+        /// Gets or sets the identifier.
+        /// </summary>
         [Column("id")]
         public int Id { get; set; }
 
+        /// <summary>
+        /// Gets or sets the identifier for Dto2, mapped to the 'dto2id' column in the database.
+        /// </summary>
         [Column("dto2id")]
         public int Dto2Id { get; set; }
 
+        /// <summary>
+        /// Gets or sets the name.
+        /// </summary>
         [Column("name")]
         public string Name { get; set; }
     }

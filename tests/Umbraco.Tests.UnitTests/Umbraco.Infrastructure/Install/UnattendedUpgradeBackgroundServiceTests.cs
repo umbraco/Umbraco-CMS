@@ -16,9 +16,17 @@ using Umbraco.Cms.Infrastructure.Install;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Install;
 
+/// <summary>
+/// Tests for the <see cref="UnattendedUpgradeBackgroundService"/> class.
+/// </summary>
 [TestFixture]
 public class UnattendedUpgradeBackgroundServiceTests
 {
+    /// <summary>
+    /// Verifies that <c>ExecuteAsync</c> does nothing when the runtime level is not <c>Upgrading</c>.
+    /// </summary>
+    /// <param name="level">The <see cref="RuntimeLevel"/> value to test.</param>
+    /// <returns>A <see cref="Task"/> representing the asynchronous test operation.</returns>
     [TestCase(RuntimeLevel.Boot)]
     [TestCase(RuntimeLevel.Install)]
     [TestCase(RuntimeLevel.Upgrade)]
@@ -39,6 +47,12 @@ public class UnattendedUpgradeBackgroundServiceTests
             Times.Never);
     }
 
+    /// <summary>
+    /// Unit test for <c>ExecuteAsync</c> verifying that when all upgrade notifications are not required,
+    /// the method still initializes components and registers lifetime callbacks as expected.
+    /// Ensures all notification steps are fired, the runtime level is determined, and no boot failure is configured.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task ExecuteAsync_WhenAllNotificationsAreNotRequired_InitializesComponentsAndRegistersLifetimeCallbacks()
     {
@@ -68,6 +82,11 @@ public class UnattendedUpgradeBackgroundServiceTests
         runtimeState.Verify(x => x.Configure(RuntimeLevel.BootFailed, It.IsAny<RuntimeLevelReason>(), It.IsAny<Exception?>()), Times.Never);
     }
 
+    /// <summary>
+    /// Verifies that when the premigrations process returns <c>CoreUpgradeComplete</c>,
+    /// the <c>DetermineRuntimeLevel</c> method is invoked exactly once.
+    /// </summary>
+    /// <returns>A <see cref="Task"/> representing the asynchronous test operation.</returns>
     [Test]
     public async Task ExecuteAsync_WhenPremigrationsReturnsCorUpgradeComplete_CallsDetermineRuntimeLevel()
     {
@@ -84,6 +103,11 @@ public class UnattendedUpgradeBackgroundServiceTests
         runtimeState.Verify(x => x.DetermineRuntimeLevel(), Times.Once);
     }
 
+    /// <summary>
+    /// Tests that when premigrations have errors and a BootFailedException exists,
+    /// the boot failed state is set and subsequent upgrade steps are not executed.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task ExecuteAsync_WhenPremigrationsHasErrorsAndBootFailedExceptionExists_SetsBootFailed()
     {
@@ -105,6 +129,11 @@ public class UnattendedUpgradeBackgroundServiceTests
         eventAggregator.Verify(x => x.PublishAsync(It.IsAny<RuntimeUnattendedUpgradeNotification>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
+    /// <summary>
+    /// Tests that when premigrations have errors and the BootFailedException is null,
+    /// the boot failed state is correctly set during execution.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task ExecuteAsync_WhenPremigrationsHasErrorsAndBootFailedExceptionIsNull_SetsBootFailed()
     {
@@ -125,6 +154,11 @@ public class UnattendedUpgradeBackgroundServiceTests
             Times.Once);
     }
 
+    /// <summary>
+    /// Tests that when the unattended upgrade has errors and a BootFailedException exists,
+    /// the system sets the runtime state to BootFailed.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task ExecuteAsync_WhenUnattendedUpgradeHasErrorsAndBootFailedExceptionExists_SetsBootFailed()
     {
@@ -145,6 +179,12 @@ public class UnattendedUpgradeBackgroundServiceTests
         eventAggregator.Verify(x => x.PublishAsync(It.IsAny<UmbracoApplicationStartingNotification>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
+    /// <summary>
+    /// Tests that when the unattended upgrade succeeds with the specified result,
+    /// the runtime level determination is called exactly once.
+    /// </summary>
+    /// <param name="result">The result of the unattended upgrade.</param>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [TestCase(RuntimeUnattendedUpgradeNotification.UpgradeResult.CoreUpgradeComplete)]
     [TestCase(RuntimeUnattendedUpgradeNotification.UpgradeResult.PackageMigrationComplete)]
     public async Task ExecuteAsync_WhenUnattendedUpgradeSucceeds_CallsDetermineRuntimeLevel(
@@ -163,6 +203,10 @@ public class UnattendedUpgradeBackgroundServiceTests
         runtimeState.Verify(x => x.DetermineRuntimeLevel(), Times.Once);
     }
 
+    /// <summary>
+    /// Tests that when PublishAsync throws an exception during execution, the boot state is set to BootFailed.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task ExecuteAsync_WhenPublishAsyncThrows_SetsBootFailed()
     {
@@ -183,6 +227,11 @@ public class UnattendedUpgradeBackgroundServiceTests
             Times.Once);
     }
 
+    /// <summary>
+    /// Tests that when a BootFailedException is already set before determining the runtime level,
+    /// the DetermineRuntimeLevel method is skipped during execution.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task ExecuteAsync_WhenBootFailedExceptionAlreadySetBeforeDetermineRuntimeLevel_SkipsDetermineRuntimeLevel()
     {
@@ -206,6 +255,10 @@ public class UnattendedUpgradeBackgroundServiceTests
         runtimeState.Verify(x => x.DetermineRuntimeLevel(), Times.Never);
     }
 
+    /// <summary>
+    /// Tests that when DetermineRuntimeLevel throws an exception, the boot state is set to BootFailed.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task ExecuteAsync_WhenDetermineRuntimeLevelThrows_SetsBootFailed()
     {

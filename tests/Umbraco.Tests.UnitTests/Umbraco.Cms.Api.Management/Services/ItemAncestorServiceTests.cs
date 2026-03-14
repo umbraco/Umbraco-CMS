@@ -15,6 +15,10 @@ internal class ItemAncestorServiceTests
     private Mock<IEntityService> _entityServiceMock = null!;
     private ItemAncestorService _sut = null!;
 
+    /// <summary>
+    /// Initializes mocks and the ItemAncestorService instance before each test in <see cref="ItemAncestorServiceTests"/>.
+    /// Sets up the IUmbracoMapper and IEntityService mocks with default behaviors.
+    /// </summary>
     [SetUp]
     public void SetUp()
     {
@@ -29,6 +33,10 @@ internal class ItemAncestorServiceTests
         _sut = new ItemAncestorService(_entityServiceMock.Object, mapper.Object);
     }
 
+    /// <summary>
+    /// Verifies that <c>GetAncestorsAsync</c> returns an empty result when called with an empty set of IDs.
+    /// </summary>
+    /// <returns>A <see cref="Task"/> representing the asynchronous test operation.</returns>
     [Test]
     public async Task Empty_Ids_Returns_Empty_Result()
     {
@@ -41,6 +49,10 @@ internal class ItemAncestorServiceTests
         Assert.IsEmpty(result);
     }
 
+    /// <summary>
+    /// Tests that when an entity is not found, the service returns an empty result.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task Entity_Not_Found_Returns_Empty_Result()
     {
@@ -59,6 +71,10 @@ internal class ItemAncestorServiceTests
         Assert.IsEmpty(result);
     }
 
+    /// <summary>
+    /// Tests that a root level entity has an empty list of ancestors.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task Root_Level_Entity_Has_Empty_Ancestors()
     {
@@ -80,6 +96,10 @@ internal class ItemAncestorServiceTests
         Assert.IsEmpty(result[0].Ancestors);
     }
 
+    /// <summary>
+    /// Tests that a single entity with ancestors returns the correct ordered chain of ancestors.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task Single_Entity_With_Ancestors_Returns_Correct_Ordered_Chain()
     {
@@ -116,6 +136,10 @@ internal class ItemAncestorServiceTests
         Assert.AreEqual(parentKey, ancestors[1].Id);
     }
 
+    /// <summary>
+    /// Tests that multiple entities sharing the same ancestors return separate ancestor chains per entity.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task Multiple_Entities_Sharing_Ancestors_Returns_Per_Entity_Chains()
     {
@@ -154,6 +178,10 @@ internal class ItemAncestorServiceTests
         Assert.AreEqual(sharedParentKey, result2.Ancestors.First().Id);
     }
 
+    /// <summary>
+    /// Tests that folder-based entity types correctly resolve both item and container ancestors.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task Folder_Based_Entity_Type_Resolves_Both_Item_And_Container_Ancestors()
     {
@@ -196,6 +224,10 @@ internal class ItemAncestorServiceTests
         Assert.AreEqual(itemAncestorKey, ancestors[1].Id);
     }
 
+    /// <summary>
+    /// Verifies that a folder entity can be correctly found using the folder object type when it cannot be found via the item type.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task Folder_Entity_Found_Via_Folder_Object_Type()
     {
@@ -238,6 +270,10 @@ internal class ItemAncestorServiceTests
         Assert.AreEqual(parentFolderKey, ancestors[0].Id);
     }
 
+    /// <summary>
+    /// Tests that when a mix of found and not found entities are requested, the not found entities are omitted from the results.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task Mixed_Found_And_Not_Found_Entities_Omits_Not_Found()
     {
@@ -260,6 +296,10 @@ internal class ItemAncestorServiceTests
         Assert.AreEqual(foundKey, result[0].Id);
     }
 
+    /// <summary>
+    /// Tests that the entity itself is not included in its list of ancestors.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task Self_Is_Not_Included_In_Ancestors()
     {
@@ -289,6 +329,10 @@ internal class ItemAncestorServiceTests
         Assert.AreEqual(parentKey, ancestors[0].Id);
     }
 
+    /// <summary>
+    /// Verifies that the deep ancestor chain retrieval returns all ancestor levels for an entity in the correct hierarchical order.
+    /// </summary>
+    /// <returns>A task that represents the asynchronous test operation.</returns>
     [Test]
     public async Task Deep_Ancestor_Chain_Returns_All_Levels_In_Order()
     {
@@ -323,6 +367,11 @@ internal class ItemAncestorServiceTests
         Assert.AreEqual(level3Key, ancestors[2].Id);
     }
 
+    /// <summary>
+    /// Verifies that when multiple root-level entities are queried for their ancestors,
+    /// each entity returns an empty ancestor list, as expected for root nodes.
+    /// </summary>
+    /// <returns>A <see cref="Task"/> representing the asynchronous test operation.</returns>
     [Test]
     public async Task Multiple_Root_Level_Entities_All_Have_Empty_Ancestors()
     {
@@ -348,6 +397,10 @@ internal class ItemAncestorServiceTests
         Assert.That(result, Has.All.Property(nameof(ItemAncestorsResponseModel<TestItemResponseModel>.Ancestors)).Empty);
     }
 
+    /// <summary>
+    /// Tests the retrieval of multiple entities at different depths and verifies their ancestors.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task Multiple_Entities_At_Different_Depths()
     {
@@ -383,6 +436,11 @@ internal class ItemAncestorServiceTests
         Assert.AreEqual(parentKey, childResult.Ancestors.First().Id);
     }
 
+    /// <summary>
+    /// Tests the scenario where a folder type is provided but all ancestors are items.
+    /// Verifies that the ancestors are correctly resolved as items and no folder lookups occur.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task Folder_Type_Provided_But_All_Ancestors_Are_Items()
     {
@@ -424,6 +482,10 @@ internal class ItemAncestorServiceTests
             Times.Never);
     }
 
+    /// <summary>
+    /// Tests that when a container ancestor is not found, it is omitted from the ancestor chain.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task Container_Ancestor_Not_Found_Is_Omitted_From_Chain()
     {
@@ -458,6 +520,10 @@ internal class ItemAncestorServiceTests
         Assert.IsEmpty(result[0].Ancestors);
     }
 
+    /// <summary>
+    /// Verifies that ancestor IDs are deduplicated before fetching, ensuring no redundant retrievals occur.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task Ancestor_Ids_Are_Deduplicated_Before_Fetching()
     {
@@ -492,6 +558,10 @@ internal class ItemAncestorServiceTests
             Times.Once);
     }
 
+    /// <summary>
+    /// Tests that when an entity is not found via item type or folder type, the service returns an empty result.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task Entity_Not_Found_Via_Item_Type_Or_Folder_Type_Returns_Empty()
     {
@@ -514,6 +584,10 @@ internal class ItemAncestorServiceTests
         Assert.IsEmpty(result);
     }
 
+    /// <summary>
+    /// Tests that folder lookup only queries keys not found as items.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task Folder_Lookup_Only_Queries_Keys_Not_Found_As_Items()
     {
@@ -549,6 +623,10 @@ internal class ItemAncestorServiceTests
             Times.Never);
     }
 
+    /// <summary>
+    /// Tests that the mapper receives all ancestor entities correctly.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task Mapper_Receives_All_Ancestor_Entities()
     {

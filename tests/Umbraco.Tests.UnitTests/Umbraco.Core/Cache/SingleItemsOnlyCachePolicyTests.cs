@@ -12,6 +12,9 @@ using IScope = Umbraco.Cms.Infrastructure.Scoping.IScope;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Cache;
 
+/// <summary>
+/// Contains unit tests that verify the behavior of the <see cref="SingleItemsOnlyRepositoryCachePolicy{TEntity, TId}"/> class.
+/// </summary>
 [TestFixture]
 public class SingleItemsOnlyCachePolicyTests
 {
@@ -27,6 +30,9 @@ public class SingleItemsOnlyCachePolicyTests
         }
     }
 
+    /// <summary>
+    /// Tests that the GetAll method does not cache any items.
+    /// </summary>
     [Test]
     public void Get_All_Doesnt_Cache()
     {
@@ -49,6 +55,9 @@ public class SingleItemsOnlyCachePolicyTests
         Assert.AreEqual(0, cached.Count);
     }
 
+    /// <summary>
+    /// Tests that the SingleItemsOnlyRepositoryCachePolicy caches a single item correctly.
+    /// </summary>
     [Test]
     public void Caches_Single()
     {

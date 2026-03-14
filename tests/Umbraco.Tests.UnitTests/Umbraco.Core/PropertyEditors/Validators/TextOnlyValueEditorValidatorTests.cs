@@ -19,6 +19,13 @@ internal class TextOnlyValueEditorValidatorTests
         TextboxConfiguration,
     }
 
+    /// <summary>
+    /// Verifies that string length validation behaves as expected for different editor configurations and maximum character limits.
+    /// </summary>
+    /// <param name="shouldSucceed">True if the validation is expected to pass; otherwise, false.</param>
+    /// <param name="configurationType">The type of value editor configuration to test (e.g., textbox or textarea).</param>
+    /// <param name="maxChars">The maximum allowed number of characters for the value, or null if unlimited.</param>
+    /// <param name="value">The input string to validate.</param>
     [TestCase(true, ConfigurationType.TextboxConfiguration, null, "123")]
     [TestCase(true, ConfigurationType.TextAreaConfiguration, null, "123")]
     [TestCase(false, ConfigurationType.TextAreaConfiguration, 2, "123")]

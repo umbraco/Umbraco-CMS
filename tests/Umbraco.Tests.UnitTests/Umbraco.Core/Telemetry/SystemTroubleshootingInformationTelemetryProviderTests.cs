@@ -15,9 +15,16 @@ using Umbraco.Cms.Infrastructure.Telemetry.Providers;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Telemetry;
 
+/// <summary>
+/// Contains unit tests that verify the functionality of the <see cref="SystemTroubleshootingInformationTelemetryProvider"/> class.
+/// </summary>
 [TestFixture]
 public class SystemTroubleshootingInformationTelemetryProviderTests
 {
+    /// <summary>
+    /// Tests that the telemetry provider reports the models mode correctly.
+    /// </summary>
+    /// <param name="modelsMode">The models mode to test.</param>
     [Test]
     [TestCase(Constants.ModelsBuilder.ModelsModes.Nothing)]
     [TestCase(ModelsModeConstants.InMemoryAuto)]
@@ -33,6 +40,10 @@ public class SystemTroubleshootingInformationTelemetryProviderTests
         Assert.AreEqual(modelsMode, actual.Data);
     }
 
+    /// <summary>
+    /// Tests that the telemetry provider reports the runtime mode correctly.
+    /// </summary>
+    /// <param name="runtimeMode">The runtime mode to test.</param>
     [Test]
     [TestCase(RuntimeMode.BackofficeDevelopment)]
     [TestCase(RuntimeMode.BackofficeDevelopment)]
@@ -48,6 +59,10 @@ public class SystemTroubleshootingInformationTelemetryProviderTests
         Assert.AreEqual(runtimeMode.ToString(), actual.Data);
     }
 
+    /// <summary>
+    /// Verifies that the telemetry provider correctly reports the debug mode status based on the input parameter.
+    /// </summary>
+    /// <param name="isDebug">A boolean value indicating whether debug mode is enabled for the test case.</param>
     [Test]
     [TestCase(true)]
     [TestCase(false)]
@@ -61,6 +76,10 @@ public class SystemTroubleshootingInformationTelemetryProviderTests
         Assert.AreEqual(isDebug, actual.Data);
     }
 
+    /// <summary>
+    /// Tests that the OS language is reported correctly by the telemetry provider for the given culture.
+    /// </summary>
+    /// <param name="culture">The culture string to set as the current thread's culture.</param>
     [Test]
     [TestCase("en-US")]
     [TestCase("de-DE")]
@@ -78,6 +97,10 @@ public class SystemTroubleshootingInformationTelemetryProviderTests
         Assert.AreEqual(culture, actual.Data.ToString());
     }
 
+    /// <summary>
+    /// Verifies that the telemetry provider correctly reports the specified ASP.NET environment value.
+    /// </summary>
+    /// <param name="environment">The ASP.NET environment name to test (e.g., "Development", "Staging", or "Production").</param>
     [Test]
     [TestCase("Development")]
     [TestCase("Staging")]

@@ -8,6 +8,9 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Web.Routing;
 
+/// <summary>
+/// Contains unit tests for the <see cref="PublishedRequestBuilder"/> class, verifying its behavior and functionality.
+/// </summary>
 [TestFixture]
 public class PublishedRequestBuilderTests
 {
@@ -17,6 +20,9 @@ public class PublishedRequestBuilderTests
         _baseUri,
         Mock.Of<IFileService>());
 
+    /// <summary>
+    /// Tests that setting published content clears the template and internal redirect flags appropriately.
+    /// </summary>
     [Test]
     public void Setting_Published_Content_Clears_Template_And_Redirect()
     {
@@ -37,6 +43,9 @@ public class PublishedRequestBuilderTests
         Assert.IsFalse(sut.IsInternalRedirect);
     }
 
+    /// <summary>
+    /// Tests that setting the domain on the PublishedRequestBuilder also sets the culture accordingly.
+    /// </summary>
     [Test]
     public void Setting_Domain_Also_Sets_Culture()
     {
@@ -52,6 +61,10 @@ public class PublishedRequestBuilderTests
         Assert.IsNotNull(sut.Culture);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="PublishedRequestBuilder"/> correctly builds a request when all possible values are set, including cache headers, domain, culture, headers, redirects, template, and published content.
+    /// Asserts that each property on the resulting request matches the values provided to the builder.
+    /// </summary>
     [Test]
     public void Builds_All_Values()
     {

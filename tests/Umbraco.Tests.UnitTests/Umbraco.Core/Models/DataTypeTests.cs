@@ -8,9 +8,15 @@ using Umbraco.Cms.Tests.Common.Builders.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models;
 
+/// <summary>
+/// Contains unit tests for the <see cref="DataType"/> model in the Umbraco.Core.Models namespace.
+/// </summary>
 [TestFixture]
 public class DataTypeTests
 {
+    /// <summary>
+    /// Tests updating properties on a DataType and verifies that the dirty properties are tracked correctly.
+    /// </summary>
     [Test]
     public void Can_Update_And_Verify_Dirty_Properties()
     {

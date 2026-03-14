@@ -20,9 +20,16 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Composing;
 
+    /// <summary>
+    /// Contains unit tests for the <see cref="TypeLoader"/> class.
+    /// </summary>
 [TestFixture]
 public class TypeLoaderTests
 {
+    /// <summary>
+    /// Sets up the test environment for <see cref="TypeLoader"/> tests by initializing the required assemblies and dependencies.
+    /// This method is called before each test to ensure a consistent and isolated test context.
+    /// </summary>
     [SetUp]
     public void Initialize()
     {
@@ -47,6 +54,9 @@ public class TypeLoaderTests
             assemblies);
     }
 
+    /// <summary>
+    /// Cleans up resources after each test run.
+    /// </summary>
     [TearDown]
     public void TearDown()
     {
@@ -73,6 +83,9 @@ public class TypeLoaderTests
         return dir;
     }
 
+    /// <summary>
+    /// Tests that the plugin hash is correctly generated and differs when the set of files changes.
+    /// </summary>
     [Test]
     public void Get_Plugins_Hash_With_Hash_Generator()
     {
@@ -113,6 +126,9 @@ public class TypeLoaderTests
         Assert.AreEqual(hash1, GetFileHash(list1, new ProfilingLogger(Mock.Of<ILogger<ProfilingLogger>>(), Mock.Of<IProfiler>())));
     }
 
+    /// <summary>
+    /// Ensures that only one type list is created when resolving the same types multiple times.
+    /// </summary>
     [Test]
     public void Ensure_Only_One_Type_List_Created()
     {
@@ -121,6 +137,9 @@ public class TypeLoaderTests
         Assert.AreEqual(1, _typeLoader.TypeLists.Count(x => x.BaseType == typeof(IFindMe) && x.AttributeType == null));
     }
 
+    /// <summary>
+    /// Tests that the type loader correctly resolves types.
+    /// </summary>
     [Test]
     public void Resolves_Types()
     {
@@ -128,6 +147,10 @@ public class TypeLoaderTests
         Assert.AreEqual(2, foundTypes1.Count());
     }
 
+    /// <summary>
+    /// Unit test that verifies the <c>GetDataEditors</c> method returns the expected number of data editor types.
+    /// Asserts that the count of returned types is 42.
+    /// </summary>
     [Test]
     public void GetDataEditors()
     {
@@ -159,14 +182,23 @@ public class TypeLoaderTests
         Assert.IsNull(shouldNotFind);
     }
 
+    /// <summary>
+    /// Marker interface used in TypeLoaderTests.
+    /// </summary>
     public interface IFindMe : IDiscoverable
     {
     }
 
+    /// <summary>
+    /// Marker class used in unit tests for verifying type loading functionality in the TypeLoader.
+    /// </summary>
     public class FindMe1 : IFindMe
     {
     }
 
+    /// <summary>
+    /// A marker class used for testing type loading.
+    /// </summary>
     public class FindMe2 : IFindMe
     {
     }

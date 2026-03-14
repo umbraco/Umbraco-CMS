@@ -12,6 +12,9 @@ using Umbraco.Cms.Infrastructure.Serialization;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Manifest;
 
+/// <summary>
+/// Contains unit tests for the <see cref="PackageManifestReader"/> class, verifying its behavior and functionality.
+/// </summary>
 [TestFixture]
 public class PackageManifestReaderTests
 {
@@ -20,6 +23,9 @@ public class PackageManifestReaderTests
     private Mock<ILogger<AppPluginsPackageManifestReader>> _loggerMock;
     private Mock<IFileProvider> _fileProviderMock;
 
+    /// <summary>
+    /// Sets up the test environment before each test.
+    /// </summary>
     [SetUp]
     public void SetUp()
     {
@@ -35,6 +41,11 @@ public class PackageManifestReaderTests
         _reader = new AppPluginsPackageManifestReader(fileProviderFactoryMock.Object, new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory()), _loggerMock.Object);
     }
 
+    /// <summary>
+    /// Verifies that package manifests located in the root directory are correctly read and parsed by the <see cref="PackageManifestReader"/>.
+    /// This includes checking the manifest's name, version, extensions, and import map structure.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task Can_Read_PackageManifests_At_Root()
     {
@@ -66,6 +77,10 @@ public class PackageManifestReaderTests
         Assert.AreEqual("https://example.com/modules/shapes/square.js", firstScope.Value);
     }
 
+    /// <summary>
+    /// Tests that package manifest extensions can be deserialized correctly from JSON content.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task Can_Deserialize_Extensions()
     {
@@ -105,6 +120,10 @@ public class PackageManifestReaderTests
          Assert.AreEqual(1, someArray[0].GetValue<int>());
     }
 
+    /// <summary>
+    /// Tests that package manifests can be read correctly from root directories.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task Can_Read_PackageManifest_In_Root_Directories()
     {
@@ -120,6 +139,10 @@ public class PackageManifestReaderTests
         Assert.AreEqual("Package Two", result.Last().Name);
     }
 
+    /// <summary>
+    /// Tests that empty directories are skipped when reading package manifests.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task Can_Skip_Empty_Directories()
     {
@@ -135,6 +158,10 @@ public class PackageManifestReaderTests
         Assert.AreEqual("My Package", result.First().Name);
     }
 
+    /// <summary>
+    /// Tests that the package manifest reader can skip files that are not package manifests.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task Can_Skip_Other_Files()
     {
@@ -156,6 +183,10 @@ public class PackageManifestReaderTests
         Assert.AreEqual("My Package", result.First().Name);
     }
 
+    /// <summary>
+    /// Tests that the package manifest reader can handle all empty directories without errors.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task Can_Handle_All_Empty_Directories()
     {
@@ -169,6 +200,9 @@ public class PackageManifestReaderTests
         Assert.AreEqual(0, result.Count());
     }
 
+    /// <summary>
+    /// Tests that reading a package manifest without a "name" property throws an exception.
+    /// </summary>
     [Test]
     public void Cannot_Read_PackageManifest_Without_Name()
     {
@@ -191,6 +225,9 @@ public class PackageManifestReaderTests
         Assert.IsInstanceOf<JsonException>(exception.InnerException);
     }
 
+    /// <summary>
+    /// Tests that reading a package manifest without extensions throws an exception.
+    /// </summary>
     [Test]
     public void Cannot_Read_PackageManifest_Without_Extensions()
     {
@@ -208,6 +245,9 @@ public class PackageManifestReaderTests
         Assert.IsInstanceOf<JsonException>(exception.InnerException);
     }
 
+    /// <summary>
+    /// Tests that reading a package manifest without the required importmap imports throws an exception.
+    /// </summary>
     [Test]
     public void Cannot_Read_PackageManifest_Without_Importmap_Imports()
     {
@@ -231,6 +271,10 @@ public class PackageManifestReaderTests
         Assert.IsInstanceOf<JsonException>(exception.InnerException);
     }
 
+    /// <summary>
+    /// Verifies that attempting to read a package manifest with invalid JSON content throws an <see cref="InvalidOperationException"/> whose inner exception is a <see cref="System.Text.Json.JsonException"/>.
+    /// </summary>
+    /// <param name="content">A string containing invalid JSON to be used as the manifest content for the test.</param>
     [TestCase("This is not JSON")]
     [TestCase(@"{""name"": ""invalid-json"", ""version"": ")]
     public void Cannot_Read_Invalid_PackageManifest(string content)

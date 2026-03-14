@@ -14,12 +14,19 @@ using Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs.ServerRegistration;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.BackgroundJobs.Jobs.ServerRegistration;
 
+/// <summary>
+/// Contains unit tests for the <see cref="InstructionProcessJob"/> class, verifying its behavior and functionality.
+/// </summary>
 [TestFixture]
 public class InstructionProcessJobTests
 {
     private Mock<IServerMessenger> _mockDatabaseServerMessenger;
 
 
+    /// <summary>
+    /// Tests that the instruction process job executes and updates the server state accordingly.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task Executes_And_Touches_Server()
     {

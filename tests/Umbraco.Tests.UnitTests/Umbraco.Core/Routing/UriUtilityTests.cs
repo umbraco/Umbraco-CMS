@@ -10,10 +10,18 @@ using Umbraco.Cms.Core.Routing;
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Routing;
 
 // TODO: not testing virtual directory!
+/// <summary>
+/// Contains unit tests for the <see cref="global::Umbraco.Core.Routing.UriUtility"/> class.
+/// </summary>
 [TestFixture]
 public class UriUtilityTests
 {
     // test normal urls
+    /// <summary>
+    /// Tests the UriToUmbraco method to ensure it converts source URLs to the expected Umbraco URLs correctly.
+    /// </summary>
+    /// <param name="sourceUrl">The source URL to convert.</param>
+    /// <param name="expectedUrl">The expected Umbraco URL result after conversion.</param>
     [TestCase("http://LocalHost/", "http://localhost/")]
     [TestCase("http://LocalHost/?x=y", "http://localhost/?x=y")]
     [TestCase("http://LocalHost/Home", "http://localhost/home")]
@@ -67,6 +75,12 @@ public class UriUtilityTests
         Assert.AreEqual(expectedUri.ToString(), resultUri.ToString());
     }
 
+    /// <summary>
+    /// Unit test for <see cref="UriUtility.ToAbsolute"/>, verifying that various combinations of virtual paths and source URLs are correctly converted to absolute URLs.
+    /// </summary>
+    /// <param name="virtualPath">The application virtual path used as the base for conversion (e.g., "/" or "/vdir").</param>
+    /// <param name="sourceUrl">The source URL or path to convert to an absolute URL (may be rooted, relative, or app-relative).</param>
+    /// <param name="expectedUrl">The expected absolute URL result after conversion.</param>
     [TestCase("/", "/", "/")]
     [TestCase("/", "/foo", "/foo")]
     [TestCase("/", "~/foo", "/foo")]
@@ -86,6 +100,12 @@ public class UriUtilityTests
         Assert.AreEqual(expectedUrl, resultUrl);
     }
 
+    /// <summary>
+    /// Tests the conversion of a source URL to an application-relative URL based on the given virtual path.
+    /// </summary>
+    /// <param name="virtualPath">The virtual path of the application.</param>
+    /// <param name="sourceUrl">The source URL to convert.</param>
+    /// <param name="expectedUrl">The expected application-relative URL result.</param>
     [TestCase("/", "/", "/")]
     [TestCase("/", "/foo", "/foo")]
     [TestCase("/", "/foo/", "/foo/")]

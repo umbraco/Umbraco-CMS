@@ -6,8 +6,14 @@ using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core;
 
+/// <summary>
+/// Contains unit tests for methods in the <see cref="GuidUtils"/> class.
+/// </summary>
 public class GuidUtilsTests
 {
+    /// <summary>
+    /// Tests that the two methods of combining GUIDs produce equal results.
+    /// </summary>
     [Test]
     public void GuidCombineMethodsAreEqual()
     {
@@ -17,6 +23,9 @@ public class GuidUtilsTests
         Assert.AreEqual(GuidUtils.Combine(a, b).ToByteArray(), Combine(a, b));
     }
 
+    /// <summary>
+    /// Tests the conversion of GUIDs to Base32 strings with specified lengths.
+    /// </summary>
     [Test]
     public void GuidThingTest()
     {

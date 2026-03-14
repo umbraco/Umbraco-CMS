@@ -7,9 +7,15 @@ using Umbraco.Cms.Core.Composing;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.EmbeddedResources;
 
+/// <summary>
+/// Contains unit tests for verifying the Language XML embedded resources in the Umbraco CMS core.
+/// </summary>
 [TestFixture]
 public class LanguageXmlTests
 {
+    /// <summary>
+    /// Tests that language XML files embedded as resources can be loaded without errors.
+    /// </summary>
     [Test]
     public void Can_Load_Language_Xml_Files()
     {

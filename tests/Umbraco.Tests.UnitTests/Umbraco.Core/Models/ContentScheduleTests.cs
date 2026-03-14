@@ -8,9 +8,15 @@ using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models;
 
+/// <summary>
+/// Contains unit tests for the <see cref="ContentSchedule"/> class in the Umbraco CMS core models.
+/// </summary>
 [TestFixture]
 public class ContentScheduleTests
 {
+    /// <summary>
+    /// Tests that the release date is less than the expire date in the content schedule.
+    /// </summary>
     [Test]
     public void Release_Date_Less_Than_Expire_Date()
     {
@@ -19,6 +25,9 @@ public class ContentScheduleTests
         Assert.IsFalse(schedule.Add(now, now));
     }
 
+    /// <summary>
+    /// Tests that adding duplicate dates to the ContentScheduleCollection throws an exception.
+    /// </summary>
     [Test]
     public void Cannot_Add_Duplicate_Dates_Invariant()
     {
@@ -28,6 +37,9 @@ public class ContentScheduleTests
         Assert.Throws<ArgumentException>(() => schedule.Add(null, now));
     }
 
+    /// <summary>
+    /// Tests that adding duplicate dates for the same variant to the content schedule throws an exception.
+    /// </summary>
     [Test]
     public void Cannot_Add_Duplicate_Dates_Variant()
     {
@@ -39,6 +51,9 @@ public class ContentScheduleTests
         Assert.Throws<ArgumentException>(() => schedule.Add(null, now));
     }
 
+    /// <summary>
+    /// Tests that an invariant schedule item can be removed from the content schedule collection.
+    /// </summary>
     [Test]
     public void Can_Remove_Invariant()
     {
@@ -50,6 +65,9 @@ public class ContentScheduleTests
         Assert.AreEqual(0, schedule.FullSchedule.Count());
     }
 
+    /// <summary>
+    /// Tests that a variant can be removed from the content schedule.
+    /// </summary>
     [Test]
     public void Can_Remove_Variant()
     {
@@ -67,6 +85,9 @@ public class ContentScheduleTests
         Assert.AreEqual(0, schedule.FullSchedule.Count());
     }
 
+    /// <summary>
+    /// Tests that the start date can be cleared from the schedule and verifies the schedule counts after clearing.
+    /// </summary>
     [Test]
     public void Can_Clear_Start_Invariant()
     {
@@ -81,6 +102,12 @@ public class ContentScheduleTests
         Assert.AreEqual(1, schedule.FullSchedule.Count());
     }
 
+    /// <summary>
+    /// Verifies that clearing the end (expire) variant of a content schedule removes the correct entries
+    /// for both invariant and culture-specific schedules, and that other schedule actions remain unaffected.
+    /// The test adds schedules for both invariant and "en-US" variants, clears expire actions, and asserts
+    /// the expected counts for each schedule type before and after clearing.
+    /// </summary>
     [Test]
     public void Can_Clear_End_Variant()
     {

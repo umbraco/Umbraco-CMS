@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using System.Xml.Linq;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -10,6 +10,9 @@ using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 
+/// <summary>
+/// Contains unit tests for the <see cref="PropertyEditorValueTypeConverter"/> class, verifying its behavior and functionality.
+/// </summary>
 [TestFixture]
 public class PropertyEditorValueTypeConverterTests
 {
@@ -38,6 +41,12 @@ public class PropertyEditorValueTypeConverterTests
         }
     }
 
+    /// <summary>
+    /// Verifies that <see cref="DecimalValueTypeConverter"/> correctly converts various input values to their expected decimal representations.
+    /// This is a parameterized unit test that checks conversion from different input types and values, including strings, null, and invalid input.
+    /// </summary>
+    /// <param name="value">The input value to convert to decimal (can be string, null, or other object).</param>
+    /// <param name="expected">The expected decimal result after conversion.</param>
     [TestCase("1", 1)]
     [TestCase("0", 0)]
     [TestCase(null, 0)]
@@ -61,6 +70,12 @@ public class PropertyEditorValueTypeConverterTests
         Assert.AreEqual(expected, result);
     }
 
+    /// <summary>
+    /// Verifies that <see cref="IntegerValueTypeConverter"/> correctly converts various input values to their expected integer representations.
+    /// This includes handling of strings, nulls, empty values, and rounding of floating-point strings.
+    /// </summary>
+    /// <param name="value">The input value to be converted to an integer.</param>
+    /// <param name="expected">The expected integer result after conversion.</param>
     [TestCase("100", 100)]
     [TestCase("0", 0)]
     [TestCase(null, 0)]
@@ -84,6 +99,12 @@ public class PropertyEditorValueTypeConverterTests
         Assert.AreEqual(expected, result);
     }
 
+    /// <summary>
+    /// Verifies that the <see cref="BigintValueTypeConverter"/> correctly converts various input values to a <see cref="long"/> type.
+    /// This is a parameterized test that checks multiple input scenarios, including strings, null, and invalid values.
+    /// </summary>
+    /// <param name="value">The input value to be converted to a long.</param>
+    /// <param name="expected">The expected <see cref="long"/> result after conversion.</param>
     [TestCase("100", 100)]
     [TestCase("0", 0)]
     [TestCase(null, 0)]
@@ -132,6 +153,11 @@ public class PropertyEditorValueTypeConverterTests
         }
     }
 
+    /// <summary>
+    /// Tests that the <see cref="TimeValueTypeConverter"/> correctly converts various input values to <see cref="TimeSpan"/> or returns null for invalid or unsupported inputs.
+    /// </summary>
+    /// <param name="value">The input value to convert, which may be a string representing a date/time, a number, or null.</param>
+    /// <param name="expectedTime">The expected time string representation (e.g., "13:14:15") or null if conversion should fail.</param>
     [TestCase("2023-01-01T03:04:00Z","03:04:00")]
     [TestCase("2023-01-01T13:14:00Z", "13:14:00")]
     [TestCase("2023-01-01T13:14:15Z", "13:14:15")]
@@ -181,6 +207,12 @@ public class PropertyEditorValueTypeConverterTests
         }
     }
 
+    /// <summary>
+    /// Verifies that the <see cref="JsonValueConverter"/> correctly converts various source inputs to a <see cref="JsonDocument"/> intermediate value.
+    /// The test checks both valid and invalid JSON strings, as well as non-string and null inputs, ensuring the converter behaves as expected.
+    /// </summary>
+    /// <param name="source">The input value to convert, which may be a JSON string, a non-JSON string, a non-string type, or null.</param>
+    /// <param name="expectsSuccess">True if the conversion is expected to succeed and produce a <see cref="JsonDocument"/>; false if it should fail and return null.</param>
     [TestCase("{\"message\":\"Hello, JSON\"}", true)]
     [TestCase("{\"nested\":{\"message\":\"Hello, Nested\"}}", true)]
     [TestCase("{\"nested\":{\"invalid JSON", false)]

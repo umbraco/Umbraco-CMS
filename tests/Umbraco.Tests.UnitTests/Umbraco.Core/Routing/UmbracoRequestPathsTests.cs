@@ -9,12 +9,19 @@ using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Routing;
 
+    /// <summary>
+    /// Contains unit tests for verifying the behavior and correctness of the <see cref="UmbracoRequestPaths"/> class in the Umbraco CMS routing system.
+    /// These tests ensure that request path handling and related logic function as expected.
+    /// </summary>
 [TestFixture]
 public class UmbracoRequestPathsTests
 {
     private IWebHostEnvironment _hostEnvironment;
     private UmbracoRequestPathsOptions _umbracoRequestPathsOptions;
 
+    /// <summary>
+    /// Sets up the test environment for UmbracoRequestPathsTests.
+    /// </summary>
     [OneTimeSetUp]
     public void Setup()
     {
@@ -35,6 +42,11 @@ public class UmbracoRequestPathsTests
             _hostEnvironment);
     }
 
+    /// <summary>
+    /// Unit test for <see cref="UmbracoRequestPaths.IsClientSideRequest"/> that verifies whether a given URL path is correctly identified as a client-side request (such as static assets).
+    /// </summary>
+    /// <param name="url">The URL path to evaluate for client-side request status.</param>
+    /// <param name="assert">The expected boolean result; <c>true</c> if the URL should be considered a client-side request, otherwise <c>false</c>.</param>
     [TestCase("/favicon.ico", true)]
     [TestCase("/umbraco_client/Tree/treeIcons.css", true)]
     [TestCase("/umbraco_client/Tree/Themes/umbraco/style.css?cdv=37", true)]
@@ -53,6 +65,9 @@ public class UmbracoRequestPathsTests
         Assert.AreEqual(assert, result);
     }
 
+    /// <summary>
+    /// Tests that an invalid client-side request path returns false.
+    /// </summary>
     [Test]
     public void Is_Client_Side_Request_InvalidPath_ReturnFalse()
     {
@@ -65,6 +80,15 @@ public class UmbracoRequestPathsTests
         Assert.AreEqual(false, result);
     }
 
+    /// <summary>
+    /// Verifies whether a given input URL and virtual path are identified as a back office request by <see cref="UmbracoRequestPaths.IsBackOfficeRequest"/>.
+    /// </summary>
+    /// <param name="input">The input URL to evaluate.</param>
+    /// <param name="virtualPath">The virtual path of the hosting environment (e.g., application root or subdirectory).</param>
+    /// <param name="expected">True if the request should be recognized as a back office request; otherwise, false.</param>
+    /// <remarks>
+    /// This test uses various URL and virtual path combinations to ensure correct identification of Umbraco back office requests.
+    /// </remarks>
     [TestCase("http://www.domain.com/umbraco/preview/frame?id=1234", "", true)]
     [TestCase("http://www.domain.com/umbraco", "", true)]
     [TestCase("http://www.domain.com/Umbraco/", "", true)]
@@ -93,6 +117,12 @@ public class UmbracoRequestPathsTests
         Assert.AreEqual(expected, umbracoRequestPaths.IsBackOfficeRequest(source.AbsolutePath));
     }
 
+    /// <summary>
+    /// Verifies that the <see cref="UmbracoRequestPaths.IsBackOfficeRequest"/> method correctly determines whether a request is considered a back office request
+    /// based on different input URL paths and custom <see cref="UmbracoRequestPathsOptions"/> configuration.
+    /// </summary>
+    /// <param name="input">The input URL string to evaluate.</param>
+    /// <param name="expected">True if the request should be identified as a back office request; otherwise, false.</param>
     [TestCase("http://www.domain.com/some/path", false)]
     [TestCase("http://www.domain.com/umbraco/surface/blah", false)]
     [TestCase("http://www.domain.com/umbraco/api/blah", false)]

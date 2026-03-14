@@ -27,6 +27,9 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 [TestFixture]
 public class MultiValuePropertyEditorTests
 {
+    /// <summary>
+    /// Tests that the MultipleValueEditor correctly formats multiple values as a comma-separated string for caching.
+    /// </summary>
     [Test]
     public void MultipleValueEditor_WithMultipleValues_Format_Data_For_Cache()
     {
@@ -62,6 +65,9 @@ public class MultiValuePropertyEditorTests
         Assert.AreEqual("Value 1,Value 2,Value 3", result);
     }
 
+    /// <summary>
+    /// Tests that the MultipleValueEditor correctly formats a single value for caching.
+    /// </summary>
     [Test]
     public void MultipleValueEditor_WithSingleValue_Format_Data_For_Cache()
     {
@@ -95,6 +101,9 @@ public class MultiValuePropertyEditorTests
         Assert.AreEqual("Value 2", result);
     }
 
+    /// <summary>
+    /// Tests that the multiple value editor correctly formats data for the editor.
+    /// </summary>
     [Test]
     public void MultipleValueEditor_Format_Data_For_Editor()
     {

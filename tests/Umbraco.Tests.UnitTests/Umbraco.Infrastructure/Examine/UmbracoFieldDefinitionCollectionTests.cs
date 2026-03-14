@@ -7,6 +7,9 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Examine;
 [TestFixture]
 internal class UmbracoFieldDefinitionCollectionTests
 {
+    /// <summary>
+    /// Tests that the UmbracoFieldDefinitionCollection contains the expected default fields upon creation.
+    /// </summary>
     [Test]
     public void Create_Contains_Expected_Fields()
     {
@@ -14,6 +17,9 @@ internal class UmbracoFieldDefinitionCollectionTests
         AssertDefaultField(collection);
     }
 
+    /// <summary>
+    /// Tests that creating a new UmbracoFieldDefinitionCollection contains the expected default and custom fields.
+    /// </summary>
     [Test]
     public void Create_New_Contains_Expected_Fields()
     {
@@ -27,6 +33,10 @@ internal class UmbracoFieldDefinitionCollectionTests
         AssertCustomField(collection, expectExists: false);
     }
 
+    /// <summary>
+    /// Verifies that creating a new <see cref="UmbracoFieldDefinitionCollection"/> from an existing collection
+    /// preserves all expected fields, including both custom and default fields.
+    /// </summary>
     [Test]
     public void Create_With_Existing_Contains_Expected_Fields()
     {
@@ -40,6 +50,9 @@ internal class UmbracoFieldDefinitionCollectionTests
         AssertCustomField(collection, expectExists: true);
     }
 
+    /// <summary>
+    /// Tests that creating a new UmbracoFieldDefinitionCollection from an existing one retains the override of the default field type.
+    /// </summary>
     [Test]
     public void Create_With_Existing_Retains_Override_Of_DefaultField()
     {

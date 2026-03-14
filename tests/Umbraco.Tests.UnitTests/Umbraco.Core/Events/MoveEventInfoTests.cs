@@ -1,8 +1,12 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Umbraco.Cms.Core.Events;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Events;
 
+    /// <summary>
+    /// Contains unit tests for the <see cref="MoveEventInfo"/> class in the Umbraco.Core.Events namespace.
+    /// These tests verify the behavior and functionality of MoveEventInfo.
+    /// </summary>
 public class MoveEventInfoTests
 {
     [TestCase("", "path", false)]
@@ -16,6 +20,9 @@ public class MoveEventInfoTests
         Assert.AreEqual(expectedResult, recycleBinMoveEvent.Equals(recycleBinMoveEventTwo));
     }
 
+    /// <summary>
+    /// Tests that two MoveToRecycleBinEventInfo instances with all parameters null or empty are considered equal.
+    /// </summary>
     [Test]
     public void Can_Equate_Move_To_Recyclebin_Move_Event_Infos_All_Params_Null_Or_Empty()
     {
@@ -25,6 +32,9 @@ public class MoveEventInfoTests
         Assert.IsTrue(recycleBinMoveEvent.Equals(recycleBinMoveEventTwo));
     }
 
+    /// <summary>
+    /// Tests that two MoveEventInfo instances with null parent keys are considered equal.
+    /// </summary>
     [Test]
     public void Can_Equate_Move_Event_Infos_Parent_Key_Null()
     {
@@ -33,6 +43,9 @@ public class MoveEventInfoTests
         Assert.IsTrue(moveEvent.Equals(moveEventTwo));
     }
 
+    /// <summary>
+    /// Tests that two MoveEventInfo instances with all parameters null or empty are considered equal.
+    /// </summary>
     [Test]
     public void Can_Equate_Move_Event_Infos_All_Params_Null_Or_Empty()
     {
@@ -41,6 +54,14 @@ public class MoveEventInfoTests
         Assert.IsTrue(moveEvent.Equals(moveEventTwo));
     }
 
+    /// <summary>
+    /// Verifies that two <see cref="MoveEventInfo{T}"/> instances are considered equal or not equal based on their constructor parameters.
+    /// </summary>
+    /// <param name="parentId">The ID of the parent entity for the move event under test.</param>
+    /// <param name="entity">The entity value for the move event under test.</param>
+    /// <param name="originalPath">The original path of the entity for the move event under test.</param>
+    /// <param name="parentKey">The unique identifier (GUID) of the parent entity for the move event under test.</param>
+    /// <param name="expectedResult">True if the two <see cref="MoveEventInfo{T}"/> instances are expected to be equal; otherwise, false.</param>
     [TestCase(123, "entity", "", "063897F1-194A-4C42-B406-CA80DBC12968", false)]
     [TestCase(123, "", "path", "063897F1-194A-4C42-B406-CA80DBC12968", false)]
     [TestCase(12, "entity", "path", "063897F1-194A-4C42-B406-CA80DBC12968", false)]

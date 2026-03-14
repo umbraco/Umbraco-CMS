@@ -8,9 +8,17 @@ using Umbraco.Cms.Core.Telemetry;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Telemetry;
 
+/// <summary>
+/// Contains unit tests for the <see cref="SiteIdentifierService"/> class, verifying its functionality and behavior.
+/// </summary>
 [TestFixture]
 public class SiteIdentifierServiceTests
 {
+    /// <summary>
+    /// Tests that TryGetSiteIdentifier only succeeds if the provided guidString is a valid GUID.
+    /// </summary>
+    /// <param name="guidString">The GUID string to test.</param>
+    /// <param name="shouldSucceed">Indicates whether the TryGetSiteIdentifier call is expected to succeed.</param>
     [TestCase("0F1785C5-7BA0-4C52-AB62-863BD2C8F3FE", true)]
     [TestCase("This is not a guid", false)]
     [TestCase("", false)]
@@ -37,6 +45,11 @@ public class SiteIdentifierServiceTests
         }
     }
 
+    /// <summary>
+    /// Tests that a new GUID is only created if the current GUID is missing or invalid.
+    /// </summary>
+    /// <param name="guidString">The GUID string to test with.</param>
+    /// <param name="shouldCreate">Indicates whether a new GUID should be created.</param>
     [TestCase("0F1785C5-7BA0-4C52-AB62-863BD2C8F3FE", false)]
     [TestCase("This is not a guid", true)]
     [TestCase("", true)]

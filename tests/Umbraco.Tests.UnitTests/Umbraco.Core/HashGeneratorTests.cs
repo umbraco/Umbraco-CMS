@@ -8,6 +8,9 @@ using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core;
 
+/// <summary>
+/// Contains unit tests that verify the functionality of the <see cref="HashGenerator"/> class.
+/// </summary>
 [TestFixture]
 public class HashGeneratorTests
 {
@@ -29,6 +32,9 @@ public class HashGeneratorTests
         return generator.GenerateHash();
     }
 
+    /// <summary>
+    /// Tests that generating hashes from multiple strings is case sensitive.
+    /// </summary>
     [Test]
     public void Generate_Hash_Multiple_Strings_Case_Sensitive()
     {
@@ -42,6 +48,9 @@ public class HashGeneratorTests
         Assert.AreNotEqual(hash1, hashFalse2);
     }
 
+    /// <summary>
+    /// Tests that the hash generation is case insensitive when generating hashes from multiple strings.
+    /// </summary>
     [Test]
     public void Generate_Hash_Multiple_Strings_Case_Insensitive()
     {
@@ -68,6 +77,9 @@ public class HashGeneratorTests
         return dir;
     }
 
+    /// <summary>
+    /// Tests that the hash combiner generates the same hash for case-insensitive strings and different hashes for different strings.
+    /// </summary>
     [Test]
     public void HashCombiner_Test_String()
     {
@@ -82,6 +94,9 @@ public class HashGeneratorTests
         }
     }
 
+    /// <summary>
+    /// Tests that the hash combiner generates consistent hashes for the same integer input and different hashes for different inputs.
+    /// </summary>
     [Test]
     public void HashCombiner_Test_Int()
     {
@@ -96,6 +111,10 @@ public class HashGeneratorTests
         }
     }
 
+    /// <summary>
+    /// Tests that the HashGenerator correctly combines DateTime values to produce consistent hashes.
+    /// Verifies that identical DateTime inputs produce the same hash and different DateTime inputs produce different hashes.
+    /// </summary>
     [Test]
     public void HashCombiner_Test_DateTime()
     {
@@ -109,6 +128,10 @@ public class HashGeneratorTests
         Assert.AreNotEqual(combiner1.GenerateHash(), combiner2.GenerateHash());
     }
 
+    /// <summary>
+    /// Tests the HashGenerator's ability to combine file hashes and verify that
+    /// identical files produce the same hash while different files produce different hashes.
+    /// </summary>
     [Test]
     public void HashCombiner_Test_File()
     {
@@ -145,6 +168,11 @@ public class HashGeneratorTests
         Assert.AreNotEqual(combiner1.GenerateHash(), combiner2.GenerateHash());
     }
 
+    /// <summary>
+    /// Tests the HashGenerator's ability to combine hashes for a folder.
+    /// It verifies that adding the same folder twice produces the same hash,
+    /// and that adding a folder after modifying its contents produces a different hash.
+    /// </summary>
     [Test]
     public void HashCombiner_Test_Folder()
     {

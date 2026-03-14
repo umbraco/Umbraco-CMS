@@ -9,6 +9,9 @@ using Umbraco.Cms.Infrastructure.Serialization;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Deploy;
 
+/// <summary>
+/// Contains unit tests for the ArtifactBase class.
+/// </summary>
 [TestFixture]
 public class ArtifactBaseTests
 {
@@ -20,6 +23,10 @@ public class ArtifactBaseTests
             }
         };
 
+    /// <summary>
+    /// Verifies that a TestArtifact instance is serialized to the expected JSON format.
+    /// Ensures all properties are correctly included in the output.
+    /// </summary>
     [Test]
     public void Can_Serialize()
     {
@@ -32,6 +39,9 @@ public class ArtifactBaseTests
         Assert.AreEqual(expected, serialized);
     }
 
+    /// <summary>
+    /// Tests that a TestArtifact object can be deserialized correctly from a JSON string.
+    /// </summary>
     [Test]
     public void Can_Deserialize()
     {
@@ -43,6 +53,10 @@ public class ArtifactBaseTests
         Assert.AreEqual("testAlias", deserialized.Alias);
     }
 
+    /// <summary>
+    /// Verifies that artifact dependencies are ordered consistently according to the defined rules,
+    /// ensuring cross-platform consistency as required by issue #72.
+    /// </summary>
     [Test]
     public void Dependencies_Are_Correctly_Ordered()
     {
@@ -66,6 +80,9 @@ public class ArtifactBaseTests
             string.Join(",", artifact.Dependencies.Select(x => x.Udi.ToString())));
     }
 
+    /// <summary>
+    /// Verifies that when multiple dependencies with the same UDI but different modes are added to the collection, the mode is correctly updated according to the collection's logic.
+    /// </summary>
     [Test]
     public void Dependencies_Correctly_Updates_Mode()
     {
@@ -86,6 +103,11 @@ public class ArtifactBaseTests
         Assert.AreEqual(null, dependency.Checksum);
     }
 
+    /// <summary>
+    /// Verifies that the <c>Dependencies</c> collection correctly updates its contents and maintains the expected ordering
+    /// when multiple <see cref="ArtifactDependency"/> instances are added, including handling duplicates and ordering flags.
+    /// Ensures that only the correct dependency remains with the appropriate properties set.
+    /// </summary>
     [Test]
     public void Dependencies_Correctly_Updates_Ordering()
     {
@@ -110,6 +132,9 @@ public class ArtifactBaseTests
         Assert.AreEqual(null, dependency.Checksum);
     }
 
+    /// <summary>
+    /// Tests that the dependencies collection correctly updates and maintains the checksum value.
+    /// </summary>
     [Test]
     public void Dependencies_Correctly_Updates_Checksum()
     {
@@ -133,6 +158,11 @@ public class ArtifactBaseTests
 
     private class TestArtifact : ArtifactBase<GuidUdi>
     {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="TestArtifact"/> class.
+    /// </summary>
+    /// <param name="udi">The unique identifier for the artifact.</param>
+    /// <param name="dependencies">The dependencies of the artifact.</param>
         public TestArtifact(GuidUdi udi, IEnumerable<ArtifactDependency> dependencies = null)
             : base(udi, dependencies)
         {

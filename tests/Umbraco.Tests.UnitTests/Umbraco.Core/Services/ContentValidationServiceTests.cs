@@ -7,6 +7,9 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models.ContentEditing;
 
+/// <summary>
+/// Contains unit tests for the <see cref="ContentValidationService"/> class within the content editing domain.
+/// </summary>
 [TestFixture]
 public class ContentValidationServiceTests
 {
@@ -15,6 +18,9 @@ public class ContentValidationServiceTests
     {
     }
 
+    /// <summary>
+    /// Tests that GetPopulatedSegmentCultures returns an empty dictionary when there are no segments in the variants.
+    /// </summary>
     [Test]
     public void GetPopulatedSegmentCultures_ReturnsEmptyDictionary_WhenNoSegmentsInVariants()
     {
@@ -36,6 +42,9 @@ public class ContentValidationServiceTests
         Assert.That(result, Is.Empty);
     }
 
+    /// <summary>
+    /// Tests that GetPopulatedSegmentCultures returns a segment with the correct cultures when properties exist for that segment.
+    /// </summary>
     [Test]
     public void GetPopulatedSegmentCultures_ReturnsSegmentWithCultures_WhenPropertiesExistForSegment()
     {
@@ -63,6 +72,10 @@ public class ContentValidationServiceTests
         Assert.That(result["segment-1"], Does.Contain("da-DK"));
     }
 
+    /// <summary>
+    /// Tests that GetPopulatedSegmentCultures returns only cultures that have properties
+    /// when some segment-culture combinations do not have any properties.
+    /// </summary>
     [Test]
     public void GetPopulatedSegmentCultures_ReturnsOnlyCulturesWithProperties_WhenSomeSegmentCultureCombinationsHaveNoProperties()
     {
@@ -88,6 +101,9 @@ public class ContentValidationServiceTests
         Assert.That(result["segment-1"], Does.Not.Contain("da-DK"));
     }
 
+    /// <summary>
+    /// Tests that GetPopulatedSegmentCultures excludes cultures not specified in the cultures parameter.
+    /// </summary>
     [Test]
     public void GetPopulatedSegmentCultures_ExcludesCulturesNotInCulturesParameter()
     {
@@ -116,6 +132,9 @@ public class ContentValidationServiceTests
         Assert.That(result["segment-1"], Does.Not.Contain("de-DE"));
     }
 
+    /// <summary>
+    /// Tests that GetPopulatedSegmentCultures correctly handles multiple segments with different cultures.
+    /// </summary>
     [Test]
     public void GetPopulatedSegmentCultures_HandlesMultipleSegments()
     {

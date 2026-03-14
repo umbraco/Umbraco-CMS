@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
 using Moq;
@@ -17,6 +17,11 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.DeliveryApi;
 [TestFixture]
 public class OutputExpansionStrategyV2Tests : OutputExpansionStrategyTestBase
 {
+    /// <summary>
+    /// Verifies that the <c>OutputExpansionStrategy</c> can correctly expand nested content pickers by ensuring that both root and nested picker properties are properly resolved and included in the output.
+    /// </summary>
+    /// <param name="rootPropertyTypeAlias">The property type alias for the root content picker to be expanded.</param>
+    /// <param name="nestedPropertyTypeAlias">The property type alias for the nested content picker within the root picker.</param>
     [TestCase("contentPicker", "contentPicker")]
     [TestCase("rootPicker", "nestedPicker")]
     public void OutputExpansionStrategy_CanExpandNestedContentPicker(string rootPropertyTypeAlias, string nestedPropertyTypeAlias)
@@ -50,6 +55,9 @@ public class OutputExpansionStrategyV2Tests : OutputExpansionStrategyTestBase
         Assert.AreEqual(654, nestedContentPickerOutput.Properties["numberTwo"]);
     }
 
+    /// <summary>
+    /// Tests that the OutputExpansionStrategy can correctly expand a specified element and its nested properties.
+    /// </summary>
     [Test]
     public void OutputExpansionStrategy_CanExpandSpecifiedElement()
     {
@@ -151,6 +159,9 @@ public class OutputExpansionStrategyV2Tests : OutputExpansionStrategyTestBase
         }
     }
 
+    /// <summary>
+    /// Tests that the output expansion strategy does not expand nested content pickers within an element.
+    /// </summary>
     [Test]
     public void OutputExpansionStrategy_DoesNotExpandElementNestedContentPicker()
     {
@@ -183,6 +194,9 @@ public class OutputExpansionStrategyV2Tests : OutputExpansionStrategyTestBase
         Assert.AreEqual(0, nestedContentPickerOutput.Properties.Count);
     }
 
+    /// <summary>
+    /// Tests that the output expansion strategy can correctly expand nested content pickers within elements.
+    /// </summary>
     [Test]
     public void OutputExpansionStrategy_CanExpandElementNestedContentPicker()
     {
@@ -217,6 +231,10 @@ public class OutputExpansionStrategyV2Tests : OutputExpansionStrategyTestBase
         Assert.AreEqual(222, nestedContentPickerOutput.Properties["numberTwo"]);
     }
 
+    /// <summary>
+    /// Verifies that the output expansion strategy correctly expands nested content picker properties beyond two levels of depth.
+    /// This test ensures that content pickers nested up to four levels deep are properly expanded into their corresponding <see cref="ApiContent"/> representations.
+    /// </summary>
     [Test]
     public void OutputExpansionStrategy_CanExpandContentPickerBeyondTwoLevels()
     {
@@ -263,6 +281,11 @@ public class OutputExpansionStrategyV2Tests : OutputExpansionStrategyTestBase
         Assert.AreEqual(5678, level4PickerOutput.Properties["numberTwo"]);
     }
 
+    /// <summary>
+    /// Verifies that the <see cref="OutputExpansionStrategy"/> correctly limits the output to only the specified direct field.
+    /// Ensures that when a single field name is provided, only that field is included in the output properties, and its value matches the expected value.
+    /// </summary>
+    /// <param name="includedField">The name of the field to include in the output properties (e.g., "numberOne" or "numberTwo").</param>
     [TestCase("numberOne")]
     [TestCase("numberTwo")]
     public void OutputExpansionStrategy_CanLimitDirectFields(string includedField)
@@ -279,6 +302,12 @@ public class OutputExpansionStrategyV2Tests : OutputExpansionStrategyTestBase
         Assert.AreEqual(includedField is "numberOne" ? 123 : 456, result.Properties[includedField]);
     }
 
+    /// <summary>
+    /// Verifies that the output expansion strategy correctly limits the fields of expanded content
+    /// according to the provided expand parameter. When <paramref name="expand"/> is true, only specified
+    /// properties of the picked content are included in the output; when false, properties are not expanded.
+    /// </summary>
+    /// <param name="expand">Determines whether properties of picked content should be expanded and limited (true) or not expanded (false).</param>
     [TestCase(false)]
     [TestCase(true)]
     public void OutputExpansionStrategy_CanLimitFieldsOfExpandedContent(bool expand)

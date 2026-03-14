@@ -10,6 +10,9 @@ using Umbraco.Cms.Core.PublishedCache;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.DeliveryApi;
 
+/// <summary>
+/// Contains unit tests for the <see cref="ContentPickerValueConverter"/> class, verifying its behavior and functionality.
+/// </summary>
 [TestFixture]
 public class ContentPickerValueConverterTests : PropertyValueConverterTests
 {
@@ -22,6 +25,9 @@ public class ContentPickerValueConverterTests : PropertyValueConverterTests
                 CreateOutputExpansionStrategyAccessor(),
                 CreateVariationContextAccessor()));
 
+    /// <summary>
+    /// Tests that the ContentPickerValueConverter correctly builds the Delivery API output.
+    /// </summary>
     [Test]
     public void ContentPickerValueConverter_BuildsDeliveryApiOutput()
     {
@@ -46,6 +52,9 @@ public class ContentPickerValueConverterTests : PropertyValueConverterTests
         Assert.IsEmpty(result.Properties);
     }
 
+    /// <summary>
+    /// Tests that the ContentPickerValueConverter can customize the content name in the Delivery API output.
+    /// </summary>
     [Test]
     public void ContentPickerValueConverter_CanCustomizeContentNameInDeliveryApiOutput()
     {
@@ -68,6 +77,9 @@ public class ContentPickerValueConverterTests : PropertyValueConverterTests
         Assert.AreEqual("Custom name for: The page", result.Name);
     }
 
+    /// <summary>
+    /// Tests that the ContentPickerValueConverter correctly renders content properties.
+    /// </summary>
     [Test]
     public void ContentPickerValueConverter_RendersContentProperties()
     {
@@ -111,6 +123,9 @@ public class ContentPickerValueConverterTests : PropertyValueConverterTests
         Assert.AreEqual("Default value", result.Properties[DefaultPropertyType.Alias]);
     }
 
+    /// <summary>
+    /// Tests that the ContentPickerValueConverter builds the correct delivery API output for draft content when preview is enabled.
+    /// </summary>
     [Test]
     public void ContentPickerValueConverter_WithPreview_BuildsDeliveryApiOutputForDraftContent()
     {
@@ -131,6 +146,9 @@ public class ContentPickerValueConverterTests : PropertyValueConverterTests
         Assert.AreEqual(DraftContent.Key, result.Id);
     }
 
+    /// <summary>
+    /// Tests that the ContentPickerValueConverter returns null when preview is disabled and the content is draft-only.
+    /// </summary>
     [Test]
     public void ContentPickerValueConverter_WithoutPreview_ReturnsNullForDraftOnlyContent()
     {
@@ -149,6 +167,9 @@ public class ContentPickerValueConverterTests : PropertyValueConverterTests
         Assert.Null(result);
     }
 
+    /// <summary>
+    /// Tests that the ContentPickerValueConverter returns the draft content when converting intermediate to object with preview enabled.
+    /// </summary>
     [Test]
     public void ContentPickerValueConverter_WithPreview_ConvertIntermediateToObject_ReturnsDraftContent()
     {
@@ -168,6 +189,9 @@ public class ContentPickerValueConverterTests : PropertyValueConverterTests
         Assert.AreEqual(DraftContent.Key, ((IPublishedContent)result).Key);
     }
 
+    /// <summary>
+    /// Tests that ConvertIntermediateToObject returns null when preview is disabled and the content is draft only.
+    /// </summary>
     [Test]
     public void ContentPickerValueConverter_WithoutPreview_ConvertIntermediateToObject_ReturnsNullForDraftOnlyContent()
     {
@@ -185,6 +209,11 @@ public class ContentPickerValueConverterTests : PropertyValueConverterTests
         Assert.Null(result);
     }
 
+    /// <summary>
+    /// Verifies that the <see cref="ContentPickerValueConverter"/> returns the raw intermediate value
+    /// (a <see cref="GuidUdi"/>) when converting properties with aliases that are excluded from routing.
+    /// </summary>
+    /// <param name="alias">The property alias to test, representing an excluded routing property.</param>
     [TestCase(Constants.Conventions.Content.InternalRedirectId)]
     [TestCase(Constants.Conventions.Content.Redirect)]
     public void ContentPickerValueConverter_ExcludedRoutingProperty_ReturnsRawIntermediateValue(string alias)

@@ -11,9 +11,15 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Persistence.Querying;
 
+/// <summary>
+/// Contains unit tests that verify the correctness of SQL clause generation in the <c>DataTypeDefinitionRepository</c>.
+/// </summary>
 [TestFixture]
 public class DataTypeDefinitionRepositorySqlClausesTest : BaseUsingSqlSyntax
 {
+    /// <summary>
+    /// Tests that the base SQL clause for DataTypeDefinitionRepository is correctly constructed.
+    /// </summary>
     [Test]
     public void Can_Verify_Base_Clause()
     {

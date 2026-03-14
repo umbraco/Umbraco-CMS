@@ -12,6 +12,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Services;
 
+/// <summary>
+/// Contains unit tests for the <see cref="AuditEntryService"/> class, verifying its behavior and functionality.
+/// </summary>
 [TestFixture]
 public class AuditEntryServiceTests
 {
@@ -21,6 +24,9 @@ public class AuditEntryServiceTests
     private Mock<IAuditEntryRepository> _auditEntryRepositoryMock;
     private Mock<IUserIdKeyResolver> _userIdKeyResolverMock;
 
+    /// <summary>
+    /// Sets up the test environment before each test is run.
+    /// </summary>
     [SetUp]
     public void Setup()
     {
@@ -36,6 +42,13 @@ public class AuditEntryServiceTests
             Mock.Of<IEventMessagesFactory>(MockBehavior.Strict));
     }
 
+    /// <summary>
+    /// Verifies that <c>WriteAsync</c> calls the audit entry repository with the correct values for all properties and returns an audit entry with the expected data.
+    /// </summary>
+    /// <remarks>
+    /// This test ensures that the <c>WriteAsync</c> method passes the correct parameters to the repository and that the returned audit entry matches the input values.
+    /// </remarks>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task WriteAsync_Calls_Repository_With_Correct_Values()
     {
@@ -85,6 +98,10 @@ public class AuditEntryServiceTests
         });
     }
 
+    /// <summary>
+    /// Verifies that the <c>GetUserId</c> method returns the correct user ID when provided with a user key.
+    /// </summary>
+    /// <returns>A <see cref="Task"/> representing the asynchronous test operation.</returns>
     [Test]
     public async Task GetUserId_UsingKey_Returns_Correct_Id()
     {
@@ -99,6 +116,10 @@ public class AuditEntryServiceTests
         Assert.AreEqual(actualUserId, userId);
     }
 
+    /// <summary>
+    /// Tests that GetUserId returns null when using a non-existing key.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task GetUserId_UsingNonExistingKey_Returns_Null()
     {
@@ -112,6 +133,11 @@ public class AuditEntryServiceTests
         Assert.AreEqual(null, actualUserId);
     }
 
+    /// <summary>
+    /// Verifies that <c>GetUserKey</c> returns the expected user key when provided with a specific user ID.
+    /// This test ensures the correct mapping between user ID and user key in the <see cref="AuditEntryService"/>.
+    /// </summary>
+    /// <returns>A task representing the asynchronous unit test operation.</returns>
     [Test]
     public async Task GetUserKey_UsingKey_Returns_Correct_Id()
     {
@@ -126,6 +152,10 @@ public class AuditEntryServiceTests
         Assert.AreEqual(actualUserKey, _testUserKey);
     }
 
+    /// <summary>
+    /// Tests that GetUserKey returns null when a non-existing user ID is provided.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
     [Test]
     public async Task GetUserKey_UsingNonExistingId_Returns_Null()
     {

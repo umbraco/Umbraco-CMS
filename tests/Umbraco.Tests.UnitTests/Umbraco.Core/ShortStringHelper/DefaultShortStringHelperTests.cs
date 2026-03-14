@@ -10,9 +10,16 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.ShortStringHelper;
 
+    /// <summary>
+    /// Contains unit tests for the <see cref="DefaultShortStringHelper"/> class, verifying its behavior and functionality.
+    /// </summary>
 [TestFixture]
 public class DefaultShortStringHelperTests
 {
+    /// <summary>
+    /// Initializes the test environment for <see cref="DefaultShortStringHelperTests"/> by configuring the <see cref="ShortStringHelper"/>
+    /// instance with various settings and filters required for the tests.
+    /// </summary>
     [SetUp]
     public void SetUp() =>
 
@@ -144,6 +151,11 @@ public class DefaultShortStringHelperTests
         Assert.AreEqual(expected, output);
     }
 
+    /// <summary>
+    /// Tests the SplitPascalCasing method to ensure it correctly splits PascalCase strings into separate words.
+    /// </summary>
+    /// <param name="input">The PascalCase input string to split.</param>
+    /// <param name="expected">The expected output string after splitting.</param>
     [TestCase("ThisIsTheEndMyFriend", "This Is The End My Friend")]
     [TestCase("ThisIsTHEEndMyFriend", "This Is THE End My Friend")]
     [TestCase("THISIsTHEEndMyFriend", "THIS Is THE End My Friend")]
@@ -163,6 +175,13 @@ public class DefaultShortStringHelperTests
         Assert.AreEqual(expected, output);
     }
 
+    /// <summary>
+    /// Tests the CleanString method with various input strings, expected results, cultures, and cleaning types.
+    /// </summary>
+    /// <param name="input">The input string to clean.</param>
+    /// <param name="expected">The expected cleaned string result.</param>
+    /// <param name="culture">The culture to use for cleaning, or null for invariant.</param>
+    /// <param name="stringType">The type of cleaning to apply to the string.</param>
     [TestCase(
         "sauté dans l'espace",
         "saute-dans-espace",

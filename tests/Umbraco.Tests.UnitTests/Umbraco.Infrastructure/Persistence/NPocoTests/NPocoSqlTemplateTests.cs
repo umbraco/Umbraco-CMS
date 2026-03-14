@@ -15,9 +15,17 @@ using MapperCollection = NPoco.MapperCollection;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Persistence.NPocoTests;
 
+/// <summary>
+/// Unit tests for the NPoco SQL template functionality.
+/// </summary>
 [TestFixture]
 public class NPocoSqlTemplateTests
 {
+    /// <summary>
+    /// Unit tests for verifying the caching and retrieval behavior of SQL templates
+    /// using the NPoco <see cref="SqlTemplates"/> class. Ensures that templates are
+    /// cached and reused as expected, preventing unnecessary re-creation.
+    /// </summary>
     [Test]
     public void SqlTemplates()
     {
@@ -42,6 +50,10 @@ public class NPocoSqlTemplateTests
             .Sql(new { id = 1 });
     }
 
+    /// <summary>
+    /// Verifies the handling of SQL template arguments in NPoco SQL templates, including positional and named arguments,
+    /// argument type flexibility, error handling for missing or extra arguments, and support for multiple arguments and collections.
+    /// </summary>
     [Test]
     public void SqlTemplateArgs()
     {
@@ -211,14 +223,23 @@ public class NPocoSqlTemplateTests
         Assert.AreEqual("oops", sql.Arguments[3]);
     }
 
+    /// <summary>
+    /// Data Transfer Object (DTO) used in NPoco SQL template tests for Thing1.
+    /// </summary>
     [TableName("zbThing1")]
     [PrimaryKey("id", AutoIncrement = false)]
     [ExplicitColumns]
     public class Thing1Dto
     {
+    /// <summary>
+    /// Gets or sets the identifier.
+    /// </summary>
         [Column("id")]
         public int Id { get; set; }
 
+        /// <summary>
+        /// Gets or sets the name.
+        /// </summary>
         [Column("name")]
         public string Name { get; set; }
     }

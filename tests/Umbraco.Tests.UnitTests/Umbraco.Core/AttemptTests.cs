@@ -6,9 +6,16 @@ using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core;
 
+/// <summary>
+/// Contains unit tests for the <see cref="Attempt"/> class in the Umbraco Core.
+/// </summary>
 [TestFixture]
 public class AttemptTests
 {
+    /// <summary>
+    /// Verifies that the <c>Attempt.If</c> method correctly interprets the result of <c>int.TryParse</c> as a condition,
+    /// and that it sets the <c>Success</c> and <c>Result</c> properties appropriately for both successful and unsuccessful parses.
+    /// </summary>
     [Test]
     public void AttemptIf()
     {

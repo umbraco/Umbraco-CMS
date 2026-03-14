@@ -17,6 +17,9 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Cache;
 
+/// <summary>
+/// Contains unit tests for the <see cref="ContentTypeCacheRefresher"/> class, verifying its caching and refresh logic.
+/// </summary>
 [TestFixture]
 public class ContentTypeCacheRefresherTests
 {
@@ -53,6 +56,9 @@ public class ContentTypeCacheRefresherTests
             _mediaCacheService.Object);
     }
 
+    /// <summary>
+    /// Sets up the test environment before each test is run.
+    /// </summary>
     [SetUp]
     public void SetUp()
     {
@@ -60,6 +66,9 @@ public class ContentTypeCacheRefresherTests
         _mediaCacheService = new Mock<IMediaCacheService>(MockBehavior.Strict);
     }
 
+    /// <summary>
+    /// Tests that a structural document change triggers a full memory cache rebuild.
+    /// </summary>
     [Test]
     public void Structural_Document_Change_Triggers_Full_Memory_Cache_Rebuild()
     {
@@ -86,6 +95,9 @@ public class ContentTypeCacheRefresherTests
             Times.Never);
     }
 
+    /// <summary>
+    /// Tests that a structural media change triggers a full memory cache rebuild.
+    /// </summary>
     [Test]
     public void Structural_Media_Change_Triggers_Full_Memory_Cache_Rebuild()
     {
@@ -112,6 +124,9 @@ public class ContentTypeCacheRefresherTests
             Times.Never);
     }
 
+    /// <summary>
+    /// Tests that a non-structural document change selectively clears the converted cache for the specified content type.
+    /// </summary>
     [Test]
     public void Non_Structural_Document_Change_Selectively_Clears_Converted_Cache()
     {
@@ -140,6 +155,9 @@ public class ContentTypeCacheRefresherTests
             Times.Never);
     }
 
+    /// <summary>
+    /// Tests that a non-structural media type change selectively clears the converted cache for the specified media type ID.
+    /// </summary>
     [Test]
     public void Non_Structural_Media_Change_Selectively_Clears_Converted_Cache()
     {
@@ -168,6 +186,10 @@ public class ContentTypeCacheRefresherTests
             Times.Never);
     }
 
+    /// <summary>
+    /// Tests that when a payload contains both structural and non-structural changes,
+    /// the cache refresher uses a rebuild operation instead of a clear operation.
+    /// </summary>
     [Test]
     public void Combined_Structural_And_Non_Structural_Change_Uses_Rebuild_Not_Clear()
     {
@@ -198,6 +220,11 @@ public class ContentTypeCacheRefresherTests
             Times.Never);
     }
 
+    /// <summary>
+    /// Tests that when a mix of structural and non-structural content and media type payloads are provided,
+    /// each type is routed correctly to their respective cache services: structural types trigger a memory cache rebuild,
+    /// while non-structural types trigger a selective cache clear.
+    /// </summary>
     [Test]
     public void Mixed_Payloads_Route_Each_Type_Correctly()
     {
@@ -247,6 +274,9 @@ public class ContentTypeCacheRefresherTests
         _mediaCacheService.Verify(x => x.ClearConvertedContentCache(), Times.Never);
     }
 
+    /// <summary>
+    /// Tests that remove changes do not trigger any cache rebuild or clear operations.
+    /// </summary>
     [Test]
     public void Remove_Change_Does_Not_Trigger_Rebuild_Or_Clear()
     {
@@ -289,6 +319,9 @@ public class ContentTypeCacheRefresherTests
         return mock.Object;
     }
 
+    /// <summary>
+    /// Tests that in auto models builder mode, a non-structural change triggers a full clear of all converted content.
+    /// </summary>
     [Test]
     public void Auto_Factory_Non_Structural_Change_Clears_All_Converted_Content()
     {
@@ -318,6 +351,10 @@ public class ContentTypeCacheRefresherTests
             Times.Never);
     }
 
+    /// <summary>
+    /// Tests that in auto models builder mode, a structural change triggers a full converted content cache clear.
+    /// This ensures that the factory reset invalidates all model types, not just the changed ones.
+    /// </summary>
     [Test]
     public void Auto_Factory_Structural_Change_Clears_All_Converted_Content()
     {

@@ -15,6 +15,9 @@ using Umbraco.Cms.Tests.UnitTests.TestHelpers;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Composing;
 
+    /// <summary>
+    /// Provides a base class for unit tests related to composition in Umbraco Core, offering common setup and utilities for composing tests.
+    /// </summary>
 public abstract class ComposingTestBase
 {
     protected TypeLoader TypeLoader { get; private set; }
@@ -25,6 +28,9 @@ public abstract class ComposingTestBase
             GetType().Assembly, // this assembly only
         };
 
+    /// <summary>
+    /// Initializes the test setup before each test runs.
+    /// </summary>
     [SetUp]
     public void Initialize()
     {

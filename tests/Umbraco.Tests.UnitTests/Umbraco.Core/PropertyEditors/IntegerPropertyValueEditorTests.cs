@@ -13,12 +13,19 @@ using Umbraco.Cms.Core.Strings;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 
+/// <summary>
+/// Contains unit tests for the <see cref="IntegerPropertyValueEditor"/> class in Umbraco CMS.
+/// </summary>
 [TestFixture]
 public class IntegerPropertyValueEditorTests
 {
     // annoyingly we can't use decimals etc. in attributes, so we can't turn these into test cases :(
     private Dictionary<object?,object?> _valuesAndExpectedResults = new();
 
+    /// <summary>
+    /// Initializes the test data mapping various input values to their expected integer conversion results
+    /// for the integer property value editor tests.
+    /// </summary>
     [SetUp]
     public void SetUp() => _valuesAndExpectedResults = new Dictionary<object?, object?>
     {
@@ -39,6 +46,9 @@ public class IntegerPropertyValueEditorTests
         { new GuidUdi(Constants.UdiEntityType.Document, Guid.NewGuid()), null }
     };
 
+    /// <summary>
+    /// Tests that values can be correctly parsed from the editor input.
+    /// </summary>
     [Test]
     public void Can_Parse_Values_From_Editor()
     {
@@ -49,6 +59,9 @@ public class IntegerPropertyValueEditorTests
         }
     }
 
+    /// <summary>
+    /// Tests that various values can be correctly parsed to the editor format.
+    /// </summary>
     [Test]
     public void Can_Parse_Values_To_Editor()
     {
@@ -59,6 +72,9 @@ public class IntegerPropertyValueEditorTests
         }
     }
 
+    /// <summary>
+    /// Tests that passing null from the editor returns null.
+    /// </summary>
     [Test]
     public void Null_From_Editor_Yields_Null()
     {
@@ -66,6 +82,9 @@ public class IntegerPropertyValueEditorTests
         Assert.IsNull(result);
     }
 
+    /// <summary>
+    /// Tests that converting a null value to the editor yields a null result.
+    /// </summary>
     [Test]
     public void Null_To_Editor_Yields_Null()
     {
@@ -73,6 +92,11 @@ public class IntegerPropertyValueEditorTests
         Assert.IsNull(result);
     }
 
+    /// <summary>
+    /// Tests that the integer property value editor correctly validates whether a value is an integer.
+    /// </summary>
+    /// <param name="value">The value to validate.</param>
+    /// <param name="expectedSuccess">Indicates whether the validation is expected to succeed.</param>
     [TestCase("x", false)]
     [TestCase(10, true)]
     public void Validates_Is_Integer(object value, bool expectedSuccess)
@@ -92,6 +116,12 @@ public class IntegerPropertyValueEditorTests
         }
     }
 
+    /// <summary>
+    /// Tests that the integer property value editor correctly validates whether the provided value
+    /// is greater than or equal to the configured minimum value.
+    /// </summary>
+    /// <param name="value">The value to validate.</param>
+    /// <param name="expectedSuccess">True if the value is expected to pass validation; otherwise, false.</param>
     [TestCase(8, false)]
     [TestCase(10, true)]
     [TestCase(12, true)]
@@ -112,6 +142,12 @@ public class IntegerPropertyValueEditorTests
         }
     }
 
+    /// <summary>
+    /// Verifies that the integer property value editor correctly validates input values against a configured maximum value.
+    /// The test checks that values less than or equal to the maximum pass validation, while values greater than the maximum fail validation.
+    /// </summary>
+    /// <param name="value">The value to be validated by the property value editor.</param>
+    /// <param name="expectedSuccess">True if the value is expected to pass validation; false if it is expected to fail.</param>
     [TestCase(18, true)]
     [TestCase(20, true)]
     [TestCase(22, false)]
@@ -132,6 +168,13 @@ public class IntegerPropertyValueEditorTests
         }
     }
 
+    /// <summary>
+    /// Tests that the value is validated against the configured step increment for integer property values.
+    /// If the step is zero, validation always succeeds, as any value is considered valid.
+    /// </summary>
+    /// <param name="step">The step increment to validate against. If zero, validation always passes.</param>
+    /// <param name="value">The value to validate.</param>
+    /// <param name="expectedSuccess">True if validation is expected to succeed; otherwise, false.</param>
     [TestCase(2, 17, false)]
     [TestCase(2, 18, true)]
     [TestCase(0, 17, true)] // A step of zero would trigger a divide by zero error in evaluating. So we always pass validation for zero, as effectively any step value is valid.

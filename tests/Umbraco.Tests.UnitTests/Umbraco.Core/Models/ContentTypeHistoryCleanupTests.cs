@@ -5,9 +5,16 @@ using Umbraco.Cms.Tests.Common.Builders;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models;
 
+/// <summary>
+/// Contains unit tests that verify the cleanup functionality for content type history in the Umbraco CMS.
+/// </summary>
 [TestFixture]
 public class ContentTypeHistoryCleanupTests
 {
+    /// <summary>
+    /// Tests that changing the KeepAllVersionsNewerThanDays property
+    /// marks the content type as dirty.
+    /// </summary>
     [Test]
     public void Changing_Keep_all_Makes_ContentType_Dirty()
     {
@@ -21,6 +28,10 @@ public class ContentTypeHistoryCleanupTests
         Assert.AreEqual(newValue, contentType.HistoryCleanup.KeepAllVersionsNewerThanDays);
     }
 
+    /// <summary>
+    /// Tests that changing the KeepLatestVersionPerDayForDays property
+    /// marks the content type as dirty.
+    /// </summary>
     [Test]
     public void Changing_Keep_latest_Makes_ContentType_Dirty()
     {
@@ -34,6 +45,9 @@ public class ContentTypeHistoryCleanupTests
         Assert.AreEqual(newValue, contentType.HistoryCleanup.KeepLatestVersionPerDayForDays);
     }
 
+    /// <summary>
+    /// Tests that changing the PreventCleanup property marks the content type as dirty.
+    /// </summary>
     [Test]
     public void Changing_Prevent_Cleanup_Makes_ContentType_Dirty()
     {
@@ -47,6 +61,9 @@ public class ContentTypeHistoryCleanupTests
         Assert.AreEqual(newValue, contentType.HistoryCleanup.PreventCleanup);
     }
 
+    /// <summary>
+    /// Tests that replacing the HistoryCleanup property registers the content type as dirty.
+    /// </summary>
     [Test]
     public void Replacing_History_Cleanup_Registers_As_Dirty()
     {
@@ -59,6 +76,9 @@ public class ContentTypeHistoryCleanupTests
         Assert.IsTrue(contentType.IsPropertyDirty(nameof(contentType.HistoryCleanup)));
     }
 
+    /// <summary>
+    /// Tests that replacing the HistoryCleanup property removes old dirty history properties and marks the new HistoryCleanup as dirty.
+    /// </summary>
     [Test]
     public void Replacing_History_Cleanup_Removes_Old_Dirty_History_Properties()
     {
@@ -86,6 +106,9 @@ public class ContentTypeHistoryCleanupTests
         });
     }
 
+    /// <summary>
+    /// Tests that modifying the old history cleanup reference does not mark the content type as dirty.
+    /// </summary>
     [Test]
     public void Old_History_Cleanup_Reference_Doesnt_Make_Content_Type_Dirty()
     {

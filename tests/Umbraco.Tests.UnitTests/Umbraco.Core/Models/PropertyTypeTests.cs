@@ -12,9 +12,15 @@ using Umbraco.Cms.Tests.Common.Builders.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models;
 
+/// <summary>
+/// Tests for the <see cref="Umbraco.Core.Models.PropertyType"/> class.
+/// </summary>
 [TestFixture]
 public class PropertyTypeTests
 {
+    /// <summary>
+    /// Sets up the test environment before each test is run.
+    /// </summary>
     [SetUp]
     public void SetUp()
     {
@@ -25,6 +31,9 @@ public class PropertyTypeTests
     private PropertyTypeBuilder _propertyTypeBuilder;
     private DataTypeBuilder _dataTypeBuilder;
 
+    /// <summary>
+    /// Tests that a PropertyType can be created correctly from a DataType.
+    /// </summary>
     [Test]
     public void Can_Create_From_DataType()
     {
@@ -38,6 +47,9 @@ public class PropertyTypeTests
         Assert.AreEqual(dt.DatabaseType, pt.ValueStorageType);
     }
 
+    /// <summary>
+    /// Tests that a PropertyType instance can be deep cloned correctly.
+    /// </summary>
     [Test]
     public void Can_Deep_Clone()
     {
@@ -78,6 +90,9 @@ public class PropertyTypeTests
         }
     }
 
+    /// <summary>
+    /// Tests that a PropertyType object can be serialized to JSON without throwing an error.
+    /// </summary>
     [Test]
     public void Can_Serialize_Without_Error()
     {

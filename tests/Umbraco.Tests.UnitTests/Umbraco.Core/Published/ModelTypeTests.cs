@@ -8,9 +8,16 @@ using Umbraco.Cms.Tests.Common.Published;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Published;
 
+/// <summary>
+/// Unit tests for the ModelType class in Umbraco.Core.Published.
+/// </summary>
 [TestFixture]
 public class ModelTypeTests
 {
+    /// <summary>
+    /// Contains unit tests that verify the equality and inequality operations for <see cref="ModelType"/> instances,
+    /// including direct comparisons, generic types, and array types.
+    /// </summary>
     [Test]
     public void ModelTypeEqualityTests()
     {
@@ -27,6 +34,9 @@ public class ModelTypeTests
         Assert.IsFalse(ModelType.Equals(ModelType.For("alias1").MakeArrayType(), ModelType.For("alias2").MakeArrayType()));
     }
 
+    /// <summary>
+    /// Tests the string representation of various types using Type.ToString().
+    /// </summary>
     [Test]
     public void TypeToStringTests()
     {
@@ -36,6 +46,10 @@ public class ModelTypeTests
         Assert.AreEqual("System.Collections.Generic.IEnumerable`1[System.Int32[]]", typeof(IEnumerable<>).MakeGenericType(type.MakeArrayType()).ToString());
     }
 
+    /// <summary>
+    /// Tests the <see cref="Type.FullName"/> property for various type scenarios, including primitive types, arrays, and generic types.
+    /// Ensures that the FullName property returns the expected string representations.
+    /// </summary>
     [Test]
     public void TypeFullNameTests()
     {
@@ -49,6 +63,10 @@ public class ModelTypeTests
             typeof(IEnumerable<>).MakeGenericType(type.MakeArrayType()).FullName);
     }
 
+    /// <summary>
+    /// Verifies that the <c>ModelType.Map</c> method correctly resolves model types from aliases
+    /// using a provided mapping dictionary, including handling of arrays and generic enumerable types.
+    /// </summary>
     [Test]
     public void ModelTypeMapTests()
     {

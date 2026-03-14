@@ -1,4 +1,4 @@
-﻿using Moq;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Delivery.Querying.Selectors;
 using Umbraco.Cms.Core.DeliveryApi;
@@ -8,12 +8,18 @@ using Umbraco.Cms.Core.Services.Navigation;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.DeliveryApi.Selectors;
 
+/// <summary>
+/// Contains unit tests for the <see cref="AncestorsSelector"/> class in the Delivery API selectors.
+/// </summary>
 [TestFixture]
 public class AncestorsSelectorTests
 {
     private readonly Guid _documentKey = Guid.NewGuid();
     private IDocumentNavigationQueryService _documentNavigationQueryService;
 
+    /// <summary>
+    /// Sets up the test environment for <see cref="AncestorsSelectorTests"/> by initializing and mocking dependencies required for the tests, including the document navigation query service.
+    /// </summary>
     [SetUp]
     public void SetUp()
     {
@@ -29,6 +35,11 @@ public class AncestorsSelectorTests
         _documentNavigationQueryService = documentNavigationQueryServiceMock.Object;
     }
 
+    /// <summary>
+    /// Verifies that the <see cref="AncestorsSelector.BuildSelectorOption"/> method correctly builds a selector option for a given path,
+    /// using the specified starting node ID if provided.
+    /// </summary>
+    /// <param name="documentStartNodeId">The optional starting node ID to use when resolving the document path; may be <c>null</c> to indicate no specific start node.</param>
     [TestCase(null)]
     [TestCase(1234)]
     public void Can_Build_Selector_Option_For_Path(int? documentStartNodeId)
@@ -58,6 +69,9 @@ public class AncestorsSelectorTests
         Assert.AreEqual("11fc9bdc-8366-4a6b-a9c2-6b8b2717c4b8", result.Values[1]);
     }
 
+    /// <summary>
+    /// Tests that the AncestorsSelector can build a selector option correctly when provided with an ID.
+    /// </summary>
     [Test]
     public void Can_Build_Selector_Option_For_Id()
     {

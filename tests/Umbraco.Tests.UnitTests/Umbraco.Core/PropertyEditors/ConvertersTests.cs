@@ -22,9 +22,16 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 
+/// <summary>
+/// Contains unit tests for verifying the functionality of property editor converters in the Umbraco Core.
+/// </summary>
 [TestFixture]
 public class ConvertersTests
 {
+    /// <summary>
+    /// Unit test that verifies the registration and behavior of multiple property value converters (SimpleConverter3A and SimpleConverter3B),
+    /// the creation of published content and element models, and the correct mapping of property types and values in the Umbraco model factory.
+    /// </summary>
     [Test]
     public void SimpleConverter3Test()
     {
@@ -158,36 +165,85 @@ public class ConvertersTests
         Assert.AreSame(cacheContent[mmodel1.Id], mmodel1);
     }
 
+    /// <summary>
+    /// A simple converter implementation for testing purposes.
+    /// </summary>
     public class SimpleConverter3A : PropertyValueConverterBase
     {
+    /// <summary>
+    /// Determines whether the specified property type is handled by this converter.
+    /// </summary>
+    /// <param name="propertyType">The property type to check.</param>
+    /// <returns><c>true</c> if this converter can handle the specified property type; otherwise, <c>false</c>.</returns>
         public override bool IsConverter(IPublishedPropertyType propertyType)
             => propertyType.EditorAlias == "Umbraco.Void";
 
+    /// <summary>
+    /// Gets the type of the property value.
+    /// </summary>
+    /// <param name="propertyType">The published property type.</param>
+    /// <returns>The type of the property value.</returns>
         public override Type GetPropertyValueType(IPublishedPropertyType propertyType)
             => typeof(string);
 
+    /// <summary>
+    /// Gets the property cache level for the specified property type.
+    /// </summary>
+    /// <param name="propertyType">The property type.</param>
+    /// <returns>The cache level of the property.</returns>
         public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
             => PropertyCacheLevel.Element;
     }
 
+    /// <summary>
+    /// Unit test class for testing the behavior of the SimpleConverter3B property value converter in Umbraco.
+    /// </summary>
     public class SimpleConverter3B : PropertyValueConverterBase
     {
         private readonly IPublishedContentCache _publishedContentCache;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SimpleConverter3B"/> class.
+    /// </summary>
+    /// <param name="publishedContentCache">The published content cache.</param>
         public SimpleConverter3B(IPublishedContentCache publishedContentCache)
         {
             _publishedContentCache = publishedContentCache;
         }
 
+    /// <summary>
+    /// Determines whether the specified property type can be converted by this converter.
+    /// </summary>
+    /// <param name="propertyType">The property type to check.</param>
+    /// <returns><c>true</c> if this converter can convert the specified property type; otherwise, <c>false</c>.</returns>
         public override bool IsConverter(IPublishedPropertyType propertyType)
             => propertyType.EditorAlias == "Umbraco.Void.2";
 
+    /// <summary>
+    /// Gets the property value type for the specified published property type.
+    /// Returns an <see cref="IEnumerable{T}"/> where <c>T</c> is the model type for "content1".
+    /// </summary>
+    /// <param name="propertyType">The published property type.</param>
+    /// <returns>The <see cref="Type"/> representing an <see cref="IEnumerable{T}"/> for the model type.</returns>
         public override Type GetPropertyValueType(IPublishedPropertyType propertyType)
             => typeof(IEnumerable<>).MakeGenericType(ModelType.For("content1"));
 
+    /// <summary>
+    /// Gets the property cache level for the specified property type.
+    /// </summary>
+    /// <param name="propertyType">The property type.</param>
+    /// <returns>The property cache level.</returns>
         public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
             => PropertyCacheLevel.Elements;
 
+    /// <summary>
+    /// Converts a comma-separated string from the source object into an array of integers as the intermediate representation.
+    /// </summary>
+    /// <param name="owner">The published element that owns the property.</param>
+    /// <param name="propertyType">The type of the published property.</param>
+    /// <param name="source">The source value to convert, expected to be a comma-separated string of integers.</param>
+    /// <param name="preview">Indicates whether the conversion is for preview mode.</param>
+    /// <returns>An array of integers parsed from the source string, or an empty array if the source is not a string.</returns>
         public override object? ConvertSourceToIntermediate(
             IPublishedElement owner,
             IPublishedPropertyType propertyType,
@@ -198,6 +254,15 @@ public class ConvertersTests
             return s?.Split(',').Select(int.Parse).ToArray() ?? Array.Empty<int>();
         }
 
+    /// <summary>
+    /// Converts an intermediate array of integer IDs to an array of <see cref="PublishedSnapshotTestObjects.TestContentModel1"/> objects.
+    /// </summary>
+    /// <param name="owner">The published element that owns the property.</param>
+    /// <param name="propertyType">The property type metadata.</param>
+    /// <param name="referenceCacheLevel">The cache level for the reference.</param>
+    /// <param name="inter">The intermediate object to convert, expected to be an <c>int[]</c> of content IDs.</param>
+    /// <param name="preview">Indicates whether the conversion is for preview mode.</param>
+    /// <returns>An array of <see cref="PublishedSnapshotTestObjects.TestContentModel1"/> objects corresponding to the provided IDs.</returns>
         public override object ConvertIntermediateToObject(
             IPublishedElement owner,
             IPublishedPropertyType propertyType,

@@ -9,14 +9,24 @@ using Umbraco.Cms.Tests.Common.Builders.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models;
 
+    /// <summary>
+    /// Contains unit tests for the <see cref="Property"/> model in <c>Umbraco.Core.Models</c>.
+    /// </summary>
 [TestFixture]
 public class PropertyTests
 {
+    /// <summary>
+    /// Sets up the test environment before each test is run.
+    /// </summary>
     [SetUp]
     public void SetUp() => _builder = new PropertyBuilder();
 
     private PropertyBuilder _builder;
 
+    /// <summary>
+    /// Tests that a Property can be deep cloned correctly.
+    /// Ensures that the clone is a different instance with copied values.
+    /// </summary>
     [Test]
     public void Can_Deep_Clone()
     {

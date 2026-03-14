@@ -19,9 +19,15 @@ using Umbraco.Cms.Tests.UnitTests.TestHelpers.Objects;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Templates;
 
+    /// <summary>
+    /// Unit tests for the HtmlImageSourceParser class.
+    /// </summary>
 [TestFixture]
 public class HtmlImageSourceParserTests
 {
+    /// <summary>
+    /// Tests that the HtmlImageSourceParser correctly extracts Udis from data-udi HTML attributes.
+    /// </summary>
     [Test]
     public void Returns_Udis_From_Data_Udi_Html_Attributes()
     {
@@ -39,6 +45,12 @@ public class HtmlImageSourceParserTests
         Assert.AreEqual(UdiParser.Parse("umb://media-type/B726D735E4C446D58F703F3FBCFC97A5"), result[1]);
     }
 
+    /// <summary>
+    /// Removes the <c>src</c> attribute values from <c>&lt;img&gt;</c> tags in the provided HTML string when the tag contains a <c>data-udi</c> attribute.
+    /// If the <c>src</c> attribute contains a query string, the query string is preserved.
+    /// </summary>
+    /// <param name="sourceHtml">The HTML content containing image tags to process.</param>
+    /// <returns>The HTML string with image sources removed from images with a <c>data-udi</c> attribute; other images are left unchanged.</returns>
     [TestCase(
         @"<p>
 <div>
@@ -77,6 +89,10 @@ public class HtmlImageSourceParserTests
         return actual;
     }
 
+    /// <summary>
+    /// Tests that the HtmlImageSourceParser correctly ensures image sources are properly set,
+    /// replacing empty or UDI-based src attributes with the correct media URLs.
+    /// </summary>
     [Test]
     public void Ensure_Image_Sources()
     {
@@ -148,6 +164,13 @@ public class HtmlImageSourceParserTests
         }
     }
 
+/// <summary>
+/// Processes the provided HTML string, updating the <c>src</c> attribute of <c>&lt;img&gt;</c> tags based on their <c>data-udi</c> attribute.
+/// If a <c>data-udi</c> attribute is present, the <c>src</c> is replaced or updated with the corresponding media URL, preserving any query parameters and other attributes.
+/// If <c>data-udi</c> is not present, the <c>src</c> remains unchanged.
+/// </summary>
+/// <param name="sourceHtml">The HTML string containing <c>&lt;img&gt;</c> tags to process.</param>
+/// <returns>The processed HTML string with updated image sources where applicable.</returns>
     [TestCase(
         @"<div><img src="""" /></div>",
         ExpectedResult = @"<div><img src="""" /></div>",
@@ -203,6 +226,9 @@ public class HtmlImageSourceParserTests
         return actual;
     }
 
+    /// <summary>
+    /// Ensures that processing a large HTML string with many characters is completed quickly.
+    /// </summary>
     [Category("Ensure image sources")]
     [Test]
     public void Ensure_Large_Html_Is_Processed_Quickly()

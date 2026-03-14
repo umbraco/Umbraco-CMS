@@ -10,11 +10,23 @@ using Umbraco.Cms.Tests.Common;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models;
 
+/// <summary>
+/// Contains unit tests for the <see cref="CultureImpact"/> class.
+/// </summary>
 [TestFixture]
 public class CultureImpactTests
 {
     private CultureImpactFactory BasicImpactFactory => CreateCultureImpactService();
 
+    /// <summary>
+    /// Unit test for <see cref="BasicImpactFactory.GetCultureForInvariantErrors"/>.
+    /// Verifies that the correct culture is returned based on the content's published state,
+    /// the provided cultures array, and the default culture.
+    /// Scenarios tested include:
+    /// - Published content with the default culture present
+    /// - Unpublished content with only non-default cultures
+    /// - Published content with only non-default cultures
+    /// </summary>
     [Test]
     public void Get_Culture_For_Invariant_Errors()
     {
@@ -38,6 +50,10 @@ public class CultureImpactTests
         Assert.AreEqual(null, result); // default culture not being saved with published version, use null
     }
 
+    /// <summary>
+    /// Tests that the impact object correctly represents the case where all cultures are affected.
+    /// Verifies that the culture is set to '*', invariant properties are impacted, and the appropriate flags are set.
+    /// </summary>
     [Test]
     public void All_Cultures()
     {
@@ -53,6 +69,11 @@ public class CultureImpactTests
         Assert.IsFalse(impact.ImpactsOnlyDefaultCulture);
     }
 
+    /// <summary>
+    /// Verifies that the <c>ImpactInvariant</c> method produces a culture impact
+    /// with the expected invariant properties, ensuring that only invariant culture
+    /// properties are impacted and no explicit or default cultures are affected.
+    /// </summary>
     [Test]
     public void Invariant_Culture()
     {
@@ -68,6 +89,10 @@ public class CultureImpactTests
         Assert.IsFalse(impact.ImpactsOnlyDefaultCulture);
     }
 
+    /// <summary>
+    /// Verifies that when an explicit default culture ("en-US") is set, the resulting impact object
+    /// correctly identifies its culture and the properties related to invariant and explicit culture impacts.
+    /// </summary>
     [Test]
     public void Explicit_Default_Culture()
     {
@@ -83,6 +108,11 @@ public class CultureImpactTests
         Assert.IsTrue(impact.ImpactsOnlyDefaultCulture);
     }
 
+    /// <summary>
+    /// Verifies that an explicit non-default culture impact is correctly identified.
+    /// Ensures that the impact is set for the specified culture (e.g., "en-US"),
+    /// does not affect invariant or default cultures, and only impacts the explicit culture.
+    /// </summary>
     [Test]
     public void Explicit_NonDefault_Culture()
     {
@@ -98,6 +128,10 @@ public class CultureImpactTests
         Assert.IsFalse(impact.ImpactsOnlyDefaultCulture);
     }
 
+    /// <summary>
+    /// Tests the creation of a CultureImpact with an explicit default culture.
+    /// Verifies that the impact properties are set correctly for the "en-US" culture.
+    /// </summary>
     [Test]
     public void TryCreate_Explicit_Default_Culture()
     {
@@ -116,6 +150,10 @@ public class CultureImpactTests
         Assert.IsTrue(impact.ImpactsOnlyDefaultCulture);
     }
 
+    /// <summary>
+    /// Verifies that creating a <see cref="CultureImpact"/> instance with an explicit non-default culture (e.g., "en-US")
+    /// succeeds and that the resulting instance correctly reflects the expected culture-specific impact flags.
+    /// </summary>
     [Test]
     public void TryCreate_Explicit_NonDefault_Culture()
     {
@@ -134,6 +172,9 @@ public class CultureImpactTests
         Assert.IsFalse(impact.ImpactsOnlyDefaultCulture);
     }
 
+    /// <summary>
+    /// Tests that the TryCreate method successfully creates an invariant culture impact.
+    /// </summary>
     [Test]
     public void TryCreate_AllCultures_For_Invariant()
     {
@@ -146,6 +187,9 @@ public class CultureImpactTests
         Assert.AreSame(BasicImpactFactory.ImpactInvariant(), impact);
     }
 
+    /// <summary>
+    /// Tests that the TryCreate method successfully creates an impact for all cultures when the variant is culture.
+    /// </summary>
     [Test]
     public void TryCreate_AllCultures_For_Variant()
     {
@@ -158,6 +202,9 @@ public class CultureImpactTests
         Assert.AreSame(BasicImpactFactory.ImpactAll(), impact);
     }
 
+    /// <summary>
+    /// Tests that TryCreate returns false when attempting to create an invariant impact for a variant content variation.
+    /// </summary>
     [Test]
     public void TryCreate_Invariant_For_Variant()
     {
@@ -165,6 +212,9 @@ public class CultureImpactTests
         Assert.IsFalse(success);
     }
 
+    /// <summary>
+    /// Tests that TryCreate returns the invariant impact when called with invariant parameters.
+    /// </summary>
     [Test]
     public void TryCreate_Invariant_For_Invariant()
     {
@@ -174,6 +224,11 @@ public class CultureImpactTests
         Assert.AreSame(BasicImpactFactory.ImpactInvariant(), impact);
     }
 
+    /// <summary>
+    /// Verifies that editing invariant properties from a non-default culture impacts invariant properties
+    /// according to the <paramref name="allowEditInvariantFromNonDefault"/> setting in <see cref="ContentSettings"/>.
+    /// </summary>
+    /// <param name="allowEditInvariantFromNonDefault">If <c>true</c>, editing invariant properties from a non-default culture is allowed and should impact invariant properties; otherwise, it should not.</param>
     [Test]
     [TestCase(true)]
     [TestCase(false)]

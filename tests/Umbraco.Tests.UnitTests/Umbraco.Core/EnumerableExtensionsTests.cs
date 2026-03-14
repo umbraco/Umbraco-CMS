@@ -8,9 +8,16 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core;
 
+/// <summary>
+/// Unit tests for the EnumerableExtensions class.
+/// </summary>
 [TestFixture]
 public class EnumerableExtensionsTests
 {
+    /// <summary>
+    /// Tests the <c>UnsortedSequenceEqual</c> extension method to verify that it correctly determines whether two sequences contain the same elements, regardless of order.
+    /// Scenarios include sequences with the same elements in different orders, sequences with different elements, and null sequence comparisons.
+    /// </summary>
     [Test]
     public void Unsorted_Sequence_Equal()
     {
@@ -27,6 +34,9 @@ public class EnumerableExtensionsTests
         Assert.IsFalse(list1.UnsortedSequenceEqual(null));
     }
 
+    /// <summary>
+    /// Tests the ContainsAll extension method to verify that it correctly determines if one collection contains all elements of another.
+    /// </summary>
     [Test]
     public void Contains_All()
     {
@@ -40,6 +50,9 @@ public class EnumerableExtensionsTests
         Assert.IsFalse(list3.ContainsAll(list1));
     }
 
+    /// <summary>
+    /// Tests the SelectRecursive extension method with a simple hierarchy.
+    /// </summary>
     [Test]
     public void SelectRecursive_2()
     {
@@ -50,6 +63,10 @@ public class EnumerableExtensionsTests
         Assert.AreEqual(3, selectRecursive.Count());
     }
 
+    /// <summary>
+    /// Tests the <c>SelectRecursive</c> extension method to ensure it correctly enumerates all nested children in a hierarchical data structure.
+    /// This test constructs a multi-level hierarchy and verifies that all descendant nodes are returned by <c>SelectRecursive</c>.
+    /// </summary>
     [Test]
     public void SelectRecursive()
     {
@@ -105,17 +122,31 @@ public class EnumerableExtensionsTests
 
     private class TestItem
     {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="TestItem"/> class.
+    /// </summary>
+    /// <param name="name">The name of the test item.</param>
         public TestItem(string name)
         {
             Children = Enumerable.Empty<TestItem>();
             Name = name;
         }
 
+    /// <summary>
+    /// Gets the name of the test item.
+    /// </summary>
         public string Name { get; }
 
+    /// <summary>
+    /// Gets or sets the child items of this TestItem.
+    /// </summary>
         public IEnumerable<TestItem> Children { get; set; }
     }
 
+    /// <summary>
+    /// Tests that the <c>InGroupsOf</c> extension method correctly groups all elements of a collection into groups of a specified size, and verifies that all original elements are present in the resulting groups.
+    /// This includes testing with group sizes both smaller and larger than the collection.
+    /// </summary>
     [Test]
     public void InGroupsOf_ReturnsAllElements()
     {
@@ -136,6 +167,9 @@ public class EnumerableExtensionsTests
         CollectionAssert.AreEquivalent(integers, flattened);
     }
 
+    /// <summary>
+    /// Tests that the InGroupsOf extension method can be enumerated multiple times and returns consistent results.
+    /// </summary>
     [Test]
     public void InGroupsOf_CanRepeat()
     {
@@ -145,6 +179,10 @@ public class EnumerableExtensionsTests
         Assert.AreEqual(5, inGroupsOf.Count()); // again
     }
 
+    /// <summary>
+    /// Tests that the DistinctBy extension method returns distinct elements based on a key selector
+    /// and that the iterator can be reset correctly to enumerate the sequence multiple times.
+    /// </summary>
     [TestCase]
     public void DistinctBy_ReturnsDistinctElements_AndResetsIteratorCorrectly()
     {

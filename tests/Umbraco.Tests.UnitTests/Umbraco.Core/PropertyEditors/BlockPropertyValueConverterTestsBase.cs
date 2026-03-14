@@ -5,6 +5,9 @@ using Umbraco.Cms.Core.PublishedCache;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 
+/// <summary>
+/// Base class for unit tests of block property value converters with a generic property editor configuration.
+/// </summary>
 public abstract class BlockPropertyValueConverterTestsBase<TPropertyEditorConfig>
 {
     protected abstract string PropertyEditorAlias { get; }

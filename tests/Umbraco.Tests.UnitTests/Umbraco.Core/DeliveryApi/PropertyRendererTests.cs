@@ -1,4 +1,4 @@
-﻿using Moq;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -6,9 +6,17 @@ using Umbraco.Cms.Core.PropertyEditors;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.DeliveryApi;
 
+/// <summary>
+/// Contains unit tests for the <see cref="PropertyRenderer"/> class within the Delivery API of Umbraco CMS.
+/// These tests verify the correct behavior and output of property rendering functionality.
+/// </summary>
 [TestFixture]
 public class PropertyRendererTests : DeliveryApiTests
 {
+    /// <summary>
+    /// Verifies that when no fallback mechanism is applied, the property renderer returns the exact value set on the property.
+    /// </summary>
+    /// <param name="value">The value assigned to the property for testing.</param>
     [TestCase(123)]
     [TestCase("hello, world")]
     [TestCase(null)]
@@ -21,6 +29,10 @@ public class PropertyRendererTests : DeliveryApiTests
         Assert.AreEqual(value, renderer.GetPropertyValue(property, false));
     }
 
+    /// <summary>
+    /// Verifies that the property renderer returns <c>null</c> when no fallback is used and the property value is not set.
+    /// </summary>
+    /// <param name="value">The value assigned to the property for this test case. If the value is not set (e.g., <c>null</c> or empty), the renderer should yield <c>null</c>.</param>
     [TestCase(123)]
     [TestCase("hello, world")]
     [TestCase(null)]
@@ -33,6 +45,10 @@ public class PropertyRendererTests : DeliveryApiTests
         Assert.AreEqual(null, renderer.GetPropertyValue(property, false));
     }
 
+    /// <summary>
+    /// Verifies that when a property value is not set (i.e., is null or empty), the custom fallback mechanism returns the specified fallback value.
+    /// </summary>
+    /// <param name="value">The test value assigned to the property; can be a value, null, or an empty string to simulate unset scenarios.</param>
     [TestCase(123)]
     [TestCase("hello, world")]
     [TestCase(null)]

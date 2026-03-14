@@ -9,11 +9,18 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.BackOffice;
 
+    /// <summary>
+     /// Contains unit tests for the Umbraco back office identity functionality (via <see cref="ClaimsIdentityExtensions.VerifyBackOfficeIdentity(ClaimsIdentity, out ClaimsIdentity)"/>).
+   /// </summary>
 [TestFixture]
 public class UmbracoBackOfficeIdentityTests
 {
     public const string TestIssuer = "TestIssuer";
 
+    /// <summary>
+    /// Verifies that an Umbraco back office identity can be correctly created from a <see cref="ClaimsIdentity"/>,
+    /// and that all expected claims (such as user ID, username, roles, allowed applications, and culture) are properly mapped.
+    /// </summary>
     [Test]
     public void Create_From_Claims_Identity()
     {
@@ -56,6 +63,9 @@ public class UmbracoBackOfficeIdentityTests
         Assert.AreEqual(11, verifiedIdentity.Claims.Count());
     }
 
+    /// <summary>
+    /// Tests that creating an Umbraco back office identity from a claims identity fails when a required claim is missing.
+    /// </summary>
     [Test]
     public void Create_From_Claims_Identity_Missing_Required_Claim()
     {
@@ -73,6 +83,9 @@ public class UmbracoBackOfficeIdentityTests
         Assert.Pass();
     }
 
+    /// <summary>
+    /// Tests that creating an Umbraco back office identity from a claims identity fails when a required claim is null or empty.
+    /// </summary>
     [Test]
     public void Create_From_Claims_Identity_Required_Claim_Null()
     {
@@ -98,6 +111,9 @@ public class UmbracoBackOfficeIdentityTests
         Assert.Pass();
     }
 
+    /// <summary>
+    /// Tests creating a ClaimsIdentity with claims and user data, verifying the claims count and actor.
+    /// </summary>
     [Test]
     public void Create_With_Claims_And_User_Data()
     {

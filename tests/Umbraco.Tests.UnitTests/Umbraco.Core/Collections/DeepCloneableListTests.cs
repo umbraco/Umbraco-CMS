@@ -8,9 +8,18 @@ using Umbraco.Cms.Tests.Common;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Collections;
 
+/// <summary>
+/// Contains unit tests for the <c>DeepCloneableList</c> class to verify its deep cloning functionality and related behaviors.
+/// </summary>
 [TestFixture]
 public class DeepCloneableListTests
 {
+    /// <summary>
+    /// Verifies that the <c>DeepClone</c> method, when using <see cref="ListCloneBehavior.CloneOnce"/>,
+    /// clones each item in the list exactly once. Ensures that the first clone contains items equal to,
+    /// but not the same instances as, the originals. Also checks that cloning the already-cloned list
+    /// returns the same item instances, confirming the 'clone once' behavior.
+    /// </summary>
     [Test]
     public void Deep_Clones_Each_Item_Once()
     {
@@ -42,6 +51,9 @@ public class DeepCloneableListTests
         }
     }
 
+    /// <summary>
+    /// Tests that all elements in a DeepCloneableList are deeply cloned.
+    /// </summary>
     [Test]
     public void Deep_Clones_All_Elements()
     {
@@ -54,6 +66,9 @@ public class DeepCloneableListTests
         Assert.AreEqual(list.Count, cloned.Count);
     }
 
+    /// <summary>
+    /// Tests that each item in the DeepCloneableList is cloned correctly.
+    /// </summary>
     [Test]
     public void Clones_Each_Item()
     {
@@ -67,6 +82,10 @@ public class DeepCloneableListTests
         }
     }
 
+    /// <summary>
+    /// Tests that a deep cloned DeepCloneableList sequence is equal to the original sequence
+    /// and that each item in the cloned list is a different instance from the original.
+    /// </summary>
     [Test]
     public void Cloned_Sequence_Equals()
     {

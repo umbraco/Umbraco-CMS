@@ -10,12 +10,18 @@ using Umbraco.Cms.Infrastructure.Serialization;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 
+/// <summary>
+/// Unit tests for the <see cref="ColorListValidator"/> class.
+/// </summary>
 [TestFixture]
 public class ColorListValidatorTest
 {
     private IConfigurationEditorJsonSerializer ConfigurationEditorJsonSerializer()
         => new SystemTextConfigurationEditorJsonSerializer(new DefaultJsonSerializerEncoderFactory());
 
+    /// <summary>
+    /// Tests that the ColorListValidator expects an array of ColorPickerItems rather than a single string.
+    /// </summary>
     [Test]
     public void Expects_Array_Of_ColorPickerItems_Not_Single_String()
     {
@@ -29,6 +35,9 @@ public class ColorListValidatorTest
         Assert.AreEqual(1, result.Count());
     }
 
+    /// <summary>
+    /// Tests that the validator expects an array of ColorPickerItems and not an array of strings.
+    /// </summary>
     [Test]
     public void Expects_Array_Of_ColorPickerItems_Not_Array_Of_String()
     {
@@ -42,6 +51,10 @@ public class ColorListValidatorTest
         Assert.AreEqual(1, result.Count());
     }
 
+    /// <summary>
+    /// Verifies that <see cref="ColorPickerConfigurationEditor.ColorListValidator"/> correctly identifies valid and invalid color values in a list.
+    /// Ensures that only properly formatted color values are accepted by the validator.
+    /// </summary>
     [Test]
     public void Validates_Color_Vals()
     {
@@ -59,6 +72,9 @@ public class ColorListValidatorTest
         Assert.AreEqual(2, result.Count());
     }
 
+    /// <summary>
+    /// Validates that color values in the list are unique.
+    /// </summary>
     [Test]
     public void Validates_Color_Vals_Are_Unique()
     {
@@ -79,6 +95,10 @@ public class ColorListValidatorTest
         Assert.IsTrue(result.First().ErrorMessage.Contains("ffffff, 000000, ff00aa"));
     }
 
+    /// <summary>
+    /// Tests that the color validator correctly allows color values that include transparency (alpha channel),
+    /// and ensures that only valid color formats are accepted.
+    /// </summary>
     [Test]
     public void Validates_Color_Can_Contain_Transparency()
     {

@@ -14,6 +14,9 @@ using Umbraco.Cms.Core.Strings;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 
+/// <summary>
+/// Contains unit tests for verifying the reuse behavior of DataValueEditor instances in Umbraco property editors.
+/// </summary>
 [TestFixture]
 public class DataValueEditorReuseTests
 {
@@ -21,6 +24,10 @@ public class DataValueEditorReuseTests
     private PropertyEditorCollection _propertyEditorCollection;
     private DataValueReferenceFactoryCollection _dataValueReferenceFactories;
 
+    /// <summary>
+    /// Initializes the test environment before each test by setting up mocks for IDataValueEditorFactory and related services,
+    /// and configuring default behaviors and collections required for data value editor tests.
+    /// </summary>
     [SetUp]
     public void SetUp()
     {
@@ -59,6 +66,9 @@ public class DataValueEditorReuseTests
                 Mock.Of<IIOHelper>()));
     }
 
+    /// <summary>
+    /// Tests that the reusable value editor is reused when created without configuration.
+    /// </summary>
     [Test]
     public void GetValueEditor_Reusable_Value_Editor_Is_Reused_When_Created_Without_Configuration()
     {
@@ -77,6 +87,10 @@ public class DataValueEditorReuseTests
             Times.Once);
     }
 
+    /// <summary>
+    /// Tests that the reusable value editor is not reused when it is created with a configuration.
+    /// This ensures that a new instance is created each time when configuration is provided.
+    /// </summary>
     [Test]
     public void GetValueEditor_Reusable_Value_Editor_Is_Not_Reused_When_Created_With_Configuration()
     {
@@ -97,6 +111,9 @@ public class DataValueEditorReuseTests
             Times.Exactly(2));
     }
 
+    /// <summary>
+    /// Tests that a non-reusable value editor is not reused when created without configuration.
+    /// </summary>
     [Test]
     public void GetValueEditor_Not_Reusable_Value_Editor_Is_Not_Reused_When_Created_Without_Configuration()
     {
@@ -117,6 +134,9 @@ public class DataValueEditorReuseTests
             Times.Exactly(2));
     }
 
+    /// <summary>
+    /// Tests that a non-reusable value editor is not reused when created with configuration.
+    /// </summary>
     [Test]
     public void GetValueEditor_Not_Reusable_Value_Editor_Is_Not_Reused_When_Created_With_Configuration()
     {

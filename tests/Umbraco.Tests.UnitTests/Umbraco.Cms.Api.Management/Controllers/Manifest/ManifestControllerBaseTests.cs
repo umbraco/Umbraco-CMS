@@ -6,11 +6,17 @@ using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Management.Controllers.Manifest;
 
+/// <summary>
+/// Contains unit tests for <see cref="ManifestControllerBase"/> in the Umbraco CMS API Management.
+/// </summary>
 [TestFixture]
 public class ManifestControllerBaseTests
 {
     private const string CacheBustHash = "abc123hash";
 
+    /// <summary>
+    /// Tests that the ReplaceCacheBusterTokens method correctly replaces the cache buster token in extension properties.
+    /// </summary>
     [Test]
     public void ReplaceCacheBusterTokens_Replaces_Token_In_Extension_Properties()
     {
@@ -28,6 +34,9 @@ public class ManifestControllerBaseTests
         Assert.That(json, Does.Not.Contain(Constants.Web.CacheBusterToken));
     }
 
+    /// <summary>
+    /// Tests that the ReplaceCacheBusterTokens method correctly replaces the cache buster token in multiple properties of the manifest model.
+    /// </summary>
     [Test]
     public void ReplaceCacheBusterTokens_Replaces_Token_In_Multiple_Properties()
     {
@@ -46,6 +55,9 @@ public class ManifestControllerBaseTests
         Assert.That(json, Does.Not.Contain(Constants.Web.CacheBusterToken));
     }
 
+    /// <summary>
+    /// Ensures that extensions without a cache buster token remain unchanged after processing.
+    /// </summary>
     [Test]
     public void ReplaceCacheBusterTokens_Leaves_Extensions_Without_Token_Untouched()
     {
@@ -63,6 +75,9 @@ public class ManifestControllerBaseTests
         Assert.That(json, Does.Not.Contain(CacheBustHash));
     }
 
+    /// <summary>
+    /// Tests that ReplaceCacheBusterTokens correctly handles models with empty Extensions collections.
+    /// </summary>
     [Test]
     public void ReplaceCacheBusterTokens_Handles_Empty_Extensions()
     {
@@ -74,6 +89,10 @@ public class ManifestControllerBaseTests
         Assert.That(models[0].Extensions, Is.Empty);
     }
 
+    /// <summary>
+    /// Tests that the ReplaceCacheBusterTokens method correctly handles multiple models,
+    /// replacing cache buster tokens where present and leaving models without tokens unchanged.
+    /// </summary>
     [Test]
     public void ReplaceCacheBusterTokens_Handles_Multiple_Models()
     {
@@ -110,6 +129,10 @@ public class ManifestControllerBaseTests
         });
     }
 
+    /// <summary>
+    /// Tests that the ReplaceCacheBusterTokens method correctly replaces the cache buster token
+    /// in nested extension objects within the manifest model.
+    /// </summary>
     [Test]
     public void ReplaceCacheBusterTokens_Replaces_Token_In_Nested_Extension_Objects()
     {
@@ -127,6 +150,9 @@ public class ManifestControllerBaseTests
         Assert.That(json, Does.Not.Contain(Constants.Web.CacheBusterToken));
     }
 
+    /// <summary>
+    /// Tests that ReplaceCacheBusterTokens preserves all models in the output without modification.
+    /// </summary>
     [Test]
     public void ReplaceCacheBusterTokens_Preserves_All_Models_In_Output()
     {
@@ -143,6 +169,10 @@ public class ManifestControllerBaseTests
         }
     }
 
+    /// <summary>
+    /// Tests that the ReplaceCacheBusterTokens method correctly handles multiple extensions in a single model,
+    /// replacing cache buster tokens in JavaScript file URLs as expected.
+    /// </summary>
     [Test]
     public void ReplaceCacheBusterTokens_Handles_Multiple_Extensions_In_Single_Model()
     {
@@ -169,6 +199,10 @@ public class ManifestControllerBaseTests
         });
     }
 
+    /// <summary>
+    /// Tests that the ReplaceCacheBusterTokens method produces valid JSON output
+    /// even when the hash contains special characters.
+    /// </summary>
     [Test]
     public void ReplaceCacheBusterTokens_Produces_Valid_Json_When_Hash_Contains_Special_Characters()
     {
@@ -198,6 +232,11 @@ public class ManifestControllerBaseTests
     /// </summary>
     private class TestableManifestControllerBase : ManifestControllerBase
     {
+    /// <summary>
+    /// Tests replacing cache buster tokens in the provided manifest response models.
+    /// </summary>
+    /// <param name="models">The collection of manifest response models to update.</param>
+    /// <param name="cacheBustHash">The cache buster hash to replace tokens with.</param>
         public static void TestReplaceCacheBusterTokens(
             IEnumerable<ManifestResponseModel> models, string cacheBustHash)
             => ReplaceCacheBusterTokens(models, cacheBustHash);

@@ -16,6 +16,9 @@ using Umbraco.Cms.Infrastructure.Serialization;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 
+/// <summary>
+/// Contains unit tests for the <see cref="BlockListPropertyValueConverter"/> class, verifying its behavior and functionality.
+/// </summary>
 [TestFixture]
 public class BlockListPropertyValueConverterTests : BlockPropertyValueConverterTestsBase<BlockListConfiguration>
 {
@@ -66,6 +69,9 @@ public class BlockListPropertyValueConverterTests : BlockPropertyValueConverterT
         UseSingleBlockMode = true,
     };
 
+    /// <summary>
+    /// Tests whether the converter correctly identifies applicable property editors.
+    /// </summary>
     [Test]
     public void IsConverter_For()
     {
@@ -76,6 +82,11 @@ public class BlockListPropertyValueConverterTests : BlockPropertyValueConverterT
             x.EditorAlias == Constants.PropertyEditors.Aliases.NestedContent)));
     }
 
+    /// <summary>
+    /// Verifies that the <c>GetPropertyValueType</c> method of the block list property value converter
+    /// returns <see cref="BlockListModel"/> as the value type when the property type is configured
+    /// to support multiple block items.
+    /// </summary>
     [Test]
     public void Get_Value_Type_Multiple()
     {
@@ -91,6 +102,9 @@ public class BlockListPropertyValueConverterTests : BlockPropertyValueConverterT
         Assert.AreEqual(typeof(BlockListModel), valueType);
     }
 
+    /// <summary>
+    /// Tests that the GetPropertyValueType method returns the correct type for a single block list configuration.
+    /// </summary>
     [Test]
     public void Get_Value_TypeSingle()
     {
@@ -106,6 +120,9 @@ public class BlockListPropertyValueConverterTests : BlockPropertyValueConverterT
         Assert.AreEqual(typeof(BlockListModel), valueType);
     }
 
+    /// <summary>
+    /// Tests that the GetPropertyValueType method returns the correct type when in single block mode.
+    /// </summary>
     [Test]
     public void Get_Value_TypeSingleBlockMode()
     {
@@ -120,6 +137,10 @@ public class BlockListPropertyValueConverterTests : BlockPropertyValueConverterT
         Assert.AreEqual(typeof(BlockListItem), valueType);
     }
 
+    /// <summary>
+    /// Tests that the BlockListPropertyValueConverter correctly converts null and empty JSON values
+    /// to an empty BlockListModel instance.
+    /// </summary>
     [Test]
     public void Convert_Null_Empty()
     {
@@ -143,6 +164,11 @@ public class BlockListPropertyValueConverterTests : BlockPropertyValueConverterT
         Assert.AreEqual(0, converted.Count);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="BlockListPropertyValueConverter"/> correctly returns an empty <see cref="BlockListModel"/>
+    /// when provided with various valid but empty or invalid JSON inputs, including empty objects, missing data, or mismatched keys.
+    /// Ensures robustness against different empty or incomplete JSON scenarios.
+    /// </summary>
     [Test]
     public void Convert_Valid_Empty_Json()
     {
@@ -246,6 +272,9 @@ public class BlockListPropertyValueConverterTests : BlockPropertyValueConverterT
         Assert.AreEqual(0, converted.Count);
     }
 
+    /// <summary>
+    /// Tests that the BlockListPropertyValueConverter correctly converts a valid JSON string into a BlockListModel.
+    /// </summary>
     [Test]
     public void Convert_Valid_Json()
     {
@@ -288,6 +317,9 @@ public class BlockListPropertyValueConverterTests : BlockPropertyValueConverterT
         Assert.AreEqual(Guid.Parse("1304E1DD-AC87-4396-84FE-8A399231CB3D"), converted[0].ContentKey);
     }
 
+    /// <summary>
+    /// Tests that data can be correctly retrieved and converted from a layout item in a BlockList property.
+    /// </summary>
     [Test]
     public void Get_Data_From_Layout_Item()
     {
@@ -370,6 +402,9 @@ public class BlockListPropertyValueConverterTests : BlockPropertyValueConverterT
         Assert.AreEqual("Setting1", item1.Settings.ContentType.Alias);
     }
 
+    /// <summary>
+    /// Tests that a data item is removed if it is removed from the configuration.
+    /// </summary>
     [Test]
     public void Data_Item_Removed_If_Removed_FromConfig()
     {

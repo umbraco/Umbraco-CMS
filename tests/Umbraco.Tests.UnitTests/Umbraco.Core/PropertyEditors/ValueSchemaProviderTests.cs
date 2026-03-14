@@ -10,9 +10,15 @@ using Umbraco.Cms.Core.Strings;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 
+/// <summary>
+/// Contains unit tests for the <see cref="ValueSchemaProvider"/> class within the property editors namespace.
+/// </summary>
 [TestFixture]
 public class ValueSchemaProviderTests
 {
+    /// <summary>
+    /// Tests that the Integer property editor returns the correct JSON schema representing an integer type.
+    /// </summary>
     [Test]
     public void IntegerPropertyEditor_Returns_Integer_Schema()
     {
@@ -31,6 +37,9 @@ public class ValueSchemaProviderTests
         Assert.That(typeArray!.Select(t => t?.GetValue<string>()), Is.EquivalentTo(new[] { "integer", "null" }));
     }
 
+    /// <summary>
+    /// Tests that the Integer property editor returns the correct value type.
+    /// </summary>
     [Test]
     public void IntegerPropertyEditor_Returns_ValueType()
     {
@@ -44,6 +53,9 @@ public class ValueSchemaProviderTests
         Assert.That(valueType, Is.EqualTo(typeof(int?)));
     }
 
+    /// <summary>
+    /// Tests that the IntegerPropertyEditor includes minimum and maximum values in the schema when configured.
+    /// </summary>
     [Test]
     public void IntegerPropertyEditor_Includes_MinMax_When_Configured()
     {
@@ -64,6 +76,9 @@ public class ValueSchemaProviderTests
         Assert.That(schema["maximum"]?.GetValue<int>(), Is.EqualTo(100));
     }
 
+    /// <summary>
+    /// Tests that the IntegerPropertyEditor includes the "step" value in the schema when the step is greater than one.
+    /// </summary>
     [Test]
     public void IntegerPropertyEditor_Includes_Step_When_Greater_Than_One()
     {
@@ -83,6 +98,9 @@ public class ValueSchemaProviderTests
         Assert.That(schema!["multipleOf"]?.GetValue<int>(), Is.EqualTo(5));
     }
 
+    /// <summary>
+    /// Tests that the IntegerPropertyEditor omits the "step" property from the value schema when the step is set to one.
+    /// </summary>
     [Test]
     public void IntegerPropertyEditor_Omits_Step_When_One()
     {
@@ -101,6 +119,9 @@ public class ValueSchemaProviderTests
         Assert.That(schema!.ContainsKey("multipleOf"), Is.False);
     }
 
+    /// <summary>
+    /// Tests that the ContentPicker property editor returns a value type of string.
+    /// </summary>
     [Test]
     public void ContentPickerPropertyEditor_Returns_ValueType_String()
     {

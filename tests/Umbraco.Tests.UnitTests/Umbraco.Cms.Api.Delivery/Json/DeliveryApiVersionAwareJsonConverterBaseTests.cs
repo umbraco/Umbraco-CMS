@@ -9,6 +9,9 @@ using Umbraco.Cms.Core.DeliveryApi;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Delivery.Json;
 
+/// <summary>
+/// Contains unit tests for the <see cref="DeliveryApiVersionAwareJsonConverterBase{T}"/> class, verifying its behavior and functionality.
+/// </summary>
 [TestFixture]
 public class DeliveryApiVersionAwareJsonConverterBaseTests
 {
@@ -32,6 +35,12 @@ public class DeliveryApiVersionAwareJsonConverterBaseTests
             .Returns(httpContext);
     }
 
+    /// <summary>
+    /// Verifies that all properties are included in the JSON output when the HTTP context is not available.
+    /// This ensures that the absence of an HTTP context does not restrict the serialization of any properties, regardless of the API version.
+    /// </summary>
+    /// <param name="apiVersion">The API version being simulated for the test.</param>
+    /// <param name="expectedPropertyNames">An array of property names expected to be present in the JSON output.</param>
     [Test]
     [TestCase(1, new[] { "PropertyAll", "PropertyV1Max", "PropertyV2Max", "PropertyV2Only", "PropertyV2Min" })]
     [TestCase(2, new[] { "PropertyAll", "PropertyV1Max", "PropertyV2Max", "PropertyV2Only", "PropertyV2Min" })]
@@ -67,6 +76,12 @@ public class DeliveryApiVersionAwareJsonConverterBaseTests
         Assert.That(expectedPropertyNames.All(v => output.Contains(v, StringComparison.InvariantCulture)), Is.True);
     }
 
+    /// <summary>
+    /// Tests that the JSON output includes the correct properties based on the specified API version attribute.
+    /// </summary>
+    /// <param name="apiVersion">The API version to test against.</param>
+    /// <param name="expectedPropertyNames">The property names expected to be included in the JSON output.</param>
+    /// <param name="expectedDisallowedPropertyNames">The property names expected to be excluded from the JSON output.</param>
     [Test]
     [TestCase(1, new[] { "PropertyAll", "PropertyV1Max", "PropertyV2Max" }, new[] { "PropertyV2Min", "PropertyV2Only" })]
     [TestCase(2, new[] { "PropertyAll", "PropertyV2Min", "PropertyV2Only", "PropertyV2Max" }, new[] { "PropertyV1Max" })]
@@ -84,6 +99,11 @@ public class DeliveryApiVersionAwareJsonConverterBaseTests
         });
     }
 
+    /// <summary>
+    /// Tests that properties are serialized correctly based on the API version attribute.
+    /// </summary>
+    /// <param name="apiVersion">The API version to test serialization against.</param>
+    /// <param name="expectedPropertyNames">The expected property names to be serialized for the given API version.</param>
     [Test]
     [TestCase(1, new[] { "PropertyAll", "PropertyV1Max", "PropertyV2Max" })]
     [TestCase(2, new[] { "PropertyAll", "PropertyV2Min", "PropertyV2Only", "PropertyV2Max" })]
@@ -105,6 +125,12 @@ public class DeliveryApiVersionAwareJsonConverterBaseTests
         }
     }
 
+    /// <summary>
+    /// Tests that the JSON serialization respects the property naming policy specified in the JSON options for different API versions.
+    /// </summary>
+    /// <param name="apiVersion">The API version to test against.</param>
+    /// <param name="expectedPropertyNames">The property names expected to be present in the JSON output.</param>
+    /// <param name="expectedDisallowedPropertyNames">The property names expected to be absent from the JSON output.</param>
     [Test]
     [TestCase(1, new[] { "propertyAll", "propertyV1Max", "propertyV2Max" }, new[] { "propertyV2Min", "propertyV2Only" })]
     [TestCase(2, new[] { "propertyAll", "propertyV2Min", "propertyV2Only", "propertyV2Max" }, new[] { "propertyV1Max" })]
@@ -127,6 +153,12 @@ public class DeliveryApiVersionAwareJsonConverterBaseTests
         });
     }
 
+    /// <summary>
+    /// Tests that the JSON output respects the property order based on the API version.
+    /// </summary>
+    /// <param name="apiVersion">The API version to test against.</param>
+    /// <param name="expectedFirstPropertyName">The expected name of the first property in the JSON output.</param>
+    /// <param name="expectedLastPropertyName">The expected name of the last property in the JSON output.</param>
     [Test]
     [TestCase(1, "PropertyV1Max", "PropertyAll")]
     [TestCase(2, "PropertyV2Min", "PropertyAll")]
@@ -187,6 +219,10 @@ public class DeliveryApiVersionAwareJsonConverterBaseTests
 
 internal class TestJsonConverter : DeliveryApiVersionAwareJsonConverterBase<TestResponseModel>
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="TestJsonConverter"/> class.
+    /// </summary>
+    /// <param name="httpContextAccessor">The HTTP context accessor.</param>
     public TestJsonConverter(IHttpContextAccessor httpContextAccessor)
         : base(httpContextAccessor)
     {
@@ -195,18 +231,32 @@ internal class TestJsonConverter : DeliveryApiVersionAwareJsonConverterBase<Test
 
 internal class TestResponseModel
 {
+    /// <summary>
+    /// Gets the value of the PropertyAll property, which is initialized to "all".
+    /// Used for testing JSON serialization order and property values in the test response model.
+    /// </summary>
     [JsonPropertyOrder(100)]
     public string PropertyAll { get; init; } = "all";
 
+    /// <summary>
+    /// Gets the property value for API version 1 maximum.
+    /// </summary>
     [IncludeInApiVersion(maxVersion: 1)]
     public string PropertyV1Max { get; init; } = "v1";
 
+    /// <summary>
+    /// Gets the property value for API version 2 and above.
+    /// </summary>
     [IncludeInApiVersion(2)]
     public string PropertyV2Min { get; init; } = "v2+";
 
+    /// <summary>
+    /// Gets the property that is only included in API version 2.
+    /// </summary>
     [IncludeInApiVersion(2, 2)]
     public string PropertyV2Only { get; init; } = "v2";
 
+    /// <summary>Gets the property included up to API version 2.</summary>
     [IncludeInApiVersion(maxVersion: 2)]
     public string PropertyV2Max { get; init; } = "up to v2";
 }

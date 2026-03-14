@@ -9,14 +9,23 @@ using Umbraco.Cms.Tests.Common.Builders;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models;
 
+    /// <summary>
+    /// Contains unit tests for the <see cref="Umbraco.Core.Models.Stylesheet"/> class, verifying its behavior and functionality.
+    /// </summary>
 [TestFixture]
 public class StylesheetTests
 {
+    /// <summary>
+    /// Sets up the test environment before each test.
+    /// </summary>
     [SetUp]
     public void SetUp() => _builder = new StylesheetBuilder();
 
     private StylesheetBuilder _builder;
 
+    /// <summary>
+    /// Tests that a Stylesheet can be created with the specified path and content.
+    /// </summary>
     [Test]
     public void Can_Create_Stylesheet()
     {
@@ -32,6 +41,9 @@ public class StylesheetTests
         Assert.That(stylesheet.Alias, Is.EqualTo("styles"));
     }
 
+    /// <summary>
+    /// Tests that a property can be added to a stylesheet and verifies the property is correctly added.
+    /// </summary>
     [Test]
     public void Can_Add_Property()
     {
@@ -51,6 +63,9 @@ public class StylesheetTests
         Assert.AreEqual("font-weight:bold;" + Environment.NewLine + "font-family:Arial;", stylesheet.Properties.Single().Value);
     }
 
+    /// <summary>
+    /// Tests that a property can be removed from the stylesheet.
+    /// </summary>
     [Test]
     public void Can_Remove_Property()
     {
@@ -69,6 +84,9 @@ public class StylesheetTests
         Assert.AreEqual(@"body { color:#000; }  .bold {font-weight:bold;}", stylesheet.Content);
     }
 
+    /// <summary>
+    /// Verifies that updating a property (alias and value) of a stylesheet correctly modifies both the property and the stylesheet content.
+    /// </summary>
     [Test]
     public void Can_Update_Property()
     {
@@ -95,6 +113,9 @@ public class StylesheetTests
             stylesheet.Content);
     }
 
+    /// <summary>
+    /// Tests that properties can be correctly retrieved from CSS content in a stylesheet.
+    /// </summary>
     [Test]
     public void Can_Get_Properties_From_Css()
     {
@@ -118,6 +139,9 @@ public class StylesheetTests
         Assert.AreEqual("li:first-child", properties.Last().Alias);
     }
 
+    /// <summary>
+    /// Tests that a Stylesheet object can be serialized to JSON without throwing an error.
+    /// </summary>
     [Test]
     public void Can_Serialize_Without_Error()
     {

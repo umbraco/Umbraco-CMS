@@ -9,6 +9,9 @@ using Umbraco.Cms.Tests.UnitTests.Umbraco.Core.ShortStringHelper;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Services;
 
+/// <summary>
+/// Contains unit tests for the <see cref="ContentTypeSchemaService"/> class in Umbraco.Core.Services.
+/// </summary>
 [TestFixture]
 public class ContentTypeSchemaServiceTests
 {
@@ -17,6 +20,9 @@ public class ContentTypeSchemaServiceTests
     private Mock<IPublishedContentTypeCache> _publishedContentTypeCacheMock = null!;
     private ContentTypeSchemaService _sut = null!;
 
+    /// <summary>
+    /// Sets up the test environment before each test is run.
+    /// </summary>
     [SetUp]
     public void SetUp()
     {
@@ -31,6 +37,9 @@ public class ContentTypeSchemaServiceTests
             new DefaultShortStringHelper(new DefaultShortStringHelperConfig()));
     }
 
+    /// <summary>
+    /// Tests that GetDocumentTypes skips content types when the cache throws an exception.
+    /// </summary>
     [Test]
     public void GetDocumentTypes_SkipsContentTypesWhenCacheThrows()
     {
@@ -57,6 +66,9 @@ public class ContentTypeSchemaServiceTests
         Assert.That(result.First().SchemaId, Is.EqualTo("Cachedtype"));
     }
 
+    /// <summary>
+    /// Tests that GetDocumentTypes correctly identifies which properties are inherited and which are own properties.
+    /// </summary>
     [Test]
     public void GetDocumentTypes_CorrectlyIdentifiesInheritedProperties()
     {
@@ -87,6 +99,9 @@ public class ContentTypeSchemaServiceTests
         Assert.That(props.First(p => p.Alias == "inheritedProperty").Inherited, Is.True);
     }
 
+    /// <summary>
+    /// Tests that the GetDocumentTypes method includes composition schema IDs correctly.
+    /// </summary>
     [Test]
     public void GetDocumentTypes_IncludesCompositionSchemaIds()
     {
@@ -110,6 +125,9 @@ public class ContentTypeSchemaServiceTests
         Assert.That(schema.CompositionSchemaIds, Is.EquivalentTo(new[] { "Basepage", "Seocomposition" }));
     }
 
+    /// <summary>
+    /// Tests that GetDocumentTypes returns an empty collection when there are no content types.
+    /// </summary>
     [Test]
     public void GetDocumentTypes_ReturnsEmptyCollectionWhenNoContentTypes()
     {
@@ -123,6 +141,9 @@ public class ContentTypeSchemaServiceTests
         Assert.That(result, Is.Empty);
     }
 
+    /// <summary>
+    /// Tests that GetDocumentTypes correctly sets the IsElement property on returned document types.
+    /// </summary>
     [Test]
     public void GetDocumentTypes_CorrectlySetsIsElementProperty()
     {
@@ -153,6 +174,9 @@ public class ContentTypeSchemaServiceTests
         Assert.That(result.First(x => x.Alias == "elementType").IsElement, Is.True);
     }
 
+    /// <summary>
+    /// Tests that GetMediaTypes skips media types when the cache throws an exception.
+    /// </summary>
     [Test]
     public void GetMediaTypes_SkipsMediaTypesWhenCacheThrows()
     {

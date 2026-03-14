@@ -12,6 +12,9 @@ using Umbraco.Cms.Core.Web;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.DeliveryApi;
 
+/// <summary>
+/// Unit tests for the MultiNodeTreePickerValueConverter class.
+/// </summary>
 [TestFixture]
 public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTests
 {
@@ -42,6 +45,10 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
             }
         }));
 
+    /// <summary>
+    /// Verifies that the <see cref="MultiNodeTreePickerValueConverter"/> correctly converts a value in single mode
+    /// to a list containing a single <see cref="IApiContent"/> instance, and that the resulting content has the expected properties.
+    /// </summary>
     [Test]
     public void MultiNodeTreePickerValueConverter_InSingleMode_ConvertsValueToListOfContent()
     {
@@ -64,6 +71,9 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
         Assert.IsEmpty(result.First().Properties);
     }
 
+    /// <summary>
+    /// Tests that the MultiNodeTreePickerValueConverter correctly converts a value to a list of content items when in multi mode.
+    /// </summary>
     [Test]
     public void MultiNodeTreePickerValueConverter_InMultiMode_ConvertsValueToListOfContent()
     {
@@ -94,6 +104,11 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
         Assert.AreEqual("TheContentType", result.Last().ContentType);
     }
 
+    /// <summary>
+    /// Verifies that when the MultiNodeTreePickerValueConverter is used in single mode with preview enabled,
+    /// it converts the intermediate value (a single Udi) into a list containing one <see cref="IApiContent"/> object
+    /// with the expected properties (name, id, route, content type, and empty properties collection).
+    /// </summary>
     [Test]
     public void MultiNodeTreePickerValueConverter_InSingleMode_WithPreview_ConvertsValueToListOfContent()
     {
@@ -116,6 +131,11 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
         Assert.IsEmpty(result.First().Properties);
     }
 
+    /// <summary>
+    /// Verifies that the <see cref="MultiNodeTreePickerValueConverter"/> correctly renders content properties
+    /// for a given entity type when used in the Delivery API context.
+    /// </summary>
+    /// <param name="entityType">The entity type to test, such as <c>document</c> or <c>content</c>.</param>
     [Test]
     [TestCase(Constants.UdiEntityType.Document)]
     [TestCase("content")]
@@ -159,6 +179,9 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
         Assert.AreEqual("Default value", result.First().Properties[DefaultPropertyType.Alias]);
     }
 
+    /// <summary>
+    /// Tests that the MultiNodeTreePickerValueConverter correctly converts a value to a list of media items when in single media mode.
+    /// </summary>
     [Test]
     public void MultiNodeTreePickerValueConverter_InSingleMediaMode_ConvertsValueToListOfMedia()
     {
@@ -180,6 +203,9 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
         Assert.AreEqual("TheMediaType", result.First().MediaType);
     }
 
+    /// <summary>
+    /// Tests that the MultiNodeTreePickerValueConverter correctly converts values to a list of media items when in multi-media mode.
+    /// </summary>
     [Test]
     public void MultiNodeTreePickerValueConverter_InMultiMediaMode_ConvertsValueToListOfMedia()
     {
@@ -209,6 +235,10 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
         Assert.AreEqual("TheMediaType", result.Last().MediaType);
     }
 
+    /// <summary>
+    /// Tests that the MultiNodeTreePickerValueConverter in multi mode with mixed entity types
+    /// only converts the configured entity type correctly.
+    /// </summary>
     [Test]
     public void MultiNodeTreePickerValueConverter_InMultiMode_WithMixedEntityTypes_OnlyConvertsConfiguredEntityType()
     {
@@ -230,6 +260,9 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
         Assert.AreEqual("TheContentType", result.First().ContentType);
     }
 
+    /// <summary>
+    /// Tests that in multi-media mode with mixed entity types, the converter only converts entities of the configured type.
+    /// </summary>
     [Test]
     public void MultiNodeTreePickerValueConverter_InMultiMediaMode_WithMixedEntityTypes_OnlyConvertsConfiguredEntityType()
     {
@@ -251,6 +284,11 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
         Assert.AreEqual("TheMediaType", result.First().MediaType);
     }
 
+    /// <summary>
+    /// Verifies that the <see cref="MultiNodeTreePickerValueConverter"/> returns an unsupported string ("(unsupported)")
+    /// when used in member mode, regardless of whether multiple selection is enabled.
+    /// </summary>
+    /// <param name="multiSelect">If set to <c>true</c>, multiple selection is enabled; otherwise, single selection is used.</param>
     [TestCase(true)]
     [TestCase(false)]
     public void MultiNodeTreePickerValueConverter_InMemberMode_IsUnsupported(bool multiSelect)
@@ -269,6 +307,10 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
         Assert.AreEqual("(unsupported)", result);
     }
 
+    /// <summary>
+    /// Verifies that when the MultiNodeTreePickerValueConverter is in single mode, passing an invalid intermediate value results in an empty array being returned.
+    /// </summary>
+    /// <param name="inter">The intermediate value to be converted, which is expected to be invalid for the converter (e.g., non-UDI values or null).</param>
     [TestCase(123)]
     [TestCase("123")]
     [TestCase(null)]
@@ -285,6 +327,10 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
         Assert.IsEmpty(result);
     }
 
+    /// <summary>
+    /// Tests that the MultiNodeTreePickerValueConverter converts invalid values to an empty array when in multi mode.
+    /// </summary>
+    /// <param name="inter">The intermediate value to convert.</param>
     [TestCase(123)]
     [TestCase("123")]
     [TestCase(null)]
@@ -301,6 +347,9 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
         Assert.IsEmpty(result);
     }
 
+    /// <summary>
+    /// Tests that the MultiNodeTreePickerValueConverter yields no results for content that is unroutable.
+    /// </summary>
     [Test]
     public void MultiNodeTreePickerValueConverter_YieldsNothingForUnRoutableContent()
     {

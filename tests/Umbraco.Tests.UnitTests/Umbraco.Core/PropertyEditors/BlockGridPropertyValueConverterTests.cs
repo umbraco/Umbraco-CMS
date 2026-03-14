@@ -13,11 +13,17 @@ using Umbraco.Cms.Infrastructure.Serialization;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 
+/// <summary>
+/// Contains unit tests for the <see cref="BlockGridPropertyValueConverter"/> class, verifying its behavior and functionality.
+/// </summary>
 [TestFixture]
 public class BlockGridPropertyValueConverterTests : BlockPropertyValueConverterTestsBase<BlockGridConfiguration>
 {
     protected override string PropertyEditorAlias => Constants.PropertyEditors.Aliases.BlockGrid;
 
+    /// <summary>
+    /// Tests that the GetPropertyValueType method returns the expected BlockGridModel type.
+    /// </summary>
     [Test]
     public void Get_Value_Type()
     {
@@ -31,6 +37,9 @@ public class BlockGridPropertyValueConverterTests : BlockPropertyValueConverterT
         Assert.AreEqual(typeof(BlockGridModel), valueType);
     }
 
+    /// <summary>
+    /// Tests that the BlockGridPropertyValueConverter correctly converts valid JSON input into a BlockGridModel.
+    /// </summary>
     [Test]
     public void Convert_Valid_Json()
     {
@@ -84,6 +93,9 @@ public class BlockGridPropertyValueConverterTests : BlockPropertyValueConverterT
         Assert.AreEqual(SettingAlias1, converted[0].Settings.ContentType.Alias);
     }
 
+    /// <summary>
+    /// Tests that the BlockGridPropertyValueConverter can convert a JSON string to a BlockGridModel without any settings.
+    /// </summary>
     [Test]
     public void Can_Convert_Without_Settings()
     {
@@ -129,6 +141,9 @@ public class BlockGridPropertyValueConverterTests : BlockPropertyValueConverterT
         Assert.IsNull(converted[0].Settings);
     }
 
+    /// <summary>
+    /// Tests that the BlockGridPropertyValueConverter ignores layouts other than the BlockGrid alias.
+    /// </summary>
     [Test]
     public void Ignores_Other_Layouts()
     {

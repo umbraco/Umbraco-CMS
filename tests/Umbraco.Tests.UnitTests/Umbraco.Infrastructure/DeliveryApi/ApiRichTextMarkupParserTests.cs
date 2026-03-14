@@ -11,12 +11,18 @@ using Umbraco.Cms.Infrastructure.DeliveryApi;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.DeliveryApi;
 
+/// <summary>
+/// Provides unit tests for the <see cref="ApiRichTextMarkupParser"/> class, verifying its functionality and behavior.
+/// </summary>
 [TestFixture]
 public class ApiRichTextMarkupParserTests
 {
     private Mock<IApiContentRouteBuilder> _apiContentRouteBuilder;
     private Mock<IApiMediaUrlProvider> _apiMediaUrlProvider;
 
+    /// <summary>
+    /// Tests that the parser can correctly parse legacy local link markup in rich text HTML.
+    /// </summary>
     [Test]
     public void Can_Parse_Legacy_LocalLinks()
     {
@@ -45,6 +51,11 @@ public class ApiRichTextMarkupParserTests
         Assert.AreEqual(expectedOutput, parsedHtml);
     }
 
+    /// <summary>
+    /// Verifies that the rich text markup parser correctly identifies and replaces local link placeholders
+    /// (e.g., <c>/{localLink:guid}</c>) in HTML with the appropriate resolved URLs and metadata attributes.
+    /// Ensures that links to internal content are parsed and rendered as expected.
+    /// </summary>
     [Test]
     public void Can_Parse_LocalLinks()
     {
@@ -83,6 +94,10 @@ public class ApiRichTextMarkupParserTests
         Assert.AreEqual(expectedOutput, parsedHtml);
     }
 
+    /// <summary>
+    /// Tests that local links with various postfixes are correctly parsed and replaced with the expected HTML output.
+    /// </summary>
+    /// <param name="postfix">The postfix string to append to the local link.</param>
     [TestCase("#some-anchor")]
     [TestCase("?something=true")]
     [TestCase("#!some-hashbang")]
@@ -124,6 +139,9 @@ public class ApiRichTextMarkupParserTests
         Assert.AreEqual(expectedOutput, parsedHtml);
     }
 
+    /// <summary>
+    /// Tests that inline local images are correctly parsed and their URLs replaced with the expected media URLs.
+    /// </summary>
     [Test]
     public void Can_Parse_Inline_LocalImages()
     {
@@ -186,17 +204,34 @@ public class ApiRichTextMarkupParserTests
         private Mock<IApiContentRoute> _apiContentRouteMock = new Mock<IApiContentRoute>();
         private Mock<IApiContentStartItem> _apiContentStartItem = new Mock<IApiContentStartItem>();
 
+    /// <summary>
+    /// Gets the mocked published content.
+    /// </summary>
         public IPublishedContent PublishedContent => _publishedContentMock.Object;
 
+    /// <summary>
+    /// Gets the mocked API content route.
+    /// </summary>
         public IApiContentRoute ApiContentRoute => _apiContentRouteMock.Object;
 
+    /// <summary>
+    /// Gets or sets the media URL.
+    /// </summary>
         public string MediaUrl { get; set; } = string.Empty;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MockData"/> class.
+    /// </summary>
         public MockData()
         {
             _apiContentRouteMock.SetupGet(r => r.StartItem).Returns(_apiContentStartItem.Object);
         }
 
+    /// <summary>
+    /// Sets the key for the mock data.
+    /// </summary>
+    /// <param name="key">The key to set.</param>
+    /// <returns>The current instance of <see cref="MockData"/> with the key set.</returns>
         public MockData WithKey(Guid key)
         {
             _publishedContentMock.SetupGet(i => i.Key).Returns(key);
@@ -204,24 +239,44 @@ public class ApiRichTextMarkupParserTests
             return this;
         }
 
+    /// <summary>
+    /// Sets the content type alias for the mock data.
+    /// </summary>
+    /// <param name="alias">The content type alias to set.</param>
+    /// <returns>The current instance of <see cref="MockData"/> for chaining.</returns>
         public MockData WithContentTypeAlias(string alias)
         {
             _publishedContentMock.SetupGet(x => x.ContentType.Alias).Returns(alias);
             return this;
         }
 
+    /// <summary>
+    /// Sets the route path for the mock data.
+    /// </summary>
+    /// <param name="path">The route path to set.</param>
+    /// <returns>The updated MockData instance.</returns>
         public MockData WithRoutePath(string path)
         {
             _apiContentRouteMock.SetupGet(r => r.Path).Returns(path);
             return this;
         }
 
+    /// <summary>
+    /// Sets the route start path for the mock data.
+    /// </summary>
+    /// <param name="path">The route start path to set.</param>
+    /// <returns>The current instance of <see cref="MockData"/> for chaining.</returns>
         public MockData WithRouteStartPath(string path)
         {
             _apiContentStartItem.SetupGet(rsi => rsi.Path).Returns(path);
             return this;
         }
 
+    /// <summary>
+    /// Sets the media URL and returns the current MockData instance.
+    /// </summary>
+    /// <param name="url">The media URL to set.</param>
+    /// <returns>The current MockData instance with the updated media URL.</returns>
         public MockData WithMediaUrl(string url)
         {
             MediaUrl = url;

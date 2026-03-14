@@ -18,6 +18,9 @@ using Umbraco.Cms.Infrastructure.Serialization;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 
+    /// <summary>
+    /// Unit tests for the <see cref="TimeOnlyPropertyEditor"/> class.
+    /// </summary>
 [TestFixture]
 public class TimeOnlyPropertyEditorTests
 {
@@ -34,6 +37,12 @@ public class TimeOnlyPropertyEditorTests
         new object[] { JsonNode.Parse("{\"date\": \"2025-08-20T14:30:00\"}"), true }
     ];
 
+    /// <summary>
+    /// Tests the validation logic of the TimeOnly property editor for the provided value.
+    /// Asserts whether the validation result matches the expected outcome.
+    /// </summary>
+    /// <param name="value">The value to be validated by the property editor.</param>
+    /// <param name="expectedSuccess">True if the validation is expected to succeed; otherwise, false.</param>
     [TestCaseSource(nameof(_validateDateReceivedTestCases))]
     public void Validates_Date_Received(object? value, bool expectedSuccess)
     {
@@ -58,6 +67,12 @@ public class TimeOnlyPropertyEditorTests
         new object[] { JsonNode.Parse("{\"date\": \"16:34\"}"), new DateTimeOffset(1, 1, 1, 16, 34, 0, TimeSpan.Zero), null },
     ];
 
+    /// <summary>
+    /// Verifies that the value editor correctly parses input values from the editor into the expected <see cref="DateTimeOffset"/> and time zone representations.
+    /// </summary>
+    /// <param name="value">The input value provided by the editor, which may be null or a time representation.</param>
+    /// <param name="expectedDateTimeOffset">The expected <see cref="DateTimeOffset"/> result after parsing the input value, or null if parsing should fail.</param>
+    /// <param name="expectedTimeZone">The expected time zone identifier string, or null if not applicable.</param>
     [TestCaseSource(nameof(_timeOnlyParseValuesFromEditorTestCases))]
     public void Can_Parse_Values_From_Editor(
         object? value,

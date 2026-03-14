@@ -10,9 +10,19 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Cache;
 
+/// <summary>
+/// Contains unit tests for methods in the <see cref="DistributedCacheExtensions"/> class.
+/// </summary>
 [TestFixture]
 public class DistributedCacheExtensionsTests
 {
+    /// <summary>
+    /// Verifies that the <c>GetPayloads</c> method correctly generates payloads for member entities.
+    /// This includes ensuring that the payloads reflect the correct username, ID, previous username (when applicable),
+    /// and the removed status as specified by the <paramref name="removed"/> parameter.
+    /// The test also checks that the previous username is set only for members present in the previous username state.
+    /// </summary>
+    /// <param name="removed">If set to <c>true</c>, indicates that the members are marked as removed; otherwise, they are not removed.</param>
     [TestCase(true)]
     [TestCase(false)]
     public void Member_GetPayloads_CorrectlyCreatesPayloads(bool removed)

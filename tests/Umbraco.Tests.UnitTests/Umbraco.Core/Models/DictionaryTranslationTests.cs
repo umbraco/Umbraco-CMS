@@ -10,14 +10,23 @@ using Umbraco.Cms.Tests.Common.Builders.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models;
 
+/// <summary>
+/// Contains unit tests for the <see cref="Umbraco.Core.Models.DictionaryTranslation"/> class.
+/// </summary>
 [TestFixture]
 public class DictionaryTranslationTests
 {
+    /// <summary>
+    /// Sets up the test environment before each test is run.
+    /// </summary>
     [SetUp]
     public void SetUp() => _builder = new DictionaryTranslationBuilder();
 
     private DictionaryTranslationBuilder _builder = new();
 
+    /// <summary>
+    /// Tests that the DictionaryTranslation object can be deeply cloned correctly.
+    /// </summary>
     [Test]
     public void Can_Deep_Clone()
     {
@@ -42,6 +51,9 @@ public class DictionaryTranslationTests
         }
     }
 
+    /// <summary>
+    /// Tests that a DictionaryTranslation object can be serialized to JSON without throwing an error.
+    /// </summary>
     [Test]
     public void Can_Serialize_Without_Error()
     {

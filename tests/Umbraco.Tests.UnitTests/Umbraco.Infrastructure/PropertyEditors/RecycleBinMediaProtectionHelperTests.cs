@@ -12,9 +12,15 @@ using Umbraco.Cms.Infrastructure.PropertyEditors.NotificationHandlers;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PropertyEditors;
 
+/// <summary>
+/// Contains unit tests for the <see cref="RecycleBinMediaProtectionHelper"/> class, verifying its behavior and functionality.
+/// </summary>
 [TestFixture]
 public class RecycleBinMediaProtectionHelperTests
 {
+    /// <summary>
+    /// Tests that DeleteContainedFilesWithProtection deletes files with the ".deleted" suffix when the media is trashed.
+    /// </summary>
     [Test]
     public void DeleteContainedFilesWithProtection_WithTrashedMedia_DeletesFilesWithSuffix()
     {
@@ -42,6 +48,10 @@ public class RecycleBinMediaProtectionHelperTests
         Assert.That(deletedFiles.Single(), Is.EqualTo("media/test/image.deleted.jpg"));
     }
 
+    /// <summary>
+    /// Verifies that <c>DeleteContainedFilesWithProtection</c> deletes files without a protection suffix
+    /// when the associated media is not trashed.
+    /// </summary>
     [Test]
     public void DeleteContainedFilesWithProtection_WithNonTrashedMedia_DeletesFilesWithoutSuffix()
     {
@@ -69,6 +79,9 @@ public class RecycleBinMediaProtectionHelperTests
         Assert.That(deletedFiles.Single(), Is.EqualTo("media/test/image.jpg"));
     }
 
+    /// <summary>
+    /// Tests that DeleteContainedFilesWithProtection deletes files correctly for both trashed and non-trashed media.
+    /// </summary>
     [Test]
     public void DeleteContainedFilesWithProtection_WithTrashedAndNonTrashedMedia_DeletesBothCorrectly()
     {
@@ -107,6 +120,10 @@ public class RecycleBinMediaProtectionHelperTests
         Assert.That(deletedFiles, Does.Contain("media/normal/image.jpg"));
     }
 
+    /// <summary>
+    /// Tests that when an empty collection is passed to DeleteContainedFilesWithProtection,
+    /// the DeleteFile method is not called on the file system.
+    /// </summary>
     [Test]
     public void DeleteContainedFilesWithProtection_WithEmptyCollection_DoesNotCallDelete()
     {
@@ -127,6 +144,9 @@ public class RecycleBinMediaProtectionHelperTests
         fileSystemMock.Verify(fs => fs.DeleteFile(It.IsAny<string>()), Times.Never);
     }
 
+    /// <summary>
+    /// Tests that DeleteContainedFilesWithProtection deletes all files with the correct ".deleted" suffix when multiple files are present.
+    /// </summary>
     [Test]
     public void DeleteContainedFilesWithProtection_WithMultipleFiles_DeletesAllWithCorrectSuffix()
     {

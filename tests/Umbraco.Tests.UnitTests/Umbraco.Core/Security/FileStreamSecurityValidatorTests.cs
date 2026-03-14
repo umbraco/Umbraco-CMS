@@ -4,8 +4,14 @@ using Umbraco.Cms.Core.Security;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Security;
 
+/// <summary>
+/// Unit tests for the <see cref="FileStreamSecurityValidator"/> class.
+/// </summary>
 public class FileStreamSecurityValidatorTests
 {
+    /// <summary>
+    /// Tests that IsConsideredSafe returns true when no analyzers are present.
+    /// </summary>
     [Test]
     public void IsConsideredSafe_True_NoAnalyzersPresent()
     {
@@ -25,6 +31,9 @@ public class FileStreamSecurityValidatorTests
         Assert.IsTrue(validationResult);
     }
 
+    /// <summary>
+    /// Tests that the IsConsideredSafe method returns true when no analyzers match the stream type.
+    /// </summary>
     [Test]
     public void IsConsideredSafe_True_NoAnalyzerMatchesType()
     {
@@ -51,6 +60,9 @@ public class FileStreamSecurityValidatorTests
         Assert.IsTrue(validationResult);
     }
 
+    /// <summary>
+    /// Tests that the IsConsideredSafe method returns true when all matching analyzers return true.
+    /// </summary>
     [Test]
     public void IsConsideredSafe_True_AllMatchingAnalyzersReturnTrue()
     {
@@ -86,6 +98,9 @@ public class FileStreamSecurityValidatorTests
         Assert.IsTrue(validationResult);
     }
 
+    /// <summary>
+    /// Tests that the IsConsideredSafe method returns false when any matching analyzer returns false.
+    /// </summary>
     [Test]
     public void IsConsideredSafe_False_AnyMatchingAnalyzersReturnFalse()
     {

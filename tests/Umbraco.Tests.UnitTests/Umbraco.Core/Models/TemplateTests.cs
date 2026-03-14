@@ -11,14 +11,23 @@ using Umbraco.Cms.Tests.Common.Builders.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models;
 
+/// <summary>
+/// Unit tests for the <see cref="Umbraco.Core.Models.Template"/> class.
+/// </summary>
 [TestFixture]
 public class TemplateTests
 {
+    /// <summary>
+    /// Sets up the test environment before each test is run.
+    /// </summary>
     [SetUp]
     public void SetUp() => _builder = new TemplateBuilder();
 
     private TemplateBuilder _builder;
 
+    /// <summary>
+    /// Tests that a Template instance can be deep cloned correctly.
+    /// </summary>
     [Test]
     public void Can_Deep_Clone()
     {
@@ -54,6 +63,9 @@ public class TemplateTests
         }
     }
 
+    /// <summary>
+    /// Tests that a template can be serialized to JSON without throwing an error.
+    /// </summary>
     [Test]
     public void Can_Serialize_Without_Error()
     {

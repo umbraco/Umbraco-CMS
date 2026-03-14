@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Delivery.Services;
@@ -10,9 +10,16 @@ using Umbraco.Cms.Tests.Common;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Delivery.Services;
 
+/// <summary>
+/// Contains unit tests for verifying the behavior of the <see cref="RequestRoutingService"/> class in the Umbraco CMS Delivery API.
+/// </summary>
 [TestFixture]
 public class RequestRoutingServiceTests
 {
+    /// <summary>
+    /// Tests that an empty or null path yields no content route.
+    /// </summary>
+    /// <param name="path">The path to test, which may be null or empty.</param>
     [TestCase(null)]
     [TestCase("")]
     public void Empty_Path_Yields_Nothing(string? path)
@@ -28,6 +35,9 @@ public class RequestRoutingServiceTests
         Assert.IsEmpty(result);
     }
 
+    /// <summary>
+    /// Tests that an explicit start item yields a path prefixed with the start item ID.
+    /// </summary>
     [Test]
     public void Explicit_Start_Item_Yields_Path_Prefixed_With_Start_Item_Id()
     {
@@ -52,6 +62,10 @@ public class RequestRoutingServiceTests
         Assert.AreEqual("1234/some/where", result);
     }
 
+    /// <summary>
+    /// Tests that when there is no domain binding, the returned path is prefixed with a slash.
+    /// </summary>
+    /// <param name="requestedPath">The requested path to test.</param>
     [TestCase("some/where")]
     [TestCase("/some/where")]
     public void Without_Domain_Binding_Yields_Path_Prefixed_With_Slash(string requestedPath)
@@ -74,6 +88,10 @@ public class RequestRoutingServiceTests
         Assert.AreEqual("/some/where", result);
     }
 
+    /// <summary>
+    /// Tests that when a domain binding exists, the returned path is prefixed with the domain content ID.
+    /// </summary>
+    /// <param name="requestedPath">The requested path to route.</param>
     [TestCase("some/where")]
     [TestCase("/some/where")]
     public void With_Domain_Binding_Yields_Path_Prefixed_With_Domain_Content_Id(string requestedPath)
@@ -98,6 +116,9 @@ public class RequestRoutingServiceTests
         Assert.AreEqual("1234/some/where", result);
     }
 
+    /// <summary>
+    /// Tests that the domain binding culture correctly sets the variation context culture.
+    /// </summary>
     [Test]
     public void Domain_Binding_Culture_Sets_Variation_Context()
     {
@@ -125,6 +146,9 @@ public class RequestRoutingServiceTests
         Assert.AreEqual("da-DK", variationContextAccessor.VariationContext.Culture);
     }
 
+    /// <summary>
+    /// Tests that the domain binding culture does not overwrite an existing segment in the variation context.
+    /// </summary>
     [Test]
     public void Domain_Binding_Culture_Does_Not_Overwrite_Existing_Segment_Context()
     {
@@ -159,6 +183,9 @@ public class RequestRoutingServiceTests
         });
     }
 
+    /// <summary>
+    /// Tests that an explicit request culture overrides the culture bound to the domain.
+    /// </summary>
     [Test]
     public void Explicit_Request_Culture_Overrides_Domain_Binding_Culture()
     {

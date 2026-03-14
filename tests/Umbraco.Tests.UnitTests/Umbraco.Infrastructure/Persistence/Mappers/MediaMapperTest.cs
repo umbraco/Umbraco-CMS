@@ -9,9 +9,15 @@ using MediaModel = Umbraco.Cms.Core.Models.Media;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Persistence.Mappers;
 
+    /// <summary>
+    /// Contains unit tests for the <see cref="MediaMapper"/> class, verifying its mapping functionality within the persistence layer.
+    /// </summary>
 [TestFixture]
 public class MediaMapperTest
 {
+    /// <summary>
+    /// Tests that the Id property is correctly mapped to the database column.
+    /// </summary>
     [Test]
     public void Can_Map_Id_Property()
     {
@@ -20,6 +26,9 @@ public class MediaMapperTest
         Assert.That(column, Is.EqualTo($"[{Constants.DatabaseSchema.Tables.Node}].[id]"));
     }
 
+    /// <summary>
+    /// Tests that the MediaMapper correctly maps the "Trashed" property to the corresponding database column.
+    /// </summary>
     [Test]
     public void Can_Map_Trashed_Property()
     {
@@ -28,6 +37,9 @@ public class MediaMapperTest
         Assert.That(column, Is.EqualTo($"[{Constants.DatabaseSchema.Tables.Node}].[trashed]"));
     }
 
+    /// <summary>
+    /// Tests that the UpdateDate property is correctly mapped to the database column.
+    /// </summary>
     [Test]
     public void Can_Map_UpdateDate_Property()
     {
@@ -36,6 +48,9 @@ public class MediaMapperTest
         Assert.That(column, Is.EqualTo($"[{Constants.DatabaseSchema.Tables.ContentVersion}].[versionDate]"));
     }
 
+    /// <summary>
+    /// Tests that the Version property is correctly mapped to the database column.
+    /// </summary>
     [Test]
     public void Can_Map_Version_Property()
     {

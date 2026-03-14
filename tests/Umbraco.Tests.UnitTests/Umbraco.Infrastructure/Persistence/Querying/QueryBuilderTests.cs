@@ -11,6 +11,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Persistence.Querying;
 
+/// <summary>
+/// Unit tests for the <see cref="QueryBuilder"/> class in the Umbraco.Infrastructure.Persistence.Querying namespace.
+/// </summary>
 [TestFixture]
 public class QueryBuilderTests : BaseUsingSqlSyntax
 {
@@ -41,6 +44,9 @@ public class QueryBuilderTests : BaseUsingSqlSyntax
         Debug.Print(strResult);
     }
 
+    /// <summary>
+    /// Tests that a query can be correctly built to filter IContent items by their ParentId.
+    /// </summary>
     [Test]
     public void Can_Build_ParentId_Query_For_IContent()
     {
@@ -68,6 +74,9 @@ public class QueryBuilderTests : BaseUsingSqlSyntax
         Debug.Print(strResult);
     }
 
+    /// <summary>
+    /// Tests that a query can be built to filter IContentType by its Alias property.
+    /// </summary>
     [Test]
     public void Can_Build_ContentTypeAlias_Query_For_IContentType()
     {
@@ -94,6 +103,11 @@ public class QueryBuilderTests : BaseUsingSqlSyntax
         Debug.Print(strResult);
     }
 
+    /// <summary>
+    /// Verifies that a SQL query can be correctly built to select published descendants of an <see cref="IContent"/> item,
+    /// using the content path, excluding a specific ID, and filtering by published and trashed status.
+    /// Ensures that the generated SQL arguments match the expected values for path, ID, published, and trashed conditions.
+    /// </summary>
     [Test]
     public void Can_Build_PublishedDescendants_Query_For_IContent()
     {

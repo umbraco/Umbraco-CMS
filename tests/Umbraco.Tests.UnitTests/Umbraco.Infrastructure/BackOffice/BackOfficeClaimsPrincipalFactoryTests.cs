@@ -16,9 +16,16 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.BackOffice;
 
+/// <summary>
+/// Contains unit tests for the <see cref="BackOfficeClaimsPrincipalFactory"/> class, verifying its behavior and functionality.
+/// </summary>
 [TestFixture]
 public class BackOfficeClaimsPrincipalFactoryTests
 {
+    /// <summary>
+    /// Initializes the test user and mocks required for each test in this class.
+    /// This method is called before each test is run to ensure a consistent test environment.
+    /// </summary>
     [SetUp]
     public void Setup()
     {
@@ -52,6 +59,9 @@ public class BackOfficeClaimsPrincipalFactoryTests
     private static Mock<UserManager<BackOfficeIdentityUser>> GetMockedUserManager()
         => new(new Mock<IUserStore<BackOfficeIdentityUser>>().Object, null, null, null, null, null, null, null, null);
 
+    /// <summary>
+    /// Tests that the constructor throws an <see cref="ArgumentNullException"/> when the user manager is null.
+    /// </summary>
     [Test]
     public void Ctor_When_UserManager_Is_Null_Expect_ArgumentNullException()
         => Assert.Throws<ArgumentNullException>(() => new BackOfficeClaimsPrincipalFactory(
@@ -59,11 +69,17 @@ public class BackOfficeClaimsPrincipalFactoryTests
             new OptionsWrapper<BackOfficeIdentityOptions>(new BackOfficeIdentityOptions()),
             new OptionsWrapper<BackOfficeAuthenticationTypeSettings>(new BackOfficeAuthenticationTypeSettings())));
 
+    /// <summary>
+    /// Tests that the constructor throws an <see cref="ArgumentNullException"/> when options are null.
+    /// </summary>
     [Test]
     public void Ctor_When_Options_Are_Null_Expect_ArgumentNullException()
         => Assert.Throws<ArgumentNullException>(() =>
             new BackOfficeClaimsPrincipalFactory(GetMockedUserManager().Object, null, new OptionsWrapper<BackOfficeAuthenticationTypeSettings>(new BackOfficeAuthenticationTypeSettings())));
 
+    /// <summary>
+    /// Tests that the constructor of <see cref="BackOfficeClaimsPrincipalFactory"/> throws an <see cref="ArgumentException"/> when the options value is null.
+    /// </summary>
     [Test]
     public void Ctor_When_Options_Value_Is_Null_Expect_ArgumentException()
         => Assert.Throws<ArgumentException>(() => new BackOfficeClaimsPrincipalFactory(
@@ -71,6 +87,9 @@ public class BackOfficeClaimsPrincipalFactoryTests
             new OptionsWrapper<BackOfficeIdentityOptions>(null),
             new OptionsWrapper<BackOfficeAuthenticationTypeSettings>(new BackOfficeAuthenticationTypeSettings())));
 
+    /// <summary>
+    /// Tests that CreateAsync throws an ArgumentNullException when the user parameter is null.
+    /// </summary>
     [Test]
     public void CreateAsync_When_User_Is_Null_Expect_ArgumentNullException()
     {
@@ -79,6 +98,10 @@ public class BackOfficeClaimsPrincipalFactoryTests
         Assert.ThrowsAsync<ArgumentNullException>(async () => await sut.CreateAsync(null));
     }
 
+    /// <summary>
+    /// Tests that CreateAsync creates a ClaimsPrincipal with a ClaimsIdentity.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task CreateAsync_Should_Create_Principal_With_Claims_Identity()
     {
@@ -90,6 +113,12 @@ public class BackOfficeClaimsPrincipalFactoryTests
         Assert.IsNotNull(umbracoBackOfficeIdentity);
     }
 
+    /// <summary>
+    /// Verifies that the <c>CreateAsync</c> method adds a claim with the specified type and value to the generated <see cref="ClaimsPrincipal"/>.
+    /// </summary>
+    /// <param name="expectedClaimType">The claim type expected to be present in the resulting principal.</param>
+    /// <param name="expectedClaimValue">The claim value expected to be present in the resulting principal.</param>
+    /// <returns>A <see cref="Task"/> representing the asynchronous test operation.</returns>
     [TestCase(ClaimTypes.NameIdentifier, TestUserId)]
     [TestCase(ClaimTypes.Name, TestUserName)]
     public async Task CreateAsync_Should_Include_Claim(string expectedClaimType, object expectedClaimValue)
@@ -102,6 +131,10 @@ public class BackOfficeClaimsPrincipalFactoryTests
         Assert.True(claimsPrincipal.GetUmbracoIdentity().HasClaim(expectedClaimType, expectedClaimValue.ToString()));
     }
 
+    /// <summary>
+    /// Tests that when the user manager supports security stamps, the created claims principal contains the security stamp claim.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task CreateAsync_When_SecurityStamp_Supported_Expect_SecurityStamp_Claim()
     {
@@ -119,6 +152,10 @@ public class BackOfficeClaimsPrincipalFactoryTests
         Assert.True(claimsPrincipal.GetUmbracoIdentity().HasClaim(expectedClaimType, expectedClaimValue));
     }
 
+    /// <summary>
+    /// Tests that when roles are supported, the created ClaimsPrincipal contains role claims in the Umbraco identity.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task CreateAsync_When_Roles_Supported_Expect_Role_Claims_In_UmbracoIdentity()
     {
@@ -136,6 +173,10 @@ public class BackOfficeClaimsPrincipalFactoryTests
         Assert.True(claimsPrincipal.HasClaim(expectedClaimType, expectedClaimValue));
     }
 
+    /// <summary>
+    /// Tests that when user claims are supported, the created claims principal contains the expected user claims in the actor.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task CreateAsync_When_UserClaims_Supported_Expect_UserClaims_In_Actor()
     {

@@ -26,6 +26,10 @@ public class LazyCollectionBuilderTests
 {
     private IServiceCollection CreateRegister() => TestHelper.GetServiceCollection();
 
+    /// <summary>
+    /// Tests that the LazyCollectionBuilder correctly handles adding and resolving types,
+    /// ensuring that the collection contains the expected transient objects.
+    /// </summary>
     [Test]
     public void LazyCollectionBuilderHandlesTypes()
     {
@@ -52,6 +56,11 @@ public class LazyCollectionBuilderTests
         Assert.IsFalse(values.Contains(o1)); // transient
     }
 
+    /// <summary>
+    /// Tests that the LazyCollectionBuilder correctly handles multiple producers,
+    /// ensuring that the resulting collection contains the expected unique transient objects,
+    /// and that each resolved collection instance is distinct.
+    /// </summary>
     [Test]
     public void LazyCollectionBuilderHandlesProducers()
     {
@@ -77,6 +86,11 @@ public class LazyCollectionBuilderTests
         Assert.IsFalse(values.Contains(o1)); // transient
     }
 
+    /// <summary>
+    /// Verifies that <see cref="LazyCollectionBuilderBase{TBuilder, TCollection, TItem}"/> correctly handles adding both types and producer functions,
+    /// and that the resulting collection contains the expected transient objects.
+    /// Also ensures that each retrieval yields a new collection instance (transient behavior).
+    /// </summary>
     [Test]
     public void LazyCollectionBuilderHandlesTypesAndProducers()
     {
@@ -103,6 +117,10 @@ public class LazyCollectionBuilderTests
         Assert.IsFalse(values.Contains(o1)); // transient
     }
 
+    /// <summary>
+    /// Tests that the LazyCollectionBuilder throws an InvalidOperationException when illegal types
+    /// (types that do not implement the required interface) are added to the collection.
+    /// </summary>
     [Test]
     public void LazyCollectionBuilderThrowsOnIllegalTypes()
     {
@@ -125,6 +143,9 @@ public class LazyCollectionBuilderTests
         });
     }
 
+    /// <summary>
+    /// Tests that the LazyCollectionBuilder can exclude specified types from the collection.
+    /// </summary>
     [Test]
     public void LazyCollectionBuilderCanExcludeTypes()
     {
@@ -184,6 +205,10 @@ public class LazyCollectionBuilderTests
     // ReSharper disable once ClassNeverInstantiated.Local
     private class TestCollection : BuilderCollectionBase<ITestInterface>
     {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="TestCollection"/> class.
+    /// </summary>
+    /// <param name="items">A function that returns the collection of <see cref="ITestInterface"/> items.</param>
         public TestCollection(Func<IEnumerable<ITestInterface>> items)
             : base(items)
         {

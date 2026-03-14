@@ -8,9 +8,15 @@ using Umbraco.Cms.Core.Configuration.Models.Validation;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Configuration.Models.Validation;
 
+/// <summary>
+/// Contains unit tests for the <see cref="HealthChecksSettingsValidator"/> class, verifying its validation logic and behavior.
+/// </summary>
 [TestFixture]
 public class HealthChecksSettingsValidatorTests
 {
+    /// <summary>
+    /// Tests that the HealthChecksSettingsValidator returns success for a valid configuration.
+    /// </summary>
     [Test]
     public void Returns_Success_ForValid_Configuration()
     {
@@ -20,6 +26,9 @@ public class HealthChecksSettingsValidatorTests
         Assert.True(result.Succeeded);
     }
 
+    /// <summary>
+    /// Tests that the validator returns a failure result when the configuration contains an invalid notification FirstRunTime.
+    /// </summary>
     [Test]
     public void Returns_Fail_For_Configuration_With_Invalid_Notification_FirstRunTime()
     {

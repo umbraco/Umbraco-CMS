@@ -8,9 +8,15 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core;
 
+/// <summary>
+/// Contains unit tests for the methods in the <see cref="XmlExtensions"/> class.
+/// </summary>
 [TestFixture]
 public class XmlExtensionsTests
 {
+    /// <summary>
+    /// Tests the conversion of an XCData element to an XmlNode.
+    /// </summary>
     [Test]
     public void XCDataToXmlNode()
     {
@@ -22,6 +28,9 @@ public class XmlExtensionsTests
         Assert.AreEqual("hello world", xmlNode.InnerText);
     }
 
+    /// <summary>
+    /// Tests that an XText element is correctly converted to an XmlNode with the expected inner text.
+    /// </summary>
     [Test]
     public void XTextToXmlNode()
     {
@@ -33,6 +42,9 @@ public class XmlExtensionsTests
         Assert.AreEqual("hello world", xmlNode.InnerText);
     }
 
+    /// <summary>
+    /// Tests that the ToXmlNode extension method does not modify the original XmlDocument.
+    /// </summary>
     [Test]
     public void ToXmlNodeIsNonDestructive()
     {

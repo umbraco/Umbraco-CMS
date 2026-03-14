@@ -6,9 +6,15 @@ using Umbraco.Cms.Core.Events;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Scoping;
 
+/// <summary>
+/// Contains unit tests for the <see cref="EventNameExtractor"/> class.
+/// </summary>
 [TestFixture]
 public class EventNameExtractorTests
 {
+    /// <summary>
+    /// Tests that the EventNameExtractor correctly finds an event with the 'Ing' suffix.
+    /// </summary>
     [Test]
     public void Find_Event_Ing()
     {
@@ -17,6 +23,9 @@ public class EventNameExtractorTests
         Assert.AreEqual("FoundMe", found.Result.Name);
     }
 
+    /// <summary>
+    /// Tests that the EventNameExtractor correctly finds event names that do not end with "ing".
+    /// </summary>
     [Test]
     public void Find_Event_Non_Ing()
     {
@@ -25,6 +34,9 @@ public class EventNameExtractorTests
         Assert.AreEqual("FindingMe", found.Result.Name);
     }
 
+    /// <summary>
+    /// Tests that an ambiguous event match is correctly identified and returns an error.
+    /// </summary>
     [Test]
     public void Ambiguous_Match()
     {
@@ -33,6 +45,9 @@ public class EventNameExtractorTests
         Assert.AreEqual(EventNameExtractorError.Ambiguous, found.Result.Error);
     }
 
+    /// <summary>
+    /// Tests that no matching event name is found when searching with given arguments.
+    /// </summary>
     [Test]
     public void No_Match()
     {

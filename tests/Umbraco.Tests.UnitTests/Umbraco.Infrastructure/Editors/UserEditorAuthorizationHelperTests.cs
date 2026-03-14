@@ -19,9 +19,15 @@ using Umbraco.Cms.Tests.Common.Builders.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Editors;
 
+/// <summary>
+/// Contains unit tests for the <see cref="UserEditorAuthorizationHelper"/> class, verifying authorization logic for user editing operations.
+/// </summary>
 [TestFixture]
 public class UserEditorAuthorizationHelperTests
 {
+    /// <summary>
+    /// Tests that an admin user is authorized correctly.
+    /// </summary>
     [Test]
     public void Admin_Is_Authorized()
     {
@@ -43,6 +49,9 @@ public class UserEditorAuthorizationHelperTests
         Assert.IsTrue(result.Success);
     }
 
+    /// <summary>
+    /// Tests that a non-admin user is not authorized to save an admin user.
+    /// </summary>
     [Test]
     public void Non_Admin_Cannot_Save_Admin()
     {
@@ -64,6 +73,9 @@ public class UserEditorAuthorizationHelperTests
         Assert.IsFalse(result.Success);
     }
 
+    /// <summary>
+    /// Tests that a user cannot grant group membership to another user without being a member of that group themselves.
+    /// </summary>
     [Test]
     public void Cannot_Grant_Group_Membership_Without_Being_A_Member()
     {
@@ -85,6 +97,9 @@ public class UserEditorAuthorizationHelperTests
         Assert.IsFalse(result.Success);
     }
 
+    /// <summary>
+    /// Tests that a user can grant group membership when they are already a member.
+    /// </summary>
     [Test]
     public void Can_Grant_Group_Membership_With_Being_A_Member()
     {
@@ -106,6 +121,14 @@ public class UserEditorAuthorizationHelperTests
         Assert.IsTrue(result.Success);
     }
 
+    /// <summary>
+    /// Unit test to verify that a user can only add user groups to another user if they are a member of those groups themselves, unless they are an admin.
+    /// </summary>
+    /// <param name="groupAlias">The alias of the group that the current (acting) user belongs to.</param>
+    /// <param name="groupToAdd">The alias of the group being added to the new user.</param>
+    /// <returns>
+    /// True if the current user is authorized to add the specified group to the new user; otherwise, false.
+    /// </returns>
     [Test]
     [TestCase(Constants.Security.AdminGroupAlias, Constants.Security.AdminGroupAlias, ExpectedResult = true)]
     [TestCase(Constants.Security.AdminGroupAlias, "SomethingElse", ExpectedResult = true)]
@@ -137,6 +160,9 @@ public class UserEditorAuthorizationHelperTests
         return result.Success;
     }
 
+    /// <summary>
+    /// Tests that a user with access can add another content start node.
+    /// </summary>
     [Test]
     public void Can_Add_Another_Content_Start_Node_On_User_With_Access()
     {
@@ -169,6 +195,9 @@ public class UserEditorAuthorizationHelperTests
         Assert.IsTrue(result.Success);
     }
 
+    /// <summary>
+    /// Tests that a user can remove a content start node even if the user does not have access to that node.
+    /// </summary>
     [Test]
     public void Can_Remove_Content_Start_Node_On_User_Without_Access()
     {
@@ -201,6 +230,9 @@ public class UserEditorAuthorizationHelperTests
         Assert.IsTrue(result.Success);
     }
 
+    /// <summary>
+    /// Tests that a user cannot add a content start node if they do not have access to it.
+    /// </summary>
     [Test]
     public void Cannot_Add_Content_Start_Node_On_User_Without_Access()
     {
@@ -233,6 +265,9 @@ public class UserEditorAuthorizationHelperTests
         Assert.IsFalse(result.Success);
     }
 
+    /// <summary>
+    /// Tests that a user can add a content start node when they have access to it.
+    /// </summary>
     [Test]
     public void Can_Add_Content_Start_Node_On_User_With_Access()
     {
@@ -265,6 +300,9 @@ public class UserEditorAuthorizationHelperTests
         Assert.IsTrue(result.Success);
     }
 
+    /// <summary>
+    /// Tests that a user cannot add a media start node if they do not have access to it.
+    /// </summary>
     [Test]
     public void Cannot_Add_Media_Start_Node_On_User_Without_Access()
     {
@@ -297,6 +335,9 @@ public class UserEditorAuthorizationHelperTests
         Assert.IsFalse(result.Success);
     }
 
+    /// <summary>
+    /// Tests that a user with access to a media start node can add media under that node.
+    /// </summary>
     [Test]
     public void Can_Add_Media_Start_Node_On_User_With_Access()
     {
@@ -329,6 +370,9 @@ public class UserEditorAuthorizationHelperTests
         Assert.IsTrue(result.Success);
     }
 
+    /// <summary>
+    /// Tests that a user can add another media start node when they have access.
+    /// </summary>
     [Test]
     public void Can_Add_Another_Media_Start_Node_On_User_With_Access()
     {
@@ -361,6 +405,9 @@ public class UserEditorAuthorizationHelperTests
         Assert.IsTrue(result.Success);
     }
 
+    /// <summary>
+    /// Tests that a user can remove a media start node even if the current user does not have access to it.
+    /// </summary>
     [Test]
     public void Can_Remove_Media_Start_Node_On_User_Without_Access()
     {

@@ -13,12 +13,18 @@ using Umbraco.Cms.Core.Strings;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 
+/// <summary>
+/// Contains unit tests for <see cref="global::Umbraco.Core.PropertyEditors.DecimalPropertyValueEditor"/>.
+/// </summary>
 [TestFixture]
 public class DecimalPropertyValueEditorTests
 {
     // annoyingly we can't use decimals etc. in attributes, so we can't turn these into test cases :(
     private Dictionary<object?,object?> _valuesAndExpectedResults = new();
 
+    /// <summary>
+    /// Sets up the test environment by initializing the dictionary of values and their expected decimal results.
+    /// </summary>
     [SetUp]
     public void SetUp() => _valuesAndExpectedResults = new Dictionary<object?, object?>
     {
@@ -41,6 +47,9 @@ public class DecimalPropertyValueEditorTests
         { new GuidUdi(Constants.UdiEntityType.Document, Guid.NewGuid()), null }
     };
 
+    /// <summary>
+    /// Tests that decimal values can be correctly parsed from the editor input.
+    /// </summary>
     [Test]
     public void Can_Parse_Values_From_Editor()
     {
@@ -51,6 +60,14 @@ public class DecimalPropertyValueEditorTests
         }
     }
 
+    /// <summary>
+    /// Verifies that decimal values entered in the editor are parsed correctly when using a culture (such as Italian) that does not use the en-US decimal separator.
+    /// </summary>
+    /// <param name="value">The input value from the editor, using various decimal and thousands separators.</param>
+    /// <param name="expected">The expected decimal result after parsing, or <c>null</c> if parsing should fail.</param>
+    /// <remarks>
+    /// The test uses the "it-IT" culture to ensure parsing respects non-en-US decimal separators, and covers cases with both valid and invalid formats.
+    /// </remarks>
     [SetCulture("it-IT")]
     [SetUICulture("it-IT")]
     [TestCase("123,45", 123.45)]
@@ -63,6 +80,9 @@ public class DecimalPropertyValueEditorTests
         Assert.AreEqual(expected, fromEditor);
     }
 
+    /// <summary>
+    /// Tests that various values can be correctly parsed to the editor format.
+    /// </summary>
     [Test]
     public void Can_Parse_Values_To_Editor()
     {
@@ -73,6 +93,9 @@ public class DecimalPropertyValueEditorTests
         }
     }
 
+    /// <summary>
+    /// Tests that passing null from the editor returns null.
+    /// </summary>
     [Test]
     public void Null_From_Editor_Yields_Null()
     {
@@ -80,6 +103,9 @@ public class DecimalPropertyValueEditorTests
         Assert.IsNull(result);
     }
 
+    /// <summary>
+    /// Tests that converting a null value to the editor returns null.
+    /// </summary>
     [Test]
     public void Null_To_Editor_Yields_Null()
     {
@@ -106,6 +132,12 @@ public class DecimalPropertyValueEditorTests
         }
     }
 
+    /// <summary>
+    /// Tests that the decimal property value editor correctly validates whether a given value
+    /// is greater than or equal to the configured minimum value.
+    /// </summary>
+    /// <param name="value">The value to validate.</param>
+    /// <param name="expectedSuccess">True if the value is expected to pass validation; otherwise, false.</param>
     [TestCase(0.9, false)]
     [TestCase(1.1, true)]
     [TestCase(1.3, true)]
@@ -126,6 +158,11 @@ public class DecimalPropertyValueEditorTests
         }
     }
 
+    /// <summary>
+    /// Tests that the value editor correctly validates whether a provided value is less than or equal to the configured maximum value.
+    /// </summary>
+    /// <param name="value">The value to validate against the maximum constraint.</param>
+    /// <param name="expectedSuccess">True if the value is expected to pass validation; otherwise, false.</param>
     [TestCase(1.7, true)]
     [TestCase(1.9, true)]
     [TestCase(2.1, false)]
@@ -146,6 +183,12 @@ public class DecimalPropertyValueEditorTests
         }
     }
 
+    /// <summary>
+    /// Tests that the value is validated as less than or equal to the configured maximum value
+    /// when the value editor is set up with whole number constraints.
+    /// </summary>
+    /// <param name="value">The value to validate against the maximum constraint.</param>
+    /// <param name="expectedSuccess">True if the value is expected to pass validation; otherwise, false.</param>
     [TestCase(1.8, true)]
     [TestCase(2.2, false)]
     public void Validates_Is_Less_Than_Or_Equal_To_Configured_Max_With_Configured_Whole_Numbers(object value, bool expectedSuccess)
@@ -165,6 +208,11 @@ public class DecimalPropertyValueEditorTests
         }
     }
 
+    /// <summary>
+    /// Tests that the value is validated as less than or equal to the configured maximum when using a culture (it-IT) with a comma decimal separator.
+    /// </summary>
+    /// <param name="value">The value to validate, using a comma as the decimal separator in the current culture.</param>
+    /// <param name="expectedSuccess">True if the value is expected to pass validation; otherwise, false.</param>
     [TestCase(1.8, true)]
     [TestCase(2.2, false)]
     [SetCulture("it-IT")] // Uses "," as the decimal separator.
@@ -185,6 +233,12 @@ public class DecimalPropertyValueEditorTests
         }
     }
 
+    /// <summary>
+    /// Validates that the value matches the configured step increment.
+    /// </summary>
+    /// <param name="step">The step increment to validate against.</param>
+    /// <param name="value">The value to validate.</param>
+    /// <param name="expectedSuccess">Indicates whether the validation is expected to succeed.</param>
     [TestCase(0.2, 1.4, false)]
     [TestCase(0.2, 1.5, true)]
     [TestCase(0.0, 1.4, true)] // A step of zero would trigger a divide by zero error in evaluating. So we always pass validation for zero, as effectively any step value is valid.

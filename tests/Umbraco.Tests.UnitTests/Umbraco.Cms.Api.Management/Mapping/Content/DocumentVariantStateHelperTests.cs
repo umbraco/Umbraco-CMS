@@ -1,4 +1,4 @@
-﻿using Moq;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Mapping.Content;
 using Umbraco.Cms.Api.Management.ViewModels.Content;
@@ -8,9 +8,19 @@ using Umbraco.Cms.Core.Models.Entities;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Management.Mapping.Content;
 
+/// <summary>
+/// Contains unit tests for the <see cref="DocumentVariantStateHelper"/> class, verifying its behavior and functionality.
+/// </summary>
 [TestFixture]
 public class DocumentVariantStateHelperTests
 {
+    /// <summary>
+    /// Tests the state of culture-invariant content based on edited, published, and trashed flags.
+    /// </summary>
+    /// <param name="edited">Indicates whether the content has been edited.</param>
+    /// <param name="published">Indicates whether the content is published.</param>
+    /// <param name="trashed">Indicates whether the content is trashed.</param>
+    /// <param name="expectedResult">The expected DocumentVariantState result.</param>
     [TestCase(false, false, false, DocumentVariantState.Draft)]
     [TestCase(false, true, false, DocumentVariantState.Published)]
     [TestCase(true, false, false, DocumentVariantState.Draft)]
@@ -32,6 +42,13 @@ public class DocumentVariantStateHelperTests
         Assert.AreEqual(DocumentVariantState.NotCreated, DocumentVariantStateHelper.GetState(content, culture: null));
     }
 
+    /// <summary>
+    /// Tests the state of a culture variant content based on its edited, published, and trashed flags.
+    /// </summary>
+    /// <param name="edited">Indicates whether the content is edited.</param>
+    /// <param name="published">Indicates whether the content is published.</param>
+    /// <param name="trashed">Indicates whether the content is trashed.</param>
+    /// <param name="expectedResult">The expected <see cref="DocumentVariantState"/> result.</param>
     [TestCase(false, false, false, DocumentVariantState.Draft)]
     [TestCase(false, true, false, DocumentVariantState.Published)]
     [TestCase(true, false, false, DocumentVariantState.Draft)]
@@ -50,6 +67,11 @@ public class DocumentVariantStateHelperTests
         Assert.AreEqual(expectedResult, DocumentVariantStateHelper.GetState(content, culture));
     }
 
+    /// <summary>
+    /// Verifies that the <see cref="DocumentVariantStateHelper.GetState"/> method returns <see cref="DocumentVariantState.NotCreated"/> when requesting the state for a culture that is not present on a culture-variant content item.
+    /// </summary>
+    /// <param name="edited">If set to <c>true</c>, the culture is marked as edited; otherwise, it is not.</param>
+    /// <param name="published">If set to <c>true</c>, the culture is marked as published; otherwise, it is not.</param>
     [TestCase(false, false)]
     [TestCase(false, true)]
     [TestCase(true, false)]
@@ -66,6 +88,14 @@ public class DocumentVariantStateHelperTests
         Assert.AreEqual(DocumentVariantState.NotCreated, DocumentVariantStateHelper.GetState(content, "dk"));
     }
 
+    /// <summary>
+    /// Verifies that the <see cref="DocumentVariantStateHelper.GetState"/> method returns the correct <see cref="DocumentVariantState"/> for a culture-invariant <see cref="IDocumentEntitySlim"/>
+    /// based on the edited, published, and trashed flags.
+    /// </summary>
+    /// <param name="edited">True if the document has been edited; otherwise, false.</param>
+    /// <param name="published">True if the document is published; otherwise, false.</param>
+    /// <param name="trashed">True if the document is trashed; otherwise, false.</param>
+    /// <param name="expectedResult">The expected <see cref="DocumentVariantState"/> result for the given flags.</param>
     [TestCase(false, false, false, DocumentVariantState.Draft)]
     [TestCase(false, true, false, DocumentVariantState.Published)]
     [TestCase(true, false, false, DocumentVariantState.Draft)]
@@ -87,6 +117,14 @@ public class DocumentVariantStateHelperTests
         Assert.AreEqual(DocumentVariantState.NotCreated, DocumentVariantStateHelper.GetState(entity, culture: null));
     }
 
+    /// <summary>
+    /// Verifies that the <see cref="DocumentVariantStateHelper.GetState"/> method returns the correct <see cref="DocumentVariantState"/>
+    /// for a culture variant document entity slim, given specific edited, published, and trashed states for a culture.
+    /// </summary>
+    /// <param name="edited">True if the culture is marked as edited; otherwise, false.</param>
+    /// <param name="published">True if the culture is published; otherwise, false.</param>
+    /// <param name="trashed">True if the document is trashed; otherwise, false.</param>
+    /// <param name="expectedResult">The expected <see cref="DocumentVariantState"/> result for the given input.</param>
     [TestCase(false, false, false, DocumentVariantState.Draft)]
     [TestCase(false, true, false, DocumentVariantState.Published)]
     [TestCase(true, false, false, DocumentVariantState.Draft)]

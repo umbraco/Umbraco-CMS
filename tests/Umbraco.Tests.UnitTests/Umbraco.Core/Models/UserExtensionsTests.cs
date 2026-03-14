@@ -14,14 +14,28 @@ using Umbraco.Cms.Tests.Common.Builders;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models;
 
+/// <summary>
+/// Contains unit tests for the extension methods of the <c>User</c> class in the <c>UserExtensions</c> class.
+/// </summary>
 [TestFixture]
 public class UserExtensionsTests
 {
+    /// <summary>
+    /// Sets up the test environment before each test.
+    /// </summary>
     [SetUp]
     public void SetUp() => _userBuilder = new UserBuilder();
 
     private UserBuilder _userBuilder;
 
+    /// <summary>
+    /// Unit test for verifying whether a user has access to a content item based on path-based permissions.
+    /// This test checks if the user's start node path allows access to the specified content path.
+    /// </summary>
+    /// <param name="startNodeId">The ID of the user's start content node, which determines the root of their accessible content tree.</param>
+    /// <param name="startNodePath">The full path of the user's start content node, represented as a comma-separated list of ancestor IDs.</param>
+    /// <param name="contentPath">The full path of the content item being checked for access, represented as a comma-separated list of ancestor IDs.</param>
+    /// <param name="outcome">True if the user is expected to have access to the content item; otherwise, false.</param>
     [TestCase(-1, "-1", "-1,1,2,3,4,5", true)] // below root start node
     [TestCase(2, "-1,1,2", "-1,1,2,3,4,5", true)] // below start node
     [TestCase(5, "-1,1,2,3,4,5", "-1,1,2,3,4,5", true)] // at start node
@@ -45,6 +59,13 @@ public class UserExtensionsTests
         Assert.AreEqual(outcome, user.HasPathAccess(content, esmock.Object, AppCaches.Disabled));
     }
 
+    /// <summary>
+    /// Unit test for the <c>CombineStartNodes</c> method, which verifies that the combination logic for group and user start node IDs produces the expected result.
+    /// This test covers various scenarios, including single and multiple start nodes, de-duplication, exclusion of certain nodes (such as the recycle bin), and edge cases.
+    /// </summary>
+    /// <param name="groupSn">A comma-separated string representing the group start node IDs.</param>
+    /// <param name="userSn">A comma-separated string representing the user start node IDs.</param>
+    /// <param name="expected">A comma-separated string representing the expected combined start node IDs after applying the combination logic.</param>
     [TestCase("", "1", "1")] // single user start, top level
     [TestCase("", "4", "4")] // single user start, deeper level
     [TestCase("", "2,3", "2,3")] // many user starts

@@ -4,9 +4,15 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Configuration.Models;
 
+/// <summary>
+/// Contains unit tests for the <see cref="RequestHandlerSettings"/> configuration model in Umbraco.
+/// </summary>
 [TestFixture]
 public class RequestHandlerSettingsTests
 {
+    /// <summary>
+    /// Tests that the character collection merges correctly when default is enabled.
+    /// </summary>
     [Test]
     public void Given_CharCollection_With_DefaultEnabled_MergesCollection()
     {
@@ -27,6 +33,10 @@ public class RequestHandlerSettingsTests
         Assert.That(actual, Is.EquivalentTo(expectedCollection));
     }
 
+    /// <summary>
+    /// Tests that when the default character replacements are disabled,
+    /// the user-defined character collection is returned correctly.
+    /// </summary>
     [Test]
     public void Given_CharCollection_With_DefaultDisabled_ReturnsUserCollection()
     {
@@ -45,6 +55,10 @@ public class RequestHandlerSettingsTests
         Assert.That(actual, Is.EquivalentTo(settings.UserDefinedCharCollection));
     }
 
+    /// <summary>
+    /// Tests that when the UserDefinedCharCollection overrides the default values,
+    /// the GetCharReplacements method returns the correct replacements including the overrides.
+    /// </summary>
     [Test]
     public void Given_CharCollection_That_OverridesDefaultValues_ReturnsReplacements()
     {
@@ -66,6 +80,10 @@ public class RequestHandlerSettingsTests
         Assert.That(actual, Has.Exactly(0).Matches<CharItem>(x => x.Char == "." && x.Replacement == string.Empty));
     }
 
+    /// <summary>
+    /// Tests that when a character collection overrides the default values and contains new entries,
+    /// the merged result includes the replacements correctly.
+    /// </summary>
     [Test]
     public void Given_CharCollection_That_OverridesDefaultValues_And_ContainsNew_ReturnsMergedWithReplacements()
     {

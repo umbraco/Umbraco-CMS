@@ -12,9 +12,20 @@ using Umbraco.Cms.Core.Strings;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 
+/// <summary>
+/// Contains unit tests for the <see cref="ColorPickerPropertyValueEditor"/> class to verify its behavior and functionality.
+/// </summary>
 [TestFixture]
 public class ColorPickerPropertyValueEditorTests
 {
+    /// <summary>
+    /// Tests whether the specified color string is recognized as a valid, configured color by the ColorPicker property value editor.
+    /// </summary>
+    /// <param name="color">The color string to validate (e.g., "#ffffff").</param>
+    /// <param name="expectedSuccess">True if the color is expected to be valid and configured; otherwise, false.</param>
+    /// <remarks>
+    /// This test parses the color value into a JSON node, validates it using the value editor, and asserts that the validation result matches the expected outcome.
+    /// </remarks>
     [TestCase("#ffffff", true)]
     [TestCase("#f0f0f0", false)]
     public void Validates_Is_Configured_Color(string color, bool expectedSuccess)

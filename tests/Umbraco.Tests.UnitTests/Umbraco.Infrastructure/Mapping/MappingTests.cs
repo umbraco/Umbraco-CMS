@@ -18,9 +18,17 @@ using PropertyCollection = Umbraco.Cms.Core.Models.PropertyCollection;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Mapping;
 
+    /// <summary>
+    /// Contains unit tests for verifying the mapping configurations and behaviors in the Umbraco infrastructure.
+    /// </summary>
 [TestFixture]
 public class MappingTests
 {
+    /// <summary>
+    /// Initializes a mock implementation of <see cref="IScopeProvider"/> for use in unit tests,
+    /// configuring it to return a mock <see cref="IScope"/> when a scope is created. This setup
+    /// is used to isolate tests from actual database or scope logic.
+    /// </summary>
     [SetUp]
     public void MockScopeProvider()
     {
@@ -40,6 +48,9 @@ public class MappingTests
 
     private IScopeProvider _scopeProvider;
 
+    /// <summary>
+    /// Tests simple mapping functionality of the UmbracoMapper.
+    /// </summary>
     [Test]
     public void SimpleMap()
     {
@@ -62,6 +73,10 @@ public class MappingTests
         Assert.AreEqual("value", thing2.Value);
     }
 
+    /// <summary>
+    /// Tests that enumerable collections of one type can be mapped to enumerable collections of another type
+    /// using the UmbracoMapper, and verifies that the mapped values are correct.
+    /// </summary>
     [Test]
     public void EnumerableMap()
     {
@@ -93,6 +108,9 @@ public class MappingTests
         Assert.AreEqual("valueB", thing2[1].Value);
     }
 
+    /// <summary>
+    /// Verifies that <see cref="UmbracoMapper"/> correctly maps properties from an inherited source type (<see cref="Thing3"/>) to a base destination type (<see cref="Thing2"/>), ensuring inherited members are handled as expected.
+    /// </summary>
     [Test]
     public void InheritedMap()
     {
@@ -115,6 +133,10 @@ public class MappingTests
         Assert.AreEqual("value", thing2.Value);
     }
 
+    /// <summary>
+    /// Tests the thread safety of the UmbracoMapper by performing concurrent mapping operations.
+    /// This test ensures that the mapper can handle concurrent access and map definitions correctly without throwing exceptions.
+    /// </summary>
     [Test]
     [Explicit]
     public void ConcurrentMap()
@@ -176,6 +198,10 @@ public class MappingTests
         }
     }
 
+    /// <summary>
+    /// Tests that enum values are correctly mapped from a <see cref="Thing5"/> instance to a <see cref="Thing6"/> instance
+    /// using <see cref="UmbracoMapper"/>. Verifies that each enum property is mapped to the corresponding value.
+    /// </summary>
     [Test]
     public void EnumMap()
     {
@@ -192,6 +218,9 @@ public class MappingTests
         Assert.AreEqual(Thing6Enum.Cherry, thing6.Fruit3);
     }
 
+    /// <summary>
+    /// Tests that mapping handles null properties correctly.
+    /// </summary>
     [Test]
     public void NullPropertyMap()
     {
@@ -208,6 +237,9 @@ public class MappingTests
 
     private class Thing1
     {
+    /// <summary>
+    /// Gets or sets the value.
+    /// </summary>
         public string Value { get; set; }
     }
 
@@ -217,6 +249,9 @@ public class MappingTests
 
     private class Thing2
     {
+    /// <summary>
+    /// Gets or sets the string value associated with this <see cref="Thing2"/> instance.
+    /// </summary>
         public string Value { get; set; }
     }
 
@@ -226,10 +261,19 @@ public class MappingTests
 
     private class Thing5
     {
+    /// <summary>
+    /// Gets or sets the fruit type represented by the <see cref="Thing5Enum"/> enumeration.
+    /// </summary>
         public Thing5Enum Fruit1 { get; set; }
 
+    /// <summary>
+    /// Gets or sets the value of the Fruit2 property, which is of type <see cref="Thing5Enum"/>.
+    /// </summary>
         public Thing5Enum Fruit2 { get; set; }
 
+    /// <summary>
+    /// Gets or sets the value of Fruit3 as a <see cref="Thing5Enum"/>.
+    /// </summary>
         public Thing5Enum Fruit3 { get; set; }
     }
 
@@ -242,10 +286,19 @@ public class MappingTests
 
     private class Thing6
     {
+    /// <summary>
+    /// Gets or sets the value of Fruit1 as a <see cref="Thing6Enum"/>.
+    /// </summary>
         public Thing6Enum Fruit1 { get; set; }
 
+    /// <summary>
+    /// Gets or sets the value of the Fruit2 property as a Thing6Enum.
+    /// </summary>
         public Thing6Enum Fruit2 { get; set; }
 
+    /// <summary>
+    /// Gets or sets the Fruit3 value of type Thing6Enum.
+    /// </summary>
         public Thing6Enum Fruit3 { get; set; }
     }
 
@@ -258,16 +311,26 @@ public class MappingTests
 
     private class Thing7
     {
+    /// <summary>
+    /// Gets or sets the collection of <see cref="Thing1"/> instances associated with this <see cref="Thing7"/>.
+    /// </summary>
         public IEnumerable<Thing1> Things { get; set; }
     }
 
     private class Thing8
     {
+    /// <summary>
+    /// Gets or sets the collection of Thing2 objects.
+    /// </summary>
         public IEnumerable<Thing2> Things { get; set; }
     }
 
     private class MapperDefinition1 : IMapDefinition
     {
+    /// <summary>
+    /// Defines the mapping configurations using the provided mapper.
+    /// </summary>
+    /// <param name="mapper">The mapper to define mappings on.</param>
         public void DefineMaps(IUmbracoMapper mapper) =>
             mapper.Define<Thing1, Thing2>((source, context) => new Thing2(), Map);
 
@@ -276,6 +339,11 @@ public class MappingTests
 
     private class MapperDefinition3 : IMapDefinition
     {
+    /// <summary>
+    /// Defines a set of type mappings on the provided <see cref="IUmbracoMapper"/> instance for testing purposes.
+    /// This method registers mappings from several source types (int, string, double, UmbracoMapper, Property) to <c>object</c>.
+    /// </summary>
+    /// <param name="mapper">The <see cref="IUmbracoMapper"/> instance on which to define the mappings.</param>
         public void DefineMaps(IUmbracoMapper mapper)
         {
             // just some random things so that the mapper contains things
@@ -289,6 +357,10 @@ public class MappingTests
 
     private class MapperDefinition4 : IMapDefinition
     {
+    /// <summary>
+    /// Defines the object mappings for <see cref="Thing5"/> to <see cref="Thing6"/> and <see cref="Thing5Enum"/> to <see cref="Thing6Enum"/> using the provided mapper.
+    /// </summary>
+    /// <param name="mapper">The <see cref="IUmbracoMapper"/> instance on which to define the mappings.</param>
         public void DefineMaps(IUmbracoMapper mapper)
         {
             mapper.Define<Thing5, Thing6>((source, context) => new Thing6(), Map);
@@ -306,6 +378,10 @@ public class MappingTests
 
     private class MapperDefinition5 : IMapDefinition
     {
+    /// <summary>
+    /// Defines the mapping configurations using the provided IUmbracoMapper.
+    /// </summary>
+    /// <param name="mapper">The mapper to define mappings on.</param>
         public void DefineMaps(IUmbracoMapper mapper)
         {
             mapper.Define<Thing1, Thing2>((source, context) => new Thing2(), Map1);

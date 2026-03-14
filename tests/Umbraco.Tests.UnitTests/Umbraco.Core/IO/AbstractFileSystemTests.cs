@@ -9,6 +9,9 @@ using Umbraco.Cms.Core.IO;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.IO;
 
+/// <summary>
+/// Provides unit tests for the <see cref="AbstractFileSystem"/> class, verifying its functionality and behavior.
+/// </summary>
 [TestFixture]
 public abstract class AbstractFileSystemTests
 {
@@ -16,6 +19,9 @@ public abstract class AbstractFileSystemTests
 
     protected AbstractFileSystemTests(IFileSystem fileSystem) => _fileSystem = fileSystem;
 
+    /// <summary>
+    /// Tests that files can be created and deleted successfully in the file system.
+    /// </summary>
     [Test]
     public void Can_Create_And_Delete_Files()
     {
@@ -28,6 +34,9 @@ public abstract class AbstractFileSystemTests
         Assert.IsFalse(_fileSystem.FileExists("test.txt"));
     }
 
+    /// <summary>
+    /// Tests that a file can be overwritten in the file system.
+    /// </summary>
     [Test]
     public void Can_Overwrite_File()
     {
@@ -46,6 +55,9 @@ public abstract class AbstractFileSystemTests
         _fileSystem.DeleteDirectory("test", true);
     }
 
+    /// <summary>
+    /// Tests that attempting to overwrite an existing file without permission throws an InvalidOperationException.
+    /// </summary>
     [Test]
     public void Cant_Overwrite_File() =>
         Assert.Throws<InvalidOperationException>(() =>
@@ -56,6 +68,9 @@ public abstract class AbstractFileSystemTests
             _fileSystem.DeleteFile("test.txt");
         });
 
+    /// <summary>
+    /// Tests that files can be added and retrieved correctly from the file system.
+    /// </summary>
     [Test]
     public void Can_Get_Files()
     {
@@ -75,6 +90,9 @@ public abstract class AbstractFileSystemTests
         _fileSystem.DeleteDirectory("test", true);
     }
 
+    /// <summary>
+    /// Tests that a file can be read correctly from the file system.
+    /// </summary>
     [Test]
     public void Can_Read_File()
     {
@@ -90,6 +108,9 @@ public abstract class AbstractFileSystemTests
         _fileSystem.DeleteFile("test.txt");
     }
 
+    /// <summary>
+    /// Tests that directories can be retrieved correctly from the file system.
+    /// </summary>
     [Test]
     public void Can_Get_Directories()
     {
@@ -107,6 +128,9 @@ public abstract class AbstractFileSystemTests
         _fileSystem.DeleteDirectory("test", true);
     }
 
+    /// <summary>
+    /// Tests that the file system can correctly retrieve the creation and last modified dates of a file.
+    /// </summary>
     [Test]
     public void Can_Get_File_Dates()
     {
@@ -128,6 +152,9 @@ public abstract class AbstractFileSystemTests
         _fileSystem.DeleteFile("test.txt");
     }
 
+    /// <summary>
+    /// Tests that a file URL can be retrieved correctly from the file system.
+    /// </summary>
     [Test]
     public void Can_Get_File_Url()
     {
@@ -140,6 +167,9 @@ public abstract class AbstractFileSystemTests
         _fileSystem.DeleteFile("test.txt");
     }
 
+    /// <summary>
+    /// Tests that full paths and URLs can be correctly converted to relative paths.
+    /// </summary>
     [Test]
     public void Can_Convert_Full_Path_And_Url_To_Relative_Path()
     {
@@ -157,6 +187,9 @@ public abstract class AbstractFileSystemTests
         _fileSystem.DeleteFile("test.txt");
     }
 
+    /// <summary>
+    /// Tests that the file system can correctly get the size of a file.
+    /// </summary>
     [Test]
     public void Can_Get_Size()
     {

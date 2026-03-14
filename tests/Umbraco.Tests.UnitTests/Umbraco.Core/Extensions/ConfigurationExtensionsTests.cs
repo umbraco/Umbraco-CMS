@@ -10,11 +10,17 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Extensions;
 
+/// <summary>
+/// Unit tests for the ConfigurationExtensions class.
+/// </summary>
 [TestFixture]
 public class ConfigurationExtensionsTests
 {
     private const string DataDirectory = @"C:\Data";
 
+    /// <summary>
+    /// Tests that a SQL Server connection string can be parsed correctly.
+    /// </summary>
     [Test]
     public void CanParseSqlServerConnectionString()
     {
@@ -31,6 +37,9 @@ public class ConfigurationExtensionsTests
             providerName);
     }
 
+    /// <summary>
+    /// Tests that a LocalDb connection string can be parsed correctly.
+    /// </summary>
     [Test]
     public void CanParseLocalDbConnectionString()
     {
@@ -47,6 +56,9 @@ public class ConfigurationExtensionsTests
             providerName);
     }
 
+    /// <summary>
+    /// Tests that a local DB connection string containing the |DataDirectory| placeholder is parsed correctly.
+    /// </summary>
     [Test]
     public void CanParseLocalDbConnectionStringWithDataDirectory()
     {
@@ -65,6 +77,9 @@ public class ConfigurationExtensionsTests
             providerName);
     }
 
+    /// <summary>
+    /// Tests that a SQLite connection string containing the |DataDirectory| placeholder is correctly parsed and resolved.
+    /// </summary>
     [Test]
     public void CanParseSQLiteConnectionStringWithDataDirectory()
     {
@@ -84,6 +99,9 @@ public class ConfigurationExtensionsTests
             providerName);
     }
 
+    /// <summary>
+    /// Tests that a connection string with a named provider can be parsed correctly.
+    /// </summary>
     [Test]
     public void CanParseConnectionStringWithNamedProvider()
     {

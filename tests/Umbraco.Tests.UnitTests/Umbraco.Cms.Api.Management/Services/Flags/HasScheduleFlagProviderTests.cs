@@ -15,6 +15,9 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Management.Services.Flags;
 [TestFixture]
 internal class HasScheduleFlagProviderTests
 {
+    /// <summary>
+    /// Tests that HasScheduleFlagProvider can provide document tree flags.
+    /// </summary>
     [Test]
     public void HasScheduleFlagProvider_Can_Provide_Document_Tree_Flags()
     {
@@ -24,6 +27,9 @@ internal class HasScheduleFlagProviderTests
         Assert.IsTrue(sut.CanProvideFlags<DocumentTreeItemResponseModel>());
     }
 
+    /// <summary>
+    /// Tests that HasScheduleFlagProvider can provide flags for DocumentCollectionResponseModel.
+    /// </summary>
     [Test]
     public void HasScheduleFlagProvider_Can_Provide_Document_Collection_Flags()
     {
@@ -33,6 +39,9 @@ internal class HasScheduleFlagProviderTests
         Assert.IsTrue(sut.CanProvideFlags<DocumentCollectionResponseModel>());
     }
 
+    /// <summary>
+    /// Tests that the HasScheduleFlagProvider can provide flags for DocumentItemResponseModel.
+    /// </summary>
     [Test]
     public void HasScheduleFlagProvider_Can_Provide_Document_Item_Flags()
     {
@@ -42,6 +51,11 @@ internal class HasScheduleFlagProviderTests
         Assert.IsTrue(sut.CanProvideFlags<DocumentItemResponseModel>());
     }
 
+    /// <summary>
+    /// Verifies that the <see cref="HasScheduleFlagProvider"/> correctly populates the document tree flags for scheduled content variants.
+    /// This test ensures that the appropriate flags are set based on the content's scheduling state and culture.
+    /// </summary>
+    /// <returns>A <see cref="Task"/> representing the asynchronous test operation.</returns>
     [Test]
     public async Task HasScheduleFlagProvider_Should_Populate_Document_Tree_Flags()
     {
@@ -77,6 +91,10 @@ internal class HasScheduleFlagProviderTests
         Assert.AreEqual("Umb.ScheduledForPublish", flagModel.Alias);
     }
 
+    /// <summary>
+    /// Tests that the HasScheduleFlagProvider correctly populates document collection flags based on content schedules.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task HasScheduleFlagProvider_Should_Populate_Document_Collection_Flags()
     {
@@ -112,6 +130,10 @@ internal class HasScheduleFlagProviderTests
         Assert.AreEqual("Umb.ScheduledForPublish", flagModel.Alias);
     }
 
+    /// <summary>
+    /// Verifies that <see cref="HasScheduleFlagProvider"/> correctly populates the flags on document item variants according to their publishing schedule.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task HasScheduleFlagProvider_Should_Populate_Document_Item_Flags()
     {

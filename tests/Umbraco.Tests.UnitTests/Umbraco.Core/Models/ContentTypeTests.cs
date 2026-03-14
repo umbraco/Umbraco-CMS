@@ -11,9 +11,15 @@ using Umbraco.Cms.Tests.Common.Builders.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models;
 
+/// <summary>
+/// Contains unit tests for the <see cref="ContentType"/> model in Umbraco CMS, verifying its behavior and functionality.
+/// </summary>
 [TestFixture]
 public class ContentTypeTests
 {
+    /// <summary>
+    /// Tests that adding a property type with a duplicate alias to a content type throws an InvalidOperationException.
+    /// </summary>
     [Test]
     [Ignore("Ignoring this test until we actually enforce this, see comments in ContentTypeBase.PropertyTypesChanged")]
     public void Cannot_Add_Duplicate_Property_Aliases()
@@ -29,6 +35,9 @@ public class ContentTypeTests
             contentType.PropertyTypeCollection.Add(additionalPropertyType));
     }
 
+    /// <summary>
+    /// Tests that updating a property alias to a duplicate alias throws an InvalidOperationException.
+    /// </summary>
     [Test]
     [Ignore("Ignoring this test until we actually enforce this, see comments in ContentTypeBase.PropertyTypesChanged")]
     public void Cannot_Update_Duplicate_Property_Aliases()
@@ -47,6 +56,11 @@ public class ContentTypeTests
         Assert.Throws<InvalidOperationException>(() => toUpdate.Alias = "myPropertyType");
     }
 
+    /// <summary>
+    /// Verifies that a <see cref="ContentTypeSort"/> instance can be deep cloned correctly.
+    /// The test ensures that the cloned object is a different instance from the original,
+    /// but has equal values for all relevant properties, including <c>Key</c>, <c>SortOrder</c>, and <c>Alias</c>.
+    /// </summary>
     [Test]
     public void Can_Deep_Clone_Content_Type_Sort()
     {
@@ -70,6 +84,11 @@ public class ContentTypeTests
             .Build();
     }
 
+    /// <summary>
+    /// Tests that a content type can be deep cloned with all identities reset.
+    /// Ensures the clone has the specified new alias and that none of the cloned
+    /// entities retain their original identities.
+    /// </summary>
     [Test]
     public void Can_Deep_Clone_Content_Type_With_Reset_Identities()
     {
@@ -96,6 +115,10 @@ public class ContentTypeTests
         }
     }
 
+    /// <summary>
+    /// Tests that a <see cref="ContentType"/> instance can be deep cloned correctly, ensuring that all properties and collections are duplicated and not shared between the original and the clone.
+    /// Verifies that the clone is equal to the original but is a separate instance, and that event handlers and property dirty tracking work as expected on the clone.
+    /// </summary>
     [Test]
     public void Can_Deep_Clone_Content_Type()
     {
@@ -172,6 +195,9 @@ public class ContentTypeTests
         Assert.IsTrue(asDirty.IsPropertyDirty("PropertyGroups"));
     }
 
+    /// <summary>
+    /// Tests that a content type can be serialized to JSON without throwing an error.
+    /// </summary>
     [Test]
     public void Can_Serialize_Content_Type_Without_Error()
     {
@@ -188,6 +214,9 @@ public class ContentTypeTests
         return builder.BuildSimpleContentType();
     }
 
+    /// <summary>
+    /// Tests that a MediaType content type can be deep cloned correctly.
+    /// </summary>
     [Test]
     public void Can_Deep_Clone_Media_Type()
     {
@@ -235,6 +264,9 @@ public class ContentTypeTests
         }
     }
 
+    /// <summary>
+    /// Tests that a media type content can be serialized to JSON without throwing an error.
+    /// </summary>
     [Test]
     public void Can_Serialize_Media_Type_Without_Error()
     {
@@ -251,6 +283,9 @@ public class ContentTypeTests
         return builder.BuildImageMediaType();
     }
 
+    /// <summary>
+    /// Tests that a MemberType can be deeply cloned correctly.
+    /// </summary>
     [Test]
     public void Can_Deep_Clone_Member_Type()
     {
@@ -298,6 +333,9 @@ public class ContentTypeTests
         }
     }
 
+    /// <summary>
+    /// Tests that a member type can be serialized to JSON without throwing an error.
+    /// </summary>
     [Test]
     public void Can_Serialize_Member_Type_Without_Error()
     {
@@ -308,6 +346,12 @@ public class ContentTypeTests
         Debug.Print(json);
     }
 
+    /// <summary>
+    /// Tests setting the member-specific property type options for sensitivity, view, and edit permissions.
+    /// </summary>
+    /// <param name="isSensitive">Indicates whether the property is sensitive.</param>
+    /// <param name="canView">Indicates whether the member can view the property.</param>
+    /// <param name="canEdit">Indicates whether the member can edit the property.</param>
     [Test]
     [TestCase(false, false, false)]
     [TestCase(true, false, false)]

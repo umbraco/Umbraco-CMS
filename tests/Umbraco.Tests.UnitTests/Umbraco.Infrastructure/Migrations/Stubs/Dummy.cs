@@ -11,6 +11,10 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations.Stubs;
 /// </summary>
 public class Dummy : MigrationBase
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Dummy"/> class.
+    /// </summary>
+    /// <param name="context">The migration context.</param>
     public Dummy(IMigrationContext context)
         : base(context)
     {

@@ -16,6 +16,9 @@ using Umbraco.Cms.Infrastructure.Serialization;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 
+/// <summary>
+/// Unit tests for validating the MultiNodeTreePicker property editor.
+/// </summary>
 [TestFixture]
 public class MultiNodeTreePickerValidationTests
 {
@@ -49,6 +52,12 @@ public class MultiNodeTreePickerValidationTests
         }
     }
 
+    /// <summary>
+    /// Tests that the MultiNodePicker value editor correctly validates the maximum number of entries allowed.
+    /// </summary>
+    /// <param name="max">The maximum number of entries allowed.</param>
+    /// <param name="shouldSucceed">Indicates whether the validation is expected to succeed.</param>
+    /// <param name="value">The JSON string representing the selected nodes.</param>
     [TestCase(0, true, "[]")]
     [TestCase(1, true, "[{\"type\":\"document\",\"unique\":\"86eb02a7-793f-4406-9152-9736b6b64bee\"}]")]
     [TestCase(0, true, "[{\"type\":\"document\",\"unique\":\"86eb02a7-793f-4406-9152-9736b6b64bee\"}]")]
@@ -74,6 +83,12 @@ public class MultiNodeTreePickerValidationTests
 
     private class ObjectTypeTestSetup
     {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ObjectTypeTestSetup"/> class.
+    /// </summary>
+    /// <param name="expectedObjectType">The expected object type.</param>
+    /// <param name="shouldSucceed">Indicates whether the test should succeed.</param>
+    /// <param name="value">The value to test.</param>
         public ObjectTypeTestSetup(string expectedObjectType, bool shouldSucceed, string value)
         {
             ExpectedObjectType = expectedObjectType;
@@ -81,8 +96,14 @@ public class MultiNodeTreePickerValidationTests
             Value = value;
         }
 
+    /// <summary>
+    /// Gets the expected object type for the test setup.
+    /// </summary>
         public string ExpectedObjectType { get; }
 
+    /// <summary>
+    /// Gets a value indicating whether the test setup is expected to succeed.
+    /// </summary>
         public bool ShouldSucceed { get; }
 
         public string Value { get; }
@@ -113,6 +134,9 @@ public class MultiNodeTreePickerValidationTests
         new(MultiNodeTreePickerPropertyEditor.MultiNodeTreePickerPropertyValueEditor.MemberObjectType, false, $"[{{\"type\":\"document\",\"unique\":\"{_entityTypeMap[Constants.ObjectTypes.Media]}\"}}]"),
     ];
 
+    /// <summary>
+    /// Tests that the MultiNodePicker value editor correctly validates values against the expected object type.
+    /// </summary>
     [Test]
     public void Validates_Object_Type()
     {
@@ -129,6 +153,13 @@ public class MultiNodeTreePickerValidationTests
         }
     }
 
+    /// <summary>
+    /// Verifies that the MultiNodeTreePicker correctly validates whether a selected entity is of an allowed type.
+    /// </summary>
+    /// <param name="shouldSucceed">True if the validation is expected to pass; otherwise, false.</param>
+    /// <param name="hasAllowedType">True if the mocked content entity has the allowed type key; otherwise, false.</param>
+    /// <param name="findsContent">True if the content entity is found by the service; otherwise, false.</param>
+    /// <param name="objectType">The object type being validated (e.g., document, media, member), or null to default to document.</param>
     [TestCase(true, true, true, MultiNodeTreePickerPropertyEditor.MultiNodeTreePickerPropertyValueEditor.DocumentObjectType)]
     [TestCase(true, true, true, MultiNodeTreePickerPropertyEditor.MultiNodeTreePickerPropertyValueEditor.MediaObjectType)]
     [TestCase(true, true, true, MultiNodeTreePickerPropertyEditor.MultiNodeTreePickerPropertyValueEditor.MemberObjectType)]

@@ -19,6 +19,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Routing;
 
+    /// <summary>
+    /// Contains unit tests for the <see cref="PublishedRouter"/> class, verifying routing functionality in Umbraco CMS.
+    /// </summary>
 [TestFixture]
 public class PublishedRouterTests
 {
@@ -48,6 +51,10 @@ public class PublishedRouterTests
         return umbracoContextAccessor;
     }
 
+    /// <summary>
+    /// Tests that ConfigureRequest returns false when there is no published content.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task ConfigureRequest_Returns_False_Without_HasPublishedContent()
     {
@@ -61,6 +68,10 @@ public class PublishedRouterTests
         Assert.IsFalse(result.Success());
     }
 
+    /// <summary>
+    /// Verifies that <c>ConfigureRequest</c> returns <c>false</c> when the request is configured as a redirect.
+    /// </summary>
+    /// <returns>A <see cref="Task"/> representing the asynchronous test operation.</returns>
     [Test]
     public async Task ConfigureRequest_Returns_False_When_IsRedirect()
     {

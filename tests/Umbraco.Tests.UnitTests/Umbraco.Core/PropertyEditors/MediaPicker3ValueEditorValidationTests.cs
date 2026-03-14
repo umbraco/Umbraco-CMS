@@ -18,6 +18,11 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 [TestFixture]
 internal class MediaPicker3ValueEditorValidationTests
 {
+    /// <summary>
+    /// Validates that the MediaPicker3 value editor correctly checks whether the start node's immediate parent is valid.
+    /// </summary>
+    /// <param name="shouldSucceed">True if the validation is expected to succeed; otherwise, false.</param>
+    /// <param name="hasValidParentKey">True if the parent key provided is valid; otherwise, false.</param>
     [TestCase(true, true)]
     [TestCase(false, false)]
     public void Validates_Start_Node_Immediate_Parent(bool shouldSucceed, bool hasValidParentKey)
@@ -46,6 +51,9 @@ internal class MediaPicker3ValueEditorValidationTests
         ValidateResult(shouldSucceed, result);
     }
 
+    /// <summary>
+    /// Tests that validation fails when the start node's parent is not found.
+    /// </summary>
     [Test]
     public void Validates_Start_Node_Parent_Not_Found()
     {
@@ -65,6 +73,12 @@ internal class MediaPicker3ValueEditorValidationTests
         ValidateResult(false, result);
     }
 
+    /// <summary>
+    /// Verifies that the MediaPicker3 value editor correctly validates whether a selected media item's ancestor matches the configured start node.
+    /// </summary>
+    /// <param name="shouldSucceed">True if the validation is expected to pass; otherwise, false.</param>
+    /// <param name="findsAncestor">True if an ancestor is found during validation; otherwise, false.</param>
+    /// <param name="hasValidAncestorKey">True if the found ancestor key matches the configured start node; otherwise, false.</param>
     [Test]
     [TestCase(true, true, true)]
     [TestCase(false, false, true)]
@@ -90,6 +104,13 @@ internal class MediaPicker3ValueEditorValidationTests
         ValidateResult(shouldSucceed, result);
     }
 
+    /// <summary>
+    /// Validates that the MediaPicker3 value editor correctly enforces allowed media types based on configuration and input conditions.
+    /// </summary>
+    /// <param name="shouldSucceed">True if validation is expected to pass; otherwise, false.</param>
+    /// <param name="hasAllowedType">True if the media item has an allowed type; otherwise, false.</param>
+    /// <param name="findsMediaType">True if the media type service can find the media type; otherwise, false.</param>
+    /// <param name="valueProvidesMediaTypeAlias">True if the value explicitly provides a media type alias; otherwise, false.</param>
     [TestCase(true, true, true, false)]
     [TestCase(false, true, false, false)]
     [TestCase(false, false, true, false)]

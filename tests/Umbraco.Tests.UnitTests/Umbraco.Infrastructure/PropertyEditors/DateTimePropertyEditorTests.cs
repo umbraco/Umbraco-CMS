@@ -8,9 +8,21 @@ using Umbraco.Cms.Core.Strings;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PropertyEditors;
 
+/// <summary>
+/// Contains unit tests for the <see cref="DateTimePropertyEditor"/> class in the Umbraco CMS infrastructure.
+/// </summary>
 public class DateTimePropertyEditorTests
 {
     // Various time formats with years below the minimum, so we expect to increase the date to the minimum supported by SQL Server.
+    /// <summary>
+    /// Verifies that a <see cref="DateTime"/> value with a time-only format is persisted correctly.
+    /// If the date component is below the minimum supported by SQL Server (1753-01-01),
+    /// the date is adjusted to the minimum; otherwise, the value is persisted as-is.
+    /// Date formats that include a full date are not adjusted, even if the year is below the minimum.
+    /// </summary>
+    /// <param name="actualDateTime">The input <see cref="DateTime"/> value to test.</param>
+    /// <param name="expectedDateTime">The expected <see cref="DateTime"/> value after processing.</param>
+    /// <param name="format">The format string indicating whether the value is time-only or includes a date.</param>
     [TestCase("01/01/0001 10:00", "01/01/1753 10:00", "hh:mm")]
     [TestCase("01/01/0001 10:00", "01/01/1753 10:00", "HH:mm")]
     [TestCase("01/01/0001 10:00", "01/01/1753 10:00", "hh mm")]
