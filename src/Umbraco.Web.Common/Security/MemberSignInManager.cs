@@ -231,6 +231,13 @@ public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMe
 
         autoLinkUser = MemberIdentityUser.CreateNew(email!, email!, autoLinkOptions.DefaultMemberTypeAlias, autoLinkOptions.DefaultIsApproved, name);
 
+        // When ExternalOnly is enabled, the member is stored as a lightweight identity record
+        // in the umbracoExternalMember table, bypassing the content system entirely.
+        if (autoLinkOptions.ExternalOnly)
+        {
+            autoLinkUser.IsExternalOnly = true;
+        }
+
         foreach (var userGroup in autoLinkOptions.DefaultMemberGroups)
         {
             autoLinkUser.AddRole(userGroup);
