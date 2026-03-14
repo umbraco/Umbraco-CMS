@@ -66,6 +66,21 @@ public class MemberIdentityUser : UmbracoIdentityUser
     public string? MemberTypeAlias { get; set; }
 
     /// <summary>
+    ///     Gets or sets a value indicating whether this member exists only as an external identity
+    ///     (backed by the lightweight umbracoExternalMember table, not the content system).
+    /// </summary>
+    /// <remarks>No change tracking because this is a routing flag set at load time.</remarks>
+    public bool IsExternalOnly { get; set; }
+
+    /// <summary>
+    ///     Gets or sets arbitrary profile data as a JSON string.
+    ///     Only used for external-only members. For content-based members, profile data
+    ///     lives in content properties and this value is null.
+    /// </summary>
+    /// <remarks>No change tracking because this is managed by IExternalMemberService.</remarks>
+    public string? ProfileData { get; set; }
+
+    /// <summary>
     ///     Creates a new <see cref="MemberIdentityUser"/> instance without assigning an identity.
     /// </summary>
     /// <param name="username">The username for the new member.</param>

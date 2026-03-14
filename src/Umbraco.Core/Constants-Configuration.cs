@@ -216,6 +216,11 @@ public static partial class Constants
         public const string ConfigSecurity = ConfigPrefix + "Security";
 
         /// <summary>
+        ///     The configuration key for external member settings.
+        /// </summary>
+        public const string ConfigExternalMembers = ConfigPrefix + "ExternalMembers";
+
+        /// <summary>
         ///     The configuration key for basic authentication settings.
         /// </summary>
         public const string ConfigBasicAuth = ConfigPrefix + "BasicAuth";
