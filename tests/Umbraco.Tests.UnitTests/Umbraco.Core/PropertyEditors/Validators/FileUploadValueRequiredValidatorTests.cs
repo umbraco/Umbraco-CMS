@@ -29,7 +29,7 @@ public class FileUploadValueRequiredValidatorTests
     /// Ensures that no validation errors are returned for a valid file upload JSON value.
     /// </summary>
     [Test]
-    public void Valdiates_File_Upload_As_Provided()
+    public void Validates_File_Upload_As_Provided()
     {
         var validator = new FileUploadValueRequiredValidator();
 
