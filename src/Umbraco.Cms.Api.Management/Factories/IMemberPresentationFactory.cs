@@ -50,4 +50,13 @@ public interface IMemberPresentationFactory
     // TODO (V19): Remove the default implementation.
     Task<MemberResponseModel> CreateExternalMemberResponseModelAsync(ExternalMemberIdentity member)
         => Task.FromResult(new MemberResponseModel { Id = member.Key, Kind = MemberKind.ExternalOnly });
+
+    /// <summary>
+    /// Creates an item response model for an external-only member.
+    /// </summary>
+    /// <param name="member">The external member identity to create the item response model from.</param>
+    /// <returns>A <see cref="MemberItemResponseModel"/> representing the external member.</returns>
+    // TODO (V19): Remove the default implementation.
+    MemberItemResponseModel CreateExternalMemberItemResponseModel(ExternalMemberIdentity member)
+        => new() { Id = member.Key, Kind = MemberKind.ExternalOnly };
 }

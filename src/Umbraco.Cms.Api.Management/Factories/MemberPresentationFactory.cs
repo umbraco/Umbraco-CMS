@@ -121,6 +121,16 @@ internal sealed class MemberPresentationFactory : IMemberPresentationFactory
         };
     }
 
+    /// <inheritdoc/>
+    public MemberItemResponseModel CreateExternalMemberItemResponseModel(ExternalMemberIdentity member) =>
+        new()
+        {
+            Id = member.Key,
+            MemberType = new MemberTypeReferenceResponseModel(),
+            Variants = [new VariantItemResponseModel { Name = member.Name ?? string.Empty, Culture = null }],
+            Kind = MemberKind.ExternalOnly,
+        };
+
     private MemberItemResponseModel CreateItemResponseModel<T>(T entity)
         where T : ITreeEntity
         => new()
