@@ -47,7 +47,11 @@ public sealed class AuditNotificationsHandler :
     INotificationHandler<UserGroupWithUsersSavedNotification>,
     INotificationAsyncHandler<UserGroupWithUsersSavedNotification>,
     INotificationHandler<AssignedUserGroupPermissionsNotification>,
-    INotificationAsyncHandler<AssignedUserGroupPermissionsNotification>
+    INotificationAsyncHandler<AssignedUserGroupPermissionsNotification>,
+    INotificationAsyncHandler<ExternalMemberSavedNotification>,
+    INotificationAsyncHandler<ExternalMemberDeletedNotification>,
+    INotificationAsyncHandler<AssignedExternalMemberRolesNotification>,
+    INotificationAsyncHandler<RemovedExternalMemberRolesNotification>
 {
     private readonly IAuditEntryService _auditEntryService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
@@ -304,6 +308,68 @@ public sealed class AuditNotificationsHandler :
         => HandleAsync(notification, CancellationToken.None).GetAwaiter().GetResult();
 
     /// <inheritdoc />
+    public async Task HandleAsync(ExternalMemberSavedNotification notification, CancellationToken cancellationToken)
+    {
+        IUser? performingUser = await GetCurrentPerformingUser();
+        foreach (ExternalMemberIdentity member in notification.SavedEntities)
+        {
+            await Audit(
+                performingUser,
+                null,
+                affectedDetails: FormatExternalMemberDetails(member),
+                "umbraco/member/save",
+                "updating external member");
+        }
+    }
+
+    /// <inheritdoc />
+    public async Task HandleAsync(ExternalMemberDeletedNotification notification, CancellationToken cancellationToken)
+    {
+        IUser? performingUser = await GetCurrentPerformingUser();
+        foreach (ExternalMemberIdentity member in notification.DeletedEntities)
+        {
+            await Audit(
+                performingUser,
+                null,
+                affectedDetails: FormatExternalMemberDetails(member),
+                "umbraco/member/delete",
+                $"delete external member \"{member.Name}\"");
+        }
+    }
+
+    /// <inheritdoc />
+    public async Task HandleAsync(AssignedExternalMemberRolesNotification notification, CancellationToken cancellationToken)
+    {
+        IUser? performingUser = await GetCurrentPerformingUser();
+        var roles = string.Join(", ", notification.Roles);
+        foreach (Guid memberKey in notification.MemberKeys)
+        {
+            await Audit(
+                performingUser,
+                null,
+                affectedDetails: $"External member {memberKey}",
+                "umbraco/member/roles/assigned",
+                $"roles modified, assigned {roles}");
+        }
+    }
+
+    /// <inheritdoc />
+    public async Task HandleAsync(RemovedExternalMemberRolesNotification notification, CancellationToken cancellationToken)
+    {
+        IUser? performingUser = await GetCurrentPerformingUser();
+        var roles = string.Join(", ", notification.Roles);
+        foreach (Guid memberKey in notification.MemberKeys)
+        {
+            await Audit(
+                performingUser,
+                null,
+                affectedDetails: $"External member {memberKey}",
+                "umbraco/member/roles/removed",
+                $"roles modified, removed {roles}");
+        }
+    }
+
+    /// <inheritdoc />
     public async Task HandleAsync(UserDeletedNotification notification, CancellationToken cancellationToken)
     {
         IUser? performingUser = await GetCurrentPerformingUser();
@@ -504,4 +570,17 @@ public sealed class AuditNotificationsHandler :
     /// <param name="email">The email address to format.</param>
     /// <returns>The email wrapped in angle brackets, or <c>null</c> if the email is empty.</returns>
     private static string? FormatEmail(string? email) => !email.IsNullOrWhiteSpace() ? $"<{email}>" : null;
+
+    /// <summary>
+    ///     Formats external member details for audit logging.
+    /// </summary>
+    /// <param name="member">The external member identity to format details for.</param>
+    /// <returns>A formatted string containing external member details.</returns>
+    private static string FormatExternalMemberDetails(ExternalMemberIdentity member)
+    {
+        var name = member.Name ?? "(unknown)";
+        var details = $"External member \"{name}\"";
+        var email = FormatEmail(member.Email);
+        return email is not null ? $"{details} {email}" : details;
+    }
 }
