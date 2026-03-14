@@ -1,10 +1,12 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.TrackedReferences;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -19,18 +21,37 @@ public class ReferencedByMemberController : MemberControllerBase
 {
     private readonly ITrackedReferencesService _trackedReferencesService;
     private readonly IRelationTypePresentationFactory _relationTypePresentationFactory;
+    private readonly IMemberEditingService _memberEditingService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ReferencedByMemberController"/> class.
     /// </summary>
     /// <param name="trackedReferencesService">An implementation of <see cref="ITrackedReferencesService"/> used to manage tracked references.</param>
     /// <param name="relationTypePresentationFactory">An implementation of <see cref="IRelationTypePresentationFactory"/> used to create relation type presentations.</param>
+    /// <param name="memberEditingService">Service used for member editing operations.</param>
+    [ActivatorUtilitiesConstructor]
     public ReferencedByMemberController(
         ITrackedReferencesService trackedReferencesService,
-        IRelationTypePresentationFactory relationTypePresentationFactory)
+        IRelationTypePresentationFactory relationTypePresentationFactory,
+        IMemberEditingService memberEditingService)
     {
         _trackedReferencesService = trackedReferencesService;
         _relationTypePresentationFactory = relationTypePresentationFactory;
+        _memberEditingService = memberEditingService;
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ReferencedByMemberController"/> class.
+    /// </summary>
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
+    public ReferencedByMemberController(
+        ITrackedReferencesService trackedReferencesService,
+        IRelationTypePresentationFactory relationTypePresentationFactory)
+        : this(
+            trackedReferencesService,
+            relationTypePresentationFactory,
+            StaticServiceProvider.Instance.GetRequiredService<IMemberEditingService>())
+    {
     }
 
     /// <summary>
@@ -91,6 +112,22 @@ public class ReferencedByMemberController : MemberControllerBase
 
         if (relationItemsAttempt.Success is false)
         {
+            // The entity-based lookup fails for external-only members (no umbracoNode entry).
+            // Fall back to a key-based relation query if this is an external member.
+            if (relationItemsAttempt.Status == GetReferencesOperationStatus.ContentNotFound
+                && await _memberEditingService.IsExternalMemberAsync(id))
+            {
+#pragma warning disable CS0618 // Type or member is obsolete — using the key-based overload that doesn't require an entity
+                PagedModel<RelationItemModel> externalRelations = await _trackedReferencesService.GetPagedRelationsForItemAsync(id, skip, take, true);
+#pragma warning restore CS0618
+
+                return Ok(new PagedViewModel<IReferenceResponseModel>
+                {
+                    Total = externalRelations.Total,
+                    Items = await _relationTypePresentationFactory.CreateReferenceResponseModelsAsync(externalRelations.Items),
+                });
+            }
+
             return GetReferencesOperationStatusResult(relationItemsAttempt.Status);
         }
 
