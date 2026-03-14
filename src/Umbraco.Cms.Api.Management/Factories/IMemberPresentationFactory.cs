@@ -3,6 +3,7 @@ using Umbraco.Cms.Api.Management.ViewModels.Member.Item;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Security;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
@@ -40,4 +41,13 @@ public interface IMemberPresentationFactory
     /// <param name="entity">The member entity to create the response model from.</param>
     /// <returns>A MemberItemResponseModel representing the member entity.</returns>
     MemberItemResponseModel CreateItemResponseModel(IMember entity);
+
+    /// <summary>
+    /// Creates a response model for an external-only member.
+    /// </summary>
+    /// <param name="member">The external member identity to create the response model from.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the <see cref="MemberResponseModel"/>.</returns>
+    // TODO (V19): Remove the default implementation.
+    Task<MemberResponseModel> CreateExternalMemberResponseModelAsync(ExternalMemberIdentity member)
+        => Task.FromResult(new MemberResponseModel { Id = member.Key, Kind = MemberKind.ExternalOnly });
 }

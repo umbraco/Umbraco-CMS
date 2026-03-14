@@ -21,7 +21,7 @@ public class ByKeyMemberController : MemberControllerBase
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="ByKeyMemberController"/> class, which handles member management operations by member key.
+    /// Initializes a new instance of the <see cref="ByKeyMemberController"/> class.
     /// </summary>
     /// <param name="memberEditingService">Service used to perform editing operations on members.</param>
     /// <param name="memberPresentationFactory">Factory for creating member presentation models.</param>
@@ -53,12 +53,20 @@ public class ByKeyMemberController : MemberControllerBase
     public async Task<IActionResult> ByKey(CancellationToken cancellationToken, Guid id)
     {
         IMember? member = await _memberEditingService.GetAsync(id);
-        if (member == null)
+        if (member is not null)
         {
-            return MemberNotFound();
+            MemberResponseModel model = await _memberPresentationFactory.CreateResponseModelAsync(member, CurrentUser(_backOfficeSecurityAccessor));
+            return Ok(model);
         }
 
-        MemberResponseModel model = await _memberPresentationFactory.CreateResponseModelAsync(member, CurrentUser(_backOfficeSecurityAccessor));
-        return Ok(model);
+        // Fall back to external member store.
+        ExternalMemberIdentity? externalMember = await _memberEditingService.GetExternalMemberAsync(id);
+        if (externalMember is not null)
+        {
+            MemberResponseModel externalModel = await _memberPresentationFactory.CreateExternalMemberResponseModelAsync(externalMember);
+            return Ok(externalModel);
+        }
+
+        return MemberNotFound();
     }
 }

@@ -22,7 +22,7 @@ public class UpdateMemberController : MemberControllerBase
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="UpdateMemberController"/> class, responsible for handling member update operations in the management API.
+    /// Initializes a new instance of the <see cref="UpdateMemberController"/> class.
     /// </summary>
     /// <param name="memberEditingService">Service used to perform member editing operations.</param>
     /// <param name="memberEditingPresentationFactory">Factory for creating presentation models related to member editing.</param>
@@ -49,6 +49,13 @@ public class UpdateMemberController : MemberControllerBase
         Guid id,
         UpdateMemberRequestModel updateRequestModel)
     {
+        // External-only members cannot be updated through this endpoint.
+        // Their identity data is managed by the external provider.
+        if (await _memberEditingService.IsExternalMemberAsync(id))
+        {
+            return ExternalMemberCannotBeModified();
+        }
+
         MemberUpdateModel model = _memberEditingPresentationFactory.MapUpdateModel(updateRequestModel);
         Attempt<MemberUpdateResult, MemberEditingStatus> result = await _memberEditingService.UpdateAsync(id, model, CurrentUser(_backOfficeSecurityAccessor));
 

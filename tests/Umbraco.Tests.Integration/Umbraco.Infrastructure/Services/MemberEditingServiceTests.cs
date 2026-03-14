@@ -27,6 +27,8 @@ internal sealed class MemberEditingServiceTests : UmbracoIntegrationTest
 
     private IMemberGroupService MemberGroupService => GetRequiredService<IMemberGroupService>();
 
+    private IExternalMemberService ExternalMemberService => GetRequiredService<IExternalMemberService>();
+
     [Test]
     public async Task Can_Create_Member()
     {
@@ -366,6 +368,130 @@ internal sealed class MemberEditingServiceTests : UmbracoIntegrationTest
         // IsApproved and IsLockedOut are always sensitive properties.
         Assert.IsTrue(member.IsApproved);
         Assert.IsFalse(member.IsLockedOut);
+    }
+
+    [Test]
+    public async Task IsExternalMember_Returns_True_For_External_Member()
+    {
+        // Arrange
+        var externalMember = new ExternalMemberIdentityBuilder()
+            .WithEmail("external@test.com")
+            .WithUserName("external@test.com")
+            .Build();
+        await ExternalMemberService.CreateAsync(externalMember);
+
+        // Act
+        var result = await MemberEditingService.IsExternalMemberAsync(externalMember.Key);
+
+        // Assert
+        Assert.IsTrue(result);
+    }
+
+    [Test]
+    public async Task IsExternalMember_Returns_False_For_Content_Member()
+    {
+        // Arrange
+        var member = await CreateMemberAsync();
+
+        // Act
+        var result = await MemberEditingService.IsExternalMemberAsync(member.Key);
+
+        // Assert
+        Assert.IsFalse(result);
+    }
+
+    [Test]
+    public async Task IsExternalMember_Returns_False_For_NonExistent_Key()
+    {
+        // Act
+        var result = await MemberEditingService.IsExternalMemberAsync(Guid.NewGuid());
+
+        // Assert
+        Assert.IsFalse(result);
+    }
+
+    [Test]
+    public async Task GetExternalMember_Returns_Member_For_External_Member()
+    {
+        // Arrange
+        var externalMember = new ExternalMemberIdentityBuilder()
+            .WithEmail("get-external@test.com")
+            .WithUserName("get-external@test.com")
+            .WithName("Get External Test")
+            .Build();
+        await ExternalMemberService.CreateAsync(externalMember);
+
+        // Act
+        var result = await MemberEditingService.GetExternalMemberAsync(externalMember.Key);
+
+        // Assert
+        Assert.IsNotNull(result);
+        Assert.AreEqual(externalMember.Key, result!.Key);
+        Assert.AreEqual("get-external@test.com", result.Email);
+        Assert.AreEqual("Get External Test", result.Name);
+    }
+
+    [Test]
+    public async Task GetExternalMember_Returns_Null_For_Content_Member()
+    {
+        // Arrange
+        var member = await CreateMemberAsync();
+
+        // Act
+        var result = await MemberEditingService.GetExternalMemberAsync(member.Key);
+
+        // Assert
+        Assert.IsNull(result);
+    }
+
+    [Test]
+    public async Task GetExternalMember_Returns_Null_For_NonExistent_Key()
+    {
+        // Act
+        var result = await MemberEditingService.GetExternalMemberAsync(Guid.NewGuid());
+
+        // Assert
+        Assert.IsNull(result);
+    }
+
+    [Test]
+    public async Task Can_Delete_External_Member()
+    {
+        // Arrange
+        var externalMember = new ExternalMemberIdentityBuilder()
+            .WithEmail("delete-external@test.com")
+            .WithUserName("delete-external@test.com")
+            .Build();
+        await ExternalMemberService.CreateAsync(externalMember);
+
+        // Verify it exists.
+        Assert.IsTrue(await MemberEditingService.IsExternalMemberAsync(externalMember.Key));
+
+        // Act
+        var result = await MemberEditingService.DeleteAsync(externalMember.Key, Constants.Security.SuperUserKey);
+
+        // Assert
+        Assert.IsTrue(result.Success);
+        Assert.IsFalse(await MemberEditingService.IsExternalMemberAsync(externalMember.Key));
+    }
+
+    [Test]
+    public async Task Delete_External_Member_Does_Not_Affect_Content_Members()
+    {
+        // Arrange — create both a content member and an external member.
+        var contentMember = await CreateMemberAsync();
+        var externalMember = new ExternalMemberIdentityBuilder()
+            .WithEmail("ext-only@test.com")
+            .WithUserName("ext-only@test.com")
+            .Build();
+        await ExternalMemberService.CreateAsync(externalMember);
+
+        // Act — delete the external member.
+        await MemberEditingService.DeleteAsync(externalMember.Key, Constants.Security.SuperUserKey);
+
+        // Assert — content member still exists.
+        var retrievedContent = await MemberEditingService.GetAsync(contentMember.Key);
+        Assert.IsNotNull(retrievedContent);
     }
 
     private IUser SuperUser() => GetRequiredService<IUserService>().GetAsync(Constants.Security.SuperUserKey).GetAwaiter().GetResult();

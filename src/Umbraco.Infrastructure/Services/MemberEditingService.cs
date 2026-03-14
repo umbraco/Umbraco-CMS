@@ -263,6 +263,7 @@ internal sealed class MemberEditingService : IMemberEditingService
 
     /// <summary>
     /// Asynchronously deletes a member by its unique key.
+    /// Checks for external-only members first and routes to the external member service if found.
     /// </summary>
     /// <param name="key">The unique key (identifier) of the member to delete.</param>
     /// <param name="userKey">The unique key (identifier) of the user performing the deletion.</param>
@@ -271,6 +272,26 @@ internal sealed class MemberEditingService : IMemberEditingService
     /// </returns>
     public async Task<Attempt<IMember?, MemberEditingStatus>> DeleteAsync(Guid key, Guid userKey)
     {
+        // Check if this is an external-only member and delete via the external service.
+        ExternalMemberIdentity? externalMember = await _externalMemberService.GetByKeyAsync(key);
+        if (externalMember is not null)
+        {
+            Attempt<ExternalMemberIdentity?, ExternalMemberOperationStatus> externalResult = await _externalMemberService.DeleteAsync(key);
+            return externalResult.Success
+                ? Attempt.SucceedWithStatus(
+                    new MemberEditingStatus
+                    {
+                        MemberEditingOperationStatus = MemberEditingOperationStatus.Success,
+                    },
+                    (IMember?)null)
+                : Attempt.FailWithStatus(
+                    new MemberEditingStatus
+                    {
+                        MemberEditingOperationStatus = MemberEditingOperationStatus.MemberNotFound,
+                    },
+                    (IMember?)null);
+        }
+
         Attempt<IMember?, ContentEditingOperationStatus> contentDeleteResult = await _memberContentEditingService.DeleteAsync(key, userKey);
         return contentDeleteResult.Success
             ? Attempt.SucceedWithStatus(
@@ -289,7 +310,19 @@ internal sealed class MemberEditingService : IMemberEditingService
                 contentDeleteResult.Result);
     }
 
-        private async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateMember(MemberEditingModelBase model, Guid? memberKey, string? password, Guid memberTypeKey)
+    /// <summary>
+    /// Checks whether the specified key belongs to an external-only member.
+    /// </summary>
+    /// <param name="key">The unique key to check.</param>
+    /// <returns><c>true</c> if the key belongs to an external-only member; otherwise, <c>false</c>.</returns>
+    public async Task<bool> IsExternalMemberAsync(Guid key)
+        => await _externalMemberService.GetByKeyAsync(key) is not null;
+
+    /// <inheritdoc />
+    public async Task<ExternalMemberIdentity?> GetExternalMemberAsync(Guid key)
+        => await _externalMemberService.GetByKeyAsync(key);
+
+    private async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateMember(MemberEditingModelBase model, Guid? memberKey, string? password, Guid memberTypeKey)
     {
         var validationErrors = new List<PropertyValidationError>();
         MemberEditingOperationStatus validationStatus = await ValidateMemberDataAsync(model, memberKey, password);

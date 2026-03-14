@@ -1,11 +1,14 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.Member.Item;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Member.Item;
@@ -19,16 +22,37 @@ public class ItemMemberItemController : MemberItemControllerBase
 {
     private readonly IEntityService _entityService;
     private readonly IMemberPresentationFactory _memberPresentationFactory;
+    private readonly IMemberEditingService _memberEditingService;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="ItemMemberItemController"/> class, which manages member item operations in the API.
+    /// Initializes a new instance of the <see cref="ItemMemberItemController"/> class.
     /// </summary>
     /// <param name="entityService">Service used for entity operations and retrieval.</param>
     /// <param name="memberPresentationFactory">Factory responsible for creating member presentation models.</param>
-    public ItemMemberItemController(IEntityService entityService, IMemberPresentationFactory memberPresentationFactory)
+    /// <param name="memberEditingService">Service used for member editing operations.</param>
+    [ActivatorUtilitiesConstructor]
+    public ItemMemberItemController(
+        IEntityService entityService,
+        IMemberPresentationFactory memberPresentationFactory,
+        IMemberEditingService memberEditingService)
     {
         _entityService = entityService;
         _memberPresentationFactory = memberPresentationFactory;
+        _memberEditingService = memberEditingService;
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ItemMemberItemController"/> class.
+    /// </summary>
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
+    public ItemMemberItemController(
+        IEntityService entityService,
+        IMemberPresentationFactory memberPresentationFactory)
+        : this(
+            entityService,
+            memberPresentationFactory,
+            StaticServiceProvider.Instance.GetRequiredService<IMemberEditingService>())
+    {
     }
 
     [HttpGet]
@@ -36,20 +60,37 @@ public class ItemMemberItemController : MemberItemControllerBase
     [ProducesResponseType(typeof(IEnumerable<MemberItemResponseModel>), StatusCodes.Status200OK)]
     [EndpointSummary("Gets a collection of member items.")]
     [EndpointDescription("Gets a collection of member items identified by the provided Ids.")]
-    public Task<IActionResult> Item(
+    public async Task<IActionResult> Item(
         CancellationToken cancellationToken,
         [FromQuery(Name = "id")] HashSet<Guid> ids)
     {
         if (ids.Count is 0)
         {
-            return Task.FromResult<IActionResult>(Ok(Enumerable.Empty<MemberItemResponseModel>()));
+            return Ok(Enumerable.Empty<MemberItemResponseModel>());
         }
 
-        IEnumerable<IMemberEntitySlim> members = _entityService
+        // Resolve content members from the entity service.
+        IMemberEntitySlim[] contentMembers = _entityService
             .GetAll(UmbracoObjectTypes.Member, ids.ToArray())
-            .OfType<IMemberEntitySlim>();
+            .OfType<IMemberEntitySlim>()
+            .ToArray();
 
-        IEnumerable<MemberItemResponseModel> responseModels = members.Select(_memberPresentationFactory.CreateItemResponseModel);
-        return Task.FromResult<IActionResult>(Ok(responseModels));
+        var responseModels = new List<MemberItemResponseModel>(
+            contentMembers.Select(_memberPresentationFactory.CreateItemResponseModel));
+
+        // Find any IDs not resolved from the content store and check external members.
+        HashSet<Guid> resolvedIds = contentMembers.Select(m => m.Key).ToHashSet();
+        IEnumerable<Guid> unresolvedIds = ids.Where(id => !resolvedIds.Contains(id));
+
+        foreach (Guid unresolvedId in unresolvedIds)
+        {
+            ExternalMemberIdentity? externalMember = await _memberEditingService.GetExternalMemberAsync(unresolvedId);
+            if (externalMember is not null)
+            {
+                responseModels.Add(_memberPresentationFactory.CreateExternalMemberItemResponseModel(externalMember));
+            }
+        }
+
+        return Ok(responseModels);
     }
 }
