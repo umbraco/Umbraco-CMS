@@ -1,6 +1,7 @@
 ﻿import { expect } from '@open-wc/testing';
 import { getInitials } from './get-initials.function.js';
 
+
 describe('getInitials', () => {
 	it('should extract first and last initials from a full name', () => {
 		expect(getInitials('Andreas Lykke Borg')).to.equal('AB');
@@ -38,12 +39,28 @@ describe('getInitials', () => {
 		expect(getInitials('   ')).to.equal('');
 	});
 
-	it('should return single initial for single digit numeric converted to string', () => {
-		expect(getInitials('1')).to.equal('1');
+	it('should ignore parenthetical suffixes when generating initials', () => {
+		expect(getInitials('Henrik Christensen (HC)')).to.equal('HC');
+		expect(getInitials('John Doe (Admin)')).to.equal('JD');
 	});
 
-	it('should return single initial for multiple numbers converted to string', () => {
-		expect(getInitials('1 2 3')).to.equal('13');
+	it('should ignore role descriptions in parentheses', () => {
+		expect(getInitials('Jane Smith (CEO)')).to.equal('JS');
+	});
+
+	it('should handle names with brackets and special characters', () => {
+		expect(getInitials('John [Admin] Doe')).to.equal('JD');
+		expect(getInitials('Alice @Company')).to.equal('A');
+	});
+
+	it('should handle names with only parentheses content', () => {
+		expect(getInitials('(Test)')).to.equal('');
+	});
+
+	it('should support non-latin characters', () => {
+		expect(getInitials('Привет Ša')).to.equal('ПŠ');
+		expect(getInitials('Привет')).to.equal('П');
+		expect(getInitials('åse hylle')).to.equal('ÅH');
 	});
 });
 
