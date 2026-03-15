@@ -343,7 +343,7 @@ internal sealed class AdvancedMigrationTests : UmbracoIntegrationTest
                 ? string.Format(provider.StringLengthUnicodeColumnDefinitionFormat, 255)
                 : "nvarchar(255)";
 
-            Database.Execute($"ALTER TABLE {SqlSyntax.GetQuotedTableName("umbracoUser")} ADD Foo {sql}");
+            Database.Execute($"ALTER TABLE {SqlSyntax.GetQuotedTableName("umbracoUser")} ADD {SqlSyntax.GetQuotedColumnName("Foo")} {sql}");
         }
     }
 }
