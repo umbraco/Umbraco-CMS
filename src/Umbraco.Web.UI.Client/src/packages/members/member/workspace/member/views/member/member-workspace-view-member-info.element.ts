@@ -124,7 +124,9 @@ export class UmbMemberWorkspaceViewMemberInfoElement extends UmbLitElement imple
 					<span
 						>${this._memberKind === UmbMemberKind.API
 							? this.localize.term('member_memberKindApi')
-							: this.localize.term('member_memberKindDefault')}</span
+							: this._memberKind === UmbMemberKind.EXTERNAL_ONLY
+								? this.localize.term('member_memberKindExternalOnly')
+								: this.localize.term('member_memberKindDefault')}</span
 					>
 				</div>
 				<div>

@@ -434,6 +434,10 @@ export default {
 		memberHasPassword: 'The member already has a password set',
 		memberKindDefault: 'Member',
 		memberKindApi: 'API Member',
+		memberKindExternalOnly: 'External',
+		externalMemberTitle: 'External member',
+		externalMemberDescription:
+			'This member is managed by an external authentication provider. Identity data such as email and username is maintained by the provider, not Umbraco.',
 		memberLockoutNotEnabled: 'Lockout is not enabled for this member',
 		memberNotInGroup: "The member is not in group '%0%'",
 	},
