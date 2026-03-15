@@ -60,9 +60,14 @@
 		"Umbraco__CMS__Global__Smtp__From": "noreply@umbraco.test"
 	},
 
+	// Codespaces uses a shallow clone by default, which prevents Nerdbank.GitVersioning
+	// from calculating the version height by walking the commit history.
+	// This command unshallows the clone to ensure the full history is available.
+	"initializeCommand": "git fetch --unshallow || true",
+
 	// Use 'postCreateCommand' to run commands after the container is created.
 	// "postCreateCommand": "dotnet restore",
-	
+
 	// This is used in the prebuilds - so dotnet build (nuget restore and node stuff) is done
 	"updateContentCommand": "dotnet build umbraco.sln && dotnet dev-certs https --trust",
 	
