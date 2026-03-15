@@ -101,8 +101,14 @@ public interface IExternalMemberService
     /// </summary>
     /// <param name="memberKey">The unique key of the external member to convert.</param>
     /// <param name="memberTypeAlias">The alias of the member type to use for the content-based member.</param>
+    /// <param name="mapProfileData">
+    ///     An optional callback invoked after the content member is created but before it is saved.
+    ///     Receives the new <see cref="IMember"/> and the external member's <c>profileData</c> JSON string,
+    ///     allowing the developer to map profile data fields to content properties
+    ///     (e.g. <c>member.SetValue("department", ...)</c>).
+    /// </param>
     /// <returns>An <see cref="Attempt{TResult,TStatus}"/> with the newly created <see cref="IMember"/> on success.</returns>
-    Task<Attempt<IMember?, ExternalMemberOperationStatus>> ConvertToContentMemberAsync(Guid memberKey, string memberTypeAlias);
+    Task<Attempt<IMember?, ExternalMemberOperationStatus>> ConvertToContentMemberAsync(Guid memberKey, string memberTypeAlias, Action<IMember, string?>? mapProfileData = null);
 
     /// <summary>
     ///     Converts a content-based member to an external-only member.

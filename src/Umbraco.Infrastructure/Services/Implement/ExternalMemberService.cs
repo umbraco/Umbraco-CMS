@@ -265,12 +265,122 @@ internal sealed class ExternalMemberService : RepositoryService, IExternalMember
     }
 
     /// <inheritdoc />
-    public Task<Attempt<IMember?, ExternalMemberOperationStatus>> ConvertToContentMemberAsync(Guid memberKey, string memberTypeAlias)
-        => Task.FromResult(Attempt.FailWithStatus<IMember?, ExternalMemberOperationStatus>(ExternalMemberOperationStatus.NotImplemented, null));
+    public async Task<Attempt<IMember?, ExternalMemberOperationStatus>> ConvertToContentMemberAsync(Guid memberKey, string memberTypeAlias, Action<IMember, string?>? mapProfileData = null)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+
+        // Load the external member.
+        ExternalMemberIdentity? externalMember = await _repository.GetByKeyAsync(memberKey);
+        if (externalMember is null)
+        {
+            scope.Complete();
+            return Attempt.FailWithStatus<IMember?, ExternalMemberOperationStatus>(ExternalMemberOperationStatus.NotFound, null);
+        }
+
+        // Create the content member entity.
+        IMember contentMember = _memberService.CreateMember(
+            externalMember.UserName,
+            externalMember.Email,
+            externalMember.Name ?? externalMember.UserName,
+            memberTypeAlias);
+
+        // Preserve the Guid key so external login links continue to resolve.
+        contentMember.Key = externalMember.Key;
+        contentMember.IsApproved = externalMember.IsApproved;
+        contentMember.IsLockedOut = externalMember.IsLockedOut;
+
+        // Invalidate active sessions by setting a new security stamp.
+        contentMember.SecurityStamp = Guid.NewGuid().ToString();
+
+        // Allow the caller to map profileData fields to content properties before save.
+        mapProfileData?.Invoke(contentMember, externalMember.ProfileData);
+
+        // Save the content member (this assigns the node ID).
+        _memberService.Save(contentMember);
+
+        // Migrate group memberships: read external roles, assign to content member.
+        IEnumerable<string> roles = await _repository.GetRolesAsync(externalMember.Key);
+        var roleNames = roles.ToArray();
+        if (roleNames.Length > 0)
+        {
+            _memberService.AssignRoles([contentMember.Id], roleNames);
+        }
+
+        // Delete the external member record and its group memberships.
+        await _repository.DeleteAsync(externalMember.Key);
+
+        scope.Complete();
+
+        // Re-fetch to get the fully hydrated entity.
+        IMember? result = _memberService.GetById(contentMember.Key);
+        return Attempt.SucceedWithStatus(ExternalMemberOperationStatus.Success, result);
+    }
 
     /// <inheritdoc />
-    public Task<Attempt<ExternalMemberIdentity?, ExternalMemberOperationStatus>> ConvertToExternalMemberAsync(Guid memberKey, bool preservePropertiesAsProfileData = false)
-        => Task.FromResult(Attempt.FailWithStatus<ExternalMemberIdentity?, ExternalMemberOperationStatus>(ExternalMemberOperationStatus.NotImplemented, null));
+    public async Task<Attempt<ExternalMemberIdentity?, ExternalMemberOperationStatus>> ConvertToExternalMemberAsync(Guid memberKey, bool preservePropertiesAsProfileData = false)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+
+        // Load the content member.
+        IMember? contentMember = _memberService.GetById(memberKey);
+        if (contentMember is null)
+        {
+            scope.Complete();
+            return Attempt.FailWithStatus<ExternalMemberIdentity?, ExternalMemberOperationStatus>(ExternalMemberOperationStatus.NotFound, null);
+        }
+
+        // Build the external member identity from the content member's fields.
+        var externalMember = new ExternalMemberIdentity
+        {
+            Key = contentMember.Key,
+            Email = contentMember.Email,
+            UserName = contentMember.Username,
+            Name = contentMember.Name,
+            IsApproved = contentMember.IsApproved,
+            IsLockedOut = contentMember.IsLockedOut,
+            LastLoginDate = contentMember.LastLoginDate,
+            LastLockoutDate = contentMember.LastLockoutDate,
+            CreateDate = contentMember.CreateDate,
+            SecurityStamp = Guid.NewGuid().ToString(),
+        };
+
+        // Optionally serialize content properties into profileData.
+        if (preservePropertiesAsProfileData)
+        {
+            var propertyData = new Dictionary<string, object?>();
+            foreach (IProperty property in contentMember.Properties)
+            {
+                var value = property.GetValue();
+                if (value is not null)
+                {
+                    propertyData[property.Alias] = value;
+                }
+            }
+
+            if (propertyData.Count > 0)
+            {
+                externalMember.SetProfileData(propertyData);
+            }
+        }
+
+        // Persist the external member.
+        await _repository.CreateAsync(externalMember);
+
+        // Migrate group memberships: read content roles, assign to external member.
+        IEnumerable<string> roles = _memberService.GetAllRoles(contentMember.Username);
+        var roleNames = roles.ToArray();
+        if (roleNames.Length > 0)
+        {
+            var groupIds = ResolveGroupIds(roleNames);
+            await _repository.AssignRolesAsync(externalMember.Id, groupIds);
+        }
+
+        // Delete the content member entity.
+        _memberService.Delete(contentMember);
+
+        scope.Complete();
+        return Attempt.SucceedWithStatus<ExternalMemberIdentity?, ExternalMemberOperationStatus>(ExternalMemberOperationStatus.Success, externalMember);
+    }
 
     private async Task<ExternalMemberOperationStatus?> ValidateUsernameUniqueAsync(string username, Guid? excludeKey)
     {

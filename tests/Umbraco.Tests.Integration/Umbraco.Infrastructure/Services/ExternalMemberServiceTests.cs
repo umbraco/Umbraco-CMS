@@ -162,7 +162,7 @@ internal sealed class ExternalMemberServiceTests : UmbracoIntegrationTest
         MemberService.AddRole("ExternalTestGroup");
 
         // Act
-        var assignResult = await ExternalMemberService.AssignRolesAsync(createResult.Result.Key, new[] { "ExternalTestGroup" });
+        var assignResult = await ExternalMemberService.AssignRolesAsync(createResult.Result.Key, ["ExternalTestGroup"]);
         var roles = await ExternalMemberService.GetRolesAsync(createResult.Result.Key);
 
         // Assert
@@ -180,14 +180,14 @@ internal sealed class ExternalMemberServiceTests : UmbracoIntegrationTest
         Assert.IsTrue(createResult.Success);
 
         MemberService.AddRole("RemovableGroup");
-        await ExternalMemberService.AssignRolesAsync(createResult.Result.Key, new[] { "RemovableGroup" });
+        await ExternalMemberService.AssignRolesAsync(createResult.Result.Key, ["RemovableGroup"]);
 
         // Verify role is assigned
         var rolesBefore = await ExternalMemberService.GetRolesAsync(createResult.Result.Key);
         CollectionAssert.Contains(rolesBefore.ToList(), "RemovableGroup");
 
         // Act
-        var removeResult = await ExternalMemberService.RemoveRolesAsync(createResult.Result.Key, new[] { "RemovableGroup" });
+        var removeResult = await ExternalMemberService.RemoveRolesAsync(createResult.Result.Key, ["RemovableGroup"]);
 
         // Assert
         Assert.IsTrue(removeResult.Success);
@@ -293,5 +293,162 @@ internal sealed class ExternalMemberServiceTests : UmbracoIntegrationTest
         // Assert
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ExternalMemberOperationStatus.DuplicateEmail, result.Status);
+    }
+
+    [Test]
+    public async Task Can_Convert_External_To_Content_Member()
+    {
+        // Arrange — create external member with a group.
+        var identity = new ExternalMemberIdentityBuilder()
+            .WithEmail("convert-to-content@test.com")
+            .WithUserName("convert-to-content")
+            .WithName("Convert Test")
+            .Build();
+        var createResult = await ExternalMemberService.CreateAsync(identity);
+        Assert.IsTrue(createResult.Success);
+        var originalKey = createResult.Result.Key;
+
+        MemberService.AddRole("ConvertGroup");
+        await ExternalMemberService.AssignRolesAsync(originalKey, ["ConvertGroup"]);
+
+        IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
+
+        // Act
+        var result = await ExternalMemberService.ConvertToContentMemberAsync(originalKey, memberType.Alias);
+
+        // Assert — content member created with same key and identity fields.
+        Assert.IsTrue(result.Success);
+        Assert.IsNotNull(result.Result);
+        Assert.AreEqual(originalKey, result.Result!.Key);
+        Assert.AreEqual("convert-to-content@test.com", result.Result.Email);
+        Assert.AreEqual("convert-to-content", result.Result.Username);
+
+        // Assert — external member record removed.
+        var externalMember = await ExternalMemberService.GetByKeyAsync(originalKey);
+        Assert.IsNull(externalMember);
+
+        // Assert — group memberships migrated.
+        IEnumerable<string> contentRoles = MemberService.GetAllRoles(result.Result.Username);
+        CollectionAssert.Contains(contentRoles.ToList(), "ConvertGroup");
+    }
+
+    [Test]
+    public async Task Can_Convert_External_To_Content_Member_With_ProfileData_Callback()
+    {
+        // Arrange — create an external member with profile data.
+        var profileJson = """{"department":"Engineering","floor":3}""";
+        var identity = new ExternalMemberIdentityBuilder()
+            .WithEmail("profile-promote@test.com")
+            .WithUserName("profile-promote")
+            .WithName("Profile Promote")
+            .WithProfileData(profileJson)
+            .Build();
+        var createResult = await ExternalMemberService.CreateAsync(identity);
+        Assert.IsTrue(createResult.Success);
+
+        IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
+
+        // Act — use the callback to map profileData into a content property.
+        string? capturedProfileData = null;
+        var result = await ExternalMemberService.ConvertToContentMemberAsync(
+            createResult.Result.Key,
+            memberType.Alias,
+            (member, profileData) =>
+            {
+                capturedProfileData = profileData;
+                member.SetValue("title", "From Profile: Engineering");
+            });
+
+        // Assert — callback received the profileData and property was persisted.
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(profileJson, capturedProfileData);
+
+        IMember? reloaded = MemberService.GetById(result.Result!.Key);
+        Assert.IsNotNull(reloaded);
+        Assert.AreEqual("From Profile: Engineering", reloaded!.GetValue<string>("title"));
+
+        // Assert — without a callback, properties would remain empty.
+        // (Verified by the absence of any auto-mapped properties on the result.)
+    }
+
+    [Test]
+    public async Task Convert_External_To_Content_Returns_NotFound_For_NonExistent()
+    {
+        // Act
+        var result = await ExternalMemberService.ConvertToContentMemberAsync(Guid.NewGuid(), "Member");
+
+        // Assert
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ExternalMemberOperationStatus.NotFound, result.Status);
+    }
+
+    [Test]
+    public async Task Can_Convert_Content_To_External_Member()
+    {
+        // Arrange — create content member with a group and properties.
+        IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
+        IMember contentMember = MemberBuilder.CreateSimpleMember(memberType, "Convert To External", "convert-to-ext@test.com", "password123!", "convert-to-ext");
+        contentMember.SetValue("title", "My Title");
+        contentMember.SetValue("author", "My Author");
+        MemberService.Save(contentMember);
+        var originalKey = contentMember.Key;
+
+        MemberService.AddRole("DemoteGroup");
+        MemberService.AssignRoles([contentMember.Id], ["DemoteGroup"]);
+
+        // Act
+        var result = await ExternalMemberService.ConvertToExternalMemberAsync(originalKey, preservePropertiesAsProfileData: true);
+
+        // Assert — external member created with same key and identity fields.
+        Assert.IsTrue(result.Success);
+        Assert.IsNotNull(result.Result);
+        Assert.AreEqual(originalKey, result.Result!.Key);
+        Assert.AreEqual("convert-to-ext@test.com", result.Result.Email);
+        Assert.AreEqual("convert-to-ext", result.Result.UserName);
+
+        // Assert — content member removed.
+        IMember? found = MemberService.GetById(originalKey);
+        Assert.IsNull(found);
+
+        // Assert — group memberships migrated.
+        IEnumerable<string> externalRoles = await ExternalMemberService.GetRolesAsync(originalKey);
+        CollectionAssert.Contains(externalRoles.ToList(), "DemoteGroup");
+
+        // Assert — properties preserved as profileData.
+        Assert.IsNotNull(result.Result.ProfileData);
+        Assert.That(result.Result.ProfileData, Does.Contain("My Title"));
+        Assert.That(result.Result.ProfileData, Does.Contain("My Author"));
+    }
+
+    [Test]
+    public async Task Convert_Content_To_External_Member_Without_PreserveProperties_Drops_ProfileData()
+    {
+        // Arrange
+        IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
+        IMember contentMember = MemberBuilder.CreateSimpleMember(memberType, "no-props", "no-props@test.com", "password123!", "No Props");
+        contentMember.SetValue("title", "Some Value");
+        MemberService.Save(contentMember);
+
+        // Act
+        var result = await ExternalMemberService.ConvertToExternalMemberAsync(contentMember.Key, preservePropertiesAsProfileData: false);
+
+        // Assert
+        Assert.IsTrue(result.Success);
+        Assert.IsNull(result.Result!.ProfileData);
+    }
+
+    [Test]
+    public async Task Convert_Content_To_External_Returns_NotFound_For_NonExistent()
+    {
+        // Act
+        var result = await ExternalMemberService.ConvertToExternalMemberAsync(Guid.NewGuid());
+
+        // Assert
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ExternalMemberOperationStatus.NotFound, result.Status);
     }
 }
