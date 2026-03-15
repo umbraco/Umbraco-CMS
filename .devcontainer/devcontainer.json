@@ -69,7 +69,7 @@
 	// "postCreateCommand": "dotnet restore",
 
 	// This is used in the prebuilds - so dotnet build (nuget restore and node stuff) is done
-	"updateContentCommand": "dotnet build umbraco.sln && dotnet dev-certs https --trust",
+	"updateContentCommand": "dotnet build umbraco.sln",
 	
 	"customizations": {
 		"vscode": {
