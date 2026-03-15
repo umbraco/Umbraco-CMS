@@ -25,38 +25,35 @@ namespace Umbraco.Cms.Api.Management.Controllers.Member.Filter;
 public class FilterMemberFilterController : MemberFilterControllerBase
 {
     private readonly IMemberFilterService _memberFilterService;
-    private readonly IMemberPresentationFactory _memberPresentationFactory;
-    private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="FilterMemberFilterController"/> class.
     /// </summary>
+    /// <param name="memberService">Service used for member management operations (unused, retained for DI compatibility).</param>
+    /// <param name="memberPresentationFactory">Factory responsible for creating member presentation models (unused, retained for DI compatibility).</param>
+    /// <param name="backOfficeSecurityAccessor">Accessor for back office security context (unused, retained for DI compatibility).</param>
     /// <param name="memberFilterService">Service for combined member filtering across content and external stores.</param>
-    /// <param name="memberPresentationFactory">Factory responsible for creating member presentation models.</param>
-    /// <param name="backOfficeSecurityAccessor">Accessor for back office security context and authentication.</param>
-    [ActivatorUtilitiesConstructor]
+    // TODO (V19): Remove unused parameters which are only here to avoid ambiguous constructor errors.
     public FilterMemberFilterController(
-        IMemberFilterService memberFilterService,
+        IMemberService memberService,
         IMemberPresentationFactory memberPresentationFactory,
-        IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
-    {
-        _memberFilterService = memberFilterService;
-        _memberPresentationFactory = memberPresentationFactory;
-        _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
-    }
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+        IMemberFilterService memberFilterService)
+        => _memberFilterService = memberFilterService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="FilterMemberFilterController"/> class.
     /// </summary>
-    [Obsolete("Please use the constructor accepting IMemberFilterService. Scheduled for removal in Umbraco 19.")]
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
     public FilterMemberFilterController(
         IMemberService memberService,
         IMemberPresentationFactory memberPresentationFactory,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
         : this(
-            StaticServiceProvider.Instance.GetRequiredService<IMemberFilterService>(),
+            memberService,
             memberPresentationFactory,
-            backOfficeSecurityAccessor)
+            backOfficeSecurityAccessor,
+            StaticServiceProvider.Instance.GetRequiredService<IMemberFilterService>())
     {
     }
 
@@ -96,41 +93,20 @@ public class FilterMemberFilterController : MemberFilterControllerBase
         var responseModels = new List<MemberResponseModel>();
         foreach (MemberFilterItem item in result.Items)
         {
-            if (item.IsExternalOnly)
+            responseModels.Add(new MemberResponseModel
             {
-                // Build a lightweight response for external members from the filter item directly.
-                responseModels.Add(new MemberResponseModel
-                {
-                    Id = item.Key,
-                    Email = item.Email,
-                    Username = item.UserName,
-                    IsApproved = item.IsApproved,
-                    IsLockedOut = item.IsLockedOut,
-                    LastLoginDate = item.LastLoginDate.HasValue ? new DateTimeOffset(item.LastLoginDate.Value, TimeSpan.Zero) : null,
-                    LastLockoutDate = item.LastLockoutDate.HasValue ? new DateTimeOffset(item.LastLockoutDate.Value, TimeSpan.Zero) : null,
-                    LastPasswordChangeDate = item.LastPasswordChangeDate.HasValue ? new DateTimeOffset(item.LastPasswordChangeDate.Value, TimeSpan.Zero) : null,
-                    Kind = MemberKind.ExternalOnly,
-                    Variants = Enumerable.Empty<MemberVariantResponseModel>(),
-                    Values = Enumerable.Empty<MemberValueResponseModel>(),
-                });
-            }
-            else
-            {
-                // Build the full response model for content members. This requires loading the IMember
-                // to get properties, variants, and sensitive data filtering.
-                responseModels.Add(new MemberResponseModel
-                {
-                    Id = item.Key,
-                    Email = item.Email,
-                    Username = item.UserName,
-                    IsApproved = item.IsApproved,
-                    IsLockedOut = item.IsLockedOut,
-                    LastLoginDate = item.LastLoginDate.HasValue ? new DateTimeOffset(item.LastLoginDate.Value, TimeSpan.Zero) : null,
-                    LastLockoutDate = item.LastLockoutDate.HasValue ? new DateTimeOffset(item.LastLockoutDate.Value, TimeSpan.Zero) : null,
-                    LastPasswordChangeDate = item.LastPasswordChangeDate.HasValue ? new DateTimeOffset(item.LastPasswordChangeDate.Value, TimeSpan.Zero) : null,
-                    Kind = item.Kind,
-                });
-            }
+                Id = item.Key,
+                Email = item.Email,
+                Username = item.UserName,
+                IsApproved = item.IsApproved,
+                IsLockedOut = item.IsLockedOut,
+                LastLoginDate = item.LastLoginDate.HasValue ? new DateTimeOffset(item.LastLoginDate.Value, TimeSpan.Zero) : null,
+                LastLockoutDate = item.LastLockoutDate.HasValue ? new DateTimeOffset(item.LastLockoutDate.Value, TimeSpan.Zero) : null,
+                LastPasswordChangeDate = item.LastPasswordChangeDate.HasValue ? new DateTimeOffset(item.LastPasswordChangeDate.Value, TimeSpan.Zero) : null,
+                Kind = item.Kind,
+                Variants = Enumerable.Empty<MemberVariantResponseModel>(),
+                Values = Enumerable.Empty<MemberValueResponseModel>(),
+            });
         }
 
         return Ok(new PagedViewModel<MemberResponseModel>
