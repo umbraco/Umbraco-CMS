@@ -20,12 +20,12 @@
 		},
 
 		// Adds SMTP4Dev to use as a local SMTP server with UI
-		"ghcr.io/warrenbuckley/codespace-features/smtp4dev:1": {
-			"autorun": true,
-			"webport": "5050",
-			"smtpport": "2525",
-			"imapport": "143"
-		},
+		// "ghcr.io/warrenbuckley/codespace-features/smtp4dev:1": {
+		// 	"autorun": true,
+		// 	"webport": "5050",
+		// 	"smtpport": "2525",
+		// 	"imapport": "143"
+		// },
 
 		// Adds SQLite feature from apt install
 		// Also adds the SQLite VSCode extension
