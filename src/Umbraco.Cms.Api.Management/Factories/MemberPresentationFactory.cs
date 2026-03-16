@@ -131,6 +131,28 @@ internal sealed class MemberPresentationFactory : IMemberPresentationFactory
             Kind = MemberKind.ExternalOnly,
         };
 
+    /// <inheritdoc/>
+    public MemberResponseModel CreateFilterItemResponseModel(MemberFilterItem item) =>
+        new()
+        {
+            Id = item.Key,
+            Email = item.Email,
+            Username = item.UserName,
+            IsApproved = item.IsApproved,
+            IsLockedOut = item.IsLockedOut,
+            LastLoginDate = item.LastLoginDate.HasValue ? new DateTimeOffset(item.LastLoginDate.Value, TimeSpan.Zero) : null,
+            LastLockoutDate = item.LastLockoutDate.HasValue ? new DateTimeOffset(item.LastLockoutDate.Value, TimeSpan.Zero) : null,
+            LastPasswordChangeDate = item.LastPasswordChangeDate.HasValue ? new DateTimeOffset(item.LastPasswordChangeDate.Value, TimeSpan.Zero) : null,
+            Kind = item.Kind,
+            Variants = [new MemberVariantResponseModel { Name = item.Name ?? string.Empty }],
+            Values = [],
+            MemberType = new MemberTypeReferenceResponseModel
+            {
+                Id = item.MemberTypeKey ?? Guid.Empty,
+                Icon = item.MemberTypeIcon ?? string.Empty,
+            },
+        };
+
     private MemberItemResponseModel CreateItemResponseModel<T>(T entity)
         where T : ITreeEntity
         => new()

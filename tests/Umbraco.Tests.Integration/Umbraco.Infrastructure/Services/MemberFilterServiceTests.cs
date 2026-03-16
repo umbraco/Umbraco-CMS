@@ -42,6 +42,9 @@ internal sealed class MemberFilterServiceTests : UmbracoIntegrationTest
         Assert.AreEqual("content@test.com", item.Email);
         Assert.IsFalse(item.IsExternalOnly);
         Assert.AreEqual(MemberKind.Default, item.Kind);
+        Assert.IsNotNull(item.MemberTypeKey);
+        Assert.AreNotEqual(Guid.Empty, item.MemberTypeKey);
+        Assert.IsNotNull(item.MemberTypeIcon);
     }
 
     [Test]
@@ -59,6 +62,8 @@ internal sealed class MemberFilterServiceTests : UmbracoIntegrationTest
         Assert.AreEqual("external@test.com", item.Email);
         Assert.IsTrue(item.IsExternalOnly);
         Assert.AreEqual(MemberKind.ExternalOnly, item.Kind);
+        Assert.IsNull(item.MemberTypeKey);
+        Assert.IsNull(item.MemberTypeIcon);
     }
 
     [Test]

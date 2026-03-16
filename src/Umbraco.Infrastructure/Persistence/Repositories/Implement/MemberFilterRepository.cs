@@ -90,16 +90,19 @@ internal sealed class MemberFilterRepository : IMemberFilterRepository
                 m.[LastLoginDate],
                 m.[LastLockoutDate],
                 m.[LastPasswordChangeDate],
-                CAST(0 AS bit) AS [IsExternalOnly]
+                CAST(0 AS bit) AS [IsExternalOnly],
+                ctn.[uniqueId] AS [MemberTypeKey],
+                ctn.[text] AS [MemberTypeName],
+                ctd.[icon] AS [MemberTypeIcon]
             FROM [{Constants.DatabaseSchema.Tables.Member}] m
-            INNER JOIN [{Constants.DatabaseSchema.Tables.Node}] n ON n.[id] = m.[nodeId]");
+            INNER JOIN [{Constants.DatabaseSchema.Tables.Node}] n ON n.[id] = m.[nodeId]
+            INNER JOIN [{Constants.DatabaseSchema.Tables.Content}] ct ON ct.[nodeId] = n.[id]
+            INNER JOIN [{Constants.DatabaseSchema.Tables.Node}] ctn ON ctn.[id] = ct.[contentTypeId]
+            INNER JOIN [cmsContentType] ctd ON ctd.[nodeId] = ctn.[id]");
 
         if (filter.MemberTypeId.HasValue)
         {
-            sql = sql.Append(
-                $@"INNER JOIN [{Constants.DatabaseSchema.Tables.Content}] c ON c.[nodeId] = n.[id]
-                INNER JOIN [{Constants.DatabaseSchema.Tables.Node}] mtn ON mtn.[id] = c.[contentTypeId]
-                WHERE mtn.[uniqueId] = @typeId", new { typeId = filter.MemberTypeId.Value });
+            sql = sql.Append("WHERE ctn.[uniqueId] = @typeId", new { typeId = filter.MemberTypeId.Value });
         }
 
         if (filter.MemberGroupName.IsNullOrWhiteSpace() is false)
@@ -127,7 +130,10 @@ internal sealed class MemberFilterRepository : IMemberFilterRepository
                 em.[lastLoginDate] AS [LastLoginDate],
                 em.[lastLockoutDate] AS [LastLockoutDate],
                 CAST(NULL AS datetime) AS [LastPasswordChangeDate],
-                CAST(1 AS bit) AS [IsExternalOnly]
+                CAST(1 AS bit) AS [IsExternalOnly],
+                CAST(NULL AS uniqueidentifier) AS [MemberTypeKey],
+                CAST(NULL AS nvarchar(255)) AS [MemberTypeName],
+                CAST(NULL AS nvarchar(255)) AS [MemberTypeIcon]
             FROM [{Constants.DatabaseSchema.Tables.ExternalMember}] em");
 
         if (filter.MemberGroupName.IsNullOrWhiteSpace() is false)
@@ -204,6 +210,9 @@ internal sealed class MemberFilterRepository : IMemberFilterRepository
             LastPasswordChangeDate = dto.LastPasswordChangeDate,
             IsExternalOnly = dto.IsExternalOnly,
             Kind = dto.IsExternalOnly ? MemberKind.ExternalOnly : MemberKind.Default,
+            MemberTypeKey = dto.MemberTypeKey,
+            MemberTypeName = dto.MemberTypeName,
+            MemberTypeIcon = dto.MemberTypeIcon,
         };
 
     /// <summary>
@@ -241,5 +250,14 @@ internal sealed class MemberFilterRepository : IMemberFilterRepository
 
         [Column("IsExternalOnly")]
         public bool IsExternalOnly { get; set; }
+
+        [Column("MemberTypeKey")]
+        public Guid? MemberTypeKey { get; set; }
+
+        [Column("MemberTypeName")]
+        public string? MemberTypeName { get; set; }
+
+        [Column("MemberTypeIcon")]
+        public string? MemberTypeIcon { get; set; }
     }
 }

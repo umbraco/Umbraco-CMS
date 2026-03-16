@@ -59,4 +59,13 @@ public interface IMemberPresentationFactory
     // TODO (V19): Remove the default implementation.
     MemberItemResponseModel CreateExternalMemberItemResponseModel(ExternalMemberIdentity member)
         => new() { Id = member.Key, Kind = MemberKind.ExternalOnly };
+
+    /// <summary>
+    /// Creates a response model from a <see cref="MemberFilterItem"/> returned by the combined filter query.
+    /// </summary>
+    /// <param name="item">The filter item to create the response model from.</param>
+    /// <returns>A <see cref="MemberResponseModel"/> representing the filter item.</returns>
+    // TODO (V19): Remove the default implementation.
+    MemberResponseModel CreateFilterItemResponseModel(MemberFilterItem item)
+        => new() { Id = item.Key, Kind = item.Kind };
 }

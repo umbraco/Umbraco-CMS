@@ -363,6 +363,65 @@ public class MemberPresentationFactoryTests
         return user;
     }
 
+    // --- CreateFilterItemResponseModel ---
+
+    [Test]
+    public void CreateFilterItemResponseModel_Maps_Content_Member_With_Type()
+    {
+        // Arrange
+        var memberTypeKey = Guid.NewGuid();
+        var item = new MemberFilterItem
+        {
+            Key = Guid.NewGuid(),
+            Email = "filter-content@test.com",
+            UserName = "filter-content",
+            Name = "Filter Content",
+            IsApproved = true,
+            Kind = MemberKind.Default,
+            MemberTypeKey = memberTypeKey,
+            MemberTypeName = "Member",
+            MemberTypeIcon = "icon-user",
+        };
+
+        // Act
+        MemberResponseModel result = _sut.CreateFilterItemResponseModel(item);
+
+        // Assert
+        Assert.AreEqual(item.Key, result.Id);
+        Assert.AreEqual("filter-content@test.com", result.Email);
+        Assert.AreEqual(MemberKind.Default, result.Kind);
+        Assert.AreEqual(memberTypeKey, result.MemberType.Id);
+        Assert.AreEqual("icon-user", result.MemberType.Icon);
+        Assert.AreEqual("Filter Content", result.Variants.First().Name);
+    }
+
+    [Test]
+    public void CreateFilterItemResponseModel_Maps_External_Member_With_Empty_Type()
+    {
+        // Arrange
+        var item = new MemberFilterItem
+        {
+            Key = Guid.NewGuid(),
+            Email = "filter-ext@test.com",
+            UserName = "filter-ext",
+            Name = "Filter External",
+            IsApproved = true,
+            Kind = MemberKind.ExternalOnly,
+            MemberTypeKey = null,
+            MemberTypeName = null,
+            MemberTypeIcon = null,
+        };
+
+        // Act
+        MemberResponseModel result = _sut.CreateFilterItemResponseModel(item);
+
+        // Assert
+        Assert.AreEqual(item.Key, result.Id);
+        Assert.AreEqual(MemberKind.ExternalOnly, result.Kind);
+        Assert.AreEqual(Guid.Empty, result.MemberType.Id);
+        Assert.AreEqual(string.Empty, result.MemberType.Icon);
+    }
+
     private static ExternalMemberIdentity CreateExternalMember() => new()
     {
         Key = Guid.NewGuid(),

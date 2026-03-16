@@ -59,9 +59,14 @@ public class MemberFilterItem
     public bool IsExternalOnly { get; set; }
 
     /// <summary>
-    ///     Gets or sets the member type alias. Null for external-only members.
+    ///     Gets or sets the member type key. Null for external-only members.
     /// </summary>
-    public string? MemberTypeAlias { get; set; }
+    public Guid? MemberTypeKey { get; set; }
+
+    /// <summary>
+    ///     Gets or sets the member type name. Null for external-only members.
+    /// </summary>
+    public string? MemberTypeName { get; set; }
 
     /// <summary>
     ///     Gets or sets the member type icon. Null for external-only members.

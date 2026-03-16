@@ -25,21 +25,26 @@ namespace Umbraco.Cms.Api.Management.Controllers.Member.Filter;
 public class FilterMemberFilterController : MemberFilterControllerBase
 {
     private readonly IMemberFilterService _memberFilterService;
+    private readonly IMemberPresentationFactory _memberPresentationFactory;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="FilterMemberFilterController"/> class.
     /// </summary>
     /// <param name="memberService">Service used for member management operations (unused, retained for DI compatibility).</param>
-    /// <param name="memberPresentationFactory">Factory responsible for creating member presentation models (unused, retained for DI compatibility).</param>
+    /// <param name="memberPresentationFactory">Factory responsible for creating member presentation models.</param>
     /// <param name="backOfficeSecurityAccessor">Accessor for back office security context (unused, retained for DI compatibility).</param>
     /// <param name="memberFilterService">Service for combined member filtering across content and external stores.</param>
     // TODO (V19): Remove unused parameters which are only here to avoid ambiguous constructor errors.
+    [ActivatorUtilitiesConstructor]
     public FilterMemberFilterController(
         IMemberService memberService,
         IMemberPresentationFactory memberPresentationFactory,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
         IMemberFilterService memberFilterService)
-        => _memberFilterService = memberFilterService;
+    {
+        _memberFilterService = memberFilterService;
+        _memberPresentationFactory = memberPresentationFactory;
+    }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="FilterMemberFilterController"/> class.
@@ -90,24 +95,7 @@ public class FilterMemberFilterController : MemberFilterControllerBase
 
         PagedModel<MemberFilterItem> result = await _memberFilterService.FilterAsync(memberFilter, orderBy, orderDirection, skip, take);
 
-        var responseModels = new List<MemberResponseModel>();
-        foreach (MemberFilterItem item in result.Items)
-        {
-            responseModels.Add(new MemberResponseModel
-            {
-                Id = item.Key,
-                Email = item.Email,
-                Username = item.UserName,
-                IsApproved = item.IsApproved,
-                IsLockedOut = item.IsLockedOut,
-                LastLoginDate = item.LastLoginDate.HasValue ? new DateTimeOffset(item.LastLoginDate.Value, TimeSpan.Zero) : null,
-                LastLockoutDate = item.LastLockoutDate.HasValue ? new DateTimeOffset(item.LastLockoutDate.Value, TimeSpan.Zero) : null,
-                LastPasswordChangeDate = item.LastPasswordChangeDate.HasValue ? new DateTimeOffset(item.LastPasswordChangeDate.Value, TimeSpan.Zero) : null,
-                Kind = item.Kind,
-                Variants = Enumerable.Empty<MemberVariantResponseModel>(),
-                Values = Enumerable.Empty<MemberValueResponseModel>(),
-            });
-        }
+        var responseModels = result.Items.Select(_memberPresentationFactory.CreateFilterItemResponseModel).ToList();
 
         return Ok(new PagedViewModel<MemberResponseModel>
         {

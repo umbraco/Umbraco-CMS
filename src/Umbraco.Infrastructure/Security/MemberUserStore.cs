@@ -430,7 +430,7 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
 
         if (user == null)
         {
-            // Check external member store
+            // Check external member store — userId is the Guid key as a string for external members.
             ExternalMemberIdentity? externalMember = null;
             if (Guid.TryParse(userId, out Guid externalKey))
             {
@@ -873,7 +873,10 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
             });
         }
 
-        user.Id = result.Result.Id.ToString(CultureInfo.InvariantCulture);
+        // Use the Guid key as the user ID for external members so that FindUserAsync
+        // can resolve them via Guid.TryParse → GetByKeyAsync. Content members use int IDs,
+        // but external members don't have content node IDs.
+        user.Id = result.Result.Key.ToString();
         user.Key = result.Result.Key;
 
         // Handle roles.
@@ -990,7 +993,9 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
     {
         var user = new MemberIdentityUser();
         user.DisableChangeTracking();
-        user.Id = external.Id.ToString(CultureInfo.InvariantCulture);
+        // Use Guid key as ID for external members (content members use int node IDs).
+        // This ensures FindUserAsync can resolve external members via Guid.TryParse.
+        user.Id = external.Key.ToString();
         user.Key = external.Key;
         user.UserName = external.UserName;
         user.Email = external.Email;
