@@ -28,12 +28,25 @@ import { UmbFileDropzoneItemStatus, type UmbDropzoneChangeEvent } from '@umbraco
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
 import type { UmbPickerContext } from '@umbraco-cms/backoffice/picker';
-import type { UUIInputEvent, UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
+import type {
+	UUIInputEvent,
+	UUIPaginationEvent,
+	UUIPopoverContainerElement,
+} from '@umbraco-cms/backoffice/external/uui';
+import type {
+	UmbTableColumn,
+	UmbTableConfig,
+	UmbTableDeselectedEvent,
+	UmbTableItem,
+	UmbTableSelectedEvent,
+} from '@umbraco-cms/backoffice/components';
 
 import './components/index.js';
 import '@umbraco-cms/backoffice/imaging';
 
 const root: UmbMediaPathModel = { name: 'Media', unique: null, entityType: UMB_MEDIA_ROOT_ENTITY_TYPE };
+
+type UmbMediaPickerView = 'cards' | 'table';
 
 // TODO: investigate how we can reuse the picker-search-field element, picker context etc.
 @customElement('umb-media-picker-modal')
@@ -90,6 +103,12 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 
 	@query('#dropzone')
 	private _dropzone!: UmbDropzoneMediaElement;
+
+	@query('#media-picker-view-popover')
+	private _viewPopover?: UUIPopoverContainerElement;
+
+	@state()
+	private _currentView: UmbMediaPickerView = 'cards';
 
 	#pagingMap = new Map<string, UmbPaginationManager>();
 	#contextCulture?: string | null;
@@ -234,6 +253,14 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 				await this.#loadChildrenOfCurrentMediaItem();
 			}
 		}
+	}
+
+	#onViewSelect(view: UmbMediaPickerView) {
+		this._currentView = view;
+		// TODO: This ignorer is just needed for JSON SCHEMA TO WORK, As its not updated with latest TS yet.
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
+		this._viewPopover?.hidePopover();
 	}
 
 	// TODO: move to location manager in context
@@ -428,13 +455,15 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 		return html`
 			${!this._searchResult.length && !this._searching
 				? html`<div class="container"><p>${this.localize.term('content_listViewNoItems')}</p></div>`
-				: html`<div id="media-grid">
-						${repeat(
-							this._searchResult,
-							(item) => item.unique,
-							(item) => this.#renderCard(item),
-						)}
-					</div>`}
+				: this._currentView === 'table'
+					? this.#renderTable(this._searchResult)
+					: html`<div id="media-grid">
+							${repeat(
+								this._searchResult,
+								(item) => item.unique,
+								(item) => this.#renderCard(item),
+							)}
+						</div>`}
 		`;
 	}
 
@@ -442,23 +471,25 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 		return html`
 			${!this._currentChildren.length
 				? html`<div class="container"><p>${this.localize.term('content_listViewNoItems')}</p></div>`
-				: html`<div id="media-grid">
-							${repeat(
-								this._currentChildren,
-								(item) => item.unique,
-								(item) => this.#renderCard(item),
-							)}
-						</div>
-						${this._currentTotalPages > 1
-							? html`<uui-pagination
-									.current=${this._currentPage}
-									.total=${this._currentTotalPages}
-									firstlabel=${this.localize.term('general_first')}
-									previouslabel=${this.localize.term('general_previous')}
-									nextlabel=${this.localize.term('general_next')}
-									lastlabel=${this.localize.term('general_last')}
-									@change=${this.#onPageChange}></uui-pagination>`
-							: nothing}`}
+				: html`${this._currentView === 'table'
+						? this.#renderTable(this._currentChildren)
+						: html`<div id="media-grid">
+								${repeat(
+									this._currentChildren,
+									(item) => item.unique,
+									(item) => this.#renderCard(item),
+								)}
+							</div>`}
+					${this._currentTotalPages > 1
+						? html`<uui-pagination
+								.current=${this._currentPage}
+								.total=${this._currentTotalPages}
+								firstlabel=${this.localize.term('general_first')}
+								previouslabel=${this.localize.term('general_previous')}
+								nextlabel=${this.localize.term('general_next')}
+								lastlabel=${this.localize.term('general_last')}
+								@change=${this.#onPageChange}></uui-pagination>`
+						: nothing}`}
 		`;
 	}
 
@@ -490,6 +521,27 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 					label=${this.localize.term('general_upload')}
 					look="outline"
 					color="default"></uui-button>
+				<uui-button compact popovertarget="media-picker-view-popover" label="View">
+					<umb-icon name=${this._currentView === 'cards' ? 'icon-grid' : 'icon-table'}></umb-icon>
+				</uui-button>
+				<uui-popover-container id="media-picker-view-popover" placement="bottom-end">
+					<umb-popover-layout>
+						<div id="view-dropdown">
+							<uui-menu-item
+								label="Cards"
+								@click-label=${() => this.#onViewSelect('cards')}
+								?active=${this._currentView === 'cards'}>
+								<umb-icon slot="icon" name="icon-grid"></umb-icon>
+							</uui-menu-item>
+							<uui-menu-item
+								label="Table"
+								@click-label=${() => this.#onViewSelect('table')}
+								?active=${this._currentView === 'table'}>
+								<umb-icon slot="icon" name="icon-table"></umb-icon>
+							</uui-menu-item>
+						</div>
+					</umb-popover-layout>
+				</uui-popover-container>
 			</div>
 		`;
 	}
@@ -515,6 +567,84 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 					alt=${item.name}
 					icon=${item.mediaType.icon}></umb-imaging-thumbnail>
 			</uui-card-media>
+		`;
+	}
+
+	#buildTableItems(items: Array<UmbMediaTreeItemModel | UmbMediaSearchItemModel>): Array<UmbTableItem> {
+		return items.map((item) => {
+			const canNavigate = this.#allowNavigateToMedia(item);
+			const selectable = this._selectableFilter(item);
+			// When not in selection mode, navigable items open on click (matching card behaviour).
+			// Mark them as non-selectable so the row doesn't intercept the click for selection.
+			const selectableInTable = this._isSelectionMode ? selectable : !canNavigate && selectable;
+			return {
+				id: item.unique,
+				icon: item.mediaType.icon,
+				selectable: selectableInTable,
+				data: [
+					{
+						columnAlias: 'name',
+						value:
+							canNavigate && !this._isSelectionMode
+								? html`<uui-button
+										look="default"
+										compact
+										label=${item.name}
+										@click=${(e: Event) => {
+											e.stopPropagation();
+											this.#onOpen(item);
+										}}
+										>${item.name}</uui-button
+									>`
+								: html`<span class="table-name">${item.name}</span>`,
+					},
+					{
+						columnAlias: 'createDate',
+						value: 'createDate' in item ? this.localize.date(item.createDate) : '',
+					},
+				],
+			};
+		});
+	}
+
+	#onTableSelected(event: UmbTableSelectedEvent) {
+		const itemId = event.getItemId();
+		if (!itemId) return;
+		const item = [...this._currentChildren, ...this._searchResult].find((i) => i.unique === itemId);
+		if (!item) return;
+		this.#onSelected(item);
+	}
+
+	#onTableDeselected(event: UmbTableDeselectedEvent) {
+		const itemId = event.getItemId();
+		if (!itemId) return;
+		const item = [...this._currentChildren, ...this._searchResult].find((i) => i.unique === itemId);
+		if (!item) return;
+		this.#onDeselected(item);
+	}
+
+	#renderTable(items: Array<UmbMediaTreeItemModel | UmbMediaSearchItemModel>) {
+		const tableColumns: Array<UmbTableColumn> = [
+			{
+				name: this.localize.term('general_name'),
+				alias: 'name',
+			},
+			{
+				name: this.localize.term('content_createDate'),
+				alias: 'createDate',
+			},
+		];
+		const tableConfig: UmbTableConfig = {
+			allowSelection: true,
+		};
+		return html`
+			<umb-table
+				.config=${tableConfig}
+				.columns=${tableColumns}
+				.items=${this.#buildTableItems(items)}
+				.selection=${this.value?.selection ?? []}
+				@selected=${this.#onTableSelected}
+				@deselected=${this.#onTableDeselected}></umb-table>
 		`;
 	}
 
@@ -573,7 +703,7 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 				padding-bottom: 5px; /** The modal is a bit jumpy due to the img card focus/hover border. This fixes the issue. */
 			}
 
-			umb-icon {
+			#media-grid umb-icon {
 				font-size: var(--uui-size-8);
 			}
 
@@ -595,6 +725,19 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 			uui-pagination {
 				display: block;
 				margin-top: var(--uui-size-layout-1);
+			}
+
+			.table-name {
+				flex: 1;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+
+			#view-dropdown {
+				padding: var(--uui-size-space-3);
+				--uui-button-content-align: left;
+				--uui-menu-item-flat-structure: 1;
 			}
 		`,
 	];
