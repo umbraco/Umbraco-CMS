@@ -83,7 +83,7 @@ public class ElementTreeControllerBase : UserStartNodeFolderTreeControllerBase<E
 
         if (entity is IElementEntitySlim elementEntitySlim)
         {
-            responseModel.HasChildren = false;
+            responseModel.HasChildren = elementEntitySlim.HasChildren;
             responseModel.CreateDate = elementEntitySlim.CreateDate;
             responseModel.DocumentType = _elementPresentationFactory.CreateDocumentTypeReferenceResponseModel(elementEntitySlim);
             responseModel.Variants = _elementPresentationFactory.CreateVariantsItemResponseModels(elementEntitySlim);
