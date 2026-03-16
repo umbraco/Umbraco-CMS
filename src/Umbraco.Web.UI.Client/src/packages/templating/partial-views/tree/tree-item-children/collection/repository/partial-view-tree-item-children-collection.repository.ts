@@ -1,31 +1,11 @@
-import { UmbPartialViewTreeRepository } from '../../../partial-view-tree.repository.js';
-import type { UmbCollectionFilterModel, UmbCollectionRepository } from '@umbraco-cms/backoffice/collection';
-import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
-import { UMB_ENTITY_CONTEXT, type UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+import { UMB_PARTIAL_VIEW_TREE_REPOSITORY_ALIAS } from '../../../constants.js';
+import { UmbTreeItemChildrenCollectionRepositoryBase } from '@umbraco-cms/backoffice/tree';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-export class UmbPartialViewTreeItemChildrenCollectionRepository
-	extends UmbRepositoryBase
-	implements UmbCollectionRepository
-{
-	#treeRepository = new UmbPartialViewTreeRepository(this);
-
-	async requestCollection(filter: UmbCollectionFilterModel) {
-		const entityContext = await this.getContext(UMB_ENTITY_CONTEXT);
-		if (!entityContext) throw new Error('Entity context not found');
-
-		const entityType = entityContext.getEntityType();
-		const unique = entityContext.getUnique();
-
-		if (!entityType) throw new Error('Entity type not found');
-		if (unique === undefined) throw new Error('Unique not found');
-
-		const parent: UmbEntityModel = { entityType, unique };
-
-		if (parent.unique === null) {
-			return this.#treeRepository.requestTreeRootItems({ skip: filter.skip, take: filter.take });
-		} else {
-			return this.#treeRepository.requestTreeItemsOf({ parent, skip: filter.skip, take: filter.take });
-		}
+export class UmbPartialViewTreeItemChildrenCollectionRepository extends UmbTreeItemChildrenCollectionRepositoryBase {
+	constructor(host: UmbControllerHost) {
+		super(host);
+		this._setTreeRepositoryAlias(UMB_PARTIAL_VIEW_TREE_REPOSITORY_ALIAS);
 	}
 }
 
