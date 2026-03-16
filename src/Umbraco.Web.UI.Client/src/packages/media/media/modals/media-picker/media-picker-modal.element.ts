@@ -284,14 +284,14 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 		this.#setLocationInInteractionMemory();
 	}
 
-	#onSelected(item: UmbMediaTreeItemModel | UmbMediaSearchItemModel) {
-		const selection = this.data?.multiple ? [...this.value.selection, item.unique!] : [item.unique!];
+	#onSelected(unique: string) {
+		const selection = this.data?.multiple ? [...this.value.selection, unique] : [unique];
 		this._isSelectionMode = selection.length > 0;
 		this.modalContext?.setValue({ selection });
 	}
 
-	#onDeselected(item: UmbMediaTreeItemModel | UmbMediaSearchItemModel) {
-		const selection = this.value.selection.filter((value) => value !== item.unique);
+	#onDeselected(unique: string) {
+		const selection = this.value.selection.filter((value) => value !== unique);
 		this._isSelectionMode = selection.length > 0;
 		this.modalContext?.setValue({ selection });
 	}
@@ -557,8 +557,8 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 				.name=${item.name}
 				data-mark="${item.entityType}:${item.unique}"
 				@open=${() => this.#onOpen(item)}
-				@selected=${() => this.#onSelected(item)}
-				@deselected=${() => this.#onDeselected(item)}
+				@selected=${() => this.#onSelected(item.unique!)}
+				@deselected=${() => this.#onDeselected(item.unique!)}
 				?selected=${this.value?.selection?.find((value) => value === item.unique)}
 				?selectable=${selectable}
 				?select-only=${this._isSelectionMode || canNavigate === false}>
@@ -610,17 +610,13 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 	#onTableSelected(event: UmbTableSelectedEvent) {
 		const itemId = event.getItemId();
 		if (!itemId) return;
-		const item = [...this._currentChildren, ...this._searchResult].find((i) => i.unique === itemId);
-		if (!item) return;
-		this.#onSelected(item);
+		this.#onSelected(itemId);
 	}
 
 	#onTableDeselected(event: UmbTableDeselectedEvent) {
 		const itemId = event.getItemId();
 		if (!itemId) return;
-		const item = [...this._currentChildren, ...this._searchResult].find((i) => i.unique === itemId);
-		if (!item) return;
-		this.#onDeselected(item);
+		this.#onDeselected(itemId);
 	}
 
 	#renderTable(items: Array<UmbMediaTreeItemModel | UmbMediaSearchItemModel>) {
