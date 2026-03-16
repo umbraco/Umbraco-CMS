@@ -8,6 +8,7 @@ import { UmbMediaPickerContext } from './media-picker.context.js';
 import type { UmbMediaPathModel } from './types.js';
 import type { UmbMediaPickerFolderPathElement } from './components/media-picker-folder-path.element.js';
 import type { UmbMediaPickerModalData, UmbMediaPickerModalValue } from './media-picker-modal.token.js';
+import { UMB_MEDIA_PICKER_CLIPBOARD_ENTRY_VALUE_TYPE } from '../../clipboard/constants.js';
 import {
 	css,
 	customElement,
@@ -29,6 +30,12 @@ import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
 import type { UmbPickerContext } from '@umbraco-cms/backoffice/picker';
 import type { UUIInputEvent, UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
+import {
+	UMB_CLIPBOARD_CONTEXT,
+	UMB_CLIPBOARD_ENTRY_PICKER_MODAL,
+	UmbClipboardCollectionRepository,
+} from '@umbraco-cms/backoffice/clipboard';
+import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 
 import './components/index.js';
 import '@umbraco-cms/backoffice/imaging';
@@ -88,12 +95,16 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 	@state()
 	private _searching: boolean = false;
 
+	@state()
+	private _hasClipboardMediaEntries: boolean = false;
+
 	@query('#dropzone')
 	private _dropzone!: UmbDropzoneMediaElement;
 
 	#pagingMap = new Map<string, UmbPaginationManager>();
 	#contextCulture?: string | null;
 	#locationInteractionMemoryUnique: string = 'UmbMediaItemPickerLocation';
+	#clipboardCollectionRepository = new UmbClipboardCollectionRepository(this);
 
 	constructor() {
 		super();
@@ -154,6 +165,21 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 
 		await this.#loadFolderTypes();
 		this.#loadChildrenOfCurrentMediaItem();
+		this.#checkClipboardEntries();
+	}
+
+	async #checkClipboardEntries() {
+		// Check if any clipboard entries exist for the media picker.
+		try {
+			const { data } = await this.#clipboardCollectionRepository.requestCollection({
+				types: [UMB_MEDIA_PICKER_CLIPBOARD_ENTRY_VALUE_TYPE],
+				take: 1,
+			});
+			this._hasClipboardMediaEntries = (data?.total ?? data?.items?.length ?? 0) > 0;
+		} catch {
+			// If clipboard is not available for some reason, just hide the button.
+			this._hasClipboardMediaEntries = false;
+		}
 	}
 
 	async #loadFolderTypes() {
@@ -430,10 +456,10 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 				? html`<div class="container"><p>${this.localize.term('content_listViewNoItems')}</p></div>`
 				: html`<div id="media-grid">
 						${repeat(
-							this._searchResult,
-							(item) => item.unique,
-							(item) => this.#renderCard(item),
-						)}
+					this._searchResult,
+					(item) => item.unique,
+					(item) => this.#renderCard(item),
+				)}
 					</div>`}
 		`;
 	}
@@ -444,13 +470,13 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 				? html`<div class="container"><p>${this.localize.term('content_listViewNoItems')}</p></div>`
 				: html`<div id="media-grid">
 							${repeat(
-								this._currentChildren,
-								(item) => item.unique,
-								(item) => this.#renderCard(item),
-							)}
+					this._currentChildren,
+					(item) => item.unique,
+					(item) => this.#renderCard(item),
+				)}
 						</div>
 						${this._currentTotalPages > 1
-							? html`<uui-pagination
+						? html`<uui-pagination
 									.current=${this._currentPage}
 									.total=${this._currentTotalPages}
 									firstlabel=${this.localize.term('general_first')}
@@ -458,7 +484,7 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 									nextlabel=${this.localize.term('general_next')}
 									lastlabel=${this.localize.term('general_last')}
 									@change=${this.#onPageChange}></uui-pagination>`
-							: nothing}`}
+						: nothing}`}
 		`;
 	}
 
@@ -473,25 +499,92 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 						value=${this._searchQuery}>
 						<div slot="prepend">
 							${this._searching
-								? html`<uui-loader-circle id="searching-indicator"></uui-loader-circle>`
-								: html`<uui-icon name="search"></uui-icon>`}
+				? html`<uui-loader-circle id="searching-indicator"></uui-loader-circle>`
+				: html`<uui-icon name="search"></uui-icon>`}
 						</div>
 					</uui-input>
 
 					${this._currentMediaEntity.unique && this._currentMediaEntity.unique !== this._startNode?.unique
-						? html`<uui-checkbox
+				? html`<uui-checkbox
 								?checked=${this._searchFrom?.unique === this._currentMediaEntity.unique}
 								@change=${this.#onSearchFromChange}
 								label="Search only in ${this._currentMediaEntity.name}"></uui-checkbox>`
-						: nothing}
+				: nothing}
 				</div>
 				<uui-button
 					@click=${() => this._dropzone.browse()}
 					label=${this.localize.term('general_upload')}
 					look="outline"
 					color="default"></uui-button>
+				${this._hasClipboardMediaEntries
+				? html`<uui-button
+							@click=${this.#pasteFromClipboard}
+							label="Paste from clipboard"
+							look="outline"
+							color="default">
+							<uui-icon name="icon-clipboard-paste"></uui-icon>
+						</uui-button>`
+				: nothing}
 			</div>
 		`;
+	}
+
+	async #pasteFromClipboard() {
+		// Open the generic clipboard entry picker, filtered to media picker clipboard entries.
+		const result = await umbOpenModal(this, UMB_CLIPBOARD_ENTRY_PICKER_MODAL, {
+			data: {
+				multiple: this.data?.multiple ?? false,
+				entryTypes: [UMB_MEDIA_PICKER_CLIPBOARD_ENTRY_VALUE_TYPE],
+			},
+		});
+
+		// Filter out potential nulls from the generic picker selection type.
+		const selectedUniques = (result?.selection ?? []).filter(
+			(unique): unique is string => typeof unique === 'string' && unique.length > 0,
+		);
+
+		if (!selectedUniques.length) return;
+
+		const mediaKeys = await this.#resolveMediaKeysFromClipboard(selectedUniques);
+		this.#updateSelection(mediaKeys);
+		// Immediately submit the media picker modal so the chosen clipboard items
+		// are applied to the underlying media picker property.
+		this._submitModal();
+	}
+
+
+	async #resolveMediaKeysFromClipboard(uniques: string[]): Promise<string[]> {
+		const clipboardContext = await this.getContext(UMB_CLIPBOARD_CONTEXT);
+
+		const mediaKeys: string[] = [];
+
+		for (const unique of uniques) {
+			const entry = await clipboardContext?.read(unique);
+			if (!entry) continue;
+
+			const mediaPickerValue = entry?.values.find(v => v.type === UMB_MEDIA_PICKER_CLIPBOARD_ENTRY_VALUE_TYPE)?.value;
+
+			if (!mediaPickerValue) continue;
+
+			for (const item of mediaPickerValue) {
+				mediaKeys.push(item.mediaKey);
+			}
+		}
+		return mediaKeys;
+	}
+
+	#updateSelection(mediaKeys: string[]) {
+		if (!mediaKeys.length) return;
+
+		if (this.data?.multiple) {
+			const existingSelection = this.value?.selection ?? [];
+			const newSelection = [...new Set([...existingSelection, ...mediaKeys])];
+			this._isSelectionMode = newSelection.length > 0;
+			this.modalContext?.setValue({ selection: newSelection });
+		} else {
+			this._isSelectionMode = true;
+			this.modalContext?.setValue({ selection: [mediaKeys[0]] });
+		}
 	}
 
 	#renderCard(item: UmbMediaTreeItemModel | UmbMediaSearchItemModel) {
@@ -527,10 +620,10 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 
 		const startNode: UmbMediaPathModel | undefined = this._startNode
 			? {
-					entityType: this._startNode.entityType,
-					unique: this._startNode.unique,
-					name: this._startNode.name,
-				}
+				entityType: this._startNode.entityType,
+				unique: this._startNode.unique,
+				name: this._startNode.name,
+			}
 			: undefined;
 
 		return html`<umb-media-picker-folder-path

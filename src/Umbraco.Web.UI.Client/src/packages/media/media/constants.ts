@@ -19,3 +19,4 @@ export {
 	UMB_MEDIA_PLACEHOLDER_ENTITY_TYPE,
 	UMB_MEDIA_PROPERTY_VALUE_ENTITY_TYPE,
 } from './entity.js';
+export { UMB_MEDIA_PICKER_CLIPBOARD_ENTRY_VALUE_TYPE } from './clipboard/constants.js';
