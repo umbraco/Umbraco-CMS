@@ -1,4 +1,4 @@
-import type { UmbTreeRepository } from './tree-repository.interface.js';
+import type { UmbTreeRepository } from '../data/index.js';
 import type { UmbCollectionFilterModel, UmbCollectionRepository } from '@umbraco-cms/backoffice/collection';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 import { UMB_ENTITY_CONTEXT, type UmbEntityModel } from '@umbraco-cms/backoffice/entity';
