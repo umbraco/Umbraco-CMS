@@ -171,4 +171,61 @@ internal sealed class SimilarNodeNameTests
         var uniqueName = SimilarNodeName.GetUniqueName(names, 0, "Test");
         Assert.AreEqual("Test (3)", uniqueName);
     }
+
+    /// <summary>
+    /// Verifies that the phantom entry approach used by DocumentRepository to resolve URL
+    /// segment collisions works correctly. When two different names produce the same URL
+    /// segment (e.g. "Title" and "Title." both produce "title"), a phantom entry with the
+    /// proposed name is added so the algorithm treats them as duplicates.
+    /// </summary>
+    [Test]
+    public void Phantom_Entry_For_Url_Segment_Collision_Causes_Suffix()
+    {
+        // Sibling "Title" exists. We're saving "Title." which produces the same URL segment.
+        // A phantom entry "Title." is added (with the sibling's ID) to simulate the collision.
+        SimilarNodeName[] names =
+        {
+            new SimilarNodeName { Id = 1, Name = "Title" },
+            new SimilarNodeName { Id = 1, Name = "Title." }, // phantom entry
+        };
+
+        var res = SimilarNodeName.GetUniqueName(names, 0, "Title.");
+
+        Assert.AreEqual("Title. (1)", res);
+    }
+
+    [Test]
+    public void Phantom_Entry_With_Multiple_Collisions_Increments_Suffix()
+    {
+        // Two existing siblings "Title" and "Title!" both produce the same URL segment as "Title.".
+        // Two phantom entries are added.
+        SimilarNodeName[] names =
+        {
+            new SimilarNodeName { Id = 1, Name = "Title" },
+            new SimilarNodeName { Id = 2, Name = "Title!" },
+            new SimilarNodeName { Id = 1, Name = "Title." }, // phantom for sibling 1
+            new SimilarNodeName { Id = 2, Name = "Title." }, // phantom for sibling 2
+        };
+
+        var res = SimilarNodeName.GetUniqueName(names, 0, "Title.");
+
+        Assert.AreEqual("Title. (1)", res);
+    }
+
+    [Test]
+    public void Phantom_Entry_With_Existing_Suffix_Increments_Correctly()
+    {
+        // Sibling "Title" exists and "Title. (1)" already exists.
+        // We're saving a new "Title." → should get "Title. (2)".
+        SimilarNodeName[] names =
+        {
+            new SimilarNodeName { Id = 1, Name = "Title" },
+            new SimilarNodeName { Id = 2, Name = "Title. (1)" },
+            new SimilarNodeName { Id = 1, Name = "Title." }, // phantom entry
+        };
+
+        var res = SimilarNodeName.GetUniqueName(names, 0, "Title.");
+
+        Assert.AreEqual("Title. (2)", res);
+    }
 }

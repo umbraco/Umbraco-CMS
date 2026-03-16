@@ -560,9 +560,6 @@ public class DocumentUrlService : IDocumentUrlService
 
         var languageDictionary = languages.ToDictionary(x => x.IsoCode);
 
-        // Track segments assigned during this batch to detect collisions among documents being processed together.
-        var batchAssignedSegments = new Dictionary<UrlCacheKey, string>();
-
         foreach (IContent document in documents)
         {
             if (_logger.IsEnabled(LogLevel.Trace))
@@ -575,7 +572,7 @@ public class DocumentUrlService : IDocumentUrlService
                 // Variant content: process per language.
                 foreach ((string culture, ILanguage language) in languageDictionary)
                 {
-                    HandleCaching(_coreScopeProvider.Context!, document, culture, language.Id, toSave, batchAssignedSegments, languageDictionary);
+                    HandleCaching(_coreScopeProvider.Context!, document, culture, language.Id, toSave);
                 }
             }
             else
@@ -591,14 +588,14 @@ public class DocumentUrlService : IDocumentUrlService
                 if (useNullLanguageId)
                 {
                     // All segments identical (or single language): store once with NULL languageId.
-                    HandleCaching(_coreScopeProvider.Context!, document, null, null, toSave, batchAssignedSegments, languageDictionary);
+                    HandleCaching(_coreScopeProvider.Context!, document, null, null, toSave);
                 }
                 else
                 {
                     // Segments differ by culture: store per-language (like variant content).
                     foreach ((string culture, ILanguage language) in languageDictionary)
                     {
-                        HandleCaching(_coreScopeProvider.Context!, document, culture, language.Id, toSave, batchAssignedSegments, languageDictionary);
+                        HandleCaching(_coreScopeProvider.Context!, document, culture, language.Id, toSave);
                     }
                 }
             }
@@ -706,14 +703,7 @@ public class DocumentUrlService : IDocumentUrlService
         return true;
     }
 
-    private void HandleCaching(
-        IScopeContext scopeContext,
-        IContent document,
-        string? culture,
-        int? languageId,
-        List<PublishedDocumentUrlSegment> toSave,
-        Dictionary<UrlCacheKey, string> batchAssignedSegments,
-        IDictionary<string, ILanguage> languageDictionary)
+    private void HandleCaching(IScopeContext scopeContext, IContent document, string? culture, int? languageId, List<PublishedDocumentUrlSegment> toSave)
     {
         foreach ((UrlCacheKey cacheKey, UrlSegmentCache? cache, bool shouldCache) in GenerateCacheEntries(document, culture, languageId))
         {
@@ -723,175 +713,10 @@ public class DocumentUrlService : IDocumentUrlService
             }
             else
             {
-                UrlSegmentCache resolvedCache = ResolveSegmentCollisions(document, cacheKey, cache, batchAssignedSegments, languageDictionary);
-                toSave.AddRange(ConvertToPersistedModel(cacheKey, resolvedCache));
-                UpdateCache(scopeContext, cacheKey, resolvedCache);
-
-                // Track this assignment so subsequent siblings in the batch can detect collisions.
-                batchAssignedSegments[cacheKey] = resolvedCache.PrimarySegment;
+                toSave.AddRange(ConvertToPersistedModel(cacheKey, cache));
+                UpdateCache(scopeContext, cacheKey, cache);
             }
         }
-    }
-
-    /// <summary>
-    /// Resolves URL segment collisions with sibling documents under the same parent.
-    /// If the primary segment collides with an existing sibling's segment, a numeric suffix
-    /// (e.g., "-2", "-3") is appended to ensure uniqueness.
-    /// </summary>
-    private UrlSegmentCache ResolveSegmentCollisions(
-        IContent document,
-        UrlCacheKey cacheKey,
-        UrlSegmentCache cache,
-        Dictionary<UrlCacheKey, string> batchAssignedSegments,
-        IDictionary<string, ILanguage> languageDictionary)
-    {
-        HashSet<string> usedSegments = CollectSiblingPrimarySegments(
-            document.Key, cacheKey.LanguageId, cacheKey.IsDraft, batchAssignedSegments, languageDictionary);
-
-        if (usedSegments.Count == 0 || usedSegments.Contains(cache.PrimarySegment) is false)
-        {
-            return cache; // No collision.
-        }
-
-        // Collision detected - find a unique segment by appending a numeric suffix.
-        var baseSegment = cache.PrimarySegment;
-        var counter = 2;
-        var resolvedSegment = $"{baseSegment}-{counter}";
-        while (usedSegments.Contains(resolvedSegment))
-        {
-            counter++;
-            resolvedSegment = $"{baseSegment}-{counter}";
-        }
-
-        _logger.LogDebug(
-            "URL segment collision detected for document {DocumentKey}: '{OriginalSegment}' is already used by a sibling. Resolved to '{ResolvedSegment}'.",
-            document.Key,
-            baseSegment,
-            resolvedSegment);
-
-        return new UrlSegmentCache
-        {
-            PrimarySegment = resolvedSegment,
-            AlternateSegments = cache.AlternateSegments,
-        };
-    }
-
-    /// <summary>
-    /// Collects the primary URL segments used by sibling documents (same parent) for a given language and draft state.
-    /// Checks both the in-memory cache (for existing documents) and the batch tracker (for documents being processed
-    /// in the same batch).
-    /// </summary>
-    private HashSet<string> CollectSiblingPrimarySegments(
-        Guid documentKey,
-        int? languageId,
-        bool isDraft,
-        Dictionary<UrlCacheKey, string> batchAssignedSegments,
-        IDictionary<string, ILanguage> languageDictionary)
-    {
-        var usedSegments = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-
-        if (_documentNavigationQueryService.TryGetSiblingsKeys(documentKey, out IEnumerable<Guid> siblingKeys) is false)
-        {
-            return usedSegments;
-        }
-
-        foreach (Guid siblingKey in siblingKeys)
-        {
-            CollectSegmentsForSibling(siblingKey, languageId, isDraft, batchAssignedSegments, languageDictionary, usedSegments);
-        }
-
-        return usedSegments;
-    }
-
-    /// <summary>
-    /// Collects primary URL segments for a single sibling document.
-    /// For invariant content (null languageId), also checks all language-specific entries
-    /// because an invariant segment applies to all cultures and could collide with variant siblings.
-    /// </summary>
-    private void CollectSegmentsForSibling(
-        Guid siblingKey,
-        int? languageId,
-        bool isDraft,
-        Dictionary<UrlCacheKey, string> batchAssignedSegments,
-        IDictionary<string, ILanguage> languageDictionary,
-        HashSet<string> usedSegments)
-    {
-        AddEffectiveSegment(siblingKey, languageId, isDraft, batchAssignedSegments, usedSegments);
-
-        if (languageId is not null)
-        {
-            return;
-        }
-
-        // Invariant content: also check all language-specific entries
-        // because an invariant segment applies to all cultures and could collide with variant siblings.
-        foreach (ILanguage language in languageDictionary.Values)
-        {
-            AddEffectiveSegment(siblingKey, language.Id, isDraft, batchAssignedSegments, usedSegments);
-        }
-    }
-
-    /// <summary>
-    /// Gets the effective segment for a sibling and adds it to the set if present.
-    /// </summary>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private void AddEffectiveSegment(
-        Guid siblingKey,
-        int? languageId,
-        bool isDraft,
-        Dictionary<UrlCacheKey, string> batchAssignedSegments,
-        HashSet<string> usedSegments)
-    {
-        var segment = GetEffectiveSiblingSegment(siblingKey, languageId, isDraft, batchAssignedSegments);
-        if (segment is not null)
-        {
-            usedSegments.Add(segment);
-        }
-    }
-
-    /// <summary>
-    /// Gets the effective primary URL segment for a sibling document, checking the batch tracker first
-    /// (for documents processed in the current batch), then the cache (for existing documents).
-    /// Uses the same culture-specific → invariant fallback logic as routing.
-    /// </summary>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private string? GetEffectiveSiblingSegment(
-        Guid siblingKey,
-        int? languageId,
-        bool isDraft,
-        Dictionary<UrlCacheKey, string> batchAssignedSegments)
-    {
-        var cacheKey = new UrlCacheKey(siblingKey, languageId, isDraft);
-
-        // Check batch tracker first (culture-specific).
-        if (batchAssignedSegments.TryGetValue(cacheKey, out var segment))
-        {
-            return segment;
-        }
-
-        // Check cache (culture-specific).
-        if (_documentUrlCache.TryGetValue(cacheKey, out UrlSegmentCache? cache))
-        {
-            return cache.PrimarySegment;
-        }
-
-        // Try invariant fallback (only when looking for a specific language).
-        if (languageId is not null)
-        {
-            var invariantKey = new UrlCacheKey(siblingKey, null, isDraft);
-
-            if (batchAssignedSegments.TryGetValue(invariantKey, out segment))
-            {
-                return segment;
-            }
-
-            if (_documentUrlCache.TryGetValue(invariantKey, out cache))
-            {
-                return cache.PrimarySegment;
-            }
-        }
-
-        return null;
     }
 
     private IEnumerable<(UrlCacheKey CacheKey, UrlSegmentCache? Cache, bool ShouldCache)> GenerateCacheEntries(IContent document, string? culture, int? languageId)

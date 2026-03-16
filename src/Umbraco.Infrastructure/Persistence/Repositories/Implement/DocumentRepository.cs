@@ -16,12 +16,14 @@ using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Factories;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
+using static Umbraco.Cms.Core.Persistence.SqlExtensionsStatics;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
@@ -38,6 +40,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
     private readonly IJsonSerializer _serializer;
     private readonly IRepositoryCacheVersionService _repositoryCacheVersionService;
     private readonly ICacheSyncService _cacheSyncService;
+    private readonly IShortStringHelper _shortStringHelper;
     private readonly ITagRepository _tagRepository;
     private readonly ITemplateRepository _templateRepository;
     private PermissionRepository<IContent>? _permissionRepository;
@@ -59,7 +62,8 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         IJsonSerializer serializer,
         IEventAggregator eventAggregator,
         IRepositoryCacheVersionService repositoryCacheVersionService,
-        ICacheSyncService cacheSyncService)
+        ICacheSyncService cacheSyncService,
+        IShortStringHelper shortStringHelper)
         : base(
             scopeAccessor,
             appCaches,
@@ -81,6 +85,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         _serializer = serializer;
         _repositoryCacheVersionService = repositoryCacheVersionService;
         _cacheSyncService = cacheSyncService;
+        _shortStringHelper = shortStringHelper;
         _appCaches = appCaches;
         _loggerFactory = loggerFactory;
         _scopeAccessor = scopeAccessor;
@@ -91,6 +96,47 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
             loggerFactory.CreateLogger<ContentByGuidReadRepository>(),
             repositoryCacheVersionService,
             cacheSyncService);
+    }
+
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
+    public DocumentRepository(
+        IScopeAccessor scopeAccessor,
+        AppCaches appCaches,
+        ILogger<DocumentRepository> logger,
+        ILoggerFactory loggerFactory,
+        IContentTypeRepository contentTypeRepository,
+        ITemplateRepository templateRepository,
+        ITagRepository tagRepository,
+        ILanguageRepository languageRepository,
+        IRelationRepository relationRepository,
+        IRelationTypeRepository relationTypeRepository,
+        PropertyEditorCollection propertyEditors,
+        DataValueReferenceFactoryCollection dataValueReferenceFactories,
+        IDataTypeService dataTypeService,
+        IJsonSerializer serializer,
+        IEventAggregator eventAggregator,
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
+        : this(
+            scopeAccessor,
+            appCaches,
+            logger,
+            loggerFactory,
+            contentTypeRepository,
+            templateRepository,
+            tagRepository,
+            languageRepository,
+            relationRepository,
+            relationTypeRepository,
+            propertyEditors,
+            dataValueReferenceFactories,
+            dataTypeService,
+            serializer,
+            eventAggregator,
+            repositoryCacheVersionService,
+            cacheSyncService,
+            StaticServiceProvider.Instance.GetRequiredService<IShortStringHelper>())
+    {
     }
 
     [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
@@ -127,7 +173,8 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
             serializer,
             eventAggregator,
             StaticServiceProvider.Instance.GetRequiredService<IRepositoryCacheVersionService>(),
-            StaticServiceProvider.Instance.GetRequiredService<ICacheSyncService>())
+            StaticServiceProvider.Instance.GetRequiredService<ICacheSyncService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IShortStringHelper>())
     {
     }
 
@@ -1983,8 +2030,33 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
     private void EnsureInvariantNameIsUnique(IContent content) =>
         content.Name = EnsureUniqueNodeName(content.ParentId, content.Name, content.Id);
 
-    protected override string? EnsureUniqueNodeName(int parentId, string? nodeName, int id = 0) =>
-        EnsureUniqueNaming == false ? nodeName : base.EnsureUniqueNodeName(parentId, nodeName, id);
+    protected override string? EnsureUniqueNodeName(int parentId, string? nodeName, int id = 0)
+    {
+        if (EnsureUniqueNaming == false)
+        {
+            return nodeName;
+        }
+
+        // Fetch all sibling names (same parent, same object type).
+        // Reuses the same cached SQL template as the base implementation.
+        SqlTemplate template = SqlContext.Templates.Get(
+            Constants.SqlTemplates.VersionableRepository.EnsureUniqueNodeName,
+            tsql => tsql
+                .Select<NodeDto>(x => Alias(x.NodeId, "id"), x => Alias(x.Text!, "name"))
+                .From<NodeDto>()
+                .Where<NodeDto>(x =>
+                    x.NodeObjectType == SqlTemplate.Arg<Guid>("nodeObjectType") &&
+                    x.ParentId == SqlTemplate.Arg<int>("parentId")));
+
+        Sql<ISqlContext> sql = template.Sql(NodeObjectTypeId, parentId);
+        List<SimilarNodeName> names = Database.Fetch<SimilarNodeName>(sql);
+
+        // Augment with phantom entries so that sibling names producing the same URL
+        // segment are treated as duplicates by the uniqueness algorithm.
+        AugmentNamesForUrlSegmentCollisions(names, nodeName, id);
+
+        return SimilarNodeName.GetUniqueName(names, id, nodeName);
+    }
 
     private SqlTemplate SqlEnsureVariantNamesAreUnique => SqlContext.Templates.Get(
         "Umbraco.Core.DomainRepository.EnsureVariantNamesAreUnique", tsql => tsql
@@ -2040,8 +2112,9 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
             }
 
             // get a unique name
-            IEnumerable<SimilarNodeName> otherNames =
-                cultureNames.Select(x => new SimilarNodeName { Id = x.Id, Name = x.Name });
+            List<SimilarNodeName> otherNames =
+                cultureNames.Select(x => new SimilarNodeName { Id = x.Id, Name = x.Name }).ToList();
+            AugmentNamesForUrlSegmentCollisions(otherNames, cultureInfo.Name, 0, cultureInfo.Culture);
             var uniqueName = SimilarNodeName.GetUniqueName(otherNames, 0, cultureInfo.Name);
 
             if (uniqueName == content.GetCultureName(cultureInfo.Culture))
@@ -2057,6 +2130,54 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
                     cultureInfo.Culture,
                     uniqueName,
                     DateTime.UtcNow); //TODO: This is weird, this call will have already been made in the SetCultureName
+            }
+        }
+    }
+
+    /// <summary>
+    /// Augments the sibling name list with phantom entries so that names producing the same
+    /// URL segment are treated as duplicates by the <see cref="SimilarNodeName.GetUniqueName"/> algorithm.
+    /// For example, siblings "Title" and "Title." both produce URL segment "title", so "Title."
+    /// should be treated as a duplicate name and receive the "(1)" suffix.
+    /// </summary>
+    private void AugmentNamesForUrlSegmentCollisions(
+        List<SimilarNodeName> names,
+        string? nodeName,
+        int nodeId,
+        string? culture = null)
+    {
+        if (string.IsNullOrWhiteSpace(nodeName))
+        {
+            return;
+        }
+
+        var proposedSegment = _shortStringHelper.CleanStringForUrlSegment(nodeName, culture);
+        if (string.IsNullOrEmpty(proposedSegment))
+        {
+            return;
+        }
+
+        // Iterate over a snapshot to avoid modifying the collection during enumeration.
+        foreach (SimilarNodeName sibling in names.ToArray())
+        {
+            if (sibling.Id == nodeId || string.IsNullOrWhiteSpace(sibling.Name))
+            {
+                continue;
+            }
+
+            // Skip if the names already match (the base algorithm handles that case).
+            if (sibling.Name.InvariantEquals(nodeName))
+            {
+                continue;
+            }
+
+            var siblingSegment = _shortStringHelper.CleanStringForUrlSegment(sibling.Name, culture);
+            if (proposedSegment.Equals(siblingSegment, StringComparison.OrdinalIgnoreCase))
+            {
+                // This sibling's name produces the same URL segment as the proposed name,
+                // but the raw names differ. Add a phantom entry with the proposed name so
+                // the uniqueness algorithm treats them as duplicates.
+                names.Add(new SimilarNodeName { Id = sibling.Id, Name = nodeName });
             }
         }
     }
