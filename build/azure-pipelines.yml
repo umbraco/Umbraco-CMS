@@ -45,7 +45,7 @@ parameters:
   - name: integrationNonReleaseTestFilter
     displayName: TestFilter used for non-release type builds
     type: string
-    default: "&TestCategory!=LongRunning&TestCategory!=NonCritical"
+    default: "--filter TestCategory!=LongRunning&TestCategory!=NonCritical"
   - name: integrationReleaseTestFilter
     displayName: TestFilter used for release type builds
     type: string
@@ -53,7 +53,7 @@ parameters:
   - name: nonWindowsIntegrationNonReleaseTestFilter
     displayName: TestFilter used for non-release type builds on non Windows agents
     type: string
-    default: "&TestCategory!=LongRunning&TestCategory!=NonCritical"
+    default: "--filter TestCategory!=LongRunning&TestCategory!=NonCritical"
   - name: nonWindowsIntegrationReleaseTestFilter
     displayName: TestFilter used for release type builds on non Windows agents
     type: string
@@ -462,13 +462,13 @@ stages:
               projects: "tests/Umbraco.Tests.Integration/Umbraco.Tests.Integration.csproj"
               testRunTitle: Integration Tests SQLite - $(Agent.OS)
               ${{ if and(eq(variables['Agent.OS'],'Windows_NT'), or(variables.releaseTestFilter, parameters.forceReleaseTestFilter)) }}:
-                arguments: '--filter "$(testFilter)${{parameters.integrationReleaseTestFilter}}" --configuration $(buildConfiguration) --no-build'
+                arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build ${{parameters.integrationReleaseTestFilter}}'
               ${{ elseif eq(variables['Agent.OS'],'Windows_NT') }}:
-                arguments: '--filter "$(testFilter)${{parameters.integrationNonReleaseTestFilter}}" --configuration $(buildConfiguration) --no-build'
+                arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build ${{parameters.integrationNonReleaseTestFilter}}'
               ${{ elseif or(variables.releaseTestFilter, parameters.forceReleaseTestFilter) }}:
-                arguments: '--filter "$(testFilter)${{parameters.nonWindowsIntegrationReleaseTestFilter}}" --configuration $(buildConfiguration) --no-build'
+                arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build ${{parameters.nonWindowsIntegrationReleaseTestFilter}}'
               ${{ else }}:
-                arguments: '--filter "$(testFilter)${{parameters.nonWindowsIntegrationNonReleaseTestFilter}}" --configuration $(buildConfiguration) --no-build'
+                arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build ${{parameters.nonWindowsIntegrationNonReleaseTestFilter}}'
       # Integration Tests (SQL Server)
       - job:
         timeoutInMinutes: 180
@@ -576,13 +576,13 @@ stages:
               projects: "tests/Umbraco.Tests.Integration/Umbraco.Tests.Integration.csproj"
               testRunTitle: Integration Tests SQL Server - $(Agent.OS)
               ${{ if and(eq(variables['Agent.OS'],'Windows_NT'), or(variables.releaseTestFilter, parameters.forceReleaseTestFilter)) }}:
-                arguments: '--filter "$(testFilter)${{parameters.integrationReleaseTestFilter}}" --configuration $(buildConfiguration) --no-build'
+                arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build ${{parameters.integrationReleaseTestFilter}}'
               ${{ elseif eq(variables['Agent.OS'],'Windows_NT') }}:
-                arguments: '--filter "$(testFilter)${{parameters.integrationNonReleaseTestFilter}}" --configuration $(buildConfiguration) --no-build'
+                arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build ${{parameters.integrationNonReleaseTestFilter}}'
               ${{ elseif or(variables.releaseTestFilter, parameters.forceReleaseTestFilter) }}:
-                arguments: '--filter "$(testFilter)${{parameters.nonWindowsIntegrationReleaseTestFilter}}" --configuration $(buildConfiguration) --no-build'
+                arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build ${{parameters.nonWindowsIntegrationReleaseTestFilter}}'
               ${{ else }}:
-                arguments: '--filter "$(testFilter)${{parameters.nonWindowsIntegrationNonReleaseTestFilter}}" --configuration $(buildConfiguration) --no-build'
+                arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build ${{parameters.nonWindowsIntegrationNonReleaseTestFilter}}'
 
           # Stop SQL Server
           - pwsh: docker stop mssql

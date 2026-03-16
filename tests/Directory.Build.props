@@ -9,9 +9,6 @@
     <BaseEnablePackageValidation>$(EnablePackageValidation)</BaseEnablePackageValidation>
     <EnablePackageValidation>false</EnablePackageValidation>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
-    <!-- NUnit3TestAdapter 6.x ships with MTP 2.0 support. Keep using VSTest mode for dotnet test in CI pipelines. -->
-    <EnableNUnitRunner>false</EnableNUnitRunner>
-    <TestingPlatformDotnetTestSupport>false</TestingPlatformDotnetTestSupport>
   </PropertyGroup>
 
   <PropertyGroup>
