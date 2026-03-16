@@ -368,10 +368,9 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
     /// After the fix, write locks are acquired before publishing notifications, so the deadlock cannot occur.
     /// </remarks>
     [Test]
-    [Explicit("Temporarily disabled: NUnit 4 [CancelAfter] cannot interrupt synchronous deadlocks (previously relied on NUnit 3 Thread.Abort).")]
-    [CancelAfter(10000)]
+    [Timeout(10000)]
     [ConfigureBuilder(ActionName = nameof(ConfigureConcurrencyTest))]
-    public async Task Parallel_Media_Save_Does_Not_Deadlock_When_Notification_Handler_Acquires_Read_Lock(CancellationToken cancellationToken)
+    public async Task Parallel_Media_Save_Does_Not_Deadlock_When_Notification_Handler_Acquires_Read_Lock()
     {
         // Arrange
         var mediaType = MediaTypeBuilder.CreateSimpleMediaType("testMedia", "Test Media");
@@ -396,13 +395,8 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
         {
             try
             {
-                cancellationToken.ThrowIfCancellationRequested();
                 media.Name += " Updated";
                 MediaService.Save(media);
-            }
-            catch (OperationCanceledException)
-            {
-                throw; // NUnit handle timeout
             }
             catch (Exception ex)
             {
@@ -435,10 +429,9 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
     /// Verifies that parallel media deletes don't deadlock when a notification handler is registered.
     /// </summary>
     [Test]
-    [Explicit("Temporarily disabled: NUnit 4 [CancelAfter] cannot interrupt synchronous deadlocks (previously relied on NUnit 3 Thread.Abort).")]
-    [CancelAfter(10000)]
+    [Timeout(10000)]
     [ConfigureBuilder(ActionName = nameof(ConfigureConcurrencyTest))]
-    public async Task Parallel_Media_Delete_Does_Not_Deadlock(CancellationToken cancellationToken)
+    public async Task Parallel_Media_Delete_Does_Not_Deadlock()
     {
         // Arrange
         var mediaType = MediaTypeBuilder.CreateSimpleMediaType("testMedia", "Test Media");

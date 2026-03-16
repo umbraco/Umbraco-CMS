@@ -13,11 +13,10 @@ using Umbraco.Cms.Tests.Integration.Umbraco.Persistence.EFCore.DbContext;
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Persistence.EFCore.Scoping;
 
 [TestFixture]
+[Timeout(60000)]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Logger = UmbracoTestOptions.Logger.Console)]
 internal sealed class EFCoreLockTests : UmbracoIntegrationTest
 {
-    private static readonly TimeSpan SafeTimeout = TimeSpan.FromSeconds(60);
-
     private IEFCoreScopeProvider<TestUmbracoDbContext> EFScopeProvider =>
         GetRequiredService<IEFCoreScopeProvider<TestUmbracoDbContext>>();
 
@@ -114,8 +113,6 @@ internal sealed class EFCoreLockTests : UmbracoIntegrationTest
     }
 
     [Test]
-    [Explicit("Temporarily disabled: NUnit 4 [CancelAfter] cannot interrupt synchronous deadlocks (previously relied on NUnit 3 Thread.Abort).")]
-    [CancelAfter(60000)]
     public void ConcurrentReadersTest()
     {
         if (BaseTestDatabase.IsSqlite())
@@ -152,7 +149,7 @@ internal sealed class EFCoreLockTests : UmbracoIntegrationTest
                             }
                         }
 
-                        Assert.That(m1.Wait(SafeTimeout), Is.True, "Timed out waiting for signal.");
+                        m1.Wait();
                         lock (locker)
                         {
                             acquired--;
@@ -177,14 +174,14 @@ internal sealed class EFCoreLockTests : UmbracoIntegrationTest
             }
         }
 
-        Assert.That(m2.Wait(SafeTimeout), Is.True, "Timed out waiting for all threads to acquire locks.");
+        m2.Wait();
         // all threads have locked in parallel
         var maxAcquired = acquired;
         m1.Set();
 
         foreach (var thread in threads)
         {
-            Assert.That(thread.Join(SafeTimeout), Is.True, "Thread did not complete in time.");
+            thread.Join();
         }
 
         Assert.AreEqual(threadCount, maxAcquired);
@@ -197,8 +194,6 @@ internal sealed class EFCoreLockTests : UmbracoIntegrationTest
     }
 
     [Test]
-    [Explicit("Temporarily disabled: NUnit 4 [CancelAfter] cannot interrupt synchronous deadlocks (previously relied on NUnit 3 Thread.Abort).")]
-    [CancelAfter(60000)]
     public void ConcurrentWritersTest()
     {
         if (BaseTestDatabase.IsSqlite())
@@ -242,10 +237,7 @@ internal sealed class EFCoreLockTests : UmbracoIntegrationTest
                             }
                         }
 
-                        if (!ms[ic].WaitOne(SafeTimeout))
-                        {
-                            throw new TimeoutException($"Thread {ic} timed out waiting for signal to acquire write lock.");
-                        }
+                        ms[ic].WaitOne();
 
                         lock (locker)
                         {
@@ -263,11 +255,7 @@ internal sealed class EFCoreLockTests : UmbracoIntegrationTest
                             acquired++;
                         }
 
-                        if (!ms[ic].WaitOne(SafeTimeout))
-                        {
-                            throw new TimeoutException($"Thread {ic} timed out waiting for signal to release write lock.");
-                        }
-
+                        ms[ic].WaitOne();
                         lock (locker)
                         {
                             acquired--;
@@ -292,7 +280,7 @@ internal sealed class EFCoreLockTests : UmbracoIntegrationTest
             }
         }
 
-        Assert.That(m1.Wait(SafeTimeout), Is.True, "Timed out waiting for all threads to enter.");
+        m1.Wait();
         // all threads have entered
         ms[0].Set(); // let 0 go
         // TODO: This timing is flaky
@@ -302,7 +290,7 @@ internal sealed class EFCoreLockTests : UmbracoIntegrationTest
             ms[i].Set(); // let others go
         }
 
-        Assert.That(m2.Wait(SafeTimeout), Is.True, "Timed out waiting for all threads to try acquiring write lock.");
+        m2.Wait();
         // only 1 thread has locked
         Assert.AreEqual(1, acquired);
         for (var i = 0; i < threadCount; i++)
@@ -312,7 +300,7 @@ internal sealed class EFCoreLockTests : UmbracoIntegrationTest
 
         foreach (var thread in threads)
         {
-            Assert.That(thread.Join(SafeTimeout), Is.True, "Thread did not complete in time.");
+            thread.Join();
         }
 
         Assert.AreEqual(0, acquired);
@@ -325,8 +313,6 @@ internal sealed class EFCoreLockTests : UmbracoIntegrationTest
 
     [Retry(10)] // TODO make this test non-flaky.
     [Test]
-    [Explicit("Temporarily disabled: NUnit 4 [CancelAfter] cannot interrupt synchronous deadlocks (previously relied on NUnit 3 Thread.Abort).")]
-    [CancelAfter(60000)]
     public void DeadLockTest()
     {
         if (BaseTestDatabase.IsSqlite())
@@ -354,8 +340,8 @@ internal sealed class EFCoreLockTests : UmbracoIntegrationTest
 
         ev2.Set();
 
-        Assert.That(thread1.Join(SafeTimeout), Is.True, "Thread1 did not complete in time.");
-        Assert.That(thread2.Join(SafeTimeout), Is.True, "Thread2 did not complete in time.");
+        thread1.Join();
+        thread2.Join();
 
         Assert.IsNotNull(e1);
         if (e1 != null)
@@ -386,11 +372,7 @@ internal sealed class EFCoreLockTests : UmbracoIntegrationTest
         using var scope = EFScopeProvider.CreateScope();
         try
         {
-            if (!otherEv.WaitOne(SafeTimeout))
-            {
-                throw new TimeoutException($"Thread [{id1}] timed out waiting for other thread signal.");
-            }
-
+            otherEv.WaitOne();
             Console.WriteLine($"[{id1}] WAIT {id1}");
             scope.Locks.EagerWriteLock(scope.InstanceId, id1);
             Console.WriteLine($"[{id1}] GRANT {id1}");
@@ -398,10 +380,7 @@ internal sealed class EFCoreLockTests : UmbracoIntegrationTest
 
             if (id1 == 1)
             {
-                if (!otherEv.WaitOne(SafeTimeout))
-                {
-                    throw new TimeoutException($"Thread [{id1}] timed out waiting for other thread signal.");
-                }
+                otherEv.WaitOne();
             }
             else
             {

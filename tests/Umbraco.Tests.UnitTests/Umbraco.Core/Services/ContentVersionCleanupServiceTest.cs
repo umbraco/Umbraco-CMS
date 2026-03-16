@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using AutoFixture.NUnit4;
+using AutoFixture.NUnit3;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Events;

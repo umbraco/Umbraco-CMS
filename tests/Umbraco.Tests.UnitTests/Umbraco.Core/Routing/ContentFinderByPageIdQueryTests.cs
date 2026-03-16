@@ -1,5 +1,5 @@
 using System.Web;
-using AutoFixture.NUnit4;
+using AutoFixture.NUnit3;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models.PublishedContent;

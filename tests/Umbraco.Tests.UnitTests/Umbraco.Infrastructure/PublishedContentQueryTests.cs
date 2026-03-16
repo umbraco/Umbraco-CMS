@@ -4,7 +4,6 @@ using Examine;
 using Examine.Search;
 using Moq;
 using NUnit.Framework;
-using NUnit.Framework.Legacy;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
