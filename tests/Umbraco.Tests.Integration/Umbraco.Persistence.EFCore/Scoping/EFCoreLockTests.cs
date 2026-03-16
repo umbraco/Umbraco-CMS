@@ -114,6 +114,7 @@ internal sealed class EFCoreLockTests : UmbracoIntegrationTest
     }
 
     [Test]
+    [CancelAfter(60000)]
     public void ConcurrentReadersTest()
     {
         if (BaseTestDatabase.IsSqlite())
@@ -195,6 +196,7 @@ internal sealed class EFCoreLockTests : UmbracoIntegrationTest
     }
 
     [Test]
+    [CancelAfter(60000)]
     public void ConcurrentWritersTest()
     {
         if (BaseTestDatabase.IsSqlite())
@@ -240,7 +242,7 @@ internal sealed class EFCoreLockTests : UmbracoIntegrationTest
 
                         if (!ms[ic].WaitOne(SafeTimeout))
                         {
-                            return;
+                            throw new TimeoutException($"Thread {ic} timed out waiting for signal to acquire write lock.");
                         }
 
                         lock (locker)
@@ -261,7 +263,7 @@ internal sealed class EFCoreLockTests : UmbracoIntegrationTest
 
                         if (!ms[ic].WaitOne(SafeTimeout))
                         {
-                            return;
+                            throw new TimeoutException($"Thread {ic} timed out waiting for signal to release write lock.");
                         }
 
                         lock (locker)
@@ -321,6 +323,7 @@ internal sealed class EFCoreLockTests : UmbracoIntegrationTest
 
     [Retry(10)] // TODO make this test non-flaky.
     [Test]
+    [CancelAfter(60000)]
     public void DeadLockTest()
     {
         if (BaseTestDatabase.IsSqlite())
@@ -382,7 +385,7 @@ internal sealed class EFCoreLockTests : UmbracoIntegrationTest
         {
             if (!otherEv.WaitOne(SafeTimeout))
             {
-                return;
+                throw new TimeoutException($"Thread [{id1}] timed out waiting for other thread signal.");
             }
 
             Console.WriteLine($"[{id1}] WAIT {id1}");
@@ -394,7 +397,7 @@ internal sealed class EFCoreLockTests : UmbracoIntegrationTest
             {
                 if (!otherEv.WaitOne(SafeTimeout))
                 {
-                    return;
+                    throw new TimeoutException($"Thread [{id1}] timed out waiting for other thread signal.");
                 }
             }
             else

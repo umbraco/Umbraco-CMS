@@ -474,15 +474,7 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
             return Task.CompletedTask;
         })).ToList();
 
-        var allTasks = Task.WhenAll(tasks);
-        var completed = await Task.WhenAny(allTasks, Task.Delay(10000, cancellationToken));
-
-        if (completed != allTasks)
-        {
-            Assert.Fail("Parallel deletes timed out after 10 seconds — possible deadlock.");
-        }
-
-        await allTasks;
+        await Task.WhenAll(tasks);
 
         // Assert
         Assert.IsEmpty(

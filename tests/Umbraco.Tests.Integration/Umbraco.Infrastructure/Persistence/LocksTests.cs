@@ -48,6 +48,7 @@ internal sealed class LocksTests : UmbracoIntegrationTest
     }
 
     [Test]
+    [CancelAfter(60000)]
     public void ConcurrentReadersTest()
     {
         const int threadCount = 8;
@@ -186,6 +187,7 @@ internal sealed class LocksTests : UmbracoIntegrationTest
 
     [Test]
     [LongRunning]
+    [CancelAfter(60000)]
     public void ConcurrentWritersTest()
     {
         const int threadCount = 8;
@@ -222,7 +224,7 @@ internal sealed class LocksTests : UmbracoIntegrationTest
 
                         if (!ms[ic].WaitOne(SafeTimeout))
                         {
-                            return;
+                            throw new TimeoutException($"Thread {ic} timed out waiting for signal to acquire write lock.");
                         }
                         scope.EagerWriteLock(Constants.Locks.Servers);
                         lock (locker)
@@ -232,7 +234,7 @@ internal sealed class LocksTests : UmbracoIntegrationTest
 
                         if (!ms[ic].WaitOne(SafeTimeout))
                         {
-                            return;
+                            throw new TimeoutException($"Thread {ic} timed out waiting for signal to release write lock.");
                         }
                         lock (locker)
                         {
@@ -258,7 +260,7 @@ internal sealed class LocksTests : UmbracoIntegrationTest
             }
         }
 
-        m1.Wait();
+        Assert.That(m1.Wait(SafeTimeout), Is.True, "Timed out waiting for all threads to enter.");
         // all threads have entered
         ms[0].Set(); // let 0 go
         // TODO: This timing is flaky
@@ -292,6 +294,7 @@ internal sealed class LocksTests : UmbracoIntegrationTest
 
     [Retry(10)] // TODO make this test non-flaky.
     [Test]
+    [CancelAfter(60000)]
     public void DeadLockTest()
     {
         if (BaseTestDatabase.IsSqlite())
@@ -354,7 +357,7 @@ internal sealed class LocksTests : UmbracoIntegrationTest
             {
                 if (!otherEv.WaitOne(SafeTimeout))
                 {
-                    return;
+                    throw new TimeoutException($"Thread [{id1}] timed out waiting for other thread signal.");
                 }
                 Console.WriteLine($"[{id1}] WAIT {id1}");
                 scope.EagerWriteLock(id1);
@@ -366,7 +369,7 @@ internal sealed class LocksTests : UmbracoIntegrationTest
                 {
                     if (!otherEv.WaitOne(SafeTimeout))
                     {
-                        return;
+                        throw new TimeoutException($"Thread [{id1}] timed out waiting for other thread signal.");
                     }
                 }
                 else
@@ -391,6 +394,7 @@ internal sealed class LocksTests : UmbracoIntegrationTest
     }
 
     [Test]
+    [CancelAfter(60000)]
     public void NoDeadLockTest()
     {
         if (BaseTestDatabase.IsSqlite())
@@ -428,6 +432,7 @@ internal sealed class LocksTests : UmbracoIntegrationTest
 
     [Test]
     [LongRunning]
+    [CancelAfter(60000)]
     public void Throws_When_Lock_Timeout_Is_Exceeded_Read()
     {
         if (BaseTestDatabase.IsSqlite())
@@ -494,6 +499,7 @@ internal sealed class LocksTests : UmbracoIntegrationTest
 
     [Test]
     [LongRunning]
+    [CancelAfter(60000)]
     public void Throws_When_Lock_Timeout_Is_Exceeded_Write()
     {
         var counter = 0;
@@ -658,7 +664,7 @@ internal sealed class LocksTests : UmbracoIntegrationTest
             {
                 if (!otherEv.WaitOne(SafeTimeout))
                 {
-                    return;
+                    throw new TimeoutException($"Thread [{id}] timed out waiting for other thread signal.");
                 }
                 Console.WriteLine($"[{id}] WAIT {id}");
                 scope.EagerWriteLock(id);
@@ -667,7 +673,7 @@ internal sealed class LocksTests : UmbracoIntegrationTest
                 myEv.Set();
                 if (!otherEv.WaitOne(SafeTimeout))
                 {
-                    return;
+                    throw new TimeoutException($"Thread [{id}] timed out waiting for other thread signal.");
                 }
             }
             catch (Exception e)
