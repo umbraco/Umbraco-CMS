@@ -33,6 +33,7 @@ Umbraco.Cms.Persistence.EFCore.Sqlite/
 │   ├── 20260209100831_AddWebhookDto.cs          # Webhook tables
 │   └── UmbracoDbContextModelSnapshot.cs         # Current model state
 ├── EFCoreSqliteComposer.cs                       # DI registration
+├── SqliteCollationModelCustomizer.cs             # Applies COLLATE NOCASE to all string properties
 ├── SqliteDatabaseConfigurator.cs                 # IDatabaseConfigurator impl
 ├── SqliteDbContextServiceRegistrar.cs            # IDbContextServiceRegistrar impl
 ├── SqliteEFCoreDistributedLockingMechanism.cs    # Distributed locking
@@ -131,17 +132,21 @@ All tables prefixed with `umbraco`:
 ### Adding New Migrations
 
 1. Configure SQLite connection string in `src/Umbraco.Web.UI/appsettings.json`
-2. Run migration command from repository root
-3. **Critical**: Also add equivalent migration to `Umbraco.Cms.Persistence.EFCore.SqlServer`
-4. Update `SqliteMigrationProvider.GetMigrationType()` switch if adding named migrations
+2. Run from repository root:
+   ```bash
+   dotnet ef migrations add %Name% -s src/Umbraco.Web.UI -p src/Umbraco.Cms.Persistence.EFCore.Sqlite -c UmbracoDbContext
+   ```
+3. Empty the `Up()` and `Down()` methods (these are no-ops — NPoco creates the tables)
+4. **Critical**: Also add equivalent migration to `Umbraco.Cms.Persistence.EFCore.SqlServer`
+5. Update `SqliteMigrationProvider.GetMigrationType()` switch if adding named migrations
 
 ### Model Customizers
 
 SQLite does **NOT** need per-DTO customizers for index features like `.IncludeProperties()` — those are SQL Server-specific.
 
-However, SQLite **does** need a global collation customizer. NPoco's `SqliteSyntaxProvider` creates ALL string columns as `TEXT COLLATE NOCASE` (case-insensitive), matching SQL Server's typical `CI_AS` database-level collation. EF Core's SQLite provider creates plain `TEXT` columns, which default to `BINARY` (case-sensitive). Without a customizer, string comparisons (lookups by alias, email, login, ISO code, dictionary keys, etc.) would silently break when EF Core takes over table creation.
+However, SQLite **does** require a global collation customizer. NPoco's `SqliteSyntaxProvider` creates ALL string columns as `TEXT COLLATE NOCASE` (case-insensitive), matching SQL Server's typical `CI_AS` database-level collation. EF Core's SQLite provider creates plain `TEXT` columns, which default to `BINARY` (case-sensitive). Without a customizer, string comparisons (lookups by alias, email, login, ISO code, dictionary keys, etc.) would silently break when EF Core takes over table creation.
 
-**Recommended approach**: Implement a global `IEFCoreModelCustomizer` (non-generic) in this project that iterates all entity types and applies `.UseCollation("NOCASE")` to all string properties. Register it via `builder.AddEFCoreModelCustomizer<T>()` in `UmbracoBuilderExtensions`. This mirrors the SQL Server pattern where provider-specific customizers are registered only in the provider package.
+**This is already handled automatically by `SqliteCollationModelCustomizer`**, registered in `UmbracoBuilderExtensions`. It iterates all entity types in the model and applies `.UseCollation("NOCASE")` to every string property. No per-DTO action is required when adding new DTOs.
 
 **Why not per-property in shared configurations?** Adding `.UseCollation("NOCASE")` to every string property in every `IEntityTypeConfiguration` would be verbose (80+ DTOs), error-prone, and would affect SQL Server unnecessarily. A single SQLite-specific customizer is cleaner.
 
@@ -167,6 +172,7 @@ However, SQLite **does** need a global collation customizer. NPoco's `SqliteSynt
 
 | File | Purpose |
 |------|---------|
+| `SqliteCollationModelCustomizer.cs` | Applies `COLLATE NOCASE` to all string properties globally |
 | `SqliteDatabaseConfigurator.cs` | DbContext configuration (IDatabaseConfigurator) |
 | `SqliteDbContextServiceRegistrar.cs` | Provider service registration (IDbContextServiceRegistrar) |
 | `SqliteEFCoreDistributedLockingMechanism.cs` | Distributed locking |

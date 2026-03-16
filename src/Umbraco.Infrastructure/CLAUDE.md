@@ -48,11 +48,12 @@ src/Umbraco.Infrastructure/
 │       ├── DbContextRegistration.cs       # Bidirectional provider registration
 │       ├── IDbContextServiceRegistrar.cs  # Provider service registration contract
 │       ├── IDatabaseConfigurator.cs       # Provider configuration contract
-│       ├── UmbracoDbContext.cs            # Base DbContext for EF Core
+│       ├── UmbracoDbContext.cs            # Base DbContext for EF Core ⭐ add DbSets here
 │       ├── EfCoreMigrationExecutor.cs     # Migration execution
 │       ├── Migrations/                    # Migration provider interfaces
 │       ├── Scoping/                       # EF Core scope management
 │       └── Extensions/                    # DI extension methods
+│   # ⭐ Migrating a NPoco repository to EF Core? See Section 12 below.
 │
 ├── Services/                      # Service implementations
 │   └── Implement/                 # Concrete service classes (16 services)
@@ -611,6 +612,7 @@ using (var outer = ScopeProvider.CreateCoreScope())
 - Performance: Faster than EF Core for Umbraco's workload
 - Control: Fine-grained SQL control
 - **Note**: EF Core abstractions (DbContext, migrations, provider registration) now live directly in `Umbraco.Infrastructure/Persistence/EFCore/`, with provider-specific implementations in `Umbraco.Cms.Persistence.EFCore.SqlServer` and `Umbraco.Cms.Persistence.EFCore.Sqlite`
+- **Migrating a repository to EF Core?** See **Section 12** at the bottom of this file for the complete DTO migration guide.
 
 **Why Separate Factories and Mappers?**
 - **Factories**: DTO → Entity (one direction, for reading from DB)
@@ -925,11 +927,13 @@ private static void AddCustomizers(IUmbracoBuilder builder) =>
         .AddEFCoreModelCustomizer<SqlServerDocumentVersionDtoModelCustomizer>();
 ```
 
-**SQLite collation**: SQLite requires a global `COLLATE NOCASE` customizer. NPoco's `SqliteSyntaxProvider` creates ALL string columns as `TEXT COLLATE NOCASE` (case-insensitive), matching SQL Server's default `CI_AS` collation. EF Core's SQLite provider creates plain `TEXT` columns (case-sensitive by default). Without a SQLite customizer that applies `NOCASE` collation to all string properties, string comparisons (lookups by alias, email, login, etc.) would silently break. See `Umbraco.Cms.Persistence.EFCore.Sqlite/CLAUDE.md` for details.
+**SQLite collation**: SQLite string collation is handled automatically — no action required when adding new DTOs. `SqliteCollationModelCustomizer` (in `Umbraco.Cms.Persistence.EFCore.Sqlite`) applies `COLLATE NOCASE` to all string properties globally. This matches NPoco's `SqliteSyntaxProvider`, which creates ALL string columns as `TEXT COLLATE NOCASE` (case-insensitive), aligning with SQL Server's default `CI_AS` collation. EF Core's SQLite provider would otherwise default to plain `TEXT` (case-sensitive). See `Umbraco.Cms.Persistence.EFCore.Sqlite/CLAUDE.md` for details.
 
 ### Step 5: Generate EF Core Migrations
 
 Migrations must be generated in **BOTH** provider projects. These migrations are **NO-OPs** (empty `Up`/`Down` methods) because NPoco creates the actual tables. They exist only to update the EF Core model snapshot.
+
+**Prerequisite**: Complete Steps 1–3 before running migration commands. EF Core generates the snapshot from the live model — if the DTO is not yet registered via `DbSet<>` in `UmbracoDbContext` (Step 3), it will not appear in the snapshot and you won't know why.
 
 **Commands** (run from repository root):
 ```bash
@@ -944,7 +948,7 @@ dotnet ef migrations add %Name% -s src/Umbraco.Web.UI -p src/Umbraco.Cms.Persist
 1. Open the generated migration files in both provider projects
 2. **Delete all content** from the `Up()` and `Down()` methods (leave them empty)
 3. Keep the `UmbracoDbContextModelSnapshot.cs` changes — these track the model state
-4. Verify the snapshot includes all new tables, columns, indexes, and relationships
+4. Verify the snapshot: search `UmbracoDbContextModelSnapshot.cs` for the table name (e.g., `umbracoKeyValue`). If absent, EF Core did not discover the DTO — check the `[EntityTypeConfiguration]` attribute (Step 1) and the `DbSet<>` registration (Step 3)
 
 **To remove the last migration** (if something went wrong):
 ```bash
@@ -964,7 +968,7 @@ dotnet ef migrations remove -s src/Umbraco.Web.UI -p src/Umbraco.Cms.Persistence
 6. **Missing indexes** — compare the NPoco DTO's `[Index]` attributes and replicate all of them in the Configuration
 7. **Generating migration for only one provider** — always generate for BOTH SQL Server and SQLite
 8. **Forgetting to register customizer** — if you create a SQL Server customizer, add it to `UmbracoBuilderExtensions.AddCustomizers()`
-9. **SQLite collation gap** — NPoco creates all SQLite string columns as `TEXT COLLATE NOCASE` (case-insensitive). EF Core's SQLite provider defaults to plain `TEXT` (case-sensitive). A global SQLite collation customizer is required to preserve case-insensitive behavior when EF Core manages table creation. See `Umbraco.Cms.Persistence.EFCore.Sqlite/CLAUDE.md`
+9. **SQLite collation** — NPoco creates all SQLite string columns as `TEXT COLLATE NOCASE` (case-insensitive), but EF Core's SQLite provider defaults to plain `TEXT` (case-sensitive). This is already handled automatically by `SqliteCollationModelCustomizer` — no per-DTO action needed. See `Umbraco.Cms.Persistence.EFCore.Sqlite/CLAUDE.md`
 
 ---
 
