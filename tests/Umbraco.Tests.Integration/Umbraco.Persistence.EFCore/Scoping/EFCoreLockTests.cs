@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.DistributedLocking.Exceptions;
 using Umbraco.Cms.Persistence.EFCore.Locking;
 using Umbraco.Cms.Persistence.EFCore.Scoping;
 using Umbraco.Cms.Persistence.Sqlite.Interceptors;
+using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Cms.Tests.Integration.Umbraco.Persistence.EFCore.DbContext;
@@ -114,6 +115,7 @@ internal sealed class EFCoreLockTests : UmbracoIntegrationTest
     }
 
     [Test]
+    [LongRunning]
     [CancelAfter(60000)]
     public void ConcurrentReadersTest()
     {
@@ -196,6 +198,7 @@ internal sealed class EFCoreLockTests : UmbracoIntegrationTest
     }
 
     [Test]
+    [LongRunning]
     [CancelAfter(60000)]
     public void ConcurrentWritersTest()
     {
@@ -323,6 +326,7 @@ internal sealed class EFCoreLockTests : UmbracoIntegrationTest
 
     [Retry(10)] // TODO make this test non-flaky.
     [Test]
+    [LongRunning]
     [CancelAfter(60000)]
     public void DeadLockTest()
     {
