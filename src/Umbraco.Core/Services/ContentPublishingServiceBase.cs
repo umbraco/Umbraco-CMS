@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
@@ -276,7 +276,7 @@ internal abstract class ContentPublishingServiceBase<TContent, TContentService>
             return Attempt.Fail(ContentPublishingOperationStatus.ContentNotFound);
         }
 
-        if (_contentSettings.DisableUnpublishWhenReferenced && _relationService.IsRelated(content.Id, RelationDirectionFilter.Child))
+        if (_contentSettings.DisableUnpublishWhenReferenced && _relationService.IsRelated(content.Id, RelationDirectionFilter.Child, null, null))
         {
             scope.Complete();
             return Attempt<ContentPublishingOperationStatus>.Fail(ContentPublishingOperationStatus.CannotUnpublishWhenReferenced);

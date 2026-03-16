@@ -29,7 +29,7 @@ public sealed class ApiLink
     /// <param name="destinationType">The content type alias of the destination.</param>
     /// <param name="route">The route information for the destination content.</param>
     /// <returns>A new <see cref="ApiLink" /> instance representing a content link.</returns>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 20.")]
     public static ApiLink Content(string title, string? queryString, string? target, Guid destinationId, string destinationType, IApiContentRoute route)
         => new(LinkType.Content, url: null, queryString, title, target, destinationId, destinationType, route);
 
