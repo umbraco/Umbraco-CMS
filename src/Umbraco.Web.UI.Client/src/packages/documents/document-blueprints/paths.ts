@@ -1,5 +1,5 @@
-import { UMB_SETTINGS_SECTION_PATHNAME } from '@umbraco-cms/backoffice/settings';
 import { UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE, type UmbDocumentBlueprintEntityTypeUnion } from './entity.js';
+import { UMB_SETTINGS_SECTION_PATHNAME } from '@umbraco-cms/backoffice/settings';
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 import { UmbPathPattern } from '@umbraco-cms/backoffice/router';
 import { UMB_WORKSPACE_PATH_PATTERN } from '@umbraco-cms/backoffice/workspace';
