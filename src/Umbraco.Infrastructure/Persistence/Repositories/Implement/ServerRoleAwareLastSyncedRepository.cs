@@ -1,4 +1,3 @@
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Sync;
 
@@ -14,24 +13,22 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 /// </remarks>
 public class ServerRoleAwareLastSyncedRepository : ILastSyncedRepository
 {
-    private readonly IServiceProvider _serviceProvider;
+    private readonly Lazy<IServerRoleAccessor> _serverRoleAccessor;
     private readonly LastSyncedRepository _databaseRepository;
     private readonly FileSystemLastSyncedRepository _fileSystemRepository;
-
-    private IServerRoleAccessor? _serverRoleAccessor;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ServerRoleAwareLastSyncedRepository"/> class.
     /// </summary>
-    /// <param name="serviceProvider">The service provider used to lazily resolve the server role accessor.</param>
+    /// <param name="serverRoleAccessor">Lazy accessor for the server role, deferred to avoid a singleton resolution deadlock.</param>
     /// <param name="databaseRepository">The database repository for non-subscriber servers.</param>
     /// <param name="fileSystemRepository">The file system repository for subscriber servers.</param>
     public ServerRoleAwareLastSyncedRepository(
-        IServiceProvider serviceProvider,
+        Lazy<IServerRoleAccessor> serverRoleAccessor,
         LastSyncedRepository databaseRepository,
         FileSystemLastSyncedRepository fileSystemRepository)
     {
-        _serviceProvider = serviceProvider;
+        _serverRoleAccessor = serverRoleAccessor;
         _databaseRepository = databaseRepository;
         _fileSystemRepository = fileSystemRepository;
     }
@@ -51,14 +48,8 @@ public class ServerRoleAwareLastSyncedRepository : ILastSyncedRepository
     /// <inheritdoc />
     public Task DeleteEntriesOlderThanAsync(DateTime pruneDate) => GetRepository().DeleteEntriesOlderThanAsync(pruneDate);
 
-    private ILastSyncedRepository GetRepository()
-    {
-        // We have to access the IServerRoleAccessor this way to prevent a deadlock. If IServerRoleAccessor is injected directly
-        // it has circular dependencies that will cause a deadlock.
-        _serverRoleAccessor ??= _serviceProvider.GetRequiredService<IServerRoleAccessor>();
-
-        return _serverRoleAccessor.CurrentServerRole == ServerRole.Subscriber
+    private ILastSyncedRepository GetRepository() =>
+        _serverRoleAccessor.Value.CurrentServerRole == ServerRole.Subscriber
             ? _fileSystemRepository
             : _databaseRepository;
-    }
 }
