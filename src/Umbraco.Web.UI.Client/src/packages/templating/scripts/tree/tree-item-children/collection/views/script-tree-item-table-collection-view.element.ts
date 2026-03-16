@@ -59,7 +59,7 @@ export class UmbScriptTreeItemTableCollectionViewElement extends UmbLitElement {
 				data: [
 					{
 						columnAlias: 'name',
-						value: html`<uui-button href=${editPath} label=${item.name}></uui-button>`,
+						value: html`<uui-button compact href=${editPath} label=${item.name}></uui-button>`,
 					},
 					{
 						columnAlias: 'entityActions',
