@@ -90,16 +90,11 @@ public class ConfigurationPresentationFactory : IConfigurationPresentationFactor
             ReservedFieldNames = _reservedFieldNamesService.GetMemberReservedFieldNames(),
         };
 
-    /// <summary>
-    /// Creates a new instance of <see cref="Umbraco.Cms.Api.Management.Models.MediaConfigurationResponseModel"/> with media configuration settings.
-    /// </summary>
-    /// <returns>A <see cref="Umbraco.Cms.Api.Management.Models.MediaConfigurationResponseModel"/> containing the media configuration.</returns>
-    public MediaConfigurationResponseModel CreateMediaConfigurationResponseModel() =>
-        new()
-        {
-            DisableDeleteWhenReferenced = _contentSettings.DisableDeleteWhenReferenced,
-            DisableUnpublishWhenReferenced = _contentSettings.DisableUnpublishWhenReferenced,
-        };
+    public MediaConfigurationResponseModel CreateMediaConfigurationResponseModel() => new()
+    {
+        DisableDeleteWhenReferenced = _contentSettings.DisableDeleteWhenReferenced,
+        DisableUnpublishWhenReferenced = _contentSettings.DisableUnpublishWhenReferenced,
+    };
 
     /// <summary>
     /// Creates a new instance of <see cref="Umbraco.Cms.Api.Management.Models.MediaTypeConfigurationResponseModel"/> containing configuration data for media types.

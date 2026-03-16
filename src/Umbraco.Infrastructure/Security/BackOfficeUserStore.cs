@@ -3,7 +3,6 @@ using System.Data.Common;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Cache;
@@ -59,7 +58,6 @@ public class BackOfficeUserStore :
     /// <param name="runtimeState">Represents the current runtime state of the Umbraco application.</param>
     /// <param name="eventMessagesFactory">Factory for creating event message collections.</param>
     /// <param name="logger">Logger instance for logging operations related to the user store.</param>
-    [ActivatorUtilitiesConstructor]
     public BackOfficeUserStore(
         ICoreScopeProvider scopeProvider,
         IEntityService entityService,

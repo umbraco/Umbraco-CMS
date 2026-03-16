@@ -408,28 +408,6 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
         }
 
         /// <summary>
-        /// Upgrades the database schema and data using the specified Umbraco plan.
-        /// </summary>
-        /// <param name="plan">The Umbraco plan describing the upgrade steps.</param>
-        /// <returns>A <see cref="Result"/> indicating the outcome of the upgrade, or <c>null</c> if no result is available.</returns>
-        /// <remarks>
-        /// This method is obsolete. Use <see cref="UpgradeSchemaAndDataAsync"/> instead.
-        /// </remarks>
-        [Obsolete("Use UpgradeSchemaAndDataAsync instead. Scheduled for removal in Umbraco 18.")]
-        public Result? UpgradeSchemaAndData(UmbracoPlan plan) => UpgradeSchemaAndData((MigrationPlan)plan);
-
-        /// <summary>
-        /// Upgrades the database schema and data according to the specified migration plan.
-        /// </summary>
-        /// <param name="plan">The migration plan to apply for upgrading the schema and data.</param>
-        /// <returns>A <see cref="Result"/> indicating the outcome of the upgrade operation, or <c>null</c> if the upgrade did not produce a result.</returns>
-        /// <remarks>
-        /// This method is obsolete. Use <see cref="UpgradeSchemaAndDataAsync"/> instead. Scheduled for removal in Umbraco 18.
-        /// </remarks>
-        [Obsolete("Use UpgradeSchemaAndDataAsync instead. Scheduled for removal in Umbraco 18.")]
-        public Result? UpgradeSchemaAndData(MigrationPlan plan) => UpgradeSchemaAndDataAsync(plan).GetAwaiter().GetResult();
-
-        /// <summary>
         /// Asynchronously upgrades the database schema and data based on the specified <see cref="UmbracoPlan"/>.
         /// </summary>
         /// <param name="plan">The <see cref="UmbracoPlan"/> that defines the migration steps to apply.</param>

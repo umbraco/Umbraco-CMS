@@ -27,20 +27,6 @@ public class MediaTypeTreeControllerBase : FolderTreeControllerBase<MediaTypeTre
     private readonly IMediaTypeService _mediaTypeService;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="MediaTypeTreeControllerBase"/> class.
-    /// </summary>
-    /// <param name="entityService">Service used for managing and retrieving entities in the system.</param>
-    /// <param name="mediaTypeService">Service used for managing and retrieving media types.</param>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
-    public MediaTypeTreeControllerBase(IEntityService entityService, IMediaTypeService mediaTypeService)
-        : this(
-            entityService,
-            StaticServiceProvider.Instance.GetRequiredService<FlagProviderCollection>(),
-            mediaTypeService)
-    {
-    }
-
-    /// <summary>
     /// Initializes a new instance of the <see cref="MediaTypeTreeControllerBase"/> class with the specified services.
     /// </summary>
     /// <param name="entityService">The service used for entity operations.</param>

@@ -22,14 +22,4 @@ public class MediaCollectionPresentationFactory : ContentCollectionPresentationF
         : base(mapper, flagProviders, userService)
     {
     }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="MediaCollectionPresentationFactory"/> class with the specified mapper.
-    /// </summary>
-    /// <param name="mapper">The <see cref="IUmbracoMapper"/> instance used for object mapping.</param>
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
-    public MediaCollectionPresentationFactory(IUmbracoMapper mapper)
-        : base(mapper)
-    {
-    }
 }

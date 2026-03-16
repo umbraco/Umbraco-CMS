@@ -1,10 +1,8 @@
 using System.Globalization;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
@@ -96,62 +94,6 @@ internal class DocumentRepository : PublishableContentRepositoryBase<IContent, D
         _appCaches = appCaches;
         _loggerFactory = loggerFactory;
         _scopeAccessor = scopeAccessor;
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.DocumentRepository"/> class.
-    /// </summary>
-    /// <param name="scopeAccessor">Provides access to the current database scope for repository operations.</param>
-    /// <param name="appCaches">The application-level caches used for optimizing data retrieval.</param>
-    /// <param name="logger">The logger instance for logging repository events and errors.</param>
-    /// <param name="loggerFactory">Factory for creating logger instances.</param>
-    /// <param name="contentTypeRepository">Repository for accessing content type definitions.</param>
-    /// <param name="templateRepository">Repository for accessing template entities.</param>
-    /// <param name="tagRepository">Repository for managing content tags.</param>
-    /// <param name="languageRepository">Repository for accessing language information.</param>
-    /// <param name="relationRepository">Repository for managing entity relations.</param>
-    /// <param name="relationTypeRepository">Repository for managing relation types.</param>
-    /// <param name="propertyEditors">Collection of property editors used for content properties.</param>
-    /// <param name="dataValueReferenceFactories">Collection of factories for resolving data value references.</param>
-    /// <param name="dataTypeService">Service for managing data types.</param>
-    /// <param name="serializer">JSON serializer for serializing and deserializing data.</param>
-    /// <param name="eventAggregator">Publishes and subscribes to domain events.</param>
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
-    public DocumentRepository(
-        IScopeAccessor scopeAccessor,
-        AppCaches appCaches,
-        ILogger<DocumentRepository> logger,
-        ILoggerFactory loggerFactory,
-        IContentTypeRepository contentTypeRepository,
-        ITemplateRepository templateRepository,
-        ITagRepository tagRepository,
-        ILanguageRepository languageRepository,
-        IRelationRepository relationRepository,
-        IRelationTypeRepository relationTypeRepository,
-        PropertyEditorCollection propertyEditors,
-        DataValueReferenceFactoryCollection dataValueReferenceFactories,
-        IDataTypeService dataTypeService,
-        IJsonSerializer serializer,
-        IEventAggregator eventAggregator)
-        : this(
-            scopeAccessor,
-            appCaches,
-            logger,
-            loggerFactory,
-            contentTypeRepository,
-            templateRepository,
-            tagRepository,
-            languageRepository,
-            relationRepository,
-            relationTypeRepository,
-            propertyEditors,
-            dataValueReferenceFactories,
-            dataTypeService,
-            serializer,
-            eventAggregator,
-            StaticServiceProvider.Instance.GetRequiredService<IRepositoryCacheVersionService>(),
-            StaticServiceProvider.Instance.GetRequiredService<ICacheSyncService>())
-    {
     }
 
     protected override DocumentRepository This => this;

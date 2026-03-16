@@ -131,55 +131,6 @@ public class DomainService : RepositoryService, IDomainService
 
         return result ? OperationResult.Attempt.Succeed(eventMessages) : OperationResult.Attempt.Cancel(eventMessages);
     }
-
-    /// <summary>
-    /// Sorts domains.
-    /// </summary>
-    /// <param name="items">The domains to sort.</param>
-    /// <returns>An attempt result indicating the success or failure of the operation.</returns>
-    [Obsolete($"Please use {nameof(UpdateDomainsAsync)}. Scheduled for removal in Umbraco 18.")]
-    public Attempt<OperationResult?> Sort(IEnumerable<IDomain> items)
-    {
-        EventMessages eventMessages = EventMessagesFactory.Get();
-
-        IDomain[] domains = items.ToArray();
-        if (domains.Length == 0)
-        {
-            return OperationResult.Attempt.NoOperation(eventMessages);
-        }
-
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            var savingNotification = new DomainSavingNotification(domains, eventMessages);
-            if (scope.Notifications.PublishCancelable(savingNotification))
-            {
-                scope.Complete();
-                return OperationResult.Attempt.Cancel(eventMessages);
-            }
-
-            scope.WriteLock(Constants.Locks.Domains);
-
-            int sortOrder = 0;
-            foreach (IDomain domain in domains)
-            {
-                // If the current sort order equals that of the domain we don't need to update it, so just increment the sort order and continue
-                if (domain.SortOrder == sortOrder)
-                {
-                    sortOrder++;
-                    continue;
-                }
-
-                domain.SortOrder = sortOrder++;
-                _domainRepository.Save(domain);
-            }
-
-            scope.Complete();
-            scope.Notifications.Publish(new DomainSavedNotification(domains, eventMessages).WithStateFrom(savingNotification));
-        }
-
-        return OperationResult.Attempt.Succeed(eventMessages);
-    }
-
     /// <inheritdoc />
     public Task<IEnumerable<IDomain>> GetAssignedDomainsAsync(Guid contentKey, bool includeWildcards)
     {

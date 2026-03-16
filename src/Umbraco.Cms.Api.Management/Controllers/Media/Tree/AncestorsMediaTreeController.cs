@@ -1,7 +1,6 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.Services.Entities;
 using Umbraco.Cms.Api.Management.Services.Flags;
@@ -21,27 +20,6 @@ public class AncestorsMediaTreeController : MediaTreeControllerBase
     /// <summary>
     /// Initializes a new instance of the <see cref="AncestorsMediaTreeController"/> class.
     /// </summary>
-    /// <param name="entityService">Service used for accessing and managing entities within the system.</param>
-    /// <param name="userStartNodeEntitiesService">Service that provides information about user start nodes for entities.</param>
-    /// <param name="dataTypeService">Service for managing data types in the application.</param>
-    /// <param name="appCaches">Provides access to application-level caches.</param>
-    /// <param name="backofficeSecurityAccessor">Accessor for backoffice security context and operations.</param>
-    /// <param name="mediaPresentationFactory">Factory for creating media presentation models.</param>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
-    public AncestorsMediaTreeController(
-        IEntityService entityService,
-        IUserStartNodeEntitiesService userStartNodeEntitiesService,
-        IDataTypeService dataTypeService,
-        AppCaches appCaches,
-        IBackOfficeSecurityAccessor backofficeSecurityAccessor,
-        IMediaPresentationFactory mediaPresentationFactory)
-        : base(entityService, userStartNodeEntitiesService, dataTypeService, appCaches, backofficeSecurityAccessor, mediaPresentationFactory)
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="AncestorsMediaTreeController"/> class.
-    /// </summary>
     /// <param name="entityService">Service for managing and retrieving entities within the system.</param>
     /// <param name="flagProviders">A collection of providers that supply flags for entities.</param>
     /// <param name="userStartNodeEntitiesService">Service for resolving user start nodes for entities.</param>
@@ -49,7 +27,6 @@ public class AncestorsMediaTreeController : MediaTreeControllerBase
     /// <param name="appCaches">Provides access to application-level caches.</param>
     /// <param name="backofficeSecurityAccessor">Accessor for backoffice security context and operations.</param>
     /// <param name="mediaPresentationFactory">Factory for creating media presentation models.</param>
-    [ActivatorUtilitiesConstructor]
     public AncestorsMediaTreeController(
         IEntityService entityService,
         FlagProviderCollection flagProviders,

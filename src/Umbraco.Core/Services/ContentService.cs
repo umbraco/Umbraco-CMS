@@ -2152,11 +2152,6 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
         return content;
     }
 
-    /// <inheritdoc />
-    [Obsolete("Use IContentBlueprintEditingService.GetScaffoldedAsync() instead. Scheduled for removal in Umbraco 18.")]
-    public IContent CreateContentFromBlueprint(IContent blueprint, string name, int userId = Constants.Security.SuperUserId)
-        => CreateBlueprintFromContent(blueprint, name, userId);
-
     /// <summary>
     /// Gets all content blueprints for the specified content type IDs.
     /// </summary>

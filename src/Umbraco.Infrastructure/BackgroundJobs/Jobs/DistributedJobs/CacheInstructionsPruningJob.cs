@@ -1,7 +1,5 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Sync;
@@ -40,28 +38,6 @@ internal class CacheInstructionsPruningJob : IDistributedBackgroundJob
         _timeProvider = timeProvider;
         Period = globalSettings.Value.DatabaseServerMessenger.TimeBetweenPruneOperations;
         _lastSyncedManager = lastSyncedManager;
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="CacheInstructionsPruningJob"/> class, responsible for pruning cache instructions in a distributed environment.
-    /// </summary>
-    /// <param name="globalSettings">The global settings for the Umbraco application.</param>
-    /// <param name="cacheInstructionRepository">The repository used to access and manage cache instructions.</param>
-    /// <param name="scopeProvider">The provider for managing database transaction scopes.</param>
-    /// <param name="timeProvider">The provider used to obtain the current time.</param>
-    [Obsolete("Use the constructor with ILastSyncedManager parameter instead. Scheduled for removal in Umbraco 18.")]
-    public CacheInstructionsPruningJob(
-        IOptions<GlobalSettings> globalSettings,
-        ICacheInstructionRepository cacheInstructionRepository,
-        ICoreScopeProvider scopeProvider,
-        TimeProvider timeProvider)
-        : this(
-            globalSettings,
-            cacheInstructionRepository,
-            scopeProvider,
-            timeProvider,
-            StaticServiceProvider.Instance.GetRequiredService<ILastSyncedManager>())
-    {
     }
 
     /// <summary>

@@ -1,4 +1,3 @@
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Mapping.Content;
 using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels;
@@ -7,7 +6,6 @@ using Umbraco.Cms.Api.Management.ViewModels.Document.Item;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentBlueprint.Item;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentPublishing;
@@ -27,34 +25,6 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
     private readonly TimeProvider _timeProvider;
     private readonly IIdKeyMap _idKeyMap;
     private readonly FlagProviderCollection _flagProviderCollection;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Factories.DocumentPresentationFactory"/> class.
-    /// </summary>
-    /// <param name="umbracoMapper">The mapper used for mapping Umbraco objects.</param>
-    /// <param name="documentUrlFactory">Factory for creating document URLs.</param>
-    /// <param name="templateService">Service for managing templates.</param>
-    /// <param name="publicAccessService">Service for controlling public access to documents.</param>
-    /// <param name="timeProvider">Provider for time-related operations.</param>
-    /// <param name="idKeyMap">Map for managing ID keys.</param>
-    [Obsolete("Please use the controller with all parameters. Scheduled for removal in Umbraco 18")]
-    public DocumentPresentationFactory(
-        IUmbracoMapper umbracoMapper,
-        IDocumentUrlFactory documentUrlFactory,
-        ITemplateService templateService,
-        IPublicAccessService publicAccessService,
-        TimeProvider timeProvider,
-        IIdKeyMap idKeyMap)
-        : this(
-            umbracoMapper,
-            documentUrlFactory,
-            templateService,
-            publicAccessService,
-            timeProvider,
-            idKeyMap,
-            StaticServiceProvider.Instance.GetRequiredService<FlagProviderCollection>())
-    {
-    }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DocumentPresentationFactory"/> class.

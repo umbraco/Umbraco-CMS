@@ -9,8 +9,6 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 
-// TODO (V18): Remove the default implementations in this interface.
-
 /// <summary>
 ///     Defines an SqlSyntaxProvider.
 /// </summary>
@@ -149,10 +147,7 @@ public interface ISqlSyntaxProvider
     /// </summary>
     string ConvertDecimalToOrderableString { get; }
 
-    /// <summary>
-    /// Converts a unique identifier (such as a GUID) to its string representation for use in SQL statements.
-    /// </summary>
-    string ConvertUniqueIdentifierToString => throw new NotImplementedException();
+    string ConvertUniqueIdentifierToString { get; }
 
     /// <summary>
     /// Converts the specified integer value to its equivalent boolean representation in SQL syntax.
@@ -171,21 +166,9 @@ public interface ISqlSyntaxProvider
     /// </summary>
     string DbProvider { get; }
 
-    /// <summary>
-    /// Gets the dictionary of scalar mappers used by the SQL syntax provider.
-    /// Scalar mappers are responsible for converting database scalar values to .NET types during data retrieval operations.
-    /// The dictionary maps .NET types to their corresponding <see cref="IScalarMapper"/> implementations.
-    /// </summary>
-    IDictionary<Type, IScalarMapper>? ScalarMappers => null;
+    IDictionary<Type, IScalarMapper>? ScalarMappers { get; }
 
-    /// <summary>
-    /// Determines the appropriate database type based on the specified current type and an optional connection string.
-    /// </summary>
-    /// <param name="current">The current <see cref="DatabaseType"/>.</param>
-    /// <param name="connectionString">An optional connection string used to help determine the updated database type.</param>
-    /// <returns>The resolved <see cref="Umbraco.Cms.Infrastructure.Persistence.DatabaseType"/>.</returns>
-    DatabaseType GetUpdatedDatabaseType(DatabaseType current, string? connectionString) =>
-        current; // Default implementation.
+    DatabaseType GetUpdatedDatabaseType(DatabaseType current, string? connectionString);
 
     /// <summary>
     /// Escapes a string value for safe inclusion in SQL queries, helping to prevent SQL injection attacks.
@@ -284,7 +267,7 @@ public interface ISqlSyntaxProvider
     /// A string containing the SQL type cast extension (null type annotation) that represents a null value for type
     /// <typeparamref name="T"/>, or an empty string if no extension is defined.
     /// </returns>
-    string GetNullCastSuffix<T>() => string.Empty;
+    string GetNullCastSuffix<T>();
 
     /// <summary>
     /// Determines whether the specified table exists in the database.
@@ -444,7 +427,7 @@ public interface ISqlSyntaxProvider
     /// Determines whether the current database provider supports sequence objects for generating numeric values like PostgreSQL.
     /// </summary>
     /// <returns>true if the provider supports sequences; otherwise, false.</returns>
-    bool SupportsSequences() => false;
+    bool SupportsSequences();
 
     /// <summary>
     /// Alters the database sequences to match the current schema requirements.
@@ -456,7 +439,7 @@ public interface ISqlSyntaxProvider
     /// invoking this method. The default implementation throws <see cref="NotImplementedException"/>.
     /// </remarks>
     /// <param name="database">The database connection to use for altering sequences.</param>
-    void AlterSequences(IUmbracoDatabase database) => throw new NotImplementedException();
+    void AlterSequences(IUmbracoDatabase database);
 
     /// <summary>
     /// Alters the database sequences associated with the specified table for providers that support sequences.
@@ -464,12 +447,11 @@ public interface ISqlSyntaxProvider
     /// <remarks>
     /// This is an optional extension point for SQL providers that support database sequences. Providers that support
     /// sequences should override this method to update sequences associated with the specified table when schema changes
-    /// require it. Callers should typically check <see cref="SupportsSequences"/> before invoking this method. The default
-    /// implementation throws <see cref="NotImplementedException"/>.
+    /// require it. Callers should typically check <see cref="SupportsSequences"/> before invoking this method.
     /// </remarks>
     /// <param name="database">The database connection to use for altering the sequences.</param>
     /// <param name="tableName">The name of the table whose sequences will be altered.</param>
-    void AlterSequences(IUmbracoDatabase database, string tableName) => throw new NotImplementedException();
+    void AlterSequences(IUmbracoDatabase database, string tableName);
 
     /// <summary>
     /// Returns the names of all tables in the schema for the specified database.
@@ -531,14 +513,7 @@ public interface ISqlSyntaxProvider
     /// </remarks>
     bool TryGetDefaultConstraint(IDatabase db, string? tableName, string columnName, [MaybeNullWhen(false)] out string constraintName);
 
-    /// <summary>
-    /// Determines whether the specified primary key exists on the given table.
-    /// </summary>
-    /// <param name="db">The database instance to use for the check.</param>
-    /// <param name="tableName">The name of the table to check.</param>
-    /// <param name="primaryKeyName">The name of the primary key to look for.</param>
-    /// <returns>True if the primary key exists; otherwise, false.</returns>
-    bool DoesPrimaryKeyExist(IDatabase db, string tableName, string primaryKeyName) => throw new NotImplementedException();
+    bool DoesPrimaryKeyExist(IDatabase db, string tableName, string primaryKeyName);
 
     /// <summary>
     /// Returns the formatted field name to be used in an SQL UPDATE statement for the specified field selector.
@@ -577,5 +552,5 @@ public interface ISqlSyntaxProvider
     /// <typeparam name="T">type of the entity.</typeparam>
     /// <param name="constraintName">unlimited name.</param>
     /// <returns>truncated name.</returns>
-    string TruncateConstraintName<T>(string constraintName) => constraintName;
+    string TruncateConstraintName<T>(string constraintName);
 }

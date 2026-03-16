@@ -1,13 +1,11 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Collection;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
@@ -26,16 +24,6 @@ public class ByKeyDocumentCollectionController : DocumentCollectionControllerBas
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly IDocumentCollectionPresentationFactory _documentCollectionPresentationFactory;
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Controllers.Document.Collection.ByKeyDocumentCollectionController"/> class,
-    /// which handles document collection operations by document key.
-    /// </summary>
-    /// <param name="contentListViewService">Service for retrieving and managing content list views.</param>
-    /// <param name="backOfficeSecurityAccessor">Accessor for back office security context.</param>
-    /// <param name="mapper">The Umbraco object mapper used for mapping between models.</param>
-    /// <param name="documentCollectionPresentationFactory">Factory for creating document collection presentation models.</param>
-    /// <param name="flagProviders">A collection of providers for document collection flags.</param>
-    [ActivatorUtilitiesConstructor]
     public ByKeyDocumentCollectionController(
         IContentListViewService contentListViewService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
@@ -47,28 +35,6 @@ public class ByKeyDocumentCollectionController : DocumentCollectionControllerBas
         _contentListViewService = contentListViewService;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
         _documentCollectionPresentationFactory = documentCollectionPresentationFactory;
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Controllers.Document.Collection.ByKeyDocumentCollectionController"/> class.
-    /// </summary>
-    /// <param name="contentListViewService">Service for managing content list views.</param>
-    /// <param name="backOfficeSecurityAccessor">Accessor for back office security operations.</param>
-    /// <param name="mapper">Maps Umbraco objects to API models.</param>
-    /// <param name="documentCollectionPresentationFactory">Factory for creating document collection presentation models.</param>
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
-    public ByKeyDocumentCollectionController(
-        IContentListViewService contentListViewService,
-        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-        IUmbracoMapper mapper,
-        IDocumentCollectionPresentationFactory documentCollectionPresentationFactory)
-        : this(
-            contentListViewService,
-            backOfficeSecurityAccessor,
-            mapper,
-            documentCollectionPresentationFactory,
-            StaticServiceProvider.Instance.GetRequiredService<FlagProviderCollection>())
-    {
     }
 
     /// <summary>

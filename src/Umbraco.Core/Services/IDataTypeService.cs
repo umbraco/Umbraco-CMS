@@ -41,29 +41,12 @@ public interface IDataTypeService : IService
         int userId = Constants.Security.SuperUserId);
 
     /// <summary>
-    ///     Saves a container.
-    /// </summary>
-    /// <param name="container">The container to save.</param>
-    /// <param name="userId">The ID of the user performing the action.</param>
-    /// <returns>An operation result indicating success or failure.</returns>
-    [Obsolete("Please use IDataTypeContainerService for all data type container operations. Scheduled for removal in Umbraco 18.")]
-    Attempt<OperationResult?> SaveContainer(EntityContainer container, int userId = Constants.Security.SuperUserId);
-
-    /// <summary>
     ///     Gets a container by its ID.
     /// </summary>
     /// <param name="containerId">The container ID.</param>
     /// <returns>The container, or null if not found.</returns>
     [Obsolete("Please use IDataTypeContainerService for all data type container operations. Scheduled for removal in Umbraco 18.")]
     EntityContainer? GetContainer(int containerId);
-
-    /// <summary>
-    ///     Gets a container by its unique key.
-    /// </summary>
-    /// <param name="containerId">The container unique key.</param>
-    /// <returns>The container, or null if not found.</returns>
-    [Obsolete("Please use IDataTypeContainerService for all data type container operations. Scheduled for removal in Umbraco 18.")]
-    EntityContainer? GetContainer(Guid containerId);
 
     /// <summary>
     ///     Gets containers by name and level.
@@ -89,38 +72,6 @@ public interface IDataTypeService : IService
     /// <returns>A collection of containers.</returns>
     [Obsolete("Please use IDataTypeContainerService for all data type container operations. Scheduled for removal in Umbraco 18.")]
     IEnumerable<EntityContainer> GetContainers(int[] containerIds);
-
-    /// <summary>
-    ///     Deletes a container.
-    /// </summary>
-    /// <param name="containerId">The ID of the container to delete.</param>
-    /// <param name="userId">The ID of the user performing the action.</param>
-    /// <returns>An operation result indicating success or failure.</returns>
-    [Obsolete("Please use IDataTypeContainerService for all data type container operations. Scheduled for removal in Umbraco 18.")]
-    Attempt<OperationResult?> DeleteContainer(int containerId, int userId = Constants.Security.SuperUserId);
-
-    /// <summary>
-    ///     Renames a container.
-    /// </summary>
-    /// <param name="id">The ID of the container to rename.</param>
-    /// <param name="name">The new name for the container.</param>
-    /// <param name="userId">The ID of the user performing the action.</param>
-    /// <returns>An operation result containing the renamed container.</returns>
-    [Obsolete("Please use IDataTypeContainerService for all data type container operations. Scheduled for removal in Umbraco 18.")]
-    Attempt<OperationResult<OperationResultType, EntityContainer>?> RenameContainer(
-        int id,
-        string name,
-        int userId = Constants.Security.SuperUserId);
-
-    /// <summary>
-    ///     Gets a <see cref="IDataType" /> by its Name
-    /// </summary>
-    /// <param name="name">Name of the <see cref="IDataType" /></param>
-    /// <returns>
-    ///     <see cref="IDataType" />
-    /// </returns>
-    [Obsolete("Please use GetAsync. Scheduled for removal in Umbraco 18.")]
-    IDataType? GetDataType(string name);
 
     /// <summary>
     ///     Gets a <see cref="IDataType" /> by its Id
@@ -252,15 +203,6 @@ public interface IDataTypeService : IService
     Task<IEnumerable<IDataType>> GetByEditorUiAlias(string editorUiAlias);
 
     /// <summary>
-    ///     Moves a <see cref="IDataType" /> to a given container.
-    /// </summary>
-    /// <param name="toMove">The data type that will be moved.</param>
-    /// <param name="parentId">The ID of the parent container to move to.</param>
-    /// <returns>An operation result indicating the move status.</returns>
-    [Obsolete("Please use MoveAsync instead. Scheduled for removal in Umbraco 18.")]
-    Attempt<OperationResult<MoveOperationStatusType>?> Move(IDataType toMove, int parentId);
-
-    /// <summary>
     /// Moves a <see cref="IDataType"/> to a given container
     /// </summary>
     /// <param name="toMove">The data type that will be moved</param>
@@ -268,16 +210,6 @@ public interface IDataTypeService : IService
     /// <param name="userKey">The user that did the Move action</param>
     /// <returns>An attempt result with the moved data type and operation status.</returns>
     Task<Attempt<IDataType, DataTypeOperationStatus>> MoveAsync(IDataType toMove, Guid? containerKey, Guid userKey);
-
-    /// <summary>
-    ///     Copies a <see cref="IDataType" /> to a given container.
-    /// </summary>
-    /// <param name="copying">The data type to copy.</param>
-    /// <param name="containerId">The ID of the target container.</param>
-    /// <returns>An operation result containing the copied data type.</returns>
-    [Obsolete("Please use CopyAsync instead. Scheduled for removal in Umbraco 18.")]
-    Attempt<OperationResult<MoveOperationStatusType, IDataType>?> Copy(IDataType copying, int containerId) =>
-        Copy(copying, containerId, Constants.Security.SuperUserId);
 
     /// <summary>
     ///     Copies a <see cref="IDataType" /> to a given container.

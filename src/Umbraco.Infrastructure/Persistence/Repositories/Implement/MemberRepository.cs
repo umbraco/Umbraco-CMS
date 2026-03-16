@@ -1,12 +1,9 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
 using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
@@ -105,65 +102,6 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
         _passwordConfiguration = passwordConfiguration.Value;
         _memberByUsernameCachePolicy =
             new MemberRepositoryUsernameCachePolicy(GlobalIsolatedCache, ScopeAccessor, DefaultOptions, repositoryCacheVersionService, cacheSyncService);
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="MemberRepository"/> class with the specified dependencies.
-    /// </summary>
-    /// <param name="scopeAccessor">The <see cref="IScopeAccessor"/> used to manage database scopes.</param>
-    /// <param name="cache">The <see cref="AppCaches"/> instance for caching data.</param>
-    /// <param name="logger">The <see cref="ILogger{MemberRepository}"/> for logging repository operations.</param>
-    /// <param name="memberTypeRepository">The <see cref="IMemberTypeRepository"/> for accessing member types.</param>
-    /// <param name="memberGroupRepository">The <see cref="IMemberGroupRepository"/> for accessing member groups.</param>
-    /// <param name="tagRepository">The <see cref="ITagRepository"/> for managing tags.</param>
-    /// <param name="languageRepository">The <see cref="ILanguageRepository"/> for accessing language data.</param>
-    /// <param name="relationRepository">The <see cref="IRelationRepository"/> for managing entity relations.</param>
-    /// <param name="relationTypeRepository">The <see cref="IRelationTypeRepository"/> for managing relation types.</param>
-    /// <param name="passwordHasher">The <see cref="IPasswordHasher"/> used for hashing member passwords.</param>
-    /// <param name="propertyEditors">The <see cref="PropertyEditorCollection"/> containing property editors.</param>
-    /// <param name="dataValueReferenceFactories">The <see cref="DataValueReferenceFactoryCollection"/> for resolving data value references.</param>
-    /// <param name="dataTypeService">The <see cref="IDataTypeService"/> for accessing data types.</param>
-    /// <param name="serializer">The <see cref="IJsonSerializer"/> for serializing and deserializing JSON data.</param>
-    /// <param name="eventAggregator">The <see cref="IEventAggregator"/> for publishing and subscribing to events.</param>
-    /// <param name="passwordConfiguration">The <see cref="IOptions{MemberPasswordConfigurationSettings}"/> containing member password configuration settings.</param>
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
-    public MemberRepository(
-        IScopeAccessor scopeAccessor,
-        AppCaches cache,
-        ILogger<MemberRepository> logger,
-        IMemberTypeRepository memberTypeRepository,
-        IMemberGroupRepository memberGroupRepository,
-        ITagRepository tagRepository,
-        ILanguageRepository languageRepository,
-        IRelationRepository relationRepository,
-        IRelationTypeRepository relationTypeRepository,
-        IPasswordHasher passwordHasher,
-        PropertyEditorCollection propertyEditors,
-        DataValueReferenceFactoryCollection dataValueReferenceFactories,
-        IDataTypeService dataTypeService,
-        IJsonSerializer serializer,
-        IEventAggregator eventAggregator,
-        IOptions<MemberPasswordConfigurationSettings> passwordConfiguration)
-        : this(
-            scopeAccessor,
-            cache,
-            logger,
-            memberTypeRepository,
-            memberGroupRepository,
-            tagRepository,
-            languageRepository,
-            relationRepository,
-            relationTypeRepository,
-            passwordHasher,
-            propertyEditors,
-            dataValueReferenceFactories,
-            dataTypeService,
-            serializer,
-            eventAggregator,
-            passwordConfiguration,
-            StaticServiceProvider.Instance.GetRequiredService<IRepositoryCacheVersionService>(),
-            StaticServiceProvider.Instance.GetRequiredService<ICacheSyncService>())
-    {
     }
 
     /// <summary>

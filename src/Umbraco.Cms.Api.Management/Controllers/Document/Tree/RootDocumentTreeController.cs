@@ -20,47 +20,6 @@ namespace Umbraco.Cms.Api.Management.Controllers.Document.Tree;
 [ApiVersion("1.0")]
 public class RootDocumentTreeController : DocumentTreeControllerBase
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="RootDocumentTreeController"/> class, which manages the root nodes of the document tree in the Umbraco backoffice.
-    /// </summary>
-    /// <param name="entityService">The service used for entity operations.</param>
-    /// <param name="userStartNodeEntitiesService">The service for resolving user start node entities.</param>
-    /// <param name="dataTypeService">The service for managing data types.</param>
-    /// <param name="publicAccessService">The service for handling public access permissions.</param>
-    /// <param name="appCaches">The application-level caches.</param>
-    /// <param name="backofficeSecurityAccessor">Accessor for backoffice security context.</param>
-    /// <param name="documentPresentationFactory">Factory for creating document presentation models.</param>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
-    public RootDocumentTreeController(
-        IEntityService entityService,
-        IUserStartNodeEntitiesService userStartNodeEntitiesService,
-        IDataTypeService dataTypeService,
-        IPublicAccessService publicAccessService,
-        AppCaches appCaches,
-        IBackOfficeSecurityAccessor backofficeSecurityAccessor,
-        IDocumentPresentationFactory documentPresentationFactory)
-        : base(
-            entityService,
-            userStartNodeEntitiesService,
-            dataTypeService,
-            publicAccessService,
-            appCaches,
-            backofficeSecurityAccessor,
-            documentPresentationFactory)
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Controllers.Document.Tree.RootDocumentTreeController"/> class.
-    /// </summary>
-    /// <param name="entityService">Service for managing and retrieving entities within Umbraco.</param>
-    /// <param name="flagProviders">A collection of providers that supply flags for document tree nodes.</param>
-    /// <param name="userStartNodeEntitiesService">Service for resolving user-specific start nodes in the content tree.</param>
-    /// <param name="dataTypeService">Service for accessing and managing data types.</param>
-    /// <param name="publicAccessService">Service for handling public access permissions on documents.</param>
-    /// <param name="appCaches">Provides application-level caching mechanisms.</param>
-    /// <param name="backofficeSecurityAccessor">Accessor for backoffice security context and operations.</param>
-    /// <param name="documentPresentationFactory">Factory for creating document presentation models.</param>
     [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
     public RootDocumentTreeController(
         IEntityService entityService,

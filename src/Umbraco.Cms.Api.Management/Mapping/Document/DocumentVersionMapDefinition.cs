@@ -1,9 +1,7 @@
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Mapping.Content;
 using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -25,19 +23,6 @@ public class DocumentVersionMapDefinition : ContentMapDefinition<IContent, Docum
         PropertyEditorCollection propertyEditorCollection,
         IDataValueEditorFactory dataValueEditorFactory)
         : base(propertyEditorCollection, dataValueEditorFactory)
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="DocumentVersionMapDefinition"/> class.
-    /// </summary>
-    /// <param name="propertyEditorCollection">The collection of property editors used for mapping document versions.</param>
-    [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in Umbraco 18.")]
-    public DocumentVersionMapDefinition(
-        PropertyEditorCollection propertyEditorCollection)
-        : this(
-            propertyEditorCollection,
-            StaticServiceProvider.Instance.GetRequiredService<IDataValueEditorFactory>())
     {
     }
 

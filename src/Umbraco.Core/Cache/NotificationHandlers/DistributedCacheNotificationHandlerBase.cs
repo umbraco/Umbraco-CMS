@@ -34,23 +34,10 @@ public abstract class DistributedCacheNotificationHandlerBase<TEntity, TNotifica
     /// </returns>
     protected abstract IEnumerable<TEntity> GetEntities(TNotification notification);
 
-    // TODO (V18): When removing the obsolete method, make the remaining Handle method abstract
-    // rather than virtual. It couldn't be made abstract when introduced as that would be a breaking change.
-
-    /// <summary>
-    /// Handles the specified entities.
-    /// </summary>
-    /// <param name="entities">The entities.</param>
-    [Obsolete("Please use the overload taking all parameters. Scheduled for removal in Umbraco 18.")]
-    protected abstract void Handle(IEnumerable<TEntity> entities);
-
     /// <summary>
     /// Handles the specified entities.
     /// </summary>
     /// <param name="entities">The entities.</param>
     /// <param name="state">The notification state.</param>
-    protected virtual void Handle(IEnumerable<TEntity> entities, IDictionary<string, object?> state)
-#pragma warning disable CS0618 // Type or member is obsolete
-        => Handle(entities);
-#pragma warning restore CS0618 // Type or member is obsolete
+    protected abstract void Handle(IEnumerable<TEntity> entities, IDictionary<string, object?> state);
 }
