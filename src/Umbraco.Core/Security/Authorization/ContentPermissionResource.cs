@@ -169,7 +169,7 @@ public class ContentPermissionResource : IPermissionResource
     /// <param name="parentKeyForBranch">The parent key of the branch.</param>
     /// <returns>An instance of <see cref="ContentPermissionResource" />.</returns>
     public static ContentPermissionResource Branch(ISet<string> permissionsToCheck, Guid parentKeyForBranch) =>
-        new(Enumerable.Empty<Guid>(), permissionsToCheck, false, true, parentKeyForBranch, null);
+        new(Enumerable.Empty<Guid>(), permissionsToCheck, false, false, parentKeyForBranch, null);
 
     /// <summary>
     ///     Creates a <see cref="ContentPermissionResource" /> with the specified permission and the branch from the specified parent key.
@@ -178,7 +178,7 @@ public class ContentPermissionResource : IPermissionResource
     /// <param name="parentKeyForBranch">The parent key of the branch.</param>
     /// <returns>An instance of <see cref="ContentPermissionResource" />.</returns>
     public static ContentPermissionResource Branch(string permissionToCheck, Guid parentKeyForBranch) =>
-        new(Enumerable.Empty<Guid>(), new HashSet<string> { permissionToCheck }, false, true, parentKeyForBranch, null);
+        new(Enumerable.Empty<Guid>(), new HashSet<string> { permissionToCheck }, false, false, parentKeyForBranch, null);
 
     /// <summary>
     ///     Creates a <see cref="ContentPermissionResource" /> with the specified permission and the branch from the specified parent key.
@@ -195,7 +195,7 @@ public class ContentPermissionResource : IPermissionResource
             Enumerable.Empty<Guid>(),
             new HashSet<string> { permissionToCheck },
             false,
-            true,
+            false,
             parentKeyForBranch,
             new HashSet<string>(culturesToCheck.Distinct()));
 
