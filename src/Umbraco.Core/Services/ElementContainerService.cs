@@ -74,7 +74,7 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
         if (_contentSettingsOptions.CurrentValue.DisableUnpublishWhenReferenced)
         {
             Attempt<PagedModel<RelationItemModel>, GetReferencesOperationStatus> referencedDescendants = await _trackedReferencesService
-                .GetPagedDescendantsInReferencesAsync(key, UmbracoObjectTypes.ElementContainer, 0, 0, filterMustBeIsDependency: true);
+                .GetPagedDescendantsInReferencesAsync(key, UmbracoObjectTypes.ElementContainer, 0, 1, filterMustBeIsDependency: true);
 
             if (referencedDescendants.Result.Total > 0)
             {
