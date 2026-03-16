@@ -600,7 +600,7 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 					},
 					{
 						columnAlias: 'createDate',
-						value: 'createDate' in item ? this.localize.date(item.createDate) : '',
+						value: 'createDate' in item ? this.localize.dateTime(item.createDate) : '',
 					},
 				],
 			};
