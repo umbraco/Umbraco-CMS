@@ -24,5 +24,5 @@ export interface UmbElementItemVariantModel {
 	createDate?: Date;
 	updateDate?: Date;
 	state?: UmbElementVariantState | null;
-	flags: Array<UmbEntityFlag>;
+	flags?: Array<UmbEntityFlag>;
 }
