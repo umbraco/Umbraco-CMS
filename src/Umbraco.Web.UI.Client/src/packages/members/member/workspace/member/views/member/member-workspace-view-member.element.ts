@@ -222,6 +222,7 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 							slot="editor"
 							data-mark="input-member-group:member-group"
 							@change=${this.#onGroupsUpdated}
+							?readonly=${this._isExternalOnly}
 							.selection=${this._workspaceContext.memberGroups}></umb-input-member-group>
 					</umb-property-layout>
 
@@ -291,10 +292,12 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 			<div id="right-column">
 				<uui-box>
 					<umb-stack look="compact">
-						<div>
-							<h4><umb-localize key="user_failedPasswordAttempts">Failed login attempts</umb-localize></h4>
-							<span>${this._workspaceContext.failedPasswordAttempts}</span>
-						</div>
+						${this._isExternalOnly
+							? nothing
+							: html`<div>
+									<h4><umb-localize key="user_failedPasswordAttempts">Failed login attempts</umb-localize></h4>
+									<span>${this._workspaceContext.failedPasswordAttempts}</span>
+								</div>`}
 						<div>
 							<h4><umb-localize key="user_lastLockoutDate">Last lockout date</umb-localize></h4>
 							<span>
@@ -311,14 +314,16 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 									: this.localize.term('general_never')}
 							</span>
 						</div>
-						<div>
-							<h4><umb-localize key="user_passwordChangedGeneric">Password changed</umb-localize></h4>
-							<span>
-								${this._workspaceContext.lastPasswordChangeDate
-									? this.localize.date(this._workspaceContext.lastPasswordChangeDate, TimeFormatOptions)
-									: this.localize.term('general_never')}
-							</span>
-						</div>
+						${this._isExternalOnly
+							? nothing
+							: html`<div>
+									<h4><umb-localize key="user_passwordChangedGeneric">Password changed</umb-localize></h4>
+									<span>
+										${this._workspaceContext.lastPasswordChangeDate
+											? this.localize.date(this._workspaceContext.lastPasswordChangeDate, TimeFormatOptions)
+											: this.localize.term('general_never')}
+									</span>
+								</div>`}
 					</umb-stack>
 				</uui-box>
 

@@ -1,4 +1,5 @@
 import { UMB_MEMBER_ROOT_WORKSPACE_PATH } from '../../paths.js';
+import { UmbMemberKind } from '../../utils/index.js';
 import { UMB_MEMBER_WORKSPACE_CONTEXT } from './member-workspace.context-token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, nothing, customElement, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
@@ -16,6 +17,9 @@ export class UmbMemberWorkspaceSplitViewElement extends UmbLitElement {
 	@state()
 	private _icon?: string;
 
+	@state()
+	private _isExternalOnly = false;
+
 	constructor() {
 		super();
 
@@ -24,6 +28,9 @@ export class UmbMemberWorkspaceSplitViewElement extends UmbLitElement {
 			this._workspaceContext = context;
 			this.#observeActiveVariantInfo();
 			this.#observeIcon();
+			this.observe(this._workspaceContext?.kind, (kind) => {
+				this._isExternalOnly = kind === UmbMemberKind.EXTERNAL_ONLY;
+			}, '_observeKind');
 		});
 	}
 
@@ -63,7 +70,7 @@ export class UmbMemberWorkspaceSplitViewElement extends UmbLitElement {
 						)}
 					</div>
 
-					<umb-workspace-footer alias="Umb.Workspace.Member"></umb-workspace-footer>`
+					${this._isExternalOnly ? nothing : html`<umb-workspace-footer alias="Umb.Workspace.Member"></umb-workspace-footer>`}`
 			: nothing;
 	}
 

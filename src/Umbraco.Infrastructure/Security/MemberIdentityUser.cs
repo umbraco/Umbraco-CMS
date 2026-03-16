@@ -81,6 +81,15 @@ public class MemberIdentityUser : UmbracoIdentityUser
     public string? ProfileData { get; set; }
 
     /// <summary>
+    ///     Deserialises the <see cref="ProfileData"/> JSON string into a typed object.
+    /// </summary>
+    /// <typeparam name="T">The type to deserialise to.</typeparam>
+    /// <param name="options">Optional JSON serializer options. If null, the default <see cref="System.Text.Json.JsonSerializer"/> options are used.</param>
+    /// <returns>The deserialised object, or <c>default</c> if <see cref="ProfileData"/> is null or empty.</returns>
+    public T? GetProfileData<T>(System.Text.Json.JsonSerializerOptions? options = null) where T : class =>
+        string.IsNullOrEmpty(ProfileData) ? default : System.Text.Json.JsonSerializer.Deserialize<T>(ProfileData, options);
+
+    /// <summary>
     ///     Creates a new <see cref="MemberIdentityUser"/> instance without assigning an identity.
     /// </summary>
     /// <param name="username">The username for the new member.</param>

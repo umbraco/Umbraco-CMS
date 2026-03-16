@@ -109,15 +109,4 @@ public interface IExternalMemberService
     /// </param>
     /// <returns>An <see cref="Attempt{TResult,TStatus}"/> with the newly created <see cref="IMember"/> on success.</returns>
     Task<Attempt<IMember?, ExternalMemberOperationStatus>> ConvertToContentMemberAsync(Guid memberKey, string memberTypeAlias, Action<IMember, string?>? mapProfileData = null);
-
-    /// <summary>
-    ///     Converts a content-based member to an external-only member.
-    /// </summary>
-    /// <param name="memberKey">The unique key of the content-based member to convert.</param>
-    /// <param name="preservePropertiesAsProfileData">
-    ///     If <c>true</c>, content properties are serialized and stored as profile data
-    ///     on the resulting external member.
-    /// </param>
-    /// <returns>An <see cref="Attempt{TResult,TStatus}"/> with the newly created <see cref="ExternalMemberIdentity"/> on success.</returns>
-    Task<Attempt<ExternalMemberIdentity?, ExternalMemberOperationStatus>> ConvertToExternalMemberAsync(Guid memberKey, bool preservePropertiesAsProfileData = false);
 }

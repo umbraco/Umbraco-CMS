@@ -1,8 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Text.Json;
-
 namespace Umbraco.Cms.Core.Security;
 
 /// <summary>
@@ -75,26 +73,4 @@ public class ExternalMemberIdentity
     ///     Gets or sets arbitrary profile data as a JSON string.
     /// </summary>
     public string? ProfileData { get; set; }
-
-    /// <summary>
-    ///     Deserializes the <see cref="ProfileData"/> JSON string into the specified type.
-    /// </summary>
-    /// <typeparam name="T">The type to deserialize to.</typeparam>
-    /// <returns>The deserialized object, or <c>null</c> if <see cref="ProfileData"/> is null or empty.</returns>
-    public T? GetProfileData<T>()
-    {
-        if (string.IsNullOrEmpty(ProfileData))
-        {
-            return default;
-        }
-
-        return JsonSerializer.Deserialize<T>(ProfileData);
-    }
-
-    /// <summary>
-    ///     Serializes the specified value and stores it as the <see cref="ProfileData"/> JSON string.
-    /// </summary>
-    /// <typeparam name="T">The type to serialize.</typeparam>
-    /// <param name="value">The value to serialize and store.</param>
-    public void SetProfileData<T>(T value) => ProfileData = JsonSerializer.Serialize(value);
 }

@@ -2,6 +2,7 @@ import { UmbMemberValidationRepository, type UmbMemberDetailRepository } from '.
 import type { UmbMemberDetailModel, UmbMemberVariantModel } from '../../types.js';
 import { UmbMemberPropertyDatasetContext } from '../../property-dataset-context/member-property-dataset.context.js';
 import { UMB_MEMBER_ENTITY_TYPE, UMB_MEMBER_ROOT_ENTITY_TYPE } from '../../entity.js';
+import { UmbMemberKind } from '../../utils/index.js';
 import { UMB_MEMBER_DETAIL_REPOSITORY_ALIAS } from '../../repository/detail/manifests.js';
 import { UMB_CREATE_MEMBER_WORKSPACE_PATH_PATTERN, UMB_EDIT_MEMBER_WORKSPACE_PATH_PATTERN } from '../../paths.js';
 import {
@@ -60,9 +61,11 @@ export class UmbMemberWorkspaceContext
 		this.observe(
 			this.contentTypeUnique,
 			(unique) => {
-				this.#entityContentTypeContext.setEntityType(unique ? UMB_MEMBER_TYPE_ENTITY_TYPE : undefined);
-				this.#entityContentTypeContext.setUnique(unique ?? undefined);
-				if (unique) {
+				// External-only members have no content type (empty Guid).
+				const hasContentType = unique && unique !== '00000000-0000-0000-0000-000000000000';
+				this.#entityContentTypeContext.setEntityType(hasContentType ? UMB_MEMBER_TYPE_ENTITY_TYPE : undefined);
+				this.#entityContentTypeContext.setUnique(hasContentType ? unique : undefined);
+				if (hasContentType) {
 					this.structure.loadType(unique);
 				}
 			},
@@ -187,6 +190,26 @@ export class UmbMemberWorkspaceContext
 				},
 			},
 		});
+	}
+
+	protected override async _processIncomingData(data: ContentModel): Promise<ContentModel> {
+		// External-only members have no content type — skip the base class's
+		// content type loading which would 404 on the empty Guid.
+		if (data.kind === UmbMemberKind.EXTERNAL_ONLY) {
+			return data;
+		}
+
+		return super._processIncomingData(data);
+	}
+
+	override async submit() {
+		// External-only members cannot be saved through the backoffice.
+		const data = this.getData();
+		if (data?.kind === UmbMemberKind.EXTERNAL_ONLY) {
+			throw new Error('External-only members cannot be modified through the backoffice.');
+		}
+
+		return super.submit();
 	}
 
 	/**

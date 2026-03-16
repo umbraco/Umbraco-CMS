@@ -915,49 +915,39 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
         var isLoginsPropertyDirty = user.IsPropertyDirty(nameof(MemberIdentityUser.Logins));
         var isTokensPropertyDirty = user.IsPropertyDirty(nameof(MemberIdentityUser.LoginTokens));
 
-        // Check if we are only updating login properties (last login date and/or security stamp).
-        // If so, use the fast path that skips entity load, notifications, and uniqueness checks.
-        var dirtyProperties = new List<string>();
-        if (user.IsPropertyDirty(nameof(MemberIdentityUser.LastLoginDate)))
+        // For external members, always do a full update. Unlike content members where a full
+        // save is expensive (content versioning, node tree, notifications), the external member
+        // update is a single-row UPDATE — there's no meaningful performance difference vs a
+        // targeted two-column fast path, and it ensures ProfileData changes from OnExternalLogin
+        // callbacks are persisted (ProfileData has no change tracking).
+        var externalIdentity = new ExternalMemberIdentity
         {
-            dirtyProperties.Add(nameof(MemberIdentityUser.LastLoginDate));
-        }
+            Key = user.Key,
+            Email = user.Email!,
+            UserName = user.UserName!,
+            Name = user.Name,
+            IsApproved = user.IsApproved,
+            IsLockedOut = user.LockoutEnd.HasValue && user.LockoutEnd.Value >= DateTimeOffset.UtcNow,
+            LastLoginDate = user.LastLoginDate,
+            LastLockoutDate = user.LastLockoutDate,
+            CreateDate = user.CreatedDate,
+            SecurityStamp = user.SecurityStamp,
+            ProfileData = user.ProfileData,
+        };
 
-        if (user.IsPropertyDirty(nameof(MemberIdentityUser.SecurityStamp)))
+        // Resolve the int Id and CreateDate from the stored record — MemberIdentityUser
+        // doesn't carry the int Id (it uses Guid key as Id) and CreateDate may not be set.
+        var existing = _externalMemberService.GetByKeyAsync(user.Key).GetAwaiter().GetResult();
+        if (existing is not null)
         {
-            dirtyProperties.Add(nameof(MemberIdentityUser.SecurityStamp));
-        }
-
-        if (UpdatingOnlyLoginProperties(dirtyProperties))
-        {
-            await _externalMemberService.UpdateLoginTimestampAsync(
-                user.Key,
-                user.LastLoginDate ?? DateTime.UtcNow,
-                user.SecurityStamp ?? string.Empty);
-        }
-        else
-        {
-            var externalIdentity = new ExternalMemberIdentity
+            externalIdentity.Id = existing.Id;
+            if (externalIdentity.CreateDate == default)
             {
-                Key = user.Key,
-                Email = user.Email!,
-                UserName = user.UserName!,
-                Name = user.Name,
-                IsApproved = user.IsApproved,
-                IsLockedOut = user.LockoutEnd.HasValue && user.LockoutEnd.Value >= DateTimeOffset.UtcNow,
-                LastLoginDate = user.LastLoginDate,
-                LastLockoutDate = user.LastLockoutDate,
-                SecurityStamp = user.SecurityStamp,
-                ProfileData = user.ProfileData,
-            };
-
-            if (int.TryParse(user.Id, NumberStyles.Integer, CultureInfo.InvariantCulture, out var externalId))
-            {
-                externalIdentity.Id = externalId;
+                externalIdentity.CreateDate = existing.CreateDate;
             }
-
-            await _externalMemberService.UpdateAsync(externalIdentity);
         }
+
+        await _externalMemberService.UpdateAsync(externalIdentity);
 
         if (isLoginsPropertyDirty)
         {
