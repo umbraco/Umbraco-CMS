@@ -2183,8 +2183,13 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
             return nodeName;
         }
 
-        // Fetch all sibling names (same parent, same object type).
-        // Reuses the same cached SQL template as the base implementation.
+        // First, handle literal name duplicates using the base algorithm
+        // (e.g. "Title" vs "Title" → "Title (1)").
+        var uniqueName = base.EnsureUniqueNodeName(parentId, nodeName, id);
+
+        // Then fetch siblings again and ensure the resulting URL segment is also unique.
+        // This is a second sibling fetch (same indexed query), but it only runs on save
+        // and the clarity benefit outweighs the minor overhead.
         SqlTemplate template = SqlContext.Templates.Get(
             Constants.SqlTemplates.VersionableRepository.EnsureUniqueNodeName,
             tsql => tsql
@@ -2195,13 +2200,9 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
                     x.ParentId == SqlTemplate.Arg<int>("parentId")));
 
         Sql<ISqlContext> sql = template.Sql(NodeObjectTypeId, parentId);
-        List<SimilarNodeName> names = Database.Fetch<SimilarNodeName>(sql);
+        List<SimilarNodeName> siblings = Database.Fetch<SimilarNodeName>(sql);
 
-        // Augment with phantom entries so that sibling names producing the same URL
-        // segment are treated as duplicates by the uniqueness algorithm.
-        AugmentNamesForUrlSegmentCollisions(names, nodeName, id);
-
-        return SimilarNodeName.GetUniqueName(names, id, nodeName);
+        return EnsureUniqueUrlSegment(uniqueName, id, siblings);
     }
 
     private SqlTemplate SqlEnsureVariantNamesAreUnique => SqlContext.Templates.Get(
@@ -2257,11 +2258,11 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
                 continue;
             }
 
-            // get a unique name
+            // get a unique name (literal duplicates first, then URL segment collisions)
             List<SimilarNodeName> otherNames =
                 cultureNames.Select(x => new SimilarNodeName { Id = x.Id, Name = x.Name }).ToList();
-            AugmentNamesForUrlSegmentCollisions(otherNames, cultureInfo.Name, 0, cultureInfo.Culture);
             var uniqueName = SimilarNodeName.GetUniqueName(otherNames, 0, cultureInfo.Name);
+            uniqueName = EnsureUniqueUrlSegment(uniqueName, 0, otherNames, cultureInfo.Culture);
 
             if (uniqueName == content.GetCultureName(cultureInfo.Culture))
             {
@@ -2281,49 +2282,57 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
     }
 
     /// <summary>
-    /// Augments the sibling name list with phantom entries so that names producing the same
-    /// URL segment are treated as duplicates by the <see cref="SimilarNodeName.GetUniqueName"/> algorithm.
-    /// For example, siblings "Title" and "Title." both produce URL segment "title", so "Title."
-    /// should be treated as a duplicate name and receive the "(1)" suffix.
+    /// Ensures the proposed name produces a URL segment that is unique among sibling URL segments.
+    /// If a collision is detected (e.g. "Title" and "Title." both produce segment "title"),
+    /// a numeric suffix is appended to the name until uniqueness is achieved.
     /// </summary>
-    private void AugmentNamesForUrlSegmentCollisions(
-        List<SimilarNodeName> names,
+    private string? EnsureUniqueUrlSegment(
         string? nodeName,
         int nodeId,
+        IEnumerable<SimilarNodeName> siblings,
         string? culture = null)
     {
         if (string.IsNullOrWhiteSpace(nodeName))
         {
-            return;
+            return nodeName;
         }
 
         var proposedSegment = _shortStringHelper.CleanStringForUrlSegment(nodeName, culture);
         if (string.IsNullOrEmpty(proposedSegment))
         {
-            return;
+            return nodeName;
         }
 
-        // Iterate over a snapshot to avoid modifying the collection during enumeration.
-        foreach (SimilarNodeName sibling in names.ToArray())
+        // Build a set of URL segments from siblings, excluding the current node.
+        var siblingSegments = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (SimilarNodeName sibling in siblings)
         {
             if (sibling.Id == nodeId || string.IsNullOrWhiteSpace(sibling.Name))
             {
                 continue;
             }
 
-            // Skip if the names already match (the base algorithm handles that case).
-            if (sibling.Name.InvariantEquals(nodeName))
+            var segment = _shortStringHelper.CleanStringForUrlSegment(sibling.Name, culture);
+            if (!string.IsNullOrEmpty(segment))
             {
-                continue;
+                siblingSegments.Add(segment);
             }
+        }
 
-            var siblingSegment = _shortStringHelper.CleanStringForUrlSegment(sibling.Name, culture);
-            if (proposedSegment.Equals(siblingSegment, StringComparison.OrdinalIgnoreCase))
+        // If the proposed segment doesn't collide, return the name as-is.
+        if (!siblingSegments.Contains(proposedSegment))
+        {
+            return nodeName;
+        }
+
+        // Increment a (N) suffix on the name until the resulting URL segment is unique.
+        for (var i = 1; ; i++)
+        {
+            var candidateName = $"{nodeName} ({i})";
+            var candidateSegment = _shortStringHelper.CleanStringForUrlSegment(candidateName, culture);
+            if (string.IsNullOrEmpty(candidateSegment) || !siblingSegments.Contains(candidateSegment))
             {
-                // This sibling's name produces the same URL segment as the proposed name,
-                // but the raw names differ. Add a phantom entry with the proposed name so
-                // the uniqueness algorithm treats them as duplicates.
-                names.Add(new SimilarNodeName { Id = sibling.Id, Name = nodeName });
+                return candidateName;
             }
         }
     }
