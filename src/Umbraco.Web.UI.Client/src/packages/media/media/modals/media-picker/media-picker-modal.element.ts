@@ -257,7 +257,7 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 
 	#onViewSelect(view: UmbMediaPickerView) {
 		this._currentView = view;
-		// TODO: This ignorer is just needed for JSON SCHEMA TO WORK, As its not updated with latest TS yet.
+		// TODO: This ignore is just needed for JSON SCHEMA TO WORK, As its not updated with latest TS yet.
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
 		this._viewPopover?.hidePopover();
