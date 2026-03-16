@@ -38,25 +38,25 @@ internal sealed class BlockEditorBackwardsCompatibilityTests : UmbracoIntegratio
                          "layout": {
                              "{{Constants.PropertyEditors.Aliases.BlockList}}": [
                                  {
-                                     "contentUdi": "umb://element/1304e1ddac87439684fe8a399231cb3d",
-                                     "settingsUdi": "umb://element/1f613e26ce274898908a561437af5100"
+                                     "contentKey": "1304e1dd-ac87-4396-84fe-8a399231cb3d",
+                                     "settingsKey": "1f613e26-ce27-4898-908a-561437af5100"
                                  },
                                  {
-                                     "contentUdi": "umb://element/0a4a416e547d464fabcc6f345c17809a",
-                                     "settingsUdi": "umb://element/63027539b0db45e7b70459762d4e83dd"
+                                     "contentKey": "0a4a416e-547d-464f-abcc-6f345c17809a",
+                                     "settingsKey": "63027539-b0db-45e7-b704-59762d4e83dd"
                                  }
                              ]
                          },
                          "contentData": [
                              {
                                  "contentTypeKey": "{{elementType.Key}}",
-                                 "udi": "umb://element/1304e1ddac87439684fe8a399231cb3d",
+                                 "key": "1304e1dd-ac87-4396-84fe-8a399231cb3d",
                                  "title": "Content Title One",
                                  "text": "Content Text One"
                              },
                              {
                                  "contentTypeKey": "{{elementType.Key}}",
-                                 "udi": "umb://element/0a4a416e547d464fabcc6f345c17809a",
+                                 "key": "0a4a416e-547d-464f-abcc-6f345c17809a",
                                  "title": "Content Title Two",
                                  "text": "Content Text Two"
                              }
@@ -64,13 +64,13 @@ internal sealed class BlockEditorBackwardsCompatibilityTests : UmbracoIntegratio
                          "settingsData": [
                              {
                                  "contentTypeKey": "{{elementType.Key}}",
-                                 "udi": "umb://element/1f613e26ce274898908a561437af5100",
+                                 "key": "1f613e26-ce27-4898-908a-561437af5100",
                                  "title": "Settings Title One",
                                  "text": "Settings Text One"
                              },
                              {
                                  "contentTypeKey": "{{elementType.Key}}",
-                                 "udi": "umb://element/63027539b0db45e7b70459762d4e83dd",
+                                 "key": "63027539-b0db-45e7-b704-59762d4e83dd",
                                  "title": "Settings Title Two",
                                  "text": "Settings Text Two"
                              }
@@ -143,14 +143,14 @@ internal sealed class BlockEditorBackwardsCompatibilityTests : UmbracoIntegratio
                          "layout": {
                              "{{Constants.PropertyEditors.Aliases.BlockGrid}}": [
                                  {
-                                     "contentUdi": "umb://element/1304e1ddac87439684fe8a399231cb3d",
-                                     "settingsUdi": "umb://element/1f613e26ce274898908a561437af5100",
+                                     "contentKey": "1304e1dd-ac87-4396-84fe-8a399231cb3d",
+                                     "settingsKey": "1f613e26-ce27-4898-908a-561437af5100",
                                      "columnSpan": 12,
                                      "rowSpan": 1,
                                      "areas": [{
                                         "key": "{{gridAreaKey}}",
                                         "items": [{
-                                           "contentUdi": "umb://element/5fc866c590be4d01a28a979472a1ffee",
+                                           "contentKey": "5fc866c5-90be-4d01-a28a-979472a1ffee",
                                            "areas": [],
                                            "columnSpan": 12,
                                            "rowSpan": 1
@@ -158,14 +158,14 @@ internal sealed class BlockEditorBackwardsCompatibilityTests : UmbracoIntegratio
                                     }]
                                  },
                                  {
-                                     "contentUdi": "umb://element/0a4a416e547d464fabcc6f345c17809a",
-                                     "settingsUdi": "umb://element/63027539b0db45e7b70459762d4e83dd",
+                                     "contentKey": "0a4a416e-547d-464f-abcc-6f345c17809a",
+                                     "settingsKey": "63027539-b0db-45e7-b704-59762d4e83dd",
                                      "columnSpan": 12,
                                      "rowSpan": 1,
                                      "areas": [{
                                         "key": "{{gridAreaKey}}",
                                         "items": [{
-                                           "contentUdi": "umb://element/264536b65b0f4641aa43d4bfb515831d",
+                                           "contentKey": "264536b6-5b0f-4641-aa43-d4bfb515831d",
                                            "areas": [],
                                            "columnSpan": 12,
                                            "rowSpan": 1
@@ -177,25 +177,25 @@ internal sealed class BlockEditorBackwardsCompatibilityTests : UmbracoIntegratio
                          "contentData": [
                              {
                                  "contentTypeKey": "{{elementType.Key}}",
-                                 "udi": "umb://element/1304e1ddac87439684fe8a399231cb3d",
+                                 "key": "1304e1dd-ac87-4396-84fe-8a399231cb3d",
                                  "title": "Content Title One",
                                  "text": "Content Text One"
                              },
                              {
                                  "contentTypeKey": "{{elementType.Key}}",
-                                 "udi": "umb://element/0a4a416e547d464fabcc6f345c17809a",
+                                 "key": "0a4a416e-547d-464f-abcc-6f345c17809a",
                                  "title": "Content Title Two",
                                  "text": "Content Text Two"
                              },
                              {
                                  "contentTypeKey": "{{elementType.Key}}",
-                                 "udi": "umb://element/5fc866c590be4d01a28a979472a1ffee",
+                                 "key": "5fc866c5-90be-4d01-a28a-979472a1ffee",
                                  "title": "Content Area Title One",
                                  "text": "Content Area Text One"
                              },
                              {
                                  "contentTypeKey": "{{elementType.Key}}",
-                                 "udi": "umb://element/264536b65b0f4641aa43d4bfb515831d",
+                                 "key": "264536b6-5b0f-4641-aa43-d4bfb515831d",
                                  "title": "Content Area Title Two",
                                  "text": "Content Area Text Two"
                              }
@@ -203,13 +203,13 @@ internal sealed class BlockEditorBackwardsCompatibilityTests : UmbracoIntegratio
                          "settingsData": [
                              {
                                  "contentTypeKey": "{{elementType.Key}}",
-                                 "udi": "umb://element/1f613e26ce274898908a561437af5100",
+                                 "key": "1f613e26-ce27-4898-908a-561437af5100",
                                  "title": "Settings Title One",
                                  "text": "Settings Text One"
                              },
                              {
                                  "contentTypeKey": "{{elementType.Key}}",
-                                 "udi": "umb://element/63027539b0db45e7b70459762d4e83dd",
+                                 "key": "63027539-b0db-45e7-b704-59762d4e83dd",
                                  "title": "Settings Title Two",
                                  "text": "Settings Text Two"
                              }
