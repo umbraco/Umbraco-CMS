@@ -11,6 +11,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Mappers;
 [MapperFor(typeof(IContentType))]
 public sealed class ContentTypeMapper : BaseMapper
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ContentTypeMapper"/> class.
+    /// </summary>
+    /// <param name="sqlContext">A lazy-loaded SQL context used for database operations.</param>
+    /// <param name="maps">The configuration store containing mapping definitions.</param>
     public ContentTypeMapper(Lazy<ISqlContext> sqlContext, MapperConfigurationStore maps)
         : base(sqlContext, maps)
     {

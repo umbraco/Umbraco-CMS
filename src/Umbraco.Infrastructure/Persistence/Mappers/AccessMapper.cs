@@ -3,9 +3,17 @@ using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Mappers;
 
+/// <summary>
+/// Provides mapping functionality for Access entities between the database and domain models in the persistence layer.
+/// </summary>
 [MapperFor(typeof(PublicAccessEntry))]
 public sealed class AccessMapper : BaseMapper
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AccessMapper"/> class.
+    /// </summary>
+    /// <param name="sqlContext">A lazily-initialized SQL context for database operations.</param>
+    /// <param name="maps">The configuration store containing mapping definitions.</param>
     public AccessMapper(Lazy<ISqlContext> sqlContext, MapperConfigurationStore maps)
         : base(sqlContext, maps)
     {

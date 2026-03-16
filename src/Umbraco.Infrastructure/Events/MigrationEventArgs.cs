@@ -1,15 +1,33 @@
-﻿using Umbraco.Cms.Core.Semver;
+using Umbraco.Cms.Core.Semver;
 using Umbraco.Cms.Infrastructure.Migrations;
 
 namespace Umbraco.Cms.Core.Events;
 
+/// <summary>
+/// Provides data for events that occur during Umbraco database migrations.
+/// </summary>
 public class MigrationEventArgs : CancellableObjectEventArgs<IList<Type>>, IEquatable<MigrationEventArgs>
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Core.Events.MigrationEventArgs"/> class.
+    /// </summary>
+    /// <param name="migrationTypes">A list of migration types that are part of the migration process.</param>
+    /// <param name="configuredVersion">The version currently configured before migration begins.</param>
+    /// <param name="targetVersion">The version to which the migration will be performed.</param>
+    /// <param name="productName">The name of the product undergoing migration.</param>
+    /// <param name="canCancel">True if the migration process can be cancelled; otherwise, false.</param>
     public MigrationEventArgs(IList<Type> migrationTypes, SemVersion configuredVersion, SemVersion targetVersion, string productName, bool canCancel)
         : this(migrationTypes, null, configuredVersion, targetVersion, productName, canCancel)
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Core.Events.MigrationEventArgs"/> class.
+    /// </summary>
+    /// <param name="migrationTypes">A list of migration types that are being executed.</param>
+    /// <param name="configuredVersion">The version configured before the migration starts.</param>
+    /// <param name="targetVersion">The version to which the migration is being applied.</param>
+    /// <param name="productName">The name of the product undergoing migration.</param>
     public MigrationEventArgs(IList<Type> migrationTypes, SemVersion configuredVersion, SemVersion targetVersion, string productName)
         : this(migrationTypes, null, configuredVersion, targetVersion, productName, false)
     {
@@ -54,6 +72,14 @@ public class MigrationEventArgs : CancellableObjectEventArgs<IList<Type>>, IEqua
 
     public static bool operator !=(MigrationEventArgs left, MigrationEventArgs right) => !Equals(left, right);
 
+    /// <summary>
+    /// Determines whether the current <see cref="Umbraco.Cms.Core.Events.MigrationEventArgs"/> instance is equal to another instance of the same type.
+    /// </summary>
+    /// <param name="other">The <see cref="Umbraco.Cms.Core.Events.MigrationEventArgs"/> to compare with the current instance.</param>
+    /// <returns><c>true</c> if the specified instance is equal to the current instance; otherwise, <c>false</c>.</returns>
+    /// <remarks>
+    /// Equality is determined by comparing the values of <c>ConfiguredSemVersion</c>, <c>MigrationContext</c>, <c>ProductName</c>, and <c>TargetSemVersion</c>.
+    /// </remarks>
     public bool Equals(MigrationEventArgs? other)
     {
         if (ReferenceEquals(null, other))
@@ -71,6 +97,11 @@ public class MigrationEventArgs : CancellableObjectEventArgs<IList<Type>>, IEqua
                string.Equals(ProductName, other.ProductName) && TargetSemVersion.Equals(other.TargetSemVersion);
     }
 
+    /// <summary>
+    /// Determines whether the specified object is equal to the current <see cref="MigrationEventArgs"/> instance.
+    /// </summary>
+    /// <param name="obj">The object to compare with the current instance.</param>
+    /// <returns><c>true</c> if the specified object is equal to the current instance; otherwise, <c>false</c>.</returns>
     public override bool Equals(object? obj)
     {
         if (ReferenceEquals(null, obj))
@@ -91,6 +122,10 @@ public class MigrationEventArgs : CancellableObjectEventArgs<IList<Type>>, IEqua
         return Equals((MigrationEventArgs)obj);
     }
 
+    /// <summary>
+    /// Returns a hash code for this instance, based on its property values.
+    /// </summary>
+    /// <returns>A hash code for the current <see cref="MigrationEventArgs"/> object.</returns>
     public override int GetHashCode()
     {
         unchecked

@@ -72,8 +72,10 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection;
 public static partial class UmbracoBuilderExtensions
 {
     /// <summary>
-    /// Adds all core Umbraco services required to run which may be replaced later in the pipeline.
+    /// Registers all core Umbraco services required for the application to run. These services may be replaced later in the pipeline.
     /// </summary>
+    /// <param name="builder">The <see cref="IUmbracoBuilder"/> to which the core services will be added.</param>
+    /// <returns>The same <see cref="IUmbracoBuilder"/> instance, enabling method chaining.</returns>
     public static IUmbracoBuilder AddCoreInitialServices(this IUmbracoBuilder builder)
     {
         builder
@@ -273,6 +275,11 @@ public static partial class UmbracoBuilderExtensions
         return builder;
     }
 
+    /// <summary>
+    /// Registers the default property index value factories used for indexing property values in Umbraco's search infrastructure.
+    /// </summary>
+    /// <param name="builder">The <see cref="IUmbracoBuilder"/> to add the property index value factories to.</param>
+    /// <returns>The same <see cref="Umbraco.Cms.Core.DependencyInjection.IUmbracoBuilder"/> instance so that multiple calls can be chained.</returns>
     public static IUmbracoBuilder AddPropertyIndexValueFactories(this IUmbracoBuilder builder)
     {
         builder.Services.AddSingleton<IBlockValuePropertyIndexValueFactory, BlockValuePropertyIndexValueFactory>();
@@ -345,6 +352,12 @@ public static partial class UmbracoBuilderExtensions
         return builder;
     }
 
+    /// <summary>
+    /// Registers the default set of core notification handlers required by Umbraco for content, media, member, and other system events.
+    /// This includes handlers for user notifications, content relations, property editors, redirect tracking, distributed cache, and more.
+    /// </summary>
+    /// <param name="builder">The <see cref="IUmbracoBuilder"/> to which the core notification handlers will be added.</param>
+    /// <returns>The same <see cref="IUmbracoBuilder"/> instance, enabling method chaining.</returns>
     public static IUmbracoBuilder AddCoreNotifications(this IUmbracoBuilder builder)
     {
         // add handlers for sending user notifications (i.e. emails)

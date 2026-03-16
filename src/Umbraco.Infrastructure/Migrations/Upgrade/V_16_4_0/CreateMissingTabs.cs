@@ -124,12 +124,22 @@ public class CreateMissingTabs : AsyncMigrationBase
 
     private class MissingTabWithDetails
     {
+        /// <summary>
+        /// Gets or sets the identifier of the content type node associated with the missing tab.
+        /// </summary>
         public required int ContentTypeNodeId { get; set; }
 
+        /// <summary>
+        /// Gets or sets the alias identifying the missing tab.
+        /// </summary>
         public required string Alias { get; set; }
 
+        /// <summary>
+        /// Gets or sets the display text (label) of the missing tab.
+        /// </summary>
         public required string Text { get; set; }
 
+        /// <summary>Gets or sets the sort order of the tab.</summary>
         public required int SortOrder { get; set; }
     }
 }

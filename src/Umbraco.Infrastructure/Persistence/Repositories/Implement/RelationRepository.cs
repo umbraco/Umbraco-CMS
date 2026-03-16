@@ -26,6 +26,15 @@ internal sealed class RelationRepository : EntityRepositoryBase<int, IRelation>,
     private readonly IEntityRepositoryExtended _entityRepository;
     private readonly IRelationTypeRepository _relationTypeRepository;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="RelationRepository"/> class.
+    /// </summary>
+    /// <param name="scopeAccessor">Provides access to the current database scope for transactional operations.</param>
+    /// <param name="logger">The logger used for logging repository operations and errors.</param>
+    /// <param name="relationTypeRepository">Repository for managing relation types.</param>
+    /// <param name="entityRepository">Repository for accessing and managing entities with extended functionality.</param>
+    /// <param name="repositoryCacheVersionService">Service for managing cache versioning within the repository.</param>
+    /// <param name="cacheSyncService">Service for synchronizing cache across distributed environments.</param>
     public RelationRepository(
         IScopeAccessor scopeAccessor,
         ILogger<RelationRepository> logger,
@@ -44,12 +53,40 @@ internal sealed class RelationRepository : EntityRepositoryBase<int, IRelation>,
         _entityRepository = entityRepository;
     }
 
+    /// <summary>
+    /// Gets a paged collection of parent entities related to the specified child entity ID.
+    /// </summary>
+    /// <param name="childId">The ID of the child entity to find parents for.</param>
+    /// <param name="pageIndex">The zero-based index of the page to retrieve.</param>
+    /// <param name="pageSize">The number of items per page.</param>
+    /// <param name="totalRecords">Outputs the total number of parent entities related to the child.</param>
+    /// <param name="entityTypes">Optional array of entity type GUIDs to filter the parent entities.</param>
+    /// <returns>An enumerable collection of parent entities implementing <see cref="IUmbracoEntity"/>.</returns>
     public IEnumerable<IUmbracoEntity> GetPagedParentEntitiesByChildId(int childId, long pageIndex, int pageSize, out long totalRecords, params Guid[] entityTypes)
         => GetPagedParentEntitiesByChildId(childId, pageIndex, pageSize, out totalRecords, [], entityTypes);
 
+    /// <summary>
+    /// Retrieves a paged collection of child entities for the specified parent entity ID.
+    /// </summary>
+    /// <param name="parentId">The ID of the parent entity.</param>
+    /// <param name="pageIndex">The zero-based index of the page to retrieve.</param>
+    /// <param name="pageSize">The number of entities per page.</param>
+    /// <param name="totalRecords">When this method returns, contains the total number of child entities available.</param>
+    /// <param name="entityTypes">Optional. One or more entity type GUIDs to filter the child entities.</param>
+    /// <returns>An enumerable collection of child entities that match the specified criteria.</returns>
     public IEnumerable<IUmbracoEntity> GetPagedChildEntitiesByParentId(int parentId, long pageIndex, int pageSize, out long totalRecords, params Guid[] entityTypes)
         => GetPagedChildEntitiesByParentId(parentId, pageIndex, pageSize, out totalRecords, [], entityTypes);
 
+    /// <summary>
+    /// Asynchronously retrieves a paged list of relations where the specified child key matches, optionally filtered by a relation type alias.
+    /// </summary>
+    /// <param name="childKey">The unique identifier (GUID) of the child entity to filter relations by.</param>
+    /// <param name="skip">The number of relations to skip before starting to collect the result set (used for paging).</param>
+    /// <param name="take">The maximum number of relations to return (used for paging).</param>
+    /// <param name="relationTypeAlias">An optional alias to filter relations by their type; if null or empty, all relation types are included.</param>
+    /// <returns>
+    /// A task representing the asynchronous operation. The result contains a <see cref="PagedModel{IRelation}"/> with the total number of matching relations and the current page of <see cref="IRelation"/> entities.
+    /// </returns>
     public Task<PagedModel<IRelation>> GetPagedByChildKeyAsync(Guid childKey, int skip, int take, string? relationTypeAlias)
     {
         Sql<ISqlContext> sql = GetBaseQuery(false);
@@ -71,6 +108,11 @@ internal sealed class RelationRepository : EntityRepositoryBase<int, IRelation>,
 
     }
 
+    /// <summary>
+    /// Saves a collection of relations by updating existing ones and performing bulk inserts for new relations.
+    /// Existing relations (those with an identity) are updated individually, while new relations are inserted in bulk for performance.
+    /// </summary>
+    /// <param name="relations">The collection of <see cref="IRelation"/> objects to save.</param>
     public void Save(IEnumerable<IRelation> relations)
     {
         foreach (IGrouping<bool, IRelation> hasIdentityGroup in relations.GroupBy(r => r.HasIdentity))
@@ -119,6 +161,11 @@ internal sealed class RelationRepository : EntityRepositoryBase<int, IRelation>,
         }
     }
 
+    /// <summary>
+    /// Saves a collection of relations in bulk, updating existing relations and inserting new ones as needed.
+    /// Existing relations (those with an identity) are updated individually, while new relations are inserted in bulk for performance.
+    /// </summary>
+    /// <param name="relations">The collection of <see cref="ReadOnlyRelation"/> objects to save.</param>
     public void SaveBulk(IEnumerable<ReadOnlyRelation> relations)
     {
         foreach (IGrouping<bool, ReadOnlyRelation> hasIdentityGroup in relations.GroupBy(r => r.HasIdentity))
@@ -145,6 +192,15 @@ internal sealed class RelationRepository : EntityRepositoryBase<int, IRelation>,
         }
     }
 
+    /// <summary>
+    /// Retrieves a paged collection of relations matching the specified query, with support for paging and custom ordering.
+    /// </summary>
+    /// <param name="query">An optional query to filter the relations; if <c>null</c>, all relations are considered.</param>
+    /// <param name="pageIndex">The zero-based index of the page to retrieve.</param>
+    /// <param name="pageSize">The number of items to include in each page.</param>
+    /// <param name="totalRecords">When this method returns, contains the total number of records matching the query.</param>
+    /// <param name="ordering">An optional ordering to apply to the results; if <c>null</c> or empty, defaults to ordering by relation ID.</param>
+    /// <returns>An enumerable collection of <see cref="IRelation"/> objects for the specified page.</returns>
     public IEnumerable<IRelation> GetPagedRelationsByQuery(IQuery<IRelation>? query, long pageIndex, int pageSize, out long totalRecords, Ordering? ordering)
     {
         Sql<ISqlContext> sql = GetBaseQuery(false);
@@ -181,6 +237,11 @@ internal sealed class RelationRepository : EntityRepositoryBase<int, IRelation>,
         return result;
     }
 
+    /// <summary>
+    /// Deletes all relations for the specified parent entity, optionally filtered by relation type aliases.
+    /// </summary>
+    /// <param name="parentId">The ID of the parent entity whose relations will be deleted.</param>
+    /// <param name="relationTypeAliases">An optional array of relation type aliases. If specified, only relations of these types will be deleted; if omitted or empty, all relations for the parent will be deleted.</param>
     public void DeleteByParent(int parentId, params string[] relationTypeAliases)
     {
         // HACK: SQLite - hard to replace this without provider specific repositories/another ORM.
@@ -248,6 +309,16 @@ internal sealed class RelationRepository : EntityRepositoryBase<int, IRelation>,
             .On<RelationDto, RelationTypeDto>((left, right) => left.RelationType == right.Id);
     }
 
+    /// <summary>
+    /// Retrieves a paged collection of parent entities related to the specified child entity.
+    /// </summary>
+    /// <param name="childId">The identifier of the child entity whose parents are to be retrieved.</param>
+    /// <param name="pageIndex">The zero-based index of the page to retrieve.</param>
+    /// <param name="pageSize">The number of entities to include in a page.</param>
+    /// <param name="totalRecords">When this method returns, contains the total number of parent entities found.</param>
+    /// <param name="relationTypes">An array of relation type IDs to filter the parent-child relationships. Pass an empty array to include all relation types.</param>
+    /// <param name="entityTypes">A set of entity type GUIDs to filter the parent entities. This parameter is optional and supports passing multiple values.</param>
+    /// <returns>An enumerable collection of parent entities that match the specified criteria.</returns>
     public IEnumerable<IUmbracoEntity> GetPagedParentEntitiesByChildId(int childId, long pageIndex, int pageSize, out long totalRecords, int[] relationTypes, params Guid[] entityTypes) =>
 
         // var contentObjectTypes = new[] { Constants.ObjectTypes.Document, Constants.ObjectTypes.Media, Constants.ObjectTypes.Member }
@@ -268,6 +339,16 @@ internal sealed class RelationRepository : EntityRepositoryBase<int, IRelation>,
                 }
             });
 
+    /// <summary>
+    /// Retrieves a paged collection of child entities related to the specified parent entity by its ID.
+    /// </summary>
+    /// <param name="parentId">The identifier of the parent entity.</param>
+    /// <param name="pageIndex">The zero-based index of the page to retrieve.</param>
+    /// <param name="pageSize">The number of child entities to include per page.</param>
+    /// <param name="totalRecords">When this method returns, contains the total number of child entities related to the parent.</param>
+    /// <param name="relationTypes">An optional array of relation type IDs to filter the relations. Pass an empty array to include all relation types.</param>
+    /// <param name="entityTypes">A set of entity type GUIDs to filter the child entities. This parameter is variadic (params).</param>
+    /// <returns>An enumerable collection of child entities that match the specified criteria.</returns>
     public IEnumerable<IUmbracoEntity> GetPagedChildEntitiesByParentId(int parentId, long pageIndex, int pageSize, out long totalRecords, int[] relationTypes, params Guid[] entityTypes) =>
 
         // var contentObjectTypes = new[] { Constants.ObjectTypes.Document, Constants.ObjectTypes.Media, Constants.ObjectTypes.Member }
@@ -474,42 +555,82 @@ internal sealed class RelationRepository : EntityRepositoryBase<int, IRelation>,
 
 internal sealed class RelationItemDto
 {
+    /// <summary>
+    /// Gets or sets the identifier of the child node in the relation.
+    /// </summary>
     [Column(Name = "nodeId")]
     public int ChildNodeId { get; set; }
 
+    /// <summary>
+    /// Gets or sets the unique key (GUID) of the child node in this relation.
+    /// </summary>
     [Column(Name = "nodeKey")]
     public Guid ChildNodeKey { get; set; }
 
+    /// <summary>
+    /// Gets or sets the name of the child node associated with this relation item.
+    /// This property is mapped to the 'nodeName' column in the database.
+    /// </summary>
     [Column(Name = "nodeName")]
     public string? ChildNodeName { get; set; }
 
+    /// <summary>
+    /// Gets or sets a value indicating whether the child node is published.
+    /// </summary>
     [Column(Name = "nodePublished")]
     public bool? ChildNodePublished { get; set; }
 
+    /// <summary>
+    /// Gets or sets the object type identifier of the child node in the relation.
+    /// </summary>
     [Column(Name = "nodeObjectType")]
     public Guid ChildNodeObjectType { get; set; }
 
+    /// <summary>
+    /// Gets or sets the unique identifier (key) of the child content type.
+    /// </summary>
     [Column(Name = "contentTypeKey")]
     public Guid ChildContentTypeKey { get; set; }
 
+    /// <summary>
+    /// Gets or sets the icon associated with the child content type.
+    /// </summary>
     [Column(Name = "contentTypeIcon")]
     public string? ChildContentTypeIcon { get; set; }
 
+    /// <summary>
+    /// Gets or sets the alias of the child content type.
+    /// </summary>
     [Column(Name = "contentTypeAlias")]
     public string? ChildContentTypeAlias { get; set; }
 
+    /// <summary>
+    /// Gets or sets the name of the child content type.
+    /// </summary>
     [Column(Name = "contentTypeName")]
     public string? ChildContentTypeName { get; set; }
 
+    /// <summary>
+    /// Gets or sets the display name of the relation type associated with this relation item.
+    /// </summary>
     [Column(Name = "relationTypeName")]
     public string? RelationTypeName { get; set; }
 
+    /// <summary>
+    /// Gets or sets the alias of the relation type.
+    /// </summary>
     [Column(Name = "relationTypeAlias")]
     public string? RelationTypeAlias { get; set; }
 
+    /// <summary>
+    /// Gets or sets a value indicating whether the relation type represents a dependency between related items.
+    /// </summary>
     [Column(Name = "relationTypeIsDependency")]
     public bool RelationTypeIsDependency { get; set; }
 
+    /// <summary>
+    /// Gets or sets a value indicating whether the relation type is bidirectional.
+    /// </summary>
     [Column(Name = "relationTypeIsBidirectional")]
     public bool RelationTypeIsBidirectional { get; set; }
 }

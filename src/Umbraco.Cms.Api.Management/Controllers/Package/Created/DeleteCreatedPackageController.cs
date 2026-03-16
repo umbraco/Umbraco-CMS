@@ -9,12 +9,20 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Package.Created;
 
+/// <summary>
+/// Controller responsible for handling requests to delete packages that have been created.
+/// </summary>
 [ApiVersion("1.0")]
 public class DeleteCreatedPackageController : CreatedPackageControllerBase
 {
     private readonly IPackagingService _packagingService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DeleteCreatedPackageController"/> class, which handles requests to delete created packages.
+    /// </summary>
+    /// <param name="packagingService">The service used for package management operations.</param>
+    /// <param name="backOfficeSecurityAccessor">Provides access to back office security features.</param>
     public DeleteCreatedPackageController(IPackagingService packagingService, IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
     {
         _packagingService = packagingService;
