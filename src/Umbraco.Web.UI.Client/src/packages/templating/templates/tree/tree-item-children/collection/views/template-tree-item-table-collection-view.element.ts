@@ -7,8 +7,7 @@ import { css, html, customElement, state } from '@umbraco-cms/backoffice/externa
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
-const elementName = 'umb-template-tree-item-table-collection-view';
-@customElement(elementName)
+@customElement('umb-template-tree-item-table-collection-view')
 export class UmbTemplateTreeItemTableCollectionViewElement extends UmbLitElement {
 	@state()
 	private _tableConfig: UmbTableConfig = {
@@ -94,6 +93,6 @@ export { UmbTemplateTreeItemTableCollectionViewElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbTemplateTreeItemTableCollectionViewElement;
+		'umb-template-tree-item-table-collection-view': UmbTemplateTreeItemTableCollectionViewElement;
 	}
 }
