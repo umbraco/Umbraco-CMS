@@ -100,12 +100,18 @@ public class LocalLinkProcessor
                 continue;
             }
 
-            var afterTagHref = tagHrefIndex + tag.TagHref.Length;
-            var closingQuoteIndex = input.IndexOf('"', afterTagHref);
-            if (closingQuoteIndex < 0)
+            // Determine the quote character used to open the href attribute. The regex matches
+            // href=['"]..., so the character immediately before the TagHref match is the opening quote.
+            var openingQuoteIndex = tagHrefIndex - 1;
+            if (openingQuoteIndex < 0 || (input[openingQuoteIndex] != '"' && input[openingQuoteIndex] != '\''))
             {
-                closingQuoteIndex = input.IndexOf('\'', afterTagHref);
+                input = input.Replace(tag.TagHref, convertedLocalLink);
+                continue;
             }
+
+            var quoteChar = input[openingQuoteIndex];
+            var afterTagHref = tagHrefIndex + tag.TagHref.Length;
+            var closingQuoteIndex = input.IndexOf(quoteChar, afterTagHref);
 
             if (closingQuoteIndex < 0)
             {
