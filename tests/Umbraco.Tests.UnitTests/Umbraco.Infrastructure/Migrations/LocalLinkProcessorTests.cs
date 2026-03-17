@@ -15,17 +15,6 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations;
 [TestFixture]
 public class LocalLinkProcessorTests
 {
-#pragma warning disable CS0618 // Type or member is obsolete
-    private LocalLinkProcessor CreateProcessor(IIdKeyMap? idKeyMap = null)
-    {
-        var parser = new HtmlLocalLinkParser(Mock.Of<IPublishedUrlProvider>());
-        return new LocalLinkProcessor(
-            parser,
-            idKeyMap ?? Mock.Of<IIdKeyMap>(),
-            Enumerable.Empty<ITypedLocalLinkProcessor>());
-    }
-#pragma warning restore CS0618 // Type or member is obsolete
-
     /// <summary>
     /// Verifies that a UDI-based document link with no hyphens in the GUID
     /// is converted to the new format with a hyphenated GUID and type attribute.
@@ -399,6 +388,79 @@ public class LocalLinkProcessorTests
     }
 
     /// <summary>
+    /// Verifies that a single-quoted href attribute is converted correctly.
+    /// </summary>
+    [Test]
+    public void ProcessStringValue_SingleQuotedHref_ConvertsToGuidWithType()
+    {
+        var processor = CreateProcessor();
+
+        var input = "<a href='{localLink:umb://document/ac2038d9dfc24294b7787edf90d1a178}'>link</a>";
+
+        var result = processor.ProcessStringValue(input);
+
+        Assert.AreEqual(
+            "<a href='{localLink:ac2038d9-dfc2-4294-b778-7edf90d1a178}' type=\"document\">link</a>",
+            result);
+    }
+
+    /// <summary>
+    /// Verifies that a single-quoted href with a fragment is handled correctly,
+    /// preserving the fragment in the href and placing the type as a separate attribute.
+    /// </summary>
+    [Test]
+    public void ProcessStringValue_SingleQuotedHref_WithFragment_PreservesFragment()
+    {
+        var processor = CreateProcessor();
+
+        var input = "<a href='{localLink:umb://document/ac2038d9dfc24294b7787edf90d1a178}#anchor'>link</a>";
+
+        var result = processor.ProcessStringValue(input);
+
+        Assert.AreEqual(
+            "<a href='{localLink:ac2038d9-dfc2-4294-b778-7edf90d1a178}#anchor' type=\"document\">link</a>",
+            result);
+    }
+
+    /// <summary>
+    /// Verifies that a single-quoted href followed by a double-quoted attribute (e.g. title)
+    /// correctly identifies the closing single quote rather than the double quote from the
+    /// next attribute. Without this, the closing-quote detection would match the wrong quote
+    /// and corrupt the tag.
+    /// </summary>
+    [Test]
+    public void ProcessStringValue_SingleQuotedHref_WithDoubleQuotedAttributeAfter_DoesNotCorrupt()
+    {
+        var processor = CreateProcessor();
+
+        var input = "<a href='{localLink:umb://document/ac2038d9dfc24294b7787edf90d1a178}#anchor' title=\"My Page\">link</a>";
+
+        var result = processor.ProcessStringValue(input);
+
+        Assert.AreEqual(
+            "<a href='{localLink:ac2038d9-dfc2-4294-b778-7edf90d1a178}#anchor' type=\"document\" title=\"My Page\">link</a>",
+            result);
+    }
+
+    /// <summary>
+    /// Verifies that a single-quoted href without a fragment but followed by a double-quoted
+    /// attribute still works correctly.
+    /// </summary>
+    [Test]
+    public void ProcessStringValue_SingleQuotedHref_NoFragment_WithDoubleQuotedAttributeAfter()
+    {
+        var processor = CreateProcessor();
+
+        var input = "<a href='{localLink:umb://document/ac2038d9dfc24294b7787edf90d1a178}' title=\"My Page\">link</a>";
+
+        var result = processor.ProcessStringValue(input);
+
+        Assert.AreEqual(
+            "<a href='{localLink:ac2038d9-dfc2-4294-b778-7edf90d1a178}' type=\"document\" title=\"My Page\">link</a>",
+            result);
+    }
+
+    /// <summary>
     /// Verifies that a local link embedded within a larger HTML document (paragraphs,
     /// surrounding text) is converted without corrupting the broader HTML context.
     /// </summary>
@@ -433,4 +495,15 @@ public class LocalLinkProcessorTests
             @"<p>See <a href=""{localLink:ac2038d9-dfc2-4294-b778-7edf90d1a178}#details"" type=""document"">details</a> below.</p>",
             result);
     }
+
+#pragma warning disable CS0618 // Type or member is obsolete
+    private LocalLinkProcessor CreateProcessor(IIdKeyMap? idKeyMap = null)
+    {
+        var parser = new HtmlLocalLinkParser(Mock.Of<IPublishedUrlProvider>());
+        return new LocalLinkProcessor(
+            parser,
+            idKeyMap ?? Mock.Of<IIdKeyMap>(),
+            Enumerable.Empty<ITypedLocalLinkProcessor>());
+    }
+#pragma warning restore CS0618 // Type or member is obsolete
 }
