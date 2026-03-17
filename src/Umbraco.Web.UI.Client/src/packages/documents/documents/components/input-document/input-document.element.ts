@@ -1,6 +1,16 @@
 import type { UmbDocumentItemModel } from '../../item/types.js';
 import { UmbDocumentPickerInputContext } from './input-document.context.js';
-import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
+import {
+	css,
+	customElement,
+	html,
+	ifDefined,
+	nothing,
+	property,
+	repeat,
+	state,
+	when,
+} from '@umbraco-cms/backoffice/external/lit';
 import { jsonStringComparison } from '@umbraco-cms/backoffice/observable-api';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
@@ -147,6 +157,9 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string, typeof 
 	@state()
 	private _statuses?: Array<UmbRepositoryItemsStatus>;
 
+	@state()
+	private _modalRoute?: string;
+
 	#pickerInputContext = new UmbDocumentPickerInputContext(this);
 
 	constructor() {
@@ -197,6 +210,10 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string, typeof 
 			},
 			'_observeMemories',
 		);
+
+		this.observe(this.#pickerInputContext.modalRoute, (modalRoute) => {
+			this._modalRoute = modalRoute;
+		});
 	}
 
 	#openPicker() {
@@ -234,6 +251,7 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string, typeof 
 					look="placeholder"
 					@click=${this.#openPicker}
 					label=${this.localize.term('general_choose')}
+					href=${ifDefined(this._modalRoute)}
 					?disabled=${this.readonly}></uui-button>
 			`;
 		}

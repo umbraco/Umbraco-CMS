@@ -27,6 +27,7 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 			// Observe noAccess from context and update base class property (_noAccess).
 			// This enables access restriction behavior (click prevention) and styling from the base class.
 			this.observe(this.#api.noAccess, (noAccess) => (this._noAccess = noAccess));
+			this.observe(this.#api.collectionPickerPath, (path) => (this._collectionPickerPath = path));
 		}
 
 		super.api = value;
@@ -37,6 +38,9 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 
 	@state()
 	private _name = '';
+
+	@state()
+	private _collectionPickerPath?: string;
 
 	/**
 	 * @internal
@@ -62,9 +66,13 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 		// `this._forceShowExpand` is equivalent to hasCollection for this element.
 		if (this._isMenu && this._forceShowExpand) {
 			return html`<umb-icon data-mark="open-collection" name="icon-list" style="font-size: 8px;"></umb-icon>`;
-		} else {
-			return undefined;
 		}
+		if (this._collectionPickerPath && this._forceShowExpand) {
+			return html`<a href=${this._collectionPickerPath}>
+				<umb-icon data-mark="open-collection-picker" name="icon-list" style="font-size: 8px;"></umb-icon>
+			</a>`;
+		}
+		return undefined;
 	};
 
 	override renderLabel() {
