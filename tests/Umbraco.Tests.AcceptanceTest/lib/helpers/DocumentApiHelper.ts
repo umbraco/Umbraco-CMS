@@ -1732,6 +1732,22 @@ export class DocumentApiHelper {
     return await this.create(document);
   }
 
+  async setupPublicAccessForDocument(documentId: string, memberGroupNames: string[], loginDocumentId: string, errorDocumentId: string) {
+    const body = {
+      memberGroupNames: memberGroupNames,
+      memberUserNames: [],
+      loginDocument: {id: loginDocumentId},
+      errorDocument: {id: errorDocumentId},
+    };
+    const response = await this.api.post(this.api.baseUrl + '/umbraco/management/api/v1/document/' + documentId + '/public-access', body);
+    return response.status();
+  }
+
+  async deletePublicAccessForDocument(documentId: string) {
+    const response = await this.api.delete(this.api.baseUrl + '/umbraco/management/api/v1/document/' + documentId + '/public-access');
+    return response.status();
+  }
+
   async getValuesByCultureAndSegmentForDocument(documentName: string, culturesAndSegments: {culture: string | null, segment: string | null}[]) {
     const documentData = await this.getByName(documentName);
     return culturesAndSegments.map(cs =>
