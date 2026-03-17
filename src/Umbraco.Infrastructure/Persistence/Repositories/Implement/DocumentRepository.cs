@@ -2244,8 +2244,8 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
             // get a unique name (literal duplicates first, then URL segment collisions)
             List<SimilarNodeName> otherNames =
                 cultureNames.Select(x => new SimilarNodeName { Id = x.Id, Name = x.Name }).ToList();
-            var uniqueName = SimilarNodeName.GetUniqueName(otherNames, 0, cultureInfo.Name);
-            uniqueName = EnsureUniqueUrlSegment(uniqueName, 0, otherNames, _shortStringHelper, cultureInfo.Culture);
+            var uniqueName = SimilarNodeName.GetUniqueName(otherNames, content.Id, cultureInfo.Name);
+            uniqueName = EnsureUniqueUrlSegment(uniqueName, content.Id, otherNames, _shortStringHelper, cultureInfo.Culture);
 
             if (uniqueName == content.GetCultureName(cultureInfo.Culture))
             {
