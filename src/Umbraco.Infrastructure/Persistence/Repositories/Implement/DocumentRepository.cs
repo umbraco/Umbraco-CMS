@@ -2185,7 +2185,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         var uniqueName = EnsureUniqueNodeName(parentId, nodeName, id, out List<SimilarNodeName>? siblings);
 
         // Ensure the resulting URL segment is also unique among siblings (resolves https://github.com/umbraco/Umbraco-CMS/issues/22070).
-        return EnsureUniqueUrlSegment(uniqueName, id, siblings);
+        return EnsureUniqueUrlSegment(uniqueName, id, siblings, _shortStringHelper);
     }
 
     private SqlTemplate SqlEnsureVariantNamesAreUnique => SqlContext.Templates.Get(
@@ -2245,7 +2245,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
             List<SimilarNodeName> otherNames =
                 cultureNames.Select(x => new SimilarNodeName { Id = x.Id, Name = x.Name }).ToList();
             var uniqueName = SimilarNodeName.GetUniqueName(otherNames, 0, cultureInfo.Name);
-            uniqueName = EnsureUniqueUrlSegment(uniqueName, 0, otherNames, cultureInfo.Culture);
+            uniqueName = EnsureUniqueUrlSegment(uniqueName, 0, otherNames, _shortStringHelper, cultureInfo.Culture);
 
             if (uniqueName == content.GetCultureName(cultureInfo.Culture))
             {
@@ -2269,10 +2269,11 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
     /// If a collision is detected (e.g. "Title" and "Title." both produce segment "title"),
     /// a numeric suffix is appended to the name until uniqueness is achieved.
     /// </summary>
-    private string? EnsureUniqueUrlSegment(
+    internal static string? EnsureUniqueUrlSegment(
         string? nodeName,
         int nodeId,
         IEnumerable<SimilarNodeName> siblings,
+        IShortStringHelper shortStringHelper,
         string? culture = null)
     {
         if (string.IsNullOrWhiteSpace(nodeName))
@@ -2280,7 +2281,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
             return nodeName;
         }
 
-        var proposedSegment = _shortStringHelper.CleanStringForUrlSegment(nodeName, culture);
+        var proposedSegment = shortStringHelper.CleanStringForUrlSegment(nodeName, culture);
         if (string.IsNullOrEmpty(proposedSegment))
         {
             return nodeName;
@@ -2295,15 +2296,15 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
                 continue;
             }
 
-            var segment = _shortStringHelper.CleanStringForUrlSegment(sibling.Name, culture);
-            if (!string.IsNullOrEmpty(segment))
+            var segment = shortStringHelper.CleanStringForUrlSegment(sibling.Name, culture);
+            if (string.IsNullOrEmpty(segment) is false)
             {
                 siblingSegments.Add(segment);
             }
         }
 
         // If the proposed segment doesn't collide, return the name as-is.
-        if (!siblingSegments.Contains(proposedSegment))
+        if (siblingSegments.Contains(proposedSegment) is false)
         {
             return nodeName;
         }
@@ -2312,8 +2313,8 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         for (var i = 1; ; i++)
         {
             var candidateName = $"{nodeName} ({i})";
-            var candidateSegment = _shortStringHelper.CleanStringForUrlSegment(candidateName, culture);
-            if (string.IsNullOrEmpty(candidateSegment) || !siblingSegments.Contains(candidateSegment))
+            var candidateSegment = shortStringHelper.CleanStringForUrlSegment(candidateName, culture);
+            if (string.IsNullOrEmpty(candidateSegment) || siblingSegments.Contains(candidateSegment) is false)
             {
                 return candidateName;
             }
