@@ -113,6 +113,7 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 	#pagingMap = new Map<string, UmbPaginationManager>();
 	#contextCulture?: string | null;
 	#locationInteractionMemoryUnique: string = 'UmbMediaItemPickerLocation';
+	#viewInteractionMemoryUnique: string = 'UmbMediaItemPickerView';
 
 	constructor() {
 		super();
@@ -169,6 +170,11 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 
 				this._searchFrom = { unique: source.unique, entityType: source.entityType };
 			}
+		}
+
+		const viewFromMemory = this.#getViewFromInteractionMemory();
+		if (viewFromMemory) {
+			this._currentView = viewFromMemory;
 		}
 
 		await this.#loadFolderTypes();
@@ -257,6 +263,7 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 
 	#onViewSelect(view: UmbMediaPickerView) {
 		this._currentView = view;
+		this.#setViewInInteractionMemory(view);
 		// TODO: This ignore is just needed for JSON SCHEMA TO WORK, As its not updated with latest TS yet.
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
@@ -423,6 +430,19 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 	#getLocationFromInteractionMemory(): { entity: UmbEntityModel } | undefined {
 		const memory = this._pickerContext.interactionMemory.getMemory(this.#locationInteractionMemoryUnique);
 		return memory?.value?.location;
+	}
+
+	#setViewInInteractionMemory(view: UmbMediaPickerView) {
+		const memory: UmbInteractionMemoryModel = {
+			unique: this.#viewInteractionMemoryUnique,
+			value: { view },
+		};
+		this._pickerContext?.interactionMemory.setMemory(memory);
+	}
+
+	#getViewFromInteractionMemory(): UmbMediaPickerView | undefined {
+		const memory = this._pickerContext.interactionMemory.getMemory(this.#viewInteractionMemoryUnique);
+		return memory?.value?.view;
 	}
 
 	override render() {
