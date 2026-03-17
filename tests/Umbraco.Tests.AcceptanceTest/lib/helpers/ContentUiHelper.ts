@@ -192,6 +192,7 @@ export class ContentUiHelper extends UiBaseLocators {
   private readonly cardCollectionView: Locator;
   private readonly cardContentNode: Locator;
   private readonly containerSetupBtn: Locator;
+  private readonly containerEditBtn: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -399,6 +400,7 @@ export class ContentUiHelper extends UiBaseLocators {
     this.cardContentNode = this.cardCollectionView.locator('uui-card-content-node');
     // Public Access
     this.containerSetupBtn = this.container.getByLabel('Setup');
+    this.containerEditBtn = this.container.getByLabel('Edit');
   }
 
   async enterContentName(name: string) {
@@ -1903,5 +1905,49 @@ export class ContentUiHelper extends UiBaseLocators {
     const contentLocator = this.cardContentNode.filter({hasText: contentName});
     await this.waitForVisible(contentLocator);
     await this.click(contentLocator.locator('#select-checkbox'), {force: true});
+  }
+
+  async addGroupBasedPublicAccessWithPrefilledPages(memberGroupName: string) {
+    await this.click(this.groupBasedProtectionBtn);
+    await this.clickNextButton();
+    await this.click(this.chooseMemberGroupBtn);
+    await this.click(this.page.getByLabel(memberGroupName));
+    await this.clickChooseModalButton();
+    await this.click(this.containerSetupBtn);
+  }
+
+  async isPublicAccessSetupWizardVisible(isVisible: boolean = true) {
+    return await this.isVisible(this.page.locator('uui-radio-group'), isVisible);
+  }
+
+  async isPublicAccessGroupBasedProtectionVisible(isVisible: boolean = true) {
+    return await this.isVisible(this.groupBasedProtectionBtn, isVisible);
+  }
+
+  async isPublicAccessEditViewVisible(isVisible: boolean = true) {
+    return await this.isVisible(this.page.locator('.select-item').filter({hasText: 'Login Page'}), isVisible);
+  }
+
+  async isPublicAccessErrorVisible(isVisible: boolean = true) {
+    return await this.isVisible(this.page.locator('#error'), isVisible);
+  }
+
+  async clickRemoveProtectionButton() {
+    await this.click(this.container.getByLabel('Remove protection'));
+  }
+
+  async updateGroupBasedPublicAccess(memberGroupName: string) {
+    await this.click(this.chooseMemberGroupBtn);
+    await this.click(this.page.getByLabel(memberGroupName));
+    await this.clickChooseModalButton();
+    await this.click(this.containerEditBtn);
+  }
+
+  async isPublicAccessHeadlineVisible(headline: string) {
+    await this.isVisible(this.container.getByRole('heading', {name: headline, exact: true}));
+  }
+
+  async doesPublicAccessHaveMemberGroupName(name: string) {
+    await this.isVisible(this.container.locator('umb-input-member-group').getByText(name));
   }
 }
