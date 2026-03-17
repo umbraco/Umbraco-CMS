@@ -79,8 +79,7 @@ export class UmbMemberItemRefElement extends UmbLitElement {
 	}
 
 	#renderIcon(item: UmbMemberItemModel) {
-		if (!item.memberType.icon) return;
-		return html`<umb-icon slot="icon" name=${item.memberType.icon}></umb-icon>`;
+		return html`<umb-icon slot="icon" name=${item.memberType.icon || 'icon-user'}></umb-icon>`;
 	}
 }
 
