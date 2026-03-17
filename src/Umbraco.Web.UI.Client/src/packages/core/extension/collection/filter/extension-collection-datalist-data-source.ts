@@ -8,15 +8,22 @@ import type {
 	UmbDatalistRequestArgs,
 	UmbDatalistResponse,
 } from '@umbraco-cms/backoffice/datalist-data-source';
+import { UmbExtensionCollectionRepository } from '../repository';
 
 export class UmbExtensionCollectionDatalistDataSource extends UmbControllerBase implements UmbDatalistDataSource {
+	#repository: UmbExtensionCollectionRepository;
+
 	constructor(host: UmbControllerHost) {
 		super(host);
+		this.#repository = new UmbExtensionCollectionRepository(this);
 	}
 
 	async requestOptions(args: UmbDatalistRequestArgs): Promise<UmbDatalistResponse<UmbDatalistItemModel>> {
-		const extensions = umbExtensionsRegistry.getAllExtensions();
-		const types = [...new Set(extensions.map((x) => x.type))];
+		const { data } = await this.#repository.requestCollection({});
+
+		if (!data) return { data: undefined };
+
+		const types = [...new Set(data.items.map((x) => x.manifest.type))];
 
 		const allItems = types.sort().map((type) => ({
 			unique: type,
