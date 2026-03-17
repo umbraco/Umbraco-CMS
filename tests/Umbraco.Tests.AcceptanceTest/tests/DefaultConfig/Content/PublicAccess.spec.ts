@@ -1,4 +1,5 @@
 import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/acceptance-test-helpers';
+import {expect} from '@playwright/test';
 
 // Contents
 const parentDocumentName = 'ParentDocument';
@@ -44,6 +45,7 @@ test('can setup public access protection on a content', async ({umbracoApi, umbr
 
   // Assert
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.publicAccessSettingCreated);
+  await umbracoApi.document.verifyPublicAccessForDocument(parentDocumentId, memberGroupName, parentDocumentId, parentDocumentId, false);
 });
 
 test('can setup public access protection on the child content', async ({umbracoApi, umbracoUi}) => {
@@ -58,6 +60,7 @@ test('can setup public access protection on the child content', async ({umbracoA
 
   // Assert
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.publicAccessSettingCreated);
+  await umbracoApi.document.verifyPublicAccessForDocument(childDocumentId, memberGroupName, parentDocumentId, parentDocumentId, false);
 });
 
 test('can update public access protection on the child content', async ({umbracoApi, umbracoUi}) => {
@@ -73,6 +76,7 @@ test('can update public access protection on the child content', async ({umbraco
 
   // Assert
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.publicAccessSettingUpdated);
+  await umbracoApi.document.verifyPublicAccessForDocument(childDocumentId, secondMemberGroupName, parentDocumentId, parentDocumentId, false);
 });
 
 test('can delete public access protection from a content', async ({umbracoApi, umbracoUi}) => {
@@ -87,6 +91,7 @@ test('can delete public access protection from a content', async ({umbracoApi, u
 
   // Assert
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.publicAccessSettingDeleted);
+  expect(await umbracoApi.document.getPublicAccessStatusForDocument(parentDocumentId)).toBe(404);
 });
 
 test('can delete public access protection from a child content', async ({umbracoApi, umbracoUi}) => {
@@ -102,6 +107,7 @@ test('can delete public access protection from a child content', async ({umbraco
 
   // Assert
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.publicAccessSettingDeleted);
+  expect(await umbracoApi.document.getPublicAccessStatusForDocument(childDocumentId)).toBe(404);
 });
 
 test('can display inherited public access protection on child content', async ({umbracoApi, umbracoUi}) => {
@@ -116,8 +122,12 @@ test('can display inherited public access protection on child content', async ({
 
   // Assert
   // The setup wizard should appear (not an error) with the inherited protection pre-filled
-  await umbracoUi.content.isPublicAccessErrorVisible(false);
   await umbracoUi.content.isPublicAccessHeadlineVisible('Setup Public Access');
-  await umbracoUi.content.isPublicAccessSetupWizardVisible();
-  await umbracoUi.content.isPublicAccessGroupBasedProtectionVisible();
+  await umbracoUi.content.clickNextButton();
+  await umbracoUi.content.isMemberGroupSelected(memberGroupName);
+  await umbracoUi.content.isDocumentSelectedAsLoginPage(parentDocumentName);
+  await umbracoUi.content.isDocumentSelectedAsErrorPage(parentDocumentName);
+  // Verify via API that the child document has no direct protection but inherits from ancestor
+  expect(await umbracoApi.document.getPublicAccessStatusForDocument(childDocumentId)).toBe(404);
+  await umbracoApi.document.verifyPublicAccessForDocument(childDocumentId, memberGroupName, parentDocumentId, parentDocumentId, true, true);
 });
