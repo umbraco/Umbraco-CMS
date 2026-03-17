@@ -1,7 +1,6 @@
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import { UmbExtensionsElementAndApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbArrayState, UmbBasicState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import type { Observable } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
@@ -11,8 +10,7 @@ export interface UmbActiveCollectionFacetFilterModel {
 }
 
 export class UmbCollectionFacetFilterManager extends UmbControllerBase {
-	#availableFilters = new UmbBasicState<any>([]);
-	public readonly availableFilters = this.#availableFilters.asObservable();
+	#filterManifests: Array<any> = [];
 
 	#activeFilters = new UmbArrayState<UmbActiveCollectionFacetFilterModel>([], (x) => x.alias);
 	public readonly activeFilters = this.#activeFilters.asObservable();
@@ -21,23 +19,14 @@ export class UmbCollectionFacetFilterManager extends UmbControllerBase {
 	constructor(host: UmbControllerHost) {
 		super(host);
 
-		new UmbExtensionsElementAndApiInitializer(
-			this,
-			umbExtensionsRegistry,
-			'collectionFacetFilter',
-			(manifest) => [{ meta: manifest.meta }],
-			undefined,
-			(filters) => {
-				// TODO: Do we need another model than the initilizer?
-				this.#availableFilters.setValue(filters);
-			},
-		);
+		this.observe(umbExtensionsRegistry.byType('collectionFacetFilter'), (manifests) => {
+			this.#filterManifests = manifests;
+		});
 	}
 
 	#getFilterKeyByAlias(alias: string): string | undefined {
-		const available = this.#availableFilters.getValue();
-		const filter = available.find((f: any) => f.manifest?.alias === alias);
-		return filter?.manifest?.meta?.filterKey;
+		const manifest = this.#filterManifests.find((m: any) => m?.alias === alias);
+		return manifest?.meta?.filterKey;
 	}
 
 	/**

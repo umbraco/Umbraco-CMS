@@ -104,8 +104,10 @@ export class UmbCollectionDefaultElement extends UmbLitElement {
 						${this.renderToolbar()}
 						<umb-collection-active-filters></umb-collection-active-filters>
 						<umb-router-slot id="router" .routes=${this._routes}></umb-router-slot>
-						${this._hasItems ? this.#renderContent() : this.#renderEmptyState()}
+						${this._hasItems ? this.renderPagination() : this.#renderEmptyState()}
+						${this.renderSelectionActions()}
 					</umb-body-layout>
+					<umb-collection-filter-sidebar></umb-collection-filter-sidebar>
 				`
 			: nothing;
 	}
@@ -120,10 +122,6 @@ export class UmbCollectionDefaultElement extends UmbLitElement {
 
 	protected renderSelectionActions() {
 		return html`<umb-collection-selection-actions slot="footer"></umb-collection-selection-actions>`;
-	}
-
-	#renderContent() {
-		return html`${this.renderPagination()} ${this.renderSelectionActions()}`;
 	}
 
 	#renderEmptyState() {
@@ -141,10 +139,14 @@ export class UmbCollectionDefaultElement extends UmbLitElement {
 		css`
 			:host {
 				display: flex;
-				flex-direction: column;
+				flex-direction: row;
 				box-sizing: border-box;
-				gap: var(--uui-size-space-5);
 				height: 100%;
+			}
+
+			umb-body-layout {
+				flex: 1;
+				min-width: 0;
 			}
 
 			#router {

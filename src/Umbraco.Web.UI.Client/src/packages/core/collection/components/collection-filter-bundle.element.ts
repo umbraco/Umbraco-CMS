@@ -1,4 +1,6 @@
 import { UMB_COLLECTION_CONTEXT } from '../default/index.js';
+import { UmbExtensionsElementAndApiInitializer } from '@umbraco-cms/backoffice/extension-api';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { css, customElement, html, nothing, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
@@ -13,12 +15,19 @@ export class UmbCollectionFilterBundleElement extends UmbLitElement {
 	constructor() {
 		super();
 
+		new UmbExtensionsElementAndApiInitializer(
+			this,
+			umbExtensionsRegistry,
+			'collectionFacetFilter',
+			undefined,
+			undefined,
+			(filters) => {
+				this._filters = filters;
+			},
+		);
+
 		this.consumeContext(UMB_COLLECTION_CONTEXT, (context) => {
 			if (!context) return;
-
-			this.observe(context.filtering.availableFilters, (filters) => {
-				this._filters = filters;
-			});
 
 			this.observe(context.filtering.totalActiveFilters, (total) => {
 				this._totalActiveFilters = total ?? 0;
