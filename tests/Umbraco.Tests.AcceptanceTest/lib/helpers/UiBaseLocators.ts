@@ -1644,4 +1644,13 @@ export class UiBaseLocators extends BasePage {
   async clickRemoveButtonForElementNodeWithName(elementStartNodeName: string) {
     await this.click(this.elementStartNode.filter({hasText: elementStartNodeName}).getByLabel('Remove'));
   }
+
+  async doesModalHaveText(text: string) {
+    await this.containsText(this.openedModal, text);
+  }
+
+  async isRestoreFromRecycleBinMessageVisible(restoreItem: string, targetFolderName: string) {
+    const message = 'Restore ' + restoreItem + ' to ' + targetFolderName;
+    return await this.doesModalHaveText(message);
+  }
 }

@@ -6,7 +6,6 @@ const elementFolderName = 'TestElementFolderForRecycleBin';
 const elementTypeName = 'TestElementTypeForRecycleBin';
 const dataTypeName = 'Textstring';
 let elementTypeId = '';
-const restoreFromRecycleBinMessage = (restoreItem, targetFolderName) => 'Restore ' + restoreItem + ' to ' + targetFolderName;
 
 test.beforeEach(async ({umbracoUi, umbracoApi}) => {
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
@@ -184,7 +183,7 @@ test('can restore element from recycle bin', async ({umbracoApi, umbracoUi}) => 
   await umbracoUi.library.isItemVisibleInRecycleBin(elementName);
   await umbracoUi.library.clickActionsMenuForElement(elementName);
   await umbracoUi.library.clickRestoreActionMenuOption();
-  await umbracoUi.content.doesModalHaveText(restoreFromRecycleBinMessage(elementName, 'Root'));
+  await umbracoUi.library.isRestoreFromRecycleBinMessageVisible(elementName, 'Root');
   await umbracoUi.library.clickRestoreButton();
 
   // Assert
@@ -205,7 +204,7 @@ test('can restore element folder from recycle bin', async ({umbracoApi, umbracoU
   await umbracoUi.library.isItemVisibleInRecycleBin(elementFolderName);
   await umbracoUi.library.clickActionsMenuForElement(elementFolderName);
   await umbracoUi.library.clickRestoreActionMenuOption();
-  await umbracoUi.content.doesModalHaveText(restoreFromRecycleBinMessage(elementFolderName, 'Root'));
+  await umbracoUi.library.isRestoreFromRecycleBinMessageVisible(elementFolderName, 'Root');
   await umbracoUi.library.clickRestoreButton();
 
   // Assert
@@ -229,7 +228,7 @@ test('can restore child element from recycle bin back to its parent folder', asy
   await umbracoUi.library.isItemVisibleInRecycleBin(elementName);
   await umbracoUi.library.clickActionsMenuForElement(elementName);
   await umbracoUi.library.clickRestoreActionMenuOption();
-  await umbracoUi.content.doesModalHaveText(restoreFromRecycleBinMessage(elementName, elementFolderName));
+  await umbracoUi.library.isRestoreFromRecycleBinMessageVisible(elementName, elementFolderName);
   await umbracoUi.library.clickRestoreButton();
 
   // Assert
@@ -253,7 +252,7 @@ test('can restore element folder with children from recycle bin', async ({umbrac
   await umbracoUi.library.isItemVisibleInRecycleBin(elementFolderName);
   await umbracoUi.library.clickActionsMenuForElement(elementFolderName);
   await umbracoUi.library.clickRestoreActionMenuOption();
-  await umbracoUi.content.doesModalHaveText(restoreFromRecycleBinMessage(elementFolderName, 'Root'));
+  await umbracoUi.library.isRestoreFromRecycleBinMessageVisible(elementFolderName, 'Root');
   await umbracoUi.library.clickRestoreButton();
 
   // Assert
