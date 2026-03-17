@@ -89,8 +89,7 @@ public static partial class UmbracoBuilderExtensions
         builder.AddNotificationHandler<PublicAccessCacheRefresherNotification, DeliveryApiContentIndexingNotificationHandler>();
         builder.AddNotificationHandler<MediaCacheRefresherNotification, MediaIndexingNotificationHandler>();
         builder.AddNotificationHandler<MemberCacheRefresherNotification, MemberIndexingNotificationHandler>();
-        builder.AddNotificationHandler<ExternalMemberSavedNotification, ExternalMemberIndexingNotificationHandler>();
-        builder.AddNotificationHandler<ExternalMemberDeletedNotification, ExternalMemberIndexingNotificationHandler>();
+        builder.AddNotificationHandler<ExternalMemberCacheRefresherNotification, ExternalMemberIndexingNotificationHandler>();
         builder.AddNotificationAsyncHandler<LanguageCacheRefresherNotification, LanguageIndexingNotificationHandler>();
 
         builder.AddNotificationHandler<UmbracoRequestBeginNotification, RebuildOnStartupHandler>();

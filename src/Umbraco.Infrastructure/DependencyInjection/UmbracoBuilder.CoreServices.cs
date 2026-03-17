@@ -428,6 +428,8 @@ public static partial class UmbracoBuilderExtensions
             .AddNotificationHandler<LanguageDeletedNotification, LanguageDeletedDistributedCacheNotificationHandler>()
             .AddNotificationHandler<MemberSavedNotification, MemberSavedDistributedCacheNotificationHandler>()
             .AddNotificationHandler<MemberDeletedNotification, MemberDeletedDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<ExternalMemberSavedNotification, ExternalMemberSavedDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<ExternalMemberDeletedNotification, ExternalMemberDeletedDistributedCacheNotificationHandler>()
             .AddNotificationHandler<PublicAccessEntrySavedNotification, PublicAccessEntrySavedDistributedCacheNotificationHandler>()
             .AddNotificationHandler<PublicAccessEntryDeletedNotification, PublicAccessEntryDeletedDistributedCacheNotificationHandler>()
             .AddNotificationHandler<UserSavedNotification, UserSavedDistributedCacheNotificationHandler>()

@@ -141,11 +141,8 @@ public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMe
             }
         }
 
-        // Persist any changes made by the identity sync or OnExternalLogin callback.
-        if (user.IsExternalOnly)
-        {
-            await UserManager.UpdateAsync(user);
-        }
+        // Changes from SyncExternalMemberIdentityFields and OnExternalLogin are persisted
+        // by ASP.NET Identity's own UpdateAsync call during sign-in (security stamp update).
 
         SignInResult? error = await PreSignInCheck(user);
         if (error != null)

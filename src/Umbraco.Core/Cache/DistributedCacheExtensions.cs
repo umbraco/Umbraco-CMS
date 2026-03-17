@@ -5,6 +5,7 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Notifications;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services.Changes;
 
 namespace Umbraco.Extensions;
@@ -331,6 +332,34 @@ public static class DistributedCacheExtensions
             ? previousUsername
             : null;
     }
+
+    #endregion
+
+    #region ExternalMemberCacheRefresher
+
+    /// <summary>
+    ///     Refreshes the specified external members in the distributed cache.
+    /// </summary>
+    /// <param name="dc">The distributed cache.</param>
+    /// <param name="externalMembers">The external members to refresh in cache.</param>
+    public static void RefreshExternalMemberCache(this DistributedCache dc, IEnumerable<ExternalMemberIdentity> externalMembers)
+        => dc.RefreshByPayload(
+            ExternalMemberCacheRefresher.UniqueId,
+            externalMembers
+                .DistinctBy(x => x.Key)
+                .Select(x => new ExternalMemberCacheRefresher.JsonPayload(x.Id, x.Key, false)));
+
+    /// <summary>
+    ///     Removes the specified external members from the distributed cache.
+    /// </summary>
+    /// <param name="dc">The distributed cache.</param>
+    /// <param name="externalMembers">The external members to remove from cache.</param>
+    public static void RemoveExternalMemberCache(this DistributedCache dc, IEnumerable<ExternalMemberIdentity> externalMembers)
+        => dc.RefreshByPayload(
+            ExternalMemberCacheRefresher.UniqueId,
+            externalMembers
+                .DistinctBy(x => x.Key)
+                .Select(x => new ExternalMemberCacheRefresher.JsonPayload(x.Id, x.Key, true)));
 
     #endregion
 
