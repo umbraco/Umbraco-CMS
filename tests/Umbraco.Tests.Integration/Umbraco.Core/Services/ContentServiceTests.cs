@@ -3317,7 +3317,7 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
 
         var contentType = ContentTypeService.Get("umbTextpage")!;
         contentType.Variations = ContentVariation.Culture;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
 
         var parent = new Content(null, Constants.System.Root, contentType);
         parent.SetCultureName("root", langUk.IsoCode);

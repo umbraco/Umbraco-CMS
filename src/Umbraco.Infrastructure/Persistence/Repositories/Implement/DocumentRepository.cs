@@ -212,8 +212,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
             serializer,
             eventAggregator,
             StaticServiceProvider.Instance.GetRequiredService<IRepositoryCacheVersionService>(),
-            StaticServiceProvider.Instance.GetRequiredService<ICacheSyncService>(),
-            StaticServiceProvider.Instance.GetRequiredService<IShortStringHelper>())
+            StaticServiceProvider.Instance.GetRequiredService<ICacheSyncService>())
     {
     }
 
