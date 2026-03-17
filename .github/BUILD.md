@@ -128,7 +128,7 @@ Request and response models used by the management APIs are made available clien
 
 ```
 cd <solution root>\src\Umbraco.Web.UI.Client
-npm run generate:server-api-dev
+npm run generate:server-api
 ```
 
 Please also update the `OpenApi.json` file held in the solution by copying and pasting the output from `/umbraco/swagger/management/swagger.json`.
