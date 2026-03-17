@@ -3278,6 +3278,68 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
+    public void Ensure_Invariant_Unique_Name_When_Url_Segments_Collide()
+    {
+        // Siblings whose names differ only in punctuation produce the same URL segment
+        // (e.g. "Title" and "Title." both produce "title"), so the second should get a suffix.
+        var contentType = ContentTypeService.Get("umbTextpage")!;
+
+        var parent = new Content("root", Constants.System.Root, contentType);
+        ContentService.Save(parent);
+
+        var child1 = new Content("Title", parent, contentType);
+        ContentService.Save(child1);
+        Assert.AreEqual("Title", child1.Name);
+
+        var child2 = new Content("Title.", parent, contentType);
+        ContentService.Save(child2);
+        Assert.AreEqual("Title. (1)", child2.Name);
+
+        // Save again to verify the name is stable (idempotent).
+        ContentService.Save(child2);
+        Assert.AreEqual("Title. (1)", child2.Name);
+    }
+
+    [Test]
+    public async Task Ensure_Unique_Culture_Names_When_Url_Segments_Collide()
+    {
+        var languageService = LanguageService;
+
+        var langUk = new LanguageBuilder()
+            .WithCultureInfo("en-GB")
+            .WithIsDefault(true)
+            .Build();
+        var langFr = new LanguageBuilder()
+            .WithCultureInfo("fr-FR")
+            .Build();
+
+        await languageService.CreateAsync(langFr, Constants.Security.SuperUserKey);
+        await languageService.CreateAsync(langUk, Constants.Security.SuperUserKey);
+
+        var contentType = ContentTypeService.Get("umbTextpage")!;
+        contentType.Variations = ContentVariation.Culture;
+        await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
+
+        var parent = new Content(null, Constants.System.Root, contentType);
+        parent.SetCultureName("root", langUk.IsoCode);
+        ContentService.Save(parent);
+
+        var child1 = new Content(null, parent, contentType);
+        child1.SetCultureName("Title", langUk.IsoCode);
+        ContentService.Save(child1);
+        Assert.AreEqual("Title", child1.GetCultureName(langUk.IsoCode));
+
+        var child2 = new Content(null, parent, contentType);
+        child2.SetCultureName("Title.", langUk.IsoCode);
+        ContentService.Save(child2);
+        Assert.AreEqual("Title. (1)", child2.GetCultureName(langUk.IsoCode));
+
+        // Save again to verify the name is stable (idempotent).
+        ContentService.Save(child2);
+        Assert.AreEqual("Title. (1)", child2.GetCultureName(langUk.IsoCode));
+    }
+
+    [Test]
     [LongRunning]
     public async Task Can_Get_Paged_Children_WithFilterAndOrder()
     {

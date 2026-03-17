@@ -16,6 +16,7 @@ using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Factories;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
@@ -38,6 +39,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
     private readonly IJsonSerializer _serializer;
     private readonly IRepositoryCacheVersionService _repositoryCacheVersionService;
     private readonly ICacheSyncService _cacheSyncService;
+    private readonly IShortStringHelper _shortStringHelper;
     private readonly ITagRepository _tagRepository;
     private readonly ITemplateRepository _templateRepository;
     private PermissionRepository<IContent>? _permissionRepository;
@@ -80,7 +82,8 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         IJsonSerializer serializer,
         IEventAggregator eventAggregator,
         IRepositoryCacheVersionService repositoryCacheVersionService,
-        ICacheSyncService cacheSyncService)
+        ICacheSyncService cacheSyncService,
+        IShortStringHelper shortStringHelper)
         : base(
             scopeAccessor,
             appCaches,
@@ -102,6 +105,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         _serializer = serializer;
         _repositoryCacheVersionService = repositoryCacheVersionService;
         _cacheSyncService = cacheSyncService;
+        _shortStringHelper = shortStringHelper;
         _appCaches = appCaches;
         _loggerFactory = loggerFactory;
         _scopeAccessor = scopeAccessor;
@@ -112,6 +116,47 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
             loggerFactory.CreateLogger<ContentByGuidReadRepository>(),
             repositoryCacheVersionService,
             cacheSyncService);
+    }
+
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
+    public DocumentRepository(
+        IScopeAccessor scopeAccessor,
+        AppCaches appCaches,
+        ILogger<DocumentRepository> logger,
+        ILoggerFactory loggerFactory,
+        IContentTypeRepository contentTypeRepository,
+        ITemplateRepository templateRepository,
+        ITagRepository tagRepository,
+        ILanguageRepository languageRepository,
+        IRelationRepository relationRepository,
+        IRelationTypeRepository relationTypeRepository,
+        PropertyEditorCollection propertyEditors,
+        DataValueReferenceFactoryCollection dataValueReferenceFactories,
+        IDataTypeService dataTypeService,
+        IJsonSerializer serializer,
+        IEventAggregator eventAggregator,
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
+        : this(
+            scopeAccessor,
+            appCaches,
+            logger,
+            loggerFactory,
+            contentTypeRepository,
+            templateRepository,
+            tagRepository,
+            languageRepository,
+            relationRepository,
+            relationTypeRepository,
+            propertyEditors,
+            dataValueReferenceFactories,
+            dataTypeService,
+            serializer,
+            eventAggregator,
+            repositoryCacheVersionService,
+            cacheSyncService,
+            StaticServiceProvider.Instance.GetRequiredService<IShortStringHelper>())
+    {
     }
 
     /// <summary>
@@ -2129,8 +2174,19 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
     private void EnsureInvariantNameIsUnique(IContent content) =>
         content.Name = EnsureUniqueNodeName(content.ParentId, content.Name, content.Id);
 
-    protected override string? EnsureUniqueNodeName(int parentId, string? nodeName, int id = 0) =>
-        EnsureUniqueNaming == false ? nodeName : base.EnsureUniqueNodeName(parentId, nodeName, id);
+    protected override string? EnsureUniqueNodeName(int parentId, string? nodeName, int id = 0)
+    {
+        if (EnsureUniqueNaming == false)
+        {
+            return nodeName;
+        }
+
+        // Call the base implementation to handle literal name duplicates (e.g. "Title" vs "Title" → "Title (1)").
+        var uniqueName = EnsureUniqueNodeName(parentId, nodeName, id, out List<SimilarNodeName>? siblings);
+
+        // Ensure the resulting URL segment is also unique among siblings (resolves https://github.com/umbraco/Umbraco-CMS/issues/22070).
+        return EnsureUniqueUrlSegment(uniqueName, id, siblings, _shortStringHelper);
+    }
 
     private SqlTemplate SqlEnsureVariantNamesAreUnique => SqlContext.Templates.Get(
         "Umbraco.Core.DomainRepository.EnsureVariantNamesAreUnique", tsql => tsql
@@ -2185,10 +2241,11 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
                 continue;
             }
 
-            // get a unique name
-            IEnumerable<SimilarNodeName> otherNames =
-                cultureNames.Select(x => new SimilarNodeName { Id = x.Id, Name = x.Name });
-            var uniqueName = SimilarNodeName.GetUniqueName(otherNames, 0, cultureInfo.Name);
+            // get a unique name (literal duplicates first, then URL segment collisions)
+            List<SimilarNodeName> otherNames =
+                cultureNames.Select(x => new SimilarNodeName { Id = x.Id, Name = x.Name }).ToList();
+            var uniqueName = SimilarNodeName.GetUniqueName(otherNames, content.Id, cultureInfo.Name);
+            uniqueName = EnsureUniqueUrlSegment(uniqueName, content.Id, otherNames, _shortStringHelper, cultureInfo.Culture);
 
             if (uniqueName == content.GetCultureName(cultureInfo.Culture))
             {
@@ -2203,6 +2260,63 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
                     cultureInfo.Culture,
                     uniqueName,
                     DateTime.UtcNow); //TODO: This is weird, this call will have already been made in the SetCultureName
+            }
+        }
+    }
+
+    /// <summary>
+    /// Ensures the proposed name produces a URL segment that is unique among sibling URL segments.
+    /// If a collision is detected (e.g. "Title" and "Title." both produce segment "title"),
+    /// a numeric suffix is appended to the name until uniqueness is achieved.
+    /// </summary>
+    internal static string? EnsureUniqueUrlSegment(
+        string? nodeName,
+        int nodeId,
+        IEnumerable<SimilarNodeName> siblings,
+        IShortStringHelper shortStringHelper,
+        string? culture = null)
+    {
+        if (string.IsNullOrWhiteSpace(nodeName))
+        {
+            return nodeName;
+        }
+
+        var proposedSegment = shortStringHelper.CleanStringForUrlSegment(nodeName, culture);
+        if (string.IsNullOrEmpty(proposedSegment))
+        {
+            return nodeName;
+        }
+
+        // Build a set of URL segments from siblings, excluding the current node.
+        var siblingSegments = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (SimilarNodeName sibling in siblings)
+        {
+            if (sibling.Id == nodeId || string.IsNullOrWhiteSpace(sibling.Name))
+            {
+                continue;
+            }
+
+            var segment = shortStringHelper.CleanStringForUrlSegment(sibling.Name, culture);
+            if (string.IsNullOrEmpty(segment) is false)
+            {
+                siblingSegments.Add(segment);
+            }
+        }
+
+        // If the proposed segment doesn't collide, return the name as-is.
+        if (siblingSegments.Contains(proposedSegment) is false)
+        {
+            return nodeName;
+        }
+
+        // Increment a (N) suffix on the name until the resulting URL segment is unique.
+        for (var i = 1; ; i++)
+        {
+            var candidateName = $"{nodeName} ({i})";
+            var candidateSegment = shortStringHelper.CleanStringForUrlSegment(candidateName, culture);
+            if (string.IsNullOrEmpty(candidateSegment) || siblingSegments.Contains(candidateSegment) is false)
+            {
+                return candidateName;
             }
         }
     }
