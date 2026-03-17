@@ -114,6 +114,10 @@ public abstract class DocumentTypeControllerBase : ManagementApiControllerBase
                     .WithTitle("Invalid IsElement flag")
                     .WithDetail("Can not create a documentType with inheritance composition where the parent and the new type's IsElement flag are different.")
                     .Build()),
+                ContentTypeOperationStatus.InvalidSegmentVariationForElementType => new BadRequestObjectResult(problemDetailsBuilder
+                    .WithTitle("Invalid segment variation")
+                    .WithDetail("Element types cannot vary by segment.")
+                    .Build()),
                 _ => new ObjectResult("Unknown content type operation status") { StatusCode = StatusCodes.Status500InternalServerError },
             });
 

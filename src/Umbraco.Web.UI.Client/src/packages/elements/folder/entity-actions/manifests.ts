@@ -13,7 +13,7 @@ import {
 const folderDelete: UmbExtensionManifest = {
 	type: 'entityAction',
 	kind: 'folderDelete',
-	alias: 'Umb.EntityAction.Element.Folder.Delete',
+	alias: 'Umb.EntityAction.ElementFolder.Delete',
 	name: 'Delete Element Folder Entity Action',
 	forEntityTypes: [UMB_ELEMENT_FOLDER_ENTITY_TYPE],
 	meta: {
@@ -32,7 +32,7 @@ const folderDelete: UmbExtensionManifest = {
 const folderUpdate: UmbExtensionManifest = {
 	type: 'entityAction',
 	kind: 'folderUpdate',
-	alias: 'Umb.EntityAction.Element.Folder.Rename',
+	alias: 'Umb.EntityAction.ElementFolder.Rename',
 	name: 'Rename Element Folder Entity Action',
 	forEntityTypes: [UMB_ELEMENT_FOLDER_ENTITY_TYPE],
 	meta: {

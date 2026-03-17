@@ -86,40 +86,37 @@ internal sealed class ElementEditingService
     public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateUpdateAsync(Guid key, ValidateElementUpdateModel updateModel, Guid userKey)
     {
         IElement? content = _elementService.GetById(key);
-        return content is not null
-            ? await ValidateCulturesAndPropertiesAsync(
-                updateModel,
-                content.ContentType.Key,
-                updateModel.Cultures,
-                userKey)
-            : Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, new ContentValidationResult());
+        if (content is null)
+        {
+            return Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, new ContentValidationResult());
+        }
+
+        return await ValidateCulturesAndPropertiesAsync(
+            updateModel,
+            content.ContentType.Key,
+            updateModel.Cultures,
+            userKey);
     }
 
     /// <inheritdoc />
     public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateCreateAsync(ElementCreateModel createModel, Guid userKey)
-        => await ValidateCulturesAndPropertiesAsync(
-            createModel,
-            createModel.ContentTypeKey,
-            createModel.Variants.Select(variant => variant.Culture),
-            userKey);
-
-    protected override IContentType? TryGetAndValidateContentType(
-        Guid contentTypeKey, ContentEditingModelBase contentEditingModelBase,
-        out ContentEditingOperationStatus operationStatus)
     {
-        IContentType? contentType = base.TryGetAndValidateContentType(contentTypeKey, contentEditingModelBase, out operationStatus);
+        IContentType? contentType = ContentTypeService.Get(createModel.ContentTypeKey);
         if (contentType is null)
         {
-            return null;
+            return Attempt.FailWithStatus(ContentEditingOperationStatus.ContentTypeNotFound, new ContentValidationResult());
         }
 
         if (contentType.IsElement is false || contentType.AllowedInLibrary is false)
         {
-            operationStatus = ContentEditingOperationStatus.NotAllowed;
-            return null;
+            return Attempt.FailWithStatus(ContentEditingOperationStatus.NotAllowed, new ContentValidationResult());
         }
 
-        return contentType;
+        return await ValidateCulturesAndPropertiesAsync(
+            createModel,
+            createModel.ContentTypeKey,
+            createModel.Variants.Select(variant => variant.Culture),
+            userKey);
     }
 
     public async Task<Attempt<ElementCreateResult, ContentEditingOperationStatus>> CreateAsync(ElementCreateModel createModel, Guid userKey)
@@ -191,6 +188,27 @@ internal sealed class ElementEditingService
 
     protected override IElement New(string? name, int parentId, IContentType contentType)
         => new Element(name, parentId, contentType);
+
+    protected override IContentType? TryGetAndValidateContentType(
+        Guid contentTypeKey, ContentEditingModelBase contentEditingModelBase,
+        out ContentEditingOperationStatus operationStatus)
+    {
+        IContentType? contentType = base.TryGetAndValidateContentType(contentTypeKey, contentEditingModelBase, out operationStatus);
+        if (contentType is null)
+        {
+            return null;
+        }
+
+        // Only enforce IsElement + AllowedInLibrary on create; updates only need the content type to exist
+        if (contentEditingModelBase is ContentCreationModelBase
+            && IsAllowedLibraryElement(contentType) is false)
+        {
+            operationStatus = ContentEditingOperationStatus.NotAllowed;
+            return null;
+        }
+
+        return contentType;
+    }
 
     protected override async Task<(int? ParentId, ContentEditingOperationStatus OperationStatus)> TryGetAndValidateParentIdAsync(Guid? parentKey, IContentType contentType)
     {
@@ -497,4 +515,7 @@ internal sealed class ElementEditingService
             return ContentEditingOperationStatus.Unknown;
         }
     }
+
+    private static bool IsAllowedLibraryElement(IContentType contentType)
+        => contentType.IsElement && contentType.AllowedInLibrary;
 }
