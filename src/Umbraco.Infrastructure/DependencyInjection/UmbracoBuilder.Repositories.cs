@@ -3,6 +3,7 @@ using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.DynamicRoot.QuerySteps;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Cms.Infrastructure.Services.Implement;
@@ -87,6 +88,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddUnique<ILongRunningOperationRepository, LongRunningOperationRepository>();
         builder.Services.AddSingleton<FileSystemLastSyncedRepository>();
         builder.Services.AddSingleton<LastSyncedRepository>();
+        builder.Services.AddUnique<IDatabaseReadOnlyAccessor, DatabaseReadOnlyAccessor>();
         builder.Services.AddUnique<ILastSyncedRepository, ServerRoleAwareLastSyncedRepository>();
         builder.Services.AddUnique<IDistributedJobRepository, DistributedJobRepository>();
 
