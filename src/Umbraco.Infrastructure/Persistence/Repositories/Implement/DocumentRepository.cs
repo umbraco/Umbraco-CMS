@@ -23,7 +23,6 @@ using Umbraco.Cms.Infrastructure.Persistence.Querying;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
-using static Umbraco.Cms.Core.Persistence.SqlExtensionsStatics;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
@@ -2182,25 +2181,10 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
             return nodeName;
         }
 
-        // First, handle literal name duplicates using the base algorithm
-        // (e.g. "Title" vs "Title" → "Title (1)").
-        var uniqueName = base.EnsureUniqueNodeName(parentId, nodeName, id);
+        // Call the base implementation to handle literal name duplicates (e.g. "Title" vs "Title" → "Title (1)").
+        var uniqueName = EnsureUniqueNodeName(parentId, nodeName, id, out List<SimilarNodeName>? siblings);
 
-        // Then fetch siblings again and ensure the resulting URL segment is also unique.
-        // This is a second sibling fetch (same indexed query), but it only runs on save
-        // and the clarity benefit outweighs the minor overhead.
-        SqlTemplate template = SqlContext.Templates.Get(
-            Constants.SqlTemplates.VersionableRepository.EnsureUniqueNodeName,
-            tsql => tsql
-                .Select<NodeDto>(x => Alias(x.NodeId, "id"), x => Alias(x.Text!, "name"))
-                .From<NodeDto>()
-                .Where<NodeDto>(x =>
-                    x.NodeObjectType == SqlTemplate.Arg<Guid>("nodeObjectType") &&
-                    x.ParentId == SqlTemplate.Arg<int>("parentId")));
-
-        Sql<ISqlContext> sql = template.Sql(NodeObjectTypeId, parentId);
-        List<SimilarNodeName> siblings = Database.Fetch<SimilarNodeName>(sql);
-
+        // Ensure the resulting URL segment is also unique among siblings (resolves https://github.com/umbraco/Umbraco-CMS/issues/22070).
         return EnsureUniqueUrlSegment(uniqueName, id, siblings);
     }
 
