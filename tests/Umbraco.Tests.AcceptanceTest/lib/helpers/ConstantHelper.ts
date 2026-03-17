@@ -114,6 +114,7 @@
     2: ['Ignore user start nodes', 'Selecting this option allows a user to choose nodes that they normally dont have access to.'],
     3: ['Overlay Size', 'Select the width of the overlay.'],
     4: ['Hide anchor/query string input', 'Selecting this hides the anchor/query string input field in the link picker overlay.'],
+    5: ['Culture-specific document links', 'Enable specifying a culture when linking to documents.']
   }
 
   public static readonly numericSettings = {
@@ -227,7 +228,8 @@
 
   public static readonly trashDeleteDialogMessage = {
     referenceHeadline: 'The following items depend on this',
-    bulkReferenceHeadline: 'The following items are used by other content.'
+    bulkReferenceHeadline: 'The following items are used by other content.',
+    descendingReferenceHeadline: 'The following descending items have dependencies'
   }
 
   public static readonly webhookEvents = [

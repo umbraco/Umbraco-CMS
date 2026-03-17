@@ -10,6 +10,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Tree;
 
+/// <summary>
+/// Serves as the base controller for file system tree management in the Umbraco CMS API, providing shared functionality for file system tree operations.
+/// </summary>
 public abstract class FileSystemTreeControllerBase : ManagementApiControllerBase
 {
     private readonly IFileSystemTreeService _fileSystemTreeService = null!;

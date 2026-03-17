@@ -7,9 +7,17 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DocumentBlueprint.Folder;
 
+/// <summary>
+/// Controller responsible for handling requests to create folders for document blueprints.
+/// </summary>
 [ApiVersion("1.0")]
 public class CreateDocumentBlueprintFolderController : DocumentBlueprintFolderControllerBase
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CreateDocumentBlueprintFolderController"/> class.
+    /// </summary>
+    /// <param name="backOfficeSecurityAccessor">Accessor for back office security operations.</param>
+    /// <param name="contentBlueprintContainerService">Service for managing content blueprint containers.</param>
     public CreateDocumentBlueprintFolderController(
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
         IContentBlueprintContainerService contentBlueprintContainerService)
@@ -17,6 +25,12 @@ public class CreateDocumentBlueprintFolderController : DocumentBlueprintFolderCo
     {
     }
 
+    /// <summary>
+    /// Creates a new document blueprint folder with the specified name and parent location.
+    /// </summary>
+    /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete.</param>
+    /// <param name="createFolderRequestModel">The model containing details for the folder to create.</param>
+    /// <returns>A <see cref="Task{IActionResult}"/> representing the asynchronous operation result.</returns>
     [HttpPost]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status201Created)]

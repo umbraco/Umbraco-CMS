@@ -339,7 +339,7 @@ test('can reset manual URL using remove button', async ({umbracoApi, umbracoUi})
   await umbracoUi.content.clickManualLinkButton();
   await umbracoUi.content.enterLink(link);
   // Click remove button to reset URL
-  await umbracoUi.content.clickRemoveExactButton();
+  await umbracoUi.content.clickManualLinkRemoveButton();
   await umbracoUi.content.clickConfirmToResetButton();
 
   // Assert

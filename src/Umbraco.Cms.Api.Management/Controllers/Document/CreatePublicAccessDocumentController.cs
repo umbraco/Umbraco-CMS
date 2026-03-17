@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -16,6 +16,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Document;
 
+/// <summary>
+/// API controller responsible for handling requests to create documents with public access permissions in Umbraco.
+/// </summary>
 [ApiVersion("1.0")]
 public class CreatePublicAccessDocumentController : DocumentControllerBase
 {
@@ -23,6 +26,12 @@ public class CreatePublicAccessDocumentController : DocumentControllerBase
     private readonly IPublicAccessPresentationFactory _publicAccessPresentationFactory;
     private readonly IPublicAccessService _publicAccessService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CreatePublicAccessDocumentController"/> class.
+    /// </summary>
+    /// <param name="authorizationService">Service used to perform permission checks.</param>
+    /// <param name="publicAccessPresentationFactory">Factory for creating public access presentation models.</param>
+    /// <param name="publicAccessService">Service for managing public access settings.</param>
     public CreatePublicAccessDocumentController(
         IAuthorizationService authorizationService,
         IPublicAccessPresentationFactory publicAccessPresentationFactory,
@@ -33,6 +42,19 @@ public class CreatePublicAccessDocumentController : DocumentControllerBase
         _publicAccessService = publicAccessService;
     }
 
+    /// <summary>
+    /// Creates public access rules for the specified document, restricting or allowing access based on the provided access details.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="id">The unique identifier (GUID) of the document to protect.</param>
+    /// <param name="publicAccessRequestModel">The model containing the public access configuration for the document.</param>
+    /// <returns>
+    /// An <see cref="IActionResult"/> indicating the result of the operation:
+    /// <list type="bullet">
+    /// <item><description><c>201 Created</c> if the public access rules were successfully created.</description></item>
+    /// <item><description><c>404 Not Found</c> if the document does not exist.</description></item>
+    /// </list>
+    /// </returns>
     [MapToApiVersion("1.0")]
     [HttpPost("{id:guid}/public-access")]
     [ProducesResponseType(StatusCodes.Status201Created)]

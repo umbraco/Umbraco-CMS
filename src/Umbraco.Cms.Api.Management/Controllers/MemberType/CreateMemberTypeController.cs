@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -14,6 +14,9 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.MemberType;
 
+/// <summary>
+/// API controller responsible for handling requests to create new member types in Umbraco CMS.
+/// </summary>
 [ApiVersion("1.0")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessMemberTypes)]
 public class CreateMemberTypeController : MemberTypeControllerBase
@@ -22,6 +25,12 @@ public class CreateMemberTypeController : MemberTypeControllerBase
     private readonly IMemberTypeEditingService _memberTypeEditingService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CreateMemberTypeController"/> class with the specified dependencies for member type editing and security.
+    /// </summary>
+    /// <param name="memberTypeEditingPresentationFactory">Factory for creating member type editing presentation models.</param>
+    /// <param name="memberTypeEditingService">Service for handling member type editing operations.</param>
+    /// <param name="backOfficeSecurityAccessor">Accessor for back office security context.</param>
     public CreateMemberTypeController(
         IMemberTypeEditingPresentationFactory memberTypeEditingPresentationFactory,
         IMemberTypeEditingService memberTypeEditingService,

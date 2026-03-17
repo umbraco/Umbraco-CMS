@@ -4,6 +4,9 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
+/// <summary>
+/// Represents a data transfer object (DTO) that defines the association between a user group and an application in the system.
+/// </summary>
 [TableName(TableName)]
 [PrimaryKey([UserGroupIdColumnName, AppAliasColumnName], AutoIncrement = false)]
 [ExplicitColumns]
@@ -17,11 +20,17 @@ public class UserGroup2AppDto
     public const string UserGroupIdColumnName = "userGroupId";
     private const string AppAliasColumnName = "app";
 
+    /// <summary>
+    /// Gets or sets the identifier of the user group.
+    /// </summary>
     [Column(UserGroupIdColumnName)]
     [PrimaryKeyColumn(AutoIncrement = false, Name = "PK_userGroup2App", OnColumns = $"{UserGroupIdColumnName}, {AppAliasColumnName}")]
     [ForeignKey(typeof(UserGroupDto))]
     public int UserGroupId { get; set; }
 
+    /// <summary>
+    /// Gets or sets the alias of the application associated with the user group.
+    /// </summary>
     [Column(AppAliasColumnName)]
     [Length(50)]
     public string AppAlias { get; set; } = null!;

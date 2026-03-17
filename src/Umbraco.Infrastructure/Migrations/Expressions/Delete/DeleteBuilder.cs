@@ -12,10 +12,17 @@ using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Delete;
 
+/// <summary>
+/// Provides functionality to construct delete expressions used in database migration operations.
+/// </summary>
 public class DeleteBuilder : IDeleteBuilder
 {
     private readonly IMigrationContext _context;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Migrations.Expressions.Delete.DeleteBuilder"/> class.
+    /// </summary>
+    /// <param name="context">The <see cref="IMigrationContext"/> to use for migration operations.</param>
     public DeleteBuilder(IMigrationContext context) => _context = context;
 
     /// <inheritdoc />
