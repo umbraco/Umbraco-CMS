@@ -21,45 +21,65 @@ using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Infrastructure.Security;
-using Umbraco.Cms.Tests.Common.Testing;
-using Umbraco.Cms.Tests.Integration.TestServerTest;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi;
 
+/// <summary>
+///     Base class for ManagementApi integration tests that use a shared host from
+///     <see cref="ManagementApiSetUpFixture"/>. Each test fixture gets its own fresh database
+///     via the <see cref="Testing.Fixtures.TestDatabaseSwapper"/>.
+/// </summary>
+/// <typeparam name="T">The ManagementApi controller type being tested.</typeparam>
 [TestFixture]
-[UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerFixture, Logger = UmbracoTestOptions.Logger.Console, Boot = true)]
-public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
+public abstract class ManagementApiTest<T>
     where T : ManagementApiControllerBase
 {
-
     private static readonly Dictionary<string, TokenModel> _tokenCache = new();
     private static readonly SHA256 _sha256 = SHA256.Create();
 
     protected abstract Expression<Func<T, object>> MethodSelector { get; set; }
 
-    protected string Url => GetManagementApiUrl(MethodSelector);
+    protected string Url => Fixture.GetManagementApiUrl(MethodSelector);
 
-    [SetUp]
-    public override void Setup()
+    private ManagementApiSetUpFixture Fixture => ManagementApiSetUpFixture.Instance;
+
+    protected HttpClient Client => Fixture.SharedClient;
+
+    protected IServiceProvider Services => Fixture.SharedServices;
+
+    protected TService GetRequiredService<TService>() => Services.GetRequiredService<TService>();
+
+    [OneTimeSetUp]
+    public virtual async Task FixtureSetUp()
     {
-        InMemoryConfiguration["Umbraco:CMS:ModelsBuilder:ModelsMode"] = "Nothing";
+        // Ensure StaticServiceProvider points to our live shared host's services.
+        // Other test infrastructure may overwrite this global static during the same test run,
+        // so we re-set it before each fixture class to prevent "disposed IServiceProvider" errors
+        // from obsolete constructors that use StaticServiceProvider.Instance.
+        StaticServiceProvider.Instance = Services;
 
-        base.Setup();
-        Client.DefaultRequestHeaders.Accept.Clear();
-        Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(MediaTypeNames.Application.Json));
+        // Swap to a fresh database for this fixture class
+        await Fixture.SwapToFreshDatabaseAsync();
+
+        // Clear token cache — tokens from previous fixture's DB are now invalid
+        _tokenCache.Clear();
+    }
+
+    [OneTimeTearDown]
+    public virtual void FixtureTearDown()
+    {
+        // Clear token cache so tokens don't leak to the next fixture
+        _tokenCache.Clear();
     }
 
     [SetUp]
-    public override void SetUp_Logging() =>
-        TestContext.Out.Write($"Start test {TestCount++}: {TestContext.CurrentContext.Test.FullName}");
-
-    [OneTimeTearDown]
-    public void ClearCache() => _tokenCache.Clear();
-
-    protected override void CustomTestAuthSetup(IServiceCollection services)
+    public virtual void Setup()
     {
-        // We do not wanna fake anything, and thereby have protection
+        Client.DefaultRequestHeaders.Accept.Clear();
+        Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(MediaTypeNames.Application.Json));
+        Client.DefaultRequestHeaders.Authorization = null;
     }
 
     protected async Task AuthenticateClientAsync(HttpClient client, string username, string password, bool isAdmin) =>
@@ -170,7 +190,7 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
 
         // Login to ensure the cookie is set (used in next request)
         var loginResponse = await client.PostAsync(
-            GetManagementApiUrl<BackOfficeController>(x => x.Login(CancellationToken.None, null)), JsonContent.Create(loginModel));
+            Fixture.GetManagementApiUrl<BackOfficeController>(x => x.Login(CancellationToken.None, null)), JsonContent.Create(loginModel));
 
         Assert.AreEqual(HttpStatusCode.OK, loginResponse.StatusCode, await loginResponse.Content.ReadAsStringAsync());
 
@@ -178,7 +198,7 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
         var codeChallenge = Convert.ToBase64String(_sha256.ComputeHash(Encoding.UTF8.GetBytes(codeVerifier)))
             .TrimEnd("=");
 
-        var authorizationUrl = GetManagementApiUrl<BackOfficeController>(x => x.Authorize(CancellationToken.None)) + $"?client_id={backofficeOpenIddictApplicationDescriptor.ClientId}&response_type=code&redirect_uri={WebUtility.UrlEncode(backofficeOpenIddictApplicationDescriptor.RedirectUris.FirstOrDefault()?.AbsoluteUri)}&code_challenge_method=S256&code_challenge={codeChallenge}";
+        var authorizationUrl = Fixture.GetManagementApiUrl<BackOfficeController>(x => x.Authorize(CancellationToken.None)) + $"?client_id={backofficeOpenIddictApplicationDescriptor.ClientId}&response_type=code&redirect_uri={WebUtility.UrlEncode(backofficeOpenIddictApplicationDescriptor.RedirectUris.FirstOrDefault()?.AbsoluteUri)}&code_challenge_method=S256&code_challenge={codeChallenge}";
         var authorizeResponse = await client.GetAsync(authorizationUrl);
 
         Assert.AreEqual(HttpStatusCode.Found, authorizeResponse.StatusCode, await authorizeResponse.Content.ReadAsStringAsync());
