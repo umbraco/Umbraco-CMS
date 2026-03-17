@@ -1,10 +1,11 @@
 import { UmbElementTreePickerDataSource } from '../picker-data-source/element-tree.picker-data-source.js';
-import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbConfigCollectionModel } from '@umbraco-cms/backoffice/utils';
+import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
 
 @customElement('umb-input-element')
 export class UmbInputElementElement extends UmbFormControlMixin<string | undefined, typeof UmbLitElement>(
@@ -15,15 +16,9 @@ export class UmbInputElementElement extends UmbFormControlMixin<string | undefin
 
 	#dataSourceConfig: UmbConfigCollectionModel = [];
 
-	#folderOnly = false;
-
 	@property({ type: Boolean })
 	set folderOnly(value: boolean) {
-		this.#folderOnly = value;
-		this.#dataSourceConfig = [{ alias: 'folderOnly', value }];
-	}
-	get folderOnly(): boolean {
-		return this.#folderOnly;
+		this.#dataSourceConfig.push({ alias: 'folderOnly', value });
 	}
 
 	@property({ type: Number })
@@ -47,6 +42,11 @@ export class UmbInputElementElement extends UmbFormControlMixin<string | undefin
 	}
 	public get selection(): Array<string> {
 		return this.#selection;
+	}
+
+	@property({ type: Object, attribute: false })
+	public set startNode(value: UmbTreeStartNode | undefined) {
+		this.#dataSourceConfig.push({ alias: 'startNode', value });
 	}
 
 	@property({ type: String })
@@ -74,14 +74,14 @@ export class UmbInputElementElement extends UmbFormControlMixin<string | undefin
 	override render() {
 		return html`
 			<umb-input-entity-data
+				min-message=${ifDefined(this.minMessage)}
+				max-message=${ifDefined(this.maxMessage)}
 				.dataSourceApi=${this.#dataSourceApi}
 				.dataSourceConfig=${this.#dataSourceConfig}
 				.value=${this.value}
 				.selection=${this.selection}
 				.min=${this.min}
-				.minMessage=${this.minMessage}
 				.max=${this.max}
-				.maxMessage=${this.maxMessage}
 				?readonly=${this.readonly}
 				@change=${this.#onChange}>
 			</umb-input-entity-data>

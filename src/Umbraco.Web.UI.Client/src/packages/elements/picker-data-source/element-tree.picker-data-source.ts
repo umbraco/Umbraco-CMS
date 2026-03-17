@@ -9,6 +9,7 @@ import type {
 	UmbTreeChildrenOfRequestArgs,
 	UmbTreeItemModel,
 	UmbTreeRootItemsRequestArgs,
+	UmbTreeStartNode,
 } from '@umbraco-cms/backoffice/tree';
 import type { UmbConfigCollectionModel } from '@umbraco-cms/backoffice/utils';
 
@@ -16,10 +17,13 @@ export class UmbElementTreePickerDataSource extends UmbControllerBase implements
 	#elementItem = new UmbElementItemRepository(this);
 	#folderItem = new UmbElementFolderItemRepository(this);
 	#folderOnly = false;
+	#startNode?: UmbTreeStartNode;
 	#tree = new UmbElementTreeRepository(this);
 
 	setConfig(config: UmbConfigCollectionModel | undefined) {
 		this.#folderOnly = Boolean(getConfigValue(config, 'folderOnly'));
+		this.#startNode = getConfigValue(config, 'startNode');
+		console.log('startNode', this.#startNode);
 	}
 
 	requestTreeRoot = () => this.#tree.requestTreeRoot();
