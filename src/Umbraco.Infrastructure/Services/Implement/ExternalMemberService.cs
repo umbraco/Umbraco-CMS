@@ -214,7 +214,7 @@ internal sealed class ExternalMemberService : RepositoryService, IExternalMember
     }
 
     /// <inheritdoc />
-    public async Task<Attempt<ExternalMemberIdentity, ExternalMemberOperationStatus>> AssignRolesAsync(Guid memberKey, string[] roleNames)
+    public async Task<Attempt<ExternalMemberIdentity?, ExternalMemberOperationStatus>> AssignRolesAsync(Guid memberKey, string[] roleNames)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
@@ -222,7 +222,7 @@ internal sealed class ExternalMemberService : RepositoryService, IExternalMember
         if (member is null)
         {
             scope.Complete();
-            return Attempt.FailWithStatus(ExternalMemberOperationStatus.NotFound, member!);
+            return Attempt.FailWithStatus<ExternalMemberIdentity?, ExternalMemberOperationStatus>(ExternalMemberOperationStatus.NotFound, null);
         }
 
         var groupIds = ResolveGroupIds(roleNames);
@@ -231,11 +231,11 @@ internal sealed class ExternalMemberService : RepositoryService, IExternalMember
         scope.Notifications.Publish(new AssignedExternalMemberRolesNotification([memberKey], roleNames));
 
         scope.Complete();
-        return Attempt.SucceedWithStatus(ExternalMemberOperationStatus.Success, member);
+        return Attempt.SucceedWithStatus<ExternalMemberIdentity?, ExternalMemberOperationStatus>(ExternalMemberOperationStatus.Success, member);
     }
 
     /// <inheritdoc />
-    public async Task<Attempt<ExternalMemberIdentity, ExternalMemberOperationStatus>> RemoveRolesAsync(Guid memberKey, string[] roleNames)
+    public async Task<Attempt<ExternalMemberIdentity?, ExternalMemberOperationStatus>> RemoveRolesAsync(Guid memberKey, string[] roleNames)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
@@ -243,7 +243,7 @@ internal sealed class ExternalMemberService : RepositoryService, IExternalMember
         if (member is null)
         {
             scope.Complete();
-            return Attempt.FailWithStatus(ExternalMemberOperationStatus.NotFound, member!);
+            return Attempt.FailWithStatus<ExternalMemberIdentity?, ExternalMemberOperationStatus>(ExternalMemberOperationStatus.NotFound, null);
         }
 
         var groupIds = ResolveGroupIds(roleNames);
@@ -252,7 +252,7 @@ internal sealed class ExternalMemberService : RepositoryService, IExternalMember
         scope.Notifications.Publish(new RemovedExternalMemberRolesNotification([memberKey], roleNames));
 
         scope.Complete();
-        return Attempt.SucceedWithStatus(ExternalMemberOperationStatus.Success, member);
+        return Attempt.SucceedWithStatus<ExternalMemberIdentity?, ExternalMemberOperationStatus>(ExternalMemberOperationStatus.Success, member);
     }
 
     /// <inheritdoc />

@@ -77,7 +77,7 @@ public interface IExternalMemberService
     /// <param name="memberKey">The unique key of the external member.</param>
     /// <param name="roleNames">The names of the roles to assign.</param>
     /// <returns>An <see cref="Attempt{TResult,TStatus}"/> indicating the operation result.</returns>
-    Task<Attempt<ExternalMemberIdentity, ExternalMemberOperationStatus>> AssignRolesAsync(Guid memberKey, string[] roleNames);
+    Task<Attempt<ExternalMemberIdentity?, ExternalMemberOperationStatus>> AssignRolesAsync(Guid memberKey, string[] roleNames);
 
     /// <summary>
     ///     Removes roles from an external member.
@@ -85,7 +85,7 @@ public interface IExternalMemberService
     /// <param name="memberKey">The unique key of the external member.</param>
     /// <param name="roleNames">The names of the roles to remove.</param>
     /// <returns>An <see cref="Attempt{TResult,TStatus}"/> indicating the operation result.</returns>
-    Task<Attempt<ExternalMemberIdentity, ExternalMemberOperationStatus>> RemoveRolesAsync(Guid memberKey, string[] roleNames);
+    Task<Attempt<ExternalMemberIdentity?, ExternalMemberOperationStatus>> RemoveRolesAsync(Guid memberKey, string[] roleNames);
 
     /// <summary>
     ///     Converts an external-only member to a full content-based member.

@@ -100,16 +100,17 @@ internal sealed class MemberFilterRepository : IMemberFilterRepository
             INNER JOIN [{Constants.DatabaseSchema.Tables.Node}] ctn ON ctn.[id] = ct.[contentTypeId]
             INNER JOIN [cmsContentType] ctd ON ctd.[nodeId] = ctn.[id]");
 
-        if (filter.MemberTypeId.HasValue)
-        {
-            sql = sql.Append("WHERE ctn.[uniqueId] = @typeId", new { typeId = filter.MemberTypeId.Value });
-        }
-
+        // Append optional JOINs before any WHERE clauses.
         if (filter.MemberGroupName.IsNullOrWhiteSpace() is false)
         {
             sql = sql.Append(
                 $@"INNER JOIN [{Constants.DatabaseSchema.Tables.Member2MemberGroup}] m2mg ON m2mg.[{Member2MemberGroupDto.MemberColumnName}] = m.[nodeId]
                 INNER JOIN [{Constants.DatabaseSchema.Tables.Node}] mgn ON mgn.[id] = m2mg.[MemberGroup] AND mgn.[text] = @groupName", new { groupName = filter.MemberGroupName });
+        }
+
+        if (filter.MemberTypeId.HasValue)
+        {
+            sql = sql.Append("WHERE ctn.[uniqueId] = @typeId", new { typeId = filter.MemberTypeId.Value });
         }
 
         AppendWhereFilters(ref sql, filter, "m.[Email]", "m.[LoginName]", "n.[text]", "m.[IsApproved]", "m.[IsLockedOut]", filter.MemberTypeId.HasValue);
