@@ -186,6 +186,88 @@ internal sealed class MemberFilterServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
+    public async Task Filter_By_MemberTypeId_And_MemberGroupName()
+    {
+        // Arrange — create a content member in a specific type and group.
+        IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
+        IMember contentMember = MemberBuilder.CreateSimpleMember(memberType, "grouped", "grouped@test.com", "password", "grouped-user");
+        MemberService.Save(contentMember);
+
+        MemberService.AddRole("FilterTestGroup");
+        MemberService.AssignRoles([contentMember.Id], ["FilterTestGroup"]);
+
+        // Create another content member of the same type but NOT in the group.
+        IMember ungroupedMember = MemberBuilder.CreateSimpleMember(memberType, "ungrouped", "ungrouped@test.com", "password", "ungrouped-user");
+        MemberService.Save(ungroupedMember);
+
+        // Create an external member in the group (should be excluded by type filter).
+        await CreateExternalMemberAsync("external@test.com", "external-user");
+        await ExternalMemberService.AssignRolesAsync(
+            (await ExternalMemberService.GetByUsernameAsync("external-user"))!.Key, ["FilterTestGroup"]);
+
+        // Act — filter by both type and group.
+        PagedModel<MemberFilterItem> result = await MemberFilterService.FilterAsync(
+            new MemberFilter { MemberTypeId = memberType.Key, MemberGroupName = "FilterTestGroup" });
+
+        // Assert — only the content member that matches both type AND group.
+        Assert.AreEqual(1, result.Total);
+        Assert.AreEqual("grouped-user", result.Items.First().UserName);
+        Assert.IsFalse(result.Items.First().IsExternalOnly);
+    }
+
+    [Test]
+    public async Task Filter_By_MemberGroupName_And_IsApproved()
+    {
+        // Arrange — create members in a group with different approval states.
+        MemberService.AddRole("ApprovalTestGroup");
+
+        await CreateContentMemberAsync("approved@test.com", "approved-content");
+        IMember? approvedMember = MemberService.GetByEmail("approved@test.com");
+        MemberService.AssignRoles([approvedMember!.Id], ["ApprovalTestGroup"]);
+
+        var unapprovedExternal = new ExternalMemberIdentityBuilder()
+            .WithEmail("unapproved@test.com")
+            .WithUserName("unapproved-external")
+            .WithIsApproved(false)
+            .Build();
+        var createResult = await ExternalMemberService.CreateAsync(unapprovedExternal);
+        await ExternalMemberService.AssignRolesAsync(createResult.Result!.Key, ["ApprovalTestGroup"]);
+
+        // Act — filter by group AND approved.
+        PagedModel<MemberFilterItem> result = await MemberFilterService.FilterAsync(
+            new MemberFilter { MemberGroupName = "ApprovalTestGroup", IsApproved = true });
+
+        // Assert — only the approved content member.
+        Assert.AreEqual(1, result.Total);
+        Assert.AreEqual("approved-content", result.Items.First().UserName);
+    }
+
+    [Test]
+    public async Task Filter_By_MemberGroupName_Returns_Both_Stores()
+    {
+        // Arrange — create members in the same group across both stores.
+        MemberService.AddRole("SharedGroup");
+
+        await CreateContentMemberAsync("content@test.com", "content-user");
+        IMember? contentMember = MemberService.GetByEmail("content@test.com");
+        MemberService.AssignRoles([contentMember!.Id], ["SharedGroup"]);
+
+        await CreateExternalMemberAsync("external@test.com", "external-user");
+        var externalMember = await ExternalMemberService.GetByUsernameAsync("external-user");
+        await ExternalMemberService.AssignRolesAsync(externalMember!.Key, ["SharedGroup"]);
+
+        // Act
+        PagedModel<MemberFilterItem> result = await MemberFilterService.FilterAsync(
+            new MemberFilter { MemberGroupName = "SharedGroup" });
+
+        // Assert — both members from the shared group.
+        Assert.AreEqual(2, result.Total);
+        Assert.IsTrue(result.Items.Any(i => !i.IsExternalOnly));
+        Assert.IsTrue(result.Items.Any(i => i.IsExternalOnly));
+    }
+
+    [Test]
     public async Task Filter_Empty_Returns_Empty()
     {
         // Act
