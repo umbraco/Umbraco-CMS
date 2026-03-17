@@ -528,13 +528,13 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 					<umb-popover-layout>
 						<div id="view-dropdown">
 							<uui-menu-item
-								label="Cards"
+								label=${this.localize.term('collection_cardViewLabel')}
 								@click-label=${() => this.#onViewSelect('cards')}
 								?active=${this._currentView === 'cards'}>
 								<umb-icon slot="icon" name="icon-grid"></umb-icon>
 							</uui-menu-item>
 							<uui-menu-item
-								label="Table"
+								label=${this.localize.term('collection_tableViewLabel')}
 								@click-label=${() => this.#onViewSelect('table')}
 								?active=${this._currentView === 'table'}>
 								<umb-icon slot="icon" name="icon-table"></umb-icon>
