@@ -371,7 +371,9 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
 
         if (user.IsExternalOnly)
         {
-            return null;
+            ExternalMemberIdentity? external = _externalMemberService.GetByKeyAsync(user.Key)
+                .GetAwaiter().GetResult();
+            return external is not null ? new PublishedExternalMember(external) : null;
         }
 
         IMember? member = _memberService.GetById(user.Key);

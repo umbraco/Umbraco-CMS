@@ -122,7 +122,7 @@ export class UmbMemberTableCollectionViewElement extends UmbLitElement {
 
 			return {
 				id: member.unique,
-				icon: memberType?.icon,
+				icon: memberType?.icon || 'icon-user',
 				data: [
 					{
 						columnAlias: 'memberName',
