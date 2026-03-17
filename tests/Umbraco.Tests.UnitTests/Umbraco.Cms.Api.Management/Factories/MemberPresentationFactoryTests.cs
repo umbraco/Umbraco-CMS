@@ -258,7 +258,7 @@ public class MemberPresentationFactoryTests
     }
 
     [Test]
-    public async Task CreateExternalMemberResponseModel_Has_Empty_Variants_And_Values()
+    public async Task CreateExternalMemberResponseModel_Has_Single_Variant_And_Empty_Values()
     {
         // Arrange
         var member = CreateExternalMember();
@@ -267,8 +267,9 @@ public class MemberPresentationFactoryTests
         // Act
         MemberResponseModel result = await _sut.CreateExternalMemberResponseModelAsync(member);
 
-        // Assert
-        Assert.IsFalse(result.Variants.Any());
+        // Assert — one variant with the member name, but no content values.
+        Assert.AreEqual(1, result.Variants.Count());
+        Assert.AreEqual(member.Name, result.Variants.First().Name);
         Assert.IsFalse(result.Values.Any());
     }
 
