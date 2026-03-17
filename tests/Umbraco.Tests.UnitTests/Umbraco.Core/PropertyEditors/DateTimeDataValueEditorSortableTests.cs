@@ -247,7 +247,7 @@ public class DateTimeDataValueEditorSortableTests
             .ToList();
 
         var sorted = sortableValues.OrderBy(x => x).ToList();
-        CollectionAssert.AreEqual(sortableValues, sorted, "Times should already be in chronological order");
+        Assert.That(sorted, Is.EqualTo(sortableValues).AsCollection, "Times should already be in chronological order");
     }
 
     [Test]
@@ -267,7 +267,7 @@ public class DateTimeDataValueEditorSortableTests
             .ToList();
 
         var sorted = sortableValues.OrderBy(x => x).ToList();
-        CollectionAssert.AreEqual(sortableValues, sorted, "Dates should already be in chronological order");
+        Assert.That(sorted, Is.EqualTo(sortableValues).AsCollection, "Dates should already be in chronological order");
     }
 
     private static string CreateStoredValue(DateTimeOffset date, string? timeZone)

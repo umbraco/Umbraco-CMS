@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
@@ -46,8 +47,8 @@ internal sealed class UserGroupServiceTests : UmbracoIntegrationTest
         Assert.AreEqual(userGroup.Description, createdUserGroup.Description);
         Assert.AreEqual(userGroup.Icon, createdUserGroup.Icon);
         Assert.AreEqual(userGroup.HasAccessToAllLanguages, createdUserGroup.HasAccessToAllLanguages);
-        CollectionAssert.AreEquivalent(userGroup.Permissions, createdUserGroup.Permissions);
-        CollectionAssert.AreEquivalent(userGroup.AllowedSections, createdUserGroup.AllowedSections);
+        Assert.That(createdUserGroup.Permissions, Is.EquivalentTo(userGroup.Permissions));
+        Assert.That(createdUserGroup.AllowedSections, Is.EquivalentTo(userGroup.AllowedSections));
     }
 
     [Test]
