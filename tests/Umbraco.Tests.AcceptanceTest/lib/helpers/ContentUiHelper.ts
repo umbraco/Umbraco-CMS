@@ -1916,21 +1916,18 @@ export class ContentUiHelper extends UiBaseLocators {
     await this.click(this.containerSetupBtn);
   }
 
-  async isPublicAccessSetupWizardVisible(isVisible: boolean = true) {
-    return await this.isVisible(this.page.locator('uui-radio-group'), isVisible);
+  async isDocumentSelectedAsLoginPage(documentName: string) {
+    return await this.isVisible(this.page.locator('.select-item').filter({hasText: 'Login Page'}).locator('uui-ref-node[name="' + documentName + '"]'));
   }
 
-  async isPublicAccessGroupBasedProtectionVisible(isVisible: boolean = true) {
-    return await this.isVisible(this.groupBasedProtectionBtn, isVisible);
+  async isDocumentSelectedAsErrorPage(documentName: string) {
+    return await this.isVisible(this.page.locator('.select-item').filter({hasText: 'Error Page'}).locator('uui-ref-node[name="' + documentName + '"]'));
   }
 
-  async isPublicAccessEditViewVisible(isVisible: boolean = true) {
-    return await this.isVisible(this.page.locator('.select-item').filter({hasText: 'Login Page'}), isVisible);
+  async isMemberGroupSelected(memberGroupName: string) {
+    return await this.isVisible(this.page.locator('umb-input-member-group uui-ref-node[name="' + memberGroupName + '"]'));
   }
-
-  async isPublicAccessErrorVisible(isVisible: boolean = true) {
-    return await this.isVisible(this.page.locator('#error'), isVisible);
-  }
+  
 
   async clickRemoveProtectionButton() {
     await this.click(this.container.getByLabel('Remove protection'));
