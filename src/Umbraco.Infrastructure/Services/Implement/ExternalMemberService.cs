@@ -173,15 +173,6 @@ internal sealed class ExternalMemberService : RepositoryService, IExternalMember
     }
 
     /// <inheritdoc />
-    public async Task UpdateLoginTimestampAsync(Guid memberKey, DateTime lastLoginDate, string securityStamp)
-    {
-        // Fast path: no entity load, no notifications, no uniqueness checks.
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
-        await _repository.UpdateLoginTimestampAsync(memberKey, lastLoginDate, securityStamp);
-        scope.Complete();
-    }
-
-    /// <inheritdoc />
     public async Task<Attempt<ExternalMemberIdentity?, ExternalMemberOperationStatus>> DeleteAsync(Guid key)
     {
         EventMessages evtMsgs = EventMessagesFactory.Get();

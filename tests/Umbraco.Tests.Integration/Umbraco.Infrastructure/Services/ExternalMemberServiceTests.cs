@@ -196,27 +196,6 @@ internal sealed class ExternalMemberServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Can_Update_Login_Timestamp()
-    {
-        // Arrange
-        var identity = ExternalMemberIdentityBuilder.CreateSimple("login-test@example.com", "Login Test");
-        var createResult = await ExternalMemberService.CreateAsync(identity);
-        Assert.IsTrue(createResult.Success);
-
-        var loginDate = DateTime.UtcNow;
-        var newSecurityStamp = Guid.NewGuid().ToString();
-
-        // Act
-        await ExternalMemberService.UpdateLoginTimestampAsync(createResult.Result.Key, loginDate, newSecurityStamp);
-
-        // Assert
-        var retrieved = await ExternalMemberService.GetByKeyAsync(createResult.Result.Key);
-        Assert.IsNotNull(retrieved);
-        Assert.That(retrieved!.LastLoginDate, Is.EqualTo(loginDate).Within(1).Seconds);
-        Assert.AreEqual(newSecurityStamp, retrieved.SecurityStamp);
-    }
-
-    [Test]
     public async Task Can_Store_And_Retrieve_ProfileData()
     {
         // Arrange

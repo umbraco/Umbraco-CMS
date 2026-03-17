@@ -469,7 +469,7 @@ public class MemberUserStoreTests
     }
 
     [Test]
-    public async Task GivenAnExternalOnlyMember_WhenUpdateAsync_WithLoginPropertiesOnly_ThenLoginTimestampUsed()
+    public async Task GivenAnExternalOnlyMember_WhenUpdateAsync_ThenFullUpdateUsed()
     {
         // Arrange
         var sut = CreateSut();
@@ -482,25 +482,23 @@ public class MemberUserStoreTests
             Email = "external@test.com",
             Name = "External Test",
             IsExternalOnly = true,
-
-            // Set LastLoginDate to make it dirty (tracked by BeingDirty).
             LastLoginDate = DateTime.UtcNow,
         };
 
         _mockExternalMemberService
-            .Setup(x => x.UpdateLoginTimestampAsync(memberKey, It.IsAny<DateTime>(), It.IsAny<string>()))
-            .Returns(Task.CompletedTask);
+            .Setup(x => x.GetByKeyAsync(memberKey))
+            .ReturnsAsync(new ExternalMemberIdentity { Id = 1, Key = memberKey, CreateDate = DateTime.UtcNow });
+        _mockExternalMemberService
+            .Setup(x => x.UpdateAsync(It.IsAny<ExternalMemberIdentity>()))
+            .ReturnsAsync(Attempt.SucceedWithStatus(ExternalMemberOperationStatus.Success, new ExternalMemberIdentity()));
 
         // Act
         var identityResult = await sut.UpdateAsync(fakeUser, CancellationToken.None);
 
-        // Assert
+        // Assert — always uses full UpdateAsync, even for login-only changes.
         Assert.IsTrue(identityResult.Succeeded);
         _mockExternalMemberService.Verify(
-            x => x.UpdateLoginTimestampAsync(memberKey, It.IsAny<DateTime>(), It.IsAny<string>()),
-            Times.Once);
-        _mockExternalMemberService.Verify(
             x => x.UpdateAsync(It.IsAny<ExternalMemberIdentity>()),
-            Times.Never);
+            Times.Once);
     }
 }

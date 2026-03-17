@@ -58,15 +58,6 @@ public interface IExternalMemberService
     Task<Attempt<ExternalMemberIdentity, ExternalMemberOperationStatus>> UpdateAsync(ExternalMemberIdentity member);
 
     /// <summary>
-    ///     Updates the login timestamp and security stamp for an external member.
-    ///     This is a fast path with no entity load, no notifications, and no uniqueness checks.
-    /// </summary>
-    /// <param name="memberKey">The unique key of the external member.</param>
-    /// <param name="lastLoginDate">The date and time of the login.</param>
-    /// <param name="securityStamp">The new security stamp value.</param>
-    Task UpdateLoginTimestampAsync(Guid memberKey, DateTime lastLoginDate, string securityStamp);
-
-    /// <summary>
     ///     Deletes an external member by its unique key.
     /// </summary>
     /// <param name="key">The unique key of the external member to delete.</param>

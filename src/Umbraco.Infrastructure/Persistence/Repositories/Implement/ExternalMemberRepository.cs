@@ -105,18 +105,6 @@ internal sealed class ExternalMemberRepository : IExternalMemberRepository
     }
 
     /// <inheritdoc />
-    public async Task UpdateLoginTimestampAsync(Guid memberKey, DateTime lastLoginDate, string securityStamp)
-    {
-        // Direct SQL for the login fast path — no entity load, minimal overhead.
-        Sql<ISqlContext> sql = SqlContext.Sql()
-            .Append(
-                $"UPDATE {ExternalMemberDto.TableName} SET lastLoginDate = @lastLoginDate, securityStamp = @securityStamp WHERE [key] = @key",
-                new { lastLoginDate, securityStamp, key = memberKey });
-
-        await Database.ExecuteAsync(sql);
-    }
-
-    /// <inheritdoc />
     public async Task DeleteAsync(Guid key)
     {
         // Delete group memberships first (FK constraint).
