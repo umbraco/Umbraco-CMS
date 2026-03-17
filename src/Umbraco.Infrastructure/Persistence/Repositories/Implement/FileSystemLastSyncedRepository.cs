@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 /// A file system based implementation of <see cref="ILastSyncedRepository"/> for use on
 /// subscriber servers that cannot write to the database.
 /// </summary>
-public class FileSystemLastSyncedRepository : ILastSyncedRepository
+internal sealed class FileSystemLastSyncedRepository : ILastSyncedRepository
 {
     private readonly IHostingEnvironment _hostingEnvironment;
 

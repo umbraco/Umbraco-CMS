@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 /// Subscriber servers cannot write to the database, so they use a file-system
 /// implementation instead. All other roles use the database implementation.
 /// </remarks>
-public class ServerRoleAwareLastSyncedRepository : ILastSyncedRepository
+internal sealed class ServerRoleAwareLastSyncedRepository : ILastSyncedRepository
 {
     private readonly Lazy<IServerRoleAccessor> _serverRoleAccessor;
     private readonly LastSyncedRepository _databaseRepository;
