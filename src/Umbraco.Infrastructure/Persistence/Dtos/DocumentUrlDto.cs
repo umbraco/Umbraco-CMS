@@ -49,7 +49,7 @@ public class DocumentUrlDto
     [Column(LanguageIdColumnName)]
     [NullSetting(NullSetting = NullSettings.Null)]
     [ForeignKey(typeof(LanguageDto))]
-    public int? NullableLanguageId { get; set; }
+    public int? LanguageId { get; set; }
 
     /// <summary>
     /// Gets or sets the URL segment, which is the part of the document's URL typically used for routing and identifying the document in URLs.

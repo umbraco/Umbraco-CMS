@@ -13,7 +13,7 @@ public class PublishedDocumentUrlSegment
     /// <summary>
     /// Gets or sets the language Id. NULL indicates invariant content (not language-specific).
     /// </summary>
-    public required int? NullableLanguageId { get; set; }
+    public required int? LanguageId { get; set; }
 
     /// <summary>
     /// Gets or sets the URL segment string.

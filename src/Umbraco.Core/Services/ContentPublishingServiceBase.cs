@@ -276,7 +276,7 @@ internal abstract class ContentPublishingServiceBase<TContent, TContentService>
             return Attempt.Fail(ContentPublishingOperationStatus.ContentNotFound);
         }
 
-        if (_contentSettings.DisableUnpublishWhenReferenced && _relationService.IsRelated(content.Id, RelationDirectionFilter.Child, null, null))
+        if (_contentSettings.DisableUnpublishWhenReferenced && _relationService.IsRelated(content.Id, RelationDirectionFilter.Child))
         {
             scope.Complete();
             return Attempt<ContentPublishingOperationStatus>.Fail(ContentPublishingOperationStatus.CannotUnpublishWhenReferenced);
