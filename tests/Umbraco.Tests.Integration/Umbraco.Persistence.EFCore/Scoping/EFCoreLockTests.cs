@@ -13,7 +13,6 @@ using Umbraco.Cms.Tests.Integration.Umbraco.Persistence.EFCore.DbContext;
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Persistence.EFCore.Scoping;
 
 [TestFixture]
-[NonParallelizable]
 [CancelAfter(60000)]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Logger = UmbracoTestOptions.Logger.Console)]
 internal sealed class EFCoreLockTests : UmbracoIntegrationTest

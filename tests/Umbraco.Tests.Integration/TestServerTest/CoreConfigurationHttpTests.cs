@@ -40,6 +40,7 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest;
 /// </para>
 /// </remarks>
 [TestFixture]
+[Ignore("WebApplicationFactory deadlocks on NUnit 4 - investigating")]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Logger = UmbracoTestOptions.Logger.Console, Boot = true)]
 public class CoreConfigurationHttpTests : UmbracoIntegrationTestBase
 {
