@@ -31,19 +31,19 @@ export const manifests: Array<UmbExtensionManifest> = [
 			columns: [
 				{
 					field: 'unique',
-					headerName: 'ISO Code',
+					label: 'ISO Code',
 				},
 				{
 					field: 'isDefault',
-					headerName: 'Default',
+					label: 'Default',
 				},
 				{
 					field: 'isMandatory',
-					headerName: 'Mandatory',
+					label: 'Mandatory',
 				},
 				{
 					field: 'fallbackIsoCode',
-					headerName: 'Fallback',
+					label: 'Fallback',
 				},
 			],
 		},

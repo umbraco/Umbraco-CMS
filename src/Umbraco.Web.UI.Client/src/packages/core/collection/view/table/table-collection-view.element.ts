@@ -43,7 +43,7 @@ export class UmbTableCollectionViewElement extends UmbCollectionViewElementBase 
 		};
 
 		const manifestColumns: Array<UmbTableColumn> = this._manifestColumns.map((col) => ({
-			name: col.headerName,
+			name: col.label,
 			alias: col.field,
 		}));
 

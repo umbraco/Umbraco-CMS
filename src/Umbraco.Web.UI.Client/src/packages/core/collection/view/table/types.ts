@@ -8,7 +8,7 @@ export interface ManifestCollectionViewTableKind extends ManifestCollectionView 
 
 export interface MetaCollectionViewTableKindColumn {
 	field: string;
-	headerName: string;
+	label: string;
 }
 
 export interface MetaCollectionViewTableKind extends MetaCollectionView {
