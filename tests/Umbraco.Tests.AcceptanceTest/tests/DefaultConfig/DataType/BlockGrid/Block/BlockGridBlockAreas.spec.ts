@@ -3,7 +3,7 @@ import {expect} from "@playwright/test";
 
 const blockGridEditorName = 'TestBlockGridEditor';
 const elementTypeName = 'BlockGridElement';
-const secondElementTypeName = 'SecondBlockGridElement';
+const secondElementTypeName = 'SecondBlockElement';
 const dataTypeName = 'Textstring';
 const groupName = 'testGroup';
 let contentElementTypeId = '';
@@ -299,6 +299,7 @@ test('can update specified allowance for an area in a block', async ({umbracoApi
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const secondContentElementTypeId = await umbracoApi.documentType.createDefaultElementType(secondElementTypeName, groupName, dataTypeName, textStringData.id);
   await umbracoApi.dataType.createBlockGridWithAnAreaWithSpecifiedAllowanceInABlock(blockGridEditorName, contentElementTypeId, secondContentElementTypeId, areaAlias);
+  expect(await umbracoApi.dataType.doesBlockEditorBlockContainAreaWithSpecifiedAllowanceForElementType(blockGridEditorName, contentElementTypeId, areaAlias, secondContentElementTypeId)).toBeTruthy();
 
   // Act
   await umbracoUi.dataType.goToDataType(blockGridEditorName);
@@ -306,14 +307,14 @@ test('can update specified allowance for an area in a block', async ({umbracoApi
   await umbracoUi.dataType.goToBlockAreasTab();
   await umbracoUi.dataType.goToAreaByAlias(areaAlias);
   await umbracoUi.dataType.clickSpecifiedAllowanceComboboxByIndex(0);
-  await umbracoUi.dataType.selectSpecifiedAllowanceOptionByName(secondElementTypeName);
+  await umbracoUi.dataType.selectSpecifiedAllowanceOptionByName(elementTypeName);
   await umbracoUi.dataType.clickAreaSubmitButton();
   await umbracoUi.dataType.clickSubmitButton();
   await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
-  expect(await umbracoApi.dataType.doesBlockEditorBlockContainAreaWithSpecifiedAllowanceForElementType(blockGridEditorName, contentElementTypeId, areaAlias, secondContentElementTypeId)).toBeTruthy();
-  expect(await umbracoApi.dataType.doesBlockEditorBlockContainAreaWithSpecifiedAllowanceForElementType(blockGridEditorName, contentElementTypeId, areaAlias, contentElementTypeId)).toBeFalsy();
+  expect(await umbracoApi.dataType.doesBlockEditorBlockContainAreaWithSpecifiedAllowanceForElementType(blockGridEditorName, contentElementTypeId, areaAlias, contentElementTypeId)).toBeTruthly();
+  expect(await umbracoApi.dataType.doesBlockEditorBlockContainAreaWithSpecifiedAllowanceForElementType(blockGridEditorName, contentElementTypeId, areaAlias, secondContentElementTypeId)).toBeFalsy();
 });
 
 test('can remove specified allowance for an area in a block', async ({umbracoApi, umbracoUi}) => {
