@@ -12,6 +12,7 @@ using Umbraco.Cms.Tests.Integration.Umbraco.Persistence.EFCore.DbContext;
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Persistence.EFCore.Scoping;
 
 [TestFixture]
+[NonParallelizable]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewEmptyPerTest)]
 internal sealed class EFCoreScopeTest : UmbracoIntegrationTest
 {
