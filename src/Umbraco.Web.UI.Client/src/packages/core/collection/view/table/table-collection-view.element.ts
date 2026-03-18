@@ -9,12 +9,14 @@ import type {
 	UmbTableItem,
 	UmbTableColumn,
 } from '@umbraco-cms/backoffice/components';
+import { UmbValueMinimalDisplayCoordinatorContext } from '@umbraco-cms/backoffice/value-minimal-display';
 
 import './entity-name-table-column-layout.element.js';
 
 @customElement('umb-table-collection-view')
 export class UmbTableCollectionViewElement extends UmbCollectionViewElementBase {
 	#manifest: ManifestCollectionViewTableKind | undefined;
+	#coordinator = new UmbValueMinimalDisplayCoordinatorContext(this);
 
 	@property({ attribute: false })
 	public set manifest(value: ManifestCollectionViewTableKind | undefined) {
@@ -62,7 +64,17 @@ export class UmbTableCollectionViewElement extends UmbCollectionViewElementBase 
 			changedProperties.has('_itemHrefs') ||
 			changedProperties.has('_manifestColumns')
 		) {
+			this.#preRegisterColumnValues();
 			this.#createTableRows();
+		}
+	}
+
+	#preRegisterColumnValues() {
+		for (const col of this._manifestColumns) {
+			if (!col.valueMinimalDisplayAlias) continue;
+			const alias = col.valueMinimalDisplayAlias;
+			const values = this._items.map((item) => (item as unknown as Record<string, unknown>)[col.field]);
+			this.#coordinator.preRegister(alias, values);
 		}
 	}
 
@@ -70,10 +82,21 @@ export class UmbTableCollectionViewElement extends UmbCollectionViewElementBase 
 		this._tableRows = this._items.map((item) => {
 			const href = item.unique ? this._itemHrefs.get(item.unique) : undefined;
 
-			const manifestColumnData = this._manifestColumns.map((col) => ({
-				columnAlias: col.field,
-				value: (item as Record<string, unknown>)[col.field],
-			}));
+			const manifestColumnData = this._manifestColumns.map((col) => {
+				const rawValue = (item as unknown as Record<string, unknown>)[col.field];
+				if (col.valueMinimalDisplayAlias) {
+					return {
+						columnAlias: col.field,
+						value: html`<umb-value-minimal-display
+							.alias=${col.valueMinimalDisplayAlias}
+							.value=${rawValue}></umb-value-minimal-display>`,
+					};
+				}
+				return {
+					columnAlias: col.field,
+					value: rawValue,
+				};
+			});
 
 			return {
 				id: item.unique,

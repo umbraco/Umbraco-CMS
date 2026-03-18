@@ -9,6 +9,7 @@ export interface ManifestCollectionViewTableKind extends ManifestCollectionView 
 export interface MetaCollectionViewTableKindColumn {
 	field: string;
 	label: string;
+	valueMinimalDisplayAlias?: string;
 }
 
 export interface MetaCollectionViewTableKind extends MetaCollectionView {

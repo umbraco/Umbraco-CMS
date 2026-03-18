@@ -35,24 +35,27 @@ export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'collectionView',
 		kind: 'table',
-		alias: 'USER TEST',
-		name: 'User Table Collection View',
+		alias: 'Umb.CollectionView.User.Table.Kind',
+		name: 'User Table Kind Collection View',
 		meta: {
-			label: 'Table KIND',
+			label: 'Table',
 			icon: 'icon-table',
 			pathName: 'table2',
 			columns: [
 				{
-					field: 'userGroupIds',
+					field: 'userGroupUniques',
 					label: 'User Groups',
+					valueMinimalDisplayAlias: 'Umb.ValueMinimalDisplay.User.UserGroups',
 				},
 				{
 					field: 'lastLoginDate',
 					label: 'Last login',
+					valueMinimalDisplayAlias: 'Umb.ValueMinimalDisplay.User.LastLogin',
 				},
 				{
 					field: 'state',
 					label: 'Status',
+					valueMinimalDisplayAlias: 'Umb.ValueMinimalDisplay.User.State',
 				},
 			],
 		},
