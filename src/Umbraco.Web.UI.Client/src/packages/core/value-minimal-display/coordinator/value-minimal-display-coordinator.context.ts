@@ -1,5 +1,5 @@
-import { UMB_VALUE_MINIMAL_DISPLAY_COORDINATOR_CONTEXT } from './value-minimal-display-coordinator.context-token.js';
 import type { UmbValueMinimalDisplayApi } from '../extensions/value-minimal-display-api.interface.js';
+import { UMB_VALUE_MINIMAL_DISPLAY_COORDINATOR_CONTEXT } from './value-minimal-display-coordinator.context-token.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
@@ -12,6 +12,10 @@ interface ResolvedEntry {
 	value: unknown;
 }
 
+/**
+ *
+ * @param v
+ */
 function toValueKey(v: unknown): string {
 	return v !== null && typeof v === 'object' ? JSON.stringify(v) : String(v);
 }
@@ -29,9 +33,7 @@ export class UmbValueMinimalDisplayCoordinatorContext extends UmbContextBase {
 	preRegister(alias: string, values: ReadonlyArray<unknown>): void {
 		const manifest = umbExtensionsRegistry.getByAlias(alias) as { api?: unknown } | undefined;
 		if (!manifest?.api) {
-			this.#state.append(
-				values.map((v) => ({ key: `${alias}:${toValueKey(v)}`, value: v })),
-			);
+			this.#state.append(values.map((v) => ({ key: `${alias}:${toValueKey(v)}`, value: v })));
 		} else {
 			if (!this.#pending.has(alias)) this.#pending.set(alias, new Set());
 			const pendingSet = this.#pending.get(alias)!;
@@ -64,3 +66,5 @@ export class UmbValueMinimalDisplayCoordinatorContext extends UmbContextBase {
 		}
 	}
 }
+
+export { UmbValueMinimalDisplayCoordinatorContext as api };
