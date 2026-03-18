@@ -76,6 +76,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<MatcherPolicy, SurfaceControllerMatcherPolicy>();
 
         builder.Services.AddSingleton<FrontEndRoutes>();
+        builder.Services.AddSingleton<BasicAuthLoginRoutes>();
 
         builder.Services.AddSingleton<MemberModelBuilderFactory>();
 

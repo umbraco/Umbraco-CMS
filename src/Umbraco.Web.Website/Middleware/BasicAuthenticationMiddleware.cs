@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.Security;
@@ -40,6 +39,7 @@ public class BasicAuthenticationMiddleware : IMiddleware
         if (_runtimeState.Level < RuntimeLevel.Run
             || !_basicAuthService.IsBasicAuthEnabled()
             || context.Request.IsBackOfficeRequest()
+            || context.Request.Path.StartsWithSegments($"{_backOfficePath}/basic-auth")
             || AllowedClientRequest(context)
             || _basicAuthService.HasCorrectSharedSecret(context.Request.Headers))
         {
@@ -54,11 +54,20 @@ public class BasicAuthenticationMiddleware : IMiddleware
             return;
         }
 
-        AuthenticateResult authenticateResult = await context.AuthenticateBackOfficeAsync();
-        if (authenticateResult.Succeeded)
+        // Check if backoffice auth scheme is registered before attempting cookie authentication.
+        // When only AddCore() is used (without AddBackOfficeSignIn() or AddBackOffice()),
+        // the UmbracoBackOffice scheme does not exist and AuthenticateBackOfficeAsync() would throw.
+        IAuthenticationSchemeProvider schemeProvider = context.RequestServices.GetRequiredService<IAuthenticationSchemeProvider>();
+        AuthenticationScheme? backOfficeScheme = await schemeProvider.GetSchemeAsync(Cms.Core.Constants.Security.BackOfficeAuthenticationType);
+
+        if (backOfficeScheme is not null)
         {
-            await next(context);
-            return;
+            AuthenticateResult authenticateResult = await context.AuthenticateBackOfficeAsync();
+            if (authenticateResult.Succeeded)
+            {
+                await next(context);
+                return;
+            }
         }
 
         if (context.TryGetBasicAuthCredentials(out var username, out var password))
@@ -101,7 +110,12 @@ public class BasicAuthenticationMiddleware : IMiddleware
     {
         if (_basicAuthService.IsRedirectToLoginPageEnabled())
         {
-            context.Response.Redirect($"{_backOfficePath}/?status=false&returnPath={WebUtility.UrlEncode(context.Request.GetEncodedPathAndQuery())}", false);
+            var returnPath = WebUtility.UrlEncode(context.Request.GetEncodedPathAndQuery());
+
+            // Always use the standalone server-rendered login page for basic auth.
+            // This is purpose-built for the "authenticate and return to the frontend" flow,
+            // avoiding the heavier backoffice SPA + OpenIddict token flow.
+            context.Response.Redirect($"{_backOfficePath}/basic-auth/login?returnPath={returnPath}", false);
         }
         else
         {
