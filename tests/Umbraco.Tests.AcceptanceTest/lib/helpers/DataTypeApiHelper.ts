@@ -604,6 +604,7 @@ export class DataTypeApiHelper {
 
   async createBlockGridWithAnAreaWithSpecifiedAllowanceInABlock(blockGridName: string, contentElementTypeId: string, specifiedAllowanceElementTypeId: string, areaAlias: string = 'area', columnSpan: number = 6, rowSpan: number = 1) {
     await this.ensureNameNotExists(blockGridName);
+
     const blockGrid = new BlockGridDataTypeBuilder()
       .withName(blockGridName)
       .addBlock()
@@ -615,7 +616,6 @@ export class DataTypeApiHelper {
           .withRowSpan(rowSpan)
           .addSpecifiedAllowance()
             .withElementTypeKey(specifiedAllowanceElementTypeId)
-            .withMinAllowed(0)
             .done()
           .done()
         .done()
@@ -625,12 +625,12 @@ export class DataTypeApiHelper {
         .done()
       .build();
 
-    console.log(JSON.stringify(blockGrid, null, 2));
     return await this.save(blockGrid);
   }
 
   async createBlockGridWithAnAreaWithSpecifiedAllowanceWithMinMaxInABlock(blockGridName: string, contentElementTypeId: string, specifiedAllowanceElementTypeId: string, minAllowed: number, maxAllowed: number, areaAlias: string = 'area', columnSpan: number = 6, rowSpan: number = 1) {
     await this.ensureNameNotExists(blockGridName);
+
     const blockGrid = new BlockGridDataTypeBuilder()
       .withName(blockGridName)
       .addBlock()
@@ -652,6 +652,7 @@ export class DataTypeApiHelper {
         .withAllowInAreas(true)
         .done()
       .build();
+    
     return await this.save(blockGrid);
   }
 
