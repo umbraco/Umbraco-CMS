@@ -984,6 +984,7 @@ export class UiBaseLocators extends BasePage {
     await this.isVisible(groupLocator);
     await expect(groupLocator).toHaveAttribute('inherited', '');
     await expect(groupLocator.locator('uui-tag.inherited')).toContainText(compositionName);
+    await expect(groupLocator.locator('[data-mark="input:group-name"]')).toHaveAttribute('disabled', '');
   }
 
   async deleteGroup(groupName: string) {
