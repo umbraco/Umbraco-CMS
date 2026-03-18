@@ -835,7 +835,7 @@ export class DataTypeUiHelper extends UiBaseLocators {
   }
 
   async goToBlockWithName(name: string) {
-    await this.click(this.page.getByRole('link', {name: name}));
+    await this.click(this.page.getByRole('link', {name: name, exact: true}));
   }
 
   async enterBlockLabelText(label: string) {
@@ -1056,6 +1056,57 @@ export class DataTypeUiHelper extends UiBaseLocators {
 
   async clickAddSpecifiedAllowanceButton() {
     await this.click(this.addSpecifiedAllowanceBtn);
+  }
+
+  async clickSpecifiedAllowanceComboboxByIndex(index: number = 0) {
+    const combobox = this.page.locator('[alias="specifiedAllowance"]')
+      .locator('.permission-setting')
+      .nth(index)
+      .locator('uui-combobox');
+    await this.click(combobox);
+  }
+
+  async selectSpecifiedAllowanceOptionByName(elementTypeName: string) {
+    const option = this.page.locator('[alias="specifiedAllowance"]')
+      .locator('uui-combobox-list-option')
+      .filter({hasText: elementTypeName});
+    await this.click(option);
+  }
+
+  async clickRemoveSpecifiedAllowanceByIndex(index: number = 0) {
+    const removeBtn = this.page.locator('[alias="specifiedAllowance"]')
+      .locator('.permission-setting')
+      .nth(index)
+      .getByLabel('Remove');
+    await this.click(removeBtn);
+  }
+
+  async enterSpecifiedAllowanceMinByIndex(value: number | undefined, index: number = 0) {
+    const minInput = this.page.locator('[alias="specifiedAllowance"]')
+      .locator('.permission-setting')
+      .nth(index)
+      .locator('uui-input[type="number"]')
+      .first();
+    await this.waitForVisible(minInput);
+    await minInput.clear();
+    if (value === undefined) {
+      return;
+    }
+    await minInput.fill(value.toString());
+  }
+
+  async enterSpecifiedAllowanceMaxByIndex(value: number | undefined, index: number = 0) {
+    const maxInput = this.page.locator('[alias="specifiedAllowance"]')
+      .locator('.permission-setting')
+      .nth(index)
+      .locator('uui-input[type="number"]')
+      .nth(1);
+    await this.waitForVisible(maxInput);
+    await maxInput.clear();
+    if (value === undefined) {
+      return;
+    }
+    await maxInput.fill(value.toString());
   }
 
   async goToBlockAdvancedTab() {
