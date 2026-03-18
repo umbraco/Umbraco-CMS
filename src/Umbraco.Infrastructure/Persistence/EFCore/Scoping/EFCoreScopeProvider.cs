@@ -167,6 +167,14 @@ internal sealed class EFCoreScopeProvider<TDbContext> : IEFCoreScopeProvider<TDb
     }
 
 
+    /// <summary>
+    /// Gets the number of scope contexts this provider has pushed that have not yet been popped.
+    /// This is only used to distinguish the amount of EFCore scopes on a stack versus NPoco scopes.
+    ///
+    /// This solution is temporary and should be removed when migration to EFCore is complete.
+    /// </summary>
+    internal int ScopeContextDepth { get; private set; }
+
     /// <inheritdoc />
     public IScopeContext? AmbientScopeContext => _ambientEfCoreScopeContextStack.AmbientContext;
 
@@ -218,6 +226,42 @@ internal sealed class EFCoreScopeProvider<TDbContext> : IEFCoreScopeProvider<TDb
     }
 
     /// <summary>
+    /// Creates a bridged EF Core scope, that has the existing NPoco scope as a parent.
+    /// This is used by <see cref="EFCoreScopeAccessor{TDbContext}"/> to create an EF Core
+    /// scope when NPoco tries to do operations in EF Core repositories.
+    ///
+    /// The Bridged scope does not know when the NPoco scope is completed so its "manually" cleaned
+    ///  up in the <see cref="EFCoreScopeAccessor{TDbContext}"/>
+    /// </summary>
+    /// <param name="existingNPocoScope">The existing ambient NPoco scope.</param>
+    /// <returns>The created bridge scope which is pushed onto the stack.</returns>
+    internal IEfCoreScope<TDbContext> CreateBridgeScope(IScope existingNPocoScope)
+    {
+        var bridgeScope = new EFCoreScope<TDbContext>(
+            existingNPocoScope,
+            _distributedLockingMechanismFactory,
+            _loggerFactory,
+            _efCoreScopeAccessor,
+            _fileSystems,
+            this,
+            null,
+            _eventAggregator,
+            _dbContextFactory)
+        {
+            IsBridgeScope = true,
+        };
+
+        _ambientEfCoreScopeStack.Push(bridgeScope);
+        bridgeScope.Complete();
+
+        _scopeProvider.Context!.Enlist(
+            bridgeScope.InstanceId.ToString(),
+            _ => bridgeScope.Dispose());
+
+        return bridgeScope;
+    }
+
+    /// <summary>
     /// Removes the current ambient scope from the stack.
     /// </summary>
     public void PopAmbientScope() => _ambientEfCoreScopeStack.Pop();
@@ -233,13 +277,19 @@ internal sealed class EFCoreScopeProvider<TDbContext> : IEFCoreScopeProvider<TDb
         {
             throw new ArgumentNullException(nameof(scopeContext));
         }
+
+        ScopeContextDepth++;
         _ambientEfCoreScopeContextStack.Push(scopeContext);
     }
 
     /// <summary>
     /// Removes the current scope context from the ambient scope context stack.
     /// </summary>
-    public void PopAmbientScopeContext() => _ambientEfCoreScopeContextStack.Pop();
+    public void PopAmbientScopeContext()
+    {
+        ScopeContextDepth--;
+        _ambientEfCoreScopeContextStack.Pop();
+    }
 
     /// <inheritdoc />
     ICoreScope CoreEFCoreScopeProvider.CreateScope(RepositoryCacheMode repositoryCacheMode, bool? scopeFileSystems)

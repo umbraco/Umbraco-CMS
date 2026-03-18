@@ -22,6 +22,7 @@ using Umbraco.Cms.Infrastructure.Persistence.EFCore.Migrations;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
 using Umbraco.Cms.Infrastructure.Services;
 using Umbraco.Cms.Infrastructure.PublishedCache;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Persistence.EFCore.Sqlite;
 using Umbraco.Cms.Persistence.EFCore.SqlServer;
 using Umbraco.Cms.Tests.Common.TestHelpers.Stubs;
@@ -93,7 +94,11 @@ public static class UmbracoBuilderExtensions
             });
 
         builder.Services.AddUnique<IAmbientEFCoreScopeStack<TestUmbracoDbContext>, AmbientEFCoreScopeStack<TestUmbracoDbContext>>();
-        builder.Services.AddUnique<IEFCoreScopeAccessor<TestUmbracoDbContext>, EFCoreScopeAccessor<TestUmbracoDbContext>>();
+        builder.Services.AddUnique<IEFCoreScopeAccessor<TestUmbracoDbContext>>(sp =>
+            new EFCoreScopeAccessor<TestUmbracoDbContext>(
+                sp.GetRequiredService<IAmbientEFCoreScopeStack<TestUmbracoDbContext>>(),
+                sp.GetRequiredService<IAmbientScopeStack>(),
+                new Lazy<IEFCoreScopeProvider<TestUmbracoDbContext>>(sp.GetRequiredService<IEFCoreScopeProvider<TestUmbracoDbContext>>)));
         builder.Services.AddUnique<IEFCoreScopeProvider<TestUmbracoDbContext>, EFCoreScopeProvider<TestUmbracoDbContext>>();
 
         builder.Services.AddSingleton<IMigrationProviderSetup, TestSqliteMigrationProviderSetup>();

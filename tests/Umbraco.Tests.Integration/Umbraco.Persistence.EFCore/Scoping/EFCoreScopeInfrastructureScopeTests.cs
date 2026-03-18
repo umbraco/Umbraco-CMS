@@ -206,4 +206,108 @@ internal sealed class EFCoreScopeInfrastructureScopeTests : UmbracoIntegrationTe
             });
         }
     }
+
+    /// <summary>
+    /// Simulates an EF Core repository being accessed during an NPoco scope.
+    /// The EFCoreScopeAccessor auto-creates a bridge scope so both ORMs share the same transaction.
+    /// Verifies bidirectional data visibility and that the transaction commits when the NPoco scope completes.
+    /// </summary>
+    [Test]
+    public async Task BridgedScope_NPocoScopeAccessesEfCoreRepository_SharesTransaction()
+    {
+        using (IScope npocoScope = InfrastructureScopeProvider.CreateScope())
+        {
+            npocoScope.Database.Execute("CREATE TABLE tmp_bridge (id INT, name NVARCHAR(64))");
+            npocoScope.Database.Execute("INSERT INTO tmp_bridge (id, name) VALUES (1, 'npoco_row')");
+
+            // Simulate an EF Core repository accessing the ambient scope via the accessor.
+            // Since only an NPoco scope is active, the accessor auto-creates a bridge scope.
+            var bridgedScope = EfCoreScopeAccessor.AmbientScope;
+            Assert.IsNotNull(bridgedScope);
+            Assert.IsTrue(((EFCoreScope<TestUmbracoDbContext>)bridgedScope!).IsBridgeScope);
+
+            // EF Core can see NPoco's uncommitted writes (same transaction)
+            await bridgedScope.ExecuteWithContextAsync<Task>(async db =>
+            {
+                string? npocoData = await db.Database.ExecuteScalarAsync<string>(
+                    "SELECT name FROM tmp_bridge WHERE id=1");
+                Assert.AreEqual("npoco_row", npocoData);
+
+                // EF Core writes in the same transaction
+                await db.Database.ExecuteSqlAsync(
+                    $"INSERT INTO tmp_bridge (id, name) VALUES (2, 'efcore_row')");
+            });
+
+            // NPoco can see EF Core's writes (same transaction)
+            string efCoreData = npocoScope.Database.ExecuteScalar<string>(
+                "SELECT name FROM tmp_bridge WHERE id=2");
+            Assert.AreEqual("efcore_row", efCoreData);
+
+
+
+            npocoScope.Complete();
+        }
+
+        // Both rows committed
+        using (IEfCoreScope<TestUmbracoDbContext> scope = EfCoreScopeProvider.CreateScope())
+        {
+            await scope.ExecuteWithContextAsync<Task>(async db =>
+            {
+                string? row1 = await db.Database.ExecuteScalarAsync<string>(
+                    "SELECT name FROM tmp_bridge WHERE id=1");
+                string? row2 = await db.Database.ExecuteScalarAsync<string>(
+                    "SELECT name FROM tmp_bridge WHERE id=2");
+                Assert.AreEqual("npoco_row", row1);
+                Assert.AreEqual("efcore_row", row2);
+            });
+            scope.Complete();
+        }
+    }
+
+    /// <summary>
+    /// Verifies that when an NPoco scope is NOT completed, the bridge scope's EF Core
+    /// writes are also rolled back since they share the same underlying transaction.
+    /// </summary>
+    [Test]
+    public async Task BridgedScope_NPocoScopeNotCompleted_EfCoreWritesRolledBack()
+    {
+        // Setup: create table in a committed scope
+        using (IScope setup = InfrastructureScopeProvider.CreateScope())
+        {
+            setup.Database.Execute("CREATE TABLE tmp_bridge2 (id INT, name NVARCHAR(64))");
+            setup.Complete();
+        }
+
+        // Insert via bridge scope, but do NOT complete the NPoco parent
+        using (IScope npocoScope = InfrastructureScopeProvider.CreateScope())
+        {
+            // Simulate EF Core repository access — triggers bridge scope creation
+            IEfCoreScope<TestUmbracoDbContext>? bridgeScope = EfCoreScopeAccessor.AmbientScope;
+            Assert.IsNotNull(bridgeScope);
+
+            await bridgeScope!.ExecuteWithContextAsync<Task>(async db =>
+            {
+                await db.Database.ExecuteSqlAsync(
+                    $"INSERT INTO tmp_bridge2 (id, name) VALUES (1, 'should_rollback')");
+
+                // Data is visible within the transaction
+                string? result = await db.Database.ExecuteScalarAsync<string>(
+                    "SELECT name FROM tmp_bridge2 WHERE id=1");
+                Assert.AreEqual("should_rollback", result);
+            });
+
+            // Do NOT call npocoScope.Complete() — transaction should roll back
+        }
+
+        // Verify rolled back
+        using (IEfCoreScope<TestUmbracoDbContext> scope = EfCoreScopeProvider.CreateScope())
+        {
+            await scope.ExecuteWithContextAsync<Task>(async db =>
+            {
+                string? result = await db.Database.ExecuteScalarAsync<string>(
+                    "SELECT name FROM tmp_bridge2 WHERE id=1");
+                Assert.IsNull(result);
+            });
+        }
+    }
 }
