@@ -320,6 +320,7 @@ stages:
   - stage: DefaultConfigE2E
     displayName: Default Config E2E Tests
     dependsOn: Integration
+    condition: always()
     variables:
       npm_config_cache: $(Pipeline.Workspace)/.npm_e2e
       # Enable console logging in Release mode
@@ -501,6 +502,7 @@ stages:
   - stage: AdditionalConfigE2E
     displayName: Additional Config E2E Tests
     dependsOn: DefaultConfigE2E
+    condition: always()
     variables:
       npm_config_cache: $(Pipeline.Workspace)/.npm_e2e
       ASPNETCORE_URLS: https://localhost:44331
