@@ -348,8 +348,7 @@ public class ConvertLocalLinks : MigrationBase
         var culture = cultureResult.Culture;
 
         var segment = propertyType.VariesBySegment() ? propertyDataDto.Segment : null;
-        var property = new Property(propertyType);
-        property.SetValue(propertyDataDto.Value, culture, segment);
+        var property = PropertyDataCultureResolver.CreateMigrationProperty(propertyType, propertyDataDto.Value, culture, segment);
         var toEditorValue = valueEditor.ToEditor(property, culture, segment);
 
         if (_localLinkProcessor.ProcessToEditorValue(toEditorValue) == false)

@@ -368,8 +368,7 @@ WHERE nodeId IN (@0)";
 
         // create a fake property to be able to get a typed value and run it through the processors.
         var segment = propertyType.VariesBySegment() ? propertyDataDto.Segment : null;
-        var property = new Property(propertyType);
-        property.SetValue(propertyDataDto.Value, culture, segment);
+        var property = PropertyDataCultureResolver.CreateMigrationProperty(propertyType, propertyDataDto.Value, culture, segment);
         var toEditorValue = valueEditor.ToEditor(property, culture, segment);
 
         if (TryTransformValue(toEditorValue, property, out var updatedValue) is false)

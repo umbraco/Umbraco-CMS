@@ -83,4 +83,35 @@ internal static class PropertyDataCultureResolver
             ShouldSkip = false,
         };
     }
+
+    /// <summary>
+    /// Creates a <see cref="Property"/> suitable for migration value roundtripping.
+    /// </summary>
+    /// <remarks>
+    /// When a property type varies by culture (e.g. inherited from a composition) but the data
+    /// is invariant (null culture), <see cref="Property.SetValue"/> rejects the null culture.
+    /// This method handles that case by deep-cloning the property type and setting its
+    /// <see cref="IPropertyType.Variations"/> to <see cref="ContentVariation.Nothing"/>,
+    /// which is safe because the data genuinely is invariant.
+    /// </remarks>
+    internal static Property CreateMigrationProperty(
+        IPropertyType propertyType,
+        object? value,
+        string? culture,
+        string? segment)
+    {
+        IPropertyType effectivePropertyType = propertyType;
+
+        if (culture is null && propertyType.VariesByCulture())
+        {
+            // Invariant data on a culture-varying property type (composition scenario).
+            // Clone to avoid mutating shared state — important for parallel migration execution.
+            effectivePropertyType = (IPropertyType)propertyType.DeepClone();
+            effectivePropertyType.Variations = ContentVariation.Nothing;
+        }
+
+        var property = new Property(effectivePropertyType);
+        property.SetValue(value, culture, segment);
+        return property;
+    }
 }

@@ -4,6 +4,7 @@
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Migrations;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations;
@@ -103,11 +104,59 @@ internal sealed class PropertyDataCultureResolverTests
         Assert.That(result.ShouldSkip, Is.False);
     }
 
+    [Test]
+    public void CreateMigrationProperty_CultureVaryingPropertyType_NullCulture_DoesNotThrow()
+    {
+        // Without the fix, this throws NotSupportedException:
+        // "Variation <null>,<null> is not supported by the property type."
+        var propertyType = CreateConcretePropertyType(ContentVariation.Culture);
+
+        var property = PropertyDataCultureResolver.CreateMigrationProperty(
+            propertyType, "test value", culture: null, segment: null);
+
+        Assert.That(property, Is.Not.Null);
+        Assert.That(property.GetValue(null, null), Is.EqualTo("test value"));
+    }
+
+    [Test]
+    public void CreateMigrationProperty_CultureVaryingPropertyType_WithCulture_Works()
+    {
+        var propertyType = CreateConcretePropertyType(ContentVariation.Culture);
+
+        var property = PropertyDataCultureResolver.CreateMigrationProperty(
+            propertyType, "test value", culture: "en-US", segment: null);
+
+        Assert.That(property, Is.Not.Null);
+        Assert.That(property.GetValue("en-US", null), Is.EqualTo("test value"));
+    }
+
+    [Test]
+    public void CreateMigrationProperty_DoesNotMutateOriginalPropertyType()
+    {
+        var propertyType = CreateConcretePropertyType(ContentVariation.Culture);
+
+        PropertyDataCultureResolver.CreateMigrationProperty(
+            propertyType, "test value", culture: null, segment: null);
+
+        Assert.That(propertyType.VariesByCulture(), Is.True,
+            "Original property type Variations must not be modified");
+    }
+
     private static IPropertyType CreatePropertyType(ContentVariation variation)
     {
         var mock = new Mock<IPropertyType>();
         mock.Setup(pt => pt.Variations).Returns(variation);
         return mock.Object;
+    }
+
+    private static PropertyType CreateConcretePropertyType(ContentVariation variation)
+    {
+        var shortStringHelper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig());
+        var propertyType = new PropertyType(shortStringHelper, "Umbraco.TextBox", ValueStorageType.Nvarchar, "testAlias")
+        {
+            Variations = variation,
+        };
+        return propertyType;
     }
 
     private static ILanguage CreateLanguage(string isoCode)
