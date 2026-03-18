@@ -58,9 +58,9 @@ public class BasicAuthLoginControllerTests
     /// Verifies that GET Login returns the login view with the return path set.
     /// </summary>
     [Test]
-    public void Login_Get_ReturnsView()
+    public async Task Login_Get_ReturnsView()
     {
-        IActionResult result = _controller.Login("/some-page");
+        IActionResult result = await _controller.Login("/some-page");
 
         var viewResult = result as ViewResult;
         Assert.IsNotNull(viewResult);
@@ -76,9 +76,9 @@ public class BasicAuthLoginControllerTests
     /// Verifies that GET Login accepts a null return path without error.
     /// </summary>
     [Test]
-    public void Login_Get_NullReturnPath_ReturnsView()
+    public async Task Login_Get_NullReturnPath_ReturnsView()
     {
-        IActionResult result = _controller.Login(null);
+        IActionResult result = await _controller.Login(null);
 
         var viewResult = result as ViewResult;
         Assert.IsNotNull(viewResult);
@@ -409,11 +409,11 @@ public class BasicAuthLoginControllerTests
     /// Verifies that GET Login returns 404 when basic auth is disabled.
     /// </summary>
     [Test]
-    public void Login_Get_BasicAuthDisabled_ReturnsNotFound()
+    public async Task Login_Get_BasicAuthDisabled_ReturnsNotFound()
     {
         _basicAuthServiceMock.Setup(x => x.IsBasicAuthEnabled()).Returns(false);
 
-        IActionResult result = _controller.Login("/page");
+        IActionResult result = await _controller.Login("/page");
 
         Assert.IsInstanceOf<NotFoundResult>(result);
     }

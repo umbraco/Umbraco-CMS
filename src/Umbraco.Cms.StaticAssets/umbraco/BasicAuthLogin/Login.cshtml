@@ -2,6 +2,7 @@
 @{
     Layout = null;
     var hasError = !string.IsNullOrEmpty(Model?.ErrorMessage);
+    var externalProviders = Model?.ExternalLoginProviders?.ToList() ?? [];
 }
 <!doctype html>
 <html lang="en">
@@ -79,6 +80,14 @@
             outline: 2px solid #2152a3;
             outline-offset: 2px;
         }
+        .btn-external {
+            background: #fff;
+            color: #1b264f;
+            border: 1px solid #d8d7d9;
+        }
+        .btn-external:hover {
+            background: #f4f4f4;
+        }
         .error-message {
             background: #fef2f2;
             color: #991b1b;
@@ -88,6 +97,21 @@
             font-size: 0.875rem;
             margin-bottom: 1rem;
         }
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 1.25rem 0;
+            color: #555d67;
+            font-size: 0.8125rem;
+        }
+        .divider::before,
+        .divider::after {
+            content: "";
+            flex: 1;
+            border-bottom: 1px solid #d8d7d9;
+        }
+        .divider::before { margin-right: 0.75rem; }
+        .divider::after { margin-left: 0.75rem; }
     </style>
 </head>
 <body>
@@ -120,6 +144,21 @@
 
             <button type="submit" class="btn">Sign in</button>
         </form>
+
+        @if (externalProviders.Count > 0)
+        {
+            <div class="divider">or</div>
+
+            @foreach (var provider in externalProviders)
+            {
+                <form method="post" action="@Url.Action("ExternalLogin", "BasicAuthLogin")">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="provider" value="@provider.Name" />
+                    <input type="hidden" name="returnPath" value="@Model?.ReturnPath" />
+                    <button type="submit" class="btn btn-external">Sign in with @(provider.DisplayName ?? provider.Name)</button>
+                </form>
+            }
+        }
     </main>
 </body>
 </html>

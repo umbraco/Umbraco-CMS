@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Security;
@@ -30,15 +32,14 @@ public class BasicAuthLoginController : Controller
     /// <param name="returnPath">The local URL to redirect to after successful login.</param>
     /// <returns>The login view, or 404 if basic auth is not enabled.</returns>
     [HttpGet]
-    public IActionResult Login(string? returnPath)
+    public async Task<IActionResult> Login(string? returnPath)
     {
         if (IsBasicAuthEnabled() is false)
         {
             return NotFound();
         }
 
-        var model = new BasicAuthLoginModel { ReturnPath = returnPath };
-        return View("/umbraco/BasicAuthLogin/Login.cshtml", model);
+        return await LoginView(returnPath);
     }
 
     /// <summary>
@@ -62,12 +63,12 @@ public class BasicAuthLoginController : Controller
 
         if (signInManager is null)
         {
-            return LoginView(returnPath, "Backoffice sign-in is not available. Ensure AddBackOfficeSignIn() is called at startup.");
+            return await LoginView(returnPath, "Backoffice sign-in is not available. Ensure AddBackOfficeSignIn() is called at startup.");
         }
 
         if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
         {
-            return LoginView(returnPath, "Please enter a username and password.");
+            return await LoginView(returnPath, "Please enter a username and password.");
         }
 
         SignInResult signInResult = await signInManager.PasswordSignInAsync(username, password, isPersistent: false, lockoutOnFailure: true);
@@ -79,12 +80,12 @@ public class BasicAuthLoginController : Controller
 
         if (signInResult.IsLockedOut)
         {
-            return LoginView(returnPath, "Your account has been locked out. Please try again later.");
+            return await LoginView(returnPath, "Your account has been locked out. Please try again later.");
         }
 
         if (signInResult.IsNotAllowed)
         {
-            return LoginView(returnPath, "Your account is not allowed to sign in.");
+            return await LoginView(returnPath, "Your account is not allowed to sign in.");
         }
 
         if (signInResult.RequiresTwoFactor)
@@ -92,7 +93,7 @@ public class BasicAuthLoginController : Controller
             return RedirectToAction(nameof(TwoFactor), new { returnPath });
         }
 
-        return LoginView(returnPath, "Invalid username or password.");
+        return await LoginView(returnPath, "Invalid username or password.");
     }
 
     /// <summary>
@@ -113,7 +114,7 @@ public class BasicAuthLoginController : Controller
 
         if (signInManager is null)
         {
-            return LoginView(returnPath, "Backoffice sign-in is not available. Ensure AddBackOfficeSignIn() is called at startup.");
+            return await LoginView(returnPath, "Backoffice sign-in is not available. Ensure AddBackOfficeSignIn() is called at startup.");
         }
 
         BackOfficeIdentityUser? user = await signInManager.GetTwoFactorAuthenticationUserAsync();
@@ -157,7 +158,7 @@ public class BasicAuthLoginController : Controller
 
         if (signInManager is null)
         {
-            return LoginView(returnPath, "Backoffice sign-in is not available. Ensure AddBackOfficeSignIn() is called at startup.");
+            return await LoginView(returnPath, "Backoffice sign-in is not available. Ensure AddBackOfficeSignIn() is called at startup.");
         }
 
         if (string.IsNullOrWhiteSpace(provider) || string.IsNullOrWhiteSpace(code))
@@ -174,10 +175,86 @@ public class BasicAuthLoginController : Controller
 
         if (signInResult.IsLockedOut)
         {
-            return LoginView(returnPath, "Your account has been locked out. Please try again later.");
+            return await LoginView(returnPath, "Your account has been locked out. Please try again later.");
         }
 
         return await TwoFactorView(signInManager, returnPath, "Invalid verification code. Please try again.");
+    }
+
+    /// <summary>
+    /// Initiates an external login challenge (e.g. Google, Microsoft) by redirecting to the provider.
+    /// </summary>
+    /// <param name="provider">The external authentication provider name.</param>
+    /// <param name="returnPath">The local URL to redirect to after successful login.</param>
+    /// <returns>A challenge result that redirects to the external provider, or 404 if basic auth is disabled.</returns>
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public IActionResult ExternalLogin(string provider, string? returnPath)
+    {
+        if (IsBasicAuthEnabled() is false)
+        {
+            return NotFound();
+        }
+
+        IBackOfficeSignInManager? signInManager =
+            HttpContext.RequestServices.GetService<IBackOfficeSignInManager>();
+
+        if (signInManager is null)
+        {
+            return NotFound();
+        }
+
+        var callbackUrl = Url.Action(nameof(ExternalLoginCallback), "BasicAuthLogin", new { returnPath });
+        AuthenticationProperties properties = signInManager.ConfigureExternalAuthenticationProperties(provider, callbackUrl);
+        return Challenge(properties, provider);
+    }
+
+    /// <summary>
+    /// Handles the callback from an external login provider after authentication.
+    /// </summary>
+    /// <param name="returnPath">The local URL to redirect to after successful login.</param>
+    /// <returns>A redirect on success, or the login view with an error message on failure.</returns>
+    [HttpGet]
+    public async Task<IActionResult> ExternalLoginCallback(string? returnPath)
+    {
+        if (IsBasicAuthEnabled() is false)
+        {
+            return NotFound();
+        }
+
+        IBackOfficeSignInManager? signInManager =
+            HttpContext.RequestServices.GetService<IBackOfficeSignInManager>();
+
+        if (signInManager is null)
+        {
+            return await LoginView(returnPath, "Backoffice sign-in is not available. Ensure AddBackOfficeSignIn() is called at startup.");
+        }
+
+        ExternalLoginInfo? loginInfo = await signInManager.GetExternalLoginInfoAsync();
+        if (loginInfo is null)
+        {
+            return await LoginView(returnPath, "Invalid response from the external login provider.");
+        }
+
+        SignInResult signInResult = await signInManager.ExternalLoginSignInAsync(loginInfo, isPersistent: false);
+
+        if (signInResult.Succeeded)
+        {
+            await signInManager.UpdateExternalAuthenticationTokensAsync(loginInfo);
+            return LocalRedirectOrHome(returnPath);
+        }
+
+        if (signInResult.RequiresTwoFactor)
+        {
+            return RedirectToAction(nameof(TwoFactor), new { returnPath });
+        }
+
+        if (signInResult.IsLockedOut)
+        {
+            return await LoginView(returnPath, "Your account has been locked out. Please try again later.");
+        }
+
+        return await LoginView(returnPath, $"Unable to sign in with {loginInfo.ProviderDisplayName}.");
     }
 
     /// <summary>
@@ -207,14 +284,22 @@ public class BasicAuthLoginController : Controller
     }
 
     /// <summary>
-    /// Builds the login view with an optional error message.
+    /// Builds the login view with an optional error message and available external login providers.
     /// </summary>
-    private ViewResult LoginView(string? returnPath, string? errorMessage)
+    private async Task<ViewResult> LoginView(string? returnPath, string? errorMessage = null)
     {
+        IBackOfficeSignInManager? signInManager =
+            HttpContext.RequestServices.GetService<IBackOfficeSignInManager>();
+
+        IEnumerable<AuthenticationScheme> externalProviders = signInManager is not null
+            ? await signInManager.GetExternalAuthenticationSchemesAsync()
+            : [];
+
         var model = new BasicAuthLoginModel
         {
             ReturnPath = returnPath,
             ErrorMessage = errorMessage,
+            ExternalLoginProviders = externalProviders,
         };
         return View("/umbraco/BasicAuthLogin/Login.cshtml", model);
     }

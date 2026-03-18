@@ -37,9 +37,18 @@ internal sealed class BasicAuthLoginRoutes : IAreaRoutes
         var controllerName = nameof(BasicAuthLoginController)
             .Replace("Controller", string.Empty, StringComparison.Ordinal);
 
+        var pathPrefix = _backOfficePath.TrimStart('/') + "/basic-auth";
+
+        // Map /basic-auth/2fa to the TwoFactor action (friendly URL for middleware redirects)
+        endpoints.MapControllerRoute(
+            name: "BasicAuth2fa",
+            pattern: pathPrefix + "/2fa",
+            defaults: new { controller = controllerName, action = "TwoFactor" });
+
+        // Map /basic-auth/{action} with Login as default
         endpoints.MapControllerRoute(
             name: "BasicAuthLogin",
-            pattern: _backOfficePath.TrimStart('/') + "/basic-auth/{action=Login}",
+            pattern: pathPrefix + "/{action=Login}",
             defaults: new { controller = controllerName });
     }
 }

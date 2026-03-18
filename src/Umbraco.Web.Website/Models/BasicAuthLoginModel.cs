@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Authentication;
+
 namespace Umbraco.Cms.Web.Website.Models;
 
 /// <summary>
@@ -14,4 +16,9 @@ public class BasicAuthLoginModel
     /// Gets or sets an error message to display on the login form.
     /// </summary>
     public string? ErrorMessage { get; set; }
+
+    /// <summary>
+    /// Gets or sets the available external authentication providers (e.g. Google, Microsoft).
+    /// </summary>
+    public IEnumerable<AuthenticationScheme> ExternalLoginProviders { get; set; } = [];
 }
