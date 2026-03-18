@@ -1078,23 +1078,21 @@ export class DataTypeUiHelper extends UiBaseLocators {
   }
 
   async enterSpecifiedAllowanceMinByIndex(value: number | undefined, index: number = 0) {
-    const minInput = this.specifiedAllowanceItems.nth(index).locator('uui-input[type="number"]').first();
-    await this.waitForVisible(minInput);
-    await minInput.clear();
+    const minInput = this.specifiedAllowanceItems.nth(index).locator('uui-input[type="number"] input').first();
     if (value === undefined) {
+      await this.clearText(minInput);
       return;
-    }
-    await minInput.fill(value.toString());
+    } 
+    await this.enterText(minInput, value.toString());
   }
 
   async enterSpecifiedAllowanceMaxByIndex(value: number | undefined, index: number = 0) {
-    const maxInput = this.specifiedAllowanceItems.nth(index).locator('uui-input[type="number"]').nth(1);
-    await this.waitForVisible(maxInput);
-    await maxInput.clear();
+    const maxInput = this.specifiedAllowanceItems.nth(index).locator('uui-input[type="number"] input').nth(1);
     if (value === undefined) {
+      await this.clearText(maxInput);
       return;
     }
-    await maxInput.fill(value.toString());
+    await this.enterText(maxInput, value.toString());
   }
 
   async goToBlockAdvancedTab() {
