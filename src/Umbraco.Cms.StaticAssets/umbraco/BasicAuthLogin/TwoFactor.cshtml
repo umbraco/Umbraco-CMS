@@ -1,0 +1,130 @@
+@model Umbraco.Cms.Web.Website.Models.BasicAuthTwoFactorModel
+@{
+    Layout = null;
+    var providers = Model?.ProviderNames?.ToList() ?? [];
+    var singleProvider = providers.Count == 1;
+}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Umbraco - Two-Factor Authentication</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f4f4f4;
+            color: #1b264f;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        .login-container {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 400px;
+        }
+        h1 {
+            font-size: 1.5rem;
+            margin-bottom: 0.25rem;
+        }
+        .subtitle {
+            color: #68717a;
+            font-size: 0.875rem;
+            margin-bottom: 1.5rem;
+        }
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 0.625rem 0.75rem;
+            border: 1px solid #d8d7d9;
+            border-radius: 4px;
+            font-size: 0.9375rem;
+            transition: border-color 0.15s;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #2152a3;
+            box-shadow: 0 0 0 2px rgba(33,82,163,0.15);
+        }
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 0.75rem;
+            background: #1b264f;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            font-size: 0.9375rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.15s;
+            margin-top: 0.5rem;
+        }
+        .btn:hover { background: #2152a3; }
+        .error-message {
+            background: #fef2f2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+            border-radius: 4px;
+            padding: 0.75rem;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h1>Umbraco</h1>
+        <p class="subtitle">Enter your two-factor authentication code</p>
+
+        @if (!string.IsNullOrEmpty(Model?.ErrorMessage))
+        {
+            <div class="error-message">@Model.ErrorMessage</div>
+        }
+
+        <form method="post" action="@Url.Action("TwoFactor", "BasicAuthLogin")">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="returnPath" value="@Model?.ReturnPath" />
+
+            @if (singleProvider)
+            {
+                <input type="hidden" name="provider" value="@providers[0]" />
+            }
+            else if (providers.Count > 1)
+            {
+                <div class="form-group">
+                    <label for="provider">Provider</label>
+                    <select id="provider" name="provider">
+                        @foreach (var provider in providers)
+                        {
+                            <option value="@provider">@provider</option>
+                        }
+                    </select>
+                </div>
+            }
+
+            <div class="form-group">
+                <label for="code">Verification code</label>
+                <input type="text" id="code" name="code" autocomplete="one-time-code" inputmode="numeric" required autofocus />
+            </div>
+
+            <button type="submit" class="btn">Verify</button>
+        </form>
+    </div>
+</body>
+</html>

@@ -84,6 +84,11 @@ public class BasicAuthenticationMiddleware : IMiddleware
                 {
                     await next.Invoke(context);
                 }
+                else if (signInResult.RequiresTwoFactor && _basicAuthService.IsRedirectToLoginPageEnabled())
+                {
+                    var returnPath = WebUtility.UrlEncode(context.Request.GetEncodedPathAndQuery());
+                    context.Response.Redirect($"{_backOfficePath}/basic-auth/2fa?returnPath={returnPath}", false);
+                }
                 else
                 {
                     HandleUnauthorized(context);
