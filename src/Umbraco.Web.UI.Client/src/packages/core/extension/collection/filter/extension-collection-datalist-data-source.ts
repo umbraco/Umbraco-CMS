@@ -1,5 +1,4 @@
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { fromCamelCase } from '@umbraco-cms/backoffice/utils';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type {
@@ -8,8 +7,8 @@ import type {
 	UmbDatalistRequestArgs,
 	UmbDatalistResponse,
 } from '@umbraco-cms/backoffice/datalist-data-source';
-import { UmbExtensionCollectionRepository } from '../repository';
-import { UmbExtensionItemRepository } from '../../item';
+import { UmbExtensionCollectionRepository } from '../repository/index.js';
+import { UmbExtensionItemRepository } from '../../item/index.js';
 
 export class UmbExtensionCollectionDatalistDataSource extends UmbControllerBase implements UmbDatalistDataSource {
 	#collectionRepository: UmbExtensionCollectionRepository;

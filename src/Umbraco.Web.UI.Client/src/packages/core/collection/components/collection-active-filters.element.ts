@@ -12,6 +12,9 @@ export class UmbCollectionActiveFiltersElement extends UmbLitElement {
 	@state()
 	private _activeFilters?: Array<UmbActiveCollectionFacetFilterModel> = [];
 
+	@state()
+	private _totalItems: number = 0;
+
 	#filterLabelsMap = new Map<string, string>();
 
 	constructor() {
@@ -39,18 +42,29 @@ export class UmbCollectionActiveFiltersElement extends UmbLitElement {
 					},
 				);
 			});
+			this.observe(this.#collectionContext?.totalItems, (total) => {
+				this._totalItems = total ?? 0;
+			});
 		});
 	}
 
 	override render() {
-		if (!this._activeFilters || this._activeFilters.length === 0) return nothing;
+		const hasActiveFilters = this._activeFilters && this._activeFilters.length > 0;
+
+		if (!hasActiveFilters) {
+			return html`
+				<div id="active-filters">
+					<small>Showing <strong>${this._totalItems}</strong> ${this._totalItems === 1 ? 'result' : 'results'}</small>
+				</div>
+			`;
+		}
 
 		return html`
 			<div id="active-filters">
 				<small>Showing results for:</small>
 				<div id="active-filter-items">
 					${repeat(
-						this._activeFilters,
+						this._activeFilters!,
 						(activeFilter) => activeFilter.alias,
 						(activeFilter) => this.#renderActiveFilterItem(activeFilter),
 					)}
@@ -82,6 +96,7 @@ export class UmbCollectionActiveFiltersElement extends UmbLitElement {
 				gap: var(--uui-size-space-4);
 				padding: var(--uui-size-space-3) 0;
 				flex-wrap: wrap;
+				min-height: 36px;
 			}
 
 			#active-filters small {

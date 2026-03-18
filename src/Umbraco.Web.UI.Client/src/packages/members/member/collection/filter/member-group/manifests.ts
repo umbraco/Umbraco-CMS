@@ -1,5 +1,5 @@
 import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
-import { UmbMemberGroupDatalistDataSource } from './member-group-datalist-data-source';
+import { UmbMemberGroupDatalistDataSource } from './member-group-datalist-data-source.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
