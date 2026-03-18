@@ -1,6 +1,4 @@
-using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Infrastructure.Scoping;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence;
 
@@ -9,46 +7,39 @@ namespace Umbraco.Cms.Infrastructure.Persistence;
 /// </summary>
 internal sealed class DatabaseReadOnlyAccessor : IDatabaseReadOnlyAccessor
 {
-    private const string CacheKey = "DatabaseReadOnly";
-
     private readonly IScopeAccessor _scopeAccessor;
-    private readonly AppCaches _appCaches;
+    private bool? _isReadOnly;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DatabaseReadOnlyAccessor"/> class.
     /// </summary>
     /// <param name="scopeAccessor">Provides access to the ambient scope for database access.</param>
-    /// <param name="appCaches">The application caches.</param>
-    public DatabaseReadOnlyAccessor(IScopeAccessor scopeAccessor, AppCaches appCaches)
+    public DatabaseReadOnlyAccessor(IScopeAccessor scopeAccessor)
     {
         _scopeAccessor = scopeAccessor;
-        _appCaches = appCaches;
     }
 
     /// <inheritdoc />
     public bool IsReadOnly() =>
-        _appCaches.RuntimeCache.GetCacheItem(CacheKey, Check);
+        _isReadOnly ??= Check();
 
     private bool Check()
     {
-        try
+        IScope? scope = _scopeAccessor.AmbientScope;
+        if (scope is null)
         {
-            IScope? scope = _scopeAccessor.AmbientScope;
-            if (scope is null)
-            {
-                return true;
-            }
-
-            var result = scope.Database.ExecuteScalar<string>(
-                "SELECT CAST(DATABASEPROPERTYEX(DB_NAME(), 'Updateability') AS NVARCHAR(20))");
-
-            return string.Equals(result, "READ_ONLY", StringComparison.OrdinalIgnoreCase);
+            throw new InvalidOperationException("DatabaseReadOnlyAccessor requires an ambient scope.");
         }
-        catch
+
+        if (scope.Database.DatabaseType.IsSqlServer() is false)
         {
-            // Query is SQL Server specific. If it fails, like it would on SQLite
-            // we assume the database is writable.
+            // Assume writeable database if it isn't a SQL Server.
             return false;
         }
+
+        var result = scope.Database.ExecuteScalar<string>(
+            "SELECT CAST(DATABASEPROPERTYEX(DB_NAME(), 'Updateability') AS NVARCHAR(20))");
+
+        return string.Equals(result, "READ_ONLY", StringComparison.OrdinalIgnoreCase);
     }
 }
