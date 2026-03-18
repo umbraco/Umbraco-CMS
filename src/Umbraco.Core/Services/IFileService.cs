@@ -9,52 +9,12 @@ namespace Umbraco.Cms.Core.Services;
 public interface IFileService : IService
 {
     /// <summary>
-    ///     Creates a folder for partial views.
-    /// </summary>
-    /// <param name="folderPath">The path of the folder to create.</param>
-    [Obsolete("Please use IPartialViewFolderService for partial view folder operations. Scheduled for removal in Umbraco 18.")]
-    void CreatePartialViewFolder(string folderPath);
-
-    /// <summary>
-    ///     Deletes a folder for partial views.
-    /// </summary>
-    /// <param name="folderPath">The path of the folder to delete.</param>
-    [Obsolete("Please use IPartialViewFolderService for partial view folder operations. Scheduled for removal in Umbraco 18.")]
-    void DeletePartialViewFolder(string folderPath);
-
-    /// <summary>
-    ///     Gets a list of all <see cref="IPartialView" /> objects
-    /// </summary>
-    /// <returns>An enumerable list of <see cref="IPartialView" /> objects</returns>
-    [Obsolete("Please use IPartialViewService for partial view operations. Scheduled for removal in Umbraco 18.")]
-    IEnumerable<IPartialView> GetPartialViews(params string[] names);
-
-    /// <summary>
     ///     Gets a <see cref="IPartialView" /> object by its path.
     /// </summary>
     /// <param name="path">The path of the partial view.</param>
     /// <returns>The <see cref="IPartialView" /> object matching the path, or null.</returns>
     [Obsolete("Please use IPartialViewService for partial view operations. Scheduled for removal in Umbraco 18.")]
     IPartialView? GetPartialView(string path);
-
-    /// <summary>
-    ///     Creates a new <see cref="IPartialView" />.
-    /// </summary>
-    /// <param name="partialView">The <see cref="IPartialView" /> to create.</param>
-    /// <param name="snippetName">Optional name of a snippet to use as template content.</param>
-    /// <param name="userId">Optional id of the user creating the partial view.</param>
-    /// <returns>An <see cref="Attempt{T}" /> indicating success or failure with the created partial view.</returns>
-    [Obsolete("Please use IPartialViewService for partial view operations. Scheduled for removal in Umbraco 18.")]
-    Attempt<IPartialView?> CreatePartialView(IPartialView partialView, string? snippetName = null, int? userId = Constants.Security.SuperUserId);
-
-    /// <summary>
-    ///     Deletes a partial view by its path.
-    /// </summary>
-    /// <param name="path">The path of the partial view to delete.</param>
-    /// <param name="userId">Optional id of the user deleting the partial view.</param>
-    /// <returns>True if the partial view was deleted; otherwise, false.</returns>
-    [Obsolete("Please use IPartialViewService for partial view operations. Scheduled for removal in Umbraco 18.")]
-    bool DeletePartialView(string path, int? userId = null);
 
     /// <summary>
     ///     Saves a <see cref="IPartialView" />.
@@ -64,37 +24,6 @@ public interface IFileService : IService
     /// <returns>An <see cref="Attempt{T}" /> indicating success or failure with the saved partial view.</returns>
     [Obsolete("Please use IPartialViewService for partial view operations. Scheduled for removal in Umbraco 18.")]
     Attempt<IPartialView?> SavePartialView(IPartialView partialView, int? userId = null);
-
-    /// <summary>
-    ///     Gets the content of a partial view as a stream.
-    /// </summary>
-    /// <param name="filepath">The filesystem path to the partial view.</param>
-    /// <returns>The content of the partial view.</returns>
-    [Obsolete("Please use IPartialViewService for partial view operations. Scheduled for removal in Umbraco 18.")]
-    Stream GetPartialViewFileContentStream(string filepath);
-
-    /// <summary>
-    ///     Sets the content of a partial view.
-    /// </summary>
-    /// <param name="filepath">The filesystem path to the partial view.</param>
-    /// <param name="content">The content of the partial view.</param>
-    [Obsolete("Please use IPartialViewService for partial view operations. Scheduled for removal in Umbraco 18.")]
-    void SetPartialViewFileContent(string filepath, Stream content);
-
-    /// <summary>
-    ///     Gets the size of a partial view.
-    /// </summary>
-    /// <param name="filepath">The filesystem path to the partial view.</param>
-    /// <returns>The size of the partial view.</returns>
-    [Obsolete("Please use IPartialViewService for partial view operations. Scheduled for removal in Umbraco 18.")]
-    long GetPartialViewFileSize(string filepath);
-
-    /// <summary>
-    ///     Gets a list of all <see cref="IStylesheet" /> objects
-    /// </summary>
-    /// <returns>An enumerable list of <see cref="IStylesheet" /> objects</returns>
-    [Obsolete("Please use IStylesheetService for stylesheet operations. Scheduled for removal in Umbraco 18.")]
-    IEnumerable<IStylesheet> GetStylesheets(params string[] paths);
 
     /// <summary>
     ///     Gets a <see cref="IStylesheet" /> object by its name
@@ -113,60 +42,6 @@ public interface IFileService : IService
     void SaveStylesheet(IStylesheet? stylesheet, int? userId = null);
 
     /// <summary>
-    ///     Deletes a stylesheet by its name
-    /// </summary>
-    /// <param name="path">Name incl. extension of the Stylesheet to delete</param>
-    /// <param name="userId">Optional id of the user deleting the stylesheet</param>
-    [Obsolete("Please use IStylesheetService for stylesheet operations. Scheduled for removal in Umbraco 18.")]
-    void DeleteStylesheet(string path, int? userId = null);
-
-    /// <summary>
-    ///     Creates a folder for style sheets
-    /// </summary>
-    /// <param name="folderPath"></param>
-    /// <returns></returns>
-    [Obsolete("Please use IStylesheetFolderService for stylesheet folder operations. Scheduled for removal in Umbraco 18.")]
-    void CreateStyleSheetFolder(string folderPath);
-
-    /// <summary>
-    ///     Deletes a folder for style sheets
-    /// </summary>
-    /// <param name="folderPath"></param>
-    [Obsolete("Please use IStylesheetFolderService for stylesheet folder operations. Scheduled for removal in Umbraco 18.")]
-    void DeleteStyleSheetFolder(string folderPath);
-
-    /// <summary>
-    ///     Gets the content of a stylesheet as a stream.
-    /// </summary>
-    /// <param name="filepath">The filesystem path to the stylesheet.</param>
-    /// <returns>The content of the stylesheet.</returns>
-    [Obsolete("Please use IStylesheetService for stylesheet operations. Scheduled for removal in Umbraco 18.")]
-    Stream GetStylesheetFileContentStream(string filepath);
-
-    /// <summary>
-    ///     Sets the content of a stylesheet.
-    /// </summary>
-    /// <param name="filepath">The filesystem path to the stylesheet.</param>
-    /// <param name="content">The content of the stylesheet.</param>
-    [Obsolete("Please use IStylesheetService for stylesheet operations. Scheduled for removal in Umbraco 18.")]
-    void SetStylesheetFileContent(string filepath, Stream content);
-
-    /// <summary>
-    ///     Gets the size of a stylesheet.
-    /// </summary>
-    /// <param name="filepath">The filesystem path to the stylesheet.</param>
-    /// <returns>The size of the stylesheet.</returns>
-    [Obsolete("Please use IStylesheetService for stylesheet operations. Scheduled for removal in Umbraco 18.")]
-    long GetStylesheetFileSize(string filepath);
-
-    /// <summary>
-    ///     Gets a list of all <see cref="IScript" /> objects
-    /// </summary>
-    /// <returns>An enumerable list of <see cref="IScript" /> objects</returns>
-    [Obsolete("Please use IScriptService for script operations. Scheduled for removal in Umbraco 18.")]
-    IEnumerable<IScript> GetScripts(params string[] names);
-
-    /// <summary>
     ///     Gets a <see cref="IScript" /> object by its name
     /// </summary>
     /// <param name="name">Name of the script incl. extension</param>
@@ -181,53 +56,6 @@ public interface IFileService : IService
     /// <param name="userId">Optional id of the user saving the script</param>
     [Obsolete("Please use IScriptService for script operations. Scheduled for removal in Umbraco 18.")]
     void SaveScript(IScript? script, int? userId = Constants.Security.SuperUserId);
-
-    /// <summary>
-    ///     Deletes a script by its name
-    /// </summary>
-    /// <param name="path">Name incl. extension of the Script to delete</param>
-    /// <param name="userId">Optional id of the user deleting the script</param>
-    [Obsolete("Please use IScriptService for script operations. Scheduled for removal in Umbraco 18.")]
-    void DeleteScript(string path, int? userId = null);
-
-    /// <summary>
-    ///     Creates a folder for scripts
-    /// </summary>
-    /// <param name="folderPath"></param>
-    /// <returns></returns>
-    [Obsolete("Please use IScriptFolderService for script folder operations. Scheduled for removal in Umbraco 18.")]
-    void CreateScriptFolder(string folderPath);
-
-    /// <summary>
-    ///     Deletes a folder for scripts
-    /// </summary>
-    /// <param name="folderPath"></param>
-    [Obsolete("Please use IScriptFolderService for script folder operations. Scheduled for removal in Umbraco 18.")]
-    void DeleteScriptFolder(string folderPath);
-
-    /// <summary>
-    ///     Gets the content of a script file as a stream.
-    /// </summary>
-    /// <param name="filepath">The filesystem path to the script.</param>
-    /// <returns>The content of the script file.</returns>
-    [Obsolete("Please use IScriptService for script operations. Scheduled for removal in Umbraco 18.")]
-    Stream GetScriptFileContentStream(string filepath);
-
-    /// <summary>
-    ///     Sets the content of a script file.
-    /// </summary>
-    /// <param name="filepath">The filesystem path to the script.</param>
-    /// <param name="content">The content of the script file.</param>
-    [Obsolete("Please use IScriptService for script operations. Scheduled for removal in Umbraco 18.")]
-    void SetScriptFileContent(string filepath, Stream content);
-
-    /// <summary>
-    ///     Gets the size of a script file.
-    /// </summary>
-    /// <param name="filepath">The filesystem path to the script file.</param>
-    /// <returns>The size of the script file.</returns>
-    [Obsolete("Please use IScriptService for script operations. Scheduled for removal in Umbraco 18.")]
-    long GetScriptFileSize(string filepath);
 
     /// <summary>
     ///     Gets a list of all <see cref="ITemplate" /> objects
@@ -260,43 +88,12 @@ public interface IFileService : IService
     ITemplate? GetTemplate(int id);
 
     /// <summary>
-    ///     Gets a <see cref="ITemplate" /> object by its guid identifier.
-    /// </summary>
-    /// <param name="id">The guid identifier of the template.</param>
-    /// <returns>The <see cref="ITemplate" /> object matching the identifier, or null.</returns>
-    [Obsolete("Please use ITemplateService for template operations. Scheduled for removal in Umbraco 18.")]
-    ITemplate? GetTemplate(Guid id);
-
-    /// <summary>
-    ///     Gets the template descendants
-    /// </summary>
-    /// <param name="masterTemplateId"></param>
-    /// <returns></returns>
-    [Obsolete("Please use ITemplateService for template operations. Scheduled for removal in Umbraco 18.")]
-    IEnumerable<ITemplate> GetTemplateDescendants(int masterTemplateId);
-
-    /// <summary>
     ///     Saves a <see cref="ITemplate" />
     /// </summary>
     /// <param name="template"><see cref="ITemplate" /> to save</param>
     /// <param name="userId">Optional id of the user saving the template</param>
     [Obsolete("Please use ITemplateService for template operations. Scheduled for removal in Umbraco 18.")]
     void SaveTemplate(ITemplate template, int userId = Constants.Security.SuperUserId);
-
-    /// <summary>
-    ///     Creates a template for a content type
-    /// </summary>
-    /// <param name="contentTypeAlias"></param>
-    /// <param name="contentTypeName"></param>
-    /// <param name="userId"></param>
-    /// <returns>
-    ///     The template created
-    /// </returns>
-    [Obsolete("Please use ITemplateService for template operations. Scheduled for removal in Umbraco 18.")]
-    Attempt<OperationResult<OperationResultType, ITemplate>?> CreateTemplateForContentType(
-        string contentTypeAlias,
-        string? contentTypeName,
-        int userId = Constants.Security.SuperUserId);
 
     /// <summary>
     ///     Creates a new template with identity, setting the content if a view exists in the filesystem.
@@ -317,36 +114,4 @@ public interface IFileService : IService
     /// <param name="userId">Optional id of the user deleting the template</param>
     [Obsolete("Please use ITemplateService for template operations. Scheduled for removal in Umbraco 18.")]
     void DeleteTemplate(string alias, int userId = Constants.Security.SuperUserId);
-
-    /// <summary>
-    ///     Saves a collection of <see cref="Template" /> objects
-    /// </summary>
-    /// <param name="templates">List of <see cref="Template" /> to save</param>
-    /// <param name="userId">Optional id of the user</param>
-    [Obsolete("Please use ITemplateService for template operations. Scheduled for removal in Umbraco 18.")]
-    void SaveTemplate(IEnumerable<ITemplate> templates, int userId = Constants.Security.SuperUserId);
-
-    /// <summary>
-    ///     Gets the content of a template as a stream.
-    /// </summary>
-    /// <param name="filepath">The filesystem path to the template.</param>
-    /// <returns>The content of the template.</returns>
-    [Obsolete("Please use ITemplateService for template operations. Scheduled for removal in Umbraco 18.")]
-    Stream GetTemplateFileContentStream(string filepath);
-
-    /// <summary>
-    ///     Sets the content of a template.
-    /// </summary>
-    /// <param name="filepath">The filesystem path to the template.</param>
-    /// <param name="content">The content of the template.</param>
-    [Obsolete("Please use ITemplateService for template operations. Scheduled for removal in Umbraco 18.")]
-    void SetTemplateFileContent(string filepath, Stream content);
-
-    /// <summary>
-    ///     Gets the size of a template.
-    /// </summary>
-    /// <param name="filepath">The filesystem path to the template.</param>
-    /// <returns>The size of the template.</returns>
-    [Obsolete("Please use ITemplateService for template operations. Scheduled for removal in Umbraco 18.")]
-    long GetTemplateFileSize(string filepath);
 }

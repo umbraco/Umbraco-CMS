@@ -35,20 +35,6 @@ public abstract class CopiedNotification<T> : ObjectNotification<T>
     }
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="CopiedNotification{T}"/> class.
-    /// </summary>
-    /// <param name="original">The original entity that was copied.</param>
-    /// <param name="copy">The copy of the entity.</param>
-    /// <param name="parentId">The ID of the new parent.</param>
-    /// <param name="relateToOriginal">A value indicating whether the copy is related to the original.</param>
-    /// <param name="messages">The event messages collection.</param>
-    [Obsolete("Please use constructor that takes a parent key. Scheduled for removal in Umbraco 18.")]
-    protected CopiedNotification(T original, T copy, int parentId, bool relateToOriginal, EventMessages messages)
-        : this(original, copy, parentId, null, relateToOriginal, messages)
-    {
-    }
-
-    /// <summary>
     ///     Gets the original entity that was copied.
     /// </summary>
     public T Original => Target;

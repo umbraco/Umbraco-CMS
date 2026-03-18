@@ -17,6 +17,10 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Element.Tree;
 
+/// <summary>
+/// Serves as the base controller for element tree operations within the Umbraco CMS Management API.
+/// Provides shared functionality for derived element tree controllers including user start node support and permission filtering.
+/// </summary>
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Tree}/{Constants.UdiEntityType.Element}")]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Element))]
 [Authorize(Policy = AuthorizationPolicies.SectionAccessForElementTree)]
@@ -27,6 +31,17 @@ public class ElementTreeControllerBase : UserStartNodeFolderTreeControllerBase<E
     private readonly IElementPresentationFactory _elementPresentationFactory;
     private readonly IElementPermissionFilterService _elementPermissionFilterService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ElementTreeControllerBase"/> class.
+    /// </summary>
+    /// <param name="entityService">Service for retrieving entity data.</param>
+    /// <param name="flagProviders">Collection of flag providers for tree item flags.</param>
+    /// <param name="userStartNodeEntitiesService">Service for user start node entity resolution.</param>
+    /// <param name="dataTypeService">Service for data type operations.</param>
+    /// <param name="appCaches">Application caches for performance optimization.</param>
+    /// <param name="backOfficeSecurityAccessor">Accessor for back office security context.</param>
+    /// <param name="elementPresentationFactory">Factory responsible for creating element presentation models.</param>
+    /// <param name="elementPermissionFilterService">Service for filtering tree entities based on element permissions.</param>
     public ElementTreeControllerBase(
         IEntityService entityService,
         FlagProviderCollection flagProviders,
@@ -68,7 +83,6 @@ public class ElementTreeControllerBase : UserStartNodeFolderTreeControllerBase<E
 
         if (entity is IElementEntitySlim elementEntitySlim)
         {
-            responseModel.HasChildren = false;
             responseModel.CreateDate = elementEntitySlim.CreateDate;
             responseModel.DocumentType = _elementPresentationFactory.CreateDocumentTypeReferenceResponseModel(elementEntitySlim);
             responseModel.Variants = _elementPresentationFactory.CreateVariantsItemResponseModels(elementEntitySlim);

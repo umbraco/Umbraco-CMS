@@ -29,6 +29,14 @@ internal static class TemplateFactory
 
     #region Implementation of IEntityFactory<ITemplate,TemplateDto>
 
+    /// <summary>
+    /// Constructs a <see cref="Umbraco.Cms.Core.Models.Template"/> entity from the provided data transfer object and related child definitions.
+    /// </summary>
+    /// <param name="shortStringHelper">The helper used for short string manipulation within the template.</param>
+    /// <param name="dto">The <see cref="TemplateDto"/> containing the template's persisted data.</param>
+    /// <param name="childDefinitions">A collection of child entities used to determine master template relationships.</param>
+    /// <param name="getFileContent">A function that retrieves the content of a <see cref="Umbraco.Cms.Core.Models.File"/> associated with the template, or <c>null</c> if unavailable.</param>
+    /// <returns>A fully constructed <see cref="Umbraco.Cms.Core.Models.Template"/> entity with properties populated from the DTO and related data.</returns>
     public static Template BuildEntity(
         IShortStringHelper shortStringHelper,
         TemplateDto dto,
@@ -63,6 +71,13 @@ internal static class TemplateFactory
         }
     }
 
+    /// <summary>
+    /// Creates a <see cref="TemplateDto"/> from the specified <see cref="Template"/> entity.
+    /// </summary>
+    /// <param name="entity">The template entity to convert.</param>
+    /// <param name="nodeObjectTypeId">An optional node object type identifier.</param>
+    /// <param name="primaryKey">The primary key value to assign to the resulting DTO.</param>
+    /// <returns>A <see cref="TemplateDto"/> representing the provided template entity.</returns>
     public static TemplateDto BuildDto(Template entity, Guid? nodeObjectTypeId, int primaryKey)
     {
         var dto = new TemplateDto {Alias = entity.Alias, NodeDto = BuildNodeDto(entity, nodeObjectTypeId)};

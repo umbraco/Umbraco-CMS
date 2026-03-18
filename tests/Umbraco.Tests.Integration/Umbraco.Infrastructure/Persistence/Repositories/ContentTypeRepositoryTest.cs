@@ -255,6 +255,7 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
                 (IScopeAccessor)provider,
                 AppCaches.Disabled,
                 LoggerFactory.CreateLogger<TemplateRepository>(),
+                LoggerFactory,
                 FileSystems,
                 ShortStringHelper,
                 Mock.Of<IViewHelper>(),

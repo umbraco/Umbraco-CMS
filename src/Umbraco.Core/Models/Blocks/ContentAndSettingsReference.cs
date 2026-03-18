@@ -11,19 +11,6 @@ public struct ContentAndSettingsReference : IEquatable<ContentAndSettingsReferen
     /// <summary>
     ///     Initializes a new instance of the <see cref="ContentAndSettingsReference" /> struct.
     /// </summary>
-    /// <param name="contentUdi">The content UDI.</param>
-    /// <param name="settingsUdi">The settings UDI.</param>
-    [Obsolete("Use constructor that accepts GUIDs instead. Scheduled for removal in Umbraco 18.")]
-    public ContentAndSettingsReference(Udi? contentUdi, Udi? settingsUdi)
-        : this(
-            (contentUdi as GuidUdi)?.Guid ?? throw new ArgumentException(nameof(contentUdi)),
-            (settingsUdi as GuidUdi)?.Guid)
-    {
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="ContentAndSettingsReference" /> struct.
-    /// </summary>
     /// <param name="contentKey">The content key.</param>
     /// <param name="settingsKey">The settings key.</param>
     public ContentAndSettingsReference(Guid contentKey, Guid? settingsKey)

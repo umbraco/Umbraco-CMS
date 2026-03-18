@@ -8,12 +8,20 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.ElementVersion;
 
+/// <summary>
+/// API controller responsible for updating the prevent-cleanup status of an element version.
+/// </summary>
 [ApiVersion("1.0")]
 public class UpdatePreventCleanupElementVersionController : ElementVersionControllerBase
 {
     private readonly IElementVersionService _elementVersionService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UpdatePreventCleanupElementVersionController"/> class.
+    /// </summary>
+    /// <param name="elementVersionService">Service for managing element versions.</param>
+    /// <param name="backOfficeSecurityAccessor">Accessor for back office security context.</param>
     public UpdatePreventCleanupElementVersionController(
         IElementVersionService elementVersionService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
@@ -22,6 +30,13 @@ public class UpdatePreventCleanupElementVersionController : ElementVersionContro
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
+    /// <summary>
+    /// Sets the prevent-cleanup status for an element version.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="id">The unique identifier of the element version.</param>
+    /// <param name="preventCleanup">Whether the version should be excluded from content history cleanup.</param>
+    /// <returns>An <see cref="IActionResult"/> representing the outcome of the operation.</returns>
     [MapToApiVersion("1.0")]
     [HttpPut("{id:guid}/prevent-cleanup")]
     [ProducesResponseType(StatusCodes.Status200OK)]

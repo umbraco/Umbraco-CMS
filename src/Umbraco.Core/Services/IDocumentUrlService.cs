@@ -10,8 +10,7 @@ public interface IDocumentUrlService
     /// <summary>
     /// Gets a value indicating whether the service has been initialized.
     /// </summary>
-    // TODO (V18): Remove the default implementation.
-    bool IsInitialized => false;
+    bool IsInitialized { get; }
 
     /// <summary>
     /// Initializes the service and ensure the content in the database is correct with the current configuration.

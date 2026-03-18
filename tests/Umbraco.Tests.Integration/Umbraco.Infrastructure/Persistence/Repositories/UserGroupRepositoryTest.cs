@@ -1,8 +1,8 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Linq;
 using Microsoft.Extensions.Logging;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models.Membership;
@@ -24,7 +24,15 @@ internal sealed class UserGroupRepositoryTest : UmbracoIntegrationTest
 
 
     private UserGroupRepository CreateRepository(IScopeProvider provider) =>
-        new((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<UserGroupRepository>(), LoggerFactory, ShortStringHelper, PermissionMappers);
+        new(
+            (IScopeAccessor)provider,
+            AppCaches.Disabled,
+            LoggerFactory.CreateLogger<UserGroupRepository>(),
+            LoggerFactory,
+            ShortStringHelper,
+            PermissionMappers,
+            Mock.Of<IRepositoryCacheVersionService>(),
+            Mock.Of<ICacheSyncService>());
 
     [Test]
     public void Can_Perform_Add_On_UserGroupRepository()
@@ -134,7 +142,16 @@ internal sealed class UserGroupRepositoryTest : UmbracoIntegrationTest
 
             var id = userGroup.Id;
 
-            var repository2 = new UserGroupRepository((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<UserGroupRepository>(), LoggerFactory, ShortStringHelper, PermissionMappers);
+            var repository2 = new UserGroupRepository(
+                (IScopeAccessor)provider,
+                AppCaches.Disabled,
+                LoggerFactory.CreateLogger<UserGroupRepository>(),
+                LoggerFactory,
+                ShortStringHelper,
+                PermissionMappers,
+                Mock.Of<IRepositoryCacheVersionService>(),
+                Mock.Of<ICacheSyncService>());
+
             repository2.Delete(userGroup);
             scope.Complete();
 

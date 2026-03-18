@@ -12,6 +12,8 @@ const test = base.extend<{ umbracoApi: ApiHelpers } & { umbracoUi: UiHelpers }>(
     try {
       const filePath = process.env.STORAGE_STATE_PATH;
       if (filePath) {
+        // Clear localStorage so preferences (e.g. selected language) don't leak between tests
+        await page.evaluate(() => localStorage.clear());
         await page.context().storageState({path: filePath});
       }
     } catch {

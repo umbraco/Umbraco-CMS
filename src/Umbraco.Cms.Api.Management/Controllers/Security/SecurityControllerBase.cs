@@ -6,6 +6,10 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Security;
 
+/// <summary>
+/// Serves as the base controller for implementing security-related operations in the management API.
+/// Provides common functionality for derived security controllers.
+/// </summary>
 [VersionedApiBackOfficeRoute("security")]
 [ApiExplorerSettings(GroupName = "Security")]
 public abstract class SecurityControllerBase : ManagementApiControllerBase

@@ -5,9 +5,16 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Delete.Data;
 
+/// <summary>
+/// Provides a builder for creating delete data migration expressions.
+/// </summary>
 public class DeleteDataBuilder : ExpressionBuilderBase<DeleteDataExpression>,
     IDeleteDataBuilder
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Migrations.Expressions.Delete.Data.DeleteDataBuilder"/> class.
+    /// </summary>
+    /// <param name="expression">The <see cref="DeleteDataExpression"/> that defines the data to be deleted in the migration.</param>
     public DeleteDataBuilder(DeleteDataExpression expression)
         : base(expression)
     {

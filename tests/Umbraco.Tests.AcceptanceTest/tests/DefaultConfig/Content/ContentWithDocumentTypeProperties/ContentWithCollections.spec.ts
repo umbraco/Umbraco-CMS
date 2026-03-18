@@ -59,11 +59,11 @@ test('can create child content in a collection', async ({umbracoApi, umbracoUi})
   const childData = await umbracoApi.document.getChildren(contentId);
   expect(childData.length).toBe(expectedNames.length);
   expect(childData[0].variants[0].name).toBe(firstChildContentName);
-  // verify that the child content displays in collection list after reloading tree
+  // verify that the child content displays in collection grid after reloading tree
   await umbracoUi.content.clickActionsMenuForContent(contentName);
   await umbracoUi.content.clickReloadChildrenActionMenuOption();
   await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.content.doesDocumentTableColumnNameValuesMatch(expectedNames);
+  await umbracoUi.content.isContentWithNameVisibleInGrid(expectedNames[0]);
 
   // Clean
   await umbracoApi.document.ensureNameNotExists(firstChildContentName);
@@ -92,11 +92,12 @@ test('can create multiple child nodes in a collection', async ({umbracoApi, umbr
   expect(childData.length).toBe(expectedNames.length);
   expect(childData[0].variants[0].name).toBe(firstChildContentName);
   expect(childData[1].variants[0].name).toBe(secondChildContentName);
-  // verify that the child content displays in collection list after reloading tree
+  // verify that the child content displays in collection grid after reloading tree
   await umbracoUi.content.clickActionsMenuForContent(contentName);
   await umbracoUi.content.clickReloadChildrenActionMenuOption();
   await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.content.doesDocumentTableColumnNameValuesMatch(expectedNames);
+  await umbracoUi.content.isContentWithNameVisibleInGrid(expectedNames[0]);
+  await umbracoUi.content.isContentWithNameVisibleInGrid(expectedNames[1]);
 
   // Clean
   await umbracoApi.document.ensureNameNotExists(firstChildContentName);
@@ -107,7 +108,7 @@ test('can create multiple child nodes in a collection', async ({umbracoApi, umbr
 test('can search in a collection of content', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const searchKeyword = 'First';
-  const expectedSearchResult = [firstChildContentName];
+  const expectedSearchResult = firstChildContentName;
   const childDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentType(childDocumentTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNodeAndCollectionId(documentTypeName, childDocumentTypeId, dataTypeData.id);
   const contentId = await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
@@ -121,7 +122,7 @@ test('can search in a collection of content', async ({umbracoApi, umbracoUi}) =>
   await umbracoUi.content.searchByKeywordInCollection(searchKeyword);
 
   // Assert
-  await umbracoUi.content.doesDocumentTableColumnNameValuesMatch(expectedSearchResult);
+  await umbracoUi.content.isContentWithNameVisibleInGrid(expectedSearchResult);
 
   // Clean
   await umbracoApi.document.ensureNameNotExists(firstChildContentName);

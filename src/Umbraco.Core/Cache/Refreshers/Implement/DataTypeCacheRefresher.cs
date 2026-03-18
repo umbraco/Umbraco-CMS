@@ -62,46 +62,6 @@ public sealed class DataTypeCacheRefresher : PayloadCacheRefresherBase<DataTypeC
         _contentTypeCommonRepository = contentTypeCommonRepository;
     }
 
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="DataTypeCacheRefresher" /> class.
-    /// </summary>
-    /// <param name="appCaches">The application caches.</param>
-    /// <param name="serializer">The JSON serializer.</param>
-    /// <param name="idKeyMap">The ID-key mapping service.</param>
-    /// <param name="eventAggregator">The event aggregator.</param>
-    /// <param name="factory">The cache refresher notification factory.</param>
-    /// <param name="publishedModelFactory">The published model factory.</param>
-    /// <param name="publishedContentTypeFactory">The published content type factory.</param>
-    /// <param name="publishedContentTypeCache">The published content type cache.</param>
-    /// <param name="documentCacheService">The document cache service.</param>
-    /// <param name="mediaCacheService">The media cache service.</param>
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 18.")]
-    public DataTypeCacheRefresher(
-        AppCaches appCaches,
-        IJsonSerializer serializer,
-        IIdKeyMap idKeyMap,
-        IEventAggregator eventAggregator,
-        ICacheRefresherNotificationFactory factory,
-        IPublishedModelFactory publishedModelFactory,
-        IPublishedContentTypeFactory publishedContentTypeFactory,
-        IPublishedContentTypeCache publishedContentTypeCache,
-        IDocumentCacheService documentCacheService,
-        IMediaCacheService mediaCacheService)
-        : this(
-            appCaches,
-            serializer,
-            idKeyMap,
-            eventAggregator,
-            factory,
-            publishedModelFactory,
-            publishedContentTypeFactory,
-            publishedContentTypeCache,
-            documentCacheService,
-            mediaCacheService,
-            StaticServiceProvider.Instance.GetRequiredService<IContentTypeCommonRepository>())
-    {
-    }
-
     #region Json
 
     /// <summary>

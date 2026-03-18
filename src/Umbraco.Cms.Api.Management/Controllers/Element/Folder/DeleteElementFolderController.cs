@@ -11,11 +11,20 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Element.Folder;
 
+/// <summary>
+/// API controller responsible for deleting element folders in the Umbraco CMS.
+/// </summary>
 [ApiVersion("1.0")]
 public class DeleteElementFolderController : ElementFolderControllerBase
 {
     private readonly IAuthorizationService _authorizationService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DeleteElementFolderController"/> class.
+    /// </summary>
+    /// <param name="authorizationService">Service used to authorize element folder deletion operations.</param>
+    /// <param name="backOfficeSecurityAccessor">Accessor for back office security context.</param>
+    /// <param name="elementContainerService">Service for managing element containers.</param>
     public DeleteElementFolderController(
         IAuthorizationService authorizationService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
@@ -23,6 +32,12 @@ public class DeleteElementFolderController : ElementFolderControllerBase
         : base(backOfficeSecurityAccessor, elementContainerService) =>
         _authorizationService = authorizationService;
 
+    /// <summary>
+    /// Deletes the element folder with the specified unique identifier.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="id">The unique identifier of the element folder to delete.</param>
+    /// <returns>An <see cref="IActionResult"/> indicating the outcome of the delete operation.</returns>
     [HttpDelete("{id:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
