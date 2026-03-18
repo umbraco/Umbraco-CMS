@@ -138,7 +138,9 @@ internal sealed class PropertyDataCultureResolverTests
         PropertyDataCultureResolver.CreateMigrationProperty(
             propertyType, "test value", culture: null, segment: null);
 
-        Assert.That(propertyType.VariesByCulture(), Is.True,
+        Assert.That(
+            propertyType.Variations,
+            Is.EqualTo(ContentVariation.Culture),
             "Original property type Variations must not be modified");
     }
 
