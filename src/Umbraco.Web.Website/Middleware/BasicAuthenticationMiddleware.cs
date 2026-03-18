@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Services;
@@ -23,6 +22,12 @@ public class BasicAuthenticationMiddleware : IMiddleware
     private readonly IRuntimeState _runtimeState;
     private readonly string _backOfficePath;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="BasicAuthenticationMiddleware"/> class.
+    /// </summary>
+    /// <param name="runtimeState">The runtime state used to determine if the application is running.</param>
+    /// <param name="basicAuthService">The service providing basic authentication configuration and validation.</param>
+    /// <param name="hostingEnvironment">The hosting environment used to resolve the backoffice path.</param>
     public BasicAuthenticationMiddleware(
         IRuntimeState runtimeState,
         IBasicAuthService basicAuthService,
