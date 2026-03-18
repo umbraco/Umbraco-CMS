@@ -11,7 +11,8 @@ namespace Umbraco.Cms.Web.Website.Routing;
 
 /// <summary>
 /// Creates routes for the standalone basic auth login controller.
-/// Only active when basic auth is enabled and <see cref="IBackOfficeSignInManager"/> is available.
+/// Routes are always registered when the runtime level is <see cref="RuntimeLevel.Run"/>;
+/// access control is enforced at the controller level, which returns 404 when basic auth is disabled.
 /// </summary>
 internal sealed class BasicAuthLoginRoutes : IAreaRoutes
 {

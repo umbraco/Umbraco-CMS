@@ -1,8 +1,5 @@
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using OpenIddict.Server;
 using Umbraco.Cms.Api.Common.DependencyInjection;
 using Umbraco.Cms.Api.Management.Configuration;
@@ -10,14 +7,11 @@ using Umbraco.Cms.Api.Management.Handlers;
 using Umbraco.Cms.Api.Management.Middleware;
 using Umbraco.Cms.Api.Management.Security;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Security;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Security;
 using Umbraco.Cms.Web.Common.ApplicationBuilder;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.DependencyInjection;
 

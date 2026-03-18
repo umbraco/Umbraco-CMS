@@ -61,17 +61,19 @@ public class BasicAuthenticationMiddleware : IMiddleware
 
         // Check if backoffice auth scheme is registered before attempting cookie authentication.
         // When only AddCore() is used (without AddBackOfficeSignIn() or AddBackOffice()),
-        // the UmbracoBackOffice scheme does not exist and AuthenticateBackOfficeAsync() would throw.
-        IAuthenticationSchemeProvider schemeProvider = context.RequestServices.GetRequiredService<IAuthenticationSchemeProvider>();
-        AuthenticationScheme? backOfficeScheme = await schemeProvider.GetSchemeAsync(Cms.Core.Constants.Security.BackOfficeAuthenticationType);
-
-        if (backOfficeScheme is not null)
+        // authentication services and the UmbracoBackOffice scheme may not be registered.
+        IAuthenticationSchemeProvider? schemeProvider = context.RequestServices.GetService<IAuthenticationSchemeProvider>();
+        if (schemeProvider is not null)
         {
-            AuthenticateResult authenticateResult = await context.AuthenticateBackOfficeAsync();
-            if (authenticateResult.Succeeded)
+            AuthenticationScheme? backOfficeScheme = await schemeProvider.GetSchemeAsync(Cms.Core.Constants.Security.BackOfficeAuthenticationType);
+            if (backOfficeScheme is not null)
             {
-                await next(context);
-                return;
+                AuthenticateResult authenticateResult = await context.AuthenticateBackOfficeAsync();
+                if (authenticateResult.Succeeded)
+                {
+                    await next(context);
+                    return;
+                }
             }
         }
 
@@ -108,7 +110,7 @@ public class BasicAuthenticationMiddleware : IMiddleware
         }
         else
         {
-            // no authorization header
+            // No authorization header.
             HandleUnauthorized(context);
         }
     }

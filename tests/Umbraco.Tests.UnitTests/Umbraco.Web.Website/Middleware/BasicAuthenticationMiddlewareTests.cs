@@ -287,6 +287,31 @@ public class BasicAuthenticationMiddlewareTests
     }
 
     /// <summary>
+    /// Verifies that when no authentication services are registered (AddCore().AddWebsite() only),
+    /// the middleware does not throw and falls through to HandleUnauthorized gracefully.
+    /// </summary>
+    [Test]
+    public async Task InvokeAsync_NoAuthenticationServicesRegistered_DoesNotThrow_HandleUnauthorized()
+    {
+        _basicAuthServiceMock.Setup(x => x.IsRedirectToLoginPageEnabled()).Returns(false);
+
+        // Create context without authentication services (no IAuthenticationSchemeProvider)
+        var services = new ServiceCollection();
+        services.AddLogging();
+        ServiceProvider serviceProvider = services.BuildServiceProvider();
+
+        var httpContext = new DefaultHttpContext { RequestServices = serviceProvider };
+        httpContext.Request.Path = "/protected-page";
+        httpContext.Request.Scheme = "https";
+        httpContext.Request.Host = new HostString("localhost");
+
+        await _middleware.InvokeAsync(httpContext, NextDelegate());
+
+        Assert.IsFalse(_nextCalled);
+        Assert.That(httpContext.Response.StatusCode, Is.EqualTo(401));
+    }
+
+    /// <summary>
     /// Verifies that the return path in the login redirect is URL-encoded.
     /// </summary>
     [Test]
