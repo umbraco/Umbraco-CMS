@@ -26,6 +26,9 @@ public class DateTimeDataValueEditorSortableTests
     private static readonly IJsonSerializer _jsonSerializer =
         new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
 
+    /// <summary>
+    /// Tests that GetSortableValue returns null when the input value is null.
+    /// </summary>
     [Test]
     public void GetSortableValue_Returns_Null_For_Null_Value()
     {
@@ -36,6 +39,9 @@ public class DateTimeDataValueEditorSortableTests
         Assert.IsNull(result);
     }
 
+    /// <summary>
+    /// Tests that GetSortableValue returns null when given an empty string.
+    /// </summary>
     [Test]
     public void GetSortableValue_Returns_Null_For_Empty_String()
     {
@@ -46,6 +52,9 @@ public class DateTimeDataValueEditorSortableTests
         Assert.IsNull(result);
     }
 
+    /// <summary>
+    /// Tests that GetSortableValue returns null when the input string is whitespace.
+    /// </summary>
     [Test]
     public void GetSortableValue_Returns_Null_For_Whitespace_String()
     {
@@ -56,6 +65,9 @@ public class DateTimeDataValueEditorSortableTests
         Assert.IsNull(result);
     }
 
+    /// <summary>
+    /// Tests that GetSortableValue returns null when the value is not a string.
+    /// </summary>
     [Test]
     public void GetSortableValue_Returns_Null_For_Non_String_Value()
     {
@@ -66,6 +78,9 @@ public class DateTimeDataValueEditorSortableTests
         Assert.IsNull(result);
     }
 
+    /// <summary>
+    /// Tests that GetSortableValue returns null when the input JSON is invalid.
+    /// </summary>
     [Test]
     public void GetSortableValue_Returns_Null_For_Invalid_Json()
     {
@@ -76,6 +91,9 @@ public class DateTimeDataValueEditorSortableTests
         Assert.IsNull(result);
     }
 
+    /// <summary>
+    /// Tests that GetSortableValue returns the default date when the JSON input lacks a date field.
+    /// </summary>
     [Test]
     public void GetSortableValue_Returns_Default_Date_For_Json_Without_Date_Field()
     {
@@ -91,6 +109,9 @@ public class DateTimeDataValueEditorSortableTests
         Assert.That(result, Does.StartWith("0001-01-01T00:00:00"));
     }
 
+    /// <summary>
+    /// Tests that GetSortableValue returns the default date when given an empty JSON object.
+    /// </summary>
     [Test]
     public void GetSortableValue_Returns_Default_Date_For_Empty_Json_Object()
     {
@@ -104,6 +125,9 @@ public class DateTimeDataValueEditorSortableTests
         Assert.That(result, Does.StartWith("0001-01-01T00:00:00"));
     }
 
+    /// <summary>
+    /// Tests that GetSortableValue returns a UTC normalized value for a UTC date.
+    /// </summary>
     [Test]
     public void GetSortableValue_Returns_Utc_Normalized_Value_For_Utc_Date()
     {
@@ -117,6 +141,9 @@ public class DateTimeDataValueEditorSortableTests
         Assert.That(result, Does.StartWith("2024-06-15T10:30:00"));
     }
 
+    /// <summary>
+    /// Tests that GetSortableValue correctly converts a DateTimeOffset with a positive offset to UTC.
+    /// </summary>
     [Test]
     public void GetSortableValue_Converts_Positive_Offset_To_Utc()
     {
@@ -132,6 +159,9 @@ public class DateTimeDataValueEditorSortableTests
         Assert.That(result, Does.EndWith("+00:00").Or.EndWith("Z"));
     }
 
+    /// <summary>
+    /// Tests that GetSortableValue correctly converts a DateTimeOffset with a negative offset to UTC.
+    /// </summary>
     [Test]
     public void GetSortableValue_Converts_Negative_Offset_To_Utc()
     {
@@ -147,6 +177,9 @@ public class DateTimeDataValueEditorSortableTests
         Assert.That(result, Does.EndWith("+00:00").Or.EndWith("Z"));
     }
 
+    /// <summary>
+    /// Tests that GetSortableValue correctly handles dates crossing day boundaries by converting to UTC.
+    /// </summary>
     [Test]
     public void GetSortableValue_Handles_Date_Crossing_Day_Boundary()
     {
@@ -161,6 +194,9 @@ public class DateTimeDataValueEditorSortableTests
         Assert.That(result, Does.Contain("2024-06-15T18:00:00"));
     }
 
+    /// <summary>
+    /// Tests that GetSortableValue correctly handles a date crossing to the previous day when converting from a time zone with a positive offset.
+    /// </summary>
     [Test]
     public void GetSortableValue_Handles_Date_Crossing_To_Previous_Day()
     {
@@ -175,6 +211,10 @@ public class DateTimeDataValueEditorSortableTests
         Assert.That(result, Does.Contain("2024-06-14T20:00:00"));
     }
 
+    /// <summary>
+    /// Tests that GetSortableValue produces lexicographically sortable values that correspond to chronological order,
+    /// ensuring correct sorting of DateTimeOffset values with different time zones.
+    /// </summary>
     [Test]
     public void GetSortableValue_Produces_Lexicographically_Sortable_Values()
     {
@@ -202,6 +242,9 @@ public class DateTimeDataValueEditorSortableTests
         Assert.AreEqual(sortableValues[2], sorted[2], "December date should be third");
     }
 
+    /// <summary>
+    /// Tests that the GetSortableValue method returns a valid ISO 8601 formatted string.
+    /// </summary>
     [Test]
     public void GetSortableValue_Returns_Valid_Iso8601_Format()
     {
@@ -216,6 +259,9 @@ public class DateTimeDataValueEditorSortableTests
         Assert.That(DateTimeOffset.TryParse(result, CultureInfo.InvariantCulture, DateTimeStyles.None, out _), Is.True);
     }
 
+    /// <summary>
+    /// Tests that the GetSortableValue method uses the MinDate component when the value is TimeOnly.
+    /// </summary>
     [Test]
     public void GetSortableValue_TimeOnly_Uses_MinDate_Component()
     {
@@ -230,6 +276,9 @@ public class DateTimeDataValueEditorSortableTests
         Assert.That(result, Does.StartWith("0001-01-01T14:30:00"));
     }
 
+    /// <summary>
+    /// Verifies that the <c>GetSortableValue</c> method returns time values in a format that preserves chronological order when using the TimeOnly property editor.
+    /// </summary>
     [Test]
     public void GetSortableValue_TimeOnly_Produces_Sortable_Times()
     {
@@ -250,6 +299,9 @@ public class DateTimeDataValueEditorSortableTests
         CollectionAssert.AreEqual(sortableValues, sorted, "Times should already be in chronological order");
     }
 
+    /// <summary>
+    /// Tests that the GetSortableValue method produces sortable date strings for date-only values.
+    /// </summary>
     [Test]
     public void GetSortableValue_DateOnly_Produces_Sortable_Dates()
     {

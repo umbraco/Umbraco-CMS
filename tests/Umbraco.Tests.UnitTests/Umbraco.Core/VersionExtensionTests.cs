@@ -6,6 +6,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core;
 
+/// <summary>
+/// Contains unit tests for the extension methods of the <see cref="Version"/> class in Umbraco.
+/// </summary>
 [TestFixture]
 public class VersionExtensionTests
 {

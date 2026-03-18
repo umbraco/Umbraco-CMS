@@ -6,11 +6,18 @@ using Umbraco.Cms.Core.Serialization;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Media.EmbedProviders;
 
+/// <summary>
+/// Contains unit tests for the <see cref="IssuuEmbedProvider"/> class, verifying its embedding functionality and behavior.
+/// </summary>
 [TestFixture]
 public class IssuuEmbedProviderTests : OEmbedProviderTestBase
 {
     protected override IEmbedProvider Provider { get; } = new Issuu(Mock.Of<IJsonSerializer>());
 
+    /// <summary>
+    /// Tests that the URL scheme regex correctly matches valid Issuu URLs.
+    /// </summary>
+    /// <param name="url">The URL to test against the regex.</param>
     [TestCase("https://www.issuu.com/username/docs/document")]
     [TestCase("https://issuu.com/username/docs/document")]
     [TestCase("http://www.issuu.com/username/docs/document")]
@@ -23,6 +30,10 @@ public class IssuuEmbedProviderTests : OEmbedProviderTestBase
         Assert.That(result, Is.True, $"Expected URL to match: {url}");
     }
 
+    /// <summary>
+    /// Tests that the URL scheme regex does not match malicious URLs to prevent SSRF attacks.
+    /// </summary>
+    /// <param name="url">The URL to test against the regex.</param>
     [TestCase("http://127.0.0.1/issuu.com/username/docs/document")]
     [TestCase("http://localhost/issuu.com/username/docs/document")]
     [TestCase("http://example.com/issuu.com/username/docs/document")]
@@ -34,6 +45,10 @@ public class IssuuEmbedProviderTests : OEmbedProviderTestBase
         Assert.That(result, Is.False, $"Expected URL to NOT match (SSRF protection): {url}");
     }
 
+    /// <summary>
+    /// Tests that the URL scheme regex does not match unrelated URLs.
+    /// </summary>
+    /// <param name="url">The URL to test against the regex.</param>
     [TestCase("https://www.youtube.com/watch?v=abc123")]
     [TestCase("https://notissuu.com/username/docs/document")]
     public void UrlSchemeRegex_DoesNotMatchUnrelatedUrls(string url)
@@ -43,10 +58,11 @@ public class IssuuEmbedProviderTests : OEmbedProviderTestBase
         Assert.That(result, Is.False, $"Expected URL to NOT match: {url}");
     }
 
-    /// <summary>
-    /// Tests that URLs with extra path segments before /docs/ are not matched.
-    /// The publisher name should be a single path segment.
-    /// </summary>
+/// <summary>
+/// Tests that URLs with extra path segments before /docs/ are not matched.
+/// The publisher name should be a single path segment.
+/// </summary>
+/// <param name="url">The URL to test against the regex.</param>
     [TestCase("https://issuu.com/publisher/extra/docs/document")]
     [TestCase("https://issuu.com/publisher/nested/path/docs/document")]
     public void UrlSchemeRegex_DoesNotMatchUrlsWithExtraPathSegments(string url)

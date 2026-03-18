@@ -10,14 +10,24 @@ using Umbraco.Cms.Tests.Common.Builders.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models;
 
+/// <summary>
+/// Contains unit tests for the <see cref="PropertyGroup"/> class, verifying its behavior and functionality.
+/// </summary>
 [TestFixture]
 public class PropertyGroupTests
 {
+    /// <summary>
+    /// Sets up the test environment before each test is run.
+    /// </summary>
     [SetUp]
     public void SetUp() => _builder = new PropertyGroupBuilder();
 
     private PropertyGroupBuilder _builder;
 
+    /// <summary>
+    /// Tests that a PropertyGroup can be deep cloned correctly.
+    /// Ensures all properties and nested objects are cloned and not referenced.
+    /// </summary>
     [Test]
     public void Can_Deep_Clone()
     {
@@ -50,6 +60,9 @@ public class PropertyGroupTests
         }
     }
 
+    /// <summary>
+    /// Tests that a PropertyGroup can be serialized to JSON without throwing an error.
+    /// </summary>
     [Test]
     public void Can_Serialize_Without_Error()
     {

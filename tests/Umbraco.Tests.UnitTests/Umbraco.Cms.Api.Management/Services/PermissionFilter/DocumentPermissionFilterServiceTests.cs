@@ -12,6 +12,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Management.Services.PermissionFilter;
 
+/// <summary>
+/// Contains unit tests for the <see cref="DocumentPermissionFilterService"/>, verifying its permission filtering logic and behavior.
+/// </summary>
 [TestFixture]
 public class DocumentPermissionFilterServiceTests
 {
@@ -20,15 +23,27 @@ public class DocumentPermissionFilterServiceTests
         private readonly Guid _userKey = Guid.NewGuid();
 
         private DocumentPermissionFilterService? _sut;
+    /// <summary>
+    /// Gets the system under test: an instance of <see cref="DocumentPermissionFilterService"/>.
+    /// </summary>
         public DocumentPermissionFilterService Sut =>
             _sut ??= new DocumentPermissionFilterService(
                 BackOfficeSecurityAccessor.Object,
                 UserService.Object);
 
+    /// <summary>
+    /// Gets the mock instance of <see cref="IBackOfficeSecurityAccessor"/> used for testing.
+    /// </summary>
         public Mock<IBackOfficeSecurityAccessor> BackOfficeSecurityAccessor { get; } = new();
 
+    /// <summary>
+    /// Gets the mock instance of <see cref="IUserService"/> used for testing.
+    /// </summary>
         public Mock<IUserService> UserService { get; } = new();
 
+    /// <summary>
+    /// Sets up the current user for the permission filter service tests.
+    /// </summary>
         public void SetupCurrentUser()
         {
             var userMock = new Mock<IUser>();
@@ -42,6 +57,10 @@ public class DocumentPermissionFilterServiceTests
                 .Returns(backOfficeSecurityMock.Object);
         }
 
+    /// <summary>
+    /// Sets up the user service to return the specified document permissions asynchronously.
+    /// </summary>
+    /// <param name="permissions">The collection of node permissions to return.</param>
         public void SetupGetDocumentPermissionsAsync(IEnumerable<NodePermissions> permissions)
         {
             var attempt = Attempt.SucceedWithStatus(UserOperationStatus.Success, permissions);
@@ -56,6 +75,10 @@ public class DocumentPermissionFilterServiceTests
     [SetUp]
     public void SetUp() => _setup = new DocumentPermissionFilterServiceSetup();
 
+    /// <summary>
+    /// Tests that FilterAsync returns all entities when all have browse permission.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task FilterAsync_ReturnsAllEntities_WhenAllHaveBrowsePermission()
     {
@@ -73,6 +96,10 @@ public class DocumentPermissionFilterServiceTests
         Assert.AreEqual(100, totalItems);
     }
 
+    /// <summary>
+    /// Tests that the FilterAsync method correctly filters out entities that the current user is denied browse permission for.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task FilterAsync_FiltersEntities_WhenSomeAreDeniedBrowsePermission()
     {
@@ -97,6 +124,10 @@ public class DocumentPermissionFilterServiceTests
         Assert.IsTrue(filteredEntities.Any(e => e.Key == entities[2].Key));
     }
 
+    /// <summary>
+    /// Tests that FilterAsync includes entities when no permission entry exists for them.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task FilterAsync_IncludesEntities_WhenNoPermissionEntryExists()
     {
@@ -118,6 +149,10 @@ public class DocumentPermissionFilterServiceTests
         Assert.AreEqual(100, totalItems);
     }
 
+    /// <summary>
+    /// Tests that FilterAsync filters out all entities when none have browse permission.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task FilterAsync_FiltersAllEntities_WhenNoneHaveBrowsePermission()
     {
@@ -135,6 +170,10 @@ public class DocumentPermissionFilterServiceTests
         Assert.AreEqual(97, totalItems);
     }
 
+    /// <summary>
+    /// Tests that FilterAsync returns all sibling entities when all have browse permission.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task FilterAsync_Siblings_ReturnsAllEntities_WhenAllHaveBrowsePermission()
     {
@@ -154,6 +193,10 @@ public class DocumentPermissionFilterServiceTests
         Assert.AreEqual(20, totalAfter);
     }
 
+    /// <summary>
+    /// Tests that when filtering siblings, the total count before the target is decremented if an entity before the target is filtered out.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task FilterAsync_Siblings_DecrementsTotalBefore_WhenEntityBeforeTargetIsFiltered()
     {
@@ -179,6 +222,10 @@ public class DocumentPermissionFilterServiceTests
         Assert.AreEqual(20, totalAfter); // Unchanged
     }
 
+    /// <summary>
+    /// Tests that filtering siblings decrements the totalAfter count when an entity after the target is filtered out.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task FilterAsync_Siblings_DecrementsTotalAfter_WhenEntityAfterTargetIsFiltered()
     {
@@ -204,6 +251,11 @@ public class DocumentPermissionFilterServiceTests
         Assert.AreEqual(19, totalAfter); // Decremented by 1
     }
 
+    /// <summary>
+    /// Tests that the FilterAsync method correctly decrements both totalBefore and totalAfter counts
+    /// when entities before and after the target entity are filtered out due to lack of browse permissions.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task FilterAsync_Siblings_DecrementsBothTotals_WhenEntitiesBeforeAndAfterAreFiltered()
     {
@@ -229,6 +281,10 @@ public class DocumentPermissionFilterServiceTests
         Assert.AreEqual(18, totalAfter); // Decremented by 2
     }
 
+    /// <summary>
+    /// Tests that filtering siblings does not affect the total counts when the target entity itself is filtered out.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task FilterAsync_Siblings_DoesNotAffectTotals_WhenTargetEntityIsFiltered()
     {

@@ -6,9 +6,17 @@ using Umbraco.Cms.Core.Routing;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Routing;
 
+/// <summary>
+/// Contains unit tests for the <see cref="Umbraco.Core.Routing.WebPath"/> class.
+/// </summary>
 [TestFixture]
 public class WebPathTests
 {
+    /// <summary>
+    /// Combines multiple path parts into a single normalized path.
+    /// </summary>
+    /// <param name="parts">The parts of the path to combine.</param>
+    /// <returns>A combined path string with normalized separators.</returns>
     [Test]
     [TestCase("/umbraco", "config", "lang", ExpectedResult = "/umbraco/config/lang")]
     [TestCase("/umbraco", "/config", "/lang", ExpectedResult = "/umbraco/config/lang")]
@@ -24,14 +32,26 @@ public class WebPathTests
     [TestCase("https://hello.com/", "/world", ExpectedResult = "https://hello.com/world")]
     public string Combine(params string[] parts) => WebPath.Combine(parts);
 
+    /// <summary>
+    /// Tests that the Combine method correctly handles an empty array input.
+    /// </summary>
     [Test]
     public void Combine_must_handle_empty_array() =>
         Assert.AreEqual(string.Empty, WebPath.Combine(Array.Empty<string>()));
 
+    /// <summary>
+    /// Tests that the Combine method throws an ArgumentNullException when passed a null argument.
+    /// </summary>
     [Test]
     public void Combine_must_handle_null() => Assert.Throws<ArgumentNullException>(() => WebPath.Combine(null));
 
 
+    /// <summary>
+    /// Determines whether the specified web path is well-formed according to the given URI kind.
+    /// </summary>
+    /// <param name="webPath">The web path to validate.</param>
+    /// <param name="uriKind">The kind of URI to validate against (Absolute, Relative, or RelativeOrAbsolute).</param>
+    /// <returns>True if the web path is well-formed for the specified URI kind; otherwise, false.</returns>
     [Test]
     [TestCase("ftp://hello.com/", UriKind.Absolute, ExpectedResult = true)]
     [TestCase("file:///hello.com/", UriKind.Absolute, ExpectedResult = true)]

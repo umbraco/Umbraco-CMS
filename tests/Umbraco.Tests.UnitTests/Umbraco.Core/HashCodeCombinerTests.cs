@@ -8,6 +8,9 @@ using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core;
 
+/// <summary>
+/// Unit tests for the <see cref="Umbraco.Core.HashCodeCombiner"/> class.
+/// </summary>
 [TestFixture]
 public class HashCodeCombinerTests
 {
@@ -24,6 +27,9 @@ public class HashCodeCombinerTests
         return dir;
     }
 
+    /// <summary>
+    /// Tests the HashCodeCombiner with case insensitive string inputs to ensure consistent hash codes.
+    /// </summary>
     [Test]
     public void HashCombiner_Test_String()
     {
@@ -40,6 +46,9 @@ public class HashCodeCombinerTests
         Assert.AreNotEqual(combiner1.GetCombinedHashCode(), combiner2.GetCombinedHashCode());
     }
 
+    /// <summary>
+    /// Tests the HashCodeCombiner's ability to combine integer hash codes correctly.
+    /// </summary>
     [Test]
     public void HashCombiner_Test_Int()
     {
@@ -56,6 +65,9 @@ public class HashCodeCombinerTests
         Assert.AreNotEqual(combiner1.GetCombinedHashCode(), combiner2.GetCombinedHashCode());
     }
 
+    /// <summary>
+    /// Tests the HashCodeCombiner's handling of DateTime values to ensure consistent and distinct combined hash codes.
+    /// </summary>
     [Test]
     public void HashCombiner_Test_DateTime()
     {
@@ -73,6 +85,12 @@ public class HashCodeCombinerTests
         Assert.AreNotEqual(combiner1.GetCombinedHashCode(), combiner2.GetCombinedHashCode());
     }
 
+    /// <summary>
+    /// Tests the <see cref="HashCodeCombiner"/> when combining hash codes for files.
+    /// Verifies that files with identical contents but different metadata (such as creation dates) produce different hash codes,
+    /// and that adding the same file multiple times affects the combined hash code as expected.
+    /// Also ensures that combining the same file in separate instances yields consistent hash codes.
+    /// </summary>
     [Test]
     public void HashCombiner_Test_File()
     {
@@ -109,6 +127,11 @@ public class HashCodeCombinerTests
         Assert.AreNotEqual(combiner1.GetCombinedHashCode(), combiner2.GetCombinedHashCode());
     }
 
+    /// <summary>
+    /// Tests the hash code combiner functionality for folders.
+    /// Ensures that adding the same folder twice results in the same combined hash code,
+    /// and that adding a new file to the folder changes the combined hash code.
+    /// </summary>
     [Test]
     public void HashCombiner_Test_Folder()
     {

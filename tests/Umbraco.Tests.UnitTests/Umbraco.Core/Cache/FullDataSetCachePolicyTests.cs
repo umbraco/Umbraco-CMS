@@ -15,6 +15,9 @@ using IScope = Umbraco.Cms.Infrastructure.Scoping.IScope;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Cache;
 
+/// <summary>
+/// Contains unit tests that verify the behavior of the <see cref="FullDataSetRepositoryCachePolicy{TEntity, TId}"/> class.
+/// </summary>
 [TestFixture]
 public class FullDataSetCachePolicyTests
 {
@@ -30,6 +33,9 @@ public class FullDataSetCachePolicyTests
         }
     }
 
+    /// <summary>
+    /// Tests that a single item is cached when using the FullDataSetRepositoryCachePolicy.
+    /// </summary>
     [Test]
     public void Caches_Single()
     {
@@ -51,6 +57,9 @@ public class FullDataSetCachePolicyTests
         Assert.IsTrue(isCached);
     }
 
+    /// <summary>
+    /// Tests retrieving a single item from the cache using the FullDataSetRepositoryCachePolicy.
+    /// </summary>
     [Test]
     public void Get_Single_From_Cache()
     {
@@ -69,6 +78,9 @@ public class FullDataSetCachePolicyTests
         Assert.IsNotNull(found);
     }
 
+    /// <summary>
+    /// Tests that the GetAll method caches an empty list correctly and returns the cached list on subsequent calls.
+    /// </summary>
     [Test]
     public void Get_All_Caches_Empty_List()
     {
@@ -108,6 +120,10 @@ public class FullDataSetCachePolicyTests
         Assert.IsNotNull(list);
     }
 
+    /// <summary>
+    /// Tests that all cache entries are retrieved and combined into a single list.
+    /// Ensures that the caching mechanism aggregates multiple cache items as expected.
+    /// </summary>
     [Test]
     public void Get_All_Caches_As_Single_List()
     {
@@ -139,6 +155,9 @@ public class FullDataSetCachePolicyTests
         Assert.IsNotNull(list);
     }
 
+    /// <summary>
+    /// Tests that getting all items without specifying IDs returns all cached items.
+    /// </summary>
     [Test]
     public void Get_All_Without_Ids_From_Cache()
     {
@@ -160,6 +179,9 @@ public class FullDataSetCachePolicyTests
         Assert.AreEqual(2, found.Length);
     }
 
+    /// <summary>
+    /// Tests that if the CreateOrUpdate operation throws an exception, the cache is cleared (removed).
+    /// </summary>
     [Test]
     public void If_CreateOrUpdate_Throws_Cache_Is_Removed()
     {
@@ -190,6 +212,10 @@ public class FullDataSetCachePolicyTests
         }
     }
 
+    /// <summary>
+    /// Tests that if an exception is thrown during the removal of an item,
+    /// the cache is cleared as expected.
+    /// </summary>
     [Test]
     public void If_Removes_Throws_Cache_Is_Removed()
     {
@@ -416,6 +442,11 @@ public class FullDataSetCachePolicyTests
     {
         private readonly Dictionary<string, object?> _cache = [];
 
+    /// <summary>
+    /// Gets the cached object associated with the specified key.
+    /// </summary>
+    /// <param name="key">The key of the cached object to get.</param>
+    /// <returns>The cached object if found; otherwise, null.</returns>
         public object? Get(string key)
             => _cache.TryGetValue(key, out var value) ? value : null;
 
@@ -433,21 +464,49 @@ public class FullDataSetCachePolicyTests
             return value;
         }
 
+    /// <summary>
+    /// Searches the cache for entries with keys that start with the specified prefix.
+    /// </summary>
+    /// <param name="keyStartsWith">The prefix to match keys against.</param>
+    /// <returns>An enumerable of cache values whose keys start with the specified prefix.</returns>
         public IEnumerable<object> SearchByKey(string keyStartsWith)
             => _cache.Where(kvp => kvp.Key.StartsWith(keyStartsWith)).Select(kvp => kvp.Value!);
 
+    /// <summary>
+    /// Searches the cache using the specified regular expression.
+    /// </summary>
+    /// <param name="regex">The regular expression to match cache entries.</param>
+    /// <returns>An enumerable collection of objects matching the regular expression.</returns>
         public IEnumerable<object> SearchByRegex(string regex) => throw new NotImplementedException();
 
+    /// <summary>
+    /// Clears all items from the cache.
+    /// </summary>
         public void Clear() => _cache.Clear();
 
         public void Clear(string key) => _cache.Remove(key);
 
+    /// <summary>
+    /// Clears the cache entries of the specified type.
+    /// </summary>
+    /// <param name="type">The type of cache entries to clear.</param>
         public void ClearOfType(Type type) => throw new NotImplementedException();
 
+    /// <summary>
+    /// Clears all cached items of the specified type.
+    /// </summary>
         public void ClearOfType<T>() => throw new NotImplementedException();
 
+    /// <summary>
+    /// Clears items of the specified type from the cache based on the given predicate.
+    /// </summary>
+    /// <param name="predicate">A function to test each cache item for a condition.</param>
         public void ClearOfType<T>(Func<string, T, bool> predicate) => throw new NotImplementedException();
 
+    /// <summary>
+    /// Clears all cache entries with keys that start with the specified prefix.
+    /// </summary>
+    /// <param name="keyStartsWith">The prefix of the keys to clear from the cache.</param>
         public void ClearByKey(string keyStartsWith)
         {
             var keysToRemove = _cache.Keys.Where(k => k.StartsWith(keyStartsWith)).ToList();
@@ -457,8 +516,19 @@ public class FullDataSetCachePolicyTests
             }
         }
 
+    /// <summary>
+    /// Clears the cache entries that match the specified regular expression.
+    /// </summary>
+    /// <param name="regex">The regular expression pattern to match cache keys.</param>
         public void ClearByRegex(string regex) => throw new NotImplementedException();
 
+    /// <summary>
+    /// Inserts an item into the cache with the specified key, using the provided factory function to generate the value.
+    /// </summary>
+    /// <param name="key">The key to identify the cached item.</param>
+    /// <param name="factory">A function to generate the cached item if it does not exist.</param>
+    /// <param name="timeout">An optional timeout after which the cache entry expires.</param>
+    /// <param name="isSliding">Indicates whether the timeout is sliding (resets on access) or absolute.</param>
         public void Insert(string key, Func<object?> factory, TimeSpan? timeout = null, bool isSliding = false)
             => _cache[key] = factory();
     }

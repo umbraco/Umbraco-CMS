@@ -4,9 +4,21 @@ using Umbraco.Cms.Persistence.SqlServer.Services;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Persistence.SqlServer;
 
+/// <summary>
+/// Contains unit tests for the <see cref="SqlServerDatabaseProviderMetadata"/> class, verifying its behavior and functionality.
+/// </summary>
 [TestFixture]
 public class SqlServerDatabaseProviderMetadataTests
 {
+    /// <summary>
+    /// Generates a SQL Server connection string based on the provided parameters.
+    /// </summary>
+    /// <param name="server">The name or network address of the instance of SQL Server to which to connect.</param>
+    /// <param name="databaseName">The name of the database.</param>
+    /// <param name="login">The login username for SQL Server authentication.</param>
+    /// <param name="password">The password for SQL Server authentication.</param>
+    /// <param name="integratedAuth">If true, uses integrated security; otherwise, uses SQL Server authentication.</param>
+    /// <returns>A connection string formatted for SQL Server.</returns>
     [Test]
     [TestCase("myServer", "myDatabase", "myLogin", "myPassword", true, ExpectedResult = "Server=myServer;Database=myDatabase;Integrated Security=true")]
     [TestCase("myServer", "myDatabase", "myLogin", "myPassword", false, ExpectedResult = "Server=myServer;Database=myDatabase;User Id=myLogin;Password=myPassword")]
@@ -23,6 +35,11 @@ public class SqlServerDatabaseProviderMetadataTests
         });
     }
 
+    /// <summary>
+    /// Determines whether the specified connection string can be recognized as a SQL Server connection string.
+    /// </summary>
+    /// <param name="connectionString">The connection string to test.</param>
+    /// <returns><c>true</c> if the connection string is recognized as SQL Server; otherwise, <c>false</c>.</returns>
     [Test]
     [TestCase("Server=myServer;Database=myDatabase;Integrated Security=true", ExpectedResult = true)] // SqlServer
     [TestCase("Server=myServer;Database=myDatabase;User Id=myLogin;Password=myPassword", ExpectedResult = true)] // SqlServer

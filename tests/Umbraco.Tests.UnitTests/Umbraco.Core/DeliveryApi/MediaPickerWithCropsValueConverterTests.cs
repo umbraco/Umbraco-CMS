@@ -11,6 +11,9 @@ using Umbraco.Cms.Infrastructure.Serialization;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.DeliveryApi;
 
+/// <summary>
+/// Contains unit tests for the MediaPickerWithCropsValueConverter class.
+/// </summary>
 [TestFixture]
 public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTests
 {
@@ -34,6 +37,10 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
             apiMediaWithCropsBuilder);
     }
 
+    /// <summary>
+    /// Verifies that the MediaPickerWithCropsValueConverter, when configured in single mode, converts a single media picker value
+    /// into a collection of <see cref="IApiMediaWithCrops"/> objects in the delivery API format, and that the resulting collection and its properties are correct.
+    /// </summary>
     [Test]
     public void MediaPickerWithCropsValueConverter_InSingleMode_ConvertsValueToCollectionOfApiMedia()
     {
@@ -77,6 +84,10 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
         Assert.AreEqual("My alt text", first.Properties["altText"]);
     }
 
+    /// <summary>
+    /// Tests that the MediaPickerWithCropsValueConverter correctly converts a multi-mode media picker value
+    /// to a collection of IApiMediaWithCrops objects with expected properties, crops, and focal points.
+    /// </summary>
     [Test]
     public void MediaPickerWithCropsValueConverter_InMultiMode_ConvertsValueToMedias()
     {
@@ -146,6 +157,11 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
         Assert.AreEqual("My other alt text", last.Properties["altText"]);
     }
 
+    /// <summary>
+    /// Tests that the MediaPickerWithCropsValueConverter correctly merges media crops with local crops,
+    /// ensuring that local crops take precedence and media crops are appended, and that focal points
+    /// are correctly resolved between local and media values.
+    /// </summary>
     [Test]
     public void MediaPickerWithCropsValueConverter_MergesMediaCropsWithLocalCrops()
     {
@@ -206,6 +222,9 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
         ValidateCrop(mediaWithCrops.Crops.Last(), "mediaOne", 111, 222, 2m, 4m, 20m, 40m);
     }
 
+    /// <summary>
+    /// Tests that local crops and focal point take precedence over media crops and focal point when converting.
+    /// </summary>
     [Test]
     public void MediaPickerWithCropsValueConverter_LocalCropsAndFocalPointTakesPrecedenceOverMediaCropsAndFocalPoint()
     {
@@ -266,6 +285,10 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
         ValidateCrop(mediaWithCrops.Crops.First(), "one", 200, 100, 1m, 2m, 10m, 20m);
     }
 
+    /// <summary>
+    /// Verifies that when the MediaPickerWithCropsValueConverter is in single mode, passing an invalid intermediate value results in an empty collection being returned.
+    /// </summary>
+    /// <param name="inter">The intermediate value to be converted, which is expected to be invalid (e.g., null, empty string, or non-media types).</param>
     [TestCase("")]
     [TestCase(null)]
     [TestCase(123)]
@@ -281,6 +304,10 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
         Assert.IsEmpty(result);
     }
 
+    /// <summary>
+    /// Tests that the MediaPickerWithCropsValueConverter converts invalid input values to an empty collection when in multi mode.
+    /// </summary>
+    /// <param name="inter">The intermediate value to convert.</param>
     [TestCase("")]
     [TestCase(null)]
     [TestCase(123)]

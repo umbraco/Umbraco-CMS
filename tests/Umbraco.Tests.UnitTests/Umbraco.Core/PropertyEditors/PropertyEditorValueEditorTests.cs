@@ -11,9 +11,18 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 
+/// <summary>
+/// Contains unit tests for the <see cref="PropertyEditorValueEditor"/> class in Umbraco.
+/// </summary>
 [TestFixture]
 public class PropertyEditorValueEditorTests
 {
+    /// <summary>
+    /// Tests whether the value editor correctly converts a given string value to a JSON object for use in the editor interface.
+    /// The test asserts that valid JSON objects and arrays are converted, while invalid JSON or plain strings are not.
+    /// </summary>
+    /// <param name="value">The input string value to attempt to convert to a JSON object.</param>
+    /// <param name="isOk">True if the conversion is expected to succeed (i.e., the input is valid JSON), otherwise false.</param>
     [TestCase("{\"prop1\": \"val1\", \"prop2\": \"val2\"}", true)]
     [TestCase("{1,2,3,4}", false)]
     [TestCase("[1,2,3,4]", true)]
@@ -29,6 +38,12 @@ public class PropertyEditorValueEditorTests
         Assert.AreEqual(isOk, !(result is string));
     }
 
+    /// <summary>
+    /// Tests that the value editor can convert a string value to the specified CLR type.
+    /// </summary>
+    /// <param name="valueType">The type of the value to convert (e.g., STRING, INT, DATETIME).</param>
+    /// <param name="val">The string value to convert.</param>
+    /// <param name="expected">The expected result after conversion.</param>
     [TestCase("STRING", "hello", "hello")]
     [TestCase("TEXT", "hello", "hello")]
     [TestCase("INT", "123", 123)]
@@ -45,6 +60,9 @@ public class PropertyEditorValueEditorTests
 
     // The following decimal tests have not been added as [TestCase]s
     // as the decimal type cannot be used as an attribute parameter
+    /// <summary>
+    /// Tests that the value editor can successfully convert a string representation of a decimal to the decimal CLR type.
+    /// </summary>
     [Test]
     public void Value_Editor_Can_Convert_To_Decimal_Clr_Type()
     {
@@ -55,6 +73,9 @@ public class PropertyEditorValueEditorTests
         Assert.AreEqual(12.34M, result.Result);
     }
 
+    /// <summary>
+    /// Tests that the value editor can convert a decimal value string with a comma as the decimal separator to the decimal CLR type.
+    /// </summary>
     [Test]
     public void Value_Editor_Can_Convert_To_Decimal_Clr_Type_With_Other_Separator()
     {
@@ -65,6 +86,9 @@ public class PropertyEditorValueEditorTests
         Assert.AreEqual(12.34M, result.Result);
     }
 
+    /// <summary>
+    /// Tests that the value editor can convert an empty string to a nullable decimal CLR type.
+    /// </summary>
     [Test]
     public void Value_Editor_Can_Convert_To_Decimal_Clr_Type_With_Empty_String()
     {
@@ -75,6 +99,9 @@ public class PropertyEditorValueEditorTests
         Assert.IsNull(result.Result);
     }
 
+    /// <summary>
+    /// Tests that the value editor can convert a string representation of a date to a DateTime CLR type.
+    /// </summary>
     [Test]
     public void Value_Editor_Can_Convert_To_Date_Clr_Type()
     {
@@ -101,6 +128,9 @@ public class PropertyEditorValueEditorTests
         Assert.AreEqual(expected, result);
     }
 
+    /// <summary>
+    /// Tests that the value editor can correctly serialize a decimal value.
+    /// </summary>
     [Test]
     public void Value_Editor_Can_Serialize_Decimal_Value()
     {
@@ -114,6 +144,9 @@ public class PropertyEditorValueEditorTests
         Assert.AreEqual("12.34", result);
     }
 
+    /// <summary>
+    /// Tests that the value editor can serialize a decimal value when the value is an empty string.
+    /// </summary>
     [Test]
     public void Value_Editor_Can_Serialize_Decimal_Value_With_Empty_String()
     {
@@ -126,6 +159,9 @@ public class PropertyEditorValueEditorTests
         Assert.AreEqual(string.Empty, result);
     }
 
+    /// <summary>
+    /// Tests that the value editor can correctly serialize a date value.
+    /// </summary>
     [Test]
     public void Value_Editor_Can_Serialize_Date_Value()
     {

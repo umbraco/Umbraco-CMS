@@ -17,9 +17,17 @@ using Umbraco.Cms.Infrastructure.Migrations.Install;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Services;
 
+/// <summary>
+/// Contains unit tests that verify the functionality of the <see cref="UserGroupService"/> class.
+/// </summary>
 [TestFixture]
 public class UserGroupServiceTests
 {
+    /// <summary>
+    /// Verifies that the <c>FilterAsync</c> method returns only the user groups matching the specified aliases for a non-admin user.
+    /// </summary>
+    /// <param name="userGroupAliases">An array of user group aliases to filter and verify in the result set.</param>
+    /// <returns>A <see cref="Task"/> representing the asynchronous unit test operation.</returns>
     [TestCase("one", "two", "three")]
     [TestCase("two", "three")]
     [TestCase("three")]
@@ -41,6 +49,11 @@ public class UserGroupServiceTests
         });
     }
 
+    /// <summary>
+    /// Verifies that filtering user groups by aliases does not return any groups that do not exist.
+    /// </summary>
+    /// <param name="userGroupAliases">The aliases of the user groups to filter by.</param>
+    /// <returns>A task that represents the asynchronous test operation.</returns>
     [TestCase("four", "five", "six")]
     [TestCase("four")]
     [TestCase]
@@ -57,6 +70,10 @@ public class UserGroupServiceTests
         });
     }
 
+    /// <summary>
+    /// Tests that the FilterAsync method returns all user groups when the user is an admin.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task Filter_Returns_All_Groups_For_Admin()
     {
@@ -75,6 +92,10 @@ public class UserGroupServiceTests
         });
     }
 
+    /// <summary>
+    /// Tests that filtering user groups by group name works correctly.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task Filter_Can_Filter_By_Group_Name()
     {
@@ -91,6 +112,13 @@ public class UserGroupServiceTests
         });
     }
 
+    /// <summary>
+    /// Verifies that attempting to update the alias of a system user group is not permitted, while updating a non-system group alias succeeds.
+    /// </summary>
+    /// <param name="systemGroupKey">The key of the user group to test. Use a system group key to test system group behavior, or <c>null</c> for a non-system group.</param>
+    /// <param name="systemGroupAlias">The alias of the user group to test. Use a system group alias to test system group behavior, or <c>null</c> for a non-system group.</param>
+    /// <param name="status">The expected <see cref="UserGroupOperationStatus"/> result after attempting the update.</param>
+    /// <returns>A <see cref="Task"/> representing the asynchronous test operation.</returns>
     [TestCase(null, null, UserGroupOperationStatus.Success)]
     [TestCase(Constants.Security.AdminGroupKeyString, Constants.Security.AdminGroupAlias, UserGroupOperationStatus.CanNotUpdateAliasIsSystemUserGroup)]
     [TestCase(Constants.Security.SensitiveDataGroupKeyString, DatabaseDataCreator.SensitiveDataGroupAlias, UserGroupOperationStatus.CanNotUpdateAliasIsSystemUserGroup)]
@@ -173,6 +201,11 @@ public class UserGroupServiceTests
         Assert.AreEqual(status, updateAttempt.Status);
     }
 
+    /// <summary>
+    /// Tests that an admin user can assign any user groups, including sensitive groups, to other users.
+    /// This verifies that the admin bypass allows assigning groups they do not belong to.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task UpdateUserGroupsOnUsers_Admin_Can_Assign_Any_Groups()
     {
@@ -201,6 +234,10 @@ public class UserGroupServiceTests
         Assert.AreEqual(UserGroupOperationStatus.Success, result.Result);
     }
 
+    /// <summary>
+    /// Tests that a non-admin user can add user groups to users only if they belong to those groups themselves.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task UpdateUserGroupsOnUsers_NonAdmin_Can_Add_Groups_They_Belong_To()
     {
@@ -228,6 +265,10 @@ public class UserGroupServiceTests
         Assert.AreEqual(UserGroupOperationStatus.Success, result.Result);
     }
 
+    /// <summary>
+    /// Tests that a non-admin user cannot add user groups to other users that they do not belong to.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task UpdateUserGroupsOnUsers_NonAdmin_Cannot_Add_Groups_They_Do_Not_Belong_To()
     {
@@ -255,6 +296,10 @@ public class UserGroupServiceTests
         Assert.AreEqual(UserGroupOperationStatus.Unauthorized, result.Result);
     }
 
+    /// <summary>
+    /// Verifies that when updating user groups for a user, a non-admin user can retain existing groups that they do not belong to, in addition to adding their own group.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task UpdateUserGroupsOnUsers_NonAdmin_Can_Keep_Existing_Groups_They_Do_Not_Belong_To()
     {
@@ -283,6 +328,10 @@ public class UserGroupServiceTests
         Assert.AreEqual(UserGroupOperationStatus.Success, result.Result);
     }
 
+    /// <summary>
+    /// Tests that a non-admin user can remove user groups from other users.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
     [Test]
     public async Task UpdateUserGroupsOnUsers_NonAdmin_Can_Remove_Groups()
     {
@@ -309,6 +358,10 @@ public class UserGroupServiceTests
         Assert.AreEqual(UserGroupOperationStatus.Success, result.Result);
     }
 
+    /// <summary>
+    /// Tests that a non-admin user cannot escalate their privileges by replacing their user groups with admin groups.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task UpdateUserGroupsOnUsers_NonAdmin_Cannot_Escalate_Via_Replacement()
     {
@@ -335,6 +388,10 @@ public class UserGroupServiceTests
         Assert.AreEqual(UserGroupOperationStatus.Unauthorized, result.Result);
     }
 
+    /// <summary>
+    /// Tests that updating user groups on users returns a <c>MissingUser</c> status when the performing user cannot be found.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task UpdateUserGroupsOnUsers_Missing_Performing_User_Returns_MissingUser()
     {

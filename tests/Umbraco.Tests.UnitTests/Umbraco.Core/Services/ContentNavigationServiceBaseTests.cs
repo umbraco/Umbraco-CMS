@@ -8,6 +8,9 @@ using Umbraco.Cms.Core.Services.Navigation;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Services;
 
+/// <summary>
+/// Contains unit tests that verify the functionality of the <see cref="ContentNavigationServiceBase"/> class.
+/// </summary>
 [TestFixture]
 public class ContentNavigationServiceBaseTests
 {
@@ -33,6 +36,10 @@ public class ContentNavigationServiceBaseTests
 
     private Guid Grandchild4 { get; set; }
 
+    /// <summary>
+    /// Initializes the test environment for <see cref="ContentNavigationServiceBaseTests"/>,
+    /// including setting up the test navigation service and creating the content hierarchy test data.
+    /// </summary>
     [SetUp]
     public void Setup()
     {
@@ -53,6 +60,9 @@ public class ContentNavigationServiceBaseTests
         CreateTestData();
     }
 
+    /// <summary>
+    /// Tests that getting the parent key from a non-existing content key returns false and null.
+    /// </summary>
     [Test]
     public void Cannot_Get_Parent_From_Non_Existing_Content_Key()
     {
@@ -70,6 +80,11 @@ public class ContentNavigationServiceBaseTests
         });
     }
 
+    /// <summary>
+    /// Verifies that the parent key can be correctly retrieved for a given content item's key.
+    /// </summary>
+    /// <param name="childKey">The unique key (GUID) of the child content item whose parent is to be retrieved.</param>
+    /// <param name="expectedParentKey">The expected unique key (GUID) of the parent content item, or <c>null</c> if the item is a root node and has no parent.</param>
     [Test]
     [TestCase("E48DD82A-7059-418E-9B82-CDD5205796CF", null)] // Root
     [TestCase("C6173927-0C59-4778-825D-D7B9F45D8DDE", "E48DD82A-7059-418E-9B82-CDD5205796CF")] // Child 1
@@ -102,6 +117,9 @@ public class ContentNavigationServiceBaseTests
         });
     }
 
+    /// <summary>
+    /// Tests that no root items are returned when the navigation tree is empty.
+    /// </summary>
     [Test]
     public void Cannot_Get_Root_Items_When_Empty_Tree()
     {
@@ -119,6 +137,9 @@ public class ContentNavigationServiceBaseTests
         Assert.IsEmpty(rootsList);
     }
 
+    /// <summary>
+    /// Tests that a single root item can be retrieved successfully.
+    /// </summary>
     [Test]
     public void Can_Get_Single_Root_Item()
     {
@@ -136,6 +157,9 @@ public class ContentNavigationServiceBaseTests
         });
     }
 
+    /// <summary>
+    /// Tests that the root items can be retrieved in the correct order.
+    /// </summary>
     [Test]
     public void Can_Get_Root_Item_In_Correct_Order()
     {
@@ -156,6 +180,9 @@ public class ContentNavigationServiceBaseTests
         });
     }
 
+    /// <summary>
+    /// Tests that attempting to get root items of a non-existing content type alias returns false and an empty collection.
+    /// </summary>
     [Test]
     public void Cannot_Get_Root_Items_Of_Type_From_Non_Existing_Content_Type_Alias()
     {
@@ -173,6 +200,9 @@ public class ContentNavigationServiceBaseTests
         });
     }
 
+    /// <summary>
+    /// Tests that the navigation service can retrieve root items of a specified content type.
+    /// </summary>
     [Test]
     public void Can_Get_Root_Items_Of_Type()
     {
@@ -208,6 +238,9 @@ public class ContentNavigationServiceBaseTests
         });
     }
 
+    /// <summary>
+    /// Tests that retrieving root items filtered by a specific content type alias returns the correct subset of root items.
+    /// </summary>
     [Test]
     public void Can_Get_Root_Items_Of_Type_Filters_Result()
     {
@@ -256,6 +289,10 @@ public class ContentNavigationServiceBaseTests
         });
     }
 
+    /// <summary>
+    /// Tests that the service can retrieve root items of a specific content type,
+    /// filters the results accordingly, and maintains the order of creation of those items.
+    /// </summary>
     [Test]
     public void Can_Get_Root_Items_Of_Type_Filters_Result_And_Maintains_Their_Order_Of_Creation()
     {
@@ -299,6 +336,9 @@ public class ContentNavigationServiceBaseTests
         Assert.IsTrue(expectedRootsOrder.SequenceEqual(rootKeysOfType));
     }
 
+    /// <summary>
+    /// Tests that root items of a specific content type can be retrieved even when the content type was not initially loaded.
+    /// </summary>
     [Test]
     public void Can_Get_Root_Items_Of_Type_Even_When_Content_Type_Was_Not_Initially_Loaded()
     {
@@ -329,6 +369,9 @@ public class ContentNavigationServiceBaseTests
         Assert.AreEqual(1, rootKeys.Count());
     }
 
+    /// <summary>
+    /// Tests that attempting to get children keys from a non-existing content key returns false and an empty collection.
+    /// </summary>
     [Test]
     public void Cannot_Get_Children_From_Non_Existing_Content_Key()
     {
@@ -346,6 +389,11 @@ public class ContentNavigationServiceBaseTests
         });
     }
 
+    /// <summary>
+    /// Tests that children keys can be retrieved from an existing content key.
+    /// </summary>
+    /// <param name="parentKey">The GUID key of the parent content item.</param>
+    /// <param name="childrenCount">The expected number of children for the given parent key.</param>
     [Test]
     [TestCase("E48DD82A-7059-418E-9B82-CDD5205796CF", 3)] // Root - Child 1, Child 2, Child 3
     [TestCase("C6173927-0C59-4778-825D-D7B9F45D8DDE", 2)] // Child 1 - Grandchild 1, Grandchild 2
@@ -369,6 +417,12 @@ public class ContentNavigationServiceBaseTests
         });
     }
 
+    /// <summary>
+    /// Verifies that the navigation service retrieves the child content keys of a given parent content item
+    /// in the exact order they were created.
+    /// </summary>
+    /// <param name="parentKey">The unique identifier (key) of the parent content item whose children are to be retrieved.</param>
+    /// <param name="children">An array of string representations of the expected child content keys, in their creation order.</param>
     [Test]
     [TestCase("E48DD82A-7059-418E-9B82-CDD5205796CF", new[] { "C6173927-0C59-4778-825D-D7B9F45D8DDE", "60E0E5C4-084E-4144-A560-7393BEAD2E96", "B606E3FF-E070-4D46-8CB9-D31352029FDF", })] // Root
     [TestCase("C6173927-0C59-4778-825D-D7B9F45D8DDE", new[] { "E856AC03-C23E-4F63-9AA9-681B42A58573", "A1B1B217-B02F-4307-862C-A5E22DB729EB" })] // Child 1
@@ -393,6 +447,9 @@ public class ContentNavigationServiceBaseTests
         }
     }
 
+    /// <summary>
+    /// Tests that trying to get children of a non-existing content type alias returns false and an empty collection.
+    /// </summary>
     [Test]
     public void Cannot_Get_Children_Of_Type_From_Non_Existing_Content_Type_Alias()
     {
@@ -411,6 +468,9 @@ public class ContentNavigationServiceBaseTests
         });
     }
 
+    /// <summary>
+    /// Tests that attempting to get children of a specific content type from a non-existing content key returns false and an empty collection.
+    /// </summary>
     [Test]
     public void Cannot_Get_Children_Of_Type_From_Non_Existing_Content_Key()
     {
@@ -441,6 +501,11 @@ public class ContentNavigationServiceBaseTests
         });
     }
 
+    /// <summary>
+    /// Verifies that the navigation service can retrieve the keys of all child content items of a specified content type for a given parent content item's unique identifier.
+    /// </summary>
+    /// <param name="parentKey">The unique identifier (GUID) of the parent content item whose children are to be retrieved.</param>
+    /// <param name="childrenCount">The expected number of child items of the specified content type under the given parent.</param>
     [Test]
     [TestCase("E48DD82A-7059-418E-9B82-CDD5205796CF", 3)] // Root - Child 1, Child 2, Child 3
     [TestCase("C6173927-0C59-4778-825D-D7B9F45D8DDE", 2)] // Child 1 - Grandchild 1, Grandchild 2
@@ -482,6 +547,10 @@ public class ContentNavigationServiceBaseTests
         });
     }
 
+    /// <summary>
+    /// Verifies that retrieving children by a specific content type alias returns only those children,
+    /// ensuring the filtering mechanism works as expected.
+    /// </summary>
     [Test]
     public void Can_Get_Children_Of_Type_Filters_Result()
     {
@@ -531,6 +600,10 @@ public class ContentNavigationServiceBaseTests
         });
     }
 
+    /// <summary>
+    /// Tests that retrieving children of a specific content type filters the results correctly
+    /// and maintains the order in which the children were created.
+    /// </summary>
     [Test]
     public void Can_Get_Children_Of_Type_Filters_Result_And_Maintains_Their_Order_Of_Creation()
     {
@@ -575,6 +648,9 @@ public class ContentNavigationServiceBaseTests
         Assert.IsTrue(expectedChildrenOrder.SequenceEqual(childrenKeysOfType));
     }
 
+    /// <summary>
+    /// Tests that children of a specific content type can be retrieved even when the content type was not initially loaded.
+    /// </summary>
     [Test]
     public void Can_Get_Children_Of_Type_Even_When_Content_Type_Was_Not_Initially_Loaded()
     {
@@ -606,6 +682,9 @@ public class ContentNavigationServiceBaseTests
         Assert.AreEqual(2, childrenKeys.Count());
     }
 
+    /// <summary>
+    /// Verifies that attempting to get descendants from a non-existing content key returns false and an empty collection.
+    /// </summary>
     [Test]
     public void Cannot_Get_Descendants_From_Non_Existing_Content_Key()
     {
@@ -623,6 +702,11 @@ public class ContentNavigationServiceBaseTests
         });
     }
 
+    /// <summary>
+    /// Verifies that the navigation service can successfully retrieve all descendant content item keys for a given parent content key.
+    /// </summary>
+    /// <param name="parentKey">The unique key identifying the parent content item.</param>
+    /// <param name="descendantsCount">The expected number of descendant content items to be retrieved.</param>
     [Test]
     [TestCase("E48DD82A-7059-418E-9B82-CDD5205796CF", 8)] // Root - Child 1, Grandchild 1, Grandchild 2, Child 2, Grandchild 3, Great-grandchild 1, Child 3, Grandchild 4
     [TestCase("C6173927-0C59-4778-825D-D7B9F45D8DDE", 2)] // Child 1 - Grandchild 1, Grandchild 2
@@ -670,6 +754,9 @@ public class ContentNavigationServiceBaseTests
         }
     }
 
+    /// <summary>
+    /// Tests that attempting to get descendants of a non-existing content type alias returns false and an empty collection.
+    /// </summary>
     [Test]
     public void Cannot_Get_Descendants_Of_Type_From_Non_Existing_Content_Type_Alias()
     {
@@ -688,6 +775,9 @@ public class ContentNavigationServiceBaseTests
         });
     }
 
+    /// <summary>
+    /// Tests that attempting to get descendants of a specific content type from a non-existing content key returns false and an empty collection.
+    /// </summary>
     [Test]
     public void Cannot_Get_Descendants_Of_Type_From_Non_Existing_Content_Key()
     {
@@ -718,6 +808,11 @@ public class ContentNavigationServiceBaseTests
         });
     }
 
+    /// <summary>
+    /// Tests that the content navigation service can retrieve the descendants of a specified content type alias for a given parent content item's key.
+    /// </summary>
+    /// <param name="parentKey">The key of the parent content item for which to retrieve descendants.</param>
+    /// <param name="descendantsCount">The expected number of descendant items of the specified content type alias.</param>
     [Test]
     [TestCase(
         "E48DD82A-7059-418E-9B82-CDD5205796CF",
@@ -761,6 +856,10 @@ public class ContentNavigationServiceBaseTests
         });
     }
 
+    /// <summary>
+    /// Tests that the method Can_Get_Descendants_Of_Type correctly filters descendants by content type.
+    /// It verifies that only descendants of the specified content type alias are returned.
+    /// </summary>
     [Test]
     public void Can_Get_Descendants_Of_Type_Filters_Result()
     {
@@ -810,6 +909,11 @@ public class ContentNavigationServiceBaseTests
         });
     }
 
+    /// <summary>
+    /// Verifies that the <c>TryGetDescendantsKeysOfType</c> method filters descendants by the specified content type alias
+    /// and that the returned descendant keys maintain the order in which they were created.
+    /// This test ensures both correct filtering and preservation of creation order for descendants of a given type.
+    /// </summary>
     [Test]
     public void Can_Get_Descendants_Of_Type_Filters_Result_And_Maintains_Their_Order_Of_Creation()
     {
@@ -854,6 +958,9 @@ public class ContentNavigationServiceBaseTests
         Assert.IsTrue(expectedDescendantsOrder.SequenceEqual(descendantsOfType));
     }
 
+    /// <summary>
+    /// Tests that attempting to get ancestors from a non-existing content key returns false and an empty collection.
+    /// </summary>
     [Test]
     public void Cannot_Get_Ancestors_From_Non_Existing_Content_Key()
     {
@@ -871,6 +978,12 @@ public class ContentNavigationServiceBaseTests
         });
     }
 
+    /// <summary>
+    /// Unit test that verifies ancestors can be retrieved for a given content key.
+    /// Asserts that the correct number of ancestor keys is returned for the specified child content item.
+    /// </summary>
+    /// <param name="childKey">The key of the child content item for which to retrieve ancestor keys.</param>
+    /// <param name="ancestorsCount">The expected number of ancestor keys to be returned.</param>
     [Test]
     [TestCase("E48DD82A-7059-418E-9B82-CDD5205796CF", 0)] // Root
     [TestCase("C6173927-0C59-4778-825D-D7B9F45D8DDE", 1)] // Child 1 - Root
@@ -894,6 +1007,11 @@ public class ContentNavigationServiceBaseTests
         });
     }
 
+    /// <summary>
+    /// Verifies that the ancestors of a given content item, identified by its key, can be retrieved in the correct order of creation.
+    /// </summary>
+    /// <param name="childKey">The GUID key of the content item whose ancestors are to be retrieved.</param>
+    /// <param name="ancestors">An array of GUID keys (as strings) representing the expected ancestors, ordered from closest to furthest ancestor.</param>
     [Test]
     [TestCase("E48DD82A-7059-418E-9B82-CDD5205796CF", new string[0])] // Root
     [TestCase("C6173927-0C59-4778-825D-D7B9F45D8DDE", new[] { "E48DD82A-7059-418E-9B82-CDD5205796CF" })] // Child 1
@@ -915,6 +1033,9 @@ public class ContentNavigationServiceBaseTests
         }
     }
 
+    /// <summary>
+    /// Tests that getting ancestors of a non-existing content type alias returns false and an empty collection.
+    /// </summary>
     [Test]
     public void Cannot_Get_Ancestors_Of_Type_From_Non_Existing_Content_Type_Alias()
     {
@@ -933,6 +1054,9 @@ public class ContentNavigationServiceBaseTests
         });
     }
 
+    /// <summary>
+    /// Tests that attempting to get ancestors of a specific type from a non-existing content key returns false and an empty collection.
+    /// </summary>
     [Test]
     public void Cannot_Get_Ancestors_Of_Type_From_Non_Existing_Content_Key()
     {
@@ -963,6 +1087,14 @@ public class ContentNavigationServiceBaseTests
         });
     }
 
+    /// <summary>
+    /// Verifies that the navigation service can retrieve the correct number of ancestor content items of a specified content type for a given child content item's key.
+    /// </summary>
+    /// <param name="childKey">The unique identifier (GUID) of the child content item whose ancestors are being retrieved.</param>
+    /// <param name="ancestorsCount">The expected number of ancestor items of the specified content type.</param>
+    /// <remarks>
+    /// This test ensures that <see cref="TestContentNavigationService.TryGetAncestorsKeysOfType"/> returns the correct ancestor keys for the given content type alias.
+    /// </remarks>
     [Test]
     [TestCase("E48DD82A-7059-418E-9B82-CDD5205796CF", 0)] // Root
     [TestCase("C6173927-0C59-4778-825D-D7B9F45D8DDE", 1)] // Child 1 - Root
@@ -1004,6 +1136,9 @@ public class ContentNavigationServiceBaseTests
         });
     }
 
+    /// <summary>
+    /// Tests that retrieving ancestors of a specific content type filters the results correctly.
+    /// </summary>
     [Test]
     public void Can_Get_Ancestors_Of_Type_Filters_Result()
     {
@@ -1054,6 +1189,9 @@ public class ContentNavigationServiceBaseTests
         });
     }
 
+    /// <summary>
+    /// Tests that trying to get siblings of a non-existing content key returns false and an empty collection.
+    /// </summary>
     [Test]
     public void Cannot_Get_Siblings_Of_Non_Existing_Content_Key()
     {
@@ -1071,6 +1209,10 @@ public class ContentNavigationServiceBaseTests
         });
     }
 
+    /// <summary>
+    /// Tests that the navigation service can retrieve sibling content keys of an existing content key,
+    /// excluding the content key itself from the siblings list.
+    /// </summary>
     [Test]
     public void Can_Get_Siblings_Of_Existing_Content_Key_Without_Self()
     {
@@ -1090,6 +1232,9 @@ public class ContentNavigationServiceBaseTests
         });
     }
 
+    /// <summary>
+    /// Tests that the service can retrieve sibling content keys of an existing content key at the content root.
+    /// </summary>
     [Test]
     public void Can_Get_Siblings_Of_Existing_Content_Key_At_Content_Root()
     {
@@ -1110,6 +1255,11 @@ public class ContentNavigationServiceBaseTests
         });
     }
 
+    /// <summary>
+    /// Tests that siblings of the content item identified by the given key can be retrieved correctly.
+    /// </summary>
+    /// <param name="key">The unique identifier of the content item to find siblings for.</param>
+    /// <param name="siblingsCount">The expected number of siblings for the given content key.</param>
     [Test]
     [TestCase("E48DD82A-7059-418E-9B82-CDD5205796CF", 0)] // Root
     [TestCase("C6173927-0C59-4778-825D-D7B9F45D8DDE", 2)] // Child 1 - Child 2, Child 3
@@ -1133,6 +1283,11 @@ public class ContentNavigationServiceBaseTests
         });
     }
 
+    /// <summary>
+    /// Verifies that the siblings of a specified content item can be retrieved in the order they were created.
+    /// </summary>
+    /// <param name="childKey">The unique key (GUID) of the content item whose siblings are to be retrieved.</param>
+    /// <param name="siblings">An array of sibling keys (as strings) expected to be returned, in their creation order.</param>
     [Test]
     [TestCase("E48DD82A-7059-418E-9B82-CDD5205796CF", new string[0])] // Root
     [TestCase("C6173927-0C59-4778-825D-D7B9F45D8DDE", new[] { "60E0E5C4-084E-4144-A560-7393BEAD2E96", "B606E3FF-E070-4D46-8CB9-D31352029FDF" })] // Child 1 - Child 2, Child 3
@@ -1153,6 +1308,9 @@ public class ContentNavigationServiceBaseTests
         }
     }
 
+    /// <summary>
+    /// Tests that trying to get siblings of a non-existing content type alias returns false and an empty collection.
+    /// </summary>
     [Test]
     public void Cannot_Get_Siblings_Of_Type_From_Non_Existing_Content_Type_Alias()
     {
@@ -1171,6 +1329,9 @@ public class ContentNavigationServiceBaseTests
         });
     }
 
+    /// <summary>
+    /// Tests that attempting to get siblings of a specific content type from a non-existing content key returns false and an empty collection.
+    /// </summary>
     [Test]
     public void Cannot_Get_Siblings_Of_Type_From_Non_Existing_Content_Key()
     {
@@ -1201,6 +1362,11 @@ public class ContentNavigationServiceBaseTests
         });
     }
 
+    /// <summary>
+    /// Verifies that siblings of a given content item, filtered by a specific content type, can be retrieved correctly.
+    /// </summary>
+    /// <param name="key">The unique identifier of the content item whose siblings of the specified type are to be found.</param>
+    /// <param name="siblingsCount">The expected number of siblings of the same content type as the specified content item.</param>
     [Test]
     [TestCase("E48DD82A-7059-418E-9B82-CDD5205796CF", 0)] // Root
     [TestCase("C6173927-0C59-4778-825D-D7B9F45D8DDE", 2)] // Child 1 - Child 2, Child 3
@@ -1242,6 +1408,10 @@ public class ContentNavigationServiceBaseTests
         });
     }
 
+    /// <summary>
+    /// Tests that the method Can_Get_Siblings_Of_Type correctly filters siblings by content type.
+    /// It verifies that only siblings of the specified content type alias are returned.
+    /// </summary>
     [Test]
     public void Can_Get_Siblings_Of_Type_Filters_Result()
     {
@@ -1291,6 +1461,10 @@ public class ContentNavigationServiceBaseTests
         });
     }
 
+    /// <summary>
+    /// Tests that getting siblings of a specific content type filters the results correctly
+    /// and maintains the order of creation of those siblings.
+    /// </summary>
     [Test]
     public void Can_Get_Siblings_Of_Type_Filters_Result_And_Maintains_Their_Order_Of_Creation()
     {
@@ -1335,6 +1509,9 @@ public class ContentNavigationServiceBaseTests
         Assert.IsTrue(expectedSiblingsOrder.SequenceEqual(siblingsKeysOfType));
     }
 
+    /// <summary>
+    /// Tests that getting the level from a non-existing content key returns false and null.
+    /// </summary>
     [Test]
     public void Cannot_Get_Level_From_Non_Existing_Content_Key()
     {
@@ -1352,6 +1529,11 @@ public class ContentNavigationServiceBaseTests
         });
     }
 
+    /// <summary>
+    /// Tests that the level of content can be retrieved correctly from an existing content key.
+    /// </summary>
+    /// <param name="key">The unique identifier of the content item.</param>
+    /// <param name="expectedLevel">The expected level of the content item in the hierarchy.</param>
     [Test]
     [TestCase("E48DD82A-7059-418E-9B82-CDD5205796CF", 1)] // Root
     [TestCase("C6173927-0C59-4778-825D-D7B9F45D8DDE", 2)] // Child 1
@@ -1376,6 +1558,9 @@ public class ContentNavigationServiceBaseTests
         });
     }
 
+    /// <summary>
+    /// Tests that moving a node to the bin fails when the content key does not exist.
+    /// </summary>
     [Test]
     public void Cannot_Move_Node_To_Bin_When_Non_Existing_Content_Key()
     {
@@ -1389,6 +1574,10 @@ public class ContentNavigationServiceBaseTests
         Assert.IsFalse(result);
     }
 
+    /// <summary>
+    /// Tests that a node identified by the given key can be moved to the bin.
+    /// </summary>
+    /// <param name="keyOfNodeToRemove">The unique identifier of the node to move to the bin.</param>
     [Test]
     [TestCase("E48DD82A-7059-418E-9B82-CDD5205796CF")] // Root
     [TestCase("C6173927-0C59-4778-825D-D7B9F45D8DDE")] // Child 1
@@ -1416,6 +1605,10 @@ public class ContentNavigationServiceBaseTests
         });
     }
 
+    /// <summary>
+    /// Tests that moving a node to the bin removes the node and all its descendants.
+    /// </summary>
+    /// <param name="keyOfNodeToRemove">The key of the node to remove.</param>
     [Test]
     [TestCase("E48DD82A-7059-418E-9B82-CDD5205796CF")] // Root
     [TestCase("C6173927-0C59-4778-825D-D7B9F45D8DDE")] // Child 1
@@ -1445,6 +1638,10 @@ public class ContentNavigationServiceBaseTests
         });
     }
 
+    /// <summary>
+    /// Tests that moving a node to the bin adds it to the recycle bin root.
+    /// </summary>
+    /// <param name="keyOfNodeToRemove">The key of the node to remove and move to the bin.</param>
     [Test]
     [TestCase("E48DD82A-7059-418E-9B82-CDD5205796CF")] // Root
     [TestCase("C6173927-0C59-4778-825D-D7B9F45D8DDE")] // Child 1
@@ -1470,6 +1667,10 @@ public class ContentNavigationServiceBaseTests
         });
     }
 
+    /// <summary>
+    /// Tests that moving a node to the recycle bin adds it to the recycle bin root as the last item.
+    /// </summary>
+    /// <param name="keyOfNodeToRemove">The key of the node to move to the recycle bin.</param>
     [Test]
     [TestCase("E48DD82A-7059-418E-9B82-CDD5205796CF")] // Root
     [TestCase("C6173927-0C59-4778-825D-D7B9F45D8DDE")] // Child 1
@@ -1494,6 +1695,10 @@ public class ContentNavigationServiceBaseTests
         Assert.AreEqual(siblingsInBin.Last(), keyOfNodeToRemove);
     }
 
+    /// <summary>
+    /// Tests that moving a node to the recycle bin also moves all its descendants to the recycle bin.
+    /// </summary>
+    /// <param name="keyOfNodeToRemove">The key of the node to move to the recycle bin.</param>
     [Test]
     [TestCase("E48DD82A-7059-418E-9B82-CDD5205796CF")] // Root
     [TestCase("C6173927-0C59-4778-825D-D7B9F45D8DDE")] // Child 1
@@ -1524,6 +1729,9 @@ public class ContentNavigationServiceBaseTests
         });
     }
 
+    /// <summary>
+    /// Tests that adding a node fails when the specified parent node does not exist.
+    /// </summary>
     [Test]
     public void Cannot_Add_Node_When_Parent_Does_Not_Exist()
     {
@@ -1538,6 +1746,9 @@ public class ContentNavigationServiceBaseTests
         Assert.IsFalse(result);
     }
 
+    /// <summary>
+    /// Tests that adding a node with a key that already exists is not allowed.
+    /// </summary>
     [Test]
     public void Cannot_Add_When_Node_With_The_Same_Key_Already_Exists()
     {
@@ -1548,6 +1759,9 @@ public class ContentNavigationServiceBaseTests
         Assert.IsFalse(result);
     }
 
+    /// <summary>
+    /// Tests that a new node can be added to the content root.
+    /// </summary>
     [Test]
     public void Can_Add_Node_To_Content_Root()
     {
@@ -1569,6 +1783,10 @@ public class ContentNavigationServiceBaseTests
         });
     }
 
+    /// <summary>
+    /// Tests that a new node can be added to the specified parent node.
+    /// </summary>
+    /// <param name="parentKey">The key of the parent node to which the new node will be added.</param>
     [Test]
     [TestCase("C6173927-0C59-4778-825D-D7B9F45D8DDE")] // Child 1
     [TestCase("F381906C-223C-4466-80F7-B63B4EE073F8")] // Grandchild 4
@@ -1596,6 +1814,10 @@ public class ContentNavigationServiceBaseTests
         });
     }
 
+    /// <summary>
+    /// Verifies that when a node is added to a specified parent, it is inserted as the last child of that parent in the navigation structure.
+    /// </summary>
+    /// <param name="parentKey">The <see cref="Guid"/> identifying the parent node to which the new node will be added.</param>
     [Test]
     [TestCase("E48DD82A-7059-418E-9B82-CDD5205796CF")] // Root
     [TestCase("C6173927-0C59-4778-825D-D7B9F45D8DDE")] // Child 1
@@ -1620,6 +1842,9 @@ public class ContentNavigationServiceBaseTests
         Assert.AreEqual(newNodeKey, childrenKeys.Last());
     }
 
+    /// <summary>
+    /// Tests that moving a node to a target parent that does not exist fails.
+    /// </summary>
     [Test]
     public void Cannot_Move_Node_When_Target_Parent_Does_Not_Exist()
     {
@@ -1634,6 +1859,9 @@ public class ContentNavigationServiceBaseTests
         Assert.IsFalse(result);
     }
 
+    /// <summary>
+    /// Tests that attempting to move a node that does not exist returns false.
+    /// </summary>
     [Test]
     public void Cannot_Move_Node_That_Does_Not_Exist()
     {
@@ -1648,6 +1876,9 @@ public class ContentNavigationServiceBaseTests
         Assert.IsFalse(result);
     }
 
+    /// <summary>
+    /// Tests that a node cannot be moved to itself.
+    /// </summary>
     [Test]
     public void Cannot_Move_Node_To_Itself()
     {
@@ -1661,6 +1892,10 @@ public class ContentNavigationServiceBaseTests
         Assert.IsFalse(result);
     }
 
+    /// <summary>
+    /// Verifies that a content node can be moved to the root of the content tree.
+    /// Ensures that after moving, the node's parent is set to null, indicating it is at the root level.
+    /// </summary>
     [Test]
     public void Can_Move_Node_To_Content_Root()
     {
@@ -1679,6 +1914,10 @@ public class ContentNavigationServiceBaseTests
         Assert.IsNull(newParentKey);
     }
 
+    /// <summary>
+    /// Tests that a node can be moved to an existing target parent successfully.
+    /// Verifies that the move operation returns true and the node's parent key is updated accordingly.
+    /// </summary>
     [Test]
     public void Can_Move_Node_To_Existing_Target_Parent()
     {
@@ -1702,6 +1941,9 @@ public class ContentNavigationServiceBaseTests
         });
     }
 
+    /// <summary>
+    /// Tests that when a node is moved, its parent is correctly updated.
+    /// </summary>
     [Test]
     public void Moved_Node_Has_Updated_Parent()
     {
@@ -1729,6 +1971,9 @@ public class ContentNavigationServiceBaseTests
         });
     }
 
+    /// <summary>
+    /// Tests that when a node is moved, it is removed from its current parent's children list.
+    /// </summary>
     [Test]
     public void Moved_Node_Is_Removed_From_Its_Current_Parent()
     {
@@ -1756,6 +2001,9 @@ public class ContentNavigationServiceBaseTests
         });
     }
 
+    /// <summary>
+    /// Tests that when a node is moved, it is correctly added to its new parent's children list.
+    /// </summary>
     [Test]
     public void Moved_Node_Is_Added_To_Its_New_Parent()
     {
@@ -1782,6 +2030,10 @@ public class ContentNavigationServiceBaseTests
         });
     }
 
+    /// <summary>
+    /// Tests that moving a node to a specified parent adds it as the last child of that parent.
+    /// </summary>
+    /// <param name="targetParentKey">The key of the target parent node to move the node to.</param>
     [Test]
     [TestCase("E48DD82A-7059-418E-9B82-CDD5205796CF")] // Root
     [TestCase("C6173927-0C59-4778-825D-D7B9F45D8DDE")] // Child 1
@@ -1804,6 +2056,13 @@ public class ContentNavigationServiceBaseTests
         Assert.AreEqual(nodeToMove, childrenKeys.Last());
     }
 
+    /// <summary>
+    /// Verifies that moving a content node to a new parent or to the root does not change the number of its descendants.
+    /// </summary>
+    /// <param name="nodeToMove">The unique identifier of the node to be moved.</param>
+    /// <param name="sortOrder">The sort order position to move the node to within the new parent.</param>
+    /// <param name="targetParentKey">The unique identifier of the new parent node, or <c>null</c> to move the node to the root.</param>
+    /// <param name="initialDescendantsCount">The expected number of descendants the node should have after the move (should match the count before the move).</param>
     [Test]
     [TestCase("E856AC03-C23E-4F63-9AA9-681B42A58573", 1, "60E0E5C4-084E-4144-A560-7393BEAD2E96", 0)] // Grandchild 1 to Child 2
     [TestCase("B606E3FF-E070-4D46-8CB9-D31352029FDF", 1, null, 1)] // Child 3 to content root
@@ -1823,6 +2082,14 @@ public class ContentNavigationServiceBaseTests
         Assert.AreEqual(initialDescendantsCount, descendantsCountAfterMove);
     }
 
+    /// <summary>
+    /// Verifies that when a node with descendants is moved to a new parent, the target parent's descendant count is updated correctly.
+    /// The test ensures that the target parent's descendant count increases by the number of descendants of the moved node plus the node itself.
+    /// </summary>
+    /// <param name="nodeToMove">The key of the node to move.</param>
+    /// <param name="sortOrder">The sort order for the move operation (not directly asserted in this test).</param>
+    /// <param name="targetParentKey">The key of the target parent node to which the node is moved.</param>
+    /// <param name="initialDescendantsCountOfTargetParent">The initial count of descendants of the target parent before the move.</param>
     [Test]
     [TestCase("B606E3FF-E070-4D46-8CB9-D31352029FDF", 0, "A1B1B217-B02F-4307-862C-A5E22DB729EB", 0)] // Child 3 to Grandchild 2
     [TestCase("60E0E5C4-084E-4144-A560-7393BEAD2E96", 1, "B606E3FF-E070-4D46-8CB9-D31352029FDF", 1)] // Child 2 to Child 3
@@ -1847,6 +2114,9 @@ public class ContentNavigationServiceBaseTests
         Assert.AreEqual(initialDescendantsCountOfTargetParent + descendantsCountOfNodeToMove + 1, updatedDescendantsCountOfTargetParent);
     }
 
+    /// <summary>
+    /// Tests that a node cannot be restored when the target parent does not exist.
+    /// </summary>
     [Test]
     public void Cannot_Restore_Node_When_Target_Parent_Does_Not_Exist()
     {
@@ -1862,6 +2132,9 @@ public class ContentNavigationServiceBaseTests
         Assert.IsFalse(result);
     }
 
+    /// <summary>
+    /// Tests that attempting to restore a node that does not exist returns false.
+    /// </summary>
     [Test]
     public void Cannot_Restore_Node_That_Does_Not_Exist()
     {
@@ -1876,6 +2149,11 @@ public class ContentNavigationServiceBaseTests
         Assert.IsFalse(result);
     }
 
+    /// <summary>
+    /// Tests that a node can be restored to an existing target parent.
+    /// </summary>
+    /// <param name="nodeToRestore">The key of the node to restore.</param>
+    /// <param name="targetParentKey">The key of the target parent node, or null if restoring to root.</param>
     [Test]
     [TestCase("E48DD82A-7059-418E-9B82-CDD5205796CF", null)] // Root
     [TestCase("C6173927-0C59-4778-825D-D7B9F45D8DDE", "E48DD82A-7059-418E-9B82-CDD5205796CF")] // Child 1
@@ -1915,6 +2193,11 @@ public class ContentNavigationServiceBaseTests
         });
     }
 
+    /// <summary>
+    /// Verifies that when a node is restored from the recycle bin, it is correctly added to the children of the specified target parent node.
+    /// </summary>
+    /// <param name="nodeToRestore">The unique identifier (GUID) of the node to be restored from the recycle bin.</param>
+    /// <param name="targetParentKey">The unique identifier (GUID) of the target parent node to which the restored node should be added as a child.</param>
     [Test]
     [TestCase("E856AC03-C23E-4F63-9AA9-681B42A58573", "C6173927-0C59-4778-825D-D7B9F45D8DDE")] // Grandchild 1 to Child 1
     [TestCase("56E29EA9-E224-4210-A59F-7C2C5C0C5CC7", "60E0E5C4-084E-4144-A560-7393BEAD2E96")] // Great-grandchild 1 to Child 2
@@ -1943,6 +2226,10 @@ public class ContentNavigationServiceBaseTests
         });
     }
 
+    /// <summary>
+    /// Tests that when a node is restored from the bin, the node and all its descendants are removed from the bin.
+    /// </summary>
+    /// <param name="nodeToRestore">The unique identifier of the node to restore from the bin.</param>
     [Test]
     [TestCase("E48DD82A-7059-418E-9B82-CDD5205796CF")] // Root
     [TestCase("C6173927-0C59-4778-825D-D7B9F45D8DDE")] // Child 1
@@ -1973,6 +2260,12 @@ public class ContentNavigationServiceBaseTests
         });
     }
 
+    /// <summary>
+    /// Tests that a restored node has the same amount of descendants as before it was moved to the bin.
+    /// </summary>
+    /// <param name="nodeToRestore">The key of the node to restore.</param>
+    /// <param name="targetParentKey">The key of the target parent node where the node will be restored. Can be null.</param>
+    /// <param name="initialDescendantsCount">The initial count of descendants before the node was moved to the bin.</param>
     [Test]
     [TestCase("E48DD82A-7059-418E-9B82-CDD5205796CF", null, 8)] // Root to content root
     [TestCase("C6173927-0C59-4778-825D-D7B9F45D8DDE", "56E29EA9-E224-4210-A59F-7C2C5C0C5CC7", 2)] // Child 1 to Great-grandchild 1
@@ -2028,6 +2321,12 @@ public class ContentNavigationServiceBaseTests
 
 internal class TestContentNavigationService : ContentNavigationServiceBase<IContentType, IContentTypeService>
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="TestContentNavigationService"/> class.
+    /// </summary>
+    /// <param name="coreScopeProvider">The core scope provider.</param>
+    /// <param name="navigationRepository">The navigation repository.</param>
+    /// <param name="contentTypeService">The content type service.</param>
     public TestContentNavigationService(
         ICoreScopeProvider coreScopeProvider,
         INavigationRepository navigationRepository,
@@ -2037,8 +2336,17 @@ internal class TestContentNavigationService : ContentNavigationServiceBase<ICont
     }
 
     // Not needed for testing here
+    /// <summary>
+    /// Asynchronously rebuilds the content navigation service.
+    /// In this test implementation, the method completes immediately and performs no operation.
+    /// </summary>
+    /// <returns>A completed task representing the asynchronous operation.</returns>
     public override Task RebuildAsync() => Task.CompletedTask;
 
     // Not needed for testing here
+    /// <summary>
+    /// Rebuilds the binary data asynchronously. Not needed for testing here.
+    /// </summary>
+    /// <returns>A completed task.</returns>
     public override Task RebuildBinAsync() => Task.CompletedTask;
 }

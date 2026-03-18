@@ -8,8 +8,14 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core;
 
+/// <summary>
+/// Contains unit tests for the <see cref="ClaimsIdentityExtensions"/> class, verifying its extension methods and expected behaviors.
+/// </summary>
 public class ClaimsIdentityExtensionsTests
 {
+    /// <summary>
+    /// Tests that FindFirstValue throws an ArgumentNullException when the identity is null.
+    /// </summary>
     [Test]
     public void FindFirstValue_WhenIdentityIsNull_ExpectArgumentNullException()
     {
@@ -17,6 +23,9 @@ public class ClaimsIdentityExtensionsTests
         Assert.Throws<ArgumentNullException>(() => identity.FindFirstValue("test"));
     }
 
+    /// <summary>
+    /// Tests that FindFirstValue returns null when the specified claim is not present.
+    /// </summary>
     [Test]
     public void FindFirstValue_WhenClaimNotPresent_ExpectNull()
     {
@@ -25,6 +34,9 @@ public class ClaimsIdentityExtensionsTests
         Assert.IsNull(value);
     }
 
+    /// <summary>
+    /// Tests that FindFirstValue returns the correct claim value when a matching claim is present.
+    /// </summary>
     [Test]
     public void FindFirstValue_WhenMatchingClaimPresent_ExpectCorrectValue()
     {
@@ -36,6 +48,9 @@ public class ClaimsIdentityExtensionsTests
         Assert.AreEqual(expectedClaim.Value, value);
     }
 
+    /// <summary>
+    /// Tests that when multiple claims with the same type are present, the first claim's value is returned.
+    /// </summary>
     [Test]
     public void FindFirstValue_WhenMultipleMatchingClaimsPresent_ExpectFirstValue()
     {

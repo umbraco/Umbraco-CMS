@@ -7,6 +7,9 @@ using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core;
 
+/// <summary>
+/// Contains unit tests for verifying the functionality of the <see cref="HexEncoder"/> class.
+/// </summary>
 public class HexEncoderTests
 {
     private static readonly char[] s_bytesToHexStringLookup =
@@ -14,6 +17,9 @@ public class HexEncoderTests
         '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F',
     };
 
+    /// <summary>
+    /// Tests that the ToHexString method creates the correct hexadecimal string representation of a byte array.
+    /// </summary>
     [Test]
     public void ToHexStringCreatesCorrectValue()
     {
@@ -33,6 +39,9 @@ public class HexEncoderTests
         Assert.AreEqual(expected, actual);
     }
 
+    /// <summary>
+    /// Tests that the ToHexString method with a separator creates the correct hex string value.
+    /// </summary>
     [Test]
     public void ToHexStringWithSeparatorCreatesCorrectValue()
     {

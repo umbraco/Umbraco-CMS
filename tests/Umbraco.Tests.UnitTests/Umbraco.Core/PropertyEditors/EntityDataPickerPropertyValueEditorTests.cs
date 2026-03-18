@@ -10,9 +10,17 @@ using Umbraco.Cms.Infrastructure.Serialization;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 
+/// <summary>
+/// Contains unit tests for the <see cref="EntityDataPickerPropertyValueEditor"/> class in Umbraco.
+/// </summary>
 [TestFixture]
 public class EntityDataPickerPropertyValueEditorTests
 {
+    /// <summary>
+    /// Validates that the number of selections is greater than or equal to the configured minimum.
+    /// </summary>
+    /// <param name="numberOfSelections">The number of selections made.</param>
+    /// <param name="expectedSuccess">Indicates whether the validation is expected to succeed.</param>
     [TestCase(1, false)]
     [TestCase(2, true)]
     [TestCase(3, true)]
@@ -39,6 +47,11 @@ public class EntityDataPickerPropertyValueEditorTests
         }
     }
 
+    /// <summary>
+    /// Validates that the number of selected entities is less than or equal to the configured maximum.
+    /// </summary>
+    /// <param name="numberOfSelections">The number of entities selected.</param>
+    /// <param name="expectedSuccess">Indicates whether the validation is expected to succeed.</param>
     [TestCase(3, true)]
     [TestCase(4, true)]
     [TestCase(5, false)]

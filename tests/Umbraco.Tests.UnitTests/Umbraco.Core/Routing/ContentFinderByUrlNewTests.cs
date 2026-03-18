@@ -11,6 +11,9 @@ using Umbraco.Cms.Core.Web;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Routing;
 
+/// <summary>
+/// Contains unit tests for the <see cref="ContentFinderByUrlNew"/> class, verifying its behavior and functionality.
+/// </summary>
 [TestFixture]
 public class ContentFinderByUrlNewTests
 {
@@ -20,6 +23,12 @@ public class ContentFinderByUrlNewTests
     private const string ContentPath = "/test-page";
     private const string DomainHost = "example.com";
 
+    /// <summary>
+    /// Tests whether the content finder can locate invariant (culture-neutral) content based on the provided URL path.
+    /// </summary>
+    /// <param name="path">The URL path to attempt to resolve to content.</param>
+    /// <param name="expectSuccess">True if the content is expected to be found; otherwise, false.</param>
+    /// <returns>A task that represents the asynchronous test operation.</returns>
     [TestCase(ContentPath, true)]
     [TestCase("/missing-page", false)]
     public async Task Can_Find_Invariant_Content(string path, bool expectSuccess)
@@ -49,6 +58,14 @@ public class ContentFinderByUrlNewTests
         }
     }
 
+    /// <summary>
+    /// Verifies that invariant (culture-neutral) content can be found or not found via URL resolution when a domain is set or not set, and when strict domain matching is enabled or disabled.
+    /// </summary>
+    /// <param name="path">The URL path to resolve content for.</param>
+    /// <param name="setDomain">If true, associates a domain with the request; otherwise, no domain is set.</param>
+    /// <param name="useStrictDomainMatching">If true, enables strict domain matching in routing settings.</param>
+    /// <param name="expectSuccess">True if content resolution is expected to succeed; otherwise, false.</param>
+    /// <returns>A task that represents the asynchronous test operation.</returns>
     [TestCase(ContentPath, true, false, true)]
     [TestCase("/missing-page", true, false, false)]
     [TestCase(ContentPath, true, true, true)]

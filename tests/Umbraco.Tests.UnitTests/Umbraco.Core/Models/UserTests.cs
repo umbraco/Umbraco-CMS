@@ -1,4 +1,4 @@
-// Copyright (c) Umbraco.
+﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.Diagnostics;
@@ -10,14 +10,23 @@ using Umbraco.Cms.Tests.Common.Builders.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models;
 
+/// <summary>
+/// Unit tests for the <see cref="global::Umbraco.Core.Models.User"/> class.
+/// </summary>
 [TestFixture]
 public class UserTests
 {
+    /// <summary>
+    /// Sets up the test environment before each test.
+    /// </summary>
     [SetUp]
     public void SetUp() => _builder = new UserBuilder();
 
     private UserBuilder _builder;
 
+    /// <summary>
+    /// Tests that a User object can be deep cloned correctly.
+    /// </summary>
     [Test]
     public void Can_Deep_Clone()
     {
@@ -38,6 +47,9 @@ public class UserTests
         }
     }
 
+    /// <summary>
+    /// Tests that a User object can be serialized to JSON without throwing an error.
+    /// </summary>
     [Test]
     public void Can_Serialize_Without_Error()
     {

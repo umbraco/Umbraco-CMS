@@ -5,9 +5,18 @@ using Umbraco.Cms.Api.Delivery.Services;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Delivery.Services;
 
+/// <summary>
+/// Contains unit tests for the <see cref="RequestPreviewService"/> class in the Umbraco CMS API delivery layer.
+/// These tests verify the functionality and behavior of the preview request service.
+/// </summary>
 [TestFixture]
 public class RequestPreviewServiceTests
 {
+    /// <summary>
+    /// Tests that the IsPreview method returns the expected result based on the provided preview header value.
+    /// </summary>
+    /// <param name="headerValue">The value of the preview header to test.</param>
+    /// <param name="expected">The expected boolean result indicating if preview mode is active.</param>
     [TestCase(null, false)]
     [TestCase("", false)]
     [TestCase("false", false)]

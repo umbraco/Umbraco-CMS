@@ -16,9 +16,15 @@ using Umbraco.Cms.Tests.UnitTests.TestHelpers.Objects;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Templates;
 
+/// <summary>
+/// Contains unit tests for the <see cref="HtmlLocalLinkParser"/> class, verifying the parsing of local links in HTML content.
+/// </summary>
 [TestFixture]
 public class HtmlLocalLinkParserTests
 {
+    /// <summary>
+    /// Tests that the HtmlLocalLinkParser correctly extracts Udis from local link references in HTML.
+    /// </summary>
     [Test]
     public void Returns_Udis_From_LocalLinks()
     {
@@ -44,6 +50,9 @@ public class HtmlLocalLinkParserTests
     }
 
     // todo remove at some point and the implementation.
+    /// <summary>
+    /// Tests that the HtmlLocalLinkParser correctly returns Udis from legacy local links in the input HTML.
+    /// </summary>
     [Test]
     public void Returns_Udis_From_Legacy_LocalLinks()
     {
@@ -69,6 +78,9 @@ public class HtmlLocalLinkParserTests
     }
 
     // todo remove at some point and the implementation.
+    /// <summary>
+    /// Tests that the HtmlLocalLinkParser correctly returns Udis from both legacy and current local link formats.
+    /// </summary>
     [Test]
     public void Returns_Udis_From_Legacy_And_Current_LocalLinks()
     {
@@ -103,6 +115,11 @@ public class HtmlLocalLinkParserTests
         });
     }
 
+    /// <summary>
+    /// Tests parsing of local links in HTML input and verifies the output matches the expected result.
+    /// </summary>
+    /// <param name="input">The input HTML string containing local links to parse.</param>
+    /// <param name="result">The expected output string after parsing local links.</param>
     [TestCase("", "")]
     // current
     [TestCase(
@@ -242,6 +259,11 @@ public class HtmlLocalLinkParserTests
         }
     }
 
+    /// <summary>
+    /// Verifies that <see cref="HtmlLocalLinkParser.EnsureInternalLinks"/> correctly respects the specified <see cref="UrlMode"/> when parsing local links.
+    /// This test ensures that when <c>UrlMode.Relative</c> is used, the output URL is relative, and when <c>UrlMode.Absolute</c> is used, the output URL is absolute.
+    /// It mocks the URL provider to return different URLs for each mode and asserts that the parser output matches the expected format for both cases.
+    /// </summary>
     [Test]
     public void ParseLocalLinks_WithUrlMode_RespectsUrlMode()
     {
@@ -457,6 +479,12 @@ public class HtmlLocalLinkParserTests
             new Mock<IPublishedContentStatusFilteringService>().Object);
     }
 
+    /// <summary>
+    /// Tests that internal links containing a culture attribute are replaced correctly,
+    /// ensuring the culture attribute is preserved in the resulting HTML.
+    /// </summary>
+    /// <param name="input">The input HTML string containing a local link with a culture attribute.</param>
+    /// <param name="expected">The expected HTML string after the link has been replaced.</param>
     [TestCase(
         "<a type=\"document\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" data-culture=\"en-US\" title=\"world\">world</a>",
         "<a href=\"/my-test-url\" data-culture=\"en-US\" title=\"world\">world</a>")]
@@ -540,6 +568,9 @@ public class HtmlLocalLinkParserTests
         }
     }
 
+    /// <summary>
+    /// Ensures that internal links with a culture attribute pass the culture to the URL provider correctly.
+    /// </summary>
     [Test]
     public void EnsureInternalLinks_WithCultureAttribute_PassesCultureToUrlProvider()
     {
@@ -604,6 +635,11 @@ public class HtmlLocalLinkParserTests
         }
     }
 
+    /// <summary>
+    /// Ensures that internal links without a culture attribute are replaced normally.
+    /// </summary>
+    /// <param name="input">The input HTML string containing local links.</param>
+    /// <param name="expected">The expected output HTML string after replacement.</param>
     [TestCase(
         "<a type=\"document\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" title=\"world\">world</a>",
         "<a href=\"/my-test-url\" title=\"world\">world</a>")]

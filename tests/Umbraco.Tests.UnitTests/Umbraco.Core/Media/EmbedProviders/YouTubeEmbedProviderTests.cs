@@ -6,11 +6,18 @@ using Umbraco.Cms.Core.Serialization;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Media.EmbedProviders;
 
+/// <summary>
+/// Contains unit tests for the <see cref="YouTubeEmbedProvider"/> class, verifying YouTube embed provider functionality in Umbraco.
+/// </summary>
 [TestFixture]
 public class YouTubeEmbedProviderTests : OEmbedProviderTestBase
 {
     protected override IEmbedProvider Provider { get; } = new YouTube(Mock.Of<IJsonSerializer>());
 
+    /// <summary>
+    /// Tests that the URL scheme regex correctly matches valid YouTube URLs.
+    /// </summary>
+    /// <param name="url">The YouTube URL to test against the regex.</param>
     [TestCase("https://www.youtube.com/watch?v=abc123")]
     [TestCase("https://youtube.com/watch?v=abc123")]
     [TestCase("http://www.youtube.com/watch?v=abc123")]
@@ -27,6 +34,10 @@ public class YouTubeEmbedProviderTests : OEmbedProviderTestBase
         Assert.That(result, Is.True, $"Expected URL to match: {url}");
     }
 
+    /// <summary>
+    /// Verifies that the URL scheme regex does not incorrectly match potentially malicious URLs, helping to prevent SSRF (Server-Side Request Forgery) attacks.
+    /// </summary>
+    /// <param name="url">A potentially malicious URL to test against the YouTube embed provider's URL scheme regex.</param>
     [TestCase("http://127.0.0.1/youtube.com/watch?v=abc123")]
     [TestCase("http://localhost/youtube.com/watch?v=abc123")]
     [TestCase("http://example.com/youtube.com/watch?v=abc123")]
@@ -39,6 +50,10 @@ public class YouTubeEmbedProviderTests : OEmbedProviderTestBase
         Assert.That(result, Is.False, $"Expected URL to NOT match (SSRF protection): {url}");
     }
 
+    /// <summary>
+    /// Tests that the URL scheme regex does not match URLs unrelated to YouTube.
+    /// </summary>
+    /// <param name="url">The URL to test against the YouTube URL scheme regex.</param>
     [TestCase("https://www.vimeo.com/123456789")]
     [TestCase("https://flickr.com/photos/example/123")]
     [TestCase("https://notyoutube.com/watch?v=abc123")]

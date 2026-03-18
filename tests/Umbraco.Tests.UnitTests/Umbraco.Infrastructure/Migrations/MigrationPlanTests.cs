@@ -27,9 +27,18 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations;
 
+/// <summary>
+/// Provides unit tests for the <see cref="MigrationPlan"/> class within the Umbraco infrastructure migrations namespace.
+/// These tests verify the behavior and correctness of migration planning functionality.
+/// </summary>
 [TestFixture]
 public class MigrationPlanTests
 {
+    /// <summary>
+    /// Tests that a migration plan can be executed successfully.
+    /// Verifies that the final migration state is as expected and that the correct database operations are performed.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task CanExecute()
     {
@@ -119,6 +128,9 @@ public class MigrationPlanTests
         Assert.AreEqual("DROP TABLE [umbracoRedirectUrl]", database.Operations[0].Sql);
     }
 
+    /// <summary>
+    /// Tests that migrations can be added to a migration plan.
+    /// </summary>
     [Test]
     public void CanAddMigrations()
     {
@@ -130,6 +142,9 @@ public class MigrationPlanTests
             .To("ccc");
     }
 
+    /// <summary>
+    /// Tests that transitioning to the same state throws an ArgumentException.
+    /// </summary>
     [Test]
     public void CannotTransitionToSameState()
     {
@@ -137,6 +152,9 @@ public class MigrationPlanTests
         Assert.Throws<ArgumentException>(() => plan.From("aaa").To("aaa"));
     }
 
+    /// <summary>
+    /// Tests that only one transition is allowed per state in the migration plan.
+    /// </summary>
     [Test]
     public void OnlyOneTransitionPerState()
     {
@@ -145,6 +163,9 @@ public class MigrationPlanTests
         Assert.Throws<InvalidOperationException>(() => plan.From("aaa").To("ccc"));
     }
 
+    /// <summary>
+    /// Tests that a migration plan cannot contain two or more heads.
+    /// </summary>
     [Test]
     public void CannotContainTwoMoreHeads()
     {
@@ -158,6 +179,9 @@ public class MigrationPlanTests
         Assert.Throws<InvalidOperationException>(() => plan.Validate());
     }
 
+    /// <summary>
+    /// Tests that the migration plan cannot contain loops and throws an exception if a loop is detected.
+    /// </summary>
     [Test]
     public void CannotContainLoops()
     {
@@ -170,6 +194,9 @@ public class MigrationPlanTests
         Assert.Throws<InvalidOperationException>(() => plan.Validate());
     }
 
+    /// <summary>
+    /// Validates the Umbraco migration plan to ensure it is correctly configured and its final state is valid.
+    /// </summary>
     [Test]
     public void ValidateUmbracoPlan()
     {
@@ -179,6 +206,10 @@ public class MigrationPlanTests
         Assert.IsFalse(plan.FinalState.IsNullOrWhiteSpace());
     }
 
+    /// <summary>
+    /// Tests that a MigrationPlan can be cloned correctly and that the cloned plan
+    /// maintains the expected migration paths.
+    /// </summary>
     [Test]
     public void CanClone()
     {
@@ -203,6 +234,9 @@ public class MigrationPlanTests
         Assert.AreEqual("yyy", plan.FollowPath("xxx", "yyy").Last());
     }
 
+    /// <summary>
+    /// Tests that migration plans can be merged correctly and the resulting plan follows the expected path.
+    /// </summary>
     [Test]
     public void CanMerge()
     {
@@ -253,8 +287,15 @@ public class MigrationPlanTests
         }
     }
 
+    /// <summary>
+    /// Tests the migration plan responsible for deleting the RedirectUrl table.
+    /// </summary>
     public class DeleteRedirectUrlTable : MigrationBase
     {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DeleteRedirectUrlTable"/> class.
+    /// </summary>
+    /// <param name="context">The migration context.</param>
         public DeleteRedirectUrlTable(IMigrationContext context)
             : base(context)
         {

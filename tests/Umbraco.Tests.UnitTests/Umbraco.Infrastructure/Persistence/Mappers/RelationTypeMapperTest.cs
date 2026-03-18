@@ -7,9 +7,15 @@ using Umbraco.Cms.Tests.UnitTests.TestHelpers;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Persistence.Mappers;
 
+/// <summary>
+/// Contains unit tests for the <see cref="RelationTypeMapper"/> class, verifying its mapping functionality and behavior.
+/// </summary>
 [TestFixture]
 public class RelationTypeMapperTest
 {
+    /// <summary>
+    /// Tests that the Id property is correctly mapped to the expected database column.
+    /// </summary>
     [Test]
     public void Can_Map_Id_Property()
     {
@@ -20,6 +26,9 @@ public class RelationTypeMapperTest
         Assert.That(column, Is.EqualTo("[umbracoRelationType].[id]"));
     }
 
+    /// <summary>
+    /// Tests that the Alias property is correctly mapped to the database column.
+    /// </summary>
     [Test]
     public void Can_Map_Alias_Property()
     {
@@ -30,6 +39,9 @@ public class RelationTypeMapperTest
         Assert.That(column, Is.EqualTo("[umbracoRelationType].[alias]"));
     }
 
+    /// <summary>
+    /// Tests that the ChildObjectType property is correctly mapped by the RelationTypeMapper.
+    /// </summary>
     [Test]
     public void Can_Map_ChildObjectType_Property()
     {
@@ -41,6 +53,9 @@ public class RelationTypeMapperTest
         Assert.That(column, Is.EqualTo("[umbracoRelationType].[childObjectType]"));
     }
 
+    /// <summary>
+    /// Tests that the IsBidirectional property maps correctly to the expected database column.
+    /// </summary>
     [Test]
     public void Can_Map_IsBidirectional_Property()
     {

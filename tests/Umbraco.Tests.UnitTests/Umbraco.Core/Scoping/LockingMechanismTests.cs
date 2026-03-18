@@ -13,6 +13,9 @@ internal class LockingMechanismTests
     private const int LockId2 = 1001;
     private static readonly Guid _scopeInstanceId = Guid.NewGuid();
 
+    /// <summary>
+    /// Tests that calling IncrementLock without an existing locks dictionary creates a new lock entry.
+    /// </summary>
     [Test]
     public void IncrementLock_WithoutLocksDictionary_CreatesLock()
     {
@@ -22,6 +25,9 @@ internal class LockingMechanismTests
         Assert.AreEqual(1, locks[_scopeInstanceId][LockId]);
     }
 
+    /// <summary>
+    /// Tests that IncrementLock correctly increments the lock count for an existing lock in the locks dictionary.
+    /// </summary>
     [Test]
     public void IncrementLock_WithExistingLocksDictionary_CreatesLock()
     {

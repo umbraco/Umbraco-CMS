@@ -19,6 +19,10 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Management.ServerEvents;
 [TestFixture]
 internal sealed class ServerEventSenderTests
 {
+    /// <summary>
+    /// Tests that handling a ContentSavedNotification triggers a RoutesCreated event.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task HandleAsync_ContentSavedNotification_RoutesCreatedEvent()
     {
@@ -41,6 +45,10 @@ internal sealed class ServerEventSenderTests
         AssertPrimaryRoutedEvent(recordingRouter, contentKey, Constants.ServerEvents.EventType.Created, Constants.ServerEvents.EventSource.Document);
     }
 
+    /// <summary>
+    /// Tests that when a ContentSavedNotification is handled, a RoutesUpdated event is correctly routed.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task HandleAsync_ContentSavedNotification_RoutesUpdatedEvent()
     {
@@ -64,6 +72,10 @@ internal sealed class ServerEventSenderTests
         AssertPrimaryRoutedEvent(recordingRouter, contentKey, Constants.ServerEvents.EventType.Updated, Constants.ServerEvents.EventSource.Document);
     }
 
+    /// <summary>
+    /// Verifies that when a <see cref="ContentSavedBlueprintNotification"/> is handled, a <c>RoutesCreated</c> server event is correctly routed.
+    /// </summary>
+    /// <returns>A <see cref="Task"/> representing the asynchronous test operation.</returns>
     [Test]
     public async Task HandleAsync_ContentSavedBlueprintNotification_RoutesCreatedEvent()
     {
@@ -86,6 +98,10 @@ internal sealed class ServerEventSenderTests
         AssertPrimaryRoutedEvent(recordingRouter, blueprintKey, Constants.ServerEvents.EventType.Created, Constants.ServerEvents.EventSource.DocumentBlueprint);
     }
 
+    /// <summary>
+    /// Tests that handling a <see cref="ContentSavedBlueprintNotification"/> triggers an Updated server event with the DocumentBlueprint as the event source.
+    /// </summary>
+    /// <returns>A task that represents the asynchronous test operation.</returns>
     [Test]
     public async Task HandleAsync_ContentSavedBlueprintNotification_RoutesUpdatedEvent()
     {
@@ -107,6 +123,10 @@ internal sealed class ServerEventSenderTests
         AssertPrimaryRoutedEvent(recordingRouter, blueprintKey, Constants.ServerEvents.EventType.Updated, Constants.ServerEvents.EventSource.DocumentBlueprint);
     }
 
+    /// <summary>
+    /// Tests that handling a ContentTypeSavedNotification results in a RoutesCreated event being routed.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task HandleAsync_ContentTypeSavedNotification_RoutesCreatedEvent()
     {
@@ -126,6 +146,10 @@ internal sealed class ServerEventSenderTests
         AssertPrimaryRoutedEvent(recordingRouter, entityKey, Constants.ServerEvents.EventType.Created, Constants.ServerEvents.EventSource.DocumentType);
     }
 
+    /// <summary>
+    /// Verifies that handling a <see cref="ContentTypeSavedNotification"/> triggers a <c>RoutesUpdated</c> server event for the corresponding content type.
+    /// </summary>
+    /// <returns>A <see cref="Task"/> representing the asynchronous test operation.</returns>
     [Test]
     public async Task HandleAsync_ContentTypeSavedNotification_RoutesUpdatedEvent()
     {
@@ -144,6 +168,10 @@ internal sealed class ServerEventSenderTests
         AssertPrimaryRoutedEvent(recordingRouter, entityKey, Constants.ServerEvents.EventType.Updated, Constants.ServerEvents.EventSource.DocumentType);
     }
 
+    /// <summary>
+    /// Tests that handling a MediaSavedNotification results in a RoutesCreatedEvent being routed.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task HandleAsync_MediaSavedNotification_RoutesCreatedEvent()
     {
@@ -163,6 +191,10 @@ internal sealed class ServerEventSenderTests
         AssertPrimaryRoutedEvent(recordingRouter, entityKey, Constants.ServerEvents.EventType.Created, Constants.ServerEvents.EventSource.Media);
     }
 
+    /// <summary>
+    /// Tests that handling a MediaSavedNotification triggers a RoutesUpdated event.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task HandleAsync_MediaSavedNotification_RoutesUpdatedEvent()
     {
@@ -181,6 +213,10 @@ internal sealed class ServerEventSenderTests
         AssertPrimaryRoutedEvent(recordingRouter, entityKey, Constants.ServerEvents.EventType.Updated, Constants.ServerEvents.EventSource.Media);
     }
 
+    /// <summary>
+    /// Tests that when a MediaTypeSavedNotification is handled, a RoutesCreated event is correctly routed.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task HandleAsync_MediaTypeSavedNotification_RoutesCreatedEvent()
     {
@@ -200,6 +236,10 @@ internal sealed class ServerEventSenderTests
         AssertPrimaryRoutedEvent(recordingRouter, entityKey, Constants.ServerEvents.EventType.Created, Constants.ServerEvents.EventSource.MediaType);
     }
 
+    /// <summary>
+    /// Tests that handling a MediaTypeSavedNotification triggers a RoutesUpdatedEvent.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task HandleAsync_MediaTypeSavedNotification_RoutesUpdatedEvent()
     {
@@ -218,6 +258,10 @@ internal sealed class ServerEventSenderTests
         AssertPrimaryRoutedEvent(recordingRouter, entityKey, Constants.ServerEvents.EventType.Updated, Constants.ServerEvents.EventSource.MediaType);
     }
 
+    /// <summary>
+    /// Verifies that when a <see cref="MemberSavedNotification"/> is handled, a <c>RoutesCreated</c> server event is correctly routed for the member entity.
+    /// </summary>
+    /// <returns>A <see cref="Task"/> representing the asynchronous test operation.</returns>
     [Test]
     public async Task HandleAsync_MemberSavedNotification_RoutesCreatedEvent()
     {
@@ -237,6 +281,10 @@ internal sealed class ServerEventSenderTests
         AssertPrimaryRoutedEvent(recordingRouter, entityKey, Constants.ServerEvents.EventType.Created, Constants.ServerEvents.EventSource.Member);
     }
 
+    /// <summary>
+    /// Tests that when a MemberSavedNotification is handled, a RoutesUpdated event is routed correctly.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
     [Test]
     public async Task HandleAsync_MemberSavedNotification_RoutesUpdatedEvent()
     {
@@ -255,6 +303,10 @@ internal sealed class ServerEventSenderTests
         AssertPrimaryRoutedEvent(recordingRouter, entityKey, Constants.ServerEvents.EventType.Updated, Constants.ServerEvents.EventSource.Member);
     }
 
+    /// <summary>
+    /// Tests that when a MemberTypeSavedNotification is handled, a RoutesCreated event is created and routed correctly.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task HandleAsync_MemberTypeSavedNotification_RoutesCreatedEvent()
     {
@@ -274,6 +326,10 @@ internal sealed class ServerEventSenderTests
         AssertPrimaryRoutedEvent(recordingRouter, entityKey, Constants.ServerEvents.EventType.Created, Constants.ServerEvents.EventSource.MemberType);
     }
 
+    /// <summary>
+    /// Tests that handling a MemberTypeSavedNotification triggers a RoutesUpdatedEvent.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
     [Test]
     public async Task HandleAsync_MemberTypeSavedNotification_RoutesUpdatedEvent()
     {
@@ -292,6 +348,10 @@ internal sealed class ServerEventSenderTests
         AssertPrimaryRoutedEvent(recordingRouter, entityKey, Constants.ServerEvents.EventType.Updated, Constants.ServerEvents.EventSource.MemberType);
     }
 
+    /// <summary>
+    /// Tests that handling a MemberGroupSavedNotification results in a RoutesCreated event being created and routed.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task HandleAsync_MemberGroupSavedNotification_RoutesCreatedEvent()
     {
@@ -311,6 +371,10 @@ internal sealed class ServerEventSenderTests
         AssertPrimaryRoutedEvent(recordingRouter, entityKey, Constants.ServerEvents.EventType.Created, Constants.ServerEvents.EventSource.MemberGroup);
     }
 
+    /// <summary>
+    /// Tests that handling a MemberGroupSavedNotification triggers a RoutesUpdatedEvent.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task HandleAsync_MemberGroupSavedNotification_RoutesUpdatedEvent()
     {
@@ -329,6 +393,10 @@ internal sealed class ServerEventSenderTests
         AssertPrimaryRoutedEvent(recordingRouter, entityKey, Constants.ServerEvents.EventType.Updated, Constants.ServerEvents.EventSource.MemberGroup);
     }
 
+    /// <summary>
+    /// Tests that when a DataTypeSavedNotification is handled, a RoutesCreated event is correctly routed.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
     [Test]
     public async Task HandleAsync_DataTypeSavedNotification_RoutesCreatedEvent()
     {
@@ -348,6 +416,10 @@ internal sealed class ServerEventSenderTests
         AssertPrimaryRoutedEvent(recordingRouter, entityKey, Constants.ServerEvents.EventType.Created, Constants.ServerEvents.EventSource.DataType);
     }
 
+    /// <summary>
+    /// Tests that handling a DataTypeSavedNotification triggers a RoutesUpdated event.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task HandleAsync_DataTypeSavedNotification_RoutesUpdatedEvent()
     {
@@ -366,6 +438,10 @@ internal sealed class ServerEventSenderTests
         AssertPrimaryRoutedEvent(recordingRouter, entityKey, Constants.ServerEvents.EventType.Updated, Constants.ServerEvents.EventSource.DataType);
     }
 
+    /// <summary>
+    /// Tests that handling a LanguageSavedNotification triggers a RoutesCreatedEvent.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task HandleAsync_LanguageSavedNotification_RoutesCreatedEvent()
     {
@@ -385,6 +461,10 @@ internal sealed class ServerEventSenderTests
         AssertPrimaryRoutedEvent(recordingRouter, entityKey, Constants.ServerEvents.EventType.Created, Constants.ServerEvents.EventSource.Language);
     }
 
+    /// <summary>
+    /// Tests that handling a LanguageSavedNotification triggers a RoutesUpdated event.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task HandleAsync_LanguageSavedNotification_RoutesUpdatedEvent()
     {
@@ -403,6 +483,10 @@ internal sealed class ServerEventSenderTests
         AssertPrimaryRoutedEvent(recordingRouter, entityKey, Constants.ServerEvents.EventType.Updated, Constants.ServerEvents.EventSource.Language);
     }
 
+    /// <summary>
+    /// Tests that handling a PublicAccessEntrySavedNotification results in both a RoutesCreated event and a DocumentUpdated event being routed.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task HandleAsync_PublicAccessEntrySavedNotification_RoutesCreatedEventAndDocumentUpdatedEvent()
     {
@@ -448,6 +532,10 @@ internal sealed class ServerEventSenderTests
         });
     }
 
+    /// <summary>
+    /// Tests that handling a <see cref="PublicAccessEntrySavedNotification"/> results in routing both a routes updated event and a document updated event.
+    /// </summary>
+    /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
     [Test]
     public async Task HandleAsync_PublicAccessEntrySavedNotification_RoutesUpdatedEventAndDocumentUpdatedEvent()
     {
@@ -494,6 +582,11 @@ internal sealed class ServerEventSenderTests
         });
     }
 
+    /// <summary>
+    /// Tests that handling a PublicAccessEntryDeletedNotification routes both a Deleted event for the entry
+    /// and an Updated event for the associated protected document.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task HandleAsync_PublicAccessEntryDeletedNotification_RoutesDeletedEventAndDocumentUpdatedEvent()
     {
@@ -553,6 +646,10 @@ internal sealed class ServerEventSenderTests
         AssertPrimaryRoutedEvent(recordingRouter, entityKey, Constants.ServerEvents.EventType.Created, Constants.ServerEvents.EventSource.Script);
     }
 
+    /// <summary>
+    /// Tests that handling a ScriptSavedNotification triggers a RoutesUpdated event.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task HandleAsync_ScriptSavedNotification_RoutesUpdatedEvent()
     {
@@ -571,6 +668,10 @@ internal sealed class ServerEventSenderTests
         AssertPrimaryRoutedEvent(recordingRouter, entityKey, Constants.ServerEvents.EventType.Updated, Constants.ServerEvents.EventSource.Script);
     }
 
+    /// <summary>
+    /// Tests that when a StylesheetSavedNotification is handled, a RoutesCreated event is created and routed correctly.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
     [Test]
     public async Task HandleAsync_StylesheetSavedNotification_RoutesCreatedEvent()
     {
@@ -590,6 +691,10 @@ internal sealed class ServerEventSenderTests
         AssertPrimaryRoutedEvent(recordingRouter, entityKey, Constants.ServerEvents.EventType.Created, Constants.ServerEvents.EventSource.Stylesheet);
     }
 
+    /// <summary>
+    /// Tests that handling a StylesheetSavedNotification triggers a RoutesUpdatedEvent.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
     [Test]
     public async Task HandleAsync_StylesheetSavedNotification_RoutesUpdatedEvent()
     {
@@ -608,6 +713,13 @@ internal sealed class ServerEventSenderTests
         AssertPrimaryRoutedEvent(recordingRouter, entityKey, Constants.ServerEvents.EventType.Updated, Constants.ServerEvents.EventSource.Stylesheet);
     }
 
+    /// <summary>
+    /// Verifies that when a <see cref="TemplateSavedNotification"/> is handled, a <c>RoutesCreated</c> server event is correctly routed.
+    /// </summary>
+    /// <remarks>
+    /// This test ensures that saving a template triggers the expected server event with the correct entity key and event type.
+    /// </remarks>
+    /// <returns>A <see cref="Task"/> representing the asynchronous test operation.</returns>
     [Test]
     public async Task HandleAsync_TemplateSavedNotification_RoutesCreatedEvent()
     {
@@ -627,6 +739,13 @@ internal sealed class ServerEventSenderTests
         AssertPrimaryRoutedEvent(recordingRouter, entityKey, Constants.ServerEvents.EventType.Created, Constants.ServerEvents.EventSource.Template);
     }
 
+    /// <summary>
+    /// Tests that handling a <see cref="TemplateSavedNotification"/> results in a <c>RoutesUpdated</c> server event being routed for the updated template.
+    /// </summary>
+    /// <remarks>
+    /// Asserts that the routed event has the correct entity key, event type, and event source for a template update.
+    /// </remarks>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task HandleAsync_TemplateSavedNotification_RoutesUpdatedEvent()
     {
@@ -645,6 +764,10 @@ internal sealed class ServerEventSenderTests
         AssertPrimaryRoutedEvent(recordingRouter, entityKey, Constants.ServerEvents.EventType.Updated, Constants.ServerEvents.EventSource.Template);
     }
 
+    /// <summary>
+    /// Tests that when a DictionaryItemSavedNotification is handled, a RoutesCreated event is correctly routed.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
     [Test]
     public async Task HandleAsync_DictionaryItemSavedNotification_RoutesCreatedEvent()
     {
@@ -664,6 +787,10 @@ internal sealed class ServerEventSenderTests
         AssertPrimaryRoutedEvent(recordingRouter, entityKey, Constants.ServerEvents.EventType.Created, Constants.ServerEvents.EventSource.DictionaryItem);
     }
 
+    /// <summary>
+    /// Tests that handling a DictionaryItemSavedNotification triggers a RoutesUpdated event.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task HandleAsync_DictionaryItemSavedNotification_RoutesUpdatedEvent()
     {
@@ -682,6 +809,10 @@ internal sealed class ServerEventSenderTests
         AssertPrimaryRoutedEvent(recordingRouter, entityKey, Constants.ServerEvents.EventType.Updated, Constants.ServerEvents.EventSource.DictionaryItem);
     }
 
+    /// <summary>
+    /// Tests that handling a DomainSavedNotification results in a RoutesCreated event being routed.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
     [Test]
     public async Task HandleAsync_DomainSavedNotification_RoutesCreatedEvent()
     {
@@ -701,6 +832,10 @@ internal sealed class ServerEventSenderTests
         AssertPrimaryRoutedEvent(recordingRouter, entityKey, Constants.ServerEvents.EventType.Created, Constants.ServerEvents.EventSource.Domain);
     }
 
+    /// <summary>
+    /// Tests that handling a DomainSavedNotification triggers a RoutesUpdatedEvent.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
     [Test]
     public async Task HandleAsync_DomainSavedNotification_RoutesUpdatedEvent()
     {
@@ -719,6 +854,10 @@ internal sealed class ServerEventSenderTests
         AssertPrimaryRoutedEvent(recordingRouter, entityKey, Constants.ServerEvents.EventType.Updated, Constants.ServerEvents.EventSource.Domain);
     }
 
+    /// <summary>
+    /// Tests that handling a PartialViewSavedNotification results in a RoutesCreated event being routed.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task HandleAsync_PartialViewSavedNotification_RoutesCreatedEvent()
     {
@@ -738,6 +877,10 @@ internal sealed class ServerEventSenderTests
         AssertPrimaryRoutedEvent(recordingRouter, entityKey, Constants.ServerEvents.EventType.Created, Constants.ServerEvents.EventSource.PartialView);
     }
 
+    /// <summary>
+    /// Verifies that when a <see cref="PartialViewSavedNotification"/> is handled, a <c>RoutesUpdatedEvent</c> is triggered.
+    /// </summary>
+    /// <returns>A <see cref="Task"/> representing the asynchronous test operation.</returns>
     [Test]
     public async Task HandleAsync_PartialViewSavedNotification_RoutesUpdatedEvent()
     {
@@ -756,6 +899,10 @@ internal sealed class ServerEventSenderTests
         AssertPrimaryRoutedEvent(recordingRouter, entityKey, Constants.ServerEvents.EventType.Updated, Constants.ServerEvents.EventSource.PartialView);
     }
 
+    /// <summary>
+    /// Tests that handling a RelationSavedNotification results in a RoutesCreated event being routed.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task HandleAsync_RelationSavedNotification_RoutesCreatedEvent()
     {
@@ -775,6 +922,10 @@ internal sealed class ServerEventSenderTests
         AssertPrimaryRoutedEvent(recordingRouter, entityKey, Constants.ServerEvents.EventType.Created, Constants.ServerEvents.EventSource.Relation);
     }
 
+    /// <summary>
+    /// Tests that handling a RelationSavedNotification triggers a RoutesUpdated event.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
     [Test]
     public async Task HandleAsync_RelationSavedNotification_RoutesUpdatedEvent()
     {
@@ -793,6 +944,10 @@ internal sealed class ServerEventSenderTests
         AssertPrimaryRoutedEvent(recordingRouter, entityKey, Constants.ServerEvents.EventType.Updated, Constants.ServerEvents.EventSource.Relation);
     }
 
+    /// <summary>
+    /// Tests that handling a RelationTypeSavedNotification results in a RoutesCreatedEvent being routed.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task HandleAsync_RelationTypeSavedNotification_RoutesCreatedEvent()
     {
@@ -812,6 +967,10 @@ internal sealed class ServerEventSenderTests
         AssertPrimaryRoutedEvent(recordingRouter, entityKey, Constants.ServerEvents.EventType.Created, Constants.ServerEvents.EventSource.RelationType);
     }
 
+    /// <summary>
+    /// Tests that handling a RelationTypeSavedNotification triggers a RoutesUpdated event.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task HandleAsync_RelationTypeSavedNotification_RoutesUpdatedEvent()
     {
@@ -830,6 +989,10 @@ internal sealed class ServerEventSenderTests
         AssertPrimaryRoutedEvent(recordingRouter, entityKey, Constants.ServerEvents.EventType.Updated, Constants.ServerEvents.EventSource.RelationType);
     }
 
+    /// <summary>
+    /// Tests that when a UserGroupSavedNotification is handled, a RoutesCreated event is correctly created and routed.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task HandleAsync_UserGroupSavedNotification_RoutesCreatedEvent()
     {
@@ -849,6 +1012,10 @@ internal sealed class ServerEventSenderTests
         AssertPrimaryRoutedEvent(recordingRouter, entityKey, Constants.ServerEvents.EventType.Created, Constants.ServerEvents.EventSource.UserGroup);
     }
 
+    /// <summary>
+    /// Tests that handling a UserGroupSavedNotification triggers a RoutesUpdatedEvent.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task HandleAsync_UserGroupSavedNotification_RoutesUpdatedEvent()
     {
@@ -867,6 +1034,10 @@ internal sealed class ServerEventSenderTests
         AssertPrimaryRoutedEvent(recordingRouter, entityKey, Constants.ServerEvents.EventType.Updated, Constants.ServerEvents.EventSource.UserGroup);
     }
 
+    /// <summary>
+    /// Verifies that when handling a <see cref="UserSavedNotification"/>, a Created server event is routed for the user and a notification is sent to the current user.
+    /// </summary>
+    /// <returns>A <see cref="Task"/> representing the asynchronous test operation.</returns>
     [Test]
     public async Task HandleAsync_UserSavedNotification_RoutesCreatedEventAndNotifiesUser()
     {
@@ -897,6 +1068,10 @@ internal sealed class ServerEventSenderTests
         });
     }
 
+    /// <summary>
+    /// Tests that when a UserSavedNotification is handled, a RoutesUpdated event is routed and the user is notified.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
     [Test]
     public async Task HandleAsync_UserSavedNotification_RoutesUpdatedEventAndNotifiesUser()
     {
@@ -926,6 +1101,10 @@ internal sealed class ServerEventSenderTests
         });
     }
 
+    /// <summary>
+    /// Tests that handling a WebhookSavedNotification triggers a RoutesCreated event.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task HandleAsync_WebhookSavedNotification_RoutesCreatedEvent()
     {
@@ -945,6 +1124,10 @@ internal sealed class ServerEventSenderTests
         AssertPrimaryRoutedEvent(recordingRouter, entityKey, Constants.ServerEvents.EventType.Created, Constants.ServerEvents.EventSource.Webhook);
     }
 
+    /// <summary>
+    /// Tests that handling a WebhookSavedNotification triggers a RoutesUpdated event.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task HandleAsync_WebhookSavedNotification_RoutesUpdatedEvent()
     {
@@ -963,6 +1146,10 @@ internal sealed class ServerEventSenderTests
         AssertPrimaryRoutedEvent(recordingRouter, entityKey, Constants.ServerEvents.EventType.Updated, Constants.ServerEvents.EventSource.Webhook);
     }
 
+    /// <summary>
+    /// Tests that handling a DataTypeDeletedNotification triggers a RoutesDeletedEvent.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task HandleAsync_DataTypeDeletedNotification_RoutesDeletedEvent()
     {
@@ -981,6 +1168,10 @@ internal sealed class ServerEventSenderTests
         AssertPrimaryRoutedEvent(recordingRouter, entityKey, Constants.ServerEvents.EventType.Deleted, Constants.ServerEvents.EventSource.DataType);
     }
 
+    /// <summary>
+    /// Tests that handling a ContentDeletedNotification routes a Deleted event for the content entity.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task HandleAsync_ContentDeletedNotification_RoutesDeletedEvent()
     {
@@ -999,6 +1190,10 @@ internal sealed class ServerEventSenderTests
         AssertPrimaryRoutedEvent(recordingRouter, entityKey, Constants.ServerEvents.EventType.Deleted, Constants.ServerEvents.EventSource.Document);
     }
 
+    /// <summary>
+    /// Verifies that when a <see cref="ContentDeletedBlueprintNotification"/> is handled, a deleted event is routed for the corresponding blueprint.
+    /// </summary>
+    /// <returns>A <see cref="Task"/> representing the asynchronous test operation.</returns>
     [Test]
     public async Task HandleAsync_ContentDeletedBlueprintNotification_RoutesDeletedEvent()
     {
@@ -1017,6 +1212,11 @@ internal sealed class ServerEventSenderTests
         AssertPrimaryRoutedEvent(recordingRouter, blueprintKey, Constants.ServerEvents.EventType.Deleted, Constants.ServerEvents.EventSource.DocumentBlueprint);
     }
 
+    /// <summary>
+    /// Verifies that handling a <see cref="ContentTypeDeletedNotification"/> results in a <c>RoutesDeletedEvent</c> being routed
+    /// with the correct entity key, event type, and event source.
+    /// </summary>
+    /// <returns>A <see cref="Task"/> representing the asynchronous test operation.</returns>
     [Test]
     public async Task HandleAsync_ContentTypeDeletedNotification_RoutesDeletedEvent()
     {
@@ -1035,6 +1235,10 @@ internal sealed class ServerEventSenderTests
         AssertPrimaryRoutedEvent(recordingRouter, entityKey, Constants.ServerEvents.EventType.Deleted, Constants.ServerEvents.EventSource.DocumentType);
     }
 
+    /// <summary>
+    /// Verifies that when a <see cref="MediaDeletedNotification"/> is handled, a Deleted server event is routed for the corresponding media entity.
+    /// </summary>
+    /// <returns>A <see cref="Task"/> representing the asynchronous test operation.</returns>
     [Test]
     public async Task HandleAsync_MediaDeletedNotification_RoutesDeletedEvent()
     {
@@ -1053,6 +1257,10 @@ internal sealed class ServerEventSenderTests
         AssertPrimaryRoutedEvent(recordingRouter, entityKey, Constants.ServerEvents.EventType.Deleted, Constants.ServerEvents.EventSource.Media);
     }
 
+    /// <summary>
+    /// Verifies that handling a <see cref="MediaTypeDeletedNotification"/> results in a <c>RoutesDeletedEvent</c> being routed by the server event sender.
+    /// </summary>
+    /// <returns>A <see cref="Task"/> representing the asynchronous test operation.</returns>
     [Test]
     public async Task HandleAsync_MediaTypeDeletedNotification_RoutesDeletedEvent()
     {
@@ -1071,6 +1279,10 @@ internal sealed class ServerEventSenderTests
         AssertPrimaryRoutedEvent(recordingRouter, entityKey, Constants.ServerEvents.EventType.Deleted, Constants.ServerEvents.EventSource.MediaType);
     }
 
+    /// <summary>
+    /// Tests that handling a MemberDeletedNotification routes a Deleted event for the Member entity.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task HandleAsync_MemberDeletedNotification_RoutesDeletedEvent()
     {
@@ -1089,6 +1301,10 @@ internal sealed class ServerEventSenderTests
         AssertPrimaryRoutedEvent(recordingRouter, entityKey, Constants.ServerEvents.EventType.Deleted, Constants.ServerEvents.EventSource.Member);
     }
 
+    /// <summary>
+    /// Tests that when a MemberTypeDeletedNotification is handled, a deleted event is routed for the member type.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task HandleAsync_MemberTypeDeletedNotification_RoutesDeletedEvent()
     {
@@ -1107,6 +1323,10 @@ internal sealed class ServerEventSenderTests
         AssertPrimaryRoutedEvent(recordingRouter, entityKey, Constants.ServerEvents.EventType.Deleted, Constants.ServerEvents.EventSource.MemberType);
     }
 
+    /// <summary>
+    /// Verifies that handling a <see cref="MemberGroupDeletedNotification"/> results in routing a deleted server event for the corresponding member group.
+    /// </summary>
+    /// <returns>A <see cref="Task"/> representing the asynchronous test operation.</returns>
     [Test]
     public async Task HandleAsync_MemberGroupDeletedNotification_RoutesDeletedEvent()
     {
@@ -1125,6 +1345,10 @@ internal sealed class ServerEventSenderTests
         AssertPrimaryRoutedEvent(recordingRouter, entityKey, Constants.ServerEvents.EventType.Deleted, Constants.ServerEvents.EventSource.MemberGroup);
     }
 
+    /// <summary>
+    /// Tests that handling a <see cref="LanguageDeletedNotification"/> results in a <c>RoutesDeletedEvent</c> being routed by the server event sender.
+    /// </summary>
+    /// <returns>A <see cref="Task"/> representing the asynchronous test operation.</returns>
     [Test]
     public async Task HandleAsync_LanguageDeletedNotification_RoutesDeletedEvent()
     {
@@ -1143,6 +1367,10 @@ internal sealed class ServerEventSenderTests
         AssertPrimaryRoutedEvent(recordingRouter, entityKey, Constants.ServerEvents.EventType.Deleted, Constants.ServerEvents.EventSource.Language);
     }
 
+    /// <summary>
+    /// Tests that handling a ScriptDeletedNotification routes a Deleted event for the Script entity.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
     [Test]
     public async Task HandleAsync_ScriptDeletedNotification_RoutesDeletedEvent()
     {
@@ -1161,6 +1389,10 @@ internal sealed class ServerEventSenderTests
         AssertPrimaryRoutedEvent(recordingRouter, entityKey, Constants.ServerEvents.EventType.Deleted, Constants.ServerEvents.EventSource.Script);
     }
 
+    /// <summary>
+    /// Verifies that when a <see cref="StylesheetDeletedNotification"/> is handled, a Deleted server event is routed for the corresponding stylesheet source.
+    /// </summary>
+    /// <returns>A task that represents the asynchronous test operation.</returns>
     [Test]
     public async Task HandleAsync_StylesheetDeletedNotification_RoutesDeletedEvent()
     {
@@ -1179,6 +1411,10 @@ internal sealed class ServerEventSenderTests
         AssertPrimaryRoutedEvent(recordingRouter, entityKey, Constants.ServerEvents.EventType.Deleted, Constants.ServerEvents.EventSource.Stylesheet);
     }
 
+    /// <summary>
+    /// Verifies that handling a <see cref="TemplateDeletedNotification"/> results in a <c>RoutesDeletedEvent</c> being routed correctly by the server event sender.
+    /// </summary>
+    /// <returns>A <see cref="Task"/> representing the asynchronous test operation.</returns>
     [Test]
     public async Task HandleAsync_TemplateDeletedNotification_RoutesDeletedEvent()
     {
@@ -1197,6 +1433,10 @@ internal sealed class ServerEventSenderTests
         AssertPrimaryRoutedEvent(recordingRouter, entityKey, Constants.ServerEvents.EventType.Deleted, Constants.ServerEvents.EventSource.Template);
     }
 
+    /// <summary>
+    /// Tests that when a DictionaryItemDeletedNotification is handled, a RoutesDeletedEvent is correctly routed.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task HandleAsync_DictionaryItemDeletedNotification_RoutesDeletedEvent()
     {
@@ -1215,6 +1455,10 @@ internal sealed class ServerEventSenderTests
         AssertPrimaryRoutedEvent(recordingRouter, entityKey, Constants.ServerEvents.EventType.Deleted, Constants.ServerEvents.EventSource.DictionaryItem);
     }
 
+    /// <summary>
+    /// Tests that when a <see cref="DomainDeletedNotification"/> is handled, a Deleted server event is routed for the corresponding domain.
+    /// </summary>
+    /// <returns>A task that represents the asynchronous test operation.</returns>
     [Test]
     public async Task HandleAsync_DomainDeletedNotification_RoutesDeletedEvent()
     {
@@ -1233,6 +1477,10 @@ internal sealed class ServerEventSenderTests
         AssertPrimaryRoutedEvent(recordingRouter, entityKey, Constants.ServerEvents.EventType.Deleted, Constants.ServerEvents.EventSource.Domain);
     }
 
+    /// <summary>
+    /// Tests that handling a PartialViewDeletedNotification routes a Deleted event for the PartialView entity.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
     [Test]
     public async Task HandleAsync_PartialViewDeletedNotification_RoutesDeletedEvent()
     {
@@ -1251,6 +1499,10 @@ internal sealed class ServerEventSenderTests
         AssertPrimaryRoutedEvent(recordingRouter, entityKey, Constants.ServerEvents.EventType.Deleted, Constants.ServerEvents.EventSource.PartialView);
     }
 
+    /// <summary>
+    /// Tests that handling a RelationDeletedNotification routes a Deleted event for a Relation entity.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
     [Test]
     public async Task HandleAsync_RelationDeletedNotification_RoutesDeletedEvent()
     {
@@ -1269,6 +1521,10 @@ internal sealed class ServerEventSenderTests
         AssertPrimaryRoutedEvent(recordingRouter, entityKey, Constants.ServerEvents.EventType.Deleted, Constants.ServerEvents.EventSource.Relation);
     }
 
+    /// <summary>
+    /// Tests that handling a RelationTypeDeletedNotification routes a Deleted event for the RelationType.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task HandleAsync_RelationTypeDeletedNotification_RoutesDeletedEvent()
     {
@@ -1287,6 +1543,10 @@ internal sealed class ServerEventSenderTests
         AssertPrimaryRoutedEvent(recordingRouter, entityKey, Constants.ServerEvents.EventType.Deleted, Constants.ServerEvents.EventSource.RelationType);
     }
 
+    /// <summary>
+    /// Verifies that when a <see cref="UserGroupDeletedNotification"/> is handled, a deleted server event is correctly routed for the corresponding user group.
+    /// </summary>
+    /// <returns>A task that represents the asynchronous test operation.</returns>
     [Test]
     public async Task HandleAsync_UserGroupDeletedNotification_RoutesDeletedEvent()
     {
@@ -1305,6 +1565,10 @@ internal sealed class ServerEventSenderTests
         AssertPrimaryRoutedEvent(recordingRouter, entityKey, Constants.ServerEvents.EventType.Deleted, Constants.ServerEvents.EventSource.UserGroup);
     }
 
+    /// <summary>
+    /// Tests that when a UserDeletedNotification is handled, a RoutesDeletedEvent is routed correctly.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task HandleAsync_UserDeletedNotification_RoutesDeletedEvent()
     {
@@ -1323,6 +1587,10 @@ internal sealed class ServerEventSenderTests
         AssertPrimaryRoutedEvent(recordingRouter, entityKey, Constants.ServerEvents.EventType.Deleted, Constants.ServerEvents.EventSource.User);
     }
 
+    /// <summary>
+    /// Verifies that handling a <see cref="WebhookDeletedNotification"/> results in routing a deleted server event for the corresponding webhook.
+    /// </summary>
+    /// <returns>A <see cref="Task"/> representing the asynchronous test operation.</returns>
     [Test]
     public async Task HandleAsync_WebhookDeletedNotification_RoutesDeletedEvent()
     {
@@ -1341,6 +1609,10 @@ internal sealed class ServerEventSenderTests
         AssertPrimaryRoutedEvent(recordingRouter, entityKey, Constants.ServerEvents.EventType.Deleted, Constants.ServerEvents.EventSource.Webhook);
     }
 
+    /// <summary>
+    /// Tests that handling a ContentMovedToRecycleBinNotification routes a Trashed event correctly.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task HandleAsync_ContentMovedToRecycleBinNotification_RoutesTrashedEvent()
     {
@@ -1360,6 +1632,10 @@ internal sealed class ServerEventSenderTests
         AssertPrimaryRoutedEvent(recordingRouter, entityKey, Constants.ServerEvents.EventType.Trashed, Constants.ServerEvents.EventSource.Document);
     }
 
+    /// <summary>
+    /// Tests that handling a MediaMovedToRecycleBinNotification routes a Trashed event for the media entity.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task HandleAsync_MediaMovedToRecycleBinNotification_RoutesTrashedEvent()
     {
@@ -1379,6 +1655,11 @@ internal sealed class ServerEventSenderTests
         AssertPrimaryRoutedEvent(recordingRouter, entityKey, Constants.ServerEvents.EventType.Trashed, Constants.ServerEvents.EventSource.Media);
     }
 
+    /// <summary>
+    /// Tests that the HandleAsync method correctly routes an updated event for composing content types
+    /// and skips removed content types when handling a ContentTypeChangedNotification.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task HandleAsync_ContentTypeChangedNotification_RoutesUpdatedEventForComposingTypes()
     {
@@ -1413,6 +1694,10 @@ internal sealed class ServerEventSenderTests
         });
     }
 
+    /// <summary>
+    /// Tests that the HandleAsync method correctly skips removed content types when processing a ContentTypeChangedNotification.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task HandleAsync_ContentTypeChangedNotification_SkipsRemovedTypes()
     {
@@ -1436,6 +1721,10 @@ internal sealed class ServerEventSenderTests
         Assert.That(recordingRouter.RoutedEvents, Has.Count.EqualTo(0));
     }
 
+    /// <summary>
+    /// Tests that the HandleAsync method skips processing content types that are newly created.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task HandleAsync_ContentTypeChangedNotification_SkipsCreatedTypes()
     {
@@ -1459,6 +1748,10 @@ internal sealed class ServerEventSenderTests
         Assert.That(recordingRouter.RoutedEvents, Has.Count.EqualTo(0));
     }
 
+    /// <summary>
+    /// Tests that when handling a MediaTypeChangedNotification, only the composing types trigger route updated events.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task HandleAsync_MediaTypeChangedNotification_RoutesUpdatedEventForComposingTypes()
     {
@@ -1493,6 +1786,10 @@ internal sealed class ServerEventSenderTests
         });
     }
 
+    /// <summary>
+    /// Tests that when a MemberTypeChangedNotification is handled, only the composing member types trigger a RoutesUpdated event.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
     [Test]
     public async Task HandleAsync_MemberTypeChangedNotification_RoutesUpdatedEventForComposingTypes()
     {
@@ -1545,22 +1842,44 @@ internal sealed class ServerEventSenderTests
 
     private class RecordingServerEventRouter : IServerEventRouter
     {
+    /// <summary>
+    /// Routes the specified server event asynchronously.
+    /// </summary>
+    /// <param name="serverEvent">The server event to route.</param>
+    /// <returns>A task that represents the asynchronous routing operation.</returns>
         public Task RouteEventAsync(ServerEvent serverEvent)
         {
             RoutedEvents.Add(serverEvent);
             return Task.CompletedTask;
         }
 
+    /// <summary>
+    /// Gets the list of routed server events.
+    /// </summary>
         public List<ServerEvent> RoutedEvents { get; } = [];
 
+    /// <summary>
+    /// Notifies a user asynchronously with the specified server event.
+    /// </summary>
+    /// <param name="serverEvent">The server event to notify the user about.</param>
+    /// <param name="userKey">The unique identifier of the user to notify.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
         public Task NotifyUserAsync(ServerEvent serverEvent, Guid userKey)
         {
             UserNotifications.Add((serverEvent, userKey));
             return Task.CompletedTask;
         }
 
+    /// <summary>
+    /// Gets the list of user notifications consisting of server events and associated user keys.
+    /// </summary>
         public List<(ServerEvent ServerEvent, Guid UserKey)> UserNotifications { get; } = [];
 
+    /// <summary>
+    /// Broadcasts the specified server event asynchronously.
+    /// </summary>
+    /// <param name="serverEvent">The server event to broadcast.</param>
+    /// <returns>A task that represents the asynchronous broadcast operation.</returns>
         public Task BroadcastEventAsync(ServerEvent serverEvent) => Task.CompletedTask;
     }
 }

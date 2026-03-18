@@ -18,6 +18,9 @@ using Umbraco.Cms.Infrastructure.Serialization;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 
+/// <summary>
+/// Contains unit tests for the <see cref="DateOnlyPropertyEditor"/> class in Umbraco CMS.
+/// </summary>
 [TestFixture]
 public class DateOnlyPropertyEditorTests
 {
@@ -34,6 +37,11 @@ public class DateOnlyPropertyEditorTests
         new object[] { JsonNode.Parse("{\"date\": \"2025-08-20T14:30:00\"}"), true }
     ];
 
+    /// <summary>
+    /// Tests that the property editor correctly validates the received date value.
+    /// </summary>
+    /// <param name="value">The input value to be validated as a date.</param>
+    /// <param name="expectedSuccess">True if the value is expected to pass validation; otherwise, false.</param>
     [TestCaseSource(nameof(_validateDateReceivedTestCases))]
     public void Validates_Date_Received(object? value, bool expectedSuccess)
     {
@@ -58,6 +66,12 @@ public class DateOnlyPropertyEditorTests
         new object[] { JsonNode.Parse("{\"date\": \"2025-08-20\"}"), new DateTimeOffset(2025, 8, 20, 0, 0, 0, TimeSpan.Zero), null },
     ];
 
+    /// <summary>
+    /// Verifies that the value editor correctly parses various input values from the editor and produces the expected <see cref="DateTimeOffset"/> and time zone results.
+    /// </summary>
+    /// <param name="value">The input value provided by the editor, which may be null or a date/time representation.</param>
+    /// <param name="expectedDateTimeOffset">The expected <see cref="DateTimeOffset"/> result after parsing, or null if parsing should fail.</param>
+    /// <param name="expectedTimeZone">The expected time zone string associated with the parsed value, or null if not applicable.</param>
     [TestCaseSource(nameof(_dateOnlyParseValuesFromEditorTestCases))]
     public void Can_Parse_Values_From_Editor(
         object? value,
@@ -87,6 +101,12 @@ public class DateOnlyPropertyEditorTests
         [0, null, new DateTimeEditorValue { Date = "2025-08-20", TimeZone = null }],
     ];
 
+    /// <summary>
+    /// Verifies that various date and time values, represented by an offset and time zone, are correctly parsed and mapped to the editor model.
+    /// </summary>
+    /// <param name="offset">The hour offset used to construct the DateTimeOffset value for testing, or <c>null</c> to represent no value.</param>
+    /// <param name="timeZone">The time zone identifier to associate with the value, or <c>null</c> if not specified.</param>
+    /// <param name="expectedResult">The expected <see cref="DateTimeEditorValue"/> result from the editor, or <c>null</c> if no value is expected.</param>
     [TestCaseSource(nameof(_dateOnlyParseValuesToEditorTestCases))]
     public void Can_Parse_Values_To_Editor(
         int? offset,

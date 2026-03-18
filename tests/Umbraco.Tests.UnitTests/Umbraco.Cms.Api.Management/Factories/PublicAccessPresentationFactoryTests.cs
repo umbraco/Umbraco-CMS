@@ -14,6 +14,10 @@ using Umbraco.Cms.Web.Common.Security;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Management.Factories;
 
+/// <summary>
+/// Contains unit tests for the <see cref="PublicAccessPresentationFactory"/> class,
+/// ensuring its methods function as expected.
+/// </summary>
 [TestFixture]
 public class PublicAccessPresentationFactoryTests
 {
@@ -24,6 +28,9 @@ public class PublicAccessPresentationFactoryTests
     private Mock<IMemberPresentationFactory> _memberPresentationFactory = null!;
     private PublicAccessPresentationFactory _factory = null!;
 
+    /// <summary>
+    /// Sets up the test environment before each test is run.
+    /// </summary>
     [SetUp]
     public void SetUp()
     {
@@ -44,6 +51,9 @@ public class PublicAccessPresentationFactoryTests
             _memberPresentationFactory.Object);
     }
 
+    /// <summary>
+    /// Tests that CreatePublicAccessResponseModel returns a ContentNotFound status when the protected node key cannot be resolved.
+    /// </summary>
     [Test]
     public void CreatePublicAccessResponseModel_Returns_ContentNotFound_When_ProtectedNodeKey_Cannot_Be_Resolved()
     {
@@ -63,6 +73,9 @@ public class PublicAccessPresentationFactoryTests
         Assert.IsNull(result.Result);
     }
 
+    /// <summary>
+    /// Tests that CreatePublicAccessResponseModel returns LoginNodeNotFound status when the login node key cannot be resolved.
+    /// </summary>
     [Test]
     public void CreatePublicAccessResponseModel_Returns_LoginNodeNotFound_When_LoginNodeKey_Cannot_Be_Resolved()
     {
@@ -83,6 +96,9 @@ public class PublicAccessPresentationFactoryTests
         Assert.AreEqual(PublicAccessOperationStatus.LoginNodeNotFound, result.Status);
     }
 
+    /// <summary>
+    /// Tests that CreatePublicAccessResponseModel returns an error with status ErrorNodeNotFound when the NoAccessNodeKey cannot be resolved.
+    /// </summary>
     [Test]
     public void CreatePublicAccessResponseModel_Returns_ErrorNodeNotFound_When_NoAccessNodeKey_Cannot_Be_Resolved()
     {
@@ -106,6 +122,9 @@ public class PublicAccessPresentationFactoryTests
         Assert.AreEqual(PublicAccessOperationStatus.ErrorNodeNotFound, result.Status);
     }
 
+    /// <summary>
+    /// Tests that CreatePublicAccessResponseModel sets IsProtectedByAncestor to false when the content key matches the protected node key.
+    /// </summary>
     [Test]
     public void CreatePublicAccessResponseModel_Sets_IsProtectedByAncestor_False_When_ContentKey_Matches_ProtectedNode()
     {
@@ -128,6 +147,10 @@ public class PublicAccessPresentationFactoryTests
         Assert.IsFalse(result.Result!.IsProtectedByAncestor);
     }
 
+    /// <summary>
+    /// Tests that CreatePublicAccessResponseModel sets IsProtectedByAncestor to true when the provided content key differs from the protected node key.
+    /// This indicates that the content is protected by an ancestor node.
+    /// </summary>
     [Test]
     public void CreatePublicAccessResponseModel_Sets_IsProtectedByAncestor_True_When_ContentKey_Differs_From_ProtectedNode()
     {
@@ -151,6 +174,9 @@ public class PublicAccessPresentationFactoryTests
         Assert.IsTrue(result.Result!.IsProtectedByAncestor);
     }
 
+    /// <summary>
+    /// Tests that CreatePublicAccessResponseModel correctly populates the LoginDocument and ErrorDocument.
+    /// </summary>
     [Test]
     public void CreatePublicAccessResponseModel_Populates_LoginDocument_And_ErrorDocument()
     {
@@ -173,6 +199,11 @@ public class PublicAccessPresentationFactoryTests
         Assert.AreEqual(errorNodeKey, result.Result.ErrorDocument.Id);
     }
 
+    /// <summary>
+    /// Verifies that <c>CreatePublicAccessResponseModel</c> resolves and includes member information
+    /// when public access rules are defined by member usernames.
+    /// Ensures that the correct member is retrieved and mapped to the response model based on the username rule.
+    /// </summary>
     [Test]
     public void CreatePublicAccessResponseModel_Resolves_Members_From_Username_Rules()
     {
@@ -210,6 +241,9 @@ public class PublicAccessPresentationFactoryTests
         Assert.AreEqual(memberKey, result.Result.Members[0].Id);
     }
 
+    /// <summary>
+    /// Tests that CreatePublicAccessResponseModel correctly resolves member groups from role rules.
+    /// </summary>
     [Test]
     public void CreatePublicAccessResponseModel_Resolves_Groups_From_Role_Rules()
     {
@@ -253,6 +287,9 @@ public class PublicAccessPresentationFactoryTests
         Assert.AreEqual(groupKey, result.Result.Groups[0].Id);
     }
 
+    /// <summary>
+    /// Tests that CreatePublicAccessResponseModel skips members that are not found by username.
+    /// </summary>
     [Test]
     public void CreatePublicAccessResponseModel_Skips_Members_Not_Found_By_Username()
     {
@@ -284,6 +321,9 @@ public class PublicAccessPresentationFactoryTests
         Assert.IsEmpty(result.Result!.Members);
     }
 
+    /// <summary>
+    /// Tests that CreatePublicAccessResponseModel correctly skips groups that are not found in the roles.
+    /// </summary>
     [Test]
     public void CreatePublicAccessResponseModel_Skips_Groups_Not_Found_In_Roles()
     {
@@ -319,6 +359,9 @@ public class PublicAccessPresentationFactoryTests
         Assert.IsEmpty(result.Result!.Groups);
     }
 
+    /// <summary>
+    /// Tests that CreatePublicAccessResponseModel correctly handles mixed member and group rules.
+    /// </summary>
     [Test]
     public void CreatePublicAccessResponseModel_Handles_Mixed_Member_And_Group_Rules()
     {
@@ -371,6 +414,9 @@ public class PublicAccessPresentationFactoryTests
         Assert.AreEqual(groupKey, result.Result.Groups[0].Id);
     }
 
+    /// <summary>
+    /// Tests that CreatePublicAccessResponseModel returns empty members and groups when there are no rules.
+    /// </summary>
     [Test]
     public void CreatePublicAccessResponseModel_Returns_Empty_Members_And_Groups_When_No_Rules()
     {

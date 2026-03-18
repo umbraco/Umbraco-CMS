@@ -7,6 +7,9 @@ using Umbraco.Cms.Core.Serialization;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Media.EmbedProviders;
 
+/// <summary>
+/// Unit tests for the <see cref="FlickrEmbedProvider"/> class.
+/// </summary>
 [TestFixture]
 public class FlickrEmbedProviderTests : OEmbedProviderTestBase
 {
@@ -14,9 +17,10 @@ public class FlickrEmbedProviderTests : OEmbedProviderTestBase
 
     private Flickr FlickrProvider => (Flickr)Provider;
 
-    /// <summary>
-    /// Tests that valid Flickr URLs are matched by the provider's URL scheme regex.
-    /// </summary>
+/// <summary>
+/// Tests that valid Flickr URLs are matched by the provider's URL scheme regex.
+/// </summary>
+/// <param name="url">The Flickr URL to test against the regex.</param>
     [TestCase("https://www.flickr.com/photos/example/12345678901")]
     [TestCase("https://flickr.com/photos/example/12345678901")]
     [TestCase("http://www.flickr.com/photos/example/12345678901")]
@@ -32,9 +36,10 @@ public class FlickrEmbedProviderTests : OEmbedProviderTestBase
         Assert.That(result, Is.True, $"Expected URL to match: {url}");
     }
 
-    /// <summary>
-    /// Tests that URLs with Flickr domain in the path (potential SSRF vector) are NOT matched.
-    /// </summary>
+/// <summary>
+/// Verifies that the URL scheme regex does not match URLs where the Flickr domain appears only in the path, which could be a potential SSRF vector.
+/// </summary>
+/// <param name="url">A URL to test against the Flickr embed provider's URL scheme regex.</param>
     [TestCase("http://127.0.0.1/flickr.com/photos/example/123")]
     [TestCase("http://localhost/flickr.com/photos/example/123")]
     [TestCase("http://example.com/flickr.com/photos/example/123")]
@@ -49,9 +54,10 @@ public class FlickrEmbedProviderTests : OEmbedProviderTestBase
         Assert.That(result, Is.False, $"Expected URL to NOT match (SSRF protection): {url}");
     }
 
-    /// <summary>
-    /// Tests that unrelated URLs are not matched.
-    /// </summary>
+/// <summary>
+/// Tests that unrelated URLs are not matched.
+/// </summary>
+/// <param name="url">The URL to test against the regex.</param>
     [TestCase("https://www.youtube.com/watch?v=abc123")]
     [TestCase("https://vimeo.com/123456789")]
     [TestCase("https://example.com/photos/123")]
@@ -64,6 +70,9 @@ public class FlickrEmbedProviderTests : OEmbedProviderTestBase
         Assert.That(result, Is.False, $"Expected URL to NOT match: {url}");
     }
 
+    /// <summary>
+    /// Verifies that <c>BuildMarkup</c> generates the correct <c>&lt;img&gt;</c> HTML tag when provided with valid Flickr oEmbed XML containing URL, width, height, and title.
+    /// </summary>
     [Test]
     public void BuildImgMarkup_WithValidXml_ReturnsCorrectImgTag()
     {
@@ -88,6 +97,9 @@ public class FlickrEmbedProviderTests : OEmbedProviderTestBase
         Assert.That(result, Is.EqualTo("<img src=\"https://live.staticflickr.com/1234/photo_b.jpg\" width=\"1024\" height=\"768\" alt=\"Test Photo Title\" />"));
     }
 
+    /// <summary>
+    /// Tests that the BuildMarkup method correctly HTML encodes special characters in the title.
+    /// </summary>
     [Test]
     public void BuildMarkup_WithSpecialCharactersInTitle_HtmlEncodesTitle()
     {
@@ -112,6 +124,9 @@ public class FlickrEmbedProviderTests : OEmbedProviderTestBase
         Assert.That(result, Does.Contain("alt=\"Photo with &quot;quotes&quot; &amp; &lt;special&gt; chars\""));
     }
 
+    /// <summary>
+    /// Tests that BuildMarkup returns an img tag with empty width, height, and alt attributes when elements are missing.
+    /// </summary>
     [Test]
     public void BuildMarkup_WithMissingElements_ReturnsImgTagWithEmptyValues()
     {

@@ -9,9 +9,17 @@ using Umbraco.Cms.Infrastructure.HostedServices;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HostedServices;
 
+/// <summary>
+/// Contains unit tests for the RecurringHostedServiceBase class.
+/// </summary>
 [TestFixture]
 public class RecurringHostedServiceBaseTests
 {
+    /// <summary>
+    /// Verifies that the delay until the next scheduled notification is correctly calculated based on the provided cron expression and current time.
+    /// </summary>
+    /// <param name="firstRunTime">A cron expression specifying the scheduled time for the recurring task.</param>
+    /// <param name="expectedDelayInMinutes">The expected delay, in minutes, between the current time and the next scheduled run as determined by the cron expression.</param>
     [TestCase("30 12 * * *", 30)]
     [TestCase("15 18 * * *", (60 * 6) + 15)]
     [TestCase("0 3 * * *", 60 * 15)]
@@ -26,6 +34,9 @@ public class RecurringHostedServiceBaseTests
         Assert.AreEqual(expectedDelayInMinutes, result.TotalMinutes);
     }
 
+    /// <summary>
+    /// Tests that the notification delay returned is the default delay when the provided time is too close to the current time.
+    /// </summary>
     [Test]
     public void Returns_Notification_Delay_From_Default_When_Provided_Time_Too_Close_To_Current_Time()
     {
@@ -38,6 +49,9 @@ public class RecurringHostedServiceBaseTests
         Assert.AreEqual(defaultDelay.TotalMinutes, result.TotalMinutes);
     }
 
+    /// <summary>
+    /// Tests that when an invalid time string is provided, the method logs a warning and returns the default notification delay.
+    /// </summary>
     [Test]
     public void Logs_And_Returns_Notification_Delay_From_Default_When_Provided_Time_Is_Not_Valid()
     {

@@ -7,9 +7,16 @@ using Umbraco.Cms.Core.PropertyEditors;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Cache;
 
+/// <summary>
+/// Contains unit tests for the <see cref="ValueEditorCache"/> functionality in the Umbraco CMS core cache.
+/// </summary>
 [TestFixture]
 public class ValueEditorCacheTests
 {
+    /// <summary>
+    /// Tests that the ValueEditorCache caches and returns the same value editor instance
+    /// when requested multiple times with the same parameters.
+    /// </summary>
     [Test]
     public void Caches_ValueEditor()
     {
@@ -29,6 +36,9 @@ public class ValueEditorCacheTests
         });
     }
 
+    /// <summary>
+    /// Tests that different data editors return different value editors from the cache.
+    /// </summary>
     [Test]
     public void Different_Data_Editors_Returns_Different_Value_Editors()
     {
@@ -44,6 +54,9 @@ public class ValueEditorCacheTests
         Assert.AreNotSame(firstEditor, secondEditor);
     }
 
+    /// <summary>
+    /// Tests that different data types return different value editors from the cache.
+    /// </summary>
     [Test]
     public void Different_Data_Types_Returns_Different_Value_Editors()
     {
@@ -58,6 +71,10 @@ public class ValueEditorCacheTests
         Assert.AreNotSame(firstEditor, secondEditor);
     }
 
+    /// <summary>
+    /// Tests that clearing the cache removes only the value editors associated with the specified data type IDs.
+    /// Ensures that value editors for other data types remain cached.
+    /// </summary>
     [Test]
     public void Clear_Cache_Removes_Specific_Editors()
     {
@@ -103,14 +120,31 @@ public class ValueEditorCacheTests
     {
         public int ValueEditorCount;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="FakeDataEditor"/> class.
+    /// </summary>
+    /// <param name="alias">The alias for the data editor.</param>
         public FakeDataEditor(string alias) => Alias = alias;
 
+    /// <summary>
+    /// Gets the alias of the FakeDataEditor.
+    /// </summary>
         public string Alias { get; }
 
+    /// <summary>
+    /// Gets the name of the fake data editor.
+    /// </summary>
         public string Name { get; }
 
+    /// <summary>
+    /// Gets a value indicating whether this editor is deprecated.
+    /// </summary>
         public bool IsDeprecated { get; }
 
+    /// <summary>
+    /// Returns a mocked <see cref="IDataValueEditor"/> instance and increments the <c>ValueEditorCount</c>.
+    /// </summary>
+    /// <returns>A mocked <see cref="IDataValueEditor"/> instance.</returns>
         public IDataValueEditor GetValueEditor()
         {
             ValueEditorCount++;
@@ -119,10 +153,20 @@ public class ValueEditorCacheTests
 
         public IDataValueEditor GetValueEditor(object configurationObject) => GetValueEditor();
 
+    /// <summary>
+    /// Gets the default configuration dictionary for the <see cref="FakeDataEditor"/>.
+    /// </summary>
         public IDictionary<string, object> DefaultConfiguration { get; }
 
+    /// <summary>
+    /// Returns an instance of the configuration editor associated with this data editor.
+    /// </summary>
+    /// <returns>An <see cref="IConfigurationEditor"/> instance for configuring the data editor.</returns>
         public IConfigurationEditor GetConfigurationEditor() => throw new NotImplementedException();
 
+    /// <summary>
+    /// Gets the <see cref="IPropertyIndexValueFactory"/> instance used by this <see cref="FakeDataEditor"/> for property index value creation.
+    /// </summary>
         public IPropertyIndexValueFactory PropertyIndexValueFactory { get; }
     }
 }

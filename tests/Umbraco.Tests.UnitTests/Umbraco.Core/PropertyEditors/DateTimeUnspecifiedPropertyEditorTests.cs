@@ -18,6 +18,9 @@ using Umbraco.Cms.Infrastructure.Serialization;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 
+/// <summary>
+/// Contains unit tests for the <see cref="DateTimeUnspecifiedPropertyEditor"/> class, verifying its behavior and functionality.
+/// </summary>
 [TestFixture]
 public class DateTimeUnspecifiedPropertyEditorTests
 {
@@ -34,6 +37,12 @@ public class DateTimeUnspecifiedPropertyEditorTests
         new object[] { JsonNode.Parse("{\"date\": \"2025-08-20T14:30:00\"}"), true }
     ];
 
+    /// <summary>
+    /// Tests the validation logic of the DateTimeUnspecifiedPropertyEditor for the 'date received' property.
+    /// Asserts that the editor correctly identifies valid and invalid date values.
+    /// </summary>
+    /// <param name="value">The input value to be validated as a date.</param>
+    /// <param name="expectedSuccess">True if the value is expected to pass validation; otherwise, false.</param>
     [TestCaseSource(nameof(_validateDateReceivedTestCases))]
     public void Validates_Date_Received(object? value, bool expectedSuccess)
     {
@@ -92,6 +101,11 @@ public class DateTimeUnspecifiedPropertyEditorTests
         [2, new DateTimeEditorValue { Date = "2025-08-20T16:30:00", TimeZone = null }],
     ];
 
+    /// <summary>
+    /// Verifies that various DateTimeOffset values, represented by an optional hour offset, are correctly parsed and mapped to the editor model.
+    /// </summary>
+    /// <param name="offset">The hour offset for the DateTimeOffset to be tested; <c>null</c> indicates that no value should be provided.</param>
+    /// <param name="expectedResult">The expected <see cref="DateTimeEditorValue"/> result after parsing, or <c>null</c> if no value is expected.</param>
     [TestCaseSource(nameof(_dateTimeUnspecifiedParseValuesToEditorTestCases))]
     public void Can_Parse_Values_To_Editor(
         int? offset,

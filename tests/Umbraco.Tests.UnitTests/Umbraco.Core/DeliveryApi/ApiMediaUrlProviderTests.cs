@@ -1,4 +1,4 @@
-﻿using Moq;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -6,6 +6,9 @@ using Umbraco.Cms.Core.Routing;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.DeliveryApi;
 
+/// <summary>
+/// Unit tests for the <see cref="ApiMediaUrlProvider"/> class, verifying its media URL generation logic.
+/// </summary>
 [TestFixture]
 public class ApiMediaUrlProviderTests : PropertyValueConverterTests
 {
@@ -29,6 +32,10 @@ public class ApiMediaUrlProviderTests : PropertyValueConverterTests
         Assert.AreEqual(publishedUrl, result);
     }
 
+    /// <summary>
+    /// Tests that the ApiMediaUrlProvider does not support non-media published item types.
+    /// </summary>
+    /// <param name="itemType">The type of the published item to test.</param>
     [TestCase(PublishedItemType.Content)]
     [TestCase(PublishedItemType.Element)]
     [TestCase(PublishedItemType.Member)]

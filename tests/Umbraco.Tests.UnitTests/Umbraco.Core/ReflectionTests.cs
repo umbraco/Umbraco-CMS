@@ -7,9 +7,15 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core;
 
+/// <summary>
+/// Contains unit tests for reflection-related functionality in Umbraco.Core.
+/// </summary>
 [TestFixture]
 public class ReflectionTests
 {
+    /// <summary>
+    /// Tests that the GetBaseTypes extension method returns the correct base types for a given type.
+    /// </summary>
     [Test]
     public void GetBaseTypesIsOk()
     {

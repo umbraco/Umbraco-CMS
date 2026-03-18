@@ -10,9 +10,15 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Services.PublishStatus;
 
+/// <summary>
+/// Contains unit tests for the <see cref="PublishedContentStatusFilteringService"/>, verifying its behavior and functionality.
+/// </summary>
 [TestFixture]
 public partial class PublishedContentStatusFilteringServiceTests
 {
+    /// <summary>
+    /// Tests that filtering available content in invariant mode for non-preview context yields only published items.
+    /// </summary>
     [Test]
     public void FilterAvailable_Invariant_ForNonPreview_YieldsPublishedItems()
     {
@@ -30,6 +36,9 @@ public partial class PublishedContentStatusFilteringServiceTests
         });
     }
 
+    /// <summary>
+    /// Tests that filtering available content in invariant mode for preview returns unpublished items.
+    /// </summary>
     [Test]
     public void FilterAvailable_Invariant_ForPreview_YieldsUnpublishedItems()
     {
@@ -43,6 +52,12 @@ public partial class PublishedContentStatusFilteringServiceTests
         }
     }
 
+    /// <summary>
+    /// Verifies that when filtering available content variants in non-preview mode, only items that are published in the specified culture are returned.
+    /// The test checks that the number and identity of published children match the expected results for each culture.
+    /// </summary>
+    /// <param name="culture">The culture identifier to filter published content by (e.g., "en-US", "da-DK", or "*").</param>
+    /// <param name="expectedNumberOfChildren">The expected number of published children in the specified culture.</param>
     [TestCase("da-DK", 3)]
     [TestCase("en-US", 4)]
     [TestCase("*", 5)]
@@ -127,6 +142,11 @@ public partial class PublishedContentStatusFilteringServiceTests
         }
     }
 
+    /// <summary>
+    /// Tests that filtering available published content with mixed variance for non-preview mode yields published items in the specified culture or invariant.
+    /// </summary>
+    /// <param name="culture">The culture to filter by.</param>
+    /// <param name="expectedNumberOfChildren">The expected number of published children returned.</param>
     [TestCase("da-DK", 4)]
     [TestCase("en-US", 4)]
     [TestCase("*", 5)]
@@ -169,6 +189,11 @@ public partial class PublishedContentStatusFilteringServiceTests
         }
     }
 
+    /// <summary>
+    /// Verifies that filtering available published content for preview returns the correct set of published items, either invariant or in the specified culture.
+    /// </summary>
+    /// <param name="culture">The culture identifier to filter published content by (e.g., "en-US", "da-DK", or "*" for invariant).</param>
+    /// <param name="expectedNumberOfChildren">The expected number of child items after filtering for the given culture.</param>
     [TestCase("da-DK", 8)]
     [TestCase("en-US", 8)]
     [TestCase("*", 10)]

@@ -1,4 +1,4 @@
-using System.Linq;
+﻿using System.Linq;
 using System.Net;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -9,9 +9,17 @@ using Umbraco.Cms.Web.Common.Mvc;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Services;
 
+/// <summary>
+/// Contains unit tests for the <see cref="BasicAuthService"/> class, verifying its authentication logic and related functionality.
+/// </summary>
 [TestFixture]
 public class BasicAuthServiceTests
 {
+    /// <summary>
+    /// Tests whether basic authentication is enabled based on the provided flag.
+    /// </summary>
+    /// <param name="enabled">A boolean indicating if basic authentication should be enabled.</param>
+    /// <returns>True if basic authentication is enabled; otherwise, false.</returns>
     [TestCase(true, ExpectedResult = true)]
     [TestCase(false, ExpectedResult = false)]
     public bool IsBasicAuthEnabled(bool enabled)

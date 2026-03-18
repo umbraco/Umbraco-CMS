@@ -7,6 +7,9 @@ using Umbraco.Cms.Core.Packaging;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Packaging;
 
+/// <summary>
+/// Contains unit tests for the <see cref="PendingPackageMigrations"/> class, verifying its migration logic and behavior.
+/// </summary>
 [TestFixture]
 public class PendingPackageMigrationsTests
 {
@@ -16,6 +19,9 @@ public class PendingPackageMigrationsTests
 
     private class TestPackageMigrationPlan : PackageMigrationPlan
     {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="TestPackageMigrationPlan"/> class.
+    /// </summary>
         public TestPackageMigrationPlan()
             : base(TestPackageName)
         {
@@ -33,6 +39,9 @@ public class PendingPackageMigrationsTests
             Mock.Of<ILogger<PendingPackageMigrations>>(),
             new PackageMigrationPlanCollection(() => new[] { new TestPackageMigrationPlan() }));
 
+    /// <summary>
+    /// Tests that when there are no registered migrations, a migration plan is still returned.
+    /// </summary>
     [Test]
     public void GivenNoRegisteredMigrations_ThenPlanIsReturned()
     {
@@ -42,6 +51,9 @@ public class PendingPackageMigrationsTests
         Assert.AreEqual(1, pending.Count);
     }
 
+    /// <summary>
+    /// Tests that when a registered migration matches the final step, no pending migrations are returned.
+    /// </summary>
     [Test]
     public void GivenRegisteredMigration_WhenFinalStepMatched_ThenNoneAreReturned()
     {
@@ -54,6 +66,9 @@ public class PendingPackageMigrationsTests
         Assert.AreEqual(0, pending.Count);
     }
 
+    /// <summary>
+    /// Tests that when a registered migration matches a non-final step, the migration plan is correctly returned.
+    /// </summary>
     [Test]
     public void GivenRegisteredMigration_WhenNonFinalStepMatched_ThenPlanIsReturned()
     {
@@ -66,6 +81,10 @@ public class PendingPackageMigrationsTests
         Assert.AreEqual(1, pending.Count);
     }
 
+    /// <summary>
+    /// Tests that when a migration step is registered with a different case,
+    /// the pending package migrations plan is still returned correctly.
+    /// </summary>
     [Test]
     public void GivenRegisteredMigration_WhenStepIsDifferentCase_ThenPlanIsReturned()
     {

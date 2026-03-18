@@ -1,4 +1,4 @@
-// Copyright (c) Umbraco.
+﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.Linq;
@@ -9,9 +9,15 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.ShortStringHelper;
 
+/// <summary>
+/// Contains unit tests for the <see cref="StylesheetHelper"/> class, which is part of the ShortStringHelper functionality in Umbraco.
+/// </summary>
 [TestFixture]
 public class StylesheetHelperTests
 {
+    /// <summary>
+    /// Tests the ReplaceRule method to ensure it correctly replaces a CSS rule in a stylesheet string.
+    /// </summary>
     [Test]
     public void Replace_Rule()
     {
@@ -35,6 +41,9 @@ p{font-size:1em; color:blue;} /** umb_name:  Test2 */ li {padding:0px;} table {m
             result.StripWhitespace());
     }
 
+    /// <summary>
+    /// Tests the AppendRule method by appending a new CSS rule to an existing stylesheet string and verifying the result.
+    /// </summary>
     [Test]
     public void Append_Rule()
     {
@@ -53,6 +62,9 @@ p{font-size:1em; color:blue;}".StripWhitespace(),
             result.StripWhitespace());
     }
 
+    /// <summary>
+    /// Tests that duplicate stylesheet names are handled correctly by parsing rules.
+    /// </summary>
     [Test]
     public void Duplicate_Names()
     {
@@ -62,6 +74,14 @@ p{font-size:1em; color:blue;}".StripWhitespace(),
     }
 
     // Standard rule stle
+    /// <summary>
+    /// Verifies that <see cref="StylesheetHelper.ParseRules(string)"/> correctly parses a CSS string containing a special Umb_Name comment,
+    /// extracting the rule name, selector, and styles as expected.
+    /// </summary>
+    /// <param name="name">The expected rule name extracted from the Umb_Name comment in the CSS.</param>
+    /// <param name="selector">The expected CSS selector for the rule.</param>
+    /// <param name="styles">The expected CSS style declarations as a string.</param>
+    /// <param name="css">The input CSS string to be parsed.</param>
     [TestCase("Test", "p", "font-size: 1em;", @"/**
     Umb_Name: Test
 */
@@ -117,6 +137,10 @@ font-size: 1em;
     }
 
     // No Name: keyword
+    /// <summary>
+    /// Verifies that the <c>ParseRules</c> method does not parse CSS strings that are either invalid, do not contain a valid <c>umb_name</c> comment, or otherwise do not meet the criteria for rule extraction.
+    /// </summary>
+    /// <param name="css">A CSS string that is expected to be ignored by the parser.</param>
     [TestCase(@"/** Test2 */
 p
 {
@@ -150,6 +174,11 @@ world */p{font-size: 1em;}")]
         Assert.IsTrue(results.Any() == false);
     }
 
+    /// <summary>
+    /// Verifies that the <c>AppendRule</c> method correctly appends new CSS rules to existing CSS,
+    /// ensuring that formatting such as indentation and special comments (e.g., <c>/**umb_name:...*/</c>)
+    /// are properly applied to the resulting stylesheet.
+    /// </summary>
     [Test]
     public void AppendRules_IsFormatted()
     {
@@ -187,6 +216,9 @@ world */p{font-size: 1em;}")]
             result.NormalizeNewLines());
     }
 
+    /// <summary>
+    /// Tests that the ParseRules method can correctly parse formatted CSS rules with custom comments.
+    /// </summary>
     [Test]
     public void ParseFormattedRules_CanParse()
     {

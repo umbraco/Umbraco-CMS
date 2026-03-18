@@ -10,14 +10,24 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models;
 
+/// <summary>
+/// Contains unit tests for the <see cref="DictionaryItem"/> model in Umbraco CMS.
+/// </summary>
 [TestFixture]
 public class DictionaryItemTests
 {
+    /// <summary>
+    /// Sets up the test environment before each test.
+    /// </summary>
     [SetUp]
     public void SetUp() => _builder = new DictionaryItemBuilder();
 
     private DictionaryItemBuilder _builder = new();
 
+    /// <summary>
+    /// Verifies that a <see cref="DictionaryItem"/> can be deep cloned, ensuring that the clone is a separate instance
+    /// with identical property values and that its translations are also deeply cloned and equal to the originals.
+    /// </summary>
     [Test]
     public void Can_Deep_Clone()
     {
@@ -50,6 +60,9 @@ public class DictionaryItemTests
         }
     }
 
+    /// <summary>
+    /// Tests that a DictionaryItem can be serialized to JSON without throwing an error.
+    /// </summary>
     [Test]
     public void Can_Serialize_Without_Error()
     {

@@ -10,14 +10,23 @@ using Umbraco.Cms.Tests.Common.Builders.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models;
 
+/// <summary>
+/// Contains unit tests for the <see cref="Language"/> model in <c>Umbraco.Core.Models</c>.
+/// </summary>
 [TestFixture]
 public class LanguageTests
 {
+    /// <summary>
+    /// Sets up the test environment before each test.
+    /// </summary>
     [SetUp]
     public void SetUp() => _builder = new LanguageBuilder();
 
     private LanguageBuilder _builder = new();
 
+    /// <summary>
+    /// Tests that a Language object can be deep cloned correctly.
+    /// </summary>
     [Test]
     public void Can_Deep_Clone()
     {
@@ -43,6 +52,9 @@ public class LanguageTests
         }
     }
 
+    /// <summary>
+    /// Tests that the language object can be serialized without throwing an error.
+    /// </summary>
     [Test]
     public void Can_Serialize_Without_Error()
     {

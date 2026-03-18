@@ -10,9 +10,23 @@ using Umbraco.Cms.Tests.UnitTests.AutoFixture;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Routing;
 
+/// <summary>
+/// Contains unit tests for the <see cref="ContentFinderByPageIdQuery"/> class, verifying its behavior and functionality.
+/// </summary>
 [TestFixture]
 public class ContentFinderByPageIdQueryTests
 {
+    /// <summary>
+    /// Verifies that content can be found by page ID specified in the query string of a URL.
+    /// </summary>
+    /// <param name="urlAsString">The URL (as a string) containing the page ID query parameter.</param>
+    /// <param name="nodeMatch">The expected node ID that should be matched and returned.</param>
+    /// <param name="publishedContent">The mocked published content instance corresponding to the node ID.</param>
+    /// <param name="umbracoContextAccessor">Mocked accessor for retrieving the Umbraco context.</param>
+    /// <param name="umbracoContext">Mocked Umbraco context used for content and URL resolution.</param>
+    /// <param name="requestAccessor">Mocked accessor for retrieving request values (such as query parameters).</param>
+    /// <param name="fileService">Mocked file service used by the PublishedRequestBuilder.</param>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     [InlineAutoMoqData("/?umbPageId=1046", 1046)]
     [InlineAutoMoqData("/?UMBPAGEID=1046", 1046)]

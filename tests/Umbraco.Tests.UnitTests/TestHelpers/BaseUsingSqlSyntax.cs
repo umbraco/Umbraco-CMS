@@ -1,4 +1,4 @@
-// Copyright (c) Umbraco.
+﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using Microsoft.Extensions.Configuration;
@@ -18,9 +18,16 @@ using MapperCollection = NPoco.MapperCollection;
 
 namespace Umbraco.Cms.Tests.UnitTests.TestHelpers;
 
+/// <summary>
+/// Provides a base class for unit tests that require SQL syntax configuration or operations.
+/// </summary>
 [TestFixture]
 public abstract class BaseUsingSqlSyntax
 {
+    /// <summary>
+    /// Sets up the test environment by configuring the SQL context, registering core mappers, and initializing required services for unit tests.
+    /// This method is typically called before each test to ensure a consistent and isolated environment.
+    /// </summary>
     [SetUp]
     public virtual void Setup()
     {

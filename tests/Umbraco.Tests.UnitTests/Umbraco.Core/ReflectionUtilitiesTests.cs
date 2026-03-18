@@ -11,9 +11,15 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core;
 
+/// <summary>
+/// Contains unit tests for the <see cref="ReflectionUtilities"/> class in the Umbraco Core.
+/// </summary>
 [TestFixture]
 public class ReflectionUtilitiesTests
 {
+    /// <summary>
+    /// Tests that the EmitConstructor method correctly emits constructors for various delegate types.
+    /// </summary>
     [Test]
     public void EmitCtorEmits()
     {
@@ -30,6 +36,11 @@ public class ReflectionUtilitiesTests
         Assert.IsInstanceOf<Class3>(ctor4(42));
     }
 
+    /// <summary>
+    /// Tests that the EmitConstructor method correctly emits constructors from ConstructorInfo.
+    /// It verifies creation of instances with parameterless and parameterized constructors,
+    /// and checks that invalid constructor signatures throw exceptions.
+    /// </summary>
     [Test]
     public void EmitCtorEmitsFromInfo()
     {
@@ -57,6 +68,9 @@ public class ReflectionUtilitiesTests
         Assert.Throws<ArgumentException>(() => ReflectionUtilities.EmitConstructor<Func<string, object>>(ctorInfo));
     }
 
+    /// <summary>
+    /// Tests that EmitConstructor correctly emits a private constructor.
+    /// </summary>
     [Test]
     public void EmitCtorEmitsPrivateCtor()
     {
@@ -64,10 +78,16 @@ public class ReflectionUtilitiesTests
         Assert.IsInstanceOf<Class3>(ctor("foo"));
     }
 
+    /// <summary>
+    /// Tests that EmitConstructor throws an InvalidOperationException if the constructor is not found.
+    /// </summary>
     [Test]
     public void EmitCtorThrowsIfNotFound() =>
         Assert.Throws<InvalidOperationException>(() => ReflectionUtilities.EmitConstructor<Func<bool, Class3>>());
 
+    /// <summary>
+    /// Tests that EmitConstructor throws an ArgumentException when given an invalid constructor.
+    /// </summary>
     [Test]
     public void EmitCtorThrowsIfInvalid()
     {
@@ -80,10 +100,16 @@ public class ReflectionUtilitiesTests
         Assert.Throws<ArgumentException>(() => ReflectionUtilities.EmitConstructor<Func<Class2>>(ctorInfo));
     }
 
+    /// <summary>
+    /// Tests that EmitConstructor returns null when expected.
+    /// </summary>
     [Test]
     public void EmitCtorReturnsNull() =>
         Assert.IsNull(ReflectionUtilities.EmitConstructor<Func<bool, Class3>>(false));
 
+    /// <summary>
+    /// Tests that the EmitMethod function correctly emits methods that operate on instance methods with various signatures.
+    /// </summary>
     [Test]
     public void EmitMethodEmitsInstance()
     {
@@ -102,6 +128,9 @@ public class ReflectionUtilitiesTests
         Assert.AreEqual(42, method4(class1, "42"));
     }
 
+    /// <summary>
+    /// Tests that EmitMethod correctly emits static methods and allows invocation.
+    /// </summary>
     [Test]
     public void EmitMethodEmitsStatic()
     {
@@ -118,6 +147,9 @@ public class ReflectionUtilitiesTests
         Assert.AreEqual(42, method4("42"));
     }
 
+    /// <summary>
+    /// Tests that EmitMethod correctly emits a static method.
+    /// </summary>
     [Test]
     public void EmitMethodEmitsStaticStatic()
     {
@@ -125,6 +157,9 @@ public class ReflectionUtilitiesTests
         method();
     }
 
+    /// <summary>
+    /// Tests that ReflectionUtilities.EmitMethod correctly emits delegates from MethodInfo instances.
+    /// </summary>
     [Test]
     public void EmitMethodEmitsFromInfo()
     {
@@ -188,6 +223,9 @@ public class ReflectionUtilitiesTests
         method();
     }
 
+    /// <summary>
+    /// Tests that EmitMethod correctly emits delegates for private methods.
+    /// </summary>
     [Test]
     public void EmitMethodEmitsPrivateMethod()
     {
@@ -200,6 +238,9 @@ public class ReflectionUtilitiesTests
         method2();
     }
 
+    /// <summary>
+    /// Tests that EmitMethod throws an InvalidOperationException when the method is not found.
+    /// </summary>
     [Test]
     public void EmitMethodThrowsIfNotFound()
     {
@@ -208,6 +249,9 @@ public class ReflectionUtilitiesTests
             ReflectionUtilities.EmitMethod<Action<Class1, int, int>>("Method1"));
     }
 
+    /// <summary>
+    /// Tests that EmitMethod throws an ArgumentException if the provided method is invalid.
+    /// </summary>
     [Test]
     public void EmitMethodThrowsIfInvalid()
     {
@@ -215,6 +259,9 @@ public class ReflectionUtilitiesTests
         Assert.Throws<ArgumentException>(() => ReflectionUtilities.EmitMethod<Action<Class1, int, int>>(methodInfo));
     }
 
+    /// <summary>
+    /// Tests that EmitMethod returns null when the specified method does not exist.
+    /// </summary>
     [Test]
     public void EmitMethodReturnsNull()
     {
@@ -222,6 +269,9 @@ public class ReflectionUtilitiesTests
         Assert.IsNull(ReflectionUtilities.EmitMethod<Action<Class1, int, int>>("Method1", false));
     }
 
+    /// <summary>
+    /// Tests that the EmitProperty methods correctly emit getters and setters for properties.
+    /// </summary>
     [Test]
     public void EmitPropertyEmits()
     {
@@ -244,6 +294,11 @@ public class ReflectionUtilitiesTests
         setter3(class1, 42);
     }
 
+    /// <summary>
+    /// Verifies that property getter and setter delegates can be correctly emitted from <see cref="PropertyInfo"/> instances
+    /// using the <see cref="ReflectionUtilities"/> methods. Ensures that the emitted delegates work for different properties
+    /// and both get and set operations.
+    /// </summary>
     [Test]
     public void EmitPropertyEmitsFromInfo()
     {
@@ -270,6 +325,9 @@ public class ReflectionUtilitiesTests
         setter3(class1, 42);
     }
 
+    /// <summary>
+    /// Tests that EmitPropertyGetter correctly emits a getter for a private property.
+    /// </summary>
     [Test]
     public void EmitPropertyEmitsPrivateProperty()
     {
@@ -279,6 +337,9 @@ public class ReflectionUtilitiesTests
         Assert.AreEqual(42, getter1(class1));
     }
 
+    /// <summary>
+    /// Tests that EmitPropertyGetter and EmitPropertySetter throw the expected exceptions when the property is not found or invalid.
+    /// </summary>
     [Test]
     public void EmitPropertyThrowsIfNotFound()
     {
@@ -289,10 +350,16 @@ public class ReflectionUtilitiesTests
         Assert.Throws<ArgumentException>(() => ReflectionUtilities.EmitPropertySetter<Class1, int>(propertyInfo));
     }
 
+    /// <summary>
+    /// Tests that EmitPropertyGetter throws an ArgumentException when given an invalid property name.
+    /// </summary>
     [Test]
     public void EmitPropertyThrowsIfInvalid() =>
         Assert.Throws<ArgumentException>(() => ReflectionUtilities.EmitPropertyGetter<Class1, string>("Value1"));
 
+    /// <summary>
+    /// Tests that EmitPropertyGetter returns null when the property does not exist.
+    /// </summary>
     [Test]
     public void EmitPropertyReturnsNull()
     {
@@ -300,6 +367,11 @@ public class ReflectionUtilitiesTests
         Assert.IsNull(ReflectionUtilities.EmitPropertyGetter<Class1, int>("Value2", false));
     }
 
+    /// <summary>
+    /// Tests that property setters emitted via ReflectionUtilities can cast unsafe values correctly.
+    /// This includes casting from object to the property type, handling reference types, boxed value types,
+    /// and verifying that invalid casts throw the appropriate exceptions.
+    /// </summary>
     [Test]
     public void PropertySetterCanCastUnsafeValue()
     {
@@ -350,6 +422,11 @@ public class ReflectionUtilitiesTests
         Assert.Throws<FormatException>(() => setterInt4(object4, "foo"));
     }
 
+    /// <summary>
+    /// Verifies that a property setter generated via reflection can cast an input object to the property's declaring type
+    /// and correctly assign the value, even when the property is defined on a base class and the value is of a derived type.
+    /// Specifically tests that an object of a derived type can be set on a property declared in a base type using the emitted setter.
+    /// </summary>
     [Test]
     public void PropertySetterCanCastObject()
     {
@@ -368,6 +445,9 @@ public class ReflectionUtilitiesTests
         Assert.AreSame(object2, object4.ClassValue);
     }
 
+    /// <summary>
+    /// Tests that the property setter can cast an unsafe object to the expected type.
+    /// </summary>
     [Test]
     public void PropertySetterCanCastUnsafeObject()
     {
@@ -385,6 +465,10 @@ public class ReflectionUtilitiesTests
         Assert.AreSame(object2, object4.ClassValue);
     }
 
+    /// <summary>
+    /// Verifies that property getters generated via <see cref="ReflectionUtilities.EmitPropertyGetter{T,TResult}"/> can correctly cast property values to the specified result type.
+    /// This includes casting reference types to base types, boxing value types to <see cref="object"/>, and ensuring that an <see cref="ArgumentException"/> is thrown when an invalid cast is attempted.
+    /// </summary>
     [Test]
     public void PropertyGetterCanCastValue()
     {
@@ -418,6 +502,10 @@ public class ReflectionUtilitiesTests
             => ReflectionUtilities.EmitPropertyGetter<Class4, Class3>(propInt4));
     }
 
+    /// <summary>
+    /// Verifies that the property getter emitted by <see cref="ReflectionUtilities.EmitPropertyGetter{T,TValue}"/> can correctly cast the declaring object type when retrieving a property value.
+    /// Ensures that casting from <see cref="Class5"/> to <see cref="Class2"/> works as expected, and that attempting to cast from <see cref="Class3"/> to <see cref="Class2"/> throws an <see cref="ArgumentException"/>.
+    /// </summary>
     [Test]
     public void PropertyGetterCanCastObject()
     {
@@ -439,6 +527,11 @@ public class ReflectionUtilitiesTests
             => ReflectionUtilities.EmitPropertyGetter<Class3, Class2>(propClass4));
     }
 
+    /// <summary>
+    /// Tests that property getters emitted by <see cref="ReflectionUtilities"/> correctly cast the returned value to <see cref="object"/>.
+    /// Verifies correct behavior for different property types, including string, reference types, and value types, ensuring boxing occurs as needed.
+    /// Also tests property getters across class hierarchies and validates integration with object extension methods such as <c>ToObjectDictionary</c>.
+    /// </summary>
     [Test]
     public void EmitPropertyCastGetterEmits()
     {
@@ -561,6 +654,10 @@ public class ReflectionUtilitiesTests
         Assert.AreEqual(1, values5D["intValue2"]); // JsonProperty changes property name
     }
 
+    /// <summary>
+    /// Tests that EmitFieldGetter and EmitFieldSetter correctly emit delegates
+    /// for getting and setting field values, including readonly fields.
+    /// </summary>
     [Test]
     public void EmitFieldGetterSetterEmits()
     {
@@ -582,6 +679,10 @@ public class ReflectionUtilitiesTests
     }
 
     // TODO: missing tests specifying 'returned' on method, property
+    /// <summary>
+    /// Verifies that property getters can be dynamically created and invoked for an anonymous type
+    /// using reflection utilities, ensuring correct deconstruction and value retrieval for each property.
+    /// </summary>
     [Test]
     public void DeconstructAnonymousType()
     {
@@ -603,21 +704,48 @@ public class ReflectionUtilitiesTests
     // these functions can be examined in eg DotPeek to understand IL works
 
     // box          [mscorlib]System.Int32
+    /// <summary>Gets the integer value from the specified Class4 object.</summary>
+    /// <param name="object4">The Class4 object from which to get the integer value.</param>
+    /// <returns>The integer value boxed as an object.</returns>
     public object GetIntValue(Class4 object4) => object4.IntValue;
 
     // unbox.any    [mscorlib]System.Int32
+    /// <summary>
+    /// Sets the <c>IntValue</c> property of the specified <see cref="Class4"/> instance to the provided value, casting it to <see cref="int"/>.
+    /// </summary>
+    /// <param name="object4">The <see cref="Class4"/> instance whose <c>IntValue</c> property will be set.</param>
+    /// <param name="i">The value to assign to <c>IntValue</c>; will be cast to <see cref="int"/>.</param>
     public void SetIntValue(Class4 object4, object i) => object4.IntValue = (int)i;
 
     // castclass    [mscorlib]System.String
+    /// <summary>
+    /// Sets the StringValue property of the given Class4 instance to the specified string.
+    /// </summary>
+    /// <param name="object4">The Class4 instance whose StringValue property will be set.</param>
+    /// <param name="s">The object to be cast to string and assigned.</param>
     public void SetStringValue(Class4 object4, object s) => object4.StringValue = (string)s;
 
     // conv.i4
+    /// <summary>
+    /// Sets the <c>IntValue</c> property of the given <see cref="Class4"/> object to the specified integer value.
+    /// </summary>
+    /// <param name="object4">The <see cref="Class4"/> instance whose <c>IntValue</c> property will be set.</param>
+    /// <param name="d">The value to set, expected to be a double that will be cast to integer.</param>
     public void SetIntValue(Class4 object4, double d) => object4.IntValue = (int)d;
 
     // unbox.any    [mscorlib]System.Double
     // conv.i4
+    /// <summary>Sets the IntValue property of the specified Class4 instance by casting the provided object to double and then to int.</summary>
+    /// <param name="object4">The Class4 instance whose IntValue property will be set.</param>
+    /// <param name="d">The object to be cast to double and then to int.</param>
     public void SetIntValue2(Class4 object4, object d) => object4.IntValue = (int)(double)d;
 
+    /// <summary>
+    /// Sets the IntValue property of the given Class4 object to the integer value represented by v.
+    /// </summary>
+    /// <param name="object4">The Class4 instance whose IntValue property will be set.</param>
+    /// <param name="v">The value to convert to an integer and assign to IntValue.</param>
+    /// <returns>The integer value of the field.</returns>
     public void SetIntValue3(Class4 object4, object v)
     {
         if (v is int i)
@@ -630,6 +758,11 @@ public class ReflectionUtilitiesTests
         }
     }
 
+    /// <summary>
+    /// Sets the IntValue property of the given Class4 object to the integer value represented by the object v.
+    /// </summary>
+    /// <param name="object4">The Class4 instance whose IntValue property will be set.</param>
+    /// <param name="v">The value to convert to an integer and assign to IntValue.</param>
     public void SetIntValue4(Class4 object4, object v)
     {
         if (v is int i)
@@ -643,42 +776,73 @@ public class ReflectionUtilitiesTests
     }
 
     // get field
+    /// <summary>
+    /// Gets the integer field value from the specified Class1 object.
+    /// </summary>
+    /// <param name="object1">The Class1 object from which to get the field value.</param>
+    /// <returns>The integer value of the field.</returns>
     public int GetIntField(Class1 object1) => object1.Field1;
 
     // set field
+    /// <summary>Sets the integer field of the specified object.</summary>
+    /// <param name="object1">The object whose field is to be set.</param>
+    /// <param name="i">The integer value to set.</param>
     public void SetIntField(Class1 object1, int i) => object1.Field1 = i;
 
+    /// <summary>
+    /// A static class used for testing reflection utilities.
+    /// </summary>
     public static class StaticClass1
     {
+    /// <summary>
+    /// Represents a static method in <see cref="StaticClass1"/> used for unit testing reflection utilities.
+    /// </summary>
         public static void Method()
         {
         }
     }
 
+    /// <summary>
+    /// A helper class used for unit testing within <see cref="ReflectionUtilitiesTests"/>.
+    /// </summary>
     public class Class1
     {
+#pragma warning disable IDE1006 // Field names should begin with lower-case letter
         public readonly int Field3 = 22;
-
         public int Field1 = 33;
-#pragma warning disable SA1306 // Field names should begin with lower-case letter
-        private readonly int Field2 = 66;
-#pragma warning restore SA1306 // Field names should begin with lower-case letter
+#pragma warning restore IDE1006 // Field names should begin with lower-case letter
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Class1"/> class.
+    /// </summary>
         public Class1()
         {
         }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Class1"/> class with the specified integer value.
+    /// </summary>
+    /// <param name="i">The integer value to initialize the class with.</param>
         public Class1(int i)
         {
         }
 
+    /// <summary>
+    /// Gets the value 1. Always returns 42.
+    /// </summary>
         public int Value1 => 42;
 
+    /// <summary>
+    /// Sets the Value2 property. This is a set-only property.
+    /// </summary>
         public int Value2
         {
             set { }
         }
 
+        /// <summary>
+        /// Gets or sets the <see cref="Value3"/> property. This property always returns the integer value 42 when accessed.
+        /// </summary>
         public int Value3
         {
             get => 42;
@@ -687,30 +851,62 @@ public class ReflectionUtilitiesTests
 
         private int ValueP1 => 42;
 
+    /// <summary>
+    /// Represents a method with no implementation.
+    /// </summary>
         public void Method1()
         {
         }
 
+    /// <summary>
+    /// A sample method that takes an integer parameter.
+    /// </summary>
+    /// <param name="i">The integer parameter.</param>
         public void Method2(int i)
         {
         }
 
+    /// <summary>Returns the integer 42.</summary>
+    /// <returns>An integer value of 42.</returns>
         public int Method3() => 42;
 
+    /// <summary>
+    /// Parses the specified string to an integer.
+    /// </summary>
+    /// <param name="s">The string to parse.</param>
+    /// <returns>The integer value parsed from the string.</returns>
         public int Method4(string s) => int.Parse(s);
 
+    /// <summary>Returns a string value.</summary>
+    /// <returns>A string.</returns>
         public string Method5() => "foo";
 
+    /// <summary>
+    /// Represents a static method in the <see cref="Class1"/> class. This method currently has no implementation.
+    /// </summary>
         public static void SMethod1()
         {
         }
 
+    /// <summary>
+    /// Static method that takes an integer parameter.
+    /// </summary>
+    /// <param name="i">The integer parameter.</param>
         public static void SMethod2(int i)
         {
         }
 
+    /// <summary>
+    /// Returns the integer value 42.
+    /// </summary>
+    /// <returns>The integer 42.</returns>
         public static int SMethod3() => 42;
 
+    /// <summary>
+    /// Parses the given string to an integer.
+    /// </summary>
+    /// <param name="s">The string to parse.</param>
+    /// <returns>The integer parsed from the string.</returns>
         public static int SMethod4(string s) => int.Parse(s);
 
         private void MethodP1()
@@ -722,16 +918,31 @@ public class ReflectionUtilitiesTests
         }
     }
 
+    /// <summary>
+    /// A helper class used within <see cref="ReflectionUtilitiesTests"/> to test reflection-related utilities.
+    /// This class is intended for use in unit tests only.
+    /// </summary>
     public class Class2
     {
     }
 
+    /// <summary>
+    /// Test fixture class used in <see cref="ReflectionUtilitiesTests"/>.
+    /// </summary>
     public class Class2A : Class2
     {
     }
 
+    /// <summary>
+    /// A test class used within <see cref="ReflectionUtilitiesTests"/> to validate reflection-based utilities.
+    /// This class serves as a sample type for unit testing reflection scenarios.
+    /// </summary>
     public class Class3
     {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Class3"/> class with the specified integer parameter.
+    /// </summary>
+    /// <param name="i">The integer value to initialize the class with.</param>
         public Class3(int i)
         {
         }
@@ -741,24 +952,52 @@ public class ReflectionUtilitiesTests
         }
     }
 
+    /// <summary>
+    /// Test fixture class used in <see cref="ReflectionUtilitiesTests"/>.
+    /// </summary>
     public class Class4
     {
+    /// <summary>
+    /// Gets or sets the integer value.
+    /// </summary>
         public int IntValue { get; set; }
 
+    /// <summary>
+    /// Gets or sets the string value.
+    /// </summary>
         public string StringValue { get; set; }
 
+    /// <summary>
+    /// Gets or sets the value of the <see cref="Class2"/> property associated with this instance of <see cref="Class4"/>.
+    /// </summary>
         public Class2 ClassValue { get; set; }
 
+    /// <summary>
+    /// Gets or sets the value of type <see cref="Class2A"/> for this property.
+    /// </summary>
         public Class2A ClassAValue { get; set; }
     }
 
+    /// <summary>
+    /// A test class used within <see cref="ReflectionUtilitiesTests"/> to verify reflection-related functionality.
+    /// </summary>
     public class Class5 : Class4
     {
+        /// <summary>
+        /// Gets or sets the secondary integer value for the <see cref="Class5"/> instance.
+        /// </summary>
         [JsonPropertyName("intValue2")]
         public int IntValue2 { get; set; }
 
+    /// <summary>
+    /// Gets or sets the value of the StringValue2 property.
+    /// This property holds a string value for testing purposes in Class5.
+    /// </summary>
         public string StringValue2 { get; set; }
 
+    /// <summary>
+    /// Gets or sets the value of type <see cref="Class2"/> for this property.
+    /// </summary>
         public Class2 ClassValue2 { get; set; }
     }
 }

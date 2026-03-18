@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
@@ -9,9 +9,15 @@ using Umbraco.Cms.Core.Security;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Security;
 
+/// <summary>
+/// Contains unit tests for the <see cref="HmacSecretKeyService"/> class, verifying its functionality and behavior.
+/// </summary>
 [TestFixture]
 public class HmacSecretKeyServiceTests
 {
+    /// <summary>
+    /// Tests that HasHmacSecretKey returns false when the key is empty.
+    /// </summary>
     [Test]
     public void HasHmacSecretKey_ReturnsFalse_WhenEmpty()
     {
@@ -20,6 +26,9 @@ public class HmacSecretKeyServiceTests
         Assert.IsFalse(sut.HasHmacSecretKey());
     }
 
+    /// <summary>
+    /// Tests that HasHmacSecretKey returns true when the key is set.
+    /// </summary>
     [Test]
     public void HasHmacSecretKey_ReturnsTrue_WhenSet()
     {
@@ -28,6 +37,10 @@ public class HmacSecretKeyServiceTests
         Assert.IsTrue(sut.HasHmacSecretKey());
     }
 
+    /// <summary>
+    /// Tests that CreateHmacSecretKeyAsync generates a new HMAC secret key and persists it correctly.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task CreateHmacSecretKeyAsync_GeneratesAndPersists()
     {
@@ -44,6 +57,10 @@ public class HmacSecretKeyServiceTests
             Times.Once);
     }
 
+    /// <summary>
+    /// Tests that CreateHmacSecretKeyAsync returns KeyExists status when the key already exists.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task CreateHmacSecretKeyAsync_ReturnsKeyExists_WhenKeyAlreadyExists()
     {
@@ -59,6 +76,10 @@ public class HmacSecretKeyServiceTests
             Times.Never);
     }
 
+    /// <summary>
+    /// Tests that CreateHmacSecretKeyAsync returns an error result when an exception is thrown.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task CreateHmacSecretKeyAsync_ReturnsError_OnException()
     {

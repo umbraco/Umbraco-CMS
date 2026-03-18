@@ -3,9 +3,16 @@ using Umbraco.Cms.Core.Collections;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Collections;
 
+/// <summary>
+/// Contains unit tests for the <see cref="TopoGraph"/> class in the Umbraco.Core.Collections namespace.
+/// </summary>
 [TestFixture]
 public class TopoGraphTests
 {
+    /// <summary>
+    /// Verifies that the <see cref="TopoGraph{TKey, TValue}"/> correctly detects cyclic dependencies
+    /// among items and throws an exception with the expected error message when a cycle is present.
+    /// </summary>
     [Test]
     public void CycleTest()
     {
@@ -25,6 +32,9 @@ public class TopoGraphTests
         }
     }
 
+    /// <summary>
+    /// Tests that the TopoGraph correctly ignores cycles when throwOnCycle is false.
+    /// </summary>
     [Test]
     public void IgnoreCycleTest()
     {
@@ -41,6 +51,10 @@ public class TopoGraphTests
         Assert.AreEqual(1, ordered[2].Id);
     }
 
+    /// <summary>
+    /// Verifies that the <see cref="TopoGraph{TKey, TValue}"/> throws an exception when attempting to sort items with a missing dependency.
+    /// Ensures that missing dependencies are correctly detected and reported as errors.
+    /// </summary>
     [Test]
     public void MissingTest()
     {
@@ -60,6 +74,9 @@ public class TopoGraphTests
         }
     }
 
+    /// <summary>
+    /// Tests that the TopoGraph correctly ignores missing dependencies when throwOnMissing is false.
+    /// </summary>
     [Test]
     public void IgnoreMissingTest()
     {
@@ -76,6 +93,9 @@ public class TopoGraphTests
         Assert.AreEqual(3, ordered[2].Id);
     }
 
+    /// <summary>
+    /// Tests that the TopoGraph correctly orders items based on their dependencies.
+    /// </summary>
     [Test]
     public void OrderTest()
     {
@@ -92,6 +112,9 @@ public class TopoGraphTests
         Assert.AreEqual(3, ordered[2].Id);
     }
 
+    /// <summary>
+    /// Tests that the TopoGraph returns items in reverse topological order when requested.
+    /// </summary>
     [Test]
     public void ReverseTest()
     {
@@ -108,14 +131,31 @@ public class TopoGraphTests
         Assert.AreEqual(1, ordered[2].Id);
     }
 
+    /// <summary>
+    /// Represents a test helper class used in <see cref="TopoGraphTests"/>.
+    /// </summary>
     public class Thing
     {
+    /// <summary>
+    /// Gets or sets the identifier of the Thing.
+    /// </summary>
         public int Id { get; set; }
 
+    /// <summary>
+    /// Gets or sets the name of the thing.
+    /// </summary>
         public string Name { get; set; }
 
+    /// <summary>
+    /// Gets the list of dependencies.
+    /// </summary>
         public List<int> Dependencies { get; } = new List<int>();
 
+    /// <summary>
+    /// Adds dependencies to this Thing.
+    /// </summary>
+    /// <param name="dependencies">The dependencies to add.</param>
+    /// <returns>The current Thing instance with added dependencies.</returns>
         public Thing Depends(params int[] dependencies)
         {
             Dependencies.AddRange(dependencies);

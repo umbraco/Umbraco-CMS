@@ -11,9 +11,15 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models;
 
+/// <summary>
+/// Contains unit tests for methods in the <see cref="ContentExtensions"/> class.
+/// </summary>
 [TestFixture]
 public class ContentExtensionsTests
 {
+    /// <summary>
+    /// Tests that resetting dirty properties clears the saved published state.
+    /// </summary>
     [Test]
     public void DirtyProperty_Reset_Clears_SavedPublishedState()
     {
@@ -31,6 +37,11 @@ public class ContentExtensionsTests
         Assert.IsFalse(content.Published);
     }
 
+    /// <summary>
+    /// Tests that the dirty property flag on content is only set when the property value actually changes.
+    /// Verifies that assigning the same value does not mark the property as dirty,
+    /// but changing the value and then changing it back does.
+    /// </summary>
     [Test]
     public void DirtyProperty_OnlyIfActuallyChanged_Content()
     {
@@ -56,6 +67,12 @@ public class ContentExtensionsTests
         Assert.IsTrue(content.IsPropertyDirty("Published"));
     }
 
+    /// <summary>
+    /// Verifies that a property is only marked as dirty when its value actually changes.
+    /// This test focuses on user property value assignments and ensures the dirty state
+    /// is set only when the value transitions to something different, not when reassigning
+    /// the same value.
+    /// </summary>
     [Test]
     public void DirtyProperty_OnlyIfActuallyChanged_User()
     {
@@ -83,6 +100,11 @@ public class ContentExtensionsTests
         Assert.IsTrue(prop.IsDirty());
     }
 
+    /// <summary>
+    /// Tests the behavior of the UpdateDate property in relation to dirty property tracking.
+    /// Verifies that changing a property marks the content as having dirty user properties without marking the entity dirty,
+    /// and that directly changing UpdateDate marks the entity as dirty.
+    /// </summary>
     [Test]
     public void DirtyProperty_UpdateDate()
     {
@@ -110,6 +132,11 @@ public class ContentExtensionsTests
         // we've tested for RequiresSaving & RequiresNewVersion so it's OK
     }
 
+    /// <summary>
+    /// Verifies the behavior of the <c>IsDirty</c> and <c>WasDirty</c> flags on a content property
+    /// as it is modified and reset. Ensures that the dirty state is tracked correctly and that
+    /// the 'was dirty' state is set appropriately after property changes and resets.
+    /// </summary>
     [Test]
     public void DirtyProperty_WasDirty_ContentProperty()
     {
@@ -141,6 +168,9 @@ public class ContentExtensionsTests
         Assert.IsTrue(content.WasDirty());
     }
 
+    /// <summary>
+    /// Tests the dirty and was dirty state behavior of the Content SortOrder property.
+    /// </summary>
     [Test]
     public void DirtyProperty_WasDirty_ContentSortOrder()
     {
@@ -172,6 +202,11 @@ public class ContentExtensionsTests
         Assert.IsTrue(content.WasDirty());
     }
 
+    /// <summary>
+    /// Tests the dirty state behavior of a user property on content.
+    /// Verifies that setting values and resetting dirty properties
+    /// correctly updates the IsDirty and WasDirty flags.
+    /// </summary>
     [Test]
     public void DirtyProperty_WasDirty_UserProperty()
     {

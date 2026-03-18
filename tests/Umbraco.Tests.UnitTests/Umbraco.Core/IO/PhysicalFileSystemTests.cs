@@ -10,9 +10,15 @@ using Umbraco.Cms.Tests.UnitTests.TestHelpers;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.IO;
 
+/// <summary>
+/// Contains unit tests for the <see cref="PhysicalFileSystem"/> class in the <c>Umbraco.Cms.Core.IO</c> namespace.
+/// </summary>
 [TestFixture]
 public class PhysicalFileSystemTests : AbstractFileSystemTests
 {
+    /// <summary>
+    /// Cleans up the test environment by deleting all files and the test directory after each test run.
+    /// </summary>
     [TearDown]
     public void TearDown()
     {
@@ -31,6 +37,10 @@ public class PhysicalFileSystemTests : AbstractFileSystemTests
         Directory.Delete(path, true);
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PhysicalFileSystemTests"/> test class.
+    /// This is the default constructor.
+    /// </summary>
     public PhysicalFileSystemTests()
         : base(new PhysicalFileSystem(
             TestHelper.IOHelper,
@@ -42,6 +52,9 @@ public class PhysicalFileSystemTests : AbstractFileSystemTests
 
     protected override string ConstructUrl(string path) => "/Media/" + path;
 
+    /// <summary>
+    /// Tests that a file can be saved correctly to the physical file system.
+    /// </summary>
     [Test]
     public void SaveFileTest()
     {
@@ -55,6 +68,9 @@ public class PhysicalFileSystemTests : AbstractFileSystemTests
         Assert.IsTrue(File.Exists(Path.Combine(basePath, "sub", "f3.txt")));
     }
 
+    /// <summary>
+    /// Tests the MoveFile method of the PhysicalFileSystem to ensure files are moved correctly.
+    /// </summary>
     [Test]
     public void MoveFileTest()
     {
@@ -73,6 +89,10 @@ public class PhysicalFileSystemTests : AbstractFileSystemTests
         Assert.IsTrue(File.Exists(Path.Combine(basePath, "sub2/f4.txt")));
     }
 
+    /// <summary>
+    /// Tests the GetFullPath method of the PhysicalFileSystem to ensure it returns the correct full path,
+    /// properly normalizes path separators, and throws exceptions on invalid paths.
+    /// </summary>
     [Test]
     public void GetFullPathTest()
     {

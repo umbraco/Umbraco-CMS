@@ -11,9 +11,15 @@ using Umbraco.Cms.Core.Security;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Security;
 
+/// <summary>
+/// Contains unit tests for verifying the functionality of the <see cref="LegacyPasswordSecurity"/> class.
+/// </summary>
 [TestFixture]
 public class LegacyPasswordSecurityTests
 {
+    /// <summary>
+    /// Tests that a password hashed using a non-keyed hash algorithm can be hashed, stored, and verified correctly.
+    /// </summary>
     [Test]
     public void Check_Password_Hashed_Non_KeyedHashAlgorithm()
     {
@@ -30,6 +36,9 @@ public class LegacyPasswordSecurityTests
         Assert.IsTrue(result);
     }
 
+    /// <summary>
+    /// Tests that a password hashed using a keyed hash algorithm can be correctly verified.
+    /// </summary>
     [Test]
     public void Check_Password_Hashed_KeyedHashAlgorithm()
     {
@@ -50,6 +59,9 @@ public class LegacyPasswordSecurityTests
         Assert.IsTrue(result);
     }
 
+    /// <summary>
+    /// Tests the verification of a legacy v4 SHA1 hashed password.
+    /// </summary>
     [Test]
     public void Check_Password_Legacy_v4_SHA1()
     {
@@ -63,6 +75,9 @@ public class LegacyPasswordSecurityTests
         Assert.IsTrue(result);
     }
 
+    /// <summary>
+    /// Tests that the FormatPasswordForStorage method correctly formats a hashed password with a salt.
+    /// </summary>
     [Test]
     public void Format_Pass_For_Storage_Hashed()
     {
@@ -78,6 +93,10 @@ public class LegacyPasswordSecurityTests
         Assert.AreEqual(salt + "ThisIsAHashedPassword", result);
     }
 
+    /// <summary>
+    /// Verifies that when a stored password string containing a salt and a hashed password is parsed,
+    /// the hashed password portion is correctly extracted and returned.
+    /// </summary>
     [Test]
     public void Get_Stored_Password_Hashed()
     {

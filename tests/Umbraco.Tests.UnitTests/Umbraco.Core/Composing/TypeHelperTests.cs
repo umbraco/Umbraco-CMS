@@ -44,6 +44,9 @@ public class TypeHelperTests
     {
     }
 
+    /// <summary>
+    /// Tests whether a class is static using the TypeHelper.
+    /// </summary>
     [Test]
     public void Is_Static_Class()
     {
@@ -51,6 +54,12 @@ public class TypeHelperTests
         Assert.IsFalse(TypeHelper.IsStaticClass(typeof(TypeHelperTests)));
     }
 
+    /// <summary>
+    /// Tests the <see cref="TypeHelper.GetLowestBaseType"/> method to determine the lowest common base class among multiple types.
+    /// This test verifies both successful and unsuccessful attempts to find a common base class for various combinations of types,
+    /// including cases where no common base exists, where the base is a specific type (e.g., <see cref="Component"/> or <see cref="MarshalByRefObject"/>),
+    /// and where only a single type is provided.
+    /// </summary>
     [Test]
     public void Find_Common_Base_Class()
     {
@@ -91,6 +100,9 @@ public class TypeHelperTests
         Assert.AreEqual(typeof(PropertyAliasDto), t5.Result);
     }
 
+    /// <summary>
+    /// Tests the <see cref="TypeHelper.MatchType"/> method with various type matching scenarios.
+    /// </summary>
     [Test]
     public void MatchTypesTest()
     {
@@ -149,6 +161,9 @@ public class TypeHelperTests
         Assert.AreEqual(typeof(int), bindings["TKey"]);
     }
 
+    /// <summary>
+    /// Tests the TypeHelper.MatchType method with various generic and non-generic types to verify correct matching behavior.
+    /// </summary>
     [Test]
     public void MatchType()
     {
@@ -193,6 +208,10 @@ public class TypeHelperTests
         Assert.IsTrue(TypeHelper.MatchType(typeof(List<int>), genericEnumerableNonGenericDefinition));
     }
 
+    /// <summary>
+    /// Tests the creation, identification, and string representations of open and constructed generic types
+    /// using reflection, verifying their properties such as name, full name, and generic type definition status.
+    /// </summary>
     [Test]
     public void CreateOpenGenericTypes()
     {
@@ -259,6 +278,7 @@ public class TypeHelperTests
     /// </summary>
     public class PropertyAliasDto
     {
+    /// <summary>Gets or sets the alias.</summary>
         public string Alias { get; set; }
     }
 }

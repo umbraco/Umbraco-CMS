@@ -6,9 +6,15 @@ using Umbraco.Cms.Core.Cache;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Cache;
 
+/// <summary>
+/// Contains unit tests for the <see cref="ObjectCacheAppCache"/> class to verify its caching functionality.
+/// </summary>
 [TestFixture]
 public class ObjectAppCacheTests : RuntimeAppCacheTests
 {
+    /// <summary>
+    /// Initializes the test environment and sets up the ObjectCacheAppCache provider for ObjectAppCacheTests.
+    /// </summary>
     public override void Setup()
     {
         base.Setup();

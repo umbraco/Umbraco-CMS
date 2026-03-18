@@ -7,10 +7,17 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Cache;
 
+/// <summary>
+/// Contains unit tests for verifying the behavior and functionality of <see cref="IAppPolicyCache"/> implementations (e.g. <see cref="ObjectCacheAppCache"/>).
+/// </summary>
 public abstract class RuntimeAppCacheTests : AppCacheTests
 {
     internal abstract IAppPolicyCache AppPolicyCache { get; }
 
+    /// <summary>
+    /// Tests that a struct value can be added to the cache and correctly expires,
+    /// including verifying behavior when retrieving as a nullable struct.
+    /// </summary>
     [Test]
     public void Can_Add_And_Expire_Struct_Strongly_Typed_With_Null()
     {
@@ -29,6 +36,10 @@ public abstract class RuntimeAppCacheTests : AppCacheTests
         Assert.AreEqual(null, cachedDateTimeNullable);
     }
 
+    /// <summary>
+    /// Tests that the cache can retrieve a value using an asynchronous factory method.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task Can_Get_With_Async_Factory()
     {
@@ -36,6 +47,10 @@ public abstract class RuntimeAppCacheTests : AppCacheTests
         Assert.AreEqual(50, value);
     }
 
+    /// <summary>
+    /// Tests that an item can be inserted into the cache using an asynchronous factory method.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task Can_Insert_With_Async_Factory()
     {

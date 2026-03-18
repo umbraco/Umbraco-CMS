@@ -16,6 +16,12 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors.Validators;
 [TestFixture]
 internal class MultiUrlPickerValueEditorValidationTests
 {
+    /// <summary>
+    /// Verifies that the MultiUrlPicker value editor correctly enforces the minimum number of URLs required, based on the specified configuration.
+    /// </summary>
+    /// <param name="min">The minimum number of URLs that must be present for validation to succeed.</param>
+    /// <param name="succeed">True if the validation is expected to pass; otherwise, false.</param>
+    /// <param name="value">A JSON string representing the collection of URLs to validate, or <c>null</c> if no value is provided.</param>
     [TestCase(1, true, "[{\"icon\":\"icon-document\",\"name\":\"Page 1\",\"published\":true,\"queryString\":null,\"target\":null,\"trashed\":false,\"type\":\"document\",\"unique\":\"7d285be2-7cd5-4c7b-a252-b064e31f049f\",\"url\":\"/\"}]")]
     [TestCase(2, false, "[{\"icon\":\"icon-document\",\"name\":\"Page 1\",\"published\":true,\"queryString\":null,\"target\":null,\"trashed\":false,\"type\":\"document\",\"unique\":\"7d285be2-7cd5-4c7b-a252-b064e31f049f\",\"url\":\"/\"}]")]
     [TestCase(1, true, "[{\"icon\":\"icon-document\",\"name\":\"Page 1\",\"published\":true,\"queryString\":null,\"target\":null,\"trashed\":false,\"type\":\"document\",\"unique\":\"7d285be2-7cd5-4c7b-a252-b064e31f049f\",\"url\":\"/\"},{\"icon\":\"icon-document\",\"name\":\"Page 1\",\"published\":true,\"queryString\":null,\"target\":null,\"trashed\":false,\"type\":\"document\",\"unique\":\"7d285be2-7cd5-4c7b-a252-b064e31f049f\",\"url\":\"/\"}]")]

@@ -15,9 +15,19 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.DeliveryApi;
 
+/// <summary>
+/// Contains unit tests for the <see cref="ApiContentRouteBuilder"/> class in the Delivery API.
+/// These tests verify the routing logic for content delivery.
+/// </summary>
 [TestFixture]
 public class ContentRouteBuilderTests : DeliveryApiTests
 {
+    /// <summary>
+    /// Verifies that the content route builder can successfully build a route for the root content item.
+    /// </summary>
+    /// <param name="hideTopLevelNodeFromPath">
+    /// If set to <c>true</c>, the top-level node is hidden from the generated route path; otherwise, it is included.
+    /// </param>
     [TestCase(true)]
     [TestCase(false)]
     public void CanBuildForRoot(bool hideTopLevelNodeFromPath)
@@ -35,6 +45,11 @@ public class ContentRouteBuilderTests : DeliveryApiTests
         Assert.AreEqual("the-root", result.StartItem.Path);
     }
 
+    /// <summary>
+    /// Tests that the content route builder can correctly build a route for a child content item,
+    /// optionally hiding the top level node from the path.
+    /// </summary>
+    /// <param name="hideTopLevelNodeFromPath">Indicates whether the top level node should be hidden from the path.</param>
     [TestCase(true)]
     [TestCase(false)]
     public void CanBuildForChild(bool hideTopLevelNodeFromPath)
@@ -62,6 +77,10 @@ public class ContentRouteBuilderTests : DeliveryApiTests
         Assert.AreEqual("the-root", result.StartItem.Path);
     }
 
+    /// <summary>
+    /// Tests that the content route builder can correctly build a route for a grandchild content item.
+    /// </summary>
+    /// <param name="hideTopLevelNodeFromPath">Indicates whether the top level node should be hidden from the path.</param>
     [TestCase(true)]
     [TestCase(false)]
     public void CanBuildForGrandchild(bool hideTopLevelNodeFromPath)
@@ -93,6 +112,9 @@ public class ContentRouteBuilderTests : DeliveryApiTests
         Assert.AreEqual("the-root", result.StartItem.Path);
     }
 
+    /// <summary>
+    /// Tests that the content route builder can correctly build routes for a culture variant root and its child.
+    /// </summary>
     [Test]
     public void CanBuildForCultureVariantRootAndChild()
     {
@@ -125,6 +147,10 @@ public class ContentRouteBuilderTests : DeliveryApiTests
         Assert.AreEqual("the-root-da-dk", result.StartItem.Path);
     }
 
+    /// <summary>
+    /// Tests that the content route builder can correctly build routes for a culture variant root content
+    /// and a culture invariant child content, verifying the path and start item properties for different cultures.
+    /// </summary>
     [Test]
     public void CanBuildForCultureVariantRootAndCultureInvariantChild()
     {
@@ -157,6 +183,11 @@ public class ContentRouteBuilderTests : DeliveryApiTests
         Assert.AreEqual("the-root-da-dk", result.StartItem.Path);
     }
 
+    /// <summary>
+    /// Tests that the content route builder can correctly build routes for a culture-invariant root content
+    /// item and a culture-variant child content item, verifying the generated paths and start item details
+    /// for different cultures.
+    /// </summary>
     [Test]
     public void CanBuildForCultureInvariantRootAndCultureVariantChild()
     {
@@ -189,6 +220,10 @@ public class ContentRouteBuilderTests : DeliveryApiTests
         Assert.AreEqual("the-root", result.StartItem.Path);
     }
 
+    /// <summary>
+    /// Verifies that the ContentRouteBuilder does not support non-content published item types.
+    /// </summary>
+    /// <param name="itemType">The published item type to test, which should not be supported.</param>
     [TestCase(PublishedItemType.Media)]
     [TestCase(PublishedItemType.Element)]
     [TestCase(PublishedItemType.Member)]
@@ -202,6 +237,14 @@ public class ContentRouteBuilderTests : DeliveryApiTests
         Assert.Throws<ArgumentException>(() => builder.Build(content.Object));
     }
 
+    /// <summary>
+    /// Verifies that when the URL provider returns an empty, whitespace, or invalid URL,
+    /// the content route builder falls back to using the content path instead.
+    /// </summary>
+    /// <param name="resolvedUrl">The URL value returned by the URL provider, which may be empty, whitespace, or invalid.</param>
+    /// <remarks>
+    /// This test ensures that the fallback mechanism is triggered when the URL provider cannot resolve a valid URL.
+    /// </remarks>
     [TestCase("")]
     [TestCase(" ")]
     [TestCase("#")]
@@ -212,6 +255,13 @@ public class ContentRouteBuilderTests : DeliveryApiTests
         Assert.AreEqual("/the/content/route/", result.Path);
     }
 
+    /// <summary>
+    /// Verifies that the route builder returns null when provided with content paths that are not routable.
+    /// </summary>
+    /// <param name="contentPath">The content path to test for routability.</param>
+    /// <remarks>
+    /// This test uses various unroutable content paths (e.g., empty string, whitespace, or invalid characters).
+    /// </remarks>
     [TestCase("")]
     [TestCase(" ")]
     [TestCase("#")]
@@ -221,6 +271,11 @@ public class ContentRouteBuilderTests : DeliveryApiTests
         Assert.IsNull(result);
     }
 
+    /// <summary>
+    /// Tests that the published URL provider is correctly configured to either include or exclude the top-level node in the generated URL paths, depending on the specified option.
+    /// This ensures that the URL structure matches the expected format for root, child, and grandchild nodes when the <paramref name="hideTopLevelNodeFromPath"/> flag is toggled.
+    /// </summary>
+    /// <param name="hideTopLevelNodeFromPath">If <c>true</c>, the top-level node is hidden from the URL path; if <c>false</c>, it is included.</param>
     [TestCase(true)]
     [TestCase(false)]
     public void VerifyPublishedUrlProviderSetup(bool hideTopLevelNodeFromPath)
@@ -254,6 +309,11 @@ public class ContentRouteBuilderTests : DeliveryApiTests
         Assert.AreEqual(hideTopLevelNodeFromPath ? "/the-child/the-grandchild" : "/the-root/the-child/the-grandchild", publishedUrlProvider.GetUrl(grandchild));
     }
 
+    /// <summary>
+    /// Verifies that an unpublished child content item can be routed correctly by the content route builder,
+    /// ensuring the route is constructed as expected in preview mode.
+    /// </summary>
+    /// <param name="hideTopLevelNodeFromPath">If set to <c>true</c>, the top-level node is omitted from the generated route path; otherwise, it is included.</param>
     [TestCase(true)]
     [TestCase(false)]
     public void CanRouteUnpublishedChild(bool hideTopLevelNodeFromPath)
@@ -281,6 +341,10 @@ public class ContentRouteBuilderTests : DeliveryApiTests
         Assert.AreEqual("the-root", result.StartItem.Path);
     }
 
+    /// <summary>
+    /// Tests that the route for an unpublished child content respects the trailing slash settings.
+    /// </summary>
+    /// <param name="addTrailingSlash">Indicates whether a trailing slash should be added to the route.</param>
     [TestCase(true)]
     [TestCase(false)]
     public void UnpublishedChildRouteRespectsTrailingSlashSettings(bool addTrailingSlash)
@@ -306,6 +370,10 @@ public class ContentRouteBuilderTests : DeliveryApiTests
         Assert.AreEqual(addTrailingSlash, result.Path.EndsWith("/"));
     }
 
+    /// <summary>
+    /// Tests routing behavior for a published child content item when its parent is unpublished, depending on preview mode.
+    /// </summary>
+    /// <param name="isPreview">Indicates whether the request is in preview mode.</param>
     [TestCase(true)]
     [TestCase(false)]
     public void CanRoutePublishedChildOfUnpublishedParentInPreview(bool isPreview)

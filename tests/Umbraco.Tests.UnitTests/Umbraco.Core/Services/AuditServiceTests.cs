@@ -16,6 +16,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Services;
 
+/// <summary>
+/// Provides unit tests to verify the behavior and functionality of the <see cref="AuditService"/> class.
+/// </summary>
 [TestFixture]
 public class AuditServiceTests
 {
@@ -25,6 +28,9 @@ public class AuditServiceTests
     private Mock<IEntityService> _entityServiceMock;
     private Mock<IUserIdKeyResolver> _userIdKeyResolverMock;
 
+    /// <summary>
+    /// Sets up the necessary mocks and initializes the AuditService before each test.
+    /// </summary>
     [SetUp]
     public void Setup()
     {
@@ -42,6 +48,15 @@ public class AuditServiceTests
             _entityServiceMock.Object);
     }
 
+    /// <summary>
+    /// Verifies that <see cref="AuditService.AddAsync"/> invokes the audit repository with the expected values for each parameter.
+    /// </summary>
+    /// <param name="type">The <see cref="AuditType"/> to be audited.</param>
+    /// <param name="objectId">The identifier of the object being audited.</param>
+    /// <param name="entityType">The type of the entity being audited, or <c>null</c> if not specified.</param>
+    /// <param name="comment">An optional comment for the audit entry, or <c>null</c> if not specified.</param>
+    /// <param name="parameters">Optional parameters for the audit entry, or <c>null</c> if not specified.</param>
+    /// <returns>A <see cref="Task"/> representing the asynchronous test operation.</returns>
     [TestCase(AuditType.Publish, 33, null, null, null)]
     [TestCase(AuditType.Copy, 1, "entityType", "comment", "parameters")]
     public async Task AddAsync_Calls_Repository_With_Correct_Values(AuditType type, int objectId, string? entityType, string? comment, string? parameters = null)
@@ -74,6 +89,10 @@ public class AuditServiceTests
         Assert.AreEqual(AuditLogOperationStatus.Success, result.Result);
     }
 
+    /// <summary>
+    /// Tests that AddAsync does not succeed when a non-existing user is provided.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task AddAsync_Does_Not_Succeed_When_Non_Existing_User_Is_Provided()
     {
@@ -90,6 +109,9 @@ public class AuditServiceTests
         Assert.AreEqual(AuditLogOperationStatus.UserNotFound, result.Result);
     }
 
+    /// <summary>
+    /// Tests that GetItemsAsync throws an ArgumentOutOfRangeException when invalid pagination arguments are provided.
+    /// </summary>
     [Test]
     public void GetItemsAsync_Throws_When_Invalid_Pagination_Arguments_Are_Provided()
     {
@@ -98,6 +120,10 @@ public class AuditServiceTests
         Assert.ThrowsAsync<ArgumentOutOfRangeException>(async () => await _auditService.GetItemsAsync(0, 0), "Take must be greater than 0.");
     }
 
+    /// <summary>
+    /// Tests that GetItemsAsync returns the correct total number of records and the correct count of items.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task GetItemsAsync_Returns_Correct_Total_And_Item_Count()
     {
@@ -122,6 +148,9 @@ public class AuditServiceTests
         Assert.AreEqual(2, result.Items.Count());
     }
 
+    /// <summary>
+    /// Tests that GetItemsByKeyAsync throws an ArgumentOutOfRangeException when invalid pagination arguments are provided.
+    /// </summary>
     [Test]
     public void GetItemsByKeyAsync_Throws_When_Invalid_Pagination_Arguments_Are_Provided()
     {
@@ -130,6 +159,10 @@ public class AuditServiceTests
         Assert.ThrowsAsync<ArgumentOutOfRangeException>(async () => await _auditService.GetItemsByKeyAsync(Guid.Empty, UmbracoObjectTypes.Document, 0, 0), "Take must be greater than 0.");
     }
 
+    /// <summary>
+    /// Tests that GetItemsByKeyAsync returns no results when the specified key is not found.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task GetItemsByKeyAsync_Returns_No_Results_When_Key_Is_Not_Found()
     {
@@ -142,6 +175,10 @@ public class AuditServiceTests
         Assert.AreEqual(0, result.Items.Count());
     }
 
+    /// <summary>
+    /// Verifies that <c>GetItemsByKeyAsync</c> returns the expected total record count and correct number of items for a given key and object type.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task GetItemsByKeyAsync_Returns_Correct_Total_And_Item_Count()
     {
@@ -170,6 +207,11 @@ public class AuditServiceTests
         Assert.AreEqual(2, result.Items.Count());
     }
 
+    /// <summary>
+    /// Verifies that <c>GetItemsByEntityAsync</c> returns no audit log entries when called with an entity ID that is either the system root or a value less than root.
+    /// </summary>
+    /// <param name="userId">The entity ID to test, representing either the root or a value lower than root.</param>
+    /// <returns>A <see cref="Task"/> representing the asynchronous test operation.</returns>
     [TestCase(Constants.System.Root)]
     [TestCase(-100)]
     public async Task GetItemsByEntityAsync_Returns_No_Results_When_Id_Is_Root_Or_Lower(int userId)
@@ -179,6 +221,10 @@ public class AuditServiceTests
         Assert.AreEqual(0, result.Items.Count());
     }
 
+    /// <summary>
+    /// Tests that GetItemsByEntityAsync returns the correct total number of records and the correct count of items.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task GetItemsByEntityAsync_Returns_Correct_Total_And_Item_Count()
     {
@@ -207,6 +253,10 @@ public class AuditServiceTests
         Assert.AreEqual(2, result.Items.Count());
     }
 
+    /// <summary>
+    /// Verifies that <see cref="AuditService.CleanLogsAsync(int)"/> calls the audit repository's <c>CleanLogs</c> method with the correct parameter value.
+    /// </summary>
+    /// <returns>A <see cref="Task"/> representing the asynchronous test operation.</returns>
     [Test]
     public async Task CleanLogsAsync_Calls_Repository_With_Correct_Values()
     {

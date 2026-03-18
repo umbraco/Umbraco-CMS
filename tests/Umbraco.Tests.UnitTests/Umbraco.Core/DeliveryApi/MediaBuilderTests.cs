@@ -1,4 +1,4 @@
-using Moq;
+﻿using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
@@ -6,9 +6,16 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.DeliveryApi;
 
+/// <summary>
+/// Contains unit tests for the <see cref="ApiMediaBuilder"/> class within the Delivery API of Umbraco CMS.
+/// These tests verify the functionality and behavior of media building operations.
+/// </summary>
 [TestFixture]
 public class MediaBuilderTests : DeliveryApiTests
 {
+    /// <summary>
+    /// Tests that the MediaBuilder correctly maps media data and default properties.
+    /// </summary>
     [Test]
     public void MediaBuilder_MapsMediaDataAndDefaultProperties()
     {
@@ -38,6 +45,9 @@ public class MediaBuilderTests : DeliveryApiTests
         Assert.AreEqual(333, result.Bytes);
     }
 
+    /// <summary>
+    /// Tests that the MediaBuilder correctly handles media items with missing default properties.
+    /// </summary>
     [Test]
     public void MediaBuilder_HandlesMissingDefaultProperties()
     {
@@ -53,6 +63,9 @@ public class MediaBuilderTests : DeliveryApiTests
         Assert.IsEmpty(result.Properties);
     }
 
+    /// <summary>
+    /// Tests that the MediaBuilder includes non-default properties when building media.
+    /// </summary>
     [Test]
     public void MediaBuilder_IncludesNonDefaultProperties()
     {

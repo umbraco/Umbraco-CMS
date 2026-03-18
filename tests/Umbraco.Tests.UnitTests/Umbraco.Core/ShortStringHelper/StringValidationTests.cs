@@ -6,9 +6,17 @@ using NUnit.Framework;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.ShortStringHelper;
 
+/// <summary>
+/// Contains unit tests for validating the methods of the ShortStringHelper class.
+/// </summary>
 [TestFixture]
 public class StringValidationTests
 {
+    /// <summary>
+    /// Validates whether the provided string is a valid email address.
+    /// </summary>
+    /// <param name="input">The email address string to validate.</param>
+    /// <returns>True if the input is a valid email address; otherwise, false.</returns>
     [TestCase("someone@somewhere.com", ExpectedResult = true)]
     [TestCase("someone@somewhere.co.uk", ExpectedResult = true)]
     [TestCase("someone+tag@somewhere.net", ExpectedResult = true)]

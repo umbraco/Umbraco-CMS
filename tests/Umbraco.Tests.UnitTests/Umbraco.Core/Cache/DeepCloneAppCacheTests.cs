@@ -12,9 +12,16 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Cache;
 
+/// <summary>
+/// Contains unit tests for verifying the behavior of the DeepCloneAppCache class and its deep cloning functionality.
+/// </summary>
 [TestFixture]
 public class DeepCloneAppCacheTests : RuntimeAppCacheTests
 {
+    /// <summary>
+    /// Sets up the test environment for <see cref="DeepCloneAppCacheTests"/>,
+    /// initializing the member cache and the deep clone app cache provider.
+    /// </summary>
     public override void Setup()
     {
         base.Setup();
@@ -32,6 +39,10 @@ public class DeepCloneAppCacheTests : RuntimeAppCacheTests
 
     internal override IAppPolicyCache AppPolicyCache => _provider;
 
+    /// <summary>
+    /// Verifies that when a list of DeepCloneable objects is cached, the cache provider returns a deep-cloned list
+    /// where each item is a clone of the original.
+    /// </summary>
     [Test]
     public void Clones_List()
     {
@@ -46,6 +57,9 @@ public class DeepCloneAppCacheTests : RuntimeAppCacheTests
         }
     }
 
+    /// <summary>
+    /// Tests that when an item is retrieved from the cache, it is deep-cloned and its state is reset, ensuring the cached instance is not the same as the original and is not marked as dirty.
+    /// </summary>
     [Test]
     public void Ensures_Cloned_And_Reset()
     {
@@ -58,6 +72,11 @@ public class DeepCloneAppCacheTests : RuntimeAppCacheTests
         Assert.IsFalse(val.IsDirty());
     }
 
+    /// <summary>
+    /// Tests that exceptions are not cached by the DeepCloneAppCache provider.
+    /// It verifies that exceptions thrown during value retrieval do not get cached,
+    /// allowing subsequent calls to attempt retrieval again until a successful value is cached.
+    /// </summary>
     [Test]
     public void DoesNotCacheExceptions()
     {
@@ -89,8 +108,14 @@ public class DeepCloneAppCacheTests : RuntimeAppCacheTests
     {
         private string _name;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="TestClass"/> class.
+    /// </summary>
         public TestClass() => CloneId = Guid.NewGuid();
 
+    /// <summary>
+    /// Gets or sets the name of the <see cref="TestClass"/> instance.
+    /// </summary>
         public string Name
         {
             get => _name;
@@ -98,8 +123,17 @@ public class DeepCloneAppCacheTests : RuntimeAppCacheTests
             set => SetPropertyValueAndDetectChanges(value, ref _name, nameof(Name));
         }
 
+    /// <summary>
+    /// Gets or sets the clone identifier.
+    /// </summary>
         public Guid CloneId { get; set; }
 
+    /// <summary>
+    /// Creates and returns a deep clone of this <see cref="TestClass"/> instance, including all reference-type properties.
+    /// </summary>
+    /// <returns>
+    /// A new <see cref="TestClass"/> object that is a deep copy of the current instance, with a new <c>CloneId</c> value.
+    /// </returns>
         public object DeepClone()
         {
             var shallowClone = (TestClass)MemberwiseClone();

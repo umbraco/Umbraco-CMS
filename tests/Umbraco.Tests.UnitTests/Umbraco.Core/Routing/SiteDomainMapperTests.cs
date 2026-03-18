@@ -7,6 +7,10 @@ using Umbraco.Cms.Core.Routing;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Routing;
 
+/// <summary>
+/// Contains unit tests for the <see cref="SiteDomainMapper"/> class in the Umbraco.Core.Routing namespace.
+/// These tests verify the domain mapping logic used in site routing.
+/// </summary>
 [TestFixture]
 public class SiteDomainMapperTests
 {
@@ -15,6 +19,9 @@ public class SiteDomainMapperTests
     private static readonly string s_cultureFr = "fr-fr";
     private static readonly string s_cultureGb = "en-gb";
 
+    /// <summary>
+    /// Tests adding sites with associated domains to the SiteDomainMapper.
+    /// </summary>
     [Test]
     public void AddSites()
     {
@@ -43,6 +50,10 @@ public class SiteDomainMapperTests
         Assert.Contains("domain2.org", domains);
     }
 
+    /// <summary>
+    /// Verifies that adding a valid domain string to the <see cref="SiteDomainMapper"/> does not throw and is accepted as a valid site domain.
+    /// </summary>
+    /// <param name="domain">The domain string to add to the site for testing validity.</param>
     [TestCase("foo")] // that one is suspect
     [TestCase("domain.com")]
     [TestCase("domain.com/")]
@@ -60,6 +71,10 @@ public class SiteDomainMapperTests
         siteDomainMapper.AddSite("site1", domain);
     }
 
+    /// <summary>
+    /// Tests that adding an invalid site domain throws an ArgumentOutOfRangeException.
+    /// </summary>
+    /// <param name="domain">The invalid domain string to test.</param>
     [TestCase("domain.com/foo")]
     [TestCase("http:/domain.com")]
     [TestCase("*")]
@@ -70,6 +85,11 @@ public class SiteDomainMapperTests
         Assert.Throws<ArgumentOutOfRangeException>(() => siteDomainMapper.AddSite("site1", domain));
     }
 
+    /// <summary>
+    /// Verifies that sites can be added to and removed from the <see cref="SiteDomainMapper"/>,
+    /// and that removing a non-existent site does not affect the existing sites.
+    /// Ensures the correct sites remain after add and remove operations.
+    /// </summary>
     [Test]
     public void AddRemoveSites()
     {
@@ -88,6 +108,9 @@ public class SiteDomainMapperTests
         Assert.Contains("site2", sites.Keys);
     }
 
+    /// <summary>
+    /// Tests that adding a site with the same name again updates the domains correctly without duplicating the site.
+    /// </summary>
     [Test]
     public void AddSiteAgain()
     {
@@ -108,6 +131,9 @@ public class SiteDomainMapperTests
         Assert.Contains("domain1.net", domains);
     }
 
+    /// <summary>
+    /// Tests that sites are bound correctly only once.
+    /// </summary>
     [Test]
     public void BindSitesOnce()
     {
@@ -135,6 +161,9 @@ public class SiteDomainMapperTests
         Assert.Contains("site1", others);
     }
 
+    /// <summary>
+    /// Tests binding multiple sites together and verifies the bindings.
+    /// </summary>
     [Test]
     public void BindMoreSites()
     {
@@ -178,6 +207,10 @@ public class SiteDomainMapperTests
             .OrderByDescending(d => d.Uri.ToString())
             .ToArray();
 
+    /// <summary>
+    /// Tests that the domain mapping logic correctly handles domains with and without schemes (http/https),
+    /// ensuring that the resulting mapped domain preserves the scheme of the current request URI when appropriate.
+    /// </summary>
     [Test]
     public void MapDomainWithScheme()
     {
@@ -230,6 +263,11 @@ public class SiteDomainMapperTests
         Assert.AreEqual("https://domain4.com/", output);
     }
 
+    /// <summary>
+    /// Tests the <c>MapDomain</c> method to ensure it correctly maps URIs to the expected domain
+    /// based on the current site and culture. Verifies that the method returns the appropriate domain
+    /// when the current URI matches a domain, when it does not, and that the order of domains does not affect the result.
+    /// </summary>
     [Test]
     public void MapDomain()
     {
@@ -284,6 +322,12 @@ public class SiteDomainMapperTests
         Assert.AreEqual("http://domain1.net/", output);
     }
 
+    /// <summary>
+    /// Tests the <c>MapDomains</c> method of the <see cref="SiteDomainMapper"/> to ensure that domain mapping behaves as expected.
+    /// Validates that the method correctly excludes the current domain and the domain that would be mapped by <c>MapDomain</c>,
+    /// and returns all domains from the same site or from sites bound together. Also verifies correct behavior when the current domain
+    /// is or is not present in the provided domains, and when sites are bound.
+    /// </summary>
     [Test]
     public void MapDomains()
     {

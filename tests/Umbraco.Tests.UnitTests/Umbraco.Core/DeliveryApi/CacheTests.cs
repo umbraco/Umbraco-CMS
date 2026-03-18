@@ -7,6 +7,9 @@ using Umbraco.Cms.Core.PublishedCache;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.DeliveryApi;
 
+/// <summary>
+/// Unit tests for the Cache functionality in the Delivery API.
+/// </summary>
 [TestFixture]
 public class CacheTests : DeliveryApiTests
 {

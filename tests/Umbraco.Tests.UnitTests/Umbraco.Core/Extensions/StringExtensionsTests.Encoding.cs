@@ -6,9 +6,17 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Extensions;
 
+/// <summary>
+/// Unit tests for the StringExtensions class.
+/// </summary>
 [TestFixture]
 public partial class StringExtensionsTests
 {
+    /// <summary>
+    /// Tests that decoding a hexadecimal string returns the expected decoded string.
+    /// </summary>
+    /// <param name="hexInput">The hexadecimal string to decode.</param>
+    /// <param name="expected">The expected decoded string result.</param>
     [TestCase("", "")] // empty string
     [TestCase("48656c6c6f", "Hello")] // "Hello"
     [TestCase("41", "A")] // single char
@@ -26,6 +34,9 @@ public partial class StringExtensionsTests
         Assert.AreEqual(expected, result);
     }
 
+    /// <summary>
+    /// Tests that decoding a hex string with an odd length throws an ArgumentException.
+    /// </summary>
     [Test]
     public void DecodeFromHex_WithOddStringLength_ThrowsArgumentException()
     {
@@ -33,6 +44,9 @@ public partial class StringExtensionsTests
         Assert.Throws<ArgumentException>(() => hexInput.DecodeFromHex());
     }
 
+    /// <summary>
+    /// Tests that encoding a string to hex and then decoding it back returns the original string.
+    /// </summary>
     [Test]
     public void DecodeFromHex_RoundTrip_WithConvertToHex()
     {
@@ -42,6 +56,11 @@ public partial class StringExtensionsTests
         Assert.AreEqual(original, decoded);
     }
 
+    /// <summary>
+    /// Tests that the ConvertToHex extension method returns the expected hexadecimal string representation of the input string.
+    /// </summary>
+    /// <param name="input">The input string to convert to hexadecimal.</param>
+    /// <param name="expected">The expected hexadecimal string result.</param>
     [TestCase("", "")] // empty string
     [TestCase("A", "41")] // single char
     [TestCase("AB", "4142")] // two chars

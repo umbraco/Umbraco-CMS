@@ -1,4 +1,4 @@
-// Copyright (c) Umbraco.
+﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.Diagnostics;
@@ -11,6 +11,9 @@ using Umbraco.Cms.Tests.UnitTests.Umbraco.Core.ShortStringHelper;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models;
 
+/// <summary>
+/// Unit tests for the <see cref="global::Umbraco.Core.Models.UserGroup"/> class.
+/// </summary>
 [TestFixture]
 public class UserGroupTests
 {
@@ -18,11 +21,19 @@ public class UserGroupTests
     private static int _danishLanguageId = 2;
     private static int _germanLanguageId = 3 ;
 
+    /// <summary>
+    /// Sets up the test environment before each test.
+    /// </summary>
     [SetUp]
     public void SetUp() => _builder = new UserGroupBuilder();
 
     private UserGroupBuilder _builder;
 
+    /// <summary>
+    /// Tests that a UserGroup instance can be deep cloned correctly.
+    /// Ensures that the clone is a different instance but equal in value,
+    /// and that collections and properties are properly cloned.
+    /// </summary>
     [Test]
     public void Can_Deep_Clone()
     {
@@ -45,6 +56,9 @@ public class UserGroupTests
         }
     }
 
+    /// <summary>
+    /// Tests that a UserGroup object can be serialized to JSON without throwing an error.
+    /// </summary>
     [Test]
     public void Can_Serialize_Without_Error()
     {
@@ -54,6 +68,9 @@ public class UserGroupTests
         Debug.Print(json);
     }
 
+    /// <summary>
+    /// Tests whether a UserGroup correctly checks if it has access to specified languages.
+    /// </summary>
     [Test]
     public void CanCheckIfUserHasAccessToLanguage()
     {
@@ -71,6 +88,9 @@ public class UserGroupTests
         });
     }
 
+    /// <summary>
+    /// Tests that a user group with access to all languages indeed has access to all specified languages.
+    /// </summary>
     [Test]
     public void CheckIfHasAccessToAllLanguagesGivesAccessToAllLanguages()
     {

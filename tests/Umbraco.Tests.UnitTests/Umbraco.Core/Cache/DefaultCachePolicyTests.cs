@@ -12,6 +12,9 @@ using IScope = Umbraco.Cms.Infrastructure.Scoping.IScope;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Cache;
 
+/// <summary>
+/// Contains unit tests that verify the behavior of the <see cref="DefaultRepositoryCachePolicy{TEntity, TId}"/> class in the Umbraco CMS core caching system.
+/// </summary>
 [TestFixture]
 public class DefaultCachePolicyTests
 {
@@ -27,6 +30,9 @@ public class DefaultCachePolicyTests
         }
     }
 
+    /// <summary>
+    /// Tests that a single item is cached correctly using the default cache policy.
+    /// </summary>
     [Test]
     public void Caches_Single()
     {
@@ -42,6 +48,9 @@ public class DefaultCachePolicyTests
         Assert.IsTrue(isCached);
     }
 
+    /// <summary>
+    /// Tests retrieving a single item from the cache using the default cache policy.
+    /// </summary>
     [Test]
     public void Get_Single_From_Cache()
     {
@@ -55,6 +64,9 @@ public class DefaultCachePolicyTests
         Assert.IsNotNull(found);
     }
 
+    /// <summary>
+    /// Tests that caching occurs per ID when calling GetAll on the default cache policy.
+    /// </summary>
     [Test]
     public void Caches_Per_Id_For_Get_All()
     {
@@ -78,6 +90,9 @@ public class DefaultCachePolicyTests
         Assert.AreEqual(2, cached.Count);
     }
 
+    /// <summary>
+    /// Tests that getting all items without specifying IDs returns all cached items.
+    /// </summary>
     [Test]
     public void Get_All_Without_Ids_From_Cache()
     {
@@ -95,6 +110,9 @@ public class DefaultCachePolicyTests
         Assert.AreEqual(2, found.Length);
     }
 
+    /// <summary>
+    /// Tests that if the CreateOrUpdate operation throws an exception, the cache is cleared (removed).
+    /// </summary>
     [Test]
     public void If_CreateOrUpdate_Throws_Cache_Is_Removed()
     {
@@ -119,6 +137,9 @@ public class DefaultCachePolicyTests
         }
     }
 
+    /// <summary>
+    /// Tests that if the cache removal operation throws an exception, the cache is still removed.
+    /// </summary>
     [Test]
     public void If_Removes_Throws_Cache_Is_Removed()
     {

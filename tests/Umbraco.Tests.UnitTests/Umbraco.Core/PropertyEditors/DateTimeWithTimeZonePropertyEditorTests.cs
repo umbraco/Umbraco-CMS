@@ -18,6 +18,9 @@ using Umbraco.Cms.Infrastructure.Serialization;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 
+/// <summary>
+/// Contains unit tests for the <see cref="DateTimeWithTimeZonePropertyEditor"/> class in Umbraco.
+/// </summary>
 [TestFixture]
 public class DateTimeWithTimeZonePropertyEditorTests
 {
@@ -47,6 +50,13 @@ public class DateTimeWithTimeZonePropertyEditorTests
         new object[] { JsonNode.Parse("{\"date\": \"2025-08-20T14:30:00\", \"timeZone\": \"Europe/Copenhagen\"}"), DateTimeConfiguration.TimeZoneMode.Custom, new[] { "Europe/Amsterdam" }, false },
     ];
 
+    /// <summary>
+    /// Tests that the value is validated against the provided time zone options and verifies whether validation succeeds or fails as expected.
+    /// </summary>
+    /// <param name="value">The value to be validated as a time zone.</param>
+    /// <param name="timeZoneMode">The configuration mode for time zone selection.</param>
+    /// <param name="timeZones">The array of valid time zone identifiers.</param>
+    /// <param name="expectedSuccess">True if validation is expected to succeed; otherwise, false.</param>
     [TestCaseSource(nameof(_sourceList2))]
     public void Validates_TimeZone_Received(
         object value,
@@ -97,6 +107,12 @@ public class DateTimeWithTimeZonePropertyEditorTests
         new object[] { JsonNode.Parse("{\"date\": \"2025-08-20T18:30:01-05:00\"}"), new DateTimeOffset(2025, 8, 20, 18, 30, 1, TimeSpan.FromHours(-5)), null },
     ];
 
+    /// <summary>
+    /// Tests that values from the editor can be parsed correctly into the expected DateTimeOffset and time zone.
+    /// </summary>
+    /// <param name="value">The input value from the editor.</param>
+    /// <param name="expectedDateTimeOffset">The expected parsed DateTimeOffset result.</param>
+    /// <param name="expectedTimeZone">The expected time zone string.</param>
     [TestCaseSource(nameof(_dateTimeWithTimeZoneParseValuesFromEditorTestCases))]
     public void Can_Parse_Values_From_Editor(
         object? value,
@@ -129,6 +145,13 @@ public class DateTimeWithTimeZonePropertyEditorTests
         [-5, "Europe/Copenhagen", DateTimeConfiguration.TimeZoneMode.All, new DateTimeEditorValue { Date = "2025-08-20T16:30:00-05:00", TimeZone = "Europe/Copenhagen" }],
     ];
 
+    /// <summary>
+    /// Verifies that various combinations of offset and time zone values are correctly parsed and mapped to the editor model.
+    /// </summary>
+    /// <param name="offset">The nullable offset in hours used to construct the <see cref="DateTimeOffset"/> for the test case.</param>
+    /// <param name="timeZone">The optional time zone identifier string to associate with the value, or <c>null</c> if not specified.</param>
+    /// <param name="timeZoneMode">The <see cref="DateTimeConfiguration.TimeZoneMode"/> indicating how time zones are handled by the editor.</param>
+    /// <param name="expectedResult">The expected <see cref="DateTimeEditorValue"/> result from the editor, or <c>null</c> if no value is expected.</param>
     [TestCaseSource(nameof(_dateTimeWithTimeZoneParseValuesToEditorTestCases))]
     public void Can_Parse_Values_To_Editor(
         int? offset,

@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using Microsoft.AspNetCore.SignalR;
 using Moq;
 using NUnit.Framework;
@@ -8,9 +8,16 @@ using Umbraco.Cms.Core.ServerEvents;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Management.ServerEvents;
 
+/// <summary>
+/// Contains unit tests for the <see cref="ServerEventUserManager"/> class, which manages server event user operations in the Umbraco CMS API Management context.
+/// </summary>
 [TestFixture]
 public class ServerEventUserManagerTests
 {
+    /// <summary>
+    /// Verifies that a user is assigned to the correct event source group when AssignToGroupsAsync is called.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task AssignsUserToEventSourceGroup()
     {
@@ -32,6 +39,10 @@ public class ServerEventUserManagerTests
         mocks.GroupManagerMock.Verify(x => x.AddToGroupAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);
     }
 
+    /// <summary>
+    /// Tests that a user is not assigned to an event source group when they are unauthorized.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task DoesNotAssignUserToEventSourceGroupWhenUnauthorized()
     {
@@ -52,6 +63,10 @@ public class ServerEventUserManagerTests
         mocks.GroupManagerMock.Verify(x => x.AddToGroupAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
+    /// <summary>
+    /// Tests that RefreshGroupsAsync correctly refreshes user groups by adding and removing connections to groups based on authorization.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task RefreshGroupsAsyncRefreshesUserGroups()
     {
@@ -79,6 +94,10 @@ public class ServerEventUserManagerTests
         mocks.GroupManagerMock.Verify(x => x.RemoveFromGroupAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once());
     }
 
+    /// <summary>
+    /// Tests that refreshing user groups does nothing when there are no active connections for the user.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
     [Test]
     public async Task RefreshUserGroupsDoesNothingIfNoConnections()
     {

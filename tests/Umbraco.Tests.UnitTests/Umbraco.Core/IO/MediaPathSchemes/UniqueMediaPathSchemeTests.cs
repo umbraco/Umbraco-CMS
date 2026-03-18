@@ -8,6 +8,9 @@ using Umbraco.Cms.Core.Strings;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.IO.MediaPathSchemes;
 
+/// <summary>
+/// Contains unit tests for the <see cref="UniqueMediaPathScheme"/> class, verifying its behavior and functionality.
+/// </summary>
 [TestFixture]
 public class UniqueMediaPathSchemeTests
 {
@@ -19,6 +22,9 @@ public class UniqueMediaPathSchemeTests
         Mock.Of<IServiceProvider>(),
         Mock.Of<Lazy<ICoreScopeProvider>>());
 
+    /// <summary>
+    /// Verifies that <see cref="UniqueMediaPathScheme.GetFilePath"/> generates the expected file path for given GUIDs and filename.
+    /// </summary>
     [Test]
     public void GetFilePath_Creates_ExpectedPath()
     {

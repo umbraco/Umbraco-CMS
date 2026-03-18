@@ -10,6 +10,9 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Management.Factories;
 
+/// <summary>
+/// Contains unit tests for the <see cref="DataTypePresentationFactory"/> class in the Umbraco CMS API Management Factories namespace.
+/// </summary>
 [TestFixture]
 public class DataTypePresentationFactoryTests
 {
@@ -17,6 +20,9 @@ public class DataTypePresentationFactoryTests
     private Mock<IDataValueEditorFactory> _dataValueEditorFactory = null!;
     private Mock<IConfigurationEditorJsonSerializer> _configurationEditorJsonSerializer = null!;
 
+    /// <summary>
+    /// Sets up the test environment before each test.
+    /// </summary>
     [SetUp]
     public void SetUp()
     {
@@ -25,6 +31,10 @@ public class DataTypePresentationFactoryTests
         _configurationEditorJsonSerializer = new Mock<IConfigurationEditorJsonSerializer>();
     }
 
+    /// <summary>
+    /// Tests that creating a data type with a label editor and a text value type sets the database type to Ntext.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task CreateAsync_LabelEditorWithTextValueType_SetsDatabaseTypeToNtext()
     {
@@ -52,6 +62,10 @@ public class DataTypePresentationFactoryTests
         Assert.AreEqual(ValueStorageType.Ntext, result.Result.DatabaseType);
     }
 
+    /// <summary>
+    /// Tests that creating a data type with the Label editor and a default string value type sets the database type to Nvarchar.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task CreateAsync_LabelEditorWithDefaultStringValueType_SetsDatabaseTypeToNvarchar()
     {
@@ -79,6 +93,11 @@ public class DataTypePresentationFactoryTests
         Assert.AreEqual(ValueStorageType.Nvarchar, result.Result.DatabaseType);
     }
 
+    /// <summary>
+    /// Tests that when the editor's configuration object does not implement IConfigureValueType,
+    /// the editor's default value type is used during creation.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task CreateAsync_EditorWithoutConfigureValueType_UsesEditorDefaultValueType()
     {
@@ -102,6 +121,10 @@ public class DataTypePresentationFactoryTests
         Assert.AreEqual(ValueStorageType.Nvarchar, result.Result.DatabaseType);
     }
 
+    /// <summary>
+    /// Tests that updating a label editor with a text value type sets the database type to Ntext.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task CreateAsync_Update_LabelEditorWithTextValueType_SetsDatabaseTypeToNtext()
     {

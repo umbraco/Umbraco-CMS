@@ -8,12 +8,18 @@ using Umbraco.Cms.Infrastructure.Serialization;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PropertyEditors;
 
+/// <summary>
+/// Tests for the <see cref="DateTimeWithTimeZonePropertyIndexValueFactory"/> class.
+/// </summary>
 [TestFixture]
 [TestOf(typeof(DateTimeWithTimeZonePropertyIndexValueFactory))]
 public class DateTimeWithTimeZonePropertyIndexValueFactoryTests
 {
     private static readonly IJsonSerializer _jsonSerializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
 
+    /// <summary>
+    /// Tests that GetIndexValues returns empty values when the property value is null.
+    /// </summary>
     [Test]
     public void GetIndexValues_ReturnsEmptyValues_ForNullPropertyValue()
     {
@@ -39,6 +45,11 @@ public class DateTimeWithTimeZonePropertyIndexValueFactoryTests
         Assert.IsEmpty(indexValue.Values);
     }
 
+    /// <summary>
+    /// Verifies that <c>GetIndexValues</c> returns a date-time string formatted in UTC
+    /// when provided with a property value containing a date and time zone.
+    /// Ensures the output matches the expected UTC representation.
+    /// </summary>
     [Test]
     public void GetIndexValues_ReturnsFormattedDateTime()
     {

@@ -61,32 +61,81 @@ public static class TestHelper
     /// <value>The assembly directory.</value>
     public static string WorkingDirectory => s_testHelperInternal.WorkingDirectory;
 
+    /// <summary>
+    /// Gets the scope provider used for managing scopes in tests.
+    /// </summary>
     public static IScopeProvider ScopeProvider => s_testHelperInternal.ScopeProvider;
+    /// <summary>
+    /// Gets the core scope provider used for unit testing.
+    /// </summary>
     public static ICoreScopeProvider CoreScopeProvider => s_testHelperInternal.ScopeProvider;
+    /// <summary>
+    /// Gets the static instance of <see cref="IShortStringHelper"/> used for testing purposes.
+    /// This helper provides methods for manipulating and formatting short strings in unit tests.
+    /// </summary>
     public static IShortStringHelper ShortStringHelper => s_testHelperInternal.ShortStringHelper;
 
+    /// <summary>
+    /// Gets the <see cref="IJsonSerializer"/> instance used internally by the test helper for JSON serialization operations.
+    /// </summary>
     public static IJsonSerializer JsonSerializer => s_testHelperInternal.JsonSerializer;
 
+    /// <summary>
+    /// Gets the <see cref="IVariationContextAccessor"/> instance used for managing variation contexts during unit tests.
+    /// </summary>
     public static IVariationContextAccessor VariationContextAccessor => s_testHelperInternal.VariationContextAccessor;
 
+    /// <summary>
+    /// Gets the bulk SQL insert provider used for performing bulk insert operations in tests.
+    /// </summary>
     public static IBulkSqlInsertProvider BulkSqlInsertProvider => s_testHelperInternal.BulkSqlInsertProvider;
 
+    /// <summary>
+    /// Gets the <see cref="IMarchal"/> instance used internally by the test helper for testing purposes.
+    /// </summary>
     public static IMarchal Marchal => s_testHelperInternal.Marchal;
 
+    /// <summary>
+    /// Gets the current <see cref="CoreDebugSettings"/> instance used by the test helper.
+    /// </summary>
     public static CoreDebugSettings CoreDebugSettings => s_testHelperInternal.CoreDebugSettings;
 
+    /// <summary>
+    /// Gets the <see cref="IIOHelper"/> instance used for testing purposes.
+    /// </summary>
     public static IIOHelper IOHelper => s_testHelperInternal.IOHelper;
 
+    /// <summary>
+    /// Gets the main domain instance used for testing.
+    /// </summary>
     public static IMainDom MainDom => s_testHelperInternal.MainDom;
 
+    /// <summary>
+    /// Gets the static <see cref="UriUtility"/> instance used for testing purposes.
+    /// </summary>
     public static UriUtility UriUtility => s_testHelperInternal.UriUtility;
 
+    /// <summary>
+    /// Gets a static instance of <see cref="IEmailSender"/> for testing purposes.
+    /// </summary>
     public static IEmailSender EmailSender { get; } = new EmailSender(new NullLogger<EmailSender>(), new TestOptionsMonitor<GlobalSettings>(new GlobalSettings()), Mock.Of<IEventAggregator>(), Mock.Of<IEmailSenderClient>(), null,null);
 
+    /// <summary>
+    /// Retrieves an <see cref="ITypeFinder"/> instance used for locating types during unit tests.
+    /// </summary>
+    /// <returns>An <see cref="ITypeFinder"/> instance for use in test scenarios.</returns>
     public static ITypeFinder GetTypeFinder() => s_testHelperInternal.GetTypeFinder();
 
+    /// <summary>
+    /// Gets a mocked instance of the <see cref="TypeLoader"/>.
+    /// </summary>
+    /// <returns>A mocked <see cref="TypeLoader"/> instance.</returns>
     public static TypeLoader GetMockedTypeLoader() => s_testHelperInternal.GetMockedTypeLoader();
 
+    /// <summary>
+    /// Gets a lazy-initialized mock instance of <see cref="ISqlContext"/>.
+    /// </summary>
+    /// <returns>A lazy instance of a mocked <see cref="ISqlContext"/>.</returns>
     public static Lazy<ISqlContext> GetMockSqlContext()
     {
         var sqlContext = Mock.Of<ISqlContext>();
@@ -95,15 +144,24 @@ public static class TestHelper
         return new Lazy<ISqlContext>(() => sqlContext);
     }
 
+    /// <summary>
+    /// Creates and returns a new instance of <see cref="MapperConfigurationStore"/>.
+    /// </summary>
+    /// <returns>A new <see cref="MapperConfigurationStore"/> instance.</returns>
     public static MapperConfigurationStore CreateMaps() => new();
 
-    /// <summary>
-    ///     Some test files are copied to the /bin (/bin/debug) on build, this is a utility to return their physical path based
-    ///     on a virtual path name
-    /// </summary>
+/// <summary>
+///     Some test files are copied to the /bin (/bin/debug) on build, this is a utility to return their physical path based
+///     on a virtual path name
+/// </summary>
+/// <param name="relativePath">The relative virtual path to the test file.</param>
+/// <returns>The physical file path corresponding to the given relative path.</returns>
     public static string MapPathForTestFiles(string relativePath) =>
         s_testHelperInternal.MapPathForTestFiles(relativePath);
 
+    /// <summary>
+    /// Initializes the content directories required by the application.
+    /// </summary>
     public static void InitializeContentDirectories() => CreateDirectories(new[]
     {
         Constants.SystemDirectories.MvcViews,
@@ -111,12 +169,19 @@ public static class TestHelper
         Constants.SystemDirectories.AppPlugins,
     });
 
+    /// <summary>
+    /// Cleans the content directories used by the system.
+    /// </summary>
     public static void CleanContentDirectories() => CleanDirectories(new[]
     {
         Constants.SystemDirectories.MvcViews,
         new GlobalSettings().UmbracoMediaPhysicalRootPath,
     });
 
+    /// <summary>
+    /// Creates the specified directories if they do not already exist.
+    /// </summary>
+    /// <param name="directories">An array of directory paths to create.</param>
     public static void CreateDirectories(string[] directories)
     {
         foreach (var directory in directories)
@@ -129,6 +194,13 @@ public static class TestHelper
         }
     }
 
+    /// <summary>
+    /// Deletes all files in the specified directories, except for files that are explicitly preserved by internal rules.
+    /// </summary>
+    /// <param name="directories">An array of directory paths to clean.</param>
+    /// <remarks>
+    /// Currently, only certain files (e.g., "dummy.txt" in the MVC views directory) are preserved; all other files are deleted.
+    /// </remarks>
     public static void CleanDirectories(string[] directories)
     {
         var preserves = new Dictionary<string, string[]> { { Constants.SystemDirectories.MvcViews, new[] { "dummy.txt" } } };
@@ -148,6 +220,9 @@ public static class TestHelper
         }
     }
 
+    /// <summary>
+    /// Deletes the umbracoSettings.config file from the config directory if it exists.
+    /// </summary>
     public static void CleanUmbracoSettingsConfig()
     {
         var currDir = new DirectoryInfo(WorkingDirectory);
@@ -161,6 +236,17 @@ public static class TestHelper
 
     // TODO: Move to Assertions or AssertHelper
     // TODO: obsolete the dateTimeFormat thing and replace with dateDelta
+    /// <summary>
+    /// Asserts that the public property values of two objects are equal, with options to customize comparison behavior.
+    /// </summary>
+    /// <param name="actual">The object whose property values are being tested.</param>
+    /// <param name="expected">The object providing the expected property values.</param>
+    /// <param name="dateTimeFormat">An optional date time format string used for comparing date properties. (Obsolete: comparison uses a fixed delta internally.)</param>
+    /// <param name="sorter">An optional function to sort <see cref="IEnumerable"/> properties before comparison, to ensure order-independent equality.</param>
+    /// <param name="ignoreProperties">An optional array of property names to ignore during comparison.</param>
+    /// <remarks>
+    /// Properties marked with <see cref="EditorBrowsableState.Never"/> or listed in <paramref name="ignoreProperties"/> are skipped. Date properties are compared with a tolerance. Throws an assertion exception if any property values differ.
+    /// </remarks>
     public static void AssertPropertyValuesAreEqual(
         object actual,
         object expected,
@@ -304,35 +390,77 @@ public static class TestHelper
         }
     }
 
+    /// <summary>
+    /// Gets the current Umbraco version.
+    /// </summary>
+    /// <returns>The current Umbraco version.</returns>
     public static IUmbracoVersion GetUmbracoVersion() => s_testHelperInternal.GetUmbracoVersion();
 
+    /// <summary>
+    /// Creates and returns a new IServiceCollection with lazy support added.
+    /// </summary>
+    /// <returns>A new IServiceCollection instance with lazy support.</returns>
     public static IServiceCollection GetServiceCollection() => new ServiceCollection().AddLazySupport();
 
+    /// <summary>
+    /// Retrieves the <see cref="IHostingEnvironment"/> instance used for testing purposes.
+    /// </summary>
+    /// <returns>The <see cref="IHostingEnvironment"/> used by the test helper.</returns>
     public static IHostingEnvironment GetHostingEnvironment() => s_testHelperInternal.GetHostingEnvironment();
 
+    /// <summary>
+    /// Gets the logging configuration based on the provided hosting environment.
+    /// </summary>
+    /// <param name="hostingEnv">The hosting environment.</param>
+    /// <returns>The logging configuration.</returns>
     public static ILoggingConfiguration GetLoggingConfiguration(IHostingEnvironment hostingEnv) =>
         s_testHelperInternal.GetLoggingConfiguration(hostingEnv);
 
+    /// <summary>Gets the hosting environment lifetime.</summary>
+    /// <returns>An instance of <see cref="IApplicationShutdownRegistry"/> representing the hosting environment lifetime.</returns>
     public static IApplicationShutdownRegistry GetHostingEnvironmentLifetime() =>
         s_testHelperInternal.GetHostingEnvironmentLifetime();
 
+    /// <summary>Gets an instance of <see cref="IIpResolver"/> for testing purposes.</summary>
+    /// <returns>An <see cref="IIpResolver"/> instance.</returns>
     public static IIpResolver GetIpResolver() => s_testHelperInternal.GetIpResolver();
 
+    /// <summary>
+    /// Retrieves the current <see cref="IRequestCache"/> instance used for request caching in tests.
+    /// </summary>
+    /// <returns>The <see cref="IRequestCache"/> instance associated with the current test context.</returns>
     public static IRequestCache GetRequestCache() => s_testHelperInternal.GetRequestCache();
 
+    /// <summary>
+    /// Retrieves an <see cref="IPublishedUrlProvider"/> instance for use in unit tests.
+    /// </summary>
+    /// <returns>An <see cref="IPublishedUrlProvider"/> used to generate published URLs in test scenarios.</returns>
     public static IPublishedUrlProvider GetPublishedUrlProvider() => s_testHelperInternal.GetPublishedUrlProvider();
 
     private class TestHelperInternal : TestHelperBase
     {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="TestHelperInternal"/> class.
+    /// </summary>
         public TestHelperInternal()
             : base(typeof(TestHelperInternal).Assembly)
         {
         }
 
+    /// <summary>
+    /// Gets the mocked bulk SQL insert provider used for testing purposes.
+    /// </summary>
         public override IBulkSqlInsertProvider BulkSqlInsertProvider { get; } = Mock.Of<IBulkSqlInsertProvider>();
 
+    /// <summary>
+    /// Gets the Marchal instance.
+    /// </summary>
         public override IMarchal Marchal { get; } = Mock.Of<IMarchal>();
 
+    /// <summary>
+    /// Gets the hosting environment for the test context.
+    /// </summary>
+    /// <returns>An <see cref="IHostingEnvironment"/> instance representing the test hosting environment.</returns>
         public override IHostingEnvironment GetHostingEnvironment()
         {
             var testPath = TestContext.CurrentContext.TestDirectory.Split("bin")[0];
@@ -345,9 +473,17 @@ public static class TestHelper
                         x.ContentRootPath == testPath));
         }
 
+    /// <summary>
+    /// Gets the hosting environment lifetime.
+    /// </summary>
+    /// <returns>An instance of <see cref="IApplicationShutdownRegistry"/>.</returns>
         public override IApplicationShutdownRegistry GetHostingEnvironmentLifetime()
             => Mock.Of<IApplicationShutdownRegistry>();
 
+    /// <summary>
+    /// Gets an IP resolver instance.
+    /// </summary>
+    /// <returns>An instance of <see cref="IIpResolver"/>.</returns>
         public override IIpResolver GetIpResolver()
             => Mock.Of<IIpResolver>();
     }

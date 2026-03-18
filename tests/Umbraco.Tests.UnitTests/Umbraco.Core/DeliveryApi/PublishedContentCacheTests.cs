@@ -9,6 +9,9 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.DeliveryApi;
 
+/// <summary>
+/// Contains unit tests for the <see cref="PublishedContentCache"/> class within the Delivery API, verifying its caching behavior and functionality.
+/// </summary>
 [TestFixture]
 public class PublishedContentCacheTests : DeliveryApiTests
 {
@@ -23,6 +26,10 @@ public class PublishedContentCacheTests : DeliveryApiTests
     private IPublishedContentCache _contentCache;
     private IDocumentUrlService _documentUrlService;
 
+    /// <summary>
+    /// Sets up the test environment for <see cref="PublishedContentCacheTests"/> by creating and configuring mocked content types, content items, and related services.
+    /// This includes setting up mock implementations for <see cref="IPublishedContentType"/>, <see cref="IPublishedContent"/>, <see cref="IDocumentUrlService"/>, and <see cref="IPublishedContentCache"/>.
+    /// </summary>
     [SetUp]
     public override void Setup()
     {
@@ -78,6 +85,9 @@ public class PublishedContentCacheTests : DeliveryApiTests
         _documentUrlService = documentUrlService.Object;
     }
 
+    /// <summary>
+    /// Tests that the PublishedContentCache can retrieve content by its ID.
+    /// </summary>
     [Test]
     public void PublishedContentCache_CanGetById()
     {
@@ -89,6 +99,9 @@ public class PublishedContentCacheTests : DeliveryApiTests
         Assert.AreEqual("theContentType", content.ContentType.Alias);
     }
 
+    /// <summary>
+    /// Tests that the PublishedContentCache can retrieve content by its route.
+    /// </summary>
     [Test]
     public void PublishedContentCache_CanGetByRoute()
     {
@@ -100,6 +113,9 @@ public class PublishedContentCacheTests : DeliveryApiTests
         Assert.AreEqual("theOtherContentType", content.ContentType.Alias);
     }
 
+    /// <summary>
+    /// Tests that PublishedContentCache can retrieve content by route when using a start node ID prefix.
+    /// </summary>
     [Test]
     public void PublishedContentCache_CanGetByRoute_WithStartNodeIdPrefix()
     {
@@ -111,6 +127,9 @@ public class PublishedContentCacheTests : DeliveryApiTests
         Assert.AreEqual("theThirdContentType", content.ContentType.Alias);
     }
 
+    /// <summary>
+    /// Tests that the PublishedContentCache can retrieve content items by their IDs.
+    /// </summary>
     [Test]
     public void PublishedContentCache_CanGetByIds()
     {
@@ -121,6 +140,10 @@ public class PublishedContentCacheTests : DeliveryApiTests
         Assert.AreEqual(_contentTwoId, content.Last().Key);
     }
 
+    /// <summary>
+    /// Verifies that the <c>PublishedContentCache.GetById</c> method correctly respects the disallow list by returning null when the content type is denied, and returning the content when it is allowed.
+    /// </summary>
+    /// <param name="denied">If <c>true</c>, the content type is included in the disallow list and should not be returned; if <c>false</c>, the content type is allowed and should be returned.</param>
     [TestCase(true)]
     [TestCase(false)]
     public void PublishedContentCache_GetById_SupportsDisallowList(bool denied)
@@ -139,6 +162,10 @@ public class PublishedContentCacheTests : DeliveryApiTests
         }
     }
 
+    /// <summary>
+    /// Tests that the PublishedContentCache.GetByRoute method respects the disallow list setting.
+    /// </summary>
+    /// <param name="denied">Indicates whether the content type is denied (true) or allowed (false).</param>
     [TestCase(true)]
     [TestCase(false)]
     public void PublishedContentCache_GetByRoute_SupportsDisallowList(bool denied)
@@ -157,6 +184,11 @@ public class PublishedContentCacheTests : DeliveryApiTests
         }
     }
 
+    /// <summary>
+    /// Verifies that the <c>PublishedContentCache.GetByIds</c> method excludes content items whose type is specified in the disallow list.
+    /// Ensures that when a content type is denied, only content items of allowed types are returned by the cache.
+    /// </summary>
+    /// <param name="deniedContentType">The alias of the content type to be excluded from the cache retrieval.</param>
     [TestCase("theContentType")]
     [TestCase("theOtherContentType")]
     public void PublishedContentCache_GetByIds_SupportsDisallowList(string deniedContentType)
@@ -176,6 +208,9 @@ public class PublishedContentCacheTests : DeliveryApiTests
         }
     }
 
+    /// <summary>
+    /// Tests that PublishedContentCache.GetById can retrieve content types that are not in the disallow list.
+    /// </summary>
     [Test]
     public void PublishedContentCache_GetById_CanRetrieveContentTypesOutsideTheDisallowList()
     {
@@ -188,6 +223,9 @@ public class PublishedContentCacheTests : DeliveryApiTests
         Assert.AreEqual("theOtherContentType", content.ContentType.Alias);
     }
 
+    /// <summary>
+    /// Tests that content types not in the disallow list can be retrieved by route.
+    /// </summary>
     [Test]
     public void PublishedContentCache_GetByRoute_CanRetrieveContentTypesOutsideTheDisallowList()
     {
@@ -200,6 +238,10 @@ public class PublishedContentCacheTests : DeliveryApiTests
         Assert.AreEqual("theContentType", content.ContentType.Alias);
     }
 
+    /// <summary>
+    /// Tests that the PublishedContentCache can retrieve content by route for a specified culture.
+    /// </summary>
+    /// <param name="culture">The culture to test retrieval for.</param>
     [TestCase("en-US")]
     [TestCase("da-DK")]
     public void PublishedContentCache_GetByRoute_CanRetrieveForCulture(string culture)
@@ -212,6 +254,10 @@ public class PublishedContentCacheTests : DeliveryApiTests
         Assert.AreEqual("theFourthContentType", content.ContentType.Alias);
     }
 
+    /// <summary>
+    /// Tests that the PublishedContentCache.GetByRoute method cannot retrieve content for a missing or unknown culture.
+    /// </summary>
+    /// <param name="culture">The culture to test retrieval with, which may be null or unknown.</param>
     [TestCase("de-DE")]
     [TestCase(null)]
     public void PublishedContentCache_GetByRoute_CannotRetrieveForMissingOrUnknownCulture(string? culture)
@@ -221,6 +267,9 @@ public class PublishedContentCacheTests : DeliveryApiTests
         Assert.IsNull(content);
     }
 
+    /// <summary>
+    /// Tests that the PublishedContentCache.GetByIds method can deny all requested content based on content type restrictions.
+    /// </summary>
     [Test]
     public void PublishedContentCache_GetByIds_CanDenyAllRequestedContent()
     {
@@ -230,6 +279,9 @@ public class PublishedContentCacheTests : DeliveryApiTests
         Assert.IsEmpty(content);
     }
 
+    /// <summary>
+    /// Tests that the disallow list in the PublishedContentCache is case insensitive.
+    /// </summary>
     [Test]
     public void PublishedContentCache_DisallowListIsCaseInsensitive()
     {
@@ -239,6 +291,10 @@ public class PublishedContentCacheTests : DeliveryApiTests
         Assert.IsNull(content);
     }
 
+    /// <summary>
+    /// Verifies that the <c>PublishedContentCache.GetById</c> method returns content only when its type is included in the allow list of content types.
+    /// </summary>
+    /// <param name="allowed">If <c>true</c>, the content type is included in the allow list and the method should return the content; if <c>false</c>, the content type is not allowed and the method should return null.</param>
     [TestCase(true)]
     [TestCase(false)]
     public void PublishedContentCache_GetById_SupportsAllowList(bool allowed)
@@ -257,6 +313,11 @@ public class PublishedContentCacheTests : DeliveryApiTests
         }
     }
 
+    /// <summary>
+    /// Verifies that <c>PublishedContentCache.GetByRoute</c> correctly respects an allow list of content type aliases.
+    /// The test asserts that content is returned only when its content type alias is present in the allow list.
+    /// </summary>
+    /// <param name="allowed">If <c>true</c>, the content type alias is included in the allow list and content should be returned; otherwise, it is excluded and no content should be returned.</param>
     [TestCase(true)]
     [TestCase(false)]
     public void PublishedContentCache_GetByRoute_SupportsAllowList(bool allowed)
@@ -275,6 +336,11 @@ public class PublishedContentCacheTests : DeliveryApiTests
         }
     }
 
+    /// <summary>
+    /// Verifies that <c>PublishedContentCache.GetByIds</c> correctly filters returned content based on an allow list of content type aliases.
+    /// The test ensures that only content items matching the specified <paramref name="allowedContentType"/> are returned.
+    /// </summary>
+    /// <param name="allowedContentType">The content type alias to include in the allow list for filtering results.</param>
     [TestCase("theContentType")]
     [TestCase("theOtherContentType")]
     public void PublishedContentCache_GetByIds_SupportsAllowList(string allowedContentType)
@@ -294,6 +360,9 @@ public class PublishedContentCacheTests : DeliveryApiTests
         }
     }
 
+    /// <summary>
+    /// Tests that the allow list can allow multiple content types when retrieving content by IDs.
+    /// </summary>
     [Test]
     public void PublishedContentCache_GetByIds_AllowListCanAllowMultipleContentTypes()
     {
@@ -303,6 +372,9 @@ public class PublishedContentCacheTests : DeliveryApiTests
         Assert.AreEqual(2, content.Length);
     }
 
+    /// <summary>
+    /// Tests that the allow list for content types is case insensitive.
+    /// </summary>
     [Test]
     public void PublishedContentCache_AllowListIsCaseInsensitive()
     {
@@ -312,6 +384,9 @@ public class PublishedContentCacheTests : DeliveryApiTests
         Assert.IsNotNull(content);
     }
 
+    /// <summary>
+    /// Tests that the allow list takes precedence over the deny list in the PublishedContentCache.
+    /// </summary>
     [Test]
     public void PublishedContentCache_AllowListTakesPrecedenceOverDisallowList()
     {
@@ -322,6 +397,10 @@ public class PublishedContentCacheTests : DeliveryApiTests
         Assert.IsNotNull(content);
     }
 
+    /// <summary>
+    /// Tests that the allow list completely overrides the disallow list,
+    /// ensuring content types in the allow list are included regardless of the disallow list.
+    /// </summary>
     [Test]
     public void PublishedContentCache_AllowListIgnoresDisallowListCompletely()
     {
@@ -336,6 +415,9 @@ public class PublishedContentCacheTests : DeliveryApiTests
         Assert.IsNull(contentTwo);
     }
 
+    /// <summary>
+    /// Tests that when the allow list is empty, the published content cache falls back to using the deny list.
+    /// </summary>
     [Test]
     public void PublishedContentCache_EmptyAllowListFallsBackToDisallowList()
     {

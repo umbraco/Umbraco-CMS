@@ -6,9 +6,18 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Extensions;
 
+/// <summary>
+/// Unit tests for string extension methods in the Umbraco CMS core.
+/// </summary>
 [TestFixture]
 public partial class StringExtensionsTests
 {
+    /// <summary>
+    /// Tests that ReplaceNonAlphanumericChars correctly replaces non-alphanumeric characters in the input string with the specified replacement string.
+    /// </summary>
+    /// <param name="input">The input string to process.</param>
+    /// <param name="replacement">The string to replace non-alphanumeric characters with.</param>
+    /// <param name="expected">The expected result after replacement.</param>
     [TestCase("hello", "-", "hello")] // no change needed
     [TestCase("Hello123", "-", "Hello123")] // alphanumeric only
     [TestCase("hello world", "-", "hello-world")] // space replaced
@@ -34,6 +43,12 @@ public partial class StringExtensionsTests
         Assert.AreEqual(expected, result);
     }
 
+    /// <summary>
+    /// Tests that ReplaceNonAlphanumericChars correctly replaces non-alphanumeric characters in the input string with the specified replacement character.
+    /// </summary>
+    /// <param name="input">The input string to process.</param>
+    /// <param name="replacement">The character to replace non-alphanumeric characters with.</param>
+    /// <param name="expected">The expected result after replacement.</param>
     [TestCase("hello", '-', "hello")] // no change needed
     [TestCase("Hello123", '-', "Hello123")] // alphanumeric only
     [TestCase("hello world", '-', "hello-world")] // space replaced
@@ -58,6 +73,11 @@ public partial class StringExtensionsTests
         Assert.AreEqual(expected, result);
     }
 
+    /// <summary>
+    /// Unit test for the <c>StripWhitespace</c> extension method, verifying that it returns the input string with all whitespace characters removed.
+    /// </summary>
+    /// <param name="input">The input string which may contain whitespace characters.</param>
+    /// <param name="expected">The expected result string after all whitespace has been removed from <paramref name="input"/>.</param>
     [TestCase("hello", "hello")] // no whitespace
     [TestCase("Hello123", "Hello123")] // alphanumeric only
     [TestCase("hello world", "helloworld")] // single space
@@ -82,6 +102,11 @@ public partial class StringExtensionsTests
         Assert.AreEqual(expected, result);
     }
 
+    /// <summary>
+    /// Verifies that the <c>StripHtml</c> extension method removes all HTML tags from the input string and returns the expected plain text result.
+    /// </summary>
+    /// <param name="input">A string that may contain HTML tags to be stripped.</param>
+    /// <param name="expected">The expected plain text result after HTML tags have been removed from <paramref name="input"/>.</param>
     [TestCase("hello", "hello")] // no HTML
     [TestCase("", "")] // empty string
     [TestCase("<p>hello</p>", "hello")] // simple tags
@@ -108,6 +133,12 @@ public partial class StringExtensionsTests
         Assert.AreEqual(expected, result);
     }
 
+    /// <summary>
+    /// Tests that the StripHtml extension method correctly replaces HTML tags in the input string with the specified replacement string.
+    /// </summary>
+    /// <param name="input">The input string potentially containing HTML tags.</param>
+    /// <param name="replacement">The string to replace HTML tags with.</param>
+    /// <param name="expected">The expected result string after HTML tags are replaced.</param>
     [TestCase("hello", " ", "hello")] // no HTML
     [TestCase("", " ", "")] // empty string
     [TestCase("<p>hello</p>", " ", "hello")] // simple tags, trimmed
@@ -128,6 +159,12 @@ public partial class StringExtensionsTests
         Assert.AreEqual(expected, result);
     }
 
+    /// <summary>
+    /// Tests that the EnsureStartsWith extension method correctly prepends the specified character to the input string if it does not already start with it.
+    /// </summary>
+    /// <param name="input">The input string to check and modify.</param>
+    /// <param name="value">The character to ensure the string starts with.</param>
+    /// <param name="expected">The expected result string after ensuring the start character.</param>
     [TestCase("hello", '/', "/hello")] // prepends char
     [TestCase("/hello", '/', "/hello")] // already starts with char
     [TestCase("", '/', "/")] // empty string
@@ -142,6 +179,15 @@ public partial class StringExtensionsTests
         Assert.AreEqual(expected, result);
     }
 
+    /// <summary>
+    /// Unit test for the <see cref="StringExtensions.EnsureStartsWith(string, string)"/> extension method, verifying that it returns the expected result for various input and prefix combinations.
+    /// </summary>
+    /// <param name="input">The input string to test.</param>
+    /// <param name="toStartWith">The string that the input should start with.</param>
+    /// <param name="expected">The expected result after ensuring the input starts with the specified string.</param>
+    /// <remarks>
+    /// This is a parameterized test that asserts the output of <c>EnsureStartsWith</c> matches the expected value for each test case.
+    /// </remarks>
     [TestCase("hello", "/", "/hello")] // prepends string
     [TestCase("/hello", "/", "/hello")] // already starts with string
     [TestCase("", "/", "/")] // empty string
@@ -156,6 +202,12 @@ public partial class StringExtensionsTests
         Assert.AreEqual(expected, result);
     }
 
+    /// <summary>
+    /// Tests that the EnsureEndsWith extension method correctly appends the specified character to the input string if it does not already end with it.
+    /// </summary>
+    /// <param name="input">The input string to test.</param>
+    /// <param name="value">The character that the string should end with.</param>
+    /// <param name="expected">The expected result after ensuring the string ends with the specified character.</param>
     [TestCase("hello", '/', "hello/")] // appends char
     [TestCase("hello/", '/', "hello/")] // already ends with char
     [TestCase("", '/', "/")] // empty string
@@ -170,6 +222,12 @@ public partial class StringExtensionsTests
         Assert.AreEqual(expected, result);
     }
 
+    /// <summary>
+    /// Verifies that <see cref="StringExtensions.EnsureEndsWith(string, string)"/> appends the specified string to the input only if it does not already end with it.
+    /// </summary>
+    /// <param name="input">The input string to test.</param>
+    /// <param name="toEndWith">The string that should be present at the end of the input.</param>
+    /// <param name="expected">The expected result after applying <c>EnsureEndsWith</c>.</param>
     [TestCase("hello", "/", "hello/")] // appends string
     [TestCase("hello/", "/", "hello/")] // already ends with string
     [TestCase("", "/", "/")] // empty string
@@ -184,6 +242,11 @@ public partial class StringExtensionsTests
         Assert.AreEqual(expected, result);
     }
 
+    /// <summary>
+    /// Unit test for the <see cref="StringExtensions.StripNewLines"/> extension method, verifying that all newline characters are removed from the input string.
+    /// </summary>
+    /// <param name="input">The input string that may contain newline characters.</param>
+    /// <param name="expected">The expected result string after all newline characters have been removed from <paramref name="input"/>.</param>
     [TestCase("hello", "hello")] // no newlines
     [TestCase("", "")] // empty string
     [TestCase("hello\nworld", "helloworld")] // LF removed
@@ -201,6 +264,11 @@ public partial class StringExtensionsTests
         Assert.AreEqual(expected, result);
     }
 
+    /// <summary>
+    /// Tests that the ToSingleLine extension method replaces new line characters with spaces.
+    /// </summary>
+    /// <param name="input">The input string that may contain new line characters.</param>
+    /// <param name="expected">The expected string after new lines are replaced with spaces.</param>
     [TestCase(null, null)] // null input
     [TestCase("hello", "hello")] // no newlines
     [TestCase("", "")] // empty string
@@ -219,6 +287,14 @@ public partial class StringExtensionsTests
         Assert.AreEqual(expected, result);
     }
 
+    /// <summary>
+    /// Verifies that the <c>Truncate</c> extension method returns the expected result for various input strings, maximum lengths, and suffixes.
+    /// Tests include cases where truncation is and is not required, and where edge cases such as zero or negative maximum lengths are provided.
+    /// </summary>
+    /// <param name="input">The input string to potentially truncate.</param>
+    /// <param name="maxLength">The maximum allowed length of the result, including the suffix if truncation occurs.</param>
+    /// <param name="suffix">The suffix to append if the input is truncated.</param>
+    /// <param name="expected">The expected string result after applying truncation logic.</param>
     [TestCase("hello", 10, "...", "hello")] // shorter than limit
     [TestCase("hello", 5, "...", "hello")] // exactly at limit
     [TestCase("hello world", 8, "...", "hello...")]  // truncated with default suffix
@@ -238,6 +314,9 @@ public partial class StringExtensionsTests
         Assert.AreEqual(expected, result);
     }
 
+    /// <summary>
+    /// Tests that TruncateWithUniqueHash returns the original string when the string is shorter than the specified maximum length.
+    /// </summary>
     [Test]
     public void TruncateWithUniqueHash_Short_String_Returns_Unchanged()
     {
@@ -246,6 +325,9 @@ public partial class StringExtensionsTests
         Assert.AreEqual("hello world", result);
     }
 
+    /// <summary>
+    /// Tests that TruncateWithUniqueHash returns the original string unchanged when the string length is exactly at the limit.
+    /// </summary>
     [Test]
     public void TruncateWithUniqueHash_Exactly_At_Limit_Returns_Unchanged()
     {
@@ -256,6 +338,9 @@ public partial class StringExtensionsTests
         Assert.AreEqual(text, result);
     }
 
+    /// <summary>
+    /// Tests that TruncateWithUniqueHash truncates the string to the maximum specified length when the input exceeds the limit.
+    /// </summary>
     [Test]
     public void TruncateWithUniqueHash_Exceeds_Limit_Truncates_To_Max_Length()
     {
@@ -266,6 +351,9 @@ public partial class StringExtensionsTests
         Assert.That(result.Length, Is.EqualTo(50));
     }
 
+    /// <summary>
+    /// Tests that TruncateWithUniqueHash correctly truncates a string exceeding the limit and appends a unique hash suffix.
+    /// </summary>
     [Test]
     public void TruncateWithUniqueHash_Exceeds_Limit_Ends_With_Hash_Suffix()
     {
@@ -278,6 +366,9 @@ public partial class StringExtensionsTests
         Assert.That(result[^8..], Does.Match("^[0-9a-f]{8}$"));
     }
 
+    /// <summary>
+    /// Tests that TruncateWithUniqueHash preserves the readable prefix of the string when truncating.
+    /// </summary>
     [Test]
     public void TruncateWithUniqueHash_Preserves_Readable_Prefix()
     {
@@ -288,6 +379,9 @@ public partial class StringExtensionsTests
         Assert.That(result, Does.StartWith("RebuildExamineIndex-MyCustomIndex"));
     }
 
+    /// <summary>
+    /// Tests that truncating different input strings with a unique hash produces different results.
+    /// </summary>
     [Test]
     public void TruncateWithUniqueHash_Different_Inputs_Produce_Different_Results()
     {
@@ -300,6 +394,9 @@ public partial class StringExtensionsTests
         Assert.AreNotEqual(resultA, resultB);
     }
 
+    /// <summary>
+    /// Tests that inputs sharing a common prefix produce different truncated results with unique hashes.
+    /// </summary>
     [Test]
     public void TruncateWithUniqueHash_Inputs_Sharing_Prefix_Produce_Different_Results()
     {
@@ -315,6 +412,9 @@ public partial class StringExtensionsTests
         Assert.AreNotEqual(resultA, resultB);
     }
 
+    /// <summary>
+    /// Tests that the TruncateWithUniqueHash method produces deterministic output for the same input.
+    /// </summary>
     [Test]
     public void TruncateWithUniqueHash_Same_Input_Is_Deterministic()
     {

@@ -16,6 +16,9 @@ using Umbraco.Cms.Tests.Common;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.BackgroundJobs.Jobs;
 
+/// <summary>
+/// Contains unit tests for the <see cref="HealthCheckNotifierJob"/> class, verifying its behavior and functionality.
+/// </summary>
 [TestFixture]
 public class HealthCheckNotifierJobTests
 {
@@ -25,6 +28,10 @@ public class HealthCheckNotifierJobTests
     private const string Check2Id = "00000000-0000-0000-0000-000000000002";
     private const string Check3Id = "00000000-0000-0000-0000-000000000003";
 
+    /// <summary>
+    /// Tests that the HealthCheckNotifierJob does not execute when it is not enabled.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task Does_Not_Execute_When_Not_Enabled()
     {
@@ -33,6 +40,10 @@ public class HealthCheckNotifierJobTests
         VerifyNotificationsNotSent();
     }
 
+    /// <summary>
+    /// Tests that the HealthCheckNotifierJob does not execute when there are no enabled notification methods.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task Does_Not_Execute_With_No_Enabled_Notification_Methods()
     {
@@ -41,6 +52,10 @@ public class HealthCheckNotifierJobTests
         VerifyNotificationsNotSent();
     }
 
+    /// <summary>
+    /// Tests that the HealthCheckNotifierJob executes correctly when notification methods are enabled.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task Executes_With_Enabled_Notification_Methods()
     {
@@ -49,6 +64,10 @@ public class HealthCheckNotifierJobTests
         VerifyNotificationsSent();
     }
 
+    /// <summary>
+    /// Verifies that the <see cref="HealthCheckNotifier"/> executes only the health checks that are enabled.
+    /// </summary>
+    /// <returns>A <see cref="Task"/> representing the asynchronous test operation.</returns>
     [Test]
     public async Task Executes_Only_Enabled_Checks()
     {
@@ -123,8 +142,17 @@ public class HealthCheckNotifierJobTests
 
     private class TestHealthCheck : HealthCheck
     {
+    /// <summary>
+    /// Executes the specified health check action and returns the resulting status.
+    /// </summary>
+    /// <param name="action">The health check action to execute.</param>
+    /// <returns>The status resulting from executing the health check action.</returns>
         public override HealthCheckStatus ExecuteAction(HealthCheckAction action) => new("Check message");
 
+    /// <summary>
+    /// Gets the status asynchronously.
+    /// </summary>
+    /// <returns>A task that represents the asynchronous operation. The task result contains an enumerable of HealthCheckStatus.</returns>
         public override Task<IEnumerable<HealthCheckStatus>> GetStatusAsync() => Task.FromResult(Enumerable.Empty<HealthCheckStatus>());
     }
 }

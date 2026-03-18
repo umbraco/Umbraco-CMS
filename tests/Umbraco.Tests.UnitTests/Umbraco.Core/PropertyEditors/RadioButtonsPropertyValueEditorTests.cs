@@ -10,9 +10,17 @@ using Umbraco.Cms.Core.Strings;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 
+/// <summary>
+/// Contains unit tests for the <see cref="RadioButtonsPropertyValueEditor"/> class, verifying its behavior and functionality.
+/// </summary>
 [TestFixture]
 public class RadioButtonsPropertyValueEditorTests
 {
+    /// <summary>
+    /// Tests that the radio button property value editor correctly validates whether the provided value is one of the allowed radio button options.
+    /// </summary>
+    /// <param name="value">The value to validate against the set of allowed radio button options.</param>
+    /// <param name="expectedSuccess">True if the value is expected to be valid (i.e., present in the allowed options); otherwise, false.</param>
     [TestCase("Red", true)]
     [TestCase("Yellow", false)]
     public void Validates_Is_One_Of_Options(object value, bool expectedSuccess)

@@ -15,6 +15,9 @@ using Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs.DistributedJobs;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.BackgroundJobs.Jobs;
 
+/// <summary>
+/// Contains unit tests for the <see cref="CacheInstructionsPruningJob"/> class, verifying its behavior and functionality.
+/// </summary>
 public class CacheInstructionsPruningJobTests
 {
     private readonly Mock<IOptions<GlobalSettings>> _globalSettingsMock = new(MockBehavior.Strict);
@@ -22,6 +25,9 @@ public class CacheInstructionsPruningJobTests
     private readonly Mock<ICoreScopeProvider> _scopeProviderMock = new(MockBehavior.Strict);
     private readonly Mock<TimeProvider> _timeProviderMock = new(MockBehavior.Strict);
 
+    /// <summary>
+    /// Tests that the run period is correctly retrieved from the global settings.
+    /// </summary>
     [Test]
     public void Run_Period_Is_Retrieved_From_GlobalSettings()
     {
@@ -30,6 +36,10 @@ public class CacheInstructionsPruningJobTests
         Assert.AreEqual(timeBetweenPruneOperations, job.Period, "The run period should be the same as 'TimeBetweenPruneOperations'.");
     }
 
+    /// <summary>
+    /// Tests that RunJobAsync calls DeleteInstructionsOlderThan with the expected prune date.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task RunJobAsync_Calls_DeleteInstructionsOlderThan_With_Expected_Date()
     {

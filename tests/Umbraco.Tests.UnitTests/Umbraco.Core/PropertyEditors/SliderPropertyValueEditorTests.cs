@@ -14,6 +14,9 @@ using Umbraco.Cms.Infrastructure.Serialization;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 
+/// <summary>
+/// Tests for the <see cref="SliderPropertyValueEditor"/> class.
+/// </summary>
 [TestFixture]
 public class SliderPropertyValueEditorTests
 {
@@ -30,6 +33,10 @@ public class SliderPropertyValueEditorTests
         new List<string> { "some", "values" },
     };
 
+    /// <summary>
+    /// Tests that invalid values from the editor are handled correctly and result in null.
+    /// </summary>
+    /// <param name="value">The value from the editor to test.</param>
     [TestCaseSource(nameof(InvalidCaseData))]
     public void Can_Handle_Invalid_Values_From_Editor(object value)
     {
@@ -37,6 +44,9 @@ public class SliderPropertyValueEditorTests
         Assert.IsNull(fromEditor);
     }
 
+    /// <summary>
+    /// Tests that the editor can handle invalid Guid values correctly by returning null.
+    /// </summary>
     [Test]
     public void Can_Handle_Invalid_Values_From_Editor_Guid()
     {
@@ -44,6 +54,9 @@ public class SliderPropertyValueEditorTests
         Assert.IsNull(fromEditor);
     }
 
+    /// <summary>
+    /// Tests that the editor can handle invalid UDI values gracefully.
+    /// </summary>
     [Test]
     public void Can_Handle_Invalid_Values_From_Editor_Udi()
     {
@@ -64,6 +77,15 @@ public class SliderPropertyValueEditorTests
         Assert.AreEqual(toEditor.To, expected);
     }
 
+    /// <summary>
+    /// Verifies that a range value string can be correctly parsed by the editor into a <see cref="SliderPropertyEditor.SliderPropertyValueEditor.SliderRange"/> object with the expected From and To values.
+    /// </summary>
+    /// <param name="value">The input string representing the range, typically in the format "from,to".</param>
+    /// <param name="expectedFrom">The expected decimal value for the start of the range (From).</param>
+    /// <param name="expectedTo">The expected decimal value for the end of the range (To).</param>
+    /// <remarks>
+    /// This test ensures that the parsing logic in <see cref="ToEditor"/> correctly interprets range strings and assigns the appropriate values to the resulting SliderRange object.
+    /// </remarks>
     [TestCase("1,1", 1, 1)]
     [TestCase("0,0", 0, 0)]
     [TestCase("-1,-1", -1, -1)]
@@ -79,6 +101,12 @@ public class SliderPropertyValueEditorTests
         Assert.AreEqual(toEditor.To, expectedTo);
     }
 
+    /// <summary>
+    /// Tests that valid slider values can be parsed correctly from the editor JSON input.
+    /// </summary>
+    /// <param name="from">The starting value of the slider range.</param>
+    /// <param name="to">The ending value of the slider range.</param>
+    /// <param name="expectedResult">The expected string representation of the slider values.</param>
     [TestCase(0, 10, "0,10")]
     [TestCase(10, 10, "10")]
     [TestCase(0, 0, "0")]
@@ -95,6 +123,10 @@ public class SliderPropertyValueEditorTests
         Assert.AreEqual(expectedResult, fromEditor);
     }
 
+    /// <summary>
+    /// Tests that invalid values are handled correctly when converting to the editor format.
+    /// </summary>
+    /// <param name="value">The value to test conversion from.</param>
     [TestCaseSource(nameof(InvalidCaseData))]
     public void Can_Handle_Invalid_Values_To_Editor(object value)
     {
@@ -102,6 +134,9 @@ public class SliderPropertyValueEditorTests
         Assert.IsNull(toEditor, message: $"Failed for: {value}");
     }
 
+    /// <summary>
+    /// Tests that passing null to FromEditor returns null.
+    /// </summary>
     [Test]
     public void Null_From_Editor_Yields_Null()
     {
@@ -109,6 +144,9 @@ public class SliderPropertyValueEditorTests
         Assert.IsNull(result);
     }
 
+    /// <summary>
+    /// Tests that passing null to the ToEditor method returns null.
+    /// </summary>
     [Test]
     public void Null_To_Editor_Yields_Null()
     {
@@ -116,6 +154,13 @@ public class SliderPropertyValueEditorTests
         Assert.IsNull(result);
     }
 
+    /// <summary>
+    /// Validates that the range is contained only when the range validation is enabled.
+    /// </summary>
+    /// <param name="enableRange">Indicates whether range validation is enabled.</param>
+    /// <param name="from">The start value of the range.</param>
+    /// <param name="to">The end value of the range.</param>
+    /// <param name="expectedSuccess">Indicates whether the validation is expected to succeed.</param>
     [TestCase(true, 1.1, 1.1, true)]
     [TestCase(true, 1.1, 1.3, true)]
     [TestCase(false, 1.1, 1.1, true)]
@@ -142,6 +187,12 @@ public class SliderPropertyValueEditorTests
         }
     }
 
+    /// <summary>
+    /// Validates that the range defined by the "from" and "to" values is valid only when the validation is enabled.
+    /// </summary>
+    /// <param name="from">The start value of the range.</param>
+    /// <param name="to">The end value of the range.</param>
+    /// <param name="expectedSuccess">Indicates whether the validation is expected to succeed.</param>
     [TestCase(1.1, 1.1, true)]
     [TestCase(1.1, 1.3, true)]
     [TestCase(1.3, 1.1, false)]
@@ -167,6 +218,12 @@ public class SliderPropertyValueEditorTests
         }
     }
 
+    /// <summary>
+    /// Validates that the "from" value is greater than or equal to the configured minimum value.
+    /// </summary>
+    /// <param name="from">The starting value to validate.</param>
+    /// <param name="to">The ending value to validate.</param>
+    /// <param name="expectedSuccess">Indicates whether the validation is expected to succeed.</param>
     [TestCase(0.9, 1.1, false)]
     [TestCase(1.1, 1.1, true)]
     [TestCase(1.3, 1.7, true)]
@@ -192,6 +249,12 @@ public class SliderPropertyValueEditorTests
         }
     }
 
+    /// <summary>
+    /// Validates that the "to" value is less than or equal to the configured maximum value.
+    /// </summary>
+    /// <param name="from">The starting value of the range.</param>
+    /// <param name="to">The ending value of the range to validate against the maximum.</param>
+    /// <param name="expectedSuccess">Indicates whether the validation is expected to succeed.</param>
     [TestCase(1.3, 1.7, true)]
     [TestCase(1.9, 1.9, true)]
     [TestCase(1.9, 2.1, false)]
@@ -217,6 +280,9 @@ public class SliderPropertyValueEditorTests
         }
     }
 
+    /// <summary>
+    /// Tests that the max item validation treats 0 as unlimited.
+    /// </summary>
     [Test]
     public void Max_Item_Validation_Respects_0_As_Unlimited()
     {
@@ -232,6 +298,14 @@ public class SliderPropertyValueEditorTests
         Assert.IsEmpty(result);
     }
 
+    /// <summary>
+    /// Tests that the slider property value is validated against the configured step increment.
+    /// Ensures that the difference between the 'from' and 'to' values is a multiple of the specified step, or that validation passes when the step is zero.
+    /// </summary>
+    /// <param name="step">The step increment configured for the slider; if zero, validation always passes.</param>
+    /// <param name="from">The starting value of the slider range to validate.</param>
+    /// <param name="to">The ending value of the slider range to validate.</param>
+    /// <param name="expectedSuccess">True if the validation is expected to succeed; otherwise, false.</param>
     [TestCase(0.2, 1.3, 1.7, true)]
     [TestCase(0.2, 1.4, 1.7, false)]
     [TestCase(0.2, 1.3, 1.6, false)]

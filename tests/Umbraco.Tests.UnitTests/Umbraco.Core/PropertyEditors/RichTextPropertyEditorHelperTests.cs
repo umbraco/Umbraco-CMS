@@ -9,9 +9,15 @@ using Umbraco.Cms.Infrastructure.Serialization;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 
+/// <summary>
+/// Contains unit tests for the <see cref="RichTextPropertyEditorHelper"/> class, which provides helper methods for the RichText property editor in Umbraco.
+/// </summary>
 [TestFixture]
 public class RichTextPropertyEditorHelperTests
 {
+    /// <summary>
+    /// Tests that a pure markup string can be parsed correctly by the RichTextPropertyEditorHelper.
+    /// </summary>
     [Test]
     public void Can_Parse_Pure_Markup_String()
     {
@@ -22,6 +28,9 @@ public class RichTextPropertyEditorHelperTests
         Assert.IsNull(value.Blocks);
     }
 
+    /// <summary>
+    /// Tests that a JSON object representing rich text editor content can be parsed correctly into a RichTextEditorValue.
+    /// </summary>
     [Test]
     public void Can_Parse_JObject()
     {
@@ -94,6 +103,9 @@ public class RichTextPropertyEditorHelperTests
         });
     }
 
+    /// <summary>
+    /// Tests that a JObject with missing blocks can be parsed correctly.
+    /// </summary>
     [Test]
     public void Can_Parse_JObject_With_Missing_Blocks()
     {
@@ -190,6 +202,10 @@ public class RichTextPropertyEditorHelperTests
         Assert.AreEqual(Guid.Parse("d2eeef66-4111-42f4-a164-7a523eaffbc2"), layout.First().SettingsKey);
     }
 
+    /// <summary>
+    /// Tests that the RichTextPropertyEditorHelper can correctly parse a JSON string containing markup and blocks
+    /// with content only, verifying that the parsed result matches the expected structure and values.
+    /// </summary>
     [Test]
     public void Can_Parse_Blocks_With_Content_Only()
     {
@@ -241,6 +257,9 @@ public class RichTextPropertyEditorHelperTests
         Assert.AreEqual(0, value.Blocks.SettingsData.Count);
     }
 
+    /// <summary>
+    /// Tests that the rich text property editor helper can correctly parse mixed blocks and inline blocks from a JSON input string.
+    /// </summary>
     [Test]
     public void Can_Parse_Mixed_Blocks_And_Inline_Blocks()
     {

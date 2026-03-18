@@ -5,8 +5,14 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Extensions;
 
+/// <summary>
+/// Contains unit tests for methods in the <see cref="ContentExtensions"/> class.
+/// </summary>
 public partial class ContentExtensionsTests
 {
+    /// <summary>
+    /// Tests that GetStatus returns ContentStatus.Trashed when the content is trashed.
+    /// </summary>
     [Test]
     public void GetStatus_WhenTrashed_ReturnsTrashed()
     {
@@ -16,6 +22,11 @@ public partial class ContentExtensionsTests
         Assert.AreEqual(ContentStatus.Trashed, result);
     }
 
+    /// <summary>
+    /// Tests that GetStatus returns the correct ContentStatus based on the published state when the schedule is empty.
+    /// </summary>
+    /// <param name="published">Indicates whether the content is published.</param>
+    /// <param name="expectedStatus">The expected ContentStatus result.</param>
     [TestCase(true, ContentStatus.Published)]
     [TestCase(false, ContentStatus.Unpublished)]
     public void GetStatus_WithEmptySchedule_ReturnsPublishState(bool published, ContentStatus expectedStatus)
@@ -30,6 +41,10 @@ public partial class ContentExtensionsTests
         Assert.AreEqual(expectedStatus, result);
     }
 
+    /// <summary>
+    /// Verifies that the <c>GetStatus</c> method returns <see cref="ContentStatus.Expired"/> when the content has a pending expiry and is invariant (not culture variant).
+    /// </summary>
+    /// <param name="minutesFromExpiry">The number of minutes before the expiry time to test.</param>
     [TestCase(1)]
     [TestCase(10)]
     [TestCase(60)]
@@ -47,6 +62,10 @@ public partial class ContentExtensionsTests
         Assert.AreEqual(ContentStatus.Expired, result);
     }
 
+    /// <summary>
+    /// Tests that GetStatus returns AwaitingRelease when there is a pending release for invariant content.
+    /// </summary>
+    /// <param name="minutesUntilRelease">The number of minutes until the scheduled release.</param>
     [TestCase(1)]
     [TestCase(10)]
     [TestCase(60)]
@@ -64,6 +83,10 @@ public partial class ContentExtensionsTests
         Assert.AreEqual(ContentStatus.AwaitingRelease, result);
     }
 
+    /// <summary>
+    /// Tests that the content status is published when the release date is in the past and the expiry date is in the future for invariant content.
+    /// </summary>
+    /// <param name="minutes">The number of minutes to offset the release and expiry dates from the current time.</param>
     [TestCase(1)]
     [TestCase(10)]
     [TestCase(60)]
@@ -82,6 +105,10 @@ public partial class ContentExtensionsTests
         Assert.AreEqual(ContentStatus.Published, result);
     }
 
+    /// <summary>
+    /// Tests that the GetStatus method returns Expired when the content variant has a pending expiry within the specified minutes.
+    /// </summary>
+    /// <param name="minutesFromExpiry">The number of minutes from expiry to test the status against.</param>
     [TestCase(1)]
     [TestCase(10)]
     [TestCase(60)]
@@ -99,6 +126,10 @@ public partial class ContentExtensionsTests
         Assert.AreEqual(ContentStatus.Expired, result);
     }
 
+    /// <summary>
+    /// Tests that GetStatus returns AwaitingRelease when there is a pending release for a variant.
+    /// </summary>
+    /// <param name="minutesUntilRelease">The number of minutes until the scheduled release.</param>
     [TestCase(1)]
     [TestCase(10)]
     [TestCase(60)]
@@ -116,6 +147,10 @@ public partial class ContentExtensionsTests
         Assert.AreEqual(ContentStatus.AwaitingRelease, result);
     }
 
+    /// <summary>
+    /// Tests that the content status is published when the release date is in the past and the expiry date is in the future for a specific variant.
+    /// </summary>
+    /// <param name="minutes">The number of minutes to offset the release and expiry dates from the current time.</param>
     [TestCase(1)]
     [TestCase(10)]
     [TestCase(60)]

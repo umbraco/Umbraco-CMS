@@ -14,9 +14,15 @@ using Umbraco.Cms.Infrastructure.Serialization;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.DeliveryApi;
 
+/// <summary>
+/// Contains unit tests for the <see cref="MultiUrlPickerValueConverter"/> class, verifying its behavior and functionality.
+/// </summary>
 [TestFixture]
 public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
 {
+    /// <summary>
+    /// Tests that the MultiUrlPickerValueConverter correctly converts content to links with content info when in single mode.
+    /// </summary>
     [Test]
     public void MultiUrlPickerValueConverter_InSingleMode_ConvertsContentToLinksWithContentInfo()
     {
@@ -49,6 +55,10 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
         Assert.AreEqual("/the-page-url/", route.Path);
     }
 
+    /// <summary>
+    /// Tests that the MultiUrlPickerValueConverter correctly converts media items to ApiLink objects in single mode,
+    /// ensuring that the links do not contain content info such as target or route.
+    /// </summary>
     [Test]
     public void MultiUrlPickerValueConverter_InSingleMode_ConvertsMediaToLinksWithoutContentInfo()
     {
@@ -79,6 +89,9 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
         Assert.AreEqual(null, link.Route);
     }
 
+    /// <summary>
+    /// Tests that the MultiUrlPickerValueConverter can handle mixed link types correctly when in multi mode.
+    /// </summary>
     [Test]
     public void MultiUrlPickerValueConverter_InMultiMode_CanHandleMixedLinkTypes()
     {
@@ -132,6 +145,9 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
         Assert.Null(last.Route);
     }
 
+    /// <summary>
+    /// Tests that the MultiUrlPickerValueConverter correctly converts an external URL to ApiLink objects.
+    /// </summary>
     [Test]
     public void MultiUrlPickerValueConverter_ConvertsExternalUrlToLinks()
     {
@@ -163,6 +179,9 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
         Assert.Null(link.Route);
     }
 
+    /// <summary>
+    /// Tests that the MultiUrlPickerValueConverter applies explicit configuration correctly to media links.
+    /// </summary>
     [Test]
     public void MultiUrlPickerValueConverter_AppliesExplicitConfigurationToMediaLink()
     {
@@ -196,6 +215,9 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
         Assert.AreEqual(null, link.Route);
     }
 
+    /// <summary>
+    /// Tests that the MultiUrlPickerValueConverter applies explicit configuration correctly to content links.
+    /// </summary>
     [Test]
     public void MultiUrlPickerValueConverter_AppliesExplicitConfigurationToContentLink()
     {
@@ -228,6 +250,9 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
         Assert.Null(link.Url);
     }
 
+    /// <summary>
+    /// Tests that the MultiUrlPickerValueConverter prioritizes the content URL over the configured URL.
+    /// </summary>
     [Test]
     public void MultiUrlPickerValueConverter_PrioritizesContentUrlOverConfiguredUrl()
     {
@@ -258,6 +283,11 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
         Assert.Null(link.Url);
     }
 
+    /// <summary>
+    /// Verifies that when the MultiUrlPickerValueConverter is configured in single mode, passing an invalid intermediate value
+    /// (such as a non-array, non-null, or otherwise unexpected type) results in an empty array being returned.
+    /// </summary>
+    /// <param name="inter">The intermediate value to convert, which may be invalid (e.g., integer, string, or null).</param>
     [TestCase(123)]
     [TestCase("123")]
     [TestCase(null)]
@@ -274,6 +304,10 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
         Assert.IsEmpty(result);
     }
 
+    /// <summary>
+    /// Verifies that when the MultiUrlPickerValueConverter operates in multi mode, any invalid intermediate value is converted to an empty array of <see cref="ApiLink"/>.
+    /// </summary>
+    /// <param name="inter">The intermediate value to be converted, which is expected to be invalid (e.g., non-array, null, or incorrect type).</param>
     [TestCase(123)]
     [TestCase("123")]
     [TestCase(null)]
@@ -308,12 +342,17 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
 
     private IJsonSerializer Serializer() => new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
 
+    /// <summary>
+    /// Tests that the MultiUrlPickerValueConverter correctly includes the culture in the API link when converting content links with culture.
+    /// </summary>
     [Test]
     public void MultiUrlPickerValueConverter_DeliveryApi_ContentLinkWithCulture_IncludesCultureInApiLink()
     {
         // Arrange
         var publishedDataType = new PublishedDataType(
-            123, "test", "test",
+            123,
+            "test",
+            "test",
             new Lazy<object>(() => new MultiUrlPickerConfiguration { MaxNumber = 1 }));
         var publishedPropertyType = new Mock<IPublishedPropertyType>();
         publishedPropertyType.SetupGet(p => p.DataType).Returns(publishedDataType);
@@ -363,12 +402,17 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
         Assert.AreEqual("/fr/the-page-url/", route.Path);
     }
 
+    /// <summary>
+    /// Tests that converting a content link with a specified culture generates a URL with the correct culture.
+    /// </summary>
     [Test]
     public void MultiUrlPickerValueConverter_ConvertToObject_ContentLinkWithCulture_GeneratesUrlWithCorrectCulture()
     {
         // Arrange
         var publishedDataType = new PublishedDataType(
-            123, "test", "test",
+            123,
+            "test",
+            "test",
             new Lazy<object>(() => new MultiUrlPickerConfiguration { MaxNumber = 1 }));
         var publishedPropertyType = new Mock<IPublishedPropertyType>();
         publishedPropertyType.SetupGet(p => p.DataType).Returns(publishedDataType);

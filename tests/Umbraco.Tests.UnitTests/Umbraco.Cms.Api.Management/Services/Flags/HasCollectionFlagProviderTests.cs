@@ -14,6 +14,9 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Management.Services.Flags;
 [TestFixture]
 internal class HasCollectionFlagProviderTests
 {
+    /// <summary>
+    /// Tests that HasCollectionFlagProvider can provide document tree flags.
+    /// </summary>
     [Test]
     public void HasCollectionFlagProvider_Can_Provide_Document_Tree_Flags()
     {
@@ -21,6 +24,9 @@ internal class HasCollectionFlagProviderTests
         Assert.IsTrue(sut.CanProvideFlags<DocumentTreeItemResponseModel>());
     }
 
+    /// <summary>
+    /// Tests that HasCollectionFlagProvider can provide flags for DocumentCollectionResponseModel.
+    /// </summary>
     [Test]
     public void HasCollectionFlagProvider_Can_Provide_Document_Collection_Flags()
     {
@@ -28,6 +34,9 @@ internal class HasCollectionFlagProviderTests
         Assert.IsTrue(sut.CanProvideFlags<DocumentCollectionResponseModel>());
     }
 
+    /// <summary>
+    /// Tests that HasCollectionFlagProvider can provide flags for DocumentItemResponseModel.
+    /// </summary>
     [Test]
     public void HasCollectionFlagProvider_Can_Provide_Document_Item_Flags()
     {
@@ -35,6 +44,9 @@ internal class HasCollectionFlagProviderTests
         Assert.IsTrue(sut.CanProvideFlags<DocumentItemResponseModel>());
     }
 
+    /// <summary>
+    /// Tests that the HasCollectionFlagProvider can provide flags for MediaTreeItemResponseModel.
+    /// </summary>
     [Test]
     public void HasCollectionFlagProvider_Can_Provide_Media_Tree_Flags()
     {
@@ -42,6 +54,9 @@ internal class HasCollectionFlagProviderTests
         Assert.IsTrue(sut.CanProvideFlags<MediaTreeItemResponseModel>());
     }
 
+    /// <summary>
+    /// Tests that HasCollectionFlagProvider can provide flags for MediaCollectionResponseModel.
+    /// </summary>
     [Test]
     public void HasCollectionFlagProvider_Can_Provide_Media_Collection_Flags()
     {
@@ -49,6 +64,9 @@ internal class HasCollectionFlagProviderTests
         Assert.IsTrue(sut.CanProvideFlags<MediaCollectionResponseModel>());
     }
 
+    /// <summary>
+    /// Tests that HasCollectionFlagProvider can provide flags for MediaItemResponseModel.
+    /// </summary>
     [Test]
     public void HasCollectionFlagProvider_Can_Provide_Media_Item_Flags()
     {
@@ -56,6 +74,10 @@ internal class HasCollectionFlagProviderTests
         Assert.IsTrue(sut.CanProvideFlags<MediaItemResponseModel>());
     }
 
+    /// <summary>
+    /// Tests that the HasCollectionFlagProvider correctly populates the document tree flags.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task HasCollectionFlagProvider_Should_Populate_Document_Tree_Flags()
     {
@@ -79,6 +101,11 @@ internal class HasCollectionFlagProviderTests
         Assert.AreEqual("Umb.HasCollection", flagModel.Alias);
     }
 
+    /// <summary>
+    /// Tests that the HasCollectionFlagProvider correctly populates the "Umb.HasCollection" flag
+    /// for document collection view models.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task HasCollectionFlagProvider_Should_Populate_Document_Collection_Flags()
     {
@@ -102,6 +129,10 @@ internal class HasCollectionFlagProviderTests
         Assert.AreEqual("Umb.HasCollection", flagModel.Alias);
     }
 
+    /// <summary>
+    /// Tests that the HasCollectionFlagProvider correctly populates the flags for document items.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task HasCollectionFlagProvider_Should_Populate_Document_Item_Flags()
     {
@@ -125,6 +156,10 @@ internal class HasCollectionFlagProviderTests
         Assert.AreEqual("Umb.HasCollection", flagModel.Alias);
     }
 
+    /// <summary>
+    /// Tests that the HasCollectionFlagProvider correctly populates the media tree flags.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task HasCollectionFlagProvider_Should_Populate_Media_Tree_Flags()
     {
@@ -148,6 +183,10 @@ internal class HasCollectionFlagProviderTests
         Assert.AreEqual("Umb.HasCollection", flagModel.Alias);
     }
 
+    /// <summary>
+    /// Tests that the HasCollectionFlagProvider correctly populates media collection flags.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task HasCollectionFlagProvider_Should_Populate_Media_Collection_Flags()
     {
@@ -171,6 +210,10 @@ internal class HasCollectionFlagProviderTests
         Assert.AreEqual("Umb.HasCollection", flagModel.Alias);
     }
 
+    /// <summary>
+    /// Tests that the HasCollectionFlagProvider correctly populates the flags for media items.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task HasCollectionFlagProvider_Should_Populate_Media_Item_Flags()
     {

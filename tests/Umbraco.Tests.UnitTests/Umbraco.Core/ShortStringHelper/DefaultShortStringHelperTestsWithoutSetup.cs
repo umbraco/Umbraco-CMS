@@ -9,9 +9,17 @@ using Umbraco.Cms.Core.Strings;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.ShortStringHelper;
 
+/// <summary>
+/// Provides unit tests for the <see cref="DefaultShortStringHelper"/> class that do not require setup.
+/// </summary>
 [TestFixture]
 public class DefaultShortStringHelperTestsWithoutSetup
 {
+    /// <summary>
+    /// Verifies that <see cref="DefaultShortStringHelper"/> correctly processes Unicode and ASCII characters
+    /// in URL segments, depending on configuration settings for character replacement and ASCII conversion.
+    /// Ensures that Unicode characters are preserved or converted as expected based on the configuration.
+    /// </summary>
     [Test]
     public void U4_4056()
     {
@@ -40,6 +48,9 @@ public class DefaultShortStringHelperTestsWithoutSetup
         Assert.AreEqual("aeoa-and-aeoa-and-and-and-grosser-bbddzhzh-page", output);
     }
 
+    /// <summary>
+    /// Verifies that the <c>TryAscii</c> option of <see cref="DefaultShortStringHelper"/> correctly converts applicable characters to their ASCII equivalents when enabled, and preserves Unicode characters when not enabled.
+    /// </summary>
     [Test]
     public void U4_4056_TryAscii()
     {
@@ -69,6 +80,11 @@ public class DefaultShortStringHelperTestsWithoutSetup
         Assert.AreEqual("aeoa-and-aeoa-and-grosser-bbddzhzh-page", helper.CleanStringForUrlSegment(input2));
     }
 
+    /// <summary>
+    /// Verifies that the <c>CleanString</c> method correctly handles underscores within terms
+    /// depending on the configuration: when underscores are allowed, they are preserved within terms;
+    /// when not allowed, underscores are treated as separators.
+    /// </summary>
     [Test]
     public void CleanStringUnderscoreInTerm()
     {
@@ -95,6 +111,11 @@ public class DefaultShortStringHelperTestsWithoutSetup
         Assert.AreEqual("foo*bar*nil", helper.CleanString("foo_bar nil", CleanStringType.Alias));
     }
 
+    /// <summary>
+    /// Tests the behavior of <see cref="DefaultShortStringHelper.CleanString"/> when cleaning strings with different rules for valid leading characters.
+    /// Verifies that the helper correctly handles cases where only letters or letters and digits are allowed as leading characters, and ensures that the output matches expected cleaned strings.
+    /// Also tests <see cref="DefaultShortStringHelper.CleanStringForSafeAlias"/> for removing invalid leading characters.
+    /// </summary>
     [Test]
     public void CleanStringLeadingChars()
     {
@@ -126,6 +147,11 @@ public class DefaultShortStringHelperTestsWithoutSetup
         Assert.AreEqual("child2", helper.CleanStringForSafeAlias("1child2"));
     }
 
+    /// <summary>
+    /// Tests the CleanString method behavior when breaking terms on uppercase letters.
+    /// It verifies that the method correctly inserts separators when BreakTermsOnUpper is true,
+    /// and does not insert separators when BreakTermsOnUpper is false.
+    /// </summary>
     [Test]
     public void CleanStringTermOnUpper()
     {
@@ -154,6 +180,10 @@ public class DefaultShortStringHelperTestsWithoutSetup
         Assert.AreEqual("fooBar", helper.CleanString("fooBar", CleanStringType.Alias));
     }
 
+    /// <summary>
+    /// Tests the behavior of CleanString when handling acronyms with non-uppercase letters.
+    /// Verifies the effect of the CutAcronymOnNonUpper setting on string cleaning.
+    /// </summary>
     [Test]
     public void CleanStringAcronymOnNonUpper()
     {
@@ -188,6 +218,10 @@ public class DefaultShortStringHelperTestsWithoutSetup
         Assert.AreEqual("foo*Bnil", helper.CleanString("foo Bnil", CleanStringType.Alias));
     }
 
+    /// <summary>
+    /// Tests the CleanString method of DefaultShortStringHelper with greedy acronyms enabled and disabled.
+    /// Verifies that acronyms are cut correctly based on the GreedyAcronyms setting.
+    /// </summary>
     [Test]
     public void CleanStringGreedyAcronyms()
     {
@@ -224,6 +258,10 @@ public class DefaultShortStringHelperTestsWithoutSetup
         Assert.AreEqual("foo*Bnil", helper.CleanString("foo Bnil", CleanStringType.Alias));
     }
 
+    /// <summary>
+    /// Tests that the CleanString method correctly trims and replaces whitespace characters
+    /// according to the specified configuration and separator.
+    /// </summary>
     [Test]
     public void CleanStringWhiteSpace()
     {
@@ -240,6 +278,10 @@ public class DefaultShortStringHelperTestsWithoutSetup
         Assert.AreEqual("foo*bar", helper.CleanString("   foo   bar   ", CleanStringType.Alias));
     }
 
+    /// <summary>
+    /// Verifies that the <see cref="DefaultShortStringHelper"/> correctly cleans strings by replacing spaces with different separator characters, including '*', ' ', no separator, and a Unicode character.
+    /// Ensures that the separator configuration is respected when cleaning strings of type <see cref="CleanStringType.Alias"/>.
+    /// </summary>
     [Test]
     public void CleanStringSeparator()
     {
@@ -287,6 +329,11 @@ public class DefaultShortStringHelperTestsWithoutSetup
         Assert.AreEqual("foo文bar", helper.CleanString("foo bar", CleanStringType.Alias));
     }
 
+    /// <summary>
+    /// Tests that the <see cref="DefaultShortStringHelper.CleanString"/> method correctly replaces symbol characters in a string
+    /// according to the provided configuration, ensuring that symbols such as parentheses are removed and replaced with the configured separator.
+    /// Verifies that "house (2)" is cleaned to "house*2" when using an asterisk as the separator for alias cleaning.
+    /// </summary>
     [Test]
     public void CleanStringSymbols()
     {
@@ -305,6 +352,11 @@ public class DefaultShortStringHelperTestsWithoutSetup
         // TODO: and what about a URL?
     }
 
+    /// <summary>
+    /// Tests the handling of Unicode surrogate pairs and supplementary characters in strings,
+    /// ensuring correct identification and encoding of surrogate pairs and their representation
+    /// in UTF-8 byte arrays.
+    /// </summary>
     [Test]
     public void Utf8Surrogates()
     {
@@ -339,6 +391,9 @@ public class DefaultShortStringHelperTestsWithoutSetup
         Debug.Print("\U00010B70");
     }
 
+    /// <summary>
+    /// Tests that <see cref="Umbraco.Cms.Core.Strings.Utf8ToAsciiConverter.ToAsciiString"/> correctly converts a UTF-8 string containing non-ASCII characters to an ASCII-only string, replacing or omitting unsupported characters as expected.
+    /// </summary>
     [Test]
     public void Utf8ToAsciiConverter()
     {
@@ -347,6 +402,9 @@ public class DefaultShortStringHelperTestsWithoutSetup
         Assert.AreEqual("a?zooteo", output);
     }
 
+    /// <summary>
+    /// Tests the CleanString method of DefaultShortStringHelper with different encoding configurations.
+    /// </summary>
     [Test]
     public void CleanStringEncoding()
     {
@@ -375,6 +433,16 @@ public class DefaultShortStringHelperTestsWithoutSetup
         Assert.AreEqual("leger*ZORG", helper.CleanString("léger 中文测试 ZÔRG", CleanStringType.Alias));
     }
 
+    /// <summary>
+    /// Verifies that the <see cref="DefaultShortStringHelper"/> cleans strings correctly using its default configuration.
+    /// This test checks the output of <c>CleanStringForSafeAlias</c>, <c>CleanStringForSafeFileName</c>, and <c>CleanStringForUrlSegment</c>
+    /// methods for a sample input containing ASCII, Unicode, and special characters.
+    /// It asserts that:
+    /// <list type="bullet">
+    /// <item>The alias is converted to a valid, ASCII-only, camel-cased string.</item>
+    /// <item>The file name and URL segment are lower-cased, UTF-8, and use dash separators, removing illegal characters.</item>
+    /// </list>
+    /// </summary>
     [Test]
     public void CleanStringDefaultConfig()
     {
@@ -403,6 +471,11 @@ public class DefaultShortStringHelperTestsWithoutSetup
         Assert.AreEqual("0123-中文测试-中文测试-léger-zôrg-2-a-x", segment, "segment");
     }
 
+    /// <summary>
+    /// Tests the <c>CleanString</c> method of <see cref="DefaultShortStringHelper"/> with various casing options.
+    /// Verifies that acronyms and words are cased correctly according to Microsoft naming conventions for camel case and Pascal case.
+    /// Ensures that two-letter and multi-letter acronyms, as well as regular words, are handled as expected for each casing type.
+    /// </summary>
     [Test]
     public void CleanStringCasing()
     {

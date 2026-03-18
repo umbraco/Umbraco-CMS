@@ -29,6 +29,10 @@ public class BackOfficeApplicationManagerTests
     private IOptions<SecuritySettings> _securitySettings = null!;
     private Mock<ILogger<BackOfficeApplicationManager>> _mockLogger = null!;
 
+    /// <summary>
+    /// Sets up the test environment before each test.
+    /// Initializes mocks and default settings.
+    /// </summary>
     [SetUp]
     public void SetUp()
     {
@@ -47,10 +51,11 @@ public class BackOfficeApplicationManagerTests
         _mockRuntimeState.Setup(x => x.Level).Returns(RuntimeLevel.Run);
     }
 
-    /// <summary>
-    /// Tests that when no existing application exists (first server startup),
-    /// the method returns the new hosts without errors.
-    /// </summary>
+/// <summary>
+/// Tests that when no existing application exists (first server startup),
+/// the method returns the new hosts without errors.
+/// </summary>
+/// <returns>A task representing the asynchronous operation.</returns>
     [Test]
     public async Task EnsureBackOfficeApplicationAsync_NoExistingApplication_ReturnsNewHosts()
     {
@@ -83,10 +88,11 @@ public class BackOfficeApplicationManagerTests
             "Should create exactly one application (back-office) in Production environment");
     }
 
-    /// <summary>
-    /// Tests that when existing redirect URIs contain invalid/malformed URIs,
-    /// those invalid URIs are skipped gracefully without throwing exceptions.
-    /// </summary>
+/// <summary>
+/// Tests that when existing redirect URIs contain invalid or malformed URIs,
+/// those invalid URIs are skipped gracefully without throwing exceptions.
+/// </summary>
+/// <returns>A <see cref="Task"/> representing the asynchronous test operation.</returns>
     [Test]
     public async Task EnsureBackOfficeApplicationAsync_InvalidUriInExisting_SkipsInvalidUri()
     {
@@ -100,8 +106,7 @@ public class BackOfficeApplicationManagerTests
         var existingRedirectUris = ImmutableArray.Create(
             "https://server1.local/umbraco/oauth_complete", // Valid
             "relative/path", // Invalid: not absolute
-            "https://server2.local/umbraco/oauth_complete"  // Valid
-        );
+            "https://server2.local/umbraco/oauth_complete");  // Valid
 
         _mockApplicationManager
             .Setup(x => x.GetRedirectUrisAsync(mockApplication, It.IsAny<CancellationToken>()))
@@ -120,10 +125,11 @@ public class BackOfficeApplicationManagerTests
             Times.Once);
     }
 
-    /// <summary>
-    /// Tests that when new hosts contain invalid URIs,
-    /// those invalid URIs are skipped without throwing exceptions.
-    /// </summary>
+/// <summary>
+/// Tests that when new hosts contain invalid URIs,
+/// those invalid URIs are skipped without throwing exceptions.
+/// </summary>
+/// <returns>A task representing the asynchronous operation.</returns>
     [Test]
     public async Task EnsureBackOfficeApplicationAsync_InvalidUriInNew_SkipsInvalidUri()
     {
@@ -133,9 +139,7 @@ public class BackOfficeApplicationManagerTests
             .Setup(x => x.FindByClientIdAsync(Constants.OAuthClientIds.BackOffice, It.IsAny<CancellationToken>()))
             .ReturnsAsync(mockApplication);
 
-        var existingRedirectUris = ImmutableArray.Create(
-            "https://server1.local/umbraco/oauth_complete"
-        );
+        var existingRedirectUris = ImmutableArray.Create("https://server1.local/umbraco/oauth_complete");
 
         _mockApplicationManager
             .Setup(x => x.GetRedirectUrisAsync(mockApplication, It.IsAny<CancellationToken>()))
@@ -152,10 +156,11 @@ public class BackOfficeApplicationManagerTests
             await sut.EnsureBackOfficeApplicationAsync(invalidHosts));
     }
 
-    /// <summary>
-    /// Tests that when existing redirect URIs contain a mix of valid and invalid entries,
-    /// only the valid entries are processed and merged with new hosts.
-    /// </summary>
+/// <summary>
+/// Tests that when existing redirect URIs contain a mix of valid and invalid entries,
+/// only the valid entries are processed and merged with new hosts.
+/// </summary>
+/// <returns>A <see cref="Task"/> representing the asynchronous test operation.</returns>
     [Test]
     public async Task EnsureBackOfficeApplicationAsync_MixOfValidAndInvalid_OnlyProcessesValid()
     {
@@ -168,8 +173,7 @@ public class BackOfficeApplicationManagerTests
         var existingRedirectUris = ImmutableArray.Create(
             "https://valid1.local/umbraco/oauth_complete",
             "relative", // Invalid: not absolute
-            "https://valid2.local/umbraco/oauth_complete"
-        );
+            "https://valid2.local/umbraco/oauth_complete");
 
         _mockApplicationManager
             .Setup(x => x.GetRedirectUrisAsync(mockApplication, It.IsAny<CancellationToken>()))
@@ -191,7 +195,9 @@ public class BackOfficeApplicationManagerTests
 
         // Assert
         Assert.That(capturedDescriptor, Is.Not.Null, "Descriptor should be captured");
-        Assert.That(capturedDescriptor!.RedirectUris.Count, Is.EqualTo(3),
+        Assert.That(
+            capturedDescriptor!.RedirectUris.Count,
+            Is.EqualTo(3),
             "Should have 3 redirect URIs (2 existing valid + 1 new)");
 
         var redirectUriStrings = capturedDescriptor.RedirectUris.Select(u => u.ToString()).ToList();
@@ -200,9 +206,10 @@ public class BackOfficeApplicationManagerTests
         Assert.That(redirectUriStrings, Does.Contain("https://new.local/umbraco/oauth_complete"));
     }
 
-    /// <summary>
-    /// Tests that duplicate hosts (case-insensitive) are not added multiple times.
-    /// </summary>
+/// <summary>
+/// Tests that duplicate hosts (case-insensitive) are not added multiple times.
+/// </summary>
+/// <returns>A task representing the asynchronous operation.</returns>
     [Test]
     public async Task EnsureBackOfficeApplicationAsync_DuplicateHosts_DeduplicatesCaseInsensitive()
     {
@@ -212,9 +219,7 @@ public class BackOfficeApplicationManagerTests
             .Setup(x => x.FindByClientIdAsync(Constants.OAuthClientIds.BackOffice, It.IsAny<CancellationToken>()))
             .ReturnsAsync(mockApplication);
 
-        var existingRedirectUris = ImmutableArray.Create(
-            "https://SERVER1.LOCAL/umbraco/oauth_complete" // Uppercase
-        );
+        var existingRedirectUris = ImmutableArray.Create("https://SERVER1.LOCAL/umbraco/oauth_complete"); // Uppercase
 
         _mockApplicationManager
             .Setup(x => x.GetRedirectUrisAsync(mockApplication, It.IsAny<CancellationToken>()))
@@ -236,14 +241,17 @@ public class BackOfficeApplicationManagerTests
 
         // Assert
         Assert.That(capturedDescriptor, Is.Not.Null);
-        Assert.That(capturedDescriptor!.RedirectUris.Count, Is.EqualTo(1),
+        Assert.That(
+            capturedDescriptor!.RedirectUris.Count,
+            Is.EqualTo(1),
             "Should have only 1 redirect URI (deduplicated by authority)");
     }
 
-    /// <summary>
-    /// Tests that when existing redirect URIs contain different paths for the same host,
-    /// they are correctly merged by authority (not by full URI).
-    /// </summary>
+/// <summary>
+/// Tests that when existing redirect URIs contain different paths for the same host,
+/// they are correctly merged by authority (not by full URI).
+/// </summary>
+/// <returns>A task representing the asynchronous operation.</returns>
     [Test]
     public async Task EnsureBackOfficeApplicationAsync_SameHostDifferentPaths_MergesByAuthority()
     {
@@ -255,8 +263,7 @@ public class BackOfficeApplicationManagerTests
 
         var existingRedirectUris = ImmutableArray.Create(
             "https://server1.local/some/old/path",
-            "https://server1.local/another/old/path"
-        );
+            "https://server1.local/another/old/path");
 
         _mockApplicationManager
             .Setup(x => x.GetRedirectUrisAsync(mockApplication, It.IsAny<CancellationToken>()))
@@ -283,13 +290,16 @@ public class BackOfficeApplicationManagerTests
 
         // Assert - should deduplicate by authority
         Assert.That(capturedDescriptor, Is.Not.Null);
-        Assert.That(capturedDescriptor!.RedirectUris.Count, Is.EqualTo(1),
+        Assert.That(
+            capturedDescriptor!.RedirectUris.Count,
+            Is.EqualTo(1),
             "Should have only 1 redirect URI (deduplicated by authority, not full path)");
     }
 
-    /// <summary>
-    /// Tests that the method returns early when RuntimeLevel is below Upgrade.
-    /// </summary>
+/// <summary>
+/// Tests that the method returns early when RuntimeLevel is below Upgrade.
+/// </summary>
+/// <returns>A task representing the asynchronous operation.</returns>
     [Test]
     public async Task EnsureBackOfficeApplicationAsync_RuntimeLevelBelowUpgrade_ReturnsEarly()
     {

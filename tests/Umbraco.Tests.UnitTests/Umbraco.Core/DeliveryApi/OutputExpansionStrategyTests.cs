@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
 using Moq;
 using NUnit.Framework;
@@ -16,6 +16,9 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.DeliveryApi;
 [TestFixture]
 public class OutputExpansionStrategyTests : OutputExpansionStrategyTestBase
 {
+    /// <summary>
+    /// Tests that the OutputExpansionStrategy can correctly expand a specified element and its nested content.
+    /// </summary>
     [Test]
     public void OutputExpansionStrategy_CanExpandSpecifiedElement()
     {
@@ -59,6 +62,10 @@ public class OutputExpansionStrategyTests : OutputExpansionStrategyTestBase
         Assert.AreEqual(0, contentPickerOutput.Properties.Count);
     }
 
+    /// <summary>
+    /// Verifies that the <see cref="OutputExpansionStrategy"/> correctly expands all element properties and their nested content,
+    /// ensuring that all expected properties and values are present in the output structure.
+    /// </summary>
     [Test]
     public void OutputExpansionStrategy_CanExpandAllElements()
     {
@@ -116,6 +123,9 @@ public class OutputExpansionStrategyTests : OutputExpansionStrategyTestBase
         }
     }
 
+    /// <summary>
+    /// Tests that the output expansion strategy does not expand nested content pickers within an element.
+    /// </summary>
     [Test]
     public void OutputExpansionStrategy_DoesNotExpandElementNestedContentPicker()
     {

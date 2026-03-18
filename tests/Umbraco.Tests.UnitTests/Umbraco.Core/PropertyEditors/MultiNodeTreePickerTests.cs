@@ -16,9 +16,15 @@ using Umbraco.Cms.Infrastructure.Serialization;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 
+/// <summary>
+/// Contains unit tests for verifying the functionality of the <see cref="MultiNodeTreePicker"/> property editor in Umbraco.
+/// </summary>
 [TestFixture]
 public class MultiNodeTreePickerTests
 {
+    /// <summary>
+    /// Tests that the MultiNodeTreePicker can handle invalid values from the editor gracefully.
+    /// </summary>
     [Test]
     public void Can_Handle_Invalid_Values_From_Editor()
     {
@@ -46,6 +52,9 @@ public class MultiNodeTreePickerTests
         }
     }
 
+    /// <summary>
+    /// Tests that the MultiNodeTreePicker editor can handle invalid values correctly by returning null.
+    /// </summary>
     [Test]
     public void Can_Handle_Invalid_Values_To_Editor()
     {
@@ -69,6 +78,9 @@ public class MultiNodeTreePickerTests
         }
     }
 
+    /// <summary>
+    /// Tests that a single value can be parsed correctly from the editor JSON input.
+    /// </summary>
     [Test]
     public void Can_Parse_Single_Value_From_Editor()
     {
@@ -79,6 +91,9 @@ public class MultiNodeTreePickerTests
         Assert.AreEqual(value.ToString(), fromEditor);
     }
 
+    /// <summary>
+    /// Tests that multiple values can be correctly parsed from the editor JSON format.
+    /// </summary>
     [Test]
     public void Can_Parse_Multi_Value_From_Editor()
     {
@@ -96,6 +111,9 @@ public class MultiNodeTreePickerTests
         Assert.AreEqual(string.Join(",", values.Select(v => v.ToString())), fromEditor);
     }
 
+    /// <summary>
+    /// Tests that the MultiNodeTreePicker can correctly parse different entity types from the editor JSON input.
+    /// </summary>
     [Test]
     public void Can_Parse_Different_Entity_Types_From_Editor()
     {
@@ -113,6 +131,9 @@ public class MultiNodeTreePickerTests
         Assert.AreEqual(string.Join(",", expectedValues.Select(v => v.ToString())), fromEditor);
     }
 
+    /// <summary>
+    /// Tests that the FromEditor method throws a JsonException when given invalid JSON input.
+    /// </summary>
     [Test]
     public void From_Editor_Throws_Error_On_Invalid_Json()
     {
@@ -129,6 +150,9 @@ public class MultiNodeTreePickerTests
             FromEditor(JsonNode.Parse(editorValue), jsonSerializer: new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory())));
     }
 
+    /// <summary>
+    /// Tests that a single value can be parsed correctly to the editor format.
+    /// </summary>
     [Test]
     public void Can_Parse_Single_Value_To_Editor()
     {
@@ -145,6 +169,9 @@ public class MultiNodeTreePickerTests
 
     }
 
+    /// <summary>
+    /// Tests that a multi-value string of Udi values can be parsed correctly to the editor format.
+    /// </summary>
     [Test]
     public void Can_Parse_Multi_Value_To_Editor()
     {
@@ -169,6 +196,9 @@ public class MultiNodeTreePickerTests
         });
     }
 
+    /// <summary>
+    /// Tests that the MultiNodeTreePicker can parse different entity types (Document, Media, Member) correctly to the editor format.
+    /// </summary>
     [Test]
     public void Can_Parse_Different_Entity_Types_To_Editor()
     {
@@ -193,6 +223,9 @@ public class MultiNodeTreePickerTests
 
     }
 
+    /// <summary>
+    /// Tests that invalid values are skipped when converting to editor format.
+    /// </summary>
     [Test]
     public void Can_Skip_Invalid_Values_To_Editor()
     {
@@ -216,6 +249,9 @@ public class MultiNodeTreePickerTests
         });
     }
 
+    /// <summary>
+    /// Tests that passing null to the FromEditor method returns null.
+    /// </summary>
     [Test]
     public void Null_From_Editor_Yields_Null()
     {
@@ -223,6 +259,9 @@ public class MultiNodeTreePickerTests
         Assert.IsNull(result);
     }
 
+    /// <summary>
+    /// Tests that passing null to the ToEditor method returns null.
+    /// </summary>
     [Test]
     public void Null_To_Editor_Yields_Null()
     {

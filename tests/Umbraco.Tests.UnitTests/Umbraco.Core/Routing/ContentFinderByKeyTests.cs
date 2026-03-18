@@ -12,9 +12,23 @@ using Umbraco.Cms.Tests.UnitTests.AutoFixture;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Routing;
 
+/// <summary>
+/// Contains unit tests for the <see cref="ContentFinderByKey"/> class, verifying its behavior and functionality.
+/// </summary>
 [TestFixture]
 public class ContentFinderByKeyTests
 {
+    /// <summary>
+    /// Unit test for verifying that content can be correctly looked up by its key using the ContentFinderByKeyPath.
+    /// </summary>
+    /// <param name="urlAsString">The URL string representing the request path to test.</param>
+    /// <param name="nodeKeyString">The string representation of the node's GUID key to look up.</param>
+    /// <param name="shouldSucceed">True if the lookup is expected to succeed; otherwise, false.</param>
+    /// <param name="publishedContent">The mocked published content instance to return for the lookup.</param>
+    /// <param name="umbracoContextAccessor">The mocked Umbraco context accessor used to provide the context.</param>
+    /// <param name="umbracoContext">The mocked Umbraco context containing the content cache.</param>
+    /// <param name="fileService">The mocked file service used by the request builder.</param>
+    /// <returns>A task that represents the asynchronous test operation.</returns>
     [Test]
     [InlineAutoMoqData("/1598901d-ebbe-4996-b7fb-6a6cbac13a62", "1598901d-ebbe-4996-b7fb-6a6cbac13a62", true)]
     [InlineAutoMoqData("/1598901d-ebbe-4996-b7fb-6a6cbac13a62", "9E966427-25AB-4909-B403-DED1F421D1A7", false)]

@@ -14,6 +14,9 @@ using Umbraco.Cms.Tests.Common;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.BackgroundJobs.Jobs.ServerRegistration;
 
+/// <summary>
+/// Contains unit tests for the <see cref="TouchServerJob"/> class to verify its behavior and functionality.
+/// </summary>
 [TestFixture]
 public class TouchServerJobTests
 {
@@ -23,6 +26,10 @@ public class TouchServerJobTests
     private readonly TimeSpan _staleServerTimeout = TimeSpan.FromMinutes(2);
 
 
+    /// <summary>
+    /// Tests that the job does not execute when the application URL is not available.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task Does_Not_Execute_When_Application_Url_Is_Not_Available()
     {
@@ -31,6 +38,10 @@ public class TouchServerJobTests
         VerifyServerNotTouched();
     }
 
+    /// <summary>
+    /// Tests that the TouchServerJob executes and successfully touches the server.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task Executes_And_Touches_Server()
     {
@@ -39,6 +50,10 @@ public class TouchServerJobTests
         VerifyServerTouched();
     }
 
+    /// <summary>
+    /// Tests that the job does not execute when the role accessor is not elected.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task Does_Not_Execute_When_Role_Accessor_Is_Not_Elected()
     {

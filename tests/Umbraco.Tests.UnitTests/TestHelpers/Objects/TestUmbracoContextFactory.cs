@@ -20,6 +20,16 @@ namespace Umbraco.Cms.Tests.UnitTests.TestHelpers.Objects;
 /// </summary>
 public class TestUmbracoContextFactory
 {
+    /// <summary>
+    /// Creates a test instance of <see cref="IUmbracoContextFactory"/> with optional dependencies.
+    /// If any parameter is not provided, a suitable mock or default implementation is used.
+    /// This is intended for use in unit tests where a fully configured Umbraco context is required.
+    /// </summary>
+    /// <param name="umbracoContextAccessor">An optional accessor for the Umbraco context. If null, a test accessor is used.</param>
+    /// <param name="httpContextAccessor">An optional accessor for the HTTP context. If null, a mock is used.</param>
+    /// <param name="publishedUrlProvider">An optional provider for published URLs. If null, a mock is used.</param>
+    /// <param name="umbracoRequestPathsOptions">Optional options for Umbraco request paths. If null, default options are used.</param>
+    /// <returns>A configured <see cref="IUmbracoContextFactory"/> instance suitable for testing.</returns>
     public static IUmbracoContextFactory Create(
         IUmbracoContextAccessor umbracoContextAccessor = null,
         IHttpContextAccessor httpContextAccessor = null,

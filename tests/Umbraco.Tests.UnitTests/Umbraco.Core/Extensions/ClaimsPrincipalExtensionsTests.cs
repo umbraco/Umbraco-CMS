@@ -9,9 +9,16 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Extensions;
 
+/// <summary>
+/// Unit tests for the ClaimsPrincipalExtensions class.
+/// </summary>
 [TestFixture]
 public class ClaimsPrincipalExtensionsTests
 {
+    /// <summary>
+    /// Verifies that the <see cref="ClaimsPrincipalExtensions.GetRemainingAuthSeconds"/> extension method correctly calculates
+    /// the number of seconds remaining until the authentication ticket expires, based on the claims present in the principal.
+    /// </summary>
     [Test]
     public void Get_Remaining_Ticket_Seconds()
     {
@@ -50,6 +57,10 @@ public class ClaimsPrincipalExtensionsTests
         Assert.AreEqual(remainingSeconds, ticketRemainingSeconds);
     }
 
+    /// <summary>
+    /// Verifies that AddOrUpdateClaim does not add duplicate claims of the same type to the ClaimsIdentity.
+    /// Ensures only one claim of a given type exists after multiple additions or updates.
+    /// </summary>
     [Test]
     public void AddOrUpdateClaim__Should_ensure_a_claim_is_not_added_twice()
     {

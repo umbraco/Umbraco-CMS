@@ -10,14 +10,23 @@ using Umbraco.Cms.Tests.Common.Builders.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models;
 
+/// <summary>
+/// Contains unit tests for the <see cref="MemberGroup"/> model in the Umbraco CMS core models.
+/// </summary>
 [TestFixture]
 public class MemberGroupTests
 {
+    /// <summary>
+    /// Sets up the test environment before each test is run.
+    /// </summary>
     [SetUp]
     public void SetUp() => _builder = new MemberGroupBuilder();
 
     private MemberGroupBuilder _builder;
 
+    /// <summary>
+    /// Tests that a MemberGroup can be deep cloned correctly.
+    /// </summary>
     [Test]
     public void Can_Deep_Clone()
     {
@@ -45,6 +54,9 @@ public class MemberGroupTests
         }
     }
 
+    /// <summary>
+    /// Tests that a MemberGroup object can be serialized to JSON without throwing an error.
+    /// </summary>
     [Test]
     public void Can_Serialize_Without_Error()
     {

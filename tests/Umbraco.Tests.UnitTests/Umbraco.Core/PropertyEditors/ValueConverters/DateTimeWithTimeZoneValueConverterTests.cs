@@ -10,6 +10,9 @@ using Umbraco.Cms.Infrastructure.Serialization;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors.ValueConverters;
 
+/// <summary>
+/// Contains unit tests for the <see cref="DateTimeWithTimeZoneValueConverter"/> class, verifying its behavior and correctness.
+/// </summary>
 [TestFixture]
 public class DateTimeWithTimeZoneValueConverterTests
 {
@@ -22,6 +25,11 @@ public class DateTimeWithTimeZoneValueConverterTests
         TimeZone = "Europe/Copenhagen",
     };
 
+    /// <summary>
+    /// Tests whether the DateTimeWithTimeZoneValueConverter correctly identifies if it can convert a given property editor alias.
+    /// </summary>
+    /// <param name="propertyEditorAlias">The alias of the property editor to test.</param>
+    /// <param name="expected">The expected result indicating if the converter should handle the given alias.</param>
     [TestCase(Constants.PropertyEditors.Aliases.DateTimeWithTimeZone, true)]
     [TestCase(Constants.PropertyEditors.Aliases.DateTimeUnspecified, false)]
     [TestCase(Constants.PropertyEditors.Aliases.DateOnly, false)]
@@ -37,6 +45,11 @@ public class DateTimeWithTimeZoneValueConverterTests
         Assert.AreEqual(expected, result);
     }
 
+    /// <summary>
+    /// Verifies that <see cref="DateTimeWithTimeZoneValueConverter.GetPropertyValueType"/> returns nullable <see cref="DateTimeOffset"/> as the property value type
+    /// for the specified <paramref name="timeZoneMode"/> in the data type configuration.
+    /// </summary>
+    /// <param name="timeZoneMode">The <see cref="DateTimeConfiguration.TimeZoneMode"/> to test.</param>
     [TestCase(DateTimeConfiguration.TimeZoneMode.All)]
     [TestCase(DateTimeConfiguration.TimeZoneMode.Custom)]
     [TestCase(DateTimeConfiguration.TimeZoneMode.Local)]
@@ -67,6 +80,11 @@ public class DateTimeWithTimeZoneValueConverterTests
         new object[] { """{"date":"2025-08-20T16:30:00.0000000-05:00","timeZone":"Europe/Copenhagen"}""", new DateTimeValueConverterBase.DateTimeDto { Date = new DateTimeOffset(2025, 08, 20, 16, 30, 0, TimeSpan.FromHours(-5)), TimeZone = "Europe/Copenhagen" } },
     ];
 
+    /// <summary>
+    /// Verifies that the <see cref="DateTimeWithTimeZoneValueConverter"/> correctly converts a string input to an intermediate <see cref="DateTimeValueConverterBase.DateTimeDto"/> value.
+    /// </summary>
+    /// <param name="input">The input string representing a date and time, which may be <c>null</c>.</param>
+    /// <param name="expected">The expected <see cref="DateTimeValueConverterBase.DateTimeDto"/> result, or <c>null</c> if the conversion should yield <c>null</c>.</param>
     [TestCaseSource(nameof(_convertToIntermediateCases))]
     public void Can_Convert_To_Intermediate_Value(string? input, object? expected)
     {
@@ -93,6 +111,12 @@ public class DateTimeWithTimeZoneValueConverterTests
         new object[] { _convertToObjectInputDate, DateTimeConfiguration.TimeZoneMode.Custom, _convertToObjectInputDate.Date },
     ];
 
+    /// <summary>
+    /// Unit test that verifies conversion of an input value to an object using the specified time zone mode.
+    /// </summary>
+    /// <param name="input">The value to be converted.</param>
+    /// <param name="timeZoneMode">The time zone mode applied during conversion.</param>
+    /// <param name="expected">The expected result after conversion, used for assertion.</param>
     [TestCaseSource(nameof(_dateTimeWithTimeZoneConvertToObjectCases))]
     public void Can_Convert_To_Object(
         object? input,

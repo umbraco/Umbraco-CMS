@@ -8,12 +8,21 @@ using Umbraco.Cms.Core.Deploy;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.CoreThings;
 
+/// <summary>
+/// Contains unit tests for the <see cref="Udi"/> class and its related functionality within the Umbraco Core.
+/// </summary>
 [TestFixture]
 public class UdiTests
 {
+    /// <summary>
+    /// Resets the UdiParser types before each test.
+    /// </summary>
     [SetUp]
     public void SetUp() => UdiParser.ResetUdiTypes();
 
+    /// <summary>
+    /// Tests the constructor of StringUdi to ensure it initializes properties correctly.
+    /// </summary>
     [Test]
     public void StringUdiCtorTest()
     {
@@ -23,6 +32,9 @@ public class UdiTests
         Assert.AreEqual("umb://" + Constants.UdiEntityType.AnyString + "/test-id", udi.ToString());
     }
 
+    /// <summary>
+    /// Tests parsing of string UDIs to ensure correct entity type and ID extraction.
+    /// </summary>
     [Test]
     public void StringUdiParseTest()
     {
@@ -38,6 +50,11 @@ public class UdiTests
         Assert.IsInstanceOf<StringUdi>(udi);
     }
 
+    /// <summary>
+    /// Verifies the encoding and decoding behavior of UDI strings, including correct handling of escaped characters,
+    /// round-trip conversion between encoded and unencoded forms, and legacy URI escaping methods. Ensures that UDI parsing
+    /// and string representations behave as expected for various input cases.
+    /// </summary>
     [Test]
     public void StringEncodingTest()
     {
@@ -68,6 +85,11 @@ public class UdiTests
         Assert.AreEqual("umb://" + Constants.UdiEntityType.AnyString + "/path%20to/this%20is%20a%20test.xyz", udi3.ToString());
     }
 
+    /// <summary>
+    /// Verifies the correct encoding and decoding of reserved and unreserved characters in UDI path strings,
+    /// ensuring proper URI escaping and the preservation of slashes in UDI paths.
+    /// Also tests legacy and current URI escaping behaviors and the round-trip integrity of UDI string representations.
+    /// </summary>
     [Test]
     public void StringEncodingTest2()
     {
@@ -91,6 +113,9 @@ public class UdiTests
         Assert.AreEqual("path/to/View[1].cshtml", ((StringUdi)udi2).Id);
     }
 
+    /// <summary>
+    /// Tests the constructor of the GuidUdi class to ensure it correctly sets properties and formats the string representation.
+    /// </summary>
     [Test]
     public void GuidUdiCtorTest()
     {
@@ -101,6 +126,9 @@ public class UdiTests
         Assert.AreEqual("umb://" + Constants.UdiEntityType.AnyGuid + "/" + guid.ToString("N"), udi.ToString());
     }
 
+    /// <summary>
+    /// Tests parsing of a GUID-based UDI string to ensure correct entity type and GUID extraction.
+    /// </summary>
     [Test]
     public void GuidUdiParseTest()
     {
@@ -115,6 +143,10 @@ public class UdiTests
         Assert.AreEqual(s, udi.ToString());
     }
 
+    /// <summary>
+    /// Verifies the equality and inequality operations for <see cref="GuidUdi"/> and <see cref="StringUdi"/> instances,
+    /// including comparisons of type and value, and cross-type equality behavior.
+    /// </summary>
     [Test]
     public void EqualityTest()
     {
@@ -136,6 +168,9 @@ public class UdiTests
         Assert.IsFalse(new GuidUdi("type", guid1) == new StringUdi("type", guid1.ToString("N")));
     }
 
+    /// <summary>
+    /// Tests that distinct Udi instances are correctly identified as unique.
+    /// </summary>
     [Test]
     public void DistinctTest()
     {
@@ -149,6 +184,9 @@ public class UdiTests
         Assert.AreEqual(1, entities.Distinct().Count());
     }
 
+    /// <summary>
+    /// Tests the creation of a Udi with a specific entity type and GUID.
+    /// </summary>
     [Test]
     public void CreateTest()
     {
@@ -161,6 +199,10 @@ public class UdiTests
         // because we don't throw anymore - see U4-10409
     }
 
+    /// <summary>
+    /// Tests the behavior of root UDIs for both string and GUID types.
+    /// Verifies that root UDIs are correctly identified and their string representations are as expected.
+    /// </summary>
     [Test]
     public void RootUdiTest()
     {
@@ -185,6 +227,9 @@ public class UdiTests
         Assert.IsInstanceOf<GuidUdi>(udi);
     }
 
+    /// <summary>
+    /// Tests parsing of Udi strings and creation of UdiRange instances, including validation of invalid ranges.
+    /// </summary>
     [Test]
     public void RangeTest()
     {
@@ -205,6 +250,10 @@ public class UdiTests
         Assert.Throws<ArgumentException>(() => new UdiRange(guidUdi, "x"));
     }
 
+    /// <summary>
+    /// Tests parsing of a UdiRange from its string representation using the specified selector.
+    /// </summary>
+    /// <param name="selector">The selector string used to create and parse the UdiRange.</param>
     [Test]
     [TestCase(Constants.DeploySelector.This)]
     [TestCase(Constants.DeploySelector.ThisAndChildren)]
@@ -220,6 +269,10 @@ public class UdiTests
         Assert.AreEqual(expected, actual);
     }
 
+    /// <summary>
+    /// Tests the TryParse method of the UdiParser to ensure it correctly parses valid Udi strings and
+    /// returns expected results for both Udi and GuidUdi types, including handling invalid inputs.
+    /// </summary>
     [Test]
     public void TryParseTest()
     {
@@ -243,6 +296,11 @@ public class UdiTests
     }
 
 
+    /// <summary>
+    /// Validates that all UDI entity types declared in Constants.UdiEntityType
+    /// are known and declared by UdiParser.GetKnownUdiTypes, and that there are
+    /// no unknown types declared by GetKnownUdiTypes.
+    /// </summary>
     [Test]
     public void ValidateUdiEntityType()
     {
@@ -276,6 +334,9 @@ public class UdiTests
             string.Join(",", types.Keys.Select(x => "\"" + x + "\"")));
     }
 
+    /// <summary>
+    /// Tests the behavior of known UDI types parsing and handling.
+    /// </summary>
     [Test]
     public void KnownTypes()
     {

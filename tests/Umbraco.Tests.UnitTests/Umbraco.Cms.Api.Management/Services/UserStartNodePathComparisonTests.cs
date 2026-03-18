@@ -10,14 +10,17 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Management.Services;
 [TestFixture]
 public class UserStartNodePathComparisonTests
 {
-    /// <summary>
-    /// Tests the IsDescendantOrSelf path comparison logic with trailing commas.
-    /// This prevents false matches when one ID is a numeric prefix of another.
-    ///
-    /// The fix: Add trailing commas to both paths before comparison:
-    /// - Without fix: "-1,100".StartsWith("-1,10") = true ❌ (incorrect match)
-    /// - With fix: "-1,100,".StartsWith("-1,10,") = false ✅ (correct)
-    /// </summary>
+/// <summary>
+/// Tests the <c>IsDescendantOrSelf</c> path comparison logic using trailing commas to prevent false matches when one ID is a numeric prefix of another.
+/// <para>
+/// The fix: Add trailing commas to both paths before comparison:
+/// - Without fix: "-1,100".StartsWith("-1,10") = true (incorrect match)
+/// - With fix: "-1,100,".StartsWith("-1,10,") = false (correct)
+/// </para>
+/// </summary>
+/// <param name="childPath">The path of the potential descendant node, as a comma-separated string of IDs.</param>
+/// <param name="startNodePath">The path of the start node, as a comma-separated string of IDs.</param>
+/// <returns><c>true</c> if <paramref name="childPath"/> is the same as or a descendant of <paramref name="startNodePath"/>; otherwise, <c>false</c>.</returns>
     [Test]
     [TestCase(
         "-1,100",

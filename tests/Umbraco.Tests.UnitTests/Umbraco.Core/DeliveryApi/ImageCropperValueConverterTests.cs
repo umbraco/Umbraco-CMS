@@ -10,9 +10,16 @@ using Umbraco.Cms.Infrastructure.Serialization;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.DeliveryApi;
 
+/// <summary>
+/// Contains unit tests for the <see cref="ImageCropperValueConverter"/> class, verifying its behavior and functionality.
+/// </summary>
 [TestFixture]
 public class ImageCropperValueConverterTests : PropertyValueConverterTests
 {
+    /// <summary>
+    /// Verifies that <see cref="ImageCropperValueConverter"/> correctly converts a serialized image cropper value
+    /// into an <see cref="ApiImageCropperValue"/> instance, including all expected properties such as URL, focal point, crops, and coordinates.
+    /// </summary>
     [Test]
     public void ImageCropperValueConverter_ConvertsValueToImageCropperValue()
     {

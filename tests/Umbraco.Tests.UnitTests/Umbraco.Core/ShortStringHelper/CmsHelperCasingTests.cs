@@ -1,4 +1,4 @@
-// Copyright (c) Umbraco.
+﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using Microsoft.Extensions.Options;
@@ -9,12 +9,20 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.ShortStringHelper;
 
+/// <summary>
+/// Provides unit tests to verify the casing behavior of methods in the <see cref="CmsHelper"/> class.
+/// </summary>
 [TestFixture]
 public class CmsHelperCasingTests
 {
     private IShortStringHelper ShortStringHelper =>
         new DefaultShortStringHelper(Options.Create(new RequestHandlerSettings()));
 
+    /// <summary>
+    /// Tests that the SpaceCamelCasing extension method correctly converts camel case strings into space-separated, capitalized words.
+    /// </summary>
+    /// <param name="input">The camel case input string to convert.</param>
+    /// <param name="expected">The expected output string with spaces and capitalization.</param>
     [TestCase("thisIsTheEnd", "This Is The End")]
     [TestCase("th", "Th")]
     [TestCase("t", "t")]

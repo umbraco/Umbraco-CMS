@@ -15,11 +15,18 @@ using Umbraco.Cms.Core.Strings;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Services;
 
+/// <summary>
+/// Contains unit tests for the DocumentUrlService in Umbraco CMS.
+/// </summary>
 [TestFixture]
 public class DocumentUrlServiceTests
 {
     #region ConvertToCacheModel Tests
 
+    /// <summary>
+    /// Tests that ConvertToCacheModel correctly converts a single document with a single URL segment
+    /// into the expected cache model representation.
+    /// </summary>
     [Test]
     public void ConvertToCacheModel_Converts_Single_Document_With_Single_Segment_To_Expected_Cache_Model()
     {
@@ -45,6 +52,10 @@ public class DocumentUrlServiceTests
         Assert.IsNull(cacheModels[0].Cache.AlternateSegments);
     }
 
+    /// <summary>
+    /// Tests that ConvertToCacheModel correctly converts multiple documents each with a single URL segment
+    /// into the expected cache model representation.
+    /// </summary>
     [Test]
     public void ConvertToCacheModel_Converts_Multiple_Documents_With_Single_Segment_To_Expected_Cache_Model()
     {
@@ -84,6 +95,10 @@ public class DocumentUrlServiceTests
         Assert.IsNull(model2.Cache.AlternateSegments);
     }
 
+    /// <summary>
+    /// Tests that converting a single document with multiple URL segments
+    /// produces the expected cache model with primary and alternate segments.
+    /// </summary>
     [Test]
     public void ConvertToCacheModel_Converts_Single_Document_With_Multiple_Segments_To_Expected_Cache_Model()
     {
@@ -118,6 +133,10 @@ public class DocumentUrlServiceTests
         Assert.AreEqual("test-segment-2", cacheModels[0].Cache.AlternateSegments[0]);
     }
 
+    /// <summary>
+    /// Benchmarks the performance of the <c>ConvertToCacheModel</c> method, comparing execution times across different implementation versions.
+    /// This test ensures that the method maintains optimal performance and validates the number of cache models produced.
+    /// </summary>
     [Test]
     public void ConvertToCacheModel_Performance_Test()
     {
@@ -141,6 +160,9 @@ public class DocumentUrlServiceTests
         //  - Current implementation (17.1+, refactored for memory optimization, same performance as previous): ~75ms
     }
 
+    /// <summary>
+    /// Tests that ConvertToCacheModel correctly handles a null LanguageId for invariant content.
+    /// </summary>
     [Test]
     public void ConvertToCacheModel_Handles_Null_LanguageId_For_Invariant_Content()
     {
@@ -166,6 +188,11 @@ public class DocumentUrlServiceTests
         Assert.IsNull(cacheModels[0].Cache.AlternateSegments);
     }
 
+    /// <summary>
+    /// Tests that ConvertToCacheModel correctly handles a mix of invariant and variant content segments.
+    /// Ensures that invariant content has a null LanguageId and variant content has a specific LanguageId.
+    /// Also verifies that the primary URL segments are correctly assigned.
+    /// </summary>
     [Test]
     public void ConvertToCacheModel_Handles_Mixed_Invariant_And_Variant_Content()
     {
@@ -324,6 +351,10 @@ public class DocumentUrlServiceTests
         return providerMock.Object;
     }
 
+    /// <summary>
+    /// Tests that CreateOrUpdateUrlSegmentsAsync correctly stores URL segments per language for variant content.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task CreateOrUpdateUrlSegmentsAsync_VariantContent_Stores_PerLanguage()
     {
@@ -373,6 +404,11 @@ public class DocumentUrlServiceTests
         Assert.That(languageIds, Does.Contain(2), "Should have segments for fr-FR (language ID 2)");
     }
 
+    /// <summary>
+    /// Tests that when creating or updating URL segments for invariant content with identical segments,
+    /// the stored URL segments have a null language ID.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
     [Test]
     public async Task CreateOrUpdateUrlSegmentsAsync_InvariantContent_WithIdenticalSegments_Stores_NullLanguageId()
     {
@@ -412,6 +448,10 @@ public class DocumentUrlServiceTests
             "Invariant content with identical segments should have NULL LanguageId");
     }
 
+    /// <summary>
+    /// Tests that CreateOrUpdateUrlSegmentsAsync stores URL segments per language when content is invariant but different segments are provided for each language.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
     [Test]
     public async Task CreateOrUpdateUrlSegmentsAsync_InvariantContent_WithDifferentSegments_Stores_PerLanguage()
     {
@@ -461,6 +501,11 @@ public class DocumentUrlServiceTests
         Assert.That(languageIds, Does.Contain(2), "Should have segments for fr-FR (language ID 2)");
     }
 
+    /// <summary>
+    /// Tests that when creating or updating URL segments for invariant content with a single language,
+    /// the stored URL segments have a null language ID.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
     [Test]
     public async Task CreateOrUpdateUrlSegmentsAsync_InvariantContent_WithSingleLanguage_Stores_NullLanguageId()
     {
@@ -498,6 +543,11 @@ public class DocumentUrlServiceTests
             "Invariant content with single language should have NULL LanguageId");
     }
 
+    /// <summary>
+    /// Tests that when CreateOrUpdateUrlSegmentsAsync is called with an empty documents array,
+    /// the repository's Save method is not called.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
     [Test]
     public async Task CreateOrUpdateUrlSegmentsAsync_EmptyDocuments_DoesNotCallRepository()
     {
@@ -516,6 +566,11 @@ public class DocumentUrlServiceTests
         repositoryMock.Verify(x => x.Save(It.IsAny<IEnumerable<PublishedDocumentUrlSegment>>()), Times.Never);
     }
 
+    /// <summary>
+    /// Tests that when creating or updating URL segments for trashed invariant content,
+    /// no URL segments are stored in the repository.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
     [Test]
     public async Task CreateOrUpdateUrlSegmentsAsync_TrashedInvariantContent_DoesNotStoreSegments()
     {

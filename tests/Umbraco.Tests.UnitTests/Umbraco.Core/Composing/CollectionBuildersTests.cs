@@ -13,9 +13,15 @@ using Umbraco.Cms.Tests.UnitTests.TestHelpers;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Composing;
 
+/// <summary>
+/// Contains unit tests for collection builders (e.g. <see cref="LazyCollectionBuilderBase{TBuilder, TCollection, TItem}"/>) in the <c>Umbraco.Core.Composing</c> namespace.
+/// </summary>
 [TestFixture]
 public class CollectionBuildersTests
 {
+    /// <summary>
+    /// Sets up the test environment before each test.
+    /// </summary>
     [SetUp]
     public void Setup()
     {
@@ -23,6 +29,9 @@ public class CollectionBuildersTests
         _composition = new UmbracoBuilder(register, Mock.Of<IConfiguration>(), TestHelper.GetMockedTypeLoader());
     }
 
+    /// <summary>
+    /// Cleans up after each test.
+    /// </summary>
     [TearDown]
     public void TearDown()
     {
@@ -30,6 +39,9 @@ public class CollectionBuildersTests
 
     private IUmbracoBuilder _composition;
 
+    /// <summary>
+    /// Tests that the collection builder correctly identifies contained types.
+    /// </summary>
     [Test]
     public void ContainsTypes()
     {
@@ -47,6 +59,9 @@ public class CollectionBuildersTests
         AssertCollection(col, typeof(Resolved1), typeof(Resolved2));
     }
 
+    /// <summary>
+    /// Tests that the collection builder can be cleared before the collection is created.
+    /// </summary>
     [Test]
     public void CanClearBuilderBeforeCollectionIsCreated()
     {
@@ -63,6 +78,9 @@ public class CollectionBuildersTests
         AssertCollection(col);
     }
 
+    /// <summary>
+    /// Tests that the collection builder cannot be cleared once the collection has been created.
+    /// </summary>
     [Test]
     public void CannotClearBuilderOnceCollectionIsCreated()
     {
@@ -76,6 +94,9 @@ public class CollectionBuildersTests
         Assert.Throws<InvalidOperationException>(() => builder.Clear());
     }
 
+    /// <summary>
+    /// Tests that items can be appended to the collection builder and verifies their presence.
+    /// </summary>
     [Test]
     public void CanAppendToBuilder()
     {
@@ -92,6 +113,9 @@ public class CollectionBuildersTests
         AssertCollection(col, typeof(Resolved1), typeof(Resolved2));
     }
 
+    /// <summary>
+    /// Tests that appending to a collection builder after the collection has been created throws an InvalidOperationException.
+    /// </summary>
     [Test]
     public void CannotAppendToBuilderOnceCollectionIsCreated()
     {
@@ -103,6 +127,9 @@ public class CollectionBuildersTests
         Assert.Throws<InvalidOperationException>(() => builder.Append<Resolved1>());
     }
 
+    /// <summary>
+    /// Tests that appending duplicate items to the builder results in a de-duplicated collection.
+    /// </summary>
     [Test]
     public void CanAppendDuplicateToBuilderAndDeDuplicate()
     {
@@ -116,6 +143,9 @@ public class CollectionBuildersTests
         AssertCollection(col, typeof(Resolved1));
     }
 
+    /// <summary>
+    /// Tests that appending an invalid type to the collection builder throws an InvalidOperationException.
+    /// </summary>
     [Test]
     public void CannotAppendInvalidTypeToBUilder()
     {
@@ -125,6 +155,9 @@ public class CollectionBuildersTests
         Assert.Throws<InvalidOperationException>(() => builder.Append(new[] { typeof(Resolved4) }));
     }
 
+    /// <summary>
+    /// Tests that items can be removed from the collection builder.
+    /// </summary>
     [Test]
     public void CanRemoveFromBuilder()
     {
@@ -142,6 +175,9 @@ public class CollectionBuildersTests
         AssertCollection(col, typeof(Resolved1));
     }
 
+    /// <summary>
+    /// Tests that removing a missing item from the collection builder does not affect existing items.
+    /// </summary>
     [Test]
     public void CanRemoveMissingFromBuilder()
     {
@@ -155,6 +191,9 @@ public class CollectionBuildersTests
         AssertCollection(col, typeof(Resolved1), typeof(Resolved2));
     }
 
+    /// <summary>
+    /// Tests that removing an item from the builder after the collection has been created throws an InvalidOperationException.
+    /// </summary>
     [Test]
     public void CannotRemoveFromBuilderOnceCollectionIsCreated()
     {
@@ -167,6 +206,9 @@ public class CollectionBuildersTests
         Assert.Throws<InvalidOperationException>(() => builder.Remove<Resolved2>());
     }
 
+    /// <summary>
+    /// Tests that items can be inserted into the collection builder and verifies their presence and order.
+    /// </summary>
     [Test]
     public void CanInsertIntoBuilder()
     {
@@ -184,6 +226,9 @@ public class CollectionBuildersTests
         AssertCollection(col, typeof(Resolved3), typeof(Resolved1), typeof(Resolved2));
     }
 
+    /// <summary>
+    /// Verifies that once a collection is created from the builder, inserting new items into the builder throws an InvalidOperationException.
+    /// </summary>
     [Test]
     public void CannotInsertIntoBuilderOnceCollectionIsCreated()
     {
@@ -196,6 +241,9 @@ public class CollectionBuildersTests
         Assert.Throws<InvalidOperationException>(() => builder.Insert<Resolved3>());
     }
 
+    /// <summary>
+    /// Tests that inserting a duplicate into the builder results in de-duplication.
+    /// </summary>
     [Test]
     public void CanInsertDuplicateIntoBuilderAndDeDuplicate()
     {
@@ -209,6 +257,9 @@ public class CollectionBuildersTests
         AssertCollection(col, typeof(Resolved2), typeof(Resolved1));
     }
 
+    /// <summary>
+    /// Tests that an item can be inserted into an empty collection builder.
+    /// </summary>
     [Test]
     public void CanInsertIntoEmptyBuilder()
     {
@@ -220,6 +271,9 @@ public class CollectionBuildersTests
         AssertCollection(col, typeof(Resolved2));
     }
 
+    /// <summary>
+    /// Tests that inserting into a collection builder at an invalid index throws an ArgumentOutOfRangeException.
+    /// </summary>
     [Test]
     public void CannotInsertIntoBuilderAtWrongIndex()
     {
@@ -232,6 +286,9 @@ public class CollectionBuildersTests
         Assert.Throws<ArgumentOutOfRangeException>(() => builder.Insert<Resolved3>(-1));
     }
 
+    /// <summary>
+    /// Tests that an item can be inserted into the builder before a specified existing item.
+    /// </summary>
     [Test]
     public void CanInsertIntoBuilderBefore()
     {
@@ -249,6 +306,9 @@ public class CollectionBuildersTests
         AssertCollection(col, typeof(Resolved1), typeof(Resolved3), typeof(Resolved2));
     }
 
+    /// <summary>
+    /// Tests that an item can be inserted into the collection builder after a specified existing item.
+    /// </summary>
     [Test]
     public void CanInsertIntoBuilderAfter()
     {
@@ -266,6 +326,9 @@ public class CollectionBuildersTests
         AssertCollection(col, typeof(Resolved1), typeof(Resolved3), typeof(Resolved2));
     }
 
+    /// <summary>
+    /// Tests that an item can be inserted into the collection builder after the last existing item.
+    /// </summary>
     [Test]
     public void CanInsertIntoBuilderAfterLast()
     {
@@ -283,6 +346,9 @@ public class CollectionBuildersTests
         AssertCollection(col, typeof(Resolved1), typeof(Resolved2), typeof(Resolved3));
     }
 
+    /// <summary>
+    /// Tests that inserting into the builder before the collection is created throws an InvalidOperationException.
+    /// </summary>
     [Test]
     public void CannotInsertIntoBuilderBeforeOnceCollectionIsCreated()
     {
@@ -296,6 +362,9 @@ public class CollectionBuildersTests
             builder.InsertBefore<Resolved2, Resolved3>());
     }
 
+    /// <summary>
+    /// Tests that inserting a duplicate item into the collection builder before another item works correctly and that duplicates are de-duplicated.
+    /// </summary>
     [Test]
     public void CanInsertDuplicateIntoBuilderBeforeAndDeDuplicate()
     {
@@ -309,6 +378,9 @@ public class CollectionBuildersTests
         AssertCollection(col, typeof(Resolved2), typeof(Resolved1));
     }
 
+    /// <summary>
+    /// Tests that inserting into a builder before a missing item throws an InvalidOperationException.
+    /// </summary>
     [Test]
     public void CannotInsertIntoBuilderBeforeMissing()
     {
@@ -319,6 +391,10 @@ public class CollectionBuildersTests
             builder.InsertBefore<Resolved2, Resolved3>());
     }
 
+    /// <summary>
+    /// Tests that the scope builder creates a scoped collection and
+    /// ensures the same collection instance is returned within the same scope.
+    /// </summary>
     [Test]
     public void ScopeBuilderCreatesScopedCollection()
     {
@@ -343,6 +419,9 @@ public class CollectionBuildersTests
         }
     }
 
+    /// <summary>
+    /// Tests that the transient collection builder creates a new collection instance each time it is requested.
+    /// </summary>
     [Test]
     public void TransientBuilderCreatesTransientCollection()
     {
@@ -364,6 +443,9 @@ public class CollectionBuildersTests
         AssertNotSameCollection(col1, col2);
     }
 
+    /// <summary>
+    /// Tests that the builder respects the order of types when appending and inserting.
+    /// </summary>
     [Test]
     public void BuilderRespectsTypesOrder()
     {
@@ -377,6 +459,11 @@ public class CollectionBuildersTests
         AssertCollection(col1, typeof(Resolved1), typeof(Resolved2), typeof(Resolved3));
     }
 
+    /// <summary>
+    /// Tests that the scope builder respects the container scope by ensuring
+    /// that collections resolved within the same scope are the same instance,
+    /// and collections resolved in different scopes are different instances.
+    /// </summary>
     [Test]
     public void ScopeBuilderRespectsContainerScope()
     {
@@ -416,6 +503,9 @@ public class CollectionBuildersTests
         AssertNotSameCollection(col1A, col2);
     }
 
+    /// <summary>
+    /// Tests that the weighted builder creates a weighted collection with the expected order.
+    /// </summary>
     [Test]
     public void WeightedBuilderCreatesWeightedCollection()
     {
@@ -428,6 +518,9 @@ public class CollectionBuildersTests
         AssertCollection(col, typeof(Resolved2), typeof(Resolved1));
     }
 
+    /// <summary>
+    /// Tests that the weight of a builder can be set and that the collection respects this weight.
+    /// </summary>
     [Test]
     public void WeightedBuilderSetWeight()
     {
@@ -489,23 +582,39 @@ public class CollectionBuildersTests
         }
     }
 
+    /// <summary>
+    /// Contains tests for verifying the behavior of resolved collection builders in the Umbraco composing system.
+    /// </summary>
     public abstract class Resolved
     {
     }
 
+    /// <summary>
+    /// Represents a test class for the Resolved1 collection builder used in unit tests.
+    /// Contains tests related to the functionality and behavior of the Resolved1 collection builder.
+    /// </summary>
     public class Resolved1 : Resolved
     {
     }
 
+    /// <summary>
+    /// Contains unit tests for the Resolved2 feature in the CollectionBuilders class.
+    /// </summary>
     [Weight(50)] // default is 100
     public class Resolved2 : Resolved
     {
     }
 
+    /// <summary>
+    /// Tests dependency resolution in the collection builder for scenario 3.
+    /// </summary>
     public class Resolved3 : Resolved
     {
     }
 
+    /// <summary>
+    /// Tests the resolution behavior of the fourth collection builder in the CollectionBuildersTests suite.
+    /// </summary>
     public class Resolved4 // not! : Resolved
     {
     }
@@ -546,6 +655,10 @@ public class CollectionBuildersTests
     // ReSharper disable once ClassNeverInstantiated.Local
     private class TestCollection : BuilderCollectionBase<Resolved>
     {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="TestCollection"/> class.
+    /// </summary>
+    /// <param name="items">A function that returns an enumerable of <see cref="Resolved"/> items.</param>
         public TestCollection(Func<IEnumerable<Resolved>> items)
             : base(items)
         {

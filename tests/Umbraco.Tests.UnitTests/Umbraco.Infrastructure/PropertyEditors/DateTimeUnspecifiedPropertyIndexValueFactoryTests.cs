@@ -8,12 +8,18 @@ using Umbraco.Cms.Infrastructure.Serialization;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PropertyEditors;
 
+/// <summary>
+/// Contains unit tests for the <see cref="DateTimeUnspecifiedPropertyIndexValueFactory"/> class, verifying its behavior and functionality.
+/// </summary>
 [TestFixture]
 [TestOf(typeof(DateTimeUnspecifiedPropertyIndexValueFactory))]
 public class DateTimeUnspecifiedPropertyIndexValueFactoryTests
 {
     private static readonly IJsonSerializer _jsonSerializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
 
+    /// <summary>
+    /// Tests that GetIndexValues returns empty values when the property value is null.
+    /// </summary>
     [Test]
     public void GetIndexValues_ReturnsEmptyValues_ForNullPropertyValue()
     {
@@ -39,6 +45,10 @@ public class DateTimeUnspecifiedPropertyIndexValueFactoryTests
         Assert.IsEmpty(indexValue.Values);
     }
 
+    /// <summary>
+    /// Tests that <c>GetIndexValues</c> returns a date time string formatted as "yyyy-MM-ddTHH:mm:ss" in UTC,
+    /// verifying that the input JSON with a time zone is correctly converted and formatted for indexing.
+    /// </summary>
     [Test]
     public void GetIndexValues_ReturnsFormattedDateTime()
     {

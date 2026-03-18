@@ -8,9 +8,15 @@ using Umbraco.Cms.Core.Services.Changes;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Cache;
 
+/// <summary>
+/// Unit tests for the Refresher functionality in the Umbraco Core cache.
+/// </summary>
 [TestFixture]
 public class RefresherTests
 {
+    /// <summary>
+    /// Tests that the MediaCacheRefresher can correctly deserialize a JSON payload into its object representation.
+    /// </summary>
     [Test]
     public void MediaCacheRefresherCanDeserializeJsonPayload()
     {
@@ -57,6 +63,9 @@ public class RefresherTests
         Assert.IsNull(payload[0].UnpublishedCultures);
     }
 
+    /// <summary>
+    /// Tests that the ContentCacheRefresher can correctly deserialize a JSON payload containing culture information.
+    /// </summary>
     [Test]
     public void ContentCacheRefresherCanDeserializeJsonPayloadWithCultures()
     {
@@ -91,6 +100,9 @@ public class RefresherTests
         });
     }
 
+    /// <summary>
+    /// Tests that the ContentTypeCacheRefresher can correctly deserialize a JSON payload.
+    /// </summary>
     [Test]
     public void ContentTypeCacheRefresherCanDeserializeJsonPayload()
     {
@@ -107,6 +119,9 @@ public class RefresherTests
         Assert.AreEqual(source[0].ChangeTypes, payload[0].ChangeTypes);
     }
 
+    /// <summary>
+    /// Tests that the DataTypeCacheRefresher can correctly deserialize a JSON payload.
+    /// </summary>
     [Test]
     public void DataTypeCacheRefresherCanDeserializeJsonPayload()
     {
@@ -123,6 +138,9 @@ public class RefresherTests
         Assert.AreEqual(source[0].Removed, payload[0].Removed);
     }
 
+    /// <summary>
+    /// Tests that the DomainCacheRefresher can correctly deserialize a JSON payload.
+    /// </summary>
     [Test]
     public void DomainCacheRefresherCanDeserializeJsonPayload()
     {

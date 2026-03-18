@@ -1,4 +1,4 @@
-using System.Text.Json.Nodes;
+﻿using System.Text.Json.Nodes;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
@@ -9,9 +9,16 @@ using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.DeliveryApi;
 
+/// <summary>
+/// Contains unit tests for the <see cref="JsonValueConverter"/> class in the context of the Umbraco Delivery API.
+/// These tests verify the correct conversion and handling of JSON values.
+/// </summary>
 [TestFixture]
 public class JsonValueConverterTests : PropertyValueConverterTests
 {
+    /// <summary>
+    /// Tests that the JsonValueConverter correctly converts a custom property with a JSON value type.
+    /// </summary>
     [Test]
     public void JsonValueConverterTests_ConvertsCustomPropertyWithValueTypeJson()
     {

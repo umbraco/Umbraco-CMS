@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Management.ServerEvents;
 using Umbraco.Cms.Core;
@@ -6,9 +6,16 @@ using Umbraco.Cms.Core.ServerEvents;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Management.ServerEvents;
 
+/// <summary>
+/// Contains unit tests for the <see cref="ServerEventAuthorizationService"/> class in the Umbraco CMS API Management ServerEvents namespace.
+/// </summary>
 [TestFixture]
 public class ServerEventAuthorizerTests
 {
+    /// <summary>
+    /// Verifies that the <see cref="ServerEventAuthorizationService"/> correctly authorizes a user for a single authorized event source.
+    /// </summary>
+    /// <returns>A task that represents the asynchronous test operation.</returns>
     [Test]
     public async Task CanAuthorize()
     {
@@ -23,6 +30,11 @@ public class ServerEventAuthorizerTests
         Assert.That(result.AuthorizedEventSources.First(), Is.EqualTo(sourceName));
     }
 
+    /// <summary>
+    /// Verifies that the <see cref="ServerEventAuthorizationService"/> correctly identifies and reports unauthorized event sources
+    /// when the authorizer denies access, ensuring that unauthorized sources are listed and no sources are incorrectly authorized.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task CanUnauthorize()
     {
@@ -37,6 +49,10 @@ public class ServerEventAuthorizerTests
         Assert.That(result.UnauthorizedEventSources.First(), Is.EqualTo(sourceName));
     }
 
+    /// <summary>
+    /// Tests that any authorization failure results in an unauthorized response.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task AnyAuthorizationFailureResultInUnauthorized()
     {
@@ -51,6 +67,11 @@ public class ServerEventAuthorizerTests
         Assert.That(result.UnauthorizedEventSources.First(), Is.EqualTo(sourceName));
     }
 
+    /// <summary>
+    /// Verifies that <see cref="ServerEventAuthorizationService"/> correctly handles multiple authorizers by
+    /// ensuring that authorized and unauthorized event sources are properly identified.
+    /// </summary>
+    /// <returns>A <see cref="Task"/> representing the asynchronous test operation.</returns>
     [Test]
     public async Task CanHandleMultiple()
     {
@@ -69,6 +90,11 @@ public class ServerEventAuthorizerTests
         Assert.That(result.UnauthorizedEventSources, Is.EquivalentTo(unauthorizedSources));
     }
 
+    /// <summary>
+    /// Tests that the ServerEventAuthorizationService can handle multiple authorizers and correctly
+    /// aggregates authorized and unauthorized event sources.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task CanHandleMultipleAuthorizers()
     {

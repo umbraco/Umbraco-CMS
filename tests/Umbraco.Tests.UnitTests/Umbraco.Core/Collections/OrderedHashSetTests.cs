@@ -6,9 +6,15 @@ using Umbraco.Cms.Core.Collections;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Collections;
 
+/// <summary>
+/// Tests for the <see cref="OrderedHashSet{T}"/> collection.
+/// </summary>
 [TestFixture]
 public class OrderedHashSetTests
 {
+    /// <summary>
+    /// Tests that the OrderedHashSet keeps the last added item when duplicates are added.
+    /// </summary>
     [Test]
     public void Keeps_Last()
     {
@@ -24,6 +30,9 @@ public class OrderedHashSetTests
         Assert.AreNotEqual(items[0].Id, list[0].Id);
     }
 
+    /// <summary>
+    /// Tests that the OrderedHashSet keeps the first added item and ignores duplicates.
+    /// </summary>
     [Test]
     public void Keeps_First()
     {
@@ -40,16 +49,31 @@ public class OrderedHashSetTests
 
     private class MyClass : IEquatable<MyClass>
     {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MyClass"/> class.
+    /// </summary>
+    /// <param name="name">The name to assign to the instance.</param>
         public MyClass(string name)
         {
             Name = name;
             Id = Guid.NewGuid();
         }
 
+    /// <summary>
+    /// Gets the name of this instance.
+    /// </summary>
         public string Name { get; }
 
+    /// <summary>
+    /// Gets the unique identifier.
+    /// </summary>
         public Guid Id { get; }
 
+    /// <summary>
+    /// Determines whether the specified <see cref="MyClass"/> is equal to the current instance.
+    /// </summary>
+    /// <param name="other">The <see cref="MyClass"/> to compare with the current instance.</param>
+    /// <returns><c>true</c> if the specified <see cref="MyClass"/> is equal to the current instance; otherwise, <c>false</c>.</returns>
         public bool Equals(MyClass other)
         {
             if (other is null)
@@ -65,6 +89,11 @@ public class OrderedHashSetTests
             return string.Equals(Name, other.Name);
         }
 
+    /// <summary>
+    /// Determines whether the specified object is equal to the current object.
+    /// </summary>
+    /// <param name="obj">The object to compare with the current object.</param>
+    /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
         public override bool Equals(object obj)
         {
             if (obj is null)
@@ -85,6 +114,8 @@ public class OrderedHashSetTests
             return Equals((MyClass)obj);
         }
 
+    /// <summary>Returns the hash code for this instance.</summary>
+    /// <returns>The hash code of the Name property.</returns>
         public override int GetHashCode() => Name.GetHashCode();
 
         public static bool operator ==(MyClass left, MyClass right) => Equals(left, right);

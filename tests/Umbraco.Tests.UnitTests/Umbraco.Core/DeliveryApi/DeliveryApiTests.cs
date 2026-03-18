@@ -16,6 +16,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.DeliveryApi;
 
+/// <summary>
+/// Contains unit tests for verifying the functionality of the Delivery API in Umbraco Core.
+/// </summary>
 public class DeliveryApiTests
 {
     protected IPublishedPropertyType DeliveryApiPropertyType { get; private set; }
@@ -24,6 +27,12 @@ public class DeliveryApiTests
 
     protected IPublishStatusQueryService PublishStatusQueryService { get; private set; }
 
+    /// <summary>
+    /// Initializes mocks and test dependencies required for Delivery API unit tests.
+    /// Sets up mock implementations for <see cref="IDeliveryApiPropertyValueConverter"/>,
+    /// <see cref="IPropertyValueConverter"/>, and <see cref="IPublishStatusQueryService"/>,
+    /// and assigns configured property types for use in test scenarios.
+    /// </summary>
     [SetUp]
     public virtual void Setup()
     {

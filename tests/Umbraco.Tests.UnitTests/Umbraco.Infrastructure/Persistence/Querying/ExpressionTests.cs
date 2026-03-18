@@ -18,9 +18,15 @@ using Umbraco.Cms.Tests.UnitTests.TestHelpers;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Persistence.Querying;
 
+/// <summary>
+/// Contains unit tests for expression querying functionality in Umbraco's persistence infrastructure.
+/// </summary>
 [TestFixture]
 public class ExpressionTests : BaseUsingSqlSyntax
 {
+    /// <summary>
+    /// Tests that the SQL expression generated from an equality clause comparing two entity values is correct.
+    /// </summary>
     [Test]
     public void Equals_Claus_With_Two_Entity_Values()
     {
@@ -38,6 +44,9 @@ public class ExpressionTests : BaseUsingSqlSyntax
         Assert.AreEqual(12345, modelToSqlExpressionHelper.GetSqlParameters()[0]);
     }
 
+    /// <summary>
+    /// Tests that a query can be correctly built using a content type alias.
+    /// </summary>
     [Test]
     public void Can_Query_With_Content_Type_Alias()
     {
@@ -52,6 +61,9 @@ public class ExpressionTests : BaseUsingSqlSyntax
         Assert.AreEqual("Test", modelToSqlExpressionHelper.GetSqlParameters()[0]);
     }
 
+    /// <summary>
+    /// Tests that querying with content type aliases using an IEnumerable works correctly.
+    /// </summary>
     [Test]
     public void Can_Query_With_Content_Type_Aliases_IEnumerable()
     {
@@ -68,6 +80,9 @@ public class ExpressionTests : BaseUsingSqlSyntax
         Assert.AreEqual("Test2", modelToSqlExpressionHelper.GetSqlParameters()[2]);
     }
 
+    /// <summary>
+    /// Tests that a query can be created using a list of content type aliases with the Contains method.
+    /// </summary>
     [Test]
     public void Can_Query_With_Content_Type_Aliases_List()
     {
@@ -84,6 +99,10 @@ public class ExpressionTests : BaseUsingSqlSyntax
         Assert.AreEqual("Test2", modelToSqlExpressionHelper.GetSqlParameters()[2]);
     }
 
+    /// <summary>
+    /// Tests that a cached expression can correctly verify that the Path property starts with a given predicate,
+    /// and that it produces the correct SQL LIKE expression and parameters for multiple predicates.
+    /// </summary>
     [Test]
     public void CachedExpression_Can_Verify_Path_StartsWith_Predicate_In_Same_Result()
     {
@@ -108,6 +127,9 @@ public class ExpressionTests : BaseUsingSqlSyntax
         Assert.AreEqual("-1,123,97%", modelToSqlExpressionHelper2.GetSqlParameters()[0]);
     }
 
+    /// <summary>
+    /// Verifies that a predicate using Path.StartsWith is correctly translated to the expected SQL LIKE expression.
+    /// </summary>
     [Test]
     public void Can_Verify_Path_StartsWith_Predicate_In_Same_Result()
     {
@@ -120,6 +142,10 @@ public class ExpressionTests : BaseUsingSqlSyntax
         Assert.AreEqual("-1%", modelToSqlExpressionHelper.GetSqlParameters()[0]);
     }
 
+    /// <summary>
+    /// Verifies that a predicate checking for ParentId equality is correctly translated to the expected SQL statement.
+    /// This ensures that the expression visitor generates the correct SQL for ParentId comparisons.
+    /// </summary>
     [Test]
     public void Can_Verify_ParentId_StartsWith_Predicate_In_Same_Result()
     {
@@ -134,6 +160,9 @@ public class ExpressionTests : BaseUsingSqlSyntax
         Assert.AreEqual(-1, modelToSqlExpressionHelper.GetSqlParameters()[0]);
     }
 
+    /// <summary>
+    /// Tests that the equals operator for a value is properly escaped in the generated SQL expression.
+    /// </summary>
     [Test]
     public void Equals_Operator_For_Value_Gets_Escaped()
     {
@@ -147,6 +176,9 @@ public class ExpressionTests : BaseUsingSqlSyntax
         Assert.AreEqual("hello@world.com", modelToSqlExpressionHelper.GetSqlParameters()[0]);
     }
 
+    /// <summary>
+    /// Tests that the Equals method for a value gets properly escaped in the SQL expression.
+    /// </summary>
     [Test]
     public void Equals_Method_For_Value_Gets_Escaped()
     {
@@ -160,6 +192,10 @@ public class ExpressionTests : BaseUsingSqlSyntax
         Assert.AreEqual("hello@world.com", modelToSqlExpressionHelper.GetSqlParameters()[0]);
     }
 
+    /// <summary>
+    /// Tests that the SQL expression generated for a mapped Replace method on the Username property
+    /// of IUser produces the expected SQL and parameters.
+    /// </summary>
     [Test]
     public void Sql_Replace_Mapped()
     {
@@ -175,6 +211,11 @@ public class ExpressionTests : BaseUsingSqlSyntax
         Assert.AreEqual("@test", modelToSqlExpressionHelper.GetSqlParameters()[2]);
     }
 
+    /// <summary>
+    /// Tests the translation of a LINQ Contains method on a List of string to a SQL IN clause.
+    /// This test ensures compatibility with .NET 10 and NPoco by verifying that List.Contains
+    /// is correctly translated, avoiding issues with string arrays and ReadOnlySpan.Contains.
+    /// </summary>
     [Test]
     public void Sql_In()
     {
@@ -202,9 +243,15 @@ public class ExpressionTests : BaseUsingSqlSyntax
 
     private class Foo
     {
+    /// <summary>
+    /// Gets or sets the string value associated with this <see cref="Foo"/> instance.
+    /// </summary>
         public string Value { get; set; }
     }
 
+    /// <summary>
+    /// Tests the translation of the StartsWith method in expressions to SQL LIKE statements.
+    /// </summary>
     [Test]
     public void StartsWith()
     {

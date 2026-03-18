@@ -22,6 +22,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models;
 
+/// <summary>
+/// Contains unit tests for the <see cref="Content"/> model in Umbraco CMS, verifying its behavior and functionality.
+/// </summary>
 [TestFixture]
 public class ContentTests
 {
@@ -29,6 +32,12 @@ public class ContentTests
 
     private readonly PropertyEditorCollection _propertyEditorCollection = new (new DataEditorCollection(() => []));
 
+    /// <summary>
+    /// Verifies that updating the culture-specific name of a content variant correctly tracks dirty changes
+    /// on both the culture info and the parent content's culture info collection.
+    /// </summary>
+    /// <param name="newName">The new culture-specific name to assign to the variant.</param>
+    /// <param name="expectedDirty">True if the property is expected to be marked as dirty after the update; otherwise, false.</param>
     [TestCase("name-fr", false)]
     [TestCase("name-fr-updated", true)]
     public void Variant_Culture_Names_Track_Dirty_Changes(string newName, bool expectedDirty)
@@ -72,6 +81,10 @@ public class ContentTests
         Assert.AreEqual(expectedDirty, content.IsPropertyDirty("CultureInfos"));
     }
 
+    /// <summary>
+    /// Verifies that changes to published culture names in content variants correctly track and reset dirty states.
+    /// Ensures that modifying culture names and publishing updates mark the relevant properties as dirty, and that resetting these properties clears the dirty state as expected.
+    /// </summary>
     [Test]
     public void Variant_Published_Culture_Names_Track_Dirty_Changes()
     {
@@ -113,6 +126,9 @@ public class ContentTests
         Assert.IsTrue(content.IsPropertyDirty("PublishCultureInfos")); // it's true now since we've updated a name
     }
 
+    /// <summary>
+    /// Tests that the GetNonGroupedProperties method returns only properties that are not grouped.
+    /// </summary>
     [Test]
     public void Get_Non_Grouped_Properties()
     {
@@ -143,6 +159,9 @@ public class ContentTests
         Assert.AreEqual(5, content.Properties.Count());
     }
 
+    /// <summary>
+    /// Tests that all dirty properties of a content instance get reset correctly.
+    /// </summary>
     [Test]
     public void All_Dirty_Properties_Get_Reset()
     {
@@ -161,6 +180,10 @@ public class ContentTests
         }
     }
 
+    /// <summary>
+    /// Verifies that a mocked content instance is created and is not null.
+    /// This test ensures that the content type service can be mocked and used to generate content for testing purposes.
+    /// </summary>
     [Test]
     public void Can_Verify_Mocked_Content()
     {
@@ -177,6 +200,9 @@ public class ContentTests
         Assert.That(content, Is.Not.Null);
     }
 
+    /// <summary>
+    /// Tests that the value of a property can be changed successfully.
+    /// </summary>
     [Test]
     public void Can_Change_Property_Value()
     {
@@ -196,6 +222,9 @@ public class ContentTests
         Assert.That(content.Properties["title"].GetValue(), Is.EqualTo("This is the new title"));
     }
 
+    /// <summary>
+    /// Tests that a property value can be set as a string on the content.
+    /// </summary>
     [Test]
     public void Can_Set_Property_Value_As_String()
     {
@@ -215,6 +244,10 @@ public class ContentTests
         Assert.That(content.Properties["title"].GetValue(), Is.EqualTo("This is the new title"));
     }
 
+    /// <summary>
+    /// Tests that a content item can be cloned with its identities reset.
+    /// Ensures the cloned content has different Id and VersionId and that it does not have an identity.
+    /// </summary>
     [Test]
     public void Can_Clone_Content_With_Reset_Identity()
     {
@@ -246,6 +279,10 @@ public class ContentTests
         return new ProfilingLogger(logger, profiler);
     }
 
+    /// <summary>
+    /// Tests the performance of deep cloning operations on content types, both with and without using the runtime cache.
+    /// This test helps to evaluate the efficiency of the deep clone implementation under different caching scenarios.
+    /// </summary>
     [Ignore("TODO - ignored test")]
     [Test]
     public void Can_Deep_Clone_Perf_Test()
@@ -294,6 +331,10 @@ public class ContentTests
         }
     }
 
+    /// <summary>
+    /// Tests that the Content object can be deeply cloned correctly.
+    /// Ensures all properties and collections are cloned and not referenced.
+    /// </summary>
     [Test]
     public void Can_Deep_Clone()
     {
@@ -407,6 +448,9 @@ public class ContentTests
         Assert.IsTrue(asDirty.IsPropertyDirty("Properties"));
     }
 
+    /// <summary>
+    /// Tests that the content correctly remembers which properties are dirty after resetting dirty properties.
+    /// </summary>
     [Test]
     public void Remember_Dirty_Properties()
     {
@@ -480,6 +524,9 @@ public class ContentTests
         }
     }
 
+    /// <summary>
+    /// Tests that the Content object can be serialized to JSON without throwing an error.
+    /// </summary>
     [Test]
     public void Can_Serialize_Without_Error()
     {
@@ -512,6 +559,9 @@ public class ContentTests
         Debug.Print(json);
     }
 
+    /// <summary>
+    /// Tests that the property value of a content item can be changed using an anonymous object.
+    /// </summary>
     [Test]
     public void Can_Change_Property_Value_Through_Anonymous_Object()
     {
@@ -533,6 +583,10 @@ public class ContentTests
         Assert.That(content.Properties["description"].GetValue(), Is.EqualTo("This is the meta description for a textpage"));
     }
 
+    /// <summary>
+    /// Tests that the dirty property tracking on content works correctly.
+    /// It verifies that after resetting dirty properties, changing a property marks it as dirty.
+    /// </summary>
     [Test]
     public void Can_Verify_Dirty_Property_On_Content()
     {
@@ -552,6 +606,9 @@ public class ContentTests
         Assert.That(content.IsPropertyDirty("Name"), Is.True);
     }
 
+    /// <summary>
+    /// Tests that a property group can be added to a content type.
+    /// </summary>
     [Test]
     public void Can_Add_PropertyGroup_On_ContentType()
     {
@@ -566,6 +623,9 @@ public class ContentTests
         Assert.That(contentType.PropertyGroups.Count, Is.EqualTo(3));
     }
 
+    /// <summary>
+    /// Tests that a property group can be removed from a content type.
+    /// </summary>
     [Test]
     public void Can_Remove_PropertyGroup_From_ContentType()
     {
@@ -581,6 +641,9 @@ public class ContentTests
         //// Assert.That(contentType.IsPropertyDirty("PropertyGroups"), Is.True);
     }
 
+    /// <summary>
+    /// Tests that a PropertyType can be added to a PropertyGroup on a ContentType.
+    /// </summary>
     [Test]
     public void Can_Add_PropertyType_To_Group_On_ContentType()
     {
@@ -598,6 +661,9 @@ public class ContentTests
         Assert.That(contentType.PropertyGroups["content"].PropertyTypes.Count, Is.EqualTo(3));
     }
 
+    /// <summary>
+    /// Tests that a new property can be added to a content instance using a new property type.
+    /// </summary>
     [Test]
     public void Can_Add_New_Property_To_New_PropertyType()
     {
@@ -623,6 +689,9 @@ public class ContentTests
         Assert.That(content.Properties["subtitle"].GetValue(), Is.EqualTo("This is a subtitle Test"));
     }
 
+    /// <summary>
+    /// Tests that a new property can be added to a new property type within a new property group.
+    /// </summary>
     [Test]
     public void Can_Add_New_Property_To_New_PropertyType_In_New_PropertyGroup()
     {
@@ -651,6 +720,10 @@ public class ContentTests
         Assert.That(content.Properties["title"].GetValue(), Is.EqualTo("Textpage textpage"));
     }
 
+    /// <summary>
+    /// Verifies that a <see cref="PropertyType"/> can be added and updated via the <c>Properties</c> collection of a <see cref="Content"/> object.
+    /// Ensures that changes to the <see cref="PropertyType"/> are reflected in the content's properties, but not all <see cref="PropertyType"/> properties (such as <c>SortOrder</c>) are updated through the content object.
+    /// </summary>
     [Test]
     public void Can_Update_PropertyType_Through_Content_Properties()
     {
@@ -674,6 +747,9 @@ public class ContentTests
         Assert.That(content.Properties["title"].GetValue(), Is.EqualTo("Textpage textpage"));
     }
 
+    /// <summary>
+    /// Tests that the content type of a content item can be changed and verifies the properties are updated accordingly.
+    /// </summary>
     [Test]
     public void Can_Change_ContentType_On_Content()
     {
@@ -695,6 +771,9 @@ public class ContentTests
         Assert.That(content.Properties.Count, Is.EqualTo(5));
     }
 
+    /// <summary>
+    /// Tests that the content type of a content item can be changed and a property value can be set on the new content type.
+    /// </summary>
     [Test]
     public void Can_Change_ContentType_On_Content_And_Set_Property_Value()
     {
@@ -715,6 +794,9 @@ public class ContentTests
         Assert.That(content.Properties["author"].GetValue(), Is.EqualTo("John Doe"));
     }
 
+    /// <summary>
+    /// Tests that changing the content type on a content instance preserves the old properties and their values.
+    /// </summary>
     [Test]
     public void Can_Change_ContentType_On_Content_And_Still_Get_Old_Properties()
     {
@@ -737,6 +819,9 @@ public class ContentTests
         Assert.That(content.Properties["description"].GetValue(), Is.EqualTo("This is the meta description for a textpage"));
     }
 
+    /// <summary>
+    /// Tests that the content type can be changed on content and that old property types are cleared.
+    /// </summary>
     [Test]
     [Ignore("Need to reimplement this logic for v8")]
     public void Can_Change_ContentType_On_Content_And_Clear_Old_PropertyTypes() => throw new NotImplementedException();
@@ -788,6 +873,9 @@ public class ContentTests
         Assert.AreEqual(PublishedState.Published, content.PublishedState);
     }
 
+    /// <summary>
+    /// Tests that adding a property group to a content type marks the entity as dirty.
+    /// </summary>
     [Test]
     public void Adding_PropertyGroup_To_ContentType_Results_In_Dirty_Entity()
     {
@@ -805,6 +893,9 @@ public class ContentTests
         //// Assert.That(contentType.IsPropertyDirty("PropertyGroups"), Is.True);
     }
 
+    /// <summary>
+    /// Tests that after committing changes, the WasDirty flag is set to true while IsDirty is false.
+    /// </summary>
     [Test]
     public void After_Committing_Changes_Was_Dirty_Is_True()
     {
@@ -822,6 +913,11 @@ public class ContentTests
         Assert.That(contentType.WasPropertyDirty("Alias"), Is.True);
     }
 
+    /// <summary>
+    /// Verifies that after making a change to a property and committing (resetting dirty properties),
+    /// the <c>WasDirty</c> flag is set to true on the changed property, indicating it was modified
+    /// before the commit.
+    /// </summary>
     [Test]
     public void After_Committing_Changes_Was_Dirty_Is_True_On_Changed_Property()
     {
@@ -855,6 +951,9 @@ public class ContentTests
         Assert.That(content.Properties["title"].WasDirty(), Is.True);
     }
 
+    /// <summary>
+    /// Tests that if the content has not been committed, the WasDirty flag is false.
+    /// </summary>
     [Test]
     public void If_Not_Committed_Was_Dirty_Is_False()
     {
@@ -869,6 +968,9 @@ public class ContentTests
         Assert.That(contentType.WasDirty(), Is.False);
     }
 
+    /// <summary>
+    /// Tests that the content type correctly detects when a property has been removed.
+    /// </summary>
     [Test]
     public void Detect_That_A_Property_Is_Removed()
     {
@@ -883,6 +985,9 @@ public class ContentTests
         Assert.That(contentType.IsPropertyDirty("HasPropertyTypeBeenRemoved"), Is.True);
     }
 
+    /// <summary>
+    /// Tests that adding a PropertyType to a PropertyGroup on a ContentType marks the PropertyGroup as dirty.
+    /// </summary>
     [Test]
     public void Adding_PropertyType_To_PropertyGroup_On_ContentType_Results_In_Dirty_Entity()
     {
@@ -903,6 +1008,9 @@ public class ContentTests
         Assert.That(contentType.PropertyGroups.Any(x => x.IsDirty()), Is.True);
     }
 
+    /// <summary>
+    /// Tests that a composite content type collection can be composed correctly by adding another content type.
+    /// </summary>
     [Test]
     public void Can_Compose_Composite_ContentType_Collection()
     {
@@ -928,6 +1036,10 @@ public class ContentTests
         Assert.That(compositionPropertyTypes.Count(), Is.EqualTo(4));
     }
 
+    /// <summary>
+    /// Tests that nested composite content types can be composed correctly,
+    /// ensuring property groups and types are aggregated as expected.
+    /// </summary>
     [Test]
     public void Can_Compose_Nested_Composite_ContentType_Collection()
     {
@@ -957,6 +1069,11 @@ public class ContentTests
         Assert.That(simpleContentType.ContentTypeCompositionExists("meta"), Is.True);
     }
 
+    /// <summary>
+    /// Verifies that the content type composition logic correctly prevents the creation of circular dependencies
+    /// when adding content types as compositions, ensuring the integrity of the content type hierarchy.
+    /// This test checks that attempts to introduce cycles are detected and rejected, while valid compositions succeed.
+    /// </summary>
     [Test]
     public void Can_Avoid_Circular_Dependencies_In_Composition()
     {

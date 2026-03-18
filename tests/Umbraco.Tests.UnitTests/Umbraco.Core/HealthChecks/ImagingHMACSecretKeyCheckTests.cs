@@ -11,6 +11,10 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.HealthChecks;
 
+/// <summary>
+/// Contains unit tests for the <see cref="ImagingHMACSecretKeyCheck"/> health check in Umbraco.
+/// These tests verify the correct behavior and validation of the HMAC secret key configuration for imaging.
+/// </summary>
 [TestFixture]
 public class ImagingHMACSecretKeyCheckTests
 {
@@ -28,6 +32,10 @@ public class ImagingHMACSecretKeyCheckTests
         return mock.Object;
     }
 
+    /// <summary>
+    /// Tests that GetStatusAsync returns a warning when the HMAC key is not configured.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
     [Test]
     public async Task GetStatusAsync_WhenHMACKeyIsNotConfigured_ReturnsWarning()
     {
@@ -45,6 +53,10 @@ public class ImagingHMACSecretKeyCheckTests
         });
     }
 
+    /// <summary>
+    /// Tests that GetStatusAsync returns a success status when the HMAC key is configured.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task GetStatusAsync_WhenHMACKeyIsConfigured_ReturnsSuccess()
     {

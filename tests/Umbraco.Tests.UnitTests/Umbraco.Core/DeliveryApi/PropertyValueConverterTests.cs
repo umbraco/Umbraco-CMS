@@ -11,6 +11,9 @@ using Umbraco.Cms.Core.Services.Navigation;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.DeliveryApi;
 
+/// <summary>
+/// Contains unit tests for the PropertyValueConverter in the Umbraco Core Delivery API.
+/// </summary>
 public class PropertyValueConverterTests : DeliveryApiTests
 {
     protected ICacheManager CacheManager { get; private set; }
@@ -39,6 +42,10 @@ public class PropertyValueConverterTests : DeliveryApiTests
 
     protected Mock<IDocumentNavigationQueryService> DocumentNavigationQueryServiceMock { get; private set; }
 
+    /// <summary>
+    /// Initializes the test environment for <see cref="PropertyValueConverterTests"/> by setting up mocked content types, content, media, caches, URL providers, and navigation services required for unit tests.
+    /// This method is called before each test to ensure a consistent and isolated test context.
+    /// </summary>
     [SetUp]
     public override void Setup()
     {

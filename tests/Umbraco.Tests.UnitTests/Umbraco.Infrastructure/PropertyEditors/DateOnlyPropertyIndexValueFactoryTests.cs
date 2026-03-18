@@ -8,12 +8,18 @@ using Umbraco.Cms.Infrastructure.Serialization;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PropertyEditors;
 
+/// <summary>
+/// Contains unit tests that verify the behavior of the <see cref="DateOnlyPropertyIndexValueFactory"/> class.
+/// </summary>
 [TestFixture]
 [TestOf(typeof(DateOnlyPropertyIndexValueFactory))]
 public class DateOnlyPropertyIndexValueFactoryTests
 {
     private static readonly IJsonSerializer _jsonSerializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
 
+    /// <summary>
+    /// Tests that GetIndexValues returns empty values when the property value is null.
+    /// </summary>
     [Test]
     public void GetIndexValues_ReturnsEmptyValues_ForNullPropertyValue()
     {
@@ -39,6 +45,9 @@ public class DateOnlyPropertyIndexValueFactoryTests
         Assert.IsEmpty(indexValue.Values);
     }
 
+    /// <summary>
+    /// Tests that GetIndexValues returns the correctly formatted date string from the property value.
+    /// </summary>
     [Test]
     public void GetIndexValues_ReturnsFormattedDateTime()
     {

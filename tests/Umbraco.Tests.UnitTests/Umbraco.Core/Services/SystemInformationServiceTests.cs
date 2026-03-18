@@ -16,14 +16,24 @@ using Umbraco.Cms.Infrastructure.Telemetry.Providers;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Services;
 
+/// <summary>
+/// Contains unit tests for the <see cref="SystemInformationService"/> class.
+/// </summary>
 [TestFixture]
 public class SystemInformationServiceTests
 {
+    /// <summary>
+    /// Creates the necessary mocks for the tests.
+    /// </summary>
     [OneTimeSetUp]
     public void CreateMocks() => CreateUmbracoVersion(9, 0, 0);
 
     private IUmbracoVersion _umbracoVersion;
 
+    /// <summary>
+    /// Tests that the default language returned by the system information service matches the expected culture.
+    /// </summary>
+    /// <param name="culture">The culture code to test as the default language.</param>
     [Test]
     [TestCase("en-US")]
     [TestCase("de-DE")]
@@ -40,6 +50,13 @@ public class SystemInformationServiceTests
         });
     }
 
+    /// <summary>
+    /// Verifies that the <see cref="SystemInformationService"/> correctly reports the current thread's culture.
+    /// </summary>
+    /// <param name="culture">The culture name (e.g., "en-US") to set as the current thread's culture for the test.</param>
+    /// <remarks>
+    /// This test sets the thread's culture, invokes the service, and asserts that the reported culture matches the expected value.
+    /// </remarks>
     [Test]
     [TestCase("en-US")]
     [TestCase("de-DE")]
@@ -57,6 +74,11 @@ public class SystemInformationServiceTests
         });
     }
 
+    /// <summary>
+    /// Verifies that the SystemInformationService returns the correct current UI culture
+    /// based on the culture string set for the current thread.
+    /// </summary>
+    /// <param name="culture">The culture name (e.g., "en-US") to set as the current UI culture for the test execution.</param>
     [Test]
     [TestCase("en-US")]
     [TestCase("de-DE")]
@@ -74,6 +96,11 @@ public class SystemInformationServiceTests
         });
     }
 
+    /// <summary>
+    /// Verifies that the system information service returns non-null troubleshooting information for the specified culture.
+    /// Specifically, checks that the entries for "Server OS", "Server Framework", and "Current Webserver" are present and not null.
+    /// </summary>
+    /// <param name="culture">The culture code to use for the test (e.g., "en-US").</param>
     [Test]
     [TestCase("en-US")]
     [TestCase("de-DE")]
@@ -91,6 +118,10 @@ public class SystemInformationServiceTests
         });
     }
 
+    /// <summary>
+    /// Tests that the system information service reports the correct Models Builder mode.
+    /// </summary>
+    /// <param name="modelsMode">The Models Builder mode to test.</param>
     [Test]
     [TestCase(Constants.ModelsBuilder.ModelsModes.Nothing)]
     [TestCase(ModelsModeConstants.InMemoryAuto)]
@@ -106,6 +137,10 @@ public class SystemInformationServiceTests
         Assert.AreEqual(modelsMode, actual.Value);
     }
 
+    /// <summary>
+    /// Tests that the system information service reports the correct runtime mode.
+    /// </summary>
+    /// <param name="runtimeMode">The runtime mode to test.</param>
     [Test]
     [TestCase(RuntimeMode.BackofficeDevelopment)]
     [TestCase(RuntimeMode.Development)]
@@ -120,6 +155,11 @@ public class SystemInformationServiceTests
         Assert.AreEqual(runtimeMode.ToString(), actual.Value);
     }
 
+    /// <summary>
+    /// Verifies that the system information service correctly reports the status of debug mode
+    /// based on the provided <paramref name="isDebug"/> parameter.
+    /// </summary>
+    /// <param name="isDebug">If set to <c>true</c>, debug mode is enabled; otherwise, it is disabled.</param>
     [Test]
     [TestCase(true)]
     [TestCase(false)]

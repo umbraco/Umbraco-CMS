@@ -16,6 +16,15 @@ namespace Umbraco.Tests.Services;
 [TestFixture]
 internal class ContentVersionCleanupServiceTest
 {
+    /// <summary>
+    /// Verifies that <see cref="ContentVersionService.PerformContentVersionCleanup"/> always respects cancellation when delete revisions notifications are published.
+    /// </summary>
+    /// <param name="eventAggregator">Mocked notification publisher for publishing cancelable notifications.</param>
+    /// <param name="policy">Mocked content version cleanup policy.</param>
+    /// <param name="documentVersionRepository">Mocked repository for document versions.</param>
+    /// <param name="someHistoricVersions">A list of historic content version metadata used as test data.</param>
+    /// <param name="aDateTime">The date and time at which the cleanup is performed.</param>
+    /// <param name="sut">The <see cref="ContentVersionService"/> instance under test.</param>
     [Test]
     [AutoMoqData]
     public void PerformContentVersionCleanup_Always_RespectsDeleteRevisionsCancellation(
@@ -48,6 +57,15 @@ internal class ContentVersionCleanupServiceTest
         });
     }
 
+    /// <summary>
+    /// Verifies that performing content version cleanup always fires a deleted versions notification for each deleted version.
+    /// </summary>
+    /// <param name="eventAggregator">The mock notification publisher used to publish notifications.</param>
+    /// <param name="policy">The mock content version cleanup policy.</param>
+    /// <param name="documentVersionRepository">The mock repository for document versions.</param>
+    /// <param name="someHistoricVersions">The list of historic content version metadata to be cleaned up.</param>
+    /// <param name="aDateTime">The date and time used for cleanup evaluation.</param>
+    /// <param name="sut">The content version service under test.</param>
     [Test]
     [AutoMoqData]
     public void PerformContentVersionCleanup_Always_FiresDeletedVersionsForEachDeletedVersion(
@@ -74,6 +92,15 @@ internal class ContentVersionCleanupServiceTest
         eventAggregator.Verify(x => x.Publish(It.IsAny<ContentDeletedVersionsNotification>()), Times.Exactly(someHistoricVersions.Count));
     }
 
+    /// <summary>
+    /// Verifies that the <see cref="ContentVersionService.PerformContentVersionCleanup(DateTime)"/> method always returns a report containing the deleted content versions.
+    /// </summary>
+    /// <param name="eventAggregator">A mock event aggregator used to simulate notification publishing during cleanup.</param>
+    /// <param name="policy">A mock content version cleanup policy that defines cleanup rules.</param>
+    /// <param name="documentVersionRepository">A mock repository providing eligible content versions for cleanup.</param>
+    /// <param name="someHistoricVersions">A list of historic content version metadata expected to be cleaned up.</param>
+    /// <param name="aDateTime">The cutoff <see cref="DateTime"/> used to determine which versions are eligible for cleanup.</param>
+    /// <param name="sut">The instance of <see cref="ContentVersionService"/> under test.</param>
     [Test]
     [AutoMoqData]
     public void PerformContentVersionCleanup_Always_ReturnsReportOfDeletedItems(
@@ -101,6 +128,15 @@ internal class ContentVersionCleanupServiceTest
         });
     }
 
+    /// <summary>
+    /// Verifies that <see cref="ContentVersionService.PerformContentVersionCleanup"/> always applies the provided cleanup policy to eligible content versions.
+    /// </summary>
+    /// <param name="eventAggregator">Mock notification publisher for publishing notifications during cleanup.</param>
+    /// <param name="policy">Mock cleanup policy to determine which versions are retained or removed.</param>
+    /// <param name="documentVersionRepository">Mock repository returning content versions eligible for cleanup.</param>
+    /// <param name="someHistoricVersions">List of historic content version metadata used as test data.</param>
+    /// <param name="aDateTime">Reference date and time for the cleanup operation.</param>
+    /// <param name="sut">The <see cref="ContentVersionService"/> instance under test.</param>
     [Test]
     [AutoMoqData]
     public void PerformContentVersionCleanup_Always_AdheresToCleanupPolicy(

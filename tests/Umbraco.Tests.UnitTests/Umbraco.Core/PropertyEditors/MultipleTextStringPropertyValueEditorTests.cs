@@ -13,9 +13,15 @@ using Umbraco.Cms.Core.Strings;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 
+/// <summary>
+/// Contains unit tests for the <see cref="MultipleTextStringPropertyValueEditor"/> class.
+/// </summary>
 [TestFixture]
 public class MultipleTextStringPropertyValueEditorTests
 {
+    /// <summary>
+    /// Tests that the MultipleTextStringPropertyValueEditor correctly handles invalid values from the editor by returning null.
+    /// </summary>
     [Test]
     public void Can_Handle_Invalid_Values_From_Editor()
     {
@@ -43,6 +49,9 @@ public class MultipleTextStringPropertyValueEditorTests
         }
     }
 
+    /// <summary>
+    /// Tests that the editor can handle invalid values gracefully by returning an empty enumerable.
+    /// </summary>
     [Test]
     public void Can_Handle_Invalid_Values_To_Editor()
     {
@@ -67,6 +76,9 @@ public class MultipleTextStringPropertyValueEditorTests
         }
     }
 
+    /// <summary>
+    /// Tests that a single value can be parsed correctly from the editor.
+    /// </summary>
     [Test]
     public void Can_Parse_Single_Value_From_Editor()
     {
@@ -74,6 +86,9 @@ public class MultipleTextStringPropertyValueEditorTests
         Assert.AreEqual("The Value", fromEditor);
     }
 
+    /// <summary>
+    /// Tests that multiple values can be parsed correctly from the editor input.
+    /// </summary>
     [Test]
     public void Can_Parse_Multi_Value_From_Editor()
     {
@@ -81,6 +96,10 @@ public class MultipleTextStringPropertyValueEditorTests
         Assert.AreEqual("The First Value\nThe Second Value\nThe Third Value", fromEditor);
     }
 
+    /// <summary>
+    /// Tests that the value editor can parse more items than the allowed maximum from the editor input.
+    /// It also verifies that the validation correctly identifies when the number of items exceeds the maximum allowed.
+    /// </summary>
     [Test]
     public void Can_Parse_More_Items_Than_Allowed_From_Editor()
     {
@@ -95,6 +114,9 @@ public class MultipleTextStringPropertyValueEditorTests
         Assert.AreEqual($"validation_outOfRangeMultipleItemsMaximum", validationResult.ErrorMessage);
     }
 
+    /// <summary>
+    /// Tests that a single string value can be parsed correctly to the editor format.
+    /// </summary>
     [Test]
     public void Can_Parse_Single_Value_To_Editor()
     {
@@ -104,6 +126,9 @@ public class MultipleTextStringPropertyValueEditorTests
         Assert.AreEqual("The Value", toEditor.First());
     }
 
+    /// <summary>
+    /// Tests that multiple values separated by new lines can be parsed correctly to the editor format.
+    /// </summary>
     [Test]
     public void Can_Parse_Multi_Value_To_Editor()
     {
@@ -115,6 +140,9 @@ public class MultipleTextStringPropertyValueEditorTests
         Assert.AreEqual("The Third Value", toEditor.Last());
     }
 
+    /// <summary>
+    /// Tests that passing null from the editor results in a null value.
+    /// </summary>
     [Test]
     public void Null_From_Editor_Yields_Null()
     {
@@ -122,6 +150,9 @@ public class MultipleTextStringPropertyValueEditorTests
         Assert.IsNull(result);
     }
 
+    /// <summary>
+    /// Tests that converting a null value to editor format yields an empty collection.
+    /// </summary>
     [Test]
     public void Null_To_Editor_Yields_Empty_Collection()
     {
@@ -130,6 +161,9 @@ public class MultipleTextStringPropertyValueEditorTests
         Assert.IsEmpty(result);
     }
 
+    /// <summary>
+    /// Tests that the value editor validates null as below the configured minimum.
+    /// </summary>
     [Test]
     public void Validates_Null_As_Below_Configured_Min()
     {
@@ -163,6 +197,13 @@ public class MultipleTextStringPropertyValueEditorTests
         }
     }
 
+    /// <summary>
+    /// Tests that the value editor correctly validates whether the number of items in the raw property value
+    /// (separated by new lines) meets or exceeds the configured minimum requirement.
+    /// </summary>
+    /// <param name="value">The raw string value to validate, containing one or more items separated by new lines.</param>
+    /// <param name="expectedSuccess">True if the validation is expected to pass; otherwise, false.</param>
+    /// <param name="expectedValidationMessageKey">The expected validation message key if validation fails; otherwise, an empty string if validation succeeds.</param>
     [TestCase("", false, "outOfRangeMultipleItemsMinimum")]
     [TestCase("one", false, "outOfRangeSingleItemMinimum")]
     [TestCase("one\ntwo", true, "")]
@@ -184,6 +225,11 @@ public class MultipleTextStringPropertyValueEditorTests
         }
     }
 
+    /// <summary>
+    /// Validates that the number of items is less than or equal to the configured maximum.
+    /// </summary>
+    /// <param name="numberOfStrings">The number of string items to validate.</param>
+    /// <param name="expectedSuccess">Indicates whether the validation is expected to succeed.</param>
     [TestCase(3, true)]
     [TestCase(4, true)]
     [TestCase(5, false)]
@@ -225,6 +271,10 @@ public class MultipleTextStringPropertyValueEditorTests
         }
     }
 
+    /// <summary>
+    /// Tests that the property value editor can parse supported property value delimiters correctly.
+    /// </summary>
+    /// <param name="value">The string value containing multiple text entries separated by delimiters.</param>
     [TestCase("one\ntwo\nthree")]
     [TestCase("one\rtwo\rthree")]
     [TestCase("one\r\ntwo\r\nthree")]
@@ -235,6 +285,9 @@ public class MultipleTextStringPropertyValueEditorTests
         Assert.IsEmpty(result);
     }
 
+    /// <summary>
+    /// Tests that the maximum item validation treats 0 as unlimited.
+    /// </summary>
     [Test]
     public void Max_Item_Validation_Respects_0_As_Unlimited()
     {
@@ -246,6 +299,9 @@ public class MultipleTextStringPropertyValueEditorTests
         Assert.IsEmpty(result);
     }
 
+    /// <summary>
+    /// Tests that FromEditor filters out empty and whitespace strings correctly.
+    /// </summary>
     [Test]
     public void FromEditor_Filters_Empty_Strings()
     {
@@ -253,6 +309,9 @@ public class MultipleTextStringPropertyValueEditorTests
         Assert.AreEqual("one\ntwo\nthree", fromEditor);
     }
 
+    /// <summary>
+    /// Tests that FromEditor returns null when given an empty collection.
+    /// </summary>
     [Test]
     public void FromEditor_Returns_Null_For_Empty_Collection()
     {
@@ -260,6 +319,9 @@ public class MultipleTextStringPropertyValueEditorTests
         Assert.IsNull(fromEditor);
     }
 
+    /// <summary>
+    /// Tests that FromEditor returns null when all input strings are empty or whitespace.
+    /// </summary>
     [Test]
     public void FromEditor_Returns_Null_When_All_Strings_Are_Empty()
     {
@@ -267,6 +329,9 @@ public class MultipleTextStringPropertyValueEditorTests
         Assert.IsNull(fromEditor);
     }
 
+    /// <summary>
+    /// Tests that FromEditor preserves non-empty strings when mixed with empty strings.
+    /// </summary>
     [Test]
     public void FromEditor_Preserves_Non_Empty_Strings_Mixed_With_Empty()
     {
@@ -274,6 +339,9 @@ public class MultipleTextStringPropertyValueEditorTests
         Assert.AreEqual("valid@email.com", fromEditor);
     }
 
+    /// <summary>
+    /// Tests that the format validator skips empty strings and does not fail validation on them.
+    /// </summary>
     [Test]
     public void Format_Validator_Skips_Empty_Strings()
     {
@@ -288,6 +356,9 @@ public class MultipleTextStringPropertyValueEditorTests
         Assert.IsEmpty(result);
     }
 
+    /// <summary>
+    /// Tests that the format validator fails for invalid non-empty strings.
+    /// </summary>
     [Test]
     public void Format_Validator_Fails_For_Invalid_Non_Empty_Strings()
     {
@@ -301,6 +372,9 @@ public class MultipleTextStringPropertyValueEditorTests
         Assert.IsNotEmpty(result);
     }
 
+    /// <summary>
+    /// Tests that the MinMax validator does not count empty strings when validating the value.
+    /// </summary>
     [Test]
     public void MinMax_Validator_Does_Not_Count_Empty_Strings()
     {
@@ -313,6 +387,9 @@ public class MultipleTextStringPropertyValueEditorTests
         Assert.IsEmpty(result);
     }
 
+    /// <summary>
+    /// Tests that the MinMax validator does not count empty strings when validating against the minimum count.
+    /// </summary>
     [Test]
     public void MinMax_Validator_Does_Not_Count_Empty_Strings_Below_Min()
     {
@@ -326,6 +403,9 @@ public class MultipleTextStringPropertyValueEditorTests
         Assert.AreEqual("validation_outOfRangeSingleItemMinimum", result.First().ErrorMessage);
     }
 
+    /// <summary>
+    /// Tests that the required validator fails when all strings in the value array are empty or whitespace.
+    /// </summary>
     [Test]
     public void Required_Validator_Fails_When_All_Strings_Are_Empty()
     {
@@ -337,6 +417,9 @@ public class MultipleTextStringPropertyValueEditorTests
         Assert.IsNotEmpty(result);
     }
 
+    /// <summary>
+    /// Tests that the required validator passes when at least one non-empty string is present in the value.
+    /// </summary>
     [Test]
     public void Required_Validator_Passes_When_Non_Empty_Strings_Present()
     {

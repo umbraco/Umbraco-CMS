@@ -18,9 +18,15 @@ using Umbraco.Cms.Tests.Common;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Scoping;
 
+/// <summary>
+/// Contains unit tests for the <see cref="ScopedNotificationPublisher"/> class, verifying its behavior and functionality.
+/// </summary>
 [TestFixture]
 public class ScopedNotificationPublisherTests
 {
+    /// <summary>
+    /// Tests that the scope uses the injected notification publisher correctly.
+    /// </summary>
     [Test]
     public void ScopeUsesInjectedNotificationPublisher()
     {
@@ -56,6 +62,9 @@ public class ScopedNotificationPublisherTests
         eventAggregatorMock.Verify(x => x.PublishCancelable(It.IsAny<ICancelableNotification>()), Times.Never);
     }
 
+    /// <summary>
+    /// Tests that specifying a notification publisher in an inner scope causes an ArgumentException to be thrown.
+    /// </summary>
     [Test]
     public void SpecifyingNotificationPublishInInnerScopeCausesError()
     {

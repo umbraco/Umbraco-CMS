@@ -10,6 +10,9 @@ using Umbraco.Cms.Core.PropertyEditors;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Management.Factories;
 
+/// <summary>
+/// Contains unit tests for the <see cref="MediaUrlFactory"/> class, verifying its behavior and functionality.
+/// </summary>
 [TestFixture]
 public class MediaUrlFactoryTests
 {
@@ -17,6 +20,9 @@ public class MediaUrlFactoryTests
     private const string MediaPath = "/media/image.jpg";
     private const string PropertyAlias = Constants.Conventions.Media.File;
 
+    /// <summary>
+    /// Tests that when recycle bin protection is disabled, the created URLs do not include the deleted suffix.
+    /// </summary>
     [Test]
     public void CreateUrls_WithRecycleBinProtectionDisabled_ReturnsUrlWithoutDeletedSuffix()
     {
@@ -33,6 +39,10 @@ public class MediaUrlFactoryTests
         Assert.IsNull(result[0].Culture);
     }
 
+    /// <summary>
+    /// Tests that when recycle bin protection is enabled and the media is not trashed,
+    /// the created URLs do not contain the deleted suffix.
+    /// </summary>
     [Test]
     public void CreateUrls_WithRecycleBinProtectionEnabled_AndMediaNotTrashed_ReturnsUrlWithoutDeletedSuffix()
     {
@@ -49,6 +59,10 @@ public class MediaUrlFactoryTests
         Assert.IsNull(result[0].Culture);
     }
 
+    /// <summary>
+    /// Tests that when recycle bin protection is enabled and the media item is trashed,
+    /// the created URL includes the deleted suffix.
+    /// </summary>
     [Test]
     public void CreateUrls_WithRecycleBinProtectionEnabled_AndMediaTrashed_ReturnsUrlWithDeletedSuffix()
     {
@@ -65,6 +79,10 @@ public class MediaUrlFactoryTests
         Assert.IsNull(result[0].Culture);
     }
 
+    /// <summary>
+    /// Tests that when recycle bin protection is disabled and media is trashed,
+    /// the created URLs do not include the deleted suffix.
+    /// </summary>
     [Test]
     public void CreateUrls_WithRecycleBinProtectionDisabled_AndMediaTrashed_ReturnsUrlWithoutDeletedSuffix()
     {
@@ -81,6 +99,9 @@ public class MediaUrlFactoryTests
         Assert.IsNull(result[0].Culture);
     }
 
+    /// <summary>
+    /// Tests that CreateUrls returns an empty collection when no URLs are provided.
+    /// </summary>
     [Test]
     public void CreateUrls_WithNoUrls_ReturnsEmptyCollection()
     {
@@ -95,6 +116,9 @@ public class MediaUrlFactoryTests
         Assert.IsEmpty(result);
     }
 
+    /// <summary>
+    /// Tests that CreateUrls returns all URLs when multiple URLs are present.
+    /// </summary>
     [Test]
     public void CreateUrls_WithMultipleUrls_ReturnsAllUrls()
     {
@@ -124,6 +148,9 @@ public class MediaUrlFactoryTests
         Assert.AreEqual($"{BaseUrl}{secondMediaPath}", result[1].Url);
     }
 
+    /// <summary>
+    /// Tests that creating URL sets with a single media item returns the correct response model.
+    /// </summary>
     [Test]
     public void CreateUrlSets_WithSingleMedia_ReturnsCorrectResponseModel()
     {
@@ -142,6 +169,9 @@ public class MediaUrlFactoryTests
         Assert.AreEqual($"{BaseUrl}{MediaPath}", result[0].UrlInfos.First().Url);
     }
 
+    /// <summary>
+    /// Tests that CreateUrlSets returns all media URL information for multiple media items.
+    /// </summary>
     [Test]
     public void CreateUrlSets_WithMultipleMedia_ReturnsAllMediaUrlInfos()
     {
@@ -264,6 +294,13 @@ public class MediaUrlFactoryTests
 
     private class StubMediaUrlGenerator : IMediaUrlGenerator
     {
+    /// <summary>
+    /// Attempts to get the media path from the given value if it is a non-empty string.
+    /// </summary>
+    /// <param name="propertyEditorAlias">The alias of the property editor (optional).</param>
+    /// <param name="value">The value to extract the media path from.</param>
+    /// <param name="mediaPath">When this method returns, contains the media path if found; otherwise, null.</param>
+    /// <returns>True if a valid media path was found; otherwise, false.</returns>
         public bool TryGetMediaPath(string? propertyEditorAlias, object? value, out string? mediaPath)
         {
             if (value is string stringValue && !string.IsNullOrEmpty(stringValue))

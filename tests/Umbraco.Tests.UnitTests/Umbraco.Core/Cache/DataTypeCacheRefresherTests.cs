@@ -15,6 +15,9 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Cache;
 
+/// <summary>
+/// Contains unit tests for verifying the behavior of the <see cref="DataTypeCacheRefresher"/> class in the Umbraco CMS core cache.
+/// </summary>
 [TestFixture]
 public class DataTypeCacheRefresherTests
 {
@@ -50,6 +53,9 @@ public class DataTypeCacheRefresherTests
             Mock.Of<IContentTypeCommonRepository>());
     }
 
+    /// <summary>
+    /// Sets up the test environment before each test is run.
+    /// </summary>
     [SetUp]
     public void SetUp()
     {
@@ -58,6 +64,9 @@ public class DataTypeCacheRefresherTests
         _publishedContentTypeCache = new Mock<IPublishedContentTypeCache>();
     }
 
+    /// <summary>
+    /// Tests that a document type change triggers a rebuild of the memory cache.
+    /// </summary>
     [Test]
     public void Document_Type_Change_Rebuilds_Memory_Cache()
     {
@@ -80,6 +89,9 @@ public class DataTypeCacheRefresherTests
             Times.Once);
     }
 
+    /// <summary>
+    /// Tests that a change in media type triggers a rebuild of the memory cache.
+    /// </summary>
     [Test]
     public void Media_Type_Change_Rebuilds_Memory_Cache()
     {
@@ -102,6 +114,9 @@ public class DataTypeCacheRefresherTests
             Times.Once);
     }
 
+    /// <summary>
+    /// Tests that a non-auto factory does not perform a full clear of the converted cache when refreshing.
+    /// </summary>
     [Test]
     public void Non_Auto_Factory_Does_Not_Full_Clear_Converted_Cache()
     {
@@ -123,6 +138,10 @@ public class DataTypeCacheRefresherTests
         _documentCacheService.Verify(x => x.ClearConvertedContentCache(), Times.Never);
     }
 
+    /// <summary>
+    /// Tests that in auto models builder mode, a document change triggers a full clear of all converted content cache.
+    /// This ensures that stale instances of other types are prevented after the factory reset invalidates all compiled model types.
+    /// </summary>
     [Test]
     public void Auto_Factory_Document_Change_Clears_All_Converted_Content()
     {
@@ -146,6 +165,9 @@ public class DataTypeCacheRefresherTests
         _documentCacheService.Verify(x => x.ClearConvertedContentCache(), Times.Once);
     }
 
+    /// <summary>
+    /// Tests that when the auto factory media changes, all converted content caches are cleared.
+    /// </summary>
     [Test]
     public void Auto_Factory_Media_Change_Clears_All_Converted_Content()
     {
@@ -167,6 +189,9 @@ public class DataTypeCacheRefresherTests
         _mediaCacheService.Verify(x => x.ClearConvertedContentCache(), Times.Once);
     }
 
+    /// <summary>
+    /// Tests that when the factory returns no affected content types, the cache refresher does not clear any caches.
+    /// </summary>
     [Test]
     public void Auto_Factory_No_Affected_Types_Does_Not_Clear()
     {
@@ -194,6 +219,10 @@ public class DataTypeCacheRefresherTests
         _mediaCacheService.Verify(x => x.ClearConvertedContentCache(), Times.Never);
     }
 
+    /// <summary>
+    /// Tests that a data type change affecting both document and media content types
+    /// triggers the appropriate cache refresh and clearing operations for both.
+    /// </summary>
     [Test]
     public void Mixed_Document_And_Media_Types_Both_Handled()
     {

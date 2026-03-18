@@ -12,6 +12,10 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 
+/// <summary>
+/// Provides unit tests for the <c>BlockEditorComponent</c> class within the Umbraco CMS core property editors.
+/// These tests verify the functionality and behavior of the Block Editor component.
+/// </summary>
 [TestFixture]
 public class BlockEditorComponentTests
 {
@@ -24,6 +28,9 @@ public class BlockEditorComponentTests
 
     private readonly IJsonSerializer _jsonSerializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
 
+    /// <summary>
+    /// Tests that a null Udi value is not allowed and throws a FormatException.
+    /// </summary>
     [Test]
     public void Cannot_Have_Null_Udi()
     {
@@ -32,6 +39,10 @@ public class BlockEditorComponentTests
         Assert.Throws<FormatException>(() => component.ReplaceBlockEditorKeys(json));
     }
 
+    /// <summary>
+    /// Verifies that the <see cref="BlockListPropertyNotificationHandler"/> correctly replaces block editor keys in a block list JSON structure when there is no nesting of blocks.
+    /// Ensures that all GUIDs are replaced and the resulting JSON structure matches the expected output.
+    /// </summary>
     [Test]
     public void No_Nesting()
     {
@@ -55,6 +66,9 @@ public class BlockEditorComponentTests
         Assert.AreEqual(expectedJson, resultJson);
     }
 
+    /// <summary>
+    /// Tests that one level of nested block editor content remains properly escaped after replacing keys.
+    /// </summary>
     [Test]
     public void One_Level_Nesting_Escaped()
     {
@@ -87,6 +101,9 @@ public class BlockEditorComponentTests
         Assert.AreEqual(expectedJson, resultJson);
     }
 
+    /// <summary>
+    /// Tests the replacement of block editor keys with one level of nesting using unescaped property values.
+    /// </summary>
     [Test]
     public void One_Level_Nesting_Unescaped()
     {
@@ -114,6 +131,11 @@ public class BlockEditorComponentTests
         Assert.AreEqual(expectedJson, resultJson);
     }
 
+    /// <summary>
+    /// Verifies that when block editor content is nested within a complex editor (such as a grid),
+    /// the nested JSON is properly escaped and all block keys are replaced as expected.
+    /// Ensures that the escaping is consistent and that key replacement occurs for all nested blocks.
+    /// </summary>
     [Test]
     public void Nested_In_Complex_Editor_Escaped()
     {
@@ -148,6 +170,10 @@ public class BlockEditorComponentTests
         Assert.AreEqual(expectedJson, resultJson);
     }
 
+    /// <summary>
+    /// Verifies that the <c>BlockGrid</c> property editor correctly replaces GUID keys in JSON data when nested <c>BlockList</c> data is present and escaped.
+    /// Ensures that the escaping of nested JSON is preserved after key replacement, and that the resulting structure matches expectations.
+    /// </summary>
     [Test]
     public void BlockGrid_With_Nested_BlockList_Escaped()
     {
@@ -179,6 +205,9 @@ public class BlockEditorComponentTests
         Assert.AreEqual(expectedJson, resultJson);
     }
 
+    /// <summary>
+    /// Tests that the BlockGrid property editor correctly replaces keys in nested BlockList data without escaping sub-features.
+    /// </summary>
     [Test]
     public void BlockGrid_With_Nested_BlockList_Unescaped()
     {
@@ -206,6 +235,9 @@ public class BlockEditorComponentTests
         Assert.AreEqual(expectedJson, resultJson);
     }
 
+    /// <summary>
+    /// Tests the BlockGrid editor with nested UDI-based editors to ensure that UDIs are correctly preserved and replaced.
+    /// </summary>
     [Test]
     public void BlockGrid_With_Nested_Udi_Based_Editor()
     {

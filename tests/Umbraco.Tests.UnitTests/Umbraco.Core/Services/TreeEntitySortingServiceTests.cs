@@ -1,10 +1,13 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Services;
 
+/// <summary>
+/// Unit tests for the <see cref="TreeEntitySortingService"/> class.
+/// </summary>
 [TestFixture]
 public class TreeEntitySortingServiceTests
 {
@@ -42,6 +45,9 @@ public class TreeEntitySortingServiceTests
         Assert.IsTrue(_treeEntities.All(e => result.SingleOrDefault(r => r.Key == e.Key) is not null));
     }
 
+    /// <summary>
+    /// Tests that the last entity in the collection can be moved to the first position.
+    /// </summary>
     [Test]
     public void Can_Move_Last_Entity_First()
     {
@@ -58,6 +64,9 @@ public class TreeEntitySortingServiceTests
         Assert.AreEqual(EntityKey(19), result.Last().Key);
     }
 
+    /// <summary>
+    /// Tests that the first entity can be moved to the last position in the sorted result.
+    /// </summary>
     [Test]
     public void Can_Move_First_Entity_Last()
     {
@@ -74,6 +83,9 @@ public class TreeEntitySortingServiceTests
         Assert.AreEqual(EntityKey(1), result.Last().Key);
     }
 
+    /// <summary>
+    /// Tests that three entities can be moved to the last positions correctly.
+    /// </summary>
     [Test]
     public void Can_Move_Three_Entities_Last()
     {
@@ -96,6 +108,9 @@ public class TreeEntitySortingServiceTests
         Assert.AreEqual(EntityKey(12), result[17].Key);
     }
 
+    /// <summary>
+    /// Tests that three entities can be moved to the first positions correctly.
+    /// </summary>
     [Test]
     public void Can_Move_Three_Entities_First()
     {
@@ -118,6 +133,9 @@ public class TreeEntitySortingServiceTests
         Assert.AreEqual(EntityKey(20), result.Last().Key);
     }
 
+    /// <summary>
+    /// Tests that applying the same position to entities does not change their order.
+    /// </summary>
     [Test]
     public void Can_Apply_Same_Position_To_Entities()
     {
@@ -138,6 +156,9 @@ public class TreeEntitySortingServiceTests
         Assert.IsTrue(result.SequenceEqual(_treeEntities));
     }
 
+    /// <summary>
+    /// Tests that multiple entities can be moved forwards correctly in the sorting order.
+    /// </summary>
     [Test]
     public void Can_Move_Multiple_Entities_Forwards()
     {
@@ -157,6 +178,9 @@ public class TreeEntitySortingServiceTests
         Assert.AreEqual(EntityKey(20), result[9].Key);
     }
 
+    /// <summary>
+    /// Tests that multiple entities can be moved backwards correctly in the sorting order.
+    /// </summary>
     [Test]
     public void Can_Move_Multiple_Entities_Backwards()
     {
@@ -176,6 +200,10 @@ public class TreeEntitySortingServiceTests
         Assert.AreEqual(EntityKey(10), result[19].Key);
     }
 
+    /// <summary>
+    /// Tests that the order of sorting instructions does not affect the final sorted result when the instructions overlap.
+    /// </summary>
+    /// <param name="lastFirst">Determines the order of sorting instructions to test both possible sequences.</param>
     [TestCase(true)]
     [TestCase(false)]
     public void Sorting_Instruction_Order_Does_Not_Matter_When_Overlapping(bool lastFirst)
@@ -195,6 +223,10 @@ public class TreeEntitySortingServiceTests
         Assert.AreEqual(EntityKey(10), result[19].Key);
     }
 
+    /// <summary>
+    /// Tests that the order of sorting instructions does not affect the sorting result when the instructions do not overlap.
+    /// </summary>
+    /// <param name="lastFirst">Indicates whether to apply the sorting instructions in last-first order.</param>
     [TestCase(false)]
     [TestCase(false)]
     public void Sorting_Instruction_Order_Does_Not_Matter_When_Not_Overlapping(bool lastFirst)
@@ -269,6 +301,10 @@ public class TreeEntitySortingServiceTests
         Assert.AreEqual(EntityKey(1), result[19].Key);
     }
 
+    /// <summary>
+    /// Verifies that attempting to sort an entity with a sort order outside the valid range throws an <see cref="ArgumentException"/>.
+    /// </summary>
+    /// <param name="sortOrder">The sort order value to test, which is outside the valid range for the entities.</param>
     [TestCase(-1)]
     [TestCase(-1000)]
     [TestCase(20)]
@@ -284,6 +320,9 @@ public class TreeEntitySortingServiceTests
             }));
     }
 
+    /// <summary>
+    /// Tests that sorting entities under different parents throws an ArgumentException.
+    /// </summary>
     [Test]
     public void Cannot_Sort_Entities_Under_Different_Parents()
     {
@@ -300,6 +339,9 @@ public class TreeEntitySortingServiceTests
             }));
     }
 
+    /// <summary>
+    /// Tests that sorting a non-existing entity throws an ArgumentException.
+    /// </summary>
     [Test]
     public void Cannot_Sort_NonExisting_Entity()
     {
@@ -312,6 +354,9 @@ public class TreeEntitySortingServiceTests
             }));
     }
 
+    /// <summary>
+    /// Tests that supplying duplicate key instructions to the SortEntities method throws an ArgumentException.
+    /// </summary>
     [Test]
     public void Cannot_Supply_Duplicate_Key_Instructions()
     {
@@ -325,6 +370,9 @@ public class TreeEntitySortingServiceTests
             }));
     }
 
+    /// <summary>
+    /// Tests that supplying duplicate sort order instructions throws an ArgumentException.
+    /// </summary>
     [Test]
     public void Cannot_Supply_Duplicate_SortOrder_Instructions()
     {

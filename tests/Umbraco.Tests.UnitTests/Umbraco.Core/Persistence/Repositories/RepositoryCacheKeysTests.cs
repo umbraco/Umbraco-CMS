@@ -9,9 +9,15 @@ using Umbraco.Cms.Tests.Common.Attributes;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 
+/// <summary>
+/// Contains unit tests that verify the behavior of the <see cref="RepositoryCacheKeys"/> class.
+/// </summary>
 [TestFixture]
 public class RepositoryCacheKeysTests
 {
+    /// <summary>
+    /// Tests that the GetKey method returns the expected cache key string for a given type.
+    /// </summary>
     [Test]
     public void GetKey_Returns_Expected_Key_For_Type()
     {
@@ -19,6 +25,9 @@ public class RepositoryCacheKeysTests
         Assert.AreEqual("uRepo_IContent_", key);
     }
 
+    /// <summary>
+    /// Tests that the GetKey method returns the expected cache key string for a given type and identifier.
+    /// </summary>
     [Test]
     public void GetKey_Returns_Expected_Key_For_Type_And_Id()
     {
@@ -26,6 +35,9 @@ public class RepositoryCacheKeysTests
         Assert.AreEqual("uRepo_IContent_1000", key);
     }
 
+    /// <summary>
+    /// Tests that the GetGuidKey method returns the expected cache key string for a given type and GUID.
+    /// </summary>
     [Test]
     public void GetGuidKey_Returns_Expected_Key_For_Type_And_Id()
     {
@@ -34,6 +46,9 @@ public class RepositoryCacheKeysTests
         Assert.AreEqual("uRepoGuid_IContent_a1b2c3d4-e5f6-7890-abcd-ef1234567890", key);
     }
 
+    /// <summary>
+    /// Tests that GetGuidKey returns an empty string when given an empty Guid.
+    /// </summary>
     [Test]
     public void GetGuidKey_Returns_Empty_For_Empty_Guid()
     {

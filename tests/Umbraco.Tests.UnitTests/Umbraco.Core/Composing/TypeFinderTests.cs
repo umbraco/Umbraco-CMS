@@ -18,6 +18,9 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Composing;
 [TestFixture]
 public class TypeFinderTests
 {
+    /// <summary>
+    /// Initializes the test by setting up the assemblies to be used.
+    /// </summary>
     [SetUp]
     public void Initialize() => _assemblies = new[]
     {
@@ -33,6 +36,9 @@ public class TypeFinderTests
     /// </summary>
     private Assembly[] _assemblies;
 
+    /// <summary>
+    /// Tests finding classes of a specified type that have a specific attribute.
+    /// </summary>
     [Test]
     public void Find_Class_Of_Type_With_Attribute()
     {
@@ -44,20 +50,32 @@ public class TypeFinderTests
         Assert.AreEqual(2, typesFound.Count());
     }
 
+    /// <summary>
+    /// A custom attribute defined specifically for use in unit tests within the <see cref="TypeFinderTests"/> class.
+    /// </summary>
     [AttributeUsage(AttributeTargets.Class)]
     public class MyTestAttribute : Attribute
     {
     }
 
+    /// <summary>
+    /// Tests the functionality of the editor type within the TypeFinder, ensuring correct identification and behavior of editor classes.
+    /// </summary>
     public abstract class TestEditor
     {
     }
 
+    /// <summary>
+    /// Represents a mock benchmark test editor class used for unit testing within the TypeFinderTests.
+    /// </summary>
     [MyTest]
     public class BenchmarkTestEditor : TestEditor
     {
     }
 
+    /// <summary>
+    /// Represents a test editor type for unit testing purposes.
+    /// </summary>
     [MyTest]
     public class MyOtherTestEditor : TestEditor
     {

@@ -24,12 +24,18 @@ using static Umbraco.Cms.Core.PropertyEditors.BlockListPropertyEditorBase;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 
+/// <summary>
+/// Contains unit tests for the <see cref="BlockListEditorPropertyValueEditor"/> class in Umbraco.
+/// </summary>
 [TestFixture]
 public class BlockListEditorPropertyValueEditorTests
 {
     private static readonly Guid _contentTypeKey = Guid.NewGuid();
     private static readonly Guid _contentKey = Guid.NewGuid();
 
+    /// <summary>
+    /// Validates that a null value is treated as below the configured minimum and triggers validation error.
+    /// </summary>
     [Test]
     public void Validates_Null_As_Below_Configured_Min()
     {
@@ -84,6 +90,9 @@ public class BlockListEditorPropertyValueEditorTests
         }
     }
 
+    /// <summary>
+    /// Tests that MergeVariantInvariantPropertyValue correctly merges null values.
+    /// </summary>
     [Test]
     public void MergeVariantInvariantPropertyValue_Can_Merge_Null_Values()
     {
@@ -92,6 +101,9 @@ public class BlockListEditorPropertyValueEditorTests
         Assert.IsNull(result);
     }
 
+    /// <summary>
+    /// Tests that the FromEditor method returns the expected JSON value when the current value is null.
+    /// </summary>
     [Test]
     public void FromEditor_With_Null_Current_Value_Returns_Expected_Json_Value()
     {
@@ -104,6 +116,9 @@ public class BlockListEditorPropertyValueEditorTests
         AssertResultValue(result, 0, "A");
     }
 
+    /// <summary>
+    /// Tests that FromEditor returns the expected JSON value when a current value is provided.
+    /// </summary>
     [Test]
     public void FromEditor_With_Current_Value_Returns_Expected_Json_Value()
     {
@@ -117,6 +132,10 @@ public class BlockListEditorPropertyValueEditorTests
         AssertResultValue(result, 0, "B");
     }
 
+    /// <summary>
+    /// Tests that the FromEditor method correctly processes a block item editor that uses the current value with an edited property,
+    /// and returns the expected JSON value.
+    /// </summary>
     [Test]
     public void FromEditor_With_Block_Item_Editor_That_Uses_Current_Value_With_Edited_Property_Returns_Expected_Json_Value()
     {
@@ -130,6 +149,10 @@ public class BlockListEditorPropertyValueEditorTests
         AssertResultValue(result, 0, "A, B");
     }
 
+    /// <summary>
+    /// Tests that the FromEditor method correctly processes block item editors that use the current value,
+    /// including cases where properties are edited and added, and returns the expected JSON value.
+    /// </summary>
     [Test]
     public void FromEditor_With_Block_Item_Editor_That_Uses_Current_Value_With_Edited_And_Added_Property_Returns_Expected_Json_Value()
     {
@@ -144,6 +167,10 @@ public class BlockListEditorPropertyValueEditorTests
         AssertResultValue(result, 1, "C");
     }
 
+    /// <summary>
+    /// Tests that the FromEditor method correctly processes a block item editor that uses the current value,
+    /// including cases where properties are edited and removed, and returns the expected JSON value.
+    /// </summary>
     [Test]
     public void FromEditor_With_Block_Item_Editor_That_Uses_Current_Value_With_Edited_And_Removed_Property_Returns_Expected_Json_Value()
     {
@@ -322,6 +349,10 @@ public class BlockListEditorPropertyValueEditorTests
         global::Umbraco.Cms.Core.Constants.PropertyEditors.Aliases.TextBox)]
     private class ConcatenatingTextboxPropertyEditor : DataEditor
     {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ConcatenatingTextboxPropertyEditor"/> class.
+    /// </summary>
+    /// <param name="dataValueEditorFactory">The factory to create data value editors.</param>
         public ConcatenatingTextboxPropertyEditor(IDataValueEditorFactory dataValueEditorFactory)
             : base(dataValueEditorFactory)
         {
@@ -339,6 +370,11 @@ public class BlockListEditorPropertyValueEditorTests
     /// </remarks>
     private class ConcatenatingTextValueEditor : DataValueEditor
     {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ConcatenatingTextValueEditor"/> class.
+    /// </summary>
+    /// <param name="shortStringHelper">An instance of <see cref="IShortStringHelper"/> used for string manipulation.</param>
+    /// <param name="jsonSerializer">An optional <see cref="IJsonSerializer"/> used for JSON serialization; may be <c>null</c>.</param>
         public ConcatenatingTextValueEditor(IShortStringHelper shortStringHelper, IJsonSerializer? jsonSerializer)
             : base(shortStringHelper, jsonSerializer)
         {

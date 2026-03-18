@@ -10,6 +10,9 @@ using Umbraco.Cms.Tests.Common.Builders.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models;
 
+/// <summary>
+/// Unit tests for the <see cref="global::Umbraco.Core.Models.Member"/> class.
+/// </summary>
 [TestFixture]
 public class MemberTests
 {
@@ -18,6 +21,9 @@ public class MemberTests
 
     private MemberBuilder _builder;
 
+    /// <summary>
+    /// Tests that a Member instance can be deeply cloned correctly.
+    /// </summary>
     [Test]
     public void Can_Deep_Clone()
     {
@@ -72,6 +78,9 @@ public class MemberTests
         }
     }
 
+    /// <summary>
+    /// Tests that a member can be serialized to JSON without throwing an error.
+    /// </summary>
     [Test]
     public void Can_Serialize_Without_Error()
     {

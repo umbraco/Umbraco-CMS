@@ -12,6 +12,9 @@ using Umbraco.Cms.Infrastructure.Serialization;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 
+/// <summary>
+/// Contains unit tests for the <see cref="PropertyEditorValueConverter"/> class, verifying its behavior and functionality.
+/// </summary>
 [TestFixture]
 public class PropertyEditorValueConverterTests
 {
@@ -70,6 +73,12 @@ public class PropertyEditorValueConverterTests
         Assert.AreEqual(expected, result);
     }
 
+    /// <summary>
+    /// Tests that the CheckboxListValueConverter correctly converts the given JSON string value
+    /// to the expected list of strings.
+    /// </summary>
+    /// <param name="value">The JSON string representing the selected checkbox values.</param>
+    /// <param name="expected">The expected list of strings after conversion.</param>
     [TestCase("[\"apples\"]", new[] { "apples" })]
     [TestCase("[\"apples\",\"oranges\"]", new[] { "apples", "oranges" })]
     [TestCase("[\"apples\",\"oranges\",\"pears\"]", new[] { "apples", "oranges", "pears" })]
@@ -83,6 +92,11 @@ public class PropertyEditorValueConverterTests
         Assert.AreEqual(expected, result);
     }
 
+    /// <summary>
+    /// Verifies that the FlexibleDropdownPropertyValueConverter correctly converts values from a dropdown list property editor configured for multiple selections.
+    /// </summary>
+    /// <param name="value">The input value to convert, typically a JSON array string representing the selected items, or null/empty for no selection.</param>
+    /// <param name="expected">The expected collection of string values after conversion.</param>
     [TestCase("[\"apples\"]", new[] { "apples" })]
     [TestCase("[\"apples\",\"oranges\"]", new[] { "apples", "oranges" })]
     [TestCase("[\"apples\",\"oranges\",\"pears\"]", new[] { "apples", "oranges", "pears" })]
@@ -116,6 +130,12 @@ public class PropertyEditorValueConverterTests
         Assert.AreEqual(expected, result);
     }
 
+    /// <summary>
+    /// Verifies that <see cref="DecimalValueConverter"/> correctly converts various string and null inputs to their expected decimal values.
+    /// This test ensures that string representations of numbers, as well as null values, are handled as expected by the converter.
+    /// </summary>
+    /// <param name="value">The input value to convert, which may be a string or null.</param>
+    /// <param name="expected">The expected decimal result after conversion.</param>
     [TestCase("1", 1)]
     [TestCase("0", 0)]
     [TestCase(null, 0)]
@@ -131,6 +151,11 @@ public class PropertyEditorValueConverterTests
         Assert.AreEqual(expected, result);
     }
 
+    /// <summary>
+    /// Tests that the IntegerValueConverter correctly converts various input values to the expected integer output.
+    /// </summary>
+    /// <param name="value">The input value to convert.</param>
+    /// <param name="expected">The expected integer result after conversion.</param>
     [TestCase("100", 100)]
     [TestCase("0", 0)]
     [TestCase(null, 0)]

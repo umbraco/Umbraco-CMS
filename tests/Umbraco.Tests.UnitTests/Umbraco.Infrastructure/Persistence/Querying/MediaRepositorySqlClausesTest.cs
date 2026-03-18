@@ -11,9 +11,17 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Persistence.Querying;
 
+/// <summary>
+/// Contains unit tests for verifying the SQL clauses used within the Media Repository.
+/// </summary>
 [TestFixture]
 public class MediaRepositorySqlClausesTest : BaseUsingSqlSyntax
 {
+    /// <summary>
+    /// Verifies that the base SQL clause generated for media repository queries matches the expected SQL statement.
+    /// This includes checking the correct table joins, selection, and where clause for the media object type.
+    /// Ensures that both the SQL string and its arguments are constructed as intended.
+    /// </summary>
     [Test]
     public void Can_Verify_Base_Clause()
     {

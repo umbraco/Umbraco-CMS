@@ -10,12 +10,19 @@ using Umbraco.Cms.Core.Web;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Routing;
 
+/// <summary>
+/// Unit tests for the <see cref="Umbraco.Core.Routing.ContentFinderByRedirectUrl"/> class.
+/// </summary>
 [TestFixture]
 public class ContentFinderByRedirectUrlTests
 {
     private const int DomainContentId = 1233;
     private const int ContentId = 1234;
 
+    /// <summary>
+    /// Verifies that the content finder is able to locate invariant content when provided with a redirect URL.
+    /// </summary>
+    /// <returns>A <see cref="Task"/> representing the asynchronous test operation.</returns>
     [Test]
     public async Task Can_Find_Invariant_Content()
     {
@@ -39,6 +46,10 @@ public class ContentFinderByRedirectUrlTests
         AssertRedirectResult(publishedRequestBuilder, result);
     }
 
+    /// <summary>
+    /// Tests that the content finder can locate variant content when the path includes a root segment.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task Can_Find_Variant_Content_With_Path_Root()
     {
@@ -62,6 +73,10 @@ public class ContentFinderByRedirectUrlTests
         AssertRedirectResult(publishedRequestBuilder, result);
     }
 
+    /// <summary>
+    /// Tests that the content finder can locate variant content using a domain node ID prefixed path.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Test]
     public async Task Can_Find_Variant_Content_With_Domain_Node_Id_Prefixed_Path()
     {

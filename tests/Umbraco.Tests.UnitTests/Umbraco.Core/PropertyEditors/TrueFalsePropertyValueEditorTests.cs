@@ -1,4 +1,4 @@
-﻿using Moq;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.IO;
@@ -11,12 +11,18 @@ using Umbraco.Cms.Core.Strings;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 
+/// <summary>
+/// Contains unit tests for the <see cref="TrueFalsePropertyValueEditor"/> class in Umbraco.
+/// </summary>
 [TestFixture]
 public class TrueFalsePropertyValueEditorTests
 {
     // annoyingly we can't use decimals etc. in attributes, so we can't turn these into test cases :(
     private Dictionary<object?, bool> _valuesAndExpectedResults = new();
 
+    /// <summary>
+    /// Sets up the test environment by initializing the dictionary of values and their expected boolean results.
+    /// </summary>
     [SetUp]
     public void SetUp() => _valuesAndExpectedResults = new Dictionary<object?, bool>
     {
@@ -46,6 +52,9 @@ public class TrueFalsePropertyValueEditorTests
         { new GuidUdi(Constants.UdiEntityType.Document, Guid.NewGuid()), false }
     };
 
+    /// <summary>
+    /// Tests that values from the editor can be correctly parsed to expected integer representations.
+    /// </summary>
     [Test]
     public void Can_Parse_Values_From_Editor()
     {
@@ -58,6 +67,9 @@ public class TrueFalsePropertyValueEditorTests
         }
     }
 
+    /// <summary>
+    /// Tests that values can be correctly parsed to the editor format.
+    /// </summary>
     [Test]
     public void Can_Parse_Values_To_Editor()
     {
@@ -68,6 +80,9 @@ public class TrueFalsePropertyValueEditorTests
         }
     }
 
+    /// <summary>
+    /// Tests that passing null from the editor yields a false (0) value.
+    /// </summary>
     [Test]
     public void Null_From_Editor_Yields_False()
     {
@@ -75,6 +90,9 @@ public class TrueFalsePropertyValueEditorTests
         Assert.AreEqual(0, result);
     }
 
+    /// <summary>
+    /// Tests that converting a null value to the editor yields false.
+    /// </summary>
     [Test]
     public void Null_To_Editor_Yields_False()
     {

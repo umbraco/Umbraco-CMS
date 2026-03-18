@@ -1,4 +1,4 @@
-﻿using Moq;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Delivery.Querying.Selectors;
 using Umbraco.Cms.Core.DeliveryApi;
@@ -7,9 +7,18 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.DeliveryApi.Selectors;
 
+/// <summary>
+/// Contains unit tests for the <see cref="ChildrenSelector"/> class in the DeliveryApi.Selectors namespace.
+/// These tests verify the behavior and functionality of the ChildrenSelector.
+/// </summary>
 [TestFixture]
 public class ChildrenSelectorTests
 {
+    /// <summary>
+    /// Verifies that the <see cref="ChildrenSelector"/> can correctly build a selector option for a specified path,
+    /// using an optional starting node ID for the document path.
+    /// </summary>
+    /// <param name="documentStartNodeId">The starting node ID for the document path, or <c>null</c> to indicate no specific start node.</param>
     [TestCase(null)]
     [TestCase(1234)]
     public void Can_Build_Selector_Option_For_Path(int? documentStartNodeId)
@@ -39,6 +48,9 @@ public class ChildrenSelectorTests
         Assert.AreEqual(documentKey.ToString("D"), result.Values[0]);
     }
 
+    /// <summary>
+    /// Tests that the ChildrenSelector can build a selector option correctly when given an ID.
+    /// </summary>
     [Test]
     public void Can_Build_Selector_Option_For_Id()
     {
