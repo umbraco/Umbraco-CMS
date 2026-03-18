@@ -979,6 +979,13 @@ export class UiBaseLocators extends BasePage {
     return await this.hasValue(this.groupLabel, value);
   }
 
+  async isInheritedGroupVisible(groupName: string, compositionName: string) {
+    const groupLocator = this.page.locator('[data-mark="group:' + groupName + '"]');
+    await this.isVisible(groupLocator);
+    await expect(groupLocator).toHaveAttribute('inherited', '');
+    await expect(groupLocator.locator('uui-tag.inherited')).toContainText(compositionName);
+  }
+
   async deleteGroup(groupName: string) {
     await this.page.waitForTimeout(ConstantHelper.wait.medium);
     const groups = this.page.locator('umb-content-type-design-editor-group').all();

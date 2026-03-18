@@ -109,6 +109,19 @@ export class MemberTypeApiHelper {
     return await this.create(memberType);
   }
 
+  async createMemberTypeWithAComposition(memberTypeName: string, compositionId: string) {
+    await this.ensureNameNotExists(memberTypeName);
+
+    const memberType = new MemberTypeBuilder()
+      .withName(memberTypeName)
+      .withAlias(AliasHelper.toAlias(memberTypeName))
+      .addComposition()
+        .withMemberTypeId(compositionId)
+        .done()
+      .build();
+    return await this.create(memberType);
+  }
+
   async createMemberTypeWithTwoPropertyEditors(memberTypeName: string, dataTypeNameOne: string, dataTypeIdOne: string, dataTypeNameTwo: string, dataTypeIdTwo: string, groupName: string = "GroupTest")
   {
     const crypto = require('crypto');

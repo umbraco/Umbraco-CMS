@@ -518,6 +518,51 @@ export class DocumentTypeApiHelper {
     return await this.create(documentType);
   }
 
+  async createDocumentTypeWithTwoCompositions(documentTypeName: string, firstCompositionId: string, secondCompositionId: string) {
+    await this.ensureNameNotExists(documentTypeName);
+
+    const documentType = new DocumentTypeBuilder()
+      .withName(documentTypeName)
+      .withAlias(AliasHelper.toAlias(documentTypeName))
+      .addComposition()
+        .withDocumentTypeId(firstCompositionId)
+        .done()
+      .addComposition()
+        .withDocumentTypeId(secondCompositionId)
+        .done()
+      .build();
+    return await this.create(documentType);
+  }
+
+  async createDocumentTypeWithACompositionAndAllowAsRoot(documentTypeName: string, compositionId: string) {
+    await this.ensureNameNotExists(documentTypeName);
+
+    const documentType = new DocumentTypeBuilder()
+      .withName(documentTypeName)
+      .withAlias(AliasHelper.toAlias(documentTypeName))
+      .withAllowedAsRoot(true)
+      .addComposition()
+        .withDocumentTypeId(compositionId)
+        .done()
+      .build();
+    return await this.create(documentType);
+  }
+
+  async createElementTypeWithAComposition(elementTypeName: string, compositionId: string) {
+    await this.ensureNameNotExists(elementTypeName);
+
+    const documentType = new DocumentTypeBuilder()
+      .withName(elementTypeName)
+      .withAlias(AliasHelper.toAlias(elementTypeName))
+      .withIsElement(true)
+      .withIcon("icon-plugin")
+      .addComposition()
+        .withDocumentTypeId(compositionId)
+        .done()
+      .build();
+    return await this.create(documentType);
+  }
+
   async createEmptyElementType(elementTypeName: string) {
     await this.ensureNameNotExists(elementTypeName);
 
