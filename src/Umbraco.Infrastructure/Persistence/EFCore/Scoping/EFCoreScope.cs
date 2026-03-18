@@ -179,8 +179,18 @@ internal class EFCoreScope<TDbContext> : CoreScope, IEfCoreScope<TDbContext>
         if (IsBridgeScope)
         {
             // Bridge scopes are the EF Core "child" of NPoco scopes so just pop from the EF Core stack
-            // and clean up (happens in scope accessor). Don't check ambient scope, don't touch the inner NPoco scope.
-            _efCoreScopeProvider.PopAmbientScope();
+            // and clean up. Don't check ambient scope, don't touch the inner NPoco scope.
+            // The pop may fail if the bridge scope was created inside an async state.
+            // In that case the scope was never visible on the stack, so there is nothing to pop.
+            try
+            {
+                _efCoreScopeProvider.PopAmbientScope();
+            }
+            catch (InvalidOperationException)
+            {
+                // Stack was empty the push was reverted by async execution context restoration.
+            }
+
             DisposeEfCoreDatabase();
             _disposed = true;
             return;

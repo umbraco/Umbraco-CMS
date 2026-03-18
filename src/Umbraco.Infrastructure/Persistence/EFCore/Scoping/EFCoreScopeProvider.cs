@@ -226,6 +226,11 @@ internal sealed class EFCoreScopeProvider<TDbContext> : IEFCoreScopeProvider<TDb
     }
 
     /// <summary>
+    /// Static key for enlisting the bridge scope in the NPoco <see cref="IScopeContext"/>.
+    /// </summary>
+    private static readonly string BridgeScopeContextKey = $"efcore-bridge-scope-{typeof(TDbContext).FullName}";
+
+    /// <summary>
     /// Creates a bridged EF Core scope, that has the existing NPoco scope as a parent.
     /// This is used by <see cref="EFCoreScopeAccessor{TDbContext}"/> to create an EF Core
     /// scope when NPoco tries to do operations in EF Core repositories.
@@ -237,6 +242,13 @@ internal sealed class EFCoreScopeProvider<TDbContext> : IEFCoreScopeProvider<TDb
     /// <returns>The created bridge scope which is pushed onto the stack.</returns>
     internal IEfCoreScope<TDbContext> CreateBridgeScope(IScope existingNPocoScope)
     {
+        // Check if a bridge scope was already created for this scope context.
+        IEfCoreScope<TDbContext>? existing = _scopeProvider.Context!.GetEnlisted<IEfCoreScope<TDbContext>>(BridgeScopeContextKey);
+        if (existing is not null)
+        {
+            return existing;
+        }
+
         var bridgeScope = new EFCoreScope<TDbContext>(
             existingNPocoScope,
             _distributedLockingMechanismFactory,
@@ -254,9 +266,10 @@ internal sealed class EFCoreScopeProvider<TDbContext> : IEFCoreScopeProvider<TDb
         _ambientEfCoreScopeStack.Push(bridgeScope);
         bridgeScope.Complete();
 
-        _scopeProvider.Context!.Enlist(
-            bridgeScope.InstanceId.ToString(),
-            _ => bridgeScope.Dispose());
+        _scopeProvider.Context!.Enlist<IEfCoreScope<TDbContext>>(
+            BridgeScopeContextKey,
+            () => bridgeScope,
+            (_, scope) => scope?.Dispose());
 
         return bridgeScope;
     }
