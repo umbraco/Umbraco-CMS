@@ -8,12 +8,20 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.HealthCheck.Group;
 
+/// <summary>
+/// Provides API endpoints for managing health check groups that are identified by their name.
+/// </summary>
 [ApiVersion("1.0")]
 public class ByNameHealthCheckGroupController : HealthCheckGroupControllerBase
 {
     private readonly IHealthCheckGroupPresentationFactory _healthCheckGroupPresentationFactory;
     private readonly IUmbracoMapper _umbracoMapper;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ByNameHealthCheckGroupController"/> class, which handles health check group operations by name.
+    /// </summary>
+    /// <param name="healthCheckGroupPresentationFactory">Factory used to create health check group presentation models.</param>
+    /// <param name="umbracoMapper">The mapper used for mapping Umbraco domain objects to API models.</param>
     public ByNameHealthCheckGroupController(
         IHealthCheckGroupPresentationFactory healthCheckGroupPresentationFactory,
         IUmbracoMapper umbracoMapper)
@@ -32,6 +40,8 @@ public class ByNameHealthCheckGroupController : HealthCheckGroupControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(HealthCheckGroupPresentationModel), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets a health check group by name.")]
+    [EndpointDescription("Gets a health check group and all its associated health checks identified by the provided group name.")]
     public Task<IActionResult> ByName(
         CancellationToken cancellationToken,
         string name)

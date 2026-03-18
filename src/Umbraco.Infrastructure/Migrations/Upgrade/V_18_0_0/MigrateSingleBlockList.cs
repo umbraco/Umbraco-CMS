@@ -21,6 +21,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_18_0_0;
 
+/// <summary>
+/// Handles migration of single block list data structures during the upgrade to Umbraco version 18.0.0.
+/// </summary>
 public class MigrateSingleBlockList : AsyncMigrationBase
 {
     private readonly IUmbracoContextFactory _umbracoContextFactory;
@@ -37,6 +40,25 @@ public class MigrateSingleBlockList : AsyncMigrationBase
     private readonly ILogger<MigrateSingleBlockList> _logger;
     private readonly IDataValueEditor _dummySingleBlockValueEditor;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MigrateSingleBlockList"/> class, responsible for migrating single block list data during the upgrade to version 18.0.0.
+    /// </summary>
+    /// <param name="context">The migration context providing information and services for the migration process.</param>
+    /// <param name="umbracoContextFactory">Factory for creating Umbraco context instances.</param>
+    /// <param name="languageService">Service for managing languages in Umbraco.</param>
+    /// <param name="contentTypeService">Service for managing content types.</param>
+    /// <param name="mediaTypeService">Service for managing media types.</param>
+    /// <param name="dataTypeService">Service for managing data types.</param>
+    /// <param name="logger">The logger used for logging migration operations.</param>
+    /// <param name="coreScopeProvider">Provides scope management for database operations.</param>
+    /// <param name="singleBlockListProcessor">Processor for handling single block list migration logic.</param>
+    /// <param name="jsonSerializer">Serializer for handling JSON data during migration.</param>
+    /// <param name="blockListConfigurationCache">Cache for block list configuration data.</param>
+    /// <param name="dataValueEditorFactory">Factory for creating data value editors.</param>
+    /// <param name="ioHelper">Helper for IO operations, such as file and path management.</param>
+    /// <param name="blockValuePropertyIndexValueFactory">Factory for creating property index values for block values.</param>
+    /// <param name="elementTypeCache">Cache for block editor element types.</param>
+    /// <param name="appCaches">Provides access to application-level caches.</param>
     public MigrateSingleBlockList(
         IMigrationContext context,
         IUmbracoContextFactory umbracoContextFactory,
@@ -420,6 +442,12 @@ WHERE nodeId IN (@0)";
 
     private class UpdateItem
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="UpdateItem"/> class with the specified property data, property type, and updated value.
+        /// </summary>
+        /// <param name="propertyDataDto">The <see cref="PropertyDataDto"/> representing the data for the property to be updated.</param>
+        /// <param name="propertyType">The <see cref="IPropertyType"/> that defines the type of the property being updated.</param>
+        /// <param name="updatedValue">The new value to assign to the property.</param>
         public UpdateItem(PropertyDataDto propertyDataDto, IPropertyType propertyType, object? updatedValue)
         {
             PropertyDataDto = propertyDataDto;
@@ -427,10 +455,21 @@ WHERE nodeId IN (@0)";
             UpdatedValue = updatedValue;
         }
 
+        /// <summary>
+        /// Gets or sets the value that has been updated for this item during the migration process.
+        /// This typically represents the new value assigned after migration logic is applied.
+        /// </summary>
         public object? UpdatedValue { get; set; }
 
+        /// <summary>
+        /// Gets or sets the property data transfer object (DTO) associated with this update item.
+        /// This object contains the data for a specific property being migrated in the single block list upgrade process.
+        /// </summary>
         public PropertyDataDto PropertyDataDto { get; set; }
 
+        /// <summary>
+        /// Gets or sets the <see cref="IPropertyType"/> that is associated with this update item.
+        /// </summary>
         public IPropertyType PropertyType { get; set; }
     }
 }

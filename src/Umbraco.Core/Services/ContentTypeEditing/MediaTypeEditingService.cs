@@ -8,6 +8,13 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services.ContentTypeEditing;
 
+/// <summary>
+///     Implementation of <see cref="IMediaTypeEditingService"/> for managing media types.
+/// </summary>
+/// <remarks>
+///     This service handles creating and updating media types including their properties,
+///     compositions, and file extension configurations for upload property editors.
+/// </remarks>
 internal sealed class MediaTypeEditingService : ContentTypeEditingServiceBase<IMediaType, IMediaTypeService, MediaTypePropertyTypeModel, MediaTypePropertyContainerModel>, IMediaTypeEditingService
 {
     private readonly IMediaTypeService _mediaTypeService;
@@ -15,6 +22,16 @@ internal sealed class MediaTypeEditingService : ContentTypeEditingServiceBase<IM
     private readonly IImageUrlGenerator _imageUrlGenerator;
     private readonly IReservedFieldNamesService _reservedFieldNamesService;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="MediaTypeEditingService"/> class.
+    /// </summary>
+    /// <param name="contentTypeService">The content type service for composition validation.</param>
+    /// <param name="mediaTypeService">The media type service for managing media types.</param>
+    /// <param name="dataTypeService">The data type service for validating property data types.</param>
+    /// <param name="entityService">The entity service for resolving entity relationships.</param>
+    /// <param name="shortStringHelper">The helper for generating safe aliases.</param>
+    /// <param name="imageUrlGenerator">The image URL generator for determining supported image formats.</param>
+    /// <param name="reservedFieldNamesService">The service providing reserved field names.</param>
     public MediaTypeEditingService(
         IContentTypeService contentTypeService,
         IMediaTypeService mediaTypeService,
@@ -31,6 +48,7 @@ internal sealed class MediaTypeEditingService : ContentTypeEditingServiceBase<IM
         _reservedFieldNamesService = reservedFieldNamesService;
     }
 
+    /// <inheritdoc />
     public async Task<Attempt<IMediaType?, ContentTypeOperationStatus>> CreateAsync(MediaTypeCreateModel model, Guid userKey)
     {
         Attempt<IMediaType?, ContentTypeOperationStatus> result = await ValidateAndMapForCreationAsync(model, model.Key, model.ContainerKey);
@@ -43,6 +61,7 @@ internal sealed class MediaTypeEditingService : ContentTypeEditingServiceBase<IM
         return result;
     }
 
+    /// <inheritdoc />
     public async Task<Attempt<IMediaType?, ContentTypeOperationStatus>> UpdateAsync(IMediaType mediaType, MediaTypeUpdateModel model, Guid userKey)
     {
         if (mediaType.IsSystemMediaType() && mediaType.Alias != model.Alias)
@@ -60,29 +79,54 @@ internal sealed class MediaTypeEditingService : ContentTypeEditingServiceBase<IM
         return result;
     }
 
+    /// <inheritdoc />
     public async Task<IEnumerable<ContentTypeAvailableCompositionsResult>> GetAvailableCompositionsAsync(
         Guid? key,
         IEnumerable<Guid> currentCompositeKeys,
         IEnumerable<string> currentPropertyAliases) =>
         await FindAvailableCompositionsAsync(key, currentCompositeKeys, currentPropertyAliases);
 
+    /// <inheritdoc />
+#pragma warning disable CS0618 // Type or member is obsolete
     public async Task<PagedModel<IMediaType>> GetMediaTypesForFileExtensionAsync(string fileExtension, int skip, int take)
+    {
+        // Delegate to the non-obsolete method to get the full list of matches with their match info.
+        PagedModel<MediaTypeFileExtensionMatchResult> result = await GetMediaTypesForFileExtensionWithMatchInfoAsync(fileExtension, 0, int.MaxValue);
+
+        // Preserve original behavior from before obsoletion: only include fallbacks when there are no specific matches.
+        var hasSpecificMatches = result.Items.Any(r => r.IsSpecificMatch);
+        IMediaType[] filtered = result.Items
+            .Where(r => r.IsSpecificMatch || hasSpecificMatches is false)
+            .Select(r => r.MediaType)
+            .ToArray();
+
+        return new PagedModel<IMediaType>
+        {
+            Items = filtered.Skip(skip).Take(take),
+            Total = filtered.Length,
+        };
+    }
+#pragma warning restore CS0618 // Type or member is obsolete
+
+    /// <inheritdoc />
+    public async Task<PagedModel<MediaTypeFileExtensionMatchResult>> GetMediaTypesForFileExtensionWithMatchInfoAsync(string fileExtension, int skip, int take)
     {
         fileExtension = fileExtension.TrimStart(Constants.CharArrays.Period);
 
         IMediaType[] candidateMediaTypes = _mediaTypeService.GetAll().Where(mt => mt.CompositionPropertyTypes.Any(pt => pt.Alias == Constants.Conventions.Media.File)).ToArray();
-        var allowedMediaTypes = new List<IMediaType>();
+        var results = new List<MediaTypeFileExtensionMatchResult>();
 
         // is this an image format supported by the image cropper?
         if (_imageUrlGenerator.IsSupportedImageFormat(fileExtension))
         {
             // yes - add all media types with an image cropper "file" property
-            allowedMediaTypes.AddRange(candidateMediaTypes
+            results.AddRange(candidateMediaTypes
                 .Where(mt => mt.CompositionPropertyTypes.Any(propertyType => propertyType is
                 {
                     Alias: Constants.Conventions.Media.File,
                     PropertyEditorAlias: Constants.PropertyEditors.Aliases.ImageCropper
-                })));
+                }))
+                .Select(mt => new MediaTypeFileExtensionMatchResult { MediaType = mt, IsSpecificMatch = true }));
         }
 
         // find media types that have an explicit allow-list of file extensions
@@ -90,26 +134,29 @@ internal sealed class MediaTypeEditingService : ContentTypeEditingServiceBase<IM
         IDictionary<IMediaType, IEnumerable<string>> allowedFileExtensionsByMediaType = await FetchAllowedFileExtensionsByMediaTypeAsync(candidateMediaTypes);
 
         // add all media types where the file extension is explicitly allowed
-        allowedMediaTypes.AddRange(allowedFileExtensionsByMediaType
+        var specificMatches = allowedFileExtensionsByMediaType
             .Where(kvp => kvp.Value.Contains(fileExtension))
-            .Select(kvp => kvp.Key));
+            .Select(kvp => kvp.Key)
+            .ToArray();
 
-        // if we at this point have no allowed media types, add all media types that allow any file extension
-        if (allowedMediaTypes.Any() is false)
-        {
-            allowedMediaTypes.AddRange(allowedFileExtensionsByMediaType
-                .Where(kvp => kvp.Value.Any() is false)
-                .Select(kvp => kvp.Key));
-        }
+        results.AddRange(specificMatches
+            .Select(mt => new MediaTypeFileExtensionMatchResult { MediaType = mt, IsSpecificMatch = true }));
 
-        return new PagedModel<IMediaType>()
+        // always add all media types that allow any file extension (catch-all/fallback types),
+        // excluding those already added as specific matches
+        var alreadyIncluded = new HashSet<int>(results.Select(r => r.MediaType.Id));
+        results.AddRange(allowedFileExtensionsByMediaType
+            .Where(kvp => kvp.Value.Any() is false && alreadyIncluded.Contains(kvp.Key.Id) is false)
+            .Select(kvp => new MediaTypeFileExtensionMatchResult { MediaType = kvp.Key, IsSpecificMatch = false }));
+
+        return new PagedModel<MediaTypeFileExtensionMatchResult>
         {
-            Items = allowedMediaTypes.Skip(skip).Take(take),
-            Total = allowedMediaTypes.Count
+            Items = results.Skip(skip).Take(take),
+            Total = results.Count,
         };
-
     }
 
+    /// <inheritdoc />
     public Task<PagedModel<IMediaType>> GetFolderMediaTypes(int skip, int take)
     {
         // we'll consider it a "folder" media type if it:
@@ -139,17 +186,30 @@ internal sealed class MediaTypeEditingService : ContentTypeEditingServiceBase<IM
         });
     }
 
+    /// <inheritdoc />
     protected override IMediaType CreateContentType(IShortStringHelper shortStringHelper, int parentId)
         => new MediaType(shortStringHelper, parentId);
 
+    /// <inheritdoc />
     protected override bool SupportsPublishing => false;
 
+    /// <inheritdoc />
     protected override UmbracoObjectTypes ContentTypeObjectType => UmbracoObjectTypes.MediaType;
 
+    /// <inheritdoc />
     protected override UmbracoObjectTypes ContainerObjectType => UmbracoObjectTypes.MediaTypeContainer;
 
+    /// <inheritdoc />
     protected override ISet<string> GetReservedFieldNames() => _reservedFieldNamesService.GetMediaReservedFieldNames();
 
+    /// <summary>
+    ///     Fetches the allowed file extensions for each media type based on their upload field configuration.
+    /// </summary>
+    /// <param name="mediaTypes">The media types to check.</param>
+    /// <returns>
+    ///     A dictionary mapping each media type to its allowed file extensions.
+    ///     An empty collection indicates all file extensions are allowed.
+    /// </returns>
     private async Task<IDictionary<IMediaType, IEnumerable<string>>> FetchAllowedFileExtensionsByMediaTypeAsync(IEnumerable<IMediaType> mediaTypes)
     {
         var allowedFileExtensionsByMediaType = new Dictionary<IMediaType, IEnumerable<string>>();

@@ -3,7 +3,6 @@ using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Collection;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Item;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Constants = Umbraco.Cms.Core.Constants;
@@ -18,15 +17,13 @@ internal class HasScheduleFlagProvider : IFlagProvider
     private const string Alias = Constants.Conventions.Flags.Prefix + "ScheduledForPublish";
 
     private readonly IContentService _contentService;
-    private readonly IIdKeyMap _keyMap;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="HasScheduleFlagProvider"/> class.
     /// </summary>
-    public HasScheduleFlagProvider(IContentService contentService, IIdKeyMap keyMap)
+    public HasScheduleFlagProvider(IContentService contentService)
     {
         _contentService = contentService;
-        _keyMap = keyMap;
     }
 
     /// <inheritdoc/>
@@ -40,16 +37,11 @@ internal class HasScheduleFlagProvider : IFlagProvider
     public Task PopulateFlagsAsync<TItem>(IEnumerable<TItem> items)
         where TItem : IHasFlags
     {
-        IDictionary<int, IEnumerable<ContentSchedule>> schedules = _contentService.GetContentSchedulesByIds(items.Select(x => x.Id).ToArray());
-        foreach (TItem item in items)
+        TItem[] itemsArray = items.ToArray();
+        IDictionary<Guid, IEnumerable<ContentSchedule>> schedules = _contentService.GetContentSchedulesByKeys(itemsArray.Select(x => x.Id).ToArray());
+        foreach (TItem item in itemsArray)
         {
-            Attempt<int> itemId = _keyMap.GetIdForKey(item.Id, UmbracoObjectTypes.Document);
-            if (itemId.Success is false)
-            {
-                continue;
-            }
-
-            if (!schedules.TryGetValue(itemId.Result, out IEnumerable<ContentSchedule>? contentSchedules))
+            if (schedules.TryGetValue(item.Id, out IEnumerable<ContentSchedule>? contentSchedules) is false)
             {
                 continue;
             }

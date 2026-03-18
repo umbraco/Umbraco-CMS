@@ -3,10 +3,18 @@ using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Mappers;
 
+/// <summary>
+/// Represents a mapper that defines the mapping configuration for the <c>Domain</c> entity between the database and the domain model.
+/// </summary>
 [MapperFor(typeof(IDomain))]
 [MapperFor(typeof(UmbracoDomain))]
 public sealed class DomainMapper : BaseMapper
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DomainMapper"/> class.
+    /// </summary>
+    /// <param name="sqlContext">The lazy-loaded SQL context used for database operations.</param>
+    /// <param name="maps">The configuration store containing mapping definitions.</param>
     public DomainMapper(Lazy<ISqlContext> sqlContext, MapperConfigurationStore maps)
         : base(sqlContext, maps)
     {

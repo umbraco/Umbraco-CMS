@@ -23,7 +23,7 @@ public class DistributedJobService : IDistributedJobService
     /// <summary>
     /// Initializes a new instance of the <see cref="DistributedJobService"/> class.
     /// </summary>
-    [Obsolete("Use the constructor that accepts IOptions<DistributedJobSettings>. Scheduled for removal in V18.")]
+    [Obsolete("Use the constructor that accepts IOptions<DistributedJobSettings>. Scheduled for removal in Umbraco 18.")]
     public DistributedJobService(
         ICoreScopeProvider coreScopeProvider,
         IDistributedJobRepository distributedJobRepository,
@@ -41,6 +41,11 @@ public class DistributedJobService : IDistributedJobService
     /// <summary>
     /// Initializes a new instance of the <see cref="DistributedJobService"/> class.
     /// </summary>
+    /// <param name="coreScopeProvider">Provides access to the core scope for database operations.</param>
+    /// <param name="distributedJobRepository">Repository for managing distributed jobs.</param>
+    /// <param name="distributedBackgroundJobs">A collection of distributed background job implementations.</param>
+    /// <param name="logger">The logger used for logging job service operations.</param>
+    /// <param name="settings">The configuration settings for distributed jobs.</param>
     public DistributedJobService(
         ICoreScopeProvider coreScopeProvider,
         IDistributedJobRepository distributedJobRepository,

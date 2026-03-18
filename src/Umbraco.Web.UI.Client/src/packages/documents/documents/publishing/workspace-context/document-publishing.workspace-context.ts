@@ -161,8 +161,8 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		await this.#documentWorkspaceContext.runMandatoryValidationForSaveData(saveData);
 		await this.#documentWorkspaceContext.askServerToValidate(saveData, variantIds);
 
-		// TODO: Only validate the specified selection.. [NL]
-		return this.#documentWorkspaceContext.validateAndSubmit(
+		return this.#documentWorkspaceContext.validateVariantsAndSubmit(
+			variantIds,
 			async () => {
 				if (!this.#documentWorkspaceContext) {
 					throw new Error('Document workspace context is missing');
@@ -259,7 +259,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
 		const localize = new UmbLocalizationController(this);
 
-		const primaryVariantName = await this.observe(this.#documentWorkspaceContext.name(variantIds[0])).asPromise();
+		const primaryVariantName = this.#documentWorkspaceContext.getName(variantIds[0]) ?? '';
 
 		const waitNotice = notificationContext?.peek('warning', {
 			data: {
@@ -285,7 +285,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 
 			// reload the document so all states are updated after the publish operation
 			await this.#documentWorkspaceContext.reload();
-			this.#loadAndProcessLastPublished();
+			await this.#loadAndProcessLastPublished();
 
 			// request reload of this entity
 			const structureEvent = new UmbRequestReloadStructureForEntityEvent({ entityType, unique });
@@ -314,6 +314,10 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 
 		// TODO: remove meta
 		await new UmbUnpublishDocumentEntityAction(this, { unique, entityType, meta: {} as never }).execute();
+
+		// Reload workspace data to reflect the unpublished state
+		await this.#documentWorkspaceContext.reload();
+		await this.#loadAndProcessLastPublished();
 	}
 
 	async #handleSaveAndPublish() {
@@ -353,8 +357,8 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		await this.#documentWorkspaceContext.runMandatoryValidationForSaveData(saveData, variantIds);
 		await this.#documentWorkspaceContext.askServerToValidate(saveData, variantIds);
 
-		// TODO: Only validate the specified selection.. [NL]
-		return this.#documentWorkspaceContext.validateAndSubmit(
+		return this.#documentWorkspaceContext.validateVariantsAndSubmit(
+			variantIds,
 			async () => {
 				return this.#performSaveAndPublish(variantIds, saveData);
 			},
@@ -400,9 +404,15 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 				},
 			});
 
+			// Clear stale published data and pending changes state so the
+			// persistedData observer does not run a comparison against outdated
+			// data during reload, which would briefly show a false-positive
+			// "pending changes" state.
+			this.#clear();
+
 			// reload the document so all states are updated after the publish operation
 			await this.#documentWorkspaceContext.reload();
-			this.#loadAndProcessLastPublished();
+			await this.#loadAndProcessLastPublished();
 
 			const event = new UmbRequestReloadStructureForEntityEvent({ unique, entityType });
 			this.#eventContext?.dispatchEvent(event);

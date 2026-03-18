@@ -4,8 +4,9 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
-[Obsolete("Will be removed in Umbraco 18.")]
+[Obsolete("Scheduled for removal in Umbraco 18.")]
 [TableName(TableName)]
+[PrimaryKey([UserGroupIdColumnName, NodeIdColumnName], AutoIncrement = false)]
 [ExplicitColumns]
 internal sealed class UserGroup2NodeDto
 {
@@ -14,11 +15,17 @@ internal sealed class UserGroup2NodeDto
     private const string UserGroupIdColumnName = "userGroupId";
     private const string NodeIdColumnName = "nodeId";
 
+    /// <summary>
+    /// Gets or sets the identifier for the user group.
+    /// </summary>
     [Column(UserGroupIdColumnName)]
     [PrimaryKeyColumn(AutoIncrement = false, Name = "PK_" + TableName, OnColumns = $"{UserGroupIdColumnName}, {NodeIdColumnName}")]
     [ForeignKey(typeof(UserGroupDto))]
     public int UserGroupId { get; set; }
 
+    /// <summary>
+    /// Gets or sets the identifier of the associated node.
+    /// </summary>
     [Column(NodeIdColumnName)]
     [ForeignKey(typeof(NodeDto))]
     [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_nodeId")]

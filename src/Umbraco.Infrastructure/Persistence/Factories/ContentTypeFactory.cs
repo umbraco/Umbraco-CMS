@@ -17,6 +17,13 @@ internal static class ContentTypeFactory
 {
     #region IContentType
 
+    /// <summary>
+    /// Creates and initializes an <see cref="IContentType"/> entity from the specified <see cref="ContentTypeDto"/>.
+    /// This includes setting common entity properties and resetting initial property states.
+    /// </summary>
+    /// <param name="shortStringHelper">The helper used for string manipulation and formatting.</param>
+    /// <param name="dto">The data transfer object containing the content type's data.</param>
+    /// <returns>A fully constructed <see cref="IContentType"/> entity with change tracking re-enabled after initialization.</returns>
     public static IContentType BuildContentTypeEntity(IShortStringHelper shortStringHelper, ContentTypeDto dto)
     {
         var contentType = new ContentType(shortStringHelper, dto.NodeDto.ParentId);
@@ -65,6 +72,15 @@ internal static class ContentTypeFactory
 
     #region IMemberType
 
+    /// <summary>
+    /// Constructs an <see cref="Umbraco.Cms.Core.Models.IMemberType"/> entity from the specified <see cref="ContentTypeDto"/>,
+    /// initializing it with data from the DTO and using the provided <see cref="IShortStringHelper"/> for string operations.
+    /// </summary>
+    /// <param name="shortStringHelper">An instance of <see cref="IShortStringHelper"/> used to assist with string manipulation during entity creation.</param>
+    /// <param name="dto">A <see cref="ContentTypeDto"/> containing the data required to build the member type entity.</param>
+    /// <returns>
+    /// A new <see cref="Umbraco.Cms.Core.Models.IMemberType"/> instance populated with values from the provided DTO.
+    /// </returns>
     public static IMemberType BuildMemberTypeEntity(IShortStringHelper shortStringHelper, ContentTypeDto dto)
     {
         var contentType = new MemberType(shortStringHelper, dto.NodeDto.ParentId);
@@ -82,6 +98,11 @@ internal static class ContentTypeFactory
         return contentType;
     }
 
+    /// <summary>
+    /// Creates a collection of <see cref="Umbraco.Cms.Core.Models.Membership.MemberPropertyTypeDto"/> objects representing the property types defined on the specified <see cref="Umbraco.Cms.Core.Models.IMemberType"/>.
+    /// </summary>
+    /// <param name="entity">The member type entity whose property types will be converted to DTOs.</param>
+    /// <returns>An enumerable of <see cref="Umbraco.Cms.Core.Models.Membership.MemberPropertyTypeDto"/> for each property type on the member type, or an empty collection if none exist.</returns>
     public static IEnumerable<MemberPropertyTypeDto> BuildMemberPropertyTypeDtos(IMemberType entity)
     {
         if (entity is not MemberType memberType || memberType.PropertyTypes.Any() == false)
@@ -100,6 +121,12 @@ internal static class ContentTypeFactory
         return dtos;
     }
 
+    /// <summary>
+    /// Creates a <see cref="ContentTypeDto"/> instance from the specified <see cref="IContentTypeBase"/> entity.
+    /// Determines the appropriate node object type based on the entity's concrete type (content, media, or member type).
+    /// </summary>
+    /// <param name="entity">The <see cref="IContentTypeBase"/> entity to convert to a DTO.</param>
+    /// <returns>A <see cref="ContentTypeDto"/> that represents the provided content type entity.</returns>
     public static ContentTypeDto BuildContentTypeDto(IContentTypeBase entity)
     {
         Guid nodeObjectType;

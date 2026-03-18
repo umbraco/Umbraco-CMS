@@ -7,11 +7,18 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.LogViewer;
 
+/// <summary>
+/// Controller that validates log file sizes in the Log Viewer.
+/// </summary>
 [ApiVersion("1.0")]
 public class ValidateLogFileSizeLogViewerController : LogViewerControllerBase
 {
     private readonly ILogViewerService _logViewerService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ValidateLogFileSizeLogViewerController"/> class, which is responsible for validating the size of log files using the provided log viewer service.
+    /// </summary>
+    /// <param name="logViewerService">The service used to interact with and validate log files.</param>
     public ValidateLogFileSizeLogViewerController(ILogViewerService logViewerService) => _logViewerService = logViewerService;
 
     /// <summary>
@@ -25,6 +32,8 @@ public class ValidateLogFileSizeLogViewerController : LogViewerControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [EndpointSummary("Validates if logs can be viewed.")]
+    [EndpointDescription("Checks if the log files are within the size limit and can be viewed.")]
     public async Task<IActionResult> CanViewLogs(
         CancellationToken cancellationToken,
         DateTimeOffset? startDate = null,

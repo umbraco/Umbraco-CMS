@@ -1,4 +1,4 @@
-﻿using HtmlAgilityPack;
+using HtmlAgilityPack;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
@@ -14,6 +14,14 @@ internal sealed class ApiRichTextMarkupParser : ApiRichTextParserBase, IApiRichT
     private readonly IPublishedMediaCache _publishedMediaCache;
     private readonly ILogger<ApiRichTextMarkupParser> _logger;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.DeliveryApi.ApiRichTextMarkupParser"/> class.
+    /// </summary>
+    /// <param name="apiContentRouteBuilder">The <see cref="IApiContentRouteBuilder"/> used to build API content routes.</param>
+    /// <param name="mediaUrlProvider">The <see cref="IApiMediaUrlProvider"/> used to provide media URLs for the API.</param>
+    /// <param name="publishedContentCache">The <see cref="IPublishedContentCache"/> for accessing published content.</param>
+    /// <param name="publishedMediaCache">The <see cref="IPublishedMediaCache"/> for accessing published media.</param>
+    /// <param name="logger">The <see cref="ILogger{ApiRichTextMarkupParser}"/> instance for logging.</param>
     public ApiRichTextMarkupParser(
         IApiContentRouteBuilder apiContentRouteBuilder,
         IApiMediaUrlProvider mediaUrlProvider,
@@ -27,6 +35,11 @@ internal sealed class ApiRichTextMarkupParser : ApiRichTextParserBase, IApiRichT
         _logger = logger;
     }
 
+    /// <summary>
+    /// Parses the specified HTML rich text, replacing local links and images with appropriate markup and cleaning up block elements.
+    /// </summary>
+    /// <param name="html">The HTML string containing the rich text to parse and transform.</param>
+    /// <returns>The processed HTML string with local links and images replaced, and block elements cleaned up.</returns>
     public string Parse(string html)
     {
         try

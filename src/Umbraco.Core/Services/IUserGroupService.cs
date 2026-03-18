@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
@@ -60,6 +60,11 @@ public interface IUserGroupService
     /// </returns>
     Task<IUserGroup?> GetAsync(Guid key);
 
+    /// <summary>
+    ///     Gets all UserGroups matching the specified keys.
+    /// </summary>
+    /// <param name="keys">The keys of the UserGroups to retrieve.</param>
+    /// <returns>An enumerable list of <see cref="IUserGroup"/>.</returns>
     Task<IEnumerable<IUserGroup>> GetAsync(IEnumerable<Guid> keys);
 
     /// <summary>
@@ -99,6 +104,11 @@ public interface IUserGroupService
     /// <returns>An attempt indicating if the operation was a success as well as a more detailed <see cref="UserGroupOperationStatus"/>.</returns>
     Task<Attempt<UserGroupOperationStatus>> DeleteAsync(ISet<Guid> userGroupKeys);
 
+    /// <summary>
+    ///     Deletes a UserGroup.
+    /// </summary>
+    /// <param name="userGroupKey">The key of the user group to delete.</param>
+    /// <returns>An attempt indicating if the operation was a success as well as a more detailed <see cref="UserGroupOperationStatus"/>.</returns>
     Task<Attempt<UserGroupOperationStatus>> DeleteAsync(Guid userGroupKey) => DeleteAsync(new HashSet<Guid> { userGroupKey });
 
     /// <summary>
@@ -107,8 +117,38 @@ public interface IUserGroupService
     /// <param name="userGroupKeys">The user groups the users should be part of.</param>
     /// <param name="userKeys">The user whose groups we want to alter.</param>
     /// <returns>An attempt indicating if the operation was a success as well as a more detailed <see cref="UserGroupOperationStatus"/>.</returns>
+    [Obsolete("Please use the overload accepting all parameters. Scheduled for removal in Umbraco 19.")]
     Task<Attempt<UserGroupOperationStatus>> UpdateUserGroupsOnUsersAsync(ISet<Guid> userGroupKeys, ISet<Guid> userKeys);
 
+    /// <summary>
+    /// Updates the users to have the groups specified, with authorization checks based on the performing user.
+    /// </summary>
+    /// <param name="userGroupKeys">The user groups the users should be part of.</param>
+    /// <param name="userKeys">The user whose groups we want to alter.</param>
+    /// <param name="performingUserKey">The key of the user performing the operation.</param>
+    /// <returns>An attempt indicating if the operation was a success as well as a more detailed <see cref="UserGroupOperationStatus"/>.</returns>
+    /// <remarks>
+    /// Non-admin users can only add groups they themselves belong to. Removing groups is always allowed.
+    /// </remarks>
+    // TODO (V18): Remove default implementation.
+    Task<Attempt<UserGroupOperationStatus>> UpdateUserGroupsOnUsersAsync(ISet<Guid> userGroupKeys, ISet<Guid> userKeys, Guid performingUserKey)
+#pragma warning disable CS0618 // Type or member is obsolete
+        => UpdateUserGroupsOnUsersAsync(userGroupKeys, userKeys);
+#pragma warning restore CS0618 // Type or member is obsolete
+
+    /// <summary>
+    ///     Adds users to a user group.
+    /// </summary>
+    /// <param name="addUsersModel">The model containing the user group and users to add.</param>
+    /// <param name="performingUserKey">The key of the user performing the operation.</param>
+    /// <returns>An attempt indicating if the operation was a success as well as a more detailed <see cref="UserGroupOperationStatus"/>.</returns>
     Task<Attempt<UserGroupOperationStatus>> AddUsersToUserGroupAsync(UsersToUserGroupManipulationModel addUsersModel, Guid performingUserKey);
+
+    /// <summary>
+    ///     Removes users from a user group.
+    /// </summary>
+    /// <param name="removeUsersModel">The model containing the user group and users to remove.</param>
+    /// <param name="performingUserKey">The key of the user performing the operation.</param>
+    /// <returns>An attempt indicating if the operation was a success as well as a more detailed <see cref="UserGroupOperationStatus"/>.</returns>
     Task<Attempt<UserGroupOperationStatus>> RemoveUsersFromUserGroupAsync(UsersToUserGroupManipulationModel removeUsersModel, Guid performingUserKey);
 }

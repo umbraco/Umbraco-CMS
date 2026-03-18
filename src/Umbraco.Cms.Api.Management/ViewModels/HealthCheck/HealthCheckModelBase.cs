@@ -1,5 +1,8 @@
 namespace Umbraco.Cms.Api.Management.ViewModels.HealthCheck;
 
+/// <summary>
+/// Serves as the base class for all health check view models in the Umbraco management API.
+/// </summary>
 public class HealthCheckModelBase
 {
     /// <summary>

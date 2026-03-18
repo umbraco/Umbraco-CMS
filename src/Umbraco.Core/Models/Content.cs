@@ -168,6 +168,7 @@ public class Content : ContentBase, IContent
         }
     }
 
+    /// <inheritdoc />
     [IgnoreDataMember]
     public bool Edited { get; set; }
 
@@ -285,12 +286,15 @@ public class Content : ContentBase, IContent
         return _publishInfos.TryGetValue(culture, out ContentCultureInfos infos) ? infos.Date : null;
     }
 
+    /// <inheritdoc />
     [IgnoreDataMember]
     public int PublishedVersionId { get; set; }
 
+    /// <inheritdoc />
     [DataMember]
     public bool Blueprint { get; set; }
 
+    /// <inheritdoc />
     public override void ResetWereDirtyProperties()
     {
         base.ResetWereDirtyProperties();
@@ -299,6 +303,7 @@ public class Content : ContentBase, IContent
         _previousPublishCultureChanges.addedCultures = null;
     }
 
+    /// <inheritdoc />
     public override void ResetDirtyProperties(bool rememberDirty)
     {
         base.ResetDirtyProperties(rememberDirty);
@@ -523,6 +528,7 @@ public class Content : ContentBase, IContent
         Properties.CollectionChanged += PropertiesChanged;
     }
 
+    /// <inheritdoc />
     protected override void PerformDeepClone(object clone)
     {
         base.PerformDeepClone(clone);

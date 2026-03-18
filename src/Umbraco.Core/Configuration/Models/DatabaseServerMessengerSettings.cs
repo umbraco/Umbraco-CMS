@@ -10,9 +10,24 @@ namespace Umbraco.Cms.Core.Configuration.Models;
 /// </summary>
 public class DatabaseServerMessengerSettings
 {
+    /// <summary>
+    ///     The default maximum number of processing instructions.
+    /// </summary>
     internal const int StaticMaxProcessingInstructionCount = 1000;
+
+    /// <summary>
+    ///     The default time to retain instructions in the database.
+    /// </summary>
     internal const string StaticTimeToRetainInstructions = "2.00:00:00"; // TimeSpan.FromDays(2);
+
+    /// <summary>
+    ///     The default time between sync operations.
+    /// </summary>
     internal const string StaticTimeBetweenSyncOperations = "00:00:05"; // TimeSpan.FromSeconds(5);
+
+    /// <summary>
+    ///     The default time between prune operations.
+    /// </summary>
     internal const string StaticTimeBetweenPruneOperations = "00:01:00"; // TimeSpan.FromMinutes(1);
 
     /// <summary>

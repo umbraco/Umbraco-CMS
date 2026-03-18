@@ -1,9 +1,16 @@
-﻿using Umbraco.Cms.Core;
+using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_13_0_0;
 
+/// <summary>
+/// Represents a migration that renames the "eventName" column in the database as part of the upgrade to version 13.0.0.
+/// </summary>
 public class RenameEventNameColumn : MigrationBase
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_13_0_0.RenameEventNameColumn"/> class.
+    /// </summary>
+    /// <param name="context">The <see cref="IMigrationContext"/> for the migration.</param>
     public RenameEventNameColumn(IMigrationContext context) : base(context)
     {
     }

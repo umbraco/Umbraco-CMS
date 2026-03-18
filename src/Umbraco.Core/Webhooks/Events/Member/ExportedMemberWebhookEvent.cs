@@ -7,9 +7,19 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events;
 
+/// <summary>
+/// Webhook event that fires when a member is exported.
+/// </summary>
 [WebhookEvent("Member Exported")]
 public class ExportedMemberWebhookEvent : WebhookEventBase<ExportedMemberNotification>
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ExportedMemberWebhookEvent"/> class.
+    /// </summary>
+    /// <param name="webhookFiringService">The webhook firing service.</param>
+    /// <param name="webHookService">The webhook service.</param>
+    /// <param name="webhookSettings">The webhook settings.</param>
+    /// <param name="serverRoleAccessor">The server role accessor.</param>
     public ExportedMemberWebhookEvent(
         IWebhookFiringService webhookFiringService,
         IWebhookService webHookService,
@@ -19,8 +29,10 @@ public class ExportedMemberWebhookEvent : WebhookEventBase<ExportedMemberNotific
     {
     }
 
+    /// <inheritdoc />
     public override string Alias => Constants.WebhookEvents.Aliases.ExportedMember;
 
+    /// <inheritdoc />
     public override object ConvertNotificationToRequestPayload(ExportedMemberNotification notification)
         => new DefaultPayloadModel { Id = notification.Member.Key };
 }

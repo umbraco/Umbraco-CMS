@@ -16,11 +16,18 @@ namespace Umbraco.Extensions;
 
 public static partial class UmbracoBuilderExtensions
 {
+    /// <summary>
+    /// Registers and configures all services, controllers, and options required for the Umbraco Management API.
+    /// This includes endpoints and features for managing Umbraco backoffice resources via HTTP APIs.
+    /// </summary>
+    /// <param name="builder">The <see cref="IUmbracoBuilder"/> to add the Management API services to.</param>
+    /// <returns>The <see cref="IUmbracoBuilder"/> instance with Management API services configured.</returns>
     public static IUmbracoBuilder AddUmbracoManagementApi(this IUmbracoBuilder builder)
     {
         IServiceCollection services = builder.Services;
         builder.Services.AddSingleton<BackOfficeAreaRoutes>();
         builder.Services.AddSingleton<BackOfficeExternalLoginProviderErrorMiddleware>();
+        builder.Services.AddSingleton<IManagementApiRouteBuilder, ManagementApiRouteBuilder>();
         builder.Services.AddUnique<IConflictingRouteService, ConflictingRouteService>();
         builder.AddUmbracoApiOpenApiUI();
 

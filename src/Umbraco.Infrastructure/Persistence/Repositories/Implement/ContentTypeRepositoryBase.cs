@@ -91,6 +91,15 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
     /// <returns></returns>
     public bool Exists(Guid id) => PerformExists(id);
 
+    /// <summary>
+    /// Moves the specified content type entity to a new container or to the root if the container is <c>null</c>.
+    /// Updates the entity's parent, path, and level, and also updates all descendant entities accordingly.
+    /// </summary>
+    /// <param name="moving">The content type entity to move.</param>
+    /// <param name="container">The target <see cref="EntityContainer"/> to move the entity into, or <c>null</c> to move to the root.</param>
+    /// <returns>
+    /// An <see cref="IEnumerable{MoveEventInfo{TEntity}}"/> containing information about the moved entity and all its descendants that were updated as part of the move operation.
+    /// </returns>
     public IEnumerable<MoveEventInfo<TEntity>> Move(TEntity moving, EntityContainer? container)
     {
         var parentId = Constants.System.Root;
@@ -1078,10 +1087,10 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
         // select tags to insert: tags pointed to by a relation ship, for proper property/content types,
         // and of source language, and where we cannot left join to an existing tag with same text,
         // group and languageId
-        var targetLanguageIdS = targetLanguageId.HasValue ? targetLanguageId.ToString() : "NULL";
+        var targetLanguageIdS = targetLanguageId.HasValue ? targetLanguageId.ToString() : "NULL" + SqlSyntax.GetNullCastSuffix<int?>();
         Sql<ISqlContext> sqlSelectTagsToInsert1 = Sql()
             .SelectDistinct<TagDto>(x => x.Text, x => x.Group)
-            .Append(", " + targetLanguageIdS)
+            .Append($", {targetLanguageIdS} ")
             .From<TagDto>();
 
         sqlSelectTagsToInsert1
@@ -1234,7 +1243,7 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
         Database.Execute(sqlDelete);
 
         // now insert all property data into the target language that exists under the source language
-        var targetLanguageIdS = targetLanguageId.HasValue ? targetLanguageId.ToString() : "NULL";
+        var targetLanguageIdS = targetLanguageId.HasValue ? targetLanguageId.ToString() : "NULL" + SqlSyntax.GetNullCastSuffix<int?>();
         var cols = Sql().ColumnsForInsert<PropertyDataDto>(
             x => x.VersionId,
             x => x.PropertyTypeId,
@@ -1612,6 +1621,12 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
 
     protected abstract bool PerformExists(Guid id);
 
+    /// <summary>
+    /// Generates a unique alias for a content type by appending an incrementing number to the provided base alias if necessary.
+    /// The uniqueness is enforced across all content types in the system.
+    /// </summary>
+    /// <param name="alias">The base alias to make unique.</param>
+    /// <returns>A unique alias string that does not conflict with any existing content type aliases.</returns>
     public string GetUniqueAlias(string alias)
     {
         // alias is unique across ALL content types!
@@ -1633,6 +1648,11 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
         return test;
     }
 
+    /// <summary>
+    /// Determines whether the specified content path contains a container.
+    /// </summary>
+    /// <param name="contentPath">The content path to check, represented as a comma-separated string of IDs.</param>
+    /// <returns>True if the content path contains a container; otherwise, false.</returns>
     public bool HasContainerInPath(string contentPath)
     {
         var ids = contentPath.Split(Constants.CharArrays.Comma)
@@ -1640,6 +1660,13 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
         return HasContainerInPath(ids);
     }
 
+    /// <summary>
+    /// Checks whether any of the specified IDs in the path correspond to a container node.
+    /// </summary>
+    /// <param name="ids">An array of integer IDs representing the path to check.</param>
+    /// <returns>
+    /// <c>true</c> if at least one of the IDs in the path represents a container; otherwise, <c>false</c>.
+    /// </returns>
     public bool HasContainerInPath(params int[] ids)
     {
         Sql<ISqlContext> sql = Sql()
@@ -1653,12 +1680,14 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
     }
 
     /// <summary>
-    ///     Returns true or false depending on whether content nodes have been created based on the provided content type id.
+    ///     Determines whether any content nodes exist for the specified content type ID.
     /// </summary>
+    /// <param name="id">The content type ID to check for associated content nodes.</param>
+    /// <returns><c>true</c> if content nodes exist for the given content type ID; otherwise, <c>false</c>.</returns>
     public bool HasContentNodes(int id)
     {
         var sql = new Sql(
-            $"SELECT CASE WHEN EXISTS (SELECT * FROM {QuoteTableName(ContentDto.TableName)} WHERE {QuoteColumnName("contentTypeId")} = @id) THEN 1 ELSE 0 END",
+            $"SELECT CASE WHEN EXISTS (SELECT * FROM {QuoteTableName(ContentDto.TableName)} WHERE {QuoteColumnName(ContentDto.ContentTypeIdColumnName)} = @id) THEN 1 ELSE 0 END",
             new { id });
         return Database.ExecuteScalar<int>(sql) == 1;
     }
@@ -1670,18 +1699,18 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
         // is included here just to be 100% sure since it has a FK on cmsPropertyType.
         var list = new List<string>
         {
-            $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.User2NodeNotify)} WHERE {QuoteColumnName("nodeId")} = @id",
-            $@"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.UserGroup2GranularPermission)} WHERE {QuoteColumnName("uniqueId")} IN
-                (SELECT {QuoteColumnName("uniqueId")} FROM {QuoteTableName(NodeDto.TableName)} WHERE id = @id)",
-            $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.TagRelationship)} WHERE {QuoteColumnName("nodeId")} = @id",
-            $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.ContentChildType)} WHERE {QuoteColumnName("Id")} = @id",
-            $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.ContentChildType)} WHERE {QuoteColumnName("AllowedId")} = @id",
-            $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.ContentTypeTree)} WHERE {QuoteColumnName("parentContentTypeId")} = @id",
-            $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.ContentTypeTree)} WHERE {QuoteColumnName("childContentTypeId")} = @id",
-            $@"DELETE FROM {QuoteTableName(PropertyDataDto.TableName)} WHERE {QuoteColumnName("propertyTypeId")} IN
-                (SELECT id FROM {QuoteTableName(Constants.DatabaseSchema.Tables.PropertyType)} WHERE {QuoteColumnName("contentTypeId")} = @id)",
-            $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.PropertyType)} WHERE {QuoteColumnName("contentTypeId")} = @id",
-            $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.PropertyTypeGroup)} WHERE {QuoteColumnName("contenttypeNodeId")} = @id",
+            $"DELETE FROM {QuoteTableName(User2NodeNotifyDto.TableName)} WHERE {QuoteColumnName(User2NodeNotifyDto.NodeIdColumnName)} = @id",
+            $@"DELETE FROM {QuoteTableName(UserGroup2GranularPermissionDto.TableName)} WHERE {QuoteColumnName(UserGroup2GranularPermissionDto.UniqueIdColumnName)} IN
+                (SELECT {QuoteColumnName("uniqueId")} FROM {QuoteTableName(NodeDto.TableName)} WHERE {QuoteColumnName(NodeDto.PrimaryKeyColumnName)} = @id)",
+            $"DELETE FROM {QuoteTableName(TagRelationshipDto.TableName)} WHERE {QuoteColumnName(TagRelationshipDto.NodeIdColumnName)} = @id",
+            $"DELETE FROM {QuoteTableName(ContentTypeAllowedContentTypeDto.TableName)} WHERE {QuoteColumnName(ContentTypeAllowedContentTypeDto.IdKeyColumnName)} = @id",
+            $"DELETE FROM {QuoteTableName(ContentTypeAllowedContentTypeDto.TableName)} WHERE {QuoteColumnName(ContentTypeAllowedContentTypeDto.AllowedIdColumnName)} = @id",
+            $"DELETE FROM {QuoteTableName(ContentType2ContentTypeDto.TableName)} WHERE {QuoteColumnName(ContentType2ContentTypeDto.ParentIdColumnName)} = @id",
+            $"DELETE FROM {QuoteTableName(ContentType2ContentTypeDto.TableName)} WHERE {QuoteColumnName(ContentType2ContentTypeDto.ChildIdColumnName)} = @id",
+            $@"DELETE FROM {QuoteTableName(PropertyDataDto.TableName)} WHERE {QuoteColumnName(PropertyDataDto.PropertyTypeIdColumnName)} IN
+                (SELECT id FROM {QuoteTableName(PropertyTypeDto.TableName)} WHERE {QuoteColumnName(PropertyTypeDto.ContentTypeIdColumnName)} = @id)",
+            $"DELETE FROM {QuoteTableName(PropertyTypeDto.TableName)} WHERE {QuoteColumnName(PropertyTypeDto.ContentTypeIdColumnName)} = @id",
+            $"DELETE FROM {QuoteTableName(PropertyTypeGroupDto.TableName)} WHERE {QuoteColumnName(PropertyTypeGroupDto.ContentTypeNodeIdColumnName)} = @id",
         };
         return list;
     }
@@ -1706,22 +1735,70 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
             ?? Array.Empty<(TEntity, int)>();
     }
 
+
+    /// <summary>
+    /// Retrieves a collection of allowed parent keys for the specified key.
+    /// </summary>
+    /// <param name="key">The unique identifier of the key for which to retrieve allowed parent keys.</param>
+    /// <returns>An enumerable collection of GUIDs representing the allowed parent keys.</returns>
+    public IEnumerable<Guid> GetAllowedParentKeys(Guid key)
+    {
+        Sql<ISqlContext> childNodeIdQuery = Sql()
+            .Select<NodeDto>(x => x.NodeId)
+            .From<NodeDto>()
+            .Where<NodeDto>(x => x.UniqueId == key);
+
+        Sql<ISqlContext> sql = Sql()
+            .Select<NodeDto>(x => x.UniqueId)
+            .From<ContentTypeAllowedContentTypeDto>()
+            .InnerJoin<NodeDto>()
+            .On<ContentTypeAllowedContentTypeDto, NodeDto>((allowed, node) => allowed.Id == node.NodeId)
+            .WhereIn<ContentTypeAllowedContentTypeDto>(x => x.AllowedId, childNodeIdQuery);
+
+        return Database.Fetch<Guid>(sql);
+    }
+
     private sealed class NameCompareDto
     {
+        /// <summary>
+        /// Gets or sets the unique identifier for the node.
+        /// </summary>
         public int NodeId { get; set; }
 
+        /// <summary>
+        /// Gets or sets the current version number of the entity.
+        /// </summary>
         public int CurrentVersion { get; set; }
 
+        /// <summary>
+        /// Gets or sets the unique identifier of the language associated with this DTO.
+        /// </summary>
         public int LanguageId { get; set; }
 
+        /// <summary>
+        /// Gets or sets the current name of the content type.
+        /// </summary>
         public string? CurrentName { get; set; }
 
+        /// <summary>
+        /// Gets or sets the name of the content type as it appears in the published version.
+        /// </summary>
         public string? PublishedName { get; set; }
 
+        /// <summary>
+        /// Gets or sets the version number of the published content item, if available.
+        /// </summary>
         public int? PublishedVersion { get; set; }
 
-        public int Id { get; set; } // the Id of the DocumentCultureVariationDto
+        /// <summary>
+        /// Gets or sets the identifier of the associated DocumentCultureVariationDto.
+        /// </summary>
+        /// <remarks>the Id of the DocumentCultureVariationDto</remarks>
+        public int Id { get; set; }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether the content type's name has been edited.
+        /// </summary>
         public bool Edited { get; set; }
     }
 
@@ -1729,16 +1806,32 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
     {
         private decimal? _decimalValue;
 
+        /// <summary>
+        /// Gets or sets the unique identifier for the version of the property value.
+        /// </summary>
         public int VersionId { get; set; }
 
+        /// <summary>
+        /// Gets or sets the identifier of the property type.
+        /// </summary>
         public int PropertyTypeId { get; set; }
 
+        /// <summary>
+        /// Gets or sets the identifier of the language associated with this property value version.
+        /// </summary>
         public int? LanguageId { get; set; }
 
+        /// <summary>
+        /// Gets or sets the culture or variation segment associated with the property value version.
+        /// </summary>
         public string? Segment { get; set; }
 
+        /// <summary>Gets or sets the integer value of the property.</summary>
         public int? IntValue { get; set; }
 
+        /// <summary>
+        /// Gets or sets the decimal value associated with this property value version, if available.
+        /// </summary>
         [Column("decimalValue")]
         public decimal? DecimalValue
         {
@@ -1746,18 +1839,37 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
             set => _decimalValue = value?.Normalize();
         }
 
+        /// <summary>
+        /// Gets or sets the date value associated with this property value version.
+        /// </summary>
         public DateTime? DateValue { get; set; }
 
+        /// <summary>
+        /// Gets or sets the string value for this property version, stored as a varchar in the database.
+        /// </summary>
         public string? VarcharValue { get; set; }
 
+        /// <summary>Gets or sets the text value of the property value version.</summary>
         public string? TextValue { get; set; }
 
+        /// <summary>
+        /// Gets or sets the identifier of the content node associated with this property value version.
+        /// </summary>
         public int NodeId { get; set; }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether this is the current version.
+        /// </summary>
         public bool Current { get; set; }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether the property value version is published.
+        /// </summary>
         public bool Published { get; set; }
 
+        /// <summary>
+        /// Gets or sets the variation flags for the property value version, indicating how the property value varies (e.g., by culture or segment).
+        /// </summary>
         public byte Variations { get; set; }
     }
 }

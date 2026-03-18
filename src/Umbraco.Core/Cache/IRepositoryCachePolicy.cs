@@ -2,6 +2,16 @@ using Umbraco.Cms.Core.Models.Entities;
 
 namespace Umbraco.Cms.Core.Cache;
 
+/// <summary>
+///     Defines a repository cache policy for managing cached entities.
+/// </summary>
+/// <typeparam name="TEntity">The type of the entity.</typeparam>
+/// <typeparam name="TId">The type of the entity identifier.</typeparam>
+/// <remarks>
+///     Repository cache policies control how repositories interact with caches,
+///     determining when to read from cache, when to populate cache, and how to
+///     keep caches in sync with the underlying data store.
+/// </remarks>
 public interface IRepositoryCachePolicy<TEntity, TId>
     where TEntity : class, IEntity
 {

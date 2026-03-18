@@ -5,8 +5,17 @@ using Umbraco.Cms.Core.Packaging;
 
 namespace Umbraco.Cms.Api.Management.Mapping.Package;
 
+/// <summary>
+/// Provides mapping configuration for converting package data to and from the <see cref="PackageViewModel"/>.
+/// </summary>
 public class PackageViewModelMapDefinition : IMapDefinition
 {
+    /// <summary>
+    /// Configures the object-object mappings for package-related models used in the management API.
+    /// This includes mappings between <see cref="PackageModelBase"/>, <see cref="PackageDefinition"/>,
+    /// <see cref="PackageDefinitionResponseModel"/>, <see cref="InstalledPackage"/>, and <see cref="PackageMigrationStatusResponseModel"/>.
+    /// </summary>
+    /// <param name="mapper">The <see cref="IUmbracoMapper"/> instance used to register the mappings.</param>
     public void DefineMaps(IUmbracoMapper mapper)
     {
         mapper.Define<PackageModelBase, PackageDefinition>((_, _) => new PackageDefinition(), Map);
@@ -58,7 +67,7 @@ public class PackageViewModelMapDefinition : IMapDefinition
     }
 
     // Umbraco.Code.MapAll
-    [Obsolete("Please use the IPackagePresentationFactory instead. Scheduled for removal in V18.")]
+    [Obsolete("Please use the IPackagePresentationFactory instead. Scheduled for removal in Umbraco 18.")]
     private static void Map(InstalledPackage source, PackageMigrationStatusResponseModel target, MapperContext context)
     {
         if (source.PackageName is not null)

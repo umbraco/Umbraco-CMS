@@ -10,6 +10,8 @@ export const UmbLink = Link.extend({
 		return {
 			...this.parent?.(),
 			'data-anchor': { default: null },
+			'data-culture': { default: null },
+			target: { default: null },
 			title: { default: null },
 			type: { default: 'external' },
 		};
@@ -23,7 +25,6 @@ export const UmbLink = Link.extend({
 		return {
 			...this.parent?.(),
 			HTMLAttributes: {
-				target: '',
 				'data-router-slot': 'disabled',
 			},
 		};
