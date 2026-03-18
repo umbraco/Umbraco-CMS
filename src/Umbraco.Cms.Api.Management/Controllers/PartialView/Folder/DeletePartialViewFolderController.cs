@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Extensions;
@@ -7,11 +7,18 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.PartialView.Folder;
 
+/// <summary>
+/// Controller responsible for handling requests to delete partial view folders in the Umbraco CMS.
+/// </summary>
 [ApiVersion("1.0")]
 public class DeletePartialViewFolderController : PartialViewFolderControllerBase
 {
     private readonly IPartialViewFolderService _partialViewFolderService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DeletePartialViewFolderController"/> class, which handles requests to delete partial view folders.
+    /// </summary>
+    /// <param name="partialViewFolderService">The service used to manage partial view folders.</param>
     public DeletePartialViewFolderController(IPartialViewFolderService partialViewFolderService)
         => _partialViewFolderService = partialViewFolderService;
 

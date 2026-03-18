@@ -12,7 +12,7 @@ using Umbraco.Cms.Core.PropertyEditors;
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Management.Factories;
 
 [TestFixture]
-public class ReziseImageUrlFactoryTests
+public class ResizeImageUrlFactoryTests
 {
     private const string BaseUrl = "https://example.com";
     private const string PropertyAlias = Constants.Conventions.Media.File;
@@ -252,7 +252,7 @@ public class ReziseImageUrlFactoryTests
         Assert.That(urlInfo!.Url, Does.Contain("mode=crop"));
     }
 
-    private static ReziseImageUrlFactory CreateFactory(ISet<string>? trueImageFormats = null)
+    private static ResizeImageUrlFactory CreateFactory(ISet<string>? trueImageFormats = null)
     {
         var contentSettings = CreateContentSettings();
         var imagingSettings = CreateImagingSettings(trueImageFormats);
@@ -260,7 +260,7 @@ public class ReziseImageUrlFactoryTests
         var mediaUrlGenerators = CreateMediaUrlGeneratorCollection();
         var absoluteUrlBuilder = CreateAbsoluteUrlBuilder();
 
-        return new ReziseImageUrlFactory(
+        return new ResizeImageUrlFactory(
             imageUrlGenerator,
             Options.Create(contentSettings),
             Options.Create(imagingSettings),

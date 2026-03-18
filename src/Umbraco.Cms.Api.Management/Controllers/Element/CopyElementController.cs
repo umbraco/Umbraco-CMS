@@ -15,6 +15,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Element;
 
+/// <summary>
+/// API controller responsible for handling copy operations on elements in the Umbraco CMS.
+/// </summary>
 [ApiVersion("1.0")]
 public class CopyElementController : ElementControllerBase
 {
@@ -22,6 +25,12 @@ public class CopyElementController : ElementControllerBase
     private readonly IElementEditingService _elementEditingService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CopyElementController"/> class.
+    /// </summary>
+    /// <param name="authorizationService">Service used to authorize element copy operations.</param>
+    /// <param name="elementEditingService">Service responsible for element editing operations.</param>
+    /// <param name="backOfficeSecurityAccessor">Accessor for back office security context.</param>
     public CopyElementController(
         IAuthorizationService authorizationService,
         IElementEditingService elementEditingService,
@@ -32,6 +41,13 @@ public class CopyElementController : ElementControllerBase
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
+    /// <summary>
+    /// Creates a copy of an element identified by the specified unique identifier.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="id">The unique identifier of the element to copy.</param>
+    /// <param name="copyElementRequestModel">The model containing the target location for the copy.</param>
+    /// <returns>An <see cref="IActionResult"/> representing the result of the copy operation.</returns>
     [HttpPost("{id:guid}/copy")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status201Created)]

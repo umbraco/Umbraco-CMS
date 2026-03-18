@@ -8,12 +8,20 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Package.Created;
 
+/// <summary>
+/// Controller responsible for handling operations on packages that are identified and managed using a unique key.
+/// </summary>
 [ApiVersion("1.0")]
 public class ByKeyCreatedPackageController : CreatedPackageControllerBase
 {
     private readonly IPackagingService _packagingService;
     private readonly IUmbracoMapper _umbracoMapper;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ByKeyCreatedPackageController"/> class.
+    /// </summary>
+    /// <param name="packagingService">Service used for package management operations.</param>
+    /// <param name="umbracoMapper">The mapper used to map Umbraco objects.</param>
     public ByKeyCreatedPackageController(IPackagingService packagingService, IUmbracoMapper umbracoMapper)
     {
         _packagingService = packagingService;

@@ -6,7 +6,6 @@ using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
@@ -15,18 +14,14 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Tree;
 
+/// <summary>
+/// Serves as the base controller for managing entity trees, where each entity is of type <typeparamref name="TItem"/>.
+/// Provides common functionality for tree-based entity management in the API.
+/// </summary>
 public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerBase
     where TItem : EntityTreeItemResponseModel, new()
 {
     private readonly FlagProviderCollection _flagProviders;
-
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
-    protected EntityTreeControllerBase(IEntityService entityService)
-        : this(
-            entityService,
-            StaticServiceProvider.Instance.GetRequiredService<FlagProviderCollection>())
-    {
-    }
 
     protected EntityTreeControllerBase(IEntityService entityService, FlagProviderCollection flagProviders)
     {

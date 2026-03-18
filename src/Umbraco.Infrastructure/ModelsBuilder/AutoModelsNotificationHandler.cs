@@ -49,13 +49,22 @@ public sealed class AutoModelsNotificationHandler : INotificationHandler<Umbraco
     // we do not manage InMemory models here
     internal bool IsEnabled => _config.ModelsMode == Constants.ModelsBuilder.ModelsModes.SourceCodeAuto;
 
+    /// <summary>
+    /// Handles a <see cref="ContentTypeCacheRefresherNotification"/> by triggering the generation of strongly-typed models when the content type cache is refreshed.
+    /// </summary>
+    /// <param name="notification">The notification instance that signals a content type cache refresh event.</param>
     public void Handle(ContentTypeCacheRefresherNotification notification) => RequestModelsGeneration();
 
+    /// <summary>
+    /// Handles the <see cref="ContentTypeCacheRefresherNotification"/> by triggering models generation.
+    /// </summary>
+    /// <param name="notification">The notification instance containing content type cache refresh information.</param>
     public void Handle(DataTypeCacheRefresherNotification notification) => RequestModelsGeneration();
 
     /// <summary>
-    ///     Handles the <see cref="UmbracoApplicationStartingNotification" /> notification
+    /// Handles the <see cref="UmbracoApplicationStartingNotification" /> by triggering the generation of strongly-typed models when the Umbraco application is starting.
     /// </summary>
+    /// <param name="notification">The notification instance that signals the Umbraco application is starting.</param>
     public void Handle(UmbracoApplicationStartingNotification notification) => Install();
 
     public void Handle(UmbracoRequestEndNotification notification)

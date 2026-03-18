@@ -14,6 +14,11 @@ public class QueuedHostedService : BackgroundService
 {
     private readonly ILogger<QueuedHostedService> _logger;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="QueuedHostedService"/> class.
+    /// </summary>
+    /// <param name="taskQueue">The queue that provides background tasks to be processed.</param>
+    /// <param name="logger">The logger used for logging information and errors related to the hosted service.</param>
     public QueuedHostedService(
         IBackgroundTaskQueue taskQueue,
         ILogger<QueuedHostedService> logger)
@@ -22,8 +27,16 @@ public class QueuedHostedService : BackgroundService
         _logger = logger;
     }
 
+    /// <summary>
+    /// Gets the queue that manages background tasks for this hosted service.
+    /// </summary>
     public IBackgroundTaskQueue TaskQueue { get; }
 
+    /// <summary>
+    /// Initiates a graceful shutdown of the hosted service.
+    /// </summary>
+    /// <param name="stoppingToken">A <see cref="CancellationToken"/> that is triggered when the host is performing a graceful shutdown.</param>
+    /// <returns>A <see cref="Task"/> that represents the asynchronous stop operation.</returns>
     public override async Task StopAsync(CancellationToken stoppingToken)
     {
         _logger.LogInformation("Queued Hosted Service is stopping.");

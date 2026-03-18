@@ -64,7 +64,7 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
         new TemplateRepository((IScopeAccessor)provider, appCaches ?? AppCaches.Disabled, LoggerFactory.CreateLogger<TemplateRepository>(), LoggerFactory, FileSystems, ShortStringHelper, ViewHelper, RuntimeSettings, Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
 
     private ITemplateRepository CreateRepository(IScopeProvider provider, IOptionsMonitor<RuntimeSettings> runtimeSettings) =>
-        new TemplateRepository((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<TemplateRepository>(), FileSystems, ShortStringHelper, ViewHelper, runtimeSettings, Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
+        new TemplateRepository((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<TemplateRepository>(), LoggerFactory, FileSystems, ShortStringHelper, ViewHelper, runtimeSettings, Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
 
     private static IOptionsMonitor<RuntimeSettings> CreateRuntimeSettingsMonitor(RuntimeMode mode)
     {
@@ -541,7 +541,9 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
                 dataValueReferences,
                 dataTypeService,
                 serializer,
-                Mock.Of<IEventAggregator>());
+                Mock.Of<IEventAggregator>(),
+                Mock.Of<IRepositoryCacheVersionService>(),
+                Mock.Of<ICacheSyncService>());
 
             var template = TemplateBuilder.CreateTextPageTemplate();
             fileService.SaveTemplate(template); // else, FK violation on contentType!

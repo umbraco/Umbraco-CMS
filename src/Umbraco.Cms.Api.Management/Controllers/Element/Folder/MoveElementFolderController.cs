@@ -14,6 +14,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Element.Folder;
 
+/// <summary>
+/// API controller responsible for handling move operations on element folders in the Umbraco CMS.
+/// </summary>
 [ApiVersion("1.0")]
 public class MoveElementFolderController : ElementFolderControllerBase
 {
@@ -21,6 +24,12 @@ public class MoveElementFolderController : ElementFolderControllerBase
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly IElementContainerService _elementContainerService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MoveElementFolderController"/> class.
+    /// </summary>
+    /// <param name="authorizationService">Service used to authorize element folder move operations.</param>
+    /// <param name="backOfficeSecurityAccessor">Accessor for back office security context.</param>
+    /// <param name="elementContainerService">Service for managing element containers.</param>
     public MoveElementFolderController(
         IAuthorizationService authorizationService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
@@ -32,6 +41,13 @@ public class MoveElementFolderController : ElementFolderControllerBase
         _elementContainerService = elementContainerService;
     }
 
+    /// <summary>
+    /// Moves an element folder identified by the specified unique identifier to a different location.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="id">The unique identifier of the element folder to move.</param>
+    /// <param name="moveFolderRequestModel">The model containing the target location for the move.</param>
+    /// <returns>An <see cref="IActionResult"/> representing the outcome of the move operation.</returns>
     [HttpPut("{id:guid}/move")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
