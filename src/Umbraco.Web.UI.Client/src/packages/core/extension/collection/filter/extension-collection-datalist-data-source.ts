@@ -9,17 +9,20 @@ import type {
 	UmbDatalistResponse,
 } from '@umbraco-cms/backoffice/datalist-data-source';
 import { UmbExtensionCollectionRepository } from '../repository';
+import { UmbExtensionItemRepository } from '../../item';
 
 export class UmbExtensionCollectionDatalistDataSource extends UmbControllerBase implements UmbDatalistDataSource {
-	#repository: UmbExtensionCollectionRepository;
+	#collectionRepository: UmbExtensionCollectionRepository;
+	#itemRepository: UmbExtensionItemRepository;
 
 	constructor(host: UmbControllerHost) {
 		super(host);
-		this.#repository = new UmbExtensionCollectionRepository(this);
+		this.#collectionRepository = new UmbExtensionCollectionRepository(this);
+		this.#itemRepository = new UmbExtensionItemRepository(this);
 	}
 
 	async requestOptions(args: UmbDatalistRequestArgs): Promise<UmbDatalistResponse<UmbDatalistItemModel>> {
-		const { data } = await this.#repository.requestCollection({});
+		const { data } = await this.#collectionRepository.requestCollection({});
 
 		if (!data) return { data: undefined };
 
@@ -47,10 +50,14 @@ export class UmbExtensionCollectionDatalistDataSource extends UmbControllerBase 
 	}
 
 	async requestItems(uniques: Array<string>): Promise<{ data?: Array<UmbDatalistItemModel> }> {
-		const items = uniques.map((unique) => ({
-			unique,
-			name: fromCamelCase(unique),
-			entityType: 'extension-type',
+		const { data } = await this.#itemRepository.requestItems(uniques);
+
+		if (!data) return { data: undefined };
+
+		const items = data.map((item) => ({
+			unique: item.unique,
+			name: item.name,
+			entityType: item.entityType,
 		}));
 
 		return { data: items };
