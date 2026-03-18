@@ -505,11 +505,13 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		// This prevents segment-specific values from being silently dropped
 		// when variant options don't cover all culture+segment combinations.
 		const mergedValues = [...processedValues];
+		const variantKey = (v: { alias: string; culture: string | null; segment: string | null }) =>
+			`${v.alias}|${UmbVariantId.Create(v).toString()}`;
+		const coveredKeys = new Set(processedValues.map(variantKey));
 		for (const serverValue of data.values) {
-			const alreadyIncluded = mergedValues.some(
-				(v) => v.alias === serverValue.alias && v.culture === serverValue.culture && v.segment === serverValue.segment,
-			);
-			if (!alreadyIncluded) {
+			const key = variantKey(serverValue);
+			if (!coveredKeys.has(key)) {
+				coveredKeys.add(key);
 				mergedValues.push(serverValue);
 			}
 		}
