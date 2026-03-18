@@ -8,7 +8,6 @@ namespace Umbraco.Cms.Infrastructure.Migrations;
 /// handling the case where the property type varies by culture but the referenced
 /// language no longer exists.
 /// </summary>
-[Obsolete("Only used by obsolete V15/V18 migrations. Scheduled for removal in Umbraco 19.")]
 internal static class PropertyDataCultureResolver
 {
     /// <summary>

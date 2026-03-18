@@ -9,7 +9,6 @@ using Umbraco.Cms.Infrastructure.Migrations;
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations;
 
 [TestFixture]
-#pragma warning disable CS0618 // Type or member is obsolete
 internal sealed class PropertyDataCultureResolverTests
 {
     [Test]
@@ -118,4 +117,3 @@ internal sealed class PropertyDataCultureResolverTests
         return mock.Object;
     }
 }
-#pragma warning restore CS0618
