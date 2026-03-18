@@ -1,0 +1,2 @@
+export const UMB_VALUE_MINIMAL_DISPLAY_COORDINATOR_WORKSPACE_CONTEXT_ALIAS =
+	'Umb.WorkspaceContext.ValueMinimalDisplayCoordinator';

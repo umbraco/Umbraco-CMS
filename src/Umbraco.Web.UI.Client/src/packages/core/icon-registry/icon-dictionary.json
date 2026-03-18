@@ -2595,6 +2595,14 @@
 		{
 			"name": "icon-land-plot",
 			"file": "land-plot.svg"
+		},
+		{
+			"name": "icon-true",
+			"file": "check.svg"
+		},
+		{
+			"name": "icon-false",
+			"file": "x.svg"
 		}
 	],
 	"custom": [],

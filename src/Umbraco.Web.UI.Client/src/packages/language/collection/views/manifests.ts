@@ -1,5 +1,6 @@
 import { UMB_LANGUAGE_TABLE_COLLECTION_VIEW_ALIAS } from './constants.js';
 import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
+import { UMB_BOOLEAN_VALUE_MINIMAL_DISPLAY_ALIAS } from '@umbraco-cms/backoffice/value-minimal-display';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -36,10 +37,12 @@ export const manifests: Array<UmbExtensionManifest> = [
 				{
 					field: 'isDefault',
 					label: 'Default',
+					valueMinimalDisplayAlias: UMB_BOOLEAN_VALUE_MINIMAL_DISPLAY_ALIAS,
 				},
 				{
 					field: 'isMandatory',
 					label: 'Mandatory',
+					valueMinimalDisplayAlias: UMB_BOOLEAN_VALUE_MINIMAL_DISPLAY_ALIAS,
 				},
 				{
 					field: 'fallbackIsoCode',

@@ -40,7 +40,11 @@ export class UmbValueMinimalDisplayElement extends UmbLitElement {
 	}
 
 	#register() {
-		if (!this.#coordinator || !this.#alias) return;
+		if (!this.#alias) return;
+		if (!this.#coordinator) {
+			this._resolvedValue = this.#rawValue;
+			return;
+		}
 		const alias = this.#alias;
 		const rawValue = this.#rawValue;
 		this.#coordinator.preRegister(alias, [rawValue]);

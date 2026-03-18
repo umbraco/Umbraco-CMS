@@ -1975,6 +1975,12 @@ path: () => import("./icons/icon-blend.js"),
 name: "icon-land-plot",
 path: () => import("./icons/icon-land-plot.js"),
 },{
+name: "icon-true",
+path: () => import("./icons/icon-true.js"),
+},{
+name: "icon-false",
+path: () => import("./icons/icon-false.js"),
+},{
 name: "icon-facebook",
 path: () => import("./icons/icon-facebook.js"),
 },{

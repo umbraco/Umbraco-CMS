@@ -11,9 +11,7 @@ export interface ManifestValueMinimalDisplay extends ManifestElement<UmbValueMin
 	meta: MetaValueMinimalDisplay;
 }
 
-export interface MetaValueMinimalDisplay {
-	label: string;
-}
+export interface MetaValueMinimalDisplay {}
 
 declare global {
 	interface UmbExtensionManifestMap {
