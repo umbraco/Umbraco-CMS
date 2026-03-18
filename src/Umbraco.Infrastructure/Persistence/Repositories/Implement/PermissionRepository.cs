@@ -26,6 +26,14 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 internal sealed class PermissionRepository<TEntity> : EntityRepositoryBase<int, ContentPermissionSet>
     where TEntity : class, IEntity
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PermissionRepository{TEntity}"/> class.
+    /// </summary>
+    /// <param name="scopeAccessor">Provides access to the database scope.</param>
+    /// <param name="cache">The application-level cache.</param>
+    /// <param name="logger">The logger used for diagnostic and operational logging.</param>
+    /// <param name="repositoryCacheVersionService">Service for managing repository cache versions.</param>
+    /// <param name="cacheSyncService">Service for synchronizing cache across instances.</param>
     public PermissionRepository(
         IScopeAccessor scopeAccessor,
         AppCaches cache,

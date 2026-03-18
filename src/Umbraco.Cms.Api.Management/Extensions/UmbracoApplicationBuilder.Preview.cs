@@ -9,6 +9,11 @@ namespace Umbraco.Extensions;
 /// </summary>
 public static partial class UmbracoApplicationBuilderExtensions
 {
+    /// <summary>
+    /// Configures the application to enable Umbraco's content preview endpoints, allowing preview functionality for unpublished or draft content.
+    /// </summary>
+    /// <param name="app">The Umbraco endpoint builder context to configure.</param>
+    /// <returns>The same <see cref="IUmbracoEndpointBuilderContext"/> instance, for chaining.</returns>
     public static IUmbracoEndpointBuilderContext UseUmbracoPreviewEndpoints(this IUmbracoEndpointBuilderContext app)
     {
         PreviewRoutes previewRoutes = app.ApplicationServices.GetRequiredService<PreviewRoutes>();

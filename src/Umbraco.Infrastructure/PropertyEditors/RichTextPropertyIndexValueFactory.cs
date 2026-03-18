@@ -13,6 +13,14 @@ internal sealed class RichTextPropertyIndexValueFactory : BlockValuePropertyInde
     private readonly IJsonSerializer _jsonSerializer;
     private readonly ILogger<RichTextPropertyIndexValueFactory> _logger;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Core.PropertyEditors.RichTextPropertyIndexValueFactory"/> class,
+    /// used to generate index values for rich text properties.
+    /// </summary>
+    /// <param name="propertyEditorCollection">A collection containing all available property editors.</param>
+    /// <param name="jsonSerializer">The serializer used for handling JSON data.</param>
+    /// <param name="indexingSettings">The monitor providing current indexing settings.</param>
+    /// <param name="logger">The logger used for logging diagnostic information.</param>
     public RichTextPropertyIndexValueFactory(
         PropertyEditorCollection propertyEditorCollection,
         IJsonSerializer jsonSerializer,
@@ -24,6 +32,23 @@ internal sealed class RichTextPropertyIndexValueFactory : BlockValuePropertyInde
         _logger = logger;
     }
 
+    /// <summary>
+    /// Retrieves the index values for a rich text property, including both the raw markup and processed, searchable content.
+    /// Handles culture and segment variants, and combines content from embedded blocks where applicable.
+    /// </summary>
+    /// <param name="property">The property from which to extract index values.</param>
+    /// <param name="culture">The culture to index for, or <c>null</c> for invariant culture.</param>
+    /// <param name="segment">The segment to index for, if any.</param>
+    /// <param name="published">Indicates whether to index the published version of the property.</param>
+    /// <param name="availableCultures">A collection of cultures available for the content item.</param>
+    /// <param name="contentTypeDictionary">A dictionary of content types, keyed by their GUID.</param>
+    /// <returns>
+    /// An enumerable of <see cref="IndexValue"/> objects representing the indexed values for the property, including:
+    /// <list type="bullet">
+    /// <item>The raw rich text markup (for the raw field).</item>
+    /// <item>The plain text content (for search indexing), with block content merged as appropriate for each culture.</item>
+    /// </list>
+    /// </returns>
     public override IEnumerable<IndexValue> GetIndexValues(
         IProperty property,
         string? culture,

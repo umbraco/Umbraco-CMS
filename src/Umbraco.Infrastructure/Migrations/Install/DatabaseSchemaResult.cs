@@ -8,6 +8,9 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install;
 /// </summary>
 public class DatabaseSchemaResult
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DatabaseSchemaResult"/> class, representing the result of a database schema operation during installation.
+    /// </summary>
     public DatabaseSchemaResult()
     {
         Errors = new List<Tuple<string, string>>();
@@ -19,19 +22,38 @@ public class DatabaseSchemaResult
         IndexDefinitions = new List<DbIndexDefinition>();
     }
 
+    /// <summary>
+    /// Gets the list of errors encountered during the database schema installation.
+    /// Each tuple contains the error code (as a string) and the corresponding error message.
+    /// </summary>
     public List<Tuple<string, string>> Errors { get; }
 
+    /// <summary>
+    /// Gets a collection of <see cref="TableDefinition"/> objects that describe the tables in the current database schema.
+    /// </summary>
     public List<TableDefinition> TableDefinitions { get; }
 
+    /// <summary>
+    /// Gets a list of table names that are considered valid in the current database schema.
+    /// </summary>
     public List<string> ValidTables { get; }
 
     // TODO: what are these exactly? TableDefinitions are those that should be there, IndexDefinitions are those that... are in DB?
     internal List<DbIndexDefinition> IndexDefinitions { get; }
 
+    /// <summary>
+    /// Gets the collection of column names that are valid according to the current database schema.
+    /// </summary>
     public List<string> ValidColumns { get; }
 
+    /// <summary>
+    /// Gets a list of database schema constraints that are considered valid.
+    /// </summary>
     public List<string> ValidConstraints { get; }
 
+    /// <summary>
+    /// Gets a list of index names that are valid according to the current database schema.
+    /// </summary>
     public List<string> ValidIndexes { get; }
 
     /// <summary>
@@ -40,6 +62,7 @@ public class DatabaseSchemaResult
     /// <remarks>
     ///     <para>A database contains an installed version when it contains at least one valid table.</para>
     /// </remarks>
+    /// <returns><c>true</c> if the database contains at least one valid table; otherwise, <c>false</c>.</returns>
     public bool DetermineHasInstalledVersion() => ValidTables.Count > 0;
 
     /// <summary>

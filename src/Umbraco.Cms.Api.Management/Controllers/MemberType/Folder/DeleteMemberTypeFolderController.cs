@@ -6,9 +6,17 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.MemberType.Folder;
 
+/// <summary>
+/// API controller responsible for handling requests to delete member type folders in the Umbraco CMS.
+/// </summary>
 [ApiVersion("1.0")]
 public class DeleteMemberTypeFolderController : MemberTypeFolderControllerBase
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DeleteMemberTypeFolderController"/> class.
+    /// </summary>
+    /// <param name="backOfficeSecurityAccessor">Accessor for back office security operations.</param>
+    /// <param name="memberTypeContainerService">Service for managing member type containers.</param>
     public DeleteMemberTypeFolderController(
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
         IMemberTypeContainerService memberTypeContainerService)

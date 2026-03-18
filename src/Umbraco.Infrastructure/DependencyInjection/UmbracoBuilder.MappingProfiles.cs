@@ -11,8 +11,10 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection;
 public static partial class UmbracoBuilderExtensions
 {
     /// <summary>
-    ///     Registers the core Umbraco mapper definitions
+    /// Registers the core Umbraco mapping profiles and related services.
     /// </summary>
+    /// <param name="builder">The <see cref="IUmbracoBuilder"/> to configure.</param>
+    /// <returns>The configured <see cref="IUmbracoBuilder"/> instance, enabling method chaining.</returns>
     public static IUmbracoBuilder AddCoreMappingProfiles(this IUmbracoBuilder builder)
     {
         builder.Services.AddUnique<IUmbracoMapper, UmbracoMapper>();
