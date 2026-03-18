@@ -54,7 +54,7 @@ internal static class PropertyDataCultureResolver
         int? languageId,
         IDictionary<int, ILanguage> languagesById)
     {
-        // NOTE: some old property data DTOs can have variance defined, even if the property type no longer varies
+        // NOTE: old property data rows may still have languageId populated even if the property type no longer varies
         string? culture = propertyType.VariesByCulture()
                           && languageId.HasValue
                           && languagesById.TryGetValue(languageId.Value, out ILanguage? language)

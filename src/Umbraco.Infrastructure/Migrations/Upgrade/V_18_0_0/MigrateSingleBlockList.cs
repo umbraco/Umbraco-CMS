@@ -366,7 +366,7 @@ WHERE nodeId IN (@0)";
 
         var culture = cultureResult.Culture;
 
-        // create a fake property to be able to get a typed value and run it trough the processors.
+        // create a fake property to be able to get a typed value and run it through the processors.
         var segment = propertyType.VariesBySegment() ? propertyDataDto.Segment : null;
         var property = new Property(propertyType);
         property.SetValue(propertyDataDto.Value, culture, segment);
