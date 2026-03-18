@@ -44,7 +44,7 @@ test('can add a composition to a document type', {tag: '@smoke'}, async ({umbrac
   await umbracoUi.documentType.clickSaveButtonAndWaitForDocumentTypeToBeUpdated();
 
   // Assert
-  expect(umbracoUi.documentType.doesGroupHaveValue(groupName)).toBeTruthy();
+  await umbracoUi.documentType.isGroupVisible(groupName);
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
   expect(documentTypeData.compositions.length).toBe(1);
   expect(documentTypeData.compositions[0].documentType.id).toBe(compositionDocumentTypeId);
@@ -257,10 +257,7 @@ test('cannot use a document type with compositions as a composition', async ({um
   await umbracoUi.documentType.clickCompositionsButton();
 
   // Assert
-  const modal = umbracoUi.documentType.page.locator('uui-modal-container[backdrop]');
-  const modalItem = modal.locator(`uui-menu-item[label="${secondCompositionDocumentTypeName}"]`);
-  await expect(modalItem).toBeHidden();
+  await umbracoUi.documentType.isModalMenuItemWithNameVisible(secondCompositionDocumentTypeName, false);
   // The original composition (which has no compositions itself) should be available
-  const originalCompositionItem = modal.locator(`uui-menu-item[label="${compositionDocumentTypeName}"]`);
-  await expect(originalCompositionItem).toBeVisible();
+  await umbracoUi.documentType.isModalMenuItemWithNameVisible(compositionDocumentTypeName);
 });
