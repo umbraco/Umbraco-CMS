@@ -500,7 +500,21 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		data.values = dataValues;
 		*/
 
-		return { ...data, values: processedValues };
+		// Merge: start with processed values, then add any original server values
+		// that weren't covered by the preset builder's variant options.
+		// This prevents segment-specific values from being silently dropped
+		// when variant options don't cover all culture+segment combinations.
+		const mergedValues = [...processedValues];
+		for (const serverValue of data.values) {
+			const alreadyIncluded = mergedValues.some(
+				(v) => v.alias === serverValue.alias && v.culture === serverValue.culture && v.segment === serverValue.segment,
+			);
+			if (!alreadyIncluded) {
+				mergedValues.push(serverValue);
+			}
+		}
+
+		return { ...data, values: mergedValues };
 	}
 
 	/**
