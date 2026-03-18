@@ -128,7 +128,7 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 		return html`
 			<details @open=${this.#setOpen}>
 				<summary>
-					<div id="timestamp">${this.date?.toLocaleString()}</div>
+					<div id="timestamp">${this.date?.toLocaleString(this.localize.lang())}</div>
 					<div id="level">
 						<umb-log-viewer-level-tag .level=${this.level ? this.level : 'Information'}></umb-log-viewer-level-tag>
 					</div>
@@ -139,7 +139,7 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 				<ul id="properties-list">
 					<li class="property">
 						<div class="property-name"><umb-localize key="logViewer_timestamp">Timestamp</umb-localize></div>
-						<div class="property-value">${this.date?.toLocaleString()}</div>
+						<div class="property-value">${this.date?.toLocaleString(this.localize.lang())}</div>
 					</li>
 					<li class="property">
 						<div class="property-name">@MessageTemplate</div>

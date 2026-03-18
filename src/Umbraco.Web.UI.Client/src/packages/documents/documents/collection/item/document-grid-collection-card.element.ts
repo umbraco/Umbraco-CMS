@@ -50,7 +50,7 @@ export class UmbDocumentGridCollectionCardElement extends UmbElementMixin(UUICar
 			case 'contentTypeAlias':
 				return this.item.documentType.alias;
 			case 'createDate':
-				return this._createDate?.toLocaleString();
+				return this._createDate?.toLocaleString(this.localize.lang());
 			case 'creator':
 			case 'owner':
 				return this.item.creator;
@@ -63,7 +63,7 @@ export class UmbDocumentGridCollectionCardElement extends UmbElementMixin(UUICar
 			case 'sortOrder':
 				return this.item.sortOrder;
 			case 'updateDate':
-				return this._updateDate?.toLocaleString();
+				return this._updateDate?.toLocaleString(this.localize.lang());
 			case 'updater':
 				return this.item.updater;
 			default: {

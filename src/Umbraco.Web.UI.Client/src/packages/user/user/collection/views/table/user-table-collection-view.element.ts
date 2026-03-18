@@ -113,7 +113,7 @@ export class UmbUserTableCollectionViewElement extends UmbCollectionViewElementB
 					},
 					{
 						columnAlias: 'userLastLogin',
-						value: user.lastLoginDate,
+						value: html`<umb-date-table-column-view .value=${user.lastLoginDate}></umb-date-table-column-view>`,
 					},
 					{
 						columnAlias: 'userStatus',

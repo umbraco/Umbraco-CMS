@@ -49,7 +49,7 @@ export class UmbDocumentTableColumnPropertyValueElement extends UmbLitElement im
 			case 'contentTypeAlias':
 				return item.documentType.alias;
 			case 'createDate':
-				return this._createDate?.toLocaleString();
+				return this._createDate?.toLocaleString(this.localize.lang());
 			case 'creator':
 			case 'owner':
 				return item.creator;
@@ -58,7 +58,7 @@ export class UmbDocumentTableColumnPropertyValueElement extends UmbLitElement im
 			case 'sortOrder':
 				return item.sortOrder;
 			case 'updateDate':
-				return this._updateDate?.toLocaleString();
+				return this._updateDate?.toLocaleString(this.localize.lang());
 			case 'updater':
 				return item.updater;
 			default: {
