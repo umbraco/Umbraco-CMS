@@ -18,6 +18,8 @@ namespace Umbraco.Cms.Web.Website.Controllers;
 /// It supports username/password login and two-factor authentication via <see cref="IBackOfficeSignInManager"/>.
 /// Dependencies are resolved from request services rather than constructor injection so that the controller
 /// can be activated even when <c>AddBackOfficeSignIn()</c> has not been called.
+/// All actions return 404 when basic authentication is not enabled, preventing the login endpoint
+/// from being used as a backdoor sign-in mechanism.
 /// </remarks>
 [AllowAnonymous]
 public class BasicAuthLoginController : Controller
@@ -26,10 +28,15 @@ public class BasicAuthLoginController : Controller
     /// Renders the login form.
     /// </summary>
     /// <param name="returnPath">The local URL to redirect to after successful login.</param>
-    /// <returns>The login view.</returns>
+    /// <returns>The login view, or 404 if basic auth is not enabled.</returns>
     [HttpGet]
     public IActionResult Login(string? returnPath)
     {
+        if (IsBasicAuthEnabled() is false)
+        {
+            return NotFound();
+        }
+
         var model = new BasicAuthLoginModel { ReturnPath = returnPath };
         return View("/umbraco/BasicAuthLogin/Login.cshtml", model);
     }
@@ -45,6 +52,11 @@ public class BasicAuthLoginController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Login(string? username, string? password, string? returnPath)
     {
+        if (IsBasicAuthEnabled() is false)
+        {
+            return NotFound();
+        }
+
         IBackOfficeSignInManager? signInManager =
             HttpContext.RequestServices.GetService<IBackOfficeSignInManager>();
 
@@ -91,6 +103,11 @@ public class BasicAuthLoginController : Controller
     [HttpGet]
     public async Task<IActionResult> TwoFactor(string? returnPath)
     {
+        if (IsBasicAuthEnabled() is false)
+        {
+            return NotFound();
+        }
+
         IBackOfficeSignInManager? signInManager =
             HttpContext.RequestServices.GetService<IBackOfficeSignInManager>();
 
@@ -130,6 +147,11 @@ public class BasicAuthLoginController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> TwoFactor(string? provider, string? code, string? returnPath)
     {
+        if (IsBasicAuthEnabled() is false)
+        {
+            return NotFound();
+        }
+
         IBackOfficeSignInManager? signInManager =
             HttpContext.RequestServices.GetService<IBackOfficeSignInManager>();
 
@@ -187,7 +209,7 @@ public class BasicAuthLoginController : Controller
     /// <summary>
     /// Builds the login view with an optional error message.
     /// </summary>
-    private IActionResult LoginView(string? returnPath, string? errorMessage)
+    private ViewResult LoginView(string? returnPath, string? errorMessage)
     {
         var model = new BasicAuthLoginModel
         {
@@ -208,5 +230,15 @@ public class BasicAuthLoginController : Controller
         }
 
         return Redirect("/");
+    }
+
+    /// <summary>
+    /// Checks whether basic authentication is enabled via <see cref="IBasicAuthService"/>.
+    /// Returns false if the service is not registered or basic auth is disabled.
+    /// </summary>
+    private bool IsBasicAuthEnabled()
+    {
+        IBasicAuthService? basicAuthService = HttpContext.RequestServices.GetService<IBasicAuthService>();
+        return basicAuthService?.IsBasicAuthEnabled() == true;
     }
 }

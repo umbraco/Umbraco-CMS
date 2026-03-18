@@ -84,8 +84,10 @@ public class BasicAuthenticationMiddleware : IMiddleware
                 {
                     await next.Invoke(context);
                 }
-                else if (signInResult.RequiresTwoFactor && _basicAuthService.IsRedirectToLoginPageEnabled())
+                else if (signInResult.RequiresTwoFactor)
                 {
+                    // Always redirect to the 2FA page, even when RedirectToLoginPage is false.
+                    // The browser's Basic auth popup cannot complete a 2FA flow.
                     var returnPath = WebUtility.UrlEncode(context.Request.GetEncodedPathAndQuery());
                     context.Response.Redirect($"{_backOfficePath}/basic-auth/2fa?returnPath={returnPath}", false);
                 }

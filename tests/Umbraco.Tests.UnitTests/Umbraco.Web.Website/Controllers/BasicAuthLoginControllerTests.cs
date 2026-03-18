@@ -20,6 +20,7 @@ public class BasicAuthLoginControllerTests
 {
     private Mock<IBackOfficeSignInManager> _signInManagerMock = null!;
     private Mock<ITwoFactorLoginService> _twoFactorServiceMock = null!;
+    private Mock<IBasicAuthService> _basicAuthServiceMock = null!;
     private BasicAuthLoginController _controller = null!;
 
     [SetUp]
@@ -27,10 +28,13 @@ public class BasicAuthLoginControllerTests
     {
         _signInManagerMock = new Mock<IBackOfficeSignInManager>();
         _twoFactorServiceMock = new Mock<ITwoFactorLoginService>();
+        _basicAuthServiceMock = new Mock<IBasicAuthService>();
+        _basicAuthServiceMock.Setup(x => x.IsBasicAuthEnabled()).Returns(true);
 
         var services = new ServiceCollection();
         services.AddSingleton(_signInManagerMock.Object);
         services.AddSingleton(_twoFactorServiceMock.Object);
+        services.AddSingleton(_basicAuthServiceMock.Object);
         services.AddAntiforgery();
         services.AddLogging();
         services.AddControllersWithViews();
@@ -231,8 +235,12 @@ public class BasicAuthLoginControllerTests
     [Test]
     public async Task Login_Post_NoSignInManager_ReturnsLoginViewWithError()
     {
-        // Create controller without IBackOfficeSignInManager registered
+        // Create controller without IBackOfficeSignInManager registered but with basic auth enabled
+        var basicAuthMock = new Mock<IBasicAuthService>();
+        basicAuthMock.Setup(x => x.IsBasicAuthEnabled()).Returns(true);
+
         var services = new ServiceCollection();
+        services.AddSingleton(basicAuthMock.Object);
         services.AddLogging();
         services.AddControllersWithViews();
         ServiceProvider serviceProvider = services.BuildServiceProvider();
@@ -395,6 +403,62 @@ public class BasicAuthLoginControllerTests
         var redirectResult = result as RedirectResult;
         Assert.IsNotNull(redirectResult);
         Assert.That(redirectResult.Url, Is.EqualTo("/"));
+    }
+
+    /// <summary>
+    /// Verifies that GET Login returns 404 when basic auth is disabled.
+    /// </summary>
+    [Test]
+    public void Login_Get_BasicAuthDisabled_ReturnsNotFound()
+    {
+        _basicAuthServiceMock.Setup(x => x.IsBasicAuthEnabled()).Returns(false);
+
+        IActionResult result = _controller.Login("/page");
+
+        Assert.IsInstanceOf<NotFoundResult>(result);
+    }
+
+    /// <summary>
+    /// Verifies that POST Login returns 404 when basic auth is disabled,
+    /// preventing the endpoint from being used as a backdoor sign-in.
+    /// </summary>
+    [Test]
+    public async Task Login_Post_BasicAuthDisabled_ReturnsNotFound()
+    {
+        _basicAuthServiceMock.Setup(x => x.IsBasicAuthEnabled()).Returns(false);
+
+        IActionResult result = await _controller.Login("admin", "pass", "/page");
+
+        Assert.IsInstanceOf<NotFoundResult>(result);
+        _signInManagerMock.Verify(
+            x => x.PasswordSignInAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>()),
+            Times.Never);
+    }
+
+    /// <summary>
+    /// Verifies that GET TwoFactor returns 404 when basic auth is disabled.
+    /// </summary>
+    [Test]
+    public async Task TwoFactor_Get_BasicAuthDisabled_ReturnsNotFound()
+    {
+        _basicAuthServiceMock.Setup(x => x.IsBasicAuthEnabled()).Returns(false);
+
+        IActionResult result = await _controller.TwoFactor("/page");
+
+        Assert.IsInstanceOf<NotFoundResult>(result);
+    }
+
+    /// <summary>
+    /// Verifies that POST TwoFactor returns 404 when basic auth is disabled.
+    /// </summary>
+    [Test]
+    public async Task TwoFactor_Post_BasicAuthDisabled_ReturnsNotFound()
+    {
+        _basicAuthServiceMock.Setup(x => x.IsBasicAuthEnabled()).Returns(false);
+
+        IActionResult result = await _controller.TwoFactor("UmbracoUserAppAuthenticator", "123456", "/page");
+
+        Assert.IsInstanceOf<NotFoundResult>(result);
     }
 
     private static void AssertLoginViewWithError(IActionResult result, string expectedError)
