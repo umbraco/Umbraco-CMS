@@ -236,6 +236,8 @@ export default {
 	collection: {
 		noItemsTitle: 'No items',
 		addCollectionConfiguration: 'Add collection',
+		cardViewLabel: 'Cards',
+		tableViewLabel: 'Table',
 	},
 	content: {
 		isPublished: 'Is Published',
@@ -555,7 +557,8 @@ export default {
 		confirmremoveusageof: 'Are you sure you want to remove the usage of <strong>%0%</strong>',
 		confirmlogout: 'Are you sure?',
 		confirmSure: 'Are you sure?',
-		cannotTrashWhenReferenced: (name: string) => `<strong>${name}</strong> cannot be moved to the Recycle Bin because it is referenced by other items.`,
+		cannotTrashWhenReferenced: (name: string) =>
+			`<strong>${name}</strong> cannot be moved to the Recycle Bin because it is referenced by other items.`,
 		confirmTrash: (name: string) => `Are you sure you want to move <strong>${name}</strong> to the Recycle Bin?`,
 		cannotBulkTrashWhenReferenced: (total: number) =>
 			`The selected <strong>${total} ${total === 1 ? 'item' : 'items'}</strong> cannot be moved to the Recycle Bin because at least one item is referenced by other content.`,
@@ -1844,6 +1847,7 @@ export default {
 		confirmDeleteTabNotice: 'This will also delete all items below this tab.',
 		confirmDeleteGroupNotice: 'This will also delete all items below this group.',
 		addTab: 'Add tab',
+		deleteTab: 'Delete tab',
 		convertToTab: 'Convert to tab',
 		tabDirectPropertiesDropZone: 'Drag properties here to place directly on the tab',
 		removeChildNode: 'You are removing the child node',
