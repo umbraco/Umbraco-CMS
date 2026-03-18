@@ -1,6 +1,7 @@
 @model Umbraco.Cms.Web.Website.Models.BasicAuthLoginModel
 @{
     Layout = null;
+    var hasError = !string.IsNullOrEmpty(Model?.ErrorMessage);
 }
 <!doctype html>
 <html lang="en">
@@ -32,7 +33,7 @@
             margin-bottom: 0.25rem;
         }
         .subtitle {
-            color: #68717a;
+            color: #555d67;
             font-size: 0.875rem;
             margin-bottom: 1.5rem;
         }
@@ -52,12 +53,12 @@
             border: 1px solid #d8d7d9;
             border-radius: 4px;
             font-size: 0.9375rem;
-            transition: border-color 0.15s;
+            transition: border-color 0.15s, outline-color 0.15s;
         }
         input:focus {
-            outline: none;
             border-color: #2152a3;
-            box-shadow: 0 0 0 2px rgba(33,82,163,0.15);
+            outline: 2px solid #2152a3;
+            outline-offset: 1px;
         }
         .btn {
             display: block;
@@ -74,6 +75,10 @@
             margin-top: 0.5rem;
         }
         .btn:hover { background: #2152a3; }
+        .btn:focus {
+            outline: 2px solid #2152a3;
+            outline-offset: 2px;
+        }
         .error-message {
             background: #fef2f2;
             color: #991b1b;
@@ -86,13 +91,13 @@
     </style>
 </head>
 <body>
-    <div class="login-container">
+    <main class="login-container">
         <h1>Umbraco</h1>
         <p class="subtitle">Sign in with your backoffice account</p>
 
-        @if (!string.IsNullOrEmpty(Model?.ErrorMessage))
+        @if (hasError)
         {
-            <div class="error-message">@Model.ErrorMessage</div>
+            <div id="login-error" class="error-message" role="alert">@Model!.ErrorMessage</div>
         }
 
         <form method="post" action="@Url.Action("Login", "BasicAuthLogin")">
@@ -101,16 +106,20 @@
 
             <div class="form-group">
                 <label for="username">Username</label>
-                <input type="text" id="username" name="username" autocomplete="username" required autofocus />
+                <input type="text" id="username" name="username" autocomplete="username"
+                       required autofocus
+                       @(hasError ? "aria-describedby=login-error aria-invalid=true" : "") />
             </div>
 
             <div class="form-group">
                 <label for="password">Password</label>
-                <input type="password" id="password" name="password" autocomplete="current-password" required />
+                <input type="password" id="password" name="password" autocomplete="current-password"
+                       required
+                       @(hasError ? "aria-describedby=login-error aria-invalid=true" : "") />
             </div>
 
             <button type="submit" class="btn">Sign in</button>
         </form>
-    </div>
+    </main>
 </body>
 </html>
