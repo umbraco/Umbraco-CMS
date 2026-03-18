@@ -8,6 +8,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 [AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
 public class ForeignKeyAttribute : ReferencesAttribute
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ForeignKeyAttribute"/> class with the specified type.
+    /// </summary>
+    /// <param name="type">The type that this foreign key references.</param>
     public ForeignKeyAttribute(Type type)
         : base(type)
     {

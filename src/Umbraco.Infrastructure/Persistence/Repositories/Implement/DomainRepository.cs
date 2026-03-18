@@ -15,6 +15,14 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
 internal sealed class DomainRepository : EntityRepositoryBase<int, IDomain>, IDomainRepository
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DomainRepository"/> class.
+    /// </summary>
+    /// <param name="scopeAccessor">Provides access to the current database scope for repository operations.</param>
+    /// <param name="cache">The application-level caches used for optimizing data retrieval.</param>
+    /// <param name="logger">The logger used for logging repository events and errors.</param>
+    /// <param name="repositoryCacheVersionService">Service for managing cache versioning within the repository.</param>
+    /// <param name="cacheSyncService">Service responsible for synchronizing cache across distributed environments.</param>
     public DomainRepository(
         IScopeAccessor scopeAccessor,
         AppCaches cache,
@@ -30,15 +38,36 @@ internal sealed class DomainRepository : EntityRepositoryBase<int, IDomain>, IDo
     {
     }
 
+    /// <summary>
+    /// Gets a domain by its name.
+    /// </summary>
+    /// <param name="domainName">The name of the domain to retrieve.</param>
+    /// <returns>The domain matching the specified name, or null if none found.</returns>
     public IDomain? GetByName(string domainName)
         => GetMany().FirstOrDefault(x => x.DomainName.InvariantEquals(domainName));
 
+    /// <summary>
+    /// Determines whether a domain with the specified name exists.
+    /// </summary>
+    /// <param name="domainName">The name of the domain to check for existence.</param>
+    /// <returns>True if the domain exists; otherwise, false.</returns>
     public bool Exists(string domainName)
         => GetMany().Any(x => x.DomainName.InvariantEquals(domainName));
 
+    /// <summary>
+    /// Gets all domains, optionally including wildcard domains.
+    /// </summary>
+    /// <param name="includeWildcards">If true, includes wildcard domains in the result; otherwise, excludes them.</param>
+    /// <returns>An enumerable collection of domains.</returns>
     public IEnumerable<IDomain> GetAll(bool includeWildcards)
         => GetMany().Where(x => includeWildcards || x.IsWildcard == false);
 
+    /// <summary>
+    /// Retrieves the domains assigned to the specified content item.
+    /// </summary>
+    /// <param name="contentId">The identifier of the content item for which to retrieve assigned domains.</param>
+    /// <param name="includeWildcards">If <c>true</c>, includes wildcard domains in the results; if <c>false</c>, only non-wildcard domains are returned.</param>
+    /// <returns>An <see cref="IEnumerable{IDomain}"/> containing the domains assigned to the specified content item.</returns>
     public IEnumerable<IDomain> GetAssignedDomains(int contentId, bool includeWildcards)
         => GetMany().Where(x => x.RootContentId == contentId).Where(x => includeWildcards || x.IsWildcard == false);
 

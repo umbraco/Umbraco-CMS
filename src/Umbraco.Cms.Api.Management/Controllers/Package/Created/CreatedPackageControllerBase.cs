@@ -4,6 +4,9 @@ using Umbraco.Cms.Api.Management.Routing;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Package.Created;
 
+/// <summary>
+/// Serves as the base controller for operations related to created packages in the management API.
+/// </summary>
 [VersionedApiBackOfficeRoute("package/created")]
 [ApiExplorerSettings(GroupName = "Package")]
 public class CreatedPackageControllerBase : PackageControllerBase

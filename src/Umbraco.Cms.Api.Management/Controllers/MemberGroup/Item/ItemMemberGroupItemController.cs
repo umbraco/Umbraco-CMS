@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using J2N.Collections.Generic.Extensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -10,12 +10,20 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.MemberGroup.Item;
 
+/// <summary>
+/// API controller responsible for managing member group items within the Umbraco CMS management interface.
+/// </summary>
 [ApiVersion("1.0")]
 public class ItemMemberGroupItemController : MemberGroupItemControllerBase
 {
     private readonly IEntityService _entityService;
     private readonly IUmbracoMapper _mapper;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Controllers.MemberGroup.Item.ItemMemberGroupItemController"/> class, providing services for managing member group items.
+    /// </summary>
+    /// <param name="entityService">The service used to interact with entities in the Umbraco CMS.</param>
+    /// <param name="mapper">The mapper used for mapping Umbraco objects.</param>
     public ItemMemberGroupItemController(IEntityService entityService, IUmbracoMapper mapper)
     {
         _entityService = entityService;

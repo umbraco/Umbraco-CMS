@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Extensions;
@@ -12,6 +12,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.PartialView;
 
+/// <summary>
+/// Controller responsible for handling HTTP requests to update partial views in the Umbraco CMS.
+/// </summary>
 [ApiVersion("1.0")]
 public class UpdatePartialViewController : PartialViewControllerBase
 {
@@ -19,6 +22,12 @@ public class UpdatePartialViewController : PartialViewControllerBase
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly IUmbracoMapper _mapper;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UpdatePartialViewController"/> class, which handles requests for updating partial views in the Umbraco backoffice.
+    /// </summary>
+    /// <param name="partialViewService">Service used to manage partial view files.</param>
+    /// <param name="backOfficeSecurityAccessor">Accessor for back office security context.</param>
+    /// <param name="mapper">The Umbraco object mapper for mapping between models.</param>
     public UpdatePartialViewController(
         IPartialViewService partialViewService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
@@ -29,6 +38,13 @@ public class UpdatePartialViewController : PartialViewControllerBase
         _mapper = mapper;
     }
 
+    /// <summary>
+    /// Updates an existing partial view identified by the specified path using the details provided in the request model.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="path">The virtual path identifying the partial view to update.</param>
+    /// <param name="updateViewModel">The model containing the updated details for the partial view.</param>
+    /// <returns>A <see cref="Task{IActionResult}"/> representing the asynchronous operation, with the result indicating the outcome of the update.</returns>
     [HttpPut("{*path}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]

@@ -25,6 +25,17 @@ internal sealed class SystemTroubleshootingInformationTelemetryProvider : IDetai
     private readonly IServerRoleAccessor _serverRoleAccessor;
     private readonly RuntimeSettings _runtimeSettings;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SystemTroubleshootingInformationTelemetryProvider"/> class.
+    /// </summary>
+    /// <param name="version">Provides information about the current Umbraco version.</param>
+    /// <param name="localizationService">Service used for localization and translations.</param>
+    /// <param name="modelsBuilderSettings">Monitors the configuration settings for the Models Builder feature.</param>
+    /// <param name="hostingSettings">Monitors the configuration settings related to hosting.</param>
+    /// <param name="hostEnvironment">Provides information about the web hosting environment.</param>
+    /// <param name="umbracoDatabaseFactory">Factory for creating and managing Umbraco database connections.</param>
+    /// <param name="serverRoleAccessor">Accessor for determining the server's role in a load-balanced environment.</param>
+    /// <param name="runtimeSettings">Monitors the runtime configuration settings.</param>
     public SystemTroubleshootingInformationTelemetryProvider(
         IUmbracoVersion version,
         ILocalizationService localizationService,
@@ -65,6 +76,10 @@ internal sealed class SystemTroubleshootingInformationTelemetryProvider : IDetai
 
     private string CurrentServerRole => _serverRoleAccessor.CurrentServerRole.ToString();
 
+    /// <summary>
+    /// Retrieves a collection of system troubleshooting information, each represented as a <see cref="Umbraco.Cms.Core.Telemetry.UsageInformation"/> instance.
+    /// </summary>
+    /// <returns>An <see cref="IEnumerable{UsageInformation}"/> containing key-value pairs with details about the server environment, configuration, and runtime state for troubleshooting purposes.</returns>
     public IEnumerable<UsageInformation> GetInformation() =>
         new UsageInformation[]
         {

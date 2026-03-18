@@ -138,6 +138,9 @@ public abstract class DatabaseServerMessenger : ServerMessengerBase, IDisposable
         _initialized = new Lazy<SyncBootState?>(InitializeWithMainDom);
     }
 
+    /// <summary>
+    /// Gets the global Umbraco CMS configuration settings used by the DatabaseServerMessenger.
+    /// </summary>
     public GlobalSettings GlobalSettings { get; private set; }
 
     protected ILogger<DatabaseServerMessenger> Logger { get; }
@@ -343,6 +346,7 @@ public abstract class DatabaseServerMessenger : ServerMessengerBase, IDisposable
             if (disposing)
             {
                 _syncIdle.Dispose();
+                _cancellationTokenSource.Dispose();
             }
 
             _disposedValue = true;

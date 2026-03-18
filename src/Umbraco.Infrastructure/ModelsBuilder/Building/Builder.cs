@@ -73,6 +73,9 @@ public abstract class Builder
     /// <remarks>Includes those that are ignored.</remarks>
     public IList<TypeModel> TypeModels { get; }
 
+    /// <summary>
+    /// Gets or sets the namespace used for generated models in tests.
+    /// </summary>
     public string? ModelsNamespaceForTests { get; set; }
 
     protected ModelsBuilderSettings Config { get; }
@@ -83,6 +86,12 @@ public abstract class Builder
     /// <returns>The models to generate</returns>
     public IEnumerable<TypeModel> GetModelsToGenerate() => TypeModels;
 
+    /// <summary>
+    /// Returns the namespace that will be used for the generated models.
+    /// </summary>
+    /// <returns>
+    /// A <see cref="string"/> representing the namespace for the generated models.
+    /// </returns>
     public string GetModelsNamespace()
     {
         if (ModelsNamespaceForTests != null)

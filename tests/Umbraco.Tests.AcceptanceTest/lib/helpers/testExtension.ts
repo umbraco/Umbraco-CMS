@@ -8,6 +8,17 @@ const test = base.extend<{ umbracoApi: ApiHelpers } & { umbracoUi: UiHelpers }>(
     // Runs the isLoginStateValid before each implementation of umbracoApi in our tests (Which is every single one). This makes sure that the login state is valid
     await umbracoApi.isLoginStateValid();
     await use(umbracoApi);
+    // Save browser context so the next test starts with valid cookies.
+    try {
+      const filePath = process.env.STORAGE_STATE_PATH;
+      if (filePath) {
+        // Clear localStorage so preferences (e.g. selected language) don't leak between tests
+        await page.evaluate(() => localStorage.clear());
+        await page.context().storageState({path: filePath});
+      }
+    } catch {
+      // Page may already be closed after a timeout.
+    }
   },
 
   umbracoUi: async ({page}, use) => {

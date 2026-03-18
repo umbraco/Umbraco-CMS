@@ -300,48 +300,93 @@ test('can enable access to all content from a user group ', async ({umbracoApi, 
   expect(await umbracoApi.userGroup.doesUserGroupContainDocumentRootAccess(userGroupName)).toBeTruthy();
 });
 
-test('can add a media start node to a user group', async ({umbracoApi, umbracoUi}) => {
+test('cannot add a media file as a media start node to a user group', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.userGroup.createEmptyUserGroup(userGroupName);
   const mediaName = 'TestMedia';
   await umbracoApi.media.ensureNameNotExists(mediaName);
-  const mediaId = await umbracoApi.media.createDefaultMediaFile(mediaName);
+  await umbracoApi.media.createDefaultMediaFile(mediaName);
   await umbracoUi.userGroup.clickUserGroupsButton();
   await umbracoUi.userGroup.clickUserGroupWithName(userGroupName);
 
   // Act
   await umbracoUi.userGroup.clickChooseMediaStartNodeButton();
-  await umbracoUi.userGroup.selectMediaWithName(mediaName);
-  await umbracoUi.userGroup.clickChooseModalButton();
-  await umbracoUi.userGroup.clickSaveButtonAndWaitForUserGroupToBeUpdated();
 
   // Assert
-  expect(await umbracoApi.userGroup.doesUserGroupContainMediaStartNodeId(userGroupName, mediaId)).toBeTruthy();
+  await umbracoUi.userGroup.isMediaCardItemWithNameDisabled(mediaName);
+  await umbracoUi.userGroup.isSelectCheckboxVisibleForMediaName(mediaName, false);
 
   // Clean
   await umbracoApi.media.ensureNameNotExists(mediaName);
 });
 
-test('can remove a media start node from a user group ', async ({umbracoApi, umbracoUi}) => {
+test('can add a media folder as a media start node to a user group', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const mediaName = 'TestMedia';
-  await umbracoApi.media.ensureNameNotExists(mediaName);
-  const mediaId = await umbracoApi.media.createDefaultMediaFile(mediaName);
-  await umbracoApi.userGroup.createUserGroupWithMediaStartNode(userGroupName, mediaId);
-  expect(await umbracoApi.userGroup.doesUserGroupContainMediaStartNodeId(userGroupName, mediaId)).toBeTruthy();
+  await umbracoApi.userGroup.createEmptyUserGroup(userGroupName);
+  const mediaFolderName = 'TestMediaFolder';
+  await umbracoApi.media.ensureNameNotExists(mediaFolderName);
+  const mediaFolderId = await umbracoApi.media.createDefaultMediaFolder(mediaFolderName);
   await umbracoUi.userGroup.clickUserGroupsButton();
   await umbracoUi.userGroup.clickUserGroupWithName(userGroupName);
 
   // Act
-  await umbracoUi.userGroup.clickRemoveMediaStartNodeFromUserGroup(mediaName);
+  await umbracoUi.userGroup.clickChooseMediaStartNodeButton();
+  await umbracoUi.userGroup.selectMediaWithName(mediaFolderName);
+  await umbracoUi.userGroup.clickChooseModalButton();
+  await umbracoUi.userGroup.clickSaveButtonAndWaitForUserGroupToBeUpdated();
+
+  // Assert
+  expect(await umbracoApi.userGroup.doesUserGroupContainMediaStartNodeId(userGroupName, mediaFolderId)).toBeTruthy();
+
+  // Clean
+  await umbracoApi.media.ensureNameNotExists(mediaFolderName);
+});
+
+test('can remove a media folder start node from a user group', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const mediaFolderName = 'TestMediaFolder';
+  await umbracoApi.media.ensureNameNotExists(mediaFolderName);
+  const mediaFolderId = await umbracoApi.media.createDefaultMediaFolder(mediaFolderName);
+  await umbracoApi.userGroup.createUserGroupWithMediaStartNode(userGroupName, mediaFolderId);
+  expect(await umbracoApi.userGroup.doesUserGroupContainMediaStartNodeId(userGroupName, mediaFolderId)).toBeTruthy();
+  await umbracoUi.userGroup.clickUserGroupsButton();
+  await umbracoUi.userGroup.clickUserGroupWithName(userGroupName);
+
+  // Act
+  await umbracoUi.userGroup.clickRemoveMediaStartNodeFromUserGroup(mediaFolderName);
   await umbracoUi.userGroup.clickConfirmRemoveButton();
   await umbracoUi.userGroup.clickSaveButtonAndWaitForUserGroupToBeUpdated();
 
   // Assert
-  expect(await umbracoApi.userGroup.doesUserGroupContainMediaStartNodeId(userGroupName, mediaId)).toBeFalsy();
+  expect(await umbracoApi.userGroup.doesUserGroupContainMediaStartNodeId(userGroupName, mediaFolderId)).toBeFalsy();
 
   // Clean
-  await umbracoApi.media.ensureNameNotExists(mediaName);
+  await umbracoApi.media.ensureNameNotExists(mediaFolderName);
+});
+
+test('can add a nested media folder as a media start node to a user group', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoApi.userGroup.createEmptyUserGroup(userGroupName);
+  const parentFolderName = 'ParentMediaFolder';
+  const childFolderName = 'ChildMediaFolder';
+  await umbracoApi.media.ensureNameNotExists(parentFolderName);
+  const parentFolderId = await umbracoApi.media.createDefaultMediaFolder(parentFolderName);
+  const childFolderId = await umbracoApi.media.createDefaultMediaFolderAndParentId(childFolderName, parentFolderId);
+  await umbracoUi.userGroup.clickUserGroupsButton();
+  await umbracoUi.userGroup.clickUserGroupWithName(userGroupName);
+
+  // Act
+  await umbracoUi.userGroup.clickChooseMediaStartNodeButton();
+  await umbracoUi.userGroup.clickMediaWithName(parentFolderName);
+  await umbracoUi.userGroup.selectMediaWithName(childFolderName);
+  await umbracoUi.userGroup.clickChooseModalButton();
+  await umbracoUi.userGroup.clickSaveButtonAndWaitForUserGroupToBeUpdated();
+
+  // Assert
+  expect(await umbracoApi.userGroup.doesUserGroupContainMediaStartNodeId(userGroupName, childFolderId)).toBeTruthy();
+
+  // Clean
+  await umbracoApi.media.ensureNameNotExists(parentFolderName);
 });
 
 test('can enable access to all media in a user group ', async ({umbracoApi, umbracoUi}) => {

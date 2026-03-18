@@ -10,6 +10,11 @@ namespace Umbraco.Cms.Infrastructure.Examine;
 public abstract class IndexPopulator<TIndex> : IndexPopulator
     where TIndex : IIndex
 {
+    /// <summary>
+    /// Determines whether the specified index is registered.
+    /// </summary>
+    /// <param name="index">The index to check for registration.</param>
+    /// <returns>True if the index is registered; otherwise, false.</returns>
     public override bool IsRegistered(IIndex index)
     {
         if (base.IsRegistered(index))
@@ -25,15 +30,29 @@ public abstract class IndexPopulator<TIndex> : IndexPopulator
         return IsRegistered(casted);
     }
 
+    /// <summary>Determines whether the specified index is registered.</summary>
+    /// <param name="index">The index to check for registration.</param>
+    /// <returns><c>true</c> if the index is registered; otherwise, <c>false</c>.</returns>
     public virtual bool IsRegistered(TIndex index) => true;
 }
 
+/// <summary>
+/// Provides functionality to populate and manage Examine indexes with data in Umbraco.
+/// </summary>
 public abstract class IndexPopulator : IIndexPopulator
 {
     private readonly ConcurrentHashSet<string> _registeredIndexes = new();
 
+    /// <summary>Determines whether the specified index is registered.</summary>
+    /// <param name="index">The index to check for registration.</param>
+    /// <returns>True if the index is registered; otherwise, false.</returns>
     public virtual bool IsRegistered(IIndex index) => _registeredIndexes.Contains(index.Name);
 
+    /// <summary>
+    /// Populates the specified indexes by initializing or updating their contents as required.
+    /// Only indexes that are registered will be populated.
+    /// </summary>
+    /// <param name="indexes">The indexes to populate.</param>
     public void Populate(params IIndex[] indexes) => PopulateIndexes(indexes.Where(IsRegistered).ToList());
 
     /// <summary>

@@ -7,4 +7,5 @@ export interface UmbReadDetailDataSourceConstructor<DetailType = any> {
 
 export interface UmbReadDetailDataSource<DetailType> {
 	read(unique: string): Promise<UmbDataSourceResponse<DetailType>>;
+	readMany?(uniques: Array<string>): Promise<UmbDataSourceResponse<Array<DetailType>>>;
 }

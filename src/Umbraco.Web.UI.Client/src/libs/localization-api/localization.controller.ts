@@ -234,6 +234,16 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 	}
 
 	/**
+	 * Outputs a localized date with time using short date and medium time format.
+	 * @param {Date | string} dateToFormat - the date to format.
+	 * @returns {string}
+	 */
+	dateTime(dateToFormat: Date | string): string {
+		dateToFormat = new Date(dateToFormat);
+		return new Intl.DateTimeFormat(this.lang(), { dateStyle: 'short', timeStyle: 'medium' }).format(dateToFormat);
+	}
+
+	/**
 	 * Outputs a localized number in the specified format.
 	 * @param {number | string} numberToFormat - the number or string to format.
 	 * @param {Intl.NumberFormatOptions} options - the options to use when formatting the number.

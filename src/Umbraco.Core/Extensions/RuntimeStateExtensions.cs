@@ -31,7 +31,6 @@ public static class RuntimeStateExtensions
     /// <param name="state"></param>
     /// <returns></returns>
     public static bool RunUnattendedBootLogic(this IRuntimeState state)
-        => (state.Reason == RuntimeLevelReason.UpgradeMigrations ||
-            state.Reason == RuntimeLevelReason.UpgradePackageMigrations)
-           && state.Level == RuntimeLevel.Run;
+        => (state.Reason == RuntimeLevelReason.UpgradeMigrations || state.Reason == RuntimeLevelReason.UpgradePackageMigrations)
+           && (state.Level == RuntimeLevel.Run || state.Level == RuntimeLevel.Upgrading);
 }
