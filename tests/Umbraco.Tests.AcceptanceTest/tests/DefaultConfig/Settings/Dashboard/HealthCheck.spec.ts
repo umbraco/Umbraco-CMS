@@ -1,6 +1,8 @@
 import {expect} from '@playwright/test';
 import {ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 
+const healthCheckName = 'Imaging HMAC Secret Key';
+
 test.beforeEach(async ({umbracoUi}) => {
   await umbracoUi.goToBackOffice();
   await umbracoUi.healthCheck.goToSection(ConstantHelper.sections.settings);
@@ -59,7 +61,6 @@ test('can view the details of a health check', async ({umbracoApi, umbracoUi}) =
 test('can see the HMAC secret key health check in the Security group', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const healthCheckGroupName = 'Security';
-  const healthCheckName = 'Imaging HMAC Secret Key';
   const healthCheckData = await umbracoApi.healthCheck.getByName(healthCheckGroupName);
 
   // Act
@@ -72,15 +73,11 @@ test('can see the HMAC secret key health check in the Security group', async ({u
 });
 
 test('can see success status for HMAC secret key after performing checks', async ({umbracoApi, umbracoUi}) => {
-    // Arrange
-  const healthCheckName = 'Imaging HMAC Secret Key';
-
   // Act
   await umbracoUi.healthCheck.clickHealthCheckGroupByName('Security');
   await umbracoUi.healthCheck.clickPerformChecksButton();
 
   // Assert
-  // Verify that
   await umbracoUi.healthCheck.doesHealthCheckHaveResultMessage(healthCheckName, ConstantHelper.healthCheckMessages.imagingHMACSecretKeyIsConfigured);
   await umbracoUi.healthCheck.isHealthCheckReadMoreLinkVisible(healthCheckName, false);
 });
