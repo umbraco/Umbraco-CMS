@@ -10,6 +10,9 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DocumentType;
 
+/// <summary>
+/// API controller responsible for handling the export of document types in the management section.
+/// </summary>
 [ApiVersion("1.0")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
 public class ExportDocumentTypeController : DocumentTypeControllerBase
@@ -17,6 +20,11 @@ public class ExportDocumentTypeController : DocumentTypeControllerBase
     private readonly IContentTypeService _contentTypeService;
     private readonly IUdtFileContentFactory _fileContentFactory;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ExportDocumentTypeController"/> class, used for exporting document types.
+    /// </summary>
+    /// <param name="contentTypeService">The <see cref="IContentTypeService"/> used to manage content types.</param>
+    /// <param name="fileContentFactory">The <see cref="IUdtFileContentFactory"/> used to create file content for export.</param>
     public ExportDocumentTypeController(
         IContentTypeService contentTypeService,
         IUdtFileContentFactory fileContentFactory)
@@ -25,6 +33,12 @@ public class ExportDocumentTypeController : DocumentTypeControllerBase
         _fileContentFactory = fileContentFactory;
     }
 
+    /// <summary>
+    /// Exports the specified document type as a downloadable file.
+    /// </summary>
+    /// <param name="cancellationToken">Token to monitor for cancellation requests.</param>
+    /// <param name="id">The unique identifier of the document type to export.</param>
+    /// <returns>A <see cref="FileContentResult"/> containing the exported document type if found; otherwise, a 404 Not Found result.</returns>
     [HttpGet("{id:guid}/export")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(FileContentResult), StatusCodes.Status200OK)]

@@ -19,6 +19,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		kind: 'trashWithRelation',
 		alias: 'Umb.EntityAction.Media.RecycleBin.Trash',
 		name: 'Trash Media Entity Action',
+		api: () => import('./trash/media-trash-with-relation.action.js'),
 		forEntityTypes: [UMB_MEDIA_ENTITY_TYPE],
 		meta: {
 			itemRepositoryAlias: UMB_MEDIA_ITEM_REPOSITORY_ALIAS,

@@ -115,4 +115,14 @@ public enum ContentEditingOperationStatus
     /// </summary>
     CannotMoveToRecycleBinWhenReferenced,
     InvalidKey,
+
+    /// <summary>
+    ///     One or more property values have a culture variance that does not match the property type's culture variance.
+    /// </summary>
+    PropertyTypeCultureVarianceMismatch,
+
+    /// <summary>
+    ///     One or more property values have a segment variance that does not match the property type's segment variance.
+    /// </summary>
+    PropertyTypeSegmentVarianceMismatch,
 }

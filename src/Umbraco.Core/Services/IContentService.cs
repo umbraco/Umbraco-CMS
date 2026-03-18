@@ -71,18 +71,6 @@ public interface IContentService : IPublishableContentService<IContent>
         => throw new NotImplementedException();
 
     /// <summary>
-    ///     (Deprecated) Creates a new content item from a blueprint.
-    /// </summary>
-    /// <param name="blueprint">The blueprint to create content from.</param>
-    /// <param name="name">The name for the new content.</param>
-    /// <param name="userId">The identifier of the user performing the action.</param>
-    /// <returns>The created content.</returns>
-    /// <remarks>If creating content from a blueprint, use <see cref="IContentBlueprintEditingService.GetScaffoldedAsync"/>
-    /// instead. If creating a blueprint from content use <see cref="CreateBlueprintFromContent"/> instead.</remarks>
-    [Obsolete("Use IContentBlueprintEditingService.GetScaffoldedAsync() instead. Scheduled for removal in Umbraco 18.")]
-    IContent CreateContentFromBlueprint(IContent blueprint, string name, int userId = Constants.Security.SuperUserId);
-
-    /// <summary>
     ///     Deletes blueprints for a content type.
     /// </summary>
     /// <param name="contentTypeId">The content type identifier.</param>
@@ -107,15 +95,6 @@ public interface IContentService : IPublishableContentService<IContent>
     /// <returns>The document, or null if not found.</returns>
     IContent? GetById(int id);
 
-    /// <summary>
-    ///     Gets a document.
-    /// </summary>
-    /// <param name="key">The unique identifier of the document.</param>
-    /// <returns>The document, or null if not found.</returns>
-    // TODO (V18): This is already declared on the base type, so for the next major, when we can allow a binary breaking change, we should remove it from here.
-#pragma warning disable CS0108 // Member hides inherited member; missing new keyword
-    IContent? GetById(Guid key);
-#pragma warning restore CS0108 // Member hides inherited member; missing new keyword
 
     /// <summary>
     ///     Gets publish/unpublish schedule for a content node.

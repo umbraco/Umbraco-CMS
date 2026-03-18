@@ -127,7 +127,7 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
         var runtimeSettingsMock = new Mock<IOptionsMonitor<RuntimeSettings>>();
         runtimeSettingsMock.Setup(x => x.CurrentValue).Returns(new RuntimeSettings());
 
-        templateRepository = new TemplateRepository(scopeAccessor, appCaches, LoggerFactory.CreateLogger<TemplateRepository>(), FileSystems, ShortStringHelper, Mock.Of<IViewHelper>(), runtimeSettingsMock.Object,  Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
+        templateRepository = new TemplateRepository(scopeAccessor, appCaches, LoggerFactory.CreateLogger<TemplateRepository>(), LoggerFactory, FileSystems, ShortStringHelper, Mock.Of<IViewHelper>(), runtimeSettingsMock.Object,  Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
         var tagRepository = new TagRepository(scopeAccessor, appCaches, LoggerFactory.CreateLogger<TagRepository>(), Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
         var commonRepository =
             new ContentTypeCommonRepository(scopeAccessor, templateRepository, appCaches, ShortStringHelper);

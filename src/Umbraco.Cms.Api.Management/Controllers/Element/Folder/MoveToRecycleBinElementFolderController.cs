@@ -13,6 +13,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Element.Folder;
 
+/// <summary>
+/// API controller responsible for moving element folders to the recycle bin in the Umbraco CMS.
+/// </summary>
 [ApiVersion("1.0")]
 public class MoveToRecycleBinElementFolderController : ElementFolderControllerBase
 {
@@ -20,6 +23,12 @@ public class MoveToRecycleBinElementFolderController : ElementFolderControllerBa
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly IElementContainerService _elementContainerService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MoveToRecycleBinElementFolderController"/> class.
+    /// </summary>
+    /// <param name="authorizationService">Service used to authorize recycle bin operations.</param>
+    /// <param name="backOfficeSecurityAccessor">Accessor for back office security context.</param>
+    /// <param name="elementContainerService">Service for managing element containers.</param>
     public MoveToRecycleBinElementFolderController(
         IAuthorizationService authorizationService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
@@ -31,6 +40,12 @@ public class MoveToRecycleBinElementFolderController : ElementFolderControllerBa
         _elementContainerService = elementContainerService;
     }
 
+    /// <summary>
+    /// Moves an element folder identified by the specified unique identifier to the recycle bin.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="id">The unique identifier of the element folder to move to the recycle bin.</param>
+    /// <returns>An <see cref="IActionResult"/> representing the outcome of the operation.</returns>
     [HttpPut("{id:guid}/move-to-recycle-bin")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]

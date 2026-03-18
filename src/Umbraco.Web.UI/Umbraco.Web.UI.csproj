@@ -31,7 +31,7 @@
     Added the following direct dependency due to Microsoft.EntityFrameworkCore.Design having a dependency on an insecure version.
     Review for removal when Microsoft.EntityFrameworkCore.Design is updated to a newer version.
     -->
-    <PackageReference Include="Microsoft.Build.Tasks.Core" PrivateAssets="all" Version="17.14.28" />
+    <PackageReference Include="Microsoft.Build.Tasks.Core" PrivateAssets="all" Version="18.3.3" />
   </ItemGroup>
 
   <ItemGroup>

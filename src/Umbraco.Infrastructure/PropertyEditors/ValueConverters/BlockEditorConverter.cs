@@ -18,6 +18,14 @@ public sealed class BlockEditorConverter
     private readonly BlockEditorVarianceHandler _blockEditorVarianceHandler;
     private readonly IBlockElementService _blockElementService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Core.PropertyEditors.ValueConverters.BlockEditorConverter"/> class.
+    /// </summary>
+    /// <param name="publishedContentTypeCache">Provides access to cached published content types for efficient lookup.</param>
+    /// <param name="cacheManager">Manages caching for property editor values and related data.</param>
+    /// <param name="publishedModelFactory">Factory for creating strongly typed published content models.</param>
+    /// <param name="variationContextAccessor">Accessor for the current variation context, used for culture and segment variations.</param>
+    /// <param name="blockEditorVarianceHandler">Handles variance logic specific to block editor properties.</param>
     public BlockEditorConverter(
         IPublishedContentTypeCache publishedContentTypeCache,
         IPublishedModelFactory publishedModelFactory,
@@ -32,6 +40,16 @@ public sealed class BlockEditorConverter
         _blockElementService = blockElementService;
     }
 
+    /// <summary>
+    /// Converts a <see cref="BlockItemData"/> instance into an <see cref="IPublishedElement"/> for use in the block editor.
+    /// </summary>
+    /// <param name="owner">The parent <see cref="IPublishedElement"/> that owns the block element, used for context such as culture and segment variations.</param>
+    /// <param name="data">The <see cref="BlockItemData"/> representing the block to convert.</param>
+    /// <param name="referenceCacheLevel">The <see cref="PropertyCacheLevel"/> to use for resolving references during conversion.</param>
+    /// <param name="preview">If <c>true</c>, conversion is performed in preview mode; otherwise, in published mode.</param>
+    /// <returns>
+    /// An <see cref="IPublishedElement"/> representing the converted block if the conversion is successful and the data is valid; otherwise, <c>null</c> if the content type is not found, is not an element type, or the key is missing or invalid.
+    /// </returns>
     public IPublishedElement? ConvertToElement(IPublishedElement owner, BlockItemData data, PropertyCacheLevel referenceCacheLevel, bool preview)
     {
         // Only convert element types - content types will cause an exception when PublishedModelFactory creates the model
@@ -79,6 +97,12 @@ public sealed class BlockEditorConverter
         return _blockElementService.BuildElementAsync(alignedData, preview).GetAwaiter().GetResult();
     }
 
+    /// <summary>
+    /// Returns the model <see cref="Type"/> associated with the specified content type key.
+    /// If the content type key does not correspond to an element type, returns <see cref="IPublishedElement"/>.
+    /// </summary>
+    /// <param name="contentTypeKey">The unique key identifying the content type.</param>
+    /// <returns>The model <see cref="Type"/> for the content type key, or <see cref="IPublishedElement"/> if not found or not an element.</returns>
     public Type GetModelType(Guid contentTypeKey)
     {
         IPublishedContentType? publishedContentType = _publishedContentTypeCache.Get(PublishedItemType.Content, contentTypeKey);

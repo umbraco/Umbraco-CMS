@@ -15,6 +15,11 @@ public sealed class ConfigureBackOfficeIdentityOptions : IConfigureOptions<BackO
     private readonly UserPasswordConfigurationSettings _userPasswordConfiguration;
     private readonly SecuritySettings _securitySettings;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ConfigureBackOfficeIdentityOptions"/> class with the specified user password configuration and security settings.
+    /// </summary>
+    /// <param name="userPasswordConfiguration">The options containing user password configuration settings.</param>
+    /// <param name="securitySettings">The options containing security settings.</param>
     public ConfigureBackOfficeIdentityOptions(
         IOptions<UserPasswordConfigurationSettings> userPasswordConfiguration,
         IOptions<SecuritySettings> securitySettings)
@@ -23,6 +28,10 @@ public sealed class ConfigureBackOfficeIdentityOptions : IConfigureOptions<BackO
         _securitySettings = securitySettings.Value;
     }
 
+    /// <summary>
+    /// Configures the specified <see cref="BackOfficeIdentityOptions"/> with security-related settings, including sign-in requirements, user validation, claims identity configuration, lockout policies, and password options for the Umbraco backoffice.
+    /// </summary>
+    /// <param name="options">The <see cref="BackOfficeIdentityOptions"/> instance to configure.</param>
     public void Configure(BackOfficeIdentityOptions options)
     {
         options.SignIn.RequireConfirmedAccount = true; // uses our custom IUserConfirmation
