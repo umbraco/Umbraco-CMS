@@ -16,6 +16,11 @@ internal sealed class DocumentBlueprintEditingPresentationFactory : ContentEditi
         return model;
     }
 
+    /// <summary>
+    /// Maps an <see cref="UpdateDocumentBlueprintRequestModel"/> to a <see cref="ContentBlueprintUpdateModel"/>.
+    /// </summary>
+    /// <param name="requestModel">The request model containing updated blueprint data.</param>
+    /// <returns>The mapped <see cref="ContentBlueprintUpdateModel"/>.</returns>
     public ContentBlueprintUpdateModel MapUpdateModel(UpdateDocumentBlueprintRequestModel requestModel)
     {
         ContentBlueprintUpdateModel model = MapContentEditingModel<ContentBlueprintUpdateModel>(requestModel);

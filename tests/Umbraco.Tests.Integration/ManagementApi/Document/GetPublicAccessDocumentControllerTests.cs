@@ -92,7 +92,7 @@ public class GetPublicAccessDocumentControllerTests : ManagementApiUserGroupTest
     }
 
     protected override Expression<Func<GetPublicAccessDocumentController, object>> MethodSelector =>
-        x => x.GetPublicAccess(CancellationToken.None, _contentDefaultPageKey);
+        x => x.GetPublicAccess(CancellationToken.None, _contentDefaultPageKey, true);
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {

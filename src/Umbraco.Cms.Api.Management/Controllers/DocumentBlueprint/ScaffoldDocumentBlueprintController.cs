@@ -10,6 +10,9 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DocumentBlueprint;
 
+/// <summary>
+/// Provides endpoints for scaffolding document blueprints in the Umbraco CMS Management API.
+/// </summary>
 [ApiVersion("1.0")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessDocuments)]
 public class ScaffoldDocumentBlueprintController : DocumentBlueprintControllerBase

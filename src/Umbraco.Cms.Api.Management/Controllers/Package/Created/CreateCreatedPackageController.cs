@@ -11,6 +11,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Package.Created;
 
+/// <summary>
+/// Controller for creating packages in the 'Created' state.
+/// </summary>
 [ApiVersion("1.0")]
 public class CreateCreatedPackageController : CreatedPackageControllerBase
 {
@@ -18,6 +21,12 @@ public class CreateCreatedPackageController : CreatedPackageControllerBase
     private readonly IPackagePresentationFactory _packagePresentationFactory;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CreateCreatedPackageController"/> class.
+    /// </summary>
+    /// <param name="packagingService">Service for handling package creation and management.</param>
+    /// <param name="packagePresentationFactory">Factory for creating package presentation models.</param>
+    /// <param name="backOfficeSecurityAccessor">Accessor for back office security context.</param>
     public CreateCreatedPackageController(
         IPackagingService packagingService,
         IPackagePresentationFactory packagePresentationFactory,

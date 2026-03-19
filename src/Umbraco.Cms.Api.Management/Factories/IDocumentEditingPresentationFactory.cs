@@ -1,32 +1,35 @@
-﻿using Umbraco.Cms.Api.Management.ViewModels.Document;
+using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Api.Management.ViewModels.Patching;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
+/// <summary>
+/// Defines a factory for creating presentation models used in editing Umbraco documents.
+/// </summary>
 public interface IDocumentEditingPresentationFactory
 {
     /// <summary>
-    /// Maps a <see cref="CreateDocumentRequestModel"/> to a <see cref="ContentCreateModel"/> for content creation.
+    /// Maps the given <see cref="CreateDocumentRequestModel"/> to a <see cref="ContentCreateModel"/>.
     /// </summary>
-    /// <param name="requestModel">The create document request model.</param>
-    /// <returns>A <see cref="ContentCreateModel"/> ready for content creation.</returns>
+    /// <param name="requestModel">The request model containing data to create the document.</param>
+    /// <returns>A <see cref="ContentCreateModel"/> representing the document to be created.</returns>
     ContentCreateModel MapCreateModel(CreateDocumentRequestModel requestModel);
 
     /// <summary>
-    /// Maps an <see cref="UpdateDocumentRequestModel"/> to a <see cref="ContentUpdateModel"/> for content updating.
+    /// Maps the given <see cref="UpdateDocumentRequestModel" /> to a <see cref="ContentUpdateModel" />.
     /// </summary>
-    /// <param name="requestModel">The update document request model.</param>
-    /// <returns>A <see cref="ContentUpdateModel"/> ready for content updating.</returns>
+    /// <param name="requestModel">The update document request model to map from.</param>
+    /// <returns>The mapped content update model.</returns>
     ContentUpdateModel MapUpdateModel(UpdateDocumentRequestModel requestModel);
 
     /// <summary>
-    /// Creates an UpdateDocumentRequestModel from IContent.
-    /// Converts property values using ToEditor transformation.
+    /// Creates an <see cref="UpdateDocumentRequestModel"/> from the given <see cref="IContent"/>,
+    /// mapping its properties, variants, and template into the request model representation.
     /// </summary>
-    /// <param name="content">The content to convert.</param>
-    /// <returns>An UpdateDocumentRequestModel representing the content.</returns>
+    /// <param name="content">The content item to create the update request model from.</param>
+    /// <returns>An <see cref="UpdateDocumentRequestModel"/> representing the content.</returns>
     Task<UpdateDocumentRequestModel> CreateUpdateRequestModelAsync(IContent content);
 
     /// <summary>

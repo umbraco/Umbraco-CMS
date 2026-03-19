@@ -7,12 +7,19 @@ import type { UmbMediaTreeItemModel } from '../../tree/types.js';
 import { isMediaTreeItem } from '../../tree/utils.js';
 import { UmbPickerInputContext } from '@umbraco-cms/backoffice/picker-input';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { isUmbracoFolder, type UmbMediaTypeEntityType } from '@umbraco-cms/backoffice/media-type';
+import { UmbMediaTypeStructureRepository, type UmbMediaTypeEntityType } from '@umbraco-cms/backoffice/media-type';
 import { UMB_VARIANT_CONTEXT } from '@umbraco-cms/backoffice/variant';
+
+export enum UmbMediaPickerFolderFilter {
+	FILES_ONLY = 'filesOnly',
+	FOLDERS_ONLY = 'foldersOnly',
+	FILES_AND_FOLDERS = 'filesAndFolders',
+}
 
 interface UmbMediaPickerInputContextOpenArgs {
 	allowedContentTypes?: Array<{ unique: string; entityType: UmbMediaTypeEntityType }>;
 	includeTrashed?: boolean;
+	folderFilter?: UmbMediaPickerFolderFilter;
 }
 
 export class UmbMediaPickerInputContext extends UmbPickerInputContext<
@@ -21,17 +28,27 @@ export class UmbMediaPickerInputContext extends UmbPickerInputContext<
 	UmbMediaPickerModalData,
 	UmbMediaPickerModalValue
 > {
+	#mediaTypeStructureRepository;
+	#folderTypeUniques = new Set<string>();
+	#folderTypesPromise: Promise<void> | null = null;
+
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_MEDIA_ITEM_REPOSITORY_ALIAS, UMB_MEDIA_PICKER_MODAL);
+		this.#mediaTypeStructureRepository = new UmbMediaTypeStructureRepository(host);
 	}
 
 	override async openPicker(pickerData?: Partial<UmbMediaPickerModalData>, args?: UmbMediaPickerInputContextOpenArgs) {
+		// Load folder types before opening the picker so the filter is ready
+		await this.#loadFolderTypes();
 		const combinedPickerData = {
 			...pickerData,
 		};
 
-		// transform allowedContentTypes to a pickable filter
-		combinedPickerData.pickableFilter = (item) => this.#pickableFilter(item, args?.allowedContentTypes);
+		// combine internal allowedContentTypes filter with user-supplied pickableFilter
+		combinedPickerData.pickableFilter = this._combinePickableFilters(
+			(item) => this.#pickableFilter(item, args?.allowedContentTypes, args?.folderFilter),
+			pickerData?.pickableFilter,
+		);
 
 		// set default search data
 		if (!pickerData?.search) {
@@ -55,18 +72,36 @@ export class UmbMediaPickerInputContext extends UmbPickerInputContext<
 		await super.openPicker(combinedPickerData);
 	}
 
+	async #loadFolderTypes() {
+		if (!this.#folderTypesPromise) {
+			this.#folderTypesPromise = this.#mediaTypeStructureRepository.requestMediaTypesOfFolders().then((folderTypes) => {
+				this.#folderTypeUniques = new Set(folderTypes.map((ft) => ft.unique).filter((u): u is string => u != null));
+			});
+		}
+		return this.#folderTypesPromise;
+	}
+
 	#pickableFilter = (
 		item: UmbMediaItemModel | UmbMediaTreeItemModel,
 		allowedContentTypes?: Array<{ unique: string; entityType: UmbMediaTypeEntityType }>,
+		folderFilter: UmbMediaPickerFolderFilter = UmbMediaPickerFolderFilter.FILES_ONLY,
 	): boolean => {
 		// Check if the user has no access to this item (tree items only)
 		if (isMediaTreeItem(item) && item.noAccess) {
 			return false;
 		}
-		// Exclude folders - they don't have URLs
-		if (isUmbracoFolder(item.mediaType.unique)) {
+
+		const isFolder = this.#folderTypeUniques.has(item.mediaType.unique);
+
+		// Apply folder filter
+		if (folderFilter === UmbMediaPickerFolderFilter.FILES_ONLY && isFolder) {
 			return false;
 		}
+		if (folderFilter === UmbMediaPickerFolderFilter.FOLDERS_ONLY && !isFolder) {
+			return false;
+		}
+		// FILES_AND_FOLDERS — no folder-level filtering
+
 		if (allowedContentTypes && allowedContentTypes.length > 0) {
 			return allowedContentTypes
 				.map((contentTypeReference) => contentTypeReference.unique)

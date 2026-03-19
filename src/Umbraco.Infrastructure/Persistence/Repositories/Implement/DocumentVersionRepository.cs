@@ -16,6 +16,10 @@ internal sealed class DocumentVersionRepository : IDocumentVersionRepository
 {
     private readonly IScopeAccessor _scopeAccessor;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DocumentVersionRepository"/> class.
+    /// </summary>
+    /// <param name="scopeAccessor">An <see cref="IScopeAccessor"/> used to manage the database scope for repository operations.</param>
     public DocumentVersionRepository(IScopeAccessor scopeAccessor) =>
         _scopeAccessor = scopeAccessor ?? throw new ArgumentNullException(nameof(scopeAccessor));
 

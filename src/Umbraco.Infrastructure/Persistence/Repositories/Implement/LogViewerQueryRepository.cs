@@ -14,6 +14,14 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
 internal sealed class LogViewerQueryRepository : EntityRepositoryBase<int, ILogViewerQuery>, ILogViewerQueryRepository
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="LogViewerQueryRepository"/> class.
+    /// </summary>
+    /// <param name="scopeAccessor">The <see cref="IScopeAccessor"/> used to manage database scopes.</param>
+    /// <param name="cache">The <see cref="AppCaches"/> instance for application-level caching.</param>
+    /// <param name="logger">The <see cref="ILogger{LogViewerQueryRepository}"/> used for logging operations.</param>
+    /// <param name="repositoryCacheVersionService">The <see cref="IRepositoryCacheVersionService"/> for managing repository cache versions.</param>
+    /// <param name="cacheSyncService">The <see cref="ICacheSyncService"/> responsible for synchronizing cache across instances.</param>
     public LogViewerQueryRepository(
         IScopeAccessor scopeAccessor,
         AppCaches cache,
@@ -29,6 +37,9 @@ internal sealed class LogViewerQueryRepository : EntityRepositoryBase<int, ILogV
     {
     }
 
+    /// <summary>Retrieves a log viewer query by its name.</summary>
+    /// <param name="name">The name of the log viewer query to retrieve.</param>
+    /// <returns>The log viewer query with the specified name, or null if not found.</returns>
     public ILogViewerQuery? GetByName(string name) =>
 
         // use the underlying GetAll which will force cache all log queries
@@ -123,12 +134,22 @@ internal sealed class LogViewerQueryRepository : EntityRepositoryBase<int, ILogV
 
     internal sealed class LogViewerQueryModelFactory
     {
+        /// <summary>
+        /// Creates an <see cref="Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.LogViewerQueryRepository.ILogViewerQuery" /> instance from the specified <see cref="Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.LogViewerQueryRepository.LogViewerQueryDto" />.
+        /// </summary>
+        /// <param name="dto">The DTO containing the log viewer query information.</param>
+        /// <returns>A new <see cref="Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.LogViewerQueryRepository.ILogViewerQuery" /> instance.</returns>
         public ILogViewerQuery BuildEntity(LogViewerQueryDto dto)
         {
             var logViewerQuery = new LogViewerQuery(dto.Name, dto.Query) { Id = dto.Id };
             return logViewerQuery;
         }
 
+        /// <summary>
+        /// Builds a <see cref="LogViewerQueryDto"/> from the given <see cref="ILogViewerQuery"/> entity.
+        /// </summary>
+        /// <param name="entity">The log viewer query entity to convert.</param>
+        /// <returns>A data transfer object representing the log viewer query.</returns>
         public LogViewerQueryDto BuildDto(ILogViewerQuery entity)
         {
             var dto = new LogViewerQueryDto { Name = entity.Name, Query = entity.Query, Id = entity.Id };

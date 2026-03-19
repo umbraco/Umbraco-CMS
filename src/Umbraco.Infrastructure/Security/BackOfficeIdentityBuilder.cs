@@ -5,6 +5,9 @@ using Umbraco.Cms.Core.Serialization;
 
 namespace Umbraco.Cms.Core.Security;
 
+/// <summary>
+/// Provides a builder for configuring identity options and services specific to the Umbraco back office.
+/// </summary>
 public class BackOfficeIdentityBuilder : IdentityBuilder
 {
     /// <summary>
@@ -17,11 +20,19 @@ public class BackOfficeIdentityBuilder : IdentityBuilder
     /// <summary>
     ///     Initializes a new instance of the <see cref="BackOfficeIdentityBuilder" /> class.
     /// </summary>
+    /// <param name="role">The <see cref="Type"/> representing the user role for the back office identity.</param>
+    /// <param name="services">The <see cref="IServiceCollection"/> to which identity services will be added.</param>
     public BackOfficeIdentityBuilder(Type role, IServiceCollection services)
         : base(typeof(BackOfficeIdentityUser), role, services)
         => InitializeServices(services);
 
-    // override to add itself, by default identity only wants a single IdentityErrorDescriber
+    /// <summary>
+    /// Adds a custom error describer of the specified type to the identity builder for back office authentication.
+    /// </summary>
+    /// <remarks>override to add itself, by default identity only wants a single IdentityErrorDescriber</remarks>
+    /// <typeparam name="TDescriber">The type of the error describer to add. Must inherit from <see cref="BackOfficeErrorDescriber"/>.</typeparam>
+    /// <returns>The current <see cref="IdentityBuilder"/> instance for chaining.</returns>
+    /// <exception cref="InvalidOperationException">Thrown if <typeparamref name="TDescriber"/> does not inherit from <see cref="BackOfficeErrorDescriber"/>.</exception>
     public override IdentityBuilder AddErrorDescriber<TDescriber>()
     {
         if (!typeof(BackOfficeErrorDescriber).IsAssignableFrom(typeof(TDescriber)))

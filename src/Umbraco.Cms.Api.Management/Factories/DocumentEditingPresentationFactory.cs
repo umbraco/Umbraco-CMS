@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Api.Management.Patching;
+using Umbraco.Cms.Api.Management.Patching;
 using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Api.Management.ViewModels.Patching;
@@ -10,12 +10,21 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
+/// <summary>
+/// Factory for creating and mapping presentation models used in document editing operations.
+/// </summary>
 internal sealed class DocumentEditingPresentationFactory : ContentEditingPresentationFactory<DocumentValueModel, DocumentVariantRequestModel>, IDocumentEditingPresentationFactory
 {
     private readonly PropertyEditorCollection _propertyEditorCollection;
     private readonly IDataValueEditorFactory _dataValueEditorFactory;
     private readonly ITemplateService _templateService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DocumentEditingPresentationFactory"/> class.
+    /// </summary>
+    /// <param name="propertyEditorCollection">The collection of available property editors.</param>
+    /// <param name="dataValueEditorFactory">The factory for creating data value editors.</param>
+    /// <param name="templateService">The service for retrieving templates.</param>
     public DocumentEditingPresentationFactory(
         PropertyEditorCollection propertyEditorCollection,
         IDataValueEditorFactory dataValueEditorFactory,
@@ -26,6 +35,7 @@ internal sealed class DocumentEditingPresentationFactory : ContentEditingPresent
         _templateService = templateService;
     }
 
+    /// <inheritdoc/>
     public ContentCreateModel MapCreateModel(CreateDocumentRequestModel requestModel)
     {
         ContentCreateModel model = MapContentEditingModel<ContentCreateModel>(requestModel);
@@ -37,9 +47,11 @@ internal sealed class DocumentEditingPresentationFactory : ContentEditingPresent
         return model;
     }
 
+    /// <inheritdoc/>
     public ContentUpdateModel MapUpdateModel(UpdateDocumentRequestModel requestModel)
         => MapUpdateContentModel<ContentUpdateModel>(requestModel);
 
+    /// <inheritdoc/>
     public async Task<UpdateDocumentRequestModel> CreateUpdateRequestModelAsync(IContent content)
     {
         DocumentValueModel[] values = MapValuesToRequestModel(content.Properties);
@@ -58,6 +70,7 @@ internal sealed class DocumentEditingPresentationFactory : ContentEditingPresent
         };
     }
 
+    /// <inheritdoc/>
     public ContentPatchModel MapPatchModel(PatchDocumentRequestModel requestModel)
     {
         PatchOperationModel[] operations = requestModel.Operations.Select(op => new PatchOperationModel
@@ -87,6 +100,7 @@ internal sealed class DocumentEditingPresentationFactory : ContentEditingPresent
         };
     }
 
+    /// <inheritdoc/>
     public ValidateContentUpdateModel MapValidateUpdateModel(ValidateUpdateDocumentRequestModel requestModel)
     {
         ValidateContentUpdateModel model = MapUpdateContentModel<ValidateContentUpdateModel>(requestModel);
