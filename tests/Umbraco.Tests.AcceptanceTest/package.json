@@ -23,7 +23,7 @@
     "testSqlite": "npm run build && npx playwright test DefaultConfig --grep-invert \"Users\"",
     "all": "npm run build && npx playwright test",
     "createTest": "node createTest.js",
-    "smokeTest": "npm run build && npx playwright test documenttypeComposition contentwithcomposition elementtypecomposition mediatypecomposition membertypecomposition",
+    "smokeTest": "npm run build && npx playwright test documenttypeComposition contentwithcomposition elementtypecomposition mediatypecomposition membertypecomposition contentwithvariantcomposition",
     "smokeTestRevert": "npm run build && npx playwright test DefaultConfig --grep \"@smoke\"",
     "smokeTestSqlite": "npm run build && npx playwright test DefaultConfig --grep \"@smoke\" --grep-invert \"Users\"",
     "releaseTest": "npm run build && npx playwright test DefaultConfig --grep \"@release\"",
