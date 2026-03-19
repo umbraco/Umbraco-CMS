@@ -1,4 +1,4 @@
-import { UMB_TEMPLATE_TREE_REPOSITORY_ALIAS } from '../../../manifests.js';
+import { UMB_TEMPLATE_TREE_REPOSITORY_ALIAS } from '../../../constants.js';
 import { UmbTreeItemChildrenCollectionRepositoryBase } from '@umbraco-cms/backoffice/tree';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 

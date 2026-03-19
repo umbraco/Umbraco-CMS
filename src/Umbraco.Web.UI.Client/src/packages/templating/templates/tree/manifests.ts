@@ -3,9 +3,9 @@ import { UMB_TEMPLATE_TREE_ITEM_CHILDREN_COLLECTION_ALIAS } from './tree-item-ch
 import { manifests as reloadTreeItemChildrenManifest } from './reload-tree-item-children/manifests.js';
 import { manifests as treeItemChildrenManifests } from './tree-item-children/manifests.js';
 import { UmbTemplateTreeStore } from './template-tree.store.js';
+import { UMB_TEMPLATE_TREE_REPOSITORY_ALIAS } from './constants.js';
 import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
 
-export const UMB_TEMPLATE_TREE_REPOSITORY_ALIAS = 'Umb.Repository.Template.Tree';
 /**
  * @deprecated Use {@link UMB_TEMPLATE_TREE_REPOSITORY_ALIAS} instead. This will be removed in Umbraco 18.
  */
