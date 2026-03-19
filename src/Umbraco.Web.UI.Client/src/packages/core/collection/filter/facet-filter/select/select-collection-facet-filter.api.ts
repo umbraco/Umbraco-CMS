@@ -1,21 +1,25 @@
 import { UMB_COLLECTION_CONTEXT } from '../../../default/index.js';
 import type { ManifestCollectionFacetFilter } from '../collection-facet-filter.extension.js';
-import type { UmbSelectOption, MetaCollectionFacetFilterSelect } from './types.js';
+import type { MetaCollectionFacetFilterSelect } from './types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbDatalistDataSource, UmbDatalistItemModel } from '@umbraco-cms/backoffice/datalist-data-source';
+import type {
+	UmbDatalistDataSource,
+	UmbDatalistItemModel,
+	UmbDatalistOptionModel,
+} from '@umbraco-cms/backoffice/datalist-data-source';
 import { UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
 
 const ObserveValueItems = Symbol();
 
-type UmbSelectValue = Pick<UmbSelectOption, 'unique' | 'entityType'>;
+type UmbSelectValue = Pick<UmbDatalistOptionModel, 'unique' | 'entityType'>;
 
 export class UmbSelectCollectionFacetFilterApi extends UmbControllerBase {
-	#options = new UmbArrayState<UmbSelectOption>([], (x) => x.unique);
+	#options = new UmbArrayState<UmbDatalistOptionModel>([], (x) => x.unique);
 	public readonly options = this.#options.asObservable();
 
-	#value = new UmbArrayState<{ unique: string; entityType: string }>([], (x) => x.unique);
+	#value = new UmbArrayState<UmbSelectValue>([], (x) => x.unique);
 	public readonly value = this.#value.asObservable();
 
 	#valueItems = new UmbArrayState<UmbDatalistItemModel>([], (x) => x.unique);
@@ -109,15 +113,8 @@ export class UmbSelectCollectionFacetFilterApi extends UmbControllerBase {
 		});
 
 		if (data) {
-			const newOptions = data.items.map((item) => ({
-				label: item.name ?? `${item.entityType}:${item.unique}`,
-				unique: item.unique,
-				entityType: item.entityType,
-			}));
-
 			const currentOptions = this.#options.getValue();
-			this.#options.setValue([...currentOptions, ...newOptions]);
-
+			this.#options.setValue([...currentOptions, ...data.items]);
 			this.pagination.setTotalItems(data.total);
 		} else {
 			if (this.pagination.getCurrentPageNumber() === 1) {

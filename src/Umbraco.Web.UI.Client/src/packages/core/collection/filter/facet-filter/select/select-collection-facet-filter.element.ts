@@ -1,12 +1,12 @@
 import type { ManifestCollectionFacetFilter } from '../collection-facet-filter.extension.js';
-import type { UmbSelectOption, MetaCollectionFacetFilterSelect } from './types.js';
+import type { MetaCollectionFacetFilterSelect } from './types.js';
 import type { UmbSelectCollectionFacetFilterApi } from './select-collection-facet-filter.api.js';
-import type { UmbDatalistItemModel } from '@umbraco-cms/backoffice/datalist-data-source';
+import type { UmbDatalistItemModel, UmbDatalistOptionModel } from '@umbraco-cms/backoffice/datalist-data-source';
 import { css, customElement, html, ifDefined, repeat, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 
-type UmbSelectValue = Pick<UmbSelectOption, 'unique' | 'entityType'>;
+type UmbSelectValue = Pick<UmbDatalistOptionModel, 'unique' | 'entityType'>;
 
 const INLINE_THRESHOLD = 6;
 
@@ -25,7 +25,7 @@ export class UmbSelectCollectionFacetFilterElement extends UmbLitElement {
 	}
 
 	@state()
-	private _options: Array<UmbSelectOption> = [];
+	private _options: Array<UmbDatalistOptionModel> = [];
 
 	@state()
 	private _value: Array<UmbSelectValue> = [];
@@ -97,7 +97,7 @@ export class UmbSelectCollectionFacetFilterElement extends UmbLitElement {
 	get #filteredOptions() {
 		if (!this._comboboxSearch) return this._options;
 		const text = this._comboboxSearch.toLowerCase();
-		return this._options.filter((option) => option.label.toLowerCase().includes(text));
+		return this._options.filter((option) => option.name?.toLowerCase().includes(text));
 	}
 
 	#onLoadMore() {
@@ -132,7 +132,7 @@ export class UmbSelectCollectionFacetFilterElement extends UmbLitElement {
 					${repeat(
 						this._options,
 						(option) => option.unique,
-						(option) => html`<uui-radio label=${option.label} value=${option.unique}></uui-radio>`,
+						(option) => html`<uui-radio label=${option.name ?? option.unique} value=${option.unique}></uui-radio>`,
 					)}
 				</uui-radio-group>
 			</div>
@@ -148,7 +148,7 @@ export class UmbSelectCollectionFacetFilterElement extends UmbLitElement {
 						(option) => option.unique,
 						(option) => html`
 							<uui-checkbox
-								label=${ifDefined(option.label)}
+								label=${ifDefined(option.name)}
 								value=${ifDefined(option.unique)}
 								@change=${this.#onCheckboxChange}
 								.checked=${this._value.some((v) => v.unique === option.unique)}></uui-checkbox>
@@ -172,7 +172,9 @@ export class UmbSelectCollectionFacetFilterElement extends UmbLitElement {
 							this.#filteredOptions,
 							(option) => option.unique,
 							(option) => html`
-								<uui-combobox-list-option value=${option.unique}>${option.label}</uui-combobox-list-option>
+								<uui-combobox-list-option value=${option.unique}
+									>${option.name ?? option.unique}</uui-combobox-list-option
+								>
 							`,
 						)}
 						${this._hasMore
@@ -201,7 +203,7 @@ export class UmbSelectCollectionFacetFilterElement extends UmbLitElement {
 								(option) => option.unique,
 								(option) => html`
 									<uui-checkbox
-										label=${ifDefined(option.label)}
+										label=${ifDefined(option.name)}
 										value=${ifDefined(option.unique)}
 										@change=${this.#onCheckboxChange}
 										.checked=${this._value.some((v) => v.unique === option.unique)}></uui-checkbox>

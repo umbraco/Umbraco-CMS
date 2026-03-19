@@ -6,9 +6,3 @@ export interface MetaCollectionFacetFilterSelect extends MetaCollectionFacetFilt
 	datalistDataSource: new (host: UmbControllerHost) => UmbDatalistDataSource;
 	multiple?: boolean;
 }
-
-export interface UmbSelectOption {
-	label: string;
-	unique: string;
-	entityType: string;
-}

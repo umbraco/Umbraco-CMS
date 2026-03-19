@@ -9,6 +9,12 @@ export interface UmbDatalistItemModel extends UmbEntityModel {
 	icon?: string;
 }
 
+export interface UmbDatalistOptionModel extends UmbEntityModel {
+	unique: string;
+	name?: string;
+	icon?: string;
+}
+
 export interface UmbDatalistRequestArgs {
 	skip?: number;
 	take?: number;
