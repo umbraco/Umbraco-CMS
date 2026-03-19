@@ -47,20 +47,20 @@ export class UmbSelectCollectionFacetFilterApi extends UmbControllerBase {
 
 		this.consumeContext(UMB_COLLECTION_FACET_FILTER_CONTEXT, (context) => {
 			this.#facetFilterContext = context;
-			this.#observeFilterValue();
+			this.#observeFilterValues();
 		});
 	}
 
-	#observeFilterValue() {
+	#observeFilterValues() {
 		if (!this.#facetFilterContext) return;
 		this.observe(
-			this.#facetFilterContext.value,
-			(activeFilter) => {
-				const values: Array<UmbSelectValue> = activeFilter?.value ?? [];
+			this.#facetFilterContext.values,
+			(entries) => {
+				const values: Array<UmbSelectValue> = entries?.map((e) => e.value) ?? [];
 				this.#value.setValue(values);
 				this.#requestValueItems(values.map((v) => v.unique));
 			},
-			'umbFilterValueObserver',
+			'umbFilterValuesObserver',
 		);
 	}
 
@@ -80,9 +80,9 @@ export class UmbSelectCollectionFacetFilterApi extends UmbControllerBase {
 		const filtered = values.filter((v) => v.unique !== '');
 
 		if (filtered.length === 0) {
-			this.#facetFilterContext?.clearValue();
+			this.#facetFilterContext?.clearAllValues();
 		} else {
-			this.#facetFilterContext?.setValue(filtered);
+			this.#facetFilterContext?.setValues(filtered.map((v) => ({ unique: v.unique, value: v })));
 		}
 	}
 

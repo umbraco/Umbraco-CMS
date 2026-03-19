@@ -15,11 +15,12 @@ export class UmbExtensionCollectionContext extends UmbDefaultCollectionContext<
 	protected override async _getFilterArgs(): Promise<Record<string, any>> {
 		const activeFilters = await this.filtering.getActiveFilters();
 		const args: Record<string, any> = {};
-		for (const filter of activeFilters) {
-			if (filter.alias === 'Umb.CollectionFacetFilter.Extension.Type') {
-				args.extensionTypes = filter.value.map((v: { unique: string }) => v.unique);
-			}
-		}
+
+		const extensionTypeFilters = activeFilters.filter(
+			(f) => f.alias === 'Umb.CollectionFacetFilter.Extension.Type',
+		);
+		if (extensionTypeFilters.length) args.extensionTypes = extensionTypeFilters.map((f) => f.unique);
+
 		return args;
 	}
 }

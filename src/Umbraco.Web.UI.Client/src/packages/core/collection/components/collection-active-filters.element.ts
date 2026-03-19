@@ -65,7 +65,7 @@ export class UmbCollectionActiveFiltersElement extends UmbLitElement {
 				<div id="active-filter-items">
 					${repeat(
 						this._activeFilters!,
-						(activeFilter) => activeFilter.alias,
+						(activeFilter) => `${activeFilter.alias}||${activeFilter.unique}`,
 						(activeFilter) => this.#renderActiveFilterItem(activeFilter),
 					)}
 				</div>
@@ -78,8 +78,8 @@ export class UmbCollectionActiveFiltersElement extends UmbLitElement {
 
 	#renderActiveFilterItem(activeFilter: UmbActiveCollectionFacetFilterModel) {
 		const label = this.#filterLabelsMap.get(activeFilter.alias) ?? activeFilter.alias;
-		const value = Array.isArray(activeFilter.value) ? activeFilter.value.join(', ') : activeFilter.value;
-		return html` <span class="active-filter-item"> <strong>${label}:</strong> ${value} </span> `;
+		const value = activeFilter.unique;
+		return html`<span class="active-filter-item"> <strong>${label}:</strong> ${value} </span>`;
 	}
 
 	#onClearAllFilters() {

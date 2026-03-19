@@ -15,14 +15,13 @@ export class UmbMemberCollectionContext extends UmbDefaultCollectionContext<
 	protected override async _getFilterArgs(): Promise<Record<string, any>> {
 		const activeFilters = await this.filtering.getActiveFilters();
 		const args: Record<string, any> = {};
-		for (const filter of activeFilters) {
-			if (filter.alias === 'Umb.CollectionFacetFilter.MemberType') {
-				args.memberTypeId = filter.value.map((v: { unique: string }) => v.unique);
-			}
-			if (filter.alias === 'Umb.CollectionFacetFilter.MemberGroup') {
-				args.memberGroupName = filter.value.map((v: { unique: string }) => v.unique);
-			}
-		}
+
+		const memberTypeFilters = activeFilters.filter((f) => f.alias === 'Umb.CollectionFacetFilter.MemberType');
+		if (memberTypeFilters.length) args.memberTypeId = memberTypeFilters.map((f) => f.unique);
+
+		const memberGroupFilters = activeFilters.filter((f) => f.alias === 'Umb.CollectionFacetFilter.MemberGroup');
+		if (memberGroupFilters.length) args.memberGroupName = memberGroupFilters.map((f) => f.unique);
+
 		return args;
 	}
 

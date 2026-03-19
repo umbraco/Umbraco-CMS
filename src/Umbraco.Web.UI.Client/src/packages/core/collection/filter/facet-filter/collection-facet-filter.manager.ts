@@ -5,47 +5,67 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export interface UmbActiveCollectionFacetFilterModel {
 	alias: string;
+	unique: string;
 	value: any;
 }
 
 export class UmbCollectionFacetFilterManager extends UmbControllerBase {
-	#activeFilters = new UmbArrayState<UmbActiveCollectionFacetFilterModel>([], (x) => x.alias);
+	#activeFilters = new UmbArrayState<UmbActiveCollectionFacetFilterModel>(
+		[],
+		(x) => `${x.alias}||${x.unique}`,
+	);
 	public readonly activeFilters = this.#activeFilters.asObservable();
-	public readonly totalActiveFilters = this.#activeFilters.asObservablePart((filters) => filters.length);
+	public readonly totalActiveFilters = this.#activeFilters.asObservablePart(
+		(filters) => new Set(filters.map((f) => f.alias)).size,
+	);
 
 	constructor(host: UmbControllerHost) {
 		super(host);
 	}
 
 	/**
-	 * Apply a filter value. Tracks the filter as active using the manifest alias as identifier.
-	 * @param {UmbActiveCollectionFacetFilterModel} filter
-	 * @param filter.alias The manifest alias used as the unique identifier.
-	 * @param filter.value The filter value.
+	 * Add or update a single filter entry identified by alias + unique.
 	 */
 	public setFilter(filter: UmbActiveCollectionFacetFilterModel): void {
-		if (this.#activeFilters.getHasOne(filter.alias)) {
-			this.#activeFilters.updateOne(filter.alias, filter);
+		const key = `${filter.alias}||${filter.unique}`;
+		if (this.#activeFilters.getHasOne(key)) {
+			this.#activeFilters.updateOne(key, filter);
 		} else {
 			this.#activeFilters.append([filter]);
 		}
 	}
 
 	/**
-	 * Observable for the active filter value by its manifest alias.
-	 * @param {string} alias The manifest alias of the filter to observe.
-	 * @returns {Observable<UmbActiveCollectionFacetFilterModel | undefined>} The active filter model, or undefined if not active.
+	 * Atomically replace all entries for a given alias.
 	 */
-	public filterValueByAlias(alias: string): Observable<UmbActiveCollectionFacetFilterModel | undefined> {
-		return this.#activeFilters.asObservablePart((filters) => filters.find((f) => f.alias === alias));
+	public setFilterValues(alias: string, entries: Array<{ unique: string; value: any }>): void {
+		const current = this.#activeFilters.getValue();
+		const kept = current.filter((f) => f.alias !== alias);
+		const added = entries.map((e) => ({ alias, unique: e.unique, value: e.value }));
+		this.#activeFilters.setValue([...kept, ...added]);
 	}
 
 	/**
-	 * Clear an active filter by its manifest alias.
-	 * @param {string} alias The manifest alias of the filter to clear.
+	 * Observable for all active filter entries for a given alias.
+	 */
+	public filterValuesByAlias(alias: string): Observable<Array<UmbActiveCollectionFacetFilterModel>> {
+		return this.#activeFilters.asObservablePart((filters) => filters.filter((f) => f.alias === alias));
+	}
+
+	/**
+	 * Clear all entries for a given alias.
 	 */
 	public clearFilter(alias: string): void {
-		this.#activeFilters.remove([alias]);
+		const current = this.#activeFilters.getValue();
+		this.#activeFilters.setValue(current.filter((f) => f.alias !== alias));
+	}
+
+	/**
+	 * Clear a single entry identified by alias + unique.
+	 */
+	public clearFilterValue(alias: string, unique: string): void {
+		const key = `${alias}||${unique}`;
+		this.#activeFilters.remove([key]);
 	}
 
 	/**
@@ -57,7 +77,6 @@ export class UmbCollectionFacetFilterManager extends UmbControllerBase {
 
 	/**
 	 * Get all currently active filters.
-	 * @returns {Promise<Array<UmbActiveCollectionFacetFilterModel>>}
 	 */
 	public async getActiveFilters(): Promise<Array<UmbActiveCollectionFacetFilterModel>> {
 		return this.#activeFilters.getValue();
