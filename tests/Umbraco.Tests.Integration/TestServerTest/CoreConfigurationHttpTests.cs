@@ -5,7 +5,6 @@ using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -13,9 +12,11 @@ using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Persistence.Sqlite;
 using Umbraco.Cms.Persistence.SqlServer;
 using Umbraco.Cms.Tests.Common.Testing;
+using Umbraco.Cms.Tests.Integration.DependencyInjection;
 using Umbraco.Cms.Tests.Integration.Testing;
 
 namespace Umbraco.Cms.Tests.Integration.TestServerTest;
@@ -53,14 +54,14 @@ public class CoreConfigurationHttpTests : UmbracoIntegrationTestBase
         var directory = new DirectoryInfo(Path.GetDirectoryName(assemblyLocation)
             ?? throw new InvalidOperationException("Could not determine assembly directory."));
 
-        // Walk up parent directories until we're no longer in a bin or obj folder
+        // Walk up parent directories until we're no longer in a bin or obj folder.
         while (directory.Parent is not null)
         {
             var name = directory.Name;
             if (name.Equals("bin", StringComparison.OrdinalIgnoreCase) ||
                 name.Equals("obj", StringComparison.OrdinalIgnoreCase))
             {
-                // Found bin/obj folder, return its parent (the project directory)
+                // Found bin/obj folder, return its parent (the project directory).
                 return directory.Parent.FullName;
             }
 
@@ -72,21 +73,18 @@ public class CoreConfigurationHttpTests : UmbracoIntegrationTestBase
             ?? throw new InvalidOperationException("Could not determine content root directory.");
     }
 
-    private WebApplicationFactory<CoreConfigurationHttpTests> CreateFactory(
+    private UmbracoWebApplicationFactory<CoreConfigurationHttpTests> CreateFactory(
         Action<IUmbracoBuilder> configureUmbraco,
         Action<IApplicationBuilder> configureApp)
     {
-        var contentRoot = GetTestContentRoot();
+        // Disable ModelsBuilder to avoid BootFailedException requiring Umbraco.Cms.DevelopmentMode.Backoffice package.
+        InMemoryConfiguration["Umbraco:CMS:ModelsBuilder:ModelsMode"] = "Nothing";
 
-        return new UmbracoWebApplicationFactory<CoreConfigurationHttpTests>(() => CreateHostBuilder(configureUmbraco, configureApp))
-            .WithWebHostBuilder(builder =>
-            {
-                builder.UseContentRoot(contentRoot);
-                builder.ConfigureTestServices(services =>
-                {
-                    services.AddSingleton<IWebProfilerRepository, TestWebProfilerRepository>();
-                });
-            });
+        return new UmbracoWebApplicationFactory<CoreConfigurationHttpTests>(
+            () => CreateHostBuilder(configureUmbraco, configureApp))
+        {
+            ContentRoot = GetTestContentRoot(),
+        };
     }
 
     private IHostBuilder CreateHostBuilder(
@@ -111,6 +109,7 @@ public class CoreConfigurationHttpTests : UmbracoIntegrationTestBase
                     context.HostingEnvironment = TestHelper.GetWebHostEnvironment();
                     ConfigureServices(services, configureUmbraco);
                     services.AddUnique(CreateLoggerFactory());
+                    services.AddSingleton<IWebProfilerRepository, TestWebProfilerRepository>();
                 });
 
                 builder.Configure(app => configureApp(app));
@@ -149,6 +148,11 @@ public class CoreConfigurationHttpTests : UmbracoIntegrationTestBase
         // Let the test configure Umbraco
         configureUmbraco(builder);
 
+        // Provide test doubles for infrastructure services (MainDom, ServerMessenger, etc.)
+        // that would otherwise hang or fail in test contexts. This matches what
+        // UmbracoTestServerTestBase does via AddTestServices.
+        builder.AddTestServices(TestHelper);
+
         builder.Build();
     }
 
@@ -159,7 +163,7 @@ public class CoreConfigurationHttpTests : UmbracoIntegrationTestBase
     public async Task FullConfiguration_BootsSuccessfully()
     {
         // Arrange
-        using var factory = CreateFactory(
+        await using var factory = CreateFactory(
             configureUmbraco: builder =>
             {
                 builder
@@ -207,7 +211,7 @@ public class CoreConfigurationHttpTests : UmbracoIntegrationTestBase
     public async Task CoreWithWebsite_BootsSuccessfully()
     {
         // Arrange
-        using var factory = CreateFactory(
+        await using var factory = CreateFactory(
             configureUmbraco: builder =>
             {
                 builder
@@ -255,7 +259,7 @@ public class CoreConfigurationHttpTests : UmbracoIntegrationTestBase
     public async Task CoreWithDeliveryApi_BootsSuccessfully()
     {
         // Arrange
-        using var factory = CreateFactory(
+        await using var factory = CreateFactory(
             configureUmbraco: builder =>
             {
                 builder
@@ -303,7 +307,7 @@ public class CoreConfigurationHttpTests : UmbracoIntegrationTestBase
     public async Task DeliveryOnlyScenario_BootsSuccessfully()
     {
         // Arrange
-        using var factory = CreateFactory(
+        await using var factory = CreateFactory(
             configureUmbraco: builder =>
             {
                 builder
@@ -353,7 +357,7 @@ public class CoreConfigurationHttpTests : UmbracoIntegrationTestBase
     public async Task BackOfficeWithWebsite_BootsSuccessfully()
     {
         // Arrange
-        using var factory = CreateFactory(
+        await using var factory = CreateFactory(
             configureUmbraco: builder =>
             {
                 builder
