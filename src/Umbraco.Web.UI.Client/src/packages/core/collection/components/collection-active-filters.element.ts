@@ -3,7 +3,6 @@ import type { UmbActiveCollectionFacetFilterModel } from '../filter/facet-filter
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-collection-active-filters')
 export class UmbCollectionActiveFiltersElement extends UmbLitElement {
@@ -15,8 +14,6 @@ export class UmbCollectionActiveFiltersElement extends UmbLitElement {
 	@state()
 	private _totalItems: number = 0;
 
-	#filterLabelsMap = new Map<string, string>();
-
 	constructor() {
 		super();
 
@@ -25,22 +22,6 @@ export class UmbCollectionActiveFiltersElement extends UmbLitElement {
 
 			this.observe(this.#collectionContext?.filtering.activeFilters, (activeFilters) => {
 				this._activeFilters = activeFilters;
-				if (!activeFilters || activeFilters.length === 0) return;
-
-				this.observe(
-					umbExtensionsRegistry.byTypeAndAliases(
-						'collectionFacetFilter',
-						activeFilters.map((x) => x.alias),
-					),
-					(extensions) => {
-						extensions.forEach((extension) => {
-							const alias = extension.alias;
-							const label = extension.meta?.label ?? alias;
-							this.#filterLabelsMap.set(alias, label);
-							this.requestUpdate();
-						});
-					},
-				);
 			});
 			this.observe(this.#collectionContext?.totalItems, (total) => {
 				this._totalItems = total ?? 0;
@@ -69,21 +50,26 @@ export class UmbCollectionActiveFiltersElement extends UmbLitElement {
 						(activeFilter) => this.#renderActiveFilterItem(activeFilter),
 					)}
 				</div>
-				<uui-button compact look="secondary" label="Clear all" @click=${this.#onClearAllFilters}>
-					Clear all
-				</uui-button>
 			</div>
 		`;
 	}
 
 	#renderActiveFilterItem(activeFilter: UmbActiveCollectionFacetFilterModel) {
-		const label = this.#filterLabelsMap.get(activeFilter.alias) ?? activeFilter.alias;
-		const value = activeFilter.unique;
-		return html`<span class="active-filter-item"> <strong>${label}:</strong> ${value} </span>`;
+		return html`
+			<span class="active-filter-item">
+				${activeFilter.unique}
+				<uui-button
+					label="Clear"
+					compact
+					@click=${() => this.#onClearFilterValue(activeFilter.alias, activeFilter.unique)}>
+					<umb-icon name="icon-delete"></umb-icon>
+				</uui-button>
+			</span>
+		`;
 	}
 
-	#onClearAllFilters() {
-		this.#collectionContext?.filtering.clearAllFilters();
+	#onClearFilterValue(alias: string, unique: string) {
+		this.#collectionContext?.filtering.clearFilterValue(alias, unique);
 		this.#collectionContext?.loadCollection();
 	}
 
@@ -91,32 +77,19 @@ export class UmbCollectionActiveFiltersElement extends UmbLitElement {
 		UmbTextStyles,
 		css`
 			#active-filters {
-				display: flex;
-				align-items: center;
-				gap: var(--uui-size-space-4);
+				display: block;
 				padding: var(--uui-size-space-3) 0;
-				flex-wrap: wrap;
-				min-height: 36px;
-			}
-
-			#active-filters small {
-				color: var(--uui-color-text-alt);
 			}
 
 			#active-filter-items {
-				display: flex;
-				align-items: center;
-				gap: var(--uui-size-space-2);
+				display: inline;
 			}
 
 			.active-filter-item {
-				font-size: var(--uui-type-small-size);
-			}
-
-			.active-filter-item:not(:last-child)::after {
-				content: '|';
-				margin-left: var(--uui-size-space-2);
-				color: var(--uui-color-border);
+				display: inline-flex;
+				align-items: center;
+				padding: 0 0 0 var(--uui-size-space-3);
+				font-size: 12px;
 			}
 		`,
 	];
