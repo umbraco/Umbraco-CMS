@@ -75,6 +75,20 @@ export class UmbUserCollectionContext extends UmbDefaultCollectionContext<
 		this.#activeOrderByOption.setValue(firstOption.unique);
 	}
 
+	protected override async _getFilterArgs(): Promise<Record<string, any>> {
+		const activeFilters = await this.filtering.getActiveFilters();
+		const args: Record<string, any> = {};
+		for (const filter of activeFilters) {
+			if (filter.alias === 'Umb.CollectionFacetFilter.UserState') {
+				args.userStates = filter.value.map((v: { unique: string }) => v.unique);
+			}
+			if (filter.alias === 'Umb.CollectionFacetFilter.UserGroup') {
+				args.userGroupIds = filter.value.map((v: { unique: string }) => v.unique);
+			}
+		}
+		return args;
+	}
+
 	/**
 	 * Sets the active order by option for the collection and refreshes the collection.
 	 * @param {string} unique

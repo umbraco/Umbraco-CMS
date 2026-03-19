@@ -9,7 +9,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Member Type Collection Filter',
 		meta: {
 			label: 'Member Type',
-			filterKey: 'memberTypeId',
 			datalistDataSource: UmbMemberTypeDatalistDataSource,
 		},
 		conditions: [

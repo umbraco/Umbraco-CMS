@@ -21,7 +21,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Example Collection Select Filter',
 		meta: {
 			label: 'Status',
-			filterKey: 'status',
 		},
 		conditions: [
 			{
@@ -37,7 +36,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Example Collection Multi Select Filter',
 		meta: {
 			label: 'Tags',
-			filterKey: 'tags',
 			multiple: true,
 		},
 		conditions: [

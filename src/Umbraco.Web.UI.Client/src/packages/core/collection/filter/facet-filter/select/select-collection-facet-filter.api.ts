@@ -9,11 +9,13 @@ import { UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
 
 const ObserveValueItems = Symbol();
 
+type UmbSelectValue = Pick<UmbSelectOption, 'unique' | 'entityType'>;
+
 export class UmbSelectCollectionFacetFilterApi extends UmbControllerBase {
-	#options = new UmbArrayState<UmbSelectOption>([], (x) => x.value);
+	#options = new UmbArrayState<UmbSelectOption>([], (x) => x.unique);
 	public readonly options = this.#options.asObservable();
 
-	#value = new UmbArrayState<string>([], (x) => x);
+	#value = new UmbArrayState<{ unique: string; entityType: string }>([], (x) => x.unique);
 	public readonly value = this.#value.asObservable();
 
 	#valueItems = new UmbArrayState<UmbDatalistItemModel>([], (x) => x.unique);
@@ -51,9 +53,9 @@ export class UmbSelectCollectionFacetFilterApi extends UmbControllerBase {
 		this.observe(
 			this.#collectionContext?.filtering.filterValueByAlias(alias),
 			(activeFilter) => {
-				const values = activeFilter ? activeFilter.value : [];
+				const values: Array<UmbSelectValue> = activeFilter?.value ?? [];
 				this.#value.setValue(values);
-				this.#requestValueItems(values);
+				this.#requestValueItems(values.map((v) => v.unique));
 			},
 			'umbFilterValueObserver',
 		);
@@ -71,8 +73,8 @@ export class UmbSelectCollectionFacetFilterApi extends UmbControllerBase {
 		}
 	}
 
-	public setValue(values: Array<string>) {
-		const filtered = values.filter((v) => v !== '');
+	public setValue(values: Array<UmbSelectValue>) {
+		const filtered = values.filter((v) => v.unique !== '');
 		const alias = this.#manifest?.alias;
 		if (!alias) return;
 
@@ -108,8 +110,9 @@ export class UmbSelectCollectionFacetFilterApi extends UmbControllerBase {
 
 		if (data) {
 			const newOptions = data.items.map((item) => ({
-				label: item.name ?? '',
-				value: item.unique,
+				label: item.name ?? `${item.entityType}:${item.unique}`,
+				unique: item.unique,
+				entityType: item.entityType,
 			}));
 
 			const currentOptions = this.#options.getValue();

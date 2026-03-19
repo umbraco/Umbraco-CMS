@@ -11,7 +11,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		weight: 100,
 		meta: {
 			label: 'Groups',
-			filterKey: 'userGroupIds',
 			multiple: true,
 			datalistDataSource: UmbUserGroupDatalistDataSource,
 		},

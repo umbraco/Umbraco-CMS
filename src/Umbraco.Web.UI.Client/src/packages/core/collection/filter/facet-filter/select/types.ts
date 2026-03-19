@@ -9,5 +9,6 @@ export interface MetaCollectionFacetFilterSelect extends MetaCollectionFacetFilt
 
 export interface UmbSelectOption {
 	label: string;
-	value: string;
+	unique: string;
+	entityType: string;
 }

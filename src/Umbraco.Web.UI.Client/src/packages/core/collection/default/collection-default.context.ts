@@ -300,6 +300,10 @@ export class UmbDefaultCollectionContext<
 		return this._requestCollection();
 	}
 
+	protected async _getFilterArgs(): Promise<Record<string, any>> {
+		return {};
+	}
+
 	protected async _requestCollection() {
 		await this._init;
 
@@ -308,7 +312,7 @@ export class UmbDefaultCollectionContext<
 
 		this._loading.setValue(true);
 
-		const filterArgs = await this.filtering.getFilterArgs();
+		const filterArgs = await this._getFilterArgs();
 		const filter = { ...this._filter.getValue(), ...filterArgs };
 		const { data } = await this._repository.requestCollection(filter);
 

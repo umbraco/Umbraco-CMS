@@ -2,7 +2,6 @@ import type { ManifestElementAndApi, ManifestWithDynamicConditions } from '@umbr
 
 export interface MetaCollectionFacetFilter {
 	label: string;
-	filterKey: string;
 }
 
 export interface ManifestCollectionFacetFilter

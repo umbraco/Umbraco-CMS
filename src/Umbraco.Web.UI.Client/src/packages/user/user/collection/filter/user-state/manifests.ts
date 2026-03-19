@@ -11,7 +11,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		weight: 200,
 		meta: {
 			label: 'Status',
-			filterKey: 'userStates',
 			multiple: true,
 			datalistDataSource: UmbUserStateDatalistDataSource,
 		},

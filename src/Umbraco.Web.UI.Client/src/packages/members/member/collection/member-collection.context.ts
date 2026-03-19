@@ -12,6 +12,20 @@ export class UmbMemberCollectionContext extends UmbDefaultCollectionContext<
 		super(host, UMB_MEMBER_TABLE_COLLECTION_VIEW_ALIAS);
 	}
 
+	protected override async _getFilterArgs(): Promise<Record<string, any>> {
+		const activeFilters = await this.filtering.getActiveFilters();
+		const args: Record<string, any> = {};
+		for (const filter of activeFilters) {
+			if (filter.alias === 'Umb.CollectionFacetFilter.MemberType') {
+				args.memberTypeId = filter.value.map((v: { unique: string }) => v.unique);
+			}
+			if (filter.alias === 'Umb.CollectionFacetFilter.MemberGroup') {
+				args.memberGroupName = filter.value.map((v: { unique: string }) => v.unique);
+			}
+		}
+		return args;
+	}
+
 	/**
 	 * Sets the member type filter for the collection and refreshes the collection.
 	 * @param {Array<string>} selection

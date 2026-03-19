@@ -1,5 +1,4 @@
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import type { Observable } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -10,23 +9,12 @@ export interface UmbActiveCollectionFacetFilterModel {
 }
 
 export class UmbCollectionFacetFilterManager extends UmbControllerBase {
-	#filterManifests: Array<any> = [];
-
 	#activeFilters = new UmbArrayState<UmbActiveCollectionFacetFilterModel>([], (x) => x.alias);
 	public readonly activeFilters = this.#activeFilters.asObservable();
 	public readonly totalActiveFilters = this.#activeFilters.asObservablePart((filters) => filters.length);
 
 	constructor(host: UmbControllerHost) {
 		super(host);
-
-		this.observe(umbExtensionsRegistry.byType('collectionFacetFilter'), (manifests) => {
-			this.#filterManifests = manifests;
-		});
-	}
-
-	#getFilterKeyByAlias(alias: string): string | undefined {
-		const manifest = this.#filterManifests.find((m: any) => m?.alias === alias);
-		return manifest?.meta?.filterKey;
 	}
 
 	/**
@@ -68,17 +56,10 @@ export class UmbCollectionFacetFilterManager extends UmbControllerBase {
 	}
 
 	/**
-	 * Get all active filter values as a flat object keyed by filterKey, to merge into request args.
-	 * @returns {Record<string, any>}
+	 * Get all currently active filters.
+	 * @returns {Promise<Array<UmbActiveCollectionFacetFilterModel>>}
 	 */
-	public async getFilterArgs(): Promise<Record<string, any>> {
-		const args: Record<string, any> = {};
-		for (const filter of this.#activeFilters.getValue()) {
-			const filterKey = this.#getFilterKeyByAlias(filter.alias);
-			if (filterKey) {
-				args[filterKey] = filter.value;
-			}
-		}
-		return args;
+	public async getActiveFilters(): Promise<Array<UmbActiveCollectionFacetFilterModel>> {
+		return this.#activeFilters.getValue();
 	}
 }
