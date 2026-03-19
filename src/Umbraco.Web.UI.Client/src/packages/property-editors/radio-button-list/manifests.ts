@@ -10,7 +10,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 			label: 'Radio Button List',
 			propertyEditorSchemaAlias: 'Umbraco.RadioButtonList',
 			icon: 'icon-target',
-			group: 'lists',
+			group: 'Lists',
 			supportsReadOnly: true,
 		},
 	},

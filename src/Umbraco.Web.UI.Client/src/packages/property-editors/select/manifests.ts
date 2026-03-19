@@ -8,7 +8,7 @@ export const manifest: ManifestPropertyEditorUi = {
 	meta: {
 		label: 'Select',
 		icon: 'icon-list',
-		group: 'pickers',
+		group: 'Pickers',
 		settings: {
 			properties: [
 				{

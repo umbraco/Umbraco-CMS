@@ -9,7 +9,7 @@ export const manifests: Array<ManifestPropertyEditorUi> = [
 		meta: {
 			label: 'Block RTE Type Configuration',
 			icon: 'icon-autofill',
-			group: 'common',
+			group: 'Common',
 		},
 	},
 ];

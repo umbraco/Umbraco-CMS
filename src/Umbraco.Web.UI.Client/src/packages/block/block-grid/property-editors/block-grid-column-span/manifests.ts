@@ -8,6 +8,6 @@ export const manifest: ManifestPropertyEditorUi = {
 	meta: {
 		label: 'Block Grid Column Span',
 		icon: 'icon-document',
-		group: 'common',
+		group: 'Common',
 	},
 };

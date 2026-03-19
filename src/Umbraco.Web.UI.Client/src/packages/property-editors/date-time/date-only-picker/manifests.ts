@@ -10,7 +10,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 			label: 'Date Only',
 			propertyEditorSchemaAlias: 'Umbraco.DateOnly',
 			icon: 'icon-calendar-alt',
-			group: 'date',
+			group: 'Date',
 			supportsReadOnly: true,
 		},
 	},

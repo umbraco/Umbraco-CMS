@@ -11,7 +11,7 @@ export const manifests: Array<ManifestPropertyEditorUi> = [
 			label: '#rte_label',
 			propertyEditorSchemaAlias: 'Umbraco.RichText',
 			icon: 'icon-browser-window',
-			group: 'richContent',
+			group: 'Rich Content',
 			settings: {
 				properties: [
 					{

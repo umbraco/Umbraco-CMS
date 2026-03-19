@@ -8,7 +8,7 @@ export const manifest: ManifestPropertyEditorUi = {
 	meta: {
 		label: 'Accepted Upload Types',
 		icon: 'icon-ordered-list',
-		group: 'lists',
+		group: 'Lists',
 		supportsReadOnly: true,
 	},
 };

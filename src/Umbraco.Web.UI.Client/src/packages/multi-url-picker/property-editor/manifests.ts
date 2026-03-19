@@ -10,7 +10,7 @@ export const manifests = [
 			label: 'Multi URL Picker',
 			propertyEditorSchemaAlias: 'Umbraco.MultiUrlPicker',
 			icon: 'icon-link',
-			group: 'pickers',
+			group: 'Pickers',
 			supportsReadOnly: true,
 			settings: {
 				properties: [

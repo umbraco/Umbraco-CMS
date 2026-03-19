@@ -12,7 +12,7 @@ const propertyEditorUi: UmbExtensionManifest = {
 		label: 'Block List',
 		propertyEditorSchemaAlias: UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS,
 		icon: 'icon-thumbnail-list',
-		group: 'richContent',
+		group: 'Rich Content',
 		supportsReadOnly: true,
 		settings: {
 			properties: [

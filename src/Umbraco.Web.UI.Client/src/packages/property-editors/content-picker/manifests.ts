@@ -12,7 +12,7 @@ const manifest: ManifestPropertyEditorUi = {
 	meta: {
 		label: 'Content Picker',
 		icon: 'icon-page-add',
-		group: 'pickers',
+		group: 'Pickers',
 		propertyEditorSchemaAlias: 'Umbraco.MultiNodeTreePicker',
 		supportsReadOnly: true,
 		settings: {

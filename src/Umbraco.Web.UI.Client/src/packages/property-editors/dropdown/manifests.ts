@@ -10,7 +10,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 			label: 'Dropdown',
 			propertyEditorSchemaAlias: 'Umbraco.DropDown.Flexible',
 			icon: 'icon-list',
-			group: 'lists',
+			group: 'Lists',
 			supportsReadOnly: true,
 		},
 	},

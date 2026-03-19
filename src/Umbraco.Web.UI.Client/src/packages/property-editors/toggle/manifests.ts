@@ -17,7 +17,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 			label: 'Toggle',
 			propertyEditorSchemaAlias: 'Umbraco.TrueFalse',
 			icon: 'icon-checkbox',
-			group: 'common',
+			group: 'Common',
 			supportsReadOnly: true,
 			settings: {
 				properties: [

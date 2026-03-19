@@ -9,7 +9,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		meta: {
 			label: 'Image Cropper',
 			icon: 'icon-crop',
-			group: 'media',
+			group: 'Media',
 			propertyEditorSchemaAlias: 'Umbraco.ImageCropper',
 		},
 	},

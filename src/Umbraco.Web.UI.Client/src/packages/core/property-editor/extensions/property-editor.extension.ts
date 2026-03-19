@@ -13,8 +13,11 @@ export interface MetaPropertyEditorUi {
 	/**
 	 * The group that this property editor UI belongs to, which will be used to group the property editor UIs in the property editor picker.
 	 * If not specified, the property editor UI will be grouped under "Common".
+	 *
+	 * Use display-ready names (e.g. `"Common"`, `"Rich Content"`). Legacy camelCase names
+	 * (e.g. `"common"`, `"richContent"`) are still supported and will be automatically converted.
 	 * @default "Common"
-	 * @example ["Common", "Content", "Media"]
+	 * @example ["Common", "Rich Content", "Pickers", "Lists", "Media"]
 	 */
 	group: string;
 	/**
