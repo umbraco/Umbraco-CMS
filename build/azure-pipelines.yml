@@ -462,13 +462,13 @@ stages:
               projects: "tests/Umbraco.Tests.Integration/Umbraco.Tests.Integration.csproj"
               testRunTitle: Integration Tests SQLite - $(Agent.OS)
               ${{ if and(eq(variables['Agent.OS'],'Windows_NT'), or(variables.releaseTestFilter, parameters.forceReleaseTestFilter)) }}:
-                arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build --blame-hang --blame-hang-timeout 3m --blame-hang-dump-type mini ${{parameters.integrationReleaseTestFilter}}'
+                arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build ${{parameters.integrationReleaseTestFilter}}'
               ${{ elseif eq(variables['Agent.OS'],'Windows_NT') }}:
-                arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build --blame-hang --blame-hang-timeout 3m --blame-hang-dump-type mini ${{parameters.integrationNonReleaseTestFilter}}'
+                arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build ${{parameters.integrationNonReleaseTestFilter}}'
               ${{ elseif or(variables.releaseTestFilter, parameters.forceReleaseTestFilter) }}:
-                arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build --blame-hang --blame-hang-timeout 3m --blame-hang-dump-type mini ${{parameters.nonWindowsIntegrationReleaseTestFilter}}'
+                arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build ${{parameters.nonWindowsIntegrationReleaseTestFilter}}'
               ${{ else }}:
-                arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build --blame-hang --blame-hang-timeout 3m --blame-hang-dump-type mini ${{parameters.nonWindowsIntegrationNonReleaseTestFilter}}'
+                arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build ${{parameters.nonWindowsIntegrationNonReleaseTestFilter}}'
       # Integration Tests (SQL Server)
       - job:
         timeoutInMinutes: 180
