@@ -75,18 +75,18 @@ internal sealed class DeferredCacheRebuildService : IDeferredCacheRebuildService
 
                 if (contentTypeIds.Length > 0)
                 {
-                    _logger.LogInformation("Background rebuilding database cache for content type IDs: {ContentTypeIds}", contentTypeIds);
+                    _logger.LogDebug("Deferred rebuild starting for content type IDs: {ContentTypeIds}", contentTypeIds);
                     _documentCacheService.Rebuild(contentTypeIds);
                     await _documentCacheService.RebuildMemoryCacheByContentTypeAsync(contentTypeIds);
-                    _logger.LogInformation("Background rebuild completed for content type IDs: {ContentTypeIds}", contentTypeIds);
+                    _logger.LogDebug("Deferred rebuild completed for content type IDs: {ContentTypeIds}", contentTypeIds);
                 }
 
                 if (mediaTypeIds.Length > 0)
                 {
-                    _logger.LogInformation("Background rebuilding database cache for media type IDs: {MediaTypeIds}", mediaTypeIds);
+                    _logger.LogDebug("Deferred rebuild starting for media type IDs: {MediaTypeIds}", mediaTypeIds);
                     _mediaCacheService.Rebuild(mediaTypeIds);
                     await _mediaCacheService.RebuildMemoryCacheByContentTypeAsync(mediaTypeIds);
-                    _logger.LogInformation("Background rebuild completed for media type IDs: {MediaTypeIds}", mediaTypeIds);
+                    _logger.LogDebug("Deferred rebuild completed for media type IDs: {MediaTypeIds}", mediaTypeIds);
                 }
             }
         }
@@ -97,6 +97,32 @@ internal sealed class DeferredCacheRebuildService : IDeferredCacheRebuildService
         finally
         {
             _semaphore.Release();
+        }
+    }
+
+    // Internal for test purposes — waits until any in-progress rebuild completes and no IDs are pending.
+    internal async Task WaitForPendingRebuildsAsync(CancellationToken cancellationToken = default)
+    {
+        // Wait until we can acquire the semaphore (meaning no rebuild is running)
+        // and no IDs are pending.
+        while (true)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            await _semaphore.WaitAsync(cancellationToken);
+            try
+            {
+                if (HasPendingIds() is false)
+                {
+                    return;
+                }
+            }
+            finally
+            {
+                _semaphore.Release();
+            }
+
+            // Yield to let the background task pick up pending IDs.
+            await Task.Delay(10, cancellationToken);
         }
     }
 
