@@ -318,7 +318,7 @@ export class UiBaseLocators extends BasePage {
     this.addGroupBtn = page.getByLabel('Add group', {exact: true});
     this.groupLabel = page.getByLabel('Group', {exact: true});
     this.typeGroups = page.locator('umb-content-type-design-editor-group');
-    this.addTabBtn = page.getByLabel('Add tab');
+    this.addTabBtn = page.getByTestId('add-tab-button');
     this.unnamedTabTxt = page.getByTestId('tab:').getByTestId('tab:name-input').locator('#input');
     this.structureTabBtn = page.locator('uui-tab').filter({hasText: 'Structure'}).locator('svg');
   
@@ -330,7 +330,7 @@ export class UiBaseLocators extends BasePage {
     this.validationMessage = page.locator('umb-form-validation-message').locator('#messages');
   
     // Composition & Structure
-    this.compositionsBtn = page.getByLabel('Compositions');
+    this.compositionsBtn = page.getByTestId('edit-compositions');
     this.allowAtRootBtn = page.locator('label').filter({hasText: 'Allow at root'});
     this.allowedChildNodesModal = page.locator('umb-tree-picker-modal');
     this.addCollectionBtn = page.locator('umb-input-content-type-collection-configuration #create-button');
