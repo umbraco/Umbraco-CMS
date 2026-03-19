@@ -37,5 +37,5 @@ test('can see warning status for HMAC secret key after performing all checks', a
   await umbracoUi.healthCheck.clickHealthCheckGroupByName(healthCheckGroupName);
   await umbracoUi.healthCheck.doesHealthCheckHaveResultMessage(healthCheckName, ConstantHelper.healthCheckMessages.imagingHMACSecretKeyIsNotConfigured);
   // Verify the "Read more" link is displayed
-  await umbracoUi.healthCheck.isHealthCheckReadMoreLinkVisible(healthCheckName,);
+  await umbracoUi.healthCheck.isHealthCheckReadMoreLinkVisible(healthCheckName);
 });
