@@ -237,8 +237,12 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 	}
 
 	#renderBlockTypeCard(block: UmbBlockTypeItemWithGroupKey) {
+		const hasProperties =
+			this._manager?.getContentTypeHasProperties(block.contentElementTypeKey) ??
+			this.data?.contentTypeHasProperties?.[block.contentElementTypeKey];
+
 		const href =
-			this._workspacePath && this._manager?.getContentTypeHasProperties(block.contentElementTypeKey)
+			this._workspacePath && hasProperties
 				? `${this._workspacePath}create/${block.contentElementTypeKey}`
 				: undefined;
 

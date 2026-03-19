@@ -209,7 +209,7 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 		UmbBlockCatalogueModalValue
 	>(this, UMB_BLOCK_CATALOGUE_MODAL, 'veCatalogue')
 		.addAdditionalPath('_catalogue/:insertIndex')
-		.onSetup((params) => {
+		.onSetup(async (params) => {
 			if (!this.#pendingAdd) {
 				console.warn('[VisualEditor] catalogue onSetup: no pendingAdd');
 				return false;
@@ -241,6 +241,15 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 				forceHideContentEditorInOverlay: b.forceHideContentEditorInOverlay ?? false,
 			}));
 
+			// Resolve which block types have editable properties so the catalogue can show workspace links
+			const contentTypeHasProperties: Record<string, boolean> = {};
+			for (const b of blockTypes) {
+				contentTypeHasProperties[b.contentElementTypeKey] = await this.#blockHasEditableFields(
+					b.contentElementTypeKey,
+					this.#pendingAdd!.propertyAlias,
+				);
+			}
+
 			const modalSize = blockTypes.length > 12 ? 'large' : blockTypes.length > 8 ? 'medium' : 'small';
 
 			return {
@@ -249,6 +258,7 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 					blocks: blockTypes,
 					blockGroups: [],
 					originData: { index: parseInt(params.insertIndex as string) || 0 },
+					contentTypeHasProperties,
 				},
 				value: undefined,
 			};
