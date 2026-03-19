@@ -760,7 +760,7 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 
 	// --- Block click → open block workspace via bridge ---
 
-	#onBlockClicked(blockKey: string, _contentTypeAlias: string) {
+	async #onBlockClicked(blockKey: string, _contentTypeAlias: string) {
 		this.#selectedBlockKey = blockKey;
 		this.#selectedPropertyAlias = undefined;
 
@@ -774,7 +774,7 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 		const bridge = this.#ensureBridge(found.propertyAlias, found.blockValue);
 
 		console.debug('[VisualEditor] opening block workspace via bridge, blockKey:', blockKey);
-		bridge.openEdit(blockKey);
+		await bridge.openEdit(blockKey);
 	}
 
 	async #handlePropertySubmit(alias: string, result: { values: Array<{ alias: string; value: unknown }> }) {
