@@ -9,6 +9,7 @@ import {
 	moveBlock,
 	reorderBlockInValue,
 	removeBlockFromValue,
+	mergeBlockValueInto,
 } from './visual-editor-block-helper.js';
 import type { BlockValue } from './visual-editor-block-helper.js';
 import { VisualEditorBlockBridge } from './visual-editor-block-bridge.js';
@@ -26,6 +27,11 @@ import { UMB_BLOCK_CATALOGUE_MODAL } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockCatalogueModalData, UmbBlockCatalogueModalValue } from '@umbraco-cms/backoffice/block';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
+import {
+	UMB_CLIPBOARD_CONTEXT,
+	UmbClipboardPastePropertyValueTranslatorValueResolver,
+} from '@umbraco-cms/backoffice/clipboard';
+import { UmbPropertyValueCloneController } from '@umbraco-cms/backoffice/property';
 import { UmbPreviewRepository } from '@umbraco-cms/backoffice/preview';
 import { HubConnectionBuilder } from '@umbraco-cms/backoffice/external/signalr';
 import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
@@ -297,6 +303,30 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 
 			const modalSize = blockTypes.length > 12 ? 'large' : blockTypes.length > 8 ? 'medium' : 'small';
 
+			// Build clipboard filter using paste translator resolver
+			const editorUiAlias = propStructure.editorUiAlias;
+			const valueResolver = new UmbClipboardPastePropertyValueTranslatorValueResolver(this);
+			const clipboardFilter = editorUiAlias
+				? async (clipboardEntryDetail: { values: Array<{ type: string; value: unknown }> }) => {
+						try {
+							const pasteTranslator = await valueResolver.getPasteTranslator(
+								clipboardEntryDetail.values,
+								editorUiAlias,
+							);
+							if (pasteTranslator.isCompatibleValue) {
+								const resolved = await valueResolver.resolve(
+									clipboardEntryDetail.values,
+									editorUiAlias,
+								);
+								return pasteTranslator.isCompatibleValue(resolved, propStructure.config);
+							}
+							return true;
+						} catch {
+							return false;
+						}
+					}
+				: undefined;
+
 			return {
 				modal: { size: modalSize },
 				data: {
@@ -304,16 +334,24 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 					blockGroups: [],
 					originData: { index: parseInt(params.insertIndex as string) || 0 },
 					contentTypeHasProperties,
+					clipboardFilter,
 				},
 				value: undefined,
 			};
 		})
 		.onSubmit(async (value) => {
-			if (!value?.create?.contentElementTypeKey || !this.#pendingAdd) return;
+			if (!this.#pendingAdd) return;
 
 			const { propertyAlias, propertyValue, insertIndex, parentBlockKey, areaAlias, areaConfigs } = this.#pendingAdd;
-			const contentTypeKey = value.create.contentElementTypeKey;
 			this.#pendingAdd = undefined;
+
+			if (value?.clipboard?.selection?.length) {
+				await this.#handleClipboardPaste(propertyAlias, propertyValue, insertIndex, value.clipboard.selection);
+				return;
+			}
+
+			if (!value?.create?.contentElementTypeKey) return;
+			const contentTypeKey = value.create.contentElementTypeKey;
 
 			if (parentBlockKey && areaAlias && areaConfigs) {
 				// Add to area
@@ -867,6 +905,67 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 		// Open routed catalogue modal
 		this.#pendingAdd = { propertyAlias, propertyValue, insertIndex, parentBlockKey, areaAlias, areaConfigs };
 		this.#catalogueModalRegistration.open({ insertIndex });
+	}
+
+	// --- Clipboard paste ---
+
+	async #handleClipboardPaste(
+		propertyAlias: string,
+		propertyValue: BlockValue,
+		insertIndex: number,
+		clipboardSelection: Array<string>,
+	) {
+		const propStructure = this.#propertyStructures.find((p) => p.alias === propertyAlias);
+		if (!propStructure?.editorUiAlias) return;
+
+		const editorUiAlias = propStructure.editorUiAlias;
+		const clipboardContext = await this.getContext(UMB_CLIPBOARD_CONTEXT);
+		if (!clipboardContext) return;
+		const valueResolver = new UmbClipboardPastePropertyValueTranslatorValueResolver<BlockValue>(this);
+
+		// Determine the schema alias from the existing layout key
+		const layoutKey = Object.keys(propertyValue.layout)[0] ?? 'Umbraco.BlockList';
+
+		let updatedValue = propertyValue;
+
+		for (const unique of clipboardSelection) {
+			const entry = await clipboardContext.read(unique);
+			if (!entry) continue;
+
+			// Translate clipboard entry to block value via paste translator
+			const pastedValue = await valueResolver.resolve(entry.values, editorUiAlias);
+			if (!pastedValue) continue;
+
+			// Clone the value to generate new unique keys
+			const cloner = new UmbPropertyValueCloneController(this);
+			const cloned = await cloner.clone<BlockValue>({
+				editorAlias: layoutKey,
+				alias: editorUiAlias,
+				value: pastedValue as BlockValue,
+			});
+
+			if (cloned.value) {
+				// Expose all pasted blocks so they render in preview.
+				// Use culture: null / segment: null (invariant) since block element
+				// types typically don't vary. The block manager normally checks
+				// variesByCulture/variesBySegment on the content type structure,
+				// but that isn't available here. Invariant expose entries work for
+				// both invariant and variant blocks.
+				const pastedBlocks = cloned.value as BlockValue;
+				for (const content of pastedBlocks.contentData) {
+					pastedBlocks.expose.push({ contentKey: content.key, culture: null, segment: null });
+				}
+
+				updatedValue = mergeBlockValueInto(updatedValue, pastedBlocks, insertIndex);
+				// Advance insert index so subsequent pastes go after the previous
+				const pastedLayoutCount =
+					pastedBlocks.layout[Object.keys(pastedBlocks.layout)[0] ?? '']?.length ?? 0;
+				insertIndex += pastedLayoutCount;
+			}
+		}
+
+		await this.#setPropertyValue(propertyAlias, updatedValue);
+		await this.#saveAndRefresh();
 	}
 
 	// --- Block delete ---

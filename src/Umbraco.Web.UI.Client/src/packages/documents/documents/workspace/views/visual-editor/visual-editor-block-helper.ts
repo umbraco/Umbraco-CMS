@@ -442,3 +442,29 @@ export function moveBlock(
 		layout: { ...blockValue.layout, [layoutKey]: newLayout },
 	};
 }
+
+/**
+ * Merge a pasted block value into an existing block value at the given index.
+ * Appends all contentData, settingsData, and expose entries, and inserts
+ * the pasted layout entries at the specified position.
+ */
+export function mergeBlockValueInto(
+	target: BlockValue,
+	pasted: BlockValue,
+	insertIndex: number,
+): BlockValue {
+	const layoutKey = Object.keys(target.layout)[0] ?? Object.keys(pasted.layout)[0] ?? 'Umbraco.BlockList';
+	const existingLayout = target.layout[layoutKey] ?? [];
+	const pastedLayout = pasted.layout[layoutKey] ?? [];
+
+	const newLayout = [...existingLayout];
+	const clampedIndex = Math.min(Math.max(insertIndex, 0), newLayout.length);
+	newLayout.splice(clampedIndex, 0, ...pastedLayout);
+
+	return {
+		layout: { ...target.layout, [layoutKey]: newLayout },
+		contentData: [...target.contentData, ...pasted.contentData],
+		settingsData: [...target.settingsData, ...pasted.settingsData],
+		expose: [...target.expose, ...pasted.expose],
+	};
+}

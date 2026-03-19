@@ -48,7 +48,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		meta: {
 			label: 'Visual Editor',
 			pathname: 'visual-editor',
-			icon: 'icon-eye',
+			icon: 'icon-layout',
 		},
 		conditions: [
 			{
