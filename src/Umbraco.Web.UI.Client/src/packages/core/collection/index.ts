@@ -16,6 +16,8 @@ export * from './workspace-view/index.js';
 export * from './default/collection-default.context.js';
 export * from './default/collection-default.context-token.js';
 export * from './filter/facet-filter/collection-facet-filter.manager.js';
+export * from './filter/facet-filter/collection-facet-filter.context.js';
+export * from './filter/facet-filter/collection-facet-filter.context-token.js';
 export type * from './collection-filter-model.interface.js';
 export type * from './types.js';
 

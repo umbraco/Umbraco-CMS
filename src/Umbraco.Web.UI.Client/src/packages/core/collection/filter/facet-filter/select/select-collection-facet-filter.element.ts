@@ -117,7 +117,6 @@ export class UmbSelectCollectionFacetFilterElement extends UmbLitElement {
 	}
 
 	protected override render() {
-		console.log('options count:', this._options.length);
 		const inline = this._options.length < INLINE_THRESHOLD && !this._hasMore;
 		if (inline) {
 			return this._multiple ? this.#renderCheckboxList() : this.#renderRadioList();

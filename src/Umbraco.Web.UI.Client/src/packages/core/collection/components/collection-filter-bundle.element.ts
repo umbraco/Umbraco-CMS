@@ -4,6 +4,8 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registr
 import { css, customElement, html, nothing, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
+import '../filter/facet-filter/collection-facet-filter-item.element.js';
+
 @customElement('umb-collection-filter-bundle')
 export class UmbCollectionFilterBundleElement extends UmbLitElement {
 	#collectionContext?: typeof UMB_COLLECTION_CONTEXT.TYPE;
@@ -69,21 +71,23 @@ export class UmbCollectionFilterBundleElement extends UmbLitElement {
 							this._filters,
 							(filter) => filter.alias,
 							(filter) => html`
-								<div class="filter-item">
-									<div class="filter-header">
-										<span class="heading">${filter.manifest?.meta?.label ?? filter.alias}</span>
-										${this.#isFilterActive(filter.alias)
-											? html`<uui-button
-													look="secondary"
-													label="Clear"
-													@click=${() => this.#onClearFilter(filter.alias)}
-													compact>
-													Clear
-												</uui-button>`
-											: nothing}
+								<umb-collection-facet-filter-item .filterAlias=${filter.alias}>
+									<div class="filter-item">
+										<div class="filter-header">
+											<span class="heading">${filter.manifest?.meta?.label ?? filter.alias}</span>
+											${this.#isFilterActive(filter.alias)
+												? html`<uui-button
+														look="secondary"
+														label="Clear"
+														@click=${() => this.#onClearFilter(filter.alias)}
+														compact>
+														Clear
+													</uui-button>`
+												: nothing}
+										</div>
+										${filter.component}
 									</div>
-									${filter.component}
-								</div>
+								</umb-collection-facet-filter-item>
 							`,
 						)}
 					</div>

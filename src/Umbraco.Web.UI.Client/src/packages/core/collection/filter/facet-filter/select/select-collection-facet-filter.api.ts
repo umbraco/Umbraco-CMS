@@ -1,4 +1,4 @@
-import { UMB_COLLECTION_CONTEXT } from '../../../default/index.js';
+import { UMB_COLLECTION_FACET_FILTER_CONTEXT } from '../collection-facet-filter.context-token.js';
 import type { ManifestCollectionFacetFilter } from '../collection-facet-filter.extension.js';
 import type { MetaCollectionFacetFilterSelect } from './types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
@@ -25,7 +25,7 @@ export class UmbSelectCollectionFacetFilterApi extends UmbControllerBase {
 	#valueItems = new UmbArrayState<UmbDatalistItemModel>([], (x) => x.unique);
 	public readonly valueItems = this.#valueItems.asObservable();
 
-	#collectionContext?: typeof UMB_COLLECTION_CONTEXT.TYPE;
+	#facetFilterContext?: typeof UMB_COLLECTION_FACET_FILTER_CONTEXT.TYPE;
 	#datalistDataSource?: UmbDatalistDataSource;
 	public readonly pagination = new UmbPaginationManager();
 
@@ -45,17 +45,16 @@ export class UmbSelectCollectionFacetFilterApi extends UmbControllerBase {
 		super(host);
 		this.pagination.setPageSize(100);
 
-		this.consumeContext(UMB_COLLECTION_CONTEXT, (instance) => {
-			this.#collectionContext = instance;
+		this.consumeContext(UMB_COLLECTION_FACET_FILTER_CONTEXT, (context) => {
+			this.#facetFilterContext = context;
 			this.#observeFilterValue();
 		});
 	}
 
 	#observeFilterValue() {
-		const alias = this.#manifest?.alias;
-		if (!alias) return;
+		if (!this.#facetFilterContext) return;
 		this.observe(
-			this.#collectionContext?.filtering.filterValueByAlias(alias),
+			this.#facetFilterContext.value,
 			(activeFilter) => {
 				const values: Array<UmbSelectValue> = activeFilter?.value ?? [];
 				this.#value.setValue(values);
@@ -79,16 +78,12 @@ export class UmbSelectCollectionFacetFilterApi extends UmbControllerBase {
 
 	public setValue(values: Array<UmbSelectValue>) {
 		const filtered = values.filter((v) => v.unique !== '');
-		const alias = this.#manifest?.alias;
-		if (!alias) return;
 
 		if (filtered.length === 0) {
-			this.#collectionContext?.filtering.clearFilter(alias);
+			this.#facetFilterContext?.clearValue();
 		} else {
-			this.#collectionContext?.filtering.setFilter({ alias, value: filtered });
+			this.#facetFilterContext?.setValue(filtered);
 		}
-
-		this.#collectionContext?.loadCollection();
 	}
 
 	async #requestValueItems(uniques: Array<string>) {
