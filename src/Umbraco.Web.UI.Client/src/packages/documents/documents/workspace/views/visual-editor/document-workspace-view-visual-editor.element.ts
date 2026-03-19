@@ -10,6 +10,8 @@ import {
 	reorderBlockInValue,
 	removeBlockFromValue,
 } from './visual-editor-block-helper.js';
+import type { BlockValue } from './visual-editor-block-helper.js';
+import { VisualEditorBlockBridge } from './visual-editor-block-bridge.js';
 import { UMB_VISUAL_EDITOR_PROPERTY_MODAL } from './visual-editor-property-modal.token.js';
 import type {
 	UmbVisualEditorPropertyGroup,
@@ -53,6 +55,60 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 	// Track which property/block is being edited so submit/reject handlers can reference it
 	#editingPropertyAlias?: string;
 	#editingBlockKey?: string;
+
+	// --- Block bridge (per-property block manager + entries for workspace integration) ---
+	#blockBridge?: VisualEditorBlockBridge;
+	#blockBridgePropertyAlias?: string;
+
+	/**
+	 * Ensure a block bridge exists for the given property.
+	 * Creates a new bridge (or reinitializes the existing one) with the property's
+	 * current block types, config, and value so the standard block workspace can be opened.
+	 */
+	#ensureBridge(propertyAlias: string, blockValue: BlockValue): VisualEditorBlockBridge {
+		const propStructure = this.#propertyStructures.find((p) => p.alias === propertyAlias);
+		const config = (propStructure?.config ?? []) as UmbPropertyEditorConfig;
+
+		const blocksConfig =
+			(config as Array<{ alias: string; value: unknown }>)?.find((c) => c.alias === 'blocks')?.value as
+				| Array<{ contentElementTypeKey: string; label?: string; settingsElementTypeKey?: string }>
+				| undefined;
+
+		const blockTypes = (blocksConfig ?? []).map((b) => ({
+			contentElementTypeKey: b.contentElementTypeKey,
+			label: b.label,
+			settingsElementTypeKey: b.settingsElementTypeKey,
+			forceHideContentEditorInOverlay: false,
+		}));
+
+		// Determine the editor schema alias from the layout keys
+		const layoutKey = Object.keys(blockValue.layout)[0] ?? 'Umbraco.BlockList';
+
+		if (this.#blockBridge && this.#blockBridgePropertyAlias === propertyAlias) {
+			// Reuse existing bridge — just reload with fresh data
+			this.#blockBridge.loadValue(blockValue);
+			return this.#blockBridge;
+		}
+
+		// Destroy previous bridge if switching properties
+		this.#blockBridge?.destroy();
+
+		this.#blockBridge = new VisualEditorBlockBridge({
+			host: this,
+			propertyAlias,
+			editorSchemaAlias: layoutKey,
+			blockTypes,
+			config,
+			onValueChanged: async (alias, value) => {
+				await this.#setPropertyValue(alias, value);
+				await this.#saveAndRefresh();
+			},
+		});
+		this.#blockBridgePropertyAlias = propertyAlias;
+		this.#blockBridge.loadValue(blockValue);
+
+		return this.#blockBridge;
+	}
 
 	@state() private _iframeReady = false;
 	@state() private _previewUrl?: string;
@@ -209,7 +265,7 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 		UmbBlockCatalogueModalValue
 	>(this, UMB_BLOCK_CATALOGUE_MODAL, 'veCatalogue')
 		.addAdditionalPath('_catalogue/:insertIndex')
-		.onSetup((params) => {
+		.onSetup(async (params) => {
 			if (!this.#pendingAdd) {
 				console.warn('[VisualEditor] catalogue onSetup: no pendingAdd');
 				return false;
@@ -241,6 +297,15 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 				forceHideContentEditorInOverlay: b.forceHideContentEditorInOverlay ?? false,
 			}));
 
+			// Resolve which block types have editable properties so the catalogue can show workspace links
+			const contentTypeHasProperties: Record<string, boolean> = {};
+			for (const b of blockTypes) {
+				contentTypeHasProperties[b.contentElementTypeKey] = await this.#blockHasEditableFields(
+					b.contentElementTypeKey,
+					this.#pendingAdd!.propertyAlias,
+				);
+			}
+
 			const modalSize = blockTypes.length > 12 ? 'large' : blockTypes.length > 8 ? 'medium' : 'small';
 
 			return {
@@ -249,6 +314,7 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 					blocks: blockTypes,
 					blockGroups: [],
 					originData: { index: parseInt(params.insertIndex as string) || 0 },
+					contentTypeHasProperties,
 				},
 				value: undefined,
 			};
@@ -674,19 +740,23 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 		return false;
 	}
 
-	// --- Block click → open routed modal ---
+	// --- Block click → open block workspace via bridge ---
 
 	#onBlockClicked(blockKey: string, _contentTypeAlias: string) {
 		this.#selectedBlockKey = blockKey;
 		this.#selectedPropertyAlias = undefined;
 
-		console.debug(
-			'[VisualEditor] opening block modal, blockKey:',
-			blockKey,
-			'active:',
-			this.#blockModalRegistration.active,
-		);
-		this.#blockModalRegistration.open({ blockKey });
+		const allValues = this.#getAllValues();
+		const found = findBlockInValues(allValues, blockKey);
+		if (!found) {
+			console.warn('[VisualEditor] block not found in values', blockKey);
+			return;
+		}
+
+		const bridge = this.#ensureBridge(found.propertyAlias, found.blockValue);
+
+		console.debug('[VisualEditor] opening block workspace via bridge, blockKey:', blockKey);
+		bridge.openEdit(blockKey);
 	}
 
 	async #handlePropertySubmit(alias: string, result: { values: Array<{ alias: string; value: unknown }> }) {

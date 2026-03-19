@@ -10,6 +10,8 @@ export interface UmbBlockCatalogueModalData {
 	openClipboard?: boolean;
 	clipboardFilter?: (clipboardDetailEntryModel: UmbClipboardEntryDetailModel) => Promise<boolean>;
 	originData: UmbBlockWorkspaceData['originData'];
+	/** Optional map of content element type key → whether the type has properties. Used as a fallback when UMB_BLOCK_MANAGER_CONTEXT is not available (e.g. visual editor). */
+	contentTypeHasProperties?: Record<string, boolean>;
 }
 
 export type UmbBlockCatalogueModalValue =
