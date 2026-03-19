@@ -27,7 +27,7 @@ import {
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
-import { debounceTime } from '@umbraco-cms/backoffice/external/rxjs';
+import { debounceTime, firstValueFrom, filter } from '@umbraco-cms/backoffice/external/rxjs';
 
 // ---------------------------------------------------------------------------
 // Grid layout types (mirrors the block-grid types but kept local to avoid
@@ -329,7 +329,12 @@ export class VisualEditorBlockBridge extends UmbControllerBase {
 			.addAdditionalPath('veBlock')
 			.onSetup(() => {
 				return {
-					data: { entityType: 'block', preset: {}, baseDataPath: undefined as unknown as string },
+					data: {
+						entityType: 'block',
+						preset: {},
+						baseDataPath: undefined as unknown as string,
+						originData: { index: -1 },
+					},
 					modal: { size: 'medium' },
 				};
 			})
@@ -399,15 +404,26 @@ export class VisualEditorBlockBridge extends UmbControllerBase {
 	}
 
 	/**
+	 * Wait for the workspace path to become available.
+	 * The modal route registration is async (consumes UMB_ROUTE_CONTEXT),
+	 * so the path may not be ready immediately after bridge construction.
+	 */
+	async #waitForWorkspacePath(): Promise<string> {
+		const current = this.#workspacePath.getValue();
+		if (current) return current;
+		return firstValueFrom(
+			(this.#workspacePath.asObservable() as Observable<string | undefined>).pipe(
+				filter((p): p is string => !!p),
+			),
+		);
+	}
+
+	/**
 	 * Open the block workspace to edit an existing block.
 	 * @returns true if navigation was initiated.
 	 */
-	openEdit(blockKey: string): boolean {
-		const path = this.#workspacePath.getValue();
-		if (!path) {
-			console.warn('[VisualEditorBlockBridge] workspace path not ready');
-			return false;
-		}
+	async openEdit(blockKey: string): Promise<boolean> {
+		const path = await this.#waitForWorkspacePath();
 
 		// Navigate to the workspace edit route — must include /view/content
 		// so the workspace's internal router matches the content view.
@@ -420,12 +436,8 @@ export class VisualEditorBlockBridge extends UmbControllerBase {
 	 * Open the block workspace to create a new block.
 	 * @returns true if navigation was initiated.
 	 */
-	openCreate(contentElementTypeKey: string): boolean {
-		const path = this.#workspacePath.getValue();
-		if (!path) {
-			console.warn('[VisualEditorBlockBridge] workspace path not ready');
-			return false;
-		}
+	async openCreate(contentElementTypeKey: string): Promise<boolean> {
+		const path = await this.#waitForWorkspacePath();
 
 		const createPath = `${path}create/${encodeURIComponent(contentElementTypeKey)}`;
 		history.pushState({}, '', createPath);
