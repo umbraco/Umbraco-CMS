@@ -28,6 +28,7 @@ test.beforeEach(async ({umbracoApi, umbracoUi}) => {
   await umbracoApi.documentType.ensureNameNotExists(thirdElementTypeName);
   await umbracoApi.document.ensureNameNotExists(contentName);
   await umbracoApi.dataType.ensureNameNotExists(blockGridDataTypeName);
+  firstElementTypeId = await umbracoApi.documentType.createEmptyElementType(firstElementTypeName);
   await umbracoUi.goToBackOffice();
 });
 
@@ -42,7 +43,6 @@ test.afterEach(async ({umbracoApi}) => {
 
 test('can create content with a block grid with an empty block in a area', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  firstElementTypeId = await umbracoApi.documentType.createEmptyElementType(firstElementTypeName);
   blockGridDataTypeId = await umbracoApi.dataType.createBlockGridWithAnAreaInABlockWithAllowInAreas(blockGridDataTypeName, firstElementTypeId, firstAreaName, toAllowInAreas, areaCreateLabel);
   documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, blockGridDataTypeName, blockGridDataTypeId);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
@@ -64,7 +64,6 @@ test('can create content with a block grid with an empty block in a area', {tag:
 
 test('can create content with a block grid with two empty blocks in a area', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  firstElementTypeId = await umbracoApi.documentType.createEmptyElementType(firstElementTypeName);
   blockGridDataTypeId = await umbracoApi.dataType.createBlockGridWithAnAreaInABlockWithAllowInAreas(blockGridDataTypeName, firstElementTypeId, firstAreaName, toAllowInAreas, areaCreateLabel);
   documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, blockGridDataTypeName, blockGridDataTypeId);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
@@ -94,7 +93,6 @@ test('can create content with a block grid with two empty blocks in a area', asy
 
 test('can create content with block grid area with a create label', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  firstElementTypeId = await umbracoApi.documentType.createEmptyElementType(firstElementTypeName);
   const createLabel = 'ThisIsACreateLabel';
   blockGridDataTypeId = await umbracoApi.dataType.createBlockGridWithAnAreaInABlockWithACreateLabel(blockGridDataTypeName, firstElementTypeId, createLabel, firstAreaName);
   documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, blockGridDataTypeName, blockGridDataTypeId);
@@ -113,7 +111,6 @@ test('can create content with block grid area with a create label', async ({umbr
 
 test('can create content with block grid area with column span', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  firstElementTypeId = await umbracoApi.documentType.createEmptyElementType(firstElementTypeName);
   const columnSpan = 2;
   blockGridDataTypeId = await umbracoApi.dataType.createBlockGridWithAnAreaInABlockWithColumnSpanAndRowSpan(blockGridDataTypeName, firstElementTypeId, columnSpan, 1, firstAreaName, areaCreateLabel);
   documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, blockGridDataTypeName, blockGridDataTypeId);
@@ -132,7 +129,6 @@ test('can create content with block grid area with column span', async ({umbraco
 
 test('can create content with block grid area with row span', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  firstElementTypeId = await umbracoApi.documentType.createEmptyElementType(firstElementTypeName);
   const rowSpan = 4;
   blockGridDataTypeId = await umbracoApi.dataType.createBlockGridWithAnAreaInABlockWithColumnSpanAndRowSpan(blockGridDataTypeName, firstElementTypeId, 12, rowSpan, firstAreaName, areaCreateLabel);
   documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, blockGridDataTypeName, blockGridDataTypeId);
@@ -151,7 +147,6 @@ test('can create content with block grid area with row span', async ({umbracoApi
 
 test('can create content with block grid area with min allowed', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  firstElementTypeId = await umbracoApi.documentType.createEmptyElementType(firstElementTypeName);
   const secondElementTypeId = await umbracoApi.documentType.createEmptyElementType(secondElementTypeName);
   const minAllowed = 2;
   blockGridDataTypeId = await umbracoApi.dataType.createBlockGridWithAnAreaInABlockWithMinAndMaxAllowed(blockGridDataTypeName, firstElementTypeId, secondElementTypeId, minAllowed, 10, firstAreaName, areaCreateLabel);
@@ -184,7 +179,6 @@ test('can create content with block grid area with min allowed', async ({umbraco
 
 test('can create content with block grid area with max allowed', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  firstElementTypeId = await umbracoApi.documentType.createEmptyElementType(firstElementTypeName);
   const secondElementTypeId = await umbracoApi.documentType.createEmptyElementType(secondElementTypeName);
   const maxAllowed = 0;
   blockGridDataTypeId = await umbracoApi.dataType.createBlockGridWithAnAreaInABlockWithMinAndMaxAllowed(blockGridDataTypeName, firstElementTypeId, secondElementTypeId, 0, maxAllowed, firstAreaName, areaCreateLabel);
@@ -217,7 +211,6 @@ test('can create content with block grid area with max allowed', async ({umbraco
 
 test('can create content with a block grid area with specified allowance', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  firstElementTypeId = await umbracoApi.documentType.createEmptyElementType(firstElementTypeName);
   const secondElementTypeId = await umbracoApi.documentType.createEmptyElementType(secondElementTypeName);
   blockGridDataTypeId = await umbracoApi.dataType.createBlockGridWithAnAreaWithSpecifiedAllowanceInABlock(blockGridDataTypeName, firstElementTypeId, secondElementTypeId, firstAreaName, areaCreateLabel);
   documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, blockGridDataTypeName, blockGridDataTypeId);
@@ -242,7 +235,6 @@ test('can create content with a block grid area with specified allowance', async
 
 test('can create content with a block grid area with specified allowance with min allowed', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  firstElementTypeId = await umbracoApi.documentType.createEmptyElementType(firstElementTypeName);
   const secondElementTypeId = await umbracoApi.documentType.createEmptyElementType(secondElementTypeName);
   const minAllowed = 2;
   const warningMessage = secondElementTypeName + ' must be present at least ' + minAllowed + ' time(s).';
@@ -273,7 +265,6 @@ test('can create content with a block grid area with specified allowance with mi
 
 test('can create content with a block grid area with specified allowance with max allowed', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  firstElementTypeId = await umbracoApi.documentType.createEmptyElementType(firstElementTypeName);
   const secondElementTypeId = await umbracoApi.documentType.createEmptyElementType(secondElementTypeName);
   const maxAllowed = 1;
   const warningMessage = secondElementTypeName + ' must maximum be present ' + maxAllowed + ' time(s).';
@@ -306,7 +297,6 @@ test('can create content with a block grid area with specified allowance with ma
 
 test('can create content with a block grid area with multiple specified allowances', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  firstElementTypeId = await umbracoApi.documentType.createEmptyElementType(firstElementTypeName);
   const secondElementTypeId = await umbracoApi.documentType.createEmptyElementType(secondElementTypeName);
   const thirdElementTypeId = await umbracoApi.documentType.createEmptyElementType(thirdElementTypeName);
   blockGridDataTypeId = await umbracoApi.dataType.createBlockGridWithAnAreaWithTwoSpecifiedAllowancesInABlockWithCreateLabel(blockGridDataTypeName, firstElementTypeId, secondElementTypeId, thirdElementTypeId, firstAreaName, areaCreateLabel);
