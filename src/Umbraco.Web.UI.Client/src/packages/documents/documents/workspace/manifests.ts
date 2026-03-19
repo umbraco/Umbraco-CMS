@@ -2,7 +2,10 @@ import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
 import { UMB_DOCUMENT_WORKSPACE_ALIAS } from './constants.js';
 import { manifests as actionManifests } from './actions/manifests.js';
 import { UMB_CONTENT_HAS_PROPERTIES_WORKSPACE_CONDITION } from '@umbraco-cms/backoffice/content';
-import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
+import {
+	UMB_WORKSPACE_CONDITION_ALIAS,
+	UMB_WORKSPACE_ENTITY_IS_NEW_CONDITION_ALIAS,
+} from '@umbraco-cms/backoffice/workspace';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -33,6 +36,28 @@ export const manifests: Array<UmbExtensionManifest> = [
 			},
 			{
 				alias: UMB_CONTENT_HAS_PROPERTIES_WORKSPACE_CONDITION,
+			},
+		],
+	},
+	{
+		type: 'workspaceView',
+		alias: 'Umb.WorkspaceView.Document.VisualEditor',
+		name: 'Document Workspace Visual Editor View',
+		element: () => import('./views/visual-editor/document-workspace-view-visual-editor.element.js'),
+		weight: 150,
+		meta: {
+			label: 'Visual Editor',
+			pathname: 'visual-editor',
+			icon: 'icon-eye',
+		},
+		conditions: [
+			{
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
+				match: UMB_DOCUMENT_WORKSPACE_ALIAS,
+			},
+			{
+				alias: UMB_WORKSPACE_ENTITY_IS_NEW_CONDITION_ALIAS,
+				match: false,
 			},
 		],
 	},

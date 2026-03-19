@@ -1,0 +1,8 @@
+{
+	"name": "@umbraco-cms/visual-editor",
+	"private": true,
+	"scripts": {
+		"build": "esbuild injected.ts --bundle --format=iife --outfile=../../../dist-cms/apps/visual-editor/injected.js --minify",
+		"dev": "esbuild injected.ts --bundle --format=iife --outfile=../../../../Umbraco.Cms.StaticAssets/wwwroot/umbraco/backoffice/apps/visual-editor/injected.js --watch"
+	}
+}

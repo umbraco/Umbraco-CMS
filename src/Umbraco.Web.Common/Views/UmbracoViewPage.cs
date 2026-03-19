@@ -28,6 +28,7 @@ public abstract class UmbracoViewPage : UmbracoViewPage<IPublishedContent>
 public abstract class UmbracoViewPage<TModel> : RazorPage<TModel>
 {
     private UmbracoHelper? _helper;
+    private int _attributeDepth;
 
     /// <summary>
     ///     Gets the Umbraco helper.
@@ -109,9 +110,63 @@ public abstract class UmbracoViewPage<TModel> : RazorPage<TModel>
     /// <inheritdoc />
     public override void Write(object? value)
     {
+        if (TryWriteVisualEditorAnnotation(value, () => WriteCore(value)))
+        {
+            return;
+        }
+
+        WriteCore(value);
+    }
+
+    /// <inheritdoc />
+    /// <remarks>
+    /// In .NET 10+, Razor resolves <c>Write(stringValue)</c> to this overload rather than
+    /// <see cref="Write(object?)"/>. Both must participate in visual editor annotation.
+    /// </remarks>
+    public override void Write(string? value)
+    {
+        if (TryWriteVisualEditorAnnotation(value, () => base.Write(value)))
+        {
+            return;
+        }
+
+        base.Write(value);
+    }
+
+    /// <summary>
+    /// Checks for a tracked property access and wraps the output with visual editor annotation attributes.
+    /// Returns true if annotation was applied (and the value was written), false otherwise.
+    /// </summary>
+    private bool TryWriteVisualEditorAnnotation(object? value, Action writeValue)
+    {
+        var propertyAccess = VisualEditorPropertyTracker.ConsumeAccess();
+
+        if (propertyAccess.HasValue
+            && value is not null
+            && _attributeDepth == 0
+            && (UmbracoContext?.InPreviewMode ?? false))
+        {
+            var access = propertyAccess.Value;
+            var escapedAlias = System.Web.HttpUtility.HtmlAttributeEncode(access.Alias);
+            base.WriteLiteral($"<span data-umb-property=\"{escapedAlias}\" data-umb-content-key=\"{access.ContentKey}\">");
+
+            writeValue();
+
+            base.WriteLiteral("</span>");
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Core write logic for the object overload, shared by annotated and non-annotated paths.
+    /// </summary>
+    private void WriteCore(object? value)
+    {
         if (value is IHtmlEncodedString htmlEncodedString)
         {
-            WriteLiteral(htmlEncodedString.ToHtmlString());
+            base.WriteLiteral(htmlEncodedString.ToHtmlString());
         }
         else if (value is TagHelperOutput tagHelperOutput)
         {
@@ -122,6 +177,40 @@ public abstract class UmbracoViewPage<TModel> : RazorPage<TModel>
         {
             base.Write(value);
         }
+    }
+
+    /// <inheritdoc />
+    public override void BeginWriteAttribute(string name, string prefix, int prefixOffset, string suffix, int suffixOffset, int attributeValuesCount)
+    {
+        VisualEditorPropertyTracker.Clear();
+        _attributeDepth++;
+        base.BeginWriteAttribute(name, prefix, prefixOffset, suffix, suffixOffset, attributeValuesCount);
+    }
+
+    /// <inheritdoc />
+    public override void EndWriteAttribute()
+    {
+        _attributeDepth--;
+        VisualEditorPropertyTracker.Clear();
+        base.EndWriteAttribute();
+    }
+
+    /// <inheritdoc />
+    public override void WriteLiteral(object? value)
+    {
+        VisualEditorPropertyTracker.Clear();
+        base.WriteLiteral(value);
+    }
+
+    /// <inheritdoc />
+    /// <remarks>
+    /// In .NET 10+, Razor resolves <c>WriteLiteral(stringValue)</c> to this overload.
+    /// Both must participate in visual editor tracker clearing.
+    /// </remarks>
+    public override void WriteLiteral(string? value)
+    {
+        VisualEditorPropertyTracker.Clear();
+        base.WriteLiteral(value);
     }
 
     public void WriteUmbracoContent(TagHelperOutput tagHelperOutput)
@@ -148,6 +237,12 @@ public abstract class UmbracoViewPage<TModel> : RazorPage<TModel>
                                                                                                 // But just to be sure of prevention of an XSS vulnterablity we'll HTML encode here too.
                                                                                                 // An expected URL is untouched by this encoding.
                             UmbracoContext.PublishedRequest?.PublishedContent?.Key);
+
+                    // Visual editor: inject guest script for property/block click-to-edit.
+                    // This runs in the preview iframe and communicates with the backoffice via postMessage.
+                    var cspNonceService = Context.RequestServices.GetService<Umbraco.Cms.Core.Security.ICspNonceService>();
+                    var nonce = cspNonceService?.GetNonce();
+                    markupToInject += VisualEditorGuestScript.GetScriptTag(nonce);
                 }
                 else
                 {

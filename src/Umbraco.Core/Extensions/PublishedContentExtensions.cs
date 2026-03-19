@@ -380,6 +380,8 @@ public static class PublishedContentExtensions
     {
         IPublishedProperty? property = content.GetProperty(alias);
 
+        TrackVisualEditorAccess(property, alias, content.Key);
+
         // if we have a property, and it has a value, return that value
         if (property != null && property.HasValue(culture, segment))
         {
@@ -420,6 +422,8 @@ public static class PublishedContentExtensions
     {
         IPublishedProperty? property = content.GetProperty(alias);
 
+        TrackVisualEditorAccess(property, alias, content.Key);
+
         // if we have a property, and it has a value, return that value
         if (property != null && property.HasValue(culture, segment))
         {
@@ -435,6 +439,28 @@ public static class PublishedContentExtensions
         // else... if we have a property, at least let the converter return its own
         // vision of 'no value' (could be an empty enumerable) - otherwise, default
         return property == null ? default : property.Value<T>(publishedValueFallback, culture, segment);
+    }
+
+    /// <summary>
+    /// Records a visual editor property access only for property editors
+    /// whose output is suitable for inline annotation (text-oriented editors).
+    /// </summary>
+    private static void TrackVisualEditorAccess(IPublishedProperty? property, string alias, Guid contentKey)
+    {
+        if (property is null || !VisualEditorPropertyTracker.IsEnabled)
+        {
+            return;
+        }
+
+        var editorAlias = property.PropertyType.DataType.EditorAlias;
+
+        if (editorAlias is Umbraco.Cms.Core.Constants.PropertyEditors.Aliases.TextBox
+            or Umbraco.Cms.Core.Constants.PropertyEditors.Aliases.TextArea
+            or Umbraco.Cms.Core.Constants.PropertyEditors.Aliases.RichText
+            or Umbraco.Cms.Core.Constants.PropertyEditors.Aliases.MarkdownEditor)
+        {
+            VisualEditorPropertyTracker.RecordAccess(alias, contentKey);
+        }
     }
 
     #endregion

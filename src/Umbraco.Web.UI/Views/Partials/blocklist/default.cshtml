@@ -8,6 +8,8 @@
         if (block?.ContentKey == null) { continue; }
         var data = block.Content;
 
-        @await Html.PartialAsync("blocklist/Components/" + data.ContentType.Alias, block)
+        <div data-umb-block-key="@block.ContentKey" data-umb-content-type="@data.ContentType.Alias">
+            @await Html.PartialAsync("blocklist/Components/" + data.ContentType.Alias, block)
+        </div>
     }
 </div>

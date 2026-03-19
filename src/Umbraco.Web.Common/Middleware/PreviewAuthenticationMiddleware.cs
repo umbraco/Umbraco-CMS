@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Preview;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
@@ -55,6 +56,10 @@ public class PreviewAuthenticationMiddleware : IMiddleware
 
             if (isPreview)
             {
+                // Enable visual editor property tracking for this request.
+                // This allows UmbracoViewPage.Write() to automatically annotate property output.
+                VisualEditorPropertyTracker.Enable();
+
                 Attempt<ClaimsIdentity> backOfficeIdentityAttempt = await _previewService.TryGetPreviewClaimsIdentityAsync();
 
                 if (backOfficeIdentityAttempt.Success)
