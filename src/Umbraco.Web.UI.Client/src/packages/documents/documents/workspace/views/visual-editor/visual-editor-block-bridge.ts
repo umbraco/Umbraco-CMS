@@ -317,10 +317,9 @@ export class VisualEditorBlockBridge extends UmbControllerBase {
 		this.#manager.setBlockTypes(config.blockTypes);
 		this.#manager.setEditorConfiguration(new UmbPropertyEditorConfigCollection(config.config));
 
-		// 1b. Set variant ID if provided (culture/segment for multilingual)
-		if (config.variantId) {
-			this.#manager.setVariantId(config.variantId);
-		}
+		// 1b. Set variant ID — the workspace context requires a non-undefined variantId
+		// from the manager to initialize. Default to invariant if none is provided.
+		this.#manager.setVariantId(config.variantId ?? UmbVariantId.CreateInvariant());
 
 		// 2. Create entries — consumes UMB_BLOCK_MANAGER_CONTEXT from host
 		this.#entries = new VisualEditorBlockEntries(config.host);
@@ -396,7 +395,7 @@ export class VisualEditorBlockBridge extends UmbControllerBase {
 	 * Update the variant ID (e.g. when the user switches culture in the workspace).
 	 */
 	setVariantId(variantId: UmbVariantId | undefined) {
-		this.#manager.setVariantId(variantId);
+		this.#manager.setVariantId(variantId ?? UmbVariantId.CreateInvariant());
 	}
 
 	/**
@@ -410,8 +409,9 @@ export class VisualEditorBlockBridge extends UmbControllerBase {
 			return false;
 		}
 
-		// Navigate to the workspace edit route
-		const editPath = `${path}edit/${encodeURIComponent(blockKey)}`;
+		// Navigate to the workspace edit route — must include /view/content
+		// so the workspace's internal router matches the content view.
+		const editPath = `${path}edit/${encodeURIComponent(blockKey)}/view/content`;
 		history.pushState({}, '', editPath);
 		return true;
 	}
