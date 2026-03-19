@@ -1733,7 +1733,7 @@ export class DocumentApiHelper {
     return await this.create(document);
   }
 
-  async setupPublicAccessForDocument(documentId: string, memberGroupNames: string[], loginDocumentId: string, errorDocumentId: string) {
+  async setPublicAccessForDocument(documentId: string, memberGroupNames: string[], loginDocumentId: string, errorDocumentId: string) {
     const body = {
       memberGroupNames: memberGroupNames,
       memberUserNames: [],

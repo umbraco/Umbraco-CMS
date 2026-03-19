@@ -1,7 +1,7 @@
 import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 import {expect} from '@playwright/test';
 
-// Contents
+// Content
 const parentDocumentName = 'ParentDocument';
 const childDocumentName = 'ChildDocument';
 let parentDocumentId = '';
@@ -34,7 +34,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.memberGroup.ensureNameNotExists(secondMemberGroupName);
 });
 
-test('can setup public access protection on a content', async ({umbracoApi, umbracoUi}) => {
+test('can setup public access protection for a content node', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
@@ -48,7 +48,7 @@ test('can setup public access protection on a content', async ({umbracoApi, umbr
   await umbracoApi.document.verifyPublicAccessForDocument(parentDocumentId, memberGroupName, parentDocumentId, parentDocumentId, false);
 });
 
-test('can setup public access protection on the child content', async ({umbracoApi, umbracoUi}) => {
+test('can setup public access protection for a child content node', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
@@ -63,9 +63,9 @@ test('can setup public access protection on the child content', async ({umbracoA
   await umbracoApi.document.verifyPublicAccessForDocument(childDocumentId, memberGroupName, parentDocumentId, parentDocumentId, false);
 });
 
-test('can update public access protection on the child content', async ({umbracoApi, umbracoUi}) => {
+test('can update public access protection for a child content node', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  await umbracoApi.document.setupPublicAccessForDocument(childDocumentId, [memberGroupName], parentDocumentId, parentDocumentId);
+  await umbracoApi.document.setPublicAccessForDocument(childDocumentId, [memberGroupName], parentDocumentId, parentDocumentId);
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
@@ -79,9 +79,9 @@ test('can update public access protection on the child content', async ({umbraco
   await umbracoApi.document.verifyPublicAccessForDocument(childDocumentId, secondMemberGroupName, parentDocumentId, parentDocumentId, false);
 });
 
-test('can delete public access protection from a content', async ({umbracoApi, umbracoUi}) => {
+test('can delete public access protection from a content node', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  await umbracoApi.document.setupPublicAccessForDocument(parentDocumentId, [memberGroupName], parentDocumentId, parentDocumentId);
+  await umbracoApi.document.setPublicAccessForDocument(parentDocumentId, [memberGroupName], parentDocumentId, parentDocumentId);
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
@@ -94,9 +94,9 @@ test('can delete public access protection from a content', async ({umbracoApi, u
   expect(await umbracoApi.document.getPublicAccessStatusForDocument(parentDocumentId)).toBe(404);
 });
 
-test('can delete public access protection from a child content', async ({umbracoApi, umbracoUi}) => {
+test('can delete public access protection from a child content node', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  await umbracoApi.document.setupPublicAccessForDocument(childDocumentId, [memberGroupName], parentDocumentId, parentDocumentId);
+  await umbracoApi.document.setPublicAccessForDocument(childDocumentId, [memberGroupName], parentDocumentId, parentDocumentId);
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
@@ -112,7 +112,7 @@ test('can delete public access protection from a child content', async ({umbraco
 
 test('can display inherited public access protection on child content', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  await umbracoApi.document.setupPublicAccessForDocument(parentDocumentId, [memberGroupName], parentDocumentId, parentDocumentId);
+  await umbracoApi.document.setPublicAccessForDocument(parentDocumentId, [memberGroupName], parentDocumentId, parentDocumentId);
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act

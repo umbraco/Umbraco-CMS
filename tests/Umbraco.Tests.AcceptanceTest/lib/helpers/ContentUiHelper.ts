@@ -193,6 +193,8 @@ export class ContentUiHelper extends UiBaseLocators {
   private readonly cardContentNode: Locator;
   private readonly containerSetupBtn: Locator;
   private readonly containerEditBtn: Locator;
+  private readonly loginPageSelectedItem: Locator;
+  private readonly errorPageSelectedItem: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -401,6 +403,8 @@ export class ContentUiHelper extends UiBaseLocators {
     // Public Access
     this.containerSetupBtn = this.container.getByLabel('Setup');
     this.containerEditBtn = this.container.getByLabel('Edit');
+    this.loginPageSelectedItem = page.locator('.select-item').filter({hasText: 'Login Page'});
+    this.errorPageSelectedItem = page.locator('.select-item').filter({hasText: 'Error Page'});
   }
 
   async enterContentName(name: string) {
@@ -1917,11 +1921,11 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async isDocumentSelectedAsLoginPage(documentName: string) {
-    return await this.isVisible(this.page.locator('.select-item').filter({hasText: 'Login Page'}).locator('uui-ref-node[name="' + documentName + '"]'));
+    return await this.isVisible(this.loginPageSelectedItem.locator('uui-ref-node[name="' + documentName + '"]'));
   }
 
   async isDocumentSelectedAsErrorPage(documentName: string) {
-    return await this.isVisible(this.page.locator('.select-item').filter({hasText: 'Error Page'}).locator('uui-ref-node[name="' + documentName + '"]'));
+    return await this.isVisible(this.errorPageSelectedItem.locator('uui-ref-node[name="' + documentName + '"]'));
   }
 
   async isMemberGroupSelected(memberGroupName: string) {
