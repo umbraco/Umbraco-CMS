@@ -38,7 +38,7 @@ test('can add a composition to a media type', {tag: '@smoke'}, async ({umbracoAp
   await umbracoUi.mediaType.clickSaveButtonAndWaitForMediaTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.mediaType.isGroupVisible(groupName);
+  await umbracoUi.mediaType.isInheritedGroupVisible(groupName, compositionMediaTypeName);
   const mediaTypeData = await umbracoApi.mediaType.getByName(mediaTypeName);
   expect(mediaTypeData.compositions.length).toBe(1);
   expect(mediaTypeData.compositions[0].mediaType.id).toBe(compositionMediaTypeId);

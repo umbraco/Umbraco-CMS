@@ -61,3 +61,24 @@ test('can edit property value from composition in content', async ({umbracoApi, 
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
   expect(contentData.values[0].value).toEqual(text);
 });
+
+test('can publish content with a document type that has a composition', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const text = 'Published composition value';
+  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+  const compositionDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(compositionDocumentTypeName, dataTypeName, dataTypeData.id, groupName);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithACompositionAndAllowAsRoot(documentTypeName, compositionDocumentTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.enterTextstring(text);
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
+
+  // Assert
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.variants[0].state).toBe('Published');
+  expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
+  expect(contentData.values[0].value).toEqual(text);
+});

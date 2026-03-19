@@ -44,7 +44,7 @@ test('can add a composition to a document type', {tag: '@smoke'}, async ({umbrac
   await umbracoUi.documentType.clickSaveButtonAndWaitForDocumentTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.documentType.isGroupVisible(groupName);
+  await umbracoUi.documentType.isInheritedGroupVisible(groupName, compositionDocumentTypeName);
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
   expect(documentTypeData.compositions.length).toBe(1);
   expect(documentTypeData.compositions[0].documentType.id).toBe(compositionDocumentTypeId);
@@ -240,6 +240,30 @@ test('composed properties are visible and read-only in the document type editor'
   await umbracoUi.waitForTimeout(ConstantHelper.wait.medium);
 
   // Assert
+  await umbracoUi.documentType.isInheritedGroupVisible(groupName, compositionDocumentTypeName);
+});
+
+test('child document type inherits properties from both parent and composition', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+  const secondDataTypeData = await umbracoApi.dataType.getByName(secondDataTypeName);
+  const compositionDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(compositionDocumentTypeName, dataTypeName, dataTypeData.id, groupName);
+  await umbracoApi.documentType.createDocumentTypeWithPropertyEditorAndComposition(parentDocumentTypeName, secondDataTypeName, secondDataTypeData.id, secondGroupName, compositionDocumentTypeId);
+  await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
+
+  // Act
+  await umbracoUi.documentType.clickRootFolderCaretButton();
+  await umbracoUi.documentType.clickActionsMenuForDocumentType(parentDocumentTypeName);
+  await umbracoUi.documentType.clickCreateActionMenuOption();
+  await umbracoUi.documentType.clickCreateDocumentTypeButton();
+  await umbracoUi.documentType.enterDocumentTypeName(childDocumentTypeName);
+  await umbracoUi.documentType.clickSaveButtonAndWaitForDocumentTypeToBeCreated();
+
+  // Assert
+  const childData = await umbracoApi.documentType.getByName(childDocumentTypeName);
+  expect(childData.compositions.length).toBe(1);
+  expect(childData.compositions[0].compositionType).toBe('Inheritance');
+  await umbracoUi.documentType.isInheritedGroupVisible(secondGroupName, parentDocumentTypeName);
   await umbracoUi.documentType.isInheritedGroupVisible(groupName, compositionDocumentTypeName);
 });
 
