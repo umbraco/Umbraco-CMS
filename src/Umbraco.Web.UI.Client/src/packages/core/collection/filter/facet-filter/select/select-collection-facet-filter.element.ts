@@ -114,7 +114,6 @@ export class UmbSelectCollectionFacetFilterElement extends UmbLitElement {
 	#renderRadioList() {
 		return html`
 			<div class="filter">
-				<span class="label">${this.#manifest?.meta.label}</span>
 				<uui-radio-group .value=${this._value[0] ?? ''} @change=${this.#onRadioChange}>
 					${repeat(
 						this._options,
@@ -129,7 +128,6 @@ export class UmbSelectCollectionFacetFilterElement extends UmbLitElement {
 	#renderCheckboxList() {
 		return html`
 			<div class="filter">
-				<span class="label">${this.#manifest?.meta.label}</span>
 				<div class="filter-list">
 					${repeat(
 						this._options,
@@ -150,7 +148,6 @@ export class UmbSelectCollectionFacetFilterElement extends UmbLitElement {
 	#renderCombobox() {
 		return html`
 			<div class="filter">
-				<span class="label">${this.#manifest?.meta?.label ?? 'Filter'}:</span>
 				<uui-combobox
 					value=${this._value[0] ?? ''}
 					@change=${this.#onComboboxSelect}
@@ -179,7 +176,6 @@ export class UmbSelectCollectionFacetFilterElement extends UmbLitElement {
 		const popoverId = `umb-select-filter-${this.#manifest?.alias}`;
 		return html`
 			<div class="filter">
-				<span class="label">${this.#manifest?.meta?.label}</span>
 				<uui-button popovertarget=${popoverId} label="Select filter" compact>
 					<b>${this.#getDropdownLabel()}</b>
 				</uui-button>

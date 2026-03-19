@@ -6,11 +6,16 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-collection-filter-bundle')
 export class UmbCollectionFilterBundleElement extends UmbLitElement {
+	#collectionContext?: typeof UMB_COLLECTION_CONTEXT.TYPE;
+
 	@state()
 	private _filters: Array<any> = [];
 
 	@state()
 	private _totalActiveFilters = 0;
+
+	@state()
+	private _activeFilterAliases: Set<string> = new Set();
 
 	constructor() {
 		super();
@@ -28,11 +33,25 @@ export class UmbCollectionFilterBundleElement extends UmbLitElement {
 
 		this.consumeContext(UMB_COLLECTION_CONTEXT, (context) => {
 			if (!context) return;
+			this.#collectionContext = context;
 
 			this.observe(context.filtering.totalActiveFilters, (total) => {
 				this._totalActiveFilters = total ?? 0;
 			});
+
+			this.observe(context.filtering.activeFilters, (filters) => {
+				this._activeFilterAliases = new Set(filters?.map((f) => f.alias) ?? []);
+			});
 		});
+	}
+
+	#isFilterActive(alias: string): boolean {
+		return this._activeFilterAliases.has(alias);
+	}
+
+	#onClearFilter(alias: string) {
+		this.#collectionContext?.filtering.clearFilter(alias);
+		this.#collectionContext?.loadCollection();
 	}
 
 	override render() {
@@ -46,11 +65,26 @@ export class UmbCollectionFilterBundleElement extends UmbLitElement {
 			<uui-popover-container id="collection-filter-bundle-popover" placement="bottom-end">
 				<umb-popover-layout>
 					<div class="filter-dropdown">
-						<span class="heading">Filters:</span>
 						${repeat(
 							this._filters,
 							(filter) => filter.alias,
-							(filter) => filter.component,
+							(filter) => html`
+								<div class="filter-item">
+									<div class="filter-header">
+										<span class="heading">${filter.manifest?.meta?.label ?? filter.alias}</span>
+										${this.#isFilterActive(filter.alias)
+											? html`<uui-button
+													look="secondary"
+													label="Clear"
+													@click=${() => this.#onClearFilter(filter.alias)}
+													compact>
+													Clear
+												</uui-button>`
+											: nothing}
+									</div>
+									${filter.component}
+								</div>
+							`,
 						)}
 					</div>
 				</umb-popover-layout>
@@ -71,6 +105,20 @@ export class UmbCollectionFilterBundleElement extends UmbLitElement {
 				padding: var(--uui-size-space-5);
 				min-width: 250px;
 			}
+
+			.filter-item {
+				display: flex;
+				flex-direction: column;
+				gap: var(--uui-size-space-2);
+				padding-top: var(--uui-size-space-2);
+			}
+
+			.filter-header {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+			}
+
 			.heading {
 				font-weight: 700;
 				font-size: var(--uui-type-default-size);
