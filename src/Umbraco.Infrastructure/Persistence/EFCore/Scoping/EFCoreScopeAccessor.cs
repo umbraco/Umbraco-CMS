@@ -45,6 +45,10 @@ internal sealed class EFCoreScopeAccessor<TDbContext> : IEFCoreScopeAccessor<TDb
     public EFCoreScope<TDbContext>? AmbientScope => (EFCoreScope<TDbContext>?)GetOrCreateAmbientScope();
 
     /// <inheritdoc />
+    public bool HasBridgedAmbientScope
+        => _ambientEfCoreScopeStack.AmbientScope is not EFCoreScope<TDbContext> { IsBridgeScope: false };
+
+    /// <inheritdoc />
     IEfCoreScope<TDbContext>? IEFCoreScopeAccessor<TDbContext>.AmbientScope => GetOrCreateAmbientScope();
 
     /// <inheritdoc />

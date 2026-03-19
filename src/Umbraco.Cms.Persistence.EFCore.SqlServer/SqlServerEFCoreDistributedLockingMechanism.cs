@@ -48,7 +48,8 @@ public sealed class SqlServerEFCoreDistributedLockingMechanism<T> : IDistributed
 
     /// <inheritdoc />
     public bool Enabled => _connectionStrings.IsConnectionStringConfigured() &&
-                           string.Equals(_connectionStrings.ProviderName, "Microsoft.Data.SqlClient", StringComparison.InvariantCultureIgnoreCase) && _scopeAccessor.Value.AmbientScope is not null;
+                           string.Equals(_connectionStrings.ProviderName, "Microsoft.Data.SqlClient", StringComparison.InvariantCultureIgnoreCase) &&
+                           _scopeAccessor.Value.HasBridgedAmbientScope is false;
 
     /// <inheritdoc />
     public IDistributedLock ReadLock(int lockId, TimeSpan? obtainLockTimeout = null)
