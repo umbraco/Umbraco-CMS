@@ -3,7 +3,6 @@ import {
 	UmbBlockManagerContext,
 	UMB_BLOCK_MANAGER_CONTEXT,
 	UmbBlockEntriesContext,
-	UMB_BLOCK_ENTRIES_CONTEXT,
 } from '@umbraco-cms/backoffice/block';
 import type {
 	UmbBlockDataModel,
@@ -18,19 +17,50 @@ import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/prope
 import type { UmbPropertyEditorConfig } from '@umbraco-cms/backoffice/property-editor';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import { UmbBooleanState, UmbStringState, observeMultiple } from '@umbraco-cms/backoffice/observable-api';
+import {
+	appendToFrozenArray,
+	pushAtToUniqueArray,
+	UmbBooleanState,
+	UmbStringState,
+	observeMultiple,
+} from '@umbraco-cms/backoffice/observable-api';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
-import { debounceTime } from '@umbraco-cms/backoffice/external/rxjs';
+import { debounceTime, firstValueFrom, filter } from '@umbraco-cms/backoffice/external/rxjs';
+
+// ---------------------------------------------------------------------------
+// Grid layout types (mirrors the block-grid types but kept local to avoid
+// importing from an internal package path)
+// ---------------------------------------------------------------------------
+interface GridLayoutAreaItem {
+	key: string;
+	items: Array<GridLayoutModel>;
+}
+
+interface GridLayoutModel extends UmbBlockLayoutBaseModel {
+	columnSpan: number;
+	rowSpan: number;
+	areas?: Array<GridLayoutAreaItem>;
+}
+
+/** Origin data that includes grid area targeting. */
+export interface VisualEditorBlockOriginData extends UmbBlockWorkspaceOriginData {
+	index: number;
+	parentUnique?: string | null;
+	areaKey?: string | null;
+}
 
 // ---------------------------------------------------------------------------
 // Concrete block manager for the visual editor.
+//
 // Extends the abstract base so it can be provided under UMB_BLOCK_MANAGER_CONTEXT.
+// Supports both block list (flat layout) and block grid (nested area layout).
 // ---------------------------------------------------------------------------
 class VisualEditorBlockManager extends UmbBlockManagerContext<
 	UmbBlockTypeBaseModel,
 	UmbBlockLayoutBaseModel,
-	UmbBlockWorkspaceOriginData
+	VisualEditorBlockOriginData
 > {
 	#inlineEditingMode = new UmbBooleanState(false);
 	readonly inlineEditingMode = this.#inlineEditingMode.asObservable();
@@ -45,19 +75,112 @@ class VisualEditorBlockManager extends UmbBlockManagerContext<
 	override async createWithPresets(
 		contentElementTypeKey: string,
 		partialLayoutEntry?: Omit<UmbBlockLayoutBaseModel, 'contentKey'>,
-		_originData?: UmbBlockWorkspaceOriginData,
+		_originData?: VisualEditorBlockOriginData,
 	) {
 		return await this._createBlockData(contentElementTypeKey, partialLayoutEntry);
+	}
+
+	// ---- Grid-aware setOneLayout -------------------------------------------
+	// If originData carries parentUnique + areaKey, insert into that area.
+	// Otherwise fall through to root-level insertion.
+	// ------------------------------------------------------------------------
+	override setOneLayout(layoutEntry: UmbBlockLayoutBaseModel, originData?: VisualEditorBlockOriginData) {
+		const index = originData?.index ?? -1;
+
+		if (originData?.parentUnique && originData?.areaKey) {
+			const updated = this.#appendLayoutEntryToArea(
+				layoutEntry as GridLayoutModel,
+				this._layouts.getValue() as Array<GridLayoutModel>,
+				originData.parentUnique,
+				originData.areaKey,
+				index,
+			);
+			if (updated) {
+				this._layouts.setValue(updated as Array<UmbBlockLayoutBaseModel>);
+				return;
+			}
+			// Parent not found — fall through to root
+			console.warn('[VisualEditorBlockManager] parent block not found for area insert, inserting at root');
+		}
+
+		this._layouts.appendOneAt(layoutEntry, index);
+	}
+
+	/**
+	 * Recursively walk layout entries to find the parent block, then insert
+	 * the new entry into the matching area's items array.
+	 *
+	 * Mirrors UmbBlockGridManagerContext.#appendLayoutEntryToArea.
+	 */
+	#appendLayoutEntryToArea(
+		insert: GridLayoutModel,
+		entries: Array<GridLayoutModel>,
+		parentId: string,
+		areaKey: string,
+		index: number,
+	): Array<GridLayoutModel> | undefined {
+		let i: number = entries.length;
+		while (i--) {
+			const currentEntry = entries[i];
+			if (currentEntry.contentKey === parentId) {
+				const areas =
+					currentEntry.areas?.map((x) =>
+						x.key === areaKey
+							? {
+									...x,
+									items: pushAtToUniqueArray(
+										[...x.items],
+										insert,
+										(x) => x.contentKey === insert.contentKey,
+										index,
+									),
+								}
+							: x,
+					) ?? [];
+				return appendToFrozenArray(
+					entries,
+					{ ...currentEntry, areas },
+					(x) => x.contentKey === currentEntry.contentKey,
+				);
+			}
+			if (currentEntry.areas) {
+				let y: number = currentEntry.areas.length;
+				while (y--) {
+					const correctedAreaItems = this.#appendLayoutEntryToArea(
+						insert,
+						currentEntry.areas[y].items,
+						parentId,
+						areaKey,
+						index,
+					);
+					if (correctedAreaItems) {
+						const area = currentEntry.areas[y];
+						return appendToFrozenArray(
+							entries,
+							{
+								...currentEntry,
+								areas: appendToFrozenArray(
+									currentEntry.areas,
+									{ ...area, items: correctedAreaItems },
+									(z) => z.key === area.key,
+								),
+							},
+							(x) => x.contentKey === currentEntry.contentKey,
+						);
+					}
+				}
+			}
+		}
+		return undefined;
 	}
 
 	insert(
 		layoutEntry: UmbBlockLayoutBaseModel,
 		content: UmbBlockDataModel,
 		settings: UmbBlockDataModel | undefined,
-		originData: UmbBlockWorkspaceOriginData,
+		originData: VisualEditorBlockOriginData,
 	) {
-		const index = (originData as { index?: number }).index ?? -1;
-		this._layouts.appendOneAt(layoutEntry, index);
+		this.setOneLayout(layoutEntry, originData);
 		this.insertBlockData(layoutEntry, content, settings, originData);
 		this.notifyBlockInserted(layoutEntry, originData);
 		return true;
@@ -76,7 +199,7 @@ class VisualEditorBlockEntries extends UmbBlockEntriesContext<
 	typeof UMB_BLOCK_MANAGER_CONTEXT.TYPE,
 	UmbBlockTypeBaseModel,
 	UmbBlockLayoutBaseModel,
-	UmbBlockWorkspaceOriginData
+	VisualEditorBlockOriginData
 > {
 	public readonly canCreate = new UmbBooleanState(true).asObservable();
 
@@ -115,7 +238,7 @@ class VisualEditorBlockEntries extends UmbBlockEntriesContext<
 	override async create(
 		contentElementTypeKey: string,
 		_layoutEntry?: Omit<UmbBlockLayoutBaseModel, 'contentKey'>,
-		originData?: UmbBlockWorkspaceOriginData,
+		originData?: VisualEditorBlockOriginData,
 	): Promise<UmbBlockDataObjectModel<UmbBlockLayoutBaseModel> | undefined> {
 		await this._retrieveManager;
 		return await this._manager?.createWithPresets(contentElementTypeKey, _layoutEntry, originData);
@@ -125,7 +248,7 @@ class VisualEditorBlockEntries extends UmbBlockEntriesContext<
 		layoutEntry: UmbBlockLayoutBaseModel,
 		content: UmbBlockDataModel,
 		settings: UmbBlockDataModel | undefined,
-		originData: UmbBlockWorkspaceOriginData,
+		originData: VisualEditorBlockOriginData,
 	): Promise<boolean> {
 		await this._retrieveManager;
 		return (
@@ -135,7 +258,7 @@ class VisualEditorBlockEntries extends UmbBlockEntriesContext<
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	protected override async _insertFromPropertyValue(_value: any, originData: UmbBlockWorkspaceOriginData) {
+	protected override async _insertFromPropertyValue(_value: any, originData: VisualEditorBlockOriginData) {
 		// Not used in the visual editor flow
 		return originData;
 	}
@@ -147,6 +270,9 @@ class VisualEditorBlockEntries extends UmbBlockEntriesContext<
 // Creates a per-property block manager + entries context on a host element,
 // registers the workspace modal route, and syncs manager state back to the
 // visual editor via a callback.
+//
+// Supports both block list (flat) and block grid (nested areas).
+// Accepts an optional variant ID for multilingual content.
 // ---------------------------------------------------------------------------
 
 export type BlockBridgeValueChangedCallback = (propertyAlias: string, value: BlockValue) => void;
@@ -164,6 +290,8 @@ export interface BlockBridgeConfig {
 	config: UmbPropertyEditorConfig;
 	/** Called when the manager state changes after editing. */
 	onValueChanged: BlockBridgeValueChangedCallback;
+	/** Optional variant ID for culture/segment-aware blocks. */
+	variantId?: UmbVariantId;
 }
 
 export class VisualEditorBlockBridge extends UmbControllerBase {
@@ -189,6 +317,10 @@ export class VisualEditorBlockBridge extends UmbControllerBase {
 		this.#manager.setBlockTypes(config.blockTypes);
 		this.#manager.setEditorConfiguration(new UmbPropertyEditorConfigCollection(config.config));
 
+		// 1b. Set variant ID — the workspace context requires a non-undefined variantId
+		// from the manager to initialize. Default to invariant if none is provided.
+		this.#manager.setVariantId(config.variantId ?? UmbVariantId.CreateInvariant());
+
 		// 2. Create entries — consumes UMB_BLOCK_MANAGER_CONTEXT from host
 		this.#entries = new VisualEditorBlockEntries(config.host);
 
@@ -197,7 +329,12 @@ export class VisualEditorBlockBridge extends UmbControllerBase {
 			.addAdditionalPath('veBlock')
 			.onSetup(() => {
 				return {
-					data: { entityType: 'block', preset: {}, baseDataPath: undefined as unknown as string },
+					data: {
+						entityType: 'block',
+						preset: {},
+						baseDataPath: undefined as unknown as string,
+						originData: { index: -1 },
+					},
 					modal: { size: 'medium' },
 				};
 			})
@@ -244,6 +381,8 @@ export class VisualEditorBlockBridge extends UmbControllerBase {
 	 * Call this before opening a workspace to ensure the manager has fresh data.
 	 */
 	loadValue(blockValue: BlockValue) {
+		this.#initialized = false;
+
 		const layouts = blockValue.layout[this.#editorSchemaAlias] ?? [];
 		this.#manager.setLayouts(layouts as Array<UmbBlockLayoutBaseModel>);
 		this.#manager.setContents(blockValue.contentData as Array<UmbBlockDataModel>);
@@ -258,18 +397,37 @@ export class VisualEditorBlockBridge extends UmbControllerBase {
 	}
 
 	/**
+	 * Update the variant ID (e.g. when the user switches culture in the workspace).
+	 */
+	setVariantId(variantId: UmbVariantId | undefined) {
+		this.#manager.setVariantId(variantId ?? UmbVariantId.CreateInvariant());
+	}
+
+	/**
+	 * Wait for the workspace path to become available.
+	 * The modal route registration is async (consumes UMB_ROUTE_CONTEXT),
+	 * so the path may not be ready immediately after bridge construction.
+	 */
+	async #waitForWorkspacePath(): Promise<string> {
+		const current = this.#workspacePath.getValue();
+		if (current) return current;
+		return firstValueFrom(
+			(this.#workspacePath.asObservable() as Observable<string | undefined>).pipe(
+				filter((p): p is string => !!p),
+			),
+		);
+	}
+
+	/**
 	 * Open the block workspace to edit an existing block.
 	 * @returns true if navigation was initiated.
 	 */
-	openEdit(blockKey: string): boolean {
-		const path = this.#workspacePath.getValue();
-		if (!path) {
-			console.warn('[VisualEditorBlockBridge] workspace path not ready');
-			return false;
-		}
+	async openEdit(blockKey: string): Promise<boolean> {
+		const path = await this.#waitForWorkspacePath();
 
-		// Navigate to the workspace edit route
-		const editPath = `${path}edit/${encodeURIComponent(blockKey)}`;
+		// Navigate to the workspace edit route — must include /view/content
+		// so the workspace's internal router matches the content view.
+		const editPath = `${path}edit/${encodeURIComponent(blockKey)}/view/content`;
 		history.pushState({}, '', editPath);
 		return true;
 	}
@@ -278,12 +436,8 @@ export class VisualEditorBlockBridge extends UmbControllerBase {
 	 * Open the block workspace to create a new block.
 	 * @returns true if navigation was initiated.
 	 */
-	openCreate(contentElementTypeKey: string): boolean {
-		const path = this.#workspacePath.getValue();
-		if (!path) {
-			console.warn('[VisualEditorBlockBridge] workspace path not ready');
-			return false;
-		}
+	async openCreate(contentElementTypeKey: string): Promise<boolean> {
+		const path = await this.#waitForWorkspacePath();
 
 		const createPath = `${path}create/${encodeURIComponent(contentElementTypeKey)}`;
 		history.pushState({}, '', createPath);

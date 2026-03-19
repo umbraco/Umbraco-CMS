@@ -33,6 +33,8 @@ import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import type { HubConnection } from '@umbraco-cms/backoffice/external/signalr';
 import type { UmbPropertyEditorConfig } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
+import { UMB_VARIANT_CONTEXT } from '@umbraco-cms/backoffice/variant';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 /**
  * Visual editor workspace view — renders as a full-screen overlay on top of the backoffice.
@@ -59,6 +61,7 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 	// --- Block bridge (per-property block manager + entries for workspace integration) ---
 	#blockBridge?: VisualEditorBlockBridge;
 	#blockBridgePropertyAlias?: string;
+	#currentVariantId?: UmbVariantId;
 
 	/**
 	 * Ensure a block bridge exists for the given property.
@@ -86,6 +89,7 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 
 		if (this.#blockBridge && this.#blockBridgePropertyAlias === propertyAlias) {
 			// Reuse existing bridge — just reload with fresh data
+			this.#blockBridge.setVariantId(this.#currentVariantId);
 			this.#blockBridge.loadValue(blockValue);
 			return this.#blockBridge;
 		}
@@ -99,6 +103,7 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 			editorSchemaAlias: layoutKey,
 			blockTypes,
 			config,
+			variantId: this.#currentVariantId,
 			onValueChanged: async (alias, value) => {
 				await this.#setPropertyValue(alias, value);
 				await this.#saveAndRefresh();
@@ -392,6 +397,19 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 
 		this.consumeContext(UMB_SERVER_CONTEXT, (serverContext) => {
 			this.#serverUrl = serverContext?.getServerUrl() ?? '';
+		});
+
+		// Observe the variant context so the bridge can set the correct culture/segment
+		this.consumeContext(UMB_VARIANT_CONTEXT, (variantContext) => {
+			this.observe(
+				variantContext?.displayVariantId,
+				(variantId) => {
+					this.#currentVariantId = variantId;
+					// Keep the active bridge in sync
+					this.#blockBridge?.setVariantId(variantId);
+				},
+				'observeVariantId',
+			);
 		});
 	}
 
@@ -742,7 +760,7 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 
 	// --- Block click → open block workspace via bridge ---
 
-	#onBlockClicked(blockKey: string, _contentTypeAlias: string) {
+	async #onBlockClicked(blockKey: string, _contentTypeAlias: string) {
 		this.#selectedBlockKey = blockKey;
 		this.#selectedPropertyAlias = undefined;
 
@@ -756,7 +774,7 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 		const bridge = this.#ensureBridge(found.propertyAlias, found.blockValue);
 
 		console.debug('[VisualEditor] opening block workspace via bridge, blockKey:', blockKey);
-		bridge.openEdit(blockKey);
+		await bridge.openEdit(blockKey);
 	}
 
 	async #handlePropertySubmit(alias: string, result: { values: Array<{ alias: string; value: unknown }> }) {
