@@ -34,7 +34,7 @@
 	// =====================================================================
 
 	/** CSS selector matching block elements annotated by Razor partials. */
-	const BLOCK_SELECTOR = '[data-umb-block-key], [data-element-key]';
+	const BLOCK_SELECTOR = ':is([data-umb-block-key], [data-element-key])';
 
 	/** CSS selector matching property elements annotated by Razor views. */
 	const PROP_SELECTOR = '[data-umb-property]';

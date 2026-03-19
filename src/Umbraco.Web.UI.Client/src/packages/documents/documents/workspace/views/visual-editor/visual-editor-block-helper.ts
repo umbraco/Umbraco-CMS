@@ -184,11 +184,11 @@ export function removeBlockFromValue(blockValue: BlockValue, blockKey: string): 
 	const layoutKey = Object.keys(blockValue.layout)[0];
 	const existingLayout = layoutKey ? (blockValue.layout[layoutKey] ?? []) : [];
 
-	// Find the layout entry to get the settingsKey before removing
-	const layoutEntry = existingLayout.find((entry) => entry.contentKey === blockKey);
+	// Find the layout entry (may be nested in grid areas) to get the settingsKey before removing
+	const layoutEntry = findLayoutEntryRecursive(existingLayout, blockKey);
 	const settingsKey = layoutEntry?.settingsKey;
 
-	const newLayout = existingLayout.filter((entry) => entry.contentKey !== blockKey);
+	const newLayout = removeLayoutEntryRecursive(existingLayout, blockKey);
 
 	return {
 		...blockValue,
@@ -199,6 +199,38 @@ export function removeBlockFromValue(blockValue: BlockValue, blockKey: string): 
 			: blockValue.settingsData,
 		expose: blockValue.expose.filter((e) => e.contentKey !== blockKey),
 	};
+}
+
+/** Recursively find a layout entry by contentKey, searching through block grid areas. */
+function findLayoutEntryRecursive(entries: BlockValueLayout[], blockKey: string): BlockValueLayout | undefined {
+	for (const entry of entries) {
+		if (entry.contentKey === blockKey) return entry;
+		const areas = entry.areas as Array<{ key: string; items: BlockValueLayout[] }> | undefined;
+		if (areas) {
+			for (const area of areas) {
+				const found = findLayoutEntryRecursive(area.items, blockKey);
+				if (found) return found;
+			}
+		}
+	}
+	return undefined;
+}
+
+/** Recursively remove a layout entry by contentKey, searching through block grid areas. */
+function removeLayoutEntryRecursive(entries: BlockValueLayout[], blockKey: string): BlockValueLayout[] {
+	return entries
+		.filter((entry) => entry.contentKey !== blockKey)
+		.map((entry) => {
+			const areas = entry.areas as Array<{ key: string; items: BlockValueLayout[] }> | undefined;
+			if (!areas) return entry;
+			return {
+				...entry,
+				areas: areas.map((area) => ({
+					...area,
+					items: removeLayoutEntryRecursive(area.items, blockKey),
+				})),
+			};
+		});
 }
 
 /**

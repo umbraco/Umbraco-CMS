@@ -25,6 +25,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_BLOCK_CATALOGUE_MODAL } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockCatalogueModalData, UmbBlockCatalogueModalValue } from '@umbraco-cms/backoffice/block';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
+import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { UmbPreviewRepository } from '@umbraco-cms/backoffice/preview';
 import { HubConnectionBuilder } from '@umbraco-cms/backoffice/external/signalr';
 import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
@@ -129,11 +130,9 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 		.onSetup((params) => {
 			const alias = params.propertyAlias as string;
 			this.#editingPropertyAlias = alias;
-			console.debug('[VisualEditor] property modal onSetup, alias:', alias);
 
 			const structure = this.#propertyStructures.find((p) => p.alias === alias);
 			if (!structure?.editorUiAlias) {
-				console.warn('[VisualEditor] property modal: no structure/editorUiAlias for', alias);
 				return false;
 			}
 
@@ -171,12 +170,9 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 		.onSetup(async (params) => {
 			const blockKey = params.blockKey as string;
 			this.#editingBlockKey = blockKey;
-			console.debug('[VisualEditor] block modal onSetup, blockKey:', blockKey);
-
 			const allValues = this.#getAllValues();
 			const found = findBlockInValues(allValues, blockKey);
 			if (!found) {
-				console.warn('[VisualEditor] block modal: block not found in values', blockKey);
 				return false;
 			}
 
@@ -186,7 +182,6 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 				groups: blockGroups,
 			} = await this.#resolveBlockPropertyStructures(found.block.contentTypeKey);
 
-			console.debug('[VisualEditor] block modal: resolved', blockProperties.length, 'properties for', blockName);
 
 			const blockValues = (found.block.values || []).map((v: { alias: string; value: unknown }) => ({
 				alias: v.alias,
@@ -226,7 +221,6 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 
 			// Skip if nothing to edit (no content properties and no settings)
 			if (blockProperties.length === 0 && !settingsProperties?.length) {
-				console.warn('[VisualEditor] block modal: no editable properties, skipping');
 				return false;
 			}
 
@@ -243,7 +237,6 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 				},
 				value: { values: [] },
 			};
-			console.debug('[VisualEditor] block modal: returning setup data', result);
 			return result;
 		})
 		.onSubmit((value) => {
@@ -272,17 +265,10 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 		.addAdditionalPath('_catalogue/:insertIndex')
 		.onSetup(async (params) => {
 			if (!this.#pendingAdd) {
-				console.warn('[VisualEditor] catalogue onSetup: no pendingAdd');
 				return false;
 			}
 
 			const propStructure = this.#propertyStructures.find((p) => p.alias === this.#pendingAdd!.propertyAlias);
-			console.debug(
-				'[VisualEditor] catalogue onSetup: propertyAlias:',
-				this.#pendingAdd!.propertyAlias,
-				'config:',
-				propStructure?.config,
-			);
 
 			if (!propStructure?.config) return false;
 
@@ -291,8 +277,6 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 			)?.value as
 				| Array<{ contentElementTypeKey: string; label?: string; forceHideContentEditorInOverlay?: boolean }>
 				| undefined;
-
-			console.debug('[VisualEditor] catalogue onSetup: blocksConfig:', blocksConfig);
 
 			if (!blocksConfig || blocksConfig.length === 0) return false;
 
@@ -522,16 +506,10 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 	async #resolveBlockPropertyStructures(
 		contentTypeKey: string,
 	): Promise<{ name: string; properties: UmbVisualEditorPropertyInfo[]; groups: UmbVisualEditorPropertyGroup[] }> {
-		console.debug('[VisualEditor] resolveBlockPropertyStructures for contentTypeKey:', contentTypeKey);
-		const { data, error } = await tryExecute(
+		const { data } = await tryExecute(
 			this,
 			DocumentTypeService.getDocumentTypeById({ path: { id: contentTypeKey } }),
 		);
-		console.debug('[VisualEditor] DocumentTypeService response:', {
-			name: data?.name,
-			propertyCount: data?.properties?.length,
-			error,
-		});
 		if (!data?.properties) return { name: 'Block', properties: [], groups: [] };
 
 		const groups: UmbVisualEditorPropertyGroup[] = (data.containers ?? [])
@@ -772,8 +750,6 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 		}
 
 		const bridge = this.#ensureBridge(found.propertyAlias, found.blockValue);
-
-		console.debug('[VisualEditor] opening block workspace via bridge, blockKey:', blockKey);
 		await bridge.openEdit(blockKey);
 	}
 
@@ -899,6 +875,18 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 		const allValues = this.#getAllValues();
 		const found = findBlockInValues(allValues, blockKey);
 		if (!found) return;
+
+		const { name: blockName } = await this.#resolveBlockPropertyStructures(found.block.contentTypeKey);
+		try {
+			await umbConfirmModal(this, {
+				headline: this.localize.term('blockEditor_confirmDeleteBlockTitle', blockName),
+				content: this.localize.term('blockEditor_confirmDeleteBlockMessage', blockName),
+				confirmLabel: this.localize.term('general_delete'),
+				color: 'danger',
+			});
+		} catch {
+			return; // User cancelled
+		}
 
 		const updatedValue = removeBlockFromValue(found.blockValue, blockKey);
 		await this.#setPropertyValue(found.propertyAlias, updatedValue);

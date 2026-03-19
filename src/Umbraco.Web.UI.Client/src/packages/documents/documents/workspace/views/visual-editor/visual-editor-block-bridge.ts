@@ -103,7 +103,57 @@ class VisualEditorBlockManager extends UmbBlockManagerContext<
 			console.warn('[VisualEditorBlockManager] parent block not found for area insert, inserting at root');
 		}
 
+		// For blocks that may be nested inside grid areas, try updating in-place
+		// before falling through to root-level append (which would duplicate).
+		const current = this._layouts.getValue() as Array<GridLayoutModel>;
+		const updatedInPlace = this.#updateLayoutEntryInPlace(
+			layoutEntry as GridLayoutModel,
+			current,
+		);
+		if (updatedInPlace) {
+			this._layouts.setValue(updatedInPlace as Array<UmbBlockLayoutBaseModel>);
+			return;
+		}
+
 		this._layouts.appendOneAt(layoutEntry, index);
+	}
+
+	/**
+	 * Recursively find an existing layout entry by contentKey and replace it
+	 * in-place, preserving its position within any nested area structure.
+	 */
+	#updateLayoutEntryInPlace(
+		entry: GridLayoutModel,
+		entries: Array<GridLayoutModel>,
+	): Array<GridLayoutModel> | undefined {
+		for (let i = 0; i < entries.length; i++) {
+			const current = entries[i];
+			if (current.contentKey === entry.contentKey) {
+				// Found at this level — replace via appendToFrozenArray
+				return appendToFrozenArray(entries, entry, (x) => x.contentKey === entry.contentKey);
+			}
+			if (current.areas) {
+				for (let y = 0; y < current.areas.length; y++) {
+					const updatedItems = this.#updateLayoutEntryInPlace(entry, current.areas[y].items);
+					if (updatedItems) {
+						const area = current.areas[y];
+						return appendToFrozenArray(
+							entries,
+							{
+								...current,
+								areas: appendToFrozenArray(
+									current.areas,
+									{ ...area, items: updatedItems },
+									(z) => z.key === area.key,
+								),
+							},
+							(x) => x.contentKey === current.contentKey,
+						);
+					}
+				}
+			}
+		}
+		return undefined;
 	}
 
 	/**
@@ -225,6 +275,35 @@ class VisualEditorBlockEntries extends UmbBlockEntriesContext<
 			},
 			'observeThisLayouts',
 		);
+	}
+
+	/**
+	 * Override layoutOf to recursively search through block grid areas.
+	 * The base implementation only searches the top-level array, which misses
+	 * blocks nested inside area items.
+	 */
+	override layoutOf(contentKey: string) {
+		return this._layoutEntries.asObservablePart((source) => this.#findLayoutRecursive(source, contentKey));
+	}
+	override getLayoutOf(contentKey: string) {
+		return this.#findLayoutRecursive(this._layoutEntries.getValue(), contentKey);
+	}
+
+	#findLayoutRecursive(
+		entries: Array<UmbBlockLayoutBaseModel>,
+		contentKey: string,
+	): UmbBlockLayoutBaseModel | undefined {
+		for (const entry of entries) {
+			if (entry.contentKey === contentKey) return entry;
+			const gridEntry = entry as GridLayoutModel;
+			if (gridEntry.areas) {
+				for (const area of gridEntry.areas) {
+					const found = this.#findLayoutRecursive(area.items as Array<UmbBlockLayoutBaseModel>, contentKey);
+					if (found) return found;
+				}
+			}
+		}
+		return undefined;
 	}
 
 	override getPathForCreateBlock(_index: number): string | undefined {
