@@ -1,4 +1,5 @@
-import type { BlockValue } from './visual-editor-block-helper.js';
+import type { BlockValue, BlockValueLayout } from './visual-editor-block-helper.js';
+import { findLayoutEntryRecursive } from './visual-editor-block-helper.js';
 import {
 	UmbBlockManagerContext,
 	UMB_BLOCK_MANAGER_CONTEXT,
@@ -283,27 +284,12 @@ class VisualEditorBlockEntries extends UmbBlockEntriesContext<
 	 * blocks nested inside area items.
 	 */
 	override layoutOf(contentKey: string) {
-		return this._layoutEntries.asObservablePart((source) => this.#findLayoutRecursive(source, contentKey));
+		return this._layoutEntries.asObservablePart((source) =>
+			findLayoutEntryRecursive(source as Array<BlockValueLayout>, contentKey),
+		);
 	}
 	override getLayoutOf(contentKey: string) {
-		return this.#findLayoutRecursive(this._layoutEntries.getValue(), contentKey);
-	}
-
-	#findLayoutRecursive(
-		entries: Array<UmbBlockLayoutBaseModel>,
-		contentKey: string,
-	): UmbBlockLayoutBaseModel | undefined {
-		for (const entry of entries) {
-			if (entry.contentKey === contentKey) return entry;
-			const gridEntry = entry as GridLayoutModel;
-			if (gridEntry.areas) {
-				for (const area of gridEntry.areas) {
-					const found = this.#findLayoutRecursive(area.items as Array<UmbBlockLayoutBaseModel>, contentKey);
-					if (found) return found;
-				}
-			}
-		}
-		return undefined;
+		return findLayoutEntryRecursive(this._layoutEntries.getValue() as Array<BlockValueLayout>, contentKey);
 	}
 
 	override getPathForCreateBlock(_index: number): string | undefined {

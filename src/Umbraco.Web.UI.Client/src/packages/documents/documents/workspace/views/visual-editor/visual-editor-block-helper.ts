@@ -1,4 +1,5 @@
 import { UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS } from '@umbraco-cms/backoffice/block-grid';
+import { UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS } from '@umbraco-cms/backoffice/block-list';
 
 /**
  * Helper for reading and manipulating block value JSON in the workspace context.
@@ -202,7 +203,7 @@ export function removeBlockFromValue(blockValue: BlockValue, blockKey: string): 
 }
 
 /** Recursively find a layout entry by contentKey, searching through block grid areas. */
-function findLayoutEntryRecursive(entries: BlockValueLayout[], blockKey: string): BlockValueLayout | undefined {
+export function findLayoutEntryRecursive(entries: BlockValueLayout[], blockKey: string): BlockValueLayout | undefined {
 	for (const entry of entries) {
 		if (entry.contentKey === blockKey) return entry;
 		const areas = entry.areas as Array<{ key: string; items: BlockValueLayout[] }> | undefined;
@@ -241,7 +242,7 @@ export function addBlockToValue(
 	blockValue: BlockValue,
 	contentTypeKey: string,
 	insertIndex: number,
-	editorAlias: string = 'Umbraco.BlockList',
+	editorAlias: string = UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS,
 	blockTypeAreas?: Array<{ key: string }>,
 	settingsElementTypeKey?: string,
 ): { updatedValue: BlockValue; contentKey: string } {
@@ -453,7 +454,7 @@ export function mergeBlockValueInto(
 	pasted: BlockValue,
 	insertIndex: number,
 ): BlockValue {
-	const layoutKey = Object.keys(target.layout)[0] ?? Object.keys(pasted.layout)[0] ?? 'Umbraco.BlockList';
+	const layoutKey = Object.keys(target.layout)[0] ?? Object.keys(pasted.layout)[0] ?? UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS;
 	const existingLayout = target.layout[layoutKey] ?? [];
 	const pastedLayout = pasted.layout[layoutKey] ?? [];
 

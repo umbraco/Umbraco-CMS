@@ -32,6 +32,7 @@ import {
 	UmbClipboardPastePropertyValueTranslatorValueResolver,
 } from '@umbraco-cms/backoffice/clipboard';
 import { UmbPropertyValueCloneController } from '@umbraco-cms/backoffice/property';
+import { UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS } from '@umbraco-cms/backoffice/block-list';
 import { UmbPreviewRepository } from '@umbraco-cms/backoffice/preview';
 import { HubConnectionBuilder } from '@umbraco-cms/backoffice/external/signalr';
 import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
@@ -65,6 +66,12 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 	#editingPropertyAlias?: string;
 	#editingBlockKey?: string;
 
+	// Cache resolved block property structures by content type key to avoid repeated API calls
+	#blockStructureCache = new Map<
+		string,
+		{ name: string; properties: UmbVisualEditorPropertyInfo[]; groups: UmbVisualEditorPropertyGroup[] }
+	>();
+
 	// --- Block bridge (per-property block manager + entries for workspace integration) ---
 	#blockBridge?: VisualEditorBlockBridge;
 	#blockBridgePropertyAlias?: string;
@@ -92,7 +99,7 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 		}));
 
 		// Determine the editor schema alias from the layout keys
-		const layoutKey = Object.keys(blockValue.layout)[0] ?? 'Umbraco.BlockList';
+		const layoutKey = Object.keys(blockValue.layout)[0] ?? UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS;
 
 		if (this.#blockBridge && this.#blockBridgePropertyAlias === propertyAlias) {
 			// Reuse existing bridge — just reload with fresh data
@@ -544,6 +551,9 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 	async #resolveBlockPropertyStructures(
 		contentTypeKey: string,
 	): Promise<{ name: string; properties: UmbVisualEditorPropertyInfo[]; groups: UmbVisualEditorPropertyGroup[] }> {
+		const cached = this.#blockStructureCache.get(contentTypeKey);
+		if (cached) return cached;
+
 		const { data } = await tryExecute(
 			this,
 			DocumentTypeService.getDocumentTypeById({ path: { id: contentTypeKey } }),
@@ -582,7 +592,9 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 			});
 		}
 
-		return { name: data.name ?? 'Block', properties: result, groups };
+		const resolved = { name: data.name ?? 'Block', properties: result, groups };
+		this.#blockStructureCache.set(contentTypeKey, resolved);
+		return resolved;
 	}
 
 	// --- Iframe ---
@@ -924,7 +936,7 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 		const valueResolver = new UmbClipboardPastePropertyValueTranslatorValueResolver<BlockValue>(this);
 
 		// Determine the schema alias from the existing layout key
-		const layoutKey = Object.keys(propertyValue.layout)[0] ?? 'Umbraco.BlockList';
+		const layoutKey = Object.keys(propertyValue.layout)[0] ?? UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS;
 
 		let updatedValue = propertyValue;
 
