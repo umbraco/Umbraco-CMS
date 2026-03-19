@@ -1,7 +1,7 @@
 import { UMB_COLLECTION_CONTEXT } from '../default/index.js';
 import type { UmbActiveCollectionFacetFilterModel } from '../filter/facet-filter/collection-facet-filter.manager.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, customElement, state, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 

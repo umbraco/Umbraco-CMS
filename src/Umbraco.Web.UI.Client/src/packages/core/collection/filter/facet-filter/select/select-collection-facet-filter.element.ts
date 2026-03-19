@@ -34,6 +34,9 @@ export class UmbSelectCollectionFacetFilterElement extends UmbLitElement {
 	@state()
 	private _hasMore = false;
 
+	@state()
+	private _comboboxSearch: string = '';
+
 	#api?: UmbSelectCollectionFacetFilterApi | undefined;
 	public get api(): UmbSelectCollectionFacetFilterApi | undefined {
 		return this.#api;
@@ -72,6 +75,17 @@ export class UmbSelectCollectionFacetFilterElement extends UmbLitElement {
 		this.#api?.setValue([target.value]);
 	}
 
+	#onComboboxSearch(event: Event) {
+		const target = event.target as any;
+		this._comboboxSearch = target.search ?? '';
+	}
+
+	get #filteredOptions() {
+		if (!this._comboboxSearch) return this._options;
+		const text = this._comboboxSearch.toLowerCase();
+		return this._options.filter((option) => option.label.toLowerCase().includes(text));
+	}
+
 	#onLoadMore() {
 		this.#api?.loadMoreOptions();
 	}
@@ -89,6 +103,7 @@ export class UmbSelectCollectionFacetFilterElement extends UmbLitElement {
 	}
 
 	protected override render() {
+		console.log('options count:', this._options.length);
 		const inline = this._options.length < INLINE_THRESHOLD && !this._hasMore;
 		if (inline) {
 			return this._multiple ? this.#renderCheckboxList() : this.#renderRadioList();
@@ -136,10 +151,14 @@ export class UmbSelectCollectionFacetFilterElement extends UmbLitElement {
 		return html`
 			<div class="filter">
 				<span class="label">${this.#manifest?.meta?.label ?? 'Filter'}:</span>
-				<uui-combobox value=${this._value[0] ?? ''} @change=${this.#onComboboxSelect} placeholder="Placeholder">
+				<uui-combobox
+					value=${this._value[0] ?? ''}
+					@change=${this.#onComboboxSelect}
+					@search=${this.#onComboboxSearch}
+					placeholder="Placeholder">
 					<uui-combobox-list>
 						${repeat(
-							this._options,
+							this.#filteredOptions,
 							(option) => option.value,
 							(option) => html`
 								<uui-combobox-list-option value=${option.value}>${option.label}</uui-combobox-list-option>
