@@ -602,7 +602,7 @@ export class DataTypeApiHelper {
     return await this.save(blockGrid);
   }
 
-  async createBlockGridWithAnAreaWithSpecifiedAllowanceInABlock(blockGridName: string, contentElementTypeId: string, specifiedAllowanceElementTypeId: string, areaAlias: string = 'area', columnSpan: number = 6, rowSpan: number = 1) {
+  async createBlockGridWithAnAreaWithSpecifiedAllowanceInABlock(blockGridName: string, contentElementTypeId: string, specifiedAllowanceElementTypeId: string, areaAlias: string = 'area', createLabel: string = 'CreateLabel', columnSpan: number = 6, rowSpan: number = 1) {
     await this.ensureNameNotExists(blockGridName);
 
     const blockGrid = new BlockGridDataTypeBuilder()
@@ -612,6 +612,7 @@ export class DataTypeApiHelper {
         .withAllowAtRoot(true)
         .addArea()
           .withAlias(areaAlias)
+          .withCreateLabel(createLabel)
           .withColumnSpan(columnSpan)
           .withRowSpan(rowSpan)
           .addSpecifiedAllowance()
@@ -628,7 +629,7 @@ export class DataTypeApiHelper {
     return await this.save(blockGrid);
   }
 
-  async createBlockGridWithAnAreaWithSpecifiedAllowanceWithMinMaxInABlock(blockGridName: string, contentElementTypeId: string, specifiedAllowanceElementTypeId: string, minAllowed: number, maxAllowed: number, areaAlias: string = 'area', columnSpan: number = 6, rowSpan: number = 1) {
+  async createBlockGridWithAnAreaWithSpecifiedAllowanceWithMinMaxInABlock(blockGridName: string, contentElementTypeId: string, specifiedAllowanceElementTypeId: string, minAllowed: number, maxAllowed: number, areaAlias: string = 'area', createLabel: string = 'CreateLabel', columnSpan: number = 6, rowSpan: number = 1) {
     await this.ensureNameNotExists(blockGridName);
 
     const blockGrid = new BlockGridDataTypeBuilder()
@@ -638,6 +639,7 @@ export class DataTypeApiHelper {
         .withAllowAtRoot(true)
         .addArea()
           .withAlias(areaAlias)
+          .withCreateLabel(createLabel)
           .withColumnSpan(columnSpan)
           .withRowSpan(rowSpan)
           .addSpecifiedAllowance()
@@ -652,7 +654,41 @@ export class DataTypeApiHelper {
         .withAllowInAreas(true)
         .done()
       .build();
-    
+
+    return await this.save(blockGrid);
+  }
+
+  async createBlockGridWithAnAreaWithTwoSpecifiedAllowancesInABlockWithCreateLabel(blockGridName: string, contentElementTypeId: string, firstSpecifiedAllowanceElementTypeId: string, secondSpecifiedAllowanceElementTypeId: string, areaAlias: string = 'area', createLabel: string = 'CreateLabel', columnSpan: number = 6, rowSpan: number = 1) {
+    await this.ensureNameNotExists(blockGridName);
+
+    const blockGrid = new BlockGridDataTypeBuilder()
+      .withName(blockGridName)
+      .addBlock()
+        .withContentElementTypeKey(contentElementTypeId)
+        .withAllowAtRoot(true)
+        .addArea()
+          .withAlias(areaAlias)
+          .withCreateLabel(createLabel)
+          .withColumnSpan(columnSpan)
+          .withRowSpan(rowSpan)
+          .addSpecifiedAllowance()
+            .withElementTypeKey(firstSpecifiedAllowanceElementTypeId)
+            .done()
+          .addSpecifiedAllowance()
+            .withElementTypeKey(secondSpecifiedAllowanceElementTypeId)
+            .done()
+          .done()
+        .done()
+      .addBlock()
+        .withContentElementTypeKey(firstSpecifiedAllowanceElementTypeId)
+        .withAllowInAreas(true)
+        .done()
+      .addBlock()
+        .withContentElementTypeKey(secondSpecifiedAllowanceElementTypeId)
+        .withAllowInAreas(true)
+        .done()
+      .build();
+
     return await this.save(blockGrid);
   }
 
