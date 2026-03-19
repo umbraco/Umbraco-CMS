@@ -193,7 +193,7 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 	}
 
 	#renderMain() {
-		return this._manager ? (this._openClipboard ? this.#renderClipboard() : this.#renderCreateEmpty()) : nothing;
+		return this._openClipboard ? this.#renderClipboard() : this.#renderCreateEmpty();
 	}
 
 	#renderClipboard() {
@@ -238,7 +238,7 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 
 	#renderBlockTypeCard(block: UmbBlockTypeItemWithGroupKey) {
 		const href =
-			this._workspacePath && this._manager!.getContentTypeHasProperties(block.contentElementTypeKey)
+			this._workspacePath && this._manager?.getContentTypeHasProperties(block.contentElementTypeKey)
 				? `${this._workspacePath}create/${block.contentElementTypeKey}`
 				: undefined;
 
