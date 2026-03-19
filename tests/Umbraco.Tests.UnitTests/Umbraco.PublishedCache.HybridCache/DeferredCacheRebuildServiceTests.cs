@@ -12,6 +12,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.PublishedCache.HybridCache;
 [TestFixture]
 public class DeferredCacheRebuildServiceTests
 {
+    private static readonly TimeSpan TestTimeout = TimeSpan.FromSeconds(5);
+
     private Mock<IDocumentCacheService> _documentCacheService = null!;
     private Mock<IMediaCacheService> _mediaCacheService = null!;
     private DeferredCacheRebuildService _service = null!;
@@ -27,9 +29,6 @@ public class DeferredCacheRebuildServiceTests
             Mock.Of<ILogger<DeferredCacheRebuildService>>());
     }
 
-    [TearDown]
-    public void TearDown() => _service.Dispose();
-
     [Test]
     public async Task QueueContentTypeRebuild_Calls_Rebuild_And_RebuildMemoryCache()
     {
@@ -40,9 +39,7 @@ public class DeferredCacheRebuildServiceTests
 
         // Act
         _service.QueueContentTypeRebuild([1, 2]);
-
-        // Allow background task to complete
-        await Task.Delay(500);
+        await WaitForProcessingAsync();
 
         // Assert
         _documentCacheService.Verify(
@@ -63,9 +60,7 @@ public class DeferredCacheRebuildServiceTests
 
         // Act
         _service.QueueMediaTypeRebuild([10, 20]);
-
-        // Allow background task to complete
-        await Task.Delay(500);
+        await WaitForProcessingAsync();
 
         // Assert
         _mediaCacheService.Verify(
@@ -87,9 +82,7 @@ public class DeferredCacheRebuildServiceTests
         // Act — queue the same ID twice
         _service.QueueContentTypeRebuild([1]);
         _service.QueueContentTypeRebuild([1]);
-
-        // Allow background task to complete
-        await Task.Delay(500);
+        await WaitForProcessingAsync();
 
         // Assert — Rebuild should be called once (or possibly twice if second Queue triggers a second loop),
         // but the ID set should never contain duplicates. Verify at least one call happened.
@@ -112,9 +105,7 @@ public class DeferredCacheRebuildServiceTests
         // Act
         _service.QueueContentTypeRebuild([1]);
         _service.QueueMediaTypeRebuild([10]);
-
-        // Allow background task to complete
-        await Task.Delay(500);
+        await WaitForProcessingAsync();
 
         // Assert
         _documentCacheService.Verify(
@@ -135,13 +126,17 @@ public class DeferredCacheRebuildServiceTests
 
         // Act — only queue media types
         _service.QueueMediaTypeRebuild([10]);
-
-        // Allow background task to complete
-        await Task.Delay(500);
+        await WaitForProcessingAsync();
 
         // Assert — document rebuild should never be called
         _documentCacheService.Verify(
             x => x.Rebuild(It.IsAny<IReadOnlyCollection<int>>()),
             Times.Never);
+    }
+
+    private async Task WaitForProcessingAsync()
+    {
+        using var cts = new CancellationTokenSource(TestTimeout);
+        await _service.WaitForPendingRebuildsAsync(cts.Token);
     }
 }

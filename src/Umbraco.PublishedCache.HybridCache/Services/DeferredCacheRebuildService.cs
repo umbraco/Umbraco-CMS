@@ -8,17 +8,19 @@ namespace Umbraco.Cms.Infrastructure.HybridCache.Services;
 ///     Accumulates content type and media type IDs for deferred background cache rebuilds with de-duplication.
 /// </summary>
 /// <remarks>
-///     Uses a <see cref="SemaphoreSlim" /> to prevent concurrent rebuilds. When a rebuild is already in progress,
-///     newly queued IDs accumulate and are processed in the next iteration after the current rebuild completes.
+///     Uses an <see cref="Interlocked" /> flag to ensure a single background worker processes pending IDs.
+///     When IDs are queued while the worker is active, they accumulate and are picked up in the next
+///     iteration. Only one <see cref="Task.Run" /> is scheduled at a time, avoiding thread-pool churn
+///     under bursty saves.
 /// </remarks>
-internal sealed class DeferredCacheRebuildService : IDeferredCacheRebuildService, IDisposable
+internal sealed class DeferredCacheRebuildService : IDeferredCacheRebuildService
 {
     private readonly IDocumentCacheService _documentCacheService;
     private readonly IMediaCacheService _mediaCacheService;
     private readonly ILogger<DeferredCacheRebuildService> _logger;
-    private readonly SemaphoreSlim _semaphore = new(1, 1);
     private readonly ConcurrentDictionary<int, byte> _pendingContentTypeIds = new();
     private readonly ConcurrentDictionary<int, byte> _pendingMediaTypeIds = new();
+    private int _processing; // 0 = idle, 1 = active
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="DeferredCacheRebuildService" /> class.
@@ -44,7 +46,7 @@ internal sealed class DeferredCacheRebuildService : IDeferredCacheRebuildService
             _pendingContentTypeIds.TryAdd(id, 0);
         }
 
-        Task.Run(ProcessPendingRebuildsAsync);
+        ScheduleProcessing();
     }
 
     /// <inheritdoc />
@@ -55,17 +57,19 @@ internal sealed class DeferredCacheRebuildService : IDeferredCacheRebuildService
             _pendingMediaTypeIds.TryAdd(id, 0);
         }
 
-        Task.Run(ProcessPendingRebuildsAsync);
+        ScheduleProcessing();
+    }
+
+    private void ScheduleProcessing()
+    {
+        if (Interlocked.CompareExchange(ref _processing, 1, 0) == 0)
+        {
+            Task.Run(ProcessPendingRebuildsAsync);
+        }
     }
 
     private async Task ProcessPendingRebuildsAsync()
     {
-        if (_semaphore.Wait(0) is false)
-        {
-            // Another rebuild is already in progress; queued IDs will be picked up when it completes.
-            return;
-        }
-
         try
         {
             while (HasPendingIds())
@@ -96,32 +100,25 @@ internal sealed class DeferredCacheRebuildService : IDeferredCacheRebuildService
         }
         finally
         {
-            _semaphore.Release();
+            Interlocked.Exchange(ref _processing, 0);
+        }
+
+        // Re-check after clearing the flag. If IDs were added between the last
+        // HasPendingIds() == false and the flag reset, the Queue* caller's
+        // ScheduleProcessing would have seen _processing == 1 and skipped Task.Run,
+        // leaving no worker scheduled. We pick them up here.
+        if (HasPendingIds())
+        {
+            ScheduleProcessing();
         }
     }
 
-    // Internal for test purposes — waits until any in-progress rebuild completes and no IDs are pending.
+    // Internal for test purposes — waits until the worker is idle and no IDs are pending.
     internal async Task WaitForPendingRebuildsAsync(CancellationToken cancellationToken = default)
     {
-        // Wait until we can acquire the semaphore (meaning no rebuild is running)
-        // and no IDs are pending.
-        while (true)
+        while (Volatile.Read(ref _processing) == 1 || HasPendingIds())
         {
             cancellationToken.ThrowIfCancellationRequested();
-            await _semaphore.WaitAsync(cancellationToken);
-            try
-            {
-                if (HasPendingIds() is false)
-                {
-                    return;
-                }
-            }
-            finally
-            {
-                _semaphore.Release();
-            }
-
-            // Yield to let the background task pick up pending IDs.
             await Task.Delay(10, cancellationToken);
         }
     }
@@ -141,7 +138,4 @@ internal sealed class DeferredCacheRebuildService : IDeferredCacheRebuildService
 
         return keys;
     }
-
-    /// <inheritdoc />
-    public void Dispose() => _semaphore.Dispose();
 }
