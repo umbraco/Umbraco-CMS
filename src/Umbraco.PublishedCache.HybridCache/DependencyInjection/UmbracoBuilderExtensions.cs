@@ -50,6 +50,7 @@ public static class UmbracoBuilderExtensions
         builder.Services.AddSingleton<ICacheNodeFactory, CacheNodeFactory>();
         builder.Services.AddSingleton<ICacheManager, CacheManager>();
         builder.Services.AddSingleton<IDatabaseCacheRebuilder, DatabaseCacheRebuilder>();
+        builder.Services.AddSingleton<IDeferredCacheRebuildService, DeferredCacheRebuildService>();
         builder.Services.AddSingleton<IContentCacheDataSerializerFactory>(s =>
         {
             IOptions<NuCacheSettings> options = s.GetRequiredService<IOptions<NuCacheSettings>>();
