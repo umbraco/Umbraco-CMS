@@ -1078,8 +1078,9 @@ export class DataTypeUiHelper extends UiBaseLocators {
   }
 
   async enterSpecifiedAllowanceMinByIndex(value: number | undefined, index: number = 0) {
-    const minInput = this.specifiedAllowanceItems.nth(index).locator('uui-input[type="number"] input').first();
+    const minInput = this.specifiedAllowanceItems.nth(index).locator('uui-input[type="number"]').first().locator('input');
     if (value === undefined) {
+      await this.focus(minInput); // Focus is needed
       await this.clearText(minInput);
       return;
     } 
@@ -1087,8 +1088,9 @@ export class DataTypeUiHelper extends UiBaseLocators {
   }
 
   async enterSpecifiedAllowanceMaxByIndex(value: number | undefined, index: number = 0) {
-    const maxInput = this.specifiedAllowanceItems.nth(index).locator('uui-input[type="number"] input').nth(1);
+    const maxInput = this.specifiedAllowanceItems.nth(index).locator('uui-input[type="number"]').nth(1).locator('input');
     if (value === undefined) {
+      await this.focus(maxInput); // Focus is needed
       await this.clearText(maxInput);
       return;
     }

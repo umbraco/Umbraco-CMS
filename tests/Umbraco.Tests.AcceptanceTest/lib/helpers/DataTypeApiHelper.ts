@@ -1046,14 +1046,7 @@ export class DataTypeApiHelper {
     return area && area.specifiedAllowance && area.specifiedAllowance.length === count;
   }
 
-  async doesBlockEditorBlockContainAreaWithSpecifiedAllowanceMinMax(
-    blockGridName: string,
-    elementTypeKey: string,
-    areaAlias: string = 'area',
-    specifiedAllowanceElementTypeKey: string,
-    minAllowed: number,
-    maxAllowed: number
-  ) {
+  async doesBlockEditorBlockContainAreaWithSpecifiedAllowanceMinMax(blockGridName: string, elementTypeKey: string, areaAlias: string = 'area', specifiedAllowanceElementTypeKey: string, minAllowed: number, maxAllowed: number) {
     const block = await this.getBlockWithContentElementTypeId(blockGridName, elementTypeKey);
     const area = block.areas.find(area => area.alias === areaAlias);
     return area && area.specifiedAllowance &&
