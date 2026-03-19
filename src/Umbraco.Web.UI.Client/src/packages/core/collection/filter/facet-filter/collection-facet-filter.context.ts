@@ -8,8 +8,8 @@ import type { Observable } from '@umbraco-cms/backoffice/observable-api';
 export class UmbCollectionFacetFilterContext extends UmbContextBase {
 	#collectionContext?: typeof UMB_COLLECTION_CONTEXT.TYPE;
 
-	#filterAlias = new UmbStringState<string | undefined>(undefined);
-	public readonly filterAlias = this.#filterAlias.asObservable();
+	#alias = new UmbStringState<string | undefined>(undefined);
+	public readonly alias = this.#alias.asObservable();
 
 	#value: Observable<any> | undefined;
 	public get value(): Observable<any> | undefined {
@@ -25,24 +25,24 @@ export class UmbCollectionFacetFilterContext extends UmbContextBase {
 		});
 	}
 
-	public setFilterAlias(alias: string): void {
-		this.#filterAlias.setValue(alias);
+	public setAlias(alias: string): void {
+		this.#alias.setValue(alias);
 		this.#observeFilterValue();
 	}
 
-	public getFilterAlias(): string | undefined {
-		return this.#filterAlias.getValue();
+	public getAlias(): string | undefined {
+		return this.#alias.getValue();
 	}
 
 	#observeFilterValue(): void {
-		const alias = this.#filterAlias.getValue();
+		const alias = this.#alias.getValue();
 		if (!alias || !this.#collectionContext) return;
 
 		this.#value = this.#collectionContext.filtering.filterValueByAlias(alias);
 	}
 
 	public setValue(value: unknown): void {
-		const alias = this.#filterAlias.getValue();
+		const alias = this.#alias.getValue();
 		if (!alias || !this.#collectionContext) return;
 
 		this.#collectionContext.filtering.setFilter({ alias, value });
@@ -50,7 +50,7 @@ export class UmbCollectionFacetFilterContext extends UmbContextBase {
 	}
 
 	public clearValue(): void {
-		const alias = this.#filterAlias.getValue();
+		const alias = this.#alias.getValue();
 		if (!alias || !this.#collectionContext) return;
 
 		this.#collectionContext.filtering.clearFilter(alias);

@@ -4,7 +4,7 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registr
 import { css, customElement, html, nothing, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
-import '../filter/facet-filter/collection-facet-filter-item.element.js';
+import '../filter/facet-filter/collection-facet-filter.element.js';
 
 @customElement('umb-collection-filter-bundle')
 export class UmbCollectionFilterBundleElement extends UmbLitElement {
@@ -71,7 +71,7 @@ export class UmbCollectionFilterBundleElement extends UmbLitElement {
 							this._filters,
 							(filter) => filter.alias,
 							(filter) => html`
-								<umb-collection-facet-filter-item .filterAlias=${filter.alias}>
+								<umb-collection-facet-filter .alias=${filter.alias}>
 									<div class="filter-item">
 										<div class="filter-header">
 											<span class="heading">${filter.manifest?.meta?.label ?? filter.alias}</span>
@@ -87,7 +87,7 @@ export class UmbCollectionFilterBundleElement extends UmbLitElement {
 										</div>
 										${filter.component}
 									</div>
-								</umb-collection-facet-filter-item>
+								</umb-collection-facet-filter>
 							`,
 						)}
 					</div>
