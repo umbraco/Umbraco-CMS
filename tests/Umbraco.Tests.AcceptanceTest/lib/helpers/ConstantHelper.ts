@@ -309,4 +309,9 @@
     'Translators': 'Users with permission to manage dictionary entries',
     'Writers': 'Users with permission to create and update but not publish content'
   }
+
+  public static readonly healthCheckMessages = {
+    imagingHMACSecretKeyIsNotConfigured: 'No HMAC secret key is configured for image URL signing. It is recommended to set Umbraco:CMS:Imaging:HMACSecretKey to prevent unauthorized image manipulation requests.',
+    imagingHMACSecretKeyIsConfigured: 'The HMAC secret key for image URL signing is configured'
+  }
 }

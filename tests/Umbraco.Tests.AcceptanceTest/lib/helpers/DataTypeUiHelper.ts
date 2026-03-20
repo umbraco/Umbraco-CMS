@@ -437,7 +437,7 @@ export class DataTypeUiHelper extends UiBaseLocators {
   async duplicateDataTypeToFolder(folderName: string) {
     await this.clickDuplicateToActionMenuOption();
     await this.click(this.sidebarModal.getByText(folderName, {exact: true}));
-    await this.click(this.duplicateBtn);
+    await this.clickCopyModalButton();
   }
 
   async addMediaStartNode(mediaName: string) {

@@ -1,4 +1,5 @@
-﻿import {AliasHelper} from "./AliasHelper";
+﻿import {expect} from "@playwright/test";
+import {AliasHelper} from "./AliasHelper";
 import {ApiHelpers} from "./ApiHelpers";
 import {DocumentBuilder, DocumentDomainBuilder} from "../builders";
 
@@ -1730,6 +1731,40 @@ export class DocumentApiHelper {
 
     const document = documentBuilder.build();
     return await this.create(document);
+  }
+
+  async setPublicAccessForDocument(documentId: string, memberGroupNames: string[], loginDocumentId: string, errorDocumentId: string) {
+    const body = {
+      memberGroupNames: memberGroupNames,
+      memberUserNames: [],
+      loginDocument: {id: loginDocumentId},
+      errorDocument: {id: errorDocumentId},
+    };
+    const response = await this.api.post(this.api.baseUrl + '/umbraco/management/api/v1/document/' + documentId + '/public-access', body);
+    return response.status();
+  }
+
+  async deletePublicAccessForDocument(documentId: string) {
+    const response = await this.api.delete(this.api.baseUrl + '/umbraco/management/api/v1/document/' + documentId + '/public-access');
+    return response.status();
+  }
+
+  async getPublicAccessForDocument(documentId: string, includeAncestors: boolean = false) {
+    const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/document/' + documentId + '/public-access?includeAncestors=' + includeAncestors);
+    return response.json();
+  }
+
+  async getPublicAccessStatusForDocument(documentId: string, includeAncestors: boolean = false) {
+    const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/document/' + documentId + '/public-access?includeAncestors=' + includeAncestors);
+    return response.status();
+  }
+
+  async verifyPublicAccessForDocument(documentId: string, expectedMemberGroupName: string, expectedLoginDocumentId: string, expectedErrorDocumentId: string, expectedIsProtectedByAncestor: boolean, includeAncestors: boolean = false) {
+    const publicAccessData = await this.getPublicAccessForDocument(documentId, includeAncestors);
+    expect(publicAccessData.groups.some((g: {name: string}) => g.name === expectedMemberGroupName)).toBeTruthy();
+    expect(publicAccessData.loginDocument.id).toBe(expectedLoginDocumentId);
+    expect(publicAccessData.errorDocument.id).toBe(expectedErrorDocumentId);
+    expect(publicAccessData.isProtectedByAncestor).toBe(expectedIsProtectedByAncestor);
   }
 
   async getValuesByCultureAndSegmentForDocument(documentName: string, culturesAndSegments: {culture: string | null, segment: string | null}[]) {

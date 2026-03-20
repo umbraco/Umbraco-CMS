@@ -25,6 +25,7 @@ export class UiBaseLocators extends BasePage {
   public readonly enableBtn: Locator;
   public readonly actionBtn: Locator;
   public readonly nextBtn: Locator;
+  public readonly copyBtn: Locator;
 
   // Confirmation Buttons
   public readonly confirmToDeleteBtn: Locator;
@@ -72,6 +73,7 @@ export class UiBaseLocators extends BasePage {
   public readonly containerChooseBtn: Locator;
   public readonly containerSaveAndPublishBtn: Locator;
   public readonly createModalBtn: Locator;
+  public readonly copyModalBtn: Locator;
 
   // Document Type & Property Editor
   public readonly documentTypeNode: Locator;
@@ -256,6 +258,7 @@ export class UiBaseLocators extends BasePage {
     this.enableBtn = page.getByLabel('Enable');
     this.actionBtn = page.getByTestId('workspace:action-menu-button');
     this.nextBtn = page.getByLabel('Next');
+    this.copyBtn = page.getByLabel('Copy', {exact: true});
   
     // Confirmation Buttons
     this.confirmToDeleteBtn = page.locator('#confirm').getByLabel('Delete');
@@ -302,7 +305,8 @@ export class UiBaseLocators extends BasePage {
     this.container = page.locator('#container');
     this.containerChooseBtn = page.locator('#container').getByLabel('Choose');
     this.containerSaveAndPublishBtn = page.locator('#container').getByLabel('Save and Publish');
-    this.createModalBtn = page.locator('uui-modal-sidebar').getByLabel('Create', {exact: true});
+    this.createModalBtn = this.sidebarModal.getByLabel('Create', {exact: true});
+    this.copyModalBtn = this.sidebarModal.getByLabel('Copy', {exact: true});
   
     // Document Type & Property Editor
     this.documentTypeNode = page.locator('uui-ref-node-document-type');
@@ -632,6 +636,10 @@ export class UiBaseLocators extends BasePage {
     await this.click(this.leftArrowBtn);
   }
 
+  async clickCopyButton() {
+    await this.click(this.copyBtn);
+  }
+
   // Confirmation Button Methods
   async clickConfirmToDeleteButton() {
     await this.click(this.confirmToDeleteBtn);
@@ -800,6 +808,10 @@ export class UiBaseLocators extends BasePage {
 
   async doesModalHaveText(text: string) {
     await this.containsText(this.openedModal, text);
+  }
+
+  async clickCopyModalButton() {
+    await this.click(this.copyModalBtn);
   }
 
   // Container Methods
