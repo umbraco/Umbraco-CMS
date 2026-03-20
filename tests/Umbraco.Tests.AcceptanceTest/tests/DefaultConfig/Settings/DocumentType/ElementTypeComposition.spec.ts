@@ -8,6 +8,7 @@ const blockGridDocumentTypeName = 'BlockGridDocumentType';
 const contentName = 'TestContent';
 const dataTypeName = 'Textstring';
 const groupName = 'TestGroup';
+let dataTypeData = null;
 
 test.beforeEach(async ({umbracoApi, umbracoUi}) => {
   await umbracoApi.document.ensureNameNotExists(contentName);
@@ -16,6 +17,7 @@ test.beforeEach(async ({umbracoApi, umbracoUi}) => {
   await umbracoApi.documentType.ensureNameNotExists(compositionElementTypeName);
   await umbracoApi.dataType.ensureNameNotExists(blockGridDataTypeName);
   await umbracoUi.goToBackOffice();
+  dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
 });
 
 test.afterEach(async ({umbracoApi}) => {
@@ -28,7 +30,6 @@ test.afterEach(async ({umbracoApi}) => {
 
 test('can add a composition to an element type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const compositionElementTypeId = await umbracoApi.documentType.createDefaultElementType(compositionElementTypeName, groupName, dataTypeName, dataTypeData.id);
   await umbracoApi.documentType.createEmptyElementType(elementTypeName);
   await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
@@ -49,7 +50,6 @@ test('can add a composition to an element type', {tag: '@smoke'}, async ({umbrac
 
 test('can remove a composition from an element type', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const compositionElementTypeId = await umbracoApi.documentType.createDefaultElementType(compositionElementTypeName, groupName, dataTypeName, dataTypeData.id);
   await umbracoApi.documentType.createElementTypeWithAComposition(elementTypeName, compositionElementTypeId);
   await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
@@ -72,7 +72,6 @@ test('can use an element type with composition in a block grid', async ({umbraco
   // Arrange
   const propertyInBlock = 'Textstring';
   const inputText = 'Block content from composition';
-  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const compositionElementTypeId = await umbracoApi.documentType.createDefaultElementType(compositionElementTypeName, groupName, propertyInBlock, dataTypeData.id);
   const elementTypeId = await umbracoApi.documentType.createElementTypeWithAComposition(elementTypeName, compositionElementTypeId);
   const blockGridDataTypeId = await umbracoApi.dataType.createBlockGridWithABlock(blockGridDataTypeName, elementTypeId);

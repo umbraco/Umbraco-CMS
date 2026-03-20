@@ -8,12 +8,14 @@ const dataTypeName = 'Textstring';
 const secondDataTypeName = 'Numeric';
 const groupName = 'TestGroup';
 const secondGroupName = 'SecondGroup';
+let dataTypeData = null;
 
 test.beforeEach(async ({umbracoApi, umbracoUi}) => {
   await umbracoApi.mediaType.ensureNameNotExists(mediaTypeName);
   await umbracoApi.mediaType.ensureNameNotExists(compositionMediaTypeName);
   await umbracoApi.mediaType.ensureNameNotExists(secondCompositionMediaTypeName);
   await umbracoUi.goToBackOffice();
+  dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
 });
 
 test.afterEach(async ({umbracoApi}) => {
@@ -24,7 +26,6 @@ test.afterEach(async ({umbracoApi}) => {
 
 test('can add a composition to a media type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const compositionMediaTypeId = await umbracoApi.mediaType.createMediaTypeWithPropertyEditor(compositionMediaTypeName, dataTypeName, dataTypeData.id, groupName);
   await umbracoApi.mediaType.createDefaultMediaType(mediaTypeName);
   await umbracoUi.mediaType.goToSection(ConstantHelper.sections.settings);
@@ -46,7 +47,6 @@ test('can add a composition to a media type', {tag: '@smoke'}, async ({umbracoAp
 
 test('can remove a composition from a media type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const compositionMediaTypeId = await umbracoApi.mediaType.createMediaTypeWithPropertyEditor(compositionMediaTypeName, dataTypeName, dataTypeData.id, groupName);
   await umbracoApi.mediaType.createMediaTypeWithAComposition(mediaTypeName, compositionMediaTypeId);
   await umbracoUi.mediaType.goToSection(ConstantHelper.sections.settings);
@@ -68,7 +68,6 @@ test('can remove a composition from a media type', {tag: '@smoke'}, async ({umbr
 
 test('can add multiple compositions to a media type', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const secondDataTypeData = await umbracoApi.dataType.getByName(secondDataTypeName);
   const compositionMediaTypeId = await umbracoApi.mediaType.createMediaTypeWithPropertyEditor(compositionMediaTypeName, dataTypeName, dataTypeData.id, groupName);
   const secondCompositionMediaTypeId = await umbracoApi.mediaType.createMediaTypeWithPropertyEditor(secondCompositionMediaTypeName, secondDataTypeName, secondDataTypeData.id, secondGroupName);
