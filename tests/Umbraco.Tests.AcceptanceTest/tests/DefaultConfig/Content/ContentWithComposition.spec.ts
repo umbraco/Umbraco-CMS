@@ -6,12 +6,15 @@ const documentTypeName = 'TestDocumentTypeForContent';
 const compositionDocumentTypeName = 'CompositionDocumentType';
 const dataTypeName = 'Textstring';
 const groupName = 'TestGroup';
+let compositionDocumentTypeId = null;
 
 test.beforeEach(async ({umbracoApi, umbracoUi}) => {
   await umbracoApi.document.ensureNameNotExists(contentName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   await umbracoApi.documentType.ensureNameNotExists(compositionDocumentTypeName);
   await umbracoUi.goToBackOffice();
+  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+  compositionDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(compositionDocumentTypeName, dataTypeName, dataTypeData.id, groupName);
 });
 
 test.afterEach(async ({umbracoApi}) => {
@@ -23,8 +26,6 @@ test.afterEach(async ({umbracoApi}) => {
 test('can create content with a document type that has a composition', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedState = 'Draft';
-  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-  const compositionDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(compositionDocumentTypeName, dataTypeName, dataTypeData.id, groupName);
   await umbracoApi.documentType.createDocumentTypeWithACompositionAndAllowAsRoot(documentTypeName, compositionDocumentTypeId);
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
@@ -44,8 +45,6 @@ test('can create content with a document type that has a composition', async ({u
 test('can edit property value from composition in content', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const text = 'This is a property value';
-  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-  const compositionDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(compositionDocumentTypeName, dataTypeName, dataTypeData.id, groupName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithACompositionAndAllowAsRoot(documentTypeName, compositionDocumentTypeId);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
@@ -65,8 +64,6 @@ test('can edit property value from composition in content', async ({umbracoApi, 
 test('can publish content with a document type that has a composition', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const text = 'Published composition value';
-  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-  const compositionDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(compositionDocumentTypeName, dataTypeName, dataTypeData.id, groupName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithACompositionAndAllowAsRoot(documentTypeName, compositionDocumentTypeId);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);

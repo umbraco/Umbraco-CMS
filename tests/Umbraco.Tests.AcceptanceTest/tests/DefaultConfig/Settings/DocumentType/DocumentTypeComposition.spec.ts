@@ -10,6 +10,7 @@ const dataTypeName = 'Textstring';
 const secondDataTypeName = 'Numeric';
 const groupName = 'TestGroup';
 const secondGroupName = 'SecondGroup';
+let dataTypeData = null;
 
 test.beforeEach(async ({umbracoApi, umbracoUi}) => {
   await umbracoApi.documentType.ensureNameNotExists(childDocumentTypeName);
@@ -18,6 +19,7 @@ test.beforeEach(async ({umbracoApi, umbracoUi}) => {
   await umbracoApi.documentType.ensureNameNotExists(secondCompositionDocumentTypeName);
   await umbracoApi.documentType.ensureNameNotExists(parentDocumentTypeName);
   await umbracoUi.goToBackOffice();
+  dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
 });
 
 test.afterEach(async ({umbracoApi}) => {
@@ -30,7 +32,6 @@ test.afterEach(async ({umbracoApi}) => {
 
 test('can add a composition to a document type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const compositionDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(compositionDocumentTypeName, dataTypeName, dataTypeData.id, groupName);
   await umbracoApi.documentType.createDefaultDocumentType(documentTypeName);
   await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
@@ -53,7 +54,6 @@ test('can add a composition to a document type', {tag: '@smoke'}, async ({umbrac
 
 test('can add multiple compositions to a document type', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const secondDataTypeData = await umbracoApi.dataType.getByName(secondDataTypeName);
   const compositionDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(compositionDocumentTypeName, dataTypeName, dataTypeData.id, groupName);
   const secondCompositionDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(secondCompositionDocumentTypeName, secondDataTypeName, secondDataTypeData.id, secondGroupName);
@@ -79,7 +79,6 @@ test('can add multiple compositions to a document type', async ({umbracoApi, umb
 
 test('can remove a composition from a document type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const compositionDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(compositionDocumentTypeName, dataTypeName, dataTypeData.id, groupName);
   await umbracoApi.documentType.createDocumentTypeWithAComposition(documentTypeName, compositionDocumentTypeId);
   await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
@@ -102,7 +101,6 @@ test('can remove a composition from a document type', {tag: '@smoke'}, async ({u
 test('can add a composition with properties in a tab to a document type', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const tabName = 'CompositionTab';
-  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const compositionDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditorInTab(compositionDocumentTypeName, dataTypeName, dataTypeData.id, tabName, groupName);
   await umbracoApi.documentType.createDefaultDocumentType(documentTypeName);
   await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
@@ -123,11 +121,9 @@ test('can add a composition with properties in a tab to a document type', async 
 
 test('can add a composition to a document type that already has properties', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const existingPropertyName = 'Numeric';
-  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-  const existingPropertyData = await umbracoApi.dataType.getByName(existingPropertyName);
+  const secondDataTypeData = await umbracoApi.dataType.getByName(secondDataTypeName);
   const compositionDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(compositionDocumentTypeName, dataTypeName, dataTypeData.id, groupName);
-  await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, existingPropertyName, existingPropertyData.id, secondGroupName);
+  await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, secondDataTypeName, secondDataTypeData.id, secondGroupName);
   await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
 
   // Act
@@ -144,12 +140,11 @@ test('can add a composition to a document type that already has properties', asy
   expect(documentTypeData.compositions[0].documentType.id).toBe(compositionDocumentTypeId);
   // Verify existing property is still there
   expect(documentTypeData.properties.length).toBe(1);
-  expect(documentTypeData.properties[0].dataType.id).toBe(existingPropertyData.id);
+  expect(documentTypeData.properties[0].dataType.id).toBe(secondDataTypeData.id);
 });
 
 test('cannot add a composition with conflicting property aliases to a document type', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   // Both document types have a property with the same alias (derived from dataTypeName = 'Textstring')
   await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(compositionDocumentTypeName, dataTypeName, dataTypeData.id, groupName);
   await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id, secondGroupName);
@@ -166,7 +161,6 @@ test('cannot add a composition with conflicting property aliases to a document t
 
 test('can remove one composition when multiple exist in a document type', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const secondDataTypeData = await umbracoApi.dataType.getByName(secondDataTypeName);
   const compositionDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(compositionDocumentTypeName, dataTypeName, dataTypeData.id, groupName);
   const secondCompositionDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(secondCompositionDocumentTypeName, secondDataTypeName, secondDataTypeData.id, secondGroupName);
@@ -192,7 +186,6 @@ test('can remove one composition when multiple exist in a document type', async 
 // Inheritance
 test('can create a document type with inheritance', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(parentDocumentTypeName, dataTypeName, dataTypeData.id, groupName);
   await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
 
@@ -212,7 +205,6 @@ test('can create a document type with inheritance', async ({umbracoApi, umbracoU
 
 test('can see inherited properties from parent document type', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(parentDocumentTypeName, dataTypeName, dataTypeData.id, groupName);
   await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
 
@@ -230,7 +222,6 @@ test('can see inherited properties from parent document type', async ({umbracoAp
 
 test('composed properties are visible and read-only in the document type editor', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const compositionDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(compositionDocumentTypeName, dataTypeName, dataTypeData.id, groupName);
   await umbracoApi.documentType.createDocumentTypeWithAComposition(documentTypeName, compositionDocumentTypeId);
   await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
@@ -245,7 +236,6 @@ test('composed properties are visible and read-only in the document type editor'
 
 test('child document type inherits properties from both parent and composition', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const secondDataTypeData = await umbracoApi.dataType.getByName(secondDataTypeName);
   const compositionDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(compositionDocumentTypeName, dataTypeName, dataTypeData.id, groupName);
   await umbracoApi.documentType.createDocumentTypeWithPropertyEditorAndComposition(parentDocumentTypeName, secondDataTypeName, secondDataTypeData.id, secondGroupName, compositionDocumentTypeId);
@@ -269,7 +259,6 @@ test('child document type inherits properties from both parent and composition',
 
 test('cannot use a document type with compositions as a composition', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const compositionDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(compositionDocumentTypeName, dataTypeName, dataTypeData.id, groupName);
   await umbracoApi.documentType.createDocumentTypeWithAComposition(secondCompositionDocumentTypeName, compositionDocumentTypeId);
   await umbracoApi.documentType.createDefaultDocumentType(documentTypeName);
