@@ -348,18 +348,20 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
             sql = sql
                 .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((memberNode, memberContent) => memberContent.NodeId == memberNode.NodeId)
                 .InnerJoin<NodeDto>("mtn").On<ContentDto, NodeDto>((memberContent, memberTypeNode) => memberContent.ContentTypeId == memberTypeNode.NodeId, aliasRight: "mtn");
-
-            if (memberFilter.MemberTypeId.HasValue)
-            {
-                sql = sql.Where<NodeDto>(memberTypeNode => memberTypeNode.UniqueId == memberFilter.MemberTypeId, "mtn");
-            }
         }
 
         if (memberFilter.MemberGroupName.IsNullOrWhiteSpace() is false)
         {
             sql = sql
                 .InnerJoin<Member2MemberGroupDto>().On<MemberDto, Member2MemberGroupDto>((m, memberToGroup) => m.NodeId == memberToGroup.Member)
-                .InnerJoin<NodeDto>("mgn").On<NodeDto, Member2MemberGroupDto>((memberGroupNode, memberToGroup) => memberToGroup.MemberGroup == memberGroupNode.NodeId && memberGroupNode.Text == memberFilter.MemberGroupName, "mgn");
+                .InnerJoin<NodeDto>("mgn").On<Member2MemberGroupDto, NodeDto>((memberToGroup, memberGroupNode) => memberToGroup.MemberGroup == memberGroupNode.NodeId, aliasRight: "mgn");
+
+            sql = sql.Where<NodeDto>(memberGroupNode => memberGroupNode.Text == memberFilter.MemberGroupName, "mgn");
+        }
+
+        if (memberFilter.MemberTypeId.HasValue)
+        {
+            sql = sql.Where<NodeDto>(memberTypeNode => memberTypeNode.UniqueId == memberFilter.MemberTypeId, "mtn");
         }
 
         if (memberFilter.IsApproved is not null)

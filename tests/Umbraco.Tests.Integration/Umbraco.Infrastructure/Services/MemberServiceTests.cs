@@ -1603,4 +1603,37 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
         result = await MemberService.FilterAsync(filter, "memberType", Direction.Descending, skip: 0, take: 10);
         Assert.AreEqual(new[] { "Charlie", "Bob", "Alice" }, result.Items.Select(m => m.Name).ToArray());
     }
+
+    [Test]
+    public async Task Can_FilterAsync_With_Combined_MemberType_And_MemberGroup()
+    {
+        // Create a member type.
+        IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
+
+        // Create two members of that type.
+        IMember member1 = MemberBuilder.CreateSimpleMember(memberType, "Alice", "alice@test.com", "pass", "alice");
+        MemberService.Save(member1);
+
+        IMember member2 = MemberBuilder.CreateSimpleMember(memberType, "Bob", "bob@test.com", "pass", "bob");
+        MemberService.Save(member2);
+
+        // Create a member group and assign only the first member to it.
+        MemberService.AddRole("Test Group");
+        MemberService.AssignRoles([member1.Id], ["Test Group"]);
+
+        // Filter by both member type ID and member group name — this previously caused
+        // a SQL syntax error ("near INNER: syntax error") because a WHERE clause was
+        // inserted between JOIN blocks.
+        var filter = new MemberFilter
+        {
+            MemberTypeId = memberType.Key,
+            MemberGroupName = "Test Group",
+        };
+
+        var result = await MemberService.FilterAsync(filter, "name", Direction.Ascending, skip: 0, take: 10);
+
+        Assert.AreEqual(1, result.Total);
+        Assert.AreEqual("Alice", result.Items.First().Name);
+    }
 }
