@@ -402,7 +402,7 @@ test('can duplicate content with duplicate permission enabled', {tag: '@release'
   // Duplicate to root
   await umbracoUi.content.clickDuplicateToActionMenuOption();
   await umbracoUi.content.clickLabelWithName('Content');
-  await umbracoUi.content.clickDuplicateButton();
+  await umbracoUi.content.clickCopyModalButton();
 
   // Assert
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.duplicated);
