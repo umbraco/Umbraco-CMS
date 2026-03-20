@@ -553,7 +553,7 @@ test('can set public access with public access permission enabled', async ({umbr
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithPublicAccessPermission(userGroupName);
   const testMemberGroup = 'TestMemberGroup';
-  await umbracoApi.memberGroup.createDefaultMemberGroup(testMemberGroup)
+  await umbracoApi.memberGroup.createDefaultMemberGroup(testMemberGroup);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
   await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
