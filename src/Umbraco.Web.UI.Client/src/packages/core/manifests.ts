@@ -9,6 +9,7 @@ import { manifests as entitySignManifests } from './entity-sign/manifests.js';
 import { manifests as facetFilterManifests } from './facet-filter/manifests.js';
 import { manifests as extensionManifests } from './extension/manifests.js';
 import { manifests as extensionRegistryManifests } from './extension-registry/manifests.js';
+import { manifests as extensionTypeManifests } from './extension-type/manifests.js';
 import { manifests as iconRegistryManifests } from './icon-registry/manifests.js';
 import { manifests as localizationManifests } from './localization/manifests.js';
 import { manifests as menuManifests } from './menu/manifests.js';
@@ -44,6 +45,7 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 	...facetFilterManifests,
 	...extensionManifests,
 	...extensionRegistryManifests,
+	...extensionTypeManifests,
 	...iconRegistryManifests,
 	...localizationManifests,
 	...menuManifests,

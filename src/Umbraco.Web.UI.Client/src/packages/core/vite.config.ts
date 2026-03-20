@@ -35,6 +35,7 @@ export default defineConfig({
 			'event/index': './event/index.ts',
 			'extension/index': './extension/index.ts',
 			'extension-registry/index': './extension-registry/index.ts',
+			'extension-type/index': './extension-type/index.ts',
 			'hint/index': './hint/index.ts',
 			'http-client/index': './http-client/index.ts',
 			'icon-registry/index': './icon-registry/index.ts',

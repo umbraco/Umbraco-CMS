@@ -57,6 +57,7 @@
 		"./event": "./dist-cms/packages/core/event/index.js",
 		"./extension": "./dist-cms/packages/core/extension/index.js",
 		"./extension-registry": "./dist-cms/packages/core/extension-registry/index.js",
+		"./extension-type": "./dist-cms/packages/core/extension-type/index.js",
 		"./health-check": "./dist-cms/packages/health-check/index.js",
 		"./help": "./dist-cms/packages/help/index.js",
 		"./hint": "./dist-cms/packages/core/hint/index.js",

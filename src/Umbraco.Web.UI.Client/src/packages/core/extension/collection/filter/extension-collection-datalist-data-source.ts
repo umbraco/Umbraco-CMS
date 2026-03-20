@@ -1,5 +1,8 @@
+import {
+	UmbExtensionTypeCollectionRepository,
+	UmbExtensionTypeItemRepository,
+} from '@umbraco-cms/backoffice/extension-type';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import { fromCamelCase } from '@umbraco-cms/backoffice/utils';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type {
 	UmbDatalistDataSource,
@@ -7,43 +10,36 @@ import type {
 	UmbDatalistRequestArgs,
 	UmbDatalistResponse,
 } from '@umbraco-cms/backoffice/datalist-data-source';
-import { UmbExtensionCollectionRepository } from '../repository/index.js';
-import { UmbExtensionItemRepository } from '../../item/index.js';
 
 export class UmbExtensionCollectionDatalistDataSource extends UmbControllerBase implements UmbDatalistDataSource {
-	#collectionRepository: UmbExtensionCollectionRepository;
-	#itemRepository: UmbExtensionItemRepository;
+	#collectionRepository: UmbExtensionTypeCollectionRepository;
+	#itemRepository: UmbExtensionTypeItemRepository;
 
 	constructor(host: UmbControllerHost) {
 		super(host);
-		this.#collectionRepository = new UmbExtensionCollectionRepository(this);
-		this.#itemRepository = new UmbExtensionItemRepository(this);
+		this.#collectionRepository = new UmbExtensionTypeCollectionRepository(this);
+		this.#itemRepository = new UmbExtensionTypeItemRepository(this);
 	}
 
 	async requestOptions(args: UmbDatalistRequestArgs): Promise<UmbDatalistResponse<UmbDatalistItemModel>> {
-		const { data } = await this.#collectionRepository.requestCollection({});
+		const { data } = await this.#collectionRepository.requestCollection({
+			filter: args.filter,
+			skip: args.skip,
+			take: args.take,
+		});
 
 		if (!data) return { data: undefined };
 
-		const types = [...new Set(data.items.map((x) => x.manifest.type))];
-
-		const allItems = types.sort().map((type) => ({
-			unique: type,
-			name: fromCamelCase(type),
-			entityType: 'extension-type',
+		const items = data.items.map((item) => ({
+			unique: item.unique,
+			name: item.name,
+			entityType: item.entityType,
 		}));
-
-		const filter = args.filter?.toLowerCase();
-		const items = filter ? allItems.filter((item) => item.name.toLowerCase().includes(filter)) : allItems;
-
-		const skip = args.skip ?? 0;
-		const take = args.take ?? items.length;
-		const paged = items.slice(skip, skip + take);
 
 		return {
 			data: {
-				items: paged,
-				total: items.length,
+				items,
+				total: data.total,
 			},
 		};
 	}
