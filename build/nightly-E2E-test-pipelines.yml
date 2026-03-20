@@ -4,12 +4,10 @@ pr: none
 trigger: none
 
 schedules:
-  - cron: '0 0 * * *'
-    displayName: Daily midnight build
+  - cron: '0 3 * * *'
+    displayName: Daily 3AM build (main)
     branches:
       include:
-        - v15/dev
-        - v16/dev
         - main
 
 parameters:
@@ -321,7 +319,8 @@ stages:
 
   - stage: DefaultConfigE2E
     displayName: Default Config E2E Tests
-    dependsOn: Build
+    dependsOn: Integration
+    condition: always()
     variables:
       npm_config_cache: $(Pipeline.Workspace)/.npm_e2e
       # Enable console logging in Release mode
@@ -502,7 +501,8 @@ stages:
 
   - stage: AdditionalConfigE2E
     displayName: Additional Config E2E Tests
-    dependsOn: Build
+    dependsOn: DefaultConfigE2E
+    condition: always()
     variables:
       npm_config_cache: $(Pipeline.Workspace)/.npm_e2e
       ASPNETCORE_URLS: https://localhost:44331
