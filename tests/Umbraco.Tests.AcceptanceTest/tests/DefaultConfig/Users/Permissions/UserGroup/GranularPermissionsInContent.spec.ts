@@ -270,8 +270,7 @@ test('can set public access for a specific content with public access permission
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithPublicAccessPermissionForSpecificDocument(userGroupName, firstDocumentId);
   const testMemberGroup = 'TestMemberGroup';
-  await umbracoApi.memberGroup.ensureNameNotExists(testMemberGroup);
-  await umbracoApi.memberGroup.create(testMemberGroup);
+  await umbracoApi.memberGroup.createDefaultMemberGroup(testMemberGroup);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
   await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
