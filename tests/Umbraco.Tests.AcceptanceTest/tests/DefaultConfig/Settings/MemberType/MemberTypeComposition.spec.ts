@@ -5,11 +5,14 @@ const memberTypeName = 'TestMemberType';
 const compositionMemberTypeName = 'CompositionMemberType';
 const dataTypeName = 'Textstring';
 const groupName = 'TestGroup';
+let compositionMemberTypeId = null;
 
 test.beforeEach(async ({umbracoApi, umbracoUi}) => {
   await umbracoApi.memberType.ensureNameNotExists(memberTypeName);
   await umbracoApi.memberType.ensureNameNotExists(compositionMemberTypeName);
   await umbracoUi.goToBackOffice();
+  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+  compositionMemberTypeId = await umbracoApi.memberType.createMemberTypeWithPropertyEditor(compositionMemberTypeName, dataTypeName, dataTypeData.id, groupName);
 });
 
 test.afterEach(async ({umbracoApi}) => {
@@ -19,8 +22,6 @@ test.afterEach(async ({umbracoApi}) => {
 
 test('can add a composition to a member type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-  const compositionMemberTypeId = await umbracoApi.memberType.createMemberTypeWithPropertyEditor(compositionMemberTypeName, dataTypeName, dataTypeData.id, groupName);
   await umbracoApi.memberType.createDefaultMemberType(memberTypeName);
   await umbracoUi.memberType.goToSection(ConstantHelper.sections.settings);
 
@@ -40,8 +41,6 @@ test('can add a composition to a member type', {tag: '@smoke'}, async ({umbracoA
 
 test('can remove a composition from a member type', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-  const compositionMemberTypeId = await umbracoApi.memberType.createMemberTypeWithPropertyEditor(compositionMemberTypeName, dataTypeName, dataTypeData.id, groupName);
   await umbracoApi.memberType.createMemberTypeWithAComposition(memberTypeName, compositionMemberTypeId);
   await umbracoUi.memberType.goToSection(ConstantHelper.sections.settings);
 

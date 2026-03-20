@@ -337,6 +337,7 @@ export class MediaTypeApiHelper {
         .withMediaTypeId(compositionId)
         .done()
       .build();
+
     return await this.create(mediaType);
   }
 

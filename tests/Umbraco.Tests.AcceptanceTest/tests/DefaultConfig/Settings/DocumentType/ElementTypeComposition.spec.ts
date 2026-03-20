@@ -94,4 +94,6 @@ test('can use an element type with composition in a block grid', async ({umbraco
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values.length).toBeGreaterThan(0);
+  const blockGridValue = contentData.values[0].value;
+  expect(blockGridValue.contentData[0].values[0].value).toEqual(inputText);
 });

@@ -7,12 +7,15 @@ const compositionDocumentTypeName = 'VariantCompositionDocumentType';
 const dataTypeName = 'Textstring';
 const groupName = 'TestGroup';
 const danishIsoCode = 'da';
+let compositionDocumentTypeId = null;
 
 test.beforeEach(async ({umbracoApi, umbracoUi}) => {
   await umbracoApi.document.ensureNameNotExists(contentName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   await umbracoApi.documentType.ensureNameNotExists(compositionDocumentTypeName);
   await umbracoUi.goToBackOffice();
+  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+  compositionDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(compositionDocumentTypeName, dataTypeName, dataTypeData.id, groupName, true, true);
 });
 
 test.afterEach(async ({umbracoApi}) => {
@@ -25,8 +28,6 @@ test.afterEach(async ({umbracoApi}) => {
 test('can create content with an invariant document type that has a variant composition', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedState = 'Draft';
-  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-  const compositionDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(compositionDocumentTypeName, dataTypeName, dataTypeData.id, groupName, true, true);
   await umbracoApi.documentType.createDocumentTypeWithACompositionAndAllowAsRoot(documentTypeName, compositionDocumentTypeId);
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
@@ -46,8 +47,6 @@ test('can create content with an invariant document type that has a variant comp
 test('can save property value from variant composition in invariant content', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const text = 'This is a property value from variant composition';
-  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-  const compositionDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(compositionDocumentTypeName, dataTypeName, dataTypeData.id, groupName, true, true);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithACompositionAndAllowAsRoot(documentTypeName, compositionDocumentTypeId);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
@@ -68,22 +67,26 @@ test('can save property values from variant composition in variant content with 
   // Arrange
   const englishText = 'English value from composition';
   const danishText = 'Danish value from composition';
-  await umbracoApi.language.ensureIsoCodeNotExists(danishIsoCode);
   await umbracoApi.language.createDanishLanguage();
-  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-  const compositionDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(compositionDocumentTypeName, dataTypeName, dataTypeData.id, groupName, true, true);
   const documentTypeId = await umbracoApi.documentType.createVariantDocumentTypeWithACompositionAndAllowAsRoot(documentTypeName, compositionDocumentTypeId);
   await umbracoApi.document.createDocumentWithMultipleVariants(
     contentName, documentTypeId, AliasHelper.toAlias(dataTypeName),
     [
-      {isoCode: 'en-US', name: contentName, value: englishText},
-      {isoCode: danishIsoCode, name: contentName + danishIsoCode, value: danishText},
+      {isoCode: 'en-US', name: contentName, value: ''},
+      {isoCode: danishIsoCode, name: contentName + danishIsoCode, value: ''},
     ]
   );
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.enterTextstring(englishText);
+  await umbracoUi.content.clickSaveButtonForContent();
+  await umbracoUi.content.clickContainerSaveButtonAndWaitForContentToBeUpdated();
+  await umbracoUi.content.switchLanguage('Danish');
+  await umbracoUi.content.enterTextstring(danishText);
+  await umbracoUi.content.clickSaveButtonForContent();
+  await umbracoUi.content.clickContainerSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
   const [englishValue, danishValue] = await umbracoApi.document.getValuesByAliasAndCultures(contentName, AliasHelper.toAlias(dataTypeName), ['en-US', danishIsoCode]);

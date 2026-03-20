@@ -82,7 +82,7 @@ export class MemberTypeApiHelper {
       .withAlias(AliasHelper.toAlias(memberTypeName))
       .withAllowedAsRoot(true)
       .build();
-      
+
     return await this.create(memberType);
   }
 
@@ -119,6 +119,7 @@ export class MemberTypeApiHelper {
         .withMemberTypeId(compositionId)
         .done()
       .build();
+
     return await this.create(memberType);
   }
 

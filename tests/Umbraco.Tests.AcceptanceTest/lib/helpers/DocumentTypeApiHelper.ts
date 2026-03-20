@@ -467,7 +467,7 @@ export class DocumentTypeApiHelper {
       .build();
     return await this.create(documentType);
   }
-  
+
   async createDocumentTypeWithTwoGroups(documentTypeName: string,dataType: string, dataTypeId: string, groupNameOne: string, groupNameTwo: string) {
     const crypto = require('crypto');
     const groupOneId = crypto.randomUUID();
@@ -504,7 +504,7 @@ export class DocumentTypeApiHelper {
       .build();
     return await this.create(documentType);
   }
-  
+
   async createDocumentTypeWithAComposition(documentTypeName: string, compositionId: string) {
     await this.ensureNameNotExists(documentTypeName);
 
@@ -531,6 +531,7 @@ export class DocumentTypeApiHelper {
         .withDocumentTypeId(secondCompositionId)
         .done()
       .build();
+
     return await this.create(documentType);
   }
 
@@ -545,6 +546,7 @@ export class DocumentTypeApiHelper {
         .withDocumentTypeId(compositionId)
         .done()
       .build();
+
     return await this.create(documentType);
   }
 
@@ -571,6 +573,7 @@ export class DocumentTypeApiHelper {
         .withDocumentTypeId(compositionId)
         .done()
       .build();
+
     return await this.create(documentType);
   }
 
@@ -586,6 +589,7 @@ export class DocumentTypeApiHelper {
         .withDocumentTypeId(compositionId)
         .done()
       .build();
+
     return await this.create(documentType);
   }
 
@@ -601,6 +605,7 @@ export class DocumentTypeApiHelper {
         .withDocumentTypeId(compositionId)
         .done()
       .build();
+
     return await this.create(documentType);
   }
 
@@ -613,9 +618,10 @@ export class DocumentTypeApiHelper {
       .withIsElement(true)
       .withIcon("icon-plugin")
       .build();
+
     return await this.create(documentType);
   }
-  
+
   async createDocumentTypeWithTwoTabs(documentTypeName: string, dataType: string, dataTypeId: string, tabNameOne: string, tabNameTwo: string) {
     const crypto = require('crypto');
     const tabOneId = crypto.randomUUID();
@@ -669,10 +675,10 @@ export class DocumentTypeApiHelper {
 
   async createDefaultElementType(elementName: string, groupName: string = 'TestGroup', dataTypeName: string = 'Textstring', dataTypeId: string, isMandatory: boolean = false) {
     await this.ensureNameNotExists(elementName);
-    
+
     const crypto = require('crypto');
     const containerId = crypto.randomUUID();
-    
+
     const documentType = new DocumentTypeBuilder()
       .withName(elementName)
       .withAlias(AliasHelper.toAlias(elementName))
@@ -719,7 +725,7 @@ export class DocumentTypeApiHelper {
       .build();
     return await this.create(documentType);
   }
-  
+
   async createElementTypeWithRegexValidation(elementName: string, groupName: string = 'TestGroup', dataTypeName: string = 'Textstring', dataTypeId: string, regex: string) {
     await this.ensureNameNotExists(elementName);
 
@@ -779,7 +785,7 @@ export class DocumentTypeApiHelper {
       .build();
     return await this.create(documentType);
   }
-  
+
   async doesGroupContainCorrectPropertyEditor(documentTypeName: string, dataTypeName: string, dataTypeId: string, groupName: string) {
     const documentType = await this.getByName(documentTypeName);
     const group = documentType.containers.find(x => x.name === groupName);
@@ -812,7 +818,7 @@ export class DocumentTypeApiHelper {
       return false;
     }
   }
-  
+
   async doesDocumentTypeGroupNameContainCorrectSortOrder(documentTypeName: string, groupName: string, sortOrder: number) {
     const documentType = await this.getByName(documentTypeName);
     const group = documentType.containers.find(x => x.name === groupName);
@@ -824,7 +830,7 @@ export class DocumentTypeApiHelper {
       return false;
     }
   }
-  
+
   async doesDocumentTypeTabNameContainCorrectSortOrder(documentTypeName: string, tabName: string, sortOrder: number) {
     const documentType = await this.getByName(documentTypeName);
     const tab = documentType.containers.find(x => x.name === tabName);
@@ -836,7 +842,7 @@ export class DocumentTypeApiHelper {
       return false;
     }
   }
-  
+
   async getContainerIdWithName(documentTypeName: string, containerName: string) {
     const documentType = await this.getByName(documentTypeName);
     const container = documentType.containers.find(x => x.name === containerName);
@@ -863,7 +869,7 @@ export class DocumentTypeApiHelper {
       .build();
     return await this.create(documentType);
   }
-  
+
   async createDocumentTypeWithAllowedChildNodeAndDataType(documentTypeName: string, allowedChildNodeId: string, dataTypeName: string, dataTypeId: string, groupName: string = "TestGroup") {
     const crypto = require('crypto');
     const containerId = crypto.randomUUID();
@@ -955,7 +961,7 @@ export class DocumentTypeApiHelper {
         .done()
       .withDefaultTemplateId(templateId)
       .build();
-    
+
     return await this.create(documentType);
   }
 
@@ -1012,7 +1018,7 @@ export class DocumentTypeApiHelper {
         .done()
       .withVariesByCulture(true)
       .build();
-      
+
     return await this.create(documentType);
   }
 
