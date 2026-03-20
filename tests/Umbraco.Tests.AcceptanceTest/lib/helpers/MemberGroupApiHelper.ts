@@ -71,7 +71,6 @@ export class MemberGroupApiHelper {
 
   async createDefaultMemberGroup(name: string) {
     await this.ensureNameNotExists(name);
-    const memberGroupId = await this.create(name);
-    return await this.get(memberGroupId);
+    return await this.create(name);
   }
 }
