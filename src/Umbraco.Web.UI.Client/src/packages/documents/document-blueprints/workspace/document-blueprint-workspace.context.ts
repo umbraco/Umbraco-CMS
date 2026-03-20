@@ -122,6 +122,19 @@ export class UmbDocumentBlueprintWorkspaceContext
 		return this.getData()?.documentType.unique;
 	}
 
+	/**
+	 * Override mandatory validation to filter out variants without a name before validating.
+	 * Blueprints allow partial variant data and users may only provide a name for some cultures.
+	 */
+	public override async runMandatoryValidationForSaveData(
+		saveData: ContentModel,
+		variantIds: Array<UmbVariantId> = [],
+	): Promise<void> {
+		saveData.variants = saveData.variants.filter((v) => v.name);
+		variantIds = variantIds.filter((variantId) => saveData.variants.some((v) => variantId.compare(v)));
+		return super.runMandatoryValidationForSaveData(saveData, variantIds);
+	}
+
 	public createPropertyDatasetContext(
 		host: UmbControllerHost,
 		variantId: UmbVariantId,
