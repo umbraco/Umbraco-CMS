@@ -26,6 +26,12 @@ public class PooledDbContextConnectionTaintingTests : UmbracoIntegrationTest
         builder.Services.AddUmbracoDbContext<PooledTestDbContext>(
             (serviceProvider, options, connectionString, providerName) =>
             {
+                if (providerName is "Npgsql2" or "Npgsql")
+                {
+                    options.UseNpgsql(connectionString!);
+                    return;
+                }
+
                 options.UseUmbracoDatabaseProvider(serviceProvider);
             });
     }
