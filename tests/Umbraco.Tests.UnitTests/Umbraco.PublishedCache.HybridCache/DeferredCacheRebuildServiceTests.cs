@@ -1,6 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
@@ -23,10 +24,21 @@ public class DeferredCacheRebuildServiceTests
     {
         _documentCacheService = new Mock<IDocumentCacheService>();
         _mediaCacheService = new Mock<IMediaCacheService>();
-        _service = new DeferredCacheRebuildService(
+        _service = CreateService();
+    }
+
+    [TearDown]
+    public void TearDown() => _service.Dispose();
+
+    private DeferredCacheRebuildService CreateService(CancellationToken shutdownToken = default)
+    {
+        var lifetime = new Mock<IHostApplicationLifetime>();
+        lifetime.Setup(x => x.ApplicationStopping).Returns(shutdownToken);
+        return new DeferredCacheRebuildService(
             _documentCacheService.Object,
             _mediaCacheService.Object,
-            Mock.Of<ILogger<DeferredCacheRebuildService>>());
+            Mock.Of<ILogger<DeferredCacheRebuildService>>(),
+            lifetime.Object);
     }
 
     [Test]
@@ -131,6 +143,133 @@ public class DeferredCacheRebuildServiceTests
         // Assert — document rebuild should never be called
         _documentCacheService.Verify(
             x => x.Rebuild(It.IsAny<IReadOnlyCollection<int>>()),
+            Times.Never);
+    }
+
+    [Test]
+    public async Task Transient_Failure_Retries_And_Succeeds()
+    {
+        // Arrange — Rebuild throws once then succeeds.
+        var callCount = 0;
+        _documentCacheService
+            .Setup(x => x.Rebuild(It.IsAny<IReadOnlyCollection<int>>()))
+            .Callback(() =>
+            {
+                if (Interlocked.Increment(ref callCount) == 1)
+                {
+                    throw new InvalidOperationException("Transient DB error");
+                }
+            });
+        _documentCacheService
+            .Setup(x => x.RebuildMemoryCacheByContentTypeAsync(It.IsAny<IEnumerable<int>>()))
+            .Returns(Task.CompletedTask);
+
+        // Act
+        _service.QueueContentTypeRebuild([1]);
+        await WaitForProcessingAsync();
+
+        // Assert — Rebuild was called twice (first failed, second succeeded).
+        _documentCacheService.Verify(
+            x => x.Rebuild(It.Is<IReadOnlyCollection<int>>(ids => ids.Contains(1))),
+            Times.Exactly(2));
+        _documentCacheService.Verify(
+            x => x.RebuildMemoryCacheByContentTypeAsync(It.Is<IEnumerable<int>>(ids => ids.Contains(1))),
+            Times.Once);
+    }
+
+    [Test]
+    public async Task Persistent_Failure_Gives_Up_After_Max_Retries()
+    {
+        // Arrange — Rebuild always throws.
+        _documentCacheService
+            .Setup(x => x.Rebuild(It.IsAny<IReadOnlyCollection<int>>()))
+            .Throws(new InvalidOperationException("Persistent DB error"));
+
+        // Act
+        _service.QueueContentTypeRebuild([1]);
+
+        // Wait for the worker to exit (IDs will remain pending after max retries).
+        using var cts = new CancellationTokenSource(TestTimeout);
+        await _service.WaitForWorkerIdleAsync(cts.Token);
+
+        // Assert — Rebuild was called 3 times (the max consecutive failure count).
+        _documentCacheService.Verify(
+            x => x.Rebuild(It.IsAny<IReadOnlyCollection<int>>()),
+            Times.Exactly(3));
+
+        // Memory cache rebuild should never be called since Rebuild always failed first.
+        _documentCacheService.Verify(
+            x => x.RebuildMemoryCacheByContentTypeAsync(It.IsAny<IEnumerable<int>>()),
+            Times.Never);
+    }
+
+    [Test]
+    public async Task Failed_Ids_Are_Retried_On_Next_Queue_Call()
+    {
+        // Arrange — Rebuild throws on every call initially.
+        var callCount = 0;
+        _documentCacheService
+            .Setup(x => x.Rebuild(It.IsAny<IReadOnlyCollection<int>>()))
+            .Callback(() =>
+            {
+                // Fail the first 3 calls (exhaust retries), then succeed.
+                if (Interlocked.Increment(ref callCount) <= 3)
+                {
+                    throw new InvalidOperationException("Persistent DB error");
+                }
+            });
+        _documentCacheService
+            .Setup(x => x.RebuildMemoryCacheByContentTypeAsync(It.IsAny<IEnumerable<int>>()))
+            .Returns(Task.CompletedTask);
+
+        // Act — first attempt exhausts retries.
+        _service.QueueContentTypeRebuild([1]);
+        using var cts = new CancellationTokenSource(TestTimeout);
+        await _service.WaitForWorkerIdleAsync(cts.Token);
+
+        // A new queue call picks up the leftover IDs from the failed attempts.
+        _service.QueueContentTypeRebuild([2]);
+        await WaitForProcessingAsync();
+
+        // Assert — the fourth Rebuild call succeeds, containing both IDs (1 from retry + 2 from new queue).
+        _documentCacheService.Verify(
+            x => x.Rebuild(It.Is<IReadOnlyCollection<int>>(ids => ids.Contains(1) && ids.Contains(2))),
+            Times.Once);
+    }
+
+    [Test]
+    public async Task Shutdown_Cancels_In_Flight_Rebuild()
+    {
+        // Arrange — use a CTS that we control as the shutdown token.
+        using var shutdownCts = new CancellationTokenSource();
+        using var service = CreateService(shutdownCts.Token);
+
+        var rebuildStarted = new TaskCompletionSource();
+        _documentCacheService
+            .Setup(x => x.Rebuild(It.IsAny<IReadOnlyCollection<int>>()))
+            .Callback(() =>
+            {
+                rebuildStarted.SetResult();
+
+                // Simulate a long-running rebuild that respects cancellation.
+                shutdownCts.Cancel();
+                shutdownCts.Token.ThrowIfCancellationRequested();
+            });
+
+        // Act
+        service.QueueContentTypeRebuild([1]);
+
+        // Wait for the worker to exit after cancellation.
+        using var timeoutCts = new CancellationTokenSource(TestTimeout);
+        await service.WaitForWorkerIdleAsync(timeoutCts.Token);
+
+        // Assert — Rebuild was called once, then cancelled. Memory cache rebuild never reached.
+        await rebuildStarted.Task;
+        _documentCacheService.Verify(
+            x => x.Rebuild(It.IsAny<IReadOnlyCollection<int>>()),
+            Times.Once);
+        _documentCacheService.Verify(
+            x => x.RebuildMemoryCacheByContentTypeAsync(It.IsAny<IEnumerable<int>>()),
             Times.Never);
     }
 
