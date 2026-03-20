@@ -9,6 +9,18 @@ namespace Umbraco.Cms.Infrastructure.Persistence.EFCore;
 public interface IEFCoreModelCustomizer
 {
     /// <summary>
+    /// Gets the EF Core provider name this customizer targets, or <c>null</c> if it applies to all providers.
+    /// </summary>
+    /// <remarks>
+    /// When non-null, <see cref="UmbracoDbContext"/> skips this customizer if the active
+    /// database provider (from <see cref="Microsoft.EntityFrameworkCore.Infrastructure.DatabaseFacade.ProviderName"/>)
+    /// does not match this value (case-insensitive).
+    /// Use the EF Core provider name, e.g. <c>"Microsoft.EntityFrameworkCore.Sqlite"</c> or
+    /// <c>"Microsoft.EntityFrameworkCore.SqlServer"</c>.
+    /// </remarks>
+    string? ProviderName => null;
+
+    /// <summary>
     /// Applies provider-specific model configuration.
     /// </summary>
     void Apply(ModelBuilder modelBuilder);

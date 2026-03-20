@@ -1,5 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore;
 
 namespace Umbraco.Cms.Persistence.EFCore.Sqlite;
@@ -11,6 +12,9 @@ namespace Umbraco.Cms.Persistence.EFCore.Sqlite;
 /// </summary>
 public class SqliteCollationModelCustomizer : IEFCoreModelCustomizer
 {
+    /// <inheritdoc />
+    public string? ProviderName => Constants.ProviderNames.EFCore.SQLite;
+
     /// <inheritdoc />
     public void Apply(ModelBuilder modelBuilder)
     {

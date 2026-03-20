@@ -8,13 +8,30 @@ public static partial class Constants
     public static class ProviderNames
     {
         /// <summary>
-        ///     The provider name for SQLite databases.
+        ///     The ADO.NET provider name for SQLite databases.
         /// </summary>
         public const string SQLite = "Microsoft.Data.Sqlite";
 
         /// <summary>
-        ///     The provider name for SQL Server databases.
+        ///     The ADO.NET provider name for SQL Server databases.
         /// </summary>
         public const string SQLServer = "Microsoft.Data.SqlClient";
+
+        /// <summary>
+        ///     Contains EF Core provider name constants, as returned by
+        ///     <see cref="Microsoft.EntityFrameworkCore.Infrastructure.DatabaseFacade.ProviderName"/>.
+        /// </summary>
+        public static class EFCore
+        {
+            /// <summary>
+            ///     The EF Core provider name for SQLite databases.
+            /// </summary>
+            public const string SQLite = "Microsoft.EntityFrameworkCore.Sqlite";
+
+            /// <summary>
+            ///     The EF Core provider name for SQL Server databases.
+            /// </summary>
+            public const string SQLServer = "Microsoft.EntityFrameworkCore.SqlServer";
+        }
     }
 }

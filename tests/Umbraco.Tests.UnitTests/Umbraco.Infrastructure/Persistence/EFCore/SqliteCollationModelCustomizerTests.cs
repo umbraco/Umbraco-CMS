@@ -1,6 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Persistence.EFCore.Sqlite;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Persistence.EFCore;
@@ -8,10 +9,19 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Persistence.EFCore;
 [TestFixture]
 public class SqliteCollationModelCustomizerTests
 {
+    private static SqliteCollationModelCustomizer CreateCustomizer() => new();
+
+    [Test]
+    public void ProviderName_ReturnsSQLiteProviderName()
+    {
+        var customizer = CreateCustomizer();
+        Assert.That(customizer.ProviderName, Is.EqualTo(Constants.ProviderNames.EFCore.SQLite));
+    }
+
     [Test]
     public void Apply_SetsNocaseCollationOnAllStringProperties()
     {
-        var customizer = new SqliteCollationModelCustomizer();
+        var customizer = CreateCustomizer();
         var modelBuilder = new ModelBuilder();
         modelBuilder.Entity<TestEntity>(b =>
         {
@@ -35,7 +45,7 @@ public class SqliteCollationModelCustomizerTests
     [Test]
     public void Apply_DoesNotSetCollationOnNonStringProperties()
     {
-        var customizer = new SqliteCollationModelCustomizer();
+        var customizer = CreateCustomizer();
         var modelBuilder = new ModelBuilder();
         modelBuilder.Entity<TestEntity>(b =>
         {
@@ -59,7 +69,7 @@ public class SqliteCollationModelCustomizerTests
     [Test]
     public void Apply_HandlesMultipleEntityTypes()
     {
-        var customizer = new SqliteCollationModelCustomizer();
+        var customizer = CreateCustomizer();
         var modelBuilder = new ModelBuilder();
         modelBuilder.Entity<TestEntity>(b =>
         {
