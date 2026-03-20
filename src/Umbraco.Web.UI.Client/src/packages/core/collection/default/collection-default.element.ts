@@ -32,6 +32,15 @@ export class UmbCollectionDefaultElement extends UmbLitElement {
 	private _hasItems = false;
 
 	@state()
+	private _currentPage = 1;
+
+	@state()
+	private _pageSize?: number;
+
+	@state()
+	private _totalItems = 0;
+
+	@state()
 	private _emptyLabel?: string;
 
 	@state()
@@ -87,9 +96,26 @@ export class UmbCollectionDefaultElement extends UmbLitElement {
 		this.observe(
 			this.#collectionContext.totalItems,
 			(totalItems) => {
+				this._totalItems = totalItems;
 				this._hasItems = totalItems > 0;
 			},
 			'umbCollectionTotalItemsObserver',
+		);
+
+		this.observe(
+			this.#collectionContext.pagination.currentPage,
+			(currentPage) => {
+				this._currentPage = currentPage ?? 1;
+			},
+			'umbCollectionCurrentPageObserver',
+		);
+
+		this.observe(
+			this.#collectionContext.pagination.pageSize,
+			(pageSize) => {
+				this._pageSize = pageSize;
+			},
+			'umbCollectionPageSizeObserver',
 		);
 	}
 
@@ -101,11 +127,9 @@ export class UmbCollectionDefaultElement extends UmbLitElement {
 		return this._routes
 			? html`
 					<umb-body-layout header-transparent class=${this._hasItems ? 'has-items' : ''}>
-						${this.renderToolbar()}
-						<umb-collection-active-filters></umb-collection-active-filters>
+						${this.renderToolbar()} ${this._hasItems ? this.#renderCollectionInfo() : nothing}
 						<umb-router-slot id="router" .routes=${this._routes}></umb-router-slot>
-						${this._hasItems ? this.renderPagination() : this.#renderEmptyState()}
-						${this.renderSelectionActions()}
+						${this._hasItems ? this.renderPagination() : this.#renderEmptyState()} ${this.renderSelectionActions()}
 					</umb-body-layout>
 					<umb-collection-filter-sidebar></umb-collection-filter-sidebar>
 				`
@@ -122,6 +146,20 @@ export class UmbCollectionDefaultElement extends UmbLitElement {
 
 	protected renderSelectionActions() {
 		return html`<umb-collection-selection-actions slot="footer"></umb-collection-selection-actions>`;
+	}
+
+	#renderCollectionInfo() {
+		if (!this._pageSize) return;
+
+		const start = (this._currentPage - 1) * this._pageSize + 1;
+		const end = Math.min(this._currentPage * this._pageSize, this._totalItems);
+
+		return html`
+			<div id="collection-info">
+				<umb-collection-active-filters></umb-collection-active-filters>
+				<small>Showing ${start}-${end} of ${this._totalItems}</small>
+			</div>
+		`;
 	}
 
 	#renderEmptyState() {
@@ -147,6 +185,16 @@ export class UmbCollectionDefaultElement extends UmbLitElement {
 			umb-body-layout {
 				flex: 1;
 				min-width: 0;
+			}
+
+			#collection-info {
+				display: flex;
+				align-items: center;
+				padding: var(--uui-size-space-3) 0;
+			}
+
+			#collection-info > small {
+				margin-left: auto;
 			}
 
 			#router {

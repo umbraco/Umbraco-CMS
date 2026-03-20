@@ -1,7 +1,6 @@
-import { UMB_COLLECTION_CONTEXT } from '../default/index.js';
 import { UMB_FACET_FILTER_MANAGER_CONTEXT, type UmbActiveFacetFilterModel } from '@umbraco-cms/backoffice/facet-filter';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, nothing, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-collection-active-filters')
@@ -10,9 +9,6 @@ export class UmbCollectionActiveFiltersElement extends UmbLitElement {
 
 	@state()
 	private _activeFilters?: Array<UmbActiveFacetFilterModel> = [];
-
-	@state()
-	private _totalItems: number = 0;
 
 	constructor() {
 		super();
@@ -24,23 +20,13 @@ export class UmbCollectionActiveFiltersElement extends UmbLitElement {
 				this._activeFilters = activeFilters;
 			});
 		});
-
-		this.consumeContext(UMB_COLLECTION_CONTEXT, (context) => {
-			this.observe(context?.totalItems, (total) => {
-				this._totalItems = total ?? 0;
-			});
-		});
 	}
 
 	override render() {
 		const hasActiveFilters = this._activeFilters && this._activeFilters.length > 0;
 
 		if (!hasActiveFilters) {
-			return html`
-				<div id="active-filters">
-					<small>Showing <strong>${this._totalItems}</strong> ${this._totalItems === 1 ? 'result' : 'results'}</small>
-				</div>
-			`;
+			return nothing;
 		}
 
 		return html`
@@ -78,9 +64,12 @@ export class UmbCollectionActiveFiltersElement extends UmbLitElement {
 	static override styles = [
 		UmbTextStyles,
 		css`
+			:host {
+				display: contents;
+			}
+
 			#active-filters {
 				display: block;
-				padding: var(--uui-size-space-3) 0;
 			}
 
 			#active-filter-items {

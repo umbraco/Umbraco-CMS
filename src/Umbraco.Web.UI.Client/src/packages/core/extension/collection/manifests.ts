@@ -8,10 +8,10 @@ export const UMB_EXTENSION_COLLECTION_ALIAS = 'Umb.Collection.Extension';
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'collection',
+		kind: 'default',
 		alias: UMB_EXTENSION_COLLECTION_ALIAS,
 		name: 'Extension Collection',
 		api: () => import('./extension-collection.context.js'),
-		element: () => import('./extension-collection.element.js'),
 		meta: {
 			repositoryAlias: UMB_EXTENSION_COLLECTION_REPOSITORY_ALIAS,
 		},

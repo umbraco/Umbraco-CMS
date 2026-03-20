@@ -19,4 +19,16 @@ export const manifests: Array<UmbExtensionManifest> = [
 			},
 		],
 	},
+	{
+		type: 'collectionTextFilter',
+		kind: 'default',
+		alias: 'Umb.Collection.TextFilter.Extension',
+		name: 'Extension Collection Text Filter',
+		conditions: [
+			{
+				alias: UMB_COLLECTION_ALIAS_CONDITION,
+				match: 'Umb.Collection.Extension',
+			},
+		],
+	},
 ];
