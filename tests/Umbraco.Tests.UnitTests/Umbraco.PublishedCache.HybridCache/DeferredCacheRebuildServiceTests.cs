@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.PublishedCache.HybridCache;
 [TestFixture]
 public class DeferredCacheRebuildServiceTests
 {
-    private static readonly TimeSpan TestTimeout = TimeSpan.FromSeconds(5);
+    private static readonly TimeSpan _testTimeout = TimeSpan.FromSeconds(5);
 
     private Mock<IDocumentCacheService> _documentCacheService = null!;
     private Mock<IMediaCacheService> _mediaCacheService = null!;
@@ -41,6 +41,9 @@ public class DeferredCacheRebuildServiceTests
             lifetime.Object);
     }
 
+    /// <summary>
+    ///     Verifies that queued content type IDs trigger both a database cache rebuild and a memory cache rebuild.
+    /// </summary>
     [Test]
     public async Task QueueContentTypeRebuild_Calls_Rebuild_And_RebuildMemoryCache()
     {
@@ -62,6 +65,9 @@ public class DeferredCacheRebuildServiceTests
             Times.Once);
     }
 
+    /// <summary>
+    ///     Verifies that queued media type IDs trigger both a database cache rebuild and a memory cache rebuild.
+    /// </summary>
     [Test]
     public async Task QueueMediaTypeRebuild_Calls_Rebuild_And_RebuildMemoryCache()
     {
@@ -83,6 +89,9 @@ public class DeferredCacheRebuildServiceTests
             Times.Once);
     }
 
+    /// <summary>
+    ///     Verifies that queuing the same content type ID multiple times does not produce duplicate rebuild calls.
+    /// </summary>
     [Test]
     public async Task QueueContentTypeRebuild_Deduplicates_Ids()
     {
@@ -103,6 +112,9 @@ public class DeferredCacheRebuildServiceTests
             Times.AtLeastOnce);
     }
 
+    /// <summary>
+    ///     Verifies that content type and media type rebuilds are processed independently within the same worker iteration.
+    /// </summary>
     [Test]
     public async Task Document_And_Media_Types_Processed_Independently()
     {
@@ -128,6 +140,9 @@ public class DeferredCacheRebuildServiceTests
             Times.AtLeastOnce);
     }
 
+    /// <summary>
+    ///     Verifies that queuing only media type IDs does not trigger a document cache rebuild.
+    /// </summary>
     [Test]
     public async Task Does_Not_Call_Rebuild_For_Empty_Content_Types()
     {
@@ -146,6 +161,9 @@ public class DeferredCacheRebuildServiceTests
             Times.Never);
     }
 
+    /// <summary>
+    ///     Verifies that a transient failure is retried and the rebuild succeeds on the second attempt.
+    /// </summary>
     [Test]
     public async Task Transient_Failure_Retries_And_Succeeds()
     {
@@ -177,6 +195,9 @@ public class DeferredCacheRebuildServiceTests
             Times.Once);
     }
 
+    /// <summary>
+    ///     Verifies that the worker stops retrying after 3 consecutive failures and does not call the memory cache rebuild.
+    /// </summary>
     [Test]
     public async Task Persistent_Failure_Gives_Up_After_Max_Retries()
     {
@@ -189,7 +210,7 @@ public class DeferredCacheRebuildServiceTests
         _service.QueueContentTypeRebuild([1]);
 
         // Wait for the worker to exit (IDs will remain pending after max retries).
-        using var cts = new CancellationTokenSource(TestTimeout);
+        using var cts = new CancellationTokenSource(_testTimeout);
         await _service.WaitForWorkerIdleAsync(cts.Token);
 
         // Assert — Rebuild was called 3 times (the max consecutive failure count).
@@ -203,6 +224,9 @@ public class DeferredCacheRebuildServiceTests
             Times.Never);
     }
 
+    /// <summary>
+    ///     Verifies that IDs left pending after max retries are picked up and rebuilt when a new queue call arrives.
+    /// </summary>
     [Test]
     public async Task Failed_Ids_Are_Retried_On_Next_Queue_Call()
     {
@@ -224,7 +248,7 @@ public class DeferredCacheRebuildServiceTests
 
         // Act — first attempt exhausts retries.
         _service.QueueContentTypeRebuild([1]);
-        using var cts = new CancellationTokenSource(TestTimeout);
+        using var cts = new CancellationTokenSource(_testTimeout);
         await _service.WaitForWorkerIdleAsync(cts.Token);
 
         // A new queue call picks up the leftover IDs from the failed attempts.
@@ -237,6 +261,9 @@ public class DeferredCacheRebuildServiceTests
             Times.Once);
     }
 
+    /// <summary>
+    ///     Verifies that application shutdown cancels an in-flight rebuild cleanly without reaching the memory cache step.
+    /// </summary>
     [Test]
     public async Task Shutdown_Cancels_In_Flight_Rebuild()
     {
@@ -260,7 +287,7 @@ public class DeferredCacheRebuildServiceTests
         service.QueueContentTypeRebuild([1]);
 
         // Wait for the worker to exit after cancellation.
-        using var timeoutCts = new CancellationTokenSource(TestTimeout);
+        using var timeoutCts = new CancellationTokenSource(_testTimeout);
         await service.WaitForWorkerIdleAsync(timeoutCts.Token);
 
         // Assert — Rebuild was called once, then cancelled. Memory cache rebuild never reached.
@@ -275,7 +302,7 @@ public class DeferredCacheRebuildServiceTests
 
     private async Task WaitForProcessingAsync()
     {
-        using var cts = new CancellationTokenSource(TestTimeout);
+        using var cts = new CancellationTokenSource(_testTimeout);
         await _service.WaitForPendingRebuildsAsync(cts.Token);
     }
 }

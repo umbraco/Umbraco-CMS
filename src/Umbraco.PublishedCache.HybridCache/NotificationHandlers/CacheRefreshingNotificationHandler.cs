@@ -11,8 +11,9 @@ namespace Umbraco.Cms.Infrastructure.HybridCache.NotificationHandlers;
 ///     Handles content and media cache invalidation in response to content, media, and type change notifications.
 /// </summary>
 /// <remarks>
-///     For structural content/media type changes, the rebuild can be deferred to a background task
-///     when <see cref="CacheSettings.ContentTypeRebuildMode" /> is set to <see cref="ContentTypeRebuildMode.Deferred" />.
+///     For structural content/media type changes, the rebuild can run immediately (default) or be deferred
+///     to a background task via <see cref="DeferredCacheRebuildNotificationHandler" /> when
+///     <see cref="CacheSettings.ContentTypeRebuildMode" /> is set to <see cref="ContentTypeRebuildMode.Deferred" />.
 /// </remarks>
 #pragma warning disable CS0618 // Type or member is obsolete
 internal sealed class CacheRefreshingNotificationHandler :
@@ -29,7 +30,6 @@ internal sealed class CacheRefreshingNotificationHandler :
     private readonly IDocumentCacheService _documentCacheService;
     private readonly IMediaCacheService _mediaCacheService;
     private readonly IPublishedContentTypeCache _publishedContentTypeCache;
-    private readonly IDeferredCacheRebuildService _deferredCacheRebuildService;
     private readonly CacheSettings _cacheSettings;
 
     /// <summary>
@@ -38,19 +38,16 @@ internal sealed class CacheRefreshingNotificationHandler :
     /// <param name="documentCacheService">The document cache service.</param>
     /// <param name="mediaCacheService">The media cache service.</param>
     /// <param name="publishedContentTypeCache">The published content type cache.</param>
-    /// <param name="deferredCacheRebuildService">The deferred cache rebuild service.</param>
     /// <param name="cacheSettings">The cache settings.</param>
     public CacheRefreshingNotificationHandler(
         IDocumentCacheService documentCacheService,
         IMediaCacheService mediaCacheService,
         IPublishedContentTypeCache publishedContentTypeCache,
-        IDeferredCacheRebuildService deferredCacheRebuildService,
         IOptions<CacheSettings> cacheSettings)
     {
         _documentCacheService = documentCacheService;
         _mediaCacheService = mediaCacheService;
         _publishedContentTypeCache = publishedContentTypeCache;
-        _deferredCacheRebuildService = deferredCacheRebuildService;
         _cacheSettings = cacheSettings.Value;
     }
 
@@ -109,16 +106,12 @@ internal sealed class CacheRefreshingNotificationHandler :
         }
 
         // Full rebuild only for structural changes (property removed, alias changed, variation changed, etc.)
-        if (structuralChangeIds.Length > 0)
+        // In deferred mode, the rebuild is queued from the ContentTypeChangedNotification handler instead,
+        // which fires after the scope is disposed — avoiding database lock contention between the
+        // deferred rebuild's transaction and the original save transaction.
+        if (structuralChangeIds.Length > 0 && _cacheSettings.ContentTypeRebuildMode != ContentTypeRebuildMode.Deferred)
         {
-            if (_cacheSettings.ContentTypeRebuildMode == ContentTypeRebuildMode.Deferred)
-            {
-                _deferredCacheRebuildService.QueueContentTypeRebuild(structuralChangeIds);
-            }
-            else
-            {
-                _documentCacheService.Rebuild(structuralChangeIds);
-            }
+            _documentCacheService.Rebuild(structuralChangeIds);
         }
 
         // For non-structural changes (name, icon, description, new property added),
@@ -168,16 +161,12 @@ internal sealed class CacheRefreshingNotificationHandler :
         }
 
         // Full rebuild only for structural changes (property removed, alias changed, variation changed, etc.)
-        if (structuralChangeIds.Length > 0)
+        // In deferred mode, the rebuild is queued from the MediaTypeChangedNotification handler instead,
+        // which fires after the scope is disposed — avoiding database lock contention between the
+        // deferred rebuild's transaction and the original save transaction.
+        if (structuralChangeIds.Length > 0 && _cacheSettings.ContentTypeRebuildMode != ContentTypeRebuildMode.Deferred)
         {
-            if (_cacheSettings.ContentTypeRebuildMode == ContentTypeRebuildMode.Deferred)
-            {
-                _deferredCacheRebuildService.QueueMediaTypeRebuild(structuralChangeIds);
-            }
-            else
-            {
-                _mediaCacheService.Rebuild(structuralChangeIds);
-            }
+            _mediaCacheService.Rebuild(structuralChangeIds);
         }
 
         // For non-structural changes (name, icon, description, new property added),
