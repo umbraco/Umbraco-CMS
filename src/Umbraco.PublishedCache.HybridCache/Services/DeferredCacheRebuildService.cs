@@ -74,7 +74,14 @@ internal sealed class DeferredCacheRebuildService : IDeferredCacheRebuildService
 
         if (Interlocked.CompareExchange(ref _processing, 1, 0) == 0)
         {
-            Task.Run(() => ProcessPendingRebuildsAsync(_shutdownCts.Token));
+            // Suppress execution context flow so the background task does not inherit the
+            // caller's ambient scope (stored in AsyncLocal). Without this, the background
+            // thread would share the same database connection as the notification handler,
+            // causing "open DataReader" errors from concurrent use of a single connection.
+            using (ExecutionContext.SuppressFlow())
+            {
+                Task.Run(() => ProcessPendingRebuildsAsync(_shutdownCts.Token));
+            }
         }
     }
 
@@ -98,18 +105,18 @@ internal sealed class DeferredCacheRebuildService : IDeferredCacheRebuildService
                 {
                     if (contentTypeIds.Length > 0)
                     {
-                        _logger.LogDebug("Deferred rebuild starting for content type IDs: {ContentTypeIds}", contentTypeIds);
+                        _logger.LogInformation("Deferred rebuild starting for content type IDs: {ContentTypeIds}", contentTypeIds);
                         _documentCacheService.Rebuild(contentTypeIds);
                         await _documentCacheService.RebuildMemoryCacheByContentTypeAsync(contentTypeIds);
-                        _logger.LogDebug("Deferred rebuild completed for content type IDs: {ContentTypeIds}", contentTypeIds);
+                        _logger.LogInformation("Deferred rebuild completed for content type IDs: {ContentTypeIds}", contentTypeIds);
                     }
 
                     if (mediaTypeIds.Length > 0)
                     {
-                        _logger.LogDebug("Deferred rebuild starting for media type IDs: {MediaTypeIds}", mediaTypeIds);
+                        _logger.LogInformation("Deferred rebuild starting for media type IDs: {MediaTypeIds}", mediaTypeIds);
                         _mediaCacheService.Rebuild(mediaTypeIds);
                         await _mediaCacheService.RebuildMemoryCacheByContentTypeAsync(mediaTypeIds);
-                        _logger.LogDebug("Deferred rebuild completed for media type IDs: {MediaTypeIds}", mediaTypeIds);
+                        _logger.LogInformation("Deferred rebuild completed for media type IDs: {MediaTypeIds}", mediaTypeIds);
                     }
 
                     consecutiveFailures = 0;
