@@ -1,4 +1,6 @@
 import type { UmbMemberDetailModel } from '../types.js';
+import { UMB_MEMBER_COLLECTION_MEMBER_TYPE_FACET_FILTER_ALIAS } from './filter/member-type/constants.js';
+import { UMB_MEMBER_COLLECTION_MEMBER_GROUP_FACET_FILTER_ALIAS } from './filter/member-group/constants.js';
 import type { UmbMemberCollectionFilterModel } from './types.js';
 import { UMB_MEMBER_TABLE_COLLECTION_VIEW_ALIAS } from './views/manifests.js';
 import { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
@@ -16,10 +18,10 @@ export class UmbMemberCollectionContext extends UmbDefaultCollectionContext<
 		const activeFilters = await this.filtering.getActiveFilters();
 		const args: Record<string, any> = {};
 
-		const memberTypeFilters = activeFilters.filter((f) => f.alias === 'Umb.CollectionFacetFilter.MemberType');
+		const memberTypeFilters = activeFilters.filter((f) => f.alias === UMB_MEMBER_COLLECTION_MEMBER_TYPE_FACET_FILTER_ALIAS);
 		if (memberTypeFilters.length) args.memberTypeId = memberTypeFilters.map((f) => f.unique);
 
-		const memberGroupFilters = activeFilters.filter((f) => f.alias === 'Umb.CollectionFacetFilter.MemberGroup');
+		const memberGroupFilters = activeFilters.filter((f) => f.alias === UMB_MEMBER_COLLECTION_MEMBER_GROUP_FACET_FILTER_ALIAS);
 		if (memberGroupFilters.length) args.memberGroupName = memberGroupFilters.map((f) => f.unique);
 
 		return args;

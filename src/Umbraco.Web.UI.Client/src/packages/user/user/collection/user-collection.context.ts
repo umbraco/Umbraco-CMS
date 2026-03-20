@@ -1,5 +1,7 @@
 import type { UmbUserDetailModel } from '../types.js';
 import { UMB_EDIT_USER_WORKSPACE_PATH_PATTERN } from '../paths.js';
+import { UMB_USER_COLLECTION_USER_STATE_FACET_FILTER_ALIAS } from './filter/user-state/constants.js';
+import { UMB_USER_COLLECTION_USER_GROUP_FACET_FILTER_ALIAS } from './filter/user-group/constants.js';
 import { UMB_COLLECTION_VIEW_USER_GRID } from './views/index.js';
 import type { UmbUserCollectionFilterModel, UmbUserOrderByOption } from './types.js';
 import type { UmbUserOrderByType, UmbUserStateFilterType } from './utils/index.js';
@@ -79,10 +81,10 @@ export class UmbUserCollectionContext extends UmbDefaultCollectionContext<
 		const activeFilters = await this.filtering.getActiveFilters();
 		const args: Record<string, any> = {};
 
-		const userStateFilters = activeFilters.filter((f) => f.alias === 'Umb.CollectionFacetFilter.UserState');
+		const userStateFilters = activeFilters.filter((f) => f.alias === UMB_USER_COLLECTION_USER_STATE_FACET_FILTER_ALIAS);
 		if (userStateFilters.length) args.userStates = userStateFilters.map((f) => f.unique);
 
-		const userGroupFilters = activeFilters.filter((f) => f.alias === 'Umb.CollectionFacetFilter.UserGroup');
+		const userGroupFilters = activeFilters.filter((f) => f.alias === UMB_USER_COLLECTION_USER_GROUP_FACET_FILTER_ALIAS);
 		if (userGroupFilters.length) args.userGroupIds = userGroupFilters.map((f) => f.unique);
 
 		return args;

@@ -1,3 +1,4 @@
+import { UMB_USER_COLLECTION_USER_STATE_FACET_FILTER_ALIAS } from './constants.js';
 import { UMB_USER_COLLECTION_ALIAS } from '../../constants.js';
 import { UmbUserStateDatalistDataSource } from './user-state-datalist-data-source.js';
 import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
@@ -6,7 +7,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'facetFilter',
 		kind: 'select',
-		alias: 'Umb.CollectionFacetFilter.UserState',
+		alias: UMB_USER_COLLECTION_USER_STATE_FACET_FILTER_ALIAS,
 		name: 'User State Collection Filter',
 		weight: 200,
 		meta: {

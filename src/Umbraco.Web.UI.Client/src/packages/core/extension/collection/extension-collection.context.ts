@@ -1,3 +1,4 @@
+import { UMB_EXTENSION_COLLECTION_EXTENSION_TYPE_FACET_FILTER_ALIAS } from './filter/constants.js';
 import type { UmbExtensionCollectionFilterModel, UmbExtensionCollectionItemModel } from './types.js';
 import { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -17,7 +18,7 @@ export class UmbExtensionCollectionContext extends UmbDefaultCollectionContext<
 		const args: Record<string, any> = {};
 
 		const extensionTypeFilters = activeFilters.filter(
-			(f) => f.alias === 'Umb.CollectionFacetFilter.Extension.Type',
+			(f) => f.alias === UMB_EXTENSION_COLLECTION_EXTENSION_TYPE_FACET_FILTER_ALIAS,
 		);
 		if (extensionTypeFilters.length) args.extensionTypes = extensionTypeFilters.map((f) => f.unique);
 
