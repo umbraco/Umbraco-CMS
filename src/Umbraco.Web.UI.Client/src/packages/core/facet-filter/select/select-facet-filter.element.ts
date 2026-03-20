@@ -1,6 +1,6 @@
-import type { ManifestCollectionFacetFilter } from '../collection-facet-filter.extension.js';
-import type { MetaCollectionFacetFilterSelect } from './types.js';
-import type { UmbSelectCollectionFacetFilterApi } from './select-collection-facet-filter.api.js';
+import type { ManifestFacetFilter } from '../facet-filter.extension.js';
+import type { MetaFacetFilterSelect } from './types.js';
+import type { UmbSelectFacetFilterApi } from './select-facet-filter.api.js';
 import type { UmbDatalistItemModel, UmbDatalistOptionModel } from '@umbraco-cms/backoffice/datalist-data-source';
 import { css, customElement, html, ifDefined, repeat, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -10,18 +10,18 @@ type UmbSelectValue = Pick<UmbDatalistOptionModel, 'unique' | 'entityType'>;
 
 const INLINE_THRESHOLD = 6;
 
-@customElement('umb-select-collection-facet-filter')
-export class UmbSelectCollectionFacetFilterElement extends UmbLitElement {
+@customElement('umb-select-facet-filter')
+export class UmbSelectFacetFilterElement extends UmbLitElement {
 	@state()
 	private _multiple = false;
 
-	#manifest?: ManifestCollectionFacetFilter;
-	public get manifest(): ManifestCollectionFacetFilter | undefined {
+	#manifest?: ManifestFacetFilter;
+	public get manifest(): ManifestFacetFilter | undefined {
 		return this.#manifest;
 	}
-	public set manifest(manifest: ManifestCollectionFacetFilter | undefined) {
+	public set manifest(manifest: ManifestFacetFilter | undefined) {
 		this.#manifest = manifest;
-		this._multiple = !!(manifest?.meta as MetaCollectionFacetFilterSelect | undefined)?.multiple;
+		this._multiple = !!(manifest?.meta as MetaFacetFilterSelect | undefined)?.multiple;
 	}
 
 	@state()
@@ -39,11 +39,11 @@ export class UmbSelectCollectionFacetFilterElement extends UmbLitElement {
 	@state()
 	private _comboboxSearch: string = '';
 
-	#api?: UmbSelectCollectionFacetFilterApi | undefined;
-	public get api(): UmbSelectCollectionFacetFilterApi | undefined {
+	#api?: UmbSelectFacetFilterApi | undefined;
+	public get api(): UmbSelectFacetFilterApi | undefined {
 		return this.#api;
 	}
-	public set api(api: UmbSelectCollectionFacetFilterApi | undefined) {
+	public set api(api: UmbSelectFacetFilterApi | undefined) {
 		this.#api = api;
 		this.observe(api?.options, (options) => (this._options = options ?? []));
 		this.observe(api?.value, (value) => (this._value = value ?? []));
@@ -257,10 +257,10 @@ export class UmbSelectCollectionFacetFilterElement extends UmbLitElement {
 	];
 }
 
-export { UmbSelectCollectionFacetFilterElement as element };
+export { UmbSelectFacetFilterElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-select-collection-facet-filter': UmbSelectCollectionFacetFilterElement;
+		'umb-select-facet-filter': UmbSelectFacetFilterElement;
 	}
 }

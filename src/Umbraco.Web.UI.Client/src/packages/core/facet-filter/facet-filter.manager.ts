@@ -1,16 +1,17 @@
-import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import { UMB_FACET_FILTER_MANAGER_CONTEXT } from './facet-filter.manager.context-token.js';
+import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import type { Observable } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-export interface UmbActiveCollectionFacetFilterModel {
+export interface UmbActiveFacetFilterModel {
 	alias: string;
 	unique: string;
 	value: any;
 }
 
-export class UmbCollectionFacetFilterManager extends UmbControllerBase {
-	#activeFilters = new UmbArrayState<UmbActiveCollectionFacetFilterModel>(
+export class UmbFacetFilterManager extends UmbContextBase {
+	#activeFilters = new UmbArrayState<UmbActiveFacetFilterModel>(
 		[],
 		(x) => `${x.alias}||${x.unique}`,
 	);
@@ -20,13 +21,13 @@ export class UmbCollectionFacetFilterManager extends UmbControllerBase {
 	);
 
 	constructor(host: UmbControllerHost) {
-		super(host);
+		super(host, UMB_FACET_FILTER_MANAGER_CONTEXT);
 	}
 
 	/**
 	 * Add or update a single filter entry identified by alias + unique.
 	 */
-	public setFilter(filter: UmbActiveCollectionFacetFilterModel): void {
+	public setFilter(filter: UmbActiveFacetFilterModel): void {
 		const key = `${filter.alias}||${filter.unique}`;
 		if (this.#activeFilters.getHasOne(key)) {
 			this.#activeFilters.updateOne(key, filter);
@@ -48,7 +49,7 @@ export class UmbCollectionFacetFilterManager extends UmbControllerBase {
 	/**
 	 * Observable for all active filter entries for a given alias.
 	 */
-	public filterValuesByAlias(alias: string): Observable<Array<UmbActiveCollectionFacetFilterModel>> {
+	public filterValuesByAlias(alias: string): Observable<Array<UmbActiveFacetFilterModel>> {
 		return this.#activeFilters.asObservablePart((filters) => filters.filter((f) => f.alias === alias));
 	}
 
@@ -78,7 +79,7 @@ export class UmbCollectionFacetFilterManager extends UmbControllerBase {
 	/**
 	 * Get all currently active filters.
 	 */
-	public async getActiveFilters(): Promise<Array<UmbActiveCollectionFacetFilterModel>> {
+	public async getActiveFilters(): Promise<Array<UmbActiveFacetFilterModel>> {
 		return this.#activeFilters.getValue();
 	}
 }

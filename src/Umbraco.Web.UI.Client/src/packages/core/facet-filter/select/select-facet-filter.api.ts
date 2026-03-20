@@ -1,6 +1,6 @@
-import { UMB_COLLECTION_FACET_FILTER_CONTEXT } from '../collection-facet-filter.context-token.js';
-import type { ManifestCollectionFacetFilter } from '../collection-facet-filter.extension.js';
-import type { MetaCollectionFacetFilterSelect } from './types.js';
+import { UMB_FACET_FILTER_CONTEXT } from '../facet-filter.context-token.js';
+import type { ManifestFacetFilter } from '../facet-filter.extension.js';
+import type { MetaFacetFilterSelect } from './types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -15,7 +15,7 @@ const ObserveValueItems = Symbol();
 
 type UmbSelectValue = Pick<UmbDatalistOptionModel, 'unique' | 'entityType'>;
 
-export class UmbSelectCollectionFacetFilterApi extends UmbControllerBase {
+export class UmbSelectFacetFilterApi extends UmbControllerBase {
 	#options = new UmbArrayState<UmbDatalistOptionModel>([], (x) => x.unique);
 	public readonly options = this.#options.asObservable();
 
@@ -25,17 +25,17 @@ export class UmbSelectCollectionFacetFilterApi extends UmbControllerBase {
 	#valueItems = new UmbArrayState<UmbDatalistItemModel>([], (x) => x.unique);
 	public readonly valueItems = this.#valueItems.asObservable();
 
-	#facetFilterContext?: typeof UMB_COLLECTION_FACET_FILTER_CONTEXT.TYPE;
+	#facetFilterContext?: typeof UMB_FACET_FILTER_CONTEXT.TYPE;
 	#datalistDataSource?: UmbDatalistDataSource;
 	public readonly pagination = new UmbPaginationManager();
 
-	#manifest?: ManifestCollectionFacetFilter | undefined;
-	public get manifest(): ManifestCollectionFacetFilter | undefined {
+	#manifest?: ManifestFacetFilter | undefined;
+	public get manifest(): ManifestFacetFilter | undefined {
 		return this.#manifest;
 	}
-	public set manifest(manifest: ManifestCollectionFacetFilter | undefined) {
+	public set manifest(manifest: ManifestFacetFilter | undefined) {
 		this.#manifest = manifest;
-		const meta = manifest?.meta as MetaCollectionFacetFilterSelect | undefined;
+		const meta = manifest?.meta as MetaFacetFilterSelect | undefined;
 		if (meta?.datalistDataSource) {
 			this.#datalistDataSource = new meta.datalistDataSource(this);
 		}
@@ -45,7 +45,7 @@ export class UmbSelectCollectionFacetFilterApi extends UmbControllerBase {
 		super(host);
 		this.pagination.setPageSize(100);
 
-		this.consumeContext(UMB_COLLECTION_FACET_FILTER_CONTEXT, (context) => {
+		this.consumeContext(UMB_FACET_FILTER_CONTEXT, (context) => {
 			this.#facetFilterContext = context;
 			this.#observeFilterValues();
 		});
@@ -120,4 +120,4 @@ export class UmbSelectCollectionFacetFilterApi extends UmbControllerBase {
 	}
 }
 
-export { UmbSelectCollectionFacetFilterApi as api };
+export { UmbSelectFacetFilterApi as api };

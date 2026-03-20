@@ -1,14 +1,14 @@
-import { UMB_COLLECTION_CONTEXT } from '../default/index.js';
+import { UMB_FACET_FILTER_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/facet-filter';
 import { UmbExtensionsElementAndApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { css, customElement, html, nothing, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
-import '../filter/facet-filter/collection-facet-filter.element.js';
+import '../../facet-filter/facet-filter.element.js';
 
 @customElement('umb-collection-filter-bundle')
 export class UmbCollectionFilterBundleElement extends UmbLitElement {
-	#collectionContext?: typeof UMB_COLLECTION_CONTEXT.TYPE;
+	#filterManager?: typeof UMB_FACET_FILTER_MANAGER_CONTEXT.TYPE;
 
 	@state()
 	private _filters: Array<any> = [];
@@ -25,7 +25,7 @@ export class UmbCollectionFilterBundleElement extends UmbLitElement {
 		new UmbExtensionsElementAndApiInitializer(
 			this,
 			umbExtensionsRegistry,
-			'collectionFacetFilter',
+			'facetFilter',
 			undefined,
 			undefined,
 			(filters) => {
@@ -33,15 +33,15 @@ export class UmbCollectionFilterBundleElement extends UmbLitElement {
 			},
 		);
 
-		this.consumeContext(UMB_COLLECTION_CONTEXT, (context) => {
-			if (!context) return;
-			this.#collectionContext = context;
+		this.consumeContext(UMB_FACET_FILTER_MANAGER_CONTEXT, (manager) => {
+			if (!manager) return;
+			this.#filterManager = manager;
 
-			this.observe(context.filtering.totalActiveFilters, (total) => {
+			this.observe(manager.totalActiveFilters, (total) => {
 				this._totalActiveFilters = total ?? 0;
 			});
 
-			this.observe(context.filtering.activeFilters, (filters) => {
+			this.observe(manager.activeFilters, (filters) => {
 				this._activeFilterAliases = new Set(filters?.map((f) => f.alias) ?? []);
 			});
 		});
@@ -52,8 +52,7 @@ export class UmbCollectionFilterBundleElement extends UmbLitElement {
 	}
 
 	#onClearFilter(alias: string) {
-		this.#collectionContext?.filtering.clearFilter(alias);
-		this.#collectionContext?.loadCollection();
+		this.#filterManager?.clearFilter(alias);
 	}
 
 	override render() {
@@ -71,7 +70,7 @@ export class UmbCollectionFilterBundleElement extends UmbLitElement {
 							this._filters,
 							(filter) => filter.alias,
 							(filter) => html`
-								<umb-collection-facet-filter .alias=${filter.alias}>
+								<umb-facet-filter .alias=${filter.alias}>
 									<div class="filter-item">
 										<div class="filter-header">
 											<span class="heading">${filter.manifest?.meta?.label ?? filter.alias}</span>
@@ -87,7 +86,7 @@ export class UmbCollectionFilterBundleElement extends UmbLitElement {
 										</div>
 										${filter.component}
 									</div>
-								</umb-collection-facet-filter>
+								</umb-facet-filter>
 							`,
 						)}
 					</div>

@@ -30,6 +30,7 @@
 		"./clipboard": "./dist-cms/packages/clipboard/index.js",
 		"./code-editor": "./dist-cms/packages/code-editor/index.js",
 		"./collection": "./dist-cms/packages/core/collection/index.js",
+		"./facet-filter": "./dist-cms/packages/core/facet-filter/index.js",
 		"./components": "./dist-cms/packages/core/components/index.js",
 		"./const": "./dist-cms/packages/core/const/index.js",
 		"./content-picker": "./dist-cms/packages/property-editors/content-picker/index.js",

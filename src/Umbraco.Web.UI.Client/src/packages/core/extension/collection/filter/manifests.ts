@@ -3,7 +3,7 @@ import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collecti
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
-		type: 'collectionFacetFilter',
+		type: 'facetFilter',
 		kind: 'select',
 		alias: 'Umb.CollectionFacetFilter.Extension.Type',
 		name: 'Extension Type Collection Filter',

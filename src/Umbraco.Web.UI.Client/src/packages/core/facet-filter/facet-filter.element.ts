@@ -1,10 +1,10 @@
-import { UmbCollectionFacetFilterContext } from './collection-facet-filter.context.js';
+import { UmbFacetFilterContext } from './facet-filter.context.js';
 import { customElement, html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
-@customElement('umb-collection-facet-filter')
-export class UmbCollectionFacetFilterElement extends UmbLitElement {
-	#context = new UmbCollectionFacetFilterContext(this);
+@customElement('umb-facet-filter')
+export class UmbFacetFilterElement extends UmbLitElement {
+	#context = new UmbFacetFilterContext(this);
 
 	#alias?: string;
 	public get alias(): string | undefined {
@@ -24,6 +24,6 @@ export class UmbCollectionFacetFilterElement extends UmbLitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-collection-facet-filter': UmbCollectionFacetFilterElement;
+		'umb-facet-filter': UmbFacetFilterElement;
 	}
 }

@@ -15,11 +15,16 @@ export * from './workspace-view/index.js';
 
 export * from './default/collection-default.context.js';
 export * from './default/collection-default.context-token.js';
-export * from './filter/facet-filter/collection-facet-filter.manager.js';
-export * from './filter/facet-filter/collection-facet-filter.context.js';
-export * from './filter/facet-filter/collection-facet-filter.context-token.js';
 export type * from './collection-filter-model.interface.js';
 export type * from './types.js';
 
 export { UmbCollectionActionElement, UmbCollectionActionBase } from './action/index.js';
 export type { UmbCollectionDataSource, UmbCollectionRepository } from './repository/index.js';
+
+// Deprecated re-exports — use @umbraco-cms/backoffice/facet-filter instead.
+export {
+	UmbFacetFilterManager as UmbCollectionFacetFilterManager,
+	UmbFacetFilterContext as UmbCollectionFacetFilterContext,
+	UMB_FACET_FILTER_CONTEXT as UMB_COLLECTION_FACET_FILTER_CONTEXT,
+	type UmbActiveFacetFilterModel as UmbActiveCollectionFacetFilterModel,
+} from '@umbraco-cms/backoffice/facet-filter';

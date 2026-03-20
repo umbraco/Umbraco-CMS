@@ -3,14 +3,14 @@ import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension
 export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
 	{
 		type: 'kind',
-		alias: 'Umb.Kind.CollectionFacetFilter.Select',
+		alias: 'Umb.Kind.FacetFilter.Select',
 		matchKind: 'select',
-		matchType: 'collectionFacetFilter',
+		matchType: 'facetFilter',
 		manifest: {
-			type: 'collectionFacetFilter',
+			type: 'facetFilter',
 			kind: 'select',
-			element: () => import('./select-collection-facet-filter.element.js'),
-			api: () => import('./select-collection-facet-filter.api.js'),
+			element: () => import('./select-facet-filter.element.js'),
+			api: () => import('./select-facet-filter.api.js'),
 		},
 	},
 ];

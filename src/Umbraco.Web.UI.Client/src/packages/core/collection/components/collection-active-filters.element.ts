@@ -1,15 +1,15 @@
 import { UMB_COLLECTION_CONTEXT } from '../default/index.js';
-import type { UmbActiveCollectionFacetFilterModel } from '../filter/facet-filter/collection-facet-filter.manager.js';
+import { UMB_FACET_FILTER_MANAGER_CONTEXT, type UmbActiveFacetFilterModel } from '@umbraco-cms/backoffice/facet-filter';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-collection-active-filters')
 export class UmbCollectionActiveFiltersElement extends UmbLitElement {
-	#collectionContext?: typeof UMB_COLLECTION_CONTEXT.TYPE;
+	#filterManager?: typeof UMB_FACET_FILTER_MANAGER_CONTEXT.TYPE;
 
 	@state()
-	private _activeFilters?: Array<UmbActiveCollectionFacetFilterModel> = [];
+	private _activeFilters?: Array<UmbActiveFacetFilterModel> = [];
 
 	@state()
 	private _totalItems: number = 0;
@@ -17,13 +17,16 @@ export class UmbCollectionActiveFiltersElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_COLLECTION_CONTEXT, (context) => {
-			this.#collectionContext = context;
+		this.consumeContext(UMB_FACET_FILTER_MANAGER_CONTEXT, (manager) => {
+			this.#filterManager = manager;
 
-			this.observe(this.#collectionContext?.filtering.activeFilters, (activeFilters) => {
+			this.observe(manager?.activeFilters, (activeFilters) => {
 				this._activeFilters = activeFilters;
 			});
-			this.observe(this.#collectionContext?.totalItems, (total) => {
+		});
+
+		this.consumeContext(UMB_COLLECTION_CONTEXT, (context) => {
+			this.observe(context?.totalItems, (total) => {
 				this._totalItems = total ?? 0;
 			});
 		});
@@ -54,7 +57,7 @@ export class UmbCollectionActiveFiltersElement extends UmbLitElement {
 		`;
 	}
 
-	#renderActiveFilterItem(activeFilter: UmbActiveCollectionFacetFilterModel) {
+	#renderActiveFilterItem(activeFilter: UmbActiveFacetFilterModel) {
 		return html`
 			<span class="active-filter-item">
 				${activeFilter.unique}
@@ -69,8 +72,7 @@ export class UmbCollectionActiveFiltersElement extends UmbLitElement {
 	}
 
 	#onClearFilterValue(alias: string, unique: string) {
-		this.#collectionContext?.filtering.clearFilterValue(alias, unique);
-		this.#collectionContext?.loadCollection();
+		this.#filterManager?.clearFilterValue(alias, unique);
 	}
 
 	static override styles = [
