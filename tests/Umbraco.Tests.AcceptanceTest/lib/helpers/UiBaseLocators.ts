@@ -259,7 +259,6 @@ export class UiBaseLocators extends BasePage {
     this.actionBtn = page.getByTestId('workspace:action-menu-button');
     this.nextBtn = page.getByLabel('Next');
     this.copyBtn = page.getByLabel('Copy', {exact: true});
-
   
     // Confirmation Buttons
     this.confirmToDeleteBtn = page.locator('#confirm').getByLabel('Delete');
