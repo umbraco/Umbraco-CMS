@@ -16,12 +16,16 @@ namespace Umbraco.Cms.Infrastructure.BackgroundJobs;
 /// </summary>
 public class DistributedBackgroundJobHostedService : BackgroundService
 {
-    private readonly IDatabaseReadOnlyAccessor _databaseReadOnlyAccessor;
     private readonly ILogger<DistributedBackgroundJobHostedService> _logger;
     private readonly IRuntimeState _runtimeState;
     private readonly IDistributedJobService _distributedJobService;
+    private readonly IDatabaseReadOnlyAccessor _databaseReadOnlyAccessor;
+
     private DistributedJobSettings _distributedJobSettings;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DistributedBackgroundJobHostedService"/> class.
+    /// </summary>
     public DistributedBackgroundJobHostedService(
         ILogger<DistributedBackgroundJobHostedService> logger,
         IRuntimeState runtimeState,
@@ -43,7 +47,7 @@ public class DistributedBackgroundJobHostedService : BackgroundService
     /// <summary>
     /// Initializes a new instance of the <see cref="DistributedBackgroundJobHostedService"/> class.
     /// </summary>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in V19")]
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
     public DistributedBackgroundJobHostedService(
         ILogger<DistributedBackgroundJobHostedService> logger,
         IRuntimeState runtimeState,
@@ -54,9 +58,9 @@ public class DistributedBackgroundJobHostedService : BackgroundService
             runtimeState,
             distributedJobService,
             distributedJobSettings,
-            StaticServiceProvider.Instance.GetRequiredService<IDatabaseReadOnlyAccessor>()
-            )
-    {}
+            StaticServiceProvider.Instance.GetRequiredService<IDatabaseReadOnlyAccessor>())
+    {
+    }
 
     /// <inheritdoc />
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -68,6 +72,7 @@ public class DistributedBackgroundJobHostedService : BackgroundService
             await Task.Delay(_distributedJobSettings.Delay, stoppingToken);
         }
 
+        // Distributed background jobs require write access to the database (e.g., to acquire locks, update job state).
         if (_databaseReadOnlyAccessor.IsReadOnly())
         {
             return;
@@ -83,7 +88,6 @@ public class DistributedBackgroundJobHostedService : BackgroundService
             // We swallow exception here, don't want the app to crash if something goes wrong
             _logger.LogError(exception, "An exception occurred while attempting to ensure distributed background jobs on startup.");
         }
-
 
         using PeriodicTimer timer = new(_distributedJobSettings.Period);
 
