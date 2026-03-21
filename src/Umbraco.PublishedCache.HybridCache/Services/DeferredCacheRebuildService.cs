@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Infrastructure.HybridCache.Services;
 /// <remarks>
 ///     Uses an <see cref="Interlocked" /> flag to ensure a single background worker processes pending IDs.
 ///     When IDs are queued while the worker is active, they accumulate and are picked up in the next
-///     iteration. Only one <see cref="Task.Run" /> is scheduled at a time, avoiding thread-pool churn
+///     iteration. Only one Task.Run is scheduled at a time, avoiding thread-pool churn
 ///     under bursty saves.
 /// </remarks>
 internal sealed class DeferredCacheRebuildService : IDeferredCacheRebuildService, IDisposable
