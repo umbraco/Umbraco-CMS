@@ -1,8 +1,13 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using Npgsql;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Persistence.EFCore.Scoping;
 using Umbraco.Cms.Tests.Common.Testing;
+using Umbraco.Cms.Tests.Integration.Extensions;
 using Umbraco.Cms.Tests.Integration.Testing;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Persistence.EFCore.DbContext;
@@ -21,18 +26,22 @@ public class PooledDbContextConnectionTaintingTests : UmbracoIntegrationTest
     private IDbContextFactory<PooledTestDbContext> DbContextFactory =>
         GetRequiredService<IDbContextFactory<PooledTestDbContext>>();
 
+    [TearDown]
+    public void TearDownNpgsqlConnections()
+    {
+        // Clear the Npgsql connection pool to prevent background NpgsqlExceptions
+        // when the test framework drops the schema. Without this, Npgsql keeps TCP
+        // connections open in its pool and they are forcibly terminated by Postgres
+        // when the schema is dropped, causing "Exception while writing to stream".
+        NpgsqlConnection.ClearAllPools();
+    }
+
     protected override void CustomTestSetup(IUmbracoBuilder builder)
     {
         builder.Services.AddUmbracoDbContext<PooledTestDbContext>(
             (serviceProvider, options, connectionString, providerName) =>
             {
-                if (providerName is "Npgsql2" or "Npgsql")
-                {
-                    options.UseNpgsql(connectionString!);
-                    return;
-                }
-
-                options.UseUmbracoDatabaseProvider(serviceProvider);
+                options.UseCustomUmbracoDatabaseProvider(serviceProvider);
             });
     }
 
@@ -115,9 +124,34 @@ public class PooledDbContextConnectionTaintingTests : UmbracoIntegrationTest
 
     internal class PooledTestDbContext : Microsoft.EntityFrameworkCore.DbContext
     {
+        private string _connectionString;
+
         public PooledTestDbContext(DbContextOptions<PooledTestDbContext> options)
             : base(options)
         {
+            _connectionString = options.Extensions
+                .OfType<CoreOptionsExtension>()
+                .FirstOrDefault()?.ApplicationServiceProvider
+                ?.GetRequiredService<IOptionsMonitor<ConnectionStrings>>()
+                .CurrentValue.ConnectionString;
+        }
+
+        public override DatabaseFacade Database
+        {
+            get
+            {
+                var db = base.Database;
+                var conn = db.GetDbConnection();
+                if (conn.State == System.Data.ConnectionState.Closed)
+                {
+                    if (string.IsNullOrEmpty(conn.ConnectionString))
+                    {
+                        db.SetConnectionString(_connectionString);
+                    }
+                }
+
+                return db;
+            }
         }
     }
 }

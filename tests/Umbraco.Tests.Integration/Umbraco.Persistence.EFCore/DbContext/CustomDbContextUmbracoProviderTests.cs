@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
+using Umbraco.Cms.Tests.Integration.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Persistence.EFCore.DbContext;
 
@@ -12,7 +13,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Persistence.EFCore.DbContext;
 internal sealed class CustomDbContextUmbracoProviderTests : UmbracoIntegrationTest
 {
     [Test]
-    [Ignore("This test requires the that the static method builder.Services.AddUmbracoDbContext injects the EFCoreDistributedLockingMechanism class for e.g. PostgreSql, but this will be injected by a composer.")]
     public void Can_Register_Custom_DbContext_And_Resolve()
     {
         var dbContext = Services.GetRequiredService<CustomDbContext>();
@@ -25,7 +25,7 @@ internal sealed class CustomDbContextUmbracoProviderTests : UmbracoIntegrationTe
     {
         builder.Services.AddUmbracoDbContext<CustomDbContext>((serviceProvider, options, connectionString, providerName) =>
         {
-            options.UseUmbracoDatabaseProvider(serviceProvider);
+            options.UseCustomUmbracoDatabaseProvider(serviceProvider);
         });
     }
 
