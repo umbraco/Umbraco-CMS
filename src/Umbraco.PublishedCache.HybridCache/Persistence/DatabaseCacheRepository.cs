@@ -487,7 +487,10 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
                         serializer))
                     .ToList();
 
-                Database.BulkInsertRecords(items);
+                // Use "insert where not exists" to skip rows that a foreground content save
+                // may have written between the initial bulk delete and this page. This ensures
+                // the foreground's fresher data is preserved rather than overwritten.
+                BulkInsertSkipExisting(items);
 
                 processed += nodeIds.Count;
                 pageComplete = true;
@@ -1019,7 +1022,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
                     .Select(media => BuildCacheDtoForContent(media, propertyDtos, propertyAliasesByContentType!, serializer))
                     .ToList();
 
-                Database.BulkInsertRecords(items);
+                BulkInsertSkipExisting(items);
 
                 processed += nodeIds.Count;
                 pageComplete = true;
@@ -1332,7 +1335,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
                     .Select(member => BuildCacheDtoForContent(member, propertyDtos, propertyAliasesByContentType!, serializer))
                     .ToList();
 
-                Database.BulkInsertRecords(items);
+                BulkInsertSkipExisting(items);
 
                 processed += nodeIds.Count;
                 pageComplete = true;
@@ -1379,6 +1382,80 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
                         contentTypeIds.Contains(c.ContentTypeId)));
             Database.Execute(sql);
         }
+    }
+
+    /// <summary>
+    ///     Inserts <c>cmsContentNu</c> rows, preserving any that already exist. A foreground content
+    ///     save may insert a row between the initial bulk delete and this page's insert; that row
+    ///     contains fresher data and must not be overwritten by the background rebuild.
+    /// </summary>
+    /// <remarks>
+    ///     Attempts a fast bulk insert first (common case — no conflicts). If a primary key violation
+    ///     occurs (rare — a foreground save raced with this page), falls back to individual
+    ///     <c>INSERT ... WHERE NOT EXISTS</c> statements that skip existing rows.
+    /// </remarks>
+    private void BulkInsertSkipExisting(List<ContentNuDto> items)
+    {
+        if (items.Count == 0)
+        {
+            return;
+        }
+
+        try
+        {
+            Database.BulkInsertRecords(items);
+        }
+        catch (Exception ex) when (IsPrimaryKeyViolation(ex))
+        {
+            _logger.LogDebug(
+                ex,
+                "Bulk insert hit a primary key conflict (foreground save raced with rebuild); falling back to row-by-row insert for {Count} items",
+                items.Count);
+
+            InsertNewRows(items);
+        }
+    }
+
+    private void InsertNewRows(List<ContentNuDto> items)
+    {
+        string C(string s) => SqlSyntax.GetQuotedColumnName(s);
+        var tableName = ContentNuDto.TableName;
+        var nodeId = C(ContentNuDto.NodeIdColumnName);
+        var published = C("published");
+
+        foreach (ContentNuDto dto in items)
+        {
+            Database.Execute($@"
+                INSERT INTO [{tableName}] ({nodeId}, {published}, {C("data")}, {C("dataRaw")}, {C("rv")})
+                SELECT @0, @1, @2, @3, @4
+                WHERE NOT EXISTS (
+                    SELECT 1 FROM [{tableName}]
+                    WHERE {nodeId} = @0 AND {published} = @1
+                )", dto.NodeId, dto.Published, (object?)dto.Data ?? DBNull.Value, (object?)dto.RawData ?? DBNull.Value, dto.Rv);
+        }
+    }
+
+    private static bool IsPrimaryKeyViolation(Exception ex)
+    {
+        // Walk the exception chain — the PK violation may be wrapped (e.g. in an AggregateException).
+        for (Exception? current = ex; current is not null; current = current.InnerException)
+        {
+            var message = current.Message;
+
+            // SQL Server: "Violation of PRIMARY KEY constraint 'PK_cmsContentNu'."
+            if (message.Contains("PRIMARY KEY constraint", StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+
+            // SQLite: "UNIQUE constraint failed: cmsContentNu.nodeId, cmsContentNu.published"
+            if (message.Contains("UNIQUE constraint", StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private ContentNuDto GetDtoFromCacheNode(ContentCacheNode cacheNode, bool published, IContentCacheDataSerializer serializer)
