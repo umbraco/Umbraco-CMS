@@ -91,11 +91,23 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     }
 
     /// <inheritdoc/>
+    [Obsolete("Use the overload accepting an executeStep delegate. Scheduled for removal in Umbraco 19.")]
     public void Rebuild(
         IReadOnlyCollection<int>? contentTypeIds = null,
         IReadOnlyCollection<int>? mediaTypeIds = null,
         IReadOnlyCollection<int>? memberTypeIds = null)
+        => Rebuild(contentTypeIds, mediaTypeIds, memberTypeIds, null);
+
+    /// <inheritdoc/>
+    public void Rebuild(
+        IReadOnlyCollection<int>? contentTypeIds,
+        IReadOnlyCollection<int>? mediaTypeIds,
+        IReadOnlyCollection<int>? memberTypeIds,
+        Action<Action>? executeStep)
     {
+        // When no executeStep delegate is provided, execute directly against the ambient scope.
+        executeStep ??= static action => action();
+
         IContentCacheDataSerializer serializer = _contentCacheDataSerializerFactory.Create(
             ContentCacheDataSerializerEntityType.Document
             | ContentCacheDataSerializerEntityType.Media
@@ -110,9 +122,9 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
             TruncateContent();
         }
 
-        RebuildContentDbCache(serializer, _nucacheSettings.Value.SqlPageSize, contentTypeIds);
-        RebuildMediaDbCache(serializer, _nucacheSettings.Value.SqlPageSize, mediaTypeIds);
-        RebuildMemberDbCache(serializer, _nucacheSettings.Value.SqlPageSize, memberTypeIds);
+        RebuildContentDbCache(serializer, _nucacheSettings.Value.SqlPageSize, contentTypeIds, executeStep);
+        RebuildMediaDbCache(serializer, _nucacheSettings.Value.SqlPageSize, mediaTypeIds, executeStep);
+        RebuildMemberDbCache(serializer, _nucacheSettings.Value.SqlPageSize, memberTypeIds, executeStep);
     }
 
     private void TruncateContent()
@@ -394,7 +406,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     /// Uses an optimized query approach that bypasses IContent entity hydration for better performance (uses JOINs instead of
     /// WHERE IN clauses for better SQL Server query plan efficiency).
     /// </remarks>
-    private void RebuildContentDbCache(IContentCacheDataSerializer serializer, int groupSize, IReadOnlyCollection<int>? contentTypeIds)
+    private void RebuildContentDbCache(IContentCacheDataSerializer serializer, int groupSize, IReadOnlyCollection<int>? contentTypeIds, Action<Action> executeStep)
     {
         if (contentTypeIds is null)
         {
@@ -403,75 +415,89 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
 
         Guid contentObjectType = Constants.ObjectTypes.Document;
 
-        // Remove all - if anything fails the transaction will rollback.
-        RemoveByObjectType(contentObjectType, contentTypeIds);
+        long total = 0;
+        Dictionary<int, byte>? contentTypeVariations = null;
+        Dictionary<short, string>? languageMap = null;
+        Dictionary<int, List<PropertyTypeInfo>>? propertyInfoByContentType = null;
 
-        // Get total count for paging
-        Sql<ISqlContext> countSql = Sql()
-            .SelectCount()
-            .From<NodeDto>()
-            .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((n, c) => n.NodeId == c.NodeId)
-            .Where<NodeDto>(x => x.NodeObjectType == contentObjectType);
-
-        if (contentTypeIds.Count > 0)
+        // Delete and pre-fetch in one step, then release locks before the paging loop.
+        executeStep(() =>
         {
-            countSql = countSql.WhereIn<ContentDto>(x => x.ContentTypeId, contentTypeIds);
-        }
+            RemoveByObjectType(contentObjectType, contentTypeIds);
 
-        var total = Database.ExecuteScalar<long>(countSql);
+            Sql<ISqlContext> countSql = Sql()
+                .SelectCount()
+                .From<NodeDto>()
+                .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((n, c) => n.NodeId == c.NodeId)
+                .Where<NodeDto>(x => x.NodeObjectType == contentObjectType);
+
+            if (contentTypeIds.Count > 0)
+            {
+                countSql = countSql.WhereIn<ContentDto>(x => x.ContentTypeId, contentTypeIds);
+            }
+
+            total = Database.ExecuteScalar<long>(countSql);
+
+            if (total == 0)
+            {
+                return;
+            }
+
+            contentTypeVariations = GetContentTypeVariations(contentTypeIds);
+            languageMap = GetLanguageMap();
+            propertyInfoByContentType = GetPropertyInfoByContentType(contentTypeIds);
+        });
 
         if (total == 0)
         {
             return;
         }
 
-        // Pre-fetch content type variations for all relevant content types.
-        Dictionary<int, byte> contentTypeVariations = GetContentTypeVariations(contentTypeIds);
-
-        // Pre-fetch all languages for culture code lookup.
-        Dictionary<short, string> languageMap = GetLanguageMap();
-
-        // Pre-fetch property info (aliases and variations) for all relevant content types (including compositions).
-        Dictionary<int, List<PropertyTypeInfo>> propertyInfoByContentType = GetPropertyInfoByContentType(contentTypeIds);
-
         long processed = 0;
         long pageIndex = 0;
 
         while (processed < total)
         {
-            // Get paged content node IDs.
-            List<int> nodeIds = GetPagedContentNodeIds(contentObjectType, contentTypeIds, pageIndex, groupSize);
-            if (nodeIds.Count == 0)
+            var pageComplete = false;
+
+            executeStep(() =>
+            {
+                List<int> nodeIds = GetPagedContentNodeIds(contentObjectType, contentTypeIds, pageIndex, groupSize);
+                if (nodeIds.Count == 0)
+                {
+                    return;
+                }
+
+                List<CacheRebuildDocumentDto> contentDtos = GetDocumentMetadataForNodes(nodeIds);
+                List<CacheRebuildPropertyDto> propertyDtos = GetPropertyDataForNodes(nodeIds);
+                List<CacheRebuildCultureDto> cultureDtos = GetCultureDataForNodes(nodeIds);
+                List<CacheRebuildDocumentCultureDto> documentCultureDtos = GetDocumentCultureDataForNodes(nodeIds);
+
+                var items = contentDtos
+                    .AsParallel()
+                    .WithDegreeOfParallelism(Environment.ProcessorCount)
+                    .SelectMany(content => BuildCacheDtosForDocument(
+                        content,
+                        propertyDtos,
+                        cultureDtos,
+                        documentCultureDtos,
+                        contentTypeVariations!,
+                        languageMap!,
+                        propertyInfoByContentType!,
+                        serializer))
+                    .ToList();
+
+                Database.BulkInsertRecords(items);
+
+                processed += nodeIds.Count;
+                pageComplete = true;
+            });
+
+            if (!pageComplete)
             {
                 break;
             }
 
-            // Fetch all data for these specific nodes (using more efficient JOINs than the WHERE IN approach used in ContentRepositoryBase).
-            List<CacheRebuildDocumentDto> contentDtos = GetDocumentMetadataForNodes(nodeIds);
-            List<CacheRebuildPropertyDto> propertyDtos = GetPropertyDataForNodes(nodeIds);
-            List<CacheRebuildCultureDto> cultureDtos = GetCultureDataForNodes(nodeIds);
-            List<CacheRebuildDocumentCultureDto> documentCultureDtos = GetDocumentCultureDataForNodes(nodeIds);
-
-            // Build cache DTOs (without IContent entity hydration).
-            // Parallelize the serialization for better performance on multi-core systems (saw 5-10% improvement doing this with a large test site).
-            var items = contentDtos
-                .AsParallel()
-                .WithDegreeOfParallelism(Environment.ProcessorCount)
-                .SelectMany(content => BuildCacheDtosForDocument(
-                    content,
-                    propertyDtos,
-                    cultureDtos,
-                    documentCultureDtos,
-                    contentTypeVariations,
-                    languageMap,
-                    propertyInfoByContentType,
-                    serializer))
-                .ToList();
-
-            // Bulk insert the DTOs.
-            Database.BulkInsertRecords(items);
-
-            processed += nodeIds.Count;
             pageIndex++;
         }
     }
@@ -927,7 +953,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     /// Assumes content tree lock.
     /// Uses an optimized query approach that bypasses IMedia entity hydration for better performance.
     /// </remarks>
-    private void RebuildMediaDbCache(IContentCacheDataSerializer serializer, int groupSize, IReadOnlyCollection<int>? contentTypeIds)
+    private void RebuildMediaDbCache(IContentCacheDataSerializer serializer, int groupSize, IReadOnlyCollection<int>? contentTypeIds, Action<Action> executeStep)
     {
         if (contentTypeIds is null)
         {
@@ -936,58 +962,74 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
 
         Guid mediaObjectType = Constants.ObjectTypes.Media;
 
-        // Remove all - if anything fails the transaction will rollback.
-        RemoveByObjectType(mediaObjectType, contentTypeIds);
+        long total = 0;
+        Dictionary<int, List<string>>? propertyAliasesByContentType = null;
 
-        // Get total count for paging.
-        Sql<ISqlContext> countSql = Sql()
-            .SelectCount()
-            .From<NodeDto>()
-            .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((n, c) => n.NodeId == c.NodeId)
-            .Where<NodeDto>(x => x.NodeObjectType == mediaObjectType);
-
-        if (contentTypeIds.Count > 0)
+        executeStep(() =>
         {
-            countSql = countSql.WhereIn<ContentDto>(x => x.ContentTypeId, contentTypeIds);
-        }
+            RemoveByObjectType(mediaObjectType, contentTypeIds);
 
-        var total = Database.ExecuteScalar<long>(countSql);
+            Sql<ISqlContext> countSql = Sql()
+                .SelectCount()
+                .From<NodeDto>()
+                .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((n, c) => n.NodeId == c.NodeId)
+                .Where<NodeDto>(x => x.NodeObjectType == mediaObjectType);
+
+            if (contentTypeIds.Count > 0)
+            {
+                countSql = countSql.WhereIn<ContentDto>(x => x.ContentTypeId, contentTypeIds);
+            }
+
+            total = Database.ExecuteScalar<long>(countSql);
+
+            if (total == 0)
+            {
+                return;
+            }
+
+            propertyAliasesByContentType = GetPropertyAliasesByContentType(contentTypeIds);
+        });
 
         if (total == 0)
         {
             return;
         }
 
-        // Pre-fetch property aliases for all content types to include empty arrays for properties without values.
-        Dictionary<int, List<string>> propertyAliasesByContentType = GetPropertyAliasesByContentType(contentTypeIds);
-
         long processed = 0;
         long pageIndex = 0;
 
         while (processed < total)
         {
-            // Get paged media node IDs.
-            List<int> nodeIds = GetPagedContentNodeIds(mediaObjectType, contentTypeIds, pageIndex, groupSize);
-            if (nodeIds.Count == 0)
+            var pageComplete = false;
+
+            executeStep(() =>
+            {
+                List<int> nodeIds = GetPagedContentNodeIds(mediaObjectType, contentTypeIds, pageIndex, groupSize);
+                if (nodeIds.Count == 0)
+                {
+                    return;
+                }
+
+                List<CacheRebuildContentDto> mediaDtos = GetContentMetadataForNodes(nodeIds);
+                List<CacheRebuildPropertyDto> propertyDtos = GetPropertyDataForNodes(nodeIds);
+
+                var items = mediaDtos
+                    .AsParallel()
+                    .WithDegreeOfParallelism(Environment.ProcessorCount)
+                    .Select(media => BuildCacheDtoForContent(media, propertyDtos, propertyAliasesByContentType!, serializer))
+                    .ToList();
+
+                Database.BulkInsertRecords(items);
+
+                processed += nodeIds.Count;
+                pageComplete = true;
+            });
+
+            if (!pageComplete)
             {
                 break;
             }
 
-            // Fetch all data for these specific nodes.
-            List<CacheRebuildContentDto> mediaDtos = GetContentMetadataForNodes(nodeIds);
-            List<CacheRebuildPropertyDto> propertyDtos = GetPropertyDataForNodes(nodeIds);
-
-            // Build cache DTOs (without IMedia entity hydration).
-            var items = mediaDtos
-                .AsParallel()
-                .WithDegreeOfParallelism(Environment.ProcessorCount)
-                .Select(media => BuildCacheDtoForContent(media, propertyDtos, propertyAliasesByContentType, serializer))
-                .ToList();
-
-            // Bulk insert the DTOs.
-            Database.BulkInsertRecords(items);
-
-            processed += nodeIds.Count;
             pageIndex++;
         }
     }
@@ -1225,7 +1267,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     /// Assumes content tree lock.
     /// Uses an optimized query approach that bypasses IMember entity hydration for better performance.
     /// </remarks>
-    private void RebuildMemberDbCache(IContentCacheDataSerializer serializer, int groupSize, IReadOnlyCollection<int>? contentTypeIds)
+    private void RebuildMemberDbCache(IContentCacheDataSerializer serializer, int groupSize, IReadOnlyCollection<int>? contentTypeIds, Action<Action> executeStep)
     {
         if (contentTypeIds is null)
         {
@@ -1234,57 +1276,73 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
 
         Guid memberObjectType = Constants.ObjectTypes.Member;
 
-        // Remove all - if anything fails the transaction will rollback.
-        RemoveByObjectType(memberObjectType, contentTypeIds);
+        long total = 0;
+        Dictionary<int, List<string>>? propertyAliasesByContentType = null;
 
-        // Get total count for paging.
-        Sql<ISqlContext> countSql = Sql()
-            .SelectCount()
-            .From<NodeDto>()
-            .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((n, c) => n.NodeId == c.NodeId)
-            .Where<NodeDto>(x => x.NodeObjectType == memberObjectType);
-
-        if (contentTypeIds.Count > 0)
+        executeStep(() =>
         {
-            countSql = countSql.WhereIn<ContentDto>(x => x.ContentTypeId, contentTypeIds);
-        }
+            RemoveByObjectType(memberObjectType, contentTypeIds);
 
-        var total = Database.ExecuteScalar<long>(countSql);
+            Sql<ISqlContext> countSql = Sql()
+                .SelectCount()
+                .From<NodeDto>()
+                .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((n, c) => n.NodeId == c.NodeId)
+                .Where<NodeDto>(x => x.NodeObjectType == memberObjectType);
+
+            if (contentTypeIds.Count > 0)
+            {
+                countSql = countSql.WhereIn<ContentDto>(x => x.ContentTypeId, contentTypeIds);
+            }
+
+            total = Database.ExecuteScalar<long>(countSql);
+            if (total == 0)
+            {
+                return;
+            }
+
+            propertyAliasesByContentType = GetPropertyAliasesByContentType(contentTypeIds);
+        });
+
         if (total == 0)
         {
             return;
         }
-
-        // Pre-fetch property aliases for all content types to include empty arrays for properties without values.
-        Dictionary<int, List<string>> propertyAliasesByContentType = GetPropertyAliasesByContentType(contentTypeIds);
 
         long processed = 0;
         long pageIndex = 0;
 
         while (processed < total)
         {
-            // Get paged member node IDs.
-            List<int> nodeIds = GetPagedContentNodeIds(memberObjectType, contentTypeIds, pageIndex, groupSize);
-            if (nodeIds.Count == 0)
+            var pageComplete = false;
+
+            executeStep(() =>
+            {
+                List<int> nodeIds = GetPagedContentNodeIds(memberObjectType, contentTypeIds, pageIndex, groupSize);
+                if (nodeIds.Count == 0)
+                {
+                    return;
+                }
+
+                List<CacheRebuildContentDto> memberDtos = GetContentMetadataForNodes(nodeIds);
+                List<CacheRebuildPropertyDto> propertyDtos = GetPropertyDataForNodes(nodeIds);
+
+                var items = memberDtos
+                    .AsParallel()
+                    .WithDegreeOfParallelism(Environment.ProcessorCount)
+                    .Select(member => BuildCacheDtoForContent(member, propertyDtos, propertyAliasesByContentType!, serializer))
+                    .ToList();
+
+                Database.BulkInsertRecords(items);
+
+                processed += nodeIds.Count;
+                pageComplete = true;
+            });
+
+            if (!pageComplete)
             {
                 break;
             }
 
-            // Fetch all data for these specific nodes - reuse the content metadata method since structure is identical.
-            List<CacheRebuildContentDto> memberDtos = GetContentMetadataForNodes(nodeIds);
-            List<CacheRebuildPropertyDto> propertyDtos = GetPropertyDataForNodes(nodeIds);
-
-            // Build cache DTOs (without IMember entity hydration) - reuse the content builder since structure is identical.
-            var items = memberDtos
-                .AsParallel()
-                .WithDegreeOfParallelism(Environment.ProcessorCount)
-                .Select(member => BuildCacheDtoForContent(member, propertyDtos, propertyAliasesByContentType, serializer))
-                .ToList();
-
-            // Bulk insert the DTOs.
-            Database.BulkInsertRecords(items);
-
-            processed += nodeIds.Count;
             pageIndex++;
         }
     }

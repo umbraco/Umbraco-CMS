@@ -284,11 +284,16 @@ internal sealed class MediaCacheService : IMediaCacheService
     }
 
     public void Rebuild(IReadOnlyCollection<int> contentTypeIds)
-    {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope();
-        _databaseCacheRepository.Rebuild(mediaTypeIds: contentTypeIds.ToList());
-        scope.Complete();
-    }
+        => _databaseCacheRepository.Rebuild(
+            null,
+            contentTypeIds.ToList(),
+            null,
+            action =>
+            {
+                using ICoreScope scope = _scopeProvider.CreateCoreScope();
+                action();
+                scope.Complete();
+            });
 
     public IEnumerable<IPublishedContent> GetByContentType(IPublishedContentType contentType)
     {

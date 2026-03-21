@@ -346,11 +346,16 @@ internal sealed class DocumentCacheService : IDocumentCacheService
     }
 
     public void Rebuild(IReadOnlyCollection<int> contentTypeIds)
-    {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope();
-        _databaseCacheRepository.Rebuild(contentTypeIds.ToList());
-        scope.Complete();
-    }
+        => _databaseCacheRepository.Rebuild(
+            contentTypeIds.ToList(),
+            null,
+            null,
+            action =>
+            {
+                using ICoreScope scope = _scopeProvider.CreateCoreScope();
+                action();
+                scope.Complete();
+            });
 
     public async Task RebuildMemoryCacheByContentTypeAsync(IEnumerable<int> contentTypeIds)
     {
