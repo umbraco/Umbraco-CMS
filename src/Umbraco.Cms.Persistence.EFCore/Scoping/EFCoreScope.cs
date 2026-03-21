@@ -290,6 +290,15 @@ internal class EFCoreScope<TDbContext> : CoreScope, IEfCoreScope<TDbContext>
             }
             finally
             {
+                try
+                {
+                    _dbContext?.Database.SetDbConnection(null);
+                }
+                catch
+                {
+                    // Best-effort cleanup — ensure context is still disposed below.
+                }
+
                 _dbContext?.Dispose();
                 _dbContext = null;
             }
