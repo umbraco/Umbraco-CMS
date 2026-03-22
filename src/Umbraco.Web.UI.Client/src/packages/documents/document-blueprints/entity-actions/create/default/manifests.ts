@@ -14,7 +14,7 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 		forEntityTypes: [UMB_DOCUMENT_BLUEPRINT_ROOT_ENTITY_TYPE, UMB_DOCUMENT_BLUEPRINT_FOLDER_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-blueprint',
-			label: '#create_createContentBlueprint',
+			label: 'Document Blueprint for...',
 			additionalOptions: true,
 		},
 	},
