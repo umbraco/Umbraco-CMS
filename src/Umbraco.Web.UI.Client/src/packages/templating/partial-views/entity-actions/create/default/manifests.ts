@@ -12,6 +12,7 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 		meta: {
 			icon: 'icon-document-html',
 			label: '#create_newEmptyPartialView',
+			additionalOptions: true,
 		},
 	},
 ];

@@ -12,6 +12,7 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 		meta: {
 			icon: 'icon-document-js',
 			label: '#create_newJavascriptFile',
+			additionalOptions: true,
 		},
 	},
 ];
