@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Persistence.EFCore.Scoping;
 using Umbraco.Cms.Tests.Common.Testing;
@@ -21,14 +20,9 @@ public class PooledDbContextConnectionTaintingTests : UmbracoIntegrationTest
     private IDbContextFactory<PooledTestDbContext> DbContextFactory =>
         GetRequiredService<IDbContextFactory<PooledTestDbContext>>();
 
-    protected override void CustomTestSetup(IUmbracoBuilder builder)
-    {
+    protected override void CustomTestSetup(IUmbracoBuilder builder) =>
         builder.Services.AddUmbracoDbContext<PooledTestDbContext>(
-            (serviceProvider, options, connectionString, providerName) =>
-            {
-                options.UseUmbracoDatabaseProvider(serviceProvider);
-            });
-    }
+            (serviceProvider, options, connectionString, providerName) => options.UseUmbracoDatabaseProvider(serviceProvider));
 
     /// <summary>
     /// Verifies that a pooled DbContext obtained from IDbContextFactory has a valid connection string
@@ -112,7 +106,6 @@ public class PooledDbContextConnectionTaintingTests : UmbracoIntegrationTest
     /// disposes. SetDbConnection(null) during scope disposal clears EF Core's internal connection
     /// string field; without the restore in DisposeEfCoreDatabase, the pooled context is returned
     /// with a null connection string, causing InvalidOperationException on SQL Server reuse.
-    /// See https://github.com/umbraco/Umbraco-CMS/issues/22211
     /// </summary>
     [Test]
     public async Task Pooled_DbContext_Preserves_ConnectionString_After_Scope_Disposal()
@@ -145,8 +138,7 @@ public class PooledDbContextConnectionTaintingTests : UmbracoIntegrationTest
         using PooledTestDbContext reusedContext = DbContextFactory.CreateDbContext();
         var connectionStringAfterDisposal = reusedContext.Database.GetConnectionString();
 
-        // Step 4: The connection string must still be set. Before the fix for #22211,
-        // this was null on SQL Server because SetDbConnection(null) cleared it.
+        // Step 4: The connection string must still be set.
         Assert.IsNotNull(connectionStringAfterDisposal, "Connection string must survive scope disposal for pooled contexts.");
         Assert.AreEqual(originalConnectionString, connectionStringAfterDisposal);
     }
