@@ -43758,6 +43758,10 @@
               "nullable": true
             },
             "nullable": true
+          },
+          "uniqueKeyFieldName": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
