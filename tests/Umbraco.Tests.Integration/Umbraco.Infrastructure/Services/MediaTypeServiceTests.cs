@@ -150,16 +150,16 @@ internal sealed class MediaTypeServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Copy_MediaType_By_Performing_Clone()
+    public async Task Can_Copy_MediaType_By_Performing_Clone()
     {
         // Arrange
         var mediaType = MediaTypeBuilder.CreateImageMediaType("Image2") as IMediaType;
-        MediaTypeService.Save(mediaType);
+        await MediaTypeService.CreateAsync(mediaType, Constants.Security.SuperUserKey);
 
         // Act
         var sut = mediaType.DeepCloneWithResetIdentities("Image2_2");
         Assert.IsNotNull(sut);
-        MediaTypeService.Save(sut);
+        await MediaTypeService.CreateAsync(sut, Constants.Security.SuperUserKey);
 
         // Assert
         Assert.That(sut.HasIdentity, Is.True);
@@ -179,15 +179,15 @@ internal sealed class MediaTypeServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Copy_MediaType_To_New_Parent_By_Performing_Clone()
+    public async Task Can_Copy_MediaType_To_New_Parent_By_Performing_Clone()
     {
         // Arrange
         var parentMediaType1 = MediaTypeBuilder.CreateSimpleMediaType("parent1", "Parent1");
-        MediaTypeService.Save(parentMediaType1);
+        await MediaTypeService.CreateAsync(parentMediaType1, Constants.Security.SuperUserKey);
         var parentMediaType2 = MediaTypeBuilder.CreateSimpleMediaType("parent2", "Parent2", null, true);
-        MediaTypeService.Save(parentMediaType2);
+        await MediaTypeService.CreateAsync(parentMediaType2, Constants.Security.SuperUserKey);
         var mediaType = MediaTypeBuilder.CreateImageMediaType("Image2") as IMediaType;
-        MediaTypeService.Save(mediaType);
+        await MediaTypeService.CreateAsync(mediaType, Constants.Security.SuperUserKey);
 
         // Act
         var clone = mediaType.DeepCloneWithResetIdentities("newcategory");
@@ -195,7 +195,7 @@ internal sealed class MediaTypeServiceTests : UmbracoIntegrationTest
         clone.RemoveContentType("parent1");
         clone.AddContentType(parentMediaType2);
         clone.ParentId = parentMediaType2.Id;
-        MediaTypeService.Save(clone);
+        await MediaTypeService.CreateAsync(clone, Constants.Security.SuperUserKey);
 
         // Assert
         Assert.That(clone.HasIdentity, Is.True);
@@ -257,12 +257,12 @@ internal sealed class MediaTypeServiceTests : UmbracoIntegrationTest
     {
         // Arrange
         var childMediaType = MediaTypeBuilder.CreateSimpleMediaType("child", "Child");
-        MediaTypeService.Save(childMediaType);
+        await MediaTypeService.CreateAsync(childMediaType, Constants.Security.SuperUserKey);
 
         var parentMediaType = MediaTypeBuilder.CreateSimpleMediaType("parent", "Parent");
 
         // Parent does not allow child as a child type
-        MediaTypeService.Save(parentMediaType);
+        await MediaTypeService.CreateAsync(parentMediaType, Constants.Security.SuperUserKey);
 
         // Act
         var result = await MediaTypeService.GetAllowedParentKeysAsync(childMediaType.Key);
@@ -278,25 +278,25 @@ internal sealed class MediaTypeServiceTests : UmbracoIntegrationTest
     {
         // Arrange
         var childMediaType = MediaTypeBuilder.CreateSimpleMediaType("child", "Child");
-        MediaTypeService.Save(childMediaType);
+        await MediaTypeService.CreateAsync(childMediaType, Constants.Security.SuperUserKey);
 
         var parentMediaType1 = MediaTypeBuilder.CreateSimpleMediaType("parent1", "Parent1");
         parentMediaType1.AllowedContentTypes = new[]
         {
             new ContentTypeSort(childMediaType.Key, 0, childMediaType.Alias)
         };
-        MediaTypeService.Save(parentMediaType1);
+        await MediaTypeService.CreateAsync(parentMediaType1, Constants.Security.SuperUserKey);
 
         var parentMediaType2 = MediaTypeBuilder.CreateSimpleMediaType("parent2", "Parent2", null, true);
         parentMediaType2.AllowedContentTypes = new[]
         {
             new ContentTypeSort(childMediaType.Key, 0, childMediaType.Alias)
         };
-        MediaTypeService.Save(parentMediaType2);
+        await MediaTypeService.CreateAsync(parentMediaType2, Constants.Security.SuperUserKey);
 
         // A parent that does NOT allow the child type
         var unrelatedParentMediaType = MediaTypeBuilder.CreateSimpleMediaType("unrelated", "Unrelated", null, true);
-        MediaTypeService.Save(unrelatedParentMediaType);
+        await MediaTypeService.CreateAsync(unrelatedParentMediaType, Constants.Security.SuperUserKey);
 
         // Act
         var result = await MediaTypeService.GetAllowedParentKeysAsync(childMediaType.Key);
@@ -331,5 +331,31 @@ internal sealed class MediaTypeServiceTests : UmbracoIntegrationTest
 
         public void Handle(MediaMovedToRecycleBinNotification notification) =>
             MovedMediaToRecycleBin?.Invoke(notification);
+    }
+
+    [Test]
+    public async Task GetAllAllowedAsRootAsync_Returns_Only_MediaTypes_Allowed_At_Root()
+    {
+        // Arrange
+        PagedModel<IMediaType> baseline = await MediaTypeService.GetAllAllowedAsRootAsync(0, 1000);
+
+        var allowedAtRoot = MediaTypeBuilder.CreateSimpleMediaType("allowed", "Allowed");
+        allowedAtRoot.AllowedAsRoot = true;
+        await MediaTypeService.CreateAsync(allowedAtRoot, Constants.Security.SuperUserKey);
+
+        var notAllowedAtRoot = MediaTypeBuilder.CreateSimpleMediaType("notAllowed", "Not Allowed");
+        notAllowedAtRoot.AllowedAsRoot = false;
+        await MediaTypeService.CreateAsync(notAllowedAtRoot, Constants.Security.SuperUserKey);
+
+        // Act
+        PagedModel<IMediaType> result = await MediaTypeService.GetAllAllowedAsRootAsync(0, 1000);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(baseline.Total + 1, result.Total);
+            Assert.IsTrue(result.Items.Any(x => x.Key == allowedAtRoot.Key));
+            Assert.IsFalse(result.Items.Any(x => x.Key == notAllowedAtRoot.Key));
+        });
     }
 }
