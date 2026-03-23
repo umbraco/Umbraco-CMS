@@ -26,8 +26,14 @@ public class SqlServerMigrationProvider : IMigrationProvider
     /// <inheritdoc />
     public async Task MigrateAsync(EFCoreMigration migration)
     {
+        Type? migrationType = GetMigrationType(migration);
+        if (migrationType is null)
+        {
+            return;
+        }
+
         UmbracoDbContext context = await _dbContextFactory.CreateDbContextAsync();
-        await context.MigrateDatabaseAsync(GetMigrationType(migration));
+        await context.MigrateDatabaseAsync(migrationType);
     }
 
     /// <inheritdoc />
@@ -37,7 +43,7 @@ public class SqlServerMigrationProvider : IMigrationProvider
         await context.Database.MigrateAsync();
     }
 
-    private static Type GetMigrationType(EFCoreMigration migration) =>
+    private static Type? GetMigrationType(EFCoreMigration migration) =>
         migration switch
         {
             EFCoreMigration.InitialCreate => typeof(Migrations.InitialCreate),
@@ -47,6 +53,7 @@ public class SqlServerMigrationProvider : IMigrationProvider
             EFCoreMigration.AddWebhookDto => typeof(Migrations.AddWebhookDto),
             EFCoreMigration.AddLastSyncedDto => typeof(Migrations.AddLastSyncedDto),
             EFCoreMigration.AddKeyValueDto => typeof(Migrations.AddKeyValueDto),
+            EFCoreMigration.SqliteCollation => null, // SQLite-only migration, no-op on SQL Server
             _ => throw new ArgumentOutOfRangeException(nameof(migration), $@"Not expected migration value: {migration}")
         };
 }

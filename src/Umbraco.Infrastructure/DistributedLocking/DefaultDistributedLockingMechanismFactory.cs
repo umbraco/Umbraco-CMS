@@ -7,11 +7,9 @@ namespace Umbraco.Cms.Infrastructure.DistributedLocking;
 public class DefaultDistributedLockingMechanismFactory : IDistributedLockingMechanismFactory
 {
     private readonly IEnumerable<IDistributedLockingMechanism> _distributedLockingMechanisms;
-
     private readonly IOptionsMonitor<GlobalSettings> _globalSettings;
-    private IDistributedLockingMechanism _distributedLockingMechanism = null!;
-    private bool _initialized;
-    private object _lock = new();
+    private IDistributedLockingMechanism? _configuredMechanism;
+    private readonly object _lock = new();
 
     public DefaultDistributedLockingMechanismFactory(
         IOptionsMonitor<GlobalSettings> globalSettings,
@@ -25,37 +23,33 @@ public class DefaultDistributedLockingMechanismFactory : IDistributedLockingMech
     {
         get
         {
-            EnsureInitialized();
-
-            return _distributedLockingMechanism;
-        }
-    }
-
-    private void EnsureInitialized()
-        => LazyInitializer.EnsureInitialized(ref _distributedLockingMechanism, ref _initialized, ref _lock, Initialize);
-
-    private IDistributedLockingMechanism Initialize()
-    {
-        var configured = _globalSettings.CurrentValue.DistributedLockingMechanism;
-
-        if (!string.IsNullOrEmpty(configured))
-        {
-            IDistributedLockingMechanism? value = _distributedLockingMechanisms
-                .FirstOrDefault(x => x.GetType().FullName?.EndsWith(configured) ?? false);
-
-            if (value == null)
+            // Fast path: configured mechanism is cached after first resolution.
+            if (_configuredMechanism is not null)
             {
-                throw new InvalidOperationException(
-                    $"Couldn't find DistributedLockingMechanism specified by global config: {configured}");
+                return _configuredMechanism;
             }
-        }
 
-        IDistributedLockingMechanism? defaultMechanism = _distributedLockingMechanisms.FirstOrDefault(x => x.Enabled);
-        if (defaultMechanism != null)
-        {
-            return defaultMechanism;
-        }
+            var configured = _globalSettings.CurrentValue.DistributedLockingMechanism;
 
-        throw new InvalidOperationException("Couldn't find an appropriate default distributed locking mechanism.");
+            if (string.IsNullOrEmpty(configured) is false)
+            {
+                // Configured mechanism is a static admin choice — resolve and cache it once.
+                lock (_lock)
+                {
+                    _configuredMechanism ??= _distributedLockingMechanisms
+                        .FirstOrDefault(x => x.GetType().FullName?.EndsWith(configured) ?? false)
+                        ?? throw new InvalidOperationException(
+                            $"Couldn't find DistributedLockingMechanism specified by global config: {configured}");
+                }
+
+                return _configuredMechanism;
+            }
+
+            // Default mechanism is selected dynamically on every call because Enabled is
+            // context-sensitive (e.g. SqliteEFCoreDistributedLockingMechanism.Enabled checks
+            // whether an EF Core ambient scope is currently active).
+            return _distributedLockingMechanisms.FirstOrDefault(x => x.Enabled)
+                ?? throw new InvalidOperationException("Couldn't find an appropriate default distributed locking mechanism.");
+        }
     }
 }

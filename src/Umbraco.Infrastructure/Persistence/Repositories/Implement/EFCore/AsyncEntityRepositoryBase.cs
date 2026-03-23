@@ -177,7 +177,7 @@ public abstract class AsyncEntityRepositoryBase<TId, TEntity> : AsyncRepositoryB
         // the additional overhead of fetching them in groups is minimal compared to the lookup time of each group
         if (ids.Length <= Core.Constants.Sql.MaxParameterCount)
         {
-            return await CachePolicy.GetAllAsync(PerformGetAllAsync);
+            return await CachePolicy.GetManyAsync(ids, PerformGetManyAsync, PerformGetAllAsync);
         }
 
         var entities = new List<TEntity>();

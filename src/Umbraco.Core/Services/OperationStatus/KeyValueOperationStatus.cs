@@ -7,11 +7,11 @@
     {
         /// <summary>
         /// The operation completed successfully.
-    /// </summary>
+        /// </summary>
         Success,
 
         /// <summary>
         /// The Value could not be set.
-    /// </summary>
+        /// </summary>
         NoValueSet,
     }

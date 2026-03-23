@@ -56,7 +56,7 @@ public sealed class SqliteEFCoreDistributedLockingMechanism<T> : IDistributedLoc
     public bool Enabled
         => _connectionStrings.IsConnectionStringConfigured() &&
         string.Equals(_connectionStrings.ProviderName, Constants.ProviderNames.SQLite, StringComparison.InvariantCultureIgnoreCase) &&
-        _efCoreScopeAccessor.Value.AmbientScope is not null;
+        _efCoreScopeAccessor.Value.HasBridgedAmbientScope is false;
 
     /// <inheritdoc />
     /// <remarks>With journal_mode=wal we can always read a snapshot.</remarks>
