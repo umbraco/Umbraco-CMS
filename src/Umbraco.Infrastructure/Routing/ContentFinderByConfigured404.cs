@@ -27,11 +27,22 @@ public class ContentFinderByConfigured404 : IContentLastChanceFinder
     private readonly IPublishedContentCache _publishedContentCache;
     private readonly IVariationContextAccessor _variationContextAccessor;
     private readonly IDocumentNavigationQueryService _documentNavigationQueryService;
+    private readonly IMediaNavigationQueryService _mediaNavigationQueryService;
     private ContentSettings _contentSettings;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="ContentFinderByConfigured404" /> class.
     /// </summary>
+    /// <param name="logger">The logger used for diagnostic and error logging.</param>
+    /// <param name="entityService">Service for accessing Umbraco entities.</param>
+    /// <param name="contentSettings">The monitor providing current content settings options.</param>
+    /// <param name="examineManager">The manager for Examine search indexes.</param>
+    /// <param name="variationContextAccessor">Accessor for the current variation context (e.g., culture/language).</param>
+    /// <param name="umbracoContextAccessor">Accessor for the current Umbraco context.</param>
+    /// <param name="documentUrlService">Service for resolving document URLs.</param>
+    /// <param name="publishedContentCache">Cache for published Umbraco content.</param>
+    /// <param name="documentNavigationQueryService">Service for querying document navigation structure.</param>
+    /// <param name="mediaNavigationQueryService">Service for querying media navigation structure.</param>
     public ContentFinderByConfigured404(
         ILogger<ContentFinderByConfigured404> logger,
         IEntityService entityService,
@@ -41,7 +52,8 @@ public class ContentFinderByConfigured404 : IContentLastChanceFinder
         IUmbracoContextAccessor umbracoContextAccessor,
         IDocumentUrlService documentUrlService,
         IPublishedContentCache publishedContentCache,
-        IDocumentNavigationQueryService documentNavigationQueryService)
+        IDocumentNavigationQueryService documentNavigationQueryService,
+        IMediaNavigationQueryService mediaNavigationQueryService)
     {
         _logger = logger;
         _entityService = entityService;
@@ -52,11 +64,37 @@ public class ContentFinderByConfigured404 : IContentLastChanceFinder
         _documentUrlService = documentUrlService;
         _publishedContentCache = publishedContentCache;
         _documentNavigationQueryService = documentNavigationQueryService;
+        _mediaNavigationQueryService = mediaNavigationQueryService;
 
         contentSettings.OnChange(x => _contentSettings = x);
     }
 
-    [Obsolete("Scheduled for removal in Umbraco 18")]
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
+    public ContentFinderByConfigured404(
+        ILogger<ContentFinderByConfigured404> logger,
+        IEntityService entityService,
+        IOptionsMonitor<ContentSettings> contentSettings,
+        IExamineManager examineManager,
+        IVariationContextAccessor variationContextAccessor,
+        IUmbracoContextAccessor umbracoContextAccessor,
+        IDocumentUrlService documentUrlService,
+        IPublishedContentCache publishedContentCache,
+        IDocumentNavigationQueryService documentNavigationQueryService)
+        : this(
+            logger,
+            entityService,
+            contentSettings,
+            examineManager,
+            variationContextAccessor,
+            umbracoContextAccessor,
+            documentUrlService,
+            publishedContentCache,
+            documentNavigationQueryService,
+            StaticServiceProvider.Instance.GetRequiredService<IMediaNavigationQueryService>())
+    {
+    }
+
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
     public ContentFinderByConfigured404(
         ILogger<ContentFinderByConfigured404> logger,
         IEntityService entityService,
@@ -64,16 +102,16 @@ public class ContentFinderByConfigured404 : IContentLastChanceFinder
         IExamineManager examineManager,
         IVariationContextAccessor variationContextAccessor,
         IUmbracoContextAccessor umbracoContextAccessor)
-    : this(
-        logger,
-        entityService,
-        contentSettings,
-        examineManager,
-        variationContextAccessor,
-        umbracoContextAccessor,
-        StaticServiceProvider.Instance.GetRequiredService<IDocumentUrlService>(),
-        StaticServiceProvider.Instance.GetRequiredService<IPublishedContentCache>(),
-        StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>())
+        : this(
+            logger,
+            entityService,
+            contentSettings,
+            examineManager,
+            variationContextAccessor,
+            umbracoContextAccessor,
+            StaticServiceProvider.Instance.GetRequiredService<IDocumentUrlService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IPublishedContentCache>(),
+            StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>())
     {
     }
 
@@ -139,7 +177,7 @@ public class ContentFinderByConfigured404 : IContentLastChanceFinder
         var error404 = NotFoundHandlerHelper.GetCurrentNotFoundPageId(
             _contentSettings.Error404Collection.ToArray(),
             _entityService,
-            new PublishedContentQuery(_variationContextAccessor, _examineManager, umbracoContext.Content!, umbracoContext.Media, _documentNavigationQueryService),
+            new PublishedContentQuery(_variationContextAccessor, _examineManager, umbracoContext.Content!, umbracoContext.Media, _documentNavigationQueryService, _mediaNavigationQueryService),
             errorCulture,
             domainContentId);
 

@@ -8,10 +8,15 @@ namespace Umbraco.Cms.Core.Routing
     /// </summary>
     public class SiteDomainMapper : ISiteDomainMapper, IDisposable
     {
+        /// <inheritdoc />
         public void Dispose() =>
             // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
             Dispose(true);
 
+        /// <summary>
+        ///     Releases unmanaged and - optionally - managed resources.
+        /// </summary>
+        /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
         protected virtual void Dispose(bool disposing)
         {
             if (!_disposedValue)
@@ -33,7 +38,14 @@ namespace Umbraco.Cms.Core.Routing
         private Dictionary<string, Dictionary<string, string[]>>? _qualifiedSites;
         private bool _disposedValue;
 
+        /// <summary>
+        ///     Gets the dictionary of sites, mapping site keys to their domain URLs.
+        /// </summary>
         internal Dictionary<string, string[]>? Sites { get; private set; }
+
+        /// <summary>
+        ///     Gets the dictionary of site bindings, mapping site keys to lists of bound site keys.
+        /// </summary>
         internal Dictionary<string, List<string>>? Bindings { get; private set; }
 
         // these are for validation

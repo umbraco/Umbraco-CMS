@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Api.Management.Mapping.ContentType;
+using Umbraco.Cms.Api.Management.Mapping.ContentType;
 using Umbraco.Cms.Api.Management.ViewModels.MemberType;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
@@ -7,8 +7,16 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Mapping.MemberType;
 
+/// <summary>
+/// Provides mapping configuration for converting MemberType entities between different representations.
+/// </summary>
 public class MemberTypeMapDefinition : ContentTypeMapDefinition<IMemberType, MemberTypePropertyTypeResponseModel, MemberTypePropertyTypeContainerResponseModel>, IMapDefinition
 {
+    /// <summary>
+    /// Configures object-object mappings related to member types for the Umbraco API.
+    /// This includes mappings from various member-related interfaces to their corresponding response models.
+    /// </summary>
+    /// <param name="mapper">The <see cref="IUmbracoMapper"/> instance used to register the mappings.</param>
     public void DefineMaps(IUmbracoMapper mapper)
     {
         mapper.Define<IMemberType, MemberTypeResponseModel>((_, _) => new MemberTypeResponseModel(), Map);

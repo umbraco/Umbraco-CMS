@@ -5,3 +5,5 @@ export * from './utils.js';
 export type { UmbItemModel } from './types.js';
 
 export type { UmbItemDataResolver, UmbItemDataResolverConstructor } from './data-resolver/types.js';
+
+import './global-components.js';

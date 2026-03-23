@@ -391,6 +391,8 @@ export default {
 		fileSecurityValidationFailure: 'Uma ou mais validações de segurança de ficheiros falharam',
 		moveToSameFolderFailed: 'As pastas pai e destino não podem ser as mesmas',
 		uploadNotAllowed: 'O carregamento não é permitido nesta localização.',
+		uploadValidationFailed: (mediaTypeName: string) =>
+			`O tipo de multimédia ${mediaTypeName} tem uma ou mais propriedades obrigatórias. Terá de ser carregado individualmente através do menu 'Criar'`,
 	},
 	member: {
 		'2fa': 'Autenticação de Dois Fatores',
@@ -525,7 +527,10 @@ export default {
 		confirmremoveusageof: 'Tem a certeza que quer remover o uso de <strong>%0%</strong>',
 		confirmlogout: 'Tem a certeza?',
 		confirmSure: 'Tem a certeza?',
+		cannotTrashWhenReferenced: (name: string) => `<strong>${name}</strong> não pode ser movido para a Reciclagem porque é referenciado por outros itens.`,
 		confirmTrash: (name: string) => `Tem a certeza que quer mover <strong>${name}</strong> para a Reciclagem?`,
+		cannotBulkTrashWhenReferenced: (total: number) =>
+			`Os <strong>${total} ${total === 1 ? 'item selecionado' : 'itens selecionados'}</strong> não podem ser movidos para a Reciclagem porque pelo menos um item é referenciado por outro conteúdo.`,
 		confirmBulkTrash: (total: number) =>
 			`Tem a certeza que quer mover <strong>${total} ${total === 1 ? 'item' : 'itens'}</strong> para a Reciclagem?`,
 		confirmBulkDelete: (total: number) =>
@@ -1378,8 +1383,9 @@ export default {
 		created: 'Criado',
 		currentVersion: 'Versão atual',
 		diffHelp:
-			'Isto mostra as diferenças entre a versão atual (rascunho) e a versão selecionada<br /><del>Texto a vermelho</del> será removido na versão selecionada, <ins>texto a verde</ins> será adicionado',
-		noDiff: 'Não existem diferenças entre a versão atual (rascunho) e a versão selecionada',
+			'<del>Texto a vermelho</del> será removido na versão selecionada, <ins>texto a verde</ins> será adicionado.',
+		showDiff: 'Mostrar diferenças entre a versão atual (rascunho) e a versão selecionada.',
+		noDiff: 'Não existem diferenças entre a versão atual (rascunho) e a versão selecionada.',
 		documentRolledBack: 'O documento foi revertido',
 		headline: 'Selecione uma versão para comparar com a versão atual',
 		htmlHelp:
@@ -2011,6 +2017,7 @@ export default {
 		noLockouts: 'não foi bloqueado',
 		noPasswordChange: 'A palavra-passe não foi alterada',
 		confirmNewPassword: 'Confirmar nova palavra-passe',
+		confirmPassword: 'Confirmar palavra-passe',
 		changePasswordDescription:
 			"Pode alterar a sua palavra-passe para aceder ao backoffice do Umbraco preenchendo o formulário abaixo e clicando no botão 'Alterar Palavra-passe'",
 		contentChannel: 'Canal de Conteúdo',

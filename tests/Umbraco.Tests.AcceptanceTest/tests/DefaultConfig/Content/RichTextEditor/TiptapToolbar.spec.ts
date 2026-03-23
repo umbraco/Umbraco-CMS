@@ -1,9 +1,11 @@
-﻿import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
+import {ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 import {expect} from "@playwright/test";
 
 const contentName = 'TestContent';
 const documentTypeName = 'TestDocumentTypeForContent';
 const customDataTypeName = 'Test RTE Tiptap';
+const manualPropertyName = 'Manual';
+const anchorOrQuerystringPropertyName = 'Anchor or querystring';
 
 test.beforeEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
@@ -34,10 +36,9 @@ test('can add a media in RTE Tiptap property editor', async ({umbracoApi, umbrac
   await umbracoUi.content.selectMediaWithName(imageName);
   await umbracoUi.content.clickChooseModalButton();
   await umbracoUi.content.clickMediaCaptionAltTextModalSubmitButton();
-  await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].value.markup).toContain('<img');
@@ -64,18 +65,16 @@ test('can embed a video into RTE Tiptap property editor', async ({umbracoApi, um
   await umbracoUi.content.clickEmbeddedRetrieveButton();
   await umbracoUi.content.waitForEmbeddedPreviewVisible();
   await umbracoUi.content.clickEmbeddedMediaModalConfirmButton();
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].value.markup).toContain('data-embed-url');
   expect(contentData.values[0].value.markup).toContain(videoURL);
 });
 
-// TODO: fails due to https://github.com/umbraco/Umbraco-CMS/issues/21044
-test.skip('cannot submit an empty link in RTE Tiptap property editor', async ({umbracoApi, umbracoUi}) => {
+test('cannot submit an empty link in RTE Tiptap property editor', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const iconTitle = 'Link';
   const customDataTypeId = await umbracoApi.dataType.createDefaultTiptapDataType(customDataTypeName);
@@ -94,11 +93,11 @@ test.skip('cannot submit an empty link in RTE Tiptap property editor', async ({u
   await umbracoUi.content.clickAddButton();
 
   // Assert
-  await umbracoUi.content.isTextWithMessageVisible(ConstantHelper.validationMessages.emptyLinkPicker);
+  await umbracoUi.content.doesPropertyWithNameContainValidationMessage(manualPropertyName, ConstantHelper.validationMessages.emptyManualLinkPicker);
+  await umbracoUi.content.doesPropertyWithNameContainValidationMessage(anchorOrQuerystringPropertyName, ConstantHelper.validationMessages.emptyManualLinkPicker);
 });
 
-// TODO: fails due to https://github.com/umbraco/Umbraco-CMS/issues/21044
-test.skip('cannot submit an empty URL with an anchor or querystring in RTE Tiptap property editor', async ({umbracoApi, umbracoUi}) => {
+test('can submit an empty URL with an anchor or querystring in RTE Tiptap property editor', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const iconTitle = 'Link';
   const customDataTypeId = await umbracoApi.dataType.createDefaultTiptapDataType(customDataTypeName);
@@ -114,9 +113,10 @@ test.skip('cannot submit an empty URL with an anchor or querystring in RTE Tipta
   await umbracoUi.content.enterLink('');
   await umbracoUi.content.enterAnchorOrQuerystring('#value');
   await umbracoUi.content.clickAddButton();
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isTextWithMessageVisible(ConstantHelper.validationMessages.emptyLinkPicker);
+  await umbracoUi.content.isErrorNotificationVisible(false);
 });
 
 test('can insert a link to an unpublished document in RTE Tiptap property editor', async ({umbracoApi, umbracoUi}) => {
@@ -129,7 +129,7 @@ test('can insert a link to an unpublished document in RTE Tiptap property editor
   const documentTypeForLinkedDocumentName = 'TestDocumentType';
   const documentTypeForLinkedDocumentId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(documentTypeForLinkedDocumentName);
   const linkedDocumentName = 'LinkedDocument';
-  await umbracoApi.document.createDefaultDocument(linkedDocumentName, documentTypeForLinkedDocumentId);
+  const linkedDocumentId = await umbracoApi.document.createDefaultDocument(linkedDocumentName, documentTypeForLinkedDocumentId);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
@@ -139,12 +139,17 @@ test('can insert a link to an unpublished document in RTE Tiptap property editor
   await umbracoUi.content.clickDocumentLinkButton();
   await umbracoUi.content.selectLinkByName(linkedDocumentName);
   await umbracoUi.content.clickButtonWithName('Choose');
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.short); // Wait for the link to be inserted
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.medium); // Wait for the link to be inserted
   await umbracoUi.content.clickAddButton();
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.medium); // Wait for the modal to close
+  await umbracoUi.content.typeRTETipTapEditorValue(linkedDocumentName);
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.values[0].value.markup).toContain('href=');
+  expect(contentData.values[0].value.markup).toContain(linkedDocumentId);
+  expect(contentData.values[0].value.markup).toContain(linkedDocumentName);
 
   // Clean
   await umbracoApi.documentType.ensureNameNotExists(documentTypeForLinkedDocumentName);

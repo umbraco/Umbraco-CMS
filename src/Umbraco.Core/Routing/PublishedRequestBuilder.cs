@@ -6,6 +6,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Routing;
 
+/// <summary>
+///     Provides a builder for constructing <see cref="IPublishedRequest" /> instances during the routing process.
+/// </summary>
 public class PublishedRequestBuilder : IPublishedRequestBuilder
 {
     private readonly IFileService _fileService;

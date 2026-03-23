@@ -57,6 +57,13 @@ export class UmbCollectionElement<
 		// @ts-ignore
 		this._api.setFilter(this.#filter);
 	}
+
+	getSelection() {
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
+		// TODO: make base interface for a collection menu element
+		return this._element?.getSelection?.() ?? [];
+	}
 }
 
 declare global {

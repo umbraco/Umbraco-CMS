@@ -24,6 +24,14 @@ internal sealed class LanguageRepository : EntityRepositoryBase<int, ILanguage>,
     private readonly Dictionary<string, int> _codeIdMap = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<int, string> _idCodeMap = new();
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="LanguageRepository"/> class.
+    /// </summary>
+    /// <param name="scopeAccessor">Provides access to the current database scope for repository operations.</param>
+    /// <param name="cache">The application-level cache manager used for caching repository data.</param>
+    /// <param name="logger">The logger used for logging repository events and errors.</param>
+    /// <param name="repositoryCacheVersionService">Service for managing cache versioning within the repository.</param>
+    /// <param name="cacheSyncService">Service responsible for synchronizing cache across distributed environments.</param>
     public LanguageRepository(
         IScopeAccessor scopeAccessor,
         AppCaches cache,
@@ -42,6 +50,11 @@ internal sealed class LanguageRepository : EntityRepositoryBase<int, ILanguage>,
     private FullDataSetRepositoryCachePolicy<ILanguage, int>? TypedCachePolicy =>
         CachePolicy as FullDataSetRepositoryCachePolicy<ILanguage, int>;
 
+    /// <summary>
+    /// Gets a language by its ISO code.
+    /// </summary>
+    /// <param name="isoCode">The ISO code of the language to retrieve.</param>
+    /// <returns>The language matching the specified ISO code, or null if not found.</returns>
     public ILanguage? GetByIsoCode(string isoCode)
     {
         EnsureCacheIsPopulated();
@@ -50,6 +63,12 @@ internal sealed class LanguageRepository : EntityRepositoryBase<int, ILanguage>,
         return id.HasValue ? Get(id.Value) : null;
     }
 
+    /// <summary>
+    /// Gets the language identifier corresponding to the specified ISO code.
+    /// </summary>
+    /// <param name="isoCode">The ISO code of the language to look up.</param>
+    /// <param name="throwOnNotFound">If true, throws an exception when the ISO code is not found; otherwise returns null.</param>
+    /// <returns>The language identifier if found; otherwise null.</returns>
     public int? GetIdByIsoCode(string? isoCode, bool throwOnNotFound = true)
     {
         if (isoCode == null)
@@ -75,6 +94,12 @@ internal sealed class LanguageRepository : EntityRepositoryBase<int, ILanguage>,
         return null;
     }
 
+    /// <summary>
+    /// Gets the ISO code for the language with the specified ID.
+    /// </summary>
+    /// <param name="id">The ID of the language to look up.</param>
+    /// <param name="throwOnNotFound">If true, throws an exception when the language ID is not found; otherwise returns null.</param>
+    /// <returns>The ISO code of the language if found; otherwise null.</returns>
     public string? GetIsoCodeById(int? id, bool throwOnNotFound = true)
     {
         if (id == null)
@@ -100,7 +125,15 @@ internal sealed class LanguageRepository : EntityRepositoryBase<int, ILanguage>,
         return null;
     }
 
-    // multi implementation of GetIsoCodeById
+    /// <summary>
+    /// Retrieves the ISO codes corresponding to the specified language IDs.
+    /// </summary>
+    /// <remarks>multi implementation of GetIsoCodeById</remarks>
+    /// <param name="ids">A collection of language IDs for which to retrieve ISO codes.</param>
+    /// <param name="throwOnNotFound">If true, throws an <see cref="ArgumentException"/> when an ID is not found; if false, the corresponding entry in the result will be <c>null</c>.</param>
+    /// <returns>
+    /// An array of ISO codes, where each element corresponds to the language ID at the same position in <paramref name="ids"/>. If <paramref name="throwOnNotFound"/> is false and an ID is not found, the corresponding element will be <c>null</c>.
+    /// </returns>
     public string[] GetIsoCodesByIds(ICollection<int> ids, bool throwOnNotFound = true)
     {
         var isoCodes = new string[ids.Count];
@@ -132,8 +165,14 @@ internal sealed class LanguageRepository : EntityRepositoryBase<int, ILanguage>,
         return isoCodes;
     }
 
+    /// <summary>
+    /// Retrieves the ISO code of the default language configured in the system.
+    /// </summary>
+    /// <returns>A string representing the ISO code of the default language.</returns>
     public string GetDefaultIsoCode() => GetDefault().IsoCode;
 
+    /// <summary>Gets the default language identifier.</summary>
+    /// <returns>The identifier of the default language, or null if none is set.</returns>
     public int? GetDefaultId() => GetDefault().Id;
 
     protected override IRepositoryCachePolicy<ILanguage, int> CreateCachePolicy() =>
@@ -188,7 +227,7 @@ internal sealed class LanguageRepository : EntityRepositoryBase<int, ILanguage>,
 
     #region Overrides of RepositoryBase<int,Language>
 
-    protected override ILanguage? PerformGet(int id) => PerformGetAll(id).FirstOrDefault();
+    protected override ILanguage? PerformGet(int id) => PerformGetAll([id]).FirstOrDefault();
 
     protected override IEnumerable<ILanguage> PerformGetAll(params int[]? ids)
     {
@@ -260,14 +299,15 @@ internal sealed class LanguageRepository : EntityRepositoryBase<int, ILanguage>,
         {
             // NOTE: There is no constraint between the Language and cmsDictionary/cmsLanguageText tables (?)
             // but we still need to remove them
-            $"DELETE FROM {SqlSyntax.GetQuotedName(Constants.DatabaseSchema.Tables.DictionaryValue)} {lIdWhere}",
-            $"DELETE FROM {SqlSyntax.GetQuotedName(Constants.DatabaseSchema.Tables.PropertyData)} {lIdWhere}",
-            $"DELETE FROM {SqlSyntax.GetQuotedName(Constants.DatabaseSchema.Tables.ContentVersionCultureVariation)} {lIdWhere}",
-            $"DELETE FROM {SqlSyntax.GetQuotedName(Constants.DatabaseSchema.Tables.DocumentCultureVariation)} {lIdWhere}",
-            $"DELETE FROM {SqlSyntax.GetQuotedName(Constants.DatabaseSchema.Tables.TagRelationship)} WHERE {QuoteColumnName("tagId")} IN (SELECT id FROM {SqlSyntax.GetQuotedName(Constants.DatabaseSchema.Tables.Tag)} {lIdWhere})",
-            $"DELETE FROM {SqlSyntax.GetQuotedName(Constants.DatabaseSchema.Tables.Tag)} {lIdWhere}",
-            $"DELETE FROM {SqlSyntax.GetQuotedName(Constants.DatabaseSchema.Tables.DocumentUrl)} {lIdWhere}",
-            $"DELETE FROM {SqlSyntax.GetQuotedName(Constants.DatabaseSchema.Tables.Language)} WHERE id = @id",
+            $"DELETE FROM {QuoteName(Constants.DatabaseSchema.Tables.DictionaryValue)} {lIdWhere}",
+            $"DELETE FROM {QuoteName(Constants.DatabaseSchema.Tables.PropertyData)} {lIdWhere}",
+            $"DELETE FROM {QuoteName(Constants.DatabaseSchema.Tables.ContentVersionCultureVariation)} {lIdWhere}",
+            $"DELETE FROM {QuoteName(Constants.DatabaseSchema.Tables.DocumentCultureVariation)} {lIdWhere}",
+            $"DELETE FROM {QuoteName(Constants.DatabaseSchema.Tables.TagRelationship)} WHERE {QuoteColumnName("tagId")} IN (SELECT id FROM {QuoteName(Constants.DatabaseSchema.Tables.Tag)} {lIdWhere})",
+            $"DELETE FROM {QuoteName(Constants.DatabaseSchema.Tables.Tag)} {lIdWhere}",
+            $"DELETE FROM {QuoteName(Constants.DatabaseSchema.Tables.DocumentUrl)} {lIdWhere}",
+            $"DELETE FROM {QuoteName(Constants.DatabaseSchema.Tables.DocumentUrlAlias)} {lIdWhere}",
+            $"DELETE FROM {QuoteName(Constants.DatabaseSchema.Tables.Language)} WHERE id = @id",
         };
         return list;
     }

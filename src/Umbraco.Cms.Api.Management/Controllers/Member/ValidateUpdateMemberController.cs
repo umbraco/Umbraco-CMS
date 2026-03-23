@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Factories;
@@ -10,12 +10,20 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Member;
 
+/// <summary>
+/// Provides API endpoints for validating updates to member entities in the system.
+/// </summary>
 [ApiVersion("1.0")]
 public class ValidateUpdateMemberController : MemberControllerBase
 {
     private readonly IMemberEditingService _memberEditingService;
     private readonly IMemberEditingPresentationFactory _memberEditingPresentationFactory;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Controllers.Member.ValidateUpdateMemberController"/> class.
+    /// </summary>
+    /// <param name="memberEditingService">The <see cref="IMemberEditingService"/> used for member editing operations.</param>
+    /// <param name="memberEditingPresentationFactory">The <see cref="IMemberEditingPresentationFactory"/> used to create member editing presentations.</param>
     public ValidateUpdateMemberController(
         IMemberEditingService memberEditingService,
         IMemberEditingPresentationFactory memberEditingPresentationFactory)
@@ -29,6 +37,8 @@ public class ValidateUpdateMemberController : MemberControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Validates updating a member.")]
+    [EndpointDescription("Validates the request model for updating a member without actually updating it.")]
     public async Task<IActionResult> Validate(
         CancellationToken cancellationToken,
         Guid id,

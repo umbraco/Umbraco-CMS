@@ -78,4 +78,20 @@ public class ColorListValidatorTest
         Assert.AreEqual(1, result.Count());
         Assert.IsTrue(result.First().ErrorMessage.Contains("ffffff, 000000, ff00aa"));
     }
+
+    [Test]
+    public void Validates_Color_Can_Contain_Transparency()
+    {
+        var validator = new ColorPickerConfigurationEditor.ColorListValidator(ConfigurationEditorJsonSerializer());
+        var result =
+            validator.Validate(
+                new JsonArray(
+                    JsonNode.Parse("""{"value": "ff000050", "label": "Transparent Red"}"""),
+                    JsonNode.Parse("""{"value": "ff0000", "label": "Regular Red"}"""),
+                    JsonNode.Parse("""{"value": "ff0000500", "label": "Invalid Red"}""")),
+                null,
+                null,
+                PropertyValidationContext.Empty());
+        Assert.AreEqual(1, result.Count());
+    }
 }

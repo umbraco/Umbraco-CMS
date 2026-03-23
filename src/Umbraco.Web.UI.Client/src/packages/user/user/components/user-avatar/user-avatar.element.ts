@@ -13,8 +13,7 @@ import {
 } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
-const elementName = 'umb-user-avatar';
-@customElement(elementName)
+@customElement('umb-user-avatar')
 export class UmbUserAvatarElement extends UmbLitElement {
 	@property({ type: String })
 	name?: string;
@@ -135,6 +134,6 @@ export class UmbUserAvatarElement extends UmbLitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbUserAvatarElement;
+		'umb-user-avatar': UmbUserAvatarElement;
 	}
 }

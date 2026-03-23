@@ -16,7 +16,7 @@ import {
 import { loadManifestApi } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { umbDestroyOnDisconnect, UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
@@ -35,6 +35,10 @@ const DEFAULT_STYLESHEET_ROOT_PATH = '/css';
 @customElement('umb-input-tiptap')
 export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof UmbLitElement, string>(UmbLitElement) {
 	#context = new UmbTiptapRteContext(this);
+
+	#hasToolbar = false;
+
+	#hasStatusbar = false;
 
 	#stylesheets = new Set(['/umbraco/backoffice/css/rte-content.css']);
 
@@ -84,7 +88,7 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 	private readonly _extensions: Array<UmbTiptapExtensionApi> = [];
 
 	@state()
-	private _styles: Array<CSSResultGroup> = [];
+	private _extensionStyles?: CSSResultGroup;
 
 	@state()
 	private _toolbar: UmbTiptapToolbarValue = [[[]]];
@@ -165,10 +169,8 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 			});
 		}
 
-		this._toolbar = this.configuration?.getValueByAlias<UmbTiptapToolbarValue>('toolbar') ?? [[[]]];
-		this._statusbar = this.configuration?.getValueByAlias<UmbTiptapStatusbarValue>('statusbar') ?? [];
-
 		const tiptapExtensions = new Map<string, AnyExtension>();
+		const collectedStyles: Array<CSSResultGroup> = [];
 
 		this._extensions.forEach((ext) => {
 			const tiptapExt = ext.getTiptapExtensions({ configuration: this.configuration });
@@ -182,9 +184,18 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 
 			const styles = ext.getStyles();
 			if (styles) {
-				this._styles.push(styles);
+				collectedStyles.push(styles);
 			}
 		});
+
+		if (collectedStyles.length) {
+			this._extensionStyles = unsafeCSS(collectedStyles.map((s) => s.toString()).join(''));
+		}
+
+		this._toolbar = this.configuration?.getValueByAlias<UmbTiptapToolbarValue>('toolbar') ?? [[[]]];
+		this._statusbar = this.configuration?.getValueByAlias<UmbTiptapStatusbarValue>('statusbar') ?? [];
+		this.#hasToolbar = this._toolbar.flat(2).length > 0;
+		this.#hasStatusbar = this._statusbar.flat().length > 0;
 
 		this._editor = new Editor({
 			element: element,
@@ -226,7 +237,7 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 	}
 
 	#renderStyles() {
-		if (!this._styles?.length) return;
+		if (!this._extensionStyles) return;
 		return html`
 			${repeat(
 				this.#stylesheets,
@@ -234,13 +245,13 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 				(stylesheet) => html`<link rel="stylesheet" href=${stylesheet} />`,
 			)}
 			<style>
-				${this._styles.map((style) => unsafeCSS(style))}
+				${this._extensionStyles}
 			</style>
 		`;
 	}
 
 	#renderToolbar() {
-		if (!this._toolbar.flat(2).length) return;
+		if (!this.#hasToolbar) return;
 		return html`
 			<umb-tiptap-toolbar
 				data-mark="tiptap-toolbar"
@@ -253,14 +264,15 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 	}
 
 	#renderStatusbar() {
-		if (!this._statusbar.flat().length) return;
+		if (!this.#hasStatusbar) return;
 		return html`
 			<umb-tiptap-statusbar
 				data-mark="tiptap-statusbar"
 				.statusbar=${this._statusbar}
 				.editor=${this._editor}
 				.configuration=${this.configuration}
-				?readonly=${this.readonly}>
+				?readonly=${this.readonly}
+				${umbDestroyOnDisconnect()}>
 			</umb-tiptap-statusbar>
 		`;
 	}

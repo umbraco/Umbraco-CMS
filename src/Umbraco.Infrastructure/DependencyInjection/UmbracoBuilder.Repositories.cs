@@ -3,6 +3,7 @@ using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.DynamicRoot.QuerySteps;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Cms.Infrastructure.Services.Implement;
@@ -34,6 +35,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddUnique<IDocumentVersionRepository, DocumentVersionRepository>();
         builder.Services.AddUnique<IDocumentTypeContainerRepository, DocumentTypeContainerRepository>();
         builder.Services.AddUnique<IDocumentUrlRepository, DocumentUrlRepository>();
+        builder.Services.AddUnique<IDocumentUrlAliasRepository, DocumentUrlAliasRepository>();
         builder.Services.AddUnique<IDomainRepository, DomainRepository>();
         builder.Services.AddMultipleUnique<IEntityRepository, IEntityRepositoryExtended, EntityRepository>();
         builder.Services.AddUnique<ITwoFactorLoginRepository, TwoFactorLoginRepository>();
@@ -84,7 +86,10 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddUnique<IPublishStatusRepository, PublishStatusRepository>();
         builder.Services.AddUnique<IRepositoryCacheVersionRepository, RepositoryCacheVersionRepository>();
         builder.Services.AddUnique<ILongRunningOperationRepository, LongRunningOperationRepository>();
-        builder.Services.AddUnique<ILastSyncedRepository, LastSyncedRepository>();
+        builder.Services.AddSingleton<FileSystemLastSyncedRepository>();
+        builder.Services.AddSingleton<LastSyncedRepository>();
+        builder.Services.AddUnique<IDatabaseReadOnlyAccessor, DatabaseReadOnlyAccessor>();
+        builder.Services.AddUnique<ILastSyncedRepository, ServerRoleAwareLastSyncedRepository>();
         builder.Services.AddUnique<IDistributedJobRepository, DistributedJobRepository>();
 
         return builder;

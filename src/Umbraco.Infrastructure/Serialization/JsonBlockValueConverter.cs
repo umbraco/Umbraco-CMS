@@ -1,6 +1,7 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Extensions;
 
@@ -11,6 +12,11 @@ namespace Umbraco.Cms.Infrastructure.Serialization;
 /// </summary>
 public class JsonBlockValueConverter : JsonConverter<BlockValue>
 {
+    /// <summary>
+    /// Determines whether the specified type can be converted by this converter.
+    /// </summary>
+    /// <param name="typeToConvert">The type to check for convertibility.</param>
+    /// <returns>True if the type can be converted; otherwise, false.</returns>
     public override bool CanConvert(Type typeToConvert) => typeToConvert.IsAssignableTo(typeof(BlockValue));
 
     /// <inheritdoc />
@@ -72,6 +78,13 @@ public class JsonBlockValueConverter : JsonConverter<BlockValue>
         return blockValue;
     }
 
+    /// <summary>
+    /// Writes the JSON representation of the specified <see cref="Umbraco.Cms.Core.Models.BlockValue" /> to the provided <see cref="System.Text.Json.Utf8JsonWriter" />.
+    /// The output includes the content data, optional settings data, expose data, and a layout object containing block layout items grouped by property editor alias.
+    /// </summary>
+    /// <param name="writer">The <see cref="System.Text.Json.Utf8JsonWriter" /> to write the JSON to.</param>
+    /// <param name="value">The <see cref="Umbraco.Cms.Core.Models.BlockValue" /> instance to serialize.</param>
+    /// <param name="options">The <see cref="System.Text.Json.JsonSerializerOptions" /> to use when serializing the value.</param>
     public override void Write(Utf8JsonWriter writer, BlockValue value, JsonSerializerOptions options)
     {
         value.Layout.TryGetValue(value.PropertyEditorAlias, out IEnumerable<IBlockLayoutItem>? blockLayoutItems);
@@ -123,14 +136,82 @@ public class JsonBlockValueConverter : JsonConverter<BlockValue>
 
     private List<BlockItemData> DeserializeBlockItemData(ref Utf8JsonReader reader, JsonSerializerOptions options, Type typeToConvert, string propertyName)
     {
+        // Create a copy of the reader in case we have to go into the fallback flow.
+        // Given FallbackBlockItemDataDeserialization method will be called following an exception in the main
+        // deserialisation flow, the original reader would already advanced past the initial StartArray token and fail on
+        // attempting to deserialize it to a JSON array.
+        // We can do this as Utf8JsonReader is a struct and thus a value type (see https://stackoverflow.com/questions/71396687/how-to-reset-an-utf8jsonreader-to-its-starting-position).
+        Utf8JsonReader readerCopy = reader;
         try
         {
-            return DeserializeListOf<BlockItemData>(ref reader, options, typeToConvert, propertyName);
+            return CurrentDeserializeBlockItemData(ref reader, options);
         }
         catch (JsonException ex) when (ex.Path?.EndsWith(".values") is true)
         {
-            // If we hit a JsonException due to the "values" property conflict, attempt the fallback deserialization
-            return FallbackBlockItemDataDeserialization(ref reader, options);
+            // If we hit a JsonException due to the "values" property conflict, attempt the fallback deserialization (using
+            // the copied reader).
+            return FallbackBlockItemDataDeserialization(ref readerCopy, options);
+        }
+    }
+
+    private List<BlockItemData> CurrentDeserializeBlockItemData(ref Utf8JsonReader reader, JsonSerializerOptions options)
+    {
+        JsonArray? arrayElement = JsonSerializer.Deserialize<JsonArray>(ref reader, options);
+        return arrayElement?
+            .Select(itemElement => CurrentDeserializeBlockItemData(itemElement, options))
+            .OfType<BlockItemData>()
+            .ToList() ?? [];
+    }
+
+    private static BlockItemData? CurrentDeserializeBlockItemData(JsonNode? jsonNode, JsonSerializerOptions options)
+    {
+        if (jsonNode is not JsonObject jsonObject)
+        {
+            return jsonNode.Deserialize<BlockItemData>(options);
+        }
+
+        // Handle legacy "udi" field if present.
+        string? udiValue = ExtractLegacyUdi(jsonObject);
+
+        BlockItemData? blockItemData = jsonObject.Deserialize<BlockItemData>(options);
+
+        SetKeyFromLegacyUdi(blockItemData, udiValue);
+
+        return blockItemData;
+    }
+
+    /// <summary>
+    /// Extracts and removes the legacy "udi" field from a JsonObject if present.
+    /// </summary>
+    /// <remarks>
+    /// The Udi property has [JsonIgnore] to prevent serialization differences between save and publish paths,
+    /// so we must handle it manually during deserialization.
+    /// </remarks>
+    private static string? ExtractLegacyUdi(JsonObject jsonObject)
+    {
+        if (jsonObject.ContainsKey("udi") is false)
+        {
+            return null;
+        }
+
+        var udiValue = jsonObject["udi"]?.GetValue<string>();
+        jsonObject.Remove("udi");
+        return udiValue;
+    }
+
+    /// <summary>
+    /// Sets the Key property from a legacy UDI string if the Key wasn't already set.
+    /// </summary>
+    private static void SetKeyFromLegacyUdi(BlockItemData? blockItemData, string? udiValue)
+    {
+        if (blockItemData is null || blockItemData.Key != Guid.Empty || udiValue is null)
+        {
+            return;
+        }
+
+        if (UdiParser.TryParse(udiValue, out Udi? udi) && udi is GuidUdi guidUdi)
+        {
+            blockItemData.Key = guidUdi.Guid;
         }
     }
 
@@ -242,13 +323,13 @@ public class JsonBlockValueConverter : JsonConverter<BlockValue>
         JsonArray? arrayElement = JsonSerializer.Deserialize<JsonArray>(ref reader, options);
 
         return arrayElement?
-            .Select(itemElement => DeserializeBlockItemData(itemElement, options))
+            .Select(itemElement => FallbackDeserializeBlockItemData(itemElement, options))
             .OfType<BlockItemData>()
             .ToList() ?? [];
     }
 
     [Obsolete("Only needed to support the old data schema. Remove in V18.")]
-    private static BlockItemData? DeserializeBlockItemData(JsonNode? jsonNode, JsonSerializerOptions options)
+    private static BlockItemData? FallbackDeserializeBlockItemData(JsonNode? jsonNode, JsonSerializerOptions options)
     {
         if (jsonNode is not JsonObject jsonObject || jsonObject.ContainsKey("values") is false)
         {
@@ -256,16 +337,18 @@ public class JsonBlockValueConverter : JsonConverter<BlockValue>
             return jsonNode.Deserialize<BlockItemData>(options);
         }
 
+        // Handle legacy "udi" field if present.
+        string? udiValue = ExtractLegacyUdi(jsonObject);
+
         // Handle the "values" property conflict by extracting the "values" property first and adding it to the
-        // RawPropertyValues dictionary after deserialization
+        // RawPropertyValues dictionary after deserialization.
         JsonNode? values = jsonObject["values"];
         jsonObject.Remove("values");
 
         BlockItemData? blockItemData = jsonObject.Deserialize<BlockItemData>(options);
-        if (blockItemData is not null)
-        {
-            blockItemData.RawPropertyValues["values"] = values.Deserialize<object?>(options);
-        }
+        blockItemData?.RawPropertyValues["values"] = values.Deserialize<object?>(options);
+
+        SetKeyFromLegacyUdi(blockItemData, udiValue);
 
         return blockItemData;
     }

@@ -4,12 +4,10 @@ pr: none
 trigger: none
 
 schedules:
-  - cron: '0 0 * * *'
-    displayName: Daily midnight build
+  - cron: '0 3 * * *'
+    displayName: Daily 3AM build (main)
     branches:
       include:
-        - v15/dev
-        - v16/dev
         - main
 
 parameters:
@@ -27,6 +25,12 @@ parameters:
     displayName: Skip tests with DefaultConfig
     type: boolean
     default: false
+
+  # Can we slow our tests down when running on SQLite? That way we might be able to avoid DB locks
+  - name: skipSqliteAcceptanceTests
+    displayName: Skip SQLite acceptance tests
+    type: boolean
+    default: true
 
 variables:
   nodeVersion: 20
@@ -315,7 +319,8 @@ stages:
 
   - stage: DefaultConfigE2E
     displayName: Default Config E2E Tests
-    dependsOn: Build
+    dependsOn: Integration
+    condition: always()
     variables:
       npm_config_cache: $(Pipeline.Workspace)/.npm_e2e
       # Enable console logging in Release mode
@@ -342,7 +347,7 @@ stages:
       - job:
         displayName: E2E Tests (SQLite)
         timeoutInMinutes: 180
-        condition: ${{ eq(parameters.skipDefaultConfigAcceptanceTests, false) }}
+        condition: ${{ and(eq(parameters.skipDefaultConfigAcceptanceTests, false), eq(parameters.skipSqliteAcceptanceTests, false)) }}
         variables:
           # Connection string
           CONNECTIONSTRINGS__UMBRACODBDSN: Data Source=Umbraco;Mode=Memory;Cache=Shared;Foreign Keys=True;Pooling=True
@@ -496,7 +501,8 @@ stages:
 
   - stage: AdditionalConfigE2E
     displayName: Additional Config E2E Tests
-    dependsOn: Build
+    dependsOn: DefaultConfigE2E
+    condition: always()
     variables:
       npm_config_cache: $(Pipeline.Workspace)/.npm_e2e
       ASPNETCORE_URLS: https://localhost:44331
@@ -578,6 +584,23 @@ stages:
               testFolder: "EntityDataPicker"
               port: ''
               testCommand: "npx playwright test --project=entityDataPicker"
+              CONNECTIONSTRINGS__UMBRACODBDSN: Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);Encrypt=True;TrustServerCertificate=True
+              CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
+              additionalEnvironmentVariables: false
+            # ContentSettingConfig
+            WindowsContentSettingsConfig:
+              vmImage: "windows-latest"
+              testFolder: "ContentSettingConfig"
+              port: ''
+              testCommand: "npx playwright test --project=contentSettingConfig"
+              CONNECTIONSTRINGS__UMBRACODBDSN: Data Source=(localdb)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Umbraco.mdf;Integrated Security=True
+              CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
+              additionalEnvironmentVariables: false
+            LinuxContentSettingsConfig:
+              vmImage: "ubuntu-latest"
+              testFolder: "ContentSettingConfig"
+              port: ''
+              testCommand: "npx playwright test --project=contentSettingConfig"
               CONNECTIONSTRINGS__UMBRACODBDSN: Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);Encrypt=True;TrustServerCertificate=True
               CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
               additionalEnvironmentVariables: false
@@ -693,7 +716,7 @@ stages:
               AZUREB2CTESTUSEREMAIL: $(AZUREB2CTESTUSEREMAIL)
               AZUREB2CTESTUSERPASSWORD: $(AZUREB2CTESTUSERPASSWORD)
               DatabaseType: ${{ variables.DatabaseType }}
-          
+
           # Stop SMTP4dev container
           - bash: |
               echo "Stopping SMTP4dev container..."

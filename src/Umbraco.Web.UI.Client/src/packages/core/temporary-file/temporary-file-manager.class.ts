@@ -10,7 +10,7 @@ import { observeMultiple, UmbArrayState } from '@umbraco-cms/backoffice/observab
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
-import { formatBytes } from '@umbraco-cms/backoffice/utils';
+import { formatBytes, getFileExtension } from '@umbraco-cms/backoffice/utils';
 import { UmbApiError, UmbCancelError } from '@umbraco-cms/backoffice/resources';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
@@ -126,7 +126,7 @@ export class UmbTemporaryFileManager<
 			}
 		}
 
-		const fileExtension = item.file.name.split('.').pop() ?? '';
+		const fileExtension = (getFileExtension(item.file.name) ?? '').toLowerCase();
 
 		const [allowedExtensions, disallowedExtensions] = await this.observe(
 			observeMultiple([
@@ -135,9 +135,12 @@ export class UmbTemporaryFileManager<
 			]),
 		).asPromise();
 
+		const allowedLower = allowedExtensions?.map((x) => x.toLowerCase());
+		const disallowedLower = disallowedExtensions?.map((x) => x.toLowerCase());
+
 		if (
-			(allowedExtensions?.length && !allowedExtensions.includes(fileExtension)) ||
-			(disallowedExtensions?.length && disallowedExtensions.includes(fileExtension))
+			(allowedLower?.length && !allowedLower.includes(fileExtension)) ||
+			(disallowedLower?.length && disallowedLower.includes(fileExtension))
 		) {
 			this.#notificationContext?.peek('warning', {
 				data: {

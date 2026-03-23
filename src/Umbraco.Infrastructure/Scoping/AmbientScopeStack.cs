@@ -7,6 +7,9 @@ namespace Umbraco.Cms.Infrastructure.Scoping
         private static Lock _lock = new();
         private static AsyncLocal<ConcurrentStack<IScope>> _stack = new ();
 
+        /// <summary>
+        /// Gets the current ambient scope if one exists; otherwise, returns null.
+        /// </summary>
         public IScope? AmbientScope
         {
             get
@@ -23,6 +26,11 @@ namespace Umbraco.Cms.Infrastructure.Scoping
             }
         }
 
+        /// <summary>
+        /// Removes and returns the ambient scope from the stack.
+        /// </summary>
+        /// <returns>The ambient scope that was removed from the stack.</returns>
+        /// <exception cref="InvalidOperationException">Thrown if there is no ambient scope on the stack to remove.</exception>
         public IScope Pop()
         {
             lock (_lock)
@@ -38,6 +46,10 @@ namespace Umbraco.Cms.Infrastructure.Scoping
             }
         }
 
+        /// <summary>
+        /// Pushes the specified scope onto the ambient scope stack.
+        /// </summary>
+        /// <param name="scope">The scope to push onto the stack.</param>
         public void Push(IScope scope)
         {
             lock (_lock)

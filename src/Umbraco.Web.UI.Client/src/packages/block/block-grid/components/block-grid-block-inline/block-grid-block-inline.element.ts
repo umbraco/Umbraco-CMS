@@ -12,6 +12,7 @@ import { UMB_BLOCK_WORKSPACE_ALIAS } from '@umbraco-cms/backoffice/block';
 import type { UmbApiConstructorArgumentsMethodType } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbBlockEditorCustomViewConfiguration } from '@umbraco-cms/backoffice/block-custom-view';
 import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
+import type { UmbDataTypeDetailModel } from '@umbraco-cms/backoffice/data-type';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UMB_BLOCK_WORKSPACE_CONTEXT, UmbBlockDataType } from '@umbraco-cms/backoffice/block';
 
@@ -54,6 +55,9 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 	private _inlineProperty?: UmbPropertyTypeModel;
 
 	@state()
+	private _inlinePropertyDataTypeDetail?: UmbDataTypeDetailModel;
+
+	@state()
 	private _inlinePropertyDataPath?: string;
 
 	@state()
@@ -80,9 +84,19 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 		this.consumeContext(UMB_BLOCK_GRID_ENTRIES_CONTEXT, (entriesContext) => {
 			this.#parentUnique = entriesContext?.getParentUnique();
 			this.#areaKey = entriesContext?.getAreaKey();
-		});
 
-		new UmbExtensionApiInitializer(
+			this.#initExtension();
+		});
+	}
+
+	#extensionInitializer?: UmbExtensionApiInitializer;
+	#initExtension() {
+		this.#extensionInitializer?.destroy();
+		if (this.#parentUnique === undefined || this.#areaKey === undefined) {
+			return;
+		}
+
+		this.#extensionInitializer = new UmbExtensionApiInitializer(
 			this,
 			umbExtensionsRegistry,
 			UMB_BLOCK_WORKSPACE_ALIAS,
@@ -100,6 +114,7 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 						parentUnique: this.#parentUnique,
 					} as UmbBlockGridWorkspaceOriginData);
 					this.#workspaceContext.establishLiveSync();
+					this.#workspaceContext.autoReportValidation();
 
 					this.#load();
 
@@ -108,6 +123,17 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 						(contentTypeProperties) => {
 							this._inlineProperty = contentTypeProperties[0];
 							this.#generatePropertyDataPath();
+
+							const dataTypeUnique = this._inlineProperty?.dataType.unique;
+							if (dataTypeUnique) {
+								this.observe(
+									this.#workspaceContext!.content.structure.contentTypeDataTypeDetailOf(dataTypeUnique),
+									(detail) => {
+										this._inlinePropertyDataTypeDetail = detail;
+									},
+									'observeInlinePropertyDataTypeDetail',
+								);
+							}
 						},
 						'observeProperties',
 					);
@@ -214,6 +240,7 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 				<div id="inside" draggable="false">
 					<umb-property-type-based-property
 						.property=${this._inlineProperty}
+						.dataTypeDetail=${this._inlinePropertyDataTypeDetail}
 						.dataPath=${this._inlinePropertyDataPath ?? ''}
 						slot="areas"></umb-property-type-based-property>
 					<umb-block-grid-areas-container slot="areas" draggable="false"></umb-block-grid-areas-container>
@@ -225,9 +252,6 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 	static override styles = [
 		UmbTextStyles,
 		css`
-			umb-block-grid-areas-container {
-				margin-top: calc(var(--uui-size-2) + 1px);
-			}
 			umb-block-grid-areas-container::part(area) {
 				margin: var(--uui-size-2);
 			}
@@ -241,6 +265,7 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 				position: relative;
 				display: block;
 				width: 100%;
+				margin-bottom: 1px;
 
 				box-sizing: border-box;
 				border-radius: var(--uui-border-radius);
@@ -328,10 +353,6 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 				justify-content: center;
 				height: 100%;
 				padding-left: var(--uui-size-2, 6px);
-			}
-
-			#name {
-				font-weight: 700;
 			}
 
 			uui-tag {

@@ -203,7 +203,7 @@ export class UmbPropertyEditorUIBlockGridAreaTypePermissionElement
 			(group) =>
 				html`<uui-combobox-list-option .value=${group.key} ?selected=${area.groupKey === group.key}>
 					<umb-icon name="icon-folder"></umb-icon>
-					${group.name}
+					${this.localize.string(group.name)}
 				</uui-combobox-list-option>`,
 		);
 	}
@@ -217,7 +217,7 @@ export class UmbPropertyEditorUIBlockGridAreaTypePermissionElement
 					.value=${block.type.contentElementTypeKey}
 					?selected=${area.elementTypeKey === block.type.contentElementTypeKey}>
 					<umb-icon name=${block.icon}></umb-icon>
-					${block.name}
+					${this.localize.string(block.name)}
 				</uui-combobox-list-option>`,
 		);
 	}

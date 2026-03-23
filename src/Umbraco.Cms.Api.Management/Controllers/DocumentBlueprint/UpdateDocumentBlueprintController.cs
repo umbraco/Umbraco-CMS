@@ -13,6 +13,9 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DocumentBlueprint;
 
+/// <summary>
+/// Controller for updating document blueprints.
+/// </summary>
 [ApiVersion("1.0")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
 public class UpdateDocumentBlueprintController : DocumentBlueprintControllerBase
@@ -21,6 +24,12 @@ public class UpdateDocumentBlueprintController : DocumentBlueprintControllerBase
     private readonly IContentBlueprintEditingService _contentBlueprintEditingService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Controllers.DocumentBlueprint.UpdateDocumentBlueprintController"/> class.
+    /// </summary>
+    /// <param name="blueprintEditingPresentationFactory">Factory used to create blueprint editing presentations.</param>
+    /// <param name="contentBlueprintEditingService">Service responsible for content blueprint editing operations.</param>
+    /// <param name="backOfficeSecurityAccessor">Accessor for the back office security context.</param>
     public UpdateDocumentBlueprintController(
         IDocumentBlueprintEditingPresentationFactory blueprintEditingPresentationFactory,
         IContentBlueprintEditingService contentBlueprintEditingService,
@@ -31,11 +40,20 @@ public class UpdateDocumentBlueprintController : DocumentBlueprintControllerBase
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
+    /// <summary>
+    /// Updates the specified document blueprint with new details provided in the request model.
+    /// </summary>
+    /// <param name="cancellationToken">Token to monitor for cancellation requests.</param>
+    /// <param name="id">The unique identifier of the document blueprint to update.</param>
+    /// <param name="requestModel">The model containing updated details for the document blueprint.</param>
+    /// <returns>An <see cref="IActionResult"/> representing the result of the update operation.</returns>
     [HttpPut("{id:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Updates a document blueprint.")]
+    [EndpointDescription("Updates a document blueprint identified by the provided Id with the details from the request model.")]
     public async Task<IActionResult> Update(CancellationToken cancellationToken, Guid id, UpdateDocumentBlueprintRequestModel requestModel)
     {
         ContentBlueprintUpdateModel model = _blueprintEditingPresentationFactory.MapUpdateModel(requestModel);

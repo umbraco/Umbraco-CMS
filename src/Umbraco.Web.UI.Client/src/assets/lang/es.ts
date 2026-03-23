@@ -15,6 +15,7 @@ export default {
 		auditTrail: 'Historial',
 		browse: 'Nodo de Exploración',
 		changeDocType: 'Cambiar tipo de documento',
+		clear: 'Eliminar todo',
 		copy: 'Copiar',
 		create: 'Crear',
 		createPackage: 'Crear Paquete',
@@ -174,11 +175,13 @@ export default {
 		parentNotPublishedAnomaly: 'Ups: este documento está publicado pero no está en la caché (error interno)',
 		getUrlException: 'No se pudo obtener la URL',
 		routeError: 'Este documento está publicado pero tu URL colisionará con contenido %0%',
+		protected: 'Protegido',
 		publish: 'Publicar',
 		publishStatus: 'Estado de la Publicación',
 		releaseDate: 'Publicar el',
 		unpublishDate: 'Retirar publicación el',
 		removeDate: 'Fecha de Eliminación',
+		scheduledPublishing: 'Publicación programada',
 		sortDone: 'El Orden esta actualizado',
 		sortHelp:
 			'Para organizar los nodos, simplemente arrastra los nodos o realice un clic en uno de los encabezados de columna. Puedes seleccionar múltiple nodos manteniendo presionados "Shift" o "Control" mientras seleccionas',
@@ -186,6 +189,7 @@ export default {
 		titleOptional: 'Título (opcional)',
 		altTextOptional: 'Texto alternativo (opcional)',
 		type: 'Tipo',
+		unpublishedChanges: 'Cambios no publicados',
 		unpublish: 'Ocultar',
 		updateDate: 'Última actualización',
 		updateDateDesc: 'Fecha/hora este documento fue modificado',
@@ -873,8 +877,8 @@ export default {
 		reset: 'Reiniciar',
 	},
 	rollback: {
-		diffHelp:
-			'Esto muestra las diferencias entre la versión actual y la versión seleccionada<br /><del>Red</del> el texto de la versión seleccionada no se mostrará. , <ins>el verde significa añadido</ins>',
+		diffHelp: '<del>El texto rojo</del> se eliminará en la versión seleccionada, <ins>el texto verde</ins> se añadirá.',
+		showDiff: 'Mostrar diferencias entre la versión actual (borrador) y la versión seleccionada.',
 		documentRolledBack: 'Se ha recuperado la última versión del documento.',
 		htmlHelp:
 			'Esto muestra la versión seleccionada como html, si deseas ver la diferencia entre 2 versiones al mismo tiempo, por favor usa la vista diff',
@@ -918,6 +922,7 @@ export default {
 		noPropertiesDefinedOnTab:
 			'No existen propiedades para esta pestaña. Haz clic en el enlace "añadir nueva propiedad" para crear una nueva propiedad.',
 		addIcon: 'Añadir icono',
+		changeIcon: 'Cambiar icono',
 	},
 	sort: {
 		sortOrder: 'Ordenar',
@@ -1289,6 +1294,7 @@ export default {
 		noLockouts: 'no ha sido bloqueado',
 		noPasswordChange: 'La contraseña no se ha cambiado',
 		confirmNewPassword: 'Confirma nueva contraseña',
+		confirmPassword: 'Confirmar contraseña',
 		changePasswordDescription:
 			"Puedes cambiar tu contraseña para acceder al 'back office' de Umbraco rellenando el siguiente formulario y haciendo clic en el botón 'Cambiar contraseña'",
 		contentChannel: 'Canal de contenido',
@@ -1447,7 +1453,8 @@ export default {
 		emptyDictionaryTree: 'No hay elementos de Diccionario para elegir',
 	},
 	textbox: {
-		characters_left: 'caracteres restantes',
+		characters_left: '<strong>%0%</strong> caracteres restantes.',
+		characters_exceed: 'Máximo %0% caracteres, <strong>%1%</strong> de más.',
 	},
 	logViewer: {
 		selectAllLogLevelFilters: 'Seleccionar todo',

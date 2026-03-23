@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Services;
@@ -10,16 +10,35 @@ internal sealed class ContentSearchService : ContentSearchServiceBase<IContent>,
 {
     private readonly IContentService _contentService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ContentSearchService"/> class.
+    /// </summary>
+    /// <param name="sqlContext">The <see cref="ISqlContext"/> used for database operations.</param>
+    /// <param name="idKeyMap">The <see cref="IIdKeyMap"/> used for mapping content identifiers.</param>
+    /// <param name="logger">The <see cref="ILogger{ContentSearchService}"/> instance used for logging.</param>
+    /// <param name="contentService">The <see cref="IContentService"/> used for content operations.</param>
     public ContentSearchService(ISqlContext sqlContext, IIdKeyMap idKeyMap, ILogger<ContentSearchService> logger, IContentService contentService)
         : base(sqlContext, idKeyMap, logger)
         => _contentService = contentService;
 
     protected override UmbracoObjectTypes ObjectType => UmbracoObjectTypes.Document;
 
+    [Obsolete("Please use the method overload with all parameters. Scheduled for removal in Umbraco 19.")]
     protected override Task<IEnumerable<IContent>> SearchChildrenAsync(
         IQuery<IContent>? query,
         int parentId,
         Ordering? ordering,
+        long pageNumber,
+        int pageSize,
+        out long total)
+        => SearchChildrenAsync(query, parentId, propertyAliases: null, ordering: ordering, loadTemplates: true, pageNumber: pageNumber, pageSize: pageSize, total: out total);
+
+    protected override Task<IEnumerable<IContent>> SearchChildrenAsync(
+        IQuery<IContent>? query,
+        int parentId,
+        string[]? propertyAliases,
+        Ordering? ordering,
+        bool loadTemplates,
         long pageNumber,
         int pageSize,
         out long total)
@@ -28,6 +47,8 @@ internal sealed class ContentSearchService : ContentSearchServiceBase<IContent>,
             pageNumber,
             pageSize,
             out total,
+            propertyAliases,
             query,
-            ordering));
+            ordering,
+            loadTemplates));
 }

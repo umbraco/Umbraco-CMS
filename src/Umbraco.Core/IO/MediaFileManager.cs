@@ -9,6 +9,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.IO;
 
+/// <summary>
+/// Manages media files and their storage in the file system.
+/// </summary>
 public sealed class MediaFileManager
 {
     private readonly ILogger<MediaFileManager> _logger;
@@ -18,6 +21,14 @@ public sealed class MediaFileManager
     private readonly IShortStringHelper _shortStringHelper;
     private MediaUrlGeneratorCollection? _mediaUrlGenerators;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MediaFileManager"/> class.
+    /// </summary>
+    /// <param name="fileSystem">The file system for media storage.</param>
+    /// <param name="mediaPathScheme">The media path scheme.</param>
+    /// <param name="logger">The logger.</param>
+    /// <param name="shortStringHelper">The short string helper.</param>
+    /// <param name="serviceProvider">The service provider.</param>
     [Obsolete("Please use the constructor taking all arguments, scheduled for removal in Umbraco 19")]
     public MediaFileManager(
         IFileSystem fileSystem,
@@ -25,7 +36,8 @@ public sealed class MediaFileManager
         ILogger<MediaFileManager> logger,
         IShortStringHelper shortStringHelper,
         IServiceProvider serviceProvider)
-        : this(fileSystem,
+        : this(
+            fileSystem,
             mediaPathScheme,
             logger,
             shortStringHelper,
@@ -34,6 +46,15 @@ public sealed class MediaFileManager
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MediaFileManager"/> class.
+    /// </summary>
+    /// <param name="fileSystem">The file system for media storage.</param>
+    /// <param name="mediaPathScheme">The media path scheme.</param>
+    /// <param name="logger">The logger.</param>
+    /// <param name="shortStringHelper">The short string helper.</param>
+    /// <param name="serviceProvider">The service provider.</param>
+    /// <param name="coreScopeProvider">The core scope provider.</param>
     public MediaFileManager(
         IFileSystem fileSystem,
         IMediaPathScheme mediaPathScheme,
@@ -110,6 +131,12 @@ public sealed class MediaFileManager
             },
             "Failed to rename media file '{File}'.");
 
+    /// <summary>
+    /// Performs a file operation on multiple media files in parallel.
+    /// </summary>
+    /// <param name="files">The files to operate on.</param>
+    /// <param name="fileOperation">The operation to perform on each file.</param>
+    /// <param name="errorMessage">The error message template to log on failure.</param>
     private void PerformMediaFileOperation(IEnumerable<string> files, Action<string> fileOperation, string errorMessage)
     {
         using ICoreScope scope = _coreScopeProvider.Value.CreateCoreScope();

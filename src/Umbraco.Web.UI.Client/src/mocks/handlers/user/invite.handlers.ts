@@ -7,7 +7,7 @@ import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 const inviteSlug = `${UMB_SLUG}/invite`;
 
 export const handlers = [
-	http.post<InviteUserRequestModel>(umbracoPath(`${inviteSlug}`), async ({ request }) => {
+	http.post<object, InviteUserRequestModel>(umbracoPath(`${inviteSlug}`), async ({ request }) => {
 		const data = await request.json();
 		if (!data) return;
 
@@ -24,7 +24,7 @@ export const handlers = [
 		});
 	}),
 
-	http.post<any>(umbracoPath(`${inviteSlug}/resend`), async ({ request }) => {
+	http.post(umbracoPath(`${inviteSlug}/resend`), async ({ request }) => {
 		const data = await request.json();
 		if (!data) return;
 

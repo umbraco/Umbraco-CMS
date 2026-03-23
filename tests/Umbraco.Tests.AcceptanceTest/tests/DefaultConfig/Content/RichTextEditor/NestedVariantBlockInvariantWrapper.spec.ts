@@ -1,4 +1,4 @@
-﻿import {ConstantHelper, test} from "@umbraco/playwright-testhelpers";
+import {ConstantHelper, test} from "@umbraco/acceptance-test-helpers";
 
 /**
  * Verifies variant blocks deep inside invariant wrappers correctly receive culture context.
@@ -67,11 +67,9 @@ test('variant block values are readable in UI after page reload', {tag: '@smoke'
   await umbracoUi.content.clickBlockCardWithName(variantBlockName, true);
   await umbracoUi.content.enterPropertyValue(variantPropertyName, englishVariantText);
   await umbracoUi.content.enterPropertyValue(invariantPropertyName, invariantText);
-  await umbracoUi.content.clickCreateForModalWithHeadline('Add ' + variantBlockName);
-  await umbracoUi.content.clickCreateForModalWithHeadline('Add ' + wrapperBlockName);
-  await umbracoUi.content.clickSaveButtonForContent();
-  await umbracoUi.content.clickSaveButton();
-
+  await umbracoUi.content.clickCreateInModal('Add ' + variantBlockName);
+  await umbracoUi.content.clickCreateInModal('Add ' + wrapperBlockName, {waitForClose: 'target'});
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
   await umbracoUi.reloadPage();
 
   // Assert

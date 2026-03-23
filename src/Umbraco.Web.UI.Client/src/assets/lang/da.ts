@@ -405,6 +405,8 @@ export default {
 			'Træk dine filer ind i dropzonen for, at uploade dem til\n      mediebiblioteket.\n    ',
 		fileSecurityValidationFailure: 'En eller flere fil-sikkerhedsvalideringer er fejlet',
 		uploadNotAllowed: 'Upload er ikke tiladt på denne lokation',
+		uploadValidationFailed: (mediaTypeName: string) =>
+			`Medietypen ${mediaTypeName} har en eller flere påkrævede egenskaber. Det skal uploades individuelt via menuen 'Opret'`,
 	},
 	member: {
 		createNewMember: 'Opret et nyt medlem',
@@ -638,7 +640,11 @@ export default {
 		seeErrorDialogHeadline: 'Fejl detaljer',
 		selectEvent: 'Vælg begivenhed',
 		editWebhook: 'Rediger webhook',
+		cannotTrashWhenReferenced: (name: string) =>
+			`<strong>${name}</strong> kan ikke flyttes til papirkurven, fordi det refereres af andre elementer.`,
 		confirmTrash: (name: string) => `Er du sikker på, at du vil flytte <strong>${name}</strong> til papirkurven?`,
+		cannotBulkTrashWhenReferenced: (total: number) =>
+			`De valgte <strong>${total} ${total === 1 ? 'element' : 'elementer'}</strong> kan ikke flyttes til papirkurven, fordi mindst \u00e9t element refereres af andet indhold.`,
 		confirmBulkTrash: (total: number) =>
 			`Er du sikker på, at du vil flytte <strong>${total} ${total === 1 ? 'element' : 'elementer'}</strong> til papirkurven?`,
 		confirmBulkDelete: (total: number) =>
@@ -1006,6 +1012,7 @@ export default {
 		manifest: 'Manifest',
 		toggleFor: 'Toggle for %0%',
 		document: 'Dokument',
+		documentCount: (count: number) => (count === 1 ? '1 dokument' : `${count} dokumenter`),
 	},
 	colors: {
 		black: 'Sort',
@@ -1397,9 +1404,9 @@ export default {
 	rollback: {
 		changes: 'Ændringer',
 		headline: 'Vælg en version at sammenligne med den nuværende version',
-		diffHelp:
-			'Her vises forskellene mellem den nuværende version og den valgte version<br /><del>Rød</del> tekst vil ikke blive vist i den valgte version. <ins>Grøn betyder tilføjet</ins>',
-		noDiff: 'Der er ingen forskelle mellem den nuværende version og den valgte version',
+		diffHelp: '<del>Rød tekst</del> vil blive fjernet i den valgte version, <ins>grøn tekst</ins> vil blive tilføjet.',
+		showDiff: 'Vis forskelle mellem den nuværende version og den valgte version.',
+		noDiff: 'Der er ingen forskelle mellem den nuværende version og den valgte version.',
 		documentRolledBack: 'Dokument tilbagerullet',
 		htmlHelp:
 			"Her vises den valgte version som html. Hvis du ønsker at se forskellen mellem de 2 versioner\n      på samme tid, brug 'diff'-oversigten\n    ",
@@ -1440,6 +1447,7 @@ export default {
 		tabs: 'Faneblade',
 		createMatchingTemplate: 'Opret tilsvarende skabelon',
 		addIcon: 'Tilføj ikon',
+		changeIcon: 'Skift ikon',
 		contentTypeEnabled: 'Master Content Type enabled',
 		contentTypeUses: 'This Content Type uses',
 		noPropertiesDefinedOnTab:
@@ -2024,6 +2032,7 @@ export default {
 		noLockouts: 'er ikke blevet låst ude',
 		noPasswordChange: 'Kodeordet er ikke blevet ændret',
 		confirmNewPassword: 'Gentag dit nye kodeord',
+		confirmPassword: 'Bekræft kodeord',
 		changePasswordDescription:
 			"Du kan ændre dit kodeord, som giver dig adgang til Umbraco backoffice ved at\n      udfylde formularen og klikke på knappen 'Skift dit kodeord'\n    ",
 		contentChannel: 'Indholdskanal',
@@ -2848,6 +2857,8 @@ export default {
 	collection: {
 		noItemsTitle: 'Intet indhold',
 		addCollectionConfiguration: 'Tilføj samling',
+		cardViewLabel: 'Kort',
+		tableViewLabel: 'Tabel',
 	},
 	linkPicker: {
 		modalSource: 'Kilde',
@@ -2858,5 +2869,9 @@ export default {
 		resetUrlHeadline: 'Nulstil URL?',
 		resetUrlMessage: 'Er du sikker på, at du vil nulstille denne URL?',
 		resetUrlLabel: 'Nulstil',
+		selectLanguageHint: 'Vælg sprog for linket',
+		selectLanguageDefault: 'Auto (besøgendes sprog)',
+		configCultureSpecificDocumentLinksLabel: 'Kulturspecifikke dokumentlinks',
+		configCultureSpecificDocumentLinksDescription: 'Tillad brugeren at vælge specifik kultur for dokumenter.',
 	},
 } as UmbLocalizationDictionary;

@@ -1,67 +1,20 @@
-import { UMB_EDIT_MEDIA_WORKSPACE_PATH_PATTERN } from '../../../paths.js';
-import type { UmbMediaCollectionItemModel } from '../../types.js';
-import type { UmbMediaCollectionContext } from '../../media-collection.context.js';
 import { UMB_MEDIA_COLLECTION_CONTEXT } from '../../media-collection.context-token.js';
-import { UMB_MEDIA_PLACEHOLDER_ENTITY_TYPE } from '../../../entity.js';
-import { css, customElement, html, ifDefined, repeat, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { UmbMediaCollectionItemModel } from '../../types.js';
+import { css, customElement, html, nothing, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbFileDropzoneItemStatus } from '@umbraco-cms/backoffice/dropzone';
-
-import '@umbraco-cms/backoffice/imaging';
+import { UmbCollectionViewElementBase } from '@umbraco-cms/backoffice/collection';
 
 @customElement('umb-media-grid-collection-view')
-export class UmbMediaGridCollectionViewElement extends UmbLitElement {
-	@state()
-	private _items: Array<UmbMediaCollectionItemModel> = [];
-
-	@state()
-	private _selection: Array<string | null> = [];
-
-	#collectionContext?: UmbMediaCollectionContext;
-
+export class UmbMediaGridCollectionViewElement extends UmbCollectionViewElementBase<UmbMediaCollectionItemModel> {
 	constructor() {
 		super();
 		this.consumeContext(UMB_MEDIA_COLLECTION_CONTEXT, (collectionContext) => {
-			this.#collectionContext = collectionContext;
 			collectionContext?.setupView(this);
-			this.#observeCollectionContext();
 		});
 	}
 
-	#observeCollectionContext() {
-		if (!this.#collectionContext) return;
-
-		this.observe(this.#collectionContext.items, (items) => (this._items = items), '_observeItems');
-
-		this.observe(
-			this.#collectionContext.selection.selection,
-			(selection) => (this._selection = selection),
-			'_observeSelection',
-		);
-	}
-
-	#onSelect(item: UmbMediaCollectionItemModel) {
-		if (item.unique) {
-			this.#collectionContext?.selection.select(item.unique);
-		}
-	}
-
-	#onDeselect(item: UmbMediaCollectionItemModel) {
-		if (item.unique) {
-			this.#collectionContext?.selection.deselect(item.unique);
-		}
-	}
-
-	#isSelected(item: UmbMediaCollectionItemModel) {
-		return this.#collectionContext?.selection.isSelected(item.unique);
-	}
-
-	#getEditUrl(item: UmbMediaCollectionItemModel) {
-		return UMB_EDIT_MEDIA_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: item.unique });
-	}
-
 	override render() {
+		if (this._loading) return nothing;
 		return html`
 			<div id="media-grid">
 				${repeat(
@@ -74,36 +27,20 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 	}
 
 	#renderItem(item: UmbMediaCollectionItemModel) {
-		if (item.entityType === UMB_MEDIA_PLACEHOLDER_ENTITY_TYPE) {
-			return this.#renderPlaceholder(item);
-		}
-		return html`
-			<uui-card-media
-				name=${ifDefined(item.name)}
-				data-mark="${item.entityType}:${item.unique}"
-				selectable
-				?select-only=${this._selection.length > 0}
-				?selected=${this.#isSelected(item)}
-				href=${this.#getEditUrl(item)}
-				@selected=${() => this.#onSelect(item)}
-				@deselected=${() => this.#onDeselect(item)}>
-				<umb-imaging-thumbnail
-					.unique=${item.unique}
-					alt=${ifDefined(item.name)}
-					icon=${ifDefined(item.icon)}></umb-imaging-thumbnail>
-			</uui-card-media>
-		`;
-	}
-
-	#renderPlaceholder(item: UmbMediaCollectionItemModel) {
-		const complete = item.status === UmbFileDropzoneItemStatus.COMPLETE;
-		const error = item.status !== UmbFileDropzoneItemStatus.WAITING && !complete;
-		return html`<uui-card-media disabled class="media-placeholder-item" name=${ifDefined(item.name)}>
-			<umb-temporary-file-badge
-				.progress=${item.progress ?? 0}
-				?complete=${complete}
-				?error=${error}></umb-temporary-file-badge>
-		</uui-card-media>`;
+		const href = item.unique ? this._itemHrefs.get(item.unique) : undefined;
+		return html` <umb-entity-collection-item-card
+			.item=${item}
+			href=${href ?? nothing}
+			?selectable=${this._isSelectableItem(item)}
+			?select-only=${this._selectOnly}
+			?selected=${this._isSelectedItem(item.unique)}
+			@selected=${() => this._selectItem(item.unique)}
+			@deselected=${() => this._deselectItem(item.unique)}>
+			<umb-entity-actions-bundle
+				slot="actions"
+				.entityType=${item.entityType}
+				.unique=${item.unique}></umb-entity-actions-bundle>
+		</umb-entity-collection-item-card>`;
 	}
 
 	static override styles = [
@@ -112,12 +49,6 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 			:host {
 				display: flex;
 				flex-direction: column;
-			}
-
-			.container {
-				display: flex;
-				justify-content: center;
-				align-items: center;
 			}
 
 			#media-grid {

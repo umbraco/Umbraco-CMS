@@ -7,6 +7,9 @@ namespace Umbraco.Cms.Core.Models.Entities;
 /// </summary>
 public interface ICanBeDirty
 {
+    /// <summary>
+    ///     Occurs when a property value changes.
+    /// </summary>
     event PropertyChangedEventHandler PropertyChanged;
 
     /// <summary>

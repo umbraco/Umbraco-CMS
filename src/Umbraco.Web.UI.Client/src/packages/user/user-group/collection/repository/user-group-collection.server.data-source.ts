@@ -24,9 +24,11 @@ export class UmbUserGroupCollectionServerDataSource implements UmbCollectionData
 	}
 
 	async getCollection(filter: UmbUserGroupCollectionFilterModel) {
+		const filterText = filter.filter ?? filter.query ?? undefined;
+
 		const { data, error } = await tryExecute(
 			this.#host,
-			UserGroupService.getFilterUserGroup({ query: { skip: filter.skip, take: filter.take, filter: filter.query } }),
+			UserGroupService.getFilterUserGroup({ query: { skip: filter.skip, take: filter.take, filter: filterText } }),
 		);
 
 		if (data) {
@@ -45,6 +47,7 @@ export class UmbUserGroupCollectionServerDataSource implements UmbCollectionData
 					mediaRootAccess: item.mediaRootAccess,
 					mediaStartNode: item.mediaStartNode ? { unique: item.mediaStartNode.id } : null,
 					name: item.name,
+					description: item.description || null,
 					permissions: item.permissions,
 					sections: item.sections,
 					unique: item.id,

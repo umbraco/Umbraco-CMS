@@ -1,9 +1,12 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+///     Provides methods for managing <see cref="IDictionaryItem"/> objects for localization.
+/// </summary>
 public interface IDictionaryItemService
 {
     /// <summary>
@@ -101,7 +104,17 @@ public interface IDictionaryItemService
     /// <param name="userKey">Key of the user moving the dictionary item</param>
     Task<Attempt<IDictionaryItem, DictionaryItemOperationStatus>> MoveAsync(IDictionaryItem dictionaryItem, Guid? parentId, Guid userKey);
 
+    /// <summary>
+    ///     Counts the number of children for a <see cref="IDictionaryItem"/>.
+    /// </summary>
+    /// <param name="parentId">The identifier of the parent dictionary item.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the count of children.</returns>
     Task<int> CountChildrenAsync(Guid parentId);
+
+    /// <summary>
+    ///     Counts the number of root <see cref="IDictionaryItem"/> objects.
+    /// </summary>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the count of root items.</returns>
     Task<int> CountRootAsync();
 
     /// <summary>

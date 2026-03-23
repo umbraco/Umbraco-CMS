@@ -9,11 +9,20 @@ namespace Umbraco.Cms.Core.Models;
 [DataContract(IsReference = true)]
 public class Script : File, IScript
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Script" /> class with a file path.
+    /// </summary>
+    /// <param name="path">The path to the script file.</param>
     public Script(string path)
         : this(path, null)
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Script" /> class with a file path and content provider.
+    /// </summary>
+    /// <param name="path">The path to the script file.</param>
+    /// <param name="getFileContent">A function to retrieve the file content lazily.</param>
     public Script(string path, Func<File, string?>? getFileContent)
         : base(path, getFileContent)
     {

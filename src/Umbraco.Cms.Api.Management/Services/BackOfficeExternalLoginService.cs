@@ -16,6 +16,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Services;
 
+/// <summary>
+/// Provides functionality for managing external login providers and authentication for the back office.
+/// </summary>
 public class BackOfficeExternalLoginService : IBackOfficeExternalLoginService
 {
     private readonly IBackOfficeExternalLoginProviders _backOfficeExternalLoginProviders;
@@ -24,6 +27,14 @@ public class BackOfficeExternalLoginService : IBackOfficeExternalLoginService
     private readonly IBackOfficeSignInManager _backOfficeSignInManager;
     private readonly IMemoryCache _memoryCache;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="BackOfficeExternalLoginService"/> class with the specified dependencies.
+    /// </summary>
+    /// <param name="backOfficeExternalLoginProviders">Provides external login providers for back office authentication.</param>
+    /// <param name="userService">Service for managing back office users.</param>
+    /// <param name="backOfficeUserManager">Manages back office user operations.</param>
+    /// <param name="backOfficeSignInManager">Handles sign-in operations for back office users.</param>
+    /// <param name="memoryCache">The memory cache used for caching authentication data.</param>
     public BackOfficeExternalLoginService(
         IBackOfficeExternalLoginProviders backOfficeExternalLoginProviders,
         IUserService userService,
@@ -38,6 +49,15 @@ public class BackOfficeExternalLoginService : IBackOfficeExternalLoginService
         _memoryCache = memoryCache;
     }
 
+    /// <summary>
+    /// Asynchronously retrieves the external login providers and their statuses for a specified user.
+    /// </summary>
+    /// <param name="userKey">The unique identifier (key) of the user whose external login status is to be retrieved.</param>
+    /// <returns>
+    /// A <see cref="Task"/> representing the asynchronous operation, containing an <see cref="Attempt{IEnumerable{UserExternalLoginProviderModel}, ExternalLoginOperationStatus}"/>.
+    /// On success, the result contains a collection of <see cref="UserExternalLoginProviderModel"/> objects describing each available external login provider and whether the user is linked to it.
+    /// On failure, the result contains an appropriate <see cref="ExternalLoginOperationStatus"/> error status.
+    /// </returns>
     public async Task<Attempt<IEnumerable<UserExternalLoginProviderModel>, ExternalLoginOperationStatus>> ExternalLoginStatusForUserAsync(Guid userKey)
     {
         IEnumerable<BackOfficeExternaLoginProviderScheme> providers =
@@ -68,6 +88,16 @@ public class BackOfficeExternalLoginService : IBackOfficeExternalLoginService
                 ExternalLoginOperationStatus.Success, providerStatuses);
     }
 
+    /// <summary>
+    /// Asynchronously unlinks an external login from the specified back office user.
+    /// </summary>
+    /// <param name="claimsPrincipal">The <see cref="ClaimsPrincipal"/> representing the current authenticated user.</param>
+    /// <param name="loginProvider">The name of the external login provider to unlink (e.g., "Google", "AzureAD").</param>
+    /// <param name="providerKey">The unique key identifying the external login to be unlinked.</param>
+    /// <returns>
+    /// A task that represents the asynchronous operation. The task result contains an <see cref="Attempt{ExternalLoginOperationStatus}"/>,
+    /// indicating whether the unlink operation succeeded and providing the status of the operation.
+    /// </returns>
     public async Task<Attempt<ExternalLoginOperationStatus>> UnLinkLoginAsync(ClaimsPrincipal claimsPrincipal, string loginProvider, string providerKey)
     {
         var userId = claimsPrincipal.Identity?.GetUserId();
@@ -118,6 +148,13 @@ public class BackOfficeExternalLoginService : IBackOfficeExternalLoginService
         return Attempt.Succeed(ExternalLoginOperationStatus.Success);
     }
 
+    /// <summary>
+    /// Handles the callback from an external login provider, attempting to link the external login to the currently authenticated back office user.
+    /// </summary>
+    /// <param name="httpContext">The current HTTP context containing authentication information from the external provider.</param>
+    /// <returns>
+    /// A <see cref="Task"/> representing the asynchronous operation. The result is an <see cref="Attempt{TResult, TStatus}"/> containing a collection of <see cref="IdentityError"/> objects if the operation fails, and an <see cref="ExternalLoginOperationStatus"/> indicating the outcome (such as Success, Unauthorized, UserNotFound, ExternalInfoNotFound, or IdentityFailure).
+    /// </returns>
     public async Task<Attempt<IEnumerable<IdentityError>, ExternalLoginOperationStatus>> HandleLoginCallbackAsync(HttpContext httpContext)
     {
         AuthenticateResult cookieAuthenticatedUserAttempt =
@@ -152,6 +189,14 @@ public class BackOfficeExternalLoginService : IBackOfficeExternalLoginService
         return Attempt.SucceedWithStatus(ExternalLoginOperationStatus.Success, Enumerable.Empty<IdentityError>());
     }
 
+    /// <summary>
+    /// Generates a secret for the specified external login provider based on the given claims principal.
+    /// </summary>
+    /// <param name="claimsPrincipal">The claims principal representing the user.</param>
+    /// <param name="loginProvider">The external login provider identifier.</param>
+    /// <returns>
+    /// An <see cref="Attempt"/> containing the generated secret GUID if successful, or a failure status otherwise.
+    /// </returns>
     public async Task<Attempt<Guid?, ExternalLoginOperationStatus>> GenerateLoginProviderSecretAsync(ClaimsPrincipal claimsPrincipal, string loginProvider)
     {
         if (claimsPrincipal.Identity is null)
@@ -178,6 +223,14 @@ public class BackOfficeExternalLoginService : IBackOfficeExternalLoginService
         return Attempt<Guid?, ExternalLoginOperationStatus>.Succeed(ExternalLoginOperationStatus.Success, secret);
     }
 
+    /// <summary>
+    /// Retrieves a <see cref="ClaimsPrincipal"/> associated with the specified login provider and link key, if available.
+    /// </summary>
+    /// <param name="loginProvider">The identifier of the external login provider.</param>
+    /// <param name="linkKey">The unique key used to locate the user link in the cache.</param>
+    /// <returns>
+    /// A <see cref="Task{TResult}"/> that resolves to an <see cref="Attempt{T, TStatus}"/> containing the <see cref="ClaimsPrincipal"/> if successful, or an <see cref="ExternalLoginOperationStatus"/> indicating the failure reason.
+    /// </returns>
     public async Task<Attempt<ClaimsPrincipal?, ExternalLoginOperationStatus>> ClaimsPrincipleFromLoginProviderLinkKeyAsync(
         string loginProvider,
         Guid linkKey)

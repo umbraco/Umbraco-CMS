@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Factories;
@@ -11,6 +11,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.UserGroup;
 
+/// <summary>
+/// API controller responsible for handling HTTP requests related to the creation of user groups in the management section.
+/// </summary>
 [ApiVersion("1.0")]
 public class CreateUserGroupController : UserGroupControllerBase
 {
@@ -18,6 +21,12 @@ public class CreateUserGroupController : UserGroupControllerBase
     private readonly IUserGroupPresentationFactory _userGroupPresentationFactory;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Controllers.UserGroup.CreateUserGroupController"/> class.
+    /// </summary>
+    /// <param name="userGroupService">Service for managing user groups.</param>
+    /// <param name="userGroupPresentationFactory">Factory for creating user group presentation models.</param>
+    /// <param name="backOfficeSecurityAccessor">Accessor for back office security context.</param>
     public CreateUserGroupController(
         IUserGroupService userGroupService,
         IUserGroupPresentationFactory userGroupPresentationFactory,
@@ -32,6 +41,8 @@ public class CreateUserGroupController : UserGroupControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status201Created)]
+    [EndpointSummary("Creates a new user group.")]
+    [EndpointDescription("Creates a new user group with the configuration specified in the request model.")]
     public async Task<IActionResult> Create(CancellationToken cancellationToken, CreateUserGroupRequestModel createUserGroupRequestModel)
     {
         Attempt<IUserGroup, UserGroupOperationStatus> userGroupCreationAttempt = await _userGroupPresentationFactory.CreateAsync(createUserGroupRequestModel);

@@ -35,8 +35,10 @@ export class UmbPathPattern<
 
 	constructor(localPattern: string, basePath?: UmbPathPattern | string) {
 		this.#local = localPattern;
-		basePath = basePath?.toString() ?? '';
-		this.#base = basePath.lastIndexOf('/') !== basePath.length - 1 ? basePath + '/' : basePath;
+		// Use toAbsolutePatternString() for UmbPathPattern to preserve the full path chain
+		const baseString =
+			basePath instanceof UmbPathPattern ? basePath.toAbsolutePatternString() : (basePath?.toString() ?? '');
+		this.#base = baseString.length > 0 && !baseString.endsWith('/') ? baseString + '/' : baseString;
 	}
 
 	generateLocal(params: LocalParamsType) {
@@ -53,6 +55,15 @@ export class UmbPathPattern<
 			(this.#base.indexOf(':') !== -1 ? umbUrlPatternToString(this.#base, params) : this.#base) +
 			umbUrlPatternToString(this.#local, params)
 		);
+	}
+
+	/**
+	 * Get the full absolute pattern string including base path.
+	 * Use this when chaining patterns to preserve the full path.
+	 * @returns The complete pattern string (base + local)
+	 */
+	toAbsolutePatternString(): string {
+		return this.#base + this.#local;
 	}
 
 	toString() {

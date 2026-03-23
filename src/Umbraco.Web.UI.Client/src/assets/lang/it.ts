@@ -357,6 +357,8 @@ export default {
 		renameFolderFailed: 'Impossibile rinominare la cartella con id %0%',
 		dragAndDropYourFilesIntoTheArea: "Trascina e rilascia i tuoi file nell'area",
 		uploadNotAllowed: 'Il caricamento non è consentito in questa posizione.',
+		uploadValidationFailed: (mediaTypeName: string) =>
+			`Il tipo di media ${mediaTypeName} ha una o più proprietà richieste. Dovrà essere caricato singolarmente tramite il menu 'Crea'`,
 	},
 	member: {
 		createNewMember: 'Crea un nuovo membro',
@@ -1221,7 +1223,8 @@ export default {
 		changes: 'Modifiche',
 		headline: 'Seleziona una versione da confrontare con la versione corrente',
 		diffHelp:
-			'Qui vengono mostrate le differenze tra la versione corrente e la versione selezionata<br />Il testo <del>in rosso</del> non verrà mostrato nella versione selezionata, <ins>quello in verde verrà aggiunto</ins>',
+			'<del>Il testo rosso</del> verrà rimosso nella versione selezionata, <ins>il testo verde</ins> verrà aggiunto.',
+		showDiff: 'Mostra le differenze tra la versione corrente (bozza) e la versione selezionata.',
 		documentRolledBack: 'Il documento è stato riportato alla versione scelta.',
 		htmlHelp:
 			'Qui viene mostrata la versione selezionata in formato html, se vuoi vedere contemporaneamente le differenze tra le due versioni, usa la modalità diff view',
@@ -1260,6 +1263,7 @@ export default {
 			'Non ci sono proprietà definite per questa tab. Clicca sul link "aggiungi una nuova proprietà" in cima per creare una nuova proprietà.',
 		createMatchingTemplate: 'Crea un template corrispondente',
 		addIcon: 'Aggiungi icona',
+		changeIcon: 'Cambia icona',
 	},
 	sort: {
 		sortOrder: 'Ordinamento',
@@ -1738,6 +1742,7 @@ export default {
 		noLockouts: 'non è stato bloccato',
 		noPasswordChange: 'La password non è stata modificata',
 		confirmNewPassword: 'Conferma la nuova password',
+		confirmPassword: 'Conferma password',
 		changePasswordDescription:
 			"È possibile modificare la password di accesso al backoffice Umbraco compilando il form sottostante e clicca sul pulsante 'Modifica password'",
 		contentChannel: 'Contenuto del canale',
