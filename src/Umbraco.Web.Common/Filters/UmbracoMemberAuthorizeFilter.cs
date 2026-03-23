@@ -85,7 +85,6 @@ public class UmbracoMemberAuthorizeFilter : IAsyncAuthorizationFilter
                 {
                     // For non-API controllers (e.g. SurfaceControllers), ForbidResult triggers the cookie authentication
                     // handler's OnRedirectToAccessDenied, which performs a redirect to the access denied page.
-                    context.HttpContext.Response.StatusCode = 403;
                     context.Result = new ForbidResult();
                 }
             }
