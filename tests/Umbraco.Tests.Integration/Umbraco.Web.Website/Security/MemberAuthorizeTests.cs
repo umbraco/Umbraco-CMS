@@ -2,6 +2,7 @@ using System.Net;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
@@ -28,8 +29,8 @@ internal sealed class MemberAuthorizeTests : UmbracoTestServerTestBase
     protected override void ConfigureTestServices(IServiceCollection services)
     {
         _memberManagerMock = new Mock<IMemberManager>();
-        services.Remove(new ServiceDescriptor(typeof(IMemberManager), typeof(MemberManager), ServiceLifetime.Scoped));
-        services.Remove(new ServiceDescriptor(typeof(MemberManager), ServiceLifetime.Scoped));
+        services.RemoveAll<IMemberManager>();
+        services.RemoveAll<MemberManager>();
         services.AddScoped(_ => _memberManagerMock.Object);
     }
 

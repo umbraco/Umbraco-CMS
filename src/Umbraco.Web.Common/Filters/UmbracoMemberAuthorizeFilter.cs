@@ -1,5 +1,4 @@
 using System.Globalization;
-using System.Reflection;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -44,17 +43,17 @@ public class UmbracoMemberAuthorizeFilter : IAsyncAuthorizationFilter
     }
 
     /// <summary>
-    ///     Gets or sets a comma delimited list of allowed member types.
+    ///     Gets a comma delimited list of allowed member types.
     /// </summary>
     public string AllowType { get; private set; }
 
     /// <summary>
-    ///     Gets or sets a comma delimited list of allowed member groups.
+    ///     Gets a comma delimited list of allowed member groups.
     /// </summary>
     public string AllowGroup { get; private set; }
 
     /// <summary>
-    ///     Gets or sets a comma delimited list of allowed members.
+    ///     Gets a comma delimited list of allowed members.
     /// </summary>
     public string AllowMembers { get; private set; }
 
@@ -103,8 +102,6 @@ public class UmbracoMemberAuthorizeFilter : IAsyncAuthorizationFilter
                 // handler's OnRedirectToAccessDenied, which performs a redirect to the access denied page.
                 // Using UnauthorizedResult here would bypass the authentication handler entirely, returning a raw 401
                 // instead of the expected redirect.
-                // We pre-set the status code so the redirect carries the correct 401.
-                context.HttpContext.Response.StatusCode = 401;
                 context.Result = new ForbidResult();
             }
         }
@@ -137,10 +134,10 @@ public class UmbracoMemberAuthorizeFilter : IAsyncAuthorizationFilter
     }
 
     private static bool IsApiController(AuthorizationFilterContext context)
-        => context.ActionDescriptor is ControllerActionDescriptor controllerDescriptor
-           && (controllerDescriptor.ControllerTypeInfo.GetCustomAttribute<ApiControllerAttribute>() is not null
+        => context.ActionDescriptor.EndpointMetadata.OfType<ApiControllerAttribute>().Any()
 #pragma warning disable CS0618 // Type or member is obsolete
-               || controllerDescriptor.ControllerTypeInfo.IsSubclassOf(typeof(UmbracoApiController)));
+           || (context.ActionDescriptor is ControllerActionDescriptor controllerDescriptor
+               && controllerDescriptor.ControllerTypeInfo.IsSubclassOf(typeof(UmbracoApiController)));
 #pragma warning restore CS0618 // Type or member is obsolete
 
     private async Task<bool> IsAuthorizedAsync(IMemberManager memberManager)
