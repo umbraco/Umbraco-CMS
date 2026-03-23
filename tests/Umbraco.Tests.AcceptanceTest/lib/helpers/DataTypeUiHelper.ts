@@ -312,7 +312,7 @@ export class DataTypeUiHelper extends UiBaseLocators {
     this.tiptapExtensionsConfiguration = this.page.locator('umb-property-editor-ui-tiptap-extensions-configuration');
     this.propertyEditor = this.page.locator('umb-ref-property-editor-ui');
     this.selectIconBtn = page.getByLabel('Select icon');
-    this.dataTypeBtn = this.createOptionActionListModal.locator('[name="Data Type"]');
+    this.dataTypeBtn = this.createOptionActionListModal.locator('[name="Data Type..."]');
     this.dataTypesMenu = page.locator('#menu-item').getByRole('link', {name: 'Data Types'});
     this.tiptapStatusbarConfiguration = this.page.locator('umb-property-editor-ui-tiptap-statusbar-configuration');
 
