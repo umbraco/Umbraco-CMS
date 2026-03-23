@@ -52,7 +52,7 @@ export class ExampleDocumentPickerPropertyEditorDataSource
 		return this.#config;
 	}
 
-	async requestStartNode() {
+	async requestTreeStartNode() {
 		if (!this.#config?.length) return;
 		const unique = getConfigValue(this.#config, 'startNodeId');
 		return unique ? { unique, entityType: UMB_DOCUMENT_ENTITY_TYPE } : undefined;

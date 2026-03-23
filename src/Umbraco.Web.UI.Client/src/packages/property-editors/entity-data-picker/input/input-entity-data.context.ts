@@ -141,7 +141,7 @@ export class UmbEntityDataPickerInputContext extends UmbPickerInputContext<
 
 	async #createTreeItemPickerModalToken(api: UmbPickerTreeDataSource) {
 		const supportsSearch = isPickerSearchableDataSource(api);
-		const startNode = api.requestStartNode ? await api.requestStartNode() : undefined;
+		const startNode = api.requestTreeStartNode ? await api.requestTreeStartNode() : undefined;
 
 		return new UmbModalToken<UmbTreePickerModalData<UmbItemModel | UmbTreeItemModel>, UmbTreePickerModalValue>(
 			UMB_TREE_PICKER_MODAL_ALIAS,

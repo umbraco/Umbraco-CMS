@@ -13,6 +13,6 @@ export interface UmbPickerTreeDataSource<
 > extends UmbPickerDataSource,
 		UmbTreeRepository<TreeItemType, TreeRootType>,
 		UmbApi {
-	requestStartNode?: () => Promise<UmbTreeStartNode | undefined>;
+	requestTreeStartNode?: () => Promise<UmbTreeStartNode | undefined>;
 	treePickableFilter?: (item: TreeItemType) => boolean;
 }
