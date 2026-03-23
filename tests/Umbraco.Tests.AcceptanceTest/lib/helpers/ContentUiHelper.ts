@@ -188,6 +188,13 @@ export class ContentUiHelper extends UiBaseLocators {
   private readonly saveModal: Locator;
   private readonly expandSegmentBtn: Locator;
   private readonly saveAndPreviewBtn: Locator;
+  private readonly manualLinkRemoveBtn: Locator;
+  private readonly cardCollectionView: Locator;
+  private readonly cardContentNode: Locator;
+  private readonly containerSetupBtn: Locator;
+  private readonly containerEditBtn: Locator;
+  private readonly loginPageSelectedItem: Locator;
+  private readonly errorPageSelectedItem: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -287,7 +294,7 @@ export class ContentUiHelper extends UiBaseLocators {
     this.duplicateBtn = page.getByLabel('Duplicate', {exact: true});
     this.contentTreeRefreshBtn = page.locator('#header').getByLabel('#actions_refreshNode');
     this.sortChildrenBtn = page.getByRole('button', {name: 'Sort children'});
-    this.rollbackBtn = page.getByRole('button', { name: 'Rollback…' });
+    this.rollbackBtn = this.documentWorkspace.getByRole('button', { name: /^Rollback(…)?$/ });
     this.rollbackContainerBtn = this.container.getByLabel('Rollback');
     this.publicAccessBtn = page.getByRole('button', {name: 'Public Access'});
     this.uuiCheckbox = page.locator('uui-checkbox');
@@ -358,7 +365,7 @@ export class ContentUiHelper extends UiBaseLocators {
     this.removeAt = this.generalItem.filter({hasText: 'Remove at'}).locator('umb-localize-date');
     this.selectAllCheckbox = this.documentScheduleModal.locator('[label="Select all"]');
     this.confirmToPublishBtn = page.locator('umb-document-publish-modal').getByLabel('Publish');
-    // Publish with descendants 
+    // Publish with descendants
     this.documentPublishWithDescendantsModal = page.locator('umb-document-publish-with-descendants-modal');
     this.publishWithDescendantsBtn = this.workspaceActionMenuItem.getByLabel('Publish with descendants', {exact: true});
     this.includeUnpublishedDescendantsToggle = this.documentPublishWithDescendantsModal.locator('#includeUnpublishedDescendants');
@@ -387,8 +394,17 @@ export class ContentUiHelper extends UiBaseLocators {
     this.linkPickerCloseBtn = this.linkPickerModal.getByRole('button', {name: 'Close', exact: true});
     this.linkPickerTargetToggle = this.linkPickerModal.locator('[label="Opens the link in a new window or tab"]').locator('#toggle');
     this.confirmToResetBtn = page.locator('#confirm').getByLabel('Reset', {exact: true});
+    this.manualLinkRemoveBtn = page.locator('[label="Manual"]').getByLabel('Remove', {exact: true});
     // Segment
     this.expandSegmentBtn = page.locator('.expand-area uui-button');
+    // Card Collection View
+    this.cardCollectionView = page.locator('umb-card-collection-view');
+    this.cardContentNode = this.cardCollectionView.locator('uui-card-content-node');
+    // Public Access
+    this.containerSetupBtn = this.container.getByLabel('Setup');
+    this.containerEditBtn = this.container.getByLabel('Edit');
+    this.loginPageSelectedItem = page.locator('.select-item').filter({hasText: 'Login Page'});
+    this.errorPageSelectedItem = page.locator('.select-item').filter({hasText: 'Error Page'});
   }
 
   async enterContentName(name: string) {
@@ -497,6 +513,7 @@ export class ContentUiHelper extends UiBaseLocators {
 
   // Info Tab
   async clickInfoTab() {
+    await this.waitForNavigation();
     await this.click(this.infoTab);
   }
 
@@ -875,11 +892,7 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async isDocumentTypeNameVisible(contentName: string, isVisible: boolean = true) {
-    return await this.isVisible(this.sidebarModal.getByText(contentName), isVisible); 
-  }
-
-  async doesModalHaveText(text: string) {
-    await this.containsText(this.openedModal, text);
+    return await this.isVisible(this.sidebarModal.getByText(contentName), isVisible);
   }
 
   // Collection tab
@@ -1075,7 +1088,7 @@ export class ContentUiHelper extends UiBaseLocators {
   async enterDocumentBlueprintName(name: string) {
     await this.enterText(this.documentBlueprintModalEnterNameTxt, name);
   }
-  
+
   async clickSaveDocumentBlueprintButton() {
     await this.click(this.documentBlueprintSaveBtn);
   }
@@ -1114,7 +1127,7 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async clickRollbackButton() {
-    await this.click(this.rollbackBtn);
+    await this.click(this.rollbackBtn, {force: true});
   }
 
   async clickRollbackContainerButton() {
@@ -1141,7 +1154,7 @@ export class ContentUiHelper extends UiBaseLocators {
     await this.click(this.selectErrorPageDocument);
     await this.click(this.container.getByLabel(documentName, {exact: true}));
     await this.clickChooseModalButton();
-    await this.click(this.containerSaveBtn);
+    await this.click(this.containerSetupBtn);
   }
 
   async sortChildrenDragAndDrop(dragFromSelector: Locator, dragToSelector: Locator, verticalOffset: number = 0, horizontalOffset: number = 0, steps: number = 5) {
@@ -1191,6 +1204,10 @@ export class ContentUiHelper extends UiBaseLocators {
 
   async clickManualLinkButton() {
     await this.click(this.linkToManualBtn);
+  }
+
+  async clickManualLinkRemoveButton() {
+    await this.click(this.manualLinkRemoveBtn);
   }
 
   // Block Grid - Block List
@@ -1470,11 +1487,11 @@ export class ContentUiHelper extends UiBaseLocators {
   async enterRTETipTapEditor(value: string) {
     await this.enterText(this.tipTapEditor, value);
   }
-  
+
   async typeRTETipTapEditorValue(value: string, toClearFirst = false) {
     await this.typeText(this.tipTapEditor, value, {clearFirst: toClearFirst});
   }
-  
+
   async clickCreateBlockModalButtonAndWaitForModalToClose() {
     await this.click(this.modalCreateBtn);
     await this.waitForHidden(this.backofficeModalContainer);
@@ -1686,7 +1703,7 @@ export class ContentUiHelper extends UiBaseLocators {
     await this.enterText(this.memberPickerSearchTxt, keyword);
     await this.pressKey(this.memberPickerSearchTxt, 'Enter');
   }
-  
+
   async isContentNameReadOnly() {
     await expect(this.contentNameTxt).toHaveAttribute('readonly');
   }
@@ -1716,11 +1733,11 @@ export class ContentUiHelper extends UiBaseLocators {
     const actionLocator = this.propertyActionMenu.locator(`umb-property-action uui-menu-item[label="${name}"]`);
     await this.click(actionLocator);
   }
-  
+
   async isContentWithNameVisibleInList(contentName: string, isVisible: boolean = true) {
     await this.isVisible(this.documentTableColumnName.filter({hasText: contentName}), isVisible);
   }
-  
+
   async selectDocumentBlueprintWithName(blueprintName: string) {
     const blueprintLocator = this.documentCreateOptionsModal.locator('uui-menu-item', {hasText: blueprintName});
     await this.click(blueprintLocator);
@@ -1759,7 +1776,7 @@ export class ContentUiHelper extends UiBaseLocators {
     await this.clickChooseContainerButton();
     await this.page.waitForTimeout(500);
   }
-  
+
   async isChooseButtonVisible(isVisible: boolean = true) {
     await this.isVisible(this.chooseBtn, isVisible);
   }
@@ -1878,5 +1895,59 @@ export class ContentUiHelper extends UiBaseLocators {
 
   async doesTextAreaHaveExpectedValue(expectedValue: string) {
     await this.hasValue(this.textAreaTxt, expectedValue);
+  }
+
+  async isContentWithNameVisibleInGrid(contentName: string, isVisible: boolean = true) {
+    await this.isVisible(this.cardContentNode.filter({hasText: contentName}), isVisible);
+  }
+
+  async clickContentCardWithName(name: string) {
+    await this.click(this.cardContentNode.filter({hasText: name}).locator('#name'));
+  }
+
+  async selectContentCardWithName(contentName: string) {
+    const contentLocator = this.cardContentNode.filter({hasText: contentName});
+    await this.waitForVisible(contentLocator);
+    await this.click(contentLocator.locator('#select-checkbox'), {force: true});
+  }
+
+  async addGroupBasedPublicAccessWithPrefilledPages(memberGroupName: string) {
+    await this.click(this.groupBasedProtectionBtn);
+    await this.clickNextButton();
+    await this.click(this.chooseMemberGroupBtn);
+    await this.click(this.page.getByLabel(memberGroupName));
+    await this.clickChooseModalButton();
+    await this.click(this.containerSetupBtn);
+  }
+
+  async isDocumentSelectedAsLoginPage(documentName: string) {
+    return await this.isVisible(this.loginPageSelectedItem.locator('uui-ref-node[name="' + documentName + '"]'));
+  }
+
+  async isDocumentSelectedAsErrorPage(documentName: string) {
+    return await this.isVisible(this.errorPageSelectedItem.locator('uui-ref-node[name="' + documentName + '"]'));
+  }
+
+  async isMemberGroupSelected(memberGroupName: string) {
+    return await this.isVisible(this.page.locator('umb-input-member-group uui-ref-node[name="' + memberGroupName + '"]'));
+  }
+  
+  async clickRemoveProtectionButton() {
+    await this.click(this.container.getByLabel('Remove protection'));
+  }
+
+  async updateGroupBasedPublicAccess(memberGroupName: string) {
+    await this.click(this.chooseMemberGroupBtn);
+    await this.click(this.page.getByLabel(memberGroupName));
+    await this.clickChooseModalButton();
+    await this.click(this.containerEditBtn);
+  }
+
+  async isPublicAccessHeadlineVisible(headline: string) {
+    await this.isVisible(this.container.getByRole('heading', {name: headline, exact: true}));
+  }
+
+  async doesPublicAccessHaveMemberGroupName(name: string) {
+    await this.isVisible(this.container.locator('umb-input-member-group').getByText(name));
   }
 }

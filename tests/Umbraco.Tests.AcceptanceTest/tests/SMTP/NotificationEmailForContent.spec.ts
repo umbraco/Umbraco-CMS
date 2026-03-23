@@ -165,7 +165,7 @@ test('can see notification when content is duplicated', async ({umbracoUi, umbra
   await umbracoUi.content.clickActionsMenuForContent(contentName);
   await umbracoUi.content.clickDuplicateToActionMenuOption();
   await umbracoUi.content.clickLabelWithName('Content');
-  await umbracoUi.content.clickDuplicateButton();
+  await umbracoUi.content.clickCopyModalButton();
 
   // Assert
   await umbracoUi.content.isSuccessNotificationVisible();
@@ -253,8 +253,7 @@ test('can see notification when content is set public access', async ({umbracoAp
   await umbracoApi.document.updatetNotifications(contentId, notificationActionIds);
   expect(await umbracoApi.document.doesNotificationExist(contentId, notificationActionIds[0])).toBeTruthy();
   const testMemberGroup = 'TestMemberGroup';
-  await umbracoApi.memberGroup.ensureNameNotExists(testMemberGroup);
-  await umbracoApi.memberGroup.create(testMemberGroup);
+  await umbracoApi.memberGroup.createDefaultMemberGroup(testMemberGroup);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 

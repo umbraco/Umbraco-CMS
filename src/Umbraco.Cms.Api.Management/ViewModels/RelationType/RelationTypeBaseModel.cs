@@ -1,7 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace Umbraco.Cms.Api.Management.ViewModels.RelationType;
 
+/// <summary>
+/// Base model for a relation type in the Umbraco CMS Management API.
+/// </summary>
 public class RelationTypeBaseModel
 {
     /// <summary>

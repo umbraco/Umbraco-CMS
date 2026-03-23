@@ -114,6 +114,7 @@
     2: ['Ignore user start nodes', 'Selecting this option allows a user to choose nodes that they normally dont have access to.'],
     3: ['Overlay Size', 'Select the width of the overlay.'],
     4: ['Hide anchor/query string input', 'Selecting this hides the anchor/query string input field in the link picker overlay.'],
+    5: ['Culture-specific document links', 'Enable specifying a culture when linking to documents.']
   }
 
   public static readonly numericSettings = {
@@ -227,7 +228,8 @@
 
   public static readonly trashDeleteDialogMessage = {
     referenceHeadline: 'The following items depend on this',
-    bulkReferenceHeadline: 'The following items are used by other content.'
+    bulkReferenceHeadline: 'The following items are used by other content.',
+    descendingReferenceHeadline: 'The following descending items have dependencies'
   }
 
   public static readonly webhookEvents = [
@@ -280,6 +282,7 @@
     language: '/umbraco/management/api/v1/language',
     media: '/umbraco/management/api/v1/media',
     mediaType: '/umbraco/management/api/v1/media-type',
+    memberType: '/umbraco/management/api/v1/member-type',
     mediaTypeFolder: '/umbraco/management/api/v1/media-type/folder',
     member: '/umbraco/management/api/v1/member',
     memberGroup: '/umbraco/management/api/v1/member-group',
@@ -306,5 +309,10 @@
     'Sensitive data': 'Users with the specific permission to be able to manage properties and data marked as sensitive',
     'Translators': 'Users with permission to manage dictionary entries',
     'Writers': 'Users with permission to create and update but not publish content'
+  }
+
+  public static readonly healthCheckMessages = {
+    imagingHMACSecretKeyIsNotConfigured: 'No HMAC secret key is configured for image URL signing. It is recommended to set Umbraco:CMS:Imaging:HMACSecretKey to prevent unauthorized image manipulation requests.',
+    imagingHMACSecretKeyIsConfigured: 'The HMAC secret key for image URL signing is configured'
   }
 }

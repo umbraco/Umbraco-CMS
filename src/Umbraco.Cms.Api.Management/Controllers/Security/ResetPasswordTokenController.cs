@@ -15,6 +15,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Security;
 
+/// <summary>
+/// Controller responsible for managing operations related to reset password tokens.
+/// </summary>
 [ApiVersion("1.0")]
 [Authorize(Policy = AuthorizationPolicies.DenyLocalLoginIfConfigured)]
 public class ResetPasswordTokenController : SecurityControllerBase
@@ -22,12 +25,26 @@ public class ResetPasswordTokenController : SecurityControllerBase
     private readonly IUserService _userService;
     private readonly IOpenIddictTokenManager _tokenManager;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ResetPasswordTokenController"/> class, which manages reset password token operations.
+    /// </summary>
+    /// <param name="userService">The <see cref="IUserService"/> used for user management operations.</param>
+    /// <param name="tokenManager">The <see cref="IOpenIddictTokenManager"/> used for managing OpenIddict tokens.</param>
     public ResetPasswordTokenController(IUserService userService, IOpenIddictTokenManager tokenManager)
     {
         _userService = userService;
         _tokenManager = tokenManager;
     }
 
+    /// <summary>
+    /// Resets the password for a user using a reset code and new password.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="model">The request model containing the user information, reset code, and new password.</param>
+    /// <returns>
+    /// An <see cref="IActionResult"/> indicating the outcome of the operation:
+    /// returns 204 No Content on success, 400 Bad Request for invalid input, or 404 Not Found if the user does not exist.
+    /// </returns>
     [HttpPost("forgot-password/reset")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]

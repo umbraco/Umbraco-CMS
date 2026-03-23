@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Factories;
@@ -9,12 +9,20 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.MemberType;
 
+/// <summary>
+/// Controller for managing member type operations by unique key.
+/// </summary>
 [ApiVersion("1.0")]
 public class ByKeyMemberTypeController : MemberTypeControllerBase
 {
     private readonly IMemberTypeService _memberTypeService;
     private readonly IMemberTypePresentationFactory _memberTypePresentationFactory;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Controllers.MemberType.ByKeyMemberTypeController"/> class.
+    /// </summary>
+    /// <param name="memberTypeService">The service used to manage member types.</param>
+    /// <param name="memberTypePresentationFactory">The factory used to create presentation models for member types.</param>
     public ByKeyMemberTypeController(IMemberTypeService memberTypeService, IMemberTypePresentationFactory memberTypePresentationFactory)
     {
         _memberTypeService = memberTypeService;

@@ -236,6 +236,8 @@ export default {
 	collection: {
 		noItemsTitle: 'No items',
 		addCollectionConfiguration: 'Add collection',
+		cardViewLabel: 'Cards',
+		tableViewLabel: 'Table',
 	},
 	content: {
 		isPublished: 'Is Published',
@@ -555,7 +557,11 @@ export default {
 		confirmremoveusageof: 'Are you sure you want to remove the usage of <strong>%0%</strong>',
 		confirmlogout: 'Are you sure?',
 		confirmSure: 'Are you sure?',
+		cannotTrashWhenReferenced: (name: string) =>
+			`<strong>${name}</strong> cannot be moved to the Recycle Bin because it is referenced by other items.`,
 		confirmTrash: (name: string) => `Are you sure you want to move <strong>${name}</strong> to the Recycle Bin?`,
+		cannotBulkTrashWhenReferenced: (total: number) =>
+			`The selected <strong>${total} ${total === 1 ? 'item' : 'items'}</strong> cannot be moved to the Recycle Bin because at least one item is referenced by other content.`,
 		confirmBulkTrash: (total: number) =>
 			`Are you sure you want to move <strong>${total} ${total === 1 ? 'item' : 'items'}</strong> to the Recycle Bin?`,
 		confirmBulkDelete: (total: number) =>
@@ -1303,6 +1309,11 @@ export default {
 		paSelectMembers: 'Select the members who have access to the page <strong>%0%</strong>',
 		paMembers: 'Specific members protection',
 		paMembersHelp: 'If you wish to grant access to specific members',
+		paProtectedByAncestor: 'Public Access settings are inherited from an ancestor page.',
+		psHeadlineSetup: 'Setup Public Access',
+		psHeadlineEdit: 'Edit Public Access',
+		psActionSetup: 'Setup',
+		psActionEdit: 'Edit',
 	},
 	publish: {
 		contentPublishedFailedIsTrashed: '%0% could not be published because the item is in the recycle bin.',
@@ -1836,6 +1847,7 @@ export default {
 		confirmDeleteTabNotice: 'This will also delete all items below this tab.',
 		confirmDeleteGroupNotice: 'This will also delete all items below this group.',
 		addTab: 'Add tab',
+		deleteTab: 'Delete tab',
 		convertToTab: 'Convert to tab',
 		tabDirectPropertiesDropZone: 'Drag properties here to place directly on the tab',
 		removeChildNode: 'You are removing the child node',
@@ -2891,6 +2903,10 @@ export default {
 		resetUrlHeadline: 'Reset URL?',
 		resetUrlMessage: 'Are you sure you want to reset this URL?',
 		resetUrlLabel: 'Reset',
+		selectLanguageHint: 'Choose a language for the link',
+		selectLanguageDefault: "Auto (visitor's language)",
+		configCultureSpecificDocumentLinksLabel: 'Culture-specific document links',
+		configCultureSpecificDocumentLinksDescription: 'Enable specifying a culture when linking to documents.',
 	},
 	missingEditor: {
 		title: 'This property type is no longer available.',

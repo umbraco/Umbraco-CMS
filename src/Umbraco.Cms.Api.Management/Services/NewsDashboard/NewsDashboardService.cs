@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Api.Management.ViewModels.NewsDashboard;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -48,6 +49,15 @@ public class NewsDashboardService : INewsDashboardService
         _newsCacheDurationProvider = newsCacheDurationProvider;
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="NewsDashboardService"/> class.
+    /// </summary>
+    /// <param name="appCaches">Provides access to application-level caching mechanisms.</param>
+    /// <param name="umbracoVersion">Provides information about the current Umbraco version.</param>
+    /// <param name="siteIdentifierService">Service used to retrieve or manage the unique site identifier.</param>
+    /// <param name="logger">The logger used for logging diagnostic and operational information.</param>
+    /// <param name="backOfficeSecurityAccessor">Accessor for back office security context and operations.</param>
+    /// <param name="globalSettings">The global settings configuration options for the application.</param>
     [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19")]
     public NewsDashboardService(
         AppCaches appCaches,
@@ -70,7 +80,7 @@ public class NewsDashboardService : INewsDashboardService
     /// <inheritdoc />
     public async Task<NewsDashboardResponseModel> GetItemsAsync()
     {
-        const string BaseUrl = "https://news-dashboard.umbraco.com";
+        const string BaseUrl = Constants.NewsDashboard.Url;
         const string Path = "/api/News";
 
         var version = _umbracoVersion.SemanticVersion.ToSemanticStringWithoutBuild();

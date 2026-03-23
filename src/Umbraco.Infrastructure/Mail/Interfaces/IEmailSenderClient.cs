@@ -11,6 +11,7 @@ namespace Umbraco.Cms.Infrastructure.Mail.Interfaces
         /// Sends the email message.
         /// </summary>
         /// <param name="message">The <see cref="EmailMessage"/> to send.</param>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         [Obsolete("Please use the overload taking all parameters. Scheduled for removal in Umbraco 18.")]
         public Task SendAsync(EmailMessage message);
 
@@ -19,6 +20,7 @@ namespace Umbraco.Cms.Infrastructure.Mail.Interfaces
         /// </summary>
         /// <param name="message">The <see cref="EmailMessage"/> to send.</param>
         /// <param name="expires">An optional time for expiry.</param>
+        /// <returns>A <see cref="Task"/> representing the asynchronous send operation.</returns>
         public Task SendAsync(EmailMessage message, TimeSpan? expires)
 #pragma warning disable CS0618 // Type or member is obsolete
             => SendAsync(message);
