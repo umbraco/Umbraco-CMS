@@ -30,6 +30,7 @@ const elementActions: Array<UmbExtensionManifest> = [
 		name: 'Trash Element Entity Action',
 		forEntityTypes: [UMB_ELEMENT_ENTITY_TYPE],
 		meta: {
+			itemDataResolver: UmbElementItemDataResolver,
 			itemRepositoryAlias: UMB_ELEMENT_ITEM_REPOSITORY_ALIAS,
 			recycleBinRepositoryAlias: UMB_ELEMENT_RECYCLE_BIN_REPOSITORY_ALIAS,
 			referenceRepositoryAlias: UMB_ELEMENT_REFERENCE_REPOSITORY_ALIAS,
