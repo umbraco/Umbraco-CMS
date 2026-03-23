@@ -116,6 +116,11 @@ export class UmbSelectFacetFilterElement extends UmbLitElement {
 		return labels.join(', ') + (length > max ? ' + ' + (length - max) : '');
 	}
 
+	#onDropdownSearch(event: Event) {
+		const target = event.target as HTMLInputElement;
+		this._comboboxSearch = target.value ?? '';
+	}
+
 	protected override render() {
 		const inline = this._options.length < INLINE_THRESHOLD && !this._hasMore;
 		if (inline) {
@@ -191,14 +196,22 @@ export class UmbSelectFacetFilterElement extends UmbLitElement {
 		const popoverId = `umb-select-filter-${this.#manifest?.alias}`;
 		return html`
 			<div class="filter">
-				<uui-button popovertarget=${popoverId} label="Select filter" compact>
-					<b>${this.#getDropdownLabel()}</b>
-				</uui-button>
+				<button class="dropdown-trigger" popovertarget=${popoverId}>
+					<span class="dropdown-trigger-label">${this.#getDropdownLabel()}</span>
+					<uui-symbol-expand .open=${false}></uui-symbol-expand>
+				</button>
 				<uui-popover-container id=${popoverId} placement="bottom">
 					<umb-popover-layout>
 						<div class="filter-dropdown">
+							<uui-input
+								type="search"
+								placeholder=${this.localize.term('general_search')}
+								label=${this.localize.term('general_search')}
+								@input=${this.#onDropdownSearch}
+								.value=${this._comboboxSearch}>
+							</uui-input>
 							${repeat(
-								this._options,
+								this.#filteredOptions,
 								(option) => option.unique,
 								(option) => html`
 									<uui-checkbox
@@ -252,6 +265,30 @@ export class UmbSelectFacetFilterElement extends UmbLitElement {
 				gap: var(--uui-size-space-3);
 				flex-direction: column;
 				padding: var(--uui-size-space-3);
+				min-width: 200px;
+			}
+
+			.dropdown-trigger {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				padding: var(--uui-size-space-2) var(--uui-size-space-3);
+				border: 1px solid var(--uui-color-border);
+				border-radius: var(--uui-border-radius);
+				background: var(--uui-color-surface);
+				cursor: pointer;
+				font-size: var(--uui-size-4);
+				min-height: 36px;
+			}
+
+			.dropdown-trigger:hover {
+				border-color: var(--uui-color-border-emphasis);
+			}
+
+			.dropdown-trigger-label {
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
 			}
 		`,
 	];
