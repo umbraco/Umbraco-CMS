@@ -1,4 +1,5 @@
-import type { UmbDocumentItemModel, UmbDocumentItemVariantModel } from '../item/repository/types.js';
+import type { UmbDocumentItemVariantModel } from '../item/repository/types.js';
+import type { UmbDocumentSearchItemModel } from './types.js';
 import {
 	classMap,
 	css,
@@ -17,7 +18,7 @@ import type { UmbSearchResultItemModel } from '@umbraco-cms/backoffice/search';
 @customElement('umb-document-search-result-item')
 export class UmbDocumentSearchResultItemElement extends UmbLitElement {
 	@property({ type: Object })
-	item?: UmbSearchResultItemModel & UmbDocumentItemModel;
+	item?: UmbSearchResultItemModel & UmbDocumentSearchItemModel;
 
 	@state()
 	private _currentCulture?: string;
@@ -88,7 +89,13 @@ export class UmbDocumentSearchResultItemElement extends UmbLitElement {
 				(icon) => html`<umb-icon name=${icon}></umb-icon>`,
 				() => html`<uui-icon name="icon-document"></uui-icon>`,
 			)}
-			<span class=${classMap(classes)}>${label}</span>
+			<span class=${classMap(classes)}>
+				${label}
+				${when(
+					this.item.ancestors?.length,
+					() => html`<small class="ancestors">${this.item?.ancestors!.map((a) => a.name).join(' > ')}</small>`,
+				)}
+			</span>
 			<div class="extra">
 				${when(
 					this.item.isTrashed,
@@ -125,6 +132,12 @@ export class UmbDocumentSearchResultItemElement extends UmbLitElement {
 
 					&.trashed {
 						text-decoration: line-through;
+					}
+					> .ancestors {
+						display: block;
+						opacity: 0.6;
+						font-size: 0.7rem;
+						font-weight: 400;
 					}
 				}
 			}

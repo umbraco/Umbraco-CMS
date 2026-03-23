@@ -48,6 +48,24 @@ export class UmbDocumentSearchServerDataSource
 		);
 
 		if (data) {
+			const ids = data.items.map((item) => item.id);
+
+			const { data: ancestorsData } = await tryExecute(
+				this.#host,
+				DocumentService.getItemDocumentAncestors({ query: { id: ids } }),
+			);
+
+			// Build a lookup map: document ID → array of ancestor names
+			const ancestorsByItemId = new Map<string, Array<{ name: string }>>();
+			if (ancestorsData) {
+				for (const entry of ancestorsData) {
+					ancestorsByItemId.set(
+						entry.id,
+						entry.ancestors.map((ancestor) => ({ name: ancestor.variants[0]?.name ?? '' })),
+					);
+				}
+			}
+
 			const mappedItems: Array<UmbDocumentSearchItemModel> = data.items.map((item) => {
 				return {
 					documentType: {
@@ -72,6 +90,7 @@ export class UmbDocumentSearchServerDataSource
 						};
 					}),
 					flags: item.flags,
+					ancestors: ancestorsByItemId.get(item.id) ?? [],
 				};
 			});
 

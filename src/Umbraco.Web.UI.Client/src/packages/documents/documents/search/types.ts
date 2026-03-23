@@ -6,6 +6,7 @@ export interface UmbDocumentSearchItemModel extends UmbDocumentItemModel {
 	// TODO: [v17] Temporarily added `name` field back in, as the `UmbSearchResultItemModel` (and `UmbNamedEntityModel`) require it. [LK]
 	name: string;
 	href: string;
+	ancestors?: Array<{ name: string }>;
 }
 
 export interface UmbDocumentSearchRequestArgs extends UmbSearchRequestArgs {
