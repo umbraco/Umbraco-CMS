@@ -99,7 +99,7 @@ internal sealed class LanguageRepositoryTest : UmbracoIntegrationTest
             var repository = CreateRepository();
 
             // Act
-            var allLanguage = await repository.GetManyAsync(null, CancellationToken.None);
+            var allLanguage = await repository.GetAllAsync(CancellationToken.None);
             var languages = allLanguage.ToArray();
 
             // Assert

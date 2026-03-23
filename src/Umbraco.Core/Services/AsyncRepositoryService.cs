@@ -10,9 +10,9 @@ namespace Umbraco.Cms.Core.Services;
 public abstract class AsyncRepositoryService : IService
 {
     /// <summary>
-    ///     Initializes a new instance of the <see cref="RepositoryService" /> class.
+    ///     Initializes a new instance of the <see cref="AsyncRepositoryService" /> class.
     /// </summary>
-    /// <param name="provider">The scope provider for unit of work operations.</param>
+    /// <param name="provider">The <see cref="IScopeProvider" /> used for EF Core unit of work operations.</param>
     /// <param name="loggerFactory">The logger factory for creating loggers.</param>
     /// <param name="eventMessagesFactory">The factory for creating event messages.</param>
     protected AsyncRepositoryService(IScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory)

@@ -26,7 +26,7 @@ internal sealed class LanguageRepository : AsyncEntityRepositoryBase<int, ILangu
     private readonly Dictionary<string, int> _codeIdMap = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<int, string> _idCodeMap = new();
 
-    private CancellationToken cancellationToken => CancellationToken.None;
+    private CancellationToken CancellationToken => CancellationToken.None;
 
     public LanguageRepository(
         IEFCoreScopeAccessor<UmbracoDbContext> scopeAccessor,
@@ -55,7 +55,7 @@ internal sealed class LanguageRepository : AsyncEntityRepositoryBase<int, ILangu
         await EnsureCacheIsPopulatedAsync();
 
         var id = await GetIdByIsoCodeAsync(isoCode, false);
-        return id.HasValue ? await GetAsync(id.Value, cancellationToken) : null;
+        return id.HasValue ? await GetAsync(id.Value, CancellationToken) : null;
     }
 
     public async Task<int?> GetIdByIsoCodeAsync(string? isoCode, bool throwOnNotFound = true)

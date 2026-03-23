@@ -495,7 +495,6 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
     public void Can_Perform_Delete_When_Assigned_To_Doc()
     {
         // Arrange
-        var newProvider = NewScopeProvider;
         var newScopeAccessor = GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>();
         var provider = ScopeProvider;
         var scopeAccessor = (IScopeAccessor)provider;

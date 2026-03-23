@@ -163,7 +163,7 @@ public abstract class AsyncEntityRepositoryBase<TId, TEntity> : AsyncRepositoryB
     /// <param name="ids">The identifiers to retrieve, or <see langword="null"/> to get all.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The matching entities.</returns>
-    public async Task<IEnumerable<TEntity>> GetManyAsync(TId[] ids, CancellationToken cancellationToken)
+    public async Task<IEnumerable<TEntity>> GetManyAsync(TId[]? ids, CancellationToken cancellationToken)
     {
         if (ids is null)
         {
