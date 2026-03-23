@@ -39,10 +39,14 @@ export class ExampleDocumentPickerPropertyEditorDataSource
 	#search = new UmbDocumentSearchRepository(this);
 	#config: ExampleDocumentPickerConfigCollectionModel = [];
 
+	async #getDataTypeUnique(): Promise<UmbReferenceByUnique | undefined> {
+		const ctx = await this.getContext(UMB_PROPERTY_TYPE_BASED_PROPERTY_CONTEXT);
+		return await this.observe(ctx?.dataType)?.asPromise();
+	}
+
 	treePickableFilter: (treeItem: UmbDocumentTreeItemModel) => boolean = (treeItem) => !!treeItem.unique;
 
 	setConfig(config: ExampleDocumentPickerConfigCollectionModel) {
-		if (!config) return;
 		// TODO: add examples for all config options
 		this.#config = config;
 		this.#applyPickableFilterFromConfig();
@@ -60,11 +64,6 @@ export class ExampleDocumentPickerPropertyEditorDataSource
 
 	requestTreeRoot() {
 		return this.#tree.requestTreeRoot();
-	}
-
-	async #getDataTypeUnique(): Promise<UmbReferenceByUnique | undefined> {
-		const ctx = await this.getContext(UMB_PROPERTY_TYPE_BASED_PROPERTY_CONTEXT);
-		return await this.observe(ctx?.dataType, (dataType) => dataType)?.asPromise();
 	}
 
 	async requestTreeRootItems(args: UmbDocumentTreeRootItemsRequestArgs) {
