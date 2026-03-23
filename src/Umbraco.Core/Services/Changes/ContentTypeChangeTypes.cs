@@ -58,7 +58,7 @@ public enum ContentTypeChangeTypes : ushort
     ///     Content type variation setting has changed (e.g., from invariant to variant or vice versa).
     ///     This impacts how URL segments and aliases are stored (NULL languageId for invariant, specific ID for variant).
     /// </summary>
-    VariationChanged = 16,
+    VariationChanged = 16 | RefreshMain,
 
     // Granular structural flags (always include RefreshMain)
 

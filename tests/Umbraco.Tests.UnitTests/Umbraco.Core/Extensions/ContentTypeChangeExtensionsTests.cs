@@ -10,6 +10,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Extensions;
 [TestFixture]
 public class ContentTypeChangeExtensionsTests
 {
+    // Existing base flags
     [TestCase(ContentTypeChangeTypes.RefreshMain, true)]
     [TestCase(ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RefreshOther, true)]
     [TestCase(ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.Create, true)]
@@ -18,9 +19,21 @@ public class ContentTypeChangeExtensionsTests
     [TestCase(ContentTypeChangeTypes.Create, false)]
     [TestCase(ContentTypeChangeTypes.Remove, false)]
     [TestCase(ContentTypeChangeTypes.RefreshOther | ContentTypeChangeTypes.Remove, false)]
+    // Granular structural flags (all include RefreshMain)
+    [TestCase(ContentTypeChangeTypes.AliasChanged, true)]
+    [TestCase(ContentTypeChangeTypes.PropertyAliasChanged, true)]
+    [TestCase(ContentTypeChangeTypes.PropertyRemoved, true)]
+    [TestCase(ContentTypeChangeTypes.CompositionRemoved, true)]
+    [TestCase(ContentTypeChangeTypes.PropertyVariationChanged, true)]
+    // Granular non-structural flags (all include RefreshOther, but NOT RefreshMain)
+    [TestCase(ContentTypeChangeTypes.PropertyAdded, false)]
+    [TestCase(ContentTypeChangeTypes.CompositionAdded, false)]
+    [TestCase(ContentTypeChangeTypes.MetadataChanged, false)]
+    [TestCase(ContentTypeChangeTypes.StructureSettingsChanged, false)]
     public void IsStructuralChange(ContentTypeChangeTypes change, bool expected) =>
         Assert.AreEqual(expected, change.IsStructuralChange());
 
+    // Existing base flags
     [TestCase(ContentTypeChangeTypes.RefreshOther, true)]
     [TestCase(ContentTypeChangeTypes.RefreshOther | ContentTypeChangeTypes.Create, true)]
     [TestCase(ContentTypeChangeTypes.RefreshOther | ContentTypeChangeTypes.Remove, true)]
@@ -29,6 +42,87 @@ public class ContentTypeChangeExtensionsTests
     [TestCase(ContentTypeChangeTypes.None, false)]
     [TestCase(ContentTypeChangeTypes.Create, false)]
     [TestCase(ContentTypeChangeTypes.Remove, false)]
+    // Granular non-structural flags (include RefreshOther but not RefreshMain)
+    [TestCase(ContentTypeChangeTypes.PropertyAdded, true)]
+    [TestCase(ContentTypeChangeTypes.CompositionAdded, true)]
+    [TestCase(ContentTypeChangeTypes.MetadataChanged, true)]
+    [TestCase(ContentTypeChangeTypes.StructureSettingsChanged, true)]
+    // Granular structural flags (include RefreshMain, so NOT non-structural)
+    [TestCase(ContentTypeChangeTypes.AliasChanged, false)]
+    [TestCase(ContentTypeChangeTypes.PropertyRemoved, false)]
+    [TestCase(ContentTypeChangeTypes.CompositionRemoved, false)]
+    [TestCase(ContentTypeChangeTypes.PropertyVariationChanged, false)]
+    // Mixed: structural + non-structural granular flags together (RefreshMain is set, so NOT non-structural)
+    [TestCase(ContentTypeChangeTypes.PropertyRemoved | ContentTypeChangeTypes.PropertyAdded, false)]
     public void IsNonStructuralChange(ContentTypeChangeTypes change, bool expected) =>
         Assert.AreEqual(expected, change.IsNonStructuralChange());
+
+    [Test]
+    public void Granular_Structural_Flags_Include_RefreshMain_Bit()
+    {
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(ContentTypeChangeTypes.AliasChanged.HasType(ContentTypeChangeTypes.RefreshMain));
+            Assert.IsTrue(ContentTypeChangeTypes.PropertyAliasChanged.HasType(ContentTypeChangeTypes.RefreshMain));
+            Assert.IsTrue(ContentTypeChangeTypes.PropertyRemoved.HasType(ContentTypeChangeTypes.RefreshMain));
+            Assert.IsTrue(ContentTypeChangeTypes.CompositionRemoved.HasType(ContentTypeChangeTypes.RefreshMain));
+            Assert.IsTrue(ContentTypeChangeTypes.PropertyVariationChanged.HasType(ContentTypeChangeTypes.RefreshMain));
+        });
+    }
+
+    [Test]
+    public void Granular_NonStructural_Flags_Include_RefreshOther_Bit()
+    {
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(ContentTypeChangeTypes.PropertyAdded.HasType(ContentTypeChangeTypes.RefreshOther));
+            Assert.IsTrue(ContentTypeChangeTypes.CompositionAdded.HasType(ContentTypeChangeTypes.RefreshOther));
+            Assert.IsTrue(ContentTypeChangeTypes.MetadataChanged.HasType(ContentTypeChangeTypes.RefreshOther));
+            Assert.IsTrue(ContentTypeChangeTypes.StructureSettingsChanged.HasType(ContentTypeChangeTypes.RefreshOther));
+        });
+    }
+
+    [Test]
+    public void Granular_NonStructural_Flags_Do_Not_Include_RefreshMain_Bit()
+    {
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(ContentTypeChangeTypes.PropertyAdded.HasType(ContentTypeChangeTypes.RefreshMain));
+            Assert.IsFalse(ContentTypeChangeTypes.CompositionAdded.HasType(ContentTypeChangeTypes.RefreshMain));
+            Assert.IsFalse(ContentTypeChangeTypes.MetadataChanged.HasType(ContentTypeChangeTypes.RefreshMain));
+            Assert.IsFalse(ContentTypeChangeTypes.StructureSettingsChanged.HasType(ContentTypeChangeTypes.RefreshMain));
+        });
+    }
+
+    [Test]
+    public void Combined_Granular_Flags_Are_Distinguishable()
+    {
+        var combined = ContentTypeChangeTypes.PropertyRemoved | ContentTypeChangeTypes.AliasChanged;
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(combined.HasType(ContentTypeChangeTypes.PropertyRemoved));
+            Assert.IsTrue(combined.HasType(ContentTypeChangeTypes.AliasChanged));
+            Assert.IsTrue(combined.HasType(ContentTypeChangeTypes.RefreshMain));
+            // HasTypesAll checks that ALL bits of the target are set, which is the correct way
+            // to test for composite flags that share the RefreshMain bit
+            Assert.IsFalse(combined.HasTypesAll(ContentTypeChangeTypes.CompositionRemoved));
+            Assert.IsFalse(combined.HasTypesAll(ContentTypeChangeTypes.PropertyVariationChanged));
+            Assert.IsFalse(combined.HasType(ContentTypeChangeTypes.RefreshOther));
+        });
+    }
+
+    [Test]
+    public void Original_Enum_Values_Are_Preserved()
+    {
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(0, (ushort)ContentTypeChangeTypes.None);
+            Assert.AreEqual(1, (ushort)ContentTypeChangeTypes.Create);
+            Assert.AreEqual(2, (ushort)ContentTypeChangeTypes.RefreshMain);
+            Assert.AreEqual(4, (ushort)ContentTypeChangeTypes.RefreshOther);
+            Assert.AreEqual(8, (ushort)ContentTypeChangeTypes.Remove);
+            Assert.AreEqual(16, (ushort)ContentTypeChangeTypes.VariationChanged);
+        });
+    }
 }

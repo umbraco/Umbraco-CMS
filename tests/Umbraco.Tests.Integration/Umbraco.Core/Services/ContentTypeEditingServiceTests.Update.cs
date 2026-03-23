@@ -72,8 +72,8 @@ internal sealed partial class ContentTypeEditingServiceTests
         Assert.AreEqual(isElement, contentType.IsElement);
         Assert.AreEqual("testUpdated", contentType.Alias);
 
-        // expect RefreshMain when changing alias
-        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.RefreshMain);
+        // expect AliasChanged (which includes RefreshMain) when changing alias
+        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.AliasChanged);
     }
 
     [TestCase(false, false)]
@@ -167,8 +167,8 @@ internal sealed partial class ContentTypeEditingServiceTests
 
         if (variesByCulture || variesBySegment)
         {
-            // expect RefreshMain when changing variation at property type level
-            AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.RefreshMain);
+            // expect PropertyVariationChanged (which includes RefreshMain) when changing variation at property type level
+            AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.PropertyVariationChanged);
         }
         else
         {
@@ -415,8 +415,8 @@ internal sealed partial class ContentTypeEditingServiceTests
 
         Assert.AreEqual(0, contentType.NoGroupPropertyTypes.Count());
 
-        // expect RefreshMain when removing properties
-        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.RefreshMain);
+        // expect PropertyRemoved (which includes RefreshMain) when removing properties
+        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.PropertyRemoved);
     }
 
     [TestCase(false)]
@@ -463,8 +463,8 @@ internal sealed partial class ContentTypeEditingServiceTests
 
         Assert.AreEqual(0, contentType.NoGroupPropertyTypes.Count());
 
-        // expect RefreshMain when removing properties
-        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.RefreshMain);
+        // expect PropertyRemoved (which includes RefreshMain) when removing properties
+        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.PropertyRemoved);
     }
 
     [Test]
@@ -506,8 +506,8 @@ internal sealed partial class ContentTypeEditingServiceTests
         Assert.AreEqual(0, contentType.PropertyTypes.Count());
         Assert.AreEqual(0, contentType.NoGroupPropertyTypes.Count());
 
-        // expect RefreshMain when removing properties
-        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.RefreshMain);
+        // expect PropertyRemoved (which includes RefreshMain) when removing properties
+        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.PropertyRemoved);
     }
 
     [TestCase(false)]
@@ -897,8 +897,8 @@ internal sealed partial class ContentTypeEditingServiceTests
         Assert.AreEqual(1, contentType.CompositionPropertyTypes.Count());
         Assert.AreEqual("testProperty2", contentType.CompositionPropertyTypes.Single().Alias);
 
-        // expect RefreshMain when removing compositions (corresponds to removing properties)
-        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.RefreshMain);
+        // expect CompositionRemoved (which includes RefreshMain) when removing compositions
+        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.CompositionRemoved);
     }
 
     [Test]
@@ -1075,11 +1075,10 @@ internal sealed partial class ContentTypeEditingServiceTests
             Assert.AreEqual(parentContentType.Key, childContentType.ContentTypeComposition.Single().Key);
         });
 
-        // expect RefreshMain when removing compositions (corresponds to removing properties)
-        // - note that both parent and child content type are affected here
+        // expect CompositionRemoved for the parent and RefreshMain for the child (affected through composition propagation)
         Assert.IsNotNull(refreshedPayloads);
         Assert.AreEqual(2, refreshedPayloads.Length);
-        AssertContentTypeRefreshPayload([refreshedPayloads.First()], parentContentType.Id, ContentTypeChangeTypes.RefreshMain);
+        AssertContentTypeRefreshPayload([refreshedPayloads.First()], parentContentType.Id, ContentTypeChangeTypes.CompositionRemoved);
         AssertContentTypeRefreshPayload([refreshedPayloads.Last()], childContentType.Id, ContentTypeChangeTypes.RefreshMain);
     }
 
@@ -1512,8 +1511,8 @@ internal sealed partial class ContentTypeEditingServiceTests
             Assert.AreEqual("Same Test Property Alias", compositionProperty.Name);
         });
 
-        // expect RefreshMain, because a property was removed to "make room" for the new compositions
-        AssertContentTypeRefreshPayload(refreshedPayloads, targetContentType.Id, ContentTypeChangeTypes.RefreshMain);
+        // expect PropertyRemoved (which includes RefreshMain), because a property was removed to "make room" for the new compositions
+        AssertContentTypeRefreshPayload(refreshedPayloads, targetContentType.Id, ContentTypeChangeTypes.PropertyRemoved);
     }
 
     private static void AssertContentTypeRefreshPayload(ContentTypeCacheRefresher.JsonPayload[]? refreshedPayloads, int expectedContentTypeId, ContentTypeChangeTypes expectedChangeTypes)
