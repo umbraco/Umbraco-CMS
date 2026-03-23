@@ -13,14 +13,6 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Persistence.EFCore;
 public class EFCoreModelCustomizerTests
 {
     [Test]
-    public void EntityType_ReturnsTypeOfTEntity()
-    {
-        IEFCoreModelCustomizer customizer = new TestCustomizer();
-
-        Assert.That(customizer.EntityType, Is.EqualTo(typeof(TestEntity)));
-    }
-
-    [Test]
     public void Apply_DispatchesToCustomizeWithEntityTypeBuilder()
     {
         var customizer = new TestCustomizer();

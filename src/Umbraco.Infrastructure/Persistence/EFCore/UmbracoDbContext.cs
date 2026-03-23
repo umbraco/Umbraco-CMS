@@ -1,7 +1,6 @@
-using System.Linq.Expressions;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -42,6 +41,7 @@ public class UmbracoDbContext : DbContext
     /// </summary>
     /// <param name="options">The options to be used by the DbContext.</param>
     /// <param name="modelCustomizers">Provider-specific model customizers to apply during model creation.</param>
+    [SetsRequiredMembers]
     public UmbracoDbContext(DbContextOptions<UmbracoDbContext> options, IEnumerable<IEFCoreModelCustomizer> modelCustomizers)
         : base(ConfigureOptions(options))
         => _modelCustomizers = modelCustomizers.ToArray();
@@ -99,9 +99,16 @@ public class UmbracoDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
+        string? activeProvider = Database.ProviderName;
+
         foreach (IEFCoreModelCustomizer customizer in _modelCustomizers)
         {
-            customizer.Apply(modelBuilder);
+            if (customizer.ProviderName is null
+                || activeProvider is null
+                || customizer.ProviderName.Equals(activeProvider, StringComparison.OrdinalIgnoreCase))
+            {
+                customizer.Apply(modelBuilder);
+            }
         }
 
         foreach (IMutableEntityType entity in modelBuilder.Model.GetEntityTypes())

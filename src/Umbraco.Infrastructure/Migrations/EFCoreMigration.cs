@@ -9,5 +9,6 @@ public enum EFCoreMigration
     AddWebhookDto = 4,
     AddLastSyncedDto = 5,
     AddKeyValueDto = 6,
-    AddLanguageDto = 7,
+    SqliteCollation = 7,
+    AddLanguageDto = 8,
 }

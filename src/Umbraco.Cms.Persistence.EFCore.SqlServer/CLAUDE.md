@@ -125,9 +125,27 @@ Prefixed with `umbraco`: Applications, Authorizations, Scopes, Tokens (see SQLit
 ### Adding New Migrations
 
 1. Configure SQL Server connection string in `src/Umbraco.Web.UI/appsettings.json`
-2. Run migration command from repository root
-3. **Critical**: Also add equivalent migration to `Umbraco.Cms.Persistence.EFCore.Sqlite`
-4. Update `SqlServerMigrationProvider.GetMigrationType()` switch if adding named migrations
+2. Run from repository root:
+   ```bash
+   dotnet ef migrations add %Name% -s src/Umbraco.Web.UI -p src/Umbraco.Cms.Persistence.EFCore.SqlServer -c UmbracoDbContext
+   ```
+3. Empty the `Up()` and `Down()` methods (these are no-ops — NPoco creates the tables)
+4. **Critical**: Also add equivalent migration to `Umbraco.Cms.Persistence.EFCore.Sqlite`
+5. Update `SqlServerMigrationProvider.GetMigrationType()` switch if adding named migrations
+
+### Model Customizers (`DtoCustomization/`)
+
+SQL Server-specific EF Core model customizations (e.g., indexes with included columns via `.IncludeProperties()`) live in `DtoCustomization/`. These extend the shared configurations in `Umbraco.Infrastructure/Persistence/Dtos/EFCore/Configurations/`.
+
+**Pattern**: Implement `IEFCoreModelCustomizer<TDto>` and register via `builder.AddEFCoreModelCustomizer<T>()` in `UmbracoBuilderExtensions.AddCustomizers()`.
+
+**Current customizers**:
+- `SqlServerNodeDtoModelCustomizer` — adds `.IncludeProperties()` to `NodeDto` indexes
+- `SqlServerDocumentVersionDtoModelCustomizer` — adds `.IncludeProperties()` to `DocumentVersionDto` indexes
+
+**When to add a new customizer**: Only when the NPoco DTO has SQL Server-specific index features (included columns via `[IncludeColumns]`). If the DTO has no included columns, no customizer is needed.
+
+**Full migration guide**: See `/src/Umbraco.Infrastructure/CLAUDE.md` → "Section 12: EF Core DTO Migration Guide".
 
 ---
 
