@@ -130,11 +130,9 @@ export class UmbDocumentBlueprintWorkspaceContext
 		saveData: ContentModel,
 		variantIds: Array<UmbVariantId> = [],
 	): Promise<void> {
-		saveData.variants = saveData.variants.filter((v) => v.name);
-		const filtered = variantIds.filter((variantId) => saveData.variants.some((v) => variantId.compare(v)));
-		variantIds.length = 0;
-		variantIds.push(...filtered);
-		return super.runMandatoryValidationForSaveData(saveData, variantIds);
+		const namedVariants = saveData.variants.filter((v) => v.name);
+		const filteredVariantIds = variantIds.filter((variantId) => namedVariants.some((v) => variantId.compare(v)));
+		return super.runMandatoryValidationForSaveData({ ...saveData, variants: namedVariants }, filteredVariantIds);
 	}
 
 	public createPropertyDatasetContext(
