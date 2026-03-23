@@ -1,14 +1,10 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using Npgsql;
 using NUnit.Framework;
-using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Persistence.EFCore.Scoping;
 using Umbraco.Cms.Tests.Common.Testing;
-using Umbraco.Cms.Tests.Integration.Extensions;
 using Umbraco.Cms.Tests.Integration.Testing;
+using Umbraco.Cms.Tests.Integration.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Persistence.EFCore.DbContext;
 
@@ -36,14 +32,9 @@ public class PooledDbContextConnectionTaintingTests : UmbracoIntegrationTest
         NpgsqlConnection.ClearAllPools();
     }
 
-    protected override void CustomTestSetup(IUmbracoBuilder builder)
-    {
+    protected override void CustomTestSetup(IUmbracoBuilder builder) =>
         builder.Services.AddUmbracoDbContext<PooledTestDbContext>(
-            (serviceProvider, options, connectionString, providerName) =>
-            {
-                options.UseCustomUmbracoDatabaseProvider(serviceProvider);
-            });
-    }
+            (serviceProvider, options, connectionString, providerName) => options.UseCustomUmbracoDatabaseProvider(serviceProvider));
 
     /// <summary>
     /// Verifies that a pooled DbContext obtained from IDbContextFactory has a valid connection string
@@ -122,36 +113,53 @@ public class PooledDbContextConnectionTaintingTests : UmbracoIntegrationTest
         });
     }
 
+    /// <summary>
+    /// Verifies that the connection string is preserved on a pooled DbContext after an EFCore scope
+    /// disposes. SetDbConnection(null) during scope disposal clears EF Core's internal connection
+    /// string field; without the restore in DisposeEfCoreDatabase, the pooled context is returned
+    /// with a null connection string, causing InvalidOperationException on SQL Server reuse.
+    /// </summary>
+    [Test]
+    public async Task Pooled_DbContext_Preserves_ConnectionString_After_Scope_Disposal()
+    {
+        if (BaseTestDatabase.IsSqlite())
+        {
+            Assert.Ignore("SQLite does not lose the connection string on SetDbConnection(null); this test targets SQL Server.");
+        }
+
+        // Step 1: Capture the original connection string before any scope usage.
+        string? originalConnectionString;
+        using (PooledTestDbContext pristineContext = DbContextFactory.CreateDbContext())
+        {
+            originalConnectionString = pristineContext.Database.GetConnectionString();
+        }
+
+        Assert.IsNotNull(originalConnectionString, "Precondition: factory context should have a connection string.");
+
+        // Step 2: Use and dispose an EFCore scope, which calls SetDbConnection(null) on cleanup.
+        using (IEfCoreScope<PooledTestDbContext> scope = EfCoreScopeProvider.CreateScope())
+        {
+            await scope.ExecuteWithContextAsync<Task>(async db =>
+            {
+                await db.Database.ExecuteSqlRawAsync("SELECT 1");
+            });
+            scope.Complete();
+        }
+
+        // Step 3: Get a context from the pool — may be the same instance that was just disposed.
+        using PooledTestDbContext reusedContext = DbContextFactory.CreateDbContext();
+        var connectionStringAfterDisposal = reusedContext.Database.GetConnectionString();
+
+        // Step 4: The connection string must still be set.
+        Assert.IsNotNull(connectionStringAfterDisposal, "Connection string must survive scope disposal for pooled contexts.");
+        Assert.AreEqual(originalConnectionString, connectionStringAfterDisposal);
+    }
+
     internal class PooledTestDbContext : Microsoft.EntityFrameworkCore.DbContext
     {
-        private string _connectionString;
-
         public PooledTestDbContext(DbContextOptions<PooledTestDbContext> options)
             : base(options)
         {
-            _connectionString = options.Extensions
-                .OfType<CoreOptionsExtension>()
-                .FirstOrDefault()?.ApplicationServiceProvider
-                ?.GetRequiredService<IOptionsMonitor<ConnectionStrings>>()
-                .CurrentValue.ConnectionString;
-        }
-
-        public override DatabaseFacade Database
-        {
-            get
-            {
-                var db = base.Database;
-                var conn = db.GetDbConnection();
-                if (conn.State == System.Data.ConnectionState.Closed)
-                {
-                    if (string.IsNullOrEmpty(conn.ConnectionString))
-                    {
-                        db.SetConnectionString(_connectionString);
-                    }
-                }
-
-                return db;
-            }
         }
     }
 }
