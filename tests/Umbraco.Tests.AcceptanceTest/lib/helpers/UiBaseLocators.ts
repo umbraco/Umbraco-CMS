@@ -426,8 +426,8 @@ export class UiBaseLocators extends BasePage {
     // Document & Content
     this.chooseDocumentInputBtn = page.locator('umb-input-document').getByLabel('Choose');
     this.createDocumentBlueprintBtn = page.getByLabel(/^Create Document Blueprint(…)?$/);
-    this.createDocumentBlueprintModal = page.locator('umb-document-blueprint-options-create-modal');
-    this.createNewDocumentBlueprintBtn = page.locator('umb-document-blueprint-options-create-modal').locator('umb-ref-item', {hasText: 'Document Blueprint for'});
+    this.createDocumentBlueprintModal = page.locator('umb-entity-create-option-action-list-modal');
+    this.createNewDocumentBlueprintBtn = page.locator('umb-entity-create-option-action-list-modal').locator('umb-ref-item', {hasText: 'Document Blueprint for'});
   
     // User
     this.currentUserAvatarBtn = page.getByTestId('header-app:Umb.HeaderApp.CurrentUser').locator('uui-avatar');
