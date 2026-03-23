@@ -8,8 +8,10 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import type { UmbUserInputElement } from '@umbraco-cms/backoffice/user';
 
 import '../components/user-group-entity-type-permission-groups.element.js';
+import '@umbraco-cms/backoffice/user';
 
 @customElement('umb-user-group-details-workspace-view')
 export class UmbUserGroupDetailsWorkspaceViewElement extends UmbLitElement implements UmbWorkspaceViewElement {
@@ -36,6 +38,9 @@ export class UmbUserGroupDetailsWorkspaceViewElement extends UmbLitElement imple
 
 	@state()
 	private _mediaRootAccess: UmbUserGroupDetailModel['mediaRootAccess'] = false;
+
+	@state()
+	private _userUniques: string[] = [];
 
 	#workspaceContext?: typeof UMB_USER_GROUP_WORKSPACE_CONTEXT.TYPE;
 
@@ -80,6 +85,12 @@ export class UmbUserGroupDetailsWorkspaceViewElement extends UmbLitElement imple
 			this.#workspaceContext?.mediaStartNode,
 			(value) => (this._mediaStartNode = value),
 			'_observeMediaStartNode',
+		);
+
+		this.observe(
+			this.#workspaceContext?.userUniques,
+			(value) => (this._userUniques = value ?? []),
+			'_observeUserUniques',
 		);
 	}
 
@@ -140,6 +151,12 @@ export class UmbUserGroupDetailsWorkspaceViewElement extends UmbLitElement imple
 		this.#workspaceContext?.updateProperty('mediaStartNode', selected ? { unique: selected } : null);
 	}
 
+	#onUsersChange(event: UmbChangeEvent) {
+		event.stopPropagation();
+		const target = event.target as UmbUserInputElement;
+		this.#workspaceContext?.setUserUniques(target.selection);
+	}
+
 	override render() {
 		if (!this._unique) return nothing;
 
@@ -163,6 +180,12 @@ export class UmbUserGroupDetailsWorkspaceViewElement extends UmbLitElement imple
 
 					${this.#renderPermissionGroups()}
 				</umb-stack>
+				<div>
+					<uui-box>
+						<div slot="headline"><umb-localize key="general_users"></umb-localize></div>
+						<umb-user-input .selection=${this._userUniques} @change=${this.#onUsersChange}></umb-user-input>
+					</uui-box>
+				</div>
 			</div>
 		`;
 	}
@@ -257,6 +280,9 @@ export class UmbUserGroupDetailsWorkspaceViewElement extends UmbLitElement imple
 			}
 
 			#main {
+				display: grid;
+				grid-template-columns: 1fr 350px;
+				gap: var(--uui-size-layout-1);
 				padding: var(--uui-size-layout-1);
 			}
 
