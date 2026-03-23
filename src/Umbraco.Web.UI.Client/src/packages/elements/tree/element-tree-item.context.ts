@@ -1,4 +1,6 @@
 import { UmbElementItemDataResolver } from '../item/data-resolver/element-item-data-resolver.js';
+import { UMB_ELEMENT_ENTITY_TYPE } from '../entity.js';
+import type { UmbElementItemModel } from '../types.js';
 import type { UmbElementTreeItemModel, UmbElementTreeRootModel } from './types.js';
 import { UmbDefaultTreeItemContext } from '@umbraco-cms/backoffice/tree';
 import { UmbIsTrashedEntityContext } from '@umbraco-cms/backoffice/recycle-bin';
@@ -31,7 +33,9 @@ export class UmbElementTreeItemContext extends UmbDefaultTreeItemContext<
 
 	public override setTreeItem(treeItem: UmbElementTreeItemModel | undefined) {
 		super.setTreeItem(treeItem);
-		this.#item.setData(treeItem as never);
+		if (treeItem?.entityType === UMB_ELEMENT_ENTITY_TYPE) {
+			this.#item.setData(treeItem as unknown as UmbElementItemModel);
+		}
 	}
 }
 
