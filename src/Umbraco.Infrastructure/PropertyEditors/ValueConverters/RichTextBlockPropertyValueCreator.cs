@@ -4,6 +4,7 @@
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
@@ -20,13 +21,15 @@ internal sealed class RichTextBlockPropertyValueCreator : BlockPropertyValueCrea
     /// <param name="blockEditorVarianceHandler">The <see cref="BlockEditorVarianceHandler"/> that handles block editor variance.</param>
     /// <param name="jsonSerializer">The <see cref="IJsonSerializer"/> used for JSON serialization and deserialization.</param>
     /// <param name="constructorCache">The <see cref="RichTextBlockPropertyValueConstructorCache"/> used to cache rich text block property value constructors.</param>
+    /// <param name="languageService">Service used to retrieve language information for fallback resolution.</param>
     public RichTextBlockPropertyValueCreator(
         BlockEditorConverter blockEditorConverter,
         IVariationContextAccessor variationContextAccessor,
         BlockEditorVarianceHandler blockEditorVarianceHandler,
         IJsonSerializer jsonSerializer,
-        RichTextBlockPropertyValueConstructorCache constructorCache)
-        : base(blockEditorConverter, variationContextAccessor, blockEditorVarianceHandler)
+        RichTextBlockPropertyValueConstructorCache constructorCache,
+        ILanguageService languageService)
+        : base(blockEditorConverter, variationContextAccessor, blockEditorVarianceHandler, languageService)
     {
         _jsonSerializer = jsonSerializer;
         _constructorCache = constructorCache;
@@ -41,13 +44,13 @@ internal sealed class RichTextBlockPropertyValueCreator : BlockPropertyValueCrea
     /// <param name="preview">True to create the model in preview mode; otherwise, false.</param>
     /// <param name="blockConfigurations">An array of <see cref="RichTextBlockConfiguration"/> objects that define the configuration for each block type.</param>
     /// <returns>A <see cref="RichTextBlockModel"/> that represents the parsed and configured block content, or <see cref="RichTextBlockModel.Empty"/> if the value is invalid or empty.</returns>
-    public RichTextBlockModel CreateBlockModel(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, RichTextBlockValue blockValue, bool preview, RichTextConfiguration.RichTextBlockConfiguration[] blockConfigurations)
+    public async Task<RichTextBlockModel> CreateBlockModelAsync(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, RichTextBlockValue blockValue, bool preview, RichTextConfiguration.RichTextBlockConfiguration[] blockConfigurations)
     {
         RichTextBlockModel CreateEmptyModel() => RichTextBlockModel.Empty;
 
         RichTextBlockModel CreateModel(IList<RichTextBlockItem> items) => new RichTextBlockModel(items);
 
-        RichTextBlockModel blockModel = CreateBlockModel(owner, referenceCacheLevel, blockValue, preview, blockConfigurations, CreateEmptyModel, CreateModel);
+        RichTextBlockModel blockModel = await CreateBlockModelAsync(owner, referenceCacheLevel, blockValue, preview, blockConfigurations, CreateEmptyModel, CreateModel);
 
         return blockModel;
     }

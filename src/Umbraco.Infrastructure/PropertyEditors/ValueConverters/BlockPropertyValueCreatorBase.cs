@@ -2,8 +2,10 @@
 // See LICENSE for more details.
 
 using System.Reflection;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
@@ -17,6 +19,7 @@ internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemMod
 {
     private readonly IVariationContextAccessor _variationContextAccessor;
     private readonly BlockEditorVarianceHandler _blockEditorVarianceHandler;
+    private readonly ILanguageService _languageService;
 
     /// <summary>
     /// Creates a specific data converter for the block property implementation.
@@ -60,16 +63,17 @@ internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemMod
     /// <returns></returns>
     protected delegate TBlockItemModel? EnrichBlockItemModelFromConfiguration(TBlockItemModel item, TBlockLayoutItem layoutItem, TBlockConfiguration configuration, CreateBlockItemModelFromLayout blockItemModelCreator);
 
-    protected BlockPropertyValueCreatorBase(BlockEditorConverter blockEditorConverter, IVariationContextAccessor variationContextAccessor, BlockEditorVarianceHandler blockEditorVarianceHandler)
+    protected BlockPropertyValueCreatorBase(BlockEditorConverter blockEditorConverter, IVariationContextAccessor variationContextAccessor, BlockEditorVarianceHandler blockEditorVarianceHandler, ILanguageService languageService)
     {
         BlockEditorConverter = blockEditorConverter;
         _variationContextAccessor = variationContextAccessor;
         _blockEditorVarianceHandler = blockEditorVarianceHandler;
+        _languageService = languageService;
     }
 
     protected BlockEditorConverter BlockEditorConverter { get; }
 
-    protected TBlockModel CreateBlockModel(
+    protected async Task<TBlockModel> CreateBlockModelAsync(
         IPublishedElement owner,
         PropertyCacheLevel referenceCacheLevel,
         string intermediateBlockModelValue,
@@ -87,10 +91,10 @@ internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemMod
 
         BlockEditorDataConverter<TBlockValue, TBlockLayoutItem> blockEditorDataConverter = CreateBlockEditorDataConverter();
         BlockEditorData<TBlockValue, TBlockLayoutItem> converted = blockEditorDataConverter.Deserialize(intermediateBlockModelValue);
-        return CreateBlockModel(owner, referenceCacheLevel, converted, preview, blockConfigurations, createEmptyModel, createModelFromItems, enrichBlockItem);
+        return await CreateBlockModelAsync(owner, referenceCacheLevel, converted, preview, blockConfigurations, createEmptyModel, createModelFromItems, enrichBlockItem);
     }
 
-    protected TBlockModel CreateBlockModel(
+    protected async Task<TBlockModel> CreateBlockModelAsync(
         IPublishedElement owner,
         PropertyCacheLevel referenceCacheLevel,
         TBlockValue blockValue,
@@ -102,10 +106,10 @@ internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemMod
     {
         BlockEditorDataConverter<TBlockValue, TBlockLayoutItem> blockEditorDataConverter = CreateBlockEditorDataConverter();
         BlockEditorData<TBlockValue, TBlockLayoutItem> converted = blockEditorDataConverter.Convert(blockValue);
-        return CreateBlockModel(owner, referenceCacheLevel, converted, preview, blockConfigurations, createEmptyModel, createModelFromItems, enrichBlockItem);
+        return await CreateBlockModelAsync(owner, referenceCacheLevel, converted, preview, blockConfigurations, createEmptyModel, createModelFromItems, enrichBlockItem);
     }
 
-    private TBlockModel CreateBlockModel(
+    private async Task<TBlockModel> CreateBlockModelAsync(
         IPublishedElement owner,
         PropertyCacheLevel referenceCacheLevel,
         BlockEditorData<TBlockValue, TBlockLayoutItem> converted,
@@ -127,6 +131,7 @@ internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemMod
 
         var blockConfigMap = blockConfigurations.ToDictionary(bc => bc.ContentElementTypeKey);
         VariationContext variationContext = _variationContextAccessor.VariationContext ?? new VariationContext();
+        IEnumerable<ILanguage> allLanguages = await _languageService.GetAllAsync();
 
         // Convert the content data
         var contentPublishedElements = new Dictionary<Guid, IPublishedElement>();
@@ -145,7 +150,7 @@ internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemMod
 
             // if case changes have been made to the content or element type variation since the content was published,
             // we need to align those changes for the exposed blocks.
-            IEnumerable<BlockItemVariation> expose = _blockEditorVarianceHandler.AlignedExposeVarianceAsync(converted.BlockValue, owner, element).GetAwaiter().GetResult();
+            IEnumerable<BlockItemVariation> expose = await _blockEditorVarianceHandler.AlignedExposeVarianceAsync(converted.BlockValue, owner, element, allLanguages);
             var expectedBlockVariationCulture = owner.ContentType.VariesByCulture() && element.ContentType.VariesByCulture()
                 ? variationContext.Culture.NullOrWhiteSpaceAsNull()
                 : null;

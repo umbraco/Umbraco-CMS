@@ -1,6 +1,7 @@
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
@@ -18,13 +19,15 @@ internal sealed class SingleBlockPropertyValueCreator : BlockPropertyValueCreato
     /// <param name="blockEditorVarianceHandler">Handles variance logic for block editors.</param>
     /// <param name="jsonSerializer">The serializer used for JSON serialization and deserialization.</param>
     /// <param name="constructorCache">A cache for constructors used in block list property value creation.</param>
+    /// <param name="languageService">Service used to retrieve language information for fallback resolution.</param>
     public SingleBlockPropertyValueCreator(
         BlockEditorConverter blockEditorConverter,
         IVariationContextAccessor variationContextAccessor,
         BlockEditorVarianceHandler blockEditorVarianceHandler,
         IJsonSerializer jsonSerializer,
-        BlockListPropertyValueConstructorCache constructorCache)
-        : base(blockEditorConverter, variationContextAccessor, blockEditorVarianceHandler)
+        BlockListPropertyValueConstructorCache constructorCache,
+        ILanguageService languageService)
+        : base(blockEditorConverter, variationContextAccessor, blockEditorVarianceHandler, languageService)
     {
         _jsonSerializer = jsonSerializer;
         _constructorCache = constructorCache;
@@ -40,13 +43,13 @@ internal sealed class SingleBlockPropertyValueCreator : BlockPropertyValueCreato
     /// <param name="preview">True if the model is being created for preview purposes; otherwise, false.</param>
     /// <param name="blockConfigurations">An array of <see cref="BlockListConfiguration.BlockConfiguration"/> objects to use when creating the model.</param>
     /// <returns>A single <see cref="BlockListItem"/> representing the block model, or <c>null</c> if none could be created.</returns>
-    public BlockListItem? CreateBlockModel(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, string intermediateBlockModelValue, bool preview, BlockListConfiguration.BlockConfiguration[] blockConfigurations)
+    public async Task<BlockListItem?> CreateBlockModelAsync(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, string intermediateBlockModelValue, bool preview, BlockListConfiguration.BlockConfiguration[] blockConfigurations)
     {
         BlockListModel CreateEmptyModel() => BlockListModel.Empty;
 
         BlockListModel CreateModel(IList<BlockListItem> items) => new BlockListModel(items);
 
-        BlockListItem? blockModel = CreateBlockModel(owner, referenceCacheLevel, intermediateBlockModelValue, preview, blockConfigurations, CreateEmptyModel, CreateModel).SingleOrDefault();
+        BlockListItem? blockModel = (await CreateBlockModelAsync(owner, referenceCacheLevel, intermediateBlockModelValue, preview, blockConfigurations, CreateEmptyModel, CreateModel)).SingleOrDefault();
 
         return blockModel;
     }

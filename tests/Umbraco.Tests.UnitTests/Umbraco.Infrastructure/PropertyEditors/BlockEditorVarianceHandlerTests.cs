@@ -318,6 +318,149 @@ public class BlockEditorVarianceHandlerTests
         });
     }
 
+    [Test]
+    public async Task AlignedExposeVarianceAsync_Adds_Fallback_Entry_When_Block_Exposed_For_Fallback_Culture()
+    {
+        var owner = PublishedElement(ContentVariation.Culture);
+        var element = PublishedElement(ContentVariation.Culture);
+        var blockValue = new BlockListValue
+        {
+            Expose = [new() { ContentKey = element.Key, Culture = "en-US" }],
+        };
+
+        var languages = new[]
+        {
+            CreateLanguage("en-US"),
+            CreateLanguage("nl-BE", fallbackIsoCode: "en-US"),
+        };
+
+        var result = (await ExecuteAlignedExposeVarianceAsync(owner, element, blockValue, languages)).ToList();
+
+        Assert.AreEqual(2, result.Count);
+        Assert.IsTrue(result.Any(v => v.Culture == "en-US" && v.ContentKey == element.Key));
+        Assert.IsTrue(result.Any(v => v.Culture == "nl-BE" && v.ContentKey == element.Key));
+    }
+
+    [Test]
+    public async Task AlignedExposeVarianceAsync_Adds_Fallback_Entry_For_Multi_Level_Fallback()
+    {
+        var owner = PublishedElement(ContentVariation.Culture);
+        var element = PublishedElement(ContentVariation.Culture);
+        var blockValue = new BlockListValue
+        {
+            Expose = [new() { ContentKey = element.Key, Culture = "en-US" }],
+        };
+
+        // nl-BE -> fr-FR -> en-US (multi-level).
+        var languages = new[]
+        {
+            CreateLanguage("en-US"),
+            CreateLanguage("fr-FR", fallbackIsoCode: "en-US"),
+            CreateLanguage("nl-BE", fallbackIsoCode: "fr-FR"),
+        };
+
+        var result = (await ExecuteAlignedExposeVarianceAsync(owner, element, blockValue, languages)).ToList();
+
+        Assert.AreEqual(3, result.Count);
+        Assert.IsTrue(result.Any(v => v.Culture == "en-US" && v.ContentKey == element.Key));
+        Assert.IsTrue(result.Any(v => v.Culture == "fr-FR" && v.ContentKey == element.Key));
+        Assert.IsTrue(result.Any(v => v.Culture == "nl-BE" && v.ContentKey == element.Key));
+    }
+
+    [Test]
+    public async Task AlignedExposeVarianceAsync_Does_Not_Add_Fallback_When_No_Fallback_Configured()
+    {
+        var owner = PublishedElement(ContentVariation.Culture);
+        var element = PublishedElement(ContentVariation.Culture);
+        var blockValue = new BlockListValue
+        {
+            Expose = [new() { ContentKey = element.Key, Culture = "en-US" }],
+        };
+
+        // nl-BE has no fallback configured.
+        var languages = new[]
+        {
+            CreateLanguage("en-US"),
+            CreateLanguage("nl-BE"),
+        };
+
+        var result = (await ExecuteAlignedExposeVarianceAsync(owner, element, blockValue, languages)).ToList();
+
+        Assert.AreEqual(1, result.Count);
+        Assert.AreEqual("en-US", result.Single().Culture);
+    }
+
+    [Test]
+    public async Task AlignedExposeVarianceAsync_Handles_Circular_Fallback_Without_Infinite_Loop()
+    {
+        var owner = PublishedElement(ContentVariation.Culture);
+        var element = PublishedElement(ContentVariation.Culture);
+        var blockValue = new BlockListValue
+        {
+            Expose = [new() { ContentKey = element.Key, Culture = "de-DE" }],
+        };
+
+        // Circular: en-US -> nl-BE -> en-US (neither resolves to de-DE).
+        var languages = new[]
+        {
+            CreateLanguage("en-US", fallbackIsoCode: "nl-BE"),
+            CreateLanguage("nl-BE", fallbackIsoCode: "en-US"),
+            CreateLanguage("de-DE"),
+        };
+
+        var result = (await ExecuteAlignedExposeVarianceAsync(owner, element, blockValue, languages)).ToList();
+
+        // Only de-DE is exposed, en-US and nl-BE cycle without reaching de-DE.
+        Assert.AreEqual(1, result.Count);
+        Assert.AreEqual("de-DE", result.Single().Culture);
+    }
+
+    [Test]
+    public async Task AlignedExposeVarianceAsync_Does_Not_Add_Fallback_For_Invariant_Blocks()
+    {
+        var owner = PublishedElement(ContentVariation.Nothing);
+        var element = PublishedElement(ContentVariation.Nothing);
+        var blockValue = new BlockListValue
+        {
+            Expose = [new() { ContentKey = element.Key, Culture = null }],
+        };
+
+        var languages = new[]
+        {
+            CreateLanguage("en-US"),
+            CreateLanguage("nl-BE", fallbackIsoCode: "en-US"),
+        };
+
+        var result = (await ExecuteAlignedExposeVarianceAsync(owner, element, blockValue, languages)).ToList();
+
+        // Invariant block - no fallback logic applied.
+        Assert.AreEqual(1, result.Count);
+        Assert.IsNull(result.Single().Culture);
+    }
+
+    [Test]
+    public async Task AlignedExposeVarianceAsync_Preserves_Segment_In_Fallback_Entries()
+    {
+        var owner = PublishedElement(ContentVariation.CultureAndSegment);
+        var element = PublishedElement(ContentVariation.CultureAndSegment);
+        var blockValue = new BlockListValue
+        {
+            Expose = [new() { ContentKey = element.Key, Culture = "en-US", Segment = "my-segment" }],
+        };
+
+        var languages = new[]
+        {
+            CreateLanguage("en-US"),
+            CreateLanguage("nl-BE", fallbackIsoCode: "en-US"),
+        };
+
+        var result = (await ExecuteAlignedExposeVarianceAsync(owner, element, blockValue, languages)).ToList();
+
+        Assert.AreEqual(2, result.Count);
+        var fallbackEntry = result.Single(v => v.Culture == "nl-BE");
+        Assert.AreEqual("my-segment", fallbackEntry.Segment);
+    }
+
     private static async Task<BlockPropertyValue?> ExecuteAlignedPropertyVarianceAsync(
         ContentVariation ownerVariation,
         ContentVariation propertyTypeVariation,
@@ -334,10 +477,12 @@ public class BlockEditorVarianceHandlerTests
     private static async Task<IEnumerable<BlockItemVariation>> ExecuteAlignedExposeVarianceAsync(
         IPublishedElement owner,
         IPublishedElement element,
-        BlockListValue blockValue)
+        BlockListValue blockValue,
+        ILanguage[]? languages = null)
     {
-        var subject = BlockEditorVarianceHandler("da-DK", element);
-        return await subject.AlignedExposeVarianceAsync(blockValue, owner, element);
+        languages ??= [CreateLanguage("da-DK")];
+        var subject = BlockEditorVarianceHandler("da-DK", element, languages);
+        return await subject.AlignedExposeVarianceAsync(blockValue, owner, element, languages);
     }
 
     private static IPublishedElement PublishedElement(ContentVariation variation)
@@ -351,10 +496,11 @@ public class BlockEditorVarianceHandlerTests
         return elementMock.Object;
     }
 
-    private static BlockEditorVarianceHandler BlockEditorVarianceHandler(string defaultLanguageIsoCode, IPublishedElement element)
+    private static BlockEditorVarianceHandler BlockEditorVarianceHandler(string defaultLanguageIsoCode, IPublishedElement element, ILanguage[]? languages = null)
     {
         var languageServiceMock = new Mock<ILanguageService>();
         languageServiceMock.Setup(m => m.GetDefaultIsoCodeAsync()).ReturnsAsync(defaultLanguageIsoCode);
+        languageServiceMock.Setup(m => m.GetAllAsync()).ReturnsAsync(languages ?? []);
         var contentTypeServiceMock = new Mock<IContentTypeService>();
         var elementType = new Mock<IContentType>();
         elementType.SetupGet(e => e.Key).Returns(element.ContentType.Key);
@@ -442,4 +588,12 @@ public class BlockEditorVarianceHandlerTests
             ContentData = contentData.Select(cd => new BlockItemData { Key = cd.key, ContentTypeKey = contentTypeKey, Values = cd.values }).ToList(),
             Expose = expose,
         };
+
+    private static ILanguage CreateLanguage(string isoCode, string? fallbackIsoCode = null)
+    {
+        var languageMock = new Mock<ILanguage>();
+        languageMock.SetupGet(m => m.IsoCode).Returns(isoCode);
+        languageMock.SetupGet(m => m.FallbackIsoCode).Returns(fallbackIsoCode);
+        return languageMock.Object;
+    }
 }
