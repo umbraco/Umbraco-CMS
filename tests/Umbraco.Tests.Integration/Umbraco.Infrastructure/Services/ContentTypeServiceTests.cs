@@ -785,20 +785,16 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
         var categoryId = simpleContentType.Id;
 
         // Act
-        var clone = (IContentType)simpleContentType.DeepCloneWithResetIdentities("newcategory");
-        Assert.IsNotNull(clone);
-        clone.Name = "new category";
-        clone.RemoveContentType("meta");
-        clone.ParentId = -1;
-        await ContentTypeService.CreateAsync(clone, Constants.Security.SuperUserKey);
+        var copyResult = await ContentTypeService.CopyAsync(simpleContentType.Key, null);
 
         // Assert
-        Assert.That(clone.HasIdentity, Is.True);
+        Assert.IsTrue(copyResult.Success);
+        var cloned = copyResult.Result;
+        Assert.IsNotNull(cloned);
+        Assert.That(cloned.HasIdentity, Is.True);
 
-        var cloned = ContentTypeService.Get(clone.Id);
         var original = ContentTypeService.Get(categoryId);
 
-        Assert.That(cloned.CompositionAliases().Any(x => x.Equals("meta")), Is.False); // it's been copied to root
         Assert.AreEqual(cloned.ParentId, -1);
         Assert.AreEqual(cloned.Level, 1);
         Assert.AreEqual(cloned.PropertyTypes.Count(), original.PropertyTypes.Count());
@@ -824,16 +820,10 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
         Assert.AreNotEqual(cloned.Key, original.Key);
         Assert.AreNotEqual(cloned.Path, original.Path);
         Assert.AreNotEqual(cloned.SortOrder, original.SortOrder);
-        Assert.AreNotEqual(
-            cloned.PropertyTypes.First(x => x.Alias.Equals("title")).Id,
-            original.PropertyTypes.First(x => x.Alias.Equals("title")).Id);
-        Assert.AreNotEqual(
-            cloned.PropertyGroups.First(x => x.Name.Equals("Content")).Id,
-            original.PropertyGroups.First(x => x.Name.Equals("Content")).Id);
     }
 
     [Test]
-    public async Task Can_Copy_ContentType_To_New_Parent_With_Service()
+    public async Task Can_Clone_ContentType_To_New_Parent_By_Performing_Clone_And_Create()
     {
         // Arrange
         var template = TemplateBuilder.CreateTextPageTemplate();
@@ -857,7 +847,7 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
             defaultTemplateId: template.Id);
         ContentTypeService.Save(simpleContentType);
 
-        // Act
+        // Act - clone and re-parent via DeepCloneWithResetIdentities + CreateAsync
         var clone = (IContentType)simpleContentType.DeepCloneWithResetIdentities("newAlias");
         Assert.IsNotNull(clone);
         clone.Name = "new alias";

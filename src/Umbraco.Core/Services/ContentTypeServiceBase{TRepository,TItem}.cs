@@ -1393,10 +1393,12 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
             contentTypes = await filter.FilterAllowedAtRootAsync(contentTypes);
         }
 
+        TItem[] materialized = contentTypes.ToArray();
+
         var pagedModel = new PagedModel<TItem>
         {
-            Total = contentTypes.Count(),
-            Items = contentTypes.Skip(skip).Take(take)
+            Total = materialized.Length,
+            Items = materialized.Skip(skip).Take(take)
         };
 
         return pagedModel;
