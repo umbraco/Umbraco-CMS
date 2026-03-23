@@ -218,11 +218,12 @@ internal class EFCoreScope<TDbContext> : CoreScope, IEfCoreScope<TDbContext>
             _dbContext = FindDbContext();
         }
 
+        _originalConnectionString ??= _dbContext.Database.GetConnectionString();
+
         // Check if we are already in a transaction before starting one
         if (_dbContext.Database.CurrentTransaction is null)
         {
             DbTransaction? transaction = _innerScope?.Database.Transaction;
-            _originalConnectionString = _dbContext.Database.GetConnectionString();
             _dbContext.Database.SetDbConnection(transaction?.Connection);
             Locks.EnsureLocks(InstanceId);
 
@@ -294,15 +295,18 @@ internal class EFCoreScope<TDbContext> : CoreScope, IEfCoreScope<TDbContext>
             {
                 try
                 {
-                    _dbContext?.Database.SetDbConnection(null);
-
-                    // SetDbConnection(null) clears EF Core's internal _connectionString field,
-                    // which is not restored from options. For pooled contexts, we must restore
-                    // the original connection string so the context is usable when returned
-                    // from the pool. See https://github.com/umbraco/Umbraco-CMS/issues/22124
-                    if (_originalConnectionString is not null && _dbContext is not null)
+                    if (_dbContext is not null)
                     {
-                        _dbContext.Database.SetConnectionString(_originalConnectionString);
+                        _dbContext.Database.SetDbConnection(null);
+
+                        // SetDbConnection(null) clears EF Core's internal _connectionString field,
+                        // which is not restored from options. For pooled contexts, we must restore
+                        // the original connection string so the context is usable when returned
+                        // from the pool. See https://github.com/umbraco/Umbraco-CMS/issues/22211
+                        if (_originalConnectionString is not null)
+                        {
+                            _dbContext.Database.SetConnectionString(_originalConnectionString);
+                        }
                     }
                 }
                 catch
