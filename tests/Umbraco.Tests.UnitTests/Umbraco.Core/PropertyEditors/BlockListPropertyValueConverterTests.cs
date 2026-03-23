@@ -33,7 +33,8 @@ public class BlockListPropertyValueConverterTests : BlockPropertyValueConverterT
             new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory()),
             new BlockListPropertyValueConstructorCache(),
             Mock.Of<IVariationContextAccessor>(),
-            blockVarianceHandler);
+            blockVarianceHandler,
+            Mock.Of<ILanguageService>());
         return editor;
     }
 
