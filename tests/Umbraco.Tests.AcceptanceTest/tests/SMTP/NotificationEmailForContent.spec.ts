@@ -165,7 +165,7 @@ test('can see notification when content is duplicated', async ({umbracoUi, umbra
   await umbracoUi.content.clickActionsMenuForContent(contentName);
   await umbracoUi.content.clickDuplicateToActionMenuOption();
   await umbracoUi.content.clickLabelWithName('Content');
-  await umbracoUi.content.clickDuplicateButton();
+  await umbracoUi.content.clickCopyModalButton();
 
   // Assert
   await umbracoUi.content.isSuccessNotificationVisible();
