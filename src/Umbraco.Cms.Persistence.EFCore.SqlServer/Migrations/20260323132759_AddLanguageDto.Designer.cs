@@ -12,7 +12,7 @@ using Umbraco.Cms.Infrastructure.Persistence.EFCore;
 namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
 {
     [DbContext(typeof(UmbracoDbContext))]
-    [Migration("20260311091622_AddLanguageDto")]
+    [Migration("20260323132759_AddLanguageDto")]
     partial class AddLanguageDto
     {
         /// <inheritdoc />
@@ -326,6 +326,10 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                         .HasColumnType("nvarchar(14)")
                         .HasColumnName("languageISOCode");
 
+                    b.Property<Guid>("LanguageKey")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("languageKey");
+
                     b.HasKey("Id");
 
                     b.HasIndex("FallbackLanguageId");
@@ -333,6 +337,9 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                     b.HasIndex("IsoCode")
                         .IsUnique()
                         .HasFilter("[languageISOCode] IS NOT NULL");
+
+                    b.HasIndex("LanguageKey")
+                        .IsUnique();
 
                     b.ToTable("umbracoLanguage", (string)null);
                 });

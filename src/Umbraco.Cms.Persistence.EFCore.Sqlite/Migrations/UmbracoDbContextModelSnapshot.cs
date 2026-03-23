@@ -335,7 +335,8 @@ namespace Umbraco.Cms.Persistence.EFCore.Sqlite.Migrations
                     b.Property<string>("CultureName")
                         .HasMaxLength(100)
                         .HasColumnType("TEXT")
-                        .HasColumnName("languageCultureName");
+                        .HasColumnName("languageCultureName")
+                        .UseCollation("NOCASE");
 
                     b.Property<int?>("FallbackLanguageId")
                         .HasColumnType("INTEGER")
@@ -356,13 +357,21 @@ namespace Umbraco.Cms.Persistence.EFCore.Sqlite.Migrations
                     b.Property<string>("IsoCode")
                         .HasMaxLength(14)
                         .HasColumnType("TEXT")
-                        .HasColumnName("languageISOCode");
+                        .HasColumnName("languageISOCode")
+                        .UseCollation("NOCASE");
+
+                    b.Property<Guid>("LanguageKey")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("languageKey");
 
                     b.HasKey("Id");
 
                     b.HasIndex("FallbackLanguageId");
 
                     b.HasIndex("IsoCode")
+                        .IsUnique();
+
+                    b.HasIndex("LanguageKey")
                         .IsUnique();
 
                     b.ToTable("umbracoLanguage", (string)null);

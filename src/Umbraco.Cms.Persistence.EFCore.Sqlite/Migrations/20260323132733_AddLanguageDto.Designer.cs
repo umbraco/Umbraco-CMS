@@ -11,7 +11,7 @@ using Umbraco.Cms.Infrastructure.Persistence.EFCore;
 namespace Umbraco.Cms.Persistence.EFCore.Sqlite.Migrations
 {
     [DbContext(typeof(UmbracoDbContext))]
-    [Migration("20260311091552_AddLanguageDto")]
+    [Migration("20260323132733_AddLanguageDto")]
     partial class AddLanguageDto
     {
         /// <inheritdoc />
@@ -24,58 +24,74 @@ namespace Umbraco.Cms.Persistence.EFCore.Sqlite.Migrations
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("ApplicationType")
                         .HasMaxLength(50)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("ClientId")
                         .HasMaxLength(100)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("ClientSecret")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("ClientType")
                         .HasMaxLength(50)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("ConcurrencyToken")
                         .IsConcurrencyToken()
                         .HasMaxLength(50)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("ConsentType")
                         .HasMaxLength(50)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("DisplayName")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("DisplayNames")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("JsonWebKeySet")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("Permissions")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("PostLogoutRedirectUris")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("Properties")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("RedirectUris")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("Requirements")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("Settings")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.HasKey("Id");
 
@@ -89,36 +105,44 @@ namespace Umbraco.Cms.Persistence.EFCore.Sqlite.Migrations
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("ApplicationId")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("ConcurrencyToken")
                         .IsConcurrencyToken()
                         .HasMaxLength(50)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<DateTime?>("CreationDate")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Properties")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("Scopes")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("Status")
                         .HasMaxLength(50)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("Subject")
                         .HasMaxLength(400)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("Type")
                         .HasMaxLength(50)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.HasKey("Id");
 
@@ -131,34 +155,43 @@ namespace Umbraco.Cms.Persistence.EFCore.Sqlite.Migrations
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("ConcurrencyToken")
                         .IsConcurrencyToken()
                         .HasMaxLength(50)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("Description")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("Descriptions")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("DisplayName")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("DisplayNames")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("Name")
                         .HasMaxLength(200)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("Properties")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("Resources")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.HasKey("Id");
 
@@ -172,18 +205,22 @@ namespace Umbraco.Cms.Persistence.EFCore.Sqlite.Migrations
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("ApplicationId")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("AuthorizationId")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("ConcurrencyToken")
                         .IsConcurrencyToken()
                         .HasMaxLength(50)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<DateTime?>("CreationDate")
                         .HasColumnType("TEXT");
@@ -192,29 +229,35 @@ namespace Umbraco.Cms.Persistence.EFCore.Sqlite.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Payload")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("Properties")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<DateTime?>("RedemptionDate")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("ReferenceId")
                         .HasMaxLength(100)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("Status")
                         .HasMaxLength(50)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("Subject")
                         .HasMaxLength(400)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("Type")
                         .HasMaxLength(150)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.HasKey("Id");
 
@@ -244,13 +287,15 @@ namespace Umbraco.Cms.Persistence.EFCore.Sqlite.Migrations
                     b.Property<string>("Instructions")
                         .IsRequired()
                         .HasColumnType("TEXT")
-                        .HasColumnName("jsonInstruction");
+                        .HasColumnName("jsonInstruction")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("OriginIdentity")
                         .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("TEXT")
-                        .HasColumnName("originated");
+                        .HasColumnName("originated")
+                        .UseCollation("NOCASE");
 
                     b.Property<DateTime>("UtcStamp")
                         .HasColumnType("TEXT")
@@ -266,7 +311,8 @@ namespace Umbraco.Cms.Persistence.EFCore.Sqlite.Migrations
                     b.Property<string>("Key")
                         .HasMaxLength(256)
                         .HasColumnType("TEXT")
-                        .HasColumnName("key");
+                        .HasColumnName("key")
+                        .UseCollation("NOCASE");
 
                     b.Property<DateTime>("UpdateDate")
                         .HasColumnType("TEXT")
@@ -274,7 +320,8 @@ namespace Umbraco.Cms.Persistence.EFCore.Sqlite.Migrations
 
                     b.Property<string>("Value")
                         .HasColumnType("TEXT")
-                        .HasColumnName("value");
+                        .HasColumnName("value")
+                        .UseCollation("NOCASE");
 
                     b.HasKey("Key");
 
@@ -291,7 +338,8 @@ namespace Umbraco.Cms.Persistence.EFCore.Sqlite.Migrations
                     b.Property<string>("CultureName")
                         .HasMaxLength(100)
                         .HasColumnType("TEXT")
-                        .HasColumnName("languageCultureName");
+                        .HasColumnName("languageCultureName")
+                        .UseCollation("NOCASE");
 
                     b.Property<int?>("FallbackLanguageId")
                         .HasColumnType("INTEGER")
@@ -312,13 +360,21 @@ namespace Umbraco.Cms.Persistence.EFCore.Sqlite.Migrations
                     b.Property<string>("IsoCode")
                         .HasMaxLength(14)
                         .HasColumnType("TEXT")
-                        .HasColumnName("languageISOCode");
+                        .HasColumnName("languageISOCode")
+                        .UseCollation("NOCASE");
+
+                    b.Property<Guid>("LanguageKey")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("languageKey");
 
                     b.HasKey("Id");
 
                     b.HasIndex("FallbackLanguageId");
 
                     b.HasIndex("IsoCode")
+                        .IsUnique();
+
+                    b.HasIndex("LanguageKey")
                         .IsUnique();
 
                     b.ToTable("umbracoLanguage", (string)null);
@@ -328,7 +384,8 @@ namespace Umbraco.Cms.Persistence.EFCore.Sqlite.Migrations
                 {
                     b.Property<string>("MachineId")
                         .HasColumnType("TEXT")
-                        .HasColumnName("machineId");
+                        .HasColumnName("machineId")
+                        .UseCollation("NOCASE");
 
                     b.Property<DateTime>("LastSyncedDate")
                         .HasColumnType("TEXT")
@@ -371,7 +428,8 @@ namespace Umbraco.Cms.Persistence.EFCore.Sqlite.Migrations
                     b.Property<string>("Event")
                         .HasMaxLength(255)
                         .HasColumnType("TEXT")
-                        .HasColumnName("event");
+                        .HasColumnName("event")
+                        .UseCollation("NOCASE");
 
                     b.HasKey("WebhookId", "Event")
                         .HasName("PK_webhookEvent2WebhookDto");
@@ -387,11 +445,13 @@ namespace Umbraco.Cms.Persistence.EFCore.Sqlite.Migrations
 
                     b.Property<string>("Key")
                         .HasColumnType("TEXT")
-                        .HasColumnName("Key");
+                        .HasColumnName("Key")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("Value")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.HasKey("WebhookId", "Key")
                         .HasName("PK_headers2WebhookDto");
@@ -408,7 +468,8 @@ namespace Umbraco.Cms.Persistence.EFCore.Sqlite.Migrations
 
                     b.Property<string>("Description")
                         .HasColumnType("TEXT")
-                        .HasColumnName("description");
+                        .HasColumnName("description")
+                        .UseCollation("NOCASE");
 
                     b.Property<bool>("Enabled")
                         .HasColumnType("INTEGER")
@@ -420,12 +481,14 @@ namespace Umbraco.Cms.Persistence.EFCore.Sqlite.Migrations
 
                     b.Property<string>("Name")
                         .HasColumnType("TEXT")
-                        .HasColumnName("name");
+                        .HasColumnName("name")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("Url")
                         .IsRequired()
                         .HasColumnType("TEXT")
-                        .HasColumnName("url");
+                        .HasColumnName("url")
+                        .UseCollation("NOCASE");
 
                     b.HasKey("Id");
 

@@ -14,6 +14,7 @@ internal sealed class LanguageDto
 
     // Public constants to bind properties between DTOs
     public const string IsoCodeColumnName = "languageISOCode";
+    public const string LanguageKeyColumnName = "languageKey";
 
     /// <summary>
     ///     Gets or sets the identifier of the language.
@@ -21,6 +22,13 @@ internal sealed class LanguageDto
     [Column(PrimaryKeyColumnName)]
     [PrimaryKeyColumn(IdentitySeed = 2)]
     public short Id { get; set; }
+
+    /// <summary>
+    ///     Gets or sets the unique key of the language.
+    /// </summary>
+    [Column(LanguageKeyColumnName)]
+    [Index(IndexTypes.UniqueNonClustered)]
+    public Guid LanguageKey { get; set; }
 
     /// <summary>
     ///     Gets or sets the ISO code of the language.
