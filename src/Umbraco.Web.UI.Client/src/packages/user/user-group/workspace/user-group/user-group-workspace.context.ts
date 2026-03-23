@@ -118,45 +118,49 @@ export class UmbUserGroupWorkspaceContext
 	}
 
 	async #persistUserChanges() {
-		if (!this.#usersEdited) return;
-
 		const unique = this.getUnique();
-		if (!unique) return;
+		if (!this.#usersEdited || !unique) return;
 
 		const pending = this.#userUniquesState.getValue();
 		const toAdd = pending.filter((u) => !this.#initialUserUniques.includes(u));
 		const toRemove = this.#initialUserUniques.filter((u) => !pending.includes(u));
 
-		let hasError = false;
-
-		if (toAdd.length) {
-			const { error } = await tryExecute(
-				this,
-				UserGroupService.postUserGroupByIdUsers({
-					path: { id: unique },
-					body: toAdd.map((id) => ({ id })),
-				}),
-			);
-			if (error) hasError = true;
-		}
-
-		if (toRemove.length) {
-			const { error } = await tryExecute(
-				this,
-				UserGroupService.deleteUserGroupByIdUsers({
-					path: { id: unique },
-					body: toRemove.map((id) => ({ id })),
-				}),
-			);
-			if (error) hasError = true;
-		}
-
+		// Run add and remove in parallel; track whether either call errored.
 		// Only update local state when all API calls succeeded.
 		// If there was an error, keep #usersEdited = true so the next Save will retry.
-		if (!hasError) {
+		const [addError, removeError] = await Promise.all([
+			this.#addUsersToGroup(unique, toAdd),
+			this.#removeUsersFromGroup(unique, toRemove),
+		]);
+
+		if (!addError && !removeError) {
 			this.#initialUserUniques = [...pending];
 			this.#usersEdited = false;
 		}
+	}
+
+	async #addUsersToGroup(unique: string, userIds: string[]): Promise<boolean> {
+		if (!userIds.length) return false;
+		const { error } = await tryExecute(
+			this,
+			UserGroupService.postUserGroupByIdUsers({
+				path: { id: unique },
+				body: userIds.map((id) => ({ id })),
+			}),
+		);
+		return !!error;
+	}
+
+	async #removeUsersFromGroup(unique: string, userIds: string[]): Promise<boolean> {
+		if (!userIds.length) return false;
+		const { error } = await tryExecute(
+			this,
+			UserGroupService.deleteUserGroupByIdUsers({
+				path: { id: unique },
+				body: userIds.map((id) => ({ id })),
+			}),
+		);
+		return !!error;
 	}
 
 	override resetState() {

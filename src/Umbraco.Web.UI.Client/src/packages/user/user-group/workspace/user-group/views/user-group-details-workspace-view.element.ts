@@ -8,10 +8,10 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
-import type { UmbUserInputElement } from '@umbraco-cms/backoffice/user';
+import type { UmbUserInputElement } from '../../../../user/components/user-input/user-input.element.js';
 
 import '../components/user-group-entity-type-permission-groups.element.js';
-import '@umbraco-cms/backoffice/user';
+import '../../../../user/components/user-input/user-input.element.js';
 
 @customElement('umb-user-group-details-workspace-view')
 export class UmbUserGroupDetailsWorkspaceViewElement extends UmbLitElement implements UmbWorkspaceViewElement {
