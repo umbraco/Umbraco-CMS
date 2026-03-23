@@ -406,8 +406,31 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
 
             if (hasAliasChanged || hasPropertyMainImpact)
             {
-                // add that one, as a main change
-                AddChange(changes, contentType, ContentTypeChangeTypes.RefreshMain);
+                // add granular structural flags (each includes RefreshMain automatically)
+                if (hasAliasChanged)
+                {
+                    AddChange(changes, contentType, ContentTypeChangeTypes.AliasChanged);
+                }
+
+                if (hasAnyPropertyChangedAlias)
+                {
+                    AddChange(changes, contentType, ContentTypeChangeTypes.PropertyAliasChanged);
+                }
+
+                if (hasAnyPropertyBeenRemoved)
+                {
+                    AddChange(changes, contentType, ContentTypeChangeTypes.PropertyRemoved);
+                }
+
+                if (hasAnyCompositionBeenRemoved)
+                {
+                    AddChange(changes, contentType, ContentTypeChangeTypes.CompositionRemoved);
+                }
+
+                if (hasAnyPropertyVariationChanged)
+                {
+                    AddChange(changes, contentType, ContentTypeChangeTypes.PropertyVariationChanged);
+                }
 
                 // Add VariationChanged flag if content type variation changed.
                 // This is used by DocumentUrlService to rebuild URL cache with correct languageId.
