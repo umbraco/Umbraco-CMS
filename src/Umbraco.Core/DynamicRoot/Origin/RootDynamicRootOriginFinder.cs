@@ -22,7 +22,7 @@ public class RootDynamicRootOriginFinder : IDynamicRootOriginFinder
     public RootDynamicRootOriginFinder(IEntityService entityService) => EntityService = entityService;
 
     /// <summary>
-    /// Gets or sets the the <see cref="IEntityService"/>.
+    /// Gets or sets the <see cref="IEntityService"/>.
     /// </summary>
     protected IEntityService EntityService { get; set; }
 

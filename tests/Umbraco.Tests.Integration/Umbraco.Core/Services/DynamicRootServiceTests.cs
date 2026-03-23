@@ -46,7 +46,7 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
 
     private ContentService ContentService => (ContentService)GetRequiredService<IContentService>();
 
-    private DynamicRootService DynamicRootService => (GetRequiredService<IDynamicRootService>() as DynamicRootService)!;
+    private DynamicRootService DynamicRootService => (DynamicRootService)GetRequiredService<IDynamicRootService>();
 
     private IDomainService DomainService => GetRequiredService<IDomainService>();
 
@@ -133,7 +133,7 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
 
         ContentTypeYears = ContentTypeBuilder.CreateSimpleContentType("years", "Years", defaultTemplateId: template.Id);
         ContentTypeYears.Key = new Guid("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522");
-        ContentTypeActs.AllowedContentTypes = [CreateContentTypeSort(ContentTypeYear, 0)];
+        ContentTypeYears.AllowedContentTypes = [CreateContentTypeSort(ContentTypeYear, 0)];
         await ContentTypeService.CreateAsync(ContentTypeYears, Constants.Security.SuperUserKey);
 
         ContentYears = ContentBuilder.CreateSimpleContent(ContentTypeYears, "Years");
@@ -699,7 +699,7 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
         var result = DynamicRootService.FindOriginKey(selector);
 
         // Assert
-        Assert.AreEqual(global::Umbraco.Cms.Core.Constants.System.RootSystemKey, result);
+        Assert.AreEqual(Constants.System.RootSystemKey, result);
     }
 
     /// <summary>
@@ -717,13 +717,13 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
             Context = new DynamicRootContext() { CurrentKey = origin.Key, ParentKey = ContentYears.Key },
         };
 
-        await DomainService.UpdateDomainsAsync(ContentYears.Key, new DomainsUpdateModel
+        await DomainService.UpdateDomainsAsync(origin.Key, new DomainsUpdateModel
         {
             Domains =
             [
                 new DomainModel
                 {
-                    IsoCode = "en-us",
+                    IsoCode = "en-US",
                     DomainName = "http://test.umbraco.com",
                 },
             ],
@@ -757,7 +757,7 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
             [
                 new DomainModel
                 {
-                    IsoCode = "en-us",
+                    IsoCode = "en-US",
                     DomainName = "http://test.umbraco.com",
                 },
             ],
@@ -800,8 +800,8 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
     /// </summary>
     [TestCase(DynamicRootOrigin.ByKey)]
     [TestCase(DynamicRootOrigin.Parent)]
+    [TestCase(DynamicRootOrigin.Current)]
     [TestCase(DynamicRootOrigin.Root)]
-    [TestCase(DynamicRootOrigin.Site)]
     [TestCase(DynamicRootOrigin.Site)]
     public void FindOriginKey_WithRandomNonExistentKey_ReturnsNull(DynamicRootOrigin origin)
     {
