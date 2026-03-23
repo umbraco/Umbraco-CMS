@@ -33,8 +33,8 @@ internal sealed class LanguageRepositoryTest : UmbracoIntegrationTest
         {
             var repository = CreateRepository();
 
-            // Act
-            var language = await repository.GetAsync(1, CancellationToken.None);
+            // Act — look up by ISO code to get the Key, then fetch by Key
+            var language = await repository.GetByIsoCodeAsync("en-US");
 
             // Assert
             Assert.That(language, Is.Not.Null);
@@ -72,7 +72,7 @@ internal sealed class LanguageRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Get_When_Id_Doesnt_Exist_Returns_Null()
+    public async Task Get_When_Key_Doesnt_Exist_Returns_Null()
     {
         // Arrange
         var provider = NewScopeProvider;
@@ -81,7 +81,7 @@ internal sealed class LanguageRepositoryTest : UmbracoIntegrationTest
             var repository = CreateRepository();
 
             // Act
-            var language = await repository.GetAsync(0,  CancellationToken.None);
+            var language = await repository.GetAsync(Guid.Empty, CancellationToken.None);
 
             // Assert
             Assert.That(language, Is.Null);
@@ -121,8 +121,15 @@ internal sealed class LanguageRepositoryTest : UmbracoIntegrationTest
         {
             var repository = CreateRepository();
 
+            // Resolve Keys for the two languages we want to fetch
+            var all = (await repository.GetAllAsync(CancellationToken.None)).ToArray();
+            var keys = all
+                .Where(x => x.IsoCode is "en-US" or "da-DK")
+                .Select(x => x.Key)
+                .ToArray();
+
             // Act
-            var selectedLanguages = await repository.GetManyAsync([1, 2], CancellationToken.None);
+            var selectedLanguages = await repository.GetManyAsync(keys, CancellationToken.None);
             var languages = selectedLanguages.ToArray();
 
             // Assert
@@ -150,7 +157,7 @@ internal sealed class LanguageRepositoryTest : UmbracoIntegrationTest
 
             // Assert
             Assert.That(languageBR.HasIdentity, Is.True);
-            Assert.That(languageBR.Id, Is.EqualTo(6)); // With 5 existing entries the Id should be 6
+            Assert.That(languageBR.Key, Is.Not.EqualTo(Guid.Empty));
             Assert.IsFalse(languageBR.IsDefault);
             Assert.IsFalse(languageBR.IsMandatory);
             Assert.IsNull(languageBR.FallbackIsoCode);
@@ -173,7 +180,7 @@ internal sealed class LanguageRepositoryTest : UmbracoIntegrationTest
 
             // Assert
             Assert.That(languageBR.HasIdentity, Is.True);
-            Assert.That(languageBR.Id, Is.EqualTo(6)); // With 5 existing entries the Id should be 6
+            Assert.That(languageBR.Key, Is.Not.EqualTo(Guid.Empty));
             Assert.IsTrue(languageBR.IsDefault);
             Assert.IsTrue(languageBR.IsMandatory);
             Assert.IsNull(languageBR.FallbackIsoCode);
@@ -196,7 +203,7 @@ internal sealed class LanguageRepositoryTest : UmbracoIntegrationTest
 
             // Assert
             Assert.That(languageBR.HasIdentity, Is.True);
-            Assert.That(languageBR.Id, Is.EqualTo(6)); // With 5 existing entries the Id should be 6
+            Assert.That(languageBR.Key, Is.Not.EqualTo(Guid.Empty));
             Assert.That(languageBR.FallbackIsoCode, Is.EqualTo("en-US"));
             scope.Complete();
         }
@@ -222,7 +229,7 @@ internal sealed class LanguageRepositoryTest : UmbracoIntegrationTest
             // Act
             var languageNZ = new Language("en-NZ", "English (New Zealand)") { IsDefault = true, IsMandatory = true };
             await repository.SaveAsync(languageNZ, CancellationToken.None);
-            languageBR = await repository.GetAsync(languageBR.Id, CancellationToken.None);
+            languageBR = await repository.GetAsync(languageBR.Key, CancellationToken.None);
 
             // Assert
             Assert.IsFalse(languageBR.IsDefault);
@@ -241,14 +248,15 @@ internal sealed class LanguageRepositoryTest : UmbracoIntegrationTest
             var repository = CreateRepository();
 
             // Act
-            var language = await repository.GetAsync(5, CancellationToken.None);
+            var language = await repository.GetByIsoCodeAsync("pt-PT");
+            var languageKey = language.Key;
             language.IsoCode = "pt-BR";
             language.CultureName = "Portuguese (Brazil)";
             language.FallbackIsoCode = "en-US";
 
             await repository.SaveAsync(language, CancellationToken.None);
 
-            var languageUpdated = await repository.GetAsync(5, CancellationToken.None);
+            var languageUpdated = await repository.GetAsync(languageKey, CancellationToken.None);
 
             // Assert
             Assert.That(languageUpdated, Is.Not.Null);
@@ -269,7 +277,7 @@ internal sealed class LanguageRepositoryTest : UmbracoIntegrationTest
             var repository = CreateRepository();
 
             // Act
-            var language = await repository.GetAsync(5, CancellationToken.None);
+            var language = await repository.GetByIsoCodeAsync("pt-PT");
             language.IsoCode = "da-DK";
             language.CultureName = "Danish (Denmark)";
 
@@ -288,10 +296,11 @@ internal sealed class LanguageRepositoryTest : UmbracoIntegrationTest
             var repository = CreateRepository();
 
             // Act
-            var language = await repository.GetAsync(3, CancellationToken.None);
+            var language = await repository.GetByIsoCodeAsync("sv-SE");
+            var languageKey = language.Key;
             await repository.DeleteAsync(language, CancellationToken.None);
 
-            var exists = await repository.ExistsAsync(3, CancellationToken.None);
+            var exists = await repository.ExistsAsync(languageKey, CancellationToken.None);
 
             // Assert
             Assert.That(exists, Is.False);
@@ -308,15 +317,16 @@ internal sealed class LanguageRepositoryTest : UmbracoIntegrationTest
         {
             // Add language to delete as a fall-back language to another one
             var repository = CreateRepository();
-            var languageToFallbackFrom = await repository.GetAsync(5, CancellationToken.None);
+            var languageToFallbackFrom = await repository.GetByIsoCodeAsync("pt-PT");
             languageToFallbackFrom.FallbackIsoCode = "da-DK"; // fall back to "da-DK" (something we can delete)
             await repository.SaveAsync(languageToFallbackFrom, CancellationToken.None);
 
-            // delete #2
-            var languageToDelete = await repository.GetAsync(2, CancellationToken.None);
+            // delete da-DK
+            var languageToDelete = await repository.GetByIsoCodeAsync("da-DK");
+            var deletedKey = languageToDelete.Key;
             await repository.DeleteAsync(languageToDelete, CancellationToken.None);
 
-            var exists = await repository.ExistsAsync(2, CancellationToken.None);
+            var exists = await repository.ExistsAsync(deletedKey, CancellationToken.None);
 
             // has been deleted
             Assert.That(exists, Is.False);
@@ -334,8 +344,9 @@ internal sealed class LanguageRepositoryTest : UmbracoIntegrationTest
             var repository = CreateRepository();
 
             // Act
-            var exists = await repository.ExistsAsync(3, CancellationToken.None);
-            var doesntExist = await repository.ExistsAsync(10, CancellationToken.None);
+            var language = await repository.GetByIsoCodeAsync("sv-SE");
+            var exists = await repository.ExistsAsync(language.Key, CancellationToken.None);
+            var doesntExist = await repository.ExistsAsync(Guid.NewGuid(), CancellationToken.None);
 
             // Assert
             Assert.That(exists, Is.True);

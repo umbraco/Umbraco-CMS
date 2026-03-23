@@ -14,16 +14,16 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.EFCore;
 /// <summary>
 ///     Provides a base class to all <see cref="IEntity" /> based repositories.
 /// </summary>
-/// <typeparam name="TId">The type of the entity's unique identifier.</typeparam>
+/// <typeparam name="TKey">The type of the entity's unique key.</typeparam>
 /// <typeparam name="TEntity">The type of the entity managed by this repository.</typeparam>
-public abstract class AsyncEntityRepositoryBase<TId, TEntity> : AsyncRepositoryBase, IAsyncReadWriteRepository<TId, TEntity>
+public abstract class AsyncEntityRepositoryBase<TKey, TEntity> : AsyncRepositoryBase, IAsyncReadWriteRepository<TKey, TEntity>
     where TEntity : class, IEntity
 {
     private static AsyncRepositoryCachePolicyOptions? _defaultOptions;
 
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="AsyncEntityRepositoryBase{TId, TEntity}"/> class.
+    ///     Initializes a new instance of the <see cref="AsyncEntityRepositoryBase{TKey, TEntity}"/> class.
     /// </summary>
     /// <param name="scopeAccessor">The EF Core scope accessor.</param>
     /// <param name="appCaches">The application caches.</param>
@@ -33,7 +33,7 @@ public abstract class AsyncEntityRepositoryBase<TId, TEntity> : AsyncRepositoryB
     public AsyncEntityRepositoryBase(
         IEFCoreScopeAccessor<UmbracoDbContext> scopeAccessor,
         AppCaches appCaches,
-        ILogger<AsyncEntityRepositoryBase<TId, TEntity>> logger,
+        ILogger<AsyncEntityRepositoryBase<TKey, TEntity>> logger,
         IRepositoryCacheVersionService repositoryCacheVersionService,
         ICacheSyncService cacheSyncService)
         : base(scopeAccessor, appCaches)
@@ -46,7 +46,7 @@ public abstract class AsyncEntityRepositoryBase<TId, TEntity> : AsyncRepositoryB
     /// <summary>
     ///     Gets the logger
     /// </summary>
-    protected ILogger<AsyncEntityRepositoryBase<TId, TEntity>> Logger { get; }
+    protected ILogger<AsyncEntityRepositoryBase<TKey, TEntity>> Logger { get; }
 
     /// <summary>
     ///    Gets the repository cache version service.
@@ -96,13 +96,13 @@ public abstract class AsyncEntityRepositoryBase<TId, TEntity> : AsyncRepositoryB
     ///     Gets the repository cache policy
     /// </summary>
     [field: AllowNull, MaybeNull]
-    protected IAsyncRepositoryCachePolicy<TEntity, TId> CachePolicy
+    protected IAsyncRepositoryCachePolicy<TEntity, TKey> CachePolicy
     {
         get
         {
             if (AppCaches == AppCaches.NoCache)
             {
-                return AsyncNoCacheRepositoryCachePolicy<TEntity, TId>.Instance;
+                return AsyncNoCacheRepositoryCachePolicy<TEntity, TKey>.Instance;
             }
 
             // create the cache policy using IsolatedCache which is either global
@@ -116,7 +116,7 @@ public abstract class AsyncEntityRepositoryBase<TId, TEntity> : AsyncRepositoryB
                     // scope cache mode
                     return field ??= CreateCachePolicy();
                 case RepositoryCacheMode.None:
-                    return AsyncNoCacheRepositoryCachePolicy<TEntity, TId>.Instance;
+                    return AsyncNoCacheRepositoryCachePolicy<TEntity, TKey>.Instance;
                 default:
                     throw new Exception("oops: cache mode.");
             }
@@ -149,13 +149,13 @@ public abstract class AsyncEntityRepositoryBase<TId, TEntity> : AsyncRepositoryB
         await CachePolicy.DeleteAsync(entity, PersistDeletedItemAsync);
 
     /// <summary>
-    ///     Gets an entity by its identifier, utilizing the repository cache policy.
+    ///     Gets an entity by its key, utilizing the repository cache policy.
     /// </summary>
-    /// <param name="id">The identifier.</param>
+    /// <param name="key">The key.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The entity, or <see langword="null"/> if not found.</returns>
-    public async Task<TEntity?> GetAsync(TId? id, CancellationToken cancellationToken) =>
-        await CachePolicy.GetAsync(id, PerformGetAsync, PerformGetAllAsync);
+    public async Task<TEntity?> GetAsync(TKey? key, CancellationToken cancellationToken) =>
+        await CachePolicy.GetAsync(key, PerformGetAsync, PerformGetAllAsync);
 
     /// <summary>
     ///     Gets all entities of type <typeparamref name="TEntity"/>, or a subset matching the passed identifiers.
@@ -163,15 +163,15 @@ public abstract class AsyncEntityRepositoryBase<TId, TEntity> : AsyncRepositoryB
     /// <param name="ids">The identifiers to retrieve, or <see langword="null"/> to get all.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The matching entities.</returns>
-    public async Task<IEnumerable<TEntity>> GetManyAsync(TId[]? ids, CancellationToken cancellationToken)
+    public async Task<IEnumerable<TEntity>> GetManyAsync(TKey[]? keys, CancellationToken cancellationToken)
     {
-        if (ids is null)
+        if (keys is null)
         {
             return await GetAllAsync(cancellationToken);
         }
 
         // ensure they are de-duplicated, easy win if people don't do this as this can cause many excess queries
-        ids = ids.Distinct()
+        keys = keys.Distinct()
 
             // don't query by anything that is a default of T (like a zero)
             // TODO: I think we should enabled this in case accidental calls are made to get all with invalid ids
@@ -180,13 +180,13 @@ public abstract class AsyncEntityRepositoryBase<TId, TEntity> : AsyncRepositoryB
 
         // can't query more than 2000 ids at a time... but if someone is really querying 2000+ entities,
         // the additional overhead of fetching them in groups is minimal compared to the lookup time of each group
-        if (ids.Length <= Core.Constants.Sql.MaxParameterCount)
+        if (keys.Length <= Core.Constants.Sql.MaxParameterCount)
         {
-            return await CachePolicy.GetManyAsync(ids, PerformGetManyAsync, PerformGetAllAsync);
+            return await CachePolicy.GetManyAsync(keys, PerformGetManyAsync, PerformGetAllAsync);
         }
 
         var entities = new List<TEntity>();
-        foreach (IEnumerable<TId> group in ids.InGroupsOf(Core.Constants.Sql.MaxParameterCount))
+        foreach (IEnumerable<TKey> group in keys.InGroupsOf(Core.Constants.Sql.MaxParameterCount))
         {
             TEntity[] groups = await CachePolicy.GetManyAsync(group.ToArray(), PerformGetManyAsync, PerformGetAllAsync);
             entities.AddRange(groups);
@@ -204,26 +204,26 @@ public abstract class AsyncEntityRepositoryBase<TId, TEntity> : AsyncRepositoryB
         await CachePolicy.GetAllAsync(PerformGetAllAsync);
 
     /// <summary>
-    ///     Returns a value indicating whether an entity with the specified identifier exists.
+    ///     Returns a value indicating whether an entity with the specified key exists.
     /// </summary>
-    /// <param name="id">The identifier.</param>
+    /// <param name="key">The key.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns><see langword="true"/> if an entity with the identifier exists; otherwise <see langword="false"/>.</returns>
-    public async Task<bool> ExistsAsync(TId id, CancellationToken cancellationToken)
-        => await CachePolicy.ExistsAsync(id, PerformExistsAsync, PerformGetAllAsync);
+    /// <returns><see langword="true"/> if an entity with the key exists; otherwise <see langword="false"/>.</returns>
+    public async Task<bool> ExistsAsync(TKey key, CancellationToken cancellationToken)
+        => await CachePolicy.ExistsAsync(key, PerformExistsAsync, PerformGetAllAsync);
 
     /// <summary>
-    ///     Get the entity id for the <typeparamref name="TEntity"/>.
+    ///     Get the entity key for the <typeparamref name="TEntity"/>.
     /// </summary>
-    protected virtual TId GetEntityId(TEntity entity) // TODO: change TId into Guid, as all entities should be using Guid keys
-        => (TId)(object)entity.Key;
+    protected virtual Guid GetEntityKey(TEntity entity)
+        => entity.Key;
 
     /// <summary>
     ///     Creates the repository cache policy.
     /// </summary>
     /// <returns>The cache policy to use for this repository.</returns>
-    protected virtual IAsyncRepositoryCachePolicy<TEntity, TId> CreateCachePolicy()
-        => new AsyncDefaultRepositoryCachePolicy<TEntity, TId>(
+    protected virtual IAsyncRepositoryCachePolicy<TEntity, TKey> CreateCachePolicy()
+        => new AsyncDefaultRepositoryCachePolicy<TEntity, TKey>(
             GlobalIsolatedCache,
             ScopeAccessor,
             DefaultOptions,
@@ -233,9 +233,9 @@ public abstract class AsyncEntityRepositoryBase<TId, TEntity> : AsyncRepositoryB
     /// <summary>
     ///     Performs the actual get operation against the data store.
     /// </summary>
-    /// <param name="id">The identifier of the entity to retrieve.</param>
+    /// <param name="key">The key of the entity to retrieve.</param>
     /// <returns>The entity, or <see langword="null"/> if not found.</returns>
-    protected abstract Task<TEntity?> PerformGetAsync(TId? id);
+    protected abstract Task<TEntity?> PerformGetAsync(TKey? key);
 
     /// <summary>
     ///     Performs the actual get-all operation against the data store.
@@ -246,9 +246,9 @@ public abstract class AsyncEntityRepositoryBase<TId, TEntity> : AsyncRepositoryB
     /// <summary>
     ///     Performs the actual get-many operation against the data store.
     /// </summary>
-    /// <param name="ids">The identifiers of the entities to retrieve.</param>
+    /// <param name="keys">The keys of the entities to retrieve.</param>
     /// <returns>The matching entities, or <see langword="null"/>.</returns>
-    protected abstract Task<IEnumerable<TEntity>?> PerformGetManyAsync(TId[]? ids);
+    protected abstract Task<IEnumerable<TEntity>?> PerformGetManyAsync(TKey[]? keys);
 
     /// <summary>
     ///     Persists a new entity to the data store.
@@ -265,17 +265,17 @@ public abstract class AsyncEntityRepositoryBase<TId, TEntity> : AsyncRepositoryB
     /// <summary>
     ///     Performs the actual exists check against the data store.
     /// </summary>
-    /// <param name="id">The identifier to check.</param>
-    /// <returns><see langword="true"/> if an entity with the identifier exists; otherwise <see langword="false"/>.</returns>
-    protected virtual Task<bool> PerformExistsAsync(TId id)
+    /// <param name="key">The key to check.</param>
+    /// <returns><see langword="true"/> if an entity with the key exists; otherwise <see langword="false"/>.</returns>
+    protected virtual Task<bool> PerformExistsAsync(TKey key)
         => AmbientScope.ExecuteWithContextAsync(async db =>
         {
-            if (id is not Guid key)
+            if (key is not Guid actualKey)
             {
                 return false;
             }
 
-            return await db.Set<TEntity>().AnyAsync(e => e.Key == key);
+            return await db.Set<TEntity>().AnyAsync(e => e.Key == actualKey);
         });
 
     /// <summary>
@@ -286,7 +286,7 @@ public abstract class AsyncEntityRepositoryBase<TId, TEntity> : AsyncRepositoryB
     {
         await AmbientScope.ExecuteWithContextAsync(async db =>
         {
-            await db.Set<TEntity>().Where(x => x.Id == entity.Id).ExecuteDeleteAsync();
+            await db.Set<TEntity>().Where(x => x.Key == entity.Key).ExecuteDeleteAsync();
             return true;
         });
 

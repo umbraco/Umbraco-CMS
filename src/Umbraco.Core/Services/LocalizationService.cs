@@ -311,11 +311,11 @@ internal class LocalizationService : RepositoryService, ILocalizationService
 
     /// <inheritdoc />
     [Obsolete("Please use ILanguageService for language operations. Scheduled for removal in Umbraco 18.")]
-    public int? GetDefaultLanguageId()
+    public Guid? GetDefaultLanguageKey()
     {
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
-            return _languageRepository.GetDefaultIdAsync().GetAwaiter().GetResult();
+            return _languageRepository.GetDefaultKeyAsync().GetAwaiter().GetResult();
         }
     }
 

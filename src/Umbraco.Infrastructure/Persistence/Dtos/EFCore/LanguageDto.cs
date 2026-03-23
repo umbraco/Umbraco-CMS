@@ -19,6 +19,11 @@ public class LanguageDto
     public int Id { get; set; }
 
     /// <summary>
+    ///     Gets or sets the unique key of the language.
+    /// </summary>
+    public Guid LanguageKey { get; set; }
+
+    /// <summary>
     ///     Gets or sets the ISO code of the language.
     /// </summary>
     public string? IsoCode { get; set; }

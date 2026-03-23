@@ -18,13 +18,15 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 /// <summary>
 ///     Represents a repository for doing CRUD operations for <see cref="Language" />
 /// </summary>
-internal sealed class LanguageRepository : AsyncEntityRepositoryBase<int, ILanguage>, ILanguageRepository
+internal sealed class LanguageRepository : AsyncEntityRepositoryBase<Guid, ILanguage>, ILanguageRepository
 {
-    // We need to lock this dictionary every time we do an operation on it as the languageRepository is registered as a unique implementation
-    // It is used to quickly get isoCodes by Id, or the reverse by avoiding (deep)cloning dtos
-    // It is rebuild on PerformGetAll
+    // Lock on _codeKeyMap for all map operations — the repository is a singleton.
+    // Maps are rebuilt on PerformGetAllAsync and allow fast ISO code / Key lookups without deep-cloning.
+    private readonly Dictionary<string, Guid> _codeKeyMap = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<Guid, string> _keyCodeMap = new();
+
+    // Internal bridge map: ISO code to int ID. Only used for FK columns that still reference language by int.
     private readonly Dictionary<string, int> _codeIdMap = new(StringComparer.OrdinalIgnoreCase);
-    private readonly Dictionary<int, string> _idCodeMap = new();
 
     private CancellationToken CancellationToken => CancellationToken.None;
 
@@ -43,22 +45,20 @@ internal sealed class LanguageRepository : AsyncEntityRepositoryBase<int, ILangu
     {
     }
 
-    private AsyncFullDataSetRepositoryCachePolicy<ILanguage, int>? TypedCachePolicy =>
-        CachePolicy as AsyncFullDataSetRepositoryCachePolicy<ILanguage, int>;
+    private AsyncFullDataSetRepositoryCachePolicy<ILanguage, Guid>? TypedCachePolicy =>
+        CachePolicy as AsyncFullDataSetRepositoryCachePolicy<ILanguage, Guid>;
 
-    // The base class GetEntityId casts entity.Key (Guid) to TId, which fails when TId is int.
-    // Language entities use int IDs, so we override to return entity.Id directly.
-    protected override int GetEntityId(ILanguage entity) => entity.Id;
+    protected override Guid GetEntityKey(ILanguage entity) => entity.Key;
 
     public async Task<ILanguage?> GetByIsoCodeAsync(string isoCode)
     {
         await EnsureCacheIsPopulatedAsync();
 
-        var id = await GetIdByIsoCodeAsync(isoCode, false);
-        return id.HasValue ? await GetAsync(id.Value, CancellationToken) : null;
+        Guid? key = await GetKeyByIsoCodeAsync(isoCode, false);
+        return key.HasValue ? await GetAsync(key.Value, CancellationToken) : null;
     }
 
-    public async Task<int?> GetIdByIsoCodeAsync(string? isoCode, bool throwOnNotFound = true)
+    public async Task<Guid?> GetKeyByIsoCodeAsync(string? isoCode, bool throwOnNotFound = true)
     {
         if (isoCode == null)
         {
@@ -67,11 +67,11 @@ internal sealed class LanguageRepository : AsyncEntityRepositoryBase<int, ILangu
 
         await EnsureMapsPopulatedAsync();
 
-        lock (_codeIdMap)
+        lock (_codeKeyMap)
         {
-            if (_codeIdMap.TryGetValue(isoCode, out var id))
+            if (_codeKeyMap.TryGetValue(isoCode, out Guid key))
             {
-                return id;
+                return key;
             }
         }
 
@@ -83,18 +83,18 @@ internal sealed class LanguageRepository : AsyncEntityRepositoryBase<int, ILangu
         return null;
     }
 
-    public async Task<string?> GetIsoCodeByIdAsync(int? id, bool throwOnNotFound = true)
+    public async Task<string?> GetIsoCodeByKeyAsync(Guid? key, bool throwOnNotFound = true)
     {
-        if (id == null)
+        if (key == null)
         {
             return null;
         }
 
         await EnsureMapsPopulatedAsync();
 
-        lock (_codeIdMap)
+        lock (_codeKeyMap)
         {
-            if (_idCodeMap.TryGetValue(id.Value, out var isoCode))
+            if (_keyCodeMap.TryGetValue(key.Value, out var isoCode))
             {
                 return isoCode;
             }
@@ -102,36 +102,35 @@ internal sealed class LanguageRepository : AsyncEntityRepositoryBase<int, ILangu
 
         if (throwOnNotFound)
         {
-            throw new ArgumentException($"Id {id} does not correspond to an existing language.", nameof(id));
+            throw new ArgumentException($"Key {key} does not correspond to an existing language.", nameof(key));
         }
 
         return null;
     }
 
-    // multi implementation of GetIsoCodeById
-    public async Task<string[]> GetIsoCodesByIdsAsync(ICollection<int> ids, bool throwOnNotFound = true)
+    public async Task<string[]> GetIsoCodesByKeysAsync(ICollection<Guid> keys, bool throwOnNotFound = true)
     {
-        var isoCodes = new string[ids.Count];
+        var isoCodes = new string[keys.Count];
 
-        if (ids.Any() == false)
+        if (keys.Any() == false)
         {
             return isoCodes;
         }
 
         await EnsureMapsPopulatedAsync();
 
-        lock (_codeIdMap)
+        lock (_codeKeyMap)
         {
-            for (var i = 0; i < ids.Count; i++)
+            for (var i = 0; i < keys.Count; i++)
             {
-                var id = ids.ElementAt(i);
-                if (_idCodeMap.TryGetValue(id, out var isoCode))
+                Guid key = keys.ElementAt(i);
+                if (_keyCodeMap.TryGetValue(key, out var isoCode))
                 {
                     isoCodes[i] = isoCode;
                 }
                 else if (throwOnNotFound)
                 {
-                    throw new ArgumentException($"Id {id} does not correspond to an existing language.", nameof(id));
+                    throw new ArgumentException($"Key {key} does not correspond to an existing language.", nameof(key));
                 }
             }
         }
@@ -145,29 +144,22 @@ internal sealed class LanguageRepository : AsyncEntityRepositoryBase<int, ILangu
         return defaultLanguage.IsoCode;
     }
 
-    public async Task<int?> GetDefaultIdAsync()
+    public async Task<Guid?> GetDefaultKeyAsync()
     {
         ILanguage defaultLanguage = await GetDefaultAsync();
-        return defaultLanguage.Id;
+        return defaultLanguage.Key;
     }
 
-    protected override IAsyncRepositoryCachePolicy<ILanguage, int> CreateCachePolicy() =>
-        new AsyncFullDataSetRepositoryCachePolicy<ILanguage, int>(GlobalIsolatedCache, ScopeAccessor,
-            RepositoryCacheVersionService, CacheSyncService, GetEntityId, /*expires:*/ false);
+    protected override IAsyncRepositoryCachePolicy<ILanguage, Guid> CreateCachePolicy() =>
+        new AsyncFullDataSetRepositoryCachePolicy<ILanguage, Guid>(GlobalIsolatedCache, ScopeAccessor,
+            RepositoryCacheVersionService, CacheSyncService, GetEntityKey, /*expires:*/ false);
 
-    private ILanguage ConvertFromDto(LanguageDto dto)
-    {
-        lock (_codeIdMap)
-        {
-            string? fallbackIsoCode = null;
-            if (dto.FallbackLanguageId.HasValue && _idCodeMap.TryGetValue(dto.FallbackLanguageId.Value, out fallbackIsoCode) == false)
-            {
-                throw new ArgumentException($"The ISO code map did not contain ISO code for fallback language ID: {dto.FallbackLanguageId}. Please reload the caches.");
-            }
-
-            return LanguageFactory.BuildEntity(dto, fallbackIsoCode);
-        }
-    }
+    /// <summary>
+    /// Converts a DTO to a domain entity. Uses the navigation property for fallback resolution,
+    /// so the DTO must be loaded with <c>.Include(x => x.FallbackLanguage)</c>.
+    /// </summary>
+    private static ILanguage ConvertFromDto(LanguageDto dto) =>
+        LanguageFactory.BuildEntity(dto, dto.FallbackLanguage?.IsoCode);
 
     // do NOT leak that language, it's not deep-cloned!
     private async Task<ILanguage> GetDefaultAsync()
@@ -192,7 +184,7 @@ internal sealed class LanguageRepository : AsyncEntityRepositoryBase<int, ILangu
         ILanguage? first = null;
         foreach (ILanguage l in languages)
         {
-            if (first == null || l.Id < first.Id)
+            if (first == null || l.Key < first.Key)
             {
                 first = l;
             }
@@ -203,27 +195,30 @@ internal sealed class LanguageRepository : AsyncEntityRepositoryBase<int, ILangu
 
     #region Overrides of RepositoryBase<int,Language>
 
-    protected override async Task<ILanguage?> PerformGetAsync(int id) =>
-        (await PerformGetManyAsync([id]))?.FirstOrDefault();
+    protected override async Task<ILanguage?> PerformGetAsync(Guid key) =>
+        (await PerformGetManyAsync([key]))?.FirstOrDefault();
 
     protected override async Task<IEnumerable<ILanguage>?> PerformGetAllAsync() =>
         await AmbientScope.ExecuteWithContextAsync(async db =>
         {
             List<LanguageDto> dtos = await db.Language
+                .Include(x => x.FallbackLanguage)
                 .OrderBy(x => x.Id)
                 .ToListAsync();
 
-            // Rebuild the code/id maps so lookups by ISO code or ID work
-            lock (_codeIdMap)
+            // Rebuild all maps from the full dataset
+            lock (_codeKeyMap)
             {
+                _codeKeyMap.Clear();
+                _keyCodeMap.Clear();
                 _codeIdMap.Clear();
-                _idCodeMap.Clear();
                 foreach (LanguageDto dto in dtos)
                 {
                     if (dto.IsoCode != null)
                     {
+                        _codeKeyMap[dto.IsoCode] = dto.LanguageKey;
+                        _keyCodeMap[dto.LanguageKey] = dto.IsoCode;
                         _codeIdMap[dto.IsoCode] = dto.Id;
-                        _idCodeMap[dto.Id] = dto.IsoCode;
                     }
                 }
             }
@@ -234,9 +229,9 @@ internal sealed class LanguageRepository : AsyncEntityRepositoryBase<int, ILangu
                 .AsEnumerable();
         });
 
-    protected override async Task<IEnumerable<ILanguage>?> PerformGetManyAsync(int[]? ids)
+    protected override async Task<IEnumerable<ILanguage>?> PerformGetManyAsync(Guid[]? keys)
     {
-        if (ids is null)
+        if (keys is null)
         {
             return null;
         }
@@ -244,7 +239,8 @@ internal sealed class LanguageRepository : AsyncEntityRepositoryBase<int, ILangu
         return await AmbientScope.ExecuteWithContextAsync(async db =>
         {
             List<LanguageDto> dtos = await db.Language
-                .Where(x => ids.Contains(x.Id))
+                .Include(x => x.FallbackLanguage)
+                .Where(x => keys.Contains(x.LanguageKey))
                 .OrderBy(x => x.Id)
                 .ToListAsync();
 
@@ -292,13 +288,14 @@ internal sealed class LanguageRepository : AsyncEntityRepositoryBase<int, ILangu
             await db.SaveChangesAsync();
 
             entity.Id = dto.Id;
+            entity.Key = dto.LanguageKey;
             entity.ResetDirtyProperties();
 
-            // yes, we want to lock _codeIdMap
-            lock (_codeIdMap)
+            lock (_codeKeyMap)
             {
+                _codeKeyMap[entity.IsoCode] = entity.Key;
+                _keyCodeMap[entity.Key] = entity.IsoCode;
                 _codeIdMap[entity.IsoCode] = entity.Id;
-                _idCodeMap[entity.Id] = entity.IsoCode;
             }
         });
 
@@ -329,12 +326,12 @@ internal sealed class LanguageRepository : AsyncEntityRepositoryBase<int, ILangu
             }
             else
             {
-                var defaultId = await db.Language
+                var defaultKey = await db.Language
                     .Where(x => x.IsDefault)
-                    .Select(x => x.Id)
+                    .Select(x => x.LanguageKey)
                     .FirstOrDefaultAsync();
 
-                if (entity.Id == defaultId)
+                if (entity.Key == defaultKey)
                 {
                     throw new InvalidOperationException(
                         $"Cannot save the default language ({entity.IsoCode}) as non-default. Make another language the default language instead.");
@@ -344,7 +341,7 @@ internal sealed class LanguageRepository : AsyncEntityRepositoryBase<int, ILangu
             if (entity.IsPropertyDirty(nameof(ILanguage.IsoCode)))
             {
                 var countOfSameCode = await db.Language
-                    .CountAsync(x => x.IsoCode == entity.IsoCode && x.Id != entity.Id);
+                    .CountAsync(x => x.IsoCode == entity.IsoCode && x.LanguageKey != entity.Key);
 
                 if (countOfSameCode > 0)
                 {
@@ -355,11 +352,11 @@ internal sealed class LanguageRepository : AsyncEntityRepositoryBase<int, ILangu
 
             // fallback cycles are detected at service level
 
-            // update
+            // update — LanguageKey is immutable, not included in SetProperty
             LanguageDto dto = LanguageFactory.BuildDto(entity, GetFallbackLanguageId(entity));
             await db.UpsertAsync(dto, () =>
                 db.Language
-                    .Where(x => x.Id == dto.Id)
+                    .Where(x => x.LanguageKey == dto.LanguageKey)
                     .ExecuteUpdateAsync(setter => setter
                         .SetProperty(x => x.IsoCode, dto.IsoCode)
                         .SetProperty(x => x.CultureName, dto.CultureName)
@@ -369,12 +366,13 @@ internal sealed class LanguageRepository : AsyncEntityRepositoryBase<int, ILangu
 
             entity.ResetDirtyProperties();
 
-            // yes, we want to lock _codeIdMap
-            lock (_codeIdMap)
+            lock (_codeKeyMap)
             {
+                _codeKeyMap.RemoveAll(kvp => kvp.Value == entity.Key);
+                _codeKeyMap[entity.IsoCode] = entity.Key;
+                _keyCodeMap[entity.Key] = entity.IsoCode;
                 _codeIdMap.RemoveAll(kvp => kvp.Value == entity.Id);
                 _codeIdMap[entity.IsoCode] = entity.Id;
-                _idCodeMap[entity.Id] = entity.IsoCode;
             }
         });
 
@@ -382,48 +380,50 @@ internal sealed class LanguageRepository : AsyncEntityRepositoryBase<int, ILangu
     protected override async Task PersistDeletedItemAsync(ILanguage entity) =>
         await AmbientScope.ExecuteWithContextAsync<LanguageDto>(async db =>
         {
-            var defaultId = await db.Language
+            var defaultKey = await db.Language
                 .Where(x => x.IsDefault)
-                .Select(x => x.Id)
+                .Select(x => x.LanguageKey)
                 .FirstOrDefaultAsync();
 
-            if (entity.Id == defaultId)
+            if (entity.Key == defaultKey)
             {
                 throw new InvalidOperationException($"Cannot delete the default language ({entity.IsoCode}).");
             }
 
             // We need to remove any references to the language if it's being used as a fall-back from other ones
+            // FallbackLanguageId is an int FK — must use entity.Id here
             await db.Language
                 .Where(x => x.FallbackLanguageId == entity.Id)
                 .ExecuteUpdateAsync(setter => setter
                     .SetProperty(x => x.FallbackLanguageId, (int?)null));
 
+            // DeleteReferences uses int ID for raw SQL against tables with int languageId FKs
             await DeleteReferences(entity.Id, db);
 
             // delete the language itself
             await db.Language
-                .Where(x => x.Id == entity.Id)
+                .Where(x => x.LanguageKey == entity.Key)
                 .ExecuteDeleteAsync();
 
-            // yes, we want to lock _codeIdMap
-            lock (_codeIdMap)
+            lock (_codeKeyMap)
             {
+                _codeKeyMap.RemoveAll(kvp => kvp.Value == entity.Key);
+                _keyCodeMap.Remove(entity.Key);
                 _codeIdMap.RemoveAll(kvp => kvp.Value == entity.Id);
-                _idCodeMap.Remove(entity.Id);
             }
         });
 
     /// <summary>
-    /// Ensures the in-memory ISO code/ID maps are populated.
+    /// Ensures the in-memory maps are populated.
     /// If the maps already contain data, returns immediately without requiring an EF Core scope.
-    /// This allows NPoco code paths to perform ID/IsoCode lookups
+    /// This allows NPoco code paths to perform ISO code/Key lookups
     /// without needing an ambient EF Core scope.
     /// </summary>
     private async Task EnsureMapsPopulatedAsync()
     {
-        lock (_codeIdMap)
+        lock (_codeKeyMap)
         {
-            if (_codeIdMap.Count > 0)
+            if (_codeKeyMap.Count > 0)
             {
                 return;
             }
@@ -454,9 +454,9 @@ internal sealed class LanguageRepository : AsyncEntityRepositoryBase<int, ILangu
             return false;
         }
 
-        lock (_codeIdMap)
+        lock (_codeKeyMap)
         {
-            if (_codeIdMap.Count > 0)
+            if (_codeKeyMap.Count > 0)
             {
                 return true;
             }
@@ -465,13 +465,14 @@ internal sealed class LanguageRepository : AsyncEntityRepositoryBase<int, ILangu
             {
                 if (language.IsoCode is not null)
                 {
+                    _codeKeyMap[language.IsoCode] = language.Key;
+                    _keyCodeMap[language.Key] = language.IsoCode;
                     _codeIdMap[language.IsoCode] = language.Id;
-                    _idCodeMap[language.Id] = language.IsoCode;
                 }
             }
         }
 
-        return _codeIdMap.Count > 0;
+        return _codeKeyMap.Count > 0;
     }
 
     private async Task EnsureCacheIsPopulatedAsync()
@@ -483,20 +484,24 @@ internal sealed class LanguageRepository : AsyncEntityRepositoryBase<int, ILangu
         }
         else
         {
-            await PerformGetAllAsync(); // We don't have a typed cache (i.e. unit tests) but need to populate the _codeIdMap
+            await PerformGetAllAsync(); // We don't have a typed cache (i.e. unit tests) but need to populate maps
         }
     }
 
+    /// <summary>
+    /// Resolves the int ID of a fallback language from its ISO code.
+    /// Uses the internal <c>_codeIdMap</c> which is populated on cache load.
+    /// This is needed because the FallbackLanguageId column is still an int FK.
+    /// </summary>
     private int? GetFallbackLanguageId(ILanguage entity)
     {
-        int? fallbackLanguageId = null;
         if (entity.FallbackIsoCode.IsNullOrWhiteSpace() == false &&
             _codeIdMap.TryGetValue(entity.FallbackIsoCode, out var languageId))
         {
-            fallbackLanguageId = languageId;
+            return languageId;
         }
 
-        return fallbackLanguageId;
+        return null;
     }
 
     /// <summary>

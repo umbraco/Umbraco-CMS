@@ -15,6 +15,9 @@ public class LanguageDtoConfiguration : IEntityTypeConfiguration<LanguageDto>
             .HasColumnName(LanguageDto.PrimaryKeyColumnName)
             .ValueGeneratedOnAdd();
 
+        builder.Property(x => x.LanguageKey)
+            .HasColumnName("languageKey");
+
         builder.Property(x => x.IsoCode)
             .HasColumnName(LanguageDto.IsoCodeColumnName)
             .HasMaxLength(14);
@@ -33,6 +36,9 @@ public class LanguageDtoConfiguration : IEntityTypeConfiguration<LanguageDto>
 
         builder.Property(x => x.FallbackLanguageId)
             .HasColumnName("fallbackLanguageId");
+
+        builder.HasIndex(x => x.LanguageKey)
+            .IsUnique();
 
         builder.HasIndex(x => x.IsoCode)
             .IsUnique();

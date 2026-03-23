@@ -1,16 +1,16 @@
 ﻿namespace Umbraco.Cms.Core.Persistence;
 
-public interface IAsyncReadRepository<in TId, TEntity> : IRepository
+public interface IAsyncReadRepository<in TKey, TEntity> : IRepository
 {
     /// <summary>
     ///     Gets an entity.
     /// </summary>
-    Task<TEntity?> GetAsync(TId? id, CancellationToken cancellationToken);
+    Task<TEntity?> GetAsync(TKey? key, CancellationToken cancellationToken);
 
     /// <summary>
     ///     Gets entities.
     /// </summary>
-    Task<IEnumerable<TEntity>> GetManyAsync(TId[] ids, CancellationToken cancellationToken);
+    Task<IEnumerable<TEntity>> GetManyAsync(TKey[] keys, CancellationToken cancellationToken);
 
     /// <summary>
     ///     Gets all entities.
@@ -20,5 +20,5 @@ public interface IAsyncReadRepository<in TId, TEntity> : IRepository
     /// <summary>
     ///     Gets a value indicating whether an entity exists.
     /// </summary>
-    Task<bool> ExistsAsync(TId id, CancellationToken cancellationToken);
+    Task<bool> ExistsAsync(TKey key, CancellationToken cancellationToken);
 }
