@@ -87,7 +87,7 @@ BEGIN CATCH
     SELECT CAST(0 AS BIT) AS Success, ERROR_MESSAGE() AS ErrorMessage;
 END CATCH";
 
-            RetrustResultDto result = Database.Fetch<RetrustResultDto>(sql).First();
+            RetrustResultDto result = Database.Single<RetrustResultDto>(sql);
 
             if (result.Success)
             {
