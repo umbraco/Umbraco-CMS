@@ -135,7 +135,7 @@ public sealed class BlockEditorVarianceHandler
     [Obsolete("Use the overload accepting allLanguages. Scheduled for removal in Umbraco 19.")]
     public async Task<IEnumerable<BlockItemVariation>> AlignedExposeVarianceAsync(BlockValue blockValue, IPublishedElement owner, IPublishedElement element)
     {
-        IEnumerable<ILanguage> allLanguages = await _languageService.GetAllAsync();
+        IReadOnlyList<ILanguage> allLanguages = (await _languageService.GetAllAsync()).ToList();
         return await AlignedExposeVarianceAsync(blockValue, owner, element, allLanguages);
     }
 
@@ -153,7 +153,7 @@ public sealed class BlockEditorVarianceHandler
     /// adds synthetic expose entries for languages that fall back to an already-exposed culture. This ensures blocks are visible when requesting a
     /// language that has a fallback path to the culture the block was exposed for.</para>
     /// </remarks>
-    public async Task<IEnumerable<BlockItemVariation>> AlignedExposeVarianceAsync(BlockValue blockValue, IPublishedElement owner, IPublishedElement element, IEnumerable<ILanguage> allLanguages)
+    public async Task<IEnumerable<BlockItemVariation>> AlignedExposeVarianceAsync(BlockValue blockValue, IPublishedElement owner, IPublishedElement element, IReadOnlyList<ILanguage> allLanguages)
     {
         BlockItemVariation[] blockVariations = blockValue.Expose.Where(v => v.ContentKey == element.Key).ToArray();
         if (blockVariations.Any() is false)
@@ -200,22 +200,21 @@ public sealed class BlockEditorVarianceHandler
     private static IReadOnlyList<BlockItemVariation> GetLanguageFallbackExposeEntries(
         BlockItemVariation[] blockVariations,
         Guid elementKey,
-        IEnumerable<ILanguage> allLanguages)
+        IReadOnlyList<ILanguage> allLanguages)
     {
-        var existingCultures = new HashSet<string?>(
+        // Track existing exposure by (culture, segment) so we only create fallback entries for specific segments that
+        // are missing — not skip an entire language just because it has some segments already exposed.
+        var cultureSegmentComparer = new CultureSegmentEqualityComparer();
+        var existingExposure = new HashSet<(string? Culture, string? Segment)>(
+            blockVariations.Select(v => (v.Culture, v.Segment)), cultureSegmentComparer);
+        var exposedCultures = new HashSet<string?>(
             blockVariations.Select(v => v.Culture), StringComparer.OrdinalIgnoreCase);
 
-        var languageList = allLanguages as IReadOnlyList<ILanguage> ?? allLanguages.ToList();
-        var languagesByIsoCode = languageList.ToDictionary(l => l.IsoCode, StringComparer.OrdinalIgnoreCase);
+        var languagesByIsoCode = allLanguages.ToDictionary(l => l.IsoCode, StringComparer.OrdinalIgnoreCase);
         var fallbackEntries = new List<BlockItemVariation>();
 
-        foreach (ILanguage language in languageList)
+        foreach (ILanguage language in allLanguages)
         {
-            if (existingCultures.Contains(language.IsoCode))
-            {
-                continue;
-            }
-
             // Walk the fallback chain for this language.
             var visited = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             ILanguage? current = language;
@@ -226,12 +225,17 @@ public sealed class BlockEditorVarianceHandler
                     break;
                 }
 
-                if (existingCultures.Contains(current.FallbackIsoCode))
+                if (exposedCultures.Contains(current.FallbackIsoCode))
                 {
                     foreach (BlockItemVariation fallbackVariation in blockVariations
                         .Where(v => string.Equals(v.Culture, current.FallbackIsoCode, StringComparison.OrdinalIgnoreCase)))
                     {
-                        fallbackEntries.Add(new BlockItemVariation(elementKey, language.IsoCode, fallbackVariation.Segment));
+                        (string IsoCode, string? Segment) candidate = (language.IsoCode, fallbackVariation.Segment);
+                        if (existingExposure.Contains(candidate) is false)
+                        {
+                            fallbackEntries.Add(new BlockItemVariation(elementKey, language.IsoCode, fallbackVariation.Segment));
+                            existingExposure.Add(candidate);
+                        }
                     }
 
                     break;
@@ -316,4 +320,16 @@ public sealed class BlockEditorVarianceHandler
 
     private static bool VariesByCulture(BlockPropertyValue blockPropertyValue)
         => blockPropertyValue.Culture.IsNullOrWhiteSpace() is false;
+
+    private sealed class CultureSegmentEqualityComparer : IEqualityComparer<(string? Culture, string? Segment)>
+    {
+        public bool Equals((string? Culture, string? Segment) x, (string? Culture, string? Segment) y)
+            => StringComparer.OrdinalIgnoreCase.Equals(x.Culture, y.Culture)
+               && StringComparer.OrdinalIgnoreCase.Equals(x.Segment, y.Segment);
+
+        public int GetHashCode((string? Culture, string? Segment) obj)
+            => HashCode.Combine(
+                StringComparer.OrdinalIgnoreCase.GetHashCode(obj.Culture ?? string.Empty),
+                StringComparer.OrdinalIgnoreCase.GetHashCode(obj.Segment ?? string.Empty));
+    }
 }

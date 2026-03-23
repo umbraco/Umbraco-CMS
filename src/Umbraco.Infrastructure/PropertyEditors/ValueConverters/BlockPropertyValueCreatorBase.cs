@@ -131,7 +131,7 @@ internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemMod
 
         var blockConfigMap = blockConfigurations.ToDictionary(bc => bc.ContentElementTypeKey);
         VariationContext variationContext = _variationContextAccessor.VariationContext ?? new VariationContext();
-        IEnumerable<ILanguage> allLanguages = await _languageService.GetAllAsync();
+        IReadOnlyList<ILanguage> allLanguages = (await _languageService.GetAllAsync()).ToList();
 
         // Convert the content data
         var contentPublishedElements = new Dictionary<Guid, IPublishedElement>();

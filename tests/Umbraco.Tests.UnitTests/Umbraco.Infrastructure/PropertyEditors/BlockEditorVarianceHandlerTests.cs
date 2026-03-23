@@ -461,6 +461,39 @@ public class BlockEditorVarianceHandlerTests
         Assert.AreEqual("my-segment", fallbackEntry.Segment);
     }
 
+    [Test]
+    public async Task AlignedExposeVarianceAsync_Adds_Fallback_For_Missing_Segments_When_Culture_Partially_Exposed()
+    {
+        var owner = PublishedElement(ContentVariation.CultureAndSegment);
+        var element = PublishedElement(ContentVariation.CultureAndSegment);
+        var blockValue = new BlockListValue
+        {
+            Expose =
+            [
+                // en-US has both segments exposed.
+                new() { ContentKey = element.Key, Culture = "en-US", Segment = "segment-a" },
+                new() { ContentKey = element.Key, Culture = "en-US", Segment = "segment-b" },
+                // nl-BE already has segment-a exposed, but is missing segment-b.
+                new() { ContentKey = element.Key, Culture = "nl-BE", Segment = "segment-a" },
+            ],
+        };
+
+        var languages = new[]
+        {
+            CreateLanguage("en-US"),
+            CreateLanguage("nl-BE", fallbackIsoCode: "en-US"),
+        };
+
+        var result = (await ExecuteAlignedExposeVarianceAsync(owner, element, blockValue, languages)).ToList();
+
+        // Should have: en-US/segment-a, en-US/segment-b, nl-BE/segment-a (original), nl-BE/segment-b (fallback).
+        Assert.AreEqual(4, result.Count);
+        Assert.IsTrue(result.Any(v => v.Culture == "nl-BE" && v.Segment == "segment-a"));
+        Assert.IsTrue(result.Any(v => v.Culture == "nl-BE" && v.Segment == "segment-b"));
+        Assert.IsTrue(result.Any(v => v.Culture == "en-US" && v.Segment == "segment-a"));
+        Assert.IsTrue(result.Any(v => v.Culture == "en-US" && v.Segment == "segment-b"));
+    }
+
     private static async Task<BlockPropertyValue?> ExecuteAlignedPropertyVarianceAsync(
         ContentVariation ownerVariation,
         ContentVariation propertyTypeVariation,
