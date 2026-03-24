@@ -1,1 +1,1 @@
-export const EXAMPLE_DYNAMIC_FACET_COLLECTION_ALIAS = 'Example.DynamicFacetFilter.Collection';
+export const EXAMPLE_PRODUCT_COLLECTION_ALIAS = 'Example.Collection.Product';

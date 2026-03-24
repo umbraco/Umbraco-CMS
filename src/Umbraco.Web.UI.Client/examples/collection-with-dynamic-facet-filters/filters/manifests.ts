@@ -1,4 +1,4 @@
-import { EXAMPLE_DYNAMIC_FACET_COLLECTION_ALIAS } from '../collection/constants.js';
+import { EXAMPLE_PRODUCT_COLLECTION_ALIAS } from '../collection/constants.js';
 import { manifests as categoryManifests } from './category/manifests.js';
 import { manifests as colorManifests } from './color/manifests.js';
 import { manifests as priceManifests } from './price/manifests.js';
@@ -14,7 +14,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		conditions: [
 			{
 				alias: UMB_COLLECTION_ALIAS_CONDITION,
-				match: EXAMPLE_DYNAMIC_FACET_COLLECTION_ALIAS,
+				match: EXAMPLE_PRODUCT_COLLECTION_ALIAS,
 			},
 		],
 	},
