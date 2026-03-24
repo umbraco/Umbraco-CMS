@@ -1706,7 +1706,7 @@ export class UiBaseLocators extends BasePage {
   async clickCreateActionWithOptionName(optionName: string) {
     await this.clickCreateActionButton();
     const createOptionLocator = this.createActionButtonCollection.locator(
-      '[label="' + optionName + '"]',
+      '[label="' + optionName + '"], [label="' + optionName + '..."]',
     );
     await this.click(createOptionLocator);
   }
