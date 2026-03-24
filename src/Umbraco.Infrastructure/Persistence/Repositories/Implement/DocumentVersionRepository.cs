@@ -150,7 +150,10 @@ internal sealed class DocumentVersionRepository : IDocumentVersionRepository
 
     /// <inheritdoc />
     /// <remarks>
-    ///     Deletes in batches of <see cref="Constants.Sql.MaxParameterCount" />
+    ///     Inserts version IDs into a temp table, then deletes from all related tables
+    ///     using a subquery join against the temp table. This is significantly faster than
+    ///     batched <c>WHERE IN (...)</c> for large sets, as the database engine can use
+    ///     indexed joins against the temp table's primary key.
     /// </remarks>
     public void DeleteVersions(IEnumerable<int> versionIds)
     {
@@ -159,34 +162,40 @@ internal sealed class DocumentVersionRepository : IDocumentVersionRepository
             return;
         }
 
-        foreach (IEnumerable<int> group in versionIds.InGroupsOf(Constants.Sql.MaxParameterCount))
+        var allIds = versionIds.ToList();
+        if (allIds.Count == 0)
         {
-            var groupedVersionIds = group.ToList();
+            return;
+        }
 
-            /* Note: We had discussed doing this in a single SQL Command.
-            *  If you can work out how to make that work with SQL CE, let me know!
-            *  Can use test PerformContentVersionCleanup_WithNoKeepPeriods_DeletesEverythingExceptActive to try things out.
-            */
+        IDatabase db = _scopeAccessor.AmbientScope.Database;
+        ISqlSyntaxProvider syntax = _scopeAccessor.AmbientScope.SqlContext.SqlSyntax;
 
-            Sql<ISqlContext> query = _scopeAccessor.AmbientScope.SqlContext.Sql()
-                .Delete<PropertyDataDto>()
-                .WhereIn<PropertyDataDto>(x => x.VersionId, groupedVersionIds);
-            _scopeAccessor.AmbientScope.Database.Execute(query);
+        var tempTableName = syntax.TempTableName("umbVersionsToDelete");
 
-            query = _scopeAccessor.AmbientScope.SqlContext.Sql()
-                .Delete<ContentVersionCultureVariationDto>()
-                .WhereIn<ContentVersionCultureVariationDto>(x => x.VersionId, groupedVersionIds);
-            _scopeAccessor.AmbientScope.Database.Execute(query);
+        try
+        {
+            db.Execute(syntax.CreateTempTable("umbVersionsToDelete", "Id INT NOT NULL PRIMARY KEY"));
 
-            query = _scopeAccessor.AmbientScope.SqlContext.Sql()
-                .Delete<DocumentVersionDto>()
-                .WhereIn<DocumentVersionDto>(x => x.Id, groupedVersionIds);
-            _scopeAccessor.AmbientScope.Database.Execute(query);
+            // Batch insert IDs into the temp table.
+            foreach (IEnumerable<int> group in allIds.InGroupsOf(1000))
+            {
+                var batch = group.ToList();
+                var placeholders = string.Join(",", batch.Select((_, i) => $"(@{i})"));
+                db.Execute(
+                    $"INSERT INTO {tempTableName} (Id) VALUES {placeholders}",
+                    batch.Cast<object>().ToArray());
+            }
 
-            query = _scopeAccessor.AmbientScope.SqlContext.Sql()
-                .Delete<ContentVersionDto>()
-                .WhereIn<ContentVersionDto>(x => x.Id, groupedVersionIds);
-            _scopeAccessor.AmbientScope.Database.Execute(query);
+            // Delete from all related tables using a subquery against the temp table.
+            db.Execute($"DELETE FROM {PropertyDataDto.TableName} WHERE versionId IN (SELECT Id FROM {tempTableName})");
+            db.Execute($"DELETE FROM {ContentVersionCultureVariationDto.TableName} WHERE versionId IN (SELECT Id FROM {tempTableName})");
+            db.Execute($"DELETE FROM {DocumentVersionDto.TableName} WHERE id IN (SELECT Id FROM {tempTableName})");
+            db.Execute($"DELETE FROM {ContentVersionDto.TableName} WHERE id IN (SELECT Id FROM {tempTableName})");
+        }
+        finally
+        {
+            db.Execute(syntax.DropTempTable("umbVersionsToDelete"));
         }
     }
 
