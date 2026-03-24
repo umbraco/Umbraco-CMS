@@ -1,4 +1,4 @@
-import { DYNAMIC_FACET_COLLECTION_ALIAS } from '../collection/constants.js';
+import { EXAMPLE_DYNAMIC_FACET_COLLECTION_ALIAS } from '../collection/constants.js';
 import { html, customElement, LitElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
 import type { UmbCollectionConfiguration } from '@umbraco-cms/backoffice/collection';
@@ -10,7 +10,9 @@ export class ExampleDynamicFacetFiltersDashboard extends UmbElementMixin(LitElem
 	};
 
 	override render() {
-		return html`<umb-collection alias=${DYNAMIC_FACET_COLLECTION_ALIAS} .config=${this.#config}></umb-collection>`;
+		return html`<umb-collection
+			alias=${EXAMPLE_DYNAMIC_FACET_COLLECTION_ALIAS}
+			.config=${this.#config}></umb-collection>`;
 	}
 }
 

@@ -1,6 +1,6 @@
 import type { UmbCollectionFilterModel, UmbCollectionItemModel } from '@umbraco-cms/backoffice/collection';
 
-export interface ExampleDynamicFacetCollectionFilterModel extends UmbCollectionFilterModel {}
+export type ExampleDynamicFacetCollectionFilterModel = UmbCollectionFilterModel;
 
 export interface ExampleProductCollectionItemModel extends UmbCollectionItemModel {
 	category: string;

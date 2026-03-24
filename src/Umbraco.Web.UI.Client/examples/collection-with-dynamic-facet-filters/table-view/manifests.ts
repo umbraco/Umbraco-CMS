@@ -1,4 +1,4 @@
-import { DYNAMIC_FACET_COLLECTION_ALIAS } from '../collection/constants.js';
+import { EXAMPLE_DYNAMIC_FACET_COLLECTION_ALIAS } from '../collection/constants.js';
 import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
 
 export const manifests: Array<UmbExtensionManifest> = [
@@ -16,7 +16,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		conditions: [
 			{
 				alias: UMB_COLLECTION_ALIAS_CONDITION,
-				match: DYNAMIC_FACET_COLLECTION_ALIAS,
+				match: EXAMPLE_DYNAMIC_FACET_COLLECTION_ALIAS,
 			},
 		],
 	},

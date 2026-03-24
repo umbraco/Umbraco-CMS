@@ -101,10 +101,11 @@ export const products: Array<ExampleProductModel> = [
 ];
 
 /**
- *
- * @param product
- * @param args
- * @param excludeField
+ * Checks whether a product matches the given filter args, optionally excluding one dimension.
+ * @param {ExampleProductModel} product - The product to test.
+ * @param {ExampleProductFilterArgs} args - The active filter arguments.
+ * @param {keyof ExampleProductFilterArgs} [excludeField] - A filter dimension to skip (for cross-facet counting).
+ * @returns {boolean} True if the product matches all (non-excluded) filters.
  */
 function matchesFilter(
 	product: ExampleProductModel,
@@ -127,11 +128,12 @@ function matchesFilter(
 }
 
 /**
- *
- * @param items
- * @param args
- * @param excludeField
- * @param accessor
+ * Counts unique values for a facet dimension, excluding its own filter to produce cross-facet counts.
+ * @param {Array<ExampleProductModel>} items - The pre-filtered product list.
+ * @param {ExampleProductFilterArgs} args - The active filter arguments.
+ * @param {keyof ExampleProductFilterArgs} excludeField - The dimension to exclude from filtering.
+ * @param {(product: ExampleProductModel) => Array<string>} accessor - Extracts the facet values from a product.
+ * @returns {Array<{unique: string, name: string, count: number}>} Sorted facet counts.
  */
 function countBy(
 	items: Array<ExampleProductModel>,
@@ -154,8 +156,9 @@ function countBy(
 }
 
 /**
- *
- * @param args
+ * Filters, paginates and computes cross-facet counts for the product dataset.
+ * @param {ExampleProductFilterArgs} args - Filter, pagination and text-search arguments.
+ * @returns {ExampleFilteredResult} The filtered items, total count and faceted result data.
  */
 export function filterProducts(args: ExampleProductFilterArgs): ExampleFilteredResult {
 	let items = products.filter((p) => matchesFilter(p, args));
