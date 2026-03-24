@@ -71,6 +71,7 @@ internal sealed class EFCoreScopeAccessor<TDbContext> : IEFCoreScopeAccessor<TDb
         }
 
         var provider = (EFCoreScopeProvider<TDbContext>)_efCoreScopeProvider.Value;
+
         if (provider.ScopeContextDepth > 0)
         {
             return null;
@@ -79,8 +80,7 @@ internal sealed class EFCoreScopeAccessor<TDbContext> : IEFCoreScopeAccessor<TDb
         // No EF Core scope on the stack. If an NPoco scope exists create a bridge scope
         if (_ambientScopeStack.AmbientScope is IScope npocoScope)
         {
-            return ((EFCoreScopeProvider<TDbContext>)_efCoreScopeProvider.Value)
-                .CreateBridgeScope(npocoScope);
+            return provider.CreateBridgeScope(npocoScope);
         }
 
         return null;

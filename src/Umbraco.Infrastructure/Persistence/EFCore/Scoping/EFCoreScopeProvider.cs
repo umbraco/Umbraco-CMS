@@ -168,12 +168,19 @@ internal sealed class EFCoreScopeProvider<TDbContext> : IEFCoreScopeProvider<TDb
 
 
     /// <summary>
-    /// Gets the number of scope contexts this provider has pushed that have not yet been popped.
-    /// This is only used to distinguish the amount of EFCore scopes on a stack versus NPoco scopes.
+    /// Gets the number of scope contexts this provider has pushed that have not yet been popped
+    /// in the current execution context. This is used to distinguish EF Core scopes from NPoco scopes
+    /// on the shared <see cref="IAmbientScopeContextStack"/>, preventing bridge scope creation
+    /// while a native EF Core scope is active.
+    ///
+    /// Stored in <see cref="AsyncLocal{T}"/> so each async flow tracks its own depth independently,
+    /// avoiding race conditions from concurrent requests sharing a singleton provider.
     ///
     /// This solution is temporary and should be removed when migration to EFCore is complete.
     /// </summary>
-    internal int ScopeContextDepth { get; private set; }
+    private static readonly AsyncLocal<int> _scopeContextDepth = new();
+
+    internal int ScopeContextDepth => _scopeContextDepth.Value;
 
     /// <inheritdoc />
     public IScopeContext? AmbientScopeContext => _ambientEfCoreScopeContextStack.AmbientContext;
@@ -291,7 +298,7 @@ internal sealed class EFCoreScopeProvider<TDbContext> : IEFCoreScopeProvider<TDb
             throw new ArgumentNullException(nameof(scopeContext));
         }
 
-        ScopeContextDepth++;
+        _scopeContextDepth.Value++;
         _ambientEfCoreScopeContextStack.Push(scopeContext);
     }
 
@@ -300,7 +307,7 @@ internal sealed class EFCoreScopeProvider<TDbContext> : IEFCoreScopeProvider<TDb
     /// </summary>
     public void PopAmbientScopeContext()
     {
-        ScopeContextDepth--;
+        _scopeContextDepth.Value--;
         _ambientEfCoreScopeContextStack.Pop();
     }
 
