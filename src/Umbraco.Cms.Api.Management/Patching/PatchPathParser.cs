@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Umbraco.Cms.Api.Management.Patching;
 
 /// <summary>
@@ -111,8 +113,9 @@ public static class PatchPathParser
     /// </summary>
     /// <param name="path">The path expression to validate.</param>
     /// <returns>True if the path is valid, false otherwise.</returns>
-    public static bool IsValid(string path)
+    public static bool IsValid(string path, [NotNullWhen(true)]out PatchPathSegment[]? parsedPath)
     {
+        parsedPath = null;
         if (string.IsNullOrWhiteSpace(path))
         {
             return false;
@@ -120,7 +123,7 @@ public static class PatchPathParser
 
         try
         {
-            Parse(path);
+            parsedPath = Parse(path);
             return true;
         }
         catch (FormatException)
@@ -136,12 +139,11 @@ public static class PatchPathParser
     {
         var cultures = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-        if (!IsValid(path))
+        if (!IsValid(path, out PatchPathSegment[]? segments))
         {
             return cultures;
         }
 
-        PatchPathSegment[] segments = Parse(path);
         foreach (PatchPathSegment segment in segments)
         {
             if (segment is FilterSegment filter)
@@ -167,12 +169,11 @@ public static class PatchPathParser
     {
         var result = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-        if (!IsValid(path))
+        if (!IsValid(path, out PatchPathSegment[]? segments))
         {
             return result;
         }
 
-        PatchPathSegment[] segments = Parse(path);
         foreach (PatchPathSegment segment in segments)
         {
             if (segment is FilterSegment filter)
@@ -196,12 +197,11 @@ public static class PatchPathParser
     /// </summary>
     public static bool TargetsInvariantCulture(string path)
     {
-        if (!IsValid(path))
+        if (!IsValid(path, out PatchPathSegment[]? segments))
         {
             return false;
         }
 
-        PatchPathSegment[] segments = Parse(path);
         foreach (PatchPathSegment segment in segments)
         {
             if (segment is FilterSegment filter)
