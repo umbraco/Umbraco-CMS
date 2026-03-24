@@ -12,18 +12,19 @@ Automated, non-interactive PR code review. Analyzes changed files for intent, im
 
 ## Arguments
 
-- `$ARGUMENTS` - Optional: target branch to diff against (default: `origin/main`)
+- `$ARGUMENTS` - Optional: target branch to diff against (auto-detected from PR, falls back to `origin/main`)
 
 ## Instructions
 
-### 1. Parse Arguments
+### 1. Resolve Target Branch
 
-Determine the target branch for comparison:
+Determine the target branch for comparison using this priority order:
 
-- If `$ARGUMENTS` is provided and non-empty, use it as the target branch
-- Otherwise, default to `origin/main`
+1. **Explicit argument**: If `$ARGUMENTS` is provided and non-empty, use it as the target branch
+2. **PR target branch**: If no argument, run `gh pr view --json baseRefName --jq '.baseRefName'` to detect the target branch of the current branch's open PR. If a PR exists, use `origin/{baseRefName}` as the target branch.
+3. **Fallback**: If no argument and no PR found (command fails or returns empty), default to `origin/main`
 
-Store the resolved target branch for use in subsequent steps.
+Store the resolved target branch for use in subsequent steps. Log which resolution method was used (e.g., "Target branch: `origin/v18/dev` (from PR #1234)").
 
 ### 2. Load Review Standards
 
