@@ -54,7 +54,7 @@ public class PatchDocumentController : PatchDocumentControllerBase
 
             // Apply PATCH operations to create an update request model
             Attempt<UpdateDocumentRequestModel, ContentPatchingOperationStatus> patchResult =
-                await _documentPatcher.ApplyPatchAsync(id, patchModel, CurrentUserKey(_backOfficeSecurityAccessor));
+                await _documentPatcher.ApplyPatchAsync(id, patchModel);
 
             if (!patchResult.Success)
             {

@@ -137,31 +137,31 @@ public class PatchPathParserTests
     [Test]
     public void IsValid_ValidSimplePath_ReturnsTrue()
     {
-        Assert.That(PatchPathParser.IsValid("/name"), Is.True);
+        Assert.That(PatchPathParser.IsValid("/name", out _), Is.True);
     }
 
     [Test]
     public void IsValid_ValidFilterPath_ReturnsTrue()
     {
-        Assert.That(PatchPathParser.IsValid("/values[alias=title,culture=en-US,segment=null]/value"), Is.True);
+        Assert.That(PatchPathParser.IsValid("/values[alias=title,culture=en-US,segment=null]/value", out _), Is.True);
     }
 
     [Test]
     public void IsValid_ValidAppendPath_ReturnsTrue()
     {
-        Assert.That(PatchPathParser.IsValid("/contentData/-"), Is.True);
+        Assert.That(PatchPathParser.IsValid("/contentData/-", out _), Is.True);
     }
 
     [Test]
     public void IsValid_EmptyString_ReturnsFalse()
     {
-        Assert.That(PatchPathParser.IsValid(string.Empty), Is.False);
+        Assert.That(PatchPathParser.IsValid(string.Empty, out _), Is.False);
     }
 
     [Test]
     public void IsValid_InvalidSyntax_ReturnsFalse()
     {
-        Assert.That(PatchPathParser.IsValid("/values[alias=title"), Is.False);
+        Assert.That(PatchPathParser.IsValid("/values[alias=title", out _), Is.False);
     }
 
     [Test]
@@ -305,7 +305,7 @@ public class PatchPathParserTests
     [Test]
     public void IsValid_PathWithEscapeSequence_ReturnsTrue()
     {
-        Assert.That(PatchPathParser.IsValid("/foo~1bar"), Is.True);
-        Assert.That(PatchPathParser.IsValid("/foo~0bar"), Is.True);
+        Assert.That(PatchPathParser.IsValid("/foo~1bar", out _), Is.True);
+        Assert.That(PatchPathParser.IsValid("/foo~0bar", out _), Is.True);
     }
 }

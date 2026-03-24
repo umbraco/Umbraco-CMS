@@ -39,13 +39,12 @@ public class DocumentPatcher
     /// <returns>An attempt containing the update model or an error status.</returns>
     public async Task<Attempt<UpdateDocumentRequestModel, ContentPatchingOperationStatus>> ApplyPatchAsync(
         Guid documentKey,
-        ContentPatchModel patchModel,
-        Guid userKey)
+        ContentPatchModel patchModel)
     {
         // Validate operation structure
         foreach (PatchOperationModel operation in patchModel.Operations)
         {
-            if (!PatchPathParser.IsValid(operation.Path))
+            if (!PatchPathParser.IsValid(operation.Path, out _))
             {
                 return Attempt.FailWithStatus(ContentPatchingOperationStatus.InvalidOperation, default(UpdateDocumentRequestModel)!);
             }
