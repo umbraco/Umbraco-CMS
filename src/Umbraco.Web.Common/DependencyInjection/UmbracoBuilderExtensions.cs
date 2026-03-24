@@ -3,6 +3,7 @@ using System.Net.Http.Headers;
 using System.Reflection;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection.Infrastructure;
+using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
@@ -55,6 +56,7 @@ using Umbraco.Cms.Web.Common.Preview;
 using Umbraco.Cms.Web.Common.Profiler;
 using Umbraco.Cms.Web.Common.Repositories;
 using Umbraco.Cms.Web.Common.Security;
+using Umbraco.Cms.Web.Common.TagHelpers;
 using Umbraco.Cms.Web.Common.Templates;
 using Umbraco.Cms.Web.Common.UmbracoContext;
 using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
@@ -326,6 +328,8 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<UmbracoRequestMiddleware>();
         builder.Services.AddSingleton<BootFailedMiddleware>();
         builder.Services.AddSingleton<ProtectRecycleBinMediaMiddleware>();
+
+        builder.Services.AddTransient<ITagHelperComponent, VisualEditorScriptTagHelperComponent>();
 
         builder.Services.AddHealthChecks()
             .AddCheck<UmbracoReadinessHealthCheck>("umbraco-ready", tags: [UmbracoReadinessHealthCheck.ReadyTag]);

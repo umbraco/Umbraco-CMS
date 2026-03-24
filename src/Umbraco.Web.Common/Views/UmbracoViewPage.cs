@@ -237,12 +237,6 @@ public abstract class UmbracoViewPage<TModel> : RazorPage<TModel>
                                                                                                 // But just to be sure of prevention of an XSS vulnterablity we'll HTML encode here too.
                                                                                                 // An expected URL is untouched by this encoding.
                             UmbracoContext.PublishedRequest?.PublishedContent?.Key);
-
-                    // Visual editor: inject guest script for property/block click-to-edit.
-                    // This runs in the preview iframe and communicates with the backoffice via postMessage.
-                    var cspNonceService = Context.RequestServices.GetService<Umbraco.Cms.Core.Security.ICspNonceService>();
-                    var nonce = cspNonceService?.GetNonce();
-                    markupToInject += VisualEditorGuestScript.GetScriptTag(nonce);
                 }
                 else
                 {
