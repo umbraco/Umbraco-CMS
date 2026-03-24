@@ -180,7 +180,7 @@ public static class PatchPathResolver
                 }
 
                 var nodeValue = propertyNode.GetValue<string>();
-                if (!string.Equals(nodeValue, condition.Value, StringComparison.Ordinal))
+                if (!string.Equals(nodeValue, condition.Value, StringComparison.OrdinalIgnoreCase))
                 {
                     return false;
                 }
