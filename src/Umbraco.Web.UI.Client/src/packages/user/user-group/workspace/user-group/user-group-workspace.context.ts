@@ -13,6 +13,7 @@ import type { UmbUserPermissionModel } from '@umbraco-cms/backoffice/user-permis
 import { UserGroupService, UserService } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
+import { jsonStringComparison } from '@umbraco-cms/backoffice/observable-api';
 
 export class UmbUserGroupWorkspaceContext
 	extends UmbEntityNamedDetailWorkspaceContextBase<UmbUserGroupDetailModel, UmbUserGroupDetailRepository>
@@ -33,9 +34,8 @@ export class UmbUserGroupWorkspaceContext
 	readonly fallbackPermissions = this._data.createObservablePartOfCurrent((data) => data?.fallbackPermissions || []);
 	readonly permissions = this._data.createObservablePartOfCurrent((data) => data?.permissions || []);
 	readonly description = this._data.createObservablePartOfCurrent((data) => data?.description || '');
-
-	#initialUserUniques: string[] = [];
-	#usersEdited = false;
+	
+	#persistedUserUniques: string[] = [];
 	readonly #userUniquesState = new UmbArrayState<string>([], (v) => v);
 	readonly userUniques = this.#userUniquesState.asObservable();
 
@@ -85,9 +85,8 @@ export class UmbUserGroupWorkspaceContext
 			UserService.getFilterUser({ query: { userGroupIds: [unique], take: 10000 } }),
 		);
 		const uniques = data?.items.map((u) => u.id) ?? [];
-		this.#initialUserUniques = [...uniques];
+		this.#persistedUserUniques = [...uniques];
 		this.#userUniquesState.setValue(uniques);
-		this.#usersEdited = false;
 	}
 
 	/**
@@ -98,11 +97,15 @@ export class UmbUserGroupWorkspaceContext
 	 */
 	setUserUniques(uniques: Array<string>) {
 		this.#userUniquesState.setValue(uniques);
-		this.#usersEdited = true;
+	}
+
+	getHasUserChanges() {
+		const result = jsonStringComparison(this.#persistedUserUniques, this.#userUniquesState.getValue()) === false;
+		return result;
 	}
 
 	override getHasUnpersistedChanges(): boolean {
-		return super.getHasUnpersistedChanges() || this.#usersEdited;
+		return super.getHasUnpersistedChanges() || this.getHasUserChanges();
 	}
 
 	override async submit() {
@@ -112,30 +115,28 @@ export class UmbUserGroupWorkspaceContext
 			await this.#persistUserChanges();
 		} else {
 			// For existing groups
-			await this.#persistUserChanges();
 			await super.submit();
+			await this.#persistUserChanges();
 		}
 	}
 
 	async #persistUserChanges() {
 		const unique = this.getUnique();
-		if (!this.#usersEdited || !unique) return;
+		if (!this.getHasUserChanges() || !unique) return;
 
 		const pending = this.#userUniquesState.getValue();
-		const toAdd = pending.filter((u) => !this.#initialUserUniques.includes(u));
-		const toRemove = this.#initialUserUniques.filter((u) => !pending.includes(u));
+		const toAdd = pending.filter((u) => !this.#persistedUserUniques.includes(u));
+		const toRemove = this.#persistedUserUniques.filter((u) => !pending.includes(u));
 
 		// Run add and remove in parallel; track whether either call errored.
 		// Only update local state when all API calls succeeded.
-		// If there was an error, keep #usersEdited = true so the next Save will retry.
 		const [addError, removeError] = await Promise.all([
 			this.#addUsersToGroup(unique, toAdd),
 			this.#removeUsersFromGroup(unique, toRemove),
 		]);
 
 		if (!addError && !removeError) {
-			this.#initialUserUniques = [...pending];
-			this.#usersEdited = false;
+			this.#persistedUserUniques = [...pending];
 		}
 	}
 
@@ -165,9 +166,8 @@ export class UmbUserGroupWorkspaceContext
 
 	override resetState() {
 		super.resetState();
-		this.#initialUserUniques = [];
+		this.#persistedUserUniques = [];
 		this.#userUniquesState.setValue([]);
-		this.#usersEdited = false;
 	}
 
 	updateProperty<Alias extends keyof UmbUserGroupDetailModel>(alias: Alias, value: UmbUserGroupDetailModel[Alias]) {
