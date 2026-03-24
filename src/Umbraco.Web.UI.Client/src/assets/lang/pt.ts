@@ -2003,7 +2003,7 @@ export default {
 		},
 		changePassword: 'Altere a sua palavra-passe',
 		changePhoto: 'Alterar foto',
-		configureMfa: 'Configurar MFA',
+		configureMfa: 'Configurar 2FA',
 		emailRequired: 'Obrigatório - introduza um endereço de email para este utilizador',
 		emailDescription: (usernameIsEmail: boolean) => {
 			return usernameIsEmail
