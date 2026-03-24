@@ -301,7 +301,7 @@ internal sealed class HideBackOfficeTokensHandler
                 value = EncryptionHelper.Decrypt(cookieValue, _dataProtectionProvider);
                 return true;
             }
-            catch (Exception ex)
+            catch (CryptographicException ex)
             {
                 // Decryption can fail if the data protection key ring has changed
                 // (e.g., after deployment, app pool recycle, or slot swap).
