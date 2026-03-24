@@ -124,6 +124,17 @@ export default defineConfig({
         ignoreHTTPSErrors: true,
         storageState: STORAGE_STATE
       }
+    },
+    {
+      name: 'imagingSettingConfig',
+      testMatch: 'ImagingSettingConfig/*.spec.ts',
+      dependencies: ['setup'],
+      use: {
+        ...devices['Desktop Chrome'],
+        // Use prepared auth state.
+        ignoreHTTPSErrors: true,
+        storageState: STORAGE_STATE
+      }
     }
   ],
 });

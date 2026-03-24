@@ -299,7 +299,7 @@ export abstract class UmbTreeItemContextBase<
 	}
 
 	#observeIsSelected() {
-		if (!this.treeContext || !this.unique) return;
+		if (!this.treeContext || this.unique === undefined) return;
 
 		this.observe(
 			this.treeContext.selection.selection.pipe(map((selection) => selection.includes(this.unique!))),
