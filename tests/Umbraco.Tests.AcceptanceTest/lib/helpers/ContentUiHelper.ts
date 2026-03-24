@@ -2826,6 +2826,8 @@ export class ContentUiHelper extends UiBaseLocators {
     await this.click(contentLocator.locator("#select-checkbox"), {
       force: true,
     });
+  }
+
   async addGroupBasedPublicAccessWithPrefilledPages(memberGroupName: string) {
     await this.click(this.groupBasedProtectionBtn);
     await this.clickNextButton();

@@ -323,6 +323,7 @@ export type CreateMediaTypeRequestModel = {
     allowedAsRoot: boolean;
     variesByCulture: boolean;
     variesBySegment: boolean;
+    collection?: ReferenceByIdModel | null;
     isElement: boolean;
     allowedInLibrary: boolean;
     properties: Array<CreateMediaTypePropertyTypeRequestModel>;
@@ -331,7 +332,6 @@ export type CreateMediaTypeRequestModel = {
     parent?: ReferenceByIdModel | null;
     allowedMediaTypes: Array<MediaTypeSortModel>;
     compositions: Array<MediaTypeCompositionModel>;
-    collection?: ReferenceByIdModel | null;
 };
 
 export type CreateMemberGroupRequestModel = {
@@ -15221,27 +15221,6 @@ export type DeletePreviewData = {
 };
 
 export type DeletePreviewResponses = {
-    /**
-     * OK
-     */
-    200: unknown;
-};
-
-export type PostPreviewData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/umbraco/management/api/v1/preview';
-};
-
-export type PostPreviewErrors = {
-    /**
-     * The resource is protected and requires an authentication token
-     */
-    401: unknown;
-};
-
-export type PostPreviewResponses = {
     /**
      * OK
      */
