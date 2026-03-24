@@ -658,7 +658,7 @@ export class DataTypeApiHelper {
     return await this.save(blockGrid);
   }
 
-  async createBlockGridWithAnAreaWithTwoSpecifiedAllowancesInABlockWithCreateLabel(blockGridName: string, contentElementTypeId: string, firstSpecifiedAllowanceElementTypeId: string, secondSpecifiedAllowanceElementTypeId: string, areaAlias: string = 'area', createLabel: string = 'CreateLabel', columnSpan: number = 6, rowSpan: number = 1) {
+  async createBlockGridWithAnAreaWithTwoSpecifiedAllowancesInABlock(blockGridName: string, contentElementTypeId: string, firstSpecifiedAllowanceElementTypeId: string, secondSpecifiedAllowanceElementTypeId: string, areaAlias: string = 'area', createLabel: string = 'CreateLabel', columnSpan: number = 6, rowSpan: number = 1) {
     await this.ensureNameNotExists(blockGridName);
 
     const blockGrid = new BlockGridDataTypeBuilder()
@@ -1029,32 +1029,33 @@ export class DataTypeApiHelper {
   }
 
   async doesBlockEditorBlockContainAreaWithSpecifiedAllowance(blockGridName: string, elementTypeKey: string, areaAlias: string = 'area') {
-    const block = await this.getBlockWithContentElementTypeId(blockGridName, elementTypeKey);
-    const area = block.areas.find(area => area.alias === areaAlias);
+    const area = await this.getBlockAreaByAlias(blockGridName, elementTypeKey, areaAlias);
     return area && area.specifiedAllowance && area.specifiedAllowance.length > 0;
   }
 
-  async doesBlockEditorBlockContainAreaWithSpecifiedAllowanceForElementType(blockGridName: string, elementTypeKey: string, areaAlias: string = 'area', specifiedAllowanceElementTypeKey: string) {
-    const block = await this.getBlockWithContentElementTypeId(blockGridName, elementTypeKey);
-    const area = block.areas.find(area => area.alias === areaAlias);
+  async doesBlockGridBlockContainAreaWithSpecifiedAllowanceForElementType(blockGridName: string, elementTypeKey: string, specifiedAllowanceElementTypeKey: string, areaAlias: string = 'area') {
+    const area = await this.getBlockAreaByAlias(blockGridName, elementTypeKey, areaAlias);
     return area && area.specifiedAllowance && area.specifiedAllowance.some(sa => sa.elementTypeKey === specifiedAllowanceElementTypeKey);
   }
 
-  async doesBlockEditorBlockContainAreaWithSpecifiedAllowanceCount(blockGridName: string, elementTypeKey: string, areaAlias: string = 'area', count: number) {
-    const block = await this.getBlockWithContentElementTypeId(blockGridName, elementTypeKey);
-    const area = block.areas.find(area => area.alias === areaAlias);
+  async doesBlockGridBlockContainAreaWithSpecifiedAllowanceCount(blockGridName: string, elementTypeKey: string, count: number, areaAlias: string = 'area') {
+    const area = await this.getBlockAreaByAlias(blockGridName, elementTypeKey, areaAlias);
     return area && area.specifiedAllowance && area.specifiedAllowance.length === count;
   }
 
-  async doesBlockEditorBlockContainAreaWithSpecifiedAllowanceMinMax(blockGridName: string, elementTypeKey: string, areaAlias: string = 'area', specifiedAllowanceElementTypeKey: string, minAllowed: number, maxAllowed: number) {
-    const block = await this.getBlockWithContentElementTypeId(blockGridName, elementTypeKey);
-    const area = block.areas.find(area => area.alias === areaAlias);
+  async doesBlockGridBlockContainAreaWithSpecifiedAllowanceMinMax(blockGridName: string, elementTypeKey: string, specifiedAllowanceElementTypeKey: string, minAllowed: number, maxAllowed: number, areaAlias: string = 'area') {
+    const area = await this.getBlockAreaByAlias(blockGridName, elementTypeKey, areaAlias);
     return area && area.specifiedAllowance &&
       area.specifiedAllowance.some(sa =>
         sa.elementTypeKey === specifiedAllowanceElementTypeKey &&
         sa.minAllowed === minAllowed &&
         sa.maxAllowed === maxAllowed
       );
+  }
+
+  private async getBlockAreaByAlias(blockGridName: string, elementTypeKey: string, areaAlias: string) {
+    const block = await this.getBlockWithContentElementTypeId(blockGridName, elementTypeKey);
+    return block.areas.find(area => area.alias === areaAlias);
   }
 
   async doesBlockEditorBlockContainStylesheet(blockGridName: string, elementTypeKey: string, stylesheetPath: string) {
