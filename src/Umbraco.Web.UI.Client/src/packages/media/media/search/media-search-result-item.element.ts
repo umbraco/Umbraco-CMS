@@ -1,12 +1,12 @@
-import type { UmbMediaItemModel } from '../repository/types.js';
 import { classMap, css, customElement, html, nothing, property, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbSearchResultItemModel } from '@umbraco-cms/backoffice/search';
+import type { UmbMediaSearchItemModel } from './types.js';
 
 @customElement('umb-media-search-result-item')
 export class UmbMediaSearchResultItemElement extends UmbLitElement {
 	@property({ type: Object })
-	item?: UmbSearchResultItemModel & UmbMediaItemModel;
+	item?: UmbSearchResultItemModel & UmbMediaSearchItemModel;
 
 	override render() {
 		if (!this.item) return nothing;
@@ -17,7 +17,13 @@ export class UmbMediaSearchResultItemElement extends UmbLitElement {
 				(icon) => html`<umb-icon name=${icon}></umb-icon>`,
 				() => html`<uui-icon name="icon-picture"></uui-icon>`,
 			)}
-			<span class=${classMap(classes)}>${this.item.name}</span>
+			<span class=${classMap(classes)}>
+				${this.item.name}
+				${when(
+					this.item.ancestors?.length,
+					() => html`<small class="ancestors">${this.item?.ancestors!.map((a) => a.name).join(' / ')}</small>`,
+				)}
+			</span>
 			<div class="extra">
 				${when(
 					this.item.isTrashed,
@@ -50,6 +56,12 @@ export class UmbMediaSearchResultItemElement extends UmbLitElement {
 					&.trashed {
 						text-decoration: line-through;
 						opacity: 0.6;
+					}
+					> .ancestors {
+						display: block;
+						opacity: 0.6;
+						font-size: 0.7rem;
+						font-weight: 400;
 					}
 				}
 			}

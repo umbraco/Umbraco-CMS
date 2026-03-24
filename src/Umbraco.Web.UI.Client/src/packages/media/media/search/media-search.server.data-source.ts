@@ -48,6 +48,23 @@ export class UmbMediaSearchServerDataSource
 		);
 
 		if (data) {
+			const ids = data.items.map((item) => item.id);
+
+			const { data: ancestorsData } = await tryExecute(
+				this.#host,
+				MediaService.getItemMediaAncestors({ query: { id: ids } }),
+			);
+
+			const ancestorsByItemId = new Map<string, Array<{ name: string }>>();
+			if (ancestorsData) {
+				for (const entry of ancestorsData) {
+					ancestorsByItemId.set(
+						entry.id,
+						entry.ancestors.map((ancestor) => ({ name: ancestor.variants[0]?.name ?? '' })),
+					);
+				}
+			}
+
 			const mappedItems: Array<UmbMediaSearchItemModel> = data.items.map((item) => {
 				return {
 					entityType: UMB_MEDIA_ENTITY_TYPE,
@@ -69,6 +86,7 @@ export class UmbMediaSearchServerDataSource
 						};
 					}),
 					flags: item.flags,
+					ancestors: ancestorsByItemId.get(item.id) ?? [],
 				};
 			});
 

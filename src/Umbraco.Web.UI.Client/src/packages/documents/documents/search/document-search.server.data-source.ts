@@ -55,7 +55,6 @@ export class UmbDocumentSearchServerDataSource
 				DocumentService.getItemDocumentAncestors({ query: { id: ids } }),
 			);
 
-			// Build a lookup map: document ID → array of ancestor names
 			const ancestorsByItemId = new Map<string, Array<{ name: string }>>();
 			if (ancestorsData) {
 				for (const entry of ancestorsData) {

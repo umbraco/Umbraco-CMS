@@ -93,7 +93,7 @@ export class UmbDocumentSearchResultItemElement extends UmbLitElement {
 				${label}
 				${when(
 					this.item.ancestors?.length,
-					() => html`<small class="ancestors">${this.item?.ancestors!.map((a) => a.name).join(' > ')}</small>`,
+					() => html`<small class="ancestors">${this.item?.ancestors!.map((a) => a.name).join(' / ')}</small>`,
 				)}
 			</span>
 			<div class="extra">
