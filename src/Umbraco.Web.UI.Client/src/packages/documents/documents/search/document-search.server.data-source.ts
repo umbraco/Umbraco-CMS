@@ -24,6 +24,26 @@ export class UmbDocumentSearchServerDataSource
 		this.#host = host;
 	}
 
+	async #fetchAncestors(ids: Array<string>) {
+		const { data } = await tryExecute(this.#host, DocumentService.getItemDocumentAncestors({ query: { id: ids } }));
+
+		const ancestorsByItemId = new Map<string, Array<{ variants: Array<{ name: string; culture: string | null }> }>>();
+		if (data) {
+			for (const entry of data) {
+				ancestorsByItemId.set(
+					entry.id,
+					entry.ancestors.map((ancestor) => ({
+						variants: ancestor.variants.map((v) => ({
+							name: v.name,
+							culture: v.culture || null,
+						})),
+					})),
+				);
+			}
+		}
+		return ancestorsByItemId;
+	}
+
 	/**
 	 * Get a list of versions for a document
 	 * @param {UmbDocumentSearchRequestArgs} args - The arguments for the search
@@ -49,26 +69,7 @@ export class UmbDocumentSearchServerDataSource
 
 		if (data) {
 			const ids = data.items.map((item) => item.id);
-
-			const { data: ancestorsData } = await tryExecute(
-				this.#host,
-				DocumentService.getItemDocumentAncestors({ query: { id: ids } }),
-			);
-
-			const ancestorsByItemId = new Map<string, Array<{ variants: Array<{ name: string; culture: string | null }> }>>();
-			if (ancestorsData) {
-				for (const entry of ancestorsData) {
-					ancestorsByItemId.set(
-						entry.id,
-						entry.ancestors.map((ancestor) => ({
-							variants: ancestor.variants.map((v) => ({
-								name: v.name,
-								culture: v.culture || null,
-							})),
-						})),
-					);
-				}
-			}
+			const ancestorsByItemId = await this.#fetchAncestors(ids);
 
 			const mappedItems: Array<UmbDocumentSearchItemModel> = data.items.map((item) => {
 				return {

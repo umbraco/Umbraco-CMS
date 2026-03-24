@@ -24,6 +24,21 @@ export class UmbMediaSearchServerDataSource
 		this.#host = host;
 	}
 
+	async #fetchAncestors(ids: Array<string>) {
+		const { data } = await tryExecute(this.#host, MediaService.getItemMediaAncestors({ query: { id: ids } }));
+
+		const ancestorsByItemId = new Map<string, Array<{ name: string }>>();
+		if (data) {
+			for (const entry of data) {
+				ancestorsByItemId.set(
+					entry.id,
+					entry.ancestors.map((ancestor) => ({ name: ancestor.variants[0]?.name ?? '' })),
+				);
+			}
+		}
+		return ancestorsByItemId;
+	}
+
 	/**
 	 * Get a list of versions for a data
 	 * @param {UmbMediaSearchRequestArgs}args - The arguments for the search
@@ -49,21 +64,7 @@ export class UmbMediaSearchServerDataSource
 
 		if (data) {
 			const ids = data.items.map((item) => item.id);
-
-			const { data: ancestorsData } = await tryExecute(
-				this.#host,
-				MediaService.getItemMediaAncestors({ query: { id: ids } }),
-			);
-
-			const ancestorsByItemId = new Map<string, Array<{ name: string }>>();
-			if (ancestorsData) {
-				for (const entry of ancestorsData) {
-					ancestorsByItemId.set(
-						entry.id,
-						entry.ancestors.map((ancestor) => ({ name: ancestor.variants[0]?.name ?? '' })),
-					);
-				}
-			}
+			const ancestorsByItemId = await this.#fetchAncestors(ids);
 
 			const mappedItems: Array<UmbMediaSearchItemModel> = data.items.map((item) => {
 				return {
