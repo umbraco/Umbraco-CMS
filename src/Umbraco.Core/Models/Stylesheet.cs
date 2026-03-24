@@ -110,7 +110,7 @@ public class Stylesheet : File, IStylesheet
         {
             // re-parse it so we can check what properties are different and adjust the event handlers
             StylesheetRule[] parsed = StylesheetHelper.ParseRules(Content).ToArray();
-            var names = parsed.Select(x => x.Name).ToArray();
+            var names = Array.ConvertAll(parsed, x => x.Name);
             StylesheetProperty[] existing = _properties.Value.Where(x => names.InvariantContains(x.Name)).ToArray();
 
             // update existing

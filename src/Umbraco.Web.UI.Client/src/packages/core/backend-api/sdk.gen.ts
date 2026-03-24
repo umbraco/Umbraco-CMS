@@ -190,6 +190,19 @@ export class DataTypeService {
         });
     }
     
+    public static getDataTypeByIdSchema<ThrowOnError extends boolean = true>(options: Options<GetDataTypeByIdSchemaData, ThrowOnError>) {
+        return (options.client ?? client).get<GetDataTypeByIdSchemaResponses, GetDataTypeByIdSchemaErrors, ThrowOnError>({
+            security: [
+                {
+                    scheme: 'bearer',
+                    type: 'http'
+                }
+            ],
+            url: '/umbraco/management/api/v1/data-type/{id}/schema',
+            ...options
+        });
+    }
+    
     /**
      * Gets multiple data types.
      * Gets multiple data types identified by the provided Ids.
@@ -297,6 +310,19 @@ export class DataTypeService {
                 'Content-Type': 'application/json',
                 ...options.headers
             }
+        });
+    }
+    
+    public static getDataTypeSchemasBatch<ThrowOnError extends boolean = true>(options?: Options<GetDataTypeSchemasBatchData, ThrowOnError>) {
+        return (options?.client ?? client).get<GetDataTypeSchemasBatchResponses, GetDataTypeSchemasBatchErrors, ThrowOnError>({
+            security: [
+                {
+                    scheme: 'bearer',
+                    type: 'http'
+                }
+            ],
+            url: '/umbraco/management/api/v1/data-type/schemas/batch',
+            ...options
         });
     }
     
@@ -1192,6 +1218,19 @@ export class DocumentTypeService {
                 'Content-Type': 'application/json',
                 ...options.headers
             }
+        });
+    }
+    
+    public static getDocumentTypeByIdSchema<ThrowOnError extends boolean = true>(options: Options<GetDocumentTypeByIdSchemaData, ThrowOnError>) {
+        return (options.client ?? client).get<GetDocumentTypeByIdSchemaResponses, GetDocumentTypeByIdSchemaErrors, ThrowOnError>({
+            security: [
+                {
+                    scheme: 'bearer',
+                    type: 'http'
+                }
+            ],
+            url: '/umbraco/management/api/v1/document-type/{id}/schema',
+            ...options
         });
     }
     
@@ -4157,6 +4196,19 @@ export class MediaTypeService {
         });
     }
     
+    public static getMediaTypeByIdSchema<ThrowOnError extends boolean = true>(options: Options<GetMediaTypeByIdSchemaData, ThrowOnError>) {
+        return (options.client ?? client).get<GetMediaTypeByIdSchemaResponses, GetMediaTypeByIdSchemaErrors, ThrowOnError>({
+            security: [
+                {
+                    scheme: 'bearer',
+                    type: 'http'
+                }
+            ],
+            url: '/umbraco/management/api/v1/media-type/{id}/schema',
+            ...options
+        });
+    }
+    
     /**
      * Gets media types allowed at root.
      * Gets a collection of media types that are allowed to be created at the root level.
@@ -4670,7 +4722,6 @@ export class MediaService {
     /**
      * Gets the media configuration.
      * Gets the configuration settings for media.
-     * @deprecated
      */
     public static getMediaConfiguration<ThrowOnError extends boolean = true>(options?: Options<GetMediaConfigurationData, ThrowOnError>) {
         return (options?.client ?? client).get<GetMediaConfigurationResponses, GetMediaConfigurationErrors, ThrowOnError>({
@@ -5304,6 +5355,36 @@ export class MemberTypeService {
                 'Content-Type': 'application/json',
                 ...options.headers
             }
+        });
+    }
+    
+    public static getMemberTypeByIdSchema<ThrowOnError extends boolean = true>(options: Options<GetMemberTypeByIdSchemaData, ThrowOnError>) {
+        return (options.client ?? client).get<GetMemberTypeByIdSchemaResponses, GetMemberTypeByIdSchemaErrors, ThrowOnError>({
+            security: [
+                {
+                    scheme: 'bearer',
+                    type: 'http'
+                }
+            ],
+            url: '/umbraco/management/api/v1/member-type/{id}/schema',
+            ...options
+        });
+    }
+    
+    /**
+     * Gets member types allowed at root.
+     * Gets a collection of member types that are allowed to be created at the root level.
+     */
+    public static getMemberTypeAllowedAtRoot<ThrowOnError extends boolean = true>(options?: Options<GetMemberTypeAllowedAtRootData, ThrowOnError>) {
+        return (options?.client ?? client).get<GetMemberTypeAllowedAtRootResponses, GetMemberTypeAllowedAtRootErrors, ThrowOnError>({
+            security: [
+                {
+                    scheme: 'bearer',
+                    type: 'http'
+                }
+            ],
+            url: '/umbraco/management/api/v1/member-type/allowed-at-root',
+            ...options
         });
     }
     

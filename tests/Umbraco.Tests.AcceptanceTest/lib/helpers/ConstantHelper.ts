@@ -295,6 +295,7 @@
     language: '/umbraco/management/api/v1/language',
     media: '/umbraco/management/api/v1/media',
     mediaType: '/umbraco/management/api/v1/media-type',
+    memberType: '/umbraco/management/api/v1/member-type',
     mediaTypeFolder: '/umbraco/management/api/v1/media-type/folder',
     member: '/umbraco/management/api/v1/member',
     memberGroup: '/umbraco/management/api/v1/member-group',
@@ -338,5 +339,10 @@
     6: ['Duplicate', 'Allow access to duplicate an element', 'Umb.Element.Duplicate'],
     7: ['Move', 'Allow access to move an element', 'Umb.Element.Move'],
     8: ['Rollback', 'Allow access to rollback an element to a previous state', 'Umb.Element.Rollback']
+  }
+
+  public static readonly healthCheckMessages = {
+    imagingHMACSecretKeyIsNotConfigured: 'No HMAC secret key is configured for image URL signing. It is recommended to set Umbraco:CMS:Imaging:HMACSecretKey to prevent unauthorized image manipulation requests.',
+    imagingHMACSecretKeyIsConfigured: 'The HMAC secret key for image URL signing is configured'
   }
 }
