@@ -228,6 +228,7 @@ public static partial class UmbracoBuilderExtensions
 
         builder.Services.AddSingleton<UploadAutoFillProperties>();
         builder.Services.AddSingleton<IImageDimensionExtractor, NoopImageDimensionExtractor>();
+        builder.Services.AddSingleton<ISvgDimensionExtractor, SvgDimensionExtractor>();
         builder.Services.AddSingleton<IImageUrlGenerator, NoopImageUrlGenerator>();
 
         builder.Services.AddSingleton<ICronTabParser, NCronTabParser>();
@@ -403,6 +404,7 @@ public static partial class UmbracoBuilderExtensions
             .AddNotificationHandler<MediaMovedNotification, FileUploadContentDeletedNotificationHandler>()
             .AddNotificationHandler<MemberDeletedNotification, FileUploadContentDeletedNotificationHandler>()
             .AddNotificationHandler<MediaSavingNotification, FileUploadMediaSavingNotificationHandler>()
+            .AddNotificationHandler<MediaSavingNotification, SvgFileUploadMediaSavingNotificationHandler>()
             .AddNotificationHandler<ContentCopiedNotification, ImageCropperPropertyEditor>()
             .AddNotificationHandler<ContentDeletedNotification, ImageCropperPropertyEditor>()
             .AddNotificationHandler<MediaDeletedNotification, ImageCropperPropertyEditor>()
