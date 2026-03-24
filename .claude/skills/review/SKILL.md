@@ -16,6 +16,22 @@ Automated, non-interactive PR code review. Analyzes changed files for intent, im
 
 ## Instructions
 
+### 0. Verify GH CLI is Available
+
+Before doing anything else, run `gh auth status` to check that the GitHub CLI is installed and authenticated.
+
+**If the command fails** (not installed or not authenticated), **stop immediately** and output this message:
+
+> **GH CLI is required for this review skill.**
+>
+> Install it (e.g. `brew install gh`) and then authorize by running this in your terminal (use the `!` prefix):
+>
+> ```
+> ! gh auth login
+> ```
+
+Do not proceed with the review if this check fails.
+
 ### 1. Resolve Target Branch
 
 Determine the target branch for comparison using this priority order:
