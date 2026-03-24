@@ -14,7 +14,7 @@ internal class ContentVersionCleanupJob : IDistributedBackgroundJob
     public string Name => "ContentVersionCleanupJob";
 
     /// <inheritdoc />
-    public TimeSpan Period { get => TimeSpan.FromHours(1); }
+    public TimeSpan Period { get => TimeSpan.FromMinutes(1); }
 
 
     private readonly ILogger<ContentVersionCleanupJob> _logger;
@@ -42,11 +42,10 @@ internal class ContentVersionCleanupJob : IDistributedBackgroundJob
         if (!_settingsMonitor.CurrentValue.ContentVersionCleanupPolicy.EnableCleanup)
         {
             _logger.LogInformation(
-                "ContentVersionCleanup task will not run as it has been globally disabled via configuration");
+                "ContentVersionCleanup task will not run as it has been globally disabled via configuration.");
             return Task.CompletedTask;
         }
 
-        ContentVersionCleanupPolicySettings policy = _settingsMonitor.CurrentValue.ContentVersionCleanupPolicy;
         var count = _service.PerformContentVersionCleanup(DateTime.UtcNow).Count;
 
         if (count > 0)
@@ -56,13 +55,6 @@ internal class ContentVersionCleanupJob : IDistributedBackgroundJob
         else
         {
             _logger.LogDebug("Task complete, no items were deleted");
-        }
-
-        if (policy.MaxVersionsToDeletePerRun > 0 && count >= policy.MaxVersionsToDeletePerRun)
-        {
-            _logger.LogInformation(
-                "Reached per-run cap of {MaxVersionsToDeletePerRun}. Remaining versions will be cleaned up in subsequent runs",
-                policy.MaxVersionsToDeletePerRun);
         }
 
         return Task.CompletedTask;

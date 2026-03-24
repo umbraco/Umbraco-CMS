@@ -222,6 +222,7 @@ internal sealed class ContentVersionService : IContentVersionService
     private IReadOnlyCollection<ContentVersionMeta> CleanupDocumentVersions(DateTime asAtDate)
     {
         List<ContentVersionMeta> versionsToDelete;
+        var fetchWasCapped = false;
 
         Configuration.Models.ContentVersionCleanupPolicySettings versionCleanupPolicy = _contentSettings.CurrentValue.ContentVersionCleanupPolicy;
 
@@ -259,6 +260,8 @@ internal sealed class ContentVersionService : IContentVersionService
                 scope.Complete();
                 return [];
             }
+
+            fetchWasCapped = fetchLimit.HasValue && allHistoricVersions.Count >= fetchLimit.Value;
 
             if (_logger.IsEnabled(LogLevel.Debug))
             {
@@ -300,7 +303,10 @@ internal sealed class ContentVersionService : IContentVersionService
             return [];
         }
 
-        _logger.LogDebug("Removing {Count} ContentVersion(s)", versionsToDelete.Count);
+        if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug("Removing {Count} ContentVersion(s)", versionsToDelete.Count);
+        }
 
         foreach (IEnumerable<ContentVersionMeta> group in versionsToDelete.InGroupsOf(Constants.Sql.MaxParameterCount))
         {
@@ -320,6 +326,13 @@ internal sealed class ContentVersionService : IContentVersionService
 
                 scope.Complete();
             }
+        }
+
+        if (fetchWasCapped)
+        {
+            _logger.LogInformation(
+                "Reached per-run cap of {MaxVersionsToDeletePerRun}. Remaining versions will be cleaned up in subsequent runs.",
+                fetchLimit);
         }
 
         using (ICoreScope scope = _scopeProvider.CreateCoreScope())
