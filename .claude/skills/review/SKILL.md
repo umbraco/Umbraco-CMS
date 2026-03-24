@@ -1,5 +1,5 @@
 ---
-name: review-pr
+name: review
 description: Automated PR code review for Umbraco CMS. Analyzes changed files for intent, impact on consumers, breaking changes, architecture compliance, and code quality. Non-interactive — outputs a full structured review.
 argument_hint: <target-branch>
 ---
@@ -39,20 +39,20 @@ Parse and internalize all rules, conventions, scoring categories, and severity d
 
 Then, for each changed file in the PR, determine which project it belongs to and load that project's CLAUDE.md if it exists. Use the file path to map to projects:
 
-| Path prefix | CLAUDE.md to load |
-|---|---|
-| `src/Umbraco.Core/` | `src/Umbraco.Core/CLAUDE.md` |
-| `src/Umbraco.Infrastructure/` | `src/Umbraco.Infrastructure/CLAUDE.md` |
-| `src/Umbraco.Web.Common/` | `src/Umbraco.Web.Common/CLAUDE.md` |
-| `src/Umbraco.Web.UI/` | `src/Umbraco.Web.UI/CLAUDE.md` |
-| `src/Umbraco.Web.UI.Client/` | `src/Umbraco.Web.UI.Client/CLAUDE.md` |
-| `src/Umbraco.Cms.Api.Management/` | `src/Umbraco.Cms.Api.Management/CLAUDE.md` |
-| `src/Umbraco.Cms.Api.Delivery/` | `src/Umbraco.Cms.Api.Delivery/CLAUDE.md` |
-| `src/Umbraco.Cms.Api.Common/` | `src/Umbraco.Cms.Api.Common/CLAUDE.md` |
-| `src/Umbraco.Cms.Persistence.EFCore/` | `src/Umbraco.Cms.Persistence.EFCore/CLAUDE.md` |
+| Path prefix                               | CLAUDE.md to load                                  |
+| ----------------------------------------- | -------------------------------------------------- |
+| `src/Umbraco.Core/`                       | `src/Umbraco.Core/CLAUDE.md`                       |
+| `src/Umbraco.Infrastructure/`             | `src/Umbraco.Infrastructure/CLAUDE.md`             |
+| `src/Umbraco.Web.Common/`                 | `src/Umbraco.Web.Common/CLAUDE.md`                 |
+| `src/Umbraco.Web.UI/`                     | `src/Umbraco.Web.UI/CLAUDE.md`                     |
+| `src/Umbraco.Web.UI.Client/`              | `src/Umbraco.Web.UI.Client/CLAUDE.md`              |
+| `src/Umbraco.Cms.Api.Management/`         | `src/Umbraco.Cms.Api.Management/CLAUDE.md`         |
+| `src/Umbraco.Cms.Api.Delivery/`           | `src/Umbraco.Cms.Api.Delivery/CLAUDE.md`           |
+| `src/Umbraco.Cms.Api.Common/`             | `src/Umbraco.Cms.Api.Common/CLAUDE.md`             |
+| `src/Umbraco.Cms.Persistence.EFCore/`     | `src/Umbraco.Cms.Persistence.EFCore/CLAUDE.md`     |
 | `src/Umbraco.PublishedCache.HybridCache/` | `src/Umbraco.PublishedCache.HybridCache/CLAUDE.md` |
-| `src/Umbraco.Examine.Lucene/` | `src/Umbraco.Examine.Lucene/CLAUDE.md` |
-| (other `src/*` projects) | Check if a CLAUDE.md exists in that project root |
+| `src/Umbraco.Examine.Lucene/`             | `src/Umbraco.Examine.Lucene/CLAUDE.md`             |
+| (other `src/*` projects)                  | Check if a CLAUDE.md exists in that project root   |
 
 **Only load each CLAUDE.md once**, even if multiple files changed in the same project. There are 23 CLAUDE.md files across the repo — only load those relevant to the PR's changed files.
 
@@ -151,19 +151,19 @@ Present the review in this exact format:
 
 ### Score Table
 
-| Category | Score | Comment |
-|----------|------:|---------|
-| **Overall** | **XX** | |
-| Security | XX | |
-| Performance | XX | |
-| Architecture | XX | |
-| Consistency | XX | |
-| Testing | XX | |
-| Readability | XX | |
-| Error Handling | XX | |
-| {context-specific 1} | XX | |
-| {context-specific 2} | XX | |
-| {context-specific 3} | XX | |
+| Category             |  Score | Comment |
+| -------------------- | -----: | ------- |
+| **Overall**          | **XX** |         |
+| Security             |     XX |         |
+| Performance          |     XX |         |
+| Architecture         |     XX |         |
+| Consistency          |     XX |         |
+| Testing              |     XX |         |
+| Readability          |     XX |         |
+| Error Handling       |     XX |         |
+| {context-specific 1} |     XX |         |
+| {context-specific 2} |     XX |         |
+| {context-specific 3} |     XX |         |
 
 Select 3-6 context-specific categories relevant to this particular PR (e.g., Breaking Changes, API Design, Database, Frontend, Concurrency, Observability, Configuration, Domain Modeling).
 
@@ -206,6 +206,7 @@ The overall score is weighted by relevance, not a simple average.
 ### Verdict
 
 [One of:]
+
 - **Approve** — Ship it.
 - **Approve with nits** — Good to go, consider the suggestions.
 - **Request Changes** — Critical/important issues must be addressed.
