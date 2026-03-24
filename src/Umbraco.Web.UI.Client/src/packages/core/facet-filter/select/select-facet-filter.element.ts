@@ -121,6 +121,11 @@ export class UmbSelectFacetFilterElement extends UmbLitElement {
 		this._comboboxSearch = target.value ?? '';
 	}
 
+	#formatOptionLabel(option: UmbDatalistOptionModel): string {
+		const name = option.name ?? option.unique;
+		return option.count !== undefined ? `${name} (${option.count})` : name;
+	}
+
 	protected override render() {
 		const inline = this._options.length < INLINE_THRESHOLD && !this._hasMore;
 		if (inline) {
@@ -136,7 +141,7 @@ export class UmbSelectFacetFilterElement extends UmbLitElement {
 					${repeat(
 						this._options,
 						(option) => option.unique,
-						(option) => html`<uui-radio label=${option.name ?? option.unique} value=${option.unique}></uui-radio>`,
+						(option) => html`<uui-radio label=${this.#formatOptionLabel(option)} value=${option.unique}></uui-radio>`,
 					)}
 				</uui-radio-group>
 			</div>
@@ -152,7 +157,7 @@ export class UmbSelectFacetFilterElement extends UmbLitElement {
 						(option) => option.unique,
 						(option) => html`
 							<uui-checkbox
-								label=${ifDefined(option.name)}
+								label=${this.#formatOptionLabel(option)}
 								value=${ifDefined(option.unique)}
 								@change=${this.#onCheckboxChange}
 								.checked=${this._value.some((v) => v.unique === option.unique)}></uui-checkbox>
@@ -177,7 +182,7 @@ export class UmbSelectFacetFilterElement extends UmbLitElement {
 							(option) => option.unique,
 							(option) => html`
 								<uui-combobox-list-option value=${option.unique}
-									>${option.name ?? option.unique}</uui-combobox-list-option
+									>${this.#formatOptionLabel(option)}</uui-combobox-list-option
 								>
 							`,
 						)}
@@ -215,7 +220,7 @@ export class UmbSelectFacetFilterElement extends UmbLitElement {
 								(option) => option.unique,
 								(option) => html`
 									<uui-checkbox
-										label=${ifDefined(option.name)}
+										label=${this.#formatOptionLabel(option)}
 										value=${ifDefined(option.unique)}
 										@change=${this.#onCheckboxChange}
 										.checked=${this._value.some((v) => v.unique === option.unique)}></uui-checkbox>

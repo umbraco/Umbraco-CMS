@@ -3,6 +3,6 @@ import type { UmbDatalistDataSource } from '@umbraco-cms/backoffice/datalist-dat
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export interface MetaFacetFilterSelect extends MetaFacetFilter {
-	datalistDataSource: new (host: UmbControllerHost) => UmbDatalistDataSource;
+	datalistDataSource?: new (host: UmbControllerHost) => UmbDatalistDataSource;
 	multiple?: boolean;
 }

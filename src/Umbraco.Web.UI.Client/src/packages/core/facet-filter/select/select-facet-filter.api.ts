@@ -27,6 +27,7 @@ export class UmbSelectFacetFilterApi extends UmbControllerBase {
 
 	#facetFilterContext?: typeof UMB_FACET_FILTER_CONTEXT.TYPE;
 	#datalistDataSource?: UmbDatalistDataSource;
+	#hasFacetedResults = false;
 	public readonly pagination = new UmbPaginationManager();
 
 	#manifest?: ManifestFacetFilter | undefined;
@@ -48,6 +49,7 @@ export class UmbSelectFacetFilterApi extends UmbControllerBase {
 		this.consumeContext(UMB_FACET_FILTER_CONTEXT, (context) => {
 			this.#facetFilterContext = context;
 			this.#observeFilterValues();
+			this.#observeFacetedResult();
 		});
 	}
 
@@ -64,11 +66,30 @@ export class UmbSelectFacetFilterApi extends UmbControllerBase {
 		);
 	}
 
+	#observeFacetedResult() {
+		if (!this.#facetFilterContext) return;
+		this.observe(
+			this.#facetFilterContext.facetedResult,
+			(result) => {
+				const options = result as Array<UmbDatalistOptionModel> | undefined;
+				if (options && options.length > 0) {
+					this.#hasFacetedResults = true;
+					this.#options.setValue(options);
+				} else {
+					this.#hasFacetedResults = false;
+				}
+			},
+			'umbFacetedResultObserver',
+		);
+	}
+
 	public loadOptions() {
+		if (this.#hasFacetedResults) return;
 		this.#requestOptions();
 	}
 
 	public loadMoreOptions() {
+		if (this.#hasFacetedResults) return;
 		const nextPage = this.pagination.getCurrentPageNumber() + 1;
 		if (nextPage <= this.pagination.getTotalPages()) {
 			this.pagination.setCurrentPageNumber(nextPage);
@@ -92,7 +113,28 @@ export class UmbSelectFacetFilterApi extends UmbControllerBase {
 			return;
 		}
 
-		const { data, asObservable } = await this.#datalistDataSource!.requestItems(uniques);
+		// When faceted results are active, resolve value items from the current options
+		if (this.#hasFacetedResults) {
+			const currentOptions = this.#options.getValue();
+			const items: Array<UmbDatalistItemModel> = [];
+			for (const unique of uniques) {
+				const option = currentOptions.find((o) => o.unique === unique);
+				if (option) {
+					items.push({
+						unique: option.unique,
+						entityType: option.entityType,
+						name: option.name,
+						icon: option.icon,
+					});
+				}
+			}
+			this.#valueItems.setValue(items);
+			return;
+		}
+
+		if (!this.#datalistDataSource) return;
+
+		const { data, asObservable } = await this.#datalistDataSource.requestItems(uniques);
 
 		if (asObservable) {
 			this.observe(asObservable(), (items) => this.#valueItems.setValue(items ?? []), ObserveValueItems);
@@ -102,7 +144,9 @@ export class UmbSelectFacetFilterApi extends UmbControllerBase {
 	}
 
 	async #requestOptions() {
-		const { data } = await this.#datalistDataSource!.requestOptions({
+		if (!this.#datalistDataSource) return;
+
+		const { data } = await this.#datalistDataSource.requestOptions({
 			skip: this.pagination.getSkip(),
 			take: this.pagination.getPageSize(),
 		});

@@ -1,24 +1,23 @@
 import { UMB_FACET_FILTER_MANAGER_CONTEXT } from './facet-filter.manager.context-token.js';
+import type { UmbActiveFacetFilterModel } from './types.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import type { Observable } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-export interface UmbActiveFacetFilterModel {
+export interface UmbFacetedResultModel {
 	alias: string;
-	unique: string;
-	value: any;
+	result: unknown;
 }
 
 export class UmbFacetFilterManager extends UmbContextBase {
-	#activeFilters = new UmbArrayState<UmbActiveFacetFilterModel>(
-		[],
-		(x) => `${x.alias}||${x.unique}`,
-	);
+	#activeFilters = new UmbArrayState<UmbActiveFacetFilterModel>([], (x) => `${x.alias}||${x.unique}`);
 	public readonly activeFilters = this.#activeFilters.asObservable();
 	public readonly totalActiveFilters = this.#activeFilters.asObservablePart(
 		(filters) => new Set(filters.map((f) => f.alias)).size,
 	);
+
+	#facetedResults = new UmbArrayState<UmbFacetedResultModel>([], (x) => x.alias);
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_FACET_FILTER_MANAGER_CONTEXT);
@@ -26,6 +25,7 @@ export class UmbFacetFilterManager extends UmbContextBase {
 
 	/**
 	 * Add or update a single filter entry identified by alias + unique.
+	 * @param filter
 	 */
 	public setFilter(filter: UmbActiveFacetFilterModel): void {
 		const key = `${filter.alias}||${filter.unique}`;
@@ -38,6 +38,8 @@ export class UmbFacetFilterManager extends UmbContextBase {
 
 	/**
 	 * Atomically replace all entries for a given alias.
+	 * @param alias
+	 * @param entries
 	 */
 	public setFilterValues(alias: string, entries: Array<{ unique: string; value: any }>): void {
 		const current = this.#activeFilters.getValue();
@@ -48,6 +50,7 @@ export class UmbFacetFilterManager extends UmbContextBase {
 
 	/**
 	 * Observable for all active filter entries for a given alias.
+	 * @param alias
 	 */
 	public filterValuesByAlias(alias: string): Observable<Array<UmbActiveFacetFilterModel>> {
 		return this.#activeFilters.asObservablePart((filters) => filters.filter((f) => f.alias === alias));
@@ -55,6 +58,7 @@ export class UmbFacetFilterManager extends UmbContextBase {
 
 	/**
 	 * Clear all entries for a given alias.
+	 * @param alias
 	 */
 	public clearFilter(alias: string): void {
 		const current = this.#activeFilters.getValue();
@@ -63,6 +67,8 @@ export class UmbFacetFilterManager extends UmbContextBase {
 
 	/**
 	 * Clear a single entry identified by alias + unique.
+	 * @param alias
+	 * @param unique
 	 */
 	public clearFilterValue(alias: string, unique: string): void {
 		const key = `${alias}||${unique}`;
@@ -81,5 +87,34 @@ export class UmbFacetFilterManager extends UmbContextBase {
 	 */
 	public async getActiveFilters(): Promise<Array<UmbActiveFacetFilterModel>> {
 		return this.#activeFilters.getValue();
+	}
+
+	/**
+	 * Set faceted result data for a given alias.
+	 * @param alias
+	 * @param result
+	 */
+	public setFacetedResult(alias: string, result: unknown): void {
+		const key = alias;
+		if (this.#facetedResults.getHasOne(key)) {
+			this.#facetedResults.updateOne(key, { alias, result });
+		} else {
+			this.#facetedResults.append([{ alias, result }]);
+		}
+	}
+
+	/**
+	 * Observable for the faceted result of a given alias.
+	 * @param alias
+	 */
+	public facetedResultByAlias(alias: string): Observable<unknown> {
+		return this.#facetedResults.asObservablePart((results) => results.find((r) => r.alias === alias)?.result);
+	}
+
+	/**
+	 * Clear all faceted results.
+	 */
+	public clearFacetedResults(): void {
+		this.#facetedResults.setValue([]);
 	}
 }

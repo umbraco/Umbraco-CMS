@@ -13,6 +13,7 @@ export interface UmbDatalistOptionModel extends UmbEntityModel {
 	unique: string;
 	name?: string;
 	icon?: string;
+	count?: number;
 }
 
 export interface UmbDatalistRequestArgs {

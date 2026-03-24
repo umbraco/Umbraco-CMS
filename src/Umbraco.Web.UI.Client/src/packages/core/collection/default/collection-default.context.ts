@@ -318,13 +318,22 @@ export class UmbDefaultCollectionContext<
 		this._loading.setValue(true);
 
 		const filterArgs = await this._getFilterArgs();
-		const filter = { ...this._filter.getValue(), ...filterArgs };
+		const filters = await this.filtering.getActiveFilters();
+		const filter = { ...this._filter.getValue(), ...filterArgs, filters };
 		const { data } = await this._repository.requestCollection(filter);
 
 		if (data) {
 			this._items.setValue(data.items);
 			this._totalItems.setValue(data.total);
 			this.pagination.setTotalItems(data.total);
+
+			// If the response includes faceted results, push them to the filter manager
+			if ('facets' in data && data.facets) {
+				const facets = data.facets as Record<string, unknown>;
+				for (const [alias, result] of Object.entries(facets)) {
+					this.filtering.setFacetedResult(alias, result);
+				}
+			}
 		}
 
 		this._loading.setValue(false);
