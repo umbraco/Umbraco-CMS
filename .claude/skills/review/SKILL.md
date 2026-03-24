@@ -168,19 +168,19 @@ Present the review in this exact format:
 
 ### Score Table
 
-| Category             |  Score | Comment |
-| -------------------- | -----: | ------- |
-| **Overall**          | **XX** |         |
-| Security             |     XX |         |
-| Performance          |     XX |         |
-| Architecture         |     XX |         |
-| Consistency          |     XX |         |
-| Testing              |     XX |         |
-| Readability          |     XX |         |
-| Error Handling       |     XX |         |
-| {context-specific 1} |     XX |         |
-| {context-specific 2} |     XX |         |
-| {context-specific 3} |     XX |         |
+| Category | Score | Comment |
+| :--- | ---: | :--- |
+| **Overall** | **XX** | |
+| Security | XX | |
+| Performance | XX | |
+| Architecture | XX | |
+| Consistency | XX | |
+| Testing | XX | |
+| Readability | XX | |
+| Error Handling | XX | |
+| {context-specific 1} | XX | |
+| {context-specific 2} | XX | |
+| {context-specific 3} | XX | |
 
 Select 3-6 context-specific categories relevant to this particular PR (e.g., Breaking Changes, API Design, Database, Frontend, Concurrency, Observability, Configuration, Domain Modeling).
 
