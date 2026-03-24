@@ -26,10 +26,6 @@ internal class ContentVersionCleanupServiceTest
         DateTime aDateTime,
         ContentVersionService sut)
     {
-        #pragma warning disable CS0618 // Type or member is obsolete
-        documentVersionRepository.Setup(x => x.GetDocumentVersionsEligibleForCleanup())
-            .Returns(someHistoricVersions);
-#pragma warning restore CS0618 // Type or member is obsolete
         documentVersionRepository.Setup(x => x.GetDocumentVersionsEligibleForCleanup(It.IsAny<DateTime>(), It.IsAny<int>()))
             .Returns(someHistoricVersions);
 
@@ -62,10 +58,6 @@ internal class ContentVersionCleanupServiceTest
         DateTime aDateTime,
         ContentVersionService sut)
     {
-        #pragma warning disable CS0618 // Type or member is obsolete
-        documentVersionRepository.Setup(x => x.GetDocumentVersionsEligibleForCleanup())
-            .Returns(someHistoricVersions);
-#pragma warning restore CS0618 // Type or member is obsolete
         documentVersionRepository.Setup(x => x.GetDocumentVersionsEligibleForCleanup(It.IsAny<DateTime>(), It.IsAny<int>()))
             .Returns(someHistoricVersions);
 
@@ -92,10 +84,6 @@ internal class ContentVersionCleanupServiceTest
         DateTime aDateTime,
         ContentVersionService sut)
     {
-        #pragma warning disable CS0618 // Type or member is obsolete
-        documentVersionRepository.Setup(x => x.GetDocumentVersionsEligibleForCleanup())
-            .Returns(someHistoricVersions);
-#pragma warning restore CS0618 // Type or member is obsolete
         documentVersionRepository.Setup(x => x.GetDocumentVersionsEligibleForCleanup(It.IsAny<DateTime>(), It.IsAny<int>()))
             .Returns(someHistoricVersions);
 
@@ -123,10 +111,6 @@ internal class ContentVersionCleanupServiceTest
         DateTime aDateTime,
         ContentVersionService sut)
     {
-        #pragma warning disable CS0618 // Type or member is obsolete
-        documentVersionRepository.Setup(x => x.GetDocumentVersionsEligibleForCleanup())
-            .Returns(someHistoricVersions);
-#pragma warning restore CS0618 // Type or member is obsolete
         documentVersionRepository.Setup(x => x.GetDocumentVersionsEligibleForCleanup(It.IsAny<DateTime>(), It.IsAny<int>()))
             .Returns(someHistoricVersions);
 
@@ -162,10 +146,6 @@ internal class ContentVersionCleanupServiceTest
         DateTime aDateTime,
         ContentVersionService sut)
     {
-        #pragma warning disable CS0618 // Type or member is obsolete
-        documentVersionRepository.Setup(x => x.GetDocumentVersionsEligibleForCleanup())
-            .Returns(someHistoricVersions);
-#pragma warning restore CS0618 // Type or member is obsolete
         documentVersionRepository.Setup(x => x.GetDocumentVersionsEligibleForCleanup(It.IsAny<DateTime>(), It.IsAny<int>()))
             .Returns(someHistoricVersions);
 
