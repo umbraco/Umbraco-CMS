@@ -2025,7 +2025,7 @@ export default {
 		},
 		changePassword: 'Skift dit kodeord',
 		changePhoto: 'Skift billede',
-		configureMfa: 'Konfigurer MFA',
+		configureMfa: 'Konfigurer 2FA',
 		newPassword: 'Nyt kodeord',
 		newPasswordFormatLengthTip: 'Minium %0% karakterer tilbage!',
 		newPasswordFormatNonAlphaTip: 'Der skal som minium være %0% specielle karakterer.',
