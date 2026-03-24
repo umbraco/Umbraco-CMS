@@ -167,6 +167,8 @@ public class UmbracoPlan : MigrationPlan
         To<V_17_3_0.AddSortableValueToPropertyData>("{9DBDB5CD-8679-4BB0-BF83-E8D508073CE0}");
         To<V_17_3_0.PopulateSortableValueForDatePropertyData>("{6748CB56-CC16-49F0-BA91-B8ECE31BF456}");
 
+        // To 17.4.0
+        To<V_17_4_0.AddDimensionsToSvg>("{72970B86-59D8-403C-B322-FFF43F9DB199}");
 
         // To 18.0.0
         // TODO (V18): Enable on 18 branch
