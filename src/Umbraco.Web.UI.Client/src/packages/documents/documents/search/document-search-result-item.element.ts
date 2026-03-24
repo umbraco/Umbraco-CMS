@@ -72,6 +72,18 @@ export class UmbDocumentSearchResultItemElement extends UmbLitElement {
 		);
 	}
 
+	#getAncestorPath() {
+		return this.item?.ancestors
+			?.map((a) => {
+				const variant =
+					a.variants.find((v) => v.culture === this._currentCulture) ??
+					a.variants.find((v) => v.culture === this._defaultCulture) ??
+					a.variants[0];
+				return variant?.name ?? '';
+			})
+			.join(' / ');
+	}
+
 	override render() {
 		if (!this.item) return nothing;
 
@@ -91,10 +103,7 @@ export class UmbDocumentSearchResultItemElement extends UmbLitElement {
 			)}
 			<span class=${classMap(classes)}>
 				${label}
-				${when(
-					this.item.ancestors?.length,
-					() => html`<small class="ancestors">${this.item?.ancestors!.map((a) => a.name).join(' / ')}</small>`,
-				)}
+				${when(this.item.ancestors?.length, () => html`<small class="ancestors">${this.#getAncestorPath()}</small>`)}
 			</span>
 			<div class="extra">
 				${when(

@@ -55,12 +55,17 @@ export class UmbDocumentSearchServerDataSource
 				DocumentService.getItemDocumentAncestors({ query: { id: ids } }),
 			);
 
-			const ancestorsByItemId = new Map<string, Array<{ name: string }>>();
+			const ancestorsByItemId = new Map<string, Array<{ variants: Array<{ name: string; culture: string | null }> }>>();
 			if (ancestorsData) {
 				for (const entry of ancestorsData) {
 					ancestorsByItemId.set(
 						entry.id,
-						entry.ancestors.map((ancestor) => ({ name: ancestor.variants[0]?.name ?? '' })),
+						entry.ancestors.map((ancestor) => ({
+							variants: ancestor.variants.map((v) => ({
+								name: v.name,
+								culture: v.culture || null,
+							})),
+						})),
 					);
 				}
 			}
