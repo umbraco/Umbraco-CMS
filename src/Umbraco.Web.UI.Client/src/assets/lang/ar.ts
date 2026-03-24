@@ -1776,7 +1776,7 @@ export default {
 		createDate: 'تاريخ إنشاء المستخدم',
 		changePassword: 'تغيير كلمة المرور',
 		changePhoto: 'تغيير الصورة',
-		configureMfa: 'تكوين 2FA',
+		configureMfa: 'تكوين MFA',
 		emailRequired: 'مطلوب - أدخل عنوان بريد إلكتروني لهذا المستخدم',
 		emailDescription: (usernameIsEmail) => {
 			return usernameIsEmail

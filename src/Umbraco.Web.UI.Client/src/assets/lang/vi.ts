@@ -2010,7 +2010,7 @@ export default {
 		},
 		changePassword: 'Đổi mật khẩu',
 		changePhoto: 'Đổi ảnh',
-		configureMfa: 'Cấu hình 2FA',
+		configureMfa: 'Cấu hình MFA',
 		emailRequired: 'Bắt buộc - nhập địa chỉ email cho người dùng này',
 		emailDescription: (usernameIsEmail: boolean) => {
 			return usernameIsEmail
