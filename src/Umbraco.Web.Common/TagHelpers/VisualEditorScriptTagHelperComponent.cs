@@ -10,9 +10,9 @@ namespace Umbraco.Cms.Web.Common.TagHelpers;
 /// Injects the visual editor guest script into the <c>&lt;body&gt;</c> tag when in preview mode.
 /// </summary>
 /// <remarks>
-/// This replaces manual script injection in <see cref="UmbracoViewPage{TModel}.WriteUmbracoContent"/>
-/// with the standard ASP.NET Core <see cref="ITagHelperComponent"/> extensibility point.
-/// The guest script runs inside the preview iframe and communicates with the backoffice via postMessage.
+/// Uses the standard ASP.NET Core <see cref="ITagHelperComponent"/> extensibility point to append
+/// the guest script to the body tag. The script runs inside the preview iframe and communicates
+/// with the backoffice via postMessage.
 /// </remarks>
 internal sealed class VisualEditorScriptTagHelperComponent : TagHelperComponent
 {

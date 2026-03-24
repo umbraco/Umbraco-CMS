@@ -329,7 +329,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<BootFailedMiddleware>();
         builder.Services.AddSingleton<ProtectRecycleBinMediaMiddleware>();
 
-        builder.Services.AddTransient<ITagHelperComponent, VisualEditorScriptTagHelperComponent>();
+        builder.Services.AddScoped<ITagHelperComponent, VisualEditorScriptTagHelperComponent>();
 
         builder.Services.AddHealthChecks()
             .AddCheck<UmbracoReadinessHealthCheck>("umbraco-ready", tags: [UmbracoReadinessHealthCheck.ReadyTag]);
