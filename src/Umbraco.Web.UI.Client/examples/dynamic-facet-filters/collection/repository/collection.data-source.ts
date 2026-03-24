@@ -7,73 +7,28 @@ import type { UmbDataSourceResponse, UmbPagedModel } from '@umbraco-cms/backoffi
 
 const ENTITY_TYPE = 'example-product';
 
-// Alias-to-field mapping: this is the data source's responsibility
-const ALIAS_FIELD_MAP: Record<string, keyof ExampleProductFilterArgs> = {
-	'Example.DynamicFacetFilter.CategoryFilter': 'categories',
-	'Example.DynamicFacetFilter.SizeFilter': 'sizes',
-	'Example.DynamicFacetFilter.ColorFilter': 'colors',
-	'Example.DynamicFacetFilter.PriceFilter': 'priceRange',
-};
-
-/**
- *
- * @param filters
- */
-function mapFiltersToArgs(filters: Array<UmbActiveFacetFilterModel>): ExampleProductFilterArgs {
-	const args: ExampleProductFilterArgs = {};
-
-	for (const filter of filters) {
-		const field = ALIAS_FIELD_MAP[filter.alias];
-		if (!field) continue;
-
-		const filterValue = filter.value?.unique ?? filter.unique;
-
-		switch (field) {
-			case 'categories':
-				args.categories ??= [];
-				args.categories.push(filterValue);
-				break;
-			case 'sizes':
-				args.sizes ??= [];
-				args.sizes.push(filterValue);
-				break;
-			case 'colors':
-				args.colors ??= [];
-				args.colors.push(filterValue);
-				break;
-			case 'priceRange': {
-				const value = parseFloat(filterValue);
-				if (!args.priceRange) {
-					args.priceRange = { min: value, max: value };
-				} else {
-					args.priceRange = {
-						min: Math.min(args.priceRange.min, value),
-						max: Math.max(args.priceRange.max, value),
-					};
-				}
-				break;
-			}
-		}
-	}
-
-	return args;
-}
-
-// Reverse mapping: field -> alias
-const FIELD_ALIAS_MAP: Record<string, string> = Object.fromEntries(
-	Object.entries(ALIAS_FIELD_MAP).map(([alias, field]) => [field, alias]),
-);
-
 export class ExampleDynamicFacetCollectionDataSource
 	implements UmbCollectionDataSource<ExampleProductCollectionItemModel, ExampleDynamicFacetCollectionFilterModel>
 {
+	// Alias-to-field mapping: this is the data source's responsibility
+	#aliasFieldMap: Record<string, keyof ExampleProductFilterArgs> = {
+		'Example.DynamicFacetFilter.CategoryFilter': 'categories',
+		'Example.DynamicFacetFilter.SizeFilter': 'sizes',
+		'Example.DynamicFacetFilter.ColorFilter': 'colors',
+		'Example.DynamicFacetFilter.PriceFilter': 'priceRange',
+	};
+
+	// Reverse mapping: field -> alias
+	#fieldAliasMap: Record<string, string> = Object.fromEntries(
+		Object.entries(this.#aliasFieldMap).map(([alias, field]) => [field, alias]),
+	);
+
 	async getCollection(
 		args: ExampleDynamicFacetCollectionFilterModel,
 	): Promise<
 		UmbDataSourceResponse<UmbPagedModel<ExampleProductCollectionItemModel> & { facets: Record<string, unknown> }>
 	> {
-		// Map the generic filter array into data-source-specific args
-		const productFilterArgs = mapFiltersToArgs(args.filters ?? []);
+		const productFilterArgs = this.#mapFiltersToArgs(args.filters ?? []);
 		productFilterArgs.skip = args.skip;
 		productFilterArgs.take = args.take;
 		productFilterArgs.textFilter = args.filter;
@@ -100,10 +55,10 @@ export class ExampleDynamicFacetCollectionDataSource
 				count: f.count,
 			}));
 
-		facets[FIELD_ALIAS_MAP['categories']] = toOptions(result.facets.categories);
-		facets[FIELD_ALIAS_MAP['sizes']] = toOptions(result.facets.sizes);
-		facets[FIELD_ALIAS_MAP['colors']] = toOptions(result.facets.colors);
-		facets[FIELD_ALIAS_MAP['priceRange']] = result.facets.priceRange;
+		facets[this.#fieldAliasMap['categories']] = toOptions(result.facets.categories);
+		facets[this.#fieldAliasMap['sizes']] = toOptions(result.facets.sizes);
+		facets[this.#fieldAliasMap['colors']] = toOptions(result.facets.colors);
+		facets[this.#fieldAliasMap['priceRange']] = result.facets.priceRange;
 
 		return {
 			data: {
@@ -112,5 +67,45 @@ export class ExampleDynamicFacetCollectionDataSource
 				facets,
 			},
 		};
+	}
+
+	#mapFiltersToArgs(filters: Array<UmbActiveFacetFilterModel>): ExampleProductFilterArgs {
+		const args: ExampleProductFilterArgs = {};
+
+		for (const filter of filters) {
+			const field = this.#aliasFieldMap[filter.alias];
+			if (!field) continue;
+
+			const filterValue = filter.value?.unique ?? filter.unique;
+
+			switch (field) {
+				case 'categories':
+					args.categories ??= [];
+					args.categories.push(filterValue);
+					break;
+				case 'sizes':
+					args.sizes ??= [];
+					args.sizes.push(filterValue);
+					break;
+				case 'colors':
+					args.colors ??= [];
+					args.colors.push(filterValue);
+					break;
+				case 'priceRange': {
+					const value = parseFloat(filterValue);
+					if (!args.priceRange) {
+						args.priceRange = { min: value, max: value };
+					} else {
+						args.priceRange = {
+							min: Math.min(args.priceRange.min, value),
+							max: Math.max(args.priceRange.max, value),
+						};
+					}
+					break;
+				}
+			}
+		}
+
+		return args;
 	}
 }
