@@ -14,6 +14,24 @@ describe('ExampleDynamicFacetCollectionDataSource', () => {
 		});
 	});
 
+	describe('model mapping', () => {
+		it('maps id to unique and adds entityType and icon', async () => {
+			const { data } = await dataSource.getCollection({});
+			const first = data!.items[0];
+			expect(first.unique).to.equal(products[0].id);
+			expect(first.entityType).to.equal('example-product');
+			expect(first.icon).to.equal('icon-shirt');
+		});
+
+		it('preserves product data fields', async () => {
+			const { data } = await dataSource.getCollection({});
+			const first = data!.items[0];
+			expect(first.name).to.equal(products[0].name);
+			expect(first.category).to.equal(products[0].category);
+			expect(first.price).to.equal(products[0].price);
+		});
+	});
+
 	describe('category filter mapping', () => {
 		it('maps category filter alias to category field', async () => {
 			const filters: Array<UmbActiveFacetFilterModel> = [

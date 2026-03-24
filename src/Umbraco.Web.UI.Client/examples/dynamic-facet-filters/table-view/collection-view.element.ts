@@ -1,4 +1,4 @@
-import type { ExampleProductModel } from '../data/types.js';
+import type { ExampleProductCollectionItemModel } from '../collection/repository/types.js';
 import type { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
 import { UMB_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 import type { UmbTableColumn, UmbTableConfig, UmbTableItem } from '@umbraco-cms/backoffice/components';
@@ -25,7 +25,7 @@ export class ExampleDynamicFacetTableViewElement extends UmbLitElement {
 	@state()
 	private _tableItems: Array<UmbTableItem> = [];
 
-	#collectionContext?: UmbDefaultCollectionContext<ExampleProductModel>;
+	#collectionContext?: UmbDefaultCollectionContext<ExampleProductCollectionItemModel>;
 
 	constructor() {
 		super();
@@ -44,7 +44,7 @@ export class ExampleDynamicFacetTableViewElement extends UmbLitElement {
 		);
 	}
 
-	#createTableItems(items: Array<ExampleProductModel> | undefined) {
+	#createTableItems(items: Array<ExampleProductCollectionItemModel> | undefined) {
 		if (!items) {
 			this._tableItems = [];
 			return;

@@ -1,9 +1,11 @@
 import { filterProducts } from '../../data/products.js';
-import type { ExampleProductFilterArgs, ExampleProductModel } from '../../data/types.js';
-import type { ExampleDynamicFacetCollectionFilterModel } from './types.js';
+import type { ExampleProductFilterArgs } from '../../data/types.js';
+import type { ExampleDynamicFacetCollectionFilterModel, ExampleProductCollectionItemModel } from './types.js';
 import type { UmbActiveFacetFilterModel } from '@umbraco-cms/backoffice/facet-filter';
 import type { UmbCollectionDataSource } from '@umbraco-cms/backoffice/collection';
 import type { UmbDataSourceResponse, UmbPagedModel } from '@umbraco-cms/backoffice/repository';
+
+const ENTITY_TYPE = 'example-product';
 
 // Alias-to-field mapping: this is the data source's responsibility
 const ALIAS_FIELD_MAP: Record<string, keyof ExampleProductFilterArgs> = {
@@ -62,17 +64,14 @@ const FIELD_ALIAS_MAP: Record<string, string> = Object.fromEntries(
 	Object.entries(ALIAS_FIELD_MAP).map(([alias, field]) => [field, alias]),
 );
 
-export interface ExampleDynamicFacetCollectionDataSourceResult {
-	data: UmbPagedModel<ExampleProductModel>;
-	facets: Record<string, unknown>;
-}
-
 export class ExampleDynamicFacetCollectionDataSource
-	implements UmbCollectionDataSource<ExampleProductModel, ExampleDynamicFacetCollectionFilterModel>
+	implements UmbCollectionDataSource<ExampleProductCollectionItemModel, ExampleDynamicFacetCollectionFilterModel>
 {
 	async getCollection(
 		args: ExampleDynamicFacetCollectionFilterModel,
-	): Promise<UmbDataSourceResponse<UmbPagedModel<ExampleProductModel> & { facets: Record<string, unknown> }>> {
+	): Promise<
+		UmbDataSourceResponse<UmbPagedModel<ExampleProductCollectionItemModel> & { facets: Record<string, unknown> }>
+	> {
 		// Map the generic filter array into data-source-specific args
 		const productFilterArgs = mapFiltersToArgs(args.filters ?? []);
 		productFilterArgs.skip = args.skip;
@@ -81,11 +80,19 @@ export class ExampleDynamicFacetCollectionDataSource
 
 		const result = filterProducts(productFilterArgs);
 
+		// Map server models to client collection items
+		const items: Array<ExampleProductCollectionItemModel> = result.items.map((product) => ({
+			...product,
+			unique: product.id,
+			entityType: ENTITY_TYPE,
+			icon: 'icon-shirt',
+		}));
+
 		// Map faceted results back using the alias mapping
 		const facets: Record<string, unknown> = {};
 
-		const toOptions = (items: Array<{ unique: string; name: string; count: number }>) =>
-			items.map((f) => ({
+		const toOptions = (facetItems: Array<{ unique: string; name: string; count: number }>) =>
+			facetItems.map((f) => ({
 				unique: f.unique,
 				name: f.name,
 				icon: '',
@@ -100,7 +107,7 @@ export class ExampleDynamicFacetCollectionDataSource
 
 		return {
 			data: {
-				items: result.items,
+				items,
 				total: result.total,
 				facets,
 			},

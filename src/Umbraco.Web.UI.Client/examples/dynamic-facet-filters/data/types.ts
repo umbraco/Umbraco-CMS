@@ -1,12 +1,10 @@
 export interface ExampleProductModel {
-	unique: string;
-	entityType: string;
+	id: string;
 	name: string;
 	category: string;
 	sizes: Array<string>;
 	colors: Array<string>;
 	price: number;
-	icon: string;
 }
 
 export interface ExampleProductFilterArgs {
