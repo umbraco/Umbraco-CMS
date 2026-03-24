@@ -1767,6 +1767,16 @@ export class DocumentApiHelper {
     expect(publicAccessData.isProtectedByAncestor).toBe(expectedIsProtectedByAncestor);
   }
 
+  async getValueByAlias(documentName: string, alias: string, culture: string | null = null) {
+    const documentData = await this.getByName(documentName);
+    return documentData.values.find(v => v.alias === alias && v.culture === culture);
+  }
+
+  async getValuesByAliasAndCultures(documentName: string, alias: string, cultures: (string | null)[]) {
+    const documentData = await this.getByName(documentName);
+    return cultures.map(culture => documentData.values.find(v => v.alias === alias && v.culture === culture));
+  }
+
   async getValuesByCultureAndSegmentForDocument(documentName: string, culturesAndSegments: {culture: string | null, segment: string | null}[]) {
     const documentData = await this.getByName(documentName);
     return culturesAndSegments.map(cs =>

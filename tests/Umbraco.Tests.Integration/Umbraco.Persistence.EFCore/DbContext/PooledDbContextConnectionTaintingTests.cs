@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Persistence.EFCore.Scoping;
 using Umbraco.Cms.Tests.Common.Testing;
@@ -21,14 +20,9 @@ public class PooledDbContextConnectionTaintingTests : UmbracoIntegrationTest
     private IDbContextFactory<PooledTestDbContext> DbContextFactory =>
         GetRequiredService<IDbContextFactory<PooledTestDbContext>>();
 
-    protected override void CustomTestSetup(IUmbracoBuilder builder)
-    {
+    protected override void CustomTestSetup(IUmbracoBuilder builder) =>
         builder.Services.AddUmbracoDbContext<PooledTestDbContext>(
-            (serviceProvider, options, connectionString, providerName) =>
-            {
-                options.UseUmbracoDatabaseProvider(serviceProvider);
-            });
-    }
+            (serviceProvider, options, connectionString, providerName) => options.UseUmbracoDatabaseProvider(serviceProvider));
 
     /// <summary>
     /// Verifies that a pooled DbContext obtained from IDbContextFactory has a valid connection string
@@ -105,6 +99,48 @@ public class PooledDbContextConnectionTaintingTests : UmbracoIntegrationTest
             // GetPendingMigrationsAsync accesses ConnectionString internally
             var pendingMigrations = await context.Database.GetPendingMigrationsAsync();
         });
+    }
+
+    /// <summary>
+    /// Verifies that the connection string is preserved on a pooled DbContext after an EFCore scope
+    /// disposes. SetDbConnection(null) during scope disposal clears EF Core's internal connection
+    /// string field; without the restore in DisposeEfCoreDatabase, the pooled context is returned
+    /// with a null connection string, causing InvalidOperationException on SQL Server reuse.
+    /// </summary>
+    [Test]
+    public async Task Pooled_DbContext_Preserves_ConnectionString_After_Scope_Disposal()
+    {
+        if (BaseTestDatabase.IsSqlite())
+        {
+            Assert.Ignore("SQLite does not lose the connection string on SetDbConnection(null); this test targets SQL Server.");
+        }
+
+        // Step 1: Capture the original connection string before any scope usage.
+        string? originalConnectionString;
+        using (PooledTestDbContext pristineContext = DbContextFactory.CreateDbContext())
+        {
+            originalConnectionString = pristineContext.Database.GetConnectionString();
+        }
+
+        Assert.IsNotNull(originalConnectionString, "Precondition: factory context should have a connection string.");
+
+        // Step 2: Use and dispose an EFCore scope, which calls SetDbConnection(null) on cleanup.
+        using (IEfCoreScope<PooledTestDbContext> scope = EfCoreScopeProvider.CreateScope())
+        {
+            await scope.ExecuteWithContextAsync<Task>(async db =>
+            {
+                await db.Database.ExecuteSqlRawAsync("SELECT 1");
+            });
+            scope.Complete();
+        }
+
+        // Step 3: Get a context from the pool — may be the same instance that was just disposed.
+        using PooledTestDbContext reusedContext = DbContextFactory.CreateDbContext();
+        var connectionStringAfterDisposal = reusedContext.Database.GetConnectionString();
+
+        // Step 4: The connection string must still be set.
+        Assert.IsNotNull(connectionStringAfterDisposal, "Connection string must survive scope disposal for pooled contexts.");
+        Assert.AreEqual(originalConnectionString, connectionStringAfterDisposal);
     }
 
     internal class PooledTestDbContext : Microsoft.EntityFrameworkCore.DbContext
