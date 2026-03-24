@@ -228,7 +228,7 @@ internal sealed class ContentVersionService : IContentVersionService
         // Use the smallest KeepAllVersionsNewerThanDays across global + per-content-type overrides as the SQL date cutoff.
         // This may load some rows the C# policy will then keep, but ensures we never miss rows that should be deleted.
         int effectiveKeepAllDays = versionCleanupPolicy.KeepAllVersionsNewerThanDays;
-        using (ICoreScope overrideScope = _scopeProvider.CreateCoreScope(autoComplete: true))
+        using (_scopeProvider.CreateCoreScope(autoComplete: true))
         {
             IReadOnlyCollection<Models.ContentVersionCleanupPolicySettings> overrides =
                 _documentVersionRepository.GetCleanupPolicies();

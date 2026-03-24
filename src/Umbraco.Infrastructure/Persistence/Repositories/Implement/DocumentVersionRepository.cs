@@ -64,11 +64,13 @@ internal sealed class DocumentVersionRepository : IDocumentVersionRepository
             query = query.Where<ContentVersionDto>(x => x.VersionDate < olderThan.Value);
         }
 
+        query = query
+            .OrderBy<ContentVersionDto>(x => x.VersionDate)
+            .OrderBy<ContentVersionDto>(x => x.Id);
+
         if (maxCount.HasValue)
         {
-            query = query
-                .OrderBy<ContentVersionDto>(x => x.VersionDate)
-                .SelectTop(maxCount.Value);
+            query = query.SelectTop(maxCount.Value);
         }
 
         List<ContentVersionMeta> results = ambientScope.Database.Fetch<ContentVersionMeta>(query);
