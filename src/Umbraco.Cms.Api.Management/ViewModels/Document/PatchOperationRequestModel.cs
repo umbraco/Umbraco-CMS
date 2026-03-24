@@ -11,6 +11,7 @@ public class PatchOperationRequestModel
     /// The operation type: "replace", "add", or "remove".
     /// </summary>
     [Required]
+    [AllowedValues("add", "replace", "remove", ErrorMessage = "Supported operations are: add, replace, remove.")]
     public string Op { get; set; } = string.Empty;
 
     /// <summary>
