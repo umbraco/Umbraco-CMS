@@ -343,7 +343,7 @@ test('can move a media item to another folder', async ({umbracoApi, umbracoUi}) 
   await umbracoApi.media.ensureNameNotExists(folderName);
 });
 
-test('can not move a media item to another media item', async ({umbracoApi, umbracoUi}) => {
+test('cannot move a media item to another media item', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const secondMediaFileName = 'SecondMediaFile';
   await umbracoApi.media.createDefaultMediaFile(mediaFileName);
