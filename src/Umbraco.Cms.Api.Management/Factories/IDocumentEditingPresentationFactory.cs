@@ -1,4 +1,4 @@
-using Umbraco.Cms.Api.Management.ViewModels.Document;
+﻿using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Api.Management.ViewModels.Patching;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
@@ -32,18 +32,20 @@ public interface IDocumentEditingPresentationFactory
     /// <returns>An <see cref="UpdateDocumentRequestModel"/> representing the content.</returns>
     Task<UpdateDocumentRequestModel> CreateUpdateRequestModelAsync(IContent content);
 
+    // TODO (V19): Remove the default implementation.
     /// <summary>
     /// Maps a <see cref="PatchDocumentRequestModel"/> to a <see cref="ContentPatchModel"/>,
     /// extracting the affected cultures and segments from the patch operation paths.
     /// </summary>
     /// <param name="requestModel">The patch document request model.</param>
     /// <returns>A <see cref="ContentPatchModel"/> containing the mapped operations and affected cultures/segments.</returns>
-    ContentPatchModel MapPatchModel(PatchDocumentRequestModel requestModel);
+    ContentPatchModel MapPatchModel(PatchDocumentRequestModel requestModel) => throw new NotImplementedException();
 
+    // TODO (V19): Remove the default implementation.
     /// <summary>
     /// Maps a <see cref="ValidateUpdateDocumentRequestModel"/> to a <see cref="ValidateContentUpdateModel"/> for update validation.
     /// </summary>
     /// <param name="requestModel">The validate update document request model.</param>
     /// <returns>A <see cref="ValidateContentUpdateModel"/> ready for validation.</returns>
-    ValidateContentUpdateModel MapValidateUpdateModel(ValidateUpdateDocumentRequestModel requestModel);
+    ValidateContentUpdateModel MapValidateUpdateModel(ValidateUpdateDocumentRequestModel requestModel) => throw new NotImplementedException();
 }
