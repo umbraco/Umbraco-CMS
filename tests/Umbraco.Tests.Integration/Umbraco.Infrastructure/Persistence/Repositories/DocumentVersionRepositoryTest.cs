@@ -9,38 +9,36 @@ using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositories;
 
-/// <remarks>
-///     v9 -> Tests.Integration
-/// </remarks>
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
 internal sealed class DocumentVersionRepositoryTest : UmbracoIntegrationTest
 {
-    public IFileService FileService => GetRequiredService<IFileService>();
+    public ITemplateService TemplateService => GetRequiredService<ITemplateService>();
+
     public IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
+
     public IContentService ContentService => GetRequiredService<IContentService>();
 
     [Test]
-    public void GetDocumentVersionsEligibleForCleanup_Always_ExcludesActiveVersions()
+    public async Task GetDocumentVersionsEligibleForCleanup_Always_ExcludesActiveVersions()
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
-        FileService.SaveTemplate(template);
+        await TemplateService.CreateAsync(template, Cms.Core.Constants.Security.SuperUserKey);
 
         var contentType =
             ContentTypeBuilder.CreateSimpleContentType("umbTextpage", "Textpage", defaultTemplateId: template.Id);
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Cms.Core.Constants.Security.SuperUserKey);
 
         var content = ContentBuilder.CreateSimpleContent(contentType);
         ContentService.Save(content);
 
-        ContentService.Publish(content, Array.Empty<string>());
+        ContentService.Publish(content, []);
         // At this point content has 2 versions, a draft version and a published version.
 
-        ContentService.Publish(content, Array.Empty<string>());
+        ContentService.Publish(content, []);
         // At this point content has 3 versions, a historic version, a draft version and a published version.
 
         using (ScopeProvider.CreateScope())
@@ -57,24 +55,24 @@ internal sealed class DocumentVersionRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void GetDocumentVersionsEligibleForCleanup_Always_ExcludesPinnedVersions()
+    public async Task GetDocumentVersionsEligibleForCleanup_Always_ExcludesPinnedVersions()
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
-        FileService.SaveTemplate(template);
+        await TemplateService.CreateAsync(template, Cms.Core.Constants.Security.SuperUserKey);
 
         var contentType =
             ContentTypeBuilder.CreateSimpleContentType("umbTextpage", "Textpage", defaultTemplateId: template.Id);
-        ContentTypeService.Save(contentType);
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Cms.Core.Constants.Security.SuperUserKey);
 
         var content = ContentBuilder.CreateSimpleContent(contentType);
         ContentService.Save(content);
 
-        ContentService.Publish(content, Array.Empty<string>());
+        ContentService.Publish(content, []);
         // At this point content has 2 versions, a draft version and a published version.
-        ContentService.Publish(content, Array.Empty<string>());
-        ContentService.Publish(content, Array.Empty<string>());
-        ContentService.Publish(content, Array.Empty<string>());
+
+        ContentService.Publish(content, []);
+        ContentService.Publish(content, []);
+        ContentService.Publish(content, []);
         // At this point content has 5 versions, 3 historic versions, a draft version and a published version.
 
         var allVersions = ContentService.GetVersions(content.Id);
@@ -101,22 +99,22 @@ internal sealed class DocumentVersionRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void DeleteVersions_Always_DeletesSpecifiedVersions()
+    public async Task DeleteVersions_Always_DeletesSpecifiedVersions()
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
-        FileService.SaveTemplate(template);
+        await TemplateService.CreateAsync(template, Cms.Core.Constants.Security.SuperUserKey);
 
         var contentType =
             ContentTypeBuilder.CreateSimpleContentType("umbTextpage", "Textpage", defaultTemplateId: template.Id);
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Cms.Core.Constants.Security.SuperUserKey);
 
         var content = ContentBuilder.CreateSimpleContent(contentType);
         ContentService.Save(content);
 
-        ContentService.Publish(content, Array.Empty<string>());
-        ContentService.Publish(content, Array.Empty<string>());
-        ContentService.Publish(content, Array.Empty<string>());
-        ContentService.Publish(content, Array.Empty<string>());
+        ContentService.Publish(content, []);
+        ContentService.Publish(content, []);
+        ContentService.Publish(content, []);
+        ContentService.Publish(content, []);
         using (var scope = ScopeProvider.CreateScope())
         {
             var query = ScopeAccessor.AmbientScope.SqlContext.Sql();
@@ -137,22 +135,77 @@ internal sealed class DocumentVersionRepositoryTest : UmbracoIntegrationTest
         }
     }
 
-
     [Test]
-    public void GetPagedItemsByContentId_WithInvariantCultureContent_ReturnsPaginatedResults()
+    public async Task DeleteVersions_VerifiesCascadeDeletion()
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
-        FileService.SaveTemplate(template);
+        await TemplateService.CreateAsync(template, Cms.Core.Constants.Security.SuperUserKey);
 
         var contentType =
             ContentTypeBuilder.CreateSimpleContentType("umbTextpage", "Textpage", defaultTemplateId: template.Id);
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Cms.Core.Constants.Security.SuperUserKey);
 
         var content = ContentBuilder.CreateSimpleContent(contentType);
         ContentService.Save(content);
 
-        ContentService.Publish(content, Array.Empty<string>()); // Draft + Published
-        ContentService.Publish(content, Array.Empty<string>()); // New Draft
+        ContentService.Publish(content, []);
+        ContentService.Publish(content, []);
+        ContentService.Publish(content, []);
+
+        // At this point content has 4 versions: 2 historic, 1 draft, 1 published.
+        using (var scope = ScopeProvider.CreateScope())
+        {
+            var db = ScopeAccessor.AmbientScope!.Database;
+
+            // Verify initial state has rows in all relevant tables
+            var beforeContentVersions = db.Single<int>("SELECT count(1) FROM umbracoContentVersion");
+            var beforeDocumentVersions = db.Single<int>("SELECT count(1) FROM umbracoDocumentVersion");
+            var beforePropertyData = db.Single<int>("SELECT count(1) FROM umbracoPropertyData");
+
+            Assert.Greater(beforeContentVersions, 2, "Should have more than 2 content versions before delete");
+            Assert.Greater(beforeDocumentVersions, 2, "Should have more than 2 document versions before delete");
+            Assert.Greater(beforePropertyData, 6, "Should have more than 6 property data rows before delete");
+
+            var sut = new DocumentVersionRepository(ScopeAccessor);
+            // Delete the 2 historic versions (IDs 1 and 2)
+            sut.DeleteVersions(new[] { 1, 2 });
+
+            var afterContentVersions = db.Single<int>("SELECT count(1) FROM umbracoContentVersion");
+            var afterDocumentVersions = db.Single<int>("SELECT count(1) FROM umbracoDocumentVersion");
+            var afterPropertyData = db.Single<int>("SELECT count(1) FROM umbracoPropertyData");
+            var afterCultureVariation = db.Single<int>(
+                "SELECT count(1) FROM umbracoContentVersionCultureVariation WHERE versionId IN (1, 2)");
+
+            Assert.Multiple(() =>
+            {
+                // 2 versions deleted, 2 remain (current draft + current published)
+                Assert.AreEqual(beforeContentVersions - 2, afterContentVersions);
+                Assert.AreEqual(beforeDocumentVersions - 2, afterDocumentVersions);
+
+                // CreateSimpleContentType has 3 properties, so 6 property data rows should be removed
+                Assert.AreEqual(beforePropertyData - 6, afterPropertyData);
+
+                // No culture variation rows for the deleted versions
+                Assert.AreEqual(0, afterCultureVariation);
+            });
+        }
+    }
+
+    [Test]
+    public async Task GetPagedItemsByContentId_WithInvariantCultureContent_ReturnsPaginatedResults()
+    {
+        var template = TemplateBuilder.CreateTextPageTemplate();
+        await TemplateService.CreateAsync(template, Cms.Core.Constants.Security.SuperUserKey);
+
+        var contentType =
+            ContentTypeBuilder.CreateSimpleContentType("umbTextpage", "Textpage", defaultTemplateId: template.Id);
+        await ContentTypeService.CreateAsync(contentType, Cms.Core.Constants.Security.SuperUserKey);
+
+        var content = ContentBuilder.CreateSimpleContent(contentType);
+        ContentService.Save(content);
+
+        ContentService.Publish(content, []); // Draft + Published
+        ContentService.Publish(content, []); // New Draft
 
         using (ScopeProvider.CreateScope())
         {
@@ -172,10 +225,10 @@ internal sealed class DocumentVersionRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void GetPagedItemsByContentId_WithVariantCultureContent_ReturnsPaginatedResults()
+    public async Task GetPagedItemsByContentId_WithVariantCultureContent_ReturnsPaginatedResults()
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
-        FileService.SaveTemplate(template);
+        await TemplateService.CreateAsync(template, Cms.Core.Constants.Security.SuperUserKey);
 
         var contentType =
             ContentTypeBuilder.CreateSimpleContentType("umbTextpage", "Textpage", defaultTemplateId: template.Id);
@@ -185,15 +238,14 @@ internal sealed class DocumentVersionRepositoryTest : UmbracoIntegrationTest
             propertyType.Variations = ContentVariation.Culture;
         }
 
-        FileService.SaveTemplate(contentType.DefaultTemplate);
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.UpdateAsync(contentType, Cms.Core.Constants.Security.SuperUserKey);
 
         var content = ContentBuilder.CreateSimpleContent(contentType, "foo", culture: "en-US");
         content.SetCultureName("foo", "en-US");
 
         ContentService.Save(content);
-        ContentService.Publish(content, new[] { "en-US" }); // Draft + Published
-        ContentService.Publish(content, new[] { "en-US" }); // New Draft
+        ContentService.Publish(content, ["en-US"]); // Draft + Published
+        ContentService.Publish(content, ["en-US"]); // New Draft
 
         using (ScopeProvider.CreateScope())
         {
