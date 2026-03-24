@@ -2099,7 +2099,7 @@ internal sealed class DatabaseDataCreator
                 var dto = new LanguageDto
                 {
                     Id = id,
-                    LanguageKey = Guid.NewGuid(),
+                    LanguageKey = new Guid("60816EBD-6B2E-4CA2-9E01-73DE41F49D80"),
                     IsoCode = culture.Name,
                     CultureName = culture.EnglishName,
                     IsDefault = isDefault,

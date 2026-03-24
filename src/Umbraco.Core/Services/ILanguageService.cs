@@ -69,9 +69,17 @@ public interface ILanguageService
 
 
     /// <summary>
+    /// Retrieves the ISO codes of configured languages by their keys.
+    /// </summary>
+    /// <param name="keys">The keys of the configured <see cref="ILanguage" />s</param>
+    /// <returns>The ISO codes of the <see cref="ILanguage" />s</returns>
+    Task<string[]> GetIsoCodesByKeysAsync(ICollection<Guid> keys);
+
+    /// <summary>
     /// Retrieves the ISO codes of configured languages by their Ids.
     /// </summary>
     /// <param name="ids">The ids of the configured <see cref="ILanguage" />s</param>
     /// <returns>The ISO codes of the <see cref="ILanguage" />s</returns>
+    [Obsolete("Use GetIsoCodesByKeysAsync instead. Scheduled for removal when EFCore Migration is completed.")]
     Task<string[]> GetIsoCodesByIdsAsync(ICollection<int> ids);
 }

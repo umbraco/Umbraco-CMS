@@ -39,6 +39,11 @@ public interface ILanguageRepository : IAsyncReadWriteRepository<Guid, ILanguage
     Task<string> GetDefaultIsoCodeAsync();
 
     /// <summary>
+    ///     Gets the default language.
+    /// </summary>
+    Task<ILanguage?> GetDefaultLanguageAsync();
+
+    /// <summary>
     ///     Gets the default language key.
     /// </summary>
     /// <remarks>
@@ -62,7 +67,7 @@ public interface ILanguageRepository : IAsyncReadWriteRepository<Guid, ILanguage
     /// <summary>
     ///     Resolves an integer language ID to its Guid key. Returns null if not found.
     /// </summary>
-    [Obsolete("Temporary bridge helper. Scheduled for removal in Umbraco 20.")]
+    [Obsolete("Temporary bridge helper. Scheduled for removal when EFCore Migration is completed.")]
     private async Task<Guid?> ResolveKeyFromIdAsync(int id)
     {
         IEnumerable<ILanguage> all = await GetAllAsync(CancellationToken.None);
@@ -72,7 +77,7 @@ public interface ILanguageRepository : IAsyncReadWriteRepository<Guid, ILanguage
     /// <summary>
     ///     Resolves a Guid language key to its integer ID. Returns null if not found.
     /// </summary>
-    [Obsolete("Temporary bridge helper. Scheduled for removal in Umbraco 20.")]
+    [Obsolete("Temporary bridge helper. Scheduled for removal when EFCore Migration is completed.")]
     private async Task<int?> ResolveIdFromKeyAsync(Guid key)
     {
         IEnumerable<ILanguage> all = await GetAllAsync(CancellationToken.None);
@@ -82,7 +87,7 @@ public interface ILanguageRepository : IAsyncReadWriteRepository<Guid, ILanguage
     /// <summary>
     ///     Gets the default language integer ID.
     /// </summary>
-    [Obsolete("Use GetDefaultKeyAsync instead. Scheduled for removal in Umbraco 20.")]
+    [Obsolete("Use GetDefaultKeyAsync instead. Scheduled for removal when EFCore Migration is completed.")]
     async Task<int?> GetDefaultIdAsync()
     {
         Guid? key = await GetDefaultKeyAsync();
@@ -90,7 +95,7 @@ public interface ILanguageRepository : IAsyncReadWriteRepository<Guid, ILanguage
     }
 
     /// <inheritdoc cref="IAsyncReadRepository{TKey, TEntity}.GetAsync"/>
-    [Obsolete("Use GetAsync(Guid, CancellationToken) instead. Scheduled for removal in Umbraco 20.")]
+    [Obsolete("Use GetAsync(Guid, CancellationToken) instead. Scheduled for removal when EFCore Migration is completed.")]
     async Task<ILanguage?> GetAsync(int? id, CancellationToken cancellationToken)
     {
         if (id is null)
@@ -103,7 +108,7 @@ public interface ILanguageRepository : IAsyncReadWriteRepository<Guid, ILanguage
     }
 
     /// <inheritdoc cref="IAsyncReadRepository{TKey, TEntity}.GetManyAsync"/>
-    [Obsolete("Use GetManyAsync(Guid[], CancellationToken) instead. Scheduled for removal in Umbraco 20.")]
+    [Obsolete("Use GetManyAsync(Guid[], CancellationToken) instead. Scheduled for removal when EFCore Migration is completed.")]
     async Task<IEnumerable<ILanguage>> GetManyAsync(int[] ids, CancellationToken cancellationToken)
     {
         IEnumerable<ILanguage> all = await GetAllAsync(CancellationToken.None);
@@ -112,7 +117,7 @@ public interface ILanguageRepository : IAsyncReadWriteRepository<Guid, ILanguage
     }
 
     /// <inheritdoc cref="IAsyncReadRepository{TKey, TEntity}.ExistsAsync"/>
-    [Obsolete("Use ExistsAsync(Guid, CancellationToken) instead. Scheduled for removal in Umbraco 20.")]
+    [Obsolete("Use ExistsAsync(Guid, CancellationToken) instead. Scheduled for removal when EFCore Migration is completed.")]
     async Task<bool> ExistsAsync(int id, CancellationToken cancellationToken)
     {
         Guid? key = await ResolveKeyFromIdAsync(id);
@@ -122,7 +127,7 @@ public interface ILanguageRepository : IAsyncReadWriteRepository<Guid, ILanguage
     /// <summary>
     ///     Gets a language integer ID from its ISO code.
     /// </summary>
-    [Obsolete("Use GetKeyByIsoCodeAsync instead. Scheduled for removal in Umbraco 20.")]
+    [Obsolete("Use GetKeyByIsoCodeAsync instead. Scheduled for removal when EFCore Migration is completed.")]
     async Task<int?> GetIdByIsoCodeAsync(string? isoCode, bool throwOnNotFound = true)
     {
         Guid? key = await GetKeyByIsoCodeAsync(isoCode, throwOnNotFound);
@@ -132,7 +137,7 @@ public interface ILanguageRepository : IAsyncReadWriteRepository<Guid, ILanguage
     /// <summary>
     ///     Gets a language ISO code from its integer ID.
     /// </summary>
-    [Obsolete("Use GetIsoCodeByKeyAsync instead. Scheduled for removal in Umbraco 20.")]
+    [Obsolete("Use GetIsoCodeByKeyAsync instead. Scheduled for removal when EFCore Migration is completed.")]
     async Task<string?> GetIsoCodeByIdAsync(int? id, bool throwOnNotFound = true)
     {
         if (id is null)
@@ -157,7 +162,7 @@ public interface ILanguageRepository : IAsyncReadWriteRepository<Guid, ILanguage
     /// <summary>
     ///     Gets multiple language ISO codes from the provided integer IDs.
     /// </summary>
-    [Obsolete("Use GetIsoCodesByKeysAsync instead. Scheduled for removal in Umbraco 20.")]
+    [Obsolete("Use GetIsoCodesByKeysAsync instead. Scheduled for removal when EFCore Migration is completed.")]
     async Task<string[]> GetIsoCodesByIdsAsync(ICollection<int> ids, bool throwOnNotFound = true)
     {
         IEnumerable<ILanguage> all = await GetAllAsync(CancellationToken.None);

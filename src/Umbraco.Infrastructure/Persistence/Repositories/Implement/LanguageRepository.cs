@@ -144,6 +144,14 @@ internal sealed class LanguageRepository : AsyncEntityRepositoryBase<Guid, ILang
         return defaultLanguage.IsoCode;
     }
 
+    public async Task<ILanguage?> GetDefaultLanguageAsync()
+    {
+        ILanguage defaultLanguage = await GetDefaultAsync();
+
+        // As to not leak the non-deep-cloned language we perform another Get.
+        return await GetAsync(defaultLanguage.Key, CancellationToken);
+    }
+
     public async Task<Guid?> GetDefaultKeyAsync()
     {
         ILanguage defaultLanguage = await GetDefaultAsync();
