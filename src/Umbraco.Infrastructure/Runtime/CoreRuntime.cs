@@ -113,11 +113,18 @@ public class CoreRuntime : IRuntime
             return;
         }
 
-        if (State.Level == RuntimeLevel.Upgrading)
+        if (State.Level == RuntimeLevel.Upgrading && isRestarting is false)
         {
             // Unattended upgrade: the database factory is already configured for upgrade.
             // The UnattendedUpgradeBackgroundService will run the migration sequence once the
             // HTTP server has started, allowing liveness probes to respond immediately.
+            //
+            // During a restart (e.g. after completing the install screen), the background service
+            // has already exited and will not re-run, so we must fall through to the synchronous
+            // migration path below.
+            // This is OK, because it's only for unattended upgrades and not new installs that we
+            // are concerned about ensuring upgrades run in the background whilst the site reports
+            // itself as healthy.
             return;
         }
 
