@@ -48,4 +48,16 @@ export const manifests: Array<UmbExtensionManifest> = [
 			},
 		],
 	},
+	{
+		type: 'currentUserAction',
+		kind: 'default',
+		alias: 'Umb.CurrentUserWorkspace.Button.Edit',
+		name: 'Current User Workspace Edit Button',
+		weight: 1000,
+		api: () => import('./edit-current-user-workspace.action.js'),
+		meta: {
+			label: '#general_edit',
+			icon: 'edit',
+		},
+	},
 ];
