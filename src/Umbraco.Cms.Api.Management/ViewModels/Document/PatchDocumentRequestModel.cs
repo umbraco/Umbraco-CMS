@@ -13,5 +13,6 @@ public class PatchDocumentRequestModel
     /// </summary>
     [Required]
     [MinLength(1)]
+    [AllowedValues("add", "replace", "remove", ErrorMessage = "Supported operations are: add, replace, remove.")]
     public PatchOperationRequestModel[] Operations { get; set; } = Array.Empty<PatchOperationRequestModel>();
 }
