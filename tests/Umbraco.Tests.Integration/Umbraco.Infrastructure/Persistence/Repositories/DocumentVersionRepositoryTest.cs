@@ -44,7 +44,7 @@ internal sealed class DocumentVersionRepositoryTest : UmbracoIntegrationTest
         using (ScopeProvider.CreateScope())
         {
             var sut = new DocumentVersionRepository(ScopeAccessor);
-            var results = sut.GetDocumentVersionsEligibleForCleanup();
+            var results = sut.GetDocumentVersionsEligibleForCleanup(DateTime.UtcNow.AddDays(1), int.MaxValue);
 
             Assert.Multiple(() =>
             {
@@ -83,7 +83,7 @@ internal sealed class DocumentVersionRepositoryTest : UmbracoIntegrationTest
             ScopeAccessor.AmbientScope.Database.Update<ContentVersionDto>("set preventCleanup = 1 where id in (1,3)");
 
             var sut = new DocumentVersionRepository(ScopeAccessor);
-            var results = sut.GetDocumentVersionsEligibleForCleanup();
+            var results = sut.GetDocumentVersionsEligibleForCleanup(DateTime.UtcNow.AddDays(1), int.MaxValue);
 
             Assert.Multiple(() =>
             {
@@ -94,6 +94,88 @@ internal sealed class DocumentVersionRepositoryTest : UmbracoIntegrationTest
                 // 5 is published
                 // So all that is left is 2
                 Assert.AreEqual(2, results.First().VersionId);
+            });
+        }
+    }
+
+    [Test]
+    public async Task GetDocumentVersionsEligibleForCleanup_WithDateFilter_OnlyReturnsOlderVersions()
+    {
+        var template = TemplateBuilder.CreateTextPageTemplate();
+        await TemplateService.CreateAsync(template, Cms.Core.Constants.Security.SuperUserKey);
+
+        var contentType =
+            ContentTypeBuilder.CreateSimpleContentType("umbTextpage", "Textpage", defaultTemplateId: template.Id);
+        await ContentTypeService.CreateAsync(contentType, Cms.Core.Constants.Security.SuperUserKey);
+
+        // Create 4 versions in total: 2 historic (1, 2), 1 current draft (3), 1 current published (4).
+        var content = ContentBuilder.CreateSimpleContent(contentType);
+        ContentService.Save(content);
+        ContentService.Publish(content, []);
+        ContentService.Publish(content, []);
+        ContentService.Publish(content, []);
+
+        using (ScopeProvider.CreateScope())
+        {
+            var db = ScopeAccessor.AmbientScope!.Database;
+
+            // Backdate version 1 to 10 days ago, leave version 2 at today.
+            db.Execute(
+                "UPDATE umbracoContentVersion SET versionDate = @0 WHERE id = 1",
+                DateTime.UtcNow.AddDays(-10));
+
+            var sut = new DocumentVersionRepository(ScopeAccessor);
+
+            // Cutoff at 5 days ago — should only return version 1.
+            var results = sut.GetDocumentVersionsEligibleForCleanup(DateTime.UtcNow.AddDays(-5), int.MaxValue);
+
+            Assert.Multiple(() =>
+            {
+                Assert.AreEqual(1, results.Count);
+                Assert.AreEqual(1, results.First().VersionId);
+            });
+        }
+    }
+
+    [Test]
+    public async Task GetDocumentVersionsEligibleForCleanup_WithMaxCount_RespectsLimitAndReturnsOldestFirst()
+    {
+        var template = TemplateBuilder.CreateTextPageTemplate();
+        await TemplateService.CreateAsync(template, Cms.Core.Constants.Security.SuperUserKey);
+
+        var contentType =
+            ContentTypeBuilder.CreateSimpleContentType("umbTextpage", "Textpage", defaultTemplateId: template.Id);
+        await ContentTypeService.CreateAsync(contentType, Cms.Core.Constants.Security.SuperUserKey);
+
+        // Create 5 versions in total: 3 historic (1, 2, 3), 1 current draft (4), 1 current published (5).
+        var content = ContentBuilder.CreateSimpleContent(contentType);
+        ContentService.Save(content);
+        ContentService.Publish(content, []);
+        ContentService.Publish(content, []);
+        ContentService.Publish(content, []);
+        ContentService.Publish(content, []);
+
+        using (ScopeProvider.CreateScope())
+        {
+            var db = ScopeAccessor.AmbientScope!.Database;
+
+            // Backdate all historic versions so they pass the date filter.
+            db.Execute(
+                "UPDATE umbracoContentVersion SET versionDate = @0 WHERE id IN (1, 2, 3)",
+                DateTime.UtcNow.AddDays(-10));
+
+            var sut = new DocumentVersionRepository(ScopeAccessor);
+
+            // Request at most 2 — should return the 2 oldest of the 3 eligible.
+            var results = sut.GetDocumentVersionsEligibleForCleanup(DateTime.UtcNow, 2);
+
+            Assert.Multiple(() =>
+            {
+                Assert.AreEqual(2, results.Count);
+
+                // Should be ordered oldest first (by versionDate ASC, and since all have same date, by id ASC).
+                var ids = results.Select(x => x.VersionId).ToList();
+                Assert.That(ids, Is.Ordered.Ascending);
             });
         }
     }

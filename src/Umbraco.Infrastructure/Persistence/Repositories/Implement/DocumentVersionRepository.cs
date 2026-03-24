@@ -24,12 +24,18 @@ internal sealed class DocumentVersionRepository : IDocumentVersionRepository
         _scopeAccessor = scopeAccessor ?? throw new ArgumentNullException(nameof(scopeAccessor));
 
     /// <inheritdoc />
-    /// <remarks>
-    ///     Never includes current draft version. <br />
-    ///     Never includes current published version.<br />
-    ///     Never includes versions marked as "preventCleanup".<br />
-    /// </remarks>
+#pragma warning disable CS0618 // Type or member is obsolete
     public IReadOnlyCollection<ContentVersionMeta> GetDocumentVersionsEligibleForCleanup()
+#pragma warning restore CS0618 // Type or member is obsolete
+        => GetDocumentVersionsEligibleForCleanup(olderThan: null, maxCount: null);
+
+    /// <inheritdoc />
+    public IReadOnlyCollection<ContentVersionMeta> GetDocumentVersionsEligibleForCleanup(DateTime olderThan, int maxCount)
+
+        // TODO (V19): When the obsolete overload is removed, bring the helper method into here and use non-nullable parameters.
+        => GetDocumentVersionsEligibleForCleanup(olderThan, (int?)maxCount);
+
+    private IReadOnlyCollection<ContentVersionMeta> GetDocumentVersionsEligibleForCleanup(DateTime? olderThan, int? maxCount)
     {
         IScope? ambientScope = _scopeAccessor.AmbientScope;
         if (ambientScope is null)
@@ -52,6 +58,18 @@ internal sealed class DocumentVersionRepository : IDocumentVersionRepository
             .Where<ContentVersionDto>(x => !x.Current) // Never delete current draft version
             .Where<ContentVersionDto>(x => !x.PreventCleanup) // Never delete "pinned" versions
             .Where<DocumentVersionDto>(x => !x.Published); // Never delete published version
+
+        if (olderThan.HasValue)
+        {
+            query = query.Where<ContentVersionDto>(x => x.VersionDate < olderThan.Value);
+        }
+
+        if (maxCount.HasValue)
+        {
+            query = query
+                .OrderBy<ContentVersionDto>(x => x.VersionDate)
+                .SelectTop(maxCount.Value);
+        }
 
         List<ContentVersionMeta> results = ambientScope.Database.Fetch<ContentVersionMeta>(query);
         EnsureUtcDates(results);
