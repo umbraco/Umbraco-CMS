@@ -179,8 +179,8 @@ public static class PatchPathResolver
                     return false;
                 }
 
-                var nodeValue = propertyNode.GetValue<string>();
-                if (!string.Equals(nodeValue, condition.Value, StringComparison.OrdinalIgnoreCase))
+                var nodeValue = propertyNode.ToString();
+                if (!string.Equals(nodeValue, condition.Value, StringComparison.Ordinal))
                 {
                     return false;
                 }
