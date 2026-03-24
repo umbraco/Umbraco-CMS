@@ -125,9 +125,7 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
         // Check cache first
         if (!string.IsNullOrEmpty(cacheKey) && _tokenCache.TryGetValue(cacheKey, out var cachedToken))
         {
-            client.DefaultRequestHeaders.Add("Cookie", $"__Host-umbAccessToken={cachedToken}");
-            client.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue("Bearer", "[redacted]");
+            SetTokenCookie(client, cachedToken);
             return;
         }
 
@@ -209,5 +207,17 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
         {
             _tokenCache[cacheKey] = cookieTokenValue;
         }
+    }
+
+    private void SetTokenCookie(HttpClient client, string token)
+    {
+        if (client.DefaultRequestHeaders.Contains("Cookie"))
+        {
+            client.DefaultRequestHeaders.Remove("Cookie");
+        }
+
+        client.DefaultRequestHeaders.Add("Cookie", $"__Host-umbAccessToken={token}");
+        client.DefaultRequestHeaders.Authorization =
+            new AuthenticationHeaderValue("Bearer", "[redacted]");
     }
 }
