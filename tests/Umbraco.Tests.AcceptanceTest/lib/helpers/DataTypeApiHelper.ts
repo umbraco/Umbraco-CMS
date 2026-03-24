@@ -1813,6 +1813,17 @@ export class DataTypeApiHelper {
     return await this.save(dataType);
   }
 
+  async createMultiUrlPickerDataTypeWithMinNumber(name: string, minNumber: number) {
+    await this.ensureNameNotExists(name);
+
+    const dataType = new MultiUrlPickerDataTypeBuilder()
+      .withName(name)
+      .withMinNumber(minNumber)
+      .build();
+
+    return await this.save(dataType);
+  }
+
   async createDefaultNumericDataType(name: string) {
     await this.ensureNameNotExists(name);
 
