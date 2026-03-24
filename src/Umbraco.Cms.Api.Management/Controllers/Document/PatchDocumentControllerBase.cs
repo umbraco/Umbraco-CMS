@@ -46,19 +46,8 @@ public abstract class PatchDocumentControllerBase : DocumentControllerBase
                 .WithTitle("Invalid operation")
                 .WithDetail("One or more PATCH operations were invalid. Check operation structure, path syntax, and operation types.")
                 .Build()),
-            ContentPatchingOperationStatus.InvalidCulture => BadRequest(problemDetailsBuilder
-                .WithTitle("Invalid culture")
-                .WithDetail("One or more cultures specified in operation paths are not valid or not configured.")
-                .Build()),
             ContentPatchingOperationStatus.NotFound => NotFound(problemDetailsBuilder
                 .WithTitle("The document could not be found")
-                .Build()),
-            ContentPatchingOperationStatus.ContentTypeNotFound => NotFound(problemDetailsBuilder
-                .WithTitle("The document's content type could not be found")
-                .Build()),
-            ContentPatchingOperationStatus.PropertyTypeNotFound => UnprocessableEntity(problemDetailsBuilder
-                .WithTitle("Property type not found")
-                .WithDetail("One or more specified properties do not exist on the content type.")
                 .Build()),
             _ => StatusCode(StatusCodes.Status500InternalServerError, problemDetailsBuilder
                 .WithTitle("Unknown error")

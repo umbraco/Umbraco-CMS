@@ -17,22 +17,7 @@ public enum ContentPatchingOperationStatus
     InvalidOperation,
 
     /// <summary>
-    /// One or more cultures specified in operation paths are not valid or not configured.
-    /// </summary>
-    InvalidCulture,
-
-    /// <summary>
     /// The target document could not be found.
     /// </summary>
     NotFound,
-
-    /// <summary>
-    /// The document's content type could not be found.
-    /// </summary>
-    ContentTypeNotFound,
-
-    /// <summary>
-    /// One or more property types specified in operations do not exist on the content type.
-    /// </summary>
-    PropertyTypeNotFound,
 }
