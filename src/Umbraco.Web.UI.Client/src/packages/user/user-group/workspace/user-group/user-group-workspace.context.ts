@@ -14,6 +14,7 @@ import { UserGroupService, UserService } from '@umbraco-cms/backoffice/external/
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { jsonStringComparison } from '@umbraco-cms/backoffice/observable-api';
+import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 
 export class UmbUserGroupWorkspaceContext
 	extends UmbEntityNamedDetailWorkspaceContextBase<UmbUserGroupDetailModel, UmbUserGroupDetailRepository>
@@ -39,11 +40,17 @@ export class UmbUserGroupWorkspaceContext
 	readonly #userUniquesState = new UmbArrayState<string>([], (v) => v);
 	readonly userUniques = this.#userUniquesState.asObservable();
 
+	#notificationContext?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;
+
 	constructor(host: UmbControllerHost) {
 		super(host, {
 			workspaceAlias: UMB_USER_GROUP_WORKSPACE_ALIAS,
 			entityType: UMB_USER_GROUP_ENTITY_TYPE,
 			detailRepositoryAlias: UMB_USER_GROUP_DETAIL_REPOSITORY_ALIAS,
+		});
+
+		this.consumeContext(UMB_NOTIFICATION_CONTEXT, (context) => {
+			this.#notificationContext = context;
 		});
 
 		this.routes.setRoutes([
@@ -134,6 +141,18 @@ export class UmbUserGroupWorkspaceContext
 			this.#addUsersToGroup(unique, toAdd),
 			this.#removeUsersFromGroup(unique, toRemove),
 		]);
+
+		if (addError) {
+			this.#notificationContext?.peek('danger', {
+				data: {headline: 'An error occurred', message: 'Can not add users to the group.' },
+			});
+		}
+
+		if (removeError) {
+			this.#notificationContext?.peek('danger', {
+				data: {headline: 'An error occurred', message: 'Can not remove users from the group.' },
+			});
+		}
 
 		if (!addError && !removeError) {
 			this.#persistedUserUniques = [...pending];
