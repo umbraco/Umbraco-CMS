@@ -184,7 +184,7 @@ internal sealed class LanguageRepository : AsyncEntityRepositoryBase<Guid, ILang
         ILanguage? first = null;
         foreach (ILanguage l in languages)
         {
-            if (first == null || l.Key < first.Key)
+            if (first == null || l.Id < first.Id)
             {
                 first = l;
             }
@@ -495,13 +495,21 @@ internal sealed class LanguageRepository : AsyncEntityRepositoryBase<Guid, ILang
     /// </summary>
     private int? GetFallbackLanguageId(ILanguage entity)
     {
-        if (entity.FallbackIsoCode.IsNullOrWhiteSpace() == false &&
-            _codeIdMap.TryGetValue(entity.FallbackIsoCode, out var languageId))
+        int? fallbackLanguageId = null;
+        if (entity.FallbackIsoCode.IsNullOrWhiteSpace())
         {
-            return languageId;
+            return fallbackLanguageId;
         }
 
-        return null;
+        lock (_codeKeyMap)
+        {
+            if (_codeIdMap.TryGetValue(entity.FallbackIsoCode, out var languageId))
+            {
+                fallbackLanguageId = languageId;
+            }
+        }
+
+        return fallbackLanguageId;
     }
 
     /// <summary>

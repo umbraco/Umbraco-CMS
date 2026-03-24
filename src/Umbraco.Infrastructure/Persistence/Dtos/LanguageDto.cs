@@ -28,6 +28,7 @@ internal sealed class LanguageDto
     /// </summary>
     [Column(LanguageKeyColumnName)]
     [Index(IndexTypes.UniqueNonClustered)]
+    [NullSetting(NullSetting = NullSettings.Null)]
     public Guid LanguageKey { get; set; }
 
     /// <summary>

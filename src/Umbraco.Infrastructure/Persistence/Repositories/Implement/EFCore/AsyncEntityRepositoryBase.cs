@@ -160,12 +160,12 @@ public abstract class AsyncEntityRepositoryBase<TKey, TEntity> : AsyncRepository
     /// <summary>
     ///     Gets all entities of type <typeparamref name="TEntity"/>, or a subset matching the passed identifiers.
     /// </summary>
-    /// <param name="ids">The identifiers to retrieve, or <see langword="null"/> to get all.</param>
+    /// <param name="keys">The keys to retrieve, or empty to get all.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The matching entities.</returns>
-    public async Task<IEnumerable<TEntity>> GetManyAsync(TKey[]? keys, CancellationToken cancellationToken)
+    public async Task<IEnumerable<TEntity>> GetManyAsync(TKey[] keys, CancellationToken cancellationToken)
     {
-        if (keys is null)
+        if (keys.Length == 0)
         {
             return await GetAllAsync(cancellationToken);
         }
@@ -272,7 +272,7 @@ public abstract class AsyncEntityRepositoryBase<TKey, TEntity> : AsyncRepository
         {
             if (key is not Guid actualKey)
             {
-                return false;
+                throw new NotSupportedException($"PerformExistsAsync must be overridden for key type {typeof(TKey).Name}.");
             }
 
             return await db.Set<TEntity>().AnyAsync(e => e.Key == actualKey);
