@@ -12,12 +12,12 @@ export class PartialViewUiHelper extends UiBaseLocators {
 
   constructor(page: Page) {
     super(page);
-    this.partialViewCreateModal = page.locator('umb-partial-view-create-options-modal');
-    this.newEmptyPartialViewBtn = this.partialViewCreateModal.locator('uui-menu-item', {hasText: 'Empty partial view'});
-    this.newPartialViewFromSnippetBtn = this.partialViewCreateModal.locator('uui-menu-item', {hasText: 'Partial view from snippet'});
+    this.partialViewCreateModal = page.locator('umb-entity-create-option-action-list-modal');
+    this.newEmptyPartialViewBtn = this.partialViewCreateModal.locator('umb-ref-item', {hasText: 'Empty partial view'});
+    this.newPartialViewFromSnippetBtn = this.partialViewCreateModal.locator('umb-ref-item', {hasText: 'Partial view from snippet'});
     this.partialViewTree = page.locator('umb-tree[alias="Umb.Tree.PartialView"]');
     this.partialViewUiLoader = page.locator('uui-loader');
-    this.newFolderThreeDots = this.partialViewCreateModal.locator('uui-menu-item', {hasText: 'Folder'});
+    this.newFolderThreeDots = this.partialViewCreateModal.locator('umb-ref-item', {hasText: 'Folder'});
   }
 
   async clickActionsMenuForPartialView(name: string) {
@@ -68,7 +68,7 @@ export class PartialViewUiHelper extends UiBaseLocators {
   }
 
   async createPartialViewFolder(folderName: string) {
-    await this.clickCreateOptionsActionMenuOption();
+    await this.clickCreateActionMenuOption();
     await this.click(this.newFolderThreeDots);
     await this.enterFolderName(folderName);
     await this.clickConfirmCreateFolderButton();
@@ -98,7 +98,7 @@ export class PartialViewUiHelper extends UiBaseLocators {
   }
 
   async createPartialViewFolderAndWaitForPartialViewToBeCreated(folderName: string) {
-    await this.clickCreateOptionsActionMenuOption();
+    await this.clickCreateActionMenuOption();
     await this.click(this.newFolderThreeDots);
     await this.enterFolderName(folderName);
     return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.partialViewFolder, this.clickConfirmCreateFolderButton(), ConstantHelper.statusCodes.created);
