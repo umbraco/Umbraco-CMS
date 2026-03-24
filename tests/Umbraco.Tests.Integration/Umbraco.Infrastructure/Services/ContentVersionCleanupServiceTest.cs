@@ -1,9 +1,12 @@
 using System.Diagnostics;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
+using Umbraco.Cms.Tests.Integration.Attributes;
 using Umbraco.Cms.Tests.Integration.Testing;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
@@ -278,24 +281,75 @@ internal class ContentVersionCleanupServiceTest : UmbracoIntegrationTest
         });
     }
 
+    public static void ConfigureLowMaxVersionsPerRun(IUmbracoBuilder builder)
+    {
+        builder.Services.Configure<ContentSettings>(settings =>
+            settings.ContentVersionCleanupPolicy.MaxVersionsToDeletePerRun = 3);
+    }
+
+    [Test]
+    [ConfigureBuilder(ActionName = nameof(ConfigureLowMaxVersionsPerRun))]
+    public async Task PerformContentVersionCleanup_WithMaxVersionsPerRunCap_DeletesOnlyUpToCap()
+    {
+        var template = TemplateBuilder.CreateTextPageTemplate();
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+
+        var contentType = ContentTypeBuilder.CreateSimpleContentType("contentTypeA", "contentTypeA", defaultTemplateId: template.Id);
+        contentType.HistoryCleanup.PreventCleanup = false;
+        contentType.HistoryCleanup.KeepAllVersionsNewerThanDays = 0;
+        contentType.HistoryCleanup.KeepLatestVersionPerDayForDays = 0;
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+
+        var content = ContentBuilder.CreateSimpleContent(contentType);
+        ContentService.Save(content);
+        ContentService.Publish(content, []);
+
+        for (var i = 0; i < 8; i++)
+        {
+            ContentService.Publish(content, []);
+        }
+
+        // 10 versions total: 8 historic + current draft + current published.
+        var before = GetReport();
+        Assert.AreEqual(10, before.ContentVersions);
+
+        // First run: MaxVersionsToDeletePerRun = 3, so only 3 historic versions should be deleted.
+        var firstResult = ContentVersionService.PerformContentVersionCleanup(DateTime.UtcNow.AddHours(1));
+        Assert.AreEqual(3, firstResult.Count, "First run should delete exactly 3 (the per-run cap)");
+
+        var afterFirst = GetReport();
+        Assert.AreEqual(7, afterFirst.ContentVersions);
+
+        // Second run: another 3 deleted.
+        var secondResult = ContentVersionService.PerformContentVersionCleanup(DateTime.UtcNow.AddHours(1));
+        Assert.AreEqual(3, secondResult.Count, "Second run should delete another 3");
+
+        var afterSecond = GetReport();
+        Assert.AreEqual(4, afterSecond.ContentVersions);
+
+        // Third run: only 2 historic remain, so fewer than cap deleted.
+        var thirdResult = ContentVersionService.PerformContentVersionCleanup(DateTime.UtcNow.AddHours(1));
+        Assert.AreEqual(2, thirdResult.Count, "Third run should delete remaining 2");
+
+        var afterThird = GetReport();
+        Assert.AreEqual(2, afterThird.ContentVersions); // Only current draft + current published remain.
+    }
+
     private Report GetReport()
     {
-        using (var scope = ScopeProvider.CreateScope(autoComplete: true))
-        {
-            var contentVersions =
-                ScopeAccessor.AmbientScope.Database.Single<int>(@"select count(1) from umbracoContentVersion");
-            var documentVersions =
-                ScopeAccessor.AmbientScope.Database.Single<int>(@"select count(1) from umbracoDocumentVersion");
-            var propertyData =
-                ScopeAccessor.AmbientScope.Database.Single<int>(@"select count(1) from umbracoPropertyData");
+        using var scope = ScopeProvider.CreateScope(autoComplete: true);
 
-            return new Report
-            {
-                ContentVersions = contentVersions,
-                DocumentVersions = documentVersions,
-                PropertyData = propertyData
-            };
-        }
+        var database = ScopeAccessor.AmbientScope.Database;
+        var contentVersions = database.Single<int>(@"select count(1) from umbracoContentVersion");
+        var documentVersions = database.Single<int>(@"select count(1) from umbracoDocumentVersion");
+        var propertyData = database.Single<int>(@"select count(1) from umbracoPropertyData");
+
+        return new Report
+        {
+            ContentVersions = contentVersions,
+            DocumentVersions = documentVersions,
+            PropertyData = propertyData,
+        };
     }
 
     private class Report

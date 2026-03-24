@@ -42,7 +42,7 @@ public class DefaultContentVersionCleanupPolicyTest
         documentVersionRepository.Setup(x => x.GetCleanupPolicies())
             .Returns(Array.Empty<ContentVersionCleanupPolicySettings>());
 
-        documentVersionRepository.Setup(x => x.GetDocumentVersionsEligibleForCleanup(It.IsAny<DateTime>(), It.IsAny<int>()))
+        documentVersionRepository.Setup(x => x.GetDocumentVersionsEligibleForCleanup(It.IsAny<DateTime>(), It.IsAny<int?>()))
             .Returns(historicItems);
 
         var results = sut.Apply(DateTime.Today, historicItems).ToList();
@@ -78,7 +78,7 @@ public class DefaultContentVersionCleanupPolicyTest
         documentVersionRepository.Setup(x => x.GetCleanupPolicies())
             .Returns(Array.Empty<ContentVersionCleanupPolicySettings>());
 
-        documentVersionRepository.Setup(x => x.GetDocumentVersionsEligibleForCleanup(It.IsAny<DateTime>(), It.IsAny<int>()))
+        documentVersionRepository.Setup(x => x.GetDocumentVersionsEligibleForCleanup(It.IsAny<DateTime>(), It.IsAny<int?>()))
             .Returns(historicItems);
 
         var results = sut.Apply(DateTime.Today, historicItems).ToList();
@@ -122,7 +122,7 @@ public class DefaultContentVersionCleanupPolicyTest
         documentVersionRepository.Setup(x => x.GetCleanupPolicies())
             .Returns(Array.Empty<ContentVersionCleanupPolicySettings>());
 
-        documentVersionRepository.Setup(x => x.GetDocumentVersionsEligibleForCleanup(It.IsAny<DateTime>(), It.IsAny<int>()))
+        documentVersionRepository.Setup(x => x.GetDocumentVersionsEligibleForCleanup(It.IsAny<DateTime>(), It.IsAny<int?>()))
             .Returns(historicItems);
 
         var results = sut.Apply(DateTime.Today, historicItems).ToList();
@@ -175,7 +175,7 @@ public class DefaultContentVersionCleanupPolicyTest
                 new() { ContentTypeId = 2, PreventCleanup = true },
             ]);
 
-        documentVersionRepository.Setup(x => x.GetDocumentVersionsEligibleForCleanup(It.IsAny<DateTime>(), It.IsAny<int>()))
+        documentVersionRepository.Setup(x => x.GetDocumentVersionsEligibleForCleanup(It.IsAny<DateTime>(), It.IsAny<int?>()))
             .Returns(historicItems);
 
         var results = sut.Apply(DateTime.Today, historicItems).ToList();
@@ -218,7 +218,7 @@ public class DefaultContentVersionCleanupPolicyTest
                 new() { ContentTypeId = 2, PreventCleanup = false, KeepAllVersionsNewerThanDays = 3 },
             });
 
-        documentVersionRepository.Setup(x => x.GetDocumentVersionsEligibleForCleanup(It.IsAny<DateTime>(), It.IsAny<int>()))
+        documentVersionRepository.Setup(x => x.GetDocumentVersionsEligibleForCleanup(It.IsAny<DateTime>(), It.IsAny<int?>()))
             .Returns(historicItems);
 
         var results = sut.Apply(DateTime.Today, historicItems).ToList();
@@ -266,7 +266,7 @@ public class DefaultContentVersionCleanupPolicyTest
                 new() { ContentTypeId = 2, PreventCleanup = false, KeepLatestVersionPerDayForDays = 3 },
             });
 
-        documentVersionRepository.Setup(x => x.GetDocumentVersionsEligibleForCleanup(It.IsAny<DateTime>(), It.IsAny<int>()))
+        documentVersionRepository.Setup(x => x.GetDocumentVersionsEligibleForCleanup(It.IsAny<DateTime>(), It.IsAny<int?>()))
             .Returns(historicItems);
 
         var results = sut.Apply(DateTime.Today, historicItems).ToList();

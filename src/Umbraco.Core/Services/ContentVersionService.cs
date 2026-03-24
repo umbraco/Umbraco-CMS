@@ -242,8 +242,9 @@ internal sealed class ContentVersionService : IContentVersionService
         }
 
         DateTime olderThan = asAtDate.AddDays(-effectiveKeepAllDays);
-        var maxPerRun = versionCleanupPolicy.MaxVersionsToDeletePerRun;
-        var fetchLimit = maxPerRun > 0 ? maxPerRun : int.MaxValue;
+        int? fetchLimit = versionCleanupPolicy.MaxVersionsToDeletePerRun > 0
+            ? versionCleanupPolicy.MaxVersionsToDeletePerRun
+            : null;
 
         // Multiple scopes are used intentionally so that locks are not held for the entire duration.
         // This allows other database connections to acquire locks between batches, keeping the backoffice responsive during

@@ -18,8 +18,8 @@ public interface IDocumentVersionRepository : IRepository
     ///     specified date and limited to a maximum number of results, ordered oldest first.
     /// </summary>
     /// <param name="olderThan">Only versions with a date earlier than this are returned.</param>
-    /// <param name="maxCount">The maximum number of versions to return.</param>
-    public IReadOnlyCollection<ContentVersionMeta> GetDocumentVersionsEligibleForCleanup(DateTime olderThan, int maxCount)
+    /// <param name="maxCount">The maximum number of versions to return, or <c>null</c> for no limit.</param>
+    public IReadOnlyCollection<ContentVersionMeta> GetDocumentVersionsEligibleForCleanup(DateTime olderThan, int? maxCount)
 #pragma warning disable CS0618 // Type or member is obsolete
         => GetDocumentVersionsEligibleForCleanup();
 #pragma warning restore CS0618 // Type or member is obsolete

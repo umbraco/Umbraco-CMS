@@ -44,7 +44,7 @@ internal sealed class DocumentVersionRepositoryTest : UmbracoIntegrationTest
         using (ScopeProvider.CreateScope())
         {
             var sut = new DocumentVersionRepository(ScopeAccessor);
-            var results = sut.GetDocumentVersionsEligibleForCleanup(DateTime.UtcNow.AddDays(1), int.MaxValue);
+            var results = sut.GetDocumentVersionsEligibleForCleanup(DateTime.UtcNow.AddDays(1), null);
 
             Assert.Multiple(() =>
             {
@@ -83,7 +83,7 @@ internal sealed class DocumentVersionRepositoryTest : UmbracoIntegrationTest
             ScopeAccessor.AmbientScope.Database.Update<ContentVersionDto>("set preventCleanup = 1 where id in (1,3)");
 
             var sut = new DocumentVersionRepository(ScopeAccessor);
-            var results = sut.GetDocumentVersionsEligibleForCleanup(DateTime.UtcNow.AddDays(1), int.MaxValue);
+            var results = sut.GetDocumentVersionsEligibleForCleanup(DateTime.UtcNow.AddDays(1), null);
 
             Assert.Multiple(() =>
             {
@@ -127,7 +127,7 @@ internal sealed class DocumentVersionRepositoryTest : UmbracoIntegrationTest
             var sut = new DocumentVersionRepository(ScopeAccessor);
 
             // Cutoff at 5 days ago — should only return version 1.
-            var results = sut.GetDocumentVersionsEligibleForCleanup(DateTime.UtcNow.AddDays(-5), int.MaxValue);
+            var results = sut.GetDocumentVersionsEligibleForCleanup(DateTime.UtcNow.AddDays(-5), null);
 
             Assert.Multiple(() =>
             {

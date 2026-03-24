@@ -26,7 +26,7 @@ internal class ContentVersionCleanupServiceTest
         DateTime aDateTime,
         ContentVersionService sut)
     {
-        documentVersionRepository.Setup(x => x.GetDocumentVersionsEligibleForCleanup(It.IsAny<DateTime>(), It.IsAny<int>()))
+        documentVersionRepository.Setup(x => x.GetDocumentVersionsEligibleForCleanup(It.IsAny<DateTime>(), It.IsAny<int?>()))
             .Returns(someHistoricVersions);
 
         eventAggregator.Setup(x => x.PublishCancelable(It.IsAny<ContentDeletingVersionsNotification>()))
@@ -58,7 +58,7 @@ internal class ContentVersionCleanupServiceTest
         DateTime aDateTime,
         ContentVersionService sut)
     {
-        documentVersionRepository.Setup(x => x.GetDocumentVersionsEligibleForCleanup(It.IsAny<DateTime>(), It.IsAny<int>()))
+        documentVersionRepository.Setup(x => x.GetDocumentVersionsEligibleForCleanup(It.IsAny<DateTime>(), It.IsAny<int?>()))
             .Returns(someHistoricVersions);
 
         eventAggregator
@@ -84,7 +84,7 @@ internal class ContentVersionCleanupServiceTest
         DateTime aDateTime,
         ContentVersionService sut)
     {
-        documentVersionRepository.Setup(x => x.GetDocumentVersionsEligibleForCleanup(It.IsAny<DateTime>(), It.IsAny<int>()))
+        documentVersionRepository.Setup(x => x.GetDocumentVersionsEligibleForCleanup(It.IsAny<DateTime>(), It.IsAny<int?>()))
             .Returns(someHistoricVersions);
 
         eventAggregator
@@ -111,7 +111,7 @@ internal class ContentVersionCleanupServiceTest
         DateTime aDateTime,
         ContentVersionService sut)
     {
-        documentVersionRepository.Setup(x => x.GetDocumentVersionsEligibleForCleanup(It.IsAny<DateTime>(), It.IsAny<int>()))
+        documentVersionRepository.Setup(x => x.GetDocumentVersionsEligibleForCleanup(It.IsAny<DateTime>(), It.IsAny<int?>()))
             .Returns(someHistoricVersions);
 
         eventAggregator
@@ -146,7 +146,7 @@ internal class ContentVersionCleanupServiceTest
         DateTime aDateTime,
         ContentVersionService sut)
     {
-        documentVersionRepository.Setup(x => x.GetDocumentVersionsEligibleForCleanup(It.IsAny<DateTime>(), It.IsAny<int>()))
+        documentVersionRepository.Setup(x => x.GetDocumentVersionsEligibleForCleanup(It.IsAny<DateTime>(), It.IsAny<int?>()))
             .Returns(someHistoricVersions);
 
         eventAggregator

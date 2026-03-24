@@ -46,16 +46,23 @@ internal class ContentVersionCleanupJob : IDistributedBackgroundJob
             return Task.CompletedTask;
         }
 
-
+        ContentVersionCleanupPolicySettings policy = _settingsMonitor.CurrentValue.ContentVersionCleanupPolicy;
         var count = _service.PerformContentVersionCleanup(DateTime.UtcNow).Count;
 
         if (count > 0)
         {
-            _logger.LogInformation("Deleted {count} ContentVersion(s)", count);
+            _logger.LogInformation("Deleted {Count} ContentVersion(s)", count);
         }
         else
         {
-            _logger.LogDebug("Task complete, no items were Deleted");
+            _logger.LogDebug("Task complete, no items were deleted");
+        }
+
+        if (policy.MaxVersionsToDeletePerRun > 0 && count >= policy.MaxVersionsToDeletePerRun)
+        {
+            _logger.LogInformation(
+                "Reached per-run cap of {MaxVersionsToDeletePerRun}. Remaining versions will be cleaned up in subsequent runs",
+                policy.MaxVersionsToDeletePerRun);
         }
 
         return Task.CompletedTask;

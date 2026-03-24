@@ -30,10 +30,10 @@ internal sealed class DocumentVersionRepository : IDocumentVersionRepository
         => GetDocumentVersionsEligibleForCleanup(olderThan: null, maxCount: null);
 
     /// <inheritdoc />
-    public IReadOnlyCollection<ContentVersionMeta> GetDocumentVersionsEligibleForCleanup(DateTime olderThan, int maxCount)
+    public IReadOnlyCollection<ContentVersionMeta> GetDocumentVersionsEligibleForCleanup(DateTime olderThan, int? maxCount)
 
         // TODO (V19): When the obsolete overload is removed, bring the helper method into here and use non-nullable parameters.
-        => GetDocumentVersionsEligibleForCleanup(olderThan, (int?)maxCount);
+        => GetDocumentVersionsEligibleForCleanup((DateTime?)olderThan, maxCount);
 
     private IReadOnlyCollection<ContentVersionMeta> GetDocumentVersionsEligibleForCleanup(DateTime? olderThan, int? maxCount)
     {
