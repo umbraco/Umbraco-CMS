@@ -161,12 +161,12 @@ Evaluate whether the PR's scope suggests it should be split. This assessment is 
 
 If no exemption applies, flag each dimension whose condition is met:
 
-| Dimension | Condition |
-|---|---|
-| **Size** | More than 30 reviewable files OR more than 1500 lines changed, AND changes span more than one project |
-| **Layer spread** | 3+ distinct production layers touched (using the layer mapping from `references/impact-analysis.md`, excluding Test), at least one is Core or Frontend, AND more than 10 reviewable files |
-| **Mixed intent** | 2+ distinct intent categories detected AND more than 15 reviewable files or more than 2 distinct projects |
-| **Formatting mixed with logic** | A file's whitespace-ignored diff is significantly smaller than its full diff (see detection method below) |
+| Dimension                       | Condition                                                                                                                                                                                 |
+| ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Size**                        | More than 30 reviewable files OR more than 1500 lines changed, AND changes span more than one project                                                                                     |
+| **Layer spread**                | 3+ distinct production layers touched (using the layer mapping from `references/impact-analysis.md`, excluding Test), at least one is Core or Frontend, AND more than 10 reviewable files |
+| **Mixed intent**                | 2+ distinct intent categories detected AND more than 15 reviewable files or more than 2 distinct projects                                                                                 |
+| **Formatting mixed with logic** | A file's whitespace-ignored diff is significantly smaller than its full diff (see detection method below)                                                                                 |
 
 **Intent categories** — detect from diff characteristics only (do not rely on commit message wording):
 
@@ -192,7 +192,20 @@ For each triggered dimension, prepare a concrete suggestion:
 
 Store the triggered dimensions and their suggestions for use in step 8.
 
+#### 4f. Classify PR scope
+
+Classify the PR to determine which review steps are relevant:
+
+| Classification  | Condition                                                                       | Effect                                                                          |
+| --------------- | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| **Docs-only**   | All reviewable files are `.md`                                                  | Skip steps 5 and 6; step 7 reviews intent and readability only                  |
+| **Test-only**   | All reviewable files are in `tests/`                                            | Skip steps 5 and 6; step 7 reviews intent, code quality, and test coverage only |
+| **Config-only** | All reviewable files are `.csproj`, `.props`, `.json` config, or CI/build files | Skip step 5; step 6 checks dependency version changes only                      |
+| **Standard**    | Anything else                                                                   | No skips — run all steps                                                        |
+
 ### 5. Impact Analysis
+
+**Skip this step if PR scope is docs-only, test-only, or config-only.**
 
 Follow the detailed procedure in `references/impact-analysis.md` (relative to this skill file).
 
@@ -205,6 +218,8 @@ In summary:
 
 ### 6. Breaking Changes Check
 
+**Skip this step if PR scope is docs-only or test-only. If config-only, only check for dependency version changes that could break consumers.**
+
 Follow the detailed procedure in `references/breaking-changes.md` (relative to this skill file).
 
 In summary:
@@ -216,6 +231,8 @@ In summary:
 5. **Verify internal callers** are updated to use new APIs (no internal code should reference obsolete members)
 
 ### 7. Review Against All Criteria
+
+**If PR scope is docs-only:** review only for intent and readability. **If test-only:** review only for intent, code quality, and test coverage. **Otherwise:** review all criteria below.
 
 Analyze each changed file against:
 
@@ -236,6 +253,7 @@ Present the review in this exact format:
 ## PR Review
 
 **Target:** `{target_branch}` · **Based on commit:** `{head_sha}` · **Files:** {total} changed, {skipped} skipped, {reviewed} reviewed ({full_read} full, {header_only} diff + header-only)
+[If step 4f classification is not "Standard", append: · **Classified as:** {classification}]
 
 [1–2 sentences: what this PR accomplishes , keep it as short as possible, only highlight the primary essence.]
 
@@ -254,7 +272,7 @@ Present the review in this exact format:
 > **Complexity advisory** — This PR may benefit from splitting.
 >
 > - **{Dimension}:** {Explanation and concrete split suggestion from step 4e}
-> [one bullet per triggered dimension]
+>   [one bullet per triggered dimension]
 >
 > _This is an observation, not a blocker. The full review follows below._
 
