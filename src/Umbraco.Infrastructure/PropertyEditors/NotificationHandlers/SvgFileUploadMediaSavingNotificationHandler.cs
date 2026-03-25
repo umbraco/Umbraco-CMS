@@ -98,7 +98,7 @@ internal sealed class SvgFileUploadMediaSavingNotificationHandler : INotificatio
 
     private static void SetProperty(IContentBase content, string alias, object? value)
     {
-        if (!string.IsNullOrEmpty(alias) &&
+        if (string.IsNullOrEmpty(alias) is false &&
             content.Properties.TryGetValue(alias, out IProperty? property))
         {
             property.SetValue(value);
