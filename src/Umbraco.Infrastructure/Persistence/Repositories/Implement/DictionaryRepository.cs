@@ -27,6 +27,17 @@ internal sealed class DictionaryRepository : EntityRepositoryBase<int, IDictiona
 
     private string QuotedColumn(string columnName) => $"{QuoteTableName(DictionaryDto.TableName)}.{QuoteColumnName(columnName)}";
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DictionaryRepository"/> class.
+    /// </summary>
+    /// <param name="scopeAccessor">Provides access to the database scope for context management.</param>
+    /// <param name="cache">The application-level cache manager.</param>
+    /// <param name="logger">The logger used for logging repository operations.</param>
+    /// <param name="loggerFactory">Factory for creating logger instances.</param>
+    /// <param name="languageRepository">Repository for managing language entities.</param>
+    /// <param name="repositoryCacheVersionService">Service for managing repository cache versions.</param>
+    /// <param name="cacheSyncService">Service for synchronizing cache across distributed environments.</param>
+    /// <param name="dictionarySettings">Monitors and provides access to dictionary-related settings.</param>
     public DictionaryRepository(
         IScopeAccessor scopeAccessor,
         AppCaches cache,
@@ -43,6 +54,11 @@ internal sealed class DictionaryRepository : EntityRepositoryBase<int, IDictiona
         _dictionarySettings = dictionarySettings;
     }
 
+    /// <summary>
+    /// Gets a dictionary item by its unique identifier.
+    /// </summary>
+    /// <param name="uniqueId">The unique identifier of the dictionary item.</param>
+    /// <returns>The dictionary item if found; otherwise, null.</returns>
     public IDictionaryItem? Get(Guid uniqueId)
     {
         var uniqueIdRepo = new DictionaryByUniqueIdRepository(
@@ -55,6 +71,11 @@ internal sealed class DictionaryRepository : EntityRepositoryBase<int, IDictiona
         return uniqueIdRepo.Get(uniqueId);
     }
 
+    /// <summary>
+    /// Retrieves multiple dictionary items by their unique identifiers.
+    /// </summary>
+    /// <param name="uniqueIds">An array of unique identifiers for the dictionary items to retrieve.</param>
+    /// <returns>An enumerable collection of dictionary items matching the specified unique identifiers.</returns>
     public IEnumerable<IDictionaryItem> GetMany(params Guid[] uniqueIds)
     {
         var uniqueIdRepo = new DictionaryByUniqueIdRepository(
@@ -67,6 +88,11 @@ internal sealed class DictionaryRepository : EntityRepositoryBase<int, IDictiona
         return uniqueIdRepo.GetMany(uniqueIds);
     }
 
+    /// <summary>
+    /// Gets a dictionary item by its key.
+    /// </summary>
+    /// <param name="key">The string key of the dictionary item.</param>
+    /// <returns>The dictionary item if found; otherwise, <c>null</c>.</returns>
     public IDictionaryItem? Get(string key)
     {
         var keyRepo = new DictionaryByKeyRepository(
@@ -79,6 +105,11 @@ internal sealed class DictionaryRepository : EntityRepositoryBase<int, IDictiona
         return keyRepo.Get(key);
     }
 
+    /// <summary>
+    /// Retrieves dictionary items corresponding to the specified keys.
+    /// </summary>
+    /// <param name="keys">The array of keys for which to retrieve dictionary items.</param>
+    /// <returns>An enumerable collection of dictionary items matching the provided keys.</returns>
     public IEnumerable<IDictionaryItem> GetManyByKeys(string[] keys)
     {
         var keyRepo = new DictionaryByKeyRepository(
@@ -91,6 +122,10 @@ internal sealed class DictionaryRepository : EntityRepositoryBase<int, IDictiona
         return keyRepo.GetMany(keys);
     }
 
+    /// <summary>
+    /// Gets a dictionary mapping of dictionary item keys to their unique identifiers.
+    /// </summary>
+    /// <returns>A dictionary where the key is the dictionary item key and the value is the corresponding unique identifier (Guid).</returns>
     public Dictionary<string, Guid> GetDictionaryItemKeyMap()
     {
         var columns = new[] { "key", "id" }.Select(x => (object)QuotedColumn(x)).ToArray();
@@ -98,6 +133,14 @@ internal sealed class DictionaryRepository : EntityRepositoryBase<int, IDictiona
         return Database.Fetch<DictionaryItemKeyIdDto>(sql).ToDictionary(x => x.Key, x => x.Id);
     }
 
+    /// <summary>
+    /// Retrieves all descendant dictionary items of a specified parent item, optionally filtered by a search string.
+    /// </summary>
+    /// <param name="parentId">The unique identifier of the parent dictionary item from which to retrieve descendants. If <c>null</c>, all dictionary items in the repository are returned.</param>
+    /// <param name="filter">An optional string to filter the dictionary items by key or value.</param>
+    /// <returns>
+    /// An <see cref="IEnumerable{IDictionaryItem}"/> containing all descendant dictionary items of the specified parent, or all items if <paramref name="parentId"/> is <c>null</c>. The results are ordered by item key.
+    /// </returns>
     public IEnumerable<IDictionaryItem> GetDictionaryItemDescendants(Guid? parentId, string? filter = null)
     {
         IDictionary<int, ILanguage> languageIsoCodeById = GetLanguagesById();
@@ -236,8 +279,14 @@ internal sealed class DictionaryRepository : EntityRepositoryBase<int, IDictiona
 
     private sealed class DictionaryItemKeyIdDto
     {
+        /// <summary>
+        /// Gets the unique key identifier for the dictionary item.
+        /// </summary>
         public string Key { get; } = null!;
 
+        /// <summary>
+        /// Gets or sets the unique identifier of the dictionary item.
+        /// </summary>
         public Guid Id { get; set; }
     }
 
@@ -250,6 +299,15 @@ internal sealed class DictionaryRepository : EntityRepositoryBase<int, IDictiona
 
         private string QuotedColumn(string columnName) => $"{QuoteTableName(DictionaryDto.TableName)}.{QuoteColumnName(columnName)}";
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.DictionaryRepository.DictionaryByUniqueIdRepository"/> class.
+        /// </summary>
+        /// <param name="dictionaryRepository">The parent <see cref="DictionaryRepository"/> used for dictionary item operations.</param>
+        /// <param name="scopeAccessor">Provides access to the current database scope.</param>
+        /// <param name="cache">The <see cref="AppCaches"/> instance for managing application-level caching.</param>
+        /// <param name="logger">The <see cref="ILogger{TCategoryName}"/> instance for logging repository activity.</param>
+        /// <param name="repositoryCacheVersionService">Service for managing repository cache versioning.</param>
+        /// <param name="cacheSyncService">Service for synchronizing cache across distributed environments.</param>
         public DictionaryByUniqueIdRepository(
             DictionaryRepository dictionaryRepository,
             IScopeAccessor scopeAccessor,
@@ -326,6 +384,15 @@ internal sealed class DictionaryRepository : EntityRepositoryBase<int, IDictiona
 
         private string QuotedColumn(string columnName) => $"{QuoteTableName(DictionaryDto.TableName)}.{QuoteColumnName(columnName)}";
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.DictionaryRepository.DictionaryByKeyRepository"/> class.
+        /// </summary>
+        /// <param name="dictionaryRepository">The parent <see cref="DictionaryRepository"/> instance.</param>
+        /// <param name="scopeAccessor">The <see cref="IScopeAccessor"/> used to manage database scopes.</param>
+        /// <param name="cache">The <see cref="AppCaches"/> instance for application-level caching.</param>
+        /// <param name="logger">The <see cref="ILogger{DictionaryByKeyRepository}"/> instance for logging.</param>
+        /// <param name="repositoryCacheVersionService">The <see cref="IRepositoryCacheVersionService"/> for managing cache versions.</param>
+        /// <param name="cacheSyncService">The <see cref="ICacheSyncService"/> for synchronizing cache across instances.</param>
         public DictionaryByKeyRepository(
             DictionaryRepository dictionaryRepository,
             IScopeAccessor scopeAccessor,

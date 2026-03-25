@@ -1,4 +1,4 @@
-﻿import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
+import {ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 import {expect} from "@playwright/test";
 
 const dataTypeName = 'Multi URL Picker';
@@ -121,4 +121,5 @@ test('the default configuration is correct', async ({umbracoApi, umbracoUi}) => 
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(dataTypeName, 'ignoreUserStartNodes')).toBeFalsy();
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(dataTypeName, 'overlaySize')).toBeFalsy();
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(dataTypeName, 'hideAnchor')).toBeFalsy();
+  expect(await umbracoApi.dataType.doesDataTypeHaveValue(dataTypeName, 'allowCultureSpecificDocumentLinks')).toBeFalsy();
 });

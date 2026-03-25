@@ -65,6 +65,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		},
 		flags: [],
 		noAccess: false,
+		allowedInLibrary: false,
 	},
 	{
 		allowedTemplates: [],
@@ -857,6 +858,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			keepLatestVersionPerDayForDays: null,
 		},
 		noAccess: false,
+		allowedInLibrary: false,
 	},
 	{
 		allowedTemplates: [],
@@ -937,6 +939,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		},
 		collection: { id: 'dt-collectionView' },
 		noAccess: false,
+		allowedInLibrary: false,
 	},
 	{
 		allowedTemplates: [],
@@ -1108,6 +1111,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			keepLatestVersionPerDayForDays: null,
 		},
 		noAccess: false,
+		allowedInLibrary: false,
 	},
 	{
 		allowedTemplates: [{ id: '916cfecc-3295-490c-a16d-c41fa9f72980' }],
@@ -1166,6 +1170,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			keepLatestVersionPerDayForDays: null,
 		},
 		noAccess: false,
+		allowedInLibrary: false,
 	},
 	{
 		allowedTemplates: [],
@@ -1269,6 +1274,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			keepLatestVersionPerDayForDays: null,
 		},
 		noAccess: false,
+		allowedInLibrary: false,
 	},
 	{
 		allowedTemplates: [],
@@ -1325,6 +1331,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			keepLatestVersionPerDayForDays: null,
 		},
 		noAccess: false,
+		allowedInLibrary: false,
 	},
 	{
 		allowedTemplates: [
@@ -1394,6 +1401,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			keepLatestVersionPerDayForDays: null,
 		},
 		noAccess: false,
+		allowedInLibrary: false,
 	},
 	{
 		allowedTemplates: [],
@@ -1470,6 +1478,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			keepLatestVersionPerDayForDays: null,
 		},
 		noAccess: false,
+		allowedInLibrary: false,
 	},
 	{
 		allowedTemplates: [],
@@ -1497,6 +1506,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		containers: [],
 		flags: [],
 		noAccess: false,
+		allowedInLibrary: false,
 	},
 	{
 		allowedTemplates: [],
@@ -1573,6 +1583,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			},
 		],
 		noAccess: false,
+		allowedInLibrary: false,
 	},
 	{
 		allowedTemplates: [],
@@ -1629,6 +1640,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			},
 		],
 		noAccess: false,
+		allowedInLibrary: false,
 	},
 	{
 		allowedTemplates: [],
@@ -1685,6 +1697,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			},
 		],
 		noAccess: false,
+		allowedInLibrary: false,
 	},
 	{
 		allowedTemplates: [],
@@ -1741,6 +1754,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			},
 		],
 		noAccess: false,
+		allowedInLibrary: false,
 	},
 	{
 		allowedTemplates: [],
@@ -1797,6 +1811,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			},
 		],
 		noAccess: false,
+		allowedInLibrary: false,
 	},
 	{
 		allowedTemplates: [],
@@ -1826,6 +1841,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		containers: [],
 		flags: [],
 		noAccess: false,
+		allowedInLibrary: false,
 	},
 	{
 		allowedTemplates: [],
@@ -1853,6 +1869,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		properties: [],
 		containers: [],
 		noAccess: false,
+		allowedInLibrary: false,
 	},
 	{
 		allowedTemplates: [],
@@ -1910,6 +1927,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			keepLatestVersionPerDayForDays: null,
 		},
 		noAccess: false,
+		allowedInLibrary: false,
 	},
 	{
 		allowedTemplates: [],
@@ -1986,6 +2004,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			keepLatestVersionPerDayForDays: null,
 		},
 		noAccess: false,
+		allowedInLibrary: false,
 	},
 	{
 		allowedTemplates: [],
@@ -2042,5 +2061,6 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			keepLatestVersionPerDayForDays: null,
 		},
 		noAccess: false,
+		allowedInLibrary: false,
 	},
 ];

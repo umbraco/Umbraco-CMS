@@ -30,6 +30,14 @@ internal sealed class LanguageRepository : AsyncEntityRepositoryBase<Guid, ILang
 
     private CancellationToken CancellationToken => CancellationToken.None;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="LanguageRepository"/> class.
+    /// </summary>
+    /// <param name="scopeAccessor">Provides access to the current database scope for repository operations.</param>
+    /// <param name="cache">The application-level cache manager used for caching repository data.</param>
+    /// <param name="logger">The logger used for logging repository events and errors.</param>
+    /// <param name="repositoryCacheVersionService">Service for managing cache versioning within the repository.</param>
+    /// <param name="cacheSyncService">Service responsible for synchronizing cache across distributed environments.</param>
     public LanguageRepository(
         IEFCoreScopeAccessor<UmbracoDbContext> scopeAccessor,
         AppCaches cache,
@@ -50,6 +58,11 @@ internal sealed class LanguageRepository : AsyncEntityRepositoryBase<Guid, ILang
 
     protected override Guid GetEntityKey(ILanguage entity) => entity.Key;
 
+    /// <summary>
+    /// Gets a language by its ISO code.
+    /// </summary>
+    /// <param name="isoCode">The ISO code of the language to retrieve.</param>
+    /// <returns>The language matching the specified ISO code, or null if not found.</returns>
     public async Task<ILanguage?> GetByIsoCodeAsync(string isoCode)
     {
         await EnsureCacheIsPopulatedAsync();
@@ -58,6 +71,12 @@ internal sealed class LanguageRepository : AsyncEntityRepositoryBase<Guid, ILang
         return key.HasValue ? await GetAsync(key.Value, CancellationToken) : null;
     }
 
+    /// <summary>
+    /// Gets the language identifier corresponding to the specified ISO code.
+    /// </summary>
+    /// <param name="isoCode">The ISO code of the language to look up.</param>
+    /// <param name="throwOnNotFound">If true, throws an exception when the ISO code is not found; otherwise returns null.</param>
+    /// <returns>The language identifier if found; otherwise null.</returns>
     public async Task<Guid?> GetKeyByIsoCodeAsync(string? isoCode, bool throwOnNotFound = true)
     {
         if (isoCode == null)
@@ -83,6 +102,12 @@ internal sealed class LanguageRepository : AsyncEntityRepositoryBase<Guid, ILang
         return null;
     }
 
+    /// <summary>
+    /// Gets the ISO code for the language with the specified ID.
+    /// </summary>
+    /// <param name="id">The ID of the language to look up.</param>
+    /// <param name="throwOnNotFound">If true, throws an exception when the language ID is not found; otherwise returns null.</param>
+    /// <returns>The ISO code of the language if found; otherwise null.</returns>
     public async Task<string?> GetIsoCodeByKeyAsync(Guid? key, bool throwOnNotFound = true)
     {
         if (key == null)
@@ -138,12 +163,18 @@ internal sealed class LanguageRepository : AsyncEntityRepositoryBase<Guid, ILang
         return isoCodes;
     }
 
+    /// <summary>
+    /// Retrieves the ISO code of the default language configured in the system.
+    /// </summary>
+    /// <returns>A string representing the ISO code of the default language.</returns>
     public async Task<string> GetDefaultIsoCodeAsync()
     {
         ILanguage defaultLanguage = await GetDefaultAsync();
         return defaultLanguage.IsoCode;
     }
 
+    /// <summary>Gets the default language identifier.</summary>
+    /// <returns>The identifier of the default language, or null if none is set.</returns>
     public async Task<ILanguage?> GetDefaultLanguageAsync()
     {
         ILanguage defaultLanguage = await GetDefaultAsync();

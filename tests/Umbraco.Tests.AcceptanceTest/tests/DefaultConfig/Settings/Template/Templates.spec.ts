@@ -1,4 +1,4 @@
-﻿import {AliasHelper, ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
+﻿import {AliasHelper, ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 import {expect} from "@playwright/test";
 
 const templateName = 'TestTemplate';
@@ -167,7 +167,8 @@ test('can use query builder with Order By statement for a template', async ({umb
   expect(templateData.content).toBe(expectedTemplateContent);
 });
 
-test('can use query builder with Where statement for a template', async ({umbracoApi, umbracoUi}) => {
+// Skip this test due to this issue: https://github.com/umbraco/Umbraco-CMS/issues/22000
+test.skip('can use query builder with Where statement for a template', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const propertyAliasValue = 'Name';
   const operatorValue = 'is';

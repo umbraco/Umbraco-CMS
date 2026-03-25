@@ -159,7 +159,7 @@ public sealed class SqlServerEFCoreDistributedLockingMechanism<T> : IDistributed
                         "A transaction with minimum ReadCommitted isolation level is required.");
                 }
 
-                var number = await dbContext.Database.ExecuteScalarAsync<int?>($"SET LOCK_TIMEOUT {(int)_timeout.TotalMilliseconds};SELECT value FROM dbo.umbracoLock WITH (REPEATABLEREAD) WHERE id={LockId}");
+                var number = await dbContext.Database.ExecuteScalarAsync<int?>($"SET LOCK_TIMEOUT {(int)_timeout.TotalMilliseconds};SELECT value FROM dbo.umbracoLock WITH (ROWLOCK, REPEATABLEREAD) WHERE id={LockId}");
 
                 if (number == null)
                 {
@@ -192,7 +192,7 @@ public sealed class SqlServerEFCoreDistributedLockingMechanism<T> : IDistributed
                 }
 
 #pragma warning disable EF1002
-                var rowsAffected = await dbContext.Database.ExecuteSqlRawAsync(@$"SET LOCK_TIMEOUT {(int)_timeout.TotalMilliseconds};UPDATE umbracoLock WITH (REPEATABLEREAD) SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id={LockId}");
+                var rowsAffected = await dbContext.Database.ExecuteSqlRawAsync(@$"SET LOCK_TIMEOUT {(int)_timeout.TotalMilliseconds};UPDATE umbracoLock WITH (ROWLOCK, REPEATABLEREAD) SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id={LockId}");
 #pragma warning restore EF1002
 
                 if (rowsAffected == 0)

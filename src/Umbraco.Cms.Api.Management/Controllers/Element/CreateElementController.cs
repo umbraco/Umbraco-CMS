@@ -12,6 +12,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Element;
 
+/// <summary>
+/// API controller responsible for handling operations related to the creation of elements in the Umbraco CMS.
+/// </summary>
 [ApiVersion("1.0")]
 public class CreateElementController : CreateElementControllerBase
 {
@@ -19,6 +22,13 @@ public class CreateElementController : CreateElementControllerBase
     private readonly IElementEditingService _elementEditingService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CreateElementController"/> class.
+    /// </summary>
+    /// <param name="authorizationService">Service used to authorize access to element creation operations.</param>
+    /// <param name="elementEditingPresentationFactory">Factory for creating element editing presentation models.</param>
+    /// <param name="elementEditingService">Service responsible for element editing functionality.</param>
+    /// <param name="backOfficeSecurityAccessor">Accessor for back office security context.</param>
     public CreateElementController(
         IAuthorizationService authorizationService,
         IElementEditingPresentationFactory elementEditingPresentationFactory,
@@ -31,6 +41,12 @@ public class CreateElementController : CreateElementControllerBase
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
+    /// <summary>
+    /// Creates a new element using the specified request model.
+    /// </summary>
+    /// <param name="cancellationToken">Token to monitor for cancellation requests.</param>
+    /// <param name="requestModel">The details of the element to create.</param>
+    /// <returns>An <see cref="IActionResult"/> representing the result of the operation.</returns>
     [HttpPost]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status201Created)]

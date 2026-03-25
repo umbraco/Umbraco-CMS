@@ -599,7 +599,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
 
         // Verify original alias exists in database
         List<PublishedDocumentUrlAlias> aliasesBefore;
-        using (ICoreScope scope = CoreScopeProvider.CreateCoreScope(autoComplete: true))
+        using (CoreScopeProvider.CreateCoreScope(autoComplete: true))
         {
             aliasesBefore = DocumentUrlAliasRepository.GetAll()
                 .Where(a => a.DocumentKey == documentKey)
@@ -621,7 +621,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
 
         // Alias should be removed from database
         List<PublishedDocumentUrlAlias> aliasesAfter;
-        using (ICoreScope scope = CoreScopeProvider.CreateCoreScope(autoComplete: true))
+        using (CoreScopeProvider.CreateCoreScope(autoComplete: true))
         {
             aliasesAfter = DocumentUrlAliasRepository.GetAll()
                 .Where(a => a.DocumentKey == documentKey)
@@ -807,7 +807,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
 
         // Verify in database
         List<PublishedDocumentUrlAlias> storedAliases;
-        using (ICoreScope scope = CoreScopeProvider.CreateCoreScope(autoComplete: true))
+        using (CoreScopeProvider.CreateCoreScope(autoComplete: true))
         {
             storedAliases = DocumentUrlAliasRepository.GetAll()
                 .Where(a => a.DocumentKey == new Guid(PageWithSingleAliasKey))
@@ -863,13 +863,11 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
     [Test]
     public async Task InitAsync_Persists_Correct_Cache_Data()
     {
-        // Arrange - get the expected language ID
-        ILanguage defaultLanguage = await LanguageService.GetDefaultLanguageAsync();
-        var expectedLanguageId = defaultLanguage.Id;
-
         // Act - get all stored aliases from the database
+        // Note: The content type created in setup is invariant (no culture variance),
+        // so aliases should be stored with NULL LanguageId
         List<PublishedDocumentUrlAlias> storedAliases;
-        using (ICoreScope scope = CoreScopeProvider.CreateCoreScope(autoComplete: true))
+        using (CoreScopeProvider.CreateCoreScope(autoComplete: true))
         {
             storedAliases = DocumentUrlAliasRepository.GetAll().ToList();
         }
@@ -887,7 +885,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         {
             Assert.That(singleAlias.DocumentKey, Is.EqualTo(singleAliasKey), "DocumentKey should match PageWithSingleAlias key");
             Assert.That(singleAlias.DocumentKey, Is.Not.EqualTo(Guid.Empty), "DocumentKey should not be empty GUID");
-            Assert.That(singleAlias.LanguageId, Is.EqualTo(expectedLanguageId), "LanguageId should match default language");
+            Assert.That(singleAlias.NullableLanguageId, Is.Null, "Invariant content should have NULL LanguageId");
             Assert.That(singleAlias.Alias, Is.EqualTo("my-single-alias"), "Alias should be normalized (lowercase, no leading slash)");
         });
 
@@ -909,7 +907,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
             Assert.Multiple(() =>
             {
                 Assert.That(alias.DocumentKey, Is.Not.EqualTo(Guid.Empty), "DocumentKey should not be empty GUID");
-                Assert.That(alias.LanguageId, Is.EqualTo(expectedLanguageId), "LanguageId should match default language");
+                Assert.That(alias.NullableLanguageId, Is.Null, "Invariant content should have NULL LanguageId");
             });
         }
 
@@ -923,7 +921,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         {
             Assert.That(childAlias.DocumentKey, Is.EqualTo(childPageKey), "DocumentKey should match ChildPage key");
             Assert.That(childAlias.DocumentKey, Is.Not.EqualTo(Guid.Empty), "DocumentKey should not be empty GUID");
-            Assert.That(childAlias.LanguageId, Is.EqualTo(expectedLanguageId), "LanguageId should match default language");
+            Assert.That(childAlias.NullableLanguageId, Is.Null, "Invariant content should have NULL LanguageId");
             Assert.That(childAlias.Alias, Is.EqualTo("child-alias"), "Alias should be 'child-alias'");
         });
 
@@ -933,6 +931,205 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
 
         var rootPageEntries = storedAliases.Where(a => a.DocumentKey == new Guid(RootPageKey)).ToList();
         Assert.That(rootPageEntries, Is.Empty, "RootPage should have no stored aliases (no umbracoUrlAlias set)");
+    }
+
+    #endregion
+
+    #region Invariant vs Variant Content Tests
+
+    [Test]
+    public async Task GetDocumentKeysByAliasAsync_Finds_Invariant_Content_For_Any_Culture()
+    {
+        // Arrange - add second language
+        var frenchLanguage = new LanguageBuilder().WithCultureInfo("fr-FR").Build();
+        await LanguageService.CreateAsync(frenchLanguage, Constants.Security.SuperUserKey);
+
+        // Act - query with French culture for invariant content (stored with NULL languageId)
+        var result = await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("my-single-alias", "fr-FR");
+
+        // Assert - should find invariant content even though queried with non-default culture
+        Assert.That(result, Does.Contain(new Guid(PageWithSingleAliasKey)));
+    }
+
+    [Test]
+    public async Task Invariant_Content_Stores_Null_LanguageId()
+    {
+        // Verify invariant content was created in setup
+        List<PublishedDocumentUrlAlias> storedAliases;
+        using (CoreScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            storedAliases = DocumentUrlAliasRepository.GetAll()
+                .Where(a => a.DocumentKey == new Guid(PageWithSingleAliasKey))
+                .ToList();
+        }
+
+        // Assert - invariant content should have NULL languageId
+        Assert.That(storedAliases, Has.Count.EqualTo(1));
+        Assert.That(storedAliases[0].NullableLanguageId, Is.Null, "Invariant content should have NULL LanguageId");
+    }
+
+    [Test]
+    public async Task Variant_Content_Stores_Specific_LanguageId()
+    {
+        // Arrange - create variant content type and content
+        var template = TemplateBuilder.CreateTextPageTemplate("variantTemplate3");
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+
+        var variantContentType = CreateCultureVariantContentTypeWithUrlAlias(template.Id, "variantType3");
+        await ContentTypeService.CreateAsync(variantContentType, Constants.Security.SuperUserKey);
+
+        var content = ContentBuilder.CreateSimpleContent(variantContentType, "Variant Page", RootPage.Id);
+        content.SetCultureName("Variant Page", "en-US");
+        content.SetValue(Constants.Conventions.Content.UrlAlias, "variant-alias", "en-US");
+        ContentService.Save(content, -1);
+        ContentService.Publish(content, ["en-US"]);
+
+        await DocumentUrlAliasService.CreateOrUpdateAliasesAsync(content.Key);
+
+        // Act - check stored alias
+        List<PublishedDocumentUrlAlias> storedAliases;
+        using (CoreScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            storedAliases = DocumentUrlAliasRepository.GetAll()
+                .Where(a => a.DocumentKey == content.Key)
+                .ToList();
+        }
+
+        // Assert - variant content should have specific languageId (not NULL)
+        var defaultLanguage = await LanguageService.GetDefaultLanguageAsync();
+        Assert.That(storedAliases, Has.Count.EqualTo(1));
+        Assert.That(storedAliases[0].NullableLanguageId, Is.EqualTo(defaultLanguage.Id), "Variant content should have specific LanguageId");
+    }
+
+    [Test]
+    public async Task Changing_ContentType_From_Invariant_To_Variant_Updates_Alias_LanguageIds()
+    {
+        // Arrange - add second language
+        var frenchLanguage = new LanguageBuilder().WithCultureInfo("fr-FR").Build();
+        await LanguageService.CreateAsync(frenchLanguage, Constants.Security.SuperUserKey);
+
+        var defaultLanguage = await LanguageService.GetDefaultLanguageAsync();
+
+        // Verify aliases are stored with NULL languageId (invariant)
+        List<PublishedDocumentUrlAlias> aliasesBefore;
+        using (CoreScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            aliasesBefore = DocumentUrlAliasRepository.GetAll()
+                .Where(a => a.DocumentKey == new Guid(PageWithSingleAliasKey))
+                .ToList();
+        }
+
+        Assert.That(aliasesBefore, Has.Count.GreaterThan(0), "Should have aliases before change");
+        Assert.That(aliasesBefore.All(a => a.NullableLanguageId == null), Is.True, "All aliases should have NULL languageId before change");
+
+        // Act - change content type from invariant to variant
+        ContentType.Variations = ContentVariation.Culture;
+
+        // Also make the urlAlias property vary by culture
+        var urlAliasProperty = ContentType.PropertyTypes.First(p => p.Alias == Constants.Conventions.Content.UrlAlias);
+        urlAliasProperty.Variations = ContentVariation.Culture;
+
+        await ContentTypeService.UpdateAsync(ContentType, Constants.Security.SuperUserKey);
+
+        // Reload content from database to pick up the new content type variation
+        var content = ContentService.GetById(PageWithSingleAlias.Key)!;
+
+        // Update content to have culture-specific alias (required for variant content)
+        content.SetCultureName("Page With Alias", defaultLanguage!.IsoCode);
+        content.SetValue(Constants.Conventions.Content.UrlAlias, "my-single-alias-variant", defaultLanguage.IsoCode);
+        ContentService.Save(content, -1);
+        ContentService.Publish(content, [defaultLanguage.IsoCode]);
+
+        // Assert - aliases should now be stored with specific languageId (handler triggered by ContentType save)
+        List<PublishedDocumentUrlAlias> aliasesAfter;
+        using (CoreScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            aliasesAfter = DocumentUrlAliasRepository.GetAll()
+                .Where(a => a.DocumentKey == new Guid(PageWithSingleAliasKey))
+                .ToList();
+        }
+
+        Assert.That(aliasesAfter, Has.Count.GreaterThan(0), "Should have aliases after change");
+        Assert.That(aliasesAfter.All(a => a.NullableLanguageId != null), Is.True, "All aliases should have specific languageId after change to variant");
+        Assert.That(aliasesAfter.Any(a => a.NullableLanguageId == defaultLanguage.Id), Is.True, "Should have alias for default language");
+    }
+
+    [Test]
+    public async Task Changing_ContentType_From_Variant_To_Invariant_Updates_Alias_LanguageIds()
+    {
+        // Arrange - add second language
+        var frenchLanguage = new LanguageBuilder().WithCultureInfo("fr-FR").Build();
+        await LanguageService.CreateAsync(frenchLanguage, Constants.Security.SuperUserKey);
+
+        var defaultLanguage = await LanguageService.GetDefaultLanguageAsync();
+
+        // Verify invariant aliases exist
+        List<PublishedDocumentUrlAlias> invariantAliases;
+        using (CoreScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            invariantAliases = DocumentUrlAliasRepository.GetAll()
+                .Where(a => a.DocumentKey == new Guid(PageWithSingleAliasKey))
+                .ToList();
+        }
+
+        Assert.That(invariantAliases, Has.Count.GreaterThan(0), "Should have invariant aliases");
+        Assert.That(invariantAliases.All(a => a.NullableLanguageId == null), Is.True, "Invariant aliases should have NULL languageId");
+
+        // Change content type to variant
+        ContentType.Variations = ContentVariation.Culture;
+
+        // Also make the urlAlias property vary by culture
+        var urlAliasProperty = ContentType.PropertyTypes.First(p => p.Alias == Constants.Conventions.Content.UrlAlias);
+        urlAliasProperty.Variations = ContentVariation.Culture;
+
+        await ContentTypeService.UpdateAsync(ContentType, Constants.Security.SuperUserKey);
+
+        // Reload content from database to pick up the new content type variation
+        var content = ContentService.GetById(PageWithSingleAlias.Key)!;
+
+        // Update content with culture-specific alias and republish as variant
+        content.SetCultureName("Page With Alias", defaultLanguage!.IsoCode);
+        content.SetValue(Constants.Conventions.Content.UrlAlias, "variant-alias", defaultLanguage.IsoCode);
+        ContentService.Save(content, -1);
+        ContentService.Publish(content, [defaultLanguage.IsoCode]);
+
+        // Verify aliases are stored with specific languageId (variant) - handler triggered by ContentType save
+        List<PublishedDocumentUrlAlias> variantAliases;
+        using (CoreScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            variantAliases = DocumentUrlAliasRepository.GetAll()
+                .Where(a => a.DocumentKey == new Guid(PageWithSingleAliasKey))
+                .ToList();
+        }
+
+        Assert.That(variantAliases, Has.Count.GreaterThan(0), "Should have variant aliases after change to variant");
+        Assert.That(variantAliases.All(a => a.NullableLanguageId != null), Is.True, "All aliases should have specific languageId after change to variant");
+
+        // Act - change content type from variant to invariant
+        ContentType.Variations = ContentVariation.Nothing;
+        urlAliasProperty.Variations = ContentVariation.Nothing;
+
+        await ContentTypeService.UpdateAsync(ContentType, Constants.Security.SuperUserKey);
+
+        // Reload content from database to pick up the new invariant content type
+        content = ContentService.GetById(PageWithSingleAlias.Key)!;
+
+        // Set invariant alias value and republish (required because alias value was stored under culture)
+        content.SetValue(Constants.Conventions.Content.UrlAlias, "invariant-alias-restored");
+        ContentService.Save(content, -1);
+        ContentService.Publish(content, []);
+
+        // Assert - aliases should now be stored with NULL languageId (handler triggered by ContentType save)
+        List<PublishedDocumentUrlAlias> aliasesAfter;
+        using (CoreScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            aliasesAfter = DocumentUrlAliasRepository.GetAll()
+                .Where(a => a.DocumentKey == new Guid(PageWithSingleAliasKey))
+                .ToList();
+        }
+
+        Assert.That(aliasesAfter, Has.Count.GreaterThan(0), "Should have aliases after change to invariant");
+        Assert.That(aliasesAfter.All(a => a.NullableLanguageId == null), Is.True, "All aliases should have NULL languageId after change to invariant");
     }
 
     #endregion

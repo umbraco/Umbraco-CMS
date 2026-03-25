@@ -6,6 +6,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories;
 
 internal static class AuditEntryFactory
 {
+    /// <summary>
+    /// Builds a collection of <see cref="IAuditEntry"/> entities from the given collection of <see cref="AuditEntryDto"/> data transfer objects.
+    /// </summary>
+    /// <param name="dtos">The collection of <see cref="AuditEntryDto"/> objects to convert.</param>
+    /// <returns>A collection of <see cref="IAuditEntry"/> entities.</returns>
     public static IEnumerable<IAuditEntry> BuildEntities(IEnumerable<AuditEntryDto> dtos) =>
         dtos.Select(BuildEntity).ToList();
 
@@ -32,6 +37,11 @@ internal static class AuditEntryFactory
         return entity;
     }
 
+    /// <summary>
+    /// Builds an <see cref="Umbraco.Cms.Infrastructure.Persistence.Dtos.AuditEntryDto"/> from the given <see cref="Umbraco.Cms.Core.Models.IAuditEntry"/> entity.
+    /// </summary>
+    /// <param name="entity">The audit entry entity to convert to a DTO.</param>
+    /// <returns>An <see cref="Umbraco.Cms.Infrastructure.Persistence.Dtos.AuditEntryDto"/> representing the audit entry.</returns>
     public static AuditEntryDto BuildDto(IAuditEntry entity) =>
         new AuditEntryDto
         {

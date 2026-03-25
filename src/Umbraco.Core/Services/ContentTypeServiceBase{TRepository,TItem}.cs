@@ -409,6 +409,13 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
                 // add that one, as a main change
                 AddChange(changes, contentType, ContentTypeChangeTypes.RefreshMain);
 
+                // Add VariationChanged flag if content type variation changed.
+                // This is used by DocumentUrlService to rebuild URL cache with correct languageId.
+                if (hasContentTypeVariationChanged)
+                {
+                    AddChange(changes, contentType, ContentTypeChangeTypes.VariationChanged);
+                }
+
                 if (hasPropertyMainImpact)
                 {
                     foreach (TItem c in GetComposedOf(contentType.Id))
@@ -884,7 +891,15 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
             return ContentTypeOperationStatus.NotAllowed;
         }
 
-        Delete(item, performingUserId);
+        EventMessages eventMessages = EventMessagesFactory.Get();
+        DeletingNotification<TItem> deletingNotification = GetDeletingNotification(item, eventMessages);
+        if (await scope.Notifications.PublishCancelableAsync(deletingNotification))
+        {
+            scope.Complete();
+            return ContentTypeOperationStatus.CancelledByNotification;
+        }
+
+        PerformDelete(scope, item, deletingNotification, eventMessages, performingUserId);
 
         scope.Complete();
         return ContentTypeOperationStatus.Success;
@@ -908,58 +923,58 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
                 return;
             }
 
-            scope.WriteLock(WriteLockIds);
+            PerformDelete(scope, item, deletingNotification, eventMessages, userId);
 
-            // all descendants are going to be deleted
-            TItem[] descendantsAndSelf = GetDescendants(item.Id, true)
-                .ToArray();
-            TItem[] deleted = descendantsAndSelf;
-
-            // all impacted (through composition) probably lose some properties
-            // don't try to be too clever here, just report them all
-            // do this before anything is deleted
-            TItem[] changed = descendantsAndSelf.SelectMany(xx => GetComposedOf(xx.Id))
-                .Distinct()
-                .Except(descendantsAndSelf)
-                .ToArray();
-
-            // delete content
-            DeleteItemsOfTypes(descendantsAndSelf.Select(x => x.Id));
-
-            // Next find all other document types that have a reference to this content type
-            IEnumerable<TItem> referenceToAllowedContentTypes = GetAll().Where(q => q.AllowedContentTypes?.Any(p => p.Key == item.Key) ?? false);
-            foreach (TItem reference in referenceToAllowedContentTypes)
-            {
-                reference.AllowedContentTypes = reference.AllowedContentTypes?.Where(p => p.Key != item.Key);
-                var changedRef = new List<ContentTypeChange<TItem>>() { new ContentTypeChange<TItem>(reference, ContentTypeChangeTypes.RefreshMain) };
-                // Fire change event
-                scope.Notifications.Publish(GetContentTypeChangedNotification(changedRef, eventMessages));
-            }
-
-            // finally delete the content type
-            // - recursively deletes all descendants
-            // - deletes all associated property data
-            //  (contents of any descendant type have been deleted but
-            //   contents of any composed (impacted) type remain but
-            //   need to have their property data cleared)
-            Repository.Delete(item);
-
-            ContentTypeChange<TItem>[] changes = descendantsAndSelf.Select(x => new ContentTypeChange<TItem>(x, ContentTypeChangeTypes.Remove))
-                .Concat(changed.Select(x => new ContentTypeChange<TItem>(x, ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RefreshOther)))
-                .ToArray();
-
-            // Publish this in scope, see comment at GetContentTypeRefreshedNotification for more info.
-            _eventAggregator.Publish(GetContentTypeRefreshedNotification(changes, eventMessages));
-
-            scope.Notifications.Publish(GetContentTypeChangedNotification(changes, eventMessages));
-
-            DeletedNotification<TItem> deletedNotification = GetDeletedNotification(deleted.DistinctBy(x => x.Id), eventMessages);
-            deletedNotification.WithStateFrom(deletingNotification);
-            scope.Notifications.Publish(deletedNotification);
-
-            Audit(AuditType.Delete, userId, item.Id);
             scope.Complete();
         }
+    }
+
+    private void PerformDelete(ICoreScope scope, TItem item, DeletingNotification<TItem> deletingNotification, EventMessages eventMessages, int userId)
+    {
+        scope.WriteLock(WriteLockIds);
+
+        TItem[] descendantsAndSelf = GetDescendants(item.Id, true).ToArray();
+
+        // all impacted (through composition) probably lose some properties
+        // don't try to be too clever here, just report them all
+        // do this before anything is deleted
+        TItem[] changed = descendantsAndSelf.SelectMany(xx => GetComposedOf(xx.Id))
+            .Distinct()
+            .Except(descendantsAndSelf)
+            .ToArray();
+
+        DeleteItemsOfTypes(descendantsAndSelf.Select(x => x.Id));
+
+        // remove references to this content type from other content types
+        IEnumerable<TItem> referenceToAllowedContentTypes = GetAll().Where(q => q.AllowedContentTypes?.Any(p => p.Key == item.Key) ?? false);
+        foreach (TItem reference in referenceToAllowedContentTypes)
+        {
+            reference.AllowedContentTypes = reference.AllowedContentTypes?.Where(p => p.Key != item.Key);
+            var changedRef = new List<ContentTypeChange<TItem>>() { new ContentTypeChange<TItem>(reference, ContentTypeChangeTypes.RefreshMain) };
+            scope.Notifications.Publish(GetContentTypeChangedNotification(changedRef, eventMessages));
+        }
+
+        // finally delete the content type
+        // - recursively deletes all descendants
+        // - deletes all associated property data
+        //  (contents of any descendant type have been deleted but
+        //   contents of any composed (impacted) type remain but
+        //   need to have their property data cleared)
+        Repository.Delete(item);
+
+        ContentTypeChange<TItem>[] changes = descendantsAndSelf.Select(x => new ContentTypeChange<TItem>(x, ContentTypeChangeTypes.Remove))
+            .Concat(changed.Select(x => new ContentTypeChange<TItem>(x, ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RefreshOther)))
+            .ToArray();
+
+        // Publish this in scope, see comment at GetContentTypeRefreshedNotification for more info.
+        _eventAggregator.Publish(GetContentTypeRefreshedNotification(changes, eventMessages));
+        scope.Notifications.Publish(GetContentTypeChangedNotification(changes, eventMessages));
+
+        DeletedNotification<TItem> deletedNotification = GetDeletedNotification(descendantsAndSelf.DistinctBy(x => x.Id), eventMessages);
+        deletedNotification.WithStateFrom(deletingNotification);
+        scope.Notifications.Publish(deletedNotification);
+
+        Audit(AuditType.Delete, userId, item.Id);
     }
 
     /// <inheritdoc />
@@ -1349,6 +1364,20 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
 
     #region Allowed types
 
+    /// <summary>
+    /// Gets the content types that are candidates for being allowed at root.
+    /// </summary>
+    /// <remarks>
+    /// Override this in derived classes to change the filtering behavior. For example,
+    /// member types override this to return all member types, since members are a flat list.
+    /// </remarks>
+    /// <returns>The content types allowed at root before additional filtering.</returns>
+    protected virtual IEnumerable<TItem> GetAllowedAtRootCandidates()
+    {
+        IQuery<TItem> query = ScopeProvider.CreateQuery<TItem>().Where(x => x.AllowedAsRoot);
+        return Repository.Get(query).ToArray();
+    }
+
     /// <inheritdoc />
     public async Task<PagedModel<TItem>> GetAllAllowedAsRootAsync(int skip, int take)
     {
@@ -1357,18 +1386,19 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         // that one is special because it works across content, media and member types
         scope.ReadLock(Constants.Locks.ContentTypes, Constants.Locks.MediaTypes, Constants.Locks.MemberTypes);
 
-        IQuery<TItem> query = ScopeProvider.CreateQuery<TItem>().Where(x => x.AllowedAsRoot);
-        IEnumerable<TItem> contentTypes = Repository.Get(query).ToArray();
+        IEnumerable<TItem> contentTypes = GetAllowedAtRootCandidates();
 
         foreach (IContentTypeFilter filter in _contentTypeFilters)
         {
             contentTypes = await filter.FilterAllowedAtRootAsync(contentTypes);
         }
 
+        TItem[] materialized = contentTypes.ToArray();
+
         var pagedModel = new PagedModel<TItem>
         {
-            Total = contentTypes.Count(),
-            Items = contentTypes.Skip(skip).Take(take)
+            Total = materialized.Length,
+            Items = materialized.Skip(skip).Take(take)
         };
 
         return pagedModel;

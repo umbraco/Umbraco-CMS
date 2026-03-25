@@ -213,6 +213,13 @@ public class MemberTypeService : ContentTypeServiceBase<IMemberTypeRepository, I
 
     /// <inheritdoc />
     /// <remarks>
+    /// Unlike document and media types, members are a flat list, so all member types are allowed at root.
+    /// </remarks>
+    protected override IEnumerable<IMemberType> GetAllowedAtRootCandidates()
+        => _memberTypeRepository.GetMany(Array.Empty<int>()).ToArray();
+
+    /// <inheritdoc />
+    /// <remarks>
     /// Unlike document and media types, allowed children (and therefore parents) are not defined for member types.
     /// </remarks>
     protected override Task<IEnumerable<Guid>> PerformGetAllowedParentKeysAsync(Guid key) => Task.FromResult(Enumerable.Empty<Guid>());

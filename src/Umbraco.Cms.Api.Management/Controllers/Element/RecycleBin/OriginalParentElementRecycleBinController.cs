@@ -15,12 +15,22 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Element.RecycleBin;
 
+/// <summary>
+/// API controller responsible for retrieving the original parent of an element in the recycle bin.
+/// </summary>
 [ApiVersion("1.0")]
 public class OriginalParentElementRecycleBinController : ElementRecycleBinControllerBase
 {
     private readonly IAuthorizationService _authorizationService;
     private readonly IElementRecycleBinQueryService _elementRecycleBinQueryService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="OriginalParentElementRecycleBinController"/> class.
+    /// </summary>
+    /// <param name="entityService">Service for retrieving entity data.</param>
+    /// <param name="elementPresentationFactory">Factory responsible for creating element presentation models.</param>
+    /// <param name="authorizationService">Service used to authorize recycle bin operations.</param>
+    /// <param name="elementRecycleBinQueryService">Service for querying the element recycle bin.</param>
     public OriginalParentElementRecycleBinController(
         IEntityService entityService,
         IElementPresentationFactory elementPresentationFactory,
@@ -32,6 +42,12 @@ public class OriginalParentElementRecycleBinController : ElementRecycleBinContro
         _elementRecycleBinQueryService = elementRecycleBinQueryService;
     }
 
+    /// <summary>
+    /// Gets the original parent location of an element before it was moved to the recycle bin.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="id">The unique identifier of the element in the recycle bin.</param>
+    /// <returns>An <see cref="IActionResult"/> containing the original parent reference, or null if the parent was root.</returns>
     [HttpGet("{id:guid}/original-parent")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ReferenceByIdModel), StatusCodes.Status200OK)]

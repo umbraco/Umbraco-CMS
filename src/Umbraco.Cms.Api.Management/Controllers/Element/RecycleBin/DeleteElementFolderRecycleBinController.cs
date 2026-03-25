@@ -15,6 +15,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Element.RecycleBin;
 
+/// <summary>
+/// API controller responsible for permanently deleting element folders from the recycle bin.
+/// </summary>
 [ApiVersion("1.0")]
 public class DeleteElementFolderRecycleBinController : ElementRecycleBinControllerBase
 {
@@ -22,6 +25,14 @@ public class DeleteElementFolderRecycleBinController : ElementRecycleBinControll
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly IElementContainerService _elementContainerService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DeleteElementFolderRecycleBinController"/> class.
+    /// </summary>
+    /// <param name="authorizationService">Service used to authorize recycle bin deletion operations.</param>
+    /// <param name="entityService">Service for retrieving entity data.</param>
+    /// <param name="elementPresentationFactory">Factory responsible for creating element presentation models.</param>
+    /// <param name="backOfficeSecurityAccessor">Accessor for back office security context.</param>
+    /// <param name="elementContainerService">Service for managing element containers.</param>
     public DeleteElementFolderRecycleBinController(
         IAuthorizationService authorizationService,
         IEntityService entityService,
@@ -35,6 +46,12 @@ public class DeleteElementFolderRecycleBinController : ElementRecycleBinControll
         _elementContainerService = elementContainerService;
     }
 
+    /// <summary>
+    /// Permanently deletes an element folder from the recycle bin.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="id">The unique identifier of the element folder to permanently delete.</param>
+    /// <returns>An <see cref="IActionResult"/> indicating the outcome of the delete operation.</returns>
     [HttpDelete("folder/{id:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]

@@ -6,6 +6,9 @@ using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Manifest;
 
+/// <summary>
+/// Serves as the base controller for manifest operations in the management API.
+/// </summary>
 [VersionedApiBackOfficeRoute("manifest")]
 [ApiExplorerSettings(GroupName = "Manifest")]
 public abstract class ManifestControllerBase : ManagementApiControllerBase

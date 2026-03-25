@@ -13,6 +13,13 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
 internal sealed class KeyValueRepository : AsyncEntityRepositoryBase<string, IKeyValue>, IKeyValueRepository
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="KeyValueRepository"/> class.
+    /// </summary>
+    /// <param name="scopeAccessor">Provides access to the current database scope for repository operations.</param>
+    /// <param name="logger">The logger used to record diagnostic and operational information for this repository.</param>
+    /// <param name="repositoryCacheVersionService">Service used to manage cache versioning for repository data.</param>
+    /// <param name="cacheSyncService">Service responsible for synchronizing cache across distributed environments.</param>
     public KeyValueRepository(
         IEFCoreScopeAccessor<UmbracoDbContext> scopeAccessor,
         ILogger<KeyValueRepository> logger,

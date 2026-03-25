@@ -4,6 +4,9 @@ using Umbraco.Cms.Core.DistributedLocking;
 
 namespace Umbraco.Cms.Infrastructure.DistributedLocking;
 
+/// <summary>
+/// Represents the default factory for creating distributed locking mechanisms in Umbraco.
+/// </summary>
 public class DefaultDistributedLockingMechanismFactory : IDistributedLockingMechanismFactory
 {
     private readonly IEnumerable<IDistributedLockingMechanism> _distributedLockingMechanisms;
@@ -11,6 +14,11 @@ public class DefaultDistributedLockingMechanismFactory : IDistributedLockingMech
     private IDistributedLockingMechanism? _configuredMechanism;
     private readonly object _lock = new();
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DefaultDistributedLockingMechanismFactory"/> class.
+    /// </summary>
+    /// <param name="globalSettings">An <see cref="IOptionsMonitor{T}"/> for accessing <see cref="GlobalSettings"/> at runtime.</param>
+    /// <param name="distributedLockingMechanisms">A collection of available <see cref="IDistributedLockingMechanism"/> implementations to be used by the factory.</param>
     public DefaultDistributedLockingMechanismFactory(
         IOptionsMonitor<GlobalSettings> globalSettings,
         IEnumerable<IDistributedLockingMechanism> distributedLockingMechanisms)
@@ -19,6 +27,9 @@ public class DefaultDistributedLockingMechanismFactory : IDistributedLockingMech
         _distributedLockingMechanisms = distributedLockingMechanisms;
     }
 
+    /// <summary>
+    /// Gets the current instance of the distributed locking mechanism, ensuring it is initialized.
+    /// </summary>
     public IDistributedLockingMechanism DistributedLockingMechanism
     {
         get

@@ -63,6 +63,7 @@ using Umbraco.Cms.Infrastructure.Security;
 using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Cms.Infrastructure.Services.Implement;
 using Umbraco.Extensions;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using IScopeProvider = Umbraco.Cms.Infrastructure.Scoping.IScopeProvider;
 
 namespace Umbraco.Cms.Infrastructure.DependencyInjection;
@@ -70,8 +71,10 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection;
 public static partial class UmbracoBuilderExtensions
 {
     /// <summary>
-    /// Adds all core Umbraco services required to run which may be replaced later in the pipeline.
+    /// Registers all core Umbraco services required for the application to run. These services may be replaced later in the pipeline.
     /// </summary>
+    /// <param name="builder">The <see cref="IUmbracoBuilder"/> to which the core services will be added.</param>
+    /// <returns>The same <see cref="IUmbracoBuilder"/> instance, enabling method chaining.</returns>
     public static IUmbracoBuilder AddCoreInitialServices(this IUmbracoBuilder builder)
     {
         builder
@@ -92,6 +95,7 @@ public static partial class UmbracoBuilderExtensions
         builder.AddNotificationAsyncHandler<RuntimeUnattendedInstallNotification, UnattendedInstaller>();
         builder.AddNotificationAsyncHandler<RuntimeUnattendedUpgradeNotification, UnattendedUpgrader>();
         builder.AddNotificationAsyncHandler<RuntimePremigrationsUpgradeNotification, PremigrationUpgrader>();
+        builder.Services.AddHostedService<UnattendedUpgradeBackgroundService>();
 
         // Database availability check.
         builder.Services.AddUnique<IDatabaseAvailabilityCheck, DefaultDatabaseAvailabilityCheck>();
@@ -249,6 +253,18 @@ public static partial class UmbracoBuilderExtensions
 
         builder.Services.AddUnique<IPasswordChanger<BackOfficeIdentityUser>, PasswordChanger<BackOfficeIdentityUser>>();
         builder.Services.AddUnique<IPasswordChanger<MemberIdentityUser>, PasswordChanger<MemberIdentityUser>>();
+
+        // Register default local login setting provider (allows local login by default).
+        // This will be replaced by the backoffice implementation when AddBackOffice() is called.
+        builder.Services.TryAddSingleton<ILocalLoginSettingProvider, NoopLocalLoginSettingProvider>();
+
+        // Register default conflicting route service (no conflicts when backoffice not enabled).
+        // This will be replaced by the backoffice implementation when AddBackOffice() is called.
+        builder.Services.TryAddSingleton<IConflictingRouteService, NoopConflictingRouteService>();
+
+        // Register URL assembler (needed by DefaultMediaUrlProvider).
+        builder.Services.TryAddTransient<IUrlAssembler, DefaultUrlAssembler>();
+
         builder.Services.AddTransient<IMemberEditingService, MemberEditingService>();
 
         builder.Services.AddSingleton<IBlockEditorElementTypeCache, BlockEditorElementTypeCache>();
@@ -260,6 +276,11 @@ public static partial class UmbracoBuilderExtensions
         return builder;
     }
 
+    /// <summary>
+    /// Registers the default property index value factories used for indexing property values in Umbraco's search infrastructure.
+    /// </summary>
+    /// <param name="builder">The <see cref="IUmbracoBuilder"/> to add the property index value factories to.</param>
+    /// <returns>The same <see cref="Umbraco.Cms.Core.DependencyInjection.IUmbracoBuilder"/> instance so that multiple calls can be chained.</returns>
     public static IUmbracoBuilder AddPropertyIndexValueFactories(this IUmbracoBuilder builder)
     {
         builder.Services.AddSingleton<IBlockValuePropertyIndexValueFactory, BlockValuePropertyIndexValueFactory>();
@@ -332,6 +353,12 @@ public static partial class UmbracoBuilderExtensions
         return builder;
     }
 
+    /// <summary>
+    /// Registers the default set of core notification handlers required by Umbraco for content, media, member, and other system events.
+    /// This includes handlers for user notifications, content relations, property editors, redirect tracking, distributed cache, and more.
+    /// </summary>
+    /// <param name="builder">The <see cref="IUmbracoBuilder"/> to which the core notification handlers will be added.</param>
+    /// <returns>The same <see cref="IUmbracoBuilder"/> instance, enabling method chaining.</returns>
     public static IUmbracoBuilder AddCoreNotifications(this IUmbracoBuilder builder)
     {
         // add handlers for sending user notifications (i.e. emails)
@@ -365,12 +392,18 @@ public static partial class UmbracoBuilderExtensions
             .AddNotificationHandler<ContentSavingNotification, BlockListPropertyNotificationHandler>()
             .AddNotificationHandler<ContentCopyingNotification, BlockListPropertyNotificationHandler>()
             .AddNotificationHandler<ContentScaffoldedNotification, BlockListPropertyNotificationHandler>()
+            .AddNotificationHandler<ElementSavingNotification, BlockListPropertyNotificationHandler>()
+            .AddNotificationHandler<ElementCopyingNotification, BlockListPropertyNotificationHandler>()
             .AddNotificationHandler<ContentSavingNotification, BlockGridPropertyNotificationHandler>()
             .AddNotificationHandler<ContentCopyingNotification, BlockGridPropertyNotificationHandler>()
             .AddNotificationHandler<ContentScaffoldedNotification, BlockGridPropertyNotificationHandler>()
+            .AddNotificationHandler<ElementSavingNotification, BlockGridPropertyNotificationHandler>()
+            .AddNotificationHandler<ElementCopyingNotification, BlockGridPropertyNotificationHandler>()
             .AddNotificationHandler<ContentSavingNotification, RichTextPropertyNotificationHandler>()
             .AddNotificationHandler<ContentCopyingNotification, RichTextPropertyNotificationHandler>()
             .AddNotificationHandler<ContentScaffoldedNotification, RichTextPropertyNotificationHandler>()
+            .AddNotificationHandler<ElementSavingNotification, RichTextPropertyNotificationHandler>()
+            .AddNotificationHandler<ElementCopyingNotification, RichTextPropertyNotificationHandler>()
             .AddNotificationHandler<ContentCopiedNotification, FileUploadContentCopiedOrScaffoldedNotificationHandler>()
             .AddNotificationHandler<ContentScaffoldedNotification, FileUploadContentCopiedOrScaffoldedNotificationHandler>()
             .AddNotificationHandler<ContentSavedBlueprintNotification, FileUploadContentCopiedOrScaffoldedNotificationHandler>()

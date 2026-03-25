@@ -109,18 +109,23 @@ export class UmbDefaultCollectionContext<
 		// The parent entity context is used to get the parent entity for the collection items
 		// All items in the collection are children of the current entity context
 		this.consumeContext(UMB_ENTITY_CONTEXT, (context) => {
-			const currentEntityUnique = context?.getUnique();
-			const currentEntityType = context?.getEntityType();
+			this.observe(
+				context?.unique,
+				(currentEntityUnique) => {
+					const currentEntityType = context?.getEntityType();
 
-			const parent: UmbEntityModel | undefined =
-				currentEntityUnique && currentEntityType
-					? {
-							unique: currentEntityUnique,
-							entityType: currentEntityType,
-						}
-					: undefined;
+					const parent: UmbEntityModel | undefined =
+						currentEntityUnique && currentEntityType
+							? ({
+									unique: currentEntityUnique,
+									entityType: currentEntityType,
+								} satisfies UmbEntityModel)
+							: undefined;
 
-			this.#parentEntityContext?.setParent(parent);
+					this.#parentEntityContext?.setParent(parent);
+				},
+				'_observeEntityContextUnique',
+			);
 		});
 	}
 
@@ -213,15 +218,7 @@ export class UmbDefaultCollectionContext<
 
 		this.#userDefinedProperties.setValue(this.#config?.userDefinedProperties ?? []);
 
-		const viewManagerConfig: UmbCollectionViewManagerConfig = { defaultViewAlias: this.#defaultViewAlias };
-
-		if (this.#config.layouts && this.#config.layouts.length > 0) {
-			this.#viewLayouts.setValue(this.#config.layouts);
-			const aliases = this.#config.layouts.map((layout) => layout.collectionView);
-			viewManagerConfig.manifestFilter = (manifest) => aliases.includes(manifest.alias);
-		}
-
-		this.view.setConfig(viewManagerConfig);
+		this.#configureViews();
 
 		this._configured = true;
 	}
@@ -449,5 +446,15 @@ export class UmbDefaultCollectionContext<
 				this._selectOnly.setValue(selection.length > 0);
 			}
 		});
+	}
+
+	#configureViews() {
+		const viewManagerConfig: UmbCollectionViewManagerConfig = { defaultViewAlias: this.#defaultViewAlias };
+		const layouts = this.#config?.layouts;
+		if (layouts && layouts.length > 0) {
+			this.#viewLayouts.setValue(layouts);
+			viewManagerConfig.viewsOverride = layouts;
+		}
+		this.view.setConfig(viewManagerConfig);
 	}
 }
