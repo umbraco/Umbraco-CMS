@@ -91,8 +91,8 @@ internal sealed class SvgFileUploadMediaSavingNotificationHandler : INotificatio
         Size? size = _svgDimensionExtractor.GetDimensions(filestream);
         if (size.HasValue)
         {
-            SetProperty(model,Core.Constants.Conventions.Media.Width,size.Value.Width);
-            SetProperty(model,Core.Constants.Conventions.Media.Height,size.Value.Height);
+            SetProperty(model, Core.Constants.Conventions.Media.Width,size.Value.Width);
+            SetProperty(model, Core.Constants.Conventions.Media.Height,size.Value.Height);
         }
     }
 
