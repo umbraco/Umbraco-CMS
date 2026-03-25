@@ -122,10 +122,11 @@ internal sealed class DocumentVersionRepositoryTest : UmbracoIntegrationTest
         using (ScopeProvider.CreateScope())
         {
             var db = ScopeAccessor.AmbientScope!.Database;
+            var syntax = ScopeAccessor.AmbientScope.SqlContext.SqlSyntax;
 
             // Backdate version 1 to 10 days ago, leave version 2 at today.
             db.Execute(
-                "UPDATE umbracoContentVersion SET versionDate = @0 WHERE id = 1",
+                $"UPDATE {syntax.GetQuotedTableName("umbracoContentVersion")} SET {syntax.GetQuotedColumnName("versionDate")} = @0 WHERE id = 1",
                 DateTime.UtcNow.AddDays(-10));
 
             var sut = new DocumentVersionRepository(ScopeAccessor);
@@ -162,10 +163,11 @@ internal sealed class DocumentVersionRepositoryTest : UmbracoIntegrationTest
         using (ScopeProvider.CreateScope())
         {
             var db = ScopeAccessor.AmbientScope!.Database;
+            var syntax = ScopeAccessor.AmbientScope.SqlContext.SqlSyntax;
 
             // Backdate all historic versions so they pass the date filter.
             db.Execute(
-                "UPDATE umbracoContentVersion SET versionDate = @0 WHERE id IN (1, 2, 3)",
+                $"UPDATE {syntax.GetQuotedTableName("umbracoContentVersion")} SET {syntax.GetQuotedColumnName("versionDate")} = @0 WHERE id IN (1, 2, 3)",
                 DateTime.UtcNow.AddDays(-10));
 
             var sut = new DocumentVersionRepository(ScopeAccessor);
@@ -242,11 +244,12 @@ internal sealed class DocumentVersionRepositoryTest : UmbracoIntegrationTest
         using (var scope = ScopeProvider.CreateScope())
         {
             var db = ScopeAccessor.AmbientScope!.Database;
+            var syntax = ScopeAccessor.AmbientScope.SqlContext.SqlSyntax;
 
             // Verify initial state has rows in all relevant tables
-            var beforeContentVersions = db.Single<int>("SELECT count(1) FROM umbracoContentVersion");
-            var beforeDocumentVersions = db.Single<int>("SELECT count(1) FROM umbracoDocumentVersion");
-            var beforePropertyData = db.Single<int>("SELECT count(1) FROM umbracoPropertyData");
+            var beforeContentVersions = db.Single<int>($"SELECT count(1) FROM {syntax.GetQuotedTableName("umbracoContentVersion")}");
+            var beforeDocumentVersions = db.Single<int>($"SELECT count(1) FROM {syntax.GetQuotedTableName("umbracoDocumentVersion")}");
+            var beforePropertyData = db.Single<int>($"SELECT count(1) FROM {syntax.GetQuotedTableName("umbracoPropertyData")}");
 
             Assert.Greater(beforeContentVersions, 2, "Should have more than 2 content versions before delete");
             Assert.Greater(beforeDocumentVersions, 2, "Should have more than 2 document versions before delete");
@@ -256,11 +259,10 @@ internal sealed class DocumentVersionRepositoryTest : UmbracoIntegrationTest
             // Delete the 2 historic versions (IDs 1 and 2)
             sut.DeleteVersions(new[] { 1, 2 });
 
-            var afterContentVersions = db.Single<int>("SELECT count(1) FROM umbracoContentVersion");
-            var afterDocumentVersions = db.Single<int>("SELECT count(1) FROM umbracoDocumentVersion");
-            var afterPropertyData = db.Single<int>("SELECT count(1) FROM umbracoPropertyData");
-            var afterCultureVariation = db.Single<int>(
-                "SELECT count(1) FROM umbracoContentVersionCultureVariation WHERE versionId IN (1, 2)");
+            var afterContentVersions = db.Single<int>($"SELECT count(1) FROM {syntax.GetQuotedTableName("umbracoContentVersion")}");
+            var afterDocumentVersions = db.Single<int>($"SELECT count(1) FROM {syntax.GetQuotedTableName("umbracoDocumentVersion")}");
+            var afterPropertyData = db.Single<int>($"SELECT count(1) FROM {syntax.GetQuotedTableName("umbracoPropertyData")}");
+            var afterCultureVariation = db.Single<int>($"SELECT count(1) FROM {syntax.GetQuotedTableName("umbracoContentVersionCultureVariation")} WHERE {syntax.GetQuotedColumnName("versionId")} IN (1, 2)");
 
             Assert.Multiple(() =>
             {
