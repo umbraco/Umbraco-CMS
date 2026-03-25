@@ -61,7 +61,7 @@ public class SvgDimensionExtractor : ISvgDimensionExtractor
 
         Size? size = null;
 
-        if(widthAttributeValue is not null && heightAttributeValue is not null)
+        if (widthAttributeValue is not null && heightAttributeValue is not null)
         {
             size = ParseWidthHeightAttributes(widthAttributeValue, heightAttributeValue);
         }
