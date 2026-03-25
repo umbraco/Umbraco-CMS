@@ -37,6 +37,7 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 			icon: 'icon-document',
 			label: '#create_documentType',
 			description: '#create_documentTypeDescription',
+			additionalOptions: true,
 		},
 	},
 	{
@@ -54,6 +55,7 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 			icon: 'icon-document-html',
 			label: '#create_documentTypeWithTemplate',
 			description: '#create_documentTypeWithTemplateDescription',
+			additionalOptions: true,
 		},
 	},
 	{
@@ -71,6 +73,7 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 			icon: 'icon-plugin',
 			label: '#create_elementType',
 			description: '#create_elementTypeDescription',
+			additionalOptions: true,
 		},
 	},
 	...folderManifests,
