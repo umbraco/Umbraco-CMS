@@ -14,13 +14,11 @@ internal class ContentVersionCleanupJob : IDistributedBackgroundJob
     public string Name => "ContentVersionCleanupJob";
 
     /// <inheritdoc />
-    public TimeSpan Period { get => TimeSpan.FromMinutes(1); }
-
+    public TimeSpan Period => TimeSpan.FromHours(1);
 
     private readonly ILogger<ContentVersionCleanupJob> _logger;
     private readonly IContentVersionService _service;
     private readonly IOptionsMonitor<ContentSettings> _settingsMonitor;
-
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="ContentVersionCleanupJob" /> class.
