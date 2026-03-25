@@ -19,7 +19,6 @@ export interface ExampleProductFilterArgs {
 
 export interface ExampleFacetCount {
 	unique: string;
-	name: string;
 	count: number;
 }
 

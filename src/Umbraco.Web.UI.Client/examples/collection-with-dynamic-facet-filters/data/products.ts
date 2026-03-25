@@ -1,103 +1,166 @@
 import type { ExampleFilteredResult, ExampleProductFilterArgs, ExampleProductModel } from './types.js';
 
 export const products: Array<ExampleProductModel> = [
-	{ id: 'p01', name: 'Classic White Tee', category: 'T-Shirt', sizes: ['S', 'M', 'L'], colors: ['White'], price: 25 },
+	{
+		id: 'p01',
+		name: 'Classic White Tee',
+		category: 'cat-tshirt',
+		sizes: ['size-s', 'size-m', 'size-l'],
+		colors: ['color-white'],
+		price: 25,
+	},
 	{
 		id: 'p02',
 		name: 'Graphic Print Tee',
-		category: 'T-Shirt',
-		sizes: ['M', 'L', 'XL'],
-		colors: ['Black', 'Red'],
+		category: 'cat-tshirt',
+		sizes: ['size-m', 'size-l', 'size-xl'],
+		colors: ['color-black', 'color-red'],
 		price: 30,
 	},
 	{
 		id: 'p03',
 		name: 'Slim Fit Trousers',
-		category: 'Trousers',
-		sizes: ['S', 'M', 'L'],
-		colors: ['Black', 'Blue'],
+		category: 'cat-trousers',
+		sizes: ['size-s', 'size-m', 'size-l'],
+		colors: ['color-black', 'color-blue'],
 		price: 55,
 	},
 	{
 		id: 'p04',
 		name: 'Cargo Trousers',
-		category: 'Trousers',
-		sizes: ['M', 'L', 'XL'],
-		colors: ['Green', 'Black'],
+		category: 'cat-trousers',
+		sizes: ['size-m', 'size-l', 'size-xl'],
+		colors: ['color-green', 'color-black'],
 		price: 65,
 	},
-	{ id: 'p05', name: 'Leather Jacket', category: 'Jacket', sizes: ['M', 'L'], colors: ['Black'], price: 120 },
-	{ id: 'p06', name: 'Denim Jacket', category: 'Jacket', sizes: ['S', 'M', 'L', 'XL'], colors: ['Blue'], price: 85 },
+	{
+		id: 'p05',
+		name: 'Leather Jacket',
+		category: 'cat-jacket',
+		sizes: ['size-m', 'size-l'],
+		colors: ['color-black'],
+		price: 120,
+	},
+	{
+		id: 'p06',
+		name: 'Denim Jacket',
+		category: 'cat-jacket',
+		sizes: ['size-s', 'size-m', 'size-l', 'size-xl'],
+		colors: ['color-blue'],
+		price: 85,
+	},
 	{
 		id: 'p07',
 		name: 'Pullover Hoodie',
-		category: 'Hoodie',
-		sizes: ['M', 'L', 'XL'],
-		colors: ['Black', 'White'],
+		category: 'cat-hoodie',
+		sizes: ['size-m', 'size-l', 'size-xl'],
+		colors: ['color-black', 'color-white'],
 		price: 50,
 	},
-	{ id: 'p08', name: 'Zip-Up Hoodie', category: 'Hoodie', sizes: ['S', 'M', 'L'], colors: ['Red', 'Blue'], price: 55 },
+	{
+		id: 'p08',
+		name: 'Zip-Up Hoodie',
+		category: 'cat-hoodie',
+		sizes: ['size-s', 'size-m', 'size-l'],
+		colors: ['color-red', 'color-blue'],
+		price: 55,
+	},
 	{
 		id: 'p09',
 		name: 'Running Shorts',
-		category: 'Shorts',
-		sizes: ['S', 'M', 'L'],
-		colors: ['Black', 'Green'],
+		category: 'cat-shorts',
+		sizes: ['size-s', 'size-m', 'size-l'],
+		colors: ['color-black', 'color-green'],
 		price: 30,
 	},
 	{
 		id: 'p10',
 		name: 'Chino Shorts',
-		category: 'Shorts',
-		sizes: ['M', 'L', 'XL'],
-		colors: ['White', 'Blue'],
+		category: 'cat-shorts',
+		sizes: ['size-m', 'size-l', 'size-xl'],
+		colors: ['color-white', 'color-blue'],
 		price: 40,
 	},
-	{ id: 'p11', name: 'V-Neck Tee', category: 'T-Shirt', sizes: ['S', 'M'], colors: ['White', 'Blue'], price: 22 },
-	{ id: 'p12', name: 'Oversized Tee', category: 'T-Shirt', sizes: ['L', 'XL'], colors: ['Black', 'Green'], price: 28 },
+	{
+		id: 'p11',
+		name: 'V-Neck Tee',
+		category: 'cat-tshirt',
+		sizes: ['size-s', 'size-m'],
+		colors: ['color-white', 'color-blue'],
+		price: 22,
+	},
+	{
+		id: 'p12',
+		name: 'Oversized Tee',
+		category: 'cat-tshirt',
+		sizes: ['size-l', 'size-xl'],
+		colors: ['color-black', 'color-green'],
+		price: 28,
+	},
 	{
 		id: 'p13',
 		name: 'Wide Leg Trousers',
-		category: 'Trousers',
-		sizes: ['S', 'M', 'L'],
-		colors: ['White', 'Black'],
+		category: 'cat-trousers',
+		sizes: ['size-s', 'size-m', 'size-l'],
+		colors: ['color-white', 'color-black'],
 		price: 60,
 	},
 	{
 		id: 'p14',
 		name: 'Bomber Jacket',
-		category: 'Jacket',
-		sizes: ['M', 'L', 'XL'],
-		colors: ['Black', 'Green'],
+		category: 'cat-jacket',
+		sizes: ['size-m', 'size-l', 'size-xl'],
+		colors: ['color-black', 'color-green'],
 		price: 95,
 	},
-	{ id: 'p15', name: 'Cropped Hoodie', category: 'Hoodie', sizes: ['S', 'M'], colors: ['White', 'Red'], price: 45 },
-	{ id: 'p16', name: 'Board Shorts', category: 'Shorts', sizes: ['M', 'L', 'XL'], colors: ['Blue', 'Red'], price: 35 },
+	{
+		id: 'p15',
+		name: 'Cropped Hoodie',
+		category: 'cat-hoodie',
+		sizes: ['size-s', 'size-m'],
+		colors: ['color-white', 'color-red'],
+		price: 45,
+	},
+	{
+		id: 'p16',
+		name: 'Board Shorts',
+		category: 'cat-shorts',
+		sizes: ['size-m', 'size-l', 'size-xl'],
+		colors: ['color-blue', 'color-red'],
+		price: 35,
+	},
 	{
 		id: 'p17',
 		name: 'Pocket Tee',
-		category: 'T-Shirt',
-		sizes: ['S', 'M', 'L', 'XL'],
-		colors: ['White', 'Black', 'Blue'],
+		category: 'cat-tshirt',
+		sizes: ['size-s', 'size-m', 'size-l', 'size-xl'],
+		colors: ['color-white', 'color-black', 'color-blue'],
 		price: 20,
 	},
 	{
 		id: 'p18',
 		name: 'Jogger Trousers',
-		category: 'Trousers',
-		sizes: ['S', 'M', 'L', 'XL'],
-		colors: ['Black', 'Blue'],
+		category: 'cat-trousers',
+		sizes: ['size-s', 'size-m', 'size-l', 'size-xl'],
+		colors: ['color-black', 'color-blue'],
 		price: 50,
 	},
 	{
 		id: 'p19',
 		name: 'Windbreaker Jacket',
-		category: 'Jacket',
-		sizes: ['S', 'M', 'L'],
-		colors: ['Red', 'White'],
+		category: 'cat-jacket',
+		sizes: ['size-s', 'size-m', 'size-l'],
+		colors: ['color-red', 'color-white'],
 		price: 75,
 	},
-	{ id: 'p20', name: 'Fleece Hoodie', category: 'Hoodie', sizes: ['L', 'XL'], colors: ['Black', 'Blue'], price: 60 },
+	{
+		id: 'p20',
+		name: 'Fleece Hoodie',
+		category: 'cat-hoodie',
+		sizes: ['size-l', 'size-xl'],
+		colors: ['color-black', 'color-blue'],
+		price: 60,
+	},
 ];
 
 /**
@@ -133,14 +196,14 @@ function matchesFilter(
  * @param {ExampleProductFilterArgs} args - The active filter arguments.
  * @param {keyof ExampleProductFilterArgs} excludeField - The dimension to exclude from filtering.
  * @param {(product: ExampleProductModel) => Array<string>} accessor - Extracts the facet values from a product.
- * @returns {Array<{unique: string, name: string, count: number}>} Sorted facet counts.
+ * @returns {Array<{unique: string, count: number}>} Sorted facet counts.
  */
 function countBy(
 	items: Array<ExampleProductModel>,
 	args: ExampleProductFilterArgs,
 	excludeField: keyof ExampleProductFilterArgs,
 	accessor: (product: ExampleProductModel) => Array<string>,
-): Array<{ unique: string; name: string; count: number }> {
+): Array<{ unique: string; count: number }> {
 	const counts = new Map<string, number>();
 
 	for (const product of products) {
@@ -151,8 +214,8 @@ function countBy(
 	}
 
 	return Array.from(counts.entries())
-		.map(([value, count]) => ({ unique: value, name: value, count }))
-		.sort((a, b) => a.name.localeCompare(b.name));
+		.map(([unique, count]) => ({ unique, count }))
+		.sort((a, b) => a.unique.localeCompare(b.unique));
 }
 
 /**

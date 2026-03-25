@@ -58,7 +58,7 @@ export class UmbSelectFacetFilterApi extends UmbControllerBase {
 		this.observe(
 			this.#facetFilterContext.values,
 			(entries) => {
-				const values: Array<UmbSelectValue> = entries?.map((e) => e.value) ?? [];
+				const values: Array<UmbSelectValue> = entries?.map((e) => e.value as UmbSelectValue) ?? [];
 				this.#value.setValue(values);
 				this.#requestValueItems(values.map((v) => v.unique));
 			},

@@ -53,11 +53,14 @@ export class ExampleRangeFacetFilterApi extends UmbControllerBase {
 		this.observe(
 			this.#facetFilterContext.values,
 			(entries) => {
-				if (entries && entries.length >= 2) {
-					const min = parseFloat(entries[0].unique);
-					const max = parseFloat(entries[1].unique);
-					if (!isNaN(min) && !isNaN(max)) {
-						this.#current.setValue({ min, max });
+				if (entries && entries.length > 0) {
+					const minEntry = entries.find((e) => e.unique === 'min');
+					const maxEntry = entries.find((e) => e.unique === 'max');
+					if (minEntry && maxEntry) {
+						this.#current.setValue({
+							min: minEntry.value as number,
+							max: maxEntry.value as number,
+						});
 					}
 				}
 			},
@@ -68,8 +71,8 @@ export class ExampleRangeFacetFilterApi extends UmbControllerBase {
 	public setValue(min: number, max: number): void {
 		this.#current.setValue({ min, max });
 		this.#facetFilterContext?.setValues([
-			{ unique: String(min), value: { unique: String(min), entityType: '' } },
-			{ unique: String(max), value: { unique: String(max), entityType: '' } },
+			{ unique: 'min', value: min },
+			{ unique: 'max', value: max },
 		]);
 	}
 

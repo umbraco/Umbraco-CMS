@@ -35,10 +35,10 @@ describe('ExampleDynamicFacetCollectionDataSource', () => {
 	describe('category filter mapping', () => {
 		it('maps category filter alias to category field', async () => {
 			const filters: Array<UmbActiveFacetFilterModel> = [
-				{ alias: 'Example.DynamicFacetFilter.CategoryFilter', unique: 'T-Shirt', value: { unique: 'T-Shirt' } },
+				{ alias: 'Example.DynamicFacetFilter.CategoryFilter', unique: 'cat-tshirt', value: { unique: 'cat-tshirt' } },
 			];
 			const { data } = await dataSource.getCollection({ filters });
-			expect(data!.items.every((p) => p.category === 'T-Shirt')).to.equal(true);
+			expect(data!.items.every((p) => p.category === 'cat-tshirt')).to.equal(true);
 			expect(data!.items.length).to.be.greaterThan(0);
 		});
 	});
@@ -46,10 +46,10 @@ describe('ExampleDynamicFacetCollectionDataSource', () => {
 	describe('size filter mapping', () => {
 		it('maps size filter alias to sizes field', async () => {
 			const filters: Array<UmbActiveFacetFilterModel> = [
-				{ alias: 'Example.DynamicFacetFilter.SizeFilter', unique: 'XL', value: { unique: 'XL' } },
+				{ alias: 'Example.DynamicFacetFilter.SizeFilter', unique: 'size-xl', value: { unique: 'size-xl' } },
 			];
 			const { data } = await dataSource.getCollection({ filters });
-			expect(data!.items.every((p) => p.sizes.includes('XL'))).to.equal(true);
+			expect(data!.items.every((p) => p.sizes.includes('size-xl'))).to.equal(true);
 			expect(data!.items.length).to.be.greaterThan(0);
 		});
 	});
@@ -57,10 +57,10 @@ describe('ExampleDynamicFacetCollectionDataSource', () => {
 	describe('color filter mapping', () => {
 		it('maps color filter alias to colors field', async () => {
 			const filters: Array<UmbActiveFacetFilterModel> = [
-				{ alias: 'Example.DynamicFacetFilter.ColorFilter', unique: 'Black', value: { unique: 'Black' } },
+				{ alias: 'Example.DynamicFacetFilter.ColorFilter', unique: 'color-black', value: { unique: 'color-black' } },
 			];
 			const { data } = await dataSource.getCollection({ filters });
-			expect(data!.items.every((p) => p.colors.includes('Black'))).to.equal(true);
+			expect(data!.items.every((p) => p.colors.includes('color-black'))).to.equal(true);
 			expect(data!.items.length).to.be.greaterThan(0);
 		});
 	});
@@ -68,8 +68,8 @@ describe('ExampleDynamicFacetCollectionDataSource', () => {
 	describe('price range filter mapping', () => {
 		it('maps price range filter entries to priceRange field', async () => {
 			const filters: Array<UmbActiveFacetFilterModel> = [
-				{ alias: 'Example.DynamicFacetFilter.PriceFilter', unique: '20', value: { unique: '20' } },
-				{ alias: 'Example.DynamicFacetFilter.PriceFilter', unique: '50', value: { unique: '50' } },
+				{ alias: 'Example.DynamicFacetFilter.PriceFilter', unique: 'min', value: 20 },
+				{ alias: 'Example.DynamicFacetFilter.PriceFilter', unique: 'max', value: 50 },
 			];
 			const { data } = await dataSource.getCollection({ filters });
 			expect(data!.items.length).to.be.greaterThan(0);
@@ -78,8 +78,8 @@ describe('ExampleDynamicFacetCollectionDataSource', () => {
 
 		it('returns items within the full price range', async () => {
 			const filters: Array<UmbActiveFacetFilterModel> = [
-				{ alias: 'Example.DynamicFacetFilter.PriceFilter', unique: '0', value: { unique: '0' } },
-				{ alias: 'Example.DynamicFacetFilter.PriceFilter', unique: '1000', value: { unique: '1000' } },
+				{ alias: 'Example.DynamicFacetFilter.PriceFilter', unique: 'min', value: 0 },
+				{ alias: 'Example.DynamicFacetFilter.PriceFilter', unique: 'max', value: 1000 },
 			];
 			const { data } = await dataSource.getCollection({ filters });
 			expect(data!.items.length).to.equal(products.length);
@@ -89,13 +89,13 @@ describe('ExampleDynamicFacetCollectionDataSource', () => {
 	describe('combined filters', () => {
 		it('applies category and price range together', async () => {
 			const filters: Array<UmbActiveFacetFilterModel> = [
-				{ alias: 'Example.DynamicFacetFilter.CategoryFilter', unique: 'Jacket', value: { unique: 'Jacket' } },
-				{ alias: 'Example.DynamicFacetFilter.PriceFilter', unique: '80', value: { unique: '80' } },
-				{ alias: 'Example.DynamicFacetFilter.PriceFilter', unique: '100', value: { unique: '100' } },
+				{ alias: 'Example.DynamicFacetFilter.CategoryFilter', unique: 'cat-jacket', value: { unique: 'cat-jacket' } },
+				{ alias: 'Example.DynamicFacetFilter.PriceFilter', unique: 'min', value: 80 },
+				{ alias: 'Example.DynamicFacetFilter.PriceFilter', unique: 'max', value: 100 },
 			];
 			const { data } = await dataSource.getCollection({ filters });
 			expect(data!.items.length).to.be.greaterThan(0);
-			expect(data!.items.every((p) => p.category === 'Jacket' && p.price >= 80 && p.price <= 100)).to.equal(true);
+			expect(data!.items.every((p) => p.category === 'cat-jacket' && p.price >= 80 && p.price <= 100)).to.equal(true);
 		});
 	});
 

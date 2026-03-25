@@ -1,7 +1,7 @@
 import { filterProducts } from '../../data/products.js';
 import type { ExampleProductFilterArgs } from '../../data/types.js';
 import type { ExampleDynamicFacetCollectionFilterModel, ExampleProductCollectionItemModel } from './types.js';
-import type { UmbActiveFacetFilterModel } from '@umbraco-cms/backoffice/facet-filter';
+import type { UmbFacetFilterValueModel } from '@umbraco-cms/backoffice/facet-filter';
 import type { UmbCollectionDataSource } from '@umbraco-cms/backoffice/collection';
 import type { UmbDataSourceResponse, UmbPagedModel } from '@umbraco-cms/backoffice/repository';
 
@@ -44,10 +44,9 @@ export class ExampleDynamicFacetCollectionDataSource
 		// Map faceted results back using the alias mapping
 		const facets: Record<string, unknown> = {};
 
-		const toOptions = (facetItems: Array<{ unique: string; name: string; count: number }>, entityType: string) =>
+		const toOptions = (facetItems: Array<{ unique: string; count: number }>, entityType: string) =>
 			facetItems.map((f) => ({
 				unique: f.unique,
-				name: f.name,
 				entityType,
 				count: f.count,
 			}));
@@ -66,38 +65,31 @@ export class ExampleDynamicFacetCollectionDataSource
 		};
 	}
 
-	#mapFiltersToArgs(filters: Array<UmbActiveFacetFilterModel>): ExampleProductFilterArgs {
+	#mapFiltersToArgs(filters: Array<UmbFacetFilterValueModel>): ExampleProductFilterArgs {
 		const args: ExampleProductFilterArgs = {};
 
 		for (const filter of filters) {
 			const field = this.#aliasFieldMap[filter.alias];
 			if (!field) continue;
 
-			const filterValue = filter.value?.unique ?? filter.unique;
-
 			switch (field) {
 				case 'categories':
 					args.categories ??= [];
-					args.categories.push(filterValue);
+					args.categories.push(filter.unique);
 					break;
 				case 'sizes':
 					args.sizes ??= [];
-					args.sizes.push(filterValue);
+					args.sizes.push(filter.unique);
 					break;
 				case 'colors':
 					args.colors ??= [];
-					args.colors.push(filterValue);
+					args.colors.push(filter.unique);
 					break;
 				case 'priceRange': {
-					const value = parseFloat(filterValue);
-					if (!args.priceRange) {
-						args.priceRange = { min: value, max: value };
-					} else {
-						args.priceRange = {
-							min: Math.min(args.priceRange.min, value),
-							max: Math.max(args.priceRange.max, value),
-						};
-					}
+					args.priceRange ??= { min: 0, max: 0 };
+					const numericValue = filter.value as number;
+					if (filter.unique === 'min') args.priceRange.min = numericValue;
+					if (filter.unique === 'max') args.priceRange.max = numericValue;
 					break;
 				}
 			}

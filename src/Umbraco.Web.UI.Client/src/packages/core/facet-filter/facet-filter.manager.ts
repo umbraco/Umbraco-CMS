@@ -41,7 +41,7 @@ export class UmbFacetFilterManager extends UmbContextBase {
 	 * @param alias
 	 * @param entries
 	 */
-	public setFilterValues(alias: string, entries: Array<{ unique: string; value: any }>): void {
+	public setFilterValues(alias: string, entries: Array<{ unique: string; value: unknown }>): void {
 		const current = this.#activeFilters.getValue();
 		const kept = current.filter((f) => f.alias !== alias);
 		const added = entries.map((e) => ({ alias, unique: e.unique, value: e.value }));
