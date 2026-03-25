@@ -30,6 +30,9 @@ public class AddContentVersionDateIndex : AsyncMigrationBase
             return;
         }
 
+        // Give scope for the migration to complete within the command timeout, which may be necessary on large datasets.
+        EnsureLongCommandTimeout(Database);
+
         // CREATE INDEX (without NONCLUSTERED) is portable across SQL Server and SQLite.
         // SQL Server defaults to nonclustered; SQLite does not support the NONCLUSTERED keyword.
         Execute.Sql($@"
