@@ -162,7 +162,8 @@ internal abstract class ContentVersionServiceBase<TContent>
     {
         using (ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true))
         {
-            var languageId = _languageRepository.GetIdByIsoCode(culture, true);
+            // TODO: Await this properly when adjusting this service to our new EF Core approach.
+            var languageId = _languageRepository.GetIdByIsoCodeAsync(culture, true).GetAwaiter().GetResult();
             scope.ReadLock(Constants.Locks.ContentTree);
             return _contentVersionRepository.GetPagedItemsByContentId(contentId, pageIndex, pageSize, out totalRecords, languageId);
         }

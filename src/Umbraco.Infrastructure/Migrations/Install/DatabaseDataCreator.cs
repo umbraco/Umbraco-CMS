@@ -2099,6 +2099,7 @@ internal sealed class DatabaseDataCreator
                 var dto = new LanguageDto
                 {
                     Id = id,
+                    LanguageKey = new Guid("60816EBD-6B2E-4CA2-9E01-73DE41F49D80"),
                     IsoCode = culture.Name,
                     CultureName = culture.EnglishName,
                     IsDefault = isDefault,
@@ -2116,7 +2117,7 @@ internal sealed class DatabaseDataCreator
                 ConditionalInsert(
                     Constants.Configuration.NamedOptions.InstallDefaultData.Languages,
                     culture.Name,
-                    new LanguageDto { Id = 1, IsoCode = culture.Name, CultureName = culture.EnglishName, IsDefault = true },
+                    new LanguageDto { Id = 1, LanguageKey = Guid.NewGuid(), IsoCode = culture.Name, CultureName = culture.EnglishName, IsDefault = true },
                     Constants.DatabaseSchema.Tables.Language,
                     "id");
             }

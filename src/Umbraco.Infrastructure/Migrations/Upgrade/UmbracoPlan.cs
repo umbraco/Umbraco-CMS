@@ -164,5 +164,7 @@ public class UmbracoPlan : MigrationPlan
         To<V_18_0_0.AddLastSyncedDto>("{5CFD4E2B-4024-42FE-9C70-295D0141ECAF}");
         To<V_18_0_0.AddKeyValueDto>("{ABDB0A9C-7476-4E00-B4C2-638FDF347AA0}");
         To<V_18_0_0.AddSqliteCollation>("{E4F5A6B7-C8D9-4E0F-A1B2-C3D4E5F6A7B8}");
+        To<V_18_0_0.AddLanguageKeyColumn>("{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}");
+        To<V_18_0_0.AddLanguageDto>("{9880258E-834C-452D-A915-400D03BF9C41}");
     }
 }

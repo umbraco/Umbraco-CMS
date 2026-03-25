@@ -186,7 +186,7 @@ public interface ILocalizationService : IService
     ///     <para>This can be optimized and bypass all deep cloning.</para>
     /// </remarks>
     [Obsolete("Please use ILanguageService for language operations. Scheduled for removal in Umbraco 18.")]
-    int? GetDefaultLanguageId();
+    Guid? GetDefaultLanguageKey();
 
     /// <summary>
     ///     Gets all available languages

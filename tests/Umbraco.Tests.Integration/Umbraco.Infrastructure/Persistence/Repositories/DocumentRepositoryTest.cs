@@ -20,6 +20,8 @@ using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Persistence.SqlServer.Services;
@@ -131,8 +133,9 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
         var tagRepository = new TagRepository(scopeAccessor, appCaches, LoggerFactory.CreateLogger<TagRepository>(), Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
         var commonRepository =
             new ContentTypeCommonRepository(scopeAccessor, templateRepository, appCaches, ShortStringHelper);
+        var efCoreScopeAccessor = GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>();
         var languageRepository =
-            new LanguageRepository(scopeAccessor, appCaches, LoggerFactory.CreateLogger<LanguageRepository>(), Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
+            new LanguageRepository(efCoreScopeAccessor, appCaches, LoggerFactory.CreateLogger<LanguageRepository>(), Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
         contentTypeRepository = new ContentTypeRepository(scopeAccessor, appCaches, LoggerFactory.CreateLogger<ContentTypeRepository>(), commonRepository, languageRepository, ShortStringHelper, Mock.Of<IRepositoryCacheVersionService>(), IdKeyMap, Mock.Of<ICacheSyncService>());
         var relationTypeRepository = new RelationTypeRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<RelationTypeRepository>(), Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
         var entityRepository = new EntityRepository(scopeAccessor, AppCaches.Disabled);
@@ -891,6 +894,8 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
     [Test]
     public void GetPagedResultsByQuery_With_Variant_Names()
     {
+        using var efCoreScope = NewScopeProvider.CreateScope();
+
         // One invariant content type named "umbInvariantTextPage"
         var template = TemplateBuilder.CreateTextPageTemplate();
         FileService.SaveTemplate(template);

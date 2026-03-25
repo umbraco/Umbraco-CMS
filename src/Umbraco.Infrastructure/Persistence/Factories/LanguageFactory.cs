@@ -1,6 +1,6 @@
 using System.Globalization;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Factories;
 
@@ -19,6 +19,7 @@ internal static class LanguageFactory
         var lang = new Language(dto.IsoCode, dto.CultureName)
         {
             Id = dto.Id,
+            Key = dto.LanguageKey,
             IsDefault = dto.IsDefault,
             IsMandatory = dto.IsMandatory,
             FallbackIsoCode = fallbackIsoCode
@@ -36,6 +37,7 @@ internal static class LanguageFactory
 
         var dto = new LanguageDto
         {
+            LanguageKey = entity.Key,
             IsoCode = entity.IsoCode,
             CultureName = entity.CultureName,
             IsDefault = entity.IsDefault,
@@ -45,7 +47,7 @@ internal static class LanguageFactory
 
         if (entity.HasIdentity)
         {
-            dto.Id = (short)entity.Id;
+            dto.Id = entity.Id;
         }
 
         return dto;

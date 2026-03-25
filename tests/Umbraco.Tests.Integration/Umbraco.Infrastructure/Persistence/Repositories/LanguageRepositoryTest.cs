@@ -2,7 +2,6 @@
 // See LICENSE for more details.
 
 using System.Globalization;
-using System.Linq;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
@@ -10,9 +9,9 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
-using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 
@@ -26,17 +25,16 @@ internal sealed class LanguageRepositoryTest : UmbracoIntegrationTest
     public async Task SetUp() => await CreateTestData();
 
     [Test]
-    public void Can_Perform_Get_On_LanguageRepository()
+    public async Task Can_Perform_Get_On_LanguageRepository()
     {
         // Arrange
-        var provider = ScopeProvider;
+        var provider = NewScopeProvider;
         using (var scope = provider.CreateScope())
         {
-            ScopeAccessor.AmbientScope.Database.AsUmbracoDatabase().EnableSqlTrace = true;
-            var repository = CreateRepository(provider);
+            var repository = CreateRepository();
 
-            // Act
-            var language = repository.Get(1);
+            // Act — look up by ISO code to get the Key, then fetch by Key
+            var language = await repository.GetByIsoCodeAsync("en-US");
 
             // Assert
             Assert.That(language, Is.Not.Null);
@@ -44,23 +42,24 @@ internal sealed class LanguageRepositoryTest : UmbracoIntegrationTest
             Assert.That(language.CultureName, Is.EqualTo("English (United States)"));
             Assert.That(language.IsoCode, Is.EqualTo("en-US"));
             Assert.That(language.FallbackIsoCode, Is.Null);
+            scope.Complete();
         }
     }
 
     [Test]
-    public void Can_Perform_Get_By_Iso_Code_On_LanguageRepository()
+    public async Task Can_Perform_Get_By_Iso_Code_On_LanguageRepository()
     {
-        var provider = ScopeProvider;
-        using (provider.CreateScope())
+        var provider = NewScopeProvider;
+        using (var scope = provider.CreateScope())
         {
-            var repository = CreateRepository(provider);
+            var repository = CreateRepository();
 
             var au = CultureInfo.GetCultureInfo("en-AU");
             ILanguage language = new Language(au.Name, au.EnglishName) { FallbackIsoCode = "en-US" };
-            repository.Save(language);
+            await repository.SaveAsync(language, CancellationToken.None);
 
             // re-get
-            language = repository.GetByIsoCode(au.Name);
+            language = await repository.GetByIsoCodeAsync(au.Name);
 
             // Assert
             Assert.That(language, Is.Not.Null);
@@ -68,305 +67,295 @@ internal sealed class LanguageRepositoryTest : UmbracoIntegrationTest
             Assert.That(language.CultureName, Is.EqualTo(au.EnglishName));
             Assert.That(language.IsoCode, Is.EqualTo(au.Name));
             Assert.That(language.FallbackIsoCode, Is.EqualTo("en-US"));
+            scope.Complete();
         }
     }
 
     [Test]
-    public void Get_When_Id_Doesnt_Exist_Returns_Null()
+    public async Task Get_When_Key_Doesnt_Exist_Returns_Null()
     {
         // Arrange
-        var provider = ScopeProvider;
-        using (provider.CreateScope())
+        var provider = NewScopeProvider;
+        using (var scope = provider.CreateScope())
         {
-            var repository = CreateRepository(provider);
+            var repository = CreateRepository();
 
             // Act
-            var language = repository.Get(0);
+            var language = await repository.GetAsync(Guid.Empty, CancellationToken.None);
 
             // Assert
             Assert.That(language, Is.Null);
+            scope.Complete();
         }
     }
 
     [Test]
-    public void Can_Perform_GetAll_On_LanguageRepository()
+    public async Task Can_Perform_GetAll_On_LanguageRepository()
     {
         // Arrange
-        var provider = ScopeProvider;
-        using (provider.CreateScope())
+        var provider = NewScopeProvider;
+        using (var scope = provider.CreateScope())
         {
-            var repository = CreateRepository(provider);
+            var repository = CreateRepository();
 
             // Act
-            var languages = repository.GetMany().ToArray();
+            var allLanguage = await repository.GetAllAsync(CancellationToken.None);
+            var languages = allLanguage.ToArray();
 
             // Assert
             Assert.That(languages, Is.Not.Null);
             Assert.That(languages.Any(), Is.True);
             Assert.That(languages.Any(x => x == null), Is.False);
             Assert.That(languages.Count(), Is.EqualTo(5));
+
+            scope.Complete();
         }
     }
 
     [Test]
-    public void Can_Perform_GetAll_With_Params_On_LanguageRepository()
+    public async Task Can_Perform_GetAll_With_Params_On_LanguageRepository()
     {
         // Arrange
-        var provider = ScopeProvider;
-        using (provider.CreateScope())
+        var provider = NewScopeProvider;
+        using (var scope = provider.CreateScope())
         {
-            var repository = CreateRepository(provider);
+            var repository = CreateRepository();
+
+            // Resolve Keys for the two languages we want to fetch
+            var all = (await repository.GetAllAsync(CancellationToken.None)).ToArray();
+            var keys = all
+                .Where(x => x.IsoCode is "en-US" or "da-DK")
+                .Select(x => x.Key)
+                .ToArray();
 
             // Act
-            var languages = repository.GetMany(1, 2).ToArray();
+            var selectedLanguages = await repository.GetManyAsync(keys, CancellationToken.None);
+            var languages = selectedLanguages.ToArray();
 
             // Assert
             Assert.That(languages, Is.Not.Null);
             Assert.That(languages.Any(), Is.True);
             Assert.That(languages.Any(x => x == null), Is.False);
             Assert.That(languages.Count(), Is.EqualTo(2));
+
+            scope.Complete();
         }
     }
 
     [Test]
-    public void Can_Perform_GetByQuery_On_LanguageRepository()
+    public async Task Can_Perform_Add_On_LanguageRepository()
     {
         // Arrange
-        var provider = ScopeProvider;
+        var provider = NewScopeProvider;
         using (var scope = provider.CreateScope())
         {
-            var repository = CreateRepository(provider);
-
-            // Act
-            var query = provider.CreateQuery<ILanguage>().Where(x => x.IsoCode == "da-DK");
-            var result = repository.Get(query).ToArray();
-
-            // Assert
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result.Any(), Is.True);
-            Assert.That(result.FirstOrDefault().IsoCode, Is.EqualTo("da-DK"));
-        }
-    }
-
-    [Test]
-    public void Can_Perform_Count_On_LanguageRepository()
-    {
-        // Arrange
-        var provider = ScopeProvider;
-        using (var scope = provider.CreateScope())
-        {
-            var repository = CreateRepository(provider);
-
-            // Act
-            var query = provider.CreateQuery<ILanguage>().Where(x => x.IsoCode.StartsWith("D"));
-            var count = repository.Count(query);
-
-            // Assert
-            Assert.That(count, Is.EqualTo(2));
-        }
-    }
-
-    [Test]
-    public void Can_Perform_Add_On_LanguageRepository()
-    {
-        // Arrange
-        var provider = ScopeProvider;
-        using (provider.CreateScope())
-        {
-            var repository = CreateRepository(provider);
+            var repository = CreateRepository();
 
             // Act
             var languageBR = new Language("pt-BR", "Portuguese (Brazil)");
-            repository.Save(languageBR);
+            await repository.SaveAsync(languageBR, CancellationToken.None);
 
             // Assert
             Assert.That(languageBR.HasIdentity, Is.True);
-            Assert.That(languageBR.Id, Is.EqualTo(6)); // With 5 existing entries the Id should be 6
+            Assert.That(languageBR.Key, Is.Not.EqualTo(Guid.Empty));
             Assert.IsFalse(languageBR.IsDefault);
             Assert.IsFalse(languageBR.IsMandatory);
             Assert.IsNull(languageBR.FallbackIsoCode);
+            scope.Complete();
         }
     }
 
     [Test]
-    public void Can_Perform_Add_On_LanguageRepository_With_Boolean_Properties()
+    public async Task Can_Perform_Add_On_LanguageRepository_With_Boolean_Properties()
     {
         // Arrange
-        var provider = ScopeProvider;
-        using (provider.CreateScope())
+        var provider = NewScopeProvider;
+        using (var scope = provider.CreateScope())
         {
-            var repository = CreateRepository(provider);
+            var repository = CreateRepository();
 
             // Act
             var languageBR = new Language("pt-BR", "Portuguese (Brazil)") { IsDefault = true, IsMandatory = true };
-            repository.Save(languageBR);
+            await repository.SaveAsync(languageBR, CancellationToken.None);
 
             // Assert
             Assert.That(languageBR.HasIdentity, Is.True);
-            Assert.That(languageBR.Id, Is.EqualTo(6)); // With 5 existing entries the Id should be 6
+            Assert.That(languageBR.Key, Is.Not.EqualTo(Guid.Empty));
             Assert.IsTrue(languageBR.IsDefault);
             Assert.IsTrue(languageBR.IsMandatory);
             Assert.IsNull(languageBR.FallbackIsoCode);
+            scope.Complete();
         }
     }
 
     [Test]
-    public void Can_Perform_Add_On_LanguageRepository_With_Fallback_Language()
+    public async Task Can_Perform_Add_On_LanguageRepository_With_Fallback_Language()
     {
         // Arrange
-        var provider = ScopeProvider;
-        using (provider.CreateScope())
+        var provider = NewScopeProvider;
+        using (var scope = provider.CreateScope())
         {
-            var repository = CreateRepository(provider);
+            var repository = CreateRepository();
 
             // Act
             var languageBR = new Language("pt-BR", "Portuguese (Brazil)") { FallbackIsoCode = "en-US" };
-            repository.Save(languageBR);
+            await repository.SaveAsync(languageBR, CancellationToken.None);
 
             // Assert
             Assert.That(languageBR.HasIdentity, Is.True);
-            Assert.That(languageBR.Id, Is.EqualTo(6)); // With 5 existing entries the Id should be 6
+            Assert.That(languageBR.Key, Is.Not.EqualTo(Guid.Empty));
             Assert.That(languageBR.FallbackIsoCode, Is.EqualTo("en-US"));
+            scope.Complete();
         }
     }
 
     [Test]
-    public void Can_Perform_Add_On_LanguageRepository_With_New_Default()
+    public async Task Can_Perform_Add_On_LanguageRepository_With_New_Default()
     {
         // Arrange
-        var provider = ScopeProvider;
-        using (provider.CreateScope())
+        var provider = NewScopeProvider;
+        using (var scope = provider.CreateScope())
         {
-            var repository = CreateRepository(provider);
+            var repository = CreateRepository();
 
             ILanguage languageBR = new Language("pt-BR", "Portuguese (Brazil)") { IsDefault = true, IsMandatory = true };
-            repository.Save(languageBR);
+            await repository.SaveAsync(languageBR, CancellationToken.None);
             var languageEN = new Language("en-AU", "English (Australia)");
-            repository.Save(languageEN);
+            await repository.SaveAsync(languageEN, CancellationToken.None);
 
             Assert.IsTrue(languageBR.IsDefault);
             Assert.IsTrue(languageBR.IsMandatory);
 
             // Act
             var languageNZ = new Language("en-NZ", "English (New Zealand)") { IsDefault = true, IsMandatory = true };
-            repository.Save(languageNZ);
-            languageBR = repository.Get(languageBR.Id);
+            await repository.SaveAsync(languageNZ, CancellationToken.None);
+            languageBR = await repository.GetAsync(languageBR.Key, CancellationToken.None);
 
             // Assert
             Assert.IsFalse(languageBR.IsDefault);
             Assert.IsTrue(languageNZ.IsDefault);
+            scope.Complete();
         }
     }
 
     [Test]
-    public void Can_Perform_Update_On_LanguageRepository()
+    public async Task Can_Perform_Update_On_LanguageRepository()
     {
         // Arrange
-        var provider = ScopeProvider;
-        using (provider.CreateScope())
+        var provider = NewScopeProvider;
+        using (var scope = provider.CreateScope())
         {
-            var repository = CreateRepository(provider);
+            var repository = CreateRepository();
 
             // Act
-            var language = repository.Get(5);
+            var language = await repository.GetByIsoCodeAsync("pt-PT");
+            var languageKey = language.Key;
             language.IsoCode = "pt-BR";
             language.CultureName = "Portuguese (Brazil)";
             language.FallbackIsoCode = "en-US";
 
-            repository.Save(language);
+            await repository.SaveAsync(language, CancellationToken.None);
 
-            var languageUpdated = repository.Get(5);
+            var languageUpdated = await repository.GetAsync(languageKey, CancellationToken.None);
 
             // Assert
             Assert.That(languageUpdated, Is.Not.Null);
             Assert.That(languageUpdated.IsoCode, Is.EqualTo("pt-BR"));
             Assert.That(languageUpdated.CultureName, Is.EqualTo("Portuguese (Brazil)"));
             Assert.That(languageUpdated.FallbackIsoCode, Is.EqualTo("en-US"));
+            scope.Complete();
         }
     }
 
     [Test]
-    public void Perform_Update_With_Existing_Culture()
+    public async Task Perform_Update_With_Existing_Culture()
     {
         // Arrange
-        var provider = ScopeProvider;
-        using (provider.CreateScope())
+        var provider = NewScopeProvider;
+        using (var scope = provider.CreateScope())
         {
-            var repository = CreateRepository(provider);
+            var repository = CreateRepository();
 
             // Act
-            var language = repository.Get(5);
+            var language = await repository.GetByIsoCodeAsync("pt-PT");
             language.IsoCode = "da-DK";
             language.CultureName = "Danish (Denmark)";
 
-            Assert.Throws<InvalidOperationException>(() => repository.Save(language));
+            Assert.ThrowsAsync<InvalidOperationException>(async () => await repository.SaveAsync(language, CancellationToken.None));
+            scope.Complete();
         }
     }
 
     [Test]
-    public void Can_Perform_Delete_On_LanguageRepository()
+    public async Task Can_Perform_Delete_On_LanguageRepository()
     {
         // Arrange
-        var provider = ScopeProvider;
-        using (provider.CreateScope())
+        var provider = NewScopeProvider;
+        using (var scope = provider.CreateScope())
         {
-            var repository = CreateRepository(provider);
+            var repository = CreateRepository();
 
             // Act
-            var language = repository.Get(3);
-            repository.Delete(language);
+            var language = await repository.GetByIsoCodeAsync("sv-SE");
+            var languageKey = language.Key;
+            await repository.DeleteAsync(language, CancellationToken.None);
 
-            var exists = repository.Exists(3);
+            var exists = await repository.ExistsAsync(languageKey, CancellationToken.None);
 
             // Assert
             Assert.That(exists, Is.False);
+            scope.Complete();
         }
     }
 
     [Test]
-    public void Can_Perform_Delete_On_LanguageRepository_With_Language_Used_As_Fallback()
+    public async Task Can_Perform_Delete_On_LanguageRepository_With_Language_Used_As_Fallback()
     {
         // Arrange
-        var provider = ScopeProvider;
-        using (provider.CreateScope())
+        var provider = NewScopeProvider;
+        using (var scope = provider.CreateScope())
         {
             // Add language to delete as a fall-back language to another one
-            var repository = CreateRepository(provider);
-            var languageToFallbackFrom = repository.Get(5);
+            var repository = CreateRepository();
+            var languageToFallbackFrom = await repository.GetByIsoCodeAsync("pt-PT");
             languageToFallbackFrom.FallbackIsoCode = "da-DK"; // fall back to "da-DK" (something we can delete)
-            repository.Save(languageToFallbackFrom);
+            await repository.SaveAsync(languageToFallbackFrom, CancellationToken.None);
 
-            // delete #2
-            var languageToDelete = repository.Get(2);
-            repository.Delete(languageToDelete);
+            // delete da-DK
+            var languageToDelete = await repository.GetByIsoCodeAsync("da-DK");
+            var deletedKey = languageToDelete.Key;
+            await repository.DeleteAsync(languageToDelete, CancellationToken.None);
 
-            var exists = repository.Exists(2);
+            var exists = await repository.ExistsAsync(deletedKey, CancellationToken.None);
 
             // has been deleted
             Assert.That(exists, Is.False);
+            scope.Complete();
         }
     }
 
     [Test]
-    public void Can_Perform_Exists_On_LanguageRepository()
+    public async Task Can_Perform_Exists_On_LanguageRepository()
     {
         // Arrange
-        var provider = ScopeProvider;
-        using (provider.CreateScope())
+        var provider = NewScopeProvider;
+        using (var scope = provider.CreateScope())
         {
-            var repository = CreateRepository(provider);
+            var repository = CreateRepository();
 
             // Act
-            var exists = repository.Exists(3);
-            var doesntExist = repository.Exists(10);
+            var language = await repository.GetByIsoCodeAsync("sv-SE");
+            var exists = await repository.ExistsAsync(language.Key, CancellationToken.None);
+            var doesntExist = await repository.ExistsAsync(Guid.NewGuid(), CancellationToken.None);
 
             // Assert
             Assert.That(exists, Is.True);
             Assert.That(doesntExist, Is.False);
+            scope.Complete();
         }
     }
 
-    private LanguageRepository CreateRepository(IScopeProvider provider) => new((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<LanguageRepository>(), Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
+    private LanguageRepository CreateRepository() => new(GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>(), AppCaches.Disabled, LoggerFactory.CreateLogger<LanguageRepository>(), Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
 
     private async Task CreateTestData()
     {
