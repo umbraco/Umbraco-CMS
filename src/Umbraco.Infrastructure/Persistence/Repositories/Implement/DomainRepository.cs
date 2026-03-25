@@ -1,22 +1,24 @@
 using System.Data;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
-using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Cache;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence.Factories;
-using Umbraco.Cms.Infrastructure.Scoping;
+using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.EFCore;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
-internal sealed class DomainRepository : EntityRepositoryBase<int, IDomain>, IDomainRepository
+internal sealed class DomainRepository : AsyncEntityRepositoryBase<int, IDomain>, IDomainRepository
 {
     public DomainRepository(
-        IScopeAccessor scopeAccessor,
+        IEFCoreScopeAccessor<UmbracoDbContext> scopeAccessor,
         AppCaches cache,
         ILogger<DomainRepository> logger,
         IRepositoryCacheVersionService repositoryCacheVersionService,
@@ -30,174 +32,229 @@ internal sealed class DomainRepository : EntityRepositoryBase<int, IDomain>, IDo
     {
     }
 
-    public IDomain? GetByName(string domainName)
-        => GetMany().FirstOrDefault(x => x.DomainName.InvariantEquals(domainName));
+    /// <inheritdoc/>
+    public async Task<IDomain?> GetByNameAsync(string domainName)
+    {
+        IEnumerable<IDomain> all = await GetAllAsync(CancellationToken.None);
+        return all.FirstOrDefault(x => x.DomainName.InvariantEquals(domainName));
+    }
 
-    public bool Exists(string domainName)
-        => GetMany().Any(x => x.DomainName.InvariantEquals(domainName));
+    /// <inheritdoc/>
+    public async Task<bool> ExistsAsync(string domainName)
+    {
+        IEnumerable<IDomain> all = await GetAllAsync(CancellationToken.None);
+        return all.Any(x => x.DomainName.InvariantEquals(domainName));
+    }
 
-    public IEnumerable<IDomain> GetAll(bool includeWildcards)
-        => GetMany().Where(x => includeWildcards || x.IsWildcard == false);
+    /// <inheritdoc/>
+    public async Task<IEnumerable<IDomain>> GetAllAsync(bool includeWildcards)
+    {
+        IEnumerable<IDomain> all = await GetAllAsync(CancellationToken.None);
+        return all.Where(x => includeWildcards || x.IsWildcard == false);
+    }
 
-    public IEnumerable<IDomain> GetAssignedDomains(int contentId, bool includeWildcards)
-        => GetMany().Where(x => x.RootContentId == contentId).Where(x => includeWildcards || x.IsWildcard == false);
+    /// <inheritdoc/>
+    public async Task<IEnumerable<IDomain>> GetAssignedDomainsAsync(int contentId, bool includeWildcards)
+    {
+        IEnumerable<IDomain> all = await GetAllAsync(CancellationToken.None);
+        return all
+            .Where(x => x.RootContentId == contentId)
+            .Where(x => includeWildcards || x.IsWildcard == false);
+    }
 
-    protected override IRepositoryCachePolicy<IDomain, int> CreateCachePolicy()
-        => new FullDataSetRepositoryCachePolicy<IDomain, int>(GlobalIsolatedCache, ScopeAccessor,  RepositoryCacheVersionService, CacheSyncService, GetEntityId, false);
+    /// <inheritdoc/>
+    protected override IAsyncRepositoryCachePolicy<IDomain, int> CreateCachePolicy()
+        => new AsyncFullDataSetRepositoryCachePolicy<IDomain, int>(GlobalIsolatedCache, ScopeAccessor, RepositoryCacheVersionService, CacheSyncService, entity => entity.Id, false);
 
-    protected override IDomain? PerformGet(int id)
+    /// <inheritdoc/>
+    protected override async Task<IDomain?> PerformGetAsync(int id)
+    {
         // Use the underlying GetAll which will force cache all domains
-        => GetMany().FirstOrDefault(x => x.Id == id);
-
-    protected override IEnumerable<IDomain> PerformGetAll(params int[]? ids)
-    {
-        Sql<ISqlContext> sql = GetBaseQuery(false).Where<DomainDto>(x => x.Id > 0);
-        if (ids?.Any() ?? false)
-        {
-            sql.WhereIn<DomainDto>(x => x.Id, ids);
-        }
-        sql.OrderBy<DomainDto>(dto => dto.SortOrder);
-
-        return Database.Fetch<DomainDto>(sql).Select(DomainFactory.BuildEntity);
+        IEnumerable<IDomain> all = await GetAllAsync(CancellationToken.None);
+        return all.FirstOrDefault(x => x.Id == id);
     }
 
-    protected override IEnumerable<IDomain> PerformGetByQuery(IQuery<IDomain> query)
-        => throw new NotSupportedException("This repository does not support this method");
+    /// <inheritdoc/>
+    protected override async Task<IEnumerable<IDomain>?> PerformGetAllAsync() =>
+        await AmbientScope.ExecuteWithContextAsync(async db =>
+        {
+            List<DomainDto> dtos = await db.Domains
+                .OrderBy(x => x.SortOrder)
+                .ToListAsync();
 
-    protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
+            return dtos
+                .Select(dto =>
+                {
+                    LanguageDto? language = db.Language
+                        .FirstOrDefault(l => l.Id == dto.DefaultLanguage);
+
+                    return DomainFactory.BuildEntity(dto, language?.IsoCode);
+                })
+                .AsEnumerable();
+        });
+
+    /// <inheritdoc/>
+    protected override async Task<IEnumerable<IDomain>?> PerformGetManyAsync(int[]? ids)
     {
-        Sql<ISqlContext> sql = Sql();
-        if (isCount)
+        if (ids is null || ids.Length == 0)
         {
-            sql.SelectCount().From<DomainDto>();
-        }
-        else
-        {
-            sql.Select($"{QuoteTableName(Constants.DatabaseSchema.Tables.Domain)}.*, {QuoteTableName(Constants.DatabaseSchema.Tables.Language)}.{QuoteColumnName("languageISOCode")}")
-                .From<DomainDto>()
-                .LeftJoin<LanguageDto>()
-                .On<DomainDto, LanguageDto>(dto => dto.DefaultLanguage, dto => dto.Id);
+            return null;
         }
 
-        return sql;
+        return await AmbientScope.ExecuteWithContextAsync(async db =>
+        {
+            List<DomainDto> dtos = await db.Domains
+                .Where(x => ids.Contains(x.Id))
+                .OrderBy(x => x.SortOrder)
+                .ToListAsync();
+
+            return dtos
+                .Select(dto =>
+                {
+                    LanguageDto? language = db.Language
+                        .FirstOrDefault(l => l.Id == dto.DefaultLanguage);
+
+                    return DomainFactory.BuildEntity(dto, language?.IsoCode);
+                })
+                .AsEnumerable();
+        });
     }
 
-    protected override string GetBaseWhereClause()
-        => $"{QuoteTableName(Constants.DatabaseSchema.Tables.Domain)}.id = @id";
-
-    protected override IEnumerable<string> GetDeleteClauses()
-        => new []
+    /// <inheritdoc/>
+    protected override async Task PersistNewItemAsync(IDomain entity) =>
+        await AmbientScope.ExecuteWithContextAsync<DomainDto>(async db =>
         {
-            $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.Domain)} WHERE id = @id",
-        };
+            // Check duplicate domain name
+            var exists = await db.Domains.AnyAsync(x => x.DomainName == entity.DomainName);
+            if (exists)
+            {
+                throw new DuplicateNameException($"The domain name {entity.DomainName} is already assigned.");
+            }
 
-    protected override void PersistNewItem(IDomain entity)
+            // Validate RootContentId exists
+            if (entity.RootContentId.HasValue)
+            {
+                var contentExists = await db.Database
+                    .SqlQuery<int>($"SELECT COUNT(*) AS [Value] FROM {Constants.DatabaseSchema.Tables.Content} WHERE nodeId = {entity.RootContentId.Value}")
+                    .FirstAsync();
+                if (contentExists == 0)
+                {
+                    throw new NullReferenceException($"No content exists with id {entity.RootContentId.Value}.");
+                }
+            }
+
+            // Validate LanguageId exists
+            if (entity.LanguageId.HasValue)
+            {
+                var languageExists = await db.Language.AnyAsync(x => x.Id == entity.LanguageId.Value);
+                if (!languageExists)
+                {
+                    throw new NullReferenceException($"No language exists with id {entity.LanguageId.Value}.");
+                }
+            }
+
+            entity.AddingEntity();
+            entity.SortOrder = await GetNewSortOrderAsync(db, entity.RootContentId, entity.IsWildcard);
+
+            DomainDto dto = DomainFactory.BuildDto(entity);
+            await db.Domains.AddAsync(dto);
+            await db.SaveChangesAsync();
+
+            entity.Id = dto.Id;
+
+            // Resolve ISO code
+            if (entity.LanguageId.HasValue)
+            {
+                LanguageDto? lang = await db.Language.FirstOrDefaultAsync(x => x.Id == entity.LanguageId.Value);
+                ((UmbracoDomain)entity).LanguageIsoCode = lang?.IsoCode;
+            }
+
+            entity.ResetDirtyProperties();
+        });
+
+    /// <inheritdoc/>
+    protected override async Task PersistUpdatedItemAsync(IDomain entity) =>
+        await AmbientScope.ExecuteWithContextAsync<DomainDto>(async db =>
+        {
+            entity.UpdatingEntity();
+
+            // Check duplicate domain name (excluding self)
+            var exists = await db.Domains.AnyAsync(x => x.DomainName == entity.DomainName && x.Id != entity.Id);
+            if (exists)
+            {
+                throw new DuplicateNameException($"The domain name {entity.DomainName} is already assigned.");
+            }
+
+            // Validate RootContentId exists
+            if (entity.RootContentId.HasValue)
+            {
+                var contentExists = await db.Database
+                    .SqlQuery<int>($"SELECT COUNT(*) AS [Value] FROM {Constants.DatabaseSchema.Tables.Content} WHERE nodeId = {entity.RootContentId.Value}")
+                    .FirstAsync();
+                if (contentExists == 0)
+                {
+                    throw new NullReferenceException($"No content exists with id {entity.RootContentId.Value}.");
+                }
+            }
+
+            // Validate LanguageId exists
+            if (entity.LanguageId.HasValue)
+            {
+                var languageExists = await db.Language.AnyAsync(x => x.Id == entity.LanguageId.Value);
+                if (!languageExists)
+                {
+                    throw new NullReferenceException($"No language exists with id {entity.LanguageId.Value}.");
+                }
+            }
+
+            DomainDto dto = DomainFactory.BuildDto(entity);
+
+            await db.Domains
+                .Where(x => x.Id == dto.Id)
+                .ExecuteUpdateAsync(setter => setter
+                    .SetProperty(x => x.Key, dto.Key)
+                    .SetProperty(x => x.DomainName, dto.DomainName)
+                    .SetProperty(x => x.DefaultLanguage, dto.DefaultLanguage)
+                    .SetProperty(x => x.RootStructureId, dto.RootStructureId)
+                    .SetProperty(x => x.SortOrder, dto.SortOrder));
+
+            // Resolve ISO code if language changed
+            if (entity.WasPropertyDirty("LanguageId"))
+            {
+                LanguageDto? lang = await db.Language.FirstOrDefaultAsync(x => x.Id == entity.LanguageId);
+                ((UmbracoDomain)entity).LanguageIsoCode = lang?.IsoCode;
+            }
+
+            entity.ResetDirtyProperties();
+        });
+
+    /// <inheritdoc/>
+    protected override async Task PersistDeletedItemAsync(IDomain entity)
     {
-        var exists = Database.ExecuteScalar<int>(
-            $"SELECT COUNT(*) FROM {QuoteTableName(Constants.DatabaseSchema.Tables.Domain)} WHERE {QuoteColumnName("domainName")} = @domainName",
-            new { domainName = entity.DomainName });
-        if (exists > 0)
+        await AmbientScope.ExecuteWithContextAsync(async db =>
         {
-            throw new DuplicateNameException($"The domain name {entity.DomainName} is already assigned.");
-        }
-
-        if (entity.RootContentId.HasValue)
-        {
-            var contentExists = Database.ExecuteScalar<int>(
-                $"SELECT COUNT(*) FROM {QuoteTableName(Constants.DatabaseSchema.Tables.Content)} WHERE {QuoteColumnName("nodeId")} = @id",
-                new { id = entity.RootContentId.Value });
-            if (contentExists == 0)
-            {
-                throw new NullReferenceException($"No content exists with id {entity.RootContentId.Value}.");
-            }
-        }
-
-        if (entity.LanguageId.HasValue)
-        {
-            var languageExists = Database.ExecuteScalar<int>(
-                $"SELECT COUNT(*) FROM {QuoteTableName(Constants.DatabaseSchema.Tables.Language)} WHERE id = @id",
-                new { id = entity.LanguageId.Value });
-            if (languageExists == 0)
-            {
-                throw new NullReferenceException($"No language exists with id {entity.LanguageId.Value}.");
-            }
-        }
-
-        entity.AddingEntity();
-
-        // Get sort order
-        entity.SortOrder = GetNewSortOrder(entity.RootContentId, entity.IsWildcard);
-
-        DomainDto dto = DomainFactory.BuildDto(entity);
-
-        var id = Convert.ToInt32(Database.Insert(dto));
-        entity.Id = id;
-
-        // If the language changed, we need to resolve the ISO code
-        if (entity.LanguageId.HasValue)
-        {
-            ((UmbracoDomain)entity).LanguageIsoCode = Database.ExecuteScalar<string>(
-                $"SELECT {QuoteColumnName("languageISOCode")} FROM {QuoteTableName(Constants.DatabaseSchema.Tables.Language)} WHERE id = @langId",
-                new { langId = entity.LanguageId });
-        }
-
-        entity.ResetDirtyProperties();
+            await db.Domains.Where(x => x.Id == entity.Id).ExecuteDeleteAsync();
+            return true;
+        });
     }
 
-    protected override void PersistUpdatedItem(IDomain entity)
+    /// <inheritdoc/>
+    protected override Task<bool> PerformExistsAsync(int key) =>
+        AmbientScope.ExecuteWithContextAsync(db => db.Domains.AnyAsync(x => x.Id == key));
+
+    private static async Task<int> GetNewSortOrderAsync(UmbracoDbContext db, int? rootContentId, bool isWildcard)
     {
-        entity.UpdatingEntity();
-
-        // Ensure there is no other domain with the same name on another entity
-        var exists = Database.ExecuteScalar<int>(
-            $"SELECT COUNT(*) FROM {QuoteTableName(Constants.DatabaseSchema.Tables.Domain)} WHERE {QuoteColumnName("domainName")} = @domainName AND id <> @id",
-            new { domainName = entity.DomainName, id = entity.Id });
-        if (exists > 0)
+        if (isWildcard)
         {
-            throw new DuplicateNameException($"The domain name {entity.DomainName} is already assigned.");
+            return -1;
         }
 
-        if (entity.RootContentId.HasValue)
-        {
-            var contentExists = Database.ExecuteScalar<int>(
-                $"SELECT COUNT(*) FROM {QuoteTableName(Constants.DatabaseSchema.Tables.Content)} WHERE {QuoteColumnName("nodeId")} = @id",
-                new { id = entity.RootContentId.Value });
-            if (contentExists == 0)
-            {
-                throw new NullReferenceException($"No content exists with id {entity.RootContentId.Value}.");
-            }
-        }
+        var maxSortOrder = await db.Domains
+            .Where(x => x.RootStructureId == rootContentId)
+            .Where(x => x.DomainName != string.Empty && !x.DomainName.StartsWith("*"))
+            .MaxAsync(x => (int?)x.SortOrder) ?? -1;
 
-        if (entity.LanguageId.HasValue)
-        {
-            var languageExists = Database.ExecuteScalar<int>(
-                $"SELECT COUNT(*) FROM {QuoteTableName(Constants.DatabaseSchema.Tables.Language)} WHERE id = @id",
-                new { id = entity.LanguageId.Value });
-            if (languageExists == 0)
-            {
-                throw new NullReferenceException($"No language exists with id {entity.LanguageId.Value}.");
-            }
-        }
-
-        DomainDto dto = DomainFactory.BuildDto(entity);
-
-        Database.Update(dto);
-
-        // If the language changed, we need to resolve the ISO code
-        if (entity.WasPropertyDirty("LanguageId"))
-        {
-            ((UmbracoDomain)entity).LanguageIsoCode = Database.ExecuteScalar<string>(
-                $"SELECT {QuoteColumnName("languageISOCode")} FROM {QuoteTableName(Constants.DatabaseSchema.Tables.Language)} WHERE id = @langId",
-                new { langId = entity.LanguageId });
-        }
-
-        entity.ResetDirtyProperties();
+        return maxSortOrder + 1;
     }
 
-    private int GetNewSortOrder(int? rootContentId, bool isWildcard)
-        => isWildcard
-        ? -1
-        : Database.ExecuteScalar<int>(
-            $"SELECT COALESCE(MAX({QuoteColumnName("sortOrder")}), -1) + 1 FROM {QuoteTableName(Constants.DatabaseSchema.Tables.Domain)} WHERE {QuoteColumnName("domainRootStructureID")} = @rootContentId AND NOT ({QuoteColumnName("domainName")} = '' OR {QuoteColumnName("domainName")} LIKE '*%')",
-            new { rootContentId });
 }

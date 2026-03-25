@@ -1,20 +1,16 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Factories;
 
 internal static class DomainFactory
 {
-    public static IDomain BuildEntity(DomainDto dto)
+    public static IDomain BuildEntity(DomainDto dto, string? isoCode)
     {
-        var domain = new UmbracoDomain(dto.DomainName, dto.IsoCode)
+        var domain = new UmbracoDomain(dto.DomainName, isoCode ?? string.Empty)
         {
             Id = dto.Id,
+            Key = dto.Key,
             LanguageId = dto.DefaultLanguage,
             RootContentId = dto.RootStructureId,
             SortOrder = dto.SortOrder,
@@ -26,17 +22,14 @@ internal static class DomainFactory
         return domain;
     }
 
-    public static DomainDto BuildDto(IDomain entity)
-    {
-        var dto = new DomainDto
+    public static DomainDto BuildDto(IDomain entity) =>
+        new()
         {
             Id = entity.Id,
+            Key = entity.Key,
             DefaultLanguage = entity.LanguageId,
             RootStructureId = entity.RootContentId,
             DomainName = entity.DomainName,
             SortOrder = entity.SortOrder,
         };
-
-        return dto;
-    }
 }
