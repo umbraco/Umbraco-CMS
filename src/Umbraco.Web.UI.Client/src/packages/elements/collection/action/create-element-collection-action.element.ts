@@ -146,7 +146,7 @@ export class UmbCreateElementCollectionActionElement extends UmbLitElement {
 						${map(
 							this._allowedElementTypes,
 							(item) => html`
-								<uui-menu-item label=${item.name} href=${this.#getCreateUrl(item)}>
+								<uui-menu-item label="${item.name}..." href=${this.#getCreateUrl(item)}>
 									<umb-icon slot="icon" name=${item.icon ?? 'icon-document'}></umb-icon>
 								</uui-menu-item>
 							`,
@@ -165,7 +165,9 @@ export class UmbCreateElementCollectionActionElement extends UmbLitElement {
 		const label = manifest.meta.label ? this.localize.string(manifest.meta.label) : manifest.name;
 
 		return html`
-			<uui-menu-item label=${label} @click=${() => this.#onExecuteCreateOption(controller)}>
+			<uui-menu-item
+				label=${manifest.meta.additionalOptions ? label + '...' : label}
+				@click=${() => this.#onExecuteCreateOption(controller)}>
 				<umb-icon slot="icon" name=${manifest.meta.icon ?? 'icon-folder'}></umb-icon>
 			</uui-menu-item>
 		`;

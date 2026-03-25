@@ -1,5 +1,4 @@
 import type { UmbElementEntityTypeUnion } from '../../entity.js';
-import { UMB_ELEMENT_FOLDER_REPOSITORY_ALIAS } from '../../folder/repository/constants.js';
 import { UMB_CREATE_ELEMENT_WORKSPACE_PATH_PATTERN } from '../../paths.js';
 import {
 	UmbElementTypeStructureRepository,
@@ -10,11 +9,12 @@ import type {
 	UmbElementCreateOptionsModalValue,
 } from './element-create-options-modal.token.js';
 import { html, nothing, customElement, state, repeat, css, when } from '@umbraco-cms/backoffice/external/lit';
-import { UmbModalBaseElement, umbOpenModal } from '@umbraco-cms/backoffice/modal';
-import { UMB_FOLDER_CREATE_MODAL } from '@umbraco-cms/backoffice/tree';
-import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
-import { UmbRequestReloadChildrenOfEntityEvent } from '@umbraco-cms/backoffice/entity-action';
+import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
+import { UmbExtensionsApiInitializer } from '@umbraco-cms/backoffice/extension-api';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import type { ManifestEntityCreateOptionAction } from '@umbraco-cms/backoffice/entity-create-option-action';
+import type { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 
 @customElement('umb-element-create-options-modal')
 export class UmbElementCreateOptionsModalElement extends UmbModalBaseElement<
@@ -27,10 +27,14 @@ export class UmbElementCreateOptionsModalElement extends UmbModalBaseElement<
 	private _allowedElementTypes: UmbAllowedElementTypeModel[] = [];
 
 	@state()
+	private _createOptionControllers: Array<UmbExtensionApiInitializer<ManifestEntityCreateOptionAction>> = [];
+
+	@state()
 	private _headline: string = this.localize.term('general_create');
 
 	override async firstUpdated() {
 		this.#retrieveAllowedElementTypes();
+		this.#initCreateOptionActions();
 	}
 
 	async #retrieveAllowedElementTypes() {
@@ -39,6 +43,27 @@ export class UmbElementCreateOptionsModalElement extends UmbModalBaseElement<
 		if (data) {
 			this._allowedElementTypes = data.items;
 		}
+	}
+
+	#initCreateOptionActions() {
+		const parent = this.data?.parent;
+		if (!parent) return;
+
+		new UmbExtensionsApiInitializer(
+			this,
+			umbExtensionsRegistry,
+			'entityCreateOptionAction',
+			(manifest: ManifestEntityCreateOptionAction) => {
+				return [{ entityType: parent.entityType, unique: parent.unique, meta: manifest.meta }];
+			},
+			(manifest: ManifestEntityCreateOptionAction) => manifest.forEntityTypes.includes(parent.entityType),
+			async (controllers) => {
+				this._createOptionControllers = controllers as unknown as Array<
+					UmbExtensionApiInitializer<ManifestEntityCreateOptionAction>
+				>;
+			},
+			'umbElementCreateOptionActions',
+		);
 	}
 
 	#onNavigate(elementType: UmbAllowedElementTypeModel) {
@@ -59,28 +84,8 @@ export class UmbElementCreateOptionsModalElement extends UmbModalBaseElement<
 		this._submitModal();
 	}
 
-	async #onCreateFolder() {
-		const parent = this.data?.parent;
-		if (!parent) return;
-
-		await umbOpenModal(this, UMB_FOLDER_CREATE_MODAL, {
-			data: {
-				folderRepositoryAlias: UMB_ELEMENT_FOLDER_REPOSITORY_ALIAS,
-				parent: {
-					unique: parent.unique,
-					entityType: parent.entityType,
-				},
-			},
-		});
-
-		const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-		if (!eventContext) return;
-		const event = new UmbRequestReloadChildrenOfEntityEvent({
-			entityType: parent.entityType,
-			unique: parent.unique,
-		});
-		eventContext.dispatchEvent(event);
-
+	async #onExecuteCreateOption(controller: UmbExtensionApiInitializer<ManifestEntityCreateOptionAction>) {
+		await controller.api?.execute();
 		this._submitModal();
 	}
 
@@ -88,11 +93,10 @@ export class UmbElementCreateOptionsModalElement extends UmbModalBaseElement<
 		return html`
 			<uui-dialog-layout headline=${this._headline ?? ''}>
 				${when(
-					this._allowedElementTypes.length === 0,
+					this._allowedElementTypes.length === 0 && this._createOptionControllers.length === 0,
 					() => this.#renderNoAllowedTypes(),
-					() => this.#renderAllowedElementTypes(),
+					() => html`${this.#renderAllowedElementTypes()}${this.#renderCreateOptionActions()}`,
 				)}
-				${this.#renderFolderOption()}
 				<uui-button
 					slot="actions"
 					id="cancel"
@@ -129,16 +133,27 @@ export class UmbElementCreateOptionsModalElement extends UmbModalBaseElement<
 		);
 	}
 
-	#renderFolderOption() {
-		return html`
-			<uui-ref-node-document-type
-				.name=${this.localize.term('create_folder') + '...'}
-				select-only
-				selectable
-				@selected=${() => this.#onCreateFolder()}>
-				<umb-icon slot="icon" name="icon-folder"></umb-icon>
-			</uui-ref-node-document-type>
-		`;
+	#renderCreateOptionActions() {
+		return repeat(
+			this._createOptionControllers,
+			(controller) => controller.manifest?.alias,
+			(controller) => {
+				const manifest = controller.manifest;
+				if (!manifest) return nothing;
+
+				const label = manifest.meta.label ? this.localize.string(manifest.meta.label) : manifest.name;
+
+				return html`
+					<uui-ref-node-document-type
+						.name=${manifest.meta.additionalOptions ? label + '...' : label}
+						select-only
+						selectable
+						@selected=${() => this.#onExecuteCreateOption(controller)}>
+						<umb-icon slot="icon" name=${manifest.meta.icon}></umb-icon>
+					</uui-ref-node-document-type>
+				`;
+			},
+		);
 	}
 
 	static override styles = [UmbTextStyles, css``];
