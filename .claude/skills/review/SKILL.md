@@ -146,7 +146,7 @@ Present the review in this exact format:
 
 **Target:** `{target_branch}` · **Commit:** `{head_sha}`
 
-[1–2 sentences: what this PR accomplishes , keep it as short as possible, only highlight the primary essence.]
+[1–2 sentences: what this PR accomplishes, keep it as short as possible, only highlight the primary essence.]
 
 - **Modified public API:** {changed existing interfaces/types/classes/methods}
   [Omit bullet if none]
@@ -185,13 +185,23 @@ Present the review in this exact format:
 
 ---
 
-### Verdict
-
 [One of:]
 
-- **Approve** — Ship it.
-- **Approve with nits** — Good to go, consider the suggestions.
-- **Request Changes** — Critical or important issues must be addressed first.
+## Approved
+
+This looks good to be merged as-is, but please do a manual sanity check and testing before merging.
+
+## Approved with Suggestions for improvement
+
+Good to go, but please carefully consider the importance of the suggestions.
+
+## Request Changes
+
+Critical or important issues must be addressed first.
+
+## Needs re-work
+
+This is in such a bad state that the feedback of this review is not sufficient to guide improvements, the PR cannot be approved.
 ```
 
 **Guidelines for the review output:**
