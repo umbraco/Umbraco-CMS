@@ -197,7 +197,7 @@ Good to go, but please carefully consider the importance of the suggestions.
 
 ## Request Changes
 
-Critical or important issues must be addressed first.
+Critical and important issues must be addressed first.
 
 ## Needs re-work
 
