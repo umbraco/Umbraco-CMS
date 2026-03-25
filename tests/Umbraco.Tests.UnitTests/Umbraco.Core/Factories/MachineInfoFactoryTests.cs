@@ -65,6 +65,16 @@ public class MachineInfoFactoryTests
         Assert.AreNotEqual(id1, id2);
     }
 
+    [Test]
+    public void GetMachineIdentifier_WithSiteNameThatExceedsMaxLength_ThrowsInvalidOperationException()
+    {
+        var siteName = new string('x', MachineInfoFactory.MaxMachineIdentifierLength);
+
+        var factory = CreateFactory(siteName);
+
+        Assert.Throws<InvalidOperationException>(() => factory.GetMachineIdentifier());
+    }
+
     private static MachineInfoFactory CreateFactory(string? siteName)
     {
         var hostingEnvironment = Mock.Of<IHostingEnvironment>();

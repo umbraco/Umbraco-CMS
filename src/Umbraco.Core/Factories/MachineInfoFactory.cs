@@ -10,6 +10,9 @@ namespace Umbraco.Cms.Core.Factories;
 /// </summary>
 internal sealed class MachineInfoFactory : IMachineInfoFactory
 {
+    // machineId is stored as NVARCHAR(255) in umbracoLastSynced
+    internal const int MaxMachineIdentifierLength = 255;
+
     private readonly IHostingEnvironment _hostingEnvironment;
     private readonly IOptions<HostingSettings> _hostingSettings;
 
@@ -28,9 +31,22 @@ internal sealed class MachineInfoFactory : IMachineInfoFactory
     public string GetMachineIdentifier()
     {
         string? siteName = _hostingSettings.Value.SiteName;
-        return string.IsNullOrWhiteSpace(siteName)
-            ? Environment.MachineName
-            : $"{Environment.MachineName}/{siteName}";
+
+        if (string.IsNullOrWhiteSpace(siteName))
+        {
+            return Environment.MachineName;
+        }
+
+        var identifier = $"{Environment.MachineName}/{siteName}";
+
+        if (identifier.Length > MaxMachineIdentifierLength)
+        {
+            throw new InvalidOperationException(
+                $"The combined machine identifier '{identifier}' ({identifier.Length} characters) exceeds the maximum allowed length of {MaxMachineIdentifierLength} characters. " +
+                $"Please shorten the value of '{Constants.Configuration.ConfigHostingPrefix}SiteName'.");
+        }
+
+        return identifier;
     }
 
     private string? _localIdentity;
