@@ -8,14 +8,6 @@ namespace Umbraco.Cms.Core.Media;
 public interface ISvgDimensionExtractor
 {
     /// <summary>
-    /// Gets the supported image file types/extensions.
-    /// </summary>
-    /// <value>
-    /// The supported image file types/extensions.
-    /// </value>
-    IEnumerable<string> SupportedImageFileTypes { get; }
-
-    /// <summary>
     /// Gets the dimensions.
     /// </summary>
     /// <param name="stream">The stream.</param>

@@ -66,12 +66,6 @@ internal sealed class SvgFileUploadMediaSavingNotificationHandler : INotificatio
 
             string filepath = _mediaFileManager.FileSystem.GetRelativePath(svalue);
 
-            var extension = (Path.GetExtension(filepath) ?? string.Empty).TrimStart(Core.Constants.CharArrays.Period);
-            if (!_svgDimensionExtractor.SupportedImageFileTypes.Contains(extension))
-            {
-                continue;
-            }
-
             if (!_mediaFileManager.FileSystem.FileExists(filepath))
             {
                 continue;

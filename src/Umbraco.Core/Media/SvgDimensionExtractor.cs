@@ -1,6 +1,5 @@
 using System.Drawing;
 using System.Globalization;
-using System.Linq.Expressions;
 using System.Xml.Linq;
 
 namespace Umbraco.Cms.Core.Media;
@@ -8,9 +7,6 @@ namespace Umbraco.Cms.Core.Media;
 /// <inheritdoc />
 public class SvgDimensionExtractor : ISvgDimensionExtractor
 {
-    /// <inheritdoc />
-    public IEnumerable<string> SupportedImageFileTypes { get; } = ["svg"];
-
     /// <inheritdoc />
     public Size? GetDimensions(Stream stream)
     {
@@ -61,7 +57,7 @@ public class SvgDimensionExtractor : ISvgDimensionExtractor
 
         Size? size = null;
 
-        if(widthAttributeValue is not null && heightAttributeValue is not null)
+        if (widthAttributeValue is not null && heightAttributeValue is not null)
         {
             size = ParseWidthHeightAttributes(widthAttributeValue, heightAttributeValue);
         }
@@ -125,7 +121,6 @@ public class SvgDimensionExtractor : ISvgDimensionExtractor
 
     /// <summary>
     /// Extract a "pixel" value from the width / height attributes.
-    /// This method makes some assumptions for valid but uncommon units like %,em and cm.
     /// </summary>
     /// <param name="attributeValue"></param>
     /// <param name="value"></param>
@@ -154,6 +149,5 @@ public class SvgDimensionExtractor : ISvgDimensionExtractor
         }
 
         return false;
-
     }
 }
