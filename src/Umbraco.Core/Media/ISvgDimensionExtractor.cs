@@ -3,7 +3,7 @@ using System.Drawing;
 namespace Umbraco.Cms.Core.Media;
 
 /// <summary>
-/// Allows SVG the image dimensions from a stream.
+/// Extracts image dimensions from an SVG stream.
 /// </summary>
 public interface ISvgDimensionExtractor
 {
