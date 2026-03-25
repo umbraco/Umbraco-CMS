@@ -78,7 +78,6 @@ public class SvgDimensionExtractor : ISvgDimensionExtractor
         }
 
         return size;
-
     }
 
     private static Size? ParseViewBox(XElement root)
