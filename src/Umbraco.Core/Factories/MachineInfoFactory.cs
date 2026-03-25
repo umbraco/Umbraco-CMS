@@ -1,4 +1,6 @@
 using System.Diagnostics;
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 
 namespace Umbraco.Cms.Core.Factories;
@@ -9,18 +11,27 @@ namespace Umbraco.Cms.Core.Factories;
 internal sealed class MachineInfoFactory : IMachineInfoFactory
 {
     private readonly IHostingEnvironment _hostingEnvironment;
+    private readonly IOptions<HostingSettings> _hostingSettings;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="MachineInfoFactory"/> class.
     /// </summary>
     /// <param name="hostingEnvironment">The hosting environment.</param>
-    public MachineInfoFactory(IHostingEnvironment hostingEnvironment)
+    /// <param name="hostingSettings">The hosting settings.</param>
+    public MachineInfoFactory(IHostingEnvironment hostingEnvironment, IOptions<HostingSettings> hostingSettings)
     {
         _hostingEnvironment = hostingEnvironment;
+        _hostingSettings = hostingSettings;
     }
 
     /// <inheritdoc />
-    public string GetMachineIdentifier() => Environment.MachineName;
+    public string GetMachineIdentifier()
+    {
+        string? siteName = _hostingSettings.Value.SiteName;
+        return string.IsNullOrWhiteSpace(siteName)
+            ? Environment.MachineName
+            : $"{Environment.MachineName}/{siteName}";
+    }
 
     private string? _localIdentity;
 
