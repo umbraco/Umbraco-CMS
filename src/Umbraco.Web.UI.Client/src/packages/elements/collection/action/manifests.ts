@@ -5,9 +5,14 @@ import { UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS } from '@umbraco-cms/backoffi
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'collectionAction',
-		kind: 'create',
-		name: 'Element Collection Create Action',
+		kind: 'button',
+		name: 'Create Element Collection Action',
 		alias: 'Umb.CollectionAction.Element.Create',
+		element: () => import('./create-element-collection-action.element.js'),
+		weight: 100,
+		meta: {
+			label: '#general_create',
+		},
 		conditions: [
 			{
 				alias: UMB_COLLECTION_ALIAS_CONDITION,
