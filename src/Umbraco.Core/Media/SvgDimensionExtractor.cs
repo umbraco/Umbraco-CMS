@@ -14,7 +14,8 @@ public class SvgDimensionExtractor : ISvgDimensionExtractor
     /// <inheritdoc />
     public Size? GetDimensions(Stream stream)
     {
-        if (stream.CanRead is false)
+
+        if (!stream.CanRead)
         {
             return null;
         }
@@ -42,18 +43,12 @@ public class SvgDimensionExtractor : ISvgDimensionExtractor
                 stream.Position = originalPosition.Value;
             }
         }
+
     }
 
     private Size? ReadDimensions(Stream stream)
     {
         var document = XDocument.Load(stream);
-        var settings = new XmlReaderSettings
-        {
-            DtdProcessing = DtdProcessing.Prohibit,
-            XmlResolver = null,
-        };
-        using var reader = XmlReader.Create(stream, settings);
-        var document = XDocument.Load(reader);        
         XElement? root = document.Root;
 
         if (root is null)
@@ -66,7 +61,7 @@ public class SvgDimensionExtractor : ISvgDimensionExtractor
 
         Size? size = null;
 
-        if (widthAttributeValue is not null && heightAttributeValue is not null)
+        if(widthAttributeValue is not null && heightAttributeValue is not null)
         {
             size = ParseWidthHeightAttributes(widthAttributeValue, heightAttributeValue);
         }
@@ -78,6 +73,7 @@ public class SvgDimensionExtractor : ISvgDimensionExtractor
         }
 
         return size;
+
     }
 
     private static Size? ParseViewBox(XElement root)
@@ -149,22 +145,6 @@ public class SvgDimensionExtractor : ISvgDimensionExtractor
 
         if (input.EndsWith("px", StringComparison.OrdinalIgnoreCase))
         {
-            multiplier = 1;
-            input = input[..^2].Trim();
-        }
-        else if (input.EndsWith("%", StringComparison.Ordinal))
-        {
-            multiplier = 4; // 100% = 400px
-            input = input[..^1].Trim();
-        }
-        else if (input.EndsWith("em", StringComparison.OrdinalIgnoreCase))
-        {
-            multiplier = 10; // 1em = 10px
-            input = input[..^2].Trim();
-        }
-        else if (input.EndsWith("cm", StringComparison.OrdinalIgnoreCase))
-        {
-            multiplier = 10; // 1cm = 10px
             input = input[..^2].Trim();
         }
 

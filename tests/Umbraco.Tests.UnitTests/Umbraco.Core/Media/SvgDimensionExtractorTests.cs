@@ -9,7 +9,7 @@ public class SvgDimensionExtractorTests
 {
 
     [Test]
-    public void Can_Parse_From_Width_Height_No_Unit()
+    public void Can_Parse_Attribute_Width_Height_No_Unit()
     {
         var svg = """
                   <svg xmlns="http://www.w3.org/2000/svg" width="100" height="50" viewBox="0 0 301 152">
@@ -26,7 +26,7 @@ public class SvgDimensionExtractorTests
     }
 
     [Test]
-    public void Can_Parse_From_Width_Height_Pixels()
+    public void Can_Parse_Attribute_Width_Height_Pixels()
     {
         var svg = """
                   <svg xmlns="http://www.w3.org/2000/svg" width="100px" height="50px" viewBox="0 0 301 152">
@@ -43,7 +43,7 @@ public class SvgDimensionExtractorTests
     }
 
     [Test]
-    public void Can_Parse_From_Width_Height_Percent()
+    public void Can_Parse_And_Fallback_Attribute_Width_Height_Percent()
     {
         var svg = """
                   <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="50%" viewBox="0 0 301 152">
@@ -56,11 +56,11 @@ public class SvgDimensionExtractorTests
 
         Size? result = sut.GetDimensions(stream);
 
-        Assert.That(result, Is.EqualTo(new Size(400, 200)));
+        Assert.That(result, Is.EqualTo(new Size(301, 152)));
     }
 
     [Test]
-    public void Can_Parse_From_Width_Height_Em()
+    public void Can_Parse_And_Fallback_Width_Height_Em()
     {
         var svg = """
                   <svg xmlns="http://www.w3.org/2000/svg" width="10em" height="5em" viewBox="0 0 301 152">
@@ -73,7 +73,7 @@ public class SvgDimensionExtractorTests
 
         Size? result = sut.GetDimensions(stream);
 
-        Assert.That(result, Is.EqualTo(new Size(100, 50)));
+        Assert.That(result, Is.EqualTo(new Size(301, 152)));
     }
 
     [Test]
