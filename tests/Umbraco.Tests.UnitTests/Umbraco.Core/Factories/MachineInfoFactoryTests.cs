@@ -54,7 +54,7 @@ public class MachineInfoFactoryTests
     }
 
     [Test]
-    public void GetMachineIdentifier_TwoInstancesWithDifferentSiteNames_ReturnDistinctIdentifiers()
+    public void GetMachineIdentifier_TwoInstancesWithDifferentSiteNames_ReturnsDistinctIdentifiers()
     {
         var factory1 = CreateFactory(siteName: "site1");
         var factory2 = CreateFactory(siteName: "site2");
