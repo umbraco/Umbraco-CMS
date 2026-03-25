@@ -47,23 +47,6 @@ export class UmbDocumentPreviewRepository extends UmbRepositoryBase {
 	}
 
 	/**
-	 * Enters preview mode.
-	 * @returns {Promise<void>}
-	 * @memberof UmbDocumentPreviewRepository
-	 * @deprecated Replaced with the Document Preview URLs feature. This will be removed in v19. [LK]
-	 */
-	async enter(): Promise<void> {
-		new UmbDeprecation({
-			removeInVersion: '19.0.0',
-			deprecated: '`UmbDocumentPreviewRepository.enter()`',
-			solution: 'Use `UmbDocumentPreviewRepository.getPreviewUrl()` instead',
-		}).warn();
-
-		await tryExecute(this, PreviewService.postPreview(), { disableNotifications: true });
-		return;
-	}
-
-	/**
 	 * Exits preview mode.
 	 * @returns {Promise<void>}
 	 * @memberof UmbDocumentPreviewRepository

@@ -312,7 +312,7 @@ export class DataTypeUiHelper extends UiBaseLocators {
     this.tiptapExtensionsConfiguration = this.page.locator('umb-property-editor-ui-tiptap-extensions-configuration');
     this.propertyEditor = this.page.locator('umb-ref-property-editor-ui');
     this.selectIconBtn = page.getByLabel('Select icon');
-    this.dataTypeBtn = this.createOptionActionListModal.locator('[name="Data Type"]');
+    this.dataTypeBtn = this.createOptionActionListModal.locator('[name="Data Type..."]');
     this.dataTypesMenu = page.locator('#menu-item').getByRole('link', {name: 'Data Types'});
     this.tiptapStatusbarConfiguration = this.page.locator('umb-property-editor-ui-tiptap-statusbar-configuration');
 
@@ -437,7 +437,7 @@ export class DataTypeUiHelper extends UiBaseLocators {
   async duplicateDataTypeToFolder(folderName: string) {
     await this.clickDuplicateToActionMenuOption();
     await this.click(this.sidebarModal.getByText(folderName, {exact: true}));
-    await this.click(this.duplicateBtn);
+    await this.clickCopyModalButton();
   }
 
   async addMediaStartNode(mediaName: string) {

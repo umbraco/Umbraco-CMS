@@ -82,6 +82,7 @@ public class CoreConfigurationHttpTests : UmbracoIntegrationTestBase
 
         return new UmbracoWebApplicationFactory<CoreConfigurationHttpTests>(
             () => CreateHostBuilder(configureUmbraco, configureApp))
+
         {
             ContentRoot = GetTestContentRoot(),
         };

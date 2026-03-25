@@ -1,8 +1,10 @@
 using System.Globalization;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
@@ -11,6 +13,7 @@ using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Factories;
 using Umbraco.Cms.Infrastructure.Scoping;
@@ -29,6 +32,7 @@ internal class DocumentRepository : PublishableContentRepositoryBase<IContent, D
     private readonly IRepositoryCacheVersionService _repositoryCacheVersionService;
     private readonly ICacheSyncService _cacheSyncService;
     private readonly ITemplateRepository _templateRepository;
+    private readonly IShortStringHelper _shortStringHelper;
     private PermissionRepository<IContent>? _permissionRepository;
 
     /// <summary>
@@ -52,6 +56,7 @@ internal class DocumentRepository : PublishableContentRepositoryBase<IContent, D
     /// <param name="eventAggregator">Publishes and subscribes to domain events.</param>
     /// <param name="repositoryCacheVersionService">Service for managing repository cache versions.</param>
     /// <param name="cacheSyncService">Service for synchronizing cache across distributed environments.</param>
+    /// <param name="shortStringHelper">The short string helper.</param>
     public DocumentRepository(
         IScopeAccessor scopeAccessor,
         AppCaches appCaches,
@@ -69,7 +74,8 @@ internal class DocumentRepository : PublishableContentRepositoryBase<IContent, D
         IJsonSerializer serializer,
         IEventAggregator eventAggregator,
         IRepositoryCacheVersionService repositoryCacheVersionService,
-        ICacheSyncService cacheSyncService)
+        ICacheSyncService cacheSyncService,
+        IShortStringHelper shortStringHelper)
         : base(
             scopeAccessor,
             appCaches,
@@ -94,6 +100,48 @@ internal class DocumentRepository : PublishableContentRepositoryBase<IContent, D
         _appCaches = appCaches;
         _loggerFactory = loggerFactory;
         _scopeAccessor = scopeAccessor;
+        _shortStringHelper = shortStringHelper;
+    }
+
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
+    public DocumentRepository(
+            IScopeAccessor scopeAccessor,
+            AppCaches appCaches,
+            ILogger<DocumentRepository> logger,
+            ILoggerFactory loggerFactory,
+            IContentTypeRepository contentTypeRepository,
+            ITemplateRepository templateRepository,
+            ITagRepository tagRepository,
+            ILanguageRepository languageRepository,
+            IRelationRepository relationRepository,
+            IRelationTypeRepository relationTypeRepository,
+            PropertyEditorCollection propertyEditors,
+            DataValueReferenceFactoryCollection dataValueReferenceFactories,
+            IDataTypeService dataTypeService,
+            IJsonSerializer serializer,
+            IEventAggregator eventAggregator,
+            IRepositoryCacheVersionService repositoryCacheVersionService,
+            ICacheSyncService cacheSyncService)
+            : this(
+                scopeAccessor,
+                appCaches,
+                logger,
+                loggerFactory,
+                contentTypeRepository,
+                templateRepository,
+                tagRepository,
+                languageRepository,
+                relationRepository,
+                relationTypeRepository,
+                propertyEditors,
+                dataValueReferenceFactories,
+                dataTypeService,
+                serializer,
+                eventAggregator,
+                repositoryCacheVersionService,
+                cacheSyncService,
+                StaticServiceProvider.Instance.GetRequiredService<IShortStringHelper>())
+    {
     }
 
     protected override DocumentRepository This => this;
@@ -298,6 +346,85 @@ internal class DocumentRepository : PublishableContentRepositoryBase<IContent, D
     /// Gets the identifier for the cache key for the content Recycle Bin.
     /// </summary>
     protected override string RecycleBinCacheKey => CacheKeys.ContentRecycleBinCacheKey;
+
+    #endregion
+
+    #region Utilities
+
+    protected override string? EnsureUniqueNodeName(int parentId, string? nodeName, int id = 0)
+    {
+        if (EnsureUniqueNaming == false)
+        {
+            return nodeName;
+        }
+
+        // Call the base implementation to handle literal name duplicates (e.g. "Title" vs "Title" → "Title (1)").
+        var uniqueName = EnsureUniqueNodeName(parentId, nodeName, id, out List<SimilarNodeName>? siblings);
+
+        // Ensure the resulting URL segment is also unique among siblings (resolves https://github.com/umbraco/Umbraco-CMS/issues/22070).
+        return EnsureUniqueUrlSegment(uniqueName, id, siblings, _shortStringHelper);
+    }
+
+    private protected override string? EnsureUniqueVariantName(
+        string? nodeName, int nodeId, List<SimilarNodeName> siblings, string culture)
+        => EnsureUniqueUrlSegment(nodeName, nodeId, siblings, _shortStringHelper, culture);
+
+    /// <summary>
+    /// Ensures the proposed name produces a URL segment that is unique among sibling URL segments.
+    /// If a collision is detected (e.g. "Title" and "Title." both produce segment "title"),
+    /// a numeric suffix is appended to the name until uniqueness is achieved.
+    /// </summary>
+    internal static string? EnsureUniqueUrlSegment(
+        string? nodeName,
+        int nodeId,
+        IEnumerable<SimilarNodeName> siblings,
+        IShortStringHelper shortStringHelper,
+        string? culture = null)
+    {
+        if (string.IsNullOrWhiteSpace(nodeName))
+        {
+            return nodeName;
+        }
+
+        var proposedSegment = shortStringHelper.CleanStringForUrlSegment(nodeName, culture);
+        if (string.IsNullOrEmpty(proposedSegment))
+        {
+            return nodeName;
+        }
+
+        // Build a set of URL segments from siblings, excluding the current node.
+        var siblingSegments = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (SimilarNodeName sibling in siblings)
+        {
+            if (sibling.Id == nodeId || string.IsNullOrWhiteSpace(sibling.Name))
+            {
+                continue;
+            }
+
+            var segment = shortStringHelper.CleanStringForUrlSegment(sibling.Name, culture);
+            if (string.IsNullOrEmpty(segment) is false)
+            {
+                siblingSegments.Add(segment);
+            }
+        }
+
+        // If the proposed segment doesn't collide, return the name as-is.
+        if (siblingSegments.Contains(proposedSegment) is false)
+        {
+            return nodeName;
+        }
+
+        // Increment a (N) suffix on the name until the resulting URL segment is unique.
+        for (var i = 1; ; i++)
+        {
+            var candidateName = $"{nodeName} ({i})";
+            var candidateSegment = shortStringHelper.CleanStringForUrlSegment(candidateName, culture);
+            if (string.IsNullOrEmpty(candidateSegment) || siblingSegments.Contains(candidateSegment) is false)
+            {
+                return candidateName;
+            }
+        }
+    }
 
     #endregion
 }
