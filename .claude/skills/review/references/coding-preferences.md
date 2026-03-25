@@ -1,29 +1,6 @@
 # Coding Preferences & Review Criteria
 
-These are the coding preferences and code review standards used by the review-pr skill. They define what the review evaluates against.
-
----
-
-## Communication Style
-
-- **Think thoroughly** before responding — consider implications, edge cases, and alternatives
-- **Ask clarifying questions** before providing detailed answers (in interactive contexts; not applicable during automated review)
-- Understand the context and requirements before diving into implementation details
-
-### Uncertainty
-
-- Communicate uncertainty with a **confidence score (1-100)**
-- If confidence is **below 85**, flag the uncertainty explicitly
-- Be explicit about assumptions and unknowns
-
----
-
-## Code Changes
-
-- Show only the **changed/relevant sections**, not entire files
-- Prefer **diff format** when showing modifications
-- Always explain **why** the change is made
-- Mention **alternatives** when relevant, with brief pros/cons
+These are the coding preferences and code review standards used by the review skill. They define what the review evaluates against.
 
 ---
 
@@ -42,13 +19,18 @@ These are the coding preferences and code review standards used by the review-pr
 
 ### Test Method Naming
 
-Use the pattern: `MethodName_Scenario_ExpectedResult`
+**C# tests**: Use the `Can_`/`Cannot_` pattern with PascalCase underscore-separated words:
 
-Examples:
-- `CreateOrder_WithValidInput_ReturnsCreatedOrder`
-- `CreateOrder_WithDuplicateId_ReturnsConflict`
-- `GetOrders_WithPagination_ReturnsPagedResult`
-- `DeleteOrder_WhenNotFound_ReturnsNotFound`
+- `Can_Schedule_Publish_Invariant`
+- `Cannot_Delete_Non_Existing`
+- `Can_Schedule_Publish_Single_Culture`
+
+Large test classes are split into partial files by method: `ContentServiceTests.Delete.cs`, `ContentServiceTests.Publish.cs`.
+
+**TypeScript tests**: Use BDD-style `it()` with natural language descriptions:
+
+- `it('should not allow the returned value to be lower than min')`
+- `it('converts string to camelCase')`
 
 ### Unit Tests
 
@@ -96,7 +78,7 @@ When making decisions, prioritize:
 ## Dependencies
 
 - Use what's available in the codebase, unless there is no good choice
-- **Always ask for approval** before adding new dependencies
+- **Flag new dependencies** for review — new packages should be justified
 - Prefer well-maintained, widely-used packages
 
 ---
