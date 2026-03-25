@@ -585,6 +585,7 @@ public interface ISqlSyntaxProvider
     /// <param name="tableName">The base name for the temporary table (without any provider-specific prefix).</param>
     /// <param name="columnDefinitionSql">The SQL column definitions (e.g., "Id INT NOT NULL PRIMARY KEY").</param>
     /// <returns>A SQL statement that creates the temporary table.</returns>
+    // TODO (V19): Remove default implementation.
     string CreateTempTable(string tableName, string columnDefinitionSql)
         => $"CREATE TEMP TABLE {tableName} ({columnDefinitionSql})";
 
@@ -593,6 +594,7 @@ public interface ISqlSyntaxProvider
     /// </summary>
     /// <param name="baseName">The base name for the temporary table.</param>
     /// <returns>The qualified temporary table name.</returns>
+    // TODO (V19): Remove default implementation.
     string TempTableName(string baseName) => baseName;
 
     /// <summary>
@@ -600,6 +602,7 @@ public interface ISqlSyntaxProvider
     /// </summary>
     /// <param name="tableName">The base name for the temporary table (without any provider-specific prefix).</param>
     /// <returns>A SQL statement that drops the temporary table if it exists.</returns>
+    // TODO (V19): Remove default implementation.
     string DropTempTable(string tableName)
         => $"DROP TABLE IF EXISTS {tableName}";
 }
