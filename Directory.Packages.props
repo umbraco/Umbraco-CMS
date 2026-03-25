@@ -8,34 +8,36 @@
   <ItemGroup>
     <GlobalPackageReference Include="Nerdbank.GitVersioning" Version="3.9.50" />
     <GlobalPackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.556" />
-    <GlobalPackageReference Include="Umbraco.Code" Version="2.4.0" />
+    <!-- TODO (V18): Bump Umbraco.Code to 3.0.0 stable before release of 18.0.0 -->
+    <GlobalPackageReference Include="Umbraco.Code" Version="3.0.0-beta" />
     <GlobalPackageReference Include="Umbraco.GitVersioning.Extensions" Version="0.2.0" />
   </ItemGroup>
   <!-- Microsoft packages -->
   <ItemGroup>
-    <PackageVersion Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="10.0.2" />
-    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="4.14.0" />
-    <PackageVersion Include="Microsoft.Data.Sqlite" Version="10.0.2" />
+    <PackageVersion Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="10.0.3" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="5.0.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="5.0.0" />
+    <PackageVersion Include="Microsoft.Data.Sqlite" Version="10.0.3" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="10.0.2" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.2" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.2" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.2" />
-    <PackageVersion Include="Microsoft.Extensions.Caching.Abstractions" Version="10.0.2" />
-    <PackageVersion Include="Microsoft.Extensions.Caching.Memory" Version="10.0.2" />
-    <PackageVersion Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.2" />
-    <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="10.0.2" />
-    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.2" />
-    <PackageVersion Include="Microsoft.Extensions.FileProviders.Embedded" Version="10.0.2" />
-    <PackageVersion Include="Microsoft.Extensions.FileProviders.Physical" Version="10.0.2" />
-    <PackageVersion Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.2" />
-    <PackageVersion Include="Microsoft.Extensions.Http" Version="10.0.2" />
-    <PackageVersion Include="Microsoft.Extensions.Identity.Core" Version="10.0.2" />
-    <PackageVersion Include="Microsoft.Extensions.Identity.Stores" Version="10.0.2" />
-    <PackageVersion Include="Microsoft.Extensions.Logging" Version="10.0.2" />
-    <PackageVersion Include="Microsoft.Extensions.Options" Version="10.0.2" />
-    <PackageVersion Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="10.0.2" />
-    <PackageVersion Include="Microsoft.Extensions.Options.DataAnnotations" Version="10.0.2" />
-    <PackageVersion Include="Microsoft.Extensions.Caching.Hybrid" Version="10.2.0" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.3" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.3" />
+    <PackageVersion Include="Microsoft.Extensions.Caching.Abstractions" Version="10.0.3" />
+    <PackageVersion Include="Microsoft.Extensions.Caching.Memory" Version="10.0.3" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.3" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="10.0.3" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.3" />
+    <PackageVersion Include="Microsoft.Extensions.FileProviders.Embedded" Version="10.0.3" />
+    <PackageVersion Include="Microsoft.Extensions.FileProviders.Physical" Version="10.0.3" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.3" />
+    <PackageVersion Include="Microsoft.Extensions.Http" Version="10.0.3" />
+    <PackageVersion Include="Microsoft.Extensions.Identity.Core" Version="10.0.3" />
+    <PackageVersion Include="Microsoft.Extensions.Identity.Stores" Version="10.0.3" />
+    <PackageVersion Include="Microsoft.Extensions.Logging" Version="10.0.3" />
+    <PackageVersion Include="Microsoft.Extensions.Options" Version="10.0.3" />
+    <PackageVersion Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="10.0.3" />
+    <PackageVersion Include="Microsoft.Extensions.Options.DataAnnotations" Version="10.0.3" />
+    <PackageVersion Include="Microsoft.Extensions.Caching.Hybrid" Version="10.3.0" />
     <PackageVersion Include="System.Linq.Async" Version="7.0.0" />
   </ItemGroup>
   <!-- Umbraco packages -->
@@ -52,34 +54,35 @@
     <PackageVersion Include="HtmlAgilityPack" Version="1.12.4" />
     <PackageVersion Include="JsonPatch.Net" Version="3.3.0" />
     <PackageVersion Include="K4os.Compression.LZ4" Version="1.3.8" />
-    <PackageVersion Include="MailKit" Version="4.14.1" />
-    <PackageVersion Include="Markdig" Version="0.44.0" />
+    <PackageVersion Include="MailKit" Version="4.15.1" />
+    <PackageVersion Include="Markdig" Version="1.1.1" />
     <PackageVersion Include="Markdown" Version="2.2.1" />
     <PackageVersion Include="MessagePack" Version="3.1.4" />
     <PackageVersion Include="MiniProfiler.AspNetCore.Mvc" Version="4.5.4" />
     <PackageVersion Include="MiniProfiler.EntityFrameworkCore" Version="4.5.4" />
     <PackageVersion Include="MiniProfiler.Shared" Version="4.5.4" />
     <PackageVersion Include="ncrontab" Version="3.4.0" />
-    <PackageVersion Include="NPoco" Version="6.1.0" />
-    <PackageVersion Include="NPoco.SqlServer" Version="6.1.0" />
+    <PackageVersion Include="NPoco" Version="6.2.0" />
+    <PackageVersion Include="NPoco.SqlServer" Version="6.2.0" />
     <PackageVersion Include="OpenIddict.Abstractions" Version="7.2.0" />
     <PackageVersion Include="OpenIddict.AspNetCore" Version="7.2.0" />
     <PackageVersion Include="OpenIddict.EntityFrameworkCore" Version="7.2.0" />
-    <PackageVersion Include="Serilog" Version="4.3.0" />
-    <PackageVersion Include="Serilog.AspNetCore" Version="9.0.0" />
+    <PackageVersion Include="Serilog" Version="4.3.1" />
+    <PackageVersion Include="Serilog.AspNetCore" Version="10.0.0" />
     <PackageVersion Include="Serilog.Enrichers.Process" Version="3.0.0" />
     <PackageVersion Include="Serilog.Enrichers.Thread" Version="4.0.0" />
     <PackageVersion Include="Serilog.Expressions" Version="5.0.0" />
-    <PackageVersion Include="Serilog.Extensions.Hosting" Version="9.0.0" />
+    <PackageVersion Include="Serilog.Extensions.Hosting" Version="10.0.0" />
     <PackageVersion Include="Serilog.Formatting.Compact" Version="3.0.0" />
     <PackageVersion Include="Serilog.Formatting.Compact.Reader" Version="4.0.0" />
-    <PackageVersion Include="Serilog.Settings.Configuration" Version="9.0.0" />
+    <PackageVersion Include="Serilog.Settings.Configuration" Version="10.0.0" />
     <PackageVersion Include="Serilog.Sinks.Async" Version="2.1.0" />
     <PackageVersion Include="Serilog.Sinks.File" Version="7.0.0" />
     <PackageVersion Include="Serilog.Sinks.Map" Version="2.0.0" />
     <PackageVersion Include="SixLabors.ImageSharp" Version="3.1.12" />
     <PackageVersion Include="SixLabors.ImageSharp.Web" Version="3.2.0" />
-    <PackageVersion Include="Swashbuckle.AspNetCore" Version="10.1.0" />
+    <!-- When updating this version, also update templates/UmbracoExtension/Umbraco.Extension.csproj -->
+    <PackageVersion Include="Swashbuckle.AspNetCore" Version="10.1.4" />
   </ItemGroup>
   <!-- Transitive pinned versions (only required because our direct dependencies have vulnerable versions of transitive dependencies) -->
   <ItemGroup>

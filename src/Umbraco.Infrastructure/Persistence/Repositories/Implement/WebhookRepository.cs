@@ -10,14 +10,27 @@ using Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence.Factories;
 using Umbraco.Extensions;
 
+/// <summary>
+/// Represents a repository responsible for managing webhook entities within the persistence layer of Umbraco CMS.
+/// </summary>
 public class WebhookRepository : IWebhookRepository
 {
     private readonly IEFCoreScopeAccessor<UmbracoDbContext> _scopeAccessor;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="WebhookRepository"/> class.
+    /// </summary>
+    /// <param name="scopeAccessor">Provides access to the current database scope for repository operations.</param>
     public WebhookRepository(
         IEFCoreScopeAccessor<UmbracoDbContext> scopeAccessor) =>
         _scopeAccessor = scopeAccessor;
 
+    /// <summary>
+    /// Asynchronously retrieves a paged list of webhooks.
+    /// </summary>
+    /// <param name="skip">The number of webhooks to skip before starting to collect the result set.</param>
+    /// <param name="take">The maximum number of webhooks to return.</param>
+    /// <returns>A task representing the asynchronous operation. The task result contains a <see cref="PagedModel{IWebhook}"/> with the requested webhooks and the total count.</returns>
     public async Task<PagedModel<IWebhook>> GetAllAsync(int skip, int take)
     {
         IEfCoreScope<UmbracoDbContext> scope = _scopeAccessor.AmbientScope
@@ -42,6 +55,13 @@ public class WebhookRepository : IWebhookRepository
         };
     }
 
+    /// <summary>
+    /// Asynchronously creates and persists a new webhook entity in the database.
+    /// </summary>
+    /// <param name="webhook">The <see cref="IWebhook"/> instance to create and persist.</param>
+    /// <returns>
+    /// A task representing the asynchronous operation. The task result contains the <see cref="IWebhook"/> instance with its identifier populated after creation.
+    /// </returns>
     public async Task<IWebhook> CreateAsync(IWebhook webhook)
     {
         IEfCoreScope<UmbracoDbContext> scope = _scopeAccessor.AmbientScope
@@ -61,6 +81,11 @@ public class WebhookRepository : IWebhookRepository
         return webhook;
     }
 
+    /// <summary>
+    /// Gets a webhook entity asynchronously by its unique key.
+    /// </summary>
+    /// <param name="key">The unique identifier of the webhook to retrieve.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the webhook entity if found; otherwise, null.</returns>
     public async Task<IWebhook?> GetAsync(Guid key)
     {
         IEfCoreScope<UmbracoDbContext>? scope = _scopeAccessor.AmbientScope;
@@ -82,6 +107,13 @@ public class WebhookRepository : IWebhookRepository
         return webhookDto is null ? null : WebhookFactory.BuildEntity(webhookDto);
     }
 
+    /// <summary>
+    /// Asynchronously retrieves a paged collection of webhooks matching the specified unique identifiers.
+    /// </summary>
+    /// <param name="keys">A collection of unique webhook identifiers to retrieve. If empty or null, an empty result is returned.</param>
+    /// <returns>
+    /// A task representing the asynchronous operation. The task result contains a <see cref="PagedModel{IWebhook}"/> with the matching webhooks and the total count.
+    /// </returns>
     public async Task<PagedModel<IWebhook>> GetByIdsAsync(IEnumerable<Guid> keys)
     {
         IEfCoreScope<UmbracoDbContext> scope = _scopeAccessor.AmbientScope
@@ -104,6 +136,14 @@ public class WebhookRepository : IWebhookRepository
         };
     }
 
+    /// <summary>
+    /// Asynchronously retrieves a collection of webhooks associated with the specified event alias.
+    /// </summary>
+    /// <param name="alias">The event alias to filter webhooks by.</param>
+    /// <returns>
+    /// A task representing the asynchronous operation. The task result contains a <see cref="PagedModel{IWebhook}"/>,
+    /// where <c>Items</c> are the webhooks matching the alias and <c>Total</c> is the total count of such webhooks.
+    /// </returns>
     public async Task<PagedModel<IWebhook>> GetByAliasAsync(string alias)
     {
         IEfCoreScope<UmbracoDbContext> scope = _scopeAccessor.AmbientScope
@@ -126,6 +166,11 @@ public class WebhookRepository : IWebhookRepository
         };
     }
 
+    /// <summary>
+    /// Deletes the specified webhook asynchronously.
+    /// </summary>
+    /// <param name="webhook">The webhook to delete.</param>
+    /// <returns>A task representing the asynchronous delete operation.</returns>
     public async Task DeleteAsync(IWebhook webhook)
     {
         IEfCoreScope<UmbracoDbContext> scope = _scopeAccessor.AmbientScope
@@ -137,6 +182,11 @@ public class WebhookRepository : IWebhookRepository
         });
     }
 
+    /// <summary>
+    /// Asynchronously updates the specified webhook and its related references in the database.
+    /// </summary>
+    /// <param name="webhook">The webhook entity to update.</param>
+    /// <returns>A task that represents the asynchronous update operation.</returns
     public async Task UpdateAsync(IWebhook webhook)
     {
         IEfCoreScope<UmbracoDbContext> scope = _scopeAccessor.AmbientScope

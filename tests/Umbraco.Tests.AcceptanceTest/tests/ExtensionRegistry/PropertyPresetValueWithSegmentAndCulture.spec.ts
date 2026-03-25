@@ -1,4 +1,4 @@
-import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
+import {ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 import {expect} from "@playwright/test";
 
 // Content
@@ -64,7 +64,7 @@ test('can insert preset value into textstring property that vary by culture and 
   await umbracoUi.content.clickSaveModalButtonAndWaitForContentToBeCreated();
   await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   await umbracoUi.content.clickSelectVariantButton();
-  await umbracoUi.content.clickExpendSegmentButton(contentName);
+  await umbracoUi.content.clickExpandSegmentButton(contentName);
   await umbracoUi.content.clickVariantAddModeButtonForLanguageName(vipMemberSegment);
 
   // Assert
@@ -90,7 +90,7 @@ test('can insert preset value into textstring property that vary by culture and 
   await umbracoUi.content.clickSaveModalButtonAndWaitForContentToBeCreated();
   await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   await umbracoUi.content.clickSelectVariantButton();
-  await umbracoUi.content.clickExpendSegmentButton(contentName);
+  await umbracoUi.content.clickExpandSegmentButton(contentName);
   await umbracoUi.content.clickVariantAddModeButtonForLanguageName(vipMemberSegment);
 
   // Assert

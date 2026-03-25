@@ -1,5 +1,5 @@
 import {expect} from '@playwright/test';
-import {AliasHelper, ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
+import {AliasHelper, ConstantHelper, NotificationConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 
 // Document Type
 const documentTypeName = 'TestDocumentTypeForContent';
@@ -150,7 +150,8 @@ test('can create content with block grid area with row span', async ({umbracoApi
   await umbracoUi.content.doesBlockAreaContainRowSpan(firstElementTypeName, firstAreaName, rowSpan, 0);
 });
 
-test('can create content with block grid area with min allowed', async ({umbracoApi, umbracoUi}) => {
+// Skip this test due to this issue: https://github.com/umbraco/Umbraco-CMS/issues/22121
+test.skip('can create content with block grid area with min allowed', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   firstElementTypeId = await umbracoApi.documentType.createEmptyElementType(firstElementTypeName);
   const secondElementTypeId = await umbracoApi.documentType.createEmptyElementType(secondElementTypeName);
@@ -184,7 +185,8 @@ test('can create content with block grid area with min allowed', async ({umbraco
   await umbracoApi.documentType.ensureNameNotExists(secondElementTypeName);
 });
 
-test('can create content with block grid area with max allowed', async ({umbracoApi, umbracoUi}) => {
+// Skip this test due to this issue: https://github.com/umbraco/Umbraco-CMS/issues/22121
+test.skip('can create content with block grid area with max allowed', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   firstElementTypeId = await umbracoApi.documentType.createEmptyElementType(firstElementTypeName);
   const secondElementTypeId = await umbracoApi.documentType.createEmptyElementType(secondElementTypeName);

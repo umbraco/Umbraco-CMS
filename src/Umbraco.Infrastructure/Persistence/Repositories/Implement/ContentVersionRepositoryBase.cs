@@ -14,10 +14,20 @@ internal abstract class ContentVersionRepositoryBase<TContentDto, TContentVersio
 {
     private readonly IScopeAccessor _scopeAccessor;
 
+    /// <summary>
+    /// Gets the database table name for the content DTO type.
+    /// </summary>
     protected abstract string ContentDtoTableName { get; }
 
+    /// <summary>
+    /// Gets the database table name for the content version DTO type.
+    /// </summary>
     protected abstract string ContentVersionDtoTableName { get; }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ContentVersionRepositoryBase{TContentDto, TContentVersionDto}"/> class.
+    /// </summary>
+    /// <param name="scopeAccessor">Provides access to the current database scope for repository operations.</param>
     public ContentVersionRepositoryBase(IScopeAccessor scopeAccessor) =>
         _scopeAccessor = scopeAccessor ?? throw new ArgumentNullException(nameof(scopeAccessor));
 

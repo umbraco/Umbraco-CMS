@@ -212,8 +212,12 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 					};
 
 					this.readOnlyGuard?.addRule(rule);
+					this.content.propertyWriteGuard.addRule({ unique, permitted: false });
+					this.settings.propertyWriteGuard.addRule({ unique, permitted: false });
 				} else {
 					this.readOnlyGuard?.removeRule(unique);
+					this.content.propertyWriteGuard.removeRule(unique);
+					this.settings.propertyWriteGuard.removeRule(unique);
 				}
 			},
 			'observeIsReadOnly',
@@ -654,7 +658,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 					this.#blockManager?.setOneContent(this.#initialContent);
 				}
 				if (this.#initialSettings) {
-					this.#blockManager?.setOneContent(this.#initialSettings);
+					this.#blockManager?.setOneSettings(this.#initialSettings);
 				}
 			}
 		}

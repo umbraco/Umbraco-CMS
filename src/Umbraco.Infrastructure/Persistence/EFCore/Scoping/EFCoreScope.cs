@@ -25,6 +25,7 @@ internal class EFCoreScope<TDbContext> : CoreScope, IEfCoreScope<TDbContext>
     private bool _disposed;
     private TDbContext? _dbContext;
     private IDbContextFactory<TDbContext> _dbContextFactory;
+    private string? _originalConnectionString;
     private bool _connectionOverridden;
 
     /// <summary>
@@ -244,6 +245,8 @@ internal class EFCoreScope<TDbContext> : CoreScope, IEfCoreScope<TDbContext>
             _dbContext = FindDbContext();
         }
 
+        _originalConnectionString ??= _dbContext.Database.GetConnectionString();
+
         // Check if we are already in a transaction before starting one
         if (_dbContext.Database.CurrentTransaction is null)
         {
@@ -346,20 +349,28 @@ internal class EFCoreScope<TDbContext> : CoreScope, IEfCoreScope<TDbContext>
             }
             finally
             {
-                // Restore connection state before returning context to the pool.
-                // SetDbConnection nulls EF Core's internal _connectionString, and the pool's
-                // ResetState never restores it (because _connectionOwned is false after
-                // SetDbConnection). Read the original connection string from the immutable
-                // DbContextOptions — the same source EF Core's RelationalConnection
-                // constructor uses — and write it back.
-                if (_dbContext is not null && _connectionOverridden)
+                try
                 {
-                    _dbContext.Database.SetDbConnection(null);
+                    // Restore connection state before returning context to the pool.
+                    // SetDbConnection nulls EF Core's internal _connectionString, and the pool's
+                    // ResetState never restores it (because _connectionOwned is false after
+                    // SetDbConnection). Read the original connection string from the immutable
+                    // DbContextOptions — the same source EF Core's RelationalConnection
+                    // constructor uses — and write it back.
+                    if (_dbContext is not null && _connectionOverridden)
+                    {
+                        _dbContext.Database.SetDbConnection(null);
 
-                    IDbContextOptions options = _dbContext.GetInfrastructure().GetRequiredService<IDbContextOptions>();
-                    var connectionString = RelationalOptionsExtension.Extract(options).ConnectionString;
-                    _dbContext.Database.SetConnectionString(connectionString);
+                        IDbContextOptions options = _dbContext.GetInfrastructure().GetRequiredService<IDbContextOptions>();
+                        var connectionString = RelationalOptionsExtension.Extract(options).ConnectionString;
+                        _dbContext.Database.SetConnectionString(connectionString);
+                    }
                 }
+                catch
+                {
+                    // Best-effort cleanup — ensure context is still disposed below.
+                }
+
 
                 _dbContext?.Dispose();
                 _dbContext = null;

@@ -1,19 +1,18 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.Services.Flags;
-using Umbraco.Cms.Api.Management.ViewModels.Document.Item;
 using Umbraco.Cms.Api.Management.ViewModels.Media.Item;
-using Umbraco.Cms.Core.DependencyInjection;
-using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Media.Item;
 
+/// <summary>
+/// Provides API endpoints for managing individual media items within the Umbraco CMS.
+/// </summary>
 [ApiVersion("1.0")]
 public class ItemMediaItemController : MediaItemControllerBase
 {
@@ -21,7 +20,12 @@ public class ItemMediaItemController : MediaItemControllerBase
     private readonly IMediaPresentationFactory _mediaPresentationFactory;
     private readonly FlagProviderCollection _flagProviders;
 
-    [ActivatorUtilitiesConstructor]
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Controllers.Media.Item.ItemMediaItemController"/> class.
+    /// </summary>
+    /// <param name="entityService">Service used for entity operations within the media item controller.</param>
+    /// <param name="mediaPresentationFactory">Factory responsible for creating media presentation models.</param>
+    /// <param name="flagProviders">A collection of providers that supply flags for media items.</param>
     public ItemMediaItemController(
         IEntityService entityService,
         IMediaPresentationFactory mediaPresentationFactory,
@@ -30,12 +34,6 @@ public class ItemMediaItemController : MediaItemControllerBase
         _entityService = entityService;
         _mediaPresentationFactory = mediaPresentationFactory;
         _flagProviders = flagProviders;
-    }
-
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18")]
-    public ItemMediaItemController(IEntityService entityService, IMediaPresentationFactory mediaPresentationFactory)
-        : this(entityService, mediaPresentationFactory, StaticServiceProvider.Instance.GetRequiredService<FlagProviderCollection>())
-    {
     }
 
     [HttpGet]
@@ -64,7 +62,7 @@ public class ItemMediaItemController : MediaItemControllerBase
 
     private async Task PopulateFlags(IEnumerable<MediaItemResponseModel> itemViewModels)
     {
-        foreach (IFlagProvider signProvider in _flagProviders.Where(x => x.CanProvideFlags<DocumentItemResponseModel>()))
+        foreach (IFlagProvider signProvider in _flagProviders.Where(x => x.CanProvideFlags<MediaItemResponseModel>()))
         {
             await signProvider.PopulateFlagsAsync(itemViewModels);
         }

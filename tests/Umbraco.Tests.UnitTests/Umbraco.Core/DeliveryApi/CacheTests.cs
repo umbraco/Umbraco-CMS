@@ -3,7 +3,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.DeliveryApi;
-using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Infrastructure.HybridCache;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.DeliveryApi;
 
@@ -34,9 +34,14 @@ public class CacheTests : DeliveryApiTests
 
         var propertyType = SetupPublishedPropertyType(propertyValueConverter.Object, "something", "Some.Thing");
 
+        var elementType = new Mock<IPublishedContentType>();
+        elementType.SetupGet(e => e.ItemType).Returns(PublishedItemType.Element);
         var element = new Mock<IPublishedElement>();
+        element.SetupGet(e => e.ContentType).Returns(elementType.Object);
 
-        var prop1 = new PublishedElementPropertyBase(propertyType, element.Object, false, cacheLevel, new VariationContext(), Mock.Of<ICacheManager>());
+        var propertyData = new PropertyData { Culture = "abc", Segment = string.Empty, Value = "n/a" };
+
+        var prop1 = new PublishedProperty(propertyType, element.Object, CreateVariationContextAccessor(), false, [propertyData], new ElementsDictionaryAppCache(), cacheLevel);
 
         var results = new List<string>
         {

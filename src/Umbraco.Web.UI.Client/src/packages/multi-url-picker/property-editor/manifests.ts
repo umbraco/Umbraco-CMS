@@ -26,6 +26,12 @@ export const manifests = [
 						description: 'Selecting this hides the anchor/query string input field in the link picker overlay.',
 						propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
 					},
+					{
+						alias: 'allowCultureSpecificDocumentLinks',
+						label: '#linkPicker_configCultureSpecificDocumentLinksLabel',
+						description: '{#linkPicker_configCultureSpecificDocumentLinksDescription}',
+						propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
+					},
 				],
 			},
 		},

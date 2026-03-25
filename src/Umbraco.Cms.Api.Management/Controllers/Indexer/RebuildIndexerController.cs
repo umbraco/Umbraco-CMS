@@ -8,6 +8,9 @@ using Umbraco.Cms.Infrastructure.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Indexer;
 
+/// <summary>
+/// API controller responsible for handling requests to rebuild the search indexer in the Umbraco CMS management context.
+/// </summary>
 [ApiVersion("1.0")]
 public class RebuildIndexerController : IndexerControllerBase
 {
@@ -15,6 +18,12 @@ public class RebuildIndexerController : IndexerControllerBase
     private readonly IIndexingRebuilderService _indexingRebuilderService;
     private readonly IExamineManager _examineManager;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="RebuildIndexerController"/> class.
+    /// </summary>
+    /// <param name="logger">The <see cref="ILogger{RebuildIndexerController}"/> used for logging.</param>
+    /// <param name="indexingRebuilderService">The <see cref="IIndexingRebuilderService"/> responsible for rebuilding search indexes.</param>
+    /// <param name="examineManager">The <see cref="IExamineManager"/> instance for managing Examine indexes.</param>
     public RebuildIndexerController(
         ILogger<RebuildIndexerController> logger,
         IIndexingRebuilderService indexingRebuilderService,

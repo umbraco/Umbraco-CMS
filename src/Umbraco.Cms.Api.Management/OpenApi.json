@@ -55,7 +55,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -203,7 +203,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -265,7 +265,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -376,7 +376,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -518,7 +518,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -651,7 +651,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -709,7 +709,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -827,7 +827,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -893,7 +893,118 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/data-type/{id}/schema": {
+      "get": {
+        "tags": [
+          "Data Type"
+        ],
+        "operationId": "GetDataTypeByIdSchema",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/DataTypeSchemaResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ProblemDetails"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": []
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/data-type/batch": {
+      "get": {
+        "tags": [
+          "Data Type"
+        ],
+        "summary": "Gets multiple data types.",
+        "description": "Gets multiple data types identified by the provided Ids.",
+        "operationId": "GetDataTypeBatch",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "uniqueItems": true,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/BatchResponseModelDataTypeResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": []
           }
         ]
       }
@@ -930,7 +1041,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -1078,7 +1189,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -1140,7 +1251,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -1251,7 +1362,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -1393,7 +1504,55 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/data-type/schemas/batch": {
+      "get": {
+        "tags": [
+          "Data Type"
+        ],
+        "operationId": "GetDataTypeSchemasBatch",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/FetchResponseModelDataTypeSchemaItemResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": []
           }
         ]
       }
@@ -1472,7 +1631,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -1523,7 +1682,58 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/item/data-type/ancestors": {
+      "get": {
+        "tags": [
+          "Data Type"
+        ],
+        "summary": "Gets ancestors for a collection of data type items.",
+        "description": "Gets the ancestor chains for data type items identified by the provided Ids.",
+        "operationId": "GetItemDataTypeAncestors",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "uniqueItems": true,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/ItemAncestorsResponseModelNamedItemResponseModel"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": []
           }
         ]
       }
@@ -1584,7 +1794,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -1634,7 +1844,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -1707,7 +1917,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -1772,7 +1982,76 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/tree/data-type/search": {
+      "get": {
+        "tags": [
+          "Data Type"
+        ],
+        "operationId": "GetTreeDataTypeSearch",
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            }
+          },
+          {
+            "name": "itemKind",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/TreeItemKindModel"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/PagedDataTypeTreeItemResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": []
           }
         ]
       }
@@ -1843,7 +2122,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -1907,7 +2186,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -2079,7 +2358,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -2141,7 +2420,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -2252,7 +2531,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -2394,7 +2673,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -2465,7 +2744,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -2609,7 +2888,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -2757,7 +3036,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -2808,7 +3087,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -2858,7 +3137,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -2923,7 +3202,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -2980,7 +3259,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -3128,7 +3407,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -3190,7 +3469,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -3301,7 +3580,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -3443,7 +3722,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -3561,7 +3840,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -3623,7 +3902,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -3771,7 +4050,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -3833,7 +4112,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -3944,7 +4223,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -4086,7 +4365,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -4208,7 +4487,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -4259,7 +4538,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -4309,7 +4588,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -4382,7 +4661,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -4447,7 +4726,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -4518,7 +4797,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -4666,7 +4945,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -4728,7 +5007,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -4813,7 +5092,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -4955,7 +5234,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -5043,7 +5322,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -5105,7 +5384,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -5185,7 +5464,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -5264,7 +5543,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -5423,7 +5702,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -5486,7 +5765,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -5630,7 +5909,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -5774,7 +6053,70 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/document-type/{id}/schema": {
+      "get": {
+        "tags": [
+          "Document Type"
+        ],
+        "operationId": "GetDocumentTypeByIdSchema",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/JsonNode"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ProblemDetails"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": []
           }
         ]
       }
@@ -5907,7 +6249,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -5964,7 +6306,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -6021,7 +6363,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -6116,7 +6458,58 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/document-type/batch": {
+      "get": {
+        "tags": [
+          "Document Type"
+        ],
+        "summary": "Gets multiple document types.",
+        "description": "Gets multiple document types identified by the provided Ids.",
+        "operationId": "GetDocumentTypeBatch",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "uniqueItems": true,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/BatchResponseModelDocumentTypeResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": []
           }
         ]
       }
@@ -6153,7 +6546,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -6301,7 +6694,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -6363,7 +6756,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -6474,7 +6867,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -6616,7 +7009,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -6764,7 +7157,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -6815,7 +7208,58 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/item/document-type/ancestors": {
+      "get": {
+        "tags": [
+          "Document Type"
+        ],
+        "summary": "Gets ancestors for a collection of document type items.",
+        "description": "Gets the ancestor chains for document type items identified by the provided Ids.",
+        "operationId": "GetItemDocumentTypeAncestors",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "uniqueItems": true,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/ItemAncestorsResponseModelNamedItemResponseModel"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": []
           }
         ]
       }
@@ -6883,7 +7327,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -6933,7 +7377,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -7006,7 +7450,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -7071,7 +7515,76 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/tree/document-type/search": {
+      "get": {
+        "tags": [
+          "Document Type"
+        ],
+        "operationId": "GetTreeDocumentTypeSearch",
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            }
+          },
+          {
+            "name": "itemKind",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/TreeItemKindModel"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/PagedDocumentTypeTreeItemResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": []
           }
         ]
       }
@@ -7142,7 +7655,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -7243,7 +7756,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -7319,7 +7832,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -7439,7 +7952,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -7559,7 +8072,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -7690,7 +8203,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -7838,7 +8351,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -7900,7 +8413,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -8011,7 +8524,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -8153,7 +8666,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -8234,7 +8747,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -8315,7 +8828,7 @@
         "deprecated": true,
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -8448,7 +8961,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -8510,7 +9023,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -8678,7 +9191,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -8796,7 +9309,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -8909,7 +9422,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -8974,7 +9487,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -9090,7 +9603,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -9187,7 +9700,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -9320,7 +9833,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -9405,7 +9918,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -9424,6 +9937,14 @@
             "schema": {
               "type": "string",
               "format": "uuid"
+            }
+          },
+          {
+            "name": "includeAncestors",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
             }
           }
         ],
@@ -9465,7 +9986,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -9581,7 +10102,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -9725,7 +10246,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -9880,7 +10401,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -9965,7 +10486,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -10027,7 +10548,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -10107,7 +10628,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -10187,7 +10708,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -10331,7 +10852,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -10475,7 +10996,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -10544,7 +11065,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -10581,7 +11102,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -10714,7 +11235,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -10768,7 +11289,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -10901,7 +11422,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -10952,7 +11473,58 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/item/document/ancestors": {
+      "get": {
+        "tags": [
+          "Document"
+        ],
+        "summary": "Gets ancestors for a collection of document items.",
+        "description": "Gets the ancestor chains for document items identified by the provided Ids.",
+        "operationId": "GetItemDocumentAncestors",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "uniqueItems": true,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/ItemAncestorsResponseModelDocumentItemResponseModel"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": []
           }
         ]
       }
@@ -11054,7 +11626,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -11130,7 +11702,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -11243,7 +11815,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -11319,7 +11891,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -11463,7 +12035,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -11528,7 +12100,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -11585,7 +12157,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -11642,7 +12214,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -11713,7 +12285,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -11763,7 +12335,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -11836,7 +12408,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -11901,7 +12473,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -11972,7 +12544,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -12064,7 +12636,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -12100,7 +12672,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -12201,7 +12773,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -12277,7 +12849,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -12397,7 +12969,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -12517,7 +13089,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -12665,7 +13237,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -12727,7 +13299,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -12838,7 +13410,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -12980,7 +13552,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -13061,7 +13633,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -13194,7 +13766,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -13312,7 +13884,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -13425,7 +13997,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -13569,7 +14141,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -13649,7 +14221,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -13793,7 +14365,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -13937,7 +14509,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -14006,7 +14578,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -14043,7 +14615,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -14191,7 +14763,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -14253,7 +14825,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -14364,7 +14936,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -14506,7 +15078,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -14650,7 +15222,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -14763,7 +15335,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -14843,7 +15415,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -14976,7 +15548,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -15027,7 +15599,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -15078,7 +15650,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -15154,7 +15726,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -15267,7 +15839,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -15343,7 +15915,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -15353,6 +15925,8 @@
         "tags": [
           "Element"
         ],
+        "summary": "Restores an element from the recycle bin.",
+        "description": "Restores an element from the recycle bin to its original location or a specified parent.",
         "operationId": "PutRecycleBinElementByIdRestore",
         "parameters": [
           {
@@ -15485,7 +16059,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -15550,7 +16124,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -15663,7 +16237,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -15739,7 +16313,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -15749,6 +16323,8 @@
         "tags": [
           "Element"
         ],
+        "summary": "Restores an element folder from the recycle bin.",
+        "description": "Restores an element folder from the recycle bin to its original location or a specified parent.",
         "operationId": "PutRecycleBinElementFolderByIdRestore",
         "parameters": [
           {
@@ -15881,7 +16457,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -15938,7 +16514,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -15995,7 +16571,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -16066,7 +16642,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -16116,7 +16692,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -16189,7 +16765,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -16254,7 +16830,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -16325,7 +16901,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -16382,7 +16958,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -16443,7 +17019,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -16540,7 +17116,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -16658,7 +17234,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -16749,7 +17325,7 @@
         "deprecated": true,
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -16835,7 +17411,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -16907,7 +17483,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -16961,7 +17537,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -17019,7 +17595,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -17142,7 +17718,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -17400,7 +17976,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -17434,7 +18010,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -17488,7 +18064,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -17634,7 +18210,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -17692,7 +18268,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -17802,7 +18378,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -17943,7 +18519,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -18000,7 +18576,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -18069,7 +18645,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -18166,7 +18742,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -18253,7 +18829,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -18310,7 +18886,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -18430,7 +19006,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -18491,7 +19067,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -18575,7 +19151,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -18633,7 +19209,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -18673,7 +19249,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -18713,7 +19289,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -18793,7 +19369,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -18841,7 +19417,7 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/PagedModelMediaTypeItemResponseModel"
+                      "$ref": "#/components/schemas/PagedModelAllowedMediaTypeItemResponseModel"
                     }
                   ]
                 }
@@ -18854,7 +19430,58 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/item/media-type/ancestors": {
+      "get": {
+        "tags": [
+          "Media Type"
+        ],
+        "summary": "Gets ancestors for a collection of media type items.",
+        "description": "Gets the ancestor chains for media type items identified by the provided Ids.",
+        "operationId": "GetItemMediaTypeAncestors",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "uniqueItems": true,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/ItemAncestorsResponseModelNamedItemResponseModel"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": []
           }
         ]
       }
@@ -18908,7 +19535,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -18969,7 +19596,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -19117,7 +19744,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -19179,7 +19806,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -19264,7 +19891,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -19406,7 +20033,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -19494,7 +20121,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -19556,7 +20183,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -19635,7 +20262,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -19794,7 +20421,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -19857,7 +20484,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -20001,7 +20628,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -20145,7 +20772,70 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/media-type/{id}/schema": {
+      "get": {
+        "tags": [
+          "Media Type"
+        ],
+        "operationId": "GetMediaTypeByIdSchema",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/JsonNode"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ProblemDetails"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": []
           }
         ]
       }
@@ -20202,7 +20892,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -20297,7 +20987,58 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/media-type/batch": {
+      "get": {
+        "tags": [
+          "Media Type"
+        ],
+        "summary": "Gets multiple media types.",
+        "description": "Gets multiple media types identified by the provided Ids.",
+        "operationId": "GetMediaTypeBatch",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "uniqueItems": true,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/BatchResponseModelMediaTypeResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": []
           }
         ]
       }
@@ -20334,7 +21075,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -20482,7 +21223,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -20544,7 +21285,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -20655,7 +21396,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -20797,7 +21538,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -20945,7 +21686,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -20995,7 +21736,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -21068,7 +21809,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -21133,7 +21874,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -21204,7 +21945,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -21327,7 +22068,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -21378,7 +22119,58 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/item/media/ancestors": {
+      "get": {
+        "tags": [
+          "Media"
+        ],
+        "summary": "Gets ancestors for a collection of media items.",
+        "description": "Gets the ancestor chains for media items identified by the provided Ids.",
+        "operationId": "GetItemMediaAncestors",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "uniqueItems": true,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/ItemAncestorsResponseModelMediaItemResponseModel"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": []
           }
         ]
       }
@@ -21480,7 +22272,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -21628,7 +22420,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -21690,7 +22482,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -21801,7 +22593,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -21943,7 +22735,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -22024,7 +22816,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -22142,7 +22934,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -22255,7 +23047,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -22335,7 +23127,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -22415,7 +23207,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -22559,7 +23351,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -22628,7 +23420,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -22663,10 +23455,9 @@
             "description": "The authenticated user does not have access to this resource"
           }
         },
-        "deprecated": true,
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -22799,7 +23590,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -22853,7 +23644,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -22986,7 +23777,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -23062,7 +23853,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -23175,7 +23966,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -23251,7 +24042,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -23395,7 +24186,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -23460,7 +24251,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -23517,7 +24308,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -23574,7 +24365,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -23645,7 +24436,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -23695,7 +24486,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -23768,7 +24559,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -23833,7 +24624,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -23904,7 +24695,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -23955,7 +24746,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -24012,7 +24803,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -24132,7 +24923,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -24183,7 +24974,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -24294,7 +25085,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -24436,7 +25227,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -24493,7 +25284,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -24544,7 +25335,58 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/item/member-type/ancestors": {
+      "get": {
+        "tags": [
+          "Member Type"
+        ],
+        "summary": "Gets ancestors for a collection of member type items.",
+        "description": "Gets the ancestor chains for member type items identified by the provided Ids.",
+        "operationId": "GetItemMemberTypeAncestors",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "uniqueItems": true,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/ItemAncestorsResponseModelNamedItemResponseModel"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": []
           }
         ]
       }
@@ -24605,7 +25447,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -24753,7 +25595,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -24815,7 +25657,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -24900,7 +25742,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -25042,7 +25884,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -25121,7 +25963,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -25280,7 +26122,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -25343,7 +26185,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -25487,7 +26329,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -25631,7 +26473,127 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/member-type/{id}/schema": {
+      "get": {
+        "tags": [
+          "Member Type"
+        ],
+        "operationId": "GetMemberTypeByIdSchema",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/JsonNode"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ProblemDetails"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": []
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/member-type/allowed-at-root": {
+      "get": {
+        "tags": [
+          "Member Type"
+        ],
+        "summary": "Gets member types allowed at root.",
+        "description": "Gets a collection of member types that are allowed to be created at the root level.",
+        "operationId": "GetMemberTypeAllowedAtRoot",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/PagedAllowedMemberTypeModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": []
           }
         ]
       }
@@ -25726,7 +26688,58 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/member-type/batch": {
+      "get": {
+        "tags": [
+          "Member Type"
+        ],
+        "summary": "Gets multiple member types.",
+        "description": "Gets multiple member types identified by the provided Ids.",
+        "operationId": "GetMemberTypeBatch",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "uniqueItems": true,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/BatchResponseModelMemberTypeResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": []
           }
         ]
       }
@@ -25763,7 +26776,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -25911,7 +26924,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -25973,7 +26986,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -26084,7 +27097,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -26226,7 +27239,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -26374,7 +27387,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -26424,7 +27437,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -26497,7 +27510,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -26562,7 +27575,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -26633,7 +27646,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -26755,7 +27768,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -26806,7 +27819,58 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/item/member/ancestors": {
+      "get": {
+        "tags": [
+          "Member"
+        ],
+        "summary": "Gets ancestors for a collection of member items.",
+        "description": "Gets the ancestor chains for member items identified by the provided Ids.",
+        "operationId": "GetItemMemberAncestors",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "uniqueItems": true,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/ItemAncestorsResponseModelMemberItemResponseModel"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": []
           }
         ]
       }
@@ -26878,7 +27942,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -27026,7 +28090,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -27088,7 +28152,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -27199,7 +28263,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -27341,7 +28405,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -27421,7 +28485,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -27501,7 +28565,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -27645,7 +28709,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -27714,7 +28778,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -27751,7 +28815,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -27884,7 +28948,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -27960,7 +29024,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -27997,7 +29061,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -28034,7 +29098,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -28068,7 +29132,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -28122,7 +29186,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -28185,7 +29249,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -28297,7 +29361,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -28334,7 +29398,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -28391,7 +29455,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -28537,7 +29601,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -28599,7 +29663,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -28684,7 +29748,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -28800,7 +29864,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -28863,7 +29927,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -28920,7 +29984,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -28970,7 +30034,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -29118,7 +30182,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -29179,7 +30243,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -29289,7 +30353,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -29430,7 +30494,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -29588,7 +30652,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -29736,7 +30800,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -29797,7 +30861,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -29907,7 +30971,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -29964,7 +31028,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -30025,7 +31089,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -30074,7 +31138,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -30138,7 +31202,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -30195,7 +31259,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -30257,7 +31321,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -30287,40 +31351,6 @@
             }
           }
         }
-      },
-      "post": {
-        "tags": [
-          "Preview"
-        ],
-        "summary": "Enters preview mode.",
-        "description": "Enters preview mode for the current user session, allowing viewing of unpublished content.",
-        "operationId": "PostPreview",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "headers": {
-              "Umb-Notifications": {
-                "description": "The list of notifications produced during the request.",
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/NotificationHeaderModel"
-                  },
-                  "nullable": true
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "The resource is protected and requires an authentication token"
-          }
-        },
-        "deprecated": true,
-        "security": [
-          {
-            "Backoffice-User": [ ]
-          }
-        ]
       }
     },
     "/umbraco/management/api/v1/profiling/status": {
@@ -30355,7 +31385,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -30434,7 +31464,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -30498,7 +31528,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -30533,7 +31563,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -30567,7 +31597,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -30602,7 +31632,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -30680,7 +31710,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -30746,7 +31776,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -30805,7 +31835,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -30842,7 +31872,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -30899,7 +31929,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -30950,7 +31980,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -31007,7 +32037,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -31069,7 +32099,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -31149,7 +32179,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -31199,7 +32229,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -31347,7 +32377,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -31408,7 +32438,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -31518,7 +32548,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -31659,7 +32689,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -31817,7 +32847,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -31965,7 +32995,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -32026,7 +33056,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -32136,7 +33166,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -32185,7 +33215,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -32249,7 +33279,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -32306,7 +33336,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -32368,7 +33398,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -32422,7 +33452,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -32505,7 +33535,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -32542,7 +33572,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -32649,7 +33679,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -32782,7 +33812,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -32971,7 +34001,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -33031,7 +34061,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -33105,7 +34135,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -33143,7 +34173,7 @@
         "deprecated": true,
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -33193,7 +34223,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -33239,7 +34269,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -33300,7 +34330,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -33354,7 +34384,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -33404,7 +34434,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -33552,7 +34582,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -33613,7 +34643,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -33723,7 +34753,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -33864,7 +34894,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -34022,7 +35052,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -34170,7 +35200,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -34231,7 +35261,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -34341,7 +35371,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -34390,7 +35420,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -34454,7 +35484,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -34511,7 +35541,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -34573,7 +35603,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -34648,7 +35678,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -34705,7 +35735,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -34742,7 +35772,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -34847,7 +35877,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -34898,7 +35928,58 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/item/template/ancestors": {
+      "get": {
+        "tags": [
+          "Template"
+        ],
+        "summary": "Gets ancestors for a collection of template items.",
+        "description": "Gets the ancestor chains for template items identified by the provided Ids.",
+        "operationId": "GetItemTemplateAncestors",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "uniqueItems": true,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/ItemAncestorsResponseModelTemplateItemResponseModel"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": []
           }
         ]
       }
@@ -34959,7 +36040,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -35107,7 +36188,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -35169,7 +36250,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -35280,7 +36361,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -35422,7 +36503,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -35459,7 +36540,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -35551,7 +36632,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -35588,7 +36669,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -35638,7 +36719,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -35703,7 +36784,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -35760,7 +36841,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -35823,7 +36904,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -35930,7 +37011,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -36003,7 +37084,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -36099,7 +37180,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -36133,7 +37214,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -36235,7 +37316,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -36286,7 +37367,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -36411,7 +37492,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -36483,7 +37564,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -36591,7 +37672,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -36639,7 +37720,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -36727,7 +37808,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -36820,7 +37901,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -36871,7 +37952,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -36978,7 +38059,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -37098,7 +38179,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -37153,7 +38234,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -37215,7 +38296,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -37300,7 +38381,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -37416,7 +38497,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -37543,7 +38624,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -37668,7 +38749,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -37798,7 +38879,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -37849,7 +38930,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -37997,7 +39078,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -38102,7 +39183,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -38171,7 +39252,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -38233,7 +39314,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -38344,7 +39425,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -38486,7 +39567,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -38551,7 +39632,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -38672,7 +39753,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -38734,7 +39815,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -38878,7 +39959,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -38996,7 +40077,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -39041,7 +40122,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -39136,7 +40217,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -39260,7 +40341,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -39373,7 +40454,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -39515,7 +40596,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -39552,7 +40633,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -39586,7 +40667,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -39623,7 +40704,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -39727,7 +40808,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -39864,7 +40945,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -39934,7 +41015,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -40026,7 +41107,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -40118,7 +41199,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -40155,7 +41236,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -40192,7 +41273,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -40254,7 +41335,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -40319,7 +41400,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -40382,7 +41463,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -40444,7 +41525,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -40577,7 +41658,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -40710,7 +41791,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -40858,7 +41939,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -41116,7 +42197,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -41333,7 +42414,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -41440,7 +42521,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -41491,7 +42572,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -41548,7 +42629,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -41694,7 +42775,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -41756,7 +42837,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -41867,7 +42948,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -42009,7 +43090,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -42075,7 +43156,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -42132,7 +43213,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -42189,7 +43270,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -42222,7 +43303,68 @@
         },
         "additionalProperties": false
       },
+      "AllowedMediaTypeItemResponseModel": {
+        "required": [
+          "flags",
+          "id",
+          "matchedFileExtension",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "flags": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/FlagModel"
+                }
+              ]
+            }
+          },
+          "name": {
+            "type": "string"
+          },
+          "icon": {
+            "type": "string",
+            "nullable": true
+          },
+          "matchedFileExtension": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
       "AllowedMediaTypeModel": {
+        "required": [
+          "id",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "icon": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "AllowedMemberTypeModel": {
         "required": [
           "id",
           "name"
@@ -42401,6 +43543,102 @@
           },
           "isCompatible": {
             "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "BatchResponseModelDataTypeResponseModel": {
+        "required": [
+          "items",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DataTypeResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "BatchResponseModelDocumentTypeResponseModel": {
+        "required": [
+          "items",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DocumentTypeResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "BatchResponseModelMediaTypeResponseModel": {
+        "required": [
+          "items",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/MediaTypeResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "BatchResponseModelMemberTypeResponseModel": {
+        "required": [
+          "items",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/MemberTypeResponseModel"
+                }
+              ]
+            }
           }
         },
         "additionalProperties": false
@@ -43439,6 +44677,14 @@
           "variesBySegment": {
             "type": "boolean"
           },
+          "collection": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ],
+            "nullable": true
+          },
           "isElement": {
             "type": "boolean"
           },
@@ -43497,14 +44743,6 @@
                 }
               ]
             }
-          },
-          "collection": {
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/ReferenceByIdModel"
-              }
-            ],
-            "nullable": true
           }
         },
         "additionalProperties": false
@@ -44640,6 +45878,59 @@
           },
           "canIgnoreStartNodes": {
             "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "DataTypeSchemaItemResponseModel": {
+        "required": [
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "valueTypeName": {
+            "type": "string",
+            "nullable": true
+          },
+          "jsonSchema": {
+            "type": "object",
+            "additionalProperties": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/JsonNode"
+                }
+              ]
+            },
+            "nullable": true
+          },
+          "error": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "DataTypeSchemaResponseModel": {
+        "type": "object",
+        "properties": {
+          "valueTypeName": {
+            "type": "string",
+            "nullable": true
+          },
+          "jsonSchema": {
+            "type": "object",
+            "additionalProperties": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/JsonNode"
+                }
+              ]
+            },
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -47557,6 +48848,30 @@
         ],
         "type": "string"
       },
+      "FetchResponseModelDataTypeSchemaItemResponseModel": {
+        "required": [
+          "items",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DataTypeSchemaItemResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
       "FieldPresentationModel": {
         "required": [
           "name",
@@ -47725,7 +49040,7 @@
           },
           "actionParameters": {
             "type": "object",
-            "additionalProperties": { },
+            "additionalProperties": {},
             "nullable": true
           }
         },
@@ -48133,6 +49448,126 @@
         },
         "additionalProperties": false
       },
+      "ItemAncestorsResponseModelDocumentItemResponseModel": {
+        "required": [
+          "ancestors",
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "ancestors": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DocumentItemResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "ItemAncestorsResponseModelMediaItemResponseModel": {
+        "required": [
+          "ancestors",
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "ancestors": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/MediaItemResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "ItemAncestorsResponseModelMemberItemResponseModel": {
+        "required": [
+          "ancestors",
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "ancestors": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/MemberItemResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "ItemAncestorsResponseModelNamedItemResponseModel": {
+        "required": [
+          "ancestors",
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "ancestors": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/NamedItemResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "ItemAncestorsResponseModelTemplateItemResponseModel": {
+        "required": [
+          "ancestors",
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "ancestors": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/TemplateItemResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
       "ItemReferenceByIdResponseModel": {
         "required": [
           "id"
@@ -48160,6 +49595,53 @@
           "sortOrder": {
             "type": "integer",
             "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "JsonNode": {
+        "required": [
+          "root"
+        ],
+        "type": "object",
+        "properties": {
+          "options": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/JsonNodeOptions"
+              }
+            ],
+            "nullable": true,
+            "readOnly": true
+          },
+          "parent": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/JsonNode"
+              }
+            ],
+            "nullable": true,
+            "readOnly": true
+          },
+          "root": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/JsonNode"
+              }
+            ],
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "JsonNodeOptions": {
+        "required": [
+          "propertyNameCaseInsensitive"
+        ],
+        "type": "object",
+        "properties": {
+          "propertyNameCaseInsensitive": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -48366,7 +49848,7 @@
           },
           "extensions": {
             "type": "array",
-            "items": { }
+            "items": {}
           }
         },
         "additionalProperties": false
@@ -48445,7 +49927,8 @@
             "type": "boolean"
           },
           "disableUnpublishWhenReferenced": {
-            "type": "boolean"
+            "type": "boolean",
+            "deprecated": true
           }
         },
         "additionalProperties": false
@@ -50418,6 +51901,34 @@
         },
         "additionalProperties": false
       },
+      "NamedItemResponseModel": {
+        "required": [
+          "flags",
+          "id",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "flags": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/FlagModel"
+                }
+              ]
+            }
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
       "NewsDashboardItemResponseModel": {
         "required": [
           "header",
@@ -50733,6 +52244,30 @@
               "oneOf": [
                 {
                   "$ref": "#/components/schemas/AllowedMediaTypeModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "PagedAllowedMemberTypeModel": {
+        "required": [
+          "items",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/AllowedMemberTypeModel"
                 }
               ]
             }
@@ -51504,6 +53039,30 @@
                 }
               ]
             }
+          }
+        },
+        "additionalProperties": false
+      },
+      "PagedModelAllowedMediaTypeItemResponseModel": {
+        "required": [
+          "items",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/AllowedMediaTypeItemResponseModel"
+                }
+              ]
+            }
+          },
+          "total": {
+            "type": "integer",
+            "format": "int64"
           }
         },
         "additionalProperties": false
@@ -52398,7 +53957,7 @@
             "nullable": true
           }
         },
-        "additionalProperties": { }
+        "additionalProperties": {}
       },
       "ProblemDetailsBuilderModel": {
         "type": "object",
@@ -52506,6 +54065,7 @@
         "required": [
           "errorDocument",
           "groups",
+          "isProtectedByAncestor",
           "loginDocument",
           "members"
         ],
@@ -52544,6 +54104,9 @@
                 }
               ]
             }
+          },
+          "isProtectedByAncestor": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -53029,6 +54592,7 @@
           "Boot",
           "Install",
           "Upgrade",
+          "Upgrading",
           "Run",
           "BootFailed"
         ],
@@ -54370,6 +55934,14 @@
           }
         },
         "additionalProperties": false
+      },
+      "TreeItemKindModel": {
+        "enum": [
+          "Item",
+          "Folder",
+          "All"
+        ],
+        "type": "string"
       },
       "UnknownTypePermissionPresentationModel": {
         "required": [
@@ -56916,7 +58488,7 @@
           "authorizationCode": {
             "authorizationUrl": "/umbraco/management/api/v1/security/back-office/authorize",
             "tokenUrl": "/umbraco/management/api/v1/security/back-office/token",
-            "scopes": { }
+            "scopes": {}
           }
         }
       }

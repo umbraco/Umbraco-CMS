@@ -1,4 +1,4 @@
-import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
+import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 import {expect} from "@playwright/test";
 
 const contentName = 'TestContent';
@@ -95,7 +95,8 @@ test('can not create content with an entity picker using the collection data sou
   await umbracoUi.content.isChooseButtonVisible(false);
 });
 
-test('can not create content with an entity picker using the collection data source that has less items than min amount', async ({umbracoApi, umbracoUi}) => {
+// Skip this test due to this issue: https://github.com/umbraco/Umbraco-CMS/issues/22121
+test.skip('can not create content with an entity picker using the collection data source that has less items than min amount', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedState = 'Published';
   const dataTypeId = await umbracoApi.dataType.createEntityDataPickerDataTypeWithMinAndMaxValues(dataTypeName, collectionDataSourceAlias, 2, 5);

@@ -22,6 +22,14 @@ public class PremigrationUpgrader : INotificationAsyncHandler<RuntimePremigratio
     private readonly IUmbracoDatabaseFactory _umbracoDatabaseFactory;
     private readonly IKeyValueService _keyValueService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PremigrationUpgrader"/> class.
+    /// </summary>
+    /// <param name="profilingLogger">Provides logging and profiling capabilities for the upgrade process.</param>
+    /// <param name="databaseBuilder">Handles database schema creation and migration tasks.</param>
+    /// <param name="runtimeState">Represents the current runtime state of the Umbraco application.</param>
+    /// <param name="umbracoDatabaseFactory">Factory for creating Umbraco database connections.</param>
+    /// <param name="keyValueService">Service for accessing and storing key-value pairs in the database.</param>
     public PremigrationUpgrader(
         IProfilingLogger profilingLogger,
         DatabaseBuilder databaseBuilder,
@@ -36,6 +44,13 @@ public class PremigrationUpgrader : INotificationAsyncHandler<RuntimePremigratio
         _keyValueService = keyValueService;
     }
 
+    /// <summary>
+    /// Executes the premigration upgrade process during Umbraco runtime startup if required.
+    /// Checks if the database is configured and Umbraco is installed, then runs any pending premigrations.
+    /// </summary>
+    /// <param name="notification">A notification object that will be updated with the result of the premigration upgrade.</param>
+    /// <param name="cancellationToken">A cancellation token that can be used to cancel the asynchronous operation.</param>
+    /// <returns>A task that represents the asynchronous premigration upgrade operation.</returns>
     public async Task HandleAsync(RuntimePremigrationsUpgradeNotification notification, CancellationToken cancellationToken)
     {
         // no connection string set

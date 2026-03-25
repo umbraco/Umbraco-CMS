@@ -10,6 +10,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 /// </summary>
 internal sealed class StylesheetRepository : FileRepository<string, IStylesheet>, IStylesheetRepository
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="StylesheetRepository"/> class, which manages stylesheet files in the Umbraco CMS.
+    /// </summary>
+    /// <param name="fileSystems">The file systems used by the repository to access and manage stylesheet files.</param>
     public StylesheetRepository(FileSystems fileSystems)
         : base(fileSystems.StylesheetsFileSystem)
     {
@@ -17,6 +21,13 @@ internal sealed class StylesheetRepository : FileRepository<string, IStylesheet>
 
     #region Overrides of FileRepository<string,Stylesheet>
 
+    /// <summary>
+    /// Retrieves a stylesheet by its identifier from the underlying file system.
+    /// </summary>
+    /// <param name="id">The identifier (relative path) of the stylesheet to retrieve. If <c>null</c>, the method returns <c>null</c>.</param>
+    /// <returns>
+    /// The <see cref="IStylesheet"/> instance if found; otherwise, <c>null</c> if the stylesheet does not exist, the identifier is <c>null</c>, or the file system is unavailable.
+    /// </returns>
     public override IStylesheet? Get(string? id)
     {
         if (id is null || FileSystem is null)
@@ -66,6 +77,13 @@ internal sealed class StylesheetRepository : FileRepository<string, IStylesheet>
         return stylesheet;
     }
 
+    /// <summary>
+    /// Saves the specified stylesheet entity to the data store.
+    /// </summary>
+    /// <param name="entity">The stylesheet entity to save.</param>
+    /// <remarks>
+    /// This method overrides the base implementation and ensures that the stylesheet's content is set up for lazy loading after saving.
+    /// </remarks>
     public override void Save(IStylesheet entity)
     {
         // TODO: Casting :/ Review GetFileContent and it's usages, need to look into it later
@@ -80,6 +98,11 @@ internal sealed class StylesheetRepository : FileRepository<string, IStylesheet>
         }
     }
 
+    /// <summary>
+    /// Retrieves multiple stylesheets by their identifiers, ensuring each identifier ends with ".css".
+    /// </summary>
+    /// <param name="ids">An optional array of stylesheet identifiers. If provided, each identifier is normalized to end with ".css" and duplicates are removed. If null or empty, all available stylesheets are returned.</param>
+    /// <returns>An enumerable collection of <see cref="IStylesheet"/> instances matching the specified identifiers, or all stylesheets if no identifiers are provided.</returns>
     public override IEnumerable<IStylesheet> GetMany(params string[]? ids)
     {
         // ensure they are de-duplicated, easy win if people don't do this as this can cause many excess queries

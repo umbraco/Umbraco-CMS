@@ -1,11 +1,9 @@
 using System.Globalization;
 using System.Text.RegularExpressions;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
@@ -32,6 +30,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         public static bool ThrowOnWarning { get; set; } = false;
     }
 
+    /// <summary>
+    /// Provides a base implementation for repositories that manage content entities in the database.
+    /// </summary>
+    /// <typeparam name="TId">The type of the unique identifier for the entity.</typeparam>
+    /// <typeparam name="TEntity">The type of the content entity managed by the repository.</typeparam>
+    /// <typeparam name="TRepository">The type of the concrete repository implementation.</typeparam>
     public abstract class ContentRepositoryBase<TId, TEntity, TRepository> : EntityRepositoryBase<TId, TEntity>, IContentRepository<TId, TEntity>
         where TEntity : class, IContentBase
         where TRepository : class, IRepository
@@ -68,35 +72,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             _eventAggregator = eventAggregator;
         }
 
-        [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
-        protected ContentRepositoryBase(
-            IScopeAccessor scopeAccessor,
-            AppCaches cache,
-            ILogger<EntityRepositoryBase<TId, TEntity>> logger,
-            ILanguageRepository languageRepository,
-            IRelationRepository relationRepository,
-            IRelationTypeRepository relationTypeRepository,
-            PropertyEditorCollection propertyEditors,
-            DataValueReferenceFactoryCollection dataValueReferenceFactories,
-            IDataTypeService dataTypeService,
-            IEventAggregator eventAggregator)
-            : this(
-                scopeAccessor,
-                cache,
-                logger,
-                languageRepository,
-                relationRepository,
-                relationTypeRepository,
-                propertyEditors,
-                dataValueReferenceFactories,
-                dataTypeService,
-                eventAggregator,
-                StaticServiceProvider.Instance.GetRequiredService<IRepositoryCacheVersionService>(),
-                StaticServiceProvider.Instance.GetRequiredService<ICacheSyncService>())
-        {
-        }
-
-
         protected abstract TRepository This { get; }
 
         /// <summary>
@@ -116,17 +91,40 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         #region Versions
 
-        // gets a specific version
+        /// <summary>
+        /// Gets a specific version of the entity by its version ID.
+        /// </summary>
+        /// <remarks>gets a specific version</remarks>
+        /// <param name="versionId">The ID of the version to retrieve.</param>
+        /// <returns>The entity corresponding to the specified version ID, or null if not found.</returns>
         public abstract TEntity? GetVersion(int versionId);
 
-        // gets all versions, current first
+        /// <summary>
+        /// Retrieves all versions of the specified content item, with the current version listed first.
+        /// </summary>
+        /// <remarks>gets all versions, current first</remarks>
+        /// <param name="nodeId">The identifier of the content node whose versions are to be retrieved.</param>
+        /// <returns>An enumerable collection containing all versions of the content item.</returns>
         public abstract IEnumerable<TEntity> GetAllVersions(int nodeId);
 
-        // gets all versions, current first
+        /// <summary>
+        /// Retrieves a paged, lightweight collection of all versions for the specified content node.
+        /// </summary>
+        /// <remarks>gets all versions, current first</remarks>
+        /// <param name="nodeId">The unique identifier of the content node whose versions are to be retrieved.</param>
+        /// <param name="skip">The number of versions to skip before starting to return results (for paging).</param>
+        /// <param name="take">The maximum number of versions to return.</param>
+        /// <returns>An <see cref="IEnumerable{TEntity}"/> containing slim representations of the content node's versions, ordered with the most recent first.</returns>
         public virtual IEnumerable<TEntity> GetAllVersionsSlim(int nodeId, int skip, int take)
             => GetAllVersions(nodeId).Skip(skip).Take(take);
 
-        // gets all version ids, current first
+        /// <summary>
+        /// Retrieves the IDs of all versions for the specified node, with the current (published or latest) version listed first, followed by previous versions in descending order by version date.
+        /// </summary>
+        /// <remarks>gets all version ids, current first</remarks>
+        /// <param name="nodeId">The identifier of the node whose version IDs are to be retrieved.</param>
+        /// <param name="maxRows">The maximum number of version IDs to return.</param>
+        /// <returns>An enumerable collection of version IDs, ordered with the current version first and older versions following in descending order by date.</returns>
         public virtual IEnumerable<int> GetVersionIds(int nodeId, int maxRows)
         {
             SqlTemplate template = SqlContext.Templates.Get(Constants.SqlTemplates.VersionableRepository.GetVersionIds, tsql =>
@@ -139,7 +137,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return Database.Fetch<int>(SqlSyntax.SelectTop(template.Sql(nodeId), maxRows));
         }
 
-        // deletes a specific version
+        /// <summary>
+        /// Deletes a specific version of the entity by its version ID.
+        /// Throws an <see cref="InvalidOperationException"/> if attempting to delete the current version.
+        /// </summary>
+        /// <remarks>deletes a specific version</remarks>
+        /// <param name="versionId">The ID of the version to delete.</param>
         public virtual void DeleteVersion(int versionId)
         {
             // TODO: test object node type?
@@ -164,7 +167,15 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             PerformDeleteVersion(versionDto.NodeId, versionId);
         }
 
-        // deletes all versions of an entity, older than a date.
+        /// <summary>
+        /// Deletes all non-current versions of an entity with the specified node ID that are older than the given version date.
+        /// </summary>
+        /// <param name="nodeId">The ID of the node whose versions are to be deleted.</param>
+        /// <param name="versionDate">The cutoff date; versions older than this date will be deleted.</param>
+        /// <remarks>
+        /// deletes all versions of an entity, older than a date.
+        /// The current version is not deleted, even if it is older than <paramref name="versionDate"/>.
+        /// </remarks>
         public virtual void DeleteVersions(int nodeId, DateTime versionDate)
         {
             // TODO: test object node type?
@@ -194,8 +205,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         #region Count
 
         /// <summary>
-        /// Count descendants of an item.
+        /// Counts the number of descendant items for a specified parent item, optionally filtered by content type alias.
         /// </summary>
+        /// <param name="parentId">The ID of the parent item whose descendants will be counted. Use -1 to count all root-level descendants.</param>
+        /// <param name="contentTypeAlias">An optional content type alias to filter descendants by type. If null or empty, all descendant types are counted.</param>
+        /// <returns>The number of descendant items that match the specified criteria.</returns>
         public int CountDescendants(int parentId, string? contentTypeAlias = null)
         {
             var pathMatch = parentId == -1
@@ -228,8 +242,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         }
 
         /// <summary>
-        /// Count children of an item.
+        /// Counts the number of child items for a specified parent item.
         /// </summary>
+        /// <param name="parentId">The ID of the parent item whose children will be counted.</param>
+        /// <param name="contentTypeAlias">An optional content type alias to filter the children by their type. If <c>null</c> or empty, all child items are counted.</param>
+        /// <returns>The total number of child items that match the specified criteria.</returns>
         public int CountChildren(int parentId, string? contentTypeAlias = null)
         {
             Sql<ISqlContext> sql = SqlContext.Sql()
@@ -258,8 +275,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         }
 
         /// <summary>
-        /// Count items.
+        /// Returns the number of content items, optionally filtered by content type alias.
         /// </summary>
+        /// <param name="contentTypeAlias">The alias of the content type to filter by, or <c>null</c> to count all content items.</param>
+        /// <returns>The number of content items matching the specified criteria.</returns>
         public int Count(string? contentTypeAlias = null)
         {
             Sql<ISqlContext> sql = SqlContext.Sql()
@@ -363,6 +382,51 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         protected void ClearEntityTags(IContentBase entity, ITagRepository tagRepo)
         {
             tagRepo.RemoveAll(entity.Id);
+        }
+
+        #endregion
+
+        #region Sortable Values
+
+        /// <summary>
+        /// Sets sortable values for property data DTOs that support custom sorting.
+        /// </summary>
+        /// <param name="entity">The content entity containing the properties.</param>
+        /// <param name="propertyDtos">The property data DTOs to update with sortable values.</param>
+        private void SetEntitySortableValues(IContentBase entity, IEnumerable<PropertyDataDto> propertyDtos)
+        {
+            // Create a lookup of property DTOs by property type ID for efficient matching
+            var dtosByPropertyTypeId = propertyDtos
+                .GroupBy(d => d.PropertyTypeId)
+                .ToDictionary(g => g.Key, g => g.ToList());
+
+            foreach (IProperty property in entity.Properties)
+            {
+                if (PropertyEditors.TryGet(property.PropertyType.PropertyEditorAlias, out IDataEditor? editor) is false)
+                {
+                    continue;
+                }
+
+                if (editor.GetValueEditor() is not IDataValueSortable sortableProvider)
+                {
+                    continue;
+                }
+
+                if (dtosByPropertyTypeId.TryGetValue(property.PropertyTypeId, out List<PropertyDataDto>? dtos) is false)
+                {
+                    continue;
+                }
+
+                object? configurationObject = DataTypeService.GetDataType(property.PropertyType.DataTypeId)?.ConfigurationObject;
+
+                // Set sortable values for each matching DTO
+                foreach (PropertyDataDto dto in dtos)
+                {
+                    // Get the stored value from the DTO
+                    object? value = dto.TextValue ?? dto.VarcharValue ?? (object?)dto.DateValue ?? dto.DecimalValue ?? dto.IntegerValue;
+                    dto.SortableValue = sortableProvider.GetSortableValue(value, configurationObject);
+                }
+            }
         }
 
         #endregion
@@ -552,7 +616,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             var sortedString = $"COALESCE({QuoteColumnName("varcharValue")},'')"; // assuming COALESCE is ok for all syntaxes
 
             // needs to be an outer join since there's no guarantee that any of the nodes have values for this property
+            // sortableValue takes precedence when populated - this allows property editors to provide a custom
+            // sortable string representation for values that don't sort naturally (e.g., JSON-serialized dates)
             Sql<ISqlContext> innerSql = Sql().Select($@"CASE
+                            WHEN {QuoteColumnName("sortableValue")} IS NOT NULL THEN {QuoteColumnName("sortableValue")}
                             WHEN {QuoteColumnName("intValue")} IS NOT NULL THEN {sortedInt}
                             WHEN {QuoteColumnName("decimalValue")} IS NOT NULL THEN {sortedDecimal}
                             WHEN {QuoteColumnName("dateValue")} IS NOT NULL THEN {sortedDate}
@@ -595,36 +662,44 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         }
 
         /// <summary>
-        ///     Gets a page of content items.
+        ///     Retrieves a page of content items based on the specified query, paging, filtering, and ordering parameters.
         /// </summary>
-        /// <param name="query">The query to filter by parent.</param>
-        /// <param name="pageIndex">The page index.</param>
-        /// <param name="pageSize">The page size.</param>
-        /// <param name="totalRecords">Total number of records.</param>
-        /// <param name="filter">Additional query filter.</param>
-        /// <param name="ordering">Ordering information.</param>
+        /// <param name="query">The query to filter content items by parent.</param>
+        /// <param name="pageIndex">The zero-based index of the page to retrieve.</param>
+        /// <param name="pageSize">The number of items per page.</param>
+        /// <param name="totalRecords">When this method returns, contains the total number of records matching the query and filter.</param>
+        /// <param name="filter">An additional query filter to further refine the results.</param>
+        /// <param name="ordering">The ordering information for sorting the results.</param>
+        /// <returns>An enumerable collection of content items for the specified page.</returns>
         [Obsolete("Please use the method overload with all parameters. Scheduled for removal in Umbraco 19.")]
         public abstract IEnumerable<TEntity> GetPage(IQuery<TEntity>? query, long pageIndex, int pageSize, out long totalRecords, IQuery<TEntity>? filter, Ordering? ordering);
 
         /// <summary>
-        ///     Gets a page of content items with optional property filtering.
+        ///     Retrieves a page of content items, optionally filtering by parent, properties, and additional criteria.
         /// </summary>
-        /// <param name="query">The query to filter by parent.</param>
-        /// <param name="pageIndex">The page index.</param>
-        /// <param name="pageSize">The page size.</param>
-        /// <param name="totalRecords">Total number of records.</param>
+        /// <param name="query">An optional query to filter content items by parent.</param>
+        /// <param name="pageIndex">The zero-based index of the page to retrieve.</param>
+        /// <param name="pageSize">The number of items per page.</param>
+        /// <param name="totalRecords">When this method returns, contains the total number of records matching the query and filter.</param>
         /// <param name="propertyAliases">
-        ///     The property aliases to load. If null, all properties are loaded.
-        ///     If empty array, no custom properties are loaded.
+        ///     The property aliases to load for each content item. If <c>null</c>, all properties are loaded. If an empty array, no custom properties are loaded.
         /// </param>
-        /// <param name="filter">Additional query filter.</param>
-        /// <param name="ordering">Ordering information.</param>
+        /// <param name="filter">An optional additional query to further filter the content items.</param>
+        /// <param name="ordering">Optional ordering information for the results.</param>
+        /// <returns>An enumerable collection of <typeparamref name="TEntity"/> representing the content items for the specified page.</returns>
         // TODO (V19): Make this method abstract.
 #pragma warning disable CS0618 // Type or member is obsolete
         public virtual IEnumerable<TEntity> GetPage(IQuery<TEntity>? query, long pageIndex, int pageSize, out long totalRecords, string[]? propertyAliases, IQuery<TEntity>? filter, Ordering? ordering)
             => GetPage(query, pageIndex, pageSize, out totalRecords, filter, ordering);
 #pragma warning restore CS0618 // Type or member is obsolete
 
+        /// <summary>
+        /// Checks the integrity of content nodes by validating their paths and levels, and optionally fixes detected inconsistencies.
+        /// </summary>
+        /// <param name="options">Specifies options for the integrity check, such as whether to automatically fix issues found.</param>
+        /// <returns>
+        /// A <see cref="Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.ContentDataIntegrityReport"/> detailing any nodes with invalid paths or levels, and indicating which issues were fixed if applicable.
+        /// </returns>
         public ContentDataIntegrityReport CheckDataIntegrity(ContentDataIntegrityReportOptions options)
         {
             var report = new Dictionary<int, ContentDataIntegrityReportEntry>();
@@ -1030,6 +1105,13 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         protected class TempContent
         {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="TempContent"/> class.
+            /// </summary>
+            /// <param name="id">The identifier of the content.</param>
+            /// <param name="versionId">The version identifier of the content.</param>
+            /// <param name="publishedVersionId">The published version identifier of the content.</param>
+            /// <param name="contentType">The content type composition associated with the content.</param>
             public TempContent(int id, int versionId, int publishedVersionId, IContentTypeComposition? contentType)
             {
                 Id = id;
@@ -1072,6 +1154,14 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         protected class TempContent<T> : TempContent
             where T : class, IContentBase
         {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="TempContent{T}"/> class with the specified identifiers, content type, and content instance.
+            /// </summary>
+            /// <param name="id">The unique identifier of the content.</param>
+            /// <param name="versionId">The unique identifier of the content version.</param>
+            /// <param name="publishedVersionId">The unique identifier of the published version of the content.</param>
+            /// <param name="contentType">The <see cref="IContentTypeComposition"/> associated with the content.</param>
+            /// <param name="content">The content instance of type <typeparamref name="T"/>. Optional.</param>
             public TempContent(int id, int versionId, int publishedVersionId, IContentTypeComposition? contentType, T? content = null)
                 : base(id, versionId, publishedVersionId, contentType)
             {
@@ -1096,16 +1186,23 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         #region Utilities
 
         protected virtual string? EnsureUniqueNodeName(int parentId, string? nodeName, int id = 0)
+            => EnsureUniqueNodeName(parentId, nodeName, id, out _);
+
+        private protected string? EnsureUniqueNodeName(int parentId, string? nodeName, int id, out List<SimilarNodeName> siblings)
         {
-            SqlTemplate? template = SqlContext.Templates.Get(Constants.SqlTemplates.VersionableRepository.EnsureUniqueNodeName, tsql => tsql
-                .Select<NodeDto>(x => Alias(x.NodeId, "id"), x => Alias(x.Text!, "name"))
-                .From<NodeDto>()
-                .Where<NodeDto>(x => x.NodeObjectType == SqlTemplate.Arg<Guid>("nodeObjectType") && x.ParentId == SqlTemplate.Arg<int>("parentId")));
+            SqlTemplate template = SqlContext.Templates.Get(
+                Constants.SqlTemplates.VersionableRepository.EnsureUniqueNodeName,
+                tsql => tsql
+                    .Select<NodeDto>(x => Alias(x.NodeId, "id"), x => Alias(x.Text!, "name"))
+                    .From<NodeDto>()
+                    .Where<NodeDto>(x =>
+                        x.NodeObjectType == SqlTemplate.Arg<Guid>("nodeObjectType") &&
+                        x.ParentId == SqlTemplate.Arg<int>("parentId")));
 
             Sql<ISqlContext> sql = template.Sql(NodeObjectTypeId, parentId);
-            List<SimilarNodeName>? names = Database.Fetch<SimilarNodeName>(sql);
+            siblings = Database.Fetch<SimilarNodeName>(sql);
 
-            return SimilarNodeName.GetUniqueName(names, id, nodeName);
+            return SimilarNodeName.GetUniqueName(siblings, id, nodeName);
         }
 
         protected virtual bool SortorderExists(int parentId, int sortOrder)
@@ -1166,18 +1263,21 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         #region Recycle bin
 
+        /// <summary>
+        /// Gets the unique identifier for the recycle bin associated with this repository.
+        /// </summary>
         public abstract int RecycleBinId { get; }
 
+        /// <summary>
+        /// Gets all entities that are currently in the recycle bin.
+        /// </summary>
+        /// <returns>An enumerable collection of entities that are trashed.</returns>
         public virtual IEnumerable<TEntity> GetRecycleBin()
         {
             return Get(Query<TEntity>().Where(entity => entity.Trashed));
         }
 
         #endregion
-
-        [Obsolete("This method is no longer used as the persistance of relations has been moved to the ContentRelationsUpdate notification handler. Scheduled for removal in Umbraco 18.")]
-        protected void PersistRelations(TEntity entity)
-            => Logger.LogWarning("ContentRepositoryBase.PersistRelations was called but this is now an obsolete, no-op method that is unused in Umbraco. No relations were persisted. Relations persistence has moved to the ContentRelationsUpdate notification handler.");
 
         /// <summary>
         /// Inserts property values for the content entity
@@ -1191,9 +1291,20 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         /// </remarks>
         protected void InsertPropertyValues(TEntity entity, int publishedVersionId, out bool edited, out HashSet<string>? editedCultures)
         {
-            // persist the property data
-            IEnumerable<PropertyDataDto> propertyDataDtos = PropertyFactory.BuildDtos(entity.ContentType.Variations, entity.VersionId, publishedVersionId, entity.Properties, LanguageRepository, out edited, out editedCultures);
-            foreach (PropertyDataDto? propertyDataDto in propertyDataDtos)
+            // Persist the property data.
+            var propertyDataDtos = PropertyFactory.BuildDtos(
+                entity.ContentType.Variations,
+                entity.VersionId,
+                publishedVersionId,
+                entity.Properties,
+                LanguageRepository,
+                out edited,
+                out editedCultures).ToList();
+
+            // Set sortable values for property editors that support custom sorting.
+            SetEntitySortableValues(entity, propertyDataDtos);
+
+            foreach (PropertyDataDto propertyDataDto in propertyDataDtos)
             {
                 Database.Insert(propertyDataDto);
             }
@@ -1226,7 +1337,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 propertyTypeToPropertyData[(p.PropertyTypeId, p.VersionId, p.LanguageId, p.Segment)] = p;
             }
 
-            IEnumerable<PropertyDataDto> propertyDataDtos = PropertyFactory.BuildDtos(entity.ContentType.Variations, entity.VersionId, publishedVersionId, entity.Properties, LanguageRepository, out edited, out editedCultures);
+            var propertyDataDtos = PropertyFactory.BuildDtos(entity.ContentType.Variations, entity.VersionId, publishedVersionId, entity.Properties, LanguageRepository, out edited, out editedCultures).ToList();
+
+            // Set sortable values for property editors that support custom sorting.
+            SetEntitySortableValues(entity, propertyDataDtos);
 
             var toUpdate = new List<PropertyDataDto>();
             var toInsert = new List<PropertyDataDto>();

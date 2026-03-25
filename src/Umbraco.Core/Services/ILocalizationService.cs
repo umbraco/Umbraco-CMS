@@ -15,16 +15,6 @@ public interface ILocalizationService : IService
     // Remove Text (in translation)
 
     /// <summary>
-    ///     Adds or updates a translation for a dictionary item and language
-    /// </summary>
-    /// <param name="item"></param>
-    /// <param name="language"></param>
-    /// <param name="value"></param>
-    /// <returns></returns>
-    [Obsolete("Please use IDictionaryItemService for dictionary item operations. Scheduled for removal in Umbraco 18.")]
-    void AddOrUpdateDictionaryValue(IDictionaryItem item, ILanguage? language, string value);
-
-    /// <summary>
     ///     Creates and saves a new dictionary item and assigns a value to all languages if defaultValue is specified.
     /// </summary>
     /// <param name="key"></param>
@@ -162,15 +152,6 @@ public interface ILocalizationService : IService
     int? GetLanguageIdByIsoCode(string isoCode);
 
     /// <summary>
-    ///     Gets a language ISO code from its identifier.
-    /// </summary>
-    /// <remarks>
-    ///     <para>This can be optimized and bypass all deep cloning.</para>
-    /// </remarks>
-    [Obsolete("Please use ILanguageService for language operations. Scheduled for removal in Umbraco 18.")]
-    string? GetLanguageIsoCodeById(int id);
-
-    /// <summary>
     ///     Gets the default language ISO code.
     /// </summary>
     /// <remarks>
@@ -210,24 +191,4 @@ public interface ILocalizationService : IService
     /// <param name="userId">Optional id of the user deleting the language</param>
     [Obsolete("Please use ILanguageService for language operations. Scheduled for removal in Umbraco 18.")]
     void Delete(ILanguage language, int userId = Constants.Security.SuperUserId);
-
-    /// <summary>
-    ///     Gets the full dictionary key map.
-    /// </summary>
-    /// <returns>The full dictionary key map.</returns>
-    [Obsolete("Please use IDictionaryItemService for dictionary item operations. Scheduled for removal in Umbraco 18.")]
-    Dictionary<string, Guid> GetDictionaryItemKeyMap();
-
-    /// <summary>
-    /// Gets all languages with paging support.
-    /// </summary>
-    /// <param name="skip">The number of items to skip.</param>
-    /// <param name="take">The number of items to take.</param>
-    /// <returns>A paged model containing the languages.</returns>
-    [Obsolete("Please use ILanguageService for language operations. Scheduled for removal in Umbraco 18.")]
-    PagedModel<ILanguage> GetAllLanguagesPaged(int skip, int take)
-    {
-        ILanguage[] all = GetAllLanguages().Skip(skip).Take(take).ToArray();
-        return new PagedModel<ILanguage>(all.Length, all);
-    }
 }

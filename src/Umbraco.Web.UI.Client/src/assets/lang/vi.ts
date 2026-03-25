@@ -401,6 +401,8 @@ export default {
 		fileSecurityValidationFailure: 'Một hoặc nhiều xác thực bảo mật tệp đã thất bại',
 		moveToSameFolderFailed: 'Thư mục cha và thư mục đích không thể giống nhau',
 		uploadNotAllowed: 'Tải lên không được phép ở vị trí này.',
+		uploadValidationFailed: (mediaTypeName: string) =>
+			`Loại phương tiện ${mediaTypeName} có một hoặc nhiều thuộc tính bắt buộc. Nó sẽ cần được tải lên riêng lẻ thông qua menu 'Tạo'`,
 	},
 	member: {
 		'2fa': 'Xác thực hai yếu tố',
@@ -533,7 +535,10 @@ export default {
 		confirmremoveusageof: 'Bạn có chắc chắn muốn xóa việc sử dụng <strong>%0%</strong> không?',
 		confirmlogout: 'Bạn có chắc chắn muốn đăng xuất?',
 		confirmSure: 'Bạn có chắc chắn?',
+		cannotTrashWhenReferenced: (name: string) => `<strong>${name}</strong> không thể được chuyển vào Thùng rác vì nó được tham chiếu bởi các mục khác.`,
 		confirmTrash: (name: string) => `Bạn có chắc chắn muốn di chuyển <strong>${name}</strong> vào Thùng rác?`,
+		cannotBulkTrashWhenReferenced: (total: number) =>
+			`<strong>${total} ${total === 1 ? 'mục' : 'các mục'}</strong> đã chọn không thể được chuyển vào Thùng rác vì ít nhất một mục được tham chiếu bởi nội dung khác.`,
 		confirmBulkTrash: (total: number) =>
 			`Bạn có chắc chắn muốn di chuyển <strong>${total} ${total === 1 ? 'mục' : 'các mục'}</strong> vào Thùng rác?`,
 		confirmBulkDelete: (total: number) =>

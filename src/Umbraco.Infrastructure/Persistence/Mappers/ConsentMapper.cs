@@ -10,6 +10,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Mappers;
 [MapperFor(typeof(Consent))]
 public sealed class ConsentMapper : BaseMapper
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ConsentMapper"/> class.
+    /// </summary>
+    /// <param name="sqlContext">A lazy-initialized SQL context used for database operations.</param>
+    /// <param name="maps">The configuration store for mapper definitions.</param>
     public ConsentMapper(Lazy<ISqlContext> sqlContext, MapperConfigurationStore maps)
         : base(sqlContext, maps)
     {

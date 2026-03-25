@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -15,6 +15,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Media;
 
+/// <summary>
+/// Provides API endpoints for moving media items within the Umbraco CMS.
+/// </summary>
 [ApiVersion("1.0")]
 public class MoveMediaController : MediaControllerBase
 {
@@ -22,6 +25,12 @@ public class MoveMediaController : MediaControllerBase
     private readonly IMediaEditingService _mediaEditingService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MoveMediaController"/> class.
+    /// </summary>
+    /// <param name="authorizationService">Service used to authorize user actions on media items.</param>
+    /// <param name="mediaEditingService">Service responsible for editing and moving media items.</param>
+    /// <param name="backOfficeSecurityAccessor">Accessor for back office security context and user information.</param>
     public MoveMediaController(
         IAuthorizationService authorizationService,
         IMediaEditingService mediaEditingService,
