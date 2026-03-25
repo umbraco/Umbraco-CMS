@@ -14,7 +14,7 @@ public class SvgDimensionExtractor : ISvgDimensionExtractor
     /// <inheritdoc />
     public Size? GetDimensions(Stream stream)
     {
-        if (!stream.CanRead)
+        if (stream.CanRead is false)
         {
             return null;
         }
