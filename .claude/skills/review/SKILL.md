@@ -142,59 +142,30 @@ Analyze each changed file against:
 Present the review in this exact format:
 
 ```markdown
-## PR Review - Umbraco CMS
+## PR Review
 
-**Target branch:** `{target}`
-**Files reviewed:** {count} ({layer breakdown, e.g. "3 Core, 2 Infrastructure, 1 API"})
-**Commits:** {count}
+**Target:** `{target_branch}` · **Commit:** `{head_sha}`
 
----
+[1–2 sentences: what this PR accomplishes , keep it as short as possible, only highlight the primary essence.]
 
-### PR Intent
-
-[2-3 sentences describing what this PR accomplishes based on commits and code changes]
-
-### Impact Analysis
-
-- **Modified public API surface:** {list of changed public interfaces/classes/methods, or "None"}
-- **Affected consumers (outside PR):** {list of files/types that use modified types, or "None found"}
-- **Dependency flow:** {OK or violations found with details}
-
-### Breaking Changes Check
-
-[Findings with specific violations, or "No breaking changes detected"]
-
----
-
-### Score Table
-
-| Category | Score | Comment |
-| :--- | ---: | :--- |
-| **Overall** | **XX** | |
-| Security | XX | |
-| Performance | XX | |
-| Architecture | XX | |
-| Consistency | XX | |
-| Testing | XX | |
-| Readability | XX | |
-| Error Handling | XX | |
-| {context-specific 1} | XX | |
-| {context-specific 2} | XX | |
-| {context-specific 3} | XX | |
-
-Select 3-6 context-specific categories relevant to this particular PR (e.g., Breaking Changes, API Design, Database, Frontend, Concurrency, Observability, Configuration, Domain Modeling).
-
-The overall score is weighted by relevance, not a simple average.
+- **Modified public API:** {changed existing interfaces/types/classes/methods}
+  [Omit bullet if none]
+- **Affected implementations (outside this PR):** {interfaces/types/classes/methods using modified public API}
+  [Omit bullet if none]
+- **Breaking changes:** {violations with specifics}
+  [Omit bullet if none]
+- **Noticeable changes:** {other changes of this PR based on commits and code changes, not listed above}
+  [Omit bullet if none]
 
 ---
 
 ### Critical
 
-[Must fix before merge — security vulnerabilities, data loss risks, broken functionality, breaking changes without proper patterns]
+[Must fix before merge — security vulnerabilities, data loss, broken functionality, breaking changes without proper patterns]
 
 - **`{file}:{line}`**: {problem} → {fix}
 
-[If none, omit this section entirely]
+[Omit section if none]
 
 ### Important
 
@@ -202,21 +173,15 @@ The overall score is weighted by relevance, not a simple average.
 
 - **`{file}:{line}`**: {observation} → {suggestion}
 
-[If none, omit this section entirely]
+[Omit section if none]
 
-### Suggestion
+### Suggestions
 
 [Nice to have — readability, minor refactoring, alternative approaches]
 
 - **`{file}:{line}`**: {detail}
 
-[If none, omit this section entirely]
-
-### Praise
-
-[Good patterns and decisions worth noting — always try to find something positive]
-
-- {what was done well and why it's good}
+[Omit section if none]
 
 ---
 
@@ -226,7 +191,7 @@ The overall score is weighted by relevance, not a simple average.
 
 - **Approve** — Ship it.
 - **Approve with nits** — Good to go, consider the suggestions.
-- **Request Changes** — Critical/important issues must be addressed.
+- **Request Changes** — Critical or important issues must be addressed first.
 ```
 
 **Guidelines for the review output:**
