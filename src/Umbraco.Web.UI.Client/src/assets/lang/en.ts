@@ -2056,7 +2056,7 @@ export default {
 		},
 		changePassword: 'Change your password',
 		changePhoto: 'Change photo',
-		configureMfa: 'Configure MFA',
+		configureMfa: 'Configure 2FA',
 		emailRequired: 'Required - enter an email address for this user',
 		emailDescription: (usernameIsEmail: boolean) => {
 			return usernameIsEmail
