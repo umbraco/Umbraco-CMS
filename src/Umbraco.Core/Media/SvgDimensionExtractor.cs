@@ -42,7 +42,6 @@ public class SvgDimensionExtractor : ISvgDimensionExtractor
                 stream.Position = originalPosition.Value;
             }
         }
-
     }
 
     private Size? ReadDimensions(Stream stream)
