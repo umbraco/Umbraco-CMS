@@ -141,14 +141,9 @@ Use the `Read` tool with the `limit` parameter. Run these in parallel for effici
 
 **For files over 1500 lines**, never read in full. Use targeted `offset`/`limit` reads around the regions identified from the diff hunks.
 
-#### 4d. Log a summary
+#### 4d. Track file counts
 
-After gathering, log:
-- Total changed files: {N}
-- Noise files skipped: {N}
-- Reviewable files: {N}
-- Files read in full: {N} (with reason)
-- Files read partially (header only): {N}
+Keep track of these numbers for the review output in step 8: total changed files, noise files skipped, reviewable files, files read in full, and files read header-only.
 
 ### 5. Impact Analysis
 
@@ -193,7 +188,7 @@ Present the review in this exact format:
 ```markdown
 ## PR Review
 
-**Target:** `{target_branch}` · **Based on commit:** `{head_sha}`
+**Target:** `{target_branch}` · **Based on commit:** `{head_sha}` · **Files:** {total} changed, {skipped} skipped, {reviewed} reviewed ({full_read} full, {header_only} header-only)
 
 [1–2 sentences: what this PR accomplishes , keep it as short as possible, only highlight the primary essence.]
 
