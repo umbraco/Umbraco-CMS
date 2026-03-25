@@ -46,8 +46,8 @@ internal sealed partial class ContentTypeEditingServiceTests
         Assert.AreEqual("icon icon-something-updated", contentType.Icon);
         Assert.IsFalse(contentType.AllowedAsRoot);
 
-        // expect MetadataChanged (which includes RefreshOther) when changing basic settings only
-        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.MetadataChanged);
+        // expect RefreshOther when changing basic settings only
+        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.RefreshOther);
     }
 
     [TestCase(false)]
@@ -214,8 +214,8 @@ internal sealed partial class ContentTypeEditingServiceTests
         Assert.IsTrue(allowedContentTypes.Any(c => c.Key == allowedOne.Key && c.SortOrder == 0 && c.Alias == allowedOne.Alias));
         Assert.IsTrue(allowedContentTypes.Any(c => c.Key == allowedTwo.Key && c.SortOrder == 1 && c.Alias == allowedTwo.Alias));
 
-        // expect StructureSettingsChanged (which includes RefreshOther) when changing allowed types
-        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.StructureSettingsChanged);
+        // expect RefreshOther when changing allowed types
+        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.RefreshOther);
     }
 
     [Test]
@@ -250,8 +250,8 @@ internal sealed partial class ContentTypeEditingServiceTests
         Assert.IsNotNull(allowedContentTypes);
         Assert.AreEqual(0, allowedContentTypes.Length);
 
-        // expect StructureSettingsChanged (which includes RefreshOther) when changing allowed types
-        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.StructureSettingsChanged);
+        // expect RefreshOther when changing allowed types
+        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.RefreshOther);
     }
 
     [Test]
@@ -325,8 +325,8 @@ internal sealed partial class ContentTypeEditingServiceTests
         Assert.AreEqual(1, allowedContentTypes.Length);
         Assert.IsTrue(allowedContentTypes.Any(c => c.Key == contentType.Key && c.SortOrder == 0 && c.Alias == contentType.Alias));
 
-        // expect StructureSettingsChanged (which includes RefreshOther) when changing allowed types
-        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.StructureSettingsChanged);
+        // expect RefreshOther when changing allowed types
+        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.RefreshOther);
     }
 
     [TestCase(false)]
@@ -776,8 +776,8 @@ internal sealed partial class ContentTypeEditingServiceTests
         Assert.AreEqual("testProperty1", contentType.PropertyGroups.First().PropertyTypes!.Single().Alias);
         Assert.AreEqual("testProperty2", contentType.NoGroupPropertyTypes.Single().Alias);
 
-        // expect StructureSettingsChanged when modifying container structure (PropertyGroups dirty)
-        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.StructureSettingsChanged);
+        // expect RefreshOther when modifying container structure
+        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.RefreshOther);
     }
 
     [Test]
@@ -988,9 +988,8 @@ internal sealed partial class ContentTypeEditingServiceTests
         Assert.AreEqual(234, contentType.HistoryCleanup.KeepAllVersionsNewerThanDays);
         Assert.AreEqual(567, contentType.HistoryCleanup.KeepLatestVersionPerDayForDays);
 
-        // expect MetadataChanged (which includes RefreshOther) when changing name.
-        // Note: HistoryCleanup is mutated in-place by the editing service, so it may not trigger StructureSettingsChanged.
-        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.MetadataChanged);
+        // expect RefreshOther when changing name.
+        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.RefreshOther);
     }
 
     [Test]
@@ -1041,8 +1040,8 @@ internal sealed partial class ContentTypeEditingServiceTests
             Assert.AreEqual(parentContentType.Key, childContentType.ContentTypeComposition.Single().Key);
         });
 
-        // expect MetadataChanged (which includes RefreshOther) when re-applying compositions with a name change
-        AssertContentTypeRefreshPayload(refreshedPayloads, parentContentType.Id, ContentTypeChangeTypes.MetadataChanged);
+        // expect RefreshOther when re-applying compositions with a name change
+        AssertContentTypeRefreshPayload(refreshedPayloads, parentContentType.Id, ContentTypeChangeTypes.RefreshOther);
     }
 
     [Test]

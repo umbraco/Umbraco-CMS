@@ -273,8 +273,7 @@ internal sealed partial class ContentTypeEditingServiceTests
         var payload = refreshedPayloads.First();
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(payload.ChangeTypes.HasTypesAll(ContentTypeChangeTypes.MetadataChanged), "Expected MetadataChanged flag");
-            Assert.IsTrue(payload.ChangeTypes.HasType(ContentTypeChangeTypes.RefreshOther), "MetadataChanged should include RefreshOther");
+            Assert.IsTrue(payload.ChangeTypes.HasType(ContentTypeChangeTypes.RefreshOther), "Should include RefreshOther");
             Assert.IsFalse(payload.ChangeTypes.HasType(ContentTypeChangeTypes.RefreshMain), "Should NOT include RefreshMain");
         });
     }

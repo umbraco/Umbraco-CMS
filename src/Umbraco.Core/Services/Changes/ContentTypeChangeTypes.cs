@@ -100,14 +100,4 @@ public enum ContentTypeChangeTypes : ushort
     ///     One or more compositions were added to the content type.
     /// </summary>
     CompositionAdded = 2048 | RefreshOther,
-
-    /// <summary>
-    ///     Non-property metadata changed (name, description, icon, thumbnail, allowed templates, etc.).
-    /// </summary>
-    MetadataChanged = 4096 | RefreshOther,
-
-    /// <summary>
-    ///     Structure settings changed (allowed child content types, sort order, list view configuration, etc.).
-    /// </summary>
-    StructureSettingsChanged = 8192 | RefreshOther,
 }

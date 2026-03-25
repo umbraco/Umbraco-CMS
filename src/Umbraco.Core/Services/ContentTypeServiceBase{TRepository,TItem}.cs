@@ -470,31 +470,6 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
                     hasGranularOther = true;
                 }
 
-                // metadata changed? (name, description, icon, thumbnail, templates, element/root settings)
-                if (dirty.WasPropertyDirty(nameof(IContentType.Name))
-                    || dirty.WasPropertyDirty(nameof(IContentType.Description))
-                    || dirty.WasPropertyDirty(nameof(IContentType.Icon))
-                    || dirty.WasPropertyDirty(nameof(IContentType.Thumbnail))
-                    || dirty.WasPropertyDirty(nameof(IContentType.AllowedTemplates))
-                    || dirty.WasPropertyDirty(nameof(IContentType.DefaultTemplateId))
-                    || dirty.WasPropertyDirty(nameof(IContentType.IsElement))
-                    || dirty.WasPropertyDirty(nameof(IContentType.AllowedAsRoot))
-                    || dirty.WasPropertyDirty(nameof(IContentType.AllowedAsRoot)))
-                {
-                    AddChange(changes, contentType, ContentTypeChangeTypes.MetadataChanged);
-                    hasGranularOther = true;
-                }
-
-                // structure settings changed? (allowed child types, cleanup, list view, tab/group rearrangement)
-                if (dirty.WasPropertyDirty(nameof(IContentType.AllowedContentTypes))
-                    || dirty.WasPropertyDirty(nameof(IContentType.HistoryCleanup))
-                    || dirty.WasPropertyDirty(nameof(IContentType.ListView))
-                    || dirty.WasPropertyDirty(nameof(IContentType.PropertyGroups)))
-                {
-                    AddChange(changes, contentType, ContentTypeChangeTypes.StructureSettingsChanged);
-                    hasGranularOther = true;
-                }
-
                 if (!hasGranularOther)
                 {
                     AddChange(changes, contentType, ContentTypeChangeTypes.RefreshOther);

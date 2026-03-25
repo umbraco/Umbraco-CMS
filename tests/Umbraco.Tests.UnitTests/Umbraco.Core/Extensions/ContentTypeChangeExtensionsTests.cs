@@ -28,8 +28,6 @@ public class ContentTypeChangeExtensionsTests
     // Granular non-structural flags (all include RefreshOther, but NOT RefreshMain)
     [TestCase(ContentTypeChangeTypes.PropertyAdded, false)]
     [TestCase(ContentTypeChangeTypes.CompositionAdded, false)]
-    [TestCase(ContentTypeChangeTypes.MetadataChanged, false)]
-    [TestCase(ContentTypeChangeTypes.StructureSettingsChanged, false)]
     public void IsStructuralChange(ContentTypeChangeTypes change, bool expected) =>
         Assert.AreEqual(expected, change.IsStructuralChange());
 
@@ -45,8 +43,6 @@ public class ContentTypeChangeExtensionsTests
     // Granular non-structural flags (include RefreshOther but not RefreshMain)
     [TestCase(ContentTypeChangeTypes.PropertyAdded, true)]
     [TestCase(ContentTypeChangeTypes.CompositionAdded, true)]
-    [TestCase(ContentTypeChangeTypes.MetadataChanged, true)]
-    [TestCase(ContentTypeChangeTypes.StructureSettingsChanged, true)]
     // Granular structural flags (include RefreshMain, so NOT non-structural)
     [TestCase(ContentTypeChangeTypes.AliasChanged, false)]
     [TestCase(ContentTypeChangeTypes.PropertyRemoved, false)]
@@ -77,8 +73,6 @@ public class ContentTypeChangeExtensionsTests
         {
             Assert.IsTrue(ContentTypeChangeTypes.PropertyAdded.HasType(ContentTypeChangeTypes.RefreshOther));
             Assert.IsTrue(ContentTypeChangeTypes.CompositionAdded.HasType(ContentTypeChangeTypes.RefreshOther));
-            Assert.IsTrue(ContentTypeChangeTypes.MetadataChanged.HasType(ContentTypeChangeTypes.RefreshOther));
-            Assert.IsTrue(ContentTypeChangeTypes.StructureSettingsChanged.HasType(ContentTypeChangeTypes.RefreshOther));
         });
     }
 
@@ -89,8 +83,6 @@ public class ContentTypeChangeExtensionsTests
         {
             Assert.IsFalse(ContentTypeChangeTypes.PropertyAdded.HasType(ContentTypeChangeTypes.RefreshMain));
             Assert.IsFalse(ContentTypeChangeTypes.CompositionAdded.HasType(ContentTypeChangeTypes.RefreshMain));
-            Assert.IsFalse(ContentTypeChangeTypes.MetadataChanged.HasType(ContentTypeChangeTypes.RefreshMain));
-            Assert.IsFalse(ContentTypeChangeTypes.StructureSettingsChanged.HasType(ContentTypeChangeTypes.RefreshMain));
         });
     }
 
