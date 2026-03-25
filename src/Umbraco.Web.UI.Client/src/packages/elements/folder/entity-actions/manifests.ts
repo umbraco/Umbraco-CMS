@@ -1,4 +1,4 @@
-import { UMB_ELEMENT_FOLDER_ENTITY_TYPE } from '../../entity.js';
+import { UMB_ELEMENT_FOLDER_ENTITY_TYPE, UMB_ELEMENT_ROOT_ENTITY_TYPE } from '../../entity.js';
 import { UMB_ELEMENT_FOLDER_REPOSITORY_ALIAS } from '../repository/constants.js';
 import {
 	UMB_ELEMENT_USER_PERMISSION_CONDITION_ALIAS,
@@ -9,6 +9,21 @@ import {
 	UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS,
 	UMB_ENTITY_IS_TRASHED_CONDITION_ALIAS,
 } from '@umbraco-cms/backoffice/recycle-bin';
+import type { ManifestEntityCreateOptionActionFolderKind } from '@umbraco-cms/backoffice/tree';
+
+const folderCreateOption: ManifestEntityCreateOptionActionFolderKind = {
+	type: 'entityCreateOptionAction',
+	kind: 'folder',
+	alias: 'Umb.EntityCreateOptionAction.Element.Folder',
+	name: 'Element Folder Entity Create Option Action',
+	forEntityTypes: [UMB_ELEMENT_ROOT_ENTITY_TYPE, UMB_ELEMENT_FOLDER_ENTITY_TYPE],
+	meta: {
+		icon: 'icon-folder',
+		label: '#create_folder',
+		additionalOptions: true,
+		folderRepositoryAlias: UMB_ELEMENT_FOLDER_REPOSITORY_ALIAS,
+	},
+};
 
 const folderDelete: UmbExtensionManifest = {
 	type: 'entityAction',
@@ -41,4 +56,9 @@ const folderUpdate: UmbExtensionManifest = {
 	conditions: [{ alias: UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS }],
 };
 
-export const manifests: Array<UmbExtensionManifest> = [folderDelete, folderUpdate, ...moveManifests];
+export const manifests: Array<UmbExtensionManifest> = [
+	folderCreateOption,
+	folderDelete,
+	folderUpdate,
+	...moveManifests,
+];
