@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Persistence.EFCore.Scoping;
 /// Represents an EF Core scope that provides database context access and transaction management.
 /// </summary>
 /// <typeparam name="TDbContext">The type of DbContext.</typeparam>
-public interface IEfCoreScope<TDbContext> : ICoreScope
+public interface IEFCoreScope<TDbContext> : ICoreScope
 {
     /// <summary>
     /// Executes the given function on the database.
@@ -34,4 +34,13 @@ public interface IEfCoreScope<TDbContext> : ICoreScope
     /// Gets the scope notification publisher.
     /// </summary>
     new IScopedNotificationPublisher Notifications { get; }
+}
+
+/// <summary>
+/// Represents an EF Core scope that provides database context access and transaction management.
+/// </summary>
+/// <typeparam name="TDbContext">The type of DbContext.</typeparam>
+[Obsolete("Use IEFCoreScope<TDbContext> instead. Scheduled for removal in Umbraco 19.")]
+public interface IEfCoreScope<TDbContext> : IEFCoreScope<TDbContext>
+{
 }

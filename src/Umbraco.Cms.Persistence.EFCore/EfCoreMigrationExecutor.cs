@@ -8,18 +8,18 @@ namespace Umbraco.Cms.Persistence.EFCore;
 /// <summary>
 /// Executes Entity Framework Core migrations for Umbraco.
 /// </summary>
-public class EfCoreMigrationExecutor : IEFCoreMigrationExecutor
+public class EFCoreMigrationExecutor : IEFCoreMigrationExecutor
 {
     private readonly IEnumerable<IMigrationProvider> _migrationProviders;
     private readonly IOptions<ConnectionStrings> _options;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="EfCoreMigrationExecutor"/> class.
+    /// Initializes a new instance of the <see cref="EFCoreMigrationExecutor"/> class.
     /// </summary>
     /// <param name="migrationProviders">The collection of migration providers.</param>
     /// <param name="options">The connection string options.</param>
     /// <remarks>We need to do migrations outside of a scope due to SQLite.</remarks>
-    public EfCoreMigrationExecutor(
+    public EFCoreMigrationExecutor(
         IEnumerable<IMigrationProvider> migrationProviders,
         IOptions<ConnectionStrings> options)
     {
@@ -46,5 +46,24 @@ public class EfCoreMigrationExecutor : IEFCoreMigrationExecutor
         {
             await provider.MigrateAllAsync();
         }
+    }
+}
+
+/// <summary>
+/// Executes Entity Framework Core migrations for Umbraco.
+/// </summary>
+[Obsolete("Use EFCoreMigrationExecutor instead. Scheduled for removal in Umbraco 19.")]
+public class EfCoreMigrationExecutor : EFCoreMigrationExecutor
+{
+    /// <summary>
+    /// Initializes a new instance of the <see cref="EfCoreMigrationExecutor"/> class.
+    /// </summary>
+    /// <param name="migrationProviders">The collection of migration providers.</param>
+    /// <param name="options">The connection string options.</param>
+    public EfCoreMigrationExecutor(
+        IEnumerable<IMigrationProvider> migrationProviders,
+        IOptions<ConnectionStrings> options)
+        : base(migrationProviders, options)
+    {
     }
 }

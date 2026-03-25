@@ -10,16 +10,16 @@ namespace Umbraco.Cms.Persistence.EFCore.Scoping;
 public class AmbientEFCoreScopeStack<TDbContext> : IAmbientEFCoreScopeStack<TDbContext> where TDbContext : DbContext
 {
     private static Lock _lock = new();
-    private static AsyncLocal<ConcurrentStack<IEfCoreScope<TDbContext>>> _stack = new();
+    private static AsyncLocal<ConcurrentStack<IEFCoreScope<TDbContext>>> _stack = new();
 
     /// <inheritdoc />
-    public IEfCoreScope<TDbContext>? AmbientScope
+    public IEFCoreScope<TDbContext>? AmbientScope
     {
         get
         {
             lock (_lock)
             {
-                if (_stack.Value?.TryPeek(out IEfCoreScope<TDbContext>? ambientScope) ?? false)
+                if (_stack.Value?.TryPeek(out IEFCoreScope<TDbContext>? ambientScope) ?? false)
                 {
                     return ambientScope;
                 }
@@ -30,11 +30,16 @@ public class AmbientEFCoreScopeStack<TDbContext> : IAmbientEFCoreScopeStack<TDbC
     }
 
     /// <inheritdoc />
-    public IEfCoreScope<TDbContext> Pop()
+#pragma warning disable CS0618 // Type or member is obsolete
+    IEfCoreScope<TDbContext>? IEFCoreScopeAccessor<TDbContext>.AmbientScope => (IEfCoreScope<TDbContext>?)AmbientScope;
+#pragma warning restore CS0618 // Type or member is obsolete
+
+    /// <inheritdoc />
+    public IEFCoreScope<TDbContext> Pop()
     {
         lock (_lock)
         {
-            if (_stack.Value?.TryPop(out IEfCoreScope<TDbContext>? ambientScope) ?? false)
+            if (_stack.Value?.TryPop(out IEFCoreScope<TDbContext>? ambientScope) ?? false)
             {
                 return ambientScope;
             }
@@ -44,11 +49,11 @@ public class AmbientEFCoreScopeStack<TDbContext> : IAmbientEFCoreScopeStack<TDbC
     }
 
     /// <inheritdoc />
-    public void Push(IEfCoreScope<TDbContext> scope)
+    public void Push(IEFCoreScope<TDbContext> scope)
     {
         lock (_lock)
         {
-            _stack.Value ??= new ConcurrentStack<IEfCoreScope<TDbContext>>();
+            _stack.Value ??= new ConcurrentStack<IEFCoreScope<TDbContext>>();
 
             _stack.Value.Push(scope);
         }
