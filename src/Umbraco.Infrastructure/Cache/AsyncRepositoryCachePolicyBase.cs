@@ -11,8 +11,8 @@ namespace Umbraco.Cms.Core.Cache;
 ///     A base class for repository cache policies.
 /// </summary>
 /// <typeparam name="TEntity">The type of the entity.</typeparam>
-/// <typeparam name="TId">The type of the identifier.</typeparam>
-public abstract class AsyncRepositoryCachePolicyBase<TEntity, TId> : IAsyncRepositoryCachePolicy<TEntity, TId>
+/// <typeparam name="TKey">The type of the entity key.</typeparam>
+public abstract class AsyncRepositoryCachePolicyBase<TEntity, TKey> : IAsyncRepositoryCachePolicy<TEntity, TKey>
     where TEntity : class, IEntity
 {
     private readonly IAppPolicyCache _globalCache;
@@ -21,7 +21,7 @@ public abstract class AsyncRepositoryCachePolicyBase<TEntity, TId> : IAsyncRepos
     private readonly ICacheSyncService _cacheSyncService;
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="AsyncRepositoryCachePolicyBase{TEntity, TId}"/> class.
+    ///     Initializes a new instance of the <see cref="AsyncRepositoryCachePolicyBase{TEntity, TKey}"/> class.
     /// </summary>
     /// <param name="globalCache">The global application policy cache.</param>
     /// <param name="scopeAccessor">The scope accessor for accessing the current scope.</param>
@@ -63,13 +63,13 @@ public abstract class AsyncRepositoryCachePolicyBase<TEntity, TId> : IAsyncRepos
     }
 
     /// <inheritdoc />
-    public abstract Task<TEntity?> GetAsync(TId? id, Func<TId?, Task<TEntity?>> performGet, Func<Task<IEnumerable<TEntity>?>> performGetAll);
+    public abstract Task<TEntity?> GetAsync(TKey? key, Func<TKey?, Task<TEntity?>> performGet, Func<Task<IEnumerable<TEntity>?>> performGetAll);
 
     /// <inheritdoc />
-    public abstract Task<TEntity?> GetCachedAsync(TId id);
+    public abstract Task<TEntity?> GetCachedAsync(TKey key);
 
     /// <inheritdoc />
-    public abstract Task<bool> ExistsAsync(TId id, Func<TId, Task<bool>> performExists, Func<Task<IEnumerable<TEntity>?>> performGetAll);
+    public abstract Task<bool> ExistsAsync(TKey key, Func<TKey, Task<bool>> performExists, Func<Task<IEnumerable<TEntity>?>> performGetAll);
 
     /// <inheritdoc />
     public abstract Task CreateAsync(TEntity entity, Func<TEntity, Task> persistNew);
@@ -84,7 +84,7 @@ public abstract class AsyncRepositoryCachePolicyBase<TEntity, TId> : IAsyncRepos
     public abstract Task<TEntity[]> GetAllAsync(Func<Task<IEnumerable<TEntity>?>> performGetAll);
 
     /// <inheritdoc />
-    public abstract Task<TEntity[]> GetManyAsync(TId[] ids, Func<TId[], Task<IEnumerable<TEntity>?>> performGetMany, Func<Task<IEnumerable<TEntity>?>> performGetAll);
+    public abstract Task<TEntity[]> GetManyAsync(TKey[] keys, Func<TKey[], Task<IEnumerable<TEntity>?>> performGetMany, Func<Task<IEnumerable<TEntity>?>> performGetAll);
 
     /// <inheritdoc />
     public abstract Task ClearAllAsync();

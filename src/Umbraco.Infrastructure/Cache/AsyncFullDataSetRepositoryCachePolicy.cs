@@ -11,34 +11,34 @@ namespace Umbraco.Cms.Infrastructure.Cache;
 ///     Represents an async caching policy that caches the entire entities set as a single collection.
 /// </summary>
 /// <typeparam name="TEntity">The type of the entity.</typeparam>
-/// <typeparam name="TId">The type of the identifier.</typeparam>
-internal sealed class AsyncFullDataSetRepositoryCachePolicy<TEntity, TId> : AsyncRepositoryCachePolicyBase<TEntity, TId>
+/// <typeparam name="TKey">The type of the entity key.</typeparam>
+internal sealed class AsyncFullDataSetRepositoryCachePolicy<TEntity, TKey> : AsyncRepositoryCachePolicyBase<TEntity, TKey>
     where TEntity : class, IEntity
 {
-    private readonly Func<TEntity, TId> _entityGetId;
+    private readonly Func<TEntity, TKey> _entityGetKey;
 
     private readonly bool _expires;
     private readonly SemaphoreSlim _getAllLock = new(1, 1);
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="AsyncFullDataSetRepositoryCachePolicy{TEntity, TId}"/> class.
+    ///     Initializes a new instance of the <see cref="AsyncFullDataSetRepositoryCachePolicy{TEntity, TKey}"/> class.
     /// </summary>
     /// <param name="globalCache">The global application policy cache.</param>
     /// <param name="scopeAccessor">The scope accessor for accessing the current scope.</param>
     /// <param name="cacheVersionService">The service for managing cache version synchronization.</param>
     /// <param name="cacheSyncService">The service for synchronizing cache changes across servers.</param>
-    /// <param name="entityGetId">A function to extract the identifier from an entity.</param>
+    /// <param name="entityGetKey">A function to extract the identifier from an entity.</param>
     /// <param name="expires">Whether cached items should expire after a timeout.</param>
     public AsyncFullDataSetRepositoryCachePolicy(
         IAppPolicyCache globalCache,
         IScopeAccessor scopeAccessor,
         IRepositoryCacheVersionService cacheVersionService,
         ICacheSyncService cacheSyncService,
-        Func<TEntity, TId> entityGetId,
+        Func<TEntity, TKey> entityGetKey,
         bool expires)
         : base(globalCache, scopeAccessor, cacheVersionService, cacheSyncService)
     {
-        _entityGetId = entityGetId;
+        _entityGetKey = entityGetKey;
         _expires = expires;
     }
 
@@ -74,13 +74,13 @@ internal sealed class AsyncFullDataSetRepositoryCachePolicy<TEntity, TId> : Asyn
     }
 
     /// <inheritdoc/>
-    public override async Task<TEntity?> GetAsync(TId? id, Func<TId?, Task<TEntity?>> performGet, Func<Task<IEnumerable<TEntity>?>> performGetAll)
+    public override async Task<TEntity?> GetAsync(TKey? key, Func<TKey?, Task<TEntity?>> performGet, Func<Task<IEnumerable<TEntity>?>> performGetAll)
     {
         await EnsureCacheIsSyncedAsync();
 
         // get all from the cache, then look for the entity
         IEnumerable<TEntity> all = await GetAllCachedAsync(performGetAll);
-        TEntity? entity = all.FirstOrDefault(x => _entityGetId(x)?.Equals(id) ?? false);
+        TEntity? entity = all.FirstOrDefault(x => _entityGetKey(x)?.Equals(key) ?? false);
 
         // see note in InsertEntities - what we get here is the original
         // cached entity, not a clone, so we need to manually ensure it is deep-cloned.
@@ -88,13 +88,13 @@ internal sealed class AsyncFullDataSetRepositoryCachePolicy<TEntity, TId> : Asyn
     }
 
     /// <inheritdoc/>
-    public override async Task<TEntity?> GetCachedAsync(TId id)
+    public override async Task<TEntity?> GetCachedAsync(TKey key)
     {
         await EnsureCacheIsSyncedAsync();
 
         // get all from the cache -- and only the cache, then look for the entity
         DeepCloneableList<TEntity>? all = Cache.GetCacheItem<DeepCloneableList<TEntity>>(GetEntityTypeCacheKey());
-        TEntity? entity = all?.FirstOrDefault(x => _entityGetId(x)?.Equals(id) ?? false);
+        TEntity? entity = all?.FirstOrDefault(x => _entityGetKey(x)?.Equals(key) ?? false);
 
         // see note in InsertEntities - what we get here is the original
         // cached entity, not a clone, so we need to manually ensure it is deep-cloned.
@@ -102,13 +102,13 @@ internal sealed class AsyncFullDataSetRepositoryCachePolicy<TEntity, TId> : Asyn
     }
 
     /// <inheritdoc/>
-    public override async Task<bool> ExistsAsync(TId id, Func<TId, Task<bool>> performExists, Func<Task<IEnumerable<TEntity>?>> performGetAll)
+    public override async Task<bool> ExistsAsync(TKey key, Func<TKey, Task<bool>> performExists, Func<Task<IEnumerable<TEntity>?>> performGetAll)
     {
         await EnsureCacheIsSyncedAsync();
 
         // get all as one set, then look for the entity
         IEnumerable<TEntity> all = await GetAllCachedAsync(performGetAll);
-        return all.Any(x => _entityGetId(x)?.Equals(id) ?? false);
+        return all.Any(x => _entityGetKey(x)?.Equals(key) ?? false);
     }
 
     /// <inheritdoc/>
@@ -179,12 +179,12 @@ internal sealed class AsyncFullDataSetRepositoryCachePolicy<TEntity, TId> : Asyn
     }
 
     /// <inheritdoc/>
-    public override async Task<TEntity[]> GetManyAsync(TId[] ids, Func<TId[], Task<IEnumerable<TEntity>?>> performGetMany, Func<Task<IEnumerable<TEntity>?>> performGetAll)
+    public override async Task<TEntity[]> GetManyAsync(TKey[] keys, Func<TKey[], Task<IEnumerable<TEntity>?>> performGetMany, Func<Task<IEnumerable<TEntity>?>> performGetAll)
     {
         await EnsureCacheIsSyncedAsync();
 
         // get all as one set, from cache if possible, else repo
-        IEnumerable<TEntity> all = (await GetAllCachedAsync(performGetAll)).Where(x => ids.Contains(_entityGetId(x)));
+        IEnumerable<TEntity> all = (await GetAllCachedAsync(performGetAll)).Where(x => keys.Contains(_entityGetKey(x)));
 
         // see note in SetCacheActionToInsertEntities - what we get here is the original
         // cached entities, not clones, so we need to manually ensure they are deep-cloned.
