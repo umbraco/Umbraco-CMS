@@ -81,7 +81,7 @@ public class AddDimensionsToSvg : AsyncMigrationBase
         Attempt<ContentTypeOperationStatus> attempt = await _mediaTypeService.UpdateAsync(vectorGraphicsMediaType, Constants.Security.SuperUserKey);
         if (!attempt.Success)
         {
-            Logger.LogError(attempt.Exception, $"Failed to update media type '{vectorGraphicsMediaType.Alias}' during migration.");
+            Logger.LogError(attempt.Exception, $"Failed to update media type  '{Alias}' during migration.", vectorGraphicsMediaType.Alias);
         }
 
     }
