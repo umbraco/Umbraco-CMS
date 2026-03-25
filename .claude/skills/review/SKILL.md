@@ -107,16 +107,16 @@ From the changed file list, classify each file as **noise** or **reviewable**.
 
 **Noise files** (skip entirely — do not read, do not review):
 
-| Pattern | Reason |
-|---|---|
-| `*.gen.ts`, `*.gen.cs` | Auto-generated API client code |
+| Pattern                                              | Reason                          |
+| ---------------------------------------------------- | ------------------------------- |
+| `*.gen.ts`, `*.gen.cs`                               | Auto-generated API client code  |
 | `*.generated.cs`, `*.Designer.cs` (in `Migrations/`) | Auto-generated models/snapshots |
-| `*/assets/lang/*.ts` (except `en.ts`) | Non-English translation files |
-| `*/mocks/data/*.ts` | Test fixture data |
-| `*/dist-cms/*`, `*/storybook-static/*` | Build output |
-| `*/TEMP/InMemoryAuto/*` | Runtime-generated models |
-| `package-lock.json` | Dependency lock file |
-| `appsettings-schema.*.json` | Generated JSON schema |
+| `*/assets/lang/*.ts` (except `en.ts`)                | Non-English translation files   |
+| `*/mocks/data/*.ts`                                  | Test fixture data               |
+| `*/dist-cms/*`, `*/storybook-static/*`               | Build output                    |
+| `*/TEMP/InMemoryAuto/*`                              | Runtime-generated models        |
+| `package-lock.json`                                  | Dependency lock file            |
+| `appsettings-schema.*.json`                          | Generated JSON schema           |
 
 Log the skip list: "Skipped {N} noise files: {comma-separated list of filenames}"
 
@@ -188,7 +188,7 @@ Present the review in this exact format:
 ```markdown
 ## PR Review
 
-**Target:** `{target_branch}` · **Based on commit:** `{head_sha}` · **Files:** {total} changed, {skipped} skipped, {reviewed} reviewed ({full_read} full, {header_only} header-only)
+**Target:** `{target_branch}` · **Based on commit:** `{head_sha}` · **Files:** {total} changed, {skipped} skipped, {reviewed} reviewed ({full_read} full, {header_only} diff + header-only)
 
 [1–2 sentences: what this PR accomplishes , keep it as short as possible, only highlight the primary essence.]
 
