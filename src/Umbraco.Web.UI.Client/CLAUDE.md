@@ -17,7 +17,8 @@ This project's documentation is organized into 9 focused guides:
 **Note**: This is a sub-project in the Umbraco CMS monorepo. For Git workflow, PR process, and CI/CD information, see the [repository root CLAUDE.md](../../CLAUDE.md).
 
 ### Architecture & Design
-- **[Architecture](./docs/architecture.md)** - Technology stack, design patterns, module organization
+- **[Architecture](./docs/architecture.md)** - Technology stack, design philosophy, package system, import map pipeline, design patterns
+- **[Package Development](./docs/package-development.md)** - Folder structure conventions, organizational rules, building new packages
 
 ### Development
 - **[Commands](./docs/commands.md)** - Build, test, and development commands
@@ -25,6 +26,7 @@ This project's documentation is organized into 9 focused guides:
 ### Code Quality
 - **[Style Guide](./docs/style-guide.md)** - Naming and formatting conventions
 - **[Clean Code](./docs/clean-code.md)** - Best practices and SOLID principles
+- **[Deprecation](./docs/deprecation.md)** - Breaking changes policy, deprecation patterns (JSDoc + UmbDeprecation)
 - **[Testing](./docs/testing.md)** - Unit, integration, and E2E testing strategies
 
 ### Troubleshooting
