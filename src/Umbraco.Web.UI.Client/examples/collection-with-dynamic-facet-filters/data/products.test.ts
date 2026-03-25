@@ -12,14 +12,14 @@ describe('filterProducts', () => {
 
 	describe('category filter', () => {
 		it('filters by a single category', () => {
-			const result = filterProducts({ categories: ['T-Shirt'] });
-			expect(result.items.every((p) => p.category === 'T-Shirt')).to.equal(true);
+			const result = filterProducts({ categories: ['cat-tshirt'] });
+			expect(result.items.every((p) => p.category === 'cat-tshirt')).to.equal(true);
 			expect(result.items.length).to.be.greaterThan(0);
 		});
 
 		it('filters by multiple categories', () => {
-			const result = filterProducts({ categories: ['T-Shirt', 'Hoodie'] });
-			expect(result.items.every((p) => ['T-Shirt', 'Hoodie'].includes(p.category))).to.equal(true);
+			const result = filterProducts({ categories: ['cat-tshirt', 'cat-hoodie'] });
+			expect(result.items.every((p) => ['cat-tshirt', 'cat-hoodie'].includes(p.category))).to.equal(true);
 			expect(result.items.length).to.be.greaterThan(0);
 		});
 
@@ -32,27 +32,27 @@ describe('filterProducts', () => {
 
 	describe('size filter', () => {
 		it('filters by a single size', () => {
-			const result = filterProducts({ sizes: ['XL'] });
-			expect(result.items.every((p) => p.sizes.includes('XL'))).to.equal(true);
+			const result = filterProducts({ sizes: ['size-xl'] });
+			expect(result.items.every((p) => p.sizes.includes('size-xl'))).to.equal(true);
 			expect(result.items.length).to.be.greaterThan(0);
 		});
 
 		it('filters by multiple sizes (OR logic)', () => {
-			const result = filterProducts({ sizes: ['S', 'XL'] });
-			expect(result.items.every((p) => p.sizes.includes('S') || p.sizes.includes('XL'))).to.equal(true);
+			const result = filterProducts({ sizes: ['size-s', 'size-xl'] });
+			expect(result.items.every((p) => p.sizes.includes('size-s') || p.sizes.includes('size-xl'))).to.equal(true);
 		});
 	});
 
 	describe('color filter', () => {
 		it('filters by a single color', () => {
-			const result = filterProducts({ colors: ['Red'] });
-			expect(result.items.every((p) => p.colors.includes('Red'))).to.equal(true);
+			const result = filterProducts({ colors: ['color-red'] });
+			expect(result.items.every((p) => p.colors.includes('color-red'))).to.equal(true);
 			expect(result.items.length).to.be.greaterThan(0);
 		});
 
 		it('filters by multiple colors (OR logic)', () => {
-			const result = filterProducts({ colors: ['Red', 'Green'] });
-			expect(result.items.every((p) => p.colors.includes('Red') || p.colors.includes('Green'))).to.equal(true);
+			const result = filterProducts({ colors: ['color-red', 'color-green'] });
+			expect(result.items.every((p) => p.colors.includes('color-red') || p.colors.includes('color-green'))).to.equal(true);
 		});
 	});
 
@@ -60,13 +60,13 @@ describe('filterProducts', () => {
 		it('filters within a price range', () => {
 			const result = filterProducts({ priceRange: { min: 20, max: 50 } });
 			expect(result.items.length).to.be.greaterThan(0);
-			expect(result.items.every((p) => p.price >= 20 && p.price <= 50)).to.equal(true);
+			expect(result.items.every((p) => p.price.amount >= 20 && p.price.amount <= 50)).to.equal(true);
 		});
 
 		it('includes items at the boundary values', () => {
 			const result = filterProducts({ priceRange: { min: 25, max: 25 } });
 			expect(result.items.length).to.be.greaterThan(0);
-			expect(result.items.every((p) => p.price === 25)).to.equal(true);
+			expect(result.items.every((p) => p.price.amount === 25)).to.equal(true);
 		});
 
 		it('returns no items when range excludes all products', () => {
@@ -82,32 +82,32 @@ describe('filterProducts', () => {
 
 	describe('combined filters', () => {
 		it('applies category and size filters together (AND logic)', () => {
-			const result = filterProducts({ categories: ['T-Shirt'], sizes: ['XL'] });
-			expect(result.items.every((p) => p.category === 'T-Shirt' && p.sizes.includes('XL'))).to.equal(true);
+			const result = filterProducts({ categories: ['cat-tshirt'], sizes: ['size-xl'] });
+			expect(result.items.every((p) => p.category === 'cat-tshirt' && p.sizes.includes('size-xl'))).to.equal(true);
 			expect(result.items.length).to.be.greaterThan(0);
 		});
 
 		it('applies category and price range together', () => {
-			const result = filterProducts({ categories: ['Jacket'], priceRange: { min: 80, max: 100 } });
-			expect(result.items.every((p) => p.category === 'Jacket' && p.price >= 80 && p.price <= 100)).to.equal(true);
+			const result = filterProducts({ categories: ['cat-jacket'], priceRange: { min: 80, max: 100 } });
+			expect(result.items.every((p) => p.category === 'cat-jacket' && p.price.amount >= 80 && p.price.amount <= 100)).to.equal(true);
 			expect(result.items.length).to.be.greaterThan(0);
 		});
 
 		it('applies all filters together', () => {
 			const result = filterProducts({
-				categories: ['T-Shirt'],
-				sizes: ['M'],
-				colors: ['Black'],
+				categories: ['cat-tshirt'],
+				sizes: ['size-m'],
+				colors: ['color-black'],
 				priceRange: { min: 20, max: 35 },
 			});
 			expect(
 				result.items.every(
 					(p) =>
-						p.category === 'T-Shirt' &&
-						p.sizes.includes('M') &&
-						p.colors.includes('Black') &&
-						p.price >= 20 &&
-						p.price <= 35,
+						p.category === 'cat-tshirt' &&
+						p.sizes.includes('size-m') &&
+						p.colors.includes('color-black') &&
+						p.price.amount >= 20 &&
+						p.price.amount <= 35,
 				),
 			).to.equal(true);
 		});
@@ -121,8 +121,8 @@ describe('filterProducts', () => {
 		});
 
 		it('combines text filter with category filter', () => {
-			const result = filterProducts({ categories: ['Hoodie'], textFilter: 'zip' });
-			expect(result.items.every((p) => p.category === 'Hoodie' && p.name.toLowerCase().includes('zip'))).to.equal(
+			const result = filterProducts({ categories: ['cat-hoodie'], textFilter: 'zip' });
+			expect(result.items.every((p) => p.category === 'cat-hoodie' && p.name.toLowerCase().includes('zip'))).to.equal(
 				true,
 			);
 			expect(result.items.length).to.be.greaterThan(0);
@@ -152,38 +152,38 @@ describe('filterProducts', () => {
 	describe('faceted counts', () => {
 		it('returns category facet counts for unfiltered results', () => {
 			const result = filterProducts({});
-			const tshirtFacet = result.facets.categories.find((f) => f.unique === 'T-Shirt');
+			const tshirtFacet = result.facets.categories.find((f) => f.unique === 'cat-tshirt');
 			expect(tshirtFacet).to.not.equal(undefined);
-			expect(tshirtFacet!.count).to.equal(products.filter((p) => p.category === 'T-Shirt').length);
+			expect(tshirtFacet!.count).to.equal(products.filter((p) => p.category === 'cat-tshirt').length);
 		});
 
 		it('returns size facet counts', () => {
 			const result = filterProducts({});
-			const xlFacet = result.facets.sizes.find((f) => f.unique === 'XL');
+			const xlFacet = result.facets.sizes.find((f) => f.unique === 'size-xl');
 			expect(xlFacet).to.not.equal(undefined);
 			expect(xlFacet!.count).to.be.greaterThan(0);
 		});
 
 		it('returns color facet counts', () => {
 			const result = filterProducts({});
-			const blackFacet = result.facets.colors.find((f) => f.unique === 'Black');
+			const blackFacet = result.facets.colors.find((f) => f.unique === 'color-black');
 			expect(blackFacet).to.not.equal(undefined);
 			expect(blackFacet!.count).to.be.greaterThan(0);
 		});
 
 		it('returns price range from filtered items', () => {
-			const result = filterProducts({ categories: ['T-Shirt'] });
-			const tshirtPrices = products.filter((p) => p.category === 'T-Shirt').map((p) => p.price);
+			const result = filterProducts({ categories: ['cat-tshirt'] });
+			const tshirtPrices = products.filter((p) => p.category === 'cat-tshirt').map((p) => p.price.amount);
 			expect(result.facets.priceRange.min).to.equal(Math.min(...tshirtPrices));
 			expect(result.facets.priceRange.max).to.equal(Math.max(...tshirtPrices));
 		});
 
 		it('category facet counts reflect cross-filtering (exclude own dimension)', () => {
 			// When filtering by size S, category counts should reflect all products with size S
-			const result = filterProducts({ sizes: ['S'] });
+			const result = filterProducts({ sizes: ['size-s'] });
 			const totalCategoryCount = result.facets.categories.reduce((sum, f) => sum + f.count, 0);
 			// Category counts should be based on products matching size S (but not re-filtered by category)
-			const productsWithSizeS = products.filter((p) => p.sizes.includes('S'));
+			const productsWithSizeS = products.filter((p) => p.sizes.includes('size-s'));
 			expect(totalCategoryCount).to.equal(productsWithSizeS.length);
 		});
 	});

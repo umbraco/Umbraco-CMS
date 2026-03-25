@@ -4,7 +4,7 @@ export interface ExampleProductModel {
 	category: string;
 	sizes: Array<string>;
 	colors: Array<string>;
-	price: number;
+	price: { amount: number; currency: string };
 }
 
 export interface ExampleProductFilterArgs {

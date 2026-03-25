@@ -7,7 +7,7 @@ export const products: Array<ExampleProductModel> = [
 		category: 'cat-tshirt',
 		sizes: ['size-s', 'size-m', 'size-l'],
 		colors: ['color-white'],
-		price: 25,
+		price: { amount: 25, currency: 'USD' },
 	},
 	{
 		id: 'p02',
@@ -15,7 +15,7 @@ export const products: Array<ExampleProductModel> = [
 		category: 'cat-tshirt',
 		sizes: ['size-m', 'size-l', 'size-xl'],
 		colors: ['color-black', 'color-red'],
-		price: 30,
+		price: { amount: 30, currency: 'USD' },
 	},
 	{
 		id: 'p03',
@@ -23,7 +23,7 @@ export const products: Array<ExampleProductModel> = [
 		category: 'cat-trousers',
 		sizes: ['size-s', 'size-m', 'size-l'],
 		colors: ['color-black', 'color-blue'],
-		price: 55,
+		price: { amount: 55, currency: 'USD' },
 	},
 	{
 		id: 'p04',
@@ -31,7 +31,7 @@ export const products: Array<ExampleProductModel> = [
 		category: 'cat-trousers',
 		sizes: ['size-m', 'size-l', 'size-xl'],
 		colors: ['color-green', 'color-black'],
-		price: 65,
+		price: { amount: 65, currency: 'USD' },
 	},
 	{
 		id: 'p05',
@@ -39,7 +39,7 @@ export const products: Array<ExampleProductModel> = [
 		category: 'cat-jacket',
 		sizes: ['size-m', 'size-l'],
 		colors: ['color-black'],
-		price: 120,
+		price: { amount: 120, currency: 'USD' },
 	},
 	{
 		id: 'p06',
@@ -47,7 +47,7 @@ export const products: Array<ExampleProductModel> = [
 		category: 'cat-jacket',
 		sizes: ['size-s', 'size-m', 'size-l', 'size-xl'],
 		colors: ['color-blue'],
-		price: 85,
+		price: { amount: 85, currency: 'USD' },
 	},
 	{
 		id: 'p07',
@@ -55,7 +55,7 @@ export const products: Array<ExampleProductModel> = [
 		category: 'cat-hoodie',
 		sizes: ['size-m', 'size-l', 'size-xl'],
 		colors: ['color-black', 'color-white'],
-		price: 50,
+		price: { amount: 50, currency: 'USD' },
 	},
 	{
 		id: 'p08',
@@ -63,7 +63,7 @@ export const products: Array<ExampleProductModel> = [
 		category: 'cat-hoodie',
 		sizes: ['size-s', 'size-m', 'size-l'],
 		colors: ['color-red', 'color-blue'],
-		price: 55,
+		price: { amount: 55, currency: 'USD' },
 	},
 	{
 		id: 'p09',
@@ -71,7 +71,7 @@ export const products: Array<ExampleProductModel> = [
 		category: 'cat-shorts',
 		sizes: ['size-s', 'size-m', 'size-l'],
 		colors: ['color-black', 'color-green'],
-		price: 30,
+		price: { amount: 30, currency: 'USD' },
 	},
 	{
 		id: 'p10',
@@ -79,7 +79,7 @@ export const products: Array<ExampleProductModel> = [
 		category: 'cat-shorts',
 		sizes: ['size-m', 'size-l', 'size-xl'],
 		colors: ['color-white', 'color-blue'],
-		price: 40,
+		price: { amount: 40, currency: 'USD' },
 	},
 	{
 		id: 'p11',
@@ -87,7 +87,7 @@ export const products: Array<ExampleProductModel> = [
 		category: 'cat-tshirt',
 		sizes: ['size-s', 'size-m'],
 		colors: ['color-white', 'color-blue'],
-		price: 22,
+		price: { amount: 22, currency: 'USD' },
 	},
 	{
 		id: 'p12',
@@ -95,7 +95,7 @@ export const products: Array<ExampleProductModel> = [
 		category: 'cat-tshirt',
 		sizes: ['size-l', 'size-xl'],
 		colors: ['color-black', 'color-green'],
-		price: 28,
+		price: { amount: 28, currency: 'USD' },
 	},
 	{
 		id: 'p13',
@@ -103,7 +103,7 @@ export const products: Array<ExampleProductModel> = [
 		category: 'cat-trousers',
 		sizes: ['size-s', 'size-m', 'size-l'],
 		colors: ['color-white', 'color-black'],
-		price: 60,
+		price: { amount: 60, currency: 'USD' },
 	},
 	{
 		id: 'p14',
@@ -111,7 +111,7 @@ export const products: Array<ExampleProductModel> = [
 		category: 'cat-jacket',
 		sizes: ['size-m', 'size-l', 'size-xl'],
 		colors: ['color-black', 'color-green'],
-		price: 95,
+		price: { amount: 95, currency: 'USD' },
 	},
 	{
 		id: 'p15',
@@ -119,7 +119,7 @@ export const products: Array<ExampleProductModel> = [
 		category: 'cat-hoodie',
 		sizes: ['size-s', 'size-m'],
 		colors: ['color-white', 'color-red'],
-		price: 45,
+		price: { amount: 45, currency: 'USD' },
 	},
 	{
 		id: 'p16',
@@ -127,7 +127,7 @@ export const products: Array<ExampleProductModel> = [
 		category: 'cat-shorts',
 		sizes: ['size-m', 'size-l', 'size-xl'],
 		colors: ['color-blue', 'color-red'],
-		price: 35,
+		price: { amount: 35, currency: 'USD' },
 	},
 	{
 		id: 'p17',
@@ -135,7 +135,7 @@ export const products: Array<ExampleProductModel> = [
 		category: 'cat-tshirt',
 		sizes: ['size-s', 'size-m', 'size-l', 'size-xl'],
 		colors: ['color-white', 'color-black', 'color-blue'],
-		price: 20,
+		price: { amount: 20, currency: 'USD' },
 	},
 	{
 		id: 'p18',
@@ -143,7 +143,7 @@ export const products: Array<ExampleProductModel> = [
 		category: 'cat-trousers',
 		sizes: ['size-s', 'size-m', 'size-l', 'size-xl'],
 		colors: ['color-black', 'color-blue'],
-		price: 50,
+		price: { amount: 50, currency: 'USD' },
 	},
 	{
 		id: 'p19',
@@ -151,7 +151,7 @@ export const products: Array<ExampleProductModel> = [
 		category: 'cat-jacket',
 		sizes: ['size-s', 'size-m', 'size-l'],
 		colors: ['color-red', 'color-white'],
-		price: 75,
+		price: { amount: 75, currency: 'USD' },
 	},
 	{
 		id: 'p20',
@@ -159,7 +159,7 @@ export const products: Array<ExampleProductModel> = [
 		category: 'cat-hoodie',
 		sizes: ['size-l', 'size-xl'],
 		colors: ['color-black', 'color-blue'],
-		price: 60,
+		price: { amount: 60, currency: 'USD' },
 	},
 ];
 
@@ -185,7 +185,7 @@ function matchesFilter(
 		if (!args.colors.some((v) => product.colors.includes(v))) return false;
 	}
 	if (excludeField !== 'priceRange' && args.priceRange) {
-		if (product.price < args.priceRange.min || product.price > args.priceRange.max) return false;
+		if (product.price.amount < args.priceRange.min || product.price.amount > args.priceRange.max) return false;
 	}
 	return true;
 }
@@ -237,7 +237,7 @@ export function filterProducts(args: ExampleProductFilterArgs): ExampleFilteredR
 	const colors = countBy(items, args, 'colors', (p) => p.colors);
 
 	// Price range from filtered items
-	const prices = items.map((p) => p.price);
+	const prices = items.map((p) => p.price.amount);
 	const priceRange = prices.length > 0 ? { min: Math.min(...prices), max: Math.max(...prices) } : { min: 0, max: 0 };
 
 	const total = items.length;

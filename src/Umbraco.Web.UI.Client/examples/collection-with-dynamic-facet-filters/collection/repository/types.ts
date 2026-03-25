@@ -6,5 +6,5 @@ export interface ExampleProductCollectionItemModel extends UmbCollectionItemMode
 	category: string;
 	sizes: Array<string>;
 	colors: Array<string>;
-	price: number;
+	price: { amount: number; currency: string };
 }

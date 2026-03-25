@@ -28,7 +28,7 @@ describe('ExampleDynamicFacetCollectionDataSource', () => {
 			const first = data!.items[0];
 			expect(first.name).to.equal(products[0].name);
 			expect(first.category).to.equal(products[0].category);
-			expect(first.price).to.equal(products[0].price);
+			expect(first.price).to.deep.equal(products[0].price);
 		});
 	});
 
@@ -73,7 +73,7 @@ describe('ExampleDynamicFacetCollectionDataSource', () => {
 			];
 			const { data } = await dataSource.getCollection({ filters });
 			expect(data!.items.length).to.be.greaterThan(0);
-			expect(data!.items.every((p) => p.price >= 20 && p.price <= 50)).to.equal(true);
+			expect(data!.items.every((p) => p.price.amount >= 20 && p.price.amount <= 50)).to.equal(true);
 		});
 
 		it('returns items within the full price range', async () => {
@@ -95,7 +95,7 @@ describe('ExampleDynamicFacetCollectionDataSource', () => {
 			];
 			const { data } = await dataSource.getCollection({ filters });
 			expect(data!.items.length).to.be.greaterThan(0);
-			expect(data!.items.every((p) => p.category === 'cat-jacket' && p.price >= 80 && p.price <= 100)).to.equal(true);
+			expect(data!.items.every((p) => p.category === 'cat-jacket' && p.price.amount >= 80 && p.price.amount <= 100)).to.equal(true);
 		});
 	});
 
