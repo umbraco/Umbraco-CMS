@@ -54,24 +54,13 @@ Parse and internalize all rules, conventions, scoring categories, and severity d
 
 **Always load** the root `/CLAUDE.md` first (it contains the architecture overview, breaking changes policy, and project structure).
 
-Then, for each changed file in the PR, determine which project it belongs to and load that project's CLAUDE.md if it exists. Use the file path to map to projects:
+Then, for each changed file in the PR, extract its project directory (the first two path segments, e.g., `src/Umbraco.Core/` from `src/Umbraco.Core/Services/Foo.cs`). Collect the unique set of project directories across all changed files, then check each one for a `CLAUDE.md` file using the Glob tool:
 
-| Path prefix                               | CLAUDE.md to load                                  |
-| ----------------------------------------- | -------------------------------------------------- |
-| `src/Umbraco.Core/`                       | `src/Umbraco.Core/CLAUDE.md`                       |
-| `src/Umbraco.Infrastructure/`             | `src/Umbraco.Infrastructure/CLAUDE.md`             |
-| `src/Umbraco.Web.Common/`                 | `src/Umbraco.Web.Common/CLAUDE.md`                 |
-| `src/Umbraco.Web.UI/`                     | `src/Umbraco.Web.UI/CLAUDE.md`                     |
-| `src/Umbraco.Web.UI.Client/`              | `src/Umbraco.Web.UI.Client/CLAUDE.md`              |
-| `src/Umbraco.Cms.Api.Management/`         | `src/Umbraco.Cms.Api.Management/CLAUDE.md`         |
-| `src/Umbraco.Cms.Api.Delivery/`           | `src/Umbraco.Cms.Api.Delivery/CLAUDE.md`           |
-| `src/Umbraco.Cms.Api.Common/`             | `src/Umbraco.Cms.Api.Common/CLAUDE.md`             |
-| `src/Umbraco.Cms.Persistence.EFCore/`     | `src/Umbraco.Cms.Persistence.EFCore/CLAUDE.md`     |
-| `src/Umbraco.PublishedCache.HybridCache/` | `src/Umbraco.PublishedCache.HybridCache/CLAUDE.md` |
-| `src/Umbraco.Examine.Lucene/`             | `src/Umbraco.Examine.Lucene/CLAUDE.md`             |
-| (other `src/*` projects)                  | Check if a CLAUDE.md exists in that project root   |
+```
+pattern: {project_directory}/CLAUDE.md
+```
 
-**Only load each CLAUDE.md once**, even if multiple files changed in the same project. There are 23 CLAUDE.md files across the repo — only load those relevant to the PR's changed files.
+Load each discovered `CLAUDE.md` once. Skip project directories that don't have one.
 
 ### 4. Gather Changed Files
 
