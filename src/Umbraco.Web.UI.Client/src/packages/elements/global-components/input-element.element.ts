@@ -4,7 +4,6 @@ import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbConfigCollectionModel } from '@umbraco-cms/backoffice/utils';
 import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
 
 @customElement('umb-input-element')
@@ -14,13 +13,8 @@ export class UmbInputElementElement extends UmbFormControlMixin<string | undefin
 ) {
 	#dataSourceApi = new UmbElementTreePickerDataSource(this);
 
-	#dataSourceConfig: UmbConfigCollectionModel = [];
-
 	@property({ type: Boolean })
-	public set folderOnly(value: boolean) {
-		this.#dataSourceConfig = this.#dataSourceConfig.filter((c) => c.alias !== 'folderOnly');
-		this.#dataSourceConfig.push({ alias: 'folderOnly', value });
-	}
+	folderOnly = false;
 
 	@property({ type: Number })
 	min = 0;
@@ -46,10 +40,7 @@ export class UmbInputElementElement extends UmbFormControlMixin<string | undefin
 	}
 
 	@property({ type: Object, attribute: false })
-	public set startNode(value: UmbTreeStartNode | undefined) {
-		this.#dataSourceConfig = this.#dataSourceConfig.filter((c) => c.alias !== 'startNode');
-		this.#dataSourceConfig.push({ alias: 'startNode', value });
-	}
+	startNode?: UmbTreeStartNode;
 
 	@property({ type: String })
 	public override set value(selectionString: string | undefined) {
@@ -74,11 +65,15 @@ export class UmbInputElementElement extends UmbFormControlMixin<string | undefin
 	}
 
 	override render() {
+		const dataSourceConfig = [
+			{ alias: 'folderOnly', value: this.folderOnly },
+			{ alias: 'startNode', value: this.startNode },
+		];
 		return html`
 			<umb-input-entity-data
 				min-message=${ifDefined(this.minMessage)}
 				max-message=${ifDefined(this.maxMessage)}
-				.dataSourceConfig=${this.#dataSourceConfig}
+				.dataSourceConfig=${dataSourceConfig}
 				.dataSourceApi=${this.#dataSourceApi}
 				.value=${this.value}
 				.selection=${this.selection}
