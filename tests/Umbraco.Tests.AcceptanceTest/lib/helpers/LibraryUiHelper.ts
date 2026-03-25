@@ -279,7 +279,7 @@ export class LibraryUiHelper extends UiBaseLocators {
     this.confirmEmptyRecycleBinBtn = page.locator('#confirm').getByLabel('Empty recycle bin', {exact: true});
     this.duplicateToBtn = page.getByRole('button', {name: 'Duplicate to'});
     this.moveToBtn = page.getByRole('button', {name: 'Move to'});
-    this.duplicateBtn = page.getByLabel('Duplicate to…', {exact: true});
+    this.duplicateBtn = page.getByLabel('Duplicate', {exact: true});
     this.elementTreeRefreshBtn = page.locator('#header').getByLabel('#actions_refreshNode');
     this.sortChildrenBtn = page.getByRole('button', {name: 'Sort children'});
     this.rollbackBtn = page.getByRole('button', { name: 'Rollback…' });
