@@ -75,6 +75,8 @@ Then, for each changed file in the PR, determine which project it belongs to and
 
 ### 4. Gather Changed Files
 
+#### 4a. Collect file list, stats, and diff
+
 Run the following git commands to understand what changed:
 
 ```bash
@@ -93,13 +95,60 @@ Where `{target}` is the resolved target branch from step 1. Use `--diff-filter=d
 
 **If no changes found**: Output "No changes found between current branch and `{target}`. Nothing to review." and stop.
 
-Then read the **full content** of each changed file using the `Read` tool. This gives you the complete context needed for a proper review (the diff alone may not show surrounding code patterns, class hierarchies, or import structures).
-
-Also get the full diff for review context:
+Then get the full diff — this is your **primary review source**:
 
 ```bash
 git diff {target}...HEAD
 ```
+
+#### 4b. Filter out noise files
+
+From the changed file list, classify each file as **noise** or **reviewable**.
+
+**Noise files** (skip entirely — do not read, do not review):
+
+| Pattern | Reason |
+|---|---|
+| `*.gen.ts`, `*.gen.cs` | Auto-generated API client code |
+| `*.generated.cs`, `*.Designer.cs` (in `Migrations/`) | Auto-generated models/snapshots |
+| `*/assets/lang/*.ts` (except `en.ts`) | Non-English translation files |
+| `*/mocks/data/*.ts` | Test fixture data |
+| `*/dist-cms/*`, `*/storybook-static/*` | Build output |
+| `*/TEMP/InMemoryAuto/*` | Runtime-generated models |
+| `package-lock.json` | Dependency lock file |
+| `appsettings-schema.*.json` | Generated JSON schema |
+
+Log the skip list: "Skipped {N} noise files: {comma-separated list of filenames}"
+
+#### 4c. Read file context selectively
+
+**Do NOT read every changed file in full.** The diff is the primary review source. Read file content only when you need structural context that the diff does not provide.
+
+**Partial header reads** — for every reviewable source file, read just the top of the file to capture `using`/`import` statements and class declarations (needed for dependency-flow checks in step 5):
+
+- `.cs` files: Read first 50 lines
+- `.ts` files: Read first 30 lines
+
+Use the `Read` tool with the `limit` parameter. Run these in parallel for efficiency.
+
+**Full file reads** — only when the diff reveals one of these situations:
+
+- **Public constructor changed or added** — need to verify the obsolete constructor pattern (old constructor must delegate to new)
+- **Interface method added** — need to verify default implementation is present
+- **Class inherits from a base class that also changed in this PR** — need to understand the inheritance chain
+- **Complex control flow change** (e.g., scope usage, transaction handling) — need surrounding method context. Use `Read` with `offset`/`limit` targeting the relevant method rather than the whole file.
+- **File is a new addition** (not in the target branch) — read the full file for proper line-number context
+
+**For files over 1500 lines**, never read in full. Use targeted `offset`/`limit` reads around the regions identified from the diff hunks.
+
+#### 4d. Log a summary
+
+After gathering, log:
+- Total changed files: {N}
+- Noise files skipped: {N}
+- Reviewable files: {N}
+- Files read in full: {N} (with reason)
+- Files read partially (header only): {N}
 
 ### 5. Impact Analysis
 
