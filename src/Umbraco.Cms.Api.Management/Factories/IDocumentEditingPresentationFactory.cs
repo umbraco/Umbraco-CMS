@@ -24,13 +24,14 @@ public interface IDocumentEditingPresentationFactory
     /// <returns>The mapped content update model.</returns>
     ContentUpdateModel MapUpdateModel(UpdateDocumentRequestModel requestModel);
 
+    // TODO (V19): Remove the default implementation.
     /// <summary>
     /// Creates an <see cref="UpdateDocumentRequestModel"/> from the given <see cref="IContent"/>,
     /// mapping its properties, variants, and template into the request model representation.
     /// </summary>
     /// <param name="content">The content item to create the update request model from.</param>
     /// <returns>An <see cref="UpdateDocumentRequestModel"/> representing the content.</returns>
-    Task<UpdateDocumentRequestModel> CreateUpdateRequestModelAsync(IContent content);
+    Task<UpdateDocumentRequestModel> CreateUpdateRequestModelAsync(IContent content) => throw new NotImplementedException();
 
     // TODO (V19): Remove the default implementation.
     /// <summary>
