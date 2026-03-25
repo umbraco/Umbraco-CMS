@@ -16,7 +16,7 @@ export class LanguageUiHelper extends UiBaseLocators {
   constructor(page: Page) {
     super(page);
     this.settingsSidebar = page.getByTestId('section-sidebar:Umb.SectionSidebarMenu.Settings');
-    this.languagesMenu = this.settingsSidebar.getByRole('link', {name: 'Languages'});
+    this.languagesMenu = this.settingsSidebar.getByRole('link', {name: 'Languages', exact: true});
     this.languageDropdown = page.locator('umb-input-culture-select #expand-symbol-wrapper');
     this.defaultLanguageToggle = page.locator('uui-toggle').filter({hasText: /Default language/}).locator('#toggle');
     this.mandatoryLanguageToggle = page.locator('uui-toggle').filter({hasText: /Mandatory language/}).locator('#toggle');

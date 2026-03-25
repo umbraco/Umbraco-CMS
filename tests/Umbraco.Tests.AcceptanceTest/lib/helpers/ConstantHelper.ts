@@ -42,7 +42,8 @@
     emptyValue: 'Value cannot be empty',
     nullValue: 'Value cannot be null',
     invalidEmail: 'Invalid email',
-    emptyManualLinkPicker: 'Please enter an URL or Anchor.'
+    emptyManualLinkPicker: 'Please enter an URL or Anchor.',
+    needMoreItems: 'This field needs more items',
   }
 
   public static readonly inputTypes = {
@@ -282,6 +283,7 @@
     language: '/umbraco/management/api/v1/language',
     media: '/umbraco/management/api/v1/media',
     mediaType: '/umbraco/management/api/v1/media-type',
+    memberType: '/umbraco/management/api/v1/member-type',
     mediaTypeFolder: '/umbraco/management/api/v1/media-type/folder',
     member: '/umbraco/management/api/v1/member',
     memberGroup: '/umbraco/management/api/v1/member-group',
@@ -308,5 +310,10 @@
     'Sensitive data': 'Users with the specific permission to be able to manage properties and data marked as sensitive',
     'Translators': 'Users with permission to manage dictionary entries',
     'Writers': 'Users with permission to create and update but not publish content'
+  }
+
+  public static readonly healthCheckMessages = {
+    imagingHMACSecretKeyIsNotConfigured: 'No HMAC secret key is configured for image URL signing. It is recommended to set Umbraco:CMS:Imaging:HMACSecretKey to prevent unauthorized image manipulation requests.',
+    imagingHMACSecretKeyIsConfigured: 'The HMAC secret key for image URL signing is configured'
   }
 }
