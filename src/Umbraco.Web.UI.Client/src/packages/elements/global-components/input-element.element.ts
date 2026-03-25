@@ -18,6 +18,7 @@ export class UmbInputElementElement extends UmbFormControlMixin<string | undefin
 
 	@property({ type: Boolean })
 	public set folderOnly(value: boolean) {
+		this.#dataSourceConfig = this.#dataSourceConfig.filter((c) => c.alias !== 'folderOnly');
 		this.#dataSourceConfig.push({ alias: 'folderOnly', value });
 	}
 
@@ -46,6 +47,7 @@ export class UmbInputElementElement extends UmbFormControlMixin<string | undefin
 
 	@property({ type: Object, attribute: false })
 	public set startNode(value: UmbTreeStartNode | undefined) {
+		this.#dataSourceConfig = this.#dataSourceConfig.filter((c) => c.alias !== 'startNode');
 		this.#dataSourceConfig.push({ alias: 'startNode', value });
 	}
 
