@@ -624,7 +624,7 @@ internal sealed class EFCoreScopeTest : UmbracoIntegrationTest
             Assert.IsNotNull(scope.ScopeContext); // the ambient context too (getter only)
             IScopeContext context = scope.ScopeContext;
 
-            IEFCoreScope<TestUmbracoDbContext> detached = EFCoreScopeProvider.CreateDetachedScope();
+            var detached = EFCoreScopeProvider.CreateDetachedScope();
             EFCoreScopeProvider.AttachScope(detached);
 
             Assert.AreEqual(detached, EFCoreScopeAccessor.AmbientScope);
