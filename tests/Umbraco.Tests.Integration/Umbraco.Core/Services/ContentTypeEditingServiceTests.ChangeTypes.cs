@@ -252,7 +252,7 @@ internal sealed partial class ContentTypeEditingServiceTests
     }
 
     [Test]
-    public async Task Non_Structural_Change_Emits_RefreshOther_Without_RefreshMain()
+    public async Task Non_Structural_Change_Emits_MetadataChanged_Without_RefreshMain()
     {
         var contentType = (await ContentTypeEditingService.CreateAsync(
             ContentTypeCreateModel("Test", "test"), Constants.Security.SuperUserKey)).Result!;
@@ -273,7 +273,8 @@ internal sealed partial class ContentTypeEditingServiceTests
         var payload = refreshedPayloads.First();
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(payload.ChangeTypes.HasType(ContentTypeChangeTypes.RefreshOther), "Expected RefreshOther flag");
+            Assert.IsTrue(payload.ChangeTypes.HasTypesAll(ContentTypeChangeTypes.MetadataChanged), "Expected MetadataChanged flag");
+            Assert.IsTrue(payload.ChangeTypes.HasType(ContentTypeChangeTypes.RefreshOther), "MetadataChanged should include RefreshOther");
             Assert.IsFalse(payload.ChangeTypes.HasType(ContentTypeChangeTypes.RefreshMain), "Should NOT include RefreshMain");
         });
     }

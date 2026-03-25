@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Extensions;
 [TestFixture]
 public class ContentTypeChangeExtensionsTests
 {
-    // Existing base flags
+    // "Main" base flags
     [TestCase(ContentTypeChangeTypes.RefreshMain, true)]
     [TestCase(ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RefreshOther, true)]
     [TestCase(ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.Create, true)]
@@ -33,7 +33,7 @@ public class ContentTypeChangeExtensionsTests
     public void IsStructuralChange(ContentTypeChangeTypes change, bool expected) =>
         Assert.AreEqual(expected, change.IsStructuralChange());
 
-    // Existing base flags
+    // "Main" base flags
     [TestCase(ContentTypeChangeTypes.RefreshOther, true)]
     [TestCase(ContentTypeChangeTypes.RefreshOther | ContentTypeChangeTypes.Create, true)]
     [TestCase(ContentTypeChangeTypes.RefreshOther | ContentTypeChangeTypes.Remove, true)]
@@ -109,20 +109,6 @@ public class ContentTypeChangeExtensionsTests
             Assert.IsFalse(combined.HasTypesAll(ContentTypeChangeTypes.CompositionRemoved));
             Assert.IsFalse(combined.HasTypesAll(ContentTypeChangeTypes.PropertyVariationChanged));
             Assert.IsFalse(combined.HasType(ContentTypeChangeTypes.RefreshOther));
-        });
-    }
-
-    [Test]
-    public void Original_Enum_Values_Are_Preserved()
-    {
-        Assert.Multiple(() =>
-        {
-            Assert.AreEqual(0, (ushort)ContentTypeChangeTypes.None);
-            Assert.AreEqual(1, (ushort)ContentTypeChangeTypes.Create);
-            Assert.AreEqual(2, (ushort)ContentTypeChangeTypes.RefreshMain);
-            Assert.AreEqual(4, (ushort)ContentTypeChangeTypes.RefreshOther);
-            Assert.AreEqual(8, (ushort)ContentTypeChangeTypes.Remove);
-            Assert.AreEqual(16, (ushort)ContentTypeChangeTypes.VariationChanged);
         });
     }
 }

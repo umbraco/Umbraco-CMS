@@ -449,8 +449,56 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
             }
             else
             {
-                // add that one, as an other change
-                AddChange(changes, contentType, ContentTypeChangeTypes.RefreshOther);
+                // Detect granular non-structural changes (each includes RefreshOther automatically).
+                // Fall back to bare RefreshOther if none of the specific checks match
+                // (e.g. for changes we haven't categorized yet).
+                var hasGranularOther = false;
+
+                // new properties added?
+                var hasAnyPropertyBeenAdded = contentType.PropertyTypes.Any(pt => pt.WasPropertyDirty("Id"));
+                if (hasAnyPropertyBeenAdded)
+                {
+                    AddChange(changes, contentType, ContentTypeChangeTypes.PropertyAdded);
+                    hasGranularOther = true;
+                }
+
+                // compositions added? (composition collection changed, but none were removed)
+                var hasCompositionsChanged = dirty.WasPropertyDirty("ContentTypeComposition");
+                if (hasCompositionsChanged && !hasAnyCompositionBeenRemoved)
+                {
+                    AddChange(changes, contentType, ContentTypeChangeTypes.CompositionAdded);
+                    hasGranularOther = true;
+                }
+
+                // metadata changed? (name, description, icon, thumbnail, templates, element/root settings)
+                if (dirty.WasPropertyDirty(nameof(IContentType.Name))
+                    || dirty.WasPropertyDirty(nameof(IContentType.Description))
+                    || dirty.WasPropertyDirty(nameof(IContentType.Icon))
+                    || dirty.WasPropertyDirty(nameof(IContentType.Thumbnail))
+                    || dirty.WasPropertyDirty(nameof(IContentType.AllowedTemplates))
+                    || dirty.WasPropertyDirty(nameof(IContentType.DefaultTemplateId))
+                    || dirty.WasPropertyDirty(nameof(IContentType.IsElement))
+                    || dirty.WasPropertyDirty(nameof(IContentType.AllowedAsRoot))
+                    || dirty.WasPropertyDirty(nameof(IContentType.AllowedAsRoot)))
+                {
+                    AddChange(changes, contentType, ContentTypeChangeTypes.MetadataChanged);
+                    hasGranularOther = true;
+                }
+
+                // structure settings changed? (allowed child types, cleanup, list view, tab/group rearrangement)
+                if (dirty.WasPropertyDirty(nameof(IContentType.AllowedContentTypes))
+                    || dirty.WasPropertyDirty(nameof(IContentType.HistoryCleanup))
+                    || dirty.WasPropertyDirty(nameof(IContentType.ListView))
+                    || dirty.WasPropertyDirty(nameof(IContentType.PropertyGroups)))
+                {
+                    AddChange(changes, contentType, ContentTypeChangeTypes.StructureSettingsChanged);
+                    hasGranularOther = true;
+                }
+
+                if (!hasGranularOther)
+                {
+                    AddChange(changes, contentType, ContentTypeChangeTypes.RefreshOther);
+                }
             }
         }
 
