@@ -9613,6 +9613,7 @@ export type GetTreeElementChildrenData = {
         skip?: number;
         take?: number;
         foldersOnly?: boolean;
+        dataTypeId?: string;
     };
     url: '/umbraco/management/api/v1/tree/element/children';
 };
@@ -9644,6 +9645,7 @@ export type GetTreeElementRootData = {
         skip?: number;
         take?: number;
         foldersOnly?: boolean;
+        dataTypeId?: string;
     };
     url: '/umbraco/management/api/v1/tree/element/root';
 };
@@ -9676,6 +9678,7 @@ export type GetTreeElementSiblingsData = {
         before?: number;
         after?: number;
         foldersOnly?: boolean;
+        dataTypeId?: string;
     };
     url: '/umbraco/management/api/v1/tree/element/siblings';
 };
