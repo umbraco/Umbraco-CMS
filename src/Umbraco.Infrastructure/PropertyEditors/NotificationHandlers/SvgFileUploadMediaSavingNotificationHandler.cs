@@ -71,31 +71,29 @@ internal sealed class SvgFileUploadMediaSavingNotificationHandler : INotificatio
                 continue;
             }
 
-            using (Stream filestream = _mediaFileManager.FileSystem.OpenFile(filepath))
-            {
-                SetWidthAndHeight(model, filestream);
-            }
+            using Stream filestream = _mediaFileManager.FileSystem.OpenFile(filepath);
 
+            SetWidthAndHeight(model, filestream, pvalue.Culture, pvalue.Segment);
         }
 
     }
 
-    private void SetWidthAndHeight(IContentBase model, Stream filestream)
+    private void SetWidthAndHeight(IContentBase model, Stream filestream, string? culture, string? segment)
     {
         Size? size = _svgDimensionExtractor.GetDimensions(filestream);
         if (size.HasValue)
         {
-            SetProperty(model, Core.Constants.Conventions.Media.Width,size.Value.Width);
-            SetProperty(model, Core.Constants.Conventions.Media.Height,size.Value.Height);
+            SetProperty(model, Core.Constants.Conventions.Media.Width, size.Value.Width, culture, segment);
+            SetProperty(model, Core.Constants.Conventions.Media.Height, size.Value.Height, culture, segment);
         }
     }
 
-    private static void SetProperty(IContentBase content, string alias, object? value)
+    private static void SetProperty(IContentBase content, string alias, object? value, string? culture, string? segment)
     {
         if (string.IsNullOrEmpty(alias) is false &&
             content.Properties.TryGetValue(alias, out IProperty? property))
         {
-            property.SetValue(value);
+            property.SetValue(value, culture, segment);
         }
     }
 
