@@ -12,21 +12,21 @@ namespace Umbraco.Cms.Core.Cache;
 ///     Represents the default cache policy.
 /// </summary>
 /// <typeparam name="TEntity">The type of the entity.</typeparam>
-/// <typeparam name="TId">The type of the identifier.</typeparam>
+/// <typeparam name="TKey">The type of the entity key.</typeparam>
 /// <remarks>
 ///     <para>The default cache policy caches entities with a 5 minutes sliding expiration.</para>
 ///     <para>Each entity is cached individually.</para>
 ///     <para>If options.GetAllCacheAllowZeroCount then a 'zero-count' array is cached when GetAll finds nothing.</para>
 ///     <para>If options.GetAllCacheValidateCount then we check against the db when getting many entities.</para>
 /// </remarks>
-public class AsyncDefaultRepositoryCachePolicy<TEntity, TId> : AsyncRepositoryCachePolicyBase<TEntity, TId>
+public class AsyncDefaultRepositoryCachePolicy<TEntity, TKey> : AsyncRepositoryCachePolicyBase<TEntity, TKey>
     where TEntity : class, IEntity
 {
     private static readonly TEntity[] _emptyEntities = new TEntity[0]; // const
     private readonly AsyncRepositoryCachePolicyOptions _options;
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="AsyncDefaultRepositoryCachePolicy{TEntity, TId}"/> class.
+    ///     Initializes a new instance of the <see cref="AsyncDefaultRepositoryCachePolicy{TEntity, TKey}"/> class.
     /// </summary>
     /// <param name="cache">The application policy cache.</param>
     /// <param name="scopeAccessor">The scope accessor for accessing the current scope.</param>
@@ -140,11 +140,11 @@ public class AsyncDefaultRepositoryCachePolicy<TEntity, TId> : AsyncRepositoryCa
     }
 
     /// <inheritdoc />
-    public override async Task<TEntity?> GetAsync(TId? id, Func<TId?, Task<TEntity?>> performGet, Func<Task<IEnumerable<TEntity>?>> performGetAll)
+    public override async Task<TEntity?> GetAsync(TKey? key, Func<TKey?, Task<TEntity?>> performGet, Func<Task<IEnumerable<TEntity>?>> performGetAll)
     {
         await EnsureCacheIsSyncedAsync();
 
-        var cacheKey = GetEntityCacheKey(id);
+        var cacheKey = GetEntityCacheKey(key);
 
         TEntity? fromCache = Cache.GetCacheItem<TEntity>(cacheKey);
 
@@ -161,7 +161,7 @@ public class AsyncDefaultRepositoryCachePolicy<TEntity, TId> : AsyncRepositoryCa
         }
 
         // Otherwise go to the database to retrieve.
-        TEntity? entity = await performGet(id);
+        TEntity? entity = await performGet(key);
 
         if (entity != null && entity.HasIdentity)
         {
@@ -178,22 +178,22 @@ public class AsyncDefaultRepositoryCachePolicy<TEntity, TId> : AsyncRepositoryCa
     }
 
     /// <inheritdoc />
-    public override async Task<TEntity?> GetCachedAsync(TId id)
+    public override async Task<TEntity?> GetCachedAsync(TKey key)
     {
         await EnsureCacheIsSyncedAsync();
-        var cacheKey = GetEntityCacheKey(id);
+        var cacheKey = GetEntityCacheKey(key);
         return Cache.GetCacheItem<TEntity>(cacheKey);
     }
 
     /// <inheritdoc />
-    public override async Task<bool> ExistsAsync(TId id, Func<TId, Task<bool>> performExists, Func<Task<IEnumerable<TEntity>?>> performGetAll)
+    public override async Task<bool> ExistsAsync(TKey key, Func<TKey, Task<bool>> performExists, Func<Task<IEnumerable<TEntity>?>> performGetAll)
     {
         await EnsureCacheIsSyncedAsync();
 
         // if found in cache the return else check
-        var cacheKey = GetEntityCacheKey(id);
+        var cacheKey = GetEntityCacheKey(key);
         TEntity? fromCache = Cache.GetCacheItem<TEntity>(cacheKey);
-        return fromCache != null || await performExists(id);
+        return fromCache != null || await performExists(key);
     }
 
     /// <inheritdoc />
@@ -250,15 +250,15 @@ public class AsyncDefaultRepositoryCachePolicy<TEntity, TId> : AsyncRepositoryCa
     }
 
     /// <inheritdoc />
-    public override async Task<TEntity[]> GetManyAsync(TId[] ids, Func<TId[], Task<IEnumerable<TEntity>?>> performGetMany, Func<Task<IEnumerable<TEntity>?>> performGetAll)
+    public override async Task<TEntity[]> GetManyAsync(TKey[] keys, Func<TKey[], Task<IEnumerable<TEntity>?>> performGetMany, Func<Task<IEnumerable<TEntity>?>> performGetAll)
     {
         await EnsureCacheIsSyncedAsync();
-        if (ids.Length > 0)
+        if (keys.Length > 0)
         {
             // try to get each entity from the cache
             // if we can find all of them, return
-            TEntity[] entities = (await Task.WhenAll(ids.Select(GetCachedAsync))).WhereNotNull().ToArray();
-            if (ids.Length.Equals(entities.Length))
+            TEntity[] entities = (await Task.WhenAll(keys.Select(GetCachedAsync))).WhereNotNull().ToArray();
+            if (keys.Length.Equals(entities.Length))
             {
                 return entities; // no need for null checks, we are not caching nulls
             }
@@ -303,7 +303,7 @@ public class AsyncDefaultRepositoryCachePolicy<TEntity, TId> : AsyncRepositoryCa
         }
 
         // cache failed, get from repo and cache
-        IEnumerable<TEntity>? repoResult = await performGetMany(ids);
+        IEnumerable<TEntity>? repoResult = await performGetMany(keys);
         TEntity[]? repoEntities = repoResult?
             .WhereNotNull() // exclude nulls!
             .Where(x => x.HasIdentity) // be safe, though would be weird...
@@ -326,23 +326,23 @@ public class AsyncDefaultRepositoryCachePolicy<TEntity, TId> : AsyncRepositoryCa
     protected string GetEntityCacheKey(int id) => EntityTypeCacheKey + id;
 
     /// <summary>
-    ///     Gets the cache key for an entity with the specified identifier.
+    ///     Gets the cache key for an entity with the specified key.
     /// </summary>
-    /// <param name="id">The identifier.</param>
+    /// <param name="key">The key.</param>
     /// <returns>The cache key.</returns>
-    protected string GetEntityCacheKey(TId? id)
+    protected string GetEntityCacheKey(TKey? key)
     {
-        if (EqualityComparer<TId>.Default.Equals(id, default))
+        if (EqualityComparer<TKey>.Default.Equals(key, default))
         {
             return string.Empty;
         }
 
-        if (typeof(TId).IsValueType)
+        if (typeof(TKey).IsValueType)
         {
-            return EntityTypeCacheKey + id;
+            return EntityTypeCacheKey + key;
         }
 
-        return EntityTypeCacheKey + id?.ToString()?.ToUpperInvariant();
+        return EntityTypeCacheKey + key?.ToString()?.ToUpperInvariant();
     }
 
     /// <summary>
