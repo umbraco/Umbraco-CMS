@@ -1,5 +1,6 @@
 import { filterProducts } from '../../data/products.js';
 import type { ExampleProductFilterArgs } from '../../data/types.js';
+import type { ExampleRangeValueModel } from '../../range-kind/types.js';
 import type { ExampleDynamicFacetCollectionFilterModel, ExampleProductCollectionItemModel } from './types.js';
 import type { UmbFacetFilterValueModel } from '@umbraco-cms/backoffice/facet-filter';
 import type { UmbCollectionDataSource } from '@umbraco-cms/backoffice/collection';
@@ -75,21 +76,21 @@ export class ExampleDynamicFacetCollectionDataSource
 			switch (field) {
 				case 'categories':
 					args.categories ??= [];
-					args.categories.push(filter.unique);
+					args.categories.push(filter.value as string);
 					break;
 				case 'sizes':
 					args.sizes ??= [];
-					args.sizes.push(filter.unique);
+					args.sizes.push(filter.value as string);
 					break;
 				case 'colors':
 					args.colors ??= [];
-					args.colors.push(filter.unique);
+					args.colors.push(filter.value as string);
 					break;
 				case 'priceRange': {
 					args.priceRange ??= { min: 0, max: 0 };
-					const numericValue = filter.value as number;
-					if (filter.unique === 'min') args.priceRange.min = numericValue;
-					if (filter.unique === 'max') args.priceRange.max = numericValue;
+					const rangeValue = filter.value as ExampleRangeValueModel;
+					if (rangeValue.key === 'min') args.priceRange.min = rangeValue.amount;
+					if (rangeValue.key === 'max') args.priceRange.max = rangeValue.amount;
 					break;
 				}
 			}

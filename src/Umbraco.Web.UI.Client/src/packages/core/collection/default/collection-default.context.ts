@@ -318,7 +318,7 @@ export class UmbDefaultCollectionContext<
 		this._loading.setValue(true);
 
 		const filterArgs = await this._getFilterArgs();
-		const filters = await this.filtering.getActiveFilters();
+		const filters = await this.filtering.getActiveFilterValues();
 		const filter = { ...this._filter.getValue(), ...filterArgs, filters };
 		const { data } = await this._repository.requestCollection(filter);
 

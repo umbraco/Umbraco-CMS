@@ -46,7 +46,7 @@ export class UmbFacetFilterContext extends UmbContextBase {
 		const alias = this.#alias.getValue();
 		if (!alias || !this.#manager) return;
 
-		this.#values = this.#manager.filterValuesByAlias(alias);
+		this.#values = this.#manager.activeFiltersByAlias(alias);
 	}
 
 	#observeFacetedResult(): void {
@@ -67,7 +67,7 @@ export class UmbFacetFilterContext extends UmbContextBase {
 		const alias = this.#alias.getValue();
 		if (!alias || !this.#manager) return;
 
-		this.#manager.clearFilterValue(alias, unique);
+		this.#manager.clearActiveFilter(alias, unique);
 	}
 
 	public clearAllValues(): void {

@@ -6,8 +6,6 @@ import { css, customElement, html, ifDefined, repeat, state, nothing } from '@um
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 
-type UmbSelectValue = Pick<UmbDatalistOptionModel, 'unique' | 'entityType'>;
-
 const INLINE_THRESHOLD = 6;
 
 @customElement('umb-select-facet-filter')
@@ -28,7 +26,7 @@ export class UmbSelectFacetFilterElement extends UmbLitElement {
 	private _options: Array<UmbDatalistOptionModel> = [];
 
 	@state()
-	private _value: Array<UmbSelectValue> = [];
+	private _value: Array<string> = [];
 
 	@state()
 	private _valueItems: Array<UmbDatalistItemModel> = [];
@@ -65,17 +63,15 @@ export class UmbSelectFacetFilterElement extends UmbLitElement {
 			this.#api?.setValue([]);
 			return;
 		}
-		const option = this._options.find((o) => o.unique === target.value);
-		if (option) this.#api?.setValue([{ unique: option.unique, entityType: option.entityType }]);
+		this.#api?.setValue([target.value]);
 	}
 
 	#onCheckboxChange(event: Event) {
 		const target = event.currentTarget as HTMLInputElement;
-		const item = this._options.find((option) => option.unique === target.value);
-		if (!item) return;
+		if (!target.value) return;
 		const newValue = target.checked
-			? [...this._value, { unique: item.unique, entityType: item.entityType }]
-			: this._value.filter((v) => v.unique !== item.unique);
+			? [...this._value, target.value]
+			: this._value.filter((v) => v !== target.value);
 		this.#api?.setValue(newValue);
 	}
 
@@ -85,8 +81,7 @@ export class UmbSelectFacetFilterElement extends UmbLitElement {
 			this.#api?.setValue([]);
 			return;
 		}
-		const option = this._options.find((o) => o.unique === target.value);
-		if (option) this.#api?.setValue([{ unique: option.unique, entityType: option.entityType }]);
+		this.#api?.setValue([target.value]);
 	}
 
 	#onComboboxSearch(event: Event) {
@@ -111,7 +106,7 @@ export class UmbSelectFacetFilterElement extends UmbLitElement {
 
 		const labels = this._value
 			.slice(0, max)
-			.map((item) => this._valueItems.find((i) => i.unique === item.unique)?.name ?? item.unique);
+			.map((item) => this._valueItems.find((i) => i.unique === item)?.name ?? item);
 
 		return labels.join(', ') + (length > max ? ' + ' + (length - max) : '');
 	}
@@ -137,7 +132,7 @@ export class UmbSelectFacetFilterElement extends UmbLitElement {
 	#renderRadioList() {
 		return html`
 			<div class="filter">
-				<uui-radio-group .value=${this._value[0]?.unique ?? ''} @change=${this.#onRadioChange}>
+				<uui-radio-group .value=${this._value[0] ?? ''} @change=${this.#onRadioChange}>
 					${repeat(
 						this._options,
 						(option) => option.unique,
@@ -160,7 +155,7 @@ export class UmbSelectFacetFilterElement extends UmbLitElement {
 								label=${this.#formatOptionLabel(option)}
 								value=${ifDefined(option.unique)}
 								@change=${this.#onCheckboxChange}
-								.checked=${this._value.some((v) => v.unique === option.unique)}></uui-checkbox>
+								.checked=${this._value.includes(option.unique)}></uui-checkbox>
 						`,
 					)}
 				</div>
@@ -172,7 +167,7 @@ export class UmbSelectFacetFilterElement extends UmbLitElement {
 		return html`
 			<div class="filter">
 				<uui-combobox
-					value=${this._value[0]?.unique ?? ''}
+					value=${this._value[0] ?? ''}
 					@change=${this.#onComboboxSelect}
 					@search=${this.#onComboboxSearch}
 					placeholder="Placeholder">
@@ -223,7 +218,7 @@ export class UmbSelectFacetFilterElement extends UmbLitElement {
 										label=${this.#formatOptionLabel(option)}
 										value=${ifDefined(option.unique)}
 										@change=${this.#onCheckboxChange}
-										.checked=${this._value.some((v) => v.unique === option.unique)}></uui-checkbox>
+										.checked=${this._value.includes(option.unique)}></uui-checkbox>
 								`,
 							)}
 							${this._hasMore

@@ -1,5 +1,5 @@
 import { UMB_FACET_FILTER_MANAGER_CONTEXT } from './facet-filter.manager.context-token.js';
-import type { UmbActiveFacetFilterModel } from './types.js';
+import type { UmbActiveFacetFilterModel, UmbFacetFilterValueModel } from './types.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import type { Observable } from '@umbraco-cms/backoffice/observable-api';
@@ -52,7 +52,7 @@ export class UmbFacetFilterManager extends UmbContextBase {
 	 * Observable for all active filter entries for a given alias.
 	 * @param alias
 	 */
-	public filterValuesByAlias(alias: string): Observable<Array<UmbActiveFacetFilterModel>> {
+	public activeFiltersByAlias(alias: string): Observable<Array<UmbActiveFacetFilterModel>> {
 		return this.#activeFilters.asObservablePart((filters) => filters.filter((f) => f.alias === alias));
 	}
 
@@ -66,11 +66,11 @@ export class UmbFacetFilterManager extends UmbContextBase {
 	}
 
 	/**
-	 * Clear a single entry identified by alias + unique.
+	 * Clear a single active filter entry identified by alias + unique.
 	 * @param alias
 	 * @param unique
 	 */
-	public clearFilterValue(alias: string, unique: string): void {
+	public clearActiveFilter(alias: string, unique: string): void {
 		const key = `${alias}||${unique}`;
 		this.#activeFilters.remove([key]);
 	}
@@ -83,10 +83,10 @@ export class UmbFacetFilterManager extends UmbContextBase {
 	}
 
 	/**
-	 * Get all currently active filters.
+	 * Get all currently active filter values (without runtime keys).
 	 */
-	public async getActiveFilters(): Promise<Array<UmbActiveFacetFilterModel>> {
-		return this.#activeFilters.getValue();
+	public async getActiveFilterValues(): Promise<Array<UmbFacetFilterValueModel>> {
+		return this.#activeFilters.getValue().map(({ alias, value }) => ({ alias, value }));
 	}
 
 	/**

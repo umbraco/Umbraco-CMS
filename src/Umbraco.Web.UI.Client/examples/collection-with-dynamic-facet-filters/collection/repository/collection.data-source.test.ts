@@ -1,7 +1,7 @@
 import { products } from '../../data/products.js';
 import { ExampleDynamicFacetCollectionDataSource } from './collection.data-source.js';
 import { expect } from '@open-wc/testing';
-import type { UmbActiveFacetFilterModel } from '@umbraco-cms/backoffice/facet-filter';
+import type { UmbFacetFilterValueModel } from '@umbraco-cms/backoffice/facet-filter';
 
 describe('ExampleDynamicFacetCollectionDataSource', () => {
 	const dataSource = new ExampleDynamicFacetCollectionDataSource();
@@ -34,8 +34,8 @@ describe('ExampleDynamicFacetCollectionDataSource', () => {
 
 	describe('category filter mapping', () => {
 		it('maps category filter alias to category field', async () => {
-			const filters: Array<UmbActiveFacetFilterModel> = [
-				{ alias: 'Example.DynamicFacetFilter.CategoryFilter', unique: 'cat-tshirt', value: { unique: 'cat-tshirt' } },
+			const filters: Array<UmbFacetFilterValueModel> = [
+				{ alias: 'Example.DynamicFacetFilter.CategoryFilter', value: 'cat-tshirt' },
 			];
 			const { data } = await dataSource.getCollection({ filters });
 			expect(data!.items.every((p) => p.category === 'cat-tshirt')).to.equal(true);
@@ -45,8 +45,8 @@ describe('ExampleDynamicFacetCollectionDataSource', () => {
 
 	describe('size filter mapping', () => {
 		it('maps size filter alias to sizes field', async () => {
-			const filters: Array<UmbActiveFacetFilterModel> = [
-				{ alias: 'Example.DynamicFacetFilter.SizeFilter', unique: 'size-xl', value: { unique: 'size-xl' } },
+			const filters: Array<UmbFacetFilterValueModel> = [
+				{ alias: 'Example.DynamicFacetFilter.SizeFilter', value: 'size-xl' },
 			];
 			const { data } = await dataSource.getCollection({ filters });
 			expect(data!.items.every((p) => p.sizes.includes('size-xl'))).to.equal(true);
@@ -56,8 +56,8 @@ describe('ExampleDynamicFacetCollectionDataSource', () => {
 
 	describe('color filter mapping', () => {
 		it('maps color filter alias to colors field', async () => {
-			const filters: Array<UmbActiveFacetFilterModel> = [
-				{ alias: 'Example.DynamicFacetFilter.ColorFilter', unique: 'color-black', value: { unique: 'color-black' } },
+			const filters: Array<UmbFacetFilterValueModel> = [
+				{ alias: 'Example.DynamicFacetFilter.ColorFilter', value: 'color-black' },
 			];
 			const { data } = await dataSource.getCollection({ filters });
 			expect(data!.items.every((p) => p.colors.includes('color-black'))).to.equal(true);
@@ -67,9 +67,9 @@ describe('ExampleDynamicFacetCollectionDataSource', () => {
 
 	describe('price range filter mapping', () => {
 		it('maps price range filter entries to priceRange field', async () => {
-			const filters: Array<UmbActiveFacetFilterModel> = [
-				{ alias: 'Example.DynamicFacetFilter.PriceFilter', unique: 'min', value: 20 },
-				{ alias: 'Example.DynamicFacetFilter.PriceFilter', unique: 'max', value: 50 },
+			const filters: Array<UmbFacetFilterValueModel> = [
+				{ alias: 'Example.DynamicFacetFilter.PriceFilter', value: { key: 'min', amount: 20 } },
+				{ alias: 'Example.DynamicFacetFilter.PriceFilter', value: { key: 'max', amount: 50 } },
 			];
 			const { data } = await dataSource.getCollection({ filters });
 			expect(data!.items.length).to.be.greaterThan(0);
@@ -77,9 +77,9 @@ describe('ExampleDynamicFacetCollectionDataSource', () => {
 		});
 
 		it('returns items within the full price range', async () => {
-			const filters: Array<UmbActiveFacetFilterModel> = [
-				{ alias: 'Example.DynamicFacetFilter.PriceFilter', unique: 'min', value: 0 },
-				{ alias: 'Example.DynamicFacetFilter.PriceFilter', unique: 'max', value: 1000 },
+			const filters: Array<UmbFacetFilterValueModel> = [
+				{ alias: 'Example.DynamicFacetFilter.PriceFilter', value: { key: 'min', amount: 0 } },
+				{ alias: 'Example.DynamicFacetFilter.PriceFilter', value: { key: 'max', amount: 1000 } },
 			];
 			const { data } = await dataSource.getCollection({ filters });
 			expect(data!.items.length).to.equal(products.length);
@@ -88,10 +88,10 @@ describe('ExampleDynamicFacetCollectionDataSource', () => {
 
 	describe('combined filters', () => {
 		it('applies category and price range together', async () => {
-			const filters: Array<UmbActiveFacetFilterModel> = [
-				{ alias: 'Example.DynamicFacetFilter.CategoryFilter', unique: 'cat-jacket', value: { unique: 'cat-jacket' } },
-				{ alias: 'Example.DynamicFacetFilter.PriceFilter', unique: 'min', value: 80 },
-				{ alias: 'Example.DynamicFacetFilter.PriceFilter', unique: 'max', value: 100 },
+			const filters: Array<UmbFacetFilterValueModel> = [
+				{ alias: 'Example.DynamicFacetFilter.CategoryFilter', value: 'cat-jacket' },
+				{ alias: 'Example.DynamicFacetFilter.PriceFilter', value: { key: 'min', amount: 80 } },
+				{ alias: 'Example.DynamicFacetFilter.PriceFilter', value: { key: 'max', amount: 100 } },
 			];
 			const { data } = await dataSource.getCollection({ filters });
 			expect(data!.items.length).to.be.greaterThan(0);
@@ -122,8 +122,8 @@ describe('ExampleDynamicFacetCollectionDataSource', () => {
 
 	describe('unknown alias', () => {
 		it('ignores filters with unknown aliases', async () => {
-			const filters: Array<UmbActiveFacetFilterModel> = [
-				{ alias: 'Unknown.Filter', unique: 'value', value: { unique: 'value' } },
+			const filters: Array<UmbFacetFilterValueModel> = [
+				{ alias: 'Unknown.Filter', value: 'some-value' },
 			];
 			const { data } = await dataSource.getCollection({ filters });
 			expect(data!.items.length).to.equal(products.length);

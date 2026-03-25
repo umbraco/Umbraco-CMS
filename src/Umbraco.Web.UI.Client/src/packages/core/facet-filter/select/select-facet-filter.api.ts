@@ -13,13 +13,11 @@ import { UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
 
 const ObserveValueItems = Symbol();
 
-type UmbSelectValue = Pick<UmbDatalistOptionModel, 'unique' | 'entityType'>;
-
 export class UmbSelectFacetFilterApi extends UmbControllerBase {
 	#options = new UmbArrayState<UmbDatalistOptionModel>([], (x) => x.unique);
 	public readonly options = this.#options.asObservable();
 
-	#value = new UmbArrayState<UmbSelectValue>([], (x) => x.unique);
+	#value = new UmbArrayState<string>([], (x) => x);
 	public readonly value = this.#value.asObservable();
 
 	#valueItems = new UmbArrayState<UmbDatalistItemModel>([], (x) => x.unique);
@@ -58,9 +56,9 @@ export class UmbSelectFacetFilterApi extends UmbControllerBase {
 		this.observe(
 			this.#facetFilterContext.values,
 			(entries) => {
-				const values: Array<UmbSelectValue> = entries?.map((e) => e.value as UmbSelectValue) ?? [];
+				const values: Array<string> = entries?.map((e) => e.value as string) ?? [];
 				this.#value.setValue(values);
-				this.#requestValueItems(values.map((v) => v.unique));
+				this.#requestValueItems(values);
 			},
 			'umbFilterValuesObserver',
 		);
@@ -97,13 +95,13 @@ export class UmbSelectFacetFilterApi extends UmbControllerBase {
 		}
 	}
 
-	public setValue(values: Array<UmbSelectValue>) {
-		const filtered = values.filter((v) => v.unique !== '');
+	public setValue(values: Array<string>) {
+		const filtered = values.filter((v) => v !== '');
 
 		if (filtered.length === 0) {
 			this.#facetFilterContext?.clearAllValues();
 		} else {
-			this.#facetFilterContext?.setValues(filtered.map((v) => ({ unique: v.unique, value: v })));
+			this.#facetFilterContext?.setValues(filtered.map((v) => ({ unique: v, value: v })));
 		}
 	}
 

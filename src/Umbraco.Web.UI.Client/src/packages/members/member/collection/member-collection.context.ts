@@ -15,14 +15,14 @@ export class UmbMemberCollectionContext extends UmbDefaultCollectionContext<
 	}
 
 	protected override async _getFilterArgs(): Promise<Record<string, any>> {
-		const activeFilters = await this.filtering.getActiveFilters();
+		const filterValues = await this.filtering.getActiveFilterValues();
 		const args: Record<string, any> = {};
 
-		const memberTypeFilters = activeFilters.filter((f) => f.alias === UMB_MEMBER_COLLECTION_MEMBER_TYPE_FACET_FILTER_ALIAS);
-		if (memberTypeFilters.length) args.memberTypeId = memberTypeFilters.map((f) => f.unique);
+		const memberTypeFilters = filterValues.filter((f) => f.alias === UMB_MEMBER_COLLECTION_MEMBER_TYPE_FACET_FILTER_ALIAS);
+		if (memberTypeFilters.length) args.memberTypeId = memberTypeFilters.map((f) => f.value);
 
-		const memberGroupFilters = activeFilters.filter((f) => f.alias === UMB_MEMBER_COLLECTION_MEMBER_GROUP_FACET_FILTER_ALIAS);
-		if (memberGroupFilters.length) args.memberGroupName = memberGroupFilters.map((f) => f.unique);
+		const memberGroupFilters = filterValues.filter((f) => f.alias === UMB_MEMBER_COLLECTION_MEMBER_GROUP_FACET_FILTER_ALIAS);
+		if (memberGroupFilters.length) args.memberGroupName = memberGroupFilters.map((f) => f.value);
 
 		return args;
 	}

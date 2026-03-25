@@ -14,13 +14,13 @@ export class UmbExtensionCollectionContext extends UmbDefaultCollectionContext<
 	}
 
 	protected override async _getFilterArgs(): Promise<Record<string, any>> {
-		const activeFilters = await this.filtering.getActiveFilters();
+		const filterValues = await this.filtering.getActiveFilterValues();
 		const args: Record<string, any> = {};
 
-		const extensionTypeFilters = activeFilters.filter(
+		const extensionTypeFilters = filterValues.filter(
 			(f) => f.alias === UMB_EXTENSION_COLLECTION_EXTENSION_TYPE_FACET_FILTER_ALIAS,
 		);
-		if (extensionTypeFilters.length) args.extensionTypes = extensionTypeFilters.map((f) => f.unique);
+		if (extensionTypeFilters.length) args.extensionTypes = extensionTypeFilters.map((f) => f.value);
 
 		return args;
 	}

@@ -46,7 +46,7 @@ export class UmbCollectionActiveFiltersElement extends UmbLitElement {
 	#renderActiveFilterItem(activeFilter: UmbActiveFacetFilterModel) {
 		return html`
 			<span class="active-filter-item">
-				${activeFilter.unique}
+				${String(activeFilter.value)}
 				<uui-button
 					label="Clear"
 					compact
@@ -58,7 +58,7 @@ export class UmbCollectionActiveFiltersElement extends UmbLitElement {
 	}
 
 	#onClearFilterValue(alias: string, unique: string) {
-		this.#filterManager?.clearFilterValue(alias, unique);
+		this.#filterManager?.clearActiveFilter(alias, unique);
 	}
 
 	static override styles = [

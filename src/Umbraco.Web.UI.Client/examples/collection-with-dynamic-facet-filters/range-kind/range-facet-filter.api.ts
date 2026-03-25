@@ -1,3 +1,4 @@
+import type { ExampleRangeValueModel } from './types.js';
 import { UMB_FACET_FILTER_CONTEXT } from '@umbraco-cms/backoffice/facet-filter';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
@@ -57,9 +58,11 @@ export class ExampleRangeFacetFilterApi extends UmbControllerBase {
 					const minEntry = entries.find((e) => e.unique === 'min');
 					const maxEntry = entries.find((e) => e.unique === 'max');
 					if (minEntry && maxEntry) {
+						const minVal = minEntry.value as ExampleRangeValueModel;
+						const maxVal = maxEntry.value as ExampleRangeValueModel;
 						this.#current.setValue({
-							min: minEntry.value as number,
-							max: maxEntry.value as number,
+							min: minVal.amount,
+							max: maxVal.amount,
 						});
 					}
 				}
@@ -71,8 +74,8 @@ export class ExampleRangeFacetFilterApi extends UmbControllerBase {
 	public setValue(min: number, max: number): void {
 		this.#current.setValue({ min, max });
 		this.#facetFilterContext?.setValues([
-			{ unique: 'min', value: min },
-			{ unique: 'max', value: max },
+			{ unique: 'min', value: { key: 'min', amount: min } satisfies ExampleRangeValueModel },
+			{ unique: 'max', value: { key: 'max', amount: max } satisfies ExampleRangeValueModel },
 		]);
 	}
 

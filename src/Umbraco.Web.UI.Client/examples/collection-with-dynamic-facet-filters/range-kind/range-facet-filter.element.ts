@@ -40,6 +40,7 @@ export class ExampleRangeFacetFilterElement extends UmbLitElement {
 
 	protected override render() {
 		if (this._max === 0) return nothing;
+		if (this._min === this._max) return html`<label>$${this._min}</label>`;
 
 		return html`
 			<div class="range-filter">

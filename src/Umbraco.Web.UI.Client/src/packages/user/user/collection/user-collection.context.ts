@@ -78,14 +78,14 @@ export class UmbUserCollectionContext extends UmbDefaultCollectionContext<
 	}
 
 	protected override async _getFilterArgs(): Promise<Record<string, any>> {
-		const activeFilters = await this.filtering.getActiveFilters();
+		const filterValues = await this.filtering.getActiveFilterValues();
 		const args: Record<string, any> = {};
 
-		const userStateFilters = activeFilters.filter((f) => f.alias === UMB_USER_COLLECTION_USER_STATE_FACET_FILTER_ALIAS);
-		if (userStateFilters.length) args.userStates = userStateFilters.map((f) => f.unique);
+		const userStateFilters = filterValues.filter((f) => f.alias === UMB_USER_COLLECTION_USER_STATE_FACET_FILTER_ALIAS);
+		if (userStateFilters.length) args.userStates = userStateFilters.map((f) => f.value);
 
-		const userGroupFilters = activeFilters.filter((f) => f.alias === UMB_USER_COLLECTION_USER_GROUP_FACET_FILTER_ALIAS);
-		if (userGroupFilters.length) args.userGroupIds = userGroupFilters.map((f) => f.unique);
+		const userGroupFilters = filterValues.filter((f) => f.alias === UMB_USER_COLLECTION_USER_GROUP_FACET_FILTER_ALIAS);
+		if (userGroupFilters.length) args.userGroupIds = userGroupFilters.map((f) => f.value);
 
 		return args;
 	}
