@@ -50,10 +50,9 @@ test('can save content with mandatory multi url picker after adding a link', asy
   expect(contentData.values[0].value[0].icon).toEqual('icon-link');
   expect(contentData.values[0].value[0].name).toEqual(linkTitle);
   expect(contentData.values[0].value[0].url).toEqual(link);
-
 });
 
-test('can see validation error reappear after removing all links from mandatory multi url picker', async ({umbracoApi, umbracoUi}) => {
+test('can see validation error after removing all links from mandatory multi url picker', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.document.createDocumentWithExternalLinkURLPicker(contentName, mandatoryDocumentTypeId, mandatoryDataTypeName, link, linkTitle);
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);

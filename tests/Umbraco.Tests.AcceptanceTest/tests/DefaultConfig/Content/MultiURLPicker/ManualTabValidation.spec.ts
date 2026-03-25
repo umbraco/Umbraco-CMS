@@ -22,6 +22,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.document.ensureNameNotExists(contentName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
+
 test('cannot create content with empty manual url and anchor', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
@@ -102,7 +103,6 @@ test('can create content with manual url only', {tag: '@release'}, async ({umbra
   await umbracoUi.content.clickAddMultiURLPickerButton();
   await umbracoUi.content.clickManualLinkButton();
   await umbracoUi.content.enterLink(link);
-  // Leave Anchor empty
   await umbracoUi.content.clickLinkPickerAddButton();
   await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
@@ -125,7 +125,6 @@ test('can create content with manual anchor only', async ({umbracoApi, umbracoUi
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickAddMultiURLPickerButton();
   await umbracoUi.content.clickManualLinkButton();
-  // Leave URL empty
   await umbracoUi.content.enterAnchorOrQuerystring(anchorValue);
   await umbracoUi.content.clickLinkPickerAddButton();
   await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
