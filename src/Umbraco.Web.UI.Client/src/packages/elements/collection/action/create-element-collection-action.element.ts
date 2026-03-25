@@ -1,4 +1,4 @@
-import type { UmbElementEntityTypeUnion } from '../../entity.js';
+import { UMB_ELEMENT_ROOT_ENTITY_TYPE, type UmbElementEntityTypeUnion } from '../../entity.js';
 import { UMB_CREATE_ELEMENT_WORKSPACE_PATH_PATTERN } from '../../paths.js';
 import {
 	UmbElementTypeStructureRepository,
@@ -87,7 +87,7 @@ export class UmbCreateElementCollectionActionElement extends UmbLitElement {
 			throw new Error('Item does not have a unique identifier');
 		}
 		return UMB_CREATE_ELEMENT_WORKSPACE_PATH_PATTERN.generateAbsolute({
-			parentEntityType: (this._parentEntityType ?? 'element-root') as UmbElementEntityTypeUnion,
+			parentEntityType: (this._parentEntityType ?? UMB_ELEMENT_ROOT_ENTITY_TYPE) as UmbElementEntityTypeUnion,
 			parentUnique: this._parentUnique ?? 'null',
 			documentTypeUnique: item.unique,
 		});
@@ -97,12 +97,8 @@ export class UmbCreateElementCollectionActionElement extends UmbLitElement {
 		await controller.api?.execute();
 	}
 
-	get #totalOptions() {
-		return this._allowedElementTypes.length + this._createOptionControllers.length;
-	}
-
 	override render() {
-		if (this.#totalOptions === 0) return nothing;
+		if (this._allowedElementTypes.length === 0 && this._createOptionControllers.length === 0) return nothing;
 
 		if (this._allowedElementTypes.length === 1 && this._createOptionControllers.length === 0) {
 			return this.#renderCreateButton();

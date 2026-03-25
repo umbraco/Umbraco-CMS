@@ -8,7 +8,7 @@ import type {
 	UmbElementCreateOptionsModalData,
 	UmbElementCreateOptionsModalValue,
 } from './element-create-options-modal.token.js';
-import { html, nothing, customElement, state, repeat, css, when } from '@umbraco-cms/backoffice/external/lit';
+import { html, nothing, customElement, state, repeat, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbExtensionsApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -28,9 +28,6 @@ export class UmbElementCreateOptionsModalElement extends UmbModalBaseElement<
 
 	@state()
 	private _createOptionControllers: Array<UmbExtensionApiInitializer<ManifestEntityCreateOptionAction>> = [];
-
-	@state()
-	private _headline: string = this.localize.term('general_create');
 
 	override async firstUpdated() {
 		this.#retrieveAllowedElementTypes();
@@ -91,7 +88,7 @@ export class UmbElementCreateOptionsModalElement extends UmbModalBaseElement<
 
 	override render() {
 		return html`
-			<uui-dialog-layout headline=${this._headline ?? ''}>
+			<uui-dialog-layout headline=${this.localize.term('general_create')}>
 				${when(
 					this._allowedElementTypes.length === 0 && this._createOptionControllers.length === 0,
 					() => this.#renderNoAllowedTypes(),
@@ -156,7 +153,7 @@ export class UmbElementCreateOptionsModalElement extends UmbModalBaseElement<
 		);
 	}
 
-	static override styles = [UmbTextStyles, css``];
+	static override styles = [UmbTextStyles];
 }
 
 export default UmbElementCreateOptionsModalElement;
