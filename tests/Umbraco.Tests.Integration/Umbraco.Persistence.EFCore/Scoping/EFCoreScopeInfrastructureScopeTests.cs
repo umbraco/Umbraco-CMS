@@ -45,7 +45,7 @@ internal sealed class EFCoreScopeInfrastructureScopeTests : UmbracoIntegrationTe
     }
 
     [Test]
-    public async Task? TransactionWithEFCoreScopeAsParent()
+    public async Task TransactionWithEFCoreScopeAsParent()
     {
         using (IEFCoreScope<TestUmbracoDbContext> parentScope = EFCoreScopeProvider.CreateScope())
         {
@@ -86,7 +86,7 @@ internal sealed class EFCoreScopeInfrastructureScopeTests : UmbracoIntegrationTe
     }
 
     [Test]
-    public async Task? TransactionWithInfrastructureScopeAsParent()
+    public async Task TransactionWithInfrastructureScopeAsParent()
     {
         using (IScope parentScope = InfrastructureScopeProvider.CreateScope())
         {

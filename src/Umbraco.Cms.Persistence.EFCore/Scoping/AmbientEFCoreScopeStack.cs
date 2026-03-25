@@ -7,19 +7,21 @@ namespace Umbraco.Cms.Persistence.EFCore.Scoping;
 /// Thread-safe stack implementation for managing ambient EF Core scopes using AsyncLocal storage.
 /// </summary>
 /// <typeparam name="TDbContext">The type of DbContext.</typeparam>
+#pragma warning disable CS0618 // Type or member is obsolete
 public class AmbientEFCoreScopeStack<TDbContext> : IAmbientEFCoreScopeStack<TDbContext> where TDbContext : DbContext
 {
+    // TODO (V19): Change to IEFCoreScope<TDbContext> when IEfCoreScope<TDbContext> is removed.
     private static Lock _lock = new();
-    private static AsyncLocal<ConcurrentStack<IEFCoreScope<TDbContext>>> _stack = new();
+    private static AsyncLocal<ConcurrentStack<IEfCoreScope<TDbContext>>> _stack = new();
 
     /// <inheritdoc />
-    public IEFCoreScope<TDbContext>? AmbientScope
+    public IEfCoreScope<TDbContext>? AmbientScope
     {
         get
         {
             lock (_lock)
             {
-                if (_stack.Value?.TryPeek(out IEFCoreScope<TDbContext>? ambientScope) ?? false)
+                if (_stack.Value?.TryPeek(out IEfCoreScope<TDbContext>? ambientScope) ?? false)
                 {
                     return ambientScope;
                 }
@@ -30,16 +32,11 @@ public class AmbientEFCoreScopeStack<TDbContext> : IAmbientEFCoreScopeStack<TDbC
     }
 
     /// <inheritdoc />
-#pragma warning disable CS0618 // Type or member is obsolete
-    IEfCoreScope<TDbContext>? IEFCoreScopeAccessor<TDbContext>.AmbientScope => (IEfCoreScope<TDbContext>?)AmbientScope;
-#pragma warning restore CS0618 // Type or member is obsolete
-
-    /// <inheritdoc />
-    public IEFCoreScope<TDbContext> Pop()
+    public IEfCoreScope<TDbContext> Pop()
     {
         lock (_lock)
         {
-            if (_stack.Value?.TryPop(out IEFCoreScope<TDbContext>? ambientScope) ?? false)
+            if (_stack.Value?.TryPop(out IEfCoreScope<TDbContext>? ambientScope) ?? false)
             {
                 return ambientScope;
             }
@@ -49,13 +46,14 @@ public class AmbientEFCoreScopeStack<TDbContext> : IAmbientEFCoreScopeStack<TDbC
     }
 
     /// <inheritdoc />
-    public void Push(IEFCoreScope<TDbContext> scope)
+    public void Push(IEfCoreScope<TDbContext> scope)
     {
         lock (_lock)
         {
-            _stack.Value ??= new ConcurrentStack<IEFCoreScope<TDbContext>>();
+            _stack.Value ??= new ConcurrentStack<IEfCoreScope<TDbContext>>();
 
             _stack.Value.Push(scope);
         }
     }
 }
+#pragma warning restore CS0618 // Type or member is obsolete

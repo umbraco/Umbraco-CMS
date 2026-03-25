@@ -23,6 +23,6 @@ internal sealed class EFCoreScopeAccessor<TDbContext> : IEFCoreScopeAccessor<TDb
 
     /// <inheritdoc />
 #pragma warning disable CS0618 // Type or member is obsolete
-    IEfCoreScope<TDbContext>? IEFCoreScopeAccessor<TDbContext>.AmbientScope => (IEfCoreScope<TDbContext>?)_ambientEFCoreScopeStack.AmbientScope;
+    IEfCoreScope<TDbContext>? IEFCoreScopeAccessor<TDbContext>.AmbientScope => _ambientEFCoreScopeStack.AmbientScope;
 #pragma warning restore CS0618 // Type or member is obsolete
 }
