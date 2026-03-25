@@ -322,7 +322,7 @@ test('can bulk trash media nodes with a relation', async ({umbracoApi, umbracoUi
   await umbracoApi.media.emptyRecycleBin();
 });
 
-test('can move a media item to another folder', async ({umbracoApi, umbracoUi}) => {
+test('can move a media item to a folder', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.media.createDefaultMediaFile(mediaFileName);
   const mediaFolderId = await umbracoApi.media.createDefaultMediaFolder(folderName);
