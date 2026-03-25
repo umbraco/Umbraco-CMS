@@ -137,29 +137,23 @@ public class SvgDimensionExtractor : ISvgDimensionExtractor
             value = onlyNumbersValue;
             return true;
         }
+
         value = 0;
 
         var input = attributeValue.Trim();
-
-        double multiplier = 1;
 
         if (input.EndsWith("px", StringComparison.OrdinalIgnoreCase))
         {
             input = input[..^2].Trim();
         }
 
-        if (!int.TryParse(input, NumberStyles.Float, CultureInfo.InvariantCulture, out var numericValue))
+        if (int.TryParse(input, out var numericValue) && numericValue > 0)
         {
-            return false;
+            value = numericValue;
+            return true;
         }
 
-        if (numericValue < 0)
-        {
-            return false;
-        }
+        return false;
 
-        value = (int)Math.Round(numericValue * multiplier);
-
-        return true;
     }
 }
