@@ -17,7 +17,7 @@ export class UmbInputElementElement extends UmbFormControlMixin<string | undefin
 	#dataSourceConfig: UmbConfigCollectionModel = [];
 
 	@property({ type: Boolean })
-	set folderOnly(value: boolean) {
+	public set folderOnly(value: boolean) {
 		this.#dataSourceConfig.push({ alias: 'folderOnly', value });
 	}
 
@@ -76,8 +76,8 @@ export class UmbInputElementElement extends UmbFormControlMixin<string | undefin
 			<umb-input-entity-data
 				min-message=${ifDefined(this.minMessage)}
 				max-message=${ifDefined(this.maxMessage)}
-				.dataSourceApi=${this.#dataSourceApi}
 				.dataSourceConfig=${this.#dataSourceConfig}
+				.dataSourceApi=${this.#dataSourceApi}
 				.value=${this.value}
 				.selection=${this.selection}
 				.min=${this.min}

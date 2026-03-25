@@ -17,12 +17,12 @@ import type { UmbConfigCollectionModel } from '@umbraco-cms/backoffice/utils';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbElementTreePickerDataSource extends UmbControllerBase implements UmbPickerTreeDataSource {
+	#dataType?: { unique: string };
 	#elementItem = new UmbElementItemRepository(this);
 	#folderItem = new UmbElementFolderItemRepository(this);
 	#folderOnly = false;
-	#startNode?: UmbTreeStartNode;
 	#tree = new UmbElementTreeRepository(this);
-	#dataType?: { unique: string };
+	#startNode?: UmbTreeStartNode;
 
 	constructor(host: UmbControllerHost) {
 		super(host);
@@ -37,8 +37,9 @@ export class UmbElementTreePickerDataSource extends UmbControllerBase implements
 	setConfig(config: UmbConfigCollectionModel | undefined) {
 		this.#folderOnly = Boolean(getConfigValue(config, 'folderOnly'));
 		this.#startNode = getConfigValue(config, 'startNode');
-		console.log('setConfig', this.#startNode);
 	}
+
+	requestTreeStartNode = async () => this.#startNode ?? undefined;
 
 	requestTreeRoot = () => this.#tree.requestTreeRoot();
 
@@ -52,10 +53,8 @@ export class UmbElementTreePickerDataSource extends UmbControllerBase implements
 	};
 
 	requestTreeItemsOf = (args: UmbTreeChildrenOfRequestArgs) => {
-		console.log('requestTreeItemsOf', this.#startNode);
 		const typedArgs: UmbElementTreeChildrenOfRequestArgs = {
 			...args,
-			parent: { unique: this.#startNode?.unique ?? null, entityType: this.#startNode?.entityType ?? 'element' },
 			foldersOnly: this.#folderOnly,
 			dataType: this.#dataType,
 		};
