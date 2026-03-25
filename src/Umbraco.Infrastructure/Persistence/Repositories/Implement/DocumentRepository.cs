@@ -365,6 +365,10 @@ internal class DocumentRepository : PublishableContentRepositoryBase<IContent, D
         return EnsureUniqueUrlSegment(uniqueName, id, siblings, _shortStringHelper);
     }
 
+    private protected override string? EnsureUniqueVariantName(
+        string? nodeName, int nodeId, List<SimilarNodeName> siblings, string culture)
+        => EnsureUniqueUrlSegment(nodeName, nodeId, siblings, _shortStringHelper, culture);
+
     /// <summary>
     /// Ensures the proposed name produces a URL segment that is unique among sibling URL segments.
     /// If a collision is detected (e.g. "Title" and "Title." both produce segment "title"),
