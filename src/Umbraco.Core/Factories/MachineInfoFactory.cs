@@ -27,17 +27,20 @@ internal sealed class MachineInfoFactory : IMachineInfoFactory
         _hostingSettings = hostingSettings;
     }
 
+    internal static string BuildMachineIdentifier(string machineName, string? siteName)
+    {
+        if (string.IsNullOrWhiteSpace(siteName))
+        {
+            return machineName;
+        }
+
+        return $"{machineName}/{siteName}";
+    }
+
     /// <inheritdoc />
     public string GetMachineIdentifier()
     {
-        string? siteName = _hostingSettings.Value.SiteName;
-
-        if (string.IsNullOrWhiteSpace(siteName))
-        {
-            return Environment.MachineName;
-        }
-
-        var identifier = $"{Environment.MachineName}/{siteName}";
+        var identifier = BuildMachineIdentifier(Environment.MachineName, _hostingSettings.Value.SiteName);
 
         if (identifier.Length > MaxMachineIdentifierLength)
         {
