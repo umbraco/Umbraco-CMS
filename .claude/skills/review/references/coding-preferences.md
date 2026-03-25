@@ -127,8 +127,14 @@ When making decisions, prioritize:
 
 ## Nullability
 
-- Prefer `undefined` over `null`
-- Only use `null` for the state of a value without a value
+- **TypeScript / JavaScript**
+  - Prefer `undefined` for optional/omitted values (e.g., optional parameters, props, and fields)
+  - Use `null` only when the domain model explicitly encodes "no value" or "not set" (e.g., `string | null` from APIs/DB), and be consistent with existing types
+  - Avoid mixing `null` and `undefined` for the same concept within the same model or API surface
+  
+- **C#**  
+  - use nullable types (e.g., `string?`, `int?`) where absence is valid
+  - Prefer domain modeling (value objects, options/results, empty collections) over `null` where appropriate, but respect existing conventions in the codebase
 
 ---
 
@@ -153,45 +159,10 @@ When making decisions, prioritize:
 
 ---
 
-## Code Review Scoring
-
-### Scale
-
-Rate every category on a **1-100 scale**:
-
-- Provide an **overall score** (weighted by relevance, not a simple average)
-- Scores are advisory — no automatic approve/reject thresholds
-
-### Fixed Categories (always include)
-
-| Category | Focus Areas |
-|----------|------------|
-| **Security** | OWASP top 10, input validation, auth/authz, secrets exposure |
-| **Performance** | N+1 queries, caching, hot paths, async patterns, allocations |
-| **Architecture** | Clean Architecture, SOLID, separation of concerns, dependency direction |
-| **Consistency** | Adherence to existing codebase conventions, naming, patterns, style |
-| **Testing** | Test coverage, test quality, edge cases, appropriate test level |
-| **Readability** | Code clarity, naming, complexity, documentation |
-| **Error Handling** | Result pattern, fail-fast, edge cases, logging, resilience |
-
-### Context-Specific Categories (select 3-6 per PR)
-
-Choose categories relevant to the particular PR:
-
-- **Concurrency** — for code with shared state or database writes
-- **API Design** — for new/changed endpoints (REST conventions, status codes, OpenAPI)
-- **Database** — for migrations, queries, indexes, EF Core usage
-- **Frontend** — for Lit components, TypeScript, accessibility
-- **Breaking Changes** — when public API surface is affected
-- **Observability** — for logging, tracing, health checks
-- **Configuration** — for DI registration, options, environment handling
-- **Domain Modeling** — for value objects, aggregates, invariants
-
-### Severity Levels
+## Severity Levels
 
 | Severity | Meaning |
 |----------|---------|
 | **Critical** | Must fix before merge — security vulnerabilities, data loss risks, broken functionality |
 | **Important** | Should fix — performance issues, missing tests, architectural violations |
 | **Suggestion** | Nice to have — readability, minor refactoring, alternative approaches |
-| **Praise** | Good patterns and decisions worth noting |
