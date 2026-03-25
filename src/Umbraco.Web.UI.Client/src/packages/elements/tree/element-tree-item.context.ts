@@ -34,6 +34,8 @@ export class UmbElementTreeItemContext extends UmbDefaultTreeItemContext<
 	public override setTreeItem(treeItem: UmbElementTreeItemModel | undefined) {
 		super.setTreeItem(treeItem);
 		if (treeItem?.entityType === UMB_ELEMENT_ENTITY_TYPE) {
+			// The entity type guard above narrows to UMB_ELEMENT_ENTITY_TYPE at runtime.
+			// The remaining type differences (variant state enum) are nominal, not structural.
 			this.#item.setData(treeItem as unknown as UmbElementItemModel);
 		}
 	}

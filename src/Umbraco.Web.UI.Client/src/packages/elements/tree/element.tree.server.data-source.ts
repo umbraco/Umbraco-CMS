@@ -73,6 +73,7 @@ export class UmbElementTreeServerDataSource
 				collection: null,
 			},
 			icon: item.isFolder ? 'icon-folder' : (item.documentType?.icon ?? 'icon-document'),
+			flags: [], // TODO: Map from API when available
 			createDate: item.createDate,
 			variants: item.variants.map((variant) => {
 				return {
