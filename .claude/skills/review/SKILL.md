@@ -263,7 +263,7 @@ Present the review in this exact format:
   [Omit bullet if none]
 - **Breaking changes:** {violations with specifics}
   [Omit bullet if none]
-- **Noticeable changes:** {other changes of this PR based on commits and code changes, not listed above}
+- **Other changes:** {changes not listed above that an Umbraco user, plugin developer, or API consumer would notice — e.g., behavior changes, default value changes, error message changes, new configuration options, removed functionality. Exclude internal renames, formatting, and private implementation details.}
   [Omit bullet if none]
 
 [If step 4e triggered any dimensions, insert this block. Omit entirely if nothing triggered:]
