@@ -575,8 +575,8 @@ public class DocumentUrlServiceTests
 
         // Return the provider type name so ShouldRebuildUrls() returns false (no rebuild needed).
         var keyValueServiceMock = new Mock<IKeyValueService>();
-        keyValueServiceMock.Setup(x => x.GetValue(DocumentUrlService.RebuildKey))
-            .Returns(string.Join("|", urlSegmentProviderCollection.Select(x => x.GetType().Name)));
+        keyValueServiceMock.Setup(x => x.GetValueAsync(DocumentUrlService.RebuildKey))
+            .Returns(Task.FromResult(string.Join("|", urlSegmentProviderCollection.Select(x => x.GetType().Name))));
 
         var idKeyMapMock = Mock.Of<IIdKeyMap>();
         var documentNavigationQueryServiceMock = Mock.Of<IDocumentNavigationQueryService>();

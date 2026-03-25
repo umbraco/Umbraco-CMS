@@ -29,15 +29,15 @@ public class OptimizeInvariantUrlRecords : AsyncMigrationBase
     {
         if (DatabaseType == DatabaseType.SQLite)
         {
-            MigrateSqlite();
+            await MigrateSqlite();
         }
         else
         {
-            MigrateSqlServer();
+            await MigrateSqlServer();
         }
     }
 
-    private void MigrateSqlServer()
+    private async Task MigrateSqlServer()
     {
         // Make languageId nullable in umbracoDocumentUrl.
         AlterDocumentUrlLanguageIdToNullable();
@@ -50,10 +50,10 @@ public class OptimizeInvariantUrlRecords : AsyncMigrationBase
         ConvertInvariantDocumentUrlAliasRecords();
 
         // Trigger rebuild to update the in-memory cache with new structure.
-        TriggerRebuild();
+        await TriggerRebuild();
     }
 
-    private void MigrateSqlite()
+    private async Task MigrateSqlite()
     {
         // SQLite doesn't support ALTER TABLE to modify columns well.
         // Instead, we drop and recreate the tables, then trigger a full rebuild on startup.
@@ -74,7 +74,7 @@ public class OptimizeInvariantUrlRecords : AsyncMigrationBase
         Create.Table<DocumentUrlAliasDto>().Do();
 
         // Trigger rebuild on startup to repopulate the tables
-        TriggerRebuild();
+        await TriggerRebuild();
     }
 
     private void AlterDocumentUrlLanguageIdToNullable()
@@ -229,10 +229,10 @@ public class OptimizeInvariantUrlRecords : AsyncMigrationBase
         ").Do();
     }
 
-    private void TriggerRebuild()
+    private async Task TriggerRebuild()
     {
         // Clear the rebuild keys to trigger a full rebuild on next startup.
-        _keyValueService.SetValue(DocumentUrlService.RebuildKey, string.Empty);
-        _keyValueService.SetValue(DocumentUrlAliasService.RebuildKey, string.Empty);
+        await _keyValueService.SetValueAsync(DocumentUrlService.RebuildKey, string.Empty);
+        await _keyValueService.SetValueAsync(DocumentUrlAliasService.RebuildKey, string.Empty);
     }
 }

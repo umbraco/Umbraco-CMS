@@ -106,6 +106,16 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     public IDictionaryItem? GetDictionaryItemById(Guid id)
         => _dictionaryItemService.GetAsync(id).GetAwaiter().GetResult();
 
+    /// <inheritdoc />
+    [Obsolete("Please use ILanguageService for language operations. Scheduled for removal in Umbraco 18.")]
+    public Guid? GetDefaultLanguageKey()
+    {
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            return _languageRepository.GetDefaultKeyAsync().GetAwaiter().GetResult();
+        }
+    }
+
     /// <summary>
     ///     Gets a collection <see cref="IDictionaryItem" /> by their <see cref="Guid" /> ids
     /// </summary>

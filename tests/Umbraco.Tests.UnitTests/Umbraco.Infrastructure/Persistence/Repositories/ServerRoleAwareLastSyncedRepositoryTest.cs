@@ -4,6 +4,8 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Factories;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Cms.Infrastructure.Scoping;
 using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
@@ -85,7 +87,7 @@ public class ServerRoleAwareLastSyncedRepositoryTest
         => new(
             new Lazy<IServerRoleAccessor>(() => _serverRoleAccessor.Object),
             new LastSyncedRepository(
-                Mock.Of<IScopeAccessor>(),
+                Mock.Of<IEFCoreScopeAccessor<UmbracoDbContext>>(),
                 AppCaches.NoCache,
                 Mock.Of<IMachineInfoFactory>()),
             _fileSystemRepository,
