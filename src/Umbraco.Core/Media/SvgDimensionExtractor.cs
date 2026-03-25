@@ -49,6 +49,13 @@ public class SvgDimensionExtractor : ISvgDimensionExtractor
     private Size? ReadDimensions(Stream stream)
     {
         var document = XDocument.Load(stream);
+        var settings = new XmlReaderSettings
+        {
+            DtdProcessing = DtdProcessing.Prohibit,
+            XmlResolver = null,
+        };
+        using var reader = XmlReader.Create(stream, settings);
+        var document = XDocument.Load(reader);        
         XElement? root = document.Root;
 
         if (root is null)
