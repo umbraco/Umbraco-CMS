@@ -147,6 +147,18 @@ When making decisions, prioritize:
 - Avoid N+1 queries
 - Profile before optimizing non-critical paths
 
+### Type Hierarchy Consistency
+
+When parallel model types have inconsistent relationships to a shared base type:
+
+**TypeScript**: manipulations via `Omit`, `Pick`, intersection overrides, or workarounds like `as unknown as` / double-casts to bridge type mismatches.
+
+**C#**: hiding base members with `new` to change types, explicit interface implementations to mask mismatches, or downcasting base return types in derived classes.
+
+- **Do NOT suggest** the PR code should deviate from its base type to match a sibling that already deviates. Copying the deviation spreads the problem.
+- **Do flag** the architectural inconsistency: parallel models should share a compatible base contract. The model that manipulates or deviates from the base type is the one that needs attention — not the one that extends it correctly.
+- **Frame the suggestion** as: "These related models have inconsistent type hierarchies. `{deviating type}` manipulates the base contract of `{base type}`, which forces shared consumers like `{shared utility}` to require a shape that conforming subtypes can't satisfy."
+
 ---
 
 ## Code Style
