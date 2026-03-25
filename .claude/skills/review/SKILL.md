@@ -144,9 +144,9 @@ Present the review in this exact format:
 ```markdown
 ## PR Review
 
-**Target:** `{target_branch}` · **Commit:** `{head_sha}`
+**Target:** `{target_branch}` · **Based on commit:** `{head_sha}`
 
-[1–2 sentences: what this PR accomplishes, keep it as short as possible, only highlight the primary essence.]
+[1–2 sentences: what this PR accomplishes , keep it as short as possible, only highlight the primary essence.]
 
 - **Modified public API:** {changed existing interfaces/types/classes/methods}
   [Omit bullet if none]
@@ -211,5 +211,5 @@ This is in such a bad state that the feedback of this review is not sufficient t
 - Provide concrete fix suggestions, including code snippets when helpful
 - Keep it constructive — the goal is to help, not gatekeep
 - Don't repeat the same finding for every occurrence — mention it once and note "same pattern in {other files}"
-- Focus on substantive issues, not trivial formatting
+- Focus on substantive issues, not trivial formatting. Do not flag cosmetic differences in HTML templates that have no rendering impact (e.g., whitespace in HTML is collapsed by the browser).
 - For breaking changes, reference the specific pattern from the CLAUDE.md that should be applied
