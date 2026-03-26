@@ -42,7 +42,8 @@
     emptyValue: 'Value cannot be empty',
     nullValue: 'Value cannot be null',
     invalidEmail: 'Invalid email',
-    emptyManualLinkPicker: 'Please enter an URL or Anchor.'
+    emptyManualLinkPicker: 'Please enter an URL or Anchor.',
+    needMoreItems: 'This field needs more items',
   }
 
   public static readonly inputTypes = {
