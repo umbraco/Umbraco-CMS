@@ -103,4 +103,34 @@ public class ContentTypeChangeExtensionsTests
             Assert.IsFalse(combined.HasType(ContentTypeChangeTypes.RefreshOther));
         });
     }
+
+    [TestCase(ContentTypeChangeTypes.AliasChanged, ContentTypeChangeTypes.RefreshMain)]
+    [TestCase(ContentTypeChangeTypes.PropertyAliasChanged, ContentTypeChangeTypes.RefreshMain)]
+    [TestCase(ContentTypeChangeTypes.PropertyRemoved, ContentTypeChangeTypes.RefreshMain)]
+    [TestCase(ContentTypeChangeTypes.CompositionRemoved, ContentTypeChangeTypes.RefreshMain)]
+    [TestCase(ContentTypeChangeTypes.PropertyVariationChanged, ContentTypeChangeTypes.RefreshMain)]
+    [TestCase(ContentTypeChangeTypes.PropertyAdded, ContentTypeChangeTypes.RefreshOther)]
+    [TestCase(ContentTypeChangeTypes.CompositionAdded, ContentTypeChangeTypes.RefreshOther)]
+    public void Sub_Flag_Yields_Positive_For_Main_Flag(ContentTypeChangeTypes subFlag, ContentTypeChangeTypes mainFlag)
+        => Assert.IsTrue(subFlag.HasFlag(mainFlag));
+
+    [TestCase(ContentTypeChangeTypes.AliasChanged, ContentTypeChangeTypes.RefreshMain)]
+    [TestCase(ContentTypeChangeTypes.PropertyAliasChanged, ContentTypeChangeTypes.RefreshMain)]
+    [TestCase(ContentTypeChangeTypes.PropertyRemoved, ContentTypeChangeTypes.RefreshMain)]
+    [TestCase(ContentTypeChangeTypes.CompositionRemoved, ContentTypeChangeTypes.RefreshMain)]
+    [TestCase(ContentTypeChangeTypes.PropertyVariationChanged, ContentTypeChangeTypes.RefreshMain)]
+    [TestCase(ContentTypeChangeTypes.PropertyAdded, ContentTypeChangeTypes.RefreshOther)]
+    [TestCase(ContentTypeChangeTypes.CompositionAdded, ContentTypeChangeTypes.RefreshOther)]
+    public void Main_Flag_Yields_Negative_For_Sub_Flag(ContentTypeChangeTypes subFlag, ContentTypeChangeTypes mainFlag)
+        => Assert.IsFalse(mainFlag.HasFlag(subFlag));
+
+    [TestCase(ContentTypeChangeTypes.AliasChanged, ContentTypeChangeTypes.PropertyAliasChanged)]
+    [TestCase(ContentTypeChangeTypes.PropertyAliasChanged, ContentTypeChangeTypes.PropertyRemoved)]
+    [TestCase(ContentTypeChangeTypes.PropertyRemoved, ContentTypeChangeTypes.CompositionRemoved)]
+    [TestCase(ContentTypeChangeTypes.CompositionRemoved, ContentTypeChangeTypes.PropertyVariationChanged)]
+    [TestCase(ContentTypeChangeTypes.PropertyVariationChanged, ContentTypeChangeTypes.AliasChanged)]
+    [TestCase(ContentTypeChangeTypes.PropertyAdded, ContentTypeChangeTypes.CompositionAdded)]
+    [TestCase(ContentTypeChangeTypes.CompositionAdded, ContentTypeChangeTypes.PropertyAdded)]
+    public void Sub_Flag_Yields_Negative_For_Other_Sub_Flag(ContentTypeChangeTypes subFlag1, ContentTypeChangeTypes subFlag2)
+        => Assert.IsFalse(subFlag1.HasFlag(subFlag2));
 }
