@@ -3,6 +3,8 @@ import { UMB_CURRENT_USER_STORE_CONTEXT } from './current-user.store.token.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
+import { UmbId } from '@umbraco-cms/backoffice/id';
+import { TemporaryFileStatus, UmbTemporaryFileManager } from '@umbraco-cms/backoffice/temporary-file';
 
 /**
  * A repository for the current user
@@ -12,6 +14,8 @@ import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 export class UmbCurrentUserRepository extends UmbRepositoryBase {
 	#currentUserSource = new UmbCurrentUserServerDataSource(this._host);
 	#currentUserStore?: typeof UMB_CURRENT_USER_STORE_CONTEXT.TYPE;
+	#temporaryFileManager = new UmbTemporaryFileManager(this);
+	#abortController = new AbortController();
 	#init: Promise<unknown>;
 	protected notificationContext?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;
 
@@ -144,6 +148,74 @@ export class UmbCurrentUserRepository extends UmbRepositoryBase {
 		}
 
 		return { data, error };
+	}
+
+	/**
+	 * Upload an avatar for the current user
+	 * @param {File} file - The image file to use as avatar
+	 */
+	async uploadAvatar(file: File) {
+		await this.#init;
+
+		const temporaryUnique = UmbId.new();
+		const { status } = await this.#temporaryFileManager.uploadOne({
+			file,
+			temporaryUnique,
+			abortController: this.#abortController,
+		});
+
+		if (status === TemporaryFileStatus.ERROR) {
+			return { error: new Error('Avatar upload failed') };
+		}
+
+		const { error } = await this.#currentUserSource.uploadCurrentUserAvatar(temporaryUnique);
+
+		if (!error) {
+			const localUrl = URL.createObjectURL(file);
+			// The server returns 5 different sizes of the avatar, so we mimic that here
+			this.#currentUserStore?.update({ avatarUrls: [localUrl, localUrl, localUrl, localUrl, localUrl] });
+
+			const notification = { data: { message: `Avatar uploaded` } };
+			this.notificationContext?.peek('positive', notification);
+		}
+
+		return { error };
+	}
+
+	/**
+	 * Delete the current user's avatar
+	 */
+	async deleteAvatar() {
+		await this.#init;
+
+		const { error } = await this.#currentUserSource.deleteCurrentUserAvatar();
+
+		if (!error) {
+			this.#currentUserStore?.update({ avatarUrls: [] });
+
+			const notification = { data: { message: `Avatar deleted` } };
+			this.notificationContext?.peek('positive', notification);
+		}
+
+		return { error };
+	}
+
+	/**
+	 * Update the current user's profile settings
+	 * @param languageIsoCode
+	 */
+	async updateProfile(languageIsoCode: string) {
+		await this.#init;
+
+		const { error } = await this.#currentUserSource.updateCurrentUserProfile(languageIsoCode);
+
+		if (error) {
+			return { error };
+		}
+
+		await this.requestCurrentUser();
+
+		return {};
 	}
 }
 

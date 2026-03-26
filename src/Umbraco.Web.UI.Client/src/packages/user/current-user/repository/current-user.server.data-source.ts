@@ -1,4 +1,5 @@
 import type { UmbCurrentUserModel } from '../types.js';
+import type { SetAvatarRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UserService } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbManagementApiDataMapper } from '@umbraco-cms/backoffice/repository';
@@ -146,6 +147,42 @@ export class UmbCurrentUserServerDataSource extends UmbControllerBase {
 				},
 			}),
 			{ disableNotifications: true },
+		);
+	}
+
+	/**
+	 * Upload an avatar for the current user using a temporary file unique
+	 * @param {string} fileUnique
+	 */
+	async uploadCurrentUserAvatar(fileUnique: string) {
+		const body: SetAvatarRequestModel = {
+			file: {
+				id: fileUnique,
+			},
+		};
+
+		return tryExecute(this, UserService.postUserCurrentAvatar({ body }));
+	}
+
+	/**
+	 * Delete the current user's avatar
+	 */
+	async deleteCurrentUserAvatar() {
+		return tryExecute(this, UserService.deleteUserCurrentAvatar());
+	}
+
+	/**
+ 	 * Update the current user's profile
+	 * @param languageIsoCode
+	 */
+	async updateCurrentUserProfile(languageIsoCode: string) {
+		return tryExecute(
+			this,
+			UserService.putUserCurrentProfile({
+				body: {
+					languageIsoCode,
+				},
+			}),
 		);
 	}
 }
