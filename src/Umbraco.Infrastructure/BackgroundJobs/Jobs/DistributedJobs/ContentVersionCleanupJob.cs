@@ -14,13 +14,11 @@ internal class ContentVersionCleanupJob : IDistributedBackgroundJob
     public string Name => "ContentVersionCleanupJob";
 
     /// <inheritdoc />
-    public TimeSpan Period { get => TimeSpan.FromHours(1); }
-
+    public TimeSpan Period => TimeSpan.FromHours(1);
 
     private readonly ILogger<ContentVersionCleanupJob> _logger;
     private readonly IContentVersionService _service;
     private readonly IOptionsMonitor<ContentSettings> _settingsMonitor;
-
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="ContentVersionCleanupJob" /> class.
@@ -42,20 +40,19 @@ internal class ContentVersionCleanupJob : IDistributedBackgroundJob
         if (!_settingsMonitor.CurrentValue.ContentVersionCleanupPolicy.EnableCleanup)
         {
             _logger.LogInformation(
-                "ContentVersionCleanup task will not run as it has been globally disabled via configuration");
+                "ContentVersionCleanup task will not run as it has been globally disabled via configuration.");
             return Task.CompletedTask;
         }
-
 
         var count = _service.PerformContentVersionCleanup(DateTime.UtcNow).Count;
 
         if (count > 0)
         {
-            _logger.LogInformation("Deleted {count} ContentVersion(s)", count);
+            _logger.LogInformation("Deleted {Count} ContentVersion(s)", count);
         }
         else
         {
-            _logger.LogDebug("Task complete, no items were Deleted");
+            _logger.LogDebug("Task complete, no items were deleted");
         }
 
         return Task.CompletedTask;
