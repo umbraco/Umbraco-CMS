@@ -2,6 +2,7 @@ import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbMediaCaptionAltTextModalData {
 	mediaUnique: string;
+	maxImageSize?: number;
 }
 
 export type UmbMediaCaptionAltTextModalValue = {

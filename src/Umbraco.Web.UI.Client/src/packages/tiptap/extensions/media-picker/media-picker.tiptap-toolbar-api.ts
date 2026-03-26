@@ -1,7 +1,7 @@
-import type { Editor, ProseMirrorNode } from '../../externals.js';
+import type { Editor } from '../../externals.js';
 import { NodeSelection } from '../../externals.js';
 import { UmbTiptapToolbarElementApiBase } from '../tiptap-toolbar-element-api-base.js';
-import { getGuidFromUdi, imageSize } from '@umbraco-cms/backoffice/utils';
+import { getGuidFromUdi } from '@umbraco-cms/backoffice/utils';
 import { ImageCropModeModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbImagingRepository } from '@umbraco-cms/backoffice/imaging';
 import { UMB_MEDIA_CAPTION_ALT_TEXT_MODAL, UMB_MEDIA_PICKER_MODAL } from '@umbraco-cms/backoffice/media';
@@ -41,28 +41,33 @@ export default class UmbTiptapToolbarMediaPickerToolbarExtensionApi extends UmbT
 	}
 
 	override async execute(editor: Editor) {
-		const currentTarget = editor.getAttributes('image');
-		const currentMediaUdi = this.#extractMediaUdi(currentTarget);
-		const currentAltText = currentTarget?.alt;
-		const currentCaption = this.#extractCaption(editor.state.selection);
-		const currentWidth = currentTarget?.width ? parseInt(currentTarget.width as string, 10) : undefined;
-		const currentHeight = currentTarget?.height ? parseInt(currentTarget.height as string, 10) : undefined;
+		let currentTarget = editor.getAttributes('image');
+		let currentMediaUdi = this.#extractMediaUdi(currentTarget);
+		let currentCaption: string | undefined;
 
-		await this.#updateImageWithMetadata(editor, currentMediaUdi, currentAltText, currentCaption, currentWidth, currentHeight);
-	}
+		// If no image found directly, check if cursor is inside a figure (e.g. in figcaption)
+		if (!currentMediaUdi) {
+			const figureData = this.#extractFigureImageData(editor);
+			if (figureData) {
+				currentTarget = figureData.imageAttrs;
+				currentMediaUdi = this.#extractMediaUdi(currentTarget);
+				currentCaption = figureData.caption;
+			}
+		} else {
+			currentCaption = this.#extractCaption(editor.state.selection);
+		}
 
-	async #updateImageWithMetadata(
-		editor: Editor,
-		currentMediaUdi: string | undefined,
-		currentAltText: string | undefined,
-		currentCaption: string | undefined,
-		currentWidth: number | undefined,
-		currentHeight: number | undefined,
-	) {
-		const mediaGuid = await this.#getMediaGuid(currentMediaUdi);
+		// If editing existing image, use its UDI; otherwise open media picker
+		const mediaGuid = currentMediaUdi ?? (await this.#openMediaPicker());
 		if (!mediaGuid) return;
 
-		const media = await this.#showMediaCaptionAltText(mediaGuid, currentAltText, currentCaption, currentWidth, currentHeight);
+		const media = await this.#showMediaCaptionAltText(
+			mediaGuid,
+			currentTarget?.alt as string | undefined,
+			currentCaption,
+			currentTarget?.width ? parseInt(currentTarget.width as string, 10) : undefined,
+			currentTarget?.height ? parseInt(currentTarget.height as string, 10) : undefined,
+		);
 		if (!media) return;
 
 		this.#insertInEditor(editor, mediaGuid, media);
@@ -76,81 +81,81 @@ export default class UmbTiptapToolbarMediaPickerToolbarExtensionApi extends UmbT
 		if (!(selection instanceof NodeSelection)) return undefined;
 		if (selection.node.type.name !== 'figure') return undefined;
 
-		return this.#findFigcaptionText(selection.node);
-	}
-
-	#findFigcaptionText(figureNode: ProseMirrorNode): string | undefined {
 		let caption: string | undefined;
-		figureNode.descendants((child) => {
+		selection.node.descendants((child) => {
 			if (child.type.name === 'figcaption') {
 				caption = child.textContent || undefined;
-				return false; // Stop searching
+				return false;
 			}
-			return true; // Continue searching
+			return true;
 		});
 		return caption;
 	}
 
-	async #getMediaGuid(currentMediaUdi?: string): Promise<string | undefined> {
-		if (currentMediaUdi) {
-			// Image already exists, go directly to edit alt text/caption
-			return currentMediaUdi;
+	#extractFigureImageData(editor: Editor): { imageAttrs: Record<string, unknown>; caption?: string } | undefined {
+		const { $from } = editor.state.selection;
+
+		for (let depth = $from.depth; depth >= 0; depth--) {
+			const node = $from.node(depth);
+			if (node.type.name === 'figure') {
+				let imageAttrs: Record<string, unknown> = {};
+				let caption: string | undefined;
+
+				node.descendants((child) => {
+					if (child.type.name === 'image') {
+						imageAttrs = { ...child.attrs };
+						return false;
+					}
+					if (child.type.name === 'figcaption') {
+						caption = child.textContent || undefined;
+						return false;
+					}
+					return true;
+				});
+
+				if (imageAttrs['data-udi']) {
+					return { imageAttrs, caption };
+				}
+			}
 		}
 
-		// No image selected, open media picker
-		const selection = await this.#openMediaPicker();
-		if (!selection?.length) return undefined;
-
-		const selectedGuid = selection[0];
-		if (!selectedGuid) {
-			throw new Error('No media selected');
-		}
-
-		return selectedGuid;
+		return undefined;
 	}
 
-	async #openMediaPicker(currentMediaUdi?: string) {
+	async #openMediaPicker(): Promise<string | undefined> {
 		const modalHandler = this.#modalManager?.open(this, UMB_MEDIA_PICKER_MODAL, {
-			data: {
-				multiple: false,
-				//startNodeIsVirtual,
-			},
-			value: {
-				selection: currentMediaUdi ? [currentMediaUdi] : [],
-			},
+			data: { multiple: false },
+			value: { selection: [] },
 		});
-
-		if (!modalHandler) return;
+		if (!modalHandler) return undefined;
 
 		const { selection } = await modalHandler.onSubmit().catch(() => ({ selection: undefined }));
-
-		return selection;
+		return selection?.[0] ?? undefined;
 	}
 
-	async #showMediaCaptionAltText(mediaUnique: string, altText?: string, caption?: string, width?: number, height?: number) {
+	async #showMediaCaptionAltText(
+		mediaUnique: string,
+		altText?: string,
+		caption?: string,
+		width?: number,
+		height?: number,
+	) {
 		const modalHandler = this.#modalManager?.open(this, UMB_MEDIA_CAPTION_ALT_TEXT_MODAL, {
-			data: { mediaUnique },
-			value: {
-				url: '',
-				altText,
-				caption,
-				width,
-				height,
-			},
+			data: { mediaUnique, maxImageSize: this.maxImageSize },
+			value: { url: '', altText, caption, width, height },
 		});
-		const mediaData = await modalHandler?.onSubmit().catch(() => null);
-		return mediaData;
+		return modalHandler?.onSubmit().catch(() => undefined);
 	}
 
 	async #insertInEditor(editor: Editor, mediaUnique: string, media: UmbMediaCaptionAltTextModalValue) {
 		if (!media?.url) return;
 
-		const maxImageSize = this.maxImageSize;
+		const width = media.width || this.maxImageSize;
+		const height = media.height || this.maxImageSize;
 
-		// Get the resized image URL
 		const { data } = await this.#imagingRepository.requestResizedItems([mediaUnique], {
-			width: maxImageSize,
-			height: maxImageSize,
+			width,
+			height,
 			mode: ImageCropModeModel.MAX,
 		});
 
@@ -159,52 +164,20 @@ export default class UmbTiptapToolbarMediaPickerToolbarExtensionApi extends UmbT
 			return;
 		}
 
-		// Set the media URL to the first item in the data array
-		const src = data[0].url;
-
-		// Use user-specified dimensions if provided, otherwise fall back to auto-detected
-		let finalWidth: number;
-		let finalHeight: number;
-
-		if (media.width && media.height) {
-			finalWidth = media.width;
-			finalHeight = media.height;
-		} else {
-			const dims = await imageSize(src);
-			finalWidth = dims.width;
-			finalHeight = dims.height;
-		}
-
 		const img = {
-			src,
+			src: data[0].url,
 			alt: media.altText,
 			'data-udi': `umb://media/${mediaUnique.replace(/-/g, '')}`,
-			width: finalWidth.toString(),
-			height: finalHeight.toString(),
+			width: width.toString(),
+			height: height.toString(),
 		};
 
 		if (media.caption) {
 			return editor.commands.insertContent({
 				type: 'figure',
 				content: [
-					{
-						type: 'paragraph',
-						content: [
-							{
-								type: 'image',
-								attrs: img,
-							},
-						],
-					},
-					{
-						type: 'figcaption',
-						content: [
-							{
-								type: 'text',
-								text: media.caption,
-							},
-						],
-					},
+					{ type: 'paragraph', content: [{ type: 'image', attrs: img }] },
+					{ type: 'figcaption', content: [{ type: 'text', text: media.caption }] },
 				],
 			});
 		}

@@ -48,10 +48,22 @@ export class UmbMediaCaptionAltTextModalElement extends UmbModalBaseElement<
 		if (url && !this.value.width) {
 			const dims = await imageSize(url);
 			this.#naturalRatio = dims.naturalWidth / dims.naturalHeight;
+
+			let width = dims.naturalWidth;
+			let height = dims.naturalHeight;
+
+			// Cap to maxImageSize proportionally
+			const maxSize = this.data?.maxImageSize;
+			if (maxSize && (width > maxSize || height > maxSize)) {
+				const ratio = Math.min(maxSize / width, maxSize / height);
+				width = Math.round(width * ratio);
+				height = Math.round(height * ratio);
+			}
+
 			this.value = {
 				...this.value,
-				width: dims.naturalWidth,
-				height: dims.naturalHeight,
+				width,
+				height,
 			};
 		} else if (this.value.width && this.value.height) {
 			this.#naturalRatio = this.value.width / this.value.height;
@@ -106,35 +118,50 @@ export class UmbMediaCaptionAltTextModalElement extends UmbModalBaseElement<
 						@input=${(e: UUIInputEvent) =>
 							(this.value = { ...this.value, caption: e.target.value as string })}></uui-input>
 
-					<uui-label>${this.localize.term('general_dimensions')}</uui-label>
 					<div id="dimensions">
-						<uui-input
-							id="width"
-							type="number"
-							label=${this.localize.term('general_width')}
-							placeholder=${this.localize.term('general_width')}
-							min="0"
-							.value=${this.value?.width?.toString() ?? ''}
-							@input=${this.#onWidthInput}></uui-input>
+						<div class="dimension-field">
+							<uui-label for="width">${this.localize.term('general_width')}</uui-label>
+							<uui-input
+								id="width"
+								type="number"
+								label=${this.localize.term('general_width')}
+								placeholder=${this.localize.term('general_width')}
+								min="0"
+								.value=${this.value?.width?.toString() ?? ''}
+								@input=${this.#onWidthInput}>
+								<span class="extra" slot="append">px</span>
+							</uui-input>
+						</div>
 						<uui-button
 							compact
-							label=${this._aspectLocked ? 'Unlock aspect ratio' : 'Lock aspect ratio'}
+							label=${this.localize.term('general_constrainProportions')}
+							title=${this.localize.term('general_constrainProportions')}
 							look=${this._aspectLocked ? 'primary' : 'default'}
 							@click=${this.#onToggleAspectLock}>
 							<uui-icon name=${this._aspectLocked ? 'icon-lock' : 'icon-unlocked'}></uui-icon>
 						</uui-button>
-						<uui-input
-							id="height"
-							type="number"
-							label=${this.localize.term('general_height')}
-							placeholder=${this.localize.term('general_height')}
-							min="0"
-							.value=${this.value?.height?.toString() ?? ''}
-							@input=${this.#onHeightInput}></uui-input>
+						<div class="dimension-field">
+							<uui-label for="height">${this.localize.term('general_height')}</uui-label>
+							<uui-input
+								id="height"
+								type="number"
+								label=${this.localize.term('general_height')}
+								placeholder=${this.localize.term('general_height')}
+								min="0"
+								.value=${this.value?.height?.toString() ?? ''}
+								@input=${this.#onHeightInput}>
+								<span class="extra" slot="append">px</span>
+							</uui-input>
+						</div>
 					</div>
 
 					<figure id="mainobject">
-						<img src=${this.value?.url ?? ''} alt=${this.value?.altText ?? ''} />
+						<img
+							src=${this.value?.url ?? ''}
+							alt=${this.value?.altText ?? ''}
+							style=${this.value?.width && this.value?.height
+								? `aspect-ratio: ${this.value.width} / ${this.value.height}`
+								: ''} />
 						<figcaption>${this.value?.caption ?? ''}</figcaption>
 					</figure>
 				</div>
@@ -163,13 +190,35 @@ export class UmbMediaCaptionAltTextModalElement extends UmbModalBaseElement<
 
 			#dimensions {
 				display: flex;
-				align-items: center;
-				gap: var(--uui-size-space-2);
+				align-items: end;
+				gap: var(--uui-size-space-3);
 				margin-bottom: var(--uui-size-layout-1);
 
-				uui-input {
+				.dimension-field {
 					flex: 1;
-					margin-bottom: 0;
+					display: flex;
+					flex-direction: column;
+					gap: var(--uui-size-space-1);
+
+					uui-input {
+						margin-bottom: 0;
+					}
+
+					.extra {
+						user-select: none;
+						height: 100%;
+						padding: 0 var(--uui-size-3);
+						border-left: 1px solid var(--uui-input-border-color, var(--uui-color-border));
+						background: var(--uui-color-background);
+						color: var(--uui-color-text);
+						display: flex;
+						justify-content: center;
+						align-items: center;
+					}
+				}
+
+				uui-button {
+					margin-bottom: var(--uui-size-space-1);
 				}
 			}
 

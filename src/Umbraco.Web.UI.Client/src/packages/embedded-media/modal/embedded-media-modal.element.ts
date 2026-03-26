@@ -13,6 +13,7 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 > {
 	#oEmbedRepository = new UmbOEmbedRepository(this);
 	#validUrl?: string;
+	#ratio?: number;
 
 	@state()
 	private _loading?: UUIButtonState;
@@ -24,6 +25,9 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 	private _height = 240;
 
 	@state()
+	private _constrain = false;
+
+	@state()
 	private _url = '';
 
 	override connectedCallback() {
@@ -31,7 +35,13 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 
 		if (this.data?.width) this._width = this.data.width;
 		if (this.data?.height) this._height = this.data.height;
-		if (this.data?.constrain) this.value = { ...this.value, constrain: this.data.constrain };
+		if (this.data?.constrain) this._constrain = this.data.constrain;
+
+		if (this._width && this._height) {
+			this.#ratio = this._width / this._height;
+		}
+
+		this.value = { ...this.value, constrain: this._constrain, width: this._width, height: this._height };
 
 		if (this.data?.url) {
 			this._url = this.data.url;
@@ -63,23 +73,46 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 	}
 
 	#onWidthChange(e: UUIInputEvent) {
-		this._width = parseInt(e.target.value as string, 10);
-		this.value = { ...this.value, width: this._width };
+		const width = parseInt(e.target.value as string, 10);
+		if (isNaN(width)) return;
+
+		this._width = width;
+
+		if (this._constrain && this.#ratio) {
+			this._height = Math.round(width / this.#ratio);
+		}
+
+		this.value = { ...this.value, width: this._width, height: this._height };
 		this.#getPreview();
 	}
 
 	#onHeightChange(e: UUIInputEvent) {
-		this._height = parseInt(e.target.value as string, 10);
-		this.value = { ...this.value, height: this._height };
+		const height = parseInt(e.target.value as string, 10);
+		if (isNaN(height)) return;
+
+		this._height = height;
+
+		if (this._constrain && this.#ratio) {
+			this._width = Math.round(height * this.#ratio);
+		}
+
+		this.value = { ...this.value, width: this._width, height: this._height };
 		this.#getPreview();
 	}
 
-	#onConstrainChange() {
-		const constrain = !this.value?.constrain;
-		this.value = { ...this.value, constrain };
+	#onToggleConstrain() {
+		this._constrain = !this._constrain;
+
+		// Update ratio when locking, based on current dimensions
+		if (this._constrain && this._width && this._height) {
+			this.#ratio = this._width / this._height;
+		}
+
+		this.value = { ...this.value, constrain: this._constrain };
 	}
 
 	override render() {
+		const isDisabled = !this.#validUrl;
 		return html`
 			<umb-body-layout headline="Embed">
 				<uui-box>
@@ -107,29 +140,46 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 							</umb-property-layout>`,
 					)}
 
-					<umb-property-layout label=${this.localize.term('general_width')} orientation="vertical">
-						<uui-input
-							slot="editor"
-							.value=${this._width}
-							type="number"
-							@change=${this.#onWidthChange}
-							?disabled=${this.#validUrl ? false : true}></uui-input>
-					</umb-property-layout>
-
-					<umb-property-layout label=${this.localize.term('general_height')} orientation="vertical">
-						<uui-input
-							slot="editor"
-							.value=${this._height}
-							type="number"
-							@change=${this.#onHeightChange}
-							?disabled=${this.#validUrl ? false : true}></uui-input>
-					</umb-property-layout>
-
-					<umb-property-layout label=${this.localize.term('general_constrainProportions')} orientation="vertical">
-						<uui-toggle
-							slot="editor"
-							@change=${this.#onConstrainChange}
-							.checked=${this.value?.constrain ?? false}></uui-toggle>
+					<umb-property-layout label=${this.localize.term('general_dimensions')} orientation="vertical">
+						<div id="dimensions" slot="editor">
+							<div class="dimension-field">
+								<uui-label for="width">${this.localize.term('general_width')}</uui-label>
+								<uui-input
+									id="width"
+									type="number"
+									label=${this.localize.term('general_width')}
+									placeholder=${this.localize.term('general_width')}
+									min="0"
+									.value=${this._width.toString()}
+									@change=${this.#onWidthChange}
+									?disabled=${isDisabled}>
+									<span class="extra" slot="append">px</span>
+								</uui-input>
+							</div>
+							<uui-button
+								compact
+								label=${this.localize.term('general_constrainProportions')}
+								title=${this.localize.term('general_constrainProportions')}
+								look=${this._constrain ? 'primary' : 'default'}
+								?disabled=${isDisabled}
+								@click=${this.#onToggleConstrain}>
+								<uui-icon name=${this._constrain ? 'icon-lock' : 'icon-unlocked'}></uui-icon>
+							</uui-button>
+							<div class="dimension-field">
+								<uui-label for="height">${this.localize.term('general_height')}</uui-label>
+								<uui-input
+									id="height"
+									type="number"
+									label=${this.localize.term('general_height')}
+									placeholder=${this.localize.term('general_height')}
+									min="0"
+									.value=${this._height.toString()}
+									@change=${this.#onHeightChange}
+									?disabled=${isDisabled}>
+									<span class="extra" slot="append">px</span>
+								</uui-input>
+							</div>
+						</div>
 					</umb-property-layout>
 				</uui-box>
 
@@ -163,6 +213,39 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 
 			umb-property-layout:last-child {
 				padding-bottom: 0;
+			}
+
+			#dimensions {
+				display: flex;
+				align-items: end;
+				gap: var(--uui-size-space-3);
+
+				.dimension-field {
+					flex: 1;
+					display: flex;
+					flex-direction: column;
+					gap: var(--uui-size-space-1);
+
+					uui-input {
+						width: 100%;
+					}
+
+					.extra {
+						user-select: none;
+						height: 100%;
+						padding: 0 var(--uui-size-3);
+						border-left: 1px solid var(--uui-input-border-color, var(--uui-color-border));
+						background: var(--uui-color-background);
+						color: var(--uui-color-text);
+						display: flex;
+						justify-content: center;
+						align-items: center;
+					}
+				}
+
+				uui-button {
+					margin-bottom: var(--uui-size-space-1);
+				}
 			}
 		`,
 	];
