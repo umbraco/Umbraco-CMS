@@ -120,11 +120,19 @@ internal sealed class DocumentCacheService : IDocumentCacheService
         if (exists is false)
         {
             contentCacheNode = await GetContentCacheNodeFromRepo();
-            await _hybridCache.SetAsync(
-                cacheKey,
-                contentCacheNode,
-                GetEntryOptions(key, preview),
-                GenerateTags(contentCacheNode));
+
+            // Only cache non-null values. Null results occur when content is not yet in the
+            // database cache or when HasPublishedAncestorPath fails (e.g. during migration
+            // before publish status is fully populated). Caching null with empty tags would
+            // create entries that survive tag-based cache clearing, causing stale nulls.
+            if (contentCacheNode is not null)
+            {
+                await _hybridCache.SetAsync(
+                    cacheKey,
+                    contentCacheNode,
+                    GetEntryOptions(key, preview),
+                    GenerateTags(contentCacheNode));
+            }
         }
 
         if (contentCacheNode is null)
