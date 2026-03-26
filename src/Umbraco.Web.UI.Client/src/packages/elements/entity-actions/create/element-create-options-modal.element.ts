@@ -29,6 +29,9 @@ export class UmbElementCreateOptionsModalElement extends UmbModalBaseElement<
 	@state()
 	private _createOptionControllers: Array<UmbExtensionApiInitializer<ManifestEntityCreateOptionAction>> = [];
 
+	@state()
+	private _hrefList: Array<string | undefined> = [];
+
 	override async firstUpdated() {
 		this.#retrieveAllowedElementTypes();
 		this.#initCreateOptionActions();
@@ -58,6 +61,8 @@ export class UmbElementCreateOptionsModalElement extends UmbModalBaseElement<
 				this._createOptionControllers = controllers as unknown as Array<
 					UmbExtensionApiInitializer<ManifestEntityCreateOptionAction>
 				>;
+				const hrefPromises = this._createOptionControllers.map((controller) => controller.api?.getHref());
+				this._hrefList = await Promise.all(hrefPromises);
 			},
 			'umbElementCreateOptionActions',
 		);
@@ -81,8 +86,15 @@ export class UmbElementCreateOptionsModalElement extends UmbModalBaseElement<
 		this._submitModal();
 	}
 
-	async #onExecuteCreateOption(controller: UmbExtensionApiInitializer<ManifestEntityCreateOptionAction>) {
-		await controller.api?.execute();
+	async #onClick(
+		event: Event,
+		controller: UmbExtensionApiInitializer<ManifestEntityCreateOptionAction>,
+		href?: string,
+	) {
+		if (href) return;
+		event.stopPropagation();
+		if (!controller.api) throw new Error('No API found');
+		await controller.api.execute().catch(() => {});
 		this._submitModal();
 	}
 
@@ -105,7 +117,7 @@ export class UmbElementCreateOptionsModalElement extends UmbModalBaseElement<
 
 	#renderNoAllowedTypes() {
 		return html`
-			<umb-localize key="create_noDocumentTypes">
+			<umb-localize key="create_noElementTypes">
 				There are no allowed Element Types available for creating elements here. You must enable these in
 				<strong>Document Types</strong> within the <strong>Settings</strong> section, by editing the
 				<strong>Allow at library root</strong> under <strong>Permissions</strong>.
@@ -124,7 +136,7 @@ export class UmbElementCreateOptionsModalElement extends UmbModalBaseElement<
 					select-only
 					selectable
 					@selected=${() => this.#onNavigate(elementType)}>
-					${elementType.icon ? html`<umb-icon slot="icon" name=${elementType.icon}></umb-icon>` : nothing}
+					<umb-icon slot="icon" name=${elementType.icon ?? 'icon-document'}></umb-icon>
 				</uui-ref-node-document-type>
 			`,
 		);
@@ -134,18 +146,19 @@ export class UmbElementCreateOptionsModalElement extends UmbModalBaseElement<
 		return repeat(
 			this._createOptionControllers,
 			(controller) => controller.manifest?.alias,
-			(controller) => {
+			(controller, index) => {
 				const manifest = controller.manifest;
 				if (!manifest) return nothing;
 
 				const label = manifest.meta.label ? this.localize.string(manifest.meta.label) : manifest.name;
+				const href = this._hrefList[index];
 
 				return html`
 					<uui-ref-node-document-type
 						.name=${manifest.meta.additionalOptions ? label + '...' : label}
 						select-only
 						selectable
-						@selected=${() => this.#onExecuteCreateOption(controller)}>
+						@selected=${(event: Event) => this.#onClick(event, controller, href)}>
 						<umb-icon slot="icon" name=${manifest.meta.icon}></umb-icon>
 					</uui-ref-node-document-type>
 				`;

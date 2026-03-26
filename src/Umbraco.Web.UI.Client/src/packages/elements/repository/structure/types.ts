@@ -1,7 +1,6 @@
-import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+import type { UmbNamedEntityModel } from '@umbraco-cms/backoffice/entity';
 
-export interface UmbAllowedElementTypeModel extends UmbEntityModel {
-	name: string;
+export interface UmbAllowedElementTypeModel extends UmbNamedEntityModel {
 	description: string | null;
 	icon: string | null;
 }

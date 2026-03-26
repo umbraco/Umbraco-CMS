@@ -4,7 +4,16 @@ import {
 	UmbElementTypeStructureRepository,
 	type UmbAllowedElementTypeModel,
 } from '../../repository/structure/index.js';
-import { html, customElement, property, state, map, nothing } from '@umbraco-cms/backoffice/external/lit';
+import {
+	css,
+	html,
+	customElement,
+	ifDefined,
+	property,
+	state,
+	map,
+	nothing,
+} from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
 import { UmbExtensionsApiInitializer } from '@umbraco-cms/backoffice/extension-api';
@@ -21,6 +30,9 @@ export class UmbCreateElementCollectionActionElement extends UmbLitElement {
 
 	@state()
 	private _createOptionControllers: Array<UmbExtensionApiInitializer<ManifestEntityCreateOptionAction>> = [];
+
+	@state()
+	private _hrefList: Array<string | undefined> = [];
 
 	@state()
 	private _parentUnique?: UmbEntityUnique;
@@ -70,6 +82,8 @@ export class UmbCreateElementCollectionActionElement extends UmbLitElement {
 				this._createOptionControllers = controllers as unknown as Array<
 					UmbExtensionApiInitializer<ManifestEntityCreateOptionAction>
 				>;
+				const hrefPromises = this._createOptionControllers.map((controller) => controller.api?.getHref());
+				this._hrefList = await Promise.all(hrefPromises);
 			},
 			'umbCollectionCreateOptionActions',
 		);
@@ -93,8 +107,22 @@ export class UmbCreateElementCollectionActionElement extends UmbLitElement {
 		});
 	}
 
-	async #onExecuteCreateOption(controller: UmbExtensionApiInitializer<ManifestEntityCreateOptionAction>) {
-		await controller.api?.execute();
+	async #onClick(
+		event: Event,
+		controller: UmbExtensionApiInitializer<ManifestEntityCreateOptionAction>,
+		href?: string,
+	) {
+		if (href) return;
+		event.stopPropagation();
+		if (!controller.api) throw new Error('No API found');
+		await controller.api.execute().catch(() => {});
+	}
+
+	#getTarget(href?: string) {
+		if (href && href.startsWith('http')) {
+			return '_blank';
+		}
+		return '_self';
 	}
 
 	override render() {
@@ -109,27 +137,16 @@ export class UmbCreateElementCollectionActionElement extends UmbLitElement {
 
 	#renderCreateButton() {
 		const item = this._allowedElementTypes[0];
-		const label =
-			(this.manifest?.meta.label
-				? this.localize.string(this.manifest?.meta.label)
-				: this.localize.term('general_create')) +
-			' ' +
-			item.name;
-
-		return html`<uui-button
-			color="default"
-			href=${this.#getCreateUrl(item)}
-			label=${label}
-			look="outline"></uui-button>`;
+		const label = `${this.localize.string(this.manifest?.meta.label || '#general_create')} ${item.name}`;
+		return html`
+			<uui-button color="default" look="outline" label=${label} href=${this.#getCreateUrl(item)}></uui-button>
+		`;
 	}
 
 	#renderDropdown() {
-		const label = this.manifest?.meta.label
-			? this.localize.string(this.manifest?.meta.label)
-			: this.localize.term('general_create');
-
+		const label = this.localize.string(this.manifest?.meta.label || '#general_create');
 		return html`
-			<uui-button popovertarget="collection-action-menu-popover" label=${label} color="default" look="outline">
+			<uui-button color="default" look="outline" label=${label} popovertarget="collection-action-menu-popover">
 				${label}
 				<uui-symbol-expand .open=${this._popoverOpen}></uui-symbol-expand>
 			</uui-button>
@@ -143,31 +160,44 @@ export class UmbCreateElementCollectionActionElement extends UmbLitElement {
 							this._allowedElementTypes,
 							(item) => html`
 								<uui-menu-item label="${item.name}..." href=${this.#getCreateUrl(item)}>
-									<umb-icon slot="icon" name=${item.icon ?? 'icon-document'}></umb-icon>
+									<umb-icon slot="icon" name=${item.icon || 'icon-document'}></umb-icon>
 								</uui-menu-item>
 							`,
 						)}
-						${map(this._createOptionControllers, (controller) => this.#renderCreateOptionItem(controller))}
+						${map(this._createOptionControllers, (controller, index) =>
+							this.#renderCreateOptionItem(controller, index),
+						)}
 					</uui-scroll-container>
 				</umb-popover-layout>
 			</uui-popover-container>
 		`;
 	}
 
-	#renderCreateOptionItem(controller: UmbExtensionApiInitializer<ManifestEntityCreateOptionAction>) {
+	#renderCreateOptionItem(controller: UmbExtensionApiInitializer<ManifestEntityCreateOptionAction>, index: number) {
 		const manifest = controller.manifest;
 		if (!manifest) return nothing;
 
 		const label = manifest.meta.label ? this.localize.string(manifest.meta.label) : manifest.name;
+		const href = this._hrefList[index];
 
 		return html`
 			<uui-menu-item
 				label=${manifest.meta.additionalOptions ? label + '...' : label}
-				@click=${() => this.#onExecuteCreateOption(controller)}>
-				<umb-icon slot="icon" name=${manifest.meta.icon ?? 'icon-folder'}></umb-icon>
+				href=${ifDefined(href)}
+				target=${this.#getTarget(href)}
+				@click=${(event: Event) => this.#onClick(event, controller, href)}>
+				<umb-icon slot="icon" name=${manifest.meta.icon || 'icon-folder'}></umb-icon>
 			</uui-menu-item>
 		`;
 	}
+
+	static override styles = [
+		css`
+			uui-scroll-container {
+				max-height: 500px;
+			}
+		`,
+	];
 }
 
 export default UmbCreateElementCollectionActionElement;
