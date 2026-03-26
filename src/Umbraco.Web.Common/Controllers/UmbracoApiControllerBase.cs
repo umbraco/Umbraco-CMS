@@ -14,6 +14,7 @@ namespace Umbraco.Cms.Web.Common.Controllers;
 ///     <para>The base class is <see cref="ControllerBase" /> which are netcore API controllers without any view support</para>
 /// </remarks>
 [Authorize(Policy = AuthorizationPolicies.UmbracoFeatureEnabled)]
+[UmbracoApiController]
 [Obsolete("Scheduled for removal in Umbraco 18.")]
 public abstract class UmbracoApiControllerBase : ControllerBase, IUmbracoFeature
 {
