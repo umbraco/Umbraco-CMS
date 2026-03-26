@@ -15,7 +15,7 @@ TypeScript/Lit web components library for the Umbraco CMS backoffice. Published 
 - **[Style Guide](./docs/style-guide.md)** - Naming and formatting conventions
 - **[Clean Code](./docs/clean-code.md)** - Best practices and SOLID principles
 - **[Deprecation](./docs/deprecation.md)** - Breaking changes policy, deprecation patterns (JSDoc + UmbDeprecation)
-- **[Testing](./docs/testing.md)** - Unit, integration, and E2E testing strategies
+- **[Testing](./docs/testing.md)** - Testing strategy, priority by code area, MSW mocking, test patterns
 
 ### Troubleshooting
 - **[Error Handling](./docs/error-handling.md)** - Error patterns and debugging
