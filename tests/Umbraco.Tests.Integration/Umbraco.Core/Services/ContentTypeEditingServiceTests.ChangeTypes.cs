@@ -252,7 +252,7 @@ internal sealed partial class ContentTypeEditingServiceTests
     }
 
     [Test]
-    public async Task Non_Structural_Change_Emits_MetadataChanged_Without_RefreshMain()
+    public async Task Non_Structural_Change_Emits_RefreshOther_Without_RefreshMain()
     {
         var contentType = (await ContentTypeEditingService.CreateAsync(
             ContentTypeCreateModel("Test", "test"), Constants.Security.SuperUserKey)).Result!;
