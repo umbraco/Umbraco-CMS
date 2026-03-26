@@ -201,7 +201,7 @@ export class UmbMediaCaptionAltTextModalElement extends UmbModalBaseElement<
 					gap: var(--uui-size-space-1);
 
 					uui-input {
-						width: 100%;
+						display: block;
 						margin-bottom: 0;
 					}
 
