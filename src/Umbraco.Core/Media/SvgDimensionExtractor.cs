@@ -1,5 +1,6 @@
 using System.Drawing;
 using System.Globalization;
+using System.Xml;
 using System.Xml.Linq;
 
 namespace Umbraco.Cms.Core.Media;
@@ -10,8 +11,7 @@ public class SvgDimensionExtractor : ISvgDimensionExtractor
     /// <inheritdoc />
     public Size? GetDimensions(Stream stream)
     {
-
-        if (!stream.CanRead)
+        if (stream.CanRead is false)
         {
             return null;
         }
@@ -42,9 +42,16 @@ public class SvgDimensionExtractor : ISvgDimensionExtractor
 
     }
 
-    private Size? ReadDimensions(Stream stream)
+    private static Size? ReadDimensions(Stream stream)
     {
-        var document = XDocument.Load(stream);
+        var settings = new XmlReaderSettings
+        {
+            DtdProcessing = DtdProcessing.Prohibit,
+            XmlResolver = null,
+        };
+        using var reader = XmlReader.Create(stream, settings);
+        var document = XDocument.Load(reader);
+
         XElement? root = document.Root;
 
         if (root is null)
@@ -62,11 +69,8 @@ public class SvgDimensionExtractor : ISvgDimensionExtractor
             size = ParseWidthHeightAttributes(widthAttributeValue, heightAttributeValue);
         }
 
-        // Fall back to viewbox
-        if (size is null)
-        {
-            size = ParseViewBox(root);
-        }
+        // Fall back to viewbox.
+        size ??= ParseViewBox(root);
 
         return size;
 
@@ -88,12 +92,12 @@ public class SvgDimensionExtractor : ISvgDimensionExtractor
             return null;
         }
 
-        if (!double.TryParse(parts[2], NumberStyles.Float, CultureInfo.InvariantCulture, out var width))
+        if (double.TryParse(parts[2], NumberStyles.Float, CultureInfo.InvariantCulture, out var width) is false)
         {
             return null;
         }
 
-        if (!double.TryParse(parts[3], NumberStyles.Float, CultureInfo.InvariantCulture, out var height))
+        if (double.TryParse(parts[3], NumberStyles.Float, CultureInfo.InvariantCulture, out var height) is false)
         {
             return null;
         }
@@ -108,7 +112,7 @@ public class SvgDimensionExtractor : ISvgDimensionExtractor
             (int)Math.Round(height));
     }
 
-    private Size? ParseWidthHeightAttributes(string widthAttributeValue, string heightAttributeValue)
+    private static Size? ParseWidthHeightAttributes(string widthAttributeValue, string heightAttributeValue)
     {
         if (TryExtractNumericFromValue(widthAttributeValue, out var widthValue)
             && TryExtractNumericFromValue(heightAttributeValue, out var heightValue))
@@ -122,10 +126,7 @@ public class SvgDimensionExtractor : ISvgDimensionExtractor
     /// <summary>
     /// Extract a "pixel" value from the width / height attributes.
     /// </summary>
-    /// <param name="attributeValue"></param>
-    /// <param name="value"></param>
-    /// <returns></returns>
-    private bool TryExtractNumericFromValue(string attributeValue, out int value)
+    private static bool TryExtractNumericFromValue(string attributeValue, out int value)
     {
         if (int.TryParse(attributeValue, out int onlyNumbersValue))
         {
