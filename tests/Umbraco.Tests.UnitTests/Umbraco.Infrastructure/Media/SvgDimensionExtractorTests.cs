@@ -2,9 +2,9 @@ using System.Drawing;
 using System.Text;
 using Microsoft.Extensions.Logging.Abstractions;
 using NUnit.Framework;
-using Umbraco.Cms.Core.Media;
+using Umbraco.Cms.Infrastructure.Media;
 
-namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Media;
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Media;
 
 public class SvgDimensionExtractorTests
 {

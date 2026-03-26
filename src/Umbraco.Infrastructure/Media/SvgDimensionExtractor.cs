@@ -3,8 +3,9 @@ using System.Globalization;
 using System.Xml;
 using System.Xml.Linq;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Media;
 
-namespace Umbraco.Cms.Core.Media;
+namespace Umbraco.Cms.Infrastructure.Media;
 
 /// <inheritdoc />
 public class SvgDimensionExtractor : ISvgDimensionExtractor
