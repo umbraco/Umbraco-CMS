@@ -105,8 +105,13 @@ internal class ContentVersionCleanupServiceTest : UmbracoIntegrationTest
         // Backdate 3 of the historic versions to 10 days ago so they exceed the 7-day keep window.
         using (var scope = ScopeProvider.CreateScope(autoComplete: true))
         {
-            ScopeAccessor.AmbientScope!.Database.Execute(
-                "UPDATE umbracoContentVersion SET versionDate = @0 WHERE id IN (1, 2, 3)",
+            var db = ScopeAccessor.AmbientScope!.Database;
+            var syntax = db.SqlContext.SqlSyntax;
+
+            var umbracoContentVersion = syntax.GetQuotedTableName("umbracoContentVersion");
+            var versionDate = syntax.GetQuotedColumnName("versionDate");
+            db.Execute(
+                $"UPDATE {umbracoContentVersion} SET {versionDate} = @0 WHERE id IN (1, 2, 3)",
                 DateTime.UtcNow.AddDays(-10));
         }
 
@@ -158,10 +163,13 @@ internal class ContentVersionCleanupServiceTest : UmbracoIntegrationTest
         using (var scope = ScopeProvider.CreateScope(autoComplete: true))
         {
             var db = ScopeAccessor.AmbientScope!.Database;
+            var syntax = db.SqlContext.SqlSyntax;
+            var umbracoContentVersion = syntax.GetQuotedTableName("umbracoContentVersion");
+            var versionDate = syntax.GetQuotedColumnName("versionDate");
             var tenDaysAgo = DateTime.UtcNow.AddDays(-10);
             var fiveDaysAgo = DateTime.UtcNow.AddDays(-5);
-            db.Execute("UPDATE umbracoContentVersion SET versionDate = @0 WHERE id IN (1, 2, 3)", tenDaysAgo);
-            db.Execute("UPDATE umbracoContentVersion SET versionDate = @0 WHERE id IN (4, 5)", fiveDaysAgo);
+            db.Execute($"UPDATE {umbracoContentVersion} SET {versionDate} = @0 WHERE id IN (1, 2, 3)", tenDaysAgo);
+            db.Execute($"UPDATE {umbracoContentVersion} SET {versionDate} = @0 WHERE id IN (4, 5)", fiveDaysAgo);
         }
 
         ContentVersionService.PerformContentVersionCleanup(DateTime.UtcNow);
@@ -221,12 +229,17 @@ internal class ContentVersionCleanupServiceTest : UmbracoIntegrationTest
         using (var scope = ScopeProvider.CreateScope(autoComplete: true))
         {
             var db = ScopeAccessor.AmbientScope!.Database;
+            var syntax = db.SqlContext.SqlSyntax;
 
+            var umbracoContentVersion = syntax.GetQuotedTableName("umbracoContentVersion");
+            var umbracoContent = syntax.GetQuotedTableName("umbracoContent");
+            var nodeId = syntax.GetQuotedColumnName("nodeId");
+            var contentTypeId = syntax.GetQuotedColumnName("contentTypeId");
             var contentAVersions = db.Single<int>(
-                "SELECT count(1) FROM umbracoContentVersion cv INNER JOIN umbracoContent c ON cv.nodeId = c.nodeId WHERE c.contentTypeId = @0",
+                $"SELECT count(1) FROM {umbracoContentVersion} cv INNER JOIN {umbracoContent} c ON cv.{nodeId} = c.{nodeId} WHERE c.{contentTypeId} = @0",
                 contentTypeA.Id);
             var contentBVersions = db.Single<int>(
-                "SELECT count(1) FROM umbracoContentVersion cv INNER JOIN umbracoContent c ON cv.nodeId = c.nodeId WHERE c.contentTypeId = @0",
+                $"SELECT count(1) FROM {umbracoContentVersion} cv INNER JOIN {umbracoContent} c ON cv.{nodeId} = c.{nodeId} WHERE c.{contentTypeId} = @0",
                 contentTypeB.Id);
 
             Assert.Multiple(() =>
@@ -340,9 +353,10 @@ internal class ContentVersionCleanupServiceTest : UmbracoIntegrationTest
         using var scope = ScopeProvider.CreateScope(autoComplete: true);
 
         var database = ScopeAccessor.AmbientScope.Database;
-        var contentVersions = database.Single<int>(@"select count(1) from umbracoContentVersion");
-        var documentVersions = database.Single<int>(@"select count(1) from umbracoDocumentVersion");
-        var propertyData = database.Single<int>(@"select count(1) from umbracoPropertyData");
+        var syntax = database.SqlContext.SqlSyntax;
+        var contentVersions = database.Single<int>($"select count(1) from {syntax.GetQuotedTableName("umbracoContentVersion")}");
+        var documentVersions = database.Single<int>($"select count(1) from {syntax.GetQuotedTableName("umbracoDocumentVersion")}");
+        var propertyData = database.Single<int>($"select count(1) from {syntax.GetQuotedTableName("umbracoPropertyData")}");
 
         return new Report
         {
