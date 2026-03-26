@@ -429,4 +429,48 @@ internal sealed partial class UserServiceCrudTests
             Assert.AreEqual(UserOperationStatus.AdminUserGroupMustNotBeEmpty, adminUserUpdateResult.Status);
         }
     }
+
+    [Test]
+    public async Task Can_update_current_user()
+    {
+        var userService = CreateUserService();
+        var (_, createdUser) = await CreateUserForUpdate(userService);
+        var modal = new CurrentUserUpdateModel
+        {
+            ExistingUserKey = createdUser.Key,
+            LanguageIsoCode = "da"
+        };
+
+        var result = await userService.UpdateCurrentUserAsync(modal);
+
+        Assert.IsTrue(result.Success);
+        var updatedUser = await userService.GetAsync(createdUser.Key);
+        Assert.IsNotNull(updatedUser);
+        Assert.AreEqual("da", updatedUser.Language);
+    }
+
+    [Test]
+    public async Task Can_Only_Update_Language_Other_Fields_Remain_Unchanged()
+    {
+        var userService = CreateUserService(securitySettings: new SecuritySettings { UsernameIsEmail = false });
+        var (_, createdUser) = await CreateUserForUpdate(userService);
+        var model = new CurrentUserUpdateModel
+        {
+            ExistingUserKey = createdUser.Key,
+            LanguageIsoCode = "da"
+        };
+
+        var result = await userService.UpdateCurrentUserAsync(model);
+
+        Assert.IsTrue(result.Success);
+        var updatedUser = await userService.GetAsync(createdUser.Key);
+        Assert.IsNotNull(updatedUser);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual("da", updatedUser.Language);
+            Assert.AreEqual(createdUser.Email, updatedUser.Email);
+            Assert.AreEqual(createdUser.Username, updatedUser.Username);
+            Assert.AreEqual(createdUser.Name, updatedUser.Name);
+        });
+    }
 }

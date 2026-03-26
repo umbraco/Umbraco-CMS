@@ -340,4 +340,16 @@ public class UserPresentationFactory : IUserPresentationFactory
 
     private static bool HasRootAccess(IEnumerable<int>? startNodeIds)
         => startNodeIds?.Contains(Constants.System.Root) is true;
+
+    /// <inheritdoc/>
+    public Task<CurrentUserUpdateModel> CreateUpdateCurrentUserModelAsync(Guid existingUserKey, UpdateCurrentUserRequestModel updateModel)
+    {
+        var model = new CurrentUserUpdateModel
+        {
+            ExistingUserKey = existingUserKey,
+            LanguageIsoCode = updateModel.LanguageIsoCode
+        };
+
+        return Task.FromResult(model);
+    }
 }

@@ -32,6 +32,11 @@ public interface IUserPresentationFactory
     Task<UserUpdateModel> CreateUpdateModelAsync(Guid existingUserKey, UpdateUserRequestModel updateModel);
 
     /// <summary>
+    /// Creates an update model for a current user based on the provided request model.
+    /// </summary>
+    Task<CurrentUserUpdateModel> CreateUpdateCurrentUserModelAsync(Guid existingUserKey, UpdateCurrentUserRequestModel updateModel);
+
+    /// <summary>
     /// Creates a response model for the current user based on the provided user.
     /// </summary>
     Task<CurrentUserResponseModel> CreateCurrentUserResponseModelAsync(IUser user);
@@ -56,10 +61,10 @@ public interface IUserPresentationFactory
     /// </summary>
     UserItemResponseModel CreateItemResponseModel(IUser user);
 
-/// <summary>
-/// Asynchronously creates a response model containing the calculated start nodes for the specified user.
-/// </summary>
-/// <param name="user">The user for whom to calculate start nodes.</param>
-/// <returns>A task representing the asynchronous operation. The task result contains the calculated user start nodes response model.</returns>
+    /// <summary>
+    /// Asynchronously creates a response model containing the calculated start nodes for the specified user.
+    /// </summary>
+    /// <param name="user">The user for whom to calculate start nodes.</param>
+    /// <returns>A task representing the asynchronous operation. The task result contains the calculated user start nodes response model.</returns>
     Task<CalculatedUserStartNodesResponseModel> CreateCalculatedUserStartNodesResponseModelAsync(IUser user);
 }
