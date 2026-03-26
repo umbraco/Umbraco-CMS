@@ -28,6 +28,14 @@ export default class UmbTiptapToolbarMediaPickerToolbarExtensionApi extends UmbT
 	 */
 	maxWidth = this.maxImageSize;
 
+	/**
+	 * @returns {Array<string> | undefined} The allowed media type unique IDs from configuration
+	 */
+	get #allowedMediaTypeIds(): Array<string> | undefined {
+		const raw = this.configuration?.getValueByAlias<string>('allowedMediaTypes');
+		return raw ? raw.split(',') : undefined;
+	}
+
 	constructor(host: UmbControllerHost) {
 		super(host);
 
@@ -106,10 +114,13 @@ export default class UmbTiptapToolbarMediaPickerToolbarExtensionApi extends UmbT
 	}
 
 	async #openMediaPicker(currentMediaUdi?: string) {
+		const allowedIds = this.#allowedMediaTypeIds;
 		const modalHandler = this.#modalManager?.open(this, UMB_MEDIA_PICKER_MODAL, {
 			data: {
 				multiple: false,
-				//startNodeIsVirtual,
+				pickableFilter: allowedIds?.length
+					? (item) => allowedIds.includes(item.mediaType.unique)
+					: undefined,
 			},
 			value: {
 				selection: currentMediaUdi ? [currentMediaUdi] : [],
