@@ -55,7 +55,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -203,7 +203,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -265,7 +265,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -376,7 +376,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -518,7 +518,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -651,7 +651,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -709,7 +709,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -827,7 +827,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -893,7 +893,67 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/data-type/{id}/schema": {
+      "get": {
+        "tags": [
+          "Data Type"
+        ],
+        "operationId": "GetDataTypeByIdSchema",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/DataTypeSchemaResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ProblemDetails"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": []
           }
         ]
       }
@@ -944,7 +1004,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -981,7 +1041,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -1129,7 +1189,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -1191,7 +1251,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -1302,7 +1362,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -1444,7 +1504,55 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/data-type/schemas/batch": {
+      "get": {
+        "tags": [
+          "Data Type"
+        ],
+        "operationId": "GetDataTypeSchemasBatch",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/FetchResponseModelDataTypeSchemaItemResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": []
           }
         ]
       }
@@ -1523,7 +1631,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -1574,7 +1682,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -1625,7 +1733,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -1686,7 +1794,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -1736,7 +1844,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -1809,7 +1917,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -1874,7 +1982,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -1943,7 +2051,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -2014,7 +2122,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -2078,7 +2186,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -2250,7 +2358,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -2312,7 +2420,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -2423,7 +2531,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -2565,7 +2673,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -2636,7 +2744,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -2780,7 +2888,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -2928,7 +3036,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -2979,7 +3087,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -3029,7 +3137,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -3094,7 +3202,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -3151,7 +3259,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -3299,7 +3407,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -3361,7 +3469,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -3472,7 +3580,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -3614,7 +3722,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -3732,7 +3840,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -3794,7 +3902,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -3942,7 +4050,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -4004,7 +4112,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -4115,7 +4223,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -4257,7 +4365,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -4379,7 +4487,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -4430,7 +4538,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -4480,7 +4588,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -4553,7 +4661,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -4618,7 +4726,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -4689,7 +4797,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -4837,7 +4945,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -4899,7 +5007,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -4984,7 +5092,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -5126,7 +5234,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -5214,7 +5322,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -5276,7 +5384,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -5356,7 +5464,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -5435,7 +5543,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -5594,7 +5702,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -5657,7 +5765,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -5801,7 +5909,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -5945,7 +6053,70 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/document-type/{id}/schema": {
+      "get": {
+        "tags": [
+          "Document Type"
+        ],
+        "operationId": "GetDocumentTypeByIdSchema",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/JsonNode"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ProblemDetails"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": []
           }
         ]
       }
@@ -6078,7 +6249,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -6135,7 +6306,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -6192,7 +6363,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -6287,7 +6458,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -6338,7 +6509,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -6375,7 +6546,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -6523,7 +6694,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -6585,7 +6756,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -6696,7 +6867,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -6838,7 +7009,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -6986,7 +7157,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -7037,7 +7208,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -7088,7 +7259,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -7156,7 +7327,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -7206,7 +7377,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -7279,7 +7450,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -7344,7 +7515,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -7413,7 +7584,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -7484,7 +7655,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -7585,7 +7756,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -7661,7 +7832,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -7781,7 +7952,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -7901,7 +8072,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -8032,7 +8203,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -8180,7 +8351,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -8242,7 +8413,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -8353,7 +8524,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -8495,7 +8666,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -8576,7 +8747,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -8657,7 +8828,7 @@
         "deprecated": true,
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -8790,7 +8961,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -8852,7 +9023,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -9020,7 +9191,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -9138,7 +9309,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -9251,7 +9422,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -9316,7 +9487,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -9432,7 +9603,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -9529,7 +9700,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -9662,7 +9833,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -9747,7 +9918,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -9815,7 +9986,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -9931,7 +10102,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -10075,7 +10246,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -10230,7 +10401,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -10315,7 +10486,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -10377,7 +10548,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -10457,7 +10628,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -10537,7 +10708,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -10681,7 +10852,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -10825,7 +10996,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -10894,7 +11065,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -10931,7 +11102,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -11064,7 +11235,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -11118,7 +11289,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -11251,7 +11422,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -11302,7 +11473,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -11353,7 +11524,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -11455,7 +11626,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -11531,7 +11702,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -11644,7 +11815,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -11720,7 +11891,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -11864,7 +12035,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -11929,7 +12100,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -11986,7 +12157,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -12043,7 +12214,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -12114,7 +12285,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -12164,7 +12335,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -12237,7 +12408,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -12302,7 +12473,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -12373,7 +12544,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -12465,7 +12636,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -12501,7 +12672,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -12602,7 +12773,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -12678,7 +12849,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -12798,7 +12969,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -12918,7 +13089,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -13066,7 +13237,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -13128,7 +13299,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -13239,7 +13410,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -13381,7 +13552,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -13462,7 +13633,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -13595,7 +13766,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -13713,7 +13884,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -13826,7 +13997,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -13970,7 +14141,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -14050,7 +14221,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -14194,7 +14365,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -14338,7 +14509,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -14407,7 +14578,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -14444,7 +14615,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -14592,7 +14763,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -14654,7 +14825,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -14765,7 +14936,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -14907,7 +15078,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -15051,7 +15222,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -15164,7 +15335,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -15244,7 +15415,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -15377,7 +15548,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -15428,7 +15599,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -15479,7 +15650,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -15555,7 +15726,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -15668,7 +15839,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -15744,7 +15915,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -15888,7 +16059,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -15953,7 +16124,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -16066,7 +16237,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -16142,7 +16313,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -16286,7 +16457,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -16343,7 +16514,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -16400,7 +16571,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -16471,7 +16642,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -16521,7 +16692,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -16594,7 +16765,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -16659,7 +16830,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -16730,7 +16901,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -16787,7 +16958,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -16848,7 +17019,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -16945,7 +17116,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -17063,7 +17234,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -17154,7 +17325,7 @@
         "deprecated": true,
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -17240,7 +17411,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -17312,7 +17483,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -17366,7 +17537,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -17424,7 +17595,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -17547,7 +17718,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -17805,7 +17976,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -17839,7 +18010,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -17893,7 +18064,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -18039,7 +18210,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -18097,7 +18268,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -18207,7 +18378,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -18348,7 +18519,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -18405,7 +18576,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -18474,7 +18645,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -18571,7 +18742,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -18658,7 +18829,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -18715,7 +18886,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -18835,7 +19006,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -18896,7 +19067,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -18980,7 +19151,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -19038,7 +19209,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -19078,7 +19249,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -19118,7 +19289,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -19198,7 +19369,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -19259,7 +19430,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -19310,7 +19481,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -19364,7 +19535,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -19425,7 +19596,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -19573,7 +19744,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -19635,7 +19806,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -19720,7 +19891,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -19862,7 +20033,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -19950,7 +20121,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -20012,7 +20183,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -20091,7 +20262,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -20250,7 +20421,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -20313,7 +20484,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -20457,7 +20628,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -20601,7 +20772,70 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/media-type/{id}/schema": {
+      "get": {
+        "tags": [
+          "Media Type"
+        ],
+        "operationId": "GetMediaTypeByIdSchema",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/JsonNode"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ProblemDetails"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": []
           }
         ]
       }
@@ -20658,7 +20892,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -20753,7 +20987,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -20804,7 +21038,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -20841,7 +21075,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -20989,7 +21223,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -21051,7 +21285,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -21162,7 +21396,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -21304,7 +21538,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -21452,7 +21686,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -21502,7 +21736,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -21575,7 +21809,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -21640,7 +21874,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -21711,7 +21945,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -21834,7 +22068,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -21885,7 +22119,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -21936,7 +22170,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -22038,7 +22272,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -22186,7 +22420,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -22248,7 +22482,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -22359,7 +22593,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -22501,7 +22735,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -22582,7 +22816,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -22700,7 +22934,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -22813,7 +23047,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -22893,7 +23127,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -22973,7 +23207,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -23117,7 +23351,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -23186,7 +23420,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -23223,7 +23457,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -23356,7 +23590,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -23410,7 +23644,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -23543,7 +23777,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -23619,7 +23853,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -23732,7 +23966,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -23808,7 +24042,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -23952,7 +24186,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -24017,7 +24251,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -24074,7 +24308,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -24131,7 +24365,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -24202,7 +24436,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -24252,7 +24486,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -24325,7 +24559,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -24390,7 +24624,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -24461,7 +24695,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -24512,7 +24746,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -24569,7 +24803,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -24689,7 +24923,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -24740,7 +24974,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -24851,7 +25085,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -24993,7 +25227,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -25050,7 +25284,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -25101,7 +25335,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -25152,7 +25386,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -25213,7 +25447,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -25361,7 +25595,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -25423,7 +25657,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -25508,7 +25742,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -25650,7 +25884,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -25729,7 +25963,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -25888,7 +26122,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -25951,7 +26185,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -26095,7 +26329,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -26239,7 +26473,127 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/member-type/{id}/schema": {
+      "get": {
+        "tags": [
+          "Member Type"
+        ],
+        "operationId": "GetMemberTypeByIdSchema",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/JsonNode"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ProblemDetails"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": []
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/member-type/allowed-at-root": {
+      "get": {
+        "tags": [
+          "Member Type"
+        ],
+        "summary": "Gets member types allowed at root.",
+        "description": "Gets a collection of member types that are allowed to be created at the root level.",
+        "operationId": "GetMemberTypeAllowedAtRoot",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/PagedAllowedMemberTypeModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": []
           }
         ]
       }
@@ -26334,7 +26688,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -26385,7 +26739,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -26422,7 +26776,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -26570,7 +26924,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -26632,7 +26986,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -26743,7 +27097,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -26885,7 +27239,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -27033,7 +27387,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -27083,7 +27437,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -27156,7 +27510,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -27221,7 +27575,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -27292,7 +27646,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -27414,7 +27768,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -27465,7 +27819,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -27516,7 +27870,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -27588,7 +27942,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -27736,7 +28090,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -27798,7 +28152,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -27909,7 +28263,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -28051,7 +28405,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -28131,7 +28485,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -28211,7 +28565,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -28355,7 +28709,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -28424,7 +28778,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -28461,7 +28815,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -28594,7 +28948,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -28670,7 +29024,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -28707,7 +29061,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -28744,7 +29098,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -28778,7 +29132,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -28832,7 +29186,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -28895,7 +29249,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -29007,7 +29361,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -29044,7 +29398,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -29101,7 +29455,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -29247,7 +29601,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -29309,7 +29663,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -29394,7 +29748,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -29510,7 +29864,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -29573,7 +29927,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -29630,7 +29984,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -29680,7 +30034,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -29828,7 +30182,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -29889,7 +30243,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -29999,7 +30353,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -30140,7 +30494,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -30298,7 +30652,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -30446,7 +30800,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -30507,7 +30861,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -30617,7 +30971,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -30674,7 +31028,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -30735,7 +31089,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -30784,7 +31138,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -30848,7 +31202,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -30905,7 +31259,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -30967,7 +31321,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -30997,40 +31351,6 @@
             }
           }
         }
-      },
-      "post": {
-        "tags": [
-          "Preview"
-        ],
-        "summary": "Enters preview mode.",
-        "description": "Enters preview mode for the current user session, allowing viewing of unpublished content.",
-        "operationId": "PostPreview",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "headers": {
-              "Umb-Notifications": {
-                "description": "The list of notifications produced during the request.",
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/NotificationHeaderModel"
-                  },
-                  "nullable": true
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "The resource is protected and requires an authentication token"
-          }
-        },
-        "deprecated": true,
-        "security": [
-          {
-            "Backoffice-User": [ ]
-          }
-        ]
       }
     },
     "/umbraco/management/api/v1/profiling/status": {
@@ -31065,7 +31385,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -31144,7 +31464,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -31208,7 +31528,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -31243,7 +31563,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -31277,7 +31597,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -31312,7 +31632,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -31390,7 +31710,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -31456,7 +31776,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -31515,7 +31835,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -31552,7 +31872,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -31609,7 +31929,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -31660,7 +31980,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -31717,7 +32037,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -31779,7 +32099,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -31859,7 +32179,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -31909,7 +32229,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -32057,7 +32377,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -32118,7 +32438,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -32228,7 +32548,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -32369,7 +32689,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -32527,7 +32847,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -32675,7 +32995,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -32736,7 +33056,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -32846,7 +33166,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -32895,7 +33215,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -32959,7 +33279,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -33016,7 +33336,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -33078,7 +33398,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -33132,7 +33452,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -33215,7 +33535,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -33252,7 +33572,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -33359,7 +33679,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -33492,7 +33812,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -33681,7 +34001,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -33741,7 +34061,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -33815,7 +34135,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -33853,7 +34173,7 @@
         "deprecated": true,
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -33903,7 +34223,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -33949,7 +34269,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -34010,7 +34330,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -34064,7 +34384,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -34114,7 +34434,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -34262,7 +34582,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -34323,7 +34643,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -34433,7 +34753,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -34574,7 +34894,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -34732,7 +35052,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -34880,7 +35200,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -34941,7 +35261,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -35051,7 +35371,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -35100,7 +35420,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -35164,7 +35484,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -35221,7 +35541,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -35283,7 +35603,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -35358,7 +35678,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -35415,7 +35735,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -35452,7 +35772,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -35557,7 +35877,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -35608,7 +35928,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -35659,7 +35979,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -35720,7 +36040,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -35868,7 +36188,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -35930,7 +36250,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -36041,7 +36361,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -36183,7 +36503,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -36220,7 +36540,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -36312,7 +36632,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -36349,7 +36669,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -36399,7 +36719,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -36464,7 +36784,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -36521,7 +36841,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -36584,7 +36904,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -36691,7 +37011,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -36764,7 +37084,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -36860,7 +37180,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -36894,7 +37214,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -36996,7 +37316,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -37047,7 +37367,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -37172,7 +37492,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -37244,7 +37564,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -37352,7 +37672,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -37400,7 +37720,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -37488,7 +37808,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -37581,7 +37901,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -37632,7 +37952,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -37739,7 +38059,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -37859,7 +38179,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -37914,7 +38234,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -37976,7 +38296,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -38061,7 +38381,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -38177,7 +38497,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -38304,7 +38624,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -38429,7 +38749,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -38559,7 +38879,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -38610,7 +38930,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -38758,7 +39078,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -38863,7 +39183,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -38932,7 +39252,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -38994,7 +39314,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -39105,7 +39425,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -39247,7 +39567,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -39312,7 +39632,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -39433,7 +39753,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -39495,7 +39815,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -39639,7 +39959,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -39757,7 +40077,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -39802,7 +40122,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -39897,7 +40217,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -40021,7 +40341,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -40134,7 +40454,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -40276,7 +40596,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -40313,7 +40633,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -40347,7 +40667,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -40384,7 +40704,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -40488,7 +40808,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -40625,7 +40945,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -40695,7 +41015,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -40787,7 +41107,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -40879,7 +41199,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -40916,7 +41236,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -40953,7 +41273,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -41015,7 +41335,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -41080,7 +41400,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -41143,7 +41463,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -41205,7 +41525,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -41338,7 +41658,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -41471,7 +41791,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -41619,7 +41939,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -41877,7 +42197,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -42094,7 +42414,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -42201,7 +42521,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -42252,7 +42572,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -42309,7 +42629,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -42455,7 +42775,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -42517,7 +42837,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -42628,7 +42948,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       },
@@ -42770,7 +43090,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -42836,7 +43156,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -42893,7 +43213,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -42950,7 +43270,7 @@
         },
         "security": [
           {
-            "Backoffice-User": [ ]
+            "Backoffice-User": []
           }
         ]
       }
@@ -43020,6 +43340,31 @@
         "additionalProperties": false
       },
       "AllowedMediaTypeModel": {
+        "required": [
+          "id",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "icon": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "AllowedMemberTypeModel": {
         "required": [
           "id",
           "name"
@@ -44332,6 +44677,14 @@
           "variesBySegment": {
             "type": "boolean"
           },
+          "collection": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ],
+            "nullable": true
+          },
           "isElement": {
             "type": "boolean"
           },
@@ -44390,14 +44743,6 @@
                 }
               ]
             }
-          },
-          "collection": {
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/ReferenceByIdModel"
-              }
-            ],
-            "nullable": true
           }
         },
         "additionalProperties": false
@@ -45533,6 +45878,59 @@
           },
           "canIgnoreStartNodes": {
             "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "DataTypeSchemaItemResponseModel": {
+        "required": [
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "valueTypeName": {
+            "type": "string",
+            "nullable": true
+          },
+          "jsonSchema": {
+            "type": "object",
+            "additionalProperties": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/JsonNode"
+                }
+              ]
+            },
+            "nullable": true
+          },
+          "error": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "DataTypeSchemaResponseModel": {
+        "type": "object",
+        "properties": {
+          "valueTypeName": {
+            "type": "string",
+            "nullable": true
+          },
+          "jsonSchema": {
+            "type": "object",
+            "additionalProperties": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/JsonNode"
+                }
+              ]
+            },
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -48450,6 +48848,30 @@
         ],
         "type": "string"
       },
+      "FetchResponseModelDataTypeSchemaItemResponseModel": {
+        "required": [
+          "items",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DataTypeSchemaItemResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
       "FieldPresentationModel": {
         "required": [
           "name",
@@ -48618,7 +49040,7 @@
           },
           "actionParameters": {
             "type": "object",
-            "additionalProperties": { },
+            "additionalProperties": {},
             "nullable": true
           }
         },
@@ -49177,6 +49599,53 @@
         },
         "additionalProperties": false
       },
+      "JsonNode": {
+        "required": [
+          "root"
+        ],
+        "type": "object",
+        "properties": {
+          "options": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/JsonNodeOptions"
+              }
+            ],
+            "nullable": true,
+            "readOnly": true
+          },
+          "parent": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/JsonNode"
+              }
+            ],
+            "nullable": true,
+            "readOnly": true
+          },
+          "root": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/JsonNode"
+              }
+            ],
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "JsonNodeOptions": {
+        "required": [
+          "propertyNameCaseInsensitive"
+        ],
+        "type": "object",
+        "properties": {
+          "propertyNameCaseInsensitive": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
       "LanguageItemResponseModel": {
         "required": [
           "isoCode",
@@ -49379,7 +49848,7 @@
           },
           "extensions": {
             "type": "array",
-            "items": { }
+            "items": {}
           }
         },
         "additionalProperties": false
@@ -51782,6 +52251,30 @@
         },
         "additionalProperties": false
       },
+      "PagedAllowedMemberTypeModel": {
+        "required": [
+          "items",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/AllowedMemberTypeModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
       "PagedAuditLogResponseModel": {
         "required": [
           "items",
@@ -53464,7 +53957,7 @@
             "nullable": true
           }
         },
-        "additionalProperties": { }
+        "additionalProperties": {}
       },
       "ProblemDetailsBuilderModel": {
         "type": "object",
@@ -57995,7 +58488,7 @@
           "authorizationCode": {
             "authorizationUrl": "/umbraco/management/api/v1/security/back-office/authorize",
             "tokenUrl": "/umbraco/management/api/v1/security/back-office/token",
-            "scopes": { }
+            "scopes": {}
           }
         }
       }
