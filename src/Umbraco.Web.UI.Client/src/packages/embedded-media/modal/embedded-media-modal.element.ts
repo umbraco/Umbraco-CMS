@@ -2,6 +2,7 @@ import { UmbOEmbedRepository } from '../repository/oembed.repository.js';
 import type { UmbEmbeddedMediaModalData, UmbEmbeddedMediaModalValue } from './embedded-media-modal.token.js';
 import { css, html, unsafeHTML, when, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
+import { debounce } from '@umbraco-cms/backoffice/utils';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UUIButtonState, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
@@ -72,7 +73,9 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 		this._url = e.target.value as string;
 	}
 
-	#onWidthChange(e: UUIInputEvent) {
+	#debouncedGetPreview = debounce(() => this.#getPreview(), 500);
+
+	#onWidthInput(e: UUIInputEvent) {
 		const width = parseInt(e.target.value as string, 10);
 		if (isNaN(width)) return;
 
@@ -83,10 +86,10 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 		}
 
 		this.value = { ...this.value, width: this._width, height: this._height };
-		this.#getPreview();
+		this.#debouncedGetPreview();
 	}
 
-	#onHeightChange(e: UUIInputEvent) {
+	#onHeightInput(e: UUIInputEvent) {
 		const height = parseInt(e.target.value as string, 10);
 		if (isNaN(height)) return;
 
@@ -97,7 +100,7 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 		}
 
 		this.value = { ...this.value, width: this._width, height: this._height };
-		this.#getPreview();
+		this.#debouncedGetPreview();
 	}
 
 	#onToggleConstrain() {
@@ -151,7 +154,7 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 									placeholder=${this.localize.term('general_width')}
 									min="0"
 									.value=${this._width.toString()}
-									@change=${this.#onWidthChange}
+									@input=${this.#onWidthInput}
 									?disabled=${isDisabled}>
 									<span class="extra" slot="append">px</span>
 								</uui-input>
@@ -174,7 +177,7 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 									placeholder=${this.localize.term('general_height')}
 									min="0"
 									.value=${this._height.toString()}
-									@change=${this.#onHeightChange}
+									@input=${this.#onHeightInput}
 									?disabled=${isDisabled}>
 									<span class="extra" slot="append">px</span>
 								</uui-input>
