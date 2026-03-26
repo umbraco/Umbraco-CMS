@@ -58,6 +58,23 @@ import type { CreateWebhookRequestModel } from '@umbraco-cms/backoffice/external
 
 ---
 
+## Caching & Request Deduplication
+
+Caching and request deduplication live **between the data source and the API client** — not in the repository or context. This is the layer that knows the API transport details needed to deduplicate and cache effectively.
+
+```
+Data Source ──> Request Manager ──> Generated API Client
+                   ├─ Data cache: returns cached items immediately
+                   ├─ Inflight cache: deduplicates concurrent requests for the same data
+                   └─ Server event sync: invalidates cache when the server broadcasts changes
+```
+
+The `management-api` package provides base classes for this: `UmbManagementApiItemDataRequestManager` handles the caching/deduplication logic, and concrete implementations wire it to a specific API endpoint and cache instance. See the document, media, and member item data sources for examples.
+
+This pattern is specific to the Management API transport. Other data sources (e.g., a custom API or offline source) would implement their own caching strategy in the same position — between data source and transport.
+
+---
+
 ## tryExecute
 
 The standard wrapper for all API calls. Handles errors, shows notifications, and returns a `{ data, error }` tuple — never throws.
