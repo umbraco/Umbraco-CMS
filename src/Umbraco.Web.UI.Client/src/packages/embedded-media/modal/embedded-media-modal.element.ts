@@ -226,10 +226,6 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 					flex-direction: column;
 					gap: var(--uui-size-space-1);
 
-					uui-input {
-						display: block;
-					}
-
 					.extra {
 						user-select: none;
 						height: 100%;
