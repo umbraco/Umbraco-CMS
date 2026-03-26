@@ -321,3 +321,4 @@ This is in such a bad state that the feedback of this review is not sufficient t
 - Don't repeat the same finding for every occurrence — mention it once and note "same pattern in {other files}"
 - Focus on substantive issues, not trivial formatting. Do not flag cosmetic differences in HTML templates that have no rendering impact (e.g., whitespace in HTML is collapsed by the browser).
 - For breaking changes, reference the specific pattern from the CLAUDE.md that should be applied
+- Do not suggest changes that would themselves introduce breaking changes. If a suggestion would alter public API surface (e.g., changing return types, renaming public members), it is not appropriate for a PR targeting `main` within a major version. Only suggest non-breaking alternatives.
