@@ -6,10 +6,10 @@ namespace Umbraco.Cms.Core.Models.Blocks;
 public abstract class BlockLayoutItemBase : IBlockLayoutItem
 {
     /// <inheritdoc />
-    public Guid ContentKey {get; set;}
+    public Guid ContentKey { get; set; }
 
     /// <inheritdoc />
-    public Guid? SettingsKey { get; set;}
+    public Guid? SettingsKey { get; set; }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="BlockLayoutItemBase" /> class.
