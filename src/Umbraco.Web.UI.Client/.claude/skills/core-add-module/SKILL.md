@@ -1,5 +1,5 @@
 ---
-name: add-module
+name: core-add-module
 description: Add a new module to the core package (src/packages/core/). Use when adding shared UI framework infrastructure that all packages can use — e.g., a new extension system feature, a new utility, a new shared component pattern, a new picker, or a new workspace primitive. Core modules are imported as @umbraco-cms/backoffice/{module-name}. Also use when the user says things like "add a module to core", "create a new core feature", or "add shared infrastructure".
 allowed-tools: Read, Write, Edit, Grep, Glob
 ---

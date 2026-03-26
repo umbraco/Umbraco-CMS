@@ -1,5 +1,5 @@
 ---
-name: create-package
+name: general-create-package
 description: Create a new package in the Umbraco backoffice client with its first module. Use when adding a new domain feature area that needs its own package under src/packages/ — e.g., a new CMS feature like webhooks, tags, or relations. Packages are self-contained domain modules that can theoretically be uninstalled independently. Also use when the user says things like "scaffold a new package", "add a new feature package", or "create a new domain module".
 allowed-tools: Read, Write, Edit, Grep, Glob
 ---

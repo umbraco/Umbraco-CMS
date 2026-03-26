@@ -1,5 +1,5 @@
 ---
-name: deprecate-api
+name: general-deprecate-api
 description: Deprecate a public API (class, method, property, type, constant, or context token) following the 2-major-version rule. Use when removing or replacing any publicly exported symbol that external consumers may depend on — includes exports from package index.ts files, global components, extension type aliases, and manifest schemas.
 allowed-tools: Read, Write, Edit, Grep, Glob
 ---

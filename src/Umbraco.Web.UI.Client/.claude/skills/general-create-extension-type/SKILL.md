@@ -1,5 +1,5 @@
 ---
-name: create-extension-type
+name: general-create-extension-type
 description: Create a new extension type for the Umbraco backoffice extension registry. Use when adding a new type of extension that can be registered via manifests (e.g., a new dashboard type, a new sidebar app type, a new toolbar extension type). Any package can define extension types.
 allowed-tools: Read, Write, Edit, Grep, Glob
 ---

@@ -19,7 +19,7 @@ Every deprecation must use **both** mechanisms:
 1. **JSDoc `@deprecated` tag** — for IDE warnings and documentation
 2. **Runtime warning via `UmbDeprecation`** — console output so consumers are notified at runtime
 
-For step-by-step implementation instructions, use the `deprecate-api` skill.
+For step-by-step implementation instructions, use the `general-deprecate-api` skill.
 
 ---
 

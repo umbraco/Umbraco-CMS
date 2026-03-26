@@ -1,5 +1,5 @@
 ---
-name: create-condition
+name: general-create-condition
 description: Create a new extension condition that controls when extensions are active. Use when you need to conditionally show or hide extensions based on application state (e.g., current section, user permissions, entity state, workspace context). Conditions are registered as extensions and referenced in manifest condition arrays.
 allowed-tools: Read, Write, Edit, Grep, Glob
 ---

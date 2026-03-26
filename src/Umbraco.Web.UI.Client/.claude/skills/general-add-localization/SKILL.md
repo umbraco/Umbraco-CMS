@@ -1,5 +1,5 @@
 ---
-name: add-localization
+name: general-add-localization
 description: Add localization keys and use them in elements or controllers. Use when adding user-facing text that should be translatable — labels, descriptions, error messages, button text, status text, or any string shown in the backoffice UI.
 allowed-tools: Read, Write, Edit, Grep, Glob
 ---

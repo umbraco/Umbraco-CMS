@@ -1,5 +1,5 @@
 ---
-name: create-kind
+name: general-create-kind
 description: Create a new extension kind — a reusable default implementation for an extension type. Use when multiple extensions of the same type share the same element/API implementation and only differ in configuration. Kinds reduce boilerplate by providing pre-built defaults that extensions customize via meta.
 allowed-tools: Read, Write, Edit, Grep, Glob
 ---
