@@ -39,12 +39,20 @@ internal sealed class DomainRepository : EntityRepositoryBase<int, IDomain>, IDo
     }
 
     /// <summary>
+    /// Gets the cache policy as <see cref="FullDataSetRepositoryCachePolicy{TEntity, TId}"/> for predicate-based lookups.
+    /// Returns null when caching is disabled (e.g. <see cref="AppCaches.NoCache"/>).
+    /// </summary>
+    private FullDataSetRepositoryCachePolicy<IDomain, int>? TypedCachePolicy
+        => CachePolicy as FullDataSetRepositoryCachePolicy<IDomain, int>;
+
+    /// <summary>
     /// Gets a domain by its name.
     /// </summary>
     /// <param name="domainName">The name of the domain to retrieve.</param>
     /// <returns>The domain matching the specified name, or null if none found.</returns>
     public IDomain? GetByName(string domainName)
-        => GetMany().FirstOrDefault(x => x.DomainName.InvariantEquals(domainName));
+        => TypedCachePolicy?.FindCached(x => x.DomainName.InvariantEquals(domainName), PerformGetAll)
+           ?? GetMany().FirstOrDefault(x => x.DomainName.InvariantEquals(domainName));
 
     /// <summary>
     /// Determines whether a domain with the specified name exists.
@@ -52,7 +60,8 @@ internal sealed class DomainRepository : EntityRepositoryBase<int, IDomain>, IDo
     /// <param name="domainName">The name of the domain to check for existence.</param>
     /// <returns>True if the domain exists; otherwise, false.</returns>
     public bool Exists(string domainName)
-        => GetMany().Any(x => x.DomainName.InvariantEquals(domainName));
+        => TypedCachePolicy?.ExistsCached(x => x.DomainName.InvariantEquals(domainName), PerformGetAll)
+           ?? GetMany().Any(x => x.DomainName.InvariantEquals(domainName));
 
     /// <summary>
     /// Gets all domains, optionally including wildcard domains.
@@ -60,7 +69,15 @@ internal sealed class DomainRepository : EntityRepositoryBase<int, IDomain>, IDo
     /// <param name="includeWildcards">If true, includes wildcard domains in the result; otherwise, excludes them.</param>
     /// <returns>An enumerable collection of domains.</returns>
     public IEnumerable<IDomain> GetAll(bool includeWildcards)
-        => GetMany().Where(x => includeWildcards || x.IsWildcard == false);
+    {
+        if (includeWildcards)
+        {
+            return GetMany();
+        }
+
+        return TypedCachePolicy?.FindAllCached(x => x.IsWildcard == false, PerformGetAll)
+               ?? GetMany().Where(x => x.IsWildcard == false);
+    }
 
     /// <summary>
     /// Retrieves the domains assigned to the specified content item.
@@ -69,13 +86,17 @@ internal sealed class DomainRepository : EntityRepositoryBase<int, IDomain>, IDo
     /// <param name="includeWildcards">If <c>true</c>, includes wildcard domains in the results; if <c>false</c>, only non-wildcard domains are returned.</param>
     /// <returns>An <see cref="IEnumerable{IDomain}"/> containing the domains assigned to the specified content item.</returns>
     public IEnumerable<IDomain> GetAssignedDomains(int contentId, bool includeWildcards)
-        => GetMany().Where(x => x.RootContentId == contentId).Where(x => includeWildcards || x.IsWildcard == false);
+        => TypedCachePolicy?.FindAllCached(x => x.RootContentId == contentId && (includeWildcards || x.IsWildcard == false), PerformGetAll)
+           ?? GetMany().Where(x => x.RootContentId == contentId).Where(x => includeWildcards || x.IsWildcard == false);
 
     protected override IRepositoryCachePolicy<IDomain, int> CreateCachePolicy()
         => new FullDataSetRepositoryCachePolicy<IDomain, int>(GlobalIsolatedCache, ScopeAccessor,  RepositoryCacheVersionService, CacheSyncService, GetEntityId, false);
 
+    // Note: PerformGet(int) is passed as a callback to the cache policy's Get(TId) method,
+    // but FullDataSetRepositoryCachePolicy.Get() never invokes it — it uses GetAllCached()
+    // internally and clones only the matched entity. This override exists only as a required
+    // implementation of the abstract base and as a fallback for non-FullDataSet policies.
     protected override IDomain? PerformGet(int id)
-        // Use the underlying GetAll which will force cache all domains
         => GetMany().FirstOrDefault(x => x.Id == id);
 
     protected override IEnumerable<IDomain> PerformGetAll(params int[]? ids)
