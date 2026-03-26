@@ -1,6 +1,6 @@
 ---
 name: review
-description: Automated PR code review for Umbraco CMS. Analyzes changed files for intent, impact on consumers, breaking changes, architecture compliance, and code quality. Non-interactive — outputs a full structured review.
+description: Automated PR code review for Umbraco CMS. Analyzes changed files for intent, impact on consumers, breaking changes, architecture compliance, and code quality. Non-interactive — outputs a full structured review. Use this skill whenever the user asks to review a branch, review a PR, check their changes for issues, analyze a diff, or validate breaking change patterns — even if they don't say "review" explicitly. Also triggers for /review. Does NOT apply to writing new code, fixing bugs, refactoring, explaining architecture, writing tests, or reviewing documentation content.
 argument-hint: <target-branch>
 ---
 
