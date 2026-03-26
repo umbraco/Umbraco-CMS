@@ -6,7 +6,7 @@ TypeScript/Lit web components library for the Umbraco CMS backoffice. Published 
 
 ### Architecture & Design
 - **[Architecture](./docs/architecture.md)** - Technology stack, design philosophy, developer roles, package system, import map pipeline, design patterns
-- **[Package Development](./docs/package-development.md)** - Package & module structure, folder structure conventions, organizational rules, building new packages
+- **[Package Development](./docs/package-development.md)** - Package & module structure, folder structure conventions, localization, organizational rules
 
 ### Development
 - **[Commands](./docs/commands.md)** - Build, test, and development commands
