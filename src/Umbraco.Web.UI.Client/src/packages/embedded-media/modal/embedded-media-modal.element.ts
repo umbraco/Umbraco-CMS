@@ -20,10 +20,10 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 	private _loading?: UUIButtonState;
 
 	@state()
-	private _width = 360;
+	private _width = 500;
 
 	@state()
-	private _height = 240;
+	private _height = 281;
 
 	@state()
 	private _constrain = false;
