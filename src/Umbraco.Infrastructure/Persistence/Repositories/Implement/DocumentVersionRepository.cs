@@ -173,11 +173,11 @@ internal sealed class DocumentVersionRepository : IDocumentVersionRepository
         IDatabase db = _scopeAccessor.AmbientScope.Database;
         ISqlSyntaxProvider syntax = _scopeAccessor.AmbientScope.SqlContext.SqlSyntax;
 
-        var ttName = "umbVersionsToDelete";
-        var tempTableName = syntax.TempTableName(ttName);
+        var tempTableName = "umbVersionsToDelete";
+        var quotedTempTableName = syntax.TempTableName(tempTableName);
         try
         {
-            db.Execute(syntax.CreateTempTable(ttName, $"{syntax.GetQuotedColumnName("Id")} INT NOT NULL PRIMARY KEY"));
+            db.Execute(syntax.CreateTempTable(tempTableName, $"{syntax.GetQuotedColumnName("Id")} INT NOT NULL PRIMARY KEY"));
 
             // Batch insert IDs into the temp table.
             foreach (IEnumerable<int> group in allIds.InGroupsOf(1000))
@@ -185,19 +185,19 @@ internal sealed class DocumentVersionRepository : IDocumentVersionRepository
                 var batch = group.ToList();
                 var placeholders = string.Join(",", batch.Select((_, i) => $"(@{i})"));
                 db.Execute(
-                    $"INSERT INTO {tempTableName} ({syntax.GetQuotedColumnName("Id")}) VALUES {placeholders}",
+                    $"INSERT INTO {quotedTempTableName} ({syntax.GetQuotedColumnName("Id")}) VALUES {placeholders}",
                     batch.Cast<object>().ToArray());
             }
 
             // Delete from all related tables using a subquery against the temp table.
-            db.Execute($"DELETE FROM {syntax.GetQuotedTableName(PropertyDataDto.TableName)} WHERE {syntax.GetQuotedColumnName("versionId")} IN (SELECT {syntax.GetQuotedColumnName("Id")} FROM {tempTableName})");
-            db.Execute($"DELETE FROM {syntax.GetQuotedTableName(ContentVersionCultureVariationDto.TableName)} WHERE {syntax.GetQuotedColumnName("versionId")} IN (SELECT {syntax.GetQuotedColumnName("Id")} FROM {tempTableName})");
-            db.Execute($"DELETE FROM {syntax.GetQuotedTableName(DocumentVersionDto.TableName)} WHERE {syntax.GetQuotedColumnName("id")} IN (SELECT {syntax.GetQuotedColumnName("Id")} FROM {tempTableName})");
-            db.Execute($"DELETE FROM {syntax.GetQuotedTableName(ContentVersionDto.TableName)} WHERE {syntax.GetQuotedColumnName("id")} IN (SELECT {syntax.GetQuotedColumnName("Id")} FROM {tempTableName})");
+            db.Execute($"DELETE FROM {syntax.GetQuotedTableName(PropertyDataDto.TableName)} WHERE {syntax.GetQuotedColumnName("versionId")} IN (SELECT {syntax.GetQuotedColumnName("Id")} FROM {quotedTempTableName})");
+            db.Execute($"DELETE FROM {syntax.GetQuotedTableName(ContentVersionCultureVariationDto.TableName)} WHERE {syntax.GetQuotedColumnName("versionId")} IN (SELECT {syntax.GetQuotedColumnName("Id")} FROM {quotedTempTableName})");
+            db.Execute($"DELETE FROM {syntax.GetQuotedTableName(DocumentVersionDto.TableName)} WHERE {syntax.GetQuotedColumnName("id")} IN (SELECT {syntax.GetQuotedColumnName("Id")} FROM {quotedTempTableName})");
+            db.Execute($"DELETE FROM {syntax.GetQuotedTableName(ContentVersionDto.TableName)} WHERE {syntax.GetQuotedColumnName("id")} IN (SELECT {syntax.GetQuotedColumnName("Id")} FROM {quotedTempTableName})");
         }
         finally
         {
-            db.Execute(syntax.DropTempTable(ttName));
+            db.Execute(syntax.DropTempTable(tempTableName));
         }
     }
 
