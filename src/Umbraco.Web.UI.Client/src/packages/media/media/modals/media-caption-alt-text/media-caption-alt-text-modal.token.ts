@@ -8,6 +8,8 @@ export type UmbMediaCaptionAltTextModalValue = {
 	altText?: string;
 	caption?: string;
 	url: string;
+	width?: number;
+	height?: number;
 };
 
 export const UMB_MEDIA_CAPTION_ALT_TEXT_MODAL = new UmbModalToken<

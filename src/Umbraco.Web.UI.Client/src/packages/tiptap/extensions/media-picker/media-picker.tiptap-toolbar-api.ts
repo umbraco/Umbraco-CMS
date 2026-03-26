@@ -45,8 +45,10 @@ export default class UmbTiptapToolbarMediaPickerToolbarExtensionApi extends UmbT
 		const currentMediaUdi = this.#extractMediaUdi(currentTarget);
 		const currentAltText = currentTarget?.alt;
 		const currentCaption = this.#extractCaption(editor.state.selection);
+		const currentWidth = currentTarget?.width ? parseInt(currentTarget.width as string, 10) : undefined;
+		const currentHeight = currentTarget?.height ? parseInt(currentTarget.height as string, 10) : undefined;
 
-		await this.#updateImageWithMetadata(editor, currentMediaUdi, currentAltText, currentCaption);
+		await this.#updateImageWithMetadata(editor, currentMediaUdi, currentAltText, currentCaption, currentWidth, currentHeight);
 	}
 
 	async #updateImageWithMetadata(
@@ -54,11 +56,13 @@ export default class UmbTiptapToolbarMediaPickerToolbarExtensionApi extends UmbT
 		currentMediaUdi: string | undefined,
 		currentAltText: string | undefined,
 		currentCaption: string | undefined,
+		currentWidth: number | undefined,
+		currentHeight: number | undefined,
 	) {
 		const mediaGuid = await this.#getMediaGuid(currentMediaUdi);
 		if (!mediaGuid) return;
 
-		const media = await this.#showMediaCaptionAltText(mediaGuid, currentAltText, currentCaption);
+		const media = await this.#showMediaCaptionAltText(mediaGuid, currentAltText, currentCaption, currentWidth, currentHeight);
 		if (!media) return;
 
 		this.#insertInEditor(editor, mediaGuid, media);
@@ -123,13 +127,15 @@ export default class UmbTiptapToolbarMediaPickerToolbarExtensionApi extends UmbT
 		return selection;
 	}
 
-	async #showMediaCaptionAltText(mediaUnique: string, altText?: string, caption?: string) {
+	async #showMediaCaptionAltText(mediaUnique: string, altText?: string, caption?: string, width?: number, height?: number) {
 		const modalHandler = this.#modalManager?.open(this, UMB_MEDIA_CAPTION_ALT_TEXT_MODAL, {
 			data: { mediaUnique },
 			value: {
 				url: '',
 				altText,
 				caption,
+				width,
+				height,
 			},
 		});
 		const mediaData = await modalHandler?.onSubmit().catch(() => null);
@@ -156,15 +162,25 @@ export default class UmbTiptapToolbarMediaPickerToolbarExtensionApi extends UmbT
 		// Set the media URL to the first item in the data array
 		const src = data[0].url;
 
-		// Fetch the actual image dimensions
-		const { width, height } = await imageSize(src);
+		// Use user-specified dimensions if provided, otherwise fall back to auto-detected
+		let finalWidth: number;
+		let finalHeight: number;
+
+		if (media.width && media.height) {
+			finalWidth = media.width;
+			finalHeight = media.height;
+		} else {
+			const dims = await imageSize(src);
+			finalWidth = dims.width;
+			finalHeight = dims.height;
+		}
 
 		const img = {
 			src,
 			alt: media.altText,
 			'data-udi': `umb://media/${mediaUnique.replace(/-/g, '')}`,
-			width: width.toString(),
-			height: height.toString(),
+			width: finalWidth.toString(),
+			height: finalHeight.toString(),
 		};
 
 		if (media.caption) {
