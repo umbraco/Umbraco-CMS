@@ -10,7 +10,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 			label: 'Text Area',
 			propertyEditorSchemaAlias: 'Umbraco.TextArea',
 			icon: 'icon-edit',
-			group: 'Common',
+			group: '#propertyEditorUIGroups_common',
 			supportsReadOnly: true,
 			settings: {
 				properties: [

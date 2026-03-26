@@ -9,7 +9,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		meta: {
 			label: 'Label',
 			icon: 'icon-readonly',
-			group: 'Common',
+			group: '#propertyEditorUIGroups_common',
 			propertyEditorSchemaAlias: 'Umbraco.Label',
 			supportsReadOnly: true,
 			settings: {

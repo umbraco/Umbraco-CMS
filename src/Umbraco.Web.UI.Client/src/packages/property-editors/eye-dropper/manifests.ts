@@ -9,7 +9,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		meta: {
 			label: 'Eye Dropper Color Picker',
 			icon: 'icon-colorpicker',
-			group: 'Pickers',
+			group: '#propertyEditorUIGroups_pickers',
 			propertyEditorSchemaAlias: 'Umbraco.ColorPicker.EyeDropper',
 			settings: {
 				properties: [

@@ -10,7 +10,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 			label: 'Date Time (unspecified)',
 			propertyEditorSchemaAlias: 'Umbraco.DateTimeUnspecified',
 			icon: 'icon-calendar-alt',
-			group: 'Date',
+			group: '#propertyEditorUIGroups_date',
 			supportsReadOnly: true,
 			settings: {
 				properties: [

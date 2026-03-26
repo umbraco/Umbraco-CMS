@@ -18,7 +18,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 			label: 'Decimal',
 			propertyEditorSchemaAlias: 'Umbraco.Decimal',
 			icon: 'icon-autofill',
-			group: 'Common',
+			group: '#propertyEditorUIGroups_common',
 			supportsReadOnly: true,
 			settings: {
 				properties: [
@@ -53,7 +53,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		meta: {
 			label: 'Numeric',
 			icon: 'icon-autofill',
-			group: 'Common',
+			group: '#propertyEditorUIGroups_common',
 			propertyEditorSchemaAlias: 'Umbraco.Integer',
 			supportsReadOnly: true,
 		},

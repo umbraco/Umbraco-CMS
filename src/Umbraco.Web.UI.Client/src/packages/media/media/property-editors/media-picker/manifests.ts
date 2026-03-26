@@ -10,7 +10,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 			label: 'Media Picker',
 			propertyEditorSchemaAlias: 'Umbraco.MediaPicker3',
 			icon: 'icon-picture',
-			group: 'Media',
+			group: '#propertyEditorUIGroups_media',
 			supportsReadOnly: true,
 		},
 	},

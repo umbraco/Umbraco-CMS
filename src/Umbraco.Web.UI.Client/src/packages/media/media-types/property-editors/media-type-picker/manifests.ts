@@ -8,6 +8,6 @@ export const manifest: ManifestPropertyEditorUi = {
 	meta: {
 		label: 'Media Type Picker',
 		icon: 'icon-media-dashed-line',
-		group: 'Advanced',
+		group: '#propertyEditorUIGroups_advanced',
 	},
 };

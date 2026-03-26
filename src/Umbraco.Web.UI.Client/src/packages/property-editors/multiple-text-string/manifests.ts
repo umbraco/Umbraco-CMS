@@ -10,7 +10,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 			label: 'Multiple Text String',
 			propertyEditorSchemaAlias: 'Umbraco.MultipleTextstring',
 			icon: 'icon-ordered-list',
-			group: 'Lists',
+			group: '#propertyEditorUIGroups_lists',
 			supportsReadOnly: true,
 		},
 	},

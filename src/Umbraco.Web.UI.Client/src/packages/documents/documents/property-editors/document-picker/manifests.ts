@@ -10,7 +10,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 			label: 'Document Picker',
 			propertyEditorSchemaAlias: 'Umbraco.ContentPicker',
 			icon: 'icon-document',
-			group: 'Pickers',
+			group: '#propertyEditorUIGroups_pickers',
 			supportsReadOnly: true,
 			settings: {
 				properties: [

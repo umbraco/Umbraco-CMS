@@ -8,7 +8,7 @@ export const manifest: ManifestPropertyEditorUi = {
 	meta: {
 		label: 'Document Type Picker',
 		icon: 'icon-document-dashed-line',
-		group: 'Advanced',
+		group: '#propertyEditorUIGroups_advanced',
 		supportsReadOnly: true,
 		settings: {
 			properties: [

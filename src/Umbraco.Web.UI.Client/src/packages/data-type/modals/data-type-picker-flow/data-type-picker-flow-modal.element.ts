@@ -218,6 +218,14 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 		this.#performFiltering();
 	}
 
+	#resolveGroupName(group: string): string {
+		if (group.includes('#')) {
+			return this.localize.string(group);
+		}
+		// Backward compatibility: external packages may still register camelCase group names.
+		return fromCamelCaseIfCamelCase(group);
+	}
+
 	#performFiltering() {
 		if (this.#currentFilterQuery) {
 			const filteredDataTypes = this.#dataTypes
@@ -227,9 +235,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-expect-error
 			const grouped = Object.groupBy(filteredDataTypes, (dataType: UmbDataTypeItemModel) =>
-				// Use fromCamelCaseIfCamelCase for backward compatibility: although core property editors provide
-				// title cased group names, external packages may still register them as camelCase.
-				fromCamelCaseIfCamelCase(this.#groupLookup[dataType.propertyEditorUiAlias] ?? 'Uncategorized'),
+				this.#resolveGroupName(this.#groupLookup[dataType.propertyEditorUiAlias] ?? 'Uncategorized'),
 			);
 
 			this._groupedDataTypes = Object.keys(grouped)
@@ -250,9 +256,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-expect-error
 		const grouped = Object.groupBy(filteredUIs, (propertyEditorUi: ManifestPropertyEditorUi) =>
-			// Use fromCamelCaseIfCamelCase for backward compatibility: although core property editors provide
-			// title cased group names, external packages may still register them as camelCase.
-			fromCamelCaseIfCamelCase(propertyEditorUi.meta.group ?? 'Uncategorized'),
+			this.#resolveGroupName(propertyEditorUi.meta.group ?? 'Uncategorized'),
 		);
 
 		this._groupedPropertyEditorUIs = Object.keys(grouped)

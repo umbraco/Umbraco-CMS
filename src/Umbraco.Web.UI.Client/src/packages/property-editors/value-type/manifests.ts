@@ -8,6 +8,6 @@ export const manifest: ManifestPropertyEditorUi = {
 	meta: {
 		label: 'Value Type',
 		icon: 'icon-autofill',
-		group: 'Common',
+		group: '#propertyEditorUIGroups_common',
 	},
 };

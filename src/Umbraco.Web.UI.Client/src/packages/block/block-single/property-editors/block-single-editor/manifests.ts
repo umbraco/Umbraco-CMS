@@ -12,7 +12,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 			label: 'Single Block',
 			propertyEditorSchemaAlias: UMB_BLOCK_SINGLE_PROPERTY_EDITOR_SCHEMA_ALIAS,
 			icon: 'icon-shape-square',
-			group: 'Rich Content',
+			group: '#propertyEditorUIGroups_richContent',
 			supportsReadOnly: true,
 			settings: {
 				properties: [

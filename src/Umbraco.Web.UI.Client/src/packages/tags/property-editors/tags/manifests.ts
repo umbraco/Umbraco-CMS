@@ -10,7 +10,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 			label: 'Tags',
 			propertyEditorSchemaAlias: 'Umbraco.Tags',
 			icon: 'icon-tags',
-			group: 'Common',
+			group: '#propertyEditorUIGroups_common',
 			supportsReadOnly: true,
 		},
 	},

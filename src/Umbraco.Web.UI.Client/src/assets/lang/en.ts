@@ -1418,6 +1418,17 @@ export default {
 		title: 'Select a property editor',
 		openPropertyEditorPicker: 'Select a property editor UI',
 	},
+	propertyEditorUIGroups: {
+		advanced: 'Advanced',
+		blocks: 'Blocks',
+		common: 'Common',
+		date: 'Date',
+		lists: 'Lists',
+		media: 'Media',
+		people: 'People',
+		pickers: 'Pickers',
+		richContent: 'Rich Content',
+	},
 	relatedlinks: {
 		enterExternal: 'enter external link',
 		chooseInternal: 'choose internal page',

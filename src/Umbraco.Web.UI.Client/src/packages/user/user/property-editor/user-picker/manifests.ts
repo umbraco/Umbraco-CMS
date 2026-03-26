@@ -10,7 +10,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 			label: 'User Picker',
 			propertyEditorSchemaAlias: 'Umbraco.UserPicker',
 			icon: 'icon-user',
-			group: 'People',
+			group: '#propertyEditorUIGroups_people',
 		},
 	},
 	userPickerSchemaManifest,

@@ -11,7 +11,7 @@ const propertyEditorUi: UmbExtensionManifest = {
 		label: 'Block Grid',
 		propertyEditorSchemaAlias: UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS,
 		icon: 'icon-layout',
-		group: 'Rich Content',
+		group: '#propertyEditorUIGroups_richContent',
 		supportsReadOnly: true,
 		settings: {
 			properties: [
