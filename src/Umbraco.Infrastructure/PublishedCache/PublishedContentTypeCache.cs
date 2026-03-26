@@ -24,7 +24,15 @@ public class PublishedContentTypeCache : IPublishedContentTypeCache
     private readonly Dictionary<string, IPublishedContentType> _typesByAlias = new();
     private readonly Dictionary<int, IPublishedContentType> _typesById = new();
 
-    // default ctor
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Core.PublishedCache.PublishedContentTypeCache"/> class.
+    /// </summary>
+    /// <remarks>default ctor</remarks>
+    /// <param name="contentTypeService">The service used to manage content types. Typically injected as a dependency.</param>
+    /// <param name="mediaTypeService">The service used to manage media types. Typically injected as a dependency.</param>
+    /// <param name="memberTypeService">The service used to manage member types. Typically injected as a dependency.</param>
+    /// <param name="publishedContentTypeFactory">The factory used to create published content types.</param>
+    /// <param name="logger">The logger used for logging cache-related events and errors.</param>
     public PublishedContentTypeCache(
         IContentTypeService? contentTypeService,
         IMediaTypeService? mediaTypeService,
@@ -120,6 +128,8 @@ public class PublishedContentTypeCache : IPublishedContentTypeCache
         }
     }
 
+    /// <summary>Clears the cached content types for the specified IDs.</summary>
+    /// <param name="ids">The collection of content type IDs to clear from the cache.</param>
     public void ClearContentTypes(IEnumerable<int> ids)
     {
         foreach (var id in ids)
@@ -134,6 +144,11 @@ public class PublishedContentTypeCache : IPublishedContentTypeCache
     /// <param name="id">A data type identifier.</param>
     public void ClearDataType(int id) => ClearByDataTypeId(id);
 
+    /// <summary>
+    /// Removes and returns all published content types that have at least one property using the specified data type ID.
+    /// </summary>
+    /// <param name="id">The unique identifier of the data type whose associated content types should be cleared.</param>
+    /// <returns>An enumerable of <see cref="IPublishedContentType"/> instances that were removed from the cache.</returns>
     public IEnumerable<IPublishedContentType> ClearByDataTypeId(int id)
     {
         if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))

@@ -75,7 +75,7 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
         if (_contentSettingsOptions.CurrentValue.DisableUnpublishWhenReferenced)
         {
             Attempt<PagedModel<RelationItemModel>, GetReferencesOperationStatus> referencedDescendants = await _trackedReferencesService
-                .GetPagedDescendantsInReferencesAsync(key, UmbracoObjectTypes.ElementContainer, 0, 0, filterMustBeIsDependency: true);
+                .GetPagedDescendantsInReferencesAsync(key, UmbracoObjectTypes.ElementContainer, 0, 1, filterMustBeIsDependency: true);
 
             if (referencedDescendants.Result.Total > 0)
             {
@@ -378,6 +378,7 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
 
         List<IElement> deletedElements = DeleteDescendantsLocked(container.Key, UmbracoObjectTypes.ElementContainer, scope, eventMessages);
 
+        DeleteContainerRelations(container);
         _entityContainerRepository.Delete(container);
 
         await AuditAsync(AuditType.Delete, userKey, container.Id);
@@ -462,6 +463,7 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
     {
         if (descendant.NodeObjectType == Constants.ObjectTypes.ElementContainer)
         {
+            DeleteContainerRelations(descendant);
             EntityContainer descendantContainer = _entityContainerRepository.Get(descendant.Id)
                                                   ?? throw new InvalidOperationException($"Descendant container with ID {descendant.Id} was not found.");
             _entityContainerRepository.Delete(descendantContainer);
@@ -474,6 +476,22 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
         _elementRepository.Delete(descendantElement);
         scope.Notifications.Publish(new ElementDeletedNotification(descendantElement, eventMessages));
         return descendantElement;
+    }
+
+    private void DeleteContainerRelations(IEntity container)
+    {
+        // Even though a container is in the recycle bin, it can still be both parent and child in one or
+        // more relations - for example:
+        // - Parent to an element that is also in the bin (for restoring the element).
+        // - Child to the original location in the elements tree (for restoring the container itself).
+        // Before the container can be deleted, the relations must be cleaned up.
+        IEnumerable<IRelation> relations = _relationService
+            .GetByParentOrChildId(container.Id)
+            .ToArray();
+        foreach (IRelation relation in relations)
+        {
+            _relationService.Delete(relation);
+        }
     }
 
     protected override Guid ContainedObjectType => Constants.ObjectTypes.Element;

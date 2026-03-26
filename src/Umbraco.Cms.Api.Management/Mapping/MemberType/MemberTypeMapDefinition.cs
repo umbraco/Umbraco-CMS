@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Api.Management.Mapping.ContentType;
+using Umbraco.Cms.Api.Management.Mapping.ContentType;
 using Umbraco.Cms.Api.Management.ViewModels.MemberType;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
@@ -7,8 +7,16 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Mapping.MemberType;
 
+/// <summary>
+/// Provides mapping configuration for converting MemberType entities between different representations.
+/// </summary>
 public class MemberTypeMapDefinition : ContentTypeMapDefinition<IMemberType, MemberTypePropertyTypeResponseModel, MemberTypePropertyTypeContainerResponseModel>, IMapDefinition
 {
+    /// <summary>
+    /// Configures object-object mappings related to member types for the Umbraco API.
+    /// This includes mappings from various member-related interfaces to their corresponding response models.
+    /// </summary>
+    /// <param name="mapper">The <see cref="IUmbracoMapper"/> instance used to register the mappings.</param>
     public void DefineMaps(IUmbracoMapper mapper)
     {
         mapper.Define<IMemberType, MemberTypeResponseModel>((_, _) => new MemberTypeResponseModel(), Map);
@@ -16,6 +24,7 @@ public class MemberTypeMapDefinition : ContentTypeMapDefinition<IMemberType, Mem
         mapper.Define<IMemberEntitySlim, MemberTypeReferenceResponseModel>((_, _) => new MemberTypeReferenceResponseModel(), Map);
         mapper.Define<IMember, MemberTypeReferenceResponseModel>((_, _) => new MemberTypeReferenceResponseModel(), Map);
         mapper.Define<ISimpleContentType, MemberTypeReferenceResponseModel>((_, _) => new MemberTypeReferenceResponseModel(), Map);
+        mapper.Define<IMemberType, AllowedMemberType>((_, _) => new AllowedMemberType(), Map);
     }
 
     // Umbraco.Code.MapAll -Collection
@@ -68,6 +77,15 @@ public class MemberTypeMapDefinition : ContentTypeMapDefinition<IMemberType, Mem
     private void Map(ISimpleContentType source, MemberTypeReferenceResponseModel target, MapperContext context)
     {
         target.Id = source.Key;
+        target.Icon = source.Icon ?? string.Empty;
+    }
+
+    // Umbraco.Code.MapAll
+    private void Map(IMemberType source, AllowedMemberType target, MapperContext context)
+    {
+        target.Id = source.Key;
+        target.Name = source.Name ?? string.Empty;
+        target.Description = source.Description;
         target.Icon = source.Icon ?? string.Empty;
     }
 }

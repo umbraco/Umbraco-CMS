@@ -475,6 +475,7 @@ export default {
 		current: '現在',
 		embed: '埋め込み',
 		restore: '復元',
+		unnamed: '名称未設定',
 	},
 	colors: {
 		blue: 'ブルー',
@@ -870,8 +871,9 @@ export default {
 	contentTypeEditor: {
 		compositions: '構成',
 		noGroups: 'タブが追加されていません',
+		addGroup: 'タブを追加',
 		inheritedFrom: '次から継承:',
-		addProperty: 'プロパティの追加',
+		addProperty: 'プロパティを追加',
 		requiredLabel: '必要なラベル',
 		enableListViewHeading: 'リスト ビューの有効化',
 		enableListViewDescription:
@@ -904,6 +906,8 @@ export default {
 		andAllDocuments: 'およびこのタイプを使用したすべてのドキュメント',
 		andAllMediaItems: 'およびこのタイプを使用したこのメディア アイテム',
 		andAllMembers: 'およびこのタイプを使用したすべてのメンバー',
+		addTab: 'タブを追加',
+		deleteTab: 'タブを削除',
 	},
 	templateEditor: {
 		alternativeField: '代替フィールド',

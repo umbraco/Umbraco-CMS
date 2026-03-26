@@ -10,6 +10,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Mappers;
 [MapperFor(typeof(AuditEntry))]
 public sealed class AuditEntryMapper : BaseMapper
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AuditEntryMapper"/> class.
+    /// </summary>
+    /// <param name="sqlContext">A lazily-initialized SQL context used for database operations.</param>
+    /// <param name="maps">The configuration store containing mapping definitions.</param>
     public AuditEntryMapper(Lazy<ISqlContext> sqlContext, MapperConfigurationStore maps)
         : base(sqlContext, maps)
     {

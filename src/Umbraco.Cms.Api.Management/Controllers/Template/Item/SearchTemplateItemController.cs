@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.ViewModels.Template.Item;
@@ -9,6 +9,9 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Template.Item;
 
+/// <summary>
+/// Provides API endpoints for searching template items within the management interface.
+/// </summary>
 [ApiVersion("1.0")]
 public class SearchTemplateItemController : TemplateItemControllerBase
 {
@@ -16,6 +19,12 @@ public class SearchTemplateItemController : TemplateItemControllerBase
     private readonly ITemplateService _templateService;
     private readonly IUmbracoMapper _mapper;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SearchTemplateItemController"/> class, which handles searching for template items.
+    /// </summary>
+    /// <param name="entitySearchService">Service used to search for entities within the system.</param>
+    /// <param name="templateService">Service used to manage and retrieve template data.</param>
+    /// <param name="mapper">The Umbraco object mapper for mapping between models.</param>
     public SearchTemplateItemController(IEntitySearchService entitySearchService, ITemplateService templateService, IUmbracoMapper mapper)
     {
         _entitySearchService = entitySearchService;

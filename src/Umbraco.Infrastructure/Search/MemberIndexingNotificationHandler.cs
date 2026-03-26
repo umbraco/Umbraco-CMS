@@ -7,11 +7,20 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Infrastructure.Search;
 
+/// <summary>
+/// Handles notifications related to indexing operations for members in Umbraco.
+/// </summary>
 public sealed class MemberIndexingNotificationHandler : INotificationHandler<MemberCacheRefresherNotification>
 {
     private readonly IMemberService _memberService;
     private readonly IUmbracoIndexingHandler _umbracoIndexingHandler;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Search.MemberIndexingNotificationHandler"/> class,
+    /// which handles notifications related to member indexing in Umbraco.
+    /// </summary>
+    /// <param name="umbracoIndexingHandler">An instance responsible for handling Umbraco indexing operations.</param>
+    /// <param name="memberService">The service used to manage member-related operations.</param>
     public MemberIndexingNotificationHandler(
         IUmbracoIndexingHandler umbracoIndexingHandler,
         IMemberService memberService)
@@ -21,6 +30,11 @@ public sealed class MemberIndexingNotificationHandler : INotificationHandler<Mem
         _memberService = memberService ?? throw new ArgumentNullException(nameof(memberService));
     }
 
+    /// <summary>
+    /// Handles notifications related to member cache changes and updates the member index accordingly.
+    /// This includes re-indexing or removing members from the index based on the type of cache refresher notification received.
+    /// </summary>
+    /// <param name="args">The <see cref="MemberCacheRefresherNotification"/> containing information about the cache change event, including the message type and relevant member data.</param>
     public void Handle(MemberCacheRefresherNotification args)
     {
         if (!_umbracoIndexingHandler.Enabled)

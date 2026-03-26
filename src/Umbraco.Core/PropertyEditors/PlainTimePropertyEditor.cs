@@ -1,3 +1,5 @@
+using System.Text.Json.Nodes;
+
 namespace Umbraco.Cms.Core.PropertyEditors;
 
 /// <summary>
@@ -7,7 +9,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     Constants.PropertyEditors.Aliases.PlainTime,
     ValueEditorIsReusable = true,
     ValueType = ValueTypes.Time)]
-public class PlainTimePropertyEditor : DataEditor
+public class PlainTimePropertyEditor : DataEditor, IValueSchemaProvider
 {
     /// <summary>
     ///     Initializes a new instance of the <see cref="PlainTimePropertyEditor" /> class.
@@ -16,4 +18,16 @@ public class PlainTimePropertyEditor : DataEditor
     public PlainTimePropertyEditor(IDataValueEditorFactory dataValueEditorFactory)
         : base(dataValueEditorFactory)
         => SupportsReadOnly = true;
+
+    /// <inheritdoc />
+    public Type? GetValueType(object? configuration) => typeof(TimeOnly?);
+
+    /// <inheritdoc />
+    public JsonObject? GetValueSchema(object? configuration) => new()
+    {
+        ["$schema"] = "https://json-schema.org/draft/2020-12/schema",
+        ["type"] = new JsonArray("string", "null"),
+        ["format"] = "time",
+        ["description"] = "ISO 8601 time string",
+    };
 }

@@ -10,7 +10,7 @@ export class ScriptUiHelper extends UiBaseLocators{
 
   constructor(page: Page) {
     super(page);
-    this.scriptCreateModal = page.locator('umb-script-create-options-modal');
+    this.scriptCreateModal = page.locator('umb-entity-create-option-action-list-modal');
     this.newJavascriptFileBtn = this.scriptCreateModal.locator('umb-ref-item', {hasText: 'JavaScript file'});
     this.newFolderThreeDots = this.scriptCreateModal.locator('umb-ref-item', {hasText: 'Folder'});
     this.scriptTree = page.locator('umb-tree[alias="Umb.Tree.Script"]');
@@ -21,7 +21,7 @@ export class ScriptUiHelper extends UiBaseLocators{
   }
 
   async createScriptFolder(folderName: string) {
-    await this.clickCreateOptionsActionMenuOption();
+    await this.clickCreateActionMenuOption();
     await this.click(this.newFolderThreeDots);
     await this.enterFolderName(folderName);
     await this.clickConfirmCreateFolderButton();
@@ -87,7 +87,7 @@ export class ScriptUiHelper extends UiBaseLocators{
   }
 
   async createScriptFolderAndWaitForScriptToBeCreated(folderName: string) {
-    await this.clickCreateOptionsActionMenuOption();
+    await this.clickCreateActionMenuOption();
     await this.click(this.newFolderThreeDots);
     await this.enterFolderName(folderName);
     return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.scriptFolder, this.clickConfirmCreateFolderButton(), ConstantHelper.statusCodes.created);

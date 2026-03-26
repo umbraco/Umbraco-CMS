@@ -59,6 +59,7 @@ export const data: Array<UmbMockMemberTypeModel> = [
 		hasChildren: false,
 		hasListView: false,
 		flags: [],
+		allowedInLibrary: false,
 	},
 	{
 		name: 'A Forbidden Member Type',
@@ -108,5 +109,6 @@ export const data: Array<UmbMockMemberTypeModel> = [
 		parent: null,
 		hasChildren: false,
 		hasListView: false,
+		allowedInLibrary: false,
 	},
 ];
