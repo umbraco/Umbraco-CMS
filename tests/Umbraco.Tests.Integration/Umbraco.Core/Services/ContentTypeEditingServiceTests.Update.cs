@@ -675,18 +675,6 @@ internal sealed partial class ContentTypeEditingServiceTests
 
         // expect RefreshOther when changing moving properties around internally on the content type
         AssertContentTypeRefreshPayload(refreshedPayloads, createAttempt.Result.Id, ContentTypeChangeTypes.RefreshOther);
-        // TODO KJA: CLEAN UP
-        // // When moving properties around internally, the update model does not explicitly set isElement,
-        // // so when isElement=true on create, the update (defaulting to false) triggers MetadataChanged.
-        // // When isElement=false, nothing changes and we get bare RefreshOther.
-        // if (isElement)
-        // {
-        //     AssertContentTypeRefreshPayload(refreshedPayloads, createAttempt.Result.Id, ContentTypeChangeTypes.MetadataChanged);
-        // }
-        // else
-        // {
-        //     AssertContentTypeRefreshPayload(refreshedPayloads, createAttempt.Result.Id, ContentTypeChangeTypes.RefreshOther);
-        // }
     }
 
     [TestCase(false)]
