@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.Scoping;
+using Umbraco.Tests.Benchmarks.Config;
 using IScope = Umbraco.Cms.Infrastructure.Scoping.IScope;
 
 namespace Umbraco.Tests.Benchmarks;
@@ -19,7 +20,7 @@ namespace Umbraco.Tests.Benchmarks;
 /// <remarks>
 /// Run with: dotnet run -c Release --project tests/Umbraco.Tests.Benchmarks -- --filter "*ContentTypeCachePolicy*"
 /// </remarks>
-[MemoryDiagnoser]
+[QuickRunWithMemoryDiagnoserConfig]
 public class ContentTypeCachePolicyBenchmarks
 {
     private FullDataSetRepositoryCachePolicy<AuditItem, object> _policy = null!;
@@ -108,7 +109,7 @@ public class ContentTypeCachePolicyBenchmarks
         }
 
         public IEnumerable<object> SearchByKey(string keyStartsWith)
-            => _cache.Where(kvp => kvp.Key.StartsWith(keyStartsWith)).Select(kvp => kvp.Value!);
+            => _cache.Where(kvp => kvp.Key.StartsWith(keyStartsWith, StringComparison.InvariantCultureIgnoreCase)).Select(kvp => kvp.Value!);
 
         public IEnumerable<object> SearchByRegex(string regex) => throw new NotImplementedException();
 
@@ -124,7 +125,7 @@ public class ContentTypeCachePolicyBenchmarks
 
         public void ClearByKey(string keyStartsWith)
         {
-            var keysToRemove = _cache.Keys.Where(k => k.StartsWith(keyStartsWith)).ToList();
+            var keysToRemove = _cache.Keys.Where(k => k.StartsWith(keyStartsWith, StringComparison.InvariantCultureIgnoreCase)).ToList();
             foreach (var key in keysToRemove)
             {
                 _cache.Remove(key);

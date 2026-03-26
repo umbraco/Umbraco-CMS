@@ -31,7 +31,7 @@ internal sealed class NonLockingCache : IAppPolicyCache
     }
 
     public IEnumerable<object> SearchByKey(string keyStartsWith)
-        => _cache.Where(kvp => kvp.Key.StartsWith(keyStartsWith)).Select(kvp => kvp.Value!);
+        => _cache.Where(kvp => kvp.Key.StartsWith(keyStartsWith, StringComparison.InvariantCultureIgnoreCase)).Select(kvp => kvp.Value!);
 
     public IEnumerable<object> SearchByRegex(string regex) => throw new NotImplementedException();
 
@@ -47,7 +47,7 @@ internal sealed class NonLockingCache : IAppPolicyCache
 
     public void ClearByKey(string keyStartsWith)
     {
-        var keysToRemove = _cache.Keys.Where(k => k.StartsWith(keyStartsWith)).ToList();
+        var keysToRemove = _cache.Keys.Where(k => k.StartsWith(keyStartsWith, StringComparison.InvariantCultureIgnoreCase)).ToList();
         foreach (var key in keysToRemove)
         {
             _cache.Remove(key);

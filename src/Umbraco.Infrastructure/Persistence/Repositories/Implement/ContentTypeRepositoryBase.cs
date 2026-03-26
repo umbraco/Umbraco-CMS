@@ -1661,7 +1661,8 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
         {
             if (ids?.Any() ?? false)
             {
-                return policy.FindAllCached(x => ids.Contains(x.Key), PerformGetAll);
+                var idSet = ids.ToHashSet();
+                return policy.FindAllCached(x => idSet.Contains(x.Key), PerformGetAll);
             }
 
             // No filter — need all, clone everything (same as GetAll).
@@ -1670,7 +1671,13 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
 
         // Fallback for non-FullDataSet policies.
         IEnumerable<TEntity> all = GetMany();
-        return ids?.Any() ?? false ? all.Where(x => ids.Contains(x.Key)) : all;
+        if (ids?.Any() ?? false)
+        {
+            var idSet = ids.ToHashSet();
+            return all.Where(x => idSet.Contains(x.Key));
+        }
+
+        return all;
     }
 
     /// <summary>
