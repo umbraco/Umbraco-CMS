@@ -271,4 +271,50 @@ internal sealed class PublicAccessRepositoryTest : UmbracoIntegrationTest
             return result;
         }
     }
+
+    [Test]
+    public void Get_By_Guid_Returns_Deep_Clone_Not_Cached_Instance()
+    {
+        var content = CreateTestData(3).ToArray();
+        var provider = ScopeProvider;
+        using (var scope = provider.CreateScope())
+        {
+            var repo = new PublicAccessRepository((IScopeAccessor)provider, AppCaches, LoggerFactory.CreateLogger<PublicAccessRepository>(), Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
+            PublicAccessRule[] rules = { new PublicAccessRule { RuleValue = "test", RuleType = "RoleName" } };
+            var entry = new PublicAccessEntry(content[0], content[1], content[2], rules);
+            repo.Save(entry);
+
+            var first = repo.Get(entry.Key);
+            var second = repo.Get(entry.Key);
+
+            Assert.IsNotNull(first);
+            Assert.IsNotNull(second);
+            Assert.AreEqual(first!.Key, second!.Key);
+            Assert.AreNotSame(first, second);
+        }
+    }
+
+    [Test]
+    public void Get_By_Guid_Mutation_Does_Not_Affect_Subsequent_Get()
+    {
+        var content = CreateTestData(3).ToArray();
+        var provider = ScopeProvider;
+        using (var scope = provider.CreateScope())
+        {
+            var repo = new PublicAccessRepository((IScopeAccessor)provider, AppCaches, LoggerFactory.CreateLogger<PublicAccessRepository>(), Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
+            PublicAccessRule[] rules = { new PublicAccessRule { RuleValue = "test", RuleType = "RoleName" } };
+            var entry = new PublicAccessEntry(content[0], content[1], content[2], rules);
+            repo.Save(entry);
+
+            var first = repo.Get(entry.Key);
+            Assert.IsNotNull(first);
+            var originalNodeId = first!.ProtectedNodeId;
+            first.ClearRules();
+
+            var second = repo.Get(entry.Key);
+            Assert.IsNotNull(second);
+            Assert.AreEqual(originalNodeId, second!.ProtectedNodeId);
+            Assert.AreEqual(1, second.Rules.Count(), "Mutation of a returned entity should not affect the cached copy");
+        }
+    }
 }
