@@ -1,4 +1,4 @@
-import { UMB_ELEMENT_ENTITY_TYPE } from '../entity.js';
+import { UMB_ELEMENT_ENTITY_TYPE, UMB_ELEMENT_FOLDER_ENTITY_TYPE } from '../entity.js';
 import {
 	UMB_USER_PERMISSION_ELEMENT_CREATE,
 	UMB_USER_PERMISSION_ELEMENT_DELETE,
@@ -22,7 +22,7 @@ const entityUserPermissions: Array<ManifestEntityUserPermission> = [
 		alias: 'Umb.EntityUserPermission.Element.Create',
 		name: 'Create Element User Permission',
 		weight: 90,
-		forEntityTypes: [UMB_ELEMENT_ENTITY_TYPE],
+		forEntityTypes: [UMB_ELEMENT_ENTITY_TYPE, UMB_ELEMENT_FOLDER_ENTITY_TYPE],
 		meta: {
 			verbs: [UMB_USER_PERMISSION_ELEMENT_CREATE],
 			label: '#userPermissions_create',
@@ -34,7 +34,7 @@ const entityUserPermissions: Array<ManifestEntityUserPermission> = [
 		alias: 'Umb.EntityUserPermission.Element.Delete',
 		name: 'Delete Element User Permission',
 		weight: 80,
-		forEntityTypes: [UMB_ELEMENT_ENTITY_TYPE],
+		forEntityTypes: [UMB_ELEMENT_ENTITY_TYPE, UMB_ELEMENT_FOLDER_ENTITY_TYPE],
 		meta: {
 			verbs: [UMB_USER_PERMISSION_ELEMENT_DELETE],
 			label: '#userPermissions_delete',
@@ -57,7 +57,7 @@ const entityUserPermissions: Array<ManifestEntityUserPermission> = [
 		type: 'entityUserPermission',
 		alias: 'Umb.EntityUserPermission.Element.Move',
 		name: 'Move Element User Permission',
-		forEntityTypes: [UMB_ELEMENT_ENTITY_TYPE],
+		forEntityTypes: [UMB_ELEMENT_ENTITY_TYPE, UMB_ELEMENT_FOLDER_ENTITY_TYPE],
 		meta: {
 			verbs: [UMB_USER_PERMISSION_ELEMENT_MOVE],
 			label: '#userPermissions_move',
@@ -81,7 +81,7 @@ const entityUserPermissions: Array<ManifestEntityUserPermission> = [
 		alias: 'Umb.EntityUserPermission.Element.Read',
 		name: 'Read Element User Permission',
 		weight: 100,
-		forEntityTypes: [UMB_ELEMENT_ENTITY_TYPE],
+		forEntityTypes: [UMB_ELEMENT_ENTITY_TYPE, UMB_ELEMENT_FOLDER_ENTITY_TYPE],
 		meta: {
 			verbs: [UMB_USER_PERMISSION_ELEMENT_READ],
 			label: '#userPermissions_read',
@@ -115,7 +115,7 @@ const entityUserPermissions: Array<ManifestEntityUserPermission> = [
 		type: 'entityUserPermission',
 		alias: 'Umb.EntityUserPermission.Element.Update',
 		name: 'Update Element User Permission',
-		forEntityTypes: [UMB_ELEMENT_ENTITY_TYPE],
+		forEntityTypes: [UMB_ELEMENT_ENTITY_TYPE, UMB_ELEMENT_FOLDER_ENTITY_TYPE],
 		meta: {
 			verbs: [UMB_USER_PERMISSION_ELEMENT_UPDATE],
 			label: '#userPermissions_update',
@@ -136,6 +136,19 @@ const granularPermissions: Array<ManifestGranularUserPermission> = [
 			schemaType: 'ElementPermissionPresentationModel',
 			label: '#user_permissionsGranular',
 			description: '{#userPermissions_granular_element}',
+		},
+	},
+	{
+		type: 'userGranularPermission',
+		alias: 'Umb.UserGranularPermission.ElementFolder',
+		name: 'Element Folder Granular User Permission',
+		weight: 900,
+		forEntityTypes: [UMB_ELEMENT_FOLDER_ENTITY_TYPE],
+		element: () => import('./input-element-folder-granular-user-permission.element.js'),
+		meta: {
+			schemaType: 'ElementPermissionPresentationModel',
+			label: '#user_permissionsGranular',
+			description: '{#userPermissions_granular_elementFolder}',
 		},
 	},
 ];
