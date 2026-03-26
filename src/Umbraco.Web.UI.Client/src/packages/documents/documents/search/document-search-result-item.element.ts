@@ -79,7 +79,7 @@ export class UmbDocumentSearchResultItemElement extends UmbLitElement {
 					a.variants.find((v) => v.culture === this._currentCulture) ??
 					a.variants.find((v) => v.culture === this._defaultCulture) ??
 					a.variants[0];
-				return variant?.name ?? '';
+				return variant?.name ?? '(Untitled)';
 			})
 			.join(' / ');
 	}

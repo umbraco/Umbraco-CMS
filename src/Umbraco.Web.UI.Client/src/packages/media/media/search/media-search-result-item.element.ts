@@ -21,7 +21,10 @@ export class UmbMediaSearchResultItemElement extends UmbLitElement {
 				${this.item.name}
 				${when(
 					this.item.ancestors?.length,
-					() => html`<small class="ancestors">${this.item?.ancestors!.map((a) => a.name).join(' / ')}</small>`,
+					() =>
+						html`<small class="ancestors"
+							>${this.item?.ancestors?.map((a) => a.name || '(Untitled)').join(' / ')}</small
+						>`,
 				)}
 			</span>
 			<div class="extra">
