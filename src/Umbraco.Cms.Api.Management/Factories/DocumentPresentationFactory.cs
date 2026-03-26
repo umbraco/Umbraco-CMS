@@ -1,4 +1,3 @@
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
@@ -6,7 +5,6 @@ using Umbraco.Cms.Api.Management.ViewModels.Document.Item;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentBlueprint.Item;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentPublishing;
@@ -29,12 +27,12 @@ internal sealed class DocumentPresentationFactory
     /// <summary>
     /// Initializes a new instance of the <see cref="DocumentPresentationFactory"/> class.
     /// </summary>
-    /// <param name="umbracoMapper">The <see cref="IUmbracoMapper"/> instance used for mapping between models.</param>
-    /// <param name="templateService">The <see cref="ITemplateService"/> instance used for resolving templates.</param>
-    /// <param name="publicAccessService">The <see cref="IPublicAccessService"/> instance used for determining public access protection.</param>
-    /// <param name="timeProvider">The <see cref="TimeProvider"/> instance used for time-based validation.</param>
-    /// <param name="idKeyMap">The <see cref="IIdKeyMap"/> instance used for mapping between IDs and keys.</param>
-    /// <param name="flagProviderCollection">The <see cref="FlagProviderCollection"/> instance used for determining flags to populate on response models.</param>
+    /// <param name="umbracoMapper">The mapper used to map between Umbraco models.</param>
+    /// <param name="templateService">Service for managing and retrieving templates.</param>
+    /// <param name="publicAccessService">Service for handling public access and permissions.</param>
+    /// <param name="timeProvider">Provider for obtaining the current time.</param>
+    /// <param name="idKeyMap">Service for mapping between IDs and keys.</param>
+    /// <param name="flagProviderCollection">Collection of providers for document flags.</param>
     public DocumentPresentationFactory(
         IUmbracoMapper umbracoMapper,
         ITemplateService templateService,

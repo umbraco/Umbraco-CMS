@@ -14,6 +14,13 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 internal sealed class ServerRegistrationRepository : EntityRepositoryBase<int, IServerRegistration>,
     IServerRegistrationRepository
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ServerRegistrationRepository"/> class, responsible for managing server registration data in the database.
+    /// </summary>
+    /// <param name="scopeAccessor">Provides access to the current database scope for repository operations.</param>
+    /// <param name="logger">The logger used for logging repository-related events and errors.</param>
+    /// <param name="repositoryCacheVersionService">Service for managing cache versioning of repository data.</param>
+    /// <param name="cacheSyncService">Service for synchronizing cache across distributed servers.</param>
     public ServerRegistrationRepository(
         IScopeAccessor scopeAccessor,
         ILogger<ServerRegistrationRepository> logger,
@@ -28,8 +35,15 @@ internal sealed class ServerRegistrationRepository : EntityRepositoryBase<int, I
     {
     }
 
+    /// <summary>
+    /// Clears the cache used by the server registration repository.
+    /// </summary>
     public void ClearCache() => CachePolicy.ClearAll();
 
+    /// <summary>
+    /// Deactivates all server registrations that have not accessed the system within the specified timeout period.
+    /// </summary>
+    /// <param name="staleTimeout">The duration after which a server is considered stale and will be deactivated.</param>
     public void DeactiveStaleServers(TimeSpan staleTimeout)
     {
         DateTime timeoutDate = DateTime.UtcNow.Subtract(staleTimeout);

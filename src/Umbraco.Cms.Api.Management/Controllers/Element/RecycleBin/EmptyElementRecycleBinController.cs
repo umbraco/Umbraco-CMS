@@ -14,6 +14,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Element.RecycleBin;
 
+/// <summary>
+/// API controller responsible for emptying the element recycle bin in the Umbraco CMS.
+/// </summary>
 [ApiVersion("1.0")]
 public class EmptyElementRecycleBinController : ElementRecycleBinControllerBase
 {
@@ -21,6 +24,14 @@ public class EmptyElementRecycleBinController : ElementRecycleBinControllerBase
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly IElementContainerService _elementContainerService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="EmptyElementRecycleBinController"/> class.
+    /// </summary>
+    /// <param name="authorizationService">Service used to authorize recycle bin operations.</param>
+    /// <param name="entityService">Service for retrieving entity data.</param>
+    /// <param name="backOfficeSecurityAccessor">Accessor for back office security context.</param>
+    /// <param name="elementContainerService">Service for managing element containers.</param>
+    /// <param name="elementPresentationFactory">Factory responsible for creating element presentation models.</param>
     public EmptyElementRecycleBinController(
         IAuthorizationService authorizationService,
         IEntityService entityService,
@@ -34,6 +45,11 @@ public class EmptyElementRecycleBinController : ElementRecycleBinControllerBase
         _elementContainerService = elementContainerService;
     }
 
+    /// <summary>
+    /// Permanently deletes all elements in the recycle bin.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <returns>An <see cref="IActionResult"/> indicating the outcome of the operation.</returns>
     [HttpDelete]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]

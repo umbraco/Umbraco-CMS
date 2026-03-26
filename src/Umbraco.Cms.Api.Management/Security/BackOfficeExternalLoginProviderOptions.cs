@@ -5,6 +5,11 @@ namespace Umbraco.Cms.Api.Management.Security;
 /// </summary>
 public class BackOfficeExternalLoginProviderOptions
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="BackOfficeExternalLoginProviderOptions"/> class.
+    /// </summary>
+    /// <param name="autoLinkOptions">Options for automatically linking external sign-in accounts. Defaults to <c>null</c>.</param>
+    /// <param name="denyLocalLogin">If set to <c>true</c>, local login is denied. Defaults to <c>false</c>.</param>
     public BackOfficeExternalLoginProviderOptions(
         ExternalSignInAutoLinkOptions? autoLinkOptions = null,
         bool denyLocalLogin = false)
@@ -13,6 +18,9 @@ public class BackOfficeExternalLoginProviderOptions
         DenyLocalLogin = denyLocalLogin;
     }
 
+    /// <summary>
+    /// Initializes a new instance of <see cref="BackOfficeExternalLoginProviderOptions"/>.
+    /// </summary>
     public BackOfficeExternalLoginProviderOptions()
     {
     }

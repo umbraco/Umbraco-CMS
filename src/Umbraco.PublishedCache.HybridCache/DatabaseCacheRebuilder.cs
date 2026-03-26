@@ -57,11 +57,6 @@ internal sealed class DatabaseCacheRebuilder : IDatabaseCacheRebuilder
         => (await _longRunningOperationService.GetByTypeAsync(RebuildOperationName, 0, 0)).Total != 0;
 
     /// <inheritdoc/>
-    [Obsolete("Use RebuildAsync instead. Scheduled for removal in Umbraco 18.")]
-    public void Rebuild(bool useBackgroundThread) =>
-        RebuildAsync(useBackgroundThread).GetAwaiter().GetResult();
-
-    /// <inheritdoc/>
     public async Task<Attempt<DatabaseCacheRebuildResult>> RebuildAsync(bool useBackgroundThread)
     {
         Attempt<Guid, LongRunningOperationEnqueueStatus> attempt = await _longRunningOperationService.RunAsync(
@@ -82,10 +77,6 @@ internal sealed class DatabaseCacheRebuilder : IDatabaseCacheRebuilder
                 $"Unexpected status {attempt.Status} when trying to enqueue the database cache rebuild operation."),
         };
     }
-
-    /// <inheritdoc/>
-    public void RebuildDatabaseCacheIfSerializerChanged() =>
-        RebuildDatabaseCacheIfSerializerChangedAsync().GetAwaiter().GetResult();
 
     /// <inheritdoc/>
     public async Task RebuildDatabaseCacheIfSerializerChangedAsync()

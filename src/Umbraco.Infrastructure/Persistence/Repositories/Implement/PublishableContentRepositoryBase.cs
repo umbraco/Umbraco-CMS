@@ -37,6 +37,9 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
     private readonly AppCaches _appCaches;
     private readonly IContentTypeRepository _contentTypeRepository;
 
+    /// <summary>
+    /// Gets the cache key used for caching the recycle bin status.
+    /// </summary>
     protected abstract string RecycleBinCacheKey { get; }
 
     protected PublishableContentRepositoryBase(
@@ -185,8 +188,23 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
         return base.ApplySystemOrdering(ref sql, ordering);
     }
 
+    /// <summary>
+    /// Builds an entity of type <typeparamref name="TEntity"/> from the specified DTO and content type.
+    /// </summary>
+    /// <param name="entityDto">The data transfer object containing the persisted entity data.</param>
+    /// <param name="contentType">The content type that defines the structure and properties of the entity, or <c>null</c> if not available.</param>
+    /// <returns>An entity instance populated from the provided DTO.</returns>
     protected abstract TEntity BuildEntity(TEntityDto entityDto, IContentType? contentType);
 
+    /// <summary>
+    /// Allows derived repositories to add additional temporary content mappings during bulk content loading.
+    /// </summary>
+    /// <param name="dtos">The list of entity DTOs being mapped.</param>
+    /// <param name="temps">The list of temporary content items being built.</param>
+    /// <param name="withCache">Whether to use cached items when available.</param>
+    /// <param name="propertyAliases">Optional property aliases to filter which properties are loaded.</param>
+    /// <param name="loadTemplates">Whether to load template associations.</param>
+    /// <param name="loadVariants">Whether to load culture variation data.</param>
     protected virtual void AddAdditionalTempContentMapping(
         List<TEntityDto> dtos,
         List<TempContent<TEntity>> temps,
@@ -197,10 +215,24 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
     {
     }
 
+    /// <summary>
+    /// Allows derived repositories to add additional mappings to a content entity after initial construction from a DTO.
+    /// </summary>
+    /// <param name="dto">The data transfer object containing the persisted entity data.</param>
+    /// <param name="content">The entity instance being populated.</param>
     protected virtual void AddAdditionalContentMapping(TEntityDto dto, TEntity content)
     {
     }
 
+    /// <summary>
+    /// Maps a list of entity DTOs to fully populated content entities, optionally using cached items.
+    /// </summary>
+    /// <param name="dtos">The list of entity DTOs to map.</param>
+    /// <param name="withCache">Whether to use cached items when available.</param>
+    /// <param name="propertyAliases">Optional property aliases to filter which properties are loaded.</param>
+    /// <param name="loadTemplates">Whether to load template associations.</param>
+    /// <param name="loadVariants">Whether to load culture variation data.</param>
+    /// <returns>An enumerable of fully populated content entities.</returns>
     protected IEnumerable<TEntity> MapDtosToContent(
         List<TEntityDto> dtos,
         bool withCache = false,
@@ -308,6 +340,11 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
         return content;
     }
 
+    /// <summary>
+    /// Maps a single entity DTO to a fully populated content entity, including properties and culture variations.
+    /// </summary>
+    /// <param name="dto">The data transfer object to map.</param>
+    /// <returns>A fully populated content entity.</returns>
     protected TEntity MapDtoToContent(TEntityDto dto)
     {
         IContentType? contentType = _contentTypeRepository.Get(dto.ContentDto.ContentTypeId);
@@ -349,6 +386,12 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
         }
     }
 
+    /// <summary>
+    /// Sets culture variation information (names, dates, edited status) on a content entity from the provided variation data.
+    /// </summary>
+    /// <param name="content">The content entity to update with variation data.</param>
+    /// <param name="contentVariations">A dictionary mapping version IDs to their content culture variations (name, date per culture).</param>
+    /// <param name="entityVariations">A dictionary mapping entity IDs to their entity culture variations (edited status per culture).</param>
     protected void SetVariations(
         TEntity? content,
         IDictionary<int, List<ContentVariation>> contentVariations,
@@ -381,6 +424,12 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
         }
     }
 
+    /// <summary>
+    /// Retrieves content version culture variations (name and date per culture) for the specified temporary content items.
+    /// </summary>
+    /// <typeparam name="T">The type of content base entity.</typeparam>
+    /// <param name="temps">The temporary content items whose variations should be retrieved.</param>
+    /// <returns>A dictionary mapping version IDs to their list of content culture variations.</returns>
     protected IDictionary<int, List<ContentVariation>> GetContentVariations<T>(List<TempContent<T>> temps)
         where T : class, IContentBase
     {
@@ -429,6 +478,12 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
         return variations;
     }
 
+    /// <summary>
+    /// Retrieves entity-level culture variations (edited status per culture) for the specified temporary content items.
+    /// </summary>
+    /// <typeparam name="T">The type of content base entity.</typeparam>
+    /// <param name="temps">The temporary content items whose entity variations should be retrieved.</param>
+    /// <returns>A dictionary mapping entity IDs to their list of entity culture variations.</returns>
     protected IDictionary<int, List<EntityVariation>> GetEntityVariations<T>(List<TempContent<T>> temps)
         where T : class, IContentBase
     {
@@ -539,16 +594,40 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
         }
     }
 
+    /// <summary>
+    /// Represents a content version's culture variation, containing the culture name and date for a specific version.
+    /// </summary>
     protected sealed class ContentVariation
     {
+        /// <summary>
+        /// Gets or sets the culture identifier (e.g., "en-US") associated with this content variation.
+        /// </summary>
         public string? Culture { get; set; }
+
+        /// <summary>
+        /// Gets or sets the display name associated with this content variation.
+        /// </summary>
         public string? Name { get; set; }
+
+        /// <summary>
+        /// Gets or sets the date and time of this content variation.
+        /// </summary>
         public DateTime Date { get; set; }
     }
 
+    /// <summary>
+    /// Represents an entity-level culture variation, indicating whether a specific culture has been edited.
+    /// </summary>
     protected sealed class EntityVariation
     {
+        /// <summary>
+        /// Gets or sets the culture identifier (e.g., "en-US") associated with this entity variation.
+        /// </summary>
         public string? Culture { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this culture variation has been edited.
+        /// </summary>
         public bool Edited { get; set; }
     }
 
@@ -612,17 +691,28 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
         return MapDtosToContent(Database.Fetch<TEntityDto>(sql));
     }
 
+    /// <summary>
+    /// Adds default ordering (by level, then sort order) to a query-by-query SQL statement.
+    /// </summary>
+    /// <param name="sql">The SQL statement to append ordering to.</param>
     protected void AddGetByQueryOrderBy(Sql<ISqlContext> sql) =>
         sql
             .OrderBy<NodeDto>(x => x.Level)
             .OrderBy<NodeDto>(x => x.SortOrder);
 
+    /// <inheritdoc />
     protected override Sql<ISqlContext> GetBaseQuery(QueryType queryType) => GetBaseQuery(queryType, true);
 
     private string VariantNameSqlExpression
         => SqlContext.VisitDto<ContentVersionCultureVariationDto, NodeDto>((ccv, node) => ccv.Name ?? node.Text, "ccv")
             .Sql;
 
+    /// <summary>
+    /// Builds the base SQL query for retrieving publishable content entities.
+    /// </summary>
+    /// <param name="queryType">The type of query (Count, Ids, Single, or Many).</param>
+    /// <param name="current">When <c>true</c>, restricts the query to the current (latest) content version.</param>
+    /// <returns>The base SQL query.</returns>
     protected Sql<ISqlContext> GetBaseQuery(QueryType queryType, bool current)
     {
         Sql<ISqlContext> sql = SqlContext.Sql();
@@ -738,6 +828,11 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
         return list;
     }
 
+    /// <summary>
+    /// Gets the entity-specific SQL DELETE clauses used when deleting a content entity.
+    /// These are combined with common delete clauses in <see cref="GetDeleteClauses"/>.
+    /// </summary>
+    /// <returns>An enumerable of SQL DELETE statements specific to the entity type.</returns>
     protected abstract IEnumerable<string> GetEntityDeleteClauses();
 
     #endregion
@@ -1382,8 +1477,17 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
         base.PersistDeletedItem(entity);
     }
 
+    /// <summary>
+    /// Builds a data transfer object from the specified content entity for persistence.
+    /// </summary>
+    /// <param name="entity">The content entity to convert to a DTO.</param>
+    /// <returns>The data transfer object representing the entity.</returns>
     protected abstract TEntityDto BuildEntityDto(TEntity entity);
 
+    /// <summary>
+    /// Called when the unit of work has been refreshed for the specified entity, allowing derived repositories to publish refresh notifications.
+    /// </summary>
+    /// <param name="entity">The entity that was refreshed.</param>
     protected abstract void OnUowRefreshedEntity(TEntity entity);
 
     #endregion
@@ -1493,6 +1597,10 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
 
     #region Recycle Bin
 
+    /// <summary>
+    /// Determines whether the recycle bin contains any items.
+    /// </summary>
+    /// <returns><c>true</c> if the recycle bin contains at least one item; otherwise, <c>false</c>.</returns>
     public bool RecycleBinSmells()
     {
         IAppPolicyCache cache = _appCaches.RuntimeCache;
@@ -1699,12 +1807,22 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
         return sql;
     }
 
+    /// <summary>
+    /// Determines whether any content items have a scheduled expiration on or before the specified date.
+    /// </summary>
+    /// <param name="date">The date to check against scheduled expirations.</param>
+    /// <returns><c>true</c> if any content is scheduled for expiration; otherwise, <c>false</c>.</returns>
     public bool HasContentForExpiration(DateTime date)
     {
         Sql sql = GetSqlForHasScheduling(ContentScheduleAction.Expire, date);
         return Database.ExecuteScalar<int>(sql) > 0;
     }
 
+    /// <summary>
+    /// Determines whether any content items have a scheduled release on or before the specified date.
+    /// </summary>
+    /// <param name="date">The date to check against scheduled releases.</param>
+    /// <returns><c>true</c> if any content is scheduled for release; otherwise, <c>false</c>.</returns>
     public bool HasContentForRelease(DateTime date)
     {
         Sql sql = GetSqlForHasScheduling(ContentScheduleAction.Release, date);
@@ -1890,10 +2008,11 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
                 continue;
             }
 
-            // get a unique name
-            IEnumerable<SimilarNodeName> otherNames =
-                cultureNames.Select(x => new SimilarNodeName { Id = x.Id, Name = x.Name });
-            var uniqueName = SimilarNodeName.GetUniqueName(otherNames, 0, cultureInfo.Name);
+            // get a unique name (literal duplicates first, then subclass-specific checks)
+            List<SimilarNodeName> otherNames =
+                cultureNames.Select(x => new SimilarNodeName { Id = x.Id, Name = x.Name }).ToList();
+            var uniqueName = SimilarNodeName.GetUniqueName(otherNames, content.Id, cultureInfo.Name);
+            uniqueName = EnsureUniqueVariantName(uniqueName, content.Id, otherNames, cultureInfo.Culture);
 
             if (uniqueName == content.GetCultureName(cultureInfo.Culture))
             {
@@ -1911,6 +2030,13 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
             }
         }
     }
+
+    /// <summary>
+    /// Called during variant name uniqueness to allow subclasses to apply additional uniqueness checks
+    /// (e.g. URL segment collision detection). The default implementation returns the name unchanged.
+    /// </summary>
+    private protected virtual string? EnsureUniqueVariantName(
+        string? nodeName, int nodeId, List<SimilarNodeName> siblings, string culture) => nodeName;
 
     // ReSharper disable once ClassNeverInstantiated.Local
     private sealed class CultureNodeName

@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Api.Management.Mapping.ContentType;
+using Umbraco.Cms.Api.Management.Mapping.ContentType;
 using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.MediaType;
 using Umbraco.Cms.Core.Mapping;
@@ -8,8 +8,16 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Mapping.MediaType;
 
+/// <summary>
+/// Provides mapping configuration for media types in the Umbraco CMS Management API.
+/// </summary>
 public class MediaTypeMapDefinition : ContentTypeMapDefinition<IMediaType, MediaTypePropertyTypeResponseModel, MediaTypePropertyTypeContainerResponseModel>, IMapDefinition
 {
+    /// <summary>
+    /// Configures the object-object mappings for media type-related models in the Umbraco CMS API.
+    /// This includes mappings between <see cref="IMediaType"/>, <see cref="IMediaEntitySlim"/>, <see cref="IContentEntitySlim"/>, <see cref="ISimpleContentType"/>, and their corresponding response models.
+    /// </summary>
+    /// <param name="mapper">The <see cref="IUmbracoMapper"/> instance used to define the mappings.</param>
     public void DefineMaps(IUmbracoMapper mapper)
     {
         mapper.Define<IMediaType, MediaTypeResponseModel>((_, _) => new MediaTypeResponseModel(), Map);

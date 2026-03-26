@@ -1,16 +1,24 @@
-﻿using NPoco;
+using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Scoping;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_17_0_0;
 
+/// <summary>
+/// Represents a migration that adds GUID columns to audit entries in the database to improve identification and tracking of records.
+/// </summary>
 public class AddGuidsToAuditEntries : UnscopedMigrationBase
 {
     private const string NewPerformingUserKeyColumnName = "performingUserKey";
     private const string NewAffectedUserKeyColumnName = "affectedUserKey";
     private readonly IScopeProvider _scopeProvider;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AddGuidsToAuditEntries"/> class.
+    /// </summary>
+    /// <param name="context">The <see cref="IMigrationContext"/> for the migration.</param>
+    /// <param name="scopeProvider">The <see cref="IScopeProvider"/> used to manage database scopes.</param>
     public AddGuidsToAuditEntries(IMigrationContext context, IScopeProvider scopeProvider)
         : base(context)
     {

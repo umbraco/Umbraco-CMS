@@ -17,27 +17,6 @@ public class RichTextBlockLayoutItem : BlockLayoutItemBase
     /// <summary>
     ///     Initializes a new instance of the <see cref="RichTextBlockLayoutItem" /> class.
     /// </summary>
-    /// <param name="contentUdi">The content UDI.</param>
-    [Obsolete("Use constructor that accepts GUIDs instead. Scheduled for removal in Umbraco 18.")]
-    public RichTextBlockLayoutItem(Udi contentUdi)
-        : base(contentUdi)
-    {
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="RichTextBlockLayoutItem" /> class.
-    /// </summary>
-    /// <param name="contentUdi">The content UDI.</param>
-    /// <param name="settingsUdi">The settings UDI.</param>
-    [Obsolete("Use constructor that accepts GUIDs instead. Scheduled for removal in Umbraco 18.")]
-    public RichTextBlockLayoutItem(Udi contentUdi, Udi settingsUdi)
-        : base(contentUdi, settingsUdi)
-    {
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="RichTextBlockLayoutItem" /> class.
-    /// </summary>
     /// <param name="contentKey">The content key.</param>
     public RichTextBlockLayoutItem(Guid contentKey)
         : base(contentKey)

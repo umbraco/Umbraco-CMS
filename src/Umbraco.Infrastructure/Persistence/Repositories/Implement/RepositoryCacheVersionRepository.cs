@@ -11,6 +11,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 /// <inheritdoc cref="IRepositoryCacheVersionRepository" />
 internal class RepositoryCacheVersionRepository : RepositoryBase, IRepositoryCacheVersionRepository
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="RepositoryCacheVersionRepository"/> class.
+    /// </summary>
+    /// <param name="scopeAccessor">Provides access to the current database scope for repository operations.</param>
+    /// <param name="appCaches">The application-level caches used for caching repository data.</param>
     public RepositoryCacheVersionRepository(IScopeAccessor scopeAccessor, AppCaches appCaches)
         : base(scopeAccessor, appCaches)
     {
@@ -34,6 +39,10 @@ internal class RepositoryCacheVersionRepository : RepositoryBase, IRepositoryCac
         return new RepositoryCacheVersion { Identifier = identifier, Version = version };
     }
 
+    /// <summary>
+    /// Asynchronously retrieves all <see cref="RepositoryCacheVersion"/> instances from the database.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation, containing an enumerable of <see cref="RepositoryCacheVersion"/>.</returns>
     public async Task<IEnumerable<RepositoryCacheVersion>> GetAllAsync()
     {
         Sql<ISqlContext> query = Sql()

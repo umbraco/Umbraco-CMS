@@ -11,6 +11,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Mappers;
 [MapperFor(typeof(Relation))]
 public sealed class RelationMapper : BaseMapper
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="RelationMapper"/> class.
+    /// </summary>
+    /// <param name="sqlContext">A lazy-loaded SQL context used for database operations.</param>
+    /// <param name="maps">The configuration store containing mapper definitions.</param>
     public RelationMapper(Lazy<ISqlContext> sqlContext, MapperConfigurationStore maps)
         : base(sqlContext, maps)
     {

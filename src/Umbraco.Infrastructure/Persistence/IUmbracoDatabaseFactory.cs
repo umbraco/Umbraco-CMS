@@ -65,11 +65,13 @@ public interface IUmbracoDatabaseFactory : IDisposable
     ///     <para>The new database must be disposed after being used.</para>
     ///     <para>Creating a database causes the factory to initialize if it is not already initialized.</para>
     /// </remarks>
+    /// <returns>A new instance of <see cref="IUmbracoDatabase"/>.</returns>
     IUmbracoDatabase CreateDatabase();
 
     /// <summary>
-    ///     Configures the database factory.
+    ///     Configures the database factory using the specified connection strings.
     /// </summary>
+    /// <param name="umbracoConnectionString">The <see cref="ConnectionStrings"/> instance containing the database connection information.</param>
     void Configure(ConnectionStrings umbracoConnectionString);
 
     /// <summary>

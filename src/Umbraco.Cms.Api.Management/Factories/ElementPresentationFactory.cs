@@ -21,9 +21,9 @@ internal sealed class ElementPresentationFactory
     /// <summary>
     /// Initializes a new instance of the <see cref="ElementPresentationFactory"/> class.
     /// </summary>
-    /// <param name="umbracoMapper">The <see cref="IUmbracoMapper"/> instance used for mapping between models.</param>
-    /// <param name="idKeyMap">The <see cref="IIdKeyMap"/> instance used for mapping between IDs and keys.</param>
-    /// <param name="flagProviderCollection">The <see cref="FlagProviderCollection"/> instance used for determining flags to populate on response models.</param>
+    /// <param name="umbracoMapper">The mapper used to map between Umbraco models.</param>
+    /// <param name="idKeyMap">Service for mapping between IDs and keys.</param>
+    /// <param name="flagProviderCollection">Collection of providers for document flags.</param>
     public ElementPresentationFactory(
         IUmbracoMapper umbracoMapper,
         IIdKeyMap idKeyMap,
