@@ -1190,6 +1190,7 @@ export type IndexResponseModel = {
     providerProperties?: {
         [key: string]: unknown;
     } | null;
+    uniqueKeyFieldName?: string | null;
 };
 
 export type InstallRequestModel = {
