@@ -84,16 +84,21 @@ export class UmbElementCreateOptionsModalElement extends UmbModalBaseElement<
 		this._submitModal();
 	}
 
-	async #onClick(
-		event: Event,
-		controller: UmbExtensionApiInitializer<ManifestEntityCreateOptionAction>,
-		href?: string,
-	) {
-		if (href) return;
-		event.stopPropagation();
+	async #onCreateOptionSelect(controller: UmbExtensionApiInitializer<ManifestEntityCreateOptionAction>, href?: string) {
+		if (href) {
+			history.pushState(null, '', href);
+			this._submitModal();
+			return;
+		}
+
 		if (!controller.api) throw new Error('No API found');
-		await controller.api.execute().catch(() => {});
-		this._submitModal();
+
+		try {
+			await controller.api.execute();
+			this._submitModal();
+		} catch {
+			// Keep the modal open on failure so the user can retry or choose another option.
+		}
 	}
 
 	override render() {
@@ -156,7 +161,7 @@ export class UmbElementCreateOptionsModalElement extends UmbModalBaseElement<
 						.name=${manifest.meta.additionalOptions ? label + '...' : label}
 						select-only
 						selectable
-						@selected=${(event: Event) => this.#onClick(event, controller, href)}>
+						@selected=${() => this.#onCreateOptionSelect(controller, href)}>
 						<umb-icon slot="icon" name=${manifest.meta.icon}></umb-icon>
 					</uui-ref-node-document-type>
 				`;
