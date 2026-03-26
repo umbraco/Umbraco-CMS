@@ -36,7 +36,7 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 
 		if (this.data?.width) this._width = this.data.width;
 		if (this.data?.height) this._height = this.data.height;
-		if (this.data?.constrain) this._constrain = this.data.constrain;
+		if (this.data?.constrain !== undefined) this._constrain = this.data.constrain;
 
 		if (this._width && this._height) {
 			this.#ratio = this._width / this._height;
@@ -152,7 +152,7 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 									type="number"
 									label=${this.localize.term('general_width')}
 									placeholder=${this.localize.term('general_width')}
-									min="0"
+									min="1"
 									.value=${this._width.toString()}
 									@input=${this.#onWidthInput}
 									?disabled=${isDisabled}>
@@ -175,7 +175,7 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 									type="number"
 									label=${this.localize.term('general_height')}
 									placeholder=${this.localize.term('general_height')}
-									min="0"
+									min="1"
 									.value=${this._height.toString()}
 									@input=${this.#onHeightInput}
 									?disabled=${isDisabled}>

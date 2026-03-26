@@ -46,25 +46,29 @@ export class UmbMediaCaptionAltTextModalElement extends UmbModalBaseElement<
 
 		// Auto-populate dimensions from natural image size if not already set
 		if (url && !this.value.width) {
-			const dims = await imageSize(url);
-			this.#naturalRatio = dims.naturalWidth / dims.naturalHeight;
+			try {
+				const dims = await imageSize(url);
+				this.#naturalRatio = dims.naturalWidth / dims.naturalHeight;
 
-			let width = dims.naturalWidth;
-			let height = dims.naturalHeight;
+				let width = dims.naturalWidth;
+				let height = dims.naturalHeight;
 
-			// Cap to maxImageSize proportionally
-			const maxSize = this.data?.maxImageSize;
-			if (maxSize && (width > maxSize || height > maxSize)) {
-				const ratio = Math.min(maxSize / width, maxSize / height);
-				width = Math.round(width * ratio);
-				height = Math.round(height * ratio);
+				// Cap to maxImageSize proportionally
+				const maxSize = this.data?.maxImageSize;
+				if (maxSize && (width > maxSize || height > maxSize)) {
+					const ratio = Math.min(maxSize / width, maxSize / height);
+					width = Math.round(width * ratio);
+					height = Math.round(height * ratio);
+				}
+
+				this.value = {
+					...this.value,
+					width,
+					height,
+				};
+			} catch {
+				// If image dimensions cannot be resolved, leave width/height unset.
 			}
-
-			this.value = {
-				...this.value,
-				width,
-				height,
-			};
 		} else if (this.value.width && this.value.height) {
 			this.#naturalRatio = this.value.width / this.value.height;
 		}
@@ -96,6 +100,11 @@ export class UmbMediaCaptionAltTextModalElement extends UmbModalBaseElement<
 
 	#onToggleAspectLock() {
 		this._aspectLocked = !this._aspectLocked;
+
+		// Update ratio when locking, based on current dimensions
+		if (this._aspectLocked && this.value?.width && this.value?.height) {
+			this.#naturalRatio = this.value.width / this.value.height;
+		}
 	}
 
 	override render() {
@@ -126,7 +135,7 @@ export class UmbMediaCaptionAltTextModalElement extends UmbModalBaseElement<
 								type="number"
 								label=${this.localize.term('general_width')}
 								placeholder=${this.localize.term('general_width')}
-								min="0"
+								min="1"
 								.value=${this.value?.width?.toString() ?? ''}
 								@input=${this.#onWidthInput}>
 								<span class="extra" slot="append">px</span>
@@ -147,7 +156,7 @@ export class UmbMediaCaptionAltTextModalElement extends UmbModalBaseElement<
 								type="number"
 								label=${this.localize.term('general_height')}
 								placeholder=${this.localize.term('general_height')}
-								min="0"
+								min="1"
 								.value=${this.value?.height?.toString() ?? ''}
 								@input=${this.#onHeightInput}>
 								<span class="extra" slot="append">px</span>
