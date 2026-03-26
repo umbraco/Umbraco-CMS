@@ -25,6 +25,7 @@ export class UmbDocumentSearchServerDataSource
 	}
 
 	async #fetchAncestors(ids: Array<string>) {
+		if (!ids.length) return new Map();
 		const { data } = await tryExecute(this.#host, DocumentService.getItemDocumentAncestors({ query: { id: ids } }));
 
 		const ancestorsByItemId = new Map<string, Array<{ variants: Array<{ name: string; culture: string | null }> }>>();

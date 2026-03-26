@@ -25,6 +25,7 @@ export class UmbMediaSearchServerDataSource
 	}
 
 	async #fetchAncestors(ids: Array<string>) {
+		if (!ids.length) return new Map();
 		const { data } = await tryExecute(this.#host, MediaService.getItemMediaAncestors({ query: { id: ids } }));
 
 		const ancestorsByItemId = new Map<string, Array<{ name: string }>>();
