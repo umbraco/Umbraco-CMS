@@ -122,7 +122,7 @@ internal sealed class DocumentVersionRepositoryTest : UmbracoIntegrationTest
 
             // Backdate version 1 to 10 days ago, leave version 2 at today.
             db.Execute(
-                $"UPDATE {syntax.GetQuotedTableName("umbracoContentVersion")} SET {syntax.GetQuotedColumnName("versionDate")} = @0 WHERE id = 1",
+                $"UPDATE {syntax.GetQuotedTableName("umbracoContentVersion")} SET {syntax.GetQuotedColumnName("versionDate")} = @0 WHERE {syntax.GetQuotedColumnName("id")} = 1",
                 DateTime.UtcNow.AddDays(-10));
 
             var sut = new DocumentVersionRepository(ScopeAccessor);
@@ -163,7 +163,7 @@ internal sealed class DocumentVersionRepositoryTest : UmbracoIntegrationTest
 
             // Backdate all historic versions so they pass the date filter.
             db.Execute(
-                $"UPDATE {syntax.GetQuotedTableName("umbracoContentVersion")} SET {syntax.GetQuotedColumnName("versionDate")} = @0 WHERE id IN (1, 2, 3)",
+                $"UPDATE {syntax.GetQuotedTableName("umbracoContentVersion")} SET {syntax.GetQuotedColumnName("versionDate")} = @0 WHERE {syntax.GetQuotedColumnName("id")} IN (1, 2, 3)",
                 DateTime.UtcNow.AddDays(-10));
 
             var sut = new DocumentVersionRepository(ScopeAccessor);
