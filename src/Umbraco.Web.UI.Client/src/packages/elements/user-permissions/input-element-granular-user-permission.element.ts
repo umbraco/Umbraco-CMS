@@ -11,7 +11,6 @@ import { UMB_ENTITY_USER_PERMISSION_MODAL } from '@umbraco-cms/backoffice/user-p
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import type { ManifestEntityUserPermission } from '@umbraco-cms/backoffice/user-permission';
-import type { UmbDeselectedEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-input-element-granular-user-permission')
@@ -88,9 +87,8 @@ export class UmbInputElementGranularUserPermissionElement extends UUIFormControl
 			},
 		});
 
-		this.#elementPickerModalContext?.addEventListener(UmbSelectedEvent.TYPE, async (event: UmbDeselectedEvent) => {
-			const selectedEvent = event as UmbSelectedEvent;
-			const unique = selectedEvent.unique;
+		this.#elementPickerModalContext?.addEventListener(UmbSelectedEvent.TYPE, async (event: UmbSelectedEvent) => {
+			const unique = event.unique;
 			if (!unique) return;
 
 			const elementItem = await this.#requestElementItem(unique);
