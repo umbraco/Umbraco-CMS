@@ -177,82 +177,23 @@ export const manifest: UmbExtensionManifestKind = {
 - Kinds can extend other kinds by spreading their manifest: `manifest: { ...UMB_ENTITY_ACTION_DEFAULT_KIND_MANIFEST.manifest, kind: 'delete', ... }`.
 - **Changing a kind affects all extensions that use it.** Treat kind implementations (element, api, meta shape) as a shared contract — changes have a wide blast radius across packages.
 
-### Context API
+### Context API, Observable State & Controllers
 
-Framework-agnostic, DOM-event-based dependency injection. Contexts flow down the DOM tree.
+These core primitives are documented in detail in **[Core Primitives](./core-primitives.md)**. In brief:
 
-- **Provider**: `this.provideContext(TOKEN, instance)` on a parent element
-- **Consumer**: `this.consumeContext(TOKEN, callback)` on any descendant
-- **Context Token** (`UmbContextToken<T>`): Typed identifier for type safety
-- **Scoping**: Global (notifications, current user), workspace-scoped, section-scoped
-
-```typescript
-export const MY_CONTEXT = new UmbContextToken<MyContext>('MyContext');
-this.provideContext(MY_CONTEXT, new MyContext(this));        // provider
-this.consumeContext(MY_CONTEXT, (ctx) => { /* typed */ });   // consumer
-```
-
-### Observable State Management
-
-State is managed via `UmbStringState`, `UmbNumberState`, `UmbArrayState`, `UmbObjectState`. These wrap values as observables. Elements use `this.observe()` (from `UmbLitElement`/`UmbElementMixin`) to subscribe and trigger re-renders.
-
-```typescript
-#counter = new UmbNumberState(0);
-readonly counter = this.#counter.asObservable();
-increment() { this.#counter.setValue(this.#counter.value + 1); }
-```
+- **Context API** — DOM-event-based dependency injection. Providers expose typed contexts to descendant elements via `provideContext()`, consumers access them via `consumeContext()` or `getContext()`.
+- **Observable State** — Reactive state containers (`UmbStringState`, `UmbArrayState`, `UmbObjectState`, etc.). Elements subscribe via `this.observe()` which handles lifecycle automatically.
+- **Controllers** — `UmbControllerBase` for logic not tied to rendering. Attach to a host element and participate in its lifecycle.
 
 **Important**: Avoid using RxJS operators (`map`, `filter`, `combineLatest`, `switchMap`) directly. Use UmbState classes and `observe()` — they handle subscription lifecycle automatically. RxJS is an implementation detail.
 
 ### Repository Pattern & Data Flow
 
-No element or context should call the Management API directly. All data flows through repositories.
+No element or context should call the Management API directly. All data flows through repositories:
 
-`Element` <- observes <- `State` <- writes to <- `Context` <- calls <- `Repository` <- delegates to <- `Data Source`
+`Element` → observes → `Context` → calls → `Repository` → delegates to → `Data Source` → calls → `Generated API Client`
 
-1. **Data Source** - Raw transport (wraps generated OpenAPI client)
-2. **Repository** - Domain interface (`getItems()`, `create()`, `save()`, `delete()`); the decoupling boundary
-3. **Context** - Calls repository, writes results into State, manages lifecycle
-4. **State** - Observable state classes exposing `.asObservable()`
-5. **Element** - Uses `this.observe()` to subscribe; never calls repositories directly
-
-```typescript
-// Data Source
-class MyServerDataSource {
-  async getItems() { return await MyService.getItems(); }
-}
-
-// Repository
-class MyRepository {
-  #source = new MyServerDataSource();
-  async requestItems() { return this.#source.getItems(); }
-}
-
-// Context — calls repository, writes to state
-class MyContext extends UmbContextBase {
-  #repo = new MyRepository();
-  #items = new UmbArrayState<MyItem>([], (x) => x.id);
-  readonly items = this.#items.asObservable();
-
-  async load() { this.#items.setValue(await this.#repo.requestItems()); }
-}
-
-// Element — observes state
-@customElement('umb-my-feature')
-class MyElement extends UmbLitElement {
-  #ctx = new MyContext(this);
-  @state() private _items: MyItem[] = [];
-
-  constructor() {
-    super();
-    this.observe(this.#ctx.items, (items) => { this._items = items; });
-  }
-}
-```
-
-### Controller System
-
-`UmbControllerBase` for logic not tied to rendering. Controllers attach to a host element and participate in its lifecycle — used for consuming contexts, managing subscriptions, and encapsulating business logic.
+See **[Data Flow](./data-flow.md)** for the complete implementation pattern with base classes, `tryExecute()`, and a worked example.
 
 ---
 
