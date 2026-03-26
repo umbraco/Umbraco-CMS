@@ -1,8 +1,8 @@
-import { UmbElementFolderItemRepository } from '../folder/repository/item/element-folder-item.repository.js';
-import { UMB_ELEMENT_PICKER_MODAL } from '../modals/element-picker-modal.token.js';
-import type { UmbElementFolderItemModel } from '../folder/repository/item/types.js';
-import type { UmbElementTreeItemModel } from '../tree/types.js';
-import type { UmbElementUserPermissionModel } from './types.js';
+import { UmbElementFolderItemRepository } from '../repository/item/element-folder-item.repository.js';
+import { UMB_ELEMENT_PICKER_MODAL } from '../../modals/element-picker-modal.token.js';
+import type { UmbElementFolderItemModel } from '../repository/item/types.js';
+import type { UmbElementTreeItemModel } from '../../tree/types.js';
+import type { UmbElementUserPermissionModel } from '../../user-permissions/types.js';
 import { css, customElement, html, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -186,7 +186,7 @@ export class UmbInputElementFolderGranularUserPermissionElement extends UUIFormC
 
 	#renderRef(item: UmbElementFolderItemModel) {
 		if (!item.unique) return;
-		const permissionNames = this.#getPermissionNamesForFolder(item.unique);
+		const permissionNames = this.#getPermissionNamesForFolder(item);
 
 		return html`
 			<uui-ref-node .name=${item.name} .detail=${permissionNames || ''}>
@@ -221,13 +221,16 @@ export class UmbInputElementFolderGranularUserPermissionElement extends UUIFormC
 		return this.#permissions?.find((permission) => permission.element.id === unique);
 	}
 
-	#getPermissionNamesForFolder(unique: string) {
-		const permission = this.#getPermissionForFolder(unique);
+	#getPermissionNamesForFolder(item: UmbElementFolderItemModel) {
+		const permission = this.#getPermissionForFolder(item.unique);
 		if (!permission) return;
 
 		return umbExtensionsRegistry
-			.getByTypeAndFilter('entityUserPermission', (manifest) =>
-				manifest.meta.verbs.every((verb) => permission.verbs.includes(verb)),
+			.getByTypeAndFilter(
+				'entityUserPermission',
+				(manifest) =>
+					manifest.forEntityTypes.includes(item.entityType) &&
+					manifest.meta.verbs.every((verb) => permission.verbs.includes(verb)),
 			)
 			.map((m) => {
 				const manifest = m as ManifestEntityUserPermission;

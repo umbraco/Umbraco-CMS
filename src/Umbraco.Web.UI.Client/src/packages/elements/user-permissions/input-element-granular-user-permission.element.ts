@@ -189,7 +189,7 @@ export class UmbInputElementGranularUserPermissionElement extends UUIFormControl
 		if (!item.unique) return;
 		// TODO: get correct variant name
 		const name = item.variants[0]?.name;
-		const permissionNames = this.#getPermissionNamesForElement(item.unique);
+		const permissionNames = this.#getPermissionNamesForElement(item);
 
 		return html`
 			<uui-ref-node .name=${name} .detail=${permissionNames || ''}>
@@ -229,13 +229,16 @@ export class UmbInputElementGranularUserPermissionElement extends UUIFormControl
 		return this.#permissions?.find((permission) => permission.element.id === unique);
 	}
 
-	#getPermissionNamesForElement(unique: string) {
-		const permission = this.#getPermissionForElement(unique);
+	#getPermissionNamesForElement(item: UmbElementItemModel) {
+		const permission = this.#getPermissionForElement(item.unique);
 		if (!permission) return;
 
 		return umbExtensionsRegistry
-			.getByTypeAndFilter('entityUserPermission', (manifest) =>
-				manifest.meta.verbs.every((verb) => permission.verbs.includes(verb)),
+			.getByTypeAndFilter(
+				'entityUserPermission',
+				(manifest) =>
+					manifest.forEntityTypes.includes(item.entityType) &&
+					manifest.meta.verbs.every((verb) => permission.verbs.includes(verb)),
 			)
 			.map((m) => {
 				const manifest = m as ManifestEntityUserPermission;
