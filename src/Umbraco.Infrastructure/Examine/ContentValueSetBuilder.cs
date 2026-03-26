@@ -102,7 +102,9 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
         {
             var isVariant = c.ContentType.VariesByCulture();
 
-            var urlValue = _documentUrlService.GetUrlSegment(c.Key, defaultCulture, false); // Always add invariant urlName
+            var urlValue = _documentUrlService.IsInitialized
+                ? _documentUrlService.GetUrlSegment(c.Key, defaultCulture, false)
+                : c.GetUrlSegment(_shortStringHelper, _urlSegmentProviders, defaultCulture); // Fallback when DocumentUrlService is not yet initialized (e.g. during upgrade)
             var values = new Dictionary<string, IEnumerable<object?>>
             {
                 { "icon", c.ContentType.Icon?.Yield() ?? Enumerable.Empty<string>() },
@@ -146,7 +148,9 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
 
                 foreach (var culture in c.AvailableCultures)
                 {
-                    var variantUrl = c.GetUrlSegment(_shortStringHelper, _urlSegmentProviders, culture);
+                    var variantUrl = _documentUrlService.IsInitialized
+                        ? _documentUrlService.GetUrlSegment(c.Key, culture, false)
+                        : c.GetUrlSegment(_shortStringHelper, _urlSegmentProviders, culture);
                     var lowerCulture = culture.ToLowerInvariant();
                     values[$"urlName_{lowerCulture}"] = variantUrl?.Yield() ?? Enumerable.Empty<string>();
                     values[$"nodeName_{lowerCulture}"] = (PublishedValuesOnly
