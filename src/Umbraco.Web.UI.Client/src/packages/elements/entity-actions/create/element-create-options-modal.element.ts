@@ -1,17 +1,15 @@
-import type { UmbElementEntityTypeUnion } from '../../entity.js';
+import { UmbElementTypeStructureRepository } from '../../repository/structure/index.js';
 import { UMB_CREATE_ELEMENT_WORKSPACE_PATH_PATTERN } from '../../paths.js';
-import {
-	UmbElementTypeStructureRepository,
-	type UmbAllowedElementTypeModel,
-} from '../../repository/structure/index.js';
+import type { UmbAllowedElementTypeModel } from '../../repository/structure/index.js';
+import type { UmbElementEntityTypeUnion } from '../../entity.js';
 import type {
 	UmbElementCreateOptionsModalData,
 	UmbElementCreateOptionsModalValue,
 } from './element-create-options-modal.token.js';
-import { html, nothing, customElement, state, repeat, when } from '@umbraco-cms/backoffice/external/lit';
-import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
+import { customElement, html, nothing, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbExtensionsApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { ManifestEntityCreateOptionAction } from '@umbraco-cms/backoffice/entity-create-option-action';
 import type { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
@@ -24,7 +22,7 @@ export class UmbElementCreateOptionsModalElement extends UmbModalBaseElement<
 	#elementTypeStructureRepository = new UmbElementTypeStructureRepository(this);
 
 	@state()
-	private _allowedElementTypes: UmbAllowedElementTypeModel[] = [];
+	private _allowedElementTypes: Array<UmbAllowedElementTypeModel> = [];
 
 	@state()
 	private _createOptionControllers: Array<UmbExtensionApiInitializer<ManifestEntityCreateOptionAction>> = [];
@@ -120,7 +118,7 @@ export class UmbElementCreateOptionsModalElement extends UmbModalBaseElement<
 			<umb-localize key="create_noElementTypes">
 				There are no allowed Element Types available for creating elements here. You must enable these in
 				<strong>Document Types</strong> within the <strong>Settings</strong> section, by editing the
-				<strong>Allow at library root</strong> under <strong>Permissions</strong>.
+				<strong>Allow in Library</strong> under <strong>Structure</strong>.
 			</umb-localize>
 		`;
 	}

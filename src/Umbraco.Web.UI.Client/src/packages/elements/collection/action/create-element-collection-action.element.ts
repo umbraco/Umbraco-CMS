@@ -1,23 +1,22 @@
-import { UMB_ELEMENT_ROOT_ENTITY_TYPE, type UmbElementEntityTypeUnion } from '../../entity.js';
+import { UmbElementTypeStructureRepository } from '../../repository/structure/index.js';
 import { UMB_CREATE_ELEMENT_WORKSPACE_PATH_PATTERN } from '../../paths.js';
-import {
-	UmbElementTypeStructureRepository,
-	type UmbAllowedElementTypeModel,
-} from '../../repository/structure/index.js';
+import { UMB_ELEMENT_ROOT_ENTITY_TYPE } from '../../entity.js';
+import type { UmbAllowedElementTypeModel } from '../../repository/structure/index.js';
+import type { UmbElementEntityTypeUnion } from '../../entity.js';
 import {
 	css,
-	html,
 	customElement,
+	html,
 	ifDefined,
-	property,
-	state,
 	map,
 	nothing,
+	property,
+	state,
 } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
 import { UmbExtensionsApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
 import type { ManifestCollectionAction } from '@umbraco-cms/backoffice/collection';
 import type { ManifestEntityCreateOptionAction } from '@umbraco-cms/backoffice/entity-create-option-action';
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
