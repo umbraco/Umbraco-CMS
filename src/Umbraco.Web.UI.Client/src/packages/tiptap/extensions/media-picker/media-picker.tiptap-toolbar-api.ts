@@ -52,6 +52,8 @@ export default class UmbTiptapToolbarMediaPickerToolbarExtensionApi extends UmbT
 				currentTarget = figureData.imageAttrs;
 				currentMediaUdi = this.#extractMediaUdi(currentTarget);
 				currentCaption = figureData.caption;
+				// Select the figure so insertContent replaces it instead of inserting at cursor
+				editor.commands.setNodeSelection(figureData.pos);
 			}
 		} else {
 			currentCaption = this.#extractCaption(editor.state.selection);
@@ -92,7 +94,9 @@ export default class UmbTiptapToolbarMediaPickerToolbarExtensionApi extends UmbT
 		return caption;
 	}
 
-	#extractFigureImageData(editor: Editor): { imageAttrs: Record<string, unknown>; caption?: string } | undefined {
+	#extractFigureImageData(
+		editor: Editor,
+	): { imageAttrs: Record<string, unknown>; caption?: string; pos: number } | undefined {
 		const { $from } = editor.state.selection;
 
 		for (let depth = $from.depth; depth >= 0; depth--) {
@@ -114,7 +118,7 @@ export default class UmbTiptapToolbarMediaPickerToolbarExtensionApi extends UmbT
 				});
 
 				if (imageAttrs['data-udi']) {
-					return { imageAttrs, caption };
+					return { imageAttrs, caption, pos: $from.before(depth) };
 				}
 			}
 		}
