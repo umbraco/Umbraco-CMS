@@ -124,9 +124,58 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 - **External packages**: `umbraco-package.json` (static).
 - **Runtime**: `umbExtensionsRegistry.register(manifest)` or `registerMany(manifests)`.
 
-**Conditions & Kinds:**
-- **Conditions**: Declarative rules for when an extension is active (e.g., section alias match).
-- **Kinds**: Preset manifest configurations that extensions inherit from (reduces boilerplate).
+**Conditions**: Declarative rules for when an extension is active (e.g., section alias match, user permission).
+
+### Kinds
+
+Kinds are **generic, reusable implementations of an extension type**. A kind provides a pre-built `element`, `api`, or both for a specific purpose. Extensions reference a kind to inherit its implementation, then customize behavior through `meta`.
+
+**How it works**: The registry merges kind defaults with the extension manifest. Extension properties override kind properties; `meta` is shallow-merged (extension meta extends/overrides kind meta).
+
+**Defining a kind** (in a `*.kind.ts` file):
+
+```typescript
+export const manifest: UmbExtensionManifestKind = {
+  type: 'kind',
+  alias: 'Umb.Kind.EntityAction.Delete',
+  matchKind: 'delete',
+  matchType: 'entityAction',
+  manifest: {
+    type: 'entityAction',
+    kind: 'delete',
+    api: () => import('./delete.action.js'),
+    meta: {
+      icon: 'icon-trash',
+      label: '#actions_delete',
+      itemRepositoryAlias: '',       // to be filled by each integration
+      detailRepositoryAlias: '',
+    },
+  },
+};
+```
+
+**Using a kind** — the extension only specifies what differs:
+
+```typescript
+{
+  type: 'entityAction',
+  kind: 'delete',                    // inherits element, api, icon, label from the kind
+  alias: 'Umb.EntityAction.DocumentType.Delete',
+  name: 'Delete Document-Type Entity Action',
+  forEntityTypes: [UMB_DOCUMENT_TYPE_ENTITY_TYPE],
+  meta: {                            // customize via meta
+    itemRepositoryAlias: UMB_DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS,
+    detailRepositoryAlias: UMB_DOCUMENT_TYPE_DETAIL_REPOSITORY_ALIAS,
+  },
+}
+```
+
+**Best practices:**
+- Kinds are for reusability — use them when multiple extensions share the same element/api implementation with only meta differences.
+- Any package (core or feature) can register kinds. Core provides common kinds (delete, moveTo, duplicate, default section, default workspace, etc.); feature packages can define domain-specific kinds.
+- Individual integrations customize behavior through `meta` — not by overriding `element` or `api` (unless replacing the implementation entirely).
+- Kinds can extend other kinds by spreading their manifest: `manifest: { ...UMB_ENTITY_ACTION_DEFAULT_KIND_MANIFEST.manifest, kind: 'delete', ... }`.
+- **Changing a kind affects all extensions that use it.** Treat kind implementations (element, api, meta shape) as a shared contract — changes have a wide blast radius across packages.
 
 ### Context API
 
