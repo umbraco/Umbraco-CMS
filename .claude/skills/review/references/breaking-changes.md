@@ -144,6 +144,8 @@ After finding obsolete patterns, verify:
 
 The backoffice is published as `@umbraco-cms/backoffice` with 140+ named exports. Plugin developers depend on this public API surface.
 
+**Critical frontend rule (does not apply to backend .NET where `public`/`protected` visibility determines the API surface): only symbols reachable through the `package.json` `exports` field are public API.** Anything not exported — whether classes, functions, constants, types, or entire files — is an internal implementation detail, even if other internal code imports it. Removing or changing unexported frontend symbols is not a breaking change. Before flagging a frontend deletion or rename as breaking, verify the symbol is reachable via `package.json` exports. If it is not, do not flag it.
+
 ### Custom Elements (Web Components)
 
 **Breaking changes:**
