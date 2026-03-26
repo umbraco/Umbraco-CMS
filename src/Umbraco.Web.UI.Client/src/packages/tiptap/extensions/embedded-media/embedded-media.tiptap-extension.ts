@@ -1,4 +1,5 @@
-import { mergeAttributes, Node } from '../../externals.js';
+import { mergeAttributes, Node, ProseMirrorPlugin } from '../../externals.js';
+import { UMB_TIPTAP_NODE_DBLCLICK_EVENT } from '../tiptap-node-dblclick.event.js';
 
 export interface UmbEmbeddedMediaOptions {
 	inline: boolean;
@@ -36,6 +37,23 @@ export const umbEmbeddedMedia = Node.create<UmbEmbeddedMediaOptions>({
 		const { markup, ...attrs } = HTMLAttributes;
 		const embed = document.createRange().createContextualFragment(markup);
 		return [this.options.inline ? 'span' : 'div', mergeAttributes({ class: 'umb-embed-holder' }, attrs), embed];
+	},
+
+	addProseMirrorPlugins() {
+		const name = this.name;
+		return [
+			new ProseMirrorPlugin({
+				props: {
+					handleDoubleClickOn: (view, _pos, node) => {
+						if (node.type.name === name) {
+							view.dom.dispatchEvent(new CustomEvent(UMB_TIPTAP_NODE_DBLCLICK_EVENT, { bubbles: true, composed: true }));
+							return true;
+						}
+						return false;
+					},
+				},
+			}),
+		];
 	},
 
 	addCommands() {

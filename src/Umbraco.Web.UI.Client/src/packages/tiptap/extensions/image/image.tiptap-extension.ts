@@ -1,4 +1,5 @@
-import { Image } from '../../externals.js';
+import { Image, ProseMirrorPlugin } from '../../externals.js';
+import { UMB_TIPTAP_NODE_DBLCLICK_EVENT } from '../tiptap-node-dblclick.event.js';
 
 export interface UmbImageAttributes {
 	src: string;
@@ -35,6 +36,24 @@ export const UmbImage = Image.extend({
 			'data-tmpimg': { default: null },
 			'data-udi': { default: null },
 		};
+	},
+
+	addProseMirrorPlugins() {
+		const name = this.name;
+		return [
+			...(this.parent?.() ?? []),
+			new ProseMirrorPlugin({
+				props: {
+					handleDoubleClickOn: (view, _pos, node) => {
+						if (node.type.name === name) {
+							view.dom.dispatchEvent(new CustomEvent(UMB_TIPTAP_NODE_DBLCLICK_EVENT, { bubbles: true, composed: true }));
+							return true;
+						}
+						return false;
+					},
+				},
+			}),
+		];
 	},
 });
 

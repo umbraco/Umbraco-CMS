@@ -1,4 +1,5 @@
 import type { Editor } from '../../externals.js';
+import type { UmbTiptapToolbarButtonElement } from './tiptap-toolbar-button.element.js';
 import type { UmbTiptapToolbarValue } from '../types.js';
 import { css, customElement, html, nothing, property, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { debounce } from '@umbraco-cms/backoffice/utils';
@@ -76,6 +77,20 @@ export class UmbTiptapToolbarElement extends UmbLitElement {
 
 		this.#extensionsController.apiProperties = { configuration: this.configuration };
 		this.#extensionsController.elementProperties = { editor: this.editor, configuration: this.configuration };
+	}
+
+	/**
+	 * Executes the toolbar action that is currently active (i.e. matches the current editor selection).
+	 * This is used by the editor component to trigger toolbar actions on double-click.
+	 */
+	executeActiveToolbarAction() {
+		for (const component of this.#lookup.values()) {
+			const button = component as UmbTiptapToolbarButtonElement;
+			if (button?.api?.isActive(this.editor)) {
+				button.api.execute(this.editor);
+				return;
+			}
+		}
 	}
 
 	override render() {

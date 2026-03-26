@@ -1,4 +1,5 @@
-import { mergeAttributes, Node } from '../../externals.js';
+import { mergeAttributes, Node, ProseMirrorPlugin } from '../../externals.js';
+import { UMB_TIPTAP_NODE_DBLCLICK_EVENT } from '../tiptap-node-dblclick.event.js';
 
 export interface UmbTiptapFigureOptions {
 	/**
@@ -48,5 +49,22 @@ export const Figure = Node.create<UmbTiptapFigureOptions>({
 
 	renderHTML({ HTMLAttributes }) {
 		return [this.name, mergeAttributes(this.options.HTMLAttributes, HTMLAttributes), 0];
+	},
+
+	addProseMirrorPlugins() {
+		const name = this.name;
+		return [
+			new ProseMirrorPlugin({
+				props: {
+					handleDoubleClickOn: (view, _pos, node) => {
+						if (node.type.name === name) {
+							view.dom.dispatchEvent(new CustomEvent(UMB_TIPTAP_NODE_DBLCLICK_EVENT, { bubbles: true, composed: true }));
+							return true;
+						}
+						return false;
+					},
+				},
+			}),
+		];
 	},
 });
