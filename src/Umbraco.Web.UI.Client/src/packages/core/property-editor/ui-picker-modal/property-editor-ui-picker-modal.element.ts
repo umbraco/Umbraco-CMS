@@ -57,9 +57,10 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbModalBaseElement<
 	}
 
 	#resolveGroupName(group: string): string {
-		if (group.includes('#')) {
+		if (group.startsWith('#')) {
 			return this.localize.string(group);
 		}
+
 		// Backward compatibility: external packages may still register camelCase group names.
 		return fromCamelCaseIfCamelCase(group);
 	}
