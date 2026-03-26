@@ -25,8 +25,13 @@ export class UmbDocumentSearchServerDataSource
 	}
 
 	async #fetchAncestors(ids: Array<string>) {
-		if (!ids.length) return new Map();
-		const { data } = await tryExecute(this.#host, DocumentService.getItemDocumentAncestors({ query: { id: ids } }));
+		if (!ids.length) return { data: new Map() };
+		const { data, error } = await tryExecute(
+			this.#host,
+			DocumentService.getItemDocumentAncestors({ query: { id: ids } }),
+		);
+
+		if (error) return { error };
 
 		const ancestorsByItemId = new Map<string, Array<{ variants: Array<{ name: string; culture: string | null }> }>>();
 		if (data) {
@@ -42,7 +47,7 @@ export class UmbDocumentSearchServerDataSource
 				);
 			}
 		}
-		return ancestorsByItemId;
+		return { data: ancestorsByItemId };
 	}
 
 	/**
@@ -70,7 +75,8 @@ export class UmbDocumentSearchServerDataSource
 
 		if (data) {
 			const ids = data.items.map((item) => item.id);
-			const ancestorsByItemId = await this.#fetchAncestors(ids);
+			const { data: ancestorsByItemId, error: ancestorsError } = await this.#fetchAncestors(ids);
+			if (ancestorsError) return { error: ancestorsError };
 
 			const mappedItems: Array<UmbDocumentSearchItemModel> = data.items.map((item) => {
 				return {

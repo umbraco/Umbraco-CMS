@@ -25,8 +25,10 @@ export class UmbMediaSearchServerDataSource
 	}
 
 	async #fetchAncestors(ids: Array<string>) {
-		if (!ids.length) return new Map();
-		const { data } = await tryExecute(this.#host, MediaService.getItemMediaAncestors({ query: { id: ids } }));
+		if (!ids.length) return { data: new Map() };
+		const { data, error } = await tryExecute(this.#host, MediaService.getItemMediaAncestors({ query: { id: ids } }));
+
+		if (error) return { error };
 
 		const ancestorsByItemId = new Map<string, Array<{ name: string }>>();
 		if (data) {
@@ -37,7 +39,7 @@ export class UmbMediaSearchServerDataSource
 				);
 			}
 		}
-		return ancestorsByItemId;
+		return { data: ancestorsByItemId };
 	}
 
 	/**
@@ -65,7 +67,8 @@ export class UmbMediaSearchServerDataSource
 
 		if (data) {
 			const ids = data.items.map((item) => item.id);
-			const ancestorsByItemId = await this.#fetchAncestors(ids);
+			const { data: ancestorsByItemId, error: ancestorsError } = await this.#fetchAncestors(ids);
+			if (ancestorsError) return { error: ancestorsError };
 
 			const mappedItems: Array<UmbMediaSearchItemModel> = data.items.map((item) => {
 				return {
