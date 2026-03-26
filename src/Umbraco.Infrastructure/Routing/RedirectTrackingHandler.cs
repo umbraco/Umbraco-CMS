@@ -54,7 +54,7 @@ public sealed class RedirectTrackingHandler :
     /// </summary>
     /// <param name="notification">The notification containing information about the moved content.</param>
     public void Handle(ContentMovingNotification notification) =>
-        StoreOldRoutes(notification.MoveInfoCollection.Select(m => m.Entity), notification);
+        StoreOldRoutes(notification.MoveInfoCollection.Select(m => m.Entity), notification, isMove: true);
 
     /// <summary>
     /// Handles a <see cref="ContentPublishedNotification"/> to track and manage redirects when content is published.
@@ -67,9 +67,9 @@ public sealed class RedirectTrackingHandler :
     /// </summary>
     /// <param name="notification">The content moved notification.</param>
     public void Handle(ContentPublishingNotification notification) =>
-        StoreOldRoutes(notification.PublishedEntities, notification);
+        StoreOldRoutes(notification.PublishedEntities, notification, isMove: false);
 
-    private void StoreOldRoutes(IEnumerable<IContent> entities, IStatefulNotification notification)
+    private void StoreOldRoutes(IEnumerable<IContent> entities, IStatefulNotification notification, bool isMove)
     {
         // Don't let the notification handlers kick in if redirect tracking is turned off in the config.
         if (_webRoutingSettings.CurrentValue.DisableRedirectUrlTracking)
@@ -80,7 +80,7 @@ public sealed class RedirectTrackingHandler :
         Dictionary<(int ContentId, string Culture), (Guid ContentKey, string OldRoute)> oldRoutes = GetOldRoutes(notification);
         foreach (IContent entity in entities)
         {
-            _redirectTracker.StoreOldRoute(entity, oldRoutes);
+            _redirectTracker.StoreOldRoute(entity, oldRoutes, isMove);
         }
     }
 

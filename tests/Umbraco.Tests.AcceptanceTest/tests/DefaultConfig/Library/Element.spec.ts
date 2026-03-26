@@ -148,7 +148,7 @@ test('can duplicate a element node to root', async ({umbracoApi, umbracoUi}) => 
   // Duplicate to root
   await umbracoUi.library.clickDuplicateToActionMenuOption();
   await umbracoUi.library.clickLabelWithName('Elements');
-  await umbracoUi.library.clickDuplicateButton();
+  await umbracoUi.library.clickCopyModalButton();
 
   // Assert
   await umbracoUi.library.doesSuccessNotificationHaveText(NotificationConstantHelper.success.duplicated);
@@ -176,7 +176,7 @@ test('can duplicate a element node to other parent', async ({umbracoApi, umbraco
   await umbracoUi.library.clickActionsMenuForElement(elementName);
   await umbracoUi.library.clickDuplicateToActionMenuOption();
   await umbracoUi.library.clickModalMenuItemWithName(elementFolderName);
-  await umbracoUi.library.clickDuplicateButton();
+  await umbracoUi.library.clickCopyModalButton();
 
   // Assert
   await umbracoUi.library.doesSuccessNotificationHaveText(NotificationConstantHelper.success.duplicated);
