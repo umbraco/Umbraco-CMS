@@ -647,7 +647,7 @@ public class DocumentUrlServiceTests
                 DocumentKey = documentKey,
                 IsDraft = false,
                 IsPrimary = true,
-                NullableLanguageId = null, // Invariant content
+                LanguageId = null, // Invariant content
                 UrlSegment = "invariant-page",
             },
         };
@@ -675,7 +675,7 @@ public class DocumentUrlServiceTests
                 DocumentKey = documentKey,
                 IsDraft = false,
                 IsPrimary = true,
-                NullableLanguageId = 1,
+                LanguageId = 1,
                 UrlSegment = "english-page",
             },
         };
@@ -704,7 +704,7 @@ public class DocumentUrlServiceTests
                 DocumentKey = documentKey,
                 IsDraft = false,
                 IsPrimary = true,
-                NullableLanguageId = null, // Stored as invariant
+                LanguageId = null, // Stored as invariant
                 UrlSegment = "invariant-page",
             },
         };
