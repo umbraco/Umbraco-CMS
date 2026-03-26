@@ -986,4 +986,98 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
 
         return new[] { parent, child1, child2, toddler1, toddler2, toddler3, toddler4, baby1, baby2 };
     }
+
+    [Test]
+    public void Get_By_Guid_Returns_Deep_Clone_Not_Cached_Instance()
+    {
+        var provider = ScopeProvider;
+        using (provider.CreateScope())
+        {
+            var repository = CreateRepository(provider);
+            var template = new Template(ShortStringHelper, "deepCloneTest", "deepCloneTest");
+            repository.Save(template);
+
+            var first = repository.Get(template.Key);
+            var second = repository.Get(template.Key);
+
+            Assert.IsNotNull(first);
+            Assert.IsNotNull(second);
+            Assert.AreEqual(first!.Id, second!.Id);
+            Assert.AreNotSame(first, second);
+        }
+    }
+
+    [Test]
+    public void Get_By_Alias_Returns_Correct_Template()
+    {
+        var provider = ScopeProvider;
+        using (provider.CreateScope())
+        {
+            var repository = CreateRepository(provider);
+            var template = new Template(ShortStringHelper, "aliasLookupTest", "aliasLookupTest");
+            repository.Save(template);
+
+            // Case-insensitive alias lookup.
+            var result = repository.Get("ALIASLOOKUPTEST");
+
+            Assert.IsNotNull(result);
+            Assert.AreEqual(template.Id, result!.Id);
+        }
+    }
+
+    [Test]
+    public void Get_By_Alias_Returns_Deep_Clone_Not_Cached_Instance()
+    {
+        var provider = ScopeProvider;
+        using (provider.CreateScope())
+        {
+            var repository = CreateRepository(provider);
+            var template = new Template(ShortStringHelper, "aliasCloneTest", "aliasCloneTest");
+            repository.Save(template);
+
+            var first = repository.Get("aliasCloneTest");
+            var second = repository.Get("aliasCloneTest");
+
+            Assert.IsNotNull(first);
+            Assert.IsNotNull(second);
+            Assert.AreEqual(first!.Id, second!.Id);
+            Assert.AreNotSame(first, second);
+        }
+    }
+
+    [Test]
+    public void Exists_By_Guid_Returns_Correct_Result()
+    {
+        var provider = ScopeProvider;
+        using (provider.CreateScope())
+        {
+            var repository = CreateRepository(provider);
+            var template = new Template(ShortStringHelper, "existsTest", "existsTest");
+            repository.Save(template);
+
+            Assert.IsTrue(repository.Exists(template.Key));
+            Assert.IsFalse(repository.Exists(Guid.NewGuid()));
+        }
+    }
+
+    [Test]
+    public void Get_By_Guid_Mutation_Does_Not_Affect_Subsequent_Get()
+    {
+        var provider = ScopeProvider;
+        using (provider.CreateScope())
+        {
+            var repository = CreateRepository(provider);
+            var template = new Template(ShortStringHelper, "mutationTest", "mutationTest");
+            repository.Save(template);
+
+            var first = repository.Get(template.Key);
+            Assert.IsNotNull(first);
+            var originalName = first!.Name;
+            first.Name = "MUTATED_" + Guid.NewGuid();
+
+            var second = repository.Get(template.Key);
+            Assert.IsNotNull(second);
+            Assert.AreEqual(originalName, second!.Name, "Mutation of a returned entity should not affect the cached copy");
+        }
+    }
 }

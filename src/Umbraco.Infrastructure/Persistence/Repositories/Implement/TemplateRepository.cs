@@ -105,17 +105,31 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
     }
 
     /// <summary>
+    /// Gets the cache policy as <see cref="FullDataSetRepositoryCachePolicy{TEntity, TId}"/> for predicate-based lookups.
+    /// Returns null when caching is disabled (e.g. <see cref="AppCaches.NoCache"/>).
+    /// </summary>
+    private FullDataSetRepositoryCachePolicy<ITemplate, int>? TypedCachePolicy
+        => CachePolicy as FullDataSetRepositoryCachePolicy<ITemplate, int>;
+
+    /// <summary>
     /// Gets the template with the specified unique identifier.
     /// </summary>
     /// <param name="key">The unique identifier of the template.</param>
     /// <returns>The template if found; otherwise, null.</returns>
-    /// <remarks>GUID-based lookups delegate to GetMany() which is served from FullDataSetRepositoryCachePolicy.</remarks>
-    public ITemplate? Get(Guid key) => GetMany().FirstOrDefault(x => x.Key == key);
+    public ITemplate? Get(Guid key)
+        => TypedCachePolicy?.FindCached(x => x.Key == key, PerformGetAll)
+           ?? GetMany().FirstOrDefault(x => x.Key == key);
 
     IEnumerable<ITemplate> IReadRepository<Guid, ITemplate>.GetMany(params Guid[]? keys)
     {
-        IEnumerable<ITemplate> all = GetMany();
-        return keys?.Length > 0 ? all.Where(x => keys.Contains(x.Key)).ToArray() : all;
+        if (keys?.Length > 0)
+        {
+            var keySet = keys.ToHashSet();
+            return TypedCachePolicy?.FindAllCached(x => keySet.Contains(x.Key), PerformGetAll)
+                   ?? GetMany().Where(x => keySet.Contains(x.Key)).ToArray();
+        }
+
+        return GetMany();
     }
 
     /// <summary>
@@ -123,7 +137,9 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
     /// </summary>
     /// <param name="id">The unique identifier of the template.</param>
     /// <returns>True if the template exists; otherwise, false.</returns>
-    public bool Exists(Guid id) => GetMany().Any(x => x.Key == id);
+    public bool Exists(Guid id)
+        => TypedCachePolicy?.ExistsCached(x => x.Key == id, PerformGetAll)
+           ?? GetMany().Any(x => x.Key == id);
 
     /// <summary>
     /// Saves the specified template entity to the repository.
@@ -432,13 +448,12 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
 
     #region Overrides of RepositoryBase<int,ITemplate>
 
+    // Note: PerformGet(int) is passed as a callback to the cache policy's Get(TId) method,
+    // but FullDataSetRepositoryCachePolicy.Get() never invokes it — it uses GetAllCached()
+    // internally and clones only the matched entity. This override exists only as a required
+    // implementation of the abstract base and as a fallback for non-FullDataSet policies.
     protected override ITemplate? PerformGet(int id)
-    {
-        //use the underlying GetAll which will force cache all templates
-        ITemplate? template = GetMany().FirstOrDefault(x => x.Id == id);
-
-        return template;
-    }
+        => GetMany().FirstOrDefault(x => x.Id == id);
 
     protected override IEnumerable<ITemplate> PerformGetAll(params int[]? ids)
     {
@@ -703,7 +718,16 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
     /// <summary>Retrieves a template by its alias.</summary>
     /// <param name="alias">The alias of the template to retrieve.</param>
     /// <returns>The template matching the specified alias, or null if not found.</returns>
-    public ITemplate? Get(string? alias) => GetAll(alias).FirstOrDefault();
+    public ITemplate? Get(string? alias)
+    {
+        if (alias is null)
+        {
+            return null;
+        }
+
+        return TypedCachePolicy?.FindCached(x => x.Alias.InvariantEquals(alias), PerformGetAll)
+               ?? GetMany().FirstOrDefault(x => x.Alias.InvariantEquals(alias));
+    }
 
     /// <summary>
     /// Retrieves all templates, or filters them by the specified aliases if provided.
@@ -712,16 +736,17 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
     /// <returns>An enumerable collection of <see cref="Umbraco.Cms.Core.Models.ITemplate"/> instances matching the specified aliases, or all templates if no aliases are given.</returns>
     public IEnumerable<ITemplate> GetAll(params string?[] aliases)
     {
-        //We must call the base (normal) GetAll method
-        // which is cached. This is a specialized method and unfortunately with the params[] it
+        // We must call the base (normal) GetAll method which is cached.
+        // This is a specialized method and unfortunately with the params[] it
         // overlaps with the normal GetAll method.
         if (aliases.Any() == false)
         {
             return GetMany();
         }
 
-        //return from base.GetAll, this is all cached
-        return GetMany().Where(x => aliases.WhereNotNull().InvariantContains(x.Alias));
+        var nonNullAliases = aliases.WhereNotNull().ToArray();
+        return TypedCachePolicy?.FindAllCached(x => nonNullAliases.InvariantContains(x.Alias), PerformGetAll)
+               ?? GetMany().Where(x => nonNullAliases.InvariantContains(x.Alias));
     }
 
     /// <summary>
@@ -731,7 +756,23 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
     /// <returns>An enumerable collection of child templates. If the specified master template does not exist, returns an empty collection.</returns>
     public IEnumerable<ITemplate> GetChildren(int masterTemplateId)
     {
-        //return from base.GetAll, this is all cached
+        if (TypedCachePolicy is { } policy)
+        {
+            if (masterTemplateId <= 0)
+            {
+                return policy.FindAllCached(x => x.MasterTemplateAlias.IsNullOrWhiteSpace(), PerformGetAll);
+            }
+
+            ITemplate? parent = policy.FindCached(x => x.Id == masterTemplateId, PerformGetAll);
+            if (parent == null)
+            {
+                return Enumerable.Empty<ITemplate>();
+            }
+
+            return policy.FindAllCached(x => x.MasterTemplateAlias.InvariantEquals(parent.Alias), PerformGetAll);
+        }
+
+        // Fallback when caching is disabled.
         ITemplate[] all = GetMany().ToArray();
 
         if (masterTemplateId <= 0)
@@ -739,14 +780,13 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
             return all.Where(x => x.MasterTemplateAlias.IsNullOrWhiteSpace());
         }
 
-        ITemplate? parent = all.FirstOrDefault(x => x.Id == masterTemplateId);
-        if (parent == null)
+        ITemplate? fallbackParent = all.FirstOrDefault(x => x.Id == masterTemplateId);
+        if (fallbackParent == null)
         {
             return Enumerable.Empty<ITemplate>();
         }
 
-        IEnumerable<ITemplate> children = all.Where(x => x.MasterTemplateAlias.InvariantEquals(parent.Alias));
-        return children;
+        return all.Where(x => x.MasterTemplateAlias.InvariantEquals(fallbackParent.Alias));
     }
 
     /// <summary>
