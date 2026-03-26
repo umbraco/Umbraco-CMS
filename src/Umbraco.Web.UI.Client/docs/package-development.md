@@ -101,65 +101,9 @@ This ensures TypeScript, the browser import map, and test configs all resolve th
 
 ## Localization
 
-No hardcoded UI-facing strings. All user-visible text must go through the localization system.
+No hardcoded UI-facing strings. All user-visible text must go through the localization system. Keys live in `src/assets/lang/en.ts`, grouped by feature area, referenced as `group_keyName` (e.g., `this.localize.term('actions_create')`).
 
-### In Elements
-
-`UmbLitElement` provides `this.localize` automatically:
-
-```typescript
-// Term lookup
-this.localize.term('general_submit')
-
-// In templates
-html`<uui-button label=${this.localize.term('actions_create')}></uui-button>`
-
-// Date formatting
-this.localize.date(someDate)
-```
-
-### In Controllers / Contexts
-
-Initialize a `UmbLocalizationController`:
-
-```typescript
-import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
-
-class MyContext extends UmbContextBase {
-  #localize = new UmbLocalizationController(this);
-
-  doSomething() {
-    const label = this.#localize.term('speechBubbles_onlineHeadline');
-  }
-}
-```
-
-### Adding Localization Keys
-
-Keys live in `src/assets/lang/en.ts` (and other language files). The file exports a nested object grouped by feature area:
-
-```typescript
-export default {
-  actions: { create: 'Create', copy: 'Duplicate', ... },
-  general: { submit: 'Submit', cancel: 'Cancel', ... },
-  myFeature: { areaHeadline: 'My Fancy Headline', ... },
-} satisfies UmbLocalizationDictionary;
-```
-
-**Key naming rules:**
-- Keys are grouped by feature (e.g., `actions`, `general`, `content`, `media`). Find an existing group that fits, or create a new one for your feature.
-- Key names describe **purpose**, not the translated text: `areaHeadline: 'My Fancy Headline'` — not `myFancyHeadline: 'My Fancy Headline'`.
-- Format: `group_keyName` when referenced as a flat string (e.g., `this.localize.term('actions_create')`).
-
-### Registering Localization Extensions
-
-Each language is registered as a `localization` manifest in `src/packages/core/localization/manifests.ts`:
-
-```typescript
-{ type: 'localization', alias: 'Umb.Localization.EN', meta: { culture: 'en' }, js: () => import('../../../assets/lang/en.js') }
-```
-
-External packages register their own localization manifests the same way.
+For step-by-step instructions on adding localization keys and using them in elements or controllers, use the `add-localization` skill.
 
 ---
 
@@ -172,6 +116,6 @@ External packages register their own localization manifests the same way.
 5. **Use element lazy loading** in manifests: `element: () => import('./path.js')`.
 6. **Use `@umbraco-ui/uui` components** for UI consistency (`<uui-box>`, `<uui-button>`, `<uui-input>`, etc.).
 7. **Declare custom manifest types** on `UmbExtensionManifestMap` so other packages can extend yours.
-8. **No hardcoded UI strings** — use the localization system. See [Localization](#localization) above.
+8. **No hardcoded UI strings** — use the localization system. See [Localization](#localization) above and the `add-localization` skill.
 9. **Element naming**: `umb-` prefix for core. Package developers use their own prefix.
 10. **Extension aliases**: Dot-separated namespace (`Umb.Section.Content`, `My.Dashboard.Analytics`).

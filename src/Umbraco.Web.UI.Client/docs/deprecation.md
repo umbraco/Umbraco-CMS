@@ -12,57 +12,14 @@ The `@umbraco-cms/backoffice` npm package, Extension Registry, Context tokens, e
 
 ---
 
-## How to Deprecate: Two Required Mechanisms
+## How to Deprecate
 
-Every deprecation must use **both**:
+Every deprecation must use **both** mechanisms:
 
-### 1. JSDoc `@deprecated` Tag
+1. **JSDoc `@deprecated` tag** — for IDE warnings and documentation
+2. **Runtime warning via `UmbDeprecation`** — console output so consumers are notified at runtime
 
-Always include: what, when deprecated, replacement, when removed.
-
-```typescript
-/**
- * @deprecated Deprecated since v16. Use `UmbAnalyticsItemRepository` instead. Will be removed in v18.
- */
-export class UmbAnalyticsLegacyRepository { /* ... */ }
-```
-
-Same pattern applies to methods, properties, constants, and types.
-
-### 2. Runtime Warning via `UmbDeprecation`
-
-Emit a console warning so consumers who miss the JSDoc annotation are still notified at runtime.
-
-```typescript
-import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
-
-/**
- * @deprecated Deprecated since v16. Use `requestSummary()` instead. Will be removed in v18.
- */
-getSummary() {
-  new UmbDeprecation({
-    deprecated: 'UmbAnalyticsDashboardContext.getSummary()',
-    deprecatedSinceVersion: '16.0.0',
-    removeInVersion: '18.0.0',
-    solution: 'Use requestSummary() instead.',
-  }).warn();
-
-  return this.requestSummary();
-}
-```
-
-For deprecated classes, place `UmbDeprecation` in the constructor so it fires on instantiation.
-
----
-
-## Checklist for Any Breaking Change
-
-1. **Introduce the replacement** alongside the old API.
-2. **Add `@deprecated` JSDoc** with migration instructions and removal version.
-3. **Add `UmbDeprecation` runtime warning**.
-4. **Keep the old code working** — ideally delegate to the new implementation internally.
-5. **Do not remove until 2 major versions later**.
-6. **Document in release changelog** when the removal happens.
+For step-by-step implementation instructions, use the `deprecate-api` skill.
 
 ---
 
