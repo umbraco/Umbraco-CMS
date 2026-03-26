@@ -40,7 +40,7 @@ export class MemberUiHelper extends UiBaseLocators {
     this.changePasswordBtn = page.getByLabel('Change password', {exact: true});
     this.membersMenu = page.locator('umb-menu').getByLabel('Members', {exact: true});
     this.infoTab = page.locator('uui-tab').filter({hasText: 'Info'}).locator('svg');
-    this.membersCreateBtn = page.locator('umb-create-member-collection-action').getByLabel('Create', {exact: true});
+    this.membersCreateBtn = page.locator('umb-create-member-collection-action').getByLabel(/^Create/);
     this.membersSidebar = page.getByTestId('section-sidebar:Umb.SectionSidebarApp.Menu.MemberManagement');
     this.membersSidebarBtn = this.membersSidebar.locator('uui-menu-item').filter({hasText: 'Members'});
     this.memberTableCollectionRow = page.locator('umb-member-table-collection-view').locator('uui-table-row');

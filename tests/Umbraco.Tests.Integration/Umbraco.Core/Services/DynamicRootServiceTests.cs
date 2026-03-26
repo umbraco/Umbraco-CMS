@@ -3,6 +3,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.DynamicRoot;
@@ -10,11 +11,12 @@ using Umbraco.Cms.Core.DynamicRoot.QuerySteps;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
+using Umbraco.Cms.Core.Models.ContentEditing;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
 /// <summary>
-///     Tests covering the DynamicRootService
+///     Tests covering the DynamicRootService resolution of dynamic roots for content pickers.
 /// </summary>
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
@@ -40,11 +42,11 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
 
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
-    private IFileService FileService => GetRequiredService<IFileService>();
+    private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
 
     private ContentService ContentService => (ContentService)GetRequiredService<IContentService>();
 
-    private DynamicRootService DynamicRootService => (GetRequiredService<IDynamicRootService>() as DynamicRootService)!;
+    private DynamicRootService DynamicRootService => (DynamicRootService)GetRequiredService<IDynamicRootService>();
 
     private IDomainService DomainService => GetRequiredService<IDomainService>();
 
@@ -80,9 +82,8 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
 
     private Content Trashed { get; set; }
 
-
     [SetUp]
-    public new void Setup()
+    public async Task SetupContentStructure()
     {
         // Root
         //    - Years (years)
@@ -99,42 +100,41 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
         //          - Acts
         //          - Stages
 
-        // NOTE Maybe not the best way to create/save test data as we are using the services, which are being tested.
         var template = TemplateBuilder.CreateTextPageTemplate();
-        FileService.SaveTemplate(template);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
 
         // DocTypes
         ContentTypeAct = ContentTypeBuilder.CreateSimpleContentType("act", "Act", defaultTemplateId: template.Id);
         ContentTypeAct.Key = new Guid("B3A50C84-5F6E-473A-A0B5-D41CBEC4EB36");
-        ContentTypeService.Save(ContentTypeAct);
+        await ContentTypeService.CreateAsync(ContentTypeAct, Constants.Security.SuperUserKey);
 
         ContentTypeStage = ContentTypeBuilder.CreateSimpleContentType("stage", "Stage", defaultTemplateId: template.Id);
         ContentTypeStage.Key = new Guid("C6DCDB3C-9D4B-4F91-9D1C-8C3B74AECA45");
-        ContentTypeService.Save(ContentTypeStage);
+        await ContentTypeService.CreateAsync(ContentTypeStage, Constants.Security.SuperUserKey);
 
         ContentTypeStages =
             ContentTypeBuilder.CreateSimpleContentType("stages", "Stages", defaultTemplateId: template.Id);
         ContentTypeStages.Key = new Guid("BFC4C6C1-51D0-4538-B818-042BEEA0461E");
-        ContentTypeStages.AllowedContentTypes = new[] { CreateContentTypeSort(ContentTypeStage, 0) };
-        ContentTypeService.Save(ContentTypeStages);
+        ContentTypeStages.AllowedContentTypes = [CreateContentTypeSort(ContentTypeStage, 0)];
+        await ContentTypeService.CreateAsync(ContentTypeStages, Constants.Security.SuperUserKey);
 
         ContentTypeActs = ContentTypeBuilder.CreateSimpleContentType("acts", "Acts", defaultTemplateId: template.Id);
         ContentTypeActs.Key = new Guid("110B6BC7-59E0-427D-B350-E488786788E7");
-        ContentTypeActs.AllowedContentTypes = new[] { CreateContentTypeSort(ContentTypeAct, 0) };
-        ContentTypeService.Save(ContentTypeActs);
+        ContentTypeActs.AllowedContentTypes = [CreateContentTypeSort(ContentTypeAct, 0)];
+        await ContentTypeService.CreateAsync(ContentTypeActs, Constants.Security.SuperUserKey);
 
         ContentTypeYear = ContentTypeBuilder.CreateSimpleContentType("year", "Year", defaultTemplateId: template.Id);
         ContentTypeYear.Key = new Guid("001E9029-6BF9-4A68-B11E-7730109E4E28");
-        ContentTypeYear.AllowedContentTypes = new[]
-        {
+        ContentTypeYear.AllowedContentTypes =
+        [
             CreateContentTypeSort(ContentTypeStages, 0), CreateContentTypeSort(ContentTypeActs, 1),
-        };
-        ContentTypeService.Save(ContentTypeYear);
+        ];
+        await ContentTypeService.CreateAsync(ContentTypeYear, Constants.Security.SuperUserKey);
 
         ContentTypeYears = ContentTypeBuilder.CreateSimpleContentType("years", "Years", defaultTemplateId: template.Id);
         ContentTypeYears.Key = new Guid("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522");
-        ContentTypeActs.AllowedContentTypes = new[] { CreateContentTypeSort(ContentTypeYear, 0) };
-        ContentTypeService.Save(ContentTypeYears);
+        ContentTypeYears.AllowedContentTypes = [CreateContentTypeSort(ContentTypeYear, 0)];
+        await ContentTypeService.CreateAsync(ContentTypeYears, Constants.Security.SuperUserKey);
 
         ContentYears = ContentBuilder.CreateSimpleContent(ContentTypeYears, "Years");
         ContentYears.Key = new Guid("CD3BBE28-D03F-422B-9DC6-A0E591543A8E");
@@ -177,9 +177,11 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
         ContentService.Save(Trashed, -1);
     }
 
-
+    /// <summary>
+    ///     Verifies that using "Current" origin with NearestAncestorOrSelf filtered to the item's own doc type returns the item itself.
+    /// </summary>
     [Test]
-    public async Task GetDynamicRoots__With_NearestAncestorOrSelf_and_filter_of_own_doc_type_should_return_self()
+    public async Task GetDynamicRootsAsync_NearestAncestorOrSelfFilterOfOwnDocType_ReturnsSelf()
     {
         // Arrange
         var startNodeSelector = new DynamicRootNodeQuery()
@@ -188,14 +190,14 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
             OriginKey = null,
             Context =
                 new DynamicRootContext() { CurrentKey = ContentAct2022RanD.Key, ParentKey = ContentActs2022.Key },
-            QuerySteps = new DynamicRootQueryStep[]
-            {
+            QuerySteps =
+            [
                 new DynamicRootQueryStep()
                 {
                     Alias = DynamicRootStepAlias.NearestAncestorOrSelf.ToString(),
-                    AnyOfDocTypeKeys = new[] { ContentAct2022RanD.ContentType.Key },
+                    AnyOfDocTypeKeys = [ContentAct2022RanD.ContentType.Key],
                 },
-            },
+            ],
         };
 
         // Act
@@ -209,8 +211,11 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
         });
     }
 
+    /// <summary>
+    ///     Verifies that NearestAncestorOrSelf from the "Root" origin returns empty when filtered to a doc type that doesn't appear above root.
+    /// </summary>
     [Test]
-    public async Task GetDynamicRoots__With_NearestAncestorOrSelf_and_origin_root_should_return_empty_list()
+    public async Task GetDynamicRootsAsync_NearestAncestorOrSelfWithOriginRoot_ReturnsEmptyList()
     {
         // Arrange
         var startNodeSelector = new DynamicRootNodeQuery()
@@ -219,14 +224,14 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
             OriginKey = null,
             Context =
                 new DynamicRootContext() { CurrentKey = ContentAct2022RanD.Key, ParentKey = ContentActs2022.Key },
-            QuerySteps = new DynamicRootQueryStep[]
-            {
+            QuerySteps =
+            [
                 new DynamicRootQueryStep()
                 {
                     Alias = DynamicRootStepAlias.NearestAncestorOrSelf.ToString(),
-                    AnyOfDocTypeKeys = new[] { ContentAct2022RanD.ContentType.Key },
+                    AnyOfDocTypeKeys = [ContentAct2022RanD.ContentType.Key],
                 },
-            },
+            ],
         };
 
         // Act
@@ -239,12 +244,14 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
         });
     }
 
+    /// <summary>
+    ///     Verifies that DescendantOrSelf steps return empty when filtered to a doc type that has no matching descendants.
+    /// </summary>
     [Test]
     [TestCase(DynamicRootStepAlias.NearestDescendantOrSelf)]
     [TestCase(DynamicRootStepAlias.FurthestDescendantOrSelf)]
-    public async Task
-        GetDynamicRoots__DescendantOrSelf_must_handle_when_there_is_not_found_any_and_level_becomes_impossible_to_get(
-            DynamicRootStepAlias dynamicRootAlias)
+    public async Task GetDynamicRootsAsync_DescendantOrSelfWithNoMatches_ReturnsEmptyList(
+        DynamicRootStepAlias dynamicRootAlias)
     {
         // Arrange
         var startNodeSelector = new DynamicRootNodeQuery()
@@ -255,13 +262,13 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
             {
                 CurrentKey = ContentAct2022RanD.Key, ParentKey = ContentActs2022.Key,
             },
-            QuerySteps = new DynamicRootQueryStep[]
-            {
+            QuerySteps =
+            [
                 new DynamicRootQueryStep()
                 {
-                    Alias = dynamicRootAlias.ToString(), AnyOfDocTypeKeys = new[] { Guid.NewGuid() }
+                    Alias = dynamicRootAlias.ToString(), AnyOfDocTypeKeys = [Guid.NewGuid()]
                 },
-            },
+            ],
         };
 
         // Act
@@ -274,18 +281,21 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
         });
     }
 
+    /// <summary>
+    ///     Verifies that NearestDescendantOrSelf returns only the shallowest matching descendant, not deeper ones.
+    /// </summary>
     [Test]
-    public async Task GetDynamicRoots__NearestDescendantOrSelf__has_to_find_only_the_nearest()
+    public async Task GetDynamicRootsAsync_NearestDescendantOrSelf_FindsOnlyNearest()
     {
         // Arrange
 
-        // Allow atc to add acts
+        // Allow act to add acts
         ContentTypeAct.AllowedContentTypes =
-            ContentTypeAct.AllowedContentTypes!.Union(new ContentTypeSort[]
-            {
+            ContentTypeAct.AllowedContentTypes!.Union(
+            [
                 CreateContentTypeSort(ContentTypeActs, 0),
-            });
-        ContentTypeService.Save(ContentTypeAct);
+            ]);
+        await ContentTypeService.UpdateAsync(ContentTypeAct, Constants.Security.SuperUserKey);
 
         var contentNewActs = ContentBuilder.CreateSimpleContent(ContentTypeActs, "new Acts", ContentAct2022RanD.Id);
         contentNewActs.Key = new Guid("EA309F8C-8F1A-4C19-9613-2F950CDDCB8D");
@@ -296,20 +306,19 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
         contentNewAct.Key = new Guid("7E14BA13-C998-46DE-92AE-8E1C18CCEE02");
         ContentService.Save(contentNewAct, -1);
 
-
         var startNodeSelector = new DynamicRootNodeQuery()
         {
             OriginAlias = DynamicRootOrigin.Root.ToString(),
             OriginKey = null,
             Context = new DynamicRootContext() { CurrentKey = contentNewAct.Key, ParentKey = contentNewActs.Key },
-            QuerySteps = new[]
-            {
+            QuerySteps =
+            [
                 new DynamicRootQueryStep()
                 {
                     Alias = DynamicRootStepAlias.NearestDescendantOrSelf.ToString(),
-                    AnyOfDocTypeKeys = new[] { ContentTypeActs.Key },
+                    AnyOfDocTypeKeys = [ContentTypeActs.Key],
                 },
-            },
+            ],
         };
 
         // Act
@@ -323,15 +332,18 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
         });
     }
 
+    /// <summary>
+    ///     Verifies that FurthestDescendantOrSelf returns only the deepest matching descendant, not shallower ones.
+    /// </summary>
     [Test]
-    public async Task GetDynamicRoots__FurthestDescendantOrSelf__has_to_find_only_the_furthest()
+    public async Task GetDynamicRootsAsync_FurthestDescendantOrSelf_FindsOnlyFurthest()
     {
         // Arrange
 
         // Allow act to add acts
         ContentTypeAct.AllowedContentTypes =
-            ContentTypeAct.AllowedContentTypes!.Union(new[] { CreateContentTypeSort(ContentTypeActs, 0) });
-        ContentTypeService.Save(ContentTypeAct);
+            ContentTypeAct.AllowedContentTypes!.Union([CreateContentTypeSort(ContentTypeActs, 0)]);
+        await ContentTypeService.UpdateAsync(ContentTypeAct, Constants.Security.SuperUserKey);
 
         var contentNewActs = ContentBuilder.CreateSimpleContent(ContentTypeActs, "new Acts", ContentAct2022RanD.Id);
         contentNewActs.Key = new Guid("EA309F8C-8F1A-4C19-9613-2F950CDDCB8D");
@@ -348,14 +360,14 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
             OriginAlias = DynamicRootOrigin.Root.ToString(),
             OriginKey = null,
             Context = new DynamicRootContext() { CurrentKey = contentNewAct.Key, ParentKey = contentNewActs.Key },
-            QuerySteps = new[]
-            {
+            QuerySteps =
+            [
                 new DynamicRootQueryStep()
                 {
                     Alias = DynamicRootStepAlias.FurthestDescendantOrSelf.ToString(),
-                    AnyOfDocTypeKeys = new[] { ContentTypeActs.Key },
+                    AnyOfDocTypeKeys = [ContentTypeActs.Key],
                 },
-            },
+            ],
         };
 
         // Act
@@ -369,8 +381,11 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
         });
     }
 
+    /// <summary>
+    ///     Verifies that chaining multiple query steps (ancestor then descendant) correctly navigates the tree to find the expected node.
+    /// </summary>
     [Test]
-    public async Task GetDynamicRoots__With_multiple_filters()
+    public async Task GetDynamicRootsAsync_MultipleQuerySteps_ReturnsExpectedNodes()
     {
         // Arrange
         var startNodeSelector = new DynamicRootNodeQuery()
@@ -379,19 +394,19 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
             OriginKey = null,
             Context =
                 new DynamicRootContext() { CurrentKey = ContentAct2022RanD.Key, ParentKey = ContentActs2022.Key },
-            QuerySteps = new[]
-            {
+            QuerySteps =
+            [
                 new DynamicRootQueryStep()
                 {
                     Alias = DynamicRootStepAlias.NearestAncestorOrSelf.ToString(),
-                    AnyOfDocTypeKeys = new[] { ContentTypeYear.Key },
+                    AnyOfDocTypeKeys = [ContentTypeYear.Key],
                 },
                 new DynamicRootQueryStep()
                 {
                     Alias = DynamicRootStepAlias.NearestDescendantOrSelf.ToString(),
-                    AnyOfDocTypeKeys = new[] { ContentTypeStages.Key },
+                    AnyOfDocTypeKeys = [ContentTypeStages.Key],
                 },
-            },
+            ],
         };
 
         // Act
@@ -405,8 +420,11 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
         });
     }
 
+    /// <summary>
+    ///     Verifies that NearestDescendantOrSelf filtered to the origin's own doc type returns the origin itself.
+    /// </summary>
     [Test]
-    public async Task GetDynamicRoots__With_NearestDescendantOrSelf_and_filter_of_own_doc_type_should_return_self()
+    public async Task GetDynamicRootsAsync_NearestDescendantOrSelfFilterOfOwnDocType_ReturnsSelf()
     {
         // Arrange
         var startNodeSelector = new DynamicRootNodeQuery()
@@ -414,14 +432,14 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
             OriginAlias = DynamicRootOrigin.Current.ToString(),
             OriginKey = null,
             Context = new DynamicRootContext() { CurrentKey = ContentYear2022.Key, ParentKey = ContentYears.Key },
-            QuerySteps = new DynamicRootQueryStep[]
-            {
+            QuerySteps =
+            [
                 new DynamicRootQueryStep()
                 {
                     Alias = DynamicRootStepAlias.NearestDescendantOrSelf.ToString(),
-                    AnyOfDocTypeKeys = new[] { ContentYear2022.ContentType.Key },
+                    AnyOfDocTypeKeys = [ContentYear2022.ContentType.Key],
                 },
-            },
+            ],
         };
 
         // Act
@@ -435,9 +453,11 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
         });
     }
 
-
+    /// <summary>
+    ///     Verifies that when no query steps are provided, the origin itself is returned as the root.
+    /// </summary>
     [Test]
-    public async Task GetDynamicRoots__With_no_filters_should_return_what_origin_finds()
+    public async Task GetDynamicRootsAsync_NoQuerySteps_ReturnsOrigin()
     {
         // Arrange
         var startNodeSelector = new DynamicRootNodeQuery()
@@ -459,9 +479,99 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
         });
     }
 
-
+    /// <summary>
+    ///     Verifies that chaining multiple query steps returns empty when the final step has no matching descendants.
+    /// </summary>
     [Test]
-    public void CalculateOriginKey__Parent_should_just_return_the_parent_key()
+    public async Task GetDynamicRootsAsync_MultipleQueryStepsWithNoResults_ReturnsEmptyList()
+    {
+        // Arrange
+        var startNodeSelector = new DynamicRootNodeQuery()
+        {
+            OriginAlias = DynamicRootOrigin.Current.ToString(),
+            OriginKey = null,
+            Context =
+                new DynamicRootContext() { CurrentKey = ContentAct2022RanD.Key, ParentKey = ContentActs2022.Key },
+            QuerySteps =
+            [
+                new DynamicRootQueryStep()
+                {
+                    Alias = DynamicRootStepAlias.NearestAncestorOrSelf.ToString(),
+                    AnyOfDocTypeKeys = [ContentTypeYear.Key],
+                },
+                new DynamicRootQueryStep()
+                {
+                    Alias = DynamicRootStepAlias.NearestDescendantOrSelf.ToString(),
+                    AnyOfDocTypeKeys = [ContentTypeStages.Key],
+                },
+                new DynamicRootQueryStep()
+                {
+                    Alias = DynamicRootStepAlias.NearestDescendantOrSelf.ToString(),
+                    AnyOfDocTypeKeys = [ContentTypeYears.Key],
+                },
+                new DynamicRootQueryStep()
+                {
+                    Alias = DynamicRootStepAlias.NearestDescendantOrSelf.ToString(),
+                    AnyOfDocTypeKeys = [ContentTypeYears.Key],
+                },
+            ],
+        };
+
+        // Act
+        var result = (await DynamicRootService.GetDynamicRootsAsync(startNodeSelector)).ToList();
+
+        // Assert
+        Assert.AreEqual(0, result.Count());
+    }
+
+    /// <summary>
+    ///     Verifies that "Current" origin with null CurrentKey and query steps resolves via the parent,
+    ///     matching the scenario from issue #22213 where a content picker with dynamic root fails for new unsaved content.
+    /// </summary>
+    [Test]
+    public async Task GetDynamicRootsAsync_CurrentOriginWithNullCurrentKeyAndQuerySteps_ResolvesViaParent()
+    {
+        // Arrange - simulates creating a new Act under Acts2022 (new content has no key yet)
+        var startNodeSelector = new DynamicRootNodeQuery()
+        {
+            OriginAlias = DynamicRootOrigin.Current.ToString(),
+            OriginKey = null,
+            Context = new DynamicRootContext()
+            {
+                CurrentKey = null,
+                ParentKey = ContentActs2022.Key,
+            },
+            QuerySteps =
+            [
+                new DynamicRootQueryStep()
+                {
+                    Alias = DynamicRootStepAlias.NearestAncestorOrSelf.ToString(),
+                    AnyOfDocTypeKeys = [ContentTypeYear.Key],
+                },
+                new DynamicRootQueryStep()
+                {
+                    Alias = DynamicRootStepAlias.NearestDescendantOrSelf.ToString(),
+                    AnyOfDocTypeKeys = [ContentTypeStages.Key],
+                },
+            ],
+        };
+
+        // Act
+        var result = (await DynamicRootService.GetDynamicRootsAsync(startNodeSelector)).ToList();
+
+        // Assert - should resolve the same as if editing existing content at the same tree position
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(1, result.Count());
+            CollectionAssert.Contains(result, ContentStages2022.Key);
+        });
+    }
+
+    /// <summary>
+    ///     Verifies that "Parent" origin returns the parent key from the context.
+    /// </summary>
+    [Test]
+    public void FindOriginKey_ParentOrigin_ReturnsParentKey()
     {
         // Arrange
         var selector = new DynamicRootNodeQuery()
@@ -478,8 +588,11 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
         Assert.AreEqual(selector.Context.ParentKey, result);
     }
 
+    /// <summary>
+    ///     Verifies that "Current" origin returns the current key when the content item exists in the database.
+    /// </summary>
     [Test]
-    public void CalculateOriginKey__Current_should_just_return_the_current_key_when_it_exists()
+    public void FindOriginKey_CurrentOriginWithExistingKey_ReturnsCurrentKey()
     {
         // Arrange
         var selector = new DynamicRootNodeQuery()
@@ -496,15 +609,19 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
         Assert.AreEqual(selector.Context.CurrentKey, result);
     }
 
+    /// <summary>
+    ///     Verifies that "Current" origin returns null when the current key points to a non-existent entity
+    ///     and the parent key also points to a non-existent entity.
+    /// </summary>
     [Test]
-    public void CalculateOriginKey__Current_should_just_return_null_when_it_does_not_exist()
+    public void FindOriginKey_CurrentOriginWithNonExistentKey_ReturnsNull()
     {
         // Arrange
         var selector = new DynamicRootNodeQuery()
         {
             OriginAlias = DynamicRootOrigin.Current.ToString(),
             OriginKey = null,
-            Context = new DynamicRootContext() { CurrentKey = Guid.NewGuid(), ParentKey = ContentYears.Key },
+            Context = new DynamicRootContext() { CurrentKey = Guid.NewGuid(), ParentKey = Guid.NewGuid() },
         };
 
         // Act
@@ -514,8 +631,33 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
         Assert.IsNull(result);
     }
 
+    /// <summary>
+    ///     Verifies that "Current" origin falls back to the parent key when the current key is null,
+    ///     which is the case when creating new unsaved content.
+    /// </summary>
     [Test]
-    public void CalculateOriginKey__Root_should_traverse_the_path_and_take_the_first_level_in_the_root()
+    public void FindOriginKey_CurrentOriginWithNullCurrentKey_FallsBackToParentKey()
+    {
+        // Arrange
+        var selector = new DynamicRootNodeQuery()
+        {
+            OriginAlias = DynamicRootOrigin.Current.ToString(),
+            OriginKey = null,
+            Context = new DynamicRootContext() { CurrentKey = null, ParentKey = ContentYears.Key },
+        };
+
+        // Act
+        var result = DynamicRootService.FindOriginKey(selector);
+
+        // Assert
+        Assert.AreEqual(ContentYears.Key, result);
+    }
+
+    /// <summary>
+    ///     Verifies that "Root" origin traverses the content path upward and returns the topmost document node below the system root.
+    /// </summary>
+    [Test]
+    public void FindOriginKey_RootOrigin_ReturnsContentTreeRoot()
     {
         // Arrange
         var selector = new DynamicRootNodeQuery()
@@ -535,8 +677,11 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
         Assert.AreEqual(ContentYears.Key, result);
     }
 
+    /// <summary>
+    ///     Verifies that "ContentRoot" origin returns the system root key regardless of the current content position.
+    /// </summary>
     [Test]
-    public void CalculateOriginKey__ContentRoot_should_return_the_system_root_key()
+    public void FindOriginKey_ContentRootOrigin_ReturnsSystemRootKey()
     {
         // Arrange
         var selector = new DynamicRootNodeQuery()
@@ -554,11 +699,14 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
         var result = DynamicRootService.FindOriginKey(selector);
 
         // Assert
-        Assert.AreEqual(global::Umbraco.Cms.Core.Constants.System.RootSystemKey, result);
+        Assert.AreEqual(Constants.System.RootSystemKey, result);
     }
 
+    /// <summary>
+    ///     Verifies that "Site" origin returns the current node when it has a domain assigned to it.
+    /// </summary>
     [Test]
-    public void CalculateOriginKey__Site_should_return_the_first_with_an_assigned_domain_also_it_self()
+    public async Task FindOriginKey_SiteOriginWithDomainOnSelf_ReturnsSelf()
     {
         // Arrange
         var origin = ContentYear2022;
@@ -569,8 +717,17 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
             Context = new DynamicRootContext() { CurrentKey = origin.Key, ParentKey = ContentYears.Key },
         };
 
-        DomainService.Save(
-            new UmbracoDomain("http://test.umbraco.com") { RootContentId = origin.Id, LanguageIsoCode = "en-us" });
+        await DomainService.UpdateDomainsAsync(origin.Key, new DomainsUpdateModel
+        {
+            Domains =
+            [
+                new DomainModel
+                {
+                    IsoCode = "en-US",
+                    DomainName = "http://test.umbraco.com",
+                },
+            ],
+        });
 
         // Act
         var result = DynamicRootService.FindOriginKey(selector);
@@ -579,8 +736,11 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
         Assert.AreEqual(origin.Key, result);
     }
 
+    /// <summary>
+    ///     Verifies that "Site" origin returns the nearest ancestor that has a domain assigned.
+    /// </summary>
     [Test]
-    public void CalculateOriginKey__Site_should_return_the_first_with_an_assigned_domain()
+    public async Task FindOriginKey_SiteOriginWithDomainOnAncestor_ReturnsAncestorWithDomain()
     {
         // Arrange
         var origin = ContentAct2022RanD;
@@ -591,10 +751,16 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
             Context = new DynamicRootContext() { CurrentKey = origin.Key, ParentKey = ContentActs2022.Key },
         };
 
-        DomainService.Save(new UmbracoDomain("http://test.umbraco.com")
+        await DomainService.UpdateDomainsAsync(ContentYears.Key, new DomainsUpdateModel
         {
-            RootContentId = ContentYears.Id,
-            LanguageIsoCode = "en-us",
+            Domains =
+            [
+                new DomainModel
+                {
+                    IsoCode = "en-US",
+                    DomainName = "http://test.umbraco.com",
+                },
+            ],
         });
 
         // Act
@@ -604,8 +770,11 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
         Assert.AreEqual(ContentYears.Key, result);
     }
 
+    /// <summary>
+    ///     Verifies that "Site" origin falls back to the content tree root when no domain is assigned to any ancestor.
+    /// </summary>
     [Test]
-    public void CalculateOriginKey__Site_should_fallback_to_root_when_no_domain_is_assigned()
+    public void FindOriginKey_SiteOriginWithNoDomain_FallsBackToRoot()
     {
         // Arrange
         var selector = new DynamicRootNodeQuery()
@@ -626,13 +795,15 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
         Assert.AreEqual(ContentYears.Key, result);
     }
 
-    [Test]
+    /// <summary>
+    ///     Verifies that all origin types return null when both context keys reference non-existent entities.
+    /// </summary>
     [TestCase(DynamicRootOrigin.ByKey)]
     [TestCase(DynamicRootOrigin.Parent)]
+    [TestCase(DynamicRootOrigin.Current)]
     [TestCase(DynamicRootOrigin.Root)]
     [TestCase(DynamicRootOrigin.Site)]
-    [TestCase(DynamicRootOrigin.Site)]
-    public void CalculateOriginKey__with_a_random_key_should_return_null(DynamicRootOrigin origin)
+    public void FindOriginKey_WithRandomNonExistentKey_ReturnsNull(DynamicRootOrigin origin)
     {
         // Arrange
         var randomKey = Guid.NewGuid();
@@ -650,13 +821,15 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
         Assert.IsNull(result);
     }
 
-    [Test]
+    /// <summary>
+    ///     Verifies that all origin types still resolve when the context keys reference a trashed content item.
+    /// </summary>
     [TestCase(DynamicRootOrigin.ByKey)]
     [TestCase(DynamicRootOrigin.Parent)]
     [TestCase(DynamicRootOrigin.Root)]
     [TestCase(DynamicRootOrigin.Site)]
     [TestCase(DynamicRootOrigin.Current)]
-    public void CalculateOriginKey__with_a_trashed_key_should_still_be_allowed(DynamicRootOrigin origin)
+    public void FindOriginKey_WithTrashedKey_ReturnsNonNull(DynamicRootOrigin origin)
     {
         // Arrange
         var trashedKey = Trashed.Key;
@@ -674,13 +847,15 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
         Assert.IsNotNull(result);
     }
 
-    [Test]
+    /// <summary>
+    ///     Verifies that all origin types return null when the context keys reference a content type key (wrong entity type).
+    /// </summary>
     [TestCase(DynamicRootOrigin.ByKey)]
     [TestCase(DynamicRootOrigin.Parent)]
     [TestCase(DynamicRootOrigin.Root)]
     [TestCase(DynamicRootOrigin.Site)]
     [TestCase(DynamicRootOrigin.Current)]
-    public void CalculateOriginKey__with_a_ContentType_key_should_return_null(DynamicRootOrigin origin)
+    public void FindOriginKey_WithContentTypeKey_ReturnsNull(DynamicRootOrigin origin)
     {
         // Arrange
         var contentTypeKey = ContentTypeYears.Key;
@@ -688,7 +863,7 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
         {
             OriginAlias = origin.ToString(),
             OriginKey = contentTypeKey,
-            Context = new DynamicRootContext() { CurrentKey = contentTypeKey, ParentKey = contentTypeKey }
+            Context = new DynamicRootContext() { CurrentKey = contentTypeKey, ParentKey = contentTypeKey },
         };
 
         // Act
@@ -696,48 +871,6 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
 
         // Assert
         Assert.IsNull(result);
-    }
-
-    [Test]
-    public async Task GetDynamicRoots__With_multiple_filters_that_do_not_return_any_results()
-    {
-        // Arrange
-        var startNodeSelector = new DynamicRootNodeQuery()
-        {
-            OriginAlias = DynamicRootOrigin.Current.ToString(),
-            OriginKey = null,
-            Context =
-                new DynamicRootContext() { CurrentKey = ContentAct2022RanD.Key, ParentKey = ContentActs2022.Key },
-            QuerySteps = new[]
-            {
-                new DynamicRootQueryStep()
-                {
-                    Alias = DynamicRootStepAlias.NearestAncestorOrSelf.ToString(),
-                    AnyOfDocTypeKeys = new[] { ContentTypeYear.Key },
-                },
-                new DynamicRootQueryStep()
-                {
-                    Alias = DynamicRootStepAlias.NearestDescendantOrSelf.ToString(),
-                    AnyOfDocTypeKeys = new[] { ContentTypeStages.Key },
-                },
-                new DynamicRootQueryStep()
-                {
-                    Alias = DynamicRootStepAlias.NearestDescendantOrSelf.ToString(),
-                    AnyOfDocTypeKeys = new[] { ContentTypeYears.Key },
-                },
-                new DynamicRootQueryStep()
-                {
-                    Alias = DynamicRootStepAlias.NearestDescendantOrSelf.ToString(),
-                    AnyOfDocTypeKeys = new[] { ContentTypeYears.Key },
-                },
-            },
-        };
-
-        // Act
-        var result = (await DynamicRootService.GetDynamicRootsAsync(startNodeSelector)).ToList();
-
-        // Assert
-        Assert.AreEqual(0, result.Count());
     }
 
     private static ContentTypeSort CreateContentTypeSort(ContentType contentType, int sortOrder)
