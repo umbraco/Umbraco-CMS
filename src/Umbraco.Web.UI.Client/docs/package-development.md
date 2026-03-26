@@ -3,7 +3,43 @@
 
 ---
 
-This guide covers how to structure, organize, and build a new package (or extend an existing one) within the Umbraco Backoffice frontend. For the underlying architecture concepts (extension registry, context API, repository pattern, etc.), see [Architecture](./architecture.md).
+This guide covers how to structure, organize, and build a new package (or extend an existing one) within the Umbraco Backoffice frontend. For the underlying architecture concepts (extension registry, context API, repository pattern, etc.), see [Architecture](./architecture.md). For import boundary rules based on where you're working, see [Developer Roles](./architecture.md#developer-roles).
+
+---
+
+## Package & Module Structure
+
+### Package Root
+
+Each top-level folder under `src/packages/` is a **package root**. The folder name is the package identity (e.g., `src/packages/media/` is the "media" package).
+
+### Modules
+
+A package contains one or more **modules**, each in its own subfolder within the package root. A module is a cohesive grouping of related functionality — its elements, repository, store, types, and manifests.
+
+```
+src/packages/media/          ← package root
+├── media/                   ← module (media management)
+│   ├── index.ts
+│   ├── manifests.ts
+│   └── ...
+├── imaging/                 ← module (image processing)
+│   ├── index.ts
+│   ├── manifests.ts
+│   └── ...
+├── manifests.ts             ← aggregates all module manifests
+└── umbraco-package.ts       ← bundle entry point
+```
+
+### Public vs. Private Modules
+
+A module becomes **publicly available** to other packages by adding an import map entry in the root `package.json` exports field (see [Registering Package Module Export](#registering-package-module-export) below). Not every module needs to be public — only those with a clear external use case.
+
+**General export rules:**
+
+- **Think deliberately about what is exported.** The public API (`index.ts` + `package.json` export) is a contract with consumers.
+- **Keep code private until there is a clear use case.** Non-exported code can be freely refactored, renamed, or restructured without breaking anyone.
+- **Once exported, changes require the [deprecation process](./deprecation.md).** This is why starting private is the safer default.
 
 ---
 
@@ -104,6 +140,8 @@ declare global {
 ---
 
 ## Registering Package Module Export
+
+Before registering a new public module, consider whether external consumers truly need it. Keeping a module private (no export entry) preserves your freedom to change its internals. Only register an export when there is a clear use case for other packages to import from it.
 
 To make a new package module importable by other packages:
 

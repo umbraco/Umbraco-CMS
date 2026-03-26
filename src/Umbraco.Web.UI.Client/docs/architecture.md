@@ -122,6 +122,38 @@ The project is built with an **"extension-first"** mindset. The core HQ team bui
 
 ---
 
+## Developer Roles
+
+The codebase has three distinct areas with different import boundaries and design philosophies. These are *mindsets*, not job titles — when you open a file, the directory it lives in determines which role applies and what rules you follow.
+
+### Library Developer (`src/libs/`)
+
+Works on the foundational infrastructure libraries. The philosophy is that **the browser is our platform and the web API is the framework**. Code must be framework-agnostic — no knowledge of the backoffice, the CMS, or any UI framework. Libraries should be developed so that any application can use them, and third-party dependencies should be included carefully.
+
+**Import rules**: Cannot import from `src/packages/` or `src/apps/`.
+
+### Core Developer (`src/packages/core/`)
+
+Works on the backoffice UI framework implementation. The philosophy is that **Core is the UI framework that wires up a well-crafted UX that any package can utilize**. Core provides the extension registry, routing, modals, notifications, workspace infrastructure, and other building blocks — but does not implement CMS-specific features.
+
+**Import rules**: Can import from `src/libs/` and other modules within `src/packages/core/`. Cannot import from any other package (e.g., `src/packages/documents/`, `src/packages/media/`).
+
+### HQ Package Developer (`src/packages/*` except `core/`)
+
+Works on the CMS feature packages. This is where the connection to the CMS takes place — documents, media, members, templating, and all other domain-specific features.
+
+**Import rules**: Can freely import from `src/packages/core/` and `src/libs/`. Can import from other non-core packages, but this should be done carefully — each cross-package dependency increases coupling and complexity.
+
+### Summary
+
+| Role | Directory | Can import from | Cannot import from |
+|------|-----------|----------------|--------------------|
+| Library Developer | `src/libs/` | Other libs | Packages, apps |
+| Core Developer | `src/packages/core/` | Libs, other core modules | Non-core packages |
+| HQ Package Developer | `src/packages/*` (not core) | Core, libs, other packages (carefully) | — |
+
+---
+
 ## The Package System
 
 Each directory under `src/packages/` is a **logical package** — a self-contained domain module. The key design principle:
@@ -134,9 +166,12 @@ The `core` package provides the foundational APIs (context system, extension reg
 
 ### Package Independence Rules
 
-1. **A package should never directly import from another non-core package's internal files.** If Package A needs something from Package B, Package B must export it through its public `index.ts`.
-2. **Cross-package dependencies should be minimized.** Each package registers its own extensions (dashboards, workspaces, property editors, etc.) via manifests.
-3. **Core provides the infrastructure; feature packages provide the domain.** The `core/` package contains: context API, extension registry, observable/state management, controller system, routing, modals, notifications, localization, element mixins, and utility types.
+These rules enforce the import boundaries described in [Developer Roles](#developer-roles) above.
+
+1. **Libraries (`src/libs/`) are the foundation.** They are framework-agnostic and have no knowledge of packages or the CMS. All packages depend on libs, but libs never depend on packages.
+2. **A package should never directly import from another non-core package's internal files.** If Package A needs something from Package B, Package B must export it through its public `index.ts`.
+3. **Cross-package dependencies should be minimized.** Each package registers its own extensions (dashboards, workspaces, property editors, etc.) via manifests.
+4. **Core provides the infrastructure; feature packages provide the domain.** The `core/` package contains: context API, extension registry, observable/state management, controller system, routing, modals, notifications, localization, element mixins, and utility types.
 
 ### Module Exports
 
@@ -394,38 +429,5 @@ export class MyController extends UmbControllerBase {
 - **Kinds**: Preset manifest configurations that other extensions can inherit from. Reduces boilerplate — e.g., a `kind: 'button'` header app inherits all button-related defaults.
 
 ---
-
-## Mental Model
-
-```
-┌─────────────────────────────────────────────┐
-│            UMBRACO BACKOFFICE               │
-│                                             │
-│  ┌───────────────────────────────────────┐  │
-│  │        Extension Registry             │  │
-│  │  (All UI registered as manifests)     │  │
-│  └───────────────────────────────────────┘  │
-│                                             │
-│  ┌───────────────────────────────────────┐  │
-│  │  Packages (src/packages/)             │  │
-│  │                                       │  │
-│  │  ┌─────────────────────────────────┐  │  │
-│  │  │  core (foundation)              │  │  │
-│  │  │  context, registry, state,      │  │  │
-│  │  │  routing, controllers           │  │  │
-│  │  └─────────────────────────────────┘  │  │
-│  │       ▲           ▲           ▲       │  │
-│  │       │           │           │       │  │
-│  │  ┌─────────┐ ┌─────────┐ ┌─────────┐ │  │
-│  │  │documents│ │  media  │ │ members │ │  │
-│  │  └─────────┘ └─────────┘ └─────────┘ │  │
-│  │  Feature packages depend on core      │  │
-│  └───────────────────────────────────────┘  │
-│                                             │
-│  ┌───────────────────────────────────────┐  │
-│  │  Management API (RESTful, Swagger)    │  │
-│  └───────────────────────────────────────┘  │
-└─────────────────────────────────────────────┘
-```
 
 The backoffice is a collection of independently-packaged Web Components, glued together by the Extension Registry, communicating via the Context API, with state managed through Observables — all built to be replaceable, removable, and extensible by default.
