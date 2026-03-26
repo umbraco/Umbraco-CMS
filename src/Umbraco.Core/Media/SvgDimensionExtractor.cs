@@ -2,12 +2,22 @@ using System.Drawing;
 using System.Globalization;
 using System.Xml;
 using System.Xml.Linq;
+using Microsoft.Extensions.Logging;
 
 namespace Umbraco.Cms.Core.Media;
 
 /// <inheritdoc />
 public class SvgDimensionExtractor : ISvgDimensionExtractor
 {
+    private readonly ILogger<SvgDimensionExtractor> _logger;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SvgDimensionExtractor"/> class.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    public SvgDimensionExtractor(ILogger<SvgDimensionExtractor> logger)
+        => _logger = logger;
+
     /// <inheritdoc />
     public Size? GetDimensions(Stream stream)
     {
@@ -28,8 +38,9 @@ public class SvgDimensionExtractor : ISvgDimensionExtractor
         {
             return ReadDimensions(stream);
         }
-        catch
+        catch (Exception ex)
         {
+            _logger.LogWarning(ex, "Failed to extract dimensions from SVG stream.");
             return null;
         }
         finally
@@ -39,7 +50,6 @@ public class SvgDimensionExtractor : ISvgDimensionExtractor
                 stream.Position = originalPosition.Value;
             }
         }
-
     }
 
     private static Size? ReadDimensions(Stream stream)
@@ -73,7 +83,6 @@ public class SvgDimensionExtractor : ISvgDimensionExtractor
         size ??= ParseViewBox(root);
 
         return size;
-
     }
 
     private static Size? ParseViewBox(XElement root)
@@ -128,7 +137,7 @@ public class SvgDimensionExtractor : ISvgDimensionExtractor
     /// </summary>
     private static bool TryExtractNumericFromValue(string attributeValue, out int value)
     {
-        if (int.TryParse(attributeValue, out int onlyNumbersValue))
+        if (int.TryParse(attributeValue, out int onlyNumbersValue) && onlyNumbersValue > 0)
         {
             value = onlyNumbersValue;
             return true;
