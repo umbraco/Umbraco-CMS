@@ -72,15 +72,15 @@ When reporting consumers, exclude files that are part of the PR's changes (they'
 The Umbraco architecture enforces strict unidirectional dependencies:
 
 ```
-Core (no dependencies)
-  ↑
-Infrastructure (depends on Core)
-  ↑
-Web.Common (depends on Infrastructure)
-  ↑
-Api.Common (depends on Web.Common)
-  ↑
 Api.Management / Api.Delivery (depend on Api.Common)
+  ↓
+Api.Common (depends on Web.Common)
+  ↓
+Web.Common (depends on Infrastructure)
+  ↓
+Infrastructure (depends on Core)
+  ↓
+Core (no dependencies)
 ```
 
 ### Layer Mapping
