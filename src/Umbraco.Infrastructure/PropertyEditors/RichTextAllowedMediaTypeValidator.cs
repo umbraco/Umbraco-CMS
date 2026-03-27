@@ -95,12 +95,8 @@ internal sealed class RichTextAllowedMediaTypeValidator : IValueValidator
 
             if (typeKey is null || allowedTypes.Contains(typeKey) is false)
             {
-                return
-                [
-                    new ValidationResult(
-                        _localizedTextService.Localize("validation", "invalidMediaType"),
-                        ["value"])
-                ];
+                var message = $"{_localizedTextService.Localize("validation", "invalidMediaType")}: '{media.Name}'";
+                return [new ValidationResult(message, ["value"])];
             }
         }
 
