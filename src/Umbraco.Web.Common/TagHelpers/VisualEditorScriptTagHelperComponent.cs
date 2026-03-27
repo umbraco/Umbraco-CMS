@@ -49,7 +49,7 @@ internal sealed class VisualEditorScriptTagHelperComponent : TagHelperComponent
         }
 
         var nonce = _cspNonceService.GetNonce();
-        var backOfficePath = _hostingEnvironment.GetBackOfficePath();
+        var backOfficePath = _hostingEnvironment.GetBackOfficePath().TrimEnd('/') + "/backoffice";
         output.PostContent.AppendHtml(VisualEditorGuestScript.GetScriptTag(nonce, backOfficePath));
     }
 }

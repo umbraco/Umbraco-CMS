@@ -53,6 +53,9 @@
 	/** Primary interactive accent (--uui-color-interactive-emphasis). */
 	const COLOR_INTERACTIVE = '#3544b1';
 
+	/** Idle editable region outline — visible on both light and dark backgrounds. */
+	const COLOR_INTERACTIVE_MUTED = 'rgba(53, 68, 177, 0.45)';
+
 	/** Surface background (--uui-color-surface). */
 	const COLOR_SURFACE = '#fff';
 
@@ -163,14 +166,17 @@
 	/**
 	 * Apply baseline visual affordances to all editable regions:
 	 * - Pointer cursor on all regions
-	 * - Subtle dashed border on blocks so they are visually identifiable
+	 * - Subtle dashed outline matching the interactive color so regions are discoverable
 	 * - `position: relative` on blocks to anchor the action bar
+	 * - Smooth transition so hover/select state changes feel polished
 	 */
 	document.querySelectorAll<HTMLElement>(ALL_SELECTOR).forEach((el) => {
 		el.style.cursor = 'pointer';
+		el.style.outline = `1px dashed ${COLOR_INTERACTIVE_MUTED}`;
+		el.style.outlineOffset = '-1px';
+		el.style.boxShadow = 'inset 0 0 0 1px rgba(255, 255, 255, 0.4)';
+		el.style.transition = 'outline 120ms, outline-offset 120ms, box-shadow 120ms';
 		if (isBlock(el)) {
-			el.style.outline = `1px dashed ${COLOR_BORDER}`;
-			el.style.outlineOffset = '-1px';
 			el.style.position = el.style.position || 'relative';
 		}
 	});
@@ -194,21 +200,18 @@
 	function applyOutline(el: HTMLElement, style: string, offset: string) {
 		el.style.outline = style;
 		el.style.outlineOffset = offset;
+		el.style.boxShadow = 'inset 0 0 0 2px rgba(255, 255, 255, 0.6)';
 	}
 
 	/**
-	 * Reset an element's outline to its default state.
-	 * Blocks return to their subtle dashed border; properties are fully cleared.
+	 * Reset an element's outline to the default editable region style.
+	 * Both blocks and properties get the same subtle dashed outline.
 	 * @param el - The target element.
 	 */
 	function clearOutline(el: HTMLElement) {
-		if (isBlock(el)) {
-			el.style.outline = `1px dashed ${COLOR_BORDER}`;
-			el.style.outlineOffset = '-1px';
-		} else {
-			el.style.outline = '';
-			el.style.outlineOffset = '';
-		}
+		el.style.outline = `1px dashed ${COLOR_INTERACTIVE_MUTED}`;
+		el.style.outlineOffset = '-1px';
+		el.style.boxShadow = 'inset 0 0 0 1px rgba(255, 255, 255, 0.4)';
 	}
 
 	/**
@@ -237,15 +240,15 @@
 	// SVG icons — inline Material Design icons for the action bar buttons
 	// =====================================================================
 
-	/** Edit (pencil) icon — 16×16 SVG. */
+	/** Edit (pencil) icon — Lucide style, matches Umbraco backoffice icon-edit. */
 	const ICON_EDIT =
-		'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">' +
-		'<path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 000-1.41l-2.34-2.34a1 1 0 00-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>';
+		'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">' +
+		'<path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="M15 5l4 4"/></svg>';
 
-	/** Delete (trash) icon — 16×16 SVG. */
+	/** Delete (trash) icon — Lucide style, matches Umbraco backoffice icon-remove. */
 	const ICON_DELETE =
-		'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">' +
-		'<path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>';
+		'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">' +
+		'<path d="M10 11v6"/><path d="M14 11v6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>';
 
 	// =====================================================================
 	// Block action bar — pill-shaped edit/delete toolbar inside each block
@@ -447,11 +450,7 @@
 		clearHoveredRegion();
 		if (region && getRegionId(region) !== selectedId) {
 			hoveredRegion = region;
-			if (isBlock(region)) {
-				applyOutline(region, `2px solid ${COLOR_INTERACTIVE}`, '-2px');
-			} else {
-				applyOutline(region, '2px dashed rgba(59, 130, 246, 0.4)', '-2px');
-			}
+			applyOutline(region, `2px solid ${COLOR_INTERACTIVE}`, '-2px');
 		}
 
 		if (region && isBlock(region)) {
@@ -620,6 +619,7 @@
 			block.setAttribute('draggable', 'true');
 
 			block.addEventListener('dragstart', ((e: DragEvent) => {
+				e.stopPropagation();
 				dragSrc = block;
 				block.style.opacity = '0.4';
 				e.dataTransfer!.effectAllowed = 'move';
@@ -635,6 +635,9 @@
 
 			block.addEventListener('dragover', ((e: DragEvent) => {
 				if (!dragSrc || dragSrc === block) return;
+				// Don't intercept drags over this block's own child areas
+				const targetArea = (e.target as Element).closest?.('.umb-block-grid__area');
+				if (targetArea && block.contains(targetArea)) return;
 				e.preventDefault();
 				e.dataTransfer!.dropEffect = 'move';
 
@@ -651,8 +654,11 @@
 			}) as EventListener);
 
 			block.addEventListener('drop', ((e: DragEvent) => {
-				e.preventDefault();
 				if (!dragSrc || dragSrc === block) return;
+				// Don't intercept drops targeting this block's own child areas
+				const targetArea = (e.target as Element).closest?.('.umb-block-grid__area');
+				if (targetArea && block.contains(targetArea)) return;
+				e.preventDefault();
 
 				const srcKey = getBlockKey(dragSrc);
 				const srcContainer = getContainer(dragSrc);
@@ -711,8 +717,11 @@
 		document.querySelectorAll<HTMLElement>('.umb-block-grid__area').forEach((area) => {
 			area.addEventListener('dragover', ((e: DragEvent) => {
 				if (!dragSrc) return;
-				// Only handle if the area itself is the target (not a block inside it)
-				if ((e.target as Element).closest(BLOCK_SELECTOR)) return;
+				// Only handle if the target is not inside a direct child block of this area.
+				// We check closest block-or-area — if a block is found before we reach
+				// this area, a child block should handle the event instead.
+				const nearest = (e.target as Element).closest(`${BLOCK_SELECTOR}, .umb-block-grid__area`);
+				if (nearest && nearest !== area && nearest.matches(BLOCK_SELECTOR)) return;
 				e.preventDefault();
 				e.dataTransfer!.dropEffect = 'move';
 
@@ -725,7 +734,8 @@
 			area.addEventListener('drop', ((e: DragEvent) => {
 				if (!dragSrc) return;
 				// Only handle direct drops on the area (not on blocks inside it)
-				if ((e.target as Element).closest(BLOCK_SELECTOR)) return;
+				const nearest = (e.target as Element).closest(`${BLOCK_SELECTOR}, .umb-block-grid__area`);
+				if (nearest && nearest !== area && nearest.matches(BLOCK_SELECTOR)) return;
 				e.preventDefault();
 
 				const srcKey = getBlockKey(dragSrc);
@@ -733,8 +743,9 @@
 				const parentBlockKey = parentBlock ? getBlockKey(parentBlock) : '';
 				const areaAlias = area.dataset.areaAlias || '';
 
-				// Move DOM
-				area.insertBefore(dragSrc, dropIndicator);
+				// Move DOM — prefer inserting into the layout container if present
+				const dropTarget = area.querySelector('.umb-block-grid__layout-container') || area;
+				dropTarget.insertBefore(dragSrc, dropIndicator.parentNode === dropTarget ? dropIndicator : null);
 				dropIndicator.style.display = 'none';
 				dropIndicator.parentNode?.removeChild(dropIndicator);
 
@@ -995,6 +1006,9 @@
 		document.querySelectorAll<HTMLElement>('.umb-block-grid__area').forEach((area) => {
 			const hasContainer = area.querySelector('.umb-block-grid__layout-container');
 			if (hasContainer) return;
+
+			// Skip if the area already has blocks (e.g. after a cross-area drop)
+			if (area.querySelector(BLOCK_SELECTOR)) return;
 
 			const areaAlias = area.dataset.areaAlias || '';
 			const parentBlock = area.closest<HTMLElement>(BLOCK_SELECTOR);

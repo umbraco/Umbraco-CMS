@@ -1,3 +1,5 @@
+import { findLayoutEntryInAreas } from '@umbraco-cms/backoffice/block';
+import type { UmbBlockLayoutWithAreasModel } from '@umbraco-cms/backoffice/block';
 import { UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS } from '@umbraco-cms/backoffice/block-grid';
 import { UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS } from '@umbraco-cms/backoffice/block-list';
 
@@ -7,12 +9,7 @@ import { UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS } from '@umbraco-cms/backof
  * layout, contentData, settingsData, and expose arrays.
  */
 
-export interface BlockValueLayout {
-	contentKey: string;
-	settingsKey?: string | null;
-	// Block Grid adds: rowSpan, columnSpan, areas, etc.
-	[key: string]: unknown;
-}
+export type BlockValueLayout = UmbBlockLayoutWithAreasModel;
 
 export interface BlockValueData {
 	key: string;
@@ -186,7 +183,7 @@ export function removeBlockFromValue(blockValue: BlockValue, blockKey: string): 
 	const existingLayout = layoutKey ? (blockValue.layout[layoutKey] ?? []) : [];
 
 	// Find the layout entry (may be nested in grid areas) to get the settingsKey before removing
-	const layoutEntry = findLayoutEntryRecursive(existingLayout, blockKey);
+	const layoutEntry = findLayoutEntryInAreas(existingLayout, blockKey);
 	const settingsKey = layoutEntry?.settingsKey;
 
 	const newLayout = removeLayoutEntryRecursive(existingLayout, blockKey);
@@ -202,31 +199,18 @@ export function removeBlockFromValue(blockValue: BlockValue, blockKey: string): 
 	};
 }
 
-/** Recursively find a layout entry by contentKey, searching through block grid areas. */
-export function findLayoutEntryRecursive(entries: BlockValueLayout[], blockKey: string): BlockValueLayout | undefined {
-	for (const entry of entries) {
-		if (entry.contentKey === blockKey) return entry;
-		const areas = entry.areas as Array<{ key: string; items: BlockValueLayout[] }> | undefined;
-		if (areas) {
-			for (const area of areas) {
-				const found = findLayoutEntryRecursive(area.items, blockKey);
-				if (found) return found;
-			}
-		}
-	}
-	return undefined;
-}
+/** @deprecated Use `findLayoutEntryInAreas` from `@umbraco-cms/backoffice/block` instead. */
+export const findLayoutEntryRecursive = findLayoutEntryInAreas;
 
 /** Recursively remove a layout entry by contentKey, searching through block grid areas. */
 function removeLayoutEntryRecursive(entries: BlockValueLayout[], blockKey: string): BlockValueLayout[] {
 	return entries
 		.filter((entry) => entry.contentKey !== blockKey)
 		.map((entry) => {
-			const areas = entry.areas as Array<{ key: string; items: BlockValueLayout[] }> | undefined;
-			if (!areas) return entry;
+			if (!entry.areas) return entry;
 			return {
 				...entry,
-				areas: areas.map((area) => ({
+				areas: entry.areas.map((area) => ({
 					...area,
 					items: removeLayoutEntryRecursive(area.items, blockKey),
 				})),
@@ -285,11 +269,12 @@ export function addBlockToValue(
 
 	// Block Grid requires rowSpan and columnSpan on layout items
 	if (layoutKey === UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS) {
-		layoutEntry.columnSpan = 12;
-		layoutEntry.rowSpan = 1;
+		const gridEntry = layoutEntry as BlockValueLayout & { columnSpan: number; rowSpan: number };
+		gridEntry.columnSpan = 12;
+		gridEntry.rowSpan = 1;
 		// Initialize areas from the block type configuration so layout blocks
 		// (e.g. two-column layouts) render their area containers correctly.
-		layoutEntry.areas = (blockTypeAreas ?? []).map((a) => ({ key: a.key, items: [] }));
+		gridEntry.areas = (blockTypeAreas ?? []).map((a) => ({ key: a.key, items: [] }));
 	}
 
 	newLayout.splice(insertIndex, 0, layoutEntry);
@@ -341,10 +326,10 @@ export function addBlockToArea(
 	const newLayout = (blockValue.layout[layoutKey] ?? []).map((entry) => {
 		if (entry.contentKey !== parentBlockKey) return entry;
 
-		const areas = ((entry.areas as Array<{ key: string; items: BlockValueLayout[] }>) ?? []).map((area) => {
+		const areas = ((entry.areas) ?? []).map((area) => {
 			if (area.key !== areaConfig.key) return area;
 			const newItems = [...area.items];
-			const newItem: BlockValueLayout = { contentKey, columnSpan: 12, rowSpan: 1 };
+			const newItem = { contentKey, columnSpan: 12, rowSpan: 1 } as BlockValueLayout & { columnSpan: number; rowSpan: number };
 			newItems.splice(insertIndex, 0, newItem);
 			return { ...area, items: newItems };
 		});
@@ -402,7 +387,7 @@ export function moveBlock(
 		// Search in areas of all layout items
 		newLayout = layout.map((entry) => {
 			if (movedEntry) return entry; // Already found
-			const areas = (entry.areas as Array<{ key: string; items: BlockValueLayout[] }>) ?? [];
+			const areas = (entry.areas) ?? [];
 			const updatedAreas = areas.map((area) => {
 				if (movedEntry) return area;
 				const idx = area.items.findIndex((item) => item.contentKey === blockKey);
@@ -425,7 +410,7 @@ export function moveBlock(
 
 		newLayout = newLayout.map((entry) => {
 			if (entry.contentKey !== targetParentBlockKey) return entry;
-			const areas = ((entry.areas as Array<{ key: string; items: BlockValueLayout[] }>) ?? []).map((area) => {
+			const areas = ((entry.areas) ?? []).map((area) => {
 				if (area.key !== areaConfig.key) return area;
 				const newItems = [...area.items];
 				newItems.splice(targetIndex, 0, movedEntry!);

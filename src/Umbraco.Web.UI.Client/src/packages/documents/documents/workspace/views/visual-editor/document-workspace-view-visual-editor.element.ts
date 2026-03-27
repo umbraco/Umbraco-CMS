@@ -12,7 +12,7 @@ import {
 	mergeBlockValueInto,
 } from './visual-editor-block-helper.js';
 import type { BlockValue } from './visual-editor-block-helper.js';
-import { VisualEditorBlockBridge } from './visual-editor-block-bridge.js';
+import { VisualEditorBlockManager } from './visual-editor-block-manager.js';
 import { UMB_VISUAL_EDITOR_PROPERTY_MODAL } from './visual-editor-property-modal.token.js';
 import type {
 	UmbVisualEditorPropertyGroup,
@@ -72,17 +72,17 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 		{ name: string; properties: UmbVisualEditorPropertyInfo[]; groups: UmbVisualEditorPropertyGroup[] }
 	>();
 
-	// --- Block bridge (per-property block manager + entries for workspace integration) ---
-	#blockBridge?: VisualEditorBlockBridge;
-	#blockBridgePropertyAlias?: string;
+	// --- Per-property block manager for workspace integration ---
+	#blockManager?: VisualEditorBlockManager;
+	#blockManagerPropertyAlias?: string;
 	#currentVariantId?: UmbVariantId;
 
 	/**
-	 * Ensure a block bridge exists for the given property.
-	 * Creates a new bridge (or reinitializes the existing one) with the property's
+	 * Ensure a block manager exists for the given property.
+	 * Creates a new manager (or reinitializes the existing one) with the property's
 	 * current block types, config, and value so the standard block workspace can be opened.
 	 */
-	#ensureBridge(propertyAlias: string, blockValue: BlockValue): VisualEditorBlockBridge {
+	#ensureBlockManager(propertyAlias: string, blockValue: BlockValue): VisualEditorBlockManager {
 		const propStructure = this.#propertyStructures.find((p) => p.alias === propertyAlias);
 		const config = (propStructure?.config ?? []) as UmbPropertyEditorConfig;
 
@@ -101,17 +101,17 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 		// Determine the editor schema alias from the layout keys
 		const layoutKey = Object.keys(blockValue.layout)[0] ?? UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS;
 
-		if (this.#blockBridge && this.#blockBridgePropertyAlias === propertyAlias) {
-			// Reuse existing bridge — just reload with fresh data
-			this.#blockBridge.setVariantId(this.#currentVariantId);
-			this.#blockBridge.loadValue(blockValue);
-			return this.#blockBridge;
+		if (this.#blockManager && this.#blockManagerPropertyAlias === propertyAlias) {
+			// Reuse existing manager — just reload with fresh data
+			this.#blockManager.setVariantId(this.#currentVariantId);
+			this.#blockManager.loadValue(blockValue);
+			return this.#blockManager;
 		}
 
-		// Destroy previous bridge if switching properties
-		this.#blockBridge?.destroy();
+		// Destroy previous manager if switching properties
+		this.#blockManager?.destroy();
 
-		this.#blockBridge = new VisualEditorBlockBridge({
+		this.#blockManager = new VisualEditorBlockManager({
 			host: this,
 			propertyAlias,
 			editorSchemaAlias: layoutKey,
@@ -120,13 +120,13 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 			variantId: this.#currentVariantId,
 			onValueChanged: async (alias, value) => {
 				await this.#setPropertyValue(alias, value);
-				await this.#saveAndRefresh();
+	
 			},
 		});
-		this.#blockBridgePropertyAlias = propertyAlias;
-		this.#blockBridge.loadValue(blockValue);
+		this.#blockManagerPropertyAlias = propertyAlias;
+		this.#blockManager.loadValue(blockValue);
 
-		return this.#blockBridge;
+		return this.#blockManager;
 	}
 
 	@state() private _iframeReady = false;
@@ -376,7 +376,7 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 				if (hasProperties) {
 					this.#onBlockClicked(contentKey, contentTypeKey);
 				} else {
-					await this.#saveAndRefresh();
+		
 				}
 			} else {
 				// Add to root
@@ -395,7 +395,7 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 				if (hasProperties) {
 					this.#onBlockClicked(contentKey, contentTypeKey);
 				} else {
-					await this.#saveAndRefresh();
+		
 				}
 			}
 		})
@@ -428,14 +428,14 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 			this.#serverUrl = serverContext?.getServerUrl() ?? '';
 		});
 
-		// Observe the variant context so the bridge can set the correct culture/segment
+		// Observe the variant context so the block manager can set the correct culture/segment
 		this.consumeContext(UMB_VARIANT_CONTEXT, (variantContext) => {
 			this.observe(
 				variantContext?.displayVariantId,
 				(variantId) => {
 					this.#currentVariantId = variantId;
-					// Keep the active bridge in sync
-					this.#blockBridge?.setVariantId(variantId);
+					// Keep the active block manager in sync
+					this.#blockManager?.setVariantId(variantId);
 				},
 				'observeVariantId',
 			);
@@ -565,8 +565,22 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 			.map((c) => ({ id: c.id, name: c.name ?? '', sortOrder: c.sortOrder }))
 			.sort((a, b) => a.sortOrder - b.sortOrder);
 
+		// Check if any property has editableInVisualEditor explicitly enabled.
+		// If none do, include all properties (opt-out model — works out of the box).
+		const anyExplicitlyEnabled = data.properties.some((p) => {
+			const a = p.appearance as { editableInVisualEditor?: boolean } | undefined;
+			return a?.editableInVisualEditor === true;
+		});
+
 		const result: UmbVisualEditorPropertyInfo[] = [];
 		for (const prop of data.properties) {
+			// If any property is explicitly opted in, filter to only those.
+			// Otherwise include all properties (opt-out fallback).
+			if (anyExplicitlyEnabled) {
+				const appearance = prop.appearance as { editableInVisualEditor?: boolean } | undefined;
+				if (!appearance?.editableInVisualEditor) continue;
+			}
+
 			let editorUiAlias = '';
 			let config: UmbPropertyEditorConfig | undefined;
 
@@ -786,21 +800,13 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 		return false;
 	}
 
-	// --- Block click → open block workspace via bridge ---
+	// --- Block click → open visual editor block modal ---
 
 	async #onBlockClicked(blockKey: string, _contentTypeAlias: string) {
 		this.#selectedBlockKey = blockKey;
 		this.#selectedPropertyAlias = undefined;
 
-		const allValues = this.#getAllValues();
-		const found = findBlockInValues(allValues, blockKey);
-		if (!found) {
-			console.warn('[VisualEditor] block not found in values', blockKey);
-			return;
-		}
-
-		const bridge = this.#ensureBridge(found.propertyAlias, found.blockValue);
-		await bridge.openEdit(blockKey);
+		this.#blockModalRegistration.open({ blockKey });
 	}
 
 	async #handlePropertySubmit(alias: string, result: { values: Array<{ alias: string; value: unknown }> }) {
@@ -815,7 +821,7 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 				value: typeof entry.value === 'string' ? entry.value : '',
 			});
 
-			await this.#saveAndRefresh();
+
 		}
 	}
 
@@ -839,7 +845,6 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 			await this.#setPropertyValue(found.propertyAlias, updatedBlockValue);
 		}
 
-		await this.#saveAndRefresh();
 	}
 
 	// --- Block add ---
@@ -883,7 +888,7 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 			if (hasProperties) {
 				this.#onBlockClicked(contentKey, contentTypeKey);
 			} else {
-				await this.#saveAndRefresh();
+	
 			}
 		} else {
 			// Multiple block types — open routed catalogue modal
@@ -977,7 +982,6 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 		}
 
 		await this.#setPropertyValue(propertyAlias, updatedValue);
-		await this.#saveAndRefresh();
 	}
 
 	// --- Block delete ---
@@ -1002,7 +1006,6 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 		const updatedValue = removeBlockFromValue(found.blockValue, blockKey);
 		await this.#setPropertyValue(found.propertyAlias, updatedValue);
 
-		await this.#saveAndRefresh();
 	}
 
 	// --- Block reorder / move ---
@@ -1034,7 +1037,6 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 		);
 		await this.#setPropertyValue(found.propertyAlias, updatedValue);
 
-		await this.#save();
 	}
 
 	async #onBlockReorder(blockKey: string, toIndex: number) {
@@ -1045,7 +1047,6 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 		const updatedValue = reorderBlockInValue(found.blockValue, blockKey, toIndex);
 		await this.#setPropertyValue(found.propertyAlias, updatedValue);
 
-		await this.#save();
 	}
 
 	// --- Save ---
@@ -1063,7 +1064,6 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 	}
 
 	async #saveAndRefresh() {
-		await this.#save();
 		this.#refreshIframe();
 	}
 
