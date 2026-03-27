@@ -11,6 +11,10 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// </summary>
 internal sealed class MultipleTextStringConfigurationEditor : ConfigurationEditor<MultipleTextStringConfiguration>
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Core.PropertyEditors.MultipleTextStringConfigurationEditor"/> class.
+    /// </summary>
+    /// <param name="ioHelper">An instance of <see cref="IIOHelper"/> used to assist with file system operations.</param>
     public MultipleTextStringConfigurationEditor(IIOHelper ioHelper)
         : base(ioHelper)
     {

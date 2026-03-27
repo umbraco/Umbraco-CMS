@@ -18,6 +18,9 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Media.Tree;
 
+/// <summary>
+/// Serves as the base controller for media tree operations in the Umbraco CMS API, providing shared functionality for derived media tree controllers.
+/// </summary>
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Tree}/{Constants.UdiEntityType.Media}")]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Media))]
 [Authorize(Policy = AuthorizationPolicies.SectionAccessForMediaTree)]
@@ -25,6 +28,13 @@ public class MediaTreeControllerBase : UserStartNodeTreeControllerBase<MediaTree
 {
     private readonly IMediaPresentationFactory _mediaPresentationFactory;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MediaTreeControllerBase"/> class.
+    /// </summary>
+    /// <param name="entityService">Service for accessing and managing entities within the system.</param>
+    /// <param name="flagProviders">A collection of providers that supply flags for entities.</param>
+    /// <param name="treeFilterService">Service for filtering media tree entities based on user start nodes.</param>
+    /// <param name="mediaPresentationFactory">Factory for creating media presentation models.</param>
     [ActivatorUtilitiesConstructor]
     public MediaTreeControllerBase(
         IEntityService entityService,

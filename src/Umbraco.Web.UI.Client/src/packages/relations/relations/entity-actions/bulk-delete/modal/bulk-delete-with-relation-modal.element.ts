@@ -51,7 +51,7 @@ export class UmbBulkDeleteWithRelationConfirmModalElement extends UmbModalBaseEl
 							.config=${this._referencesConfig}></umb-confirm-bulk-action-modal-entity-references>`
 					: nothing}
 
-				<uui-button slot="actions" id="cancel" label="Cancel" @click=${this._rejectModal}></uui-button>
+				<uui-button slot="actions" id="cancel" label=${this.localize.term('general_cancel')} @click=${this._rejectModal}></uui-button>
 
 				<uui-button
 					slot="actions"

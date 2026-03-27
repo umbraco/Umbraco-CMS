@@ -14,9 +14,21 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Document.Tree;
 
+/// <summary>
+/// Controller responsible for handling operations related to the ancestors of documents in the document tree.
+/// </summary>
 [ApiVersion("1.0")]
 public class AncestorsDocumentTreeController : DocumentTreeControllerBase
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Controllers.Document.Tree.AncestorsDocumentTreeController"/> class.
+    /// </summary>
+    /// <param name="entityService">Service for managing and retrieving entities in the system.</param>
+    /// <param name="flagProviders">A collection of providers that supply flags for document tree nodes.</param>
+    /// <param name="treeFilterService">Service for filtering document tree entities based on user start nodes.</param>
+    /// <param name="publicAccessService">Service for handling public access permissions on documents.</param>
+    /// <param name="documentPresentationFactory">Factory for creating document presentation models.</param>
+    /// <param name="documentPermissionFilterService">Service for filtering documents based on user permissions.</param>
     [ActivatorUtilitiesConstructor]
     public AncestorsDocumentTreeController(
         IEntityService entityService,

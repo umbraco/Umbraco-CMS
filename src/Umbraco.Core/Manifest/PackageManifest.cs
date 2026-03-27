@@ -31,12 +31,6 @@ public class PackageManifest
     public bool AllowTelemetry { get; set; } = true;
 
     /// <summary>
-    ///     Gets or sets a value indicating whether the package allows telemetry collection.
-    /// </summary>
-    [Obsolete("Use AllowTelemetry instead. Scheduled for removal in Umbraco 18.")]
-    public bool AllowPackageTelemetry { get; set; } = true;
-
-    /// <summary>
     ///     Gets or sets the array of extension objects defined by this package.
     /// </summary>
     public required object[] Extensions { get; set; }

@@ -15,9 +15,13 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Element.Tree;
 
+/// <summary>
+/// API controller responsible for retrieving root-level element tree items.
+/// </summary>
 [ApiVersion("1.0")]
 public class RootElementTreeController : ElementTreeControllerBase
 {
+    /// <inheritdoc />
     [ActivatorUtilitiesConstructor]
     public RootElementTreeController(
         IEntityService entityService,
@@ -48,6 +52,14 @@ public class RootElementTreeController : ElementTreeControllerBase
     {
     }
 
+    /// <summary>
+    /// Gets a paginated collection of element tree items from the root level.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="skip">The number of items to skip for pagination.</param>
+    /// <param name="take">The number of items to return for pagination.</param>
+    /// <param name="foldersOnly">Whether to return only folder items.</param>
+    /// <returns>A paginated collection of root element tree items.</returns>
     [HttpGet("root")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<ElementTreeItemResponseModel>), StatusCodes.Status200OK)]

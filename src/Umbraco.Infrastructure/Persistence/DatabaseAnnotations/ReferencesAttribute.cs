@@ -6,6 +6,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property)]
 public class ReferencesAttribute : Attribute
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ReferencesAttribute"/> class, specifying the type that is referenced by the decorated property or field.
+    /// </summary>
+    /// <param name="type">The <see cref="Type"/> that the decorated member references, typically representing a related entity or table.</param>
     public ReferencesAttribute(Type type) => Type = type;
 
     /// <summary>

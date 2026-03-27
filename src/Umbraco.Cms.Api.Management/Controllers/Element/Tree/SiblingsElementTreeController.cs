@@ -15,9 +15,13 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Element.Tree;
 
+/// <summary>
+/// API controller responsible for retrieving sibling element tree items.
+/// </summary>
 [ApiVersion("1.0")]
 public class SiblingsElementTreeController : ElementTreeControllerBase
 {
+    /// <inheritdoc />
     [ActivatorUtilitiesConstructor]
     public SiblingsElementTreeController(
         IEntityService entityService,
@@ -48,6 +52,15 @@ public class SiblingsElementTreeController : ElementTreeControllerBase
     {
     }
 
+    /// <summary>
+    /// Gets a collection of sibling element tree items for the specified target.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="target">The unique identifier of the target element.</param>
+    /// <param name="before">The number of sibling items to retrieve before the target.</param>
+    /// <param name="after">The number of sibling items to retrieve after the target.</param>
+    /// <param name="foldersOnly">Whether to return only folder items.</param>
+    /// <returns>A subset collection of sibling element tree items.</returns>
     [HttpGet("siblings")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(SubsetViewModel<ElementTreeItemResponseModel>), StatusCodes.Status200OK)]

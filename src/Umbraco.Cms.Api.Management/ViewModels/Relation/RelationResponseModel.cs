@@ -1,10 +1,19 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace Umbraco.Cms.Api.Management.ViewModels.Relation;
 
+/// <summary>
+/// Represents a response model containing information about a relation returned by the Umbraco CMS Management API.
+/// </summary>
 public class RelationResponseModel
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.ViewModels.Relation.RelationResponseModel"/> class.
+    /// </summary>
+    /// <param name="relationType">The relation type, referenced by its identifier.</param>
+    /// <param name="parent">The parent entity in the relation.</param>
+    /// <param name="child">The child entity in the relation.</param>
     public RelationResponseModel(ReferenceByIdModel relationType, RelationReferenceModel parent, RelationReferenceModel child)
     {
         RelationType = relationType;
@@ -12,6 +21,9 @@ public class RelationResponseModel
         Child = child;
     }
 
+    /// <summary>
+    /// Gets or sets the unique identifier of the relation.
+    /// </summary>
     public Guid Id { get; set; }
 
     /// <summary>

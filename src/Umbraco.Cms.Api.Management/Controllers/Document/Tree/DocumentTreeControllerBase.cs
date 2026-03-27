@@ -20,6 +20,9 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Document.Tree;
 
+/// <summary>
+/// Serves as the base controller for document tree management in the Umbraco CMS API, providing shared functionality for document tree operations.
+/// </summary>
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Tree}/{Constants.UdiEntityType.Document}")]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Document))]
 [Authorize(Policy = AuthorizationPolicies.SectionAccessForContentTree)]
@@ -29,6 +32,15 @@ public abstract class DocumentTreeControllerBase : UserStartNodeTreeControllerBa
     private readonly IDocumentPresentationFactory _documentPresentationFactory;
     private readonly IDocumentPermissionFilterService _documentPermissionFilterService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DocumentTreeControllerBase"/> class.
+    /// </summary>
+    /// <param name="entityService">Service for managing and retrieving entities in the system.</param>
+    /// <param name="flagProviders">A collection of providers that supply flags for document tree nodes.</param>
+    /// <param name="treeFilterService">Service for filtering document tree entities based on user start nodes.</param>
+    /// <param name="publicAccessService">Service for handling public access permissions on documents.</param>
+    /// <param name="documentPresentationFactory">Factory for creating document presentation models.</param>
+    /// <param name="documentPermissionFilterService">Service for filtering documents based on user permissions.</param>
     [ActivatorUtilitiesConstructor]
     protected DocumentTreeControllerBase(
         IEntityService entityService,

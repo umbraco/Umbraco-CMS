@@ -24,6 +24,18 @@ internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContent
     private readonly IRepositoryCacheVersionService _repositoryCacheVersionService;
     private readonly ICacheSyncService _cacheSyncService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ContentTypeRepository"/> class.
+    /// </summary>
+    /// <param name="scopeAccessor">Provides access to the current database scope.</param>
+    /// <param name="cache">The application-level cache manager.</param>
+    /// <param name="logger">The logger used for logging repository operations.</param>
+    /// <param name="commonRepository">Repository for common content type operations.</param>
+    /// <param name="languageRepository">Repository for managing languages.</param>
+    /// <param name="shortStringHelper">Helper for generating and manipulating short strings.</param>
+    /// <param name="repositoryCacheVersionService">Service for managing repository cache versions.</param>
+    /// <param name="idKeyMap">Service for mapping between IDs and keys.</param>
+    /// <param name="cacheSyncService">Service for synchronizing cache across distributed environments.</param>
     public ContentTypeRepository(
         IScopeAccessor scopeAccessor,
         AppCaches cache,
@@ -97,6 +109,11 @@ internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContent
         return Database.Fetch<string>(sql);
     }
 
+    /// <summary>
+    /// Retrieves the IDs of all content types that match the specified aliases.
+    /// </summary>
+    /// <param name="aliases">An array of content type aliases for which to retrieve the corresponding IDs.</param>
+    /// <returns>An <see cref="IEnumerable{Int32}"/> containing the IDs of content types that match the provided aliases. If no aliases are specified, returns an empty collection.</returns>
     public IEnumerable<int> GetAllContentTypeIds(string[] aliases)
     {
         if (aliases.Length == 0)

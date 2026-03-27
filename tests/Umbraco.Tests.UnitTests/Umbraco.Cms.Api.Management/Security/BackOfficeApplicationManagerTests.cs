@@ -100,8 +100,7 @@ public class BackOfficeApplicationManagerTests
         var existingRedirectUris = ImmutableArray.Create(
             "https://server1.local/umbraco/oauth_complete", // Valid
             "relative/path", // Invalid: not absolute
-            "https://server2.local/umbraco/oauth_complete"  // Valid
-        );
+            "https://server2.local/umbraco/oauth_complete");  // Valid
 
         _mockApplicationManager
             .Setup(x => x.GetRedirectUrisAsync(mockApplication, It.IsAny<CancellationToken>()))
@@ -134,8 +133,7 @@ public class BackOfficeApplicationManagerTests
             .ReturnsAsync(mockApplication);
 
         var existingRedirectUris = ImmutableArray.Create(
-            "https://server1.local/umbraco/oauth_complete"
-        );
+            "https://server1.local/umbraco/oauth_complete");
 
         _mockApplicationManager
             .Setup(x => x.GetRedirectUrisAsync(mockApplication, It.IsAny<CancellationToken>()))
@@ -168,8 +166,7 @@ public class BackOfficeApplicationManagerTests
         var existingRedirectUris = ImmutableArray.Create(
             "https://valid1.local/umbraco/oauth_complete",
             "relative", // Invalid: not absolute
-            "https://valid2.local/umbraco/oauth_complete"
-        );
+            "https://valid2.local/umbraco/oauth_complete");
 
         _mockApplicationManager
             .Setup(x => x.GetRedirectUrisAsync(mockApplication, It.IsAny<CancellationToken>()))
@@ -191,7 +188,9 @@ public class BackOfficeApplicationManagerTests
 
         // Assert
         Assert.That(capturedDescriptor, Is.Not.Null, "Descriptor should be captured");
-        Assert.That(capturedDescriptor!.RedirectUris.Count, Is.EqualTo(3),
+        Assert.That(
+            capturedDescriptor!.RedirectUris.Count,
+            Is.EqualTo(3),
             "Should have 3 redirect URIs (2 existing valid + 1 new)");
 
         var redirectUriStrings = capturedDescriptor.RedirectUris.Select(u => u.ToString()).ToList();
@@ -213,8 +212,7 @@ public class BackOfficeApplicationManagerTests
             .ReturnsAsync(mockApplication);
 
         var existingRedirectUris = ImmutableArray.Create(
-            "https://SERVER1.LOCAL/umbraco/oauth_complete" // Uppercase
-        );
+            "https://SERVER1.LOCAL/umbraco/oauth_complete"); // Uppercase
 
         _mockApplicationManager
             .Setup(x => x.GetRedirectUrisAsync(mockApplication, It.IsAny<CancellationToken>()))
@@ -236,7 +234,9 @@ public class BackOfficeApplicationManagerTests
 
         // Assert
         Assert.That(capturedDescriptor, Is.Not.Null);
-        Assert.That(capturedDescriptor!.RedirectUris.Count, Is.EqualTo(1),
+        Assert.That(
+            capturedDescriptor!.RedirectUris.Count,
+            Is.EqualTo(1),
             "Should have only 1 redirect URI (deduplicated by authority)");
     }
 
@@ -255,8 +255,7 @@ public class BackOfficeApplicationManagerTests
 
         var existingRedirectUris = ImmutableArray.Create(
             "https://server1.local/some/old/path",
-            "https://server1.local/another/old/path"
-        );
+            "https://server1.local/another/old/path");
 
         _mockApplicationManager
             .Setup(x => x.GetRedirectUrisAsync(mockApplication, It.IsAny<CancellationToken>()))
@@ -283,7 +282,9 @@ public class BackOfficeApplicationManagerTests
 
         // Assert - should deduplicate by authority
         Assert.That(capturedDescriptor, Is.Not.Null);
-        Assert.That(capturedDescriptor!.RedirectUris.Count, Is.EqualTo(1),
+        Assert.That(
+            capturedDescriptor!.RedirectUris.Count,
+            Is.EqualTo(1),
             "Should have only 1 redirect URI (deduplicated by authority, not full path)");
     }
 
@@ -309,11 +310,133 @@ public class BackOfficeApplicationManagerTests
             Times.Never);
     }
 
+    /// <summary>
+    /// Tests that when SecuritySettings.BackOfficeHost is configured, the configured host
+    /// is appended to the merged hosts rather than replacing them. In a shared-database
+    /// environment, hosts from the DB, middleware, and settings must all be preserved.
+    /// </summary>
+    [Test]
+    public async Task EnsureBackOfficeApplicationAsync_WithBackOfficeHostConfigured_PreservesExistingHosts()
+    {
+        // Arrange
+        var configuredHost = new Uri("https://configured-host.local/");
+        var securitySettingsWithHost = Options.Create(new SecuritySettings
+        {
+            BackOfficeHost = configuredHost,
+            AuthorizeCallbackPathName = "umbraco/oauth_complete",
+            AuthorizeCallbackLogoutPathName = "umbraco/logout"
+        });
+
+        var mockApplication = new object();
+        _mockApplicationManager
+            .Setup(x => x.FindByClientIdAsync(Constants.OAuthClientIds.BackOffice, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(mockApplication);
+
+        // Existing redirect URIs in the DB (from server1 that started previously)
+        var existingRedirectUris = ImmutableArray.Create(
+            "https://server1.local/umbraco/oauth_complete");
+
+        _mockApplicationManager
+            .Setup(x => x.GetRedirectUrisAsync(mockApplication, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(existingRedirectUris);
+
+        OpenIddictApplicationDescriptor? capturedDescriptor = null;
+        _mockApplicationManager
+            .Setup(x => x.UpdateAsync(It.IsAny<object>(), It.IsAny<OpenIddictApplicationDescriptor>(), It.IsAny<CancellationToken>()))
+            .Callback<object, OpenIddictApplicationDescriptor, CancellationToken>((_, descriptor, _) =>
+                capturedDescriptor = descriptor)
+            .Returns(ValueTask.CompletedTask);
+
+        var sut = new BackOfficeApplicationManager(
+            _mockApplicationManager.Object,
+            _mockWebHostEnvironment.Object,
+            securitySettingsWithHost,
+            _mockRuntimeState.Object,
+            _mockLogger.Object);
+
+        // server2 is the host detected by the middleware on this instance
+        var newHosts = new[] { new Uri("https://server2.local/") };
+
+        // Act
+        await sut.EnsureBackOfficeApplicationAsync(newHosts);
+
+        // Assert - all three hosts must be present: server1 (DB), server2 (middleware), configured-host (settings)
+        Assert.That(capturedDescriptor, Is.Not.Null, "Descriptor should be captured");
+        Assert.That(
+            capturedDescriptor!.RedirectUris.Count,
+            Is.EqualTo(3),
+            "Should have 3 redirect URIs (server1 from DB + server2 from middleware + configured-host from settings)");
+
+        var redirectUriStrings = capturedDescriptor.RedirectUris.Select(u => u.ToString()).ToList();
+        Assert.That(redirectUriStrings, Does.Contain("https://server1.local/umbraco/oauth_complete"));
+        Assert.That(redirectUriStrings, Does.Contain("https://server2.local/umbraco/oauth_complete"));
+        Assert.That(redirectUriStrings, Does.Contain("https://configured-host.local/umbraco/oauth_complete"));
+    }
+
+    /// <summary>
+    /// Tests that when SecuritySettings.BackOfficeHost is set to a host that already exists
+    /// in the merged hosts, it is not duplicated.
+    /// </summary>
+    [Test]
+    public async Task EnsureBackOfficeApplicationAsync_WithBackOfficeHostAlreadyInHosts_DoesNotDuplicate()
+    {
+        // Arrange - BackOfficeHost is the same as what's already in the DB
+        var configuredHost = new Uri("https://server1.local/");
+        var securitySettingsWithHost = Options.Create(new SecuritySettings
+        {
+            BackOfficeHost = configuredHost,
+            AuthorizeCallbackPathName = "umbraco/oauth_complete",
+            AuthorizeCallbackLogoutPathName = "umbraco/logout"
+        });
+
+        var mockApplication = new object();
+        _mockApplicationManager
+            .Setup(x => x.FindByClientIdAsync(Constants.OAuthClientIds.BackOffice, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(mockApplication);
+
+        var existingRedirectUris = ImmutableArray.Create(
+            "https://server1.local/umbraco/oauth_complete");
+
+        _mockApplicationManager
+            .Setup(x => x.GetRedirectUrisAsync(mockApplication, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(existingRedirectUris);
+
+        OpenIddictApplicationDescriptor? capturedDescriptor = null;
+        _mockApplicationManager
+            .Setup(x => x.UpdateAsync(It.IsAny<object>(), It.IsAny<OpenIddictApplicationDescriptor>(), It.IsAny<CancellationToken>()))
+            .Callback<object, OpenIddictApplicationDescriptor, CancellationToken>((_, descriptor, _) =>
+                capturedDescriptor = descriptor)
+            .Returns(ValueTask.CompletedTask);
+
+        var sut = new BackOfficeApplicationManager(
+            _mockApplicationManager.Object,
+            _mockWebHostEnvironment.Object,
+            securitySettingsWithHost,
+            _mockRuntimeState.Object,
+            _mockLogger.Object);
+
+        // Pass the same host as middleware-detected
+        var newHosts = new[] { new Uri("https://server1.local/") };
+
+        // Act
+        await sut.EnsureBackOfficeApplicationAsync(newHosts);
+
+        // Assert - should have only 1 redirect URI (no duplication)
+        Assert.That(capturedDescriptor, Is.Not.Null, "Descriptor should be captured");
+        Assert.That(
+            capturedDescriptor!.RedirectUris.Count,
+            Is.EqualTo(1),
+            "Should have only 1 redirect URI (no duplication when BackOfficeHost matches existing)");
+
+        var redirectUriStrings = capturedDescriptor.RedirectUris.Select(u => u.ToString()).ToList();
+        Assert.That(redirectUriStrings, Does.Contain("https://server1.local/umbraco/oauth_complete"));
+    }
+
     private BackOfficeApplicationManager CreateDefaultMockedBackofficeApplicationManager() =>
-        new BackOfficeApplicationManager(
-        _mockApplicationManager.Object,
-        _mockWebHostEnvironment.Object,
-        _securitySettings,
-        _mockRuntimeState.Object,
-        _mockLogger.Object);
+        new(
+            _mockApplicationManager.Object,
+            _mockWebHostEnvironment.Object,
+            _securitySettings,
+            _mockRuntimeState.Object,
+            _mockLogger.Object);
 }

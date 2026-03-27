@@ -13,8 +13,19 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Media.Tree;
 
+/// <summary>
+/// Controller responsible for handling operations related to sibling media items within the media tree.
+/// Provides endpoints for retrieving and managing media items that share the same parent.
+/// </summary>
 public class SiblingsMediaTreeController : MediaTreeControllerBase
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SiblingsMediaTreeController"/> class, which manages operations related to sibling media items in the media tree.
+    /// </summary>
+    /// <param name="entityService">Service for accessing and managing entities within the Umbraco CMS.</param>
+    /// <param name="flagProviders">A collection of providers that supply flags for entities, used for additional metadata or state.</param>
+    /// <param name="treeFilterService">Service for filtering media tree entities based on user start nodes.</param>
+    /// <param name="mediaPresentationFactory">Factory for creating media presentation models for API responses.</param>
     [ActivatorUtilitiesConstructor]
     public SiblingsMediaTreeController(
         IEntityService entityService,
@@ -42,6 +53,15 @@ public class SiblingsMediaTreeController : MediaTreeControllerBase
     {
     }
 
+    /// <summary>
+    /// Retrieves sibling media items in the media tree for the specified target item.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="target">The unique identifier of the media item whose siblings are to be retrieved.</param>
+    /// <param name="before">The number of sibling items to include before the target item.</param>
+    /// <param name="after">The number of sibling items to include after the target item.</param>
+    /// <param name="dataTypeId">An optional data type identifier to filter the sibling items.</param>
+    /// <returns>A task representing the asynchronous operation. The result contains an <see cref="ActionResult{T}"/> with a <see cref="SubsetViewModel{MediaTreeItemResponseModel}"/> representing the sibling media items.</returns>
     [HttpGet("siblings")]
     [ProducesResponseType(typeof(SubsetViewModel<MediaTreeItemResponseModel>), StatusCodes.Status200OK)]
     [EndpointSummary("Gets a collection of media tree sibling items.")]

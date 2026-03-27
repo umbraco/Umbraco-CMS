@@ -8,13 +8,9 @@ using Umbraco.Cms.Core.Services;
 namespace Umbraco.Cms.Api.Management.Controllers.Tree;
 
 /// <summary>
-/// Base class for tree controllers that support user start node filtering.
+/// Provides a base controller for managing tree structures representing user start nodes in the Umbraco management API.
 /// </summary>
-/// <typeparam name="TItem">The type of tree item response model.</typeparam>
-/// <remarks>
-/// Users without root access will only see items within their configured start nodes,
-/// with ancestor items marked as "no access" for navigation purposes.
-/// </remarks>
+/// <typeparam name="TItem">The type of the tree item managed by the controller.</typeparam>
 public abstract class UserStartNodeTreeControllerBase<TItem> : EntityTreeControllerBase<TItem>
     where TItem : ContentTreeItemResponseModel, new()
 {

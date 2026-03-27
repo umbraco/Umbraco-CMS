@@ -13,9 +13,19 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Media.Tree;
 
+/// <summary>
+/// Controller responsible for handling operations related to the ancestors of media items in the media tree.
+/// </summary>
 [ApiVersion("1.0")]
 public class AncestorsMediaTreeController : MediaTreeControllerBase
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AncestorsMediaTreeController"/> class.
+    /// </summary>
+    /// <param name="entityService">Service for managing and retrieving entities within the system.</param>
+    /// <param name="flagProviders">A collection of providers that supply flags for entities.</param>
+    /// <param name="treeFilterService">Service for filtering media tree entities based on user start nodes.</param>
+    /// <param name="mediaPresentationFactory">Factory for creating media presentation models.</param>
     [ActivatorUtilitiesConstructor]
     public AncestorsMediaTreeController(
         IEntityService entityService,
@@ -43,6 +53,10 @@ public class AncestorsMediaTreeController : MediaTreeControllerBase
     {
     }
 
+    /// <summary>Gets a collection of ancestor media items.</summary>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <param name="descendantId">The ID of the descendant media item.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains an ActionResult with a collection of MediaTreeItemResponseModel representing the ancestors.</returns>
     [HttpGet("ancestors")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<MediaTreeItemResponseModel>), StatusCodes.Status200OK)]
