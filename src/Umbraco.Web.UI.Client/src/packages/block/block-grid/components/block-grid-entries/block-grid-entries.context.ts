@@ -33,6 +33,7 @@ import {
 	UMB_BLOCK_CATALOGUE_MODAL,
 	UmbBlockEntriesContext,
 	type UmbBlockDataModel,
+	findLayoutEntryInAreas,
 } from '@umbraco-cms/backoffice/block';
 
 interface UmbBlockGridAreaTypeInvalidRuleType {
@@ -288,6 +289,13 @@ export class UmbBlockGridEntriesContext
 				const newPath = routeBuilder({});
 				this._workspacePath.setValue(newPath);
 			});
+	}
+
+	protected override _findLayout(
+		source: Array<UmbBlockGridLayoutModel>,
+		contentKey: string,
+	): UmbBlockGridLayoutModel | undefined {
+		return findLayoutEntryInAreas(source, contentKey);
 	}
 
 	async #clipboardEntriesFilter(propertyValue: UmbBlockGridValueModel) {

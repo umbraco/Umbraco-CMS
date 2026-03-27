@@ -12,6 +12,7 @@ import {
 	type MappingFunction,
 	mergeObservables,
 } from '@umbraco-cms/backoffice/observable-api';
+import { UMB_PROPERTY_SORT_MODE_CONTEXT } from '@umbraco-cms/backoffice/property-sort-mode';
 import { UmbDocumentTypeDetailRepository } from '@umbraco-cms/backoffice/document-type';
 import { UmbContentTypeStructureManager, type UmbContentTypeModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbId } from '@umbraco-cms/backoffice/id';
@@ -77,6 +78,27 @@ export abstract class UmbBlockManagerContext<
 
 	readonly #settings = new UmbArrayState(<Array<UmbBlockDataModel>>[], (x) => x.key);
 	public readonly settings = this.#settings.asObservable();
+
+	#inlineEditingMode = new UmbBooleanState(undefined);
+	readonly inlineEditingMode = this.#inlineEditingMode.asObservable();
+
+	setInlineEditingMode(inlineEditingMode: boolean | undefined) {
+		this.#inlineEditingMode.setValue(inlineEditingMode ?? false);
+	}
+	getInlineEditingMode(): boolean | undefined {
+		return this.#inlineEditingMode.getValue();
+	}
+
+	#sortModeContext?: typeof UMB_PROPERTY_SORT_MODE_CONTEXT.TYPE;
+	#isSortMode = new UmbBooleanState(undefined);
+	readonly isSortMode = this.#isSortMode.asObservable();
+
+	setIsSortMode(isSortMode: boolean) {
+		this.#sortModeContext?.setIsSortMode(isSortMode);
+	}
+	getIsSortMode(): boolean | undefined {
+		return this.#sortModeContext?.getIsSortMode();
+	}
 
 	// TODO: This is a bad seperation of concerns, this should be self initializing, not defined from the outside. [NL]
 	public readonly readOnlyState = new UmbReadOnlyVariantGuardManager(this);
@@ -173,6 +195,13 @@ export abstract class UmbBlockManagerContext<
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_BLOCK_MANAGER_CONTEXT);
+
+		this.consumeContext(UMB_PROPERTY_SORT_MODE_CONTEXT, (sortModeContext) => {
+			this.#sortModeContext = sortModeContext;
+			this.observe(this.#sortModeContext?.isSortMode, (isSortMode) => {
+				this.#isSortMode.setValue(isSortMode);
+			});
+		});
 
 		this.observe(
 			this.blockTypes,
@@ -417,11 +446,14 @@ export abstract class UmbBlockManagerContext<
 		);
 	}
 
-	abstract createWithPresets(
+	async createWithPresets(
 		contentElementTypeKey: string,
 		partialLayoutEntry?: Omit<BlockLayoutType, 'contentKey'>,
-		originData?: BlockOriginDataType,
-	): Promise<UmbBlockDataObjectModel<BlockLayoutType> | undefined>;
+		// This property is used by some implementations, but not used in this base. Do not remove. [NL]
+		_originData?: BlockOriginDataType,
+	) {
+		return await this._createBlockData(contentElementTypeKey, partialLayoutEntry);
+	}
 
 	public async createBlockSettingsData(contentElementTypeKey: string) {
 		const blockType = this.#blockTypes.value.find((x) => x.contentElementTypeKey === contentElementTypeKey);
@@ -540,12 +572,17 @@ export abstract class UmbBlockManagerContext<
 		};
 	}
 
-	abstract insert(
+	insert(
 		layoutEntry: BlockLayoutType,
 		content: UmbBlockDataModel,
 		settings: UmbBlockDataModel | undefined,
 		originData: BlockOriginDataType,
-	): boolean;
+	) {
+		this._layouts.appendOneAt(layoutEntry, originData.index ?? -1);
+		this.insertBlockData(layoutEntry, content, settings, originData);
+		this.notifyBlockInserted(layoutEntry, originData);
+		return true;
+	}
 
 	protected insertBlockData(
 		layoutEntry: BlockLayoutType,

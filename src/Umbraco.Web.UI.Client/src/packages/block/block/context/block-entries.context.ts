@@ -62,10 +62,21 @@ export abstract class UmbBlockEntriesContext<
 	// Public methods:
 
 	layoutOf(contentKey: string) {
-		return this._layoutEntries.asObservablePart((source) => source.find((x) => x.contentKey === contentKey));
+		return this._layoutEntries.asObservablePart((source) => this._findLayout(source, contentKey));
 	}
 	getLayoutOf(contentKey: string) {
-		return this._layoutEntries.getValue().find((x) => x.contentKey === contentKey);
+		return this._findLayout(this._layoutEntries.getValue(), contentKey);
+	}
+
+	/**
+	 * Find a layout entry by contentKey in the given source array.
+	 * Override in subclasses to support recursive search through nested areas (e.g. block grid).
+	 * @param source The layout entries to search.
+	 * @param contentKey The contentKey to find.
+	 * @returns The matching layout entry, or undefined if not found.
+	 */
+	protected _findLayout(source: Array<BlockLayoutType>, contentKey: string): BlockLayoutType | undefined {
+		return source.find((x) => x.contentKey === contentKey);
 	}
 	setLayouts(layouts: Array<BlockLayoutType>) {
 		return this._layoutEntries.setValue(layouts);

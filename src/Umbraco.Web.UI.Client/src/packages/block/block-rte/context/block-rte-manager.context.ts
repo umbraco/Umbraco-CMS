@@ -51,7 +51,7 @@ export class UmbBlockRteManagerContext<
 	 * @param partialLayoutEntry
 	 * @param _originData
 	 */
-	async createWithPresets(
+	override async createWithPresets(
 		contentElementTypeKey: string,
 		partialLayoutEntry?: Omit<BlockLayoutType, 'contentKey'>,
 		// This property is used by some implementations, but not used in this, do not remove. [NL]
@@ -69,7 +69,7 @@ export class UmbBlockRteManagerContext<
 		return data;
 	}
 
-	insert(
+	override insert(
 		layoutEntry: BlockLayoutType,
 		content: UmbBlockDataModel,
 		settings: UmbBlockDataModel | undefined,
