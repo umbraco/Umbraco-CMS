@@ -16,7 +16,11 @@
         {"id": "frontend-breaking-change-awareness", "text": "Checks frontend-specific breaking changes (exports, custom elements) not just backend"},
         {"id": "file-references-present", "text": "Findings reference specific files with line numbers"},
         {"id": "no-false-critical-on-deprecations", "text": "Properly deprecated code is NOT flagged as Critical breaking change"},
-        {"id": "no-stylistic-nitpicks", "text": "Review does not flag purely cosmetic/stylistic issues (formatting, whitespace, naming conventions, comment grammar, code style preferences) unless they affect performance or rendering"}
+        {"id": "no-stylistic-nitpicks", "text": "Review does not flag purely cosmetic/stylistic issues (formatting, whitespace, naming conventions, comment grammar, code style preferences) unless they affect performance or rendering"},
+        {"id": "manifest-alias-rename-detected", "text": "Alias renames (CreateOptions → Create) flagged as Critical breaking change"},
+        {"id": "non-exported-deletions-dismissed", "text": "Deleted action classes NOT flagged as breaking (verified against package.json exports)"},
+        {"id": "formatting-mixed-with-logic", "text": "Flags UiBaseLocators.ts as formatting changes mixed with functional changes"},
+        {"id": "noise-files-filtered", "text": "Does not review noise files (generated files, lock files, etc.)"}
       ]
     },
     {
@@ -49,7 +53,10 @@
         {"id": "correct-target-branch", "text": "Review references 'v18/dev' as the target branch (not 'main')"},
         {"id": "default-value-change-noted", "text": "Review discusses the behavioral impact of changing the default payload type"},
         {"id": "proportionate-review", "text": "Review output is under 150 lines"},
-        {"id": "no-stylistic-nitpicks", "text": "Review does not flag purely cosmetic/stylistic issues (formatting, whitespace, naming conventions, comment grammar, code style preferences) unless they affect performance or rendering"}
+        {"id": "no-stylistic-nitpicks", "text": "Review does not flag purely cosmetic/stylistic issues (formatting, whitespace, naming conventions, comment grammar, code style preferences) unless they affect performance or rendering"},
+        {"id": "ignores-preexisting-issues", "text": "Does NOT flag the ~30 builder extension methods with Legacy defaults (pre-existing, not changed in the PR)"},
+        {"id": "side-effect-detection", "text": "Flags stale WebhookSettings.cs docs as a side-effect of the constant value change"},
+        {"id": "consumer-identification", "text": "Identifies affected consumers outside the PR (WebhookSettings, UmbracoBuilder, or WebhookEventCollectionBuilderExtensions)"}
       ]
     }
   ]
