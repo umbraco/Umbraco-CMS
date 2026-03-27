@@ -252,6 +252,26 @@ internal sealed class MediaTypeServiceTests : UmbracoIntegrationTest
         Assert.Throws<InvalidOperationException>(() => mediaType.Alias += "_updated");
     }
 
+    [TestCase(Constants.Conventions.MediaTypes.File)]
+    [TestCase(Constants.Conventions.MediaTypes.Folder)]
+    [TestCase(Constants.Conventions.MediaTypes.Image)]
+    public async Task Can_Copy_System_Media_Type(string mediaTypeAlias)
+    {
+        // Arrange
+        var mediaType = MediaTypeService.Get(mediaTypeAlias);
+        Assert.IsNotNull(mediaType);
+
+        // Act
+        var result = await MediaTypeService.CopyAsync(mediaType.Key, null);
+
+        // Assert
+        Assert.IsTrue(result.Success);
+        Assert.IsNotNull(result.Result);
+        Assert.AreNotEqual(mediaType.Alias, result.Result!.Alias);
+        Assert.AreNotEqual(mediaType.Id, result.Result.Id);
+        Assert.AreNotEqual(mediaType.Key, result.Result.Key);
+    }
+
     [Test]
     public async Task GetAllowedParentsAsync_ReturnsEmptyCollection_WhenNoParentsAllowChildType()
     {
