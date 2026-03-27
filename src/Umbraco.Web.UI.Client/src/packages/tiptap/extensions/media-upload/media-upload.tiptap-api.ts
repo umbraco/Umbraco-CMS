@@ -132,12 +132,6 @@ export default class UmbTiptapMediaUploadExtensionApi extends UmbTiptapExtension
 			const upload = uploads[0];
 
 			if (!upload || upload.status !== TemporaryFileStatus.SUCCESS) {
-				this.#notificationContext?.peek('danger', {
-					data: {
-						headline: file.name,
-						message: this.#localize.term('errors_dissallowedMediaType'),
-					},
-				});
 				continue;
 			}
 

@@ -114,11 +114,11 @@ internal class RichTextAllowedMediaTypeValidatorTests
     private static IEnumerable<System.ComponentModel.DataAnnotations.ValidationResult> Validate(
         RichTextAllowedMediaTypeValidator validator,
         string markup,
-        string? allowedMediaTypes = null) =>
+        string? allowedMediaTypes = "USE_DEFAULT") =>
         validator.Validate(
             $$"""{"markup":"{{markup.Replace("\"", "\\\"")}}","blocks":null}""",
             null,
-            new RichTextConfiguration { AllowedMediaTypes = allowedMediaTypes ?? AllowedTypeKey.ToString() },
+            new RichTextConfiguration { AllowedMediaTypes = allowedMediaTypes == "USE_DEFAULT" ? AllowedTypeKey.ToString() : allowedMediaTypes },
             PropertyValidationContext.Empty());
 
     private static string BuildMarkup(Guid mediaKey) =>
