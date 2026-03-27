@@ -699,7 +699,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 
 			#container-list {
 				display: flex;
-				overflow: hidden;
+				overflow-x: auto;
 				min-width: 0;
 				flex: 1;
 			}
@@ -716,6 +716,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 
 			uui-tab-group {
 				flex-wrap: nowrap;
+				flex-shrink: 0;
 			}
 
 			uui-tab.content-tab-is-empty {
@@ -781,6 +782,10 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 
 			[drag-placeholder] {
 				opacity: 0.2;
+			}
+
+			#add-tab {
+				flex-shrink: 0;
 			}
 		`,
 	];
