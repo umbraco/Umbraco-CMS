@@ -33,6 +33,8 @@ namespace Umbraco.Cms.Web.Common.Middleware;
 /// </remarks>
 internal sealed class UmbracoRequestMiddleware : IMiddleware
 {
+    private static bool _applicationUrlLogged;
+
     private readonly IDefaultCultureAccessor _defaultCultureAccessor;
     private readonly IEventAggregator _eventAggregator;
     private readonly IHostingEnvironment _hostingEnvironment;
@@ -93,6 +95,16 @@ internal sealed class UmbracoRequestMiddleware : IMiddleware
 
         Uri? currentApplicationUrl = GetApplicationUrlFromCurrentRequest(context.Request);
         _hostingEnvironment.EnsureApplicationMainUrl(currentApplicationUrl);
+
+        if (currentApplicationUrl is not null
+            && _applicationUrlLogged is false
+            && _hostingEnvironment.ApplicationMainUrl is not null)
+        {
+            _applicationUrlLogged = true;
+            _logger.LogInformation(
+                "Application URL auto-detected as {ApplicationMainUrl}. To override, set Umbraco:CMS:WebRouting:UmbracoApplicationUrl in configuration.",
+                _hostingEnvironment.ApplicationMainUrl);
+        }
 
         var pathAndQuery = context.Request.GetEncodedPathAndQuery();
 
