@@ -1,6 +1,7 @@
 using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
+using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
@@ -11,6 +12,7 @@ internal sealed class DomainDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.Domain;
     public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
+    public const string KeyColumnName = "key";
 
     /// <summary>
     /// Gets or sets the unique identifier for the domain.
@@ -18,6 +20,14 @@ internal sealed class DomainDto
     [Column(PrimaryKeyColumnName)]
     [PrimaryKeyColumn]
     public int Id { get; set; }
+
+    /// <summary>
+    /// Gets or sets the globally unique key for the domain.
+    /// </summary>
+    [Column(KeyColumnName)]
+    [NullSetting(NullSetting = NullSettings.NotNull)]
+    [Constraint(Default = SystemMethods.NewGuid)]
+    public Guid Key { get; set; }
 
     /// <summary>
     /// Gets or sets the default language identifier for the domain.

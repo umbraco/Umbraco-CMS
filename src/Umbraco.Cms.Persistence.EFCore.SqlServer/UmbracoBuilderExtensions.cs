@@ -4,6 +4,7 @@ using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore.Migrations;
 using Umbraco.Cms.Persistence.EFCore.Migrations;
+using Umbraco.Cms.Persistence.EFCore.SqlServer.DtoCustomization;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Persistence.EFCore.SqlServer;
@@ -24,6 +25,11 @@ public static class UmbracoBuilderExtensions
 
         builder.AddDbContextRegistrar<SqlServerDbContextServiceRegistrar>();
 
+        AddCustomizers(builder);
+
         return builder;
     }
+
+    private static void AddCustomizers(IUmbracoBuilder builder) =>
+        builder.AddEFCoreModelCustomizer<SqlServerNodeDtoModelCustomizer>();
 }
