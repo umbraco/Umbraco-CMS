@@ -233,6 +233,7 @@ internal sealed class DomainRepository : AsyncEntityRepositoryBase<Guid, IDomain
 
         Dictionary<int, string> isoCodeLookup = await db.Language
             .Where(l => languageIds.Contains(l.Id))
+            .Select(l => new { l.Id, l.IsoCode })
             .ToDictionaryAsync(l => l.Id, l => l.IsoCode!);
 
         var nodeIds = dtos
@@ -243,6 +244,7 @@ internal sealed class DomainRepository : AsyncEntityRepositoryBase<Guid, IDomain
 
         Dictionary<int, Guid> nodeKeyLookup = await db.Nodes
             .Where(n => nodeIds.Contains(n.NodeId))
+            .Select(n => new { n.NodeId, n.UniqueId })
             .ToDictionaryAsync(n => n.NodeId, n => n.UniqueId);
 
         return DomainFactory.BuildEntities(dtos, isoCodeLookup, nodeKeyLookup);
