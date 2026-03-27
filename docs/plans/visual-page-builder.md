@@ -35,6 +35,7 @@
     - 10.8 [Migration Path](#108-migration-path)
     - 10.9 [Comparison: Embedded vs Standalone](#109-comparison-embedded-vs-standalone)
     - 10.10 [Server-Side Changes](#1010-server-side-changes)
+11. [Discussion Notes & Feedback](#11-discussion-notes--feedback)
 
 ---
 
@@ -2016,3 +2017,68 @@ The `sandbox` attribute on the iframe was removed as it's not needed for trusted
 For text properties (TextBox, TextArea), the panel sends `umb:ve:update-property-text` via postMessage to the guest script, which does a simple `span.textContent = newValue`. This is instant — no server round-trip. The server re-render on save replaces the optimistic content with the Razor-rendered version (source of truth).
 
 This approach works for plain text. For RichText (HTML content) and properties whose rendered output differs from their stored value (e.g., Markdown → HTML), a server-side partial re-render API will be needed (Phase 2+).
+
+---
+
+## 11. Discussion Notes & Feedback
+
+> Captured 2026-03-27 — early feedback on the visual editor direction.
+
+### General Sentiment
+
+Full page preview is the right direction — this is the way forward for visual editing in Umbraco.
+
+### Block Manipulation Challenges
+
+Moving blocks **between areas** or **reordering blocks** within the preview will be tricky. The block ordering/drag-and-drop logic currently lives deep inside the Block Grid and Block List packages. To make this work in the visual editor, we need to **abstract the block manipulation logic up to the library/view level** so it can be driven from the preview iframe context, not just from the backoffice block editor UI.
+
+This ties into the existing Phase 3 block manipulation work (§4.6) but highlights that the abstraction boundary needs to be higher than currently planned.
+
+### Inline Block Editing
+
+Currently there is **no support for editing individual blocks** inline within the visual editor. The PoC handles property-level inline editing for text properties, but block-level editing (opening a block's properties, changing its content/settings) is not yet wired up. This is a prerequisite for the visual editor to be useful on block-heavy pages.
+
+### Headless Rendering Support
+
+The visual editor must support **both template-based rendering and headless rendering**. Currently the architecture assumes server-side Razor rendering for the preview iframe. For headless sites (using the Delivery API), there is no Razor template to render.
+
+**Action**: Investigate [Kenn's headless preview package](https://github.com/kjac) for inspiration on how headless preview rendering is handled. The visual editor should be able to render a headless frontend (e.g., Next.js, Nuxt) in the iframe alongside the editing overlay, using the same postMessage protocol.
+
+This may require:
+- A configurable preview URL source (template URL vs external frontend URL)
+- A way for headless frontends to opt into the guest script injection (or load it themselves)
+- Delivery API support for draft/preview content in the iframe context
+
+### Code Deduplication
+
+There is duplicated logic between the **Block Grid** and **Block List** packages that should be consolidated. As we build the visual editor's block manipulation layer, this is the right time to extract shared code into common utilities. The new `src/packages/block/block/utils/` directory (visible in current working changes) is a step in this direction.
+
+### Validation in Preview
+
+Validation in the visual editor preview will be **tricky but achievable**. Currently, validation runs in the editing overlay/modal — the standard property editor validation pipeline fires when saving from the workspace. Making validation visible directly in the preview (e.g., highlighting invalid blocks, showing inline validation messages) requires surfacing validation state in the iframe guest script.
+
+This is durable once implemented — the workspace's existing validation pipeline remains the source of truth, and the preview simply reflects its state visually.
+
+### Document Type–Controlled Editability
+
+The document type should be able to **decide which property editors are editable in the visual editor**. This extends Open Question #5 (property type setting vs editor-alias convention). Rather than a hard-coded list of "inline-editable" editor aliases, the document type or property type configuration should include an "Editable in Visual Editor" toggle.
+
+This gives content architects control over which properties appear as interactive in the preview versus read-only rendered output.
+
+### Scroll Position Retention
+
+Need to introduce **scroll position retention** so that when the preview iframe re-renders (after save, after property change), the user's scroll position is preserved. Currently a full iframe reload loses scroll state. Options:
+- Store `scrollTop` before reload, restore after `load` event
+- For partial re-renders (Phase 2+), no scroll change needed since the page doesn't reload
+- The guest script could report and restore scroll position via postMessage
+
+### Responsive UI Controls
+
+The visual editor should reuse the **existing preview responsive controls** (device selector, viewport resizing). The preview app already supports device simulation — the visual editor should inherit this capability so editors can see and edit content at different breakpoints.
+
+### Save & Preview → Visual Editor Fullscreen
+
+The **Save and Preview** button could navigate directly to the visual editor experience in fullscreen mode (standalone window) rather than the current preview-only view. This creates a natural workflow:
+- Edit in form view → Save and Preview → lands in visual editor (fullscreen, standalone window)
+- The visual editor IS the preview, but with editing capabilities
+- This aligns with the standalone window architecture (§10) and makes the visual editor the default "preview" destination
