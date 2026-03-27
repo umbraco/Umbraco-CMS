@@ -75,6 +75,23 @@
         {"id": "diff-scoped", "text": "All findings reference code that was changed in the diff, not pre-existing issues"},
         {"id": "new-feature-assessed", "text": "Review assesses the new feature's architecture, patterns, or integration approach — not just absence of bugs"}
       ]
+    },
+    {
+      "id": 4,
+      "name": "pr-22215-frontend-architecture-violation",
+      "prompt": "Review the changes in PR #22215 (branch origin/pr/22215 targeting main). This is a 2-file frontend feature adding user management to the user group workspace.",
+      "expected_output": "A review that catches the architecture violation: the workspace context directly imports and calls UserService and UserGroupService (generated API clients) instead of going through a repository. In the Umbraco backoffice, workspace contexts access data via repositories, not by calling API services directly. The review should flag this as a significant architecture issue and request changes.",
+      "pr_number": 22215,
+      "pr_branch": "origin/pr/22215",
+      "base_branch": "origin/main",
+      "files": [],
+      "assertions": [
+        {"id": "service-bypass-detected", "text": "Review flags that the workspace context directly imports/calls UserService or UserGroupService instead of using a repository"},
+        {"id": "repository-pattern-recommended", "text": "Review recommends using the repository pattern (going through a repository/data-source layer) rather than calling API services directly from the workspace context"},
+        {"id": "verdict-request-changes", "text": "Verdict is 'Request Changes' (the architecture violation warrants requesting changes, not just approving with suggestions)"},
+        {"id": "no-stylistic-nitpicks", "text": "Review does not flag purely cosmetic/stylistic issues (formatting, whitespace, naming conventions, comment grammar, code style preferences) unless they affect performance or rendering"},
+        {"id": "no-false-breaking-changes", "text": "Review does not flag breaking changes (this PR only adds new code, no public API is removed or modified)"}
+      ]
     }
   ]
 }
