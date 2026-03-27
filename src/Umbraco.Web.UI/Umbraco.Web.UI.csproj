@@ -32,6 +32,7 @@
     Review for removal when Microsoft.EntityFrameworkCore.Design is updated to a newer version.
     -->
     <PackageReference Include="Microsoft.Build.Tasks.Core" PrivateAssets="all" Version="17.14.28" />
+    <PackageReference Include="Umbraco.TheStarterKit" Version="17.0.0" />
   </ItemGroup>
 
   <ItemGroup>
