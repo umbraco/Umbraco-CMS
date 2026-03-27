@@ -440,6 +440,7 @@ internal sealed class ContentTypeCommonRepository : IContentTypeCommonRepository
             ValidationRegExpMessage = dto.ValidationRegExpMessage,
             Variations = (ContentVariation)dto.Variations,
             LabelOnTop = dto.LabelOnTop,
+            EditableInVisualEditor = dto.EditableInVisualEditor,
         };
     }
 }

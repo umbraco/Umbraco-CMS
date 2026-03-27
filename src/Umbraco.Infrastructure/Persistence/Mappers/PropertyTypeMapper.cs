@@ -34,6 +34,7 @@ public sealed class PropertyTypeMapper : BaseMapper
         DefineMap<PropertyType, PropertyTypeDto>(nameof(PropertyType.ValidationRegExp), nameof(PropertyTypeDto.ValidationRegExp));
         DefineMap<PropertyType, PropertyTypeDto>(nameof(PropertyType.ValidationRegExpMessage), nameof(PropertyTypeDto.ValidationRegExpMessage));
         DefineMap<PropertyType, PropertyTypeDto>(nameof(PropertyType.LabelOnTop), nameof(PropertyTypeDto.LabelOnTop));
+        DefineMap<PropertyType, PropertyTypeDto>(nameof(PropertyType.EditableInVisualEditor), nameof(PropertyTypeDto.EditableInVisualEditor));
         DefineMap<PropertyType, DataTypeDto>(nameof(PropertyType.PropertyEditorAlias), nameof(DataTypeDto.EditorAlias));
         DefineMap<PropertyType, DataTypeDto>(nameof(PropertyType.ValueStorageType), nameof(DataTypeDto.DbType));
     }

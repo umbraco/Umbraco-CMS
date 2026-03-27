@@ -48,6 +48,7 @@ internal static class PropertyGroupFactory
             UniqueId = propertyType.Key,
             Variations = (byte)propertyType.Variations,
             LabelOnTop = propertyType.LabelOnTop,
+            EditableInVisualEditor = propertyType.EditableInVisualEditor,
         };
 
         if (groupId != default)

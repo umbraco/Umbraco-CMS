@@ -9,4 +9,9 @@ public class PropertyTypeAppearance
     /// Gets or sets a value indicating whether the label for the property type is displayed above the input.
     /// </summary>
     public bool LabelOnTop { get; set; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether this property type is editable in the visual editor.
+    /// </summary>
+    public bool EditableInVisualEditor { get; set; }
 }

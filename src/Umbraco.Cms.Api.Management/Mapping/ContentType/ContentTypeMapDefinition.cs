@@ -49,7 +49,8 @@ public abstract class ContentTypeMapDefinition<TContentType, TPropertyTypeModel,
                     },
                     Appearance = new PropertyTypeAppearance
                     {
-                        LabelOnTop = propertyType.LabelOnTop
+                        LabelOnTop = propertyType.LabelOnTop,
+                        EditableInVisualEditor = propertyType.EditableInVisualEditor,
                     }
                 })
             .ToArray();

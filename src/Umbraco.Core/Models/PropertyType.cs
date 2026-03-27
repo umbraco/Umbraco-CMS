@@ -21,6 +21,7 @@ public class PropertyType : EntityBase, IPropertyType, IEquatable<PropertyType>
     private Guid _dataTypeKey;
     private string? _description;
     private bool _labelOnTop;
+    private bool _editableInVisualEditor;
     private bool _mandatory;
     private string? _mandatoryMessage;
     private string _name;
@@ -223,6 +224,14 @@ public class PropertyType : EntityBase, IPropertyType, IEquatable<PropertyType>
     {
         get => _labelOnTop;
         set => SetPropertyValueAndDetectChanges(value, ref _labelOnTop, nameof(LabelOnTop));
+    }
+
+    /// <inheritdoc />
+    [DataMember]
+    public bool EditableInVisualEditor
+    {
+        get => _editableInVisualEditor;
+        set => SetPropertyValueAndDetectChanges(value, ref _editableInVisualEditor, nameof(EditableInVisualEditor));
     }
 
     /// <inheritdoc />

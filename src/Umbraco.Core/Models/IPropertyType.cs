@@ -59,6 +59,11 @@ public interface IPropertyType : IEntity, IRememberBeingDirty
     bool LabelOnTop { get; set; }
 
     /// <summary>
+    ///     Gets or sets a value indicating whether this property type is editable in the visual editor.
+    /// </summary>
+    bool EditableInVisualEditor { get; set; }
+
+    /// <summary>
     ///     Gets of sets the sort order of the property type.
     /// </summary>
     int SortOrder { get; set; }

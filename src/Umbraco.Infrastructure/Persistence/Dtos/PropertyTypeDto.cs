@@ -115,6 +115,13 @@ internal class PropertyTypeDto
     public bool LabelOnTop { get; set; }
 
     /// <summary>
+    /// Gets or sets a value indicating whether this property type is editable in the visual editor.
+    /// </summary>
+    [Column("editableInVisualEditor")]
+    [Constraint(Default = "0")]
+    public bool EditableInVisualEditor { get; set; }
+
+    /// <summary>
     /// Gets or sets the variation flags for the property type, indicating whether the property supports culture, segment, or invariant variations.
     /// The value corresponds to the <c>ContentVariation</c> enum.
     /// </summary>

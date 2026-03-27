@@ -166,6 +166,12 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 		});
 	}
 
+	#onToggleEditableInVisualEditor(event: UUIBooleanInputEvent) {
+		this.updateValue({
+			appearance: { labelOnTop: this._data?.appearance?.labelOnTop ?? false, editableInVisualEditor: event.target.checked },
+		});
+	}
+
 	#onShareAcrossCulturesChange(event: UUIBooleanInputEvent) {
 		const sharedAcrossCultures = event.target.checked;
 		this.updateValue({ variesByCulture: !sharedAcrossCultures });
@@ -235,6 +241,24 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 				<umb-localize key="contentTypeEditor_displaySettingsHeadline" slot="headline">Appearance</umb-localize>
 				<umb-property-layout orientation="vertical">
 					<div id="appearances" slot="editor">${this.#renderAlignLeftIcon()} ${this.#renderAlignTopIcon()}</div>
+				</umb-property-layout>
+			</uui-box>
+
+			<uui-box class="uui-text">
+				<umb-localize key="contentTypeEditor_visualEditorHeadline" slot="headline">Visual Editor</umb-localize>
+				<umb-property-layout
+					orientation="vertical"
+					label=${this.localize.term('contentTypeEditor_editableInVisualEditor')}>
+					<uui-toggle
+						slot="editor"
+						?checked=${this._data?.appearance?.editableInVisualEditor ?? false}
+						@change=${this.#onToggleEditableInVisualEditor}>
+					</uui-toggle>
+					<small slot="description">
+						<umb-localize key="contentTypeEditor_editableInVisualEditorDescription">
+							Allow this property to be edited inline in the visual editor
+						</umb-localize>
+					</small>
 				</umb-property-layout>
 			</uui-box>
 

@@ -37,6 +37,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
             : this(propertyType.Alias, propertyType.DataTypeId, true, propertyType.Variations, propertyValueConverters, publishedModelFactory, factory)
         {
             ContentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
+            EditableInVisualEditor = propertyType.EditableInVisualEditor;
         }
 
         /// <summary>
@@ -93,6 +94,9 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
 
         /// <inheritdoc />
         public bool IsUserProperty { get; }
+
+        /// <inheritdoc />
+        public bool EditableInVisualEditor { get; }
 
         /// <inheritdoc />
         public ContentVariation Variations { get; }

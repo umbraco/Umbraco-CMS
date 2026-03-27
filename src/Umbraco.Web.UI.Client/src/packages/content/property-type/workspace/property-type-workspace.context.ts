@@ -170,6 +170,7 @@ export class UmbPropertyTypeWorkspaceContext
 			},
 			appearance: {
 				labelOnTop: false,
+				editableInVisualEditor: false,
 			},
 			sortOrder: 0,
 		};

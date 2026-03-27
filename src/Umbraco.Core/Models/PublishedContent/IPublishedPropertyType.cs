@@ -47,6 +47,11 @@ public interface IPublishedPropertyType
     bool IsUserProperty { get; }
 
     /// <summary>
+    ///     Gets a value indicating whether this property type is editable in the visual editor.
+    /// </summary>
+    bool EditableInVisualEditor => false;
+
+    /// <summary>
     ///     Gets the content variations of the property type.
     /// </summary>
     ContentVariation Variations { get; }

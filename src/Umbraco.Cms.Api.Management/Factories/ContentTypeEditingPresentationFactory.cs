@@ -117,7 +117,7 @@ internal abstract class ContentTypeEditingPresentationFactory<TContentType>
         {
             Alias = property.Alias,
             Appearance =
-                new ContentTypeEditingModels.PropertyTypeAppearance { LabelOnTop = property.Appearance.LabelOnTop },
+                new ContentTypeEditingModels.PropertyTypeAppearance { LabelOnTop = property.Appearance.LabelOnTop, EditableInVisualEditor = property.Appearance.EditableInVisualEditor },
             Name = property.Name,
             Validation = new ContentTypeEditingModels.PropertyTypeValidation
             {

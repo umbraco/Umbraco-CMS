@@ -820,6 +820,7 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         propertyType.Description = property.Description;
         propertyType.SortOrder = property.SortOrder;
         propertyType.LabelOnTop = property.Appearance.LabelOnTop;
+        propertyType.EditableInVisualEditor = property.Appearance.EditableInVisualEditor;
 
         propertyType.PropertyGroupId = propertyGroup is null
             ? null

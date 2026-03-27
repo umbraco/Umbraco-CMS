@@ -90,6 +90,12 @@ internal sealed class PropertyTypeReadOnlyDto
     [Column("labelOnTop")]
     public bool LabelOnTop { get; set; }
 
+    /// <summary>
+    /// Gets or sets a value indicating whether this property type is editable in the visual editor.
+    /// </summary>
+    [Column("editableInVisualEditor")]
+    public bool EditableInVisualEditor { get; set; }
+
     /* cmsMemberType */
 
     /// <summary>

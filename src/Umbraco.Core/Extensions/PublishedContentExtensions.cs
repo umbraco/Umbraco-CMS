@@ -442,8 +442,8 @@ public static class PublishedContentExtensions
     }
 
     /// <summary>
-    /// Records a visual editor property access only for property editors
-    /// whose output is suitable for inline annotation (text-oriented editors).
+    /// Records a visual editor property access for property types
+    /// that have been marked as editable in the visual editor.
     /// </summary>
     private static void TrackVisualEditorAccess(IPublishedProperty? property, string alias, Guid contentKey)
     {
@@ -452,12 +452,7 @@ public static class PublishedContentExtensions
             return;
         }
 
-        var editorAlias = property.PropertyType.DataType.EditorAlias;
-
-        if (editorAlias is Umbraco.Cms.Core.Constants.PropertyEditors.Aliases.TextBox
-            or Umbraco.Cms.Core.Constants.PropertyEditors.Aliases.TextArea
-            or Umbraco.Cms.Core.Constants.PropertyEditors.Aliases.RichText
-            or Umbraco.Cms.Core.Constants.PropertyEditors.Aliases.MarkdownEditor)
+        if (property.PropertyType.EditableInVisualEditor)
         {
             VisualEditorPropertyTracker.RecordAccess(alias, contentKey);
         }
