@@ -15,7 +15,7 @@
         {"id": "frontend-breaking-change-awareness", "text": "Checks frontend-specific breaking changes (exports, custom elements) not just backend"},
         {"id": "file-references-present", "text": "Findings reference specific files with line numbers"},
         {"id": "no-false-critical-on-deprecations", "text": "Properly deprecated code is NOT flagged as Critical breaking change"},
-        {"id": "no-stylistic-nitpicks", "text": "Review does not flag purely cosmetic/stylistic issues (formatting, whitespace, naming conventions, comment grammar, code style preferences) unless they affect performance or rendering"},
+        {"id": "no-stylistic-nitpicks", "text": "Review does not flag purely cosmetic/stylistic issues (formatting, whitespace, naming conventions, comment grammar, code style preferences) unless they affect performance or rendering. Missing JSDoc on new public APIs is NOT a stylistic issue — it is a legitimate finding."},
         {"id": "manifest-alias-rename-detected", "text": "Alias renames (CreateOptions → Create) flagged as Critical breaking change"},
         {"id": "non-exported-deletions-dismissed", "text": "Deleted action classes NOT flagged as breaking (verified against package.json exports)"},
         {"id": "noise-files-filtered", "text": "Does not review noise files (generated files, lock files, etc.)"},
@@ -36,7 +36,7 @@
         {"id": "no-false-breaking-changes", "text": "Review does not flag breaking changes"},
         {"id": "proportionate-verdict", "text": "Verdict is 'Request Changes'"},
         {"id": "concise-review", "text": "Review output is under 200 lines"},
-        {"id": "no-stylistic-nitpicks", "text": "Review does not flag purely cosmetic/stylistic issues (formatting, whitespace, naming conventions, comment grammar, code style preferences) unless they affect performance or rendering"}
+        {"id": "no-stylistic-nitpicks", "text": "Review does not flag purely cosmetic/stylistic issues (formatting, whitespace, naming conventions, comment grammar, code style preferences) unless they affect performance or rendering. Missing JSDoc on new public APIs is NOT a stylistic issue — it is a legitimate finding."}
       ]
     },
     {
@@ -52,7 +52,7 @@
         {"id": "correct-target-branch", "text": "Review references 'v18/dev' as the target branch (not 'main')"},
         {"id": "default-value-change-noted", "text": "Review discusses the behavioral impact of changing the default payload type"},
         {"id": "proportionate-review", "text": "Review output is under 150 lines"},
-        {"id": "no-stylistic-nitpicks", "text": "Review does not flag purely cosmetic/stylistic issues (formatting, whitespace, naming conventions, comment grammar, code style preferences) unless they affect performance or rendering"},
+        {"id": "no-stylistic-nitpicks", "text": "Review does not flag purely cosmetic/stylistic issues (formatting, whitespace, naming conventions, comment grammar, code style preferences) unless they affect performance or rendering. Missing JSDoc on new public APIs is NOT a stylistic issue — it is a legitimate finding."},
         {"id": "ignores-preexisting-issues", "text": "Does NOT flag the ~30 builder extension methods with Legacy defaults (pre-existing, not changed in the PR)"},
         {"id": "side-effect-detection", "text": "Flags stale WebhookSettings.cs docs as a side-effect of the constant value change"},
         {"id": "consumer-identification", "text": "Identifies affected consumers outside the PR (WebhookSettings, UmbracoBuilder, or WebhookEventCollectionBuilderExtensions)"}
@@ -70,7 +70,7 @@
       "assertions": [
         {"id": "complexity-advisory-triggers", "text": "Review includes a complexity/split advisory (3 layers: Core, API, Frontend across 27+ files)"},
         {"id": "breaking-changes-on-interface-additions", "text": "Flags new interface methods without default implementations as breaking changes (Pattern 3)"},
-        {"id": "no-stylistic-nitpicks", "text": "Review does not flag purely cosmetic/stylistic issues unless they affect performance or rendering"},
+        {"id": "no-stylistic-nitpicks", "text": "Review does not flag purely cosmetic/stylistic issues unless they affect performance or rendering. Missing JSDoc on new public APIs is NOT a stylistic issue — it is a legitimate finding."},
         {"id": "diff-scoped", "text": "All findings reference code that was changed in the diff, not pre-existing issues"},
         {"id": "new-feature-assessed", "text": "Review assesses the new feature's architecture, patterns, or integration approach — not just absence of bugs"}
       ]
@@ -88,7 +88,7 @@
         {"id": "service-bypass-detected", "text": "Review flags that the workspace context directly imports/calls UserService or UserGroupService instead of using a repository"},
         {"id": "repository-pattern-recommended", "text": "Review recommends using the repository pattern (going through a repository/data-source layer) rather than calling API services directly from the workspace context"},
         {"id": "verdict-request-changes", "text": "Verdict is 'Request Changes' (the architecture violation warrants requesting changes, not just approving with suggestions)"},
-        {"id": "no-stylistic-nitpicks", "text": "Review does not flag purely cosmetic/stylistic issues (formatting, whitespace, naming conventions, comment grammar, code style preferences) unless they affect performance or rendering"},
+        {"id": "no-stylistic-nitpicks", "text": "Review does not flag purely cosmetic/stylistic issues (formatting, whitespace, naming conventions, comment grammar, code style preferences) unless they affect performance or rendering. Missing JSDoc on new public APIs is NOT a stylistic issue — it is a legitimate finding."},
         {"id": "no-false-breaking-changes", "text": "Review does not flag breaking changes (this PR only adds new code, no public API is removed or modified)"}
       ]
     }
