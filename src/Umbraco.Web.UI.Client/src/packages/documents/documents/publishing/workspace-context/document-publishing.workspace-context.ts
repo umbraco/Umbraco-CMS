@@ -42,6 +42,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 	#eventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
 	#publishingRepository = new UmbDocumentPublishingRepository(this);
 	#publishedDocumentData?: UmbDocumentDetailModel;
+	#loadingPublishedData = false;
 	#currentUnique?: UmbEntityUnique;
 	#notificationContext?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;
 	readonly #localize = new UmbLocalizationController(this);
@@ -545,8 +546,14 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		const hasPublishedVariant = this.#hasPublishedVariant();
 		if (!hasPublishedVariant) return;
 
+		// Prevent concurrent loads (e.g. save-and-publish calls #clear then reload,
+		// which can trigger this from both the persistedData observer and explicitly).
+		if (this.#loadingPublishedData) return;
+		this.#loadingPublishedData = true;
+
 		const { data } = await this.#publishingRepository.published(unique);
 		this.#publishedDocumentData = data;
+		this.#loadingPublishedData = false;
 		this.#processPendingChanges();
 	}
 
