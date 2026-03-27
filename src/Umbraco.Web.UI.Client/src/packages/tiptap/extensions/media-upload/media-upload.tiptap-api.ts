@@ -169,7 +169,7 @@ export default class UmbTiptapMediaUploadExtensionApi extends UmbTiptapExtension
 		const allowedIds = this.#allowedMediaTypeIds;
 		if (!allowedIds.length) return true;
 
-		const extension = getFileExtension(file.name);
+		const extension = getFileExtension(file.name)?.toLowerCase();
 		if (!extension) {
 			this.#showDisallowedNotification(file.name);
 			return false;
