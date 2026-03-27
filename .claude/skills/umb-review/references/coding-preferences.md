@@ -124,7 +124,7 @@ When making decisions, prioritize:
 
 - Follow **Clean Architecture** principles
 - **Fail-fast** principle: detect and report errors as early as possible
-- Feature-based folder structure (not layer-based)
+- Within the established layered architecture (Core/Infrastructure/Web/API), organize code by feature inside each layer where practical, while preserving dependency direction
 - One class per file
 - Avoid N+1 queries
 - Profile before optimizing non-critical paths
