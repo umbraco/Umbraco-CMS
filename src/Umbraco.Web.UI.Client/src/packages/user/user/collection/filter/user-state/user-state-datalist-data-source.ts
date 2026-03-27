@@ -7,16 +7,23 @@ import type {
 	UmbDatalistRequestArgs,
 	UmbDatalistResponse,
 } from '@umbraco-cms/backoffice/datalist-data-source';
+import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
+
+const stateLocalizationKeyMap: Record<string, string> = {
+	Active: 'user_stateActive',
+	Disabled: 'user_stateDisabled',
+	LockedOut: 'user_stateLockedOut',
+	Invited: 'user_stateInvited',
+	Inactive: 'user_stateInactive',
+};
 
 export class UmbUserStateDatalistDataSource extends UmbControllerBase implements UmbDatalistDataSource {
-	constructor(host: UmbControllerHost) {
-		super(host);
-	}
+	#localize = new UmbLocalizationController(this);
 
 	async requestOptions(args: UmbDatalistRequestArgs): Promise<UmbDatalistResponse<UmbDatalistItemModel>> {
 		const allItems = Object.values(UmbUserStateFilter).map((state) => ({
 			unique: state,
-			name: state,
+			name: this.#localize.term(stateLocalizationKeyMap[state]),
 			entityType: 'user-state',
 		}));
 
@@ -34,7 +41,7 @@ export class UmbUserStateDatalistDataSource extends UmbControllerBase implements
 	async requestItems(uniques: Array<string>): Promise<{ data?: Array<UmbDatalistItemModel> }> {
 		const items = uniques.map((unique) => ({
 			unique,
-			name: unique,
+			name: this.#localize.term(stateLocalizationKeyMap[unique] ?? unique),
 			entityType: 'user-state',
 		}));
 
