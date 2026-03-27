@@ -2,7 +2,7 @@ import { Extension } from '../../externals.js';
 import { UmbTiptapExtensionApiBase } from '../tiptap-extension-api-base.js';
 import type { Editor } from '../../externals.js';
 import type { UmbTiptapExtensionArgs } from '../types.js';
-import { getFileExtension, imageSize } from '@umbraco-cms/backoffice/utils';
+import { getFileExtension, imageSize, splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { TemporaryFileStatus, UmbTemporaryFileManager } from '@umbraco-cms/backoffice/temporary-file';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
@@ -47,12 +47,8 @@ export default class UmbTiptapMediaUploadExtensionApi extends UmbTiptapExtension
 		);
 	}
 
-	/**
-	 * @returns {Array<string> | undefined} The allowed media type unique IDs from configuration
-	 */
-	get #allowedMediaTypeIds(): Array<string> | undefined {
-		const raw = this.#configuration?.getValueByAlias<string>('allowedMediaTypes');
-		return raw ? raw.split(',') : undefined;
+	get #allowedMediaTypeIds(): Array<string> {
+		return splitStringToArray(this.#configuration?.getValueByAlias<string>('allowedMediaTypes'));
 	}
 
 	readonly #manager = new UmbTemporaryFileManager(this);
@@ -177,7 +173,7 @@ export default class UmbTiptapMediaUploadExtensionApi extends UmbTiptapExtension
 	 */
 	async #validateMediaType(file: File): Promise<boolean> {
 		const allowedIds = this.#allowedMediaTypeIds;
-		if (!allowedIds?.length) return true; // No filter configured — allow all
+		if (!allowedIds.length) return true;
 
 		const extension = getFileExtension(file.name);
 		if (!extension) {
