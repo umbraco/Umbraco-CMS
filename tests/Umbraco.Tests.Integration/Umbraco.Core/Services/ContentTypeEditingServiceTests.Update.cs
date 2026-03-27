@@ -1512,8 +1512,9 @@ internal sealed partial class ContentTypeEditingServiceTests
             Assert.AreEqual("Same Test Property Alias", compositionProperty.Name);
         });
 
-        // expect PropertyRemoved (which includes RefreshMain), because a property was removed to "make room" for the new compositions
-        AssertContentTypeRefreshPayload(refreshedPayloads, targetContentType.Id, ContentTypeChangeTypes.PropertyRemoved);
+        // expect PropertyRemoved (which includes RefreshMain), because a property was removed to "make room" for the
+        // new composition - AND CompositionAdded, because the composition was also added in the same operation
+        AssertContentTypeRefreshPayload(refreshedPayloads, targetContentType.Id, ContentTypeChangeTypes.PropertyRemoved | ContentTypeChangeTypes.CompositionAdded);
     }
 
     private static void AssertContentTypeRefreshPayload(ContentTypeCacheRefresher.JsonPayload[]? refreshedPayloads, int expectedContentTypeId, ContentTypeChangeTypes expectedChangeTypes)

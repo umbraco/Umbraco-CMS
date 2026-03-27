@@ -342,4 +342,143 @@ internal sealed partial class ContentTypeEditingServiceTests
         var childPayload = refreshedPayloads.Single(p => p.Id == childType.Id);
         Assert.IsTrue(childPayload.ChangeTypes.HasType(ContentTypeChangeTypes.RefreshMain), "Child should have RefreshMain (propagated)");
     }
+
+    [Test]
+    public async Task Remove_Property_And_Add_Property_Emits_Both_Flags()
+    {
+        var container = ContentTypePropertyContainerModel();
+        var propertyType = ContentTypePropertyTypeModel("Title", "title", containerKey: container.Key);
+        var contentType = (await ContentTypeEditingService.CreateAsync(
+            ContentTypeCreateModel("Test", "test", propertyTypes: [propertyType], containers: [container]),
+            Constants.Security.SuperUserKey)).Result!;
+
+        ContentTypeCacheRefresher.JsonPayload[]? refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
+        // Remove the old property and add a new one in the same update
+        var newPropertyType = ContentTypePropertyTypeModel("Subtitle", "subtitle", containerKey: container.Key);
+        var updateModel = ContentTypeUpdateModel("Test", "test", propertyTypes: [newPropertyType], containers: [container]);
+        var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+
+        Assert.IsNotNull(refreshedPayloads);
+        Assert.AreEqual(1, refreshedPayloads!.Length);
+        var payload = refreshedPayloads.First();
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(payload.ChangeTypes.HasTypesAll(ContentTypeChangeTypes.PropertyRemoved), "Expected PropertyRemoved flag");
+            Assert.IsTrue(payload.ChangeTypes.HasTypesAll(ContentTypeChangeTypes.PropertyAdded), "Expected PropertyAdded flag");
+            Assert.IsTrue(payload.ChangeTypes.HasType(ContentTypeChangeTypes.RefreshMain), "PropertyRemoved should include RefreshMain");
+            Assert.IsTrue(payload.ChangeTypes.HasType(ContentTypeChangeTypes.RefreshOther), "PropertyAdded should include RefreshOther");
+        });
+    }
+
+    [Test]
+    public async Task Remove_Composition_And_Add_Composition_Emits_Both_Flags()
+    {
+        var compositionA = (await ContentTypeEditingService.CreateAsync(
+            ContentTypeCreateModel("CompositionA", "compositionA",
+                propertyTypes: [ContentTypePropertyTypeModel("Prop A", "propA")]),
+            Constants.Security.SuperUserKey)).Result!;
+
+        var compositionB = (await ContentTypeEditingService.CreateAsync(
+            ContentTypeCreateModel("CompositionB", "compositionB",
+                propertyTypes: [ContentTypePropertyTypeModel("Prop B", "propB")]),
+            Constants.Security.SuperUserKey)).Result!;
+
+        var contentType = (await ContentTypeEditingService.CreateAsync(
+            ContentTypeCreateModel(
+                "Test",
+                "test",
+                compositions: [new Composition { Key = compositionA.Key, CompositionType = CompositionType.Composition }]),
+            Constants.Security.SuperUserKey)).Result!;
+
+        ContentTypeCacheRefresher.JsonPayload[]? refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
+        // Remove compositionA and add compositionB in the same update
+        var updateModel = ContentTypeUpdateModel(
+            "Test",
+            "test",
+            compositions: [new Composition { Key = compositionB.Key, CompositionType = CompositionType.Composition }]);
+        var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+
+        Assert.IsNotNull(refreshedPayloads);
+        Assert.AreEqual(1, refreshedPayloads!.Length);
+        var payload = refreshedPayloads.First();
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(payload.ChangeTypes.HasTypesAll(ContentTypeChangeTypes.CompositionRemoved), "Expected CompositionRemoved flag");
+            Assert.IsTrue(payload.ChangeTypes.HasTypesAll(ContentTypeChangeTypes.CompositionAdded), "Expected CompositionAdded flag");
+            Assert.IsTrue(payload.ChangeTypes.HasType(ContentTypeChangeTypes.RefreshMain), "CompositionRemoved should include RefreshMain");
+            Assert.IsTrue(payload.ChangeTypes.HasType(ContentTypeChangeTypes.RefreshOther), "CompositionAdded should include RefreshOther");
+        });
+    }
+
+    [Test]
+    public async Task Add_Property_Emits_PropertyAdded()
+    {
+        var container = ContentTypePropertyContainerModel();
+        var contentType = (await ContentTypeEditingService.CreateAsync(
+            ContentTypeCreateModel("Test", "test", containers: [container]),
+            Constants.Security.SuperUserKey)).Result!;
+
+        ContentTypeCacheRefresher.JsonPayload[]? refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
+        var newPropertyType = ContentTypePropertyTypeModel("Title", "title", containerKey: container.Key);
+        var updateModel = ContentTypeUpdateModel("Test", "test", propertyTypes: [newPropertyType], containers: [container]);
+        var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+
+        Assert.IsNotNull(refreshedPayloads);
+        Assert.AreEqual(1, refreshedPayloads!.Length);
+        var payload = refreshedPayloads.First();
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(payload.ChangeTypes.HasTypesAll(ContentTypeChangeTypes.PropertyAdded), "Expected PropertyAdded flag");
+            Assert.IsTrue(payload.ChangeTypes.HasType(ContentTypeChangeTypes.RefreshOther), "PropertyAdded should include RefreshOther");
+            Assert.IsFalse(payload.ChangeTypes.HasTypesAll(ContentTypeChangeTypes.PropertyRemoved), "Did NOT expect PropertyRemoved flag");
+            Assert.IsFalse(payload.ChangeTypes.HasType(ContentTypeChangeTypes.RefreshMain), "Should NOT include RefreshMain");
+        });
+    }
+
+    [Test]
+    public async Task Add_Composition_Emits_CompositionAdded()
+    {
+        var compositionType = (await ContentTypeEditingService.CreateAsync(
+            ContentTypeCreateModel("Composition", "composition",
+                propertyTypes: [ContentTypePropertyTypeModel("Comp Property", "compProperty")]),
+            Constants.Security.SuperUserKey)).Result!;
+
+        var contentType = (await ContentTypeEditingService.CreateAsync(
+            ContentTypeCreateModel("Test", "test"),
+            Constants.Security.SuperUserKey)).Result!;
+
+        ContentTypeCacheRefresher.JsonPayload[]? refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
+        var updateModel = ContentTypeUpdateModel(
+            "Test",
+            "test",
+            compositions: [new Composition { Key = compositionType.Key, CompositionType = CompositionType.Composition }]);
+        var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+
+        Assert.IsNotNull(refreshedPayloads);
+        Assert.AreEqual(1, refreshedPayloads!.Length);
+        var payload = refreshedPayloads.First();
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(payload.ChangeTypes.HasTypesAll(ContentTypeChangeTypes.CompositionAdded), "Expected CompositionAdded flag");
+            Assert.IsTrue(payload.ChangeTypes.HasType(ContentTypeChangeTypes.RefreshOther), "CompositionAdded should include RefreshOther");
+            Assert.IsFalse(payload.ChangeTypes.HasTypesAll(ContentTypeChangeTypes.CompositionRemoved), "Did NOT expect CompositionRemoved flag");
+            Assert.IsFalse(payload.ChangeTypes.HasType(ContentTypeChangeTypes.RefreshMain), "Should NOT include RefreshMain");
+        });
+    }
 }

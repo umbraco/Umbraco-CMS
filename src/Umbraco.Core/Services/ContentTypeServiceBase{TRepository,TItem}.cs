@@ -400,80 +400,85 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
             // property variation change?
             var hasAnyPropertyVariationChanged = contentType.WasPropertyTypeVariationChanged();
 
-            // main impact on properties?
+            // Detect all granular change types independently so that structural
+            // and non-structural changes can be detected in the same operation
+            // (e.g. removing a property AND adding another at the same time).
+            var hasAnyChange = false;
+
+            // --- Structural changes (each includes RefreshMain automatically) ---
+
+            if (hasAliasChanged)
+            {
+                AddChange(changes, contentType, ContentTypeChangeTypes.AliasChanged);
+                hasAnyChange = true;
+            }
+
+            if (hasAnyPropertyChangedAlias)
+            {
+                AddChange(changes, contentType, ContentTypeChangeTypes.PropertyAliasChanged);
+                hasAnyChange = true;
+            }
+
+            if (hasAnyPropertyBeenRemoved)
+            {
+                AddChange(changes, contentType, ContentTypeChangeTypes.PropertyRemoved);
+                hasAnyChange = true;
+            }
+
+            if (hasAnyCompositionBeenRemoved)
+            {
+                AddChange(changes, contentType, ContentTypeChangeTypes.CompositionRemoved);
+                hasAnyChange = true;
+            }
+
+            if (hasAnyPropertyVariationChanged)
+            {
+                AddChange(changes, contentType, ContentTypeChangeTypes.PropertyVariationChanged);
+                hasAnyChange = true;
+            }
+
+            // Add VariationChanged flag if content type variation changed.
+            // This is used by DocumentUrlService to rebuild URL cache with correct languageId.
+            if (hasContentTypeVariationChanged)
+            {
+                AddChange(changes, contentType, ContentTypeChangeTypes.VariationChanged);
+                hasAnyChange = true;
+            }
+
+            // main impact on properties? Propagate RefreshMain to composed types.
             var hasPropertyMainImpact = hasContentTypeVariationChanged || hasAnyPropertyVariationChanged
                                                                        || hasAnyCompositionBeenRemoved || hasAnyPropertyBeenRemoved || hasAnyPropertyChangedAlias;
-
-            if (hasAliasChanged || hasPropertyMainImpact)
+            if (hasPropertyMainImpact)
             {
-                // add granular structural flags (each includes RefreshMain automatically)
-                if (hasAliasChanged)
+                foreach (TItem c in GetComposedOf(contentType.Id))
                 {
-                    AddChange(changes, contentType, ContentTypeChangeTypes.AliasChanged);
-                }
-
-                if (hasAnyPropertyChangedAlias)
-                {
-                    AddChange(changes, contentType, ContentTypeChangeTypes.PropertyAliasChanged);
-                }
-
-                if (hasAnyPropertyBeenRemoved)
-                {
-                    AddChange(changes, contentType, ContentTypeChangeTypes.PropertyRemoved);
-                }
-
-                if (hasAnyCompositionBeenRemoved)
-                {
-                    AddChange(changes, contentType, ContentTypeChangeTypes.CompositionRemoved);
-                }
-
-                if (hasAnyPropertyVariationChanged)
-                {
-                    AddChange(changes, contentType, ContentTypeChangeTypes.PropertyVariationChanged);
-                }
-
-                // Add VariationChanged flag if content type variation changed.
-                // This is used by DocumentUrlService to rebuild URL cache with correct languageId.
-                if (hasContentTypeVariationChanged)
-                {
-                    AddChange(changes, contentType, ContentTypeChangeTypes.VariationChanged);
-                }
-
-                if (hasPropertyMainImpact)
-                {
-                    foreach (TItem c in GetComposedOf(contentType.Id))
-                    {
-                        AddChange(changes, c, ContentTypeChangeTypes.RefreshMain);
-                    }
+                    AddChange(changes, c, ContentTypeChangeTypes.RefreshMain);
                 }
             }
-            else
+
+            // --- Non-structural changes (each includes RefreshOther automatically) ---
+
+            // new properties added?
+            var hasAnyPropertyBeenAdded = contentType.PropertyTypes.Any(pt => pt.WasPropertyDirty("Id"));
+            if (hasAnyPropertyBeenAdded)
             {
-                // Detect granular non-structural changes (each includes RefreshOther automatically).
-                // Fall back to bare RefreshOther if none of the specific checks match
-                // (e.g. for changes we haven't categorized yet).
-                var hasGranularOther = false;
+                AddChange(changes, contentType, ContentTypeChangeTypes.PropertyAdded);
+                hasAnyChange = true;
+            }
 
-                // new properties added?
-                var hasAnyPropertyBeenAdded = contentType.PropertyTypes.Any(pt => pt.WasPropertyDirty("Id"));
-                if (hasAnyPropertyBeenAdded)
-                {
-                    AddChange(changes, contentType, ContentTypeChangeTypes.PropertyAdded);
-                    hasGranularOther = true;
-                }
+            // compositions added?
+            var hasAnyCompositionBeenAdded = dirty.WasPropertyDirty("HasCompositionTypeBeenAdded");
+            if (hasAnyCompositionBeenAdded)
+            {
+                AddChange(changes, contentType, ContentTypeChangeTypes.CompositionAdded);
+                hasAnyChange = true;
+            }
 
-                // compositions added? (composition collection changed, but none were removed)
-                var hasCompositionsChanged = dirty.WasPropertyDirty("ContentTypeComposition");
-                if (hasCompositionsChanged && !hasAnyCompositionBeenRemoved)
-                {
-                    AddChange(changes, contentType, ContentTypeChangeTypes.CompositionAdded);
-                    hasGranularOther = true;
-                }
-
-                if (!hasGranularOther)
-                {
-                    AddChange(changes, contentType, ContentTypeChangeTypes.RefreshOther);
-                }
+            // Fall back to bare RefreshOther if none of the specific checks matched
+            // (e.g. for changes we haven't categorized yet).
+            if (!hasAnyChange)
+            {
+                AddChange(changes, contentType, ContentTypeChangeTypes.RefreshOther);
             }
         }
 
