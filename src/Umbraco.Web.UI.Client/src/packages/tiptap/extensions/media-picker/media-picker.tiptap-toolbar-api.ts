@@ -118,9 +118,7 @@ export default class UmbTiptapToolbarMediaPickerToolbarExtensionApi extends UmbT
 		const modalHandler = this.#modalManager?.open(this, UMB_MEDIA_PICKER_MODAL, {
 			data: {
 				multiple: false,
-				pickableFilter: allowedIds?.length
-					? (item) => allowedIds.includes(item.mediaType.unique)
-					: undefined,
+				pickableFilter: allowedIds?.length ? (item) => allowedIds.includes(item.mediaType.unique) : undefined,
 			},
 			value: {
 				selection: currentMediaUdi ? [currentMediaUdi] : [],

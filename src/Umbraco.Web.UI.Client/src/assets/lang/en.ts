@@ -2850,8 +2850,6 @@ export default {
 		config_ignoreUserStartNodes: 'Ignore User Start Nodes',
 		config_maxImageSize: 'Maximum size for inserted images',
 		config_maxImageSize_description: 'Maximum width or height - enter 0 to disable resizing.',
-		config_allowedMediaTypes: 'Accepted media types',
-		config_allowedMediaTypes_description: 'Limit the media picker to specific media types.',
 		config_mediaParentId: 'Image Upload Folder',
 		config_mediaParentId_description: 'Choose the upload location of pasted images.',
 		config_overlaySize: 'Overlay size',

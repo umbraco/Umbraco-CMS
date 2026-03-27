@@ -9,10 +9,7 @@ import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import { UMB_DROPZONE_MEDIA_TYPE_PICKER_MODAL } from '@umbraco-cms/backoffice/media';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
-import {
-	UmbMediaTypeStructureRepository,
-	type UmbAllowedMediaTypeModel,
-} from '@umbraco-cms/backoffice/media-type';
+import { UmbMediaTypeStructureRepository, type UmbAllowedMediaTypeModel } from '@umbraco-cms/backoffice/media-type';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbTemporaryFileModel } from '@umbraco-cms/backoffice/temporary-file';
@@ -61,6 +58,7 @@ export default class UmbTiptapMediaUploadExtensionApi extends UmbTiptapExtension
 	readonly #manager = new UmbTemporaryFileManager(this);
 	readonly #localize = new UmbLocalizationController(this);
 	readonly #mediaTypeStructure = new UmbMediaTypeStructureRepository(this);
+	readonly #mediaTypeCache = new Map<string, Array<UmbAllowedMediaTypeModel>>();
 	#notificationContext?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;
 
 	constructor(host: UmbControllerHost) {
@@ -128,9 +126,7 @@ export default class UmbTiptapMediaUploadExtensionApi extends UmbTiptapExtension
 
 			const fileModel = this.#mapFileToTemporaryFile(file);
 
-			this.dispatchEvent(
-				new CustomEvent('rte.file.uploading', { composed: true, bubbles: true, detail: [fileModel] }),
-			);
+			this.dispatchEvent(new CustomEvent('rte.file.uploading', { composed: true, bubbles: true, detail: [fileModel] }));
 
 			const uploads = await this.#manager.upload([fileModel]);
 			const upload = uploads[0];
@@ -164,9 +160,7 @@ export default class UmbTiptapMediaUploadExtensionApi extends UmbTiptapExtension
 				})
 				.run();
 
-			this.dispatchEvent(
-				new CustomEvent('rte.file.uploaded', { composed: true, bubbles: true, detail: [upload] }),
-			);
+			this.dispatchEvent(new CustomEvent('rte.file.uploaded', { composed: true, bubbles: true, detail: [upload] }));
 		}
 	}
 
@@ -187,7 +181,7 @@ export default class UmbTiptapMediaUploadExtensionApi extends UmbTiptapExtension
 			return false;
 		}
 
-		const availableMediaTypes = await this.#mediaTypeStructure.requestMediaTypesOf({ fileExtension: extension });
+		const availableMediaTypes = await this.#getAvailableMediaTypesOf(extension);
 		if (!availableMediaTypes.length) {
 			this.#showDisallowedNotification(file.name);
 			return false;
@@ -216,6 +210,19 @@ export default class UmbTiptapMediaUploadExtensionApi extends UmbTiptapExtension
 
 		// All fallbacks — auto-select
 		return true;
+	}
+
+	async #getAvailableMediaTypesOf(extension: string): Promise<Array<UmbAllowedMediaTypeModel>> {
+		const cached = this.#mediaTypeCache.get(extension);
+		if (cached) return cached;
+
+		try {
+			const result = await this.#mediaTypeStructure.requestMediaTypesOf({ fileExtension: extension });
+			this.#mediaTypeCache.set(extension, result);
+			return result;
+		} catch {
+			return [];
+		}
 	}
 
 	async #showMediaTypePicker(options: Array<UmbAllowedMediaTypeModel>): Promise<string | undefined> {

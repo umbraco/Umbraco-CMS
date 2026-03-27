@@ -10,8 +10,8 @@ export const manifest: ManifestPropertyEditorSchema = {
 			properties: [
 				{
 					alias: 'allowedMediaTypes',
-					label: '#rte_config_allowedMediaTypes',
-					description: '{#rte_config_allowedMediaTypes_description}',
+					label: 'Accepted types',
+					description: 'Limit to specific types',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.MediaTypePicker',
 					weight: 75,
 				},
