@@ -118,12 +118,22 @@ public interface IDocumentPresentationFactory
         return Attempt.SucceedWithStatus(ContentPublishingOperationStatus.Success, model);
     }
 
+    /// <summary>
+    /// Asynchronously creates a response model for a document item based on the provided entity.
+    /// </summary>
+    /// <param name="entity">The document entity to create the response model from.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains a <see cref="DocumentItemResponseModel"/> representing the document item.</returns>
     // TODO (V19): Remove the default implementation when CreateItemResponseModel is removed.
     Task<DocumentItemResponseModel> CreateItemResponseModelAsync(IDocumentEntitySlim entity)
 #pragma warning disable CS0618 // Type or member is obsolete
         => Task.FromResult(CreateItemResponseModel(entity));
 #pragma warning restore CS0618 // Type or member is obsolete
 
+    /// <summary>
+    /// Asynchronously creates a collection of <see cref="DocumentVariantItemResponseModel"/> instances representing the variants of the specified document entity.
+    /// </summary>
+    /// <param name="entity">The document entity to create variant response models for.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains an enumerable of <see cref="DocumentVariantItemResponseModel"/> representing the document variants.</returns>
     // TODO (V19): Remove the default implementation when CreateVariantsItemResponseModels is removed.
     Task<IEnumerable<DocumentVariantItemResponseModel>> CreateVariantsItemResponseModelsAsync(IDocumentEntitySlim entity)
 #pragma warning disable CS0618 // Type or member is obsolete
