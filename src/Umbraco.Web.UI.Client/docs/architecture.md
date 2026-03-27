@@ -4,16 +4,20 @@
 
 ### Technology Stack
 
-- **Node.js**: >=22.17.1, **npm**: >=10.9.2
-- **Language**: TypeScript 5.9.3 (strict mode, ESM)
-- **Framework**: Lit 3.x (Web Components with reactive templates)
-- **UI Library**: @umbraco-ui/uui (80+ Web Components, Shadow DOM)
-- **Build**: Vite 7.1.11
-- **State**: RxJS (via UmbState wrapper classes), Context API
-- **Testing**: @web/test-runner + Playwright 1.55.1, @open-wc/testing
-- **Code Quality**: ESLint 9.37.0, Prettier 3.6.2
-- **Mocking**: MSW 1.3.5
-- **Other**: Luxon, Monaco Editor, DOMPurify, Marked, SignalR
+> Exact versions are in `package.json` (root and workspace packages). Only major versions that affect API usage are listed here.
+
+- **Runtime**: Node.js >=22, npm >=10 (see `engines` in `package.json`)
+- **Language**: TypeScript 5.x (strict mode, ESM — all imports must use `.js` extensions)
+- **Framework**: **Lit 3** — Web Components with reactive templates, decorators, and `html`/`css` tagged template literals
+- **UI Library**: **@umbraco-ui/uui 1.x** — 80+ Web Components (`<uui-button>`, `<uui-input>`, `<uui-box>`, etc.). Always prefer UUI components over native HTML or custom implementations.
+- **Rich Text**: **TipTap 3** — ProseMirror-based editor (see `src/packages/tiptap/`)
+- **Build**: Vite 7 (config in `vite.config.ts`)
+- **State**: RxJS 7 wrapped by UmbState classes — see [Core Primitives](./core-primitives.md)
+- **Context/DI**: DOM-event-based Context API — see [Core Primitives](./core-primitives.md)
+- **Testing**: @web/test-runner + Playwright, @open-wc/testing — see [Testing](./testing.md)
+- **Mocking**: MSW 2 — see [Testing](./testing.md)
+- **Code Quality**: ESLint 9 (flat config), Prettier
+- **Key Libraries**: Luxon 3, Monaco Editor (code editing), DOMPurify 3 (sanitization — see [Security](./security.md)), Marked (Markdown→HTML), SignalR (real-time server events)
 
 ### Application Type
 
