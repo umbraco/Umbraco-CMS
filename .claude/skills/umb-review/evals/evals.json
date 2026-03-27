@@ -18,7 +18,6 @@
         {"id": "no-stylistic-nitpicks", "text": "Review does not flag purely cosmetic/stylistic issues (formatting, whitespace, naming conventions, comment grammar, code style preferences) unless they affect performance or rendering"},
         {"id": "manifest-alias-rename-detected", "text": "Alias renames (CreateOptions → Create) flagged as Critical breaking change"},
         {"id": "non-exported-deletions-dismissed", "text": "Deleted action classes NOT flagged as breaking (verified against package.json exports)"},
-        {"id": "no-false-complexity-advisory", "text": "Review does NOT trigger a complexity split advisory (single project directory, formatting threshold not met)"},
         {"id": "noise-files-filtered", "text": "Does not review noise files (generated files, lock files, etc.)"},
         {"id": "complexity-advisory-triggers", "text": "Review includes a complexity/split advisory for the large 75+ file scope"}
       ]
