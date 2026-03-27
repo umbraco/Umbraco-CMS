@@ -497,6 +497,9 @@ public abstract class ContentTypeBase : TreeEntityBase, IContentTypeBase
     public IContentTypeBase DeepCloneWithResetIdentities(string alias)
     {
         var clone = (IContentTypeBase)DeepClone();
+
+        // ResetIdentity() must be called before setting the alias, because HasIdentity
+        // is used by system content types to guard against alias changes.
         clone.ResetIdentity();
         clone.Alias = alias;
         foreach (PropertyGroup propertyGroup in clone.PropertyGroups)

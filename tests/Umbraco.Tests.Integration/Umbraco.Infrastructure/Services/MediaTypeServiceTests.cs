@@ -270,6 +270,10 @@ internal sealed class MediaTypeServiceTests : UmbracoIntegrationTest
         Assert.AreNotEqual(mediaType.Alias, result.Result!.Alias);
         Assert.AreNotEqual(mediaType.Id, result.Result.Id);
         Assert.AreNotEqual(mediaType.Key, result.Result.Key);
+
+        // Verify the copy's alias can be changed (it is not system-protected)
+        result.Result.Alias = "myCustomAlias";
+        Assert.AreEqual("myCustomAlias", result.Result.Alias);
     }
 
     [Test]
