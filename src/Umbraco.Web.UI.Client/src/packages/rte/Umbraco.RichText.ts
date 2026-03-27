@@ -9,13 +9,6 @@ export const manifest: ManifestPropertyEditorSchema = {
 		settings: {
 			properties: [
 				{
-					alias: 'allowedMediaTypes',
-					label: 'Accepted types',
-					description: 'Limit to specific types',
-					propertyEditorUiAlias: 'Umb.PropertyEditorUi.MediaTypePicker',
-					weight: 75,
-				},
-				{
 					alias: 'blocks',
 					label: '#rte_config_blocks',
 					description: '{#rte_config_blocks_description}',
@@ -29,6 +22,13 @@ export const manifest: ManifestPropertyEditorSchema = {
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.MediaEntityPicker',
 					config: [{ alias: 'validationLimit', value: { min: 0, max: 1 } }],
 					weight: 90,
+				},
+				{
+					alias: 'allowedMediaTypes',
+					label: '#rte_config_allowedMediaTypes',
+					description: '{#rte_config_allowedMediaTypes_description}',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.MediaTypePicker',
+					weight: 91,
 				},
 				{
 					alias: 'ignoreUserStartNodes',
