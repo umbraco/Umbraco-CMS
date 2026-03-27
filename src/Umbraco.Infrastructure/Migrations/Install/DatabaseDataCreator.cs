@@ -1947,6 +1947,44 @@ internal sealed class DatabaseDataCreator
                     Description = null,
                     Variations = (byte)ContentVariation.Nothing,
                 });
+            _database.Insert(
+                Constants.DatabaseSchema.Tables.PropertyType,
+                "id",
+                false,
+                new PropertyTypeDto
+                {
+                    Id = 53,
+                    UniqueId = new Guid("5BC7E468-C53E-41A6-A522-2723F3B94514"),
+                    DataTypeId = Constants.DataTypes.LabelPixels,
+                    ContentTypeId = 1037,
+                    PropertyTypeGroupId = 55,
+                    Alias = Constants.Conventions.Media.Width,
+                    Name = "Width",
+                    SortOrder = 0,
+                    Mandatory = false,
+                    ValidationRegExp = null,
+                    Description = null,
+                    Variations = (byte)ContentVariation.Nothing,
+                });
+            _database.Insert(
+                Constants.DatabaseSchema.Tables.PropertyType,
+                "id",
+                false,
+                new PropertyTypeDto
+                {
+                    Id = 54,
+                    UniqueId = new Guid("9E4C2B59-6BC6-4648-BB71-B0F45DDBC274"),
+                    DataTypeId = Constants.DataTypes.LabelPixels,
+                    ContentTypeId = 1037,
+                    PropertyTypeGroupId = 55,
+                    Alias = Constants.Conventions.Media.Height,
+                    Name = "Height",
+                    SortOrder = 0,
+                    Mandatory = false,
+                    ValidationRegExp = null,
+                    Description = null,
+                    Variations = (byte)ContentVariation.Nothing,
+                });
         }
 
         // Membership property types.

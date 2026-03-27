@@ -94,7 +94,7 @@ export class BlockGridAreaBuilder {
     }
 
     if (this.blockGridSpecifiedAllowanceBuilder && this.blockGridSpecifiedAllowanceBuilder.length > 0) {
-      values.specifiedAllowances = this.blockGridSpecifiedAllowanceBuilder.map((builder) => {
+      values.specifiedAllowance = this.blockGridSpecifiedAllowanceBuilder.map((builder) => {
         return builder.getValues();
       });
     }
