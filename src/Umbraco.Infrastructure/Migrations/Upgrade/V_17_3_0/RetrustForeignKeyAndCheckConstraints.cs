@@ -78,7 +78,9 @@ public class RetrustForeignKeyAndCheckConstraints : AsyncMigrationBase
             // Use T-SQL TRY...CATCH to handle errors at the SQL level. This prevents a constraint
             // validation failure from dooming the .NET SqlTransaction, which would cause all
             // subsequent operations to fail with "This SqlTransaction has completed".
-            var sql = $@"
+            // Leading semicolon prevents NPoco's auto-select from prepending
+            // "SELECT ... FROM []" based on the empty [TableName("")] attribute.
+            var sql = $@";
 BEGIN TRY
     ALTER TABLE [{constraint.SchemaName}].[{constraint.TableName}] WITH CHECK CHECK CONSTRAINT [{constraint.ConstraintName}];
     SELECT CAST(1 AS BIT) AS Success, NULL AS ErrorMessage;
