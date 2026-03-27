@@ -1,0 +1,12 @@
+{
+  "eval_id": 3,
+  "eval_name": "pr-22268-frontend-feature-workspace-modal",
+  "config": "umb_review",
+  "expectations": [
+    {"text": "Review includes a complexity/split advisory (3 layers: Core, API, Frontend across 27+ files)", "passed": true, "evidence": "[!NOTE] Complexity advisory with Layer spread dimension: '3 distinct production layers touched (Core, API, Frontend)'"},
+    {"text": "Flags new interface methods without default implementations as breaking changes (Pattern 3)", "passed": true, "evidence": "Critical: IUserService.UpdateCurrentUserAsync and IUserPresentationFactory.CreateUpdateCurrentUserModelAsync both flagged with Pattern 3 fix suggestions"},
+    {"text": "Review does not flag purely cosmetic/stylistic issues unless they affect performance or rendering", "passed": true, "evidence": "All findings functional: missing default impl, missing validation, error swallowing, missing CancellationToken"},
+    {"text": "All findings reference code that was changed in the diff, not pre-existing issues", "passed": true, "evidence": "All findings reference new code added in this PR"},
+    {"text": "Review assesses the new feature's architecture, patterns, or integration approach — not just absence of bugs", "passed": true, "evidence": "Assesses: layer spread architecture, missing validation parity with UpdateAsync, notification handler parity, modal error handling patterns"}
+  ]
+}

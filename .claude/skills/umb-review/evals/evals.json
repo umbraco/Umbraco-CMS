@@ -11,7 +11,6 @@
       "base_branch": "origin/main",
       "files": [],
       "assertions": [
-        {"id": "complexity-advisory-triggers", "text": "Review includes a complexity/split advisory for the large 75+ file scope"},
         {"id": "deprecation-patterns-noted", "text": "Review identifies deprecation patterns (@deprecated, UmbDeprecation)"},
         {"id": "frontend-breaking-change-awareness", "text": "Checks frontend-specific breaking changes (exports, custom elements) not just backend"},
         {"id": "file-references-present", "text": "Findings reference specific files with line numbers"},
@@ -19,8 +18,9 @@
         {"id": "no-stylistic-nitpicks", "text": "Review does not flag purely cosmetic/stylistic issues (formatting, whitespace, naming conventions, comment grammar, code style preferences) unless they affect performance or rendering"},
         {"id": "manifest-alias-rename-detected", "text": "Alias renames (CreateOptions → Create) flagged as Critical breaking change"},
         {"id": "non-exported-deletions-dismissed", "text": "Deleted action classes NOT flagged as breaking (verified against package.json exports)"},
-        {"id": "formatting-mixed-with-logic", "text": "Flags UiBaseLocators.ts as formatting changes mixed with functional changes"},
-        {"id": "noise-files-filtered", "text": "Does not review noise files (generated files, lock files, etc.)"}
+        {"id": "no-false-complexity-advisory", "text": "Review does NOT trigger a complexity split advisory (single project directory, formatting threshold not met)"},
+        {"id": "noise-files-filtered", "text": "Does not review noise files (generated files, lock files, etc.)"},
+        {"id": "complexity-advisory-triggers", "text": "Review includes a complexity/split advisory for the large 75+ file scope"}
       ]
     },
     {
@@ -57,6 +57,23 @@
         {"id": "ignores-preexisting-issues", "text": "Does NOT flag the ~30 builder extension methods with Legacy defaults (pre-existing, not changed in the PR)"},
         {"id": "side-effect-detection", "text": "Flags stale WebhookSettings.cs docs as a side-effect of the constant value change"},
         {"id": "consumer-identification", "text": "Identifies affected consumers outside the PR (WebhookSettings, UmbracoBuilder, or WebhookEventCollectionBuilderExtensions)"}
+      ]
+    },
+    {
+      "id": 3,
+      "name": "pr-22268-frontend-feature-workspace-modal",
+      "prompt": "Review the changes in PR #22268 (branch origin/pr/22268 targeting main). This is a 29-file frontend feature adding a current user workspace modal.",
+      "expected_output": "A review of a medium-sized new feature PR. Should assess the new code for architectural compliance, check for breaking changes (new exports, custom elements), and evaluate code quality without flagging pre-existing issues.",
+      "pr_number": 22268,
+      "pr_branch": "origin/pr/22268",
+      "base_branch": "origin/main",
+      "files": [],
+      "assertions": [
+        {"id": "complexity-advisory-triggers", "text": "Review includes a complexity/split advisory (3 layers: Core, API, Frontend across 27+ files)"},
+        {"id": "breaking-changes-on-interface-additions", "text": "Flags new interface methods without default implementations as breaking changes (Pattern 3)"},
+        {"id": "no-stylistic-nitpicks", "text": "Review does not flag purely cosmetic/stylistic issues unless they affect performance or rendering"},
+        {"id": "diff-scoped", "text": "All findings reference code that was changed in the diff, not pre-existing issues"},
+        {"id": "new-feature-assessed", "text": "Review assesses the new feature's architecture, patterns, or integration approach — not just absence of bugs"}
       ]
     }
   ]

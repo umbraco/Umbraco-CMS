@@ -1,0 +1,57 @@
+{
+  "eval_id": 0,
+  "eval_name": "pr-22214-large-frontend-refactor",
+  "config": "no_skill",
+  "expectations": [
+    {
+      "text": "Review includes a complexity/split advisory for the large 75+ file scope",
+      "passed": false,
+      "evidence": "The review notes '78 Files changed' in the header but does not include any advisory about the large scope or suggest splitting the PR."
+    },
+    {
+      "text": "Review identifies deprecation patterns (@deprecated, UmbDeprecation)",
+      "passed": true,
+      "evidence": "Positive Observations section explicitly notes 'Deprecation warnings (UmbDeprecation) are correctly added' and 'Legacy modals are preserved with @deprecated JSDoc'. Finding #11 also discusses incomplete deprecation annotations."
+    },
+    {
+      "text": "Checks frontend-specific breaking changes (exports, custom elements) not just backend",
+      "passed": true,
+      "evidence": "Finding #5 flags deleted classes (UmbCreateMemberGroupEntityAction, UmbLanguageCreateEntityAction) as breaking changes referencing 'the project's own guidelines state that breaking changes within a major version should be avoided'. However, it misses the alias renames and incorrectly flags non-exported deletions."
+    },
+    {
+      "text": "Findings reference specific files with line numbers",
+      "passed": true,
+      "evidence": "Findings include file paths, e.g. 'document-blueprints/entity-actions/create/default/manifests.ts', 'UiBaseLocators.ts'. Some have line numbers, some don't."
+    },
+    {
+      "text": "Properly deprecated code is NOT flagged as Critical breaking change",
+      "passed": true,
+      "evidence": "Deprecated code (modals, old actions) is not flagged as Critical. The review notes in Positive Observations that deprecation patterns are correctly applied."
+    },
+    {
+      "text": "Review does not flag purely cosmetic/stylistic issues (formatting, whitespace, naming conventions, comment grammar, code style preferences) unless they affect performance or rendering",
+      "passed": false,
+      "evidence": "Finding #7 flags double assignment in UiBaseLocators.ts as 'Dead code' -- this is a pre-existing issue preserved by the formatting refactor. Finding #9 flags inconsistent weight values. Finding #10 flags array type narrowness. These are stylistic/code quality nitpicks rather than functional issues."
+    },
+    {
+      "text": "Alias renames (CreateOptions -> Create) flagged as Critical breaking change",
+      "passed": false,
+      "evidence": "The alias renames from CreateOptions to Create are not mentioned anywhere in the review. The breaking change discussion focuses only on deleted classes."
+    },
+    {
+      "text": "Deleted action classes NOT flagged as breaking (verified against package.json exports)",
+      "passed": false,
+      "evidence": "Finding #5 flags the deletion of UmbCreateMemberGroupEntityAction and UmbLanguageCreateEntityAction as 'Potential Bug' breaking changes, stating 'If any external code imported or instantiated these classes directly, they will break silently at runtime.' These classes are not exported via package.json exports, so this is a false positive."
+    },
+    {
+      "text": "Flags UiBaseLocators.ts as formatting changes mixed with functional changes",
+      "passed": true,
+      "evidence": "Finding #7 discusses UiBaseLocators.ts and notes 'the formatting refactor in this PR preserves the double assignment'. The Positive Observations section also notes 'The UiBaseLocators.ts formatting refactor is a non-functional but welcome improvement to readability'. This acknowledges the formatting nature of the changes."
+    },
+    {
+      "text": "Does not review noise files (generated files, lock files, etc.)",
+      "passed": true,
+      "evidence": "No generated files, lock files, or other noise files are reviewed."
+    }
+  ]
+}
