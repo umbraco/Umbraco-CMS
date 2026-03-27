@@ -1,0 +1,37 @@
+{
+  "eval_id": 0,
+  "eval_name": "pr-22214-large-frontend-refactor",
+  "config": "umb_review",
+  "expectations": [
+    {
+      "text": "Output contains '## PR Review' header, '**Target:**' metadata line, and a verdict section (Approved/Request Changes/etc.)",
+      "passed": true,
+      "evidence": "Line 1: '## PR Review', Line 3: '**Target:** `origin/main`', Line 49: '## Approved with Suggestions for improvement'"
+    },
+    {
+      "text": "Review includes a complexity/split advisory noting the large scope (75+ files across many packages)",
+      "passed": true,
+      "evidence": "Lines 11-17 contain a '> [!NOTE] **Complexity advisory** -- This PR may benefit from splitting.' section noting 78 reviewable files with 1323 insertions and 566 deletions spanning 2 projects."
+    },
+    {
+      "text": "Review identifies and discusses the deprecation patterns (@deprecated, UmbDeprecation, deprecated modal tokens)",
+      "passed": true,
+      "evidence": "Line 5 mentions 'Deprecated modals and interfaces are preserved with @deprecated JSDoc and runtime UmbDeprecation warnings'. Line 43 specifically praises the deprecation pattern for modal manifests."
+    },
+    {
+      "text": "Review checks for frontend-specific breaking changes (export changes, custom element API, package.json exports) rather than only backend patterns",
+      "passed": true,
+      "evidence": "Lines 7-8 discuss entity action alias renames as breaking changes for plugin developers. Lines 22-25 detail alias renames for PartialView and Script extensions as Critical findings. The review focuses on manifest aliases and extension registry patterns, which are frontend-specific breaking change vectors."
+    },
+    {
+      "text": "Findings reference specific files with line numbers (file:line format or equivalent)",
+      "passed": true,
+      "evidence": "Multiple file:line references throughout, e.g. 'partial-views/entity-actions/create/manifests.ts:8', 'collection-create-action.element.ts:145', 'default-blueprint-create-option-action.ts:14'."
+    },
+    {
+      "text": "Properly deprecated code with @deprecated + UmbDeprecation warnings is NOT flagged as a Critical breaking change",
+      "passed": true,
+      "evidence": "The Critical findings (lines 22-25) are about alias renames without deprecation, NOT about the properly deprecated modals. The review explicitly distinguishes: 'The old modal aliases are correctly preserved for backwards compatibility, but the entity action alias is not.' Properly deprecated items are treated as acceptable."
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "eval_id": 1,
+  "eval_name": "pr-21672-small-frontend-bugfix",
+  "config": "code_review",
+  "expectations": [
+    {
+      "text": "Output contains '## PR Review' header, '**Target:**' metadata line, and a verdict section (Approved/Request Changes/etc.)",
+      "passed": false,
+      "evidence": "Uses '### Code review' header (not '## PR Review'). No '**Target:**' metadata line. No verdict section. The format is a simple list of 2 issues."
+    },
+    {
+      "text": "Review does NOT include a complexity/split advisory (only 4 files in a single project)",
+      "passed": true,
+      "evidence": "No mention of complexity, splitting, or PR size in the 20-line review. Correctly treats this as a focused change."
+    },
+    {
+      "text": "Review does not flag breaking changes — this is a bugfix adding tab badge functionality, no public API surface changed",
+      "passed": true,
+      "evidence": "No mention of 'breaking change' anywhere. The two issues found are a bug (missing root tab context) and a resource leak, both correctly categorized."
+    },
+    {
+      "text": "Verdict is 'Approved' or 'Approved with Suggestions' (not 'Request Changes' or 'Needs re-work')",
+      "passed": false,
+      "evidence": "No verdict section present at all. The review simply lists 2 issues with no overall assessment or approval/rejection verdict."
+    },
+    {
+      "text": "Review output is under 200 lines — proportionate to the small 4-file change",
+      "passed": true,
+      "evidence": "Review is 20 lines, well under the 200-line threshold."
+    }
+  ]
+}

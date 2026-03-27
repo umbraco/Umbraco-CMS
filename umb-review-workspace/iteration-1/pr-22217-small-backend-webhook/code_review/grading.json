@@ -1,0 +1,27 @@
+{
+  "eval_id": 2,
+  "eval_name": "pr-22217-small-backend-webhook",
+  "config": "code_review",
+  "expectations": [
+    {
+      "text": "Output contains '## PR Review' header, '**Target:**' metadata line, and a verdict section (Approved/Request Changes/etc.)",
+      "passed": false,
+      "evidence": "Uses '### Code review' header (not '## PR Review'). No '**Target:**' metadata line. No verdict section. Simple format listing 1 issue plus sub-threshold findings."
+    },
+    {
+      "text": "Review references 'v18/dev' as the target branch (not 'main')",
+      "passed": false,
+      "evidence": "No mention of target branch, v18/dev, or any branch information anywhere in the 16-line review."
+    },
+    {
+      "text": "Review discusses the behavioral impact of changing the default webhook payload type from the current default to 'Minimal'",
+      "passed": false,
+      "evidence": "The review focuses only on a stale XML doc remark. It does not discuss the behavioral impact of changing the default from Legacy to Minimal, the effect on existing installations, or the implications for webhook consumers."
+    },
+    {
+      "text": "Review output is under 150 lines — proportionate to the tiny 3-file, 25-line change",
+      "passed": true,
+      "evidence": "Review is 16 lines, well under the 150-line threshold."
+    }
+  ]
+}

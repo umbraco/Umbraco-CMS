@@ -1,0 +1,240 @@
+{
+  "metadata": {
+    "skill_name": "umb-review",
+    "skill_path": "/Users/nielslyngso/Projects/Umbraco-CMS-v17/.claude/skills/umb-review",
+    "executor_model": "claude-opus-4-6",
+    "timestamp": "2026-03-26T21:00:00Z",
+    "evals_run": [0, 1, 2],
+    "runs_per_configuration": 1
+  },
+
+  "runs": [
+    {
+      "eval_id": 0,
+      "eval_name": "pr-22214-large-frontend-refactor",
+      "configuration": "umb_review",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 6,
+        "failed": 0,
+        "total": 6,
+        "time_seconds": 531.5,
+        "tokens": 144884
+      },
+      "expectations": [
+        {"text": "Output contains '## PR Review' header, '**Target:**' metadata line, and a verdict section", "passed": true, "evidence": "Has '## PR Review' header, '**Target:** `origin/main`' line, and '## Approved with Suggestions' verdict"},
+        {"text": "Review includes a complexity/split advisory for the large 75+ file scope", "passed": true, "evidence": "Contains '[!NOTE] Complexity advisory' with Size and Formatting mixed with logic dimensions"},
+        {"text": "Review identifies deprecation patterns (@deprecated, UmbDeprecation)", "passed": true, "evidence": "Summary mentions '@deprecated JSDoc and runtime UmbDeprecation warnings for backwards compatibility'"},
+        {"text": "Checks frontend-specific breaking changes (exports, custom elements) not just backend", "passed": true, "evidence": "Critical section flags alias renames as breaking changes for plugin developers"},
+        {"text": "Findings reference specific files with line numbers", "passed": true, "evidence": "All findings include file:line references like 'manifests.ts:8', 'default-blueprint-create-option-action.ts:14'"},
+        {"text": "Properly deprecated code is NOT flagged as Critical breaking change", "passed": true, "evidence": "Deprecated modals are noted as properly handled; Critical only flags alias renames which lack deprecation"}
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "pr-22214-large-frontend-refactor",
+      "configuration": "code_review",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.67,
+        "passed": 4,
+        "failed": 2,
+        "total": 6,
+        "time_seconds": 190.4,
+        "tokens": 94985
+      },
+      "expectations": [
+        {"text": "Output contains '## PR Review' header, '**Target:**' metadata line, and a verdict section", "passed": false, "evidence": "Uses '### Code review' format with no Target line or verdict section"},
+        {"text": "Review includes a complexity/split advisory for the large 75+ file scope", "passed": false, "evidence": "No complexity or split advisory present"},
+        {"text": "Review identifies deprecation patterns (@deprecated, UmbDeprecation)", "passed": true, "evidence": "Issue #1 discusses deprecated modals preserved with @deprecated and UmbDeprecation"},
+        {"text": "Checks frontend-specific breaking changes (exports, custom elements) not just backend", "passed": true, "evidence": "Issue #1 flags alias renaming as breaking change for plugin developers"},
+        {"text": "Findings reference specific files with line numbers", "passed": true, "evidence": "Both issues reference specific file paths"},
+        {"text": "Properly deprecated code is NOT flagged as Critical breaking change", "passed": true, "evidence": "Only flags alias rename (no deprecation path) not the properly deprecated modals"}
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "pr-22214-large-frontend-refactor",
+      "configuration": "no_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.83,
+        "passed": 5,
+        "failed": 1,
+        "total": 6,
+        "time_seconds": 439.6,
+        "tokens": 135075
+      },
+      "expectations": [
+        {"text": "Output contains '## PR Review' header, '**Target:**' metadata line, and a verdict section", "passed": false, "evidence": "Uses '# Code Review: PR #22214' format with no Target metadata line"},
+        {"text": "Review includes a complexity/split advisory for the large 75+ file scope", "passed": true, "evidence": "Issue #5 explicitly flags massive reformatting of UiBaseLocators.ts and suggests separating formatting from functional changes"},
+        {"text": "Review identifies deprecation patterns (@deprecated, UmbDeprecation)", "passed": true, "evidence": "Backwards Compatibility section discusses @deprecated JSDoc, UmbDeprecation warnings, and modal preservation"},
+        {"text": "Checks frontend-specific breaking changes (exports, custom elements) not just backend", "passed": true, "evidence": "Issues #1 and #6 flag alias renames and deleted action classes as frontend breaking changes"},
+        {"text": "Findings reference specific files with line numbers", "passed": true, "evidence": "All issues reference specific file paths"},
+        {"text": "Properly deprecated code is NOT flagged as Critical breaking change", "passed": true, "evidence": "Deprecated modals noted as properly handled; only undeprecated deletions flagged"}
+      ]
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "pr-21672-small-frontend-bugfix",
+      "configuration": "umb_review",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5,
+        "time_seconds": 294.6,
+        "tokens": 82416
+      },
+      "expectations": [
+        {"text": "Output contains '## PR Review' header, '**Target:**' metadata line, and a verdict section", "passed": true, "evidence": "Has '## PR Review' header, '**Target:** `origin/main`' line, and '## Approved with Suggestions' verdict"},
+        {"text": "Review does NOT include a complexity/split advisory", "passed": true, "evidence": "No complexity advisory present"},
+        {"text": "Review does not flag breaking changes", "passed": true, "evidence": "No breaking changes mentioned"},
+        {"text": "Verdict is 'Approved' or 'Approved with Suggestions'", "passed": true, "evidence": "Verdict: '## Approved with Suggestions for improvement'"},
+        {"text": "Review output is under 200 lines", "passed": true, "evidence": "Review is approximately 50 lines"}
+      ]
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "pr-21672-small-frontend-bugfix",
+      "configuration": "code_review",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.6,
+        "passed": 3,
+        "failed": 2,
+        "total": 5,
+        "time_seconds": 139.3,
+        "tokens": 61065
+      },
+      "expectations": [
+        {"text": "Output contains '## PR Review' header, '**Target:**' metadata line, and a verdict section", "passed": false, "evidence": "Uses '### Code review' format with no Target or verdict"},
+        {"text": "Review does NOT include a complexity/split advisory", "passed": true, "evidence": "No complexity advisory present"},
+        {"text": "Review does not flag breaking changes", "passed": true, "evidence": "No breaking changes mentioned"},
+        {"text": "Verdict is 'Approved' or 'Approved with Suggestions'", "passed": false, "evidence": "No explicit verdict - just lists 2 issues found"},
+        {"text": "Review output is under 200 lines", "passed": true, "evidence": "Review is approximately 25 lines"}
+      ]
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "pr-21672-small-frontend-bugfix",
+      "configuration": "no_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.6,
+        "passed": 3,
+        "failed": 2,
+        "total": 5,
+        "time_seconds": 208.6,
+        "tokens": 78383
+      },
+      "expectations": [
+        {"text": "Output contains '## PR Review' header, '**Target:**' metadata line, and a verdict section", "passed": false, "evidence": "Uses '# Code Review: PR #21672' format with no Target metadata line"},
+        {"text": "Review does NOT include a complexity/split advisory", "passed": true, "evidence": "No complexity advisory present"},
+        {"text": "Review does not flag breaking changes", "passed": true, "evidence": "Correctly states 'No breaking changes'"},
+        {"text": "Verdict is 'Approved' or 'Approved with Suggestions'", "passed": false, "evidence": "No explicit approve/reject verdict — ends with 'there is one likely bug' which implies request changes"},
+        {"text": "Review output is under 200 lines", "passed": true, "evidence": "Review is approximately 70 lines"}
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "pr-22217-small-backend-webhook",
+      "configuration": "umb_review",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 4,
+        "failed": 0,
+        "total": 4,
+        "time_seconds": 318.1,
+        "tokens": 62695
+      },
+      "expectations": [
+        {"text": "Output contains '## PR Review' header, '**Target:**' metadata line, and a verdict section", "passed": true, "evidence": "Has '## PR Review', '**Target:** `origin/v18/dev`', and '## Approved with Suggestions'"},
+        {"text": "Review references 'v18/dev' as the target branch (not 'main')", "passed": true, "evidence": "Target line reads 'origin/v18/dev (from argument)'"},
+        {"text": "Review discusses the behavioral impact of changing the default payload type", "passed": true, "evidence": "Modified public API section and Other changes section discuss the default change and telemetry impact"},
+        {"text": "Review output is under 150 lines", "passed": true, "evidence": "Review is approximately 40 lines"}
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "pr-22217-small-backend-webhook",
+      "configuration": "code_review",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.25,
+        "passed": 1,
+        "failed": 3,
+        "total": 4,
+        "time_seconds": 171.2,
+        "tokens": 35734
+      },
+      "expectations": [
+        {"text": "Output contains '## PR Review' header, '**Target:**' metadata line, and a verdict section", "passed": false, "evidence": "Uses '### Code review' format with no Target or verdict"},
+        {"text": "Review references 'v18/dev' as the target branch (not 'main')", "passed": false, "evidence": "No target branch mentioned at all"},
+        {"text": "Review discusses the behavioral impact of changing the default payload type", "passed": false, "evidence": "Only discusses stale docs, not behavioral impact of changing the default"},
+        {"text": "Review output is under 150 lines", "passed": true, "evidence": "Review is approximately 20 lines"}
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "pr-22217-small-backend-webhook",
+      "configuration": "no_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.75,
+        "passed": 3,
+        "failed": 1,
+        "total": 4,
+        "time_seconds": 201.1,
+        "tokens": 51484
+      },
+      "expectations": [
+        {"text": "Output contains '## PR Review' header, '**Target:**' metadata line, and a verdict section", "passed": false, "evidence": "Uses '# Code Review: PR #22217' format with no Target metadata line"},
+        {"text": "Review references 'v18/dev' as the target branch (not 'main')", "passed": true, "evidence": "States 'Branch: pr/22217 targeting v18/dev'"},
+        {"text": "Review discusses the behavioral impact of changing the default payload type", "passed": true, "evidence": "Detailed 'Breaking Change Assessment' section discusses behavioral impact"},
+        {"text": "Review output is under 150 lines", "passed": false, "evidence": "Review is approximately 120 lines including detailed file-by-file analysis — close but borderline"}
+      ]
+    }
+  ],
+
+  "run_summary": {
+    "umb_review": {
+      "pass_rate": {"mean": 1.0, "stddev": 0.0, "min": 1.0, "max": 1.0},
+      "time_seconds": {"mean": 381.4, "stddev": 106.6, "min": 294.6, "max": 531.5},
+      "tokens": {"mean": 96665, "stddev": 36906, "min": 62695, "max": 144884}
+    },
+    "code_review": {
+      "pass_rate": {"mean": 0.51, "stddev": 0.19, "min": 0.25, "max": 0.67},
+      "time_seconds": {"mean": 167.0, "stddev": 21.1, "min": 139.3, "max": 190.4},
+      "tokens": {"mean": 63928, "stddev": 24254, "min": 35734, "max": 94985}
+    },
+    "no_skill": {
+      "pass_rate": {"mean": 0.73, "stddev": 0.10, "min": 0.60, "max": 0.83},
+      "time_seconds": {"mean": 283.1, "stddev": 108.0, "min": 201.1, "max": 439.6},
+      "tokens": {"mean": 88314, "stddev": 34726, "min": 51484, "max": 135075}
+    },
+    "delta_umb_vs_no_skill": {
+      "pass_rate": "+0.27",
+      "time_seconds": "+98.3",
+      "tokens": "+8351"
+    },
+    "delta_umb_vs_code_review": {
+      "pass_rate": "+0.49",
+      "time_seconds": "+214.4",
+      "tokens": "+32737"
+    }
+  },
+
+  "notes": [
+    "umb_review achieved 100% pass rate across all 15 assertions — perfect score on format, content, and correctness",
+    "code_review consistently failed format assertions (uses its own '### Code review' format, no target branch or verdict) — expected since it's a different tool with different output format",
+    "no_skill performed well on content assertions (73%) but always failed the structured format check — Claude Opus 4.6 is capable without the skill but inconsistent on format",
+    "umb_review is slower (381s avg vs 167s code_review, 283s no_skill) — the structured multi-step workflow adds overhead",
+    "The 'structured-format' assertion passes only for umb_review by design — it tests the skill's specific output format. This accounts for 3 of code_review's 7 failures and 3 of no_skill's 4 failures",
+    "All 3 configs correctly identified the alias rename breaking change in PR#22214 — this is a real issue, not a false positive",
+    "code_review struggled most on PR#22217 (25% pass rate) — its confidence filtering approach missed behavioral impact analysis entirely"
+  ]
+}

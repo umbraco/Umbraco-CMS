@@ -1,0 +1,37 @@
+{
+  "eval_id": 0,
+  "eval_name": "pr-22214-large-frontend-refactor",
+  "config": "code_review",
+  "expectations": [
+    {
+      "text": "Output contains '## PR Review' header, '**Target:**' metadata line, and a verdict section (Approved/Request Changes/etc.)",
+      "passed": false,
+      "evidence": "Uses '### Code review' header (not '## PR Review'). No '**Target:**' metadata line. No verdict section. The format is a simple list of issues without the structured review format."
+    },
+    {
+      "text": "Review includes a complexity/split advisory noting the large scope (75+ files across many packages)",
+      "passed": false,
+      "evidence": "No mention of complexity, splitting, PR size, or file count anywhere in the 24-line review."
+    },
+    {
+      "text": "Review identifies and discusses the deprecation patterns (@deprecated, UmbDeprecation, deprecated modal tokens)",
+      "passed": true,
+      "evidence": "Issue 1 mentions: 'Unlike the modal tokens and elements which are properly deprecated with @deprecated JSDoc and UmbDeprecation runtime warnings, the old entity action aliases are simply removed.' Demonstrates awareness of the deprecation patterns."
+    },
+    {
+      "text": "Review checks for frontend-specific breaking changes (export changes, custom element API, package.json exports) rather than only backend patterns",
+      "passed": true,
+      "evidence": "Issue 1 discusses entity action alias renaming as a breaking change, noting external consumers referencing aliases in conditions, overrides, or extension manifests. This is frontend-specific breaking change awareness."
+    },
+    {
+      "text": "Findings reference specific files with line numbers (file:line format or equivalent)",
+      "passed": true,
+      "evidence": "File references include line numbers: 'document-blueprints/entity-actions/create/folder/manifests.ts:18', 'partial-views/entity-actions/create/folder/manifests.ts:16', 'scripts/entity-actions/create/folder/manifests.ts:16'."
+    },
+    {
+      "text": "Properly deprecated code with @deprecated + UmbDeprecation warnings is NOT flagged as a Critical breaking change",
+      "passed": true,
+      "evidence": "Issue 1 explicitly acknowledges that modal tokens and elements are 'properly deprecated' and does not flag them as critical. The breaking change concern is specifically about the alias renames that lack deprecation, not the properly deprecated modals."
+    }
+  ]
+}

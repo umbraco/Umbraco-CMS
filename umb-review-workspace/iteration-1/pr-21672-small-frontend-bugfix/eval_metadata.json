@@ -1,0 +1,32 @@
+{
+  "eval_id": 1,
+  "eval_name": "pr-21672-small-frontend-bugfix",
+  "prompt": "Review the changes in PR #21672 (branch origin/pr/21672 targeting main). This is a small 4-file frontend bugfix implementing tab validation badges in the block editor.",
+  "assertions": [
+    {
+      "id": "structured-format",
+      "text": "Output contains '## PR Review' header, '**Target:**' metadata line, and a verdict section (Approved/Request Changes/etc.)",
+      "type": "format"
+    },
+    {
+      "id": "complexity-advisory-absent",
+      "text": "Review does NOT include a complexity/split advisory (only 4 files in a single project)",
+      "type": "correctness"
+    },
+    {
+      "id": "no-false-breaking-changes",
+      "text": "Review does not flag breaking changes — this is a bugfix adding tab badge functionality, no public API surface changed",
+      "type": "correctness"
+    },
+    {
+      "id": "proportionate-verdict",
+      "text": "Verdict is 'Approved' or 'Approved with Suggestions' (not 'Request Changes' or 'Needs re-work')",
+      "type": "correctness"
+    },
+    {
+      "id": "concise-review",
+      "text": "Review output is under 200 lines — proportionate to the small 4-file change",
+      "type": "format"
+    }
+  ]
+}

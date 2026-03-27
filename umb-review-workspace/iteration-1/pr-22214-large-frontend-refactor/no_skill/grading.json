@@ -1,0 +1,37 @@
+{
+  "eval_id": 0,
+  "eval_name": "pr-22214-large-frontend-refactor",
+  "config": "no_skill",
+  "expectations": [
+    {
+      "text": "Output contains '## PR Review' header, '**Target:**' metadata line, and a verdict section (Approved/Request Changes/etc.)",
+      "passed": false,
+      "evidence": "Uses '# Code Review: PR #22214' header (not '## PR Review'). No '**Target:**' metadata line. Has a 'Verdict' section but uses non-standard format. Has some structure (headers, sections) but not the specified format."
+    },
+    {
+      "text": "Review includes a complexity/split advisory noting the large scope (75+ files across many packages)",
+      "passed": true,
+      "evidence": "Line 14 notes '78 files changed, +1323 / -566 lines (though a large portion is reformatting)'. Issue 5 (line 109) is titled 'Massive Reformatting of UiBaseLocators.ts' and recommends separating formatting changes. However, there is no explicit 'split advisory' or recommendation to split the PR itself."
+    },
+    {
+      "text": "Review identifies and discusses the deprecation patterns (@deprecated, UmbDeprecation, deprecated modal tokens)",
+      "passed": true,
+      "evidence": "Lines 32-40 explicitly discuss the backwards compatibility patterns: '@deprecated JSDoc annotations with Scheduled for removal in Umbraco 19', 'Runtime UmbDeprecation warnings in connectedCallback()', and 'Modal manifests kept registered for external consumers'. Issue 6 (line 123) also discusses deleted action classes not being deprecated first."
+    },
+    {
+      "text": "Review checks for frontend-specific breaking changes (export changes, custom element API, package.json exports) rather than only backend patterns",
+      "passed": true,
+      "evidence": "Issue 1 (line 46) discusses entity action alias renames as breaking changes. Issue 6 (line 123) discusses deleted exported TypeScript classes as breaking for plugin developers who imported them. Both are frontend-specific concerns about manifest aliases and module exports."
+    },
+    {
+      "text": "Findings reference specific files with line numbers (file:line format or equivalent)",
+      "passed": true,
+      "evidence": "Multiple file references with line numbers throughout, e.g. 'block-workspace-view-edit.element.ts, line 219', 'lines 120-128', 'lines 131-145'. Some references use line ranges rather than exact file:line format."
+    },
+    {
+      "text": "Properly deprecated code with @deprecated + UmbDeprecation warnings is NOT flagged as a Critical breaking change",
+      "passed": true,
+      "evidence": "Issue 1 (line 46) is labeled 'Severity: Medium' not Critical. The review explicitly notes that deprecated modals are 'preserved with clear deprecation notices' (line 32) and treats them as positive ('Good deprecation documentation' on line 170). The breaking change concern is about alias renames and deleted classes that lacked deprecation."
+    }
+  ]
+}

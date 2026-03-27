@@ -1,0 +1,32 @@
+{
+  "eval_id": 1,
+  "eval_name": "pr-21672-small-frontend-bugfix",
+  "config": "umb_review",
+  "expectations": [
+    {
+      "text": "Output contains '## PR Review' header, '**Target:**' metadata line, and a verdict section (Approved/Request Changes/etc.)",
+      "passed": true,
+      "evidence": "Line 1: '## PR Review', Line 3: '**Target:** `origin/main`', Line 29: '## Approved with Suggestions for improvement'"
+    },
+    {
+      "text": "Review does NOT include a complexity/split advisory (only 4 files in a single project)",
+      "passed": true,
+      "evidence": "No mention of complexity, splitting, or PR size anywhere in the 31-line review. The review correctly treats this as a small, focused change."
+    },
+    {
+      "text": "Review does not flag breaking changes — this is a bugfix adding tab badge functionality, no public API surface changed",
+      "passed": true,
+      "evidence": "No mention of 'breaking change' anywhere in the review. The review correctly focuses on functional issues (missing root tab context, memory leak) and suggestions."
+    },
+    {
+      "text": "Verdict is 'Approved' or 'Approved with Suggestions' (not 'Request Changes' or 'Needs re-work')",
+      "passed": true,
+      "evidence": "Line 29: '## Approved with Suggestions for improvement'"
+    },
+    {
+      "text": "Review output is under 200 lines — proportionate to the small 4-file change",
+      "passed": true,
+      "evidence": "Review is 31 lines, well under the 200-line threshold."
+    }
+  ]
+}
