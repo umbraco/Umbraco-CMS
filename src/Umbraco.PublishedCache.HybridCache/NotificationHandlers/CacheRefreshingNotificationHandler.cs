@@ -67,11 +67,13 @@ internal sealed class CacheRefreshingNotificationHandler :
         var structuralChangeIds = notification.Changes
             .Where(x => x.ChangeTypes.IsStructuralChange())
             .Select(x => x.Item.Id)
+            .Distinct()
             .ToArray();
 
         var nonStructuralChangeIds = notification.Changes
             .Where(x => x.ChangeTypes.IsNonStructuralChange())
             .Select(x => x.Item.Id)
+            .Distinct()
             .ToArray();
 
         // Clear content type cache for all changes - content type definitions need refreshing regardless
