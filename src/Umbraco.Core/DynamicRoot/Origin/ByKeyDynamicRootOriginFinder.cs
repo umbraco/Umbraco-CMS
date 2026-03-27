@@ -9,17 +9,12 @@ namespace Umbraco.Cms.Core.DynamicRoot.Origin;
 /// </summary>
 public class ByKeyDynamicRootOriginFinder : IDynamicRootOriginFinder
 {
-    /// <summary>
-    ///     Gets or sets the origin type alias that this finder supports.
-    /// </summary>
-    protected virtual string SupportedOriginType { get; set; } = "ByKey";
-
     private readonly IEntityService _entityService;
 
-    private ISet<Guid> _allowedObjectTypes = new HashSet<Guid>(new[]
-    {
+    private readonly ISet<Guid> _allowedObjectTypes = new HashSet<Guid>(
+    [
         Constants.ObjectTypes.Document, Constants.ObjectTypes.SystemRoot
-    });
+    ]);
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="ByKeyDynamicRootOriginFinder"/> class.
@@ -29,6 +24,11 @@ public class ByKeyDynamicRootOriginFinder : IDynamicRootOriginFinder
     {
         _entityService = entityService;
     }
+
+    /// <summary>
+    ///     Gets or sets the origin type alias that this finder supports.
+    /// </summary>
+    protected virtual string SupportedOriginType { get; set; } = "ByKey";
 
     /// <inheritdoc/>
     public virtual Guid? FindOriginKey(DynamicRootNodeQuery query)
