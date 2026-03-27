@@ -203,7 +203,6 @@ export class UmbBodyLayoutElement extends LitElement {
 				align-items: center;
 				box-sizing: border-box;
 				min-width: 0;
-				flex-shrink: 0;
 			}
 			#navigation-slot {
 				margin-left: auto;

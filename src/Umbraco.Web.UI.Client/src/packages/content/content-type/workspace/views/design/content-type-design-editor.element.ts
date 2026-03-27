@@ -483,7 +483,11 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 	#renderAddButton() {
 		if (this._sortModeActive) return;
 		return html`
-			<uui-button id="add-tab" data-mark="add-tab-button" @click="${this.#addTab}" label=${this.localize.term('contentTypeEditor_addTab')}>
+			<uui-button
+				id="add-tab"
+				data-mark="add-tab-button"
+				@click="${this.#addTab}"
+				label=${this.localize.term('contentTypeEditor_addTab')}>
 				<uui-icon name="icon-add"></uui-icon>
 				<umb-localize key="contentTypeEditor_addTab">Add tab</umb-localize>
 			</uui-button>
@@ -695,10 +699,14 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 
 			#container-list {
 				display: flex;
+				overflow: hidden;
+				min-width: 0;
+				flex: 1;
 			}
 
 			#tabs-group {
 				display: flex;
+				overflow: hidden;
 			}
 
 			#actions {
