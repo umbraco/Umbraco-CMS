@@ -39,11 +39,10 @@ internal class RichTextAllowedMediaTypeValidatorTests
     [Test]
     public void Allowed_Media_Type_Passes()
     {
-        var mediaKey = Guid.NewGuid();
         var (validator, mediaServiceMock, mediaTypeServiceMock) = CreateValidator();
-        SetupMedia(mediaServiceMock, mediaTypeServiceMock, mediaKey, "Image", AllowedTypeKey);
+        SetupMedia(mediaServiceMock, mediaTypeServiceMock, "Image", AllowedTypeKey);
 
-        var result = Validate(validator, BuildMarkup(mediaKey));
+        var result = Validate(validator, BuildMarkup(Guid.NewGuid()));
 
         Assert.IsEmpty(result);
     }
@@ -51,11 +50,10 @@ internal class RichTextAllowedMediaTypeValidatorTests
     [Test]
     public void Disallowed_Media_Type_Fails()
     {
-        var mediaKey = Guid.NewGuid();
         var (validator, mediaServiceMock, mediaTypeServiceMock) = CreateValidator();
-        SetupMedia(mediaServiceMock, mediaTypeServiceMock, mediaKey, "File", Guid.NewGuid());
+        SetupMedia(mediaServiceMock, mediaTypeServiceMock, "File", Guid.NewGuid());
 
-        var result = Validate(validator, BuildMarkup(mediaKey));
+        var result = Validate(validator, BuildMarkup(Guid.NewGuid()));
 
         Assert.That(result.Count(), Is.EqualTo(1));
     }
@@ -106,14 +104,12 @@ internal class RichTextAllowedMediaTypeValidatorTests
     {
         var secondTypeKey = Guid.NewGuid();
         var (validator, mediaServiceMock, mediaTypeServiceMock) = CreateValidator();
-        SetupMedia(mediaServiceMock, mediaTypeServiceMock, Guid.NewGuid(), "Video", secondTypeKey);
+        SetupMedia(mediaServiceMock, mediaTypeServiceMock, "Video", secondTypeKey);
 
         var result = Validate(validator, BuildMarkup(Guid.NewGuid()), $"{AllowedTypeKey},{secondTypeKey}");
 
         Assert.IsEmpty(result);
     }
-
-    #region Helpers
 
     private static IEnumerable<System.ComponentModel.DataAnnotations.ValidationResult> Validate(
         RichTextAllowedMediaTypeValidator validator,
@@ -142,7 +138,7 @@ internal class RichTextAllowedMediaTypeValidatorTests
         mock.Setup(x => x.Get(alias)).Returns(mediaType.Object);
     }
 
-    private static void SetupMedia(Mock<IMediaService> mediaServiceMock, Mock<IMediaTypeService> mediaTypeServiceMock, Guid mediaKey, string typeAlias, Guid typeKey)
+    private static void SetupMedia(Mock<IMediaService> mediaServiceMock, Mock<IMediaTypeService> mediaTypeServiceMock, string typeAlias, Guid typeKey)
     {
         var media = CreateMediaMock(typeAlias);
         mediaServiceMock.Setup(x => x.GetByIds(It.IsAny<IEnumerable<Guid>>())).Returns([media.Object]);
@@ -166,5 +162,4 @@ internal class RichTextAllowedMediaTypeValidatorTests
         return (validator, mediaServiceMock, mediaTypeServiceMock);
     }
 
-    #endregion
 }
