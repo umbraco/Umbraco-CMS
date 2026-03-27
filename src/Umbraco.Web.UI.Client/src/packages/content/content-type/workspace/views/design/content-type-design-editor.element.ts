@@ -11,7 +11,16 @@ import {
 import { UMB_COMPOSITION_PICKER_MODAL } from '../../../modals/constants.js';
 import type { UmbContentTypeDesignEditorTabElement } from './content-type-design-editor-tab.element.js';
 import { UmbContentTypeDesignEditorContext } from './content-type-design-editor.context.js';
-import { css, html, customElement, state, repeat, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
+import {
+	css,
+	html,
+	customElement,
+	state,
+	repeat,
+	ifDefined,
+	nothing,
+	query,
+} from '@umbraco-cms/backoffice/external/lit';
 import type { UUIInputElement, UUIInputEvent, UUITabElement } from '@umbraco-cms/backoffice/external/uui';
 import { encodeFolderName } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -130,6 +139,17 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 
 	@state()
 	private _sortModeActive?: boolean;
+
+	@query('#tabs-group')
+	private _tabsGroupEl?: HTMLElement;
+
+	#scrollTabsRight() {
+		this._tabsGroupEl?.scrollBy({ left: 200, behavior: 'smooth' });
+	}
+
+	#scrollTabsLeft() {
+		this._tabsGroupEl?.scrollBy({ left: -200, behavior: 'smooth' });
+	}
 
 	constructor() {
 		super();
@@ -531,15 +551,19 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		if (!this._tabs || this._tabs.length === 0) return;
 
 		return html`
-			<div id="tabs-group">
-				<uui-tab-group>
-					${this.renderRootTab()}
-					${repeat(
-						this._tabs,
-						(tab) => tab.ownerId ?? tab.ids[0],
-						(tab) => this.renderTab(tab),
-					)}
-				</uui-tab-group>
+			<div id="container-list">
+				<uui-button id="scroll-left" @click=${this.#scrollTabsLeft}>◀</uui-button>
+				<div id="tabs-group">
+					<uui-tab-group>
+						${this.renderRootTab()}
+						${repeat(
+							this._tabs,
+							(tab) => tab.ownerId ?? tab.ids[0],
+							(tab) => this.renderTab(tab),
+						)}
+					</uui-tab-group>
+				</div>
+				<uui-button id="scroll-right" @click=${this.#scrollTabsRight}>▶</uui-button>
 			</div>
 		`;
 	}
@@ -707,6 +731,12 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 			#tabs-group {
 				display: flex;
 				overflow: hidden;
+				min-width: 0;
+			}
+
+			#scroll-left,
+			#scroll-right {
+				flex-shrink: 0;
 			}
 
 			#actions {
