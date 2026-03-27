@@ -326,7 +326,7 @@ export class DocumentApiHelper {
     return await this.create(document);
   }
 
-  async createDocumentWithExternalLinkURLPicker(documentName: string, documentTypeId: string, link: string, linkTitle: string) {
+  async createDocumentWithExternalLinkURLPicker(documentName: string, documentTypeId: string, dataTypeName: string, link: string, linkTitle: string) {
     await this.ensureNameNotExists(documentName);
 
     const document = new DocumentBuilder()
@@ -335,7 +335,7 @@ export class DocumentApiHelper {
         .withName(documentName)
         .done()
       .addValue()
-        .withAlias('multiUrlPicker')
+        .withAlias(AliasHelper.toAlias(dataTypeName))
         .addURLPickerValue()
           .withIcon('icon-link')
           .withName(linkTitle)
@@ -1765,6 +1765,16 @@ export class DocumentApiHelper {
     expect(publicAccessData.loginDocument.id).toBe(expectedLoginDocumentId);
     expect(publicAccessData.errorDocument.id).toBe(expectedErrorDocumentId);
     expect(publicAccessData.isProtectedByAncestor).toBe(expectedIsProtectedByAncestor);
+  }
+
+  async getValueByAlias(documentName: string, alias: string, culture: string | null = null) {
+    const documentData = await this.getByName(documentName);
+    return documentData.values.find(v => v.alias === alias && v.culture === culture);
+  }
+
+  async getValuesByAliasAndCultures(documentName: string, alias: string, cultures: (string | null)[]) {
+    const documentData = await this.getByName(documentName);
+    return cultures.map(culture => documentData.values.find(v => v.alias === alias && v.culture === culture));
   }
 
   async getValuesByCultureAndSegmentForDocument(documentName: string, culturesAndSegments: {culture: string | null, segment: string | null}[]) {
