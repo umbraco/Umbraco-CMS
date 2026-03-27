@@ -208,7 +208,8 @@ Present the review in this exact format:
 ```markdown
 ## PR Review
 
-**Target:** `{target_branch}` · **Based on commit:** `{head_sha}` · **Files:** {total} changed, {skipped} skipped, {reviewed} reviewed
+**Target:** `{target_branch}` · **Based on commit:** `{head_sha}`
+[If any skipped files, append: · **Skipped:** {skipped} files out of {total} total]
 [If step 3f classification is not "Standard", append: · **Classified as:** {classification}]
 
 [1–2 sentences: what this PR accomplishes , keep it as short as possible, only highlight the primary essence.]
