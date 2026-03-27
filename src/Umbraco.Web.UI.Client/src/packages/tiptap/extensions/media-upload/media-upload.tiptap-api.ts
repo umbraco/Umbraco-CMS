@@ -204,8 +204,7 @@ export default class UmbTiptapMediaUploadExtensionApi extends UmbTiptapExtension
 
 		if (specificMatches.length > 1) {
 			// Multiple specific matches — let the user pick
-			const picked = await this.#showMediaTypePicker(specificMatches);
-			return !!picked;
+			return await this.#showMediaTypePicker(specificMatches);
 		}
 
 		// All fallbacks — auto-select
@@ -225,11 +224,11 @@ export default class UmbTiptapMediaUploadExtensionApi extends UmbTiptapExtension
 		}
 	}
 
-	async #showMediaTypePicker(options: Array<UmbAllowedMediaTypeModel>): Promise<string | undefined> {
-		const value = await umbOpenModal(this, UMB_DROPZONE_MEDIA_TYPE_PICKER_MODAL, { data: { options } }).catch(
-			() => undefined,
+	async #showMediaTypePicker(options: Array<UmbAllowedMediaTypeModel>): Promise<boolean> {
+		return umbOpenModal(this, UMB_DROPZONE_MEDIA_TYPE_PICKER_MODAL, { data: { options } }).then(
+			() => true,
+			() => false,
 		);
-		return value?.mediaTypeUnique;
 	}
 
 	#showDisallowedNotification(fileName: string) {
