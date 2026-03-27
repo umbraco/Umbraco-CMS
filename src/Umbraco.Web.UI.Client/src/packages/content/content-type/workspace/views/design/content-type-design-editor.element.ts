@@ -581,12 +581,15 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		}
 
 		return html`
-			${this._showScrollLeft
+			${this._showScrollLeft && !this._sortModeActive
 				? html`<uui-button id="scroll-left" compact @click=${this.#scrollTabsLeft} label="Scroll left"
 						><uui-icon name="icon-arrow-left"></uui-icon>
 					</uui-button>`
 				: nothing}
-			<div id="tabs-group" @scroll=${this.#updateScrollButtons}>
+			<div
+				id="tabs-group"
+				@scroll=${this.#updateScrollButtons}
+				style="overflow-x: ${this._sortModeActive ? 'auto' : 'hidden'}">
 				<uui-tab-group>
 					${this.renderRootTab()}
 					${repeat(
@@ -596,7 +599,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 					)}
 				</uui-tab-group>
 			</div>
-			${this._showScrollRight
+			${this._showScrollRight && !this._sortModeActive
 				? html`<uui-button id="scroll-right" compact @click=${this.#scrollTabsRight} label="Scroll right"
 						><uui-icon name="icon-arrow-right"></uui-icon
 					></uui-button>`
@@ -769,6 +772,11 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 				display: flex;
 				overflow: hidden;
 				min-width: 0;
+				scrollbar-width: none;
+			}
+
+			#tabs-group::-webkit-scrollbar {
+				display: none;
 			}
 
 			#scroll-left,
