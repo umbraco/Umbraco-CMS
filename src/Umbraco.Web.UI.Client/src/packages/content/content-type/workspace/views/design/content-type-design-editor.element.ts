@@ -140,8 +140,25 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 	@state()
 	private _sortModeActive?: boolean;
 
+	//Tab scroll
 	@query('#tabs-group')
 	private _tabsGroupEl?: HTMLElement;
+
+	@state()
+	private _showScrollLeft = false;
+
+	@state()
+	private _showScrollRight = false;
+
+	#tabsResizeObserver = new ResizeObserver(() => this.#updateScrollButtons());
+	#tabsResizeObserverConnected = false;
+
+	#updateScrollButtons() {
+		const el = this._tabsGroupEl;
+		if (!el) return;
+		this._showScrollLeft = el.scrollLeft > 0;
+		this._showScrollRight = el.scrollLeft + el.clientWidth < el.scrollWidth - 1;
+	}
 
 	#scrollTabsRight() {
 		this._tabsGroupEl?.scrollBy({ left: 200, behavior: 'smooth' });
@@ -149,6 +166,13 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 
 	#scrollTabsLeft() {
 		this._tabsGroupEl?.scrollBy({ left: -200, behavior: 'smooth' });
+	}
+
+	override updated() {
+		if (this._tabsGroupEl && !this.#tabsResizeObserverConnected) {
+			this.#tabsResizeObserver.observe(this._tabsGroupEl);
+			this.#tabsResizeObserverConnected = true;
+		}
 	}
 
 	constructor() {
@@ -548,23 +572,35 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 	}
 
 	renderTabsNavigation() {
-		if (!this._tabs || this._tabs.length === 0) return;
+		if (!this._tabs || this._tabs.length === 0) {
+			if (this.#tabsResizeObserverConnected) {
+				this.#tabsResizeObserver.disconnect();
+				this.#tabsResizeObserverConnected = false;
+			}
+			return;
+		}
 
 		return html`
-			<div id="container-list">
-				<uui-button id="scroll-left" @click=${this.#scrollTabsLeft}>◀</uui-button>
-				<div id="tabs-group">
-					<uui-tab-group>
-						${this.renderRootTab()}
-						${repeat(
-							this._tabs,
-							(tab) => tab.ownerId ?? tab.ids[0],
-							(tab) => this.renderTab(tab),
-						)}
-					</uui-tab-group>
-				</div>
-				<uui-button id="scroll-right" @click=${this.#scrollTabsRight}>▶</uui-button>
+			${this._showScrollLeft
+				? html`<uui-button id="scroll-left" compact @click=${this.#scrollTabsLeft} label="Scroll left"
+						><uui-icon name="icon-arrow-left"></uui-icon>
+					</uui-button>`
+				: nothing}
+			<div id="tabs-group" @scroll=${this.#updateScrollButtons}>
+				<uui-tab-group>
+					${this.renderRootTab()}
+					${repeat(
+						this._tabs,
+						(tab) => tab.ownerId ?? tab.ids[0],
+						(tab) => this.renderTab(tab),
+					)}
+				</uui-tab-group>
 			</div>
+			${this._showScrollRight
+				? html`<uui-button id="scroll-right" compact @click=${this.#scrollTabsRight} label="Scroll right"
+						><uui-icon name="icon-arrow-right"></uui-icon
+					></uui-button>`
+				: nothing}
 		`;
 	}
 
@@ -679,6 +715,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 	}
 
 	override destroy(): void {
+		this.#tabsResizeObserver.disconnect();
 		this.#currentTabComponent = undefined;
 		super.destroy();
 	}
@@ -723,7 +760,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 
 			#container-list {
 				display: flex;
-				overflow-x: auto;
+				overflow-x: hidden;
 				min-width: 0;
 				flex: 1;
 			}
