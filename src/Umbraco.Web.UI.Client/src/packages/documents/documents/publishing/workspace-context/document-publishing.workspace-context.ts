@@ -503,13 +503,26 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 
 		this.observe(
 			this.#documentWorkspaceContext.persistedData,
-			() => this.#processPendingChanges(),
+			() => {
+				// The unique/isNew observer fires before document data is loaded,
+				// so #loadAndProcessLastPublished may return early (no variants yet).
+				// When persistedData arrives and published data hasn't been loaded,
+				// trigger the load now that variant data is available.
+				if (!this.#publishedDocumentData && this.#hasPublishedVariant()) {
+					this.#loadAndProcessLastPublished();
+				} else {
+					this.#processPendingChanges();
+				}
+			},
 			'umbPersistedDataObserver',
 		);
 	}
 
 	#hasPublishedVariant() {
-		const variants = this.#documentWorkspaceContext?.getVariants();
+		// Use persisted data (falls back to current) because this may be called
+		// from the persistedData observer before setCurrent has run.
+		const variants = this.#documentWorkspaceContext?.getPersistedData()?.variants
+			?? this.#documentWorkspaceContext?.getVariants();
 		return (
 			variants?.some(
 				(variant) =>
