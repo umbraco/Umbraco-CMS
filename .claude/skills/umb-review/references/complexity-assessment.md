@@ -2,7 +2,7 @@
 
 Evaluate whether the PR's scope suggests it should be split. This assessment is **informational only** — it never blocks or shortens the review.
 
-## Exemptions — skip entirely if ANY hold
+## Exemptions — skip Size, Layer spread, and Mixed intent if ANY hold
 
 - More than 80% of reviewable files are `.md` documentation
 - All reviewable production files reside in a single project directory
@@ -10,9 +10,11 @@ Evaluate whether the PR's scope suggests it should be split. This assessment is 
 - The PR is primarily a dependency bump (`Directory.Packages.props` or `package.json` are the main changes)
 - The majority of changes are renames (`git diff {target}...HEAD --diff-filter=R --name-only`)
 
+**"Formatting mixed with logic" is always checked regardless of exemptions** — it's about per-file reviewability, not PR scope.
+
 ## Trigger rules
 
-If no exemption applies, flag each dimension whose condition is met:
+Flag each dimension whose condition is met (respecting exemptions above):
 
 | Dimension                       | Condition                                                                                                                                                                                 |
 | ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
