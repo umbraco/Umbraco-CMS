@@ -92,7 +92,7 @@ To make a module importable by other packages:
 
 2. Run the generators:
 ```bash
-npm run i && npm run generate:tsconfig
+npm i && npm run generate:tsconfig
 ```
 
 This ensures TypeScript, the browser import map, and test configs all resolve the new package.

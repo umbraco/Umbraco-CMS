@@ -47,7 +47,7 @@ src/
 
 **Extension-first architecture**: HQ builds extensions the same way third-party developers do. All UI (sections, dashboards, property editors, workspaces, trees, actions) is registered via manifests. Any default behavior can be replaced, overridden, or removed. Consumers can use any framework that outputs a Web Component.
 
-*Note: The extension-first mindset is the guiding principle. The frontend fully embraces this*
+*Note: The extension-first mindset is the guiding principle, and the frontend fully embraces this by treating all features as manifest-registered, replaceable extensions.*
 
 ---
 
