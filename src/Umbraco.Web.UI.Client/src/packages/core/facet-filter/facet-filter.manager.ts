@@ -13,9 +13,7 @@ export interface UmbFacetedResultModel {
 export class UmbFacetFilterManager extends UmbContextBase {
 	#activeFilters = new UmbArrayState<UmbActiveFacetFilterModel>([], (x) => `${x.alias}||${x.unique}`);
 	public readonly activeFilters = this.#activeFilters.asObservable();
-	public readonly totalActiveFilters = this.#activeFilters.asObservablePart(
-		(filters) => new Set(filters.map((f) => f.alias)).size,
-	);
+	public readonly totalActiveFilters = this.#activeFilters.asObservablePart((filters) => filters.length);
 
 	#facetedResults = new UmbArrayState<UmbFacetedResultModel>([], (x) => x.alias);
 
