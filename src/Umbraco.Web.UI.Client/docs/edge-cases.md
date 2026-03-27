@@ -581,4 +581,73 @@ async loadById(id: string, options?: LoadOptions): Promise<UmbContentModel> {
 }
 ```
 
+---
+
+### Auth & Cross-tab Coordination
+
+**`window.opener` is set for ANY window opened with `window.open()`**
+
+Not just OAuth popups. The preview window, for example, also has `window.opener` set. Do not use `window.opener` alone as a signal that you are in the OAuth code exchange flow — check the pathname too:
+
+```typescript
+// ❌ Too broad — breaks preview window, any other window.open() target
+if (window.opener) return;
+
+// ✅ Specific to the OAuth code exchange popup
+const pathname = pathWithoutBasePath({ start: true, end: false });
+if (window.opener && pathname === '/oauth_complete') return;
+```
+
+This mistake caused issue #22083 (preview window stuck loading) — the `window.opener` guard in `#setAuthStatus()` prevented `setInitialState()` from running in the preview window, so `isAuthorized` never became `true`.
+
+**BroadcastChannel does NOT deliver messages to the sender's own tab**
+
+Only other tabs/windows receive the message. Do not call methods that broadcast inside a BroadcastChannel handler — this causes N² message storms:
+
+```typescript
+// ❌ This tab sent 'sessionUpdate', now it receives it back and broadcasts again
+this.#channel.onmessage = (evt) => {
+	if (evt.data.type === 'sessionUpdate') {
+		this.#updateSession(...); // #updateSession also calls postMessage — storm!
+	}
+};
+
+// ✅ Use the local-only setter inside handlers, not the broadcasting wrapper
+this.#channel.onmessage = (evt) => {
+	if (evt.data.type === 'sessionUpdate') {
+		this.#setSessionLocally(...); // no broadcast
+	}
+};
+```
+
+**`sessionRequest` must guard against sharing expired sessions**
+
+When a new tab asks for the current session via BroadcastChannel `sessionRequest`, only respond if the session is still valid. Sharing an expired session causes the recipient to believe it is already authorized and skip the auth flow:
+
+```typescript
+// ✅ Guard with isSessionValid() before responding
+case 'sessionRequest': {
+	if (this.isSessionValid()) {
+		this.#channel.postMessage({ type: 'sessionResponse', session: this.#session.getValue()! });
+	}
+	break;
+}
+```
+
+**Web Lock `umb:token-refresh` deduplicates concurrent `/token` calls across tabs**
+
+Only one tab at a time should call `/token`. If your code needs to wait for an ongoing refresh in another tab before sending a request (to avoid using a token that is about to be revoked), query the lock state first and then conditionally wait:
+
+```typescript
+// Check if another tab is currently refreshing
+const state = await navigator.locks.query();
+if (state.held?.some((l) => l.name === 'umb:token-refresh')) {
+	// Wait for it to finish (no-op inside the lock)
+	await navigator.locks.request('umb:token-refresh', async () => {});
+}
+// Now safe to proceed — cookie reflects the latest token
+```
+
+Note: there is a TOCTOU gap between `query()` and `request()`. If the lock releases between the two calls, `request()` acquires and releases immediately — this is harmless.
+
 

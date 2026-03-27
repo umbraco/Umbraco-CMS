@@ -1,20 +1,19 @@
 import { UMB_SCRIPT_FOLDER_ENTITY_TYPE, UMB_SCRIPT_ROOT_ENTITY_TYPE } from '../../entity.js';
+import { manifests as defaultManifests } from './default/manifests.js';
+import { manifests as folderManifests } from './folder/manifests.js';
+import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifests: Array<UmbExtensionManifest> = [
+export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
 	{
 		type: 'entityAction',
-		kind: 'default',
-		alias: 'Umb.EntityAction.Script.CreateOptions',
-		name: 'Script Create Options Entity Action',
-		weight: 1200,
-		api: () => import('./create.action.js'),
+		kind: 'create',
+		alias: 'Umb.EntityAction.Script.Create',
+		name: 'Create Script Entity Action',
 		forEntityTypes: [UMB_SCRIPT_ROOT_ENTITY_TYPE, UMB_SCRIPT_FOLDER_ENTITY_TYPE],
-		meta: {
-			icon: 'icon-add',
-			label: '#actions_createFor',
-			additionalOptions: true,
-		},
 	},
+	...defaultManifests,
+	...folderManifests,
+	// Deprecated: kept for backwards compatibility. Scheduled for removal in Umbraco 19.
 	{
 		type: 'modal',
 		alias: 'Umb.Modal.Script.CreateOptions',

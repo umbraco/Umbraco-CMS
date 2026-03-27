@@ -16,6 +16,11 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.PropertyEditors.ValueConverters;
 
+/// <summary>
+/// Converts the value stored by a single block property editor in Umbraco into a strongly-typed object
+/// that can be used within the application. This value converter is typically used to deserialize
+/// the JSON representation of a single block into a .NET object for further processing or display.
+/// </summary>
 [DefaultPropertyValueConverter(typeof(JsonValueConverter))]
 public class SingleBlockPropertyValueConverter : PropertyValueConverterBase, IDeliveryApiPropertyValueConverter
 {
@@ -27,6 +32,16 @@ public class SingleBlockPropertyValueConverter : PropertyValueConverterBase, IDe
     private readonly IVariationContextAccessor _variationContextAccessor;
     private readonly BlockEditorVarianceHandler _blockEditorVarianceHandler;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SingleBlockPropertyValueConverter"/> class.
+    /// </summary>
+    /// <param name="proflog">The logger used for profiling and diagnostics.</param>
+    /// <param name="blockConverter">The service responsible for converting block editor values.</param>
+    /// <param name="apiElementBuilder">Builds API elements for block properties.</param>
+    /// <param name="jsonSerializer">Handles JSON serialization and deserialization.</param>
+    /// <param name="constructorCache">Caches constructors for block list property values.</param>
+    /// <param name="variationContextAccessor">Provides access to the current variation context.</param>
+    /// <param name="blockEditorVarianceHandler">Handles variance logic for block editors.</param>
     public SingleBlockPropertyValueConverter(
         IProfilingLogger proflog,
         BlockEditorConverter blockConverter,

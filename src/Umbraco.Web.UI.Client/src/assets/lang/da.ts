@@ -640,7 +640,11 @@ export default {
 		seeErrorDialogHeadline: 'Fejl detaljer',
 		selectEvent: 'Vælg begivenhed',
 		editWebhook: 'Rediger webhook',
+		cannotTrashWhenReferenced: (name: string) =>
+			`<strong>${name}</strong> kan ikke flyttes til papirkurven, fordi det refereres af andre elementer.`,
 		confirmTrash: (name: string) => `Er du sikker på, at du vil flytte <strong>${name}</strong> til papirkurven?`,
+		cannotBulkTrashWhenReferenced: (total: number) =>
+			`De valgte <strong>${total} ${total === 1 ? 'element' : 'elementer'}</strong> kan ikke flyttes til papirkurven, fordi mindst \u00e9t element refereres af andet indhold.`,
 		confirmBulkTrash: (total: number) =>
 			`Er du sikker på, at du vil flytte <strong>${total} ${total === 1 ? 'element' : 'elementer'}</strong> til papirkurven?`,
 		confirmBulkDelete: (total: number) =>
@@ -2021,7 +2025,7 @@ export default {
 		},
 		changePassword: 'Skift dit kodeord',
 		changePhoto: 'Skift billede',
-		configureMfa: 'Konfigurer MFA',
+		configureMfa: 'Konfigurer 2FA',
 		newPassword: 'Nyt kodeord',
 		newPasswordFormatLengthTip: 'Minium %0% karakterer tilbage!',
 		newPasswordFormatNonAlphaTip: 'Der skal som minium være %0% specielle karakterer.',
@@ -2853,6 +2857,8 @@ export default {
 	collection: {
 		noItemsTitle: 'Intet indhold',
 		addCollectionConfiguration: 'Tilføj samling',
+		cardViewLabel: 'Kort',
+		tableViewLabel: 'Tabel',
 	},
 	linkPicker: {
 		modalSource: 'Kilde',
@@ -2863,5 +2869,9 @@ export default {
 		resetUrlHeadline: 'Nulstil URL?',
 		resetUrlMessage: 'Er du sikker på, at du vil nulstille denne URL?',
 		resetUrlLabel: 'Nulstil',
+		selectLanguageHint: 'Vælg sprog for linket',
+		selectLanguageDefault: 'Auto (besøgendes sprog)',
+		configCultureSpecificDocumentLinksLabel: 'Kulturspecifikke dokumentlinks',
+		configCultureSpecificDocumentLinksDescription: 'Tillad brugeren at vælge specifik kultur for dokumenter.',
 	},
 } as UmbLocalizationDictionary;

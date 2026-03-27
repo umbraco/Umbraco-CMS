@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.ViewModels.TemporaryFile;
@@ -10,12 +10,20 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.TemporaryFile;
 
+/// <summary>
+/// API controller responsible for handling requests to create temporary files within the Umbraco CMS management API.
+/// </summary>
 [ApiVersion("1.0")]
 public class CreateTemporaryFileController : TemporaryFileControllerBase
 {
     private readonly ITemporaryFileService _temporaryFileService;
     private readonly IUmbracoMapper _umbracoMapper;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CreateTemporaryFileController"/> class, which handles operations related to creating temporary files.
+    /// </summary>
+    /// <param name="temporaryFileService">Service used to manage temporary file operations.</param>
+    /// <param name="umbracoMapper">The mapper used for mapping Umbraco objects.</param>
     public CreateTemporaryFileController(ITemporaryFileService temporaryFileService, IUmbracoMapper umbracoMapper)
     {
         _temporaryFileService = temporaryFileService;

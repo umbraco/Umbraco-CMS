@@ -1,5 +1,8 @@
-﻿namespace Umbraco.Cms.Api.Management.ViewModels.Dictionary;
+namespace Umbraco.Cms.Api.Management.ViewModels.Dictionary;
 
+/// <summary>
+/// Provides an overview of dictionary items for the Umbraco CMS Management API.
+/// </summary>
 public class DictionaryOverviewResponseModel
 {
     /// <summary>

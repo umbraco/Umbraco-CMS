@@ -14,11 +14,17 @@ internal sealed class Member2MemberGroupDto
 
     private const string MemberGroupColumnName = "MemberGroup";
 
+    /// <summary>
+    /// Gets or sets the unique identifier of the member.
+    /// </summary>
     [Column(MemberColumnName)]
     [PrimaryKeyColumn(AutoIncrement = false, Name = "PK_cmsMember2MemberGroup", OnColumns = $"{MemberColumnName}, {MemberGroupColumnName}")]
     [ForeignKey(typeof(MemberDto))]
     public int Member { get; set; }
 
+    /// <summary>
+    /// Gets or sets the unique identifier of the member group.
+    /// </summary>
     [Column(MemberGroupColumnName)]
     [ForeignKey(typeof(NodeDto))]
     public int MemberGroup { get; set; }

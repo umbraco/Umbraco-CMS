@@ -43,6 +43,15 @@ internal sealed class FileUploadPropertyValueEditor : DataValueEditor, IDisposab
     /// <summary>
     /// Initializes a new instance of the <see cref="FileUploadPropertyValueEditor"/> class.
     /// </summary>
+    /// <param name="attribute">The attribute that defines metadata for the data editor.</param>
+    /// <param name="mediaFileManager">Handles media file operations such as upload and retrieval.</param>
+    /// <param name="shortStringHelper">Provides utilities for working with short strings and string manipulation.</param>
+    /// <param name="contentSettings">Monitors and provides access to content-related configuration settings.</param>
+    /// <param name="jsonSerializer">Serializes and deserializes objects to and from JSON format.</param>
+    /// <param name="ioHelper">Assists with input/output operations and file system access.</param>
+    /// <param name="temporaryFileService">Manages temporary files used during file upload processes.</param>
+    /// <param name="scopeProvider">Provides database scope management for transactional operations.</param>
+    /// <param name="fileStreamSecurityValidator">Validates file streams for security during upload and access.</param>
     public FileUploadPropertyValueEditor(
         DataEditorAttribute attribute,
         MediaFileManager mediaFileManager,
@@ -172,14 +181,26 @@ internal sealed class FileUploadPropertyValueEditor : DataValueEditor, IDisposab
     private TemporaryFileModel? TryGetTemporaryFile(Guid temporaryFileKey)
         => _temporaryFileService.GetAsync(temporaryFileKey).GetAwaiter().GetResult();
 
-    private static bool IsAllowedInDataTypeConfiguration(string extension, object? dataTypeConfiguration)
+    /// <summary>
+    /// Determines whether a file extension is allowed by the given data type configuration.
+    /// </summary>
+    /// <param name="extension">The file extension to check (without leading period).</param>
+    /// <param name="dataTypeConfiguration">The data type configuration, expected to be a <see cref="FileUploadConfiguration"/>.</param>
+    /// <returns>
+    /// <c>true</c> if the extension is allowed (or no extensions are configured); otherwise, <c>false</c>.
+    /// </returns>
+    /// <remarks>
+    /// This method is <c>internal</c> rather than <c>private</c> to allow direct unit testing.
+    /// The comparison is case-insensitive to handle file extensions like <c>.PDF</c> and <c>.pdf</c> equally.
+    /// </remarks>
+    internal static bool IsAllowedInDataTypeConfiguration(string extension, object? dataTypeConfiguration)
     {
         if (dataTypeConfiguration is FileUploadConfiguration fileUploadConfiguration)
         {
             // If FileExtensions is empty and no allowed extensions have been specified, we allow everything.
             // If there are any extensions specified, we need to check that the uploaded extension is one of them.
             return fileUploadConfiguration.FileExtensions.Any() is false ||
-                   fileUploadConfiguration.FileExtensions.Contains(extension);
+                   fileUploadConfiguration.FileExtensions.Contains(extension, StringComparer.OrdinalIgnoreCase);
         }
 
         return false;
@@ -226,5 +247,8 @@ internal sealed class FileUploadPropertyValueEditor : DataValueEditor, IDisposab
         return _mediaFileManager.GetMediaPath(file.FileName, contentKey, propertyTypeKey);
     }
 
+    /// <summary>
+    /// Releases the managed resources used by the <see cref="FileUploadPropertyValueEditor"/>, including any active subscriptions.
+    /// </summary>
     public void Dispose() => _contentSettingsChangeSubscription?.Dispose();
 }
