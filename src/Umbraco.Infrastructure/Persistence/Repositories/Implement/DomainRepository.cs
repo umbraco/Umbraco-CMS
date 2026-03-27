@@ -15,7 +15,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
-internal sealed class DomainRepository : AsyncEntityRepositoryBase<int, IDomain>, IDomainRepository
+internal sealed class DomainRepository : AsyncEntityRepositoryBase<Guid, IDomain>, IDomainRepository
 {
     public DomainRepository(
         IEFCoreScopeAccessor<UmbracoDbContext> scopeAccessor,
@@ -54,24 +54,24 @@ internal sealed class DomainRepository : AsyncEntityRepositoryBase<int, IDomain>
     }
 
     /// <inheritdoc/>
-    public async Task<IEnumerable<IDomain>> GetAssignedDomainsAsync(int contentId, bool includeWildcards)
+    public async Task<IEnumerable<IDomain>> GetAssignedDomainsAsync(Guid contentKey, bool includeWildcards)
     {
         IEnumerable<IDomain> all = await GetAllAsync(CancellationToken.None);
         return all
-            .Where(x => x.RootContentId == contentId)
+            .Where(x => x.RootContentKey == contentKey)
             .Where(x => includeWildcards || x.IsWildcard == false);
     }
 
     /// <inheritdoc/>
-    protected override IAsyncRepositoryCachePolicy<IDomain, int> CreateCachePolicy()
-        => new AsyncFullDataSetRepositoryCachePolicy<IDomain, int>(GlobalIsolatedCache, ScopeAccessor, RepositoryCacheVersionService, CacheSyncService, entity => entity.Id, false);
+    protected override IAsyncRepositoryCachePolicy<IDomain, Guid> CreateCachePolicy()
+        => new AsyncFullDataSetRepositoryCachePolicy<IDomain, Guid>(GlobalIsolatedCache, ScopeAccessor, RepositoryCacheVersionService, CacheSyncService, entity => entity.Key, false);
 
     /// <inheritdoc/>
-    protected override async Task<IDomain?> PerformGetAsync(int id)
+    protected override async Task<IDomain?> PerformGetAsync(Guid key)
     {
         // Use the underlying GetAll which will force cache all domains
         IEnumerable<IDomain> all = await GetAllAsync(CancellationToken.None);
-        return all.FirstOrDefault(x => x.Id == id);
+        return all.FirstOrDefault(x => x.Key == key);
     }
 
     /// <inheritdoc/>
@@ -82,21 +82,13 @@ internal sealed class DomainRepository : AsyncEntityRepositoryBase<int, IDomain>
                 .OrderBy(x => x.SortOrder)
                 .ToListAsync();
 
-            return dtos
-                .Select(dto =>
-                {
-                    LanguageDto? language = db.Language
-                        .FirstOrDefault(l => l.Id == dto.DefaultLanguage);
-
-                    return DomainFactory.BuildEntity(dto, language?.IsoCode);
-                })
-                .AsEnumerable();
+            return await BuildEntitiesAsync(db, dtos);
         });
 
     /// <inheritdoc/>
-    protected override async Task<IEnumerable<IDomain>?> PerformGetManyAsync(int[]? ids)
+    protected override async Task<IEnumerable<IDomain>?> PerformGetManyAsync(Guid[]? keys)
     {
-        if (ids is null || ids.Length == 0)
+        if (keys is null || keys.Length == 0)
         {
             return null;
         }
@@ -104,19 +96,11 @@ internal sealed class DomainRepository : AsyncEntityRepositoryBase<int, IDomain>
         return await AmbientScope.ExecuteWithContextAsync(async db =>
         {
             List<DomainDto> dtos = await db.Domains
-                .Where(x => ids.Contains(x.Id))
+                .Where(x => keys.Contains(x.Key))
                 .OrderBy(x => x.SortOrder)
                 .ToListAsync();
 
-            return dtos
-                .Select(dto =>
-                {
-                    LanguageDto? language = db.Language
-                        .FirstOrDefault(l => l.Id == dto.DefaultLanguage);
-
-                    return DomainFactory.BuildEntity(dto, language?.IsoCode);
-                })
-                .AsEnumerable();
+            return await BuildEntitiesAsync(db, dtos);
         });
     }
 
@@ -134,10 +118,8 @@ internal sealed class DomainRepository : AsyncEntityRepositoryBase<int, IDomain>
             // Validate RootContentId exists
             if (entity.RootContentId.HasValue)
             {
-                var contentExists = await db.Database
-                    .SqlQuery<int>($"SELECT COUNT(*) AS [Value] FROM {Constants.DatabaseSchema.Tables.Content} WHERE nodeId = {entity.RootContentId.Value}")
-                    .FirstAsync();
-                if (contentExists == 0)
+                var contentExists = await db.Nodes.AnyAsync(x => x.NodeId == entity.RootContentId.Value);
+                if (!contentExists)
                 {
                     throw new NullReferenceException($"No content exists with id {entity.RootContentId.Value}.");
                 }
@@ -188,10 +170,8 @@ internal sealed class DomainRepository : AsyncEntityRepositoryBase<int, IDomain>
             // Validate RootContentId exists
             if (entity.RootContentId.HasValue)
             {
-                var contentExists = await db.Database
-                    .SqlQuery<int>($"SELECT COUNT(*) AS [Value] FROM {Constants.DatabaseSchema.Tables.Content} WHERE nodeId = {entity.RootContentId.Value}")
-                    .FirstAsync();
-                if (contentExists == 0)
+                var contentExists = await db.Nodes.AnyAsync(x => x.NodeId == entity.RootContentId.Value);
+                if (!contentExists)
                 {
                     throw new NullReferenceException($"No content exists with id {entity.RootContentId.Value}.");
                 }
@@ -239,8 +219,34 @@ internal sealed class DomainRepository : AsyncEntityRepositoryBase<int, IDomain>
     }
 
     /// <inheritdoc/>
-    protected override Task<bool> PerformExistsAsync(int key) =>
-        AmbientScope.ExecuteWithContextAsync(db => db.Domains.AnyAsync(x => x.Id == key));
+    protected override Task<bool> PerformExistsAsync(Guid key) =>
+        AmbientScope.ExecuteWithContextAsync(db => db.Domains.AnyAsync(x => x.Key == key));
+
+    private static async Task<IEnumerable<IDomain>> BuildEntitiesAsync(UmbracoDbContext db, List<DomainDto> dtos)
+    {
+        // Batch-load language ISO codes
+        var languageIds = dtos
+            .Where(d => d.DefaultLanguage.HasValue)
+            .Select(d => d.DefaultLanguage!.Value)
+            .Distinct()
+            .ToList();
+
+        Dictionary<int, string> isoCodeLookup = await db.Language
+            .Where(l => languageIds.Contains(l.Id))
+            .ToDictionaryAsync(l => l.Id, l => l.IsoCode!);
+
+        var nodeIds = dtos
+            .Where(d => d.RootStructureId.HasValue)
+            .Select(d => d.RootStructureId!.Value)
+            .Distinct()
+            .ToList();
+
+        Dictionary<int, Guid> nodeKeyLookup = await db.Nodes
+            .Where(n => nodeIds.Contains(n.NodeId))
+            .ToDictionaryAsync(n => n.NodeId, n => n.UniqueId);
+
+        return DomainFactory.BuildEntities(dtos, isoCodeLookup, nodeKeyLookup);
+    }
 
     private static async Task<int> GetNewSortOrderAsync(UmbracoDbContext db, int? rootContentId, bool isWildcard)
     {

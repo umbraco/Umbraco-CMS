@@ -1,4 +1,3 @@
-using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -19,62 +18,39 @@ public interface IDomainService : IService
     /// </summary>
     /// <param name="domainName">The domain name to check.</param>
     /// <returns><c>true</c> if the domain exists; otherwise, <c>false</c>.</returns>
-    bool Exists(string domainName);
-
-    /// <summary>
-    ///     Deletes a domain.
-    /// </summary>
-    /// <param name="domain">The domain to delete.</param>
-    /// <returns>An attempt containing the operation result.</returns>
-    [Obsolete($"Please use {nameof(UpdateDomainsAsync)}. Scheduled for removal in Umbraco 18.")]
-    Attempt<OperationResult?> Delete(IDomain domain);
+    Task<bool> ExistsAsync(string domainName);
 
     /// <summary>
     ///     Gets a domain by its name.
     /// </summary>
     /// <param name="name">The domain name.</param>
     /// <returns>The domain, or <c>null</c> if not found.</returns>
-    IDomain? GetByName(string name);
+    Task<IDomain?> GetByNameAsync(string name);
 
     /// <summary>
     ///     Gets a domain by its identifier.
     /// </summary>
     /// <param name="id">The domain identifier.</param>
     /// <returns>The domain, or <c>null</c> if not found.</returns>
-    IDomain? GetById(int id);
+    [Obsolete("Use key-based overloads instead. Scheduled for removal when EFCore migration is completed.")]
+    Task<IDomain?> GetByIdAsync(int id);
 
     /// <summary>
-    ///     Gets all domains.
-    /// </summary>
-    /// <param name="includeWildcards">Whether to include wildcard domains.</param>
-    /// <returns>A collection of domains.</returns>
-    [Obsolete($"Please use {nameof(GetAllAsync)}. Scheduled for removal in Umbraco 18.")]
-    IEnumerable<IDomain> GetAll(bool includeWildcards);
-
-    /// <summary>
-    ///     Gets all domains assigned to a content item.
-    /// </summary>
-    /// <param name="contentId">The content item identifier.</param>
-    /// <param name="includeWildcards">Whether to include wildcard domains.</param>
-    /// <returns>A collection of domains assigned to the content item.</returns>
-    [Obsolete($"Please use {nameof(GetAssignedDomainsAsync)}. Scheduled for removal in Umbraco 18.")]
-    IEnumerable<IDomain> GetAssignedDomains(int contentId, bool includeWildcards);
-
-    /// <summary>
-    ///     Saves a domain.
-    /// </summary>
-    /// <param name="domainEntity">The domain to save.</param>
-    /// <returns>An attempt containing the operation result.</returns>
-    [Obsolete($"Please use {nameof(UpdateDomainsAsync)}. Scheduled for removal in Umbraco 18.")]
-    Attempt<OperationResult?> Save(IDomain domainEntity);
-
-    /// <summary>
-    ///     Gets all assigned domains for a content item.
+    ///     Gets all assigned domains for a content item by its key.
     /// </summary>
     /// <param name="contentKey">The unique identifier of the content item.</param>
     /// <param name="includeWildcards">Whether to include wildcard domains.</param>
     /// <returns>A collection of domains assigned to the content item.</returns>
     Task<IEnumerable<IDomain>> GetAssignedDomainsAsync(Guid contentKey, bool includeWildcards);
+
+    /// <summary>
+    ///     Gets all assigned domains for a content item by its integer identifier.
+    /// </summary>
+    /// <param name="contentId">The integer identifier of the content item.</param>
+    /// <param name="includeWildcards">Whether to include wildcard domains.</param>
+    /// <returns>A collection of domains assigned to the content item.</returns>
+    [Obsolete("Use the Guid key overload instead. Scheduled for removal when EFCore migration is completed.")]
+    Task<IEnumerable<IDomain>> GetAssignedDomainsAsync(int contentId, bool includeWildcards);
 
     /// <summary>
     ///     Gets all assigned domains.

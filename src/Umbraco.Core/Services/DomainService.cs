@@ -5,6 +5,7 @@ using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Scoping.EFCore;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
 
@@ -13,7 +14,7 @@ namespace Umbraco.Cms.Core.Services;
 /// <summary>
 /// Provides services for managing domains (hostnames and culture assignments for content).
 /// </summary>
-public class DomainService : RepositoryService, IDomainService
+public class DomainService : AsyncRepositoryService, IDomainService
 {
     private readonly IDomainRepository _domainRepository;
     private readonly ILanguageService _languageService;
@@ -22,14 +23,8 @@ public class DomainService : RepositoryService, IDomainService
     /// <summary>
     /// Initializes a new instance of the <see cref="DomainService"/> class.
     /// </summary>
-    /// <param name="provider">The core scope provider.</param>
-    /// <param name="loggerFactory">The logger factory.</param>
-    /// <param name="eventMessagesFactory">The event messages factory.</param>
-    /// <param name="domainRepository">The domain repository.</param>
-    /// <param name="languageService">The language service.</param>
-    /// <param name="contentService">The content service.</param>
     public DomainService(
-        ICoreScopeProvider provider,
+        IScopeProvider provider,
         ILoggerFactory loggerFactory,
         IEventMessagesFactory eventMessagesFactory,
         IDomainRepository domainRepository,
@@ -43,112 +38,69 @@ public class DomainService : RepositoryService, IDomainService
     }
 
     /// <inheritdoc />
-    public bool Exists(string domainName)
+    public async Task<bool> ExistsAsync(string domainName)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return _domainRepository.Exists(domainName);
-        }
-    }
-
-    /// <summary>
-    /// Deletes a domain.
-    /// </summary>
-    /// <param name="domain">The domain to delete.</param>
-    /// <returns>An attempt result indicating the success or failure of the operation.</returns>
-    [Obsolete($"Please use {nameof(UpdateDomainsAsync)}. Scheduled for removal in Umbraco 18.")]
-    public Attempt<OperationResult?> Delete(IDomain domain)
-    {
-        EventMessages eventMessages = EventMessagesFactory.Get();
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
-
-        var result = DeleteAll(new[] { domain }, scope, eventMessages);
+        using ICoreScope scope = ScopeProvider.CreateScope();
+        var exists = await _domainRepository.ExistsAsync(domainName);
         scope.Complete();
 
-        return result ? OperationResult.Attempt.Succeed(eventMessages) : OperationResult.Attempt.Cancel(eventMessages);
+        return exists;
     }
 
     /// <inheritdoc />
-    public IDomain? GetByName(string name)
+    public async Task<IDomain?> GetByNameAsync(string name)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return _domainRepository.GetByName(name);
-        }
-    }
-
-    /// <inheritdoc />
-    public IDomain? GetById(int id)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return _domainRepository.Get(id);
-        }
-    }
-
-    /// <summary>
-    /// Gets all domains.
-    /// </summary>
-    /// <param name="includeWildcards">A value indicating whether to include wildcard domains.</param>
-    /// <returns>A collection of all domains.</returns>
-    [Obsolete($"Please use {nameof(GetAllAsync)}. Scheduled for removal in Umbraco 18.")]
-    public IEnumerable<IDomain> GetAll(bool includeWildcards)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return _domainRepository.GetAll(includeWildcards);
-        }
-    }
-
-    /// <summary>
-    /// Gets the domains assigned to a specific content item.
-    /// </summary>
-    /// <param name="contentId">The identifier of the content item.</param>
-    /// <param name="includeWildcards">A value indicating whether to include wildcard domains.</param>
-    /// <returns>A collection of domains assigned to the content item.</returns>
-    [Obsolete($"Please use {nameof(GetAssignedDomainsAsync)}. Scheduled for removal in Umbraco 18.")]
-    public IEnumerable<IDomain> GetAssignedDomains(int contentId, bool includeWildcards)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return _domainRepository.GetAssignedDomains(contentId, includeWildcards);
-        }
-    }
-
-    /// <summary>
-    /// Saves a domain.
-    /// </summary>
-    /// <param name="domainEntity">The domain entity to save.</param>
-    /// <returns>An attempt result indicating the success or failure of the operation.</returns>
-    [Obsolete($"Please use {nameof(UpdateDomainsAsync)}. Scheduled for removal in Umbraco 18.")]
-    public Attempt<OperationResult?> Save(IDomain domainEntity)
-    {
-        EventMessages eventMessages = EventMessagesFactory.Get();
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
-
-        var result = SaveAll(new[] { domainEntity }, scope, eventMessages);
+        using ICoreScope scope = ScopeProvider.CreateScope();
+        IDomain? domain = await _domainRepository.GetByNameAsync(name);
         scope.Complete();
 
-        return result ? OperationResult.Attempt.Succeed(eventMessages) : OperationResult.Attempt.Cancel(eventMessages);
+        return domain;
     }
+
     /// <inheritdoc />
-    public Task<IEnumerable<IDomain>> GetAssignedDomainsAsync(Guid contentKey, bool includeWildcards)
+    public async Task<IDomain?> GetByIdAsync(int id)
     {
-        IContent? content = _contentService.GetById(contentKey);
+        using ICoreScope scope = ScopeProvider.CreateScope();
+        IEnumerable<IDomain> all = await _domainRepository.GetAllAsync(true);
+        scope.Complete();
+
+        return all.FirstOrDefault(x => x.Id == id);
+    }
+
+    /// <inheritdoc />
+    public async Task<IEnumerable<IDomain>> GetAssignedDomainsAsync(Guid contentKey, bool includeWildcards)
+    {
+        using ICoreScope scope = ScopeProvider.CreateScope();
+        IEnumerable<IDomain> domains = await _domainRepository.GetAssignedDomainsAsync(contentKey, includeWildcards);
+
+        return domains;
+    }
+
+    /// <inheritdoc />
+    // TODO: Remove this method once any usages has been migrated to the key alternative method.
+    public async Task<IEnumerable<IDomain>> GetAssignedDomainsAsync(int contentId, bool includeWildcards)
+    {
+        using ICoreScope scope = ScopeProvider.CreateScope();
+        IContent? content = _contentService.GetById(contentId);
         if (content == null)
         {
-            return Task.FromResult(Enumerable.Empty<IDomain>());
+            return Enumerable.Empty<IDomain>();
         }
 
-        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
-        return Task.FromResult(_domainRepository.GetAssignedDomains(content.Id, includeWildcards));
+        IEnumerable<IDomain> domains = await _domainRepository.GetAssignedDomainsAsync(content.Key, includeWildcards);
+        scope.Complete();
+
+        return domains;
     }
 
     /// <inheritdoc />
-    public Task<IEnumerable<IDomain>> GetAllAsync(bool includeWildcards)
+    public async Task<IEnumerable<IDomain>> GetAllAsync(bool includeWildcards)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
-        return Task.FromResult(_domainRepository.GetAll(includeWildcards));
+        using ICoreScope scope = ScopeProvider.CreateScope();
+        IEnumerable<IDomain> domains = await _domainRepository.GetAllAsync(includeWildcards);
+        scope.Complete();
+
+        return domains;
     }
 
     /// <inheritdoc />
@@ -160,7 +112,7 @@ public class DomainService : RepositoryService, IDomainService
             return Attempt.FailWithStatus(DomainOperationStatus.ContentNotFound, new DomainUpdateResult());
         }
 
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        using ICoreScope scope = ScopeProvider.CreateScope();
 
         IEnumerable<ILanguage> allLanguages = await _languageService.GetAllAsync();
         var languageIdByIsoCode = allLanguages.ToDictionary(l => l.IsoCode, l => l.Id);
@@ -176,7 +128,7 @@ public class DomainService : RepositoryService, IDomainService
         {
             domainModel.DomainName = domainModel.DomainName.ToLowerInvariant();
 
-            if(Uri.IsWellFormedUriString(domainModel.DomainName, UriKind.RelativeOrAbsolute) is false)
+            if (Uri.IsWellFormedUriString(domainModel.DomainName, UriKind.RelativeOrAbsolute) is false)
             {
                 return Attempt.FailWithStatus(DomainOperationStatus.InvalidDomainName, new DomainUpdateResult());
             }
@@ -211,16 +163,14 @@ public class DomainService : RepositoryService, IDomainService
         scope.WriteLock(Constants.Locks.Domains);
 
         // delete any obsolete domain assignments
-        if (DeleteAll(currentlyAssignedDomains.Except(newAssignedDomains).ToArray(), scope, eventMessages) == false)
+        if (await DeleteAllAsync(currentlyAssignedDomains.Except(newAssignedDomains).ToArray(), scope, eventMessages) == false)
         {
             scope.Complete();
-
-            // this is the only error scenario in DeleteAll
             return Attempt.FailWithStatus(DomainOperationStatus.CancelledByNotification, new DomainUpdateResult());
         }
 
         // update all domain assignments (also current ones, in case sort order or ISO code has changed)
-        var result = SaveAll(newAssignedDomains, scope, eventMessages);
+        var result = await SaveAllAsync(newAssignedDomains, scope, eventMessages);
         scope.Complete();
 
         return result
@@ -233,9 +183,6 @@ public class DomainService : RepositoryService, IDomainService
             : Attempt.FailWithStatus(DomainOperationStatus.CancelledByNotification, new DomainUpdateResult());
     }
 
-    /// <summary>
-    /// Tests if any of the ISO codes in the update model are invalid
-    /// </summary>
     private bool HasInvalidIsoCode(DomainsUpdateModel updateModel, IEnumerable<string> allIsoCodes)
         => new[] { updateModel.DefaultIsoCode }
             .Union(updateModel.Domains.Select(domainModel => domainModel.IsoCode))
@@ -243,9 +190,6 @@ public class DomainService : RepositoryService, IDomainService
             .Except(allIsoCodes)
             .Any();
 
-    /// <summary>
-    /// Returns any current domain assignments in conflict with the updateModel domain names
-    /// </summary>
     private IDomain[] GetDomainNameConflicts(int contentId, DomainsUpdateModel updateModel, IEnumerable<IDomain> allDomains)
     {
         IDomain[] domainsAssignedToOtherContent = allDomains
@@ -259,12 +203,8 @@ public class DomainService : RepositoryService, IDomainService
             .ToArray();
     }
 
-    /// <summary>
-    /// Calculates the new domain assignment incl. wildcard domains
-    /// </summary>
     private IDomain[] CalculateNewAssignedDomains(int contentId, DomainsUpdateModel updateModel, IDomain[] currentlyAssignedDomains, IDictionary<string, int> languageIdByIsoCode)
     {
-        // calculate the assigned domains as they should be after updating (including wildcard domains)
         var newAssignedDomains = new List<IDomain>();
         if (updateModel.DefaultIsoCode.IsNullOrWhiteSpace() == false)
         {
@@ -272,12 +212,10 @@ public class DomainService : RepositoryService, IDomainService
                                     ?? new UmbracoDomain($"*{contentId}")
                                     {
                                         LanguageId = languageIdByIsoCode[updateModel.DefaultIsoCode],
-                                        RootContentId = contentId
+                                        RootContentId = contentId,
                                     };
 
-            // wildcard domains should have sort order -1 (lowest possible sort order)
             defaultDomain.SortOrder = -1;
-
             newAssignedDomains.Add(defaultDomain);
         }
 
@@ -286,7 +224,6 @@ public class DomainService : RepositoryService, IDomainService
         {
             IDomain? assignedDomain = currentlyAssignedDomains.FirstOrDefault(domain => domainModel.DomainName.InvariantEquals(domain.DomainName));
 
-            // If we do not have an assigned domain, or the domain-language has been changed, create new domain.
             if (assignedDomain is null || assignedDomain.LanguageId != languageIdByIsoCode[domainModel.IsoCode])
             {
                 assignedDomain = new UmbracoDomain(domainModel.DomainName)
@@ -303,10 +240,7 @@ public class DomainService : RepositoryService, IDomainService
         return newAssignedDomains.ToArray();
     }
 
-    /// <summary>
-    /// Handles deletion of one or more domains incl. notifications
-    /// </summary>
-    private bool DeleteAll(IDomain[] domainsToDelete, ICoreScope scope, EventMessages eventMessages)
+    private async Task<bool> DeleteAllAsync(IDomain[] domainsToDelete, ICoreScope scope, EventMessages eventMessages)
     {
         if (domainsToDelete.Any() == false)
         {
@@ -321,17 +255,14 @@ public class DomainService : RepositoryService, IDomainService
 
         foreach (IDomain domainToDelete in domainsToDelete)
         {
-            _domainRepository.Delete(domainToDelete);
+            await _domainRepository.DeleteAsync(domainToDelete, CancellationToken.None);
         }
 
         scope.Notifications.Publish(new DomainDeletedNotification(domainsToDelete, eventMessages).WithStateFrom(deletingNotification));
         return true;
     }
 
-    /// <summary>
-    /// Handles saving of one or more domains incl. notifications
-    /// </summary>
-    private bool SaveAll(IDomain[] domainsToSave, ICoreScope scope, EventMessages eventMessages)
+    private async Task<bool> SaveAllAsync(IDomain[] domainsToSave, ICoreScope scope, EventMessages eventMessages)
     {
         if (domainsToSave.Any() == false)
         {
@@ -346,7 +277,7 @@ public class DomainService : RepositoryService, IDomainService
 
         foreach (IDomain assignedDomain in domainsToSave)
         {
-            _domainRepository.Save(assignedDomain);
+            await _domainRepository.SaveAsync(assignedDomain, CancellationToken.None);
         }
 
         scope.Notifications.Publish(new DomainSavedNotification(domainsToSave, eventMessages).WithStateFrom(savingNotification));

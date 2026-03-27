@@ -5,7 +5,7 @@ namespace Umbraco.Cms.Core.Persistence.Repositories;
 /// <summary>
 ///     Represents a repository for <see cref="IDomain" /> entities.
 /// </summary>
-public interface IDomainRepository : IAsyncReadWriteRepository<int, IDomain>
+public interface IDomainRepository : IAsyncReadWriteRepository<Guid, IDomain>
 {
     /// <summary>
     ///     Gets a domain by its name.
@@ -31,8 +31,8 @@ public interface IDomainRepository : IAsyncReadWriteRepository<int, IDomain>
     /// <summary>
     ///     Gets all domains assigned to a content item.
     /// </summary>
-    /// <param name="contentId">The identifier of the content item.</param>
+    /// <param name="contentKey">The key of the content item.</param>
     /// <param name="includeWildcards">Whether to include wildcard domains.</param>
     /// <returns>A collection of domains assigned to the content.</returns>
-    Task<IEnumerable<IDomain>> GetAssignedDomainsAsync(int contentId, bool includeWildcards);
+    Task<IEnumerable<IDomain>> GetAssignedDomainsAsync(Guid contentKey, bool includeWildcards);
 }
