@@ -496,7 +496,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 				this.#currentUnique = unique;
 
 				if (isNew === false && unique) {
-					this.#loadAndProcessLastPublished();
+					this.#loadAndProcessLastPublished().catch(() => undefined);
 				}
 			},
 			'uniqueObserver',
@@ -510,7 +510,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 				// When persistedData arrives and published data hasn't been loaded,
 				// trigger the load now that variant data is available.
 				if (!this.#publishedDocumentData && this.#hasPublishedVariant()) {
-					this.#loadAndProcessLastPublished();
+					this.#loadAndProcessLastPublished().catch(() => undefined);
 				} else {
 					this.#processPendingChanges();
 				}
@@ -551,10 +551,13 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		if (this.#loadingPublishedData) return;
 		this.#loadingPublishedData = true;
 
-		const { data } = await this.#publishingRepository.published(unique);
-		this.#publishedDocumentData = data;
-		this.#loadingPublishedData = false;
-		this.#processPendingChanges();
+		try {
+			const { data } = await this.#publishingRepository.published(unique);
+			this.#publishedDocumentData = data;
+			this.#processPendingChanges();
+		} finally {
+			this.#loadingPublishedData = false;
+		}
 	}
 
 	#processPendingChanges() {
@@ -569,6 +572,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 
 	#clear() {
 		this.#publishedDocumentData = undefined;
+		this.#loadingPublishedData = false;
 		this.publishedPendingChanges.clear();
 	}
 }
