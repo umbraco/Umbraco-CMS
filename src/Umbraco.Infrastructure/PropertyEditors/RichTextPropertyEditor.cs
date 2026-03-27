@@ -4,8 +4,10 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Nodes;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Cache.PropertyEditors;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
@@ -194,25 +196,7 @@ public class RichTextPropertyEditor : DataEditor, IValueSchemaProvider
         /// <summary>
         /// Initializes a new instance of the <see cref="RichTextPropertyValueEditor"/> class.
         /// </summary>
-        /// <param name="attribute">The data editor attribute that defines metadata for the editor.</param>
-        /// <param name="propertyEditors">A collection of available property editors.</param>
-        /// <param name="dataTypeReadCache">The cache for data type configuration.</param>
-        /// <param name="logger">The logger used for diagnostic and error messages.</param>
-        /// <param name="backOfficeSecurityAccessor">Provides access to back office security context.</param>
-        /// <param name="shortStringHelper">Helper for short string operations.</param>
-        /// <param name="imageSourceParser">Parses image sources in HTML content.</param>
-        /// <param name="localLinkParser">Parses local links in HTML content.</param>
-        /// <param name="pastedImages">Handles pasted images in the rich text editor.</param>
-        /// <param name="jsonSerializer">Serializes and deserializes JSON data.</param>
-        /// <param name="htmlSanitizer">Sanitizes HTML content for security.</param>
-        /// <param name="elementTypeCache">Caches block editor element types.</param>
-        /// <param name="propertyValidationService">Service for property validation logic.</param>
-        /// <param name="dataValueReferenceFactoryCollection">A collection of factories for data value references.</param>
-        /// <param name="richTextRequiredValidator">Validator for required rich text fields.</param>
-        /// <param name="richTextRegexValidator">Validator for rich text fields using regular expressions.</param>
-        /// <param name="blockEditorVarianceHandler">Handles variance logic for block editors.</param>
-        /// <param name="languageService">Provides language and localization services.</param>
-        /// <param name="ioHelper">Helper for IO operations.</param>
+        [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
         public RichTextPropertyValueEditor(
             DataEditorAttribute attribute,
             PropertyEditorCollection propertyEditors,
@@ -233,6 +217,83 @@ public class RichTextPropertyEditor : DataEditor, IValueSchemaProvider
             BlockEditorVarianceHandler blockEditorVarianceHandler,
             ILanguageService languageService,
             IIOHelper ioHelper)
+            : this(
+                attribute,
+                propertyEditors,
+                dataTypeReadCache,
+                logger,
+                backOfficeSecurityAccessor,
+                shortStringHelper,
+                imageSourceParser,
+                localLinkParser,
+                pastedImages,
+                jsonSerializer,
+                htmlSanitizer,
+                elementTypeCache,
+                propertyValidationService,
+                dataValueReferenceFactoryCollection,
+                richTextRequiredValidator,
+                richTextRegexValidator,
+                blockEditorVarianceHandler,
+                languageService,
+                ioHelper,
+                StaticServiceProvider.Instance.GetRequiredService<IMediaService>(),
+                StaticServiceProvider.Instance.GetRequiredService<IMediaTypeService>(),
+                StaticServiceProvider.Instance.GetRequiredService<ILocalizedTextService>(),
+                StaticServiceProvider.Instance.GetRequiredService<AppCaches>())
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RichTextPropertyValueEditor"/> class.
+        /// </summary>
+        /// <param name="attribute">The data editor attribute that defines metadata for the editor.</param>
+        /// <param name="propertyEditors">A collection of available property editors.</param>
+        /// <param name="dataTypeReadCache">The cache for data type configuration.</param>
+        /// <param name="logger">The logger used for diagnostic and error messages.</param>
+        /// <param name="backOfficeSecurityAccessor">Provides access to back office security context.</param>
+        /// <param name="shortStringHelper">Helper for short string operations.</param>
+        /// <param name="imageSourceParser">Parses image sources in HTML content.</param>
+        /// <param name="localLinkParser">Parses local links in HTML content.</param>
+        /// <param name="pastedImages">Handles pasted images in the rich text editor.</param>
+        /// <param name="jsonSerializer">Serializes and deserializes JSON data.</param>
+        /// <param name="htmlSanitizer">Sanitizes HTML content for security.</param>
+        /// <param name="elementTypeCache">Caches block editor element types.</param>
+        /// <param name="propertyValidationService">Service for property validation logic.</param>
+        /// <param name="dataValueReferenceFactoryCollection">A collection of factories for data value references.</param>
+        /// <param name="richTextRequiredValidator">Validator for required rich text fields.</param>
+        /// <param name="richTextRegexValidator">Validator for rich text fields using regular expressions.</param>
+        /// <param name="blockEditorVarianceHandler">Handles variance logic for block editors.</param>
+        /// <param name="languageService">Provides language and localization services.</param>
+        /// <param name="ioHelper">Helper for IO operations.</param>
+        /// <param name="mediaService">Service for media operations.</param>
+        /// <param name="mediaTypeService">Service for media type operations.</param>
+        /// <param name="localizedTextService">Service for localized text lookups.</param>
+        /// <param name="appCaches">Application caches for request-level caching.</param>
+        public RichTextPropertyValueEditor(
+            DataEditorAttribute attribute,
+            PropertyEditorCollection propertyEditors,
+            IDataTypeConfigurationCache dataTypeReadCache,
+            ILogger<RichTextPropertyValueEditor> logger,
+            IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+            IShortStringHelper shortStringHelper,
+            HtmlImageSourceParser imageSourceParser,
+            HtmlLocalLinkParser localLinkParser,
+            RichTextEditorPastedImages pastedImages,
+            IJsonSerializer jsonSerializer,
+            IHtmlSanitizer htmlSanitizer,
+            IBlockEditorElementTypeCache elementTypeCache,
+            IPropertyValidationService propertyValidationService,
+            DataValueReferenceFactoryCollection dataValueReferenceFactoryCollection,
+            IRichTextRequiredValidator richTextRequiredValidator,
+            IRichTextRegexValidator richTextRegexValidator,
+            BlockEditorVarianceHandler blockEditorVarianceHandler,
+            ILanguageService languageService,
+            IIOHelper ioHelper,
+            IMediaService mediaService,
+            IMediaTypeService mediaTypeService,
+            ILocalizedTextService localizedTextService,
+            AppCaches appCaches)
             : base(propertyEditors, dataTypeReadCache, shortStringHelper, jsonSerializer, dataValueReferenceFactoryCollection, blockEditorVarianceHandler, languageService, ioHelper, attribute)
         {
             _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
@@ -248,6 +309,7 @@ public class RichTextPropertyEditor : DataEditor, IValueSchemaProvider
 
             BlockEditorValues = new(new RichTextEditorBlockDataConverter(_jsonSerializer), elementTypeCache, logger);
             Validators.Add(new RichTextEditorBlockValidator(propertyValidationService, BlockEditorValues, elementTypeCache, jsonSerializer, logger));
+            Validators.Add(new RichTextAllowedMediaTypeValidator(imageSourceParser, mediaService, mediaTypeService, localizedTextService, jsonSerializer, logger, appCaches));
         }
 
         /// <summary>
