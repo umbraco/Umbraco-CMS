@@ -81,28 +81,28 @@ public class RelationTypePresentationFactory : IRelationTypePresentationFactory
             Constants.UdiEntityType.Element,
             Constants.ObjectTypes.Element);
 
-        IReferenceResponseModel?[] results = await Task.WhenAll(
-            relationItemModelsCollection.Select<RelationItemModel, Task<IReferenceResponseModel?>>(async relationItemModel =>
-                relationItemModel.NodeType switch
-                {
-                    Constants.ReferenceType.Document => await MapReference<DocumentReferenceResponseModel, DocumentEntitySlim>(
-                        relationItemModel,
-                        documentSlimEntities,
-                        async (r, e) => r.Variants
-                            = await _documentPresentationFactory.CreateVariantsItemResponseModelsAsync(e)),
-                    Constants.ReferenceType.Element => await MapReference<ElementReferenceResponseModel, IElementEntitySlim>(
-                        relationItemModel,
-                        elementSlimEntities,
-                        async (r, e) => r.Variants
-                            = await _elementPresentationFactory.CreateVariantsItemResponseModelsAsync(e)),
-                    Constants.ReferenceType.ElementContainer => _umbracoMapper.Map<ElementContainerReferenceResponseModel>(relationItemModel),
-                    Constants.ReferenceType.Media => _umbracoMapper.Map<MediaReferenceResponseModel>(relationItemModel),
-                    Constants.ReferenceType.Member => _umbracoMapper.Map<MemberReferenceResponseModel>(relationItemModel),
-                    Constants.ReferenceType.DocumentTypePropertyType => _umbracoMapper.Map<DocumentTypePropertyTypeReferenceResponseModel>(relationItemModel),
-                    Constants.ReferenceType.MediaTypePropertyType => _umbracoMapper.Map<MediaTypePropertyTypeReferenceResponseModel>(relationItemModel),
-                    Constants.ReferenceType.MemberTypePropertyType => _umbracoMapper.Map<MemberTypePropertyTypeReferenceResponseModel>(relationItemModel),
-                    _ => _umbracoMapper.Map<DefaultReferenceResponseModel>(relationItemModel),
-                }));
+        IEnumerable<Task<IReferenceResponseModel?>> tasks = relationItemModelsCollection.Select<RelationItemModel, Task<IReferenceResponseModel?>>(async relationItemModel =>
+            relationItemModel.NodeType switch
+            {
+                Constants.ReferenceType.Document => await MapReference<DocumentReferenceResponseModel, DocumentEntitySlim>(
+                    relationItemModel,
+                    documentSlimEntities,
+                    async (r, e) => r.Variants
+                        = await _documentPresentationFactory.CreateVariantsItemResponseModelsAsync(e)),
+                Constants.ReferenceType.Element => await MapReference<ElementReferenceResponseModel, IElementEntitySlim>(
+                    relationItemModel,
+                    elementSlimEntities,
+                    async (r, e) => r.Variants
+                        = await _elementPresentationFactory.CreateVariantsItemResponseModelsAsync(e)),
+                Constants.ReferenceType.ElementContainer => _umbracoMapper.Map<ElementContainerReferenceResponseModel>(relationItemModel),
+                Constants.ReferenceType.Media => _umbracoMapper.Map<MediaReferenceResponseModel>(relationItemModel),
+                Constants.ReferenceType.Member => _umbracoMapper.Map<MemberReferenceResponseModel>(relationItemModel),
+                Constants.ReferenceType.DocumentTypePropertyType => _umbracoMapper.Map<DocumentTypePropertyTypeReferenceResponseModel>(relationItemModel),
+                Constants.ReferenceType.MediaTypePropertyType => _umbracoMapper.Map<MediaTypePropertyTypeReferenceResponseModel>(relationItemModel),
+                Constants.ReferenceType.MemberTypePropertyType => _umbracoMapper.Map<MemberTypePropertyTypeReferenceResponseModel>(relationItemModel),
+                _ => _umbracoMapper.Map<DefaultReferenceResponseModel>(relationItemModel),
+            });
+        IReferenceResponseModel?[] results = await Task.WhenAll(tasks);
 
         return results.WhereNotNull().ToArray();
     }

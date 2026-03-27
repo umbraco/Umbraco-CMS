@@ -57,8 +57,8 @@ public class ItemDocumentItemController : DocumentItemControllerBase
             .GetAll(UmbracoObjectTypes.Document, ids.ToArray())
             .OfType<IDocumentEntitySlim>();
 
-        DocumentItemResponseModel[] responseModels = await Task.WhenAll(
-            documents.Select(_documentPresentationFactory.CreateItemResponseModelAsync));
+        IEnumerable<Task<DocumentItemResponseModel>> tasks = documents.Select(_documentPresentationFactory.CreateItemResponseModelAsync);
+        DocumentItemResponseModel[] responseModels = await Task.WhenAll(tasks);
         return Ok(responseModels);
     }
 }
