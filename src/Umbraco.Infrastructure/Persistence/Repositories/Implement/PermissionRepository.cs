@@ -182,9 +182,9 @@ internal sealed class PermissionRepository<TEntity> : EntityRepositoryBase<int, 
                 .WhereIn<UserGroup2GranularPermissionDto>(
                     x => x.UniqueId,
                     Sql()
-                        .Select<NodeDto>()
+                        .Select<NodeDto>(x => x.UniqueId)
                         .From<NodeDto>()
-                        .Where<NodeDto>(x => entityIds.Contains(x.NodeId)))
+                        .WhereIn<NodeDto>(x => x.NodeId, entityIds))
                 .WhereIn<UserGroup2GranularPermissionDto>(
                     x => x.UserGroupKey,
                     Sql()
@@ -196,7 +196,7 @@ internal sealed class PermissionRepository<TEntity> : EntityRepositoryBase<int, 
         Guid userGroupKey = db.Fetch<Guid>(Sql().Select<UserGroupDto>(x => x.Key).From<UserGroupDto>()
             .Where<UserGroupDto>(x => x.Id == groupId)).SingleOrDefault();
         var idToKey = db.Fetch<NodeDto>(Sql().Select<NodeDto>().From<NodeDto>()
-            .Where<NodeDto>(x => entityIds.Contains(x.NodeId))).ToDictionary(x=>x.NodeId, x=>x.UniqueId);
+            .WhereIn<NodeDto>(x => x.NodeId, entityIds)).ToDictionary(x=>x.NodeId, x=>x.UniqueId);
 
         IEnumerable<UserGroup2GranularPermissionDto> toInsert =
             from entityId in entityIds
@@ -226,9 +226,9 @@ internal sealed class PermissionRepository<TEntity> : EntityRepositoryBase<int, 
                 .WhereIn<UserGroup2GranularPermissionDto>(
                     x => x.UniqueId,
                     Sql()
-                        .Select<NodeDto>()
+                        .Select<NodeDto>(x => x.UniqueId)
                         .From<NodeDto>()
-                        .Where<NodeDto>(x => entityIds.Contains(x.NodeId)))
+                        .WhereIn<NodeDto>(x => x.NodeId, entityIds))
                 .WhereIn<UserGroup2GranularPermissionDto>(
                     x => x.UserGroupKey,
                     Sql()
@@ -240,7 +240,7 @@ internal sealed class PermissionRepository<TEntity> : EntityRepositoryBase<int, 
         var userGroupKey = db.Fetch<Guid>(Sql().Select<UserGroupDto>(x => x.Key).From<UserGroupDto>()
             .Where<UserGroupDto>(x => x.Id == groupId)).SingleOrDefault();
         var idToKey = db.Fetch<NodeDto>(Sql().Select<NodeDto>().From<NodeDto>()
-            .Where<NodeDto>(x => entityIds.Contains(x.NodeId))).ToDictionary(x=>x.NodeId, x=>x.UniqueId);
+            .WhereIn<NodeDto>(x => x.NodeId, entityIds)).ToDictionary(x=>x.NodeId, x=>x.UniqueId);
 
         var toInsert = entityIds.Select(e => new UserGroup2GranularPermissionDto()
                 {
