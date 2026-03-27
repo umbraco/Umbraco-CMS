@@ -195,7 +195,7 @@ internal sealed class PermissionRepository<TEntity> : EntityRepositoryBase<int, 
         // This is a poor man's solution to avoid breaking changes.. Sooner or later we should obsolete this method and take Guids as input.
         Guid userGroupKey = db.Fetch<Guid>(Sql().Select<UserGroupDto>(x => x.Key).From<UserGroupDto>()
             .Where<UserGroupDto>(x => x.Id == groupId)).SingleOrDefault();
-        var idToKey = db.Fetch<NodeDto>(Sql().Select<NodeDto>().From<NodeDto>()
+        var idToKey = db.Fetch<NodeDto>(Sql().Select<NodeDto>(x => x.NodeId, x => x.UniqueId).From<NodeDto>()
             .WhereIn<NodeDto>(x => x.NodeId, entityIds)).ToDictionary(x=>x.NodeId, x=>x.UniqueId);
 
         IEnumerable<UserGroup2GranularPermissionDto> toInsert =
@@ -239,7 +239,7 @@ internal sealed class PermissionRepository<TEntity> : EntityRepositoryBase<int, 
         // This is a poor man's solution to avoid breaking changes.. Sooner or later we should obsolete this method and take Guids as input.
         var userGroupKey = db.Fetch<Guid>(Sql().Select<UserGroupDto>(x => x.Key).From<UserGroupDto>()
             .Where<UserGroupDto>(x => x.Id == groupId)).SingleOrDefault();
-        var idToKey = db.Fetch<NodeDto>(Sql().Select<NodeDto>().From<NodeDto>()
+        var idToKey = db.Fetch<NodeDto>(Sql().Select<NodeDto>(x => x.NodeId, x => x.UniqueId).From<NodeDto>()
             .WhereIn<NodeDto>(x => x.NodeId, entityIds)).ToDictionary(x=>x.NodeId, x=>x.UniqueId);
 
         var toInsert = entityIds.Select(e => new UserGroup2GranularPermissionDto()
