@@ -118,9 +118,13 @@ export default class UmbTiptapMediaUploadExtensionApi extends UmbTiptapExtension
 	 * @param {Editor} editor The editor to insert the images into.
 	 */
 	async #uploadTemporaryFile(files: FileList, editor: Editor): Promise<void> {
-		const filteredFiles = this.#filterFiles(files);
+		const { allowed, rejected } = this.#filterFiles(files);
 
-		for (const file of filteredFiles) {
+		for (const file of rejected) {
+			this.#showDisallowedNotification(file.name);
+		}
+
+		for (const file of allowed) {
 			const isAllowed = await this.#validateMediaType(file);
 			if (!isAllowed) continue;
 
@@ -246,7 +250,12 @@ export default class UmbTiptapMediaUploadExtensionApi extends UmbTiptapExtension
 		};
 	}
 
-	#filterFiles(files: FileList): File[] {
-		return Array.from(files).filter((file) => this.allowedFileTypes.includes(file.type));
+	#filterFiles(files: FileList): { allowed: File[]; rejected: File[] } {
+		const allowed: File[] = [];
+		const rejected: File[] = [];
+		for (const file of files) {
+			(this.allowedFileTypes.includes(file.type) ? allowed : rejected).push(file);
+		}
+		return { allowed, rejected };
 	}
 }
