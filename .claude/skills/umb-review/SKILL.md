@@ -163,28 +163,13 @@ Classify the PR to determine which review steps are relevant:
 
 **Skip this step if PR scope is docs-only, test-only, or config-only.**
 
-Follow the detailed procedure in `references/impact-analysis.md` (relative to this skill file).
-
-In summary:
-
-1. **Extract changed public symbols** — scan the diff for changes to `public` or `protected` interfaces, classes, methods, properties, and type exports
-2. **Search for consumers** — use Grep to find usages of changed types/methods in `src/`, excluding the changed file itself. Use `head_limit: 20` to avoid overwhelming results
-3. **Check dependency flow** — verify changes respect the dependency direction: `Core <- Infrastructure <- Web/APIs`, never backwards
-4. **Flag cross-project risks** — if a change in one project could affect consumers in another project
+Follow the procedure in `references/impact-analysis.md`.
 
 ### 5. Breaking Changes Check
 
 **Skip this step if PR scope is docs-only or test-only. If config-only, only check for dependency version changes that could break consumers.**
 
-Follow the detailed procedure in `references/breaking-changes.md` (relative to this skill file).
-
-In summary:
-
-1. **Read `version.json`** to determine the current major version
-2. **Backend (.NET)**: Check for public API surface changes without proper obsolete patterns (constructor, method, interface patterns)
-3. **Frontend (TypeScript)**: Check for removed exports, changed custom element APIs, manifest/extension system changes
-4. **Validate obsolete attributes** have correct format: `[Obsolete("... Scheduled for removal in Umbraco {current+2}.")]`
-5. **Verify internal callers** are updated to use new APIs (no internal code should reference obsolete members)
+Follow the procedure in `references/breaking-changes.md`.
 
 ### 6. Review Against All Criteria
 
