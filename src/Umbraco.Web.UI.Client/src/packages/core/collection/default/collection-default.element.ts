@@ -127,7 +127,7 @@ export class UmbCollectionDefaultElement extends UmbLitElement {
 		return this._routes
 			? html`
 					<umb-body-layout header-transparent class=${this._hasItems ? 'has-items' : ''}>
-						${this.renderToolbar()} ${this._hasItems ? this.#renderCollectionInfo() : nothing}
+						${this.renderToolbar()} ${this.#renderCollectionInfo()}
 						<umb-router-slot id="router" .routes=${this._routes}></umb-router-slot>
 						${this._hasItems ? this.renderPagination() : this.#renderEmptyState()} ${this.renderSelectionActions()}
 					</umb-body-layout>
@@ -157,7 +157,7 @@ export class UmbCollectionDefaultElement extends UmbLitElement {
 		return html`
 			<div id="collection-info">
 				<umb-collection-active-filters></umb-collection-active-filters>
-				<small>Showing ${start}-${end} of ${this._totalItems}</small>
+				${this._hasItems ? html`<small>Showing ${start}-${end} of ${this._totalItems}</small>` : nothing}
 			</div>
 		`;
 	}
