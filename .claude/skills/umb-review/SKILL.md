@@ -38,21 +38,9 @@ Read the coding preferences and code review scoring criteria from:
 
 Parse and internalize all rules, conventions, scoring categories, and severity definitions. These are your review criteria.
 
-### 3. Read Relevant CLAUDE.md Files
+### 3. Gather Changed Files
 
-**Always load** the root `/CLAUDE.md` first (it contains the architecture overview, breaking changes policy, and project structure).
-
-Then, for each changed file in the PR, extract its project directory (the first two path segments, e.g., `src/Umbraco.Core/` from `src/Umbraco.Core/Services/Foo.cs`). Collect the unique set of project directories across all changed files, then check each one for a `CLAUDE.md` file using the Glob tool:
-
-```
-pattern: {project_directory}/CLAUDE.md
-```
-
-Load each discovered `CLAUDE.md` once. Skip project directories that don't have one.
-
-### 4. Gather Changed Files
-
-#### 4a. Collect file list, stats, and diff
+#### 3a. Collect file list, stats, and diff
 
 Run the following git commands to understand what changed:
 
@@ -78,7 +66,7 @@ Then get the full diff — this is your **primary review source**:
 git diff {target}...HEAD
 ```
 
-#### 4b. Filter out noise files
+#### 3b. Filter out noise files
 
 From the changed file list, classify each file as **noise** or **reviewable**.
 
@@ -97,32 +85,23 @@ From the changed file list, classify each file as **noise** or **reviewable**.
 
 Log the skip list: "Skipped {N} noise files: {comma-separated list of filenames}"
 
-#### 4c. Read file context selectively
+#### 3c. Read reviewable changed files
 
-**Do NOT read every changed file in full.** The diff is the primary review source. Read file content only when you need structural context that the diff does not provide.
+##### For files under 1501 lines
 
-**Partial header reads** — for every reviewable source file, read just the top of the file to capture `using`/`import` statements and class declarations (needed for dependency-flow checks in step 5):
+Read the full file.
 
-- `.cs` files: Read first 50 lines
-- `.ts` files: Read first 30 lines
+##### For files over 1500 lines
 
-Use the `Read` tool with the `limit` parameter. Run these in parallel for efficiency.
+Use targeted `offset`/`limit` reads around the diff hunks instead, and read the first 100 lines of the file to capture `using`/`import` statements and class declarations (needed for dependency-flow checks in step 5):
 
-**Full file reads** — only when the diff reveals one of these situations:
+If an extended class, interface or type has been changed as part of this PR, then read the full file.
 
-- **Public constructor changed or added** — need to verify the obsolete constructor pattern (old constructor must delegate to new)
-- **Interface method added** — need to verify default implementation is present
-- **Class inherits from a base class that also changed in this PR** — need to understand the inheritance chain
-- **Complex control flow change** (e.g., scope usage, transaction handling) — need surrounding method context. Use `Read` with `offset`/`limit` targeting the relevant method rather than the whole file.
-- **File is a new addition** (not in the target branch) — read the full file for proper line-number context
+#### 3d. Track file counts
 
-**For files over 1500 lines**, never read in full. Use targeted `offset`/`limit` reads around the regions identified from the diff hunks.
+Keep track of these numbers for the review output in step 7: total changed files, noise files skipped, and reviewable files read. Also record: distinct production layers touched, distinct project directories, and total lines changed — these feed step 3e.
 
-#### 4d. Track file counts
-
-Keep track of these numbers for the review output in step 8: total changed files, noise files skipped, reviewable files, files read in full, and files read header-only. Also record: distinct production layers touched, distinct project directories, and total lines changed — these feed step 4e.
-
-#### 4e. Assess PR complexity
+#### 3e. Assess PR complexity
 
 Evaluate whether the PR's scope suggests it should be split. This assessment is **informational only** — it never blocks or shortens the review.
 
@@ -167,20 +146,20 @@ For each triggered dimension, prepare a concrete suggestion:
 - **Size (many projects):** "If changes in {projectA} and {projectB} are independently functional, they could be separate PRs."
 - **Formatting mixed with logic:** "File(s) {list} contain significant formatting changes mixed with logic changes. Consider a separate formatting-only commit or PR to keep the functional diff reviewable."
 
-Store the triggered dimensions and their suggestions for use in step 8.
+Store the triggered dimensions and their suggestions for use in step 7.
 
-#### 4f. Classify PR scope
+#### 3f. Classify PR scope
 
 Classify the PR to determine which review steps are relevant:
 
 | Classification  | Condition                                                                       | Effect                                                                          |
 | --------------- | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
-| **Docs-only**   | All reviewable files are `.md`                                                  | Skip steps 5 and 6; step 7 reviews intent and readability only                  |
-| **Test-only**   | All reviewable files are in `tests/`                                            | Skip steps 5 and 6; step 7 reviews intent, code quality, and test coverage only |
-| **Config-only** | All reviewable files are `.csproj`, `.props`, `.json` config, or CI/build files | Skip step 5; step 6 checks dependency version changes only                      |
+| **Docs-only**   | All reviewable files are `.md`                                                  | Skip steps 4 and 5; step 6 reviews intent and readability only                  |
+| **Test-only**   | All reviewable files are in `tests/`                                            | Skip steps 4 and 5; step 6 reviews intent, code quality, and test coverage only |
+| **Config-only** | All reviewable files are `.csproj`, `.props`, `.json` config, or CI/build files | Skip step 4; step 5 checks dependency version changes only                      |
 | **Standard**    | Anything else                                                                   | No skips — run all steps                                                        |
 
-### 5. Impact Analysis
+### 4. Impact Analysis
 
 **Skip this step if PR scope is docs-only, test-only, or config-only.**
 
@@ -193,7 +172,7 @@ In summary:
 3. **Check dependency flow** — verify changes respect the dependency direction: `Core <- Infrastructure <- Web/APIs`, never backwards
 4. **Flag cross-project risks** — if a change in one project could affect consumers in another project
 
-### 6. Breaking Changes Check
+### 5. Breaking Changes Check
 
 **Skip this step if PR scope is docs-only or test-only. If config-only, only check for dependency version changes that could break consumers.**
 
@@ -207,30 +186,30 @@ In summary:
 4. **Validate obsolete attributes** have correct format: `[Obsolete("... Scheduled for removal in Umbraco {current+2}.")]`
 5. **Verify internal callers** are updated to use new APIs (no internal code should reference obsolete members)
 
-### 7. Review Against All Criteria
+### 6. Review Against All Criteria
 
 **If PR scope is docs-only:** review only for intent and readability. **If test-only:** review only for intent, code quality, and test coverage. **Otherwise:** review all criteria below.
 
 Analyze each changed file against:
 
 - **Intent**: Does the change accomplish what the commits describe? Are there unintended side effects?
-- **Impact**: What consumers are affected? Does this change ripple through the architecture? (from step 5)
-- **Breaking changes**: Public API surface changes without proper obsolete patterns? (from step 6)
+- **Impact**: What consumers are affected? Does this change ripple through the architecture? (from step 4)
+- **Breaking changes**: Public API surface changes without proper obsolete patterns? (from step 5)
 - **Architecture compliance**: Correct dependency direction, layer separation, pattern usage (from CLAUDE.md files)
 - **Umbraco patterns**: Notification pattern (not C# events), Composer pattern (DI registration), Scoping with `Complete()`, Attempt pattern for operation results
 - **Code quality**: Per coding preferences in `references/coding-preferences.md`
 - **Test coverage**: New public methods have tests? Test files included in the PR?
 - **Security**: Authorization checks, no hardcoded secrets, OWASP Top 10 baseline
 
-### 8. Output Structured Review
+### 7. Output Structured Review
 
 Present the review in this exact format:
 
 ```markdown
 ## PR Review
 
-**Target:** `{target_branch}` · **Based on commit:** `{head_sha}` · **Files:** {total} changed, {skipped} skipped, {reviewed} reviewed ({full_read} full, {header_only} diff + header-only)
-[If step 4f classification is not "Standard", append: · **Classified as:** {classification}]
+**Target:** `{target_branch}` · **Based on commit:** `{head_sha}` · **Files:** {total} changed, {skipped} skipped, {reviewed} reviewed
+[If step 3f classification is not "Standard", append: · **Classified as:** {classification}]
 
 [1–2 sentences: what this PR accomplishes , keep it as short as possible, only highlight the primary essence.]
 
@@ -243,12 +222,12 @@ Present the review in this exact format:
 - **Other changes:** {changes not listed above that an Umbraco user, plugin developer, or API consumer would notice — e.g., behavior changes, default value changes, error message changes, new configuration options, removed functionality. Exclude internal renames, formatting, and private implementation details.}
   [Omit bullet if none]
 
-[If step 4e triggered any dimensions, insert this block. Omit entirely if nothing triggered:]
+[If step 3e triggered any dimensions, insert this block. Omit entirely if nothing triggered:]
 
 > [!NOTE]
 > **Complexity advisory** — This PR may benefit from splitting.
 >
-> - **{Dimension}:** {Explanation and concrete split suggestion from step 4e}
+> - **{Dimension}:** {Explanation and concrete split suggestion from step 3e}
 >   [one bullet per triggered dimension]
 >
 > _This is an observation, not a blocker. The full review follows below._
@@ -302,6 +281,7 @@ This is in such a bad state that the feedback of this review is not sufficient t
 
 **Guidelines for the review output:**
 
+- Only review code that was changed in the diff — pre-existing issues are out of scope. Focus on what compilers and linters cannot catch: behavioral side-effects (e.g., a changed default alters runtime behavior for consumers), architectural violations (e.g., a new dependency breaks layering), breaking changes for external consumers of the public API, and security implications. Leave type errors, missing imports, and broken references to CI.
 - Be specific — always reference file and line number
 - Explain WHY something is an issue, not just WHAT
 - Provide concrete fix suggestions, including code snippets when helpful
