@@ -183,6 +183,7 @@ The backoffice is published as `@umbraco-cms/backoffice` with 140+ named exports
 
 **Breaking changes:**
 
+- Renaming a manifest `alias` value — plugin developers reference aliases by string in conditions, overwrites, and extension registry lookups. Alias renames are not caught by the compiler since they are string-based. A renamed alias silently breaks any plugin that references the old string.
 - Removing support for a manifest `type` that plugins use
 - Changing manifest `alias` resolution or validation
 - Removing or renaming manifest `kind` types
@@ -190,6 +191,7 @@ The backoffice is published as `@umbraco-cms/backoffice` with 140+ named exports
 
 **How to detect:**
 
+- **Alias renames**: Compare `alias:` values in manifest files before and after. Changed alias strings are Critical — the old alias should be preserved as a deprecated entry.
 - Search for changes to manifest type definitions
 - Check for removed or renamed manifest kinds
 

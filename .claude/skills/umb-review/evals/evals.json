@@ -31,7 +31,7 @@
       "assertions": [
         {"id": "complexity-advisory-absent", "text": "Review does NOT include a complexity/split advisory"},
         {"id": "no-false-breaking-changes", "text": "Review does not flag breaking changes"},
-        {"id": "proportionate-verdict", "text": "Verdict is 'Approved' or 'Approved with Suggestions'"},
+        {"id": "proportionate-verdict", "text": "Verdict is 'Request Changes'"},
         {"id": "concise-review", "text": "Review output is under 200 lines"},
         {"id": "no-stylistic-nitpicks", "text": "Review does not flag purely cosmetic/stylistic issues (formatting, whitespace, naming conventions, comment grammar, code style preferences) unless they affect performance or rendering"}
       ]

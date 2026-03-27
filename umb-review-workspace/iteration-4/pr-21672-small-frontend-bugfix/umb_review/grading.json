@@ -1,0 +1,12 @@
+{
+  "eval_id": 1,
+  "eval_name": "pr-21672-small-frontend-bugfix",
+  "config": "umb_review",
+  "expectations": [
+    {"text": "Review does NOT include a complexity/split advisory", "passed": true, "evidence": "No complexity advisory present"},
+    {"text": "Review does not flag breaking changes", "passed": true, "evidence": "Correctly identifies UmbBlockElementManager.hints→view as internal-only, not a breaking change"},
+    {"text": "Verdict is 'Approved' or 'Approved with Suggestions'", "passed": false, "evidence": "Verdict is 'Request Changes' — found Critical bug where root tab view context is never created, so Generic tab badges never work in routed mode. This is a genuine functional gap in the changed code."},
+    {"text": "Review output is under 200 lines", "passed": true, "evidence": "Review is approximately 55 lines"},
+    {"text": "Review does not flag purely cosmetic/stylistic issues unless they affect performance or rendering", "passed": true, "evidence": "All findings are functional: missing view context (Critical), route asymmetry, observer race condition, optional chain guard. No grammar, typo, or style flags."}
+  ]
+}

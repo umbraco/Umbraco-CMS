@@ -1,0 +1,13 @@
+{
+  "eval_id": 0,
+  "eval_name": "pr-22214-large-frontend-refactor",
+  "config": "umb_review",
+  "expectations": [
+    {"text": "Review includes a complexity/split advisory for the large 75+ file scope", "passed": true, "evidence": "Contains '[!NOTE] Complexity advisory' noting 1,889 lines across 78 files spanning two projects"},
+    {"text": "Review identifies deprecation patterns (@deprecated, UmbDeprecation)", "passed": true, "evidence": "Summary mentions deprecated-but-functional modals, @deprecated JSDoc, runtime UmbDeprecation warnings"},
+    {"text": "Checks frontend-specific breaking changes (exports, custom elements) not just backend", "passed": true, "evidence": "Breaking changes section explicitly checks package.json exports and correctly concludes 'None — deleted action classes were internal'"},
+    {"text": "Findings reference specific files with line numbers", "passed": true, "evidence": "All findings have file paths with line numbers (e.g., document-create-options-modal.element.ts:178)"},
+    {"text": "Properly deprecated code is NOT flagged as Critical breaking change", "passed": true, "evidence": "No Critical section at all; deprecated items noted as correctly handled"},
+    {"text": "Review does not flag purely cosmetic/stylistic issues unless they affect performance or rendering", "passed": true, "evidence": "All findings are functional: misleading ellipsis UX, formatting mixed with logic affecting reviewability. Pre-existing error message noted as 'not introduced by this PR'"}
+  ]
+}

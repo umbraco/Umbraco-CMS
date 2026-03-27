@@ -1,0 +1,13 @@
+{
+  "eval_id": 0,
+  "eval_name": "pr-22214-large-frontend-refactor",
+  "config": "umb_review",
+  "expectations": [
+    {"text": "Review includes a complexity/split advisory for the large 75+ file scope", "passed": true, "evidence": "Contains '[!NOTE] Complexity advisory' with Formatting mixed with logic dimension"},
+    {"text": "Review identifies deprecation patterns (@deprecated, UmbDeprecation)", "passed": true, "evidence": "Other changes section discusses @deprecated JSDoc, UmbDeprecation.warn(), kept until Umbraco 19"},
+    {"text": "Checks frontend-specific breaking changes (exports, custom elements) not just backend", "passed": true, "evidence": "Modified public API lists all alias renames and kind changes"},
+    {"text": "Findings reference specific files with line numbers", "passed": true, "evidence": "All Important and Suggestion items reference specific file paths"},
+    {"text": "Properly deprecated code is NOT flagged as Critical breaking change", "passed": true, "evidence": "No Critical section — deprecated modals and old action classes handled correctly as deprecated, not breaking"},
+    {"text": "Review does not flag purely cosmetic/stylistic issues unless they affect performance or rendering", "passed": true, "evidence": "All findings are functional: UX misleading ellipsis, i18n hardcoded string, formatting mixed with logic"}
+  ]
+}

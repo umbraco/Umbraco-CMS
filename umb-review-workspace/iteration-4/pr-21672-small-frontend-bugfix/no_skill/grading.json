@@ -1,0 +1,12 @@
+{
+  "eval_id": 1,
+  "eval_name": "pr-21672-small-frontend-bugfix",
+  "config": "no_skill",
+  "expectations": [
+    {"text": "Review does NOT include a complexity/split advisory", "passed": true, "evidence": "No complexity advisory"},
+    {"text": "Review does not flag breaking changes", "passed": true, "evidence": "Correctly states 'No breaking changes'"},
+    {"text": "Verdict is 'Request Changes'", "passed": false, "evidence": "No explicit Request Changes verdict — ends with 'one likely bug' implying changes needed but not using the term"},
+    {"text": "Review output is under 200 lines", "passed": true, "evidence": "~70 lines"},
+    {"text": "Review does not flag purely cosmetic/stylistic issues unless they affect performance or rendering", "passed": false, "evidence": "Flags code duplication as a concern and suggests 'as any' cast cleanup — both are pre-existing style concerns"}
+  ]
+}

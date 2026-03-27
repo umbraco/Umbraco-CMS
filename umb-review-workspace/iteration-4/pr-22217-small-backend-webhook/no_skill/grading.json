@@ -1,0 +1,11 @@
+{
+  "eval_id": 2,
+  "eval_name": "pr-22217-small-backend-webhook",
+  "config": "no_skill",
+  "expectations": [
+    {"text": "Review references 'v18/dev' as the target branch (not 'main')", "passed": true, "evidence": "States 'Branch: pr/22217 targeting v18/dev'"},
+    {"text": "Review discusses the behavioral impact of changing the default payload type", "passed": true, "evidence": "Detailed Breaking Change Assessment section"},
+    {"text": "Review output is under 150 lines", "passed": false, "evidence": "~120 lines, close to limit"},
+    {"text": "Review does not flag purely cosmetic/stylistic issues unless they affect performance or rendering", "passed": false, "evidence": "Flags pre-existing inconsistent default parameter values across 30+ methods — not changed in the PR"}
+  ]
+}

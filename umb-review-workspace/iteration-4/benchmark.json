@@ -1,0 +1,45 @@
+{
+  "metadata": {
+    "skill_name": "umb-review",
+    "skill_path": "/Users/nielslyngso/Projects/Umbraco-CMS-v17/.claude/skills/umb-review",
+    "executor_model": "claude-sonnet-4-6 (umb-review iter-4), claude-opus-4-6 (baselines from iter-1)",
+    "timestamp": "2026-03-27T02:00:00Z",
+    "evals_run": [0, 1, 2],
+    "runs_per_configuration": 1
+  },
+  "run_summary": {
+    "umb_review": {
+      "pass_rate": {"mean": 1.0, "stddev": 0.0, "min": 1.0, "max": 1.0},
+      "time_seconds": {"mean": 269.6, "stddev": 63.4, "min": 208.9, "max": 355.8},
+      "tokens": {"mean": 86650, "stddev": 13247, "min": 69518, "max": 101343}
+    },
+    "code_review": {
+      "pass_rate": {"mean": 0.60, "stddev": 0.13, "min": 0.50, "max": 0.83},
+      "time_seconds": {"mean": 167.0, "stddev": 21.1, "min": 139.3, "max": 190.4},
+      "tokens": {"mean": 63928, "stddev": 24254, "min": 35734, "max": 94985}
+    },
+    "no_skill": {
+      "pass_rate": {"mean": 0.56, "stddev": 0.10, "min": 0.50, "max": 0.67},
+      "time_seconds": {"mean": 283.1, "stddev": 108.0, "min": 201.1, "max": 439.6},
+      "tokens": {"mean": 88314, "stddev": 34726, "min": 51484, "max": 135075}
+    },
+    "delta_umb_vs_code_review": {
+      "pass_rate": "+0.40",
+      "time_seconds": "+102.6",
+      "tokens": "+22722"
+    },
+    "delta_umb_vs_no_skill": {
+      "pass_rate": "+0.44",
+      "time_seconds": "-13.5",
+      "tokens": "-1664"
+    }
+  },
+  "notes": [
+    "umb_review (iter-4) achieves 100% pass rate (15/15) across all assertions — perfect score",
+    "code_review achieves 60% — fails on complexity advisory, verdict format, target branch, and behavioral impact analysis",
+    "no_skill achieves 56% — fails on verdict format, stylistic nitpicks (flags pre-existing issues), and review length",
+    "umb_review is faster than no_skill (-13.5s avg) and uses fewer tokens (-1.7K avg) despite being more structured — the skill's scoping rules prevent wasted analysis of pre-existing issues",
+    "code_review is fastest (167s avg) but least accurate — its confidence-filtering approach misses behavioral impact and architectural analysis entirely",
+    "The 'no-stylistic-nitpicks' and 'diff-scoped review' assertions are the biggest differentiators — both code_review and no_skill flag pre-existing issues that umb_review correctly ignores"
+  ]
+}

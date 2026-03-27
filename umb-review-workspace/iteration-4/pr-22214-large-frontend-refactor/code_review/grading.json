@@ -1,0 +1,13 @@
+{
+  "eval_id": 0,
+  "eval_name": "pr-22214-large-frontend-refactor",
+  "config": "code_review",
+  "expectations": [
+    {"text": "Review includes a complexity/split advisory for the large 75+ file scope", "passed": false, "evidence": "No complexity or split advisory present"},
+    {"text": "Review identifies deprecation patterns (@deprecated, UmbDeprecation)", "passed": true, "evidence": "Issue #1 discusses deprecated modals preserved with @deprecated and UmbDeprecation"},
+    {"text": "Checks frontend-specific breaking changes (exports, custom elements) not just backend", "passed": true, "evidence": "Issue #1 flags alias renaming as breaking change for plugin developers"},
+    {"text": "Findings reference specific files with line numbers", "passed": true, "evidence": "Both issues reference specific file paths with line numbers"},
+    {"text": "Properly deprecated code is NOT flagged as Critical breaking change", "passed": true, "evidence": "Only flags alias rename (no deprecation) not the properly deprecated modals"},
+    {"text": "Review does not flag purely cosmetic/stylistic issues unless they affect performance or rendering", "passed": true, "evidence": "Both findings are functional: breaking change and UX inconsistency"}
+  ]
+}

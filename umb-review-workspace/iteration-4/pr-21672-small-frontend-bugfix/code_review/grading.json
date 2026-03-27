@@ -1,0 +1,12 @@
+{
+  "eval_id": 1,
+  "eval_name": "pr-21672-small-frontend-bugfix",
+  "config": "code_review",
+  "expectations": [
+    {"text": "Review does NOT include a complexity/split advisory", "passed": true, "evidence": "No complexity advisory"},
+    {"text": "Review does not flag breaking changes", "passed": true, "evidence": "No breaking changes mentioned"},
+    {"text": "Verdict is 'Request Changes'", "passed": false, "evidence": "No explicit verdict — just lists 2 issues found without a clear approve/reject"},
+    {"text": "Review output is under 200 lines", "passed": true, "evidence": "~25 lines"},
+    {"text": "Review does not flag purely cosmetic/stylistic issues unless they affect performance or rendering", "passed": true, "evidence": "Both findings are functional bugs (missing view context, resource leak)"}
+  ]
+}
