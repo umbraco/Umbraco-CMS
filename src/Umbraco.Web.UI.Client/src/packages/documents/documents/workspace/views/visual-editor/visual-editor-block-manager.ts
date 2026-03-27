@@ -3,9 +3,8 @@ import type {
 	UmbBlockDataModel,
 	UmbBlockLayoutBaseModel,
 	UmbBlockExposeModel,
-	UmbBlockWorkspaceOriginData,
 } from '@umbraco-cms/backoffice/block';
-import { UmbBlockManagerContext } from '@umbraco-cms/backoffice/block';
+import type { UmbBlockManagerContext } from '@umbraco-cms/backoffice/block';
 import { UMB_BLOCK_LIST_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/block-list';
 import { UmbBlockListManagerContext } from '@umbraco-cms/backoffice/block-list';
 import { UMB_BLOCK_GRID_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/block-grid';

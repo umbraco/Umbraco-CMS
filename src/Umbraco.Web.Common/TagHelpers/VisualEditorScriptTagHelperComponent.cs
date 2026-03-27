@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Razor.TagHelpers;
-using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Web.Common.Hosting;
 using Umbraco.Cms.Web.Common.Views;
 
 namespace Umbraco.Cms.Web.Common.TagHelpers;
@@ -18,16 +18,16 @@ internal sealed class VisualEditorScriptTagHelperComponent : TagHelperComponent
 {
     private readonly IUmbracoContextAccessor _umbracoContextAccessor;
     private readonly ICspNonceService _cspNonceService;
-    private readonly IHostingEnvironment _hostingEnvironment;
+    private readonly IBackOfficePathGenerator _backOfficePathGenerator;
 
     public VisualEditorScriptTagHelperComponent(
         IUmbracoContextAccessor umbracoContextAccessor,
         ICspNonceService cspNonceService,
-        IHostingEnvironment hostingEnvironment)
+        IBackOfficePathGenerator backOfficePathGenerator)
     {
         _umbracoContextAccessor = umbracoContextAccessor;
         _cspNonceService = cspNonceService;
-        _hostingEnvironment = hostingEnvironment;
+        _backOfficePathGenerator = backOfficePathGenerator;
     }
 
     /// <summary>
@@ -49,7 +49,7 @@ internal sealed class VisualEditorScriptTagHelperComponent : TagHelperComponent
         }
 
         var nonce = _cspNonceService.GetNonce();
-        var backOfficePath = _hostingEnvironment.GetBackOfficePath().TrimEnd('/') + "/backoffice";
-        output.PostContent.AppendHtml(VisualEditorGuestScript.GetScriptTag(nonce, backOfficePath));
+        var backOfficeAssetsPath = _backOfficePathGenerator.BackOfficeAssetsPath;
+        output.PostContent.AppendHtml(VisualEditorGuestScript.GetScriptTag(nonce, backOfficeAssetsPath));
     }
 }

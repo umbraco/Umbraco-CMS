@@ -44,6 +44,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				},
 				appearance: {
 					labelOnTop: false,
+					editableInVisualEditor: false,
 				},
 			},
 		],
@@ -105,6 +106,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				},
 				appearance: {
 					labelOnTop: false,
+					editableInVisualEditor: false,
 				},
 			},
 			{
@@ -129,6 +131,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				},
 				appearance: {
 					labelOnTop: false,
+					editableInVisualEditor: false,
 				},
 			},
 			{
@@ -153,6 +156,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				},
 				appearance: {
 					labelOnTop: false,
+					editableInVisualEditor: false,
 				},
 			},
 			{
@@ -173,6 +177,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				},
 				appearance: {
 					labelOnTop: false,
+					editableInVisualEditor: false,
 				},
 			},
 			{
@@ -193,6 +198,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				},
 				appearance: {
 					labelOnTop: false,
+					editableInVisualEditor: false,
 				},
 			},
 			{
@@ -213,6 +219,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				},
 				appearance: {
 					labelOnTop: false,
+					editableInVisualEditor: false,
 				},
 			},
 			{
@@ -233,6 +240,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				},
 				appearance: {
 					labelOnTop: false,
+					editableInVisualEditor: false,
 				},
 			},
 			{
@@ -253,6 +261,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				},
 				appearance: {
 					labelOnTop: false,
+					editableInVisualEditor: false,
 				},
 			},
 			{
@@ -273,6 +282,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				},
 				appearance: {
 					labelOnTop: false,
+					editableInVisualEditor: false,
 				},
 			},
 			{
@@ -293,6 +303,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				},
 				appearance: {
 					labelOnTop: false,
+					editableInVisualEditor: false,
 				},
 			},
 			{
@@ -313,6 +324,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				},
 				appearance: {
 					labelOnTop: false,
+					editableInVisualEditor: false,
 				},
 			},
 			{
@@ -333,6 +345,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				},
 				appearance: {
 					labelOnTop: false,
+					editableInVisualEditor: false,
 				},
 			},
 			{
@@ -353,6 +366,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				},
 				appearance: {
 					labelOnTop: false,
+					editableInVisualEditor: false,
 				},
 			},
 			{
@@ -373,6 +387,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				},
 				appearance: {
 					labelOnTop: false,
+					editableInVisualEditor: false,
 				},
 			},
 			{
@@ -393,6 +408,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				},
 				appearance: {
 					labelOnTop: false,
+					editableInVisualEditor: false,
 				},
 			},
 			{
@@ -413,6 +429,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				},
 				appearance: {
 					labelOnTop: false,
+					editableInVisualEditor: false,
 				},
 			},
 			{
@@ -433,6 +450,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				},
 				appearance: {
 					labelOnTop: false,
+					editableInVisualEditor: false,
 				},
 			},
 			{
@@ -453,6 +471,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				},
 				appearance: {
 					labelOnTop: false,
+					editableInVisualEditor: false,
 				},
 			},
 			{
@@ -473,6 +492,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				},
 				appearance: {
 					labelOnTop: false,
+					editableInVisualEditor: false,
 				},
 			},
 			{
@@ -493,6 +513,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				},
 				appearance: {
 					labelOnTop: false,
+					editableInVisualEditor: false,
 				},
 			},
 			{
@@ -513,6 +534,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				},
 				appearance: {
 					labelOnTop: false,
+					editableInVisualEditor: false,
 				},
 			},
 			{
@@ -533,6 +555,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				},
 				appearance: {
 					labelOnTop: false,
+					editableInVisualEditor: false,
 				},
 			},
 			{
@@ -553,6 +576,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				},
 				appearance: {
 					labelOnTop: false,
+					editableInVisualEditor: false,
 				},
 			},
 			{
@@ -573,6 +597,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				},
 				appearance: {
 					labelOnTop: false,
+					editableInVisualEditor: false,
 				},
 			},
 			{
@@ -593,6 +618,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				},
 				appearance: {
 					labelOnTop: false,
+					editableInVisualEditor: false,
 				},
 			},
 			{
@@ -613,6 +639,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				},
 				appearance: {
 					labelOnTop: false,
+					editableInVisualEditor: false,
 				},
 			},
 			{
@@ -633,6 +660,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				},
 				appearance: {
 					labelOnTop: false,
+					editableInVisualEditor: false,
 				},
 			},
 			{
@@ -653,6 +681,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				},
 				appearance: {
 					labelOnTop: false,
+					editableInVisualEditor: false,
 				},
 			},
 			{
@@ -673,6 +702,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				},
 				appearance: {
 					labelOnTop: false,
+					editableInVisualEditor: false,
 				},
 			},
 			{
@@ -693,6 +723,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				},
 				appearance: {
 					labelOnTop: false,
+					editableInVisualEditor: false,
 				},
 			},
 			{
@@ -713,6 +744,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				},
 				appearance: {
 					labelOnTop: false,
+					editableInVisualEditor: false,
 				},
 			},
 			{
@@ -733,6 +765,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				},
 				appearance: {
 					labelOnTop: false,
+					editableInVisualEditor: false,
 				},
 			},
 			{
@@ -757,6 +790,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				},
 				appearance: {
 					labelOnTop: false,
+					editableInVisualEditor: false,
 				},
 			},
 			{
@@ -777,6 +811,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				},
 				appearance: {
 					labelOnTop: false,
+					editableInVisualEditor: false,
 				},
 			},
 			{
@@ -797,6 +832,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				},
 				appearance: {
 					labelOnTop: false,
+					editableInVisualEditor: false,
 				},
 			},
 			{
@@ -817,6 +853,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				},
 				appearance: {
 					labelOnTop: false,
+					editableInVisualEditor: false,
 				},
 			},
 			{
@@ -837,6 +874,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				},
 				appearance: {
 					labelOnTop: false,
+					editableInVisualEditor: false,
 				},
 			},
 		],
@@ -892,6 +930,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				},
 				appearance: {
 					labelOnTop: false,
+					editableInVisualEditor: false,
 				},
 			},
 			{
@@ -912,6 +951,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				},
 				appearance: {
 					labelOnTop: false,
+					editableInVisualEditor: false,
 				},
 			},
 		],
@@ -971,6 +1011,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				},
 				appearance: {
 					labelOnTop: false,
+					editableInVisualEditor: false,
 				},
 			},
 			{
@@ -991,6 +1032,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				},
 				appearance: {
 					labelOnTop: false,
+					editableInVisualEditor: false,
 				},
 			},
 			{
@@ -1011,6 +1053,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				},
 				appearance: {
 					labelOnTop: false,
+					editableInVisualEditor: false,
 				},
 			},
 			{
@@ -1031,6 +1074,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				},
 				appearance: {
 					labelOnTop: true,
+					editableInVisualEditor: false,
 				},
 			},
 			{
@@ -1051,6 +1095,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				},
 				appearance: {
 					labelOnTop: false,
+					editableInVisualEditor: false,
 				},
 			},
 		],
@@ -1143,6 +1188,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				},
 				appearance: {
 					labelOnTop: false,
+					editableInVisualEditor: false,
 				},
 			},
 		],
@@ -1198,6 +1244,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				},
 				appearance: {
 					labelOnTop: false,
+					editableInVisualEditor: false,
 				},
 			},
 			{
@@ -1218,6 +1265,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				},
 				appearance: {
 					labelOnTop: false,
+					editableInVisualEditor: false,
 				},
 			},
 			{
@@ -1238,6 +1286,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				},
 				appearance: {
 					labelOnTop: false,
+					editableInVisualEditor: false,
 				},
 			},
 		],
@@ -1300,6 +1349,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				},
 				appearance: {
 					labelOnTop: false,
+					editableInVisualEditor: false,
 				},
 			},
 		],
@@ -1365,6 +1415,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				},
 				appearance: {
 					labelOnTop: false,
+					editableInVisualEditor: false,
 				},
 			},
 		],
@@ -1423,6 +1474,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				},
 				appearance: {
 					labelOnTop: false,
+					editableInVisualEditor: false,
 				},
 			},
 			{
@@ -1443,6 +1495,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				},
 				appearance: {
 					labelOnTop: false,
+					editableInVisualEditor: false,
 				},
 			},
 		],
@@ -1531,6 +1584,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				},
 				appearance: {
 					labelOnTop: false,
+					editableInVisualEditor: false,
 				},
 			},
 			{
@@ -1551,6 +1605,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				},
 				appearance: {
 					labelOnTop: false,
+					editableInVisualEditor: false,
 				},
 			},
 		],
@@ -1606,6 +1661,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				},
 				appearance: {
 					labelOnTop: false,
+					editableInVisualEditor: false,
 				},
 			},
 		],
@@ -1661,6 +1717,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				},
 				appearance: {
 					labelOnTop: false,
+					editableInVisualEditor: false,
 				},
 			},
 		],
@@ -1716,6 +1773,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				},
 				appearance: {
 					labelOnTop: false,
+					editableInVisualEditor: false,
 				},
 			},
 		],
@@ -1771,6 +1829,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				},
 				appearance: {
 					labelOnTop: false,
+					editableInVisualEditor: false,
 				},
 			},
 		],
@@ -1874,6 +1933,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				},
 				appearance: {
 					labelOnTop: false,
+					editableInVisualEditor: false,
 				},
 			},
 		],
@@ -1929,6 +1989,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				},
 				appearance: {
 					labelOnTop: false,
+					editableInVisualEditor: false,
 				},
 			},
 			{
@@ -1949,6 +2010,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				},
 				appearance: {
 					labelOnTop: false,
+					editableInVisualEditor: false,
 				},
 			},
 		],
@@ -2004,6 +2066,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				},
 				appearance: {
 					labelOnTop: false,
+					editableInVisualEditor: false,
 				},
 			},
 		],

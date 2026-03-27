@@ -4,7 +4,7 @@ import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, umbBindToValidation } from '@umb
 import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_CONTENT_TYPE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content-type';
-import type { UmbPropertyTypeScaffoldModel } from '@umbraco-cms/backoffice/content-type';
+import type { UmbPropertyTypeAppearanceModel, UmbPropertyTypeScaffoldModel } from '@umbraco-cms/backoffice/content-type';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
 import type { UUIBooleanInputEvent, UUIInputEvent, UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbInputWithAliasElement } from '@umbraco-cms/backoffice/components';
@@ -104,12 +104,16 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 		});
 	}
 
+	#getAppearanceDefaults(): UmbPropertyTypeAppearanceModel {
+		return { labelOnTop: false, editableInVisualEditor: false, ...this._data?.appearance };
+	}
+
 	#setAppearanceNormal() {
 		const currentValue = this._data?.appearance?.labelOnTop;
 		if (currentValue !== true) return;
 
 		this.updateValue({
-			appearance: { ...this._data?.appearance, labelOnTop: false },
+			appearance: { ...this.#getAppearanceDefaults(), labelOnTop: false },
 		});
 	}
 	#setAppearanceTop() {
@@ -117,7 +121,7 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 		if (currentValue === true) return;
 
 		this.updateValue({
-			appearance: { ...this._data?.appearance, labelOnTop: true },
+			appearance: { ...this.#getAppearanceDefaults(), labelOnTop: true },
 		});
 	}
 
@@ -168,7 +172,7 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 
 	#onToggleEditableInVisualEditor(event: UUIBooleanInputEvent) {
 		this.updateValue({
-			appearance: { labelOnTop: this._data?.appearance?.labelOnTop ?? false, editableInVisualEditor: event.target.checked },
+			appearance: { ...this.#getAppearanceDefaults(), editableInVisualEditor: event.target.checked },
 		});
 	}
 

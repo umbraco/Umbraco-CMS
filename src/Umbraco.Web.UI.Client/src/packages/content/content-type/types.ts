@@ -87,7 +87,7 @@ export interface UmbPropertyTypeValidationModel {
 
 export interface UmbPropertyTypeAppearanceModel {
 	labelOnTop: boolean;
-	editableInVisualEditor?: boolean;
+	editableInVisualEditor: boolean;
 }
 
 export interface UmbContentTypeSortModel {

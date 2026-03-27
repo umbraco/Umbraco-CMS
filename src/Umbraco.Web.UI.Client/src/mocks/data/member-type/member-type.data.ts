@@ -38,6 +38,7 @@ export const data: Array<UmbMockMemberTypeModel> = [
 				},
 				appearance: {
 					labelOnTop: false,
+					editableInVisualEditor: false,
 				},
 			},
 		],
@@ -88,6 +89,7 @@ export const data: Array<UmbMockMemberTypeModel> = [
 				},
 				appearance: {
 					labelOnTop: false,
+					editableInVisualEditor: false,
 				},
 			},
 		],

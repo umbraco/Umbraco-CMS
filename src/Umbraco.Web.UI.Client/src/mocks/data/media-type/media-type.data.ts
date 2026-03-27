@@ -41,6 +41,7 @@ export const data: Array<UmbMockMediaTypeModel> = [
 				},
 				appearance: {
 					labelOnTop: false,
+					editableInVisualEditor: false,
 				},
 			},
 			{
@@ -61,6 +62,7 @@ export const data: Array<UmbMockMediaTypeModel> = [
 				},
 				appearance: {
 					labelOnTop: false,
+					editableInVisualEditor: false,
 				},
 			},
 			{
@@ -81,6 +83,7 @@ export const data: Array<UmbMockMediaTypeModel> = [
 				},
 				appearance: {
 					labelOnTop: false,
+					editableInVisualEditor: false,
 				},
 			},
 		],
@@ -132,6 +135,7 @@ export const data: Array<UmbMockMediaTypeModel> = [
 				},
 				appearance: {
 					labelOnTop: false,
+					editableInVisualEditor: false,
 				},
 			},
 		],
@@ -183,6 +187,7 @@ export const data: Array<UmbMockMediaTypeModel> = [
 				},
 				appearance: {
 					labelOnTop: false,
+					editableInVisualEditor: false,
 				},
 			},
 		],
@@ -234,6 +239,7 @@ export const data: Array<UmbMockMediaTypeModel> = [
 				},
 				appearance: {
 					labelOnTop: false,
+					editableInVisualEditor: false,
 				},
 			},
 		],
@@ -285,6 +291,7 @@ export const data: Array<UmbMockMediaTypeModel> = [
 				},
 				appearance: {
 					labelOnTop: false,
+					editableInVisualEditor: false,
 				},
 			},
 		],
@@ -336,6 +343,7 @@ export const data: Array<UmbMockMediaTypeModel> = [
 				},
 				appearance: {
 					labelOnTop: false,
+					editableInVisualEditor: false,
 				},
 			},
 		],

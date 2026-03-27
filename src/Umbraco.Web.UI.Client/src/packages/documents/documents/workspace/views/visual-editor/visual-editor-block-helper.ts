@@ -199,9 +199,6 @@ export function removeBlockFromValue(blockValue: BlockValue, blockKey: string): 
 	};
 }
 
-/** @deprecated Use `findLayoutEntryInAreas` from `@umbraco-cms/backoffice/block` instead. */
-export const findLayoutEntryRecursive = findLayoutEntryInAreas;
-
 /** Recursively remove a layout entry by contentKey, searching through block grid areas. */
 function removeLayoutEntryRecursive(entries: BlockValueLayout[], blockKey: string): BlockValueLayout[] {
 	return entries

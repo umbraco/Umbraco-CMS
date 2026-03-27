@@ -120,7 +120,6 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 			variantId: this.#currentVariantId,
 			onValueChanged: async (alias, value) => {
 				await this.#setPropertyValue(alias, value);
-	
 			},
 		});
 		this.#blockManagerPropertyAlias = propertyAlias;
@@ -375,8 +374,6 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 				const hasProperties = await this.#blockHasEditableFields(contentTypeKey, propertyAlias);
 				if (hasProperties) {
 					this.#onBlockClicked(contentKey, contentTypeKey);
-				} else {
-		
 				}
 			} else {
 				// Add to root
@@ -394,8 +391,6 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 				const hasProperties = await this.#blockHasEditableFields(contentTypeKey, propertyAlias);
 				if (hasProperties) {
 					this.#onBlockClicked(contentKey, contentTypeKey);
-				} else {
-		
 				}
 			}
 		})
@@ -887,8 +882,6 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 			const hasProperties = await this.#blockHasEditableFields(contentTypeKey, propertyAlias);
 			if (hasProperties) {
 				this.#onBlockClicked(contentKey, contentTypeKey);
-			} else {
-	
 			}
 		} else {
 			// Multiple block types — open routed catalogue modal
@@ -1047,24 +1040,6 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 		const updatedValue = reorderBlockInValue(found.blockValue, blockKey, toIndex);
 		await this.#setPropertyValue(found.propertyAlias, updatedValue);
 
-	}
-
-	// --- Save ---
-
-	async #save() {
-		this.#suppressRefresh = true;
-		try {
-			await this.#workspaceContext?.requestSave();
-		} catch {
-			// Save may fail due to validation — workspace shows notifications
-		}
-		setTimeout(() => {
-			this.#suppressRefresh = false;
-		}, 2000);
-	}
-
-	async #saveAndRefresh() {
-		this.#refreshIframe();
 	}
 
 	// --- Preview URL ---

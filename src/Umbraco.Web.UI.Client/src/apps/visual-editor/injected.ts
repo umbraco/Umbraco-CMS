@@ -62,6 +62,12 @@
 	/** Border/divider color (--uui-color-border). */
 	const COLOR_BORDER = '#e3e3e3';
 
+	// Default outline/shadow values applied to all editable regions
+	const DEFAULT_OUTLINE = `1px dashed ${COLOR_INTERACTIVE_MUTED}`;
+	const DEFAULT_OUTLINE_OFFSET = '-1px';
+	const DEFAULT_BOX_SHADOW = 'inset 0 0 0 1px rgba(255, 255, 255, 0.4)';
+	const ACTIVE_BOX_SHADOW = 'inset 0 0 0 2px rgba(255, 255, 255, 0.6)';
+
 	/** Selected region outline color (same as interactive). */
 	const COLOR_SELECTED = COLOR_INTERACTIVE;
 
@@ -172,9 +178,9 @@
 	 */
 	document.querySelectorAll<HTMLElement>(ALL_SELECTOR).forEach((el) => {
 		el.style.cursor = 'pointer';
-		el.style.outline = `1px dashed ${COLOR_INTERACTIVE_MUTED}`;
-		el.style.outlineOffset = '-1px';
-		el.style.boxShadow = 'inset 0 0 0 1px rgba(255, 255, 255, 0.4)';
+		el.style.outline = DEFAULT_OUTLINE;
+		el.style.outlineOffset = DEFAULT_OUTLINE_OFFSET;
+		el.style.boxShadow = DEFAULT_BOX_SHADOW;
 		el.style.transition = 'outline 120ms, outline-offset 120ms, box-shadow 120ms';
 		if (isBlock(el)) {
 			el.style.position = el.style.position || 'relative';
@@ -200,7 +206,7 @@
 	function applyOutline(el: HTMLElement, style: string, offset: string) {
 		el.style.outline = style;
 		el.style.outlineOffset = offset;
-		el.style.boxShadow = 'inset 0 0 0 2px rgba(255, 255, 255, 0.6)';
+		el.style.boxShadow = ACTIVE_BOX_SHADOW;
 	}
 
 	/**
@@ -209,9 +215,9 @@
 	 * @param el - The target element.
 	 */
 	function clearOutline(el: HTMLElement) {
-		el.style.outline = `1px dashed ${COLOR_INTERACTIVE_MUTED}`;
-		el.style.outlineOffset = '-1px';
-		el.style.boxShadow = 'inset 0 0 0 1px rgba(255, 255, 255, 0.4)';
+		el.style.outline = DEFAULT_OUTLINE;
+		el.style.outlineOffset = DEFAULT_OUTLINE_OFFSET;
+		el.style.boxShadow = DEFAULT_BOX_SHADOW;
 	}
 
 	/**
@@ -603,6 +609,18 @@
 			return el.closest('.umb-block-list, .umb-block-grid__layout-container');
 		}
 
+		/** Check if a drag event targets a child area of the given block. */
+		function isDragOverChildArea(e: DragEvent, block: Element): boolean {
+			const targetArea = (e.target as Element).closest?.('.umb-block-grid__area');
+			return !!targetArea && block.contains(targetArea);
+		}
+
+		/** Check if a drag event targets a block inside the given area (not the area itself). */
+		function isDragOverNestedBlock(e: DragEvent, area: Element): boolean {
+			const nearest = (e.target as Element).closest(`${BLOCK_SELECTOR}, .umb-block-grid__area`);
+			return !!nearest && nearest !== area && nearest.matches(BLOCK_SELECTOR);
+		}
+
 		/** Get area info for a container (if it's inside an area). */
 		function getAreaInfo(container: Element): { parentBlockKey: string; areaAlias: string } | null {
 			const area = container.closest<HTMLElement>('.umb-block-grid__area');
@@ -635,9 +653,7 @@
 
 			block.addEventListener('dragover', ((e: DragEvent) => {
 				if (!dragSrc || dragSrc === block) return;
-				// Don't intercept drags over this block's own child areas
-				const targetArea = (e.target as Element).closest?.('.umb-block-grid__area');
-				if (targetArea && block.contains(targetArea)) return;
+				if (isDragOverChildArea(e, block)) return;
 				e.preventDefault();
 				e.dataTransfer!.dropEffect = 'move';
 
@@ -655,9 +671,7 @@
 
 			block.addEventListener('drop', ((e: DragEvent) => {
 				if (!dragSrc || dragSrc === block) return;
-				// Don't intercept drops targeting this block's own child areas
-				const targetArea = (e.target as Element).closest?.('.umb-block-grid__area');
-				if (targetArea && block.contains(targetArea)) return;
+				if (isDragOverChildArea(e, block)) return;
 				e.preventDefault();
 
 				const srcKey = getBlockKey(dragSrc);
@@ -717,11 +731,7 @@
 		document.querySelectorAll<HTMLElement>('.umb-block-grid__area').forEach((area) => {
 			area.addEventListener('dragover', ((e: DragEvent) => {
 				if (!dragSrc) return;
-				// Only handle if the target is not inside a direct child block of this area.
-				// We check closest block-or-area — if a block is found before we reach
-				// this area, a child block should handle the event instead.
-				const nearest = (e.target as Element).closest(`${BLOCK_SELECTOR}, .umb-block-grid__area`);
-				if (nearest && nearest !== area && nearest.matches(BLOCK_SELECTOR)) return;
+				if (isDragOverNestedBlock(e, area)) return;
 				e.preventDefault();
 				e.dataTransfer!.dropEffect = 'move';
 
@@ -733,9 +743,7 @@
 
 			area.addEventListener('drop', ((e: DragEvent) => {
 				if (!dragSrc) return;
-				// Only handle direct drops on the area (not on blocks inside it)
-				const nearest = (e.target as Element).closest(`${BLOCK_SELECTOR}, .umb-block-grid__area`);
-				if (nearest && nearest !== area && nearest.matches(BLOCK_SELECTOR)) return;
+				if (isDragOverNestedBlock(e, area)) return;
 				e.preventDefault();
 
 				const srcKey = getBlockKey(dragSrc);
