@@ -98,6 +98,7 @@ Classify the PR to determine which review steps are relevant:
 
 | Classification  | Condition                                                                       | Effect                                                                          |
 | --------------- | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| **Gen-only**    | All reviewable files are `gen.ts`                                               | Skip steps 4 and 5; step 6 reviews impact on other code.                        |
 | **Docs-only**   | All reviewable files are `.md`                                                  | Skip steps 4 and 5; step 6 reviews intent and readability only                  |
 | **Test-only**   | All reviewable files are in `tests/`                                            | Skip steps 4 and 5; step 6 reviews intent, code quality, and test coverage only |
 | **Config-only** | All reviewable files are `.csproj`, `.props`, `.json` config, or CI/build files | Skip step 4; step 5 checks dependency version changes only                      |
