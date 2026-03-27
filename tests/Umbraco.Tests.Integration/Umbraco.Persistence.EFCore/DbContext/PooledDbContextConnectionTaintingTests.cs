@@ -63,10 +63,7 @@ public class PooledDbContextConnectionTaintingTests : UmbracoIntegrationTest
         // Step 4: The context should be usable. Before the fix, this would throw
         // NullReferenceException at ProfiledDbConnection.get_ConnectionString() because
         // the pooled context retained a stale ProfiledDbConnection whose inner connection was null.
-        Assert.DoesNotThrowAsync(async () =>
-        {
-            await context.Database.CanConnectAsync();
-        });
+        await context.Database.CanConnectAsync();
     }
 
     /// <summary>
@@ -94,11 +91,7 @@ public class PooledDbContextConnectionTaintingTests : UmbracoIntegrationTest
         // This is what fails in the reported issue:
         // context.Database.GetPendingMigrationsAsync() eventually calls
         // ProfiledDbConnection.ConnectionString which NREs.
-        Assert.DoesNotThrowAsync(async () =>
-        {
-            // GetPendingMigrationsAsync accesses ConnectionString internally
-            var pendingMigrations = await context.Database.GetPendingMigrationsAsync();
-        });
+        await context.Database.GetPendingMigrationsAsync();
     }
 
     /// <summary>
