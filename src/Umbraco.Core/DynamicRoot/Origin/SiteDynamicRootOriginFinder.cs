@@ -45,7 +45,8 @@ public class SiteDynamicRootOriginFinder : RootDynamicRootOriginFinder
         for (int i = contentIdStrings.Length - 1; i >= 0; i--)
         {
             var contentId = int.Parse(contentIdStrings[i], NumberStyles.Integer, CultureInfo.InvariantCulture);
-            IEnumerable<IDomain> domains = _domainService.GetAssignedDomains(contentId, true);
+            // TODO: Remove int-based overload when EFCore migration is completed.
+            IEnumerable<IDomain> domains = _domainService.GetAssignedDomainsAsync(contentId, true).GetAwaiter().GetResult();
             if (!domains.Any())
             {
                 continue;

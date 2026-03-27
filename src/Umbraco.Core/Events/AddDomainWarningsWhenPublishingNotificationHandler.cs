@@ -61,9 +61,10 @@ public class AddDomainWarningsWhenPublishingNotificationHandler : INotificationH
             }
 
             // If more than a single culture is published we need to verify that there's a domain registered for each published culture
+            // TODO: Remove int-based overload when EFCore migration is completed.
             HashSet<IDomain>? assignedDomains = content is null
                 ? null
-                : _domainService.GetAssignedDomains(content.Id, true)?.ToHashSet();
+                : _domainService.GetAssignedDomainsAsync(content.Id, true).GetAwaiter().GetResult()?.ToHashSet();
 
             IEnumerable<int>? ancestorIds = content?.GetAncestorIds();
             if (ancestorIds is not null && assignedDomains is not null)
@@ -71,7 +72,7 @@ public class AddDomainWarningsWhenPublishingNotificationHandler : INotificationH
                 // We also have to check all of the ancestors, if any of those has the appropriate culture assigned we don't need to warn
                 foreach (var ancestorID in ancestorIds)
                 {
-                    assignedDomains.UnionWith(_domainService.GetAssignedDomains(ancestorID, true) ??
+                    assignedDomains.UnionWith(_domainService.GetAssignedDomainsAsync(ancestorID, true).GetAwaiter().GetResult() ??
                                               Enumerable.Empty<IDomain>());
                 }
             }

@@ -501,11 +501,10 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
             return;
         }
 
-#pragma warning disable CS0618 // Type or member is obsolete
-        var assignedDomains = _domainService.GetAll(true)
+        // TODO: Make async when EFCore migration is completed.
+        var assignedDomains = _domainService.GetAllAsync(true).GetAwaiter().GetResult()
             .Where(x => x.RootContentId.HasValue && idsRemoved.Contains(x.RootContentId.Value))
             .ToList();
-#pragma warning restore CS0618 // Type or member is obsolete
         if (assignedDomains.Count <= 0)
         {
             return;
