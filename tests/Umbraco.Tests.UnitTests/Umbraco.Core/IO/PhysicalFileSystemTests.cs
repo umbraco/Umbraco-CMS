@@ -122,7 +122,14 @@ public class PhysicalFileSystemTests : AbstractFileSystemTests
             "/Media/");
 
         IFileProvider fileProvider = ((IFileProviderFactory)fs).Create();
-        Assert.IsNotNull(fileProvider);
-        Assert.IsTrue(Directory.Exists(nonExistentPath));
+        try
+        {
+            Assert.IsNotNull(fileProvider);
+            Assert.IsTrue(Directory.Exists(nonExistentPath));
+        }
+        finally
+        {
+            (fileProvider as IDisposable)?.Dispose();
+        }
     }
 }
