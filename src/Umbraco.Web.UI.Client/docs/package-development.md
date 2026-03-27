@@ -103,7 +103,7 @@ This ensures TypeScript, the browser import map, and test configs all resolve th
 
 No hardcoded UI-facing strings. All user-visible text must go through the localization system. Keys live in `src/assets/lang/en.ts`, grouped by feature area, referenced as `group_keyName` (e.g., `this.localize.term('actions_create')`).
 
-For step-by-step instructions on adding localization keys and using them in elements or controllers, use the `add-localization` skill.
+For step-by-step instructions on adding localization keys and using them in elements or controllers, use the `general-add-localization` skill.
 
 ---
 
@@ -116,6 +116,6 @@ For step-by-step instructions on adding localization keys and using them in elem
 5. **Use element lazy loading** in manifests: `element: () => import('./path.js')`.
 6. **Use `@umbraco-ui/uui` components** for UI consistency (`<uui-box>`, `<uui-button>`, `<uui-input>`, etc.).
 7. **Declare custom manifest types** on `UmbExtensionManifestMap` so other packages can extend yours.
-8. **No hardcoded UI strings** — use the localization system. See [Localization](#localization) above and the `add-localization` skill.
+8. **No hardcoded UI strings** — use the localization system. See [Localization](#localization) above and the `general-add-localization` skill.
 9. **Element naming**: `umb-` prefix for core. Package developers use their own prefix.
 10. **Extension aliases**: Dot-separated namespace (`Umb.Section.Content`, `My.Dashboard.Analytics`).
