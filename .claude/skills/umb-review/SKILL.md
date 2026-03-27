@@ -281,10 +281,12 @@ This is in such a bad state that the feedback of this review is not sufficient t
 
 **Guidelines for the review output:**
 
+— When reporting information, be extremely concise and sacrifice grammar for sake of concision.
+
 - Only review code that was changed in the diff — pre-existing issues are out of scope. Focus on what compilers and linters cannot catch: behavioral side-effects (e.g., a changed default alters runtime behavior for consumers), architectural violations (e.g., a new dependency breaks layering), breaking changes for external consumers of the public API, and security implications. Leave type errors, missing imports, and broken references to CI.
 - Be specific — always reference file and line number
-- Explain WHY something is an issue, not just WHAT
-- Provide concrete fix suggestions, including code snippets when helpful
+- Explain WHY something is an issue, not just WHAT, but avoid stating the obvious.
+- For complex matters, provide concrete fix suggestions, including code snippets when helpful
 - Keep it constructive — the goal is to help, not gatekeep
 - Don't repeat the same finding for every occurrence — mention it once and note "same pattern in {other files}"
 - Focus on substantive issues only. Do NOT flag purely cosmetic or stylistic concerns. Specifically, never flag: code formatting or whitespace, comment grammar or wording, redundant-but-harmless syntax (e.g., optional chaining after a truthiness check), code duplication that doesn't cause bugs, or HTML template cosmetics. The only exception is when a stylistic issue has a concrete impact on performance or rendering.
