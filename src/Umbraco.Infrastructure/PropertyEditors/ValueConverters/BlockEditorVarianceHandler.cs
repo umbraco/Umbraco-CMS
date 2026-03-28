@@ -120,7 +120,7 @@ public sealed class BlockEditorVarianceHandler
     }
 
     /// <summary>
-    /// Aligns a block value for variance changes and adds language fallback entries.
+    /// Aligns a block value for variance changes.
     /// </summary>
     /// <param name="blockValue">The block property value to align for variance.</param>
     /// <param name="owner">The owner element, which is either the content for block properties at the content level or the parent element for nested block properties.</param>
@@ -128,32 +128,13 @@ public sealed class BlockEditorVarianceHandler
     /// <returns>A task representing the asynchronous operation, with a result containing the aligned <see cref="BlockItemVariation"/> instances for the specified block element.</returns>
     /// <remarks>
     /// <para>Used for aligning block item variations according to variance (such as culture or segment) when rendering content.</para>
-    /// <para>Additionally, for culture-variant blocks, this method walks the language fallback chain (<see cref="ILanguage.FallbackIsoCode"/>) and
-    /// adds synthetic expose entries for languages that fall back to an already-exposed culture. This ensures blocks are visible when requesting a
-    /// language that has a fallback path to the culture the block was exposed for.</para>
+    /// <para>In case of mismatch in culture variation for block value variation:</para>
+    /// <list type="bullet">
+    /// <item><description>If the expected variation is by culture but all expose entries are invariant, assign the default culture.</description></item>
+    /// <item><description>If the expected variation is invariant but all expose entries have cultures, use the default culture entry as invariant.</description></item>
+    /// </list>
     /// </remarks>
-    [Obsolete("Use the overload accepting allLanguages. Scheduled for removal in Umbraco 19.")]
     public async Task<IEnumerable<BlockItemVariation>> AlignedExposeVarianceAsync(BlockValue blockValue, IPublishedElement owner, IPublishedElement element)
-    {
-        IReadOnlyList<ILanguage> allLanguages = (await _languageService.GetAllAsync()).ToList();
-        return await AlignedExposeVarianceAsync(blockValue, owner, element, allLanguages);
-    }
-
-    /// <summary>
-    /// Aligns a block value for variance changes and adds language fallback entries.
-    /// </summary>
-    /// <param name="blockValue">The block property value to align for variance.</param>
-    /// <param name="owner">The owner element, which is either the content for block properties at the content level or the parent element for nested block properties.</param>
-    /// <param name="element">The block element containing the property.</param>
-    /// <param name="allLanguages">All configured languages, used for walking fallback chains.</param>
-    /// <returns>A task representing the asynchronous operation, with a result containing the aligned <see cref="BlockItemVariation"/> instances for the specified block element.</returns>
-    /// <remarks>
-    /// <para>Used for aligning block item variations according to variance (such as culture or segment) when rendering content.</para>
-    /// <para>Additionally, for culture-variant blocks, this method walks the language fallback chain (<see cref="ILanguage.FallbackIsoCode"/>) and
-    /// adds synthetic expose entries for languages that fall back to an already-exposed culture. This ensures blocks are visible when requesting a
-    /// language that has a fallback path to the culture the block was exposed for.</para>
-    /// </remarks>
-    public async Task<IEnumerable<BlockItemVariation>> AlignedExposeVarianceAsync(BlockValue blockValue, IPublishedElement owner, IPublishedElement element, IReadOnlyList<ILanguage> allLanguages)
     {
         BlockItemVariation[] blockVariations = blockValue.Expose.Where(v => v.ContentKey == element.Key).ToArray();
         if (blockVariations.Any() is false)
@@ -180,72 +161,7 @@ public sealed class BlockEditorVarianceHandler
                 .ToList();
         }
 
-        // For culture-variant blocks, add expose entries for languages whose fallback chains lead to an already-exposed culture.
-        if (exposeVariation.VariesByCulture())
-        {
-            IReadOnlyList<BlockItemVariation> fallbackEntries = GetLanguageFallbackExposeEntries(blockVariations, element.Key, allLanguages);
-            if (fallbackEntries.Count > 0)
-            {
-                return blockVariations.Concat(fallbackEntries);
-            }
-        }
-
         return blockVariations;
-    }
-
-    /// <summary>
-    /// Walks the language fallback chains and returns synthetic expose entries for languages
-    /// that are not directly exposed but have a fallback path to an exposed culture.
-    /// </summary>
-    private static IReadOnlyList<BlockItemVariation> GetLanguageFallbackExposeEntries(
-        BlockItemVariation[] blockVariations,
-        Guid elementKey,
-        IReadOnlyList<ILanguage> allLanguages)
-    {
-        // Track existing exposure by (culture, segment) so we only create fallback entries for specific segments that
-        // are missing — not skip an entire language just because it has some segments already exposed.
-        var cultureSegmentComparer = new CultureSegmentEqualityComparer();
-        var existingExposure = new HashSet<(string? Culture, string? Segment)>(
-            blockVariations.Select(v => (v.Culture, v.Segment)), cultureSegmentComparer);
-        var exposedCultures = new HashSet<string?>(
-            blockVariations.Select(v => v.Culture), StringComparer.OrdinalIgnoreCase);
-
-        var languagesByIsoCode = allLanguages.ToDictionary(l => l.IsoCode, StringComparer.OrdinalIgnoreCase);
-        var fallbackEntries = new List<BlockItemVariation>();
-
-        foreach (ILanguage language in allLanguages)
-        {
-            // Walk the fallback chain for this language.
-            var visited = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            ILanguage? current = language;
-            while (current?.FallbackIsoCode is not null)
-            {
-                if (visited.Add(current.FallbackIsoCode) is false)
-                {
-                    break;
-                }
-
-                if (exposedCultures.Contains(current.FallbackIsoCode))
-                {
-                    foreach (BlockItemVariation fallbackVariation in blockVariations
-                        .Where(v => string.Equals(v.Culture, current.FallbackIsoCode, StringComparison.OrdinalIgnoreCase)))
-                    {
-                        (string IsoCode, string? Segment) candidate = (language.IsoCode, fallbackVariation.Segment);
-                        if (existingExposure.Contains(candidate) is false)
-                        {
-                            fallbackEntries.Add(new BlockItemVariation(elementKey, language.IsoCode, fallbackVariation.Segment));
-                            existingExposure.Add(candidate);
-                        }
-                    }
-
-                    break;
-                }
-
-                languagesByIsoCode.TryGetValue(current.FallbackIsoCode, out current);
-            }
-        }
-
-        return fallbackEntries;
     }
 
     /// <summary>
@@ -320,16 +236,4 @@ public sealed class BlockEditorVarianceHandler
 
     private static bool VariesByCulture(BlockPropertyValue blockPropertyValue)
         => blockPropertyValue.Culture.IsNullOrWhiteSpace() is false;
-
-    private sealed class CultureSegmentEqualityComparer : IEqualityComparer<(string? Culture, string? Segment)>
-    {
-        public bool Equals((string? Culture, string? Segment) x, (string? Culture, string? Segment) y)
-            => StringComparer.OrdinalIgnoreCase.Equals(x.Culture, y.Culture)
-               && StringComparer.OrdinalIgnoreCase.Equals(x.Segment, y.Segment);
-
-        public int GetHashCode((string? Culture, string? Segment) obj)
-            => HashCode.Combine(
-                StringComparer.OrdinalIgnoreCase.GetHashCode(obj.Culture ?? string.Empty),
-                StringComparer.OrdinalIgnoreCase.GetHashCode(obj.Segment ?? string.Empty));
-    }
 }

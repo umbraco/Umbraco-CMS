@@ -25,6 +25,8 @@ public static class PublishedPropertyExtension
     /// <returns>The property value, or the fallback/default value if not found.</returns>
     public static object? Value(this IPublishedProperty property, IPublishedValueFallback publishedValueFallback, string? culture = null, string? segment = null, Fallback fallback = default, object? defaultValue = default)
     {
+        using var _ = publishedValueFallback.EnterFallbackScope(fallback);
+
         if (property.HasValue(culture, segment))
         {
             return property.GetValue(culture, segment);
@@ -52,6 +54,8 @@ public static class PublishedPropertyExtension
     /// <returns>The property value converted to the specified type, or the fallback/default value if not found.</returns>
     public static T? Value<T>(this IPublishedProperty property, IPublishedValueFallback publishedValueFallback, string? culture = null, string? segment = null, Fallback fallback = default, T? defaultValue = default)
     {
+        using var _ = publishedValueFallback.EnterFallbackScope(fallback);
+
         if (property.HasValue(culture, segment))
         {
             // we have a value

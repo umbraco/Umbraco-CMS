@@ -132,6 +132,8 @@ internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemMod
         var blockConfigMap = blockConfigurations.ToDictionary(bc => bc.ContentElementTypeKey);
         VariationContext variationContext = _variationContextAccessor.VariationContext ?? new VariationContext();
         IReadOnlyList<ILanguage> allLanguages = (await _languageService.GetAllAsync()).ToList();
+        var languagesByIsoCode = allLanguages.ToDictionary(l => l.IsoCode, StringComparer.OrdinalIgnoreCase);
+        var defaultIsoCode = await _languageService.GetDefaultIsoCodeAsync();
 
         // Convert the content data
         var contentPublishedElements = new Dictionary<Guid, IPublishedElement>();
@@ -150,16 +152,14 @@ internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemMod
 
             // if case changes have been made to the content or element type variation since the content was published,
             // we need to align those changes for the exposed blocks.
-            IEnumerable<BlockItemVariation> expose = await _blockEditorVarianceHandler.AlignedExposeVarianceAsync(converted.BlockValue, owner, element, allLanguages);
+            IEnumerable<BlockItemVariation> expose = await _blockEditorVarianceHandler.AlignedExposeVarianceAsync(converted.BlockValue, owner, element);
             var expectedBlockVariationCulture = owner.ContentType.VariesByCulture() && element.ContentType.VariesByCulture()
                 ? variationContext.Culture.NullOrWhiteSpaceAsNull()
                 : null;
             var expectedBlockVariationSegment = owner.ContentType.VariesBySegment() && element.ContentType.VariesBySegment()
                 ? variationContext.Segment.NullOrWhiteSpaceAsNull()
                 : null;
-            if (expose.Any(v =>
-                    v.ContentKey == element.Key && v.Culture == expectedBlockVariationCulture &&
-                    v.Segment == expectedBlockVariationSegment) is false)
+            if (BlockExposeFallbackHelper.IsBlockExposed(expose, element.Key, expectedBlockVariationCulture, expectedBlockVariationSegment, variationContext.Fallback, languagesByIsoCode, defaultIsoCode) is false)
             {
                 continue;
             }

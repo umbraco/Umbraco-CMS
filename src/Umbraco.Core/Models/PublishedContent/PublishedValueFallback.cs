@@ -392,5 +392,18 @@ public class PublishedValueFallback : IPublishedValueFallback
         }
     }
 
+    /// <inheritdoc />
+    public IDisposable? EnterFallbackScope(Fallback fallback)
+    {
+        VariationContext? current = _variationContextAccessor.VariationContext;
+        _variationContextAccessor.VariationContext = new VariationContext(current?.Culture, current?.Segment) { Fallback = fallback };
+        return new FallbackScope(_variationContextAccessor, current);
+    }
+
+    private sealed class FallbackScope(IVariationContextAccessor accessor, VariationContext? previous) : IDisposable
+    {
+        public void Dispose() => accessor.VariationContext = previous;
+    }
+
     private delegate T? TryGetValueForCultureAndSegment<out T>(string actualCulture, string? actualSegment);
 }

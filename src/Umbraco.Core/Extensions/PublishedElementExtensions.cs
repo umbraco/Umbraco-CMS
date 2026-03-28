@@ -186,7 +186,7 @@ public static class PublishedElementExtensions
         // if we have a property, and it has a value, return that value
         if (property != null && property.HasValue(culture, segment))
         {
-            return property.Value<T>(publishedValueFallback, culture, segment);
+            return property.Value<T>(publishedValueFallback, culture, segment, fallback);
         }
 
         // else let fallback try to get a value
@@ -197,7 +197,7 @@ public static class PublishedElementExtensions
 
         // else... if we have a property, at least let the converter return its own
         // vision of 'no value' (could be an empty enumerable) - otherwise, default
-        return property == null ? default : property.Value<T>(publishedValueFallback, culture, segment);
+        return property == null ? default : property.Value<T>(publishedValueFallback, culture, segment, fallback);
     }
 
     #endregion
