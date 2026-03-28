@@ -402,7 +402,18 @@ public class PublishedValueFallback : IPublishedValueFallback
 
     private sealed class FallbackScope(IVariationContextAccessor accessor, VariationContext? previous) : IDisposable
     {
-        public void Dispose() => accessor.VariationContext = previous;
+        private bool _disposed;
+
+        public void Dispose()
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            _disposed = true;
+            accessor.VariationContext = previous;
+        }
     }
 
     private delegate T? TryGetValueForCultureAndSegment<out T>(string actualCulture, string? actualSegment);
