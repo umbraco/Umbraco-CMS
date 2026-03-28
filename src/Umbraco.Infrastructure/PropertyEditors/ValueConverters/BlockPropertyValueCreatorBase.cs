@@ -159,6 +159,7 @@ internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemMod
             var expectedBlockVariationSegment = owner.ContentType.VariesBySegment() && element.ContentType.VariesBySegment()
                 ? variationContext.Segment.NullOrWhiteSpaceAsNull()
                 : null;
+
             if (BlockExposeFallbackHelper.IsBlockExposed(expose, element.Key, expectedBlockVariationCulture, expectedBlockVariationSegment, variationContext.Fallback, languagesByIsoCode, defaultIsoCode) is false)
             {
                 continue;
