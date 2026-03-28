@@ -160,9 +160,29 @@ internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemMod
                 ? variationContext.Segment.NullOrWhiteSpaceAsNull()
                 : null;
 
-            if (BlockExposeFallbackHelper.IsBlockExposed(expose, element.Key, expectedBlockVariationCulture, expectedBlockVariationSegment, variationContext.Fallback, languagesByIsoCode, defaultIsoCode) is false)
+            if (BlockExposeFallbackHelper.IsBlockExposed(expose, element.Key, expectedBlockVariationCulture, expectedBlockVariationSegment, variationContext.Fallback, languagesByIsoCode, defaultIsoCode, out var resolvedCulture) is false)
             {
                 continue;
+            }
+
+            // If the block was exposed via fallback to a different culture, recreate the element
+            // with that culture's variation context so its property values come from the resolved culture.
+            if (resolvedCulture is not null && string.Equals(resolvedCulture, expectedBlockVariationCulture, StringComparison.OrdinalIgnoreCase) is false)
+            {
+                VariationContext? originalContext = _variationContextAccessor.VariationContext;
+                try
+                {
+                    _variationContextAccessor.VariationContext = new VariationContext(resolvedCulture, originalContext?.Segment) { Fallback = originalContext?.Fallback ?? default };
+                    element = BlockEditorConverter.ConvertToElement(owner, data, referenceCacheLevel, preview);
+                    if (element is null)
+                    {
+                        continue;
+                    }
+                }
+                finally
+                {
+                    _variationContextAccessor.VariationContext = originalContext;
+                }
             }
 
             contentPublishedElements[element.Key] = element;

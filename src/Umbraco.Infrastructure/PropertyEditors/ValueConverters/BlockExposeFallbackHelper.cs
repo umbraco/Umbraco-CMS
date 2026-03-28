@@ -24,6 +24,9 @@ internal static class BlockExposeFallbackHelper
     /// <param name="fallback">The fallback policy from the current variation context.</param>
     /// <param name="languagesByIsoCode">All configured languages keyed by ISO code, used for walking fallback chains.</param>
     /// <param name="defaultIsoCode">The default language ISO code, used for <see cref="Fallback.DefaultLanguage"/> checks.</param>
+    /// <param name="resolvedCulture">When the method returns <c>true</c>, the culture the block is actually exposed for.
+    /// This equals <paramref name="expectedCulture"/> for direct matches, or the fallback culture that was resolved.
+    /// When the method returns <c>false</c>, this is <c>null</c>.</param>
     /// <returns><c>true</c> if the block is exposed for the expected culture/segment or reachable via the specified fallback policy; otherwise <c>false</c>.</returns>
     public static bool IsBlockExposed(
         IEnumerable<BlockItemVariation> expose,
@@ -32,19 +35,22 @@ internal static class BlockExposeFallbackHelper
         string? expectedSegment,
         Fallback fallback,
         Dictionary<string, ILanguage> languagesByIsoCode,
-        string defaultIsoCode)
+        string defaultIsoCode,
+        out string? resolvedCulture)
     {
         IList<BlockItemVariation> exposeList = expose as IList<BlockItemVariation> ?? expose.ToList();
 
         // Direct match check.
         if (IsExposedForCulture(exposeList, elementKey, expectedCulture, expectedSegment))
         {
+            resolvedCulture = expectedCulture;
             return true;
         }
 
         // Only apply language fallback for culture-variant blocks.
         if (expectedCulture is null)
         {
+            resolvedCulture = null;
             return false;
         }
 
@@ -54,8 +60,10 @@ internal static class BlockExposeFallbackHelper
             switch (policy)
             {
                 case Fallback.Language:
-                    if (IsExposedViaLanguageFallback(exposeList, elementKey, expectedCulture, expectedSegment, languagesByIsoCode))
+                    var languageFallbackCulture = FindLanguageFallbackCulture(exposeList, elementKey, expectedCulture, expectedSegment, languagesByIsoCode);
+                    if (languageFallbackCulture is not null)
                     {
+                        resolvedCulture = languageFallbackCulture;
                         return true;
                     }
 
@@ -63,6 +71,7 @@ internal static class BlockExposeFallbackHelper
                 case Fallback.DefaultLanguage:
                     if (IsExposedForCulture(exposeList, elementKey, defaultIsoCode, expectedSegment))
                     {
+                        resolvedCulture = defaultIsoCode;
                         return true;
                     }
 
@@ -70,6 +79,7 @@ internal static class BlockExposeFallbackHelper
             }
         }
 
+        resolvedCulture = null;
         return false;
     }
 
@@ -83,7 +93,11 @@ internal static class BlockExposeFallbackHelper
             string.Equals(v.Culture, culture, StringComparison.OrdinalIgnoreCase) &&
             v.Segment == segment);
 
-    private static bool IsExposedViaLanguageFallback(
+    /// <summary>
+    /// Walks the language fallback chain and returns the culture that the block is exposed for,
+    /// or <c>null</c> if no fallback culture has an expose entry.
+    /// </summary>
+    private static string? FindLanguageFallbackCulture(
         IList<BlockItemVariation> expose,
         Guid elementKey,
         string expectedCulture,
@@ -92,7 +106,7 @@ internal static class BlockExposeFallbackHelper
     {
         if (languagesByIsoCode.TryGetValue(expectedCulture, out ILanguage? language) is false)
         {
-            return false;
+            return null;
         }
 
         var visited = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -107,12 +121,12 @@ internal static class BlockExposeFallbackHelper
 
             if (IsExposedForCulture(expose, elementKey, current.FallbackIsoCode, expectedSegment))
             {
-                return true;
+                return current.FallbackIsoCode;
             }
 
             languagesByIsoCode.TryGetValue(current.FallbackIsoCode, out current);
         }
 
-        return false;
+        return null;
     }
 }

@@ -22,9 +22,10 @@ public class BlockExposeFallbackHelperTests
         var expose = CreateExpose(("nl-BE", null));
         var languages = BuildLanguageMap(CreateLanguage("nl-BE"));
 
-        var result = BlockExposeFallbackHelper.IsBlockExposed(expose, _elementKey, "nl-BE", null, default, languages, "en-US");
+        var result = BlockExposeFallbackHelper.IsBlockExposed(expose, _elementKey, "nl-BE", null, default, languages, "en-US", out var resolvedCulture);
 
         Assert.IsTrue(result);
+        Assert.AreEqual("nl-BE", resolvedCulture);
     }
 
     [Test]
@@ -35,9 +36,10 @@ public class BlockExposeFallbackHelperTests
             CreateLanguage("en-US"),
             CreateLanguage("nl-BE", fallbackIsoCode: "en-US"));
 
-        var result = BlockExposeFallbackHelper.IsBlockExposed(expose, _elementKey, "nl-BE", null, Fallback.ToLanguage, languages, "en-US");
+        var result = BlockExposeFallbackHelper.IsBlockExposed(expose, _elementKey, "nl-BE", null, Fallback.ToLanguage, languages, "en-US", out var resolvedCulture);
 
         Assert.IsTrue(result);
+        Assert.AreEqual("en-US", resolvedCulture);
     }
 
     [Test]
@@ -50,9 +52,27 @@ public class BlockExposeFallbackHelperTests
             CreateLanguage("fr-FR", fallbackIsoCode: "en-US"),
             CreateLanguage("nl-BE", fallbackIsoCode: "fr-FR"));
 
-        var result = BlockExposeFallbackHelper.IsBlockExposed(expose, _elementKey, "nl-BE", null, Fallback.ToLanguage, languages, "en-US");
+        var result = BlockExposeFallbackHelper.IsBlockExposed(expose, _elementKey, "nl-BE", null, Fallback.ToLanguage, languages, "en-US", out var resolvedCulture);
 
         Assert.IsTrue(result);
+        Assert.AreEqual("en-US", resolvedCulture);
+    }
+
+    [Test]
+    public void IsBlockExposed_Resolves_To_Nearest_Fallback_Culture()
+    {
+        // Block is exposed for fr-FR (the intermediate language).
+        var expose = CreateExpose(("fr-FR", null));
+        // nl-BE -> fr-FR -> en-US
+        var languages = BuildLanguageMap(
+            CreateLanguage("en-US"),
+            CreateLanguage("fr-FR", fallbackIsoCode: "en-US"),
+            CreateLanguage("nl-BE", fallbackIsoCode: "fr-FR"));
+
+        var result = BlockExposeFallbackHelper.IsBlockExposed(expose, _elementKey, "nl-BE", null, Fallback.ToLanguage, languages, "en-US", out var resolvedCulture);
+
+        Assert.IsTrue(result);
+        Assert.AreEqual("fr-FR", resolvedCulture);
     }
 
     [Test]
@@ -64,9 +84,10 @@ public class BlockExposeFallbackHelperTests
             CreateLanguage("nl-BE", fallbackIsoCode: "en-US"));
 
         // Default Fallback (None) — should NOT walk fallback chain.
-        var result = BlockExposeFallbackHelper.IsBlockExposed(expose, _elementKey, "nl-BE", null, default, languages, "en-US");
+        var result = BlockExposeFallbackHelper.IsBlockExposed(expose, _elementKey, "nl-BE", null, default, languages, "en-US", out var resolvedCulture);
 
         Assert.IsFalse(result);
+        Assert.IsNull(resolvedCulture);
     }
 
     [Test]
@@ -77,9 +98,10 @@ public class BlockExposeFallbackHelperTests
             CreateLanguage("en-US"),
             CreateLanguage("nl-BE"));
 
-        var result = BlockExposeFallbackHelper.IsBlockExposed(expose, _elementKey, "nl-BE", null, Fallback.ToDefaultLanguage, languages, "en-US");
+        var result = BlockExposeFallbackHelper.IsBlockExposed(expose, _elementKey, "nl-BE", null, Fallback.ToDefaultLanguage, languages, "en-US", out var resolvedCulture);
 
         Assert.IsTrue(result);
+        Assert.AreEqual("en-US", resolvedCulture);
     }
 
     [Test]
@@ -93,9 +115,10 @@ public class BlockExposeFallbackHelperTests
             CreateLanguage("nl-BE", fallbackIsoCode: "en-US"),
             CreateLanguage("de-DE"));
 
-        var result = BlockExposeFallbackHelper.IsBlockExposed(expose, _elementKey, "en-US", null, Fallback.ToLanguage, languages, "de-DE");
+        var result = BlockExposeFallbackHelper.IsBlockExposed(expose, _elementKey, "en-US", null, Fallback.ToLanguage, languages, "de-DE", out var resolvedCulture);
 
         Assert.IsFalse(result);
+        Assert.IsNull(resolvedCulture);
     }
 
     [Test]
@@ -105,9 +128,10 @@ public class BlockExposeFallbackHelperTests
         var languages = BuildLanguageMap(CreateLanguage("en-US"));
 
         // expectedCulture is null for invariant blocks — direct match should succeed.
-        var result = BlockExposeFallbackHelper.IsBlockExposed(expose, _elementKey, null, null, default, languages, "en-US");
+        var result = BlockExposeFallbackHelper.IsBlockExposed(expose, _elementKey, null, null, default, languages, "en-US", out var resolvedCulture);
 
         Assert.IsTrue(result);
+        Assert.IsNull(resolvedCulture);
     }
 
     [Test]
@@ -118,9 +142,10 @@ public class BlockExposeFallbackHelperTests
             CreateLanguage("en-US"),
             CreateLanguage("nl-BE", fallbackIsoCode: "en-US"));
 
-        var result = BlockExposeFallbackHelper.IsBlockExposed(expose, _elementKey, "nl-BE", "my-segment", Fallback.ToLanguage, languages, "en-US");
+        var result = BlockExposeFallbackHelper.IsBlockExposed(expose, _elementKey, "nl-BE", "my-segment", Fallback.ToLanguage, languages, "en-US", out var resolvedCulture);
 
         Assert.IsTrue(result);
+        Assert.AreEqual("en-US", resolvedCulture);
     }
 
     [Test]
@@ -131,9 +156,10 @@ public class BlockExposeFallbackHelperTests
             CreateLanguage("en-US"),
             CreateLanguage("nl-BE", fallbackIsoCode: "en-US"));
 
-        var result = BlockExposeFallbackHelper.IsBlockExposed(expose, _elementKey, "nl-BE", "segment-b", Fallback.ToLanguage, languages, "en-US");
+        var result = BlockExposeFallbackHelper.IsBlockExposed(expose, _elementKey, "nl-BE", "segment-b", Fallback.ToLanguage, languages, "en-US", out var resolvedCulture);
 
         Assert.IsFalse(result);
+        Assert.IsNull(resolvedCulture);
     }
 
     [Test]
@@ -146,9 +172,10 @@ public class BlockExposeFallbackHelperTests
             CreateLanguage("en-US"),
             CreateLanguage("nl-BE"));
 
-        var result = BlockExposeFallbackHelper.IsBlockExposed(expose, _elementKey, "nl-BE", null, Fallback.ToLanguage, languages, "en-US");
+        var result = BlockExposeFallbackHelper.IsBlockExposed(expose, _elementKey, "nl-BE", null, Fallback.ToLanguage, languages, "en-US", out var resolvedCulture);
 
         Assert.IsFalse(result);
+        Assert.IsNull(resolvedCulture);
     }
 
     private static List<BlockItemVariation> CreateExpose(params (string? Culture, string? Segment)[] entries)
