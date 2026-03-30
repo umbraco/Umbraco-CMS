@@ -222,7 +222,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
             _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Document);
         return dtos
             .Select(x => CreateContentNodeKit(x, serializer, preview))
-            .Where(x => x is not null)!;
+            .OfType<ContentCacheNode>();
     }
 
     private IEnumerable<ContentSourceDto> GetContentSourceByDocumentTypeKey(IEnumerable<Guid> documentTypeKeys, Guid objectType)
