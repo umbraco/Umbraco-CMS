@@ -1,6 +1,6 @@
 ---
 name: general-create-repository
-description: Create or extend a repository for an entity in the Umbraco backoffice. Covers detail (CRUD), item (batch lookup), collection (paginated list), and action-specific (publish, duplicate, move, etc.) repositories. Use when the user says "create a repository", "add a data source", "add a duplicate action", "add publishing", or when a feature needs to fetch or post data. Each repository type has its own template — pick the right one based on the operation.
+description: Create or extend a repository in the Umbraco backoffice. Covers detail (CRUD), item (batch lookup), collection (paginated list), and action-specific (publish, duplicate, move, etc.) repositories. Use when the user says "create a repository", "add a data source", or when a feature needs to fetch or post data. Each repository type has its own template — pick the right one based on the operation.
 allowed-tools: Read, Write, Edit, Grep, Glob
 ---
 
