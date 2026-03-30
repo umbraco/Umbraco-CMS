@@ -36,6 +36,7 @@ internal sealed partial class UserServiceCrudTests
             LanguageIsoCode = user.Language,
             ContentStartNodeKeys = GetKeysFromIds(user.StartContentIds, UmbracoObjectTypes.Document),
             MediaStartNodeKeys = GetKeysFromIds(user.StartMediaIds, UmbracoObjectTypes.Media),
+            ElementStartNodeKeys = GetKeysFromIds(user.StartElementIds, UmbracoObjectTypes.ElementContainer),
             UserGroupKeys = groups.Select(x=>x.Key).ToHashSet(),
         };
     }
@@ -263,14 +264,19 @@ internal sealed partial class UserServiceCrudTests
     {
         var contentService = GetRequiredService<IContentService>();
         var mediaService = GetRequiredService<IMediaService>();
+        var elementContainerService = GetRequiredService<IElementContainerService>();
         var contentStartNode = contentService.GetRootContent().First();
         var mediaStartNode = mediaService.CreateMediaWithIdentity("test", -1, "Image");
+        var elementContainerResult = await elementContainerService.CreateAsync(null, "TestElementFolder", null, Constants.Security.SuperUserKey);
+        Assert.IsTrue(elementContainerResult.Success);
+        var elementContainer = elementContainerResult.Result!;
 
         var userService = CreateUserService(securitySettings: new SecuritySettings { UsernameIsEmail = false });
 
         var (updateModel, createdUser) = await CreateUserForUpdate(userService);
         updateModel.ContentStartNodeKeys = new HashSet<Guid> { contentStartNode.Key };
         updateModel.MediaStartNodeKeys = new HashSet<Guid> { mediaStartNode.Key };
+        updateModel.ElementStartNodeKeys = new HashSet<Guid> { elementContainer.Key };
 
         var result = await userService.UpdateAsync(Constants.Security.SuperUserKey, updateModel);
 
@@ -284,19 +290,25 @@ internal sealed partial class UserServiceCrudTests
         Assert.IsNotNull(updatedUser.StartMediaIds);
         Assert.AreEqual(1, updatedUser.StartMediaIds.Length);
         Assert.AreEqual(mediaStartNode.Id, updatedUser.StartMediaIds.First());
+        Assert.IsNotNull(updatedUser.StartElementIds);
+        Assert.AreEqual(1, updatedUser.StartElementIds.Length);
+        Assert.AreEqual(elementContainer.Id, updatedUser.StartElementIds.First());
     }
 
-    [TestCase(false, false)]
-    [TestCase(false, true)]
-    [TestCase(true, false)]
-    [TestCase(true, true)]
-    public async Task Can_Assign_Root_As_User_Start_Node(bool contentRootAccess, bool mediaRootAccess)
+    [TestCase(false, false, false)]
+    [TestCase(false, true, false)]
+    [TestCase(true, false, false)]
+    [TestCase(true, true, false)]
+    [TestCase(false, false, true)]
+    [TestCase(true, true, true)]
+    public async Task Can_Assign_Root_As_User_Start_Node(bool contentRootAccess, bool mediaRootAccess, bool elementRootAccess)
     {
         var userService = CreateUserService(securitySettings: new SecuritySettings { UsernameIsEmail = false });
 
         var (updateModel, createdUser) = await CreateUserForUpdate(userService);
         updateModel.HasContentRootAccess = contentRootAccess;
         updateModel.HasMediaRootAccess = mediaRootAccess;
+        updateModel.HasElementRootAccess = elementRootAccess;
 
         var result = await userService.UpdateAsync(Constants.Security.SuperUserKey, updateModel);
 
@@ -325,6 +337,17 @@ internal sealed partial class UserServiceCrudTests
         {
             Assert.IsEmpty(updatedUser.StartMediaIds);
         }
+
+        Assert.IsNotNull(updatedUser.StartElementIds);
+        if (elementRootAccess)
+        {
+            Assert.AreEqual(1, updatedUser.StartElementIds.Length);
+            Assert.AreEqual(Constants.System.Root, updatedUser.StartElementIds.First());
+        }
+        else
+        {
+            Assert.IsEmpty(updatedUser.StartElementIds);
+        }
     }
 
     // todo Ideally we would test content and media separately and together (Introduce Testcases for switching permutations)
@@ -333,14 +356,19 @@ internal sealed partial class UserServiceCrudTests
     {
         var contentService = GetRequiredService<IContentService>();
         var mediaService = GetRequiredService<IMediaService>();
+        var elementContainerService = GetRequiredService<IElementContainerService>();
         var contentStartNode = contentService.GetRootContent().First();
         var mediaStartNode = mediaService.CreateMediaWithIdentity("test", -1, "Image");
+        var elementContainerResult = await elementContainerService.CreateAsync(null, "TestElementFolder", null, Constants.Security.SuperUserKey);
+        Assert.IsTrue(elementContainerResult.Success);
+        var elementContainer = elementContainerResult.Result!;
 
         var userService = CreateUserService(securitySettings: new SecuritySettings { UsernameIsEmail = false });
 
         var (updateModel, createdUser) = await CreateUserForUpdate(userService);
         updateModel.ContentStartNodeKeys = new HashSet<Guid> { contentStartNode.Key };
         updateModel.MediaStartNodeKeys = new HashSet<Guid> { mediaStartNode.Key };
+        updateModel.ElementStartNodeKeys = new HashSet<Guid> { elementContainer.Key };
 
         await userService.UpdateAsync(Constants.Security.SuperUserKey, updateModel);
 
@@ -348,10 +376,12 @@ internal sealed partial class UserServiceCrudTests
         Assert.IsNotNull(updatedUser);
         Assert.IsNotEmpty(updatedUser.StartContentIds!);
         Assert.IsNotEmpty(updatedUser.StartMediaIds!);
+        Assert.IsNotEmpty(updatedUser.StartElementIds!);
 
         updateModel = await MapUserToUpdateModel(updatedUser);
         updateModel.ContentStartNodeKeys = new HashSet<Guid>();
         updateModel.MediaStartNodeKeys = new HashSet<Guid>();
+        updateModel.ElementStartNodeKeys = new HashSet<Guid>();
 
         var result = await userService.UpdateAsync(Constants.Security.SuperUserKey, updateModel);
 
@@ -364,6 +394,9 @@ internal sealed partial class UserServiceCrudTests
 
         Assert.IsNotNull(updatedUser.StartMediaIds);
         Assert.IsEmpty(updatedUser.StartMediaIds);
+
+        Assert.IsNotNull(updatedUser.StartElementIds);
+        Assert.IsEmpty(updatedUser.StartElementIds);
     }
 
     // todo Ideally we would test content and media separately and together (Introduce Testcases for switching permutations)
@@ -375,16 +408,19 @@ internal sealed partial class UserServiceCrudTests
         var (updateModel, createdUser) = await CreateUserForUpdate(userService);
         updateModel.HasContentRootAccess = true;
         updateModel.HasMediaRootAccess = true;
+        updateModel.HasElementRootAccess = true;
 
         await userService.UpdateAsync(Constants.Security.SuperUserKey, updateModel);
         var updatedUser = await userService.GetAsync(createdUser.Key);
         Assert.IsNotNull(updatedUser);
         Assert.IsNotEmpty(updatedUser.StartContentIds!);
         Assert.IsNotEmpty(updatedUser.StartMediaIds!);
+        Assert.IsNotEmpty(updatedUser.StartElementIds!);
 
         updateModel = await MapUserToUpdateModel(updatedUser);
         updateModel.HasContentRootAccess = false;
         updateModel.HasMediaRootAccess = false;
+        updateModel.HasElementRootAccess = false;
 
         var result = await userService.UpdateAsync(Constants.Security.SuperUserKey, updateModel);
 
@@ -397,6 +433,9 @@ internal sealed partial class UserServiceCrudTests
 
         Assert.IsNotNull(updatedUser.StartMediaIds);
         Assert.IsEmpty(updatedUser.StartMediaIds);
+
+        Assert.IsNotNull(updatedUser.StartElementIds);
+        Assert.IsEmpty(updatedUser.StartElementIds);
     }
 
     [TestCase(false, false)]
