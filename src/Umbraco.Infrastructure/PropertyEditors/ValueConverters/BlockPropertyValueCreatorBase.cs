@@ -18,6 +18,7 @@ internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemMod
     where TBlockValue : BlockValue<TBlockLayoutItem>, new()
 {
     private readonly IVariationContextAccessor _variationContextAccessor;
+    private readonly IPropertyRenderingContextAccessor _propertyRenderingContextAccessor;
     private readonly BlockEditorVarianceHandler _blockEditorVarianceHandler;
     private readonly ILanguageService _languageService;
 
@@ -63,10 +64,11 @@ internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemMod
     /// <returns></returns>
     protected delegate TBlockItemModel? EnrichBlockItemModelFromConfiguration(TBlockItemModel item, TBlockLayoutItem layoutItem, TBlockConfiguration configuration, CreateBlockItemModelFromLayout blockItemModelCreator);
 
-    protected BlockPropertyValueCreatorBase(BlockEditorConverter blockEditorConverter, IVariationContextAccessor variationContextAccessor, BlockEditorVarianceHandler blockEditorVarianceHandler, ILanguageService languageService)
+    protected BlockPropertyValueCreatorBase(BlockEditorConverter blockEditorConverter, IVariationContextAccessor variationContextAccessor, IPropertyRenderingContextAccessor propertyRenderingContextAccessor, BlockEditorVarianceHandler blockEditorVarianceHandler, ILanguageService languageService)
     {
         BlockEditorConverter = blockEditorConverter;
         _variationContextAccessor = variationContextAccessor;
+        _propertyRenderingContextAccessor = propertyRenderingContextAccessor;
         _blockEditorVarianceHandler = blockEditorVarianceHandler;
         _languageService = languageService;
     }
@@ -160,7 +162,8 @@ internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemMod
                 ? variationContext.Segment.NullOrWhiteSpaceAsNull()
                 : null;
 
-            if (BlockExposeFallbackHelper.IsBlockExposed(expose, element.Key, expectedBlockVariationCulture, expectedBlockVariationSegment, variationContext.Fallback, languagesByIsoCode, defaultIsoCode, out var resolvedCulture) is false)
+            Fallback fallback = _propertyRenderingContextAccessor.PropertyRenderingContext?.Fallback ?? default;
+            if (BlockExposeFallbackHelper.IsBlockExposed(expose, element.Key, expectedBlockVariationCulture, expectedBlockVariationSegment, fallback, languagesByIsoCode, defaultIsoCode, out var resolvedCulture) is false)
             {
                 continue;
             }
@@ -172,7 +175,7 @@ internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemMod
                 VariationContext? originalContext = _variationContextAccessor.VariationContext;
                 try
                 {
-                    _variationContextAccessor.VariationContext = new VariationContext(resolvedCulture, originalContext?.Segment) { Fallback = originalContext?.Fallback ?? default };
+                    _variationContextAccessor.VariationContext = new VariationContext(resolvedCulture, originalContext?.Segment);
                     element = BlockEditorConverter.ConvertToElement(owner, data, referenceCacheLevel, preview);
                     if (element is null)
                     {

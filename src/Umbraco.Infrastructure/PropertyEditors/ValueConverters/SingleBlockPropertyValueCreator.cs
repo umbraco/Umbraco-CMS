@@ -23,11 +23,12 @@ internal sealed class SingleBlockPropertyValueCreator : BlockPropertyValueCreato
     public SingleBlockPropertyValueCreator(
         BlockEditorConverter blockEditorConverter,
         IVariationContextAccessor variationContextAccessor,
+        IPropertyRenderingContextAccessor propertyRenderingContextAccessor,
         BlockEditorVarianceHandler blockEditorVarianceHandler,
         IJsonSerializer jsonSerializer,
         BlockListPropertyValueConstructorCache constructorCache,
         ILanguageService languageService)
-        : base(blockEditorConverter, variationContextAccessor, blockEditorVarianceHandler, languageService)
+        : base(blockEditorConverter, variationContextAccessor, propertyRenderingContextAccessor, blockEditorVarianceHandler, languageService)
     {
         _jsonSerializer = jsonSerializer;
         _constructorCache = constructorCache;

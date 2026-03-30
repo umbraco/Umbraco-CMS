@@ -34,7 +34,8 @@ public class BlockListPropertyValueConverterTests : BlockPropertyValueConverterT
             new BlockListPropertyValueConstructorCache(),
             Mock.Of<IVariationContextAccessor>(),
             blockVarianceHandler,
-            Mock.Of<ILanguageService>());
+            Mock.Of<ILanguageService>(),
+            Mock.Of<IPropertyRenderingContextAccessor>());
         return editor;
     }
 

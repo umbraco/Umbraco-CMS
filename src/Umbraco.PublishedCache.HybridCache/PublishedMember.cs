@@ -14,8 +14,9 @@ internal sealed class PublishedMember : PublishedContent, IPublishedMember
         IMember member,
         ContentNode contentNode,
         IElementsCache elementsCache,
-        IVariationContextAccessor variationContextAccessor)
-        : base(contentNode, false, elementsCache, variationContextAccessor) =>
+        IVariationContextAccessor variationContextAccessor,
+        IPropertyRenderingContextAccessor propertyRenderingContextAccessor)
+        : base(contentNode, false, elementsCache, variationContextAccessor, propertyRenderingContextAccessor) =>
         _member = member;
 
     public string Email => _member.Email;

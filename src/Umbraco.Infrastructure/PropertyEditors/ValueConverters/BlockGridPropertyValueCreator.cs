@@ -23,11 +23,12 @@ internal sealed class BlockGridPropertyValueCreator : BlockPropertyValueCreatorB
     public BlockGridPropertyValueCreator(
         BlockEditorConverter blockEditorConverter,
         IVariationContextAccessor variationContextAccessor,
+        IPropertyRenderingContextAccessor propertyRenderingContextAccessor,
         BlockEditorVarianceHandler blockEditorVarianceHandler,
         IJsonSerializer jsonSerializer,
         BlockGridPropertyValueConstructorCache constructorCache,
         ILanguageService languageService)
-        : base(blockEditorConverter, variationContextAccessor, blockEditorVarianceHandler, languageService)
+        : base(blockEditorConverter, variationContextAccessor, propertyRenderingContextAccessor, blockEditorVarianceHandler, languageService)
     {
         _jsonSerializer = jsonSerializer;
         _constructorCache = constructorCache;

@@ -196,7 +196,8 @@ public class BlockGridPropertyValueConverterTests : BlockPropertyValueConverterT
             new BlockGridPropertyValueConstructorCache(),
             Mock.Of<IVariationContextAccessor>(),
             blockVarianceHandler,
-            Mock.Of<ILanguageService>());
+            Mock.Of<ILanguageService>(),
+            Mock.Of<IPropertyRenderingContextAccessor>());
         return editor;
     }
 

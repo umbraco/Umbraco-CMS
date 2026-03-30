@@ -25,11 +25,6 @@ public class VariationContext
     public string Segment { get; }
 
     /// <summary>
-    ///     Gets the fallback policy for property value resolution.
-    /// </summary>
-    public Fallback Fallback { get; init; }
-
-    /// <summary>
     ///     Gets the segment for the content item.
     /// </summary>
     /// <param name="contentId">The content Id.</param>

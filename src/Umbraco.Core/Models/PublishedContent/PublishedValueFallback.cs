@@ -13,14 +13,28 @@ public class PublishedValueFallback : IPublishedValueFallback
 {
     private readonly ILocalizationService? _localizationService;
     private readonly IVariationContextAccessor _variationContextAccessor;
+    private readonly IPropertyRenderingContextAccessor _propertyRenderingContextAccessor;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="PublishedValueFallback" /> class.
     /// </summary>
-    public PublishedValueFallback(ServiceContext serviceContext, IVariationContextAccessor variationContextAccessor)
+    /// <param name="serviceContext">The service context.</param>
+    /// <param name="variationContextAccessor">The variation context accessor.</param>
+    /// <param name="propertyRenderingContextAccessor">The property rendering context accessor.</param>
+    public PublishedValueFallback(ServiceContext serviceContext, IVariationContextAccessor variationContextAccessor, IPropertyRenderingContextAccessor propertyRenderingContextAccessor)
     {
         _localizationService = serviceContext.LocalizationService;
         _variationContextAccessor = variationContextAccessor;
+        _propertyRenderingContextAccessor = propertyRenderingContextAccessor;
+    }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="PublishedValueFallback" /> class.
+    /// </summary>
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
+    public PublishedValueFallback(ServiceContext serviceContext, IVariationContextAccessor variationContextAccessor)
+        : this(serviceContext, variationContextAccessor, StaticServiceProvider.Instance.GetRequiredService<IPropertyRenderingContextAccessor>())
+    {
     }
 
     /// <inheritdoc />
@@ -395,12 +409,18 @@ public class PublishedValueFallback : IPublishedValueFallback
     /// <inheritdoc />
     public IDisposable? EnterFallbackScope(Fallback fallback)
     {
-        VariationContext? current = _variationContextAccessor.VariationContext;
-        _variationContextAccessor.VariationContext = new VariationContext(current?.Culture, current?.Segment) { Fallback = fallback };
-        return new FallbackScope(_variationContextAccessor, current);
+        // Short-circuit when no fallback policies are specified to avoid unnecessary allocations.
+        if (fallback.HasPolicies is false)
+        {
+            return null;
+        }
+
+        PropertyRenderingContext? current = _propertyRenderingContextAccessor.PropertyRenderingContext;
+        _propertyRenderingContextAccessor.PropertyRenderingContext = new PropertyRenderingContext(fallback);
+        return new FallbackScope(_propertyRenderingContextAccessor, current);
     }
 
-    private sealed class FallbackScope(IVariationContextAccessor accessor, VariationContext? previous) : IDisposable
+    private sealed class FallbackScope(IPropertyRenderingContextAccessor accessor, PropertyRenderingContext? previous) : IDisposable
     {
         private bool _disposed;
 
@@ -412,7 +432,7 @@ public class PublishedValueFallback : IPublishedValueFallback
             }
 
             _disposed = true;
-            accessor.VariationContext = previous;
+            accessor.PropertyRenderingContext = previous;
         }
     }
 

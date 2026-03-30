@@ -165,7 +165,7 @@ internal sealed class PublishedProperty : PublishedPropertyBase
 
         // Include the fallback policy in the cache key so that different fallback strategies
         // produce separate cached values (e.g., block editors filter differently with Fallback.ToLanguage).
-        Fallback fallback = _content.VariationContextAccessor.VariationContext?.Fallback ?? default;
+        Fallback fallback = _content.PropertyRenderingContextAccessor.PropertyRenderingContext?.Fallback ?? default;
         CacheValue cacheValues = GetCacheValues(PropertyType.CacheLevel).For(culture, segment, fallback);
 
         // initial reference cache level always is .Content

@@ -15,6 +15,11 @@ public struct Fallback : IEnumerable<int>
     private readonly int[] _values;
 
     /// <summary>
+    /// Gets a value indicating whether any fallback policies are specified.
+    /// </summary>
+    public bool HasPolicies => _values is { Length: > 0 };
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="Fallback" /> struct with values.
     /// </summary>
     /// <param name="values">The values.</param>
