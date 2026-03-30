@@ -13,8 +13,8 @@ A repository is a **domain-specific, feature-scoped** data access layer. It prov
 **Key principles:**
 
 - **Feature-scoped** — A repository lives with the feature that uses it, both in naming and file location. A publishing repository lives inside the publishing feature folder, not in a generic repository folder.
-- **Extension-registered** — Repositories are registered as `type: 'repository'` extensions. Any extension (including third-party packages) can provide its own repository implementation.
-- **Data source delegation** — The repository orchestrates but doesn't call APIs directly. It delegates to a data source that handles mapping between server types and domain models.
+- **Extension-registered** — Repositories are registered as `type: 'repository'` extensions with lazy-loaded `api` imports. Any extension can override a repository by registering the same alias with a higher weight.
+- **Data source delegation** — The repository orchestrates but doesn't call APIs directly. It delegates to a data source that handles mapping between server types and domain models. See [Data Flow](./Data-Flow.md) for the full delegation pattern.
 - **One concern per repository** — A detail repository handles CRUD. A publishing repository handles publish/unpublish. Don't mix concerns.
 
 ---
@@ -148,75 +148,6 @@ Repositories live **with their feature**, not in a separate data-access layer. T
 
 ---
 
-## How Repositories Fit in the Extension System
-
-Every repository is registered as an extension manifest:
-
-```typescript
-{
-    type: 'repository',
-    alias: 'Umb.Repository.Webhook.Detail',
-    name: 'Webhook Detail Repository',
-    api: () => import('./webhook-detail.repository.js'),
-}
-```
-
-This means:
-- **Lazy-loaded** — code is only loaded when the repository is first consumed
-- **Replaceable** — any extension can override a repository by registering the same alias with a higher weight
-- **Discoverable** — the workspace context finds its repository by alias, not by direct import
-
-The workspace context typically consumes a repository via its alias:
-
-```typescript
-// In the workspace context constructor
-super(host, {
-    detailRepositoryAlias: UMB_WEBHOOK_DETAIL_REPOSITORY_ALIAS,
-    // ...
-});
-```
-
----
-
-## Repository ↔ Data Source Relationship
-
-Every repository delegates to a **data source**. The data source is the only layer that knows about server API types.
-
-```
-Repository                          Data Source
-─────────────────                   ─────────────────
-orchestrates lifecycle              calls generated API client
-manages store caching               maps server types ↔ domain models
-returns { data, error } tuples      uses tryExecute() for all API calls
-provides observable streams         knows nothing about stores or caching
-```
-
-**Standard repositories** receive the data source as a constructor parameter (constructor injection of the class itself, not an instance):
-
-```typescript
-export class UmbWebhookDetailRepository extends UmbDetailRepositoryBase<UmbWebhookDetailModel> {
-    constructor(host: UmbControllerHost) {
-        super(host, UmbWebhookDetailServerDataSource, UMB_WEBHOOK_DETAIL_STORE_CONTEXT);
-    }
-}
-```
-
-**Action-specific repositories** instantiate their data source directly:
-
-```typescript
-export class UmbDuplicateDocumentRepository extends UmbRepositoryBase {
-    #duplicateSource = new UmbDuplicateDocumentServerDataSource(this);
-
-    async requestDuplicate(args: UmbDuplicateDocumentRequestArgs) {
-        const { error } = await this.#duplicateSource.duplicate(args);
-        // handle success notification...
-        return { error };
-    }
-}
-```
-
----
-
 ## When to Create Which Repository Type
 
 | Scenario | Repository type | Base class |
@@ -250,8 +181,5 @@ Study these when implementing repositories:
 
 1. **Repositories live with their feature** — colocated in the feature's directory, not in a shared `repositories/` folder
 2. **One concern per repository** — detail CRUD, publishing, duplication, and tree navigation are separate repositories
-3. **Always delegate to a data source** — repositories never call generated API services directly
-4. **Export `default` and `as api`** — enables lazy-loading via `api: () => import(...)`
-5. **Register as extensions** — every repository needs a manifest with `type: 'repository'`
-6. **Use base classes when they exist** — only create custom repositories for operations without a base class
-7. **Return `{ data, error }` tuples** — never throw from async data operations (see [Data Flow](./Data-Flow.md#tryexecute))
+3. **Use base classes when they exist** — only create custom repositories for operations without a base class
+4. **Always delegate to a data source** — see [Data Flow](./Data-Flow.md) for the delegation pattern, `tryExecute`, and `{ data, error }` tuple conventions

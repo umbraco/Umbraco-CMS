@@ -28,12 +28,7 @@ Read these before creating a repository — they define the conventions this ski
 
 ## Choosing the right type
 
-| Need | Type | Base class |
-|------|------|-----------|
-| Create, read, update, delete a single entity | **Detail** | `UmbDetailRepositoryBase<T>` |
-| Fetch display info for a list of known IDs | **Item** | `UmbItemRepositoryBase<T>` |
-| Paginated/filtered listing of entities | **Collection** | `UmbRepositoryBase` implementing `UmbCollectionRepository` |
-| Domain action (publish, duplicate, move, sort, etc.) | **Action-specific** | `UmbRepositoryBase` or `UmbControllerBase` |
+See [Repositories — When to Create Which](../../../docs/Repositories.md#when-to-create-which-repository-type) for the decision matrix.
 
 ---
 
@@ -96,7 +91,7 @@ export default Umb{EntityName}DetailStore;
 
 File: `{entity}-detail.server.data-source.ts`
 
-The data source is the only layer that knows about server API types. It maps in both directions — server → domain on reads, domain → server on writes. See [Data Flow — Data Source](../../../docs/Data-Flow.md#2-data-source) for the full pattern.
+The data source maps between server API types and domain models. See [Data Flow](../../../docs/Data-Flow.md) for context on how this fits in the chain.
 
 ```typescript
 import type { Umb{EntityName}DetailModel } from '../../types.js';
@@ -608,13 +603,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 
 ---
 
-## Reference: existing repositories to study
+## Reference examples
 
-| Pattern | Path | What it shows |
-|---------|------|---------------|
-| Simple detail + item | `src/packages/webhook/webhook/repository/` | Minimal CRUD entity |
-| Full entity | `src/packages/documents/documents/` | Detail + item + tree + collection + actions |
-| Action (duplicate) | `src/packages/documents/documents/entity-actions/duplicate/repository/` | Single-action with notification |
-| Action (publishing) | `src/packages/documents/documents/publishing/repository/` | Multi-method domain repository |
-| Action (read/write) | `src/packages/documents/documents/entity-actions/culture-and-hostnames/repository/` | Custom read + update |
-| Data type package | `src/packages/data-type/` | Detail + item + tree + collection |
+See [Repositories — Reference Examples](../../../docs/Repositories.md#reference-examples) for real implementations to study.
