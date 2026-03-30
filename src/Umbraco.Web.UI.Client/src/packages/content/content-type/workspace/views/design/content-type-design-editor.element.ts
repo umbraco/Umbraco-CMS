@@ -508,7 +508,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		return html`
 			<umb-body-layout header-fit-height>
 				<div id="header" slot="header">
-					<div id="container-list">${this.renderTabsNavigation()} ${this.#renderAddButton()}</div>
+					<div id="container-list">${this.renderTabsNavigation()}</div>
 					${this.#renderActions()}
 				</div>
 				<umb-router-slot
@@ -598,6 +598,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 						(tab) => this.renderTab(tab),
 					)}
 				</uui-tab-group>
+				${this.#renderAddButton()}
 			</div>
 			${this._showScrollRight && !this._sortModeActive
 				? html`<uui-button id="scroll-right" compact @click=${this.#scrollTabsRight} label="Scroll right"
@@ -861,6 +862,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 
 			#add-tab {
 				flex-shrink: 0;
+				border-left: 1px solid var(--uui-color-border);
 			}
 		`,
 	];
