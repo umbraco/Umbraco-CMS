@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
+using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
 using Umbraco.Cms.Core.Services;
@@ -7,11 +7,23 @@ namespace Umbraco.Cms.Api.Management.Factories;
 
 internal sealed class DocumentTypeEditingPresentationFactory : ContentTypeEditingPresentationFactory<IContentType>, IDocumentTypeEditingPresentationFactory
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DocumentTypeEditingPresentationFactory"/> class, using the specified content type service.
+    /// </summary>
+    /// <param name="contentTypeService">The service used to manage and retrieve content types.</param>
     public DocumentTypeEditingPresentationFactory(IContentTypeService contentTypeService)
         : base(contentTypeService)
     {
     }
 
+    /// <summary>
+    /// Maps the data from a <see cref="CreateDocumentTypeRequestModel"/> to a new <see cref="ContentTypeCreateModel"/> instance.
+    /// This includes transferring basic properties, allowed templates, default template, list view, allowed content types, compositions, and container information.
+    /// </summary>
+    /// <param name="requestModel">The request model containing the document type creation data to be mapped.</param>
+    /// <returns>
+    /// A <see cref="ContentTypeCreateModel"/> populated with the corresponding data from the <paramref name="requestModel"/>.
+    /// </returns>
     public ContentTypeCreateModel MapCreateModel(CreateDocumentTypeRequestModel requestModel)
     {
         ContentTypeCreateModel createModel = MapContentTypeEditingModel<
@@ -37,6 +49,11 @@ internal sealed class DocumentTypeEditingPresentationFactory : ContentTypeEditin
         return createModel;
     }
 
+    /// <summary>
+    /// Maps the given <see cref="UpdateDocumentTypeRequestModel"/> to a <see cref="ContentTypeUpdateModel"/>.
+    /// </summary>
+    /// <param name="requestModel">The update request model containing document type data to map.</param>
+    /// <returns>A <see cref="ContentTypeUpdateModel"/> representing the updated document type.</returns>
     public ContentTypeUpdateModel MapUpdateModel(UpdateDocumentTypeRequestModel requestModel)
     {
         ContentTypeUpdateModel updateModel = MapContentTypeEditingModel<

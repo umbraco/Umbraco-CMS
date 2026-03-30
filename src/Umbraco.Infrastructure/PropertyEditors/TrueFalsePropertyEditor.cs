@@ -1,6 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System.Text.Json.Nodes;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
@@ -17,7 +18,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     Constants.PropertyEditors.Aliases.Boolean,
     ValueType = ValueTypes.Integer,
     ValueEditorIsReusable = true)]
-public class TrueFalsePropertyEditor : DataEditor
+public class TrueFalsePropertyEditor : DataEditor, IValueSchemaProvider
 {
     /// <summary>
     ///     Initializes a new instance of the <see cref="TrueFalsePropertyEditor" /> class.
@@ -25,6 +26,17 @@ public class TrueFalsePropertyEditor : DataEditor
     public TrueFalsePropertyEditor(IDataValueEditorFactory dataValueEditorFactory)
         : base(dataValueEditorFactory)
         => SupportsReadOnly = true;
+
+    /// <inheritdoc />
+    public Type? GetValueType(object? configuration) => typeof(bool);
+
+    /// <inheritdoc />
+    public JsonObject? GetValueSchema(object? configuration) => new()
+    {
+        ["$schema"] = "https://json-schema.org/draft/2020-12/schema",
+        ["type"] = "boolean",
+        ["description"] = "Boolean value (true or false)",
+    };
 
     /// <inheritdoc />
     protected override IDataValueEditor CreateValueEditor()

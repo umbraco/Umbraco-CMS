@@ -20,6 +20,9 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Document.Tree;
 
+/// <summary>
+/// Serves as the base controller for document tree management in the Umbraco CMS API, providing shared functionality for document tree operations.
+/// </summary>
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Tree}/{Constants.UdiEntityType.Document}")]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Document))]
 [Authorize(Policy = AuthorizationPolicies.SectionAccessForContentTree)]
@@ -30,27 +33,6 @@ public abstract class DocumentTreeControllerBase : UserStartNodeTreeControllerBa
     private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
     private readonly IDocumentPresentationFactory _documentPresentationFactory;
     private readonly IDocumentPermissionFilterService _documentPermissionFilterService;
-
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
-    protected DocumentTreeControllerBase(
-        IEntityService entityService,
-        IUserStartNodeEntitiesService userStartNodeEntitiesService,
-        IDataTypeService dataTypeService,
-        IPublicAccessService publicAccessService,
-        AppCaches appCaches,
-        IBackOfficeSecurityAccessor backofficeSecurityAccessor,
-        IDocumentPresentationFactory documentPresentationFactory)
-        : this(
-              entityService,
-              StaticServiceProvider.Instance.GetRequiredService<FlagProviderCollection>(),
-              userStartNodeEntitiesService,
-              dataTypeService,
-              publicAccessService,
-              appCaches,
-              backofficeSecurityAccessor,
-              documentPresentationFactory)
-    {
-    }
 
     [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
     protected DocumentTreeControllerBase(

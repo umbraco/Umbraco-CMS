@@ -65,40 +65,6 @@ public class DefaultUrlProvider : IUrlProvider
         requestSettings.OnChange(x => _requestSettings = x);
     }
 
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="DefaultUrlProvider"/> class.
-    /// </summary>
-    /// <param name="requestSettings">The request handler settings.</param>
-    /// <param name="logger">The logger.</param>
-    /// <param name="siteDomainMapper">The site domain mapper.</param>
-    /// <param name="umbracoContextAccessor">The Umbraco context accessor.</param>
-    /// <param name="uriUtility">The URI utility.</param>
-    /// <param name="localizationService">The localization service.</param>
-    /// <param name="navigationQueryService">The document navigation query service.</param>
-    /// <param name="publishedContentStatusFilteringService">The published content status filtering service.</param>
-    [Obsolete("Use the other constructor - Scheduled for removal in Umbraco 18.")]
-    public DefaultUrlProvider(
-        IOptionsMonitor<RequestHandlerSettings> requestSettings,
-        ILogger<DefaultUrlProvider> logger,
-        ISiteDomainMapper siteDomainMapper,
-        IUmbracoContextAccessor umbracoContextAccessor,
-        UriUtility uriUtility,
-        ILocalizationService localizationService,
-        IDocumentNavigationQueryService navigationQueryService,
-        IPublishedContentStatusFilteringService publishedContentStatusFilteringService)
-    : this(
-        requestSettings,
-        logger,
-        siteDomainMapper,
-        umbracoContextAccessor,
-        uriUtility,
-        localizationService,
-        navigationQueryService,
-        publishedContentStatusFilteringService,
-        StaticServiceProvider.Instance.GetRequiredService<IPublishedUrlProvider>())
-    {
-    }
-
     /// <inheritdoc />
     public string Alias => $"{Constants.UrlProviders.Content}Legacy";
 

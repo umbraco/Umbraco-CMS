@@ -189,7 +189,7 @@ public class DataValueReferenceFactoryCollectionTests
         var result = collection.GetAllAutomaticRelationTypesAliases(propertyEditors).ToArray();
 
         var expected = Constants.Conventions.RelationTypes.AutomaticRelationTypes;
-        CollectionAssert.AreEquivalent(expected, result, "Result does not contain the expected relation type aliases.");
+        Assert.That(result, Is.EquivalentTo(expected), "Result does not contain the expected relation type aliases.");
     }
 
     [Test]
@@ -204,7 +204,7 @@ public class DataValueReferenceFactoryCollectionTests
         var result = collection.GetAllAutomaticRelationTypesAliases(propertyEditors).ToArray();
 
         var expected = Constants.Conventions.RelationTypes.AutomaticRelationTypes.Append("umbTest");
-        CollectionAssert.AreEquivalent(expected, result, "Result does not contain the expected relation type aliases.");
+        Assert.That(result, Is.EquivalentTo(expected), "Result does not contain the expected relation type aliases.");
     }
 
     private class TestDataValueReferenceFactory : IDataValueReferenceFactory

@@ -11,6 +11,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Mappers;
 [MapperFor(typeof(ITemplate))]
 public sealed class TemplateMapper : BaseMapper
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="TemplateMapper"/> class.
+    /// </summary>
+    /// <param name="sqlContext">The lazy-loaded <see cref="ISqlContext"/> used for database operations.</param>
+    /// <param name="maps">The <see cref="MapperConfigurationStore"/> containing mapper configurations.</param>
     public TemplateMapper(Lazy<ISqlContext> sqlContext, MapperConfigurationStore maps)
         : base(sqlContext, maps)
     {

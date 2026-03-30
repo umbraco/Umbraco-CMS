@@ -133,27 +133,25 @@ public static partial class Constants
         /// </summary>
         public static class EventType
         {
-            // TODO (V18): Convert these statics to consts to comply with SA1401.
-
             /// <summary>
             ///     The event type for entity creation events.
             /// </summary>
-            public static string Created = "Created";
+            public const string Created = "Created";
 
             /// <summary>
             ///     The event type for entity update events.
             /// </summary>
-            public static string Updated = "Updated";
+            public const string Updated = "Updated";
 
             /// <summary>
             ///     The event type for entity deletion events.
             /// </summary>
-            public static string Deleted = "Deleted";
+            public const string Deleted = "Deleted";
 
             /// <summary>
             ///     The event type for entity trashed events.
             /// </summary>
-            public static string Trashed = "Trashed";
+            public const string Trashed = "Trashed";
         }
     }
 }

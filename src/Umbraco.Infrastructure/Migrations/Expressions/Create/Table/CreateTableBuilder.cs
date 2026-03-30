@@ -6,18 +6,33 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.Table;
 
+/// <summary>
+/// Provides a fluent builder for defining and creating database tables as part of a migration.
+/// </summary>
 public class CreateTableBuilder : ExpressionBuilderBase<CreateTableExpression, ICreateTableColumnOptionBuilder>,
     ICreateTableColumnAsTypeBuilder,
     ICreateTableColumnOptionForeignKeyCascadeBuilder
 {
     private readonly IMigrationContext _context;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CreateTableBuilder"/> class.
+    /// </summary>
+    /// <param name="context">The migration context used for the table creation operation. (<see cref="IMigrationContext"/>)</param>
+    /// <param name="expression">The expression that defines the table to be created. (<see cref="CreateTableExpression"/>)</param>
     public CreateTableBuilder(IMigrationContext context, CreateTableExpression expression)
         : base(expression) =>
         _context = context;
 
+    /// <summary>
+    /// Gets or sets the <see cref="ColumnDefinition"/> instance representing the column currently being configured in the table creation process.
+    /// </summary>
     public ColumnDefinition CurrentColumn { get; set; } = null!;
 
+    /// <summary>
+    /// Gets or sets the definition of the foreign key currently being configured
+    /// during the table creation process.
+    /// </summary>
     public ForeignKeyDefinition CurrentForeignKey { get; set; } = null!;
 
     /// <inheritdoc />
@@ -44,6 +59,11 @@ public class CreateTableBuilder : ExpressionBuilderBase<CreateTableExpression, I
         return this;
     }
 
+    /// <summary>
+    /// Specifies a default value for the current column being defined.
+    /// </summary>
+    /// <param name="value">The default value to set for the column.</param>
+    /// <returns>An <see cref="ICreateTableColumnOptionBuilder"/> for further column configuration.</returns>
     public ICreateTableColumnOptionBuilder WithDefaultValue(object value)
     {
         CurrentColumn.DefaultValue = value;
@@ -261,5 +281,7 @@ public class CreateTableBuilder : ExpressionBuilderBase<CreateTableExpression, I
         return this;
     }
 
+    /// <summary>Gets the column definition for the current column type.</summary>
+    /// <returns>The <see cref="Umbraco.Cms.Infrastructure.Migrations.Expressions.ColumnDefinition"/> representing the current column.</returns>
     public override ColumnDefinition GetColumnForType() => CurrentColumn;
 }

@@ -15,6 +15,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Document;
 
+/// <summary>
+/// Provides API endpoints for managing domains associated with documents.
+/// </summary>
 [ApiVersion("1.0")]
 public class DomainsController : DocumentControllerBase
 {
@@ -23,6 +26,11 @@ public class DomainsController : DocumentControllerBase
     private readonly IUmbracoMapper _umbracoMapper;
 
     [ActivatorUtilitiesConstructor]
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Controllers.Document.DomainsController"/> class.
+    /// </summary>
+    /// <param name="domainService">Service used to manage domain-related operations.</param>
+    /// <param name="umbracoMapper">The mapper used to map Umbraco objects to API models.</param>
     public DomainsController(IAuthorizationService authorizationService, IDomainService domainService, IUmbracoMapper umbracoMapper)
     {
         _authorizationService = authorizationService;
@@ -30,14 +38,14 @@ public class DomainsController : DocumentControllerBase
         _umbracoMapper = umbracoMapper;
     }
 
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
-    public DomainsController(IDomainService domainService, IUmbracoMapper umbracoMapper)
-        : this(
-            StaticServiceProvider.Instance.GetRequiredService<IAuthorizationService>(),
-            domainService,
-            umbracoMapper)
-    {
-    }
+    /// <summary>
+    /// Retrieves the list of domains and their associated culture settings assigned to the specified document.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="id">The unique identifier (GUID) of the document for which to retrieve domain assignments.</param>
+    /// <returns>
+    /// An <see cref="IActionResult"/> containing a <see cref="DomainsResponseModel"/> with the assigned domains and culture settings, or a <see cref="ProblemDetails"/> if the document is not found.
+    /// </returns>
 
     [MapToApiVersion("1.0")]
     [HttpGet("{id:guid}/domains")]

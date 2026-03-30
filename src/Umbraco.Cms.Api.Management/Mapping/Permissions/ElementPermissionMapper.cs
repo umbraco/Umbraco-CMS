@@ -23,6 +23,8 @@ public class ElementPermissionMapper : IPermissionPresentationMapper, IPermissio
     /// <summary>
     /// Initializes a new instance of the <see cref="ElementPermissionMapper"/> class.
     /// </summary>
+    /// <param name="entityService">Lazy-loaded service for interacting with entities.</param>
+    /// <param name="userService">Lazy-loaded service for interacting with users and their permissions.</param>
     public ElementPermissionMapper(Lazy<IEntityService> entityService, Lazy<IUserService> userService)
     {
         _entityService = entityService;

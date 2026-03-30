@@ -25,34 +25,14 @@ internal interface IDatabaseCacheRepository
     /// </summary>
     /// <param name="key">The document key.</param>
     /// <returns>A tuple containing the draft and published cache nodes (either may be null).</returns>
-    // TODO (V18): Remove the default implementation on this method.
-    async Task<(ContentCacheNode? Draft, ContentCacheNode? Published)> GetContentSourceForPublishStatesAsync(Guid key)
-    {
-        ContentCacheNode? draftNode = await GetContentSourceAsync(key, preview: true);
-        ContentCacheNode? publishedNode = await GetContentSourceAsync(key, preview: false);
-        return (draftNode, publishedNode);
-    }
+    Task<(ContentCacheNode? Draft, ContentCacheNode? Published)> GetContentSourceForPublishStatesAsync(Guid key);
 
     /// <summary>
     /// Gets a collection of cache nodes for a collection of document keys.
     /// </summary>
     /// <param name="keys">The document keys.</param>
     /// <param name="preview">A flag indicating whether to get the draft (preview) version or the published version.</param>
-    // TODO (V18): Remove the default implementation on this method.
-    async Task<IEnumerable<ContentCacheNode>> GetContentSourcesAsync(IEnumerable<Guid> keys, bool preview = false)
-    {
-        var contentCacheNodes = new List<ContentCacheNode>();
-        foreach (Guid key in keys)
-        {
-            ContentCacheNode? contentSource = await GetContentSourceAsync(key, preview);
-            if (contentSource is not null)
-            {
-                contentCacheNodes.Add(contentSource);
-            }
-        }
-
-        return contentCacheNodes;
-    }
+    Task<IEnumerable<ContentCacheNode>> GetContentSourcesAsync(IEnumerable<Guid> keys, bool preview = false);
 
     /// <summary>
     /// Gets a single cache node for a media key.
@@ -62,21 +42,7 @@ internal interface IDatabaseCacheRepository
     /// <summary>
     /// Gets a collection of cache nodes for a collection of media keys.
     /// </summary>
-    // TODO (V18): Remove the default implementation on this method.
-    async Task<IEnumerable<ContentCacheNode>> GetMediaSourcesAsync(IEnumerable<Guid> keys)
-    {
-        var contentCacheNodes = new List<ContentCacheNode>();
-        foreach (Guid key in keys)
-        {
-            ContentCacheNode? contentSource = await GetMediaSourceAsync(key);
-            if (contentSource is not null)
-            {
-                contentCacheNodes.Add(contentSource);
-            }
-        }
-
-        return contentCacheNodes;
-    }
+    Task<IEnumerable<ContentCacheNode>> GetMediaSourcesAsync(IEnumerable<Guid> keys);
 
     /// <summary>
     /// Gets a collection of cache nodes for a collection of content type keys and entity type.
@@ -96,10 +62,7 @@ internal interface IDatabaseCacheRepository
     /// </summary>
     /// <param name="contentTypeKeys">The document type keys to find content for.</param>
     /// <returns>Tuples of content key and whether the cache entry is a draft.</returns>
-    // TODO (V18): Remove the default implementation on this method.
-    IEnumerable<(Guid Key, bool IsDraft)> GetDocumentKeysWithPublishedStatus(IEnumerable<Guid> contentTypeKeys)
-        => GetContentByContentTypeKey(contentTypeKeys, ContentCacheDataSerializerEntityType.Document)
-            .Select(x => (x.Key, x.IsDraft));
+    IEnumerable<(Guid Key, bool IsDraft)> GetDocumentKeysWithPublishedStatus(IEnumerable<Guid> contentTypeKeys);
 
     /// <summary>
     /// Gets all media content keys for specific media types.
@@ -107,10 +70,7 @@ internal interface IDatabaseCacheRepository
     /// </summary>
     /// <param name="mediaTypeKeys">The media type keys to find media for.</param>
     /// <returns>The keys of all media items using the specified media types.</returns>
-    // TODO (V18): Remove the default implementation on this method.
-    IEnumerable<Guid> GetMediaKeysByContentTypeKeys(IEnumerable<Guid> mediaTypeKeys)
-        => GetContentByContentTypeKey(mediaTypeKeys, ContentCacheDataSerializerEntityType.Media)
-            .Select(x => x.Key);
+    IEnumerable<Guid> GetMediaKeysByContentTypeKeys(IEnumerable<Guid> mediaTypeKeys);
 
     /// <summary>
     /// Refreshes the cache for the given document cache node.

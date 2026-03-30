@@ -110,7 +110,7 @@ internal sealed class PublicAccessRepositoryTest : UmbracoIntegrationTest
             Assert.IsTrue(found[0].HasIdentity);
             Assert.AreNotEqual(default(DateTime), found[0].CreateDate);
             Assert.AreNotEqual(default(DateTime), found[0].UpdateDate);
-            CollectionAssert.AreEquivalent(found[0].Rules, entry.Rules);
+            Assert.That(entry.Rules, Is.EquivalentTo(found[0].Rules));
             Assert.AreNotEqual(default(DateTime), found[0].Rules.First().CreateDate);
             Assert.AreNotEqual(default(DateTime), found[0].Rules.First().UpdateDate);
             Assert.IsTrue(found[0].Rules.First().HasIdentity);

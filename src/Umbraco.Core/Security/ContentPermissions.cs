@@ -103,66 +103,6 @@ public class ContentPermissions
     /// </summary>
     /// <param name="nodeId"></param>
     /// <param name="user"></param>
-    /// <param name="entity">The <see cref="IUmbracoEntity" /> item resolved if one was found for the id</param>
-    /// <param name="permissionsToCheck"></param>
-    /// <returns></returns>
-    [Obsolete($"Please use {nameof(IContentPermissionService)} instead. Scheduled for removal in Umbraco 18.")]
-    public ContentAccess CheckPermissions(
-        int nodeId,
-        IUser user,
-        out IUmbracoEntity? entity,
-        IReadOnlySet<string>? permissionsToCheck = null)
-    {
-        if (user == null)
-        {
-            throw new ArgumentNullException(nameof(user));
-        }
-
-        bool hasPathAccess;
-        entity = null;
-
-        if (nodeId == Constants.System.Root)
-        {
-            hasPathAccess = user.HasContentRootAccess(_entityService, _appCaches);
-        }
-        else if (nodeId == Constants.System.RecycleBinContent)
-        {
-            hasPathAccess = user.HasContentBinAccess(_entityService, _appCaches);
-        }
-        else
-        {
-            entity = _entityService.Get(nodeId, UmbracoObjectTypes.Document);
-
-            if (entity == null)
-            {
-                return ContentAccess.NotFound;
-            }
-
-            hasPathAccess = user.HasContentPathAccess(entity, _entityService, _appCaches);
-        }
-
-        if (hasPathAccess == false)
-        {
-            return ContentAccess.Denied;
-        }
-
-        if (permissionsToCheck == null || permissionsToCheck.Count == 0)
-        {
-            return ContentAccess.Granted;
-        }
-
-        // get the implicit/inherited permissions for the user for this path
-        // if there is no entity for this id, then just use the id as the path (i.e. -1 or -20)
-        return CheckPermissionsPath(entity?.Path ?? nodeId.ToString(CultureInfo.InvariantCulture), user, permissionsToCheck)
-            ? ContentAccess.Granted
-            : ContentAccess.Denied;
-    }
-
-    /// <summary>
-    ///     Checks if the user has access to the specified node and permissions set
-    /// </summary>
-    /// <param name="nodeId"></param>
-    /// <param name="user"></param>
     /// <param name="contentItem">The <see cref="IContent" /> item resolved if one was found for the id</param>
     /// <param name="permissionsToCheck"></param>
     /// <returns></returns>

@@ -527,7 +527,10 @@ export default {
 		confirmremoveusageof: 'Tem a certeza que quer remover o uso de <strong>%0%</strong>',
 		confirmlogout: 'Tem a certeza?',
 		confirmSure: 'Tem a certeza?',
+		cannotTrashWhenReferenced: (name: string) => `<strong>${name}</strong> não pode ser movido para a Reciclagem porque é referenciado por outros itens.`,
 		confirmTrash: (name: string) => `Tem a certeza que quer mover <strong>${name}</strong> para a Reciclagem?`,
+		cannotBulkTrashWhenReferenced: (total: number) =>
+			`Os <strong>${total} ${total === 1 ? 'item selecionado' : 'itens selecionados'}</strong> não podem ser movidos para a Reciclagem porque pelo menos um item é referenciado por outro conteúdo.`,
 		confirmBulkTrash: (total: number) =>
 			`Tem a certeza que quer mover <strong>${total} ${total === 1 ? 'item' : 'itens'}</strong> para a Reciclagem?`,
 		confirmBulkDelete: (total: number) =>
@@ -2000,7 +2003,7 @@ export default {
 		},
 		changePassword: 'Altere a sua palavra-passe',
 		changePhoto: 'Alterar foto',
-		configureMfa: 'Configurar MFA',
+		configureMfa: 'Configurar 2FA',
 		emailRequired: 'Obrigatório - introduza um endereço de email para este utilizador',
 		emailDescription: (usernameIsEmail: boolean) => {
 			return usernameIsEmail

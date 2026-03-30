@@ -8,11 +8,18 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.LogViewer.SavedSearch;
 
+/// <summary>
+/// Controller for deleting saved search entries in the Log Viewer.
+/// </summary>
 [ApiVersion("1.0")]
 public class DeleteSavedSearchLogViewerController : SavedSearchLogViewerControllerBase
 {
     private readonly ILogViewerService _logViewerService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DeleteSavedSearchLogViewerController"/> class, which handles requests to delete saved log viewer searches.
+    /// </summary>
+    /// <param name="logViewerService">The service used to manage log viewer operations.</param>
     public DeleteSavedSearchLogViewerController(ILogViewerService logViewerService) => _logViewerService = logViewerService;
 
     /// <summary>

@@ -18,11 +18,6 @@ public class ElementTreeChangeDistributedCacheNotificationHandler : TreeChangeDi
         => _distributedCache = distributedCache;
 
     /// <inheritdoc />
-    [Obsolete("Scheduled for removal in Umbraco 18.")]
-    protected override void Handle(IEnumerable<TreeChange<IElement>> entities)
-        => Handle(entities, new Dictionary<string, object?>());
-
-    /// <inheritdoc />
     protected override void Handle(IEnumerable<TreeChange<IElement>> entities, IDictionary<string, object?> state)
         => _distributedCache.RefreshElementCache(entities);
 }

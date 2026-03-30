@@ -4,7 +4,6 @@ using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Exceptions;
-using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Querying;
@@ -68,124 +67,6 @@ namespace Umbraco.Cms.Core.Services.Implement
             _userIdKeyResolver = StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>();
         }
 
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="DataTypeService" /> class.
-        /// </summary>
-        /// <param name="provider">The core scope provider.</param>
-        /// <param name="loggerFactory">The logger factory.</param>
-        /// <param name="eventMessagesFactory">The event messages factory.</param>
-        /// <param name="dataTypeRepository">The data type repository.</param>
-        /// <param name="auditRepository">The audit repository (obsolete).</param>
-        /// <param name="contentTypeRepository">The content type repository.</param>
-        /// <param name="mediaTypeRepository">The media type repository.</param>
-        /// <param name="memberTypeRepository">The member type repository.</param>
-        /// <param name="idKeyMap">The ID key map.</param>
-        [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 18.")]
-        public DataTypeService(
-            ICoreScopeProvider provider,
-            ILoggerFactory loggerFactory,
-            IEventMessagesFactory eventMessagesFactory,
-            IDataTypeRepository dataTypeRepository,
-            IAuditRepository auditRepository,
-            IContentTypeRepository contentTypeRepository,
-            IMediaTypeRepository mediaTypeRepository,
-            IMemberTypeRepository memberTypeRepository,
-            Lazy<IIdKeyMap> idKeyMap)
-            : this(
-                provider,
-                loggerFactory,
-                eventMessagesFactory,
-                dataTypeRepository,
-                StaticServiceProvider.Instance.GetRequiredService<IAuditService>(),
-                contentTypeRepository,
-                mediaTypeRepository,
-                memberTypeRepository,
-                idKeyMap)
-        {
-        }
-
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="DataTypeService" /> class.
-        /// </summary>
-        /// <param name="provider">The core scope provider.</param>
-        /// <param name="loggerFactory">The logger factory.</param>
-        /// <param name="eventMessagesFactory">The event messages factory.</param>
-        /// <param name="dataTypeRepository">The data type repository.</param>
-        /// <param name="dataValueEditorFactory">The data value editor factory (obsolete).</param>
-        /// <param name="auditRepository">The audit repository (obsolete).</param>
-        /// <param name="contentTypeRepository">The content type repository.</param>
-        /// <param name="mediaTypeRepository">The media type repository.</param>
-        /// <param name="memberTypeRepository">The member type repository.</param>
-        /// <param name="ioHelper">The IO helper (obsolete).</param>
-        /// <param name="idKeyMap">The ID key map.</param>
-        [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 18.")]
-        public DataTypeService(
-            ICoreScopeProvider provider,
-            ILoggerFactory loggerFactory,
-            IEventMessagesFactory eventMessagesFactory,
-            IDataTypeRepository dataTypeRepository,
-            IDataValueEditorFactory dataValueEditorFactory,
-            IAuditRepository auditRepository,
-            IContentTypeRepository contentTypeRepository,
-            IMediaTypeRepository mediaTypeRepository,
-            IMemberTypeRepository memberTypeRepository,
-            IIOHelper ioHelper,
-            Lazy<IIdKeyMap> idKeyMap)
-            : this(
-                provider,
-                loggerFactory,
-                eventMessagesFactory,
-                dataTypeRepository,
-                StaticServiceProvider.Instance.GetRequiredService<IAuditService>(),
-                contentTypeRepository,
-                mediaTypeRepository,
-                memberTypeRepository,
-                idKeyMap)
-        {
-        }
-
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="DataTypeService" /> class.
-        /// </summary>
-        /// <param name="provider">The core scope provider.</param>
-        /// <param name="loggerFactory">The logger factory.</param>
-        /// <param name="eventMessagesFactory">The event messages factory.</param>
-        /// <param name="dataTypeRepository">The data type repository.</param>
-        /// <param name="dataValueEditorFactory">The data value editor factory (obsolete).</param>
-        /// <param name="auditRepository">The audit repository (obsolete).</param>
-        /// <param name="auditService">The audit service.</param>
-        /// <param name="contentTypeRepository">The content type repository.</param>
-        /// <param name="mediaTypeRepository">The media type repository.</param>
-        /// <param name="memberTypeRepository">The member type repository.</param>
-        /// <param name="ioHelper">The IO helper (obsolete).</param>
-        /// <param name="idKeyMap">The ID key map.</param>
-        [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 18.")]
-        public DataTypeService(
-            ICoreScopeProvider provider,
-            ILoggerFactory loggerFactory,
-            IEventMessagesFactory eventMessagesFactory,
-            IDataTypeRepository dataTypeRepository,
-            IDataValueEditorFactory dataValueEditorFactory,
-            IAuditRepository auditRepository,
-            IAuditService auditService,
-            IContentTypeRepository contentTypeRepository,
-            IMediaTypeRepository mediaTypeRepository,
-            IMemberTypeRepository memberTypeRepository,
-            IIOHelper ioHelper,
-            Lazy<IIdKeyMap> idKeyMap)
-            : this(
-                provider,
-                loggerFactory,
-                eventMessagesFactory,
-                dataTypeRepository,
-                auditService,
-                contentTypeRepository,
-                mediaTypeRepository,
-                memberTypeRepository,
-                idKeyMap)
-        {
-        }
-
         #region Containers
 
         /// <summary>
@@ -236,15 +117,6 @@ namespace Umbraco.Cms.Core.Services.Implement
         }
 
         /// <summary>
-        ///     Gets a container by its unique key.
-        /// </summary>
-        /// <param name="containerId">The container unique key.</param>
-        /// <returns>The container, or null if not found.</returns>
-        [Obsolete($"Please use {nameof(IDataTypeContainerService)} for all data type container operations. Scheduled for removal in Umbraco 18.")]
-        public EntityContainer? GetContainer(Guid containerId)
-            => _dataTypeContainerService.GetAsync(containerId).GetAwaiter().GetResult();
-
-        /// <summary>
         ///     Gets containers by name and level.
         /// </summary>
         /// <param name="name">The container name.</param>
@@ -289,120 +161,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             return _dataTypeContainerRepository.GetMany(containerIds);
         }
 
-        /// <summary>
-        ///     Saves a container.
-        /// </summary>
-        /// <param name="container">The container to save.</param>
-        /// <param name="userId">The ID of the user performing the action.</param>
-        /// <returns>An operation result indicating success or failure.</returns>
-        [Obsolete($"Please use {nameof(IDataTypeContainerService)} for all data type container operations. Scheduled for removal in Umbraco 18.")]
-        public Attempt<OperationResult?> SaveContainer(EntityContainer container, int userId = Constants.Security.SuperUserId)
-        {
-            EventMessages evtMsgs = EventMessagesFactory.Get();
-            using (ScopeProvider.CreateCoreScope(autoComplete: true))
-            {
-                var isNew = container.Id == 0;
-                Guid? parentKey = isNew && container.ParentId > 0 ? _dataTypeContainerRepository.Get(container.ParentId)?.Key : null;
-                Guid currentUserKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult();
-
-                Attempt<EntityContainer?, EntityContainerOperationStatus> result = isNew
-                    ? _dataTypeContainerService.CreateAsync(container.Key, container.Name.IfNullOrWhiteSpace(string.Empty), parentKey, currentUserKey).GetAwaiter().GetResult()
-                    : _dataTypeContainerService.UpdateAsync(container.Key, container.Name.IfNullOrWhiteSpace(string.Empty), currentUserKey).GetAwaiter().GetResult();
-
-                // mimic old service behavior
-                return result.Status switch
-                {
-                    EntityContainerOperationStatus.Success => OperationResult.Attempt.Succeed(evtMsgs),
-                    EntityContainerOperationStatus.CancelledByNotification => OperationResult.Attempt.Cancel(evtMsgs),
-                    EntityContainerOperationStatus.ParentNotFound => OperationResult.Attempt.Fail(evtMsgs, new InvalidOperationException("Cannot save a container with a modified parent, move the container instead.")),
-                    EntityContainerOperationStatus.InvalidObjectType => OperationResult.Attempt.Fail(evtMsgs, new InvalidOperationException("Not a " + Constants.ObjectTypes.DataType + " container.")),
-                    _ => OperationResult.Attempt.Fail(evtMsgs, new InvalidOperationException($"Invalid operation status: {result.Status}"))
-                };
-            }
-        }
-
-        /// <summary>
-        ///     Deletes a container.
-        /// </summary>
-        /// <param name="containerId">The ID of the container to delete.</param>
-        /// <param name="userId">The ID of the user performing the action.</param>
-        /// <returns>An operation result indicating success or failure.</returns>
-        [Obsolete($"Please use {nameof(IDataTypeContainerService)} for all data type container operations. Scheduled for removal in Umbraco 18.")]
-        public Attempt<OperationResult?> DeleteContainer(int containerId, int userId = Constants.Security.SuperUserId)
-        {
-            EventMessages evtMsgs = EventMessagesFactory.Get();
-            using (ScopeProvider.CreateCoreScope(autoComplete: true))
-            {
-                EntityContainer? container = _dataTypeContainerRepository.Get(containerId);
-                if (container == null)
-                {
-                    return OperationResult.Attempt.NoOperation(evtMsgs);
-                }
-
-                Guid currentUserKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult();
-                Attempt<EntityContainer?, EntityContainerOperationStatus> result = _dataTypeContainerService.DeleteAsync(container.Key, currentUserKey).GetAwaiter().GetResult();
-                // mimic old service behavior
-                return result.Status switch
-                {
-                    EntityContainerOperationStatus.Success => OperationResult.Attempt.Succeed(evtMsgs),
-                    EntityContainerOperationStatus.NotEmpty => Attempt.Fail(new OperationResult(OperationResultType.FailedCannot, evtMsgs)),
-                    EntityContainerOperationStatus.CancelledByNotification => Attempt.Fail(new OperationResult(OperationResultType.FailedCancelledByEvent, evtMsgs)),
-                    _ => OperationResult.Attempt.Fail(evtMsgs, new InvalidOperationException($"Invalid operation status: {result.Status}"))
-                };
-            }
-        }
-
-        /// <summary>
-        ///     Renames a container.
-        /// </summary>
-        /// <param name="id">The ID of the container to rename.</param>
-        /// <param name="name">The new name for the container.</param>
-        /// <param name="userId">The ID of the user performing the action.</param>
-        /// <returns>An operation result containing the renamed container.</returns>
-        [Obsolete($"Please use {nameof(IDataTypeContainerService)} for all data type container operations. Scheduled for removal in Umbraco 18.")]
-        public Attempt<OperationResult<OperationResultType, EntityContainer>?> RenameContainer(int id, string name, int userId = Constants.Security.SuperUserId)
-        {
-            EventMessages evtMsgs = EventMessagesFactory.Get();
-            using (ScopeProvider.CreateCoreScope(autoComplete: true))
-            {
-                try
-                {
-                    EntityContainer? container = _dataTypeContainerRepository.Get(id);
-
-                    //throw if null, this will be caught by the catch and a failed returned
-                    if (container == null)
-                    {
-                        throw new InvalidOperationException("No container found with id " + id);
-                    }
-
-                    container.Name = name;
-                    Guid currentUserKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult();
-                    Attempt<EntityContainer?, EntityContainerOperationStatus> result = _dataTypeContainerService.UpdateAsync(container.Key, container.Name, currentUserKey).GetAwaiter().GetResult();
-                    // mimic old service behavior
-                    return result.Status switch
-                    {
-                        EntityContainerOperationStatus.Success => OperationResult.Attempt.Succeed(OperationResultType.Success, evtMsgs, result.Result ?? throw new NullReferenceException("Container update operation succeeded but the result was null")),
-                        EntityContainerOperationStatus.CancelledByNotification => OperationResult.Attempt.Cancel(evtMsgs, container),
-                        _ => OperationResult.Attempt.Fail<EntityContainer>(evtMsgs, new InvalidOperationException($"Invalid operation status: {result.Status}"))
-                    };
-                }
-                catch (Exception ex)
-                {
-                    return OperationResult.Attempt.Fail<EntityContainer>(evtMsgs, ex);
-                }
-            }
-        }
-
         #endregion
-
-        /// <summary>
-        /// Gets a <see cref="IDataType"/> by its Name
-        /// </summary>
-        /// <param name="name">Name of the <see cref="IDataType"/></param>
-        /// <returns><see cref="IDataType"/></returns>
-        [Obsolete("Please use GetAsync. Scheduled for removal in Umbraco 18.")]
-        public IDataType? GetDataType(string name)
-            => GetAsync(name).GetAwaiter().GetResult();
 
         /// <inheritdoc />
         public Task<IDataType?> GetAsync(string name)
@@ -530,35 +289,6 @@ namespace Umbraco.Cms.Core.Services.Implement
         }
 
         /// <inheritdoc />
-        public Attempt<OperationResult<MoveOperationStatusType>?> Move(IDataType toMove, int parentId)
-        {
-            Guid? containerKey = null;
-            if (parentId > 0)
-            {
-                // mimic obsolete Copy method behavior
-                EntityContainer? container = GetContainer(parentId);
-                if (container is null)
-                {
-                    throw new DataOperationException<MoveOperationStatusType>(MoveOperationStatusType.FailedParentNotFound);
-                }
-
-                containerKey = container.Key;
-            }
-
-            Attempt<IDataType, DataTypeOperationStatus> result = MoveAsync(toMove, containerKey, Constants.Security.SuperUserKey).GetAwaiter().GetResult();
-
-            // mimic old service behavior
-            EventMessages evtMsgs = EventMessagesFactory.Get();
-            return result.Status switch
-            {
-                DataTypeOperationStatus.Success => OperationResult.Attempt.Succeed(MoveOperationStatusType.Success, evtMsgs),
-                DataTypeOperationStatus.CancelledByNotification => OperationResult.Attempt.Fail(MoveOperationStatusType.FailedCancelledByEvent, evtMsgs),
-                DataTypeOperationStatus.ParentNotFound => OperationResult.Attempt.Fail(MoveOperationStatusType.FailedParentNotFound, evtMsgs),
-                _ => OperationResult.Attempt.Fail<MoveOperationStatusType>(MoveOperationStatusType.FailedNotAllowedByPath, evtMsgs, new InvalidOperationException($"Invalid operation status: {result.Status}")),
-            };
-        }
-
-        /// <inheritdoc />
         public async Task<Attempt<IDataType, DataTypeOperationStatus>> MoveAsync(IDataType toMove, Guid? containerKey, Guid userKey)
         {
             EventMessages eventMessages = EventMessagesFactory.Get();
@@ -601,16 +331,6 @@ namespace Umbraco.Cms.Core.Services.Implement
 
             return Attempt.SucceedWithStatus(DataTypeOperationStatus.Success, toMove);
         }
-
-        /// <summary>
-        ///     Copies a data type to a container.
-        /// </summary>
-        /// <param name="copying">The data type to copy.</param>
-        /// <param name="containerId">The target container ID.</param>
-        /// <returns>An operation result containing the copied data type.</returns>
-        [Obsolete("Use the method which specifies the userId parameter")]
-        public Attempt<OperationResult<MoveOperationStatusType, IDataType>?> Copy(IDataType copying, int containerId)
-            => Copy(copying, containerId, Constants.Security.SuperUserId);
 
         /// <summary>
         ///     Copies a data type to a container.

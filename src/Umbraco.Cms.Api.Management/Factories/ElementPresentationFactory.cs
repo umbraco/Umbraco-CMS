@@ -13,17 +13,26 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Api.Management.Factories;
 
 // TODO ELEMENTS: lots of code here was duplicated from DocumentPresentationFactory - abstract and refactor
+/// <summary>
+/// Factory for creating element presentation models from domain models.
+/// </summary>
 public class ElementPresentationFactory : IElementPresentationFactory
 {
     private readonly IUmbracoMapper _umbracoMapper;
     private readonly IIdKeyMap _idKeyMap;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ElementPresentationFactory"/> class.
+    /// </summary>
+    /// <param name="umbracoMapper">The mapper used to map between Umbraco models.</param>
+    /// <param name="idKeyMap">Service for mapping between IDs and keys.</param>
     public ElementPresentationFactory(IUmbracoMapper umbracoMapper, IIdKeyMap idKeyMap)
     {
         _umbracoMapper = umbracoMapper;
         _idKeyMap = idKeyMap;
     }
 
+    /// <inheritdoc />
     public ElementResponseModel CreateResponseModel(IElement element, ContentScheduleCollection schedule)
     {
         ElementResponseModel responseModel = _umbracoMapper.Map<ElementResponseModel>(element)!;
@@ -32,6 +41,7 @@ public class ElementPresentationFactory : IElementPresentationFactory
         return responseModel;
     }
 
+    /// <inheritdoc />
     public ElementItemResponseModel CreateItemResponseModel(IElementEntitySlim entity)
     {
         Attempt<Guid> parentKeyAttempt = _idKeyMap.GetKeyForId(entity.ParentId, UmbracoObjectTypes.ElementContainer);
@@ -50,6 +60,7 @@ public class ElementPresentationFactory : IElementPresentationFactory
         return responseModel;
     }
 
+    /// <inheritdoc />
     public IEnumerable<ElementVariantItemResponseModel> CreateVariantsItemResponseModels(IElementEntitySlim entity)
     {
         if (entity.Variations.VariesByCulture() is false)
@@ -78,6 +89,7 @@ public class ElementPresentationFactory : IElementPresentationFactory
         }
     }
 
+    /// <inheritdoc />
     public DocumentTypeReferenceResponseModel CreateDocumentTypeReferenceResponseModel(IElementEntitySlim entity)
         => _umbracoMapper.Map<DocumentTypeReferenceResponseModel>(entity)!;
 }

@@ -13,6 +13,9 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DocumentType;
 
+/// <summary>
+/// Provides API endpoints for managing document blueprints associated with specific document types in Umbraco.
+/// </summary>
 [ApiVersion("1.0")]
 [Authorize(Policy = AuthorizationPolicies.SectionAccessContent)]
 public class DocumentBlueprintForDocumentTypeController : DocumentTypeControllerBase
@@ -21,12 +24,25 @@ public class DocumentBlueprintForDocumentTypeController : DocumentTypeController
 
     private readonly IUmbracoMapper _umbracoMapper;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DocumentBlueprintForDocumentTypeController"/> class, which manages document blueprints for a specific document type.
+    /// </summary>
+    /// <param name="contentBlueprintEditingService">Service used to edit content blueprints.</param>
+    /// <param name="umbracoMapper">The mapper used for mapping Umbraco objects.</param>
     public DocumentBlueprintForDocumentTypeController(IContentBlueprintEditingService contentBlueprintEditingService, IUmbracoMapper umbracoMapper)
     {
         _contentBlueprintEditingService = contentBlueprintEditingService;
         _umbracoMapper = umbracoMapper;
     }
 
+    /// <summary>
+    /// Retrieves a paged collection of document blueprints for the specified document type.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="id">The unique identifier (GUID) of the document type.</param>
+    /// <param name="skip">The number of items to skip before starting to collect the result set (used for pagination).</param>
+    /// <param name="take">The maximum number of items to return (used for pagination).</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains an <see cref="IActionResult"/> with a paged collection of document blueprints, or a 404 response if the document type is not found.</returns>
     [HttpGet("{id:guid}/blueprint")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<DocumentTypeBlueprintItemResponseModel>), StatusCodes.Status200OK)]
