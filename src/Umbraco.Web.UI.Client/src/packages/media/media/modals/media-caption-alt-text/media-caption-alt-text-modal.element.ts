@@ -154,6 +154,7 @@ export class UmbMediaCaptionAltTextModalElement extends UmbModalBaseElement<
 				img {
 					max-width: 100%;
 					height: auto;
+					transition: aspect-ratio 0.3s ease;
 				}
 			}
 		`,
