@@ -76,7 +76,7 @@ export class UmbMediaCaptionAltTextModalElement extends UmbModalBaseElement<
 
 	#onWidthInput(e: UUIInputEvent) {
 		const width = parseInt(e.target.value as string, 10);
-		if (isNaN(width)) return;
+		if (isNaN(width) || width <= 0) return;
 
 		if (this._aspectLocked && this.#naturalRatio) {
 			const height = Math.round(width / this.#naturalRatio);
@@ -88,7 +88,7 @@ export class UmbMediaCaptionAltTextModalElement extends UmbModalBaseElement<
 
 	#onHeightInput(e: UUIInputEvent) {
 		const height = parseInt(e.target.value as string, 10);
-		if (isNaN(height)) return;
+		if (isNaN(height) || height <= 0) return;
 
 		if (this._aspectLocked && this.#naturalRatio) {
 			const width = Math.round(height * this.#naturalRatio);
