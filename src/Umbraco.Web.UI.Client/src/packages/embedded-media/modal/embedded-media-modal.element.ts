@@ -158,6 +158,7 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 			#preview {
 				width: 100%;
 				overflow: hidden;
+				transition: aspect-ratio 0.3s ease;
 
 				/* oEmbed markup could be an iframe, object, or any element */
 				> *:first-child {
