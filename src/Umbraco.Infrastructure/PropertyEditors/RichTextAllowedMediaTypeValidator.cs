@@ -3,7 +3,6 @@
 
 using System.ComponentModel.DataAnnotations;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Validation;
 using Umbraco.Cms.Core.Serialization;
@@ -18,32 +17,27 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// </summary>
 internal sealed class RichTextAllowedMediaTypeValidator : IValueValidator
 {
-    private const string MediaTypeCacheKeyFormat = nameof(RichTextAllowedMediaTypeValidator) + "_MediaTypeKey_{0}";
-
     private readonly HtmlImageSourceParser _imageSourceParser;
     private readonly IMediaService _mediaService;
-    private readonly IMediaTypeService _mediaTypeService;
     private readonly ILocalizedTextService _localizedTextService;
     private readonly IJsonSerializer _jsonSerializer;
     private readonly ILogger _logger;
-    private readonly AppCaches _appCaches;
+    private readonly AllowedMediaTypeHelper _allowedMediaTypeHelper;
 
     public RichTextAllowedMediaTypeValidator(
         HtmlImageSourceParser imageSourceParser,
         IMediaService mediaService,
-        IMediaTypeService mediaTypeService,
         ILocalizedTextService localizedTextService,
         IJsonSerializer jsonSerializer,
         ILogger logger,
-        AppCaches appCaches)
+        AllowedMediaTypeHelper allowedMediaTypeHelper)
     {
         _imageSourceParser = imageSourceParser;
         _mediaService = mediaService;
-        _mediaTypeService = mediaTypeService;
         _localizedTextService = localizedTextService;
         _jsonSerializer = jsonSerializer;
         _logger = logger;
-        _appCaches = appCaches;
+        _allowedMediaTypeHelper = allowedMediaTypeHelper;
     }
 
     /// <inheritdoc/>
@@ -58,12 +52,10 @@ internal sealed class RichTextAllowedMediaTypeValidator : IValueValidator
             return [];
         }
 
-        var allowedTypes = configuration.AllowedMediaTypes?.Split(
-            Constants.CharArrays.Comma,
-            StringSplitOptions.RemoveEmptyEntries);
+        HashSet<string> allowedTypeKeys = AllowedMediaTypeHelper.ParseAllowedTypeKeys(configuration.AllowedMediaTypes);
 
         // No allowed types configured = all types are allowed
-        if (allowedTypes is null || allowedTypes.Length == 0)
+        if (allowedTypeKeys.Count == 0)
         {
             return [];
         }
@@ -90,10 +82,7 @@ internal sealed class RichTextAllowedMediaTypeValidator : IValueValidator
 
         foreach (IMedia media in mediaItems)
         {
-            var typeAlias = media.ContentType.Alias;
-            var typeKey = GetMediaTypeKey(typeAlias);
-
-            if (typeKey is null || allowedTypes.Contains(typeKey) is false)
+            if (_allowedMediaTypeHelper.IsAllowed(media.ContentType.Alias, allowedTypeKeys) is false)
             {
                 var message = $"{_localizedTextService.Localize("validation", "invalidMediaType")}: '{media.Name}'";
                 return [new ValidationResult(message, ["value"])];
@@ -101,28 +90,5 @@ internal sealed class RichTextAllowedMediaTypeValidator : IValueValidator
         }
 
         return [];
-    }
-
-    private string? GetMediaTypeKey(string typeAlias)
-    {
-        string? GetMediaTypeKeyFromService(string alias) => _mediaTypeService.Get(alias)?.Key.ToString();
-
-        if (_appCaches.RequestCache.IsAvailable is false)
-        {
-            return GetMediaTypeKeyFromService(typeAlias);
-        }
-
-        var cacheKey = string.Format(MediaTypeCacheKeyFormat, typeAlias);
-        var typeKey = _appCaches.RequestCache.GetCacheItem<string?>(cacheKey);
-        if (typeKey is null)
-        {
-            typeKey = GetMediaTypeKeyFromService(typeAlias);
-            if (typeKey is not null)
-            {
-                _appCaches.RequestCache.Set(cacheKey, typeKey);
-            }
-        }
-
-        return typeKey;
     }
 }

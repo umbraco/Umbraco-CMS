@@ -111,6 +111,17 @@ internal class RichTextAllowedMediaTypeValidatorTests
         Assert.IsEmpty(result);
     }
 
+    [Test]
+    public void Allowed_Type_Key_Comparison_Is_Case_Insensitive()
+    {
+        var (validator, mediaServiceMock, mediaTypeServiceMock) = CreateValidator();
+        SetupMedia(mediaServiceMock, mediaTypeServiceMock, "Image", AllowedTypeKey);
+
+        var result = Validate(validator, BuildMarkup(Guid.NewGuid()), AllowedTypeKey.ToString().ToUpperInvariant());
+
+        Assert.IsEmpty(result);
+    }
+
     private static IEnumerable<System.ComponentModel.DataAnnotations.ValidationResult> Validate(
         RichTextAllowedMediaTypeValidator validator,
         string markup,
@@ -153,13 +164,11 @@ internal class RichTextAllowedMediaTypeValidatorTests
         var validator = new RichTextAllowedMediaTypeValidator(
             new HtmlImageSourceParser(_ => string.Empty),
             mediaServiceMock.Object,
-            mediaTypeServiceMock.Object,
             Mock.Of<ILocalizedTextService>(),
             new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory()),
             Mock.Of<Microsoft.Extensions.Logging.ILogger>(),
-            AppCaches.Disabled);
+            new AllowedMediaTypeHelper(mediaTypeServiceMock.Object, AppCaches.Disabled));
 
         return (validator, mediaServiceMock, mediaTypeServiceMock);
     }
-
 }

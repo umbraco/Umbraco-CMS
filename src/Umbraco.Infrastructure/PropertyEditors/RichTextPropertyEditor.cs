@@ -4,10 +4,8 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Nodes;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Cache.PropertyEditors;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
@@ -196,57 +194,6 @@ public class RichTextPropertyEditor : DataEditor, IValueSchemaProvider
         /// <summary>
         /// Initializes a new instance of the <see cref="RichTextPropertyValueEditor"/> class.
         /// </summary>
-        [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
-        public RichTextPropertyValueEditor(
-            DataEditorAttribute attribute,
-            PropertyEditorCollection propertyEditors,
-            IDataTypeConfigurationCache dataTypeReadCache,
-            ILogger<RichTextPropertyValueEditor> logger,
-            IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-            IShortStringHelper shortStringHelper,
-            HtmlImageSourceParser imageSourceParser,
-            HtmlLocalLinkParser localLinkParser,
-            RichTextEditorPastedImages pastedImages,
-            IJsonSerializer jsonSerializer,
-            IHtmlSanitizer htmlSanitizer,
-            IBlockEditorElementTypeCache elementTypeCache,
-            IPropertyValidationService propertyValidationService,
-            DataValueReferenceFactoryCollection dataValueReferenceFactoryCollection,
-            IRichTextRequiredValidator richTextRequiredValidator,
-            IRichTextRegexValidator richTextRegexValidator,
-            BlockEditorVarianceHandler blockEditorVarianceHandler,
-            ILanguageService languageService,
-            IIOHelper ioHelper)
-            : this(
-                attribute,
-                propertyEditors,
-                dataTypeReadCache,
-                logger,
-                backOfficeSecurityAccessor,
-                shortStringHelper,
-                imageSourceParser,
-                localLinkParser,
-                pastedImages,
-                jsonSerializer,
-                htmlSanitizer,
-                elementTypeCache,
-                propertyValidationService,
-                dataValueReferenceFactoryCollection,
-                richTextRequiredValidator,
-                richTextRegexValidator,
-                blockEditorVarianceHandler,
-                languageService,
-                ioHelper,
-                StaticServiceProvider.Instance.GetRequiredService<IMediaService>(),
-                StaticServiceProvider.Instance.GetRequiredService<IMediaTypeService>(),
-                StaticServiceProvider.Instance.GetRequiredService<ILocalizedTextService>(),
-                StaticServiceProvider.Instance.GetRequiredService<AppCaches>())
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="RichTextPropertyValueEditor"/> class.
-        /// </summary>
         /// <param name="attribute">The data editor attribute that defines metadata for the editor.</param>
         /// <param name="propertyEditors">A collection of available property editors.</param>
         /// <param name="dataTypeReadCache">The cache for data type configuration.</param>
@@ -309,7 +256,7 @@ public class RichTextPropertyEditor : DataEditor, IValueSchemaProvider
 
             BlockEditorValues = new(new RichTextEditorBlockDataConverter(_jsonSerializer), elementTypeCache, logger);
             Validators.Add(new RichTextEditorBlockValidator(propertyValidationService, BlockEditorValues, elementTypeCache, jsonSerializer, logger));
-            Validators.Add(new RichTextAllowedMediaTypeValidator(imageSourceParser, mediaService, mediaTypeService, localizedTextService, jsonSerializer, logger, appCaches));
+            Validators.Add(new RichTextAllowedMediaTypeValidator(imageSourceParser, mediaService, localizedTextService, jsonSerializer, logger, new AllowedMediaTypeHelper(mediaTypeService, appCaches)));
         }
 
         /// <summary>
