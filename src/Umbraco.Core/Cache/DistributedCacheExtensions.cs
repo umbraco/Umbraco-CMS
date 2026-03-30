@@ -374,13 +374,25 @@ public static class DistributedCacheExtensions
 
     #region ElementCacheRefresher
 
+    /// <summary>
+    ///     Refreshes all elements in the distributed cache.
+    /// </summary>
+    /// <param name="dc">The distributed cache.</param>
     public static void RefreshAllElementCache(this DistributedCache dc)
         // note: refresh all element cache does refresh content types too
         => dc.RefreshByPayload(ElementCacheRefresher.UniqueId, new ElementCacheRefresher.JsonPayload(0, Guid.Empty, TreeChangeTypes.RefreshAll).Yield());
 
-
+    /// <summary>
+    ///     Refreshes the element cache for the specified element changes.
+    /// </summary>
+    /// <param name="dc">The distributed cache.</param>
+    /// <param name="changes">The element changes to refresh.</param>
     public static void RefreshElementCache(this DistributedCache dc, IEnumerable<TreeChange<IElement>> changes)
-        => dc.RefreshByPayload(ElementCacheRefresher.UniqueId, changes.DistinctBy(x => (x.Item.Id, x.Item.Key, x.ChangeTypes)).Select(x => new ElementCacheRefresher.JsonPayload(x.Item.Id, x.Item.Key, x.ChangeTypes)));
+        => dc.RefreshByPayload(ElementCacheRefresher.UniqueId, changes.DistinctBy(x => (x.Item.Id, x.Item.Key, x.ChangeTypes)).Select(x => new ElementCacheRefresher.JsonPayload(x.Item.Id, x.Item.Key, x.ChangeTypes)
+        {
+            PublishedCultures = x.PublishedCultures?.ToArray(),
+            UnpublishedCultures = x.UnpublishedCultures?.ToArray(),
+        }));
 
     #endregion
 
