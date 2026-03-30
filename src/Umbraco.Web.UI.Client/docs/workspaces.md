@@ -270,8 +270,8 @@ Workspace contexts can use kinds for shared patterns:
 
 | Class | File | Consumes | Calls |
 |---|---|---|---|
-| `UmbSubmitWorkspaceAction` | `core/workspace/components/workspace-action/common/submit/submit.action.ts` | `UMB_SUBMITTABLE_WORKSPACE_CONTEXT` | `requestSubmit()` |
-| `UmbSaveWorkspaceAction` | `core/workspace/components/workspace-action/common/save/save.action.ts` | `UMB_SAVEABLE_WORKSPACE_CONTEXT` | `requestSave()` |
+| `UmbSubmitWorkspaceAction` | `src/packages/core/workspace/components/workspace-action/common/submit/submit.action.ts` | `UMB_SUBMITTABLE_WORKSPACE_CONTEXT` | `requestSubmit()` |
+| `UmbSaveWorkspaceAction` | `src/packages/core/workspace/components/workspace-action/common/save/save.action.ts` | `UMB_SAVEABLE_WORKSPACE_CONTEXT` | `requestSave()` |
 
 Most simple entities use `UmbSubmitWorkspaceAction` directly (no custom action class needed). Complex entities like documents define custom action classes for variant dialogs, permission checks, etc.
 
