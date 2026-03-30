@@ -11,16 +11,7 @@ import {
 import { UMB_COMPOSITION_PICKER_MODAL } from '../../../modals/constants.js';
 import type { UmbContentTypeDesignEditorTabElement } from './content-type-design-editor-tab.element.js';
 import { UmbContentTypeDesignEditorContext } from './content-type-design-editor.context.js';
-import {
-	css,
-	html,
-	customElement,
-	state,
-	repeat,
-	ifDefined,
-	nothing,
-	query,
-} from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, repeat, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIInputElement, UUIInputEvent, UUITabElement } from '@umbraco-cms/backoffice/external/uui';
 import { encodeFolderName } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -39,6 +30,8 @@ import type { UmbConfirmModalData } from '@umbraco-cms/backoffice/modal';
 import { umbConfirmModal, umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
+
+import '@umbraco-cms/backoffice/components';
 
 @customElement('umb-content-type-design-editor')
 export class UmbContentTypeDesignEditorElement extends UmbLitElement implements UmbWorkspaceViewElement {
@@ -139,41 +132,6 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 
 	@state()
 	private _sortModeActive?: boolean;
-
-	//Tab scroll
-	@query('#tabs-group')
-	private _tabsGroupEl?: HTMLElement;
-
-	@state()
-	private _showScrollLeft = false;
-
-	@state()
-	private _showScrollRight = false;
-
-	#tabsResizeObserver = new ResizeObserver(() => this.#updateScrollButtons());
-	#tabsResizeObserverConnected = false;
-
-	#updateScrollButtons() {
-		const el = this._tabsGroupEl;
-		if (!el) return;
-		this._showScrollLeft = el.scrollLeft > 0;
-		this._showScrollRight = el.scrollLeft + el.clientWidth < el.scrollWidth - 1;
-	}
-
-	#scrollTabsRight() {
-		this._tabsGroupEl?.scrollBy({ left: 200, behavior: 'smooth' });
-	}
-
-	#scrollTabsLeft() {
-		this._tabsGroupEl?.scrollBy({ left: -200, behavior: 'smooth' });
-	}
-
-	override updated() {
-		if (this._tabsGroupEl && !this.#tabsResizeObserverConnected) {
-			this.#tabsResizeObserver.observe(this._tabsGroupEl);
-			this.#tabsResizeObserverConnected = true;
-		}
-	}
 
 	constructor() {
 		super();
@@ -572,21 +530,10 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 	}
 
 	renderTabsNavigation() {
-		if (!this._tabs || this._tabs.length === 0) {
-			if (this.#tabsResizeObserverConnected) {
-				this.#tabsResizeObserver.disconnect();
-				this.#tabsResizeObserverConnected = false;
-			}
-			return;
-		}
+		if (!this._tabs || this._tabs.length === 0) return;
 
 		return html`
-			${this._showScrollLeft
-				? html`<uui-button id="scroll-left" compact @click=${this.#scrollTabsLeft} label="Scroll left"
-						><uui-icon name="icon-arrow-left"></uui-icon>
-					</uui-button>`
-				: nothing}
-			<div id="tabs-group" @scroll=${this.#updateScrollButtons}>
+			<umb-scrollable-container id="tabs-group">
 				<uui-tab-group>
 					${this.renderRootTab()}
 					${repeat(
@@ -596,12 +543,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 					)}
 				</uui-tab-group>
 				${this.#renderAddButton()}
-			</div>
-			${this._showScrollRight
-				? html`<uui-button id="scroll-right" compact @click=${this.#scrollTabsRight} label="Scroll right"
-						><uui-icon name="icon-arrow-right"></uui-icon
-					></uui-button>`
-				: nothing}
+			</umb-scrollable-container>
 		`;
 	}
 
@@ -716,7 +658,6 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 	}
 
 	override destroy(): void {
-		this.#tabsResizeObserver.disconnect();
 		this.#currentTabComponent = undefined;
 		super.destroy();
 	}
@@ -767,14 +708,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 			}
 
 			#tabs-group {
-				display: flex;
-				overflow: hidden;
 				min-width: 0;
-			}
-
-			#scroll-left,
-			#scroll-right {
-				flex-shrink: 0;
 			}
 
 			#actions {
