@@ -14,6 +14,7 @@ export class UmbScrollableContainerElement extends UmbLitElement {
 
 	#updateScrollButtons() {
 		this._showScrollLeft = this.scrollLeft > 0;
+		// -1 tolerance accounts for subpixel rounding differences across browsers.
 		this._showScrollRight = this.scrollLeft + this.clientWidth < this.scrollWidth - 1;
 	}
 
@@ -40,6 +41,8 @@ export class UmbScrollableContainerElement extends UmbLitElement {
 	override disconnectedCallback() {
 		super.disconnectedCallback();
 		this.removeEventListener('scroll', this.#updateScrollButtons);
+		this.#resizeObserver.disconnect();
+		this.#resizeObserverConnected = false;
 	}
 
 	override destroy() {
@@ -50,13 +53,21 @@ export class UmbScrollableContainerElement extends UmbLitElement {
 	override render() {
 		return html`
 			${this._showScrollLeft
-				? html`<uui-button id="scroll-left" compact @click=${this.#scrollLeft} label="Scroll left">
+				? html`<uui-button
+						id="scroll-left"
+						compact
+						@click=${this.#scrollLeft}
+						label=${this.localize.term('general_scrollLeft')}>
 						<uui-icon name="icon-arrow-left"></uui-icon>
 					</uui-button>`
 				: nothing}
 			<slot></slot>
 			${this._showScrollRight
-				? html`<uui-button id="scroll-right" compact @click=${this.#scrollRight} label="Scroll right">
+				? html`<uui-button
+						id="scroll-right"
+						compact
+						@click=${this.#scrollRight}
+						label=${this.localize.term('general_scrollRight')}>
 						<uui-icon name="icon-arrow-right"></uui-icon>
 					</uui-button>`
 				: nothing}
@@ -68,9 +79,14 @@ export class UmbScrollableContainerElement extends UmbLitElement {
 			:host {
 				display: flex;
 				position: relative;
-				overflow: hidden;
+				overflow-x: auto;
 				min-width: 0;
 				align-items: center;
+				scrollbar-width: none;
+			}
+
+			:host::-webkit-scrollbar {
+				display: none;
 			}
 
 			#scroll-left,

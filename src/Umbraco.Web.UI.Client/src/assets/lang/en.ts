@@ -966,6 +966,8 @@ export default {
 		search: 'Search',
 		searchNoResult: 'Sorry, we can not find what you are looking for.',
 		noItemsInList: 'No items have been added',
+		scrollLeft: 'Scroll left',
+		scrollRight: 'Scroll right',
 		server: 'Server',
 		settings: 'Settings',
 		shared: 'Shared',
