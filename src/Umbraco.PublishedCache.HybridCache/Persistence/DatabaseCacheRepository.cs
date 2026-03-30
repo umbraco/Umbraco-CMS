@@ -138,6 +138,14 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
             return null;
         }
 
+        if (preview is false && dto.PubName is null)
+        {
+            _logger.LogWarning(
+                "Node {NodeKey} appears published but has no published version name, indicating an inconsistent database state. Consider republishing the content. Skipping node.",
+                key);
+            return null;
+        }
+
         if (preview is false && dto.PubDataRaw is null && dto.PubData is null)
         {
             return null;
@@ -156,8 +164,8 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
             return (null, null);
         }
 
-        ContentCacheNode draftNode = CreateContentNodeKit(true, dto);
-        ContentCacheNode? publishedNode = dto.PubDataRaw is null && dto.PubData is null
+        ContentCacheNode? draftNode = CreateContentNodeKit(true, dto);
+        ContentCacheNode? publishedNode = dto.PubName is null || (dto.PubDataRaw is null && dto.PubData is null)
             ? null
             : CreateContentNodeKit(false, dto);
 
@@ -174,7 +182,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         return await Database.FirstOrDefaultAsync<ContentSourceDto>(sql);
     }
 
-    private ContentCacheNode CreateContentNodeKit(bool preview, ContentSourceDto dto)
+    private ContentCacheNode? CreateContentNodeKit(bool preview, ContentSourceDto dto)
     {
         IContentCacheDataSerializer serializer =
             _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Document);
@@ -193,13 +201,14 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
 
         dtos = dtos
             .Where(x => x is not null)
-            .Where(x => preview || x.PubDataRaw is not null || x.PubData is not null)
+            .Where(x => preview || (x.PubName is not null && (x.PubDataRaw is not null || x.PubData is not null)))
             .ToList();
 
         IContentCacheDataSerializer serializer =
             _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Document);
         return dtos
-            .Select(x => CreateContentNodeKit(x, serializer, preview));
+            .Select(x => CreateContentNodeKit(x, serializer, preview))
+            .Where(x => x is not null)!;
     }
 
     private IEnumerable<ContentSourceDto> GetContentSourceByDocumentTypeKey(IEnumerable<Guid> documentTypeKeys, Guid objectType)
@@ -244,7 +253,11 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         {
             if (entityType == ContentCacheDataSerializerEntityType.Document)
             {
-                yield return CreateContentNodeKit(row, serializer, row.Published is false);
+                ContentCacheNode? node = CreateContentNodeKit(row, serializer, row.Published is false);
+                if (node is not null)
+                {
+                    yield return node;
+                }
             }
             else
             {
@@ -1523,7 +1536,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         return sql;
     }
 
-    private ContentCacheNode CreateContentNodeKit(ContentSourceDto dto, IContentCacheDataSerializer serializer, bool preview)
+    private ContentCacheNode? CreateContentNodeKit(ContentSourceDto dto, IContentCacheDataSerializer serializer, bool preview)
     {
         if (preview)
         {
@@ -1538,35 +1551,42 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
                 _logger.LogWarning(
                     "Missing cmsContentNu edited content for node {NodeId}, consider rebuilding.",
                     dto.Id);
+                return null;
             }
-            else
-            {
-                bool published = false;
-                ContentCacheDataModel? deserializedDraftContent =
-                    serializer.Deserialize(dto, dto.EditData, dto.EditDataRaw, published);
-                var draftContentData = new ContentData(
-                    dto.EditName,
-                    deserializedDraftContent?.UrlSegment,
-                    dto.VersionId,
-                    dto.EditVersionDate,
-                    dto.CreatorId,
-                    dto.EditTemplateId == 0 ? null : dto.EditTemplateId,
-                    published,
-                    deserializedDraftContent?.PropertyData,
-                    deserializedDraftContent?.CultureData);
 
-                return new ContentCacheNode
-                {
-                    Id = dto.Id,
-                    Key = dto.Key,
-                    SortOrder = dto.SortOrder,
-                    CreateDate = dto.CreateDate,
-                    CreatorId = dto.CreatorId,
-                    ContentTypeId = dto.ContentTypeId,
-                    Data = draftContentData,
-                    IsDraft = true,
-                };
+            if (dto.EditName is null)
+            {
+                _logger.LogError(
+                    "Node {NodeId} has edited data but EditName is null, indicating an inconsistent database state. Skipping node.",
+                    dto.Id);
+                return null;
             }
+
+            bool published = false;
+            ContentCacheDataModel? deserializedDraftContent =
+                serializer.Deserialize(dto, dto.EditData, dto.EditDataRaw, published);
+            var draftContentData = new ContentData(
+                dto.EditName,
+                deserializedDraftContent?.UrlSegment,
+                dto.VersionId,
+                dto.EditVersionDate,
+                dto.CreatorId,
+                dto.EditTemplateId == 0 ? null : dto.EditTemplateId,
+                published,
+                deserializedDraftContent?.PropertyData,
+                deserializedDraftContent?.CultureData);
+
+            return new ContentCacheNode
+            {
+                Id = dto.Id,
+                Key = dto.Key,
+                SortOrder = dto.SortOrder,
+                CreateDate = dto.CreateDate,
+                CreatorId = dto.CreatorId,
+                ContentTypeId = dto.ContentTypeId,
+                Data = draftContentData,
+                IsDraft = true,
+            };
         }
 
         if (dto.PubData == null && dto.PubDataRaw == null)
@@ -1580,6 +1600,15 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
             _logger.LogWarning(
                 "Missing cmsContentNu published content for node {NodeId}, consider rebuilding.",
                 dto.Id);
+            return null;
+        }
+
+        if (dto.PubName is null)
+        {
+            _logger.LogError(
+                "Node {NodeId} has published data but PubName is null, indicating an inconsistent database state. Consider republishing or rebuilding the cache. Skipping node.",
+                dto.Id);
+            return null;
         }
 
         ContentCacheDataModel? deserializedContent = serializer.Deserialize(dto, dto.PubData, dto.PubDataRaw, true);
