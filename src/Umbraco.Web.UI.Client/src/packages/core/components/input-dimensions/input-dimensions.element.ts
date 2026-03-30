@@ -26,6 +26,7 @@ export class UmbInputDimensionsElement extends UmbFormControlMixin<
 		const oldValue = this.value?.width;
 		if (value !== oldValue) {
 			this.value = { ...this.value, width: value, height: this.value?.height };
+			if (this.locked) this.#updateRatio();
 		}
 	}
 	public get width(): number | undefined {
@@ -37,6 +38,7 @@ export class UmbInputDimensionsElement extends UmbFormControlMixin<
 		const oldValue = this.value?.height;
 		if (value !== oldValue) {
 			this.value = { ...this.value, width: this.value?.width, height: value };
+			if (this.locked) this.#updateRatio();
 		}
 	}
 	public get height(): number | undefined {
