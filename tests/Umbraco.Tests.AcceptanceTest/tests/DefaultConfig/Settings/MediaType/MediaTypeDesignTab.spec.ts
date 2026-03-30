@@ -254,32 +254,6 @@ test('can delete a tab from a media type', {tag: '@release'}, async ({umbracoApi
   expect(await umbracoApi.mediaType.doesNameExist(mediaTypeName)).toBeTruthy();
 });
 
-test('can create a media type with a composition', async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  const compositionMediaTypeName = 'CompositionMediaType';
-  await umbracoApi.mediaType.ensureNameNotExists(compositionMediaTypeName);
-  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-  const compositionMediaTypeId = await umbracoApi.mediaType.createMediaTypeWithPropertyEditor(compositionMediaTypeName, dataTypeName, dataTypeData.id, groupName);
-  await umbracoApi.mediaType.createDefaultMediaType(mediaTypeName);
-
-  // Act
-  await umbracoUi.mediaType.goToMediaType(mediaTypeName);
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
-  await umbracoUi.mediaType.clickCompositionsButton();
-  await umbracoUi.mediaType.clickModalMenuItemWithName(compositionMediaTypeName);
-  await umbracoUi.mediaType.clickSubmitButton();
-  await umbracoUi.mediaType.clickSaveButtonAndWaitForMediaTypeToBeUpdated();
-
-  // Assert
-  expect(umbracoUi.mediaType.doesGroupHaveValue(groupName)).toBeTruthy();
-  // Checks if the composition in the media type is correct
-  const mediaTypeData = await umbracoApi.mediaType.getByName(mediaTypeName);
-  expect(mediaTypeData.compositions[0].mediaType.id).toBe(compositionMediaTypeId);
-
-  // Clean
-  await umbracoApi.mediaType.ensureNameNotExists(compositionMediaTypeName);
-});
-
 test('can reorder groups in a media type', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);

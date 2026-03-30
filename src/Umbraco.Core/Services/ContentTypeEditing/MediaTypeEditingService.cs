@@ -111,7 +111,7 @@ internal sealed class MediaTypeEditingService : ContentTypeEditingServiceBase<IM
     /// <inheritdoc />
     public async Task<PagedModel<MediaTypeFileExtensionMatchResult>> GetMediaTypesForFileExtensionWithMatchInfoAsync(string fileExtension, int skip, int take)
     {
-        fileExtension = fileExtension.TrimStart(Constants.CharArrays.Period);
+        fileExtension = fileExtension.TrimStart(Constants.CharArrays.Period).ToLowerInvariant();
 
         IMediaType[] candidateMediaTypes = _mediaTypeService.GetAll().Where(mt => mt.CompositionPropertyTypes.Any(pt => pt.Alias == Constants.Conventions.Media.File)).ToArray();
         var results = new List<MediaTypeFileExtensionMatchResult>();

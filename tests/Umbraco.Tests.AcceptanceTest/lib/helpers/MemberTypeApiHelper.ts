@@ -82,7 +82,7 @@ export class MemberTypeApiHelper {
       .withAlias(AliasHelper.toAlias(memberTypeName))
       .withAllowedAsRoot(true)
       .build();
-      
+
     return await this.create(memberType);
   }
 
@@ -106,6 +106,20 @@ export class MemberTypeApiHelper {
         .withDataTypeId(dataTypeId)
         .done()
       .build();
+    return await this.create(memberType);
+  }
+
+  async createMemberTypeWithAComposition(memberTypeName: string, compositionId: string) {
+    await this.ensureNameNotExists(memberTypeName);
+
+    const memberType = new MemberTypeBuilder()
+      .withName(memberTypeName)
+      .withAlias(AliasHelper.toAlias(memberTypeName))
+      .addComposition()
+        .withMemberTypeId(compositionId)
+        .done()
+      .build();
+
     return await this.create(memberType);
   }
 

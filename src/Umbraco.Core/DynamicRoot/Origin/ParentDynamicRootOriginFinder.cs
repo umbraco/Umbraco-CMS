@@ -23,8 +23,6 @@ public class ParentDynamicRootOriginFinder : ByKeyDynamicRootOriginFinder
     public override Guid? FindOriginKey(DynamicRootNodeQuery query)
     {
         query.OriginKey = query.Context.ParentKey;
-        var baseResult = base.FindOriginKey(query);
-
-        return baseResult;
+        return base.FindOriginKey(query);
     }
 }

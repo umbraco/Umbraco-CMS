@@ -209,7 +209,7 @@ public partial class ElementEditingServiceTests
         element = await ElementEditingService.GetAsync(element.Key);
         Assert.NotNull(element);
         Assert.IsTrue(element.Published);
-        CollectionAssert.AreEquivalent(publishedCultures, element.PublishedCultures);
+        Assert.That(element.PublishedCultures, Is.EquivalentTo(publishedCultures));
         Assert.IsTrue(element.Trashed);
 
         var moveResult = await ElementEditingService.MoveAsync(element.Key, null, Constants.Security.SuperUserKey);

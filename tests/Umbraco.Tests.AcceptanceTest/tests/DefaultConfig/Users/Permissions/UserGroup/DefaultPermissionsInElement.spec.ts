@@ -290,7 +290,7 @@ test('can duplicate element with duplicate permission enabled', {tag: '@smoke'},
   // Act
   await umbracoUi.library.clickEntityActionOnElementWithName(elementName);
   await umbracoUi.library.clickLabelWithName('Elements');
-  await umbracoUi.library.clickDuplicateButton();
+  await umbracoUi.library.clickCopyModalButton();
 
   // Assert
   await umbracoUi.library.doesSuccessNotificationHaveText(NotificationConstantHelper.success.duplicated);
