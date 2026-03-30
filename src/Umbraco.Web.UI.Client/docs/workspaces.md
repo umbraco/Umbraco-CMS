@@ -10,16 +10,16 @@ Workspaces are registered and composed through the **extension system** — the 
 
 ## Extension Types for Workspaces
 
-All workspace-related extensions use **conditions** to scope to a specific workspace.
+Workspace *views, actions, contexts, and footer apps* typically use **conditions** to scope to a specific workspace, while the `workspace` manifest itself is matched by `meta.entityType`.
 
 | Extension Type | Purpose | Key Config |
 |---|---|---|
 | `workspace` | The workspace itself | `kind` (`default`/`routable`), `api` (context class), `meta.entityType` |
-| `workspaceView` | Tabs/views within workspace | `element`/`js` (lazy), `meta.label`, `meta.pathname`, `meta.icon`, `weight` |
-| `workspaceAction` | Toolbar actions (save, publish) | `kind`, `api` (action class), `meta.look`, `meta.color`, `meta.label` |
-| `workspaceActionMenuItem` | Dropdown items on actions | `forWorkspaceActions` (target action alias) |
+| `workspaceView` | Tabs/views within workspace | `element`/`js` (lazy), `meta.label`, `meta.pathname`, `meta.icon`, `weight`, `conditions` |
+| `workspaceAction` | Toolbar actions (save, publish) | `kind`, `api` (action class), `meta.look`, `meta.color`, `meta.label`, `conditions` |
+| `workspaceActionMenuItem` | Dropdown items on actions | `forWorkspaceActions` (target action alias), `conditions` |
 | `workspaceContext` | Additional composable contexts | `api` (lazy), `conditions` |
-| `workspaceFooterApp` | Footer components | `kind` (`menuBreadcrumb`, `variantMenuBreadcrumb`) |
+| `workspaceFooterApp` | Footer components | `kind` (`menuBreadcrumb`, `variantMenuBreadcrumb`), `conditions` |
 
 ### How extensions are discovered
 
@@ -270,8 +270,8 @@ Workspace contexts can use kinds for shared patterns:
 
 | Class | File | Consumes | Calls |
 |---|---|---|---|
-| `UmbSubmitWorkspaceAction` | `core/workspace/components/workspace-action/common/submit/submit.action.ts` | `UMB_SUBMITTABLE_WORKSPACE_CONTEXT` | `requestSubmit()` |
-| `UmbSaveWorkspaceAction` | `core/workspace/components/workspace-action/common/save/save.action.ts` | `UMB_SAVEABLE_WORKSPACE_CONTEXT` | `requestSave()` |
+| `UmbSubmitWorkspaceAction` | `src/packages/core/workspace/components/workspace-action/common/submit/submit.action.ts` | `UMB_SUBMITTABLE_WORKSPACE_CONTEXT` | `requestSubmit()` |
+| `UmbSaveWorkspaceAction` | `src/packages/core/workspace/components/workspace-action/common/save/save.action.ts` | `UMB_SAVEABLE_WORKSPACE_CONTEXT` | `requestSave()` |
 
 Most simple entities use `UmbSubmitWorkspaceAction` directly (no custom action class needed). Complex entities like documents define custom action classes for variant dialogs, permission checks, etc.
 
