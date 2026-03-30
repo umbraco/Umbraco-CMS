@@ -910,7 +910,7 @@ internal partial class UserService : RepositoryService, IUserService
         if (startElementIds is null || startElementIds.Count != model.ElementStartNodeKeys.Count)
         {
             scope.Complete();
-            return Attempt.FailWithStatus<IUser?, UserOperationStatus>(UserOperationStatus.ElementNodeNotFound, existingUser);
+            return Attempt.FailWithStatus<IUser?, UserOperationStatus>(UserOperationStatus.ElementStartNodeNotFound, existingUser);
         }
 
         if (model.HasContentRootAccess)
@@ -1018,6 +1018,7 @@ internal partial class UserService : RepositoryService, IUserService
     /// <param name="target">The target user to update.</param>
     /// <param name="startContentIds">The content start node IDs.</param>
     /// <param name="startMediaIds">The media start node IDs.</param>
+    /// <param name="startElementIds">The element start node IDs.</param>
     /// <returns>The updated <see cref="IUser" />.</returns>
     private IUser MapUserUpdate(
         UserUpdateModel source,
