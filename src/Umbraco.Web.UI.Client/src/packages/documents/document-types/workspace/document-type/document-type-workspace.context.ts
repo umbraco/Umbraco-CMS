@@ -53,6 +53,10 @@ export class UmbDocumentTypeWorkspaceContext
 		this.defaultTemplate = this.structure.ownerContentTypeObservablePart((data) => data?.defaultTemplate);
 		this.cleanup = this.structure.ownerContentTypeObservablePart((data) => data?.cleanup);
 
+		this.#setupRoutes();
+	}
+
+	#setupRoutes() {
 		this.routes.setRoutes([
 			{
 				path: UMB_CREATE_DOCUMENT_TYPE_WORKSPACE_PATH_PATTERN.toString(),
