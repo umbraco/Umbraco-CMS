@@ -1,8 +1,10 @@
 import type { UmbNotificationHandler } from '../../notification-handler.js';
 import type { UmbPeekErrorArgs } from '../../types.js';
-import { customElement, html, ifDefined, nothing, property } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, ifDefined, nothing, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_ERROR_VIEWER_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+
+const DETAIL_MAX_LENGTH = 250;
 
 @customElement('umb-peek-error-notification')
 export class UmbPeekErrorNotificationElement extends UmbLitElement {
@@ -11,31 +13,69 @@ export class UmbPeekErrorNotificationElement extends UmbLitElement {
 
 	public notificationHandler!: UmbNotificationHandler;
 
-	async #onClick() {
+	async #openErrorViewer(data: unknown) {
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 		if (!modalManager) {
 			throw new Error('Modal manager not found.');
 		}
 
-		modalManager.open(this, UMB_ERROR_VIEWER_MODAL, { data: this.data?.details });
-
+		// The modal handles both strings and objects at runtime despite the type expecting an object
+		modalManager.open(this, UMB_ERROR_VIEWER_MODAL, { data: data as any });
 		this.notificationHandler.close();
 	}
 
-	protected override render() {
-		return this.data
-			? html`<uui-toast-notification-layout headline=${ifDefined(this.data.headline)}
-					>${this.data.message}${this.data.details
-						? html`<uui-button
-								slot="actions"
-								look="primary"
-								color="danger"
-								label=${this.localize.term('defaultdialogs_seeErrorAction')}
-								@click=${this.#onClick}></uui-button>`
-						: nothing}</uui-toast-notification-layout
-				>`
-			: nothing;
+	get #message() {
+		const detail = this.data?.detail;
+		if (detail && detail.length <= DETAIL_MAX_LENGTH) {
+			return html`${this.data?.message}
+				<p class="detail">${detail}</p>`;
+		}
+		return this.data?.message;
 	}
+
+	get #actions() {
+		const hasErrors = !!this.data?.details;
+		const hasLongDetail = !!this.data?.detail && this.data.detail.length > DETAIL_MAX_LENGTH;
+		if (!hasErrors && !hasLongDetail) return nothing;
+
+		return html`
+			${hasErrors
+				? html`<uui-button
+						slot="actions"
+						look="primary"
+						color="danger"
+						label=${this.localize.term('defaultdialogs_seeErrorAction')}
+						@click=${() => this.#openErrorViewer(this.data?.details)}></uui-button>`
+				: nothing}
+			${hasLongDetail
+				? html`<uui-button
+						slot="actions"
+						look="primary"
+						color="danger"
+						label=${this.localize.term('defaultdialogs_exceptionDetail')}
+						@click=${() => this.#openErrorViewer(this.data?.detail)}></uui-button>`
+				: nothing}
+		`;
+	}
+
+	protected override render() {
+		if (!this.data) return nothing;
+		return html`<uui-toast-notification-layout headline=${ifDefined(this.data.headline)}>
+			${this.#message} ${this.#actions}
+		</uui-toast-notification-layout>`;
+	}
+
+	static override readonly styles = [
+		css`
+			.detail {
+				overflow: hidden;
+				text-overflow: ellipsis;
+				display: -webkit-box;
+				-webkit-line-clamp: 3;
+				-webkit-box-orient: vertical;
+			}
+		`,
+	];
 }
 
 declare global {

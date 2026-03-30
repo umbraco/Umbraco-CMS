@@ -73,7 +73,7 @@ export class UmbResourceController<T = unknown> extends UmbControllerBase {
 		this.cancel();
 	}
 
-	protected async _peekError(headline: string, message: string, details: unknown) {
+	protected async _peekError(headline: string, message: string, details: unknown, detail?: string) {
 		// Store the host for usage in the following async context
 		const host = this._host;
 
@@ -81,6 +81,7 @@ export class UmbResourceController<T = unknown> extends UmbControllerBase {
 		(await import('@umbraco-cms/backoffice/notification')).umbPeekError(host, {
 			headline,
 			message,
+			detail,
 			details,
 		});
 	}

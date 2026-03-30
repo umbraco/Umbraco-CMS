@@ -59,7 +59,8 @@ export class UmbTryExecuteController<T> extends UmbResourceController<T> {
 
 		let headline = 'An error occurred';
 		let message = 'A fatal server error occurred. If this continues, please reach out to your administrator.';
-		let details: Record<string, string[]> | undefined = undefined;
+		let detail: string | undefined;
+		let details: Record<string, string[]> | undefined;
 
 		const apiError = error as UmbApiError;
 
@@ -82,7 +83,8 @@ export class UmbTryExecuteController<T> extends UmbResourceController<T> {
 
 			// UmbProblemDetails, show notification
 			message = apiError.problemDetails.title;
-			details = apiError.problemDetails.errors ?? undefined;
+			detail = apiError.problemDetails.detail;
+			details = apiError.problemDetails.errors;
 
 			// Special handling for ObjectCacheAppCache corruption errors, which we are investigating
 			if (
@@ -92,13 +94,14 @@ export class UmbTryExecuteController<T> extends UmbResourceController<T> {
 				headline = 'Please restart the server';
 				message =
 					'The Umbraco object cache is corrupt, but your action may still have been executed. Please restart the server to reset the cache. This is a work in progress.';
+				detail = undefined;
 			}
 		} else {
 			// Unknown error, show notification
 			message = apiError instanceof Error ? apiError.message : 'An unknown error occurred.';
 		}
 
-		this._peekError(headline, message, details);
+		this._peekError(headline, message, details, detail);
 		console.error('[UmbTryExecuteController] Error in request:', error);
 	}
 }
