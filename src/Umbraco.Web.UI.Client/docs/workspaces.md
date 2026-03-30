@@ -159,6 +159,8 @@ Adds name management for entities with a `name` property:
 
 **This is the base class most entity detail workspaces extend.**
 
+**Editor element pattern**: Use `<umb-workspace-header-name-editable slot="header">` inside `<umb-entity-detail-workspace-editor>`. This built-in element auto-consumes the workspace context for name binding, validation (`umbBindToValidation`), write guard permissions, auto-focus, and localization — no manual name wiring needed. See `src/packages/core/workspace/components/workspace-header-name-editable/`.
+
 ---
 
 ## Workspace Context Extensions (Modularity & Reuse)

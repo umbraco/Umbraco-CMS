@@ -236,12 +236,11 @@ Replace the `create` route with:
 
 File: `{entity}-workspace-editor.element.ts`
 
+Uses `<umb-workspace-header-name-editable>` — a built-in element that auto-consumes the workspace context for name binding, validation, write guard permissions, and auto-focus. No manual name wiring needed.
+
 ```typescript
-import { UMB_{ENTITY}_WORKSPACE_CONTEXT } from './{entity}-workspace.context-token.js';
-import { html, customElement, state, css } from '@umbraco-cms/backoffice/external/lit';
-import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
-import { umbFocus, UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 // Back path: find or create a constant like UMB_{ENTITY}_SECTION_PATH in the entity's section-path constants.
 // Grep for 'SECTION_PATH' or 'WORKSPACE_PATH' in the entity's package to find the correct import.
@@ -249,51 +248,20 @@ const BACK_PATH = 'FIXME: replace with section path constant';
 
 @customElement('umb-{entity}-workspace-editor')
 export class Umb{EntityName}WorkspaceEditorElement extends UmbLitElement {
-	#workspaceContext?: typeof UMB_{ENTITY}_WORKSPACE_CONTEXT.TYPE;
-
-	@state()
-	private _name = '';
-
-	constructor() {
-		super();
-
-		this.consumeContext(UMB_{ENTITY}_WORKSPACE_CONTEXT, (context) => {
-			this.#workspaceContext = context;
-			this.observe(this.#workspaceContext?.name, (name) => (this._name = name ?? ''));
-		});
-	}
-
-	#onNameChange(event: InputEvent & { target: UUIInputElement }) {
-		const value = event.target.value.toString();
-		this.#workspaceContext?.setName(value);
-	}
-
 	override render() {
 		return html`
 			<umb-entity-detail-workspace-editor back-path=${BACK_PATH}>
-				<div id="header" slot="header">
-					<uui-input
-						id="name"
-						label=${this.localize.term('placeholders_entername')}
-						placeholder=${this.localize.term('placeholders_entername')}
-						.value=${this._name}
-						@change=${this.#onNameChange}
-						${umbFocus()}>
-					</uui-input>
-				</div>
+				<umb-workspace-header-name-editable slot="header"></umb-workspace-header-name-editable>
 			</umb-entity-detail-workspace-editor>
 		`;
 	}
 
 	static override styles = [
-		UmbTextStyles,
 		css`
-			#header {
+			:host {
+				display: block;
 				width: 100%;
-			}
-
-			#name {
-				width: 100%;
+				height: 100%;
 			}
 		`,
 	];
@@ -467,7 +435,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 - [ ] Workspace context exported as `api` (last line)
 - [ ] Routes set up with `create` and `edit/:unique` paths
 - [ ] `UmbWorkspaceIsNewRedirectController` used in create route
-- [ ] Editor element uses `<umb-entity-detail-workspace-editor>`
+- [ ] Editor element uses `<umb-entity-detail-workspace-editor>` with `<umb-workspace-header-name-editable slot="header">`
 - [ ] Editor element exports as `element` and declared on `HTMLElementTagNameMap`
 - [ ] View element implements `UmbWorkspaceViewElement`
 - [ ] View element exports as `element` and declared on `HTMLElementTagNameMap`
