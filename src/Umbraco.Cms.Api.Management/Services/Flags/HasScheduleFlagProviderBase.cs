@@ -74,7 +74,7 @@ internal abstract class HasScheduleFlagProviderBase : IFlagProvider
         {
             var culture = getCulture(variant);
             ContentSchedule? schedule = schedules.FirstOrDefault(x => x.Culture == culture);
-            if (schedule is not null && schedule.Date > _timeProvider.GetUtcNow() && string.Equals(schedule.Culture, culture))
+            if (schedule is not null && schedule.Date > _timeProvider.GetUtcNow().UtcDateTime && string.Equals(schedule.Culture, culture))
             {
                 variant.AddFlag(Alias);
             }
