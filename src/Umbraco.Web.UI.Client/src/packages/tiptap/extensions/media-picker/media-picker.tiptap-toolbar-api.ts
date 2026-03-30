@@ -147,6 +147,7 @@ export default class UmbTiptapToolbarMediaPickerToolbarExtensionApi extends UmbT
 		const modalHandler = this.#modalManager?.open(this, UMB_MEDIA_CAPTION_ALT_TEXT_MODAL, {
 			data: { mediaUnique, maxImageSize: this.maxImageSize },
 			value: { url: '', altText, caption, width, height },
+			modal: { size: 'medium' }, // Override default sidebar size for better UX
 		});
 		return modalHandler?.onSubmit().catch(() => undefined);
 	}
