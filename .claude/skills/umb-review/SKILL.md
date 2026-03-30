@@ -109,9 +109,8 @@ For each changed file, reason about: What does this code do? Is it correct? What
 For each new piece of functionality in the diff, search for its closest existing sibling and compare the full implementation:
 
 1. **New method on existing class/interface**: Grep for the most similar existing method on the same class using `-A 80` to capture the full method body (e.g., `UpdateCurrentUserAsync` → grep for `UpdateAsync` in the same file with `-A 80`). Compare line by line for missing cross-cutting concerns: notifications/events, validation, scoping, authorization, error handling, audit logging.
-2. **New manifest**: Search for similar existing manifests by any of: same package directory, same `forEntityTypes` value, same manifest type, or same alias prefix (first two dot-separated segments, e.g., `Umb.Workspace` from `Umb.Workspace.Document`). Once found, consider consistency — should they share the same conditions, `kind`, and meta properties? Flag inconsistencies, but also consider whether there are valid reasons for the difference.
-3. **New TS class**: Grep for siblings by base class (`extends {BaseClass}`) or by interface (`implements {Interface}`) or by name suffix (e.g., `CurrentUserController` → grep for `UserController`). Compare for missing concerns.
-4. **New CS class**: Grep for siblings by base class (`class {ClassName} : {BaseClass}`) or by interface (`class {ClassName} : {Interface}`) or by name suffix (e.g., `ManagementApiComposer` → grep for `ApiComposer`). Compare for missing concerns.
+2. **New TS class**: Grep for siblings by base class (`extends {BaseClass}`) or by interface (`implements {Interface}`) or by name suffix (e.g., `CurrentUserController` → grep for `UserController`). Compare for missing concerns.
+3. **New CS class**: Grep for siblings by base class (`class {ClassName} : {BaseClass}`) or by interface (`class {ClassName} : {Interface}`) or by name suffix (e.g., `ManagementApiComposer` → grep for `ApiComposer`). Compare for missing concerns.
 
 Store your raw findings — they feed into step 7.
 
