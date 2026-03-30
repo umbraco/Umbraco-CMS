@@ -85,6 +85,7 @@ export class UmbMediaCaptionAltTextModalElement extends UmbModalBaseElement<
 	override render() {
 		return html`
 			<umb-body-layout .headline=${this.localize.term('defaultdialogs_editSelectedMedia')}>
+				<uui-box>
 				<div id="wrapper">
 					<uui-label for="alt-text">${this.localize.term('content_altTextOptional')}</uui-label>
 					<uui-input
@@ -114,11 +115,12 @@ export class UmbMediaCaptionAltTextModalElement extends UmbModalBaseElement<
 							src=${this.value?.url ?? ''}
 							alt=${this.value?.altText ?? ''}
 							style=${this.value?.width && this.value?.height
-								? `aspect-ratio: ${this.value.width} / ${this.value.height}`
+								? `width: ${this.value.width}px; aspect-ratio: ${this.value.width} / ${this.value.height}`
 								: ''} />
 						<figcaption>${this.value?.caption ?? ''}</figcaption>
 					</figure>
 				</div>
+				</uui-box>
 				<div slot="actions">
 					<uui-button label=${this.localize.term('general_close')} @click=${this._rejectModal}></uui-button>
 					<uui-button
@@ -149,6 +151,7 @@ export class UmbMediaCaptionAltTextModalElement extends UmbModalBaseElement<
 			#mainobject {
 				display: flex;
 				flex-direction: column;
+				align-items: center;
 				max-width: 100%;
 
 				img {

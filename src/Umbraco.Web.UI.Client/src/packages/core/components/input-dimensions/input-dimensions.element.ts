@@ -167,7 +167,7 @@ export class UmbInputDimensionsElement extends UmbFormControlMixin<
 				? html`<uui-button
 						id="reset"
 						compact
-						label=${this.localize.term('general_clear')}
+						label=${this.localize.term('general_reset')}
 						?disabled=${this.disabled}
 						@click=${this.#onReset}></uui-button>`
 				: nothing}

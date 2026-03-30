@@ -119,14 +119,14 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 								<div slot="editor">
 									${when(this._loading === 'waiting', () => html`<uui-loader-circle></uui-loader-circle>`)}
 									${when(
-									this.value?.markup,
-									() =>
-										html`<div
-											id="preview"
-											style="aspect-ratio: ${this._width} / ${this._height}">
-											${unsafeHTML(this.value.markup)}
-										</div>`,
-								)}
+										this.value?.markup,
+										() =>
+											html`<div
+												id="preview"
+												style="width: ${this._width}px; aspect-ratio: ${this._width} / ${this._height}">
+												${unsafeHTML(this.value.markup)}
+											</div>`,
+									)}
 								</div>
 							</umb-property-layout>`,
 					)}
@@ -169,12 +169,14 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 			}
 
 			#preview {
-				width: 100%;
+				position: relative;
+				max-width: 100%;
+				margin-inline: auto;
 				overflow: hidden;
-				transition: aspect-ratio 0.3s ease;
 
-				/* oEmbed markup could be an iframe, object, or any element */
 				> *:first-child {
+					position: absolute;
+					inset: 0;
 					width: 100% !important;
 					height: 100% !important;
 				}

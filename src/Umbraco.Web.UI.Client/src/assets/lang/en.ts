@@ -958,6 +958,7 @@ export default {
 		rename: 'Rename',
 		renew: 'Renew',
 		required: 'Required',
+		reset: 'Reset',
 		retrieve: 'Retrieve',
 		retry: 'Retry',
 		rights: 'Permissions',
