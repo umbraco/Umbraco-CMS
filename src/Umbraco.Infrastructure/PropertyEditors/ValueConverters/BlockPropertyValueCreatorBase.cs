@@ -170,7 +170,7 @@ internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemMod
 
             // If the block was exposed via fallback to a different culture, recreate the element
             // with that culture's variation context so its property values come from the resolved culture.
-            if (resolvedCulture is not null && string.Equals(resolvedCulture, expectedBlockVariationCulture, StringComparison.OrdinalIgnoreCase) is false)
+            if (resolvedCulture is not null && resolvedCulture.InvariantEquals(expectedBlockVariationCulture) is false)
             {
                 VariationContext? originalContext = _variationContextAccessor.VariationContext;
                 try

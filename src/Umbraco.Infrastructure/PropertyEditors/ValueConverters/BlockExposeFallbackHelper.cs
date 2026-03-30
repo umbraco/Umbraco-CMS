@@ -4,6 +4,7 @@
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
@@ -90,7 +91,7 @@ internal static class BlockExposeFallbackHelper
         string? segment)
         => expose.Any(v =>
             v.ContentKey == elementKey &&
-            string.Equals(v.Culture, culture, StringComparison.OrdinalIgnoreCase) &&
+            v.Culture.InvariantEquals(culture) &&
             v.Segment == segment);
 
     /// <summary>
