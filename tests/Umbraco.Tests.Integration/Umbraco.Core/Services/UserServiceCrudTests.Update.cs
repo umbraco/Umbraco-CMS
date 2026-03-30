@@ -359,6 +359,7 @@ internal sealed partial class UserServiceCrudTests
         var elementContainerService = GetRequiredService<IElementContainerService>();
         var contentStartNode = contentService.GetRootContent().First();
         var mediaStartNode = mediaService.CreateMediaWithIdentity("test", -1, "Image");
+
         var elementContainerResult = await elementContainerService.CreateAsync(null, "TestElementFolder", null, Constants.Security.SuperUserKey);
         Assert.IsTrue(elementContainerResult.Success);
         var elementContainer = elementContainerResult.Result!;
