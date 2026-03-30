@@ -8,6 +8,7 @@
  * It filters out parts beginning with special characters or punctuation to handle
  * cases like "John Doe (Admin)" correctly, resulting in "JD" instead of "J(".
  */
+// TODO: When the utility to extract initials is exposed from the UUI library, use it and deprecate this function.
 export function getInitials(name: string): string {
 	let initials = '';
 
