@@ -12,7 +12,7 @@ export interface UmbInputDimensionsValue {
 /**
  * A dimension input element with width/height fields and an aspect ratio lock.
  * @element umb-input-dimensions
- * @fires change - When width, height, or locked state changes.
+ * @fires UmbChangeEvent - When width, height, or locked state changes.
  */
 @customElement('umb-input-dimensions')
 export class UmbInputDimensionsElement extends UmbFormControlMixin<
@@ -165,6 +165,7 @@ export class UmbInputDimensionsElement extends UmbFormControlMixin<
 			</div>
 			${this.#hasNaturalDimensions && !this.#isNatural
 				? html`<uui-button
+						id="reset"
 						compact
 						label=${this.localize.term('general_reset')}
 						?disabled=${this.disabled}
@@ -201,10 +202,10 @@ export class UmbInputDimensionsElement extends UmbFormControlMixin<
 					align-items: center;
 				}
 			}
+		}
 
-			> uui-button {
-				margin-bottom: var(--uui-size-space-1);
-			}
+		#reset {
+			margin-bottom: var(--uui-size-space-1);
 		}
 	`;
 }
