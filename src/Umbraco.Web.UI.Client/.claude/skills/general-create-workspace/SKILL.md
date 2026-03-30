@@ -324,7 +324,7 @@ export class Umb{EntityName}WorkspaceEditorElement extends UmbLitElement {
 	];
 }
 
-export default Umb{EntityName}WorkspaceEditorElement;
+export { Umb{EntityName}WorkspaceEditorElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
@@ -337,7 +337,7 @@ Key points:
 - Context type via `typeof TOKEN.TYPE` — avoids importing the context class directly
 - `umbFocus()` directive auto-focuses the name input on load
 - `back-path` on `<umb-entity-detail-workspace-editor>` controls the back button URL
-- Must export as `default` and declare on `HTMLElementTagNameMap`
+- Must export as `element` and declare on `HTMLElementTagNameMap`
 
 ## Step 5: Create detail view element
 
@@ -410,7 +410,7 @@ export class Umb{EntityName}DetailsWorkspaceViewElement extends UmbLitElement im
 	];
 }
 
-export default Umb{EntityName}DetailsWorkspaceViewElement;
+export { Umb{EntityName}DetailsWorkspaceViewElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
@@ -421,7 +421,7 @@ declare global {
 
 Key points:
 - Must implement `UmbWorkspaceViewElement` interface
-- Must export as `default` (lazy-loaded by the extension system)
+- Must export as `element` (lazy-loaded by the extension system)
 - Use `<umb-property-layout>` for consistent field layout
 - Use `<uui-box>` as the container
 - Use localization via `this.localize.term()` for labels
@@ -577,9 +577,9 @@ Example: Document publishing implements `UmbPublishableWorkspaceContext`. If med
 - [ ] Routes set up with `create` and `edit/:unique` paths
 - [ ] `UmbWorkspaceIsNewRedirectController` used in create route
 - [ ] Editor element uses `<umb-entity-detail-workspace-editor>`
-- [ ] Editor element exports as `default` and declared on `HTMLElementTagNameMap`
+- [ ] Editor element exports as `element` and declared on `HTMLElementTagNameMap`
 - [ ] View element implements `UmbWorkspaceViewElement`
-- [ ] View element exports as `default` and declared on `HTMLElementTagNameMap`
+- [ ] View element exports as `element` and declared on `HTMLElementTagNameMap`
 - [ ] Manifests include `workspace`, `workspaceView`, and `workspaceAction`
 - [ ] All view/action manifests use `UMB_WORKSPACE_CONDITION_ALIAS` condition
 - [ ] Workspace manifests wired into parent module's `manifests.ts`
