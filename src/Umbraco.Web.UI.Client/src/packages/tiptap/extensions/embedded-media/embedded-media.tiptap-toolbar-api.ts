@@ -17,6 +17,7 @@ export default class UmbTiptapToolbarEmbeddedMediaExtensionApi extends UmbTiptap
 			height: Math.round(width / (16 / 9)),
 			width,
 			url: '',
+			maxImageSize: width,
 		};
 
 		const attrs = editor?.getAttributes(umbEmbeddedMedia.name);

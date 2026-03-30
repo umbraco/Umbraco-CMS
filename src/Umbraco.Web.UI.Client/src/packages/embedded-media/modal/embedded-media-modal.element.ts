@@ -34,8 +34,19 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 	@state()
 	private _url = '';
 
+	@state()
+	private _naturalWidth = DEFAULT_WIDTH;
+
+	@state()
+	private _naturalHeight = DEFAULT_HEIGHT;
+
 	override connectedCallback() {
 		super.connectedCallback();
+
+		if (this.data?.maxImageSize) {
+			this._naturalWidth = this.data.maxImageSize;
+			this._naturalHeight = Math.round(this.data.maxImageSize / (16 / 9));
+		}
 
 		if (this.data?.width) this._width = this.data.width > 0 ? this.data.width : DEFAULT_WIDTH;
 		if (this.data?.height) this._height = this.data.height > 0 ? this.data.height : DEFAULT_HEIGHT;
@@ -125,8 +136,8 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 							slot="editor"
 							.width=${this._width}
 							.height=${this._height}
-							.naturalWidth=${DEFAULT_WIDTH}
-							.naturalHeight=${DEFAULT_HEIGHT}
+							.naturalWidth=${this._naturalWidth}
+							.naturalHeight=${this._naturalHeight}
 							.locked=${this._constrain}
 							?disabled=${isDisabled}
 							@change=${this.#onDimensionsChange}></umb-input-dimensions>
