@@ -8,6 +8,7 @@ import { css, html, customElement, state } from '@umbraco-cms/backoffice/externa
 import { imageSize } from '@umbraco-cms/backoffice/utils';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import type { UmbInputDimensionsElement } from '@umbraco-cms/backoffice/components';
 
 @customElement('umb-media-caption-alt-text-modal')
 export class UmbMediaCaptionAltTextModalElement extends UmbModalBaseElement<
@@ -18,10 +19,11 @@ export class UmbMediaCaptionAltTextModalElement extends UmbModalBaseElement<
 	readonly #mediaDetailRepository = new UmbMediaDetailRepository(this);
 	readonly #mediaUrlRepository = new UmbMediaUrlRepository(this);
 
-	#naturalRatio?: number;
+	@state()
+	private _naturalWidth?: number;
 
 	@state()
-	private _aspectLocked = true;
+	private _naturalHeight?: number;
 
 	override connectedCallback() {
 		super.connectedCallback();
@@ -48,7 +50,8 @@ export class UmbMediaCaptionAltTextModalElement extends UmbModalBaseElement<
 		if (url && !this.value.width) {
 			try {
 				const dims = await imageSize(url);
-				this.#naturalRatio = dims.naturalWidth / dims.naturalHeight;
+				this._naturalWidth = dims.naturalWidth;
+				this._naturalHeight = dims.naturalHeight;
 
 				let width = dims.naturalWidth;
 				let height = dims.naturalHeight;
@@ -69,42 +72,12 @@ export class UmbMediaCaptionAltTextModalElement extends UmbModalBaseElement<
 			} catch {
 				// If image dimensions cannot be resolved, leave width/height unset.
 			}
-		} else if (this.value.width && this.value.height) {
-			this.#naturalRatio = this.value.width / this.value.height;
 		}
 	}
 
-	#onWidthInput(e: UUIInputEvent) {
-		const width = parseInt(e.target.value as string, 10);
-		if (isNaN(width) || width <= 0) return;
-
-		if (this._aspectLocked && this.#naturalRatio) {
-			const height = Math.round(width / this.#naturalRatio);
-			this.value = { ...this.value, width, height };
-		} else {
-			this.value = { ...this.value, width };
-		}
-	}
-
-	#onHeightInput(e: UUIInputEvent) {
-		const height = parseInt(e.target.value as string, 10);
-		if (isNaN(height) || height <= 0) return;
-
-		if (this._aspectLocked && this.#naturalRatio) {
-			const width = Math.round(height * this.#naturalRatio);
-			this.value = { ...this.value, width, height };
-		} else {
-			this.value = { ...this.value, height };
-		}
-	}
-
-	#onToggleAspectLock() {
-		this._aspectLocked = !this._aspectLocked;
-
-		// Update ratio when locking, based on current dimensions
-		if (this._aspectLocked && this.value?.width && this.value?.height) {
-			this.#naturalRatio = this.value.width / this.value.height;
-		}
+	#onDimensionsChange(e: Event) {
+		const target = e.target as UmbInputDimensionsElement;
+		this.value = { ...this.value, width: target.width, height: target.height };
 	}
 
 	override render() {
@@ -127,42 +100,12 @@ export class UmbMediaCaptionAltTextModalElement extends UmbModalBaseElement<
 						@input=${(e: UUIInputEvent) =>
 							(this.value = { ...this.value, caption: e.target.value as string })}></uui-input>
 
-					<div id="dimensions">
-						<div class="dimension-field">
-							<uui-label for="width">${this.localize.term('general_width')}</uui-label>
-							<uui-input
-								id="width"
-								type="number"
-								label=${this.localize.term('general_width')}
-								placeholder=${this.localize.term('general_width')}
-								min="1"
-								.value=${this.value?.width?.toString() ?? ''}
-								@input=${this.#onWidthInput}>
-								<span class="extra" slot="append">px</span>
-							</uui-input>
-						</div>
-						<uui-button
-							compact
-							label=${this.localize.term('general_constrainProportions')}
-							title=${this.localize.term('general_constrainProportions')}
-							look=${this._aspectLocked ? 'primary' : 'default'}
-							@click=${this.#onToggleAspectLock}>
-							<uui-icon name=${this._aspectLocked ? 'icon-lock' : 'icon-unlocked'}></uui-icon>
-						</uui-button>
-						<div class="dimension-field">
-							<uui-label for="height">${this.localize.term('general_height')}</uui-label>
-							<uui-input
-								id="height"
-								type="number"
-								label=${this.localize.term('general_height')}
-								placeholder=${this.localize.term('general_height')}
-								min="1"
-								.value=${this.value?.height?.toString() ?? ''}
-								@input=${this.#onHeightInput}>
-								<span class="extra" slot="append">px</span>
-							</uui-input>
-						</div>
-					</div>
+					<umb-input-dimensions
+						.width=${this.value?.width}
+						.height=${this.value?.height}
+						.naturalWidth=${this._naturalWidth}
+						.naturalHeight=${this._naturalHeight}
+						@change=${this.#onDimensionsChange}></umb-input-dimensions>
 
 					<figure id="mainobject">
 						<img
@@ -197,38 +140,8 @@ export class UmbMediaCaptionAltTextModalElement extends UmbModalBaseElement<
 				flex-direction: column;
 			}
 
-			#dimensions {
-				display: flex;
-				align-items: end;
-				gap: var(--uui-size-space-3);
+			umb-input-dimensions {
 				margin-bottom: var(--uui-size-layout-1);
-
-				.dimension-field {
-					flex: 1;
-					display: flex;
-					flex-direction: column;
-					gap: var(--uui-size-space-1);
-
-					uui-input {
-						margin-bottom: 0;
-					}
-
-					.extra {
-						user-select: none;
-						height: 100%;
-						padding: 0 var(--uui-size-3);
-						border-left: 1px solid var(--uui-input-border-color, var(--uui-color-border));
-						background: var(--uui-color-background);
-						color: var(--uui-color-text);
-						display: flex;
-						justify-content: center;
-						align-items: center;
-					}
-				}
-
-				uui-button {
-					margin-bottom: var(--uui-size-space-1);
-				}
 			}
 
 			#mainobject {
