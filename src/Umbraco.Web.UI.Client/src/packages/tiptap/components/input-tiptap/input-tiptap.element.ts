@@ -1,9 +1,7 @@
 import { Editor } from '../../externals.js';
 import { UmbTiptapRteContext } from '../../contexts/tiptap-rte.context.js';
-import { UMB_TIPTAP_NODE_DBLCLICK_EVENT } from '../../extensions/tiptap-node-dblclick.event.js';
 import type { AnyExtension } from '../../externals.js';
 import type { UmbTiptapExtensionApi } from '../../extensions/types.js';
-import type { UmbTiptapToolbarElement } from '../toolbar/tiptap-toolbar.element.js';
 import type { UmbTiptapStatusbarValue, UmbTiptapToolbarValue } from '../types.js';
 import {
 	css,
@@ -223,13 +221,6 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 				this._runValidators();
 				this.dispatchEvent(new UmbChangeEvent());
 			},
-		});
-
-		// Listen for double-click events dispatched by node extensions (image, figure, embedded media)
-		// and delegate to the toolbar to execute the active action.
-		element.addEventListener(UMB_TIPTAP_NODE_DBLCLICK_EVENT, () => {
-			const toolbar = this.shadowRoot?.querySelector<UmbTiptapToolbarElement>('umb-tiptap-toolbar');
-			toolbar?.executeActiveToolbarAction();
 		});
 
 		this.#context.setEditor(this._editor);
