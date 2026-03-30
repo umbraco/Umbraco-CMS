@@ -162,19 +162,14 @@ export class UmbInputDimensionsElement extends UmbFormControlMixin<
 						<span class="extra" slot="append">px</span>
 					</uui-input>
 				</div>
-				${this.#hasNaturalDimensions && !this.#isNatural
-					? html`
-							<uui-button
-								compact
-								label=${this.localize.term('general_reset')}
-								title=${this.localize.term('general_reset')}
-								?disabled=${this.disabled}
-								@click=${this.#onReset}>
-								<uui-icon name="icon-undo"></uui-icon>
-							</uui-button>
-						`
-					: nothing}
 			</div>
+			${this.#hasNaturalDimensions && !this.#isNatural
+				? html`<uui-button
+						compact
+						label=${this.localize.term('general_reset')}
+						?disabled=${this.disabled}
+						@click=${this.#onReset}></uui-button>`
+				: nothing}
 		`;
 	}
 
@@ -207,7 +202,7 @@ export class UmbInputDimensionsElement extends UmbFormControlMixin<
 				}
 			}
 
-			uui-button {
+			> uui-button {
 				margin-bottom: var(--uui-size-space-1);
 			}
 		}
