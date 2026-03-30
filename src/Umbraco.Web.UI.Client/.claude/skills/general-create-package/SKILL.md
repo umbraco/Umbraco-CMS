@@ -32,13 +32,12 @@ src/packages/{package-name}/
 ├── vite.config.ts                  # Build configuration
 ├── umbraco-package.ts              # Bundle entry point (lazy-loads manifests)
 ├── manifests.ts                    # Aggregates all module manifests
-├── entity.ts                       # Entity type constants (if entity-based)
 ├── {module-name}/                  # First module
+│   ├── entity.ts                  # Entity type constants (if entity-based)
 │   ├── index.ts                   # Public API exports
 │   ├── manifests.ts               # Module manifest registrations
 │   ├── constants.ts               # Module constants
 │   └── types.ts                   # Module types
-└── index.ts                        # Package-level public API (optional, only if exporting)
 ```
 
 ## Step 1: Create package.json
