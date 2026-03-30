@@ -46,29 +46,31 @@ export class UmbMediaCaptionAltTextModalElement extends UmbModalBaseElement<
 			url,
 		};
 
-		// Auto-populate dimensions from natural image size if not already set
-		if (url && !this.value.width) {
+		if (url) {
 			try {
 				const dims = await imageSize(url);
 				this._naturalWidth = dims.naturalWidth;
 				this._naturalHeight = dims.naturalHeight;
 
-				let width = dims.naturalWidth;
-				let height = dims.naturalHeight;
+				// Auto-populate dimensions from natural image size if not already set
+				if (!this.value.width) {
+					let width = dims.naturalWidth;
+					let height = dims.naturalHeight;
 
-				// Cap to maxImageSize proportionally
-				const maxSize = this.data?.maxImageSize;
-				if (maxSize && (width > maxSize || height > maxSize)) {
-					const ratio = Math.min(maxSize / width, maxSize / height);
-					width = Math.round(width * ratio);
-					height = Math.round(height * ratio);
+					// Cap to maxImageSize proportionally
+					const maxSize = this.data?.maxImageSize;
+					if (maxSize && (width > maxSize || height > maxSize)) {
+						const ratio = Math.min(maxSize / width, maxSize / height);
+						width = Math.round(width * ratio);
+						height = Math.round(height * ratio);
+					}
+
+					this.value = {
+						...this.value,
+						width,
+						height,
+					};
 				}
-
-				this.value = {
-					...this.value,
-					width,
-					height,
-				};
 			} catch {
 				// If image dimensions cannot be resolved, leave width/height unset.
 			}
