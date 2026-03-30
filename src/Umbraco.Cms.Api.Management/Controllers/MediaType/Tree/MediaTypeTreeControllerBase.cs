@@ -56,15 +56,15 @@ public class MediaTypeTreeControllerBase : FolderTreeControllerBase<MediaTypeTre
 
     protected override UmbracoObjectTypes FolderObjectType => UmbracoObjectTypes.MediaTypeContainer;
 
-    protected override MediaTypeTreeItemResponseModel[] MapTreeItemViewModels(Guid? parentKey, IEntitySlim[] entities)
+    protected override async Task<MediaTypeTreeItemResponseModel[]> MapTreeItemViewModelsAsync(Guid? parentKey, IEntitySlim[] entities)
     {
         var mediaTypes = _mediaTypeService
             .GetMany(entities.Select(entity => entity.Id).ToArray())
             .ToDictionary(contentType => contentType.Id);
 
-        return entities.Select(entity =>
+        IEnumerable<Task<MediaTypeTreeItemResponseModel>> tasks = entities.Select(async entity =>
         {
-            MediaTypeTreeItemResponseModel responseModel = MapTreeItemViewModel(parentKey, entity);
+            MediaTypeTreeItemResponseModel responseModel = await MapTreeItemViewModelAsync(parentKey, entity);
             if (mediaTypes.TryGetValue(entity.Id, out IMediaType? mediaType))
             {
                 responseModel.Icon = mediaType.Icon ?? responseModel.Icon;
@@ -72,6 +72,8 @@ public class MediaTypeTreeControllerBase : FolderTreeControllerBase<MediaTypeTre
             }
 
             return responseModel;
-        }).ToArray();
+        });
+
+        return await Task.WhenAll(tasks);
     }
 }

@@ -3,9 +3,9 @@ using Umbraco.Cms.Api.Management.ViewModels.Document;
 namespace Umbraco.Cms.Api.Management.ViewModels.Content;
 
 /// <summary>
-/// Base class for publishable variant response models, providing flag support, publish state, and scheduling information.
+/// Base class for publishable variant item response models, providing flag support and publish state.
 /// </summary>
-public abstract class PublishableVariantResponseModelBase : VariantResponseModelBase, IHasFlags
+public abstract class PublishableVariantItemResponseModelBase : VariantItemResponseModelBase, IHasFlags
 {
     private readonly List<FlagModel> _flags = [];
 
@@ -32,20 +32,5 @@ public abstract class PublishableVariantResponseModelBase : VariantResponseModel
     /// <summary>
     /// Gets or sets the publish state of the variant.
     /// </summary>
-    public DocumentVariantState State { get; set; }
-
-    /// <summary>
-    /// Gets or sets the date the variant was published.
-    /// </summary>
-    public DateTimeOffset? PublishDate { get; set; }
-
-    /// <summary>
-    /// Gets or sets the scheduled publish date for the variant.
-    /// </summary>
-    public DateTimeOffset? ScheduledPublishDate { get; set; }
-
-    /// <summary>
-    /// Gets or sets the scheduled unpublish date for the variant.
-    /// </summary>
-    public DateTimeOffset? ScheduledUnpublishDate { get; set; }
+    public required DocumentVariantState State { get; set; }
 }

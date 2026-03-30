@@ -985,12 +985,12 @@ export type DocumentVariantResponseModel = {
     name: string;
     createDate: string;
     updateDate: string;
+    readonly id: string;
+    flags: Array<FlagModel>;
     state: DocumentVariantStateModel;
     publishDate?: string | null;
     scheduledPublishDate?: string | null;
     scheduledUnpublishDate?: string | null;
-    readonly id: string;
-    flags: Array<FlagModel>;
 };
 
 export enum DocumentVariantStateModel {
@@ -1153,6 +1153,8 @@ export type ElementValueResponseModel = {
 export type ElementVariantItemResponseModel = {
     name: string;
     culture?: string | null;
+    readonly id: string;
+    flags: Array<FlagModel>;
     state: DocumentVariantStateModel;
 };
 
@@ -1168,6 +1170,8 @@ export type ElementVariantResponseModel = {
     name: string;
     createDate: string;
     updateDate: string;
+    readonly id: string;
+    flags: Array<FlagModel>;
     state: DocumentVariantStateModel;
     publishDate?: string | null;
     scheduledPublishDate?: string | null;
@@ -3477,11 +3481,31 @@ export type DocumentVariantResponseModelWritable = {
     name: string;
     createDate: string;
     updateDate: string;
+    flags: Array<FlagModel>;
     state: DocumentVariantStateModel;
     publishDate?: string | null;
     scheduledPublishDate?: string | null;
     scheduledUnpublishDate?: string | null;
+};
+
+export type ElementVariantItemResponseModelWritable = {
+    name: string;
+    culture?: string | null;
     flags: Array<FlagModel>;
+    state: DocumentVariantStateModel;
+};
+
+export type ElementVariantResponseModelWritable = {
+    culture?: string | null;
+    segment?: string | null;
+    name: string;
+    createDate: string;
+    updateDate: string;
+    flags: Array<FlagModel>;
+    state: DocumentVariantStateModel;
+    publishDate?: string | null;
+    scheduledPublishDate?: string | null;
+    scheduledUnpublishDate?: string | null;
 };
 
 export type JsonNodeWritable = {
