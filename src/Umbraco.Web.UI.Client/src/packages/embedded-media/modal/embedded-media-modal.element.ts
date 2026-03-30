@@ -159,6 +159,7 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 				width: 100%;
 				overflow: hidden;
 
+				/* oEmbed markup could be an iframe, object, or any element */
 				> *:first-child {
 					width: 100%;
 					height: 100%;
