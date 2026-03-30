@@ -138,16 +138,16 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
             return null;
         }
 
-        if (preview is false && dto.PubName is null)
+        if (preview is false && dto.PubDataRaw is null && dto.PubData is null)
+        {
+            return null;
+        }
+
+        if (preview is false && dto.Published && dto.PubName is null)
         {
             _logger.LogWarning(
                 "Node {NodeKey} appears published but has no published version name, indicating an inconsistent database state. Consider republishing the content. Skipping node.",
                 key);
-            return null;
-        }
-
-        if (preview is false && dto.PubDataRaw is null && dto.PubData is null)
-        {
             return null;
         }
 
@@ -165,9 +165,23 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         }
 
         ContentCacheNode? draftNode = CreateContentNodeKit(true, dto);
-        ContentCacheNode? publishedNode = dto.PubName is null || (dto.PubDataRaw is null && dto.PubData is null)
-            ? null
-            : CreateContentNodeKit(false, dto);
+
+        ContentCacheNode? publishedNode;
+        if (dto.PubDataRaw is null && dto.PubData is null)
+        {
+            publishedNode = null;
+        }
+        else if (dto.Published && dto.PubName is null)
+        {
+            _logger.LogWarning(
+                "Node {NodeKey} appears published but has no published version name, indicating an inconsistent database state. Consider republishing the content. Skipping node.",
+                key);
+            publishedNode = null;
+        }
+        else
+        {
+            publishedNode = CreateContentNodeKit(false, dto);
+        }
 
         return (draftNode, publishedNode);
     }
@@ -201,7 +215,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
 
         dtos = dtos
             .Where(x => x is not null)
-            .Where(x => preview || (x.PubName is not null && (x.PubDataRaw is not null || x.PubData is not null)))
+            .Where(x => preview || ((x.PubDataRaw is not null || x.PubData is not null) && (!x.Published || x.PubName is not null)))
             .ToList();
 
         IContentCacheDataSerializer serializer =

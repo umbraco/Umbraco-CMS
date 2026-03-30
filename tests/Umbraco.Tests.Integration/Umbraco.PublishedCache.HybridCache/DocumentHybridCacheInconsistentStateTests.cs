@@ -105,17 +105,16 @@ internal sealed class DocumentHybridCacheInconsistentStateTests : UmbracoIntegra
         // CreateContentNodeKit. A corrupt node should not crash the entire enumeration.
         var databaseCacheRepository = GetRequiredService<IDatabaseCacheRepository>();
 
-        // Assert: Should not throw — corrupt node should be skipped.
-        Assert.DoesNotThrow(() =>
-        {
-            using var scope = ScopeProvider.CreateScope(autoComplete: true);
-            var nodes = databaseCacheRepository.GetContentByContentTypeKey(
-                [ContentType.Key],
-                ContentCacheDataSerializerEntityType.Document);
+        using var scope = ScopeProvider.CreateScope(autoComplete: true);
+        var nodes = databaseCacheRepository.GetContentByContentTypeKey(
+            [ContentType.Key],
+            ContentCacheDataSerializerEntityType.Document)
+            .ToList();
 
-            // Force full enumeration (it uses yield return).
-            _ = nodes.ToList();
-        });
+        // Assert: Healthy nodes are returned, corrupt node is skipped.
+        var returnedKeys = nodes.Select(n => n.Key).ToHashSet();
+        Assert.That(returnedKeys, Does.Not.Contain(Textpage.Key), "Corrupt node should be skipped");
+        Assert.That(returnedKeys, Does.Contain(Subpage.Key), "Healthy sibling should still be returned");
     }
 
     /// <summary>
