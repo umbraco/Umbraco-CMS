@@ -1,6 +1,6 @@
 ---
 name: general-create-package
-description: Create a new package in the Umbraco backoffice client with its first module. Use when adding a new domain feature area that needs its own package under src/packages/ — e.g., a new CMS feature like webhooks, tags, or relations. Packages are self-contained domain modules that can theoretically be uninstalled independently. Also use when the user says things like "scaffold a new package", "add a new feature package", or "create a new domain module".
+description: Create a new package in the Umbraco backoffice client with its first module. Use when adding a new domain feature area that needs its own package under src/packages/ — e.g., a new CMS feature like data types, tags, or relations. Packages are self-contained domain modules that can theoretically be uninstalled independently. Also use when the user says things like "scaffold a new package", "add a new feature package", or "create a new domain module".
 allowed-tools: Read, Write, Edit, Grep, Glob
 ---
 
@@ -18,17 +18,17 @@ Read these docs before creating a package — they define the conventions this s
 
 ## Naming conventions
 
-- **Package names** are **plural** (e.g., `webhooks`, `languages`, `tags`, `documents`, `relations`)
-- **Module names** are **singular** (e.g., `webhook`, `language`, `tag`, `document`, `relation`)
+- **Package names** are **plural** (e.g., `data-types`, `languages`, `tags`, `documents`, `relations`)
+- **Module names** are **singular** (e.g., `data-type`, `language`, `tag`, `document`, `relation`)
 
 ## What you need from the user
 
-1. **Package name** — The domain name in plural form (e.g., `webhooks`, `languages`, `tags`) — kebab-case
-2. **First module name** — The primary module in singular form (e.g., `webhook`, `language`, `tag`)
+1. **Package name** — The domain name in plural form (e.g., `data-types`, `languages`, `tags`) — kebab-case
+2. **First module name** — The primary module in singular form (e.g., `data-type`, `language`, `tag`)
 
 ## When to create a package vs. add to core
 
-- **New package**: Domain-specific CMS features (documents, media, webhook, language). Each package is independent and self-contained.
+- **New package**: Domain-specific CMS features (documents, media, data-type, language). Each package is independent and self-contained.
 - **Add to core**: UI framework infrastructure shared by all packages (modals, routing, extension system). Use the `add-core-module` skill instead.
 
 ## Files to create
@@ -171,7 +171,7 @@ This registers the new workspace package with npm.
 
 ## Reference: existing packages to study
 
-- **Simple package**: `src/packages/webhook/` — straightforward entity with CRUD
+- **Simple package**: `src/packages/data-type/` — straightforward entity with CRUD
 - **Complex package**: `src/packages/documents/` — multiple modules, rich entity
 - **Minimal package**: `src/packages/tags/` — small feature area
 
