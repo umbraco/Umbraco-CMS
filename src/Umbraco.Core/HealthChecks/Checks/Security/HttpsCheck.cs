@@ -74,8 +74,27 @@ public class HttpsCheck : HealthCheck
         return sslErrors == SslPolicyErrors.None;
     }
 
+    private HealthCheckStatus? CheckApplicationUrlAvailable()
+    {
+        if (_hostingEnvironment.ApplicationMainUrl is not null)
+        {
+            return null;
+        }
+
+        return new HealthCheckStatus(
+            _textService.Localize("healthcheck", "httpsCheckNoApplicationUrl"))
+        {
+            ResultType = StatusResultType.Info,
+        };
+    }
+
     private async Task<HealthCheckStatus> CheckForValidCertificate()
     {
+        if (CheckApplicationUrlAvailable() is HealthCheckStatus unavailable)
+        {
+            return unavailable;
+        }
+
         string message;
         StatusResultType result;
 
@@ -154,6 +173,11 @@ public class HttpsCheck : HealthCheck
 
     private Task<HealthCheckStatus> CheckIfCurrentSchemeIsHttps()
     {
+        if (CheckApplicationUrlAvailable() is HealthCheckStatus unavailable)
+        {
+            return Task.FromResult(unavailable);
+        }
+
         Uri uri = _hostingEnvironment.ApplicationMainUrl;
         var success = uri.Scheme == Uri.UriSchemeHttps;
 
@@ -169,6 +193,11 @@ public class HttpsCheck : HealthCheck
 
     private Task<HealthCheckStatus> CheckHttpsConfigurationSetting()
     {
+        if (CheckApplicationUrlAvailable() is HealthCheckStatus unavailable)
+        {
+            return Task.FromResult(unavailable);
+        }
+
         var httpsSettingEnabled = _globalSettings.CurrentValue.UseHttps;
         Uri uri = _hostingEnvironment.ApplicationMainUrl;
 

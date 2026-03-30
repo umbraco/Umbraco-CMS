@@ -1,5 +1,8 @@
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
@@ -16,6 +19,7 @@ public class InviteUriProvider : IInviteUriProvider
     private readonly ICoreBackOfficeUserManager _userManager;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IHostingEnvironment _hostingEnvironment;
+    private readonly ILogger<InviteUriProvider> _logger;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Security.InviteUriProvider"/> class, used to generate invite URIs for user management.
@@ -23,15 +27,36 @@ public class InviteUriProvider : IInviteUriProvider
     /// <param name="userManager">The user manager responsible for core back office user operations.</param>
     /// <param name="httpContextAccessor">Provides access to the current HTTP context.</param>
     /// <param name="hostingEnvironment">Provides information about the web hosting environment.</param>
+    /// <param name="logger">A logger instance for diagnostic messages.</param>
+    public InviteUriProvider(
+        ICoreBackOfficeUserManager userManager,
+        IHttpContextAccessor httpContextAccessor,
+        IHostingEnvironment hostingEnvironment,
+        ILogger<InviteUriProvider> logger)
+    {
+        _userManager = userManager;
+        _httpContextAccessor = httpContextAccessor;
+        _hostingEnvironment = hostingEnvironment;
+        _logger = logger;
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Security.InviteUriProvider"/> class, used to generate invite URIs for user management.
+    /// </summary>
+    /// <param name="userManager">The user manager responsible for core back office user operations.</param>
+    /// <param name="httpContextAccessor">Provides access to the current HTTP context.</param>
+    /// <param name="hostingEnvironment">Provides information about the web hosting environment.</param>
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
     public InviteUriProvider(
         ICoreBackOfficeUserManager userManager,
         IHttpContextAccessor httpContextAccessor,
         IHostingEnvironment hostingEnvironment)
+        : this(
+            userManager,
+            httpContextAccessor,
+            hostingEnvironment,
+            StaticServiceProvider.Instance.GetRequiredService<ILogger<InviteUriProvider>>())
     {
-
-        _userManager = userManager;
-        _httpContextAccessor = httpContextAccessor;
-        _hostingEnvironment = hostingEnvironment;
     }
 
     /// <summary>
@@ -56,14 +81,28 @@ public class InviteUriProvider : IInviteUriProvider
             throw new NotSupportedException("Needs a HttpContext");
         }
 
-        var uriBuilder = new UriBuilder(_hostingEnvironment.ApplicationMainUrl);
-        uriBuilder.Path = BackOfficeLoginController.LoginPath;
-        uriBuilder.Query = QueryString.Create(new KeyValuePair<string, string?>[]
+        var query = QueryString.Create(new KeyValuePair<string, string?>[]
         {
             new ("flow", "invite-user"),
             new ("userId", invitee.Key.ToString()),
             new ("inviteCode", tokenAttempt.Result.ToUrlBase64()),
         }).ToUriComponent();
+
+        Uri? appUrl = _hostingEnvironment.ApplicationMainUrl;
+        if (appUrl is null)
+        {
+            _logger.LogWarning(
+                "ApplicationMainUrl is not configured. Invite link will use a relative path. "
+                + "Set Umbraco:CMS:WebRouting:UmbracoApplicationUrl in configuration.");
+
+            return Attempt.SucceedWithStatus(
+                UserOperationStatus.Success,
+                new Uri(BackOfficeLoginController.LoginPath + query, UriKind.Relative));
+        }
+
+        var uriBuilder = new UriBuilder(appUrl);
+        uriBuilder.Path = BackOfficeLoginController.LoginPath;
+        uriBuilder.Query = query;
 
         return Attempt.SucceedWithStatus(UserOperationStatus.Success, uriBuilder.Uri);
     }

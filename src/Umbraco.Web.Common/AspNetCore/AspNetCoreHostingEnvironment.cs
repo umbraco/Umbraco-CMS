@@ -185,22 +185,41 @@ public class AspNetCoreHostingEnvironment : IHostingEnvironment
             return;
         }
 
+        // Explicit configuration always takes precedence.
         if (_webRoutingSettings.CurrentValue.UmbracoApplicationUrl is not null)
         {
             return;
         }
 
-        // Once ApplicationMainUrl is set via auto-detection, lock it.
-        // This prevents Host header poisoning where a forged Host header
-        // could overwrite the URL used in password reset links, invitations, etc.
-        if (ApplicationMainUrl is not null)
+        switch (_webRoutingSettings.CurrentValue.ApplicationUrlDetection)
         {
-            return;
-        }
+            case ApplicationUrlDetection.None:
+                return;
 
-        if (_applicationUrls.TryAdd(currentApplicationUrl))
-        {
-            ApplicationMainUrl = currentApplicationUrl;
+            case ApplicationUrlDetection.FirstRequest:
+                if (ApplicationMainUrl is not null)
+                {
+                    return;
+                }
+
+                if (_applicationUrls.TryAdd(currentApplicationUrl))
+                {
+                    ApplicationMainUrl = currentApplicationUrl;
+                }
+
+                break;
+
+            case ApplicationUrlDetection.EveryRequest:
+                var change = _applicationUrls.Contains(currentApplicationUrl) is false;
+                if (change)
+                {
+                    if (_applicationUrls.TryAdd(currentApplicationUrl))
+                    {
+                        ApplicationMainUrl = currentApplicationUrl;
+                    }
+                }
+
+                break;
         }
     }
 
