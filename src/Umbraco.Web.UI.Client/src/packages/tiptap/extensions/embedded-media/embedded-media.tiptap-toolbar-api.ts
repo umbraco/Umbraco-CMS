@@ -13,7 +13,7 @@ export default class UmbTiptapToolbarEmbeddedMediaExtensionApi extends UmbTiptap
 	override async execute(editor?: Editor) {
 		const width = this.maxImageSize;
 		const data = {
-			constrain: false,
+			constrain: true,
 			height: Math.round(width / (16 / 9)),
 			width,
 			url: '',
