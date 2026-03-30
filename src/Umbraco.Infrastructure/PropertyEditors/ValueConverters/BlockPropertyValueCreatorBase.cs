@@ -133,8 +133,8 @@ internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemMod
 
         var blockConfigMap = blockConfigurations.ToDictionary(bc => bc.ContentElementTypeKey);
         VariationContext variationContext = _variationContextAccessor.VariationContext ?? new VariationContext();
-        IReadOnlyList<ILanguage> allLanguages = (await _languageService.GetAllAsync()).ToList();
-        var languagesByIsoCode = allLanguages.ToDictionary(l => l.IsoCode, StringComparer.OrdinalIgnoreCase);
+        var languagesByIsoCode = (await _languageService.GetAllAsync())
+            .ToDictionary(l => l.IsoCode, StringComparer.OrdinalIgnoreCase);
         var defaultIsoCode = await _languageService.GetDefaultIsoCodeAsync();
 
         // Convert the content data
