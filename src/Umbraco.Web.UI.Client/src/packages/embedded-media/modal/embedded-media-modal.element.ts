@@ -23,7 +23,7 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 	private _width = 500;
 
 	@state()
-	private _height = 281;
+	private _height = Math.round(500 / (16 / 9));
 
 	@state()
 	private _constrain = false;
