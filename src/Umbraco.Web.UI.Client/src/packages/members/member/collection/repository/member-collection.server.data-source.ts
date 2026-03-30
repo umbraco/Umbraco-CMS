@@ -4,9 +4,10 @@ import type { UmbMemberCollectionFilterModel } from '../types.js';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import type { UmbCollectionDataSource } from '@umbraco-cms/backoffice/collection';
 import type { MemberResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { MemberService } from '@umbraco-cms/backoffice/external/backend-api';
+import { DirectionModel, MemberService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbEntityVariantModel } from '@umbraco-cms/backoffice/variant';
+import { UmbDirection } from '@umbraco-cms/backoffice/utils';
 
 /**
  * A data source that fetches the member collection data from the server.
@@ -31,7 +32,17 @@ export class UmbMemberCollectionServerDataSource implements UmbCollectionDataSou
 	 * @returns {*}
 	 * @memberof UmbMemberCollectionServerDataSource
 	 */
-	async getCollection(query: UmbMemberCollectionFilterModel) {
+	async getCollection(filter: UmbMemberCollectionFilterModel) {
+		const query = {
+			memberTypeId: filter.memberTypeId,
+			filter: filter.filter,
+			orderBy: filter.orderBy ?? 'username',
+			orderDirection:
+				filter.orderDirection === UmbDirection.DESCENDING ? DirectionModel.DESCENDING : DirectionModel.ASCENDING,
+			skip: filter.skip ?? 0,
+			take: filter.take ?? 100,
+		};
+
 		const { data, error } = await tryExecute(this.#host, MemberService.getFilterMember({ query }));
 
 		if (error) {

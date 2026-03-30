@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Controllers.Content;
 using Umbraco.Cms.Api.Management.Routing;
@@ -10,11 +10,16 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Media;
 
+/// <summary>
+/// Serves as the base class for controllers that handle media-related API endpoints in the management area.
+/// </summary>
 [VersionedApiBackOfficeRoute(Constants.UdiEntityType.Media)]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Media))]
 [Authorize(Policy = AuthorizationPolicies.SectionAccessMedia)]
 public class MediaControllerBase : ContentControllerBase
 {
+    protected override string EntityName => "media";
+
     protected IActionResult MediaNotFound()
         => OperationStatusResult(ContentEditingOperationStatus.NotFound, problemDetailsBuilder
             => NotFound(problemDetailsBuilder

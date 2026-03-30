@@ -7,6 +7,9 @@ using Umbraco.Cms.Web.Common.Attributes;
 
 namespace Umbraco.Cms.Api.Management.Services;
 
+/// <summary>
+/// Provides functionality to detect and resolve conflicting routes in the Umbraco CMS API management.
+/// </summary>
 public class ConflictingRouteService : IConflictingRouteService
 {
     private readonly TypeLoader _typeLoader;

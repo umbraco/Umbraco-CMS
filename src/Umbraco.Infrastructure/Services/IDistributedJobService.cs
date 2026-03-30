@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Infrastructure.BackgroundJobs;
+using Umbraco.Cms.Infrastructure.BackgroundJobs;
 
 namespace Umbraco.Cms.Infrastructure.Services;
 
@@ -16,8 +16,10 @@ public interface IDistributedJobService
     Task<IDistributedBackgroundJob?> TryTakeRunnableAsync();
 
     /// <summary>
-    /// Finishes a job.
+    /// Marks the specified distributed job as finished.
     /// </summary>
+    /// <param name="jobName">The name of the job to finish.</param>
+    /// <returns>A task that represents the asynchronous finish operation.</returns>
     Task FinishAsync(string jobName);
 
     /// <summary>
@@ -31,5 +33,6 @@ public interface IDistributedJobService
     /// </list>
     /// Jobs that exist in the database but are no longer registered in code will be removed.
     /// </remarks>
+    /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
     Task EnsureJobsAsync();
 }

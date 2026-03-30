@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.ViewModels.Folder;
@@ -11,6 +11,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers;
 
+/// <summary>
+/// Serves as a base controller for managing folder-related operations for a specified tree entity type in the management API.
+/// </summary>
 public abstract class FolderManagementControllerBase<TTreeEntity> : ManagementApiControllerBase
     where TTreeEntity : ITreeEntity
 {
@@ -103,6 +106,10 @@ public abstract class FolderManagementControllerBase<TTreeEntity> : ManagementAp
             EntityContainerOperationStatus.CancelledByNotification => new BadRequestObjectResult(problemDetailsBuilder
                 .WithTitle("Cancelled by notification")
                 .WithDetail("A notification handler prevented the folder operation.")
+                .Build()),
+            EntityContainerOperationStatus.HasReferencedDescendants => new BadRequestObjectResult(problemDetailsBuilder
+                .WithTitle("The folder has referenced descendants")
+                .WithDetail("The folder cannot be moved to the recycle bin because it contains items that are referenced by other content.")
                 .Build()),
             _ => new ObjectResult(problemDetailsBuilder
                 .WithTitle("Unknown folder operation status.")

@@ -62,46 +62,6 @@ public sealed class DataTypeCacheRefresher : PayloadCacheRefresherBase<DataTypeC
         _contentTypeCommonRepository = contentTypeCommonRepository;
     }
 
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="DataTypeCacheRefresher" /> class.
-    /// </summary>
-    /// <param name="appCaches">The application caches.</param>
-    /// <param name="serializer">The JSON serializer.</param>
-    /// <param name="idKeyMap">The ID-key mapping service.</param>
-    /// <param name="eventAggregator">The event aggregator.</param>
-    /// <param name="factory">The cache refresher notification factory.</param>
-    /// <param name="publishedModelFactory">The published model factory.</param>
-    /// <param name="publishedContentTypeFactory">The published content type factory.</param>
-    /// <param name="publishedContentTypeCache">The published content type cache.</param>
-    /// <param name="documentCacheService">The document cache service.</param>
-    /// <param name="mediaCacheService">The media cache service.</param>
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 18.")]
-    public DataTypeCacheRefresher(
-        AppCaches appCaches,
-        IJsonSerializer serializer,
-        IIdKeyMap idKeyMap,
-        IEventAggregator eventAggregator,
-        ICacheRefresherNotificationFactory factory,
-        IPublishedModelFactory publishedModelFactory,
-        IPublishedContentTypeFactory publishedContentTypeFactory,
-        IPublishedContentTypeCache publishedContentTypeCache,
-        IDocumentCacheService documentCacheService,
-        IMediaCacheService mediaCacheService)
-        : this(
-            appCaches,
-            serializer,
-            idKeyMap,
-            eventAggregator,
-            factory,
-            publishedModelFactory,
-            publishedContentTypeFactory,
-            publishedContentTypeCache,
-            documentCacheService,
-            mediaCacheService,
-            StaticServiceProvider.Instance.GetRequiredService<IContentTypeCommonRepository>())
-    {
-    }
-
     #region Json
 
     /// <summary>
@@ -182,6 +142,7 @@ public sealed class DataTypeCacheRefresher : PayloadCacheRefresherBase<DataTypeC
             if (dataTypeCache.Success)
             {
                 dataTypeCache.Result?.Clear(RepositoryCacheKeys.GetKey<IDataType, int>(payload.Id));
+                dataTypeCache.Result?.Clear(RepositoryCacheKeys.GetGuidKey<IDataType>(payload.Key));
             }
         }
 
@@ -197,20 +158,48 @@ public sealed class DataTypeCacheRefresher : PayloadCacheRefresherBase<DataTypeC
             removedContentTypes.AddRange(_publishedContentTypeCache.ClearByDataTypeId(payload.Id));
         }
 
-        var changedIds = payloads.Select(x => x.Id).ToArray();
+        var changedIds = Array.ConvertAll(payloads, x => x.Id);
         _publishedContentTypeFactory.NotifyDataTypeChanges(changedIds);
 
         _publishedModelFactory.WithSafeLiveFactoryReset(() =>
         {
-            IEnumerable<int> documentTypeIds = removedContentTypes
+            var documentTypeIds = removedContentTypes
                 .Where(x => x.ItemType == PublishedItemType.Content)
-                .Select(x => x.Id);
-            _documentCacheService.RebuildMemoryCacheByContentTypeAsync(documentTypeIds).GetAwaiter().GetResult();
+                .Select(x => x.Id)
+                .ToArray();
 
-            IEnumerable<int> mediaTypeIds = removedContentTypes
+            var mediaTypeIds = removedContentTypes
                 .Where(x => x.ItemType == PublishedItemType.Media)
-                .Select(x => x.Id);
-            _mediaCacheService.RebuildMemoryCacheByContentTypeAsync(mediaTypeIds).GetAwaiter().GetResult();
+                .Select(x => x.Id)
+                .ToArray();
+
+            if (documentTypeIds.Length > 0)
+            {
+                _documentCacheService.RebuildMemoryCacheByContentTypeAsync(documentTypeIds).GetAwaiter().GetResult();
+            }
+
+            if (mediaTypeIds.Length > 0)
+            {
+                _mediaCacheService.RebuildMemoryCacheByContentTypeAsync(mediaTypeIds).GetAwaiter().GetResult();
+            }
+
+            // In auto models builder mode (InMemoryAuto), the factory reset above invalidates ALL compiled
+            // model types, so we must clear all converted content entries — not just the rebuilt types —
+            // to prevent stale instances of other types (e.g. Model.Parent<T>()) from being returned.
+            // RebuildMemoryCacheByContentTypeAsync already clears selectively for the affected types,
+            // but the full clear is needed for all other types whose models were also invalidated.
+            if (_publishedModelFactory is IAutoPublishedModelFactory)
+            {
+                if (documentTypeIds.Length > 0)
+                {
+                    _documentCacheService.ClearConvertedContentCache();
+                }
+
+                if (mediaTypeIds.Length > 0)
+                {
+                    _mediaCacheService.ClearConvertedContentCache();
+                }
+            }
         });
         base.Refresh(payloads);
     }

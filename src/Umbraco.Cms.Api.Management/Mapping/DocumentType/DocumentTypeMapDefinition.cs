@@ -8,8 +8,16 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Mapping.DocumentType;
 
+/// <summary>
+/// Provides mapping configuration for document types in the Umbraco CMS Management API.
+/// </summary>
 public class DocumentTypeMapDefinition : ContentTypeMapDefinition<IContentType, DocumentTypePropertyTypeResponseModel, DocumentTypePropertyTypeContainerResponseModel>, IMapDefinition
 {
+    /// <summary>
+    /// Configures the object-object mappings for document type-related models within the Umbraco CMS API.
+    /// This includes mappings between core content type interfaces and various response models used by the management API.
+    /// </summary>
+    /// <param name="mapper">The <see cref="IUmbracoMapper"/> instance used to register the mapping definitions.</param>
     public void DefineMaps(IUmbracoMapper mapper)
     {
         mapper.Define<IContentType, DocumentTypeResponseModel>((_, _) => new DocumentTypeResponseModel(), Map);
@@ -35,6 +43,7 @@ public class DocumentTypeMapDefinition : ContentTypeMapDefinition<IContentType, 
         target.VariesByCulture = source.VariesByCulture();
         target.VariesBySegment = source.VariesBySegment();
         target.IsElement = source.IsElement;
+        target.AllowedInLibrary = source.AllowedInLibrary;
         target.Collection = ReferenceByIdModel.ReferenceOrNull(source.ListView);
         target.Containers = MapPropertyTypeContainers(source);
         target.Properties = MapPropertyTypes(source);

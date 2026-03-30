@@ -1075,6 +1075,7 @@ export default {
 		changePassword: 'Ändra lösenord',
 		changePhoto: 'Ändra bild',
 		confirmNewPassword: 'Bekräfta det nya lösenordet',
+		confirmPassword: 'Bekräfta lösenord',
 		changePasswordDescription:
 			'Du kan byta ditt lösenord för Umbraco backoffice genom att fylla i nedanstående formulär och klicka på knappen "Ändra lösenord".',
 		contentChannel: 'Innehållskanal',

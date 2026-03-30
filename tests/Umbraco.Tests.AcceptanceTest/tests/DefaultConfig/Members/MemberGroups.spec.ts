@@ -1,4 +1,4 @@
-﻿import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
+import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 import {expect} from "@playwright/test";
 
 const memberGroupName = 'Test Member Group';
@@ -37,7 +37,7 @@ test('cannot create member group with empty name', {tag: '@release'}, async ({um
 
 test('cannot create member group with duplicate name', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  await umbracoApi.memberGroup.create(memberGroupName);
+  await umbracoApi.memberGroup.createDefaultMemberGroup(memberGroupName);
   expect(await umbracoApi.memberGroup.doesNameExist(memberGroupName)).toBeTruthy();
 
   // Act
@@ -52,7 +52,7 @@ test('cannot create member group with duplicate name', {tag: '@release'}, async 
 
 test('can delete a member group', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  await umbracoApi.memberGroup.create(memberGroupName);
+  await umbracoApi.memberGroup.createDefaultMemberGroup(memberGroupName);
   expect(await umbracoApi.memberGroup.doesNameExist(memberGroupName)).toBeTruthy();
 
   // Act

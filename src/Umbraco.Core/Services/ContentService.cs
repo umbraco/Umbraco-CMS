@@ -744,6 +744,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
     }
 
     /// <inheritdoc/>
+    [Obsolete("Use GetContentSchedulesByKeys instead. Scheduled for removal in Umbraco 19.")]
     public IDictionary<int, IEnumerable<ContentSchedule>> GetContentSchedulesByIds(Guid[] keys)
     {
         if (keys.Length == 0)
@@ -751,8 +752,31 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
             return ImmutableDictionary<int, IEnumerable<ContentSchedule>>.Empty;
         }
 
-        List<int> contentIds = [];
-        foreach (var key in keys)
+        IDictionary<Guid, IEnumerable<ContentSchedule>> guidKeyedResults = GetContentSchedulesByKeys(keys);
+
+        var intKeyedResults = new Dictionary<int, IEnumerable<ContentSchedule>>(guidKeyedResults.Count);
+        foreach (KeyValuePair<Guid, IEnumerable<ContentSchedule>> entry in guidKeyedResults)
+        {
+            Attempt<int> contentId = _idKeyMap.GetIdForKey(entry.Key, UmbracoObjectTypes.Document);
+            if (contentId.Success)
+            {
+                intKeyedResults[contentId.Result] = entry.Value;
+            }
+        }
+
+        return intKeyedResults;
+    }
+
+    /// <inheritdoc/>
+    public IDictionary<Guid, IEnumerable<ContentSchedule>> GetContentSchedulesByKeys(Guid[] keys)
+    {
+        if (keys.Length == 0)
+        {
+            return ImmutableDictionary<Guid, IEnumerable<ContentSchedule>>.Empty;
+        }
+
+        Dictionary<int, Guid> intToKeyMap = new(keys.Length);
+        foreach (Guid key in keys)
         {
             Attempt<int> contentId = _idKeyMap.GetIdForKey(key, UmbracoObjectTypes.Document);
             if (contentId.Success is false)
@@ -760,14 +784,25 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
                 continue;
             }
 
-            contentIds.Add(contentId.Result);
+            intToKeyMap[contentId.Result] = key;
         }
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        scope.ReadLock(Constants.Locks.ContentTree);
+
+        IDictionary<int, IEnumerable<ContentSchedule>> intKeyedResults =
+            _documentRepository.GetContentSchedulesByIds(intToKeyMap.Keys.ToArray());
+
+        var guidKeyedResults = new Dictionary<Guid, IEnumerable<ContentSchedule>>(intKeyedResults.Count);
+        foreach (KeyValuePair<int, IEnumerable<ContentSchedule>> entry in intKeyedResults)
         {
-            scope.ReadLock(Constants.Locks.ContentTree);
-            return _documentRepository.GetContentSchedulesByIds(contentIds.ToArray());
+            if (intToKeyMap.TryGetValue(entry.Key, out Guid guidKey))
+            {
+                guidKeyedResults[guidKey] = entry.Value;
+            }
         }
+
+        return guidKeyedResults;
     }
 
     /// <summary>
@@ -1384,9 +1419,22 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
 
             if (contents is not null)
             {
+                // When checking if an item is related, we need to exclude the "relate parent on delete" relation type,
+                // as this is automatically created when items are trashed and would prevent emptying the recycle bin.
+                int[]? relateParentOnDeleteRelationTypeIds = null;
+                if (_contentSettings.DisableDeleteWhenReferenced)
+                {
+                    IRelationType? relateParentOnDeleteRelationType = _relationService.GetRelationTypeByAlias(
+                        Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteAlias);
+                    if (relateParentOnDeleteRelationType is not null)
+                    {
+                        relateParentOnDeleteRelationTypeIds = [relateParentOnDeleteRelationType.Id];
+                    }
+                }
+
                 foreach (IContent content in contents)
                 {
-                    if (_contentSettings.DisableDeleteWhenReferenced && _relationService.IsRelated(content.Id, RelationDirectionFilter.Child))
+                    if (_contentSettings.DisableDeleteWhenReferenced && _relationService.IsRelated(content.Id, RelationDirectionFilter.Child, excludeRelationTypeIds: relateParentOnDeleteRelationTypeIds))
                     {
                         continue;
                     }
@@ -2103,11 +2151,6 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
 
         return content;
     }
-
-    /// <inheritdoc />
-    [Obsolete("Use IContentBlueprintEditingService.GetScaffoldedAsync() instead. Scheduled for removal in Umbraco 18.")]
-    public IContent CreateContentFromBlueprint(IContent blueprint, string name, int userId = Constants.Security.SuperUserId)
-        => CreateBlueprintFromContent(blueprint, name, userId);
 
     /// <summary>
     /// Gets all content blueprints for the specified content type IDs.

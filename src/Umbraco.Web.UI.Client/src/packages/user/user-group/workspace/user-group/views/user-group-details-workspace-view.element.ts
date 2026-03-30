@@ -270,14 +270,13 @@ export class UmbUserGroupDetailsWorkspaceViewElement extends UmbLitElement imple
 				${when(
 					this._elementRootAccess === false,
 					() => html`
-						<umb-input-entity-data
+						<umb-input-element
 							slot="editor"
 							max="1"
 							.selection=${this._elementStartNode?.unique ? [this._elementStartNode.unique] : []}
-							.dataSourceAlias=${'Umb.PropertyEditorDataSource.ElementFolder'}
-							.dataSourceConfig=${[]}
+							?folderOnly=${true}
 							@change=${this.#onElementStartNodeChange}>
-						</umb-input-entity-data>
+						</umb-input-element>
 					`,
 				)}
 			</umb-property-layout>
@@ -302,6 +301,7 @@ export class UmbUserGroupDetailsWorkspaceViewElement extends UmbLitElement imple
 						<umb-input-media
 							slot="editor"
 							max="1"
+							folder-filter="foldersOnly"
 							.selection=${this._mediaStartNode?.unique ? [this._mediaStartNode.unique] : []}
 							@change=${this.#onMediaStartNodeChange}>
 						</umb-input-media>

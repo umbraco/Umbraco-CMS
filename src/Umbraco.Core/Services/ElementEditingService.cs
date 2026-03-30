@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Core.Services.Filters;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
@@ -25,6 +26,7 @@ internal sealed class ElementEditingService
     private readonly IEventMessagesFactory _eventMessagesFactory;
     private readonly IIdKeyMap _idKeyMap;
     private readonly IAuditService _auditService;
+    private readonly IRelationService _relationService;
 
     public ElementEditingService(
         IElementService elementService,
@@ -68,7 +70,12 @@ internal sealed class ElementEditingService
         _eventMessagesFactory = eventMessagesFactory;
         _idKeyMap = idKeyMap;
         _auditService = auditService;
+        _relationService = relationService;
     }
+
+    /// <inheritdoc/>
+    protected override string RelateParentOnDeleteAlias
+        => Constants.Conventions.RelationTypes.RelateParentElementContainerOnElementDeleteAlias;
 
     public Task<IElement?> GetAsync(Guid key)
     {
@@ -80,22 +87,38 @@ internal sealed class ElementEditingService
     public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateUpdateAsync(Guid key, ValidateElementUpdateModel updateModel, Guid userKey)
     {
         IElement? content = _elementService.GetById(key);
-        return content is not null
-            ? await ValidateCulturesAndPropertiesAsync(
-                updateModel,
-                content.ContentType.Key,
-                updateModel.Cultures,
-                userKey)
-            : Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, new ContentValidationResult());
+        if (content is null)
+        {
+            return Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, new ContentValidationResult());
+        }
+
+        return await ValidateCulturesAndPropertiesAsync(
+            updateModel,
+            content.ContentType.Key,
+            updateModel.Cultures,
+            userKey);
     }
 
     /// <inheritdoc />
     public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateCreateAsync(ElementCreateModel createModel, Guid userKey)
-        => await ValidateCulturesAndPropertiesAsync(
+    {
+        IContentType? contentType = ContentTypeService.Get(createModel.ContentTypeKey);
+        if (contentType is null)
+        {
+            return Attempt.FailWithStatus(ContentEditingOperationStatus.ContentTypeNotFound, new ContentValidationResult());
+        }
+
+        if (contentType.IsElement is false || contentType.AllowedInLibrary is false)
+        {
+            return Attempt.FailWithStatus(ContentEditingOperationStatus.NotAllowed, new ContentValidationResult());
+        }
+
+        return await ValidateCulturesAndPropertiesAsync(
             createModel,
             createModel.ContentTypeKey,
             createModel.Variants.Select(variant => variant.Culture),
             userKey);
+    }
 
     public async Task<Attempt<ElementCreateResult, ContentEditingOperationStatus>> CreateAsync(ElementCreateModel createModel, Guid userKey)
     {
@@ -167,6 +190,27 @@ internal sealed class ElementEditingService
     protected override IElement New(string? name, int parentId, IContentType contentType)
         => new Element(name, parentId, contentType);
 
+    protected override IContentType? TryGetAndValidateContentType(
+        Guid contentTypeKey, ContentEditingModelBase contentEditingModelBase,
+        out ContentEditingOperationStatus operationStatus)
+    {
+        IContentType? contentType = base.TryGetAndValidateContentType(contentTypeKey, contentEditingModelBase, out operationStatus);
+        if (contentType is null)
+        {
+            return null;
+        }
+
+        // Only enforce IsElement + AllowedInLibrary on create; updates only need the content type to exist
+        if (contentEditingModelBase is ContentCreationModelBase
+            && IsAllowedLibraryElement(contentType) is false)
+        {
+            operationStatus = ContentEditingOperationStatus.NotAllowed;
+            return null;
+        }
+
+        return contentType;
+    }
+
     protected override async Task<(int? ParentId, ContentEditingOperationStatus OperationStatus)> TryGetAndValidateParentIdAsync(Guid? parentKey, IContentType contentType)
     {
         if (parentKey.HasValue is false)
@@ -192,6 +236,20 @@ internal sealed class ElementEditingService
     {
         using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
         scope.WriteLock(Constants.Locks.ElementTree);
+
+        IElement? element = await GetAsync(key);
+        if (element is null)
+        {
+            scope.Complete();
+            return Attempt.Fail(ContentEditingOperationStatus.NotFound);
+        }
+
+        if (ContentSettings.DisableUnpublishWhenReferenced
+            && _relationService.IsRelated(element.Id, RelationDirectionFilter.Child, null))
+        {
+            scope.Complete();
+            return Attempt.Fail(ContentEditingOperationStatus.CannotMoveToRecycleBinWhenReferenced);
+        }
 
         var originalPath = string.Empty;
         Attempt<ContentEditingOperationStatus> moveResult = await MoveLockedAsync(
@@ -363,13 +421,15 @@ internal sealed class ElementEditingService
             : null;
         await _auditService.AddAsync(AuditType.Move, userKey, toMove.Id, UmbracoObjectTypes.Element.GetName(), auditMessage);
 
+        scope.Notifications.Publish(new ElementTreeChangeNotification(toMove, TreeChangeTypes.RefreshBranch, eventMessages));
+
         IStatefulNotification movedNotification = movedNotificationFactory(toMove, eventMessages);
         scope.Notifications.Publish(movedNotification.WithStateFrom(movingNotification));
 
         return Attempt.Succeed(ContentEditingOperationStatus.Success);
     }
 
-    protected override IElement? Copy(IElement element, int newParentId, bool relateToOriginal, bool includeDescendants, int userId)
+    protected override async Task<IElement?> CopyAsync(IElement element, int newParentId, bool relateToOriginal, bool includeDescendants, Guid userKey)
     {
         Guid? newParentKey;
         if (newParentId is Constants.System.Root)
@@ -396,7 +456,7 @@ internal sealed class ElementEditingService
         copy.ParentId = newParentId;
 
         var copyingNotification = new ElementCopyingNotification(element, copy, newParentId, newParentKey, eventMessages);
-        if (scope.Notifications.PublishCancelable(copyingNotification))
+        if (await scope.Notifications.PublishCancelableAsync(copyingNotification))
         {
             scope.Complete();
             return null;
@@ -406,6 +466,7 @@ internal sealed class ElementEditingService
         copy.Published = false;
 
         // update creator and writer IDs
+        var userId = await GetUserIdAsync(userKey);
         copy.CreatorId = userId;
         copy.WriterId = userId;
 
@@ -415,9 +476,12 @@ internal sealed class ElementEditingService
             return null;
         }
 
+        scope.Notifications.Publish(new ElementTreeChangeNotification(copy, TreeChangeTypes.RefreshBranch, eventMessages));
         scope.Notifications.Publish(
             new ElementCopiedNotification(element, copy, newParentId, newParentKey, relateToOriginal, eventMessages)
                 .WithStateFrom(copyingNotification));
+
+        await _auditService.AddAsync(AuditType.Copy, userKey, element.Id, UmbracoObjectTypes.Element.GetName());
 
         scope.Complete();
 
@@ -455,4 +519,7 @@ internal sealed class ElementEditingService
             return ContentEditingOperationStatus.Unknown;
         }
     }
+
+    private static bool IsAllowedLibraryElement(IContentType contentType)
+        => contentType.IsElement && contentType.AllowedInLibrary;
 }

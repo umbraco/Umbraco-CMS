@@ -3,6 +3,7 @@ import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 
 export type * from './composition/types.js';
 export type * from './conditions/types.js';
+export type * from './entity-content-type/types.js';
 
 export type UmbPropertyContainerTypes = 'Group' | 'Tab';
 
@@ -41,6 +42,7 @@ export interface UmbContentTypeModel {
 	variesByCulture: boolean;
 	variesBySegment: boolean;
 	isElement: boolean;
+	allowedInLibrary: boolean;
 	properties: Array<UmbPropertyTypeModel>;
 	containers: Array<UmbPropertyTypeContainerModel>;
 	allowedContentTypes: Array<UmbContentTypeSortModel>;
@@ -57,7 +59,7 @@ export interface UmbPropertyTypeScaffoldModel extends Omit<UmbPropertyTypeModel,
 }
 
 export interface UmbPropertyTypeModel {
-	dataType: { unique: string };
+	dataType: UmbReferenceByUnique;
 	unique: string;
 	container?: { id: string } | null; // TODO: change to unique
 	sortOrder: number;

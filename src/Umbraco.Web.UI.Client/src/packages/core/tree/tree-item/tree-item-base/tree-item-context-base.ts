@@ -11,7 +11,7 @@ import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbBooleanState, UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { debounce } from '@umbraco-cms/backoffice/utils';
-import { UmbParentEntityContext } from '@umbraco-cms/backoffice/entity';
+import { UmbEntityContext, UmbParentEntityContext } from '@umbraco-cms/backoffice/entity';
 import { UMB_SECTION_CONTEXT } from '@umbraco-cms/backoffice/section';
 import { UMB_WORKSPACE_EDIT_PATH_PATTERN } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -72,6 +72,7 @@ export abstract class UmbTreeItemContextBase<
 
 	#sectionContext?: typeof UMB_SECTION_CONTEXT.TYPE;
 
+	#entityContext = new UmbEntityContext(this);
 	#parentContext = new UmbParentEntityContext(this);
 
 	#hasActiveDescendant = new UmbBooleanState(undefined);
@@ -128,6 +129,8 @@ export abstract class UmbTreeItemContextBase<
 	public setTreeItem(treeItem: TreeItemType | undefined) {
 		if (!treeItem) {
 			this._treeItem.setValue(undefined);
+			this.#entityContext.setEntityType(undefined);
+			this.#entityContext.setUnique(null);
 			return;
 		}
 
@@ -137,6 +140,9 @@ export abstract class UmbTreeItemContextBase<
 
 		if (!treeItem.entityType) throw new Error('Could not create tree item context, tree item type is missing');
 		this.entityType = treeItem.entityType;
+
+		this.#entityContext.setEntityType(treeItem.entityType);
+		this.#entityContext.setUnique(treeItem.unique);
 
 		this._treeItemChildrenManager.setTreeItem(treeItem);
 		this.#treeItemExpansionManager.setTreeItem(treeItem);
@@ -270,7 +276,7 @@ export abstract class UmbTreeItemContextBase<
 	}
 
 	#observeIsSelected() {
-		if (!this.treeContext || !this.unique) return;
+		if (!this.treeContext || this.unique === undefined) return;
 
 		this.observe(
 			this.treeContext.selection.selection.pipe(map((selection) => selection.includes(this.unique!))),

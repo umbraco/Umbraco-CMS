@@ -25,6 +25,18 @@ internal sealed class DeliveryApiContentIndexValueSetBuilder : IDeliveryApiConte
     private readonly ICoreScopeProvider _coreScopeProvider;
     private DeliveryApiSettings _deliveryApiSettings;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Examine.DeliveryApiContentIndexValueSetBuilder"/> class.
+    /// </summary>
+    /// <param name="contentIndexHandlerCollection">A collection of handlers for content indexing operations.</param>
+    /// <param name="contentService">Service for managing content items.</param>
+    /// <param name="publicAccessService">Service for handling public access restrictions.</param>
+    /// <param name="logger">Logger for diagnostic and error messages.</param>
+    /// <param name="deliveryApiContentIndexFieldDefinitionBuilder">Builder for defining content index fields for the Delivery API.</param>
+    /// <param name="deliveryApiSettings">Monitor for Delivery API configuration settings.</param>
+    /// <param name="memberService">Service for managing members.</param>
+    /// <param name="deliveryApiCompositeIdHandler">Handler for composite IDs in the Delivery API.</param>
+    /// <param name="coreScopeProvider">Provider for managing core data scopes.</param>
     public DeliveryApiContentIndexValueSetBuilder(
         ContentIndexHandlerCollection contentIndexHandlerCollection,
         IContentService contentService,

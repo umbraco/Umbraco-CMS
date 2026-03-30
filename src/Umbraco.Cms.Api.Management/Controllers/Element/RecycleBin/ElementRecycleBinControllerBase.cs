@@ -15,15 +15,27 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Element.RecycleBin;
 
+/// <summary>
+/// Serves as the base controller for element recycle bin operations within the Umbraco CMS Management API.
+/// Provides shared functionality for derived element recycle bin controllers.
+/// </summary>
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.RecycleBin}/{Constants.UdiEntityType.Element}")]
 [RequireElementTreeRootAccess]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Element))]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessElements)]
 public class ElementRecycleBinControllerBase : RecycleBinControllerBase<ElementRecycleBinItemResponseModel>
 {
+    /// <inheritdoc />
+    protected override string EntityName => "element";
+
     private readonly IEntityService _entityService;
     private readonly IElementPresentationFactory _elementPresentationFactory;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ElementRecycleBinControllerBase"/> class.
+    /// </summary>
+    /// <param name="entityService">Service for retrieving entity data.</param>
+    /// <param name="elementPresentationFactory">Factory responsible for creating element presentation models.</param>
     public ElementRecycleBinControllerBase( IEntityService entityService, IElementPresentationFactory elementPresentationFactory)
         : base(entityService)
     {

@@ -13,6 +13,7 @@ using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Factories;
 using Umbraco.Cms.Infrastructure.Scoping;
@@ -31,8 +32,31 @@ internal class DocumentRepository : PublishableContentRepositoryBase<IContent, D
     private readonly IRepositoryCacheVersionService _repositoryCacheVersionService;
     private readonly ICacheSyncService _cacheSyncService;
     private readonly ITemplateRepository _templateRepository;
+    private readonly IShortStringHelper _shortStringHelper;
     private PermissionRepository<IContent>? _permissionRepository;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DocumentRepository"/> class with the specified dependencies.
+    /// This constructor sets up the repository for managing document entities in the persistence layer.
+    /// </summary>
+    /// <param name="scopeAccessor">Provides access to the current database scope for transactional operations.</param>
+    /// <param name="appCaches">The application-level cache helpers for performance optimization.</param>
+    /// <param name="logger">The logger instance for logging repository operations.</param>
+    /// <param name="loggerFactory">Factory for creating logger instances.</param>
+    /// <param name="contentTypeRepository">Repository for accessing content type definitions.</param>
+    /// <param name="templateRepository">Repository for accessing template entities.</param>
+    /// <param name="tagRepository">Repository for managing tags associated with documents.</param>
+    /// <param name="languageRepository">Repository for managing language entities.</param>
+    /// <param name="relationRepository">Repository for managing entity relations.</param>
+    /// <param name="relationTypeRepository">Repository for managing relation types.</param>
+    /// <param name="propertyEditors">Collection of property editors used for document properties.</param>
+    /// <param name="dataValueReferenceFactories">Collection of factories for resolving data value references.</param>
+    /// <param name="dataTypeService">Service for managing data types.</param>
+    /// <param name="serializer">JSON serializer for serializing and deserializing data.</param>
+    /// <param name="eventAggregator">Publishes and subscribes to domain events.</param>
+    /// <param name="repositoryCacheVersionService">Service for managing repository cache versions.</param>
+    /// <param name="cacheSyncService">Service for synchronizing cache across distributed environments.</param>
+    /// <param name="shortStringHelper">The short string helper.</param>
     public DocumentRepository(
         IScopeAccessor scopeAccessor,
         AppCaches appCaches,
@@ -50,7 +74,8 @@ internal class DocumentRepository : PublishableContentRepositoryBase<IContent, D
         IJsonSerializer serializer,
         IEventAggregator eventAggregator,
         IRepositoryCacheVersionService repositoryCacheVersionService,
-        ICacheSyncService cacheSyncService)
+        ICacheSyncService cacheSyncService,
+        IShortStringHelper shortStringHelper)
         : base(
             scopeAccessor,
             appCaches,
@@ -75,43 +100,47 @@ internal class DocumentRepository : PublishableContentRepositoryBase<IContent, D
         _appCaches = appCaches;
         _loggerFactory = loggerFactory;
         _scopeAccessor = scopeAccessor;
+        _shortStringHelper = shortStringHelper;
     }
 
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
     public DocumentRepository(
-        IScopeAccessor scopeAccessor,
-        AppCaches appCaches,
-        ILogger<DocumentRepository> logger,
-        ILoggerFactory loggerFactory,
-        IContentTypeRepository contentTypeRepository,
-        ITemplateRepository templateRepository,
-        ITagRepository tagRepository,
-        ILanguageRepository languageRepository,
-        IRelationRepository relationRepository,
-        IRelationTypeRepository relationTypeRepository,
-        PropertyEditorCollection propertyEditors,
-        DataValueReferenceFactoryCollection dataValueReferenceFactories,
-        IDataTypeService dataTypeService,
-        IJsonSerializer serializer,
-        IEventAggregator eventAggregator)
-        : this(
-            scopeAccessor,
-            appCaches,
-            logger,
-            loggerFactory,
-            contentTypeRepository,
-            templateRepository,
-            tagRepository,
-            languageRepository,
-            relationRepository,
-            relationTypeRepository,
-            propertyEditors,
-            dataValueReferenceFactories,
-            dataTypeService,
-            serializer,
-            eventAggregator,
-            StaticServiceProvider.Instance.GetRequiredService<IRepositoryCacheVersionService>(),
-            StaticServiceProvider.Instance.GetRequiredService<ICacheSyncService>())
+            IScopeAccessor scopeAccessor,
+            AppCaches appCaches,
+            ILogger<DocumentRepository> logger,
+            ILoggerFactory loggerFactory,
+            IContentTypeRepository contentTypeRepository,
+            ITemplateRepository templateRepository,
+            ITagRepository tagRepository,
+            ILanguageRepository languageRepository,
+            IRelationRepository relationRepository,
+            IRelationTypeRepository relationTypeRepository,
+            PropertyEditorCollection propertyEditors,
+            DataValueReferenceFactoryCollection dataValueReferenceFactories,
+            IDataTypeService dataTypeService,
+            IJsonSerializer serializer,
+            IEventAggregator eventAggregator,
+            IRepositoryCacheVersionService repositoryCacheVersionService,
+            ICacheSyncService cacheSyncService)
+            : this(
+                scopeAccessor,
+                appCaches,
+                logger,
+                loggerFactory,
+                contentTypeRepository,
+                templateRepository,
+                tagRepository,
+                languageRepository,
+                relationRepository,
+                relationTypeRepository,
+                propertyEditors,
+                dataValueReferenceFactories,
+                dataTypeService,
+                serializer,
+                eventAggregator,
+                repositoryCacheVersionService,
+                cacheSyncService,
+                StaticServiceProvider.Instance.GetRequiredService<IShortStringHelper>())
     {
     }
 
@@ -240,6 +269,10 @@ internal class DocumentRepository : PublishableContentRepositoryBase<IContent, D
 
     #region Content Repository
 
+    /// <summary>
+    /// Replaces all existing content permissions with the specified permission set for the relevant entities.
+    /// </summary>
+    /// <param name="permissionSet">The permission set to apply to the entities.</param>
     public void ReplaceContentPermissions(EntityPermissionSet permissionSet) =>
         PermissionRepository.ReplaceEntityPermissions(permissionSet);
 
@@ -252,6 +285,11 @@ internal class DocumentRepository : PublishableContentRepositoryBase<IContent, D
     public void AssignEntityPermission(IContent entity, string permission, IEnumerable<int> groupIds) =>
         PermissionRepository.AssignEntityPermission(entity, permission, groupIds);
 
+    /// <summary>
+    /// Retrieves the collection of permissions assigned to the specified entity.
+    /// </summary>
+    /// <param name="entityId">The unique identifier of the entity for which to retrieve permissions.</param>
+    /// <returns>An <see cref="EntityPermissionCollection"/> containing the permissions associated with the entity.</returns>
     public EntityPermissionCollection GetPermissionsForEntity(int entityId) =>
         PermissionRepository.GetPermissionsForEntity(entityId);
 
@@ -261,6 +299,13 @@ internal class DocumentRepository : PublishableContentRepositoryBase<IContent, D
     /// <param name="permission"></param>
     public void AddOrUpdatePermissions(ContentPermissionSet permission) => PermissionRepository.Save(permission);
 
+    /// <summary>
+    /// Determines whether the specified content item and all its ancestors in the content path are published.
+    /// </summary>
+    /// <param name="content">The content item to check.</param>
+    /// <returns>
+    /// True if the content item and every node in its path (from the root to itself) are published; otherwise, false.
+    /// </returns>
     public bool IsPathPublished(IContent? content)
     {
         // fail fast
@@ -292,9 +337,94 @@ internal class DocumentRepository : PublishableContentRepositoryBase<IContent, D
 
     #region Recycle Bin
 
+    /// <summary>
+    /// Gets the identifier for the content Recycle Bin in Umbraco.
+    /// </summary>
     public override int RecycleBinId => Constants.System.RecycleBinContent;
 
+    /// <summary>
+    /// Gets the identifier for the cache key for the content Recycle Bin.
+    /// </summary>
     protected override string RecycleBinCacheKey => CacheKeys.ContentRecycleBinCacheKey;
+
+    #endregion
+
+    #region Utilities
+
+    protected override string? EnsureUniqueNodeName(int parentId, string? nodeName, int id = 0)
+    {
+        if (EnsureUniqueNaming == false)
+        {
+            return nodeName;
+        }
+
+        // Call the base implementation to handle literal name duplicates (e.g. "Title" vs "Title" → "Title (1)").
+        var uniqueName = EnsureUniqueNodeName(parentId, nodeName, id, out List<SimilarNodeName>? siblings);
+
+        // Ensure the resulting URL segment is also unique among siblings (resolves https://github.com/umbraco/Umbraco-CMS/issues/22070).
+        return EnsureUniqueUrlSegment(uniqueName, id, siblings, _shortStringHelper);
+    }
+
+    private protected override string? EnsureUniqueVariantName(
+        string? nodeName, int nodeId, List<SimilarNodeName> siblings, string culture)
+        => EnsureUniqueUrlSegment(nodeName, nodeId, siblings, _shortStringHelper, culture);
+
+    /// <summary>
+    /// Ensures the proposed name produces a URL segment that is unique among sibling URL segments.
+    /// If a collision is detected (e.g. "Title" and "Title." both produce segment "title"),
+    /// a numeric suffix is appended to the name until uniqueness is achieved.
+    /// </summary>
+    internal static string? EnsureUniqueUrlSegment(
+        string? nodeName,
+        int nodeId,
+        IEnumerable<SimilarNodeName> siblings,
+        IShortStringHelper shortStringHelper,
+        string? culture = null)
+    {
+        if (string.IsNullOrWhiteSpace(nodeName))
+        {
+            return nodeName;
+        }
+
+        var proposedSegment = shortStringHelper.CleanStringForUrlSegment(nodeName, culture);
+        if (string.IsNullOrEmpty(proposedSegment))
+        {
+            return nodeName;
+        }
+
+        // Build a set of URL segments from siblings, excluding the current node.
+        var siblingSegments = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (SimilarNodeName sibling in siblings)
+        {
+            if (sibling.Id == nodeId || string.IsNullOrWhiteSpace(sibling.Name))
+            {
+                continue;
+            }
+
+            var segment = shortStringHelper.CleanStringForUrlSegment(sibling.Name, culture);
+            if (string.IsNullOrEmpty(segment) is false)
+            {
+                siblingSegments.Add(segment);
+            }
+        }
+
+        // If the proposed segment doesn't collide, return the name as-is.
+        if (siblingSegments.Contains(proposedSegment) is false)
+        {
+            return nodeName;
+        }
+
+        // Increment a (N) suffix on the name until the resulting URL segment is unique.
+        for (var i = 1; ; i++)
+        {
+            var candidateName = $"{nodeName} ({i})";
+            var candidateSegment = shortStringHelper.CleanStringForUrlSegment(candidateName, culture);
+            if (string.IsNullOrEmpty(candidateSegment) || siblingSegments.Contains(candidateSegment) is false)
+            {
+                return candidateName;
+            }
+        }
+    }
 
     #endregion
 }

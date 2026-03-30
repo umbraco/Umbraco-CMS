@@ -12,11 +12,17 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Member;
 
+/// <summary>
+/// Serves as the base controller for API endpoints that manage member entities in Umbraco CMS.
+/// Provides common functionality for derived member management controllers.
+/// </summary>
 [VersionedApiBackOfficeRoute(Constants.UdiEntityType.Member)]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Member))]
 [Authorize(Policy = AuthorizationPolicies.SectionAccessMembers)]
 public class MemberControllerBase : ContentControllerBase
 {
+    protected override string EntityName => "member";
+
     protected IActionResult MemberNotFound() => OperationStatusResult(MemberEditingOperationStatus.MemberNotFound, MemberNotFound);
 
     protected IActionResult MemberEditingStatusResult(MemberEditingStatus status)

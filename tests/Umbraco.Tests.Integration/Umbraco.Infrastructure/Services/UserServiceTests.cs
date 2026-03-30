@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 /// </summary>
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-internal sealed class UserServiceTests : UmbracoIntegrationTest
+internal sealed partial class UserServiceTests : UmbracoIntegrationTest
 {
     private UserService UserService => (UserService)GetRequiredService<IUserService>();
 
@@ -984,7 +984,7 @@ internal sealed class UserServiceTests : UmbracoIntegrationTest
         var profiles = UserService.GetProfilesById(42);
 
         // Assert
-        CollectionAssert.IsEmpty(profiles);
+        Assert.That(profiles, Is.Empty);
     }
 
     [Test]

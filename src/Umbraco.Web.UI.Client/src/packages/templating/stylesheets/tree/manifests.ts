@@ -3,11 +3,16 @@ import {
 	UMB_STYLESHEET_FOLDER_ENTITY_TYPE,
 	UMB_STYLESHEET_ROOT_ENTITY_TYPE,
 } from '../entity.js';
+import { UMB_STYLESHEET_TREE_ITEM_CHILDREN_COLLECTION_ALIAS } from './tree-item-children/constants.js';
 import { manifests as folderManifests } from './folder/manifests.js';
 import { manifests as reloadTreeItemChildrenManifest } from './reload-tree-item-children/manifests.js';
+import { manifests as treeItemChildrenManifests } from './tree-item-children/manifests.js';
+import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
 
 export const UMB_STYLESHEET_TREE_ALIAS = 'Umb.Tree.Stylesheet';
 export const UMB_STYLESHEET_TREE_REPOSITORY_ALIAS = 'Umb.Repository.StylesheetTree';
+
+const UMB_STYLESHEET_ROOT_WORKSPACE_ALIAS = 'Umb.Workspace.Stylesheet.Root';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -36,13 +41,32 @@ export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'workspace',
 		kind: 'default',
-		alias: 'Umb.Workspace.Stylesheet.Root',
+		alias: UMB_STYLESHEET_ROOT_WORKSPACE_ALIAS,
 		name: 'Stylesheet Root Workspace',
 		meta: {
 			entityType: UMB_STYLESHEET_ROOT_ENTITY_TYPE,
 			headline: '#treeHeaders_stylesheets',
 		},
 	},
+	{
+		type: 'workspaceView',
+		kind: 'collection',
+		alias: 'Umb.WorkspaceView.Stylesheet.TreeItemChildrenCollection',
+		name: 'Stylesheet Tree Item Children Collection Workspace View',
+		meta: {
+			label: '#general_items',
+			pathname: 'items',
+			icon: 'icon-grid',
+			collectionAlias: UMB_STYLESHEET_TREE_ITEM_CHILDREN_COLLECTION_ALIAS,
+		},
+		conditions: [
+			{
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
+				oneOf: [UMB_STYLESHEET_ROOT_WORKSPACE_ALIAS, 'Umb.Workspace.Stylesheet.Folder'],
+			},
+		],
+	},
 	...folderManifests,
 	...reloadTreeItemChildrenManifest,
+	...treeItemChildrenManifests,
 ];

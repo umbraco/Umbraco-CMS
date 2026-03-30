@@ -5,10 +5,18 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_15_3_0;
 
+/// <summary>
+/// Represents a migration that adds <c>Name</c> and <c>Description</c> fields to webhook entities in the database.
+/// </summary>
 public class AddNameAndDescriptionToWebhooks : MigrationBase
 {
     private readonly ILogger<AddNameAndDescriptionToWebhooks> _logger;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AddNameAndDescriptionToWebhooks"/> class.
+    /// </summary>
+    /// <param name="context">The migration context.</param>
+    /// <param name="logger">The logger instance.</param>
     public AddNameAndDescriptionToWebhooks(IMigrationContext context, ILogger<AddNameAndDescriptionToWebhooks> logger)
         : base(context)
     {

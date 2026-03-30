@@ -1,15 +1,15 @@
-import { UMB_AUTH_CONTEXT, UMB_MODAL_APP_AUTH, type UmbUserLoginState } from '@umbraco-cms/backoffice/auth';
+import { UMB_AUTH_CONTEXT, UMB_MODAL_APP_AUTH } from '@umbraco-cms/backoffice/auth';
+import type { UmbUserLoginState } from '@umbraco-cms/backoffice/auth';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { umbOpenModal, UmbPersistentModalDialogElement } from '@umbraco-cms/backoffice/modal';
 import { setStoredPath } from '@umbraco-cms/backoffice/utils';
 
 export class UmbAppAuthController extends UmbControllerBase {
 	#retrievedModal: Promise<unknown>;
 	#authContext?: typeof UMB_AUTH_CONTEXT.TYPE;
-	#isFirstCheck = true;
 
 	constructor(host: UmbControllerHost) {
 		super(host);
@@ -32,6 +32,7 @@ export class UmbAppAuthController extends UmbControllerBase {
 	/**
 	 * Checks if the user is authorized.
 	 * If not, the authorization flow is started.
+	 * Session verification is handled by setInitialState() before the router evaluates guards.
 	 */
 	async isAuthorized(): Promise<boolean> {
 		await this.#retrievedModal.catch(() => undefined);
@@ -39,21 +40,8 @@ export class UmbAppAuthController extends UmbControllerBase {
 			throw new Error('[Fatal] Auth context is not available');
 		}
 
-		const isAuthorized = this.#authContext.getIsAuthorized();
-
-		if (isAuthorized) {
-			// If this is the first time we are checking the authorization state (i.e. on first load), we need to make sure
-			// that the token is still valid. If it is not, we need to start the authorization flow.
-			// If the token is still valid, we can return true.
-			if (this.#isFirstCheck) {
-				this.#isFirstCheck = false;
-				const isValid = await this.#authContext.validateToken();
-				if (isValid) {
-					return true;
-				}
-			} else {
-				return true;
-			}
+		if (this.#authContext.getIsAuthorized()) {
+			return true;
 		}
 
 		// Make a request to the auth server to start the auth flow
@@ -121,30 +109,18 @@ export class UmbAppAuthController extends UmbControllerBase {
 		}
 
 		// Show the provider selection screen
-		const authModalKey = 'umbAuthModal';
-		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		if (!modalManager) {
-			throw new Error('[Fatal] Modal manager is not available');
-		}
+		const selected = await umbOpenModal(this._host, UMB_MODAL_APP_AUTH, {
+			data: {
+				userLoginState,
+			},
+			modal: {
+				type: 'custom',
+				element: UmbPersistentModalDialogElement,
+				backdropBackground: 'var(--umb-auth-backdrop, var(--uui-color-surface))',
+			},
+		}).catch(() => undefined);
 
-		const selected = await modalManager
-			.open(this._host, UMB_MODAL_APP_AUTH, {
-				data: {
-					userLoginState,
-				},
-				modal: {
-					key: authModalKey,
-					backdropBackground: 'var(--umb-auth-backdrop, var(--uui-color-surface))',
-				},
-			})
-			.onSubmit()
-			.catch(() => undefined);
-
-		if (!selected?.success) {
-			return false;
-		}
-
-		return true;
+		return selected?.success ?? false;
 	}
 
 	#updateState() {

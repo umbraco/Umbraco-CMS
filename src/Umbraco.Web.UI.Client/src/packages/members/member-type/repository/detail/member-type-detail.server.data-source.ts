@@ -1,32 +1,26 @@
 import type { UmbMemberTypeDetailModel } from '../../types.js';
 import { UMB_MEMBER_TYPE_ENTITY_TYPE } from '../../entity.js';
+import { UmbManagementApiMemberTypeDetailDataRequestManager } from './server-data-source/member-type-detail.server.request-manager.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
 import type {
 	CreateMemberTypeRequestModel,
+	MemberTypeResponseModel,
 	UpdateMemberTypeRequestModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
-import { MemberTypeService } from '@umbraco-cms/backoffice/external/backend-api';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import type { UmbPropertyContainerTypes } from '@umbraco-cms/backoffice/content-type';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
 /**
  * A data source for the Member Type that fetches data from the server
  * @class UmbMemberTypeDetailServerDataSource
  * @implements {UmbDetailDataSource<UmbMemberTypeDetailModel>}
  */
-export class UmbMemberTypeDetailServerDataSource implements UmbDetailDataSource<UmbMemberTypeDetailModel> {
-	#host: UmbControllerHost;
-
-	/**
-	 * Creates an instance of UmbMemberTypeDetailServerDataSource.
-	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
-	 * @memberof UmbMemberTypeDetailServerDataSource
-	 */
-	constructor(host: UmbControllerHost) {
-		this.#host = host;
-	}
+export class UmbMemberTypeDetailServerDataSource
+	extends UmbControllerBase
+	implements UmbDetailDataSource<UmbMemberTypeDetailModel>
+{
+	#detailRequestManager = new UmbManagementApiMemberTypeDetailDataRequestManager(this);
 
 	/**
 	 * Creates a new Member Type scaffold
@@ -46,6 +40,7 @@ export class UmbMemberTypeDetailServerDataSource implements UmbDetailDataSource<
 			variesByCulture: false,
 			variesBySegment: false,
 			isElement: false,
+			allowedInLibrary: false,
 			properties: [],
 			containers: [],
 			allowedContentTypes: [],
@@ -66,14 +61,147 @@ export class UmbMemberTypeDetailServerDataSource implements UmbDetailDataSource<
 	async read(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		const { data, error } = await tryExecute(this.#host, MemberTypeService.getMemberTypeById({ path: { id: unique } }));
+		const { data, error } = await this.#detailRequestManager.read(unique);
 
-		if (error || !data) {
-			return { error };
+		return { data: data ? this.#mapServerResponseModelToEntityDetailModel(data) : undefined, error };
+	}
+
+	/**
+	 * Fetches multiple Member Types by their unique IDs from the server
+	 * @param {Array<string>} uniques - The unique IDs of the member types to fetch
+	 * @returns {*}
+	 * @memberof UmbMemberTypeDetailServerDataSource
+	 */
+	async readMany(uniques: Array<string>) {
+		if (!uniques || uniques.length === 0) {
+			return { data: [] };
 		}
 
+		const { data, error } = await this.#detailRequestManager.readMany(uniques);
+
+		return {
+			data: data?.items?.map((item) => this.#mapServerResponseModelToEntityDetailModel(item)),
+			error,
+		};
+	}
+
+	/**
+	 * Inserts a new Member Type on the server
+	 * @param {UmbMemberTypeDetailModel} model - Member Type Model
+	 * @returns {*}
+	 * @memberof UmbMemberTypeDetailServerDataSource
+	 */
+	async create(model: UmbMemberTypeDetailModel, parentUnique: string | null = null) {
+		if (!model) throw new Error('Member Type is missing');
+
 		// TODO: make data mapper to prevent errors
-		const memberType: UmbMemberTypeDetailModel = {
+		const body: CreateMemberTypeRequestModel = {
+			alias: model.alias,
+			name: model.name,
+			description: model.description,
+			icon: model.icon,
+			allowedAsRoot: model.allowedAtRoot,
+			variesByCulture: model.variesByCulture,
+			variesBySegment: model.variesBySegment,
+			isElement: model.isElement,
+			allowedInLibrary: model.allowedInLibrary,
+			properties: model.properties.map((property) => {
+				return {
+					id: property.unique,
+					container: property.container ? { id: property.container.id } : null,
+					sortOrder: property.sortOrder,
+					alias: property.alias,
+					isSensitive: property.isSensitive ?? false,
+					visibility: property.visibility ?? { memberCanEdit: false, memberCanView: false },
+					name: property.name,
+					description: property.description,
+					dataType: { id: property.dataType.unique },
+					variesByCulture: property.variesByCulture,
+					variesBySegment: property.variesBySegment,
+					validation: property.validation,
+					appearance: property.appearance,
+				};
+			}),
+			containers: model.containers,
+			id: model.unique,
+			parent: parentUnique ? { id: parentUnique } : null,
+			compositions: model.compositions.map((composition) => {
+				return {
+					memberType: { id: composition.contentType.unique },
+					compositionType: composition.compositionType,
+				};
+			}),
+		};
+
+		const { data, error } = await this.#detailRequestManager.create(body);
+
+		return { data: data ? this.#mapServerResponseModelToEntityDetailModel(data) : undefined, error };
+	}
+
+	/**
+	 * Updates a MemberType on the server
+	 * @param { UmbMemberTypeDetailModel } model - Member Type Model
+	 * @returns {*}
+	 * @memberof UmbMemberTypeDetailServerDataSource
+	 */
+	async update(model: UmbMemberTypeDetailModel) {
+		if (!model.unique) throw new Error('Unique is missing');
+
+		// TODO: make data mapper to prevent errors
+		const body: UpdateMemberTypeRequestModel = {
+			alias: model.alias,
+			name: model.name,
+			description: model.description,
+			icon: model.icon,
+			allowedAsRoot: model.allowedAtRoot,
+			variesByCulture: model.variesByCulture,
+			variesBySegment: model.variesBySegment,
+			isElement: model.isElement,
+			allowedInLibrary: model.allowedInLibrary,
+			properties: model.properties.map((property) => {
+				return {
+					id: property.unique,
+					container: property.container ? { id: property.container.id } : null,
+					sortOrder: property.sortOrder,
+					isSensitive: property.isSensitive ?? false,
+					visibility: property.visibility ?? { memberCanEdit: false, memberCanView: false },
+					alias: property.alias,
+					name: property.name,
+					description: property.description,
+					dataType: { id: property.dataType.unique },
+					variesByCulture: property.variesByCulture,
+					variesBySegment: property.variesBySegment,
+					validation: property.validation,
+					appearance: property.appearance,
+				};
+			}),
+			containers: model.containers,
+			compositions: model.compositions.map((composition) => {
+				return {
+					memberType: { id: composition.contentType.unique },
+					compositionType: composition.compositionType,
+				};
+			}),
+		};
+
+		const { data, error } = await this.#detailRequestManager.update(model.unique, body);
+
+		return { data: data ? this.#mapServerResponseModelToEntityDetailModel(data) : undefined, error };
+	}
+
+	/**
+	 * Deletes a Member Type on the server
+	 * @param {string} unique - The unique identifier of the Member Type to delete
+	 * @returns {*}
+	 * @memberof UmbMemberTypeDetailServerDataSource
+	 */
+	async delete(unique: string) {
+		if (!unique) throw new Error('Unique is missing');
+		return this.#detailRequestManager.delete(unique);
+	}
+
+	#mapServerResponseModelToEntityDetailModel(data: MemberTypeResponseModel): UmbMemberTypeDetailModel {
+		return {
 			entityType: UMB_MEMBER_TYPE_ENTITY_TYPE,
 			unique: data.id,
 			name: data.name,
@@ -84,6 +212,7 @@ export class UmbMemberTypeDetailServerDataSource implements UmbDetailDataSource<
 			variesByCulture: data.variesByCulture,
 			variesBySegment: data.variesBySegment,
 			isElement: data.isElement,
+			allowedInLibrary: data.allowedInLibrary,
 			properties: data.properties.map((property) => {
 				return {
 					id: property.id,
@@ -120,145 +249,5 @@ export class UmbMemberTypeDetailServerDataSource implements UmbDetailDataSource<
 			}),
 			collection: data.collection ? { unique: data.collection.id } : null,
 		};
-
-		return { data: memberType };
-	}
-
-	/**
-	 * Inserts a new Member Type on the server
-	 * @param {UmbMemberTypeDetailModel} model - Member Type Model
-	 * @returns {*}
-	 * @memberof UmbMemberTypeDetailServerDataSource
-	 */
-	async create(model: UmbMemberTypeDetailModel, parentUnique: string | null = null) {
-		if (!model) throw new Error('Member Type is missing');
-
-		// TODO: make data mapper to prevent errors
-		const body: CreateMemberTypeRequestModel = {
-			alias: model.alias,
-			name: model.name,
-			description: model.description,
-			icon: model.icon,
-			allowedAsRoot: model.allowedAtRoot,
-			variesByCulture: model.variesByCulture,
-			variesBySegment: model.variesBySegment,
-			isElement: model.isElement,
-			properties: model.properties.map((property) => {
-				return {
-					id: property.unique,
-					container: property.container ? { id: property.container.id } : null,
-					sortOrder: property.sortOrder,
-					alias: property.alias,
-					isSensitive: property.isSensitive ?? false,
-					visibility: property.visibility ?? { memberCanEdit: false, memberCanView: false },
-					name: property.name,
-					description: property.description,
-					dataType: { id: property.dataType.unique },
-					variesByCulture: property.variesByCulture,
-					variesBySegment: property.variesBySegment,
-					validation: property.validation,
-					appearance: property.appearance,
-				};
-			}),
-			containers: model.containers,
-			id: model.unique,
-			parent: parentUnique ? { id: parentUnique } : null,
-			compositions: model.compositions.map((composition) => {
-				return {
-					memberType: { id: composition.contentType.unique },
-					compositionType: composition.compositionType,
-				};
-			}),
-		};
-
-		const { data, error } = await tryExecute(
-			this.#host,
-			MemberTypeService.postMemberType({
-				body,
-			}),
-		);
-
-		if (data && typeof data === 'string') {
-			return this.read(data);
-		}
-
-		return { error };
-	}
-
-	/**
-	 * Updates a MemberType on the server
-	 * @param { UmbMemberTypeDetailModel } model - Member Type Model
-	 * @returns {*}
-	 * @memberof UmbMemberTypeDetailServerDataSource
-	 */
-	async update(model: UmbMemberTypeDetailModel) {
-		if (!model.unique) throw new Error('Unique is missing');
-
-		// TODO: make data mapper to prevent errors
-		const body: UpdateMemberTypeRequestModel = {
-			alias: model.alias,
-			name: model.name,
-			description: model.description,
-			icon: model.icon,
-			allowedAsRoot: model.allowedAtRoot,
-			variesByCulture: model.variesByCulture,
-			variesBySegment: model.variesBySegment,
-			isElement: model.isElement,
-			properties: model.properties.map((property) => {
-				return {
-					id: property.unique,
-					container: property.container ? { id: property.container.id } : null,
-					sortOrder: property.sortOrder,
-					isSensitive: property.isSensitive ?? false,
-					visibility: property.visibility ?? { memberCanEdit: false, memberCanView: false },
-					alias: property.alias,
-					name: property.name,
-					description: property.description,
-					dataType: { id: property.dataType.unique },
-					variesByCulture: property.variesByCulture,
-					variesBySegment: property.variesBySegment,
-					validation: property.validation,
-					appearance: property.appearance,
-				};
-			}),
-			containers: model.containers,
-			compositions: model.compositions.map((composition) => {
-				return {
-					memberType: { id: composition.contentType.unique },
-					compositionType: composition.compositionType,
-				};
-			}),
-		};
-
-		const { error } = await tryExecute(
-			this.#host,
-			MemberTypeService.putMemberTypeById({
-				path: { id: model.unique },
-				body,
-			}),
-		);
-
-		if (!error) {
-			return this.read(model.unique);
-		}
-
-		return { error };
-	}
-
-	/**
-	 * Deletes a Member Type on the server
-	 * @param {string} unique - The unique identifier of the Member Type to delete
-	 * @returns {*}
-	 * @memberof UmbMemberTypeDetailServerDataSource
-	 */
-	async delete(unique: string) {
-		if (!unique) throw new Error('Unique is missing');
-
-		return tryExecute(
-			this.#host,
-			MemberTypeService.deleteMemberTypeById({
-				path: { id: unique },
-			}),
-		);
 	}
 }

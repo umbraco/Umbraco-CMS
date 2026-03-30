@@ -20,6 +20,12 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection;
 /// </summary>
 public static partial class UmbracoBuilderExtensions
 {
+    /// <summary>
+    /// Registers all Examine search and indexing services, including index populators, index rebuilders, value set builders, and notification handlers, with the Umbraco builder.
+    /// This enables full-text search and indexing capabilities within an Umbraco application.
+    /// </summary>
+    /// <param name="builder">The <see cref="IUmbracoBuilder"/> to configure with Examine services.</param>
+    /// <returns>The configured <see cref="IUmbracoBuilder"/> instance.</returns>
     public static IUmbracoBuilder AddExamine(this IUmbracoBuilder builder)
     {
         builder.Services.AddUnique<IExamineManager, ExamineManager>();
@@ -71,8 +77,6 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IDeliveryApiIndexingHandler, DeliveryApiIndexingHandler>();
 
         builder.Services.AddUnique<IDeliveryApiCompositeIdHandler, DeliveryApiCompositeIdHandler>();
-
-        builder.Services.AddTransient<IIndexRebuilder, ExamineIndexRebuilder>();
 
         builder.AddNotificationHandler<ContentCacheRefresherNotification, ContentIndexingNotificationHandler>();
         builder.AddNotificationHandler<PublicAccessCacheRefresherNotification, ContentIndexingNotificationHandler>();

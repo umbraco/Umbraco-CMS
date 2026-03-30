@@ -1,0 +1,159 @@
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Api.Management.Routing;
+using Umbraco.Cms.Api.Management.ViewModels.Media;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Media;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Extensions;
+
+namespace Umbraco.Cms.Api.Management.Factories;
+
+/// <summary>
+/// Provides methods for generating URLs for resized images.
+/// </summary>
+public class ResizeImageUrlFactory : IResizeImageUrlFactory
+{
+    private readonly IImageUrlGenerator _imageUrlGenerator;
+    private readonly ContentSettings _contentSettings;
+    private readonly ContentImagingSettings _imagingSettings;
+    private readonly MediaUrlGeneratorCollection _mediaUrlGenerators;
+    private readonly IAbsoluteUrlBuilder _absoluteUrlBuilder;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Factories.ReziseImageUrlFactory"/> class.
+    /// </summary>
+    /// <param name="imageUrlGenerator">The service used to generate image URLs.</param>
+    /// <param name="contentSettings">The options containing content settings configuration.</param>
+    /// <param name="mediaUrlGenerators">A collection of media URL generators.</param>
+    /// <param name="absoluteUrlBuilder">The service used to build absolute URLs.</param>
+    [Obsolete("Use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
+    public ResizeImageUrlFactory(
+        IImageUrlGenerator imageUrlGenerator,
+        IOptions<ContentSettings> contentSettings,
+        MediaUrlGeneratorCollection mediaUrlGenerators,
+        IAbsoluteUrlBuilder absoluteUrlBuilder)
+        : this(
+            imageUrlGenerator,
+            contentSettings,
+            StaticServiceProvider.Instance.GetRequiredService<IOptions<ContentImagingSettings>>(),
+            mediaUrlGenerators,
+            absoluteUrlBuilder)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ResizeImageUrlFactory"/> class.
+    /// </summary>
+    /// <param name="imageUrlGenerator">The service used to generate image URLs.</param>
+    /// <param name="contentSettings">The options for content settings.</param>
+    /// <param name="imagingSettings">The options for content imaging settings.</param>
+    /// <param name="mediaUrlGenerators">A collection of media URL generators.</param>
+    /// <param name="absoluteUrlBuilder">The service used to build absolute URLs.</param>
+    public ResizeImageUrlFactory(
+        IImageUrlGenerator imageUrlGenerator,
+        IOptions<ContentSettings> contentSettings,
+        IOptions<ContentImagingSettings> imagingSettings,
+        MediaUrlGeneratorCollection mediaUrlGenerators,
+        IAbsoluteUrlBuilder absoluteUrlBuilder)
+    {
+        _imageUrlGenerator = imageUrlGenerator;
+        _contentSettings = contentSettings.Value;
+        _imagingSettings = imagingSettings.Value;
+        _mediaUrlGenerators = mediaUrlGenerators;
+        _absoluteUrlBuilder = absoluteUrlBuilder;
+    }
+
+    /// <inheritdoc />
+    [Obsolete("Use the overload that accepts ImageResizeOptions instead. Scheduled for removal in Umbraco 19.")]
+    public IEnumerable<MediaUrlInfoResponseModel> CreateUrlSets(IEnumerable<IMedia> mediaItems, int height, int width, ImageCropMode? mode)
+        => CreateUrlSets(mediaItems, new ImageResizeOptions(height, width, mode));
+
+    /// <inheritdoc />
+    public IEnumerable<MediaUrlInfoResponseModel> CreateUrlSets(IEnumerable<IMedia> mediaItems, ImageResizeOptions options)
+        => mediaItems.Select(media => new MediaUrlInfoResponseModel(media.Key, CreateUrls(media, options))).ToArray();
+
+    private IEnumerable<MediaUrlInfo> CreateUrls(IMedia media, ImageResizeOptions options)
+    {
+        IEnumerable<string> urls = media
+            .GetUrls(_contentSettings, _mediaUrlGenerators)
+            .WhereNotNull();
+
+        return CreateThumbnailUrls(urls, options);
+    }
+
+    private IEnumerable<MediaUrlInfo> CreateThumbnailUrls(IEnumerable<string> urls, ImageResizeOptions options)
+    {
+        foreach (var url in urls)
+        {
+            var extension = new Uri(url, UriKind.RelativeOrAbsolute).GetFileExtension();
+            if (_imageUrlGenerator.SupportedImageFileTypes.InvariantContains(extension) is false)
+            {
+                // It's okay to return just the image URL for SVGs, as they are always scalable.
+                if (extension == "svg")
+                {
+                    yield return new MediaUrlInfo
+                    {
+                        Culture = null,
+                        Url = _absoluteUrlBuilder.ToAbsoluteUrl(url).ToString(),
+                    };
+                }
+
+                continue;
+            }
+
+            var imageOptions = new ImageUrlGenerationOptions(url)
+            {
+                Height = options.Height,
+                Width = options.Width,
+                ImageCropMode = options.Mode,
+                Format = DetermineOutputFormat(extension, options.Format),
+            };
+
+            var relativeUrl = _imageUrlGenerator.GetImageUrl(imageOptions);
+            if (relativeUrl is null)
+            {
+                continue;
+            }
+
+            yield return new MediaUrlInfo
+            {
+                Culture = null,
+                Url = _absoluteUrlBuilder.ToAbsoluteUrl(relativeUrl).ToString(),
+            };
+        }
+    }
+
+    /// <summary>
+    /// Determines the appropriate output format for an image based on the file extension and requested format.
+    /// </summary>
+    /// <param name="extension">The source file extension (without leading dot, lowercase).</param>
+    /// <param name="requestedFormat">The explicitly requested format (from API request), or null to use automatic determination.</param>
+    /// <returns>The format to use for the output image, or null to keep the original format.</returns>
+    /// <remarks>
+    /// Format determination logic:
+    /// 1. If a format is explicitly requested, use it
+    /// 2. If the source file is not a native image format (e.g., PDF), convert to WebP
+    /// 3. For native image formats (JPG, PNG, etc.), keep original format (null = no conversion)
+    /// </remarks>
+    private string? DetermineOutputFormat(string extension, string? requestedFormat)
+    {
+        // If user explicitly requested a format, honor it
+        if (!string.IsNullOrWhiteSpace(requestedFormat))
+        {
+            return requestedFormat;
+        }
+
+        if (string.IsNullOrEmpty(extension))
+        {
+            return null;
+        }
+
+        var isNativeImageFormat = _imagingSettings.ImageFileTypes
+            .Any(format => format.Equals(extension, StringComparison.OrdinalIgnoreCase));
+
+        return isNativeImageFormat ? null : "webp";
+    }
+}

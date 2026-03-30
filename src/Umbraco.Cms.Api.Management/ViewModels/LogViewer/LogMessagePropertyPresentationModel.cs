@@ -1,5 +1,8 @@
 namespace Umbraco.Cms.Api.Management.ViewModels.LogViewer;
 
+/// <summary>
+/// Represents a presentation model for a property of a log message in the log viewer.
+/// </summary>
 public class LogMessagePropertyPresentationModel
 {
     /// <summary>

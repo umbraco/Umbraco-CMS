@@ -37,7 +37,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
     Database = UmbracoTestOptions.Database.NewSchemaPerTest,
     PublishedRepositoryEvents = true,
     WithApplication = true)]
-internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
+internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithContent
 {
     [SetUp]
     public void Setup() => ContentRepositoryBase.ThrowOnWarning = true;
@@ -694,6 +694,29 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
+    [Obsolete("As this is testing an obsolete method, it will be removed when that the method is deleted. Scheduled for removal in Umbraco 19.")]
+    public void Can_Get_Content_Schedules_By_Ids()
+    {
+        // Arrange
+        var root = ContentService.GetById(Textpage.Id);
+        ContentService.Publish(root!, root!.AvailableCultures.ToArray());
+        var content = ContentService.GetById(Subpage.Id);
+        var contentSchedule = ContentScheduleCollection.CreateWithEntry(DateTime.UtcNow.AddDays(1), null);
+        ContentService.PersistContentSchedule(content!, contentSchedule);
+        ContentService.Publish(content, content.AvailableCultures.ToArray());
+
+        // Act
+#pragma warning disable CS0618 // Type or member is obsolete
+        var keys = ContentService.GetContentSchedulesByIds([Textpage.Key, Subpage.Key, Subpage2.Key]).ToList();
+#pragma warning restore CS0618 // Type or member is obsolete
+
+        // Assert
+        Assert.AreEqual(1, keys.Count);
+        Assert.AreEqual(keys[0].Key, Subpage.Id);
+        Assert.AreEqual(keys[0].Value.First().Id, contentSchedule.FullSchedule.First().Id);
+    }
+
+    [Test]
     public void Can_Get_Content_Schedules_By_Keys()
     {
         // Arrange
@@ -705,12 +728,12 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         ContentService.Publish(content, content.AvailableCultures.ToArray());
 
         // Act
-        var keys = ContentService.GetContentSchedulesByIds([Textpage.Key, Subpage.Key, Subpage2.Key]).ToList();
+        var results = ContentService.GetContentSchedulesByKeys([Textpage.Key, Subpage.Key, Subpage2.Key]).ToList();
 
         // Assert
-        Assert.AreEqual(1, keys.Count);
-        Assert.AreEqual(keys[0].Key, Subpage.Id);
-        Assert.AreEqual(keys[0].Value.First().Id, contentSchedule.FullSchedule.First().Id);
+        Assert.AreEqual(1, results.Count);
+        Assert.AreEqual(Subpage.Key, results[0].Key);
+        Assert.AreEqual(contentSchedule.FullSchedule.First().Id, results[0].Value.First().Id);
     }
 
     [Test]
@@ -3251,6 +3274,68 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
             Assert.AreEqual("child" + (i == 0 ? string.Empty : " (" + i + ")"),
                 child.GetCultureName(langUk.IsoCode));
         }
+    }
+
+    [Test]
+    public void Ensure_Invariant_Unique_Name_When_Url_Segments_Collide()
+    {
+        // Siblings whose names differ only in punctuation produce the same URL segment
+        // (e.g. "Title" and "Title." both produce "title"), so the second should get a suffix.
+        var contentType = ContentTypeService.Get("umbTextpage")!;
+
+        var parent = new Content("root", Constants.System.Root, contentType);
+        ContentService.Save(parent);
+
+        var child1 = new Content("Title", parent, contentType);
+        ContentService.Save(child1);
+        Assert.AreEqual("Title", child1.Name);
+
+        var child2 = new Content("Title.", parent, contentType);
+        ContentService.Save(child2);
+        Assert.AreEqual("Title. (1)", child2.Name);
+
+        // Save again to verify the name is stable (idempotent).
+        ContentService.Save(child2);
+        Assert.AreEqual("Title. (1)", child2.Name);
+    }
+
+    [Test]
+    public async Task Ensure_Unique_Culture_Names_When_Url_Segments_Collide()
+    {
+        var languageService = LanguageService;
+
+        var langUk = new LanguageBuilder()
+            .WithCultureInfo("en-GB")
+            .WithIsDefault(true)
+            .Build();
+        var langFr = new LanguageBuilder()
+            .WithCultureInfo("fr-FR")
+            .Build();
+
+        await languageService.CreateAsync(langFr, Constants.Security.SuperUserKey);
+        await languageService.CreateAsync(langUk, Constants.Security.SuperUserKey);
+
+        var contentType = ContentTypeService.Get("umbTextpage")!;
+        contentType.Variations = ContentVariation.Culture;
+        await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
+
+        var parent = new Content(null, Constants.System.Root, contentType);
+        parent.SetCultureName("root", langUk.IsoCode);
+        ContentService.Save(parent);
+
+        var child1 = new Content(null, parent, contentType);
+        child1.SetCultureName("Title", langUk.IsoCode);
+        ContentService.Save(child1);
+        Assert.AreEqual("Title", child1.GetCultureName(langUk.IsoCode));
+
+        var child2 = new Content(null, parent, contentType);
+        child2.SetCultureName("Title.", langUk.IsoCode);
+        ContentService.Save(child2);
+        Assert.AreEqual("Title. (1)", child2.GetCultureName(langUk.IsoCode));
+
+        // Save again to verify the name is stable (idempotent).
+        ContentService.Save(child2);
+        Assert.AreEqual("Title. (1)", child2.GetCultureName(langUk.IsoCode));
     }
 
     [Test]

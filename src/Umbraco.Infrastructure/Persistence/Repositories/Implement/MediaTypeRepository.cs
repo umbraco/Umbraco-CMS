@@ -22,6 +22,18 @@ internal sealed class MediaTypeRepository : ContentTypeRepositoryBase<IMediaType
     private readonly IRepositoryCacheVersionService _repositoryCacheVersionService;
     private readonly ICacheSyncService _cacheSyncService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MediaTypeRepository"/> class.
+    /// </summary>
+    /// <param name="scopeAccessor">Provides access to the current database scope.</param>
+    /// <param name="cache">The application-level caches used for performance optimization.</param>
+    /// <param name="logger">The logger used for logging repository operations.</param>
+    /// <param name="commonRepository">Repository for common content type operations.</param>
+    /// <param name="languageRepository">Repository for managing languages.</param>
+    /// <param name="shortStringHelper">Helper for processing and formatting short strings.</param>
+    /// <param name="repositoryCacheVersionService">Service for managing cache versioning in repositories.</param>
+    /// <param name="idKeyMap">Service for mapping between IDs and keys.</param>
+    /// <param name="cacheSyncService">Service for synchronizing cache across distributed environments.</param>
     public MediaTypeRepository(
         IScopeAccessor scopeAccessor,
         AppCaches cache,

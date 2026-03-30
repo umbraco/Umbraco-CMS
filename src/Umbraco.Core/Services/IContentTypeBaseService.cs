@@ -349,6 +349,11 @@ public interface IContentTypeBaseService<TItem> : IContentTypeBaseService, IServ
     Task<PagedModel<TItem>> GetAllAllowedAsRootAsync(int skip, int take);
 
     /// <summary>
+    /// Returns all the content types allowed in the library.
+    /// </summary>
+    Task<PagedModel<TItem>> GetAllAllowedInLibraryAsync(int skip, int take);
+
+    /// <summary>
     /// Returns all content types allowed as children for a given content type key.
     /// </summary>
     /// <param name="key">The content type key.</param>
@@ -371,7 +376,5 @@ public interface IContentTypeBaseService<TItem> : IContentTypeBaseService, IServ
     /// </summary>
     /// <param name="key">The key of the child content type.</param>
     /// <returns>A collection of the keys of all potential parents.</returns>
-    /// <exception cref="NotImplementedException">Default implementation due to breaking changes.</exception>
-    /// TODO (V18): Remove the default implementation.
-    Task<Attempt<IEnumerable<Guid>, ContentTypeOperationStatus>> GetAllowedParentKeysAsync(Guid key) => Task.FromResult(Attempt.FailWithStatus<IEnumerable<Guid>, ContentTypeOperationStatus>(ContentTypeOperationStatus.NotImplemented, []));
+    Task<Attempt<IEnumerable<Guid>, ContentTypeOperationStatus>> GetAllowedParentKeysAsync(Guid key);
 }

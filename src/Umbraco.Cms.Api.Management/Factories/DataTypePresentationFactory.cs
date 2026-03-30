@@ -17,6 +17,14 @@ public class DataTypePresentationFactory : IDataTypePresentationFactory
     private readonly IConfigurationEditorJsonSerializer _configurationEditorJsonSerializer;
     private readonly TimeProvider _timeProvider;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DataTypePresentationFactory"/> class, which is responsible for creating data type presentation models.
+    /// </summary>
+    /// <param name="dataTypeContainerService">Service used to manage data type containers.</param>
+    /// <param name="propertyEditorCollection">A collection containing all available property editors.</param>
+    /// <param name="dataValueEditorFactory">Factory for creating data value editors.</param>
+    /// <param name="configurationEditorJsonSerializer">Serializer for configuration editor JSON data.</param>
+    /// <param name="timeProvider">Provides the current time for time-dependent operations.</param>
     public DataTypePresentationFactory(
         IDataTypeContainerService dataTypeContainerService,
         PropertyEditorCollection propertyEditorCollection,
@@ -47,12 +55,13 @@ public class DataTypePresentationFactory : IDataTypePresentationFactory
         }
 
         DateTime createDate = _timeProvider.GetLocalNow().DateTime;
+        IDictionary<string, object> configurationData = MapConfigurationData(requestModel, editor);
         var dataType = new DataType(editor, _configurationEditorJsonSerializer)
         {
             Name = requestModel.Name,
             EditorUiAlias = requestModel.EditorUiAlias,
-            DatabaseType = GetEditorValueStorageType(editor),
-            ConfigurationData = MapConfigurationData(requestModel, editor),
+            DatabaseType = GetEditorValueStorageType(editor, configurationData),
+            ConfigurationData = configurationData,
             ParentId = parentAttempt.Result,
             CreateDate = createDate,
             UpdateDate = createDate,
@@ -97,18 +106,27 @@ public class DataTypePresentationFactory : IDataTypePresentationFactory
 
         IDataType dataType = (IDataType)current.DeepClone();
 
+        IDictionary<string, object> configurationData = MapConfigurationData(requestModel, editor);
         dataType.Name = requestModel.Name;
         dataType.Editor = editor;
         dataType.EditorUiAlias = requestModel.EditorUiAlias;
-        dataType.DatabaseType = GetEditorValueStorageType(editor);
-        dataType.ConfigurationData = MapConfigurationData(requestModel, editor);
+        dataType.DatabaseType = GetEditorValueStorageType(editor, configurationData);
+        dataType.ConfigurationData = configurationData;
 
         return Task.FromResult(Attempt.SucceedWithStatus<IDataType, DataTypeOperationStatus>(DataTypeOperationStatus.Success, dataType));
     }
 
 
-    private ValueStorageType GetEditorValueStorageType(IDataEditor editor)
+    private ValueStorageType GetEditorValueStorageType(IDataEditor editor, IDictionary<string, object> configurationData)
     {
+        var configurationObject = editor.GetConfigurationEditor()
+            .ToConfigurationObject(configurationData, _configurationEditorJsonSerializer);
+
+        if (configurationObject is IConfigureValueType configureValueType)
+        {
+            return ValueTypes.ToStorageType(configureValueType.ValueType);
+        }
+
         var valueType = editor.GetValueEditor().ValueType;
         return ValueTypes.ToStorageType(valueType);
     }

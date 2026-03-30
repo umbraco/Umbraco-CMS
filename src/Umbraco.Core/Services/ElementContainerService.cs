@@ -1,11 +1,16 @@
 using System.Globalization;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Notifications;
+using Umbraco.Cms.Core.Persistence;
+using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
 
@@ -18,6 +23,9 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
     private readonly IElementRepository _elementRepository;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
     private readonly IElementService _elementService;
+    private readonly IOptionsMonitor<ContentSettings> _contentSettingsOptions;
+    private readonly IRelationService _relationService;
+    private readonly ITrackedReferencesService _trackedReferencesService;
     private readonly ILogger<ElementContainerService> _logger;
 
     // internal so the tests can reach it
@@ -34,6 +42,9 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
         IEntityService entityService,
         IElementRepository elementRepository,
         IElementService elementService,
+        IOptionsMonitor<ContentSettings> contentSettingsOptions,
+        IRelationService relationService,
+        ITrackedReferencesService trackedReferencesService,
         ILogger<ElementContainerService> logger)
         : base(provider, loggerFactory, eventMessagesFactory, entityContainerRepository, auditService, entityRepository, userIdKeyResolver)
     {
@@ -42,6 +53,9 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
         _entityService = entityService;
         _elementRepository = elementRepository;
         _elementService = elementService;
+        _contentSettingsOptions = contentSettingsOptions;
+        _relationService = relationService;
+        _trackedReferencesService = trackedReferencesService;
         _logger = logger;
     }
 
@@ -57,6 +71,18 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.WriteLock(Constants.Locks.ElementTree);
+
+        if (_contentSettingsOptions.CurrentValue.DisableUnpublishWhenReferenced)
+        {
+            Attempt<PagedModel<RelationItemModel>, GetReferencesOperationStatus> referencedDescendants = await _trackedReferencesService
+                .GetPagedDescendantsInReferencesAsync(key, UmbracoObjectTypes.ElementContainer, 0, 1, filterMustBeIsDependency: true);
+
+            if (referencedDescendants.Result.Total > 0)
+            {
+                scope.Complete();
+                return Attempt.Fail(EntityContainerOperationStatus.HasReferencedDescendants);
+            }
+        }
 
         var originalPath = string.Empty;
         Attempt<EntityContainerOperationStatus> moveResult = await MoveLockedAsync(
@@ -168,7 +194,12 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
         return moveResult;
     }
 
-    public async Task<Attempt<EntityContainerOperationStatus>> EmptyRecycleBinAsync(Guid userKey)
+    /// <inheritdoc/>
+    public Task<Attempt<EntityContainerOperationStatus>> EmptyRecycleBinAsync(Guid userKey)
+        => EmptyRecycleBinAsync(userKey, DescendantsIteratorPageSize);
+
+    // internal so tests can use a smaller page size
+    internal async Task<Attempt<EntityContainerOperationStatus>> EmptyRecycleBinAsync(Guid userKey, int pageSize)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.WriteLock(Constants.Locks.ElementTree);
@@ -182,46 +213,24 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
             return Attempt.Fail(EntityContainerOperationStatus.CancelledByNotification);
         }
 
-        long total;
-        do
+        // query root elements in recycle bin and fire deleting notification (cancelable)
+        IQuery<IElement> rootQuery = Query<IElement>().Where(x => x.ParentId == Constants.System.RecycleBinElement);
+        IElement[] rootElements = _elementRepository.Get(rootQuery)?.ToArray() ?? Array.Empty<IElement>();
+
+        var deletingNotification = new ElementDeletingNotification(rootElements, eventMessages);
+        if (await scope.Notifications.PublishCancelableAsync(deletingNotification))
         {
-            IEnumerable<IEntitySlim> recycleBinRootItems = _entityService.GetPagedChildren(
-                Constants.System.RecycleBinElementKey,
-                [UmbracoObjectTypes.ElementContainer],
-                [UmbracoObjectTypes.ElementContainer, UmbracoObjectTypes.Element],
-                0, // pageIndex = 0 because we continuously delete items as we move through the descendants
-                DescendantsIteratorPageSize,
-                trashed: true,
-                out total);
-
-            foreach (IEntitySlim recycleBinRootItem in recycleBinRootItems)
-            {
-                DeleteDescendantsLocked(recycleBinRootItem.Key);
-
-                if (recycleBinRootItem.NodeObjectType == Constants.ObjectTypes.Element)
-                {
-                    IElement? element = _elementRepository.Get(recycleBinRootItem.Key);
-                    if (element is not null)
-                    {
-                        _elementRepository.Delete(element);
-                    }
-                }
-                else
-                {
-                    EntityContainer? container = await GetAsync(recycleBinRootItem.Key);
-                    if (container is not null)
-                    {
-                        _entityContainerRepository.Delete(container);
-                    }
-                }
-            }
+            return Attempt.Fail(EntityContainerOperationStatus.CancelledByNotification);
         }
-        while (total > DescendantsIteratorPageSize);
+
+        List<IElement> deletedElements = DeleteDescendantsLocked(Constants.System.RecycleBinElementKey, UmbracoObjectTypes.ElementRecycleBin, scope, eventMessages, pageSize);
 
         await AuditAsync(AuditType.Delete, userKey, Constants.System.RecycleBinElement, "Recycle bin emptied");
 
         // fire the deleted notification
         scope.Notifications.Publish(new ElementEmptiedRecycleBinNotification(eventMessages).WithStateFrom(emptyingNotification));
+
+        scope.Notifications.Publish(new ElementTreeChangeNotification(deletedElements, TreeChangeTypes.Remove, eventMessages));
 
         scope.Complete();
         return Attempt.Succeed(EntityContainerOperationStatus.Success);
@@ -271,6 +280,7 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
 
         var newContainerPath = $"{parentPath.TrimEnd(Constants.CharArrays.Comma)},{container.Id}";
         var levelDelta = 1 - container.Level + parentLevel;
+        var movedElements = new List<IElement>();
 
         long total;
 
@@ -313,6 +323,7 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
                     //       similar, and at the time of writing this, we are subject to the limitations imposed there.
                     ((TreeEntityBase)descendantElement).Trashed = trash;
                     _elementRepository.Save(descendantElement);
+                    movedElements.Add(descendantElement);
                 }
             }
         }
@@ -329,6 +340,8 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
             ? $"Moved to recycle bin from parent {originalPath.GetParentIdFromPath()}"
             : null;
         await AuditAsync(AuditType.Move, userKey, container.Id, auditMessage);
+
+        scope.Notifications.Publish(new ElementTreeChangeNotification(movedElements, TreeChangeTypes.RefreshNode, eventMessages));
 
         // fire the moved notification
         IStatefulNotification movedNotification = movedNotificationFactory(container, eventMessages);
@@ -363,49 +376,122 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
             return Attempt.FailWithStatus<EntityContainer?, EntityContainerOperationStatus>(EntityContainerOperationStatus.CancelledByNotification, container);
         }
 
-        DeleteDescendantsLocked(container.Key);
+        List<IElement> deletedElements = DeleteDescendantsLocked(container.Key, UmbracoObjectTypes.ElementContainer, scope, eventMessages);
 
+        DeleteContainerRelations(container);
         _entityContainerRepository.Delete(container);
 
         await AuditAsync(AuditType.Delete, userKey, container.Id);
 
         // fire the deleted notification
         scope.Notifications.Publish(new EntityContainerDeletedNotification(container, eventMessages).WithStateFrom(deletingNotification));
+        scope.Notifications.Publish(new ElementTreeChangeNotification(deletedElements, TreeChangeTypes.Remove, eventMessages));
 
         return Attempt.SucceedWithStatus<EntityContainer?, EntityContainerOperationStatus>(EntityContainerOperationStatus.Success, container);
     }
 
-    private void DeleteDescendantsLocked(Guid key)
+    private List<IElement> DeleteDescendantsLocked(Guid key, UmbracoObjectTypes objectType, ICoreScope scope, EventMessages eventMessages, int pageSize = DescendantsIteratorPageSize)
     {
-        long total;
+        var deletedElements = new List<IElement>();
 
-        do
+        // Order by path descending to ensure children are deleted before parents
+        var pathDescendingOrdering = Ordering.By("Path", Direction.Descending);
+
+        // Use path as a cursor to track progress - this avoids skip/take pagination issues
+        // when some items are skipped due to being referenced
+        string? lastProcessedPath = null;
+
+        // Track paths of items that couldn't be deleted (referenced items)
+        // so we can skip deleting containers that are ancestors of these items
+        var protectedPaths = new List<string>();
+
+        while (true)
         {
-            IEnumerable<IEntitySlim> descendants = _entityService.GetPagedDescendants(
+            // Build filter: path less than the last processed path (if any) for cursor-based pagination
+            var pathCursor = lastProcessedPath;
+            IQuery<IUmbracoEntity>? filter = pathCursor is null
+                ? null
+                : Query<IUmbracoEntity>().Where(d => d.Path.SqlLessThan(pathCursor));
+
+            IEntitySlim[] descendants = _entityService.GetPagedDescendants(
                 key,
-                UmbracoObjectTypes.ElementContainer,
+                objectType,
                 [UmbracoObjectTypes.ElementContainer, UmbracoObjectTypes.Element],
-                0, // pageIndex = 0 because we continuously delete items as we move through the descendants
-                DescendantsIteratorPageSize,
-                out total);
+                0,
+                pageSize,
+                out _,
+                filter: filter,
+                ordering: pathDescendingOrdering).ToArray();
+
+            if (descendants.Length == 0)
+            {
+                break;
+            }
 
             foreach (IEntitySlim descendant in descendants)
             {
-                if (descendant.NodeObjectType == Constants.ObjectTypes.ElementContainer)
+                // Skip deleting containers that are ancestors of protected (referenced) items
+                if (descendant.NodeObjectType == Constants.ObjectTypes.ElementContainer
+                    && protectedPaths.Any(p => p.StartsWith(descendant.Path + ",")))
                 {
-                    EntityContainer descendantContainer = _entityContainerRepository.Get(descendant.Id)
-                                                          ?? throw new InvalidOperationException($"Descendant container with ID {descendant.Id} was not found.");
-                    _entityContainerRepository.Delete(descendantContainer);
+                    continue;
                 }
-                else
+
+                // Check if referenced before fetching the full entity
+                if (_contentSettingsOptions.CurrentValue.DisableDeleteWhenReferenced
+                    && _relationService.IsRelated(descendant.Id, RelationDirectionFilter.Child, null))
                 {
-                    IElement descendantElement = _elementRepository.Get(descendant.Id)
-                                                 ?? throw new InvalidOperationException($"Descendant element with ID {descendant.Id} was not found.");
-                    _elementRepository.Delete(descendantElement);
+                    protectedPaths.Add(descendant.Path);
+                    continue;
+                }
+
+                IUmbracoEntity deletedEntity = DeleteItem(scope, descendant, eventMessages);
+                if (deletedEntity is IElement deletedElement)
+                {
+                    deletedElements.Add(deletedElement);
                 }
             }
+
+            // Track the smallest path we've seen (last in descending order) as cursor for next iteration
+            lastProcessedPath = descendants[^1].Path;
         }
-        while (total > DescendantsIteratorPageSize);
+
+        return deletedElements;
+    }
+
+    private IUmbracoEntity DeleteItem(ICoreScope scope, IEntitySlim descendant, EventMessages eventMessages)
+    {
+        if (descendant.NodeObjectType == Constants.ObjectTypes.ElementContainer)
+        {
+            DeleteContainerRelations(descendant);
+            EntityContainer descendantContainer = _entityContainerRepository.Get(descendant.Id)
+                                                  ?? throw new InvalidOperationException($"Descendant container with ID {descendant.Id} was not found.");
+            _entityContainerRepository.Delete(descendantContainer);
+            scope.Notifications.Publish(new EntityContainerDeletedNotification(descendantContainer, eventMessages));
+            return descendantContainer;
+        }
+
+        IElement descendantElement = _elementRepository.Get(descendant.Id)
+                                     ?? throw new InvalidOperationException($"Descendant element with ID {descendant.Id} was not found.");
+        _elementRepository.Delete(descendantElement);
+        scope.Notifications.Publish(new ElementDeletedNotification(descendantElement, eventMessages));
+        return descendantElement;
+    }
+
+    private void DeleteContainerRelations(IEntity container)
+    {
+        // Even though a container is in the recycle bin, it can still be both parent and child in one or
+        // more relations - for example:
+        // - Parent to an element that is also in the bin (for restoring the element).
+        // - Child to the original location in the elements tree (for restoring the container itself).
+        // Before the container can be deleted, the relations must be cleaned up.
+        IEnumerable<IRelation> relations = _relationService
+            .GetByParentOrChildId(container.Id)
+            .ToArray();
+        foreach (IRelation relation in relations)
+        {
+            _relationService.Delete(relation);
+        }
     }
 
     protected override Guid ContainedObjectType => Constants.ObjectTypes.Element;
