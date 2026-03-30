@@ -8,6 +8,14 @@ allowed-tools: Read, Write, Edit, Grep, Glob
 
 Create a new self-contained package under `src/packages/` with its first module.
 
+## Foundational documentation
+
+Read these docs before creating a package — they define the conventions this skill builds on:
+
+- **[Package Development](../../../docs/package-development.md)** — Package & module structure, folder conventions, manifest bubbling, public API rules
+- **[Entities](../../../docs/entities.md)** — Entity types, entity context, how entityType connects workspaces/trees/actions/routing
+- **[Data Flow](../../../docs/data-flow.md)** — Repository pattern, data sources, stores, worked examples
+
 ## Naming conventions
 
 - **Package names** are **plural** (e.g., `webhooks`, `languages`, `tags`, `documents`, `relations`)
@@ -17,7 +25,6 @@ Create a new self-contained package under `src/packages/` with its first module.
 
 1. **Package name** — The domain name in plural form (e.g., `webhooks`, `languages`, `tags`) — kebab-case
 2. **First module name** — The primary module in singular form (e.g., `webhook`, `language`, `tag`)
-3. **Whether it has an entity type** — Most packages represent an entity (e.g., webhook, language)
 
 ## When to create a package vs. add to core
 
@@ -33,7 +40,6 @@ src/packages/{package-name}/
 ├── umbraco-package.ts              # Bundle entry point (lazy-loads manifests)
 ├── manifests.ts                    # Aggregates all module manifests
 ├── {module-name}/                  # First module
-│   ├── entity.ts                  # Entity type constants (if entity-based)
 │   ├── index.ts                   # Public API exports
 │   ├── manifests.ts               # Module manifest registrations
 │   ├── constants.ts               # Module constants
@@ -46,7 +52,7 @@ Every package is an npm workspace. It needs a minimal `package.json`:
 
 ```json
 {
-	"name": "@umbraco-cms/backoffice-{package-name}",
+	"name": "@umbraco-backoffice/{package-name}",
 	"version": "0.0.0",
 	"private": true,
 	"type": "module",
@@ -93,19 +99,7 @@ export const extensions = [
 
 Convention: `name` uses `Umbraco.Core.{PascalCaseName}`, alias uses `Umb.Bundle.{PascalCaseName}`.
 
-## Step 4: Create entity.ts (if entity-based)
-
-Most packages define entity types and workspace aliases:
-
-```typescript
-export const UMB_{ENTITY}_ENTITY_TYPE = '{entity-name}';
-export const UMB_{ENTITY}_ROOT_ENTITY_TYPE = '{entity-name}-root';
-export const UMB_{ENTITY}_WORKSPACE_ALIAS = 'Umb.Workspace.{EntityName}';
-
-export type Umb{EntityName}EntityType = typeof UMB_{ENTITY}_ENTITY_TYPE;
-```
-
-## Step 5: Create the package-level manifests.ts
+## Step 4: Create the package-level manifests.ts
 
 Aggregates all module manifests:
 
@@ -119,7 +113,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 
 As you add more modules, import and spread their manifests here.
 
-## Step 6: Create the first module
+## Step 5: Create the first module
 
 ### {module-name}/manifests.ts
 
@@ -147,7 +141,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 // Module type definitions — domain models, config interfaces
 ```
 
-## Step 7: Register the package
+## Step 6: Register the package
 
 Three registrations are needed to wire the package into the build:
 
@@ -188,7 +182,6 @@ This registers the new workspace package with npm.
 - [ ] `umbraco-package.ts` created with bundle entry point
 - [ ] `manifests.ts` created at package level, aggregating module manifests
 - [ ] First module has `manifests.ts`, `index.ts`, `constants.ts`, `types.ts`
-- [ ] `entity.ts` created with entity type constants (if entity-based)
 - [ ] Subpath export added to root `package.json`
 - [ ] `npm run generate:tsconfig` executed
 - [ ] `npm install` executed to register the workspace
