@@ -530,18 +530,18 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 	}
 
 	renderTabsNavigation() {
-		if (!this._tabs || this._tabs.length === 0) return;
-
 		return html`
 			<umb-scrollable-container id="tabs-group">
-				<uui-tab-group>
-					${this.renderRootTab()}
-					${repeat(
-						this._tabs,
-						(tab) => tab.ownerId ?? tab.ids[0],
-						(tab) => this.renderTab(tab),
-					)}
-				</uui-tab-group>
+				${this._tabs && this._tabs.length > 0
+					? html`<uui-tab-group>
+							${this.renderRootTab()}
+							${repeat(
+								this._tabs,
+								(tab) => tab.ownerId ?? tab.ids[0],
+								(tab) => this.renderTab(tab),
+							)}
+						</uui-tab-group>`
+					: nothing}
 				${this.#renderAddButton()}
 			</umb-scrollable-container>
 		`;
@@ -788,7 +788,6 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 
 			#add-tab {
 				flex-shrink: 0;
-				border-left: 1px solid var(--uui-color-border);
 			}
 		`,
 	];
