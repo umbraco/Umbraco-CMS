@@ -2846,6 +2846,9 @@ export default {
 	},
 	rte: {
 		label: 'Rich Text Editor',
+		config_allowedMediaTypes: 'Accepted media types',
+		config_allowedMediaTypes_description:
+			'Limit to specific media types for the media picker toolbar and drag-and-drop uploads.',
 		config_blocks: 'Available Blocks',
 		config_blocks_description: 'Define the available blocks.',
 		config_ignoreUserStartNodes: 'Ignore User Start Nodes',
