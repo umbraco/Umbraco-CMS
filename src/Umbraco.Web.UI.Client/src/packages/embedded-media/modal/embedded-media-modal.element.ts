@@ -125,6 +125,8 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 							slot="editor"
 							.width=${this._width}
 							.height=${this._height}
+							.naturalWidth=${DEFAULT_WIDTH}
+							.naturalHeight=${DEFAULT_HEIGHT}
 							.locked=${this._constrain}
 							?disabled=${isDisabled}
 							@change=${this.#onDimensionsChange}></umb-input-dimensions>
