@@ -97,7 +97,8 @@ public interface IUserService : IMembershipUserService
     /// </summary>
     /// <param name="model">The model containing the updated user details.</param>
     /// <returns>An attempt containing the updated <see cref="IUser"/> if successful, as well as a more detailed <see cref="UserOperationStatus"/>.</returns>
-    Task<Attempt<IUser?, UserOperationStatus>> UpdateCurrentUserAsync(CurrentUserUpdateModel model);
+    // TODO V19: Remove default implementation
+    Task<Attempt<IUser?, UserOperationStatus>> UpdateCurrentUserAsync(CurrentUserUpdateModel model) => throw new NotImplementedException();
 
     /// <summary>
     ///     Sets the avatar for a user from a temporary file.

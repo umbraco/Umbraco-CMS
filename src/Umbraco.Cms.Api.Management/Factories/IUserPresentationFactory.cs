@@ -34,7 +34,8 @@ public interface IUserPresentationFactory
     /// <summary>
     /// Creates an update model for a current user based on the provided request model.
     /// </summary>
-    Task<CurrentUserUpdateModel> CreateUpdateCurrentUserModelAsync(Guid existingUserKey, UpdateCurrentUserRequestModel updateModel);
+    // TODO V19: Remove default implementation
+    Task<CurrentUserUpdateModel> CreateUpdateCurrentUserModelAsync(Guid existingUserKey, UpdateCurrentUserRequestModel updateModel) => throw new NotImplementedException();
 
     /// <summary>
     /// Creates a response model for the current user based on the provided user.
