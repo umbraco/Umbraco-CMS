@@ -7,6 +7,9 @@ import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UUIButtonState, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
+const DEFAULT_WIDTH = 500;
+const DEFAULT_HEIGHT = 500 / (16 / 9);
+
 @customElement('umb-embedded-media-modal')
 export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 	UmbEmbeddedMediaModalData,
@@ -20,10 +23,10 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 	private _loading?: UUIButtonState;
 
 	@state()
-	private _width = 500;
+	private _width = DEFAULT_WIDTH;
 
 	@state()
-	private _height = Math.round(500 / (16 / 9));
+	private _height = DEFAULT_HEIGHT;
 
 	@state()
 	private _constrain = false;
@@ -34,8 +37,8 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 	override connectedCallback() {
 		super.connectedCallback();
 
-		if (this.data?.width) this._width = this.data.width;
-		if (this.data?.height) this._height = this.data.height;
+		if (this.data?.width) this._width = this.data.width > 0 ? this.data.width : DEFAULT_WIDTH;
+		if (this.data?.height) this._height = this.data.height > 0 ? this.data.height : DEFAULT_HEIGHT;
 		if (this.data?.constrain !== undefined) this._constrain = this.data.constrain;
 
 		if (this._width && this._height) {
