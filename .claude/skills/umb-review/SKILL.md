@@ -109,7 +109,7 @@ For each changed file, reason about: What does this code do? Is it correct? What
 For each new piece of functionality in the diff, search for its closest existing sibling and compare the full implementation:
 
 1. **New method on existing class/interface**: Grep for the most similar existing method on the same class using `-A 80` to capture the full method body (e.g., `UpdateCurrentUserAsync` → grep for `UpdateAsync` in the same file with `-A 80`). Compare line by line for missing cross-cutting concerns: notifications/events, validation, scoping, authorization, error handling, audit logging.
-2. **New manifest for an existing entity type**: Grep for existing manifests with the same `forEntityTypes` value or entity type alias prefix or manifest alias prefix (e.g. 'Umb.Workspace' from 'Umb.Workspace.Document'). Compare conditions, `kind`, and meta properties.
+2. **New manifest**: Search for similar existing manifests by any of: same package directory, same `forEntityTypes` value, same manifest type, or same alias prefix (first two dot-separated segments, e.g., `Umb.Workspace` from `Umb.Workspace.Document`). Once found, consider consistency — should they share the same conditions, `kind`, and meta properties? Flag inconsistencies, but also consider whether there are valid reasons for the difference.
 3. **New TS class**: Grep for siblings by base class (`extends {BaseClass}`) or by interface (`implements {Interface}`) or by name suffix (e.g., `CurrentUserController` → grep for `UserController`). Compare for missing concerns.
 4. **New CS class**: Grep for siblings by base class (`class {ClassName} : {BaseClass}`) or by interface (`class {ClassName} : {Interface}`) or by name suffix (e.g., `ManagementApiComposer` → grep for `ApiComposer`). Compare for missing concerns.
 
@@ -129,7 +129,7 @@ Follow the procedure in `references/breaking-changes.md`.
 
 ### 7. Consolidate and Output Review
 
-Merge findings from step 4 (raw review), step 5 (impact analysis), and step 6 (breaking changes). For each finding, assign severity (Critical/Important/Suggestion), filter out cosmetic noise, and verify it relates to changed code — not pre-existing issues. Then present the review in this exact format:
+Merge findings from step 4 (raw review), step 5 (impact analysis), and step 6 (breaking changes). For each finding, assign severity (Critical/Important/Suggestion) and verify it relates to changed code — not pre-existing issues. Before outputting, drop any finding about whitespace, blank lines, formatting, or comment wording. Then present the review in this exact format:
 
 ```markdown
 ## PR Review

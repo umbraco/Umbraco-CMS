@@ -120,6 +120,12 @@ When making decisions, prioritize:
 
 ---
 
+## C# Specific
+
+- use Notification pattern (not C# events), Composer pattern (DI registration), Scoping with `Complete()`, Attempt pattern for operation results.
+
+---
+
 ## Architecture
 
 - Follow **Clean Architecture** principles
