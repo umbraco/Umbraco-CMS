@@ -31,6 +31,18 @@ TypeScript/Lit web components library for the Umbraco CMS backoffice. Published 
 
 ---
 
+## Skills & Documentation — Mandatory Usage
+
+**When a skill or documentation file exists for the task you are performing, you MUST use it. Do NOT improvise, skip steps, or manually create files that a skill is designed to scaffold.**
+
+- Before starting any scaffolding or creation task, check if a matching skill exists in `.claude/skills/`. If one exists, invoke it.
+- Skills define prerequisites. If a prerequisite is not met, you MUST resolve it first using the appropriate skill.
+- Documentation files (`docs/*.md`) describe conventions and patterns. When they cover the area you are working in, read and follow them.
+- If a skill includes verification steps, run them before proceeding to the next step.
+- If you are unsure whether a skill applies, check — the cost of checking is low, the cost of skipping is high.
+
+---
+
 ## Quick Start
 
 ```bash
@@ -136,4 +148,3 @@ When using `@umbraco-cms/backoffice`:
 | `devops/publish/cleanse-pkg.js` | Script that runs during `npm pack` to hoist and convert versions |
 | `src/external/*` | Dependency wrapper packages |
 | `src/packages/core` | Contains `@hey-api/openapi-ts` and other utilities |
-
