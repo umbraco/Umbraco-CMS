@@ -29,7 +29,7 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 	private _height = DEFAULT_HEIGHT;
 
 	@state()
-	private _constrain = false;
+	private _constrain = true;
 
 	@state()
 	private _url = '';
