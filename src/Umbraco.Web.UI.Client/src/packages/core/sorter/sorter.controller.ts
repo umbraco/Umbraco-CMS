@@ -23,8 +23,10 @@ function getParentScrollElement(el: Element, includeSelf: boolean) {
 			const elemCSS = getComputedStyle(elem);
 
 			if (
-				(elem.clientHeight < elem.scrollHeight && (elemCSS.overflowY == 'auto' || elemCSS.overflowY == 'scroll')) ||
-				(elem.clientWidth < elem.scrollWidth && (elemCSS.overflowX == 'auto' || elemCSS.overflowX == 'scroll'))
+				(elem.clientHeight < elem.scrollHeight &&
+					(elemCSS.overflowY == 'auto' || elemCSS.overflowY == 'scroll' || elemCSS.overflowY == 'hidden')) ||
+				(elem.clientWidth < elem.scrollWidth &&
+					(elemCSS.overflowX == 'auto' || elemCSS.overflowX == 'scroll' || elemCSS.overflowX == 'hidden'))
 			) {
 				if (!elem.getBoundingClientRect || elem === document.body) return null;
 				if (gotSelf || includeSelf) return elem;
