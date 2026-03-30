@@ -112,3 +112,9 @@ export class UmbScrollableContainerElement extends UmbLitElement {
 		`,
 	];
 }
+
+declare global {
+	interface HTMLElementTagNameMap {
+		'umb-scrollable-container': UmbScrollableContainerElement;
+	}
+}
