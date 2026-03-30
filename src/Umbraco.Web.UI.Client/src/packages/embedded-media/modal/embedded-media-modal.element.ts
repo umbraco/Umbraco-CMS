@@ -107,7 +107,15 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 							html` <umb-property-layout label=${this.localize.term('general_preview')} orientation="vertical">
 								<div slot="editor">
 									${when(this._loading === 'waiting', () => html`<uui-loader-circle></uui-loader-circle>`)}
-									${when(this.value?.markup, () => html`${unsafeHTML(this.value.markup)}`)}
+									${when(
+									this.value?.markup,
+									() =>
+										html`<div
+											id="preview"
+											style="aspect-ratio: ${this._width} / ${this._height}">
+											${unsafeHTML(this.value.markup)}
+										</div>`,
+								)}
 								</div>
 							</umb-property-layout>`,
 					)}
@@ -145,6 +153,16 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 			uui-input {
 				width: 100%;
 				--uui-button-border-radius: 0;
+			}
+
+			#preview {
+				width: 100%;
+				overflow: hidden;
+
+				iframe {
+					width: 100%;
+					height: 100%;
+				}
 			}
 
 			umb-property-layout:first-child {
