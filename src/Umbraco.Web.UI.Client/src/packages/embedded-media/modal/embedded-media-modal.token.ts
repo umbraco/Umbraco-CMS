@@ -2,7 +2,6 @@ import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbEmbeddedMediaModalData extends Partial<UmbEmbeddedMediaDimensionsModel> {
 	url?: string;
-	maxImageSize?: number;
 }
 
 export interface UmbEmbeddedMediaDimensionsModel {

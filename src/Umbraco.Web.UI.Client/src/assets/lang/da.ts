@@ -2263,6 +2263,10 @@ export default {
 		enableError:
 			'Der opstod en fejl under forsøget på at slå URL trackeren til, der findes mere information\n      i logfilen.\n    ',
 	},
+	embeddedMedia: {
+		dimensionsDescription:
+			'Disse værdier sendes som den maksimale bredde og højde til embed-udbyderen. Udbyderen kan justere de endelige dimensioner for at overholde sine egne begrænsninger.',
+	},
 	emptyStates: {
 		emptyDictionaryTree: 'Ingen ordbog elementer at vælge imellem',
 	},

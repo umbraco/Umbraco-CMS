@@ -5,19 +5,10 @@ import { UMB_EMBEDDED_MEDIA_MODAL } from '@umbraco-cms/backoffice/embedded-media
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 
 export default class UmbTiptapToolbarEmbeddedMediaExtensionApi extends UmbTiptapToolbarElementApiBase {
-	get maxImageSize(): number {
-		const maxImageSize = parseInt(this.configuration?.getValueByAlias('maxImageSize') ?? '', 10);
-		return isNaN(maxImageSize) ? 500 : maxImageSize;
-	}
-
 	override async execute(editor?: Editor) {
-		const width = this.maxImageSize;
-		const data = {
+		const data: Record<string, unknown> = {
 			constrain: true,
-			height: Math.round(width / (16 / 9)),
-			width,
 			url: '',
-			maxImageSize: width,
 		};
 
 		const attrs = editor?.getAttributes(umbEmbeddedMedia.name);

@@ -2357,6 +2357,10 @@ export default {
 		enableError: 'Error enabling the URL tracker, more information can be found in your log file.',
 		culture: 'Culture',
 	},
+	embeddedMedia: {
+		dimensionsDescription:
+			'These values are passed as the maximum width and height to the embed provider. The provider may adjust the final dimensions to fit its own constraints.',
+	},
 	emptyStates: {
 		emptyDictionaryTree: 'No Dictionary items to choose from',
 	},

@@ -34,19 +34,8 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 	@state()
 	private _url = '';
 
-	@state()
-	private _naturalWidth = DEFAULT_WIDTH;
-
-	@state()
-	private _naturalHeight = DEFAULT_HEIGHT;
-
 	override connectedCallback() {
 		super.connectedCallback();
-
-		if (this.data?.maxImageSize) {
-			this._naturalWidth = this.data.maxImageSize;
-			this._naturalHeight = Math.round(this.data.maxImageSize / (16 / 9));
-		}
 
 		if (this.data?.width) this._width = this.data.width > 0 ? this.data.width : DEFAULT_WIDTH;
 		if (this.data?.height) this._height = this.data.height > 0 ? this.data.height : DEFAULT_HEIGHT;
@@ -94,6 +83,16 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 		this.#debouncedGetPreview();
 	}
 
+	protected override updated() {
+		// Iframes don't have intrinsic aspect ratios like images, so height:auto collapses to 150px.
+		// Read the provider's width/height attributes and apply aspect-ratio to keep proportions.
+		const iframe = this.renderRoot.querySelector<HTMLIFrameElement>('#preview iframe');
+		if (iframe?.width && iframe?.height) {
+			iframe.style.aspectRatio = `${iframe.width} / ${iframe.height}`;
+			iframe.style.height = 'auto';
+		}
+	}
+
 	override render() {
 		const isDisabled = !this.#validUrl;
 		return html`
@@ -112,36 +111,29 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 						</div>
 					</umb-property-layout>
 
+					<umb-property-layout
+						label=${this.localize.term('general_dimensions')}
+						description=${this.localize.term('embeddedMedia_dimensionsDescription')}
+						orientation="vertical">
+						<umb-input-dimensions
+							slot="editor"
+							.width=${this._width}
+							.height=${this._height}
+							.locked=${this._constrain}
+							?disabled=${isDisabled}
+							@change=${this.#onDimensionsChange}></umb-input-dimensions>
+					</umb-property-layout>
+
 					${when(
 						this.#validUrl !== undefined,
 						() =>
 							html` <umb-property-layout label=${this.localize.term('general_preview')} orientation="vertical">
 								<div slot="editor">
 									${when(this._loading === 'waiting', () => html`<uui-loader-circle></uui-loader-circle>`)}
-									${when(
-										this.value?.markup,
-										() =>
-											html`<div
-												id="preview"
-												style="width: ${this._width}px; aspect-ratio: ${this._width} / ${this._height}">
-												${unsafeHTML(this.value.markup)}
-											</div>`,
-									)}
+									${when(this.value?.markup, () => html`<div id="preview">${unsafeHTML(this.value.markup)}</div>`)}
 								</div>
 							</umb-property-layout>`,
 					)}
-
-					<umb-property-layout label=${this.localize.term('general_dimensions')} orientation="vertical">
-						<umb-input-dimensions
-							slot="editor"
-							.width=${this._width}
-							.height=${this._height}
-							.naturalWidth=${this._naturalWidth}
-							.naturalHeight=${this._naturalHeight}
-							.locked=${this._constrain}
-							?disabled=${isDisabled}
-							@change=${this.#onDimensionsChange}></umb-input-dimensions>
-					</umb-property-layout>
 				</uui-box>
 
 				<uui-button
@@ -169,25 +161,16 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 			}
 
 			#preview {
-				position: relative;
 				max-width: 100%;
-				margin-inline: auto;
 				overflow: hidden;
 
 				> *:first-child {
-					position: absolute;
-					inset: 0;
-					width: 100% !important;
-					height: 100% !important;
+					max-width: 100%;
 				}
 			}
 
 			umb-property-layout:first-child {
 				padding-top: 0;
-			}
-
-			umb-property-layout:last-child {
-				padding-bottom: 0;
 			}
 		`,
 	];
