@@ -10,7 +10,7 @@ export class UmbElementRecycleBinTreeItemChildrenCollectionRepository
 {
 	#treeRepository = new UmbElementRecycleBinTreeRepository(this);
 
-	async requestCollection(filter: UmbCollectionFilterModel) {
+	async requestCollection(filter: UmbCollectionFilterModel = {}) {
 		// TODO: get parent from args
 		const entityContext = await this.getContext(UMB_ENTITY_CONTEXT);
 		if (!entityContext) throw new Error('Entity context not found');
