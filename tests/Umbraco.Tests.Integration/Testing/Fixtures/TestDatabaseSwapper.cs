@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -26,6 +27,7 @@ public class TestDatabaseSwapper
 {
     private static readonly Lock s_dbLocker = new();
     private static ITestDatabase? s_dbInstance;
+    private static readonly ConcurrentDictionary<string, SemaphoreSlim> s_seedLocks = new();
 
     private ConnectionStrings? _controlledConnectionStrings;
     private TestDbMeta? _currentMeta;
@@ -137,6 +139,128 @@ public class TestDatabaseSwapper
         var backOfficeAppManager = scope.ServiceProvider.GetRequiredService<IBackOfficeApplicationManager>();
         var backOfficeHost = new Uri("https://localhost/");
         await backOfficeAppManager.EnsureBackOfficeApplicationAsync([backOfficeHost]);
+    }
+
+    /// <summary>
+    ///     Swaps to a seeded database on an already-running host.
+    ///     If a snapshot for the seed profile's key already exists, restores from it.
+    ///     Otherwise, attaches a fresh schema database, runs the seed profile, and creates
+    ///     a snapshot so subsequent callers with the same key restore instantly.
+    ///     <para>
+    ///         The seed profile is responsible for all database-level setup (e.g. unattended
+    ///         install, content creation). The swapper handles only the connection swap and
+    ///         in-memory cache rebuilds.
+    ///     </para>
+    /// </summary>
+    public async Task SwapToSeededDatabaseAsync(
+        IServiceProvider services,
+        IConfiguration configuration,
+        TestHelper testHelper,
+        ITestDatabaseSeedProfile seedProfile)
+    {
+        if (_controlledConnectionStrings is null)
+        {
+            throw new InvalidOperationException(
+                "InitialSetup must be called before SwapToSeededDatabaseAsync.");
+        }
+
+        var db = GetOrCreateDatabase(
+            services.GetRequiredService<ILoggerFactory>(),
+            services.GetRequiredService<TestUmbracoDatabaseFactoryProvider>(),
+            configuration,
+            testHelper);
+
+        if (db is not ISnapshotableTestDatabase snapshotDb)
+        {
+            // Fallback: swap to a fresh schema DB and seed manually every time
+            await SwapDatabaseAsync(services, configuration, testHelper);
+            await seedProfile.SeedAsync(services);
+            return;
+        }
+
+        // Synchronize per seed key so only one thread seeds and snapshots
+        var seedLock = s_seedLocks.GetOrAdd(seedProfile.SeedKey, _ => new SemaphoreSlim(1, 1));
+        await seedLock.WaitAsync();
+        try
+        {
+            // Detach current database
+            if (_currentMeta is not null)
+            {
+                db.Detach(_currentMeta);
+            }
+
+            if (snapshotDb.HasSnapshot(seedProfile.SeedKey))
+            {
+                // Restore from existing snapshot
+                _currentMeta = snapshotDb.AttachFromSnapshot(seedProfile.SeedKey);
+            }
+            else
+            {
+                // First caller: attach fresh schema DB, let the seed profile do all setup, then snapshot
+                _currentMeta = db.AttachSchema();
+
+                // Point the host at the new DB before the seed runs
+                MutateConnectionStrings(services, _currentMeta);
+
+                // The seed profile handles everything: install, content creation, etc.
+                await seedProfile.SeedAsync(services);
+
+                // Snapshot the seeded state
+                snapshotDb.CreateSnapshot(seedProfile.SeedKey, _currentMeta);
+            }
+        }
+        finally
+        {
+            seedLock.Release();
+        }
+
+        // Mutate connection strings for the (possibly snapshot-restored) database
+        MutateConnectionStrings(services, _currentMeta);
+
+        // Re-determine runtime level so the host knows we're in Run state
+        var runtimeState = services.GetRequiredService<IRuntimeState>();
+        runtimeState.DetermineRuntimeLevel();
+
+        // Rebuild in-memory caches — these are host-side state, not in the DB snapshot
+        await RebuildInMemoryCachesAsync(services);
+    }
+
+    /// <summary>
+    ///     Mutates the stored <see cref="ConnectionStrings"/> and the
+    ///     <see cref="IOptionsMonitor{ConnectionStrings}"/> so new connections use the given database.
+    /// </summary>
+    private void MutateConnectionStrings(IServiceProvider services, TestDbMeta meta)
+    {
+        _controlledConnectionStrings!.ConnectionString = meta.ConnectionString;
+        _controlledConnectionStrings.ProviderName = meta.Provider;
+
+        var connectionStrings = services.GetRequiredService<IOptionsMonitor<ConnectionStrings>>();
+        connectionStrings.CurrentValue.ConnectionString = meta.ConnectionString;
+        connectionStrings.CurrentValue.ProviderName = meta.Provider;
+    }
+
+    /// <summary>
+    ///     Rebuilds in-memory caches that hold data from the previous database.
+    ///     Must be called after every database swap regardless of whether the DB
+    ///     came from a snapshot or a fresh install.
+    /// </summary>
+    private static async Task RebuildInMemoryCachesAsync(IServiceProvider services)
+    {
+        // Clear the IdKeyMap cache — it holds int-to-Guid mappings from the previous database
+        services.GetRequiredService<IIdKeyMap>().ClearCache();
+
+        // Rebuild in-memory navigation structures
+        var docNav = services.GetRequiredService<IDocumentNavigationManagementService>();
+        await docNav.RebuildAsync();
+        await docNav.RebuildBinAsync();
+
+        var mediaNav = services.GetRequiredService<IMediaNavigationManagementService>();
+        await mediaNav.RebuildAsync();
+        await mediaNav.RebuildBinAsync();
+
+        // Re-initialize publish status cache from the new database
+        var publishStatus = services.GetRequiredService<IPublishStatusManagementService>();
+        await publishStatus.InitializeAsync(CancellationToken.None);
     }
 
     /// <summary>

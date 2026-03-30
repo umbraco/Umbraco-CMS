@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Net.Mime;
+using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -21,8 +22,9 @@ using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Infrastructure.Security;
+using Umbraco.Cms.Tests.Common.Testing;
+using Umbraco.Cms.Tests.Integration.Testing.SeedProfiles;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi;
 
@@ -33,6 +35,7 @@ namespace Umbraco.Cms.Tests.Integration.ManagementApi;
 /// </summary>
 /// <typeparam name="T">The ManagementApi controller type being tested.</typeparam>
 [TestFixture]
+[DatabaseSeedProfile(typeof(InstalledSchemaSeed))]
 public abstract class ManagementApiTest<T>
     where T : ManagementApiControllerBase
 {
@@ -60,8 +63,18 @@ public abstract class ManagementApiTest<T>
         // from obsolete constructors that use StaticServiceProvider.Instance.
         StaticServiceProvider.Instance = Services;
 
-        // Swap to a fresh database for this fixture class
-        await Fixture.SwapToFreshDatabaseAsync();
+        // Check if this fixture class opted into a seed profile via [DatabaseSeedProfile].
+        // If so, use snapshot-aware seeded swap; otherwise fall back to a fresh database.
+        var seedAttr = GetType().GetCustomAttribute<DatabaseSeedProfileAttribute>();
+        if (seedAttr is not null)
+        {
+            var profile = (ITestDatabaseSeedProfile)Activator.CreateInstance(seedAttr.SeedProfileType)!;
+            await Fixture.SwapToSeededDatabaseAsync(profile);
+        }
+        else
+        {
+            await Fixture.SwapToFreshDatabaseAsync();
+        }
 
         // Clear token cache — tokens from previous fixture's DB are now invalid
         _tokenCache.Clear();

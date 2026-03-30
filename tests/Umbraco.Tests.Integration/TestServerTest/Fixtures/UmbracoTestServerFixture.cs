@@ -154,6 +154,23 @@ public abstract class UmbracoTestServerFixture : UmbracoIntegrationFixtureBase
     }
 
     /// <summary>
+    ///     Swaps to a seeded database on the running host.
+    ///     If a snapshot for the seed profile already exists, restores from it instantly.
+    ///     Otherwise, seeds the database and creates a snapshot for future callers.
+    ///     Requires <see cref="DatabaseSwapper"/> to be set.
+    /// </summary>
+    public async Task SwapToSeededDatabaseAsync(ITestDatabaseSeedProfile seedProfile)
+    {
+        if (DatabaseSwapper is null)
+        {
+            throw new InvalidOperationException(
+                "DatabaseSwapper must be set to use SwapToSeededDatabaseAsync.");
+        }
+
+        await DatabaseSwapper.SwapToSeededDatabaseAsync(Services, Configuration, TestHelper, seedProfile);
+    }
+
+    /// <summary>
     ///     Detaches the current database without attaching a new one.
     ///     Requires <see cref="DatabaseSwapper"/> to be set.
     /// </summary>
