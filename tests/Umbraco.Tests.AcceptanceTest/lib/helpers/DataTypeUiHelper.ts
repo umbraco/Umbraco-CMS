@@ -146,6 +146,8 @@ export class DataTypeUiHelper extends UiBaseLocators {
   private readonly dynamicRootOriginPickerModal: Locator;
   private readonly dynamicRootQueryStepPickerModal: Locator;
   private readonly closeDynamicRootOriginPickerModalBtn: Locator;
+  private readonly specifiedAllowance: Locator;
+  private readonly specifiedAllowanceItems: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -297,13 +299,15 @@ export class DataTypeUiHelper extends UiBaseLocators {
     this.createLabelTxt = this.page.locator('[alias="createLabel"]').locator('#input');
     this.minAllowedTxt = this.page.locator('#container').getByLabel('Low value');
     this.maxAllowedTxt = this.page.locator('#container').getByLabel('High value');
-    this.addSpecifiedAllowanceBtn = this.page.locator('[alias="specifiedAllowance"]').getByLabel('Add');
     this.advancedTabBtn = this.page.getByRole('tab', {name: 'Advanced'});
     this.allowBlockAtRootToggle = this.page.getByTestId('property:allowAtRoot').locator('#toggle');
     this.allowInAreasToggle = this.page.getByTestId('property:allowInAreas').locator('#toggle');
     this.expandChildItemsForMediaBtn = this.page.getByLabel('Expand child items for media', {exact: true});
     this.chooseCustomStylesheetBtn = this.page.locator('[label="Custom stylesheet"]').getByLabel('Choose');
     this.blockThumbnailRemoveBtn = this.page.getByTestId('property:thumbnail').getByLabel('Remove', {exact: true});
+    this.specifiedAllowance = this.page.getByTestId('property:specifiedAllowance');
+    this.addSpecifiedAllowanceBtn = this.specifiedAllowance.getByLabel('Add');
+    this.specifiedAllowanceItems = this.specifiedAllowance.locator('.permission-setting');
 
     // Tiptap
     this.tiptapToolbarConfiguration = this.page.locator('umb-property-editor-ui-tiptap-toolbar-configuration');
@@ -835,7 +839,7 @@ export class DataTypeUiHelper extends UiBaseLocators {
   }
 
   async goToBlockWithName(name: string) {
-    await this.click(this.page.getByRole('link', {name: name}));
+    await this.click(this.page.getByRole('link', {name: name, exact: true}));
   }
 
   async enterBlockLabelText(label: string) {
@@ -1056,6 +1060,41 @@ export class DataTypeUiHelper extends UiBaseLocators {
 
   async clickAddSpecifiedAllowanceButton() {
     await this.click(this.addSpecifiedAllowanceBtn);
+  }
+
+  async clickSpecifiedAllowanceComboboxByIndex(index: number = 0) {
+    const combobox = this.specifiedAllowanceItems.nth(index).locator('uui-combobox');
+    await this.click(combobox);
+  }
+
+  async selectSpecifiedAllowanceOptionByName(elementTypeName: string) {
+    const option = this.specifiedAllowanceItems.locator('uui-combobox-list-option').filter({hasText: elementTypeName});
+    await this.click(option);
+  }
+
+  async clickRemoveSpecifiedAllowanceByIndex(index: number = 0) {
+    const removeBtn = this.specifiedAllowanceItems.nth(index).locator('uui-button[label="Remove"]');
+    await this.click(removeBtn);
+  }
+
+  async enterSpecifiedAllowanceMinByIndex(value: number | undefined, index: number = 0) {
+    const minInput = this.specifiedAllowanceItems.nth(index).locator('uui-input[type="number"]').first().locator('input');
+    if (value === undefined) {
+      await this.focus(minInput); // Focus is needed
+      await this.clearText(minInput);
+      return;
+    } 
+    await this.enterText(minInput, value.toString());
+  }
+
+  async enterSpecifiedAllowanceMaxByIndex(value: number | undefined, index: number = 0) {
+    const maxInput = this.specifiedAllowanceItems.nth(index).locator('uui-input[type="number"]').nth(1).locator('input');
+    if (value === undefined) {
+      await this.focus(maxInput); // Focus is needed
+      await this.clearText(maxInput);
+      return;
+    }
+    await this.enterText(maxInput, value.toString());
   }
 
   async goToBlockAdvancedTab() {
