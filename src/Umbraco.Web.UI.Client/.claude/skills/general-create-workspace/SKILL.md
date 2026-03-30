@@ -8,10 +8,8 @@ allowed-tools: Read, Write, Edit, Grep, Glob
 
 Create a workspace in the Umbraco backoffice. Two workspace types are available:
 
-- **Default workspace** — manifest-only, no custom code. For root pages, listing pages, settings. Supports workspace views, actions, and context extensions out of the box.
+- **Default workspace** — manifest-only, no custom code. For root pages, listing pages, settings.
 - **Routable workspace** — custom context class with create/edit URL routing. For entity detail editing with full CRUD lifecycle.
-
-For full workspace system documentation see [Workspaces](../../../docs/workspaces.md).
 
 ## What you need from the user
 
@@ -76,17 +74,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 ];
 ```
 
-**What you get automatically:**
-- Headline rendered from `meta.headline` (supports localization keys like `'#treeHeaders_webhooks'`)
-- `UmbEntityContext` propagation (entityType + unique)
-- Full support for `workspaceView`, `workspaceAction`, `workspaceContext`, and `workspaceFooterApp` extensions via conditions
-- No custom context class, element, or context token needed
-
-**Reference examples:**
-- `src/packages/webhook/webhook-root/workspace/manifests.ts`
-- `src/packages/user/user/workspace/user-root/manifests.ts`
-- `src/packages/extension-insights/workspace/manifests.ts`
-
 ### Default workspace checklist
 
 - [ ] Workspace alias constant defined
@@ -143,12 +130,6 @@ export const UMB_{ENTITY}_WORKSPACE_CONTEXT = new UmbContextToken<
 	(context): context is Umb{EntityName}WorkspaceContext => context.getEntityType?.() === '{entity-type}',
 );
 ```
-
-Rules:
-- First generic = `UmbSubmittableWorkspaceContext` (base type)
-- Second generic = concrete context class
-- Context string is always `'UmbWorkspaceContext'`
-- Discriminator checks `getEntityType()` against the entity type constant value
 
 ## Step 2: Create constants.ts
 
@@ -251,13 +232,6 @@ Replace the `create` route with:
 },
 ```
 
-### Key patterns for the context
-
-- **Observables**: `this._data.createObservablePartOfCurrent((data) => data?.prop)` — one per property
-- **Getters**: `this._data.getCurrent()?.prop` — read from current data
-- **Setters**: `this._data.updateCurrent({ prop: value })` — partial update current data
-- **Export as `api`**: The last line must be `export { ClassName as api };` — the extension system expects this
-
 ## Step 4: Create editor element
 
 File: `{entity}-workspace-editor.element.ts`
@@ -269,8 +243,9 @@ import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { umbFocus, UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
-// TODO: Replace with the correct back path constant for this entity
-const BACK_PATH = 'FIXME';
+// Back path: find or create a constant like UMB_{ENTITY}_SECTION_PATH in the entity's section-path constants.
+// Grep for 'SECTION_PATH' or 'WORKSPACE_PATH' in the entity's package to find the correct import.
+const BACK_PATH = 'FIXME: replace with section path constant';
 
 @customElement('umb-{entity}-workspace-editor')
 export class Umb{EntityName}WorkspaceEditorElement extends UmbLitElement {
@@ -332,12 +307,6 @@ declare global {
 	}
 }
 ```
-
-Key points:
-- Context type via `typeof TOKEN.TYPE` — avoids importing the context class directly
-- `umbFocus()` directive auto-focuses the name input on load
-- `back-path` on `<umb-entity-detail-workspace-editor>` controls the back button URL
-- Must export as `element` and declare on `HTMLElementTagNameMap`
 
 ## Step 5: Create detail view element
 
@@ -419,13 +388,6 @@ declare global {
 }
 ```
 
-Key points:
-- Must implement `UmbWorkspaceViewElement` interface
-- Must export as `element` (lazy-loaded by the extension system)
-- Use `<umb-property-layout>` for consistent field layout
-- Use `<uui-box>` as the container
-- Use localization via `this.localize.term()` for labels
-
 ## Step 6: Create manifests
 
 File: `manifests.ts`
@@ -484,14 +446,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 ];
 ```
 
-Key points:
-- `api: () => import(...)` for workspace — lazy-loads the context class
-- `element: () => import(...)` for views — lazy-loads the view element
-- `api: UmbSubmitWorkspaceAction` for save action — direct class reference (built-in action, no custom class needed)
-- All views and actions use `UMB_WORKSPACE_CONDITION_ALIAS` to scope to this workspace
-- `weight` controls tab ordering (higher = further left)
-- `meta.pathname` becomes the URL segment for the view tab
-
 ## Step 7: Wire manifests into parent module
 
 Import and spread the workspace manifests in the parent module's `manifests.ts`:
@@ -504,69 +458,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 	// ... other manifests
 ];
 ```
-
-## Extending with workspace context extensions
-
-Workspace context extensions let other packages add capabilities to this workspace without modifying its code. They can also enable cross-workspace reuse — the same feature (publishing, permissions, menu structure) can be added to multiple workspaces independently. See [Workspaces — Workspace Context Extensions](../../../docs/workspaces.md#workspace-context-extensions-modularity--reuse) for the full pattern.
-
-A workspace context extension is a full feature stack: it can have its own repository, data source, actions, and UI — all scoped to the target workspace via conditions.
-
-### Registration
-
-```typescript
-// In: src/packages/other-feature/manifests.ts
-{
-  type: 'workspaceContext',
-  alias: 'Umb.WorkspaceContext.{EntityName}.OtherFeature',
-  api: () => import('./other-feature.workspace-context.js'),
-  conditions: [
-    { alias: UMB_WORKSPACE_CONDITION_ALIAS, match: UMB_{ENTITY}_WORKSPACE_ALIAS },
-  ],
-}
-```
-
-### Implementation
-
-The context extends `UmbContextBase`, consumes the parent workspace context via its token, and provides its own token for consumers:
-
-```typescript
-export class UmbMyFeatureWorkspaceContext extends UmbContextBase {
-  // Own repository for feature-specific API endpoints
-  #repository = new UmbMyFeatureRepository(this);
-
-  constructor(host: UmbControllerHost) {
-    super(host, UMB_MY_FEATURE_WORKSPACE_CONTEXT.toString());
-
-    // Consume the parent workspace context for entity data
-    this.consumeContext(UMB_{ENTITY}_WORKSPACE_CONTEXT, (workspaceContext) => {
-      // Access workspace data, observe state, add shortcuts, etc.
-    });
-  }
-
-  // Feature-specific methods
-  async doSomething() { /* ... */ }
-}
-
-export { UmbMyFeatureWorkspaceContext as api };
-```
-
-### Reuse across workspaces
-
-To support the same feature for multiple entity types:
-
-1. **Define a core interface** in `src/packages/core/workspace/contexts/tokens/` (e.g., `UmbPublishableWorkspaceContext`)
-2. **Create entity-specific implementations** in each entity's package, implementing the core interface
-3. **Register each implementation** with conditions matching its target workspace
-4. **Workspace actions** can consume the core interface token to work with any implementing workspace
-
-Example: Document publishing implements `UmbPublishableWorkspaceContext`. If media needed publishing, a similar context would be created in `src/packages/media/` with its own repository and endpoints, registered against the media workspace alias.
-
-## Reference: existing workspaces to study
-
-- **Simple**: `src/packages/webhook/webhook/workspace/` — single view, flat data model
-- **Simple**: `src/packages/dictionary/workspace/` — single view, array data management
-- **Medium**: `src/packages/data-type/workspace/` — two views, invariant dataset
-- **Complex**: `src/packages/documents/documents/workspace/` — variants, publishing, permissions
 
 ## Routable workspace checklist
 

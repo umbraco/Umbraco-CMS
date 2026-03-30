@@ -65,38 +65,7 @@ The simplest workspace. Provides a headline, renders `<umb-workspace-editor>`, a
 - `entityType` (required) — the entity type constant
 - `headline` (required) — workspace title, supports localization keys (e.g., `'#treeHeaders_webhooks'`)
 
-**Common pattern:** Default workspaces often pair with a collection view to list child entities:
-
-```typescript
-// Webhook root workspace + collection view
-export const manifests: Array<UmbExtensionManifest> = [
-  {
-    type: 'workspace',
-    kind: 'default',
-    alias: UMB_WEBHOOK_ROOT_WORKSPACE_ALIAS,
-    name: 'Webhook Root Workspace',
-    meta: {
-      entityType: UMB_WEBHOOK_ROOT_ENTITY_TYPE,
-      headline: '#treeHeaders_webhooks',
-    },
-  },
-  {
-    type: 'workspaceView',
-    kind: 'collection',
-    alias: 'Umb.WorkspaceView.WebhookRoot.Collection',
-    name: 'Webhook Root Collection Workspace View',
-    meta: {
-      label: 'Collection',
-      pathname: 'collection',
-      icon: 'icon-layers',
-      collectionAlias: UMB_WEBHOOK_COLLECTION_ALIAS,
-    },
-    conditions: [
-      { alias: UMB_WORKSPACE_CONDITION_ALIAS, match: UMB_WEBHOOK_ROOT_WORKSPACE_ALIAS },
-    ],
-  },
-];
-```
+**Common pattern:** Default workspaces often pair with a `workspaceView` of `kind: 'collection'` to list child entities. See `src/packages/webhook/webhook-root/workspace/manifests.ts` for a complete example.
 
 **Kind implementation:** `src/packages/core/workspace/kinds/default/`
 
@@ -245,117 +214,23 @@ this.consumeContext(UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT, (ctx) => { /* ...
 
 ### Deep example: Document Publishing
 
-The document publishing system is the best example of a workspace context extension with a full stack. It demonstrates how an entire feature — with its own repository, actions, and UI — layers on top of a workspace.
+The best example of a full-stack workspace context extension. The publishing feature has its own repository, data source, workspace actions, and keyboard shortcuts — all layered on top of the document workspace via a `workspaceContext` registration.
 
-**Architecture:**
+**Key principles:** own repository & endpoints (separate from document detail), consumes parent workspace context for entity data, implements a core interface (`UmbPublishableWorkspaceContext` in `src/packages/core/workspace/contexts/tokens/`), and registers its own workspace actions that delegate to the publishing context.
 
-```
-documents/publishing/                          # Feature package
-├── workspace-context/
-│   ├── document-publishing.workspace-context.ts    # Context: adds publish/unpublish/schedule
-│   ├── document-publishing.workspace-context.token.ts
-│   └── manifests.ts                                # Registers as workspaceContext
-├── repository/
-│   ├── document-publishing.repository.ts           # Own repository (separate from document detail)
-│   └── document-publishing.server.data-source.ts   # Own API endpoints
-├── pending-changes/
-│   └── document-published-pending-changes.manager.ts  # Tracks published vs. current diffs
-├── publish/workspace-action/
-│   └── save-and-publish.action.ts                  # Workspace action consuming publishing context
-├── schedule-publish/workspace-action/
-│   └── save-and-schedule.action.ts                 # Schedule workspace action
-├── publish-with-descendants/workspace-action/
-│   └── publish-with-descendants.action.ts          # Bulk publish workspace action
-└── unpublish/entity-action/
-    └── unpublish.action.ts                         # Entity action for unpublish
-```
-
-**Key design principles:**
-
-1. **Own repository & endpoints** — The publishing context has its own `UmbDocumentPublishingRepository` with dedicated API endpoints (publish, unpublish, publishWithDescendants, getPublished). This is completely separate from the document detail repository.
-
-2. **Consumes parent workspace context** — The publishing context uses `consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT)` to access the document's data, variant options, validation, and save flow. It calls methods like `getUnique()`, `variantOptions`, `constructSaveData()`, and `performCreateOrUpdate()` on the parent.
-
-3. **Implements a core interface** — `UmbPublishableWorkspaceContext` is defined in core (`src/packages/core/workspace/contexts/tokens/publishable-workspace-context.interface.ts`). Any entity type could implement this interface if it gains publishing support in the future.
-
-4. **Own workspace actions** — Save & Publish, Schedule, and Publish with Descendants are each separate workspace actions that consume `UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT` and delegate to its methods.
-
-5. **Adds keyboard shortcuts** — The publishing context registers Ctrl+P for save-and-publish via the parent workspace's `view.shortcuts`.
-
-**Core interface for reuse:**
-
-```typescript
-// src/packages/core/workspace/contexts/tokens/publishable-workspace-context.interface.ts
-export interface UmbPublishableWorkspaceContext extends UmbWorkspaceContext {
-  saveAndPublish(): Promise<void>;
-  publish(): Promise<void>;
-  unpublish(): Promise<void>;
-}
-```
-
-If media were to support publishing, a similar `UmbMediaPublishingWorkspaceContext` could be created in `src/packages/media/` implementing this same interface, with its own repository and endpoints, registered as a `workspaceContext` conditioned on the media workspace alias.
+**Reference:** `src/packages/documents/documents/publishing/`
 
 ### Reuse patterns
 
-Workspace contexts achieve reuse across workspaces in two ways:
+1. **Shared base classes** — A base class in core provides common logic; entity-specific subclasses just pass configuration (e.g., `UmbMenuVariantTreeStructureWorkspaceContextBase` used by both document and media menu structure contexts, each passing their own tree repository alias).
 
-**1. Shared base classes** — A base class provides common logic; entity-specific subclasses configure it:
-
-```typescript
-// Base in core — provides breadcrumb structure from any tree repository
-export class UmbMenuTreeStructureWorkspaceContextBase extends UmbContextBase { /* ... */ }
-
-// Document-specific — just passes its tree repository alias
-export class UmbDocumentMenuStructureContext extends UmbMenuVariantTreeStructureWorkspaceContextBase {
-  constructor(host: UmbControllerHost) {
-    super(host, { treeRepositoryAlias: UMB_DOCUMENT_TREE_REPOSITORY_ALIAS });
-  }
-}
-
-// Media-specific — same base, different repo
-export class UmbMediaMenuStructureContext extends UmbMenuVariantTreeStructureWorkspaceContextBase {
-  constructor(host: UmbControllerHost) {
-    super(host, { treeRepositoryAlias: UMB_MEDIA_TREE_REPOSITORY_ALIAS });
-  }
-}
-```
-
-**2. Multiple registrations** — The same context class (or base class) registered for different workspaces:
-
-```typescript
-// Property permissions registered for both document and block workspaces
-{
-  type: 'workspaceContext',
-  alias: 'Umb.WorkspaceContext.Document.PropertyValueUserPermission',
-  api: () => import('./document-property-value-user-permission.workspace-context.js'),
-  conditions: [{ alias: UMB_WORKSPACE_CONDITION_ALIAS, match: UMB_DOCUMENT_WORKSPACE_ALIAS }],
-},
-{
-  type: 'workspaceContext',
-  alias: 'Umb.WorkspaceContext.Block.PropertyValueUserPermission',
-  api: () => import('./block-property-value-user-permission.workspace-context.js'),
-  conditions: [{ alias: UMB_WORKSPACE_CONDITION_ALIAS, match: UMB_BLOCK_WORKSPACE_ALIAS }],
-}
-```
-
-### Examples
-
-| Package | Context | Extends Workspace | Reuse Pattern |
-|---|---|---|---|
-| `documents/publishing/` | `UmbDocumentPublishingWorkspaceContext` | Document | Core `UmbPublishableWorkspaceContext` interface |
-| `documents/menu/` | Document menu structure context | Document | `UmbMenuVariantTreeStructureWorkspaceContextBase` base class |
-| `media/menu/` | Media menu structure context | Media | Same base class as documents |
-| `language/` | Language access workspace context | Document | Single workspace |
-| `documents/user-permissions/` | Property value permission context | Document, Block | `UmbPropertyValueUserPermissionWorkspaceContextBase` base class |
+2. **Multiple registrations** — The same context class registered for different workspaces with different conditions (e.g., property value permissions registered for both document and block workspaces).
 
 ### Package boundary rules
 
 - **The package that owns the feature registers the workspaceContext**, not the workspace's package
-- Publishing features live in `documents/publishing/`, not `documents/workspace/`
-- Menu structure contexts live in the entity's `menu/` directory
 - Views and actions from other packages use conditions to target the workspace alias
 - Never import internal files from another package — use public `index.ts` exports
-- A workspace context can have its own repository, data source, and actions — it's a full feature stack
 
 ### Kinds for workspace contexts
 
@@ -398,64 +273,18 @@ Workspace contexts can use kinds for shared patterns:
 
 Most simple entities use `UmbSubmitWorkspaceAction` directly (no custom action class needed). Complex entities like documents define custom action classes for variant dialogs, permission checks, etc.
 
-### Action manifest example
-
-```typescript
-{
-  type: 'workspaceAction',
-  kind: 'default',
-  alias: 'Umb.WorkspaceAction.Webhook.Save',
-  api: UmbSubmitWorkspaceAction,
-  meta: { label: '#buttons_save', look: 'primary', color: 'positive' },
-  conditions: [{ alias: UMB_WORKSPACE_CONDITION_ALIAS, match: UMB_WEBHOOK_WORKSPACE_ALIAS }],
-}
-```
-
 ---
 
 ## Route Patterns
 
-Routable workspaces define internal routes in the context constructor via `this.routes.setRoutes()`.
+Routable workspaces define internal routes in the context constructor via `this.routes.setRoutes()`. Two patterns exist:
 
-### Simple (no parent hierarchy)
+- **Simple** (flat entities) — `create` route with fixed parent, `edit/:unique` route for existing entities
+- **Parent-aware** (tree entities) — `create/parent/:entityType/:parentUnique` route that extracts parent from URL params
 
-```typescript
-this.routes.setRoutes([
-  {
-    path: 'create',
-    component: MyEditorElement,
-    setup: async () => {
-      await this.createScaffold({ parent: { entityType: ROOT_ENTITY_TYPE, unique: null } });
-      new UmbWorkspaceIsNewRedirectController(this, this, this.getHostElement().shadowRoot!.querySelector('umb-router-slot')!);
-    },
-  },
-  {
-    path: 'edit/:unique',
-    component: MyEditorElement,
-    setup: (_component, info) => {
-      this.removeUmbControllerByAlias(UmbWorkspaceIsNewRedirectControllerAlias);
-      this.load(info.match.params.unique);
-    },
-  },
-]);
-```
+Both patterns use **`UmbWorkspaceIsNewRedirectController`** in the create route — it observes the workspace's `isNew` state and replaces the URL from `/create` to `/edit/:unique` after the first save. The edit route must call `removeUmbControllerByAlias(UmbWorkspaceIsNewRedirectControllerAlias)` to clean up.
 
-### Parent-aware (tree entities)
-
-```typescript
-{
-  path: 'create/parent/:entityType/:parentUnique',
-  component: MyEditorElement,
-  setup: async (_component, info) => {
-    const parentEntityType = info.match.params.entityType;
-    const parentUnique = info.match.params.parentUnique === 'null' ? null : info.match.params.parentUnique;
-    await this.createScaffold({ parent: { entityType: parentEntityType, unique: parentUnique } });
-    new UmbWorkspaceIsNewRedirectController(this, this, this.getHostElement().shadowRoot!.querySelector('umb-router-slot')!);
-  },
-}
-```
-
-**`UmbWorkspaceIsNewRedirectController`** observes the workspace's `isNew` state and replaces the URL from `/create` to `/edit/:unique` after the first save. File: `src/packages/core/workspace/controllers/workspace-is-new-redirect.controller.ts`
+File: `src/packages/core/workspace/controllers/workspace-is-new-redirect.controller.ts`
 
 ---
 
@@ -478,33 +307,9 @@ Files: `src/packages/core/workspace/conditions/`
 
 ## Context Token Pattern
 
-Every routable workspace should expose a typed context token so views, actions, and workspace context extensions can consume it with type safety.
+Every routable workspace exposes a typed context token so views, actions, and workspace context extensions can consume it with type safety. The token uses `UmbContextToken` with two generics: the base interface (`UmbSubmittableWorkspaceContext`) and the concrete context class. The context string is always `'UmbWorkspaceContext'`, and a discriminator function checks `getEntityType()` to find the right workspace context in the DOM tree.
 
-```typescript
-// {entity}-workspace.context-token.ts
-import type { UmbMyEntityWorkspaceContext } from './{entity}-workspace.context.js';
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import type { UmbSubmittableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
-
-export const UMB_MY_ENTITY_WORKSPACE_CONTEXT = new UmbContextToken<
-  UmbSubmittableWorkspaceContext,       // Base type (what consumers minimally expect)
-  UmbMyEntityWorkspaceContext           // Concrete type (what they actually get)
->(
-  'UmbWorkspaceContext',                // Context string — always 'UmbWorkspaceContext'
-  undefined,
-  (context): context is UmbMyEntityWorkspaceContext =>
-    context.getEntityType?.() === 'my-entity',  // Discriminator function
-);
-```
-
-**Rules:**
-- First generic = base interface (`UmbSubmittableWorkspaceContext`)
-- Second generic = concrete context class
-- Context string is always `'UmbWorkspaceContext'` (shared across all workspace contexts)
-- Discriminator checks `getEntityType()` to find the right workspace context in the DOM tree
-- Re-export from `constants.ts` for public API
-
-Default workspaces don't need a custom context token — they use `UMB_WORKSPACE_CONTEXT` from core.
+Re-export the token from `constants.ts` for the public API. Default workspaces don't need a custom context token — they use `UMB_WORKSPACE_CONTEXT` from core.
 
 ---
 
@@ -533,22 +338,9 @@ this._data.resetCurrent()              // Revert to persisted
 
 ## Reference Examples
 
-### Default workspaces (kind: `default`)
-
-| Entity | Package Path | Notes |
-|---|---|---|
-| Webhook Root | `src/packages/webhook/webhook-root/workspace/` | Root + collection view |
-| User Root | `src/packages/user/user/workspace/user-root/` | Root + collection view |
-| Extension Insights Root | `src/packages/extension-insights/workspace/` | Root + collection view |
-| Clipboard Root | `src/packages/clipboard/clipboard-root/` | Root workspace |
-| Data Type Root | `src/packages/data-type/data-type-root/` | Root + collection view |
-
-### Routable workspaces (kind: `routable`)
-
-| Complexity | Entity | Package Path | Notes |
+| Kind | Complexity | Path | Notes |
 |---|---|---|---|
-| Simple | Webhook | `src/packages/webhook/webhook/workspace/` | Single view, flat data, `UmbSubmitWorkspaceAction` |
-| Simple | Dictionary | `src/packages/dictionary/workspace/` | Single view, translation array management |
-| Medium | Data Type | `src/packages/data-type/workspace/` | Two views, invariant dataset, property editor management |
-| Complex | Document | `src/packages/documents/documents/workspace/` | Variants, publishing contexts, permissions, content workspace base |
-| Complex | Media | `src/packages/media/media/workspace/` | Content workspace base, menu structure context |
+| `default` | — | `src/packages/webhook/webhook-root/workspace/` | Root + collection view |
+| `routable` | Simple | `src/packages/webhook/webhook/workspace/` | Single view, flat data |
+| `routable` | Medium | `src/packages/data-type/workspace/` | Two views, invariant dataset |
+| `routable` | Complex | `src/packages/documents/documents/workspace/` | Variants, publishing, permissions |
