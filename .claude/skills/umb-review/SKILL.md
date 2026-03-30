@@ -74,15 +74,7 @@ Log the skip list: "Skipped {N} noise files: {comma-separated list of filenames}
 
 #### 3c. Read reviewable changed files
 
-##### For files under 1501 lines
-
-Read the full file.
-
-##### For files over 1500 lines
-
-Use targeted `offset`/`limit` reads around the diff hunks instead, and read the first 100 lines of the file to capture `using`/`import` statements and class declarations (needed for dependency-flow checks in step 5):
-
-If an extended class, interface or type has been changed as part of this PR, then read the full file.
+Read the full file for every reviewable changed file.
 
 #### 3d. Track file counts
 
@@ -98,42 +90,46 @@ Classify the PR to determine which review steps are relevant:
 
 | Classification  | Condition                                                                       | Effect                                                                          |
 | --------------- | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
-| **Gen-only**    | All reviewable files are `gen.ts`                                               | Skip steps 4 and 5; step 6 reviews impact on other code.                        |
-| **Docs-only**   | All reviewable files are `.md`                                                  | Skip steps 4 and 5; step 6 reviews intent and readability only                  |
-| **Test-only**   | All reviewable files are in `tests/`                                            | Skip steps 4 and 5; step 6 reviews intent, code quality, and test coverage only |
-| **Config-only** | All reviewable files are `.csproj`, `.props`, `.json` config, or CI/build files | Skip step 4; step 5 checks dependency version changes only                      |
+| **Gen-only**    | All reviewable files are `gen.ts`                                               | Skip steps 5 and 6; step 4 reviews impact on other code only                    |
+| **Docs-only**   | All reviewable files are `.md`                                                  | Skip steps 5 and 6; step 4 reviews intent and readability only                  |
+| **Test-only**   | All reviewable files are in `tests/`                                            | Skip steps 5 and 6; step 4 reviews intent, code quality, and test coverage only |
+| **Config-only** | All reviewable files are `.csproj`, `.props`, `.json` config, or CI/build files | Skip step 5; step 6 checks dependency version changes only                      |
 | **Standard**    | Anything else                                                                   | No skips — run all steps                                                        |
 
-### 4. Impact Analysis
+### 4. Raw Code Review
+
+Review each changed file holistically. Think like a senior developer reading a colleague's PR. Note all findings without worrying about format or severity yet.
+
+#### 4a. Read and reason about each file
+
+For each changed file, reason about: What does this code do? Is it correct? What's missing — validation, error handling, notifications, cleanup, edge cases? Could this break anything for consumers?
+
+#### 4b. Search for sibling implementations
+
+For each new piece of functionality in the diff, search for its closest existing sibling and compare the full implementation:
+
+1. **New method on existing class/interface**: Grep for the most similar existing method on the same class using `-A 80` to capture the full method body (e.g., `UpdateCurrentUserAsync` → grep for `UpdateAsync` in the same file with `-A 80`). Compare line by line for missing cross-cutting concerns: notifications/events, validation, scoping, authorization, error handling, audit logging.
+2. **New manifest for an existing entity type**: Grep for existing manifests with the same `forEntityTypes` value or entity type alias prefix or manifest alias prefix (e.g. 'Umb.Workspace' from 'Umb.Workspace.Document'). Compare conditions, `kind`, and meta properties.
+3. **New TS class**: Grep for siblings by base class (`extends {BaseClass}`) or by interface (`implements {Interface}`) or by name suffix (e.g., `CurrentUserController` → grep for `UserController`). Compare for missing concerns.
+4. **New CS class**: Grep for siblings by base class (`class {ClassName} : {BaseClass}`) or by interface (`class {ClassName} : {Interface}`) or by name suffix (e.g., `ManagementApiComposer` → grep for `ApiComposer`). Compare for missing concerns.
+
+Store your raw findings — they feed into step 7.
+
+### 5. Impact Analysis
 
 **Skip this step if PR scope is docs-only, test-only, or config-only.**
 
 Follow the procedure in `references/impact-analysis.md`.
 
-### 5. Breaking Changes Check
+### 6. Breaking Changes Check
 
 **Skip this step if PR scope is docs-only or test-only. If config-only, only check for dependency version changes that could break consumers.**
 
 Follow the procedure in `references/breaking-changes.md`.
 
-### 6. Review Against All Criteria
+### 7. Consolidate and Output Review
 
-**If PR scope is docs-only:** review only for intent and readability. **If test-only:** review only for intent, code quality, and test coverage. **Otherwise:** review all criteria below.
-
-Analyze each changed file against:
-
-- **Intent**: Does the change accomplish what the commits describe? Are there unintended side effects?
-- **Impact**: What consumers are affected? Does this change ripple through the architecture? (from step 4)
-- **Breaking changes**: Public API surface changes without proper obsolete patterns? (from step 5)
-- **Architecture compliance**: Correct dependency direction, layer separation, pattern usage (from CLAUDE.md files)
-- **Umbraco patterns**: Notification pattern (not C# events), Composer pattern (DI registration), Scoping with `Complete()`, Attempt pattern for operation results
-- **Code quality**: Per coding preferences in `references/coding-preferences.md`
-- **Test coverage**: New public methods have tests? Test files included in the PR?
-- **Security**: Authorization checks, no hardcoded secrets, OWASP Top 10 baseline
-
-### 7. Output Structured Review
-
-Present the review in this exact format:
+Merge findings from step 4 (raw review), step 5 (impact analysis), and step 6 (breaking changes). For each finding, assign severity (Critical/Important/Suggestion), filter out cosmetic noise, and verify it relates to changed code — not pre-existing issues. Then present the review in this exact format:
 
 ```markdown
 ## PR Review
