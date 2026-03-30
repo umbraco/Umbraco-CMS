@@ -10,7 +10,7 @@
 
   <ItemGroup>
     <PackageReference Include="AutoFixture.AutoMoq" />
-    <PackageReference Include="AutoFixture.NUnit3" />
+    <PackageReference Include="AutoFixture.NUnit4" />
     <PackageReference Include="Moq" />
     <PackageReference Include="NUnit" />
   </ItemGroup>

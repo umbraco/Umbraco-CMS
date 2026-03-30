@@ -343,14 +343,14 @@ public class RichTextParserTests : PropertyValueConverterTests
             new List<RichTextBlockItem>
             {
                 new (
-                    Udi.Create(Constants.UdiEntityType.Element, block1ContentId),
+                    block1ContentId,
                     CreateElement(block1ContentId, 123),
-                    null!,
-                    null!),
+                    null,
+                    null),
                 new (
-                    Udi.Create(Constants.UdiEntityType.Element, block2ContentId),
+                    block2ContentId,
                     CreateElement(block2ContentId, 456),
-                    Udi.Create(Constants.UdiEntityType.Element, block2SettingsId),
+                    block2SettingsId,
                     CreateElement(block2SettingsId, 789))
             });
 

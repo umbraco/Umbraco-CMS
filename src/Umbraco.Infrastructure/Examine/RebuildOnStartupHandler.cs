@@ -28,6 +28,12 @@ public sealed class RebuildOnStartupHandler : INotificationHandler<UmbracoReques
     private readonly ISyncBootStateAccessor _syncBootStateAccessor;
     private readonly IIndexRebuilder _indexRebuilder;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Examine.RebuildOnStartupHandler"/> class, responsible for handling index rebuilds during application startup.
+    /// </summary>
+    /// <param name="syncBootStateAccessor">Provides access to the application's synchronous boot state, used to determine if the system is ready for index rebuilding.</param>
+    /// <param name="indexRebuilder">The service responsible for rebuilding Examine indexes.</param>
+    /// <param name="runtimeState">Provides information about the current runtime state of the Umbraco application.</param>
     public RebuildOnStartupHandler(
         ISyncBootStateAccessor syncBootStateAccessor,
         IIndexRebuilder indexRebuilder,

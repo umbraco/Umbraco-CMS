@@ -12,10 +12,6 @@ public static partial class Constants
         /// <summary>
         /// Gets the default webhook payload type.
         /// </summary>
-        /// <remarks>
-        /// Currently, the default payload type is <see cref="WebhookPayloadType.Legacy"/> for backward compatibility until Umbraco 17.
-        /// From Umbraco 17 this will be changed to <see cref="WebhookPayloadType.Minimal"/>.
-        /// </remarks>
-        public const WebhookPayloadType DefaultPayloadType = WebhookPayloadType.Legacy;
+        public const WebhookPayloadType DefaultPayloadType = WebhookPayloadType.Minimal;
     }
 }

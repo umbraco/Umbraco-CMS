@@ -11,6 +11,13 @@ internal sealed class DeferredActions
 
     private readonly List<IDeferredAction> _actions = new();
 
+    /// <summary>
+    /// Retrieves the <see cref="DeferredActions"/> instance enlisted in the current scope context associated with the specified <paramref name="scopeProvider"/>.
+    /// </summary>
+    /// <param name="scopeProvider">The scope provider from which to obtain the current scope context.</param>
+    /// <returns>
+    /// The <see cref="DeferredActions"/> instance enlisted in the current scope, or <c>null</c> if no scope context is available.
+    /// </returns>
     public static DeferredActions? Get(ICoreScopeProvider scopeProvider)
     {
         IScopeContext? scopeContext = scopeProvider.Context;
@@ -28,6 +35,10 @@ internal sealed class DeferredActions
             EnlistPriority);
     }
 
+    /// <summary>
+    /// Adds the specified deferred action to the collection of actions to be executed later.
+    /// </summary>
+    /// <param name="action">The <see cref="IDeferredAction"/> to add to the collection.</param>
     public void Add(IDeferredAction action) => _actions.Add(action);
 
     private void Execute()

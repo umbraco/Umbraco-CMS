@@ -13,6 +13,10 @@ public partial class ContentEditingServiceTests
         => builder.Services.Configure<ContentSettings>(config =>
             config.DisableUnpublishWhenReferenced = true);
 
+    public static void ConfigureDisableDeleteWhenReferencedTrue(IUmbracoBuilder builder)
+        => builder.Services.Configure<ContentSettings>(config =>
+            config.DisableDeleteWhenReferenced = true);
+
     [TestCase(true)]
     [TestCase(false)]
     public async Task Can_Move_To_Recycle_Bin(bool variant)
@@ -30,8 +34,8 @@ public partial class ContentEditingServiceTests
     }
 
     [Test]
-    [ConfigureBuilder(ActionName = nameof(ConfigureDisableUnpublishWhenReferencedTrue))]
-    public async Task Cannot_Move_To_Recycle_Bin_When_Content_Is_Related_As_A_Child_And_Configured_To_Disable_When_Related()
+    [ConfigureBuilder(ActionName = nameof(ConfigureDisableDeleteWhenReferencedTrue))]
+    public async Task Cannot_Move_To_Recycle_Bin_When_Content_Is_Related_As_A_Child_And_DisableDeleteWhenReferenced_Is_True()
     {
         // Setup a relation where the page being deleted is related to another page as a child (e.g. the other page has a picker and has selected this page).
         Relate(Subpage2, Subpage);
@@ -47,6 +51,22 @@ public partial class ContentEditingServiceTests
 
     [Test]
     [ConfigureBuilder(ActionName = nameof(ConfigureDisableUnpublishWhenReferencedTrue))]
+    public async Task Can_Move_To_Recycle_Bin_When_Content_Is_Related_And_DisableUnpublishWhenReferenced_Is_True()
+    {
+        // DisableUnpublishWhenReferenced should NOT block trashing — only unpublishing.
+        Relate(Subpage2, Subpage);
+        var moveAttempt = await ContentEditingService.MoveToRecycleBinAsync(Subpage.Key, Constants.Security.SuperUserKey);
+        Assert.IsTrue(moveAttempt.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.Success, moveAttempt.Status);
+
+        // re-get and verify moved
+        var content = await ContentEditingService.GetAsync(Subpage.Key);
+        Assert.IsNotNull(content);
+        Assert.IsTrue(content.Trashed);
+    }
+
+    [Test]
+    [ConfigureBuilder(ActionName = nameof(ConfigureDisableDeleteWhenReferencedTrue))]
     public async Task Can_Move_To_Recycle_Bin_When_Content_Is_Related_As_A_Parent_And_Configured_To_Disable_When_Related()
     {
         // Setup a relation where the page being deleted is related to another page as a child (e.g. the other page has a picker and has selected this page).

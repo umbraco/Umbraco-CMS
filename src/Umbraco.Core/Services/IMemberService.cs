@@ -203,21 +203,10 @@ public interface IMemberService : IMembershipMemberService, IContentServiceBase<
     /// <summary>
     ///     Saves a single <see cref="IMember" /> object
     /// </summary>
-    /// <param name="media">The <see cref="IMember" /> to save</param>
+    /// <param name="member">The <see cref="IMember" /> to save</param>
     /// <param name="userId">Id of the User saving the Member</param>
     /// <returns>An <see cref="Attempt{OperationResult}"/> indicating the result of the save operation.</returns>
-    Attempt<OperationResult?> Save(IMember media, int userId = Constants.Security.SuperUserId); // TODO (V18): Rename parameter 'media' to 'member'.
-
-    /// <summary>
-    ///     Saves a list of <see cref="IMember" /> objects
-    /// </summary>
-    /// <param name="members">Collection of <see cref="IMember" /> to save</param>
-    /// <param name="userId">Id of the User saving the Members</param>
-    /// <returns>An <see cref="Attempt{OperationResult}"/> indicating the result of the save operation.</returns>
-    // TODO (V18): This is already declared on the base type, so for the next major, when we can allow a binary breaking change, we should remove it from here.
-#pragma warning disable CS0108 // Member hides inherited member; missing new keyword
-    Attempt<OperationResult?> Save(IEnumerable<IMember> members, int userId = Constants.Security.SuperUserId);
-#pragma warning restore CS0108 // Member hides inherited member; missing new keyword
+    Attempt<OperationResult?> Save(IMember member, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
     ///     Gets the count of Members by an optional MemberType alias

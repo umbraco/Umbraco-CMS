@@ -8,6 +8,10 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.ElementVersion;
 
+/// <summary>
+/// Serves as the base controller for element version management operations within the Umbraco CMS Management API.
+/// Provides shared functionality for derived element version controllers.
+/// </summary>
 [VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.Element}-version")]
 [ApiExplorerSettings(GroupName = $"{nameof(Constants.UdiEntityType.Element)} Version")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessElements)]

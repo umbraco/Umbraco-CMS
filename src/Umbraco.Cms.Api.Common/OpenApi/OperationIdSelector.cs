@@ -13,15 +13,6 @@ public class OperationIdSelector : IOperationIdSelector
     /// <summary>
     ///     Initializes a new instance of the <see cref="OperationIdSelector"/> class.
     /// </summary>
-    [Obsolete("Use non-obsolete constructor. Scheduled for removal in Umbraco 18.")]
-    public OperationIdSelector()
-        : this(Enumerable.Empty<IOperationIdHandler>())
-    {
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="OperationIdSelector"/> class.
-    /// </summary>
     /// <param name="operationIdHandlers">The registered operation ID handlers.</param>
     public OperationIdSelector(IEnumerable<IOperationIdHandler> operationIdHandlers)
         => _operationIdHandlers = operationIdHandlers;

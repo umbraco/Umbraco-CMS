@@ -12,6 +12,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Element;
 
+/// <summary>
+/// Controller responsible for handling update operations on elements in the management API.
+/// </summary>
 [ApiVersion("1.0")]
 public class UpdateElementController : UpdateElementControllerBase
 {
@@ -19,6 +22,13 @@ public class UpdateElementController : UpdateElementControllerBase
     private readonly IElementEditingService _elementEditingService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UpdateElementController"/> class.
+    /// </summary>
+    /// <param name="authorizationService">Service for verifying user permissions.</param>
+    /// <param name="elementEditingPresentationFactory">Factory for creating element editing presentation models.</param>
+    /// <param name="elementEditingService">Service for managing element updates.</param>
+    /// <param name="backOfficeSecurityAccessor">Accessor for the back office user security context.</param>
     public UpdateElementController(
         IAuthorizationService authorizationService,
         IElementEditingPresentationFactory elementEditingPresentationFactory,
@@ -31,6 +41,11 @@ public class UpdateElementController : UpdateElementControllerBase
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
+    /// <summary>Updates the specified element with new details provided in the request model.</summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="id">The unique identifier of the element to update.</param>
+    /// <param name="requestModel">The model containing the updated element details.</param>
+    /// <returns>An <see cref="IActionResult"/> representing the outcome of the update operation.</returns>
     [HttpPut("{id:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]

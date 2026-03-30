@@ -6,9 +6,16 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_16_2_0;
 
+/// <summary>
+/// Represents a database migration that adds support for tracking and managing long-running operations.
+/// </summary>
 [Obsolete("Remove in Umbraco 18.")]
 public class AddLongRunningOperations : MigrationBase
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AddLongRunningOperations"/> class with the specified migration context.
+    /// </summary>
+    /// <param name="context">The <see cref="IMigrationContext"/> to be used for the migration.</param>
     public AddLongRunningOperations(IMigrationContext context)
         : base(context)
     {

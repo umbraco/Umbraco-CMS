@@ -507,6 +507,15 @@ dotnet format
 dotnet pack -c Release
 ```
 
+### Integration Test Database Configuration
+
+Integration tests are configured in `tests/Umbraco.Tests.Integration/appsettings.Tests.json`.
+
+The `Tests:Database:DatabaseType` setting controls which database is used:
+- `"SQLite"` (default) - No external dependencies
+- `"LocalDb"` - Uses SQL Server LocalDB, required for SQL Server-specific tests (e.g., page-level locking, `sys.dm_tran_locks`)
+
+SQL Server-specific tests use `BaseTestDatabase.IsSqlite()` to skip when running on SQLite.
 ### Key Projects
 
 | Project | Type | Description |

@@ -18,6 +18,12 @@ internal sealed class DeliveryApiContentIndexHelper : IDeliveryApiContentIndexHe
 
     private IndexingSettings _indexingSettings;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DeliveryApiContentIndexHelper"/> class.
+    /// </summary>
+    /// <param name="contentService">Service used to manage and retrieve Umbraco content items.</param>
+    /// <param name="umbracoDatabaseFactory">Factory for creating Umbraco database connections.</param>
+    /// <param name="deliveryApiSettings">Monitors configuration settings for the Delivery API.</param>
     [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in Umbraco 19.")]
     public DeliveryApiContentIndexHelper(
         IContentService contentService,
@@ -27,6 +33,13 @@ internal sealed class DeliveryApiContentIndexHelper : IDeliveryApiContentIndexHe
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DeliveryApiContentIndexHelper"/> class.
+    /// </summary>
+    /// <param name="contentService">An <see cref="IContentService"/> used to access and manage content data.</param>
+    /// <param name="umbracoDatabaseFactory">An <see cref="IUmbracoDatabaseFactory"/> for creating database connections.</param>
+    /// <param name="deliveryApiSettings">An <see cref="IOptionsMonitor{DeliveryApiSettings}"/> providing access to Delivery API configuration settings.</param>
+    /// <param name="indexingSettings">An <see cref="IOptionsMonitor{IndexingSettings}"/> providing access to indexing configuration settings.</param>
     public DeliveryApiContentIndexHelper(
         IContentService contentService,
         IUmbracoDatabaseFactory umbracoDatabaseFactory,
@@ -41,6 +54,11 @@ internal sealed class DeliveryApiContentIndexHelper : IDeliveryApiContentIndexHe
         indexingSettings.OnChange(settings => _indexingSettings = settings);
     }
 
+    /// <summary>
+    /// Enumerates applicable descendant content items for content indexing starting from the specified root content ID.
+    /// </summary>
+    /// <param name="rootContentId">The ID of the root content item to start enumeration from.</param>
+    /// <param name="actionToPerform">The action to perform on each batch of descendant content items.</param>
     public void EnumerateApplicableDescendantsForContentIndex(int rootContentId, Action<IContent[]> actionToPerform)
         => EnumerateApplicableDescendantsForContentIndex(rootContentId, actionToPerform, _indexingSettings.BatchSize);
 
