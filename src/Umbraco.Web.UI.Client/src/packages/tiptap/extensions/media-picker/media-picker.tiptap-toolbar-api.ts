@@ -1,7 +1,7 @@
 import type { Editor, ProseMirrorNode } from '../../externals.js';
 import { NodeSelection } from '../../externals.js';
 import { UmbTiptapToolbarElementApiBase } from '../tiptap-toolbar-element-api-base.js';
-import { getGuidFromUdi, imageSize } from '@umbraco-cms/backoffice/utils';
+import { getGuidFromUdi, imageSize, splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { ImageCropModeModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbImagingRepository } from '@umbraco-cms/backoffice/imaging';
 import { UMB_MEDIA_CAPTION_ALT_TEXT_MODAL, UMB_MEDIA_PICKER_MODAL } from '@umbraco-cms/backoffice/media';
@@ -27,6 +27,10 @@ export default class UmbTiptapToolbarMediaPickerToolbarExtensionApi extends UmbT
 	 * @returns {number} The maximum width of uploaded images
 	 */
 	maxWidth = this.maxImageSize;
+
+	get #allowedMediaTypeIds(): Array<string> {
+		return splitStringToArray(this.configuration?.getValueByAlias<string>('allowedMediaTypes'));
+	}
 
 	constructor(host: UmbControllerHost) {
 		super(host);
@@ -106,10 +110,11 @@ export default class UmbTiptapToolbarMediaPickerToolbarExtensionApi extends UmbT
 	}
 
 	async #openMediaPicker(currentMediaUdi?: string) {
+		const allowedIds = this.#allowedMediaTypeIds;
 		const modalHandler = this.#modalManager?.open(this, UMB_MEDIA_PICKER_MODAL, {
 			data: {
 				multiple: false,
-				//startNodeIsVirtual,
+				pickableFilter: allowedIds.length ? (item) => allowedIds.includes(item.mediaType.unique) : undefined,
 			},
 			value: {
 				selection: currentMediaUdi ? [currentMediaUdi] : [],
