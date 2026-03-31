@@ -42,6 +42,9 @@ export class UmbUserGroupDetailsWorkspaceViewElement extends UmbLitElement imple
 	@state()
 	private _userUniques: string[] = [];
 
+	@state()
+	private _usersRemainingCount = 0;
+
 	#workspaceContext?: typeof UMB_USER_GROUP_WORKSPACE_CONTEXT.TYPE;
 
 	constructor() {
@@ -91,6 +94,12 @@ export class UmbUserGroupDetailsWorkspaceViewElement extends UmbLitElement imple
 			this.#workspaceContext?.userUniques,
 			(value) => (this._userUniques = value ?? []),
 			'_observeUserUniques',
+		);
+
+		this.observe(
+			this.#workspaceContext?.usersRemainingCount,
+			(value) => (this._usersRemainingCount = value ?? 0),
+			'_observeUsersRemainingCount',
 		);
 	}
 
@@ -183,7 +192,10 @@ export class UmbUserGroupDetailsWorkspaceViewElement extends UmbLitElement imple
 				<div>
 					<uui-box>
 						<div slot="headline"><umb-localize key="general_users"></umb-localize></div>
-						<umb-user-input .selection=${this._userUniques} @change=${this.#onUsersChange}></umb-user-input>
+						<umb-user-input
+							.selection=${this._userUniques}
+							.remainingCount=${this._usersRemainingCount}
+							@change=${this.#onUsersChange}></umb-user-input>
 					</uui-box>
 				</div>
 			</div>

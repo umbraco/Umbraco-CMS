@@ -12,8 +12,8 @@ import type { UmbRoutableWorkspaceContext, UmbSubmittableWorkspaceContext } from
 import type { UmbUserPermissionModel } from '@umbraco-cms/backoffice/user-permission';
 import { UserGroupService, UserService } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
-import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
-import { jsonStringComparison } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState, UmbNumberState, jsonStringComparison } from '@umbraco-cms/backoffice/observable-api';
+
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 
 export class UmbUserGroupWorkspaceContext
@@ -35,10 +35,13 @@ export class UmbUserGroupWorkspaceContext
 	readonly fallbackPermissions = this._data.createObservablePartOfCurrent((data) => data?.fallbackPermissions || []);
 	readonly permissions = this._data.createObservablePartOfCurrent((data) => data?.permissions || []);
 	readonly description = this._data.createObservablePartOfCurrent((data) => data?.description || '');
-	
+
 	#persistedUserUniques: string[] = [];
 	readonly #userUniquesState = new UmbArrayState<string>([], (v) => v);
 	readonly userUniques = this.#userUniquesState.asObservable();
+
+	readonly #usersRemainingCountState = new UmbNumberState(0);
+	readonly usersRemainingCount = this.#usersRemainingCountState.asObservable();
 
 	#notificationContext?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;
 
@@ -87,13 +90,12 @@ export class UmbUserGroupWorkspaceContext
 	}
 
 	async #loadUsers(unique: string) {
-		const { data } = await tryExecute(
-			this,
-			UserService.getFilterUser({ query: { userGroupIds: [unique], take: 10000 } }),
-		);
+		const { data } = await tryExecute(this, UserService.getFilterUser({ query: { userGroupIds: [unique], take: 3 } }));
 		const uniques = data?.items.map((u) => u.id) ?? [];
 		this.#persistedUserUniques = [...uniques];
 		this.#userUniquesState.setValue(uniques);
+		const total = data?.total ?? 0;
+		this.#usersRemainingCountState.setValue(Math.max(0, total - uniques.length));
 	}
 
 	/**
@@ -144,13 +146,13 @@ export class UmbUserGroupWorkspaceContext
 
 		if (addError) {
 			this.#notificationContext?.peek('danger', {
-				data: {headline: 'An error occurred', message: 'Can not add users to the group.' },
+				data: { headline: 'An error occurred', message: 'Can not add users to the group.' },
 			});
 		}
 
 		if (removeError) {
 			this.#notificationContext?.peek('danger', {
-				data: {headline: 'An error occurred', message: 'Can not remove users from the group.' },
+				data: { headline: 'An error occurred', message: 'Can not remove users from the group.' },
 			});
 		}
 
@@ -187,6 +189,7 @@ export class UmbUserGroupWorkspaceContext
 		super.resetState();
 		this.#persistedUserUniques = [];
 		this.#userUniquesState.setValue([]);
+		this.#usersRemainingCountState.setValue(0);
 	}
 
 	updateProperty<Alias extends keyof UmbUserGroupDetailModel>(alias: Alias, value: UmbUserGroupDetailModel[Alias]) {
