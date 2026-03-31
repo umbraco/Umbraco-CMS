@@ -231,7 +231,7 @@ export class LibraryUiHelper extends UiBaseLocators {
     this.selectAVariantBtn = page.getByRole('button', {name: 'Open version selector'});
     this.variantAddModeBtn = page.locator('.switch-button.add-mode').locator('.variant-name');
     this.saveAndCloseBtn = page.getByLabel('Save and close');
-    this.elementTreeItem = page.locator('umb-default-tree-item');
+    this.elementTreeItem = page.locator(':is(umb-element-tree-item, umb-default-tree-item)');
     this.elementLanguageSelect = page.locator('umb-app-language-select');
     this.elementLanguageSelectPopover = page.locator('umb-popover-layout');
     this.elementReadOnly = this.elementWorkspace.locator('#name-input').getByText('Read-only');
