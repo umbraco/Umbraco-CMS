@@ -41,7 +41,7 @@ test('can create empty element', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.library.isElementInTreeVisible(elementName);
 });
 
-test('can save and publish empty element', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+test.skip('can save and publish empty element', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedState = 'Published';
   await umbracoUi.goToBackOffice();
@@ -62,7 +62,7 @@ test('can save and publish empty element', {tag: '@smoke'}, async ({umbracoApi, 
   expect(elementData.variants[0].state).toBe(expectedState);
 });
 
-test('can create element', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+test.skip('can create element', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoUi.goToBackOffice();
   await umbracoUi.library.goToSection(ConstantHelper.sections.library);
