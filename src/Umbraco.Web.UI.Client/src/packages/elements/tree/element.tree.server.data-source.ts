@@ -73,6 +73,7 @@ export class UmbElementTreeServerDataSource
 				collection: null,
 			},
 			icon: item.isFolder ? 'icon-folder' : (item.documentType?.icon ?? 'icon-document'),
+			flags: item.flags,
 			createDate: item.createDate,
 			variants: item.variants.map((variant) => {
 				return {
@@ -80,7 +81,7 @@ export class UmbElementTreeServerDataSource
 					culture: variant.culture || null,
 					segment: null, // TODO: add segment to the backend API?
 					state: variant.state,
-					flags: [], //variant.flags,
+					flags: variant.flags,
 				};
 			}),
 		};

@@ -128,7 +128,7 @@ internal class DocumentUrlAliasRepository : IDocumentUrlAliasRepository
         {
             Alias = dto.Alias,
             DocumentKey = dto.UniqueId,
-            NullableLanguageId = dto.LanguageId,
+            LanguageId = dto.LanguageId,
         };
 
     private DocumentUrlAliasDto BuildDto(PublishedDocumentUrlAlias model) =>
@@ -136,6 +136,6 @@ internal class DocumentUrlAliasRepository : IDocumentUrlAliasRepository
         {
             Alias = model.Alias,
             UniqueId = model.DocumentKey,
-            LanguageId = model.NullableLanguageId,
+            LanguageId = model.LanguageId,
         };
 }

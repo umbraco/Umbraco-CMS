@@ -354,8 +354,4 @@
     <key alias="scheduledHealthCheckEmailBody"><![CDATA[<html><body><p>Výsledky plánovaných kontrol Umbraco Health Checks provedených na %0% v %1% jsou následující:</p>%2%</body></html>]]></key>
     <key alias="scheduledHealthCheckEmailSubject">Stav Umbraco Health Check: %0%</key>
   </area>
-  <area alias="recycleBin">
-    <key alias="contentTrashed">Obsah s ID: {0} v koši souvisí s původním nadřazeným obsahem s ID: {1}</key>
-    <key alias="mediaTrashed">Média s ID: {0} v koši souvisí s původním nadřazeným médiem s ID: {1}</key>
-  </area>
 </language>

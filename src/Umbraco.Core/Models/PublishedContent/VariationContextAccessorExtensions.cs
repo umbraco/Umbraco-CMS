@@ -28,23 +28,6 @@ public static class VariationContextAccessorExtensions
         => variationContextAccessor.ContextualizeVariation(variations, null, propertyAlias, ref culture, ref segment);
 
     /// <summary>
-    ///     Contextualizes the variation based on the content variation settings and content ID.
-    /// </summary>
-    /// <param name="variationContextAccessor">The variation context accessor.</param>
-    /// <param name="variations">The content variation settings.</param>
-    /// <param name="contentId">The content ID.</param>
-    /// <param name="culture">The culture, which may be set based on the variation context.</param>
-    /// <param name="segment">The segment, which may be set based on the variation context.</param>
-    [Obsolete("Please use the method overload that accepts all parameters. Scheduled for removal in Umbraco 18.")]
-    public static void ContextualizeVariation(
-        this IVariationContextAccessor variationContextAccessor,
-        ContentVariation variations,
-        int contentId,
-        ref string? culture,
-        ref string? segment)
-        => variationContextAccessor.ContextualizeVariation(variations, (int?)contentId, null, ref culture, ref segment);
-
-    /// <summary>
     ///     Contextualizes the variation based on the content variation settings, content ID, and property alias.
     /// </summary>
     /// <param name="variationContextAccessor">The variation context accessor.</param>
