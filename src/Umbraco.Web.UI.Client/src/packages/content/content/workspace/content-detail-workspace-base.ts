@@ -1114,7 +1114,9 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		const variantIdsIncludingInvariant = [...variantIds, UmbVariantId.CreateInvariant()];
 
 		// Only update the variants that was chosen to be saved:
-		const persistedData = this._data.getCurrent();
+		// Use getPersisted() as the base so non-saved variants retain the actual
+		// server state, not unsaved local edits from current data.
+		const persistedData = this._data.getPersisted();
 		const newPersistedData = await new UmbMergeContentVariantDataController(this).process(
 			persistedData,
 			data,
