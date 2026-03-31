@@ -10,7 +10,6 @@ export class UmbScrollableContainerElement extends UmbLitElement {
 	private _showScrollRight = false;
 
 	#resizeObserver = new ResizeObserver(() => this.#updateScrollButtons());
-	#resizeObserverConnected = false;
 
 	#updateScrollButtons() {
 		this._showScrollLeft = this.scrollLeft > 0;
@@ -35,7 +34,6 @@ export class UmbScrollableContainerElement extends UmbLitElement {
 		super.disconnectedCallback();
 		this.removeEventListener('scroll', this.#updateScrollButtons);
 		this.#resizeObserver.disconnect();
-		this.#resizeObserverConnected = false;
 	}
 
 	override destroy() {
