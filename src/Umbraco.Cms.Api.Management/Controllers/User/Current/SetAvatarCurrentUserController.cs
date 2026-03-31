@@ -20,7 +20,6 @@ namespace Umbraco.Cms.Api.Management.Controllers.User.Current;
 public class SetAvatarCurrentUserController : CurrentUserControllerBase
 {
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
-    private readonly IAuthorizationService _authorizationService;
     private readonly IUserService _userService;
 
     /// <summary>
@@ -29,13 +28,15 @@ public class SetAvatarCurrentUserController : CurrentUserControllerBase
     /// <param name="backOfficeSecurityAccessor">Provides access to back office security features for the current user.</param>
     /// <param name="authorizationService">Service used to authorize user actions.</param>
     /// <param name="userService">Service for managing user-related operations.</param>
+    // TODO (V18): Remove the IAuthorizationService parameter from the constructor and the class, as it is not used in the current implementation.
     public SetAvatarCurrentUserController(
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+#pragma warning disable IDE0060 // Remove unused parameter
         IAuthorizationService authorizationService,
+#pragma warning restore IDE0060 // Remove unused parameter
         IUserService userService)
     {
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
-        _authorizationService = authorizationService;
         _userService = userService;
     }
 

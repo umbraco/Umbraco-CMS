@@ -3,7 +3,7 @@ namespace Umbraco.Cms.Core.Models;
 /// <summary>
 ///  Represents the model used for updating a current user.
 /// </summary>
-public class CurrentUserUpdateModel
+public class UserUpdateProfileModel
 {
     /// <summary>
     ///     Gets or sets the ISO code of the user's preferred language.

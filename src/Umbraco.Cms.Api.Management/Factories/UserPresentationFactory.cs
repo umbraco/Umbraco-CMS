@@ -342,9 +342,9 @@ public class UserPresentationFactory : IUserPresentationFactory
         => startNodeIds?.Contains(Constants.System.Root) is true;
 
     /// <inheritdoc/>
-    public Task<CurrentUserUpdateModel> CreateUpdateCurrentUserModelAsync(UpdateCurrentUserRequestModel updateModel)
+    public Task<UserUpdateProfileModel> CreateUpdateProfileModelAsync(UpdateCurrentUserRequestModel updateModel)
     {
-        var model = new CurrentUserUpdateModel
+        var model = new UserUpdateProfileModel
         {
             LanguageIsoCode = updateModel.LanguageIsoCode
         };

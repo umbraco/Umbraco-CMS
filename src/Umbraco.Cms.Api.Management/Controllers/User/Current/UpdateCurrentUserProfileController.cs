@@ -1,5 +1,4 @@
 using Asp.Versioning;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Factories;
@@ -29,7 +28,6 @@ public class UpdateCurrentUserProfileController : CurrentUserControllerBase
     /// <param name="userService">Service for managing user data and operations.</param>
     /// <param name="userPresentationFactory">Factory for creating user presentation models.</param>
     /// <param name="backOfficeSecurityAccessor">Accessor for back office security context.</param>
-    /// <param name="authorizationService">Service for handling authorization checks.</param>
     public UpdateCurrentUserProfileController(
         IUserService userService,
         IUserPresentationFactory userPresentationFactory,
@@ -56,7 +54,7 @@ public class UpdateCurrentUserProfileController : CurrentUserControllerBase
     {
         Guid userKey = CurrentUserKey(_backOfficeSecurityAccessor);
 
-        CurrentUserUpdateModel updateModel = await _userPresentationFactory.CreateUpdateCurrentUserModelAsync(model);
+        UserUpdateProfileModel updateModel = await _userPresentationFactory.CreateUpdateCurrentUserModelAsync(model);
         Attempt<IUser?, UserOperationStatus> result = await _userService.UpdateProfileAsync(userKey, updateModel);
 
         return result.Success
