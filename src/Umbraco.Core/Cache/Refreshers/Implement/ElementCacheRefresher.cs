@@ -147,26 +147,9 @@ public sealed class ElementCacheRefresher : PayloadCacheRefresherBase<ElementCac
     }
 
     private static bool ShouldClearPartialViewCache(JsonPayload[] payloads)
-    {
-        return payloads.Any(x =>
-        {
-            // Check for relevant change type
-            var isRelevantChangeType = x.ChangeTypes.HasType(TreeChangeTypes.RefreshAll) ||
-                x.ChangeTypes.HasType(TreeChangeTypes.Remove) ||
-                x.ChangeTypes.HasType(TreeChangeTypes.RefreshNode) ||
-                x.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch);
-
-            // Check for published/unpublished changes
-            var hasChanges = x.PublishedCultures?.Length > 0 ||
-                   x.UnpublishedCultures?.Length > 0;
-
-            // There's no other way to detect trashed elements as the change type is only Remove when deleted permanently
-            var isTrashed = x.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch) && x.PublishedCultures is null && x.UnpublishedCultures is null;
-
-            // Only clear the partial cache for removals or refreshes with changes
-            return isTrashed || (isRelevantChangeType && hasChanges);
-        });
-    }
+        // Reuse the "should clear partial view cache" logic from the content cache refresher.
+        => ContentCacheRefresher.ShouldClearPartialViewCache(payloads
+            .Select(payload => (payload.ChangeTypes, payload.PublishedCultures, payload.UnpublishedCultures)));
 
     private void HandleMemoryCache(JsonPayload payload)
     {
