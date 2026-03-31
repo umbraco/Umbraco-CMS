@@ -2,7 +2,7 @@
 
 How data access is organized across features. Repositories separate **where data comes from** from the UI that consumes it — the UI never knows whether data comes from a server API, a manifest, or a local cache.
 
-For the full data flow chain (element → context → repository → data source → API client), see [Data Flow](./Data-Flow.md). This document focuses on how repositories are structured, categorized, and organized within the codebase.
+For the full data flow chain (element → context → repository → data source → API client), see [Data Flow](./data-Flow.md). This document focuses on how repositories are structured, categorized, and organized within the codebase.
 
 ---
 
@@ -14,7 +14,7 @@ A repository is a **domain-specific, feature-scoped** data access layer. It prov
 
 - **Feature-scoped** — A repository lives with the feature that uses it, both in naming and file location. A publishing repository lives inside the publishing feature folder, not in a generic repository folder.
 - **Extension-registered** — Repositories are registered as `type: 'repository'` extensions with lazy-loaded `api` imports. Any extension can override a repository by registering the same alias with a higher weight.
-- **Data source delegation** — The repository orchestrates but doesn't call APIs directly. It delegates to a data source that handles mapping between server types and domain models. See [Data Flow](./Data-Flow.md) for the full delegation pattern.
+- **Data source delegation** — The repository orchestrates but doesn't call APIs directly. It delegates to a data source that handles mapping between server types and domain models. See [Data Flow](./data-Flow.md) for the full delegation pattern.
 - **One concern per repository** — A detail repository handles CRUD. A publishing repository handles publish/unpublish. Don't mix concerns.
 
 ---
@@ -183,4 +183,4 @@ Study these when implementing repositories:
 1. **Repositories live with their feature** — colocated in the feature's directory, not in a shared `repositories/` folder
 2. **One concern per repository** — detail CRUD, publishing, duplication, and tree navigation are separate repositories
 3. **Use base classes when they exist** — only create custom repositories for operations without a base class
-4. **Always delegate to a data source** — see [Data Flow](./Data-Flow.md) for the delegation pattern, `tryExecute`, and `{ data, error }` tuple conventions
+4. **Always delegate to a data source** — see [Data Flow](./data-Flow.md) for the delegation pattern, `tryExecute`, and `{ data, error }` tuple conventions
