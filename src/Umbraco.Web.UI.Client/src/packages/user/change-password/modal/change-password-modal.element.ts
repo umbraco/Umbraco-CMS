@@ -27,6 +27,10 @@ export class UmbChangePasswordModalElement extends UmbModalBaseElement<
 	@state()
 	private _passwordConfiguration?: PasswordConfigurationResponseModel;
 
+	get #newPasswordValue(): string {
+		return (this._newPasswordInput?.value as string) ?? '';
+	}
+
 	#userItemRepository = new UmbUserItemRepository(this);
 	#userConfigRepository = new UmbUserConfigRepository(this);
 	#currentUserContext?: typeof UMB_CURRENT_USER_CONTEXT.TYPE;
@@ -95,8 +99,8 @@ export class UmbChangePasswordModalElement extends UmbModalBaseElement<
 				]),
 			() => {
 				const config = this._passwordConfiguration;
-				if (!config || !config.minimumPasswordLength) return false;
-				const password = (this._newPasswordInput?.value as string) ?? '';
+				if (!config || config.minimumPasswordLength <= 0) return false;
+				const password = this.#newPasswordValue;
 				return password.length > 0 && password.length < config.minimumPasswordLength;
 			},
 		);
@@ -106,8 +110,7 @@ export class UmbChangePasswordModalElement extends UmbModalBaseElement<
 			() => this.localize.term('user_passwordRequiresDigit'),
 			() => {
 				if (!this._passwordConfiguration?.requireDigit) return false;
-				const password = (this._newPasswordInput?.value as string) ?? '';
-				return password.length > 0 && !/\d/.test(password);
+				return this.#newPasswordValue.length > 0 && !/\d/.test(this.#newPasswordValue);
 			},
 		);
 
@@ -116,8 +119,7 @@ export class UmbChangePasswordModalElement extends UmbModalBaseElement<
 			() => this.localize.term('user_passwordRequiresLower'),
 			() => {
 				if (!this._passwordConfiguration?.requireLowercase) return false;
-				const password = (this._newPasswordInput?.value as string) ?? '';
-				return password.length > 0 && !/[a-z]/.test(password);
+				return this.#newPasswordValue.length > 0 && !/[a-z]/.test(this.#newPasswordValue);
 			},
 		);
 
@@ -126,8 +128,7 @@ export class UmbChangePasswordModalElement extends UmbModalBaseElement<
 			() => this.localize.term('user_passwordRequiresUpper'),
 			() => {
 				if (!this._passwordConfiguration?.requireUppercase) return false;
-				const password = (this._newPasswordInput?.value as string) ?? '';
-				return password.length > 0 && !/[A-Z]/.test(password);
+				return this.#newPasswordValue.length > 0 && !/[A-Z]/.test(this.#newPasswordValue);
 			},
 		);
 
@@ -136,8 +137,7 @@ export class UmbChangePasswordModalElement extends UmbModalBaseElement<
 			() => this.localize.term('user_passwordRequiresNonAlphanumeric'),
 			() => {
 				if (!this._passwordConfiguration?.requireNonLetterOrDigit) return false;
-				const password = (this._newPasswordInput?.value as string) ?? '';
-				return password.length > 0 && !/[^a-zA-Z0-9]/.test(password);
+				return this.#newPasswordValue.length > 0 && !/[^a-zA-Z0-9]/.test(this.#newPasswordValue);
 			},
 		);
 
