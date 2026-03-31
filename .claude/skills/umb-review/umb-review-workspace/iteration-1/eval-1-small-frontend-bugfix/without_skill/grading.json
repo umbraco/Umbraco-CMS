@@ -1,0 +1,44 @@
+{
+  "expectations": [
+    {
+      "text": "Review does NOT include a complexity/split advisory",
+      "passed": true,
+      "evidence": "The 140-line review contains no mention of complexity advisory or suggestion to split the PR. Appropriate for a 4-file bugfix."
+    },
+    {
+      "text": "Review does not flag breaking changes",
+      "passed": true,
+      "evidence": "No mention of 'breaking' anywhere in the review. All findings are about correctness, maintainability, and code quality."
+    },
+    {
+      "text": "Verdict is 'Request Changes'",
+      "passed": true,
+      "evidence": "The verdict section states: 'Request changes. Issue #1 is a functional bug: the routed block workspace element is missing #createViewContext and #provideViewContext calls for the root tab route... This should be fixed before merge.'"
+    },
+    {
+      "text": "Review output is under 200 lines",
+      "passed": true,
+      "evidence": "The review is 140 lines, under the 200-line threshold."
+    },
+    {
+      "text": "Review does not flag purely cosmetic/stylistic issues (formatting, whitespace, naming conventions, comment grammar, code style preferences) unless they affect performance or rendering. Missing JSDoc on new public APIs is NOT a stylistic issue -- it is a legitimate finding.",
+      "passed": false,
+      "evidence": "Issue 6 flags 'this._tabs?.length double-optional-chaining' as a 'Minor style nit' -- this is a purely cosmetic code style preference about optional chaining that has no impact on behavior, performance, or rendering."
+    }
+  ],
+  "summary": {
+    "passed": 4,
+    "failed": 1,
+    "total": 5,
+    "pass_rate": 0.80
+  },
+  "timing": {
+    "total_tokens": 86853,
+    "duration_ms": 185507,
+    "total_duration_seconds": 185.5
+  },
+  "eval_feedback": {
+    "suggestions": [],
+    "overall": "Solid review with correct verdict and good bug identification. The one style nit (double optional chaining) is minor but triggers the no-stylistic-nitpicks assertion."
+  }
+}
