@@ -2,7 +2,12 @@ import type { UmbElementEntityType, UmbElementRootEntityType, UmbElementFolderEn
 import type { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbEntityFlag, UmbEntityWithFlags } from '@umbraco-cms/backoffice/entity-flag';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
-import type { UmbTreeItemModel, UmbTreeRootModel } from '@umbraco-cms/backoffice/tree';
+import type {
+	UmbTreeChildrenOfRequestArgs,
+	UmbTreeItemModel,
+	UmbTreeRootItemsRequestArgs,
+	UmbTreeRootModel,
+} from '@umbraco-cms/backoffice/tree';
 
 export type { UmbElementTreeItemContext } from './element-tree-item.context.js';
 export type { UmbElementTreeRepository } from './element-tree.repository.js';
@@ -29,4 +34,16 @@ export interface UmbElementTreeItemVariantModel {
 	segment: string | null;
 	state: DocumentVariantStateModel;
 	flags: Array<UmbEntityFlag>;
+}
+
+export interface UmbElementTreeRootItemsRequestArgs extends UmbTreeRootItemsRequestArgs {
+	dataType?: {
+		unique: string;
+	};
+}
+
+export interface UmbElementTreeChildrenOfRequestArgs extends UmbTreeChildrenOfRequestArgs {
+	dataType?: {
+		unique: string;
+	};
 }
