@@ -47,7 +47,7 @@ export class UmbPeekErrorNotificationElement extends UmbLitElement {
 						look="primary"
 						color="danger"
 						label=${this.localize.term('defaultdialogs_seeErrorAction')}
-						@click=${() => this.#openErrorViewer(this.#validationErrors)}></uui-button>`
+						@click=${() => this.#openErrorViewer(this.#validationErrors!)}></uui-button>`
 				: nothing}
 			${hasLongDetail
 				? html`<uui-button
@@ -55,7 +55,10 @@ export class UmbPeekErrorNotificationElement extends UmbLitElement {
 						look="primary"
 						color="danger"
 						label=${this.localize.term('defaultdialogs_exceptionDetail')}
-						@click=${() => this.#openErrorViewer(this.data?.detail)}></uui-button>`
+						@click=${() => {
+							// Cast: the error viewer modal handles strings at runtime, but UmbModalToken constrains data to object types.
+							this.#openErrorViewer(this.data!.detail! as unknown as UmbErrorViewerModalData);
+						}}></uui-button>`
 				: nothing}
 		`;
 	}

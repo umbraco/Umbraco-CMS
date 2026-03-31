@@ -285,9 +285,9 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 
 				// Notify about non-GET 401s after successful re-auth
 				if (this.#nonGet401Requests.length > 0) {
-					const errors: Record<string, string> = {};
+					const errors: Record<string, string[]> = {};
 					this.#nonGet401Requests.forEach((req) => {
-						errors[`${req.request.method} ${req.request.url}`] = `Request failed with 401 Unauthorized.`;
+						errors[`${req.request.method} ${req.request.url}`] = ['Request failed with 401 Unauthorized.'];
 					});
 					this.#peekError(
 						'Some actions were not completed',
