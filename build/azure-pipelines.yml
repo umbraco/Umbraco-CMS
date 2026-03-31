@@ -961,7 +961,7 @@ stages:
           - checkout: none
           - download: current
             artifact: npm-testhelpers
-          - bash: echo "@umbraco:registry=https://registry.npmjs.org" >> .npmrc
+          - bash: echo "@umbraco-cms:registry=https://registry.npmjs.org" >> .npmrc
             workingDirectory: $(Pipeline.Workspace)/npm-testhelpers
             displayName: Add scoped registry to .npmrc
           - task: npmAuthenticate@0
