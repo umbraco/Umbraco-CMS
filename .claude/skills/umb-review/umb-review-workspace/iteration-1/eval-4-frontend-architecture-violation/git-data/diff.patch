@@ -1,0 +1,232 @@
+diff --git a/src/Umbraco.Web.UI.Client/src/packages/user/user-group/workspace/user-group/user-group-workspace.context.ts b/src/Umbraco.Web.UI.Client/src/packages/user/user-group/workspace/user-group/user-group-workspace.context.ts
+index 52303de88ef..072e82b75c4 100644
+--- a/src/Umbraco.Web.UI.Client/src/packages/user/user-group/workspace/user-group/user-group-workspace.context.ts
++++ b/src/Umbraco.Web.UI.Client/src/packages/user/user-group/workspace/user-group/user-group-workspace.context.ts
+@@ -10,6 +10,11 @@ import {
+ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+ import type { UmbRoutableWorkspaceContext, UmbSubmittableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
+ import type { UmbUserPermissionModel } from '@umbraco-cms/backoffice/user-permission';
++import { UserGroupService, UserService } from '@umbraco-cms/backoffice/external/backend-api';
++import { tryExecute } from '@umbraco-cms/backoffice/resources';
++import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
++import { jsonStringComparison } from '@umbraco-cms/backoffice/observable-api';
++import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
+ 
+ export class UmbUserGroupWorkspaceContext
+ 	extends UmbEntityNamedDetailWorkspaceContextBase<UmbUserGroupDetailModel, UmbUserGroupDetailRepository>
+@@ -30,6 +35,12 @@ export class UmbUserGroupWorkspaceContext
+ 	readonly fallbackPermissions = this._data.createObservablePartOfCurrent((data) => data?.fallbackPermissions || []);
+ 	readonly permissions = this._data.createObservablePartOfCurrent((data) => data?.permissions || []);
+ 	readonly description = this._data.createObservablePartOfCurrent((data) => data?.description || '');
++	
++	#persistedUserUniques: string[] = [];
++	readonly #userUniquesState = new UmbArrayState<string>([], (v) => v);
++	readonly userUniques = this.#userUniquesState.asObservable();
++
++	#notificationContext?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;
+ 
+ 	constructor(host: UmbControllerHost) {
+ 		super(host, {
+@@ -38,6 +49,10 @@ export class UmbUserGroupWorkspaceContext
+ 			detailRepositoryAlias: UMB_USER_GROUP_DETAIL_REPOSITORY_ALIAS,
+ 		});
+ 
++		this.consumeContext(UMB_NOTIFICATION_CONTEXT, (context) => {
++			this.#notificationContext = context;
++		});
++
+ 		this.routes.setRoutes([
+ 			{
+ 				path: 'create',
+@@ -63,6 +78,117 @@ export class UmbUserGroupWorkspaceContext
+ 		]);
+ 	}
+ 
++	override async load(unique: string) {
++		const result = await super.load(unique);
++		if (!result.error) {
++			await this.#loadUsers(unique);
++		}
++		return result;
++	}
++
++	async #loadUsers(unique: string) {
++		const { data } = await tryExecute(
++			this,
++			UserService.getFilterUser({ query: { userGroupIds: [unique], take: 10000 } }),
++		);
++		const uniques = data?.items.map((u) => u.id) ?? [];
++		this.#persistedUserUniques = [...uniques];
++		this.#userUniquesState.setValue(uniques);
++	}
++
++	/**
++	 * Sets the pending user uniques for this group (client-side only until Save).
++	 * Also sets the dirty flag so the workspace knows there are unpersisted changes.
++	 * @param {Array<string>} uniques
++	 * @memberof UmbUserGroupWorkspaceContext
++	 */
++	setUserUniques(uniques: Array<string>) {
++		this.#userUniquesState.setValue(uniques);
++	}
++
++	getHasUserChanges() {
++		const result = jsonStringComparison(this.#persistedUserUniques, this.#userUniquesState.getValue()) === false;
++		return result;
++	}
++
++	override getHasUnpersistedChanges(): boolean {
++		return super.getHasUnpersistedChanges() || this.getHasUserChanges();
++	}
++
++	override async submit() {
++		if (this.getIsNew()) {
++			// For new groups: create group first (so it exists on server), then add users.
++			await super.submit();
++			await this.#persistUserChanges();
++		} else {
++			// For existing groups
++			await super.submit();
++			await this.#persistUserChanges();
++		}
++	}
++
++	async #persistUserChanges() {
++		const unique = this.getUnique();
++		if (!this.getHasUserChanges() || !unique) return;
++
++		const pending = this.#userUniquesState.getValue();
++		const toAdd = pending.filter((u) => !this.#persistedUserUniques.includes(u));
++		const toRemove = this.#persistedUserUniques.filter((u) => !pending.includes(u));
++
++		// Run add and remove in parallel; track whether either call errored.
++		// Only update local state when all API calls succeeded.
++		const [addError, removeError] = await Promise.all([
++			this.#addUsersToGroup(unique, toAdd),
++			this.#removeUsersFromGroup(unique, toRemove),
++		]);
++
++		if (addError) {
++			this.#notificationContext?.peek('danger', {
++				data: {headline: 'An error occurred', message: 'Can not add users to the group.' },
++			});
++		}
++
++		if (removeError) {
++			this.#notificationContext?.peek('danger', {
++				data: {headline: 'An error occurred', message: 'Can not remove users from the group.' },
++			});
++		}
++
++		if (!addError && !removeError) {
++			this.#persistedUserUniques = [...pending];
++		}
++	}
++
++	async #addUsersToGroup(unique: string, userIds: string[]): Promise<boolean> {
++		if (!userIds.length) return false;
++		const { error } = await tryExecute(
++			this,
++			UserGroupService.postUserGroupByIdUsers({
++				path: { id: unique },
++				body: userIds.map((id) => ({ id })),
++			}),
++		);
++		return !!error;
++	}
++
++	async #removeUsersFromGroup(unique: string, userIds: string[]): Promise<boolean> {
++		if (!userIds.length) return false;
++		const { error } = await tryExecute(
++			this,
++			UserGroupService.deleteUserGroupByIdUsers({
++				path: { id: unique },
++				body: userIds.map((id) => ({ id })),
++			}),
++		);
++		return !!error;
++	}
++
++	override resetState() {
++		super.resetState();
++		this.#persistedUserUniques = [];
++		this.#userUniquesState.setValue([]);
++	}
++
+ 	updateProperty<Alias extends keyof UmbUserGroupDetailModel>(alias: Alias, value: UmbUserGroupDetailModel[Alias]) {
+ 		this._data.updateCurrent({ [alias]: value });
+ 	}
+diff --git a/src/Umbraco.Web.UI.Client/src/packages/user/user-group/workspace/user-group/views/user-group-details-workspace-view.element.ts b/src/Umbraco.Web.UI.Client/src/packages/user/user-group/workspace/user-group/views/user-group-details-workspace-view.element.ts
+index 37bb40d9d19..d125a94552b 100644
+--- a/src/Umbraco.Web.UI.Client/src/packages/user/user-group/workspace/user-group/views/user-group-details-workspace-view.element.ts
++++ b/src/Umbraco.Web.UI.Client/src/packages/user/user-group/workspace/user-group/views/user-group-details-workspace-view.element.ts
+@@ -8,8 +8,10 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+ import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
+ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+ import type { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
++import type { UmbUserInputElement } from '../../../../user/components/user-input/user-input.element.js';
+ 
+ import '../components/user-group-entity-type-permission-groups.element.js';
++import '../../../../user/components/user-input/user-input.element.js';
+ 
+ @customElement('umb-user-group-details-workspace-view')
+ export class UmbUserGroupDetailsWorkspaceViewElement extends UmbLitElement implements UmbWorkspaceViewElement {
+@@ -37,6 +39,9 @@ export class UmbUserGroupDetailsWorkspaceViewElement extends UmbLitElement imple
+ 	@state()
+ 	private _mediaRootAccess: UmbUserGroupDetailModel['mediaRootAccess'] = false;
+ 
++	@state()
++	private _userUniques: string[] = [];
++
+ 	#workspaceContext?: typeof UMB_USER_GROUP_WORKSPACE_CONTEXT.TYPE;
+ 
+ 	constructor() {
+@@ -81,6 +86,12 @@ export class UmbUserGroupDetailsWorkspaceViewElement extends UmbLitElement imple
+ 			(value) => (this._mediaStartNode = value),
+ 			'_observeMediaStartNode',
+ 		);
++
++		this.observe(
++			this.#workspaceContext?.userUniques,
++			(value) => (this._userUniques = value ?? []),
++			'_observeUserUniques',
++		);
+ 	}
+ 
+ 	#onSectionsChange(event: UmbChangeEvent) {
+@@ -140,6 +151,12 @@ export class UmbUserGroupDetailsWorkspaceViewElement extends UmbLitElement imple
+ 		this.#workspaceContext?.updateProperty('mediaStartNode', selected ? { unique: selected } : null);
+ 	}
+ 
++	#onUsersChange(event: UmbChangeEvent) {
++		event.stopPropagation();
++		const target = event.target as UmbUserInputElement;
++		this.#workspaceContext?.setUserUniques(target.selection);
++	}
++
+ 	override render() {
+ 		if (!this._unique) return nothing;
+ 
+@@ -163,6 +180,12 @@ export class UmbUserGroupDetailsWorkspaceViewElement extends UmbLitElement imple
+ 
+ 					${this.#renderPermissionGroups()}
+ 				</umb-stack>
++				<div>
++					<uui-box>
++						<div slot="headline"><umb-localize key="general_users"></umb-localize></div>
++						<umb-user-input .selection=${this._userUniques} @change=${this.#onUsersChange}></umb-user-input>
++					</uui-box>
++				</div>
+ 			</div>
+ 		`;
+ 	}
+@@ -257,6 +280,9 @@ export class UmbUserGroupDetailsWorkspaceViewElement extends UmbLitElement imple
+ 			}
+ 
+ 			#main {
++				display: grid;
++				grid-template-columns: 1fr 350px;
++				gap: var(--uui-size-layout-1);
+ 				padding: var(--uui-size-layout-1);
+ 			}
+ 

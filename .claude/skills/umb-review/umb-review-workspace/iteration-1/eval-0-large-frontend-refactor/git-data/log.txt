@@ -1,0 +1,62 @@
+c19e424cdd9 Tiptap RTE: Add width/height to edit image properties (AB#65981) (#22266)
+b79639cb236 Document Editing: Fix unchanged variants selected in save and publish dialog (closes #22277) (#22285)
+934834b6f54 Rich Text Editor: Filter paste, drag&drop, and media picker to allowed media types (closes #21824) (#22267)
+0bf0634d4f7 Templating: Add Production Mode condition to Partial View and Template Collection create actions (#22295)
+c765ce60668 Accessibility: Include visible initials in name displayed on account menu button (closes #21942) (#22117)
+71d9e34f202 Install: Ensure media directory exists before creating `PhysicalFileProvider` (closes #14877) (#22281)
+dbb492b6e87 User Service: Fix `WhereIn` subquery in `PermissionRepository` (closes #22288) (#22289)
+753976bdcc8 User management: Show change password validation error (closes #22291) (#22292)
+6b9bd4c787c Media: Allow duplicating system media types (closes #22282) (#22284)
+581c3ec64d0 Merge branch 'release/17.3.0'
+65a89244f07 Unattended Upgrades: Rebuild routing caches after background migrations to fix unroutable document URLs (#22269)
+1cde598dedb Unattended Upgrades: Rebuild routing caches after background migrations to fix unroutable document URLs (#22269)
+400fd5b0e0c Backoffice Agent Context: Add design philosophy, developer roles and skills for a few common extensions and infrastructure tasks (#22273)
+a69ce5df2fe Backoffice: Remove token cookie if decryption fails (mitigates #16107) (#22237)
+6f152eae648 Migrations: Fix NPoco auto-select breaking retrust FK migration (#22270)
+dd7fb875347 Migrations: Fix NPoco auto-select breaking retrust FK migration (#22270)
+a619182bae6 Dependencies: Update Microsoft packages to latest patch and fix HybridCache ParseFault with Redis (#22278)
+4940b28cc3d Tests: Remove dead KeepAlive config remnants (#22272)
+0c294fb8bc2 Dependencies: Update Microsoft packages to latest patch and fix HybridCache ParseFault with Redis (#22278)
+a03fb9b0e38 Media: Set width and height for uploaded SVGs (#22244)
+867414629b0 Cache sync: append SiteName to machine identifier for same-host load balancing (#22257)
+b292535cf99 Repositories: Fix Raw Sql Statements without Escaped Table, Column or Alias Names (closes #22259) (#22261)
+3238f2306a8 E2E: Added acceptance tests for block grid area (#22181)
+bb44bed058c Examine Dashboard: Support content node links from delivery API index (closes #22221) (#22225)
+5f684eaa10e Content Version Cleanup: Optimize for large datasets (closes #22224) (#22239)
+2f7f8cf9055 Backoffice: Fix Ctrl+C not terminating the example dev server (#22249)
+29f267338c7 E2E: Reverted npm command for smokeTest (#22246)
+949584afc21 Examine: Fix `DocumentUrlService` not initialized during Examine indexing after package upgrade (#22243)
+9a7c8efbd06 Bump version to 17.3.0-rc3.
+cef63cb07d1 Examine: Fix `DocumentUrlService` not initialized during Examine indexing after package upgrade (#22243)
+276d12d9635 E2E: QA Added acceptance tests for validating a mandatory multi URL picker (#22235)
+88d8a5acb3f E2E: QA Added acceptance tests for moving media items (#22232)
+b57aacc1769 Localization: Update "MFA" label to "2FA" in language files (#22236)
+23123adeaa5 Member Authorization: Return correct status codes for unauthenticated members (fixes #21638) (#22220)
+851d96c2b80 Members: Fix Create Members based on Member Types in folders (#22241)
+70be022109a Backoffice: Migrate Templating, Language, Member Group, and Document Blueprint create entity actions to use entityCreateOptionAction extensions (#22214)
+124c01cd6e3 Merge branch 'release/17.3.0'
+6c40f4aefa2 Update LanguageUiHelper.ts
+282e3af6b82 Entity Data Picker: Adds start node support to tree data-sources (#22172)
+218e2580202 Update creation action locators and tests
+fd81ade58b3 Migrations: Fix package migrations not running after fresh install with packages (closes #22202) (#22204)
+27c926940f8 Migrations: Fix retrust constraints migration targeting non-Umbraco tables and transaction failure (closes #22227) (#22229)
+186498ef391 Dynamic Root: Fix current origin resolution for new unsaved content (closes #22213) (#22216)
+2859cb808aa Management API: Add endpoint to get all member types allowed at root (#22226)
+be7b80e8c2e Update DocumentTypeUiHelper.ts
+63f16a9aec9 Update DataTypeUiHelper.ts
+219270e1817 Add ellipsis to names in create content modals
+d4d0f922a40 Add additionalOptions to create manifests
+b697fa95751 Merge branch 'main' into v17/feature/templating-create-action-options
+51b7fbf5ee8 Tree Picker: Fix root item not deselecting in single-selection picker (closes #22073) (#22099)
+7512f21bb0f Update UiBaseLocators.ts
+6d767b71dad Refactor language and member group create actions into create option actions
+61b7c882314 Enable additional options for create actions
+3dc9bf19899 Show ellipsis for labels with additional options
+47ca2400844 Add collection create actions for tree item children
+c1060768205 Remove ellipsis from document blueprint label
+fa4710fdf63 restore label
+3af13e407f9 register as create options
+4822ddd889d Distributed Locking: Add ROWLOCK hint to prevent cross-row contention on umbracoLock table (closes #22113) (#22126)
+48222951f37 Application URLs: Prevent back office hosts being overwritten in a shared database setup (closes #16741) (#22160)
+51ae5b66d70 Migrations: Fix property detection for invariant content types with culture-varying compositions (closes #22159) (#22167)
+49b3c24c9f9 Bumped version to 17.3.0-rc2.

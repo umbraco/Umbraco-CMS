@@ -1,0 +1,4 @@
+ src/Umbraco.Core/Constants-Webhooks.cs                      |  6 +-----
+ src/Umbraco.Core/Webhooks/WebhookPayloadType.cs             |  6 +++---
+ .../Telemetry/Providers/WebhookTelemetryProvider.cs         | 13 ++++++++-----
+ 3 files changed, 12 insertions(+), 13 deletions(-)

@@ -1,0 +1,35 @@
+{
+  "eval_id": 2,
+  "eval_name": "small-backend-webhook",
+  "prompt": "Review the changes in PR #22217 (branch origin/pr/22217 targeting v18/dev). This is a tiny 3-file backend change to the default webhook payload type.",
+  "assertions": [
+    {
+      "id": "correct-target-branch",
+      "text": "Review references 'v18/dev' as the target branch (not 'main')"
+    },
+    {
+      "id": "default-value-change-noted",
+      "text": "Review discusses the behavioral impact of changing the default payload type"
+    },
+    {
+      "id": "proportionate-review",
+      "text": "Review output is under 150 lines"
+    },
+    {
+      "id": "no-stylistic-nitpicks",
+      "text": "Review does not flag purely cosmetic/stylistic issues (formatting, whitespace, naming conventions, comment grammar, code style preferences) unless they affect performance or rendering. Missing JSDoc on new public APIs is NOT a stylistic issue \u2014 it is a legitimate finding."
+    },
+    {
+      "id": "ignores-preexisting-issues",
+      "text": "Does NOT flag the ~30 builder extension methods with Legacy defaults (pre-existing, not changed in the PR)"
+    },
+    {
+      "id": "side-effect-detection",
+      "text": "Flags stale WebhookSettings.cs docs as a side-effect of the constant value change"
+    },
+    {
+      "id": "consumer-identification",
+      "text": "Identifies affected consumers outside the PR (WebhookSettings, UmbracoBuilder, or WebhookEventCollectionBuilderExtensions)"
+    }
+  ]
+}

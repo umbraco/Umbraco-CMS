@@ -1,0 +1,27 @@
+{
+  "eval_id": 1,
+  "eval_name": "small-frontend-bugfix",
+  "prompt": "Review the changes in PR #21672 (branch origin/pr/21672 targeting main). This is a small 4-file frontend bugfix implementing tab validation badges in the block editor.",
+  "assertions": [
+    {
+      "id": "complexity-advisory-absent",
+      "text": "Review does NOT include a complexity/split advisory"
+    },
+    {
+      "id": "no-false-breaking-changes",
+      "text": "Review does not flag breaking changes"
+    },
+    {
+      "id": "proportionate-verdict",
+      "text": "Verdict is 'Request Changes'"
+    },
+    {
+      "id": "concise-review",
+      "text": "Review output is under 200 lines"
+    },
+    {
+      "id": "no-stylistic-nitpicks",
+      "text": "Review does not flag purely cosmetic/stylistic issues (formatting, whitespace, naming conventions, comment grammar, code style preferences) unless they affect performance or rendering. Missing JSDoc on new public APIs is NOT a stylistic issue \u2014 it is a legitimate finding."
+    }
+  ]
+}

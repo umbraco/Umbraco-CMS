@@ -1,0 +1,31 @@
+{
+  "eval_id": 3,
+  "eval_name": "frontend-feature-workspace-modal",
+  "prompt": "Review the changes in PR #22268 (branch origin/pr/22268 targeting main). This is a 29-file frontend feature adding a current user workspace modal.",
+  "assertions": [
+    {
+      "id": "complexity-advisory-triggers",
+      "text": "Review includes a complexity/split advisory (3 layers: Core, API, Frontend across 27+ files)"
+    },
+    {
+      "id": "breaking-changes-on-interface-additions",
+      "text": "Flags new interface methods without default implementations as breaking changes (Pattern 3)"
+    },
+    {
+      "id": "no-stylistic-nitpicks",
+      "text": "Review does not flag purely cosmetic/stylistic issues unless they affect performance or rendering. Missing JSDoc on new public APIs is NOT a stylistic issue \u2014 it is a legitimate finding."
+    },
+    {
+      "id": "diff-scoped",
+      "text": "All findings reference code that was changed in the diff, not pre-existing issues"
+    },
+    {
+      "id": "new-feature-assessed",
+      "text": "Review assesses the new feature's architecture, patterns, or integration approach \u2014 not just absence of bugs"
+    },
+    {
+      "id": "no-false-notification-finding",
+      "text": "Review does NOT flag UpdateCurrentUserAsync as missing UserSavingNotification/UserSavedNotification \u2014 the sibling UpdateAsync also does not publish these notifications, so flagging their absence would be a false positive"
+    }
+  ]
+}

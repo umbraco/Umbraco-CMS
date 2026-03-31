@@ -1,0 +1,43 @@
+{
+  "eval_id": 0,
+  "eval_name": "large-frontend-refactor",
+  "prompt": "Review the changes in PR #22214 (branch origin/pr/22214 targeting main). This is a large frontend refactor migrating create entity actions to use entityCreateOptionAction extensions, with deprecations.",
+  "assertions": [
+    {
+      "id": "deprecation-patterns-noted",
+      "text": "Review identifies deprecation patterns (@deprecated, UmbDeprecation)"
+    },
+    {
+      "id": "frontend-breaking-change-awareness",
+      "text": "Checks frontend-specific breaking changes (exports, custom elements) not just backend"
+    },
+    {
+      "id": "file-references-present",
+      "text": "Findings reference specific files with line numbers"
+    },
+    {
+      "id": "no-false-critical-on-deprecations",
+      "text": "Properly deprecated code is NOT flagged as Critical breaking change"
+    },
+    {
+      "id": "no-stylistic-nitpicks",
+      "text": "Review does not flag purely cosmetic/stylistic issues (formatting, whitespace, naming conventions, comment grammar, code style preferences) unless they affect performance or rendering. Missing JSDoc on new public APIs is NOT a stylistic issue \u2014 it is a legitimate finding."
+    },
+    {
+      "id": "manifest-alias-rename-detected",
+      "text": "Alias renames (CreateOptions \u2192 Create) flagged as Critical breaking change"
+    },
+    {
+      "id": "non-exported-deletions-dismissed",
+      "text": "Deleted action classes NOT flagged as breaking (verified against package.json exports)"
+    },
+    {
+      "id": "noise-files-filtered",
+      "text": "Does not review noise files (generated files, lock files, etc.)"
+    },
+    {
+      "id": "complexity-advisory-triggers",
+      "text": "Review includes a complexity/split advisory for the large 75+ file scope"
+    }
+  ]
+}

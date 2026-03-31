@@ -1,0 +1,1263 @@
+diff --git a/src/Umbraco.Cms.Api.Management/Controllers/User/Current/ClearAvatarCurrentUserController.cs b/src/Umbraco.Cms.Api.Management/Controllers/User/Current/ClearAvatarCurrentUserController.cs
+new file mode 100644
+index 00000000000..180019fa53c
+--- /dev/null
++++ b/src/Umbraco.Cms.Api.Management/Controllers/User/Current/ClearAvatarCurrentUserController.cs
+@@ -0,0 +1,72 @@
++using Asp.Versioning;
++using Microsoft.AspNetCore.Authorization;
++using Microsoft.AspNetCore.Http;
++using Microsoft.AspNetCore.Mvc;
++using Umbraco.Cms.Core.Security;
++using Umbraco.Cms.Core.Security.Authorization;
++using Umbraco.Cms.Core.Services;
++using Umbraco.Cms.Core.Services.OperationStatus;
++using Umbraco.Cms.Web.Common.Authorization;
++using Umbraco.Extensions;
++
++namespace Umbraco.Cms.Api.Management.Controllers.User.Current;
++
++/// <summary>
++/// Controller responsible for handling requests to clear the avatar of the currently authenticated user.
++/// </summary>
++[ApiVersion("1.0")]
++public class ClearAvatarCurrentUserController : CurrentUserControllerBase
++{
++    private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
++    private readonly IAuthorizationService _authorizationService;
++    private readonly IUserService _userService;
++
++    /// <summary>
++    /// Initializes a new instance of the <see cref="ClearAvatarCurrentUserController"/> class.
++    /// </summary>
++    /// <param name="backOfficeSecurityAccessor">Provides access to back office security features for the current user.</param>
++    /// <param name="authorizationService">Service used to authorize user actions.</param>
++    /// <param name="userService">Service for managing user-related operations.</param>
++    public ClearAvatarCurrentUserController(
++        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
++        IAuthorizationService authorizationService,
++        IUserService userService)
++    {
++        _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
++        _authorizationService = authorizationService;
++        _userService = userService;
++    }
++
++    /// <summary>
++    /// Removes the avatar image for the currently authenticated user.
++    /// </summary>
++    /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
++    /// <returns>An <see cref="IActionResult"/> indicating the result of the operation.</returns>
++    [MapToApiVersion("1.0")]
++    [HttpDelete("avatar")]
++    [ProducesResponseType(StatusCodes.Status200OK)]
++    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
++    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
++    [EndpointSummary("Clears the current user's avatar.")]
++    [EndpointDescription("Removes the avatar image for the currently authenticated user.")]
++    public async Task<IActionResult> ClearAvatar(CancellationToken cancellationToken)
++    {
++        Guid userKey = CurrentUserKey(_backOfficeSecurityAccessor);
++
++        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
++            User,
++            UserPermissionResource.WithKeys(userKey),
++            AuthorizationPolicies.UserPermissionByResource);
++
++        if (!authorizationResult.Succeeded)
++        {
++            return Forbidden();
++        }
++
++        UserOperationStatus result = await _userService.ClearAvatarAsync(userKey);
++
++        return result is UserOperationStatus.Success
++            ? Ok()
++            : UserOperationStatusResult(result);
++    }
++}
+diff --git a/src/Umbraco.Cms.Api.Management/Controllers/User/Current/UpdateCurrentUserProfileController.cs b/src/Umbraco.Cms.Api.Management/Controllers/User/Current/UpdateCurrentUserProfileController.cs
+new file mode 100644
+index 00000000000..4f36c64512c
+--- /dev/null
++++ b/src/Umbraco.Cms.Api.Management/Controllers/User/Current/UpdateCurrentUserProfileController.cs
+@@ -0,0 +1,82 @@
++using Asp.Versioning;
++using Microsoft.AspNetCore.Authorization;
++using Microsoft.AspNetCore.Http;
++using Microsoft.AspNetCore.Mvc;
++using Umbraco.Cms.Api.Management.Factories;
++using Umbraco.Cms.Api.Management.ViewModels.User;
++using Umbraco.Cms.Core;
++using Umbraco.Cms.Core.Models;
++using Umbraco.Cms.Core.Models.Membership;
++using Umbraco.Cms.Core.Security;
++using Umbraco.Cms.Core.Security.Authorization;
++using Umbraco.Cms.Core.Services;
++using Umbraco.Cms.Core.Services.OperationStatus;
++using Umbraco.Cms.Web.Common.Authorization;
++using Umbraco.Extensions;
++
++namespace Umbraco.Cms.Api.Management.Controllers.User.Current;
++
++/// <summary>
++/// Controller responsible for update information about the currently authenticated user.
++/// </summary>
++[ApiVersion("1.0")]
++public class UpdateCurrentUserProfileController : CurrentUserControllerBase
++{
++    private readonly IUserService _userService;
++    private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
++    private readonly IUserPresentationFactory _userPresentationFactory;
++    private readonly IAuthorizationService _authorizationService;
++
++    /// <summary>
++    /// Initializes a new instance of the <see cref="UpdateCurrentUserProfileController"/> class, which manages user update operations in the Umbraco backoffice API.
++    /// </summary>
++    /// <param name="userService">Service for managing user data and operations.</param>
++    /// <param name="userPresentationFactory">Factory for creating user presentation models.</param>
++    /// <param name="backOfficeSecurityAccessor">Accessor for back office security context.</param>
++    /// <param name="authorizationService">Service for handling authorization checks.</param>
++    public UpdateCurrentUserProfileController(
++        IUserService userService,
++        IUserPresentationFactory userPresentationFactory,
++        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
++        IAuthorizationService authorizationService)
++    {
++        _userService = userService;
++        _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
++        _userPresentationFactory = userPresentationFactory;
++        _authorizationService = authorizationService;
++    }
++
++    /// <summary>
++    /// Updates the current user with new details provided in the request model.
++    /// </summary>
++    /// <param name="model">The request model containing updated current user information.</param>
++    /// <returns>An <see cref="IActionResult"/> indicating the outcome of the update operation.</returns>
++    [HttpPut("profile")]
++    [MapToApiVersion("1.0")]
++    [ProducesResponseType(StatusCodes.Status200OK)]
++    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
++    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
++    [EndpointSummary("Updates current user profile.")]
++    [EndpointDescription("Updates current user profile with the details from the request model.")]
++    public async Task<IActionResult> UpdateCurrentUser(UpdateCurrentUserRequestModel model)
++    {
++        Guid userKey = CurrentUserKey(_backOfficeSecurityAccessor);
++
++        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
++            User,
++            UserPermissionResource.WithKeys(userKey),
++            AuthorizationPolicies.UserPermissionByResource);
++
++        if (!authorizationResult.Succeeded)
++        {
++            return Forbidden();
++        }
++
++        CurrentUserUpdateModel updateModel = await _userPresentationFactory.CreateUpdateCurrentUserModelAsync(userKey, model);
++        Attempt<IUser?, UserOperationStatus> result = await _userService.UpdateCurrentUserAsync(updateModel);
++
++        return result.Success
++            ? Ok()
++            : UserOperationStatusResult(result.Status);
++    }
++}
+diff --git a/src/Umbraco.Cms.Api.Management/Factories/IUserPresentationFactory.cs b/src/Umbraco.Cms.Api.Management/Factories/IUserPresentationFactory.cs
+index f9fd6fe99bb..ae5fc4ff884 100644
+--- a/src/Umbraco.Cms.Api.Management/Factories/IUserPresentationFactory.cs
++++ b/src/Umbraco.Cms.Api.Management/Factories/IUserPresentationFactory.cs
+@@ -31,6 +31,11 @@ public interface IUserPresentationFactory
+     /// </summary>
+     Task<UserUpdateModel> CreateUpdateModelAsync(Guid existingUserKey, UpdateUserRequestModel updateModel);
+ 
++    /// <summary>
++    /// Creates an update model for a current user based on the provided request model.
++    /// </summary>
++    Task<CurrentUserUpdateModel> CreateUpdateCurrentUserModelAsync(Guid existingUserKey, UpdateCurrentUserRequestModel updateModel);
++
+     /// <summary>
+     /// Creates a response model for the current user based on the provided user.
+     /// </summary>
+@@ -56,10 +61,10 @@ public interface IUserPresentationFactory
+     /// </summary>
+     UserItemResponseModel CreateItemResponseModel(IUser user);
+ 
+-/// <summary>
+-/// Asynchronously creates a response model containing the calculated start nodes for the specified user.
+-/// </summary>
+-/// <param name="user">The user for whom to calculate start nodes.</param>
+-/// <returns>A task representing the asynchronous operation. The task result contains the calculated user start nodes response model.</returns>
++    /// <summary>
++    /// Asynchronously creates a response model containing the calculated start nodes for the specified user.
++    /// </summary>
++    /// <param name="user">The user for whom to calculate start nodes.</param>
++    /// <returns>A task representing the asynchronous operation. The task result contains the calculated user start nodes response model.</returns>
+     Task<CalculatedUserStartNodesResponseModel> CreateCalculatedUserStartNodesResponseModelAsync(IUser user);
+ }
+diff --git a/src/Umbraco.Cms.Api.Management/Factories/UserPresentationFactory.cs b/src/Umbraco.Cms.Api.Management/Factories/UserPresentationFactory.cs
+index 9231547aad0..af12893893b 100644
+--- a/src/Umbraco.Cms.Api.Management/Factories/UserPresentationFactory.cs
++++ b/src/Umbraco.Cms.Api.Management/Factories/UserPresentationFactory.cs
+@@ -340,4 +340,16 @@ private ISet<ReferenceByIdModel> GetKeysFromIds(IEnumerable<int>? ids, UmbracoOb
+ 
+     private static bool HasRootAccess(IEnumerable<int>? startNodeIds)
+         => startNodeIds?.Contains(Constants.System.Root) is true;
++
++    /// <inheritdoc/>
++    public Task<CurrentUserUpdateModel> CreateUpdateCurrentUserModelAsync(Guid existingUserKey, UpdateCurrentUserRequestModel updateModel)
++    {
++        var model = new CurrentUserUpdateModel
++        {
++            ExistingUserKey = existingUserKey,
++            LanguageIsoCode = updateModel.LanguageIsoCode
++        };
++
++        return Task.FromResult(model);
++    }
+ }
+diff --git a/src/Umbraco.Cms.Api.Management/ViewModels/User/UpdateCurrentUserRequestModel.cs b/src/Umbraco.Cms.Api.Management/ViewModels/User/UpdateCurrentUserRequestModel.cs
+new file mode 100644
+index 00000000000..af47ebd2f72
+--- /dev/null
++++ b/src/Umbraco.Cms.Api.Management/ViewModels/User/UpdateCurrentUserRequestModel.cs
+@@ -0,0 +1,12 @@
++namespace Umbraco.Cms.Api.Management.ViewModels.User;
++
++/// <summary>
++/// Represents a request model for updating information about a current user.
++/// </summary>
++public class UpdateCurrentUserRequestModel
++{
++    /// <summary>
++    /// Gets or sets the ISO code of the user's language.
++    /// </summary>
++    public string LanguageIsoCode { get; set; } = string.Empty;
++}
+diff --git a/src/Umbraco.Core/Models/CurrentUserUpdateModel.cs b/src/Umbraco.Core/Models/CurrentUserUpdateModel.cs
+new file mode 100644
+index 00000000000..7ead7bbb4d4
+--- /dev/null
++++ b/src/Umbraco.Core/Models/CurrentUserUpdateModel.cs
+@@ -0,0 +1,17 @@
++namespace Umbraco.Cms.Core.Models;
++
++/// <summary>
++///  Represents the model used for updating a current user.
++/// </summary>
++public class CurrentUserUpdateModel
++{
++    /// <summary>
++    ///     Gets or sets the unique key of the existing user to update.
++    /// </summary>
++    public required Guid ExistingUserKey { get; set; }
++
++    /// <summary>
++    ///     Gets or sets the ISO code of the user's preferred language.
++    /// </summary>
++    public string LanguageIsoCode { get; set; } = string.Empty;
++}
+diff --git a/src/Umbraco.Core/Services/IUserService.cs b/src/Umbraco.Core/Services/IUserService.cs
+index f767483cf6f..e3afe122ef6 100644
+--- a/src/Umbraco.Core/Services/IUserService.cs
++++ b/src/Umbraco.Core/Services/IUserService.cs
+@@ -92,6 +92,13 @@ public interface IUserService : IMembershipUserService
+     /// <returns>An attempt containing the updated <see cref="IUser"/> if successful, as well as a more detailed <see cref="UserOperationStatus"/>.</returns>
+     Task<Attempt<IUser?, UserOperationStatus>> UpdateAsync(Guid performingUserKey, UserUpdateModel model);
+ 
++    /// <summary>
++    ///     Updates the current user.
++    /// </summary>
++    /// <param name="model">The model containing the updated user details.</param>
++    /// <returns>An attempt containing the updated <see cref="IUser"/> if successful, as well as a more detailed <see cref="UserOperationStatus"/>.</returns>
++    Task<Attempt<IUser?, UserOperationStatus>> UpdateCurrentUserAsync(CurrentUserUpdateModel model);
++
+     /// <summary>
+     ///     Sets the avatar for a user from a temporary file.
+     /// </summary>
+diff --git a/src/Umbraco.Core/Services/UserService.cs b/src/Umbraco.Core/Services/UserService.cs
+index fe177d1fbe2..f29f9f7a1c3 100644
+--- a/src/Umbraco.Core/Services/UserService.cs
++++ b/src/Umbraco.Core/Services/UserService.cs
+@@ -829,6 +829,32 @@ private async Task<UserOperationStatus> ValidateUserCreateModel(UserCreateModel
+         return UserOperationStatus.Success;
+     }
+ 
++    /// <inheritdoc/>
++    public async Task<Attempt<IUser?, UserOperationStatus>> UpdateCurrentUserAsync(CurrentUserUpdateModel model)
++    {
++        using ICoreScope scope = ScopeProvider.CreateCoreScope();
++        using IServiceScope serviceScope = _serviceScopeFactory.CreateScope();
++        IBackOfficeUserStore userStore = serviceScope.ServiceProvider.GetRequiredService<IBackOfficeUserStore>();
++
++        IUser? existingUser = await userStore.GetAsync(model.ExistingUserKey);
++
++        if (existingUser is null)
++        {
++            return Attempt.FailWithStatus(UserOperationStatus.UserNotFound, existingUser);
++        }
++
++        IUser updated = MapCurrentUserUpdate(model, existingUser);
++        UserOperationStatus saveStatus = await userStore.SaveAsync(updated);
++
++        if (saveStatus is not UserOperationStatus.Success)
++        {
++            return Attempt.FailWithStatus<IUser?, UserOperationStatus>(saveStatus, existingUser);
++        }
++
++        scope.Complete();
++        return Attempt.SucceedWithStatus<IUser?, UserOperationStatus>(UserOperationStatus.Success, updated);
++    }
++
+     /// <inheritdoc/>
+     public async Task<Attempt<IUser?, UserOperationStatus>> UpdateAsync(Guid performingUserKey, UserUpdateModel model)
+     {
+@@ -1029,6 +1055,20 @@ private IUser MapUserUpdate(
+         return target;
+     }
+ 
++    /// <summary>
++    ///     Maps user update model properties to an existing user.
++    /// </summary>
++    /// <param name="source">The source update model.</param>
++    /// <param name="target">The target user to update.</param>
++    /// <returns>The updated <see cref="IUser" />.</returns>
++    private IUser MapCurrentUserUpdate(
++        CurrentUserUpdateModel source,
++        IUser target)
++    {
++        target.Language = source.LanguageIsoCode;
++        return target;
++    }
++
+     /// <summary>
+     ///     Validates a user update model against an existing user.
+     /// </summary>
+@@ -2476,5 +2516,7 @@ private static void AddAdditionalPermissions(ISet<string> assignedPermissions, I
+     [GeneratedRegex(@"^[\w\d\-\._~]{1,100}$")]
+     private static partial Regex ValidClientId();
+ 
++    
++
+     #endregion
+ }
+diff --git a/src/Umbraco.Web.UI.Client/src/packages/core/backend-api/sdk.gen.ts b/src/Umbraco.Web.UI.Client/src/packages/core/backend-api/sdk.gen.ts
+index 7d2dd20dd79..fba3d72e78b 100644
+--- a/src/Umbraco.Web.UI.Client/src/packages/core/backend-api/sdk.gen.ts
++++ b/src/Umbraco.Web.UI.Client/src/packages/core/backend-api/sdk.gen.ts
+@@ -2,7 +2,7 @@
+ 
+ import { type Client, formDataBodySerializer, type Options as Options2, type TDataShape } from './client';
+ import { client } from './client.gen';
+-import type { DeleteDataTypeByIdData, DeleteDataTypeByIdErrors, DeleteDataTypeByIdResponses, DeleteDataTypeFolderByIdData, DeleteDataTypeFolderByIdErrors, DeleteDataTypeFolderByIdResponses, DeleteDictionaryByIdData, DeleteDictionaryByIdErrors, DeleteDictionaryByIdResponses, DeleteDocumentBlueprintByIdData, DeleteDocumentBlueprintByIdErrors, DeleteDocumentBlueprintByIdResponses, DeleteDocumentBlueprintFolderByIdData, DeleteDocumentBlueprintFolderByIdErrors, DeleteDocumentBlueprintFolderByIdResponses, DeleteDocumentByIdData, DeleteDocumentByIdErrors, DeleteDocumentByIdPublicAccessData, DeleteDocumentByIdPublicAccessErrors, DeleteDocumentByIdPublicAccessResponses, DeleteDocumentByIdResponses, DeleteDocumentTypeByIdData, DeleteDocumentTypeByIdErrors, DeleteDocumentTypeByIdResponses, DeleteDocumentTypeFolderByIdData, DeleteDocumentTypeFolderByIdErrors, DeleteDocumentTypeFolderByIdResponses, DeleteLanguageByIsoCodeData, DeleteLanguageByIsoCodeErrors, DeleteLanguageByIsoCodeResponses, DeleteLogViewerSavedSearchByNameData, DeleteLogViewerSavedSearchByNameErrors, DeleteLogViewerSavedSearchByNameResponses, DeleteMediaByIdData, DeleteMediaByIdErrors, DeleteMediaByIdResponses, DeleteMediaTypeByIdData, DeleteMediaTypeByIdErrors, DeleteMediaTypeByIdResponses, DeleteMediaTypeFolderByIdData, DeleteMediaTypeFolderByIdErrors, DeleteMediaTypeFolderByIdResponses, DeleteMemberByIdData, DeleteMemberByIdErrors, DeleteMemberByIdResponses, DeleteMemberGroupByIdData, DeleteMemberGroupByIdErrors, DeleteMemberGroupByIdResponses, DeleteMemberTypeByIdData, DeleteMemberTypeByIdErrors, DeleteMemberTypeByIdResponses, DeleteMemberTypeFolderByIdData, DeleteMemberTypeFolderByIdErrors, DeleteMemberTypeFolderByIdResponses, DeletePackageCreatedByIdData, DeletePackageCreatedByIdErrors, DeletePackageCreatedByIdResponses, DeletePartialViewByPathData, DeletePartialViewByPathErrors, DeletePartialViewByPathResponses, DeletePartialViewFolderByPathData, DeletePartialViewFolderByPathErrors, DeletePartialViewFolderByPathResponses, DeletePreviewData, DeletePreviewResponses, DeleteRecycleBinDocumentByIdData, DeleteRecycleBinDocumentByIdErrors, DeleteRecycleBinDocumentByIdResponses, DeleteRecycleBinDocumentData, DeleteRecycleBinDocumentErrors, DeleteRecycleBinDocumentResponses, DeleteRecycleBinMediaByIdData, DeleteRecycleBinMediaByIdErrors, DeleteRecycleBinMediaByIdResponses, DeleteRecycleBinMediaData, DeleteRecycleBinMediaErrors, DeleteRecycleBinMediaResponses, DeleteRedirectManagementByIdData, DeleteRedirectManagementByIdErrors, DeleteRedirectManagementByIdResponses, DeleteScriptByPathData, DeleteScriptByPathErrors, DeleteScriptByPathResponses, DeleteScriptFolderByPathData, DeleteScriptFolderByPathErrors, DeleteScriptFolderByPathResponses, DeleteStylesheetByPathData, DeleteStylesheetByPathErrors, DeleteStylesheetByPathResponses, DeleteStylesheetFolderByPathData, DeleteStylesheetFolderByPathErrors, DeleteStylesheetFolderByPathResponses, DeleteTemplateByIdData, DeleteTemplateByIdErrors, DeleteTemplateByIdResponses, DeleteTemporaryFileByIdData, DeleteTemporaryFileByIdErrors, DeleteTemporaryFileByIdResponses, DeleteUserAvatarByIdData, DeleteUserAvatarByIdErrors, DeleteUserAvatarByIdResponses, DeleteUserById2FaByProviderNameData, DeleteUserById2FaByProviderNameErrors, DeleteUserById2FaByProviderNameResponses, DeleteUserByIdClientCredentialsByClientIdData, DeleteUserByIdClientCredentialsByClientIdErrors, DeleteUserByIdClientCredentialsByClientIdResponses, DeleteUserByIdData, DeleteUserByIdErrors, DeleteUserByIdResponses, DeleteUserCurrent2FaByProviderNameData, DeleteUserCurrent2FaByProviderNameErrors, DeleteUserCurrent2FaByProviderNameResponses, DeleteUserData, DeleteUserDataByIdData, DeleteUserDataByIdErrors, DeleteUserDataByIdResponses, DeleteUserErrors, DeleteUserGroupByIdData, DeleteUserGroupByIdErrors, DeleteUserGroupByIdResponses, DeleteUserGroupByIdUsersData, DeleteUserGroupByIdUsersErrors, DeleteUserGroupByIdUsersResponses, DeleteUserGroupData, DeleteUserGroupErrors, DeleteUserGroupResponses, DeleteUserResponses, DeleteWebhookByIdData, DeleteWebhookByIdErrors, DeleteWebhookByIdResponses, GetCollectionDocumentByIdData, GetCollectionDocumentByIdErrors, GetCollectionDocumentByIdResponses, GetCollectionMediaData, GetCollectionMediaErrors, GetCollectionMediaResponses, GetCultureData, GetCultureErrors, GetCultureResponses, GetDataTypeBatchData, GetDataTypeBatchErrors, GetDataTypeBatchResponses, GetDataTypeByIdData, GetDataTypeByIdErrors, GetDataTypeByIdIsUsedData, GetDataTypeByIdIsUsedErrors, GetDataTypeByIdIsUsedResponses, GetDataTypeByIdReferencedByData, GetDataTypeByIdReferencedByErrors, GetDataTypeByIdReferencedByResponses, GetDataTypeByIdResponses, GetDataTypeByIdSchemaData, GetDataTypeByIdSchemaErrors, GetDataTypeByIdSchemaResponses, GetDataTypeConfigurationData, GetDataTypeConfigurationErrors, GetDataTypeConfigurationResponses, GetDataTypeFolderByIdData, GetDataTypeFolderByIdErrors, GetDataTypeFolderByIdResponses, GetDataTypeSchemasBatchData, GetDataTypeSchemasBatchErrors, GetDataTypeSchemasBatchResponses, GetDictionaryByIdData, GetDictionaryByIdErrors, GetDictionaryByIdExportData, GetDictionaryByIdExportErrors, GetDictionaryByIdExportResponses, GetDictionaryByIdResponses, GetDictionaryData, GetDictionaryErrors, GetDictionaryResponses, GetDocumentAreReferencedData, GetDocumentAreReferencedErrors, GetDocumentAreReferencedResponses, GetDocumentBlueprintByIdData, GetDocumentBlueprintByIdErrors, GetDocumentBlueprintByIdResponses, GetDocumentBlueprintByIdScaffoldData, GetDocumentBlueprintByIdScaffoldErrors, GetDocumentBlueprintByIdScaffoldResponses, GetDocumentBlueprintFolderByIdData, GetDocumentBlueprintFolderByIdErrors, GetDocumentBlueprintFolderByIdResponses, GetDocumentByIdAuditLogData, GetDocumentByIdAuditLogErrors, GetDocumentByIdAuditLogResponses, GetDocumentByIdAvailableSegmentOptionsData, GetDocumentByIdAvailableSegmentOptionsErrors, GetDocumentByIdAvailableSegmentOptionsResponses, GetDocumentByIdData, GetDocumentByIdDomainsData, GetDocumentByIdDomainsErrors, GetDocumentByIdDomainsResponses, GetDocumentByIdErrors, GetDocumentByIdNotificationsData, GetDocumentByIdNotificationsErrors, GetDocumentByIdNotificationsResponses, GetDocumentByIdPreviewUrlData, GetDocumentByIdPreviewUrlErrors, GetDocumentByIdPreviewUrlResponses, GetDocumentByIdPublicAccessData, GetDocumentByIdPublicAccessErrors, GetDocumentByIdPublicAccessResponses, GetDocumentByIdPublishedData, GetDocumentByIdPublishedErrors, GetDocumentByIdPublishedResponses, GetDocumentByIdPublishWithDescendantsResultByTaskIdData, GetDocumentByIdPublishWithDescendantsResultByTaskIdErrors, GetDocumentByIdPublishWithDescendantsResultByTaskIdResponses, GetDocumentByIdReferencedByData, GetDocumentByIdReferencedByErrors, GetDocumentByIdReferencedByResponses, GetDocumentByIdReferencedDescendantsData, GetDocumentByIdReferencedDescendantsErrors, GetDocumentByIdReferencedDescendantsResponses, GetDocumentByIdResponses, GetDocumentConfigurationData, GetDocumentConfigurationErrors, GetDocumentConfigurationResponses, GetDocumentTypeAllowedAtRootData, GetDocumentTypeAllowedAtRootErrors, GetDocumentTypeAllowedAtRootResponses, GetDocumentTypeBatchData, GetDocumentTypeBatchErrors, GetDocumentTypeBatchResponses, GetDocumentTypeByIdAllowedChildrenData, GetDocumentTypeByIdAllowedChildrenErrors, GetDocumentTypeByIdAllowedChildrenResponses, GetDocumentTypeByIdAllowedParentsData, GetDocumentTypeByIdAllowedParentsErrors, GetDocumentTypeByIdAllowedParentsResponses, GetDocumentTypeByIdBlueprintData, GetDocumentTypeByIdBlueprintErrors, GetDocumentTypeByIdBlueprintResponses, GetDocumentTypeByIdCompositionReferencesData, GetDocumentTypeByIdCompositionReferencesErrors, GetDocumentTypeByIdCompositionReferencesResponses, GetDocumentTypeByIdData, GetDocumentTypeByIdErrors, GetDocumentTypeByIdExportData, GetDocumentTypeByIdExportErrors, GetDocumentTypeByIdExportResponses, GetDocumentTypeByIdResponses, GetDocumentTypeByIdSchemaData, GetDocumentTypeByIdSchemaErrors, GetDocumentTypeByIdSchemaResponses, GetDocumentTypeConfigurationData, GetDocumentTypeConfigurationErrors, GetDocumentTypeConfigurationResponses, GetDocumentTypeFolderByIdData, GetDocumentTypeFolderByIdErrors, GetDocumentTypeFolderByIdResponses, GetDocumentUrlsData, GetDocumentUrlsErrors, GetDocumentUrlsResponses, GetDocumentVersionByIdData, GetDocumentVersionByIdErrors, GetDocumentVersionByIdResponses, GetDocumentVersionData, GetDocumentVersionErrors, GetDocumentVersionResponses, GetDynamicRootStepsData, GetDynamicRootStepsErrors, GetDynamicRootStepsResponses, GetFilterDataTypeData, GetFilterDataTypeErrors, GetFilterDataTypeResponses, GetFilterMemberData, GetFilterMemberErrors, GetFilterMemberResponses, GetFilterUserData, GetFilterUserErrors, GetFilterUserGroupData, GetFilterUserGroupErrors, GetFilterUserGroupResponses, GetFilterUserResponses, GetHealthCheckGroupByNameData, GetHealthCheckGroupByNameErrors, GetHealthCheckGroupByNameResponses, GetHealthCheckGroupData, GetHealthCheckGroupErrors, GetHealthCheckGroupResponses, GetHelpData, GetHelpErrors, GetHelpResponses, GetImagingResizeUrlsData, GetImagingResizeUrlsErrors, GetImagingResizeUrlsResponses, GetImportAnalyzeData, GetImportAnalyzeErrors, GetImportAnalyzeResponses, GetIndexerByIndexNameData, GetIndexerByIndexNameErrors, GetIndexerByIndexNameResponses, GetIndexerData, GetIndexerErrors, GetIndexerResponses, GetInstallSettingsData, GetInstallSettingsErrors, GetInstallSettingsResponses, GetItemDataTypeAncestorsData, GetItemDataTypeAncestorsErrors, GetItemDataTypeAncestorsResponses, GetItemDataTypeData, GetItemDataTypeErrors, GetItemDataTypeResponses, GetItemDataTypeSearchData, GetItemDataTypeSearchErrors, GetItemDataTypeSearchResponses, GetItemDictionaryData, GetItemDictionaryErrors, GetItemDictionaryResponses, GetItemDocumentAncestorsData, GetItemDocumentAncestorsErrors, GetItemDocumentAncestorsResponses, GetItemDocumentBlueprintData, GetItemDocumentBlueprintErrors, GetItemDocumentBlueprintResponses, GetItemDocumentData, GetItemDocumentErrors, GetItemDocumentResponses, GetItemDocumentSearchData, GetItemDocumentSearchErrors, GetItemDocumentSearchResponses, GetItemDocumentTypeAncestorsData, GetItemDocumentTypeAncestorsErrors, GetItemDocumentTypeAncestorsResponses, GetItemDocumentTypeData, GetItemDocumentTypeErrors, GetItemDocumentTypeResponses, GetItemDocumentTypeSearchData, GetItemDocumentTypeSearchErrors, GetItemDocumentTypeSearchResponses, GetItemLanguageData, GetItemLanguageDefaultData, GetItemLanguageDefaultErrors, GetItemLanguageDefaultResponses, GetItemLanguageErrors, GetItemLanguageResponses, GetItemMediaAncestorsData, GetItemMediaAncestorsErrors, GetItemMediaAncestorsResponses, GetItemMediaData, GetItemMediaErrors, GetItemMediaResponses, GetItemMediaSearchData, GetItemMediaSearchErrors, GetItemMediaSearchResponses, GetItemMediaTypeAllowedData, GetItemMediaTypeAllowedErrors, GetItemMediaTypeAllowedResponses, GetItemMediaTypeAncestorsData, GetItemMediaTypeAncestorsErrors, GetItemMediaTypeAncestorsResponses, GetItemMediaTypeData, GetItemMediaTypeErrors, GetItemMediaTypeFoldersData, GetItemMediaTypeFoldersErrors, GetItemMediaTypeFoldersResponses, GetItemMediaTypeResponses, GetItemMediaTypeSearchData, GetItemMediaTypeSearchErrors, GetItemMediaTypeSearchResponses, GetItemMemberAncestorsData, GetItemMemberAncestorsErrors, GetItemMemberAncestorsResponses, GetItemMemberData, GetItemMemberErrors, GetItemMemberGroupData, GetItemMemberGroupErrors, GetItemMemberGroupResponses, GetItemMemberResponses, GetItemMemberSearchData, GetItemMemberSearchErrors, GetItemMemberSearchResponses, GetItemMemberTypeAncestorsData, GetItemMemberTypeAncestorsErrors, GetItemMemberTypeAncestorsResponses, GetItemMemberTypeData, GetItemMemberTypeErrors, GetItemMemberTypeResponses, GetItemMemberTypeSearchData, GetItemMemberTypeSearchErrors, GetItemMemberTypeSearchResponses, GetItemPartialViewData, GetItemPartialViewErrors, GetItemPartialViewResponses, GetItemRelationTypeData, GetItemRelationTypeErrors, GetItemRelationTypeResponses, GetItemScriptData, GetItemScriptErrors, GetItemScriptResponses, GetItemStaticFileData, GetItemStaticFileErrors, GetItemStaticFileResponses, GetItemStylesheetData, GetItemStylesheetErrors, GetItemStylesheetResponses, GetItemTemplateAncestorsData, GetItemTemplateAncestorsErrors, GetItemTemplateAncestorsResponses, GetItemTemplateData, GetItemTemplateErrors, GetItemTemplateResponses, GetItemTemplateSearchData, GetItemTemplateSearchErrors, GetItemTemplateSearchResponses, GetItemUserData, GetItemUserErrors, GetItemUserGroupData, GetItemUserGroupErrors, GetItemUserGroupResponses, GetItemUserResponses, GetItemWebhookData, GetItemWebhookErrors, GetItemWebhookResponses, GetLanguageByIsoCodeData, GetLanguageByIsoCodeErrors, GetLanguageByIsoCodeResponses, GetLanguageData, GetLanguageErrors, GetLanguageResponses, GetLogViewerLevelCountData, GetLogViewerLevelCountErrors, GetLogViewerLevelCountResponses, GetLogViewerLevelData, GetLogViewerLevelErrors, GetLogViewerLevelResponses, GetLogViewerLogData, GetLogViewerLogErrors, GetLogViewerLogResponses, GetLogViewerMessageTemplateData, GetLogViewerMessageTemplateErrors, GetLogViewerMessageTemplateResponses, GetLogViewerSavedSearchByNameData, GetLogViewerSavedSearchByNameErrors, GetLogViewerSavedSearchByNameResponses, GetLogViewerSavedSearchData, GetLogViewerSavedSearchErrors, GetLogViewerSavedSearchResponses, GetLogViewerValidateLogsSizeData, GetLogViewerValidateLogsSizeErrors, GetLogViewerValidateLogsSizeResponses, GetManifestManifestData, GetManifestManifestErrors, GetManifestManifestPrivateData, GetManifestManifestPrivateErrors, GetManifestManifestPrivateResponses, GetManifestManifestPublicData, GetManifestManifestPublicResponses, GetManifestManifestResponses, GetMediaAreReferencedData, GetMediaAreReferencedErrors, GetMediaAreReferencedResponses, GetMediaByIdAuditLogData, GetMediaByIdAuditLogErrors, GetMediaByIdAuditLogResponses, GetMediaByIdData, GetMediaByIdErrors, GetMediaByIdReferencedByData, GetMediaByIdReferencedByErrors, GetMediaByIdReferencedByResponses, GetMediaByIdReferencedDescendantsData, GetMediaByIdReferencedDescendantsErrors, GetMediaByIdReferencedDescendantsResponses, GetMediaByIdResponses, GetMediaConfigurationData, GetMediaConfigurationErrors, GetMediaConfigurationResponses, GetMediaTypeAllowedAtRootData, GetMediaTypeAllowedAtRootErrors, GetMediaTypeAllowedAtRootResponses, GetMediaTypeBatchData, GetMediaTypeBatchErrors, GetMediaTypeBatchResponses, GetMediaTypeByIdAllowedChildrenData, GetMediaTypeByIdAllowedChildrenErrors, GetMediaTypeByIdAllowedChildrenResponses, GetMediaTypeByIdAllowedParentsData, GetMediaTypeByIdAllowedParentsErrors, GetMediaTypeByIdAllowedParentsResponses, GetMediaTypeByIdCompositionReferencesData, GetMediaTypeByIdCompositionReferencesErrors, GetMediaTypeByIdCompositionReferencesResponses, GetMediaTypeByIdData, GetMediaTypeByIdErrors, GetMediaTypeByIdExportData, GetMediaTypeByIdExportErrors, GetMediaTypeByIdExportResponses, GetMediaTypeByIdResponses, GetMediaTypeByIdSchemaData, GetMediaTypeByIdSchemaErrors, GetMediaTypeByIdSchemaResponses, GetMediaTypeConfigurationData, GetMediaTypeConfigurationErrors, GetMediaTypeConfigurationResponses, GetMediaTypeFolderByIdData, GetMediaTypeFolderByIdErrors, GetMediaTypeFolderByIdResponses, GetMediaUrlsData, GetMediaUrlsErrors, GetMediaUrlsResponses, GetMemberAreReferencedData, GetMemberAreReferencedErrors, GetMemberAreReferencedResponses, GetMemberByIdData, GetMemberByIdErrors, GetMemberByIdReferencedByData, GetMemberByIdReferencedByErrors, GetMemberByIdReferencedByResponses, GetMemberByIdReferencedDescendantsData, GetMemberByIdReferencedDescendantsErrors, GetMemberByIdReferencedDescendantsResponses, GetMemberByIdResponses, GetMemberConfigurationData, GetMemberConfigurationErrors, GetMemberConfigurationResponses, GetMemberGroupByIdData, GetMemberGroupByIdErrors, GetMemberGroupByIdResponses, GetMemberGroupData, GetMemberGroupErrors, GetMemberGroupResponses, GetMemberTypeAllowedAtRootData, GetMemberTypeAllowedAtRootErrors, GetMemberTypeAllowedAtRootResponses, GetMemberTypeBatchData, GetMemberTypeBatchErrors, GetMemberTypeBatchResponses, GetMemberTypeByIdCompositionReferencesData, GetMemberTypeByIdCompositionReferencesErrors, GetMemberTypeByIdCompositionReferencesResponses, GetMemberTypeByIdData, GetMemberTypeByIdErrors, GetMemberTypeByIdExportData, GetMemberTypeByIdExportErrors, GetMemberTypeByIdExportResponses, GetMemberTypeByIdResponses, GetMemberTypeByIdSchemaData, GetMemberTypeByIdSchemaErrors, GetMemberTypeByIdSchemaResponses, GetMemberTypeConfigurationData, GetMemberTypeConfigurationErrors, GetMemberTypeConfigurationResponses, GetMemberTypeFolderByIdData, GetMemberTypeFolderByIdErrors, GetMemberTypeFolderByIdResponses, GetModelsBuilderDashboardData, GetModelsBuilderDashboardErrors, GetModelsBuilderDashboardResponses, GetModelsBuilderStatusData, GetModelsBuilderStatusErrors, GetModelsBuilderStatusResponses, GetNewsDashboardData, GetNewsDashboardErrors, GetNewsDashboardResponses, GetObjectTypesData, GetObjectTypesErrors, GetObjectTypesResponses, GetOembedQueryData, GetOembedQueryErrors, GetOembedQueryResponses, GetPackageConfigurationData, GetPackageConfigurationErrors, GetPackageConfigurationResponses, GetPackageCreatedByIdData, GetPackageCreatedByIdDownloadData, GetPackageCreatedByIdDownloadErrors, GetPackageCreatedByIdDownloadResponses, GetPackageCreatedByIdErrors, GetPackageCreatedByIdResponses, GetPackageCreatedData, GetPackageCreatedErrors, GetPackageCreatedResponses, GetPackageMigrationStatusData, GetPackageMigrationStatusErrors, GetPackageMigrationStatusResponses, GetPartialViewByPathData, GetPartialViewByPathErrors, GetPartialViewByPathResponses, GetPartialViewFolderByPathData, GetPartialViewFolderByPathErrors, GetPartialViewFolderByPathResponses, GetPartialViewSnippetByIdData, GetPartialViewSnippetByIdErrors, GetPartialViewSnippetByIdResponses, GetPartialViewSnippetData, GetPartialViewSnippetErrors, GetPartialViewSnippetResponses, GetProfilingStatusData, GetProfilingStatusErrors, GetProfilingStatusResponses, GetPropertyTypeIsUsedData, GetPropertyTypeIsUsedErrors, GetPropertyTypeIsUsedResponses, GetPublishedCacheRebuildStatusData, GetPublishedCacheRebuildStatusErrors, GetPublishedCacheRebuildStatusResponses, GetRecycleBinDocumentByIdOriginalParentData, GetRecycleBinDocumentByIdOriginalParentErrors, GetRecycleBinDocumentByIdOriginalParentResponses, GetRecycleBinDocumentChildrenData, GetRecycleBinDocumentChildrenErrors, GetRecycleBinDocumentChildrenResponses, GetRecycleBinDocumentReferencedByData, GetRecycleBinDocumentReferencedByErrors, GetRecycleBinDocumentReferencedByResponses, GetRecycleBinDocumentRootData, GetRecycleBinDocumentRootErrors, GetRecycleBinDocumentRootResponses, GetRecycleBinDocumentSiblingsData, GetRecycleBinDocumentSiblingsErrors, GetRecycleBinDocumentSiblingsResponses, GetRecycleBinMediaByIdOriginalParentData, GetRecycleBinMediaByIdOriginalParentErrors, GetRecycleBinMediaByIdOriginalParentResponses, GetRecycleBinMediaChildrenData, GetRecycleBinMediaChildrenErrors, GetRecycleBinMediaChildrenResponses, GetRecycleBinMediaReferencedByData, GetRecycleBinMediaReferencedByErrors, GetRecycleBinMediaReferencedByResponses, GetRecycleBinMediaRootData, GetRecycleBinMediaRootErrors, GetRecycleBinMediaRootResponses, GetRecycleBinMediaSiblingsData, GetRecycleBinMediaSiblingsErrors, GetRecycleBinMediaSiblingsResponses, GetRedirectManagementByIdData, GetRedirectManagementByIdErrors, GetRedirectManagementByIdResponses, GetRedirectManagementData, GetRedirectManagementErrors, GetRedirectManagementResponses, GetRedirectManagementStatusData, GetRedirectManagementStatusErrors, GetRedirectManagementStatusResponses, GetRelationByRelationTypeIdData, GetRelationByRelationTypeIdErrors, GetRelationByRelationTypeIdResponses, GetRelationTypeByIdData, GetRelationTypeByIdErrors, GetRelationTypeByIdResponses, GetRelationTypeData, GetRelationTypeErrors, GetRelationTypeResponses, GetScriptByPathData, GetScriptByPathErrors, GetScriptByPathResponses, GetScriptFolderByPathData, GetScriptFolderByPathErrors, GetScriptFolderByPathResponses, GetSearcherBySearcherNameQueryData, GetSearcherBySearcherNameQueryErrors, GetSearcherBySearcherNameQueryResponses, GetSearcherData, GetSearcherErrors, GetSearcherResponses, GetSecurityConfigurationData, GetSecurityConfigurationErrors, GetSecurityConfigurationResponses, GetSegmentData, GetSegmentErrors, GetSegmentResponses, GetServerConfigurationData, GetServerConfigurationResponses, GetServerInformationData, GetServerInformationErrors, GetServerInformationResponses, GetServerStatusData, GetServerStatusErrors, GetServerStatusResponses, GetServerTroubleshootingData, GetServerTroubleshootingErrors, GetServerTroubleshootingResponses, GetServerUpgradeCheckData, GetServerUpgradeCheckErrors, GetServerUpgradeCheckResponses, GetStylesheetByPathData, GetStylesheetByPathErrors, GetStylesheetByPathResponses, GetStylesheetFolderByPathData, GetStylesheetFolderByPathErrors, GetStylesheetFolderByPathResponses, GetTagData, GetTagErrors, GetTagResponses, GetTelemetryData, GetTelemetryErrors, GetTelemetryLevelData, GetTelemetryLevelErrors, GetTelemetryLevelResponses, GetTelemetryResponses, GetTemplateByIdData, GetTemplateByIdErrors, GetTemplateByIdResponses, GetTemplateConfigurationData, GetTemplateConfigurationErrors, GetTemplateConfigurationResponses, GetTemplateQuerySettingsData, GetTemplateQuerySettingsErrors, GetTemplateQuerySettingsResponses, GetTemporaryFileByIdData, GetTemporaryFileByIdErrors, GetTemporaryFileByIdResponses, GetTemporaryFileConfigurationData, GetTemporaryFileConfigurationErrors, GetTemporaryFileConfigurationResponses, GetTreeDataTypeAncestorsData, GetTreeDataTypeAncestorsErrors, GetTreeDataTypeAncestorsResponses, GetTreeDataTypeChildrenData, GetTreeDataTypeChildrenErrors, GetTreeDataTypeChildrenResponses, GetTreeDataTypeRootData, GetTreeDataTypeRootErrors, GetTreeDataTypeRootResponses, GetTreeDataTypeSearchData, GetTreeDataTypeSearchErrors, GetTreeDataTypeSearchResponses, GetTreeDataTypeSiblingsData, GetTreeDataTypeSiblingsErrors, GetTreeDataTypeSiblingsResponses, GetTreeDictionaryAncestorsData, GetTreeDictionaryAncestorsErrors, GetTreeDictionaryAncestorsResponses, GetTreeDictionaryChildrenData, GetTreeDictionaryChildrenErrors, GetTreeDictionaryChildrenResponses, GetTreeDictionaryRootData, GetTreeDictionaryRootErrors, GetTreeDictionaryRootResponses, GetTreeDocumentAncestorsData, GetTreeDocumentAncestorsErrors, GetTreeDocumentAncestorsResponses, GetTreeDocumentBlueprintAncestorsData, GetTreeDocumentBlueprintAncestorsErrors, GetTreeDocumentBlueprintAncestorsResponses, GetTreeDocumentBlueprintChildrenData, GetTreeDocumentBlueprintChildrenErrors, GetTreeDocumentBlueprintChildrenResponses, GetTreeDocumentBlueprintRootData, GetTreeDocumentBlueprintRootErrors, GetTreeDocumentBlueprintRootResponses, GetTreeDocumentBlueprintSiblingsData, GetTreeDocumentBlueprintSiblingsErrors, GetTreeDocumentBlueprintSiblingsResponses, GetTreeDocumentChildrenData, GetTreeDocumentChildrenErrors, GetTreeDocumentChildrenResponses, GetTreeDocumentRootData, GetTreeDocumentRootErrors, GetTreeDocumentRootResponses, GetTreeDocumentSiblingsData, GetTreeDocumentSiblingsErrors, GetTreeDocumentSiblingsResponses, GetTreeDocumentTypeAncestorsData, GetTreeDocumentTypeAncestorsErrors, GetTreeDocumentTypeAncestorsResponses, GetTreeDocumentTypeChildrenData, GetTreeDocumentTypeChildrenErrors, GetTreeDocumentTypeChildrenResponses, GetTreeDocumentTypeRootData, GetTreeDocumentTypeRootErrors, GetTreeDocumentTypeRootResponses, GetTreeDocumentTypeSearchData, GetTreeDocumentTypeSearchErrors, GetTreeDocumentTypeSearchResponses, GetTreeDocumentTypeSiblingsData, GetTreeDocumentTypeSiblingsErrors, GetTreeDocumentTypeSiblingsResponses, GetTreeMediaAncestorsData, GetTreeMediaAncestorsErrors, GetTreeMediaAncestorsResponses, GetTreeMediaChildrenData, GetTreeMediaChildrenErrors, GetTreeMediaChildrenResponses, GetTreeMediaRootData, GetTreeMediaRootErrors, GetTreeMediaRootResponses, GetTreeMediaSiblingsData, GetTreeMediaSiblingsErrors, GetTreeMediaSiblingsResponses, GetTreeMediaTypeAncestorsData, GetTreeMediaTypeAncestorsErrors, GetTreeMediaTypeAncestorsResponses, GetTreeMediaTypeChildrenData, GetTreeMediaTypeChildrenErrors, GetTreeMediaTypeChildrenResponses, GetTreeMediaTypeRootData, GetTreeMediaTypeRootErrors, GetTreeMediaTypeRootResponses, GetTreeMediaTypeSiblingsData, GetTreeMediaTypeSiblingsErrors, GetTreeMediaTypeSiblingsResponses, GetTreeMemberGroupRootData, GetTreeMemberGroupRootErrors, GetTreeMemberGroupRootResponses, GetTreeMemberTypeAncestorsData, GetTreeMemberTypeAncestorsErrors, GetTreeMemberTypeAncestorsResponses, GetTreeMemberTypeChildrenData, GetTreeMemberTypeChildrenErrors, GetTreeMemberTypeChildrenResponses, GetTreeMemberTypeRootData, GetTreeMemberTypeRootErrors, GetTreeMemberTypeRootResponses, GetTreeMemberTypeSiblingsData, GetTreeMemberTypeSiblingsErrors, GetTreeMemberTypeSiblingsResponses, GetTreePartialViewAncestorsData, GetTreePartialViewAncestorsErrors, GetTreePartialViewAncestorsResponses, GetTreePartialViewChildrenData, GetTreePartialViewChildrenErrors, GetTreePartialViewChildrenResponses, GetTreePartialViewRootData, GetTreePartialViewRootErrors, GetTreePartialViewRootResponses, GetTreePartialViewSiblingsData, GetTreePartialViewSiblingsErrors, GetTreePartialViewSiblingsResponses, GetTreeScriptAncestorsData, GetTreeScriptAncestorsErrors, GetTreeScriptAncestorsResponses, GetTreeScriptChildrenData, GetTreeScriptChildrenErrors, GetTreeScriptChildrenResponses, GetTreeScriptRootData, GetTreeScriptRootErrors, GetTreeScriptRootResponses, GetTreeScriptSiblingsData, GetTreeScriptSiblingsErrors, GetTreeScriptSiblingsResponses, GetTreeStaticFileAncestorsData, GetTreeStaticFileAncestorsErrors, GetTreeStaticFileAncestorsResponses, GetTreeStaticFileChildrenData, GetTreeStaticFileChildrenErrors, GetTreeStaticFileChildrenResponses, GetTreeStaticFileRootData, GetTreeStaticFileRootErrors, GetTreeStaticFileRootResponses, GetTreeStylesheetAncestorsData, GetTreeStylesheetAncestorsErrors, GetTreeStylesheetAncestorsResponses, GetTreeStylesheetChildrenData, GetTreeStylesheetChildrenErrors, GetTreeStylesheetChildrenResponses, GetTreeStylesheetRootData, GetTreeStylesheetRootErrors, GetTreeStylesheetRootResponses, GetTreeStylesheetSiblingsData, GetTreeStylesheetSiblingsErrors, GetTreeStylesheetSiblingsResponses, GetTreeTemplateAncestorsData, GetTreeTemplateAncestorsErrors, GetTreeTemplateAncestorsResponses, GetTreeTemplateChildrenData, GetTreeTemplateChildrenErrors, GetTreeTemplateChildrenResponses, GetTreeTemplateRootData, GetTreeTemplateRootErrors, GetTreeTemplateRootResponses, GetTreeTemplateSiblingsData, GetTreeTemplateSiblingsErrors, GetTreeTemplateSiblingsResponses, GetUpgradeSettingsData, GetUpgradeSettingsErrors, GetUpgradeSettingsResponses, GetUserById2FaData, GetUserById2FaErrors, GetUserById2FaResponses, GetUserByIdCalculateStartNodesData, GetUserByIdCalculateStartNodesErrors, GetUserByIdCalculateStartNodesResponses, GetUserByIdClientCredentialsData, GetUserByIdClientCredentialsErrors, GetUserByIdClientCredentialsResponses, GetUserByIdData, GetUserByIdErrors, GetUserByIdResponses, GetUserConfigurationData, GetUserConfigurationErrors, GetUserConfigurationResponses, GetUserCurrent2FaByProviderNameData, GetUserCurrent2FaByProviderNameErrors, GetUserCurrent2FaByProviderNameResponses, GetUserCurrent2FaData, GetUserCurrent2FaErrors, GetUserCurrent2FaResponses, GetUserCurrentConfigurationData, GetUserCurrentConfigurationErrors, GetUserCurrentConfigurationResponses, GetUserCurrentData, GetUserCurrentErrors, GetUserCurrentLoginProvidersData, GetUserCurrentLoginProvidersErrors, GetUserCurrentLoginProvidersResponses, GetUserCurrentPermissionsData, GetUserCurrentPermissionsDocumentData, GetUserCurrentPermissionsDocumentErrors, GetUserCurrentPermissionsDocumentResponses, GetUserCurrentPermissionsErrors, GetUserCurrentPermissionsMediaData, GetUserCurrentPermissionsMediaErrors, GetUserCurrentPermissionsMediaResponses, GetUserCurrentPermissionsResponses, GetUserCurrentResponses, GetUserData, GetUserDataByIdData, GetUserDataByIdErrors, GetUserDataByIdResponses, GetUserDataData, GetUserDataErrors, GetUserDataResponses, GetUserErrors, GetUserGroupByIdData, GetUserGroupByIdErrors, GetUserGroupByIdResponses, GetUserGroupData, GetUserGroupErrors, GetUserGroupResponses, GetUserResponses, GetWebhookByIdData, GetWebhookByIdErrors, GetWebhookByIdLogsData, GetWebhookByIdLogsErrors, GetWebhookByIdLogsResponses, GetWebhookByIdResponses, GetWebhookData, GetWebhookErrors, GetWebhookEventsData, GetWebhookEventsErrors, GetWebhookEventsResponses, GetWebhookLogsData, GetWebhookLogsErrors, GetWebhookLogsResponses, GetWebhookResponses, PostDataTypeByIdCopyData, PostDataTypeByIdCopyErrors, PostDataTypeByIdCopyResponses, PostDataTypeData, PostDataTypeErrors, PostDataTypeFolderData, PostDataTypeFolderErrors, PostDataTypeFolderResponses, PostDataTypeResponses, PostDictionaryData, PostDictionaryErrors, PostDictionaryImportData, PostDictionaryImportErrors, PostDictionaryImportResponses, PostDictionaryResponses, PostDocumentBlueprintData, PostDocumentBlueprintErrors, PostDocumentBlueprintFolderData, PostDocumentBlueprintFolderErrors, PostDocumentBlueprintFolderResponses, PostDocumentBlueprintFromDocumentData, PostDocumentBlueprintFromDocumentErrors, PostDocumentBlueprintFromDocumentResponses, PostDocumentBlueprintResponses, PostDocumentByIdCopyData, PostDocumentByIdCopyErrors, PostDocumentByIdCopyResponses, PostDocumentByIdPublicAccessData, PostDocumentByIdPublicAccessErrors, PostDocumentByIdPublicAccessResponses, PostDocumentData, PostDocumentErrors, PostDocumentResponses, PostDocumentTypeAvailableCompositionsData, PostDocumentTypeAvailableCompositionsErrors, PostDocumentTypeAvailableCompositionsResponses, PostDocumentTypeByIdCopyData, PostDocumentTypeByIdCopyErrors, PostDocumentTypeByIdCopyResponses, PostDocumentTypeByIdTemplateData, PostDocumentTypeByIdTemplateErrors, PostDocumentTypeByIdTemplateResponses, PostDocumentTypeData, PostDocumentTypeErrors, PostDocumentTypeFolderData, PostDocumentTypeFolderErrors, PostDocumentTypeFolderResponses, PostDocumentTypeImportData, PostDocumentTypeImportErrors, PostDocumentTypeImportResponses, PostDocumentTypeResponses, PostDocumentValidateData, PostDocumentValidateErrors, PostDocumentValidateResponses, PostDocumentVersionByIdRollbackData, PostDocumentVersionByIdRollbackErrors, PostDocumentVersionByIdRollbackResponses, PostDynamicRootQueryData, PostDynamicRootQueryErrors, PostDynamicRootQueryResponses, PostHealthCheckExecuteActionData, PostHealthCheckExecuteActionErrors, PostHealthCheckExecuteActionResponses, PostHealthCheckGroupByNameCheckData, PostHealthCheckGroupByNameCheckErrors, PostHealthCheckGroupByNameCheckResponses, PostIndexerByIndexNameRebuildData, PostIndexerByIndexNameRebuildErrors, PostIndexerByIndexNameRebuildResponses, PostInstallSetupData, PostInstallSetupErrors, PostInstallSetupResponses, PostInstallValidateDatabaseData, PostInstallValidateDatabaseErrors, PostInstallValidateDatabaseResponses, PostLanguageData, PostLanguageErrors, PostLanguageResponses, PostLogViewerSavedSearchData, PostLogViewerSavedSearchErrors, PostLogViewerSavedSearchResponses, PostMediaData, PostMediaErrors, PostMediaResponses, PostMediaTypeAvailableCompositionsData, PostMediaTypeAvailableCompositionsErrors, PostMediaTypeAvailableCompositionsResponses, PostMediaTypeByIdCopyData, PostMediaTypeByIdCopyErrors, PostMediaTypeByIdCopyResponses, PostMediaTypeData, PostMediaTypeErrors, PostMediaTypeFolderData, PostMediaTypeFolderErrors, PostMediaTypeFolderResponses, PostMediaTypeImportData, PostMediaTypeImportErrors, PostMediaTypeImportResponses, PostMediaTypeResponses, PostMediaValidateData, PostMediaValidateErrors, PostMediaValidateResponses, PostMemberData, PostMemberErrors, PostMemberGroupData, PostMemberGroupErrors, PostMemberGroupResponses, PostMemberResponses, PostMemberTypeAvailableCompositionsData, PostMemberTypeAvailableCompositionsErrors, PostMemberTypeAvailableCompositionsResponses, PostMemberTypeByIdCopyData, PostMemberTypeByIdCopyErrors, PostMemberTypeByIdCopyResponses, PostMemberTypeData, PostMemberTypeErrors, PostMemberTypeFolderData, PostMemberTypeFolderErrors, PostMemberTypeFolderResponses, PostMemberTypeImportData, PostMemberTypeImportErrors, PostMemberTypeImportResponses, PostMemberTypeResponses, PostMemberValidateData, PostMemberValidateErrors, PostMemberValidateResponses, PostModelsBuilderBuildData, PostModelsBuilderBuildErrors, PostModelsBuilderBuildResponses, PostPackageByNameRunMigrationData, PostPackageByNameRunMigrationErrors, PostPackageByNameRunMigrationResponses, PostPackageCreatedData, PostPackageCreatedErrors, PostPackageCreatedResponses, PostPartialViewData, PostPartialViewErrors, PostPartialViewFolderData, PostPartialViewFolderErrors, PostPartialViewFolderResponses, PostPartialViewResponses, PostPreviewData, PostPreviewErrors, PostPreviewResponses, PostPublishedCacheRebuildData, PostPublishedCacheRebuildErrors, PostPublishedCacheRebuildResponses, PostPublishedCacheReloadData, PostPublishedCacheReloadErrors, PostPublishedCacheReloadResponses, PostRedirectManagementStatusData, PostRedirectManagementStatusErrors, PostRedirectManagementStatusResponses, PostScriptData, PostScriptErrors, PostScriptFolderData, PostScriptFolderErrors, PostScriptFolderResponses, PostScriptResponses, PostSecurityForgotPasswordData, PostSecurityForgotPasswordErrors, PostSecurityForgotPasswordResetData, PostSecurityForgotPasswordResetErrors, PostSecurityForgotPasswordResetResponses, PostSecurityForgotPasswordResponses, PostSecurityForgotPasswordVerifyData, PostSecurityForgotPasswordVerifyErrors, PostSecurityForgotPasswordVerifyResponses, PostStylesheetData, PostStylesheetErrors, PostStylesheetFolderData, PostStylesheetFolderErrors, PostStylesheetFolderResponses, PostStylesheetResponses, PostTelemetryLevelData, PostTelemetryLevelErrors, PostTelemetryLevelResponses, PostTemplateData, PostTemplateErrors, PostTemplateQueryExecuteData, PostTemplateQueryExecuteErrors, PostTemplateQueryExecuteResponses, PostTemplateResponses, PostTemporaryFileData, PostTemporaryFileErrors, PostTemporaryFileResponses, PostUpgradeAuthorizeData, PostUpgradeAuthorizeErrors, PostUpgradeAuthorizeResponses, PostUserAvatarByIdData, PostUserAvatarByIdErrors, PostUserAvatarByIdResponses, PostUserByIdChangePasswordData, PostUserByIdChangePasswordErrors, PostUserByIdChangePasswordResponses, PostUserByIdClientCredentialsData, PostUserByIdClientCredentialsErrors, PostUserByIdClientCredentialsResponses, PostUserByIdResetPasswordData, PostUserByIdResetPasswordErrors, PostUserByIdResetPasswordResponses, PostUserCurrent2FaByProviderNameData, PostUserCurrent2FaByProviderNameErrors, PostUserCurrent2FaByProviderNameResponses, PostUserCurrentAvatarData, PostUserCurrentAvatarErrors, PostUserCurrentAvatarResponses, PostUserCurrentChangePasswordData, PostUserCurrentChangePasswordErrors, PostUserCurrentChangePasswordResponses, PostUserData, PostUserDataData, PostUserDataErrors, PostUserDataResponses, PostUserDisableData, PostUserDisableErrors, PostUserDisableResponses, PostUserEnableData, PostUserEnableErrors, PostUserEnableResponses, PostUserErrors, PostUserGroupByIdUsersData, PostUserGroupByIdUsersErrors, PostUserGroupByIdUsersResponses, PostUserGroupData, PostUserGroupErrors, PostUserGroupResponses, PostUserInviteCreatePasswordData, PostUserInviteCreatePasswordErrors, PostUserInviteCreatePasswordResponses, PostUserInviteData, PostUserInviteErrors, PostUserInviteResendData, PostUserInviteResendErrors, PostUserInviteResendResponses, PostUserInviteResponses, PostUserInviteVerifyData, PostUserInviteVerifyErrors, PostUserInviteVerifyResponses, PostUserResponses, PostUserSetUserGroupsData, PostUserSetUserGroupsErrors, PostUserSetUserGroupsResponses, PostUserUnlockData, PostUserUnlockErrors, PostUserUnlockResponses, PostWebhookData, PostWebhookErrors, PostWebhookResponses, PutDataTypeByIdData, PutDataTypeByIdErrors, PutDataTypeByIdMoveData, PutDataTypeByIdMoveErrors, PutDataTypeByIdMoveResponses, PutDataTypeByIdResponses, PutDataTypeFolderByIdData, PutDataTypeFolderByIdErrors, PutDataTypeFolderByIdResponses, PutDictionaryByIdData, PutDictionaryByIdErrors, PutDictionaryByIdMoveData, PutDictionaryByIdMoveErrors, PutDictionaryByIdMoveResponses, PutDictionaryByIdResponses, PutDocumentBlueprintByIdData, PutDocumentBlueprintByIdErrors, PutDocumentBlueprintByIdMoveData, PutDocumentBlueprintByIdMoveErrors, PutDocumentBlueprintByIdMoveResponses, PutDocumentBlueprintByIdResponses, PutDocumentBlueprintFolderByIdData, PutDocumentBlueprintFolderByIdErrors, PutDocumentBlueprintFolderByIdResponses, PutDocumentByIdData, PutDocumentByIdDomainsData, PutDocumentByIdDomainsErrors, PutDocumentByIdDomainsResponses, PutDocumentByIdErrors, PutDocumentByIdMoveData, PutDocumentByIdMoveErrors, PutDocumentByIdMoveResponses, PutDocumentByIdMoveToRecycleBinData, PutDocumentByIdMoveToRecycleBinErrors, PutDocumentByIdMoveToRecycleBinResponses, PutDocumentByIdNotificationsData, PutDocumentByIdNotificationsErrors, PutDocumentByIdNotificationsResponses, PutDocumentByIdPublicAccessData, PutDocumentByIdPublicAccessErrors, PutDocumentByIdPublicAccessResponses, PutDocumentByIdPublishData, PutDocumentByIdPublishErrors, PutDocumentByIdPublishResponses, PutDocumentByIdPublishWithDescendantsData, PutDocumentByIdPublishWithDescendantsErrors, PutDocumentByIdPublishWithDescendantsResponses, PutDocumentByIdResponses, PutDocumentByIdUnpublishData, PutDocumentByIdUnpublishErrors, PutDocumentByIdUnpublishResponses, PutDocumentSortData, PutDocumentSortErrors, PutDocumentSortResponses, PutDocumentTypeByIdData, PutDocumentTypeByIdErrors, PutDocumentTypeByIdImportData, PutDocumentTypeByIdImportErrors, PutDocumentTypeByIdImportResponses, PutDocumentTypeByIdMoveData, PutDocumentTypeByIdMoveErrors, PutDocumentTypeByIdMoveResponses, PutDocumentTypeByIdResponses, PutDocumentTypeFolderByIdData, PutDocumentTypeFolderByIdErrors, PutDocumentTypeFolderByIdResponses, PutDocumentVersionByIdPreventCleanupData, PutDocumentVersionByIdPreventCleanupErrors, PutDocumentVersionByIdPreventCleanupResponses, PutLanguageByIsoCodeData, PutLanguageByIsoCodeErrors, PutLanguageByIsoCodeResponses, PutMediaByIdData, PutMediaByIdErrors, PutMediaByIdMoveData, PutMediaByIdMoveErrors, PutMediaByIdMoveResponses, PutMediaByIdMoveToRecycleBinData, PutMediaByIdMoveToRecycleBinErrors, PutMediaByIdMoveToRecycleBinResponses, PutMediaByIdResponses, PutMediaByIdValidateData, PutMediaByIdValidateErrors, PutMediaByIdValidateResponses, PutMediaSortData, PutMediaSortErrors, PutMediaSortResponses, PutMediaTypeByIdData, PutMediaTypeByIdErrors, PutMediaTypeByIdImportData, PutMediaTypeByIdImportErrors, PutMediaTypeByIdImportResponses, PutMediaTypeByIdMoveData, PutMediaTypeByIdMoveErrors, PutMediaTypeByIdMoveResponses, PutMediaTypeByIdResponses, PutMediaTypeFolderByIdData, PutMediaTypeFolderByIdErrors, PutMediaTypeFolderByIdResponses, PutMemberByIdData, PutMemberByIdErrors, PutMemberByIdResponses, PutMemberByIdValidateData, PutMemberByIdValidateErrors, PutMemberByIdValidateResponses, PutMemberGroupByIdData, PutMemberGroupByIdErrors, PutMemberGroupByIdResponses, PutMemberTypeByIdData, PutMemberTypeByIdErrors, PutMemberTypeByIdImportData, PutMemberTypeByIdImportErrors, PutMemberTypeByIdImportResponses, PutMemberTypeByIdMoveData, PutMemberTypeByIdMoveErrors, PutMemberTypeByIdMoveResponses, PutMemberTypeByIdResponses, PutMemberTypeFolderByIdData, PutMemberTypeFolderByIdErrors, PutMemberTypeFolderByIdResponses, PutPackageCreatedByIdData, PutPackageCreatedByIdErrors, PutPackageCreatedByIdResponses, PutPartialViewByPathData, PutPartialViewByPathErrors, PutPartialViewByPathRenameData, PutPartialViewByPathRenameErrors, PutPartialViewByPathRenameResponses, PutPartialViewByPathResponses, PutProfilingStatusData, PutProfilingStatusErrors, PutProfilingStatusResponses, PutRecycleBinDocumentByIdRestoreData, PutRecycleBinDocumentByIdRestoreErrors, PutRecycleBinDocumentByIdRestoreResponses, PutRecycleBinMediaByIdRestoreData, PutRecycleBinMediaByIdRestoreErrors, PutRecycleBinMediaByIdRestoreResponses, PutScriptByPathData, PutScriptByPathErrors, PutScriptByPathRenameData, PutScriptByPathRenameErrors, PutScriptByPathRenameResponses, PutScriptByPathResponses, PutStylesheetByPathData, PutStylesheetByPathErrors, PutStylesheetByPathRenameData, PutStylesheetByPathRenameErrors, PutStylesheetByPathRenameResponses, PutStylesheetByPathResponses, PutTemplateByIdData, PutTemplateByIdErrors, PutTemplateByIdResponses, PutUmbracoManagementApiV11DocumentByIdValidate11Data, PutUmbracoManagementApiV11DocumentByIdValidate11Errors, PutUmbracoManagementApiV11DocumentByIdValidate11Responses, PutUserByIdData, PutUserByIdErrors, PutUserByIdResponses, PutUserDataData, PutUserDataErrors, PutUserDataResponses, PutUserGroupByIdData, PutUserGroupByIdErrors, PutUserGroupByIdResponses, PutWebhookByIdData, PutWebhookByIdErrors, PutWebhookByIdResponses } from './types.gen';
++import type { DeleteDataTypeByIdData, DeleteDataTypeByIdErrors, DeleteDataTypeByIdResponses, DeleteDataTypeFolderByIdData, DeleteDataTypeFolderByIdErrors, DeleteDataTypeFolderByIdResponses, DeleteDictionaryByIdData, DeleteDictionaryByIdErrors, DeleteDictionaryByIdResponses, DeleteDocumentBlueprintByIdData, DeleteDocumentBlueprintByIdErrors, DeleteDocumentBlueprintByIdResponses, DeleteDocumentBlueprintFolderByIdData, DeleteDocumentBlueprintFolderByIdErrors, DeleteDocumentBlueprintFolderByIdResponses, DeleteDocumentByIdData, DeleteDocumentByIdErrors, DeleteDocumentByIdPublicAccessData, DeleteDocumentByIdPublicAccessErrors, DeleteDocumentByIdPublicAccessResponses, DeleteDocumentByIdResponses, DeleteDocumentTypeByIdData, DeleteDocumentTypeByIdErrors, DeleteDocumentTypeByIdResponses, DeleteDocumentTypeFolderByIdData, DeleteDocumentTypeFolderByIdErrors, DeleteDocumentTypeFolderByIdResponses, DeleteLanguageByIsoCodeData, DeleteLanguageByIsoCodeErrors, DeleteLanguageByIsoCodeResponses, DeleteLogViewerSavedSearchByNameData, DeleteLogViewerSavedSearchByNameErrors, DeleteLogViewerSavedSearchByNameResponses, DeleteMediaByIdData, DeleteMediaByIdErrors, DeleteMediaByIdResponses, DeleteMediaTypeByIdData, DeleteMediaTypeByIdErrors, DeleteMediaTypeByIdResponses, DeleteMediaTypeFolderByIdData, DeleteMediaTypeFolderByIdErrors, DeleteMediaTypeFolderByIdResponses, DeleteMemberByIdData, DeleteMemberByIdErrors, DeleteMemberByIdResponses, DeleteMemberGroupByIdData, DeleteMemberGroupByIdErrors, DeleteMemberGroupByIdResponses, DeleteMemberTypeByIdData, DeleteMemberTypeByIdErrors, DeleteMemberTypeByIdResponses, DeleteMemberTypeFolderByIdData, DeleteMemberTypeFolderByIdErrors, DeleteMemberTypeFolderByIdResponses, DeletePackageCreatedByIdData, DeletePackageCreatedByIdErrors, DeletePackageCreatedByIdResponses, DeletePartialViewByPathData, DeletePartialViewByPathErrors, DeletePartialViewByPathResponses, DeletePartialViewFolderByPathData, DeletePartialViewFolderByPathErrors, DeletePartialViewFolderByPathResponses, DeletePreviewData, DeletePreviewResponses, DeleteRecycleBinDocumentByIdData, DeleteRecycleBinDocumentByIdErrors, DeleteRecycleBinDocumentByIdResponses, DeleteRecycleBinDocumentData, DeleteRecycleBinDocumentErrors, DeleteRecycleBinDocumentResponses, DeleteRecycleBinMediaByIdData, DeleteRecycleBinMediaByIdErrors, DeleteRecycleBinMediaByIdResponses, DeleteRecycleBinMediaData, DeleteRecycleBinMediaErrors, DeleteRecycleBinMediaResponses, DeleteRedirectManagementByIdData, DeleteRedirectManagementByIdErrors, DeleteRedirectManagementByIdResponses, DeleteScriptByPathData, DeleteScriptByPathErrors, DeleteScriptByPathResponses, DeleteScriptFolderByPathData, DeleteScriptFolderByPathErrors, DeleteScriptFolderByPathResponses, DeleteStylesheetByPathData, DeleteStylesheetByPathErrors, DeleteStylesheetByPathResponses, DeleteStylesheetFolderByPathData, DeleteStylesheetFolderByPathErrors, DeleteStylesheetFolderByPathResponses, DeleteTemplateByIdData, DeleteTemplateByIdErrors, DeleteTemplateByIdResponses, DeleteTemporaryFileByIdData, DeleteTemporaryFileByIdErrors, DeleteTemporaryFileByIdResponses, DeleteUserAvatarByIdData, DeleteUserAvatarByIdErrors, DeleteUserAvatarByIdResponses, DeleteUserById2FaByProviderNameData, DeleteUserById2FaByProviderNameErrors, DeleteUserById2FaByProviderNameResponses, DeleteUserByIdClientCredentialsByClientIdData, DeleteUserByIdClientCredentialsByClientIdErrors, DeleteUserByIdClientCredentialsByClientIdResponses, DeleteUserByIdData, DeleteUserByIdErrors, DeleteUserByIdResponses, DeleteUserCurrent2FaByProviderNameData, DeleteUserCurrent2FaByProviderNameErrors, DeleteUserCurrent2FaByProviderNameResponses, DeleteUserCurrentAvatarData, DeleteUserData, DeleteUserDataByIdData, DeleteUserDataByIdErrors, DeleteUserDataByIdResponses, DeleteUserErrors, DeleteUserGroupByIdData, DeleteUserGroupByIdErrors, DeleteUserGroupByIdResponses, DeleteUserGroupByIdUsersData, DeleteUserGroupByIdUsersErrors, DeleteUserGroupByIdUsersResponses, DeleteUserGroupData, DeleteUserGroupErrors, DeleteUserGroupResponses, DeleteUserResponses, DeleteWebhookByIdData, DeleteWebhookByIdErrors, DeleteWebhookByIdResponses, GetCollectionDocumentByIdData, GetCollectionDocumentByIdErrors, GetCollectionDocumentByIdResponses, GetCollectionMediaData, GetCollectionMediaErrors, GetCollectionMediaResponses, GetCultureData, GetCultureErrors, GetCultureResponses, GetDataTypeBatchData, GetDataTypeBatchErrors, GetDataTypeBatchResponses, GetDataTypeByIdData, GetDataTypeByIdErrors, GetDataTypeByIdIsUsedData, GetDataTypeByIdIsUsedErrors, GetDataTypeByIdIsUsedResponses, GetDataTypeByIdReferencedByData, GetDataTypeByIdReferencedByErrors, GetDataTypeByIdReferencedByResponses, GetDataTypeByIdResponses, GetDataTypeByIdSchemaData, GetDataTypeByIdSchemaErrors, GetDataTypeByIdSchemaResponses, GetDataTypeConfigurationData, GetDataTypeConfigurationErrors, GetDataTypeConfigurationResponses, GetDataTypeFolderByIdData, GetDataTypeFolderByIdErrors, GetDataTypeFolderByIdResponses, GetDataTypeSchemasBatchData, GetDataTypeSchemasBatchErrors, GetDataTypeSchemasBatchResponses, GetDictionaryByIdData, GetDictionaryByIdErrors, GetDictionaryByIdExportData, GetDictionaryByIdExportErrors, GetDictionaryByIdExportResponses, GetDictionaryByIdResponses, GetDictionaryData, GetDictionaryErrors, GetDictionaryResponses, GetDocumentAreReferencedData, GetDocumentAreReferencedErrors, GetDocumentAreReferencedResponses, GetDocumentBlueprintByIdData, GetDocumentBlueprintByIdErrors, GetDocumentBlueprintByIdResponses, GetDocumentBlueprintByIdScaffoldData, GetDocumentBlueprintByIdScaffoldErrors, GetDocumentBlueprintByIdScaffoldResponses, GetDocumentBlueprintFolderByIdData, GetDocumentBlueprintFolderByIdErrors, GetDocumentBlueprintFolderByIdResponses, GetDocumentByIdAuditLogData, GetDocumentByIdAuditLogErrors, GetDocumentByIdAuditLogResponses, GetDocumentByIdAvailableSegmentOptionsData, GetDocumentByIdAvailableSegmentOptionsErrors, GetDocumentByIdAvailableSegmentOptionsResponses, GetDocumentByIdData, GetDocumentByIdDomainsData, GetDocumentByIdDomainsErrors, GetDocumentByIdDomainsResponses, GetDocumentByIdErrors, GetDocumentByIdNotificationsData, GetDocumentByIdNotificationsErrors, GetDocumentByIdNotificationsResponses, GetDocumentByIdPreviewUrlData, GetDocumentByIdPreviewUrlErrors, GetDocumentByIdPreviewUrlResponses, GetDocumentByIdPublicAccessData, GetDocumentByIdPublicAccessErrors, GetDocumentByIdPublicAccessResponses, GetDocumentByIdPublishedData, GetDocumentByIdPublishedErrors, GetDocumentByIdPublishedResponses, GetDocumentByIdPublishWithDescendantsResultByTaskIdData, GetDocumentByIdPublishWithDescendantsResultByTaskIdErrors, GetDocumentByIdPublishWithDescendantsResultByTaskIdResponses, GetDocumentByIdReferencedByData, GetDocumentByIdReferencedByErrors, GetDocumentByIdReferencedByResponses, GetDocumentByIdReferencedDescendantsData, GetDocumentByIdReferencedDescendantsErrors, GetDocumentByIdReferencedDescendantsResponses, GetDocumentByIdResponses, GetDocumentConfigurationData, GetDocumentConfigurationErrors, GetDocumentConfigurationResponses, GetDocumentTypeAllowedAtRootData, GetDocumentTypeAllowedAtRootErrors, GetDocumentTypeAllowedAtRootResponses, GetDocumentTypeBatchData, GetDocumentTypeBatchErrors, GetDocumentTypeBatchResponses, GetDocumentTypeByIdAllowedChildrenData, GetDocumentTypeByIdAllowedChildrenErrors, GetDocumentTypeByIdAllowedChildrenResponses, GetDocumentTypeByIdAllowedParentsData, GetDocumentTypeByIdAllowedParentsErrors, GetDocumentTypeByIdAllowedParentsResponses, GetDocumentTypeByIdBlueprintData, GetDocumentTypeByIdBlueprintErrors, GetDocumentTypeByIdBlueprintResponses, GetDocumentTypeByIdCompositionReferencesData, GetDocumentTypeByIdCompositionReferencesErrors, GetDocumentTypeByIdCompositionReferencesResponses, GetDocumentTypeByIdData, GetDocumentTypeByIdErrors, GetDocumentTypeByIdExportData, GetDocumentTypeByIdExportErrors, GetDocumentTypeByIdExportResponses, GetDocumentTypeByIdResponses, GetDocumentTypeByIdSchemaData, GetDocumentTypeByIdSchemaErrors, GetDocumentTypeByIdSchemaResponses, GetDocumentTypeConfigurationData, GetDocumentTypeConfigurationErrors, GetDocumentTypeConfigurationResponses, GetDocumentTypeFolderByIdData, GetDocumentTypeFolderByIdErrors, GetDocumentTypeFolderByIdResponses, GetDocumentUrlsData, GetDocumentUrlsErrors, GetDocumentUrlsResponses, GetDocumentVersionByIdData, GetDocumentVersionByIdErrors, GetDocumentVersionByIdResponses, GetDocumentVersionData, GetDocumentVersionErrors, GetDocumentVersionResponses, GetDynamicRootStepsData, GetDynamicRootStepsErrors, GetDynamicRootStepsResponses, GetFilterDataTypeData, GetFilterDataTypeErrors, GetFilterDataTypeResponses, GetFilterMemberData, GetFilterMemberErrors, GetFilterMemberResponses, GetFilterUserData, GetFilterUserErrors, GetFilterUserGroupData, GetFilterUserGroupErrors, GetFilterUserGroupResponses, GetFilterUserResponses, GetHealthCheckGroupByNameData, GetHealthCheckGroupByNameErrors, GetHealthCheckGroupByNameResponses, GetHealthCheckGroupData, GetHealthCheckGroupErrors, GetHealthCheckGroupResponses, GetHelpData, GetHelpErrors, GetHelpResponses, GetImagingResizeUrlsData, GetImagingResizeUrlsErrors, GetImagingResizeUrlsResponses, GetImportAnalyzeData, GetImportAnalyzeErrors, GetImportAnalyzeResponses, GetIndexerByIndexNameData, GetIndexerByIndexNameErrors, GetIndexerByIndexNameResponses, GetIndexerData, GetIndexerErrors, GetIndexerResponses, GetInstallSettingsData, GetInstallSettingsErrors, GetInstallSettingsResponses, GetItemDataTypeAncestorsData, GetItemDataTypeAncestorsErrors, GetItemDataTypeAncestorsResponses, GetItemDataTypeData, GetItemDataTypeErrors, GetItemDataTypeResponses, GetItemDataTypeSearchData, GetItemDataTypeSearchErrors, GetItemDataTypeSearchResponses, GetItemDictionaryData, GetItemDictionaryErrors, GetItemDictionaryResponses, GetItemDocumentAncestorsData, GetItemDocumentAncestorsErrors, GetItemDocumentAncestorsResponses, GetItemDocumentBlueprintData, GetItemDocumentBlueprintErrors, GetItemDocumentBlueprintResponses, GetItemDocumentData, GetItemDocumentErrors, GetItemDocumentResponses, GetItemDocumentSearchData, GetItemDocumentSearchErrors, GetItemDocumentSearchResponses, GetItemDocumentTypeAncestorsData, GetItemDocumentTypeAncestorsErrors, GetItemDocumentTypeAncestorsResponses, GetItemDocumentTypeData, GetItemDocumentTypeErrors, GetItemDocumentTypeResponses, GetItemDocumentTypeSearchData, GetItemDocumentTypeSearchErrors, GetItemDocumentTypeSearchResponses, GetItemLanguageData, GetItemLanguageDefaultData, GetItemLanguageDefaultErrors, GetItemLanguageDefaultResponses, GetItemLanguageErrors, GetItemLanguageResponses, GetItemMediaAncestorsData, GetItemMediaAncestorsErrors, GetItemMediaAncestorsResponses, GetItemMediaData, GetItemMediaErrors, GetItemMediaResponses, GetItemMediaSearchData, GetItemMediaSearchErrors, GetItemMediaSearchResponses, GetItemMediaTypeAllowedData, GetItemMediaTypeAllowedErrors, GetItemMediaTypeAllowedResponses, GetItemMediaTypeAncestorsData, GetItemMediaTypeAncestorsErrors, GetItemMediaTypeAncestorsResponses, GetItemMediaTypeData, GetItemMediaTypeErrors, GetItemMediaTypeFoldersData, GetItemMediaTypeFoldersErrors, GetItemMediaTypeFoldersResponses, GetItemMediaTypeResponses, GetItemMediaTypeSearchData, GetItemMediaTypeSearchErrors, GetItemMediaTypeSearchResponses, GetItemMemberAncestorsData, GetItemMemberAncestorsErrors, GetItemMemberAncestorsResponses, GetItemMemberData, GetItemMemberErrors, GetItemMemberGroupData, GetItemMemberGroupErrors, GetItemMemberGroupResponses, GetItemMemberResponses, GetItemMemberSearchData, GetItemMemberSearchErrors, GetItemMemberSearchResponses, GetItemMemberTypeAncestorsData, GetItemMemberTypeAncestorsErrors, GetItemMemberTypeAncestorsResponses, GetItemMemberTypeData, GetItemMemberTypeErrors, GetItemMemberTypeResponses, GetItemMemberTypeSearchData, GetItemMemberTypeSearchErrors, GetItemMemberTypeSearchResponses, GetItemPartialViewData, GetItemPartialViewErrors, GetItemPartialViewResponses, GetItemRelationTypeData, GetItemRelationTypeErrors, GetItemRelationTypeResponses, GetItemScriptData, GetItemScriptErrors, GetItemScriptResponses, GetItemStaticFileData, GetItemStaticFileErrors, GetItemStaticFileResponses, GetItemStylesheetData, GetItemStylesheetErrors, GetItemStylesheetResponses, GetItemTemplateAncestorsData, GetItemTemplateAncestorsErrors, GetItemTemplateAncestorsResponses, GetItemTemplateData, GetItemTemplateErrors, GetItemTemplateResponses, GetItemTemplateSearchData, GetItemTemplateSearchErrors, GetItemTemplateSearchResponses, GetItemUserData, GetItemUserErrors, GetItemUserGroupData, GetItemUserGroupErrors, GetItemUserGroupResponses, GetItemUserResponses, GetItemWebhookData, GetItemWebhookErrors, GetItemWebhookResponses, GetLanguageByIsoCodeData, GetLanguageByIsoCodeErrors, GetLanguageByIsoCodeResponses, GetLanguageData, GetLanguageErrors, GetLanguageResponses, GetLogViewerLevelCountData, GetLogViewerLevelCountErrors, GetLogViewerLevelCountResponses, GetLogViewerLevelData, GetLogViewerLevelErrors, GetLogViewerLevelResponses, GetLogViewerLogData, GetLogViewerLogErrors, GetLogViewerLogResponses, GetLogViewerMessageTemplateData, GetLogViewerMessageTemplateErrors, GetLogViewerMessageTemplateResponses, GetLogViewerSavedSearchByNameData, GetLogViewerSavedSearchByNameErrors, GetLogViewerSavedSearchByNameResponses, GetLogViewerSavedSearchData, GetLogViewerSavedSearchErrors, GetLogViewerSavedSearchResponses, GetLogViewerValidateLogsSizeData, GetLogViewerValidateLogsSizeErrors, GetLogViewerValidateLogsSizeResponses, GetManifestManifestData, GetManifestManifestErrors, GetManifestManifestPrivateData, GetManifestManifestPrivateErrors, GetManifestManifestPrivateResponses, GetManifestManifestPublicData, GetManifestManifestPublicResponses, GetManifestManifestResponses, GetMediaAreReferencedData, GetMediaAreReferencedErrors, GetMediaAreReferencedResponses, GetMediaByIdAuditLogData, GetMediaByIdAuditLogErrors, GetMediaByIdAuditLogResponses, GetMediaByIdData, GetMediaByIdErrors, GetMediaByIdReferencedByData, GetMediaByIdReferencedByErrors, GetMediaByIdReferencedByResponses, GetMediaByIdReferencedDescendantsData, GetMediaByIdReferencedDescendantsErrors, GetMediaByIdReferencedDescendantsResponses, GetMediaByIdResponses, GetMediaConfigurationData, GetMediaConfigurationErrors, GetMediaConfigurationResponses, GetMediaTypeAllowedAtRootData, GetMediaTypeAllowedAtRootErrors, GetMediaTypeAllowedAtRootResponses, GetMediaTypeBatchData, GetMediaTypeBatchErrors, GetMediaTypeBatchResponses, GetMediaTypeByIdAllowedChildrenData, GetMediaTypeByIdAllowedChildrenErrors, GetMediaTypeByIdAllowedChildrenResponses, GetMediaTypeByIdAllowedParentsData, GetMediaTypeByIdAllowedParentsErrors, GetMediaTypeByIdAllowedParentsResponses, GetMediaTypeByIdCompositionReferencesData, GetMediaTypeByIdCompositionReferencesErrors, GetMediaTypeByIdCompositionReferencesResponses, GetMediaTypeByIdData, GetMediaTypeByIdErrors, GetMediaTypeByIdExportData, GetMediaTypeByIdExportErrors, GetMediaTypeByIdExportResponses, GetMediaTypeByIdResponses, GetMediaTypeByIdSchemaData, GetMediaTypeByIdSchemaErrors, GetMediaTypeByIdSchemaResponses, GetMediaTypeConfigurationData, GetMediaTypeConfigurationErrors, GetMediaTypeConfigurationResponses, GetMediaTypeFolderByIdData, GetMediaTypeFolderByIdErrors, GetMediaTypeFolderByIdResponses, GetMediaUrlsData, GetMediaUrlsErrors, GetMediaUrlsResponses, GetMemberAreReferencedData, GetMemberAreReferencedErrors, GetMemberAreReferencedResponses, GetMemberByIdData, GetMemberByIdErrors, GetMemberByIdReferencedByData, GetMemberByIdReferencedByErrors, GetMemberByIdReferencedByResponses, GetMemberByIdReferencedDescendantsData, GetMemberByIdReferencedDescendantsErrors, GetMemberByIdReferencedDescendantsResponses, GetMemberByIdResponses, GetMemberConfigurationData, GetMemberConfigurationErrors, GetMemberConfigurationResponses, GetMemberGroupByIdData, GetMemberGroupByIdErrors, GetMemberGroupByIdResponses, GetMemberGroupData, GetMemberGroupErrors, GetMemberGroupResponses, GetMemberTypeAllowedAtRootData, GetMemberTypeAllowedAtRootErrors, GetMemberTypeAllowedAtRootResponses, GetMemberTypeBatchData, GetMemberTypeBatchErrors, GetMemberTypeBatchResponses, GetMemberTypeByIdCompositionReferencesData, GetMemberTypeByIdCompositionReferencesErrors, GetMemberTypeByIdCompositionReferencesResponses, GetMemberTypeByIdData, GetMemberTypeByIdErrors, GetMemberTypeByIdExportData, GetMemberTypeByIdExportErrors, GetMemberTypeByIdExportResponses, GetMemberTypeByIdResponses, GetMemberTypeByIdSchemaData, GetMemberTypeByIdSchemaErrors, GetMemberTypeByIdSchemaResponses, GetMemberTypeConfigurationData, GetMemberTypeConfigurationErrors, GetMemberTypeConfigurationResponses, GetMemberTypeFolderByIdData, GetMemberTypeFolderByIdErrors, GetMemberTypeFolderByIdResponses, GetModelsBuilderDashboardData, GetModelsBuilderDashboardErrors, GetModelsBuilderDashboardResponses, GetModelsBuilderStatusData, GetModelsBuilderStatusErrors, GetModelsBuilderStatusResponses, GetNewsDashboardData, GetNewsDashboardErrors, GetNewsDashboardResponses, GetObjectTypesData, GetObjectTypesErrors, GetObjectTypesResponses, GetOembedQueryData, GetOembedQueryErrors, GetOembedQueryResponses, GetPackageConfigurationData, GetPackageConfigurationErrors, GetPackageConfigurationResponses, GetPackageCreatedByIdData, GetPackageCreatedByIdDownloadData, GetPackageCreatedByIdDownloadErrors, GetPackageCreatedByIdDownloadResponses, GetPackageCreatedByIdErrors, GetPackageCreatedByIdResponses, GetPackageCreatedData, GetPackageCreatedErrors, GetPackageCreatedResponses, GetPackageMigrationStatusData, GetPackageMigrationStatusErrors, GetPackageMigrationStatusResponses, GetPartialViewByPathData, GetPartialViewByPathErrors, GetPartialViewByPathResponses, GetPartialViewFolderByPathData, GetPartialViewFolderByPathErrors, GetPartialViewFolderByPathResponses, GetPartialViewSnippetByIdData, GetPartialViewSnippetByIdErrors, GetPartialViewSnippetByIdResponses, GetPartialViewSnippetData, GetPartialViewSnippetErrors, GetPartialViewSnippetResponses, GetProfilingStatusData, GetProfilingStatusErrors, GetProfilingStatusResponses, GetPropertyTypeIsUsedData, GetPropertyTypeIsUsedErrors, GetPropertyTypeIsUsedResponses, GetPublishedCacheRebuildStatusData, GetPublishedCacheRebuildStatusErrors, GetPublishedCacheRebuildStatusResponses, GetRecycleBinDocumentByIdOriginalParentData, GetRecycleBinDocumentByIdOriginalParentErrors, GetRecycleBinDocumentByIdOriginalParentResponses, GetRecycleBinDocumentChildrenData, GetRecycleBinDocumentChildrenErrors, GetRecycleBinDocumentChildrenResponses, GetRecycleBinDocumentReferencedByData, GetRecycleBinDocumentReferencedByErrors, GetRecycleBinDocumentReferencedByResponses, GetRecycleBinDocumentRootData, GetRecycleBinDocumentRootErrors, GetRecycleBinDocumentRootResponses, GetRecycleBinDocumentSiblingsData, GetRecycleBinDocumentSiblingsErrors, GetRecycleBinDocumentSiblingsResponses, GetRecycleBinMediaByIdOriginalParentData, GetRecycleBinMediaByIdOriginalParentErrors, GetRecycleBinMediaByIdOriginalParentResponses, GetRecycleBinMediaChildrenData, GetRecycleBinMediaChildrenErrors, GetRecycleBinMediaChildrenResponses, GetRecycleBinMediaReferencedByData, GetRecycleBinMediaReferencedByErrors, GetRecycleBinMediaReferencedByResponses, GetRecycleBinMediaRootData, GetRecycleBinMediaRootErrors, GetRecycleBinMediaRootResponses, GetRecycleBinMediaSiblingsData, GetRecycleBinMediaSiblingsErrors, GetRecycleBinMediaSiblingsResponses, GetRedirectManagementByIdData, GetRedirectManagementByIdErrors, GetRedirectManagementByIdResponses, GetRedirectManagementData, GetRedirectManagementErrors, GetRedirectManagementResponses, GetRedirectManagementStatusData, GetRedirectManagementStatusErrors, GetRedirectManagementStatusResponses, GetRelationByRelationTypeIdData, GetRelationByRelationTypeIdErrors, GetRelationByRelationTypeIdResponses, GetRelationTypeByIdData, GetRelationTypeByIdErrors, GetRelationTypeByIdResponses, GetRelationTypeData, GetRelationTypeErrors, GetRelationTypeResponses, GetScriptByPathData, GetScriptByPathErrors, GetScriptByPathResponses, GetScriptFolderByPathData, GetScriptFolderByPathErrors, GetScriptFolderByPathResponses, GetSearcherBySearcherNameQueryData, GetSearcherBySearcherNameQueryErrors, GetSearcherBySearcherNameQueryResponses, GetSearcherData, GetSearcherErrors, GetSearcherResponses, GetSecurityConfigurationData, GetSecurityConfigurationErrors, GetSecurityConfigurationResponses, GetSegmentData, GetSegmentErrors, GetSegmentResponses, GetServerConfigurationData, GetServerConfigurationResponses, GetServerInformationData, GetServerInformationErrors, GetServerInformationResponses, GetServerStatusData, GetServerStatusErrors, GetServerStatusResponses, GetServerTroubleshootingData, GetServerTroubleshootingErrors, GetServerTroubleshootingResponses, GetServerUpgradeCheckData, GetServerUpgradeCheckErrors, GetServerUpgradeCheckResponses, GetStylesheetByPathData, GetStylesheetByPathErrors, GetStylesheetByPathResponses, GetStylesheetFolderByPathData, GetStylesheetFolderByPathErrors, GetStylesheetFolderByPathResponses, GetTagData, GetTagErrors, GetTagResponses, GetTelemetryData, GetTelemetryErrors, GetTelemetryLevelData, GetTelemetryLevelErrors, GetTelemetryLevelResponses, GetTelemetryResponses, GetTemplateByIdData, GetTemplateByIdErrors, GetTemplateByIdResponses, GetTemplateConfigurationData, GetTemplateConfigurationErrors, GetTemplateConfigurationResponses, GetTemplateQuerySettingsData, GetTemplateQuerySettingsErrors, GetTemplateQuerySettingsResponses, GetTemporaryFileByIdData, GetTemporaryFileByIdErrors, GetTemporaryFileByIdResponses, GetTemporaryFileConfigurationData, GetTemporaryFileConfigurationErrors, GetTemporaryFileConfigurationResponses, GetTreeDataTypeAncestorsData, GetTreeDataTypeAncestorsErrors, GetTreeDataTypeAncestorsResponses, GetTreeDataTypeChildrenData, GetTreeDataTypeChildrenErrors, GetTreeDataTypeChildrenResponses, GetTreeDataTypeRootData, GetTreeDataTypeRootErrors, GetTreeDataTypeRootResponses, GetTreeDataTypeSearchData, GetTreeDataTypeSearchErrors, GetTreeDataTypeSearchResponses, GetTreeDataTypeSiblingsData, GetTreeDataTypeSiblingsErrors, GetTreeDataTypeSiblingsResponses, GetTreeDictionaryAncestorsData, GetTreeDictionaryAncestorsErrors, GetTreeDictionaryAncestorsResponses, GetTreeDictionaryChildrenData, GetTreeDictionaryChildrenErrors, GetTreeDictionaryChildrenResponses, GetTreeDictionaryRootData, GetTreeDictionaryRootErrors, GetTreeDictionaryRootResponses, GetTreeDocumentAncestorsData, GetTreeDocumentAncestorsErrors, GetTreeDocumentAncestorsResponses, GetTreeDocumentBlueprintAncestorsData, GetTreeDocumentBlueprintAncestorsErrors, GetTreeDocumentBlueprintAncestorsResponses, GetTreeDocumentBlueprintChildrenData, GetTreeDocumentBlueprintChildrenErrors, GetTreeDocumentBlueprintChildrenResponses, GetTreeDocumentBlueprintRootData, GetTreeDocumentBlueprintRootErrors, GetTreeDocumentBlueprintRootResponses, GetTreeDocumentBlueprintSiblingsData, GetTreeDocumentBlueprintSiblingsErrors, GetTreeDocumentBlueprintSiblingsResponses, GetTreeDocumentChildrenData, GetTreeDocumentChildrenErrors, GetTreeDocumentChildrenResponses, GetTreeDocumentRootData, GetTreeDocumentRootErrors, GetTreeDocumentRootResponses, GetTreeDocumentSiblingsData, GetTreeDocumentSiblingsErrors, GetTreeDocumentSiblingsResponses, GetTreeDocumentTypeAncestorsData, GetTreeDocumentTypeAncestorsErrors, GetTreeDocumentTypeAncestorsResponses, GetTreeDocumentTypeChildrenData, GetTreeDocumentTypeChildrenErrors, GetTreeDocumentTypeChildrenResponses, GetTreeDocumentTypeRootData, GetTreeDocumentTypeRootErrors, GetTreeDocumentTypeRootResponses, GetTreeDocumentTypeSearchData, GetTreeDocumentTypeSearchErrors, GetTreeDocumentTypeSearchResponses, GetTreeDocumentTypeSiblingsData, GetTreeDocumentTypeSiblingsErrors, GetTreeDocumentTypeSiblingsResponses, GetTreeMediaAncestorsData, GetTreeMediaAncestorsErrors, GetTreeMediaAncestorsResponses, GetTreeMediaChildrenData, GetTreeMediaChildrenErrors, GetTreeMediaChildrenResponses, GetTreeMediaRootData, GetTreeMediaRootErrors, GetTreeMediaRootResponses, GetTreeMediaSiblingsData, GetTreeMediaSiblingsErrors, GetTreeMediaSiblingsResponses, GetTreeMediaTypeAncestorsData, GetTreeMediaTypeAncestorsErrors, GetTreeMediaTypeAncestorsResponses, GetTreeMediaTypeChildrenData, GetTreeMediaTypeChildrenErrors, GetTreeMediaTypeChildrenResponses, GetTreeMediaTypeRootData, GetTreeMediaTypeRootErrors, GetTreeMediaTypeRootResponses, GetTreeMediaTypeSiblingsData, GetTreeMediaTypeSiblingsErrors, GetTreeMediaTypeSiblingsResponses, GetTreeMemberGroupRootData, GetTreeMemberGroupRootErrors, GetTreeMemberGroupRootResponses, GetTreeMemberTypeAncestorsData, GetTreeMemberTypeAncestorsErrors, GetTreeMemberTypeAncestorsResponses, GetTreeMemberTypeChildrenData, GetTreeMemberTypeChildrenErrors, GetTreeMemberTypeChildrenResponses, GetTreeMemberTypeRootData, GetTreeMemberTypeRootErrors, GetTreeMemberTypeRootResponses, GetTreeMemberTypeSiblingsData, GetTreeMemberTypeSiblingsErrors, GetTreeMemberTypeSiblingsResponses, GetTreePartialViewAncestorsData, GetTreePartialViewAncestorsErrors, GetTreePartialViewAncestorsResponses, GetTreePartialViewChildrenData, GetTreePartialViewChildrenErrors, GetTreePartialViewChildrenResponses, GetTreePartialViewRootData, GetTreePartialViewRootErrors, GetTreePartialViewRootResponses, GetTreePartialViewSiblingsData, GetTreePartialViewSiblingsErrors, GetTreePartialViewSiblingsResponses, GetTreeScriptAncestorsData, GetTreeScriptAncestorsErrors, GetTreeScriptAncestorsResponses, GetTreeScriptChildrenData, GetTreeScriptChildrenErrors, GetTreeScriptChildrenResponses, GetTreeScriptRootData, GetTreeScriptRootErrors, GetTreeScriptRootResponses, GetTreeScriptSiblingsData, GetTreeScriptSiblingsErrors, GetTreeScriptSiblingsResponses, GetTreeStaticFileAncestorsData, GetTreeStaticFileAncestorsErrors, GetTreeStaticFileAncestorsResponses, GetTreeStaticFileChildrenData, GetTreeStaticFileChildrenErrors, GetTreeStaticFileChildrenResponses, GetTreeStaticFileRootData, GetTreeStaticFileRootErrors, GetTreeStaticFileRootResponses, GetTreeStylesheetAncestorsData, GetTreeStylesheetAncestorsErrors, GetTreeStylesheetAncestorsResponses, GetTreeStylesheetChildrenData, GetTreeStylesheetChildrenErrors, GetTreeStylesheetChildrenResponses, GetTreeStylesheetRootData, GetTreeStylesheetRootErrors, GetTreeStylesheetRootResponses, GetTreeStylesheetSiblingsData, GetTreeStylesheetSiblingsErrors, GetTreeStylesheetSiblingsResponses, GetTreeTemplateAncestorsData, GetTreeTemplateAncestorsErrors, GetTreeTemplateAncestorsResponses, GetTreeTemplateChildrenData, GetTreeTemplateChildrenErrors, GetTreeTemplateChildrenResponses, GetTreeTemplateRootData, GetTreeTemplateRootErrors, GetTreeTemplateRootResponses, GetTreeTemplateSiblingsData, GetTreeTemplateSiblingsErrors, GetTreeTemplateSiblingsResponses, GetUpgradeSettingsData, GetUpgradeSettingsErrors, GetUpgradeSettingsResponses, GetUserById2FaData, GetUserById2FaErrors, GetUserById2FaResponses, GetUserByIdCalculateStartNodesData, GetUserByIdCalculateStartNodesErrors, GetUserByIdCalculateStartNodesResponses, GetUserByIdClientCredentialsData, GetUserByIdClientCredentialsErrors, GetUserByIdClientCredentialsResponses, GetUserByIdData, GetUserByIdErrors, GetUserByIdResponses, GetUserConfigurationData, GetUserConfigurationErrors, GetUserConfigurationResponses, GetUserCurrent2FaByProviderNameData, GetUserCurrent2FaByProviderNameErrors, GetUserCurrent2FaByProviderNameResponses, GetUserCurrent2FaData, GetUserCurrent2FaErrors, GetUserCurrent2FaResponses, GetUserCurrentConfigurationData, GetUserCurrentConfigurationErrors, GetUserCurrentConfigurationResponses, GetUserCurrentData, GetUserCurrentErrors, GetUserCurrentLoginProvidersData, GetUserCurrentLoginProvidersErrors, GetUserCurrentLoginProvidersResponses, GetUserCurrentPermissionsData, GetUserCurrentPermissionsDocumentData, GetUserCurrentPermissionsDocumentErrors, GetUserCurrentPermissionsDocumentResponses, GetUserCurrentPermissionsErrors, GetUserCurrentPermissionsMediaData, GetUserCurrentPermissionsMediaErrors, GetUserCurrentPermissionsMediaResponses, GetUserCurrentPermissionsResponses, GetUserCurrentResponses, GetUserData, GetUserDataByIdData, GetUserDataByIdErrors, GetUserDataByIdResponses, GetUserDataData, GetUserDataErrors, GetUserDataResponses, GetUserErrors, GetUserGroupByIdData, GetUserGroupByIdErrors, GetUserGroupByIdResponses, GetUserGroupData, GetUserGroupErrors, GetUserGroupResponses, GetUserResponses, GetWebhookByIdData, GetWebhookByIdErrors, GetWebhookByIdLogsData, GetWebhookByIdLogsErrors, GetWebhookByIdLogsResponses, GetWebhookByIdResponses, GetWebhookData, GetWebhookErrors, GetWebhookEventsData, GetWebhookEventsErrors, GetWebhookEventsResponses, GetWebhookLogsData, GetWebhookLogsErrors, GetWebhookLogsResponses, GetWebhookResponses, PostDataTypeByIdCopyData, PostDataTypeByIdCopyErrors, PostDataTypeByIdCopyResponses, PostDataTypeData, PostDataTypeErrors, PostDataTypeFolderData, PostDataTypeFolderErrors, PostDataTypeFolderResponses, PostDataTypeResponses, PostDictionaryData, PostDictionaryErrors, PostDictionaryImportData, PostDictionaryImportErrors, PostDictionaryImportResponses, PostDictionaryResponses, PostDocumentBlueprintData, PostDocumentBlueprintErrors, PostDocumentBlueprintFolderData, PostDocumentBlueprintFolderErrors, PostDocumentBlueprintFolderResponses, PostDocumentBlueprintFromDocumentData, PostDocumentBlueprintFromDocumentErrors, PostDocumentBlueprintFromDocumentResponses, PostDocumentBlueprintResponses, PostDocumentByIdCopyData, PostDocumentByIdCopyErrors, PostDocumentByIdCopyResponses, PostDocumentByIdPublicAccessData, PostDocumentByIdPublicAccessErrors, PostDocumentByIdPublicAccessResponses, PostDocumentData, PostDocumentErrors, PostDocumentResponses, PostDocumentTypeAvailableCompositionsData, PostDocumentTypeAvailableCompositionsErrors, PostDocumentTypeAvailableCompositionsResponses, PostDocumentTypeByIdCopyData, PostDocumentTypeByIdCopyErrors, PostDocumentTypeByIdCopyResponses, PostDocumentTypeByIdTemplateData, PostDocumentTypeByIdTemplateErrors, PostDocumentTypeByIdTemplateResponses, PostDocumentTypeData, PostDocumentTypeErrors, PostDocumentTypeFolderData, PostDocumentTypeFolderErrors, PostDocumentTypeFolderResponses, PostDocumentTypeImportData, PostDocumentTypeImportErrors, PostDocumentTypeImportResponses, PostDocumentTypeResponses, PostDocumentValidateData, PostDocumentValidateErrors, PostDocumentValidateResponses, PostDocumentVersionByIdRollbackData, PostDocumentVersionByIdRollbackErrors, PostDocumentVersionByIdRollbackResponses, PostDynamicRootQueryData, PostDynamicRootQueryErrors, PostDynamicRootQueryResponses, PostHealthCheckExecuteActionData, PostHealthCheckExecuteActionErrors, PostHealthCheckExecuteActionResponses, PostHealthCheckGroupByNameCheckData, PostHealthCheckGroupByNameCheckErrors, PostHealthCheckGroupByNameCheckResponses, PostIndexerByIndexNameRebuildData, PostIndexerByIndexNameRebuildErrors, PostIndexerByIndexNameRebuildResponses, PostInstallSetupData, PostInstallSetupErrors, PostInstallSetupResponses, PostInstallValidateDatabaseData, PostInstallValidateDatabaseErrors, PostInstallValidateDatabaseResponses, PostLanguageData, PostLanguageErrors, PostLanguageResponses, PostLogViewerSavedSearchData, PostLogViewerSavedSearchErrors, PostLogViewerSavedSearchResponses, PostMediaData, PostMediaErrors, PostMediaResponses, PostMediaTypeAvailableCompositionsData, PostMediaTypeAvailableCompositionsErrors, PostMediaTypeAvailableCompositionsResponses, PostMediaTypeByIdCopyData, PostMediaTypeByIdCopyErrors, PostMediaTypeByIdCopyResponses, PostMediaTypeData, PostMediaTypeErrors, PostMediaTypeFolderData, PostMediaTypeFolderErrors, PostMediaTypeFolderResponses, PostMediaTypeImportData, PostMediaTypeImportErrors, PostMediaTypeImportResponses, PostMediaTypeResponses, PostMediaValidateData, PostMediaValidateErrors, PostMediaValidateResponses, PostMemberData, PostMemberErrors, PostMemberGroupData, PostMemberGroupErrors, PostMemberGroupResponses, PostMemberResponses, PostMemberTypeAvailableCompositionsData, PostMemberTypeAvailableCompositionsErrors, PostMemberTypeAvailableCompositionsResponses, PostMemberTypeByIdCopyData, PostMemberTypeByIdCopyErrors, PostMemberTypeByIdCopyResponses, PostMemberTypeData, PostMemberTypeErrors, PostMemberTypeFolderData, PostMemberTypeFolderErrors, PostMemberTypeFolderResponses, PostMemberTypeImportData, PostMemberTypeImportErrors, PostMemberTypeImportResponses, PostMemberTypeResponses, PostMemberValidateData, PostMemberValidateErrors, PostMemberValidateResponses, PostModelsBuilderBuildData, PostModelsBuilderBuildErrors, PostModelsBuilderBuildResponses, PostPackageByNameRunMigrationData, PostPackageByNameRunMigrationErrors, PostPackageByNameRunMigrationResponses, PostPackageCreatedData, PostPackageCreatedErrors, PostPackageCreatedResponses, PostPartialViewData, PostPartialViewErrors, PostPartialViewFolderData, PostPartialViewFolderErrors, PostPartialViewFolderResponses, PostPartialViewResponses, PostPreviewData, PostPreviewErrors, PostPreviewResponses, PostPublishedCacheRebuildData, PostPublishedCacheRebuildErrors, PostPublishedCacheRebuildResponses, PostPublishedCacheReloadData, PostPublishedCacheReloadErrors, PostPublishedCacheReloadResponses, PostRedirectManagementStatusData, PostRedirectManagementStatusErrors, PostRedirectManagementStatusResponses, PostScriptData, PostScriptErrors, PostScriptFolderData, PostScriptFolderErrors, PostScriptFolderResponses, PostScriptResponses, PostSecurityForgotPasswordData, PostSecurityForgotPasswordErrors, PostSecurityForgotPasswordResetData, PostSecurityForgotPasswordResetErrors, PostSecurityForgotPasswordResetResponses, PostSecurityForgotPasswordResponses, PostSecurityForgotPasswordVerifyData, PostSecurityForgotPasswordVerifyErrors, PostSecurityForgotPasswordVerifyResponses, PostStylesheetData, PostStylesheetErrors, PostStylesheetFolderData, PostStylesheetFolderErrors, PostStylesheetFolderResponses, PostStylesheetResponses, PostTelemetryLevelData, PostTelemetryLevelErrors, PostTelemetryLevelResponses, PostTemplateData, PostTemplateErrors, PostTemplateQueryExecuteData, PostTemplateQueryExecuteErrors, PostTemplateQueryExecuteResponses, PostTemplateResponses, PostTemporaryFileData, PostTemporaryFileErrors, PostTemporaryFileResponses, PostUpgradeAuthorizeData, PostUpgradeAuthorizeErrors, PostUpgradeAuthorizeResponses, PostUserAvatarByIdData, PostUserAvatarByIdErrors, PostUserAvatarByIdResponses, PostUserByIdChangePasswordData, PostUserByIdChangePasswordErrors, PostUserByIdChangePasswordResponses, PostUserByIdClientCredentialsData, PostUserByIdClientCredentialsErrors, PostUserByIdClientCredentialsResponses, PostUserByIdResetPasswordData, PostUserByIdResetPasswordErrors, PostUserByIdResetPasswordResponses, PostUserCurrent2FaByProviderNameData, PostUserCurrent2FaByProviderNameErrors, PostUserCurrent2FaByProviderNameResponses, PostUserCurrentAvatarData, PostUserCurrentAvatarErrors, PostUserCurrentAvatarResponses, PostUserCurrentChangePasswordData, PostUserCurrentChangePasswordErrors, PostUserCurrentChangePasswordResponses, PostUserData, PostUserDataData, PostUserDataErrors, PostUserDataResponses, PostUserDisableData, PostUserDisableErrors, PostUserDisableResponses, PostUserEnableData, PostUserEnableErrors, PostUserEnableResponses, PostUserErrors, PostUserGroupByIdUsersData, PostUserGroupByIdUsersErrors, PostUserGroupByIdUsersResponses, PostUserGroupData, PostUserGroupErrors, PostUserGroupResponses, PostUserInviteCreatePasswordData, PostUserInviteCreatePasswordErrors, PostUserInviteCreatePasswordResponses, PostUserInviteData, PostUserInviteErrors, PostUserInviteResendData, PostUserInviteResendErrors, PostUserInviteResendResponses, PostUserInviteResponses, PostUserInviteVerifyData, PostUserInviteVerifyErrors, PostUserInviteVerifyResponses, PostUserResponses, PostUserSetUserGroupsData, PostUserSetUserGroupsErrors, PostUserSetUserGroupsResponses, PostUserUnlockData, PostUserUnlockErrors, PostUserUnlockResponses, PostWebhookData, PostWebhookErrors, PostWebhookResponses, PutDataTypeByIdData, PutDataTypeByIdErrors, PutDataTypeByIdMoveData, PutDataTypeByIdMoveErrors, PutDataTypeByIdMoveResponses, PutDataTypeByIdResponses, PutDataTypeFolderByIdData, PutDataTypeFolderByIdErrors, PutDataTypeFolderByIdResponses, PutDictionaryByIdData, PutDictionaryByIdErrors, PutDictionaryByIdMoveData, PutDictionaryByIdMoveErrors, PutDictionaryByIdMoveResponses, PutDictionaryByIdResponses, PutDocumentBlueprintByIdData, PutDocumentBlueprintByIdErrors, PutDocumentBlueprintByIdMoveData, PutDocumentBlueprintByIdMoveErrors, PutDocumentBlueprintByIdMoveResponses, PutDocumentBlueprintByIdResponses, PutDocumentBlueprintFolderByIdData, PutDocumentBlueprintFolderByIdErrors, PutDocumentBlueprintFolderByIdResponses, PutDocumentByIdData, PutDocumentByIdDomainsData, PutDocumentByIdDomainsErrors, PutDocumentByIdDomainsResponses, PutDocumentByIdErrors, PutDocumentByIdMoveData, PutDocumentByIdMoveErrors, PutDocumentByIdMoveResponses, PutDocumentByIdMoveToRecycleBinData, PutDocumentByIdMoveToRecycleBinErrors, PutDocumentByIdMoveToRecycleBinResponses, PutDocumentByIdNotificationsData, PutDocumentByIdNotificationsErrors, PutDocumentByIdNotificationsResponses, PutDocumentByIdPublicAccessData, PutDocumentByIdPublicAccessErrors, PutDocumentByIdPublicAccessResponses, PutDocumentByIdPublishData, PutDocumentByIdPublishErrors, PutDocumentByIdPublishResponses, PutDocumentByIdPublishWithDescendantsData, PutDocumentByIdPublishWithDescendantsErrors, PutDocumentByIdPublishWithDescendantsResponses, PutDocumentByIdResponses, PutDocumentByIdUnpublishData, PutDocumentByIdUnpublishErrors, PutDocumentByIdUnpublishResponses, PutDocumentSortData, PutDocumentSortErrors, PutDocumentSortResponses, PutDocumentTypeByIdData, PutDocumentTypeByIdErrors, PutDocumentTypeByIdImportData, PutDocumentTypeByIdImportErrors, PutDocumentTypeByIdImportResponses, PutDocumentTypeByIdMoveData, PutDocumentTypeByIdMoveErrors, PutDocumentTypeByIdMoveResponses, PutDocumentTypeByIdResponses, PutDocumentTypeFolderByIdData, PutDocumentTypeFolderByIdErrors, PutDocumentTypeFolderByIdResponses, PutDocumentVersionByIdPreventCleanupData, PutDocumentVersionByIdPreventCleanupErrors, PutDocumentVersionByIdPreventCleanupResponses, PutLanguageByIsoCodeData, PutLanguageByIsoCodeErrors, PutLanguageByIsoCodeResponses, PutMediaByIdData, PutMediaByIdErrors, PutMediaByIdMoveData, PutMediaByIdMoveErrors, PutMediaByIdMoveResponses, PutMediaByIdMoveToRecycleBinData, PutMediaByIdMoveToRecycleBinErrors, PutMediaByIdMoveToRecycleBinResponses, PutMediaByIdResponses, PutMediaByIdValidateData, PutMediaByIdValidateErrors, PutMediaByIdValidateResponses, PutMediaSortData, PutMediaSortErrors, PutMediaSortResponses, PutMediaTypeByIdData, PutMediaTypeByIdErrors, PutMediaTypeByIdImportData, PutMediaTypeByIdImportErrors, PutMediaTypeByIdImportResponses, PutMediaTypeByIdMoveData, PutMediaTypeByIdMoveErrors, PutMediaTypeByIdMoveResponses, PutMediaTypeByIdResponses, PutMediaTypeFolderByIdData, PutMediaTypeFolderByIdErrors, PutMediaTypeFolderByIdResponses, PutMemberByIdData, PutMemberByIdErrors, PutMemberByIdResponses, PutMemberByIdValidateData, PutMemberByIdValidateErrors, PutMemberByIdValidateResponses, PutMemberGroupByIdData, PutMemberGroupByIdErrors, PutMemberGroupByIdResponses, PutMemberTypeByIdData, PutMemberTypeByIdErrors, PutMemberTypeByIdImportData, PutMemberTypeByIdImportErrors, PutMemberTypeByIdImportResponses, PutMemberTypeByIdMoveData, PutMemberTypeByIdMoveErrors, PutMemberTypeByIdMoveResponses, PutMemberTypeByIdResponses, PutMemberTypeFolderByIdData, PutMemberTypeFolderByIdErrors, PutMemberTypeFolderByIdResponses, PutPackageCreatedByIdData, PutPackageCreatedByIdErrors, PutPackageCreatedByIdResponses, PutPartialViewByPathData, PutPartialViewByPathErrors, PutPartialViewByPathRenameData, PutPartialViewByPathRenameErrors, PutPartialViewByPathRenameResponses, PutPartialViewByPathResponses, PutProfilingStatusData, PutProfilingStatusErrors, PutProfilingStatusResponses, PutRecycleBinDocumentByIdRestoreData, PutRecycleBinDocumentByIdRestoreErrors, PutRecycleBinDocumentByIdRestoreResponses, PutRecycleBinMediaByIdRestoreData, PutRecycleBinMediaByIdRestoreErrors, PutRecycleBinMediaByIdRestoreResponses, PutScriptByPathData, PutScriptByPathErrors, PutScriptByPathRenameData, PutScriptByPathRenameErrors, PutScriptByPathRenameResponses, PutScriptByPathResponses, PutStylesheetByPathData, PutStylesheetByPathErrors, PutStylesheetByPathRenameData, PutStylesheetByPathRenameErrors, PutStylesheetByPathRenameResponses, PutStylesheetByPathResponses, PutTemplateByIdData, PutTemplateByIdErrors, PutTemplateByIdResponses, PutUmbracoManagementApiV11DocumentByIdValidate11Data, PutUmbracoManagementApiV11DocumentByIdValidate11Errors, PutUmbracoManagementApiV11DocumentByIdValidate11Responses, PutUserByIdData, PutUserByIdErrors, PutUserByIdResponses, PutUserCurrentProfileData, PutUserDataData, PutUserDataErrors, PutUserDataResponses, PutUserGroupByIdData, PutUserGroupByIdErrors, PutUserGroupByIdResponses, PutWebhookByIdData, PutWebhookByIdErrors, PutWebhookByIdResponses } from './types.gen';
+ 
+ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
+     /**
+@@ -7823,6 +7823,23 @@ export class UserService {
+         });
+     }
+     
++    /**
++     * Clears the current user's avatar.
++     * Removes the avatar image for the currently authenticated user.
++     */
++    public static deleteUserCurrentAvatar<ThrowOnError extends boolean = true>(options?: Options<DeleteUserCurrentAvatarData, ThrowOnError>) {
++        return (options?.client ?? client).delete<DeleteUserAvatarByIdResponses, DeleteUserAvatarByIdErrors, ThrowOnError>({
++            security: [
++                {
++                    scheme: 'bearer',
++                    type: 'http'
++                }
++            ],
++            url: '/umbraco/management/api/v1/user/current/avatar',
++            ...options
++        });
++    }
++
+     /**
+      * Sets the current user's avatar.
+      * Sets or updates the avatar image for the currently authenticated user.
+@@ -7864,6 +7881,23 @@ export class UserService {
+             }
+         });
+     }
++
++    public static putUserCurrentProfile<ThrowOnError extends boolean = true>(options?: Options<PutUserCurrentProfileData, ThrowOnError>) {
++        return (options?.client ?? client).put<PutUserByIdResponses, PutUserByIdErrors, ThrowOnError>({
++            security: [ 
++                {
++                    scheme: 'bearer',
++                    type: 'http'
++                }
++            ],
++            url: '/umbraco/management/api/v1/user/current/profile',
++            ...options,
++            headers: {
++                'Content-Type': 'application/json',
++                ...options?.headers
++            }
++        });
++    }
+     
+     /**
+      * Gets the current user's configuration.
+diff --git a/src/Umbraco.Web.UI.Client/src/packages/core/backend-api/types.gen.ts b/src/Umbraco.Web.UI.Client/src/packages/core/backend-api/types.gen.ts
+index a91021c78e0..a177401c66a 100644
+--- a/src/Umbraco.Web.UI.Client/src/packages/core/backend-api/types.gen.ts
++++ b/src/Umbraco.Web.UI.Client/src/packages/core/backend-api/types.gen.ts
+@@ -125,6 +125,10 @@ export type ChangePasswordCurrentUserRequestModel = {
+     oldPassword?: string | null;
+ };
+ 
++export type UpdateCurrentUserRequestModel = {
++    languageIsoCode: string;
++}
++
+ export type ChangePasswordUserRequestModel = {
+     newPassword: string;
+ };
+@@ -17245,6 +17249,41 @@ export type PostUserCurrent2FaByProviderNameResponses = {
+ 
+ export type PostUserCurrent2FaByProviderNameResponse = PostUserCurrent2FaByProviderNameResponses[keyof PostUserCurrent2FaByProviderNameResponses];
+ 
++export type DeleteUserCurrentAvatarData = {
++    body?: never;
++    path?: never;
++    query?: never;
++    url: '/umbraco/management/api/v1/user/current/avatar';
++};
++
++export type DeleteUserCurrentAvatarErrors = {
++    /**
++     * Bad Request
++     */
++    400: ProblemDetails;
++    /**
++     * The resource is protected and requires an authentication token
++     */
++    401: unknown;
++    /**
++     * The authenticated user does not have access to this resource
++     */
++    403: unknown;
++    /**
++     * Not Found
++     */
++    404: ProblemDetails;
++};
++
++export type DeleteUserCurrentAvatarError = DeleteUserCurrentAvatarErrors[keyof DeleteUserCurrentAvatarErrors];
++
++export type DeleteUserCurrentAvatarResponses = {
++    /**
++     * OK
++     */
++    200: unknown;
++};
++
+ export type PostUserCurrentAvatarData = {
+     body?: SetAvatarRequestModel;
+     path?: never;
+@@ -17279,6 +17318,13 @@ export type PostUserCurrentChangePasswordData = {
+     url: '/umbraco/management/api/v1/user/current/change-password';
+ };
+ 
++export type PutUserCurrentProfileData = {
++    body?: UpdateCurrentUserRequestModel;
++    path?: never;
++    query?: never;
++    url: '/umbraco/management/api/v1/user/current/profile';
++}
++
+ export type PostUserCurrentChangePasswordErrors = {
+     /**
+      * Bad Request
+diff --git a/src/Umbraco.Web.UI.Client/src/packages/core/section/conditions/constants.ts b/src/Umbraco.Web.UI.Client/src/packages/core/section/conditions/constants.ts
+index 36d4b2350f9..c7ba46455ef 100644
+--- a/src/Umbraco.Web.UI.Client/src/packages/core/section/conditions/constants.ts
++++ b/src/Umbraco.Web.UI.Client/src/packages/core/section/conditions/constants.ts
+@@ -1,2 +1,3 @@
+ export * from './section-alias/constants.js';
+ export * from './section-user-permission/constants.js';
++export * from './section-user-no-permission/constants.js';
+diff --git a/src/Umbraco.Web.UI.Client/src/packages/core/section/conditions/manifests.ts b/src/Umbraco.Web.UI.Client/src/packages/core/section/conditions/manifests.ts
+index 68e9e244a86..27d6cc37cd5 100644
+--- a/src/Umbraco.Web.UI.Client/src/packages/core/section/conditions/manifests.ts
++++ b/src/Umbraco.Web.UI.Client/src/packages/core/section/conditions/manifests.ts
+@@ -1,4 +1,9 @@
+ import { manifests as sectionAliasManifests } from './section-alias/manifests.js';
+ import { manifests as sectionUserPermissionManifests } from './section-user-permission/manifests.js';
++import { manifests as sectionUserNoPermissionManifests } from './section-user-no-permission/manifests.js';
+ 
+-export const manifests: Array<UmbExtensionManifest> = [...sectionAliasManifests, ...sectionUserPermissionManifests];
++export const manifests: Array<UmbExtensionManifest> = [
++	...sectionAliasManifests,
++	...sectionUserPermissionManifests,
++	...sectionUserNoPermissionManifests,
++];
+diff --git a/src/Umbraco.Web.UI.Client/src/packages/core/section/conditions/section-user-no-permission/constants.ts b/src/Umbraco.Web.UI.Client/src/packages/core/section/conditions/section-user-no-permission/constants.ts
+new file mode 100644
+index 00000000000..291931b2ca6
+--- /dev/null
++++ b/src/Umbraco.Web.UI.Client/src/packages/core/section/conditions/section-user-no-permission/constants.ts
+@@ -0,0 +1 @@
++export const UMB_SECTION_USER_NO_PERMISSION_CONDITION_ALIAS = 'Umb.Condition.SectionUserNoPermission';
+diff --git a/src/Umbraco.Web.UI.Client/src/packages/core/section/conditions/section-user-no-permission/manifests.ts b/src/Umbraco.Web.UI.Client/src/packages/core/section/conditions/section-user-no-permission/manifests.ts
+new file mode 100644
+index 00000000000..31885326da0
+--- /dev/null
++++ b/src/Umbraco.Web.UI.Client/src/packages/core/section/conditions/section-user-no-permission/manifests.ts
+@@ -0,0 +1,11 @@
++import { UmbSectionUserNoPermissionCondition } from './section-user-no-permission.condition.js';
++import { UMB_SECTION_USER_NO_PERMISSION_CONDITION_ALIAS } from './constants.js';
++
++export const manifests: Array<UmbExtensionManifest> = [
++	{
++		type: 'condition',
++		name: 'Section User No Permission Condition',
++		alias: UMB_SECTION_USER_NO_PERMISSION_CONDITION_ALIAS,
++		api: UmbSectionUserNoPermissionCondition,
++	},
++];
+diff --git a/src/Umbraco.Web.UI.Client/src/packages/core/section/conditions/section-user-no-permission/section-user-no-permission.condition.ts b/src/Umbraco.Web.UI.Client/src/packages/core/section/conditions/section-user-no-permission/section-user-no-permission.condition.ts
+new file mode 100644
+index 00000000000..249279bfba6
+--- /dev/null
++++ b/src/Umbraco.Web.UI.Client/src/packages/core/section/conditions/section-user-no-permission/section-user-no-permission.condition.ts
+@@ -0,0 +1,30 @@
++import type { UmbSectionUserNoPermissionConditionConfig } from './types.js';
++import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
++import type { UmbConditionControllerArguments, UmbExtensionCondition } from '@umbraco-cms/backoffice/extension-api';
++import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
++import { UmbConditionBase } from '@umbraco-cms/backoffice/extension-registry';
++
++const ObserveSymbol = Symbol();
++
++export class UmbSectionUserNoPermissionCondition
++	extends UmbConditionBase<UmbSectionUserNoPermissionConditionConfig>
++	implements UmbExtensionCondition
++{
++	constructor(
++		host: UmbControllerHost,
++		args: UmbConditionControllerArguments<UmbSectionUserNoPermissionConditionConfig>,
++	) {
++		super(host, args);
++
++		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (context) => {
++			this.observe(
++				context?.currentUser,
++				(currentUser) => {
++					const allowedSections = currentUser?.allowedSections ?? [];
++					this.permitted = !allowedSections.includes(this.config.match);
++				},
++				ObserveSymbol,
++			);
++		});
++	}
++}
+diff --git a/src/Umbraco.Web.UI.Client/src/packages/core/section/conditions/section-user-no-permission/types.ts b/src/Umbraco.Web.UI.Client/src/packages/core/section/conditions/section-user-no-permission/types.ts
+new file mode 100644
+index 00000000000..696d3798977
+--- /dev/null
++++ b/src/Umbraco.Web.UI.Client/src/packages/core/section/conditions/section-user-no-permission/types.ts
+@@ -0,0 +1,19 @@
++import type { UMB_SECTION_USER_NO_PERMISSION_CONDITION_ALIAS } from './constants.js';
++import type { UmbConditionConfigBase } from '@umbraco-cms/backoffice/extension-api';
++
++export type UmbSectionUserNoPermissionConditionConfig = UmbConditionConfigBase<
++	typeof UMB_SECTION_USER_NO_PERMISSION_CONDITION_ALIAS
++> & {
++	/**
++	 * The section alias to check that the user does NOT have access to.
++	 * @example
++	 * "Umb.Section.Users"
++	 */
++	match: string;
++};
++
++declare global {
++	interface UmbExtensionConditionConfigMap {
++		UmbSectionUserNoPermissionConditionConfig: UmbSectionUserNoPermissionConditionConfig;
++	}
++}
+diff --git a/src/Umbraco.Web.UI.Client/src/packages/core/section/conditions/types.ts b/src/Umbraco.Web.UI.Client/src/packages/core/section/conditions/types.ts
+index 02345913ab8..b681f0c6742 100644
+--- a/src/Umbraco.Web.UI.Client/src/packages/core/section/conditions/types.ts
++++ b/src/Umbraco.Web.UI.Client/src/packages/core/section/conditions/types.ts
+@@ -1,2 +1,3 @@
+ export type * from './section-alias/types.js';
+ export type * from './section-user-permission/types.js';
++export type * from './section-user-no-permission/types.js';
+diff --git a/src/Umbraco.Web.UI.Client/src/packages/user/current-user/modals/constants.ts b/src/Umbraco.Web.UI.Client/src/packages/user/current-user/modals/constants.ts
+index 76298b2ef35..e4f399edcfa 100644
+--- a/src/Umbraco.Web.UI.Client/src/packages/user/current-user/modals/constants.ts
++++ b/src/Umbraco.Web.UI.Client/src/packages/user/current-user/modals/constants.ts
+@@ -2,3 +2,4 @@ export * from './current-user/constants.js';
+ export * from './current-user-mfa/constants.js';
+ export * from './current-user-mfa-disable/constants.js';
+ export * from './current-user-mfa-enable/constants.js';
++export * from './current-user-workspace/constants.js';
+diff --git a/src/Umbraco.Web.UI.Client/src/packages/user/current-user/modals/current-user-workspace/constants.ts b/src/Umbraco.Web.UI.Client/src/packages/user/current-user/modals/current-user-workspace/constants.ts
+new file mode 100644
+index 00000000000..7d6c83e4649
+--- /dev/null
++++ b/src/Umbraco.Web.UI.Client/src/packages/user/current-user/modals/current-user-workspace/constants.ts
+@@ -0,0 +1 @@
++export { UMB_CURRENT_USER_WORKSPACE_MODAL } from './current-user-workspace-modal.token.js';
+diff --git a/src/Umbraco.Web.UI.Client/src/packages/user/current-user/modals/current-user-workspace/current-user-workspace-avatar.element.ts b/src/Umbraco.Web.UI.Client/src/packages/user/current-user/modals/current-user-workspace/current-user-workspace-avatar.element.ts
+new file mode 100644
+index 00000000000..9e422efa40e
+--- /dev/null
++++ b/src/Umbraco.Web.UI.Client/src/packages/user/current-user/modals/current-user-workspace/current-user-workspace-avatar.element.ts
+@@ -0,0 +1,159 @@
++import type { UmbCurrentUserModel } from '../../types.js';
++import { UMB_CURRENT_USER_CONTEXT } from '../../current-user.context.token.js';
++import { UmbCurrentUserRepository } from '../../repository/current-user.repository.js';
++import { UmbTemporaryFileConfigRepository } from '@umbraco-cms/backoffice/temporary-file';
++import { css, html, customElement, query, nothing, state } from '@umbraco-cms/backoffice/external/lit';
++import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
++
++import '../../../../user/user/components/user-avatar/user-avatar.element.js';
++
++@customElement('umb-current-user-workspace-avatar')
++export class UmbCurrentUserWorkspaceAvatarElement extends UmbLitElement {
++	@state()
++	private _currentUser?: UmbCurrentUserModel;
++
++	@state()
++	private _allowedFileTypes = 'image/*';
++
++	@query('#AvatarFileField')
++	private _avatarFileField?: HTMLInputElement;
++
++	#currentUserContext?: typeof UMB_CURRENT_USER_CONTEXT.TYPE;
++	#currentUserRepository = new UmbCurrentUserRepository(this);
++	#temporaryFileConfigRepository = new UmbTemporaryFileConfigRepository(this);
++
++	constructor() {
++		super();
++
++		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (instance) => {
++			this.#currentUserContext = instance;
++			if (!this.#currentUserContext) return;
++			this.#observeCurrentUser();
++		});
++
++		this.#observeAllowedFileTypes();
++	}
++
++	async #observeAllowedFileTypes() {
++		await this.#temporaryFileConfigRepository.initialized;
++		this.observe(
++			this.#temporaryFileConfigRepository.part('imageFileTypes'),
++			(fileTypes) => {
++				if (fileTypes.length) {
++					this._allowedFileTypes = fileTypes.map((t) => `.${t}`).join(',');
++				} else {
++					this._allowedFileTypes = 'image/*';
++				}
++			},
++			'_imageFileTypes',
++		);
++	}
++
++	#observeCurrentUser = () => {
++		this.observe(
++			this.#currentUserContext!.currentUser,
++			(user) => {
++				this._currentUser = user;
++			},
++			'umbCurrentUserObserver',
++		);
++	};
++
++	#uploadAvatar = async () => {
++		try {
++			const selectedFile = await this.#selectAvatar();
++			await this.#currentUserRepository.uploadAvatar(selectedFile);
++		} catch (error) {
++			console.error(error);
++		}
++	};
++
++	#selectAvatar() {
++		return new Promise<File>((resolve, reject) => {
++			if (!this._avatarFileField) {
++				reject("Can't find avatar file field");
++				return;
++			}
++
++			// Reset value to allow selecting the same file again
++			this._avatarFileField.value = '';
++
++			this._avatarFileField.addEventListener(
++				'change',
++				(event) => {
++					const target = event?.target as HTMLInputElement;
++					const file = target.files?.[0];
++					if (!file) {
++						reject("Can't find avatar file");
++						return;
++					}
++					resolve(file);
++				},
++				{ once: true },
++			);
++
++			this._avatarFileField.click();
++		});
++	}
++
++	#deleteAvatar = async () => {
++		await this.#currentUserRepository.deleteAvatar();
++	};
++
++	#hasAvatar() {
++		if (!this._currentUser) return false;
++		return this._currentUser.avatarUrls.length > 0;
++	}
++
++	override render() {
++		if (!this._currentUser) return nothing;
++		return html`
++			<uui-box>
++				<form id="AvatarUploadForm" novalidate>
++					<umb-user-avatar
++						id="Avatar"
++						.name=${this._currentUser.name}
++						.imgUrls=${this._currentUser.avatarUrls ?? []}></umb-user-avatar>
++					<input id="AvatarFileField" type="file" name="avatarFile" accept=${this._allowedFileTypes} required hidden />
++					<uui-button label="${this.localize.term('user_changePhoto')}" @click=${this.#uploadAvatar}></uui-button>
++					${this.#hasAvatar()
++						? html`
++								<uui-button
++									type="button"
++									label=${this.localize.term('user_removePhoto')}
++									@click=${this.#deleteAvatar}></uui-button>
++							`
++						: nothing}
++				</form>
++			</uui-box>
++		`;
++	}
++
++	static override styles = [
++		css`
++			:host {
++				display: block;
++			}
++
++			#Avatar {
++				font-size: 75px;
++				place-self: center;
++			}
++
++			form {
++				text-align: center;
++				display: flex;
++				flex-direction: column;
++				gap: var(--uui-size-space-2);
++			}
++		`,
++	];
++}
++
++export default UmbCurrentUserWorkspaceAvatarElement;
++
++declare global {
++	interface HTMLElementTagNameMap {
++		'umb-current-user-workspace-avatar': UmbCurrentUserWorkspaceAvatarElement;
++	}
++}
+diff --git a/src/Umbraco.Web.UI.Client/src/packages/user/current-user/modals/current-user-workspace/current-user-workspace-modal.element.ts b/src/Umbraco.Web.UI.Client/src/packages/user/current-user/modals/current-user-workspace/current-user-workspace-modal.element.ts
+new file mode 100644
+index 00000000000..aa1485fcc18
+--- /dev/null
++++ b/src/Umbraco.Web.UI.Client/src/packages/user/current-user/modals/current-user-workspace/current-user-workspace-modal.element.ts
+@@ -0,0 +1,93 @@
++import type { UmbCurrentUserModel } from '../../types.js';
++import { UMB_CURRENT_USER_CONTEXT } from '../../current-user.context.token.js';
++import type { UmbCurrentUserWorkspaceProfileSettingsElement } from './current-user-workspace-profile-settings.element.js';
++import { css, customElement, html, property, query, state } from '@umbraco-cms/backoffice/external/lit';
++import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
++import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
++import type { UmbModalContext } from '@umbraco-cms/backoffice/modal';
++
++import './current-user-workspace-avatar.element.js';
++import './current-user-workspace-profile-settings.element.js';
++@customElement('umb-current-user-workspace-modal')
++export class UmbCurrentUserWorkspaceModalElement extends UmbLitElement {
++	@property({ attribute: false })
++	modalContext?: UmbModalContext;
++
++	@query('umb-current-user-workspace-profile-settings')
++	private _profileSettings?: UmbCurrentUserWorkspaceProfileSettingsElement;
++
++	@state()
++	private _currentUser?: UmbCurrentUserModel;
++
++	private _close() {
++		this.modalContext?.reject();
++	}
++
++	private async _save() {
++		await this._profileSettings?.save();
++		this.modalContext?.submit();
++	}
++
++	#currentUserContext?: typeof UMB_CURRENT_USER_CONTEXT.TYPE;
++
++	constructor() {
++		super();
++
++		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (instance) => {
++			this.#currentUserContext = instance;
++			this._observeCurrentUser();
++		});
++	}
++
++	private async _observeCurrentUser() {
++		if (!this.#currentUserContext) return;
++
++		this.observe(
++			this.#currentUserContext.currentUser,
++			(currentUser) => {
++				this._currentUser = currentUser;
++			},
++			'umbCurrentUserObserver',
++		);
++	}
++
++	override render() {
++		return html`
++			<umb-body-layout headline="${this._currentUser?.name || ''}">
++				<div id="main">
++					<umb-stack>
++						<umb-current-user-workspace-avatar></umb-current-user-workspace-avatar>
++						<umb-current-user-workspace-profile-settings></umb-current-user-workspace-profile-settings>
++					</umb-stack>
++				</div>
++				<div slot="actions">
++					<uui-button @click=${this._close} look="secondary" .label=${this.localize.term('general_close')}>
++						${this.localize.term('general_close')}
++					</uui-button>
++					<uui-button @click=${this._save} look="primary" color="positive" .label=${this.localize.term('buttons_save')}>
++						${this.localize.term('buttons_save')}
++					</uui-button>
++				</div>
++			</umb-body-layout>
++		`;
++	}
++
++	static override styles = [
++		UmbTextStyles,
++		css`
++			:host {
++				display: block;
++				width: 100%;
++				height: 100%;
++			}
++		`,
++	];
++}
++
++export default UmbCurrentUserWorkspaceModalElement;
++
++declare global {
++	interface HTMLElementTagNameMap {
++		'umb-current-user-workspace-modal': UmbCurrentUserWorkspaceModalElement;
++	}
++}
+diff --git a/src/Umbraco.Web.UI.Client/src/packages/user/current-user/modals/current-user-workspace/current-user-workspace-modal.token.ts b/src/Umbraco.Web.UI.Client/src/packages/user/current-user/modals/current-user-workspace/current-user-workspace-modal.token.ts
+new file mode 100644
+index 00000000000..5855281a414
+--- /dev/null
++++ b/src/Umbraco.Web.UI.Client/src/packages/user/current-user/modals/current-user-workspace/current-user-workspace-modal.token.ts
+@@ -0,0 +1,8 @@
++import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
++
++export const UMB_CURRENT_USER_WORKSPACE_MODAL = new UmbModalToken('Umb.Modal.CurrentUser.Workspace', {
++	modal: {
++		type: 'sidebar',
++		size: 'small',
++	},
++});
+diff --git a/src/Umbraco.Web.UI.Client/src/packages/user/current-user/modals/current-user-workspace/current-user-workspace-profile-settings.element.ts b/src/Umbraco.Web.UI.Client/src/packages/user/current-user/modals/current-user-workspace/current-user-workspace-profile-settings.element.ts
+new file mode 100644
+index 00000000000..37dc74a1e41
+--- /dev/null
++++ b/src/Umbraco.Web.UI.Client/src/packages/user/current-user/modals/current-user-workspace/current-user-workspace-profile-settings.element.ts
+@@ -0,0 +1,94 @@
++import type { UmbCurrentUserModel } from '../../types.js';
++import { UMB_CURRENT_USER_CONTEXT } from '../../current-user.context.token.js';
++import { UmbCurrentUserRepository } from '../../repository/index.js';
++import { html, customElement, state, ifDefined, css } from '@umbraco-cms/backoffice/external/lit';
++import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
++import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
++import type { UmbUiCultureInputElement } from '@umbraco-cms/backoffice/localization';
++
++@customElement('umb-current-user-workspace-profile-settings')
++export class UmbCurrentUserWorkspaceProfileSettingsElement extends UmbLitElement {
++	@state()
++	private _currentUser?: UmbCurrentUserModel;
++
++	@state()
++	private _languageIsoCode = '';
++
++	#currentUserContext?: typeof UMB_CURRENT_USER_CONTEXT.TYPE;
++	#currentUserRepository = new UmbCurrentUserRepository(this);
++	
++	constructor() {
++		super();
++
++		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (instance) => {
++			this.#currentUserContext = instance;
++			if (!this.#currentUserContext) return;
++			this.#observeCurrentUser();
++		});
++	}
++
++	#observeCurrentUser = () => {
++		this.observe(
++			this.#currentUserContext!.currentUser,
++			(user) => {
++				this._currentUser = user;
++				if (user) {
++					this._languageIsoCode = user.languageIsoCode;
++				}
++			},
++			'umbCurrentUserObserver',
++		);
++	};
++
++	#onLanguageChange(event: UmbChangeEvent) {
++		const target = event.target as UmbUiCultureInputElement;
++		if (typeof target?.value === 'string') {
++			this._languageIsoCode = target.value;
++		}
++	}
++
++	async save() {
++		await this.#currentUserRepository.updateProfile(this._languageIsoCode);
++	}
++
++	override render() {
++		return html`
++			<uui-box>
++				<div slot="headline"><umb-localize key="user_profile">Profile</umb-localize></div>
++				${this.#renderUILanguageProperty()}
++			</uui-box>
++		`;
++	}
++
++	#renderUILanguageProperty() {
++		return html`
++			<umb-property-layout
++				label=${this.localize.term('user_language')}
++				description=${this.localize.term('user_languageHelp')}>
++				<umb-ui-culture-input
++					slot="editor"
++					name="language"
++					label=${this.localize.term('user_language')}
++					value=${ifDefined(this._languageIsoCode ?? undefined)}
++					@change=${this.#onLanguageChange}>
++				</umb-ui-culture-input>
++			</umb-property-layout>
++		`;
++	}
++
++	static override styles = [
++		css`
++			:host {
++				display: block;
++			}
++		`,
++	];
++}
++
++export default UmbCurrentUserWorkspaceProfileSettingsElement;
++
++declare global {
++	interface HTMLElementTagNameMap {
++		'umb-current-user-workspace-profile-settings': UmbCurrentUserWorkspaceProfileSettingsElement;
++	}
++}
+diff --git a/src/Umbraco.Web.UI.Client/src/packages/user/current-user/modals/manifests.ts b/src/Umbraco.Web.UI.Client/src/packages/user/current-user/modals/manifests.ts
+index 9443fba66f5..5011a9d26b9 100644
+--- a/src/Umbraco.Web.UI.Client/src/packages/user/current-user/modals/manifests.ts
++++ b/src/Umbraco.Web.UI.Client/src/packages/user/current-user/modals/manifests.ts
+@@ -23,4 +23,10 @@ export const manifests: Array<UmbExtensionManifest> = [
+ 		name: 'Current User MFA Disable Provider Modal',
+ 		element: () => import('./current-user-mfa-disable/current-user-mfa-disable-modal.element.js'),
+ 	},
++	{
++		type: 'modal',
++		alias: 'Umb.Modal.CurrentUser.Workspace',
++		name: 'Current User Workspace Modal',
++		element: () => import('./current-user-workspace/current-user-workspace-modal.element.js'),
++	},
+ ];
+diff --git a/src/Umbraco.Web.UI.Client/src/packages/user/current-user/profile/edit-current-user-workspace.action.ts b/src/Umbraco.Web.UI.Client/src/packages/user/current-user/profile/edit-current-user-workspace.action.ts
+new file mode 100644
+index 00000000000..8f7cf256054
+--- /dev/null
++++ b/src/Umbraco.Web.UI.Client/src/packages/user/current-user/profile/edit-current-user-workspace.action.ts
+@@ -0,0 +1,19 @@
++import { UMB_CURRENT_USER_WORKSPACE_MODAL } from '../modals/current-user-workspace/current-user-workspace-modal.token.js';
++import type { UmbCurrentUserAction, UmbCurrentUserActionArgs } from '../current-user-action.extension.js';
++import { UmbActionBase } from '@umbraco-cms/backoffice/action';
++import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
++
++export class UmbEditCurrentUserWorkspaceAction<ArgsMetaType = never>
++	extends UmbActionBase<UmbCurrentUserActionArgs<ArgsMetaType>>
++	implements UmbCurrentUserAction<ArgsMetaType>
++{
++	async getHref() {
++		return undefined;
++	}
++
++	async execute() {
++		await umbOpenModal(this, UMB_CURRENT_USER_WORKSPACE_MODAL);
++	}
++}
++
++export { UmbEditCurrentUserWorkspaceAction as api };
+diff --git a/src/Umbraco.Web.UI.Client/src/packages/user/current-user/profile/manifests.ts b/src/Umbraco.Web.UI.Client/src/packages/user/current-user/profile/manifests.ts
+index 7b87322454e..7862c74e944 100644
+--- a/src/Umbraco.Web.UI.Client/src/packages/user/current-user/profile/manifests.ts
++++ b/src/Umbraco.Web.UI.Client/src/packages/user/current-user/profile/manifests.ts
+@@ -1,4 +1,7 @@
+-import { UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
++import {
++	UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS,
++	UMB_SECTION_USER_NO_PERMISSION_CONDITION_ALIAS,
++} from '@umbraco-cms/backoffice/section';
+ import { UMB_CURRENT_USER_ALLOW_CHANGE_PASSWORD_CONDITION_ALIAS } from '@umbraco-cms/backoffice/user';
+ 
+ export const manifests: Array<UmbExtensionManifest> = [
+@@ -48,4 +51,22 @@ export const manifests: Array<UmbExtensionManifest> = [
+ 			},
+ 		],
+ 	},
++	{
++		type: 'currentUserAction',
++		kind: 'default',
++		alias: 'Umb.CurrentUserWorkspace.Button.Edit',
++		name: 'Current User Workspace Edit Button',
++		weight: 1000,
++		api: () => import('./edit-current-user-workspace.action.js'),
++		meta: {
++			label: '#general_edit',
++			icon: 'edit',
++		},
++		conditions: [
++			{
++				alias: UMB_SECTION_USER_NO_PERMISSION_CONDITION_ALIAS,
++				match: 'Umb.Section.Users',
++			},
++		],
++	},
+ ];
+diff --git a/src/Umbraco.Web.UI.Client/src/packages/user/current-user/repository/current-user.repository.ts b/src/Umbraco.Web.UI.Client/src/packages/user/current-user/repository/current-user.repository.ts
+index fa9d3125d17..791ae4ea5bc 100644
+--- a/src/Umbraco.Web.UI.Client/src/packages/user/current-user/repository/current-user.repository.ts
++++ b/src/Umbraco.Web.UI.Client/src/packages/user/current-user/repository/current-user.repository.ts
+@@ -3,6 +3,8 @@ import { UMB_CURRENT_USER_STORE_CONTEXT } from './current-user.store.token.js';
+ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+ import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
+ import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
++import { UmbId } from '@umbraco-cms/backoffice/id';
++import { TemporaryFileStatus, UmbTemporaryFileManager } from '@umbraco-cms/backoffice/temporary-file';
+ 
+ /**
+  * A repository for the current user
+@@ -12,6 +14,8 @@ import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
+ export class UmbCurrentUserRepository extends UmbRepositoryBase {
+ 	#currentUserSource = new UmbCurrentUserServerDataSource(this._host);
+ 	#currentUserStore?: typeof UMB_CURRENT_USER_STORE_CONTEXT.TYPE;
++	#temporaryFileManager = new UmbTemporaryFileManager(this);
++	#abortController = new AbortController();
+ 	#init: Promise<unknown>;
+ 	protected notificationContext?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;
+ 
+@@ -145,6 +149,74 @@ export class UmbCurrentUserRepository extends UmbRepositoryBase {
+ 
+ 		return { data, error };
+ 	}
++
++	/**
++	 * Upload an avatar for the current user
++	 * @param {File} file - The image file to use as avatar
++	 */
++	async uploadAvatar(file: File) {
++		await this.#init;
++
++		const temporaryUnique = UmbId.new();
++		const { status } = await this.#temporaryFileManager.uploadOne({
++			file,
++			temporaryUnique,
++			abortController: this.#abortController,
++		});
++
++		if (status === TemporaryFileStatus.ERROR) {
++			return { error: new Error('Avatar upload failed') };
++		}
++
++		const { error } = await this.#currentUserSource.uploadCurrentUserAvatar(temporaryUnique);
++
++		if (!error) {
++			const localUrl = URL.createObjectURL(file);
++			// The server returns 5 different sizes of the avatar, so we mimic that here
++			this.#currentUserStore?.update({ avatarUrls: [localUrl, localUrl, localUrl, localUrl, localUrl] });
++
++			const notification = { data: { message: `Avatar uploaded` } };
++			this.notificationContext?.peek('positive', notification);
++		}
++
++		return { error };
++	}
++
++	/**
++	 * Delete the current user's avatar
++	 */
++	async deleteAvatar() {
++		await this.#init;
++
++		const { error } = await this.#currentUserSource.deleteCurrentUserAvatar();
++
++		if (!error) {
++			this.#currentUserStore?.update({ avatarUrls: [] });
++
++			const notification = { data: { message: `Avatar deleted` } };
++			this.notificationContext?.peek('positive', notification);
++		}
++
++		return { error };
++	}
++
++	/**
++	 * Update the current user's profile settings
++	 * @param languageIsoCode
++	 */
++	async updateProfile(languageIsoCode: string) {
++		await this.#init;
++
++		const { error } = await this.#currentUserSource.updateCurrentUserProfile(languageIsoCode);
++
++		if (error) {
++			return { error };
++		}
++
++		await this.requestCurrentUser();
++
++		return {};
++	}
+ }
+ 
+ export default UmbCurrentUserRepository;
+diff --git a/src/Umbraco.Web.UI.Client/src/packages/user/current-user/repository/current-user.server.data-source.ts b/src/Umbraco.Web.UI.Client/src/packages/user/current-user/repository/current-user.server.data-source.ts
+index 1058924a347..00a4b64bc4d 100644
+--- a/src/Umbraco.Web.UI.Client/src/packages/user/current-user/repository/current-user.server.data-source.ts
++++ b/src/Umbraco.Web.UI.Client/src/packages/user/current-user/repository/current-user.server.data-source.ts
+@@ -1,4 +1,5 @@
+ import type { UmbCurrentUserModel } from '../types.js';
++import type { SetAvatarRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
+ import { UserService } from '@umbraco-cms/backoffice/external/backend-api';
+ import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+ import { UmbManagementApiDataMapper } from '@umbraco-cms/backoffice/repository';
+@@ -148,4 +149,40 @@ export class UmbCurrentUserServerDataSource extends UmbControllerBase {
+ 			{ disableNotifications: true },
+ 		);
+ 	}
++
++	/**
++	 * Upload an avatar for the current user using a temporary file unique
++	 * @param {string} fileUnique
++	 */
++	async uploadCurrentUserAvatar(fileUnique: string) {
++		const body: SetAvatarRequestModel = {
++			file: {
++				id: fileUnique,
++			},
++		};
++
++		return tryExecute(this, UserService.postUserCurrentAvatar({ body }));
++	}
++
++	/**
++	 * Delete the current user's avatar
++	 */
++	async deleteCurrentUserAvatar() {
++		return tryExecute(this, UserService.deleteUserCurrentAvatar());
++	}
++
++	/**
++ 	 * Update the current user's profile
++	 * @param languageIsoCode
++	 */
++	async updateCurrentUserProfile(languageIsoCode: string) {
++		return tryExecute(
++			this,
++			UserService.putUserCurrentProfile({
++				body: {
++					languageIsoCode,
++				},
++			}),
++		);
++	}
+ }
+diff --git a/tests/Umbraco.Tests.Integration/Umbraco.Core/Services/UserServiceCrudTests.Update.cs b/tests/Umbraco.Tests.Integration/Umbraco.Core/Services/UserServiceCrudTests.Update.cs
+index d9a1fed95cb..8afc42a0f92 100644
+--- a/tests/Umbraco.Tests.Integration/Umbraco.Core/Services/UserServiceCrudTests.Update.cs
++++ b/tests/Umbraco.Tests.Integration/Umbraco.Core/Services/UserServiceCrudTests.Update.cs
+@@ -429,4 +429,48 @@ public async Task Cannot_Remove_Admin_Group_From_Only_Admin_User(bool createAddi
+             Assert.AreEqual(UserOperationStatus.AdminUserGroupMustNotBeEmpty, adminUserUpdateResult.Status);
+         }
+     }
++
++    [Test]
++    public async Task Can_update_current_user()
++    {
++        var userService = CreateUserService();
++        var (_, createdUser) = await CreateUserForUpdate(userService);
++        var modal = new CurrentUserUpdateModel
++        {
++            ExistingUserKey = createdUser.Key,
++            LanguageIsoCode = "da"
++        };
++
++        var result = await userService.UpdateCurrentUserAsync(modal);
++
++        Assert.IsTrue(result.Success);
++        var updatedUser = await userService.GetAsync(createdUser.Key);
++        Assert.IsNotNull(updatedUser);
++        Assert.AreEqual("da", updatedUser.Language);
++    }
++
++    [Test]
++    public async Task Can_Only_Update_Language_Other_Fields_Remain_Unchanged()
++    {
++        var userService = CreateUserService(securitySettings: new SecuritySettings { UsernameIsEmail = false });
++        var (_, createdUser) = await CreateUserForUpdate(userService);
++        var model = new CurrentUserUpdateModel
++        {
++            ExistingUserKey = createdUser.Key,
++            LanguageIsoCode = "da"
++        };
++
++        var result = await userService.UpdateCurrentUserAsync(model);
++
++        Assert.IsTrue(result.Success);
++        var updatedUser = await userService.GetAsync(createdUser.Key);
++        Assert.IsNotNull(updatedUser);
++        Assert.Multiple(() =>
++        {
++            Assert.AreEqual("da", updatedUser.Language);
++            Assert.AreEqual(createdUser.Email, updatedUser.Email);
++            Assert.AreEqual(createdUser.Username, updatedUser.Username);
++            Assert.AreEqual(createdUser.Name, updatedUser.Name);
++        });
++    }
+ }

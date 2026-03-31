@@ -72,7 +72,8 @@
         {"id": "breaking-changes-on-interface-additions", "text": "Flags new interface methods without default implementations as breaking changes (Pattern 3)"},
         {"id": "no-stylistic-nitpicks", "text": "Review does not flag purely cosmetic/stylistic issues unless they affect performance or rendering. Missing JSDoc on new public APIs is NOT a stylistic issue — it is a legitimate finding."},
         {"id": "diff-scoped", "text": "All findings reference code that was changed in the diff, not pre-existing issues"},
-        {"id": "new-feature-assessed", "text": "Review assesses the new feature's architecture, patterns, or integration approach — not just absence of bugs"}
+        {"id": "new-feature-assessed", "text": "Review assesses the new feature's architecture, patterns, or integration approach — not just absence of bugs"},
+        {"id": "no-false-notification-finding", "text": "Review does NOT flag UpdateCurrentUserAsync as missing UserSavingNotification/UserSavedNotification — the sibling UpdateAsync also does not publish these notifications, so flagging their absence would be a false positive"}
       ]
     },
     {

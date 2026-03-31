@@ -1,0 +1,73 @@
+2bfb83d6f76 Global Elements: Add "Allowed in library" toggle to Document Type structure view (#21875)
+f1a7c6bbc11 Localization: Remove unused recycleBin keys from XML language files (#22299)
+4d993a6dd13 Elements: Add flag support for pending changes and scheduled publish (#21877)
+950470aade2 Make long-running concurrent save test more robust.
+7f1255b5e75 Content Types: Granular content type change types (#22223)
+6e27ab2e0a8 Elements: Add missing notifications to element container and element editing services (#22012)
+da614e7d2c4 Fixed integration tests failing on SQL Server and NUnit 4.
+858c4502238 Merge branch 'main' into v18/dev
+e8f5b98cb00 Code Clean-up (18): Remove obsoleted code flagged for removal (Part 2) (#22137)
+a03fb9b0e38 Media: Set width and height for uploaded SVGs (#22244)
+867414629b0 Cache sync: append SiteName to machine identifier for same-host load balancing (#22257)
+b292535cf99 Repositories: Fix Raw Sql Statements without Escaped Table, Column or Alias Names (closes #22259) (#22261)
+3238f2306a8 E2E: Added acceptance tests for block grid area (#22181)
+bb44bed058c Examine Dashboard: Support content node links from delivery API index (closes #22221) (#22225)
+5f684eaa10e Content Version Cleanup: Optimize for large datasets (closes #22224) (#22239)
+2f7f8cf9055 Backoffice: Fix Ctrl+C not terminating the example dev server (#22249)
+339da5e19ed E2E: V18 Fixed the failing smoke tests (#22248)
+29f267338c7 E2E: Reverted npm command for smokeTest (#22246)
+9ef7c5b9550 Further fix to failing acceptance test.
+ad8db9c567e Fixed failing integration and acceptance tests after merge.
+cef63cb07d1 Examine: Fix `DocumentUrlService` not initialized during Examine indexing after package upgrade (#22243)
+276d12d9635 E2E: QA Added acceptance tests for validating a mandatory multi URL picker (#22235)
+88d8a5acb3f E2E: QA Added acceptance tests for moving media items (#22232)
+0210dd00a0a Fix after merge.
+b57aacc1769 Localization: Update "MFA" label to "2FA" in language files (#22236)
+41f62ae03bd Merge branch 'main' into v18/dev
+23123adeaa5 Member Authorization: Return correct status codes for unauthenticated members (fixes #21638) (#22220)
+851d96c2b80 Members: Fix Create Members based on Member Types in folders (#22241)
+70be022109a Backoffice: Migrate Templating, Language, Member Group, and Document Blueprint create entity actions to use entityCreateOptionAction extensions (#22214)
+b19f8a2eb12 Add v18/dev to nightly build trigger
+124c01cd6e3 Merge branch 'release/17.3.0'
+282e3af6b82 Entity Data Picker: Adds start node support to tree data-sources (#22172)
+fd81ade58b3 Migrations: Fix package migrations not running after fresh install with packages (closes #22202) (#22204)
+27c926940f8 Migrations: Fix retrust constraints migration targeting non-Umbraco tables and transaction failure (closes #22227) (#22229)
+186498ef391 Dynamic Root: Fix current origin resolution for new unsaved content (closes #22213) (#22216)
+2859cb808aa Management API: Add endpoint to get all member types allowed at root (#22226)
+51b7fbf5ee8 Tree Picker: Fix root item not deselecting in single-selection picker (closes #22073) (#22099)
+3119b3a8ef3 Blueprints: Allow saving document blueprints with partial variant names (closes #22190) (#22210)
+d428cf2d5b0 Add v18/dev to nightly build trigger
+1a86c9f45c7 Change the default webhook payload type to "minimal" (#22217)
+0538555e98f Include expected defaults in webhook telemetry + use core constants instead of local strings
+dc8941fefe6 EFCore Scoping: Preserve connection string before disposing `EFCoreScope` database (closes #22211) (#22212)
+eb33dcebdf8 E2E: QA: add acceptance tests for compositions (#22180)
+1a316ac17bf Change the default webhook payload type to "minimal"
+112250da905 Distributed Background Jobs: Preventing Jobs From Running When Database Is Read-Only (#22208)
+597300863a3 E2E: QA Updated acceptance tests for duplication action due to UI changes (#22206)
+4c8cf2146c5 E2E: QA Added acceptance tests for public access  (#22158)
+e28de802121 Integration Tests: Avoid hidden `BootFailedException` in `CoreConfigurationHttpTests` (#22188)
+3611a28966a E2E: QA Added acceptance test for HMAC secret key health check (#22141)
+21bde287bb5 Build: Serialize E2E stages and stagger branch schedules to reduce agent usage (#22164)
+d0072a572e2 EFCore Scoping: Clear stale connection on pooled DbContext before returning to pool (closes #22124) (#22132)
+4822ddd889d Distributed Locking: Add ROWLOCK hint to prevent cross-row contention on umbracoLock table (closes #22113) (#22126)
+48222951f37 Application URLs: Prevent back office hosts being overwritten in a shared database setup (closes #16741) (#22160)
+a986268d28f Distributed Locking: Add ROWLOCK hint to prevent cross-row contention on umbracoLock table (closes #22113) (#22126)
+51ae5b66d70 Migrations: Fix property detection for invariant content types with culture-varying compositions (closes #22159) (#22167)
+49b3c24c9f9 Bumped version to 17.3.0-rc2.
+d76493fa76f  Backoffice: Add tree item children collection views for Partial Views, Stylesheets, Scripts, Templates, and Document Blueprints (#22146)
+b7f8a62f0de Migrations: Fix property detection for invariant content types with culture-varying compositions (closes #22159) (#22167)
+21c988309a2 Merge branch 'release/17.3.0'
+f27e5a19173 Application URLs: Prevent back office hosts being overwritten in a shared database setup (closes #16741) (#22160)
+0e6ce7d691c Localization: Added missing for elements (#22079)
+67008d349c7 Last Synced: Adding A File System Approach to Subscriber Servers (#22145)
+634b1eed889 Media Picker: Add Cards/Table view switcher (closes #22005) (#22138)
+3ece7b1276f Upload Field: Fix image overflowing content container (closes #22106) (#22107)
+cfa74db61a6 Routing: Resolve URL segment collision for siblings differing only in punctuation (closes #22070) (#22090)
+7945bd408ca Use Array.ConvertAll instead of LINQ .Select .ToArray
+af9577e7921 Redirect Tracking: Fix segment change detection and optimise descendant traversal (#22091)
+7363183ef66 Redirect Tracking: Fix segment change detection and optimise descendant traversal (#22091)
+7f9570c671f Block Editors: Resolves incorrect "Discard unsaved changes" message when editing blocks with live editing (#22134)
+f56bad89890 E2E: QA: Added document segemented variant acceptance tests (#21957)
+8ae64d26fd8 E2E: QA Updated acceptance tests for bulk trash content due to UI changes (#22118)
+502cab9ff29 Temporary File: Lowercase file extension before validation (closes #22096) (#22108)
+9271da4a735 Fixed mocks in media-type.db.ts.
