@@ -35,7 +35,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.DocumentBlueprint.Info',
 		name: 'Document Blueprint Workspace Info View',
-		element: () => import('./views/info/workspace-view-document-blueprint-info.element.js'),
+		element: () => import('./views/info/document-blueprint-workspace-view-info.element.js'),
 		weight: 100,
 		meta: {
 			label: '#general_info',

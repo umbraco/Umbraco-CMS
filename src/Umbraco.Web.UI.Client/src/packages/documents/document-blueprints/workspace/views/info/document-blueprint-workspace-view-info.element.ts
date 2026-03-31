@@ -12,8 +12,8 @@ import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
 
-@customElement('umb-workspace-view-document-blueprint-info')
-export class UmbWorkspaceViewDocumentBlueprintInfoElement extends UmbLitElement implements UmbWorkspaceViewElement {
+@customElement('umb-document-blueprint-workspace-view-info')
+export class UmbDocumentBlueprintWorkspaceViewInfoElement extends UmbLitElement implements UmbWorkspaceViewElement {
 	@state()
 	private _documentBlueprintUnique = '';
 
@@ -188,9 +188,11 @@ export class UmbWorkspaceViewDocumentBlueprintInfoElement extends UmbLitElement 
 		`,
 	];
 }
-export default UmbWorkspaceViewDocumentBlueprintInfoElement;
+
+export default UmbDocumentBlueprintWorkspaceViewInfoElement;
+
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-workspace-view-document-blueprint-info': UmbWorkspaceViewDocumentBlueprintInfoElement;
+		'umb-document-blueprint-workspace-view-info': UmbDocumentBlueprintWorkspaceViewInfoElement;
 	}
 }
