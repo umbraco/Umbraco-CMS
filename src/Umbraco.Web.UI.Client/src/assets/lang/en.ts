@@ -958,6 +958,7 @@ export default {
 		rename: 'Rename',
 		renew: 'Renew',
 		required: 'Required',
+		reset: 'Reset',
 		retrieve: 'Retrieve',
 		retry: 'Retry',
 		rights: 'Permissions',
@@ -2355,6 +2356,10 @@ export default {
 		enabledConfirm: 'URL tracker has now been enabled.',
 		enableError: 'Error enabling the URL tracker, more information can be found in your log file.',
 		culture: 'Culture',
+	},
+	embeddedMedia: {
+		dimensionsDescription:
+			'These values are passed as the maximum width and height to the embed provider. The provider may adjust the final dimensions to fit its own constraints.',
 	},
 	emptyStates: {
 		emptyDictionaryTree: 'No Dictionary items to choose from',
