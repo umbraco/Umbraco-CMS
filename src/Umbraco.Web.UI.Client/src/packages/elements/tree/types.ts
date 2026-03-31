@@ -1,5 +1,6 @@
 import type { UmbElementEntityType, UmbElementRootEntityType, UmbElementFolderEntityType } from '../entity.js';
 import type { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { UmbEntityFlag, UmbEntityWithFlags } from '@umbraco-cms/backoffice/entity-flag';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 import type {
 	UmbTreeChildrenOfRequestArgs,
@@ -11,7 +12,7 @@ import type {
 export type { UmbElementTreeItemContext } from './element-tree-item.context.js';
 export type { UmbElementTreeRepository } from './element-tree.repository.js';
 
-export interface UmbElementTreeItemModel extends UmbTreeItemModel {
+export interface UmbElementTreeItemModel extends Omit<UmbTreeItemModel, 'flags'>, UmbEntityWithFlags {
 	entityType: UmbElementEntityType | UmbElementFolderEntityType;
 	isTrashed: boolean;
 	documentType: {
@@ -32,6 +33,7 @@ export interface UmbElementTreeItemVariantModel {
 	culture: string | null;
 	segment: string | null;
 	state: DocumentVariantStateModel;
+	flags: Array<UmbEntityFlag>;
 }
 
 export interface UmbElementTreeRootItemsRequestArgs extends UmbTreeRootItemsRequestArgs {

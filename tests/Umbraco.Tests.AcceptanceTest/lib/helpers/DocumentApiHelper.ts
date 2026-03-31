@@ -326,7 +326,7 @@ export class DocumentApiHelper {
     return await this.create(document);
   }
 
-  async createDocumentWithExternalLinkURLPicker(documentName: string, documentTypeId: string, link: string, linkTitle: string) {
+  async createDocumentWithExternalLinkURLPicker(documentName: string, documentTypeId: string, dataTypeName: string, link: string, linkTitle: string) {
     await this.ensureNameNotExists(documentName);
 
     const document = new DocumentBuilder()
@@ -335,7 +335,7 @@ export class DocumentApiHelper {
         .withName(documentName)
         .done()
       .addValue()
-        .withAlias('multiUrlPicker')
+        .withAlias(AliasHelper.toAlias(dataTypeName))
         .addURLPickerValue()
           .withIcon('icon-link')
           .withName(linkTitle)

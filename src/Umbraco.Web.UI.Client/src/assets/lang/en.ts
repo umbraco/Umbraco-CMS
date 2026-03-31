@@ -1794,6 +1794,8 @@ export default {
 		allowedTemplatesDescription: 'Choose which templates editors are allowed to use on content of this type',
 		allowAtRootHeading: 'Allow at root',
 		allowAtRootDescription: 'Allow editors to create content of this type in the root of the content tree.',
+		allowInLibraryHeading: 'Allow in Library',
+		allowInLibraryDescription: 'Allow editors to create Elements of this type in the Library section.',
 		childNodesHeading: 'Allowed child node types',
 		childNodesDescription: 'Allow content of the specified types to be created underneath content of this type.',
 		chooseChildNode: 'Choose child node',
@@ -2076,7 +2078,7 @@ export default {
 		},
 		changePassword: 'Change your password',
 		changePhoto: 'Change photo',
-		configureMfa: 'Configure MFA',
+		configureMfa: 'Configure 2FA',
 		emailRequired: 'Required - enter an email address for this user',
 		emailDescription: (usernameIsEmail: boolean) => {
 			return usernameIsEmail
