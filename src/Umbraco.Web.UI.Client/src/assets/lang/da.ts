@@ -616,7 +616,7 @@ export default {
 		noMacroParams: 'Der er ingen parametre for denne makro',
 		noMacros: 'Der er ikke tilføjet nogen makroer',
 		externalLoginProviders: 'Eksternt login',
-		exceptionDetail: 'Undtagelsesdetaljer',
+		exceptionDetail: 'Fejldetaljer',
 		stacktrace: 'Stacktrace',
 		innerException: 'Indre undtagelse',
 		linkYour: 'Link din {0} konto',
@@ -636,7 +636,7 @@ export default {
 		deleteLayout: 'You are deleting the layout',
 		deletingALayout:
 			'Modifying layout will result in loss of data for any existing content that is based on this configuration.',
-		seeErrorAction: 'Se fejlen',
+		seeErrorAction: 'Se hele fejlbeskeden',
 		seeErrorDialogHeadline: 'Fejl detaljer',
 		selectEvent: 'Vælg begivenhed',
 		editWebhook: 'Rediger webhook',
