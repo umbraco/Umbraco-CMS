@@ -36,7 +36,7 @@ export interface UmbPeekErrorArgs extends UmbNotificationDefaultData {
 	errors?: Record<string, string[]>;
 	/**
 	 * Validation errors keyed by field name (from ProblemDetails.errors).
-	 * @deprecated Use {@link errors} instead. Scheduled for removal in Umbraco 19.
+	 * @deprecated Use `errors` instead. Scheduled for removal in Umbraco 19.
 	 */
 	details?: Record<string, string[]>;
 	/** The notification color. Defaults to 'danger'. */

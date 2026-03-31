@@ -2,7 +2,11 @@ import type { UmbNotificationHandler } from '../../notification-handler.js';
 import type { UmbPeekErrorArgs } from '../../types.js';
 import { css, customElement, html, ifDefined, nothing, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_ERROR_VIEWER_MODAL, UMB_MODAL_MANAGER_CONTEXT, type UmbErrorViewerModalData } from '@umbraco-cms/backoffice/modal';
+import {
+	UMB_ERROR_VIEWER_MODAL,
+	UMB_MODAL_MANAGER_CONTEXT,
+	type UmbErrorViewerModalData,
+} from '@umbraco-cms/backoffice/modal';
 
 const DETAIL_MAX_LENGTH = 250;
 
