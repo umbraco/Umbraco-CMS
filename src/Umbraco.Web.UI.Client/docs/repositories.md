@@ -67,15 +67,16 @@ Repositories live **with their feature**, not in a separate data-access layer. T
 
 ```
 {package}/{entity}/
-├── repository/
-│   ├── detail/
-│   │   ├── {entity}-detail.repository.ts
-│   │   ├── {entity}-detail.server.data-source.ts
-│   │   ├── {entity}-detail.store.ts
-│   │   ├── {entity}-detail.store.context-token.ts
-│   │   ├── manifests.ts
-│   │   └── constants.ts
-│   └── item/                              # Optional — only if entity needs item lookups
+├── detail/
+│   └── data/
+│       ├── {entity}-detail.repository.ts
+│       ├── {entity}-detail.server.data-source.ts
+│       ├── {entity}-detail.store.ts
+│       ├── {entity}-detail.store.context-token.ts
+│       ├── manifests.ts
+│       └── constants.ts
+├── item/                                  # Optional — only if entity needs item lookups
+│   └── data/
 │       ├── {entity}-item.repository.ts
 │       ├── {entity}-item.server.data-source.ts
 │       ├── {entity}-item.store.ts
@@ -88,11 +89,11 @@ Repositories live **with their feature**, not in a separate data-access layer. T
 ```
 {package}/{entity}/
 ├── tree/
-│   ├── {entity}-tree.repository.ts
-│   ├── {entity}-tree.store.context-token.ts
-│   ├── server-data-source/
-│   │   └── {entity}-tree.server.data-source.ts
-│   └── manifests.ts
+│   └── data/
+│       ├── {entity}-tree.repository.ts
+│       ├── {entity}-tree.server.data-source.ts
+│       ├── {entity}-tree.store.context-token.ts
+│       └── manifests.ts
 ```
 
 ### Collection repository
@@ -100,7 +101,7 @@ Repositories live **with their feature**, not in a separate data-access layer. T
 ```
 {package}/{entity}/
 ├── collection/
-│   └── repository/
+│   └── data/
 │       ├── {entity}-collection.repository.ts
 │       ├── {entity}-collection.server.data-source.ts
 │       └── manifests.ts
@@ -112,25 +113,25 @@ Repositories live **with their feature**, not in a separate data-access layer. T
 {package}/{entity}/
 ├── entity-actions/
 │   ├── duplicate/
-│   │   └── repository/
+│   │   └── data/
 │   │       ├── {entity}-duplicate.repository.ts
 │   │       ├── {entity}-duplicate.server.data-source.ts
 │   │       └── types.ts
 │   ├── move-to/
-│   │   └── repository/
+│   │   └── data/
 │   │       └── ...
 │   └── culture-and-hostnames/
-│       └── repository/
+│       └── data/
 │           └── ...
 ├── entity-bulk-actions/
 │   ├── move-to/
-│   │   └── repository/
+│   │   └── data/
 │   │       └── ...
 │   └── duplicate-to/
-│       └── repository/
+│       └── data/
 │           └── ...
 ├── publishing/
-│   └── repository/
+│   └── data/
 │       ├── {entity}-publishing.repository.ts
 │       └── {entity}-publishing.server.data-source.ts
 ```
