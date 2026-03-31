@@ -6,15 +6,15 @@ import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/back
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
-import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
-import { UMB_TEMPLATE_PICKER_MODAL, UmbTemplateItemRepository } from '@umbraco-cms/backoffice/template';
-import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/document-type';
-import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
+import { UmbTemplateItemRepository, UMB_TEMPLATE_PICKER_MODAL } from '@umbraco-cms/backoffice/template';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_DATE_TIME_FORMAT_OPTIONS } from '@umbraco-cms/backoffice/utils';
+import { UMB_IS_TRASHED_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/recycle-bin';
 import { UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
 import { UMB_SETTINGS_SECTION_ALIAS } from '@umbraco-cms/backoffice/settings';
-import { UMB_IS_TRASHED_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/recycle-bin';
-import { UMB_DATE_TIME_FORMAT_OPTIONS } from '@umbraco-cms/backoffice/utils';
+import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
+import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/document-type';
+import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 
 @customElement('umb-document-workspace-view-info')
 export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {

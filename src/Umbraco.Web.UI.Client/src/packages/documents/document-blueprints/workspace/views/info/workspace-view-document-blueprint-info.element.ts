@@ -1,16 +1,16 @@
 import type { UmbDocumentBlueprintVariantModel } from '../../../types.js';
 import { UMB_DOCUMENT_BLUEPRINT_PROPERTY_DATASET_CONTEXT } from '../../../property-dataset-context/document-blueprint-property-dataset-context.token.js';
 import { UMB_DOCUMENT_BLUEPRINT_WORKSPACE_CONTEXT } from '../../constants.js';
-import { UMB_DATE_TIME_FORMAT_OPTIONS as TimeOptions } from '@umbraco-cms/backoffice/utils';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
-import { css, html, customElement, state, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
-import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
-import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
+import { css, customElement, html, ifDefined, nothing, state } from '@umbraco-cms/backoffice/external/lit';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
+import { UMB_DATE_TIME_FORMAT_OPTIONS } from '@umbraco-cms/backoffice/utils';
 import { UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
 import { UMB_SETTINGS_SECTION_ALIAS } from '@umbraco-cms/backoffice/settings';
+import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
+import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
+import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
 
 @customElement('umb-workspace-view-document-blueprint-info')
 export class UmbWorkspaceViewDocumentBlueprintInfoElement extends UmbLitElement implements UmbWorkspaceViewElement {
@@ -146,7 +146,7 @@ export class UmbWorkspaceViewDocumentBlueprintInfoElement extends UmbLitElement 
 			<div class="general-item">
 				<strong><umb-localize .key=${labelKey}>${labelText}</umb-localize></strong>
 				<span>
-					<umb-localize-date .date=${date} .options=${TimeOptions}></umb-localize-date>
+					<umb-localize-date .date=${date} .options=${UMB_DATE_TIME_FORMAT_OPTIONS}></umb-localize-date>
 				</span>
 			</div>
 		`;
