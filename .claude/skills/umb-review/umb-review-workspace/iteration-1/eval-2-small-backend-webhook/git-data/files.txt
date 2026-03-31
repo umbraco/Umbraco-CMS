@@ -1,3 +1,0 @@
-src/Umbraco.Core/Constants-Webhooks.cs
-src/Umbraco.Core/Webhooks/WebhookPayloadType.cs
-src/Umbraco.Infrastructure/Telemetry/Providers/WebhookTelemetryProvider.cs

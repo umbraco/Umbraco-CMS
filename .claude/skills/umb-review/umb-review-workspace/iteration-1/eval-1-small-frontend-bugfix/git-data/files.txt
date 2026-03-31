@@ -1,4 +1,0 @@
-src/Umbraco.Web.UI.Client/src/packages/block/block/workspace/block-element-manager.ts
-src/Umbraco.Web.UI.Client/src/packages/block/block/workspace/block-workspace.context.ts
-src/Umbraco.Web.UI.Client/src/packages/block/block/workspace/views/edit/block-workspace-view-edit-content-no-router.element.ts
-src/Umbraco.Web.UI.Client/src/packages/block/block/workspace/views/edit/block-workspace-view-edit.element.ts

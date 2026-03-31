@@ -1,2 +1,0 @@
-src/Umbraco.Web.UI.Client/src/packages/user/user-group/workspace/user-group/user-group-workspace.context.ts
-src/Umbraco.Web.UI.Client/src/packages/user/user-group/workspace/user-group/views/user-group-details-workspace-view.element.ts

@@ -1,5 +1,0 @@
- .../block/block/workspace/block-element-manager.ts |  19 ++-
- .../block/workspace/block-workspace.context.ts     |   3 +
- ...orkspace-view-edit-content-no-router.element.ts | 164 ++++++++++++++++++---
- .../edit/block-workspace-view-edit.element.ts      | 163 +++++++++++++++-----
- 4 files changed, 285 insertions(+), 64 deletions(-)
