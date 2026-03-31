@@ -66,7 +66,7 @@ internal sealed class BlockGridPropertyValueCreator : BlockPropertyValueCreatorB
                 }
 
                 var items = area.Items.Select(item => createBlockItem(item)).WhereNotNull().ToList();
-                return new BlockGridArea(items, areaConfig.Alias!, areaConfig.RowSpan ?? DefaultRowSpan, areaConfig.ColumnSpan ?? DefaultColumnSpan);
+                return new BlockGridArea(items, areaConfig.Alias!, areaConfig.RowSpan ?? DefaultRowSpan, areaConfig.ColumnSpan ?? blockConfig.AreaGridColumns ?? gridColumns ?? DefaultColumnSpan);
             }).WhereNotNull().ToArray();
 
             return blockItem;

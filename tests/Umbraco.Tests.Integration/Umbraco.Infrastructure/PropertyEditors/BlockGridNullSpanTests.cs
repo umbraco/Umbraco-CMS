@@ -13,12 +13,12 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.PropertyEditors;
 /// Regression test for https://github.com/umbraco/Umbraco-CMS/issues/22306
 /// BlockGrid throws "Nullable object must have a value" when a block item has null columnSpan/rowSpan.
 /// </summary>
-internal sealed class BlockGridNullColumnSpanTests : BlockEditorElementVariationTestBase
+internal sealed class BlockGridNullSpanTests : BlockEditorElementVariationTestBase
 {
     private IJsonSerializer JsonSerializer => GetRequiredService<IJsonSerializer>();
 
     [Test]
-    public async Task Can_Render_BlockGrid_When_Items_Have_Null_ColumnSpan()
+    public async Task Can_Render_BlockGrid_When_Items_Have_Null_Spans()
     {
         var elementType = CreateElementType(ContentVariation.Nothing);
         var areaKey = Guid.NewGuid();
@@ -81,13 +81,17 @@ internal sealed class BlockGridNullColumnSpanTests : BlockEditorElementVariation
 
         Assert.IsNotNull(blocks);
         Assert.AreEqual(1, blocks!.Count);
+
+        // Null RowSpan defaults to 1, null ColumnSpan defaults to gridColumns (12).
         Assert.AreEqual(1, blocks[0].RowSpan);
-        Assert.Greater(blocks[0].ColumnSpan, 0);
+        Assert.AreEqual(12, blocks[0].ColumnSpan);
 
         var area = blocks[0].Areas.FirstOrDefault();
         Assert.IsNotNull(area);
         Assert.AreEqual(1, area!.Count);
+
+        // Nested item gets the same defaults.
         Assert.AreEqual(1, area[0].RowSpan);
-        Assert.Greater(area[0].ColumnSpan, 0);
+        Assert.AreEqual(12, area[0].ColumnSpan);
     }
 }
