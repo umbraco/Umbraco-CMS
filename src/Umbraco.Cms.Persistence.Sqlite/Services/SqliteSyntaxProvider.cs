@@ -134,7 +134,7 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
     /// </summary>
     /// <param name="foreignKey">The foreign key definition to format.</param>
     /// <returns>The formatted foreign key constraint SQL.</returns>
-    public virtual string Format(ForeignKeyDefinition foreignKey)
+    public new virtual string Format(ForeignKeyDefinition foreignKey)
     {
         var constraintName = string.IsNullOrEmpty(foreignKey.Name)
             ? $"FK_{foreignKey.ForeignTable}_{foreignKey.PrimaryTable}_{foreignKey.PrimaryColumns.First()}"
@@ -306,7 +306,7 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
 
     // TODO (V18): Change 'virtual' to 'override' to properly override base class method (currently causes CS0114 warning).
     /// <inheritdoc />
-    public virtual string Format(IEnumerable<ColumnDefinition> columns)
+    public new virtual string Format(IEnumerable<ColumnDefinition> columns)
     {
         var sb = new StringBuilder();
         foreach (ColumnDefinition column in columns)

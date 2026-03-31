@@ -306,7 +306,7 @@ public abstract class UmbracoUserManager<TUser, TPasswordConfig> : UserManager<T
     /// </summary>
     /// <param name="user">The user whose valid two-factor providers are to be retrieved.</param>
     /// <returns>A task representing the asynchronous operation, containing a list of valid two-factor provider names.</returns>
-    public virtual async Task<IList<string>> GetValidTwoFactorProvidersAsync(TUser user)
+    public new virtual async Task<IList<string>> GetValidTwoFactorProvidersAsync(TUser user)
     {
         IList<string>? results = await base.GetValidTwoFactorProvidersAsync(user);
 
