@@ -431,7 +431,7 @@ internal sealed partial class UserServiceCrudTests
     }
 
     [Test]
-    public async Task Can_update_current_user()
+    public async Task Can_Update_Current_User()
     {
         var userService = CreateUserService();
         var (_, createdUser) = await CreateUserForUpdate(userService);
