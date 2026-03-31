@@ -8,11 +8,8 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
-using Umbraco.Cms.Core.Security.Authorization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
-using Umbraco.Cms.Web.Common.Authorization;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.User.Current;
 
@@ -25,7 +22,6 @@ public class UpdateCurrentUserProfileController : CurrentUserControllerBase
     private readonly IUserService _userService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly IUserPresentationFactory _userPresentationFactory;
-    private readonly IAuthorizationService _authorizationService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="UpdateCurrentUserProfileController"/> class, which manages user update operations in the Umbraco backoffice API.
@@ -37,13 +33,11 @@ public class UpdateCurrentUserProfileController : CurrentUserControllerBase
     public UpdateCurrentUserProfileController(
         IUserService userService,
         IUserPresentationFactory userPresentationFactory,
-        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-        IAuthorizationService authorizationService)
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
     {
         _userService = userService;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
         _userPresentationFactory = userPresentationFactory;
-        _authorizationService = authorizationService;
     }
 
     /// <summary>
@@ -62,18 +56,8 @@ public class UpdateCurrentUserProfileController : CurrentUserControllerBase
     {
         Guid userKey = CurrentUserKey(_backOfficeSecurityAccessor);
 
-        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
-            User,
-            UserPermissionResource.WithKeys(userKey),
-            AuthorizationPolicies.UserPermissionByResource);
-
-        if (!authorizationResult.Succeeded)
-        {
-            return Forbidden();
-        }
-
-        CurrentUserUpdateModel updateModel = await _userPresentationFactory.CreateUpdateCurrentUserModelAsync(userKey, model);
-        Attempt<IUser?, UserOperationStatus> result = await _userService.UpdateCurrentUserAsync(updateModel);
+        CurrentUserUpdateModel updateModel = await _userPresentationFactory.CreateUpdateCurrentUserModelAsync(model);
+        Attempt<IUser?, UserOperationStatus> result = await _userService.UpdateProfileAsync(userKey, updateModel);
 
         return result.Success
             ? Ok()

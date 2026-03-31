@@ -435,13 +435,12 @@ internal sealed partial class UserServiceCrudTests
     {
         var userService = CreateUserService();
         var (_, createdUser) = await CreateUserForUpdate(userService);
-        var modal = new CurrentUserUpdateModel
+        var model = new CurrentUserUpdateModel
         {
-            ExistingUserKey = createdUser.Key,
             LanguageIsoCode = "da"
         };
 
-        var result = await userService.UpdateCurrentUserAsync(modal);
+        var result = await userService.UpdateProfileAsync(createdUser.Key, model);
 
         Assert.IsTrue(result.Success);
         var updatedUser = await userService.GetAsync(createdUser.Key);
@@ -456,11 +455,10 @@ internal sealed partial class UserServiceCrudTests
         var (_, createdUser) = await CreateUserForUpdate(userService);
         var model = new CurrentUserUpdateModel
         {
-            ExistingUserKey = createdUser.Key,
             LanguageIsoCode = "da"
         };
 
-        var result = await userService.UpdateCurrentUserAsync(model);
+        var result = await userService.UpdateProfileAsync(createdUser.Key, model);
 
         Assert.IsTrue(result.Success);
         var updatedUser = await userService.GetAsync(createdUser.Key);

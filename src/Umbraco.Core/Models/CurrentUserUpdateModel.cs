@@ -6,11 +6,6 @@ namespace Umbraco.Cms.Core.Models;
 public class CurrentUserUpdateModel
 {
     /// <summary>
-    ///     Gets or sets the unique key of the existing user to update.
-    /// </summary>
-    public required Guid ExistingUserKey { get; set; }
-
-    /// <summary>
     ///     Gets or sets the ISO code of the user's preferred language.
     /// </summary>
     public required string LanguageIsoCode { get; set; }

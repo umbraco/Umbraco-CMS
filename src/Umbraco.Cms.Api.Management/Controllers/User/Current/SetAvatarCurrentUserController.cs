@@ -55,16 +55,6 @@ public class SetAvatarCurrentUserController : CurrentUserControllerBase
     {
         Guid userKey = CurrentUserKey(_backOfficeSecurityAccessor);
 
-        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
-            User,
-            UserPermissionResource.WithKeys(userKey),
-            AuthorizationPolicies.UserPermissionByResource);
-
-        if (!authorizationResult.Succeeded)
-        {
-            return Forbidden();
-        }
-
         UserOperationStatus result = await _userService.SetAvatarAsync(userKey, model.File.Id);
 
         return result is UserOperationStatus.Success

@@ -830,13 +830,13 @@ internal partial class UserService : RepositoryService, IUserService
     }
 
     /// <inheritdoc/>
-    public async Task<Attempt<IUser?, UserOperationStatus>> UpdateCurrentUserAsync(CurrentUserUpdateModel model)
+    public async Task<Attempt<IUser?, UserOperationStatus>> UpdateProfileAsync(Guid userKey, CurrentUserUpdateModel model)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         using IServiceScope serviceScope = _serviceScopeFactory.CreateScope();
         IBackOfficeUserStore userStore = serviceScope.ServiceProvider.GetRequiredService<IBackOfficeUserStore>();
 
-        IUser? existingUser = await userStore.GetAsync(model.ExistingUserKey);
+        IUser? existingUser = await userStore.GetAsync(userKey);
 
         if (existingUser is null)
         {

@@ -35991,6 +35991,206 @@
             "Backoffice-User": []
           }
         ]
+      },
+      "delete": {
+        "tags": ["User"],
+        "summary": "Clears the current user's avatar.",
+        "description": "Removes the avatar image for the currently authenticated user.",
+        "operationId": "DeleteUserCurrentAvatar",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  },
+                  "nullable": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  },
+                  "nullable": true
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ProblemDetails"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  },
+                  "nullable": true
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ProblemDetails"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": []
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/user/current/profile": {
+      "put": {
+        "tags": ["User"],
+        "summary": "Updates current user profile.",
+        "description": "Updates current user profile with the details from the request model.",
+        "operationId": "PutUserCurrentProfile",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/UpdateCurrentUserRequestModel"
+                  }
+                ]
+              }
+            },
+            "text/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/UpdateCurrentUserRequestModel"
+                  }
+                ]
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/UpdateCurrentUserRequestModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  },
+                  "nullable": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  },
+                  "nullable": true
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ProblemDetails"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  },
+                  "nullable": true
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ProblemDetails"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": []
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/user/current/change-password": {
@@ -49977,6 +50177,16 @@
           },
           "hasMediaRootAccess": {
             "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "UpdateCurrentUserRequestModel": {
+        "required": ["languageIsoCode"],
+        "type": "object",
+        "properties": {
+          "languageIsoCode": {
+            "type": "string"
           }
         },
         "additionalProperties": false
