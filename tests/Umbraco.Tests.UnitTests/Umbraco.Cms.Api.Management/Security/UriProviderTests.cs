@@ -2,7 +2,6 @@
 // See LICENSE for more details.
 
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Security;
@@ -45,8 +44,7 @@ public class UriProviderTests
         var sut = new ForgotPasswordUriProvider(
             _userManager.Object,
             _hostingEnvironment.Object,
-            _httpContextAccessor.Object,
-            Mock.Of<ILogger<ForgotPasswordUriProvider>>());
+            _httpContextAccessor.Object);
 
         Attempt<Uri, UserOperationStatus> result = await sut.CreateForgotPasswordUriAsync(_user.Object);
 
@@ -59,7 +57,7 @@ public class UriProviderTests
     }
 
     [Test]
-    public async Task ForgotPasswordUri_WithoutApplicationMainUrl_ReturnsRelativeUri()
+    public async Task ForgotPasswordUri_WithoutApplicationMainUrl_FailsWithApplicationUrlNotConfigured()
     {
         _hostingEnvironment.Setup(h => h.ApplicationMainUrl).Returns((Uri?)null);
         _userManager
@@ -69,16 +67,12 @@ public class UriProviderTests
         var sut = new ForgotPasswordUriProvider(
             _userManager.Object,
             _hostingEnvironment.Object,
-            _httpContextAccessor.Object,
-            Mock.Of<ILogger<ForgotPasswordUriProvider>>());
+            _httpContextAccessor.Object);
 
         Attempt<Uri, UserOperationStatus> result = await sut.CreateForgotPasswordUriAsync(_user.Object);
 
-        Assert.IsTrue(result.Success);
-        Assert.IsFalse(result.Result.IsAbsoluteUri);
-        var uriString = result.Result.ToString();
-        Assert.That(uriString, Does.StartWith("/umbraco/login"));
-        Assert.That(uriString, Does.Contain("flow=reset-password"));
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(UserOperationStatus.ApplicationUrlNotConfigured, result.Status);
     }
 
     [Test]
@@ -93,8 +87,7 @@ public class UriProviderTests
         var sut = new InviteUriProvider(
             _userManager.Object,
             _httpContextAccessor.Object,
-            _hostingEnvironment.Object,
-            Mock.Of<ILogger<InviteUriProvider>>());
+            _hostingEnvironment.Object);
 
         Attempt<Uri, UserOperationStatus> result = await sut.CreateInviteUriAsync(_user.Object);
 
@@ -107,7 +100,7 @@ public class UriProviderTests
     }
 
     [Test]
-    public async Task InviteUri_WithoutApplicationMainUrl_ReturnsRelativeUri()
+    public async Task InviteUri_WithoutApplicationMainUrl_FailsWithApplicationUrlNotConfigured()
     {
         _hostingEnvironment.Setup(h => h.ApplicationMainUrl).Returns((Uri?)null);
         _userManager
@@ -117,15 +110,11 @@ public class UriProviderTests
         var sut = new InviteUriProvider(
             _userManager.Object,
             _httpContextAccessor.Object,
-            _hostingEnvironment.Object,
-            Mock.Of<ILogger<InviteUriProvider>>());
+            _hostingEnvironment.Object);
 
         Attempt<Uri, UserOperationStatus> result = await sut.CreateInviteUriAsync(_user.Object);
 
-        Assert.IsTrue(result.Success);
-        Assert.IsFalse(result.Result.IsAbsoluteUri);
-        var uriString = result.Result.ToString();
-        Assert.That(uriString, Does.StartWith("/umbraco/login"));
-        Assert.That(uriString, Does.Contain("flow=invite-user"));
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(UserOperationStatus.ApplicationUrlNotConfigured, result.Status);
     }
 }

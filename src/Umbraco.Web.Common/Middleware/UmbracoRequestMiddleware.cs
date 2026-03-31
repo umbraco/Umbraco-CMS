@@ -94,23 +94,26 @@ internal sealed class UmbracoRequestMiddleware : IMiddleware
         UmbracoContextReference umbracoContextReference = _umbracoContextFactory.EnsureUmbracoContext();
 
         Uri? currentApplicationUrl = GetApplicationUrlFromCurrentRequest(context.Request);
+        Uri? applicationUrlBeforeDetection = _hostingEnvironment.ApplicationMainUrl;
         _hostingEnvironment.EnsureApplicationMainUrl(currentApplicationUrl);
 
         if (_applicationUrlLogged is false && currentApplicationUrl is not null)
         {
+            _applicationUrlLogged = true;
+
             if (_hostingEnvironment.ApplicationMainUrl is not null)
             {
-                _applicationUrlLogged = true;
+                var source = applicationUrlBeforeDetection is not null ? "configured" : "auto-detected";
                 _logger.LogInformation(
-                    "Application URL auto-detected as {ApplicationMainUrl}. To override, set Umbraco:CMS:WebRouting:UmbracoApplicationUrl in configuration.",
+                    "Application URL {Source} as {ApplicationMainUrl}.",
+                    source,
                     _hostingEnvironment.ApplicationMainUrl);
             }
             else
             {
-                _applicationUrlLogged = true;
                 _logger.LogWarning(
                     "Application URL auto-detection is disabled and no explicit URL is configured. "
-                    + "Email links (invitations, password resets) will use relative paths. "
+                    + "Email links (invitations, password resets) will not be available. "
                     + "Set Umbraco:CMS:WebRouting:UmbracoApplicationUrl in configuration, "
                     + "or change Umbraco:CMS:WebRouting:ApplicationUrlDetection to 'FirstRequest' or 'EveryRequest'.");
             }
