@@ -26,13 +26,6 @@ export class UmbScrollableContainerElement extends UmbLitElement {
 		this.scrollBy({ left: 200, behavior: 'smooth' });
 	}
 
-	override updated() {
-		if (!this.#resizeObserverConnected) {
-			this.#resizeObserver.observe(this);
-			this.#resizeObserverConnected = true;
-		}
-	}
-
 	override connectedCallback() {
 		super.connectedCallback();
 		this.addEventListener('scroll', this.#updateScrollButtons);
@@ -50,6 +43,16 @@ export class UmbScrollableContainerElement extends UmbLitElement {
 		super.destroy();
 	}
 
+	#onSlotChange(e: Event) {
+		const slot = e.target as HTMLSlotElement;
+		this.#resizeObserver.disconnect();
+		this.#resizeObserver.observe(this);
+		for (const el of slot.assignedElements()) {
+			this.#resizeObserver.observe(el);
+		}
+		this.#updateScrollButtons();
+	}
+
 	override render() {
 		return html`
 			${this._showScrollLeft
@@ -61,7 +64,7 @@ export class UmbScrollableContainerElement extends UmbLitElement {
 						<uui-icon name="icon-arrow-left"></uui-icon>
 					</uui-button>`
 				: nothing}
-			<slot></slot>
+			<slot @slotchange=${this.#onSlotChange}></slot>
 			${this._showScrollRight
 				? html`<uui-button
 						id="scroll-right"
