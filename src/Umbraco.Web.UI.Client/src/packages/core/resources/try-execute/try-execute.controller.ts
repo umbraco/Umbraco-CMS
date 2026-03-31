@@ -57,7 +57,8 @@ export class UmbTryExecuteController<T> extends UmbResourceController<T> {
 			return;
 		}
 
-		let headline = 'An error occurred';
+		/** This is a constant on purpose, because the headline should not change. We cannot trust the error details to provide a reliable headline. */
+		const headline = 'An error occurred';
 		let message = 'A fatal server error occurred. If this continues, please reach out to your administrator.';
 		let detail: string | undefined;
 		let errors: Record<string, string[]> | undefined;
@@ -91,17 +92,16 @@ export class UmbTryExecuteController<T> extends UmbResourceController<T> {
 				apiError.problemDetails.detail?.includes('ObjectCacheAppCache') ||
 				apiError.problemDetails.detail?.includes('Umbraco.Cms.Infrastructure.Scoping.Scope.DisposeLastScope()')
 			) {
-				headline = 'Please restart the server';
-				message =
+				message = 'Please restart the server';
+				detail =
 					'The Umbraco object cache is corrupt, but your action may still have been executed. Please restart the server to reset the cache. This is a work in progress.';
-				detail = undefined;
 			}
 		} else {
 			// Unknown error, show notification
 			message = apiError instanceof Error ? apiError.message : 'An unknown error occurred.';
 		}
 
-		this._peekError(headline, message, errors, detail);
+		this._peekError({ headline, message, detail, errors });
 		console.error('[UmbTryExecuteController] Error in request:', error);
 	}
 }

@@ -33,7 +33,7 @@ export class UmbPeekErrorNotificationElement extends UmbLitElement {
 	}
 
 	get #actions() {
-		const hasErrors = !!this.data?.details;
+		const hasErrors = !!(this.data?.errors ?? this.data?.details);
 		const hasLongDetail = !!this.data?.detail && this.data.detail.length > DETAIL_MAX_LENGTH;
 		if (!hasErrors && !hasLongDetail) return nothing;
 
@@ -44,7 +44,7 @@ export class UmbPeekErrorNotificationElement extends UmbLitElement {
 						look="primary"
 						color="danger"
 						label=${this.localize.term('defaultdialogs_seeErrorAction')}
-						@click=${() => this.#openErrorViewer(this.data?.details)}></uui-button>`
+						@click=${() => this.#openErrorViewer(this.data?.errors ?? this.data?.details)}></uui-button>`
 				: nothing}
 			${hasLongDetail
 				? html`<uui-button

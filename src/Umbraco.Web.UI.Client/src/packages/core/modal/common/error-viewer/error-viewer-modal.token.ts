@@ -1,7 +1,7 @@
 import type { UmbPeekErrorArgs } from '../../../notification/types.js';
 import { UmbModalToken } from '../../token/index.js';
 
-export type UmbErrorViewerModalData = UmbPeekErrorArgs | string;
+export type UmbErrorViewerModalData = UmbPeekErrorArgs | Record<string, string[]> | string;
 
 export type UmbErrorViewerModalValue = undefined;
 
