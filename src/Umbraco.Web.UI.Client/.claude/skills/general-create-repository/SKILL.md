@@ -13,7 +13,7 @@ Create or extend a repository and its data source for an entity feature in the U
 Read these before creating a repository — they define the conventions this skill builds on:
 
 - **[Repositories](../../../docs/repositories.md)** — Repository categories, file structure, naming, extension registration, when to use which type
-- **[Data Flow](../../../docs/Data-Flow.md)** — Full data flow chain, tryExecute, model mapping, store direction
+- **[Data Flow](../../../docs/data-flow.md)** — Full data flow chain, tryExecute, model mapping, store direction
 - **[Package Development](../../../docs/package-development.md)** — Folder conventions, vertical slices, public API rules
 
 ## What you need from the user
