@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Exceptions;
@@ -291,6 +292,44 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         }
 
         return GetContentScheduleByContentId(idAttempt.Result);
+    }
+
+    /// <inheritdoc />
+    public IDictionary<Guid, IEnumerable<ContentSchedule>> GetContentSchedulesByKeys(Guid[] keys)
+    {
+        if (keys.Length == 0)
+        {
+            return ImmutableDictionary<Guid, IEnumerable<ContentSchedule>>.Empty;
+        }
+
+        Dictionary<int, Guid> intToKeyMap = new(keys.Length);
+        foreach (Guid key in keys)
+        {
+            Attempt<int> contentId = _idKeyMap.GetIdForKey(key, ContentObjectType);
+            if (contentId.Success is false)
+            {
+                continue;
+            }
+
+            intToKeyMap[contentId.Result] = key;
+        }
+
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        scope.ReadLock(ReadLockIds);
+
+        IDictionary<int, IEnumerable<ContentSchedule>> intKeyedResults =
+            _documentRepository.GetContentSchedulesByIds(intToKeyMap.Keys.ToArray());
+
+        var guidKeyedResults = new Dictionary<Guid, IEnumerable<ContentSchedule>>(intKeyedResults.Count);
+        foreach (KeyValuePair<int, IEnumerable<ContentSchedule>> entry in intKeyedResults)
+        {
+            if (intToKeyMap.TryGetValue(entry.Key, out Guid guidKey))
+            {
+                guidKeyedResults[guidKey] = entry.Value;
+            }
+        }
+
+        return guidKeyedResults;
     }
 
     /// <inheritdoc />

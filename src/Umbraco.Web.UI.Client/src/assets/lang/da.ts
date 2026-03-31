@@ -2025,7 +2025,7 @@ export default {
 		},
 		changePassword: 'Skift dit kodeord',
 		changePhoto: 'Skift billede',
-		configureMfa: 'Konfigurer MFA',
+		configureMfa: 'Konfigurer 2FA',
 		newPassword: 'Nyt kodeord',
 		newPasswordFormatLengthTip: 'Minium %0% karakterer tilbage!',
 		newPasswordFormatNonAlphaTip: 'Der skal som minium være %0% specielle karakterer.',
@@ -2263,6 +2263,10 @@ export default {
 		enableError:
 			'Der opstod en fejl under forsøget på at slå URL trackeren til, der findes mere information\n      i logfilen.\n    ',
 	},
+	embeddedMedia: {
+		dimensionsDescription:
+			'Disse værdier sendes som den maksimale bredde og højde til embed-udbyderen. Udbyderen kan justere de endelige dimensioner for at overholde sine egne begrænsninger.',
+	},
 	emptyStates: {
 		emptyDictionaryTree: 'Ingen ordbog elementer at vælge imellem',
 	},
@@ -2324,7 +2328,8 @@ export default {
 		openBackofficeSearch: 'Åben backoffice søgning',
 		openCloseBackofficeHelp: 'Åben/Luk backoffice hjælp',
 		openCloseBackofficeProfileOptions: 'Åben/Luk dine profil indstillinger',
-		profileOptions: 'Profil indstillinger',
+		profileOptions: 'Brugerprofil for %0% (%1%)',
+		profileOptionsDefault: 'Brugerprofil',
 		assignDomainDescription: 'Tilføj domæne på %0%',
 		createDescription: 'Opret ny node under %0%',
 		protectDescription: 'Opsæt offentlig adgang på %0%',
