@@ -905,6 +905,14 @@ internal partial class UserService : RepositoryService, IUserService
             return Attempt.FailWithStatus<IUser?, UserOperationStatus>(UserOperationStatus.MediaStartNodeNotFound, existingUser);
         }
 
+        List<int>? startElementIds = GetIdsFromKeys(model.ElementStartNodeKeys, UmbracoObjectTypes.ElementContainer);
+
+        if (startElementIds is null || startElementIds.Count != model.ElementStartNodeKeys.Count)
+        {
+            scope.Complete();
+            return Attempt.FailWithStatus<IUser?, UserOperationStatus>(UserOperationStatus.ElementStartNodeNotFound, existingUser);
+        }
+
         if (model.HasContentRootAccess)
         {
             startContentIds.Add(Constants.System.Root);
@@ -913,6 +921,11 @@ internal partial class UserService : RepositoryService, IUserService
         if (model.HasMediaRootAccess)
         {
             startMediaIds.Add(Constants.System.Root);
+        }
+
+        if (model.HasElementRootAccess)
+        {
+            startElementIds.Add(Constants.System.Root);
         }
 
         Attempt<string?> isAuthorized = _userEditorAuthorizationHelper.IsAuthorized(
@@ -939,7 +952,7 @@ internal partial class UserService : RepositoryService, IUserService
         // TODO: This probably shouldn't live here, once we have user content start nodes as keys this can be moved to a mapper
         // Alternatively it should be a map definition, but then we need to use entity service to resolve the IDs
         // TODO: Add auditing
-        IUser updated = MapUserUpdate(model, userGroups, existingUser, startContentIds, startMediaIds);
+        IUser updated = MapUserUpdate(model, userGroups, existingUser, startContentIds, startMediaIds, startElementIds);
         UserOperationStatus saveStatus = await userStore.SaveAsync(updated);
 
         if (saveStatus is not UserOperationStatus.Success)
@@ -1005,13 +1018,15 @@ internal partial class UserService : RepositoryService, IUserService
     /// <param name="target">The target user to update.</param>
     /// <param name="startContentIds">The content start node IDs.</param>
     /// <param name="startMediaIds">The media start node IDs.</param>
+    /// <param name="startElementIds">The element start node IDs.</param>
     /// <returns>The updated <see cref="IUser" />.</returns>
     private IUser MapUserUpdate(
         UserUpdateModel source,
         ISet<IUserGroup> sourceUserGroups,
         IUser target,
         List<int> startContentIds,
-        List<int> startMediaIds)
+        List<int> startMediaIds,
+        List<int> startElementIds)
     {
         target.Name = source.Name;
         target.Language = source.LanguageIsoCode;
@@ -1019,6 +1034,7 @@ internal partial class UserService : RepositoryService, IUserService
         target.Username = source.UserName;
         target.StartContentIds = startContentIds.ToArray();
         target.StartMediaIds = startMediaIds.ToArray();
+        target.StartElementIds = startElementIds.ToArray();
 
         target.ClearGroups();
         foreach (IUserGroup group in sourceUserGroups)
