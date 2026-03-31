@@ -181,21 +181,25 @@ public sealed class ContentTypeCacheRefresher : PayloadCacheRefresherBase<Conten
             var structuralDocumentTypeIds = payloads
                 .Where(x => x.ItemType == nameof(IContentType) && x.ChangeTypes.IsStructuralChange())
                 .Select(x => x.Id)
+                .Distinct()
                 .ToArray();
 
             var nonStructuralDocumentTypeIds = payloads
                 .Where(x => x.ItemType == nameof(IContentType) && x.ChangeTypes.IsNonStructuralChange())
                 .Select(x => x.Id)
+                .Distinct()
                 .ToArray();
 
             var structuralMediaTypeIds = payloads
                 .Where(x => x.ItemType == nameof(IMediaType) && x.ChangeTypes.IsStructuralChange())
                 .Select(x => x.Id)
+                .Distinct()
                 .ToArray();
 
             var nonStructuralMediaTypeIds = payloads
                 .Where(x => x.ItemType == nameof(IMediaType) && x.ChangeTypes.IsNonStructuralChange())
                 .Select(x => x.Id)
+                .Distinct()
                 .ToArray();
 
             // Full memory cache rebuild only for structural changes

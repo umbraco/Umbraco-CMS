@@ -1,6 +1,4 @@
 import { UmbElementItemDataResolver } from '../item/data-resolver/element-item-data-resolver.js';
-import { UMB_ELEMENT_ENTITY_TYPE } from '../entity.js';
-import type { UmbElementItemModel } from '../types.js';
 import type { UmbElementTreeItemModel, UmbElementTreeRootModel } from './types.js';
 import { UmbDefaultTreeItemContext } from '@umbraco-cms/backoffice/tree';
 import { UmbIsTrashedEntityContext } from '@umbraco-cms/backoffice/recycle-bin';
@@ -33,11 +31,7 @@ export class UmbElementTreeItemContext extends UmbDefaultTreeItemContext<
 
 	public override setTreeItem(treeItem: UmbElementTreeItemModel | undefined) {
 		super.setTreeItem(treeItem);
-		if (treeItem?.entityType === UMB_ELEMENT_ENTITY_TYPE) {
-			// The entity type guard above narrows to UMB_ELEMENT_ENTITY_TYPE at runtime.
-			// The remaining type differences (variant state enum) are nominal, not structural.
-			this.#item.setData(treeItem as unknown as UmbElementItemModel);
-		}
+		this.#item.setData(treeItem);
 	}
 }
 

@@ -127,7 +127,9 @@ export class UmbDashboardExamineIndexElement extends UmbLitElement {
 	#renderIndexSearch() {
 		// Do we want to show the search while rebuilding?
 		if (!this._indexData || this._indexData.healthStatus.status === HealthStatusModel.REBUILDING) return nothing;
-		return html`<umb-dashboard-examine-searcher .searcherName="${this.indexName}"></umb-dashboard-examine-searcher>`;
+		return html`<umb-dashboard-examine-searcher
+			.searcherName=${this.indexName}
+			.uniqueKeyFieldName=${this._indexData?.uniqueKeyFieldName ?? undefined}></umb-dashboard-examine-searcher>`;
 	}
 
 	#renderPropertyList() {

@@ -1,6 +1,6 @@
 import type { UmbElementTreeItemModel } from './types.js';
 import type { UmbElementTreeItemContext } from './element-tree-item.context.js';
-import { css, html, customElement, state, property, classMap } from '@umbraco-cms/backoffice/external/lit';
+import { classMap, css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTreeItemElementBase } from '@umbraco-cms/backoffice/tree';
 
 @customElement('umb-element-tree-item')
@@ -30,7 +30,10 @@ export class UmbElementTreeItemElement extends UmbTreeItemElementBase<
 	@state()
 	private _name = '';
 
-	/** @internal */
+	/**
+	 * @internal
+	 * Indicates whether the document is a draft, this is controlled internally but present as an attribute as it affects styling.
+	 */
 	@property({ type: Boolean, reflect: true, attribute: 'draft' })
 	protected _isDraft = false;
 
@@ -46,7 +49,7 @@ export class UmbElementTreeItemElement extends UmbTreeItemElementBase<
 	}
 
 	override renderLabel() {
-		return html`<span id="label" slot="label" class=${classMap({ draft: this._isDraft })}> ${this._name} </span> `;
+		return html`<span id="label" slot="label" class=${classMap({ draft: this._isDraft })}>${this._name}</span>`;
 	}
 
 	static override styles = [

@@ -85,7 +85,7 @@ const mapper = (item: ElementRecycleBinItemResponseModel): UmbElementRecycleBinT
 				culture: variant.culture || null,
 				segment: null, // TODO: add segment to the backend API?
 				state: variant.state,
-				flags: [], // variant.flags
+				flags: variant.flags,
 			};
 		}),
 		// TODO: this is not correct. We need to get it from the variants. This is a temp solution. [LK]

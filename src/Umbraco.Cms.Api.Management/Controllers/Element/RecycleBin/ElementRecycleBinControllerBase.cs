@@ -47,15 +47,15 @@ public class ElementRecycleBinControllerBase : RecycleBinControllerBase<ElementR
 
     protected override Guid RecycleBinRootKey => Constants.System.RecycleBinElementKey;
 
-    protected override ElementRecycleBinItemResponseModel MapRecycleBinViewModel(Guid? parentId, IEntitySlim entity)
+    protected override async Task<ElementRecycleBinItemResponseModel> MapRecycleBinViewModelAsync(Guid? parentId, IEntitySlim entity)
     {
-        ElementRecycleBinItemResponseModel responseModel = base.MapRecycleBinViewModel(parentId, entity);
+        ElementRecycleBinItemResponseModel responseModel = await base.MapRecycleBinViewModelAsync(parentId, entity);
 
         responseModel.Name = entity.Name ?? string.Empty;
 
         if (entity is IElementEntitySlim elementEntitySlim)
         {
-            responseModel.Variants = _elementPresentationFactory.CreateVariantsItemResponseModels(elementEntitySlim);
+            responseModel.Variants = await _elementPresentationFactory.CreateVariantsItemResponseModelsAsync(elementEntitySlim);
             responseModel.DocumentType = _elementPresentationFactory.CreateDocumentTypeReferenceResponseModel(elementEntitySlim);
             responseModel.IsFolder = false;
         }
