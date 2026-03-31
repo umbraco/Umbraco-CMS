@@ -223,6 +223,33 @@ public class NewDefaultUrlProvider : IUrlProvider
 
         if (pos < 0)
         {
+            // No '/' in the route: treat the entire route as a potential domainRootId
+            if (!int.TryParse(route, NumberStyles.Integer, CultureInfo.InvariantCulture, out var domainRootId))
+            {
+                return null;
+            }
+
+            var domainUriForRoot = DomainUtilities.DomainForNode(
+                _domainCache,
+                _siteDomainMapper,
+                domainRootId,
+                current,
+                culture);
+
+            if (domainUriForRoot is null)
+            {
+                return null;
+            }
+
+            var rootPath = "/";
+            var defaultCultureForRoot = _languageService.GetDefaultIsoCodeAsync().GetAwaiter().GetResult();
+            if (domainUriForRoot is not null ||
+                string.IsNullOrEmpty(culture) ||
+                culture.Equals(defaultCultureForRoot, StringComparison.InvariantCultureIgnoreCase))
+            {
+                Uri url = AssembleUrl(domainUriForRoot, rootPath, current, mode);
+                return UrlInfo.FromUri(url, Alias, culture);
+            }
             return null;
         }
 
