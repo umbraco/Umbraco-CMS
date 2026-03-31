@@ -11,6 +11,8 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_18_0_0;
 /// </summary>
 public class AddDomainKeyColumn : AsyncMigrationBase
 {
+    const string indexName = "IX_umbracoDomain_key";
+
     public AddDomainKeyColumn(IMigrationContext context)
         : base(context)
     {
@@ -32,7 +34,7 @@ public class AddDomainKeyColumn : AsyncMigrationBase
             return;
         }
 
-        // Add the column as nullable first so existing rows don't fail
+        // Add the column. existing rows will get a default empty Guid
         AddColumn<DomainDto>(tableName, columnName);
 
         // Populate each existing row with a new Guid
@@ -43,6 +45,11 @@ public class AddDomainKeyColumn : AsyncMigrationBase
             await Database.ExecuteAsync(
                 $"UPDATE {tableName} SET {columnName} = @0 WHERE {DomainDto.PrimaryKeyColumnName} = @1",
                 [domain.Key, domain.Id]);
+        }
+
+        if (IndexExists(indexName) is false)
+        {
+            CreateIndex<DomainDto>(indexName);
         }
     }
 }

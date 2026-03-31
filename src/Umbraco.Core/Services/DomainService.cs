@@ -61,10 +61,22 @@ public class DomainService : AsyncRepositoryService, IDomainService
     public async Task<IDomain?> GetByIdAsync(int id)
     {
         using ICoreScope scope = ScopeProvider.CreateScope();
+
+        // Gets all from cache and sets the cache again.
         IEnumerable<IDomain> all = await _domainRepository.GetAllAsync(true);
         scope.Complete();
 
         return all.FirstOrDefault(x => x.Id == id);
+    }
+
+    /// <inheritdoc />
+    public async Task<IDomain?> GetByKeyAsync(Guid key)
+    {
+        using ICoreScope scope = ScopeProvider.CreateScope();
+        IDomain? domain = await _domainRepository.GetAsync(key, CancellationToken.None);
+
+        scope.Complete();
+        return domain;
     }
 
     /// <inheritdoc />
@@ -73,6 +85,7 @@ public class DomainService : AsyncRepositoryService, IDomainService
         using ICoreScope scope = ScopeProvider.CreateScope();
         IEnumerable<IDomain> domains = await _domainRepository.GetAssignedDomainsAsync(contentKey, includeWildcards);
 
+        scope.Complete();
         return domains;
     }
 

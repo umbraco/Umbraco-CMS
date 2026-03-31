@@ -323,7 +323,7 @@ internal sealed class LanguageRepository : AsyncEntityRepositoryBase<Guid, ILang
 
             // insert
             LanguageDto dto = LanguageFactory.BuildDto(entity, GetFallbackLanguageId(entity));
-            await db.Language.AddAsync(dto);
+            db.Language.Add(dto);
             await db.SaveChangesAsync();
 
             entity.Id = dto.Id;

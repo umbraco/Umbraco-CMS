@@ -50,12 +50,12 @@ public interface IDomain : IEntity, IRememberBeingDirty
     int? RootContentId { get; set; }
 
     /// <summary>
-    /// Gets the key of the root content assigned to the domain.
+    /// Gets or sets the key of the root content assigned to the domain.
     /// </summary>
     /// <value>
     /// The root content key, or <c>null</c> if no content is assigned.
     /// </value>
-    Guid? RootContentKey { get; }
+    Guid? RootContentKey { get; set; }
 
     /// <summary>
     /// Gets or sets the sort order.

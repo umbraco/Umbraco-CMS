@@ -139,7 +139,7 @@ internal sealed class DomainRepository : AsyncEntityRepositoryBase<Guid, IDomain
             entity.SortOrder = await GetNewSortOrderAsync(db, entity.RootContentId, entity.IsWildcard);
 
             DomainDto dto = DomainFactory.BuildDto(entity);
-            await db.Domains.AddAsync(dto);
+            db.Domains.Add(dto);
             await db.SaveChangesAsync();
 
             entity.Id = dto.Id;

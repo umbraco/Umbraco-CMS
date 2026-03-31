@@ -27,6 +27,7 @@ internal sealed class DomainDto
     [Column(KeyColumnName)]
     [NullSetting(NullSetting = NullSettings.NotNull)]
     [Constraint(Default = SystemMethods.NewGuid)]
+    [Index(IndexTypes.UniqueNonClustered, Name = "IX_umbracoDomain_key")]
     public Guid Key { get; set; }
 
     /// <summary>

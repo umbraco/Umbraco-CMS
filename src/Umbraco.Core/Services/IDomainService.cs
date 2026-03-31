@@ -36,6 +36,13 @@ public interface IDomainService : IService
     Task<IDomain?> GetByIdAsync(int id);
 
     /// <summary>
+    ///     Gets a domain by its key.
+    /// </summary>
+    /// <param name="key">The domain key.</param>
+    /// <returns>The domain, or <c>null</c> if not found.</returns>
+    Task<IDomain?> GetByKeyAsync(Guid key);
+
+    /// <summary>
     ///     Gets all assigned domains for a content item by its key.
     /// </summary>
     /// <param name="contentKey">The unique identifier of the content item.</param>
