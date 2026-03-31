@@ -220,6 +220,12 @@ public class NewDefaultUrlProvider : IUrlProvider
         // extract domainUri and path
         // route is /<path> or <domainRootId>/<path>
         var pos = route.IndexOf('/', StringComparison.Ordinal);
+
+        if (pos < 0)
+        {
+            return null;
+        }
+
         var path = pos == 0 ? route : route[pos..];
         DomainAndUri? domainUri = pos == 0
             ? null
