@@ -32,19 +32,22 @@ export class UmbPeekErrorNotificationElement extends UmbLitElement {
 		return this.data?.message;
 	}
 
+	get #validationErrors() {
+		return this.data?.errors ?? this.data?.details;
+	}
+
 	get #actions() {
-		const hasErrors = !!(this.data?.errors ?? this.data?.details);
 		const hasLongDetail = !!this.data?.detail && this.data.detail.length > DETAIL_MAX_LENGTH;
-		if (!hasErrors && !hasLongDetail) return nothing;
+		if (!this.#validationErrors && !hasLongDetail) return nothing;
 
 		return html`
-			${hasErrors
+			${this.#validationErrors
 				? html`<uui-button
 						slot="actions"
 						look="primary"
 						color="danger"
 						label=${this.localize.term('defaultdialogs_seeErrorAction')}
-						@click=${() => this.#openErrorViewer(this.data?.errors ?? this.data?.details)}></uui-button>`
+						@click=${() => this.#openErrorViewer(this.#validationErrors)}></uui-button>`
 				: nothing}
 			${hasLongDetail
 				? html`<uui-button
