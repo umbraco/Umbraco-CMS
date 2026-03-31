@@ -16,21 +16,29 @@ public class MergeBuilder
     internal MergeBuilder(MigrationPlan plan) => _plan = plan;
 
     /// <summary>
-    ///     Adds a transition to a target state through an empty migration.
+    ///     Adds a transition from the current state to the specified target state using an empty (no-operation) migration.
     /// </summary>
+    /// <param name="targetState">The target state to transition to.</param>
+    /// <returns>The current <see cref="Umbraco.Cms.Infrastructure.Migrations.MergeBuilder"/> instance.</returns>
     public MergeBuilder To(string targetState)
         => To<NoopMigration>(targetState);
 
     /// <summary>
-    ///     Adds a transition to a target state through a migration.
+    /// Adds a transition to the specified target state using the given migration type.
     /// </summary>
+    /// <typeparam name="TMigration">The type of migration to apply during the transition.</typeparam>
+    /// <param name="targetState">The target state to transition to.</param>
+    /// <returns>The current <see cref="MergeBuilder"/> instance for chaining.</returns>
     public MergeBuilder To<TMigration>(string targetState)
         where TMigration : AsyncMigrationBase
         => To(targetState, typeof(TMigration));
 
     /// <summary>
-    ///     Adds a transition to a target state through a migration.
+    ///     Adds a transition from the current state to the specified target state using the provided migration type.
     /// </summary>
+    /// <param name="targetState">The name of the target state to transition to.</param>
+    /// <param name="migration">The <see cref="Type"/> of the migration that performs the transition.</param>
+    /// <returns>The current <see cref="Umbraco.Cms.Infrastructure.Migrations.MergeBuilder"/> instance for method chaining.</returns>
     public MergeBuilder To(string targetState, Type migration)
     {
         if (_with)
@@ -48,8 +56,9 @@ public class MergeBuilder
     }
 
     /// <summary>
-    ///     Begins the second branch of the merge.
+    ///     Marks the start of the second branch in the merge operation, enabling further configuration.
     /// </summary>
+    /// <returns>The current <see cref="Umbraco.Cms.Infrastructure.Migrations.MergeBuilder"/> instance for method chaining.</returns>
     public MergeBuilder With()
     {
         if (_with)
@@ -62,8 +71,10 @@ public class MergeBuilder
     }
 
     /// <summary>
-    ///     Completes the merge.
+    ///     Finalizes the merge operation by updating the migration plan to reach the specified target state.
     /// </summary>
+    /// <param name="targetState">The final state to which the migration plan should merge.</param>
+    /// <returns>The <see cref="MigrationPlan"/> representing the completed merge.</returns>
     public MigrationPlan As(string targetState)
     {
         if (!_with)

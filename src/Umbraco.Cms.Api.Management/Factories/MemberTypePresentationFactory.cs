@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Api.Management.ViewModels.MemberType;
+using Umbraco.Cms.Api.Management.ViewModels.MemberType;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 
@@ -8,6 +8,10 @@ internal sealed class MemberTypePresentationFactory : IMemberTypePresentationFac
 {
     private readonly IUmbracoMapper _umbracoMapper;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Factories.MemberTypePresentationFactory"/> class.
+    /// </summary>
+    /// <param name="umbracoMapper">An instance of <see cref="IUmbracoMapper"/> used for mapping Umbraco objects.</param>
     public MemberTypePresentationFactory(IUmbracoMapper umbracoMapper)
         => _umbracoMapper = umbracoMapper;
 

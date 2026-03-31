@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Routing;
@@ -9,6 +9,10 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DocumentType;
 
+/// <summary>
+/// Serves as the base controller for API endpoints that manage document types in the Umbraco CMS.
+/// Provides common functionality and contracts for derived document type controllers.
+/// </summary>
 [VersionedApiBackOfficeRoute(Constants.UdiEntityType.DocumentType)]
 [ApiExplorerSettings(GroupName = "Document Type")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentsOrDocumentTypes)]
@@ -90,6 +94,10 @@ public abstract class DocumentTypeControllerBase : ManagementApiControllerBase
                     .WithTitle("Operation not permitted")
                     .WithDetail("The attempted operation was not permitted, likely due to a permission/configuration mismatch with the operation.")
                     .Build()),
+                ContentTypeOperationStatus.SystemAliasChangeNotAllowed => new BadRequestObjectResult(problemDetailsBuilder
+                    .WithTitle("Alias change not permitted")
+                    .WithDetail($"The alias of a system {type} type cannot be changed. To create a {type} type with a different alias, use the duplicate operation instead.")
+                    .Build()),
                 ContentTypeOperationStatus.CancelledByNotification => new BadRequestObjectResult(problemDetailsBuilder
                     .WithTitle("Cancelled by notification")
                     .WithDetail("The attempted operation was cancelled by a notification.")
@@ -121,6 +129,19 @@ public abstract class DocumentTypeControllerBase : ManagementApiControllerBase
                 _ => new ObjectResult("Unknown content type operation status") { StatusCode = StatusCodes.Status500InternalServerError },
             });
 
+    /// <summary>
+    /// Generates an <see cref="IActionResult"/> that represents the outcome of a content type structure operation, returning appropriate HTTP responses based on the operation status.
+    /// </summary>
+    /// <param name="status">The result status of the content type structure operation, indicating success or a specific failure reason.</param>
+    /// <param name="type">The name or identifier of the content type involved in the operation, used for contextual error messages.</param>
+    /// <returns>
+    /// An <see cref="IActionResult"/> corresponding to the provided <paramref name="status"/>:
+    /// <list type="bullet">
+    /// <item><description><see cref="OkResult"/> if the operation was successful.</description></item>
+    /// <item><description><see cref="BadRequestObjectResult"/> or <see cref="NotFoundObjectResult"/> with problem details if the operation failed for a known reason.</description></item>
+    /// <item><description><see cref="ObjectResult"/> with status 500 for unknown statuses.</description></item>
+    /// </list>
+    /// </returns>
     public static IActionResult ContentTypeStructureOperationStatusResult(ContentTypeStructureOperationStatus status, string type) =>
         status is ContentTypeStructureOperationStatus.Success
             ? new OkResult()

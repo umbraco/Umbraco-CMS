@@ -2,6 +2,9 @@ using Umbraco.Cms.Core.Logging;
 
 namespace Umbraco.Cms.Api.Management.ViewModels.LogViewer;
 
+/// <summary>
+/// Represents a response model containing information about a logger as returned by the log viewer API.
+/// </summary>
 public class LoggerResponseModel
 {
     /// <summary>

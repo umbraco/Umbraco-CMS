@@ -9,6 +9,10 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Template;
 
+/// <summary>
+/// Serves as the base controller for template management operations in the Umbraco CMS API.
+/// Provides shared functionality for controllers handling template-related requests.
+/// </summary>
 [VersionedApiBackOfficeRoute(Constants.UdiEntityType.Template)]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Template))]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessTemplates)]

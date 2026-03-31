@@ -300,17 +300,30 @@ internal abstract class BlockValuePropertyIndexValueFactoryBase<TSerialized> : J
 
     protected class RawDataItem
     {
+        /// <summary>
+        /// Gets or sets the unique identifier for the content type.
+        /// </summary>
         public required Guid ContentTypeKey { get; init; }
 
+        /// <summary>
+        /// Gets or sets the collection of raw property data associated with this block item.
+        /// </summary>
         public required IEnumerable<RawPropertyData> Properties { get; init; }
     }
 
     protected class RawPropertyData
     {
+        /// <summary>Gets or sets the alias of the raw property data.</summary>
         public required string Alias { get; init; }
 
+        /// <summary>
+        /// Gets the unprocessed or original value of the property before any transformation or indexing.
+        /// </summary>
         public required object? Value { get; init; }
 
+        /// <summary>
+        /// Gets or sets the culture identifier (e.g., "en-US") associated with the raw property data, or <c>null</c> if invariant.
+        /// </summary>
         public required string? Culture { get; init; }
     }
 }

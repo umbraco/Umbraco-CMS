@@ -25,6 +25,19 @@ internal sealed class MemberTypeRepository : ContentTypeRepositoryBase<IMemberTy
     private readonly IRepositoryCacheVersionService _repositoryCacheVersionService;
     private readonly ICacheSyncService _cacheSyncService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.MemberTypeRepository"/> class,
+    /// which is responsible for managing member type persistence in the Umbraco CMS.
+    /// </summary>
+    /// <param name="scopeAccessor">Provides access to the current database scope for transactional operations.</param>
+    /// <param name="cache">The application-level caches used for optimizing repository operations.</param>
+    /// <param name="logger">The logger used for logging repository activity and errors.</param>
+    /// <param name="commonRepository">A repository for common content type operations shared across repositories.</param>
+    /// <param name="languageRepository">Repository for accessing language information.</param>
+    /// <param name="shortStringHelper">Helper for generating and manipulating short strings, such as aliases.</param>
+    /// <param name="repositoryCacheVersionService">Service for managing cache versioning within the repository.</param>
+    /// <param name="idKeyMap">Maps between integer IDs and GUID keys for entities.</param>
+    /// <param name="cacheSyncService">Service for synchronizing cache across distributed environments.</param>
     public MemberTypeRepository(
         IScopeAccessor scopeAccessor,
         AppCaches cache,
@@ -58,28 +71,12 @@ internal sealed class MemberTypeRepository : ContentTypeRepositoryBase<IMemberTy
     protected override IRepositoryCachePolicy<IMemberType, int> CreateCachePolicy() =>
         new FullDataSetRepositoryCachePolicy<IMemberType, int>(GlobalIsolatedCache, ScopeAccessor,  _repositoryCacheVersionService, _cacheSyncService, GetEntityId, /*expires:*/ true);
 
-    // every GetExists method goes cachePolicy.GetSomething which in turns goes PerformGetAll,
-    // since this is a FullDataSet policy - and everything is cached
-    // so here,
-    // every PerformGet/Exists just GetMany() and then filters
-    // except PerformGetAll which is the one really doing the job
+    // Note: PerformGet(int) is passed as a callback to the cache policy's Get(TId) method,
+    // but FullDataSetRepositoryCachePolicy.Get() never invokes it — it uses GetAllCached()
+    // internally and clones only the matched entity. This override exists only as a required
+    // implementation of the abstract base and as a fallback for non-FullDataSet policies.
     protected override IMemberType? PerformGet(int id)
         => GetMany().FirstOrDefault(x => x.Id == id);
-
-    protected override IMemberType? PerformGet(Guid id)
-        => GetMany().FirstOrDefault(x => x.Key == id);
-
-    protected override IEnumerable<IMemberType> PerformGetAll(params Guid[]? ids)
-    {
-        IEnumerable<IMemberType> all = GetMany();
-        return ids?.Any() ?? false ? all.Where(x => ids.Contains(x.Key)) : all;
-    }
-
-    protected override bool PerformExists(Guid id)
-        => GetMany().FirstOrDefault(x => x.Key == id) != null;
-
-    protected override IMemberType? PerformGet(string alias)
-        => GetMany().FirstOrDefault(x => x.Alias.InvariantEquals(alias));
 
     protected override IEnumerable<IMemberType>? GetAllWithFullCachePolicy() =>
         CommonRepository.GetAllTypes()?.OfType<IMemberType>();

@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
@@ -12,6 +12,9 @@ using Umbraco.Cms.Infrastructure.Persistence.Querying;
 
 namespace Umbraco.Cms.Api.Management.Controllers.UserData;
 
+/// <summary>
+/// Controller responsible for retrieving user-specific data via the API.
+/// </summary>
 [ApiVersion("1.0")]
 public class GetUserDataController : UserDataControllerBase
 {
@@ -19,6 +22,12 @@ public class GetUserDataController : UserDataControllerBase
     private readonly IUserDataService _userDataService;
     private readonly IUmbracoMapper _umbracoMapper;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="GetUserDataController"/> class.
+    /// </summary>
+    /// <param name="backOfficeSecurityAccessor">Accessor for back office security operations.</param>
+    /// <param name="userDataService">Service for managing user data.</param>
+    /// <param name="umbracoMapper">The mapper used for mapping Umbraco objects.</param>
     public GetUserDataController(
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
         IUserDataService userDataService,
@@ -29,6 +38,17 @@ public class GetUserDataController : UserDataControllerBase
         _umbracoMapper = umbracoMapper;
     }
 
+    /// <summary>
+    /// Retrieves user-specific data for the currently authenticated user, with optional filtering and pagination.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="groups">An optional array of group names to filter the user data by group.</param>
+    /// <param name="identifiers">An optional array of identifiers to filter the user data by specific keys.</param>
+    /// <param name="skip">The number of items to skip before starting to collect the result set (used for pagination).</param>
+    /// <param name="take">The maximum number of items to return in the result set (used for pagination).</param>
+    /// <returns>
+    /// A task that represents the asynchronous operation. The task result contains an <see cref="IActionResult"/> with a <see cref="PagedViewModel{UserDataResponseModel}"/> representing the filtered and paginated user data.
+    /// </returns>
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<UserDataResponseModel>), StatusCodes.Status200OK)]

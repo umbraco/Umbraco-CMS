@@ -27,6 +27,12 @@ internal sealed class UmbracoPocoDataBuilder : PocoDataBuilder
 {
     private readonly bool _upgrading;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UmbracoPocoDataBuilder"/> class.
+    /// </summary>
+    /// <param name="type">The <see cref="Type"/> representing the POCO (Plain Old CLR Object) to build data for.</param>
+    /// <param name="mapper">An optional <see cref="MapperCollection"/> containing mappers to use during the build process.</param>
+    /// <param name="upgrading">True if the builder should operate in upgrading mode; otherwise, false.</param>
     public UmbracoPocoDataBuilder(Type type, MapperCollection? mapper, bool upgrading)
         : base(type, mapper) =>
         _upgrading = upgrading;
