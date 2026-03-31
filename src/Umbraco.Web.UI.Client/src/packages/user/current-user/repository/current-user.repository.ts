@@ -5,6 +5,7 @@ import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { TemporaryFileStatus, UmbTemporaryFileManager } from '@umbraco-cms/backoffice/temporary-file';
+import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 
 /**
  * A repository for the current user
@@ -16,6 +17,7 @@ export class UmbCurrentUserRepository extends UmbRepositoryBase {
 	#currentUserStore?: typeof UMB_CURRENT_USER_STORE_CONTEXT.TYPE;
 	#temporaryFileManager = new UmbTemporaryFileManager(this);
 	#abortController = new AbortController();
+	#localize = new UmbLocalizationController(this);
 	#init: Promise<unknown>;
 	protected notificationContext?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;
 
@@ -140,10 +142,10 @@ export class UmbCurrentUserRepository extends UmbRepositoryBase {
 		const { data, error } = await this.#currentUserSource.changePassword(newPassword, oldPassword);
 
 		if (!error) {
-			const notification = { data: { message: `Password changed` } };
+			const notification = { data: { message: this.#localize.term('user_passwordChangedGeneric') } };
 			this.notificationContext?.peek('positive', notification);
 		} else {
-			const notification = { data: { message: error.message ?? 'Unknown failure' } };
+			const notification = { data: { message: error.message ?? this.#localize.term('user_unknownFailure') } };
 			this.notificationContext?.peek('danger', notification);
 		}
 
@@ -175,7 +177,7 @@ export class UmbCurrentUserRepository extends UmbRepositoryBase {
 			// The server returns 5 different sizes of the avatar, so we mimic that here
 			this.#currentUserStore?.update({ avatarUrls: [localUrl, localUrl, localUrl, localUrl, localUrl] });
 
-			const notification = { data: { message: `Avatar uploaded` } };
+			const notification = { data: { message: this.#localize.term('user_avatarUploadSuccess') } };
 			this.notificationContext?.peek('positive', notification);
 		}
 
@@ -193,7 +195,7 @@ export class UmbCurrentUserRepository extends UmbRepositoryBase {
 		if (!error) {
 			this.#currentUserStore?.update({ avatarUrls: [] });
 
-			const notification = { data: { message: `Avatar deleted` } };
+			const notification = { data: { message: this.#localize.term('user_avatarDeleteSuccess') } };
 			this.notificationContext?.peek('positive', notification);
 		}
 
