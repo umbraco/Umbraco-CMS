@@ -1,5 +1,5 @@
 {
-  "name": "@umbraco/acceptance-test-helpers",
+  "name": "@umbraco-cms/acceptance-test-helpers",
   "version": "17.3.0-rc",
   "description": "Test helpers and builders for making Playwright tests for Umbraco solutions",
   "main": "dist/index.js",
