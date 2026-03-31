@@ -180,8 +180,12 @@ export class UmbCollectionDefaultElement extends UmbLitElement {
 				flex-direction: row;
 				box-sizing: border-box;
 				height: 100%;
+				container-type: inline-size;
 			}
 
+			umb-collection-filter-sidebar {
+				display: none;
+			}
 			umb-body-layout {
 				flex: 1;
 				min-width: 0;
@@ -216,6 +220,16 @@ export class UmbCollectionDefaultElement extends UmbLitElement {
 			router-slot {
 				width: 100%;
 				height: 100%;
+			}
+
+			@container (min-width: 1024px) {
+				umb-body-layout {
+					--umb-collection-filter-bundle-display: none;
+					--umb-collection-active-filters-display: none;
+				}
+				umb-collection-filter-sidebar {
+					display: block;
+				}
 			}
 
 			@keyframes fadeIn {

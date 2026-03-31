@@ -98,7 +98,7 @@ export class UmbCollectionFilterBundleElement extends UmbLitElement {
 	static override styles = [
 		css`
 			:host {
-				display: contents;
+				display: var(--umb-collection-filter-bundle-display, contents);
 			}
 
 			.filter-dropdown {

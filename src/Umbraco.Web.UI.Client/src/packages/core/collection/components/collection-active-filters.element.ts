@@ -65,7 +65,7 @@ export class UmbCollectionActiveFiltersElement extends UmbLitElement {
 		UmbTextStyles,
 		css`
 			:host {
-				display: contents;
+				display: var(--umb-collection-active-filters-display, contents);
 			}
 
 			#active-filters {
