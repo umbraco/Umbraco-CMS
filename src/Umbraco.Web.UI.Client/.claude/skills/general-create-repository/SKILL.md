@@ -12,7 +12,7 @@ Create or extend a repository and its data source for an entity feature in the U
 
 Read these before creating a repository — they define the conventions this skill builds on:
 
-- **[Repositories](../../../docs/Repositories.md)** — Repository categories, file structure, naming, extension registration, when to use which type
+- **[Repositories](../../../docs/repositories.md)** — Repository categories, file structure, naming, extension registration, when to use which type
 - **[Data Flow](../../../docs/Data-Flow.md)** — Full data flow chain, tryExecute, model mapping, store direction
 - **[Package Development](../../../docs/package-development.md)** — Folder conventions, vertical slices, public API rules
 
@@ -28,7 +28,7 @@ Read these before creating a repository — they define the conventions this ski
 
 ## Choosing the right type
 
-See [Repositories — When to Create Which](../../../docs/Repositories.md#when-to-create-which-repository-type) for the decision matrix.
+See [Repositories — When to Create Which](../../../docs/repositories.md#when-to-create-which-repository-type) for the decision matrix.
 
 ---
 
@@ -605,4 +605,4 @@ export const manifests: Array<UmbExtensionManifest> = [
 
 ## Reference examples
 
-See [Repositories — Reference Examples](../../../docs/Repositories.md#reference-examples) for real implementations to study.
+See [Repositories — Reference Examples](../../../docs/repositories.md#reference-examples) for real implementations to study.
