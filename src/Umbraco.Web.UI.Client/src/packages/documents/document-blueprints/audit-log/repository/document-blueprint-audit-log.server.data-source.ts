@@ -1,16 +1,9 @@
-import type {
-	UmbAuditLogDataSource,
-	UmbAuditLogModel,
-	UmbAuditLogRequestArgs,
-	UmbAuditLogType,
-} from '@umbraco-cms/backoffice/audit-log';
+import type { UmbDocumentBlueprintAuditLogModel, UmbDocumentBlueprintAuditLogType } from './types.js';
+import type { UmbAuditLogDataSource, UmbAuditLogRequestArgs } from '@umbraco-cms/backoffice/audit-log';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { DirectionModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { DocumentBlueprintService } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
-
-type UmbDocumentBlueprintAuditLogType = 'New' | 'Save' | 'SaveVariant' | 'Open' | 'Move' | UmbAuditLogType;
-type UmbDocumentBlueprintAuditLogModel = UmbAuditLogModel<UmbDocumentBlueprintAuditLogType>;
 
 export class UmbDocumentBlueprintAuditLogServerDataSource
 	implements UmbAuditLogDataSource<UmbDocumentBlueprintAuditLogModel>

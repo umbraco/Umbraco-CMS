@@ -1,5 +1,5 @@
-import type { UmbDocumentAuditLogModel } from '../../../documents/audit-log/types.js';
 import { UmbDocumentBlueprintAuditLogServerDataSource } from './document-blueprint-audit-log.server.data-source.js';
+import type { UmbDocumentBlueprintAuditLogModel } from './types.js';
 import type {
 	UmbAuditLogRepository,
 	UmbAuditLogRequestArgs,
@@ -20,7 +20,7 @@ const UmbDocumentBlueprintAuditLog = Object.freeze({
 
 export class UmbDocumentBlueprintAuditLogRepository
 	extends UmbRepositoryBase
-	implements UmbAuditLogRepository<UmbDocumentAuditLogModel>
+	implements UmbAuditLogRepository<UmbDocumentBlueprintAuditLogModel>
 {
 	#dataSource: UmbDocumentBlueprintAuditLogServerDataSource;
 
