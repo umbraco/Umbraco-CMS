@@ -1,7 +1,7 @@
 const { http, HttpResponse } = window.MockServiceWorker;
 import { umbUserMockDb } from '../../data/user/user.db.js';
 import { UMB_SLUG } from './slug.js';
-import type { GetUserCurrentLoginProvidersResponse } from '@umbraco-cms/backoffice/external/backend-api';
+import type { GetUserCurrentLoginProvidersResponse, UserPermissionsResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 export const handlers = [
@@ -73,5 +73,28 @@ export const handlers = [
 
 		const result = umbUserMockDb.disableMfaProvider(providerName);
 		return new HttpResponse(null, { status: result ? 200 : 404 });
+	}),
+	http.get(umbracoPath(`${UMB_SLUG}/current/permissions/element`), ({ request }) => {
+		const url = new URL(request.url);
+		const ids = url.searchParams.getAll('id');
+
+		const response: UserPermissionsResponseModel = {
+			permissions: ids.map((id) => ({
+				nodeKey: id,
+				permissions: [
+					'Umb.Element.Browse',
+					'Umb.Element.Create',
+					'Umb.Element.Update',
+					'Umb.Element.Delete',
+					'Umb.Element.Move',
+					'Umb.Element.Copy',
+					'Umb.Element.Publish',
+					'Umb.Element.Unpublish',
+					'Umb.Element.Rollback',
+				],
+			})),
+		};
+
+		return HttpResponse.json(response);
 	}),
 ];
