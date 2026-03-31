@@ -107,6 +107,8 @@ export class UmbCollectionFilterBundleElement extends UmbLitElement {
 				gap: var(--uui-size-space-5);
 				padding: var(--uui-size-space-5);
 				min-width: 250px;
+				max-height: 70vh;
+				overflow-y: auto;
 			}
 
 			.filter-item {
