@@ -91,7 +91,7 @@ export default Umb{EntityName}DetailStore;
 
 File: `{entity}-detail.server.data-source.ts`
 
-The data source maps between server API types and domain models. See [Data Flow](../../../docs/Data-Flow.md) for context on how this fits in the chain.
+The data source maps between server API types and domain models. See [Data Flow](../../../docs/data-flow.md) for context on how this fits in the chain.
 
 ```typescript
 import type { Umb{EntityName}DetailModel } from '../../types.js';
