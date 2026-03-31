@@ -13,5 +13,5 @@ public class CurrentUserUpdateModel
     /// <summary>
     ///     Gets or sets the ISO code of the user's preferred language.
     /// </summary>
-    public string LanguageIsoCode { get; set; } = string.Empty;
+    public required string LanguageIsoCode { get; set; }
 }
