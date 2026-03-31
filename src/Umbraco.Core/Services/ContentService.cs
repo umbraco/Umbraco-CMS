@@ -3899,6 +3899,33 @@ public class ContentService : RepositoryService, IContentService
     }
 
     /// <summary>
+    /// Moves a content blueprint to a different container.
+    /// </summary>
+    /// <param name="content">The blueprint content to move.</param>
+    /// <param name="userId">The optional ID of the user moving the blueprint.</param>
+    public void MoveBlueprint(IContent content, int userId = Constants.Security.SuperUserId)
+    {
+        EventMessages evtMsgs = EventMessagesFactory.Get();
+
+        content.Blueprint = true;
+
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        {
+            scope.WriteLock(Constants.Locks.ContentTree);
+
+            content.WriterId = userId;
+
+            _documentBlueprintRepository.Save(content);
+
+            Audit(AuditType.Move, userId, content.Id);
+
+            scope.Notifications.Publish(new ContentTreeChangeNotification(content, TreeChangeTypes.RefreshNode, evtMsgs));
+
+            scope.Complete();
+        }
+    }
+
+    /// <summary>
     /// Deletes a content blueprint.
     /// </summary>
     /// <param name="content">The blueprint content to delete.</param>

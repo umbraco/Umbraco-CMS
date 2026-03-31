@@ -4687,6 +4687,40 @@ export type PutDocumentBlueprintByIdResponses = {
     200: unknown;
 };
 
+export type GetDocumentBlueprintByIdAuditLogData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: {
+        orderDirection?: DirectionModel;
+        sinceDate?: string;
+        skip?: number;
+        take?: number;
+    };
+    url: '/umbraco/management/api/v1/document-blueprint/{id}/audit-log';
+};
+
+export type GetDocumentBlueprintByIdAuditLogErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type GetDocumentBlueprintByIdAuditLogResponses = {
+    /**
+     * OK
+     */
+    200: PagedAuditLogResponseModel;
+};
+
+export type GetDocumentBlueprintByIdAuditLogResponse = GetDocumentBlueprintByIdAuditLogResponses[keyof GetDocumentBlueprintByIdAuditLogResponses];
+
 export type PutDocumentBlueprintByIdMoveData = {
     body?: MoveDocumentBlueprintRequestModel;
     path: {

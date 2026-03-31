@@ -31,7 +31,24 @@ export const manifests: Array<UmbExtensionManifest> = [
 			},
 		],
 	},
-
+	{
+		type: 'workspaceView',
+		alias: 'Umb.WorkspaceView.DocumentBlueprint.Info',
+		name: 'Document Blueprint Workspace Info View',
+		element: () => import('./views/info/document-blueprint-workspace-view-info.element.js'),
+		weight: 100,
+		meta: {
+			label: '#general_info',
+			pathname: 'info',
+			icon: 'info',
+		},
+		conditions: [
+			{
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
+				match: UMB_DOCUMENT_BLUEPRINT_WORKSPACE_ALIAS,
+			},
+		],
+	},
 	{
 		type: 'workspaceAction',
 		kind: 'default',
