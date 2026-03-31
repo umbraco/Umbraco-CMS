@@ -84,7 +84,7 @@ export class Umb{EntityName}DetailStore extends UmbDetailStoreBase<Umb{EntityNam
 	}
 }
 
-export default Umb{EntityName}DetailStore;
+export { Umb{EntityName}DetailStore as api };
 ```
 
 ### Step 3: Create server data source
@@ -211,7 +211,7 @@ export class Umb{EntityName}DetailRepository extends UmbDetailRepositoryBase<Umb
 	}
 }
 
-export default Umb{EntityName}DetailRepository;
+export { Umb{EntityName}DetailRepository as api };
 ```
 
 ### Step 5: Create constants
@@ -229,6 +229,7 @@ File: `manifests.ts`
 
 ```typescript
 import { UMB_{ENTITY}_DETAIL_REPOSITORY_ALIAS, UMB_{ENTITY}_DETAIL_STORE_ALIAS } from './constants.js';
+import { Umb{EntityName}DetailStore } from './{entity}-detail.store.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -241,7 +242,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'store',
 		alias: UMB_{ENTITY}_DETAIL_STORE_ALIAS,
 		name: '{EntityName} Detail Store',
-		api: () => import('./{entity}-detail.store.js'),
+		api: Umb{EntityName}DetailStore,
 	},
 ];
 ```
@@ -269,7 +270,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 - [ ] Data source maps server types ↔ domain model in both directions
 - [ ] Data source uses `tryExecute()` for all API calls
 - [ ] Repository extends `UmbDetailRepositoryBase<T>`, passing data source class + store context
-- [ ] Repository and store exported as `default` (for lazy-loading)
+- [ ] Repository and store exported as `api` (for lazy-loading)
 - [ ] Manifest aliases defined as constants
 - [ ] Manifests registered with `type: 'repository'` and `type: 'store'`
 - [ ] Manifests wired into parent module's `manifests.ts`
@@ -327,7 +328,7 @@ export class Umb{EntityName}ItemStore extends UmbItemStoreBase<Umb{EntityName}It
 	}
 }
 
-export default Umb{EntityName}ItemStore;
+export { Umb{EntityName}ItemStore as api };
 ```
 
 ### Step 3: Create item server data source
@@ -377,7 +378,7 @@ export class Umb{EntityName}ItemRepository extends UmbItemRepositoryBase<Umb{Ent
 	}
 }
 
-export default Umb{EntityName}ItemRepository;
+export { Umb{EntityName}ItemRepository as api };
 ```
 
 ### Step 5: Create constants and manifests
@@ -467,7 +468,7 @@ export class Umb{EntityName}CollectionRepository
 	}
 }
 
-export default Umb{EntityName}CollectionRepository;
+export { Umb{EntityName}CollectionRepository as api };
 ```
 
 ### Collection repository checklist
