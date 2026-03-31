@@ -311,31 +311,23 @@ public class ConvertLocalLinks : MigrationBase
         IDictionary<int, ILanguage> languagesById,
         IDataValueEditor valueEditor)
     {
-        // NOTE: some old property data DTOs can have variance defined, even if the property type no longer varies
-        var culture = propertyType.VariesByCulture()
-                      && propertyDataDto.LanguageId.HasValue
-                      && languagesById.TryGetValue(propertyDataDto.LanguageId.Value, out ILanguage? language)
-            ? language.IsoCode
-            : null;
-
-        if (culture is null && propertyType.VariesByCulture())
+        var cultureResult = PropertyDataCultureResolver.ResolveCulture(propertyType, propertyDataDto.LanguageId, languagesById);
+        if (cultureResult.ShouldSkip)
         {
-            // if we end up here, the property DTO is bound to a language that no longer exists. this is an error scenario,
-            // and we can't really handle it in any other way than logging; in all likelihood this is an old property version,
-            // and it won't cause any runtime issues
             _logger.LogWarning(
-                "    - property data with id: {propertyDataId} references a language that does not exist - language id: {languageId} (property type: {propertyTypeName}, id: {propertyTypeId}, alias: {propertyTypeAlias})",
+                PropertyDataCultureResolver.OrphanedLanguageWarningTemplate,
                 propertyDataDto.Id,
-                propertyDataDto.LanguageId,
+                cultureResult.OrphanedLanguageId,
                 propertyType.Name,
                 propertyType.Id,
                 propertyType.Alias);
             return false;
         }
 
+        var culture = cultureResult.Culture;
+
         var segment = propertyType.VariesBySegment() ? propertyDataDto.Segment : null;
-        var property = new Property(propertyType);
-        property.SetValue(propertyDataDto.Value, culture, segment);
+        var property = PropertyDataCultureResolver.CreateMigrationProperty(propertyType, propertyDataDto.Value, culture, segment);
         var toEditorValue = valueEditor.ToEditor(property, culture, segment);
 
         if (_localLinkProcessor.ProcessToEditorValue(toEditorValue) == false)
