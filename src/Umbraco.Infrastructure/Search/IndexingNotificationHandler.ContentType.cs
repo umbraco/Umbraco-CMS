@@ -52,16 +52,16 @@ public sealed class ContentTypeIndexingNotificationHandler : INotificationHandle
             throw new NotSupportedException();
         }
 
-        var changedIds = new Dictionary<string, (List<int> removedIds, List<int> refreshedIds, List<int> otherIds)>();
+        var changedIds = new Dictionary<string, (List<int> removedIds, List<int> refreshedIds)>();
 
         foreach (ContentTypeCacheRefresher.JsonPayload payload in (ContentTypeCacheRefresher.JsonPayload[])args
                      .MessageObject)
         {
             if (!changedIds.TryGetValue(
                 payload.ItemType,
-                out (List<int> removedIds, List<int> refreshedIds, List<int> otherIds) idLists))
+                out (List<int> removedIds, List<int> refreshedIds) idLists))
             {
-                idLists = (removedIds: new List<int>(), refreshedIds: new List<int>(), otherIds: new List<int>());
+                idLists = (removedIds: new List<int>(), refreshedIds: new List<int>());
                 changedIds.Add(payload.ItemType, idLists);
             }
 
@@ -73,28 +73,24 @@ public sealed class ContentTypeIndexingNotificationHandler : INotificationHandle
             {
                 idLists.refreshedIds.Add(payload.Id);
             }
-            else if (payload.ChangeTypes.HasType(ContentTypeChangeTypes.RefreshOther))
-            {
-                idLists.otherIds.Add(payload.Id);
-            }
         }
 
-        foreach (KeyValuePair<string, (List<int> removedIds, List<int> refreshedIds, List<int> otherIds)> ci in
+        foreach (KeyValuePair<string, (List<int> removedIds, List<int> refreshedIds)> ci in
                  changedIds)
         {
-            if (ci.Value.refreshedIds.Count > 0 || ci.Value.otherIds.Count > 0)
+            if (ci.Value.refreshedIds.Count > 0)
             {
                 switch (ci.Key)
                 {
                     case var itemType when itemType == typeof(IContentType).Name:
-                        RefreshContentOfContentTypes(ci.Value.refreshedIds.Concat(ci.Value.otherIds).Distinct()
+                        RefreshContentOfContentTypes(ci.Value.refreshedIds.Distinct()
                             .ToArray());
                         break;
                     case var itemType when itemType == typeof(IMediaType).Name:
-                        RefreshMediaOfMediaTypes(ci.Value.refreshedIds.Concat(ci.Value.otherIds).Distinct().ToArray());
+                        RefreshMediaOfMediaTypes(ci.Value.refreshedIds.Distinct().ToArray());
                         break;
                     case var itemType when itemType == typeof(IMemberType).Name:
-                        RefreshMemberOfMemberTypes(ci.Value.refreshedIds.Concat(ci.Value.otherIds).Distinct()
+                        RefreshMemberOfMemberTypes(ci.Value.refreshedIds.Distinct()
                             .ToArray());
                         break;
                 }
@@ -154,6 +150,10 @@ public sealed class ContentTypeIndexingNotificationHandler : INotificationHandle
         const int pageSize = 500;
         var page = 0;
         var total = long.MaxValue;
+
+        // track which Ids have their paths are published
+        var publishChecked = new Dictionary<int, bool>();
+
         while (page * pageSize < total)
         {
             IEnumerable<IContent> contentToRefresh = _contentService.GetPagedOfTypes(
@@ -165,20 +165,20 @@ public sealed class ContentTypeIndexingNotificationHandler : INotificationHandle
                 // order by shallowest to deepest, this allows us to check it's published state without checking every item
                 Ordering.By("Path"));
 
-            // track which Ids have their paths are published
-            var publishChecked = new Dictionary<int, bool>();
-
             foreach (IContent c in contentToRefresh)
             {
                 var isPublished = false;
                 if (c.Published)
                 {
-                    if (!publishChecked.TryGetValue(c.ParentId, out isPublished))
+                    if (publishChecked.TryGetValue(c.ParentId, out isPublished) is false)
                     {
-                        // nothing by parent id, so query the service and cache the result for the next child to check against
                         isPublished = _contentService.IsPathPublished(c);
-                        publishChecked[c.Id] = isPublished;
+
+                        // the parent *must* be published it the entire path is published
+                        publishChecked[c.ParentId] = isPublished;
                     }
+
+                    publishChecked[c.Id] = isPublished;
                 }
 
                 _umbracoIndexingHandler.ReIndexForContent(c, isPublished);
