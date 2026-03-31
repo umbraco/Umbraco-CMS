@@ -271,4 +271,150 @@ internal sealed partial class UserServiceTests
         Assert.IsFalse(result.Success);
         Assert.AreEqual(UserOperationStatus.UserNotFound, result.Status);
     }
+
+    [Test]
+    public async Task ReplaceUserGroupPermissions_Replaces_Existing_Permissions()
+    {
+        // Arrange
+        var userGroup = await CreateTestUserGroup();
+        var user = UserService.CreateUserWithIdentity("test1", "test1@test.com");
+        user.AddGroup(userGroup.ToReadOnlyGroup());
+        UserService.Save(user);
+
+        var contentType = ContentTypeBuilder.CreateSimpleContentType();
+        contentType.AllowedTemplates = null;
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+
+        var content = ContentBuilder.CreateSimpleContent(contentType);
+        ContentService.Save(content);
+
+        // Set initial permissions
+        var initialPermissions = new HashSet<string> { ActionBrowse.ActionLetter, ActionDelete.ActionLetter };
+        UserService.ReplaceUserGroupPermissions(userGroup.Id, initialPermissions, content.Id);
+
+        // Act - replace with different permissions
+        var newPermissions = new HashSet<string> { ActionMove.ActionLetter, ActionUpdate.ActionLetter };
+        UserService.ReplaceUserGroupPermissions(userGroup.Id, newPermissions, content.Id);
+
+        // Assert - verify only the new permissions exist
+        var result = await UserService.GetDocumentPermissionsAsync(user.Key, [content.Key]);
+
+        Assert.IsTrue(result.Success);
+        var nodePermissions = result.Result.ToArray();
+        Assert.AreEqual(1, nodePermissions.Length);
+
+        // Old permissions should be gone
+        Assert.IsFalse(nodePermissions[0].Permissions.Contains(ActionBrowse.ActionLetter));
+        Assert.IsFalse(nodePermissions[0].Permissions.Contains(ActionDelete.ActionLetter));
+
+        // New permissions should be set
+        Assert.IsTrue(nodePermissions[0].Permissions.Contains(ActionMove.ActionLetter));
+        Assert.IsTrue(nodePermissions[0].Permissions.Contains(ActionUpdate.ActionLetter));
+    }
+
+    [Test]
+    public async Task ReplaceUserGroupPermissions_Sets_Permissions_On_Multiple_Entities()
+    {
+        // Arrange
+        var userGroup = await CreateTestUserGroup();
+        var user = UserService.CreateUserWithIdentity("test1", "test1@test.com");
+        user.AddGroup(userGroup.ToReadOnlyGroup());
+        UserService.Save(user);
+
+        var contentType = ContentTypeBuilder.CreateSimpleContentType();
+        contentType.AllowedTemplates = null;
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+
+        var content1 = ContentBuilder.CreateSimpleContent(contentType);
+        ContentService.Save(content1);
+        var content2 = ContentBuilder.CreateSimpleContent(contentType, "second");
+        ContentService.Save(content2);
+
+        var permissions = new HashSet<string> { ActionBrowse.ActionLetter, ActionMove.ActionLetter };
+
+        // Act
+        UserService.ReplaceUserGroupPermissions(userGroup.Id, permissions, content1.Id, content2.Id);
+
+        // Assert - verify permissions on both content items
+        var result = await UserService.GetDocumentPermissionsAsync(user.Key, [content1.Key, content2.Key]);
+
+        Assert.IsTrue(result.Success);
+        var nodePermissions = result.Result.ToArray();
+        Assert.AreEqual(2, nodePermissions.Length);
+
+        var perms1 = nodePermissions.Single(x => x.NodeKey == content1.Key);
+        var perms2 = nodePermissions.Single(x => x.NodeKey == content2.Key);
+
+        Assert.IsTrue(perms1.Permissions.Contains(ActionBrowse.ActionLetter));
+        Assert.IsTrue(perms1.Permissions.Contains(ActionMove.ActionLetter));
+        Assert.IsTrue(perms2.Permissions.Contains(ActionBrowse.ActionLetter));
+        Assert.IsTrue(perms2.Permissions.Contains(ActionMove.ActionLetter));
+    }
+
+    [Test]
+    public async Task AssignUserGroupPermission_Sets_Permission_On_Multiple_Entities()
+    {
+        // Arrange
+        var userGroup = await CreateTestUserGroup();
+        var user = UserService.CreateUserWithIdentity("test1", "test1@test.com");
+        user.AddGroup(userGroup.ToReadOnlyGroup());
+        UserService.Save(user);
+
+        var contentType = ContentTypeBuilder.CreateSimpleContentType();
+        contentType.AllowedTemplates = null;
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+
+        var content1 = ContentBuilder.CreateSimpleContent(contentType);
+        ContentService.Save(content1);
+        var content2 = ContentBuilder.CreateSimpleContent(contentType, "second");
+        ContentService.Save(content2);
+
+        // Act
+        UserService.AssignUserGroupPermission(userGroup.Id, ActionBrowse.ActionLetter, content1.Id, content2.Id);
+
+        // Assert - verify permissions on both content items
+        var result = await UserService.GetDocumentPermissionsAsync(user.Key, [content1.Key, content2.Key]);
+
+        Assert.IsTrue(result.Success);
+        var nodePermissions = result.Result.ToArray();
+        Assert.AreEqual(2, nodePermissions.Length);
+
+        var perms1 = nodePermissions.Single(x => x.NodeKey == content1.Key);
+        var perms2 = nodePermissions.Single(x => x.NodeKey == content2.Key);
+
+        Assert.IsTrue(perms1.Permissions.Contains(ActionBrowse.ActionLetter));
+        Assert.IsTrue(perms2.Permissions.Contains(ActionBrowse.ActionLetter));
+    }
+
+    [Test]
+    public async Task AssignUserGroupPermission_Adds_To_Existing_Permissions()
+    {
+        // Arrange
+        var userGroup = await CreateTestUserGroup();
+        var user = UserService.CreateUserWithIdentity("test1", "test1@test.com");
+        user.AddGroup(userGroup.ToReadOnlyGroup());
+        UserService.Save(user);
+
+        var contentType = ContentTypeBuilder.CreateSimpleContentType();
+        contentType.AllowedTemplates = null;
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+
+        var content = ContentBuilder.CreateSimpleContent(contentType);
+        ContentService.Save(content);
+
+        // Set initial permission
+        UserService.AssignUserGroupPermission(userGroup.Id, ActionBrowse.ActionLetter, content.Id);
+
+        // Act - assign an additional permission
+        UserService.AssignUserGroupPermission(userGroup.Id, ActionDelete.ActionLetter, content.Id);
+
+        // Assert - both permissions should exist
+        var result = await UserService.GetDocumentPermissionsAsync(user.Key, [content.Key]);
+
+        Assert.IsTrue(result.Success);
+        var nodePermissions = result.Result.ToArray();
+        Assert.AreEqual(1, nodePermissions.Length);
+        Assert.IsTrue(nodePermissions[0].Permissions.Contains(ActionBrowse.ActionLetter));
+        Assert.IsTrue(nodePermissions[0].Permissions.Contains(ActionDelete.ActionLetter));
+    }
 }
