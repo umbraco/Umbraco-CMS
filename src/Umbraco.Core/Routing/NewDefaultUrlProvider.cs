@@ -220,23 +220,27 @@ public class NewDefaultUrlProvider : IUrlProvider
         // extract domainUri and path
         // route is /<path> or <domainRootId>/<path>
         var pos = route.IndexOf('/', StringComparison.Ordinal);
-        var path = pos == 0 ? route : route[pos..];
-        DomainAndUri? domainUri = pos == 0
-            ? null
-            : DomainUtilities.DomainForNode(
-                _domainCache,
-                _siteDomainMapper,
-                int.Parse(route[..pos], CultureInfo.InvariantCulture),
-                current,
-                culture);
 
-        var defaultCulture = _languageService.GetDefaultIsoCodeAsync().GetAwaiter().GetResult();
-        if (domainUri is not null ||
-            string.IsNullOrEmpty(culture) ||
-            culture.Equals(defaultCulture, StringComparison.InvariantCultureIgnoreCase))
+        if (pos >= 0)
         {
-            Uri url = AssembleUrl(domainUri, path, current, mode);
-            return UrlInfo.FromUri(url, Alias, culture);
+            var path = pos == 0 ? route : route[pos..];
+            DomainAndUri? domainUri = pos == 0
+                ? null
+                : DomainUtilities.DomainForNode(
+                    _domainCache,
+                    _siteDomainMapper,
+                    int.Parse(route[..pos], CultureInfo.InvariantCulture),
+                    current,
+                    culture);
+
+            var defaultCulture = _languageService.GetDefaultIsoCodeAsync().GetAwaiter().GetResult();
+            if (domainUri is not null ||
+                string.IsNullOrEmpty(culture) ||
+                culture.Equals(defaultCulture, StringComparison.InvariantCultureIgnoreCase))
+            {
+                Uri url = AssembleUrl(domainUri, path, current, mode);
+                return UrlInfo.FromUri(url, Alias, culture);
+            }
         }
 
         return null;
