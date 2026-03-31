@@ -117,7 +117,7 @@ stages:
               artifactName: csharp-docs-dlls
           - powershell: |
               dotnet tool install --global CycloneDX
-              dotnet-CycloneDX $(solution) --output $(Build.ArtifactStagingDirectory)/bom --filename bom-dotnet.xml
+              dotnet-CycloneDX $(solution) --spec-version 1.5 --output $(Build.ArtifactStagingDirectory)/bom --filename bom-dotnet.xml
             displayName: 'Generate Backend BOM'
           - powershell: |
               npm install --global @cyclonedx/cyclonedx-npm
