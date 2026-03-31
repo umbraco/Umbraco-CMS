@@ -58,6 +58,13 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
 
     protected ILanguageRepository LanguageRepository { get; }
 
+    /// <summary>
+    /// Gets the cache policy as <see cref="FullDataSetRepositoryCachePolicy{TEntity, TId}"/> for predicate-based lookups.
+    /// Returns null if the repository uses a different cache policy type.
+    /// </summary>
+    protected FullDataSetRepositoryCachePolicy<TEntity, int>? TypedCachePolicy
+        => CachePolicy as FullDataSetRepositoryCachePolicy<TEntity, int>;
+
     protected abstract bool SupportsPublishing { get; }
 
     /// <summary>
@@ -1559,7 +1566,20 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
         }
     }
 
-    protected abstract TEntity? PerformGet(Guid id);
+    /// <summary>
+    /// Gets a content type by its unique key (GUID), using the full-dataset cache policy
+    /// to clone only the matched entity rather than the entire cached collection.
+    /// </summary>
+    protected virtual TEntity? PerformGet(Guid id)
+    {
+        if (TypedCachePolicy is { } policy)
+        {
+            return policy.FindCached(x => x.Key == id, PerformGetAll);
+        }
+
+        // Fallback for non-FullDataSet policies.
+        return GetMany().FirstOrDefault(x => x.Key == id);
+    }
 
     /// <summary>
     ///     Try to set the data type Id based on the provided key or property editor alias.
@@ -1615,11 +1635,65 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
         }
     }
 
-    protected abstract TEntity? PerformGet(string alias);
+    /// <summary>
+    /// Gets a content type by its alias, using the full-dataset cache policy
+    /// to clone only the matched entity rather than the entire cached collection.
+    /// </summary>
+    protected virtual TEntity? PerformGet(string alias)
+    {
+        if (TypedCachePolicy is { } policy)
+        {
+            return policy.FindCached(x => x.Alias.InvariantEquals(alias), PerformGetAll);
+        }
 
-    protected abstract IEnumerable<TEntity>? PerformGetAll(params Guid[]? ids);
+        // Fallback for non-FullDataSet policies.
+        return GetMany().FirstOrDefault(x => x.Alias.InvariantEquals(alias));
+    }
 
-    protected abstract bool PerformExists(Guid id);
+    /// <summary>
+    /// Gets content types by their unique keys (GUIDs), using the full-dataset cache policy
+    /// to clone only the matched entities rather than the entire cached collection.
+    /// When <paramref name="ids"/> is null or empty, returns all content types.
+    /// </summary>
+    protected virtual IEnumerable<TEntity>? PerformGetAll(params Guid[]? ids)
+    {
+        if (TypedCachePolicy is { } policy)
+        {
+            if (ids?.Any() ?? false)
+            {
+                var idSet = ids.ToHashSet();
+                return policy.FindAllCached(x => idSet.Contains(x.Key), PerformGetAll);
+            }
+
+            // No filter — need all, clone everything (same as GetAll).
+            return policy.GetAll(null, PerformGetAll);
+        }
+
+        // Fallback for non-FullDataSet policies.
+        IEnumerable<TEntity> all = GetMany();
+        if (ids?.Any() ?? false)
+        {
+            var idSet = ids.ToHashSet();
+            return all.Where(x => idSet.Contains(x.Key));
+        }
+
+        return all;
+    }
+
+    /// <summary>
+    /// Checks whether a content type with the specified unique key (GUID) exists,
+    /// using the full-dataset cache policy to avoid any deep-cloning.
+    /// </summary>
+    protected virtual bool PerformExists(Guid id)
+    {
+        if (TypedCachePolicy is { } policy)
+        {
+            return policy.ExistsCached(x => x.Key == id, PerformGetAll);
+        }
+
+        // Fallback for non-FullDataSet policies.
+        return GetMany().Any(x => x.Key == id);
+    }
 
     /// <summary>
     /// Generates a unique alias for a content type by appending an incrementing number to the provided base alias if necessary.

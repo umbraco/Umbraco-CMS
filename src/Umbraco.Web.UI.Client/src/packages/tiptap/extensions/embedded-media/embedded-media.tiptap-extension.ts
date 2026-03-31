@@ -20,7 +20,7 @@ export const umbEmbeddedMedia = Node.create<UmbEmbeddedMediaOptions>({
 
 	addAttributes() {
 		return {
-			'data-embed-constrain': { default: false },
+			'data-embed-constrain': { default: true },
 			'data-embed-height': { default: 240 },
 			'data-embed-url': { default: null },
 			'data-embed-width': { default: 360 },
