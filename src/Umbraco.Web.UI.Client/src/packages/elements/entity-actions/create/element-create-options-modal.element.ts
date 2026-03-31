@@ -6,11 +6,10 @@ import type {
 	UmbElementCreateOptionsModalData,
 	UmbElementCreateOptionsModalValue,
 } from './element-create-options-modal.token.js';
-import { customElement, html, nothing, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbExtensionsApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { ManifestEntityCreateOptionAction } from '@umbraco-cms/backoffice/entity-create-option-action';
 import type { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 
@@ -107,7 +106,9 @@ export class UmbElementCreateOptionsModalElement extends UmbModalBaseElement<
 				${when(
 					this._allowedElementTypes.length === 0 && this._createOptionControllers.length === 0,
 					() => this.#renderNoAllowedTypes(),
-					() => html`${this.#renderAllowedElementTypes()}${this.#renderCreateOptionActions()}`,
+					() => html`
+						<uui-ref-list>${this.#renderCreateOptionActions()}${this.#renderAllowedElementTypes()}</uui-ref-list>
+					`,
 				)}
 				<uui-button
 					slot="actions"
@@ -169,7 +170,16 @@ export class UmbElementCreateOptionsModalElement extends UmbModalBaseElement<
 		);
 	}
 
-	static override styles = [UmbTextStyles];
+	static override styles = css`
+		:host {
+			max-width: 800px;
+		}
+
+		uui-ref-node-document-type {
+			padding-top: var(--uui-size-3);
+			padding-bottom: var(--uui-size-3);
+		}
+	`;
 }
 
 export default UmbElementCreateOptionsModalElement;
