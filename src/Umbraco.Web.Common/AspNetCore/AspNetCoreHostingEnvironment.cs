@@ -78,8 +78,14 @@ public class AspNetCoreHostingEnvironment : IHostingEnvironment
     /// <inheritdoc />
     public bool IsHosted { get; } = true;
 
+    private Uri? _applicationMainUrl;
+
     /// <inheritdoc />
-    public Uri ApplicationMainUrl { get; private set; } = null!;
+    public Uri ApplicationMainUrl
+    {
+        get => _applicationMainUrl!;
+        private set => _applicationMainUrl = value;
+    }
 
     /// <inheritdoc />
     public string? SiteName { get; private set; }
@@ -197,16 +203,9 @@ public class AspNetCoreHostingEnvironment : IHostingEnvironment
                 return;
 
             case ApplicationUrlDetection.FirstRequest:
-                if (ApplicationMainUrl is not null)
-                {
-                    return;
-                }
-
-                if (_applicationUrls.TryAdd(currentApplicationUrl))
-                {
-                    ApplicationMainUrl = currentApplicationUrl;
-                }
-
+                // Atomic: only the first thread to arrive sets the URL.
+                // Subsequent calls (even concurrent ones with different hosts) are no-ops.
+                Interlocked.CompareExchange(ref _applicationMainUrl, currentApplicationUrl, null);
                 break;
 
             case ApplicationUrlDetection.EveryRequest:

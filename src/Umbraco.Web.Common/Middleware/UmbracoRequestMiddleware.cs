@@ -33,7 +33,7 @@ namespace Umbraco.Cms.Web.Common.Middleware;
 /// </remarks>
 internal sealed class UmbracoRequestMiddleware : IMiddleware
 {
-    private static bool _applicationUrlLogged;
+    private static int _applicationUrlLogged;
 
     private readonly IDefaultCultureAccessor _defaultCultureAccessor;
     private readonly IEventAggregator _eventAggregator;
@@ -97,10 +97,8 @@ internal sealed class UmbracoRequestMiddleware : IMiddleware
         Uri? applicationUrlBeforeDetection = _hostingEnvironment.ApplicationMainUrl;
         _hostingEnvironment.EnsureApplicationMainUrl(currentApplicationUrl);
 
-        if (_applicationUrlLogged is false && currentApplicationUrl is not null)
+        if (currentApplicationUrl is not null && Interlocked.CompareExchange(ref _applicationUrlLogged, 1, 0) == 0)
         {
-            _applicationUrlLogged = true;
-
             if (_hostingEnvironment.ApplicationMainUrl is not null)
             {
                 var source = applicationUrlBeforeDetection is not null ? "configured" : "auto-detected";

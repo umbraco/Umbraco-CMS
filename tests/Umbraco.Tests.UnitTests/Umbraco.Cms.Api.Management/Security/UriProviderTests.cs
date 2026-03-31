@@ -60,9 +60,6 @@ public class UriProviderTests
     public async Task ForgotPasswordUri_WithoutApplicationMainUrl_FailsWithApplicationUrlNotConfigured()
     {
         _hostingEnvironment.Setup(h => h.ApplicationMainUrl).Returns((Uri?)null);
-        _userManager
-            .Setup(m => m.GeneratePasswordResetTokenAsync(It.IsAny<IUser>()))
-            .ReturnsAsync(Attempt.SucceedWithStatus(UserOperationStatus.Success, "test-token"));
 
         var sut = new ForgotPasswordUriProvider(
             _userManager.Object,
@@ -73,6 +70,7 @@ public class UriProviderTests
 
         Assert.IsFalse(result.Success);
         Assert.AreEqual(UserOperationStatus.ApplicationUrlNotConfigured, result.Status);
+        _userManager.Verify(m => m.GeneratePasswordResetTokenAsync(It.IsAny<IUser>()), Times.Never());
     }
 
     [Test]
@@ -103,9 +101,6 @@ public class UriProviderTests
     public async Task InviteUri_WithoutApplicationMainUrl_FailsWithApplicationUrlNotConfigured()
     {
         _hostingEnvironment.Setup(h => h.ApplicationMainUrl).Returns((Uri?)null);
-        _userManager
-            .Setup(m => m.GenerateEmailConfirmationTokenAsync(It.IsAny<IUser>()))
-            .ReturnsAsync(Attempt.SucceedWithStatus(UserOperationStatus.Success, "test-token"));
 
         var sut = new InviteUriProvider(
             _userManager.Object,
@@ -116,5 +111,6 @@ public class UriProviderTests
 
         Assert.IsFalse(result.Success);
         Assert.AreEqual(UserOperationStatus.ApplicationUrlNotConfigured, result.Status);
+        _userManager.Verify(m => m.GenerateEmailConfirmationTokenAsync(It.IsAny<IUser>()), Times.Never());
     }
 }

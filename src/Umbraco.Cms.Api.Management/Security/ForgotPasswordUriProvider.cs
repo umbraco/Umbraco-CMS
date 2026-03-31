@@ -36,7 +36,10 @@ public class ForgotPasswordUriProvider : IForgotPasswordUriProvider
     /// <inheritdoc/>
     public async Task<Attempt<Uri, UserOperationStatus>> CreateForgotPasswordUriAsync(IUser user)
     {
-        HttpRequest? request = _httpContextAccessor.HttpContext?.Request ?? throw new NotSupportedException("Needs a HttpContext");
+        if (_httpContextAccessor.HttpContext is null)
+        {
+            throw new NotSupportedException("Needs a HttpContext");
+        }
 
         Uri? appUrl = _hostingEnvironment.ApplicationMainUrl;
         if (appUrl is null)
@@ -48,7 +51,7 @@ public class ForgotPasswordUriProvider : IForgotPasswordUriProvider
 
         if (tokenAttempt.Success is false)
         {
-            return Attempt.FailWithStatus(tokenAttempt.Status, new Uri(string.Empty));
+            return Attempt.FailWithStatus<Uri, UserOperationStatus>(tokenAttempt.Status, default!);
         }
 
         var uriBuilder = new UriBuilder(appUrl)

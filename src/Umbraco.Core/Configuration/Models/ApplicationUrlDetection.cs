@@ -8,7 +8,8 @@ public enum ApplicationUrlDetection
     /// <summary>
     ///     No auto-detection. The application URL must be explicitly configured
     ///     via <see cref="WebRoutingSettings.UmbracoApplicationUrl" />.
-    ///     Emails will use relative links if no URL is configured.
+    ///     Operations that require a URL (invitations, password resets) will fail
+    ///     if no explicit URL is configured.
     /// </summary>
     None,
 
