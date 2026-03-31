@@ -2,8 +2,9 @@ import { UMB_MEDIA_ENTITY_TYPE } from '../entity.js';
 import type { UmbMediaSearchItemModel, UmbMediaSearchRequestArgs } from './types.js';
 import type { UmbSearchDataSource } from '@umbraco-cms/backoffice/search';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { MediaService } from '@umbraco-cms/backoffice/external/backend-api';
+import { MediaService, type MediaItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
+import type { UmbMediaItemModel } from '../types.js';
 
 /**
  * A data source for the Rollback that fetches data from the server
@@ -30,12 +31,29 @@ export class UmbMediaSearchServerDataSource
 
 		if (error) return { error };
 
-		const ancestorsByItemId = new Map<string, Array<{ name: string }>>();
+		const ancestorsByItemId = new Map<string, Array<UmbMediaItemModel>>();
 		if (data) {
 			for (const entry of data) {
 				ancestorsByItemId.set(
 					entry.id,
-					entry.ancestors.map((ancestor) => ({ name: ancestor.variants[0]?.name ?? '' })),
+					entry.ancestors.map((ancestor: MediaItemResponseModel) => ({
+						entityType: UMB_MEDIA_ENTITY_TYPE,
+						hasChildren: ancestor.hasChildren,
+						isTrashed: ancestor.isTrashed,
+						unique: ancestor.id,
+						mediaType: {
+							collection: ancestor.mediaType.collection ? { unique: ancestor.mediaType.collection.id } : null,
+							icon: ancestor.mediaType.icon,
+							unique: ancestor.mediaType.id,
+						},
+						name: ancestor.variants[0]?.name ?? '',
+						parent: ancestor.parent ? { unique: ancestor.parent.id } : null,
+						variants: ancestor.variants.map((variant) => ({
+							culture: variant.culture || null,
+							name: variant.name,
+						})),
+						flags: ancestor.flags,
+					})),
 				);
 			}
 		}

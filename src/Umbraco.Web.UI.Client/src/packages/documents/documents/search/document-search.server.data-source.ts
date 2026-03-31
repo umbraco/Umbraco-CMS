@@ -2,8 +2,9 @@ import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
 import type { UmbDocumentSearchItemModel, UmbDocumentSearchRequestArgs } from './types.js';
 import type { UmbSearchDataSource } from '@umbraco-cms/backoffice/search';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
+import { DocumentService, type DocumentItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
+import type { UmbDocumentItemModel } from '../types.js';
 
 /**
  * A data source for the Rollback that fetches data from the server
@@ -33,16 +34,30 @@ export class UmbDocumentSearchServerDataSource
 
 		if (error) return { error };
 
-		const ancestorsByItemId = new Map<string, Array<{ variants: Array<{ name: string; culture: string | null }> }>>();
+		const ancestorsByItemId = new Map<string, Array<UmbDocumentItemModel>>();
 		if (data) {
 			for (const entry of data) {
 				ancestorsByItemId.set(
 					entry.id,
-					entry.ancestors.map((ancestor) => ({
-						variants: ancestor.variants.map((v) => ({
-							name: v.name,
-							culture: v.culture || null,
+					entry.ancestors.map((ancestor: DocumentItemResponseModel) => ({
+						documentType: {
+							unique: ancestor.documentType.id,
+							icon: ancestor.documentType.icon,
+							collection: ancestor.documentType.collection ? { unique: ancestor.documentType.collection.id } : null,
+						},
+						entityType: UMB_DOCUMENT_ENTITY_TYPE,
+						hasChildren: ancestor.hasChildren,
+						isProtected: ancestor.isProtected,
+						isTrashed: ancestor.isTrashed,
+						parent: ancestor.parent ? { unique: ancestor.parent.id } : null,
+						unique: ancestor.id,
+						variants: ancestor.variants.map((variant) => ({
+							name: variant.name,
+							culture: variant.culture || null,
+							state: variant.state,
+							flags: variant.flags,
 						})),
+						flags: ancestor.flags,
 					})),
 				);
 			}
