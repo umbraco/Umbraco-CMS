@@ -1,8 +1,7 @@
 import type { UmbPeekErrorArgs } from '../../../notification/types.js';
 import { UmbModalToken } from '../../token/index.js';
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface UmbErrorViewerModalData extends UmbPeekErrorArgs {}
+export type UmbErrorViewerModalData = UmbPeekErrorArgs | string;
 
 export type UmbErrorViewerModalValue = undefined;
 
