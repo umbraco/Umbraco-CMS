@@ -90,7 +90,7 @@ export class UmbUserGroupWorkspaceContext
 	}
 
 	async #loadUsers(unique: string) {
-		const { data } = await tryExecute(this, UserService.getFilterUser({ query: { userGroupIds: [unique], take: 3 } }));
+		const { data } = await tryExecute(this, UserService.getFilterUser({ query: { userGroupIds: [unique], take: 100 } }));
 		const uniques = data?.items.map((u) => u.id) ?? [];
 		this.#persistedUserUniques = [...uniques];
 		this.#userUniquesState.setValue(uniques);
