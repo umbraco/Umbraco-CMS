@@ -164,9 +164,9 @@ internal sealed class EFCoreScopeTest : UmbracoIntegrationTest
                 Assert.IsTrue(await database.Database.CanConnectAsync());
                 var parentTransaction = database.Database.CurrentTransaction;
 
-                using (var nestedSCope = EFCoreScopeProvider.CreateScope())
+                using (var nestedScope = EFCoreScopeProvider.CreateScope())
                 {
-                    await nestedSCope.ExecuteWithContextAsync<Task>(async nestedDatabase =>
+                    await nestedScope.ExecuteWithContextAsync<Task>(async nestedDatabase =>
                     {
                         Assert.IsTrue(await nestedDatabase.Database.CanConnectAsync());
                         Assert.IsNotNull(nestedDatabase.Database.CurrentTransaction); // in a transaction

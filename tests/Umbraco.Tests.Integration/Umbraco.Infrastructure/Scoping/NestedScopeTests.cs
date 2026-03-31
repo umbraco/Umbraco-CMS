@@ -77,7 +77,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
         }
 
         [Test]
-        public void CanNestScopes_Core_Normal_Efcore()
+        public void CanNestScopes_Core_Normal_EFCore()
         {
             using (var ambientScope = CoreScopeProvider.CreateCoreScope())
             {

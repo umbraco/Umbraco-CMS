@@ -182,7 +182,7 @@ internal sealed class EFCoreScopeNotificationsTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Cant_Suppress_Notifactions_On_Child_When_Parent_Suppressing()
+    public void Cant_Suppress_Notifications_On_Child_When_Parent_Suppressing()
     {
         using var parentScope = EFCoreScopeProvider.CreateScope();
         using var parentSuppressed = parentScope.Notifications.Suppress();

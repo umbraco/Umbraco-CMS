@@ -150,13 +150,13 @@ internal sealed class EFCoreScopeProvider<TDbContext> : IEFCoreScopeProvider<TDb
         var originalScope = (EFCoreScope<TDbContext>)_ambientEFCoreScopeStack.AmbientScope!;
         if (originalScope != ambientScope.OriginalScope)
         {
-            throw new InvalidOperationException($"The detatched scope ({ambientScope.InstanceId}) does not match the original ({originalScope.InstanceId})");
+            throw new InvalidOperationException($"The detached scope ({ambientScope.InstanceId}) does not match the original ({originalScope.InstanceId})");
         }
 
         IScopeContext? originalScopeContext = AmbientScopeContext;
         if (originalScopeContext != ambientScope.OriginalContext)
         {
-            throw new InvalidOperationException($"The detatched scope context does not match the original");
+            throw new InvalidOperationException($"The detached scope context does not match the original");
         }
 
         ambientScope.OriginalScope = null;
