@@ -532,15 +532,6 @@ public class RelationService : RepositoryService, IRelationService
     [Obsolete("No longer used in Umbraco, please the overload taking all parameters. Scheduled for removal in Umbraco 19.")]
     public bool IsRelated(int id) => IsRelated(id, RelationDirectionFilter.Any, null, null);
 
-    /// <summary>
-    /// Checks whether an entity has relations in the specified direction.
-    /// </summary>
-    /// <param name="id">The identifier of the entity.</param>
-    /// <param name="directionFilter">The direction filter to apply when checking relations.</param>
-    /// <returns><c>true</c> if the entity has relations matching the filter; otherwise, <c>false</c>.</returns>
-    [Obsolete("Please the overload taking all parameters. Scheduled for removal in Umbraco 18.")]
-    public bool IsRelated(int id, RelationDirectionFilter directionFilter) => IsRelated(id, directionFilter, null, null);
-
     /// <inheritdoc />
     public bool IsRelated(int id, RelationDirectionFilter directionFilter, int[]? includeRelationTypeIds = null, int[]? excludeRelationTypeIds = null)
     {

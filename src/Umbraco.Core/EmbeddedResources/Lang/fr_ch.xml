@@ -2150,13 +2150,7 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
 		<key alias="characters_left"><![CDATA[<strong>%0%</strong> caractères restant.]]></key>
 		<key alias="characters_exceed"><![CDATA[Maximum %0% caractères, <strong>%1%</strong> en trop.]]></key>
 	</area>
-	<area alias="recycleBin">
-		<key alias="contentTrashed">Suppression du contenu avec l'Id : {0} lié au contenu parent original avec l'Id : {1}</key>
-		<key alias="mediaTrashed">Suppression du media avec l'Id : {0} lié à l'élément media parent original avec l'Id : {1}</key>
-		<key alias="itemCannotBeRestored">Cet élément ne peut pas être restauré automatiquement</key>
-		<key alias="itemCannotBeRestoredHelpText">Il n'y a aucun endroit où cet élément peut être restauré automatiquement. Vous pouvez déplacer l'élément manuellement en utilisant l'arborescence ci-dessous.</key>
-		<key alias="wasRestored">a été restauré sous</key>
-	</area>
+
 	<area alias="relationType">
 		<key alias="direction">Direction</key>
 		<key alias="parentToChild">Parent vers enfant</key>

@@ -28,17 +28,4 @@ public sealed class ContentCopyingNotification : CopyingNotification<IContent>
         : base(original, copy, parentId, parentKey, messages)
     {
     }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="ContentCopyingNotification"/> class.
-    /// </summary>
-    /// <param name="original">The original content item being copied.</param>
-    /// <param name="copy">The copy of the content item.</param>
-    /// <param name="parentId">The ID of the new parent.</param>
-    /// <param name="messages">The event messages collection.</param>
-    [Obsolete("Please use constructor that takes a parent key as well. Scheduled for removal in Umbraco 18.")]
-    public ContentCopyingNotification(IContent original, IContent copy, int parentId, EventMessages messages)
-        : this(original, copy, parentId, null, messages)
-    {
-    }
 }

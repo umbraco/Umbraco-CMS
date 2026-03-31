@@ -8,10 +8,18 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
+/// <summary>
+/// Provides methods for managing and persisting URLs associated with documents in the Umbraco CMS.
+/// This repository handles storage, retrieval, and manipulation of document URL data in the persistence layer.
+/// </summary>
 public class DocumentUrlRepository : IDocumentUrlRepository
 {
     private readonly IScopeAccessor _scopeAccessor;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DocumentUrlRepository"/> class, providing access to document URL persistence operations.
+    /// </summary>
+    /// <param name="scopeAccessor">An accessor for the current database scope, used to manage transactional operations within the repository.</param>
     public DocumentUrlRepository(IScopeAccessor scopeAccessor) => _scopeAccessor = scopeAccessor;
 
     private IUmbracoDatabase Database
@@ -27,6 +35,11 @@ public class DocumentUrlRepository : IDocumentUrlRepository
         }
     }
 
+    /// <summary>
+    /// Saves a collection of published document URL segments to the repository, updating existing entries and removing obsolete ones as needed.
+    /// </summary>
+    /// <param name="publishedDocumentUrlSegments">The collection of <see cref="PublishedDocumentUrlSegment"/> instances to save.</param>
+
     public void Save(IEnumerable<PublishedDocumentUrlSegment> publishedDocumentUrlSegments)
     {
         // TODO: avoid this is called as first thing on first restart after install
@@ -34,10 +47,10 @@ public class DocumentUrlRepository : IDocumentUrlRepository
 
         Dictionary<(Guid UniqueId, int? LanguageId, bool isDraft, string urlSegment), DocumentUrlDto> dtoDictionary = publishedDocumentUrlSegments
             .Select(BuildDto)
-            .ToDictionary(x => (x.UniqueId, x.NullableLanguageId, x.IsDraft, x.UrlSegment));
+            .ToDictionary(x => (x.UniqueId, x.LanguageId, x.IsDraft, x.UrlSegment));
 
         var toDelete = new List<int>();
-        var toInsert = dtoDictionary.Values.ToDictionary(x => (x.UniqueId, x.NullableLanguageId, x.IsDraft, x.UrlSegment));
+        var toInsert = dtoDictionary.Values.ToDictionary(x => (x.UniqueId, x.LanguageId, x.IsDraft, x.UrlSegment));
 
         foreach (IEnumerable<Guid> group in documentKeys.InGroupsOf(Constants.Sql.MaxParameterCount))
         {
@@ -51,12 +64,12 @@ public class DocumentUrlRepository : IDocumentUrlRepository
 
             foreach (DocumentUrlDto existing in existingUrlsInBatch)
             {
-                if (dtoDictionary.TryGetValue((existing.UniqueId, existing.NullableLanguageId, existing.IsDraft, existing.UrlSegment), out DocumentUrlDto? found))
+                if (dtoDictionary.TryGetValue((existing.UniqueId, existing.LanguageId, existing.IsDraft, existing.UrlSegment), out DocumentUrlDto? found))
                 {
                     found.NodeId = existing.NodeId;
 
                     // If we found it, we know we should not insert it as a new record.
-                    toInsert.Remove((found.UniqueId, found.NullableLanguageId, found.IsDraft, found.UrlSegment));
+                    toInsert.Remove((found.UniqueId, found.LanguageId, found.IsDraft, found.UrlSegment));
                 }
                 else
                 {
@@ -74,6 +87,12 @@ public class DocumentUrlRepository : IDocumentUrlRepository
         Database.InsertBulk(toInsert.Values);
     }
 
+    /// <summary>
+    /// Retrieves all published document URL segments from the database.
+    /// </summary>
+    /// <returns>
+    /// An <see cref="IEnumerable{T}"/> of <see cref="PublishedDocumentUrlSegment"/> objects representing all published document URL segments.
+    /// </returns>
     public IEnumerable<PublishedDocumentUrlSegment> GetAll()
     {
         List<DocumentUrlDto>? dtos = Database.Fetch<DocumentUrlDto>(Database.SqlContext.Sql().Select<DocumentUrlDto>().From<DocumentUrlDto>());
@@ -81,6 +100,10 @@ public class DocumentUrlRepository : IDocumentUrlRepository
         return dtos.Select(BuildModel);
     }
 
+    /// <summary>
+    /// Deletes all document URLs associated with the specified document keys.
+    /// </summary>
+    /// <param name="documentKeys">A collection of document keys whose URLs should be deleted.</param>
     public void DeleteByDocumentKey(IEnumerable<Guid> documentKeys)
     {
         foreach (IEnumerable<Guid> group in documentKeys.InGroupsOf(Constants.Sql.MaxParameterCount))
@@ -94,7 +117,7 @@ public class DocumentUrlRepository : IDocumentUrlRepository
         {
             UrlSegment = dto.UrlSegment,
             DocumentKey = dto.UniqueId,
-            NullableLanguageId = dto.NullableLanguageId,
+            LanguageId = dto.LanguageId,
             IsDraft = dto.IsDraft,
             IsPrimary = dto.IsPrimary
         };
@@ -105,7 +128,7 @@ public class DocumentUrlRepository : IDocumentUrlRepository
         {
             UrlSegment = model.UrlSegment,
             UniqueId = model.DocumentKey,
-            NullableLanguageId = model.NullableLanguageId,
+            LanguageId = model.LanguageId,
             IsDraft = model.IsDraft,
             IsPrimary = model.IsPrimary,
         };

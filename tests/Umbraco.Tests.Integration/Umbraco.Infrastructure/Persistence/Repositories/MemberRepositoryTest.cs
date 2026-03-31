@@ -71,7 +71,9 @@ internal sealed class MemberRepositoryTest : UmbracoIntegrationTest
             DataTypeService,
             JsonSerializer,
             Mock.Of<IEventAggregator>(),
-            Options.Create(new MemberPasswordConfigurationSettings()));
+            Options.Create(new MemberPasswordConfigurationSettings()),
+            Mock.Of<IRepositoryCacheVersionService>(),
+            Mock.Of<ICacheSyncService>());
     }
 
     [Test]

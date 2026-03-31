@@ -1,9 +1,7 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Querying;
@@ -47,27 +45,9 @@ public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IRead
         Logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
-    protected EntityRepositoryBase(
-        IScopeAccessor scopeAccessor,
-        AppCaches appCaches,
-        ILogger<EntityRepositoryBase<TId, TEntity>> logger)
-        : this(
-            scopeAccessor,
-            appCaches,
-            logger,
-            StaticServiceProvider.Instance.GetRequiredService<IRepositoryCacheVersionService>(),
-            StaticServiceProvider.Instance.GetRequiredService<ICacheSyncService>())
-    {
-    }
+    protected IRepositoryCacheVersionService RepositoryCacheVersionService { get; }
 
-// TODO (V18): Make these fields into read-only properties.
-
-#pragma warning disable IDE1006 // Naming Styles
-    protected readonly IRepositoryCacheVersionService RepositoryCacheVersionService;
-
-    protected readonly ICacheSyncService CacheSyncService;
-#pragma warning restore IDE1006 // Naming Styles
+    protected ICacheSyncService CacheSyncService { get; }
 
     /// <summary>
     ///     Gets the logger
@@ -160,14 +140,17 @@ public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IRead
     }
 
     /// <summary>
-    ///     Deletes the passed in entity
+    /// Deletes the specified entity.
     /// </summary>
+    /// <param name="entity">The entity to delete.</param>
     public virtual void Delete(TEntity entity)
         => CachePolicy.Delete(entity, PersistDeletedItem);
 
     /// <summary>
     ///     Gets an entity by the passed in Id utilizing the repository's cache policy
     /// </summary>
+    /// <param name="id">The Id of the entity to get.</param>
+    /// <returns>The entity matching the specified Id, or null if not found.</returns>
     public TEntity? Get(TId? id)
         => CachePolicy.Get(id, PerformGet, PerformGetAll);
 
@@ -202,8 +185,10 @@ public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IRead
     }
 
     /// <summary>
-    ///     Gets a list of entities by the passed in query
+    /// Retrieves a collection of entities that satisfy the specified query criteria.
     /// </summary>
+    /// <param name="query">The query used to filter and select entities.</param>
+    /// <returns>An enumerable collection of entities matching the query.</returns>
     public IEnumerable<TEntity> Get(IQuery<TEntity> query) =>
 
         // ensure we don't include any null refs in the returned collection!
@@ -217,8 +202,10 @@ public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IRead
         => CachePolicy.Exists(id, PerformExists, PerformGetAll);
 
     /// <summary>
-    ///     Returns an integer with the count of entities found with the passed in query
+    /// Returns the number of entities that match the specified query.
     /// </summary>
+    /// <param name="query">The query used to filter entities to count. If null, all entities are counted.</param>
+    /// <returns>The count of entities matching the query.</returns>
     public int Count(IQuery<TEntity>? query)
         => PerformCount(query);
 

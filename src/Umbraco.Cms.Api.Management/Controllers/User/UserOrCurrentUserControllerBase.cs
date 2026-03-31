@@ -5,6 +5,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.User;
 
+/// <summary>
+/// Serves as a base controller for API endpoints that operate on either a specified user or the current user.
+/// </summary>
 [ApiExplorerSettings(GroupName = "User")]
 public abstract class UserOrCurrentUserControllerBase : ManagementApiControllerBase
 {
@@ -91,6 +94,10 @@ public abstract class UserOrCurrentUserControllerBase : ManagementApiControllerB
             UserOperationStatus.MediaStartNodeNotFound => BadRequest(problemDetailsBuilder
                 .WithTitle("Media Start Node not found")
                 .WithDetail("Some of the provided media start nodes was not found.")
+                .Build()),
+            UserOperationStatus.ElementStartNodeNotFound => BadRequest(problemDetailsBuilder
+                .WithTitle("Element Start Node not found")
+                .WithDetail("Some of the provided element start nodes was not found.")
                 .Build()),
             UserOperationStatus.UserNotFound => NotFound(problemDetailsBuilder
                 .WithTitle("The user was not found")

@@ -1,6 +1,7 @@
 import { manifests as auditLogManifests } from './audit-log/manifests.js';
 import { manifests as collectionManifests } from './collection/manifests.js';
 import { manifests as entityActionManifests } from './entity-actions/manifests.js';
+import { manifests as entitySignManifests } from './entity-sign/manifests.js';
 import { manifests as entityBulkActionManifests } from './entity-bulk-actions/manifests.js';
 import { manifests as folderManifests } from './folder/manifests.js';
 import { manifests as itemManifests } from './item/manifests.js';
@@ -24,6 +25,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 	...collectionManifests,
 	...entityActionManifests,
 	...entityBulkActionManifests,
+	...entitySignManifests,
 	...folderManifests,
 	...itemManifests,
 	...menuManifests,

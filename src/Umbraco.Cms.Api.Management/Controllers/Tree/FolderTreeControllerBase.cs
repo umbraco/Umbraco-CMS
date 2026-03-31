@@ -13,6 +13,10 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Tree;
 
+/// <summary>
+/// Serves as a base controller for managing folder-based tree structures containing items of type <typeparamref name="TItem"/>.
+/// Provides common functionality for derived controllers handling hierarchical folder trees.
+/// </summary>
 public abstract class FolderTreeControllerBase<TItem> : NamedEntityTreeControllerBase<TItem>
     where TItem : FolderTreeItemResponseModel, new()
 {
@@ -35,14 +39,6 @@ public abstract class FolderTreeControllerBase<TItem> : NamedEntityTreeControlle
 
             return ordering;
         }
-    }
-
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
-    protected FolderTreeControllerBase(IEntityService entityService)
-        : this(
-              entityService,
-              StaticServiceProvider.Instance.GetRequiredService<FlagProviderCollection>())
-    {
     }
 
     [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
@@ -126,9 +122,9 @@ public abstract class FolderTreeControllerBase<TItem> : NamedEntityTreeControlle
             .ToArray();
     }
 
-    protected override TItem MapTreeItemViewModel(Guid? parentKey, IEntitySlim entity)
+    protected override async Task<TItem> MapTreeItemViewModelAsync(Guid? parentKey, IEntitySlim entity)
     {
-        TItem viewModel = base.MapTreeItemViewModel(parentKey, entity);
+        TItem viewModel = await base.MapTreeItemViewModelAsync(parentKey, entity);
 
         if (entity.NodeObjectType == _folderObjectTypeId)
         {
@@ -198,7 +194,7 @@ public abstract class FolderTreeControllerBase<TItem> : NamedEntityTreeControlle
         (IEntitySlim[] entities, long totalItems) =
             await FilterTreeEntities(itemSearchResult.Items.ToArray(), itemSearchResult.Total);
 
-        TItem[] treeItemViewModels = MapSearchTreeItemViewModels(entities);
+        TItem[] treeItemViewModels = await MapSearchTreeItemViewModelsAsync(entities);
 
         await PopulateFlags(treeItemViewModels);
 
@@ -207,8 +203,11 @@ public abstract class FolderTreeControllerBase<TItem> : NamedEntityTreeControlle
         return Ok(result);
     }
 
-    protected virtual TItem[] MapSearchTreeItemViewModels(IEntitySlim[] entities)
-        => entities.Select(entity => MapTreeItemViewModel(GetSearchResultParentKey(entity), entity)).ToArray();
+    protected virtual async Task<TItem[]> MapSearchTreeItemViewModelsAsync(IEntitySlim[] entities)
+    {
+        IEnumerable<Task<TItem>> tasks = entities.Select(entity => MapTreeItemViewModelAsync(GetSearchResultParentKey(entity), entity));
+        return await Task.WhenAll(tasks);
+    }
 
     private Guid? GetSearchResultParentKey(IEntitySlim entity)
     {

@@ -191,7 +191,7 @@ export class UmbElementServerDataSource implements UmbDetailDataSource<UmbElemen
 					updateDate: variant.updateDate,
 					scheduledPublishDate: variant.scheduledPublishDate || null,
 					scheduledUnpublishDate: variant.scheduledUnpublishDate || null,
-					flags: [], //variant.flags,
+					flags: variant.flags,
 				};
 			}),
 			documentType: {

@@ -1,15 +1,14 @@
 import { UMB_ELEMENT_ENTITY_TYPE, UMB_ELEMENT_ROOT_ENTITY_TYPE, UMB_ELEMENT_FOLDER_ENTITY_TYPE } from '../entity.js';
-import type { UmbElementTreeItemModel } from '../types.js';
+import type {
+	UmbElementTreeChildrenOfRequestArgs,
+	UmbElementTreeItemModel,
+	UmbElementTreeRootItemsRequestArgs,
+} from '../types.js';
 import { UmbManagementApiElementTreeDataRequestManager } from './element-tree.server.request-manager.js';
 import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { ElementTreeItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
-import type {
-	UmbTreeAncestorsOfRequestArgs,
-	UmbTreeChildrenOfRequestArgs,
-	UmbTreeDataSource,
-	UmbTreeRootItemsRequestArgs,
-} from '@umbraco-cms/backoffice/tree';
+import type { UmbTreeAncestorsOfRequestArgs, UmbTreeDataSource } from '@umbraco-cms/backoffice/tree';
 
 /**
  * A data source for the Element tree that fetches data from the server
@@ -21,7 +20,7 @@ export class UmbElementTreeServerDataSource
 {
 	#treeRequestManager = new UmbManagementApiElementTreeDataRequestManager(this);
 
-	async getRootItems(args: UmbTreeRootItemsRequestArgs) {
+	async getRootItems(args: UmbElementTreeRootItemsRequestArgs) {
 		const { data, error } = await this.#treeRequestManager.getRootItems(args);
 
 		const mappedData = data
@@ -34,7 +33,7 @@ export class UmbElementTreeServerDataSource
 		return { data: mappedData, error };
 	}
 
-	async getChildrenOf(args: UmbTreeChildrenOfRequestArgs) {
+	async getChildrenOf(args: UmbElementTreeChildrenOfRequestArgs) {
 		const { data, error } = await this.#treeRequestManager.getChildrenOf(args);
 
 		const mappedData = data
@@ -74,15 +73,16 @@ export class UmbElementTreeServerDataSource
 				collection: null,
 			},
 			icon: item.isFolder ? 'icon-folder' : (item.documentType?.icon ?? 'icon-document'),
+			flags: item.flags,
 			createDate: item.createDate,
 			variants: item.isFolder
-				? [{ name: item.name, culture: null, segment: null, state: DocumentVariantStateModel.PUBLISHED }]
+				? [{ name: item.name, culture: null, segment: null, state: DocumentVariantStateModel.PUBLISHED, flags: [] }]
 				: item.variants.map((variant) => ({
 						name: variant.name,
 						culture: variant.culture || null,
 						segment: null, // TODO: add segment to the backend API?
 						state: variant.state,
-						flags: [], //variant.flags,
+						flags: variant.flags,
 					})),
 		};
 	}

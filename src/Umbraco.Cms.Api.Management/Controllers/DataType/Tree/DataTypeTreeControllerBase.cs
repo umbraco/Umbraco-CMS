@@ -15,21 +15,15 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DataType.Tree;
 
+/// <summary>
+/// Serves as the base controller for handling operations related to data type trees in the Umbraco CMS Management API.
+/// </summary>
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Tree}/{Constants.UdiEntityType.DataType}")]
 [ApiExplorerSettings(GroupName = "Data Type")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessDataTypes)]
 public class DataTypeTreeControllerBase : FolderTreeControllerBase<DataTypeTreeItemResponseModel>
 {
     private readonly IDataTypeService _dataTypeService;
-
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
-    public DataTypeTreeControllerBase(IEntityService entityService, IDataTypeService dataTypeService)
-        : this(
-              entityService,
-              StaticServiceProvider.Instance.GetRequiredService<FlagProviderCollection>(),
-              dataTypeService)
-    {
-    }
 
     [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
     public DataTypeTreeControllerBase(IEntityService entityService, FlagProviderCollection flagProviders, IDataTypeService dataTypeService)
@@ -66,17 +60,17 @@ public class DataTypeTreeControllerBase : FolderTreeControllerBase<DataTypeTreeI
         }
     }
 
-    protected override DataTypeTreeItemResponseModel[] MapTreeItemViewModels(Guid? parentId, IEntitySlim[] entities)
+    protected override async Task<DataTypeTreeItemResponseModel[]> MapTreeItemViewModelsAsync(Guid? parentId, IEntitySlim[] entities)
     {
         Dictionary<int, IDataType> dataTypes = entities.Any()
-            ? _dataTypeService
-                .GetAllAsync(entities.Select(entity => entity.Key).ToArray()).GetAwaiter().GetResult()
+            ? (await _dataTypeService
+                .GetAllAsync(entities.Select(entity => entity.Key).ToArray()))
                 .ToDictionary(contentType => contentType.Id)
             : new Dictionary<int, IDataType>();
 
-        return entities.Select(entity =>
+        IEnumerable<Task<DataTypeTreeItemResponseModel>> tasks = entities.Select(async entity =>
         {
-            DataTypeTreeItemResponseModel responseModel = MapTreeItemViewModel(parentId, entity);
+            DataTypeTreeItemResponseModel responseModel = await MapTreeItemViewModelAsync(parentId, entity);
             if (dataTypes.TryGetValue(entity.Id, out IDataType? dataType))
             {
                 responseModel.EditorUiAlias = dataType.EditorUiAlias;
@@ -84,6 +78,8 @@ public class DataTypeTreeControllerBase : FolderTreeControllerBase<DataTypeTreeI
             }
 
             return responseModel;
-        }).ToArray();
+        });
+
+        return await Task.WhenAll(tasks);
     }
 }

@@ -39,7 +39,6 @@ const createDetailMockMapper = (request: CreateMemberTypeRequestModel): UmbMockM
 		parent: null,
 		hasListView: false,
 		flags: [],
-		allowedInLibrary: request.allowedInLibrary,
 	};
 };
 
@@ -53,11 +52,11 @@ const detailResponseMapper = (item: UmbMockMemberTypeModel): MemberTypeResponseM
 		properties: item.properties,
 		containers: item.containers,
 		allowedAsRoot: item.allowedAsRoot,
+		allowedInLibrary: false,
 		variesByCulture: item.variesByCulture,
 		variesBySegment: item.variesBySegment,
 		isElement: item.isElement,
 		compositions: item.compositions,
-		allowedInLibrary: item.allowedInLibrary,
 	};
 };
 

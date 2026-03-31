@@ -3,7 +3,7 @@ import type {
 	MemberTypeResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 
-export type UmbMockMemberTypeModel = MemberTypeResponseModel &
+export type UmbMockMemberTypeModel = Omit<MemberTypeResponseModel, 'allowedInLibrary'> &
 	MemberTypeItemResponseModel & {
 		hasChildren: boolean;
 		parent: { id: string } | null;
@@ -59,7 +59,6 @@ export const data: Array<UmbMockMemberTypeModel> = [
 		hasChildren: false,
 		hasListView: false,
 		flags: [],
-		allowedInLibrary: false,
 	},
 	{
 		name: 'A Forbidden Member Type',
@@ -109,6 +108,5 @@ export const data: Array<UmbMockMemberTypeModel> = [
 		parent: null,
 		hasChildren: false,
 		hasListView: false,
-		allowedInLibrary: false,
 	},
 ];
