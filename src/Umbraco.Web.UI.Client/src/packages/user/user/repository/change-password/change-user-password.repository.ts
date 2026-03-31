@@ -20,6 +20,9 @@ export class UmbChangeUserPasswordRepository extends UmbUserRepositoryBase {
 		if (!error) {
 			const notification = { data: { message: `Password changed` } };
 			this.notificationContext?.peek('positive', notification);
+		} else {
+			const notification = { data: { message: error.message ?? 'Unknown failure' } };
+			this.notificationContext?.peek('danger', notification);
 		}
 
 		return { data, error };

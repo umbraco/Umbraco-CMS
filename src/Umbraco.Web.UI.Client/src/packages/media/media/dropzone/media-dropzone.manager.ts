@@ -267,7 +267,9 @@ export class UmbMediaDropzoneManager extends UmbDropzoneManager {
 		const value = await umbOpenModal(this, UMB_DROPZONE_MEDIA_TYPE_PICKER_MODAL, { data: { options } }).catch(
 			() => undefined,
 		);
-		return value?.mediaTypeUnique;
+		if (!value) return undefined; // cancelled
+		// Auto-pick: mediaTypeUnique is undefined → use the server's preferred type (first in the list)
+		return value.mediaTypeUnique ?? options[0]?.unique;
 	}
 
 	async #createOneMediaItem(item: UmbUploadableItem) {
