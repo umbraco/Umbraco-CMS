@@ -25,123 +25,14 @@ export class UmbChangePasswordModalElement extends UmbModalBaseElement<
 	private _isCurrentUser: boolean = false;
 
 	@state()
-	private _minimumPasswordLength = 10;
-
-	@state()
 	private _passwordConfiguration?: PasswordConfigurationResponseModel;
-
-	@state()
-	private _passwordPattern = '';
-
-	@state()
-	private _isLoadingConfig = true;
 
 	#userItemRepository = new UmbUserItemRepository(this);
 	#userConfigRepository = new UmbUserConfigRepository(this);
 	#currentUserContext?: typeof UMB_CURRENT_USER_CONTEXT.TYPE;
-	#validationDebounceTimer?: ReturnType<typeof setTimeout>;
 
 	#onClose() {
 		this.modalContext?.reject();
-	}
-
-	#onPasswordInput = () => {
-		// Clear any existing timer
-		if (this.#validationDebounceTimer) {
-			clearTimeout(this.#validationDebounceTimer);
-		}
-
-		// Set a new timer for 200ms
-		this.#validationDebounceTimer = setTimeout(() => {
-			if (!this._newPasswordInput) return;
-
-			const password = this._newPasswordInput.value as string;
-			if (!password) {
-				// Clear validation for empty password
-				this._newPasswordInput.setCustomValidity('');
-				return;
-			}
-
-			// Validate the password
-			const passwordError = this.#validatePassword(password);
-			if (passwordError) {
-				this._newPasswordInput.setCustomValidity(passwordError);
-			} else {
-				this._newPasswordInput.setCustomValidity('');
-			}
-		}, 200);
-	};
-
-	#validatePasswordLength(password: string): string | null {
-		if (!this._passwordConfiguration) return null;
-		if (this._passwordConfiguration.minimumPasswordLength > 0 && password.length < this._passwordConfiguration.minimumPasswordLength) {
-			return this.localize.term('user_newPasswordFormatLengthTip', [this._passwordConfiguration.minimumPasswordLength]);
-		}
-		return null;
-	}
-
-	#validatePasswordDigit(password: string): string | null {
-		if (!this._passwordConfiguration?.requireDigit) return null;
-		const hasDigit = /\d/.test(password);
-		if (!hasDigit) {
-			return this.localize.term('user_passwordRequiresDigit');
-		}
-		return null;
-	}
-
-	#validatePasswordLowercase(password: string): string | null {
-		if (!this._passwordConfiguration?.requireLowercase) return null;
-		const hasLowercase = /[a-z]/.test(password);
-		if (!hasLowercase) {
-			return this.localize.term('user_passwordRequiresLower');
-		}
-		return null;
-	}
-
-	#validatePasswordUppercase(password: string): string | null {
-		if (!this._passwordConfiguration?.requireUppercase) return null;
-		const hasUppercase = /[A-Z]/.test(password);
-		if (!hasUppercase) {
-			return this.localize.term('user_passwordRequiresUpper');
-		}
-		return null;
-	}
-
-	#validatePasswordNonLetterOrDigit(password: string): string | null {
-		if (!this._passwordConfiguration?.requireNonLetterOrDigit) return null;
-		const hasNonLetterOrDigit = /[^a-zA-Z0-9]/.test(password);
-		if (!hasNonLetterOrDigit) {
-			return this.localize.term('user_passwordRequiresNonAlphanumeric');
-		}
-		return null;
-	}
-
-	#validatePassword(password: string): string | null {
-		// Test against full pattern first
-		if (this._passwordPattern) {
-			const regex = new RegExp(this._passwordPattern);
-			if (regex.test(password)) {
-				return null; // Password is valid
-			}
-		}
-
-		// If pattern doesn't match, check each requirement to provide specific feedback
-		const lengthError = this.#validatePasswordLength(password);
-		if (lengthError) return lengthError;
-
-		const digitError = this.#validatePasswordDigit(password);
-		if (digitError) return digitError;
-
-		const lowercaseError = this.#validatePasswordLowercase(password);
-		if (lowercaseError) return lowercaseError;
-
-		const uppercaseError = this.#validatePasswordUppercase(password);
-		if (uppercaseError) return uppercaseError;
-
-		const specialCharError = this.#validatePasswordNonLetterOrDigit(password);
-		if (specialCharError) return specialCharError;
-
-		return null;
 	}
 
 	#onSubmit(e: SubmitEvent) {
@@ -149,19 +40,6 @@ export class UmbChangePasswordModalElement extends UmbModalBaseElement<
 
 		const form = e.target as HTMLFormElement;
 		if (!form) return;
-
-		// Prevent submission if configuration is still loading
-		if (this._isLoadingConfig || !this._passwordConfiguration) {
-			return;
-		}
-
-		// Re-validate to ensure validation state is current
-		const passwordError = this.#validatePassword(this._newPasswordInput?.value as string);
-		if (passwordError && this._newPasswordInput) {
-			this._newPasswordInput.setCustomValidity(passwordError);
-		} else if (this._newPasswordInput) {
-			this._newPasswordInput.setCustomValidity('');
-		}
 
 		const isValid = form.checkValidity();
 		if (!isValid) return;
@@ -186,37 +64,10 @@ export class UmbChangePasswordModalElement extends UmbModalBaseElement<
 		this.#loadPasswordConfiguration();
 	}
 
-	override disconnectedCallback() {
-		super.disconnectedCallback();
-		// Clean up debounce timer
-		if (this.#validationDebounceTimer) {
-			clearTimeout(this.#validationDebounceTimer);
-		}
-	}
-
 	async #loadPasswordConfiguration() {
 		await this.#userConfigRepository.initialized;
 		this.observe(this.#userConfigRepository.part('passwordConfiguration'), (passwordConfig) => {
 			this._passwordConfiguration = passwordConfig;
-			this._minimumPasswordLength = passwordConfig.minimumPasswordLength ?? this._minimumPasswordLength;
-			
-			// Build password pattern
-			let pattern = '';
-			if (passwordConfig.requireDigit) {
-				pattern += '(?=.*\\d)';
-			}
-			if (passwordConfig.requireLowercase) {
-				pattern += '(?=.*[a-z])';
-			}
-			if (passwordConfig.requireUppercase) {
-				pattern += '(?=.*[A-Z])';
-			}
-			if (passwordConfig.requireNonLetterOrDigit) {
-				pattern += '(?=.*[^a-zA-Z0-9])';
-			}
-			pattern += `.{${passwordConfig.minimumPasswordLength ?? 10},}`;
-			this._passwordPattern = pattern;
-			this._isLoadingConfig = false;
 		});
 	}
 
@@ -234,6 +85,60 @@ export class UmbChangePasswordModalElement extends UmbModalBaseElement<
 			'customError',
 			() => this.localize.term('user_passwordMismatch'),
 			() => this._confirmPasswordInput?.value !== this._newPasswordInput?.value,
+		);
+
+		this._newPasswordInput?.addValidator(
+			'customError',
+			() =>
+				this.localize.term('user_newPasswordFormatLengthTip', [
+					this._passwordConfiguration?.minimumPasswordLength ?? 0,
+				]),
+			() => {
+				const config = this._passwordConfiguration;
+				if (!config || !config.minimumPasswordLength) return false;
+				const password = (this._newPasswordInput?.value as string) ?? '';
+				return password.length > 0 && password.length < config.minimumPasswordLength;
+			},
+		);
+
+		this._newPasswordInput?.addValidator(
+			'customError',
+			() => this.localize.term('user_passwordRequiresDigit'),
+			() => {
+				if (!this._passwordConfiguration?.requireDigit) return false;
+				const password = (this._newPasswordInput?.value as string) ?? '';
+				return password.length > 0 && !/\d/.test(password);
+			},
+		);
+
+		this._newPasswordInput?.addValidator(
+			'customError',
+			() => this.localize.term('user_passwordRequiresLower'),
+			() => {
+				if (!this._passwordConfiguration?.requireLowercase) return false;
+				const password = (this._newPasswordInput?.value as string) ?? '';
+				return password.length > 0 && !/[a-z]/.test(password);
+			},
+		);
+
+		this._newPasswordInput?.addValidator(
+			'customError',
+			() => this.localize.term('user_passwordRequiresUpper'),
+			() => {
+				if (!this._passwordConfiguration?.requireUppercase) return false;
+				const password = (this._newPasswordInput?.value as string) ?? '';
+				return password.length > 0 && !/[A-Z]/.test(password);
+			},
+		);
+
+		this._newPasswordInput?.addValidator(
+			'customError',
+			() => this.localize.term('user_passwordRequiresNonAlphanumeric'),
+			() => {
+				if (!this._passwordConfiguration?.requireNonLetterOrDigit) return false;
+				const password = (this._newPasswordInput?.value as string) ?? '';
+				return password.length > 0 && !/[^a-zA-Z0-9]/.test(password);
+			},
 		);
 
 		if (!this.data?.user.unique) return;
@@ -273,11 +178,8 @@ export class UmbChangePasswordModalElement extends UmbModalBaseElement<
 							<uui-input-password
 								id="newPassword"
 								name="newPassword"
-								.minlength=${this._minimumPasswordLength}
 								required
-								required-message="New password is required"
-								.minlengthMessage=${this.localize.term('user_newPasswordFormatLengthTip', [this._minimumPasswordLength])}
-								@input=${this.#onPasswordInput}>
+								required-message="New password is required">
 							</uui-input-password>
 						</uui-form-layout-item>
 						<uui-form-layout-item>
@@ -287,10 +189,8 @@ export class UmbChangePasswordModalElement extends UmbModalBaseElement<
 							<uui-input-password
 								id="confirmPassword"
 								name="confirmPassword"
-								.minlength=${this._minimumPasswordLength}
 								required
-								required-message="Confirm password is required"
-								.minlengthMessage=${this.localize.term('user_newPasswordFormatLengthTip', [this._minimumPasswordLength])}>
+								required-message="Confirm password is required">
 							</uui-input-password>
 						</uui-form-layout-item>
 					</form>
@@ -302,7 +202,6 @@ export class UmbChangePasswordModalElement extends UmbModalBaseElement<
 					form="ChangePasswordForm"
 					color="positive"
 					look="primary"
-					?disabled=${this._isLoadingConfig}
 					label=${this.localize.term('general_confirm')}></uui-button>
 			</uui-dialog-layout>
 		`;
