@@ -54,7 +54,7 @@ public class UpdateCurrentUserProfileController : CurrentUserControllerBase
     {
         Guid userKey = CurrentUserKey(_backOfficeSecurityAccessor);
 
-        UserUpdateProfileModel updateModel = await _userPresentationFactory.CreateUpdateCurrentUserModelAsync(model);
+        UserUpdateProfileModel updateModel = await _userPresentationFactory.CreateUpdateProfileModelAsync(model);
         Attempt<IUser?, UserOperationStatus> result = await _userService.UpdateProfileAsync(userKey, updateModel);
 
         return result.Success
