@@ -8,5 +8,5 @@ public class UpdateCurrentUserRequestModel
     /// <summary>
     /// Gets or sets the ISO code of the user's language.
     /// </summary>
-    public string LanguageIsoCode { get; set; } = string.Empty;
+    public required string LanguageIsoCode { get; set; }
 }
