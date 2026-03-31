@@ -15,6 +15,15 @@ export class UmbCurrentUserWorkspaceAvatarElement extends UmbLitElement {
 	@state()
 	private _allowedFileTypes = 'image/*';
 
+	@state()
+	private _pendingFile?: File;
+
+	@state()
+	private _pendingPreviewUrl?: string;
+
+	@state()
+	private _pendingDelete = false;
+
 	@query('#AvatarFileField')
 	private _avatarFileField?: HTMLInputElement;
 
@@ -32,6 +41,11 @@ export class UmbCurrentUserWorkspaceAvatarElement extends UmbLitElement {
 		});
 
 		this.#observeAllowedFileTypes();
+	}
+
+	override disconnectedCallback() {
+		super.disconnectedCallback();
+		this.#revokePendingPreviewUrl();
 	}
 
 	async #observeAllowedFileTypes() {
@@ -59,10 +73,20 @@ export class UmbCurrentUserWorkspaceAvatarElement extends UmbLitElement {
 		);
 	};
 
+	#revokePendingPreviewUrl() {
+		if (this._pendingPreviewUrl) {
+			URL.revokeObjectURL(this._pendingPreviewUrl);
+			this._pendingPreviewUrl = undefined;
+		}
+	}
+
 	#uploadAvatar = async () => {
 		try {
 			const selectedFile = await this.#selectAvatar();
-			await this.#currentUserRepository.uploadAvatar(selectedFile);
+			this.#revokePendingPreviewUrl();
+			this._pendingFile = selectedFile;
+			this._pendingPreviewUrl = URL.createObjectURL(selectedFile);
+			this._pendingDelete = false;
 		} catch (error) {
 			console.error(error);
 		}
@@ -96,11 +120,32 @@ export class UmbCurrentUserWorkspaceAvatarElement extends UmbLitElement {
 		});
 	}
 
-	#deleteAvatar = async () => {
-		await this.#currentUserRepository.deleteAvatar();
+	#deleteAvatar = () => {
+		this.#revokePendingPreviewUrl();
+		this._pendingFile = undefined;
+		this._pendingDelete = (this._currentUser?.avatarUrls.length ?? 0) > 0;
 	};
 
+	async save() {
+		if (this._pendingFile) {
+			await this.#currentUserRepository.uploadAvatar(this._pendingFile);
+		} else if (this._pendingDelete) {
+			await this.#currentUserRepository.deleteAvatar();
+		}
+		this.#revokePendingPreviewUrl();
+		this._pendingFile = undefined;
+		this._pendingDelete = false;
+	}
+
+	get #displayAvatarUrls(): string[] {
+		if (this._pendingDelete) return [];
+		if (this._pendingPreviewUrl) return Array(5).fill(this._pendingPreviewUrl);
+		return this._currentUser?.avatarUrls ?? [];
+	}
+
 	#hasAvatar() {
+		if (this._pendingDelete) return false;
+		if (this._pendingFile) return true;
 		if (!this._currentUser) return false;
 		return this._currentUser.avatarUrls.length > 0;
 	}
@@ -113,7 +158,7 @@ export class UmbCurrentUserWorkspaceAvatarElement extends UmbLitElement {
 					<umb-user-avatar
 						id="Avatar"
 						.name=${this._currentUser.name}
-						.imgUrls=${this._currentUser.avatarUrls ?? []}></umb-user-avatar>
+						.imgUrls=${this.#displayAvatarUrls}></umb-user-avatar>
 					<input id="AvatarFileField" type="file" name="avatarFile" accept=${this._allowedFileTypes} required hidden />
 					<uui-button label="${this.localize.term('user_changePhoto')}" @click=${this.#uploadAvatar}></uui-button>
 					${this.#hasAvatar()

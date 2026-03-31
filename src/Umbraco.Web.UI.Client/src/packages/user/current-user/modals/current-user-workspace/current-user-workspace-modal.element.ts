@@ -1,6 +1,7 @@
 import type { UmbCurrentUserModel } from '../../types.js';
 import { UMB_CURRENT_USER_CONTEXT } from '../../current-user.context.token.js';
 import type { UmbCurrentUserWorkspaceProfileSettingsElement } from './current-user-workspace-profile-settings.element.js';
+import type { UmbCurrentUserWorkspaceAvatarElement } from './current-user-workspace-avatar.element.js';
 import { css, customElement, html, property, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -12,6 +13,9 @@ import './current-user-workspace-profile-settings.element.js';
 export class UmbCurrentUserWorkspaceModalElement extends UmbLitElement {
 	@property({ attribute: false })
 	modalContext?: UmbModalContext;
+
+	@query('umb-current-user-workspace-avatar')
+	private _avatar?: UmbCurrentUserWorkspaceAvatarElement;
 
 	@query('umb-current-user-workspace-profile-settings')
 	private _profileSettings?: UmbCurrentUserWorkspaceProfileSettingsElement;
@@ -25,6 +29,7 @@ export class UmbCurrentUserWorkspaceModalElement extends UmbLitElement {
 
 	private async _save() {
 		await this._profileSettings?.save();
+		await this._avatar?.save();
 		this.modalContext?.submit();
 	}
 

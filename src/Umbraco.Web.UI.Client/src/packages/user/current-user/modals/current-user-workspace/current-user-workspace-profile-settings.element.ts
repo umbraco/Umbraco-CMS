@@ -10,13 +10,13 @@ import type { UmbUiCultureInputElement } from '@umbraco-cms/backoffice/localizat
 export class UmbCurrentUserWorkspaceProfileSettingsElement extends UmbLitElement {
 	@state()
 	private _currentUser?: UmbCurrentUserModel;
-
+	
 	@state()
 	private _languageIsoCode = '';
 
 	#currentUserContext?: typeof UMB_CURRENT_USER_CONTEXT.TYPE;
 	#currentUserRepository = new UmbCurrentUserRepository(this);
-	
+
 	constructor() {
 		super();
 
@@ -48,6 +48,8 @@ export class UmbCurrentUserWorkspaceProfileSettingsElement extends UmbLitElement
 	}
 
 	async save() {
+		if (this._languageIsoCode === this._currentUser?.languageIsoCode) return;
+
 		await this.#currentUserRepository.updateProfile(this._languageIsoCode);
 	}
 
