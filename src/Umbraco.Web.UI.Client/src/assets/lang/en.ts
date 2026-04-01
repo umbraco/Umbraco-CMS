@@ -2226,6 +2226,8 @@ export default {
 		'2faCodeInput': 'Verification code',
 		'2faCodeInputHelp': 'Please enter the verification code',
 		'2faInvalidCode': 'Invalid code entered',
+		addUsersToGroupError: 'Could not add users to the group.',
+		removeUsersFromGroupError: 'Could not remove users from the group.',
 	},
 	validation: {
 		validation: 'Validation',

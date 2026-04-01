@@ -8,10 +8,9 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
-import type { UmbUserInputElement } from '../../../../user/components/user-input/user-input.element.js';
 
 import '../components/user-group-entity-type-permission-groups.element.js';
-import '../../../../user/components/user-input/user-input.element.js';
+import '../components/user-group-workspace-users.element.js';
 
 @customElement('umb-user-group-details-workspace-view')
 export class UmbUserGroupDetailsWorkspaceViewElement extends UmbLitElement implements UmbWorkspaceViewElement {
@@ -38,12 +37,6 @@ export class UmbUserGroupDetailsWorkspaceViewElement extends UmbLitElement imple
 
 	@state()
 	private _mediaRootAccess: UmbUserGroupDetailModel['mediaRootAccess'] = false;
-
-	@state()
-	private _userUniques: string[] = [];
-
-	@state()
-	private _usersRemainingCount = 0;
 
 	#workspaceContext?: typeof UMB_USER_GROUP_WORKSPACE_CONTEXT.TYPE;
 
@@ -88,18 +81,6 @@ export class UmbUserGroupDetailsWorkspaceViewElement extends UmbLitElement imple
 			this.#workspaceContext?.mediaStartNode,
 			(value) => (this._mediaStartNode = value),
 			'_observeMediaStartNode',
-		);
-
-		this.observe(
-			this.#workspaceContext?.userUniques,
-			(value) => (this._userUniques = value ?? []),
-			'_observeUserUniques',
-		);
-
-		this.observe(
-			this.#workspaceContext?.usersRemainingCount,
-			(value) => (this._usersRemainingCount = value ?? 0),
-			'_observeUsersRemainingCount',
 		);
 	}
 
@@ -160,12 +141,6 @@ export class UmbUserGroupDetailsWorkspaceViewElement extends UmbLitElement imple
 		this.#workspaceContext?.updateProperty('mediaStartNode', selected ? { unique: selected } : null);
 	}
 
-	#onUsersChange(event: UmbChangeEvent) {
-		event.stopPropagation();
-		const target = event.target as UmbUserInputElement;
-		this.#workspaceContext?.setUserUniques(target.selection);
-	}
-
 	override render() {
 		if (!this._unique) return nothing;
 
@@ -190,13 +165,7 @@ export class UmbUserGroupDetailsWorkspaceViewElement extends UmbLitElement imple
 					${this.#renderPermissionGroups()}
 				</umb-stack>
 				<div>
-					<uui-box>
-						<div slot="headline"><umb-localize key="general_users"></umb-localize></div>
-						<umb-user-input
-							.selection=${this._userUniques}
-							.remainingCount=${this._usersRemainingCount}
-							@change=${this.#onUsersChange}></umb-user-input>
-					</uui-box>
+					<umb-user-group-workspace-users></umb-user-group-workspace-users>
 				</div>
 			</div>
 		`;
