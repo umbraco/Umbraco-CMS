@@ -70,6 +70,10 @@ public abstract class ContentEditingServiceSnapshotTestBase
     [SetUp]
     public virtual async Task SetUp()
     {
+        // Re-set StaticServiceProvider for obsolete constructors BEFORE swapping,
+        // because seeding may trigger code that uses StaticServiceProvider.Instance.
+        StaticServiceProvider.Instance = Services;
+
         // Swap to a seeded database per test (snapshot-aware)
         var seedAttr = GetType().GetCustomAttribute<DatabaseSeedProfileAttribute>();
         if (seedAttr is not null)
@@ -81,9 +85,6 @@ public abstract class ContentEditingServiceSnapshotTestBase
         {
             await Fixture.SwapToFreshDatabaseAsync();
         }
-
-        // Re-set StaticServiceProvider for obsolete constructors
-        StaticServiceProvider.Instance = Services;
 
         // Reset ContentSettings to defaults — previous tests may have mutated them
         // and since we share a host, the mutations persist across tests

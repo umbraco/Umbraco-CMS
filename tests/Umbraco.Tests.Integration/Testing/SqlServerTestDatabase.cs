@@ -20,7 +20,6 @@ public class SqlServerTestDatabase : SqlServerBaseTestDatabase, ITestDatabase, I
 {
     public const string DatabaseName = "UmbracoTests";
     private readonly TestDatabaseSettings _settings;
-    private readonly string _snapshotDir;
     private readonly ConcurrentDictionary<string, string> _snapshotPaths = new();
     private readonly ConcurrentBag<string> _snapshotRestoredDatabases = new();
     private int _snapshotCounter;
@@ -31,7 +30,6 @@ public class SqlServerTestDatabase : SqlServerBaseTestDatabase, ITestDatabase, I
         _databaseFactory = databaseFactory ?? throw new ArgumentNullException(nameof(databaseFactory));
 
         _settings = settings;
-        _snapshotDir = Path.Combine(settings.FilesPath, "snapshots");
 
         var counter = 0;
 
@@ -115,11 +113,14 @@ public class SqlServerTestDatabase : SqlServerBaseTestDatabase, ITestDatabase, I
     /// <inheritdoc />
     public void CreateSnapshot(string snapshotKey, TestDatabaseInformation sourceMeta)
     {
-        Directory.CreateDirectory(_snapshotDir);
-        var backupPath = Path.Combine(_snapshotDir, $"{snapshotKey}.bak");
-
         using var connection = new SqlConnection(_settings.SQLServerMasterConnectionString);
         connection.Open();
+
+        // Write .bak to SQL Server's default data directory so the SQL Server process
+        // can always access it (critical when SQL Server runs in Docker or as a service).
+        var (defaultDataPath, _) = GetDefaultPaths(connection);
+        var backupPath = Path.Combine(defaultDataPath, $"{snapshotKey}.bak");
+
         using var cmd = connection.CreateCommand();
 
         // BACKUP DATABASE cannot use SQL parameters for database name or file path.
@@ -248,17 +249,8 @@ public class SqlServerTestDatabase : SqlServerBaseTestDatabase, ITestDatabase, I
             DropByName(name);
         }
 
-        // Clean up snapshot files
-        if (Directory.Exists(_snapshotDir))
-        {
-            try
-            {
-                Directory.Delete(_snapshotDir, recursive: true);
-            }
-            catch
-            {
-                // Best-effort cleanup
-            }
-        }
+        // Snapshot .bak files reside in SQL Server's data directory.
+        // In containerized environments they are cleaned up with the container.
+        // In local environments they are small and overwritten on next run (WITH INIT).
     }
 }

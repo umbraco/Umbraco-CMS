@@ -25,8 +25,6 @@ namespace Umbraco.Cms.Tests.Integration.Testing.Fixtures;
 [NonParallelizable]
 public abstract class UmbracoIntegrationFixtureBase
 {
-    private static readonly Lock s_dbLocker = new();
-    private static ITestDatabase? s_dbInstance;
     private static TestDatabaseInformation _sFixtureDatabaseInformation;
 
     protected static int TestCount = 1;
@@ -132,9 +130,7 @@ public abstract class UmbracoIntegrationFixtureBase
         var databaseFactory = serviceProvider.GetRequiredService<IUmbracoDatabaseFactory>();
         var connectionStrings = serviceProvider.GetRequiredService<IOptionsMonitor<ConnectionStrings>>();
 
-        var db = GetOrCreateDatabase(
-            serviceProvider.GetRequiredService<ILoggerFactory>(),
-            serviceProvider.GetRequiredService<TestUmbracoDatabaseFactoryProvider>());
+        var db = GetOrCreateDatabase(serviceProvider);
 
         TestDatabaseInformation meta = TestOptions.Database switch
         {
@@ -170,31 +166,22 @@ public abstract class UmbracoIntegrationFixtureBase
         return _sFixtureDatabaseInformation;
     }
 
-    private ITestDatabase GetOrCreateDatabase(ILoggerFactory loggerFactory, TestUmbracoDatabaseFactoryProvider dbFactory)
+    private ITestDatabase GetOrCreateDatabase(IServiceProvider serviceProvider)
     {
-        lock (s_dbLocker)
+        var settings = new TestDatabaseSettings
         {
-            if (s_dbInstance != null)
-            {
-                return s_dbInstance;
-            }
+            FilesPath = Path.Combine(TestHelper.WorkingDirectory, "databases"),
+            DatabaseType =
+                Configuration.GetValue<TestDatabaseSettings.TestDatabaseType>("Tests:Database:DatabaseType"),
+            PrepareThreadCount = Configuration.GetValue<int>("Tests:Database:PrepareThreadCount"),
+            EmptyDatabasesCount = Configuration.GetValue<int>("Tests:Database:EmptyDatabasesCount"),
+            SchemaDatabaseCount = Configuration.GetValue<int>("Tests:Database:SchemaDatabaseCount"),
+            SQLServerMasterConnectionString = Configuration.GetValue<string>("Tests:Database:SQLServerMasterConnectionString"),
+        };
 
-            var settings = new TestDatabaseSettings
-            {
-                FilesPath = Path.Combine(TestHelper.WorkingDirectory, "databases"),
-                DatabaseType =
-                    Configuration.GetValue<TestDatabaseSettings.TestDatabaseType>("Tests:Database:DatabaseType"),
-                PrepareThreadCount = Configuration.GetValue<int>("Tests:Database:PrepareThreadCount"),
-                EmptyDatabasesCount = Configuration.GetValue<int>("Tests:Database:EmptyDatabasesCount"),
-                SchemaDatabaseCount = Configuration.GetValue<int>("Tests:Database:SchemaDatabaseCount"),
-                SQLServerMasterConnectionString = Configuration.GetValue<string>("Tests:Database:SQLServerMasterConnectionString"),
-            };
-
-            Directory.CreateDirectory(settings.FilesPath);
-
-            s_dbInstance = TestDatabaseFactory.Create(settings, dbFactory, loggerFactory);
-
-            return s_dbInstance;
-        }
+        return TestDatabaseFactory.GetOrCreate(
+            settings,
+            serviceProvider.GetRequiredService<TestUmbracoDatabaseFactoryProvider>(),
+            serviceProvider.GetRequiredService<ILoggerFactory>());
     }
 }

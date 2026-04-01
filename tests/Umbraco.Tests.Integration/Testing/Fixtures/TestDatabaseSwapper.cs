@@ -25,8 +25,6 @@ namespace Umbraco.Cms.Tests.Integration.Testing.Fixtures;
 public class TestDatabaseSwapper
 {
     private static readonly ConcurrentDictionary<string, SemaphoreSlim> _seedLocks = new();
-    private static readonly Lock _dbLocker = new();
-    private static ITestDatabase? _dbInstance;
 
     private ConnectionStrings? _controlledConnectionStrings;
     private TestDatabaseInformation? _currentDatabaseInformation;
@@ -301,29 +299,19 @@ public class TestDatabaseSwapper
     private static ITestDatabase GetOrCreateDatabase(
         ILoggerFactory loggerFactory,
         TestUmbracoDatabaseFactoryProvider dbFactory,
-        Microsoft.Extensions.Configuration.IConfiguration configuration,
+        IConfiguration configuration,
         TestHelper testHelper)
     {
-        lock (_dbLocker)
+        var settings = new TestDatabaseSettings
         {
-            if (_dbInstance is not null)
-            {
-                return _dbInstance;
-            }
+            FilesPath = Path.Combine(testHelper.WorkingDirectory, "databases"),
+            DatabaseType = configuration.GetValue<TestDatabaseSettings.TestDatabaseType>("Tests:Database:DatabaseType"),
+            PrepareThreadCount = configuration.GetValue<int>("Tests:Database:PrepareThreadCount"),
+            EmptyDatabasesCount = configuration.GetValue<int>("Tests:Database:EmptyDatabasesCount"),
+            SchemaDatabaseCount = configuration.GetValue<int>("Tests:Database:SchemaDatabaseCount"),
+            SQLServerMasterConnectionString = configuration.GetValue<string>("Tests:Database:SQLServerMasterConnectionString"),
+        };
 
-            var settings = new TestDatabaseSettings
-            {
-                FilesPath = Path.Combine(testHelper.WorkingDirectory, "databases"),
-                DatabaseType = configuration.GetValue<TestDatabaseSettings.TestDatabaseType>("Tests:Database:DatabaseType"),
-                PrepareThreadCount = configuration.GetValue<int>("Tests:Database:PrepareThreadCount"),
-                EmptyDatabasesCount = configuration.GetValue<int>("Tests:Database:EmptyDatabasesCount"),
-                SchemaDatabaseCount = configuration.GetValue<int>("Tests:Database:SchemaDatabaseCount"),
-                SQLServerMasterConnectionString = configuration.GetValue<string>("Tests:Database:SQLServerMasterConnectionString"),
-            };
-
-            Directory.CreateDirectory(settings.FilesPath);
-            _dbInstance = TestDatabaseFactory.Create(settings, dbFactory, loggerFactory);
-            return _dbInstance;
-        }
+        return TestDatabaseFactory.GetOrCreate(settings, dbFactory, loggerFactory);
     }
 }
