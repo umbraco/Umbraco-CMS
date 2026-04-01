@@ -33,8 +33,6 @@ namespace Umbraco.Cms.Web.Common.Middleware;
 /// </remarks>
 internal sealed class UmbracoRequestMiddleware : IMiddleware
 {
-    private static int _applicationUrlLogged;
-
     private readonly IDefaultCultureAccessor _defaultCultureAccessor;
     private readonly IEventAggregator _eventAggregator;
     private readonly IHostingEnvironment _hostingEnvironment;
@@ -94,28 +92,7 @@ internal sealed class UmbracoRequestMiddleware : IMiddleware
         UmbracoContextReference umbracoContextReference = _umbracoContextFactory.EnsureUmbracoContext();
 
         Uri? currentApplicationUrl = GetApplicationUrlFromCurrentRequest(context.Request);
-        Uri? applicationUrlBeforeDetection = _hostingEnvironment.ApplicationMainUrl;
         _hostingEnvironment.EnsureApplicationMainUrl(currentApplicationUrl);
-
-        if (currentApplicationUrl is not null && Interlocked.CompareExchange(ref _applicationUrlLogged, 1, 0) == 0)
-        {
-            if (_hostingEnvironment.ApplicationMainUrl is not null)
-            {
-                var source = applicationUrlBeforeDetection is not null ? "configured" : "auto-detected";
-                _logger.LogInformation(
-                    "Application URL {Source} as {ApplicationMainUrl}.",
-                    source,
-                    _hostingEnvironment.ApplicationMainUrl);
-            }
-            else
-            {
-                _logger.LogWarning(
-                    "Application URL auto-detection is disabled and no explicit URL is configured. "
-                    + "Email links (invitations, password resets) will not be available. "
-                    + "Set Umbraco:CMS:WebRouting:UmbracoApplicationUrl in configuration, "
-                    + "or change Umbraco:CMS:WebRouting:ApplicationUrlDetection to 'FirstRequest' or 'EveryRequest'.");
-            }
-        }
 
         var pathAndQuery = context.Request.GetEncodedPathAndQuery();
 
