@@ -468,7 +468,7 @@ When implementing a new component that mirrors an existing core or sibling imple
 
 **Checklist**:
 
-1. **Full API surface**: If the core version calls `getHref()`, `execute()`, etc. on controllers, the new version must too. Check the full callback in `UmbExtensionsApiInitializer` — if the core resolves hrefs, so should the new implementation.
+1. **Full API surface**: Read the reference implementation's controller/API usage line by line. Every method call, callback, and property access on controllers in the reference must have a counterpart in the new implementation — don't cherry-pick only the obvious ones.
 2. **Error handling**: Match the core's error handling pattern (e.g. `.catch(() => {})` on `execute()` calls) to prevent unhandled promise rejections.
 3. **Type hierarchy**: Before defining new interfaces, search for existing base types (e.g. `UmbNamedEntityModel` vs `UmbEntityModel`) that already declare the fields you need. Use the most specific base.
 4. **UI consistency**: Check CSS from sibling implementations (e.g. `max-height` on scroll containers, icon fallbacks like `?? 'icon-document'`).
