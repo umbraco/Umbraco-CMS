@@ -471,6 +471,7 @@ The `Tests:Database:DatabaseType` setting controls which database is used:
 - `"LocalDb"` - Uses SQL Server LocalDB, required for SQL Server-specific tests (e.g., page-level locking, `sys.dm_tran_locks`)
 
 SQL Server-specific tests use `BaseTestDatabase.IsSqlite()` to skip when running on SQLite.
+
 ### Key Projects
 
 | Project | Type | Description |
