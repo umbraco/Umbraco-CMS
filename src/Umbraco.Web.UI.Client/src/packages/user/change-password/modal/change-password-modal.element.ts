@@ -31,6 +31,18 @@ export class UmbChangePasswordModalElement extends UmbModalBaseElement<
 		return (this._newPasswordInput?.value as string) ?? '';
 	}
 
+	// Extracted from repeated validator pattern to reduce duplication across password policy rules.
+	#addNewPasswordValidator(messageKey: string, configKey: keyof PasswordConfigurationResponseModel, pattern: RegExp) {
+		this._newPasswordInput?.addValidator(
+			'customError',
+			() => this.localize.term(messageKey),
+			() => {
+				if (!this._passwordConfiguration?.[configKey]) return false;
+				return this.#newPasswordValue.length > 0 && !pattern.test(this.#newPasswordValue);
+			},
+		);
+	}
+
 	#userItemRepository = new UmbUserItemRepository(this);
 	#userConfigRepository = new UmbUserConfigRepository(this);
 	#currentUserContext?: typeof UMB_CURRENT_USER_CONTEXT.TYPE;
@@ -70,6 +82,7 @@ export class UmbChangePasswordModalElement extends UmbModalBaseElement<
 
 	async #loadPasswordConfiguration() {
 		await this.#userConfigRepository.initialized;
+		if (!this.isConnected) return;
 		this.observe(this.#userConfigRepository.part('passwordConfiguration'), (passwordConfig) => {
 			this._passwordConfiguration = passwordConfig;
 		});
@@ -105,41 +118,10 @@ export class UmbChangePasswordModalElement extends UmbModalBaseElement<
 			},
 		);
 
-		this._newPasswordInput?.addValidator(
-			'customError',
-			() => this.localize.term('user_passwordRequiresDigit'),
-			() => {
-				if (!this._passwordConfiguration?.requireDigit) return false;
-				return this.#newPasswordValue.length > 0 && !/\d/.test(this.#newPasswordValue);
-			},
-		);
-
-		this._newPasswordInput?.addValidator(
-			'customError',
-			() => this.localize.term('user_passwordRequiresLower'),
-			() => {
-				if (!this._passwordConfiguration?.requireLowercase) return false;
-				return this.#newPasswordValue.length > 0 && !/[a-z]/.test(this.#newPasswordValue);
-			},
-		);
-
-		this._newPasswordInput?.addValidator(
-			'customError',
-			() => this.localize.term('user_passwordRequiresUpper'),
-			() => {
-				if (!this._passwordConfiguration?.requireUppercase) return false;
-				return this.#newPasswordValue.length > 0 && !/[A-Z]/.test(this.#newPasswordValue);
-			},
-		);
-
-		this._newPasswordInput?.addValidator(
-			'customError',
-			() => this.localize.term('user_passwordRequiresNonAlphanumeric'),
-			() => {
-				if (!this._passwordConfiguration?.requireNonLetterOrDigit) return false;
-				return this.#newPasswordValue.length > 0 && !/[^a-zA-Z0-9]/.test(this.#newPasswordValue);
-			},
-		);
+		this.#addNewPasswordValidator('user_passwordRequiresDigit', 'requireDigit', /\d/);
+		this.#addNewPasswordValidator('user_passwordRequiresLower', 'requireLowercase', /[a-z]/);
+		this.#addNewPasswordValidator('user_passwordRequiresUpper', 'requireUppercase', /[A-Z]/);
+		this.#addNewPasswordValidator('user_passwordRequiresNonAlphanumeric', 'requireNonLetterOrDigit', /[^a-zA-Z0-9]/);
 
 		if (!this.data?.user.unique) return;
 		const { data } = await this.#userItemRepository.requestItems([this.data.user.unique]);
