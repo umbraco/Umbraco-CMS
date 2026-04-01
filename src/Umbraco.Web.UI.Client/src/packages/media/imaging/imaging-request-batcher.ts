@@ -26,8 +26,6 @@ interface PendingBatch {
 
 const pendingBatches = new Map<string, PendingBatch>();
 
-
-
 /**
  * Flushes a pending batch, executing the API call and resolving all waiting promises.
  * @param {string} key - The batch key identifying the batch
