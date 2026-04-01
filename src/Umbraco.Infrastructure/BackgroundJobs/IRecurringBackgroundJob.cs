@@ -7,9 +7,6 @@ namespace Umbraco.Cms.Infrastructure.BackgroundJobs;
 /// </summary>
 public interface IRecurringBackgroundJob
 {
-    static readonly TimeSpan DefaultDelay = TimeSpan.FromMinutes(3);
-    static readonly ServerRole[] DefaultServerRoles = [ServerRole.Single, ServerRole.SchedulingPublisher];
-
     /// <summary>
     /// Timespan representing how often the task should recur.
     /// </summary>
@@ -24,7 +21,7 @@ public interface IRecurringBackgroundJob
     /// <value>
     /// The delay.
     /// </value>
-    TimeSpan Delay => DefaultDelay;
+    TimeSpan Delay => RecurringBackgroundJobBase.DefaultDelay; // TODO (V19): Remove the default implementation
 
     /// <summary>
     /// Gets the server roles the task executes on.
@@ -32,7 +29,7 @@ public interface IRecurringBackgroundJob
     /// <value>
     /// The server roles.
     /// </value>
-    ServerRole[] ServerRoles => DefaultServerRoles;
+    ServerRole[] ServerRoles => RecurringBackgroundJobBase.DefaultServerRoles; // TODO (V19): Remove the default implementation
 
     /// <summary>
     /// This event should be raised when the <see cref="Period" /> property changes to notify the background job manager to update the schedule for this job.

@@ -66,7 +66,7 @@ public class RecurringBackgroundJobHostedServiceTests
     public async Task Does_Executes_When_Server_Role_Is_Default(ServerRole serverRole)
     {
         var mockJob = new Mock<IRecurringBackgroundJob>();
-        mockJob.Setup(x => x.ServerRoles).Returns(IRecurringBackgroundJob.DefaultServerRoles);
+        mockJob.Setup(x => x.ServerRoles).Returns(RecurringBackgroundJobBase.DefaultServerRoles);
 
         var sut = CreateRecurringBackgroundJobHostedService(mockJob, serverRole: serverRole);
         await sut.PerformExecuteAsync(CancellationToken.None);
@@ -129,7 +129,7 @@ public class RecurringBackgroundJobHostedServiceTests
     public async Task Publishes_Executed_Notification_When_Run()
     {
         var mockJob = new Mock<IRecurringBackgroundJob>();
-        mockJob.Setup(x => x.ServerRoles).Returns(IRecurringBackgroundJob.DefaultServerRoles);
+        mockJob.Setup(x => x.ServerRoles).Returns(RecurringBackgroundJobBase.DefaultServerRoles);
         var mockEventAggregator = new Mock<IEventAggregator>();
 
         var sut = CreateRecurringBackgroundJobHostedService(mockJob, mockEventAggregator: mockEventAggregator);
@@ -143,7 +143,7 @@ public class RecurringBackgroundJobHostedServiceTests
     public async Task Publishes_Failed_Notification_When_Fails()
     {
         var mockJob = new Mock<IRecurringBackgroundJob>();
-        mockJob.Setup(x => x.ServerRoles).Returns(IRecurringBackgroundJob.DefaultServerRoles);
+        mockJob.Setup(x => x.ServerRoles).Returns(RecurringBackgroundJobBase.DefaultServerRoles);
         mockJob.Setup(x => x.RunJobAsync(It.IsAny<CancellationToken>())).Throws<Exception>();
         var mockEventAggregator = new Mock<IEventAggregator>();
 
