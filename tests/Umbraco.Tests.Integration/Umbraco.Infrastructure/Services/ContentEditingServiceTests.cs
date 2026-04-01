@@ -1,9 +1,7 @@
 using NUnit.Framework;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
-using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
@@ -11,10 +9,16 @@ using Umbraco.Cms.Tests.Common.Builders;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
-public partial class ContentEditingServiceTests : ContentEditingServiceTestsBase
+public partial class ContentEditingServiceTests : ContentEditingServiceSnapshotTestBase
 {
     [SetUp]
-    public void Setup() => ContentRepositoryBase.ThrowOnWarning = true;
+    public override async Task SetUp()
+    {
+        await base.SetUp();
+        ContentRepositoryBase.ThrowOnWarning = true;
+    }
+
+    protected IRelationService RelationService => GetRequiredService<IRelationService>();
 
     public void Relate(IContent parent, IContent child, string relationTypeAlias = Constants.Conventions.RelationTypes.RelatedDocumentAlias)
     {
@@ -23,9 +27,6 @@ public partial class ContentEditingServiceTests : ContentEditingServiceTestsBase
         var relation = RelationService.Relate(parent.Id, child.Id, relatedContentRelType);
         RelationService.Save(relation);
     }
-
-    protected override void CustomTestSetup(IUmbracoBuilder builder)
-        => builder.AddNotificationAsyncHandler<ContentCopiedNotification, RelateOnCopyNotificationHandler>();
 
     private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
 
@@ -68,4 +69,4 @@ public partial class ContentEditingServiceTests : ContentEditingServiceTestsBase
 
         return (root, child);
     }
- }
+}

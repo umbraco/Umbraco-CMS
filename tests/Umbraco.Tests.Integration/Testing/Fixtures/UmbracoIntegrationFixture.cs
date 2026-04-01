@@ -74,6 +74,13 @@ public abstract class UmbracoIntegrationFixture : UmbracoIntegrationFixtureBase
     protected UserGroupBuilder UserGroupBuilderInstance { get; } = new();
 
     /// <summary>
+    ///     When non-null, uses the swapper for database setup instead of the normal
+    ///     <see cref="UmbracoIntegrationFixtureBase.UseTestDatabase"/> flow.
+    ///     This enables swapping databases on a running host without restarting it.
+    /// </summary>
+    protected TestDatabaseSwapper DatabaseSwapper { get; set; }
+
+    /// <summary>
     ///     Builds and starts the Umbraco host. Call this from [SetUp], [OneTimeSetUp], or any other context.
     /// </summary>
     public void BuildAndStartHost()
@@ -82,13 +89,52 @@ public abstract class UmbracoIntegrationFixture : UmbracoIntegrationFixtureBase
         var hostBuilder = CreateHostBuilder();
 
         _host = hostBuilder.Build();
-        UseTestDatabase(_host.Services);
+
+        if (DatabaseSwapper is not null)
+        {
+            DatabaseSwapper.InitialSetup(_host.Services, Configuration, TestHelper);
+        }
+        else
+        {
+            UseTestDatabase(_host.Services);
+        }
+
         _host.Start();
 
         if (TestOptions.Boot)
         {
             Services.GetRequiredService<IUmbracoContextFactory>().EnsureUmbracoContext();
         }
+    }
+
+    /// <summary>
+    ///     Convenience method: swaps to a seeded database (snapshot-aware).
+    ///     Requires <see cref="DatabaseSwapper"/> to be set.
+    /// </summary>
+    public Task SwapToSeededDatabaseAsync(ITestDatabaseSeedProfile seedProfile)
+    {
+        if (DatabaseSwapper is null)
+        {
+            throw new InvalidOperationException(
+                "DatabaseSwapper must be set to use SwapToSeededDatabaseAsync.");
+        }
+
+        return DatabaseSwapper.SwapToSeededDatabaseAsync(Services, Configuration, TestHelper, seedProfile);
+    }
+
+    /// <summary>
+    ///     Convenience method: swaps to a fresh database with schema + unattended install.
+    ///     Requires <see cref="DatabaseSwapper"/> to be set.
+    /// </summary>
+    public Task SwapToFreshDatabaseAsync()
+    {
+        if (DatabaseSwapper is null)
+        {
+            throw new InvalidOperationException(
+                "DatabaseSwapper must be set to use SwapToFreshDatabaseAsync.");
+        }
+
+        return DatabaseSwapper.SwapDatabaseAsync(Services, Configuration, TestHelper);
     }
 
     /// <summary>

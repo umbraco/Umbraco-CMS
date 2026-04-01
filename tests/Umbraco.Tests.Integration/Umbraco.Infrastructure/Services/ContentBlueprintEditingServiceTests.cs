@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 ///     Tests for the content blueprint editing service. Please notice that a lot of the functional tests are covered by the content
 ///     editing service tests, since these services share the same base implementation.
 /// </summary>
-public partial class ContentBlueprintEditingServiceTests : ContentEditingServiceTestsBase
+public partial class ContentBlueprintEditingServiceTests : ContentEditingServiceSnapshotTestBase
 {
     private IContentBlueprintContainerService ContentBlueprintContainerService => GetRequiredService<IContentBlueprintContainerService>();
 
@@ -101,4 +101,3 @@ public partial class ContentBlueprintEditingServiceTests : ContentEditingService
     private IEntitySlim[] GetBlueprintChildren(Guid? containerKey)
         => EntityService.GetPagedChildren(containerKey, [UmbracoObjectTypes.DocumentBlueprintContainer], UmbracoObjectTypes.DocumentBlueprint, 0, 100, out _).ToArray();
 }
-
