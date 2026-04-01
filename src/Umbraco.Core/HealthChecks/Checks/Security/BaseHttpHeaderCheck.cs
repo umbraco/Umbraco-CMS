@@ -79,6 +79,16 @@ public abstract class BaseHttpHeaderCheck : HealthCheck
         // Access the site home page and check for the click-jack protection header or meta tag
         var url = _hostingEnvironment.ApplicationMainUrl?.GetLeftPart(UriPartial.Authority);
 
+        if (url is null)
+        {
+            return new HealthCheckStatus(
+                LocalizedTextService.Localize("healthcheck", "httpsCheckNoApplicationUrl"))
+            {
+                ResultType = StatusResultType.Info,
+                ReadMoreLink = ReadMoreLink,
+            };
+        }
+
         try
         {
             using HttpResponseMessage response = await HttpClient.GetAsync(url);
