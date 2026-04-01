@@ -41,6 +41,18 @@ export class UmbElementFolderWorkspaceContext
 
 	#onTrashStateChange(isTrashed?: boolean) {
 		this.#isTrashedContext.setIsTrashed(isTrashed ?? false);
+
+		const guardUnique = 'UMB_PREVENT_TRASHED_FOLDER_RENAME';
+
+		if (isTrashed) {
+			this.nameWriteGuard.addRule({
+				unique: guardUnique,
+				permitted: false,
+				message: 'Cannot rename folders in the recycle bin.',
+			});
+		} else {
+			this.nameWriteGuard.removeRule(guardUnique);
+		}
 	}
 }
 
