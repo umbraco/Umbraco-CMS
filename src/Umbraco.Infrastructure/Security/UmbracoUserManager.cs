@@ -301,6 +301,7 @@ public abstract class UmbracoUserManager<TUser, TPasswordConfig> : UserManager<T
         return result == PasswordVerificationResult.Success || result == PasswordVerificationResult.SuccessRehashNeeded;
     }
 
+    // TODO (V18): Change 'new virtual' to 'override' to properly override base class method.
     /// <summary>
     /// Asynchronously retrieves the valid two-factor authentication providers for the specified user.
     /// </summary>
