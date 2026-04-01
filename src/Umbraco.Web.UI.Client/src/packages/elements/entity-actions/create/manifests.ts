@@ -50,7 +50,7 @@ const elementCreateOptionAction: ManifestEntityCreateOptionAction = {
 const folderCreateOptionAction: ManifestEntityCreateOptionActionFolderKind = {
 	type: 'entityCreateOptionAction',
 	kind: 'folder',
-	alias: 'Umb.EntityCreateOptionAction.Element.Folder',
+	alias: 'Umb.EntityCreateOptionAction.ElementFolder',
 	name: 'Element Folder Entity Create Option Action',
 	forEntityTypes: [UMB_ELEMENT_ROOT_ENTITY_TYPE, UMB_ELEMENT_FOLDER_ENTITY_TYPE],
 	meta: {
