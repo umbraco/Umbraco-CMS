@@ -111,6 +111,8 @@ export class UmbWorkspaceBreadcrumbElement extends UmbLitElement {
 		UmbTextStyles,
 		css`
 			:host {
+				overflow: hidden;
+				min-width: 0;
 				margin-left: var(--uui-size-layout-1);
 			}
 		`,

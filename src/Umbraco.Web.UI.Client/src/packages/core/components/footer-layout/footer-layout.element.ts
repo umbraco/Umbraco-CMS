@@ -32,6 +32,11 @@ export class UmbFooterLayoutElement extends LitElement {
 				box-sizing: border-box;
 			}
 
+			::slotted(*:not([slot])) {
+				min-width: 0;
+				overflow: hidden;
+			}
+
 			#actions {
 				display: flex;
 				gap: var(--uui-size-space-2);
