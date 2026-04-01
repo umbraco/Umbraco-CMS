@@ -23,6 +23,9 @@ public abstract class RecurringHostedServiceBase : BackgroundService
     private readonly ILogger? _logger;
     private readonly SemaphoreSlim _signal = new(0, 1);
     private TimeSpan _period;
+    private NextExecutionStrategy _nextExecutionStrategy;
+    private TimeSpan? _nextExecutionDelay;
+    private bool _nextExecutionSkipOnOvershoot;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RecurringHostedServiceBase" /> class.
@@ -105,6 +108,8 @@ public abstract class RecurringHostedServiceBase : BackgroundService
             }
         }
 
+        TimeSpan nextDelayBasis = _period;
+
         while (!stoppingToken.IsCancellationRequested)
         {
             var sw = Stopwatch.StartNew();
@@ -126,19 +131,77 @@ public abstract class RecurringHostedServiceBase : BackgroundService
                 sw.Stop();
             }
 
-            // Wait for remaining period or early signal
-            TimeSpan remaining = ComputeNextDelay(_period, sw.Elapsed);
-            if (remaining > TimeSpan.Zero)
-            {
-                try
-                {
-                    await _signal.WaitAsync(remaining, stoppingToken);
-                }
-                catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
-                {
-                    break;
-                }
-            }
+            nextDelayBasis = await WaitForNextExecutionAsync(nextDelayBasis, sw.Elapsed, stoppingToken);
+        }
+    }
+
+    /// <summary>
+    /// Waits for the remaining period (minus execution time) before the next execution.
+    /// If <see cref="TriggerExecution()" /> is called, the wait exits immediately and returns the delay basis for the execution after the triggered one.
+    /// </summary>
+    /// <param name="delayBasis">The delay basis.</param>
+    /// <param name="executionElapsed">The execution elapsed.</param>
+    /// <param name="stoppingToken">The stopping token.</param>
+    /// <returns>
+    /// The delay basis to use for the next wait cycle.
+    /// </returns>
+    private async Task<TimeSpan> WaitForNextExecutionAsync(TimeSpan delayBasis, TimeSpan executionElapsed, CancellationToken stoppingToken)
+    {
+        TimeSpan delay = ComputeNextDelay(delayBasis, executionElapsed);
+
+        // If the delay basis was from a NextExecutionStrategy.None trigger and the execution overshot the scheduled time,
+        // advance to the next period tick instead of executing immediately.
+        if (delay <= TimeSpan.Zero && _nextExecutionSkipOnOvershoot)
+        {
+            _nextExecutionSkipOnOvershoot = false;
+            delay = ComputeNextDelay(delayBasis + _period, executionElapsed);
+        }
+
+        if (delay <= TimeSpan.Zero)
+        {
+            return _period;
+        }
+
+        var waitSw = Stopwatch.StartNew();
+        bool signaled;
+        try
+        {
+            signaled = await _signal.WaitAsync(delay, stoppingToken);
+        }
+        catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+        {
+            return _period;
+        }
+
+        waitSw.Stop();
+
+        if (!signaled)
+        {
+            return _period; // Normal timeout — next wait uses normal period
+        }
+
+        // Triggered — determine delay basis for after the triggered execution.
+        // The semaphore provides a memory barrier, so writes from TriggerExecution are visible here.
+        if (_nextExecutionDelay.HasValue)
+        {
+            TimeSpan custom = _nextExecutionDelay.Value;
+            _nextExecutionDelay = null;
+
+            return custom;
+        }
+
+        TimeSpan remaining = ComputeNextDelay(delay, waitSw.Elapsed);
+
+        switch (_nextExecutionStrategy)
+        {
+            case NextExecutionStrategy.None:
+                _nextExecutionSkipOnOvershoot = true;
+                return remaining;
+            case NextExecutionStrategy.Replace:
+                return remaining + _period;
+            case NextExecutionStrategy.Reset:
+            default:
+                return _period;
         }
     }
 
@@ -198,8 +261,37 @@ public abstract class RecurringHostedServiceBase : BackgroundService
 
     /// <summary>
     /// Signals the background loop to execute immediately.
+    /// After the triggered execution, the original schedule is kept.
+    /// If the scheduled time has already passed during the triggered execution, it is skipped and the next period tick is awaited.
     /// </summary>
-    protected void TriggerExecution()
+    public void TriggerExecution()
+        => TriggerExecution(NextExecutionStrategy.None);
+
+    /// <summary>
+    /// Signals the background loop to execute immediately, with the specified strategy for determining the next execution after the triggered one completes.
+    /// </summary>
+    /// <param name="strategy">Controls the delay after the triggered execution.</param>
+    public void TriggerExecution(NextExecutionStrategy strategy)
+    {
+        _nextExecutionStrategy = strategy;
+        _nextExecutionDelay = null;
+
+        ReleaseSignal();
+    }
+
+    /// <summary>
+    /// Signals the background loop to execute immediately.
+    /// After the triggered execution, the loop waits for the specified delay before the next execution.
+    /// </summary>
+    /// <param name="nextDelay">The delay to wait after the triggered execution completes (execution time is subtracted to prevent drift).</param>
+    public void TriggerExecution(TimeSpan nextDelay)
+    {
+        _nextExecutionDelay = nextDelay;
+
+        ReleaseSignal();
+    }
+
+    private void ReleaseSignal()
     {
         if (_signal.CurrentCount == 0)
         {

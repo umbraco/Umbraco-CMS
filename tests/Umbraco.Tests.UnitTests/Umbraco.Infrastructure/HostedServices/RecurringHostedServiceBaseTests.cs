@@ -151,6 +151,167 @@ public class RecurringHostedServiceBaseTests
     }
 
     [Test]
+    public async Task TriggerExecution_Reset_Starts_New_Full_Period()
+    {
+        var executionCount = 0;
+        var sut = new TestRecurringHostedService(
+            period: TimeSpan.FromSeconds(30),
+            delay: TimeSpan.Zero,
+            onExecute: _ => { Interlocked.Increment(ref executionCount); return Task.CompletedTask; });
+
+        using var cts = new CancellationTokenSource();
+        await sut.StartAsync(cts.Token);
+
+        await Task.Delay(100);
+        Assert.AreEqual(1, executionCount);
+
+        // Trigger with Reset — after the triggered execution, a full 30s period starts
+        sut.PublicTriggerExecutionReset();
+        await Task.Delay(100);
+        Assert.AreEqual(2, executionCount, "Should have executed again after trigger");
+
+        // With a 30s period, no further execution in the next 300ms
+        await Task.Delay(300);
+        Assert.AreEqual(2, executionCount, "Should not execute again within 30s period");
+
+        cts.Cancel();
+        await sut.StopAsync(CancellationToken.None);
+    }
+
+    [Test]
+    public async Task TriggerExecution_None_Resumes_Original_Wait()
+    {
+        var executionCount = 0;
+        var sut = new TestRecurringHostedService(
+            period: TimeSpan.FromSeconds(30),
+            delay: TimeSpan.Zero,
+            onExecute: _ => { Interlocked.Increment(ref executionCount); return Task.CompletedTask; });
+
+        using var cts = new CancellationTokenSource();
+        await sut.StartAsync(cts.Token);
+
+        await Task.Delay(100);
+        Assert.AreEqual(1, executionCount);
+
+        // Trigger with None — after the triggered execution, the remaining ~30s continues
+        sut.PublicTriggerExecutionNone();
+        await Task.Delay(100);
+        Assert.AreEqual(2, executionCount, "Should have executed again after trigger");
+
+        // The remaining time from the interrupted 30s wait is still ~29s, so no execution soon
+        await Task.Delay(300);
+        Assert.AreEqual(2, executionCount, "Should not execute again — remaining schedule still active");
+
+        cts.Cancel();
+        await sut.StopAsync(CancellationToken.None);
+    }
+
+    [Test]
+    public async Task TriggerExecution_None_Skips_Overshot_Execution()
+    {
+        var executionCount = 0;
+        var sut = new TestRecurringHostedService(
+            period: TimeSpan.FromMilliseconds(500),
+            delay: TimeSpan.Zero,
+            onExecute: async _ =>
+            {
+                var count = Interlocked.Increment(ref executionCount);
+                if (count == 2)
+                {
+                    // Triggered execution takes longer than the remaining time to the next tick
+                    await Task.Delay(600);
+                }
+            });
+
+        using var cts = new CancellationTokenSource();
+        await sut.StartAsync(cts.Token);
+
+        // Wait for first execution
+        await Task.Delay(50);
+        Assert.AreEqual(1, executionCount, "Should have executed once initially");
+
+        // Trigger with None. Remaining is ~450ms, but the triggered execution takes 600ms.
+        // The scheduled tick at ~500ms passes during execution. It should NOT execute immediately.
+        sut.PublicTriggerExecutionNone();
+
+        // Triggered execution finishes at ~650ms from start. The overshoot is ~100ms.
+        // Next period tick is at ~500ms + 500ms = ~1000ms from start, so ~350ms from now.
+        // Verify no immediate execution after the triggered one finishes.
+        await Task.Delay(750);
+        Assert.AreEqual(2, executionCount, "Should not have executed again — scheduled tick was overshot and skipped");
+
+        // Wait for the next period tick
+        await Task.Delay(400);
+        Assert.AreEqual(3, executionCount, "Should execute at next period tick");
+
+        cts.Cancel();
+        await sut.StopAsync(CancellationToken.None);
+    }
+
+    [Test]
+    public async Task TriggerExecution_Replace_Skips_Next_Tick()
+    {
+        var executionCount = 0;
+        var sut = new TestRecurringHostedService(
+            period: TimeSpan.FromMilliseconds(200),
+            delay: TimeSpan.Zero,
+            onExecute: _ => { Interlocked.Increment(ref executionCount); return Task.CompletedTask; });
+
+        using var cts = new CancellationTokenSource();
+        await sut.StartAsync(cts.Token);
+
+        // Wait for first execution
+        await Task.Delay(50);
+        Assert.AreEqual(1, executionCount, "Should have executed once initially");
+
+        // Trigger with Replace — the triggered execution replaces the next tick.
+        // Next execution should be at ~original_tick + period = ~200ms + 200ms = ~400ms from start.
+        sut.PublicTriggerExecutionReplace();
+        await Task.Delay(50);
+        Assert.AreEqual(2, executionCount, "Should have executed after trigger");
+
+        // At ~100ms from start. The next tick is ~400ms from start, so ~300ms from now.
+        // No execution should happen in the next 200ms.
+        await Task.Delay(200);
+        Assert.AreEqual(2, executionCount, "Should not execute — skipped scheduled tick");
+
+        // Wait enough for the tick after the skipped one (~200ms more)
+        await Task.Delay(250);
+        Assert.AreEqual(3, executionCount, "Should execute at tick after the skipped one");
+
+        cts.Cancel();
+        await sut.StopAsync(CancellationToken.None);
+    }
+
+    [Test]
+    public async Task TriggerExecution_CustomDelay_Uses_Specified_Delay()
+    {
+        var executionCount = 0;
+        var sut = new TestRecurringHostedService(
+            period: TimeSpan.FromSeconds(30),
+            delay: TimeSpan.Zero,
+            onExecute: _ => { Interlocked.Increment(ref executionCount); return Task.CompletedTask; });
+
+        using var cts = new CancellationTokenSource();
+        await sut.StartAsync(cts.Token);
+
+        await Task.Delay(100);
+        Assert.AreEqual(1, executionCount);
+
+        // Trigger with a short custom delay — executes immediately, then again after ~50ms
+        sut.PublicTriggerExecutionWithDelay(TimeSpan.FromMilliseconds(50));
+        await Task.Delay(200);
+        Assert.AreEqual(3, executionCount, "Should have executed: initial + trigger + after custom delay");
+
+        // The next cycle uses the normal 30s period, so no more executions
+        await Task.Delay(300);
+        Assert.AreEqual(3, executionCount, "Should not execute again within 30s period");
+
+        cts.Cancel();
+        await sut.StopAsync(CancellationToken.None);
+    }
+
+    [Test]
     public async Task Exception_In_PerformExecuteAsync_Does_Not_Kill_Loop()
     {
         var executionCount = 0;
@@ -178,26 +339,32 @@ public class RecurringHostedServiceBaseTests
     }
 
     [Test]
-    public async Task ChangePeriod_Wakes_Loop_With_New_Period()
+    public async Task ChangePeriod_Applies_New_Period_On_Next_Cycle()
     {
         var executionCount = 0;
         var sut = new TestRecurringHostedService(
-            period: TimeSpan.FromSeconds(30),
+            period: TimeSpan.FromMilliseconds(100),
             delay: TimeSpan.Zero,
             onExecute: _ => { Interlocked.Increment(ref executionCount); return Task.CompletedTask; });
 
         using var cts = new CancellationTokenSource();
         await sut.StartAsync(cts.Token);
 
-        // Wait for first execution
-        await Task.Delay(100);
-        Assert.AreEqual(1, executionCount);
+        // Wait for first execution + one period tick
+        await Task.Delay(250);
+        var countBeforeChange = executionCount;
+        Assert.GreaterOrEqual(countBeforeChange, 2, "Should have executed at least twice with short period");
 
-        // Change period to something short — this should also trigger immediate execution
-        sut.PublicChangePeriod(TimeSpan.FromMilliseconds(50));
-        await Task.Delay(200);
+        // Change to a long period — subsequent executions should stop
+        sut.PublicChangePeriod(TimeSpan.FromSeconds(30));
 
-        Assert.GreaterOrEqual(executionCount, 2, "ChangePeriod should wake the loop");
+        // Allow one in-flight execution to complete, then snapshot
+        await Task.Delay(150);
+        var countAfterChange = executionCount;
+
+        // With a 30s period, no further executions should happen in the next 300ms
+        await Task.Delay(300);
+        Assert.AreEqual(countAfterChange, executionCount, "No additional executions should occur with long period");
 
         cts.Cancel();
         await sut.StopAsync(CancellationToken.None);
@@ -220,6 +387,14 @@ public class RecurringHostedServiceBaseTests
             => _onExecute(stoppingToken);
 
         public void PublicTriggerExecution() => TriggerExecution();
+
+        public void PublicTriggerExecutionReset() => TriggerExecution(NextExecutionStrategy.Reset);
+
+        public void PublicTriggerExecutionNone() => TriggerExecution(NextExecutionStrategy.None);
+
+        public void PublicTriggerExecutionReplace() => TriggerExecution(NextExecutionStrategy.Replace);
+
+        public void PublicTriggerExecutionWithDelay(TimeSpan nextDelay) => TriggerExecution(nextDelay);
 
         public void PublicChangePeriod(TimeSpan newPeriod) => ChangePeriod(newPeriod);
     }
