@@ -10,12 +10,25 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Cache;
 
+/// <summary>
+/// Provides cache refresh functionality for element items, ensuring that element-related caches are updated or
+/// invalidated in response to element changes.
+/// </summary>
+/// <remarks>
+/// The ElementCacheRefresher coordinates cache invalidation for elements, including memory caches and
+/// isolated caches. It responds to element change notifications and ensures that all relevant caches reflect
+/// the current state of published and unpublished elements. This refresher is used internally to maintain
+/// cache consistency after element operations such as publish, unpublish, or delete.
+/// </remarks>
 public sealed class ElementCacheRefresher : PayloadCacheRefresherBase<ElementCacheRefresherNotification, ElementCacheRefresher.JsonPayload>
 {
     private readonly IIdKeyMap _idKeyMap;
     private readonly IElementCacheService _elementCacheService;
     private readonly ICacheManager _cacheManager;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ElementCacheRefresher"/> class.
+    /// </summary>
     public ElementCacheRefresher(
         AppCaches appCaches,
         IJsonSerializer serializer,
@@ -35,6 +48,10 @@ public sealed class ElementCacheRefresher : PayloadCacheRefresherBase<ElementCac
 
     #region Json
 
+    /// <summary>
+    /// Represents a JSON-serializable payload containing information about an element change event, including
+    /// identifiers, change types, and culture-specific publishing details.
+    /// </summary>
     public class JsonPayload
     {
         public JsonPayload(int id, Guid key, TreeChangeTypes changeTypes)
@@ -44,23 +61,45 @@ public sealed class ElementCacheRefresher : PayloadCacheRefresherBase<ElementCac
             ChangeTypes = changeTypes;
         }
 
+        /// <summary>
+        /// Gets the unique integer identifier for the entity.
+        /// </summary>
         public int Id { get; }
 
+        /// <summary>
+        /// Gets the unique GUID key associated with the entity.
+        /// </summary>
         public Guid Key { get; }
 
+        /// <summary>
+        /// Gets the types of changes that have occurred in the tree.
+        /// </summary>
         public TreeChangeTypes ChangeTypes { get; }
 
-        // TODO ELEMENTS: should we support (un)published cultures in this payload? see ContentCacheRefresher.JsonPayload
+        /// <summary>
+        /// Gets the collection of culture codes in which the element is published.
+        /// </summary>
+        public string[]? PublishedCultures { get; init; }
+
+        /// <summary>
+        /// Gets the collection of culture codes for which the element has been unpublished.
+        /// </summary>
+        public string[]? UnpublishedCultures { get; init; }
     }
 
     #endregion
 
     #region Define
 
+    /// <summary>
+    /// Represents a unique identifier for the cache refresher.
+    /// </summary>
     public static readonly Guid UniqueId = Guid.Parse("EE5BB23A-A656-4F7E-A234-16F21AAABFD1");
 
+    /// <inheritdoc/>
     public override Guid RefresherUniqueId => UniqueId;
 
+    /// <inheritdoc/>
     public override string Name => "Element Cache Refresher";
 
     #endregion
@@ -93,16 +132,24 @@ public sealed class ElementCacheRefresher : PayloadCacheRefresherBase<ElementCac
             // TODO ELEMENTS: if we need published status caching for elements (e.g. for seeding purposes), make sure
             //                it is kept in sync here (see ContentCacheRefresher)
 
-            if (payload.ChangeTypes == TreeChangeTypes.Remove)
+            if (payload.ChangeTypes.HasType(TreeChangeTypes.Remove))
             {
                 _idKeyMap.ClearCache(payload.Id);
             }
         }
 
-        AppCaches.ClearPartialViewCache();
+        if (ShouldClearPartialViewCache(payloads))
+        {
+            AppCaches.ClearPartialViewCache();
+        }
 
         base.Refresh(payloads);
     }
+
+    private static bool ShouldClearPartialViewCache(JsonPayload[] payloads)
+        // Reuse the "should clear partial view cache" logic from the content cache refresher.
+        => ContentCacheRefresher.ShouldClearPartialViewCache(payloads
+            .Select(payload => (payload.ChangeTypes, payload.PublishedCultures, payload.UnpublishedCultures)));
 
     private void HandleMemoryCache(JsonPayload payload)
     {
@@ -122,14 +169,18 @@ public sealed class ElementCacheRefresher : PayloadCacheRefresherBase<ElementCac
         }
     }
 
-    // these events should never trigger
-    // everything should be JSON
+    // These events should never trigger. Everything should be PAYLOAD/JSON.
+
+    /// <inheritdoc/>
     public override void RefreshAll() => throw new NotSupportedException();
 
+    /// <inheritdoc/>
     public override void Refresh(int id) => throw new NotSupportedException();
 
+    /// <inheritdoc/>
     public override void Refresh(Guid id) => throw new NotSupportedException();
 
+    /// <inheritdoc/>
     public override void Remove(int id) => throw new NotSupportedException();
 
     #endregion
