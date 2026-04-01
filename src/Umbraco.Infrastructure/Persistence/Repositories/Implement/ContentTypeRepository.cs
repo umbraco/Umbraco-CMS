@@ -134,36 +134,15 @@ internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContent
     protected override IRepositoryCachePolicy<IContentType, int> CreateCachePolicy() =>
         new FullDataSetRepositoryCachePolicy<IContentType, int>(GlobalIsolatedCache, ScopeAccessor, _repositoryCacheVersionService, _cacheSyncService, GetEntityId, /*expires:*/ true);
 
-    // every GetExists method goes cachePolicy.GetSomething which in turns goes PerformGetAll,
-    // since this is a FullDataSet policy - and everything is cached
-    // so here,
-    // every PerformGet/Exists just GetMany() and then filters
-    // except PerformGetAll which is the one really doing the job
-
-    // TODO: the filtering is highly inefficient as we deep-clone everything
-    // there should be a way to GetMany(predicate) right from the cache policy!
-    // and ah, well, this all caching should be refactored + the cache refreshers
-    // should to repository.Clear() not deal with magic caches by themselves
+    // Note: PerformGet(int) is passed as a callback to the cache policy's Get(TId) method,
+    // but FullDataSetRepositoryCachePolicy.Get() never invokes it — it uses GetAllCached()
+    // internally and clones only the matched entity. This override exists only as a required
+    // implementation of the abstract base and as a fallback for non-FullDataSet policies.
     protected override IContentType? PerformGet(int id)
         => GetMany().FirstOrDefault(x => x.Id == id);
 
-    protected override IContentType? PerformGet(Guid id)
-        => GetMany().FirstOrDefault(x => x.Key == id);
-
-    protected override IContentType? PerformGet(string alias)
-        => GetMany().FirstOrDefault(x => x.Alias.InvariantEquals(alias));
-
-    protected override bool PerformExists(Guid id)
-        => GetMany().FirstOrDefault(x => x.Key == id) != null;
-
     protected override IEnumerable<IContentType>? GetAllWithFullCachePolicy() =>
         CommonRepository.GetAllTypes()?.OfType<IContentType>();
-
-    protected override IEnumerable<IContentType> PerformGetAll(params Guid[]? ids)
-    {
-        IEnumerable<IContentType> all = GetMany();
-        return ids?.Any() ?? false ? all.Where(x => ids.Contains(x.Key)) : all;
-    }
 
     protected override IEnumerable<IContentType> PerformGetByQuery(IQuery<IContentType> query)
     {
