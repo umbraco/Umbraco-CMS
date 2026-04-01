@@ -184,3 +184,11 @@ Study these when implementing repositories:
 2. **One concern per repository** — detail CRUD, publishing, duplication, and tree navigation are separate repositories
 3. **Use base classes when they exist** — only create custom repositories for operations without a base class
 4. **Always delegate to a data source** — see [Data Flow](./data-Flow.md) for the delegation pattern, `tryExecute`, and `{ data, error }` tuple conventions
+
+---
+
+## Classify by Operations, Not by Neighbors
+
+When creating or reviewing a repository, determine its **category** based on what operations it performs — not based on what nearby files look like. Then verify it uses the correct base class, interfaces, and data flow conventions for that category.
+
+Use the [When to Create Which Repository Type](#when-to-create-which-repository-type) table as the decision guide. If the operations map to a standard category, the repository must use the corresponding base class and interfaces. A repository should only extend `UmbRepositoryBase` directly when no standard category fits.
