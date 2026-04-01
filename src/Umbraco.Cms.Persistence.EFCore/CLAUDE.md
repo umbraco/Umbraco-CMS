@@ -42,7 +42,7 @@ Umbraco.Cms.Persistence.EFCore/
 │   ├── EFCoreScopeAccessor.cs         # Ambient scope accessor
 │   └── I*.cs                          # Interfaces
 ├── Constants-ProviderNames.cs         # SQLite/SQLServer provider constants
-├── EfCoreMigrationExecutor.cs         # Migration orchestrator
+├── EFCoreMigrationExecutor.cs         # Migration orchestrator
 ├── StringExtensions.cs                # Provider name comparison
 └── UmbracoDbContext.cs                # Base DbContext
 ```
@@ -111,7 +111,7 @@ Registers: `IDbContextFactory<T>`, scope providers, accessors, and distributed l
 ### Using EF Core Scopes
 
 ```csharp
-using IEfCoreScope<UmbracoDbContext> scope = _scopeProvider.CreateScope();
+using IEFCoreScope<UmbracoDbContext> scope = _scopeProvider.CreateScope();
 
 await scope.ExecuteWithContextAsync<MyEntity>(async dbContext =>
 {
@@ -178,9 +178,9 @@ Requires active scope, transaction, and minimum `ReadCommitted` isolation.
 
 ### How Migrations Execute
 
-1. `UmbracoEFCoreComposer` registers `EfCoreMigrationExecutor`
+1. `UmbracoEFCoreComposer` registers `EFCoreMigrationExecutor`
 2. Notification handler triggers on database creation
-3. `EfCoreMigrationExecutor` finds correct `IMigrationProvider` by provider name
+3. `EFCoreMigrationExecutor` finds correct `IMigrationProvider` by provider name
 4. Provider executes via `dbContext.Database.Migrate()`
 
 ### Adding New Migrations
@@ -235,7 +235,7 @@ Top-level dependency on `Microsoft.Extensions.Caching.Memory` overrides vulnerab
 
 | Interface | Purpose |
 |-----------|---------|
-| `IEfCoreScope<TDbContext>` | Scope contract with `ExecuteWithContextAsync` |
+| `IEFCoreScope<TDbContext>` | Scope contract with `ExecuteWithContextAsync` |
 | `IEFCoreScopeProvider<TDbContext>` | Creates/manages scopes |
 | `IEFCoreScopeAccessor<TDbContext>` | Access ambient scope |
 | `IMigrationProvider` | Provider-specific migration execution |

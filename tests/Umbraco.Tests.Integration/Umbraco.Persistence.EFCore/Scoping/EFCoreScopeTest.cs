@@ -15,35 +15,35 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Persistence.EFCore.Scoping;
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewEmptyPerTest)]
 internal sealed class EFCoreScopeTest : UmbracoIntegrationTest
 {
-    private IEFCoreScopeProvider<TestUmbracoDbContext> EfCoreScopeProvider =>
+    private IEFCoreScopeProvider<TestUmbracoDbContext> EFCoreScopeProvider =>
         GetRequiredService<IEFCoreScopeProvider<TestUmbracoDbContext>>();
 
-    private EFCoreScopeAccessor<TestUmbracoDbContext> EfCoreScopeAccessor => (EFCoreScopeAccessor<TestUmbracoDbContext>)GetRequiredService<IEFCoreScopeAccessor<TestUmbracoDbContext>>();
+    private EFCoreScopeAccessor<TestUmbracoDbContext> EFCoreScopeAccessor => (EFCoreScopeAccessor<TestUmbracoDbContext>)GetRequiredService<IEFCoreScopeAccessor<TestUmbracoDbContext>>();
 
     [Test]
     public void CanCreateScope()
     {
-        Assert.IsNull(EfCoreScopeAccessor.AmbientScope);
-        using (IEfCoreScope<TestUmbracoDbContext> scope = EfCoreScopeProvider.CreateScope())
+        Assert.IsNull(EFCoreScopeAccessor.AmbientScope);
+        using (IEFCoreScope<TestUmbracoDbContext> scope = EFCoreScopeProvider.CreateScope())
         {
             Assert.IsInstanceOf<EFCoreScope<TestUmbracoDbContext>>(scope);
-            Assert.IsNotNull(EfCoreScopeAccessor.AmbientScope);
-            Assert.AreSame(scope, EfCoreScopeAccessor.AmbientScope);
+            Assert.IsNotNull(EFCoreScopeAccessor.AmbientScope);
+            Assert.AreSame(scope, EFCoreScopeAccessor.AmbientScope);
         }
 
-        Assert.IsNull(EfCoreScopeAccessor.AmbientScope);
+        Assert.IsNull(EFCoreScopeAccessor.AmbientScope);
     }
 
     [Test]
     public void CanCreateScopeTwice() =>
         Assert.DoesNotThrow(() =>
         {
-            using (var scope = EfCoreScopeProvider.CreateScope())
+            using (var scope = EFCoreScopeProvider.CreateScope())
             {
                 scope.Complete();
             }
 
-            using (var scopeTwo = EfCoreScopeProvider.CreateScope())
+            using (var scopeTwo = EFCoreScopeProvider.CreateScope())
             {
                 scopeTwo.Complete();
             }
@@ -52,22 +52,22 @@ internal sealed class EFCoreScopeTest : UmbracoIntegrationTest
     [Test]
     public void NestedCreateScope()
     {
-        Assert.IsNull(EfCoreScopeAccessor.AmbientScope);
-        using (IEfCoreScope<TestUmbracoDbContext> scope = EfCoreScopeProvider.CreateScope())
+        Assert.IsNull(EFCoreScopeAccessor.AmbientScope);
+        using (IEFCoreScope<TestUmbracoDbContext> scope = EFCoreScopeProvider.CreateScope())
         {
             Assert.IsInstanceOf<EFCoreScope<TestUmbracoDbContext>>(scope);
-            Assert.IsNotNull(EfCoreScopeAccessor.AmbientScope);
-            Assert.AreSame(scope, EfCoreScopeAccessor.AmbientScope);
-            using (IEfCoreScope<TestUmbracoDbContext> nested = EfCoreScopeProvider.CreateScope())
+            Assert.IsNotNull(EFCoreScopeAccessor.AmbientScope);
+            Assert.AreSame(scope, EFCoreScopeAccessor.AmbientScope);
+            using (IEFCoreScope<TestUmbracoDbContext> nested = EFCoreScopeProvider.CreateScope())
             {
                 Assert.IsInstanceOf<EFCoreScope<TestUmbracoDbContext>>(nested);
-                Assert.IsNotNull(EfCoreScopeAccessor.AmbientScope);
-                Assert.AreSame(nested, EfCoreScopeAccessor.AmbientScope);
+                Assert.IsNotNull(EFCoreScopeAccessor.AmbientScope);
+                Assert.AreSame(nested, EFCoreScopeAccessor.AmbientScope);
                 Assert.AreSame(scope, ((EFCoreScope<TestUmbracoDbContext>)nested).ParentScope);
             }
         }
 
-        Assert.IsNull(EfCoreScopeAccessor.AmbientScope);
+        Assert.IsNull(EFCoreScopeAccessor.AmbientScope);
     }
 
     [Test]
@@ -75,23 +75,23 @@ internal sealed class EFCoreScopeTest : UmbracoIntegrationTest
     {
         bool scopeCompleted = false;
 
-        Assert.IsNull(EfCoreScopeAccessor.AmbientScope);
+        Assert.IsNull(EFCoreScopeAccessor.AmbientScope);
         try
         {
-            using (IEfCoreScope<TestUmbracoDbContext> scope = EfCoreScopeProvider.CreateScope())
+            using (IEFCoreScope<TestUmbracoDbContext> scope = EFCoreScopeProvider.CreateScope())
             {
                 // scopeProvider.Context.Enlist("test", completed => scopeCompleted = completed);
                 await scope.ExecuteWithContextAsync(database =>
                 {
                     scope.ScopeContext!.Enlist("test", completed => scopeCompleted = completed);
                     Assert.IsInstanceOf<EFCoreScope<TestUmbracoDbContext>>(scope);
-                    Assert.IsNotNull(EfCoreScopeAccessor.AmbientScope);
-                    Assert.AreSame(scope, EfCoreScopeAccessor.AmbientScope);
-                    using (IEfCoreScope<TestUmbracoDbContext> nested = EfCoreScopeProvider.CreateScope())
+                    Assert.IsNotNull(EFCoreScopeAccessor.AmbientScope);
+                    Assert.AreSame(scope, EFCoreScopeAccessor.AmbientScope);
+                    using (IEFCoreScope<TestUmbracoDbContext> nested = EFCoreScopeProvider.CreateScope())
                     {
                         Assert.IsInstanceOf<EFCoreScope<TestUmbracoDbContext>>(nested);
-                        Assert.IsNotNull(EfCoreScopeAccessor.AmbientScope);
-                        Assert.AreSame(nested, EfCoreScopeAccessor.AmbientScope);
+                        Assert.IsNotNull(EFCoreScopeAccessor.AmbientScope);
+                        Assert.AreSame(nested, EFCoreScopeAccessor.AmbientScope);
                         Assert.AreSame(scope, ((EFCoreScope<TestUmbracoDbContext>)nested).ParentScope);
                         nested.Complete();
                         throw new Exception("bang!");
@@ -113,14 +113,14 @@ internal sealed class EFCoreScopeTest : UmbracoIntegrationTest
             }
         }
 
-        Assert.IsNull(EfCoreScopeAccessor.AmbientScope);
+        Assert.IsNull(EFCoreScopeAccessor.AmbientScope);
         Assert.IsFalse(scopeCompleted);
     }
 
     [Test]
     public async Task CanAccessDbContext()
     {
-        using var scope = EfCoreScopeProvider.CreateScope();
+        using var scope = EFCoreScopeProvider.CreateScope();
         await scope.ExecuteWithContextAsync<Task>(async database =>
         {
             Assert.IsTrue(await database.Database.CanConnectAsync());
@@ -132,7 +132,7 @@ internal sealed class EFCoreScopeTest : UmbracoIntegrationTest
     [Test]
     public async Task CanAccessDbContextTwice()
     {
-        using (var scope = EfCoreScopeProvider.CreateScope())
+        using (var scope = EFCoreScopeProvider.CreateScope())
         {
             await scope.ExecuteWithContextAsync<Task>(async database =>
             {
@@ -142,7 +142,7 @@ internal sealed class EFCoreScopeTest : UmbracoIntegrationTest
             scope.Complete();
         }
 
-        using (var scopeTwo = EfCoreScopeProvider.CreateScope())
+        using (var scopeTwo = EFCoreScopeProvider.CreateScope())
         {
             await scopeTwo.ExecuteWithContextAsync<Task>(async database =>
             {
@@ -157,16 +157,16 @@ internal sealed class EFCoreScopeTest : UmbracoIntegrationTest
     [Test]
     public async Task CanAccessNestedDbContext()
     {
-        using (var scope = EfCoreScopeProvider.CreateScope())
+        using (var scope = EFCoreScopeProvider.CreateScope())
         {
             await scope.ExecuteWithContextAsync<Task>(async database =>
             {
                 Assert.IsTrue(await database.Database.CanConnectAsync());
                 var parentTransaction = database.Database.CurrentTransaction;
 
-                using (var nestedSCope = EfCoreScopeProvider.CreateScope())
+                using (var nestedScope = EFCoreScopeProvider.CreateScope())
                 {
-                    await nestedSCope.ExecuteWithContextAsync<Task>(async nestedDatabase =>
+                    await nestedScope.ExecuteWithContextAsync<Task>(async nestedDatabase =>
                     {
                         Assert.IsTrue(await nestedDatabase.Database.CanConnectAsync());
                         Assert.IsNotNull(nestedDatabase.Database.CurrentTransaction); // in a transaction
@@ -182,12 +182,12 @@ internal sealed class EFCoreScopeTest : UmbracoIntegrationTest
     [Test]
     public void GivenUncompletedScopeOnChildThread_WhenTheParentCompletes_TheTransactionIsRolledBack()
     {
-        Assert.IsNull(EfCoreScopeAccessor.AmbientScope);
-        IEfCoreScope<TestUmbracoDbContext> mainScope = EfCoreScopeProvider.CreateScope();
+        Assert.IsNull(EFCoreScopeAccessor.AmbientScope);
+        IEFCoreScope<TestUmbracoDbContext> mainScope = EFCoreScopeProvider.CreateScope();
 
         var t = Task.Run(() =>
         {
-            IEfCoreScope<TestUmbracoDbContext> nested = EfCoreScopeProvider.CreateScope();
+            IEFCoreScope<TestUmbracoDbContext> nested = EFCoreScopeProvider.CreateScope();
             Thread.Sleep(2000);
             nested.Dispose();
         });
@@ -202,10 +202,10 @@ internal sealed class EFCoreScopeTest : UmbracoIntegrationTest
     [Test]
     public void GivenNonDisposedChildScope_WhenTheParentDisposes_ThenInvalidOperationExceptionThrows()
     {
-        Assert.IsNull(EfCoreScopeAccessor.AmbientScope);
-        IEfCoreScope<TestUmbracoDbContext> mainScope = EfCoreScopeProvider.CreateScope();
+        Assert.IsNull(EFCoreScopeAccessor.AmbientScope);
+        IEFCoreScope<TestUmbracoDbContext> mainScope = EFCoreScopeProvider.CreateScope();
 
-        IEfCoreScope<TestUmbracoDbContext> nested = EfCoreScopeProvider.CreateScope(); // not disposing
+        IEFCoreScope<TestUmbracoDbContext> nested = EFCoreScopeProvider.CreateScope(); // not disposing
 
         InvalidOperationException ex = Assert.Throws<InvalidOperationException>(() => mainScope.Dispose());
         Console.WriteLine(ex);
@@ -214,41 +214,41 @@ internal sealed class EFCoreScopeTest : UmbracoIntegrationTest
     [Test]
     public void GivenChildThread_WhenParentDisposedBeforeChild_ParentScopeThrows()
     {
-        Assert.IsNull(EfCoreScopeAccessor.AmbientScope);
-        IEfCoreScope<TestUmbracoDbContext> mainScope = EfCoreScopeProvider.CreateScope();
+        Assert.IsNull(EFCoreScopeAccessor.AmbientScope);
+        IEFCoreScope<TestUmbracoDbContext> mainScope = EFCoreScopeProvider.CreateScope();
 
         var t = Task.Run(() =>
         {
-            Console.WriteLine("Child Task start: " + EfCoreScopeAccessor.AmbientScope?.InstanceId);
+            Console.WriteLine("Child Task start: " + EFCoreScopeAccessor.AmbientScope?.InstanceId);
 
             // This will push the child scope to the top of the Stack
-            IEfCoreScope<TestUmbracoDbContext> nested = EfCoreScopeProvider.CreateScope();
-            Console.WriteLine("Child Task scope created: " + EfCoreScopeAccessor.AmbientScope?.InstanceId);
+            IEFCoreScope<TestUmbracoDbContext> nested = EFCoreScopeProvider.CreateScope();
+            Console.WriteLine("Child Task scope created: " + EFCoreScopeAccessor.AmbientScope?.InstanceId);
             Thread.Sleep(5000); // block for a bit to ensure the parent task is disposed first
-            Console.WriteLine("Child Task before dispose: " + EfCoreScopeAccessor.AmbientScope?.InstanceId);
+            Console.WriteLine("Child Task before dispose: " + EFCoreScopeAccessor.AmbientScope?.InstanceId);
             nested.Dispose();
-            Console.WriteLine("Child Task after dispose: " + EfCoreScopeAccessor.AmbientScope?.InstanceId);
+            Console.WriteLine("Child Task after dispose: " + EFCoreScopeAccessor.AmbientScope?.InstanceId);
         });
 
         // provide some time for the child thread to start so the ambient context is copied in AsyncLocal
         Thread.Sleep(2000);
 
         // now dispose the main without waiting for the child thread to join
-        Console.WriteLine("Parent Task disposing: " + EfCoreScopeAccessor.AmbientScope?.InstanceId);
+        Console.WriteLine("Parent Task disposing: " + EFCoreScopeAccessor.AmbientScope?.InstanceId);
 
         // This will throw because at this stage a child scope has been created which means
         // it is the Ambient (top) scope but here we're trying to dispose the non top scope.
         Assert.Throws<InvalidOperationException>(() => mainScope.Dispose());
         t.Wait(); // wait for the child to dispose
         mainScope.Dispose(); // now it's ok
-        Console.WriteLine("Parent Task disposed: " + EfCoreScopeAccessor.AmbientScope?.InstanceId);
+        Console.WriteLine("Parent Task disposed: " + EFCoreScopeAccessor.AmbientScope?.InstanceId);
     }
 
     [Test]
     public void GivenChildThread_WhenChildDisposedBeforeParent_OK()
     {
-        Assert.IsNull(EfCoreScopeAccessor.AmbientScope);
-        IEfCoreScope<TestUmbracoDbContext> mainScope = EfCoreScopeProvider.CreateScope();
+        Assert.IsNull(EFCoreScopeAccessor.AmbientScope);
+        IEFCoreScope<TestUmbracoDbContext> mainScope = EFCoreScopeProvider.CreateScope();
 
         // Task.Run will flow the execution context unless ExecutionContext.SuppressFlow() is explicitly called.
         // This is what occurs in normal async behavior since it is expected to await (and join) the main thread,
@@ -256,18 +256,18 @@ internal sealed class EFCoreScopeTest : UmbracoIntegrationTest
         // flow to that thread.
         var t = Task.Run(() =>
         {
-            Console.WriteLine("Child Task start: " + EfCoreScopeAccessor.AmbientScope?.InstanceId);
-            IEfCoreScope<TestUmbracoDbContext> nested = EfCoreScopeProvider.CreateScope();
-            Console.WriteLine("Child Task before dispose: " + EfCoreScopeAccessor.AmbientScope?.InstanceId);
+            Console.WriteLine("Child Task start: " + EFCoreScopeAccessor.AmbientScope?.InstanceId);
+            IEFCoreScope<TestUmbracoDbContext> nested = EFCoreScopeProvider.CreateScope();
+            Console.WriteLine("Child Task before dispose: " + EFCoreScopeAccessor.AmbientScope?.InstanceId);
             nested.Dispose();
-            Console.WriteLine("Child Task after disposed: " + EfCoreScopeAccessor.AmbientScope?.InstanceId);
+            Console.WriteLine("Child Task after disposed: " + EFCoreScopeAccessor.AmbientScope?.InstanceId);
         });
 
-        Console.WriteLine("Parent Task waiting: " + EfCoreScopeAccessor.AmbientScope?.InstanceId);
+        Console.WriteLine("Parent Task waiting: " + EFCoreScopeAccessor.AmbientScope?.InstanceId);
         t.Wait();
-        Console.WriteLine("Parent Task disposing: " + EfCoreScopeAccessor.AmbientScope?.InstanceId);
+        Console.WriteLine("Parent Task disposing: " + EFCoreScopeAccessor.AmbientScope?.InstanceId);
         mainScope.Dispose();
-        Console.WriteLine("Parent Task disposed: " + EfCoreScopeAccessor.AmbientScope?.InstanceId);
+        Console.WriteLine("Parent Task disposed: " + EFCoreScopeAccessor.AmbientScope?.InstanceId);
 
         Assert.Pass();
     }
@@ -275,7 +275,7 @@ internal sealed class EFCoreScopeTest : UmbracoIntegrationTest
     [Test]
     public async Task Transaction()
     {
-        using (IEfCoreScope<TestUmbracoDbContext> scope = EfCoreScopeProvider.CreateScope())
+        using (IEFCoreScope<TestUmbracoDbContext> scope = EFCoreScopeProvider.CreateScope())
         {
             await scope.ExecuteWithContextAsync<Task>(async database =>
             {
@@ -284,7 +284,7 @@ internal sealed class EFCoreScopeTest : UmbracoIntegrationTest
             scope.Complete();
         }
 
-        using (IEfCoreScope<TestUmbracoDbContext> scope = EfCoreScopeProvider.CreateScope())
+        using (IEFCoreScope<TestUmbracoDbContext> scope = EFCoreScopeProvider.CreateScope())
         {
             await scope.ExecuteWithContextAsync<Task>(async database =>
             {
@@ -295,7 +295,7 @@ internal sealed class EFCoreScopeTest : UmbracoIntegrationTest
             });
         }
 
-        using (IEfCoreScope<TestUmbracoDbContext> scope = EfCoreScopeProvider.CreateScope())
+        using (IEFCoreScope<TestUmbracoDbContext> scope = EFCoreScopeProvider.CreateScope())
         {
             await scope.ExecuteWithContextAsync<Task>(async database =>
             {
@@ -304,7 +304,7 @@ internal sealed class EFCoreScopeTest : UmbracoIntegrationTest
             });
         }
 
-        using (IEfCoreScope<TestUmbracoDbContext> scope = EfCoreScopeProvider.CreateScope())
+        using (IEFCoreScope<TestUmbracoDbContext> scope = EFCoreScopeProvider.CreateScope())
         {
             await scope.ExecuteWithContextAsync<Task>(async database =>
             {
@@ -314,7 +314,7 @@ internal sealed class EFCoreScopeTest : UmbracoIntegrationTest
             scope.Complete();
         }
 
-        using (IEfCoreScope<TestUmbracoDbContext> scope = EfCoreScopeProvider.CreateScope())
+        using (IEFCoreScope<TestUmbracoDbContext> scope = EFCoreScopeProvider.CreateScope())
         {
             await scope.ExecuteWithContextAsync<Task>(async database =>
             {
@@ -329,7 +329,7 @@ internal sealed class EFCoreScopeTest : UmbracoIntegrationTest
     [Test]
     public async Task NestedTransactionInnerFail()
     {
-        using (IEfCoreScope<TestUmbracoDbContext> scope = EfCoreScopeProvider.CreateScope())
+        using (IEFCoreScope<TestUmbracoDbContext> scope = EFCoreScopeProvider.CreateScope())
         {
             await scope.ExecuteWithContextAsync<Task>(async database =>
             {
@@ -339,7 +339,7 @@ internal sealed class EFCoreScopeTest : UmbracoIntegrationTest
             scope.Complete();
         }
 
-        using (IEfCoreScope<TestUmbracoDbContext> scope = EfCoreScopeProvider.CreateScope())
+        using (IEFCoreScope<TestUmbracoDbContext> scope = EFCoreScopeProvider.CreateScope())
         {
             string n;
             await scope.ExecuteWithContextAsync<Task>(async database =>
@@ -348,7 +348,7 @@ internal sealed class EFCoreScopeTest : UmbracoIntegrationTest
                 n = await database.Database.ExecuteScalarAsync<string>("SELECT name FROM tmp1 WHERE id=1");
                 Assert.AreEqual("a", n);
 
-                using (IEfCoreScope<TestUmbracoDbContext> nested = EfCoreScopeProvider.CreateScope())
+                using (IEFCoreScope<TestUmbracoDbContext> nested = EFCoreScopeProvider.CreateScope())
                 {
                     await nested.ExecuteWithContextAsync<Task>(async nestedDatabase =>
                     {
@@ -366,7 +366,7 @@ internal sealed class EFCoreScopeTest : UmbracoIntegrationTest
             scope.Complete();
         }
 
-        using (IEfCoreScope<TestUmbracoDbContext> scope = EfCoreScopeProvider.CreateScope())
+        using (IEFCoreScope<TestUmbracoDbContext> scope = EFCoreScopeProvider.CreateScope())
         {
             await scope.ExecuteWithContextAsync<Task>(async database =>
             {
@@ -381,7 +381,7 @@ internal sealed class EFCoreScopeTest : UmbracoIntegrationTest
     [Test]
     public async Task NestedTransactionOuterFail()
     {
-        using (IEfCoreScope<TestUmbracoDbContext> scope = EfCoreScopeProvider.CreateScope())
+        using (IEFCoreScope<TestUmbracoDbContext> scope = EFCoreScopeProvider.CreateScope())
         {
             await scope.ExecuteWithContextAsync<Task>(async database =>
             {
@@ -391,7 +391,7 @@ internal sealed class EFCoreScopeTest : UmbracoIntegrationTest
             scope.Complete();
         }
 
-        using (IEfCoreScope<TestUmbracoDbContext> scope = EfCoreScopeProvider.CreateScope())
+        using (IEFCoreScope<TestUmbracoDbContext> scope = EFCoreScopeProvider.CreateScope())
         {
             await scope.ExecuteWithContextAsync<Task>(async database =>
             {
@@ -399,7 +399,7 @@ internal sealed class EFCoreScopeTest : UmbracoIntegrationTest
                 string n = await database.Database.ExecuteScalarAsync<string>("SELECT name FROM tmp2 WHERE id=1");
                 Assert.AreEqual("a", n);
 
-                using (IEfCoreScope<TestUmbracoDbContext> nested = EfCoreScopeProvider.CreateScope())
+                using (IEFCoreScope<TestUmbracoDbContext> nested = EFCoreScopeProvider.CreateScope())
                 {
                     await scope.ExecuteWithContextAsync<Task>(async nestedDatabase =>
                     {
@@ -417,7 +417,7 @@ internal sealed class EFCoreScopeTest : UmbracoIntegrationTest
             });
         }
 
-        using (IEfCoreScope<TestUmbracoDbContext> scope = EfCoreScopeProvider.CreateScope())
+        using (IEFCoreScope<TestUmbracoDbContext> scope = EFCoreScopeProvider.CreateScope())
         {
             await scope.ExecuteWithContextAsync<Task>(async database =>
             {
@@ -432,7 +432,7 @@ internal sealed class EFCoreScopeTest : UmbracoIntegrationTest
     [Test]
     public async Task NestedTransactionComplete()
     {
-        using (IEfCoreScope<TestUmbracoDbContext> scope = EfCoreScopeProvider.CreateScope())
+        using (IEFCoreScope<TestUmbracoDbContext> scope = EFCoreScopeProvider.CreateScope())
         {
             await scope.ExecuteWithContextAsync<Task>(async database =>
             {
@@ -441,7 +441,7 @@ internal sealed class EFCoreScopeTest : UmbracoIntegrationTest
             scope.Complete();
         }
 
-        using (IEfCoreScope<TestUmbracoDbContext> scope = EfCoreScopeProvider.CreateScope())
+        using (IEFCoreScope<TestUmbracoDbContext> scope = EFCoreScopeProvider.CreateScope())
         {
             await scope.ExecuteWithContextAsync<Task>(async database =>
             {
@@ -449,7 +449,7 @@ internal sealed class EFCoreScopeTest : UmbracoIntegrationTest
                 string n = await database.Database.ExecuteScalarAsync<string>("SELECT name FROM tmp WHERE id=1");
                 Assert.AreEqual("a", n);
 
-                using (IEfCoreScope<TestUmbracoDbContext> nested = EfCoreScopeProvider.CreateScope())
+                using (IEFCoreScope<TestUmbracoDbContext> nested = EFCoreScopeProvider.CreateScope())
                 {
                     await scope.ExecuteWithContextAsync<Task>(async nestedDatabase =>
                     {
@@ -469,7 +469,7 @@ internal sealed class EFCoreScopeTest : UmbracoIntegrationTest
             scope.Complete();
         }
 
-        using (IEfCoreScope<TestUmbracoDbContext> scope = EfCoreScopeProvider.CreateScope())
+        using (IEFCoreScope<TestUmbracoDbContext> scope = EFCoreScopeProvider.CreateScope())
         {
             await scope.ExecuteWithContextAsync<Task>(async database =>
             {
@@ -485,67 +485,67 @@ internal sealed class EFCoreScopeTest : UmbracoIntegrationTest
     public void CallContextScope1()
     {
         var taskHelper = new TaskHelper(Mock.Of<ILogger<TaskHelper>>());
-        using (IEfCoreScope<TestUmbracoDbContext> scope = EfCoreScopeProvider.CreateScope())
+        using (IEFCoreScope<TestUmbracoDbContext> scope = EFCoreScopeProvider.CreateScope())
         {
-            Assert.IsNotNull(EfCoreScopeAccessor.AmbientScope);
+            Assert.IsNotNull(EFCoreScopeAccessor.AmbientScope);
 
             // Run on another thread without a flowed context
             Task t = taskHelper.ExecuteBackgroundTask(() =>
             {
-                Assert.IsNull(EfCoreScopeAccessor.AmbientScope);
+                Assert.IsNull(EFCoreScopeAccessor.AmbientScope);
 
-                using (IEfCoreScope<TestUmbracoDbContext> newScope = EfCoreScopeProvider.CreateScope())
+                using (IEFCoreScope<TestUmbracoDbContext> newScope = EFCoreScopeProvider.CreateScope())
                 {
-                    Assert.IsNotNull(EfCoreScopeAccessor.AmbientScope);
-                    Assert.IsNull(EfCoreScopeAccessor.AmbientScope.ParentScope);
+                    Assert.IsNotNull(EFCoreScopeAccessor.AmbientScope);
+                    Assert.IsNull(EFCoreScopeAccessor.AmbientScope.ParentScope);
                 }
 
-                Assert.IsNull(EfCoreScopeAccessor.AmbientScope);
+                Assert.IsNull(EFCoreScopeAccessor.AmbientScope);
 
                 return Task.CompletedTask;
             });
 
             Task.WaitAll(t);
 
-            Assert.IsNotNull(EfCoreScopeAccessor.AmbientScope);
-            Assert.AreSame(scope, EfCoreScopeAccessor.AmbientScope);
+            Assert.IsNotNull(EFCoreScopeAccessor.AmbientScope);
+            Assert.AreSame(scope, EFCoreScopeAccessor.AmbientScope);
         }
 
-        Assert.IsNull(EfCoreScopeAccessor.AmbientScope);
+        Assert.IsNull(EFCoreScopeAccessor.AmbientScope);
     }
 
     [Test]
     public void CallContextScope2()
     {
         var taskHelper = new TaskHelper(Mock.Of<ILogger<TaskHelper>>());
-        Assert.IsNull(EfCoreScopeAccessor.AmbientScope);
+        Assert.IsNull(EFCoreScopeAccessor.AmbientScope);
 
-        using (IEfCoreScope<TestUmbracoDbContext> scope = EfCoreScopeProvider.CreateScope())
+        using (IEFCoreScope<TestUmbracoDbContext> scope = EFCoreScopeProvider.CreateScope())
         {
-            Assert.IsNotNull(EfCoreScopeAccessor.AmbientScope);
+            Assert.IsNotNull(EFCoreScopeAccessor.AmbientScope);
 
             // Run on another thread without a flowed context
             Task t = taskHelper.ExecuteBackgroundTask(() =>
             {
-                Assert.IsNull(EfCoreScopeAccessor.AmbientScope);
+                Assert.IsNull(EFCoreScopeAccessor.AmbientScope);
 
-                using (IEfCoreScope<TestUmbracoDbContext> newScope = EfCoreScopeProvider.CreateScope())
+                using (IEFCoreScope<TestUmbracoDbContext> newScope = EFCoreScopeProvider.CreateScope())
                 {
-                    Assert.IsNotNull(EfCoreScopeAccessor.AmbientScope);
-                    Assert.IsNull(EfCoreScopeAccessor.AmbientScope.ParentScope);
+                    Assert.IsNotNull(EFCoreScopeAccessor.AmbientScope);
+                    Assert.IsNull(EFCoreScopeAccessor.AmbientScope.ParentScope);
                 }
 
-                Assert.IsNull(EfCoreScopeAccessor.AmbientScope);
+                Assert.IsNull(EFCoreScopeAccessor.AmbientScope);
                 return Task.CompletedTask;
             });
 
             Task.WaitAll(t);
 
-            Assert.IsNotNull(EfCoreScopeAccessor.AmbientScope);
-            Assert.AreSame(scope, EfCoreScopeAccessor.AmbientScope);
+            Assert.IsNotNull(EFCoreScopeAccessor.AmbientScope);
+            Assert.AreSame(scope, EFCoreScopeAccessor.AmbientScope);
         }
 
-        Assert.IsNull(EfCoreScopeAccessor.AmbientScope);
+        Assert.IsNull(EFCoreScopeAccessor.AmbientScope);
     }
 
     [TestCase(true)]
@@ -553,17 +553,17 @@ internal sealed class EFCoreScopeTest : UmbracoIntegrationTest
     public void ScopeContextEnlist(bool complete)
     {
         bool? completed = null;
-        IEfCoreScope<TestUmbracoDbContext> ambientScope = null;
+        IEFCoreScope<TestUmbracoDbContext> ambientScope = null;
         IScopeContext ambientContext = null;
 
-        Assert.IsNull(EfCoreScopeAccessor.AmbientScope);
-        using (IEfCoreScope<TestUmbracoDbContext> scope = EfCoreScopeProvider.CreateScope())
+        Assert.IsNull(EFCoreScopeAccessor.AmbientScope);
+        using (IEFCoreScope<TestUmbracoDbContext> scope = EFCoreScopeProvider.CreateScope())
         {
             scope.ScopeContext.Enlist("name", c =>
             {
                 completed = c;
-                ambientScope = EfCoreScopeAccessor.AmbientScope;
-                ambientContext = EfCoreScopeProvider.AmbientScopeContext;
+                ambientScope = EFCoreScopeAccessor.AmbientScope;
+                ambientContext = EFCoreScopeProvider.AmbientScopeContext;
             });
             if (complete)
             {
@@ -571,8 +571,8 @@ internal sealed class EFCoreScopeTest : UmbracoIntegrationTest
             }
         }
 
-        Assert.IsNull(EfCoreScopeAccessor.AmbientScope);
-        Assert.IsNull(EfCoreScopeProvider.AmbientScopeContext);
+        Assert.IsNull(EFCoreScopeAccessor.AmbientScope);
+        Assert.IsNull(EFCoreScopeProvider.AmbientScopeContext);
         Assert.IsNotNull(completed);
         Assert.AreEqual(complete, completed.Value);
         Assert.IsNull(ambientScope); // the scope is gone
@@ -586,15 +586,15 @@ internal sealed class EFCoreScopeTest : UmbracoIntegrationTest
         bool? completed = null;
         bool? completed2 = null;
 
-        Assert.IsNull(EfCoreScopeAccessor.AmbientScope);
-        using (IEfCoreScope<TestUmbracoDbContext> scope = EfCoreScopeProvider.CreateScope())
+        Assert.IsNull(EFCoreScopeAccessor.AmbientScope);
+        using (IEFCoreScope<TestUmbracoDbContext> scope = EFCoreScopeProvider.CreateScope())
         {
             scope.ScopeContext.Enlist("name", c =>
             {
                 completed = c;
 
                 // at that point the scope is gone, but the context is still there
-                IScopeContext ambientContext = EfCoreScopeProvider.AmbientScopeContext;
+                IScopeContext ambientContext = EFCoreScopeProvider.AmbientScopeContext;
                 ambientContext.Enlist("another", c2 => completed2 = c2);
             });
             if (complete)
@@ -603,8 +603,8 @@ internal sealed class EFCoreScopeTest : UmbracoIntegrationTest
             }
         }
 
-        Assert.IsNull(EfCoreScopeAccessor.AmbientScope);
-        Assert.IsNull(EfCoreScopeProvider.AmbientScopeContext);
+        Assert.IsNull(EFCoreScopeAccessor.AmbientScope);
+        Assert.IsNull(EFCoreScopeProvider.AmbientScopeContext);
         Assert.IsNotNull(completed);
         Assert.AreEqual(complete, completed.Value);
         Assert.AreEqual(complete, completed2.Value);
@@ -613,41 +613,41 @@ internal sealed class EFCoreScopeTest : UmbracoIntegrationTest
     [Test]
     public void DetachableScope()
     {
-        Assert.IsNull(EfCoreScopeAccessor.AmbientScope);
-        using (IEfCoreScope<TestUmbracoDbContext> scope = EfCoreScopeProvider.CreateScope())
+        Assert.IsNull(EFCoreScopeAccessor.AmbientScope);
+        using (IEFCoreScope<TestUmbracoDbContext> scope = EFCoreScopeProvider.CreateScope())
         {
             Assert.IsInstanceOf<EFCoreScope<TestUmbracoDbContext>>(scope);
-            Assert.IsNotNull(EfCoreScopeAccessor.AmbientScope);
-            Assert.AreSame(scope, EfCoreScopeAccessor.AmbientScope);
+            Assert.IsNotNull(EFCoreScopeAccessor.AmbientScope);
+            Assert.AreSame(scope, EFCoreScopeAccessor.AmbientScope);
 
-            Assert.IsNotNull(EfCoreScopeProvider.AmbientScopeContext); // the ambient context
+            Assert.IsNotNull(EFCoreScopeProvider.AmbientScopeContext); // the ambient context
             Assert.IsNotNull(scope.ScopeContext); // the ambient context too (getter only)
             IScopeContext context = scope.ScopeContext;
 
-            IEfCoreScope<TestUmbracoDbContext> detached = EfCoreScopeProvider.CreateDetachedScope();
-            EfCoreScopeProvider.AttachScope(detached);
+            IEFCoreScope<TestUmbracoDbContext> detached = EFCoreScopeProvider.CreateDetachedScope();
+            EFCoreScopeProvider.AttachScope(detached);
 
-            Assert.AreEqual(detached, EfCoreScopeAccessor.AmbientScope);
-            Assert.AreNotSame(context, EfCoreScopeProvider.AmbientScopeContext);
+            Assert.AreEqual(detached, EFCoreScopeAccessor.AmbientScope);
+            Assert.AreNotSame(context, EFCoreScopeProvider.AmbientScopeContext);
 
             // nesting under detached!
-            using (IEfCoreScope<TestUmbracoDbContext> nested = EfCoreScopeProvider.CreateScope())
+            using (IEFCoreScope<TestUmbracoDbContext> nested = EFCoreScopeProvider.CreateScope())
             {
                 Assert.Throws<InvalidOperationException>(() =>
 
                     // cannot detach a non-detachable scope
-                    EfCoreScopeProvider.DetachScope());
+                    EFCoreScopeProvider.DetachScope());
                 nested.Complete();
             }
 
-            Assert.AreEqual(detached, EfCoreScopeAccessor.AmbientScope);
-            Assert.AreNotSame(context, EfCoreScopeProvider.AmbientScopeContext);
+            Assert.AreEqual(detached, EFCoreScopeAccessor.AmbientScope);
+            Assert.AreNotSame(context, EFCoreScopeProvider.AmbientScopeContext);
 
             // can detach
-            Assert.AreSame(detached, EfCoreScopeProvider.DetachScope());
+            Assert.AreSame(detached, EFCoreScopeProvider.DetachScope());
 
-            Assert.AreSame(scope, EfCoreScopeAccessor.AmbientScope);
-            Assert.AreSame(context, EfCoreScopeProvider.AmbientScopeContext);
+            Assert.AreSame(scope, EFCoreScopeAccessor.AmbientScope);
+            Assert.AreSame(context, EFCoreScopeProvider.AmbientScopeContext);
 
             Assert.Throws<InvalidOperationException>(() =>
 
@@ -655,16 +655,16 @@ internal sealed class EFCoreScopeTest : UmbracoIntegrationTest
                 // in fact, only the ambient scope can be disposed
                 detached.Dispose());
 
-            EfCoreScopeProvider.AttachScope(detached);
+            EFCoreScopeProvider.AttachScope(detached);
             detached.Complete();
             detached.Dispose();
 
             // has self-detached, and is gone!
-            Assert.AreSame(scope, EfCoreScopeAccessor.AmbientScope);
-            Assert.AreSame(context, EfCoreScopeProvider.AmbientScopeContext);
+            Assert.AreSame(scope, EFCoreScopeAccessor.AmbientScope);
+            Assert.AreSame(context, EFCoreScopeProvider.AmbientScopeContext);
         }
 
-        Assert.IsNull(EfCoreScopeAccessor.AmbientScope);
-        Assert.IsNull(EfCoreScopeProvider.AmbientScopeContext);
+        Assert.IsNull(EFCoreScopeAccessor.AmbientScope);
+        Assert.IsNull(EFCoreScopeProvider.AmbientScopeContext);
     }
 }
