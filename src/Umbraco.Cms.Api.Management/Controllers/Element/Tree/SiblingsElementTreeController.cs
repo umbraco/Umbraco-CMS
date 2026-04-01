@@ -41,6 +41,7 @@ public class SiblingsElementTreeController : ElementTreeControllerBase
     /// <param name="before">The number of sibling items to retrieve before the target.</param>
     /// <param name="after">The number of sibling items to retrieve after the target.</param>
     /// <param name="foldersOnly">Whether to return only folder items.</param>
+    /// <param name="dataTypeId">An optional data type identifier to filter the sibling items.</param>
     /// <returns>A subset collection of sibling element tree items.</returns>
     [HttpGet("siblings")]
     [MapToApiVersion("1.0")]
@@ -52,9 +53,11 @@ public class SiblingsElementTreeController : ElementTreeControllerBase
         Guid target,
         int before,
         int after,
-        bool foldersOnly = false)
+        bool foldersOnly = false,
+        Guid? dataTypeId = null)
     {
         RenderFoldersOnly(foldersOnly);
+        IgnoreUserStartNodesForDataType(dataTypeId);
         return await GetSiblings(target, before, after);
     }
 }

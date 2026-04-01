@@ -150,7 +150,7 @@ export class UmbContentWorkspaceDataManager<
 		});
 
 		const changedProperties = current?.values.map((value) => {
-			const persistedValues = persisted?.values.find((x) => UmbVariantId.Create(value).compare(x));
+			const persistedValues = persisted?.values.find((x) => x.alias === value.alias && UmbVariantId.Create(value).compare(x));
 			return {
 				culture: value.culture,
 				segment: value.segment,
