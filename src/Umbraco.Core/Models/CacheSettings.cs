@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Core.Models;
 /// </summary>
 /// <remarks>
 ///     This class configures cache seeding behavior and cache entry durations for
-///     documents and media items. Cache seeding pre-populates the cache during
+///     documents, media and element items. Cache seeding pre-populates the cache during
 ///     application startup for improved performance.
 /// </remarks>
 [UmbracoOptions(Constants.Configuration.ConfigCache)]
@@ -33,6 +33,16 @@ public class CacheSettings
     ///     The default batch size for seeding media items.
     /// </summary>
     internal const int StaticMediaSeedBatchSize = 100;
+
+    /// <summary>
+    ///     The default number of elements to seed.
+    /// </summary>
+    internal const int StaticElementSeedCount = 100;
+
+    /// <summary>
+    ///     The default batch size for seeding element items.
+    /// </summary>
+    internal const int StaticElementSeedBatchSize = 100;
 
     /// <summary>
     /// Gets or sets a value for the collection of content type ids to always have in the cache.
@@ -65,12 +75,24 @@ public class CacheSettings
     public int MediaSeedBatchSize { get; set; } = StaticMediaSeedBatchSize;
 
     /// <summary>
+    /// Gets or sets a value for the element seed count.
+    /// </summary>
+    [DefaultValue(StaticElementSeedCount)]
+    public int ElementSeedCount { get; set; } = StaticElementSeedCount;
+
+    /// <summary>
+    /// Gets or sets a value for the element seed batch size.
+    /// </summary>
+    [DefaultValue(StaticElementSeedBatchSize)]
+    public int ElementSeedBatchSize { get; set; } = StaticElementSeedBatchSize;
+
+    /// <summary>
     ///     Gets or sets the cache entry settings for documents and media.
     /// </summary>
     public CacheEntry Entry { get; set; } = new CacheEntry();
 
     /// <summary>
-    ///     Represents cache entry settings for documents and media items.
+    ///     Represents cache entry settings for documents, media and element items.
     /// </summary>
     public class CacheEntry
     {
@@ -83,5 +105,10 @@ public class CacheSettings
         ///     Gets or sets the cache entry settings for media items.
         /// </summary>
         public CacheEntrySettings Media { get; set; } = new CacheEntrySettings();
+
+        /// <summary>
+        ///     Gets or sets the cache entry settings for element items.
+        /// </summary>
+        public CacheEntrySettings Element { get; set; } = new CacheEntrySettings();
     }
 }

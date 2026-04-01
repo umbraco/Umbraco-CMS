@@ -3,6 +3,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
@@ -85,9 +86,7 @@ internal class ElementRepository : PublishableContentRepositoryBase<IElement, El
         => ContentBaseFactory.BuildEntity(entityDto, contentType);
 
     protected override void OnUowRefreshedEntity(IElement entity)
-    {
-        // TODO ELEMENTS: implement this for elements
-    }
+        => OnUowRefreshedEntity(new ElementRefreshNotification(entity, new EventMessages()));
 
     #region Repository Base
 
