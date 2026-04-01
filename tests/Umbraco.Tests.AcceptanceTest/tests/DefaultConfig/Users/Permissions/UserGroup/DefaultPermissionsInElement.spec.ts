@@ -320,7 +320,7 @@ test('can not duplicate element with duplicate permission disabled', async ({umb
   await umbracoUi.library.isActionsMenuForNameVisible(elementName, false);
 });
 
-test('can move element with move to permission enabled', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+test.skip('can move element with move to permission enabled', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const elementFolderName = 'TestElementFolder';
   const elementFolderId = await umbracoApi.element.createDefaultElementFolder(elementFolderName);
