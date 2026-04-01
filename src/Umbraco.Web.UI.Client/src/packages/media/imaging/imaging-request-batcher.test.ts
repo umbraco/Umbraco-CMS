@@ -132,7 +132,7 @@ describe('batchImagingRequest', () => {
 		expect(calls[1]).to.deep.equal(['id-2']);
 	});
 
-	it('resolves successful items and returns undefined for failed chunk items on partial failure', async () => {
+	it('rejects failed chunk callers and resolves successful ones on partial thrown error', async () => {
 		// Generate 50 IDs to force chunking (batch size is 40)
 		const allIds = Array.from({ length: 50 }, (_, i) => `id-${i}`);
 		const urlMap: Record<string, string> = {};
@@ -143,7 +143,7 @@ describe('batchImagingRequest', () => {
 		let callIndex = 0;
 		const fetchFn: FetchFn = async (uniques) => {
 			callIndex++;
-			// First chunk succeeds, second chunk fails
+			// First chunk succeeds, second chunk throws
 			if (callIndex === 2) {
 				throw new Error('Chunk 2 failed');
 			}
@@ -163,13 +163,45 @@ describe('batchImagingRequest', () => {
 			}
 		}
 
-		// Last 10 items (failed chunk) should resolve as undefined, not hang
+		// Last 10 items (failed chunk) should be rejected, not silently undefined
 		for (let i = 40; i < 50; i++) {
+			expect(results[i].status).to.equal('rejected');
+		}
+	});
+
+	it('rejects failed chunk callers when fetchFn returns { error } instead of throwing', async () => {
+		const allIds = Array.from({ length: 50 }, (_, i) => `id-${i}`);
+		const urlMap: Record<string, string> = {};
+		for (const id of allIds) {
+			urlMap[id] = `http://example.com/${id}.jpg`;
+		}
+
+		let callIndex = 0;
+		const fetchFn: FetchFn = async (uniques) => {
+			callIndex++;
+			// First chunk succeeds, second chunk returns { error } (tryExecute style)
+			if (callIndex === 2) {
+				return { error: new Error('Chunk 2 error response') };
+			}
+			const data = uniques.map((u) => ({ unique: u, url: urlMap[u] }));
+			return { data };
+		};
+
+		const promises = allIds.map((id) => batchImagingRequest(id, model, fetchFn));
+		const results = await Promise.allSettled(promises);
+
+		// First 40 items (successful chunk) should resolve with URLs
+		for (let i = 0; i < 40; i++) {
 			const result = results[i];
 			expect(result.status).to.equal('fulfilled');
 			if (result.status === 'fulfilled') {
-				expect(result.value).to.be.undefined;
+				expect(result.value).to.equal(`http://example.com/id-${i}.jpg`);
 			}
+		}
+
+		// Last 10 items (error-response chunk) should be rejected
+		for (let i = 40; i < 50; i++) {
+			expect(results[i].status).to.equal('rejected');
 		}
 	});
 

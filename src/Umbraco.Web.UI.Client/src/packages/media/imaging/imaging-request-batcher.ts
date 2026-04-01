@@ -1,4 +1,4 @@
-import type { UmbImagingResizeModel } from './types.js';
+import { generateImagingCacheKey, type UmbImagingResizeModel } from './types.js';
 import { batchArray } from '@umbraco-cms/backoffice/utils';
 
 const BATCH_SIZE = 40;
@@ -26,14 +26,7 @@ interface PendingBatch {
 
 const pendingBatches = new Map<string, PendingBatch>();
 
-/**
- * Generates a batch key from the resize model configuration.
- * @param {UmbImagingResizeModel} model - The resize configuration
- * @returns {string} The batch key
- */
-function generateBatchKey(model?: UmbImagingResizeModel): string {
-	return model ? `${model.width}x${model.height};${model.mode};${model.format}` : 'generic';
-}
+
 
 /**
  * Flushes a pending batch, executing the API call and resolving all waiting promises.
@@ -49,21 +42,37 @@ async function flush(key: string) {
 
 		const uniqueArray = Array.from(batch.requests.keys());
 		let allItems: Array<BatchedItem> = [];
+		const failedUniques = new Set<string>();
+		let firstError: unknown;
 
 		if (uniqueArray.length > BATCH_SIZE) {
 			const chunks = batchArray(uniqueArray, BATCH_SIZE);
 			const results = await Promise.allSettled(chunks.map((chunk) => batch.fetchFn(chunk, batch.imagingModel)));
 
-			for (const result of results) {
-				if (result.status === 'fulfilled' && result.value.data) {
+			// A chunk can fail in two ways: the promise rejects (thrown error),
+			// or it resolves with { error } (tryExecute convention). Both must
+			// be treated as failures so callers get rejected rather than silently
+			// receiving undefined and caching an empty string.
+
+			for (let i = 0; i < results.length; i++) {
+				const result = results[i];
+				if (result.status === 'rejected') {
+					firstError ??= result.reason;
+					for (const unique of chunks[i]) {
+						failedUniques.add(unique);
+					}
+				} else if (result.value.error) {
+					firstError ??= result.value.error;
+					for (const unique of chunks[i]) {
+						failedUniques.add(unique);
+					}
+				} else if (result.value.data) {
 					allItems = allItems.concat(result.value.data);
 				}
 			}
 
 			// If every chunk failed, reject all callers with the first error.
-			const allFailed = results.every((r) => r.status === 'rejected');
-			if (allFailed) {
-				const firstError = (results[0] as PromiseRejectedResult).reason;
+			if (failedUniques.size === uniqueArray.length) {
 				rejectAll(batch, firstError);
 				return;
 			}
@@ -84,12 +93,17 @@ async function flush(key: string) {
 			urlMap.set(item.unique, item.url);
 		}
 
-		// Resolve each caller's promise. Items not present in the response
-		// (e.g. from a failed chunk in a partial failure) resolve as undefined.
+		// Resolve successful callers; reject those whose chunk failed.
 		for (const [unique, requests] of batch.requests) {
-			const url = urlMap.get(unique);
-			for (const request of requests) {
-				request.resolve(url);
+			if (failedUniques.has(unique)) {
+				for (const request of requests) {
+					request.reject(firstError);
+				}
+			} else {
+				const url = urlMap.get(unique);
+				for (const request of requests) {
+					request.resolve(url);
+				}
 			}
 		}
 	} catch (error) {
@@ -124,7 +138,7 @@ export function batchImagingRequest(
 	imagingModel: UmbImagingResizeModel | undefined,
 	fetchFn: FetchFn,
 ): Promise<string | undefined> {
-	const key = generateBatchKey(imagingModel);
+	const key = generateImagingCacheKey(imagingModel);
 
 	let batch = pendingBatches.get(key);
 	if (!batch) {

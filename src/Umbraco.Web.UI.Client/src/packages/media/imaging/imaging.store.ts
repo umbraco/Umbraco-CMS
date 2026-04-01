@@ -1,5 +1,5 @@
 import { UMB_IMAGING_STORE_CONTEXT } from './imaging.store.token.js';
-import type { UmbImagingResizeModel } from './types.js';
+import { generateImagingCacheKey, type UmbImagingResizeModel } from './types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
@@ -27,7 +27,7 @@ export class UmbImagingStore extends UmbContextBase implements UmbApi {
 	 * @returns {string | undefined} - The crop if it exists
 	 */
 	getCrop(unique: string, data?: UmbImagingResizeModel): string | undefined {
-		return this.#data.get(unique)?.get(this.#generateCropKey(data));
+		return this.#data.get(unique)?.get(generateImagingCacheKey(data));
 	}
 
 	/**
@@ -40,7 +40,7 @@ export class UmbImagingStore extends UmbContextBase implements UmbApi {
 		if (!this.#data.has(unique)) {
 			this.#data.set(unique, new Map());
 		}
-		this.#data.get(unique)?.set(this.#generateCropKey(data), urlInfo);
+		this.#data.get(unique)?.set(generateImagingCacheKey(data), urlInfo);
 	}
 
 	/**
@@ -64,17 +64,10 @@ export class UmbImagingStore extends UmbContextBase implements UmbApi {
 	 * @param {UmbImagingResizeModel | undefined} data - The resize configuration
 	 */
 	clearCropByConfiguration(unique: string, data?: UmbImagingResizeModel) {
-		this.#data.get(unique)?.delete(this.#generateCropKey(data));
+		this.#data.get(unique)?.delete(generateImagingCacheKey(data));
 	}
 
-	/**
-	 * Generates a unique key for the crop based on the width, height, mode and format.
-	 * @param {UmbImagingResizeModel} data - The resize configuration
-	 * @returns {string} - The crop key
-	 */
-	#generateCropKey(data?: UmbImagingResizeModel): string {
-		return data ? `${data.width}x${data.height};${data.mode};${data.format}` : 'generic';
-	}
+
 }
 
 export default UmbImagingStore;
