@@ -427,7 +427,7 @@ When a PR changes Management API controllers or models, the `OpenApi.json` file 
 2. Open Swagger UI and navigate to the swagger.json link (e.g. `https://localhost:44339/umbraco/swagger/management/swagger.json`)
 3. Copy the full JSON content and paste it into `src/Umbraco.Cms.Api.Management/OpenApi.json`
 
-**Important**: Commit only the substantive changes — not IDE-applied formatting (whitespace, reordering, etc.). Extraneous formatting diffs make PRs harder to review and merge-ups more error-prone. In Visual Studio, paste then immediately Ctrl+Z to get changes without auto-formatting.
+**Important**: Commit only the substantive changes — not IDE-applied formatting (whitespace, reordering, etc.). Extraneous formatting diffs make PRs harder to review and merge-ups more error-prone.
 
 ### Backoffice npm Package
 
