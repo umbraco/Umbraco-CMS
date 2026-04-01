@@ -3,7 +3,7 @@ import {expect} from '@playwright/test';
 
 const elementFolderName = 'TestElementFolder';
 const elementName = 'TestElementInFolder';
-const elementTypeName = 'TestElementTypeForFolder';
+const elementTypeName = 'TestElementType';
 const dataTypeName = 'Textstring';
 let elementTypeId = '';
 
@@ -26,7 +26,7 @@ test('can create an empty element folder', {tag: '@smoke'}, async ({umbracoApi, 
   await umbracoUi.library.goToSection(ConstantHelper.sections.library);
   await umbracoUi.library.clickActionsMenuAtRoot();
   await umbracoUi.library.clickCreateActionMenuOption();
-  await umbracoUi.library.clickElementFolderButton();
+  await umbracoUi.library.chooseElementType('Folder');
   await umbracoUi.library.enterFolderName(elementFolderName);
   await umbracoUi.library.clickCreateFolderButtonAndWaitForElementFolderToBeCreated();
 
@@ -80,7 +80,7 @@ test('can create an element folder in a folder', async ({umbracoApi, umbracoUi})
   await umbracoUi.library.goToSection(ConstantHelper.sections.library);
   await umbracoUi.library.clickActionsMenuForElement(elementFolderName);
   await umbracoUi.library.clickCreateActionMenuOption();
-  await umbracoUi.library.clickElementFolderButton();
+  await umbracoUi.library.chooseElementType('Folder');
   await umbracoUi.library.enterFolderName(childFolderName);
   await umbracoUi.library.clickCreateFolderButtonAndWaitForElementFolderToBeCreated();
 
@@ -107,7 +107,7 @@ test('can create a folder in a folder in a folder', {tag: '@smoke'}, async ({umb
   await umbracoUi.library.openElementCaretButtonForName(grandParentFolderName);
   await umbracoUi.library.clickActionsMenuForElement(parentFolderName);
   await umbracoUi.library.clickCreateActionMenuOption();
-  await umbracoUi.library.clickElementFolderButton();
+  await umbracoUi.library.chooseElementType('Folder');
   await umbracoUi.library.enterFolderName(elementFolderName);
   await umbracoUi.library.clickCreateFolderButtonAndWaitForElementFolderToBeCreated();
 
@@ -134,9 +134,7 @@ test('can create and publish an element in a folder', async ({umbracoApi, umbrac
   await umbracoUi.library.goToSection(ConstantHelper.sections.library);
   await umbracoUi.library.clickActionsMenuForElement(elementFolderName);
   await umbracoUi.library.clickCreateActionMenuOption();
-  await umbracoUi.library.clickElementButton();
-  await umbracoUi.library.clickModalMenuItemWithName(elementTypeName);
-  await umbracoUi.library.clickChooseModalButton();
+  await umbracoUi.library.chooseElementType(elementTypeName);
   await umbracoUi.library.enterElementName(elementName);
   await umbracoUi.library.clickSaveAndPublishButtonAndWaitForElementToBeCreated();
 
@@ -160,9 +158,7 @@ test('can create an element in a nested folder', async ({umbracoApi, umbracoUi})
   await umbracoUi.library.openElementCaretButtonForName(parentFolderName);
   await umbracoUi.library.clickActionsMenuForElement(elementFolderName);
   await umbracoUi.library.clickCreateActionMenuOption();
-  await umbracoUi.library.clickElementButton();
-  await umbracoUi.library.clickModalMenuItemWithName(elementTypeName);
-  await umbracoUi.library.clickChooseModalButton();
+  await umbracoUi.library.chooseElementType(elementTypeName);
   await umbracoUi.library.enterElementName(elementName);
   await umbracoUi.library.clickSaveButtonAndWaitForElementToBeCreated();
 

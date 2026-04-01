@@ -36,9 +36,7 @@ test('can create element with the element picker data type', async ({umbracoApi,
   // Act
   await umbracoUi.library.clickActionsMenuAtRoot();
   await umbracoUi.library.clickCreateActionMenuOption();
-  await umbracoUi.library.clickElementButton();
-  await umbracoUi.library.clickModalMenuItemWithName(elementTypeName);
-  await umbracoUi.library.clickChooseModalButton();
+  await umbracoUi.library.chooseElementType(elementTypeName);
   await umbracoUi.library.enterElementName(elementName);
   await umbracoUi.library.clickSaveButtonAndWaitForElementToBeCreated();
 

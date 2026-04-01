@@ -69,9 +69,7 @@ test('can create element with multiple culture variants', async ({umbracoApi, um
   // Create element with English culture
   await umbracoUi.library.clickActionsMenuAtRoot();
   await umbracoUi.library.clickCreateActionMenuOption();
-  await umbracoUi.library.clickElementButton();
-  await umbracoUi.library.clickModalMenuItemWithName(variantElementTypeName);
-  await umbracoUi.library.clickChooseModalButton();
+  await umbracoUi.library.chooseElementType(variantElementTypeName);
   await umbracoUi.library.enterElementName(elementNameEnglish);
   await umbracoUi.library.enterTextstring(englishText);
   await umbracoUi.library.clickSaveButtonAndWaitForElementToBeCreated();
@@ -112,9 +110,7 @@ test('can create element with invariant and variant properties', async ({umbraco
   // Create element with English culture
   await umbracoUi.library.clickActionsMenuAtRoot();
   await umbracoUi.library.clickCreateActionMenuOption();
-  await umbracoUi.library.clickElementButton();
-  await umbracoUi.library.clickModalMenuItemWithName(mixedElementTypeName);
-  await umbracoUi.library.clickChooseModalButton();
+  await umbracoUi.library.chooseElementType(mixedElementTypeName);
   await umbracoUi.library.enterElementName(elementNameEnglish);
   await umbracoUi.library.enterPropertyValue(variantPropertyName, englishText);
   await umbracoUi.library.enterPropertyValue(invariantPropertyName, invariantText);
