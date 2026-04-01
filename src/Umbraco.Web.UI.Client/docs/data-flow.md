@@ -1,6 +1,6 @@
 # Data Flow & API Integration
 
-How data moves between the server and UI components. This covers the internal implementation pattern using base classes — the same pattern used across all entity types in the backoffice.
+How data moves between the server and UI components. This covers the internal implementation pattern using base classes — the same pattern used across all entity types in the backoffice. For how repositories are categorized, organized, and structured across features, see [Repositories](./repositories.md).
 
 ---
 
@@ -25,7 +25,7 @@ Each layer has a single responsibility:
 | **Store** | Caches entities, provides observables (see note below) |
 | **Generated Client** | Typed HTTP calls from OpenAPI spec |
 
-Each layer has domain-specific base classes depending on the type of data operation (detail CRUD, item listing, collection, tree, etc.). The example below uses the **detail** variant.
+Each layer has domain-specific base classes depending on the type of data operation (detail CRUD, item listing, collection, tree, etc.). See [Repositories](./repositories.md) for a complete guide to all repository categories and when to use each. The example below uses the **detail** variant.
 
 ### Store Direction
 
