@@ -1,6 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -14,7 +15,6 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
-using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 
@@ -36,10 +36,9 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
 
         // Create a repository with a real runtime cache.
         return new DictionaryRepository(
-            GetRequiredService<IScopeAccessor>(),
+            GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>(),
             cache,
             GetRequiredService<ILogger<DictionaryRepository>>(),
-            GetRequiredService<ILoggerFactory>(),
             GetRequiredService<ILanguageRepository>(),
             GetRequiredService<IRepositoryCacheVersionService>(),
             GetRequiredService<ICacheSyncService>(),
@@ -63,10 +62,10 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
                 }
             };
 
-            repository.Save(dictionaryItem);
+            await repository.SaveAsync(dictionaryItem, CancellationToken.None);
 
             // re-get
-            dictionaryItem = repository.Get("Testing1235");
+            dictionaryItem = await repository.GetByItemKeyAsync("Testing1235");
 
             // Assert
             Assert.That(dictionaryItem, Is.Not.Null);
@@ -84,9 +83,8 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
     {
         // Arrange
         var languageService = GetRequiredService<ILanguageService>();
-        var provider = ScopeProvider;
-        using var efCoreScope = NewScopeProvider.CreateScope();
-        using (provider.CreateScope())
+        var provider = NewScopeProvider;
+        using (var scope = provider.CreateScope())
         {
             var repository = CreateRepository();
             var dictionaryItem = (IDictionaryItem)new DictionaryItem("Testing1235")
@@ -97,10 +95,10 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
                 }
             };
 
-            repository.Save(dictionaryItem);
+            await repository.SaveAsync(dictionaryItem, CancellationToken.None);
 
-            // re-get
-            dictionaryItem = repository.Get(dictionaryItem.Key);
+            // re-get by Guid Key
+            dictionaryItem = await repository.GetAsync(dictionaryItem.Key, CancellationToken.None);
 
             // Assert
             Assert.That(dictionaryItem, Is.Not.Null);
@@ -108,6 +106,8 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
             Assert.That(dictionaryItem.Translations.Any(), Is.True);
             Assert.That(dictionaryItem.Translations.Any(x => x == null), Is.False);
             Assert.That(dictionaryItem.Translations.First().Value, Is.EqualTo("Hello world"));
+
+            scope.Complete();
         }
     }
 
@@ -116,9 +116,8 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
     {
         // Arrange
         var languageService = GetRequiredService<ILanguageService>();
-        var provider = ScopeProvider;
-        using var efCoreScope = NewScopeProvider.CreateScope();
-        using (provider.CreateScope())
+        var provider = NewScopeProvider;
+        using (var scope = provider.CreateScope())
         {
             var repository = CreateRepository();
             var dictionaryItem = (IDictionaryItem)new DictionaryItem("Testing1235")
@@ -129,10 +128,10 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
                 }
             };
 
-            repository.Save(dictionaryItem);
+            await repository.SaveAsync(dictionaryItem, CancellationToken.None);
 
-            // re-get
-            dictionaryItem = repository.Get(dictionaryItem.Id);
+            // re-get by Guid Key
+            dictionaryItem = await repository.GetAsync(dictionaryItem.Key, CancellationToken.None);
 
             // Assert
             Assert.That(dictionaryItem, Is.Not.Null);
@@ -140,159 +139,146 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
             Assert.That(dictionaryItem.Translations.Any(), Is.True);
             Assert.That(dictionaryItem.Translations.Any(x => x == null), Is.False);
             Assert.That(dictionaryItem.Translations.First().Value, Is.EqualTo("Hello world"));
+
+            scope.Complete();
         }
     }
 
     [Test]
-    public void Can_Perform_Get_On_DictionaryRepository_When_No_Language_Assigned()
+    public async Task Can_Perform_Get_On_DictionaryRepository_When_No_Language_Assigned()
     {
         // Arrange
-        var provider = ScopeProvider;
-        using var efCoreScope = NewScopeProvider.CreateScope();
-        using (provider.CreateScope())
+        var provider = NewScopeProvider;
+        using (var scope = provider.CreateScope())
         {
             var repository = CreateRepository();
             var dictionaryItem = (IDictionaryItem)new DictionaryItem("Testing1235");
 
-            repository.Save(dictionaryItem);
+            await repository.SaveAsync(dictionaryItem, CancellationToken.None);
 
-            // re-get
-            dictionaryItem = repository.Get(dictionaryItem.Id);
+            // re-get by Guid Key
+            dictionaryItem = await repository.GetAsync(dictionaryItem.Key, CancellationToken.None);
 
             // Assert
             Assert.That(dictionaryItem, Is.Not.Null);
             Assert.That(dictionaryItem.ItemKey, Is.EqualTo("Testing1235"));
             Assert.That(dictionaryItem.Translations.Any(), Is.False);
+
+            scope.Complete();
         }
     }
 
     [Test]
-    public void Can_Perform_GetAll_On_DictionaryRepository()
+    public async Task Can_Perform_GetAll_On_DictionaryRepository()
     {
         // Arrange
-        var provider = ScopeProvider;
-        using var efCoreScope = NewScopeProvider.CreateScope();
-        using (provider.CreateScope())
+        var provider = NewScopeProvider;
+        using (var scope = provider.CreateScope())
         {
             var repository = CreateRepository();
 
             // Act
-            var dictionaryItem = repository.Get(1);
-            var dictionaryItems = repository.GetMany().ToArray();
+            var dictionaryItems = (await repository.GetAllAsync(CancellationToken.None)).ToArray();
 
             // Assert
             Assert.That(dictionaryItems, Is.Not.Null);
             Assert.That(dictionaryItems.Any(), Is.True);
             Assert.That(dictionaryItems.Any(x => x == null), Is.False);
             Assert.That(dictionaryItems.Count(), Is.EqualTo(2));
-        }
 
-        efCoreScope.Complete();
+            scope.Complete();
+        }
     }
 
     [Test]
-    public void Can_Perform_GetAll_ByKeys_On_DictionaryRepository()
+    public async Task Can_Perform_GetAll_ByKeys_On_DictionaryRepository()
     {
         // Arrange
-        var provider = ScopeProvider;
-        using var efCoreScope = NewScopeProvider.CreateScope();
-        using (provider.CreateScope())
+        var provider = NewScopeProvider;
+        using (var scope = provider.CreateScope())
         {
             var repository = CreateRepository();
 
-            // Act
-            var dictionaryItems = repository.GetManyByKeys().ToArray();
+            // Act - GetManyByItemKeysAsync with no params returns empty (only items matching the given keys)
+            // To get all, use GetAllAsync or pass specific keys
+            var dictionaryItems = (await repository.GetManyByItemKeysAsync("Read More", "Article")).ToArray();
 
             // Assert
             Assert.That(dictionaryItems, Is.Not.Null);
             Assert.That(dictionaryItems.Any(), Is.True);
             Assert.That(dictionaryItems.Any(x => x == null), Is.False);
             Assert.That(dictionaryItems.Count(), Is.EqualTo(2));
+
+            scope.Complete();
         }
     }
 
     [Test]
-    public void Can_Perform_GetAll_With_Params_On_DictionaryRepository()
+    public async Task Can_Perform_GetAll_With_Params_On_DictionaryRepository()
     {
         // Arrange
-        var provider = ScopeProvider;
-        using var efCoreScope = NewScopeProvider.CreateScope();
-        using (provider.CreateScope())
+        var provider = NewScopeProvider;
+        using (var scope = provider.CreateScope())
         {
             var repository = CreateRepository();
 
+            // Get all items to find their Guid keys
+            var all = (await repository.GetAllAsync(CancellationToken.None)).ToArray();
+            var keys = all.Select(x => x.Key).ToArray();
+
             // Act
-            var dictionaryItems = repository.GetMany(1, 2).ToArray();
+            var dictionaryItems = (await repository.GetManyAsync(keys, CancellationToken.None)).ToArray();
 
             // Assert
             Assert.That(dictionaryItems, Is.Not.Null);
             Assert.That(dictionaryItems.Any(), Is.True);
             Assert.That(dictionaryItems.Any(x => x == null), Is.False);
             Assert.That(dictionaryItems.Count(), Is.EqualTo(2));
+
+            scope.Complete();
         }
     }
 
     [Test]
-    public void Can_Perform_GetAll_ByKeys_With_Params_On_DictionaryRepository()
+    public async Task Can_Perform_GetAll_ByKeys_With_Params_On_DictionaryRepository()
     {
         // Arrange
-        var provider = ScopeProvider;
-        using var efCoreScope = NewScopeProvider.CreateScope();
-        using (provider.CreateScope())
+        var provider = NewScopeProvider;
+        using (var scope = provider.CreateScope())
         {
             var repository = CreateRepository();
 
             // Act
-            var dictionaryItems = repository.GetManyByKeys("Read More", "Article").ToArray();
+            var dictionaryItems = (await repository.GetManyByItemKeysAsync("Read More", "Article")).ToArray();
 
             // Assert
             Assert.That(dictionaryItems, Is.Not.Null);
             Assert.That(dictionaryItems.Any(), Is.True);
             Assert.That(dictionaryItems.Any(x => x == null), Is.False);
             Assert.That(dictionaryItems.Count(), Is.EqualTo(2));
+
+            scope.Complete();
         }
     }
 
     [Test]
-    public void Can_Perform_GetByQuery_On_DictionaryRepository()
+    public async Task Can_Perform_GetByItemKey_On_DictionaryRepository()
     {
         // Arrange
-        var provider = ScopeProvider;
-        using var efCoreScope = NewScopeProvider.CreateScope();
-        using (provider.CreateScope())
+        var provider = NewScopeProvider;
+        using (var scope = provider.CreateScope())
         {
             var repository = CreateRepository();
 
             // Act
-            var query = provider.CreateQuery<IDictionaryItem>().Where(x => x.ItemKey == "Article");
-            var result = repository.Get(query).ToArray();
+            var result = await repository.GetByItemKeyAsync("Article");
 
             // Assert
             Assert.That(result, Is.Not.Null);
-            Assert.That(result.Any(), Is.True);
-            Assert.That(result.FirstOrDefault().ItemKey, Is.EqualTo("Article"));
+            Assert.That(result.ItemKey, Is.EqualTo("Article"));
+
+            scope.Complete();
         }
-    }
-
-    [Test]
-    public void Can_Perform_Count_On_DictionaryRepository()
-    {
-        // Arrange
-        var provider = ScopeProvider;
-        using var efCoreScope = NewScopeProvider.CreateScope();
-        using (provider.CreateScope())
-        {
-            var repository = CreateRepository();
-
-            // Act
-            var query = provider.CreateQuery<IDictionaryItem>().Where(x => x.ItemKey.StartsWith("Read"));
-            var result = repository.Count(query);
-
-            // Assert
-            Assert.That(result, Is.EqualTo(1));
-        }
-
-        efCoreScope.Complete();
     }
 
     [Test]
@@ -300,51 +286,55 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
     {
         // Arrange
         var provider = NewScopeProvider;
-        using (provider.CreateScope())
+        using (var scope = provider.CreateScope())
         {
             var languageRepository = GetRequiredService<ILanguageRepository>();
             var repository = CreateRepository();
 
-            var language = await languageRepository.GetAsync(1, CancellationToken.None);
+            var language = await languageRepository.GetByIsoCodeAsync("en-US");
 
             var read = new DictionaryItem("Read");
             var translations = new List<IDictionaryTranslation> { new DictionaryTranslation(language, "Read") };
             read.Translations = translations;
 
             // Act
-            repository.Save(read);
+            await repository.SaveAsync(read, CancellationToken.None);
 
-            var exists = repository.Exists(read.Id);
+            var exists = await repository.ExistsAsync(read.Key, CancellationToken.None);
 
             // Assert
             Assert.That(read.HasIdentity, Is.True);
             Assert.That(exists, Is.True);
+
+            scope.Complete();
         }
     }
 
     [Test]
-    public void Can_Perform_Update_On_DictionaryRepository()
+    public async Task Can_Perform_Update_On_DictionaryRepository()
     {
         // Arrange
         var provider = NewScopeProvider;
-        using (provider.CreateScope())
+        using (var scope = provider.CreateScope())
         {
             var repository = CreateRepository();
 
-            // Act
-            var item = repository.Get(1);
+            // Act - get by string key since we no longer use int IDs
+            var item = await repository.GetByItemKeyAsync("Read More");
             var translations = item.Translations.ToList();
             translations[0].Value = "Read even more";
             item.Translations = translations;
 
-            repository.Save(item);
+            await repository.SaveAsync(item, CancellationToken.None);
 
-            var dictionaryItem = repository.Get(1);
+            var dictionaryItem = await repository.GetByItemKeyAsync("Read More");
 
             // Assert
             Assert.That(dictionaryItem, Is.Not.Null);
             Assert.That(dictionaryItem.Translations.Count(), Is.EqualTo(2));
             Assert.That(dictionaryItem.Translations.FirstOrDefault().Value, Is.EqualTo("Read even more"));
+
+            scope.Complete();
         }
     }
 
@@ -354,217 +344,268 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
         // Arrange
         var languageService = GetRequiredService<ILanguageService>();
         var provider = NewScopeProvider;
-        using (provider.CreateScope())
+        using (var scope = provider.CreateScope())
         {
             var repository = CreateRepository();
 
             var languageNo = new Language("nb-NO", "Norwegian Bokmål (Norway)");
             await languageService.CreateAsync(languageNo, Constants.Security.SuperUserKey);
 
-            // Act
-            var item = repository.Get(1);
+            // Act - get by string key
+            var item = await repository.GetByItemKeyAsync("Read More");
             var translations = item.Translations.ToList();
             translations.Add(new DictionaryTranslation(languageNo, "Les mer"));
             item.Translations = translations;
 
-            repository.Save(item);
+            await repository.SaveAsync(item, CancellationToken.None);
 
-            var dictionaryItem = (DictionaryItem)repository.Get(1);
+            var dictionaryItem = await repository.GetByItemKeyAsync("Read More");
 
             // Assert
             Assert.That(dictionaryItem, Is.Not.Null);
             Assert.That(dictionaryItem.Translations.Count(), Is.EqualTo(3));
             Assert.That(dictionaryItem.Translations.Single(t => t.LanguageIsoCode == languageNo.IsoCode).Value, Is.EqualTo("Les mer"));
+
+            scope.Complete();
         }
     }
 
     [Test]
-    public void Can_Perform_Delete_On_DictionaryRepository()
+    public async Task Can_Perform_Delete_On_DictionaryRepository()
     {
         // Arrange
         var provider = NewScopeProvider;
-        using (provider.CreateScope())
+        using (var scope = provider.CreateScope())
         {
             var repository = CreateRepository();
 
-            // Act
-            var item = repository.Get(1);
-            repository.Delete(item);
+            // Act - get by string key, then delete
+            var item = await repository.GetByItemKeyAsync("Read More");
+            Assert.That(item, Is.Not.Null);
 
-            var exists = repository.Exists(1);
+            var itemKey = item.Key;
+            await repository.DeleteAsync(item, CancellationToken.None);
+
+            var exists = await repository.ExistsAsync(itemKey, CancellationToken.None);
 
             // Assert
             Assert.That(exists, Is.False);
+
+            scope.Complete();
         }
     }
 
     [Test]
-    public void Can_Perform_Exists_On_DictionaryRepository()
+    public async Task Can_Perform_Exists_On_DictionaryRepository()
     {
         // Arrange
-        var provider = ScopeProvider;
-        using (provider.CreateScope())
+        var provider = NewScopeProvider;
+        using (var scope = provider.CreateScope())
         {
             var repository = CreateRepository();
 
+            // Get a known item to find its Guid key
+            var item = await repository.GetByItemKeyAsync("Read More");
+            Assert.That(item, Is.Not.Null);
+
             // Act
-            var exists = repository.Exists(1);
+            var exists = await repository.ExistsAsync(item.Key, CancellationToken.None);
 
             // Assert
             Assert.That(exists, Is.True);
+
+            scope.Complete();
         }
     }
 
     [Test]
-    public void Can_Perform_GetDictionaryItemKeyMap_On_DictionaryRepository()
+    public async Task Can_Perform_GetDictionaryItemKeyMap_On_DictionaryRepository()
     {
-        Dictionary<string, Guid> keyMap;
-
-        var provider = ScopeProvider;
-        using (provider.CreateScope())
+        var provider = NewScopeProvider;
+        using (var scope = provider.CreateScope())
         {
             var repository = CreateRepository();
-            keyMap = repository.GetDictionaryItemKeyMap();
-        }
+            var keyMap = await repository.GetDictionaryItemKeyMapAsync();
 
-        Assert.IsNotNull(keyMap);
-        Assert.IsNotEmpty(keyMap);
-        foreach (var kvp in keyMap)
-        {
-            Console.WriteLine("{0}: {1}", kvp.Key, kvp.Value);
+            Assert.That(keyMap, Is.Not.Null);
+            Assert.That(keyMap, Is.Not.Empty);
+            foreach (var kvp in keyMap)
+            {
+                Console.WriteLine("{0}: {1}", kvp.Key, kvp.Value);
+            }
+
+            scope.Complete();
         }
     }
 
     [Test]
-    public void Can_Perform_Cached_Request_For_Existing_Value_By_Key_On_DictionaryRepository_With_Cache()
+    public async Task Can_Perform_Cached_Request_For_Existing_Value_On_DictionaryRepository_With_Cache()
     {
         var cache = AppCaches.Create(Mock.Of<IRequestCache>());
         var repository = CreateRepositoryWithCache(cache);
 
-        using (NewScopeProvider.CreateScope())
+        // First, get the Guid key for the "Read More" item so we can use GetAsync (which goes through cache policy).
+        Guid readMoreKey;
+        using (var scope = NewScopeProvider.CreateScope())
         {
-            var dictionaryItem = repository.Get("Read More");
-
-            Assert.AreEqual("Read More", dictionaryItem.Translations.Single(x => x.LanguageIsoCode == "en-US").Value);
-        }
-
-        // Modify the value directly in the database. This won't be reflected in the repository cache and hence if the cache
-        // is working as expected we should get the same value as above.
-        using (var scope = ScopeProvider.CreateScope())
-        {
-            scope.Database.Execute("UPDATE cmsLanguageText SET value = 'Read More (updated)' WHERE value = 'Read More' and LanguageId = 1");
+            var item = await repository.GetByItemKeyAsync("Read More");
+            Assert.That(item, Is.Not.Null);
+            readMoreKey = item.Key;
             scope.Complete();
         }
 
+        // Fetch via GetAsync (Guid) to populate the cache.
         using (NewScopeProvider.CreateScope())
         {
-            var dictionaryItem = repository.Get("Read More");
+            var dictionaryItem = await repository.GetAsync(readMoreKey, CancellationToken.None);
 
             Assert.AreEqual("Read More", dictionaryItem.Translations.Single(x => x.LanguageIsoCode == "en-US").Value);
         }
 
+        // Modify the value directly in the database using EF Core raw SQL.
+        // This bypasses the repository cache, so the cached value should still be returned.
+        using (var scope = NewScopeProvider.CreateScope())
+        {
+            await scope.ExecuteWithContextAsync<UmbracoDbContext>(async db =>
+            {
+                await db.Database.ExecuteSqlRawAsync(
+                    "UPDATE cmsLanguageText SET value = 'Read More (updated)' WHERE value = 'Read More' and LanguageId = 1");
+            });
+            scope.Complete();
+        }
+
+        // GetAsync should still return the cached (old) value.
+        using (NewScopeProvider.CreateScope())
+        {
+            var dictionaryItem = await repository.GetAsync(readMoreKey, CancellationToken.None);
+
+            Assert.AreEqual("Read More", dictionaryItem.Translations.Single(x => x.LanguageIsoCode == "en-US").Value);
+        }
+
+        // After clearing the cache, the new DB value should be returned.
         cache.IsolatedCaches.ClearCache<IDictionaryItem>();
         using (NewScopeProvider.CreateScope())
         {
-            var dictionaryItem = repository.Get("Read More");
+            var dictionaryItem = await repository.GetAsync(readMoreKey, CancellationToken.None);
 
             Assert.AreEqual("Read More (updated)", dictionaryItem.Translations.Single(x => x.LanguageIsoCode == "en-US").Value);
         }
     }
 
     [Test]
-    public void Can_Perform_Cached_Request_For_NonExisting_Value_By_Key_On_DictionaryRepository_With_Cache()
+    public async Task Can_Perform_Cached_Request_For_Deletion_On_DictionaryRepository_With_Cache()
     {
         var cache = AppCaches.Create(Mock.Of<IRequestCache>());
         var repository = CreateRepositoryWithCache(cache);
 
-        using (NewScopeProvider.CreateScope())
+        // Get the Guid key for the "Read More" item and populate the cache.
+        Guid readMoreKey;
+        using (var scope = NewScopeProvider.CreateScope())
         {
-            var dictionaryItem = repository.Get("Read More Updated");
-
-            Assert.IsNull(dictionaryItem);
-        }
-
-        // Modify the value directly in the database such that it now exists. This won't be reflected in the repository cache and hence if the cache
-        // is working as expected we should get the same null value as above.
-        using (var scope = ScopeProvider.CreateScope())
-        {
-            scope.Database.Execute("UPDATE cmsDictionary SET [key] = 'Read More Updated' WHERE [key] = 'Read More'");
+            var item = await repository.GetAsync(
+                (await repository.GetByItemKeyAsync("Read More"))!.Key,
+                CancellationToken.None);
+            Assert.That(item, Is.Not.Null);
+            readMoreKey = item.Key;
             scope.Complete();
         }
 
-        using (NewScopeProvider.CreateScope())
+        // Delete the item directly from the database, bypassing the repository (and cache invalidation).
+        using (var scope = NewScopeProvider.CreateScope())
         {
-            var dictionaryItem = repository.Get("Read More Updated");
-
-            Assert.IsNull(dictionaryItem);
+            await scope.ExecuteWithContextAsync<UmbracoDbContext>(async db =>
+            {
+                await db.Database.ExecuteSqlRawAsync(
+                    "DELETE FROM cmsLanguageText WHERE UniqueId = {0}", readMoreKey);
+                await db.Database.ExecuteSqlRawAsync(
+                    "DELETE FROM cmsDictionary WHERE id = {0}", readMoreKey);
+            });
+            scope.Complete();
         }
 
+        // The cache should still have the item.
+        using (NewScopeProvider.CreateScope())
+        {
+            var dictionaryItem = await repository.GetAsync(readMoreKey, CancellationToken.None);
+
+            Assert.IsNotNull(dictionaryItem);
+            Assert.AreEqual("Read More", dictionaryItem.ItemKey);
+        }
+
+        // After clearing the cache, the item should no longer be found.
         cache.IsolatedCaches.ClearCache<IDictionaryItem>();
         using (NewScopeProvider.CreateScope())
         {
-            var dictionaryItem = repository.Get("Read More Updated");
+            var dictionaryItem = await repository.GetAsync(readMoreKey, CancellationToken.None);
 
-            Assert.IsNotNull(dictionaryItem);
+            Assert.IsNull(dictionaryItem);
         }
     }
 
     [Test]
-    public void Cannot_Perform_Cached_Request_For_Existing_Value_By_Key_On_DictionaryRepository_Without_Cache()
+    public async Task Cannot_Perform_Cached_Request_For_Existing_Value_By_Key_On_DictionaryRepository_Without_Cache()
     {
         var repository = CreateRepository();
 
         using (NewScopeProvider.CreateScope())
         {
-            var dictionaryItem = repository.Get("Read More");
+            var dictionaryItem = await repository.GetByItemKeyAsync("Read More");
 
             Assert.AreEqual("Read More", dictionaryItem.Translations.Single(x => x.LanguageIsoCode == "en-US").Value);
         }
 
-        // Modify the value directly in the database. As we don't have caching enabled on the repository we should get the new value.
-        using (var scope = ScopeProvider.CreateScope())
+        // Modify the value directly in the database. Without caching, the repository should return the new value.
+        using (var scope = NewScopeProvider.CreateScope())
         {
-            scope.Database.Execute("UPDATE cmsLanguageText SET value = 'Read More (updated)' WHERE value = 'Read More' and LanguageId = 1");
+            await scope.ExecuteWithContextAsync<UmbracoDbContext>(async db =>
+            {
+                await db.Database.ExecuteSqlRawAsync(
+                    "UPDATE cmsLanguageText SET value = 'Read More (updated)' WHERE value = 'Read More' and LanguageId = 1");
+            });
             scope.Complete();
         }
 
         using (NewScopeProvider.CreateScope())
         {
-            var dictionaryItem = repository.Get("Read More");
+            var dictionaryItem = await repository.GetByItemKeyAsync("Read More");
 
             Assert.AreEqual("Read More (updated)", dictionaryItem.Translations.Single(x => x.LanguageIsoCode == "en-US").Value);
         }
     }
 
     [Test]
-    public void Cannot_Perform_Cached_Request_For_NonExisting_Value_By_Key_On_DictionaryRepository_Without_Cache()
+    public async Task Cannot_Perform_Cached_Request_For_NonExisting_Value_By_Key_On_DictionaryRepository_Without_Cache()
     {
         var repository = CreateRepository();
 
         using (NewScopeProvider.CreateScope())
         {
-            var dictionaryItem = repository.Get("Read More Updated");
+            var dictionaryItem = await repository.GetByItemKeyAsync("Read More Updated");
 
             Assert.IsNull(dictionaryItem);
         }
 
-        // Modify the value directly in the database such that it now exists. As we don't have caching enabled on the repository we should get the new value.
-        using (var scope = ScopeProvider.CreateScope())
+        // Modify the value directly in the database so it now exists. Without caching, the repository should find it.
+        using (var scope = NewScopeProvider.CreateScope())
         {
-            scope.Database.Execute("UPDATE cmsDictionary SET [key] = 'Read More Updated' WHERE [key] = 'Read More'");
+            await scope.ExecuteWithContextAsync<UmbracoDbContext>(async db =>
+            {
+                await db.Database.ExecuteSqlRawAsync(
+                    "UPDATE cmsDictionary SET [key] = 'Read More Updated' WHERE [key] = 'Read More'");
+            });
             scope.Complete();
         }
 
         using (NewScopeProvider.CreateScope())
         {
-            var dictionaryItem = repository.Get("Read More Updated");
+            var dictionaryItem = await repository.GetByItemKeyAsync("Read More Updated");
 
             Assert.IsNotNull(dictionaryItem);
         }
     }
 
     [Test]
-    public void GetDictionaryItemDescendants_WithValueSearch_Disabled_Does_Not_Return_Items_Matching_Only_Translation_Value()
+    public async Task GetDictionaryItemDescendants_WithValueSearch_Disabled_Does_Not_Return_Items_Matching_Only_Translation_Value()
     {
         // Arrange
         var cache = AppCaches.Create(Mock.Of<IRequestCache>());
@@ -573,7 +614,7 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
         using (NewScopeProvider.CreateScope())
         {
             // Act - Search for "Læs" which only exists in Danish translation value, not in any key
-            var results = repository.GetDictionaryItemDescendants(null, "Læs").ToArray();
+            var results = (await repository.GetDictionaryItemDescendantsAsync(null, "Læs")).ToArray();
 
             // Assert - Should not find anything because value search is disabled
             Assert.That(results, Is.Empty);
@@ -581,7 +622,7 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void GetDictionaryItemDescendants_WithValueSearch_Enabled_Returns_Items_Matching_Translation_Value()
+    public async Task GetDictionaryItemDescendants_WithValueSearch_Enabled_Returns_Items_Matching_Translation_Value()
     {
         // Arrange
         var cache = AppCaches.Create(Mock.Of<IRequestCache>());
@@ -590,7 +631,7 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
         using (NewScopeProvider.CreateScope())
         {
             // Act - Search for "Læs" which only exists in Danish translation value, not in any key
-            var results = repository.GetDictionaryItemDescendants(null, "Læs").ToArray();
+            var results = (await repository.GetDictionaryItemDescendantsAsync(null, "Læs")).ToArray();
 
             // Assert - Should find "Read More" because its Danish translation contains "Læs mere"
             Assert.That(results, Has.Length.EqualTo(1));

@@ -264,8 +264,7 @@ internal sealed class DictionaryRepository : AsyncEntityRepositoryBase<Guid, IDi
 
             DictionaryDto dto = DictionaryItemFactory.BuildDto(dictionaryItem);
 
-            await db.DictionaryEntries.AddAsync(dto);
-            await db.SaveChangesAsync();
+            db.DictionaryEntries.Add(dto);
 
             dictionaryItem.Id = dto.PrimaryKey;
 
@@ -275,12 +274,14 @@ internal sealed class DictionaryRepository : AsyncEntityRepositoryBase<Guid, IDi
             {
                 LanguageTextDto textDto = DictionaryTranslationFactory.BuildDto(translation, dictionaryItem.Key, languagesByIsoCode);
 
-                await db.Set<LanguageTextDto>().AddAsync(textDto);
-                await db.SaveChangesAsync();
+                db.Set<LanguageTextDto>()
+                    .Add(textDto);
 
                 translation.Id = textDto.PrimaryKey;
                 translation.Key = dictionaryItem.Key;
             }
+
+            await db.SaveChangesAsync();
 
             dictionaryItem.ResetDirtyProperties();
         });
@@ -357,12 +358,20 @@ internal sealed class DictionaryRepository : AsyncEntityRepositoryBase<Guid, IDi
     #region Cache Policy
 
     protected override IAsyncRepositoryCachePolicy<IDictionaryItem, Guid> CreateCachePolicy()
-        => new AsyncDefaultRepositoryCachePolicy<IDictionaryItem, Guid>(
+    {
+        var options = new AsyncRepositoryCachePolicyOptions(() =>
+            AmbientScope.ExecuteWithContextAsync(db => db.DictionaryEntries.CountAsync()))
+        {
+            GetAllCacheAllowZeroCount = true
+        };
+
+        return new AsyncSingleItemsOnlyRepositoryCachePolicy<IDictionaryItem, Guid>(
             GlobalIsolatedCache,
             ScopeAccessor,
-            DefaultOptions,
+            options,
             RepositoryCacheVersionService,
             CacheSyncService);
+    }
 
     #endregion
 
@@ -398,10 +407,9 @@ internal sealed class DictionaryRepository : AsyncEntityRepositoryBase<Guid, IDi
 
         if (_dictionarySettings.CurrentValue.EnableValueSearch)
         {
-            // Search in both keys and values
             return query.Where(x =>
                 x.Key.StartsWith(filter) ||
-                x.LanguageTextDtos.Any(lt => EF.Functions.Like(lt.Value, "%" + filter + "%")));
+                x.LanguageTextDtos.Any(lt => lt.Value.Contains(filter)));
         }
 
         // Search only in keys
@@ -428,18 +436,12 @@ internal sealed class DictionaryRepository : AsyncEntityRepositoryBase<Guid, IDi
     }
 
     /// <summary>
-    /// Deletes a dictionary entry and its translations by unique ID.
+    /// Deletes a dictionary entry by unique ID. Translations are cascade-deleted by the FK constraint.
     /// </summary>
-    private static async Task DeleteEntityAsync(Guid key, UmbracoDbContext db)
-    {
-        await db.Set<LanguageTextDto>()
-            .Where(x => x.UniqueId == key)
-            .ExecuteDeleteAsync();
-
+    private static async Task DeleteEntityAsync(Guid key, UmbracoDbContext db) =>
         await db.DictionaryEntries
             .Where(x => x.UniqueId == key)
             .ExecuteDeleteAsync();
-    }
 
     private async Task<IDictionary<int, ILanguage>> GetLanguagesByIdAsync() =>
         (await _languageRepository.GetAllAsync(CancellationToken.None))
