@@ -13,6 +13,7 @@ public abstract class ContentTypeCompositionBase : ContentTypeBase, IContentType
 {
     private List<IContentTypeComposition> _contentTypeComposition = new();
     private List<int> _removedContentTypeKeyTracker = new();
+    private bool _hasCompositionBeenRemoved;
 
     protected ContentTypeCompositionBase(IShortStringHelper shortStringHelper, int parentId)
         : base(shortStringHelper, parentId)
@@ -104,6 +105,24 @@ public abstract class ContentTypeCompositionBase : ContentTypeBase, IContentType
         }
     }
 
+    /// <summary>
+    ///     A boolean flag indicating if a composition has been removed from this instance.
+    /// </summary>
+    /// <remarks>
+    ///     This is currently (specifically) used in order to know that we need to refresh the content cache which
+    ///     needs to occur when a composition has been removed from a content type
+    /// </remarks>
+    [IgnoreDataMember]
+    internal bool HasCompositionTypeBeenRemoved
+    {
+        get => _hasCompositionBeenRemoved;
+        private set
+        {
+            _hasCompositionBeenRemoved = value;
+            OnPropertyChanged(nameof(HasCompositionTypeBeenRemoved));
+        }
+    }
+
     /// <inheritdoc />
     public IEnumerable<IPropertyType> GetOriginalComposedPropertyTypes() => GetRawComposedPropertyTypes();
 
@@ -178,6 +197,8 @@ public abstract class ContentTypeCompositionBase : ContentTypeBase, IContentType
             {
                 _removedContentTypeKeyTracker.AddRange(compositionIdsToRemove);
             }
+
+            HasCompositionTypeBeenRemoved = true;
 
             OnPropertyChanged(nameof(ContentTypeComposition));
 

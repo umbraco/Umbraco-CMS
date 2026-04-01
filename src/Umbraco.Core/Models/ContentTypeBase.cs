@@ -443,21 +443,21 @@ public abstract class ContentTypeBase : TreeEntityBase, IContentTypeBase
     ///     Please note that resetting the dirty properties could potentially
     ///     obstruct the saving of a new or updated entity.
     /// </remarks>
-    public override void ResetDirtyProperties()
+    public override void ResetDirtyProperties(bool rememberDirty)
     {
-        base.ResetDirtyProperties();
+        base.ResetDirtyProperties(rememberDirty);
 
         // loop through each property group to reset the property types
         var propertiesReset = new List<int>();
 
         foreach (PropertyGroup propertyGroup in PropertyGroups)
         {
-            propertyGroup.ResetDirtyProperties();
+            propertyGroup.ResetDirtyProperties(rememberDirty);
             if (propertyGroup.PropertyTypes is not null)
             {
                 foreach (IPropertyType propertyType in propertyGroup.PropertyTypes)
                 {
-                    propertyType.ResetDirtyProperties();
+                    propertyType.ResetDirtyProperties(rememberDirty);
                     propertiesReset.Add(propertyType.Id);
                 }
             }
@@ -467,7 +467,7 @@ public abstract class ContentTypeBase : TreeEntityBase, IContentTypeBase
         // but don't re-reset ones we've already done.
         foreach (IPropertyType propertyType in PropertyTypes.Where(x => propertiesReset.Contains(x.Id) == false))
         {
-            propertyType.ResetDirtyProperties();
+            propertyType.ResetDirtyProperties(rememberDirty);
         }
     }
 

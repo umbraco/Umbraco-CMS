@@ -5,12 +5,16 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Changes;
+using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
@@ -35,6 +39,10 @@ public class ContentTypeServiceTests : UmbracoIntegrationTest
     {
         builder.AddNotificationHandler<ContentMovedToRecycleBinNotification, ContentNotificationHandler>();
         builder.AddNotificationHandler<ContentTypeDeletedNotification, ContentTypeNotificationHandler>();
+
+        builder.AddNotificationHandler<ContentTypeChangedNotification, ContentTypeChangedDistributedCacheNotificationHandler>();
+        builder.AddNotificationHandler<ContentTypeCacheRefresherNotification, ContentTypeCacheRefreshedNotificationHandler>();
+        builder.Services.AddUnique<IServerMessenger, ContentEventsTests.LocalServerMessenger>();
     }
 
     [Test]
@@ -2026,6 +2034,298 @@ public class ContentTypeServiceTests : UmbracoIntegrationTest
         Assert.That(ctBase.PropertyTypes.First().PropertyEditorAlias, Is.EqualTo(dtdYesNo.EditorAlias));
     }
 
+    [Test]
+    public void Adding_ContentType_Composition_Yields_RefreshOther()
+    {
+        var cts = ContentTypeService;
+
+        // Arrange
+        IContentType component = CreateComponent();
+        cts.Save(component);
+        IContentType site = CreateSite();
+        cts.Save(site);
+
+        // re-fetch before acting
+        site = cts.Get(site.Id)!;
+
+        // Act
+        ContentTypeCacheRefresher.JsonPayload[] refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
+        Assert.IsTrue(site.AddContentType(component));
+        Assert.IsTrue(site.ContentTypeCompositionExists(component.Alias));
+        cts.Save(site);
+
+        // Assert; expect RefreshOther when adding a compostion
+        AssertContentTypeRefreshPayload(refreshedPayloads, site.Id, ContentTypeChangeTypes.RefreshOther);
+    }
+
+    [Test]
+    public void Adding_PropertyType_Yields_RefreshOther()
+    {
+        var cts = ContentTypeService;
+
+        // Arrange
+        IContentType site = CreateSite();
+        cts.Save(site);
+
+        // re-fetch before acting
+        site = cts.Get(site.Id)!;
+
+        // Act
+        ContentTypeCacheRefresher.JsonPayload[] refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
+        var propertyType =
+            new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext,
+                "title")
+            {
+                Name = "Title",
+                Description = string.Empty,
+                Mandatory = false,
+                SortOrder = 1,
+                DataTypeId = -88
+            };
+        Assert.IsTrue(site.AddPropertyType(propertyType));
+        cts.Save(site);
+
+        // Assert; expect RefreshOther when adding a property
+        AssertContentTypeRefreshPayload(refreshedPayloads, site.Id, ContentTypeChangeTypes.RefreshOther);
+    }
+
+    [Test]
+    public void Removing_ContentType_Composition_Yields_RefreshMain()
+    {
+        var cts = ContentTypeService;
+
+        // Arrange
+        IContentType component = CreateComponent();
+        cts.Save(component);
+        IContentType site = CreateSite();
+        Assert.IsTrue(site.AddContentType(component));
+        cts.Save(site);
+
+        // re-fetch before acting
+        site = cts.Get(site.Id)!;
+        Assert.IsTrue(site.ContentTypeCompositionExists(component.Alias));
+
+        // Act
+        ContentTypeCacheRefresher.JsonPayload[] refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
+        Assert.IsTrue(site.RemoveContentType(component.Alias));
+        cts.Save(site);
+
+        // Assert; expect RefreshMain when removing a composition
+        AssertContentTypeRefreshPayload(refreshedPayloads, site.Id, ContentTypeChangeTypes.RefreshMain);
+    }
+
+    [Test]
+    public void Removing_PropertyType_Yields_RefreshMain()
+    {
+        var cts = ContentTypeService;
+
+        // Arrange
+        IContentType site = CreateSite();
+        cts.Save(site);
+
+        // re-fetch before acting
+        site = cts.Get(site.Id)!;
+
+        // Act
+        ContentTypeCacheRefresher.JsonPayload[] refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
+        site.RemovePropertyType(site.PropertyTypes.First().Alias);
+        cts.Save(site);
+
+        // Assert; expect RefreshMain when removing a property
+        AssertContentTypeRefreshPayload(refreshedPayloads, site.Id, ContentTypeChangeTypes.RefreshMain);
+    }
+
+    [Test]
+    public void Removing_PropertyTypeGroup_Yields_RefreshOther()
+    {
+        var cts = ContentTypeService;
+
+        // Arrange
+        IContentType site = CreateSite();
+        cts.Save(site);
+
+        // re-fetch before acting
+        site = cts.Get(site.Id)!;
+
+        // Act
+        ContentTypeCacheRefresher.JsonPayload[] refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
+        site.RemovePropertyGroup(site.PropertyTypes.First().Alias);
+        cts.Save(site);
+
+        // Assert; removing a group does not cause the contained properties to be removed, so expect RefreshOther
+        AssertContentTypeRefreshPayload(refreshedPayloads, site.Id, ContentTypeChangeTypes.RefreshOther);
+    }
+
+    [Test]
+    public void Changing_PropertyType_Alias_Yields_RefreshMain()
+    {
+        var cts = ContentTypeService;
+
+        // Arrange
+        IContentType site = CreateSite();
+        cts.Save(site);
+
+        // re-fetch before acting
+        site = cts.Get(site.Id)!;
+
+        // Act
+        ContentTypeCacheRefresher.JsonPayload[] refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
+        site.PropertyTypes.First().Alias += "_updated";
+        cts.Save(site);
+
+        // Assert; expect RefreshMain when changing the alias of a property (it corresponds to removing the property)
+        AssertContentTypeRefreshPayload(refreshedPayloads, site.Id, ContentTypeChangeTypes.RefreshMain);
+    }
+
+    [Test]
+    public void Changing_ContentType_Alias_Yields_RefreshMain()
+    {
+        var cts = ContentTypeService;
+
+        // Arrange
+        IContentType site = CreateSite();
+        cts.Save(site);
+
+        // re-fetch before acting
+        site = cts.Get(site.Id)!;
+
+        // Act
+        ContentTypeCacheRefresher.JsonPayload[] refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
+        site.Alias += "_updated";
+        cts.Save(site);
+
+        // Assert; expect RefreshMain when changing the alias of a content type
+        AssertContentTypeRefreshPayload(refreshedPayloads, site.Id, ContentTypeChangeTypes.RefreshMain);
+    }
+
+    [Test]
+    public void Changing_PropertyType_Variance_Yields_RefreshMain()
+    {
+        var cts = ContentTypeService;
+
+        // Arrange
+        IContentType site = CreateSite();
+        site.Variations = ContentVariation.Culture;
+        cts.Save(site);
+
+        // re-fetch before acting
+        site = cts.Get(site.Id)!;
+
+        // Act
+        ContentTypeCacheRefresher.JsonPayload[] refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
+        site.PropertyTypes.First().Variations = ContentVariation.Culture;
+        cts.Save(site);
+
+        // Assert; expect RefreshMain when changing the variance of a property
+        AssertContentTypeRefreshPayload(refreshedPayloads, site.Id, ContentTypeChangeTypes.RefreshMain);
+    }
+
+    [Test]
+    public void Changing_ContentType_Variance_Yields_RefreshMain()
+    {
+        var cts = ContentTypeService;
+
+        // Arrange
+        IContentType site = CreateSite();
+        cts.Save(site);
+
+        // re-fetch before acting
+        site = cts.Get(site.Id)!;
+
+        // Act
+        ContentTypeCacheRefresher.JsonPayload[] refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
+        site.Variations = ContentVariation.Culture;
+        cts.Save(site);
+
+        // Assert; expect RefreshMain when changing the variance of a content type
+        AssertContentTypeRefreshPayload(refreshedPayloads, site.Id, ContentTypeChangeTypes.RefreshMain);
+    }
+
+    [Test]
+    public void Changing_User_Interface_Settings_Yields_RefreshMain()
+    {
+        var cts = ContentTypeService;
+
+        // Arrange
+        IContentType site = CreateSite();
+        cts.Save(site);
+
+        // re-fetch before acting
+        site = cts.Get(site.Id)!;
+
+        // Act
+        ContentTypeCacheRefresher.JsonPayload[] refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
+        site.Name += "_updated";
+        site.Description += "_updated";
+        site.Icon += "_updated";
+        site.PropertyTypes.First().Name += "_updated";
+        cts.Save(site);
+
+        // Assert; expect RefreshOther when making UI changes only (names, icon, description etc.)
+        AssertContentTypeRefreshPayload(refreshedPayloads, site.Id, ContentTypeChangeTypes.RefreshOther);
+    }
+
+    [Test]
+    public void Changing_History_Cleanup_And_Basic_Structure_Settings_Yields_RefreshMain()
+    {
+        var cts = ContentTypeService;
+
+        // Arrange
+        IContentType site = CreateSite();
+        cts.Save(site);
+
+        // re-fetch before acting
+        site = cts.Get(site.Id)!;
+
+        // Act
+        ContentTypeCacheRefresher.JsonPayload[] refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
+        site.HistoryCleanup = new HistoryCleanup
+        {
+            KeepAllVersionsNewerThanDays = 12,
+            KeepLatestVersionPerDayForDays = 32,
+            PreventCleanup = false,
+        };
+        site.AllowedAsRoot = !site.AllowedAsRoot;
+        site.AllowedContentTypes = [new ContentTypeSort(site.Id, 1)];
+        cts.Save(site);
+
+        // Assert; expect RefreshOther when making UI changes only (names, icon, description etc.)
+        AssertContentTypeRefreshPayload(refreshedPayloads, site.Id, ContentTypeChangeTypes.RefreshOther);
+    }
+
     private ContentType CreateComponent()
     {
         var component = new ContentType(ShortStringHelper, -1)
@@ -2168,5 +2468,33 @@ public class ContentTypeServiceTests : UmbracoIntegrationTest
     {
         public static Action<ContentTypeDeletedNotification> Deleted { get; set; }
         public void Handle(ContentTypeDeletedNotification notification) => Deleted?.Invoke(notification);
+    }
+
+    public class ContentTypeCacheRefreshedNotificationHandler : INotificationHandler<ContentTypeCacheRefresherNotification>
+    {
+        public static Action<ContentTypeCacheRefresher.JsonPayload[]>? ContentTypeCacheRefreshed { get; set; }
+
+        public void Handle(ContentTypeCacheRefresherNotification notification)
+        {
+            if (notification.MessageType != MessageType.RefreshByPayload || notification.MessageObject is not ContentTypeCacheRefresher.JsonPayload[] payloads)
+            {
+                throw new NotSupportedException();
+            }
+
+            ContentTypeCacheRefreshed?.Invoke(payloads);
+        }
+    }
+
+    private static void AssertContentTypeRefreshPayload(ContentTypeCacheRefresher.JsonPayload[]? refreshedPayloads, int expectedContentTypeId, ContentTypeChangeTypes expectedChangeTypes)
+    {
+        Assert.IsNotNull(refreshedPayloads);
+        Assert.AreEqual(1, refreshedPayloads.Length);
+        Assert.Multiple(() =>
+        {
+            var payload = refreshedPayloads.First();
+            Assert.AreEqual(expectedContentTypeId, payload.Id);
+            Assert.AreEqual(expectedChangeTypes, payload.ChangeTypes);
+            Assert.AreEqual(nameof(IContentType), payload.ItemType);
+        });
     }
 }
