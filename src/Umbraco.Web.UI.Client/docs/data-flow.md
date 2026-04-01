@@ -241,8 +241,6 @@ export class UmbMyEntityDetailStore extends UmbDetailStoreBase<UmbMyEntityDetail
 	}
 }
 
-export default UmbMyEntityDetailStore;
-
 export const UMB_MY_ENTITY_DETAIL_STORE_CONTEXT = new UmbContextToken<UmbMyEntityDetailStore>(
 	'UmbMyEntityDetailStore',
 );
@@ -265,7 +263,7 @@ export class UmbMyEntityDetailRepository extends UmbDetailRepositoryBase<UmbMyEn
 	}
 }
 
-export default UmbMyEntityDetailRepository;
+export { UmbMyEntityDetailRepository as api };
 ```
 
 ### 5. Workspace Context
@@ -411,5 +409,5 @@ const model: UmbMyEntityDetailModel = {
 2. **Always use `tryExecute()` for API calls** — it handles errors and notifications
 3. **Data sources are the only layer that knows about external types** — they map between external system types and client-side domain models. No other layer should import or reference generated API types.
 4. **All return values use `{ data, error }` tuples** — never throw from async data operations
-5. **Export `default` from repositories, stores, and data sources** — this enables lazy-loading via `api: () => import(...)`
+5. **Export as `api` from repositories** — classes bound to a manifest use `export { ClassName as api }`, which enables lazy-loading via `api: () => import(...)`
 6. **Do not introduce new store types** — stores are being phased out. Manage state in the context layer using observable state classes directly
