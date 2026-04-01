@@ -174,7 +174,7 @@ public sealed class ContentTypeIndexingNotificationHandler : INotificationHandle
                     {
                         isPublished = _contentService.IsPathPublished(c);
 
-                        // the parent *must* be published it the entire path is published
+                        // the parent *must* be published if the entire path is published
                         publishChecked[c.ParentId] = isPublished;
                     }
 
