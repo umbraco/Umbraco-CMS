@@ -247,7 +247,7 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 					this.#peekError(
 						notification.category,
 						notification.message,
-						null,
+						undefined,
 						extractUmbNotificationColor(notification.type),
 					);
 				}
@@ -285,9 +285,9 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 
 				// Notify about non-GET 401s after successful re-auth
 				if (this.#nonGet401Requests.length > 0) {
-					const errors: Record<string, string> = {};
+					const errors: Record<string, string[]> = {};
 					this.#nonGet401Requests.forEach((req) => {
-						errors[`${req.request.method} ${req.request.url}`] = `Request failed with 401 Unauthorized.`;
+						errors[`${req.request.method} ${req.request.url}`] = ['Request failed with 401 Unauthorized.'];
 					});
 					this.#peekError(
 						'Some actions were not completed',
@@ -335,10 +335,10 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 	 * Helper to show a notification error.
 	 * @param {string} headline The headline of the error notification.
 	 * @param {string} message The message of the error notification.
-	 * @param {unknown} details Additional details to show in the notification.
+	 * @param {Record<string, string[]>} [errors] Validation errors keyed by field name.
 	 * @param {UmbNotificationColor} [color] The color of the notification.
 	 */
-	async #peekError(headline: string, message: string, details: unknown, color?: UmbNotificationColor) {
+	async #peekError(headline: string, message: string, errors?: Record<string, string[]>, color?: UmbNotificationColor) {
 		// Store the host for usage in the following async context
 		const host = this._host;
 
@@ -346,7 +346,7 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 		(await import('@umbraco-cms/backoffice/notification')).umbPeekError(host, {
 			headline,
 			message,
-			details,
+			errors,
 			color,
 		});
 	}
