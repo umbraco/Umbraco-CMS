@@ -296,6 +296,7 @@ public static partial class UmbracoBuilderExtensions
         // AspNetCore specific services
         builder.Services.AddUnique<IRequestAccessor, AspNetCoreRequestAccessor>();
         builder.AddNotificationHandler<UmbracoRequestBeginNotification, ApplicationUrlRequestBeginNotificationHandler>();
+        builder.AddNotificationHandler<UmbracoApplicationStartedNotification, ApplicationUrlConfigurationNotificationHandler>();
 
         // Password hasher
         builder.Services.AddUnique<IPasswordHasher, AspNetCorePasswordHasher>();
