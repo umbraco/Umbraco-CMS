@@ -36,7 +36,7 @@ public class TemplateTreeControllerBase : NamedEntityTreeControllerBase<NamedEnt
     /// <param name="entityService">The <see cref="IEntityService"/> used for entity operations within the template tree controller.</param>
     /// <param name="flagProviders">A collection of <see cref="FlagProviderCollection"/> used to provide additional flags or metadata for entities.</param>
     public TemplateTreeControllerBase(
-        IEntityService entityService, 
+        IEntityService entityService,
         FlagProviderCollection flagProviders)
         : base(entityService, flagProviders)
     {
