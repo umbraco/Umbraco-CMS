@@ -1,6 +1,3 @@
-// Copyright (c) Umbraco.
-// See LICENSE for more details.
-
 using System.Data.Common;
 using System.Text.RegularExpressions;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -8,9 +5,9 @@ using Umbraco.Cms.Persistence.SqlServer;
 
 namespace Umbraco.Cms.Tests.Integration.Testing;
 
-public class TestDbMeta
+public class TestDatabaseInformation
 {
-    public TestDbMeta(string name, bool isEmpty, string connectionString, string providerName, string path)
+    public TestDatabaseInformation(string name, bool isEmpty, string? connectionString, string providerName, string? path)
     {
         IsEmpty = isEmpty;
         Name = name;
@@ -20,11 +17,16 @@ public class TestDbMeta
     }
 
     public string Name { get; }
+
     public bool IsEmpty { get; }
-    public string ConnectionString { get; set; }
+
+    public string? ConnectionString { get; set; }
+
     public string Provider { get; set; }
-    public string Path { get; set; } // Null if not embedded.
-    public DbConnection Connection { get; set; } // for SQLite in memory, can move to subclass later.
+
+    public string? Path { get; set; } // Null if not embedded.
+
+    public DbConnection? Connection { get; set; } // for SQLite in memory.
 
     private static string ConstructConnectionString(string masterConnectionString, string databaseName)
     {
@@ -33,11 +35,10 @@ public class TestDbMeta
         return connectionString.Replace(";;", ";");
     }
 
-        public static TestDbMeta CreateWithMasterConnectionString(string name, bool isEmpty, string masterConnectionString) =>
-            new TestDbMeta(name, isEmpty, ConstructConnectionString(masterConnectionString, name), Persistence.SqlServer.Constants.ProviderName, null);
+    public static TestDatabaseInformation CreateWithMasterConnectionString(string name, bool isEmpty, string masterConnectionString) =>
+            new TestDatabaseInformation(name, isEmpty, ConstructConnectionString(masterConnectionString, name), Persistence.SqlServer.Constants.ProviderName, null);
 
-    // LocalDb mdf funtimes
-    public static TestDbMeta CreateWithoutConnectionString(string name, bool isEmpty) =>
+    public static TestDatabaseInformation CreateWithoutConnectionString(string name, bool isEmpty) =>
         new(name, isEmpty, null, Constants.ProviderName, null);
 
     public ConnectionStrings ToStronglyTypedConnectionString() =>

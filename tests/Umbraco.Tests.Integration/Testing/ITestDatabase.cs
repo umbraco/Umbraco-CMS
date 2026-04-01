@@ -5,9 +5,9 @@ namespace Umbraco.Cms.Tests.Integration.Testing;
 
 public interface ITestDatabase
 {
-    TestDbMeta AttachEmpty();
+    TestDatabaseInformation AttachEmpty();
 
-    TestDbMeta AttachSchema();
+    TestDatabaseInformation AttachSchema();
 
-    void Detach(TestDbMeta id);
+    void Detach(TestDatabaseInformation id);
 }

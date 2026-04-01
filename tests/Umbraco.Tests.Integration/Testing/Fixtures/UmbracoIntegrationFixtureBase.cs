@@ -27,7 +27,7 @@ public abstract class UmbracoIntegrationFixtureBase
 {
     private static readonly Lock s_dbLocker = new();
     private static ITestDatabase? s_dbInstance;
-    private static TestDbMeta s_fixtureDbMeta;
+    private static TestDatabaseInformation _sFixtureDatabaseInformation;
 
     protected static int TestCount = 1;
 
@@ -136,7 +136,7 @@ public abstract class UmbracoIntegrationFixtureBase
             serviceProvider.GetRequiredService<ILoggerFactory>(),
             serviceProvider.GetRequiredService<TestUmbracoDatabaseFactoryProvider>());
 
-        TestDbMeta meta = TestOptions.Database switch
+        TestDatabaseInformation meta = TestOptions.Database switch
         {
             UmbracoTestOptions.Database.NewSchemaPerTest => SetupPerTestDatabase(db, true),
             UmbracoTestOptions.Database.NewEmptyPerTest => SetupPerTestDatabase(db, false),
@@ -152,22 +152,22 @@ public abstract class UmbracoIntegrationFixtureBase
         serviceProvider.GetRequiredService<IEventAggregator>().Publish(new UnattendedInstallNotification());
     }
 
-    private TestDbMeta SetupPerTestDatabase(ITestDatabase db, bool withSchema)
+    private TestDatabaseInformation SetupPerTestDatabase(ITestDatabase db, bool withSchema)
     {
         var meta = withSchema ? db.AttachSchema() : db.AttachEmpty();
         AddOnTestTearDown(() => db.Detach(meta));
         return meta;
     }
 
-    private TestDbMeta SetupPerFixtureDatabase(ITestDatabase db, bool withSchema)
+    private TestDatabaseInformation SetupPerFixtureDatabase(ITestDatabase db, bool withSchema)
     {
         if (IsFirstTestInFixture)
         {
-            s_fixtureDbMeta = withSchema ? db.AttachSchema() : db.AttachEmpty();
-            AddOnFixtureTearDown(() => db.Detach(s_fixtureDbMeta));
+            _sFixtureDatabaseInformation = withSchema ? db.AttachSchema() : db.AttachEmpty();
+            AddOnFixtureTearDown(() => db.Detach(_sFixtureDatabaseInformation));
         }
 
-        return s_fixtureDbMeta;
+        return _sFixtureDatabaseInformation;
     }
 
     private ITestDatabase GetOrCreateDatabase(ILoggerFactory loggerFactory, TestUmbracoDatabaseFactoryProvider dbFactory)

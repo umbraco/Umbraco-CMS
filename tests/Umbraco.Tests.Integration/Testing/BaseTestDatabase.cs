@@ -1,12 +1,7 @@
-// Copyright (c) Umbraco.
-// See LICENSE for more details.
-
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Diagnostics;
-using System.Threading;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Infrastructure.Persistence;
 
@@ -18,19 +13,22 @@ public abstract class BaseTestDatabase
 
     protected ILoggerFactory _loggerFactory;
 
-    protected BlockingCollection<TestDbMeta> _prepareQueue;
-    protected BlockingCollection<TestDbMeta> _readyEmptyQueue;
-    protected BlockingCollection<TestDbMeta> _readySchemaQueue;
-    protected IList<TestDbMeta> _testDatabases;
+    protected BlockingCollection<TestDatabaseInformation> _prepareQueue;
+    protected BlockingCollection<TestDatabaseInformation> _readyEmptyQueue;
+    protected BlockingCollection<TestDatabaseInformation> _readySchemaQueue;
+    protected IList<TestDatabaseInformation> _testDatabases;
 
     public BaseTestDatabase() => Instance = this;
+
     public static BaseTestDatabase Instance { get; private set; }
+
     public static bool IsSqlite() => Instance is SqliteTestDatabase;
+
     public static bool IsSqlServer() => Instance is SqlServerBaseTestDatabase;
 
     protected abstract void Initialize();
 
-    public virtual TestDbMeta AttachEmpty()
+    public virtual TestDatabaseInformation AttachEmpty()
     {
         if (_prepareQueue == null)
         {
@@ -40,7 +38,7 @@ public abstract class BaseTestDatabase
         return _readyEmptyQueue.Take();
     }
 
-    public virtual TestDbMeta AttachSchema()
+    public virtual TestDatabaseInformation AttachSchema()
     {
         if (_prepareQueue == null)
         {
@@ -50,14 +48,14 @@ public abstract class BaseTestDatabase
         return _readySchemaQueue.Take();
     }
 
-    public virtual void Detach(TestDbMeta meta) => _prepareQueue.TryAdd(meta);
+    public virtual void Detach(TestDatabaseInformation meta) => _prepareQueue.TryAdd(meta);
 
     protected virtual void PrepareDatabase() =>
         Retry(10, () =>
         {
             while (_prepareQueue.IsCompleted == false)
             {
-                TestDbMeta meta;
+                TestDatabaseInformation meta;
                 try
                 {
                     meta = _prepareQueue.Take();
@@ -99,11 +97,11 @@ public abstract class BaseTestDatabase
         cmd.Parameters.Add(p);
     }
 
-    protected abstract DbConnection GetConnection(TestDbMeta meta);
+    protected abstract DbConnection GetConnection(TestDatabaseInformation meta);
 
-    protected abstract void RebuildSchema(IDbCommand command, TestDbMeta meta);
+    protected abstract void RebuildSchema(IDbCommand command, TestDatabaseInformation meta);
 
-    protected abstract void ResetTestDatabase(TestDbMeta meta);
+    protected abstract void ResetTestDatabase(TestDatabaseInformation meta);
 
     protected static void Retry(int maxIterations, Action action)
     {

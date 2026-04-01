@@ -36,19 +36,19 @@ public class SqlServerTestDatabase : SqlServerBaseTestDatabase, ITestDatabase, I
         var counter = 0;
 
         var schema = Enumerable.Range(0, _settings.SchemaDatabaseCount)
-            .Select(x => TestDbMeta.CreateWithMasterConnectionString($"{DatabaseName}-{++counter}", false, _settings.SQLServerMasterConnectionString));
+            .Select(x => TestDatabaseInformation.CreateWithMasterConnectionString($"{DatabaseName}-{++counter}", false, _settings.SQLServerMasterConnectionString));
 
         var empty = Enumerable.Range(0, _settings.EmptyDatabasesCount)
-            .Select(x => TestDbMeta.CreateWithMasterConnectionString($"{DatabaseName}-{++counter}", true, _settings.SQLServerMasterConnectionString));
+            .Select(x => TestDatabaseInformation.CreateWithMasterConnectionString($"{DatabaseName}-{++counter}", true, _settings.SQLServerMasterConnectionString));
 
         _testDatabases = schema.Concat(empty).ToList();
     }
 
     protected override void Initialize()
     {
-        _prepareQueue = new BlockingCollection<TestDbMeta>();
-        _readySchemaQueue = new BlockingCollection<TestDbMeta>();
-        _readyEmptyQueue = new BlockingCollection<TestDbMeta>();
+        _prepareQueue = new BlockingCollection<TestDatabaseInformation>();
+        _readySchemaQueue = new BlockingCollection<TestDatabaseInformation>();
+        _readyEmptyQueue = new BlockingCollection<TestDatabaseInformation>();
 
         foreach (var meta in _testDatabases)
         {
@@ -63,7 +63,7 @@ public class SqlServerTestDatabase : SqlServerBaseTestDatabase, ITestDatabase, I
         }
     }
 
-    private void CreateDatabase(TestDbMeta meta)
+    private void CreateDatabase(TestDatabaseInformation meta)
     {
         Drop(meta);
 
@@ -78,7 +78,7 @@ public class SqlServerTestDatabase : SqlServerBaseTestDatabase, ITestDatabase, I
         }
     }
 
-    private void Drop(TestDbMeta meta) => DropByName(meta.Name);
+    private void Drop(TestDatabaseInformation meta) => DropByName(meta.Name);
 
     private void DropByName(string name)
     {
@@ -113,7 +113,7 @@ public class SqlServerTestDatabase : SqlServerBaseTestDatabase, ITestDatabase, I
     public bool HasSnapshot(string snapshotKey) => _snapshotPaths.ContainsKey(snapshotKey);
 
     /// <inheritdoc />
-    public void CreateSnapshot(string snapshotKey, TestDbMeta sourceMeta)
+    public void CreateSnapshot(string snapshotKey, TestDatabaseInformation sourceMeta)
     {
         Directory.CreateDirectory(_snapshotDir);
         var backupPath = Path.Combine(_snapshotDir, $"{snapshotKey}.bak");
@@ -134,7 +134,7 @@ public class SqlServerTestDatabase : SqlServerBaseTestDatabase, ITestDatabase, I
     }
 
     /// <inheritdoc />
-    public TestDbMeta AttachFromSnapshot(string snapshotKey)
+    public TestDatabaseInformation AttachFromSnapshot(string snapshotKey)
     {
         if (!_snapshotPaths.TryGetValue(snapshotKey, out var backupPath))
         {
@@ -142,7 +142,7 @@ public class SqlServerTestDatabase : SqlServerBaseTestDatabase, ITestDatabase, I
         }
 
         var dbName = $"{DatabaseName}-Snap-{Interlocked.Increment(ref _snapshotCounter)}";
-        var meta = TestDbMeta.CreateWithMasterConnectionString(dbName, false, _settings.SQLServerMasterConnectionString);
+        var meta = TestDatabaseInformation.CreateWithMasterConnectionString(dbName, false, _settings.SQLServerMasterConnectionString);
 
         _snapshotRestoredDatabases.Add(dbName);
 

@@ -46,7 +46,7 @@ public class SqliteTestDatabase : BaseTestDatabase, ITestDatabase, ISnapshotable
         _testDatabases = schema.Concat(empty).ToList();
     }
 
-    public override void Detach(TestDbMeta meta)
+    public override void Detach(TestDatabaseInformation meta)
     {
         meta.Connection.Close();
         _prepareQueue.TryAdd(CreateSqLiteMeta(meta.IsEmpty));
@@ -54,9 +54,9 @@ public class SqliteTestDatabase : BaseTestDatabase, ITestDatabase, ISnapshotable
 
     protected override void Initialize()
     {
-        _prepareQueue = new BlockingCollection<TestDbMeta>();
-        _readySchemaQueue = new BlockingCollection<TestDbMeta>();
-        _readyEmptyQueue = new BlockingCollection<TestDbMeta>();
+        _prepareQueue = new BlockingCollection<TestDatabaseInformation>();
+        _readySchemaQueue = new BlockingCollection<TestDatabaseInformation>();
+        _readyEmptyQueue = new BlockingCollection<TestDatabaseInformation>();
 
         foreach (var meta in _testDatabases)
         {
@@ -70,16 +70,16 @@ public class SqliteTestDatabase : BaseTestDatabase, ITestDatabase, ISnapshotable
         }
     }
 
-    protected override void ResetTestDatabase(TestDbMeta meta)
+    protected override void ResetTestDatabase(TestDatabaseInformation meta)
     {
         // Database survives in memory until all connections closed.
         meta.Connection = GetConnection(meta);
         meta.Connection.Open();
     }
 
-    protected override DbConnection GetConnection(TestDbMeta meta) => new SqliteConnection(meta.ConnectionString);
+    protected override DbConnection GetConnection(TestDatabaseInformation meta) => new SqliteConnection(meta.ConnectionString);
 
-    protected override void RebuildSchema(IDbCommand command, TestDbMeta meta)
+    protected override void RebuildSchema(IDbCommand command, TestDatabaseInformation meta)
     {
         using var connection = GetConnection(meta);
         connection.Open();
@@ -110,7 +110,7 @@ public class SqliteTestDatabase : BaseTestDatabase, ITestDatabase, ISnapshotable
         database.CompleteTransaction();
     }
 
-    private void RebuildSchemaFirstTime(TestDbMeta meta)
+    private void RebuildSchemaFirstTime(TestDatabaseInformation meta)
     {
         var dbFactory = _dbFactoryProvider.Create();
         dbFactory.Configure(meta.ToStronglyTypedConnectionString());
@@ -144,7 +144,7 @@ public class SqliteTestDatabase : BaseTestDatabase, ITestDatabase, ISnapshotable
     public bool HasSnapshot(string snapshotKey) => _snapshotPaths.ContainsKey(snapshotKey);
 
     /// <inheritdoc />
-    public void CreateSnapshot(string snapshotKey, TestDbMeta sourceMeta)
+    public void CreateSnapshot(string snapshotKey, TestDatabaseInformation sourceMeta)
     {
         Directory.CreateDirectory(_snapshotDir);
         var filePath = Path.Combine(_snapshotDir, $"{snapshotKey}.db");
@@ -157,7 +157,7 @@ public class SqliteTestDatabase : BaseTestDatabase, ITestDatabase, ISnapshotable
     }
 
     /// <inheritdoc />
-    public TestDbMeta AttachFromSnapshot(string snapshotKey)
+    public TestDatabaseInformation AttachFromSnapshot(string snapshotKey)
     {
         if (!_snapshotPaths.TryGetValue(snapshotKey, out var filePath))
         {
@@ -208,7 +208,7 @@ public class SqliteTestDatabase : BaseTestDatabase, ITestDatabase, ISnapshotable
         }
     }
 
-    private TestDbMeta CreateSqLiteMeta(bool empty)
+    private TestDatabaseInformation CreateSqLiteMeta(bool empty)
     {
         var builder = new SqliteConnectionStringBuilder
         {
@@ -219,6 +219,6 @@ public class SqliteTestDatabase : BaseTestDatabase, ITestDatabase, ISnapshotable
             Cache = SqliteCacheMode.Shared
         };
 
-        return new TestDbMeta(builder.DataSource, empty, builder.ConnectionString, Constants.ProviderName, "InMemory");
+        return new TestDatabaseInformation(builder.DataSource, empty, builder.ConnectionString, Constants.ProviderName, "InMemory");
     }
 }

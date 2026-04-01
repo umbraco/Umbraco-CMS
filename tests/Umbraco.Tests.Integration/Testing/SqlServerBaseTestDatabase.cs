@@ -17,7 +17,7 @@ public abstract class SqlServerBaseTestDatabase : BaseTestDatabase
 {
     protected UmbracoDatabase.CommandInfo[] _cachedDatabaseInitCommands = new UmbracoDatabase.CommandInfo[0];
 
-    protected override void ResetTestDatabase(TestDbMeta meta)
+    protected override void ResetTestDatabase(TestDatabaseInformation meta)
     {
         using var connection = GetConnection(meta);
         connection.Open();
@@ -63,9 +63,9 @@ public abstract class SqlServerBaseTestDatabase : BaseTestDatabase
     }
 
 
-    protected override DbConnection GetConnection(TestDbMeta meta) => new SqlConnection(meta.ConnectionString);
+    protected override DbConnection GetConnection(TestDatabaseInformation meta) => new SqlConnection(meta.ConnectionString);
 
-    protected override void RebuildSchema(IDbCommand command, TestDbMeta meta)
+    protected override void RebuildSchema(IDbCommand command, TestDatabaseInformation meta)
     {
         lock (_cachedDatabaseInitCommands)
         {
@@ -90,7 +90,7 @@ public abstract class SqlServerBaseTestDatabase : BaseTestDatabase
         }
     }
 
-    private void RebuildSchemaFirstTime(TestDbMeta meta)
+    private void RebuildSchemaFirstTime(TestDatabaseInformation meta)
     {
         _databaseFactory.Configure(meta.ToStronglyTypedConnectionString());
 

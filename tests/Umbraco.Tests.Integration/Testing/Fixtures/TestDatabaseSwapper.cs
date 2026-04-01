@@ -12,7 +12,6 @@ using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Security;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Implementations;
-using Umbraco.Cms.Tests.Integration.Testing;
 
 namespace Umbraco.Cms.Tests.Integration.Testing.Fixtures;
 
@@ -25,12 +24,12 @@ namespace Umbraco.Cms.Tests.Integration.Testing.Fixtures;
 /// </summary>
 public class TestDatabaseSwapper
 {
-    private static readonly Lock s_dbLocker = new();
-    private static ITestDatabase? s_dbInstance;
-    private static readonly ConcurrentDictionary<string, SemaphoreSlim> s_seedLocks = new();
+    private static readonly ConcurrentDictionary<string, SemaphoreSlim> _seedLocks = new();
+    private static readonly Lock _dbLocker = new();
+    private static ITestDatabase? _dbInstance;
 
     private ConnectionStrings? _controlledConnectionStrings;
-    private TestDbMeta? _currentMeta;
+    private TestDatabaseInformation? _currentDatabaseInformation;
 
     /// <summary>
     ///     Performs the initial database setup during host startup.
@@ -40,7 +39,7 @@ public class TestDatabaseSwapper
     /// </summary>
     public void InitialSetup(
         IServiceProvider services,
-        Microsoft.Extensions.Configuration.IConfiguration configuration,
+        IConfiguration configuration,
         TestHelper testHelper)
     {
         var databaseFactory = services.GetRequiredService<IUmbracoDatabaseFactory>();
@@ -52,12 +51,12 @@ public class TestDatabaseSwapper
             configuration,
             testHelper);
 
-        _currentMeta = db.AttachSchema();
-        _controlledConnectionStrings = _currentMeta.ToStronglyTypedConnectionString();
+        _currentDatabaseInformation = db.AttachSchema();
+        _controlledConnectionStrings = _currentDatabaseInformation.ToStronglyTypedConnectionString();
 
         databaseFactory.Configure(_controlledConnectionStrings);
-        connectionStrings.CurrentValue.ConnectionString = _currentMeta.ConnectionString;
-        connectionStrings.CurrentValue.ProviderName = _currentMeta.Provider;
+        connectionStrings.CurrentValue.ConnectionString = _currentDatabaseInformation.ConnectionString;
+        connectionStrings.CurrentValue.ProviderName = _currentDatabaseInformation.Provider;
 
         var state = services.GetRequiredService<IRuntimeState>();
         state.DetermineRuntimeLevel();
@@ -87,24 +86,24 @@ public class TestDatabaseSwapper
             testHelper);
 
         // Detach the current database (return to pool)
-        if (_currentMeta is not null)
+        if (_currentDatabaseInformation is not null)
         {
-            db.Detach(_currentMeta);
+            db.Detach(_currentDatabaseInformation);
         }
 
         // Attach a fresh database
-        _currentMeta = db.AttachSchema();
+        _currentDatabaseInformation = db.AttachSchema();
 
         // Mutate the ConnectionStrings object that UmbracoDatabaseFactory holds a reference to.
         // New NPoco connections will pick up the new connection string automatically
         // because CreateDatabaseInstance() reads ConnectionString via the property getter each time.
-        _controlledConnectionStrings.ConnectionString = _currentMeta.ConnectionString;
-        _controlledConnectionStrings.ProviderName = _currentMeta.Provider;
+        _controlledConnectionStrings.ConnectionString = _currentDatabaseInformation.ConnectionString;
+        _controlledConnectionStrings.ProviderName = _currentDatabaseInformation.Provider;
 
         // Also update the IOptionsMonitor<ConnectionStrings> so EF Core picks up the change
         var connectionStrings = services.GetRequiredService<IOptionsMonitor<ConnectionStrings>>();
-        connectionStrings.CurrentValue.ConnectionString = _currentMeta.ConnectionString;
-        connectionStrings.CurrentValue.ProviderName = _currentMeta.Provider;
+        connectionStrings.CurrentValue.ConnectionString = _currentDatabaseInformation.ConnectionString;
+        connectionStrings.CurrentValue.ProviderName = _currentDatabaseInformation.Provider;
 
         // Re-determine runtime level with the new database
         var state = services.GetRequiredService<IRuntimeState>();
@@ -179,34 +178,46 @@ public class TestDatabaseSwapper
         }
 
         // Synchronize per seed key so only one thread seeds and snapshots
-        var seedLock = s_seedLocks.GetOrAdd(seedProfile.SeedKey, _ => new SemaphoreSlim(1, 1));
+        var seedLock = _seedLocks.GetOrAdd(seedProfile.SeedKey, _ => new SemaphoreSlim(1, 1));
         await seedLock.WaitAsync();
         try
         {
             // Detach current database
-            if (_currentMeta is not null)
+            if (_currentDatabaseInformation is not null)
             {
-                db.Detach(_currentMeta);
+                db.Detach(_currentDatabaseInformation);
+                _currentDatabaseInformation = null;
             }
 
             if (snapshotDb.HasSnapshot(seedProfile.SeedKey))
             {
                 // Restore from existing snapshot
-                _currentMeta = snapshotDb.AttachFromSnapshot(seedProfile.SeedKey);
+                _currentDatabaseInformation = snapshotDb.AttachFromSnapshot(seedProfile.SeedKey);
             }
             else
             {
                 // First caller: attach fresh schema DB, let the seed profile do all setup, then snapshot
-                _currentMeta = db.AttachSchema();
+                _currentDatabaseInformation = db.AttachSchema();
 
                 // Point the host at the new DB before the seed runs
-                MutateConnectionStrings(services, _currentMeta);
+                MutateConnectionStrings(services, _currentDatabaseInformation);
 
-                // The seed profile handles everything: install, content creation, etc.
-                await seedProfile.SeedAsync(services);
+                try
+                {
+                    // The seed profile handles everything: install, content creation, etc.
+                    await seedProfile.SeedAsync(services);
 
-                // Snapshot the seeded state
-                snapshotDb.CreateSnapshot(seedProfile.SeedKey, _currentMeta);
+                    // Snapshot the seeded state
+                    snapshotDb.CreateSnapshot(seedProfile.SeedKey, _currentDatabaseInformation);
+                }
+                catch
+                {
+                    // Seed or snapshot failed — detach the partially-seeded database
+                    // to prevent it from leaking. The next caller will retry with a fresh DB.
+                    db.Detach(_currentDatabaseInformation);
+                    _currentDatabaseInformation = null;
+                    throw;
+                }
             }
         }
         finally
@@ -215,7 +226,7 @@ public class TestDatabaseSwapper
         }
 
         // Mutate connection strings for the (possibly snapshot-restored) database
-        MutateConnectionStrings(services, _currentMeta);
+        MutateConnectionStrings(services, _currentDatabaseInformation);
 
         // Re-determine runtime level so the host knows we're in Run state
         var runtimeState = services.GetRequiredService<IRuntimeState>();
@@ -229,7 +240,7 @@ public class TestDatabaseSwapper
     ///     Mutates the stored <see cref="ConnectionStrings"/> and the
     ///     <see cref="IOptionsMonitor{ConnectionStrings}"/> so new connections use the given database.
     /// </summary>
-    private void MutateConnectionStrings(IServiceProvider services, TestDbMeta meta)
+    private void MutateConnectionStrings(IServiceProvider services, TestDatabaseInformation meta)
     {
         _controlledConnectionStrings!.ConnectionString = meta.ConnectionString;
         _controlledConnectionStrings.ProviderName = meta.Provider;
@@ -272,7 +283,7 @@ public class TestDatabaseSwapper
         Microsoft.Extensions.Configuration.IConfiguration configuration,
         TestHelper testHelper)
     {
-        if (_currentMeta is null)
+        if (_currentDatabaseInformation is null)
         {
             return;
         }
@@ -283,8 +294,8 @@ public class TestDatabaseSwapper
             configuration,
             testHelper);
 
-        db.Detach(_currentMeta);
-        _currentMeta = null;
+        db.Detach(_currentDatabaseInformation);
+        _currentDatabaseInformation = null;
     }
 
     private static ITestDatabase GetOrCreateDatabase(
@@ -293,11 +304,11 @@ public class TestDatabaseSwapper
         Microsoft.Extensions.Configuration.IConfiguration configuration,
         TestHelper testHelper)
     {
-        lock (s_dbLocker)
+        lock (_dbLocker)
         {
-            if (s_dbInstance is not null)
+            if (_dbInstance is not null)
             {
-                return s_dbInstance;
+                return _dbInstance;
             }
 
             var settings = new TestDatabaseSettings
@@ -311,8 +322,8 @@ public class TestDatabaseSwapper
             };
 
             Directory.CreateDirectory(settings.FilesPath);
-            s_dbInstance = TestDatabaseFactory.Create(settings, dbFactory, loggerFactory);
-            return s_dbInstance;
+            _dbInstance = TestDatabaseFactory.Create(settings, dbFactory, loggerFactory);
+            return _dbInstance;
         }
     }
 }

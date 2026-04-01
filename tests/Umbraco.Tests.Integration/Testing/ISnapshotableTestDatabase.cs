@@ -19,10 +19,10 @@ public interface ISnapshotableTestDatabase : ITestDatabase
     ///     Creates a named snapshot from the given database.
     ///     The database should already have schema and seed data applied.
     /// </summary>
-    void CreateSnapshot(string snapshotKey, TestDbMeta sourceMeta);
+    void CreateSnapshot(string snapshotKey, TestDatabaseInformation sourceMeta);
 
     /// <summary>
     ///     Attaches a new database restored from the named snapshot.
     /// </summary>
-    TestDbMeta AttachFromSnapshot(string snapshotKey);
+    TestDatabaseInformation AttachFromSnapshot(string snapshotKey);
 }
