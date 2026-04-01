@@ -32,11 +32,26 @@ Store the resolved target branch for use in subsequent steps. Log which resoluti
 
 ### 2. Load Review Standards
 
+#### 2a. Load coding preferences
+
 Read the coding preferences and code review scoring criteria from:
 
 - `references/coding-preferences.md` (relative to this skill file)
 
 Parse and internalize all rules, conventions, scoring categories, and severity definitions. These are your review criteria.
+
+#### 2b. Load area-specific documentation
+
+Once the changed file list is known (after step 3a), determine which areas of the codebase are touched and load the relevant documentation. Execute this sub-step between 3a and 3b. This documentation takes precedence over sibling comparison for architectural and pattern validation.
+
+**Resolution order for each changed file:**
+
+1. **Find the nearest `CLAUDE.md`** — walk up from the changed file's directory toward the repository root. The first `CLAUDE.md` found is the area guide for that file. Read it.
+2. **Read referenced docs** — if the `CLAUDE.md` references documentation files (e.g., a `docs/` directory), use the descriptions in the `CLAUDE.md` to determine which docs are relevant to the type of code being changed, and read those. If unsure, read all referenced docs — the cost of reading is low, the cost of missing a convention is high.
+3. **Follow cross-references in loaded docs** — if a loaded doc references another doc as covering a complementary or related concern, and the changed files touch that concern, read the referenced doc too. Repeat until no new relevant cross-references remain.
+4. **Check for applicable skills** — review the available skills list. If a skill exists for the type of code being changed, read the skill file to understand the expected patterns, structure, and conventions it enforces. Do NOT invoke the skill — just use it as a reference for what the correct implementation should look like.
+
+**Store all loaded documentation** for use in step 4. These docs define the authoritative patterns and conventions that the review evaluates against.
 
 ### 3. Gather Changed Files
 
@@ -104,13 +119,29 @@ Review each changed file holistically. Think like a senior developer reading a c
 
 For each changed file, reason about: What does this code do? Is it correct? What's missing — validation, error handling, notifications, cleanup, edge cases? Could this break anything for consumers?
 
-#### 4b. Search for sibling implementations
+#### 4b. Validate against documentation and patterns
 
-For each new piece of functionality in the diff, search for its closest existing sibling and compare the full implementation:
+Use a **docs-first** approach: classify the code by what it does, check it against documented conventions, and only fall back to sibling comparison when docs don't cover the pattern.
+
+**Step 1 — Determine the correct approach from documentation, then check whether the PR matches**
+
+A PR is a proposed solution, not the source of truth. This step has two parts that must happen in order — do not start part B until part A is complete.
+
+**Part A — Before validating/judging the implementation**, determine what the correct approach is for each new class or file based on what it does. Use the documentation loaded in step 2b to identify the expected base classes, patterns, and conventions. Write down the expected approach. Classify based on what the code does, not based on what neighboring files look like.
+
+**Part B — Now compare the PR's implementation** against the expected approach from Part A. If it deviates from the documented approach, flag it. If the documentation specifies reference examples, read those examples to verify the implementation matches.
+
+**Pattern match is the leading finding.** If the documentation defines a pattern that fits what the code does, the first and most important finding is whether the code follows that pattern.
+
+**Step 2 — Fall back to sibling comparison**
+
+If the documentation does not cover the specific pattern, or for cross-cutting concerns not addressed in docs, fall back to sibling comparison:
 
 1. **New method on existing class/interface**: Grep for the most similar existing method on the same class using `-A 80` to capture the full method body (e.g., `UpdateCurrentUserAsync` → grep for `UpdateAsync` in the same file with `-A 80`). Compare line by line for missing cross-cutting concerns: notifications/events, validation, scoping, authorization, error handling, audit logging.
 2. **New TS class**: Grep for siblings by base class (`extends {BaseClass}`) or by interface (`implements {Interface}`) or by name suffix (e.g., `CurrentUserController` → grep for `UserController`). Compare for missing concerns.
 3. **New CS class**: Grep for siblings by base class (`class {ClassName} : {BaseClass}`) or by interface (`class {ClassName} : {Interface}`) or by name suffix (e.g., `ManagementApiComposer` → grep for `ApiComposer`). Compare for missing concerns.
+
+**Important:** Sibling comparison validates cross-cutting concerns, but it must not override documented conventions. If a sibling deviates from documented patterns, that sibling is wrong — do not copy its deviation.
 
 Store your raw findings — they feed into step 7.
 
