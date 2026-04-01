@@ -217,51 +217,27 @@ public class NewDefaultUrlProvider : IUrlProvider
             return null;
         }
 
-        // extract domainUri and path
-        // route is /<path> or <domainRootId>/<path>
+        // A route of just "<domainRootId>" (no slash) can occur when the path is "/" and was trimmed.
+        // Normalize by appending "/" so the existing parsing logic handles it correctly.
         var pos = route.IndexOf('/', StringComparison.Ordinal);
-
         if (pos < 0)
         {
-            // No '/' in the route: treat the entire route as a potential domainRootId
-            if (!int.TryParse(route, NumberStyles.Integer, CultureInfo.InvariantCulture, out var domainRootId))
-            {
-                return null;
-            }
-
-            var domainUriForRoot = DomainUtilities.DomainForNode(
-                _domainCache,
-                _siteDomainMapper,
-                domainRootId,
-                current,
-                culture);
-
-            if (domainUriForRoot is null)
-            {
-                return null;
-            }
-
-            var rootPath = "/";
-            var defaultCultureForRoot = _languageService.GetDefaultIsoCodeAsync().GetAwaiter().GetResult();
-            if (domainUriForRoot is not null ||
-                string.IsNullOrEmpty(culture) ||
-                culture.Equals(defaultCultureForRoot, StringComparison.InvariantCultureIgnoreCase))
-            {
-                Uri url = AssembleUrl(domainUriForRoot, rootPath, current, mode);
-                return UrlInfo.FromUri(url, Alias, culture);
-            }
-            return null;
+            route += "/";
+            pos = route.Length - 1;
         }
 
         var path = pos == 0 ? route : route[pos..];
-        DomainAndUri? domainUri = pos == 0
-            ? null
-            : DomainUtilities.DomainForNode(
+
+        DomainAndUri? domainUri = null;
+        if (pos > 0 && int.TryParse(route[..pos], NumberStyles.None, CultureInfo.InvariantCulture, out var nodeId))
+        {
+            domainUri = DomainUtilities.DomainForNode(
                 _domainCache,
                 _siteDomainMapper,
-                int.Parse(route[..pos], CultureInfo.InvariantCulture),
+                nodeId,
                 current,
                 culture);
+        }
 
         var defaultCulture = _languageService.GetDefaultIsoCodeAsync().GetAwaiter().GetResult();
         if (domainUri is not null ||
