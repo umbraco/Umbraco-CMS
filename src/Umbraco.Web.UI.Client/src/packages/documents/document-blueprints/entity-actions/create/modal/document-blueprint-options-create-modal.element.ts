@@ -15,7 +15,9 @@ import {
 	UMB_DOCUMENT_TYPE_PICKER_MODAL,
 	type UmbDocumentTypeTreeItemModel,
 } from '@umbraco-cms/backoffice/document-type';
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 
+/** @deprecated Use the `Umb.EntityAction.DocumentBlueprint.Create` entity action with `entityCreateOptionAction` extensions instead. Scheduled for removal in Umbraco 19. */
 @customElement('umb-document-blueprint-options-create-modal')
 export class UmbDocumentBlueprintOptionsCreateModalElement extends UmbModalBaseElement<
 	UmbDocumentBlueprintOptionsCreateModalData,
@@ -30,6 +32,14 @@ export class UmbDocumentBlueprintOptionsCreateModalElement extends UmbModalBaseE
 
 	override async connectedCallback(): Promise<void> {
 		super.connectedCallback();
+
+		new UmbDeprecation({
+			deprecated: 'UMB_DOCUMENT_BLUEPRINT_OPTIONS_CREATE_MODAL and its associated modal element are deprecated.',
+			removeInVersion: '19.0.0',
+			solution:
+				'Use the Umb.EntityAction.DocumentBlueprint.Create entity action with entityCreateOptionAction extensions instead.',
+		}).warn();
+
 		if (!this.data?.parent) throw new Error('A parent is required to create a folder');
 
 		if (this.data.parent.unique) {

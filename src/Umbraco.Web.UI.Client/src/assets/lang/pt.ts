@@ -2003,7 +2003,7 @@ export default {
 		},
 		changePassword: 'Altere a sua palavra-passe',
 		changePhoto: 'Alterar foto',
-		configureMfa: 'Configurar MFA',
+		configureMfa: 'Configurar 2FA',
 		emailRequired: 'Obrigatório - introduza um endereço de email para este utilizador',
 		emailDescription: (usernameIsEmail: boolean) => {
 			return usernameIsEmail
@@ -2365,7 +2365,8 @@ export default {
 		openBackofficeSearch: 'Abrir pesquisa do backoffice',
 		openCloseBackofficeHelp: 'Abrir/Fechar ajuda do backoffice',
 		openCloseBackofficeProfileOptions: 'Abrir/Fechar as opções do seu perfil',
-		profileOptions: 'Opções perfil',
+		profileOptions: 'Perfil do usuário para %0% (%1%)',
+		profileOptionsDefault: 'Perfil do usuário',
 		assignDomainDescription: 'Configurar Cultura e Domínios para %0%',
 		createDescription: 'Criar novo nó em %0%',
 		protectDescription: 'Configurar restrições de acesso em %0%',

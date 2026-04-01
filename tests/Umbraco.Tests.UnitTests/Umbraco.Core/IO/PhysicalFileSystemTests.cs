@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using System.Text;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
@@ -102,5 +103,33 @@ public class PhysicalFileSystemTests : AbstractFileSystemTests
 
         // that path is invalid as it would be outside the root directory
         Assert.Throws<UnauthorizedAccessException>(() => _fileSystem.GetFullPath("../../foo.tmp"));
+    }
+
+    [Test]
+    public void CreateFileProviderCreatesDirectoryIfMissing()
+    {
+        var nonExistentPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "FileSysTests", "NonExistent");
+        if (Directory.Exists(nonExistentPath))
+        {
+            Directory.Delete(nonExistentPath, true);
+        }
+
+        var fs = new PhysicalFileSystem(
+            TestHelper.IOHelper,
+            TestHelper.GetHostingEnvironment(),
+            Mock.Of<ILogger<PhysicalFileSystem>>(),
+            nonExistentPath,
+            "/Media/");
+
+        IFileProvider fileProvider = ((IFileProviderFactory)fs).Create();
+        try
+        {
+            Assert.IsNotNull(fileProvider);
+            Assert.IsTrue(Directory.Exists(nonExistentPath));
+        }
+        finally
+        {
+            (fileProvider as IDisposable)?.Dispose();
+        }
     }
 }
