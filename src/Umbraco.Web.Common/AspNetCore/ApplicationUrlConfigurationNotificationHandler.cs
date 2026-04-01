@@ -56,8 +56,7 @@ internal sealed class ApplicationUrlConfigurationNotificationHandler
         }
 
         _logger.LogInformation(
-            "Application URL auto-detection is enabled ({DetectionMode}). "
-            + "The URL will be determined from the first HTTP request.",
+            "Application URL auto-detection is enabled ({DetectionMode}). ",
             settings.ApplicationUrlDetection);
     }
 }
