@@ -110,6 +110,18 @@ internal sealed partial class MediaTypeEditingServiceTests
         Assert.IsFalse(result.Items.First().IsSpecificMatch);
     }
 
+    [TestCase("PDF")]
+    [TestCase("Pdf")]
+    [TestCase("pdf")]
+    public async Task Extension_Matching_Is_Case_Insensitive(string fileExtension)
+    {
+        var result = await MediaTypeEditingService.GetMediaTypesForFileExtensionWithMatchInfoAsync(fileExtension, 0, 100);
+
+        Assert.IsTrue(
+            result.Items.Any(r => r.MediaType.Alias == Constants.Conventions.MediaTypes.ArticleAlias && r.IsSpecificMatch),
+            $"Article should be a specific match for extension '{fileExtension}'");
+    }
+
     [Test]
 #pragma warning disable CS0618 // Type or member is obsolete
     public async Task GetMediaTypesForFileExtension_Excludes_Fallbacks_When_Specific_Match_Exists()

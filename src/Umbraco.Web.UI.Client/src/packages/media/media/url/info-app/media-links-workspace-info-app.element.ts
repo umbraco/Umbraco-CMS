@@ -139,7 +139,7 @@ export class UmbMediaLinksWorkspaceInfoAppElement extends UmbLitElement {
 
 	#renderLinkItem(item: UmbMediaInfoViewLink) {
 		if (!item.url) return nothing;
-		const ext = item.url.split(/[#?]/)[0].split('.').pop()?.trim();
+		const ext = item.url.split(/[#?]/)[0].split('.').pop()?.trim().toLowerCase();
 		if (ext === 'svg') {
 			return html`
 				<a href="#" target="_blank" class="link-item with-href" @click=${() => this.#openSvg(item.url!)}>

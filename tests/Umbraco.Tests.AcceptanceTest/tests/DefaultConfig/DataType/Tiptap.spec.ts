@@ -229,6 +229,21 @@ test('can add a nested media folder as image upload folder', async ({umbracoApi,
   await umbracoApi.media.ensureNameNotExists(parentFolderName);
 });
 
+test('can add allowed media type', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const mediaTypeName = 'Image';
+  const mediaTypeData = await umbracoApi.mediaType.getByName(mediaTypeName);
+  await umbracoApi.dataType.createDefaultTiptapDataType(tipTapName);
+  await umbracoUi.dataType.goToDataType(tipTapName);
+
+  // Act
+  await umbracoUi.dataType.addAllowedMediaType(mediaTypeName);
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
+
+  // Assert
+  expect(await umbracoApi.dataType.doesDataTypeHaveValue(tipTapName, 'allowedMediaTypes', mediaTypeData.id)).toBeTruthy();
+});
+
 test('can enable ignore user start nodes', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.dataType.createDefaultTiptapDataType(tipTapName);
