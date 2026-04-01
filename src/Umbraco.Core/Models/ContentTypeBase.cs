@@ -133,6 +133,30 @@ public abstract class ContentTypeBase : TreeEntityBase, IContentTypeBase
     }
 
     /// <summary>
+    ///     Detects if any persisted property types have been removed by comparing old and new collections,
+    ///     and sets <see cref="HasPropertyTypeBeenRemoved"/> accordingly.
+    /// </summary>
+    private void DetectPropertyTypeRemovals(IEnumerable<IPropertyType> oldPropertyTypes, IEnumerable<IPropertyType> newPropertyTypes)
+    {
+        if (HasPropertyTypeBeenRemoved)
+        {
+            return;
+        }
+
+        var oldIds = new HashSet<int>(oldPropertyTypes.Select(pt => pt.Id).Where(id => id > 0));
+        if (oldIds.Count == 0)
+        {
+            return;
+        }
+
+        var newIds = new HashSet<int>(newPropertyTypes.Select(pt => pt.Id).Where(id => id > 0));
+        if (oldIds.Any(id => !newIds.Contains(id)))
+        {
+            HasPropertyTypeBeenRemoved = true;
+        }
+    }
+
+    /// <summary>
     ///     PropertyTypes that are not part of a PropertyGroup
     /// </summary>
     [IgnoreDataMember]
@@ -273,6 +297,7 @@ public abstract class ContentTypeBase : TreeEntityBase, IContentTypeBase
         {
             if (PropertyTypeCollection != null)
             {
+                DetectPropertyTypeRemovals(PropertyTypeCollection, value);
                 PropertyTypeCollection.ClearCollectionChangedEvents();
             }
 

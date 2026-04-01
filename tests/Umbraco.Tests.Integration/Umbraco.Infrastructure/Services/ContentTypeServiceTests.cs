@@ -2148,6 +2148,36 @@ public class ContentTypeServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
+    public void Removing_PropertyType_By_Replacing_Collection_Yields_RefreshMain()
+    {
+        // This test simulates how the backoffice mapper removes a property: rather than calling
+        // RemovePropertyType(), it rebuilds the property collection without the removed property
+        // and assigns it to the group. This is the code path in ContentTypeMapDefinition.MapSaveToTypeBase().
+        var cts = ContentTypeService;
+
+        // Arrange
+        IContentType site = CreateSite();
+        cts.Save(site);
+
+        // re-fetch before acting
+        site = cts.Get(site.Id)!;
+
+        // Act
+        ContentTypeCacheRefresher.JsonPayload[] refreshedPayloads = null;
+        ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
+            => refreshedPayloads = payloads;
+
+        // Simulate the mapper path: replace the group's PropertyTypes with an empty collection
+        // (as if the property was removed via the backoffice UI)
+        PropertyGroup group = site.PropertyGroups.First();
+        group.PropertyTypes = new PropertyTypeCollection(true);
+        cts.Save(site);
+
+        // Assert; expect RefreshMain when removing a property, regardless of how it was removed
+        AssertContentTypeRefreshPayload(refreshedPayloads, site.Id, ContentTypeChangeTypes.RefreshMain);
+    }
+
+    [Test]
     public void Removing_PropertyTypeGroup_Yields_RefreshOther()
     {
         var cts = ContentTypeService;

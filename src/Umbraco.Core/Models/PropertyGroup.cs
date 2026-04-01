@@ -20,6 +20,7 @@ public class PropertyGroup : EntityBase, IEquatable<PropertyGroup>
 
     private string _alias;
     private string? _name;
+    private bool _hasPropertyTypeBeenRemoved;
     private PropertyTypeCollection? _propertyTypes;
     private int _sortOrder;
 
@@ -95,6 +96,20 @@ public class PropertyGroup : EntityBase, IEquatable<PropertyGroup>
     }
 
     /// <summary>
+    ///     A boolean flag indicating if a property type has been removed from this group.
+    /// </summary>
+    [IgnoreDataMember]
+    internal bool HasPropertyTypeBeenRemoved
+    {
+        get => _hasPropertyTypeBeenRemoved;
+        private set
+        {
+            _hasPropertyTypeBeenRemoved = value;
+            OnPropertyChanged(nameof(HasPropertyTypeBeenRemoved));
+        }
+    }
+
+    /// <summary>
     ///     Gets or sets a collection of property types for the group.
     /// </summary>
     /// <value>
@@ -112,6 +127,7 @@ public class PropertyGroup : EntityBase, IEquatable<PropertyGroup>
         {
             if (_propertyTypes != null)
             {
+                DetectPropertyTypeRemovals(_propertyTypes, value);
                 _propertyTypes.ClearCollectionChangedEvents();
             }
 
@@ -155,4 +171,27 @@ public class PropertyGroup : EntityBase, IEquatable<PropertyGroup>
 
     private void PropertyTypesChanged(object? sender, NotifyCollectionChangedEventArgs e) =>
         OnPropertyChanged(nameof(PropertyTypes));
+
+    private void DetectPropertyTypeRemovals(PropertyTypeCollection oldPropertyTypes, PropertyTypeCollection? newPropertyTypes)
+    {
+        if (HasPropertyTypeBeenRemoved)
+        {
+            return;
+        }
+
+        var oldIds = new HashSet<int>(oldPropertyTypes.Select(pt => pt.Id).Where(id => id > 0));
+        if (oldIds.Count == 0)
+        {
+            return;
+        }
+
+        var newIds = newPropertyTypes != null
+            ? new HashSet<int>(newPropertyTypes.Select(pt => pt.Id).Where(id => id > 0))
+            : new HashSet<int>();
+
+        if (oldIds.Any(id => !newIds.Contains(id)))
+        {
+            HasPropertyTypeBeenRemoved = true;
+        }
+    }
 }
