@@ -127,7 +127,7 @@ Use a **docs-first** approach: classify the code by what it does, check it again
 
 A PR is a proposed solution, not the source of truth. This step has two parts that must happen in order — do not start part B until part A is complete.
 
-**Part A — Before looking at the implementation**, determine what the correct approach is for each new class or file based on what it does. Use the documentation loaded in step 2b to identify the expected base classes, patterns, and conventions. Write down the expected approach. Classify based on what the code does, not based on what neighboring files look like.
+**Part A — Before validating/judging the implementation**, determine what the correct approach is for each new class or file based on what it does. Use the documentation loaded in step 2b to identify the expected base classes, patterns, and conventions. Write down the expected approach. Classify based on what the code does, not based on what neighboring files look like.
 
 **Part B — Now compare the PR's implementation** against the expected approach from Part A. If it deviates from the documented approach, flag it. If the documentation specifies reference examples, read those examples to verify the implementation matches.
 
