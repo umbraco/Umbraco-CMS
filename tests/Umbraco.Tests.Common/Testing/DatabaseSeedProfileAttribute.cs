@@ -1,6 +1,3 @@
-// Copyright (c) Umbraco.
-// See LICENSE for more details.
-
 namespace Umbraco.Cms.Tests.Common.Testing;
 
 /// <summary>
@@ -11,6 +8,11 @@ namespace Umbraco.Cms.Tests.Common.Testing;
 [AttributeUsage(AttributeTargets.Class, Inherited = true)]
 public class DatabaseSeedProfileAttribute : Attribute
 {
+    /// <summary>
+    /// Creates a new instance of <see cref="DatabaseSeedProfileAttribute"/>.
+    /// </summary>
+    /// <param name="seedProfileType">The Seedprofile to use.</param>
+    /// <exception cref="ArgumentException">Thrown when the profile does not implement <see cref="ITestDatabaseSeedProfile"/>.</exception>
     public DatabaseSeedProfileAttribute(Type seedProfileType)
     {
         if (!typeof(ITestDatabaseSeedProfile).IsAssignableFrom(seedProfileType))
@@ -24,7 +26,7 @@ public class DatabaseSeedProfileAttribute : Attribute
     }
 
     /// <summary>
-    ///     The <see cref="ITestDatabaseSeedProfile"/> type to instantiate and use for seeding.
+    ///     Gets the <see cref="ITestDatabaseSeedProfile"/> type to instantiate and use for seeding.
     /// </summary>
     public Type SeedProfileType { get; }
 }

@@ -1,6 +1,3 @@
-// Copyright (c) Umbraco.
-// See LICENSE for more details.
-
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
@@ -13,26 +10,24 @@ using Umbraco.Cms.Tests.Common.Testing;
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.SeedProfiles;
 
 /// <summary>
-///     Seed profile that creates a text page content type with a template and a published document.
-///     Multiple test fixture classes can share this seed — the first one pays the cost,
-///     subsequent fixtures restore from a database snapshot.
+/// Seed profile that creates a text page content type with a template and a published document.
 /// </summary>
 public class TextPageDocumentSeed : ITestDatabaseSeedProfile
 {
     /// <summary>
     ///     Well-known key for the template created by this seed.
     /// </summary>
-    public static readonly Guid TemplateKey = new("aaaaaaaa-0001-0001-0001-000000000001");
+    public static readonly Guid TemplateKey = new("abe050d1-a094-44f1-b49b-fc0b13c53404");
 
     /// <summary>
     ///     Well-known key for the content type created by this seed.
     /// </summary>
-    public static readonly Guid ContentTypeKey = new("aaaaaaaa-0002-0002-0002-000000000002");
+    public static readonly Guid ContentTypeKey = new("a128b76b-6a34-44b3-b149-8988185f5d2e");
 
     /// <summary>
     ///     Well-known key for the published document created by this seed.
     /// </summary>
-    public static readonly Guid DocumentKey = new("aaaaaaaa-0003-0003-0003-000000000003");
+    public static readonly Guid DocumentKey = new("27fa2640-d13f-4caf-9f36-9ff1065dad51");
 
     /// <inheritdoc />
     public string SeedKey => "TextPageDocument";
@@ -50,7 +45,7 @@ public class TextPageDocumentSeed : ITestDatabaseSeedProfile
         template.Key = TemplateKey;
         await templateService.CreateAsync(template, Constants.Security.SuperUserKey);
 
-        // Create content type
+        // Create contentType
         var contentType = ContentTypeBuilder.CreateTextPageContentType(
             defaultTemplateId: template.Id,
             name: "TextPageSeedContentType",

@@ -3,25 +3,23 @@ using System.Reflection;
 using Asp.Versioning;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Tests.Integration.Testing;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Controllers;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Persistence.EFCore;
 using Umbraco.Cms.Tests.Common.Testing;
-using Umbraco.Cms.Tests.Integration.TestServerTest.Fixtures;
+using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Cms.Tests.Integration.Testing.Fixtures;
+using Umbraco.Cms.Tests.Integration.TestServerTest.Fixtures;
 using Umbraco.Cms.Tests.Integration.Umbraco.Persistence.EFCore.DbContext;
-using Umbraco.Cms.Web.Common.Controllers;
 
+// ReSharper disable once CheckNamespace
 namespace Umbraco.Cms.Tests.Integration.ManagementApi;
 
 /// <summary>
@@ -34,21 +32,24 @@ namespace Umbraco.Cms.Tests.Integration.ManagementApi;
 public class ManagementApiSetUpFixture : UmbracoTestServerFixture
 {
     /// <summary>
-    ///     The shared fixture instance, accessible by all test fixtures in this namespace.
+    ///     Gets the shared fixture instance, accessible by all test fixtures in this namespace.
     /// </summary>
-    public static ManagementApiSetUpFixture Instance { get; private set; }
+    public static ManagementApiSetUpFixture? Instance { get; private set; }
 
     /// <summary>
-    ///     The shared HttpClient, reused across all fixture classes.
+    ///     Gets the shared HttpClient, reused across all fixture classes.
     ///     Each fixture class clears auth headers in its own [SetUp].
     /// </summary>
-    public HttpClient SharedClient { get; private set; }
+    public HttpClient? SharedClient { get; private set; }
 
     /// <summary>
-    ///     The shared service provider from the running host.
+    ///     Gets the shared service provider from the running host.
     /// </summary>
     public IServiceProvider SharedServices => Services;
 
+    /// <summary>
+    /// Initializes the fixture during NUnit's one-time setup'.
+    /// </summary>
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
@@ -71,6 +72,9 @@ public class ManagementApiSetUpFixture : UmbracoTestServerFixture
         });
     }
 
+    /// <summary>
+    /// Cleans up the fixture during NUnit's one-time teardown.'
+    /// </summary>
     [OneTimeTearDown]
     public async Task OneTimeTearDown()
     {
@@ -81,6 +85,10 @@ public class ManagementApiSetUpFixture : UmbracoTestServerFixture
         Instance = null;
     }
 
+    /// <summary>
+    /// Sets up the Umbraco builder with regard to the management api tests.
+    /// </summary>
+    /// <param name="builder"></param>
     protected override void CustomTestSetup(IUmbracoBuilder builder)
     {
         // Override EF Core context registrations to use transient options.
@@ -171,15 +179,21 @@ public class ManagementApiSetUpFixture : UmbracoTestServerFixture
     ///     Resolves a ManagementApi URL for the given controller method.
     ///     Used by <see cref="ManagementApiTest{T}"/> to build URLs without needing direct LinkGenerator access.
     /// </summary>
-    public string GetManagementApiUrl<T>(Expression<Func<T, object>> methodSelector)
+    public new string GetManagementApiUrl<T>(Expression<Func<T, object>> methodSelector)
         where T : ManagementApiControllerBase
     {
         MethodInfo? method = ExpressionHelper.GetMethodInfo(methodSelector);
+        if (method is null)
+        {
+            throw new ArgumentException(@"The supplied methodSelector could not resolved to a valid method.", nameof(methodSelector));
+        }
+
         IDictionary<string, object?> methodParams = ExpressionHelper.GetMethodParams(methodSelector) ?? new Dictionary<string, object?>();
 
         // Remove the CancellationToken from the method params
         methodParams.Remove(methodParams.FirstOrDefault(x => x.Value is CancellationToken).Key);
-        methodParams["version"] = method?.GetCustomAttribute<MapToApiVersionAttribute>()?.Versions[0].MajorVersion.ToString();
-        return LinkGenerator.GetUmbracoControllerUrl(method.Name, ControllerExtensions.GetControllerName<T>(), null, methodParams);
+        methodParams["version"] = method.GetCustomAttribute<MapToApiVersionAttribute>()?.Versions[0].MajorVersion.ToString();
+        return LinkGenerator.GetUmbracoControllerUrl(method.Name, ControllerExtensions.GetControllerName<T>(), null, methodParams)
+               ?? throw new InvalidOperationException(@"Could not generate an Umbraco controller URL for the given method.");
     }
 }
