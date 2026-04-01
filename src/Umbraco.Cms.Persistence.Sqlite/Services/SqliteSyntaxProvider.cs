@@ -128,7 +128,7 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
         return foreignKeys.Select(Format).ToList();
     }
 
-    // TODO (V18): Change 'virtual' to 'override' to properly override base class method (currently causes CS0114 warning).
+    // TODO (V18): Change 'new virtual' to 'override' to properly override base class method.
     /// <summary>
     /// Formats a foreign key definition for SQLite inline table constraint syntax.
     /// </summary>
@@ -304,7 +304,7 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
         return sql.Append($"LIMIT {top}");
     }
 
-    // TODO (V18): Change 'virtual' to 'override' to properly override base class method (currently causes CS0114 warning).
+    // TODO (V18): Change 'new virtual' to 'override' to properly override base class method.
     /// <inheritdoc />
     public new virtual string Format(IEnumerable<ColumnDefinition> columns)
     {
