@@ -1,4 +1,5 @@
 import { UmbImagingCropMode, type UmbImagingResizeModel } from './types.js';
+import { batchImagingRequest } from './imaging-request-batcher.js';
 import { UmbImagingServerDataSource } from './imaging.server.data.js';
 import { UMB_IMAGING_STORE_CONTEXT } from './imaging.store.token.js';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
@@ -45,27 +46,51 @@ export class UmbImagingRepository extends UmbRepositoryBase implements UmbApi {
 		}
 
 		const urls = new Map<string, string>();
+		const uncachedUniques: Array<string> = [];
 
+		// Serve what we can from the in-memory crop cache.
 		for (const unique of uniques) {
 			const existingCrop = this.#dataStore?.getCrop(unique, imagingModel);
 			if (existingCrop !== undefined) {
 				urls.set(unique, existingCrop);
-				continue;
+			} else {
+				uncachedUniques.push(unique);
 			}
+		}
 
-			const { data: urlModels, error } = await this.#itemSource.getItems([unique], imagingModel);
+		// For cache misses, hand each unique to the request batcher.
+		// The batcher collects all requests that arrive within the same event loop
+		// turn (e.g. many <umb-imaging-thumbnail> elements becoming visible at once)
+		// and combines them into a single API call to /imaging/resize/urls. This turns
+		// what was previously N sequential HTTP requests into one batched request,
+		// significantly reducing network overhead when rendering media collections
+		// or picker grids.
+		//
+		// Each call to batchImagingRequest returns a Promise that resolves with
+		// the URL for that specific unique once the shared batch completes.
+		// Promise.allSettled lets us handle partial failures: if one item errors,
+		// the rest still resolve and get cached normally.
+		if (uncachedUniques.length > 0) {
+			const results = await Promise.allSettled(
+				uncachedUniques.map((unique) =>
+					batchImagingRequest(unique, imagingModel, (batchUniques, model) =>
+						this.#itemSource.getItems(batchUniques, model),
+					),
+				),
+			);
 
-			if (error) {
-				console.error('[UmbImagingRepository] Error fetching items', error);
-				continue;
-			}
-
-			const url = urlModels?.[0]?.url;
-
-			this.#dataStore?.addCrop(unique, url ?? '', imagingModel);
-
-			if (url) {
-				urls.set(unique, url);
+			// Populate the cache with results so subsequent requests are instant.
+			for (let i = 0; i < uncachedUniques.length; i++) {
+				const result = results[i];
+				if (result.status === 'fulfilled') {
+					const url = result.value;
+					this.#dataStore?.addCrop(uncachedUniques[i], url ?? '', imagingModel);
+					if (url) {
+						urls.set(uncachedUniques[i], url);
+					}
+				} else {
+					console.error('[UmbImagingRepository] Error fetching item', result.reason);
+				}
 			}
 		}
 
