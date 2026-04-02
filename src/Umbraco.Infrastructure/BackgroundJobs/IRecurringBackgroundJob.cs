@@ -8,6 +8,18 @@ namespace Umbraco.Cms.Infrastructure.BackgroundJobs;
 public interface IRecurringBackgroundJob
 {
     /// <summary>
+    /// The default delay to use for recurring tasks for the first run after application start-up if no alternative is configured.
+    /// </summary>
+    [Obsolete("Use RecurringBackgroundJobBase.DefaultDelay instead. Scheduled for removal in Umbraco 19.")]
+    static readonly TimeSpan DefaultDelay = RecurringBackgroundJobBase.DefaultDelay;
+
+    /// <summary>
+    /// The default server roles that recurring background jobs run on.
+    /// </summary>
+    [Obsolete("Use RecurringBackgroundJobBase.DefaultServerRoles instead. Scheduled for removal in Umbraco 19.")]
+    static readonly ServerRole[] DefaultServerRoles = RecurringBackgroundJobBase.DefaultServerRoles;
+
+    /// <summary>
     /// Timespan representing how often the task should recur.
     /// </summary>
     /// <value>
