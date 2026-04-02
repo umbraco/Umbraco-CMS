@@ -22,5 +22,5 @@ public interface IWebsiteOutputCacheEvictionProvider
     /// <param name="context">Details of the content change.</param>
     /// <param name="cancellationToken">A cancellation token.</param>
     /// <returns>Additional cache tags to evict.</returns>
-    Task<IEnumerable<string>> GetAdditionalEvictionTagsAsync(ContentChangedContext context, CancellationToken cancellationToken = default);
+    Task<IEnumerable<string>> GetAdditionalEvictionTagsAsync(OutputCacheContentChangedContext context, CancellationToken cancellationToken = default);
 }

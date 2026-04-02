@@ -1,20 +1,27 @@
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Cache.PartialViewCacheInvalidators;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.DependencyInjection;
+using Umbraco.Cms.Web.Common.ApplicationBuilder;
 using Umbraco.Cms.Web.Common.Middleware;
 using Umbraco.Cms.Web.Common.Routing;
 using Umbraco.Cms.Web.Website.Cache.PartialViewCacheInvalidators;
+using Umbraco.Cms.Web.Website.Caching;
 using Umbraco.Cms.Web.Website.Collections;
 using Umbraco.Cms.Web.Website.Models;
 using Umbraco.Cms.Web.Website.Routing;
@@ -89,6 +96,46 @@ public static partial class UmbracoBuilderExtensions
 
         // Member identity for public member login
         builder.AddMembersIdentity();
+
+        builder.AddWebsiteOutputCache();
+
+        return builder;
+    }
+
+    private static IUmbracoBuilder AddWebsiteOutputCache(this IUmbracoBuilder builder)
+    {
+        WebsiteSettings.OutputCacheSettings settings = builder.Config
+            .GetSection(Constants.Configuration.ConfigWebsite)
+            .Get<WebsiteSettings>()?.OutputCache
+            ?? new WebsiteSettings.OutputCacheSettings();
+
+        // Always register the policy (self-disables when Enabled=false).
+        // AddOutputCache() is safe to call multiple times (e.g. if the Delivery API also
+        // registers output caching) — each call just adds its policies to the shared options.
+        builder.Services.AddOutputCache(options =>
+        {
+            options.AddPolicy(
+                Constants.Website.OutputCache.ContentCachePolicy,
+                new WebsiteOutputCachePolicy(settings.ContentDuration, settings.Enabled));
+        });
+
+        // Register pipeline filter only if no output cache filter exists yet.
+        // UseOutputCache() must only appear once in the pipeline. The Delivery API may have
+        // already registered its filter ("UmbracoDeliveryApiOutputCache") — we check by
+        // convention that all output cache filters include "OutputCache" in their name.
+        builder.Services.PostConfigure<UmbracoPipelineOptions>(options =>
+        {
+            if (options.PipelineFilters.Any(f => f.Name.Contains("OutputCache")) is false)
+            {
+                options.AddFilter(new WebsiteOutputCachePipelineFilter("UmbracoWebsiteOutputCache"));
+            }
+        });
+
+        // Register eviction handler and providers
+        builder.AddNotificationAsyncHandler<ContentCacheRefresherNotification, WebsiteOutputCacheEvictionHandler>();
+        builder.Services.AddSingleton<IWebsiteOutputCacheTagProvider, DefaultWebsiteOutputCacheTagProvider>();
+        builder.Services.AddSingleton<IWebsiteOutputCacheDurationProvider, DefaultWebsiteOutputCacheDurationProvider>();
+        builder.Services.AddSingleton<IWebsiteOutputCacheManager, WebsiteOutputCacheManager>();
 
         return builder;
     }
