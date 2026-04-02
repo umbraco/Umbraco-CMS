@@ -70,6 +70,8 @@ public class RecurringBackgroundJobHostedServiceRunner : IHostedService
 
         foreach ((Type jobType, IHostedService hostedService) in _hostedServices)
         {
+            _hostedServices.TryRemove(jobType, out _);
+
             try
             {
                 _logger.LogInformation("Stopping background hosted service for {job}", jobType.Name);
