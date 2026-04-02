@@ -100,7 +100,15 @@ public abstract class RecurringHostedServiceBase : BackgroundService
         {
             try
             {
-                await _signal.WaitAsync(_delay, stoppingToken);
+                bool signaled = await _signal.WaitAsync(_delay, stoppingToken);
+                if (signaled)
+                {
+                    // Trigger interrupted the initial delay — consume the strategy/delay state
+                    // so it doesn't leak into WaitForNextExecutionAsync after the first execution.
+                    _nextExecutionStrategy = default;
+                    _nextExecutionDelay = null;
+                    _nextExecutionSkipOnOvershoot = false;
+                }
             }
             catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
             {

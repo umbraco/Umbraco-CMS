@@ -266,6 +266,37 @@ public class RecurringHostedServiceBaseTests
             afterWaitMessage: "Should not execute again within 30s period");
 
     [Test]
+    public async Task TriggerExecution_During_InitialDelay_Does_Not_Leak_Strategy()
+    {
+        var executionCount = 0;
+        var sut = new TestRecurringHostedService(
+            period: TimeSpan.FromSeconds(30),
+            delay: TimeSpan.FromSeconds(30),
+            onExecute: _ => { Interlocked.Increment(ref executionCount); return Task.CompletedTask; });
+
+        using var cts = new CancellationTokenSource();
+        await sut.StartAsync(cts.Token);
+
+        // No execution yet — still in initial delay
+        await Task.Delay(50);
+        Assert.AreEqual(0, executionCount, "Should not have executed during initial delay");
+
+        // Trigger with a custom delay during the initial delay
+        sut.PublicTriggerExecutionWithDelay(TimeSpan.FromMilliseconds(50));
+        await Task.Delay(100);
+        Assert.AreEqual(1, executionCount, "Should have executed once after trigger interrupted delay");
+
+        // The custom delay should NOT be applied after the first execution —
+        // the strategy was consumed when the initial delay was interrupted.
+        // The next wait should use the normal 30s period, so no more executions.
+        await Task.Delay(200);
+        Assert.AreEqual(1, executionCount, "Custom delay should not leak — next wait uses normal period");
+
+        cts.Cancel();
+        await sut.StopAsync(CancellationToken.None);
+    }
+
+    [Test]
     public async Task Exception_In_PerformExecuteAsync_Does_Not_Kill_Loop()
     {
         var executionCount = 0;
