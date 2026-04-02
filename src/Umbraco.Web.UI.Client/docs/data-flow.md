@@ -241,8 +241,6 @@ export class UmbMyEntityDetailStore extends UmbDetailStoreBase<UmbMyEntityDetail
 	}
 }
 
-export default UmbMyEntityDetailStore;
-
 export const UMB_MY_ENTITY_DETAIL_STORE_CONTEXT = new UmbContextToken<UmbMyEntityDetailStore>(
 	'UmbMyEntityDetailStore',
 );
@@ -265,7 +263,7 @@ export class UmbMyEntityDetailRepository extends UmbDetailRepositoryBase<UmbMyEn
 	}
 }
 
-export default UmbMyEntityDetailRepository;
+export { UmbMyEntityDetailRepository as api };
 ```
 
 ### 5. Workspace Context
@@ -376,11 +374,40 @@ Manifests are lazy-loaded — the `api: () => import(...)` pattern ensures code 
 
 ---
 
+## Client-Side Models
+
+All layers above the data source work exclusively with **client-side domain models** — never with types from external systems (generated API types, third-party SDK types, etc.). The data source is the boundary where external types are mapped to client-side models and vice versa.
+
+**Why:** External models are shaped by their system's concerns (API versioning, serialization format, naming conventions). Client-side models are shaped by what the UI needs. Coupling the UI to external models means changes in any external system ripple through the entire frontend.
+
+**What to map:**
+
+| External concept | Client-side convention |
+|-----------------|----------------------|
+| `id`, `key`, `path`, `isoCode`, or any identifier | `unique` (standardized across all models) |
+| Entity classification | `entityType` (attached to models that represent entities) |
+| Server-specific field names | Domain-appropriate property names |
+| Nullable server fields with defaults | Resolved to concrete values where possible |
+
+**Where mapping happens:** Only in data sources. The data source reads external types, constructs a client-side model, and returns it. On writes, it does the reverse — takes a client-side model and constructs the external request type.
+
+```typescript
+// Data source maps server response → client-side model
+const model: UmbMyEntityDetailModel = {
+    entityType: UMB_MY_ENTITY_ENTITY_TYPE,
+    unique: data.id,        // server "id" → client "unique"
+};
+```
+
+**Rule:** If generated API types (`CreateXRequestModel`, `XResponseModel`, etc.) appear in a repository, context, or element import — the data source mapping layer is missing or incomplete.
+
+---
+
 ## Key Rules
 
 1. **Never call generated API services directly from elements or contexts** — always go through data source → repository
 2. **Always use `tryExecute()` for API calls** — it handles errors and notifications
-3. **Data sources handle model mapping** — they translate between backend API types and frontend domain models
+3. **Data sources are the only layer that knows about external types** — they map between external system types and client-side domain models. No other layer should import or reference generated API types.
 4. **All return values use `{ data, error }` tuples** — never throw from async data operations
-5. **Export `default` from repositories, stores, and data sources** — this enables lazy-loading via `api: () => import(...)`
+5. **Export as `api` from repositories** — classes bound to a manifest use `export { ClassName as api }`, which enables lazy-loading via `api: () => import(...)`
 6. **Do not introduce new store types** — stores are being phased out. Manage state in the context layer using observable state classes directly
