@@ -681,13 +681,15 @@ public class RelationService : RepositoryService, IRelationService
     {
         // Validate that parent & child object types are allowed
         UmbracoObjectTypes[] allowedObjectTypes = GetAllowedObjectTypes().ToArray();
-        var childObjectTypeAllowed = allowedObjectTypes.Any(x => x.GetGuid() == relationType.ChildObjectType);
+        var childObjectTypeAllowed = relationType.ChildObjectType is null
+            || allowedObjectTypes.Any(x => x.GetGuid() == relationType.ChildObjectType);
         if (childObjectTypeAllowed is false)
         {
             return Attempt.FailWithStatus(RelationTypeOperationStatus.InvalidChildObjectType, relationType);
         }
 
-        var parentObjectTypeAllowed = allowedObjectTypes.Any(x => x.GetGuid() == relationType.ParentObjectType);
+        var parentObjectTypeAllowed = relationType.ParentObjectType is null
+            || allowedObjectTypes.Any(x => x.GetGuid() == relationType.ParentObjectType);
 
         if (parentObjectTypeAllowed is false)
         {
