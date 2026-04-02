@@ -455,7 +455,7 @@ internal sealed class ElementEditingService
         IElement copy = element.DeepCloneWithResetIdentities();
         copy.ParentId = newParentId;
 
-        var copyingNotification = new ElementCopyingNotification(element, copy, newParentId, newParentKey, eventMessages);
+        var copyingNotification = new ElementCopyingNotification(element, copy, newParentKey, eventMessages);
         if (await scope.Notifications.PublishCancelableAsync(copyingNotification))
         {
             scope.Complete();

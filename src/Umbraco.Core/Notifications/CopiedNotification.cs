@@ -59,12 +59,6 @@ public abstract class CopiedNotification<T> : ObjectNotification<T>
     public T Copy { get; }
 
     /// <summary>
-    ///     Gets the ID of the new parent.
-    /// </summary>
-    [Obsolete("Please use parent key instead. Scheduled for removal in Umbraco 18.")]
-    public int ParentId { get; }
-
-    /// <summary>
     ///     Gets the key of the new parent.
     /// </summary>
     public Guid? ParentKey { get; }

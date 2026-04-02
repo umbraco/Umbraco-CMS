@@ -1474,7 +1474,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
             scope.WriteLock(Constants.Locks.ContentTree);
 
             TryGetParentKey(parentId, out Guid? parentKey);
-            if (scope.Notifications.PublishCancelable(new ContentCopyingNotification(content, copy, parentId, parentKey, eventMessages)))
+            if (scope.Notifications.PublishCancelable(new ContentCopyingNotification(content, copy, parentKey, eventMessages)))
             {
                 scope.Complete();
                 return null;
@@ -1544,7 +1544,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
                         IContent descendantCopy = descendant.DeepCloneWithResetIdentities();
                         descendantCopy.ParentId = parentId;
 
-                        if (scope.Notifications.PublishCancelable(new ContentCopyingNotification(descendant, descendantCopy, parentId, parentKey, eventMessages)))
+                        if (scope.Notifications.PublishCancelable(new ContentCopyingNotification(descendant, descendantCopy, parentKey, eventMessages)))
                         {
                             continue;
                         }
