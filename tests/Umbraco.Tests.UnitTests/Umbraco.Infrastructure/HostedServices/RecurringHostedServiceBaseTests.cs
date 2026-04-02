@@ -163,59 +163,21 @@ public class RecurringHostedServiceBaseTests
 
     [Test]
     public async Task TriggerExecution_Reset_Starts_New_Full_Period()
-    {
-        var executionCount = 0;
-        var sut = new TestRecurringHostedService(
-            period: TimeSpan.FromSeconds(30),
-            delay: TimeSpan.Zero,
-            onExecute: _ => { Interlocked.Increment(ref executionCount); return Task.CompletedTask; });
-
-        using var cts = new CancellationTokenSource();
-        await sut.StartAsync(cts.Token);
-
-        await Task.Delay(100);
-        Assert.AreEqual(1, executionCount);
-
-        // Trigger with Reset — after the triggered execution, a full 30s period starts
-        sut.PublicTriggerExecutionReset();
-        await Task.Delay(100);
-        Assert.AreEqual(2, executionCount, "Should have executed again after trigger");
-
-        // With a 30s period, no further execution in the next 300ms
-        await Task.Delay(300);
-        Assert.AreEqual(2, executionCount, "Should not execute again within 30s period");
-
-        cts.Cancel();
-        await sut.StopAsync(CancellationToken.None);
-    }
+        => await AssertTriggerExecutionBehavior(
+            sut => sut.PublicTriggerExecutionReset(),
+            expectedCountAfterTrigger: 2,
+            afterTriggerMessage: "Should have executed again after trigger",
+            expectedCountAfterWait: 2,
+            afterWaitMessage: "Should not execute again within 30s period");
 
     [Test]
     public async Task TriggerExecution_None_Resumes_Original_Wait()
-    {
-        var executionCount = 0;
-        var sut = new TestRecurringHostedService(
-            period: TimeSpan.FromSeconds(30),
-            delay: TimeSpan.Zero,
-            onExecute: _ => { Interlocked.Increment(ref executionCount); return Task.CompletedTask; });
-
-        using var cts = new CancellationTokenSource();
-        await sut.StartAsync(cts.Token);
-
-        await Task.Delay(100);
-        Assert.AreEqual(1, executionCount);
-
-        // Trigger with None — after the triggered execution, the remaining ~30s continues
-        sut.PublicTriggerExecutionNone();
-        await Task.Delay(100);
-        Assert.AreEqual(2, executionCount, "Should have executed again after trigger");
-
-        // The remaining time from the interrupted 30s wait is still ~29s, so no execution soon
-        await Task.Delay(300);
-        Assert.AreEqual(2, executionCount, "Should not execute again — remaining schedule still active");
-
-        cts.Cancel();
-        await sut.StopAsync(CancellationToken.None);
-    }
+        => await AssertTriggerExecutionBehavior(
+            sut => sut.PublicTriggerExecutionNone(),
+            expectedCountAfterTrigger: 2,
+            afterTriggerMessage: "Should have executed again after trigger",
+            expectedCountAfterWait: 2,
+            afterWaitMessage: "Should not execute again — remaining schedule still active");
 
     [Test]
     public async Task TriggerExecution_None_Skips_Overshot_Execution()
@@ -296,31 +258,12 @@ public class RecurringHostedServiceBaseTests
 
     [Test]
     public async Task TriggerExecution_CustomDelay_Uses_Specified_Delay()
-    {
-        var executionCount = 0;
-        var sut = new TestRecurringHostedService(
-            period: TimeSpan.FromSeconds(30),
-            delay: TimeSpan.Zero,
-            onExecute: _ => { Interlocked.Increment(ref executionCount); return Task.CompletedTask; });
-
-        using var cts = new CancellationTokenSource();
-        await sut.StartAsync(cts.Token);
-
-        await Task.Delay(100);
-        Assert.AreEqual(1, executionCount);
-
-        // Trigger with a short custom delay — executes immediately, then again after ~50ms
-        sut.PublicTriggerExecutionWithDelay(TimeSpan.FromMilliseconds(50));
-        await Task.Delay(200);
-        Assert.AreEqual(3, executionCount, "Should have executed: initial + trigger + after custom delay");
-
-        // The next cycle uses the normal 30s period, so no more executions
-        await Task.Delay(300);
-        Assert.AreEqual(3, executionCount, "Should not execute again within 30s period");
-
-        cts.Cancel();
-        await sut.StopAsync(CancellationToken.None);
-    }
+        => await AssertTriggerExecutionBehavior(
+            sut => sut.PublicTriggerExecutionWithDelay(TimeSpan.FromMilliseconds(50)),
+            expectedCountAfterTrigger: 3,
+            afterTriggerMessage: "Should have executed: initial + trigger + after custom delay",
+            expectedCountAfterWait: 3,
+            afterWaitMessage: "Should not execute again within 30s period");
 
     [Test]
     public async Task Exception_In_PerformExecuteAsync_Does_Not_Kill_Loop()
@@ -376,6 +319,36 @@ public class RecurringHostedServiceBaseTests
         // With a 30s period, no further executions should happen in the next 300ms
         await Task.Delay(300);
         Assert.AreEqual(countAfterChange, executionCount, "No additional executions should occur with long period");
+
+        cts.Cancel();
+        await sut.StopAsync(CancellationToken.None);
+    }
+
+    private async Task AssertTriggerExecutionBehavior(
+        Action<TestRecurringHostedService> trigger,
+        int expectedCountAfterTrigger,
+        string afterTriggerMessage,
+        int expectedCountAfterWait,
+        string afterWaitMessage)
+    {
+        var executionCount = 0;
+        var sut = new TestRecurringHostedService(
+            period: TimeSpan.FromSeconds(30),
+            delay: TimeSpan.Zero,
+            onExecute: _ => { Interlocked.Increment(ref executionCount); return Task.CompletedTask; });
+
+        using var cts = new CancellationTokenSource();
+        await sut.StartAsync(cts.Token);
+
+        await Task.Delay(100);
+        Assert.AreEqual(1, executionCount);
+
+        trigger(sut);
+        await Task.Delay(200);
+        Assert.AreEqual(expectedCountAfterTrigger, executionCount, afterTriggerMessage);
+
+        await Task.Delay(300);
+        Assert.AreEqual(expectedCountAfterWait, executionCount, afterWaitMessage);
 
         cts.Cancel();
         await sut.StopAsync(CancellationToken.None);
