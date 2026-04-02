@@ -59,59 +59,19 @@ public class RecurringHostedServiceBaseTests
             Times.Once);
     }
 
-    [Test]
-    public void ComputeNextDelay_Subtracts_Elapsed_Time_From_Period()
+    [TestCase(10_000, 3_000, 7_000, Description = "Subtracts elapsed time from period")]
+    [TestCase(10_000, 15_000, 0, Description = "Returns zero when execution exceeds period")]
+    [TestCase(10_000, 0, 10_000, Description = "Returns full period when elapsed is zero")]
+    [TestCase(10_000, 10_000, 0, Description = "Returns zero when execution equals period")]
+    [TestCase(-1, 1_000, 0, Description = "Returns zero for negative period")]
+    public void ComputeNextDelay_Returns_Expected_Result(long periodMs, long elapsedMs, long expectedMs)
     {
-        var period = TimeSpan.FromSeconds(10);
-        var elapsed = TimeSpan.FromSeconds(3);
+        var period = TimeSpan.FromMilliseconds(periodMs);
+        var elapsed = TimeSpan.FromMilliseconds(elapsedMs);
 
         TimeSpan result = RecurringHostedServiceBase.ComputeNextDelay(period, elapsed);
 
-        Assert.AreEqual(TimeSpan.FromSeconds(7), result);
-    }
-
-    [Test]
-    public void ComputeNextDelay_Returns_Zero_When_Execution_Exceeds_Period()
-    {
-        var period = TimeSpan.FromSeconds(10);
-        var elapsed = TimeSpan.FromSeconds(15);
-
-        TimeSpan result = RecurringHostedServiceBase.ComputeNextDelay(period, elapsed);
-
-        Assert.AreEqual(TimeSpan.Zero, result);
-    }
-
-    [Test]
-    public void ComputeNextDelay_Returns_Full_Period_When_Elapsed_Is_Zero()
-    {
-        var period = TimeSpan.FromSeconds(10);
-        var elapsed = TimeSpan.Zero;
-
-        TimeSpan result = RecurringHostedServiceBase.ComputeNextDelay(period, elapsed);
-
-        Assert.AreEqual(period, result);
-    }
-
-    [Test]
-    public void ComputeNextDelay_Returns_Zero_When_Execution_Equals_Period()
-    {
-        var period = TimeSpan.FromSeconds(10);
-        var elapsed = TimeSpan.FromSeconds(10);
-
-        TimeSpan result = RecurringHostedServiceBase.ComputeNextDelay(period, elapsed);
-
-        Assert.AreEqual(TimeSpan.Zero, result);
-    }
-
-    [Test]
-    public void ComputeNextDelay_Returns_Zero_For_Negative_Period()
-    {
-        var period = TimeSpan.FromMilliseconds(-1);
-        var elapsed = TimeSpan.FromSeconds(1);
-
-        TimeSpan result = RecurringHostedServiceBase.ComputeNextDelay(period, elapsed);
-
-        Assert.AreEqual(TimeSpan.Zero, result);
+        Assert.AreEqual(TimeSpan.FromMilliseconds(expectedMs), result);
     }
 
     [Test]
