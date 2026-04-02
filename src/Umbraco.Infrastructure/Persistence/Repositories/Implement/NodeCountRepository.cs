@@ -7,10 +7,18 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
+/// <summary>
+/// Repository responsible for managing and persisting node count data within the Umbraco CMS.
+/// Provides methods for retrieving and updating the count of content nodes.
+/// </summary>
 public class NodeCountRepository : INodeCountRepository
 {
     private readonly IScopeAccessor _scopeAccessor;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="NodeCountRepository"/> class with the specified scope accessor.
+    /// </summary>
+    /// <param name="scopeAccessor">Provides access to the current database scope for repository operations.</param>
     public NodeCountRepository(IScopeAccessor scopeAccessor) => _scopeAccessor = scopeAccessor;
 
     /// <inheritdoc />
@@ -29,6 +37,12 @@ public class NodeCountRepository : INodeCountRepository
         return _scopeAccessor.AmbientScope.Database.ExecuteScalar<int>(query);
     }
 
+    /// <summary>
+    /// Gets the count of media nodes that are not trashed and are not of the folder media type.
+    /// </summary>
+    /// <returns>
+    /// The total number of media nodes that are not in the recycle bin and are not folders.
+    /// </returns>
     public int GetMediaCount()
     {
         if (_scopeAccessor.AmbientScope is null)

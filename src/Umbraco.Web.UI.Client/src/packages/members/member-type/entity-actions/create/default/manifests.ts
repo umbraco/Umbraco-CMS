@@ -12,6 +12,7 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 		meta: {
 			icon: 'icon-user',
 			label: '#content_membertype',
+			additionalOptions: true,
 		},
 	},
 ];

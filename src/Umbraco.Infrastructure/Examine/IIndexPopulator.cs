@@ -2,6 +2,10 @@ using Examine;
 
 namespace Umbraco.Cms.Infrastructure.Examine;
 
+/// <summary>
+/// Defines the contract for classes responsible for populating search indexes with data.
+/// Implementations of this interface handle the logic required to add or update content in an index.
+/// </summary>
 public interface IIndexPopulator
 {
     /// <summary>

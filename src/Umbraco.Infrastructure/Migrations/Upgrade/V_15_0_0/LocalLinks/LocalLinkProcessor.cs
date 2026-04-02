@@ -5,6 +5,9 @@ using Umbraco.Cms.Core.Templates;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_15_0_0.LocalLinks;
 
+/// <summary>
+/// Handles the processing and migration of local links as part of the upgrade process to Umbraco version 15.0.0.
+/// </summary>
 [Obsolete("Scheduled for removal in Umbraco 18.")]
 public class LocalLinkProcessor
 {
@@ -12,6 +15,12 @@ public class LocalLinkProcessor
     private readonly IIdKeyMap _idKeyMap;
     private readonly IEnumerable<ITypedLocalLinkProcessor> _localLinkProcessors;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="LocalLinkProcessor"/> class, which processes and parses local links during migration upgrades.
+    /// </summary>
+    /// <param name="localLinkParser">An instance of <see cref="HtmlLocalLinkParser"/> used to parse local links within HTML content.</param>
+    /// <param name="idKeyMap">An implementation of <see cref="IIdKeyMap"/> that provides mapping between IDs and keys for content references.</param>
+    /// <param name="localLinkProcessors">A collection of <see cref="ITypedLocalLinkProcessor"/> used to handle specific types of local link processing.</param>
     public LocalLinkProcessor(
         HtmlLocalLinkParser localLinkParser,
         IIdKeyMap idKeyMap,
@@ -22,9 +31,18 @@ public class LocalLinkProcessor
         _localLinkProcessors = localLinkProcessors;
     }
 
+    /// <summary>
+    /// Gets all supported property editor aliases by aggregating the aliases from the registered local link processors.
+    /// </summary>
+    /// <returns>An <see cref="IEnumerable{T}"/> of strings representing the supported property editor aliases.</returns>
     public IEnumerable<string> GetSupportedPropertyEditorAliases() =>
         _localLinkProcessors.SelectMany(p => p.PropertyEditorAliases);
 
+    /// <summary>
+    /// Attempts to process the specified editor value using a matching local link processor based on the value's type.
+    /// </summary>
+    /// <param name="editorValue">The editor value to process; its runtime type is used to select the appropriate processor.</param>
+    /// <returns><c>true</c> if a suitable processor was found and processing succeeded; otherwise, <c>false</c>.</returns>
     public bool ProcessToEditorValue(object? editorValue)
     {
         ITypedLocalLinkProcessor? processor =
@@ -33,6 +51,14 @@ public class LocalLinkProcessor
         return processor is not null && processor.Process.Invoke(editorValue, ProcessToEditorValue, ProcessStringValue);
     }
 
+    /// <summary>
+    /// Processes the input string by searching for legacy local link tags and replacing them with updated link tags that include GUIDs and entity types.
+    /// If a legacy tag cannot be converted (due to missing information), it is left unchanged in the output.
+    /// </summary>
+    /// <param name="input">The input string potentially containing legacy local link tags to process.</param>
+    /// <returns>
+    /// The input string with all convertible legacy local link tags replaced by updated tags containing GUIDs and entity types; unconvertible tags remain unchanged.
+    /// </returns>
     public string ProcessStringValue(string input)
     {
         // find all legacy tags

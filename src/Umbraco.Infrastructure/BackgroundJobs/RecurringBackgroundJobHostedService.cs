@@ -13,8 +13,18 @@ using Umbraco.Cms.Infrastructure.Notifications;
 
 namespace Umbraco.Cms.Infrastructure.BackgroundJobs;
 
+/// <summary>
+/// Hosted service responsible for scheduling and executing recurring background jobs within the application.
+/// </summary>
 public static class RecurringBackgroundJobHostedService
 {
+    /// <summary>
+    /// Creates a factory function that produces hosted services for recurring background jobs.
+    /// </summary>
+    /// <param name="serviceProvider">The service provider used to create hosted service instances.</param>
+    /// <returns>
+    /// A function that takes an <see cref="IRecurringBackgroundJob" /> and returns an <see cref="IHostedService" />.
+    /// </returns>
     public static Func<IRecurringBackgroundJob, IHostedService> CreateHostedServiceFactory(IServiceProvider serviceProvider)
         => (IRecurringBackgroundJob job) =>
         {
@@ -39,6 +49,16 @@ public class RecurringBackgroundJobHostedService<TJob> : RecurringHostedServiceB
     private readonly IEventMessagesFactory _eventMessagesFactory;
     private readonly IRecurringBackgroundJob _job;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="RecurringBackgroundJobHostedService{TJob}" /> class, which manages the execution of a recurring background job.
+    /// </summary>
+    /// <param name="runtimeState">Provides information about the current runtime state of the Umbraco application.</param>
+    /// <param name="logger">The logger used to record diagnostic and operational information for this hosted service.</param>
+    /// <param name="mainDom">The main domain instance responsible for coordinating single-instance operations across multiple application domains.</param>
+    /// <param name="serverRoleAccessor">Determines the current server's role in a multi-server environment.</param>
+    /// <param name="eventAggregator">Handles the publishing and subscribing of application events.</param>
+    /// <param name="eventMessagesFactory">The event messages factory.</param>
+    /// <param name="job">The recurring background job instance to be managed and executed by this service.</param>
     public RecurringBackgroundJobHostedService(
         IRuntimeState runtimeState,
         ILogger<RecurringBackgroundJobHostedService<TJob>> logger,
@@ -60,6 +80,15 @@ public class RecurringBackgroundJobHostedService<TJob> : RecurringHostedServiceB
         _job.PeriodChanged += (sender, e) => ChangePeriod(_job.Period);
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="RecurringBackgroundJobHostedService{TJob}" /> class, which manages the execution of a recurring background job.
+    /// </summary>
+    /// <param name="runtimeState">Provides information about the current runtime state of the Umbraco application.</param>
+    /// <param name="logger">The logger used to record diagnostic and operational information for this hosted service.</param>
+    /// <param name="mainDom">The main domain instance responsible for coordinating single-instance operations across multiple application domains.</param>
+    /// <param name="serverRoleAccessor">Determines the current server's role in a multi-server environment.</param>
+    /// <param name="eventAggregator">Handles the publishing and subscribing of application events.</param>
+    /// <param name="job">The recurring background job instance to be managed and executed by this service.</param>
     [Obsolete("Use the overload accepting IEventMessagesFactory instead. This overload will be removed in Umbraco 19.")]
     public RecurringBackgroundJobHostedService(
        IRuntimeState runtimeState,
@@ -111,7 +140,6 @@ public class RecurringBackgroundJobHostedService<TJob> : RecurringHostedServiceB
             await _eventAggregator.PublishAsync(new RecurringBackgroundJobFailedNotification(_job, eventMessages).WithStateFrom(executingNotification), stoppingToken);
             _logger.LogError(ex, "Unhandled exception in recurring background job.");
         }
-
     }
 
     /// <inheritdoc />

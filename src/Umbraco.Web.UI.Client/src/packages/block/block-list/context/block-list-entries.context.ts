@@ -173,18 +173,9 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 		if (!this._manager) return undefined;
 		const blockTypes = this._manager.getBlockTypes();
 		if (blockTypes.length === 1) {
-			const elementKey = blockTypes[0].contentElementTypeKey;
 			if (this._manager.getInlineEditingMode()) {
 				return undefined;
 			}
-
-			// does the Block have any Content properties?
-			const contentTypeKey = this._manager.getContentTypeKeyOfContentKey(elementKey);
-			if (contentTypeKey && this._manager.getContentTypeHasProperties(contentTypeKey) === false) {
-				return undefined;
-			}
-
-			return pathBuilder?.({ view: 'create', index: index }) + 'modal/umb-modal-workspace/create/' + elementKey;
 		}
 
 		return pathBuilder?.({ view: 'create', index: index });

@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.Reflection;
@@ -249,12 +249,27 @@ internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemMod
 
         private readonly BlockEditorPropertyValueConstructorCacheBase<T> _constructorCache;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BlockItemActivator{T}"/> class.
+        /// </summary>
+        /// <param name="blockConverter">The <see cref="BlockEditorConverter"/> used for block editor conversion.</param>
+        /// <param name="constructorCache">The <see cref="BlockEditorPropertyValueConstructorCacheBase{T}"/> used to cache constructors for block item models.</param>
         public BlockItemActivator(BlockEditorConverter blockConverter, BlockEditorPropertyValueConstructorCacheBase<T> constructorCache)
         {
             _blockConverter = blockConverter;
             _constructorCache = constructorCache;
         }
 
+        /// <summary>
+        /// Creates an instance of the block item model of type <typeparamref name="T"/> using the provided content and settings identifiers and data.
+        /// </summary>
+        /// <param name="contentTypeKey">The unique identifier for the content type.</param>
+        /// <param name="settingsTypeKey">The unique identifier for the settings type, or <c>null</c> if not applicable.</param>
+        /// <param name="contentKey">The unique identifier for the content item.</param>
+        /// <param name="contentData">The published element containing the content data.</param>
+        /// <param name="settingsKey">The unique identifier for the settings item, or <c>null</c> if not applicable.</param>
+        /// <param name="settingsData">The published element containing the settings data, or <c>null</c> if not applicable.</param>
+        /// <returns>A new instance of the block item model of type <typeparamref name="T"/>.</returns>
         public T CreateInstance(Guid contentTypeKey, Guid? settingsTypeKey, Guid contentKey, IPublishedElement contentData, Guid? settingsKey, IPublishedElement? settingsData)
         {
             if (!_constructorCache.TryGetValue(

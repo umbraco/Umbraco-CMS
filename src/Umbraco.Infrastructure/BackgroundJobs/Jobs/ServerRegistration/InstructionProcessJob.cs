@@ -15,12 +15,25 @@ namespace Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs.ServerRegistration;
 /// </summary>
 public class InstructionProcessJob : IRecurringBackgroundJob
 {
-
+    /// <summary>
+    /// Gets the interval between executions of the instruction process job.
+    /// </summary>
     public TimeSpan Period { get; }
+
+    /// <summary>
+    /// Gets the delay time before the job is executed. The delay is fixed at one minute.
+    /// </summary>
     public TimeSpan Delay { get => TimeSpan.FromMinutes(1); }
+
+    /// <summary>
+    /// Gets an array containing all possible values of the <see cref="ServerRole"/> enumeration.
+    /// </summary>
     public ServerRole[] ServerRoles { get => Enum.GetValues<ServerRole>(); }
 
-    // No-op event as the period never changes on this job
+    /// <summary>
+    /// Event that is raised when the execution period of the <see cref="InstructionProcessJob"/> is changed.
+    /// </summary>
+    /// <remarks>No-op event as the period never changes on this job</remarks>
     public event EventHandler PeriodChanged { add { } remove { } }
 
     private readonly ILogger<InstructionProcessJob> _logger;
@@ -43,6 +56,11 @@ public class InstructionProcessJob : IRecurringBackgroundJob
         Period = globalSettings.Value.DatabaseServerMessenger.TimeBetweenSyncOperations;
     }
 
+    /// <summary>
+    /// Executes the instruction processing job asynchronously by synchronizing messages using the messenger service.
+    /// Logs an error if the synchronization fails, but always completes the task.
+    /// </summary>
+    /// <returns>A completed task representing the asynchronous operation.</returns>
     public Task RunJobAsync()
     {
         try

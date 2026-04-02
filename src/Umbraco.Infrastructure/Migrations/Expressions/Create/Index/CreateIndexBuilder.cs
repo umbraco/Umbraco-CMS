@@ -5,17 +5,27 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.Index;
 
+/// <summary>
+/// Provides a fluent builder for defining and creating database indexes as part of migration expressions.
+/// </summary>
 public class CreateIndexBuilder : ExpressionBuilderBase<CreateIndexExpression>,
     ICreateIndexForTableBuilder,
     ICreateIndexOnColumnBuilder,
     ICreateIndexColumnOptionsBuilder,
     ICreateIndexOptionsBuilder
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.Index.CreateIndexBuilder"/> class with the specified create index expression.
+    /// </summary>
+    /// <param name="expression">The <see cref="CreateIndexExpression"/> that defines the index to be created.</param>
     public CreateIndexBuilder(CreateIndexExpression expression)
         : base(expression)
     {
     }
 
+    /// <summary>
+    /// Gets or sets the definition of the current column being added to the index.
+    /// </summary>
     public IndexColumnDefinition? CurrentColumn { get; set; }
 
     /// <inheritdoc />

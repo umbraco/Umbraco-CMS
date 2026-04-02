@@ -21,6 +21,13 @@ public class MemberPasswordHasher : UmbracoPasswordHasher<MemberIdentityUser>
     private readonly IOptions<LegacyPasswordMigrationSettings> _legacyMachineKeySettings;
     private readonly ILogger<MemberPasswordHasher> _logger;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Core.Security.MemberPasswordHasher"/> class.
+    /// </summary>
+    /// <param name="legacyPasswordHasher">Provides legacy password hashing and verification functionality.</param>
+    /// <param name="jsonSerializer">Used to serialize and deserialize JSON data for password migration.</param>
+    /// <param name="legacyMachineKeySettings">The configuration options for legacy machine key password migration.</param>
+    /// <param name="logger">The logger used for logging password hasher operations and events.</param>
     public MemberPasswordHasher(
         LegacyPasswordSecurity legacyPasswordHasher,
         IJsonSerializer jsonSerializer,
@@ -35,10 +42,10 @@ public class MemberPasswordHasher : UmbracoPasswordHasher<MemberIdentityUser>
     /// <summary>
     ///     Verifies a user's hashed password
     /// </summary>
-    /// <param name="user"></param>
-    /// <param name="hashedPassword"></param>
-    /// <param name="providedPassword"></param>
-    /// <returns></returns>
+    /// <param name="user">The member whose password is being verified.</param>
+    /// <param name="hashedPassword">The stored hashed password.</param>
+    /// <param name="providedPassword">The plain-text password to verify.</param>
+    /// <returns>The verification result indicating whether the password matches.</returns>
     /// <exception cref="InvalidOperationException">Thrown when the correct hashing algorith cannot be determined</exception>
     public override PasswordVerificationResult VerifyHashedPassword(MemberIdentityUser user, string hashedPassword, string providedPassword)
     {

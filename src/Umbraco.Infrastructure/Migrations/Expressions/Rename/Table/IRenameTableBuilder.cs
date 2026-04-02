@@ -8,7 +8,9 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Rename.Table;
 public interface IRenameTableBuilder : IFluentBuilder
 {
     /// <summary>
-    ///     Specifies the new name of the table.
+    /// Sets the new name for the table to be renamed.
     /// </summary>
+    /// <param name="name">The new name of the table.</param>
+    /// <returns>An <see cref="IExecutableBuilder"/> that can execute the rename operation.</returns>
     IExecutableBuilder To(string name);
 }

@@ -13,8 +13,16 @@ namespace Umbraco.Extensions;
 public static class PublishedElementExtensions
 {
     /// <summary>
-    ///     Gets the value of a property.
+    ///     Gets the value of a specified property from the model.
     /// </summary>
+    /// <param name="model">The published element model from which to retrieve the property value.</param>
+    /// <param name="publishedValueFallback">The fallback strategy to use when resolving the property value.</param>
+    /// <param name="property">An expression that identifies the property to retrieve.</param>
+    /// <param name="culture">The culture to use when retrieving the value, or <c>null</c> for the default culture.</param>
+    /// <param name="segment">The segment to use when retrieving the value, or <c>null</c> if not applicable.</param>
+    /// <param name="fallback">The fallback behavior to apply if the value is not found.</param>
+    /// <param name="defaultValue">The value to return if the property value is not found.</param>
+    /// <returns>The value of the specified property, or <paramref name="defaultValue"/> if not found.</returns>
     public static TValue? ValueFor<TModel, TValue>(
         this TModel model,
         IPublishedValueFallback publishedValueFallback,

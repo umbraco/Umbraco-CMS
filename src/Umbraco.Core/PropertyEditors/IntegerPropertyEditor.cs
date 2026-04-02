@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
+using System.Text.Json.Nodes;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
@@ -20,7 +21,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     Constants.PropertyEditors.Aliases.Integer,
     ValueType = ValueTypes.Integer,
     ValueEditorIsReusable = true)]
-public class IntegerPropertyEditor : DataEditor
+public class IntegerPropertyEditor : DataEditor, IValueSchemaProvider
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="IntegerPropertyEditor"/> class.
@@ -28,6 +29,40 @@ public class IntegerPropertyEditor : DataEditor
     public IntegerPropertyEditor(IDataValueEditorFactory dataValueEditorFactory)
         : base(dataValueEditorFactory)
         => SupportsReadOnly = true;
+
+    /// <inheritdoc />
+    public Type? GetValueType(object? configuration) => typeof(int?);
+
+    /// <inheritdoc />
+    public JsonObject? GetValueSchema(object? configuration)
+    {
+        var schema = new JsonObject
+        {
+            ["$schema"] = "https://json-schema.org/draft/2020-12/schema",
+            ["type"] = new JsonArray("integer", "null"),
+        };
+
+        // Add min/max constraints from configuration if available
+        if (configuration is IDictionary<string, object> configDict)
+        {
+            if (configDict.TryGetValue("min", out var minValue) && minValue is int min)
+            {
+                schema["minimum"] = min;
+            }
+
+            if (configDict.TryGetValue("max", out var maxValue) && maxValue is int max)
+            {
+                schema["maximum"] = max;
+            }
+
+            if (configDict.TryGetValue("step", out var stepValue) && stepValue is int step && step > 1)
+            {
+                schema["multipleOf"] = step;
+            }
+        }
+
+        return schema;
+    }
 
     /// <inheritdoc />
     protected override IDataValueEditor CreateValueEditor()

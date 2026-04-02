@@ -3,6 +3,9 @@ using Umbraco.Cms.Infrastructure.Examine;
 
 namespace Umbraco.Cms.Infrastructure.Search;
 
+/// <summary>
+/// Contains the constant field names used by the Umbraco tree searcher for indexing and querying content.
+/// </summary>
 public class UmbracoTreeSearcherFields : IUmbracoTreeSearcherFields
 {
     private readonly ISet<string> _backOfficeDocumentFieldsToLoad =
@@ -37,6 +40,10 @@ public class UmbracoTreeSearcherFields : IUmbracoTreeSearcherFields
 
     private readonly IReadOnlyList<string> _backOfficeMembersFields = new List<string> { "email", "loginName" };
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UmbracoTreeSearcherFields"/> class.
+    /// </summary>
+    /// <param name="localizationService">The localization service used for localizing field names and values.</param>
     public UmbracoTreeSearcherFields(ILocalizationService localizationService) =>
         _localizationService = localizationService;
 

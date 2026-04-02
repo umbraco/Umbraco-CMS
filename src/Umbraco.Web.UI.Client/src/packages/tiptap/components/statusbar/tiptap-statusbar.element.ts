@@ -40,6 +40,7 @@ export class UmbTiptapStatusbarElement extends UmbLitElement {
 		}
 
 		this.#statusbar = value;
+		this.#reinitializeExtensions();
 	}
 	public get statusbar(): UmbTiptapStatusbarValue {
 		return this.#statusbar;
@@ -54,14 +55,18 @@ export class UmbTiptapStatusbarElement extends UmbLitElement {
 
 	override disconnectedCallback() {
 		this.#attached = false;
-		this.#extensionsController?.destroy();
-		this.#extensionsController = undefined;
 		super.disconnectedCallback();
 	}
 
+	#reinitializeExtensions() {
+		this.#extensionsController?.destroy();
+		this.#extensionsController = undefined;
+		this.#lookup.clear();
+		this.#observeExtensions();
+	}
 	#observeExtensions() {
 		if (!this.#attached) return;
-		this.#extensionsController?.destroy();
+		if (this.#extensionsController) return;
 
 		this.#extensionsController = new UmbExtensionsElementInitializer(
 			this,
@@ -93,6 +98,12 @@ export class UmbTiptapStatusbarElement extends UmbLitElement {
 
 	#renderActions(aliases: Array<string>) {
 		return repeat(aliases, (alias) => this.#lookup?.get(alias) ?? nothing);
+	}
+
+	override destroy(): void {
+		super.destroy();
+		this.#extensionsController?.destroy();
+		this.#extensionsController = undefined;
 	}
 
 	static override readonly styles = css`

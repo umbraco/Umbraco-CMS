@@ -7,6 +7,10 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Tree;
 
+/// <summary>
+/// Provides a base controller for managing tree operations on entities that have a name property.
+/// This controller is intended to be inherited by controllers handling hierarchical structures of named entities.
+/// </summary>
 public abstract class NamedEntityTreeControllerBase<TItem> : EntityTreeControllerBase<TItem>
     where TItem : NamedEntityTreeItemResponseModel, new()
 {

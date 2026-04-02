@@ -3,23 +3,25 @@ using Umbraco.Cms.Infrastructure.BackgroundJobs;
 
 namespace Umbraco.Extensions;
 
+/// <summary>
+/// Contains extension methods for <see cref="IServiceCollection"/> to configure and register Umbraco-related services.
+/// </summary>
 public static class ServiceCollectionExtensions
 {
     /// <summary>
     /// Adds a recurring background job with an implementation type of <typeparamref name="TJob" />.
     /// </summary>
-    /// <typeparam name="TJob">The type of the job.</typeparam>
-    /// <param name="services">The services.</param>
-    public static void AddRecurringBackgroundJob<TJob>(this IServiceCollection services)
-        where TJob : class, IRecurringBackgroundJob
-        => services.AddSingleton<IRecurringBackgroundJob, TJob>();
+    /// <param name="services">The <see cref="IServiceCollection" /> to add the recurring background job to.</param>
+    public static void AddRecurringBackgroundJob<TJob>(
+        this IServiceCollection services)
+        where TJob : class, IRecurringBackgroundJob =>
+        services.AddSingleton<IRecurringBackgroundJob, TJob>();
 
     /// <summary>
     /// Adds a recurring background job with an implementation type of <typeparamref name="TJob" /> using the factory <paramref name="implementationFactory" />.
     /// </summary>
-    /// <typeparam name="TJob">The type of the job.</typeparam>
-    /// <param name="services">The services.</param>
-    /// <param name="implementationFactory">The implementation factory.</param>
+    /// <param name="services">The <see cref="IServiceCollection" /> to add the recurring background job to.</param>
+    /// <param name="implementationFactory">A factory function to create an instance of <typeparamref name="TJob" /> using the provided <see cref="IServiceProvider" />.</param>
     public static void AddRecurringBackgroundJob<TJob>(
         this IServiceCollection services,
         Func<IServiceProvider, TJob> implementationFactory)

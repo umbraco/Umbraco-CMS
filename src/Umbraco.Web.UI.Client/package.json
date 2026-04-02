@@ -1,7 +1,7 @@
 {
 	"name": "@umbraco-cms/backoffice",
 	"license": "MIT",
-	"version": "17.3.0-rc",
+	"version": "17.4.0-rc",
 	"type": "module",
 	"exports": {
 		".": null,
@@ -22,6 +22,7 @@
 		"./block-custom-view": "./dist-cms/packages/block/block-custom-view/index.js",
 		"./block-grid": "./dist-cms/packages/block/block-grid/index.js",
 		"./block-list": "./dist-cms/packages/block/block-list/index.js",
+		"./block-single": "./dist-cms/packages/block/block-single/index.js",
 		"./block-rte": "./dist-cms/packages/block/block-rte/index.js",
 		"./block-type": "./dist-cms/packages/block/block-type/index.js",
 		"./block": "./dist-cms/packages/block/block/index.js",
@@ -272,9 +273,9 @@
 		"typescript": "5.9.3",
 		"typescript-eslint": "^8.45.0",
 		"typescript-json-schema": "^0.65.1",
-		"vite": "^7.1.11",
-		"vite-plugin-static-copy": "^3.1.3",
-		"vite-tsconfig-paths": "^5.1.4",
+		"vite": "^7.3.1",
+		"vite-plugin-static-copy": "^3.2.0",
+		"vite-tsconfig-paths": "^6.1.1",
 		"web-component-analyzer": "^2.0.0"
 	},
 	"msw": {

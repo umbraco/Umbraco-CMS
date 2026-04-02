@@ -8,6 +8,14 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
 internal sealed class MemberTypeContainerRepository : EntityContainerRepository, IMemberTypeContainerRepository
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MemberTypeContainerRepository"/> class, responsible for managing member type containers in the persistence layer.
+    /// </summary>
+    /// <param name="scopeAccessor">Provides access to the current database scope for transactional operations.</param>
+    /// <param name="cache">The application-level caches used for optimizing data retrieval and storage.</param>
+    /// <param name="logger">The logger instance used for logging repository operations and errors.</param>
+    /// <param name="repositoryCacheVersionService">Service for managing cache versioning to ensure cache consistency.</param>
+    /// <param name="cacheSyncService">Service used to synchronize cache across distributed environments.</param>
     public MemberTypeContainerRepository(
         IScopeAccessor scopeAccessor,
         AppCaches cache,

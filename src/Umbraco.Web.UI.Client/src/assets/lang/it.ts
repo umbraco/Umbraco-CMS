@@ -357,6 +357,8 @@ export default {
 		renameFolderFailed: 'Impossibile rinominare la cartella con id %0%',
 		dragAndDropYourFilesIntoTheArea: "Trascina e rilascia i tuoi file nell'area",
 		uploadNotAllowed: 'Il caricamento non è consentito in questa posizione.',
+		uploadValidationFailed: (mediaTypeName: string) =>
+			`Il tipo di media ${mediaTypeName} ha una o più proprietà richieste. Dovrà essere caricato singolarmente tramite il menu 'Crea'`,
 	},
 	member: {
 		createNewMember: 'Crea un nuovo membro',
@@ -2072,7 +2074,8 @@ export default {
 		openBackofficeSearch: 'Apri la ricerca nel backoffice',
 		openCloseBackofficeHelp: "Apri/chiudi l'aiuto del backoffice",
 		openCloseBackofficeProfileOptions: 'Apri/chiudi le opzioni del tuo profilo',
-		profileOptions: 'Opzioni del profilo',
+		profileOptions: 'Profilo utente per %0% (%1%)',
+		profileOptionsDefault: 'Profilo utente',
 		assignDomainDescription: 'Imposta le Culture e gli Hostnames per %0%',
 		createDescription: 'Crea nuovo nodo sotto %0%',
 		protectDescription: 'Imposta le restrizioni di accesso per %0%',

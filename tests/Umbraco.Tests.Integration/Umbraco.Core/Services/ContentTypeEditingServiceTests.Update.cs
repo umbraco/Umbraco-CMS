@@ -1528,4 +1528,35 @@ internal sealed partial class ContentTypeEditingServiceTests
             Assert.AreEqual(nameof(IContentType), payload.ItemType);
         });
     }
+
+    [Test]
+    public async Task Cannot_Update_Element_Type_With_Segment_Variation()
+    {
+        var createModel = ContentTypeCreateModel("Test", "test", isElement: true);
+        var contentType = (await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
+
+        var updateModel = ContentTypeUpdateModel("Test", "test", isElement: true);
+        updateModel.VariesBySegment = true;
+
+        var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentTypeOperationStatus.InvalidSegmentVariationForElementType, result.Status);
+    }
+
+    [Test]
+    public async Task Cannot_Switch_To_Element_Type_With_Existing_Segment_Variation()
+    {
+        var createModel = ContentTypeCreateModel("Test", "test");
+        createModel.VariesBySegment = true;
+        var contentType = (await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
+
+        var updateModel = ContentTypeUpdateModel("Test", "test", isElement: true);
+        updateModel.VariesBySegment = true;
+
+        var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentTypeOperationStatus.InvalidSegmentVariationForElementType, result.Status);
+    }
 }

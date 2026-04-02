@@ -2,8 +2,18 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Umbraco.Cms.Infrastructure.Migrations;
 
+/// <summary>
+/// Represents the state and progress of a migration plan that has been executed.
+/// </summary>
 public class ExecutedMigrationPlan
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Migrations.ExecutedMigrationPlan"/> class
+    /// with the specified migration plan and its initial and final states.
+    /// </summary>
+    /// <param name="plan">The <see cref="MigrationPlan"/> that was executed.</param>
+    /// <param name="initialState">The state of the migration plan before execution.</param>
+    /// <param name="finalState">The state of the migration plan after execution.</param>
     public ExecutedMigrationPlan(MigrationPlan plan, string initialState, string finalState)
     {
         Plan = plan;
@@ -11,6 +21,14 @@ public class ExecutedMigrationPlan
         FinalState = finalState ?? throw new ArgumentNullException(nameof(finalState));
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Migrations.ExecutedMigrationPlan"/> class with the specified migration plan, states, success flag, and completed transitions.
+    /// </summary>
+    /// <param name="plan">The migration plan that was executed.</param>
+    /// <param name="initialState">The state before the migration was executed.</param>
+    /// <param name="finalState">The state after the migration was executed.</param>
+    /// <param name="successful">True if the migration execution was successful; otherwise, false.</param>
+    /// <param name="completedTransitions">The transitions that were completed during the migration execution.</param>
     [SetsRequiredMembers]
     public ExecutedMigrationPlan(
         MigrationPlan plan,
@@ -27,6 +45,9 @@ public class ExecutedMigrationPlan
         ExecutedMigrationContexts = Array.Empty<IMigrationContext>();
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ExecutedMigrationPlan"/> class, which represents a record of a completed migration plan execution.
+    /// </summary>
     public ExecutedMigrationPlan()
     {
     }

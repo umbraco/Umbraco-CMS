@@ -108,6 +108,13 @@ public static partial class UmbracoBuilderExtensions
         return umbracoBuilder;
     }
 
+    /// <summary>
+    /// Registers a two-factor authentication provider for the back office identity system.
+    /// </summary>
+    /// <typeparam name="T">The type of the two-factor provider to register. Must implement <see cref="ITwoFactorProvider"/>.</typeparam>
+    /// <param name="identityBuilder">The <see cref="BackOfficeIdentityBuilder"/> to configure.</param>
+    /// <param name="providerName">The unique name of the two-factor provider.</param>
+    /// <returns>The configured <see cref="BackOfficeIdentityBuilder"/> instance.</returns>
     public static BackOfficeIdentityBuilder AddTwoFactorProvider<T>(
         this BackOfficeIdentityBuilder identityBuilder,
         string providerName) where T : class, ITwoFactorProvider
