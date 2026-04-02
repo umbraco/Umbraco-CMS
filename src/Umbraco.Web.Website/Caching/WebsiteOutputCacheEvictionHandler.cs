@@ -85,6 +85,7 @@ internal sealed class WebsiteOutputCacheEvictionHandler : INotificationAsyncHand
 
             // Invoke custom eviction providers.
             var context = new OutputCacheContentChangedContext(
+                payload.Id,
                 contentKey,
                 payload.PublishedCultures ?? Array.Empty<string>(),
                 payload.UnpublishedCultures ?? Array.Empty<string>());

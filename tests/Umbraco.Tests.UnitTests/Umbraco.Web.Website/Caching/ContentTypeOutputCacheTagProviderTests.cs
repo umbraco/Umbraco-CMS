@@ -6,7 +6,7 @@ using Umbraco.Cms.Web.Website.Caching;
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Website.Caching;
 
 [TestFixture]
-public class DefaultWebsiteOutputCacheTagProviderTests
+public class ContentTypeOutputCacheTagProviderTests
 {
     [Test]
     public void GetTags_ReturnsContentTypeTag()
@@ -14,7 +14,7 @@ public class DefaultWebsiteOutputCacheTagProviderTests
         var contentType = Mock.Of<IPublishedContentType>(ct => ct.Alias == "blogPost");
         var content = Mock.Of<IPublishedContent>(c => c.ContentType == contentType);
 
-        var provider = new DefaultWebsiteOutputCacheTagProvider();
+        var provider = new ContentTypeOutputCacheTagProvider();
 
         var tags = provider.GetTags(content).ToList();
 
