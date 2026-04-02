@@ -24,7 +24,7 @@ public class ContentFinderByUrlNew : IContentFinder
     private WebRoutingSettings _webRoutingSettings;
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="ContentFinderByUrl" /> class.
+    ///     Initializes a new instance of the <see cref="ContentFinderByUrlNew" /> class.
     /// </summary>
     public ContentFinderByUrlNew(
         ILogger<ContentFinderByUrlNew> logger,
