@@ -1,98 +1,106 @@
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { html, customElement, state, repeat, css, until, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { UMB_CREATE_MEMBER_WORKSPACE_PATH_PATTERN } from '../../paths.js';
+import { css, customElement, html, map, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { UmbMemberTypeStructureRepository } from '@umbraco-cms/backoffice/member-type';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbMemberTypeTreeRepository } from '@umbraco-cms/backoffice/member-type';
+import type { ManifestCollectionAction } from '@umbraco-cms/backoffice/collection';
+import type { UmbAllowedMemberTypeModel } from '@umbraco-cms/backoffice/member-type';
 
 @customElement('umb-create-member-collection-action')
 export class UmbCreateMemberCollectionActionElement extends UmbLitElement {
 	@state()
-	private _options: Array<{ label: string; unique: string; icon: string }> = [];
+	private _allowedMemberTypes: Array<UmbAllowedMemberTypeModel> = [];
 
-	#memberTypeTreeRepository = new UmbMemberTypeTreeRepository(this);
-	#optionRequestPromise?: Promise<void>;
+	@state()
+	private _popoverOpen = false;
 
-	async #getOptions() {
-		//TODO: Should we use the tree repository or make a collection repository?
-		//TODO: And how would we get all the member types?
-		//TODO: This only works because member types can't have folders.
-		const { data } = await this.#memberTypeTreeRepository.requestTreeRootItems({});
-		if (!data) return;
+	@property({ attribute: false })
+	manifest?: ManifestCollectionAction;
 
-		this._options = data.items.map((item) => {
-			return {
-				label: item.name,
-				unique: item.unique,
-				icon: item.icon || '',
-			};
-		});
-		this.requestUpdate();
+	#memberTypeStructureRepository = new UmbMemberTypeStructureRepository(this);
+
+	override async firstUpdated() {
+		this.#retrieveAllowedMemberTypes();
 	}
 
-	#onButtonClick = async () => {
-		if (this._options.length > 0) return;
-
-		await this.#getOptions();
-
-		if (this._options.length === 1) {
-			history.pushState({}, '', `section/member-management/workspace/member/create/${this._options[0].unique}`);
+	async #retrieveAllowedMemberTypes() {
+		const { data } = await this.#memberTypeStructureRepository.requestAllowedChildrenOf(null, null);
+		if (data && data.items) {
+			this._allowedMemberTypes = data.items;
 		}
-	};
+	}
 
-	async #renderOptions() {
-		await this.#optionRequestPromise;
+	#onPopoverToggle(event: ToggleEvent) {
+		// TODO: This ignorer is just needed for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
+		this._popoverOpen = event.newState === 'open';
+	}
 
-		// If we only have one option, we don't need to render the popover. We will go directly to it on click.
-		if (this._options.length === 1) return nothing;
-
-		return html`
-			${repeat(
-				this._options,
-				(option) => option.unique,
-				(option) =>
-					html`<uui-button
-						class="create-member-type"
-						compact
-						label=${option.label}
-						href="section/member-management/workspace/member/create/${option.unique}">
-						<div>
-							<umb-icon name=${option.icon}></umb-icon>
-							<span>${option.label}</span>
-						</div>
-					</uui-button>`,
-			)}
-		`;
+	#getCreateUrl(item: UmbAllowedMemberTypeModel) {
+		if (!item.unique) {
+			throw new Error('Item unique is missing');
+		}
+		return UMB_CREATE_MEMBER_WORKSPACE_PATH_PATTERN.generateAbsolute({
+			memberTypeUnique: item.unique,
+		});
 	}
 
 	override render() {
+		return this._allowedMemberTypes.length !== 1 ? this.#renderDropdown() : this.#renderCreateButton();
+	}
+
+	#renderCreateButton() {
+		if (this._allowedMemberTypes.length !== 1) return;
+
+		const item = this._allowedMemberTypes[0];
+		const label =
+			(this.manifest?.meta.label
+				? this.localize.string(this.manifest?.meta.label)
+				: this.localize.term('general_create')) +
+			' ' +
+			this.localize.string(item.name);
+
 		return html`
-			<uui-button
-				label=${this.localize.term('general_create')}
-				@click=${this.#onButtonClick}
-				look="outline"
-				data-mark="action:create"
-				popovertarget="create-popover"></uui-button>
-			<uui-popover-container id="create-popover">
-				<div id="popover-content">${until(this.#renderOptions(), html`<uui-loader></uui-loader>`)}</div>
+			<uui-button color="default" href=${this.#getCreateUrl(item)} label=${label} look="outline"></uui-button>
+		`;
+	}
+
+	#renderDropdown() {
+		if (!this._allowedMemberTypes.length) return;
+
+		const label = this.manifest?.meta.label
+			? this.localize.string(this.manifest?.meta.label)
+			: this.localize.term('general_create');
+
+		return html`
+			<uui-button popovertarget="collection-action-menu-popover" label=${label} color="default" look="outline">
+				${label}
+				<uui-symbol-expand .open=${this._popoverOpen}></uui-symbol-expand>
+			</uui-button>
+			<uui-popover-container
+				id="collection-action-menu-popover"
+				placement="bottom-start"
+				@toggle=${this.#onPopoverToggle}>
+				<umb-popover-layout>
+					<uui-scroll-container>
+						${map(
+							this._allowedMemberTypes,
+							(item) => html`
+								<uui-menu-item label=${this.localize.string(item.name)} href=${this.#getCreateUrl(item)}>
+									<umb-icon slot="icon" name=${item.icon ?? 'icon-user'}></umb-icon>
+								</uui-menu-item>
+							`,
+						)}
+					</uui-scroll-container>
+				</umb-popover-layout>
 			</uui-popover-container>
 		`;
 	}
 
 	static override styles = [
-		UmbTextStyles,
 		css`
-			#popover-content {
-				background-color: var(--uui-color-surface);
-				box-shadow: var(--uui-shadow-depth-3);
-				border-radius: var(--uui-border-radius);
-				display: flex;
-				flex-direction: column;
-				--uui-button-content-align: left;
-			}
-
-			uui-button.create-member-type > div {
-				display: flex;
-				align-items: center;
-				gap: 5px;
+			uui-scroll-container {
+				max-height: 500px;
 			}
 		`,
 	];

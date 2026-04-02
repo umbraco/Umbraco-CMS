@@ -83,6 +83,7 @@ public interface IHostingEnvironment
     /// <summary>
     ///     Gets the main application url.
     /// </summary>
+    // TODO (V18): Change to Uri? to reflect that this can be null when ApplicationUrlDetection is None and no explicit URL is configured.
     Uri ApplicationMainUrl { get; }
 
     /// <summary>
