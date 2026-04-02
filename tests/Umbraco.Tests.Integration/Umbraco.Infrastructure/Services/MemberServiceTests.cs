@@ -34,24 +34,6 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
 
     private IPublishedContentFactory PublishedContentFactory => GetRequiredService<IPublishedContentFactory>();
 
-    private IExamineManager ExamineManager => GetRequiredService<IExamineManager>();
-
-    private ISearcher MembersIndexSearcher
-    {
-        get
-        {
-            if (!ExamineManager.TryGetIndex(Constants.UmbracoIndexes.MembersIndexName, out IIndex? index))
-            {
-                Assert.Fail("MembersIndex not found");
-            }
-
-            return index!.Searcher;
-        }
-    }
-
-    protected override void CustomTestSetup(IUmbracoBuilder builder)
-        => builder.Services.AddUnique<IServerMessenger, ContentEventsTests.LocalServerMessenger>();
-
     [Test]
     public async Task Can_Update_Member_Property_Values()
     {
@@ -1023,12 +1005,12 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
         var customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
         MemberService.Save(customMember);
 
-        ISearchResults found = MembersIndexSearcher
-            .CreateQuery(IndexTypes.Member)
-            .Field("title", "hello member")
-            .Execute();
+#pragma warning disable CS0618 // Type or member is obsolete
+        var found = MemberService.GetMembersByPropertyValue(
+            "title", "hello member");
+#pragma warning restore CS0618 // Type or member is obsolete
 
-        Assert.AreEqual(1, found.TotalItemCount);
+        Assert.AreEqual(1, found.Count());
     }
 
     [Test]
@@ -1041,12 +1023,12 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
         var customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
         MemberService.Save(customMember);
 
-        ISearchResults found = MembersIndexSearcher
-            .CreateQuery(IndexTypes.Member)
-            .Field("title", (IExamineValue)new ExamineValue(Examineness.ComplexWildcard, "*member*"))
-            .Execute();
+#pragma warning disable CS0618 // Type or member is obsolete
+        var found = MemberService.GetMembersByPropertyValue(
+            "title", " member", StringPropertyMatchType.Contains);
+#pragma warning restore CS0618 // Type or member is obsolete
 
-        Assert.AreEqual(11, found.TotalItemCount);
+        Assert.AreEqual(11, found.Count());
     }
 
     [Test]
@@ -1059,14 +1041,12 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
         var customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
         MemberService.Save(customMember);
 
-        ISearchResults found = MembersIndexSearcher
-            .CreateQuery(IndexTypes.Member)
-            .Field("title", "member")
-            .And()
-            .Field("title", (IExamineValue)new ExamineValue(Examineness.ComplexWildcard, "no*"))
-            .Execute();
+#pragma warning disable CS0618 // Type or member is obsolete
+        var found = MemberService.GetMembersByPropertyValue(
+            "title", "Member No", StringPropertyMatchType.StartsWith);
+#pragma warning restore CS0618 // Type or member is obsolete
 
-        Assert.AreEqual(10, found.TotalItemCount);
+        Assert.AreEqual(10, found.Count());
     }
 
     [Test]
@@ -1080,12 +1060,12 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
         customMember.SetValue("title", "title of mine");
         MemberService.Save(customMember);
 
-        ISearchResults found = MembersIndexSearcher
-            .CreateQuery(IndexTypes.Member)
-            .Field("title", (IExamineValue)new ExamineValue(Examineness.ComplexWildcard, "*mine"))
-            .Execute();
+#pragma warning disable CS0618 // Type or member is obsolete
+        var found = MemberService.GetMembersByPropertyValue(
+            "title", "mine", StringPropertyMatchType.EndsWith);
+#pragma warning restore CS0618 // Type or member is obsolete
 
-        Assert.AreEqual(1, found.TotalItemCount);
+        Assert.AreEqual(1, found.Count());
     }
 
     [Test]
@@ -1114,12 +1094,12 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
         customMember.SetValue("number", 2);
         MemberService.Save(customMember);
 
-        ISearchResults found = MembersIndexSearcher
-            .CreateQuery(IndexTypes.Member)
-            .Field("number", 2)
-            .Execute();
+#pragma warning disable CS0618 // Type or member is obsolete
+        var found = MemberService.GetMembersByPropertyValue(
+            "number", 2);
+#pragma warning restore CS0618 // Type or member is obsolete
 
-        Assert.AreEqual(2, found.TotalItemCount);
+        Assert.AreEqual(2, found.Count());
     }
 
     [Test]
@@ -1148,12 +1128,12 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
         customMember.SetValue("number", 10);
         MemberService.Save(customMember);
 
-        ISearchResults found = MembersIndexSearcher
-            .CreateQuery(IndexTypes.Member)
-            .RangeQuery<int>(new[] { "number" }, 3, null, false, false)
-            .Execute();
+#pragma warning disable CS0618 // Type or member is obsolete
+        var found = MemberService.GetMembersByPropertyValue(
+            "number", 3, ValuePropertyMatchType.GreaterThan);
+#pragma warning restore CS0618 // Type or member is obsolete
 
-        Assert.AreEqual(7, found.TotalItemCount);
+        Assert.AreEqual(7, found.Count());
     }
 
     [Test]
@@ -1182,12 +1162,12 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
         customMember.SetValue("number", 10);
         MemberService.Save(customMember);
 
-        ISearchResults found = MembersIndexSearcher
-            .CreateQuery(IndexTypes.Member)
-            .RangeQuery<int>(new[] { "number" }, 3, null, true, false)
-            .Execute();
+#pragma warning disable CS0618 // Type or member is obsolete
+        var found = MemberService.GetMembersByPropertyValue(
+            "number", 3, ValuePropertyMatchType.GreaterThanOrEqualTo);
+#pragma warning restore CS0618 // Type or member is obsolete
 
-        Assert.AreEqual(8, found.TotalItemCount);
+        Assert.AreEqual(8, found.Count());
     }
 
     [Test]
@@ -1216,12 +1196,12 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
         customMember.SetValue("number", 1);
         MemberService.Save(customMember);
 
-        ISearchResults found = MembersIndexSearcher
-            .CreateQuery(IndexTypes.Member)
-            .RangeQuery<int>(new[] { "number" }, null, 5, false, false)
-            .Execute();
+#pragma warning disable CS0618 // Type or member is obsolete
+        var found = MemberService.GetMembersByPropertyValue(
+            "number", 5, ValuePropertyMatchType.LessThan);
+#pragma warning restore CS0618 // Type or member is obsolete
 
-        Assert.AreEqual(6, found.TotalItemCount);
+        Assert.AreEqual(6, found.Count());
     }
 
     [Test]
@@ -1250,12 +1230,12 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
         customMember.SetValue("number", 1);
         MemberService.Save(customMember);
 
-        ISearchResults found = MembersIndexSearcher
-            .CreateQuery(IndexTypes.Member)
-            .RangeQuery<int>(new[] { "number" }, null, 5, false, true)
-            .Execute();
+#pragma warning disable CS0618 // Type or member is obsolete
+        var found = MemberService.GetMembersByPropertyValue(
+            "number", 5, ValuePropertyMatchType.LessThanOrEqualTo);
+#pragma warning restore CS0618 // Type or member is obsolete
 
-        Assert.AreEqual(7, found.TotalItemCount);
+        Assert.AreEqual(7, found.Count());
     }
 
     [Test]
@@ -1286,12 +1266,12 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
         customMember.SetValue("date", new DateTime(2013, 12, 20, 1, 2, 0));
         MemberService.Save(customMember);
 
-        ISearchResults found = MembersIndexSearcher
-            .CreateQuery(IndexTypes.Member)
-            .Field("date", new DateTime(2013, 12, 20, 1, 2, 0))
-            .Execute();
+#pragma warning disable CS0618 // Type or member is obsolete
+        var found = MemberService.GetMembersByPropertyValue(
+            "date", new DateTime(2013, 12, 20, 1, 2, 0));
+#pragma warning restore CS0618 // Type or member is obsolete
 
-        Assert.AreEqual(2, found.TotalItemCount);
+        Assert.AreEqual(2, found.Count());
     }
 
     [Test]
@@ -1322,12 +1302,12 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
         customMember.SetValue("date", new DateTime(2013, 12, 20, 1, 10, 0));
         MemberService.Save(customMember);
 
-        ISearchResults found = MembersIndexSearcher
-            .CreateQuery(IndexTypes.Member)
-            .RangeQuery<DateTime>(new[] { "date" }, new DateTime(2013, 12, 20, 1, 3, 0), null, false, false)
-            .Execute();
+#pragma warning disable CS0618 // Type or member is obsolete
+        var found = MemberService.GetMembersByPropertyValue(
+            "date", new DateTime(2013, 12, 20, 1, 3, 0), ValuePropertyMatchType.GreaterThan);
+#pragma warning restore CS0618 // Type or member is obsolete
 
-        Assert.AreEqual(7, found.TotalItemCount);
+        Assert.AreEqual(7, found.Count());
     }
 
     [Test]
@@ -1358,12 +1338,12 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
         customMember.SetValue("date", new DateTime(2013, 12, 20, 1, 10, 0));
         MemberService.Save(customMember);
 
-        ISearchResults found = MembersIndexSearcher
-            .CreateQuery(IndexTypes.Member)
-            .RangeQuery<DateTime>(new[] { "date" }, new DateTime(2013, 12, 20, 1, 3, 0), null, true, false)
-            .Execute();
+#pragma warning disable CS0618 // Type or member is obsolete
+        var found = MemberService.GetMembersByPropertyValue(
+            "date", new DateTime(2013, 12, 20, 1, 3, 0), ValuePropertyMatchType.GreaterThanOrEqualTo);
+#pragma warning restore CS0618 // Type or member is obsolete
 
-        Assert.AreEqual(8, found.TotalItemCount);
+        Assert.AreEqual(8, found.Count());
     }
 
     [Test]
@@ -1394,12 +1374,12 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
         customMember.SetValue("date", new DateTime(2013, 12, 20, 1, 1, 0));
         MemberService.Save(customMember);
 
-        ISearchResults found = MembersIndexSearcher
-            .CreateQuery(IndexTypes.Member)
-            .RangeQuery<DateTime>(new[] { "date" }, null, new DateTime(2013, 12, 20, 1, 5, 0), false, false)
-            .Execute();
+#pragma warning disable CS0618 // Type or member is obsolete
+        var found = MemberService.GetMembersByPropertyValue(
+            "date", new DateTime(2013, 12, 20, 1, 5, 0), ValuePropertyMatchType.LessThan);
+#pragma warning restore CS0618 // Type or member is obsolete
 
-        Assert.AreEqual(6, found.TotalItemCount);
+        Assert.AreEqual(6, found.Count());
     }
 
     [Test]
@@ -1430,12 +1410,14 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
         customMember.SetValue("date", new DateTime(2013, 12, 20, 1, 1, 0));
         MemberService.Save(customMember);
 
-        ISearchResults found = MembersIndexSearcher
-            .CreateQuery(IndexTypes.Member)
-            .RangeQuery<DateTime>(new[] { "date" }, null, new DateTime(2013, 12, 20, 1, 5, 0), false, true)
-            .Execute();
+#pragma warning disable CS0618 // Type or member is obsolete
+        var found = MemberService.GetMembersByPropertyValue(
+            "date",
+            new DateTime(2013, 12, 20, 1, 5, 0),
+            ValuePropertyMatchType.LessThanOrEqualTo);
+#pragma warning restore CS0618 // Type or member is obsolete
 
-        Assert.AreEqual(7, found.TotalItemCount);
+        Assert.AreEqual(7, found.Count());
     }
 
     [Test]
