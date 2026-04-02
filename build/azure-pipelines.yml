@@ -117,7 +117,7 @@ stages:
               artifactName: csharp-docs-dlls
           - powershell: |
               dotnet tool install --global CycloneDX
-              dotnet-CycloneDX $(solution) --output $(Build.ArtifactStagingDirectory)/bom --filename bom-dotnet.xml
+              dotnet-CycloneDX $(solution) --spec-version 1.5 --output $(Build.ArtifactStagingDirectory)/bom --filename bom-dotnet.xml
             displayName: 'Generate Backend BOM'
           - powershell: |
               npm install --global @cyclonedx/cyclonedx-npm
@@ -866,6 +866,40 @@ stages:
               npm publish "${files[0]}"
             displayName: Push to npm (MyGet)
             workingDirectory: $(Pipeline.Workspace)/npm
+      - job: PublishTestHelpersNpm
+        displayName: Push TestHelpers to pre-release feed (npm)
+        steps:
+          - checkout: none
+          - download: current
+            artifact: npm-testhelpers
+          - bash: |
+              # Check if we are on a nightly build
+              if [ $isNightly = "False" ]; then
+                  echo "##[debug]Prerelease build detected"
+                  registry="https://www.myget.org/F/umbracoprereleases/npm/"
+              else
+                  echo "##[debug]Nightly build detected"
+                  registry="https://www.myget.org/F/umbraconightly/npm/"
+              fi
+              echo "@umbraco-cms:registry=$registry" >> .npmrc
+            env:
+              isNightly: ${{parameters.isNightly}}
+            workingDirectory: $(Pipeline.Workspace)/npm-testhelpers
+            displayName: Add scoped registry to .npmrc
+          - task: npmAuthenticate@0
+            displayName: Authenticate with npm (MyGet)
+            inputs:
+              workingFile: "$(Pipeline.Workspace)/npm-testhelpers/.npmrc"
+              customEndpoint: "MyGet (npm) - Umbracoprereleases, MyGet (npm) - Umbraconightly"
+          - bash: |
+              # Setup temp npm project to load in defaults from the local .npmrc
+              npm init -y
+
+              # Find the first .tgz file in the current directory and publish it
+              files=( ./*.tgz )
+              npm publish "${files[0]}"
+            displayName: Push test helpers to npm (MyGet)
+            workingDirectory: $(Pipeline.Workspace)/npm-testhelpers
 
   - stage: Deploy_NuGet
     displayName: NuGet release
@@ -926,7 +960,7 @@ stages:
           - checkout: none
           - download: current
             artifact: npm-testhelpers
-          - bash: echo "@umbraco:registry=https://registry.npmjs.org" >> .npmrc
+          - bash: echo "@umbraco-cms:registry=https://registry.npmjs.org" >> .npmrc
             workingDirectory: $(Pipeline.Workspace)/npm-testhelpers
             displayName: Add scoped registry to .npmrc
           - task: npmAuthenticate@0
