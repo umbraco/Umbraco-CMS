@@ -12,7 +12,7 @@ public class RecurringBackgroundJobHostedServiceRunner : IHostedService
     private readonly ILogger<RecurringBackgroundJobHostedServiceRunner> _logger;
     private readonly List<IRecurringBackgroundJob> _jobs;
     private readonly Func<IRecurringBackgroundJob, IHostedService> _jobFactory;
-    private readonly List<NamedServiceJob> _hostedServices = new();
+    private readonly List<TypedServiceJob> _hostedServices = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RecurringBackgroundJobHostedServiceRunner" /> class.
@@ -37,22 +37,22 @@ public class RecurringBackgroundJobHostedServiceRunner : IHostedService
 
         foreach (IRecurringBackgroundJob job in _jobs)
         {
-            var jobName = job.GetType().Name;
+            Type jobType = job.GetType();
             try
             {
 
-                _logger.LogDebug("Creating background hosted service for {job}", jobName);
+                _logger.LogDebug("Creating background hosted service for {job}", jobType.Name);
                 IHostedService hostedService = _jobFactory(job);
 
-                _logger.LogInformation("Starting a background hosted service for {job} with a delay of {delay}, running every {period}", jobName, job.Delay, job.Period);
+                _logger.LogInformation("Starting a background hosted service for {job} with a delay of {delay}, running every {period}", jobType.Name, job.Delay, job.Period);
 
                 await hostedService.StartAsync(cancellationToken).ConfigureAwait(false);
 
-                _hostedServices.Add(new NamedServiceJob(jobName, hostedService));
+                _hostedServices.Add(new TypedServiceJob(jobType, hostedService));
             }
             catch (Exception exception)
             {
-                _logger.LogError(exception, "Failed to start background hosted service for {job}", jobName);
+                _logger.LogError(exception, "Failed to start background hosted service for {job}", jobType.Name);
             }
         }
 
@@ -64,16 +64,16 @@ public class RecurringBackgroundJobHostedServiceRunner : IHostedService
     {
         _logger.LogInformation("Stopping recurring background jobs hosted services");
 
-        foreach (NamedServiceJob namedServiceJob in _hostedServices)
+        foreach (TypedServiceJob typedServiceJob in _hostedServices)
         {
             try
             {
-                _logger.LogInformation("Stopping background hosted service for {job}", namedServiceJob.Name);
-                await namedServiceJob.HostedService.StopAsync(stoppingToken).ConfigureAwait(false);
+                _logger.LogInformation("Stopping background hosted service for {job}", typedServiceJob.JobType.Name);
+                await typedServiceJob.HostedService.StopAsync(stoppingToken).ConfigureAwait(false);
             }
             catch (Exception exception)
             {
-                _logger.LogError(exception, "Failed to stop background hosted service for {job}", namedServiceJob.Name);
+                _logger.LogError(exception, "Failed to stop background hosted service for {job}", typedServiceJob.JobType.Name);
             }
         }
 
@@ -137,31 +137,31 @@ public class RecurringBackgroundJobHostedServiceRunner : IHostedService
 
     private RecurringHostedServiceBase? FindHostedService<TJob>()
         where TJob : IRecurringBackgroundJob
-        => _hostedServices.Find(x => x.Name == typeof(TJob).Name)?.HostedService as RecurringHostedServiceBase;
+        => _hostedServices.Find(x => x.JobType == typeof(TJob))?.HostedService as RecurringHostedServiceBase;
 
-    private sealed class NamedServiceJob
+    private sealed class TypedServiceJob
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="NamedServiceJob" /> class using the specified job name and hosted service instance.
+        /// Initializes a new instance of the <see cref="TypedServiceJob" /> class using the specified job type and hosted service instance.
         /// </summary>
-        /// <param name="name">The unique name identifying the job.</param>
+        /// <param name="jobType">The runtime type of the recurring background job.</param>
         /// <param name="hostedService">The <see cref="IHostedService" /> instance to be executed as the background job.</param>
-        public NamedServiceJob(string name, IHostedService hostedService)
+        public TypedServiceJob(Type jobType, IHostedService hostedService)
         {
-            Name = name;
+            JobType = jobType;
             HostedService = hostedService;
         }
 
         /// <summary>
-        /// Gets the unique name that identifies this background job.
+        /// Gets the runtime type of the recurring background job.
         /// </summary>
         /// <value>
-        /// The name.
+        /// The job type.
         /// </value>
-        public string Name { get; }
+        public Type JobType { get; }
 
         /// <summary>
-        /// Gets the hosted service instance associated with the named service job.
+        /// Gets the hosted service instance associated with the job.
         /// </summary>
         /// <value>
         /// The hosted service.
