@@ -135,10 +135,15 @@ public class RecurringBackgroundJobHostedService<TJob> : RecurringHostedServiceB
             await _job.RunJobAsync(stoppingToken);
             await _eventAggregator.PublishAsync(new RecurringBackgroundJobExecutedNotification(_job, eventMessages).WithStateFrom(executingNotification), stoppingToken);
         }
+        catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+        {
+            _logger.LogDebug("Job canceled during shutdown.");
+            await _eventAggregator.PublishAsync(new RecurringBackgroundJobCanceledNotification(_job, eventMessages).WithStateFrom(executingNotification), CancellationToken.None);
+        }
         catch (Exception ex)
         {
-            await _eventAggregator.PublishAsync(new RecurringBackgroundJobFailedNotification(_job, eventMessages).WithStateFrom(executingNotification), stoppingToken);
             _logger.LogError(ex, "Unhandled exception in recurring background job.");
+            await _eventAggregator.PublishAsync(new RecurringBackgroundJobFailedNotification(_job, eventMessages).WithStateFrom(executingNotification), stoppingToken);
         }
     }
 
