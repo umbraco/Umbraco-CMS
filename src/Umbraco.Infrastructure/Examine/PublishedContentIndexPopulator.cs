@@ -1,4 +1,6 @@
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence;
 
@@ -15,12 +17,38 @@ namespace Umbraco.Cms.Infrastructure.Examine;
 /// </remarks>
 public class PublishedContentIndexPopulator : ContentIndexPopulator
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PublishedContentIndexPopulator"/> class.
+    /// </summary>
+    /// <param name="logger">The logger used for logging information and errors.</param>
+    /// <param name="contentService">The service used to manage Umbraco content.</param>
+    /// <param name="umbracoDatabaseFactory">The factory for creating Umbraco database instances.</param>
+    /// <param name="contentValueSetBuilder">The builder for creating value sets from published content.</param>
+    [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in Umbraco 19.")]
     public PublishedContentIndexPopulator(
         ILogger<PublishedContentIndexPopulator> logger,
         IContentService contentService,
         IUmbracoDatabaseFactory umbracoDatabaseFactory,
         IPublishedContentValueSetBuilder contentValueSetBuilder)
         : base(logger, true, null, contentService, umbracoDatabaseFactory, contentValueSetBuilder)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PublishedContentIndexPopulator"/> class.
+    /// </summary>
+    /// <param name="logger">The <see cref="ILogger{PublishedContentIndexPopulator}"/> used for logging operations.</param>
+    /// <param name="contentService">The <see cref="IContentService"/> used to access and manage content items.</param>
+    /// <param name="umbracoDatabaseFactory">The <see cref="IUmbracoDatabaseFactory"/> used to create Umbraco database connections.</param>
+    /// <param name="contentValueSetBuilder">The <see cref="IPublishedContentValueSetBuilder"/> responsible for building value sets for published content.</param>
+    /// <param name="indexingSettings">The <see cref="IOptionsMonitor{IndexingSettings}"/> providing access to indexing configuration settings.</param>
+    public PublishedContentIndexPopulator(
+        ILogger<PublishedContentIndexPopulator> logger,
+        IContentService contentService,
+        IUmbracoDatabaseFactory umbracoDatabaseFactory,
+        IPublishedContentValueSetBuilder contentValueSetBuilder,
+        IOptionsMonitor<IndexingSettings> indexingSettings)
+        : base(logger, true, null, contentService, umbracoDatabaseFactory, contentValueSetBuilder, indexingSettings)
     {
     }
 }

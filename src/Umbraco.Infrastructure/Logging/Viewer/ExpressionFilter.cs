@@ -11,6 +11,10 @@ internal sealed class ExpressionFilter : ILogFilter
     private const string ExpressionOperators = "()+=*<>%-";
     private readonly Func<LogEvent, bool>? _filter;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Core.Logging.Viewer.ExpressionFilter"/> class with the specified filter expression.
+    /// </summary>
+    /// <param name="filterExpression">The filter expression to apply.</param>
     public ExpressionFilter(string? filterExpression)
     {
         Func<LogEvent, bool>? filter;
@@ -54,6 +58,12 @@ internal sealed class ExpressionFilter : ILogFilter
 
         _filter = filter;
     }
+
+    /// <summary>
+    /// Evaluates whether a given log event satisfies the filter criteria.
+    /// </summary>
+    /// <param name="e">The <see cref="LogEvent"/> to evaluate.</param>
+    /// <returns><c>true</c> if the log event passes the filter; otherwise, <c>false</c>.</returns>
 
     public bool TakeLogEvent(LogEvent e) => _filter == null || _filter(e);
 

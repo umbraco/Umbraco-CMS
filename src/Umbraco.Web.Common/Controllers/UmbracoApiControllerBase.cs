@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Web.Common.Controllers;
 /// </remarks>
 [Authorize(Policy = AuthorizationPolicies.UmbracoFeatureEnabled)]
 [UmbracoApiController]
-[Obsolete("This will be removed in Umbraco 15.")]
+[Obsolete("Scheduled for removal in Umbraco 18.")]
 public abstract class UmbracoApiControllerBase : ControllerBase, IUmbracoFeature
 {
     /// <summary>

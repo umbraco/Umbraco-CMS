@@ -14,8 +14,11 @@ export type * from './collection/types.js';
 export type * from './entity.js';
 export type * from './item/types.js';
 export type * from './modals/types.js';
+export type * from './preview/types.js';
 export type * from './publishing/types.js';
 export type * from './recycle-bin/types.js';
+export type * from './search/types.js';
+export type * from './repository/types.js';
 export type * from './tree/types.js';
 export type * from './url/types.js';
 export type * from './user-permissions/types.js';
@@ -49,8 +52,9 @@ export interface UmbDocumentUrlInfoModel {
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface UmbDocumentValueModel<ValueType = unknown> extends UmbElementValueModel<ValueType> {}
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface UmbDocumentVariantOptionModel extends UmbEntityVariantOptionModel<UmbDocumentVariantModel> {}
+export interface UmbDocumentVariantOptionModel extends UmbEntityVariantOptionModel<UmbDocumentVariantModel> {
+	documentCount?: number;
+}
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface UmbDocumentVariantPublishModel extends UmbEntityVariantPublishModel {}

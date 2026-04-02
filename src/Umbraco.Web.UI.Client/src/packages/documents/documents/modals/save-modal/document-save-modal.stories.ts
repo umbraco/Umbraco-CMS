@@ -22,6 +22,7 @@ const modalData: UmbDocumentSaveModalData = {
 				segment: null,
 				scheduledPublishDate: null,
 				scheduledUnpublishDate: null,
+				flags: [],
 			},
 			language: {
 				entityType: 'language',
@@ -46,6 +47,7 @@ const modalData: UmbDocumentSaveModalData = {
 				updateDate: null,
 				scheduledPublishDate: null,
 				scheduledUnpublishDate: null,
+				flags: [],
 			},
 			language: {
 				entityType: 'language',
@@ -70,6 +72,7 @@ const modalData: UmbDocumentSaveModalData = {
 				segment: null,
 				scheduledPublishDate: null,
 				scheduledUnpublishDate: null,
+				flags: [],
 			},
 			language: {
 				entityType: 'language',
@@ -88,7 +91,7 @@ const modalValue: UmbDocumentSaveModalValue = {
 };
 
 const meta: Meta<UmbDocumentSaveModalElement> = {
-	title: 'Workspaces/Document/Modals/Save',
+	title: 'Entity/Document/Modals/Save',
 	component: 'umb-document-save-modal',
 	id: 'umb-document-save-modal',
 	args: {
@@ -121,6 +124,7 @@ this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (modalManager) => {
 						publishDate: null,
 						updateDate: null,
 						segment: null,
+						flags: [],
 					},
 					language: {
 						entityType: 'language',
@@ -143,6 +147,7 @@ this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (modalManager) => {
 						publishDate: null,
 						updateDate: null,
 						segment: null,
+						flags: [],
 					},
 					language: {
 						entityType: 'language',
@@ -166,4 +171,4 @@ this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (modalManager) => {
 export default meta;
 type Story = StoryObj<UmbDocumentSaveModalElement>;
 
-export const Overview: Story = {};
+export const Docs: Story = {};

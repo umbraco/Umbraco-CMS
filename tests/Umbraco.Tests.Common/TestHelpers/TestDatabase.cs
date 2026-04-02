@@ -1,13 +1,10 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Moq;
 using NPoco;
@@ -89,6 +86,9 @@ public class TestDatabase : IUmbracoDatabase
     public bool EnableSqlCount { get; set; }
 
     public int SqlCount { get; }
+    IMapperCollection IDatabaseConfig.Mappers { get => Mappers; set => throw new NotImplementedException(); }
+
+    IDatabaseType IDatabaseConfig.DatabaseType => DatabaseType;
 
     public int BulkInsertRecords<T>(IEnumerable<T> records) => throw new NotImplementedException();
     public bool IsUmbracoInstalled() => true;
@@ -154,15 +154,19 @@ public class TestDatabase : IUmbracoDatabase
         return default;
     }
 
-    public Task<T> ExecuteScalarAsync<T>(string sql, params object[] args) => throw new NotImplementedException();
+    public Task<T> ExecuteScalarAsync<T>(string sql, CancellationToken token) => throw new NotImplementedException();
 
-    public Task<T> ExecuteScalarAsync<T>(Sql sql) => throw new NotImplementedException();
+    public Task<T> ExecuteScalarAsync<T>(string sql, object[] args, CancellationToken token) => throw new NotImplementedException();
 
-    public Task<int> ExecuteAsync(string sql, params object[] args) => throw new NotImplementedException();
+    public Task<T> ExecuteScalarAsync<T>(Sql sql, CancellationToken token) => throw new NotImplementedException();
 
-    public Task<int> ExecuteAsync(Sql sql) => throw new NotImplementedException();
+    public Task<int> ExecuteAsync(string sql, CancellationToken token) => throw new NotImplementedException();
 
-    public Task<object> InsertAsync(string tableName, string primaryKeyName, object poco) =>
+    public Task<int> ExecuteAsync(string sql, object[] args, CancellationToken token) => throw new NotImplementedException();
+
+    public Task<int> ExecuteAsync(Sql sql, CancellationToken token) => throw new NotImplementedException();
+
+    public Task<object> InsertAsync(string tableName, string primaryKeyName, object poco, CancellationToken token) =>
         throw new NotImplementedException();
 
     public object Insert<T>(string tableName, string primaryKeyName, bool autoIncrement, T poco) =>
@@ -172,34 +176,35 @@ public class TestDatabase : IUmbracoDatabase
 
     public object Insert<T>(T poco) => throw new NotImplementedException();
 
-    public void InsertBulk<T>(IEnumerable<T> pocos, InsertBulkOptions? options = null) =>
+    public void InsertBulk<T>(IEnumerable<T> pocos, InsertBulkOptions? options) =>
         throw new NotImplementedException();
 
-    public Task<object> InsertAsync<T>(T poco) => throw new NotImplementedException();
+    public Task<object> InsertAsync<T>(T poco, CancellationToken token) => throw new NotImplementedException();
 
-    public Task InsertBulkAsync<T>(IEnumerable<T> pocos, InsertBulkOptions options = null) =>
+    public Task InsertBulkAsync<T>(IEnumerable<T> pocos, InsertBulkOptions? options, CancellationToken token) =>
         throw new NotImplementedException();
 
-    public Task<int> InsertBatchAsync<T>(IEnumerable<T> pocos, BatchOptions options = null) =>
+    public Task<int> InsertBatchAsync<T>(IEnumerable<T> pocos, BatchOptions? options, CancellationToken token) =>
         throw new NotImplementedException();
 
-    public Task<int> UpdateAsync(object poco) => throw new NotImplementedException();
+    public Task<int> UpdateAsync(object poco, CancellationToken token) => throw new NotImplementedException();
 
-    public Task<int> UpdateAsync(object poco, IEnumerable<string> columns) => throw new NotImplementedException();
+    public Task<int> UpdateAsync(object poco, IEnumerable<string> columns, CancellationToken token) => throw new NotImplementedException();
 
-    public Task<int> UpdateAsync<T>(T poco, Expression<Func<T, object>> fields) => throw new NotImplementedException();
+    public Task<int> UpdateAsync<T>(T poco, Expression<Func<T, object>> fields, CancellationToken token) => throw new NotImplementedException();
 
-    public Task<int> UpdateBatchAsync<T>(IEnumerable<UpdateBatch<T>> pocos, BatchOptions options = null) =>
+    public Task<int> UpdateBatchAsync<T>(IEnumerable<UpdateBatch<T>> pocos, BatchOptions? options, CancellationToken token) =>
         throw new NotImplementedException();
 
-    public Task<int> DeleteAsync(object poco) => throw new NotImplementedException();
+    public Task<int> DeleteAsync(object poco, CancellationToken token) => throw new NotImplementedException();
 
     public IAsyncUpdateQueryProvider<T> UpdateManyAsync<T>() => throw new NotImplementedException();
 
     public IAsyncDeleteQueryProvider<T> DeleteManyAsync<T>() => throw new NotImplementedException();
-    public Task<bool> IsNewAsync<T>(T poco) => throw new NotImplementedException();
 
-    public Task SaveAsync<T>(T poco) => throw new NotImplementedException();
+    public Task<bool> IsNewAsync<T>(T poco, CancellationToken token) => throw new NotImplementedException();
+
+    public Task SaveAsync<T>(T poco, CancellationToken token) => throw new NotImplementedException();
 
     int IDatabase.InsertBatch<T>(IEnumerable<T> pocos, BatchOptions options) => throw new NotImplementedException();
 
@@ -371,83 +376,117 @@ public class TestDatabase : IUmbracoDatabase
     (List<T1>, List<T2>, List<T3>) IDatabaseQuery.FetchMultiple<T1, T2, T3>(Sql sql) =>
         throw new NotImplementedException();
 
-    public Task<T> SingleAsync<T>(string sql, params object[] args) => throw new NotImplementedException();
+    public Task<T> SingleAsync<T>(string sql, CancellationToken token) => throw new NotImplementedException();
 
-    public Task<T> SingleAsync<T>(Sql sql) => throw new NotImplementedException();
+    public Task<T> SingleAsync<T>(string sql, object[] args, CancellationToken token) => throw new NotImplementedException();
 
-    public Task<T> SingleOrDefaultAsync<T>(string sql, params object[] args) => throw new NotImplementedException();
+    public Task<T> SingleAsync<T>(Sql sql, CancellationToken token) => throw new NotImplementedException();
 
-    public Task<T> SingleOrDefaultAsync<T>(Sql sql) => throw new NotImplementedException();
+    public Task<T> SingleOrDefaultAsync<T>(string sql, CancellationToken token) => throw new NotImplementedException();
 
-    public Task<T> SingleByIdAsync<T>(object primaryKey) => throw new NotImplementedException();
+    public Task<T> SingleOrDefaultAsync<T>(string sql, object[] args, CancellationToken token) => throw new NotImplementedException();
 
-    public Task<T> SingleOrDefaultByIdAsync<T>(object primaryKey) => throw new NotImplementedException();
+    public Task<T> SingleOrDefaultAsync<T>(Sql sql, CancellationToken token) => throw new NotImplementedException();
 
-    public Task<T> FirstAsync<T>(string sql, params object[] args) => throw new NotImplementedException();
+    public Task<T> SingleByIdAsync<T>(object primaryKey, CancellationToken token) => throw new NotImplementedException();
 
-    public Task<T> FirstAsync<T>(Sql sql) => throw new NotImplementedException();
+    public Task<T> SingleOrDefaultByIdAsync<T>(object primaryKey, CancellationToken token) => throw new NotImplementedException();
 
-    public Task<T> FirstOrDefaultAsync<T>(string sql, params object[] args) => throw new NotImplementedException();
+    public Task<T> FirstAsync<T>(string sql, CancellationToken token) => throw new NotImplementedException();
 
-    public Task<T> FirstOrDefaultAsync<T>(Sql sql) => throw new NotImplementedException();
+    public Task<T> FirstAsync<T>(string sql, object[] args, CancellationToken token) => throw new NotImplementedException();
 
-    IAsyncEnumerable<T> IAsyncQueryDatabase.QueryAsync<T>(string sql, params object[] args) =>
-        throw new NotImplementedException();
+    public Task<T> FirstAsync<T>(Sql sql, CancellationToken token) => throw new NotImplementedException();
 
-    IAsyncEnumerable<T> IAsyncQueryDatabase.QueryAsync<T>(Sql sql) => throw new NotImplementedException();
+    public Task<T> FirstOrDefaultAsync<T>(string sql, CancellationToken token) => throw new NotImplementedException();
+
+    public Task<T> FirstOrDefaultAsync<T>(string sql, object[] args, CancellationToken token) => throw new NotImplementedException();
+
+    public Task<T> FirstOrDefaultAsync<T>(Sql sql, CancellationToken token) => throw new NotImplementedException();
 
     public IAsyncQueryProviderWithIncludes<T> QueryAsync<T>() => throw new NotImplementedException();
 
-    public Task<List<T>> FetchAsync<T>(string sql, params object[] args) => throw new NotImplementedException();
+    IAsyncEnumerable<T> IAsyncQueryDatabase.QueryAsync<T>(string sql, CancellationToken token) => throw new NotImplementedException();
 
-    public Task<List<T>> FetchAsync<T>(Sql sql) => throw new NotImplementedException();
+    IAsyncEnumerable<T> IAsyncQueryDatabase.QueryAsync<T>(string sql, object[] args, CancellationToken token) => throw new NotImplementedException();
 
-    public Task<List<T>> FetchAsync<T>() => throw new NotImplementedException();
+    IAsyncEnumerable<T> IAsyncQueryDatabase.QueryAsync<T>(Sql sql, CancellationToken token) => throw new NotImplementedException();
 
-    public Task<Page<T>> PageAsync<T>(long page, long itemsPerPage, string sql, params object[] args) =>
+    public IAsyncQueryProviderWithIncludes<T> QueryAsync<T>(CancellationToken token) => throw new NotImplementedException();
+
+    public Task<List<T>> FetchAsync<T>(string sql, CancellationToken token) => throw new NotImplementedException();
+
+    public Task<List<T>> FetchAsync<T>(string sql, object[] args, CancellationToken token) => throw new NotImplementedException();
+
+    public Task<List<T>> FetchAsync<T>(Sql sql, CancellationToken token) => throw new NotImplementedException();
+
+    public Task<List<T>> FetchAsync<T>(CancellationToken token) => throw new NotImplementedException();
+
+    public Task<Page<T>> PageAsync<T>(long page, long itemsPerPage, string sql, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+
+    public Task<Page<T>> PageAsync<T>(long page, long itemsPerPage, string sql, object[] args, CancellationToken token) =>
         throw new NotImplementedException();
 
-    public Task<Page<T>> PageAsync<T>(long page, long itemsPerPage, Sql sql) => throw new NotImplementedException();
+    public Task<Page<T>> PageAsync<T>(long page, long itemsPerPage, Sql sql, CancellationToken token) => throw new NotImplementedException();
 
-    public Task<List<T>> FetchAsync<T>(long page, long itemsPerPage, string sql, params object[] args) =>
+    public Task<List<T>> FetchAsync<T>(long page, long itemsPerPage, string sql, CancellationToken token) =>
         throw new NotImplementedException();
 
-    public Task<List<T>> FetchAsync<T>(long page, long itemsPerPage, Sql sql) => throw new NotImplementedException();
-
-    public Task<List<T>> SkipTakeAsync<T>(long skip, long take, string sql, params object[] args) =>
+    public Task<List<T>> FetchAsync<T>(long page, long itemsPerPage, string sql, object[] args, CancellationToken token) =>
         throw new NotImplementedException();
 
-    public Task<List<T>> SkipTakeAsync<T>(long skip, long take, Sql sql) => throw new NotImplementedException();
+    public Task<List<T>> FetchAsync<T>(long page, long itemsPerPage, Sql sql, CancellationToken token) => throw new NotImplementedException();
 
-    public Task<TRet> FetchMultipleAsync<T1, T2, TRet>(Func<List<T1>, List<T2>, TRet> cb, string sql, params object[] args) => throw new NotImplementedException();
-
-    public Task<TRet> FetchMultipleAsync<T1, T2, T3, TRet>(Func<List<T1>, List<T2>, List<T3>, TRet> cb, string sql, params object[] args) => throw new NotImplementedException();
-
-    public Task<TRet> FetchMultipleAsync<T1, T2, T3, T4, TRet>(Func<List<T1>, List<T2>, List<T3>, List<T4>, TRet> cb, string sql, params object[] args) => throw new NotImplementedException();
-
-    public Task<TRet> FetchMultipleAsync<T1, T2, TRet>(Func<List<T1>, List<T2>, TRet> cb, Sql sql) =>
+    public Task<List<T>> SkipTakeAsync<T>(long skip, long take, string sql, CancellationToken token) =>
         throw new NotImplementedException();
 
-    public Task<TRet> FetchMultipleAsync<T1, T2, T3, TRet>(Func<List<T1>, List<T2>, List<T3>, TRet> cb, Sql sql) =>
+    public Task<List<T>> SkipTakeAsync<T>(long skip, long take, string sql, object[] args, CancellationToken token) =>
         throw new NotImplementedException();
 
-    public Task<TRet> FetchMultipleAsync<T1, T2, T3, T4, TRet>(Func<List<T1>, List<T2>, List<T3>, List<T4>, TRet> cb, Sql sql) => throw new NotImplementedException();
+    public Task<List<T>> SkipTakeAsync<T>(long skip, long take, Sql sql, CancellationToken token) => throw new NotImplementedException();
 
-    public Task<(List<T1>, List<T2>)> FetchMultipleAsync<T1, T2>(string sql, params object[] args) =>
+    public Task<TRet> FetchMultipleAsync<T1, T2, TRet>(Func<List<T1>, List<T2>, TRet> cb, string sql, object[] args, CancellationToken token) => throw new NotImplementedException();
+
+    public Task<TRet> FetchMultipleAsync<T1, T2, T3, TRet>(Func<List<T1>, List<T2>, List<T3>, TRet> cb, string sql, object[] args, CancellationToken token) => throw new NotImplementedException();
+
+    public Task<TRet> FetchMultipleAsync<T1, T2, T3, T4, TRet>(Func<List<T1>, List<T2>, List<T3>, List<T4>, TRet> cb, string sql, object[] args, CancellationToken token) => throw new NotImplementedException();
+
+    public Task<TRet> FetchMultipleAsync<T1, T2, TRet>(Func<List<T1>, List<T2>, TRet> cb, Sql sql, CancellationToken token) =>
         throw new NotImplementedException();
 
-    public Task<(List<T1>, List<T2>, List<T3>)> FetchMultipleAsync<T1, T2, T3>(string sql, params object[] args) =>
+    public Task<TRet> FetchMultipleAsync<T1, T2, T3, TRet>(Func<List<T1>, List<T2>, List<T3>, TRet> cb, Sql sql, CancellationToken token) =>
         throw new NotImplementedException();
 
-    public Task<(List<T1>, List<T2>, List<T3>, List<T4>)> FetchMultipleAsync<T1, T2, T3, T4>(string sql, params object[] args) => throw new NotImplementedException();
+    public Task<TRet> FetchMultipleAsync<T1, T2, T3, T4, TRet>(Func<List<T1>, List<T2>, List<T3>, List<T4>, TRet> cb, Sql sql, CancellationToken token) => throw new NotImplementedException();
 
-    public Task<(List<T1>, List<T2>)> FetchMultipleAsync<T1, T2>(Sql sql) => throw new NotImplementedException();
-
-    public Task<(List<T1>, List<T2>, List<T3>)> FetchMultipleAsync<T1, T2, T3>(Sql sql) =>
+    public Task<(List<T1>, List<T2>)> FetchMultipleAsync<T1, T2>(string sql, object[] args, CancellationToken token) =>
         throw new NotImplementedException();
 
-    public Task<(List<T1>, List<T2>, List<T3>, List<T4>)> FetchMultipleAsync<T1, T2, T3, T4>(Sql sql) =>
+    public Task<(List<T1>, List<T2>, List<T3>)> FetchMultipleAsync<T1, T2, T3>(string sql, object[] args, CancellationToken token) =>
         throw new NotImplementedException();
+
+    public Task<(List<T1>, List<T2>, List<T3>, List<T4>)> FetchMultipleAsync<T1, T2, T3, T4>(string sql, object[] args, CancellationToken token) => throw new NotImplementedException();
+
+    public Task<(List<T1>, List<T2>)> FetchMultipleAsync<T1, T2>(Sql sql, CancellationToken token) => throw new NotImplementedException();
+
+    public Task<(List<T1>, List<T2>, List<T3>)> FetchMultipleAsync<T1, T2, T3>(Sql sql, CancellationToken token) =>
+        throw new NotImplementedException();
+
+    public Task<(List<T1>, List<T2>, List<T3>, List<T4>)> FetchMultipleAsync<T1, T2, T3, T4>(Sql sql, CancellationToken token) =>
+        throw new NotImplementedException();
+
+    public Task<TRet> FetchMultipleAsync<T1, T2, TRet>(Func<List<T1>, List<T2>, TRet> cb, string sql, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+
+    public Task<TRet> FetchMultipleAsync<T1, T2, T3, TRet>(Func<List<T1>, List<T2>, List<T3>, TRet> cb, string sql, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+
+    public Task<TRet> FetchMultipleAsync<T1, T2, T3, T4, TRet>(Func<List<T1>, List<T2>, List<T3>, List<T4>, TRet> cb, string sql, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+
+    public Task<(List<T1>, List<T2>)> FetchMultipleAsync<T1, T2>(string sql, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+
+    public Task<(List<T1>, List<T2>, List<T3>)> FetchMultipleAsync<T1, T2, T3>(string sql, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+
+    public Task<(List<T1>, List<T2>, List<T3>, List<T4>)> FetchMultipleAsync<T1, T2, T3, T4>(string sql, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+
 
     public void BuildPageQueries<T>(long skip, long take, string sql, ref object[] args, out string sqlCount, out string sqlPage) => throw new NotImplementedException();
 
@@ -473,9 +512,27 @@ public class TestDatabase : IUmbracoDatabase
     public Tuple<List<T1>, List<T2>, List<T3>, List<T4>> FetchMultiple<T1, T2, T3, T4>(Sql sql) =>
         throw new NotImplementedException();
 
-    public Task<IEnumerable<T>> QueryAsync<T>(string sql, params object[] args) => throw new NotImplementedException();
+    public IDatabase OpenSharedConnection(OpenConnectionOptions? options = null) => throw new NotImplementedException();
 
-    public Task<IEnumerable<T>> QueryAsync<T>(Sql sql) => throw new NotImplementedException();
+    public Task<IAsyncDatabase> OpenSharedConnectionAsync(CancellationToken cancellationToken = default) => throw new NotImplementedException();
+
+    public Task<IAsyncDatabase> OpenSharedConnectionAsync(OpenConnectionOptions options, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+
+    public Task CloseSharedConnectionAsync() => throw new NotImplementedException();
+
+    public Task<IAsyncTransaction> GetTransactionAsync() => throw new NotImplementedException();
+
+    public Task<IAsyncTransaction> GetTransactionAsync(IsolationLevel isolationLevel) => throw new NotImplementedException();
+
+    public Task BeginTransactionAsync(CancellationToken cancellationToken = default) => throw new NotImplementedException();
+
+    public Task BeginTransactionAsync(IsolationLevel isolationLevel, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+
+    public Task AbortTransactionAsync(CancellationToken cancellationToken = default) => throw new NotImplementedException();
+
+    public Task CompleteTransactionAsync(CancellationToken cancellationToken = default) => throw new NotImplementedException();
+
+    public ValueTask DisposeAsync() => throw new NotImplementedException();
 
     /// <summary>
     ///     Represents a database operation.

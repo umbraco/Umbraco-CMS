@@ -1,6 +1,5 @@
 import type { ExampleTreeItemModel, ExampleTreeRootModel } from '../../types.js';
 import { EXAMPLE_ROOT_ENTITY_TYPE } from '../../../entity.js';
-import { EXAMPLE_TREE_STORE_CONTEXT } from '../store/index.js';
 import { ExampleTreeLocalDataSource } from '../local-data-source/index.js';
 import { UmbTreeRepositoryBase, type UmbTreeRepository } from '@umbraco-cms/backoffice/tree';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -11,7 +10,7 @@ export class ExampleTreeRepository
 	implements UmbTreeRepository, UmbApi
 {
 	constructor(host: UmbControllerHost) {
-		super(host, ExampleTreeLocalDataSource, EXAMPLE_TREE_STORE_CONTEXT);
+		super(host, ExampleTreeLocalDataSource);
 	}
 
 	async requestTreeRoot() {

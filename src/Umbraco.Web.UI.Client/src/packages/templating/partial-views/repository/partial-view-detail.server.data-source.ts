@@ -68,10 +68,7 @@ export class UmbPartialViewDetailServerDataSource implements UmbDetailDataSource
 		const path = this.#serverFilePathUniqueSerializer.toServerPath(unique);
 		if (!path) throw new Error('Path is missing');
 
-		const { data, error } = await tryExecute(
-			this.#host,
-			PartialViewService.getPartialViewByPath({ path: { path } }),
-		);
+		const { data, error } = await tryExecute(this.#host, PartialViewService.getPartialViewByPath({ path: { path } }));
 
 		if (error || !data) {
 			return { error };

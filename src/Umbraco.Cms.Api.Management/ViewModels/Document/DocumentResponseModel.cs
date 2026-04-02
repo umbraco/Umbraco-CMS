@@ -1,11 +1,15 @@
 namespace Umbraco.Cms.Api.Management.ViewModels.Document;
 
+/// <summary>
+/// Represents a response model for a document returned by the Umbraco CMS Management API.
+/// </summary>
 public class DocumentResponseModel : DocumentResponseModelBase<DocumentValueResponseModel, DocumentVariantResponseModel>
 {
-    [Obsolete("This property is no longer populated. Please use /document/{id}/urls instead to retrieve the URLs for a document. Scheduled for removal in Umbraco 17.")]
-    public IEnumerable<DocumentUrlInfo> Urls { get; set; } = Enumerable.Empty<DocumentUrlInfo>();
-
+    /// <summary>Gets or sets the template reference associated with the document.</summary>
     public ReferenceByIdModel? Template { get; set; }
 
+    /// <summary>
+    /// Gets or sets a value indicating whether the document is trashed.
+    /// </summary>
     public bool IsTrashed { get; set; }
 }

@@ -1,4 +1,8 @@
-import { UMB_BLOCK_WORKSPACE_ALIAS } from './index.js';
+import {
+	UMB_BLOCK_WORKSPACE_ALIAS,
+	UMB_BLOCK_WORKSPACE_VIEW_CONTENT,
+	UMB_BLOCK_WORKSPACE_VIEW_SETTINGS,
+} from './constants.js';
 import { UMB_WORKSPACE_CONDITION_ALIAS, UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 
 export const manifests: Array<UmbExtensionManifest> = [
@@ -22,6 +26,10 @@ export const manifests: Array<UmbExtensionManifest> = [
 				alias: 'Umb.Condition.BlockWorkspaceIsExposed',
 				match: false,
 			},
+			{
+				alias: 'Umb.Condition.BlockWorkspaceIsReadOnly',
+				match: false,
+			},
 		],
 	},
 	{
@@ -43,6 +51,10 @@ export const manifests: Array<UmbExtensionManifest> = [
 			{
 				alias: 'Umb.Condition.BlockWorkspaceIsExposed',
 			},
+			{
+				alias: 'Umb.Condition.BlockWorkspaceIsReadOnly',
+				match: false,
+			},
 		],
 	},
 	{
@@ -57,7 +69,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 	},
 	{
 		type: 'workspaceView',
-		alias: 'Umb.WorkspaceView.Block.Content',
+		alias: UMB_BLOCK_WORKSPACE_VIEW_CONTENT,
 		name: 'Block Workspace Content View',
 		element: () => import('./views/edit/block-workspace-view-edit.element.js'),
 		weight: 1000,
@@ -73,6 +85,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 				match: UMB_BLOCK_WORKSPACE_ALIAS,
 			},
 		],
+		// eslint-disable-next-line @typescript-eslint/naming-convention
 		TODO_conditions: [
 			{
 				alias: 'Umb.Condition.BlockEntryShowContentEdit',
@@ -82,7 +95,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 	// TODO: Fix manifest types so it support additional properties.
 	{
 		type: 'workspaceView',
-		alias: 'Umb.WorkspaceView.Block.Settings',
+		alias: UMB_BLOCK_WORKSPACE_VIEW_SETTINGS,
 		name: 'Block Workspace Settings View',
 		element: () => import('./views/edit/block-workspace-view-edit.element.js'),
 		weight: 900,

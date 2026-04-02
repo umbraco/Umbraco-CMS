@@ -1,4 +1,6 @@
-﻿using Umbraco.Cms.Api.Management.ViewModels.Content;
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Api.Management.ViewModels.Content;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -6,36 +8,64 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Mapping.Content;
 
+/// <summary>
+/// Provides mapping configuration between content types, value view models, and variant view models in the Umbraco CMS management API.
+/// </summary>
 public abstract class ContentMapDefinition<TContent, TValueViewModel, TVariantViewModel>
     where TContent : IContentBase
     where TValueViewModel : ValueResponseModelBase, new()
     where TVariantViewModel : VariantResponseModelBase, new()
 {
     private readonly PropertyEditorCollection _propertyEditorCollection;
+    private readonly IDataValueEditorFactory _dataValueEditorFactory;
 
-    protected ContentMapDefinition(PropertyEditorCollection propertyEditorCollection) => _propertyEditorCollection = propertyEditorCollection;
+    protected ContentMapDefinition(
+        PropertyEditorCollection propertyEditorCollection,
+        IDataValueEditorFactory dataValueEditorFactory)
+    {
+        _propertyEditorCollection = propertyEditorCollection;
+        _dataValueEditorFactory = dataValueEditorFactory;
+    }
+
+    [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in Umbraco 18.")]
+    protected ContentMapDefinition(PropertyEditorCollection propertyEditorCollection)
+        : this(
+            propertyEditorCollection,
+            StaticServiceProvider.Instance.GetRequiredService<IDataValueEditorFactory>())
+    {
+    }
 
     protected delegate void ValueViewModelMapping(IDataEditor propertyEditor, TValueViewModel variantViewModel);
 
     protected delegate void VariantViewModelMapping(string? culture, string? segment, TVariantViewModel variantViewModel);
 
-    protected IEnumerable<TValueViewModel> MapValueViewModels(IEnumerable<IProperty> properties, ValueViewModelMapping? additionalPropertyMapping = null, bool published = false) =>
-        properties
+    protected IEnumerable<TValueViewModel> MapValueViewModels(
+        IEnumerable<IProperty> properties,
+        ValueViewModelMapping? additionalPropertyMapping = null,
+        bool published = false)
+    {
+        Dictionary<string, IDataEditor> missingPropertyEditors = [];
+        return properties
             .SelectMany(property => property
                 .Values
                 .Select(propertyValue =>
                 {
                     IDataEditor? propertyEditor = _propertyEditorCollection[property.PropertyType.PropertyEditorAlias];
-                    if (propertyEditor == null)
+                    if (propertyEditor is null && !missingPropertyEditors.TryGetValue(property.PropertyType.PropertyEditorAlias, out propertyEditor))
                     {
-                        return null;
+                        // We cache the missing property editors to avoid creating multiple instances of them
+                        propertyEditor = new MissingPropertyEditor(property.PropertyType.PropertyEditorAlias, _dataValueEditorFactory);
+                        missingPropertyEditors[property.PropertyType.PropertyEditorAlias] = propertyEditor;
                     }
 
                     IProperty? publishedProperty = null;
                     if (published)
                     {
                         publishedProperty = new Property(property.PropertyType);
-                        publishedProperty.SetValue(propertyValue.PublishedValue, propertyValue.Culture, propertyValue.Segment);
+                        publishedProperty.SetValue(
+                            propertyValue.PublishedValue,
+                            propertyValue.Culture,
+                            propertyValue.Segment);
                     }
 
                     var variantViewModel = new TValueViewModel
@@ -43,14 +73,18 @@ public abstract class ContentMapDefinition<TContent, TValueViewModel, TVariantVi
                         Culture = propertyValue.Culture,
                         Segment = propertyValue.Segment,
                         Alias = property.Alias,
-                        Value = propertyEditor.GetValueEditor().ToEditor(publishedProperty ?? property, propertyValue.Culture, propertyValue.Segment),
-                        EditorAlias = propertyEditor.Alias
+                        Value = propertyEditor.GetValueEditor().ToEditor(
+                            publishedProperty ?? property,
+                            propertyValue.Culture,
+                            propertyValue.Segment),
+                        EditorAlias = propertyEditor.Alias,
                     };
                     additionalPropertyMapping?.Invoke(propertyEditor, variantViewModel);
                     return variantViewModel;
                 }))
             .WhereNotNull()
             .ToArray();
+    }
 
     protected IEnumerable<TVariantViewModel> MapVariantViewModels(TContent source, VariantViewModelMapping? additionalVariantMapping = null)
     {

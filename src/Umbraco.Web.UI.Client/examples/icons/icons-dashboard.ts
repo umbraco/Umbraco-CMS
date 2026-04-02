@@ -2,9 +2,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, LitElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
 
-// eslint-disable-next-line local-rules/enforce-umb-prefix-on-element-name
 @customElement('example-icons-dashboard')
-// eslint-disable-next-line local-rules/umb-class-prefix
 export class ExampleIconsDashboard extends UmbElementMixin(LitElement) {
 	override render() {
 		return html`

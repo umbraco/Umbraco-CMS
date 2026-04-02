@@ -11,6 +11,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
+/// <summary>
+/// Serves as the base class for property value editors that process block-based property values, parameterized by specific value (<typeparamref name="TValue"/>) and layout (<typeparamref name="TLayout"/>) types.
+/// </summary>
 public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataValueEditor, IDataValueReference, IDataValueTags
     where TValue : BlockValue<TLayout>, new()
     where TLayout : class, IBlockLayoutItem, new()
@@ -42,6 +45,45 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
         _blockEditorVarianceHandler = blockEditorVarianceHandler;
         _languageService = languageService;
     }
+
+              /// <summary>
+              /// Caches referenced entities for all property values with supporting property editors within the specified block editor data
+              /// optimising subsequent retrieval of entities when parsing and converting property values.
+              /// </summary>
+              /// <remarks>
+              /// This method iterates through all property values associated with data editors in the provided
+              /// block editor data and invokes caching for referenced entities where supported by the property editor.
+              /// </remarks>
+              /// <param name="blockEditorData">The block editor data containing content and settings property values to analyze for referenced entities.</param>
+    [Obsolete("This method is available for support of request caching retrieved entities in derived property value editors. " +
+              "The intention is to supersede this with lazy loaded read locks, which will make this unnecessary. " +
+              "Scheduled for removal in Umbraco 19.")]
+    protected void CacheReferencedEntities(BlockEditorData<TValue, TLayout>? blockEditorData)
+    {
+        // Group property values by their associated data editor alias.
+        IEnumerable<IGrouping<string, BlockPropertyValue>> valuesByDataEditors = (blockEditorData?.BlockValue.ContentData ?? []).Union(blockEditorData?.BlockValue.SettingsData ?? [])
+            .SelectMany(x => x.Values)
+            .Where(x => x.EditorAlias is not null && x.Value is not null)
+            .GroupBy(x => x.EditorAlias!);
+
+        // Iterate through each group and cache referenced entities if supported by the data editor.
+        foreach (IGrouping<string, BlockPropertyValue> valueByDataEditor in valuesByDataEditors)
+        {
+            IDataEditor? dataEditor = _propertyEditors[valueByDataEditor.Key];
+            if (dataEditor is null)
+            {
+                continue;
+            }
+
+            IDataValueEditor valueEditor = dataEditor.GetValueEditor();
+
+            if (valueEditor is ICacheReferencedEntities valueEditorWithPrecaching)
+            {
+                valueEditorWithPrecaching.CacheReferencedEntities(valueByDataEditor.Select(x => x.Value!));
+            }
+        }
+    }
+
 
     /// <inheritdoc />
     public abstract IEnumerable<UmbracoEntityReference> GetReferences(object? value);
@@ -129,9 +171,6 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
         return result;
     }
 
-    [Obsolete("This method is no longer used within Umbraco. Please use the overload taking all parameters. Scheduled for removal in Umbraco 17.")]
-    protected void MapBlockValueFromEditor(TValue blockValue) => MapBlockValueFromEditor(blockValue, null, Guid.Empty);
-
     protected void MapBlockValueFromEditor(TValue? editedBlockValue, TValue? currentBlockValue, Guid contentKey)
     {
         MapBlockItemDataFromEditor(
@@ -196,8 +235,14 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
 
     private sealed class BlockStateMapping<T>
     {
+        /// <summary>
+        /// Gets or sets the edited value for the block, or <c>null</c> if no edited value is present.
+        /// </summary>
         public T? Edited { get; set; }
 
+        /// <summary>
+        /// Gets or sets the current mapped block state value of type <typeparamref name="T"/>.
+        /// </summary>
         public T? Current { get; set; }
     }
 
@@ -305,10 +350,10 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
     /// <summary>
     /// Updates the invariant data in the source with the invariant data in the value if allowed
     /// </summary>
-    /// <param name="source"></param>
-    /// <param name="target"></param>
-    /// <param name="canUpdateInvariantData"></param>
-    /// <returns></returns>
+    /// <param name="source">The source block editor data.</param>
+    /// <param name="target">The target block editor data.</param>
+    /// <param name="canUpdateInvariantData">Whether invariant data can be updated.</param>
+    /// <returns>The merged block editor data, or null.</returns>
     internal virtual BlockEditorData<TValue, TLayout>? UpdateSourceInvariantData(BlockEditorData<TValue, TLayout>? source, BlockEditorData<TValue, TLayout>? target, bool canUpdateInvariantData)
     {
         if (source is null && target is null)
@@ -577,6 +622,7 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
             ?? new BlockEditorData<TValue, TLayout>([], CreateWithLayout(sourceBlockEditorValues.Layout));
 
         TValue mergeResult = MergeBlockEditorDataForCulture(sourceBlockEditorValues.BlockValue, targetBlockEditorValues.BlockValue, culture);
+        SortBlockItemValuesByCulture(mergeResult);
         return _jsonSerializer.Serialize(mergeResult);
     }
 
@@ -639,7 +685,8 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
                     {
                         Alias = sourceBlockPropertyValue.Alias,
                         Culture = sourceBlockPropertyValue.Culture,
-                        Segment = sourceBlockPropertyValue.Segment
+                        Segment = sourceBlockPropertyValue.Segment,
+                        PropertyType = sourceBlockPropertyValue.PropertyType
                     };
                     targetBlockItem.Values.Add(targetBlockPropertyValue);
                 }
@@ -649,6 +696,40 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
                     ? sourceBlockPropertyValue.Value
                     : mergingDataEditor!.MergePartialPropertyValueForCulture(sourceBlockPropertyValue.Value, targetBlockPropertyValue.Value, culture);
             }
+        }
+
+        // After merging, remove stale values when property variation changed.
+        foreach (BlockItemData targetBlockItem in targetBlockItems)
+        {
+            targetBlockItem.Values.RemoveAll(value =>
+            {
+                if (value.PropertyType is null)
+                {
+                    throw new ArgumentException("One or more block item values did not have a resolved property type. Block item value property types must be resolved before attempting perform partial value merging.", nameof(targetBlockItem));
+                }
+
+                var propertyValueIsCultureVariant = value.Culture is not null;
+                return propertyValueIsCultureVariant != value.PropertyType.VariesByCulture();
+            });
+        }
+    }
+
+    /// <summary>
+    /// Sorts block item values by culture to ensure consistent JSON serialization order.
+    /// This prevents false positives in edited state detection where PublishedValue and EditedValue
+    /// differ only in culture order.
+    /// </summary>
+    protected static void SortBlockItemValuesByCulture(TValue blockValue)
+    {
+        SortBlockItemValuesByCulture(blockValue.ContentData);
+        SortBlockItemValuesByCulture(blockValue.SettingsData);
+    }
+
+    private static void SortBlockItemValuesByCulture(List<BlockItemData> blockItemData)
+    {
+        foreach (BlockItemData item in blockItemData)
+        {
+            item.Values = [.. item.Values.OrderBy(v => v.Culture, StringComparer.OrdinalIgnoreCase)];
         }
     }
 }

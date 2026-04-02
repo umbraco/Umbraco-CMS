@@ -15,8 +15,13 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Notifications;
 /// </remarks>
 public class MigrationPlansExecutedNotification : INotification
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MigrationPlansExecutedNotification"/> class using the specified collection of executed migration plans.
+    /// </summary>
+    /// <param name="executedPlans">A read-only list containing the executed migration plans.</param>
     public MigrationPlansExecutedNotification(IReadOnlyList<ExecutedMigrationPlan> executedPlans)
         => ExecutedPlans = executedPlans;
 
+    /// <summary>Gets the list of executed migration plans.</summary>
     public IReadOnlyList<ExecutedMigrationPlan> ExecutedPlans { get; }
 }

@@ -3,6 +3,7 @@
 
 using System.Linq;
 using Microsoft.Extensions.Logging;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
@@ -411,9 +412,44 @@ internal sealed class MediaTypeRepositoryTest : UmbracoIntegrationTest
         }
     }
 
+    [Test]
+    public void Get_By_Guid_Returns_Deep_Clone_Not_Cached_Instance()
+    {
+        var provider = ScopeProvider;
+        using (var scope = provider.CreateScope())
+        {
+            var repository = CreateRepository(provider);
+            IMediaType mediaType = MediaTypeBuilder.CreateNewMediaType();
+            repository.Save(mediaType);
+
+            var first = repository.Get(mediaType.Key);
+            var second = repository.Get(mediaType.Key);
+
+            Assert.IsNotNull(first);
+            Assert.IsNotNull(second);
+            Assert.AreEqual(first.Id, second.Id);
+            Assert.AreNotSame(first, second);
+        }
+    }
+
+    [Test]
+    public void Exists_By_Guid_Returns_Correct_Result()
+    {
+        var provider = ScopeProvider;
+        using (var scope = provider.CreateScope())
+        {
+            var repository = CreateRepository(provider);
+            IMediaType mediaType = MediaTypeBuilder.CreateNewMediaType();
+            repository.Save(mediaType);
+
+            Assert.IsTrue(repository.Exists(mediaType.Key));
+            Assert.IsFalse(repository.Exists(Guid.NewGuid()));
+        }
+    }
+
     private MediaTypeRepository CreateRepository(IScopeProvider provider) =>
-        new((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<MediaTypeRepository>(), CommonRepository, LanguageRepository, ShortStringHelper, IdKeyMap);
+        new((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<MediaTypeRepository>(), CommonRepository, LanguageRepository, ShortStringHelper, Mock.Of<IRepositoryCacheVersionService>(), IdKeyMap, Mock.Of<ICacheSyncService>());
 
     private EntityContainerRepository CreateContainerRepository(IScopeProvider provider) =>
-        new((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<EntityContainerRepository>(), Constants.ObjectTypes.MediaTypeContainer);
+        new((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<EntityContainerRepository>(), Constants.ObjectTypes.MediaTypeContainer, Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
 }

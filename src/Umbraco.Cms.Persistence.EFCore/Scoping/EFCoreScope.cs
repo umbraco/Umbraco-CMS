@@ -10,6 +10,10 @@ using IScope = Umbraco.Cms.Infrastructure.Scoping.IScope;
 
 namespace Umbraco.Cms.Persistence.EFCore.Scoping;
 
+/// <summary>
+/// Represents an EF Core scope that provides database context access and transaction management.
+/// </summary>
+/// <typeparam name="TDbContext">The type of DbContext.</typeparam>
 internal class EFCoreScope<TDbContext> : CoreScope, IEfCoreScope<TDbContext>
     where TDbContext : DbContext
 {
@@ -19,7 +23,21 @@ internal class EFCoreScope<TDbContext> : CoreScope, IEfCoreScope<TDbContext>
     private bool _disposed;
     private TDbContext? _dbContext;
     private IDbContextFactory<TDbContext> _dbContextFactory;
+    private string? _originalConnectionString;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="EFCoreScope{TDbContext}"/> class.
+    /// </summary>
+    /// <param name="distributedLockingMechanismFactory">The distributed locking mechanism factory.</param>
+    /// <param name="loggerFactory">The logger factory.</param>
+    /// <param name="efCoreScopeAccessor">The EF Core scope accessor.</param>
+    /// <param name="scopedFileSystem">The scoped file system.</param>
+    /// <param name="iefCoreScopeProvider">The EF Core scope provider.</param>
+    /// <param name="scopeContext">The scope context.</param>
+    /// <param name="eventAggregator">The event aggregator.</param>
+    /// <param name="dbContextFactory">The DbContext factory.</param>
+    /// <param name="repositoryCacheMode">The repository cache mode.</param>
+    /// <param name="scopeFileSystems">Whether to scope file systems.</param>
     protected EFCoreScope(
         IDistributedLockingMechanismFactory distributedLockingMechanismFactory,
         ILoggerFactory loggerFactory,
@@ -39,6 +57,20 @@ internal class EFCoreScope<TDbContext> : CoreScope, IEfCoreScope<TDbContext>
         _dbContextFactory = dbContextFactory;
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="EFCoreScope{TDbContext}"/> class with an IScope parent.
+    /// </summary>
+    /// <param name="parentScope">The parent scope.</param>
+    /// <param name="distributedLockingMechanismFactory">The distributed locking mechanism factory.</param>
+    /// <param name="loggerFactory">The logger factory.</param>
+    /// <param name="efCoreScopeAccessor">The EF Core scope accessor.</param>
+    /// <param name="scopedFileSystem">The scoped file system.</param>
+    /// <param name="iefCoreScopeProvider">The EF Core scope provider.</param>
+    /// <param name="scopeContext">The scope context.</param>
+    /// <param name="eventAggregator">The event aggregator.</param>
+    /// <param name="dbContextFactory">The DbContext factory.</param>
+    /// <param name="repositoryCacheMode">The repository cache mode.</param>
+    /// <param name="scopeFileSystems">Whether to scope file systems.</param>
     public EFCoreScope(
         IScope parentScope,
         IDistributedLockingMechanismFactory distributedLockingMechanismFactory,
@@ -60,6 +92,20 @@ internal class EFCoreScope<TDbContext> : CoreScope, IEfCoreScope<TDbContext>
         _dbContextFactory = dbContextFactory;
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="EFCoreScope{TDbContext}"/> class with an EFCoreScope parent.
+    /// </summary>
+    /// <param name="parentScope">The parent EF Core scope.</param>
+    /// <param name="distributedLockingMechanismFactory">The distributed locking mechanism factory.</param>
+    /// <param name="loggerFactory">The logger factory.</param>
+    /// <param name="efCoreScopeAccessor">The EF Core scope accessor.</param>
+    /// <param name="scopedFileSystem">The scoped file system.</param>
+    /// <param name="iefCoreScopeProvider">The EF Core scope provider.</param>
+    /// <param name="scopeContext">The scope context.</param>
+    /// <param name="eventAggregator">The event aggregator.</param>
+    /// <param name="dbContextFactory">The DbContext factory.</param>
+    /// <param name="repositoryCacheMode">The repository cache mode.</param>
+    /// <param name="scopeFileSystems">Whether to scope file systems.</param>
     public EFCoreScope(
         EFCoreScope<TDbContext> parentScope,
         IDistributedLockingMechanismFactory distributedLockingMechanismFactory,
@@ -82,10 +128,15 @@ internal class EFCoreScope<TDbContext> : CoreScope, IEfCoreScope<TDbContext>
     }
 
 
+    /// <summary>
+    /// Gets the parent EF Core scope, if any.
+    /// </summary>
     public EFCoreScope<TDbContext>? ParentScope { get; }
 
+    /// <inheritdoc />
     public IScopeContext? ScopeContext { get; set; }
 
+    /// <inheritdoc />
     public async Task<T> ExecuteWithContextAsync<T>(Func<TDbContext, Task<T>> method)
     {
         if (_disposed)
@@ -102,6 +153,7 @@ internal class EFCoreScope<TDbContext> : CoreScope, IEfCoreScope<TDbContext>
         return await method(_dbContext!);
     }
 
+    /// <inheritdoc />
     public async Task ExecuteWithContextAsync<T>(Func<TDbContext, Task> method) =>
         await ExecuteWithContextAsync(async db =>
         {
@@ -109,8 +161,12 @@ internal class EFCoreScope<TDbContext> : CoreScope, IEfCoreScope<TDbContext>
             return true; // Do nothing
         });
 
+    /// <summary>
+    /// Resets the scope's completion state.
+    /// </summary>
     public void Reset() => Completed = null;
 
+    /// <inheritdoc />
     public override void Dispose()
     {
         if (this != _efCoreScopeAccessor.AmbientScope)
@@ -161,6 +217,8 @@ internal class EFCoreScope<TDbContext> : CoreScope, IEfCoreScope<TDbContext>
         {
             _dbContext = FindDbContext();
         }
+
+        _originalConnectionString ??= _dbContext.Database.GetConnectionString();
 
         // Check if we are already in a transaction before starting one
         if (_dbContext.Database.CurrentTransaction is null)
@@ -235,6 +293,27 @@ internal class EFCoreScope<TDbContext> : CoreScope, IEfCoreScope<TDbContext>
             }
             finally
             {
+                try
+                {
+                    if (_dbContext is not null)
+                    {
+                        _dbContext.Database.SetDbConnection(null);
+
+                        // SetDbConnection(null) clears EF Core's internal _connectionString field,
+                        // which is not restored from options. For pooled contexts, we must restore
+                        // the original connection string so the context is usable when returned
+                        // from the pool. See https://github.com/umbraco/Umbraco-CMS/issues/22211
+                        if (_originalConnectionString is not null)
+                        {
+                            _dbContext.Database.SetConnectionString(_originalConnectionString);
+                        }
+                    }
+                }
+                catch
+                {
+                    // Best-effort cleanup — ensure context is still disposed below.
+                }
+
                 _dbContext?.Dispose();
                 _dbContext = null;
             }

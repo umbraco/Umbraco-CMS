@@ -77,12 +77,14 @@ public class PropertyCollection : KeyedCollection<string, IProperty>, IPropertyC
         }
     }
 
+    /// <inheritdoc />
     public new bool TryGetValue(string propertyTypeAlias, [MaybeNullWhen(false)] out IProperty property)
     {
         property = this.FirstOrDefault(x => x.Alias.InvariantEquals(propertyTypeAlias));
         return property != null;
     }
 
+    /// <inheritdoc />
     public void ClearCollectionChangedEvents() => CollectionChanged = null;
 
     /// <inheritdoc />
@@ -194,6 +196,7 @@ public class PropertyCollection : KeyedCollection<string, IProperty>, IPropertyC
         OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
     }
 
+    /// <inheritdoc />
     protected override string GetKeyForItem(IProperty item) => item.Alias;
 
     /// <summary>
@@ -212,6 +215,10 @@ public class PropertyCollection : KeyedCollection<string, IProperty>, IPropertyC
         return -1;
     }
 
+    /// <summary>
+    ///     Raises the <see cref="CollectionChanged" /> event.
+    /// </summary>
+    /// <param name="args">The event arguments.</param>
     protected virtual void OnCollectionChanged(NotifyCollectionChangedEventArgs args) =>
         CollectionChanged?.Invoke(this, args);
 }

@@ -31,10 +31,12 @@ public class RuntimeState : IRuntimeState
     private readonly IConflictingRouteService _conflictingRouteService = null!;
     private readonly IEnumerable<IDatabaseProviderMetadata> _databaseProviderMetadata = null!;
     private readonly IRuntimeModeValidationService _runtimeModeValidationService = null!;
+    private readonly IDatabaseAvailabilityCheck _databaseAvailabilityCheck = null!;
 
     /// <summary>
-    /// The initial <see cref="RuntimeState"/>
+    /// Creates and returns the initial <see cref="RuntimeState"/> instance representing the booting state of the application.
     /// </summary>
+    /// <returns>The initial <see cref="RuntimeState"/> instance representing the booting state.</returns>
     public static RuntimeState Booting() => new RuntimeState() { Level = RuntimeLevel.Boot };
 
     /// <summary>
@@ -44,8 +46,18 @@ public class RuntimeState : IRuntimeState
     { }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="RuntimeState" /> class.
+    /// Initializes a new instance of the <see cref="RuntimeState" /> class with the specified configuration and services.
     /// </summary>
+    /// <param name="globalSettings">The global settings for the Umbraco application.</param>
+    /// <param name="unattendedSettings">The unattended installation and upgrade settings.</param>
+    /// <param name="umbracoVersion">Provides information about the current Umbraco version.</param>
+    /// <param name="databaseFactory">Factory for creating Umbraco database connections.</param>
+    /// <param name="logger">The logger used for logging runtime state information.</param>
+    /// <param name="packageMigrationState">Tracks the state of pending package migrations.</param>
+    /// <param name="conflictingRouteService">Service for detecting conflicting routes in the application.</param>
+    /// <param name="databaseProviderMetadata">A collection of metadata describing available database providers.</param>
+    /// <param name="runtimeModeValidationService">Service for validating the runtime mode of the application.</param>
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
     public RuntimeState(
        IOptions<GlobalSettings> globalSettings,
        IOptions<UnattendedSettings> unattendedSettings,
@@ -56,6 +68,44 @@ public class RuntimeState : IRuntimeState
        IConflictingRouteService conflictingRouteService,
        IEnumerable<IDatabaseProviderMetadata> databaseProviderMetadata,
        IRuntimeModeValidationService runtimeModeValidationService)
+       : this(
+             globalSettings,
+             unattendedSettings,
+             umbracoVersion,
+             databaseFactory,
+             logger,
+             packageMigrationState,
+             conflictingRouteService,
+             databaseProviderMetadata,
+             runtimeModeValidationService,
+             StaticServiceProvider.Instance.GetRequiredService<IDatabaseAvailabilityCheck>())
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="RuntimeState" /> class.
+    /// </summary>
+    /// <param name="globalSettings">The global settings for the Umbraco application.</param>
+    /// <param name="unattendedSettings">The unattended installation and upgrade settings.</param>
+    /// <param name="umbracoVersion">Provides information about the current Umbraco version.</param>
+    /// <param name="databaseFactory">Factory for creating Umbraco database connections.</param>
+    /// <param name="logger">The logger used for logging runtime state information.</param>
+    /// <param name="packageMigrationState">Tracks the state of pending package migrations.</param>
+    /// <param name="conflictingRouteService">Service for detecting conflicting routes in the application.</param>
+    /// <param name="databaseProviderMetadata">A collection of metadata for available database providers.</param>
+    /// <param name="runtimeModeValidationService">Service for validating the current runtime mode.</param>
+    /// <param name="databaseAvailabilityCheck">Service to check the availability of the database.</param>
+    public RuntimeState(
+       IOptions<GlobalSettings> globalSettings,
+       IOptions<UnattendedSettings> unattendedSettings,
+       IUmbracoVersion umbracoVersion,
+       IUmbracoDatabaseFactory databaseFactory,
+       ILogger<RuntimeState> logger,
+       PendingPackageMigrations packageMigrationState,
+       IConflictingRouteService conflictingRouteService,
+       IEnumerable<IDatabaseProviderMetadata> databaseProviderMetadata,
+       IRuntimeModeValidationService runtimeModeValidationService,
+       IDatabaseAvailabilityCheck databaseAvailabilityCheck)
     {
         _globalSettings = globalSettings;
         _unattendedSettings = unattendedSettings;
@@ -66,6 +116,7 @@ public class RuntimeState : IRuntimeState
         _conflictingRouteService = conflictingRouteService;
         _databaseProviderMetadata = databaseProviderMetadata;
         _runtimeModeValidationService = runtimeModeValidationService;
+        _databaseAvailabilityCheck = databaseAvailabilityCheck;
     }
 
     /// <inheritdoc />
@@ -176,11 +227,17 @@ public class RuntimeState : IRuntimeState
 
                 // although the files version matches the code version, the database version does not
                 // which means the local files have been upgraded but not the database - need to upgrade
-                    if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                    if (_logger.IsEnabled(LogLevel.Debug))
                     {
                         _logger.LogDebug("Has not reached the final upgrade step, need to upgrade Umbraco.");
                     }
-                    Level = _unattendedSettings.Value.UpgradeUnattended ? RuntimeLevel.Run : RuntimeLevel.Upgrade;
+
+                    // When unattended upgrade is enabled, set Upgrading so that CoreRuntime returns early and
+                    // UnattendedUpgradeBackgroundService runs the migrations after the HTTP server has
+                    // started (allowing health probes to respond).
+                    // When unattended upgrade is disabled, set Upgrade so that the operator can trigger the migration
+                    // manually via the back office.
+                    Level = _unattendedSettings.Value.UpgradeUnattended ? RuntimeLevel.Upgrading : RuntimeLevel.Upgrade;
                     Reason = RuntimeLevelReason.UpgradeMigrations;
                 }
                 break;
@@ -192,14 +249,22 @@ public class RuntimeState : IRuntimeState
 
                 if (_unattendedSettings.Value.PackageMigrationsUnattended)
                 {
-                    if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                    if (_logger.IsEnabled(LogLevel.Debug))
                     {
                         _logger.LogDebug("Package migrations need to execute.");
                     }
+
+                    // Upgrading signals CoreRuntime to return early so the HTTP server starts immediately;
+                    // UnattendedUpgradeBackgroundService then runs the package migrations in the background
+                    // while health probes remain reachable.
+                    Level = RuntimeLevel.Upgrading;
                     Reason = RuntimeLevelReason.UpgradePackageMigrations;
                 }
                 else
                 {
+                    // Package migrations are pending but unattended execution is disabled.
+                    // Keep Level = Run so the site stays operational; the operator must trigger the package
+                    // migrations manually from the back office.
                     _logger.LogInformation("Package migrations need to execute but unattended package migrations is disabled. They will need to be run from the back office.");
                     Reason = RuntimeLevelReason.Run;
                 }
@@ -208,8 +273,6 @@ public class RuntimeState : IRuntimeState
             case UmbracoDatabaseState.Ok:
             default:
                 {
-
-
                     // the database version matches the code & files version, all clear, can run
                     Level = RuntimeLevel.Run;
                     Reason = RuntimeLevelReason.Run;
@@ -218,6 +281,12 @@ public class RuntimeState : IRuntimeState
         }
     }
 
+    /// <summary>
+    /// Configures the runtime state by setting the specified runtime level and reason, and optionally records an exception that caused the boot process to fail.
+    /// </summary>
+    /// <param name="level">The <see cref="RuntimeLevel"/> to set for the runtime state.</param>
+    /// <param name="reason">The <see cref="RuntimeLevelReason"/> indicating why the runtime level is being set.</param>
+    /// <param name="bootFailedException">An optional <see cref="Exception"/> that caused the boot to fail. If provided, it will be wrapped in a <see cref="BootFailedException"/> and stored.</param>
     public void Configure(RuntimeLevel level, RuntimeLevelReason reason, Exception? bootFailedException = null)
     {
         Level = level;
@@ -242,7 +311,7 @@ public class RuntimeState : IRuntimeState
     {
         try
         {
-            if (!TryDbConnect(databaseFactory))
+            if (_databaseAvailabilityCheck.IsDatabaseAvailable(databaseFactory) is false)
             {
                 return UmbracoDatabaseState.CannotConnect;
             }
@@ -304,28 +373,5 @@ public class RuntimeState : IRuntimeState
             _logger.LogDebug("Final upgrade state is {FinalMigrationState}, database contains {DatabaseState}", FinalMigrationState, CurrentMigrationState ?? "<null>");
         }
         return CurrentMigrationState != FinalMigrationState;
-    }
-
-    private bool TryDbConnect(IUmbracoDatabaseFactory databaseFactory)
-    {
-        // anything other than install wants a database - see if we can connect
-        // (since this is an already existing database, assume localdb is ready)
-        bool canConnect;
-        var tries = 5;
-        for (var i = 0; ;)
-        {
-            canConnect = databaseFactory.CanConnect;
-            if (canConnect || ++i == tries)
-            {
-                break;
-            }
-            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
-            {
-                _logger.LogDebug("Could not immediately connect to database, trying again.");
-            }
-            Thread.Sleep(1000);
-        }
-
-        return canConnect;
     }
 }

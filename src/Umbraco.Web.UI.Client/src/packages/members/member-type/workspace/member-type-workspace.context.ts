@@ -52,29 +52,6 @@ export class UmbMemberTypeWorkspaceContext
 			},
 		]);
 	}
-
-	/**
-	 * @deprecated Use the individual set methods instead. Will be removed in 17.
-	 * @template PropertyName
-	 * @param {PropertyName} propertyName
-	 * @param {EntityDetailModel[PropertyName]} value
-	 * @memberof UmbMemberTypeWorkspaceContext
-	 */
-	set<PropertyName extends keyof EntityDetailModel>(
-		propertyName: PropertyName,
-		value: EntityDetailModel[PropertyName],
-	) {
-		this.structure.updateOwnerContentType({ [propertyName]: value });
-	}
-
-	/**
-	 * @deprecated Use the createScaffold method instead. Will be removed in 17.
-	 * @param {UmbEntityModel} parent
-	 * @memberof UmbMemberTypeWorkspaceContext
-	 */
-	async create(parent: UmbEntityModel) {
-		this.createScaffold({ parent });
-	}
 }
 
 export { UmbMemberTypeWorkspaceContext as api };

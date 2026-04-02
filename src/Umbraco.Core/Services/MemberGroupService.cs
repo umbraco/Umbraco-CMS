@@ -8,18 +8,35 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+///     Provides services for managing member groups in Umbraco.
+/// </summary>
+/// <remarks>
+///     This service handles CRUD operations for member groups, which are used to organize
+///     and categorize members for access control and content personalization purposes.
+/// </remarks>
 internal sealed class MemberGroupService : RepositoryService, IMemberGroupService
 {
     private readonly IMemberGroupRepository _memberGroupRepository;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="MemberGroupService" /> class.
+    /// </summary>
+    /// <param name="provider">The core scope provider for managing database transactions.</param>
+    /// <param name="loggerFactory">The factory for creating loggers.</param>
+    /// <param name="eventMessagesFactory">The factory for creating event messages.</param>
+    /// <param name="memberGroupRepository">The repository for member group operations.</param>
     public MemberGroupService(ICoreScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory, IMemberGroupRepository memberGroupRepository)
         : base(provider, loggerFactory, eventMessagesFactory) =>
         _memberGroupRepository = memberGroupRepository;
 
+    /// <inheritdoc />
     public IEnumerable<IMemberGroup> GetAll() => GetAllAsync().GetAwaiter().GetResult();
 
+    /// <inheritdoc />
     public IEnumerable<IMemberGroup> GetByIds(IEnumerable<int> ids) => GetByIdsAsync(ids).GetAwaiter().GetResult();
 
+    /// <inheritdoc />
     public IMemberGroup? GetById(int id)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -28,10 +45,13 @@ internal sealed class MemberGroupService : RepositoryService, IMemberGroupServic
         }
     }
 
+    /// <inheritdoc />
     public IMemberGroup? GetById(Guid id) => GetAsync(id).GetAwaiter().GetResult();
 
+    /// <inheritdoc />
     public IMemberGroup? GetByName(string? name) => name is null ? null : GetByNameAsync(name).GetAwaiter().GetResult();
 
+    /// <inheritdoc />
     public void Save(IMemberGroup memberGroup)
     {
         if (string.IsNullOrWhiteSpace(memberGroup.Name))
@@ -58,6 +78,7 @@ internal sealed class MemberGroupService : RepositoryService, IMemberGroupServic
         }
     }
 
+    /// <inheritdoc />
     public void Delete(IMemberGroup memberGroup) => DeleteAsync(memberGroup.Key).GetAwaiter().GetResult();
 
     /// <inheritdoc/>
@@ -81,6 +102,7 @@ internal sealed class MemberGroupService : RepositoryService, IMemberGroupServic
         return Task.FromResult(_memberGroupRepository.GetMany());
     }
 
+    /// <inheritdoc />
     public Task<IEnumerable<IMemberGroup>> GetByIdsAsync(IEnumerable<int> ids)
     {
         if (ids.Any() == false)
@@ -156,6 +178,7 @@ internal sealed class MemberGroupService : RepositoryService, IMemberGroupServic
         return Attempt.SucceedWithStatus<IMemberGroup?, MemberGroupOperationStatus>(MemberGroupOperationStatus.Success, memberGroup);
     }
 
+    /// <inheritdoc />
     public async Task<Attempt<IMemberGroup?, MemberGroupOperationStatus>> UpdateAsync(IMemberGroup memberGroup)
     {
         if (string.IsNullOrWhiteSpace(memberGroup.Name))
@@ -188,6 +211,14 @@ internal sealed class MemberGroupService : RepositoryService, IMemberGroupServic
         return Attempt.SucceedWithStatus<IMemberGroup?, MemberGroupOperationStatus>(MemberGroupOperationStatus.Success, memberGroup);
     }
 
+    /// <summary>
+    ///     Determines whether a member group with the same name already exists.
+    /// </summary>
+    /// <param name="memberGroup">The member group to check for name duplication.</param>
+    /// <returns>
+    ///     A task that represents the asynchronous operation.
+    ///     The task result is <c>true</c> if a member group with the same name exists; otherwise, <c>false</c>.
+    /// </returns>
     private async Task<bool> NameAlreadyExistsAsync(IMemberGroup memberGroup)
     {
         IMemberGroup? existingMemberGroup = await GetByNameAsync(memberGroup.Name!);

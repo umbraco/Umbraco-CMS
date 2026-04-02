@@ -2,7 +2,7 @@ import { UmbUserActionConditionBase } from '../../../conditions/user-allow-actio
 import { UserStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 export class UmbUserAllowResendInviteActionCondition extends UmbUserActionConditionBase {
-	async _onUserDataChange() {
+	protected override async _onUserDataChange() {
 		if (!this.userUnique) {
 			this.permitted = false;
 			return;

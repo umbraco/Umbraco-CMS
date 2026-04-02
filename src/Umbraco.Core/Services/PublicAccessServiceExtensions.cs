@@ -12,6 +12,13 @@ namespace Umbraco.Extensions;
 /// </summary>
 public static class PublicAccessServiceExtensions
 {
+    /// <summary>
+    ///     Renames member group role rules from an old role name to a new role name.
+    /// </summary>
+    /// <param name="publicAccessService">The public access service.</param>
+    /// <param name="oldRolename">The old role name to find.</param>
+    /// <param name="newRolename">The new role name to set.</param>
+    /// <returns><c>true</c> if any rules were updated; otherwise, <c>false</c>.</returns>
     public static bool RenameMemberGroupRoleRules(this IPublicAccessService publicAccessService, string? oldRolename, string? newRolename)
     {
         var hasChange = false;
@@ -46,6 +53,15 @@ public static class PublicAccessServiceExtensions
         return hasChange;
     }
 
+    /// <summary>
+    ///     Checks if the specified user has access to a document based on the current member roles.
+    /// </summary>
+    /// <param name="publicAccessService">The public access service.</param>
+    /// <param name="documentId">The document ID to check access for.</param>
+    /// <param name="contentService">The content service for retrieving the document.</param>
+    /// <param name="username">The username to check access for.</param>
+    /// <param name="currentMemberRoles">The current member roles of the user.</param>
+    /// <returns><c>true</c> if the user has access; otherwise, <c>false</c>.</returns>
     public static bool HasAccess(this IPublicAccessService publicAccessService, int documentId, IContentService contentService, string username, IEnumerable<string> currentMemberRoles)
     {
         IContent? content = contentService.GetById(documentId);
@@ -100,6 +116,13 @@ public static class PublicAccessServiceExtensions
         return HasAccess(entry, username, roles);
     }
 
+    /// <summary>
+    ///     Checks if the specified user has access based on the public access entry rules.
+    /// </summary>
+    /// <param name="entry">The public access entry containing the rules.</param>
+    /// <param name="username">The username to check access for.</param>
+    /// <param name="roles">The roles of the user.</param>
+    /// <returns><c>true</c> if the user has access; otherwise, <c>false</c>.</returns>
     private static bool HasAccess(PublicAccessEntry entry, string username, IEnumerable<string> roles)
     {
         if (entry is null)

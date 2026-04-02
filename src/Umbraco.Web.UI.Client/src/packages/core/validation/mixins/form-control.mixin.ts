@@ -124,12 +124,12 @@ export function UmbFormControlMixin<
 		 * @default
 		 */
 		@property({ reflect: false }) // Do not 'reflect' as the attribute value is used as fallback. [NL]
+		set value(newValue: ValueType | DefaultValueType) {
+			this.#value = newValue;
+		}
 		get value(): ValueType | DefaultValueType {
 			// For some reason we need to keep this as setters and getters for inherited classes for work properly when they override these methods. [NL]
 			return this.#value;
-		}
-		set value(newValue: ValueType | DefaultValueType) {
-			this.#value = newValue;
 		}
 
 		// Validation
@@ -263,6 +263,14 @@ export function UmbFormControlMixin<
 		 * @returns {void}
 		 */
 		protected addFormControlElement(element: UmbNativeFormControlElement) {
+			if (!element) {
+				throw new Error('Element is null or undefined');
+			}
+			if (!element.validity) {
+				console.log(element);
+				throw new Error('Element is not a Form Control');
+			}
+			if (this.#formCtrlElements.includes(element)) return;
 			this.#formCtrlElements.push(element);
 			element.addEventListener(UmbValidationInvalidEvent.TYPE, this.#runValidatorsCallback);
 			element.addEventListener(UmbValidationValidEvent.TYPE, this.#runValidatorsCallback);
@@ -324,7 +332,6 @@ export function UmbFormControlMixin<
 		 */
 		protected _runValidators() {
 			this.#validity = {};
-			//const messages: Set<string> = new Set();
 			let message: string | undefined = undefined;
 			let innerFormControlEl: UmbNativeFormControlElement | undefined = undefined;
 
@@ -332,7 +339,6 @@ export function UmbFormControlMixin<
 			this.#validators.some((validator) => {
 				if (validator.checkMethod()) {
 					this.#validity[validator.flagKey] = true;
-					//messages.add(validator.getMessageMethod());
 					message = validator.getMessageMethod();
 					return true;
 				}
@@ -362,13 +368,7 @@ export function UmbFormControlMixin<
 			this.#validity.valid = !hasError;
 
 			// Transfer the new validityState to the ElementInternals. [NL]
-			this._internals.setValidity(
-				this.#validity,
-				// Turn messages into an array and join them with a comma. [NL]:
-				//[...messages].join(', '),
-				message,
-				innerFormControlEl ?? this.getFormElement() ?? undefined,
-			);
+			this._internals.setValidity(this.#validity, message, innerFormControlEl ?? this.getFormElement() ?? undefined);
 
 			this.#dispatchValidationState();
 		}

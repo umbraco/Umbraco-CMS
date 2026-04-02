@@ -1,9 +1,11 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models;
@@ -26,11 +28,22 @@ namespace Umbraco.Cms
             private readonly ICacheInstructionRepository _cacheInstructionRepository;
             private readonly GlobalSettings _globalSettings;
             private readonly ILogger<CacheInstructionService> _logger;
+            private readonly ILastSyncedManager _lastSyncedManager;
+            private readonly IRepositoryCacheVersionService _repositoryCacheVersionService;
             private readonly IProfilingLogger _profilingLogger;
+            private readonly Lock _syncLock = new();
 
             /// <summary>
-            ///     Initializes a new instance of the <see cref="CacheInstructionService" /> class.
+            /// Initializes a new instance of the <see cref="CacheInstructionService"/> class.
             /// </summary>
+            /// <param name="provider">The <see cref="ICoreScopeProvider"/> used for managing database scopes.</param>
+            /// <param name="loggerFactory">The <see cref="ILoggerFactory"/> used to create logger instances.</param>
+            /// <param name="eventMessagesFactory">The <see cref="IEventMessagesFactory"/> for creating event messages.</param>
+            /// <param name="cacheInstructionRepository">The <see cref="ICacheInstructionRepository"/> for accessing cache instructions.</param>
+            /// <param name="profilingLogger">The <see cref="IProfilingLogger"/> for profiling and logging operations.</param>
+            /// <param name="logger">The <see cref="ILogger{CacheInstructionService}"/> instance for logging.</param>
+            /// <param name="globalSettings">The <see cref="IOptions{GlobalSettings}"/> providing global configuration settings.</param>
+            [Obsolete("Use the overload that requires ILastSyncedManager and IRepositoryCacheVersionService. Scheduled for removal in Umbraco 18.")]
             public CacheInstructionService(
                 ICoreScopeProvider provider,
                 ILoggerFactory loggerFactory,
@@ -39,11 +52,48 @@ namespace Umbraco.Cms
                 IProfilingLogger profilingLogger,
                 ILogger<CacheInstructionService> logger,
                 IOptions<GlobalSettings> globalSettings)
+                 : this(
+                     provider,
+                     loggerFactory,
+                     eventMessagesFactory,
+                     cacheInstructionRepository,
+                     profilingLogger,
+                     logger,
+                     globalSettings,
+                     StaticServiceProvider.Instance.GetRequiredService<ILastSyncedManager>(),
+                     StaticServiceProvider.Instance.GetRequiredService<IRepositoryCacheVersionService>())
+            {
+            }
+
+            /// <summary>
+            /// Initializes a new instance of the <see cref="CacheInstructionService"/> class.
+            /// </summary>
+            /// <param name="provider">Provides access to core database scopes.</param>
+            /// <param name="loggerFactory">The factory used to create logger instances.</param>
+            /// <param name="eventMessagesFactory">Factory for creating event message collections.</param>
+            /// <param name="cacheInstructionRepository">Repository for managing cache instructions.</param>
+            /// <param name="profilingLogger">Logger used for profiling and diagnostics.</param>
+            /// <param name="logger">The typed logger instance for this service.</param>
+            /// <param name="globalSettings">The global settings for the application.</param>
+            /// <param name="lastSyncedManager">Manages the last synchronization state.</param>
+            /// <param name="repositoryCacheVersionService">Service for managing repository cache versions.</param>
+            public CacheInstructionService(
+                ICoreScopeProvider provider,
+                ILoggerFactory loggerFactory,
+                IEventMessagesFactory eventMessagesFactory,
+                ICacheInstructionRepository cacheInstructionRepository,
+                IProfilingLogger profilingLogger,
+                ILogger<CacheInstructionService> logger,
+                IOptions<GlobalSettings> globalSettings,
+                ILastSyncedManager lastSyncedManager,
+                IRepositoryCacheVersionService repositoryCacheVersionService)
                 : base(provider, loggerFactory, eventMessagesFactory)
             {
                 _cacheInstructionRepository = cacheInstructionRepository;
                 _profilingLogger = profilingLogger;
                 _logger = logger;
+                _lastSyncedManager = lastSyncedManager;
+                _repositoryCacheVersionService = repositoryCacheVersionService;
                 _globalSettings = globalSettings.Value;
             }
 
@@ -119,7 +169,15 @@ namespace Umbraco.Cms
                 }
             }
 
-            /// <inheritdoc />
+            [Obsolete("Please use ProcessAllInstructions instead. Scheduled for removal in Umbraco 19.")]
+            /// <summary>
+            /// Processes cache instructions from the database using the provided cache refreshers.
+            /// </summary>
+            /// <param name="cacheRefreshers">A collection of cache refreshers used to process the instructions.</param>
+            /// <param name="cancellationToken">A token to observe while waiting for the task to complete.</param>
+            /// <param name="localIdentity">A string identifying the local instance or caller.</param>
+            /// <param name="lastId">The last processed instruction ID; this value is updated to reflect the most recent processed instruction.</param>
+            /// <returns>A <see cref="ProcessInstructionsResult"/> representing the result of the processing operation.</returns>
             public ProcessInstructionsResult ProcessInstructions(
                 CacheRefresherCollection cacheRefreshers,
                 CancellationToken cancellationToken,
@@ -136,15 +194,59 @@ namespace Umbraco.Cms
             }
 
             /// <inheritdoc />
-            [Obsolete("Use the non-obsolete overload. Scheduled for removal in V17.")]
-            public ProcessInstructionsResult ProcessInstructions(
+            public ProcessInstructionsResult ProcessAllInstructions(
                 CacheRefresherCollection cacheRefreshers,
-                ServerRole serverRole,
                 CancellationToken cancellationToken,
-                string localIdentity,
-                DateTime lastPruned,
-                int lastId) =>
-                ProcessInstructions(cacheRefreshers, cancellationToken, localIdentity, lastId);
+                string localIdentity)
+            {
+                lock (_syncLock)
+                {
+                    using (!_profilingLogger.IsEnabled(Core.Logging.LogLevel.Debug) ? null : _profilingLogger.DebugDuration<CacheInstructionService>("Syncing from database..."))
+                    using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+                    {
+                        _repositoryCacheVersionService.SetCachesSyncedAsync();
+                        var lastId = _lastSyncedManager.GetLastSyncedExternalAsync().GetAwaiter().GetResult() ?? 0;
+                        var previousLastId = lastId;
+                        var numberOfInstructionsProcessed = ProcessDatabaseInstructions(cacheRefreshers, cancellationToken, localIdentity, ref lastId);
+
+                        if (lastId > 0 && lastId != previousLastId)
+                        {
+                            _lastSyncedManager.SaveLastSyncedExternalAsync(lastId).GetAwaiter().GetResult();
+                            _lastSyncedManager.SaveLastSyncedInternalAsync(lastId).GetAwaiter().GetResult();
+                        }
+
+                        scope.Complete();
+                        return ProcessInstructionsResult.AsCompleted(numberOfInstructionsProcessed, lastId);
+                    }
+                }
+            }
+
+            /// <inheritdoc />
+            public ProcessInstructionsResult ProcessInternalInstructions(
+                CacheRefresherCollection cacheRefreshers,
+                CancellationToken cancellationToken,
+                string localIdentity)
+            {
+                lock (_syncLock)
+                {
+                    using (!_profilingLogger.IsEnabled(Core.Logging.LogLevel.Debug) ? null : _profilingLogger.DebugDuration<CacheInstructionService>("Syncing from database..."))
+                    using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+                    {
+                        _repositoryCacheVersionService.SetCachesSyncedAsync();
+                        var lastId = _lastSyncedManager.GetLastSyncedInternalAsync().GetAwaiter().GetResult() ?? 0;
+                        var previousLastId = lastId;
+                        var numberOfInstructionsProcessed = ProcessDatabaseInstructions(cacheRefreshers, cancellationToken, localIdentity, ref lastId);
+
+                        if (lastId > 0 && lastId != previousLastId)
+                        {
+                            _lastSyncedManager.SaveLastSyncedInternalAsync(lastId).GetAwaiter().GetResult();
+                        }
+
+                        scope.Complete();
+                        return ProcessInstructionsResult.AsCompleted(numberOfInstructionsProcessed, lastId);
+                    }
+                }
+            }
 
             private CacheInstruction CreateCacheInstruction(IEnumerable<RefreshInstruction> instructions, string localIdentity)
                 => new(
@@ -218,7 +320,17 @@ namespace Umbraco.Cms
                         continue;
                     }
 
-                    List<RefreshInstruction> instructionBatch = GetAllInstructions(jsonInstructions?.RootElement);
+                    // Dispose the JsonDocument once we've extracted instructions from its RootElement.
+                    // Use try/finally to ensure pooled buffers are returned even if retrieving the instructions throws.
+                    List<RefreshInstruction> instructionBatch;
+                    try
+                    {
+                        instructionBatch = GetAllInstructions(jsonInstructions?.RootElement);
+                    }
+                    finally
+                    {
+                        jsonInstructions?.Dispose();
+                    }
 
                     // Process as per-normal.
                     var success = ProcessDatabaseInstructions(cacheRefreshers, instructionBatch, instruction, processed, cancellationToken, ref lastId);
@@ -297,14 +409,14 @@ namespace Umbraco.Cms
             /// <summary>
             ///     Processes the instruction batch and checks for errors.
             /// </summary>
-            /// <param name="cacheRefreshers"></param>
-            /// <param name="instructionBatch"></param>
-            /// <param name="instruction"></param>
+            /// <param name="cacheRefreshers">The collection of cache refreshers to notify.</param>
+            /// <param name="instructionBatch">The batch of refresh instructions to process.</param>
+            /// <param name="instruction">The current instruction being processed.</param>
             /// <param name="processed">
             ///     Tracks which instructions have already been processed to avoid duplicates
             /// </param>
-            /// <param name="cancellationToken"></param>
-            /// <param name="lastId"></param>
+            /// <param name="cancellationToken">Cancellation token.</param>
+            /// <param name="lastId">The last processed instruction ID, updated when processing completes.</param>
             /// <returns>
             /// Returns true if all instructions in the batch were processed, otherwise false if they could not be due to the app being shut down
             /// </returns>
@@ -439,6 +551,7 @@ namespace Umbraco.Cms
                 IJsonCacheRefresher refresher = GetJsonRefresher(cacheRefreshers, uniqueIdentifier);
                 if (jsonPayload is not null)
                 {
+                    refresher.RefreshInternal(jsonPayload);
                     refresher.Refresh(jsonPayload);
                 }
             }

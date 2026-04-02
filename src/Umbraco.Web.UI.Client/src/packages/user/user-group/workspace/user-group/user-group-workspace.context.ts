@@ -3,19 +3,18 @@ import { UMB_USER_GROUP_DETAIL_REPOSITORY_ALIAS, type UmbUserGroupDetailReposito
 import { UMB_USER_GROUP_ENTITY_TYPE, UMB_USER_GROUP_ROOT_ENTITY_TYPE } from '../../entity.js';
 import { UmbUserGroupWorkspaceEditorElement } from './user-group-workspace-editor.element.js';
 import { UMB_USER_GROUP_WORKSPACE_ALIAS } from './constants.js';
-import type { UmbUserPermissionModel } from '@umbraco-cms/backoffice/user-permission';
-import type { UmbRoutableWorkspaceContext, UmbSubmittableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import {
-	UmbEntityDetailWorkspaceContextBase,
+	UmbEntityNamedDetailWorkspaceContextBase,
 	UmbWorkspaceIsNewRedirectController,
 } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbRoutableWorkspaceContext, UmbSubmittableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
+import type { UmbUserPermissionModel } from '@umbraco-cms/backoffice/user-permission';
 
 export class UmbUserGroupWorkspaceContext
-	extends UmbEntityDetailWorkspaceContextBase<UmbUserGroupDetailModel, UmbUserGroupDetailRepository>
+	extends UmbEntityNamedDetailWorkspaceContextBase<UmbUserGroupDetailModel, UmbUserGroupDetailRepository>
 	implements UmbSubmittableWorkspaceContext, UmbRoutableWorkspaceContext
 {
-	readonly name = this._data.createObservablePartOfCurrent((data) => data?.name || '');
 	readonly alias = this._data.createObservablePartOfCurrent((data) => data?.alias || '');
 	readonly aliasCanBeChanged = this._data.createObservablePartOfCurrent((data) => data?.aliasCanBeChanged);
 	readonly icon = this._data.createObservablePartOfCurrent((data) => data?.icon || null);
@@ -30,6 +29,7 @@ export class UmbUserGroupWorkspaceContext
 	readonly mediaRootAccess = this._data.createObservablePartOfCurrent((data) => data?.mediaRootAccess || false);
 	readonly fallbackPermissions = this._data.createObservablePartOfCurrent((data) => data?.fallbackPermissions || []);
 	readonly permissions = this._data.createObservablePartOfCurrent((data) => data?.permissions || []);
+	readonly description = this._data.createObservablePartOfCurrent((data) => data?.description || '');
 
 	constructor(host: UmbControllerHost) {
 		super(host, {
@@ -99,6 +99,15 @@ export class UmbUserGroupWorkspaceContext
 	 */
 	setFallbackPermissions(fallbackPermissions: Array<string>) {
 		this._data.updateCurrent({ fallbackPermissions });
+	}
+
+	/**
+	 * Sets the description
+	 * @param {string} description - The description
+	 * @memberof UmbUserGroupWorkspaceContext
+	 */
+	setDescription(description: string) {
+		this._data.updateCurrent({ description });
 	}
 }
 

@@ -3,8 +3,12 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.IO;
 
+/// <summary>
+/// Provides default content for Razor view files.
+/// </summary>
 public class DefaultViewContentProvider : IDefaultViewContentProvider
 {
+    /// <inheritdoc />
     public string GetDefaultFileContent(string? layoutPageAlias = null, string? modelClassName = null, string? modelNamespace = null, string? modelNamespaceAlias = null)
     {
         var content = new StringBuilder();

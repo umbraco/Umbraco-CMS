@@ -6,6 +6,7 @@ import type {
 	UmbInvariantDatasetWorkspaceContext,
 	UmbRoutableWorkspaceContext,
 	ManifestWorkspace,
+	UmbNamableWorkspaceContext,
 } from '@umbraco-cms/backoffice/workspace';
 import {
 	UmbSubmittableWorkspaceContextBase,
@@ -26,7 +27,7 @@ type PropertyTypeDataModel = UmbPropertyTypeScaffoldModel;
 
 export class UmbPropertyTypeWorkspaceContext
 	extends UmbSubmittableWorkspaceContextBase<PropertyTypeDataModel>
-	implements UmbInvariantDatasetWorkspaceContext, UmbRoutableWorkspaceContext
+	implements UmbInvariantDatasetWorkspaceContext, UmbRoutableWorkspaceContext, UmbNamableWorkspaceContext
 {
 	// Just for context token safety:
 	public readonly IS_PROPERTY_TYPE_WORKSPACE_CONTEXT = true;
@@ -44,7 +45,7 @@ export class UmbPropertyTypeWorkspaceContext
 	readonly data = this.#data.asObservable();
 
 	readonly name = this.#data.asObservablePart((data) => data?.name);
-	readonly unique = this.#data.asObservablePart((data) => data?.id);
+	readonly unique = this.#data.asObservablePart((data) => data?.unique);
 
 	readonly values = this.#data.asObservablePart((data) => {
 		return umbObjectToPropertyValueArray(data);
@@ -62,11 +63,22 @@ export class UmbPropertyTypeWorkspaceContext
 		this.validationContext = new UmbValidationContext(this);
 		this.addValidationContext(this.validationContext);
 
-		this.observe(this.unique, (unique) => {
-			if (unique) {
-				this.validationContext.setDataPath(UmbDataPathPropertyTypeQuery({ id: unique }));
-			}
-		});
+		this.observe(
+			this.unique,
+			(unique) => {
+				if (unique) {
+					this.validationContext.setDataPath(UmbDataPathPropertyTypeQuery({ unique }));
+				}
+			},
+			null,
+		);
+		this.observe(
+			this.name,
+			(name) => {
+				this.view.setTitle(name);
+			},
+			null,
+		);
 
 		this.#init = this.consumeContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT, (context) => {
 			this.#contentTypeContext = context;
@@ -143,7 +155,6 @@ export class UmbPropertyTypeWorkspaceContext
 
 		const unique = UmbId.new();
 		let data: PropertyTypeDataModel = {
-			id: unique,
 			unique: unique,
 			container: containerId ? { id: containerId } : null,
 			alias: '',
@@ -182,7 +193,7 @@ export class UmbPropertyTypeWorkspaceContext
 	}
 
 	getUnique() {
-		return this.getData()!.id;
+		return this.getData()!.unique;
 	}
 
 	getEntityType() {

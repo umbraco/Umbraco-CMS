@@ -6,6 +6,7 @@ import { html, customElement, property, state } from '@umbraco-cms/backoffice/ex
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbInputDateElement } from '@umbraco-cms/backoffice/components';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 /**
  * This property editor allows the user to pick a date, datetime-local, or time.
@@ -27,7 +28,10 @@ import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
  * @element umb-property-editor-ui-date-picker
  */
 @customElement('umb-property-editor-ui-date-picker')
-export class UmbPropertyEditorUIDatePickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
+export class UmbPropertyEditorUIDatePickerElement
+	extends UmbFormControlMixin<string | undefined, typeof UmbLitElement, undefined>(UmbLitElement)
+	implements UmbPropertyEditorUiElement
+{
 	/**
 	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
 	 * @type {boolean}
@@ -36,6 +40,17 @@ export class UmbPropertyEditorUIDatePickerElement extends UmbLitElement implemen
 	 */
 	@property({ type: Boolean, reflect: true })
 	readonly: boolean = false;
+	@property({ type: Boolean })
+	mandatory = false;
+
+	@property({ type: String })
+	override get value(): string | undefined {
+		return super.value;
+	}
+	override set value(value: string | undefined) {
+		super.value = value;
+		this.#formatValue(value ?? '');
+	}
 
 	@state()
 	private _inputType: UmbInputDateElement['type'] = 'datetime-local';
@@ -48,9 +63,6 @@ export class UmbPropertyEditorUIDatePickerElement extends UmbLitElement implemen
 
 	@state()
 	private _step?: number;
-
-	@property()
-	value?: string;
 
 	@state()
 	private _inputValue?: string;
@@ -144,16 +156,21 @@ export class UmbPropertyEditorUIDatePickerElement extends UmbLitElement implemen
 		}
 	}
 
+	override firstUpdated() {
+		this.addFormControlElement(this.shadowRoot!.querySelector('umb-input-date')!);
+	}
+
 	override render() {
 		return html`
 			<umb-input-date
 				label=${this.localize.term('placeholders_enterdate')}
-				.value=${this._inputValue}
+				.value=${this._inputValue ?? ''}
 				.min=${this._min}
 				.max=${this._max}
 				.step=${this._step}
 				.type=${this._inputType}
 				@change=${this.#onChange}
+				?required=${this.mandatory}
 				?readonly=${this.readonly}>
 			</umb-input-date>
 		`;

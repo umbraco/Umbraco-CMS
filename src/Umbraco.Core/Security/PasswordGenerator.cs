@@ -14,9 +14,17 @@ public class PasswordGenerator
 {
     private readonly IPasswordConfiguration _passwordConfiguration;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="PasswordGenerator" /> class.
+    /// </summary>
+    /// <param name="passwordConfiguration">The password configuration settings.</param>
     public PasswordGenerator(IPasswordConfiguration passwordConfiguration) =>
         _passwordConfiguration = passwordConfiguration;
 
+    /// <summary>
+    ///     Generates a password that meets the configured password requirements.
+    /// </summary>
+    /// <returns>A randomly generated password.</returns>
     public string GeneratePassword()
     {
         var password = PasswordStore.GeneratePassword(
@@ -98,10 +106,7 @@ public class PasswordGenerator
                 var data = new byte[length];
                 var chArray = new char[length];
                 var num1 = 0;
-                using (var rng = new RNGCryptoServiceProvider())
-                {
-                    rng.GetBytes(data);
-                }
+                RandomNumberGenerator.Fill(data);
 
                 for (var index = 0; index < length; ++index)
                 {

@@ -119,7 +119,7 @@ public class DeliveryApiTests
             {
                 {
                     string.Empty,
-                    new PublishedCultureInfo(string.Empty, name, urlSegment, DateTime.Now)
+                    new PublishedCultureInfo(string.Empty, name, urlSegment, DateTime.UtcNow)
                 }
             });
         content.SetupGet(c => c.ContentType).Returns(contentType);

@@ -1,4 +1,4 @@
-const { rest } = window.MockServiceWorker;
+const { http, HttpResponse } = window.MockServiceWorker;
 import { UMB_SLUG } from './slug.js';
 import type { ImportDictionaryRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
@@ -9,9 +9,9 @@ const uploadResponse: ImportDictionaryRequestModel = {
 };
 
 export const uploadHandlers = [
-	rest.post(umbracoPath(`${UMB_SLUG}/upload`), async (req, res, ctx) => {
-		if (!req.arrayBuffer()) return;
+	http.post(umbracoPath(`${UMB_SLUG}/upload`), async ({ request }) => {
+		if (!request.arrayBuffer()) return;
 
-		return res(ctx.status(200), ctx.json(uploadResponse));
+		return HttpResponse.json(uploadResponse);
 	}),
 ];

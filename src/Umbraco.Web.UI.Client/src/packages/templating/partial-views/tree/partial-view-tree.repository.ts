@@ -15,7 +15,7 @@ export class UmbPartialViewTreeRepository
 	}
 
 	async requestTreeRoot() {
-		const { data: treeRootData } = await this._treeSource.getRootItems({ skip: 0, take: 1 });
+		const { data: treeRootData } = await this._treeSource.getRootItems({ skip: 0, take: 0 });
 		const hasChildren = treeRootData ? treeRootData.total > 0 : false;
 
 		const data: UmbPartialViewTreeRootModel = {

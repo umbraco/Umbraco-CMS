@@ -5,11 +5,10 @@ import { html } from '@umbraco-cms/backoffice/external/lit';
 import './property-editor-ui-tags.element.js';
 
 export default {
-	title: 'Property Editor UIs/Tags',
+	title: 'Extension Type/Property Editor UI/Tags',
 	component: 'umb-property-editor-ui-tags',
 	id: 'umb-property-editor-ui-tags',
 } as Meta;
 
-export const AAAOverview: StoryFn<UmbPropertyEditorUITagsElement> = () =>
+export const Docs: StoryFn<UmbPropertyEditorUITagsElement> = () =>
 	html`<umb-property-editor-ui-tags></umb-property-editor-ui-tags>`;
-AAAOverview.storyName = 'Overview';

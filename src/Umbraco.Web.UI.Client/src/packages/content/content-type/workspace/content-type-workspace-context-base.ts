@@ -70,7 +70,9 @@ export abstract class UmbContentTypeWorkspaceContextBase<
 		this.collection = this.structure.ownerContentTypeObservablePart((data) => data?.collection);
 
 		// Keep current data in sync with the owner content type - This is used for the discard changes feature
-		this.observe(this.structure.ownerContentType, (data) => this._data.setCurrent(data));
+		this.observe(this.structure.ownerContentType, (data) => this._data.setCurrent(data), null);
+		this.observe(this.name, (name) => this.view.setTitle(name), null);
+		// TODO: sometimes the browserTitle for a parent view is set later than the child is updating. We need to fix this as well enable a parent browser title to be updating on the go. [NL]
 	}
 
 	/**
@@ -140,6 +142,21 @@ export abstract class UmbContentTypeWorkspaceContextBase<
 		return response;
 	}
 
+	/**
+	 * Reload the workspace data
+	 * @returns { Promise<void> } The promise of the reload
+	 */
+	override async reload(): Promise<void> {
+		const unique = this.getUnique();
+		if (!unique) throw new Error('Unique is not set');
+
+		const data = await this.structure.reload();
+		if (data) {
+			this._data.setPersisted(data);
+			this._data.setCurrent(data);
+		}
+	}
+
 	#onDetailStoreChange(entity: DetailModelType | undefined) {
 		if (!entity) {
 			this._data.clear();
@@ -152,11 +169,13 @@ export abstract class UmbContentTypeWorkspaceContextBase<
 	 * @param { UmbEntityModel } parent The parent entity
 	 * @memberof UmbContentTypeWorkspaceContextBase
 	 */
-	override async _create(currentData: DetailModelType, parent: UmbEntityModel) {
+	protected override async _create(currentData: DetailModelType, parent: UmbEntityModel) {
 		try {
 			await this.structure.create(parent?.unique);
 
-			this._data.setPersisted(this.structure.getOwnerContentType());
+			const savedData = this.structure.getOwnerContentType();
+			this._data.setPersisted(savedData);
+			this._data.setCurrent(savedData);
 
 			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 			if (!eventContext) {
@@ -178,11 +197,13 @@ export abstract class UmbContentTypeWorkspaceContextBase<
 	 * Updates the content type for the workspace
 	 * @memberof UmbContentTypeWorkspaceContextBase
 	 */
-	override async _update() {
+	protected override async _update() {
 		try {
 			await this.structure.save();
 
-			this._data.setPersisted(this.structure.getOwnerContentType());
+			const savedData = this.structure.getOwnerContentType();
+			this._data.setPersisted(savedData);
+			this._data.setCurrent(savedData);
 
 			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 			if (!eventContext) {

@@ -1,4 +1,4 @@
-import type ExampleSorterItem from './sorter-item.js';
+import type { ExampleSorterItem } from './sorter-item.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, LitElement, repeat, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';

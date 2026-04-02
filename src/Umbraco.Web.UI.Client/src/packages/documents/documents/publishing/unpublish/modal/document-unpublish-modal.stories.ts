@@ -25,6 +25,7 @@ const modalData: UmbDocumentUnpublishModalData = {
 				segment: null,
 				scheduledPublishDate: null,
 				scheduledUnpublishDate: null,
+				flags: [],
 			},
 			language: {
 				entityType: 'language',
@@ -49,6 +50,7 @@ const modalData: UmbDocumentUnpublishModalData = {
 				updateDate: null,
 				scheduledPublishDate: null,
 				scheduledUnpublishDate: null,
+				flags: [],
 			},
 			language: {
 				entityType: 'language',
@@ -73,6 +75,7 @@ const modalData: UmbDocumentUnpublishModalData = {
 				segment: null,
 				scheduledPublishDate: null,
 				scheduledUnpublishDate: null,
+				flags: [],
 			},
 			language: {
 				entityType: 'language',
@@ -91,7 +94,7 @@ const modalValue: UmbDocumentUnpublishModalValue = {
 };
 
 const meta: Meta<UmbDocumentUnpublishModalElement> = {
-	title: 'Workspaces/Document/Modals/Unpublish',
+	title: 'Entity/Document/Modals/Unpublish',
 	component: 'umb-document-unpublish-modal',
 	id: 'umb-document-unpublish-modal',
 	args: {
@@ -124,6 +127,7 @@ this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (modalManager) => {
 						publishDate: null,
 						updateDate: null,
 						segment: null,
+						flags: []
 					},
 					language: {
 						entityType: 'language',
@@ -146,6 +150,7 @@ this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (modalManager) => {
 						publishDate: null,
 						updateDate: null,
 						segment: null,
+						flags: []
 					},
 					language: {
 						entityType: 'language',
@@ -169,7 +174,7 @@ this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (modalManager) => {
 export default meta;
 type Story = StoryObj<UmbDocumentUnpublishModalElement>;
 
-export const Overview: Story = {};
+export const Docs: Story = {};
 
 export const WithTrackedReferences: Story = {
 	args: {

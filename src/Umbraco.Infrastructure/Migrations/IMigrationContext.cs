@@ -38,7 +38,13 @@ public interface IMigrationContext
     /// </summary>
     bool BuildingExpression { get; set; }
 
+    /// <summary>
+    /// Gets a value indicating whether the migration process has completed successfully.
+    /// </summary>
     bool IsCompleted { get; }
 
+    /// <summary>
+    /// Marks the migration process as complete.
+    /// </summary>
     void Complete();
 }

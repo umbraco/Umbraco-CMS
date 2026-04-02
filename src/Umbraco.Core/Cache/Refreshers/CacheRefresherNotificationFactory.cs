@@ -12,6 +12,10 @@ public sealed class CacheRefresherNotificationFactory : ICacheRefresherNotificat
 {
     private readonly IServiceProvider _serviceProvider;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="CacheRefresherNotificationFactory" /> class.
+    /// </summary>
+    /// <param name="serviceProvider">The service provider.</param>
     public CacheRefresherNotificationFactory(IServiceProvider serviceProvider) => _serviceProvider = serviceProvider;
 
     /// <summary>

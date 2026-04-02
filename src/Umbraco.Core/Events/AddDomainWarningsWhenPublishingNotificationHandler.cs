@@ -8,6 +8,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Events;
 
+/// <summary>
+///     Handles the <see cref="ContentPublishedNotification" /> to add warnings when domains are not properly configured for multilingual sites.
+/// </summary>
 public class AddDomainWarningsWhenPublishingNotificationHandler : INotificationHandler<ContentPublishedNotification>
 {
     private readonly IOptions<ContentSettings> _contentSettings;
@@ -16,6 +19,14 @@ public class AddDomainWarningsWhenPublishingNotificationHandler : INotificationH
     private readonly IEventMessagesFactory _eventMessagesFactory;
     private readonly ILogger<AddDomainWarningsWhenPublishingNotificationHandler> _logger;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="AddDomainWarningsWhenPublishingNotificationHandler" /> class.
+    /// </summary>
+    /// <param name="contentSettings">The content settings.</param>
+    /// <param name="contentService">The content service.</param>
+    /// <param name="domainService">The domain service.</param>
+    /// <param name="eventMessagesFactory">The event messages factory.</param>
+    /// <param name="logger">The logger.</param>
     public AddDomainWarningsWhenPublishingNotificationHandler(
         IOptions<ContentSettings> contentSettings,
         IContentService contentService,
@@ -30,6 +41,7 @@ public class AddDomainWarningsWhenPublishingNotificationHandler : INotificationH
         _logger = logger;
     }
 
+    /// <inheritdoc />
     public void Handle(ContentPublishedNotification notification)
     {
         if (_contentSettings.Value.ShowDomainWarnings is false)
@@ -95,6 +107,11 @@ public class AddDomainWarningsWhenPublishingNotificationHandler : INotificationH
         }
     }
 
+    /// <summary>
+    ///     Gets all published cultures from the content and its ancestors.
+    /// </summary>
+    /// <param name="content">The content to check.</param>
+    /// <returns>An enumerable of published culture codes.</returns>
     private IEnumerable<string> GetPublishedCulturesFromAncestors(IContent? content)
     {
         if (content?.ParentId is not -1 && content?.HasIdentity is false)

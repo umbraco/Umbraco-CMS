@@ -16,7 +16,7 @@ public class BlockListValueRequiredValidatorTests
     [Test]
     public void Validates_Empty_Block_List_As_Not_Provided()
     {
-        var validator = new BlockListValueRequiredValidator(new SystemTextJsonSerializer());
+        var validator = new BlockListValueRequiredValidator(new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory()));
 
         var value = JsonNode.Parse("{ \"contentData\": [], \"settingsData\": [] }");
         var result = validator.ValidateRequired(value, ValueTypes.Json);
@@ -26,7 +26,7 @@ public class BlockListValueRequiredValidatorTests
     [Test]
     public void Validates_Populated_Block_List_As_Provided()
     {
-        var validator = new BlockListValueRequiredValidator(new SystemTextJsonSerializer());
+        var validator = new BlockListValueRequiredValidator(new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory()));
 
         var value = JsonNode.Parse("{ \"contentData\": [ {} ], \"settingsData\": [] }");
         var result = validator.ValidateRequired(value, ValueTypes.Json);

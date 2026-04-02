@@ -19,13 +19,31 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 /// </summary>
 internal sealed class RelationTypeRepository : EntityRepositoryBase<int, IRelationType>, IRelationTypeRepository
 {
-    public RelationTypeRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<RelationTypeRepository> logger)
-        : base(scopeAccessor, cache, logger)
+    /// <summary>
+    /// Initializes a new instance of the <see cref="RelationTypeRepository"/> class with the specified dependencies.
+    /// </summary>
+    /// <param name="scopeAccessor">Provides access to the current database scope.</param>
+    /// <param name="cache">The application-level cache manager.</param>
+    /// <param name="logger">The logger used for logging repository operations.</param>
+    /// <param name="repositoryCacheVersionService">Service for managing repository cache versions.</param>
+    /// <param name="cacheSyncService">Service for synchronizing cache across distributed environments.</param>
+    public RelationTypeRepository(
+        IScopeAccessor scopeAccessor,
+        AppCaches cache,
+        ILogger<RelationTypeRepository> logger,
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
+        : base(
+            scopeAccessor,
+            cache,
+            logger,
+            repositoryCacheVersionService,
+            cacheSyncService)
     {
     }
 
     protected override IRepositoryCachePolicy<IRelationType, int> CreateCachePolicy() =>
-        new FullDataSetRepositoryCachePolicy<IRelationType, int>(GlobalIsolatedCache, ScopeAccessor, GetEntityId, /*expires:*/ true);
+        new FullDataSetRepositoryCachePolicy<IRelationType, int>(GlobalIsolatedCache, ScopeAccessor,  RepositoryCacheVersionService, CacheSyncService, GetEntityId, /*expires:*/ true);
 
     private static void CheckNullObjectTypeValues(IRelationType entity)
     {
@@ -47,11 +65,21 @@ internal sealed class RelationTypeRepository : EntityRepositoryBase<int, IRelati
         // use the underlying GetAll which will force cache all content types
         GetMany()?.FirstOrDefault(x => x.Id == id);
 
+    /// <summary>
+    /// Gets a relation type by its unique identifier.
+    /// </summary>
+    /// <param name="id">The unique identifier of the relation type.</param>
+    /// <returns>The relation type matching the specified identifier, or null if not found.</returns>
     public IRelationType? Get(Guid id) =>
 
         // use the underlying GetAll which will force cache all content types
         GetMany()?.FirstOrDefault(x => x.Key == id);
 
+    /// <summary>
+    /// Determines whether a relation type with the specified identifier exists.
+    /// </summary>
+    /// <param name="id">The unique identifier of the relation type.</param>
+    /// <returns>True if the relation type exists; otherwise, false.</returns>
     public bool Exists(Guid id) => Get(id) != null;
 
     protected override IEnumerable<IRelationType> PerformGetAll(params int[]? ids)
@@ -63,6 +91,11 @@ internal sealed class RelationTypeRepository : EntityRepositoryBase<int, IRelati
         return dtos.Select(x => DtoToEntity(x));
     }
 
+    /// <summary>
+    /// Retrieves multiple relation types by their unique identifiers.
+    /// </summary>
+    /// <param name="ids">An optional array of unique identifiers for the relation types to retrieve. If no identifiers are provided, all relation types are returned.</param>
+    /// <returns>An enumerable collection of relation types matching the specified identifiers, or all relation types if no identifiers are specified.</returns>
     public IEnumerable<IRelationType> GetMany(params Guid[]? ids)
     {
         // should not happen due to the cache policy
@@ -113,13 +146,14 @@ internal sealed class RelationTypeRepository : EntityRepositoryBase<int, IRelati
         return sql;
     }
 
-    protected override string GetBaseWhereClause() => $"{Constants.DatabaseSchema.Tables.RelationType}.id = @id";
+    protected override string GetBaseWhereClause() => $"{QuoteTableName(Constants.DatabaseSchema.Tables.RelationType)}.id = @id";
 
     protected override IEnumerable<string> GetDeleteClauses()
     {
         var list = new List<string>
         {
-            "DELETE FROM umbracoRelation WHERE relType = @id", "DELETE FROM umbracoRelationType WHERE id = @id",
+            $"DELETE FROM {QuoteTableName("umbracoRelation")} WHERE {QuoteColumnName("relType")} = @id",
+            $"DELETE FROM {QuoteTableName("umbracoRelationType")} WHERE id = @id",
         };
         return list;
     }

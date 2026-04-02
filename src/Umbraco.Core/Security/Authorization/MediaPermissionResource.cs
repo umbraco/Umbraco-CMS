@@ -3,7 +3,7 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Core.Security.Authorization;
 
 /// <summary>
-///     A resource used for the <see cref="MediaPermissionHandler" />.
+///     A resource used for the MediaPermissionHandler authorization handler.
 /// </summary>
 public class MediaPermissionResource : IPermissionResource
 {

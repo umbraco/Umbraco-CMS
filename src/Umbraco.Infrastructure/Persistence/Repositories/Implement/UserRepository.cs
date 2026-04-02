@@ -18,10 +18,13 @@ using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Factories;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
+using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
+using IMapperCollection = Umbraco.Cms.Infrastructure.Persistence.Mappers.IMapperCollection;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
+
 /// <summary>
 /// Represents the UserRepository for doing CRUD operations for <see cref="IUser"/>
 /// </summary>
@@ -43,15 +46,14 @@ internal sealed class UserRepository : EntityRepositoryBase<Guid, IUser>, IUserR
     /// <param name="scopeAccessor">The scope accessor.</param>
     /// <param name="appCaches">The application caches.</param>
     /// <param name="logger">The logger.</param>
-    /// <param name="mapperCollection">
-    ///     A dictionary specifying the configuration for user passwords. If this is null then no
-    ///     password configuration will be persisted or read.
-    /// </param>
+    /// <param name="mapperCollection">The mapper collection.</param>
     /// <param name="globalSettings">The global settings.</param>
     /// <param name="passwordConfiguration">The password configuration.</param>
     /// <param name="jsonSerializer">The JSON serializer.</param>
     /// <param name="runtimeState">State of the runtime.</param>
+    /// <param name="repositoryCacheVersionService">The repository cache version service.</param>
     /// <param name="permissionMappers">The permission mappers.</param>
+    /// <param name="cacheSyncService">The cache synchronization service.</param>
     /// <exception cref="System.ArgumentNullException">
     ///     mapperCollection
     ///     or
@@ -68,8 +70,15 @@ internal sealed class UserRepository : EntityRepositoryBase<Guid, IUser>, IUserR
         IOptions<UserPasswordConfigurationSettings> passwordConfiguration,
         IJsonSerializer jsonSerializer,
         IRuntimeState runtimeState,
-        IEnumerable<IPermissionMapper> permissionMappers)
-        : base(scopeAccessor, appCaches, logger)
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        IEnumerable<IPermissionMapper> permissionMappers,
+        ICacheSyncService cacheSyncService)
+        : base(
+            scopeAccessor,
+            appCaches,
+            logger,
+            repositoryCacheVersionService,
+            cacheSyncService)
     {
         _mapperCollection = mapperCollection ?? throw new ArgumentNullException(nameof(mapperCollection));
         _globalSettings = globalSettings.Value ?? throw new ArgumentNullException(nameof(globalSettings));
@@ -130,10 +139,9 @@ internal sealed class UserRepository : EntityRepositoryBase<Guid, IUser>, IUserR
     /// <summary>
     ///     Returns a user by username
     /// </summary>
-    /// <param name="username"></param>
+    /// <param name="username">The username of the user to retrieve.</param>
     /// <param name="includeSecurityData">
     ///     Can be used for slightly faster user lookups if the result doesn't require security data (i.e. groups, apps &amp; start nodes).
-    ///     This is really only used for a shim in order to upgrade to 7.6.
     /// </param>
     /// <returns>
     ///     A non cached <see cref="IUser" /> instance
@@ -141,15 +149,30 @@ internal sealed class UserRepository : EntityRepositoryBase<Guid, IUser>, IUserR
     public IUser? GetByUsername(string username, bool includeSecurityData) =>
         GetWith(sql => sql.Where<UserDto>(x => x.Login == username), includeSecurityData);
 
+    /// <summary>
+    /// Retrieves a user entity by username specifically for upgrade operations.
+    /// </summary>
+    /// <param name="username">The username of the user to retrieve for upgrade.</param>
+    /// <returns>The <see cref="IUser"/> instance matching the specified username, or <c>null</c> if no user is found.</returns>
     public IUser? GetForUpgradeByUsername(string username) => GetUpgradeUserWith(sql => sql.Where<UserDto>(x => x.Login == username));
 
+    /// <summary>
+    /// Retrieves a user entity for upgrade operations by matching the specified email address.
+    /// </summary>
+    /// <param name="email">The email address of the user to look up.</param>
+    /// <returns>The <see cref="IUser"/> instance matching the email, or <c>null</c> if no user is found.</returns>
     public IUser? GetForUpgradeByEmail(string email) => GetUpgradeUserWith(sql => sql.Where<UserDto>(x => x.Email == email));
 
+    /// <summary>
+    /// Retrieves the user with the specified identifier for upgrade operations.
+    /// </summary>
+    /// <param name="id">The unique identifier of the user to retrieve.</param>
+    /// <returns>The <see cref="IUser"/> instance if found; otherwise, <c>null</c>.</returns>
     public IUser? GetForUpgrade(int id) => GetUpgradeUserWith(sql => sql.Where<UserDto>(x => x.Id == id));
 
     private IUser? GetUpgradeUserWith(Action<Sql<ISqlContext>> with)
     {
-        if (_runtimeState.Level != RuntimeLevel.Upgrade)
+        if (_runtimeState.Level is not RuntimeLevel.Upgrade and not RuntimeLevel.Upgrading)
         {
             return null;
         }
@@ -187,7 +210,7 @@ internal sealed class UserRepository : EntityRepositoryBase<Guid, IUser>, IUserR
     /// <summary>
     ///     Returns a user by id
     /// </summary>
-    /// <param name="id"></param>
+    /// <param name="id">The user ID to retrieve.</param>
     /// <param name="includeSecurityData">
     ///     This is really only used for a shim in order to upgrade to 7.6 but could be used
     ///     for slightly faster user lookups if the result doesn't require security data (i.e. groups, apps &amp; start nodes)
@@ -198,38 +221,67 @@ internal sealed class UserRepository : EntityRepositoryBase<Guid, IUser>, IUserR
     public IUser? Get(int? id, bool includeSecurityData) =>
         GetWith(sql => sql.Where<UserDto>(x => x.Id == id), includeSecurityData);
 
+    /// <summary>
+    /// Retrieves the user profile associated with the specified username.
+    /// </summary>
+    /// <param name="username">The username whose profile is to be retrieved.</param>
+    /// <returns>The <see cref="IProfile"/> for the given username, or <c>null</c> if no user is found.</returns>
     public IProfile? GetProfile(string username)
     {
         UserDto? dto = GetDtoWith(sql => sql.Where<UserDto>(x => x.Login == username), false);
         return dto == null ? null : new UserProfile(dto.Id, dto.UserName);
     }
 
+    /// <summary>
+    /// Retrieves the user profile associated with the specified user ID.
+    /// </summary>
+    /// <param name="id">The ID of the user whose profile is to be retrieved.</param>
+    /// <returns>The <see cref="IProfile"/> for the given user ID, or <c>null</c> if no user is found.</returns>
     public IProfile? GetProfile(int id)
     {
         UserDto? dto = GetDtoWith(sql => sql.Where<UserDto>(x => x.Id == id), false);
         return dto == null ? null : new UserProfile(dto.Id, dto.UserName);
     }
 
+    /// <summary>
+    /// Retrieves a dictionary containing the number of users for each <see cref="Umbraco.Core.Models.Membership.UserState"/>.
+    /// </summary>
+    /// <returns>
+    /// A dictionary where each key is a <see cref="Umbraco.Core.Models.Membership.UserState"/> value representing a user state, and the corresponding value is the count of users in that state.
+    /// </returns>
     public IDictionary<UserState, int> GetUserStates()
     {
         // These keys in this query map to the `Umbraco.Core.Models.Membership.UserState` enum
-        var sql = @"SELECT -1 AS [Key], COUNT(id) AS [Value] FROM umbracoUser
+        var keyAlias = SqlSyntax.GetQuotedName("Key");
+        var valueAlias = SqlSyntax.GetQuotedName("Value");
+        var userTableName = QuoteTableName("umbracoUser");
+        var sql = @$"SELECT -1 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName}
 UNION
-SELECT 0 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 AND userNoConsole = 0 AND lastLoginDate IS NOT NULL
+SELECT 0 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName}
+    WHERE {QuoteColumnName("userDisabled")} = 0 AND {QuoteColumnName("userNoConsole")} = 0 AND {QuoteColumnName("lastLoginDate")} IS NOT NULL
 UNION
-SELECT 1 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 1
+SELECT 1 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName} WHERE {QuoteColumnName("userDisabled")} = 1
 UNION
-SELECT 2 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userNoConsole = 1
+SELECT 2 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName} WHERE {QuoteColumnName("userNoConsole")} = 1
 UNION
-SELECT 3 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE lastLoginDate IS NULL AND userDisabled = 1 AND invitedDate IS NOT NULL
+SELECT 3 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName}
+    WHERE {QuoteColumnName("lastLoginDate")} IS NULL AND {QuoteColumnName("userDisabled")} = 1 AND {QuoteColumnName("invitedDate")} IS NOT NULL
 UNION
-SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 AND userNoConsole = 0 AND lastLoginDate IS NULL";
+SELECT 4 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName}
+    WHERE {QuoteColumnName("userDisabled")} = 0 AND {QuoteColumnName("userNoConsole")} = 0 AND {QuoteColumnName("lastLoginDate")} IS NULL";
 
         Dictionary<int, int>? result = Database.Dictionary<int, int>(sql);
 
         return result.ToDictionary(x => (UserState)x.Key, x => x.Value);
     }
 
+    /// <summary>
+    /// Creates a new login session for a user and optionally clears stale sessions.
+    /// </summary>
+    /// <param name="userId">The ID of the user for whom to create the login session.</param>
+    /// <param name="requestingIpAddress">The IP address from which the login request originated.</param>
+    /// <param name="cleanStaleSessions">If true, removes login sessions older than 15 days.</param>
+    /// <returns>The GUID of the newly created login session.</returns>
     public Guid CreateLoginSession(int? userId, string requestingIpAddress, bool cleanStaleSessions = true)
     {
         DateTime now = DateTime.UtcNow;
@@ -237,9 +289,9 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
         {
             UserId = userId,
             IpAddress = requestingIpAddress,
-            LoggedInUtc = now,
-            LastValidatedUtc = now,
-            LoggedOutUtc = null,
+            LoggedIn = now,
+            LastValidated = now,
+            LoggedOut = null,
             SessionId = Guid.NewGuid()
         };
         Database.Insert(dto);
@@ -252,6 +304,12 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
         return dto.SessionId;
     }
 
+    /// <summary>
+    /// Validates whether the specified session ID is valid for the given user.
+    /// </summary>
+    /// <param name="userId">The unique identifier of the user whose session is being validated.</param>
+    /// <param name="sessionId">The unique identifier of the login session to validate.</param>
+    /// <returns><c>true</c> if the session is valid for the user; otherwise, <c>false</c>.</returns>
     public bool ValidateLoginSession(int userId, Guid sessionId)
     {
         // HACK: Avoid a deadlock - BackOfficeCookieOptions OnValidatePrincipal
@@ -286,13 +344,13 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
         Sql<ISqlContext> sql = t.Sql(sessionId);
 
         UserLoginDto? found = Database.FirstOrDefault<UserLoginDto>(sql);
-        if (found == null || found.UserId != userId || found.LoggedOutUtc.HasValue)
+        if (found == null || found.UserId != userId || found.LoggedOut.HasValue)
         {
             return false;
         }
 
         //now detect if there's been a timeout
-        if (DateTime.UtcNow - found.LastValidatedUtc > _globalSettings.TimeOut)
+        if (DateTime.UtcNow - found.LastValidated > _globalSettings.TimeOut)
         {
             //timeout detected, update the record
             if (Logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
@@ -308,24 +366,33 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
         {
             Logger.LogDebug("Updating LastValidatedUtc for sessionId {sessionId}", sessionId);
         }
-        found.LastValidatedUtc = DateTime.UtcNow;
+        found.LastValidated = DateTime.UtcNow;
         Database.Update(found);
         return true;
     }
 
+    /// <summary>
+    /// Clears all login sessions for the specified user.
+    /// </summary>
+    /// <param name="userId">The ID of the user whose login sessions will be cleared.</param>
+    /// <returns>The number of login sessions deleted.</returns>
     public int ClearLoginSessions(int userId) =>
         Database.Delete<UserLoginDto>(Sql().Where<UserLoginDto>(x => x.UserId == userId));
 
     public int ClearLoginSessions(TimeSpan timespan)
     {
         DateTime fromDate = DateTime.UtcNow - timespan;
-        return Database.Delete<UserLoginDto>(Sql().Where<UserLoginDto>(x => x.LastValidatedUtc < fromDate));
+        return Database.Delete<UserLoginDto>(Sql().Where<UserLoginDto>(x => x.LastValidated < fromDate));
     }
 
+    /// <summary>
+    /// Marks the specified login session as logged out by setting its logout time to the current UTC time.
+    /// </summary>
+    /// <param name="sessionId">The unique identifier of the login session to mark as logged out.</param>
     public void ClearLoginSession(Guid sessionId) =>
         // TODO: why is that one updating and not deleting?
         Database.Execute(Sql()
-            .Update<UserLoginDto>(u => u.Set(x => x.LoggedOutUtc, DateTime.UtcNow))
+            .Update<UserLoginDto>(u => u.Set(x => x.LoggedOut, DateTime.UtcNow))
             .Where<UserLoginDto>(x => x.SessionId == sessionId));
 
 
@@ -409,22 +476,19 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
         Sql<ISqlContext> sql;
         try
         {
-            sql = SqlContext.Sql()
-                .Select<UserGroupDto>(x => x.Id, x => x.Key)
-                .From<UserGroupDto>()
-                .InnerJoin<User2UserGroupDto>().On<UserGroupDto, User2UserGroupDto>((left, right) => left.Id == right.UserGroupId)
-                .WhereIn<User2UserGroupDto>(x => x.UserId, userIds);
-
-            List<UserGroupDto>? userGroups = Database.Fetch<UserGroupDto>(sql);
-
-
-            groupKeys = userGroups.Select(x => x.Key).ToList();
-
+            groupKeys = Database.FetchByGroups<UserGroupDto, int>(userIds, Constants.Sql.MaxParameterCount, ints =>
+            {
+                return SqlContext.Sql()
+                    .Select<UserGroupDto>(x => x.Id, x => x.Key)
+                    .From<UserGroupDto>()
+                    .InnerJoin<User2UserGroupDto>().On<UserGroupDto, User2UserGroupDto>((left, right) => left.Id == right.UserGroupId)
+                    .WhereIn<User2UserGroupDto>(x => x.UserId, ints);
+            }).Select(x => x.Key).ToList();
         }
         catch (DbException)
         {
             // ignore doing upgrade, as we know the Key potentially do not exists
-            if (_runtimeState.Level != RuntimeLevel.Upgrade)
+            if (_runtimeState.Level is not RuntimeLevel.Upgrade and not RuntimeLevel.Upgrading)
             {
                 throw;
             }
@@ -433,19 +497,19 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
 
 
         // get users2groups
-        sql = SqlContext.Sql()
-            .Select<User2UserGroupDto>()
-            .From<User2UserGroupDto>()
-            .WhereIn<User2UserGroupDto>(x => x.UserId, userIds);
-
-        List<User2UserGroupDto>? user2Groups = Database.Fetch<User2UserGroupDto>(sql);
+        List<User2UserGroupDto>? user2Groups = Database.FetchByGroups<User2UserGroupDto, int>(userIds, Constants.Sql.MaxParameterCount, ints =>
+        {
+            return SqlContext.Sql()
+                .Select<User2UserGroupDto>()
+                .From<User2UserGroupDto>()
+                .WhereIn<User2UserGroupDto>(x => x.UserId, ints);
+        }).ToList();
 
         if (groupIds.Any() is false)
         {
             //this can happen if we are upgrading, so we try do read from this table, as we counn't because of the key earlier
             groupIds = user2Groups.Select(x => x.UserGroupId).Distinct().ToList();
         }
-
 
         // get groups
         // We wrap this in a try-catch, as this might throw errors when you try to login before having migrated your database
@@ -485,13 +549,13 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
             .ToDictionary(x => x.Key, x => x);
 
         // get start nodes
-
-        sql = SqlContext.Sql()
-            .Select<UserStartNodeDto>()
-            .From<UserStartNodeDto>()
-            .WhereIn<UserStartNodeDto>(x => x.UserId, userIds);
-
-        List<UserStartNodeDto>? startNodes = Database.Fetch<UserStartNodeDto>(sql);
+        List<UserStartNodeDto>? startNodes = Database.FetchByGroups<UserStartNodeDto, int>(userIds, Constants.Sql.MaxParameterCount, ints =>
+        {
+            return SqlContext.Sql()
+                .Select<UserStartNodeDto>()
+                .From<UserStartNodeDto>()
+                .WhereIn<UserStartNodeDto>(x => x.UserId, ints);
+        }).ToList();
 
         // get groups2languages
 
@@ -651,33 +715,44 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
             .Select(columns)
             .From<UserDto>();
 
-    protected override string GetBaseWhereClause() => $"{Constants.DatabaseSchema.Tables.User}.id = @id";
+    protected override string GetBaseWhereClause() => $"{QuoteTableName(UserDto.TableName)}.id = @id";
 
     protected override IEnumerable<string> GetDeleteClauses()
     {
+        var userColName = QuoteColumnName("userId");
         var list = new List<string>
         {
-            $"DELETE FROM {Constants.DatabaseSchema.Tables.UserLogin} WHERE userId = @id",
-            $"DELETE FROM {Constants.DatabaseSchema.Tables.User2UserGroup} WHERE userId = @id",
-            $"DELETE FROM {Constants.DatabaseSchema.Tables.User2NodeNotify} WHERE userId = @id",
-            $"DELETE FROM {Constants.DatabaseSchema.Tables.User2ClientId} WHERE userId = @id",
-            $"DELETE FROM {Constants.DatabaseSchema.Tables.UserStartNode} WHERE userId = @id",
-            $"DELETE FROM {Constants.DatabaseSchema.Tables.ExternalLoginToken} WHERE externalLoginId = (SELECT id FROM {Constants.DatabaseSchema.Tables.ExternalLogin} WHERE userOrMemberKey = @key)",
-            $"DELETE FROM {Constants.DatabaseSchema.Tables.ExternalLogin} WHERE userOrMemberKey = @key",
-            $"DELETE FROM {Constants.DatabaseSchema.Tables.User} WHERE id = @id",
+            $"DELETE FROM {QuoteTableName(UserLoginDto.TableName)} WHERE {userColName} = @id",
+            $"DELETE FROM {QuoteTableName(User2UserGroupDto.TableName)} WHERE {userColName} = @id",
+            $"DELETE FROM {QuoteTableName(User2NodeNotifyDto.TableName)} WHERE {userColName} = @id",
+            $"DELETE FROM {QuoteTableName(User2ClientIdDto.TableName)} WHERE {userColName} = @id",
+            $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.UserStartNode)} WHERE {userColName} = @id",
+            @$"DELETE FROM {QuoteTableName(ExternalLoginTokenDto.TableName)} WHERE {QuoteColumnName("externalLoginId")} =
+                (SELECT id FROM {QuoteTableName(ExternalLoginDto.TableName)} WHERE {QuoteColumnName("userOrMemberKey")} = @key)",
+            $"DELETE FROM {QuoteTableName(ExternalLoginDto.TableName)} WHERE {QuoteColumnName("userOrMemberKey")} = @key",
+            $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.User)} WHERE id = @id",
         };
         return list;
     }
 
     protected override void PersistDeletedItem(IUser entity)
     {
+        // Clear user group caches for any user groups associated with the deleted user.
+        // We need to do this because the count of the number of users in the user group is cached
+        // along with the user group, and if we've made changes to the user groups assigned to the user,
+        // the count for the groups need to be refreshed.
+        foreach (IReadOnlyUserGroup group in entity.Groups)
+        {
+            ClearRepositoryCacheForUserGroup(group.Id);
+        }
+
         IEnumerable<string> deletes = GetDeleteClauses();
         foreach (var delete in deletes)
         {
             Database.Execute(delete, new { id = entity.Id, key = GetEntityId(entity) });
         }
 
-        entity.DeleteDate = DateTime.Now;
+        entity.DeleteDate = DateTime.UtcNow;
     }
 
     protected override void PersistNewItem(IUser entity)
@@ -700,29 +775,48 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
 
         if (entity.IsPropertyDirty("StartContentIds"))
         {
-            AddingOrUpdateStartNodes(entity, Enumerable.Empty<UserStartNodeDto>(),
-                UserStartNodeDto.StartNodeTypeValue.Content, entity.StartContentIds);
+            AddingOrUpdateStartNodes(
+                entity,
+                Enumerable.Empty<UserStartNodeDto>(),
+                UserStartNodeDto.StartNodeTypeValue.Content,
+                entity.StartContentIds);
         }
 
         if (entity.IsPropertyDirty("StartMediaIds"))
         {
-            AddingOrUpdateStartNodes(entity, Enumerable.Empty<UserStartNodeDto>(),
-                UserStartNodeDto.StartNodeTypeValue.Media, entity.StartMediaIds);
+            AddingOrUpdateStartNodes(
+                entity,
+                Enumerable.Empty<UserStartNodeDto>(),
+                UserStartNodeDto.StartNodeTypeValue.Media,
+                entity.StartMediaIds);
         }
 
         if (entity.IsPropertyDirty("Groups"))
         {
-            // lookup all assigned
-            List<UserGroupDto>? assigned = entity.Groups == null || entity.Groups.Any() == false
-                ? new List<UserGroupDto>()
-                : Database.Fetch<UserGroupDto>(
-                    "SELECT * FROM umbracoUserGroup WHERE userGroupAlias IN (@aliases)",
-                    new { aliases = entity.Groups.Select(x => x.Alias) });
+            // Lookup all assigned groups.
+            List<UserGroupDto> assigned = [];
+            if (entity.Groups.Any())
+            {
+                Sql<ISqlContext> sql = SqlContext.Sql()
+                    .SelectAll()
+                    .From<UserGroupDto>()
+                    .WhereIn<UserGroupDto>(x => x.Alias, entity.Groups.Select(x => x.Alias).ToArray());
+                assigned = Database.Fetch<UserGroupDto>(sql);
+            }
 
             foreach (UserGroupDto? groupDto in assigned)
             {
                 var dto = new User2UserGroupDto { UserGroupId = groupDto.Id, UserId = entity.Id };
                 Database.Insert(dto);
+            }
+
+            // Clear user group caches for the user groups associated with the new user.
+            // We need to do this because the count of the number of users in the user group is cached
+            // along with the user group, and if we've made changes to the user groups assigned to the user,
+            // the count for the groups need to be refreshed.
+            foreach (IReadOnlyUserGroup group in entity.Groups)
+            {
+                ClearRepositoryCacheForUserGroup(group.Id);
             }
         }
 
@@ -817,48 +911,93 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
 
         if (entity.IsPropertyDirty("StartContentIds") || entity.IsPropertyDirty("StartMediaIds"))
         {
+            Sql<ISqlContext> sql = SqlContext.Sql()
+                .SelectAll()
+                .From<UserStartNodeDto>()
+                .Where<UserStartNodeDto>(x => x.UserId == entity.Id);
             List<UserStartNodeDto>? assignedStartNodes =
-                Database.Fetch<UserStartNodeDto>(
-                    "SELECT * FROM umbracoUserStartNode WHERE userId = @userId",
-                    new { userId = entity.Id });
+                Database.Fetch<UserStartNodeDto>(sql);
+
             if (entity.IsPropertyDirty("StartContentIds"))
             {
-                AddingOrUpdateStartNodes(entity, assignedStartNodes, UserStartNodeDto.StartNodeTypeValue.Content,
-                    entity.StartContentIds);
+                AddingOrUpdateStartNodes(entity, assignedStartNodes, UserStartNodeDto.StartNodeTypeValue.Content, entity.StartContentIds);
             }
 
             if (entity.IsPropertyDirty("StartMediaIds"))
             {
-                AddingOrUpdateStartNodes(entity, assignedStartNodes, UserStartNodeDto.StartNodeTypeValue.Media,
-                    entity.StartMediaIds);
+                AddingOrUpdateStartNodes(entity, assignedStartNodes, UserStartNodeDto.StartNodeTypeValue.Media, entity.StartMediaIds);
             }
         }
 
         if (entity.IsPropertyDirty("Groups"))
         {
-            //lookup all assigned
-            List<UserGroupDto>? assigned = entity.Groups == null || entity.Groups.Any() == false
-                ? new List<UserGroupDto>()
-                : Database.Fetch<UserGroupDto>(
-                    "SELECT * FROM umbracoUserGroup WHERE userGroupAlias IN (@aliases)",
-                    new { aliases = entity.Groups.Select(x => x.Alias) });
+            // Get all user groups Ids currently assigned to the user.
+            Sql<ISqlContext> sql = SqlContext.Sql()
+                .Select<User2UserGroupDto>(x => x.UserGroupId)
+                .From<User2UserGroupDto>()
+                .Where<User2UserGroupDto>(c => c.UserId == entity.Id);
 
-            //first delete all
-            // TODO: We could do this a nicer way instead of "Nuke and Pave"
-            Database.Delete<User2UserGroupDto>("WHERE UserId = @UserId", new { UserId = entity.Id });
+            List<int> existingUserGroupIds = Database.Fetch<int>(sql);
 
-            foreach (UserGroupDto? groupDto in assigned)
+            // Get the user groups Ids that need to be removed and added.
+            var userGroupsIdsToRemove = existingUserGroupIds
+                .Except(entity.Groups.Select(x => x.Id))
+                .ToList();
+            var userGroupIdsToAdd = entity.Groups
+                .Select(x => x.Id)
+                .Except(existingUserGroupIds)
+                .ToList();
+
+            // Remove user groups that are no longer assigned to the user.
+            if (userGroupsIdsToRemove.Count > 0)
             {
-                var dto = new User2UserGroupDto { UserGroupId = groupDto.Id, UserId = entity.Id };
-                Database.Insert(dto);
+                Database.Delete<User2UserGroupDto>(
+                    Sql()
+                        .Where<User2UserGroupDto>(x => x.UserId == entity.Id)
+                        .WhereIn<User2UserGroupDto>(x => x.UserGroupId, userGroupsIdsToRemove));
+            }
+
+            // Add user groups that are newly assigned to the user.
+            if (userGroupIdsToAdd.Count > 0)
+            {
+                IEnumerable<User2UserGroupDto> user2UserGroupDtos = userGroupIdsToAdd
+                    .Select(userGroupId => new User2UserGroupDto
+                    {
+                        UserGroupId = userGroupId,
+                        UserId = entity.Id,
+                    });
+                Database.InsertBulk(user2UserGroupDtos);
+            }
+
+            // Clear user group caches for any user group that have been removed or added.
+            // We need to do this because the count of the number of users in the user group is cached
+            // along with the user group, and if we've made changes to the user groups assigned to the user,
+            // the count for the groups need to be refreshed.
+            var userGroupIdsToRefresh = userGroupsIdsToRemove
+                .Union(userGroupIdsToAdd)
+                .ToList();
+            foreach (int userGroupIdToRefresh in userGroupIdsToRefresh)
+            {
+                ClearRepositoryCacheForUserGroup(userGroupIdToRefresh);
             }
         }
 
         entity.ResetDirtyProperties();
     }
 
-    private void AddingOrUpdateStartNodes(IEntity entity, IEnumerable<UserStartNodeDto> current,
-        UserStartNodeDto.StartNodeTypeValue startNodeType, int[]? entityStartIds)
+    private void ClearRepositoryCacheForUserGroup(int id)
+    {
+        IAppPolicyCache userGroupCache = AppCaches.IsolatedCaches.GetOrCreate<IUserGroup>();
+
+        string cacheKey = RepositoryCacheKeys.GetKey<IUserGroup, int>(id);
+        userGroupCache.Clear(cacheKey);
+    }
+
+    private void AddingOrUpdateStartNodes(
+        IEntity entity,
+        IEnumerable<UserStartNodeDto> current,
+        UserStartNodeDto.StartNodeTypeValue startNodeType,
+        int[]? entityStartIds)
     {
         if (entityStartIds is null)
         {
@@ -867,16 +1006,18 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
 
         var assignedIds = current.Where(x => x.StartNodeType == (int)startNodeType).Select(x => x.StartNode).ToArray();
 
-        //remove the ones not assigned to the entity
+        // remove the ones not assigned to the entity
         var toDelete = assignedIds.Except(entityStartIds).ToArray();
         if (toDelete.Length > 0)
         {
-            Database.Delete<UserStartNodeDto>(
-                "WHERE UserId = @UserId AND startNode IN (@startNodes)",
-                new { UserId = entity.Id, startNodes = toDelete });
+            Sql<ISqlContext> sql = SqlContext.Sql()
+                .Delete<UserStartNodeDto>()
+                .Where<UserStartNodeDto>(x => x.UserId == entity.Id)
+                .WhereIn<UserStartNodeDto>(x => x.StartNode, toDelete);
+            Database.Execute(sql);
         }
 
-        //add the ones not currently in the db
+        // add the ones not currently in the db
         var toAdd = entityStartIds.Except(assignedIds).ToArray();
         foreach (var i in toAdd)
         {
@@ -889,14 +1030,20 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
 
     #region Implementation of IUserRepository
 
+    /// <summary>
+    /// Returns the number of users that satisfy the specified query criteria.
+    /// </summary>
+    /// <param name="query">An <see cref="IQuery{IUser}"/> instance used to filter users; may be <c>null</c> to count all users.</param>
+    /// <returns>The total number of users matching the query.</returns>
     public int GetCountByQuery(IQuery<IUser>? query)
     {
-        Sql<ISqlContext> sqlClause = GetBaseQuery("umbracoUser.id");
+        var userIdQuoted = SqlSyntax.GetQuotedColumn(UserDto.TableName, "id");
+        Sql<ISqlContext> sqlClause = GetBaseQuery(userIdQuoted);
         var translator = new SqlTranslator<IUser>(sqlClause, query);
         Sql<ISqlContext> subquery = translator.Translate();
         //get the COUNT base query
         Sql<ISqlContext>? sql = GetBaseQuery(true)
-            .Append(new Sql("WHERE umbracoUser.id IN (" + subquery.SQL + ")", subquery.Arguments));
+            .Append(new Sql($"WHERE {userIdQuoted} IN ({subquery.SQL})", subquery.Arguments));
 
         return Database.ExecuteScalar<int>(sql);
     }
@@ -911,8 +1058,18 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
         return Database.ExecuteScalar<int>(sql) > 0;
     }
 
+    /// <summary>
+    /// Determines whether a user with the specified username exists.
+    /// </summary>
+    /// <param name="username">The username to check for existence.</param>
+    /// <returns>True if the user exists; otherwise, false.</returns>
     public bool Exists(string username) => ExistsByUserName(username);
 
+    /// <summary>
+    /// Determines whether a user with the specified username exists.
+    /// </summary>
+    /// <param name="username">The username to check for existence.</param>
+    /// <returns>True if a user with the specified username exists; otherwise, false.</returns>
     public bool ExistsByUserName(string username)
     {
         Sql<ISqlContext> sql = SqlContext.Sql()
@@ -923,10 +1080,19 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
         return Database.ExecuteScalar<int>(sql) > 0;
     }
 
-    // This is a bit hacky, as we're stealing some of the cache implementation, so we also can cache user by id
-    // We do however need this, as all content have creatorId (as int) and thus when we index content
-    // this gets called for each content item, and we need to cache the user to avoid a lot of db calls
-    // TODO: Remove this once CreatorId gets migrated to a key.
+    /// <summary>
+    /// Retrieves a non-cached <see cref="IUser"/> instance for the specified user ID, or <c>null</c> if no user is found.
+    /// </summary>
+    /// <remarks>
+    /// This is a bit hacky, as we're stealing some of the cache implementation, so we also can cache user by id
+    /// We do however need this, as all content have creatorId (as int) and thus when we index content
+    /// this gets called for each content item, and we need to cache the user to avoid a lot of db calls
+    /// TODO: Remove this once CreatorId gets migrated to a key.
+    /// </remarks>
+    /// <param name="id">The ID of the user to retrieve.</param>
+    /// <returns>
+    /// A non-cached <see cref="IUser"/> instance if a user with the specified ID exists; otherwise, <c>null</c>.
+    /// </returns>
     public IUser? Get(int id)
     {
         string cacheKey = RepositoryCacheKeys.GetKey<IUser, int>(id);
@@ -951,11 +1117,16 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
         PerformGetReferencedDtos(dtos);
 
         IUser user = UserFactory.BuildEntity(_globalSettings, dtos[0], _permissionMappers);
-        IsolatedCache.Insert(cacheKey, () => user, TimeSpan.FromMinutes(5), true);
+        IsolatedCache.Insert(cacheKey, () => user, RepositoryCacheConstants.DefaultCacheDuration, true);
 
         return user;
     }
 
+    /// <summary>
+    /// Determines whether a user with the specified login exists.
+    /// </summary>
+    /// <param name="login">The login identifier to check for existence.</param>
+    /// <returns>True if a user with the specified login exists; otherwise, false.</returns>
     public bool ExistsByLogin(string login)
     {
         Sql<ISqlContext> sql = SqlContext.Sql()
@@ -970,12 +1141,14 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
     ///     Gets a list of <see cref="IUser" /> objects associated with a given group
     /// </summary>
     /// <param name="groupId">Id of group</param>
+    /// <returns>An enumerable collection of <see cref="IUser" /> objects in the specified group.</returns>
     public IEnumerable<IUser> GetAllInGroup(int groupId) => GetAllInOrNotInGroup(groupId, true);
 
     /// <summary>
     ///     Gets a list of <see cref="IUser" /> objects not associated with a given group
     /// </summary>
     /// <param name="groupId">Id of group</param>
+    /// <returns>An enumerable collection of <see cref="IUser" /> objects not in the specified group.</returns>
     public IEnumerable<IUser> GetAllNotInGroup(int groupId) => GetAllInOrNotInGroup(groupId, false);
 
     private IEnumerable<IUser> GetAllInOrNotInGroup(int groupId, bool include)
@@ -1010,12 +1183,12 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
     /// <summary>
     ///     Gets paged user results
     /// </summary>
-    /// <param name="query"></param>
-    /// <param name="pageIndex"></param>
-    /// <param name="pageSize"></param>
-    /// <param name="totalRecords"></param>
-    /// <param name="orderBy"></param>
-    /// <param name="orderDirection"></param>
+    /// <param name="query">The query to filter users.</param>
+    /// <param name="pageIndex">The zero-based page index.</param>
+    /// <param name="pageSize">The number of items per page.</param>
+    /// <param name="totalRecords">The total number of records matching the query.</param>
+    /// <param name="orderBy">The expression to order results by.</param>
+    /// <param name="orderDirection">The sort direction.</param>
     /// <param name="includeUserGroups">
     ///     A filter to only include user that belong to these user groups
     /// </param>
@@ -1023,124 +1196,25 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
     ///     A filter to only include users that do not belong to these user groups
     /// </param>
     /// <param name="userState">Optional parameter to filter by specified user state</param>
-    /// <param name="filter"></param>
-    /// <returns></returns>
+    /// <param name="filter">Optional filter to apply to results.</param>
+    /// <returns>A paged enumerable of users.</returns>
     /// <remarks>
     ///     The query supplied will ONLY work with data specifically on the umbracoUser table because we are using NPoco paging
     ///     (SQL paging)
     /// </remarks>
-    public IEnumerable<IUser> GetPagedResultsByQuery(IQuery<IUser>? query, long pageIndex, int pageSize,
+    public IEnumerable<IUser> GetPagedResultsByQuery(
+        IQuery<IUser>? query,
+        long pageIndex,
+        int pageSize,
         out long totalRecords,
-        Expression<Func<IUser, object?>> orderBy, Direction orderDirection = Direction.Ascending,
-        string[]? includeUserGroups = null, string[]? excludeUserGroups = null, UserState[]? userState = null,
+        Expression<Func<IUser, object?>> orderBy,
+        Direction orderDirection = Direction.Ascending,
+        string[]? includeUserGroups = null,
+        string[]? excludeUserGroups = null,
+        UserState[]? userState = null,
         IQuery<IUser>? filter = null)
     {
-        if (orderBy == null)
-        {
-            throw new ArgumentNullException(nameof(orderBy));
-        }
-
-        Sql<ISqlContext>? filterSql = null;
-        Tuple<string, object[]>[]? customFilterWheres = filter?.GetWhereClauses().ToArray();
-        var hasCustomFilter = customFilterWheres != null && customFilterWheres.Length > 0;
-        if (hasCustomFilter
-            || (includeUserGroups != null && includeUserGroups.Length > 0)
-            || (excludeUserGroups != null && excludeUserGroups.Length > 0)
-            || (userState != null && userState.Length > 0 && userState.Contains(UserState.All) == false))
-        {
-            filterSql = SqlContext.Sql();
-        }
-
-        if (hasCustomFilter)
-        {
-            foreach (Tuple<string, object[]> clause in customFilterWheres!)
-            {
-                filterSql?.Append($"AND ({clause.Item1})", clause.Item2);
-            }
-        }
-
-        if (includeUserGroups != null && includeUserGroups.Length > 0)
-        {
-            const string subQuery = @"AND (umbracoUser.id IN (SELECT DISTINCT umbracoUser.id
-                    FROM umbracoUser
-                    INNER JOIN umbracoUser2UserGroup ON umbracoUser2UserGroup.userId = umbracoUser.id
-                    INNER JOIN umbracoUserGroup ON umbracoUserGroup.id = umbracoUser2UserGroup.userGroupId
-                    WHERE umbracoUserGroup.userGroupAlias IN (@userGroups)))";
-            filterSql?.Append(subQuery, new { userGroups = includeUserGroups });
-        }
-
-        if (excludeUserGroups != null && excludeUserGroups.Length > 0)
-        {
-            const string subQuery = @"AND (umbracoUser.id NOT IN (SELECT DISTINCT umbracoUser.id
-                    FROM umbracoUser
-                    INNER JOIN umbracoUser2UserGroup ON umbracoUser2UserGroup.userId = umbracoUser.id
-                    INNER JOIN umbracoUserGroup ON umbracoUserGroup.id = umbracoUser2UserGroup.userGroupId
-                    WHERE umbracoUserGroup.userGroupAlias IN (@userGroups)))";
-            filterSql?.Append(subQuery, new { userGroups = excludeUserGroups });
-        }
-
-        if (userState != null && userState.Length > 0)
-        {
-            //the "ALL" state doesn't require any filtering so we ignore that, if it exists in the list we don't do any filtering
-            if (userState.Contains(UserState.All) == false)
-            {
-                var sb = new StringBuilder("(");
-                var appended = false;
-
-                if (userState.Contains(UserState.Active))
-                {
-                    sb.Append("(userDisabled = 0 AND userNoConsole = 0 AND lastLoginDate IS NOT NULL)");
-                    appended = true;
-                }
-
-                if (userState.Contains(UserState.Inactive))
-                {
-                    if (appended)
-                    {
-                        sb.Append(" OR ");
-                    }
-
-                    sb.Append("(userDisabled = 0 AND userNoConsole = 0 AND lastLoginDate IS NULL)");
-                    appended = true;
-                }
-
-                if (userState.Contains(UserState.Disabled))
-                {
-                    if (appended)
-                    {
-                        sb.Append(" OR ");
-                    }
-
-                    sb.Append("(userDisabled = 1)");
-                    appended = true;
-                }
-
-                if (userState.Contains(UserState.LockedOut))
-                {
-                    if (appended)
-                    {
-                        sb.Append(" OR ");
-                    }
-
-                    sb.Append("(userNoConsole = 1)");
-                    appended = true;
-                }
-
-                if (userState.Contains(UserState.Invited))
-                {
-                    if (appended)
-                    {
-                        sb.Append(" OR ");
-                    }
-
-                    sb.Append("(lastLoginDate IS NULL AND userDisabled = 1 AND invitedDate IS NOT NULL)");
-                    appended = true;
-                }
-
-                sb.Append(")");
-                filterSql?.Append("AND " + sb);
-            }
-        }
+        ArgumentNullException.ThrowIfNull(orderBy);
 
         // create base query
         Sql<ISqlContext> sql = SqlContext.Sql()
@@ -1153,9 +1227,12 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
             sql = new SqlTranslator<IUser>(sql, query).Translate();
         }
 
-        // get sorted and filtered sql
+        // get filtered sql
+        Sql<ISqlContext> filteredSql = ApplyFilter(sql, query, includeUserGroups, excludeUserGroups, userState, filter);
+
+        // get sorted sql
         Sql<ISqlContext> sqlNodeIdsWithSort =
-            ApplySort(ApplyFilter(sql, filterSql, query != null), orderBy, orderDirection);
+            ApplySort(filteredSql, orderBy, orderDirection);
 
         // get a page of results and total count
         Page<UserDto>? pagedResult = Database.Page<UserDto>(pageIndex + 1, pageSize, sqlNodeIdsWithSort);
@@ -1166,24 +1243,64 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
         return pagedResult.Items.Select(x => UserFactory.BuildEntity(_globalSettings, x, _permissionMappers));
     }
 
+    private string GetSuQueryInExclude(string inOrNotIn)
+    {
+        var userIdQuoted = SqlSyntax.GetQuotedColumn("umbracoUser", "id");
+        // this is used to get the correct query for the in or not in clause
+        return @$"AND ({userIdQuoted} {inOrNotIn} (SELECT DISTINCT {userIdQuoted}
+            FROM {QuoteTableName("umbracoUser")}
+            INNER JOIN {QuoteTableName("umbracoUser2UserGroup")}
+            ON {QuoteColumnName("umbracoUser2UserGroup", "userId")} = {userIdQuoted}
+            INNER JOIN {QuoteTableName("umbracoUserGroup")}
+            ON {QuoteColumnName("umbracoUserGroup", "id")} = {QuoteColumnName("umbracoUser2UserGroup", "userGroupId")}
+            WHERE {QuoteColumnName("umbracoUserGroup", "userGroupAlias")} IN (@userGroups)))";
+    }
+
+    /// <summary>
+    /// Retrieves all unique client IDs that are associated with users in the system.
+    /// </summary>
+    /// <returns>An <see cref="IEnumerable{String}"/> containing all client ID strings.</returns>
     public IEnumerable<string> GetAllClientIds()
         => Database.Fetch<string>(SqlContext.Sql()
             .Select<User2ClientIdDto>(d => d.ClientId)
             .From<User2ClientIdDto>());
 
+    /// <summary>
+    /// Gets the client IDs associated with the specified user ID.
+    /// </summary>
+    /// <param name="id">The user ID to retrieve client IDs for.</param>
+    /// <returns>An enumerable collection of client IDs.</returns>
     public IEnumerable<string> GetClientIds(int id)
         => Database.Fetch<string>(SqlContext.Sql()
             .Select<User2ClientIdDto>(d => d.ClientId)
             .From<User2ClientIdDto>()
             .Where<User2ClientIdDto>(d => d.UserId == id));
 
+    /// <summary>
+    /// Adds a client identifier associated with the specified user ID.
+    /// </summary>
+    /// <param name="id">The user identifier.</param>
+    /// <param name="clientId">The client identifier to add.</param>
     public void AddClientId(int id, string clientId)
         => Database.Insert(new User2ClientIdDto { UserId = id, ClientId = clientId });
 
+    /// <summary>
+    /// Removes the association between the specified user and client ID.
+    /// </summary>
+    /// <param name="id">The unique identifier of the user.</param>
+    /// <param name="clientId">The client ID to remove from the user.</param>
+    /// <returns><c>true</c> if the client ID was successfully removed; otherwise, <c>false</c>.</returns>
     public bool RemoveClientId(int id, string clientId)
         => Database.Delete<User2ClientIdDto>(SqlContext.Sql()
             .Where<User2ClientIdDto>(d => d.UserId == id && d.ClientId == clientId)) > 0;
 
+    /// <summary>
+    /// Retrieves a user associated with the specified client ID.
+    /// </summary>
+    /// <param name="clientId">The client ID to look up.</param>
+    /// <returns>
+    /// The <see cref="IUser"/> associated with the given client ID, or <c>null</c> if no such user exists.
+    /// </returns>
     public IUser? GetByClientId(string clientId)
     {
         var userId = Database.ExecuteScalar<int>(
@@ -1199,16 +1316,17 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
         return Get(userId);
     }
 
-    private Sql<ISqlContext> ApplyFilter(Sql<ISqlContext> sql, Sql<ISqlContext>? filterSql, bool hasWhereClause)
+    private Sql<ISqlContext> ApplyFilter(Sql<ISqlContext> sql, IQuery<IUser>? query, string[]? includeUserGroups, string[]? excludeUserGroups, UserState[]? userState, IQuery<IUser>? filter)
     {
+        Sql<ISqlContext>? filterSql = PrepareFilterSql(includeUserGroups, excludeUserGroups, userState, filter);
         if (filterSql == null)
         {
             return sql;
         }
 
-        //ensure we don't append a WHERE if there is already one
+        // ensure we don't append a WHERE if there is already one
         var args = filterSql.Arguments;
-        var sqlFilter = hasWhereClause
+        var sqlFilter = query != null
             ? filterSql.SQL
             : " WHERE " + filterSql.SQL.TrimStart("AND ");
 
@@ -1217,7 +1335,9 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
         return sql;
     }
 
-    private Sql<ISqlContext> ApplySort(Sql<ISqlContext> sql, Expression<Func<IUser, object?>>? orderBy,
+    private Sql<ISqlContext> ApplySort(
+        Sql<ISqlContext> sql,
+        Expression<Func<IUser, object?>>? orderBy,
         Direction orderDirection)
     {
         if (orderBy == null)
@@ -1285,7 +1405,136 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
         // Delete the OpenIddict tokens for the users associated with the removed providers.
         // The following is safe from SQL injection as we are dealing with GUIDs, not strings.
         var userKeysForInClause = string.Join("','", userKeysAssociatedWithRemovedProviders.Select(x => x.ToString()));
-        Database.Execute("DELETE FROM umbracoOpenIddictTokens WHERE Subject IN ('" + userKeysForInClause + "')");
+        Database.Execute($"DELETE FROM {QuoteTableName("umbracoOpenIddictTokens")} WHERE {QuoteColumnName("Subject")} IN ('{userKeysForInClause}')");
+    }
+
+    private Sql<ISqlContext>? PrepareFilterSql(string[]? includeUserGroups, string[]? excludeUserGroups, UserState[]? userState, IQuery<IUser>? filter)
+    {
+        Sql<ISqlContext>? filterSql = null;
+
+        Tuple<string, object[]>[]? customFilterWheres = filter?.GetWhereClauses().ToArray();
+        var hasCustomFilter = customFilterWheres != null && customFilterWheres.Length > 0;
+        if (hasCustomFilter
+            || (includeUserGroups != null && includeUserGroups.Length > 0)
+            || (excludeUserGroups != null && excludeUserGroups.Length > 0)
+            || (userState != null && userState.Length > 0 && userState.Contains(UserState.All) == false))
+        {
+            filterSql = SqlContext.Sql();
+
+            if (hasCustomFilter)
+            {
+                foreach (Tuple<string, object[]> clause in customFilterWheres!)
+                {
+                    filterSql.Append($"AND ({clause.Item1})", clause.Item2);
+                }
+            }
+
+            FilterByIncludedUserGroups(includeUserGroups, filterSql);
+
+            FilterByExcludedUserGroups(excludeUserGroups, filterSql);
+
+            FilterByUserState(userState, filterSql);
+        }
+
+        return filterSql;
+    }
+
+    private void FilterByIncludedUserGroups(string[]? includeUserGroups, Sql<ISqlContext> filterSql)
+    {
+        if (includeUserGroups != null && includeUserGroups.Length > 0)
+        {
+            string subQuery = GetSuQueryInExclude("IN");
+            filterSql.Append(subQuery, new { userGroups = includeUserGroups });
+        }
+    }
+
+    private void FilterByExcludedUserGroups(string[]? excludeUserGroups, Sql<ISqlContext> filterSql)
+    {
+        if (excludeUserGroups != null && excludeUserGroups.Length > 0)
+        {
+            string subQuery = GetSuQueryInExclude("NOT IN");
+            filterSql.Append(subQuery, new { userGroups = excludeUserGroups });
+        }
+    }
+
+    /// <summary>
+    /// Appends user state filtering conditions to the specified SQL filter based on the provided user states.
+    /// </summary>
+    /// <remarks>If multiple user states are specified, the resulting filter will match users in any of the
+    /// given states. The method does not modify the filter if no applicable user states are provided.</remarks>
+    /// <param name="userState">An array of user states to filter by. If null, empty, or contains the 'All' state, no filtering is applied.</param>
+    /// <param name="filterSql">The SQL filter to which the user state conditions are appended. If null, no conditions are added.</param>
+    private void FilterByUserState(UserState[]? userState, Sql<ISqlContext> filterSql)
+    {
+        // the "ALL" state doesn't require any filtering so we ignore that, if it exists in the list we don't do any filtering
+        if (userState != null && userState.Length > 0)
+        {
+            if (userState.Contains(UserState.All) == false)
+            {
+                var sb = new StringBuilder("(");
+                var appended = false;
+                var userDisabled = QuoteColumnName("userDisabled");
+                var userNoConsole = QuoteColumnName("userNoConsole");
+                var lastLoginDate = QuoteColumnName("lastLoginDate");
+                var invitedDate = QuoteColumnName("invitedDate");
+
+                var falseValue = SqlSyntax.ConvertIntegerToBoolean(0);
+                var trueValue = SqlSyntax.ConvertIntegerToBoolean(1);
+                if (userState.Contains(UserState.Active))
+                {
+                    sb.Append($"({userDisabled} = {falseValue} AND {userNoConsole} = {falseValue} AND {lastLoginDate} IS NOT NULL)");
+                    appended = true;
+                }
+
+                if (userState.Contains(UserState.Inactive))
+                {
+                    if (appended)
+                    {
+                        sb.Append(" OR ");
+                    }
+
+                    sb.Append($"({userDisabled} = {falseValue} AND {userNoConsole} = {falseValue} AND {lastLoginDate} IS NULL)");
+                    appended = true;
+                }
+
+                if (userState.Contains(UserState.Disabled))
+                {
+                    if (appended)
+                    {
+                        sb.Append(" OR ");
+                    }
+
+                    sb.Append($"({userDisabled} = {trueValue})");
+                    appended = true;
+                }
+
+                if (userState.Contains(UserState.LockedOut))
+                {
+                    if (appended)
+                    {
+                        sb.Append(" OR ");
+                    }
+
+                    sb.Append($"({userNoConsole} = {trueValue})");
+                    appended = true;
+                }
+
+                if (userState.Contains(UserState.Invited))
+                {
+                    if (appended)
+                    {
+                        sb.Append(" OR ");
+                    }
+
+                    sb.Append($"({lastLoginDate} IS NULL AND {userDisabled} = {trueValue} AND {invitedDate} IS NOT NULL)");
+                    appended = true;
+                }
+
+                sb.Append(")");
+
+                filterSql.Append("AND " + sb);
+            }
+        }
     }
 
     #endregion

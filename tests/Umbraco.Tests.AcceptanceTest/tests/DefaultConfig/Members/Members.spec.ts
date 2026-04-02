@@ -1,4 +1,4 @@
-﻿import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
+﻿import {ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 import {expect} from "@playwright/test";
 
 let memberId = '';
@@ -35,13 +35,12 @@ test('can create a member', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => 
   await umbracoUi.member.enterEmail(email);
   await umbracoUi.member.enterPassword(password);
   await umbracoUi.member.enterConfirmPassword(password);
-  await umbracoUi.member.clickSaveButton();
+  await umbracoUi.member.clickSaveButtonAndWaitForMemberToBeCreated();
 
   // Assert
-  await umbracoUi.member.waitForMemberToBeCreated();
+  expect(await umbracoApi.member.doesNameExist(memberName)).toBeTruthy();
   await umbracoUi.member.clickMembersSidebarButton();
   await umbracoUi.member.isMemberWithNameVisible(memberName, true);
-  expect(await umbracoApi.member.doesNameExist(memberName)).toBeTruthy();
 });
 
 test('can edit comments', async ({umbracoApi, umbracoUi}) => {
@@ -53,10 +52,9 @@ test('can edit comments', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.member.clickMemberLinkByName(memberName);
   await umbracoUi.member.enterComments(comment);
-  await umbracoUi.member.clickSaveButton();
+  await umbracoUi.member.clickSaveButtonAndWaitForMemberToBeUpdated();
 
   // Assert
-  await umbracoUi.member.isSuccessStateVisibleForSaveButton();
   const memberData = await umbracoApi.member.get(memberId);
   expect(memberData.values[0].value).toBe(comment);
 });
@@ -71,10 +69,9 @@ test('can edit username', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.member.clickMemberLinkByName(memberName);
   await umbracoUi.member.enterUsername(updatedUsername);
-  await umbracoUi.member.clickSaveButton();
+  await umbracoUi.member.clickSaveButtonAndWaitForMemberToBeUpdated();
 
   // Assert
-  await umbracoUi.member.isSuccessStateVisibleForSaveButton();
   const memberData = await umbracoApi.member.get(memberId);
   expect(memberData.username).toBe(updatedUsername);
 });
@@ -89,10 +86,9 @@ test('can edit email', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.member.clickMemberLinkByName(memberName);
   await umbracoUi.member.enterEmail(updatedEmail);
-  await umbracoUi.member.clickSaveButton();
+  await umbracoUi.member.clickSaveButtonAndWaitForMemberToBeUpdated();
 
   // Assert
-  await umbracoUi.member.isSuccessStateVisibleForSaveButton();
   const memberData = await umbracoApi.member.get(memberId);
   expect(memberData.email).toBe(updatedEmail);
 });
@@ -109,17 +105,13 @@ test('can edit password', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.member.clickChangePasswordButton();
   await umbracoUi.member.enterNewPassword(updatedPassword);
   await umbracoUi.member.enterConfirmNewPassword(updatedPassword);
-  await umbracoUi.member.clickSaveButton();
-
-  // Assert
-  await umbracoUi.member.isSuccessStateVisibleForSaveButton();
+  await umbracoUi.member.clickSaveButtonAndWaitForMemberToBeUpdated();
 });
 
 test('can add member group', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const memberGroupName = 'TestMemberGroup';
-  await umbracoApi.memberGroup.ensureNameNotExists(memberGroupName);
-  const memberGroupId = await umbracoApi.memberGroup.create(memberGroupName);
+  const memberGroupId = await umbracoApi.memberGroup.createDefaultMemberGroup(memberGroupName);
   memberTypeId = await umbracoApi.memberType.createDefaultMemberType(memberTypeName);
   memberId = await umbracoApi.member.createDefaultMember(memberName, memberTypeId, email, username, password);
   await umbracoUi.member.goToMembers();
@@ -127,10 +119,9 @@ test('can add member group', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) =>
   // Act
   await umbracoUi.member.clickMemberLinkByName(memberName);
   await umbracoUi.member.chooseMemberGroup(memberGroupName);
-  await umbracoUi.member.clickSaveButton();
+  await umbracoUi.member.clickSaveButtonAndWaitForMemberToBeUpdated();
 
   // Assert
-  await umbracoUi.member.isSuccessStateVisibleForSaveButton();
   const memberData = await umbracoApi.member.get(memberId);
   expect(memberData.groups[0]).toBe(memberGroupId);
 
@@ -141,8 +132,7 @@ test('can add member group', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) =>
 test('can remove member group', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const memberGroupName = 'TestMemberGroup';
-  await umbracoApi.memberGroup.ensureNameNotExists(memberGroupName);
-  const memberGroupId = await umbracoApi.memberGroup.create(memberGroupName);
+  const memberGroupId = await umbracoApi.memberGroup.createDefaultMemberGroup(memberGroupName);
   memberTypeId = await umbracoApi.memberType.createDefaultMemberType(memberTypeName);
   memberId = await umbracoApi.member.createMemberWithMemberGroup(memberName, memberTypeId, email, username, password, memberGroupId);
   await umbracoUi.member.goToMembers();
@@ -151,10 +141,9 @@ test('can remove member group', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.member.clickMemberLinkByName(memberName);
   await umbracoUi.member.clickRemoveMemberGroupByName(memberGroupName);
   await umbracoUi.member.clickConfirmRemoveButton();
-  await umbracoUi.member.clickSaveButton();
+  await umbracoUi.member.clickSaveButtonAndWaitForMemberToBeUpdated();
 
   // Assert
-  await umbracoUi.member.isSuccessStateVisibleForSaveButton();
   const memberData = await umbracoApi.member.get(memberId);
   expect(memberData.groups.length).toBe(0);
 
@@ -195,10 +184,9 @@ test('can enable approved', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.member.clickMemberLinkByName(memberName);
   await umbracoUi.member.clickApprovedToggle();
-  await umbracoUi.member.clickSaveButton();
+  await umbracoUi.member.clickSaveButtonAndWaitForMemberToBeUpdated();
 
   // Assert
-  await umbracoUi.member.isSuccessStateVisibleForSaveButton();
   const memberData = await umbracoApi.member.get(memberId);
   expect(memberData.isApproved).toBe(true);
 });
@@ -213,16 +201,15 @@ test('can delete member', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.member.clickMemberLinkByName(memberName);
   await umbracoUi.memberGroup.clickActionButton();
   await umbracoUi.memberGroup.clickDeleteButton();
-  await umbracoUi.memberGroup.clickConfirmToDeleteButton();
+  await umbracoUi.member.clickConfirmToDeleteButtonAndWaitForMemberToBeDeleted();
 
   // Assert
-  await umbracoUi.member.waitForMemberToBeDeleted();
   await umbracoUi.member.clickMembersSidebarButton();
   await umbracoUi.member.isMemberWithNameVisible(memberName, false);
   expect(await umbracoApi.member.doesNameExist(memberName)).toBeFalsy();
 });
 
-test('cannot create member with invalid email', async ({umbracoApi, umbracoUi}) => {
+test('cannot create member with invalid email', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const invalidEmail = 'invalidemail';
   await umbracoUi.member.goToMembers();
@@ -240,12 +227,11 @@ test('cannot create member with invalid email', async ({umbracoApi, umbracoUi}) 
 
   // Assert
   await umbracoUi.member.isFailedStateButtonVisible();
-  await umbracoUi.member.doesErrorNotificationHaveText(NotificationConstantHelper.error.invalidEmail);
+  await umbracoUi.member.isValidationMessageVisible(ConstantHelper.validationMessages.invalidEmail);
   expect(await umbracoApi.member.doesNameExist(memberName)).toBeFalsy();
 });
 
-// TODO: Remove skip when the front-end is ready. Currently it is possible to update member with invalid email.
-test.skip('cannot update email to an invalid email', async ({umbracoApi, umbracoUi}) => {
+test('cannot update email to an invalid email', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const invalidEmail = 'invalidemail';
   memberTypeId = await umbracoApi.memberType.createDefaultMemberType(memberTypeName);
@@ -259,7 +245,7 @@ test.skip('cannot update email to an invalid email', async ({umbracoApi, umbraco
 
   // Assert
   await umbracoUi.member.isFailedStateButtonVisible();
-  await umbracoUi.member.isErrorNotificationVisible();
+  await umbracoUi.member.isValidationMessageVisible(ConstantHelper.validationMessages.invalidEmail);
   const memberData = await umbracoApi.member.get(memberId);
   expect(memberData.email).toBe(email);
 });

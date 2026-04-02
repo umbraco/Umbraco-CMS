@@ -1,4 +1,3 @@
-import type { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context.js';
 import type { UmbInputDocumentTypeElement } from '../../../../components/input-document-type/input-document-type.element.js';
 import { UMB_DOCUMENT_TYPE_WORKSPACE_CONTEXT } from '../../document-type-workspace.context-token.js';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
@@ -13,7 +12,7 @@ import type { UUIToggleElement } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-document-type-workspace-view-structure')
 export class UmbDocumentTypeWorkspaceViewStructureElement extends UmbLitElement implements UmbWorkspaceViewElement {
-	#workspaceContext?: UmbDocumentTypeWorkspaceContext;
+	#workspaceContext?: typeof UMB_DOCUMENT_TYPE_WORKSPACE_CONTEXT.TYPE;
 
 	@state()
 	private _allowedAtRoot?: boolean;
@@ -27,9 +26,8 @@ export class UmbDocumentTypeWorkspaceViewStructureElement extends UmbLitElement 
 	constructor() {
 		super();
 
-		// TODO: Figure out if this is the best way to consume the context or if it can be strongly typed with an UmbContextToken
 		this.consumeContext(UMB_DOCUMENT_TYPE_WORKSPACE_CONTEXT, (documentTypeContext) => {
-			this.#workspaceContext = documentTypeContext as UmbDocumentTypeWorkspaceContext;
+			this.#workspaceContext = documentTypeContext;
 			this._observeDocumentType();
 		});
 	}

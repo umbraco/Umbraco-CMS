@@ -1,14 +1,7 @@
 import { UMB_MEDIA_WORKSPACE_ALIAS } from './constants.js';
-import {
-	UmbSubmitWorkspaceAction,
-	UMB_WORKSPACE_CONDITION_ALIAS,
-	UMB_WORKSPACE_ENTITY_IS_NEW_CONDITION_ALIAS,
-} from '@umbraco-cms/backoffice/workspace';
+import { UmbSubmitWorkspaceAction, UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
+import { UMB_CONTENT_HAS_PROPERTIES_WORKSPACE_CONDITION } from '@umbraco-cms/backoffice/content';
 import { UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS } from '@umbraco-cms/backoffice/recycle-bin';
-import {
-	UMB_CONTENT_HAS_PROPERTIES_WORKSPACE_CONDITION,
-	UMB_WORKSPACE_HAS_CONTENT_COLLECTION_CONDITION_ALIAS,
-} from '@umbraco-cms/backoffice/content';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -20,30 +13,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		meta: {
 			entityType: 'media',
 		},
-	},
-	{
-		type: 'workspaceView',
-		kind: 'contentCollection',
-		alias: 'Umb.WorkspaceView.Media.Collection',
-		name: 'Media Workspace Collection View',
-		meta: {
-			label: 'Collection',
-			pathname: 'collection',
-			icon: 'icon-grid',
-		},
-		conditions: [
-			{
-				alias: UMB_WORKSPACE_CONDITION_ALIAS,
-				match: UMB_MEDIA_WORKSPACE_ALIAS,
-			},
-			{
-				alias: UMB_WORKSPACE_HAS_CONTENT_COLLECTION_CONDITION_ALIAS,
-			},
-			{
-				alias: UMB_WORKSPACE_ENTITY_IS_NEW_CONDITION_ALIAS,
-				match: false,
-			},
-		],
 	},
 	{
 		type: 'workspaceView',

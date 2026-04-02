@@ -73,6 +73,9 @@ public abstract class Builder
     /// <remarks>Includes those that are ignored.</remarks>
     public IList<TypeModel> TypeModels { get; }
 
+    /// <summary>
+    /// Gets or sets the namespace used for generated models in tests.
+    /// </summary>
     public string? ModelsNamespaceForTests { get; set; }
 
     protected ModelsBuilderSettings Config { get; }
@@ -83,6 +86,12 @@ public abstract class Builder
     /// <returns>The models to generate</returns>
     public IEnumerable<TypeModel> GetModelsToGenerate() => TypeModels;
 
+    /// <summary>
+    /// Returns the namespace that will be used for the generated models.
+    /// </summary>
+    /// <returns>
+    /// A <see cref="string"/> representing the namespace for the generated models.
+    /// </returns>
     public string GetModelsNamespace()
     {
         if (ModelsNamespaceForTests != null)
@@ -122,7 +131,8 @@ public abstract class Builder
     {
         TypeModel.MapModelTypes(TypeModels, ModelsNamespace);
 
-        var isInMemoryMode = Config.ModelsMode == ModelsMode.InMemoryAuto;
+        // TODO: Remove this, this is a hack ideally InMemoryAuto should have its own builder in Umbraco.Cms.DevelopmentMode.Backoffice
+        var isInMemoryMode = Config.ModelsMode == "InMemoryAuto";
 
         // for the first two of these two tests,
         //  always throw, even in InMemory mode: cannot happen unless ppl start fidling with attributes to rename

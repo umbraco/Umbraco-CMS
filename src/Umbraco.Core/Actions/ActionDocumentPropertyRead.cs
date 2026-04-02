@@ -1,5 +1,11 @@
-﻿namespace Umbraco.Cms.Core.Actions;
+namespace Umbraco.Cms.Core.Actions;
 
+/// <summary>
+///     Represents the action that allows reading document property values.
+/// </summary>
+/// <remarks>
+///     This action is used for permission control when accessing property values on documents.
+/// </remarks>
 public class ActionDocumentPropertyRead : IAction
 {
     /// <inheritdoc cref="IAction.ActionLetter" />
@@ -19,11 +25,5 @@ public class ActionDocumentPropertyRead : IAction
 
     /// <inheritdoc />
     public bool CanBePermissionAssigned => true;
-
-    /// <inheritdoc />
-    public string Icon => string.Empty;
-
-    /// <inheritdoc />
-    public string Category => Constants.Conventions.PermissionCategories.OtherCategory;
 }
 

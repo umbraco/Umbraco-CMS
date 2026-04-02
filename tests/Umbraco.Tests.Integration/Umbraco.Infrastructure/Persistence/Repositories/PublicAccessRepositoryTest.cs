@@ -4,7 +4,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
+using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Infrastructure.Persistence;
@@ -33,7 +35,7 @@ internal sealed class PublicAccessRepositoryTest : UmbracoIntegrationTest
         var provider = ScopeProvider;
         using (var scope = provider.CreateScope())
         {
-            var repo = new PublicAccessRepository((IScopeAccessor)provider, AppCaches, LoggerFactory.CreateLogger<PublicAccessRepository>());
+            var repo = new PublicAccessRepository((IScopeAccessor)provider, AppCaches, LoggerFactory.CreateLogger<PublicAccessRepository>(), Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
 
             PublicAccessRule[] rules = { new PublicAccessRule { RuleValue = "test", RuleType = "RoleName" } };
             var entry = new PublicAccessEntry(content[0], content[1], content[2], rules);
@@ -55,7 +57,7 @@ internal sealed class PublicAccessRepositoryTest : UmbracoIntegrationTest
         using (var scope = provider.CreateScope())
         {
             ScopeAccessor.AmbientScope.Database.AsUmbracoDatabase().EnableSqlTrace = true;
-            var repo = new PublicAccessRepository((IScopeAccessor)provider, AppCaches, LoggerFactory.CreateLogger<PublicAccessRepository>());
+            var repo = new PublicAccessRepository((IScopeAccessor)provider, AppCaches, LoggerFactory.CreateLogger<PublicAccessRepository>(), Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
 
             PublicAccessRule[] rules = { new PublicAccessRule { RuleValue = "test", RuleType = "RoleName" } };
             var entry = new PublicAccessEntry(content[0], content[1], content[2], rules);
@@ -89,7 +91,7 @@ internal sealed class PublicAccessRepositoryTest : UmbracoIntegrationTest
         using (var scope = provider.CreateScope())
         {
             ScopeAccessor.AmbientScope.Database.AsUmbracoDatabase().EnableSqlTrace = true;
-            var repo = new PublicAccessRepository((IScopeAccessor)provider, AppCaches, LoggerFactory.CreateLogger<PublicAccessRepository>());
+            var repo = new PublicAccessRepository((IScopeAccessor)provider, AppCaches, LoggerFactory.CreateLogger<PublicAccessRepository>(), Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
 
             PublicAccessRule[] rules =
             {
@@ -123,7 +125,7 @@ internal sealed class PublicAccessRepositoryTest : UmbracoIntegrationTest
         var provider = ScopeProvider;
         using (var scope = provider.CreateScope())
         {
-            var repo = new PublicAccessRepository((IScopeAccessor)provider, AppCaches, LoggerFactory.CreateLogger<PublicAccessRepository>());
+            var repo = new PublicAccessRepository((IScopeAccessor)provider, AppCaches, LoggerFactory.CreateLogger<PublicAccessRepository>(), Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
 
             PublicAccessRule[] rules = { new PublicAccessRule { RuleValue = "test", RuleType = "RoleName" } };
             var entry = new PublicAccessEntry(content[0], content[1], content[2], rules);
@@ -152,7 +154,7 @@ internal sealed class PublicAccessRepositoryTest : UmbracoIntegrationTest
         var provider = ScopeProvider;
         using (var scope = provider.CreateScope())
         {
-            var repo = new PublicAccessRepository((IScopeAccessor)provider, AppCaches, LoggerFactory.CreateLogger<PublicAccessRepository>());
+            var repo = new PublicAccessRepository((IScopeAccessor)provider, AppCaches, LoggerFactory.CreateLogger<PublicAccessRepository>(),Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
 
             PublicAccessRule[] rules = { new PublicAccessRule { RuleValue = "test", RuleType = "RoleName" } };
             var entry = new PublicAccessEntry(content[0], content[1], content[2], rules);
@@ -173,7 +175,7 @@ internal sealed class PublicAccessRepositoryTest : UmbracoIntegrationTest
         var provider = ScopeProvider;
         using (var scope = provider.CreateScope())
         {
-            var repo = new PublicAccessRepository((IScopeAccessor)provider, AppCaches, LoggerFactory.CreateLogger<PublicAccessRepository>());
+            var repo = new PublicAccessRepository((IScopeAccessor)provider, AppCaches, LoggerFactory.CreateLogger<PublicAccessRepository>(), Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
 
             var allEntries = new List<PublicAccessEntry>();
             for (var i = 0; i < 10; i++)
@@ -233,7 +235,7 @@ internal sealed class PublicAccessRepositoryTest : UmbracoIntegrationTest
         var provider = ScopeProvider;
         using (var scope = provider.CreateScope())
         {
-            var repo = new PublicAccessRepository((IScopeAccessor)provider, AppCaches, LoggerFactory.CreateLogger<PublicAccessRepository>());
+            var repo = new PublicAccessRepository((IScopeAccessor)provider, AppCaches, LoggerFactory.CreateLogger<PublicAccessRepository>(),  Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
 
             PublicAccessRule[] rules1 = { new PublicAccessRule { RuleValue = "test", RuleType = "RoleName" } };
             var entry1 = new PublicAccessEntry(content[0], content[1], content[2], rules1);

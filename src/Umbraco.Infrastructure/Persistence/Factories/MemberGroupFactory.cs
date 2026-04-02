@@ -1,4 +1,5 @@
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
@@ -12,6 +13,11 @@ internal static class MemberGroupFactory
 
     #region Implementation of IEntityFactory<ITemplate,TemplateDto>
 
+    /// <summary>
+    /// Builds an <see cref="Umbraco.Cms.Core.Models.IMemberGroup"/> entity from the given <see cref="NodeDto"/>.
+    /// </summary>
+    /// <param name="dto">The data transfer object containing the member group data.</param>
+    /// <returns>An <see cref="Umbraco.Cms.Core.Models.IMemberGroup"/> instance populated with data from the DTO.</returns>
     public static IMemberGroup BuildEntity(NodeDto dto)
     {
         var group = new MemberGroup();
@@ -20,7 +26,7 @@ internal static class MemberGroupFactory
         {
             group.DisableChangeTracking();
 
-            group.CreateDate = dto.CreateDate;
+            group.CreateDate = dto.CreateDate.EnsureUtc();
             group.Id = dto.NodeId;
             group.Key = dto.UniqueId;
             group.Name = dto.Text;
@@ -35,6 +41,13 @@ internal static class MemberGroupFactory
         }
     }
 
+    /// <summary>
+    /// Creates and returns a <see cref="Umbraco.Cms.Infrastructure.Persistence.Dtos.NodeDto"/> that represents the specified <see cref="Umbraco.Cms.Core.Models.IMemberGroup"/> entity.
+    /// </summary>
+    /// <param name="entity">The member group entity from which to construct the <see cref="NodeDto"/>.</param>
+    /// <returns>
+    /// A <see cref="Umbraco.Cms.Infrastructure.Persistence.Dtos.NodeDto"/> populated with values from the given member group, including its ID, name, creation date, creator ID, and unique key.
+    /// </returns>
     public static NodeDto BuildDto(IMemberGroup entity)
     {
         var dto = new NodeDto

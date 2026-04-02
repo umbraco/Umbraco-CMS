@@ -1,11 +1,13 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import type { IRouterSlot } from '../router-slot/index.js';
 import type { UmbModalRouteRegistration } from '../modal-registration/modal-route-registration.interface.js';
 import { umbGenerateRoutePathBuilder } from '../generate-route-path-builder.function.js';
+// Import UMB_MODAL_MANAGER_CONTEXT directly from token file to avoid circular dependency with router package
+import { UMB_MODAL_MANAGER_CONTEXT } from '../../modal/context/modal-manager.context-token.js';
 import type { UmbRoute } from './route.interface.js';
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { UMB_ROUTE_CONTEXT } from './route.context-token.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
-import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UmbStringState, mergeObservables } from '@umbraco-cms/backoffice/observable-api';
 
 const EmptyDiv = document.createElement('div');
@@ -41,7 +43,7 @@ export class UmbRouteContext extends UmbContextBase {
 		return this.#basePath.getValue();
 	}
 	getActivePath() {
-		return this.getBasePath() + '/' + this.#activeLocalPath;
+		return this.getBasePath() + '/' + this.#activeLocalPath.getValue();
 	}
 
 	public registerModal(registration: UmbModalRouteRegistration) {
@@ -178,4 +180,5 @@ export class UmbRouteContext extends UmbContextBase {
 	}
 }
 
-export const UMB_ROUTE_CONTEXT = new UmbContextToken<UmbRouteContext>('UmbRouterContext');
+// Re-export for backwards compatibility
+export { UMB_ROUTE_CONTEXT } from './route.context-token.js';

@@ -30,9 +30,27 @@ public class UmbracoFieldDefinitionCollection : FieldDefinitionCollection
         new(UmbracoExamineFieldNames.VariesByCultureFieldName, FieldDefinitionTypes.Raw),
     };
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UmbracoFieldDefinitionCollection"/> class containing
+    /// the default Umbraco field definitions.
+    /// </summary>
     public UmbracoFieldDefinitionCollection()
         : base(UmbracoIndexFieldDefinitions)
     {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UmbracoFieldDefinitionCollection"/> class containing the containing
+    /// the default Umbraco field definitions, augmented or overridden by the provided definitions.
+    /// </summary>
+    /// <param name="definitions">Existing collection of field definitions.</param>
+    public UmbracoFieldDefinitionCollection(FieldDefinitionCollection definitions)
+        : base(UmbracoIndexFieldDefinitions)
+    {
+        foreach (FieldDefinition definition in definitions)
+        {
+            AddOrUpdate(definition);
+        }
     }
 
     /// <summary>

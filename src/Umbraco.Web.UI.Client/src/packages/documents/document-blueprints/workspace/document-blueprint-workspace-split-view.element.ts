@@ -1,7 +1,7 @@
 import { UMB_DOCUMENT_BLUEPRINT_WORKSPACE_ALIAS, UMB_DOCUMENT_BLUEPRINT_WORKSPACE_CONTEXT } from './constants.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, nothing, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
-import type { ActiveVariant } from '@umbraco-cms/backoffice/workspace';
+import type { UmbActiveVariant } from '@umbraco-cms/backoffice/workspace';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-document-blueprint-workspace-split-view')
@@ -10,7 +10,7 @@ export class UmbDocumentBlueprintWorkspaceSplitViewElement extends UmbLitElement
 	private _workspaceContext?: typeof UMB_DOCUMENT_BLUEPRINT_WORKSPACE_CONTEXT.TYPE;
 
 	@state()
-	_variants?: Array<ActiveVariant>;
+	private _variants?: Array<UmbActiveVariant>;
 
 	constructor() {
 		super();

@@ -3,12 +3,18 @@ using Umbraco.Cms.Api.Management.ViewModels.MediaType;
 
 namespace Umbraco.Cms.Api.Management.ViewModels.Media;
 
+/// <summary>
+/// Represents a response model for a media entity in the API management layer.
+/// </summary>
 public class MediaResponseModel : ContentResponseModelBase<MediaValueResponseModel, MediaVariantResponseModel>
 {
-    [Obsolete("This property is no longer populated. Please use /media/{id}/urls instead to retrieve the URLs for a document. Scheduled for removal in Umbraco 17.")]
-    public IEnumerable<MediaUrlInfo> Urls { get; set; } = Enumerable.Empty<MediaUrlInfo>();
-
+    /// <summary>
+    /// Gets or sets a value indicating whether the media item is trashed.
+    /// </summary>
     public bool IsTrashed { get; set; }
 
+    /// <summary>
+    /// Gets or sets the media type reference associated with this media item.
+    /// </summary>
     public MediaTypeReferenceResponseModel MediaType { get; set; } = new();
 }

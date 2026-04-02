@@ -1,5 +1,6 @@
 import { UmbPickerSearchResultItemElementBase } from '../picker-search-result-item-element-base.js';
-import { customElement, html, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { getItemFallbackIcon, getItemFallbackName } from '@umbraco-cms/backoffice/entity-item';
+import { css, customElement, html, nothing } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbSearchResultItemModel } from '@umbraco-cms/backoffice/search';
 
 @customElement('umb-default-picker-search-result-item')
@@ -9,9 +10,9 @@ export class UmbDefaultPickerSearchResultItemElement extends UmbPickerSearchResu
 		if (!item) return nothing;
 		return html`
 			<umb-ref-item
-				name=${item.name}
+				name=${item.name ?? getItemFallbackName(item)}
 				id=${item.unique}
-				icon=${item.icon ?? 'icon-document'}
+				icon=${item.icon ?? getItemFallbackIcon()}
 				select-only
 				?selectable=${!this.disabled}
 				?selected=${this._isSelected}
@@ -21,6 +22,15 @@ export class UmbDefaultPickerSearchResultItemElement extends UmbPickerSearchResu
 			</umb-ref-item>
 		`;
 	}
+
+	static override styles = [
+		css`
+			umb-ref-item {
+				padding-top: 0;
+				padding-bottom: 0;
+			}
+		`,
+	];
 }
 
 export { UmbDefaultPickerSearchResultItemElement as element };

@@ -18,8 +18,8 @@ public class MemberGroupBuilderTests
         const string testName = "Test Group";
         const int testCreatorId = 4;
         var testKey = Guid.NewGuid();
-        var testCreateDate = DateTime.Now.AddHours(-1);
-        var testUpdateDate = DateTime.Now;
+        var testCreateDate = DateTime.UtcNow.AddHours(-1);
+        var testUpdateDate = DateTime.UtcNow;
 
         var builder = new MemberGroupBuilder();
 

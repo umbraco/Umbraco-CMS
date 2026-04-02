@@ -26,16 +26,16 @@ export class UmbConfirmActionModalEntityReferencesElement extends UmbLitElement 
 	config?: UmbConfirmActionModalEntityReferencesConfig;
 
 	@state()
-	_referencedByItems: Array<UmbReferenceItemModel> = [];
+	private _referencedByItems: Array<UmbReferenceItemModel> = [];
 
 	@state()
-	_totalReferencedByItems: number = 0;
+	private _totalReferencedByItems: number = 0;
 
 	@state()
-	_totalDescendantsWithReferences: number = 0;
+	private _totalDescendantsWithReferences: number = 0;
 
 	@state()
-	_descendantsWithReferences: Array<any> = [];
+	private _descendantsWithReferences: Array<any> = [];
 
 	#itemRepository?: UmbItemRepository<any>;
 	#referenceRepository?: UmbEntityReferenceRepository;
@@ -80,8 +80,8 @@ export class UmbConfirmActionModalEntityReferencesElement extends UmbLitElement 
 			this.config.itemRepositoryAlias,
 		);
 
-		this.#loadReferencedBy();
-		this.#loadDescendantsWithReferences();
+		await Promise.all([this.#loadReferencedBy(), this.#loadDescendantsWithReferences()]);
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	async #loadReferencedBy() {
@@ -98,7 +98,6 @@ export class UmbConfirmActionModalEntityReferencesElement extends UmbLitElement 
 		if (data) {
 			this._referencedByItems = [...data.items];
 			this._totalReferencedByItems = data.total;
-			this.dispatchEvent(new UmbChangeEvent());
 		}
 	}
 
@@ -129,7 +128,6 @@ export class UmbConfirmActionModalEntityReferencesElement extends UmbLitElement 
 			const uniques = data.items.map((item) => item.unique).filter((unique) => unique) as Array<string>;
 			const { data: items } = await this.#itemRepository.requestItems(uniques);
 			this._descendantsWithReferences = items ?? [];
-			this.dispatchEvent(new UmbChangeEvent());
 		}
 	}
 

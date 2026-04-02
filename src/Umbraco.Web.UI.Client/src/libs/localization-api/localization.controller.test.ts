@@ -238,6 +238,37 @@ describe('UmbLocalizationController', () => {
 		});
 	});
 
+	describe('dateTime', () => {
+		it('should return a localized date with time', () => {
+			const date = new Date(2020, 0, 1, 13, 30, 0);
+			const expected = new Intl.DateTimeFormat('en-us', { dateStyle: 'short', timeStyle: 'medium' }).format(date);
+			expect(controller.dateTime(date)).to.equal(expected);
+		});
+
+		it('should accept a string input', () => {
+			const dateStr = '2020-06-15T10:30:00';
+			const expected = new Intl.DateTimeFormat('en-us', { dateStyle: 'short', timeStyle: 'medium' }).format(
+				new Date(dateStr),
+			);
+			expect(controller.dateTime(dateStr)).to.equal(expected);
+		});
+
+		it('should update the dateTime when the language changes', async () => {
+			const date = new Date(2020, 11, 31, 13, 30, 0);
+			const enResult = controller.dateTime(date);
+
+			// Switch browser to Danish
+			document.documentElement.lang = danishRegional.$code;
+			await aTimeout(0);
+
+			const daResult = controller.dateTime(date);
+			const expectedDa = new Intl.DateTimeFormat('da-dk', { dateStyle: 'short', timeStyle: 'medium' }).format(date);
+
+			expect(daResult).to.equal(expectedDa);
+			expect(daResult).to.not.equal(enResult);
+		});
+	});
+
 	describe('number', () => {
 		it('should return a number', () => {
 			expect(controller.number(123456.789)).to.equal('123,456.789');
@@ -315,6 +346,74 @@ describe('UmbLocalizationController', () => {
 
 		it('should return a list with disjunction', () => {
 			expect(controller.list(['one', 'two', 'three'], { type: 'disjunction' })).to.equal('one, two, or three');
+		});
+	});
+
+	describe('termOrDefault', () => {
+		it('should return the translation when the key exists', () => {
+			expect(controller.termOrDefault('close', 'X')).to.equal('Close');
+			expect(controller.termOrDefault('logout', 'Sign out')).to.equal('Log out');
+		});
+
+		it('should return the default value when the key does not exist', () => {
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			expect((controller.termOrDefault as any)('nonExistentKey', 'Default Value')).to.equal('Default Value');
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			expect((controller.termOrDefault as any)('anotherMissingKey', 'Fallback')).to.equal('Fallback');
+		});
+
+		it('should work with function-based translations and arguments', () => {
+			expect(controller.termOrDefault('numUsersSelected', 'No selection', 0)).to.equal('No users selected');
+			expect(controller.termOrDefault('numUsersSelected', 'No selection', 1)).to.equal('One user selected');
+			expect(controller.termOrDefault('numUsersSelected', 'No selection', 5)).to.equal('5 users selected');
+		});
+
+		it('should work with string-based translations and placeholder arguments', () => {
+			expect(controller.termOrDefault('withInlineToken', 'N/A', 'Hello', 'World')).to.equal('Hello World');
+			expect(controller.termOrDefault('withInlineTokenLegacy', 'N/A', 'Foo', 'Bar')).to.equal('Foo Bar');
+		});
+
+		it('should use default value for missing key even with arguments', () => {
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			expect((controller.termOrDefault as any)('missingKey', 'Default', 'arg1', 'arg2')).to.equal('Default');
+		});
+
+		it('should handle the three-tier fallback before using defaultValue', async () => {
+			// Switch to Danish regional
+			document.documentElement.lang = danishRegional.$code;
+			await aTimeout(0);
+
+			// Primary (da-dk) has 'close'
+			expect(controller.termOrDefault('close', 'X')).to.equal('Luk');
+
+			// Secondary (da) has 'notOnRegional', not on da-dk
+			expect(controller.termOrDefault('notOnRegional', 'Not found')).to.equal('Not on regional');
+
+			// Fallback (en) has 'logout', not on da-dk or da
+			expect(controller.termOrDefault('logout', 'Sign out')).to.equal('Log out');
+
+			// Non-existent key should use default
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			expect((controller.termOrDefault as any)('completelyMissing', 'Fallback Value')).to.equal('Fallback Value');
+		});
+
+		it('should update when language changes', async () => {
+			expect(controller.termOrDefault('close', 'X')).to.equal('Close');
+
+			// Switch to Danish
+			document.documentElement.lang = danishRegional.$code;
+			await aTimeout(0);
+
+			expect(controller.termOrDefault('close', 'X')).to.equal('Luk');
+		});
+
+		it('should override a term if new localization is registered', () => {
+			expect(controller.termOrDefault('close', 'X')).to.equal('Close');
+
+			// Register override
+			umbLocalizationManager.registerLocalization(englishOverride);
+
+			expect(controller.termOrDefault('close', 'X')).to.equal('Close 2');
 		});
 	});
 

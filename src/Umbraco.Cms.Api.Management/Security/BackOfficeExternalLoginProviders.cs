@@ -18,19 +18,14 @@ public class BackOfficeExternalLoginProviders : IBackOfficeExternalLoginProvider
 
     private const string ExternalLoginProvidersKey = "Umbraco.Cms.Web.BackOffice.Security.BackOfficeExternalLoginProviders";
 
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 17.")]
-    public BackOfficeExternalLoginProviders(
-        IEnumerable<BackOfficeExternalLoginProvider> externalLogins,
-        IAuthenticationSchemeProvider authenticationSchemeProvider)
-        : this(
-              externalLogins,
-              authenticationSchemeProvider,
-              StaticServiceProvider.Instance.GetRequiredService<IKeyValueService>(),
-              StaticServiceProvider.Instance.GetRequiredService<IExternalLoginWithKeyService>(),
-              StaticServiceProvider.Instance.GetRequiredService<ILogger<BackOfficeExternalLoginProviders>>())
-    {
-    }
-
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Security.BackOfficeExternalLoginProviders"/> class.
+    /// </summary>
+    /// <param name="externalLogins">A collection of available external login providers for the backoffice.</param>
+    /// <param name="authenticationSchemeProvider">Provides access to authentication schemes used for external logins.</param>
+    /// <param name="keyValueService">Service for storing and retrieving key-value pairs related to authentication.</param>
+    /// <param name="externalLoginWithKeyService">Service for handling external logins that require a key.</param>
+    /// <param name="logger">The logger used for logging information and errors related to external login providers.</param>
     public BackOfficeExternalLoginProviders(
         IEnumerable<BackOfficeExternalLoginProvider> externalLogins,
         IAuthenticationSchemeProvider authenticationSchemeProvider,

@@ -15,6 +15,10 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
+/// <summary>
+/// Converts the raw value stored by the Block List property editor into a strongly-typed object
+/// that can be used within Umbraco, typically for rendering or further processing.
+/// </summary>
 [DefaultPropertyValueConverter(typeof(JsonValueConverter))]
 public class BlockListPropertyValueConverter : PropertyValueConverterBase, IDeliveryApiPropertyValueConverter
 {
@@ -27,6 +31,17 @@ public class BlockListPropertyValueConverter : PropertyValueConverterBase, IDeli
     private readonly IVariationContextAccessor _variationContextAccessor;
     private readonly BlockEditorVarianceHandler _blockEditorVarianceHandler;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="BlockListPropertyValueConverter"/> class.
+    /// </summary>
+    /// <param name="proflog">The profiling logger used for performance logging.</param>
+    /// <param name="blockConverter">The converter for block editor values.</param>
+    /// <param name="contentTypeService">Service for accessing content types.</param>
+    /// <param name="apiElementBuilder">Builds API elements for block list properties.</param>
+    /// <param name="jsonSerializer">The serializer used for JSON operations.</param>
+    /// <param name="constructorCache">Cache for block list property value constructors.</param>
+    /// <param name="variationContextAccessor">Accessor for variation context information.</param>
+    /// <param name="blockEditorVarianceHandler">Handles variance for block editors.</param>
     public BlockListPropertyValueConverter(
         IProfilingLogger proflog,
         BlockEditorConverter blockConverter,

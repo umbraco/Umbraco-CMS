@@ -1,0 +1,55 @@
+parameters:
+  - name: projectName
+    type: string
+  - name: umbracoVersion
+    type: string
+  - name: projects
+    type: object
+
+jobs:
+- job: Create_DT_Project
+  displayName: Create Dependency Track Project
+  steps:
+    - checkout: none
+
+    - bash: |
+        project_id=$(curl --no-progress-meter -H "X-Api-Key: $(DT_API_KEY)" "$(DT_API_URI)/api/v1/project/lookup?name=${{ parameters.projectName }}&version=${{ parameters.umbracoVersion }}" | jq -r '.uuid')
+        if [ "$project_id" != "null" ] && [ -n "$project_id" ]; then
+          echo "Project '${{ parameters.projectName }}' with version '${{ parameters.umbracoVersion }}' already exists (ID: $project_id)."
+        else
+          project_id=$(curl --no-progress-meter \
+            -X PUT "$(DT_API_URI)/api/v1/project" \
+            -H "X-Api-Key: $(DT_API_KEY)" \
+            -H "Content-Type: application/json" \
+            -d '{"name": "${{ parameters.projectName }}", "version": "${{ parameters.umbracoVersion }}", "collectionLogic": "AGGREGATE_DIRECT_CHILDREN"}' \
+            | jq -r '.uuid')
+          if [ -z "$project_id" ] || [ "$project_id" == "null" ]; then
+            echo "Failed to create project '${{ parameters.projectName }}' version '${{ parameters.umbracoVersion }}'."
+            exit 1
+          fi
+          echo "Created project '${{ parameters.projectName }}' with version '${{ parameters.umbracoVersion }}' (ID: $project_id)."
+        fi
+      displayName: Ensure main project exists in Dependency Track
+
+- ${{ each project in parameters.projects }}:
+  - job:
+    displayName: Upload ${{ project.name }} BOM
+    dependsOn: Create_DT_Project
+    steps:
+      - checkout: none
+
+      - download: current
+        artifact: ${{ project.artifact }}
+        displayName: Download ${{ project.artifact }} artifact
+
+      - task: upload-bom-dtrack@1
+        inputs:
+          dtrackURI: $(DT_API_URI)
+          dtrackAPIKey: $(DT_API_KEY)
+          dtrackProjAutoCreate: true
+          dtrackProjName: '${{ parameters.projectName }}-${{ project.name }}'
+          dtrackProjVersion: ${{ parameters.umbracoVersion }}
+          dtrackParentProjName: ${{ parameters.projectName }}
+          dtrackParentProjVersion: ${{ parameters.umbracoVersion }}
+          bomFilePath: '$(Pipeline.Workspace)/${{ project.artifact }}/${{ project.bomFilePath }}'
+        displayName: Upload ${{ project.name }} BOM to Dependency Track

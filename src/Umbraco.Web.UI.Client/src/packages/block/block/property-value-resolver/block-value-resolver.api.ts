@@ -15,13 +15,13 @@ export abstract class UmbBlockValueResolver<ValueType>
 		valuesCallback: (values: Array<UmbBlockDataValueModel>) => Promise<Array<UmbBlockDataValueModel> | undefined>,
 	) {
 		const contentData = await Promise.all(
-			value.contentData?.map(async (entry) => ({
+			(value.contentData ?? []).map(async (entry) => ({
 				...entry,
 				values: (await valuesCallback(entry.values)) ?? [],
 			})),
 		);
 		const settingsData = await Promise.all(
-			value.settingsData?.map(async (entry) => ({
+			(value.settingsData ?? []).map(async (entry) => ({
 				...entry,
 				values: (await valuesCallback(entry.values)) ?? [],
 			})),

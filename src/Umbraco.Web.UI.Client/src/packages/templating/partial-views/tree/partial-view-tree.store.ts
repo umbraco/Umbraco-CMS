@@ -6,6 +6,7 @@ import { UmbUniqueTreeStore } from '@umbraco-cms/backoffice/tree';
  * @class UmbPartialViewTreeStore
  * @augments {UmbStoreBase}
  * @description - Tree Data Store for PartialView
+ * @deprecated - Use `UmbPartialViewTreeRepository` instead. This will be removed in Umbraco 18.
  */
 export class UmbPartialViewTreeStore extends UmbUniqueTreeStore {
 	/**

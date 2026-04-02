@@ -5,6 +5,7 @@ export interface UmbPropertyEditorUiElement extends HTMLElement {
 	manifest?: ManifestPropertyEditorUi;
 	name?: string;
 	value?: unknown;
+	dataSourceAlias?: string;
 	config?: UmbPropertyEditorConfigCollection;
 	readonly?: boolean;
 	mandatory?: boolean;

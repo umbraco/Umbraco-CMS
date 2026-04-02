@@ -101,8 +101,12 @@ public class PackagesRepository : ICreatedPackagesRepository
         _fileSystems = fileSystems;
     }
 
+    /// <summary>
+    ///     Gets the full path to the created packages file.
+    /// </summary>
     private string CreatedPackagesFile => _packagesFolderPath.EnsureEndsWith('/') + _packageRepositoryFileName;
 
+    /// <inheritdoc/>
     public IEnumerable<PackageDefinition?> GetAll()
     {
         XDocument packagesXml = EnsureStorage(out _);
@@ -117,6 +121,7 @@ public class PackagesRepository : ICreatedPackagesRepository
         }
     }
 
+    /// <inheritdoc/>
     public PackageDefinition? GetById(int id)
     {
         XDocument packagesXml = EnsureStorage(out var packageFile);
@@ -125,9 +130,11 @@ public class PackagesRepository : ICreatedPackagesRepository
         return packageXml == null ? null : _parser.ToPackageDefinition(packageXml);
     }
 
-    // Default implementation as the class is obsolete
+    /// <inheritdoc/>
+    /// <remarks>Default implementation returns <c>null</c> as the class is obsolete.</remarks>
     public PackageDefinition? GetByKey(Guid key) => null;
 
+    /// <inheritdoc/>
     public void Delete(int id)
     {
         XDocument packagesXml = EnsureStorage(out var packagesFile);
@@ -143,6 +150,7 @@ public class PackagesRepository : ICreatedPackagesRepository
         packagesXml?.Save(packagesFile);
     }
 
+    /// <inheritdoc/>
     public bool SavePackage(PackageDefinition definition)
     {
         if (definition == null)
@@ -190,6 +198,7 @@ public class PackagesRepository : ICreatedPackagesRepository
         return true;
     }
 
+    /// <inheritdoc/>
     public string ExportPackage(PackageDefinition definition)
     {
         if (definition.Id == default)
@@ -301,6 +310,9 @@ public class PackagesRepository : ICreatedPackagesRepository
         }
     }
 
+    /// <summary>
+    ///     Deletes the local repository files including the packages configuration file and folder.
+    /// </summary>
     public void DeleteLocalRepositoryFiles()
     {
         var packagesFile = _hostingEnvironment.MapPathContentRoot(CreatedPackagesFile);
@@ -327,6 +339,11 @@ public class PackagesRepository : ICreatedPackagesRepository
         return info;
     }
 
+    /// <summary>
+    ///     Validates the package definition using data annotations.
+    /// </summary>
+    /// <param name="definition">The package definition to validate.</param>
+    /// <exception cref="InvalidOperationException">Thrown when validation fails.</exception>
     private void ValidatePackage(PackageDefinition definition)
     {
         // ensure it's valid
@@ -340,6 +357,11 @@ public class PackagesRepository : ICreatedPackagesRepository
         }
     }
 
+    /// <summary>
+    ///     Packages data types into the XML container.
+    /// </summary>
+    /// <param name="definition">The package definition containing data type identifiers.</param>
+    /// <param name="root">The XML container to add data types to.</param>
     private void PackageDataTypes(PackageDefinition definition, XContainer root)
     {
         var dataTypes = new XElement("DataTypes");
@@ -362,6 +384,11 @@ public class PackagesRepository : ICreatedPackagesRepository
         root.Add(dataTypes);
     }
 
+    /// <summary>
+    ///     Packages languages into the XML container.
+    /// </summary>
+    /// <param name="definition">The package definition containing language identifiers.</param>
+    /// <param name="root">The XML container to add languages to.</param>
     private void PackageLanguages(PackageDefinition definition, XContainer root)
     {
         var languages = new XElement("Languages");
@@ -384,6 +411,11 @@ public class PackagesRepository : ICreatedPackagesRepository
         root.Add(languages);
     }
 
+    /// <summary>
+    ///     Packages dictionary items into the XML container, preserving hierarchy.
+    /// </summary>
+    /// <param name="definition">The package definition containing dictionary item identifiers.</param>
+    /// <param name="root">The XML container to add dictionary items to.</param>
     private void PackageDictionaryItems(PackageDefinition definition, XContainer root)
     {
         var rootDictionaryItems = new XElement("DictionaryItems");
@@ -444,6 +476,9 @@ public class PackagesRepository : ICreatedPackagesRepository
 
         root.Add(rootDictionaryItems);
 
+        /// <summary>
+        ///     Appends a dictionary element to the root and tracks it as processed.
+        /// </summary>
         static void AppendDictionaryElement(
             XElement rootDictionaryItems,
             Dictionary<Guid, (IDictionaryItem dictionaryItem, XElement serializedDictionaryValue)> items,
@@ -462,6 +497,11 @@ public class PackagesRepository : ICreatedPackagesRepository
         }
     }
 
+    /// <summary>
+    ///     Packages stylesheets into the XML container.
+    /// </summary>
+    /// <param name="definition">The package definition containing stylesheet paths.</param>
+    /// <param name="root">The XML container to add stylesheets to.</param>
     private void PackageStylesheets(PackageDefinition definition, XContainer root)
     {
         var stylesheetsXml = new XElement("Stylesheets");
@@ -482,6 +522,15 @@ public class PackagesRepository : ICreatedPackagesRepository
         root.Add(stylesheetsXml);
     }
 
+    /// <summary>
+    ///     Packages static files from a file system into the XML container.
+    /// </summary>
+    /// <param name="filePaths">The collection of file paths to package.</param>
+    /// <param name="root">The XML container to add files to.</param>
+    /// <param name="containerName">The name of the XML container element.</param>
+    /// <param name="elementName">The name of each file element.</param>
+    /// <param name="fileSystem">The file system to read files from.</param>
+    /// <exception cref="InvalidOperationException">Thrown when a file is not found.</exception>
     private void PackageStaticFiles(
         IEnumerable<string> filePaths,
         XContainer root,
@@ -519,6 +568,11 @@ public class PackagesRepository : ICreatedPackagesRepository
         root.Add(scriptsXml);
     }
 
+    /// <summary>
+    ///     Packages templates into the XML container.
+    /// </summary>
+    /// <param name="definition">The package definition containing template identifiers.</param>
+    /// <param name="root">The XML container to add templates to.</param>
     private void PackageTemplates(PackageDefinition definition, XContainer root)
     {
         var templatesXml = new XElement("Templates");
@@ -541,6 +595,11 @@ public class PackagesRepository : ICreatedPackagesRepository
         root.Add(templatesXml);
     }
 
+    /// <summary>
+    ///     Packages document types into the XML container, including parent types.
+    /// </summary>
+    /// <param name="definition">The package definition containing document type identifiers.</param>
+    /// <param name="root">The XML container to add document types to.</param>
     private void PackageDocumentTypes(PackageDefinition definition, XContainer root)
     {
         var contentTypes = new HashSet<IContentType>();
@@ -569,6 +628,11 @@ public class PackagesRepository : ICreatedPackagesRepository
         root.Add(docTypesXml);
     }
 
+    /// <summary>
+    ///     Packages media types into the XML container, including parent types.
+    /// </summary>
+    /// <param name="definition">The package definition containing media type identifiers.</param>
+    /// <param name="root">The XML container to add media types to.</param>
     private void PackageMediaTypes(PackageDefinition definition, XContainer root)
     {
         var mediaTypes = new HashSet<IMediaType>();
@@ -597,6 +661,11 @@ public class PackagesRepository : ICreatedPackagesRepository
         root.Add(mediaTypesXml);
     }
 
+    /// <summary>
+    ///     Packages documents and tags into the XML container.
+    /// </summary>
+    /// <param name="definition">The package definition containing content node information.</param>
+    /// <param name="root">The XML container to add documents to.</param>
     private void PackageDocumentsAndTags(PackageDefinition definition, XContainer root)
     {
         // Documents and tags
@@ -684,6 +753,12 @@ public class PackagesRepository : ICreatedPackagesRepository
         }
     }
 
+    /// <summary>
+    ///     Packages media items into the XML container and collects their file streams.
+    /// </summary>
+    /// <param name="definition">The package definition containing media UDIs.</param>
+    /// <param name="root">The XML element to add media items to.</param>
+    /// <returns>A dictionary of media file paths and their corresponding streams.</returns>
     private Dictionary<string, Stream> PackageMedia(PackageDefinition definition, XElement root)
     {
         var mediaStreams = new Dictionary<string, Stream>();
@@ -745,6 +820,11 @@ public class PackagesRepository : ICreatedPackagesRepository
         return _serializer.Serialize(stylesheet, includeProperties);
     }
 
+    /// <summary>
+    ///     Recursively adds a document type and its parent types to the collection.
+    /// </summary>
+    /// <param name="dt">The document type to add.</param>
+    /// <param name="dtl">The collection to add document types to.</param>
     private void AddDocumentType(IContentType dt, HashSet<IContentType> dtl)
     {
         if (dt.ParentId > 0)
@@ -764,6 +844,11 @@ public class PackagesRepository : ICreatedPackagesRepository
         }
     }
 
+    /// <summary>
+    ///     Recursively adds a media type and its parent types to the collection.
+    /// </summary>
+    /// <param name="mediaType">The media type to add.</param>
+    /// <param name="mediaTypes">The collection to add media types to.</param>
     private void AddMediaType(IMediaType mediaType, HashSet<IMediaType> mediaTypes)
     {
         if (mediaType.ParentId > 0)
@@ -783,6 +868,11 @@ public class PackagesRepository : ICreatedPackagesRepository
         }
     }
 
+    /// <summary>
+    ///     Creates a new compiled package XML document.
+    /// </summary>
+    /// <param name="root">When this method returns, contains the root element of the document.</param>
+    /// <returns>A new <see cref="XDocument"/> for the compiled package.</returns>
     private static XDocument CreateCompiledPackageXml(out XElement root)
     {
         root = new XElement("umbPackage");
@@ -790,6 +880,11 @@ public class PackagesRepository : ICreatedPackagesRepository
         return compiledPackageXml;
     }
 
+    /// <summary>
+    ///     Ensures the package storage exists and returns the packages XML document.
+    /// </summary>
+    /// <param name="packagesFile">When this method returns, contains the path to the packages file.</param>
+    /// <returns>The packages XML document.</returns>
     private XDocument EnsureStorage(out string packagesFile)
     {
         var packagesFolder = _hostingEnvironment.MapPathContentRoot(_packagesFolderPath);

@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using Microsoft.Extensions.Logging;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
@@ -651,12 +652,12 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             ContentTypeRepository.Save(contentType);
 
             var content1 = ContentBuilder.CreateSimpleContent(contentType);
-            content1.PublishCulture(CultureImpact.Invariant, DateTime.Now, GetRequiredService<PropertyEditorCollection>());
+            content1.PublishCulture(CultureImpact.Invariant, DateTime.UtcNow, GetRequiredService<PropertyEditorCollection>());
             content1.PublishedState = PublishedState.Publishing;
             DocumentRepository.Save(content1);
 
             var content2 = ContentBuilder.CreateSimpleContent(contentType);
-            content2.PublishCulture(CultureImpact.Invariant, DateTime.Now, GetRequiredService<PropertyEditorCollection>());
+            content2.PublishCulture(CultureImpact.Invariant, DateTime.UtcNow, GetRequiredService<PropertyEditorCollection>());
             content2.PublishedState = PublishedState.Publishing;
             content2.Trashed = true;
             DocumentRepository.Save(content2);
@@ -1140,5 +1141,5 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
     }
 
     private TagRepository CreateRepository(IScopeProvider provider) =>
-        new((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<TagRepository>());
+        new((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<TagRepository>(), Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
 }

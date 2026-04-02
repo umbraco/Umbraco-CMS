@@ -8,14 +8,26 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Common.Serialization;
 
+/// <summary>
+///     Implements JSON type info resolution for Umbraco with support for polymorphic serialization.
+/// </summary>
+/// <remarks>
+///     This resolver discovers sub-types of interfaces for polymorphic JSON serialization,
+///     caching results for performance. It also handles type discriminator values for OpenAPI schema generation.
+/// </remarks>
 public sealed class UmbracoJsonTypeInfoResolver : DefaultJsonTypeInfoResolver, IUmbracoJsonTypeInfoResolver
 {
     private readonly ITypeFinder _typeFinder;
     private readonly ConcurrentDictionary<Type, ISet<Type>> _subTypesCache = new ConcurrentDictionary<Type, ISet<Type>>();
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="UmbracoJsonTypeInfoResolver"/> class.
+    /// </summary>
+    /// <param name="typeFinder">The type finder for discovering sub-types.</param>
     public UmbracoJsonTypeInfoResolver(ITypeFinder typeFinder)
         => _typeFinder = typeFinder;
 
+    /// <inheritdoc/>
     public IEnumerable<Type> FindSubTypes(Type type)
     {
         JsonDerivedTypeAttribute[] explicitJsonDerivedTypes = type
@@ -44,6 +56,7 @@ public sealed class UmbracoJsonTypeInfoResolver : DefaultJsonTypeInfoResolver, I
         return result;
     }
 
+    /// <inheritdoc/>
     public string? GetTypeDiscriminatorValue(Type type)
     {
         JsonDerivedTypeAttribute? jsonDerivedTypeAttribute = type
@@ -62,6 +75,7 @@ public sealed class UmbracoJsonTypeInfoResolver : DefaultJsonTypeInfoResolver, I
         return typeof(IOpenApiDiscriminator).IsAssignableFrom(type) ? type.Name : null;
     }
 
+    /// <inheritdoc/>
     public override JsonTypeInfo GetTypeInfo(Type type, JsonSerializerOptions options)
     {
         JsonTypeInfo result = base.GetTypeInfo(type, options);

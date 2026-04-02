@@ -4,7 +4,7 @@ export class UmbFlatLayoutBlockPropertyValueCloner<
 	ValueType extends UmbBlockValueType = UmbBlockValueType,
 > extends UmbBlockPropertyValueCloner<ValueType> {
 	//
-	_cloneLayout(
+	protected override _cloneLayout(
 		layouts: Array<UmbBlockLayoutBaseModel> | undefined,
 	): Promise<Array<UmbBlockLayoutBaseModel> | undefined> | undefined {
 		return layouts ? Promise.all(layouts.map((layout) => this._cloneBlock(layout))) : undefined;

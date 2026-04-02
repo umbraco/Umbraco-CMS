@@ -3,6 +3,9 @@ using Umbraco.Cms.Core.Models.Entities;
 
 namespace Umbraco.Cms.Core.Models;
 
+/// <summary>
+///     Represents a translation for a dictionary item in a specific language.
+/// </summary>
 public interface IDictionaryTranslation : IEntity, IRememberBeingDirty
 {
     /// <summary>

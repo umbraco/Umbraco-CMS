@@ -10,6 +10,8 @@ export class UmbBackofficeNotificationContainerElement extends UmbLitElement {
 	@query('#notifications')
 	private _notificationsElement?: HTMLElement;
 
+	#srContainer?: HTMLDivElement;
+
 	@state()
 	private _notifications?: UmbNotificationHandler[];
 
@@ -24,12 +26,55 @@ export class UmbBackofficeNotificationContainerElement extends UmbLitElement {
 		});
 	}
 
+	override connectedCallback(): void {
+		super.connectedCallback();
+		this.#createSrContainer();
+	}
+
+	override disconnectedCallback(): void {
+		super.disconnectedCallback();
+		this.#destroySrContainer();
+	}
+
+	#createSrContainer(): void {
+		if (this.#srContainer) return;
+
+		// Check if a global announcer container already exists
+		const existing = document.getElementById('umb-sr-announcer');
+		if (existing) {
+			this.#srContainer = existing as HTMLDivElement;
+			return;
+		}
+
+		this.#srContainer = document.createElement('div');
+		this.#srContainer.id = 'umb-sr-announcer';
+
+		// Visually hidden but accessible to screen readers
+		Object.assign(this.#srContainer.style, {
+			position: 'absolute',
+			width: '1px',
+			height: '1px',
+			padding: '0',
+			margin: '-1px',
+			overflow: 'hidden',
+			whiteSpace: 'nowrap',
+			clip: 'rect(0, 0, 0, 0)',
+			clipPath: 'inset(50%)',
+			border: '0',
+		});
+
+		document.body.appendChild(this.#srContainer);
+	}
+
+	#destroySrContainer(): void {
+		this.#srContainer = undefined;
+	}
+
 	private _observeNotifications() {
 		if (!this._notificationContext) return;
 
 		this.observe(this._notificationContext.notifications, (notifications) => {
 			this._notifications = notifications;
-
 			// Close and instantly open the popover again to make sure it stays on top of all other content on the page
 			// TODO: This ignorer is just needed for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -39,7 +84,42 @@ export class UmbBackofficeNotificationContainerElement extends UmbLitElement {
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-ignore
 			this._notificationsElement?.showPopover?.(); // To prevent issues in FireFox I added `?.` before `()`  [NL]
+
+			// Announce the newest notification
+			this._announceNewest(this._notifications);
 		});
+	}
+
+	private _getNotificationText(notificationData: UmbNotificationHandler): string {
+		// Trick to access the data (notification message) inside a private property
+		const data = (notificationData as any)._data ?? {};
+		const notificationText = data.message ?? '';
+		return notificationText;
+	}
+
+	private _announce(message: string) {
+		if (!this.#srContainer || !message) return;
+
+		// Create a new element for each announcement - this is more reliable
+		// than updating text content of an existing live region
+		const alert = document.createElement('div');
+		alert.setAttribute('role', 'alert');
+		alert.setAttribute('aria-live', 'assertive');
+		alert.setAttribute('aria-atomic', 'true');
+		alert.textContent = message;
+
+		this.#srContainer.appendChild(alert);
+
+		// Clean up after announcement (screen readers will have captured it)
+		setTimeout(() => {
+			alert.remove();
+		}, 1000);
+	}
+
+	private _announceNewest(list?: UmbNotificationHandler[]) {
+		const newest = list?.[list.length - 1];
+		if (!newest) return;
+		this._announce(this._getNotificationText(newest));
 	}
 
 	override render() {
@@ -49,7 +129,7 @@ export class UmbBackofficeNotificationContainerElement extends UmbLitElement {
 					? repeat(
 							this._notifications,
 							(notification: UmbNotificationHandler) => notification.key,
-							(notification) => html`${notification.element}`,
+							(notification) => html`${notification.element} `,
 						)
 					: ''}
 			</uui-toast-notification-container>
@@ -66,7 +146,6 @@ export class UmbBackofficeNotificationContainerElement extends UmbLitElement {
 				bottom: 45px;
 				height: auto;
 				padding: var(--uui-size-layout-1);
-
 				position: fixed;
 				width: 100vw;
 				background: 0;

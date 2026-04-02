@@ -1,5 +1,5 @@
 import {expect} from '@playwright/test';
-import {AliasHelper, ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
+import {AliasHelper, ConstantHelper, NotificationConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 
 // Document Type
 const documentTypeName = 'TestDocumentTypeForContent';
@@ -12,6 +12,7 @@ const contentName = 'TestContent';
 const firstElementTypeName = 'FirstBlockGridElement';
 let firstElementTypeId = null;
 const secondElementTypeName = 'SecondBlockGridElement';
+const thirdElementTypeName = 'ThirdBlockGridElement';
 
 // Block Grid Data Type
 const blockGridDataTypeName = 'BlockGridTester';
@@ -20,29 +21,26 @@ const firstAreaName = 'FirstArea';
 const areaCreateLabel = 'CreateLabel';
 const toAllowInAreas = true;
 
-test.beforeEach(async ({umbracoApi}) => {
-  await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
-  await umbracoApi.documentType.ensureNameNotExists(firstElementTypeName);
-  await umbracoApi.documentType.ensureNameNotExists(secondElementTypeName);
+test.beforeEach(async ({umbracoApi, umbracoUi}) => {
   await umbracoApi.document.ensureNameNotExists(contentName);
-  await umbracoApi.dataType.ensureNameNotExists(blockGridDataTypeName);
+  firstElementTypeId = await umbracoApi.documentType.createEmptyElementType(firstElementTypeName);
+  await umbracoUi.goToBackOffice();
 });
 
 test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   await umbracoApi.documentType.ensureNameNotExists(firstElementTypeName);
   await umbracoApi.documentType.ensureNameNotExists(secondElementTypeName);
+  await umbracoApi.documentType.ensureNameNotExists(thirdElementTypeName);
   await umbracoApi.document.ensureNameNotExists(contentName);
   await umbracoApi.dataType.ensureNameNotExists(blockGridDataTypeName);
 });
 
 test('can create content with a block grid with an empty block in a area', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  firstElementTypeId = await umbracoApi.documentType.createEmptyElementType(firstElementTypeName);
   blockGridDataTypeId = await umbracoApi.dataType.createBlockGridWithAnAreaInABlockWithAllowInAreas(blockGridDataTypeName, firstElementTypeId, firstAreaName, toAllowInAreas, areaCreateLabel);
   documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, blockGridDataTypeName, blockGridDataTypeId);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
-  await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
   await umbracoUi.content.goToContentWithName(contentName);
 
@@ -51,10 +49,9 @@ test('can create content with a block grid with an empty block in a area', {tag:
   await umbracoUi.content.clickSelectBlockElementWithName(firstElementTypeName);
   await umbracoUi.content.clickLinkWithName(areaCreateLabel);
   await umbracoUi.content.clickSelectBlockElementInAreaWithName(firstElementTypeName);
-  await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
   await umbracoUi.reloadPage();
   await umbracoUi.content.doesBlockContainBlockInAreaWithName(firstElementTypeName, firstAreaName, firstElementTypeName);
   await umbracoUi.content.doesBlockContainBlockCountInArea(firstElementTypeName, firstAreaName, 1);
@@ -62,11 +59,9 @@ test('can create content with a block grid with an empty block in a area', {tag:
 
 test('can create content with a block grid with two empty blocks in a area', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  firstElementTypeId = await umbracoApi.documentType.createEmptyElementType(firstElementTypeName);
   blockGridDataTypeId = await umbracoApi.dataType.createBlockGridWithAnAreaInABlockWithAllowInAreas(blockGridDataTypeName, firstElementTypeId, firstAreaName, toAllowInAreas, areaCreateLabel);
   documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, blockGridDataTypeName, blockGridDataTypeId);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
-  await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
   await umbracoUi.content.goToContentWithName(contentName);
 
@@ -77,10 +72,9 @@ test('can create content with a block grid with two empty blocks in a area', asy
   await umbracoUi.content.clickSelectBlockElementInAreaWithName(firstElementTypeName);
   await umbracoUi.content.addBlockToAreasWithExistingBlock(firstElementTypeName, firstAreaName, 0, 0);
   await umbracoUi.content.clickSelectBlockElementInAreaWithName(firstElementTypeName);
-  await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
   await umbracoUi.reloadPage();
   await umbracoUi.content.doesBlockContainCountOfBlockInArea(firstElementTypeName, firstAreaName, firstElementTypeName, 2);
 
@@ -94,82 +88,70 @@ test('can create content with a block grid with two empty blocks in a area', asy
 
 test('can create content with block grid area with a create label', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  firstElementTypeId = await umbracoApi.documentType.createEmptyElementType(firstElementTypeName);
   const createLabel = 'ThisIsACreateLabel';
   blockGridDataTypeId = await umbracoApi.dataType.createBlockGridWithAnAreaInABlockWithACreateLabel(blockGridDataTypeName, firstElementTypeId, createLabel, firstAreaName);
   documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, blockGridDataTypeName, blockGridDataTypeId);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
-  await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
   await umbracoUi.content.goToContentWithName(contentName);
 
   // Act
   await umbracoUi.content.clickAddBlockGridElementWithName(firstElementTypeName);
   await umbracoUi.content.clickSelectBlockElementWithName(firstElementTypeName);
-  await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
   await umbracoUi.content.doesBlockGridBlockWithAreaContainCreateLabel(firstElementTypeName, createLabel);
 });
 
 test('can create content with block grid area with column span', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  firstElementTypeId = await umbracoApi.documentType.createEmptyElementType(firstElementTypeName);
   const columnSpan = 2;
   blockGridDataTypeId = await umbracoApi.dataType.createBlockGridWithAnAreaInABlockWithColumnSpanAndRowSpan(blockGridDataTypeName, firstElementTypeId, columnSpan, 1, firstAreaName, areaCreateLabel);
   documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, blockGridDataTypeName, blockGridDataTypeId);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
-  await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
   await umbracoUi.content.goToContentWithName(contentName);
 
   // Act
   await umbracoUi.content.clickAddBlockGridElementWithName(firstElementTypeName);
   await umbracoUi.content.clickSelectBlockElementWithName(firstElementTypeName);
-  await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
   await umbracoUi.content.doesBlockAreaContainColumnSpan(firstElementTypeName, firstAreaName, columnSpan, 0);
 });
 
 test('can create content with block grid area with row span', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  firstElementTypeId = await umbracoApi.documentType.createEmptyElementType(firstElementTypeName);
   const rowSpan = 4;
   blockGridDataTypeId = await umbracoApi.dataType.createBlockGridWithAnAreaInABlockWithColumnSpanAndRowSpan(blockGridDataTypeName, firstElementTypeId, 12, rowSpan, firstAreaName, areaCreateLabel);
   documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, blockGridDataTypeName, blockGridDataTypeId);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
-  await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
   await umbracoUi.content.goToContentWithName(contentName);
 
   // Act
   await umbracoUi.content.clickAddBlockGridElementWithName(firstElementTypeName);
   await umbracoUi.content.clickSelectBlockElementWithName(firstElementTypeName);
-  await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
   await umbracoUi.content.doesBlockAreaContainRowSpan(firstElementTypeName, firstAreaName, rowSpan, 0);
 });
 
-// Remove fixme when this issue is fixed https://github.com/umbraco/Umbraco-CMS/issues/18639
-test.fixme('can create content with block grid area with min allowed', async ({umbracoApi, umbracoUi}) => {
+test('can create content with block grid area with min allowed', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  firstElementTypeId = await umbracoApi.documentType.createEmptyElementType(firstElementTypeName);
   const secondElementTypeId = await umbracoApi.documentType.createEmptyElementType(secondElementTypeName);
   const minAllowed = 2;
   blockGridDataTypeId = await umbracoApi.dataType.createBlockGridWithAnAreaInABlockWithMinAndMaxAllowed(blockGridDataTypeName, firstElementTypeId, secondElementTypeId, minAllowed, 10, firstAreaName, areaCreateLabel);
   documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, blockGridDataTypeName, blockGridDataTypeId);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
-  await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
   await umbracoUi.content.goToContentWithName(contentName);
 
   // Act
-  await umbracoUi.content.clickAddBlockGridElementWithName(firstElementTypeName);
+  await umbracoUi.content.clickAddBlockGridElementWithName('content');
   await umbracoUi.content.clickSelectBlockElementWithName(firstElementTypeName);
   await umbracoUi.content.clickLinkWithName(areaCreateLabel);
   await umbracoUi.content.clickSelectBlockElementInAreaWithName(secondElementTypeName);
@@ -178,25 +160,56 @@ test.fixme('can create content with block grid area with min allowed', async ({u
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
   await umbracoUi.content.clickInlineAddToAreaButton(firstElementTypeName, firstAreaName, 0, 1);
   await umbracoUi.content.clickSelectBlockElementInAreaWithName(secondElementTypeName);
-  await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.variants[0].state).toBe('Published');
+  await umbracoUi.reloadPage();
+  await umbracoUi.content.doesBlockContainBlockCountInArea(firstElementTypeName, firstAreaName, 2);
 
   // Clean
   await umbracoApi.documentType.ensureNameNotExists(secondElementTypeName);
 });
 
-// Remove fixme when this issue is fixed https://github.com/umbraco/Umbraco-CMS/issues/18639
-test.fixme('can create content with block grid area with max allowed', async ({umbracoApi, umbracoUi}) => {
+test('can create content with block grid area with max allowed', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  firstElementTypeId = await umbracoApi.documentType.createEmptyElementType(firstElementTypeName);
   const secondElementTypeId = await umbracoApi.documentType.createEmptyElementType(secondElementTypeName);
   const maxAllowed = 0;
   blockGridDataTypeId = await umbracoApi.dataType.createBlockGridWithAnAreaInABlockWithMinAndMaxAllowed(blockGridDataTypeName, firstElementTypeId, secondElementTypeId, 0, maxAllowed, firstAreaName, areaCreateLabel);
   documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, blockGridDataTypeName, blockGridDataTypeId);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
-  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(contentName);
+
+  // Act
+  await umbracoUi.content.clickAddBlockGridElementWithName('content');
+  await umbracoUi.content.clickSelectBlockElementWithName(firstElementTypeName);
+  await umbracoUi.content.clickLinkWithName(areaCreateLabel);
+  await umbracoUi.content.clickSelectBlockElementInAreaWithName(secondElementTypeName);
+  await umbracoUi.content.isTextWithExactNameVisible('Maximum 0 entries, you have entered 1 too many.');
+  await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
+  await umbracoUi.content.removeBlockFromArea(firstElementTypeName, firstAreaName, secondElementTypeName);
+  await umbracoUi.content.clickConfirmToDeleteButton();
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
+
+  // Assert
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.variants[0].state).toBe('Published');
+  await umbracoUi.reloadPage();
+  await umbracoUi.content.doesBlockContainBlockCountInArea(firstElementTypeName, firstAreaName, 0);
+
+  // Clean
+  await umbracoApi.documentType.ensureNameNotExists(secondElementTypeName);
+});
+
+test('can create content with a block grid area with specified allowance', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const secondElementTypeId = await umbracoApi.documentType.createEmptyElementType(secondElementTypeName);
+  blockGridDataTypeId = await umbracoApi.dataType.createBlockGridWithAnAreaWithSpecifiedAllowanceInABlock(blockGridDataTypeName, firstElementTypeId, secondElementTypeId, firstAreaName, areaCreateLabel);
+  documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, blockGridDataTypeName, blockGridDataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
   await umbracoUi.content.goToContentWithName(contentName);
 
@@ -205,16 +218,90 @@ test.fixme('can create content with block grid area with max allowed', async ({u
   await umbracoUi.content.clickSelectBlockElementWithName(firstElementTypeName);
   await umbracoUi.content.clickLinkWithName(areaCreateLabel);
   await umbracoUi.content.clickSelectBlockElementInAreaWithName(secondElementTypeName);
-  await umbracoUi.content.isTextWithExactNameVisible('Maximum 0 entries, 1 too many.');
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
+
+  // Assert
+  await umbracoUi.content.doesBlockContainBlockInAreaWithName(firstElementTypeName, firstAreaName, secondElementTypeName);
+  await umbracoUi.content.doesBlockContainBlockCountInArea(firstElementTypeName, firstAreaName, 1);
+});
+
+test('can create content with a block grid area with specified allowance with min allowed', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const secondElementTypeId = await umbracoApi.documentType.createEmptyElementType(secondElementTypeName);
+  const minAllowed = 2;
+  const warningMessage = secondElementTypeName + ' must be present at least ' + minAllowed + ' time(s).';
+  blockGridDataTypeId = await umbracoApi.dataType.createBlockGridWithAnAreaWithSpecifiedAllowanceWithMinMaxInABlock(blockGridDataTypeName, firstElementTypeId, secondElementTypeId, minAllowed, 10, firstAreaName, areaCreateLabel);
+  documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, blockGridDataTypeName, blockGridDataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(contentName);
+
+  // Act
+  await umbracoUi.content.clickAddBlockGridElementWithName(firstElementTypeName);
+  await umbracoUi.content.clickSelectBlockElementWithName(firstElementTypeName);
+  await umbracoUi.content.clickLinkWithName(areaCreateLabel);
+  await umbracoUi.content.clickSelectBlockElementInAreaWithName(secondElementTypeName);
+  await umbracoUi.content.isTextWithExactNameVisible(warningMessage);
+  await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
+  await umbracoUi.content.clickInlineAddToAreaButton(firstElementTypeName, firstAreaName, 0, 1);
+  await umbracoUi.content.clickSelectBlockElementInAreaWithName(secondElementTypeName);
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
+
+  // Assert
+  await umbracoUi.content.doesBlockContainBlockCountInArea(firstElementTypeName, firstAreaName, 2);
+});
+
+test('can create content with a block grid area with specified allowance with max allowed', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const secondElementTypeId = await umbracoApi.documentType.createEmptyElementType(secondElementTypeName);
+  const maxAllowed = 1;
+  const warningMessage = secondElementTypeName + ' must maximum be present ' + maxAllowed + ' time(s).';
+  blockGridDataTypeId = await umbracoApi.dataType.createBlockGridWithAnAreaWithSpecifiedAllowanceWithMinMaxInABlock(blockGridDataTypeName, firstElementTypeId, secondElementTypeId, 0, maxAllowed, firstAreaName, areaCreateLabel);
+  documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, blockGridDataTypeName, blockGridDataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(contentName);
+
+  // Act
+  await umbracoUi.content.clickAddBlockGridElementWithName(firstElementTypeName);
+  await umbracoUi.content.clickSelectBlockElementWithName(firstElementTypeName);
+  await umbracoUi.content.clickLinkWithName(areaCreateLabel);
+  await umbracoUi.content.clickSelectBlockElementInAreaWithName(secondElementTypeName);
+  await umbracoUi.content.clickInlineAddToAreaButton(firstElementTypeName, firstAreaName, 0, 1);
+  await umbracoUi.content.clickSelectBlockElementInAreaWithName(secondElementTypeName);
+  await umbracoUi.content.isTextWithExactNameVisible(warningMessage);
   await umbracoUi.content.clickSaveAndPublishButton();
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
   await umbracoUi.content.removeBlockFromArea(firstElementTypeName, firstAreaName, secondElementTypeName);
   await umbracoUi.content.clickConfirmToDeleteButton();
-  await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
+  await umbracoUi.content.doesBlockContainBlockCountInArea(firstElementTypeName, firstAreaName, 1);
+});
 
-  // Clean
-  await umbracoApi.documentType.ensureNameNotExists(secondElementTypeName);
+test('can create content with a block grid area with multiple specified allowances', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const secondElementTypeId = await umbracoApi.documentType.createEmptyElementType(secondElementTypeName);
+  const thirdElementTypeId = await umbracoApi.documentType.createEmptyElementType(thirdElementTypeName);
+  blockGridDataTypeId = await umbracoApi.dataType.createBlockGridWithAnAreaWithTwoSpecifiedAllowancesInABlock(blockGridDataTypeName, firstElementTypeId, secondElementTypeId, thirdElementTypeId, firstAreaName, areaCreateLabel);
+  documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, blockGridDataTypeName, blockGridDataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(contentName);
+
+  // Act
+  await umbracoUi.content.clickAddBlockGridElementWithName(firstElementTypeName);
+  await umbracoUi.content.clickSelectBlockElementWithName(firstElementTypeName);
+  await umbracoUi.content.clickLinkWithName(areaCreateLabel);
+  await umbracoUi.content.clickSelectBlockElementInAreaWithName(secondElementTypeName);
+  await umbracoUi.content.clickInlineAddToAreaButton(firstElementTypeName, firstAreaName, 0, 1);
+  await umbracoUi.content.clickSelectBlockElementInAreaWithName(thirdElementTypeName);
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
+
+  // Assert
+  await umbracoUi.content.doesBlockContainBlockInAreaWithName(firstElementTypeName, firstAreaName, secondElementTypeName);
+  await umbracoUi.content.doesBlockContainBlockInAreaWithName(firstElementTypeName, firstAreaName, thirdElementTypeName);
+  await umbracoUi.content.doesBlockContainBlockCountInArea(firstElementTypeName, firstAreaName, 2);
 });

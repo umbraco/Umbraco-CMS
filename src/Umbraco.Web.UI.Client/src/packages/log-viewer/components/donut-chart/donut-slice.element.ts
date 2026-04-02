@@ -32,6 +32,13 @@ export class UmbDonutSliceElement extends LitElement {
 	@property()
 	kind = '';
 
+	/**
+	 * Optional href to make the slice clickable
+	 * @memberof UmbDonutSliceElement
+	 */
+	@property()
+	href = '';
+
 	override willUpdate() {
 		this.dispatchEvent(new CustomEvent('slice-update', { composed: true, bubbles: true }));
 	}

@@ -1,19 +1,20 @@
 import { UMB_DOCUMENT_PROPERTY_DATASET_CONTEXT, UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../../constants.js';
 import type { UmbDocumentVariantModel } from '../../../types.js';
 import { UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT } from '../../../publishing/index.js';
-import { TimeOptions } from '../../../utils.js';
 import { css, customElement, html, ifDefined, nothing, state } from '@umbraco-cms/backoffice/external/lit';
 import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
-import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
-import { UMB_TEMPLATE_PICKER_MODAL, UmbTemplateItemRepository } from '@umbraco-cms/backoffice/template';
-import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/document-type';
-import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
+import { UmbTemplateItemRepository, UMB_TEMPLATE_PICKER_MODAL } from '@umbraco-cms/backoffice/template';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_DATE_TIME_FORMAT_OPTIONS } from '@umbraco-cms/backoffice/utils';
+import { UMB_IS_TRASHED_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/recycle-bin';
 import { UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
 import { UMB_SETTINGS_SECTION_ALIAS } from '@umbraco-cms/backoffice/settings';
+import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
+import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/document-type';
+import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 
 @customElement('umb-document-workspace-view-info')
 export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
@@ -49,6 +50,9 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 	@state()
 	private _hasSettingsAccess: boolean = false;
 
+	@state()
+	private _isTrashed: boolean = false;
+
 	#workspaceContext?: typeof UMB_DOCUMENT_WORKSPACE_CONTEXT.TYPE;
 	#templateRepository = new UmbTemplateItemRepository(this);
 	#documentPublishingWorkspaceContext?: typeof UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT.TYPE;
@@ -83,6 +87,16 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 		this.consumeContext(UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT, (instance) => {
 			this.#documentPublishingWorkspaceContext = instance;
 			this.#observePendingChanges();
+		});
+
+		this.consumeContext(UMB_IS_TRASHED_ENTITY_CONTEXT, (context) => {
+			this.observe(
+				context?.isTrashed,
+				(isTrashed) => {
+					this._isTrashed = isTrashed ?? false;
+				},
+				'_isTrashed',
+			);
 		});
 
 		createExtensionApiByAlias(this, UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS, [
@@ -165,6 +179,12 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 					</uui-tag>
 				`;
 			}
+			case DocumentVariantStateModel.TRASHED:
+				return html`
+					<uui-tag color="danger" look="primary" label=${this.localize.term('content_trashed')}>
+						${this.localize.term('content_trashed')}
+					</uui-tag>
+				`;
 			default:
 				return html`
 					<uui-tag look="primary" label=${this.localize.term('content_notCreated')}>
@@ -202,7 +222,7 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 					href=${ifDefined(
 						this._hasSettingsAccess ? editDocumentTypePath + 'edit/' + this._documentTypeUnique : undefined,
 					)}
-					?readonly=${!this._hasSettingsAccess}
+					?readonly=${!this._hasSettingsAccess || this._isTrashed}
 					name=${ifDefined(this.localize.string(this._documentTypeName ?? ''))}>
 					<umb-icon slot="icon" name=${ifDefined(this._documentTypeIcon)}></umb-icon>
 				</uui-ref-node-document-type>
@@ -231,13 +251,15 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 								href=${ifDefined(
 									this._hasSettingsAccess ? editTemplatePath + 'edit/' + this._templateUnique : undefined,
 								)}
-								?readonly=${!this._hasSettingsAccess}>
+								?readonly=${!this._hasSettingsAccess || this._isTrashed}>
 								<uui-icon slot="icon" name="icon-document-html"></uui-icon>
-								<uui-action-bar slot="actions">
-									<uui-button
-										label=${this.localize.term('general_choose')}
-										@click=${this.#openTemplatePicker}></uui-button>
-								</uui-action-bar>
+								${!this._isTrashed
+									? html` <uui-action-bar slot="actions">
+											<uui-button
+												label=${this.localize.term('general_choose')}
+												@click=${this.#openTemplatePicker}></uui-button>
+										</uui-action-bar>`
+									: nothing}
 							</uui-ref-node>
 						`
 					: html`
@@ -267,12 +289,12 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 
 	#renderScheduledPublishDate() {
 		if (!this._variant?.scheduledPublishDate) return nothing;
-		return this.#renderDate(this._variant.scheduledPublishDate, 'content_releaseDate', 'Publish At');
+		return this.#renderDate(this._variant.scheduledPublishDate, 'content_releaseDate', 'Publish at');
 	}
 
 	#renderScheduledUnpublishDate() {
 		if (!this._variant?.scheduledUnpublishDate) return nothing;
-		return this.#renderDate(this._variant.scheduledUnpublishDate, 'content_expireDate', 'Remove At');
+		return this.#renderDate(this._variant.scheduledUnpublishDate, 'content_expireDate', 'Remove at');
 	}
 
 	#renderDate(date: string, labelKey: string, labelText: string) {
@@ -280,7 +302,7 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 			<div class="general-item">
 				<strong><umb-localize .key=${labelKey}>${labelText}</umb-localize></strong>
 				<span>
-					<umb-localize-date .date=${date} .options=${TimeOptions}></umb-localize-date>
+					<umb-localize-date .date=${date} .options=${UMB_DATE_TIME_FORMAT_OPTIONS}></umb-localize-date>
 				</span>
 			</div>
 		`;

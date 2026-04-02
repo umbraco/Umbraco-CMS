@@ -21,6 +21,8 @@ internal abstract class ContentTypeEditingServiceTestsBase : UmbracoIntegrationT
 
     protected IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
+    protected IContentService ContentService => GetRequiredService<IContentService>();
+
     protected IMediaTypeService MediaTypeService => GetRequiredService<IMediaTypeService>();
 
     protected const string TabContainerType = "Tab";

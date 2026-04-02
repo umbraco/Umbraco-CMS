@@ -32,12 +32,12 @@ public class MemberBuilderTests
         const int testSortOrder = 5;
         const bool testTrashed = false;
         var testKey = Guid.NewGuid();
-        var testCreateDate = DateTime.Now.AddHours(-1);
-        var testUpdateDate = DateTime.Now;
+        var testCreateDate = DateTime.UtcNow.AddHours(-1);
+        var testUpdateDate = DateTime.UtcNow;
         const int testFailedPasswordAttempts = 22;
-        var testLastLockoutDate = DateTime.Now.AddHours(-2);
-        var testLastLoginDate = DateTime.Now.AddHours(-3);
-        var testLastPasswordChangeDate = DateTime.Now.AddHours(-4);
+        var testLastLockoutDate = DateTime.UtcNow.AddHours(-2);
+        var testLastLoginDate = DateTime.UtcNow.AddHours(-3);
+        var testLastPasswordChangeDate = DateTime.UtcNow.AddHours(-4);
         var testPropertyType1 =
             new PropertyTypeDetail { Alias = "title", Name = "Title", SortOrder = 1, DataTypeId = -88 };
         var testPropertyType2 =

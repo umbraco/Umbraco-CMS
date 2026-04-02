@@ -18,6 +18,13 @@ export class UmbTreeElement extends UmbExtensionElementAndApiSlotElementBase<Man
 		// TODO: make base interface for a tree element
 		return this._element?.getSelection?.() ?? [];
 	}
+
+	getExpansion() {
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
+		// TODO: make base interface for a tree element
+		return this._element?.getExpansion?.() ?? [];
+	}
 }
 
 declare global {

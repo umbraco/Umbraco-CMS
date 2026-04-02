@@ -1,7 +1,6 @@
-import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
+import {ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 
 const testUser = ConstantHelper.testUserCredentials;
-let testUserCookieAndToken = {cookie: "", accessToken: "", refreshToken: ""};
 
 const userGroupName = 'TestUserGroup';
 let userGroupId = null;
@@ -13,7 +12,7 @@ test.beforeEach(async ({umbracoApi}) => {
 
 test.afterEach(async ({umbracoApi}) => {
   // Ensure we are logged in to admin
-  await umbracoApi.loginToAdminUser(testUserCookieAndToken.cookie, testUserCookieAndToken.accessToken, testUserCookieAndToken.refreshToken);
+  await umbracoApi.loginToAdminUser();
   await umbracoApi.userGroup.ensureNameNotExists(userGroupName);
 });
 
@@ -21,7 +20,7 @@ test('can go to section defined in userGroup', async ({umbracoApi, umbracoUi}) =
   // Arrange
   userGroupId = await umbracoApi.userGroup.createSimpleUserGroupWithContentSection(userGroupName);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
 
   // Act
   await umbracoUi.goToBackOffice();
@@ -31,11 +30,11 @@ test('can go to section defined in userGroup', async ({umbracoApi, umbracoUi}) =
   await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
 });
 
-test('can not see section that is not defined in userGroup', async ({umbracoApi, umbracoUi}) => {
+test('can not see section that is not defined in userGroup', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createSimpleUserGroupWithContentSection(userGroupName);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
 
   // Act
   await umbracoUi.goToBackOffice();

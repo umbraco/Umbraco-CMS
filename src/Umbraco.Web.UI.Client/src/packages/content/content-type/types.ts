@@ -3,12 +3,24 @@ import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 
 export type * from './composition/types.js';
 export type * from './conditions/types.js';
+export type * from './entity-content-type/types.js';
 
 export type UmbPropertyContainerTypes = 'Group' | 'Tab';
 
 export interface UmbPropertyTypeContainerModel {
 	id: string;
 	parent: { id: string } | null; // TODO: change to unique
+	name: string;
+	type: UmbPropertyContainerTypes;
+	sortOrder: number;
+}
+
+export interface UmbPropertyTypeContainerMergedModel {
+	key: string;
+	ids: Array<string>;
+	ownerId?: string;
+	parentIds: Set<string | null>;
+	path: Array<string>;
 	name: string;
 	type: UmbPropertyContainerTypes;
 	sortOrder: number;
@@ -46,14 +58,7 @@ export interface UmbPropertyTypeScaffoldModel extends Omit<UmbPropertyTypeModel,
 }
 
 export interface UmbPropertyTypeModel {
-	dataType: { unique: string };
-	/**
-	 * The unique identifier of the property type
-	 * @deprecated The id property is deprecated and will be removed in version 17. Please use the unique property instead.
-	 * @type {string}
-	 * @memberof UmbPropertyTypeModel
-	 */
-	id: string; // TODO: change to unique
+	dataType: UmbReferenceByUnique;
 	unique: string;
 	container?: { id: string } | null; // TODO: change to unique
 	sortOrder: number;

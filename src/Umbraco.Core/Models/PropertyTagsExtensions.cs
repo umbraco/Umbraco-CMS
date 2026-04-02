@@ -12,8 +12,13 @@ namespace Umbraco.Extensions;
 /// </summary>
 public static class PropertyTagsExtensions
 {
-    // gets the tag configuration for a property
-    // from the datatype configuration, and the editor tag configuration attribute
+    /// <summary>
+    ///     Gets the tag configuration for a property from the datatype configuration and editor tag configuration attribute.
+    /// </summary>
+    /// <param name="property">The property.</param>
+    /// <param name="propertyEditors">The property editors collection.</param>
+    /// <param name="dataTypeService">The data type service.</param>
+    /// <returns>The tag configuration if available; otherwise, <c>null</c>.</returns>
     public static TagConfiguration? GetTagConfiguration(this IProperty property, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService)
     {
         if (property == null)
@@ -37,6 +42,9 @@ public static class PropertyTagsExtensions
         return configuration;
     }
 
+    /// <summary>
+    ///     Gets the tags property editor attribute from the data editor.
+    /// </summary>
     private static TagsPropertyEditorAttribute? GetTagAttribute(IDataEditor? editor)
         => editor?.GetType().GetCustomAttribute<TagsPropertyEditorAttribute>(false);
 
@@ -91,7 +99,15 @@ public static class PropertyTagsExtensions
         property.RemoveTags(tags, configuration.StorageType, serializer, configuration.Delimiter, culture);
     }
 
-    // used by ContentRepositoryBase
+    /// <summary>
+    ///     Gets the tags value from a property. Used by ContentRepositoryBase.
+    /// </summary>
+    /// <param name="property">The property.</param>
+    /// <param name="propertyEditors">The property editors collection.</param>
+    /// <param name="dataTypeService">The data type service.</param>
+    /// <param name="serializer">The JSON serializer.</param>
+    /// <param name="culture">A culture, for multi-lingual properties.</param>
+    /// <returns>An enumeration of tag values.</returns>
     public static IEnumerable<string> GetTagsValue(this IProperty property, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IJsonSerializer serializer, string? culture = null)
     {
         if (property == null)

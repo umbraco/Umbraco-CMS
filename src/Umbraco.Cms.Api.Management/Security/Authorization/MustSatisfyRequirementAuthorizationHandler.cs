@@ -52,7 +52,9 @@ public abstract class MustSatisfyRequirementAuthorizationHandler<T, TResource> :
     where T : IAuthorizationRequirement
 {
     /// <inheritdoc />
-    protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, T requirement,
+    protected override async Task HandleRequirementAsync(
+        AuthorizationHandlerContext context,
+        T requirement,
         TResource resource)
     {
         var isAuth = await IsAuthorized(context, requirement, resource);

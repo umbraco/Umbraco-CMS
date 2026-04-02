@@ -1,5 +1,6 @@
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -26,6 +27,14 @@ internal sealed class LanguageServiceTests : UmbracoIntegrationTest
         Assert.NotNull(languages);
         Assert.IsTrue(languages.Any());
         Assert.That(languages.Count(), Is.EqualTo(3));
+    }
+
+    [Test]
+    public async Task Can_Get_All_Language_Iso_Codes()
+    {
+        var isoCodes = await LanguageService.GetAllIsoCodesAsync();
+        Assert.That(isoCodes.Count(), Is.EqualTo(3));
+        Assert.AreEqual("da-DK,en-GB,en-US", string.Join(",", isoCodes.OrderBy(x => x)));
     }
 
     [Test]
@@ -190,6 +199,11 @@ internal sealed class LanguageServiceTests : UmbracoIntegrationTest
         var result = await LanguageService.UpdateAsync(languageDaDk, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(LanguageOperationStatus.Success, result.Status);
+
+        // Verify that the create and update dates can be used to distinguish between creates
+        // and updates (as these fields are used in ServerEventSender to emit a "Created" or "Updated"
+        // event.
+        Assert.Greater(result.Result.UpdateDate, result.Result.CreateDate);
 
         // re-get
         languageDaDk = await LanguageService.GetAsync(languageDaDk.IsoCode);

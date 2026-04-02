@@ -14,14 +14,21 @@ It has to be enabled by an appSetting:
   "Umbraco": {
     "CMS": {
       "TestData": {
-        "Enabled" : true,
+        "Enabled" : true
       }
     }
   }
 }
 ```
 
-Once this is enabled this endpoint can be executed:
+After this, you also need to add a reference to the `Umbraco.TestData.csproj`, from `Umbraco.Web.UI.csproj` so the composers will be recognized.
+```xml
+  <ItemGroup>
+    <ProjectReference Include="..\..\tests\Umbraco.TestData\Umbraco.TestData.csproj" />
+  </ItemGroup>
+```
+
+Once this is done this endpoint can be executed:
 
 `/umbraco/surface/umbracotestdata/CreateTree?count=100&depth=5`
 
@@ -43,9 +50,6 @@ All values are generated using the very handy `Bogus` package.
 This will install some schema items:
 
 * `umbTestDataContent` Document Type. __TIP__: If you want to delete all of the content data generated with this tool, just delete this content type
-* `UmbracoTestDataContent.RTE` Data Type
-* `UmbracoTestDataContent.MediaPicker` Data Type
-* `UmbracoTestDataContent.Text` Data Type
 
 For media, the normal folder and image is used
 

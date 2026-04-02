@@ -7,10 +7,10 @@ export class UmbPropertyTypeWorkspaceEditorElement extends UmbLitElement {
 	#workspaceContext?: typeof UMB_PROPERTY_TYPE_WORKSPACE_CONTEXT.TYPE;
 
 	@state()
-	_isNew?: boolean;
+	private _isNew?: boolean;
 
 	@state()
-	_name?: string;
+	private _name?: string;
 
 	constructor() {
 		super();

@@ -32,6 +32,7 @@ public class DocumentEntitySlim : ContentEntitySlim, IDocumentEntitySlim
         set => _editedCultures = value;
     }
 
+    /// <inheritdoc />
     public ContentVariation Variations { get; set; }
 
     /// <inheritdoc />

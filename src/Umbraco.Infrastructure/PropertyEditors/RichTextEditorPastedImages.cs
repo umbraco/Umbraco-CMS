@@ -3,14 +3,9 @@
 
 using HtmlAgilityPack;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Exceptions;
-using Umbraco.Cms.Core.Hosting;
-using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
@@ -18,13 +13,15 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Models.TemporaryFile;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
+/// <summary>
+/// Provides configuration options for managing how images pasted into the rich text editor are handled.
+/// </summary>
 public sealed class RichTextEditorPastedImages
 {
     private const string TemporaryImageDataAttribute = "data-tmpimg";
@@ -38,48 +35,18 @@ public sealed class RichTextEditorPastedImages
     private readonly AppCaches _appCaches;
     private readonly IUserService _userService;
 
-    [Obsolete("Please use the non-obsolete constructor. Will be removed in V17.")]
-    public RichTextEditorPastedImages(
-        IUmbracoContextAccessor umbracoContextAccessor,
-        ILogger<RichTextEditorPastedImages> logger,
-        IHostingEnvironment hostingEnvironment,
-        IMediaService mediaService,
-        IContentTypeBaseServiceProvider contentTypeBaseServiceProvider,
-        MediaFileManager mediaFileManager,
-        MediaUrlGeneratorCollection mediaUrlGenerators,
-        IShortStringHelper shortStringHelper,
-        IPublishedUrlProvider publishedUrlProvider,
-        ITemporaryFileService temporaryFileService,
-        IScopeProvider scopeProvider,
-        IMediaImportService mediaImportService,
-        IImageUrlGenerator imageUrlGenerator,
-        IOptions<ContentSettings> contentSettings,
-        IEntityService entityService,
-        AppCaches appCaches)
-        : this(umbracoContextAccessor, publishedUrlProvider, temporaryFileService, scopeProvider, mediaImportService, imageUrlGenerator, entityService, appCaches)
-    {
-    }
-
-    [Obsolete("Please use the non-obsolete constructor. Will be removed in V17.")]
-    public RichTextEditorPastedImages(
-        IUmbracoContextAccessor umbracoContextAccessor,
-        IPublishedUrlProvider publishedUrlProvider,
-        ITemporaryFileService temporaryFileService,
-        IScopeProvider scopeProvider,
-        IMediaImportService mediaImportService,
-        IImageUrlGenerator imageUrlGenerator)
-        : this(
-            umbracoContextAccessor,
-            publishedUrlProvider,
-            temporaryFileService,
-            scopeProvider,
-            mediaImportService,
-            imageUrlGenerator,
-            StaticServiceProvider.Instance.GetRequiredService<IEntityService>(),
-            StaticServiceProvider.Instance.GetRequiredService<AppCaches>())
-    {
-    }
-
+    /// <summary>
+    /// Initializes a new instance of the <see cref="RichTextEditorPastedImages"/> class.
+    /// Handles the processing of images pasted into the rich text editor, including temporary storage and import into the media library.
+    /// </summary>
+    /// <param name="umbracoContextAccessor">Provides access to the current Umbraco context.</param>
+    /// <param name="publishedUrlProvider">Resolves published URLs for content and media items.</param>
+    /// <param name="temporaryFileService">Service for managing temporary files, such as those created when images are pasted.</param>
+    /// <param name="scopeProvider">Manages database transaction scopes.</param>
+    /// <param name="mediaImportService">Handles importing images into the media library.</param>
+    /// <param name="imageUrlGenerator">Generates URLs for images, including those stored in the media library.</param>
+    /// <param name="entityService">Provides access to Umbraco entities, such as media items.</param>
+    /// <param name="appCaches">Provides caching for application data.</param>
     public RichTextEditorPastedImages(
         IUmbracoContextAccessor umbracoContextAccessor,
         IPublishedUrlProvider publishedUrlProvider,
@@ -106,8 +73,13 @@ public sealed class RichTextEditorPastedImages
     }
 
     /// <summary>
-    ///     Used by the RTE (and grid RTE) for drag/drop/persisting images.
+    /// Finds all temporary pasted images in the provided HTML content, persists them to the media library,
+    /// updates their URLs, and returns the modified HTML. Used by the RTE (and grid RTE) for drag/drop and pasting images.
     /// </summary>
+    /// <param name="html">The HTML content containing pasted images with temporary references.</param>
+    /// <param name="mediaParentFolder">The <see cref="Guid"/> of the media parent folder where images will be stored. If empty, the default media root is used.</param>
+    /// <param name="userKey">The <see cref="Guid"/> of the user performing the operation.</param>
+    /// <returns>A <see cref="Task{TResult}"/> representing the asynchronous operation. The task result contains the updated HTML with persisted image URLs and data attributes updated.</returns>
     public async Task<string> FindAndPersistPastedTempImagesAsync(string html, Guid mediaParentFolder, Guid userKey)
     {
         // Find all img's that has data-tmpimg attribute

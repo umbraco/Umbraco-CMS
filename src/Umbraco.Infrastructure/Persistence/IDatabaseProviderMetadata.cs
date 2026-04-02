@@ -3,6 +3,9 @@ using Umbraco.Cms.Core.Install.Models;
 
 namespace Umbraco.Cms.Infrastructure.Persistence;
 
+/// <summary>
+/// Defines metadata details for a specific database provider implementation.
+/// </summary>
 public interface IDatabaseProviderMetadata
 {
     /// <summary>
@@ -72,6 +75,12 @@ public interface IDatabaseProviderMetadata
     bool SupportsIntegratedAuthentication { get; }
 
     /// <summary>
+    ///     Gets a value indicating whether "Trust the database certificate" is supported (e.g. SQL Server &amp; Oracle).
+    /// </summary>
+    [DataMember(Name = "supportsTrustServerCertificate")]
+    bool SupportsTrustServerCertificate => false;
+
+    /// <summary>
     ///     Gets a value indicating whether the connection should be tested before continuing install process.
     /// </summary>
     [DataMember(Name = "requiresConnectionTest")]
@@ -84,12 +93,16 @@ public interface IDatabaseProviderMetadata
 
 
     /// <summary>
-    /// Gets a value indicating whether this connections could have been build using <see cref="GenerateConnectionString"/>.
+    /// Determines whether the specified connection string could have been built using <see cref="GenerateConnectionString"/>.
     /// </summary>
+    /// <param name="connectionString">The connection string to evaluate.</param>
+    /// <returns><c>true</c> if the connection string could have been built using <see cref="GenerateConnectionString"/>; otherwise, <c>false</c>.</returns>
     public bool CanRecognizeConnectionString(string? connectionString) => false;
 
     /// <summary>
-    ///     Creates a connection string for this provider.
+    ///     Generates a connection string for the specified database model using this provider's format.
     /// </summary>
+    /// <param name="databaseModel">The database model for which to generate the connection string.</param>
+    /// <returns>The generated connection string, or <c>null</c> if it cannot be generated.</returns>
     string? GenerateConnectionString(DatabaseModel databaseModel);
 }

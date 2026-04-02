@@ -1,17 +1,18 @@
-const { rest } = window.MockServiceWorker;
+const { http, HttpResponse } = window.MockServiceWorker;
 import { umbUserMockDb } from '../../data/user/user.db.js';
 import { UMB_SLUG } from './slug.js';
 import type { DisableUserRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 export const handlers = [
-	rest.post<DisableUserRequestModel>(umbracoPath(`${UMB_SLUG}/disable`), async (req, res, ctx) => {
-		const data = await req.json();
+	http.post<object, DisableUserRequestModel>(umbracoPath(`${UMB_SLUG}/disable`), async ({ request }) => {
+		const data = await request.json();
 		if (!data) return;
 		if (!data.userIds) return;
 
-		umbUserMockDb.disable(data.userIds);
+		const ids = data.userIds.map((ref) => ref.id);
+		umbUserMockDb.disable(ids);
 
-		return res(ctx.status(200));
+		return new HttpResponse(null, { status: 200 });
 	}),
 ];

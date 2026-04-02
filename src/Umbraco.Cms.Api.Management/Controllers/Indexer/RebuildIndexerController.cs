@@ -8,6 +8,9 @@ using Umbraco.Cms.Infrastructure.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Indexer;
 
+/// <summary>
+/// API controller responsible for handling requests to rebuild the search indexer in the Umbraco CMS management context.
+/// </summary>
 [ApiVersion("1.0")]
 public class RebuildIndexerController : IndexerControllerBase
 {
@@ -15,6 +18,12 @@ public class RebuildIndexerController : IndexerControllerBase
     private readonly IIndexingRebuilderService _indexingRebuilderService;
     private readonly IExamineManager _examineManager;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="RebuildIndexerController"/> class.
+    /// </summary>
+    /// <param name="logger">The <see cref="ILogger{RebuildIndexerController}"/> used for logging.</param>
+    /// <param name="indexingRebuilderService">The <see cref="IIndexingRebuilderService"/> responsible for rebuilding search indexes.</param>
+    /// <param name="examineManager">The <see cref="IExamineManager"/> instance for managing Examine indexes.</param>
     public RebuildIndexerController(
         ILogger<RebuildIndexerController> logger,
         IIndexingRebuilderService indexingRebuilderService,
@@ -26,17 +35,20 @@ public class RebuildIndexerController : IndexerControllerBase
     }
 
     /// <summary>
-    ///     Rebuilds the index
+    ///     Rebuilds the index.
     /// </summary>
-    /// <param name="indexName"></param>
-    /// <returns></returns>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <param name="indexName">The name of the index to rebuild.</param>
+    /// <returns>The result of the rebuild operation.</returns>
     [HttpPost("{indexName}/rebuild")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public Task<IActionResult> Rebuild(CancellationToken cancellationToken, string indexName)
+    [EndpointSummary("Rebuilds an indexer.")]
+    [EndpointDescription("Rebuilds the search index for the indexer identified by the provided name.")]
+    public async Task<IActionResult> Rebuild(CancellationToken cancellationToken, string indexName)
     {
         if (!_examineManager.TryGetIndex(indexName, out IIndex? index))
         {
@@ -48,7 +60,7 @@ public class RebuildIndexerController : IndexerControllerBase
                 Type = "Error",
             };
 
-            return Task.FromResult<IActionResult>(NotFound(invalidModelProblem));
+            return NotFound(invalidModelProblem);
         }
 
         if (!_indexingRebuilderService.CanRebuild(index.Name))
@@ -57,19 +69,19 @@ public class RebuildIndexerController : IndexerControllerBase
             {
                 Title = "Could not validate the populator",
                 Detail =
-                    $"The index {index?.Name} could not be rebuilt because we could not validate its associated {typeof(IIndexPopulator)}",
+                    $"The index {index.Name} could not be rebuilt because we could not validate its associated {typeof(IIndexPopulator)}",
                 Status = StatusCodes.Status400BadRequest,
                 Type = "Error",
             };
 
-            return Task.FromResult<IActionResult>(BadRequest(invalidModelProblem));
+            return BadRequest(invalidModelProblem);
         }
 
         _logger.LogInformation("Rebuilding index '{IndexName}'", indexName);
 
-        if (_indexingRebuilderService.TryRebuild(index, indexName))
+        if (await _indexingRebuilderService.TryRebuildAsync(index, indexName))
         {
-            return Task.FromResult<IActionResult>(Ok());
+            return Ok();
         }
 
         var problemDetails = new ProblemDetails
@@ -80,6 +92,6 @@ public class RebuildIndexerController : IndexerControllerBase
             Type = "Error",
         };
 
-        return Task.FromResult<IActionResult>(Conflict(problemDetails));
+        return Conflict(problemDetails);
     }
 }

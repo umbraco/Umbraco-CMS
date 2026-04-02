@@ -1,8 +1,11 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+///     Defines the Stylesheet Service, which provides operations for managing <see cref="IStylesheet" /> files.
+/// </summary>
 public interface IStylesheetService : IBasicFileService<IStylesheet>
 {
     /// <summary>

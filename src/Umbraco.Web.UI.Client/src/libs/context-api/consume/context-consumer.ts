@@ -27,7 +27,9 @@ export class UmbContextConsumer<
 > {
 	protected _retrieveHost: HostElementMethod;
 
-	#raf?: number;
+	#attached = false;
+	#requestRaf?: number;
+	#disconnectAC?: AbortController;
 	#skipHost?: boolean;
 	#stopAtContextMatch = true;
 	#callback?: UmbContextCallback<ResultType>;
@@ -121,7 +123,7 @@ export class UmbContextConsumer<
 
 	protected async setInstance(instance: ResultType): Promise<void> {
 		this.#instance = instance;
-		this.#setCurrentTarget(instance.getHostElement());
+		this.#setCurrentScope(instance.getHostElement());
 		await this.#callback?.(instance); // Resolve callback first as it might perform something you like completed before resolving the promise, as the promise might be used to determine when things are ready/initiated [NL]
 		this.#resolvePromise();
 	}
@@ -187,8 +189,16 @@ export class UmbContextConsumer<
 	 * @description Request the context from the host element.
 	 */
 	public request(): void {
-		if (this.#raf !== undefined) {
-			cancelAnimationFrame(this.#raf);
+		if (this.#requestRaf !== undefined) {
+			cancelAnimationFrame(this.#requestRaf);
+		}
+
+		const hostElement = this._retrieveHost();
+
+		// Add connection check to prevent requesting on disconnected elements
+		if (hostElement && !hostElement.isConnected) {
+			console.warn('UmbContextConsumer: Attempting to request context on disconnected element', hostElement);
+			return;
 		}
 
 		const event = new UmbContextRequestEventImplementation(
@@ -197,28 +207,48 @@ export class UmbContextConsumer<
 			this._onResponse,
 			this.#stopAtContextMatch,
 		);
-		(this.#skipHost ? this._retrieveHost()?.parentNode : this._retrieveHost())?.dispatchEvent(event);
+		(this.#skipHost ? hostElement?.parentNode : hostElement)?.dispatchEvent(event);
 
 		if (this.#promiseResolver && this.#promiseOptions?.preventTimeout !== true) {
-			this.#raf = requestAnimationFrame(() => {
+			this.#requestRaf = requestAnimationFrame(() => {
 				// For unproviding, then setInstance to undefined here. [NL]
 				this.#rejectPromise();
-				this.#raf = undefined;
+				this.#requestRaf = undefined;
 			});
 		}
 	}
 
 	public hostConnected(): void {
-		this.#setupCurrentTarget();
+		this.#attached = true;
+		if (this.#disconnectAC) {
+			this.#disconnectAC.abort();
+			this.#disconnectAC = undefined;
+		}
+
+		this.#setCurrentScope(window);
 		this.request();
 	}
 
 	public hostDisconnected(): void {
-		if (this.#raf !== undefined) {
-			cancelAnimationFrame(this.#raf);
-			this.#raf = undefined;
+		if (!this.#attached) return;
+		this.#attached = false;
+		if (this.#requestRaf !== undefined) {
+			cancelAnimationFrame(this.#requestRaf);
+			this.#requestRaf = undefined;
 		}
+		this.#disconnectAC?.abort();
+		this.#setCurrentScope(undefined);
 
+		const abortController = (this.#disconnectAC = new AbortController());
+		queueMicrotask(() => {
+			if (!abortController.signal.aborted) {
+				this.#handleDisconnect();
+			}
+		});
+	}
+
+	#handleDisconnect() {
+		this.#disconnectAC = undefined;
 		this.#unprovide();
 		if (this.#promiseRejecter) {
 			const hostElement = this._retrieveHost();
@@ -230,28 +260,26 @@ export class UmbContextConsumer<
 		this.#promiseOptions = undefined;
 		this.#promiseResolver = undefined;
 		this.#promiseRejecter = undefined;
-
-		this.#dismentalCurrentTarget();
-		this.#currentTarget = window;
 	}
 
-	#currentTarget: EventTarget = window;
-	#setCurrentTarget(target: EventTarget | undefined) {
-		this.#dismentalCurrentTarget();
-		this.#currentTarget = target ?? window;
-		this.#setupCurrentTarget();
+	// The current scope of which is being listened to for context providing/unproviding, this is usually the host element or the provided context's host element. [NL]
+	#currentScope?: EventTarget;
+	#setCurrentScope(scope: EventTarget | undefined) {
+		if (this.#currentScope !== scope) {
+			this.#dismantleCurrentScope();
+			this.#currentScope = scope;
+			// Setup the scope event listening:
+			this.#currentScope?.addEventListener(UMB_CONTEXT_PROVIDE_EVENT_TYPE, this.#onProvide);
+			// TODO: consider not listening if it does not have a Context....
+			this.#currentScope?.addEventListener(UMB_CONTEXT_UNPROVIDED_EVENT_TYPE, this.#onUnprovided);
+		}
 	}
 
-	#setupCurrentTarget() {
-		this.#currentTarget.addEventListener(UMB_CONTEXT_PROVIDE_EVENT_TYPE, this.#onProvide);
-		// TODO: consider not listening if it does not have a Context....
-		this.#currentTarget.addEventListener(UMB_CONTEXT_UNPROVIDED_EVENT_TYPE, this.#onUnprovided);
-	}
-
-	#dismentalCurrentTarget() {
-		if (this.#currentTarget) {
-			this.#currentTarget.removeEventListener(UMB_CONTEXT_PROVIDE_EVENT_TYPE, this.#onProvide);
-			this.#currentTarget.removeEventListener(UMB_CONTEXT_UNPROVIDED_EVENT_TYPE, this.#onUnprovided);
+	// dismantle the current scope event listening:
+	#dismantleCurrentScope() {
+		if (this.#currentScope) {
+			this.#currentScope.removeEventListener(UMB_CONTEXT_PROVIDE_EVENT_TYPE, this.#onProvide);
+			this.#currentScope.removeEventListener(UMB_CONTEXT_UNPROVIDED_EVENT_TYPE, this.#onUnprovided);
 		}
 	}
 
@@ -269,6 +297,7 @@ export class UmbContextConsumer<
 		if (!isUmbContextUnprovidedEventType(event)) return;
 
 		if (this.#contextAlias === event.contextAlias && event.instance === this.#instance) {
+			this.#setCurrentScope(window);
 			this.#unprovide();
 		}
 	};
@@ -281,13 +310,17 @@ export class UmbContextConsumer<
 	}
 
 	public destroy(): void {
-		this.hostDisconnected();
+		if (this.#requestRaf !== undefined) {
+			cancelAnimationFrame(this.#requestRaf);
+		}
+		this.#disconnectAC?.abort();
+		this.#disconnectAC = undefined;
+		this.#dismantleCurrentScope();
+		this.#handleDisconnect();
+		this.#currentScope = undefined;
 		this._retrieveHost = undefined as any;
+		this.#attached = false;
 		this.#callback = undefined;
-		this.#promise = undefined;
-		this.#promiseOptions = undefined;
-		this.#promiseResolver = undefined;
-		this.#promiseRejecter = undefined;
 		this.#instance = undefined;
 		this.#discriminator = undefined;
 	}

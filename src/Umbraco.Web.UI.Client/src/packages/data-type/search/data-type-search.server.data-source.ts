@@ -32,14 +32,18 @@ export class UmbDataTypeSearchServerDataSource implements UmbSearchDataSource<Um
 		const { data, error } = await tryExecute(
 			this.#host,
 			DataTypeService.getItemDataTypeSearch({
-				query: { query: args.query },
+				query: {
+					query: args.query,
+					skip: args.paging?.skip,
+					take: args.paging?.take,
+				},
 			}),
 		);
 
 		if (data) {
 			const mappedItems: Array<UmbDataTypeSearchItemModel> = data.items.map((item) => {
 				return {
-					href: '/section/settings/workspace/data-type/edit/' + item.id,
+					href: 'section/settings/workspace/data-type/edit/' + item.id,
 					entityType: UMB_DATA_TYPE_ENTITY_TYPE,
 					unique: item.id,
 					name: item.name,

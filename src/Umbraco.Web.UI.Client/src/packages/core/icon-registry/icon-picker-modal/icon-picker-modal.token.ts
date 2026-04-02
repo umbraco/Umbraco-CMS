@@ -1,6 +1,10 @@
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
-export type UmbIconPickerModalData = never;
+export interface UmbIconPickerModalData {
+	placeholder?: string;
+	showEmptyOption?: boolean;
+	hideColors?: boolean;
+}
 
 export interface UmbIconPickerModalValue {
 	color: string | undefined;

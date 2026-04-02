@@ -47,6 +47,9 @@ public class SqlServerDatabaseProviderMetadata : IDatabaseProviderMetadata
     public bool SupportsIntegratedAuthentication => true;
 
     /// <inheritdoc />
+    public bool SupportsTrustServerCertificate => true;
+
+    /// <inheritdoc />
     public bool RequiresConnectionTest => true;
 
     /// <inheritdoc />

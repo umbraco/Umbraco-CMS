@@ -12,27 +12,6 @@ public sealed class DescendantsSelector : QueryOptionBase, ISelectorHandler
 {
     private const string DescendantsSpecifier = "descendants:";
 
-    [Obsolete("Please use the non-obsolete constructor. Will be removed in V17.")]
-    public DescendantsSelector(IPublishedContentCache publishedContentCache, IRequestRoutingService requestRoutingService)
-        : this(
-            requestRoutingService,
-            StaticServiceProvider.Instance.GetRequiredService<IRequestPreviewService>(),
-            StaticServiceProvider.Instance.GetRequiredService<IApiDocumentUrlService>(),
-            StaticServiceProvider.Instance.GetRequiredService<IVariationContextAccessor>())
-    {
-    }
-
-    [Obsolete("Please use the non-obsolete constructor. Will be removed in V17.")]
-    public DescendantsSelector(
-        IPublishedContentCache publishedContentCache,
-        IRequestRoutingService requestRoutingService,
-        IRequestPreviewService requestPreviewService,
-        IApiDocumentUrlService apiDocumentUrlService,
-        IVariationContextAccessor variationContextAccessor)
-        : this(requestRoutingService, requestPreviewService, apiDocumentUrlService, variationContextAccessor)
-    {
-    }
-
     public DescendantsSelector(
         IRequestRoutingService requestRoutingService,
         IRequestPreviewService requestPreviewService,

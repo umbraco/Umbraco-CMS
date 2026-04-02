@@ -2,6 +2,9 @@ using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Extensions;
 
+/// <summary>
+///     Provides extension methods for <see cref="IDictionaryItem" />.
+/// </summary>
 public static class DictionaryItemExtensions
 {
     /// <summary>
@@ -10,7 +13,7 @@ public static class DictionaryItemExtensions
     /// <param name="d"></param>
     /// <param name="isoCode"></param>
     /// <returns></returns>
-    public static string? GetTranslatedValue(this IDictionaryItem d, string isoCode)
+    public static string GetTranslatedValue(this IDictionaryItem d, string isoCode)
     {
         IDictionaryTranslation? trans = d.Translations.FirstOrDefault(x => x.LanguageIsoCode == isoCode);
         return trans == null ? string.Empty : trans.Value;

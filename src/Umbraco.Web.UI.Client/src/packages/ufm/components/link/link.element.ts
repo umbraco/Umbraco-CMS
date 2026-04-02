@@ -51,7 +51,8 @@ export class UmbUfmLinkElement extends UmbUfmElementBase {
 			if (repository) {
 				const { data } = await repository.requestItems([unique]);
 				if (Array.isArray(data) && data.length > 0) {
-					return data.map((item) => item.name).join(', ');
+					// TODO: [v17] Review usage of `item.variants[0].name` as this needs to be implemented properly! [LK]
+					return data.map((item) => item.variants[0].name).join(', ');
 				}
 			}
 		}

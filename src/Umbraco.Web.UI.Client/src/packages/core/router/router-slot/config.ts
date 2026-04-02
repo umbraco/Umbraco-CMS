@@ -1,6 +1,6 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import type { PathMatch } from './model.js';
 
-/* eslint-disable local-rules/exported-string-constant-naming */
 export const CATCH_ALL_WILDCARD: string = '**';
 export const TRAVERSE_FLAG: string = '\\.\\.\\/';
 export const PARAM_IDENTIFIER: RegExp = /:([^\\/]+)/g;

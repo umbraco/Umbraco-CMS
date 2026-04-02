@@ -5,5 +5,8 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// </summary>
 public interface IIgnoreUserStartNodesConfig
 {
+    /// <summary>
+    /// Gets or sets a value indicating whether to ignore user start nodes when selecting content.
+    /// </summary>
     bool IgnoreUserStartNodes { get; set; }
 }

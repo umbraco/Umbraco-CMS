@@ -1,4 +1,6 @@
-import { UMB_COLLECTION_ALIAS_CONDITION, UMB_COLLECTION_BULK_ACTION_PERMISSION_CONDITION } from './constants.js';
+import UmbCollectionAliasCondition from './collection-alias.condition.js';
+import { UmbCollectionHasItemsCondition } from './collection-has-items.condition.js';
+import { UMB_COLLECTION_ALIAS_CONDITION, UMB_COLLECTION_HAS_ITEMS_CONDITION_ALIAS } from './constants.js';
 import type { ManifestCondition } from '@umbraco-cms/backoffice/extension-api';
 
 export const manifests: Array<ManifestCondition> = [
@@ -6,13 +8,12 @@ export const manifests: Array<ManifestCondition> = [
 		type: 'condition',
 		name: 'Collection Alias Condition',
 		alias: UMB_COLLECTION_ALIAS_CONDITION,
-		api: () => import('./collection-alias.condition.js'),
+		api: UmbCollectionAliasCondition,
 	},
-	/** @deprecated No longer used internally. This class will be removed in Umbraco 17. [LK] */
 	{
 		type: 'condition',
-		name: 'Collection Bulk Action Permission Condition',
-		alias: UMB_COLLECTION_BULK_ACTION_PERMISSION_CONDITION,
-		api: () => import('./collection-bulk-action-permission.condition.js'),
+		name: 'Collection Has Items Condition',
+		alias: UMB_COLLECTION_HAS_ITEMS_CONDITION_ALIAS,
+		api: UmbCollectionHasItemsCondition,
 	},
 ];

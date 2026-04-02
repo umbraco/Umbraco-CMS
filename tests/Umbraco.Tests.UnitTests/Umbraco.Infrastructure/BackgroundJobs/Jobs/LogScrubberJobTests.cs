@@ -2,19 +2,15 @@
 // See LICENSE for more details.
 
 using System.Data;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Logging;
-using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Sync;
-using Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
-using Umbraco.Cms.Infrastructure.HostedServices;
+using Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs.DistributedJobs;
 using Umbraco.Cms.Tests.Common;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.BackgroundJobs.Jobs;
@@ -30,7 +26,7 @@ public class LogScrubberJobTests
     public async Task Executes_And_Scrubs_Logs()
     {
         var sut = CreateLogScrubber();
-        await sut.RunJobAsync();
+        await sut.ExecuteAsync();
         VerifyLogsScrubbed();
     }
 
@@ -50,7 +46,6 @@ public class LogScrubberJobTests
                 It.IsAny<bool>(),
                 It.IsAny<bool>()))
             .Returns(mockScope.Object);
-        var mockLogger = new Mock<ILogger<LogScrubberJob>>();
         var mockProfilingLogger = new Mock<IProfilingLogger>();
 
         _mockAuditService = new Mock<IAuditService>();
@@ -59,7 +54,6 @@ public class LogScrubberJobTests
             _mockAuditService.Object,
             new TestOptionsMonitor<LoggingSettings>(settings),
             mockScopeProvider.Object,
-            mockLogger.Object,
             mockProfilingLogger.Object);
     }
 
@@ -68,5 +62,5 @@ public class LogScrubberJobTests
     private void VerifyLogsScrubbed() => VerifyLogsScrubbed(Times.Once());
 
     private void VerifyLogsScrubbed(Times times) =>
-        _mockAuditService.Verify(x => x.CleanLogs(It.Is<int>(y => y == MaxLogAgeInMinutes)), times);
+        _mockAuditService.Verify(x => x.CleanLogsAsync(It.Is<int>(y => y == MaxLogAgeInMinutes)), times);
 }

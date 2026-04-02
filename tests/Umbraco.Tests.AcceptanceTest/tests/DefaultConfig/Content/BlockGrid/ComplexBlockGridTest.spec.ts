@@ -1,5 +1,5 @@
-﻿import {expect} from '@playwright/test';
-import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
+import {expect} from '@playwright/test';
+import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 
 // DocumentType
 const documentTypeName = 'TestDocumentType';
@@ -94,8 +94,8 @@ test('can update property value nested in a block grid area with an RTE with a b
   await umbracoUi.content.clickSelectBlockElementWithName(areaElementTypeName);
   await umbracoUi.content.clickAddBlockGridElementWithName(richTextEditorElementTypeName);
   await umbracoUi.content.clickExactLinkWithName(richTextEditorElementTypeName);
-  await umbracoUi.content.clickInsertBlockButton();
-  await umbracoUi.content.clickExactLinkWithName(blockListElementTypeName);
+  await umbracoUi.content.clickTipTapToolbarIconWithTitle('Insert Block');
+  await umbracoUi.content.clickExactLinkWithName(blockListElementTypeName, true);
   await umbracoUi.content.clickAddBlockGridElementWithName(textStringElementTypeName);
   await umbracoUi.content.clickExactLinkWithName(textStringElementTypeName);
   // Enter text in the textstring block that won't match regex
@@ -108,25 +108,24 @@ test('can update property value nested in a block grid area with an RTE with a b
   await umbracoUi.content.isFailedStateButtonVisible();
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished, true, true);
   // Updates the textstring block with the correct value
-  await umbracoUi.content.clickBlockElementWithName(blockListElementTypeName);
+  await umbracoUi.content.clickBlockElementInRTEWithName(blockListElementTypeName);
   await umbracoUi.content.clickEditBlockListEntryWithName(textStringElementTypeName);
   await umbracoUi.content.enterPropertyValue(textStringElementDataTypeName, correctPropertyValue);
   await umbracoUi.content.clickUpdateButtonForModalWithElementTypeNameAndGroupName(textStringElementTypeName, textStringElementGroupName);
   await umbracoUi.content.clickUpdateButtonForModalWithElementTypeNameAndGroupName(blockListElementTypeName, blockListGroupName);
-  await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
   // Checks if published
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe('Published');
   // Checks if the textstring block has the correct value after reloading the page
   await umbracoUi.reloadPage();
   // Waits to make sure the page has loaded
-  await umbracoUi.waitForTimeout(2000);
-  await umbracoUi.content.clickBlockElementWithName(blockListElementTypeName);
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.long);
+  await umbracoUi.content.clickBlockElementInRTEWithName(blockListElementTypeName);
   // Needs to wait to make sure it has loaded
-  await umbracoUi.waitForTimeout(2000);
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.long);
   await umbracoUi.content.clickEditBlockListEntryWithName(textStringElementTypeName);
   await umbracoUi.content.doesPropertyContainValue(textStringElementDataTypeName, correctPropertyValue);
 });

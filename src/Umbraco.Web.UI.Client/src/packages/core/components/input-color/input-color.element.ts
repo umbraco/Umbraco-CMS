@@ -1,16 +1,16 @@
 import { html, customElement, property, map, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbSwatchDetails } from '@umbraco-cms/backoffice/models';
 import type { UUIColorSwatchesEvent } from '@umbraco-cms/backoffice/external/uui';
+import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 /*
  * This wraps the UUI library uui-color-swatches component
  * @element umb-input-color
  */
 @customElement('umb-input-color')
-export class UmbInputColorElement extends UUIFormControlMixin(UmbLitElement, '') {
+export class UmbInputColorElement extends UmbFormControlMixin<string, typeof UmbLitElement, undefined>(UmbLitElement) {
 	protected override getFormElement() {
 		return undefined;
 	}
@@ -22,12 +22,25 @@ export class UmbInputColorElement extends UUIFormControlMixin(UmbLitElement, '')
 	 */
 	@property({ type: Boolean, reflect: true })
 	readonly = false;
+	@property({ type: Boolean })
+	required = false;
+	@property({ type: String })
+	requiredMessage: string = UMB_VALIDATION_EMPTY_LOCALIZATION_KEY;
 
 	@property({ type: Boolean })
 	showLabels = false;
 
 	@property({ type: Array })
 	swatches?: Array<UmbSwatchDetails>;
+
+	constructor() {
+		super();
+		this.addValidator(
+			'valueMissing',
+			() => this.requiredMessage ?? UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
+			() => !!this.required && !this.value && !this.readonly,
+		);
+	}
 
 	#onChange(event: UUIColorSwatchesEvent) {
 		this.value = event.target.value;

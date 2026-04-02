@@ -1,16 +1,16 @@
 import { css, customElement, html, ifDefined, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
+import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/property-editor';
-import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 @customElement('umb-property-editor-ui-number')
 export class UmbPropertyEditorUINumberElement
-	extends UmbFormControlMixin<number | undefined, typeof UmbLitElement, undefined>(UmbLitElement)
+	extends UmbFormControlMixin<number, typeof UmbLitElement, undefined>(UmbLitElement, undefined)
 	implements UmbPropertyEditorUiElement
 {
 	/**
@@ -21,6 +21,15 @@ export class UmbPropertyEditorUINumberElement
 	 */
 	@property({ type: Boolean, reflect: true })
 	readonly = false;
+
+	/**
+	 * Sets the input to mandatory, meaning validation will fail if the value is empty.
+	 * @type {boolean}
+	 */
+	@property({ type: Boolean })
+	mandatory?: boolean;
+	@property({ type: String })
+	mandatoryMessage = UMB_VALIDATION_EMPTY_LOCALIZATION_KEY;
 
 	@state()
 	private _label?: string;
@@ -42,7 +51,7 @@ export class UmbPropertyEditorUINumberElement
 		this._min = this.#parseNumber(config.getValueByAlias('min'));
 		this._max = this.#parseNumber(config.getValueByAlias('max'));
 		this._step = this.#parseNumber(config.getValueByAlias('step'));
-		this._placeholder = config.getValueByAlias('placeholder');
+		this._placeholder = this.localize.string(config.getValueByAlias<string>('placeholder') ?? '');
 	}
 
 	constructor() {
@@ -78,6 +87,7 @@ export class UmbPropertyEditorUINumberElement
 				this,
 			);
 		}
+		this.addFormControlElement(this.shadowRoot!.querySelector('uui-input')!);
 	}
 
 	#parseNumber(input: unknown): number | undefined {
@@ -100,10 +110,12 @@ export class UmbPropertyEditorUINumberElement
 				min=${ifDefined(this._min)}
 				max=${ifDefined(this._max)}
 				step=${ifDefined(this._step)}
-				placeholder=${ifDefined(this._placeholder)}
 				value=${this.value?.toString() ?? ''}
-				@change=${this.#onChange}
-				?readonly=${this.readonly}>
+				.placeholder=${this._placeholder ?? ''}
+				.requiredMessage=${this.mandatoryMessage}
+				?required=${this.mandatory}
+				?readonly=${this.readonly}
+				@change=${this.#onChange}>
 			</uui-input>
 		`;
 	}

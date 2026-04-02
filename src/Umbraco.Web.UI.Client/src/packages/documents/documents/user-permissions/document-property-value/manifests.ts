@@ -39,13 +39,14 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 		alias: 'Umb.UserGranularPermission.Document.PropertyValue',
 		name: 'Document Property Values Granular User Permission',
 		weight: 950,
+		forEntityTypes: [UMB_DOCUMENT_PROPERTY_VALUE_ENTITY_TYPE],
 		element: () =>
 			import(
 				'./input-document-property-value-user-permission/input-document-property-value-user-permission.element.js'
 			),
 		meta: {
 			schemaType: 'DocumentPropertyValuePermissionPresentationModel',
-			label: 'Document Property Values',
+			label: '#user_permissionsGranular',
 			description: 'Assign permissions to Document property values',
 		},
 	},

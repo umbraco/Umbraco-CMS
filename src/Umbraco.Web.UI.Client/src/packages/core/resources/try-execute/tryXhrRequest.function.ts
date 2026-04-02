@@ -23,7 +23,7 @@ export async function tryXhrRequest<T>(
 	const promise = createXhrRequest<T>({
 		...options,
 		baseUrl: config.baseUrl,
-		token: () => (typeof config.auth === 'function' ? config.auth({ type: 'http', scheme: 'bearer' }) : config.auth),
+		token: '[redacted]',
 	});
 	const controller = new UmbTryExecuteController(host, promise);
 	const response = await controller.tryExecute(options);
@@ -44,6 +44,7 @@ function createXhrRequest<T>(options: XhrRequestOptions): UmbCancelablePromise<T
 	return new UmbCancelablePromise<T>(async (resolve, reject, onCancel) => {
 		const xhr = new XMLHttpRequest();
 		xhr.open(options.method, `${baseUrl}${options.url}`, true);
+		xhr.withCredentials = options.withCredentials ?? true;
 
 		// Set default headers
 		if (options.token) {

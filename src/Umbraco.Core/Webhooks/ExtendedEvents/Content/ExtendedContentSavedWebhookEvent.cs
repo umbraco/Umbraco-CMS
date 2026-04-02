@@ -11,6 +11,9 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events;
 
+/// <summary>
+/// Extended webhook event that fires when content is saved, including full Delivery API content payloads.
+/// </summary>
 [WebhookEvent("Content Saved", Constants.WebhookEvents.Types.Content)]
 public class ExtendedContentSavedWebhookEvent : ExtendedContentWebhookEventBase<ContentSavedNotification>
 {
@@ -19,6 +22,17 @@ public class ExtendedContentSavedWebhookEvent : ExtendedContentWebhookEventBase<
     private readonly IVariationContextAccessor _variationContextAccessor;
     private readonly IOutputExpansionStrategyAccessor _outputExpansionStrategyAccessor;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ExtendedContentSavedWebhookEvent"/> class.
+    /// </summary>
+    /// <param name="webhookFiringService">The webhook firing service.</param>
+    /// <param name="webhookService">The webhook service.</param>
+    /// <param name="webhookSettings">The webhook settings.</param>
+    /// <param name="serverRoleAccessor">The server role accessor.</param>
+    /// <param name="apiContentBuilder">The API content response builder.</param>
+    /// <param name="contentCache">The published content cache.</param>
+    /// <param name="variationContextAccessor">The variation context accessor.</param>
+    /// <param name="outputExpansionStrategyAccessor">The output expansion strategy accessor.</param>
     public ExtendedContentSavedWebhookEvent(
         IWebhookFiringService webhookFiringService,
         IWebhookService webhookService,
@@ -42,11 +56,14 @@ public class ExtendedContentSavedWebhookEvent : ExtendedContentWebhookEventBase<
         _outputExpansionStrategyAccessor = outputExpansionStrategyAccessor;
     }
 
+    /// <inheritdoc />
     public override string Alias => Constants.WebhookEvents.Aliases.ContentSaved;
 
+    /// <inheritdoc />
     protected override IEnumerable<IContent> GetEntitiesFromNotification(ContentSavedNotification notification) =>
         notification.SavedEntities;
 
+    /// <inheritdoc />
     protected override object? ConvertEntityToRequestPayload(IContent entity)
     {
         // Get preview/saved version of content

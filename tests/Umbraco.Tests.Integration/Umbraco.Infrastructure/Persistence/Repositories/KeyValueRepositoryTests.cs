@@ -2,7 +2,9 @@
 // See LICENSE for more details.
 
 using Microsoft.Extensions.Logging;
+using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
@@ -25,7 +27,7 @@ internal sealed class KeyValueRepositoryTests : UmbracoIntegrationTest
         // Insert new key/value
         using (var scope = provider.CreateCoreScope())
         {
-            var keyValue = new KeyValue { Identifier = "foo", Value = "bar", UpdateDate = DateTime.Now };
+            var keyValue = new KeyValue { Identifier = "foo", Value = "bar", UpdateDate = DateTime.UtcNow };
             var repo = CreateRepository(provider);
             repo.Save(keyValue);
             scope.Complete();
@@ -47,7 +49,7 @@ internal sealed class KeyValueRepositoryTests : UmbracoIntegrationTest
             var repo = CreateRepository(provider);
             var keyValue = repo.Get("foo");
             keyValue.Value = "buzz";
-            keyValue.UpdateDate = DateTime.Now;
+            keyValue.UpdateDate = DateTime.UtcNow;
             repo.Save(keyValue);
             scope.Complete();
         }
@@ -64,5 +66,5 @@ internal sealed class KeyValueRepositoryTests : UmbracoIntegrationTest
     }
 
     private IKeyValueRepository CreateRepository(ICoreScopeProvider provider) =>
-        new KeyValueRepository((IScopeAccessor)provider, LoggerFactory.CreateLogger<KeyValueRepository>());
+        new KeyValueRepository((IScopeAccessor)provider, LoggerFactory.CreateLogger<KeyValueRepository>(),  Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
 }

@@ -1,7 +1,6 @@
-import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
+import {ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 
 const testUser = ConstantHelper.testUserCredentials;
-let testUserCookieAndToken = {cookie: "", accessToken: "", refreshToken: ""};
 
 const userGroupName = 'TestUserGroup';
 let userGroupId = null;
@@ -25,7 +24,7 @@ test.beforeEach(async ({umbracoApi}) => {
 
 test.afterEach(async ({umbracoApi}) => {
   // Ensure we are logged in to admin
-  await umbracoApi.loginToAdminUser(testUserCookieAndToken.cookie, testUserCookieAndToken.accessToken, testUserCookieAndToken.refreshToken);
+  await umbracoApi.loginToAdminUser();
   await umbracoApi.user.ensureNameNotExists(testUser.name);
   await umbracoApi.userGroup.ensureNameNotExists(userGroupName);
   await umbracoApi.media.ensureNameNotExists(rootFolderName);
@@ -33,11 +32,11 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.media.ensureNameNotExists(childFolderTwoName);
 });
 
-test('can see root media start node and children', async ({umbracoApi, umbracoUi}) => {
+test('can see root media start node and children', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithMediaStartNode(userGroupName, rootFolderId);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
 
   // Act
@@ -45,16 +44,17 @@ test('can see root media start node and children', async ({umbracoApi, umbracoUi
 
   // Assert
   await umbracoUi.media.isMediaTreeItemVisible(rootFolderName);
-  await umbracoUi.media.clickCaretButtonForMediaName(rootFolderName);
+  await umbracoUi.media.openMediaCaretButtonForName(rootFolderName);
   await umbracoUi.media.isChildMediaVisible(rootFolderName, childFolderOneName);
   await umbracoUi.media.isChildMediaVisible(rootFolderName, childFolderTwoName);
 });
 
-test('can see parent of start node but not access it', async ({umbracoApi, umbracoUi}) => {
+// Skip this test due to this issue: https://github.com/umbraco/Umbraco-CMS/issues/20505
+test.skip('can see parent of start node but not access it', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithMediaStartNode(userGroupName, childFolderOneId);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
 
   // Act
@@ -62,12 +62,10 @@ test('can see parent of start node but not access it', async ({umbracoApi, umbra
 
   // Assert
   await umbracoUi.media.isMediaTreeItemVisible(rootFolderName);
-  await umbracoUi.waitForTimeout(500);
   await umbracoUi.media.goToMediaWithName(rootFolderName);
-  await umbracoUi.content.isErrorNotificationVisible();
-  // TODO: Uncomment this when this issue is fixed https://github.com/umbraco/Umbraco-CMS/issues/18533
-  //await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.noAccessToResource);
-  await umbracoUi.media.clickCaretButtonForMediaName(rootFolderName);
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.short); // Wait for workspace to load
+  await umbracoUi.media.doesMediaWorkspaceHaveText('Access denied');
+  await umbracoUi.media.openMediaCaretButtonForName(rootFolderName);
   await umbracoUi.media.isChildMediaVisible(rootFolderName, childFolderOneName);
   await umbracoUi.media.isChildMediaVisible(rootFolderName, childFolderTwoName, false);
 });
@@ -76,7 +74,7 @@ test('can not see any media when no media start nodes specified', async ({umbrac
   // Arrange
   userGroupId = await umbracoApi.userGroup.createSimpleUserGroupWithMediaSection(userGroupName);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
 
   // Act

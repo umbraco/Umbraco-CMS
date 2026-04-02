@@ -6,6 +6,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
  * @class UmbDocumentBlueprintTreeStore
  * @augments {UmbStoreBase}
  * @description - Tree Data Store for Document Blueprints
+ * @deprecated - Use `UmbDocumentBlueprintTreeRepository` instead. This will be removed in Umbraco 18.
  */
 export class UmbDocumentBlueprintTreeStore extends UmbUniqueTreeStore {
 	/**

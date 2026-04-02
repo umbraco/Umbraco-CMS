@@ -1,3 +1,5 @@
+import { UmbStylesheetItemStore } from './stylesheet-item.store.js';
+
 export const UMB_STYLESHEET_ITEM_REPOSITORY_ALIAS = 'Umb.Repository.Stylesheet.Item';
 export const UMB_STYLESHEET_ITEM_STORE_ALIAS = 'Umb.ItemStore.Stylesheet';
 
@@ -12,6 +14,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'itemStore',
 		alias: 'Umb.ItemStore.Stylesheet',
 		name: 'Stylesheet Item Store',
-		api: () => import('./stylesheet-item.store.js'),
+		api: UmbStylesheetItemStore,
 	},
 ];

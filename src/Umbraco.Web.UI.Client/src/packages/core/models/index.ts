@@ -2,7 +2,7 @@ export interface UmbSwatchDetails {
 	label: string;
 	value: string;
 }
-export interface ServertimeOffset {
+export interface UmbServertimeOffset {
 	/**
 	 * offset in minutes relative to UTC
 	 */
@@ -32,4 +32,25 @@ export interface UmbUniqueItemModel {
 	unique: string;
 	name: string;
 	icon?: string;
+}
+
+export interface UmbThumbnailModel {
+	src: string;
+	alt?: string;
+}
+
+export interface UmbWithThumbnailModel {
+	thumbnail: UmbThumbnailModel | null;
+}
+
+export interface UmbWithOptionalThumbnailModel {
+	thumbnail?: UmbThumbnailModel | null;
+}
+
+export interface UmbWithDescriptionModel {
+	description: string | null;
+}
+
+export interface UmbWithOptionalDescriptionModel {
+	description?: string | null;
 }

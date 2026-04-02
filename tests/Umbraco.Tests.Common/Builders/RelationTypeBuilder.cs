@@ -115,8 +115,8 @@ public class RelationTypeBuilder
         var key = _key ?? Guid.NewGuid();
         var isBidirectional = _isBidirectional ?? false;
         var isDependency = _isDependency ?? false;
-        var createDate = _createDate ?? DateTime.Now;
-        var updateDate = _updateDate ?? DateTime.Now;
+        var createDate = _createDate ?? DateTime.UtcNow;
+        var updateDate = _updateDate ?? DateTime.UtcNow;
         var deleteDate = _deleteDate;
 
         return new RelationType(name, alias, isBidirectional, parentObjectType, childObjectType, isDependency)

@@ -5,11 +5,10 @@ import { html } from '@umbraco-cms/backoffice/external/lit';
 import './property-editor-ui-block-grid-column-span.element.js';
 
 export default {
-	title: 'Property Editor UIs/Block Grid Column Span',
+	title: 'Extension Type/Property Editor UI/Block/Block Grid Column Span',
 	component: 'umb-property-editor-ui-block-grid-column-span',
 	id: 'umb-property-editor-ui-block-grid-column-span',
 } as Meta;
 
-export const AAAOverview: StoryFn<UmbPropertyEditorUIBlockGridColumnSpanElement> = () =>
+export const Docs: StoryFn<UmbPropertyEditorUIBlockGridColumnSpanElement> = () =>
 	html` <umb-property-editor-ui-block-grid-column-span></umb-property-editor-ui-block-grid-column-span>`;
-AAAOverview.storyName = 'Overview';

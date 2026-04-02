@@ -13,7 +13,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		forEntityTypes: [UMB_DICTIONARY_ENTITY_TYPE, UMB_DICTIONARY_ROOT_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-add',
-			label: '#general_create',
+			label: '#actions_createFor',
 			additionalOptions: true,
 		},
 	},

@@ -1,4 +1,5 @@
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -9,8 +10,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories;
 internal sealed class ContentBaseFactory
 {
     /// <summary>
-    ///     Builds an IContent item from a dto and content type.
+    ///     Creates a <see cref="Content"/> entity from the specified <see cref="DocumentDto"/> and <see cref="IContentType"/>.
     /// </summary>
+    /// <param name="dto">The <see cref="DocumentDto"/> containing the data used to construct the content entity.</param>
+    /// <param name="contentType">The <see cref="IContentType"/> that defines the structure and properties of the content.</param>
+    /// <returns>A <see cref="Content"/> instance populated with data from the provided <paramref name="dto"/> and <paramref name="contentType"/>.</returns>
     public static Content BuildEntity(DocumentDto dto, IContentType? contentType)
     {
         ContentDto contentDto = dto.ContentDto;
@@ -40,10 +44,8 @@ internal sealed class ContentBaseFactory
             content.CreatorId = nodeDto.UserId ?? Constants.Security.UnknownUserId;
             content.WriterId = contentVersionDto.UserId ?? Constants.Security.UnknownUserId;
 
-            // Dates stored in the database are local server time, but for SQL Server, will be considered
-            // as DateTime.Kind = Utc. Fix this so we are consistent when later mapping to DataTimeOffset.
-            content.CreateDate = DateTime.SpecifyKind(nodeDto.CreateDate, DateTimeKind.Local);
-            content.UpdateDate = DateTime.SpecifyKind(contentVersionDto.VersionDate, DateTimeKind.Local);
+            content.CreateDate = nodeDto.CreateDate.EnsureUtc();
+            content.UpdateDate = contentVersionDto.VersionDate.EnsureUtc();
 
             content.Published = dto.Published;
             content.Edited = dto.Edited;
@@ -55,7 +57,7 @@ internal sealed class ContentBaseFactory
                 content.PublishedVersionId = publishedVersionDto.Id;
                 if (dto.Published)
                 {
-                    content.PublishDate = DateTime.SpecifyKind(publishedVersionDto.ContentVersionDto.VersionDate, DateTimeKind.Local);
+                    content.PublishDate = publishedVersionDto.ContentVersionDto.VersionDate.EnsureUtc();
                     content.PublishName = publishedVersionDto.ContentVersionDto.Text;
                     content.PublisherId = publishedVersionDto.ContentVersionDto.UserId;
                 }
@@ -74,8 +76,11 @@ internal sealed class ContentBaseFactory
     }
 
     /// <summary>
-    ///     Builds a Media item from a dto and content type.
+    ///     Constructs a Media item entity from the provided data transfer object (DTO) and media type.
     /// </summary>
+    /// <param name="dto">The <see cref="ContentDto"/> containing the data for the media item.</param>
+    /// <param name="contentType">The <see cref="IMediaType"/> representing the type of the media item, or <c>null</c> if not specified.</param>
+    /// <returns>A <see cref="Media"/> entity built from the specified DTO and media type.</returns>
     public static Core.Models.Media BuildEntity(ContentDto dto, IMediaType? contentType)
     {
         NodeDto nodeDto = dto.NodeDto;
@@ -100,8 +105,8 @@ internal sealed class ContentBaseFactory
 
             content.CreatorId = nodeDto.UserId ?? Constants.Security.UnknownUserId;
             content.WriterId = contentVersionDto.UserId ?? Constants.Security.UnknownUserId;
-            content.CreateDate = DateTime.SpecifyKind(nodeDto.CreateDate, DateTimeKind.Local);
-            content.UpdateDate = DateTime.SpecifyKind(contentVersionDto.VersionDate, DateTimeKind.Local);
+            content.CreateDate = nodeDto.CreateDate.EnsureUtc();
+            content.UpdateDate = contentVersionDto.VersionDate.EnsureUtc();
 
             // reset dirty initial properties (U4-1946)
             content.ResetDirtyProperties(false);
@@ -114,8 +119,11 @@ internal sealed class ContentBaseFactory
     }
 
     /// <summary>
-    ///     Builds a Member item from a dto and member type.
+    /// Builds a <see cref="Member"/> instance from the specified data transfer object and member type.
     /// </summary>
+    /// <param name="dto">The <see cref="MemberDto"/> containing the member data.</param>
+    /// <param name="contentType">The <see cref="IMemberType"/> describing the member type, or <c>null</c> if not specified.</param>
+    /// <returns>The constructed <see cref="Member"/> instance.</returns>
     public static Member BuildEntity(MemberDto dto, IMemberType? contentType)
     {
         NodeDto nodeDto = dto.ContentDto.NodeDto;
@@ -130,7 +138,7 @@ internal sealed class ContentBaseFactory
             content.Id = dto.NodeId;
             content.SecurityStamp = dto.SecurityStampToken;
             content.EmailConfirmedDate = dto.EmailConfirmedDate.HasValue
-                ? DateTime.SpecifyKind(dto.EmailConfirmedDate.Value, DateTimeKind.Local)
+                ? dto.EmailConfirmedDate.Value.EnsureUtc()
                 : null;
             content.PasswordConfiguration = dto.PasswordConfig;
             content.Key = nodeDto.UniqueId;
@@ -145,19 +153,19 @@ internal sealed class ContentBaseFactory
 
             content.CreatorId = nodeDto.UserId ?? Constants.Security.UnknownUserId;
             content.WriterId = contentVersionDto.UserId ?? Constants.Security.UnknownUserId;
-            content.CreateDate = DateTime.SpecifyKind(nodeDto.CreateDate, DateTimeKind.Local);
-            content.UpdateDate = DateTime.SpecifyKind(contentVersionDto.VersionDate, DateTimeKind.Local);
+            content.CreateDate = nodeDto.CreateDate.EnsureUtc();
+            content.UpdateDate = contentVersionDto.VersionDate.EnsureUtc();
             content.FailedPasswordAttempts = dto.FailedPasswordAttempts ?? default;
             content.IsLockedOut = dto.IsLockedOut;
             content.IsApproved = dto.IsApproved;
             content.LastLockoutDate = dto.LastLockoutDate.HasValue
-                ? DateTime.SpecifyKind(dto.LastLockoutDate.Value, DateTimeKind.Local)
+                ? dto.LastLockoutDate.Value.EnsureUtc()
                 : null;
             content.LastLoginDate = dto.LastLoginDate.HasValue
-                ? DateTime.SpecifyKind(dto.LastLoginDate.Value, DateTimeKind.Local)
+                ? dto.LastLoginDate.Value.EnsureUtc()
                 : null;
             content.LastPasswordChangeDate = dto.LastPasswordChangeDate.HasValue
-                ? DateTime.SpecifyKind(dto.LastPasswordChangeDate.Value, DateTimeKind.Local)
+                ? dto.LastPasswordChangeDate.Value.EnsureUtc()
                 : null;
 
             // reset dirty initial properties (U4-1946)
@@ -171,8 +179,11 @@ internal sealed class ContentBaseFactory
     }
 
     /// <summary>
-    ///     Builds a dto from an IContent item.
+    /// Creates a <see cref="DocumentDto"/> instance from the specified <see cref="IContent"/> entity and object type identifier.
     /// </summary>
+    /// <param name="entity">The content entity to convert into a DTO.</param>
+    /// <param name="objectType">The unique identifier representing the object type.</param>
+    /// <returns>A <see cref="DocumentDto"/> representing the specified content entity.</returns>
     public static DocumentDto BuildDto(IContent entity, Guid objectType)
     {
         ContentDto contentDto = BuildContentDto(entity, objectType);
@@ -188,6 +199,13 @@ internal sealed class ContentBaseFactory
         return dto;
     }
 
+    /// <summary>
+    /// Creates a collection of tuples pairing each <see cref="ContentSchedule"/> in the provided schedule with its corresponding <see cref="ContentScheduleDto"/>.
+    /// </summary>
+    /// <param name="entity">The content entity associated with the schedules.</param>
+    /// <param name="contentSchedule">The collection of content schedules to convert.</param>
+    /// <param name="languageRepository">The repository used to resolve language identifiers for each schedule.</param>
+    /// <returns>An enumerable of tuples, each containing a <see cref="ContentSchedule"/> and its corresponding <see cref="ContentScheduleDto"/>.</returns>
     public static IEnumerable<(ContentSchedule Model, ContentScheduleDto Dto)> BuildScheduleDto(
         IContent entity,
         ContentScheduleCollection contentSchedule,
@@ -197,15 +215,18 @@ internal sealed class ContentBaseFactory
                 new ContentScheduleDto
                 {
                     Action = x.Action.ToString(),
-                    Date = DateTime.SpecifyKind(x.Date, DateTimeKind.Local),
+                    Date = x.Date,
                     NodeId = entity.Id,
                     LanguageId = languageRepository.GetIdByIsoCode(x.Culture, false),
                     Id = x.Id,
                 }));
 
     /// <summary>
-    ///     Builds a dto from an IMedia item.
+    ///     Creates a <see cref="MediaDto"/> instance from the specified <see cref="IMedia"/> entity.
     /// </summary>
+    /// <param name="mediaUrlGenerators">A collection of media URL generators used to resolve media URLs.</param>
+    /// <param name="entity">The <see cref="IMedia"/> entity to convert to a DTO.</param>
+    /// <returns>A <see cref="MediaDto"/> representing the provided media entity.</returns>
     public static MediaDto BuildDto(MediaUrlGeneratorCollection mediaUrlGenerators, IMedia entity)
     {
         ContentDto contentDto = BuildContentDto(entity, Constants.ObjectTypes.Media);
@@ -221,8 +242,10 @@ internal sealed class ContentBaseFactory
     }
 
     /// <summary>
-    ///     Builds a dto from an IMember item.
+    ///     Builds a <see cref="MemberDto"/> from the specified <see cref="IMember"/> entity.
     /// </summary>
+    /// <param name="entity">The <see cref="IMember"/> entity to build the DTO from.</param>
+    /// <returns>A <see cref="MemberDto"/> representing the given <paramref name="entity"/>.</returns>
     public static MemberDto BuildDto(IMember entity)
     {
         ContentDto contentDto = BuildContentDto(entity, Constants.ObjectTypes.Member);
@@ -272,7 +295,7 @@ internal sealed class ContentBaseFactory
             UserId = entity.CreatorId,
             Text = entity.Name,
             NodeObjectType = objectType,
-            CreateDate = DateTime.SpecifyKind(entity.CreateDate, DateTimeKind.Local),
+            CreateDate = entity.CreateDate,
         };
 
         return dto;
@@ -286,7 +309,7 @@ internal sealed class ContentBaseFactory
         {
             Id = entity.VersionId,
             NodeId = entity.Id,
-            VersionDate = DateTime.SpecifyKind(entity.UpdateDate, DateTimeKind.Local),
+            VersionDate = entity.UpdateDate,
             UserId = entity.WriterId,
             Current = true, // always building the current one
             Text = entity.Name,

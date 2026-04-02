@@ -1,7 +1,10 @@
-﻿using System.Runtime.InteropServices;
+using System.Runtime.InteropServices;
 
 namespace Umbraco.Cms.Core.Extensions;
 
+/// <summary>
+/// Provides extension methods for ensuring consistent line endings in strings.
+/// </summary>
 public static class LineEndingsExtensions
 {
     /// <summary>

@@ -1,14 +1,19 @@
-import type { ManifestTiptapToolbarExtensionButtonKind } from '../../extensions/index.js';
+import type { Editor } from '../../externals.js';
+import type {
+	ManifestTiptapToolbarExtension,
+	ManifestTiptapToolbarExtensionButtonKind,
+} from '../../extensions/tiptap-toolbar.extension.js';
 import type { UmbTiptapToolbarElementApi } from '../../extensions/types.js';
-import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';
 import { customElement, html, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-tiptap-toolbar-button')
-export class UmbTiptapToolbarButtonElement extends UmbLitElement {
+export class UmbTiptapToolbarButtonElement<
+	ManifestType extends ManifestTiptapToolbarExtension = ManifestTiptapToolbarExtensionButtonKind,
+> extends UmbLitElement {
 	public api?: UmbTiptapToolbarElementApi;
 	public editor?: Editor;
-	public manifest?: ManifestTiptapToolbarExtensionButtonKind;
+	public manifest?: ManifestType;
 
 	@state()
 	protected isActive = false;
@@ -45,7 +50,7 @@ export class UmbTiptapToolbarButtonElement extends UmbLitElement {
 				look=${this.isActive ? 'outline' : 'default'}
 				label=${label}
 				title=${label}
-				?disabled=${this.api && this.editor && this.api.isDisabled(this.editor)}
+				?disabled=${this.api?.isDisabled(this.editor)}
 				@click=${() => this.api?.execute(this.editor)}>
 				${when(
 					this.manifest?.meta.icon,

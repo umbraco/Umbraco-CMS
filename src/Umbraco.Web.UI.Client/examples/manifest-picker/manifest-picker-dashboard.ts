@@ -5,10 +5,8 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
 
-// eslint-disable-next-line local-rules/enforce-umb-prefix-on-element-name
 @customElement('example-manifest-picker-dashboard')
-// eslint-disable-next-line local-rules/enforce-element-suffix-on-element-class-name, local-rules/umb-class-prefix
-export class ExampleManifestPickerDashboard extends UmbLitElement {
+export class ExampleManifestPickerDashboardElement extends UmbLitElement {
 	#options: Array<Option> = [];
 
 	@state()
@@ -90,10 +88,10 @@ export class ExampleManifestPickerDashboard extends UmbLitElement {
 	];
 }
 
-export default ExampleManifestPickerDashboard;
+export default ExampleManifestPickerDashboardElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'example-manifest-picker-dashboard': ExampleManifestPickerDashboard;
+		'example-manifest-picker-dashboard': ExampleManifestPickerDashboardElement;
 	}
 }

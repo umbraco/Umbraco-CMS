@@ -114,7 +114,7 @@ public abstract class BaseTestDatabase
                 action();
                 return;
             }
-            catch (DbException ex)
+            catch (DbException)
             {
                 // Console.Error.WriteLine($"SqlException occured, but we try again {i+1}/{maxIterations}.\n{e}");
                 // This can occur when there's a transaction deadlock which means (i think) that the database is still in use and hasn't been closed properly yet

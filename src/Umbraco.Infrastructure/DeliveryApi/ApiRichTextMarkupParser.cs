@@ -1,7 +1,8 @@
-﻿using HtmlAgilityPack;
+using HtmlAgilityPack;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Extensions;
 
@@ -13,6 +14,14 @@ internal sealed class ApiRichTextMarkupParser : ApiRichTextParserBase, IApiRichT
     private readonly IPublishedMediaCache _publishedMediaCache;
     private readonly ILogger<ApiRichTextMarkupParser> _logger;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.DeliveryApi.ApiRichTextMarkupParser"/> class.
+    /// </summary>
+    /// <param name="apiContentRouteBuilder">The <see cref="IApiContentRouteBuilder"/> used to build API content routes.</param>
+    /// <param name="mediaUrlProvider">The <see cref="IApiMediaUrlProvider"/> used to provide media URLs for the API.</param>
+    /// <param name="publishedContentCache">The <see cref="IPublishedContentCache"/> for accessing published content.</param>
+    /// <param name="publishedMediaCache">The <see cref="IPublishedMediaCache"/> for accessing published media.</param>
+    /// <param name="logger">The <see cref="ILogger{ApiRichTextMarkupParser}"/> instance for logging.</param>
     public ApiRichTextMarkupParser(
         IApiContentRouteBuilder apiContentRouteBuilder,
         IApiMediaUrlProvider mediaUrlProvider,
@@ -26,6 +35,11 @@ internal sealed class ApiRichTextMarkupParser : ApiRichTextParserBase, IApiRichT
         _logger = logger;
     }
 
+    /// <summary>
+    /// Parses the specified HTML rich text, replacing local links and images with appropriate markup and cleaning up block elements.
+    /// </summary>
+    /// <param name="html">The HTML string containing the rich text to parse and transform.</param>
+    /// <returns>The processed HTML string with local links and images replaced, and block elements cleaned up.</returns>
     public string Parse(string html)
     {
         try
@@ -58,17 +72,23 @@ internal sealed class ApiRichTextMarkupParser : ApiRichTextParserBase, IApiRichT
                     mediaCache,
                 link.GetAttributeValue("href", string.Empty),
                 link.GetAttributeValue("type", "unknown"),
-                route =>
+                (route, content) =>
                 {
-                    link.SetAttributeValue("href", route.Path);
+                    link.SetAttributeValue("href", $"{route.Path}{route.QueryString}");
+                    link.SetAttributeValue("data-destination-id", content.Key.ToString("D"));
+                    link.SetAttributeValue("data-destination-type", content.ContentType.Alias);
                     link.SetAttributeValue("data-start-item-path", route.StartItem.Path);
                     link.SetAttributeValue("data-start-item-id", route.StartItem.Id.ToString("D"));
                     link.Attributes["type"]?.Remove();
+                    link.SetAttributeValue("data-link-type", nameof(LinkType.Content));
                 },
-                url =>
+                (url, media) =>
                 {
                     link.SetAttributeValue("href", url);
+                    link.SetAttributeValue("data-destination-id", media.Key.ToString("D"));
+                    link.SetAttributeValue("data-destination-type", media.ContentType.Alias);
                     link.Attributes["type"]?.Remove();
+                    link.SetAttributeValue("data-link-type", nameof(LinkType.Media));
                 },
                 () =>
                 {

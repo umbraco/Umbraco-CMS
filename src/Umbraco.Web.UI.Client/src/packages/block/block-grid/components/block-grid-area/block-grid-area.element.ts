@@ -7,7 +7,7 @@ import { customElement } from '@umbraco-cms/backoffice/external/lit';
  * This element is used to render a single block grid area.
  */
 @customElement('umb-block-grid-area')
-export class UmbBlockGridAreasContainerElement extends UmbBlockGridEntriesElement {
+export class UmbBlockGridAreaElement extends UmbBlockGridEntriesElement {
 	//
 	constructor() {
 		super();
@@ -30,10 +30,10 @@ export class UmbBlockGridAreasContainerElement extends UmbBlockGridEntriesElemen
 	}
 }
 
-export default UmbBlockGridAreasContainerElement;
+export default UmbBlockGridAreaElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-block-grid-area': UmbBlockGridAreasContainerElement;
+		'umb-block-grid-area': UmbBlockGridAreaElement;
 	}
 }

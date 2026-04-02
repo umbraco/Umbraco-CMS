@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
@@ -12,9 +12,16 @@ namespace Umbraco.Cms.Web.Common.Security;
 /// </summary>
 public class MemberSecurityStampValidator : SecurityStampValidator<MemberIdentityUser>
 {
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="MemberSecurityStampValidator" /> class.
+    /// </summary>
+    /// <param name="options">The options.</param>
+    /// <param name="signInManager">The sign in manager.</param>
+    /// <param name="logger">The logger factory.</param>
     public MemberSecurityStampValidator(
         IOptions<MemberSecurityStampValidatorOptions> options,
-        MemberSignInManager signInManager, ILoggerFactory logger)
+        MemberSignInManager signInManager,
+        ILoggerFactory logger)
         : base(options, signInManager, logger)
     {
     }

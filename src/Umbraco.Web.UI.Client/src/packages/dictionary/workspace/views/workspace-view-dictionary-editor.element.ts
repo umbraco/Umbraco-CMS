@@ -1,7 +1,6 @@
 import { UMB_DICTIONARY_WORKSPACE_CONTEXT } from '../dictionary-workspace.context-token.js';
 import type { UmbDictionaryDetailModel } from '../../types.js';
 import type { UUITextareaElement } from '@umbraco-cms/backoffice/external/uui';
-import { UUITextareaEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbLanguageCollectionRepository, type UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
@@ -72,13 +71,11 @@ export class UmbWorkspaceViewDictionaryEditorElement extends UmbLitElement {
 	}
 
 	#onTextareaChange(e: Event) {
-		if (e instanceof UUITextareaEvent) {
-			const target = e.composedPath()[0] as UUITextareaElement;
-			const translation = (target.value as string).toString();
-			const isoCode = target.getAttribute('name')!;
+		const target = e.composedPath()[0] as UUITextareaElement;
+		const translation = (target.value as string).toString();
+		const isoCode = target.getAttribute('name')!;
 
-			this.#workspaceContext?.setPropertyValue(isoCode, translation);
-		}
+		this.#workspaceContext?.setPropertyValue(isoCode, translation);
 	}
 
 	override render() {
@@ -104,7 +101,7 @@ export class UmbWorkspaceViewDictionaryEditorElement extends UmbLitElement {
 				slot="editor"
 				name=${language.unique}
 				label="translation"
-				@change=${this.#onTextareaChange}
+				@input=${this.#onTextareaChange}
 				.value=${translation?.translation ?? ''}
 				?readonly=${this.#isReadOnly(language.unique)}></uui-textarea>
 		</umb-property-layout>`;

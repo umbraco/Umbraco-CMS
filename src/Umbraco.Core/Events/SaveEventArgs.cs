@@ -1,5 +1,9 @@
 namespace Umbraco.Cms.Core.Events;
 
+/// <summary>
+///     Represents event data for save operations.
+/// </summary>
+/// <typeparam name="TEntity">The type of the entity being saved.</typeparam>
 public class SaveEventArgs<TEntity> : CancellableEnumerableObjectEventArgs<TEntity>
 {
     /// <summary>

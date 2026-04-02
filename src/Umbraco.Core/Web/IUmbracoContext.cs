@@ -3,6 +3,10 @@ using Umbraco.Cms.Core.Routing;
 
 namespace Umbraco.Cms.Core.Web;
 
+/// <summary>
+///     Represents the Umbraco context for a request, providing access to published content,
+///     media, domains, and request-specific information.
+/// </summary>
 public interface IUmbracoContext : IDisposable
 {
     /// <summary>

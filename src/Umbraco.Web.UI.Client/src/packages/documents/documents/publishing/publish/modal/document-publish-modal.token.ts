@@ -3,7 +3,6 @@ import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export const UMB_DOCUMENT_PUBLISH_MODAL_ALIAS = 'Umb.Modal.DocumentPublish';
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface UmbDocumentPublishModalData extends UmbDocumentVariantPickerData {
 	headline?: string;
 	confirmLabel?: string;

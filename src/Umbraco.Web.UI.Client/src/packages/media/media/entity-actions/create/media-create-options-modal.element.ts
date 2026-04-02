@@ -63,20 +63,18 @@ export class UmbMediaCreateOptionsModalElement extends UmbModalBaseElement<
 
 	override render() {
 		return html`
-			<umb-body-layout headline=${this._headline ?? ''}>
-				<uui-box>
-					${when(
-						this._allowedMediaTypes.length === 0,
-						() => this.#renderNotAllowed(),
-						() => this.#renderAllowedMediaTypes(),
-					)}
-				</uui-box>
+			<uui-dialog-layout headline=${this._headline ?? ''}>
+				${when(
+					this._allowedMediaTypes.length === 0,
+					() => this.#renderNotAllowed(),
+					() => this.#renderAllowedMediaTypes(),
+				)}
 				<uui-button
 					slot="actions"
 					id="cancel"
 					label=${this.localize.term('general_cancel')}
 					@click="${this._rejectModal}"></uui-button>
-			</umb-body-layout>
+			</uui-dialog-layout>
 		`;
 	}
 
@@ -102,7 +100,7 @@ export class UmbMediaCreateOptionsModalElement extends UmbModalBaseElement<
 			(mediaType) => mediaType.unique,
 			(mediaType) => html`
 				<uui-ref-node-document-type
-					.name=${this.localize.string(mediaType.name)}
+					.name=${this.localize.string(mediaType.name) + '...'}
 					.alias=${this.localize.string(mediaType.description ?? '')}
 					select-only
 					selectable

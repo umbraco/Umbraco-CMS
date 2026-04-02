@@ -5,8 +5,7 @@ import { customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbExtensionElementAndApiSlotElementBase } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
-const elementName = 'umb-collection';
-@customElement(elementName)
+@customElement('umb-collection')
 export class UmbCollectionElement<
 	ConfigType extends UmbCollectionConfiguration = UmbCollectionConfiguration,
 	FilterType extends UmbCollectionFilterModel = UmbCollectionFilterModel,
@@ -58,10 +57,17 @@ export class UmbCollectionElement<
 		// @ts-ignore
 		this._api.setFilter(this.#filter);
 	}
+
+	getSelection() {
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
+		// TODO: make base interface for a collection menu element
+		return this._element?.getSelection?.() ?? [];
+	}
 }
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbCollectionElement;
+		'umb-collection': UmbCollectionElement;
 	}
 }

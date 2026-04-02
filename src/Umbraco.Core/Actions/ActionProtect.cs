@@ -21,12 +21,6 @@ public class ActionProtect : IAction
     public string Alias => ActionAlias;
 
     /// <inheritdoc />
-    public string Category => Constants.Conventions.PermissionCategories.AdministrationCategory;
-
-    /// <inheritdoc />
-    public string Icon => "icon-lock";
-
-    /// <inheritdoc />
     public bool ShowInNotifier => true;
 
     /// <inheritdoc />

@@ -1,4 +1,5 @@
-﻿using System.Text;
+using System.Text;
+using System.Text.Json;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.IO;
@@ -16,6 +17,13 @@ internal class PackageManifestReader : IPackageManifestReader
     private readonly IJsonSerializer _jsonSerializer;
     private readonly ILogger<PackageManifestReader> _logger;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Manifest.PackageManifestReader"/> class.
+    /// </summary>
+    /// <param name="appPluginsPath">The absolute or relative path to the application's plugins directory.</param>
+    /// <param name="packageManifestFileProviderFactory">A factory responsible for creating file providers to access package manifest files.</param>
+    /// <param name="jsonSerializer">The JSON serializer used to deserialize manifest files.</param>
+    /// <param name="logger">The logger used for logging operations and errors related to package manifest reading.</param>
     public PackageManifestReader(
         string appPluginsPath,
         IPackageManifestFileProviderFactory packageManifestFileProviderFactory,
@@ -28,6 +36,13 @@ internal class PackageManifestReader : IPackageManifestReader
         _logger = logger;
     }
 
+    /// <summary>
+    /// Asynchronously reads all package manifests from the configured file provider and returns a collection of <see cref="Umbraco.Cms.Infrastructure.Manifest.PackageManifest"/> instances.
+    /// </summary>
+    /// <returns>
+    /// A task that represents the asynchronous operation. The task result contains an enumerable of <see cref="Umbraco.Cms.Infrastructure.Manifest.PackageManifest"/> objects.
+    /// </returns>
+    /// <exception cref="System.ArgumentNullException">Thrown if the file provider cannot be created.</exception>
     public async Task<IEnumerable<PackageManifest>> ReadPackageManifestsAsync()
     {
         IFileProvider? fileProvider = _packageManifestFileProviderFactory.Create();
@@ -92,10 +107,15 @@ internal class PackageManifestReader : IPackageManifestReader
                     packageManifests.Add(packageManifest);
                 }
             }
+            catch (JsonException ex)
+            {
+                throw new InvalidOperationException(
+                    $"The package manifest file {fileInfo.PhysicalPath} could not be parsed as it does not contain valid JSON. Please see the inner exception for details.", ex);
+            }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Unable to load package manifest file: {FileName}", fileInfo.Name);
-                throw;
+                throw new InvalidOperationException(
+                    $"The package manifest file {fileInfo.PhysicalPath} could not be parsed due to an unexpected error. Please see the inner exception for details.", ex);
             }
         }
 

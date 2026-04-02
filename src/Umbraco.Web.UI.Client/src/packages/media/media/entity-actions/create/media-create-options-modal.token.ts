@@ -16,7 +16,6 @@ export const UMB_MEDIA_CREATE_OPTIONS_MODAL = new UmbModalToken<
 	UmbMediaCreateOptionsModalValue
 >('Umb.Modal.Media.CreateOptions', {
 	modal: {
-		type: 'sidebar',
-		size: 'small',
+		type: 'dialog',
 	},
 });

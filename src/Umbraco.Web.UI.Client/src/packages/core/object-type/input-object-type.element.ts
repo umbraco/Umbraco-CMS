@@ -7,14 +7,14 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 @customElement('umb-input-object-type')
 export class UmbInputObjectTypeElement extends UUIFormControlMixin(UmbLitElement, '') {
 	@query('uui-select')
-	private select!: UUISelectElement;
+	private _select!: UUISelectElement;
 
 	@property()
 	public override set value(value: UUISelectElement['value']) {
-		this.select.value = value;
+		this._select.value = value;
 	}
 	public override get value(): UUISelectElement['value'] {
-		return this.select.value;
+		return this._select.value;
 	}
 
 	@state()

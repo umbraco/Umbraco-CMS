@@ -1,6 +1,7 @@
 import type { Observable, Subscription } from '@umbraco-cms/backoffice/external/rxjs';
 export type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export type ObserverCallback<T> = (value: T) => void;
 
 export class UmbObserver<T> {

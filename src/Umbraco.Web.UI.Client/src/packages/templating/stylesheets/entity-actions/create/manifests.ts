@@ -35,6 +35,7 @@ const entityCreateOptionActions: Array<UmbExtensionManifest> = [
 		meta: {
 			icon: 'icon-palette',
 			label: '#create_newStyleSheetFile',
+			additionalOptions: true,
 		},
 	},
 	{
@@ -46,7 +47,7 @@ const entityCreateOptionActions: Array<UmbExtensionManifest> = [
 		meta: {
 			icon: 'icon-folder',
 			label: '#create_folder',
-			description: '#create_folderDescription',
+			additionalOptions: true,
 			folderRepositoryAlias: UMB_STYLESHEET_FOLDER_REPOSITORY_ALIAS,
 		},
 	},

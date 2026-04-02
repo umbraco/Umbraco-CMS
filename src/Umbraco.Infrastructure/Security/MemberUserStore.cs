@@ -35,8 +35,7 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
     /// <param name="describer">The error describer</param>
     /// <param name="externalLoginService">The external login service</param>
     /// <param name="twoFactorLoginService">The two factor login service</param>
-    /// <param name="memberCache"></param>
-    [ActivatorUtilitiesConstructor]
+    /// <param name="memberCache">The published member cache for resolving member content.</param>
     public MemberUserStore(
         IMemberService memberService,
         IUmbracoMapper mapper,
@@ -245,7 +244,7 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
 
     private static bool UpdatingOnlyLoginProperties(IReadOnlyList<string> propertiesUpdated)
     {
-        string[] loginPropertyUpdates = [nameof(MemberIdentityUser.LastLoginDateUtc), nameof(MemberIdentityUser.SecurityStamp)];
+        string[] loginPropertyUpdates = [nameof(MemberIdentityUser.LastLoginDate), nameof(MemberIdentityUser.SecurityStamp)];
         return (propertiesUpdated.Count == 2 && propertiesUpdated.ContainsAll(loginPropertyUpdates)) ||
                (propertiesUpdated.Count == 1 && propertiesUpdated.ContainsAny(loginPropertyUpdates));
     }
@@ -297,15 +296,22 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
         return Task.FromResult<MemberIdentityUser?>(result);
     }
 
+    /// <summary>
+    /// Retrieves the published member content associated with the specified <see cref="MemberIdentityUser"/>.
+    /// </summary>
+    /// <param name="user">The member identity user whose published member content is to be retrieved. If <c>null</c>, the method returns <c>null</c>.</param>
+    /// <returns>
+    /// The <see cref="IPublishedContent"/> representing the published member content if found; otherwise, <c>null</c>.
+    /// </returns>
     public IPublishedContent? GetPublishedMember(MemberIdentityUser? user)
     {
-        if (user == null)
+        if (user is null)
         {
             return null;
         }
 
         IMember? member = _memberService.GetById(user.Key);
-        if (member == null)
+        if (member is null)
         {
             return null;
         }
@@ -388,7 +394,9 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
     }
 
     /// <inheritdoc />
-    public override Task AddLoginAsync(MemberIdentityUser user, UserLoginInfo login,
+    public override Task AddLoginAsync(
+        MemberIdentityUser user,
+        UserLoginInfo login,
         CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -429,7 +437,10 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
     }
 
     /// <inheritdoc />
-    public override Task RemoveLoginAsync(MemberIdentityUser user, string loginProvider, string providerKey,
+    public override Task RemoveLoginAsync(
+        MemberIdentityUser user,
+        string loginProvider,
+        string providerKey,
         CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -476,11 +487,14 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
     }
 
     /// <summary>
-    ///     Gets a list of role names the specified user belongs to.
+    ///     Gets a list of role names that the specified user belongs to.
     /// </summary>
     /// <remarks>
-    ///     This lazy loads the roles for the member
+    ///     This method lazy loads the roles for the member.
     /// </remarks>
+    /// <param name="user">The user whose roles are to be retrieved.</param>
+    /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the list of role names the user belongs to.</returns>
     public override Task<IList<string>> GetRolesAsync(
         MemberIdentityUser user,
         CancellationToken cancellationToken = default)
@@ -490,9 +504,15 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
     }
 
     /// <summary>
-    ///     Returns true if a user is in the role
+    ///     Determines whether the specified user is a member of the given role.
     /// </summary>
-    public override Task<bool> IsInRoleAsync(MemberIdentityUser user, string roleName,
+    /// <param name="user">The user to check.</param>
+    /// <param name="roleName">The name of the role to check.</param>
+    /// <param name="cancellationToken">A cancellation token to observe while waiting for the task to complete.</param>
+    /// <returns>True if the user is in the specified role; otherwise, false.</returns>
+    public override Task<bool> IsInRoleAsync(
+        MemberIdentityUser user,
+        string roleName,
         CancellationToken cancellationToken = default)
     {
         EnsureRoles(user);
@@ -588,8 +608,11 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
     }
 
     /// <summary>
-    ///     Lists all users of a given role.
+    ///     Asynchronously retrieves all users assigned to the specified role as <see cref="MemberIdentityUser"/> objects.
     /// </summary>
+    /// <param name="roleName">The name of the role to list users for.</param>
+    /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains a list of <see cref="MemberIdentityUser"/> instances in the specified role.</returns>
     public override Task<IList<MemberIdentityUser>> GetUsersInRoleAsync(
         string roleName,
         CancellationToken cancellationToken = default)
@@ -659,7 +682,10 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
     ///     tracking ORMs like EFCore.
     /// </remarks>
     /// <inheritdoc />
-    public override Task<string?> GetTokenAsync(MemberIdentityUser user, string loginProvider, string name,
+    public override Task<string?> GetTokenAsync(
+        MemberIdentityUser user,
+        string loginProvider,
+        string name,
         CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -698,7 +724,9 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
     }
 
     /// <inheritdoc />
-    protected override async Task<IdentityUserRole<string>?> FindUserRoleAsync(string userId, string roleId,
+    protected override async Task<IdentityUserRole<string>?> FindUserRoleAsync(
+        string userId,
+        string roleId,
         CancellationToken cancellationToken)
     {
         MemberIdentityUser? user = await FindUserAsync(userId, cancellationToken);
@@ -728,27 +756,23 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
         updateRoles = false;
 
         // don't assign anything if nothing has changed as this will trigger the track changes of the model
-        if (identityUser.IsPropertyDirty(nameof(MemberIdentityUser.LastLoginDateUtc))
-            || (member.LastLoginDate != default && identityUser.LastLoginDateUtc.HasValue == false)
-            || (identityUser.LastLoginDateUtc.HasValue &&
-                member.LastLoginDate?.ToUniversalTime() != identityUser.LastLoginDateUtc.Value))
+        if (identityUser.IsPropertyDirty(nameof(MemberIdentityUser.LastLoginDate))
+            || (member.LastLoginDate != default && identityUser.LastLoginDate.HasValue == false)
+            || (identityUser.LastLoginDate.HasValue &&
+                member.LastLoginDate?.ToUniversalTime() != identityUser.LastLoginDate.Value))
         {
-            updatedProperties.Add(nameof(MemberIdentityUser.LastLoginDateUtc));
+            updatedProperties.Add(nameof(MemberIdentityUser.LastLoginDate));
 
-            // if the LastLoginDate is being set to MinValue, don't convert it ToLocalTime
-            DateTime dt = identityUser.LastLoginDateUtc == DateTime.MinValue
-                ? DateTime.MinValue
-                : identityUser.LastLoginDateUtc?.ToLocalTime() ?? DateTime.MinValue;
-            member.LastLoginDate = dt;
+            member.LastLoginDate = identityUser.LastLoginDate;
         }
 
-        if (identityUser.IsPropertyDirty(nameof(MemberIdentityUser.LastPasswordChangeDateUtc))
-            || (member.LastPasswordChangeDate != default && identityUser.LastPasswordChangeDateUtc.HasValue == false)
-            || (identityUser.LastPasswordChangeDateUtc.HasValue && member.LastPasswordChangeDate?.ToUniversalTime() !=
-                identityUser.LastPasswordChangeDateUtc.Value))
+        if (identityUser.IsPropertyDirty(nameof(MemberIdentityUser.LastPasswordChangeDate))
+            || (member.LastPasswordChangeDate != default && identityUser.LastPasswordChangeDate.HasValue == false)
+            || (identityUser.LastPasswordChangeDate.HasValue && member.LastPasswordChangeDate?.ToUniversalTime() !=
+                identityUser.LastPasswordChangeDate.Value))
         {
-            updatedProperties.Add(nameof(MemberIdentityUser.LastPasswordChangeDateUtc));
-            member.LastPasswordChangeDate = identityUser.LastPasswordChangeDateUtc?.ToLocalTime() ?? DateTime.Now;
+            updatedProperties.Add(nameof(MemberIdentityUser.LastPasswordChangeDate));
+            member.LastPasswordChangeDate = identityUser.LastPasswordChangeDate ?? DateTime.UtcNow;
         }
 
         if (identityUser.IsPropertyDirty(nameof(MemberIdentityUser.Comments))
@@ -765,7 +789,7 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
                 identityUser.EmailConfirmed))
         {
             updatedProperties.Add(nameof(MemberIdentityUser.EmailConfirmed));
-            member.EmailConfirmedDate = identityUser.EmailConfirmed ? DateTime.Now : null;
+            member.EmailConfirmedDate = identityUser.EmailConfirmed ? DateTime.UtcNow : null;
         }
 
         if (identityUser.IsPropertyDirty(nameof(MemberIdentityUser.Name))
@@ -797,7 +821,7 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
             if (member.IsLockedOut)
             {
                 // need to set the last lockout date
-                member.LastLockoutDate = DateTime.Now;
+                member.LastLockoutDate = DateTime.UtcNow;
             }
         }
 

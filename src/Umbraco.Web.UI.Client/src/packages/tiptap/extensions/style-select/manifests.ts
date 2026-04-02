@@ -4,6 +4,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		kind: 'styleMenu',
 		alias: 'Umb.Tiptap.Toolbar.StyleSelect',
 		name: 'Style Select Tiptap Extension',
+		forExtensions: ['Umb.Tiptap.Heading', 'Umb.Tiptap.Blockquote', 'Umb.Tiptap.CodeBlock'],
 		items: [
 			{
 				label: 'Headers',

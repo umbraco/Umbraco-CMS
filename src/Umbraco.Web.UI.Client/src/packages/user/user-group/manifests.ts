@@ -6,6 +6,7 @@ import { manifests as modalManifests } from './modals/manifests.js';
 import { manifests as repositoryManifests } from './repository/manifests.js';
 import { manifests as sectionViewManifests } from './workspace/user-group-root/manifests.js';
 import { manifests as workspaceManifests } from './workspace/manifests.js';
+import * as entryPointModule from './entry-point.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	...collectionManifests,
@@ -16,4 +17,10 @@ export const manifests: Array<UmbExtensionManifest> = [
 	...repositoryManifests,
 	...sectionViewManifests,
 	...workspaceManifests,
+	{
+		name: 'User Group Backoffice Entry Point',
+		alias: 'Umb.EntryPoint.UserGroup',
+		type: 'backofficeEntryPoint',
+		js: entryPointModule,
+	},
 ];

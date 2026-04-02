@@ -69,6 +69,13 @@ export class UmbContentTypeWorkspaceEditorHeaderElement extends UmbLitElement {
 			}
 		});
 	}
+	get #iconAlias(): string | undefined {
+		return this._icon?.replace('icon-', '').replace('color-', '')?.split(' ')[0];
+	}
+	get #iconTitle(): string | undefined {
+		const alias = this.#iconAlias;
+		return alias ? this.localize.term('settings_changeIcon') + ': ' + alias : undefined;
+	}
 
 	#onNameAndAliasChange(event: InputEvent & { target: UmbInputWithAliasElement }) {
 		this.#workspaceContext?.setName(event.target.value ?? '');
@@ -82,8 +89,8 @@ export class UmbContentTypeWorkspaceEditorHeaderElement extends UmbLitElement {
 	override render() {
 		return html`
 			<div id="header">
-				<uui-button id="icon" compact label="icon" look="outline" @click=${this._handleIconClick}>
-					<umb-icon name=${ifDefined(this._icon)}></umb-icon>
+				<uui-button id="icon" compact label=${this.#iconTitle ?? 'icon'} look="outline" title=${ifDefined(this.#iconTitle)} @click=${this._handleIconClick}>
+					<umb-icon aria-hidden="true" name=${ifDefined(this._icon)}></umb-icon>
 				</uui-button>
 
 				<div id="editors">
@@ -126,6 +133,7 @@ export class UmbContentTypeWorkspaceEditorHeaderElement extends UmbLitElement {
 				display: flex;
 				flex: 1 1 auto;
 				flex-direction: column;
+				gap: 1px;
 			}
 
 			#name {
@@ -135,7 +143,6 @@ export class UmbContentTypeWorkspaceEditorHeaderElement extends UmbLitElement {
 
 			#description {
 				width: 100%;
-				margin-top: 1px;
 				--uui-input-height: var(--uui-size-8);
 				--uui-input-border-color: transparent;
 			}

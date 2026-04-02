@@ -10,6 +10,9 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events;
 
+/// <summary>
+/// Extended webhook event that fires when media is saved, including full Delivery API media payloads.
+/// </summary>
 // todo: convert to proper extended media event when deliveryApi models are fixed
 [WebhookEvent("Media Saved", Constants.WebhookEvents.Types.Media)]
 public class ExtendedMediaSavedWebhookEvent : WebhookEventContentBase<MediaSavedNotification, IMedia>
@@ -17,6 +20,15 @@ public class ExtendedMediaSavedWebhookEvent : WebhookEventContentBase<MediaSaved
     private readonly IPublishedMediaCache _mediaCache;
     private readonly IApiMediaBuilder _apiMediaBuilder;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ExtendedMediaSavedWebhookEvent"/> class.
+    /// </summary>
+    /// <param name="webhookFiringService">The webhook firing service.</param>
+    /// <param name="webhookService">The webhook service.</param>
+    /// <param name="webhookSettings">The webhook settings.</param>
+    /// <param name="serverRoleAccessor">The server role accessor.</param>
+    /// <param name="mediaCache">The published media cache.</param>
+    /// <param name="apiMediaBuilder">The API media builder.</param>
     public ExtendedMediaSavedWebhookEvent(
         IWebhookFiringService webhookFiringService,
         IWebhookService webhookService,
@@ -34,10 +46,13 @@ public class ExtendedMediaSavedWebhookEvent : WebhookEventContentBase<MediaSaved
         _apiMediaBuilder = apiMediaBuilder;
     }
 
+    /// <inheritdoc />
     public override string Alias => Constants.WebhookEvents.Aliases.MediaSave;
 
+    /// <inheritdoc />
     protected override IEnumerable<IMedia> GetEntitiesFromNotification(MediaSavedNotification notification) => notification.SavedEntities;
 
+    /// <inheritdoc />
     protected override object? ConvertEntityToRequestPayload(IMedia entity)
     {
         IPublishedContent? publishedContent = _mediaCache.GetById(entity.Key);

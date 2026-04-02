@@ -1,3 +1,4 @@
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
@@ -5,6 +6,14 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories;
 
 internal static class ConsentFactory
 {
+    /// <summary>
+    /// Builds a collection of <see cref="IConsent"/> entities from the given collection of <see cref="ConsentDto"/> data transfer objects.
+    /// Consents with the same source, context, and action are grouped together, with additional consents added to the <c>HistoryInternal</c> property of the first entity in each group.
+    /// </summary>
+    /// <param name="dtos">The collection of <see cref="ConsentDto"/> objects to convert.</param>
+    /// <returns>
+    /// A collection of <see cref="IConsent"/> entities, each representing the latest consent for a unique combination of source, context, and action, with their history populated as applicable.
+    /// </returns>
     public static IEnumerable<IConsent> BuildEntities(IEnumerable<ConsentDto> dtos)
     {
         var ix = new Dictionary<string, Consent>();
@@ -18,7 +27,7 @@ internal static class ConsentFactory
             {
                 Id = dto.Id,
                 Current = dto.Current,
-                CreateDate = dto.CreateDate,
+                CreateDate = dto.CreateDate.EnsureUtc(),
                 Source = dto.Source,
                 Context = dto.Context,
                 Action = dto.Action,
@@ -49,6 +58,11 @@ internal static class ConsentFactory
         return output;
     }
 
+    /// <summary>
+    /// Creates a <see cref="ConsentDto"/> from the specified <see cref="IConsent"/> entity.
+    /// </summary>
+    /// <param name="entity">The <see cref="IConsent"/> entity to convert.</param>
+    /// <returns>A <see cref="ConsentDto"/> representing the provided consent entity.</returns>
     public static ConsentDto BuildDto(IConsent entity) =>
         new ConsentDto
         {

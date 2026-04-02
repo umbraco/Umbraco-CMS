@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Nodes;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
@@ -22,7 +23,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     Constants.PropertyEditors.Aliases.MultipleTextstring,
     ValueType = ValueTypes.Text,
     ValueEditorIsReusable = true)]
-public class MultipleTextStringPropertyEditor : DataEditor
+public class MultipleTextStringPropertyEditor : DataEditor, IValueSchemaProvider
 {
     private readonly IIOHelper _ioHelper;
 
@@ -34,6 +35,40 @@ public class MultipleTextStringPropertyEditor : DataEditor
     {
         _ioHelper = ioHelper;
         SupportsReadOnly = true;
+    }
+
+    /// <inheritdoc />
+    public Type? GetValueType(object? configuration) => typeof(IEnumerable<string>);
+
+    /// <inheritdoc />
+    public JsonObject? GetValueSchema(object? configuration)
+    {
+        var schema = new JsonObject
+        {
+            ["$schema"] = "https://json-schema.org/draft/2020-12/schema",
+            ["type"] = new JsonArray("array", "null"),
+            ["items"] = new JsonObject
+            {
+                ["type"] = "string",
+            },
+            ["description"] = "Array of text strings",
+        };
+
+        // Add min/max items from configuration if available
+        if (configuration is MultipleTextStringConfiguration textStringConfig)
+        {
+            if (textStringConfig.Min > 0)
+            {
+                schema["minItems"] = textStringConfig.Min;
+            }
+
+            if (textStringConfig.Max > 0)
+            {
+                schema["maxItems"] = textStringConfig.Max;
+            }
+        }
+
+        return schema;
     }
 
     /// <inheritdoc />
@@ -73,6 +108,14 @@ public class MultipleTextStringPropertyEditor : DataEditor
         public override IValueFormatValidator FormatValidator => new MultipleTextStringFormatValidator();
 
         /// <summary>
+        /// A custom <see cref="IValueRequiredValidator" /> is used to evaluate "required" against the count of non-empty
+        /// strings, consistent with how <see cref="FromEditor"/> filters empty/whitespace strings before persistence.
+        /// Without this, the default <see cref="RequiredValidator"/> would call <c>ToString()</c> on the array
+        /// (yielding <c>"System.String[]"</c>) and incorrectly pass the required check.
+        /// </summary>
+        public override IValueRequiredValidator RequiredValidator => new MultipleTextStringRequiredValidator();
+
+        /// <summary>
         /// The value passed in from the editor will be an array of simple objects so we'll need to parse them to get the
         /// string.
         /// </summary>
@@ -89,7 +132,13 @@ public class MultipleTextStringPropertyEditor : DataEditor
                 return null;
             }
 
-            return string.Join(_newLine, value);
+            var nonEmptyValues = value.Where(x => string.IsNullOrWhiteSpace(x) is false).ToArray();
+            if (nonEmptyValues.Length == 0)
+            {
+                return null;
+            }
+
+            return string.Join(_newLine, nonEmptyValues);
         }
 
         /// <inheritdoc/>
@@ -123,6 +172,11 @@ public class MultipleTextStringPropertyEditor : DataEditor
             var textStringValidator = new RegexValidator();
             foreach (var textString in textStrings)
             {
+                if (string.IsNullOrWhiteSpace(textString))
+                {
+                    continue;
+                }
+
                 var validationResults = textStringValidator.ValidateFormat(textString, valueType, format).ToList();
                 if (validationResults.Any())
                 {
@@ -131,6 +185,27 @@ public class MultipleTextStringPropertyEditor : DataEditor
             }
 
             return [];
+        }
+    }
+
+    /// <summary>
+    /// A custom <see cref="IValueRequiredValidator" /> that treats an array of empty/whitespace-only strings as "no value",
+    /// consistent with how <see cref="MultipleTextStringPropertyValueEditor.FromEditor"/> filters them before persistence.
+    /// </summary>
+    internal sealed class MultipleTextStringRequiredValidator : IValueRequiredValidator
+    {
+        private static readonly RequiredValidator _defaultValidator = new();
+
+        /// <inheritdoc/>
+        public IEnumerable<ValidationResult> ValidateRequired(object? value, string valueType)
+        {
+            if (value is IEnumerable<string> strings && strings.Any(s => string.IsNullOrWhiteSpace(s) is false) is false)
+            {
+                // All strings are empty/whitespace — treat as no value.
+                return _defaultValidator.ValidateRequired(null, valueType);
+            }
+
+            return _defaultValidator.ValidateRequired(value, valueType);
         }
     }
 
@@ -157,9 +232,10 @@ public class MultipleTextStringPropertyEditor : DataEditor
             // Handle both a newline delimited string and an IEnumerable<string> as the value (see: https://github.com/umbraco/Umbraco-CMS/pull/18936).
             // If we have a null value, treat as a string count of zero for minimum number validation.
             var stringCount = value is string stringValue
-                ? MultipleTextStringPropertyValueEditor.SplitPropertyValue(stringValue).Length
+                ? MultipleTextStringPropertyValueEditor.SplitPropertyValue(stringValue)
+                    .Count(s => string.IsNullOrWhiteSpace(s) is false)
                 : value is IEnumerable<string> strings
-                    ? strings.Count()
+                    ? strings.Count(s => string.IsNullOrWhiteSpace(s) is false)
                     : 0;
 
             if (stringCount < multipleTextStringConfiguration.Min)

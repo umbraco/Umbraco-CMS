@@ -9,11 +9,27 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Extensions;
 
+/// <summary>
+///     Provides extension methods for the <see cref="IUser" /> interface.
+/// </summary>
 public static class UmbracoUserExtensions
 {
+    /// <summary>
+    ///     Gets the permissions for a user on a specific content path.
+    /// </summary>
+    /// <param name="user">The user to get permissions for.</param>
+    /// <param name="path">The content path to check permissions on.</param>
+    /// <param name="userService">The user service.</param>
+    /// <returns>An enumerable of permission strings.</returns>
     public static IEnumerable<string> GetPermissions(this IUser user, string path, IUserService userService) =>
         userService.GetPermissionsForPath(user, path).GetAllPermissions();
 
+    /// <summary>
+    ///     Determines whether the user has access to the specified section (application).
+    /// </summary>
+    /// <param name="user">The user to check.</param>
+    /// <param name="app">The section/application alias to check access for.</param>
+    /// <returns><c>true</c> if the user has access to the section; otherwise, <c>false</c>.</returns>
     public static bool HasSectionAccess(this IUser user, string app)
     {
         IEnumerable<string> apps = user.AllowedSections;
@@ -69,6 +85,13 @@ public static class UmbracoUserExtensions
         return GetUserCulture(user.Language, textService, globalSettings);
     }
 
+    /// <summary>
+    ///     Gets the culture info for a specified language code.
+    /// </summary>
+    /// <param name="userLanguage">The user's language code.</param>
+    /// <param name="textService">The localized text service.</param>
+    /// <param name="globalSettings">The global settings.</param>
+    /// <returns>The <see cref="CultureInfo" /> for the specified language, or the default UI language if not found.</returns>
     public static CultureInfo GetUserCulture(string? userLanguage, ILocalizedTextService textService, GlobalSettings globalSettings)
     {
         try

@@ -2,6 +2,9 @@ using Umbraco.Cms.Core.Models.Entities;
 
 namespace Umbraco.Cms.Core.Security;
 
+/// <summary>
+///     Entity type for a user's external login token.
+/// </summary>
 public class IdentityUserToken : EntityBase, IIdentityUserToken
 {
     /// <summary>

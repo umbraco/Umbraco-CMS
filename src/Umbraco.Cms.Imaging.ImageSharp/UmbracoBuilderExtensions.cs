@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Web.Caching;
 using SixLabors.ImageSharp.Web.DependencyInjection;
 using SixLabors.ImageSharp.Web.Middleware;
@@ -13,11 +14,16 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Imaging.ImageSharp;
 
+/// <summary>
+///     Extension methods for <see cref="IUmbracoBuilder" /> to add ImageSharp image processing.
+/// </summary>
 public static class UmbracoBuilderExtensions
 {
     /// <summary>
-    ///     Adds Image Sharp with Umbraco settings
+    ///     Adds ImageSharp image processing with Umbraco settings.
     /// </summary>
+    /// <param name="builder">The <see cref="IUmbracoBuilder" />.</param>
+    /// <returns>The <see cref="IServiceCollection" />.</returns>
     public static IServiceCollection AddUmbracoImageSharp(this IUmbracoBuilder builder)
     {
         // Add default ImageSharp configuration and service implementations

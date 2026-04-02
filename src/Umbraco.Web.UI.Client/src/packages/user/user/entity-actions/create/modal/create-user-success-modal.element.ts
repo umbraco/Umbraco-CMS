@@ -19,10 +19,10 @@ export class UmbCreateUserSuccessModalElement extends UmbModalBaseElement<
 	UmbCreateUserSuccessModalValue
 > {
 	@state()
-	_userItem?: UmbUserItemModel;
+	private _userItem?: UmbUserItemModel;
 
 	@state()
-	_initialPassword: string = '';
+	private _initialPassword: string = '';
 
 	#userItemRepository = new UmbUserItemRepository(this);
 	#userNewPasswordRepository = new UmbNewUserPasswordRepository(this);

@@ -2,9 +2,11 @@ using System.Globalization;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Net;
 using Umbraco.Cms.Core.Security;
@@ -18,6 +20,8 @@ public class MemberManager : UmbracoUserManager<MemberIdentityUser, MemberPasswo
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IPublicAccessService _publicAccessService;
     private readonly IMemberUserStore _store;
+    private readonly IPublishedModelFactory _publishedModelFactory;
+
     private MemberIdentityUser? _currentMember;
 
     public MemberManager(
@@ -32,7 +36,8 @@ public class MemberManager : UmbracoUserManager<MemberIdentityUser, MemberPasswo
         ILogger<UserManager<MemberIdentityUser>> logger,
         IOptionsSnapshot<MemberPasswordConfigurationSettings> passwordConfiguration,
         IPublicAccessService publicAccessService,
-        IHttpContextAccessor httpContextAccessor)
+        IHttpContextAccessor httpContextAccessor,
+        IPublishedModelFactory publishedModelFactory)
         : base(
             ipResolver,
             store,
@@ -48,6 +53,38 @@ public class MemberManager : UmbracoUserManager<MemberIdentityUser, MemberPasswo
         _store = store;
         _publicAccessService = publicAccessService;
         _httpContextAccessor = httpContextAccessor;
+        _publishedModelFactory = publishedModelFactory;
+    }
+
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
+    public MemberManager(
+        IIpResolver ipResolver,
+        IMemberUserStore store,
+        IOptions<IdentityOptions> optionsAccessor,
+        IPasswordHasher<MemberIdentityUser> passwordHasher,
+        IEnumerable<IUserValidator<MemberIdentityUser>> userValidators,
+        IEnumerable<IPasswordValidator<MemberIdentityUser>> passwordValidators,
+        IdentityErrorDescriber errors,
+        IServiceProvider services,
+        ILogger<UserManager<MemberIdentityUser>> logger,
+        IOptionsSnapshot<MemberPasswordConfigurationSettings> passwordConfiguration,
+        IPublicAccessService publicAccessService,
+        IHttpContextAccessor httpContextAccessor)
+        : this(
+            ipResolver,
+            store,
+            optionsAccessor,
+            passwordHasher,
+            userValidators,
+            passwordValidators,
+            errors,
+            services,
+            logger,
+            passwordConfiguration,
+            publicAccessService,
+            httpContextAccessor,
+            StaticServiceProvider.Instance.GetRequiredService<IPublishedModelFactory>())
+    {
     }
 
     /// <inheritdoc />
@@ -191,7 +228,16 @@ public class MemberManager : UmbracoUserManager<MemberIdentityUser, MemberPasswo
         return _currentMember;
     }
 
-    public virtual IPublishedContent? AsPublishedMember(MemberIdentityUser user) => _store.GetPublishedMember(user);
+    /// <inheritdoc />
+    public virtual IPublishedContent? AsPublishedMember(MemberIdentityUser user)
+    {
+        if (_store.GetPublishedMember(user) is not IPublishedMember publishedMember)
+        {
+            return null;
+        }
+
+        return publishedMember.CreateModel(_publishedModelFactory);
+    }
 
     /// <summary>
     /// This will check if the member has access to this path.

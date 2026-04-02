@@ -1,5 +1,5 @@
 import { UMB_COLLECTION_CONTEXT } from '../default/index.js';
-import type { ManifestCollectionView } from '../extensions/types.js';
+import type { ManifestCollectionView } from '../view/types.js';
 import type { UmbCollectionLayoutConfiguration } from '../types.js';
 import { css, customElement, html, nothing, query, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
@@ -19,10 +19,10 @@ interface UmbCollectionViewLayout {
 @customElement('umb-collection-view-bundle')
 export class UmbCollectionViewBundleElement extends UmbLitElement {
 	@state()
-	_views: Array<UmbCollectionViewLayout> = [];
+	private _views: Array<UmbCollectionViewLayout> = [];
 
 	@state()
-	_currentView?: UmbCollectionViewLayout;
+	private _currentView?: UmbCollectionViewLayout;
 
 	@state()
 	private _collectionRootPathName?: string;

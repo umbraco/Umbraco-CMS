@@ -9,8 +9,6 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 [DataContract]
 public class ConfigurationField
 {
-    private readonly string? _view;
-
     /// <summary>
     ///     Initializes a new instance of the <see cref="ConfigurationField" /> class.
     /// </summary>
@@ -22,6 +20,7 @@ public class ConfigurationField
     /// <summary>
     ///     Initializes a new instance of the <see cref="ConfigurationField" /> class.
     /// </summary>
+    /// <param name="validators">The validators for this configuration field.</param>
     public ConfigurationField(params IValueValidator[] validators)
         : this(validators.ToList())
     {

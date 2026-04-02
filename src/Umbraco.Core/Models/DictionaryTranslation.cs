@@ -13,16 +13,28 @@ public class DictionaryTranslation : EntityBase, IDictionaryTranslation
     // note: this will be memberwise cloned
     private string _value;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="DictionaryTranslation" /> class.
+    /// </summary>
+    /// <param name="language">The language for this translation.</param>
+    /// <param name="value">The translated text.</param>
     public DictionaryTranslation(ILanguage language, string value)
     {
         LanguageIsoCode = language.IsoCode;
         _value = value;
     }
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="DictionaryTranslation" /> class with a unique identifier.
+    /// </summary>
+    /// <param name="language">The language for this translation.</param>
+    /// <param name="value">The translated text.</param>
+    /// <param name="uniqueId">The unique identifier for the translation.</param>
     public DictionaryTranslation(ILanguage language, string value, Guid uniqueId)
         : this(language, value) =>
         Key = uniqueId;
 
+    /// <inheritdoc />
     public string LanguageIsoCode { get; private set; }
 
     /// <summary>

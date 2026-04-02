@@ -1,8 +1,14 @@
-import { manifests as previewApps } from './apps/manifests.js';
-import { UmbPreviewContext } from './preview.context.js';
 import { css, customElement, html, nothing, state, when } from '@umbraco-cms/backoffice/external/lit';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import {
+	umbExtensionsRegistry,
+	UmbBackofficeEntryPointExtensionInitializer,
+} from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbPreviewContext } from '@umbraco-cms/backoffice/preview';
+import { UmbServerExtensionRegistrator } from '@umbraco-cms/backoffice/extension-api';
+import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
+
+const CORE_PACKAGES = [import('../../packages/preview/umbraco-package.js')];
 
 /**
  * @element umb-preview
@@ -11,66 +17,62 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 export class UmbPreviewElement extends UmbLitElement {
 	#context = new UmbPreviewContext(this);
 
-	constructor() {
-		super();
-
-		if (previewApps?.length) {
-			umbExtensionsRegistry.registerMany(previewApps);
-		}
-
-		this.observe(this.#context.iframeReady, (iframeReady) => (this._iframeReady = iframeReady));
-		this.observe(this.#context.previewUrl, (previewUrl) => (this._previewUrl = previewUrl));
-	}
-
-	override connectedCallback() {
-		super.connectedCallback();
-		this.addEventListener('visibilitychange', this.#onVisibilityChange);
-		window.addEventListener('beforeunload', () => this.#context.exitSession());
-		this.#context.startSession();
-	}
-
-	override disconnectedCallback() {
-		super.disconnectedCallback();
-		this.removeEventListener('visibilitychange', this.#onVisibilityChange);
-		// NOTE: Unsure how we remove an anonymous function from 'beforeunload' event listener.
-		// The reason for the anonymous function is that if we used a named function,
-		// `this` would be the `window` and would not have context to the class instance. [LK]
-		//window.removeEventListener('beforeunload', () => this.#context.exitSession());
-		this.#context.exitSession();
-	}
-
 	@state()
 	private _iframeReady?: boolean;
 
 	@state()
 	private _previewUrl?: string;
 
-	#onIFrameLoad(event: Event & { target: HTMLIFrameElement }) {
-		this.#context.iframeLoaded(event.target);
+	constructor() {
+		super();
+
+		new UmbBackofficeEntryPointExtensionInitializer(this, umbExtensionsRegistry);
+
+		this.observe(this.#context.iframeReady, (iframeReady) => (this._iframeReady = iframeReady));
+		this.observe(this.#context.previewUrl, (previewUrl) => (this._previewUrl = previewUrl));
 	}
 
-	#onVisibilityChange() {
-		this.#context.checkSession();
+	override async firstUpdated() {
+		await this.#extensionsAfterAuth();
+
+		// Extensions are loaded in parallel and don't need to block the preview frame
+		CORE_PACKAGES.forEach(async (packageImport) => {
+			const { extensions } = await packageImport;
+			umbExtensionsRegistry.registerMany(extensions);
+		});
+	}
+
+	async #extensionsAfterAuth() {
+		const authContext = await this.getContext(UMB_AUTH_CONTEXT, { preventTimeout: true });
+		if (!authContext) {
+			throw new Error('UmbPreviewElement requires the UMB_AUTH_CONTEXT to be set.');
+		}
+		await this.observe(authContext.isAuthorized).asPromise();
+		await new UmbServerExtensionRegistrator(this, umbExtensionsRegistry).registerPrivateExtensions();
+	}
+
+	#onIFrameLoad(event: Event & { target: HTMLIFrameElement }) {
+		this.#context.iframeLoaded(event.target);
 	}
 
 	override render() {
 		if (!this._previewUrl) return nothing;
 		return html`
 			${when(!this._iframeReady, () => html`<div id="loading"><uui-loader-circle></uui-loader-circle></div>`)}
-			<div id="wrapper">
+			<div id="wrapper" class="fullsize">
 				<div id="container">
 					<iframe
 						src=${this._previewUrl}
 						title="Page preview"
 						@load=${this.#onIFrameLoad}
-						sandbox="allow-scripts allow-same-origin"></iframe>
+						sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
 				</div>
 			</div>
 			<div id="menu">
 				<h4>Preview Mode</h4>
-				<uui-button-group>
-					<umb-extension-slot id="apps" type="previewApp"></umb-extension-slot>
-				</uui-button-group>
+				<div id="apps">
+					<umb-extension-slot type="previewApp"></umb-extension-slot>
+				</div>
 			</div>
 		`;
 	}
@@ -83,10 +85,7 @@ export class UmbPreviewElement extends UmbLitElement {
 				align-items: center;
 
 				position: absolute;
-				top: 0;
-				left: 0;
-				right: 0;
-				bottom: 0;
+				inset: 0;
 
 				padding-bottom: 40px;
 			}
@@ -103,7 +102,9 @@ export class UmbPreviewElement extends UmbLitElement {
 				bottom: 0;
 
 				font-size: 6rem;
-				backdrop-filter: blur(5px);
+				backdrop-filter: blur(var(--uui-size-1, 3px));
+
+				z-index: 1;
 			}
 
 			#wrapper {
@@ -118,7 +119,7 @@ export class UmbPreviewElement extends UmbLitElement {
 				overflow: hidden;
 			}
 
-			#wrapper.shadow {
+			#wrapper:not(.fullsize) {
 				margin: 10px auto;
 				background-color: white;
 				border-radius: 3px;
@@ -144,6 +145,8 @@ export class UmbPreviewElement extends UmbLitElement {
 				left: 0;
 				right: 0;
 
+				z-index: 1;
+
 				background-color: var(--uui-color-header-surface);
 				height: 40px;
 
@@ -157,7 +160,9 @@ export class UmbPreviewElement extends UmbLitElement {
 				padding: 0 15px;
 			}
 
-			#menu > uui-button-group {
+			#apps {
+				display: inline-flex;
+				align-items: stretch;
 				height: 100%;
 			}
 

@@ -9,7 +9,7 @@ export interface UmbWebhookDetailModel {
 	unique: string;
 	enabled: boolean;
 	url: string;
-	name: string | null | undefined;
+	name: string;
 	description: string | null | undefined;
 	events: Array<UmbWebhookEventModel>;
 	contentTypes: Array<string>;

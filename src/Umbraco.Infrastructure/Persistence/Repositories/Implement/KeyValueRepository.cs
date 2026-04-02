@@ -14,8 +14,24 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
 internal sealed class KeyValueRepository : EntityRepositoryBase<string, IKeyValue>, IKeyValueRepository
 {
-    public KeyValueRepository(IScopeAccessor scopeAccessor, ILogger<KeyValueRepository> logger)
-        : base(scopeAccessor, AppCaches.NoCache, logger)
+    /// <summary>
+    /// Initializes a new instance of the <see cref="KeyValueRepository"/> class.
+    /// </summary>
+    /// <param name="scopeAccessor">Provides access to the current database scope for repository operations.</param>
+    /// <param name="logger">The logger used to record diagnostic and operational information for this repository.</param>
+    /// <param name="repositoryCacheVersionService">Service used to manage cache versioning for repository data.</param>
+    /// <param name="cacheSyncService">Service responsible for synchronizing cache across distributed environments.</param>
+    public KeyValueRepository(
+        IScopeAccessor scopeAccessor,
+        ILogger<KeyValueRepository> logger,
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
+        : base(
+            scopeAccessor,
+            AppCaches.NoCache,
+            logger,
+            repositoryCacheVersionService,
+            cacheSyncService)
     {
     }
 
@@ -26,6 +42,10 @@ internal sealed class KeyValueRepository : EntityRepositoryBase<string, IKeyValu
 
     #region Overrides of IReadWriteQueryRepository<string, IKeyValue>
 
+    /// <summary>
+    /// Saves the specified key-value entity to the repository. If the entity does not exist, it will be inserted; otherwise, it will be updated.
+    /// </summary>
+    /// <param name="entity">The key-value entity to save.</param>
     public override void Save(IKeyValue entity)
     {
         if (Get(entity.Identifier) == null)
@@ -56,7 +76,7 @@ internal sealed class KeyValueRepository : EntityRepositoryBase<string, IKeyValu
         return sql;
     }
 
-    protected override string GetBaseWhereClause() => Constants.DatabaseSchema.Tables.KeyValue + ".key = @id";
+    protected override string GetBaseWhereClause() => QuoteTableName(Constants.DatabaseSchema.Tables.KeyValue) + ".key = @id";
 
     protected override IEnumerable<string> GetDeleteClauses() => Enumerable.Empty<string>();
 

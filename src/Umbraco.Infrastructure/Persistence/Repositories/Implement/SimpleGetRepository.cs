@@ -18,8 +18,18 @@ internal abstract class SimpleGetRepository<TId, TEntity, TDto> : EntityReposito
     where TEntity : class, IEntity
     where TDto : class
 {
-    protected SimpleGetRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<SimpleGetRepository<TId, TEntity, TDto>> logger)
-        : base(scopeAccessor, cache, logger)
+    protected SimpleGetRepository(
+        IScopeAccessor scopeAccessor,
+        AppCaches cache,
+        ILogger<SimpleGetRepository<TId, TEntity, TDto>> logger,
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
+        : base(
+            scopeAccessor,
+            cache,
+            logger,
+            repositoryCacheVersionService,
+            cacheSyncService)
     {
     }
 

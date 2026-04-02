@@ -5,6 +5,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.User;
 
+/// <summary>
+/// Serves as a base controller for API endpoints that operate on either a specified user or the current user.
+/// </summary>
 [ApiExplorerSettings(GroupName = "User")]
 public abstract class UserOrCurrentUserControllerBase : ManagementApiControllerBase
 {
@@ -25,7 +28,7 @@ public abstract class UserOrCurrentUserControllerBase : ManagementApiControllerB
                 .Build()),
             UserOperationStatus.NoUserGroup => BadRequest(problemDetailsBuilder
                 .WithTitle("No User Group Specified")
-                .WithDetail("A user group must be specified to create a user")
+                .WithDetail("A user must be assigned to at least one group")
                 .Build()),
             UserOperationStatus.UserNameIsNotEmail => BadRequest(problemDetailsBuilder
                 .WithTitle("Invalid Username")
@@ -137,6 +140,10 @@ public abstract class UserOrCurrentUserControllerBase : ManagementApiControllerB
                 .WithDetail("The target user type does not support this operation.")
                 .Build()),
             UserOperationStatus.Forbidden => Forbidden(),
+            UserOperationStatus.ApplicationUrlNotConfigured => BadRequest(problemDetailsBuilder
+                .WithTitle("Application URL not configured")
+                .WithDetail("The application URL is not configured. Set Umbraco:CMS:WebRouting:UmbracoApplicationUrl in configuration, or change Umbraco:CMS:WebRouting:ApplicationUrlDetection to 'FirstRequest' or 'EveryRequest'.")
+                .Build()),
             _ => StatusCode(StatusCodes.Status500InternalServerError, problemDetailsBuilder
                 .WithTitle("Unknown user operation status.")
                 .Build()),

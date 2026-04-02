@@ -27,7 +27,7 @@ export class UmbRefDataTypeElement extends UmbElementMixin(UUIRefNodeElement) {
 	async setDataTypeId(value: string | undefined) {
 		if (value) {
 			this.observe(
-				(await this.repository.requestByUnique(value)).asObservable(),
+				(await this.repository.requestByUnique(value)).asObservable?.(),
 				(dataType) => {
 					if (dataType) {
 						this.name = dataType.name ?? '';

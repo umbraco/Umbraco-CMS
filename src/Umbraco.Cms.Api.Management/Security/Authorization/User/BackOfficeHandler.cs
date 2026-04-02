@@ -10,6 +10,10 @@ public class BackOfficeHandler : MustSatisfyRequirementAuthorizationHandler<Back
 {
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurity;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="BackOfficeHandler"/> class.
+    /// </summary>
+    /// <param name="backOfficeSecurity">An accessor for back office security services used to authorize user actions.</param>
     public BackOfficeHandler(IBackOfficeSecurityAccessor backOfficeSecurity)
     {
         _backOfficeSecurity = backOfficeSecurity;

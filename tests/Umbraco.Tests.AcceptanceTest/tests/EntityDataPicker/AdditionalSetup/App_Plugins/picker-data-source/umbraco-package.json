@@ -1,0 +1,30 @@
+{
+  "name": "My Picker Data Source",
+  "alias": "My.PickerDataSource",
+  "extensions": [
+    {
+      "type": "propertyEditorDataSource",
+      "dataSourceType": "Umb.DataSourceType.Picker",
+      "alias": "My.PickerDataSource.Tree",
+      "name": "My Picker Tree Data Source",
+      "api": "/App_Plugins/picker-data-source/tree-api.js",
+      "meta": {
+        "icon": "icon-database",
+        "label": "My Picker Tree Data Source",
+        "description": "Some description goes here"
+      }
+    },
+    {
+      "type": "propertyEditorDataSource",
+      "dataSourceType": "Umb.DataSourceType.Picker",
+      "alias": "My.PickerDataSource.Collection",
+      "name": "My Picker Collection Data Source",
+      "api": "/App_Plugins/picker-data-source/collection-api.js",
+      "meta": {
+        "icon": "icon-database",
+        "label": "My Picker Collection Data Source",
+        "description": "Some description goes here"
+      }
+    }
+  ]
+}

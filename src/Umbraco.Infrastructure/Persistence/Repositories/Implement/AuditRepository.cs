@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Persistence.Factories;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
@@ -14,31 +15,61 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
 internal sealed class AuditRepository : EntityRepositoryBase<int, IAuditItem>, IAuditRepository
 {
-    public AuditRepository(IScopeAccessor scopeAccessor, ILogger<AuditRepository> logger)
-        : base(scopeAccessor, AppCaches.NoCache, logger)
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AuditRepository"/> class.
+    /// </summary>
+    /// <param name="scopeAccessor">Provides access to the current database scope for repository operations.</param>
+    /// <param name="logger">The logger used to record diagnostic and audit information for this repository.</param>
+    /// <param name="repositoryCacheVersionService">Service responsible for managing cache versioning for repository data.</param>
+    /// <param name="cacheSyncService">Service used to synchronize cache state across distributed environments.</param>
+    public AuditRepository(
+        IScopeAccessor scopeAccessor,
+        ILogger<AuditRepository> logger,
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
+        : base(
+            scopeAccessor,
+            AppCaches.NoCache,
+            logger,
+            repositoryCacheVersionService,
+            cacheSyncService)
     {
     }
 
+    /// <summary>
+    /// Retrieves a collection of audit items of the specified <paramref name="type"/>, filtered according to the provided <paramref name="query"/> criteria.
+    /// </summary>
+    /// <param name="type">The <see cref="AuditType"/> to filter audit items by.</param>
+    /// <param name="query">An <see cref="IQuery{IAuditItem}"/> used to further filter the audit items.</param>
+    /// <returns>An <see cref="IEnumerable{IAuditItem}"/> containing audit items that match the specified type and query.</returns>
     public IEnumerable<IAuditItem> Get(AuditType type, IQuery<IAuditItem> query)
     {
         Sql<ISqlContext>? sqlClause = GetBaseQuery(false)
-            .Where("(logHeader=@0)", type.ToString());
+            .Where($"({SqlSyntax.GetQuotedColumnName("logHeader")}=@0)", type.ToString());
 
         var translator = new SqlTranslator<IAuditItem>(sqlClause, query);
         Sql<ISqlContext> sql = translator.Translate();
 
         List<LogDto>? dtos = Database.Fetch<LogDto>(sql);
 
-        return dtos.Select(x => new AuditItem(x.NodeId, Enum<AuditType>.Parse(x.Header), x.UserId ?? Constants.Security.UnknownUserId, x.EntityType, x.Comment, x.Parameters, DateTime.SpecifyKind(x.Datestamp, DateTimeKind.Local))).ToList();
+        return AuditItemFactory.BuildEntities(dtos);
     }
 
+    /// <summary>
+    /// Removes audit log entries with a datestamp older than the specified maximum age, in minutes.
+    /// Only logs with headers "open" or "system" are affected.
+    /// </summary>
+    /// <param name="maximumAgeOfLogsInMinutes">The maximum age, in minutes, for logs to retain. Logs older than this will be deleted.</param>
     public void CleanLogs(int maximumAgeOfLogsInMinutes)
     {
-        DateTime oldestPermittedLogEntry = DateTime.Now.Subtract(new TimeSpan(0, maximumAgeOfLogsInMinutes, 0));
+        DateTime oldestPermittedLogEntry = DateTime.UtcNow.Subtract(new TimeSpan(0, maximumAgeOfLogsInMinutes, 0));
 
-        Database.Execute(
-            "delete from umbracoLog where datestamp < @oldestPermittedLogEntry and logHeader in ('open','system')",
-            new { oldestPermittedLogEntry });
+        var headers = new[] { "open", "system" };
+        Sql<ISqlContext> sql = SqlContext.Sql()
+            .Delete<LogDto>()
+            .Where<LogDto>(c => c.Datestamp < oldestPermittedLogEntry)
+            .WhereIn<LogDto>(c => c.Header, headers);
+        Database.Execute(sql);
     }
 
     /// <summary>
@@ -69,10 +100,7 @@ internal sealed class AuditRepository : EntityRepositoryBase<int, IAuditItem>, I
         AuditType[]? auditTypeFilter,
         IQuery<IAuditItem>? customFilter)
     {
-        if (auditTypeFilter == null)
-        {
-            auditTypeFilter = Array.Empty<AuditType>();
-        }
+        auditTypeFilter ??= [];
 
         Sql<ISqlContext> sql = GetBaseQuery(false);
 
@@ -83,7 +111,7 @@ internal sealed class AuditRepository : EntityRepositoryBase<int, IAuditItem>, I
         {
             foreach (Tuple<string, object[]> filterClause in customFilter.GetWhereClauses())
             {
-                sql.Where(filterClause.Item1, filterClause.Item2);
+                sql = sql.Where(filterClause.Item1, filterClause.Item2);
             }
         }
 
@@ -91,65 +119,39 @@ internal sealed class AuditRepository : EntityRepositoryBase<int, IAuditItem>, I
         {
             foreach (AuditType type in auditTypeFilter)
             {
-                sql.Where("(logHeader=@0)", type.ToString());
+                var typeString = type.ToString();
+                sql = sql.Where<LogDto>(c => c.Header == typeString);
             }
         }
 
         sql = orderDirection == Direction.Ascending
-            ? sql.OrderBy("Datestamp")
-            : sql.OrderByDescending("Datestamp");
+            ? sql.OrderBy<LogDto>(c => c.Datestamp)
+            : sql.OrderByDescending<LogDto>(c => c.Datestamp);
 
         // get page
         Page<LogDto>? page = Database.Page<LogDto>(pageIndex + 1, pageSize, sql);
         totalRecords = page.TotalItems;
 
-        var items = page.Items.Select(
-            dto => new AuditItem(dto.NodeId, Enum<AuditType>.ParseOrNull(dto.Header) ?? AuditType.Custom, dto.UserId ?? Constants.Security.UnknownUserId, dto.EntityType, dto.Comment, dto.Parameters, DateTime.SpecifyKind(dto.Datestamp, DateTimeKind.Local))).ToList();
-
-        // map the DateStamp
-        for (var i = 0; i < items.Count; i++)
-        {
-            items[i].CreateDate = DateTime.SpecifyKind(page.Items[i].Datestamp, DateTimeKind.Local);
-        }
-
-        return items;
+        return AuditItemFactory.BuildEntities(page.Items);
     }
 
     protected override void PersistNewItem(IAuditItem entity) =>
-        Database.Insert(new LogDto
-        {
-            Comment = entity.Comment,
-            Datestamp = DateTime.Now,
-            Header = entity.AuditType.ToString(),
-            NodeId = entity.Id,
-            UserId = entity.UserId,
-            EntityType = entity.EntityType,
-            Parameters = entity.Parameters,
-        });
+        Database.Insert(AuditItemFactory.BuildDto(entity));
 
     protected override void PersistUpdatedItem(IAuditItem entity) =>
 
         // inserting when updating because we never update a log entry, perhaps this should throw?
-        Database.Insert(new LogDto
-        {
-            Comment = entity.Comment,
-            Datestamp = DateTime.Now,
-            Header = entity.AuditType.ToString(),
-            NodeId = entity.Id,
-            UserId = entity.UserId,
-            EntityType = entity.EntityType,
-            Parameters = entity.Parameters,
-        });
+        Database.Insert(AuditItemFactory.BuildDto(entity));
 
     protected override IAuditItem? PerformGet(int id)
     {
         Sql<ISqlContext> sql = GetBaseQuery(false);
-        sql.Where(GetBaseWhereClause(), new { id = id });
+        sql.Where(GetBaseWhereClause(), new { id });
 
         LogDto? dto = Database.First<LogDto>(sql);
         return dto == null
             ? null
-            : new AuditItem(dto.NodeId, Enum<AuditType>.Parse(dto.Header), dto.UserId ?? Constants.Security.UnknownUserId, dto.EntityType, dto.Comment, dto.Parameters, DateTime.SpecifyKind(dto.Datestamp, DateTimeKind.Local));
+            : AuditItemFactory.BuildEntity(dto);
     }
 
     protected override IEnumerable<IAuditItem> PerformGetAll(params int[]? ids) => throw new NotImplementedException();
@@ -162,7 +164,7 @@ internal sealed class AuditRepository : EntityRepositoryBase<int, IAuditItem>, I
 
         List<LogDto>? dtos = Database.Fetch<LogDto>(sql);
 
-        return dtos.Select(x => new AuditItem(x.NodeId, Enum<AuditType>.Parse(x.Header), x.UserId ?? Constants.Security.UnknownUserId, x.EntityType,  x.Comment, x.Parameters, DateTime.SpecifyKind(x.Datestamp, DateTimeKind.Local))).ToList();
+        return AuditItemFactory.BuildEntities(dtos);
     }
 
     protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
@@ -184,7 +186,8 @@ internal sealed class AuditRepository : EntityRepositoryBase<int, IAuditItem>, I
         return sql;
     }
 
-    protected override string GetBaseWhereClause() => "umbracoLog.id = @id";
+    protected override string GetBaseWhereClause() =>
+        $"{QuoteTableName(LogDto.TableName)}.{QuoteColumnName("id")} = @id";
 
     protected override IEnumerable<string> GetDeleteClauses() => throw new NotImplementedException();
 }

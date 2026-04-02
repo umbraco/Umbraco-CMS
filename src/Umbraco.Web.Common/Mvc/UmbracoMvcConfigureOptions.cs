@@ -16,13 +16,6 @@ namespace Umbraco.Cms.Web.Common.Mvc;
 /// </remarks>
 public class UmbracoMvcConfigureOptions : IConfigureOptions<MvcOptions>
 {
-    public UmbracoMvcConfigureOptions()
-    { }
-
-    [Obsolete("The global settings is not required anymore, use the default constructor instead. Scheduled for removal in Umbraco 17.")]
-    public UmbracoMvcConfigureOptions(IOptions<GlobalSettings> globalSettings)
-    { }
-
     /// <inheritdoc />
     public void Configure(MvcOptions options)
     {

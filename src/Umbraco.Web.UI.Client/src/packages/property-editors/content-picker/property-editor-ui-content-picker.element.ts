@@ -5,16 +5,20 @@ import { css, customElement, html, nothing, property, repeat, state } from '@umb
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
-import { UMB_ANCESTORS_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
+import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import { UMB_PARENT_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '@umbraco-cms/backoffice/document';
 import { UMB_MEDIA_ENTITY_TYPE } from '@umbraco-cms/backoffice/media';
 import { UMB_MEMBER_ENTITY_TYPE } from '@umbraco-cms/backoffice/member';
+import { UmbPropertyEditorUiInteractionMemoryManager } from '@umbraco-cms/backoffice/property-editor';
+import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
 import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
+import { UMB_CONTENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content';
+import type { UmbSubmittableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 
 // import of local component
 import './components/input-content/index.js';
@@ -29,15 +33,6 @@ export class UmbPropertyEditorUIContentPickerElement
 	extends UmbFormControlMixin<UmbContentPickerValueType | undefined, typeof UmbLitElement>(UmbLitElement, undefined)
 	implements UmbPropertyEditorUiElement
 {
-	@property({ type: Array })
-	public override set value(value: UmbContentPickerValueType | undefined) {
-		this.#value = value;
-	}
-	public override get value(): UmbContentPickerValueType | undefined {
-		return this.#value;
-	}
-	#value?: UmbContentPickerValueType = [];
-
 	/**
 	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
 	 * @type {boolean}
@@ -46,6 +41,10 @@ export class UmbPropertyEditorUIContentPickerElement
 	 */
 	@property({ type: Boolean, reflect: true })
 	readonly = false;
+	@property({ type: Boolean })
+	mandatory = false;
+	@property({ type: String })
+	mandatoryMessage = UMB_VALIDATION_EMPTY_LOCALIZATION_KEY;
 
 	@state()
 	private _type: UmbContentPickerSource['type'] = 'content';
@@ -63,7 +62,7 @@ export class UmbPropertyEditorUIContentPickerElement
 	private _maxMessage = '';
 
 	@state()
-	private _allowedContentTypeUniques?: string | null;
+	private _allowedContentTypeUniques?: string;
 
 	@state()
 	private _rootUnique?: string | null;
@@ -74,6 +73,9 @@ export class UmbPropertyEditorUIContentPickerElement
 	@state()
 	private _invalidData?: UmbContentPickerValueType;
 
+	@state()
+	private _interactionMemories: Array<UmbInteractionMemoryModel> = [];
+
 	#dynamicRoot?: UmbContentPickerSource['dynamicRoot'];
 	#dynamicRootRepository = new UmbContentPickerDynamicRootRepository(this);
 
@@ -83,7 +85,21 @@ export class UmbPropertyEditorUIContentPickerElement
 		member: UMB_MEMBER_ENTITY_TYPE,
 	};
 
+	#interactionMemoryManager = new UmbPropertyEditorUiInteractionMemoryManager(this, {
+		memoryUniquePrefix: 'UmbContentPicker',
+	});
+
+	constructor() {
+		super();
+
+		this.observe(this.#interactionMemoryManager.memoriesForPropertyEditor, (interactionMemories) => {
+			this._interactionMemories = interactionMemories ?? [];
+		});
+	}
+
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
+		this.#interactionMemoryManager.setPropertyEditorConfig(config);
+
 		if (!config) return;
 
 		const startNode = config.getValueByAlias<UmbContentPickerSource>('startNode');
@@ -94,7 +110,7 @@ export class UmbPropertyEditorUIContentPickerElement
 			this.#dynamicRoot = startNode.dynamicRoot;
 
 			// NOTE: Filter out any items that do not match the entity type. [LK]
-			this._invalidData = this.#value?.filter((x) => x.type !== this._rootEntityType);
+			this._invalidData = this.value?.filter((x) => x.type !== this._rootEntityType);
 			if (this._invalidData?.length) {
 				this.readonly = true;
 			}
@@ -107,11 +123,6 @@ export class UmbPropertyEditorUIContentPickerElement
 
 		this._minMessage = `${this.localize.term('validation_minCount')} ${this._min} ${this.localize.term('validation_items')}`;
 		this._maxMessage = `${this.localize.term('validation_maxCount')} ${this._max} ${this.localize.term('validation_itemsSelected')}`;
-
-		// NOTE: Run validation immediately, to notify if the value is outside of min/max range. [LK]
-		if (this._min > 0 || this._max < Infinity) {
-			this.checkValidity();
-		}
 	}
 
 	#parseInt(value: unknown, fallback: number): number {
@@ -119,7 +130,8 @@ export class UmbPropertyEditorUIContentPickerElement
 		return !isNaN(num) && num > 0 ? num : fallback;
 	}
 
-	override firstUpdated() {
+	override firstUpdated(changedProperties: Map<string | number | symbol, unknown>) {
+		super.firstUpdated(changedProperties);
 		this.addFormControlElement(this.shadowRoot!.querySelector('umb-input-content')!);
 		this.#setPickerRootUnique();
 
@@ -140,9 +152,25 @@ export class UmbPropertyEditorUIContentPickerElement
 		if (this._rootUnique) return;
 		if (!this.#dynamicRoot) return;
 
-		const ancestorsContext = await this.getContext(UMB_ANCESTORS_ENTITY_CONTEXT);
-		const ancestors = ancestorsContext?.getAncestors();
-		const [parentUnique, unique] = ancestors?.slice(-2).map((x) => x.unique) ?? [];
+		// Use passContextAliasMatches to skip past block element workspaces and find the document workspace.
+		const workspaceContext = await this.getContext(UMB_CONTENT_WORKSPACE_CONTEXT, {
+			passContextAliasMatches: true,
+		}).catch(() => undefined);
+
+		// For new documents, the unique is a client-generated GUID that doesn't exist in the DB.
+		// The backend expects null for CurrentKey when creating new content and falls back to ParentKey.
+		const isNew =
+			workspaceContext &&
+			'getIsNew' in workspaceContext &&
+			(workspaceContext as UmbSubmittableWorkspaceContext).getIsNew() === true;
+
+		const unique = isNew ? null : (workspaceContext?.getUnique() ?? null);
+
+		// Use parent entity context to get the parent unique. Its observable starts as undefined,
+		// so asPromise() properly waits for the async structure loading to complete.
+		const parentContext = await this.getContext(UMB_PARENT_ENTITY_CONTEXT);
+		const parent = await this.observe(parentContext?.parent, () => {})?.asPromise();
+		const parentUnique = parent?.unique ?? null;
 
 		const result = await this.#dynamicRootRepository.requestRoot(this.#dynamicRoot, unique, parentUnique);
 		if (result && result.length > 0) {
@@ -168,6 +196,17 @@ export class UmbPropertyEditorUIContentPickerElement
 		this.readonly = false;
 	}
 
+	async #onInputInteractionMemoriesChange(event: UmbChangeEvent) {
+		const target = event.target as UmbInputContentElement;
+		const interactionMemories = target.interactionMemories;
+
+		if (interactionMemories && interactionMemories.length > 0) {
+			await this.#interactionMemoryManager.saveMemoriesForPropertyEditor(interactionMemories);
+		} else {
+			await this.#interactionMemoryManager.deleteMemoriesForPropertyEditor();
+		}
+	}
+
 	override render() {
 		const startNode: UmbTreeStartNode | undefined =
 			this._rootUnique && this._rootEntityType
@@ -183,9 +222,13 @@ export class UmbPropertyEditorUIContentPickerElement
 				.max=${this._max}
 				.maxMessage=${this._maxMessage}
 				.startNode=${startNode}
-				.allowedContentTypeIds=${this._allowedContentTypeUniques ?? ''}
+				.allowedContentTypeIds=${this._allowedContentTypeUniques}
 				?readonly=${this.readonly}
-				@change=${this.#onChange}>
+				?required=${this.mandatory}
+				.requiredMessage=${this.mandatoryMessage}
+				@change=${this.#onChange}
+				.interactionMemories=${this._interactionMemories}
+				@interaction-memories-change=${this.#onInputInteractionMemoriesChange}>
 			</umb-input-content>
 			${this.#renderInvalidData()}
 		`;

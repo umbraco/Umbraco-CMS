@@ -53,6 +53,14 @@ export class UmbContentWorkspaceDataManager<
 		this.updateVariantData(variantId);
 	}
 
+	ensureVariantsData(variantIds: UmbVariantId[]) {
+		this.initiatePropertyValueChange();
+		for (const variantId of variantIds) {
+			this.updateVariantData(variantId);
+		}
+		this.finishPropertyValueChange();
+	}
+
 	updateVariantData(variantId: UmbVariantId, update?: Partial<ModelVariantType>) {
 		if (!this.#variantScaffold) throw new Error('Variant scaffold data is missing');
 
@@ -89,6 +97,7 @@ export class UmbContentWorkspaceDataManager<
 		const currentData = this.getCurrent();
 		if (!currentData) throw new Error('Data is missing');
 
+		// If varies by segment:
 		if (!variantId.isSegmentInvariant()) {
 			// The server requires a segment name. It doesn't matter what it is as long as it is not empty. The server will overwrite it with the name of the default.
 			update = { ...update, name: 'Segment' } as ModelVariantType;
@@ -141,7 +150,7 @@ export class UmbContentWorkspaceDataManager<
 		});
 
 		const changedProperties = current?.values.map((value) => {
-			const persistedValues = persisted?.values.find((x) => UmbVariantId.Create(value).compare(x));
+			const persistedValues = persisted?.values.find((x) => x.alias === value.alias && UmbVariantId.Create(value).compare(x));
 			return {
 				culture: value.culture,
 				segment: value.segment,

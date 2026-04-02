@@ -80,7 +80,7 @@ export class UmbDataTypeTreeItemTableCollectionViewElement extends UmbLitElement
 
 			return {
 				id: item.unique,
-				icon: item.isFolder && !item.icon ? 'icon-folder' : item.icon,
+				icon: item.isFolder && !item.icon ? 'icon-folder' : item.icon || 'icon-circle-dotted',
 				data: [
 					{
 						columnAlias: 'name',

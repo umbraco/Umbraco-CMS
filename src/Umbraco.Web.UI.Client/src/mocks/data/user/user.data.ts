@@ -29,6 +29,7 @@ export const data: Array<UmbMockUserModel> = [
 		updateDate: '2/10/2022',
 		userGroupIds: [{ id: 'user-group-administrators-id' }, { id: 'user-group-editors-id' }],
 		userName: '',
+		flags: [],
 	},
 	{
 		avatarUrls: [],
@@ -51,6 +52,7 @@ export const data: Array<UmbMockUserModel> = [
 		updateDate: '2023-10-12T18:30:32.879Z',
 		userGroupIds: [{ id: 'user-group-administrators-id' }],
 		userName: '',
+		flags: [],
 	},
 	{
 		avatarUrls: [],
@@ -73,6 +75,7 @@ export const data: Array<UmbMockUserModel> = [
 		updateDate: '2023-10-12T18:30:32.879Z',
 		userGroupIds: [{ id: 'user-group-editors-id' }],
 		userName: '',
+		flags: [],
 	},
 	{
 		avatarUrls: [],
@@ -95,6 +98,7 @@ export const data: Array<UmbMockUserModel> = [
 		updateDate: '2023-10-12T18:30:32.879Z',
 		userGroupIds: [{ id: 'user-group-editors-id' }],
 		userName: '',
+		flags: [],
 	},
 	{
 		avatarUrls: [],
@@ -117,6 +121,7 @@ export const data: Array<UmbMockUserModel> = [
 		updateDate: '2023-10-12T18:30:32.879Z',
 		userGroupIds: [{ id: 'user-group-editors-id' }, { id: 'user-group-sensitive-data-id' }],
 		userName: '',
+		flags: [],
 	},
 	{
 		avatarUrls: [],
@@ -139,6 +144,7 @@ export const data: Array<UmbMockUserModel> = [
 		updateDate: '2023-10-12T18:30:32.879Z',
 		userGroupIds: [{ id: 'user-group-editors-id' }, { id: 'user-group-sensitive-data-id' }],
 		userName: '',
+		flags: [],
 	},
 ];
 

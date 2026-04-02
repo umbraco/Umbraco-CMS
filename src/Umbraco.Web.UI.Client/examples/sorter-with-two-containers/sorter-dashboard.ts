@@ -1,9 +1,10 @@
+import type { ModelEntryType } from './sorter-group.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, LitElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
-import type { ModelEntryType } from './sorter-group.js';
 
 import './sorter-group.js';
+
 @customElement('example-sorter-dashboard')
 export class ExampleSorterDashboard extends UmbElementMixin(LitElement) {
 	groupOneItems: ModelEntryType[] = [

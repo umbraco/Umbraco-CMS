@@ -16,6 +16,12 @@ public class StylesheetProperty : BeingDirtyBase, IValueObject, IStylesheetPrope
     private string _alias;
     private string _value;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="StylesheetProperty" /> class.
+    /// </summary>
+    /// <param name="name">The name of the CSS rule for use in the back office.</param>
+    /// <param name="alias">The CSS selector.</param>
+    /// <param name="value">The CSS value for the selector.</param>
     public StylesheetProperty(string name, string alias, string value)
     {
         Name = name;

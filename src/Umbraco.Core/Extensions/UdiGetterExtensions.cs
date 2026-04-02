@@ -64,6 +64,10 @@ public static class UdiGetterExtensions
         {
             entityType = Constants.UdiEntityType.DataTypeContainer;
         }
+        else if (entity.ContainedObjectType == Constants.ObjectTypes.DocumentBlueprint)
+        {
+            entityType = Constants.UdiEntityType.DocumentBlueprintContainer;
+        }
         else if (entity.ContainedObjectType == Constants.ObjectTypes.DocumentType)
         {
             entityType = Constants.UdiEntityType.DocumentTypeContainer;
@@ -72,9 +76,9 @@ public static class UdiGetterExtensions
         {
             entityType = Constants.UdiEntityType.MediaTypeContainer;
         }
-        else if (entity.ContainedObjectType == Constants.ObjectTypes.DocumentBlueprint)
+        else if (entity.ContainedObjectType == Constants.ObjectTypes.MemberType)
         {
-            entityType = Constants.UdiEntityType.DocumentBlueprintContainer;
+            entityType = Constants.UdiEntityType.MemberTypeContainer;
         }
         else
         {

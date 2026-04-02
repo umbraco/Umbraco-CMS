@@ -103,8 +103,8 @@ public class TemplateBuilder
         var key = _key ?? Guid.NewGuid();
         var name = _name ?? Guid.NewGuid().ToString();
         var alias = _alias ?? name.ToCamelCase();
-        var createDate = _createDate ?? DateTime.Now;
-        var updateDate = _updateDate ?? DateTime.Now;
+        var createDate = _createDate ?? DateTime.UtcNow;
+        var updateDate = _updateDate ?? DateTime.UtcNow;
         var path = _path ?? $"-1,{id}";
         var content = _content;
         var isMasterTemplate = _isMasterTemplate ?? false;
@@ -129,9 +129,9 @@ public class TemplateBuilder
         return template;
     }
 
-    public static Template CreateTextPageTemplate(string alias = "textPage") =>
+    public static Template CreateTextPageTemplate(string alias = "textPage", string name = "Text page") =>
         (Template)new TemplateBuilder()
             .WithAlias(alias)
-            .WithName("Text page")
+            .WithName(name)
             .Build();
 }

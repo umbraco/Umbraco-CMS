@@ -433,6 +433,13 @@ public class PublishedRouter : IPublishedRouter
         }
     }
 
+    /// <summary>
+    ///     Finds a template rendering engine in the specified directory.
+    /// </summary>
+    /// <param name="directory">The directory to search.</param>
+    /// <param name="alias">The template alias.</param>
+    /// <param name="extensions">The file extensions to search for.</param>
+    /// <returns><c>true</c> if the template was found; otherwise, <c>false</c>.</returns>
     internal bool FindTemplateRenderingEngineInDirectory(DirectoryInfo? directory, string alias, string[] extensions)
     {
         if (directory == null || directory.Exists == false)

@@ -27,5 +27,6 @@ public class KeyValue : EntityBase, IKeyValue
         set => SetPropertyValueAndDetectChanges(value, ref _value, nameof(Value));
     }
 
+    /// <inheritdoc />
     bool IEntity.HasIdentity => !string.IsNullOrEmpty(Identifier);
 }

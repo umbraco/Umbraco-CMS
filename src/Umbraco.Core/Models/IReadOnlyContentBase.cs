@@ -1,5 +1,8 @@
 namespace Umbraco.Cms.Core.Models;
 
+/// <summary>
+///     Represents a read-only view of content base properties.
+/// </summary>
 public interface IReadOnlyContentBase
 {
     /// <summary>

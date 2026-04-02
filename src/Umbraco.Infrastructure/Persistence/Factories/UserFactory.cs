@@ -1,3 +1,4 @@
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Models.Membership.Permissions;
@@ -9,6 +10,13 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories;
 
 internal static class UserFactory
 {
+    /// <summary>
+    /// Constructs an <see cref="IUser"/> entity using the provided global settings, user data transfer object, and a set of permission mappers.
+    /// </summary>
+    /// <param name="globalSettings">The <see cref="GlobalSettings"/> instance containing configuration values used during user creation.</param>
+    /// <param name="dto">The <see cref="UserDto"/> containing user information from the data store.</param>
+    /// <param name="permissionMappers">A dictionary mapping permission keys to <see cref="IPermissionMapper"/> implementations, used to assign permissions to the user.</param>
+    /// <returns>An <see cref="IUser"/> entity populated with data from the provided <paramref name="dto"/> and configured according to <paramref name="globalSettings"/> and <paramref name="permissionMappers"/>.</returns>
     public static IUser BuildEntity(
         GlobalSettings globalSettings,
         UserDto dto,
@@ -21,7 +29,13 @@ internal static class UserFactory
             key = dto.Id.ToGuid();
         }
 
-        var user = new User(globalSettings, dto.Id, dto.UserName, dto.Email, dto.Login, dto.Password,
+        var user = new User(
+            globalSettings,
+            dto.Id,
+            dto.UserName,
+            dto.Email,
+            dto.Login,
+            dto.Password,
             dto.PasswordConfig,
             dto.UserGroupDtos.Select(x => ToReadOnlyGroup(x, permissionMappers)).ToArray(),
             dto.UserStartNodeDtos.Where(x => x.StartNodeType == (int)UserStartNodeDto.StartNodeTypeValue.Content)
@@ -40,23 +54,15 @@ internal static class UserFactory
             user.SecurityStamp = dto.SecurityStampToken;
             user.FailedPasswordAttempts = dto.FailedLoginAttempts ?? 0;
             user.Avatar = dto.Avatar;
-            user.EmailConfirmedDate = dto.EmailConfirmedDate;
-            user.InvitedDate = dto.InvitedDate;
+            user.EmailConfirmedDate = dto.EmailConfirmedDate?.EnsureUtc();
+            user.InvitedDate = dto.InvitedDate?.EnsureUtc();
             user.Kind = (UserKind)dto.Kind;
 
-            // Dates stored in the database are local server time, but for SQL Server, will be considered
-            // as DateTime.Kind = Utc. Fix this so we are consistent when later mapping to DataTimeOffset.
-            user.LastLockoutDate = dto.LastLockoutDate.HasValue
-                ? DateTime.SpecifyKind(dto.LastLockoutDate.Value, DateTimeKind.Local)
-                : null;
-            user.LastLoginDate = dto.LastLoginDate.HasValue
-                ? DateTime.SpecifyKind(dto.LastLoginDate.Value, DateTimeKind.Local)
-                : null;
-            user.LastPasswordChangeDate = dto.LastPasswordChangeDate.HasValue
-                ? DateTime.SpecifyKind(dto.LastPasswordChangeDate.Value, DateTimeKind.Local)
-                : null;
-            user.CreateDate = DateTime.SpecifyKind(dto.CreateDate, DateTimeKind.Local);
-            user.UpdateDate = DateTime.SpecifyKind(dto.UpdateDate, DateTimeKind.Local);
+            user.LastLockoutDate = dto.LastLockoutDate?.EnsureUtc();
+            user.LastLoginDate = dto.LastLoginDate?.EnsureUtc();
+            user.LastPasswordChangeDate = dto.LastPasswordChangeDate?.EnsureUtc();
+            user.CreateDate = dto.CreateDate.EnsureUtc();
+            user.UpdateDate = dto.UpdateDate.EnsureUtc();
 
             // reset dirty initial properties (U4-1946)
             user.ResetDirtyProperties(false);
@@ -69,6 +75,12 @@ internal static class UserFactory
         }
     }
 
+    /// <summary>
+    /// Creates a <see cref="UserDto"/> instance from the specified <see cref="IUser"/> entity.
+    /// Copies relevant properties from the user entity to the data transfer object, including start nodes and metadata.
+    /// </summary>
+    /// <param name="entity">The <see cref="IUser"/> entity to convert.</param>
+    /// <returns>A <see cref="UserDto"/> populated with data from the provided user entity.</returns>
     public static UserDto BuildDto(IUser entity)
     {
         var dto = new UserDto
@@ -123,7 +135,7 @@ internal static class UserFactory
 
         if (entity.HasIdentity)
         {
-            dto.Id = entity.Id.SafeCast<int>();
+            dto.Id = entity.Id;
         }
 
         return dto;

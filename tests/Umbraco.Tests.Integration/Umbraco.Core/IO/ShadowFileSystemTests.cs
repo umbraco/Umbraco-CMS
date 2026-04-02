@@ -38,8 +38,7 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
     {
         TestHelper.DeleteDirectory(hostingEnvironment.MapPathContentRoot("FileSysTests"));
         TestHelper.DeleteDirectory(
-            hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempData.EnsureEndsWith('/') +
-                                                  "ShadowFs"));
+            hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempData.EnsureEndsWith('/') + "ShadowFs"));
     }
 
     private static string NormPath(string path) => path.Replace('\\', Path.AltDirectorySeparatorChar);
@@ -160,6 +159,49 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
         Assert.IsTrue(File.Exists(path + "/ShadowTests/f1.txt"));
         Assert.IsTrue(fs.FileExists("f1.txt"));
         Assert.IsFalse(ss.FileExists("f1.txt"));
+
+        files = ss.GetFiles(string.Empty);
+        Assert.AreEqual(1, files.Count());
+        Assert.IsTrue(files.Contains("f2.txt"));
+    }
+
+    [Test]
+    public void ShadowMoveFile()
+    {
+        var path = HostingEnvironment.MapPathContentRoot("FileSysTests");
+        Directory.CreateDirectory(path);
+        Directory.CreateDirectory(path + "/ShadowTests");
+        Directory.CreateDirectory(path + "/ShadowSystem");
+
+        var fs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowTests/", "ignore");
+        var sfs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowSystem/", "ignore");
+        var ss = new ShadowFileSystem(fs, sfs);
+
+        File.WriteAllText(path + "/ShadowTests/f1.txt", "foo");
+        using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
+        {
+            ss.AddFile("f1.txt", ms);
+        }
+
+        var files = fs.GetFiles(string.Empty);
+        Assert.AreEqual(1, files.Count());
+        Assert.IsTrue(files.Contains("f1.txt"));
+
+        files = ss.GetFiles(string.Empty);
+        Assert.AreEqual(1, files.Count());
+        Assert.IsTrue(files.Contains("f1.txt"));
+
+        var dirs = ss.GetDirectories(string.Empty);
+        Assert.AreEqual(0, dirs.Count());
+
+        ss.MoveFile("f1.txt", "f2.txt");
+
+        Assert.IsTrue(File.Exists(path + "/ShadowTests/f1.txt"));
+        Assert.IsFalse(File.Exists(path + "/ShadowTests/f2.txt"));
+        Assert.IsTrue(fs.FileExists("f1.txt"));
+        Assert.IsFalse(fs.FileExists("f2.txt"));
+        Assert.IsFalse(ss.FileExists("f1.txt"));
+        Assert.IsTrue(ss.FileExists("f2.txt"));
 
         files = ss.GetFiles(string.Empty);
         Assert.AreEqual(1, files.Count());

@@ -35,7 +35,13 @@ namespace Umbraco.Cms.Core.IO
         private static string? _shadowCurrentId; // static - unique!!
         #region Constructor
 
-        // DI wants a public ctor
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FileSystems"/> class.
+        /// </summary>
+        /// <param name="loggerFactory">The logger factory.</param>
+        /// <param name="ioHelper">The IO helper.</param>
+        /// <param name="globalSettings">The global settings.</param>
+        /// <param name="hostingEnvironment">The hosting environment.</param>
         public FileSystems(
             ILoggerFactory loggerFactory,
             IIOHelper ioHelper,
@@ -49,7 +55,18 @@ namespace Umbraco.Cms.Core.IO
             _hostingEnvironment = hostingEnvironment;
         }
 
-        // Ctor for tests, allows you to set the various filesystems
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FileSystems"/> class for testing.
+        /// </summary>
+        /// <param name="loggerFactory">The logger factory.</param>
+        /// <param name="ioHelper">The IO helper.</param>
+        /// <param name="globalSettings">The global settings.</param>
+        /// <param name="hostingEnvironment">The hosting environment.</param>
+        /// <param name="partialViewsFileSystem">The partial views file system.</param>
+        /// <param name="stylesheetFileSystem">The stylesheet file system.</param>
+        /// <param name="scriptsFileSystem">The scripts file system.</param>
+        /// <param name="mvcViewFileSystem">The MVC view file system.</param>
+        /// <remarks>This constructor allows setting the various filesystems for testing purposes.</remarks>
         internal FileSystems(
             ILoggerFactory loggerFactory,
             IIOHelper ioHelper,
@@ -186,10 +203,16 @@ namespace Umbraco.Cms.Core.IO
             _stylesheetsFileSystem = CreateShadowWrapperInternal(fileSystem, "css");
         }
 
+        /// <summary>
+        /// Ensures that the well-known file systems are initialized.
+        /// </summary>
         private void EnsureWellKnownFileSystems() => LazyInitializer.EnsureInitialized(ref _wkfsObject, ref _wkfsInitialized, ref _wkfsLock, CreateWellKnownFileSystems);
 
-        // need to return something to LazyInitializer.EnsureInitialized
-        // but it does not really matter what we return - here, null
+        /// <summary>
+        /// Creates the well-known file systems.
+        /// </summary>
+        /// <returns>Always returns null; the return value is required by LazyInitializer.</returns>
+        /// <remarks>Need to return something to LazyInitializer.EnsureInitialized but it does not really matter what we return.</remarks>
         private object? CreateWellKnownFileSystems()
         {
             ILogger<PhysicalFileSystem> logger = _loggerFactory.CreateLogger<PhysicalFileSystem>();
@@ -237,7 +260,7 @@ namespace Umbraco.Cms.Core.IO
         /// <summary>
         /// Shadows the filesystem, should never be used outside the Scope class.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>An <see cref="ICompletable"/> representing the shadow scope.</returns>
         [EditorBrowsable(EditorBrowsableState.Never)]
         public ICompletable Shadow()
         {
@@ -250,6 +273,11 @@ namespace Umbraco.Cms.Core.IO
             return new ShadowFileSystems(this, id); // will invoke BeginShadow and EndShadow
         }
 
+        /// <summary>
+        /// Begins shadowing with the specified identifier.
+        /// </summary>
+        /// <param name="id">The shadow identifier.</param>
+        /// <exception cref="InvalidOperationException">Thrown when already shadowing.</exception>
         internal void BeginShadow(string id)
         {
             lock (_shadowLocker)
@@ -273,6 +301,13 @@ namespace Umbraco.Cms.Core.IO
             }
         }
 
+        /// <summary>
+        /// Ends shadowing with the specified identifier.
+        /// </summary>
+        /// <param name="id">The shadow identifier.</param>
+        /// <param name="completed">Whether the shadow operation completed successfully.</param>
+        /// <exception cref="InvalidOperationException">Thrown when not currently shadowing or when the identifier doesn't match.</exception>
+        /// <exception cref="AggregateException">Thrown when some changes could not be applied or aborted.</exception>
         internal void EndShadow(string id, bool completed)
         {
             lock (_shadowLocker)
@@ -316,14 +351,20 @@ namespace Umbraco.Cms.Core.IO
         }
 
         /// <summary>
-        /// Creates a shadow wrapper for a filesystem, should never be used outside UmbracoBuilder or testing
+        /// Creates a shadow wrapper for a filesystem, should never be used outside UmbracoBuilder or testing.
         /// </summary>
-        /// <param name="filesystem"></param>
-        /// <param name="shadowPath"></param>
-        /// <returns></returns>
+        /// <param name="filesystem">The file system to wrap.</param>
+        /// <param name="shadowPath">The shadow path.</param>
+        /// <returns>A shadow-wrapped file system.</returns>
         [EditorBrowsable(EditorBrowsableState.Never)]
         public IFileSystem CreateShadowWrapper(IFileSystem filesystem, string shadowPath) => CreateShadowWrapperInternal(filesystem, shadowPath);
 
+        /// <summary>
+        /// Creates a shadow wrapper for a filesystem.
+        /// </summary>
+        /// <param name="filesystem">The file system to wrap.</param>
+        /// <param name="shadowPath">The shadow path.</param>
+        /// <returns>A shadow-wrapped file system.</returns>
         private ShadowWrapper CreateShadowWrapperInternal(IFileSystem filesystem, string shadowPath)
         {
             lock (_shadowLocker)

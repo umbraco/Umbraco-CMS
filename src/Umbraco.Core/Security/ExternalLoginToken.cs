@@ -4,6 +4,11 @@ namespace Umbraco.Cms.Core.Security;
 public class ExternalLoginToken : IExternalLoginToken
 {
     /// <summary>
+    ///     The database table name for external login tokens.
+    /// </summary>
+    public const string TableName = Constants.DatabaseSchema.Tables.ExternalLoginToken;
+
+    /// <summary>
     ///     Initializes a new instance of the <see cref="ExternalLoginToken" /> class.
     /// </summary>
     public ExternalLoginToken(string loginProvider, string name, string value)

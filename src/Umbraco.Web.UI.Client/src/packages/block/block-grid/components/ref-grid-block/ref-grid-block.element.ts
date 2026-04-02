@@ -23,6 +23,7 @@ export class UmbRefGridBlockElement extends UUIRefNodeElement {
 				min-height: var(--uui-size-16);
 				flex-flow: row wrap;
 				background-color: var(--uui-color-surface);
+				padding: 0;
 			}
 
 			.break {
@@ -32,8 +33,10 @@ export class UmbRefGridBlockElement extends UUIRefNodeElement {
 
 			#open-part {
 				display: flex;
+				align-self: start;
+				box-sizing: border-box;
 				min-height: var(--uui-size-16);
-				padding: calc(var(--uui-size-2) + 1px);
+				margin: 0;
 			}
 
 			:host([unpublished]) #open-part {

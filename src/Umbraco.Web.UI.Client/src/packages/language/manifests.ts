@@ -9,6 +9,7 @@ import { manifests as menuManifests } from './menu/manifests.js';
 import { manifests as modalManifests } from './modals/manifests.js';
 import { manifests as repositoryManifests } from './repository/manifests.js';
 import { manifests as workspaceManifests } from './workspace/manifests.js';
+import * as entryPointModule from './entry-point.js';
 import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
 
 export const manifests: Array<UmbExtensionManifest> = [
@@ -34,5 +35,11 @@ export const manifests: Array<UmbExtensionManifest> = [
 				match: 'Umb.Workspace.Document',
 			},
 		],
+	},
+	{
+		name: 'Language Backoffice Entry Point',
+		alias: 'Umb.EntryPoint.Language',
+		type: 'backofficeEntryPoint',
+		js: entryPointModule,
 	},
 ];

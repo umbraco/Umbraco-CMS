@@ -13,7 +13,7 @@ export class UmbCreateUserModalElement extends UmbModalBaseElement<UmbCreateUser
 	#userDetailRepository = new UmbUserDetailRepository(this);
 
 	@query('#CreateUserForm')
-	_form?: HTMLFormElement;
+	private _form?: HTMLFormElement;
 
 	async #onSubmit(e: SubmitEvent) {
 		e.preventDefault();

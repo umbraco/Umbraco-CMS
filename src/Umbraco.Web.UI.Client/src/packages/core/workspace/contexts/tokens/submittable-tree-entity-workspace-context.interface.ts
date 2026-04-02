@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import type { UmbSubmittableWorkspaceContext } from './submittable-workspace-context.interface.js';
 import type { UmbEntityModel, UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 import type { Observable } from '@umbraco-cms/backoffice/observable-api';

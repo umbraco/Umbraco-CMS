@@ -43,5 +43,6 @@ public class DomainAndUri : Domain
     /// </summary>
     public Uri Uri { get; }
 
+    /// <inheritdoc />
     public override string ToString() => $"{{ \"{Name}\", \"{Uri}\" }}";
 }

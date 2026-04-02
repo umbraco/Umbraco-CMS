@@ -1,20 +1,16 @@
 import { UMB_MEDIA_PLACEHOLDER_ENTITY_TYPE } from '../entity.js';
+import { UMB_EDIT_MEDIA_WORKSPACE_PATH_PATTERN } from '../paths.js';
 import { UMB_MEDIA_GRID_COLLECTION_VIEW_ALIAS } from './views/constants.js';
 import type { UmbMediaCollectionFilterModel, UmbMediaCollectionItemModel } from './types.js';
 import type { UmbFileDropzoneItemStatus } from '@umbraco-cms/backoffice/dropzone';
 import { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 export class UmbMediaCollectionContext extends UmbDefaultCollectionContext<
 	UmbMediaCollectionItemModel,
 	UmbMediaCollectionFilterModel
 > {
-	/**
-	 * The thumbnail items that are currently displayed in the collection.
-	 * @deprecated Use the `<umb-imaging-thumbnail>` element instead. This will be removed in Umbraco 17.
-	 */
-	public readonly thumbnailItems = this.items;
-
 	#placeholders = new UmbArrayState<UmbMediaCollectionItemModel>([], (x) => x.unique);
 	public readonly placeholders = this.#placeholders.asObservable();
 
@@ -33,6 +29,7 @@ export class UmbMediaCollectionContext extends UmbDefaultCollectionContext<
 				updateDate: date,
 				createDate: date,
 				entityType: UMB_MEDIA_PLACEHOLDER_ENTITY_TYPE,
+				flags: [],
 				...placeholder,
 			}))
 			.reverse();
@@ -56,9 +53,20 @@ export class UmbMediaCollectionContext extends UmbDefaultCollectionContext<
 	/**
 	 * Requests the collection from the repository.
 	 * @returns {Promise<void>}
-	 * @memberof UmbCollectionContext
+	 * @deprecated Deprecated since v.17.0.0. Use `loadCollection` instead.
+	 * @memberof UmbMediaCollectionContext
 	 */
-	public override async requestCollection() {
+	public override async requestCollection(): Promise<void> {
+		new UmbDeprecation({
+			removeInVersion: '19.0.0',
+			deprecated: 'requestCollection',
+			solution: 'Use .loadCollection method instead',
+		}).warn();
+
+		return this._requestCollection();
+	}
+
+	protected override async _requestCollection() {
 		await this._init;
 
 		if (!this._configured) this._configure();
@@ -90,6 +98,15 @@ export class UmbMediaCollectionContext extends UmbDefaultCollectionContext<
 		completedPlaceholders.forEach((placeholder) => {
 			this.#placeholders.removeOne(placeholder.unique);
 		});
+	}
+
+	/**
+	 * Returns the href for a specific media collection item.
+	 * @param {UmbMediaCollectionItemModel} item - The media item to get the href for.
+	 * @returns {Promise<string | undefined>} - The edit workspace href for the media.
+	 */
+	override async requestItemHref(item: UmbMediaCollectionItemModel): Promise<string | undefined> {
+		return `${UMB_EDIT_MEDIA_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: item.unique })}`;
 	}
 }
 

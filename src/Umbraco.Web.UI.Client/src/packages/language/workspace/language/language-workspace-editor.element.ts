@@ -6,7 +6,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 @customElement('umb-language-workspace-editor')
 export class UmbLanguageWorkspaceEditorElement extends UmbLitElement {
 	@state()
-	_isNew?: boolean;
+	private _isNew?: boolean;
 
 	constructor() {
 		super();

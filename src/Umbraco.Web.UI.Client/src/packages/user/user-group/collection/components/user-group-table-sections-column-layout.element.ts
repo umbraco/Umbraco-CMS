@@ -16,11 +16,11 @@ export class UmbUserGroupTableSectionsColumnLayoutElement extends UmbLitElement 
 
 	override updated(changedProperties: Map<string, any>) {
 		if (changedProperties.has('value')) {
-			this.observeSectionNames();
+			this._observeSectionNames();
 		}
 	}
 
-	private observeSectionNames() {
+	private _observeSectionNames() {
 		this.observe(
 			umbExtensionsRegistry.byType('section'),
 			(sections) => {

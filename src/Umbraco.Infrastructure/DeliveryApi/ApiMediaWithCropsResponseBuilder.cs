@@ -11,6 +11,13 @@ internal sealed class ApiMediaWithCropsResponseBuilder : ApiMediaWithCropsBuilde
     private readonly IPublishedMediaCache _mediaCache;
     private readonly IMediaNavigationQueryService _navigationQueryService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ApiMediaWithCropsResponseBuilder"/> class.
+    /// </summary>
+    /// <param name="apiMediaBuilder">The builder used to construct API media representations.</param>
+    /// <param name="publishedValueFallback">The service used to provide fallback values for published content properties.</param>
+    /// <param name="mediaCache">The cache used for accessing published media items.</param>
+    /// <param name="navigationQueryService">The service used to query media navigation structures.</param>
     public ApiMediaWithCropsResponseBuilder(
         IApiMediaBuilder apiMediaBuilder,
         IPublishedValueFallback publishedValueFallback,

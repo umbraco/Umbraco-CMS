@@ -1,5 +1,8 @@
-﻿namespace Umbraco.Cms.Core.DeliveryApi;
+namespace Umbraco.Cms.Core.DeliveryApi;
 
+/// <summary>
+///     Defines a provider that retrieves claims for the currently logged in member.
+/// </summary>
 public interface ICurrentMemberClaimsProvider
 {
     /// <summary>

@@ -40,7 +40,7 @@ export class UmbMediaUrlServerDataSource extends UmbItemServerDataSourceBase<
 }
 
 const mapper = (item: MediaUrlInfoResponseModel): UmbMediaUrlModel => {
-	const url = item.urlInfos.length ? item.urlInfos[0].url : undefined;
+	const url = item.urlInfos.length ? (item.urlInfos[0].url ?? undefined) : undefined;
 	const extension = url ? url.slice(url.lastIndexOf('.') + 1, url.length) : undefined;
 
 	return {

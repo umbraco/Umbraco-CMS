@@ -7,6 +7,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// </summary>
 public class UnPublishedContentPropertyCacheCompressionOptions : IPropertyCacheCompressionOptions
 {
+    /// <inheritdoc />
     public bool IsCompressed(IReadOnlyContentBase content, IPropertyType propertyType, IDataEditor dataEditor, bool published)
     {
         if (!published && propertyType.SupportsPublishing && propertyType.ValueStorageType == ValueStorageType.Ntext)

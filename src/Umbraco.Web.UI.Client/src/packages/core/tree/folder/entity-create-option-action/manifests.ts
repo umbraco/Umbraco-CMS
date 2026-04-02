@@ -15,7 +15,7 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 			meta: {
 				icon: 'icon-folder',
 				label: '#create_folder',
-				description: '#create_folderDescription',
+				additionalOptions: true,
 			},
 		},
 	},

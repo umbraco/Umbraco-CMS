@@ -11,25 +11,88 @@ namespace Umbraco.Cms.Core.Configuration.Models;
 [UmbracoOptions(Constants.Configuration.ConfigContent)]
 public class ContentSettings
 {
+    /// <summary>
+    ///     The default value for resolving URLs from text strings.
+    /// </summary>
     internal const bool StaticResolveUrlsFromTextString = false;
 
+    /// <summary>
+    ///     The default preview badge markup template.
+    /// </summary>
     internal const string StaticDefaultPreviewBadge = @"
 <script src=""{0}/website/preview.js""></script>
 <umb-website-preview path=""{0}"" url=""{1}"" unique=""{2}""></umb-website-preview>";
 
+    /// <summary>
+    ///     The default comma-separated list of disallowed file extensions for upload.
+    /// </summary>
     internal const string StaticDisallowedUploadFiles = "ashx,aspx,ascx,config,cshtml,vbhtml,asmx,air,axd,xamlx";
+
+    /// <summary>
+    ///     The default value for showing deprecated property editors.
+    /// </summary>
     internal const bool StaticShowDeprecatedPropertyEditors = false;
+
+    /// <summary>
+    ///     The default path for the login background image.
+    /// </summary>
     internal const string StaticLoginBackgroundImage = "assets/login.jpg";
+
+    /// <summary>
+    ///     The default path for the login logo image.
+    /// </summary>
     internal const string StaticLoginLogoImage = "assets/logo_light.svg";
+
+    /// <summary>
+    ///     The default path for the alternative login logo image.
+    /// </summary>
     internal const string StaticLoginLogoImageAlternative = "assets/logo_dark.svg";
+
+    /// <summary>
+    ///     The default path for the back-office logo.
+    /// </summary>
     internal const string StaticBackOfficeLogo = "assets/logo.svg";
+
+    /// <summary>
+    ///     The default path for the alternative back-office logo.
+    /// </summary>
     internal const string StaticBackOfficeLogoAlternative = "assets/logo_blue.svg";
+
+    /// <summary>
+    ///     The default value for hiding the back-office logo.
+    /// </summary>
     internal const bool StaticHideBackOfficeLogo = false;
+
+    /// <summary>
+    ///     The default value for disabling delete when referenced.
+    /// </summary>
     internal const bool StaticDisableDeleteWhenReferenced = false;
+
+    /// <summary>
+    ///     The default value for disabling unpublish when referenced.
+    /// </summary>
     internal const bool StaticDisableUnpublishWhenReferenced = false;
+
+    /// <summary>
+    ///     The default value for allowing edit of invariant properties from non-default language.
+    /// </summary>
     internal const bool StaticAllowEditInvariantFromNonDefault = false;
+
+    /// <summary>
+    ///     The default value for showing domain warnings.
+    /// </summary>
     internal const bool StaticShowDomainWarnings = true;
+
+    /// <summary>
+    ///     The default value for showing unroutable content warnings.
+    /// </summary>
     internal const bool StaticShowUnroutableContentWarnings = true;
+
+    // TODO (V18): Consider enabling this by default and documenting as a behavioural breaking change.
+    /// <summary>
+    ///     The default value for enabling media recycle bin protection.
+    /// </summary>
+    private const bool StaticEnableMediaRecycleBinProtection = false;
 
     /// <summary>
     ///     Gets or sets a value for the content notification settings.
@@ -105,7 +168,7 @@ public class ContentSettings
     ///     Gets or sets a value indicating whether to hide the backoffice umbraco logo or not.
     /// </summary>
     [DefaultValue(StaticHideBackOfficeLogo)]
-    [Obsolete("This setting is no longer used and will be removed in future versions. An alternative BackOffice logo can be set using the BackOfficeLogo setting.")]
+    [Obsolete("This setting is no longer used. An alternative BackOffice logo can be set using the BackOfficeLogo setting. Scheduled for removal in Umbraco 18.")]
     public bool HideBackOfficeLogo { get; set; } = StaticHideBackOfficeLogo;
 
     /// <summary>
@@ -158,4 +221,16 @@ public class ContentSettings
     /// </summary>
     [DefaultValue(StaticShowUnroutableContentWarnings)]
     public bool ShowUnroutableContentWarnings { get; set; } = StaticShowUnroutableContentWarnings;
+
+    /// <summary>
+    /// Gets or sets a value indicating whether to enable or disable the recycle bin protection for media.
+    /// </summary>
+    /// <remarks>
+    /// When set to true, this will:
+    ///  - Rename media moved to the recycle bin to have a .deleted suffice (e.g. image.jpg will be renamed to image.deleted.jpg).
+    ///  - On restore, the media file will be renamed back to its original name.
+    ///  - A middleware component will be enabled to prevent access to media files in the recycle bin unless the user is authenticated with access to the media section.
+    /// </remarks>
+    [DefaultValue(StaticEnableMediaRecycleBinProtection)]
+    public bool EnableMediaRecycleBinProtection { get; set; } = StaticEnableMediaRecycleBinProtection;
 }

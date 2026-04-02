@@ -3,6 +3,7 @@
 
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Configuration.Models;
 
@@ -14,6 +15,7 @@ public class UnattendedSettings
 {
     private const bool StaticInstallUnattended = false;
     private const bool StaticUpgradeUnattended = false;
+    private const TelemetryLevel StaticTelemetryLevel = TelemetryLevel.Detailed;
 
     /// <summary>
     ///     Gets or sets a value indicating whether unattended installs are enabled.
@@ -58,4 +60,10 @@ public class UnattendedSettings
     ///     Gets or sets a value to use for creating a user with a password for Unattended Installs
     /// </summary>
     public string? UnattendedUserPassword { get; set; } = null;
+
+    /// <summary>
+    ///     Gets or sets a telemetry level to use for Unattended Installs
+    /// </summary>
+    [DefaultValue(StaticTelemetryLevel)]
+    public TelemetryLevel UnattendedTelemetryLevel { get; set; } = StaticTelemetryLevel;
 }

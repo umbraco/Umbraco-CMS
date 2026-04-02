@@ -1,4 +1,5 @@
 import { UMB_CLIPBOARD_ENTRY_ITEM_REPOSITORY_ALIAS, UMB_CLIPBOARD_ENTRY_ITEM_STORE_ALIAS } from './constants.js';
+import { UmbClipboardEntryItemStore } from './clipboard-entry-item.store.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -11,6 +12,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'itemStore',
 		alias: UMB_CLIPBOARD_ENTRY_ITEM_STORE_ALIAS,
 		name: 'Clipboard Entry Item Store',
-		api: () => import('./clipboard-entry-item.store.js'),
+		api: UmbClipboardEntryItemStore,
 	},
 ];

@@ -7,10 +7,9 @@ import { html, customElement, state, repeat, css } from '@umbraco-cms/backoffice
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 
-import { UmbMemberTypeTreeRepository } from '@umbraco-cms/backoffice/member-type';
+import { UmbMemberTypeStructureRepository } from '@umbraco-cms/backoffice/member-type';
 
-const elementName = 'umb-member-create-options-modal';
-@customElement(elementName)
+@customElement('umb-member-create-options-modal')
 export class UmbMemberCreateOptionsModalElement extends UmbModalBaseElement<
 	UmbMemberCreateOptionsModalData,
 	UmbMemberCreateOptionsModalValue
@@ -18,26 +17,23 @@ export class UmbMemberCreateOptionsModalElement extends UmbModalBaseElement<
 	@state()
 	private _options: Array<{ label: string; unique: string; icon: string }> = [];
 
-	#memberTypeTreeRepository = new UmbMemberTypeTreeRepository(this);
+	#memberTypeStructureRepository = new UmbMemberTypeStructureRepository(this);
 
 	override firstUpdated() {
 		this.#getOptions();
 	}
 
 	async #getOptions() {
-		//TODO: Should we use the tree repository or make a collection repository?
-		//TODO: And how would we get all the member types?
-		//TODO: This only works because member types can't have folders.
-		const { data } = await this.#memberTypeTreeRepository.requestTreeRootItems({});
+		const { data } = await this.#memberTypeStructureRepository.requestAllowedChildrenOf(null, null);
 		if (!data) return;
 
-		this._options = data.items.map((item) => {
-			return {
+		this._options = data.items
+			.filter((item) => item.unique !== null)
+			.map((item) => ({
 				label: item.name,
-				unique: item.unique,
+				unique: item.unique!,
 				icon: item.icon || '',
-			};
-		});
+			}));
 	}
 
 	// close the modal when navigating
@@ -53,33 +49,29 @@ export class UmbMemberCreateOptionsModalElement extends UmbModalBaseElement<
 
 	override render() {
 		return html`
-			<umb-body-layout headline=${this.localize.term('actions_create')}>
+			<uui-dialog-layout headline=${this.localize.term('actions_create')}>
 				${this.#renderOptions()}
 				<uui-button
 					slot="actions"
 					id="cancel"
 					label=${this.localize.term('general_cancel')}
 					@click="${this._rejectModal}"></uui-button>
-			</umb-body-layout>
+			</uui-dialog-layout>
 		`;
 	}
 
 	#renderOptions() {
-		return html`
-			<uui-box>
-				${repeat(
-					this._options,
-					(option) => option.unique,
-					(option) => html`
-						<uui-ref-node
-							.name=${this.localize.string(option.label)}
-							@open=${(event: Event) => this.#onOpen(event, option.unique)}>
-							<umb-icon slot="icon" name=${option.icon || 'icon-circle-dotted'}></umb-icon>
-						</uui-ref-node>
-					`,
-				)}
-			</uui-box>
-		`;
+		return repeat(
+			this._options,
+			(option) => option.unique,
+			(option) => html`
+				<uui-ref-node
+					.name=${this.localize.string(option.label) + '...'}
+					@open=${(event: Event) => this.#onOpen(event, option.unique)}>
+					<umb-icon slot="icon" name=${option.icon || 'icon-circle-dotted'}></umb-icon>
+				</uui-ref-node>
+			`,
+		);
 	}
 
 	static override styles = [
@@ -100,6 +92,6 @@ export { UmbMemberCreateOptionsModalElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbMemberCreateOptionsModalElement;
+		'umb-member-create-options-modal': UmbMemberCreateOptionsModalElement;
 	}
 }

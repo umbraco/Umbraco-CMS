@@ -18,6 +18,7 @@ public class ContentFinderByKeyPath : ContentFinderByIdentifierPathBase, IConten
     private readonly IUmbracoContextAccessor _umbracoContextAccessor;
     private WebRoutingSettings _webRoutingSettings;
 
+    /// <inheritdoc />
     protected override string FailureLogMessageTemplate => "Not a node key";
 
     /// <summary>

@@ -1,0 +1,1 @@
+The full development guide for this repository lives in [CLAUDE.md](../CLAUDE.md). Please read that file for complete instructions on architecture, build steps, testing, branching conventions, and coding patterns.

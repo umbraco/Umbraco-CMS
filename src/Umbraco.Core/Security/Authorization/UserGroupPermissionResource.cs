@@ -3,7 +3,7 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Core.Security.Authorization;
 
 /// <summary>
-///     A resource used for the <see cref="UserGroupPermissionHandler" />.
+///     A resource used for the UserGroupPermissionHandler authorization handler.
 /// </summary>
 public class UserGroupPermissionResource : IPermissionResource
 {

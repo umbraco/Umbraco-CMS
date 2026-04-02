@@ -1,5 +1,8 @@
 namespace Umbraco.Cms.Core;
 
+/// <summary>
+///     Provides information about the Umbraco backoffice.
+/// </summary>
 public interface IBackOfficeInfo
 {
     /// <summary>

@@ -21,12 +21,6 @@ public class ActionPublish : IAction
     public string Alias => ActionAlias;
 
     /// <inheritdoc />
-    public string Category => Constants.Conventions.PermissionCategories.ContentCategory;
-
-    /// <inheritdoc />
-    public string Icon => string.Empty;
-
-    /// <inheritdoc />
     public bool ShowInNotifier => true;
 
     /// <inheritdoc />

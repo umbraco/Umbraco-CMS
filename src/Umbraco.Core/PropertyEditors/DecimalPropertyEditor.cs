@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
+using System.Text.Json.Nodes;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
@@ -20,7 +21,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     Constants.PropertyEditors.Aliases.Decimal,
     ValueType = ValueTypes.Decimal,
     ValueEditorIsReusable = true)]
-public class DecimalPropertyEditor : DataEditor
+public class DecimalPropertyEditor : DataEditor, IValueSchemaProvider
 {
     /// <summary>
     ///     Initializes a new instance of the <see cref="DecimalPropertyEditor" /> class.
@@ -31,12 +32,45 @@ public class DecimalPropertyEditor : DataEditor
         SupportsReadOnly = true;
 
     /// <inheritdoc />
+    public Type? GetValueType(object? configuration) => typeof(decimal?);
+
+    /// <inheritdoc />
+    public JsonObject? GetValueSchema(object? configuration)
+    {
+        var schema = new JsonObject
+        {
+            ["$schema"] = "https://json-schema.org/draft/2020-12/schema",
+            ["type"] = new JsonArray("number", "null"),
+        };
+
+        // Add min/max/step constraints from configuration if available
+        if (configuration is IDictionary<string, object> configDict)
+        {
+            if (configDict.TryGetValue("min", out var minValue) && minValue is double min)
+            {
+                schema["minimum"] = min;
+            }
+
+            if (configDict.TryGetValue("max", out var maxValue) && maxValue is double max)
+            {
+                schema["maximum"] = max;
+            }
+
+            if (configDict.TryGetValue("step", out var stepValue) && stepValue is double step && step > 0)
+            {
+                schema["multipleOf"] = step;
+            }
+        }
+
+        return schema;
+    }
+
+    /// <inheritdoc />
     protected override IDataValueEditor CreateValueEditor()
         => DataValueEditorFactory.Create<DecimalPropertyValueEditor>(Attribute!);
 
     /// <inheritdoc />
     protected override IConfigurationEditor CreateConfigurationEditor() => new DecimalConfigurationEditor();
-
 
     /// <summary>
     /// Defines the value editor for the decimal property editor.
@@ -64,11 +98,18 @@ public class DecimalPropertyEditor : DataEditor
             => TryParsePropertyValue(editorValue.Value);
 
         private static decimal? TryParsePropertyValue(object? value)
-            => value is decimal decimalValue
-                ? decimalValue
-                : decimal.TryParse(value?.ToString(), CultureInfo.InvariantCulture, out var parsedDecimalValue)
-                    ? parsedDecimalValue
-                    : null;
+            => value switch
+            {
+                decimal d => d,
+                double db => (decimal)db,
+                float f => (decimal)f,
+                IFormattable f => decimal.TryParse(f.ToString(null, CultureInfo.InvariantCulture), NumberStyles.Any, CultureInfo.InvariantCulture, out var parsedDecimalValue)
+                        ? parsedDecimalValue
+                        : null,
+                _ => decimal.TryParse(value?.ToString(), CultureInfo.CurrentCulture, out var parsedDecimalValue)
+                        ? parsedDecimalValue
+                        : null,
+            };
 
         /// <summary>
         /// Base validator for the decimal property editor validation against data type configured values.
@@ -102,7 +143,38 @@ public class DecimalPropertyEditor : DataEditor
 
             /// <inheritdoc/>
             protected override bool TryParsePropertyValue(object? value, out double parsedDecimalValue)
-                => double.TryParse(value?.ToString(), CultureInfo.InvariantCulture, out parsedDecimalValue);
+            {
+                if (value is null)
+                {
+                    parsedDecimalValue = default;
+                    return false;
+                }
+
+                if (value is decimal decimalValue)
+                {
+                    parsedDecimalValue = (double)decimalValue;
+                    return true;
+                }
+
+                if (value is double doubleValue)
+                {
+                    parsedDecimalValue = doubleValue;
+                    return true;
+                }
+
+                if (value is float floatValue)
+                {
+                    parsedDecimalValue = (double)floatValue;
+                    return true;
+                }
+
+                if (value is IFormattable formattableValue)
+                {
+                    return double.TryParse(formattableValue.ToString(null, CultureInfo.InvariantCulture), NumberStyles.Any, CultureInfo.InvariantCulture, out parsedDecimalValue);
+                }
+
+                return double.TryParse(value.ToString(), NumberStyles.Any, CultureInfo.CurrentCulture, out parsedDecimalValue);
+            }
         }
 
         /// <summary>

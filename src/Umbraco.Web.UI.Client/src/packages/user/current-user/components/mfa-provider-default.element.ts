@@ -101,8 +101,8 @@ export class UmbMfaProviderDefaultElement extends UmbLitElement implements UmbMf
 									<img
 										id="qrCode"
 										.src=${this._qrCodeSetupImageUrl}
-										alt=${this.localize.term('user_2faQrCodeAlt')}
-										title=${this.localize.term('user_2faQrCodeTitle')}
+										alt=${this.localize.term('user_2faQrCodeAlt', this.displayName)}
+										title=${this.localize.term('user_2faQrCodeTitle', this.displayName)}
 										loading="eager" />
 								</div>
 								<uui-form-layout-item class="text-center">

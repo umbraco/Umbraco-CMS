@@ -1,6 +1,5 @@
-import { UMB_USER_WORKSPACE_PATH } from '../../../../../paths.js';
 import { html, LitElement, customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbTableColumn, UmbTableItem } from '@umbraco-cms/backoffice/components';
+import type { UmbTableColumn } from '@umbraco-cms/backoffice/components';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 @customElement('umb-user-table-name-column-layout')
@@ -8,22 +7,26 @@ export class UmbUserTableNameColumnLayoutElement extends LitElement {
 	@property({ type: Object, attribute: false })
 	column!: UmbTableColumn;
 
-	@property({ type: Object, attribute: false })
-	item!: UmbTableItem;
-
 	@property({ attribute: false })
-	value!: any;
+	value!: {
+		name: string;
+		unique: string;
+		kind: string;
+		avatarUrls: Record<string, string>;
+		href?: string;
+	};
 
 	override render() {
-		const href = UMB_USER_WORKSPACE_PATH + '/edit/' + this.value.unique;
-
 		return html` <div style="display: flex; align-items: center;">
 			<umb-user-avatar
 				style="margin-right: var(--uui-size-space-3);"
 				name=${this.value.name}
 				kind=${this.value.kind}
 				.imgUrls=${this.value.avatarUrls}></umb-user-avatar>
-			<a style="font-weight: bold;" href="${href}">${this.value.name}</a>
+
+			${this.value.href
+				? html`<a style="font-weight: bold;" href="${this.value.href}">${this.value.name}</a>`
+				: html` <span>${this.value.name}</span>`}
 		</div>`;
 	}
 	static override styles = [UmbTextStyles];

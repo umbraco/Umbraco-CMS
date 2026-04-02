@@ -4,15 +4,27 @@ using Umbraco.Cms.Core.Models.Packaging;
 namespace Umbraco.Cms.Core.Packaging;
 
 /// <summary>
-///     Parses the xml document contained in a compiled (zip) Umbraco package
+///     Parses the XML document contained in a compiled (zip) Umbraco package.
 /// </summary>
 public class CompiledPackageXmlParser
 {
     private readonly ConflictingPackageData _conflictingPackageData;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="CompiledPackageXmlParser"/> class.
+    /// </summary>
+    /// <param name="conflictingPackageData">The service used to detect conflicting package data.</param>
     public CompiledPackageXmlParser(ConflictingPackageData conflictingPackageData) =>
         _conflictingPackageData = conflictingPackageData;
 
+    /// <summary>
+    ///     Converts an XML document to a <see cref="CompiledPackage"/> model.
+    /// </summary>
+    /// <param name="xml">The XML document representing the package.</param>
+    /// <returns>A <see cref="CompiledPackage"/> instance containing the parsed package data.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="xml"/> is <c>null</c>.</exception>
+    /// <exception cref="InvalidOperationException">Thrown when the XML document is invalid.</exception>
+    /// <exception cref="FormatException">Thrown when the XML document format is not a valid Umbraco package.</exception>
     public CompiledPackage ToCompiledPackage(XDocument xml)
     {
         if (xml is null)
@@ -70,6 +82,11 @@ public class CompiledPackageXmlParser
         return def;
     }
 
+    /// <summary>
+    ///     Gets the installation warnings for a compiled package by checking for conflicts.
+    /// </summary>
+    /// <param name="package">The compiled package to check for conflicts.</param>
+    /// <returns>An <see cref="InstallWarnings"/> instance containing any detected conflicts.</returns>
     private InstallWarnings GetInstallWarnings(CompiledPackage package)
     {
         var installWarnings = new InstallWarnings

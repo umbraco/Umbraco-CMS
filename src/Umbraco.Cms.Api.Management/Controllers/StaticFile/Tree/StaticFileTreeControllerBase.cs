@@ -1,20 +1,49 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Controllers.Tree;
 using Umbraco.Cms.Api.Management.Routing;
+using Umbraco.Cms.Api.Management.Services.FileSystem;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 
 namespace Umbraco.Cms.Api.Management.Controllers.StaticFile.Tree;
 
+/// <summary>
+/// Serves as the base controller for handling operations related to static file trees in the Umbraco CMS Management API.
+/// Provides common functionality for derived controllers managing static files.
+/// </summary>
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Tree}/static-file")]
 [ApiExplorerSettings(GroupName = "Static File")]
 public class StaticFileTreeControllerBase : FileSystemTreeControllerBase
 {
+    private readonly IFileSystemTreeService _fileSystemTreeService;
     private static readonly string[] _allowedRootFolders = { $"{Path.DirectorySeparatorChar}App_Plugins", $"{Path.DirectorySeparatorChar}wwwroot" };
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="StaticFileTreeControllerBase"/> class.
+    /// </summary>
+    /// <param name="physicalFileSystem">An injected <see cref="IPhysicalFileSystem"/> instance representing the physical file system to be used by the controller.</param>
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
     public StaticFileTreeControllerBase(IPhysicalFileSystem physicalFileSystem)
-        => FileSystem = physicalFileSystem;
+        : base(StaticServiceProvider.Instance.GetRequiredService<IPhysicalFileSystemTreeService>())
+    {
+        FileSystem = physicalFileSystem;
+        _fileSystemTreeService = StaticServiceProvider.Instance.GetRequiredService<IPhysicalFileSystemTreeService>();
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="StaticFileTreeControllerBase"/> class with the specified file system and tree service.
+    /// </summary>
+    /// <param name="physicalFileSystem">The physical file system used for file operations.</param>
+    /// <param name="fileSystemTreeService">The service used to manage the file system tree structure.</param>
+    public StaticFileTreeControllerBase(IPhysicalFileSystem physicalFileSystem, IPhysicalFileSystemTreeService fileSystemTreeService)
+        : base (fileSystemTreeService)
+    {
+        FileSystem = physicalFileSystem;
+        _fileSystemTreeService = fileSystemTreeService;
+    }
 
     protected override IFileSystem FileSystem { get; }
 
@@ -22,17 +51,18 @@ public class StaticFileTreeControllerBase : FileSystemTreeControllerBase
         IsTreeRootPath(path)
             ? _allowedRootFolders
             : IsAllowedPath(path)
-                ? base.GetDirectories(path)
+                ? _fileSystemTreeService.GetDirectories(path)
                 : Array.Empty<string>();
 
     protected override string[] GetFiles(string path)
         => IsTreeRootPath(path) || IsAllowedPath(path) == false
             ? Array.Empty<string>()
-            : base.GetFiles(path);
+            : _fileSystemTreeService.GetFiles(path);
 
-    protected override FileSystemTreeItemPresentationModel[] GetAncestorModels(string path, bool includeSelf)
+    // TODO (V18): Change 'new' to 'override' to properly override base class method.
+    protected new FileSystemTreeItemPresentationModel[] GetAncestorModels(string path, bool includeSelf)
         => IsAllowedPath(path)
-            ? base.GetAncestorModels(path, includeSelf)
+            ? _fileSystemTreeService.GetAncestorModels(path, includeSelf)
             : Array.Empty<FileSystemTreeItemPresentationModel>();
 
     private bool IsTreeRootPath(string path) => path == Path.DirectorySeparatorChar.ToString();

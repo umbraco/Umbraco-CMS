@@ -12,6 +12,9 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.MediaType;
 
+/// <summary>
+/// API controller responsible for importing definitions of existing media types in the system.
+/// </summary>
 [ApiVersion("1.0")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessMediaTypes)]
 public class ImportExistingMediaTypeController : MediaTypeControllerBase
@@ -19,6 +22,12 @@ public class ImportExistingMediaTypeController : MediaTypeControllerBase
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly IMediaTypeImportService _mediaTypeImportService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Controllers.MediaType.ImportExistingMediaTypeController"/> class,
+    /// providing dependencies for back office security and media type import operations.
+    /// </summary>
+    /// <param name="backOfficeSecurityAccessor">Provides access to back office security context and authentication information.</param>
+    /// <param name="mediaTypeImportService">Service responsible for handling media type import functionality.</param>
     public ImportExistingMediaTypeController(
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
         IMediaTypeImportService mediaTypeImportService)
@@ -32,6 +41,8 @@ public class ImportExistingMediaTypeController : MediaTypeControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [EndpointSummary("Imports a media type.")]
+    [EndpointDescription("Imports a media type from the provided file upload.")]
     public async Task<IActionResult> Import(
         CancellationToken cancellationToken,
         Guid id,

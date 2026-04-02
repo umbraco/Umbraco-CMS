@@ -1,4 +1,5 @@
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+import type { UmbItemDataResolverConstructor } from '@umbraco-cms/backoffice/entity-item';
 import type { UmbPickerModalData, UmbPickerModalValue } from '@umbraco-cms/backoffice/modal';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
@@ -7,6 +8,7 @@ export interface UmbRestoreFromRecycleBinModalData {
 	entityType: string;
 	recycleBinRepositoryAlias: string;
 	itemRepositoryAlias: string;
+	itemDataResolver?: UmbItemDataResolverConstructor;
 	pickerModal: UmbModalToken<UmbPickerModalData<any>, UmbPickerModalValue> | string;
 }
 

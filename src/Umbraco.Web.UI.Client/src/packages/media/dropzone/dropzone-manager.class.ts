@@ -102,8 +102,8 @@ export class UmbDropzoneManager extends UmbControllerBase {
 		return uploadableItems;
 	}
 
-	protected _updateStatus(item: UmbUploadableItem, status: UmbFileDropzoneItemStatus) {
-		this.#progressItems.updateOne(item.unique, { status });
+	protected _updateStatus(item: UmbUploadableItem, status: UmbFileDropzoneItemStatus, statusMessage?: string) {
+		this.#progressItems.updateOne(item.unique, { status, statusMessage });
 		const progress = this.#progress.getValue();
 		this.#progress.update({ completed: progress.completed + 1 });
 	}

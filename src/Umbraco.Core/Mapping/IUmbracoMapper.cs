@@ -1,5 +1,12 @@
 namespace Umbraco.Cms.Core.Mapping;
 
+/// <summary>
+/// Provides object-to-object mapping functionality for Umbraco.
+/// </summary>
+/// <remarks>
+/// The mapper supports defining custom mappings between types, including constructors and mapping methods.
+/// It can map single objects, map to existing objects, and map enumerables of objects.
+/// </remarks>
 public interface IUmbracoMapper
 {
     /// <summary>

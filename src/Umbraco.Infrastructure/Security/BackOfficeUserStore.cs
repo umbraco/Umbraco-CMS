@@ -46,6 +46,19 @@ public class BackOfficeUserStore :
     /// <summary>
     ///     Initializes a new instance of the <see cref="BackOfficeUserStore" /> class.
     /// </summary>
+    /// <param name="scopeProvider">Provides database transaction scopes for data operations.</param>
+    /// <param name="entityService">Service for managing Umbraco entities.</param>
+    /// <param name="externalLoginService">Handles external login providers with key support.</param>
+    /// <param name="globalSettings">The global configuration settings for Umbraco.</param>
+    /// <param name="mapper">Maps between domain and view models in Umbraco.</param>
+    /// <param name="describer">Provides error descriptions for back office user operations.</param>
+    /// <param name="appCaches">Provides access to application-level caches.</param>
+    /// <param name="twoFactorLoginService">Service for managing two-factor authentication for users.</param>
+    /// <param name="userGroupService">Service for managing user groups in the back office.</param>
+    /// <param name="userRepository">Repository for accessing and persisting user data.</param>
+    /// <param name="runtimeState">Represents the current runtime state of the Umbraco application.</param>
+    /// <param name="eventMessagesFactory">Factory for creating event message collections.</param>
+    /// <param name="logger">Logger instance for logging operations related to the user store.</param>
     [ActivatorUtilitiesConstructor]
     public BackOfficeUserStore(
         ICoreScopeProvider scopeProvider,
@@ -246,6 +259,11 @@ public class BackOfficeUserStore :
         return SaveAsync(user);
     }
 
+    /// <summary>
+    /// Asynchronously retrieves a user by their unique identifier.
+    /// </summary>
+    /// <param name="id">The unique identifier of the user to retrieve.</param>
+    /// <returns>A task representing the asynchronous operation. The task result contains the <see cref="IUser"/> if found; otherwise, <c>null</c>.</returns>
     public Task<IUser?> GetAsync(int id)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
@@ -270,6 +288,13 @@ public class BackOfficeUserStore :
         }
     }
 
+    /// <summary>
+    /// Asynchronously retrieves the users with the specified IDs.
+    /// </summary>
+    /// <param name="ids">An array of user IDs to retrieve. If null or empty, an empty collection is returned.</param>
+    /// <returns>
+    /// A task that represents the asynchronous operation. The task result contains an <see cref="IEnumerable{IUser}"/> of users matching the specified IDs.
+    /// </returns>
     public Task<IEnumerable<IUser>> GetUsersAsync(params int[]? ids)
     {
         if (ids is null || ids.Length <= 0)
@@ -278,12 +303,24 @@ public class BackOfficeUserStore :
         }
 
         using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
-        IQuery<IUser> query = _scopeProvider.CreateQuery<IUser>().Where(x => ids.Contains(x.Id));
+
+        // Need to use a List here because the expression tree cannot convert the array when used in Contains.
+        // See ExpressionTests.Sql_In().
+        List<int> idsAsList = [.. ids];
+        IQuery<IUser> query = _scopeProvider.CreateQuery<IUser>().Where(x => idsAsList.Contains(x.Id));
+
         IEnumerable<IUser> users = _userRepository.Get(query);
 
         return Task.FromResult(users);
     }
 
+    /// <summary>
+    /// Asynchronously retrieves the users with the specified IDs.
+    /// </summary>
+    /// <param name="ids">An array of user IDs to retrieve. If <c>null</c> or empty, an empty collection is returned.</param>
+    /// <returns>
+    /// A task that represents the asynchronous operation. The task result contains an <see cref="IEnumerable{IUser}"/> of users matching the specified IDs.
+    /// </returns>
     public Task<IEnumerable<IUser>> GetUsersAsync(params Guid[]? keys)
     {
         if (keys is null || keys.Length <= 0)
@@ -365,7 +402,7 @@ public class BackOfficeUserStore :
     }
 
     private bool IsUpgrading =>
-        _runtimeState.Level == RuntimeLevel.Install || _runtimeState.Level == RuntimeLevel.Upgrade;
+        _runtimeState.Level == RuntimeLevel.Install || _runtimeState.Level == RuntimeLevel.Upgrade || _runtimeState.Level == RuntimeLevel.Upgrading;
 
     /// <inheritdoc />
     public override Task<IdentityResult> UpdateAsync(
@@ -606,11 +643,14 @@ public class BackOfficeUserStore :
     }
 
     /// <summary>
-    ///     Lists all users of a given role.
+    ///     Returns all users that belong to the specified role.
     /// </summary>
     /// <remarks>
-    ///     Identity Role names are equal to Umbraco UserGroup alias.
+    ///     Identity role names correspond to Umbraco UserGroup aliases.
     /// </remarks>
+    /// <param name="normalizedRoleName">The normalized name of the role (UserGroup alias) whose users are to be listed.</param>
+    /// <param name="cancellationToken">A cancellation token to observe while waiting for the task to complete.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains a list of <see cref="BackOfficeIdentityUser"/> objects in the specified role.</returns>
     public override async Task<IList<BackOfficeIdentityUser>> GetUsersInRoleAsync(
         string normalizedRoleName,
         CancellationToken cancellationToken = default)
@@ -775,33 +815,31 @@ public class BackOfficeUserStore :
         var anythingChanged = false;
 
         // don't assign anything if nothing has changed as this will trigger the track changes of the model
-        if (identityUser.IsPropertyDirty(nameof(BackOfficeIdentityUser.LastLoginDateUtc))
-            || (user.LastLoginDate != default && identityUser.LastLoginDateUtc.HasValue == false)
-            || (identityUser.LastLoginDateUtc.HasValue &&
-                user.LastLoginDate?.ToUniversalTime() != identityUser.LastLoginDateUtc.Value))
+        if (identityUser.IsPropertyDirty(nameof(BackOfficeIdentityUser.LastLoginDate))
+            || (user.LastLoginDate != default && identityUser.LastLoginDate.HasValue == false)
+            || (identityUser.LastLoginDate.HasValue &&
+                user.LastLoginDate?.ToUniversalTime() != identityUser.LastLoginDate.Value))
         {
             anythingChanged = true;
 
-            // if the LastLoginDate is being set to MinValue, don't convert it ToLocalTime
-            DateTime? dt = identityUser.LastLoginDateUtc?.ToLocalTime();
-            user.LastLoginDate = dt;
+            user.LastLoginDate = identityUser.LastLoginDate;
         }
 
-        if (identityUser.IsPropertyDirty(nameof(BackOfficeIdentityUser.InviteDateUtc))
-            || user.InvitedDate?.ToUniversalTime() != identityUser.InviteDateUtc)
+        if (identityUser.IsPropertyDirty(nameof(BackOfficeIdentityUser.InviteDate))
+            || user.InvitedDate?.ToUniversalTime() != identityUser.InviteDate)
         {
             anythingChanged = true;
-            user.InvitedDate = identityUser.InviteDateUtc?.ToLocalTime();
+            user.InvitedDate = identityUser.InviteDate;
         }
 
-        if (identityUser.IsPropertyDirty(nameof(BackOfficeIdentityUser.LastPasswordChangeDateUtc))
+        if (identityUser.IsPropertyDirty(nameof(BackOfficeIdentityUser.LastPasswordChangeDate))
             || (user.LastPasswordChangeDate.HasValue && user.LastPasswordChangeDate.Value != default &&
-                identityUser.LastPasswordChangeDateUtc.HasValue == false)
-            || (identityUser.LastPasswordChangeDateUtc.HasValue && user.LastPasswordChangeDate?.ToUniversalTime() !=
-                identityUser.LastPasswordChangeDateUtc.Value))
+                identityUser.LastPasswordChangeDate.HasValue == false)
+            || (identityUser.LastPasswordChangeDate.HasValue && user.LastPasswordChangeDate?.ToUniversalTime() !=
+                identityUser.LastPasswordChangeDate.Value))
         {
             anythingChanged = true;
-            user.LastPasswordChangeDate = identityUser.LastPasswordChangeDateUtc?.ToLocalTime() ?? DateTime.Now;
+            user.LastPasswordChangeDate = identityUser.LastPasswordChangeDate ?? DateTime.UtcNow;
         }
 
         if (identityUser.IsPropertyDirty(nameof(BackOfficeIdentityUser.EmailConfirmed))
@@ -811,7 +849,7 @@ public class BackOfficeUserStore :
                 identityUser.EmailConfirmed))
         {
             anythingChanged = true;
-            user.EmailConfirmedDate = identityUser.EmailConfirmed ? DateTime.Now : null;
+            user.EmailConfirmedDate = identityUser.EmailConfirmed ? DateTime.UtcNow : null;
         }
 
         if (identityUser.IsPropertyDirty(nameof(BackOfficeIdentityUser.Name))
@@ -849,7 +887,7 @@ public class BackOfficeUserStore :
             if (user.IsLockedOut)
             {
                 // need to set the last lockout date
-                user.LastLockoutDate = DateTime.Now;
+                user.LastLockoutDate = DateTime.UtcNow;
             }
         }
 

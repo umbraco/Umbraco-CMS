@@ -1,7 +1,9 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Querying;
@@ -25,11 +27,47 @@ public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IRead
     private IQuery<TEntity>? _hasIdQuery;
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="EntityRepositoryBase{TId, TEntity}" /> class.
+    /// Initializes a new instance of the <see cref="EntityRepositoryBase{TId, TEntity}" /> class.
     /// </summary>
-    protected EntityRepositoryBase(IScopeAccessor scopeAccessor, AppCaches appCaches, ILogger<EntityRepositoryBase<TId, TEntity>> logger)
-        : base(scopeAccessor, appCaches) =>
+    /// <param name="scopeAccessor">The scope accessor.</param>
+    /// <param name="appCaches">The application caches.</param>
+    /// <param name="logger">The logger.</param>
+    /// <param name="repositoryCacheVersionService">The repository cache version service.</param>
+    /// <param name="cacheSyncService">The cache synchronization service.</param>
+    protected EntityRepositoryBase(
+        IScopeAccessor scopeAccessor,
+        AppCaches appCaches,
+        ILogger<EntityRepositoryBase<TId, TEntity>> logger,
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
+        : base(scopeAccessor, appCaches)
+    {
+        RepositoryCacheVersionService = repositoryCacheVersionService;
+        CacheSyncService = cacheSyncService;
         Logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    }
+
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
+    protected EntityRepositoryBase(
+        IScopeAccessor scopeAccessor,
+        AppCaches appCaches,
+        ILogger<EntityRepositoryBase<TId, TEntity>> logger)
+        : this(
+            scopeAccessor,
+            appCaches,
+            logger,
+            StaticServiceProvider.Instance.GetRequiredService<IRepositoryCacheVersionService>(),
+            StaticServiceProvider.Instance.GetRequiredService<ICacheSyncService>())
+    {
+    }
+
+// TODO (V18): Make these fields into read-only properties.
+
+#pragma warning disable IDE1006 // Naming Styles
+    protected readonly IRepositoryCacheVersionService RepositoryCacheVersionService;
+
+    protected readonly ICacheSyncService CacheSyncService;
+#pragma warning restore IDE1006 // Naming Styles
 
     /// <summary>
     ///     Gets the logger
@@ -122,14 +160,17 @@ public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IRead
     }
 
     /// <summary>
-    ///     Deletes the passed in entity
+    /// Deletes the specified entity.
     /// </summary>
+    /// <param name="entity">The entity to delete.</param>
     public virtual void Delete(TEntity entity)
         => CachePolicy.Delete(entity, PersistDeletedItem);
 
     /// <summary>
     ///     Gets an entity by the passed in Id utilizing the repository's cache policy
     /// </summary>
+    /// <param name="id">The Id of the entity to get.</param>
+    /// <returns>The entity matching the specified Id, or null if not found.</returns>
     public TEntity? Get(TId? id)
         => CachePolicy.Get(id, PerformGet, PerformGetAll);
 
@@ -144,11 +185,11 @@ public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IRead
             // don't query by anything that is a default of T (like a zero)
             // TODO: I think we should enabled this in case accidental calls are made to get all with invalid ids
             // .Where(x => Equals(x, default(TId)) == false)
-            .ToArray();
+            .ToArray() ?? [];
 
         // can't query more than 2000 ids at a time... but if someone is really querying 2000+ entities,
         // the additional overhead of fetching them in groups is minimal compared to the lookup time of each group
-        if (ids?.Length <= Constants.Sql.MaxParameterCount)
+        if (ids.Length <= Constants.Sql.MaxParameterCount)
         {
             return CachePolicy.GetAll(ids, PerformGetAll);
         }
@@ -164,8 +205,10 @@ public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IRead
     }
 
     /// <summary>
-    ///     Gets a list of entities by the passed in query
+    /// Retrieves a collection of entities that satisfy the specified query criteria.
     /// </summary>
+    /// <param name="query">The query used to filter and select entities.</param>
+    /// <returns>An enumerable collection of entities matching the query.</returns>
     public IEnumerable<TEntity> Get(IQuery<TEntity> query) =>
 
         // ensure we don't include any null refs in the returned collection!
@@ -179,8 +222,10 @@ public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IRead
         => CachePolicy.Exists(id, PerformExists, PerformGetAll);
 
     /// <summary>
-    ///     Returns an integer with the count of entities found with the passed in query
+    /// Returns the number of entities that match the specified query.
     /// </summary>
+    /// <param name="query">The query used to filter entities to count. If null, all entities are counted.</param>
+    /// <returns>The count of entities matching the query.</returns>
     public int Count(IQuery<TEntity>? query)
         => PerformCount(query);
 
@@ -194,7 +239,12 @@ public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IRead
     ///     Create the repository cache policy
     /// </summary>
     protected virtual IRepositoryCachePolicy<TEntity, TId> CreateCachePolicy()
-        => new DefaultRepositoryCachePolicy<TEntity, TId>(GlobalIsolatedCache, ScopeAccessor, DefaultOptions);
+        => new DefaultRepositoryCachePolicy<TEntity, TId>(
+            GlobalIsolatedCache,
+            ScopeAccessor,
+            DefaultOptions,
+            RepositoryCacheVersionService,
+            CacheSyncService);
 
     protected abstract TEntity? PerformGet(TId? id);
 
@@ -215,8 +265,7 @@ public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IRead
 
     protected virtual bool PerformExists(TId id)
     {
-        Sql<ISqlContext> sql = GetBaseQuery(true);
-        sql.Where(GetBaseWhereClause(), new { id });
+        Sql<ISqlContext> sql = GetBaseQuery(true).Where(GetBaseWhereClause(), new { id });
         var count = Database.ExecuteScalar<int>(sql);
         return count == 1;
     }
@@ -243,6 +292,6 @@ public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IRead
             Database.Execute(delete, new { id = GetEntityId(entity) });
         }
 
-        entity.DeleteDate = DateTime.Now;
+        entity.DeleteDate = DateTime.UtcNow;
     }
 }

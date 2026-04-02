@@ -265,6 +265,7 @@ export class UmbPropertyEditorUIImageCropsElement extends UmbLitElement implemen
 				font-size: var(--uui-type-small-size);
 				display: flex;
 				align-items: center;
+				height: 100%;
 			}
 			.action-wrapper {
 				display: flex;

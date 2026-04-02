@@ -37,6 +37,7 @@ const itemResponseMapper = (item: UmbMockRelationTypeItemModel): RelationTypeIte
 		id: item.id,
 		name: item.name,
 		isDeletable: item.isDeletable,
+		flags: item.flags,
 	};
 };
 

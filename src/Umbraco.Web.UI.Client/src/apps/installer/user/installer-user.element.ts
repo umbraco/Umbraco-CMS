@@ -2,7 +2,7 @@ import type { UmbInstallerContext } from '../installer.context.js';
 import { UMB_INSTALLER_CONTEXT } from '../installer.context.js';
 import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { umbFocus, UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-installer-user')
 export class UmbInstallerUserElement extends UmbLitElement {
@@ -67,9 +67,10 @@ export class UmbInstallerUserElement extends UmbLitElement {
 					<uui-form-layout-item>
 						<uui-label id="nameLabel" for="name" slot="label" required>Name</uui-label>
 						<uui-input
+							${umbFocus()}
 							type="text"
 							id="name"
-							.value=${this._userFormData?.name}
+							.value=${this._userFormData?.name ?? ''}
 							name="name"
 							label="name"
 							required
@@ -81,7 +82,7 @@ export class UmbInstallerUserElement extends UmbLitElement {
 						<uui-input
 							type="email"
 							id="email"
-							.value=${this._userFormData?.email}
+							.value=${this._userFormData?.email ?? ''}
 							name="email"
 							label="email"
 							required
@@ -95,7 +96,7 @@ export class UmbInstallerUserElement extends UmbLitElement {
 							name="password"
 							label="password"
 							minlength=${this._minimumPasswordLength}
-							.value=${this._userFormData?.password}
+							.value=${this._userFormData?.password ?? ''}
 							required
 							required-message="Password is required"></uui-input-password>
 					</uui-form-layout-item>

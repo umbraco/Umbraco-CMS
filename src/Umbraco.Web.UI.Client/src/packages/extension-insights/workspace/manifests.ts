@@ -1,6 +1,6 @@
-import { UMB_EXTENSION_COLLECTION_ALIAS } from '../collection/manifests.js';
 import { UMB_EXTENSION_ROOT_ENTITY_TYPE } from '../entity.js';
 import { UMB_EXTENSION_ROOT_WORKSPACE_ALIAS } from './constants.js';
+import { UMB_EXTENSION_COLLECTION_ALIAS } from '@umbraco-cms/backoffice/extension';
 import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
 
 export const manifests: Array<UmbExtensionManifest> = [

@@ -1,15 +1,45 @@
 namespace Umbraco.Cms.Core.Collections;
 
+/// <summary>
+///     Provides static methods and nested types for creating topologically sortable graph nodes.
+/// </summary>
 public class TopoGraph
 {
+    /// <summary>
+    ///     Error message used when a cyclic dependency is detected.
+    /// </summary>
     internal const string CycleDependencyError = "Cyclic dependency.";
+
+    /// <summary>
+    ///     Error message used when a required dependency is missing.
+    /// </summary>
     internal const string MissingDependencyError = "Missing dependency.";
 
+    /// <summary>
+    ///     Creates a new graph node with the specified key, item, and dependencies.
+    /// </summary>
+    /// <typeparam name="TKey">The type of the key.</typeparam>
+    /// <typeparam name="TItem">The type of the item.</typeparam>
+    /// <param name="key">The key that uniquely identifies the node.</param>
+    /// <param name="item">The item stored in the node.</param>
+    /// <param name="dependencies">The keys of nodes that this node depends on.</param>
+    /// <returns>A new <see cref="Node{TKey, TItem}" /> instance.</returns>
     public static Node<TKey, TItem> CreateNode<TKey, TItem>(TKey key, TItem item, IEnumerable<TKey> dependencies) =>
         new(key, item, dependencies);
 
+    /// <summary>
+    ///     Represents a node in a topological graph with a key, item, and dependencies.
+    /// </summary>
+    /// <typeparam name="TKey">The type of the key.</typeparam>
+    /// <typeparam name="TItem">The type of the item.</typeparam>
     public class Node<TKey, TItem>
     {
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="Node{TKey, TItem}" /> class.
+        /// </summary>
+        /// <param name="key">The key that uniquely identifies the node.</param>
+        /// <param name="item">The item stored in the node.</param>
+        /// <param name="dependencies">The keys of nodes that this node depends on.</param>
         public Node(TKey key, TItem item, IEnumerable<TKey> dependencies)
         {
             Key = key;
@@ -17,10 +47,19 @@ public class TopoGraph
             Dependencies = dependencies;
         }
 
+        /// <summary>
+        ///     Gets the key that uniquely identifies this node.
+        /// </summary>
         public TKey Key { get; }
 
+        /// <summary>
+        ///     Gets the item stored in this node.
+        /// </summary>
         public TItem Item { get; }
 
+        /// <summary>
+        ///     Gets the keys of nodes that this node depends on.
+        /// </summary>
         public IEnumerable<TKey> Dependencies { get; }
     }
 }
@@ -92,9 +131,27 @@ public class TopoGraph<TKey, TItem> : TopoGraph
         return sorted;
     }
 
+    /// <summary>
+    ///     Determines whether the specified item exists in the array within the given range.
+    /// </summary>
+    /// <param name="items">The array to search.</param>
+    /// <param name="item">The item to locate.</param>
+    /// <param name="start">The starting index of the search range.</param>
+    /// <param name="count">The number of elements to search.</param>
+    /// <returns><c>true</c> if the item is found; otherwise, <c>false</c>.</returns>
     private static bool Contains(TItem[] items, TItem item, int start, int count) =>
         Array.IndexOf(items, item, start, count) >= 0;
 
+    /// <summary>
+    ///     Recursively visits a node and its dependencies to perform topological sorting.
+    /// </summary>
+    /// <param name="item">The item to visit.</param>
+    /// <param name="visited">The set of already visited items.</param>
+    /// <param name="sorted">The array to store sorted items.</param>
+    /// <param name="index">The current index in the sorted array.</param>
+    /// <param name="incr">The increment direction (+1 for forward, -1 for reverse).</param>
+    /// <param name="throwOnCycle">Whether to throw an exception on cyclic dependencies.</param>
+    /// <param name="throwOnMissing">Whether to throw an exception on missing dependencies.</param>
     private void Visit(TItem item, ISet<TItem> visited, TItem[] sorted, ref int index, int incr, bool throwOnCycle, bool throwOnMissing)
     {
         if (visited.Contains(item))
@@ -127,6 +184,12 @@ public class TopoGraph<TKey, TItem> : TopoGraph
         index += incr;
     }
 
+    /// <summary>
+    ///     Finds and returns the items corresponding to the specified dependency keys.
+    /// </summary>
+    /// <param name="keys">The keys of the dependencies to find.</param>
+    /// <param name="throwOnMissing">Whether to throw an exception if a dependency is not found.</param>
+    /// <returns>An enumerable of items corresponding to the keys.</returns>
     private IEnumerable<TItem> FindDependencies(IEnumerable<TKey> keys, bool throwOnMissing)
     {
         foreach (TKey key in keys)

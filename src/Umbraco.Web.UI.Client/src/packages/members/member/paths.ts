@@ -17,4 +17,7 @@ export const UMB_CREATE_MEMBER_WORKSPACE_PATH_PATTERN = new UmbPathPattern<{
 	memberTypeUnique: string;
 }>('create/:memberTypeUnique', UMB_MEMBER_WORKSPACE_PATH);
 
-export const UMB_EDIT_MEMBER_WORKSPACE_PATH_PATTERN = new UmbPathPattern<{ unique: string }>('edit/:unique');
+export const UMB_EDIT_MEMBER_WORKSPACE_PATH_PATTERN = new UmbPathPattern<{ unique: string }>(
+	'edit/:unique',
+	UMB_MEMBER_WORKSPACE_PATH,
+);

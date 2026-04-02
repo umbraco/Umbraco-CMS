@@ -4,19 +4,25 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <inheritdoc/>
 public class PropertyTypeUsageService : IPropertyTypeUsageService
 {
     private readonly IPropertyTypeUsageRepository _propertyTypeUsageRepository;
-    private readonly IContentTypeService _contentTypeService;
     private readonly ICoreScopeProvider _scopeProvider;
 
+    // TODO (V18): Remove IContentTypeService parameter from constructor.
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PropertyTypeUsageService"/> class.
+    /// </summary>
     public PropertyTypeUsageService(
         IPropertyTypeUsageRepository propertyTypeUsageRepository,
+#pragma warning disable IDE0060 // Remove unused parameter
         IContentTypeService contentTypeService,
+#pragma warning restore IDE0060 // Remove unused parameter
         ICoreScopeProvider scopeProvider)
     {
         _propertyTypeUsageRepository = propertyTypeUsageRepository;
-        _contentTypeService = contentTypeService;
         _scopeProvider = scopeProvider;
     }
 

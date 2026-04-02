@@ -13,6 +13,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Document.RecycleBin;
 
+/// <summary>
+/// Provides an API controller for permanently deleting all items from the media recycle bin in Umbraco.
+/// </summary>
 [ApiVersion("1.0")]
 public class EmptyMediaRecycleBinController : MediaRecycleBinControllerBase
 {
@@ -20,6 +23,14 @@ public class EmptyMediaRecycleBinController : MediaRecycleBinControllerBase
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly IMediaService _mediaService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="EmptyMediaRecycleBinController"/> class, responsible for handling requests to empty the media recycle bin.
+    /// </summary>
+    /// <param name="entityService">Service for managing and querying entities in the system.</param>
+    /// <param name="authorizationService">Service used to authorize user actions.</param>
+    /// <param name="backOfficeSecurityAccessor">Accessor for back office user security context.</param>
+    /// <param name="mediaService">Service for managing media items.</param>
+    /// <param name="mediaPresentationFactory">Factory for creating media presentation models.</param>
     public EmptyMediaRecycleBinController(
         IEntityService entityService,
         IAuthorizationService authorizationService,
@@ -33,10 +44,19 @@ public class EmptyMediaRecycleBinController : MediaRecycleBinControllerBase
         _mediaService = mediaService;
     }
 
+    /// <summary>
+    /// Empties the media recycle bin by permanently deleting all media items in it.
+    /// This operation cannot be undone.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <returns>An <see cref="IActionResult"/> indicating the result of the operation.</returns>
+    
     [HttpDelete]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [EndpointSummary("Empties the media recycle bin.")]
+    [EndpointDescription("Permanently deletes all media items in the recycle bin. This operation cannot be undone.")]
     public async Task<IActionResult> EmptyRecycleBin(CancellationToken cancellationToken)
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(

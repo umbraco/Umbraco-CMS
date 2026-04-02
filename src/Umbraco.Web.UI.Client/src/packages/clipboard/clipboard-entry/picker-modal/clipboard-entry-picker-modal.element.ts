@@ -26,18 +26,16 @@ export class UmbClipboardEntryPickerModalElement extends UmbModalBaseElement<
 	}
 
 	override render() {
-		return html`<umb-body-layout headline="Clipboard">
-			<uui-box>
-				<umb-clipboard-entry-picker
-					.selection=${this.value?.selection}
-					.config=${this.data}
-					@selection-change=${this.#onSelectionChange}></umb-clipboard-entry-picker>
-			</uui-box>
+		return html`<umb-body-layout headline=${this.localize.term('general_clipboard')}>
+			<umb-clipboard-entry-picker
+				.selection=${this.value?.selection}
+				.config=${this.data}
+				@selection-change=${this.#onSelectionChange}></umb-clipboard-entry-picker>
 			<div slot="actions">
-				<uui-button label="Close" @click=${this.#close}></uui-button>
-				<uui-button label="Submit" look="primary" color="positive" @click=${this.#submit}></uui-button>
+				<uui-button label=${this.localize.term('general_close')} @click=${this.#close}></uui-button>
+				<uui-button label=${this.localize.term('general_submit')} look="primary" color="positive" @click=${this.#submit}></uui-button>
 			</div>
-		</umb-body-layout> `;
+		</umb-body-layout>`;
 	}
 }
 

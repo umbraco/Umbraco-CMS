@@ -52,7 +52,7 @@ export class ExampleTableCollectionViewElement extends UmbLitElement {
 		this._tableItems = items.map((item) => {
 			return {
 				id: item.unique,
-				icon: 'icon-newspaper',
+				icon: item.icon,
 				data: [
 					{
 						columnAlias: 'name',

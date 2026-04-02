@@ -25,17 +25,6 @@ public class DocumentPermissionMapper : IPermissionPresentationMapper, IPermissi
     /// <summary>
     /// Initializes a new instance of the <see cref="DocumentPermissionMapper"/> class.
     /// </summary>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 17.")]
-    public DocumentPermissionMapper()
-        : this(
-              StaticServiceProvider.Instance.GetRequiredService<Lazy<IEntityService>>(),
-              StaticServiceProvider.Instance.GetRequiredService<Lazy<IUserService>>())
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="DocumentPermissionMapper"/> class.
-    /// </summary>
     public DocumentPermissionMapper(Lazy<IEntityService> entityService, Lazy<IUserService> userService)
     {
         _entityService = entityService;
@@ -45,6 +34,11 @@ public class DocumentPermissionMapper : IPermissionPresentationMapper, IPermissi
     /// <inheritdoc/>
     public string Context => DocumentGranularPermission.ContextType;
 
+    /// <summary>
+    /// Maps a <see cref="UserGroup2GranularPermissionDto"/> to an <see cref="IGranularPermission"/> instance.
+    /// </summary>
+    /// <param name="dto">The DTO containing user group granular permission data.</param>
+    /// <returns>An <see cref="IGranularPermission"/> representing the mapped document permission.</returns>
     public IGranularPermission MapFromDto(UserGroup2GranularPermissionDto dto) =>
         new DocumentGranularPermission()
         {

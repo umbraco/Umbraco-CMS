@@ -21,6 +21,7 @@ interface HistoryData {
 /**
  * @description Helper function to get look and color for uui-tag and localization keys for the label and description.
  * @param type AuditTypeModel
+ * @deprecated Scheduled for removal in Umbraco 19. Use the audit log repository's getTagStyleAndText() method instead.
  */
 export function getMediaHistoryTagStyleAndText(type: UmbMediaAuditLogType): HistoryData {
 	switch (type) {
@@ -30,6 +31,36 @@ export function getMediaHistoryTagStyleAndText(type: UmbMediaAuditLogType): Hist
 				text: { label: 'auditTrails_smallSave', desc: 'auditTrails_save' },
 			};
 
+		case UmbMediaAuditLog.COPY:
+			return {
+				style: { look: 'secondary', color: 'default' },
+				text: { label: 'auditTrails_smallCopy', desc: 'auditTrails_copy' },
+			};
+
+		case UmbMediaAuditLog.MOVE:
+			return {
+				style: { look: 'secondary', color: 'default' },
+				text: { label: 'auditTrails_smallMove', desc: 'auditTrails_move' },
+			};
+
+		case UmbMediaAuditLog.DELETE:
+			return {
+				style: { look: 'secondary', color: 'danger' },
+				text: { label: 'auditTrails_smallDelete', desc: 'auditTrails_delete' },
+			};
+
+		case UmbMediaAuditLog.SORT:
+			return {
+				style: { look: 'secondary', color: 'default' },
+				text: { label: 'auditTrails_smallSort', desc: 'auditTrails_sort' },
+			};
+
+		case UmbMediaAuditLog.CUSTOM:
+			return {
+				style: { look: 'placeholder', color: 'default' },
+				text: { label: 'auditTrails_smallCustom', desc: 'auditTrails_custom' },
+			};
+
 		default:
 			return {
 				style: { look: 'placeholder', color: 'danger' },
@@ -37,12 +68,3 @@ export function getMediaHistoryTagStyleAndText(type: UmbMediaAuditLogType): Hist
 			};
 	}
 }
-
-export const TimeOptions: Intl.DateTimeFormatOptions = {
-	year: 'numeric',
-	month: 'long',
-	day: 'numeric',
-	hour: 'numeric',
-	minute: 'numeric',
-	second: 'numeric',
-};

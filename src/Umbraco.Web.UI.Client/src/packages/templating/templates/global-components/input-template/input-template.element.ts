@@ -51,29 +51,28 @@ export class UmbInputTemplateElement extends UUIFormControlMixin(UmbLitElement, 
 
 	@property({ type: Array })
 	public set selection(newKeys: Array<string> | undefined) {
-		this._selection = newKeys ?? [];
+		this.#selection = newKeys ?? [];
 		this.#observePickedTemplates();
 	}
 	public get selection() {
-		return this._selection;
+		return this.#selection;
 	}
-	_selection: Array<string> = [];
+	#selection: Array<string> = [];
 
-	_defaultUnique = '';
 	@property({ type: String })
 	public set defaultUnique(newId: string) {
-		this._defaultUnique = newId;
+		this.#defaultUnique = newId;
 		super.value = newId;
 	}
 	public get defaultUnique(): string {
-		return this._defaultUnique;
+		return this.#defaultUnique;
 	}
-
-	private _templateItemRepository = new UmbTemplateItemRepository(this);
+	#defaultUnique = '';
 
 	@state()
-	_pickedTemplates: UmbTemplateItemModel[] = [];
+	private _pickedTemplates: UmbTemplateItemModel[] = [];
 
+	#templateItemRepository = new UmbTemplateItemRepository(this);
 	#templatePath = '';
 
 	constructor() {
@@ -91,7 +90,7 @@ export class UmbInputTemplateElement extends UUIFormControlMixin(UmbLitElement, 
 
 	async #observePickedTemplates() {
 		this.observe(
-			(await this._templateItemRepository?.requestItems(this._selection))?.asObservable?.(),
+			(await this.#templateItemRepository?.requestItems(this.#selection))?.asObservable?.(),
 			(data) => {
 				const oldValue = this._pickedTemplates;
 				this._pickedTemplates = data ?? [];
@@ -102,7 +101,7 @@ export class UmbInputTemplateElement extends UUIFormControlMixin(UmbLitElement, 
 	}
 
 	protected override getFormElement() {
-		return this;
+		return undefined;
 	}
 
 	#appendTemplates(unique: string[]) {
@@ -127,7 +126,7 @@ export class UmbInputTemplateElement extends UUIFormControlMixin(UmbLitElement, 
 		const value = await umbOpenModal(this, UMB_TEMPLATE_PICKER_MODAL, {
 			data: {
 				multiple: true,
-				pickableFilter: (template) => template.unique !== null && !this._selection.includes(template.unique),
+				pickableFilter: (template) => template.unique !== null && !this.#selection.includes(template.unique),
 			},
 		}).catch(() => undefined);
 
@@ -151,7 +150,7 @@ export class UmbInputTemplateElement extends UUIFormControlMixin(UmbLitElement, 
 		In current backoffice we just prevent deleting a default when there are other templates. But if its the only one its okay. This is a weird experience, so we should make something that makes more sense.
 		BTW. its weird cause the damage of removing the default template is equally bad when there is one or more templates.
 		*/
-		this.selection = this._selection.filter((x) => x !== unique);
+		this.selection = this.#selection.filter((x) => x !== unique);
 
 		// If the default template is removed, set the first picked template as default or reset defaultUnique.
 		if (unique === this.defaultUnique) {

@@ -5,6 +5,9 @@ using Umbraco.Cms.Core.PropertyEditors;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+///     Provides validation services for content properties.
+/// </summary>
 public interface IPropertyValidationService
 {
     /// <summary>

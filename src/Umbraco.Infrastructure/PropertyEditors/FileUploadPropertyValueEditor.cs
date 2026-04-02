@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
@@ -13,6 +14,7 @@ using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.PropertyEditors;
+using Umbraco.Cms.Infrastructure.PropertyEditors.Validators;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 
@@ -21,18 +23,35 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// <summary>
 ///     The value editor for the file upload property editor.
 /// </summary>
-internal sealed class FileUploadPropertyValueEditor : DataValueEditor
+/// <remarks>
+///     As this class is loaded into <see cref="ValueEditorCache"/> which can be cleared, it needs
+///     to be disposable in order to properly clean up resources such as
+///     the settings change subscription and avoid a memory leak.
+/// </remarks>
+internal sealed class FileUploadPropertyValueEditor : DataValueEditor, IDisposable
 {
     private readonly MediaFileManager _mediaFileManager;
     private readonly ITemporaryFileService _temporaryFileService;
     private readonly IScopeProvider _scopeProvider;
     private readonly IFileStreamSecurityValidator _fileStreamSecurityValidator;
     private readonly FileUploadValueParser _valueParser;
+
     private ContentSettings _contentSettings;
+    private readonly IDisposable? _contentSettingsChangeSubscription;
+
 
     /// <summary>
     /// Initializes a new instance of the <see cref="FileUploadPropertyValueEditor"/> class.
     /// </summary>
+    /// <param name="attribute">The attribute that defines metadata for the data editor.</param>
+    /// <param name="mediaFileManager">Handles media file operations such as upload and retrieval.</param>
+    /// <param name="shortStringHelper">Provides utilities for working with short strings and string manipulation.</param>
+    /// <param name="contentSettings">Monitors and provides access to content-related configuration settings.</param>
+    /// <param name="jsonSerializer">Serializes and deserializes objects to and from JSON format.</param>
+    /// <param name="ioHelper">Assists with input/output operations and file system access.</param>
+    /// <param name="temporaryFileService">Manages temporary files used during file upload processes.</param>
+    /// <param name="scopeProvider">Provides database scope management for transactional operations.</param>
+    /// <param name="fileStreamSecurityValidator">Validates file streams for security during upload and access.</param>
     public FileUploadPropertyValueEditor(
         DataEditorAttribute attribute,
         MediaFileManager mediaFileManager,
@@ -45,14 +64,14 @@ internal sealed class FileUploadPropertyValueEditor : DataValueEditor
         IFileStreamSecurityValidator fileStreamSecurityValidator)
         : base(shortStringHelper, jsonSerializer, ioHelper, attribute)
     {
-        _mediaFileManager = mediaFileManager ?? throw new ArgumentNullException(nameof(mediaFileManager));
+        _mediaFileManager = mediaFileManager;
         _temporaryFileService = temporaryFileService;
         _scopeProvider = scopeProvider;
         _fileStreamSecurityValidator = fileStreamSecurityValidator;
         _valueParser = new FileUploadValueParser(jsonSerializer);
 
-        _contentSettings = contentSettings.CurrentValue ?? throw new ArgumentNullException(nameof(contentSettings));
-        contentSettings.OnChange(x => _contentSettings = x);
+        _contentSettings = contentSettings.CurrentValue;
+        _contentSettingsChangeSubscription = contentSettings.OnChange(x => _contentSettings = x);
 
         Validators.Add(new TemporaryFileUploadValidator(
             () => _contentSettings,
@@ -60,6 +79,9 @@ internal sealed class FileUploadPropertyValueEditor : DataValueEditor
             TryGetTemporaryFile,
             IsAllowedInDataTypeConfiguration));
     }
+
+    /// <inheritdoc/>
+    public override IValueRequiredValidator RequiredValidator => new FileUploadValueRequiredValidator();
 
     /// <inheritdoc/>
     public override object? ToEditor(IProperty property, string? culture = null, string? segment = null)
@@ -159,14 +181,26 @@ internal sealed class FileUploadPropertyValueEditor : DataValueEditor
     private TemporaryFileModel? TryGetTemporaryFile(Guid temporaryFileKey)
         => _temporaryFileService.GetAsync(temporaryFileKey).GetAwaiter().GetResult();
 
-    private static bool IsAllowedInDataTypeConfiguration(string extension, object? dataTypeConfiguration)
+    /// <summary>
+    /// Determines whether a file extension is allowed by the given data type configuration.
+    /// </summary>
+    /// <param name="extension">The file extension to check (without leading period).</param>
+    /// <param name="dataTypeConfiguration">The data type configuration, expected to be a <see cref="FileUploadConfiguration"/>.</param>
+    /// <returns>
+    /// <c>true</c> if the extension is allowed (or no extensions are configured); otherwise, <c>false</c>.
+    /// </returns>
+    /// <remarks>
+    /// This method is <c>internal</c> rather than <c>private</c> to allow direct unit testing.
+    /// The comparison is case-insensitive to handle file extensions like <c>.PDF</c> and <c>.pdf</c> equally.
+    /// </remarks>
+    internal static bool IsAllowedInDataTypeConfiguration(string extension, object? dataTypeConfiguration)
     {
         if (dataTypeConfiguration is FileUploadConfiguration fileUploadConfiguration)
         {
             // If FileExtensions is empty and no allowed extensions have been specified, we allow everything.
             // If there are any extensions specified, we need to check that the uploaded extension is one of them.
             return fileUploadConfiguration.FileExtensions.Any() is false ||
-                   fileUploadConfiguration.FileExtensions.Contains(extension);
+                   fileUploadConfiguration.FileExtensions.Contains(extension, StringComparer.OrdinalIgnoreCase);
         }
 
         return false;
@@ -212,4 +246,9 @@ internal sealed class FileUploadPropertyValueEditor : DataValueEditor
         // in case we are using the old path scheme, try to re-use numbers (bah...)
         return _mediaFileManager.GetMediaPath(file.FileName, contentKey, propertyTypeKey);
     }
+
+    /// <summary>
+    /// Releases the managed resources used by the <see cref="FileUploadPropertyValueEditor"/>, including any active subscriptions.
+    /// </summary>
+    public void Dispose() => _contentSettingsChangeSubscription?.Dispose();
 }

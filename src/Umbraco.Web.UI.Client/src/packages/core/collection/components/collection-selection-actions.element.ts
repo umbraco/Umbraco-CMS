@@ -33,6 +33,9 @@ export class UmbCollectionSelectionActionsElement extends UmbLitElement {
 	@state()
 	private _apiProps = {};
 
+	@state()
+	private _hasBulkActions = false;
+
 	private _selection: Array<string | null> = [];
 
 	private _collectionContext?: typeof UMB_COLLECTION_CONTEXT.TYPE;
@@ -71,6 +74,14 @@ export class UmbCollectionSelectionActionsElement extends UmbLitElement {
 		);
 
 		this.observe(
+			this._collectionContext.bulkAction.hasBulkActions,
+			(value) => {
+				this._hasBulkActions = value || false;
+			},
+			'umbCollectionHasBulkActionsObserver',
+		);
+
+		this.observe(
 			this._collectionContext.selection.selection,
 			(selection) => {
 				this._selectionLength = selection.length;
@@ -91,6 +102,7 @@ export class UmbCollectionSelectionActionsElement extends UmbLitElement {
 	}
 
 	override render() {
+		if (!this._hasBulkActions) return nothing;
 		if (this._selectionLength === 0) return nothing;
 
 		return html`

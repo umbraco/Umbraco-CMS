@@ -3,6 +3,9 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 
 namespace Umbraco.Cms.Core.Routing;
 
+/// <summary>
+///     Represents the result of Umbraco routing, containing all information needed to render a published content item.
+/// </summary>
 public class PublishedRequest : IPublishedRequest
 {
     /// <summary>

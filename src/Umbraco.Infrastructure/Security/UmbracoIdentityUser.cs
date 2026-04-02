@@ -58,6 +58,9 @@ public abstract class UmbracoIdentityUser : IdentityUser, IRememberBeingDirty
         _name = string.Empty;
     }
 
+    /// <summary>
+    /// Occurs when a property value of the <see cref="UmbracoIdentityUser"/> changes.
+    /// </summary>
     public event PropertyChangedEventHandler PropertyChanged
     {
         add => BeingDirty.PropertyChanged += value;
@@ -65,21 +68,27 @@ public abstract class UmbracoIdentityUser : IdentityUser, IRememberBeingDirty
         remove => BeingDirty.PropertyChanged -= value;
     }
 
-    // NOTE: The purpose
-    // of this value is to try to prevent concurrent writes in the DB but this is
-    // an implementation detail at the data source level that has leaked into the
-    // model. A good writeup of that is here:
-    // https://stackoverflow.com/a/37362173
-    // For our purposes currently we won't worry about this.
+    /// <summary>
+    /// Gets or sets a random value that is updated whenever the user object is persisted to the data store.
+    /// This value is used to detect and prevent concurrent updates to the same user record.
+    /// </summary>
+    /// <remarks>
+    /// NOTE: The purpose
+    /// of this value is to try to prevent concurrent writes in the DB but this is
+    /// an implementation detail at the data source level that has leaked into the
+    /// model. A good writeup of that is here:
+    /// https://stackoverflow.com/a/37362173
+    /// For our purposes currently we won't worry about this.
+    /// </remarks>
     public override string? ConcurrencyStamp { get => base.ConcurrencyStamp; set => base.ConcurrencyStamp = value; }
 
     /// <summary>
     ///     Gets or sets last login date
     /// </summary>
-    public DateTime? LastLoginDateUtc
+    public DateTime? LastLoginDate
     {
         get => _lastLoginDateUtc;
-        set => BeingDirty.SetPropertyValueAndDetectChanges(value, ref _lastLoginDateUtc, nameof(LastLoginDateUtc));
+        set => BeingDirty.SetPropertyValueAndDetectChanges(value, ref _lastLoginDateUtc, nameof(LastLoginDate));
     }
 
     /// <summary>
@@ -112,11 +121,13 @@ public abstract class UmbracoIdentityUser : IdentityUser, IRememberBeingDirty
     /// <summary>
     ///     Gets or sets dateTime in UTC when the password was last changed.
     /// </summary>
-    public DateTime? LastPasswordChangeDateUtc
+    public DateTime? LastPasswordChangeDate
     {
         get => _lastPasswordChangeDateUtc;
-        set => BeingDirty.SetPropertyValueAndDetectChanges(value, ref _lastPasswordChangeDateUtc,
-            nameof(LastPasswordChangeDateUtc));
+        set => BeingDirty.SetPropertyValueAndDetectChanges(
+            value,
+            ref _lastPasswordChangeDateUtc,
+            nameof(LastPasswordChangeDate));
     }
 
     /// <summary>
@@ -260,18 +271,18 @@ public abstract class UmbracoIdentityUser : IdentityUser, IRememberBeingDirty
     {
         get
         {
-            var isLocked = LockoutEnabled && LockoutEnd.HasValue && LockoutEnd.Value.ToLocalTime() >= DateTime.Now;
+            var isLocked = LockoutEnabled && LockoutEnd.HasValue && LockoutEnd.Value >= DateTime.UtcNow;
             return isLocked;
         }
     }
 
     /// <summary>
-    ///     Gets the <see cref="BeingDirty" /> for change tracking
+    ///     Gets the <see cref="BeingDirty" /> instance used for change tracking.
     /// </summary>
     protected BeingDirty BeingDirty { get; } = new();
 
     /// <summary>
-    ///     Gets or sets a value indicating whether the IUser IsApproved
+    ///     Gets or sets a value indicating whether the user is approved.
     /// </summary>
     public bool IsApproved { get; set; }
 

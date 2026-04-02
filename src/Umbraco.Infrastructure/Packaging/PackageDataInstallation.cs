@@ -23,6 +23,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Packaging
 {
+    /// <summary>
+    /// Handles the installation of package data in the Umbraco CMS, managing the import and setup of content, files, and other resources included in a package.
+    /// </summary>
     public class PackageDataInstallation : IPackageDataInstallation
     {
         private readonly IDataValueEditorFactory _dataValueEditorFactory;
@@ -41,7 +44,29 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         private readonly IEntityService _entityService;
         private readonly IContentTypeService _contentTypeService;
         private readonly IContentService _contentService;
+        private readonly IMemberTypeService _memberTypeService;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Packaging.PackageDataInstallation"/> class,
+        /// providing all required services and helpers for package data installation operations.
+        /// </summary>
+        /// <param name="dataValueEditorFactory">Factory for creating data value editors used in property editing.</param>
+        /// <param name="logger">The logger used for logging installation events and errors.</param>
+        /// <param name="fileService">Service for managing files such as templates, stylesheets, and scripts.</param>
+        /// <param name="localizationService">Service for managing localization and dictionary items.</param>
+        /// <param name="dataTypeService">Service for managing data types within Umbraco.</param>
+        /// <param name="entityService">Service for managing Umbraco entities generically.</param>
+        /// <param name="contentTypeService">Service for managing content types (document types, media types, etc.).</param>
+        /// <param name="contentService">Service for managing content items (nodes).</param>
+        /// <param name="propertyEditors">Collection of available property editors.</param>
+        /// <param name="scopeProvider">Provider for managing database transaction scopes.</param>
+        /// <param name="shortStringHelper">Helper for generating and manipulating short strings (e.g., aliases).</param>
+        /// <param name="serializer">Serializer for configuration editor JSON data.</param>
+        /// <param name="mediaService">Service for managing media items.</param>
+        /// <param name="mediaTypeService">Service for managing media types.</param>
+        /// <param name="templateContentParserService">Service for parsing template content.</param>
+        /// <param name="templateService">Service for managing templates.</param>
+        /// <param name="memberTypeService">Service for managing member types.</param>
         public PackageDataInstallation(
             IDataValueEditorFactory dataValueEditorFactory,
             ILogger<PackageDataInstallation> logger,
@@ -58,7 +83,8 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             IMediaService mediaService,
             IMediaTypeService mediaTypeService,
             ITemplateContentParserService templateContentParserService,
-            ITemplateService templateService)
+            ITemplateService templateService,
+            IMemberTypeService memberTypeService)
         {
             _dataValueEditorFactory = dataValueEditorFactory;
             _logger = logger;
@@ -76,10 +102,87 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             _mediaTypeService = mediaTypeService;
             _templateContentParserService = templateContentParserService;
             _templateService = templateService;
+            _memberTypeService = memberTypeService;
         }
 
-        // Also remove factory service registration when this constructor is removed
-        [Obsolete("Use the constructor with Infrastructure.IScopeProvider and without global settings and hosting environment instead.")]
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Packaging.PackageDataInstallation"/> class,
+        /// providing all required services and helpers for package data installation operations.
+        /// </summary>
+        /// <param name="dataValueEditorFactory">Factory for creating data value editors.</param>
+        /// <param name="logger">The logger used for logging installation events and errors.</param>
+        /// <param name="fileService">Service for managing files within the CMS.</param>
+        /// <param name="localizationService">Service for handling localization and translations.</param>
+        /// <param name="dataTypeService">Service for managing data types.</param>
+        /// <param name="entityService">Service for managing entities.</param>
+        /// <param name="contentTypeService">Service for managing content types.</param>
+        /// <param name="contentService">Service for managing content items.</param>
+        /// <param name="propertyEditors">A collection of property editors available in the system.</param>
+        /// <param name="scopeProvider">Provider for managing database transaction scopes.</param>
+        /// <param name="shortStringHelper">Helper for handling short string operations.</param>
+        /// <param name="serializer">Serializer for configuration editor JSON data.</param>
+        /// <param name="mediaService">Service for managing media items.</param>
+        /// <param name="mediaTypeService">Service for managing media types.</param>
+        /// <param name="templateContentParserService">Service for parsing template content.</param>
+        /// <param name="templateService">Service for managing templates.</param>
+        [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
+        public PackageDataInstallation(
+            IDataValueEditorFactory dataValueEditorFactory,
+            ILogger<PackageDataInstallation> logger,
+            IFileService fileService,
+            ILocalizationService localizationService,
+            IDataTypeService dataTypeService,
+            IEntityService entityService,
+            IContentTypeService contentTypeService,
+            IContentService contentService,
+            PropertyEditorCollection propertyEditors,
+            IScopeProvider scopeProvider,
+            IShortStringHelper shortStringHelper,
+            IConfigurationEditorJsonSerializer serializer,
+            IMediaService mediaService,
+            IMediaTypeService mediaTypeService,
+            ITemplateContentParserService templateContentParserService,
+            ITemplateService templateService)
+            : this(
+                  dataValueEditorFactory,
+                  logger,
+                  fileService,
+                  localizationService,
+                  dataTypeService,
+                  entityService,
+                  contentTypeService,
+                  contentService,
+                  propertyEditors,
+                  scopeProvider,
+                  shortStringHelper,
+                  serializer,
+                  mediaService,
+                  mediaTypeService,
+                  templateContentParserService,
+                  templateService,
+                  StaticServiceProvider.Instance.GetRequiredService<IMemberTypeService>())
+        { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Packaging.PackageDataInstallation"/> class, responsible for handling the installation of package data within Umbraco.
+        /// </summary>
+        /// <param name="dataValueEditorFactory">Factory for creating data value editors used in property editing.</param>
+        /// <param name="logger">The logger used for logging installation operations and errors.</param>
+        /// <param name="fileService">Service for managing files such as templates, stylesheets, and scripts.</param>
+        /// <param name="localizationService">Service for managing language and dictionary items.</param>
+        /// <param name="dataTypeService">Service for managing data types within Umbraco.</param>
+        /// <param name="entityService">Service for accessing and managing Umbraco entities.</param>
+        /// <param name="contentTypeService">Service for managing content types and media types.</param>
+        /// <param name="contentService">Service for managing content items (nodes) in Umbraco.</param>
+        /// <param name="propertyEditors">A collection of property editors available in the system.</param>
+        /// <param name="scopeProvider">Provides database transaction scopes for data operations.</param>
+        /// <param name="shortStringHelper">Helper for generating and manipulating short strings, such as aliases.</param>
+        /// <param name="globalSettings">The global settings options for the Umbraco installation.</param>
+        /// <param name="serializer">Serializer for configuration editor JSON data.</param>
+        /// <param name="mediaService">Service for managing media items (files, images, etc.).</param>
+        /// <param name="mediaTypeService">Service for managing media types.</param>
+        /// <param name="hostingEnvironment">Provides information about the web hosting environment.</param>
+        [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
         public PackageDataInstallation(
             IDataValueEditorFactory dataValueEditorFactory,
             ILogger<PackageDataInstallation> logger,
@@ -107,7 +210,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                   contentTypeService,
                   contentService,
                   propertyEditors,
-                  (Umbraco.Cms.Infrastructure.Scoping.IScopeProvider)scopeProvider,
+                  (IScopeProvider)scopeProvider,
                   shortStringHelper,
                   serializer,
                   mediaService,
@@ -118,6 +221,14 @@ namespace Umbraco.Cms.Infrastructure.Packaging
 
         #region Install/Uninstall
 
+        /// <summary>
+        /// Installs all supported data (such as data types, templates, languages, dictionary items, document types, media types, stylesheets, scripts, partial views, content, and media) from the specified compiled package into the system.
+        /// </summary>
+        /// <param name="compiledPackage">The compiled package containing the data to install.</param>
+        /// <param name="userId">The ID of the user performing the installation. This is used for audit and ownership purposes.</param>
+        /// <returns>
+        /// An <see cref="InstallationSummary"/> that summarizes the results of the installation, including details about which items were installed and any warnings encountered.
+        /// </returns>
         public InstallationSummary InstallPackageData(CompiledPackage compiledPackage, int userId)
         {
             using (IScope scope = _scopeProvider.CreateScope())
@@ -126,16 +237,22 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 {
                     Warnings = compiledPackage.Warnings,
                     DataTypesInstalled =
-                        ImportDataTypes(compiledPackage.DataTypes.ToList(), userId,
+                        ImportDataTypes(
+                            compiledPackage.DataTypes.ToList(),
+                            userId,
                             out IEnumerable<EntityContainer> dataTypeEntityContainersInstalled),
                     LanguagesInstalled = ImportLanguages(compiledPackage.Languages, userId),
                     DictionaryItemsInstalled = ImportDictionaryItems(compiledPackage.DictionaryItems, userId),
                     TemplatesInstalled = ImportTemplatesAsync(compiledPackage.Templates.ToList(), userId).GetAwaiter().GetResult(),
                     DocumentTypesInstalled =
-                        ImportDocumentTypes(compiledPackage.DocumentTypes, userId,
+                        ImportDocumentTypes(
+                            compiledPackage.DocumentTypes,
+                            userId,
                             out IEnumerable<EntityContainer> documentTypeEntityContainersInstalled),
                     MediaTypesInstalled =
-                        ImportMediaTypes(compiledPackage.MediaTypes, userId,
+                        ImportMediaTypes(
+                            compiledPackage.MediaTypes,
+                            userId,
                             out IEnumerable<EntityContainer> mediaTypeEntityContainersInstalled),
                     StylesheetsInstalled = ImportStylesheets(compiledPackage.Stylesheets, userId),
                     ScriptsInstalled = ImportScripts(compiledPackage.Scripts, userId),
@@ -152,10 +269,18 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 var importedDocTypes = installationSummary.DocumentTypesInstalled.ToDictionary(x => x.Alias, x => x);
                 var importedMediaTypes = installationSummary.MediaTypesInstalled.ToDictionary(x => x.Alias, x => x);
 
-                installationSummary.ContentInstalled = ImportContentBase(compiledPackage.Documents, importedDocTypes,
-                    userId, _contentTypeService, _contentService);
-                installationSummary.MediaInstalled = ImportContentBase(compiledPackage.Media, importedMediaTypes,
-                    userId, _mediaTypeService, _mediaService);
+                installationSummary.ContentInstalled = ImportContentBase(
+                    compiledPackage.Documents,
+                    importedDocTypes,
+                    userId,
+                    _contentTypeService,
+                    _contentService);
+                installationSummary.MediaInstalled = ImportContentBase(
+                    compiledPackage.Media,
+                    importedMediaTypes,
+                    userId,
+                    _mediaTypeService,
+                    _mediaService);
 
                 scope.Complete();
 
@@ -163,31 +288,61 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             }
         }
 
-        /// <summary>
-        /// Imports and saves package xml as <see cref="IContentType"/>
-        /// </summary>
-        /// <param name="docTypeElements">Xml to import</param>
-        /// <param name="userId">Optional id of the User performing the operation. Default is zero (admin).</param>
-        /// <returns>An enumerable list of generated ContentTypes</returns>
+        /// <inheritdoc/>
         public IReadOnlyList<IMediaType> ImportMediaTypes(IEnumerable<XElement> docTypeElements, int userId)
+#pragma warning disable CS0618 // Type or member is obsolete
             => ImportMediaTypes(docTypeElements, userId, out _);
+#pragma warning restore CS0618 // Type or member is obsolete
 
         /// <summary>
-        /// Imports and saves package xml as <see cref="IContentType"/>
+        /// Imports media types from the provided XML elements and installs any associated entity containers.
         /// </summary>
-        /// <param name="docTypeElements">Xml to import</param>
-        /// <param name="userId">Optional id of the User performing the operation. Default is zero (admin).</param>
-        /// <param name="entityContainersInstalled">Collection of entity containers installed by the package to be populated with those created in installing data types.</param>
-        /// <returns>An enumerable list of generated ContentTypes</returns>
-        public IReadOnlyList<IMediaType> ImportMediaTypes(IEnumerable<XElement> docTypeElements, int userId,
+        /// <param name="docTypeElements">A collection of <see cref="XElement"/> objects representing the media types to import.</param>
+        /// <param name="userId">The identifier of the user performing the import operation.</param>
+        /// <param name="entityContainersInstalled">When this method returns, contains the collection of <see cref="EntityContainer"/> objects that were installed as part of the import process.</param>
+        /// <returns>A read-only list of the imported <see cref="IMediaType"/> objects.</returns>
+        [Obsolete("This method is not used in Umbraco outside of this class so will be made private in Umbraco 19.")]
+        public IReadOnlyList<IMediaType> ImportMediaTypes(
+            IEnumerable<XElement> docTypeElements,
+            int userId,
             out IEnumerable<EntityContainer> entityContainersInstalled)
-            => ImportDocumentTypes(docTypeElements.ToList(), true, userId, _mediaTypeService,
+            => ImportDocumentTypes(
+                docTypeElements.ToList(),
+                true,
+                userId,
+                _mediaTypeService,
+                out entityContainersInstalled);
+
+        /// <inheritdoc/>
+        public IReadOnlyList<IMemberType> ImportMemberTypes(IEnumerable<XElement> docTypeElements, int userId)
+            => ImportMemberTypes(docTypeElements, userId, out _);
+
+        private IReadOnlyList<IMemberType> ImportMemberTypes(
+            IEnumerable<XElement> docTypeElements,
+            int userId,
+            out IEnumerable<EntityContainer> entityContainersInstalled)
+            => ImportDocumentTypes(
+                docTypeElements.ToList(),
+                true,
+                userId,
+                _memberTypeService,
                 out entityContainersInstalled);
 
         #endregion
 
         #region Content
 
+        /// <summary>
+        /// Imports content base items of a specified type from the provided compiled package content documents.
+        /// </summary>
+        /// <typeparam name="TContentBase">The type of content base item to import, which must implement <see cref="IContentBase"/>.</typeparam>
+        /// <typeparam name="TContentTypeComposition">The type of content type composition, which must implement <see cref="IContentTypeComposition"/>.</typeparam>
+        /// <param name="docs">A collection of <see cref="CompiledPackageContentBase"/> documents to import content from.</param>
+        /// <param name="importedDocumentTypes">A dictionary mapping document type aliases to their imported <typeparamref name="TContentTypeComposition"/> instances.</param>
+        /// <param name="userId">The identifier of the user performing the import operation.</param>
+        /// <param name="typeService">The service used to manage content type compositions.</param>
+        /// <param name="service">The service used to manage content base items.</param>
+        /// <returns>A read-only list containing the imported content base items of type <typeparamref name="TContentBase"/>.</returns>
         public IReadOnlyList<TContentBase> ImportContentBase<TContentBase, TContentTypeComposition>(
             IEnumerable<CompiledPackageContentBase> docs,
             IDictionary<string, TContentTypeComposition> importedDocumentTypes,
@@ -197,8 +352,13 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             where TContentBase : class, IContentBase
             where TContentTypeComposition : IContentTypeComposition
             => docs.SelectMany(x =>
-                ImportContentBase(x.XmlData.Elements().Where(doc => (string?)doc.Attribute("isDoc") == string.Empty), -1,
-                    importedDocumentTypes, userId, typeService, service)).ToList();
+                ImportContentBase(
+                    x.XmlData.Elements().Where(doc => (string?)doc.Attribute("isDoc") == string.Empty),
+                    -1,
+                    importedDocumentTypes,
+                    userId,
+                    typeService,
+                    service)).ToList();
 
         /// <summary>
         /// Imports and saves package xml as <see cref="IContent"/>
@@ -308,7 +468,12 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 }
 
                 // Create and add the child to the list
-                if (TryCreateContentFromXml(child, importedContentTypes[contentTypeAlias], parent, default, service,
+                if (TryCreateContentFromXml(
+                        child,
+                        importedContentTypes[contentTypeAlias],
+                        parent,
+                        default,
+                        service,
                         out TContentBase content))
                 {
                     list.Add(content);
@@ -318,7 +483,11 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 var grandChildren = child.Elements().Where(x => (string?)x.Attribute("isDoc") == string.Empty).ToList();
                 if (grandChildren.Any())
                 {
-                    list.AddRange(CreateContentFromXml(grandChildren, content, importedContentTypes, typeService,
+                    list.AddRange(CreateContentFromXml(
+                        grandChildren,
+                        content,
+                        importedContentTypes,
+                        typeService,
                         service));
                 }
             }
@@ -439,8 +608,15 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             return true;
         }
 
-        private TContentBase? CreateContent<TContentBase, TContentTypeComposition>(string name, TContentBase? parent,
-            int parentId, TContentTypeComposition contentType, Guid key, int level, int sortOrder, int? templateId)
+        private TContentBase? CreateContent<TContentBase, TContentTypeComposition>(
+            string name,
+            TContentBase? parent,
+            int parentId,
+            TContentTypeComposition contentType,
+            Guid key,
+            int level,
+            int sortOrder,
+            int? templateId)
             where TContentBase : class?, IContentBase
             where TContentTypeComposition : IContentTypeComposition
         {
@@ -501,6 +677,12 @@ namespace Umbraco.Cms.Infrastructure.Packaging
 
         #region DocumentTypes
 
+        /// <summary>
+        /// Imports a single document type from the specified XML element.
+        /// </summary>
+        /// <param name="docTypeElement">The <see cref="XElement"/> representing the document type to import.</param>
+        /// <param name="userId">The identifier of the user performing the import operation.</param>
+        /// <returns>A read-only list containing the imported <see cref="IContentType"/> objects.</returns>
         public IReadOnlyList<IContentType> ImportDocumentType(XElement docTypeElement, int userId)
             => ImportDocumentTypes(new[] { docTypeElement }, userId, out _);
 
@@ -520,9 +702,15 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         /// <param name="userId">Optional id of the User performing the operation. Default is zero (admin).</param>
         /// <param name="entityContainersInstalled">Collection of entity containers installed by the package to be populated with those created in installing data types.</param>
         /// <returns>An enumerable list of generated ContentTypes</returns>
-        public IReadOnlyList<IContentType> ImportDocumentTypes(IEnumerable<XElement> docTypeElements, int userId,
+        public IReadOnlyList<IContentType> ImportDocumentTypes(
+            IEnumerable<XElement> docTypeElements,
+            int userId,
             out IEnumerable<EntityContainer> entityContainersInstalled)
-            => ImportDocumentTypes(docTypeElements.ToList(), true, userId, _contentTypeService,
+            => ImportDocumentTypes(
+                docTypeElements.ToList(),
+                true,
+                userId,
+                _contentTypeService,
                 out entityContainersInstalled);
 
         /// <summary>
@@ -548,7 +736,8 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         /// <returns>An enumerable list of generated ContentTypes</returns>
         public IReadOnlyList<T> ImportDocumentTypes<T>(
             IReadOnlyCollection<XElement> unsortedDocumentTypes,
-            bool importStructure, int userId,
+            bool importStructure,
+            int userId,
             IContentTypeBaseService<T> service,
             out IEnumerable<EntityContainer> entityContainersInstalled)
             where T : class, IContentTypeComposition
@@ -593,7 +782,9 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                         }
                     }
 
-                    graph.AddItem(TopoGraph.CreateNode(infoElement!.Element("Alias")!.Value, elementCopy,
+                    graph.AddItem(TopoGraph.CreateNode(
+                        infoElement!.Element("Alias")!.Value,
+                        elementCopy,
                         dependencies.ToArray()));
                 }
             }
@@ -647,8 +838,11 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                         continue;
                     }
 
-                    T updated = UpdateContentTypesStructure(importedContentTypes[alias], structureElement,
-                        importedContentTypes, service);
+                    T updated = UpdateContentTypesStructure(
+                        importedContentTypes[alias],
+                        structureElement,
+                        importedContentTypes,
+                        service);
                     updatedContentTypes.Add(updated);
                 }
 
@@ -711,7 +905,9 @@ namespace Umbraco.Cms.Infrastructure.Packaging
 
                         if (tryCreateFolder == false)
                         {
-                            _logger.LogError(tryCreateFolder.Exception, "Could not create folder: {FolderName}",
+                            _logger.LogError(
+                                tryCreateFolder.Exception,
+                                "Could not create folder: {FolderName}",
                                 rootFolder);
                             throw tryCreateFolder.Exception!;
                         }
@@ -761,9 +957,19 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             return _contentTypeService.GetContainer(tryCreateFolder.Result!.Entity!.Id);
         }
 
+        /// <summary>
+        /// Gets the content type key from the specified content type XML element.
+        /// </summary>
+        /// <param name="contentType">The XML element representing the content type.</param>
+        /// <returns>The GUID key of the content type.</returns>
         public Guid GetContentTypeKey(XElement contentType)
             => Guid.Parse(contentType.Element("Info")!.Element("Key")!.Value);
 
+        /// <summary>
+        /// Gets the alias of the entity type from the provided XML element.
+        /// </summary>
+        /// <param name="entityType">The XML element representing the entity type.</param>
+        /// <returns>The alias string if found; otherwise, null.</returns>
         public string? GetEntityTypeAlias(XElement entityType)
             => entityType.Element("Info")?.Element("Alias")?.Value;
 
@@ -805,26 +1011,23 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         {
             if (typeof(T) == typeof(IContentType))
             {
-                if (parent is null)
-                {
-                    return new ContentType(_shortStringHelper, parentId) { Alias = alias, Key = key } as T;
-                }
-                else
-                {
-                    return new ContentType(_shortStringHelper, (IContentType)parent, alias) { Key = key } as T;
-                }
+                return parent is null
+                    ? new ContentType(_shortStringHelper, parentId) { Alias = alias, Key = key } as T
+                    : new ContentType(_shortStringHelper, (IContentType)parent, alias) { Key = key } as T;
             }
 
             if (typeof(T) == typeof(IMediaType))
             {
-                if (parent is null)
-                {
-                    return new MediaType(_shortStringHelper, parentId) { Alias = alias, Key = key } as T;
-                }
-                else
-                {
-                    return new MediaType(_shortStringHelper, (IMediaType)parent, alias) { Key = key } as T;
-                }
+                return parent is null
+                    ? new MediaType(_shortStringHelper, parentId) { Alias = alias, Key = key } as T
+                    : new MediaType(_shortStringHelper, (IMediaType)parent, alias) { Key = key } as T;
+            }
+
+            if (typeof(T) == typeof(IMemberType))
+            {
+                return parent is null
+                    ? new MemberType(_shortStringHelper, parentId) { Alias = alias, Key = key } as T
+                    : new MemberType(_shortStringHelper, (IMemberType)parent, alias) { Key = key } as T;
             }
 
             throw new NotSupportedException($"Type {typeof(T)} is not supported");
@@ -914,7 +1117,9 @@ namespace Umbraco.Cms.Infrastructure.Packaging
 
             if (contentType is IContentType contentTypex)
             {
-                UpdateContentTypesAllowedTemplates(contentTypex, infoElement.Element("AllowedTemplates"),
+                UpdateContentTypesAllowedTemplates(
+                    contentTypex,
+                    infoElement.Element("AllowedTemplates"),
                     defaultTemplateElement);
             }
 
@@ -962,7 +1167,9 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             }
         }
 
-        private void UpdateContentTypesAllowedTemplates(IContentType contentType, XElement? allowedTemplatesElement,
+        private void UpdateContentTypesAllowedTemplates(
+            IContentType contentType,
+            XElement? allowedTemplatesElement,
             XElement? defaultTemplateElement)
         {
             if (allowedTemplatesElement != null && allowedTemplatesElement.Elements("Template").Any())
@@ -1042,8 +1249,11 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                     propertyGroup.Type = type;
                 }
 
-                if (int.TryParse(propertyGroupElement.Element("SortOrder")?.Value, NumberStyles.Integer,
-                        CultureInfo.InvariantCulture, out var sortOrder))
+                if (int.TryParse(
+                        propertyGroupElement.Element("SortOrder")?.Value,
+                        NumberStyles.Integer,
+                        CultureInfo.InvariantCulture,
+                        out var sortOrder))
                 {
                     // Override the sort order with the imported value
                     propertyGroup.SortOrder = sortOrder;
@@ -1100,7 +1310,9 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                     // TODO: We should expose this to the UI during install!
                     _logger.LogWarning(
                         "Packager: Error handling creation of PropertyType '{PropertyType}'. Could not find DataTypeDefintion with unique id '{DataTypeDefinitionId}' nor one referencing the DataType with a property editor alias (or legacy control id) '{PropertyEditorAlias}'. Did the package creator forget to package up custom datatypes? This property will be converted to a label/readonly editor if one exists.",
-                        property.Element("Name")?.Value, dataTypeDefinitionId, property.Element("Type")?.Value.Trim());
+                        property.Element("Name")?.Value,
+                        dataTypeDefinitionId,
+                        property.Element("Type")?.Value.Trim());
 
                     //convert to a label!
                     dataTypeDefinition = _dataTypeService.GetByEditorAlias(Constants.PropertyEditors.Aliases.Label)?
@@ -1116,7 +1328,10 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 XElement? sortOrderElement = property.Element("SortOrder");
                 if (sortOrderElement != null)
                 {
-                    int.TryParse(sortOrderElement.Value, NumberStyles.Integer, CultureInfo.InvariantCulture,
+                    int.TryParse(
+                        sortOrderElement.Value,
+                        NumberStyles.Integer,
+                        CultureInfo.InvariantCulture,
                         out sortOrder);
                 }
 
@@ -1166,8 +1381,11 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             }
         }
 
-        private T UpdateContentTypesStructure<T>(T contentType, XElement structureElement,
-            IReadOnlyDictionary<string, T> importedContentTypes, IContentTypeBaseService<T> service)
+        private T UpdateContentTypesStructure<T>(
+            T contentType,
+            XElement structureElement,
+            IReadOnlyDictionary<string, T> importedContentTypes,
+            IContentTypeBaseService<T> service)
             where T : IContentTypeComposition
         {
             var allowedChildren = contentType.AllowedContentTypes?.ToList();
@@ -1183,7 +1401,8 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 {
                     _logger.LogWarning(
                         "Packager: Error handling DocumentType structure. DocumentType with alias '{DoctypeAlias}' could not be found and was not added to the structure for '{DoctypeStructureAlias}'.",
-                        alias, contentType.Alias);
+                        alias,
+                        contentType.Alias);
                     continue;
                 }
 
@@ -1234,7 +1453,9 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         /// <param name="userId">Optional id of the user</param>
         /// <param name="entityContainersInstalled">Collection of entity containers installed by the package to be populated with those created in installing data types.</param>
         /// <returns>An enumerable list of generated DataTypeDefinitions</returns>
-        public IReadOnlyList<IDataType> ImportDataTypes(IReadOnlyCollection<XElement> dataTypeElements, int userId,
+        public IReadOnlyList<IDataType> ImportDataTypes(
+            IReadOnlyCollection<XElement> dataTypeElements,
+            int userId,
             out IEnumerable<EntityContainer> entityContainersInstalled)
         {
             var dataTypes = new List<IDataType>();
@@ -1339,7 +1560,9 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                         Attempt<OperationResult<OperationResultType, EntityContainer>?> tryCreateFolder = _dataTypeService.CreateContainer(-1, rootFolderKey, rootFolder);
                         if (tryCreateFolder == false)
                         {
-                            _logger.LogError(tryCreateFolder.Exception, "Could not create folder: {FolderName}",
+                            _logger.LogError(
+                                tryCreateFolder.Exception,
+                                "Could not create folder: {FolderName}",
                                 rootFolder);
                             throw tryCreateFolder.Exception!;
                         }
@@ -1403,6 +1626,13 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             return ImportDictionaryItems(dictionaryItemElementList, languages, null, userId);
         }
 
+        /// <summary>
+        /// Imports a dictionary item and its translations from the specified XML element into the system.
+        /// </summary>
+        /// <param name="dictionaryItemElement">The <see cref="XElement"/> representing the dictionary item to import, including its translations.</param>
+        /// <param name="userId">The identifier of the user performing the import operation.</param>
+        /// <param name="parentId">The optional unique identifier of the parent dictionary item, if this item is a child; otherwise, <c>null</c>.</param>
+        /// <returns>An <see cref="IEnumerable{IDictionaryItem}"/> containing the imported dictionary item(s), including any nested child items.</returns>
         public IEnumerable<IDictionaryItem> ImportDictionaryItem(XElement dictionaryItemElement, int userId, Guid? parentId)
         {
             var languages = _localizationService.GetAllLanguages().ToList();
@@ -1449,12 +1679,17 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             _localizationService.Save(dictionaryItem, userId);
             items.Add(dictionaryItem);
 
-            items.AddRange(ImportDictionaryItems(dictionaryItemElement.Elements("DictionaryItem"), languages,
-                dictionaryItem.Key, userId));
+            items.AddRange(ImportDictionaryItems(
+                dictionaryItemElement.Elements("DictionaryItem"),
+                languages,
+                dictionaryItem.Key,
+                userId));
             return items;
         }
 
-        private IDictionaryItem UpdateDictionaryItem(IDictionaryItem dictionaryItem, XElement dictionaryItemElement,
+        private IDictionaryItem UpdateDictionaryItem(
+            IDictionaryItem dictionaryItem,
+            XElement dictionaryItemElement,
             List<ILanguage> languages)
         {
             var translations = dictionaryItem.Translations.ToList();
@@ -1468,8 +1703,12 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             return dictionaryItem;
         }
 
-        private static DictionaryItem CreateNewDictionaryItem(Guid itemId, string itemName,
-            XElement dictionaryItemElement, List<ILanguage> languages, Guid? parentId)
+        private static DictionaryItem CreateNewDictionaryItem(
+            Guid itemId,
+            string itemName,
+            XElement dictionaryItemElement,
+            List<ILanguage> languages,
+            Guid? parentId)
         {
             DictionaryItem dictionaryItem = parentId.HasValue
                 ? new DictionaryItem(parentId.Value, itemName)
@@ -1551,6 +1790,13 @@ namespace Umbraco.Cms.Infrastructure.Packaging
 
         #endregion
 
+        /// <summary>
+        /// Imports scripts from the specified XML elements, saving new scripts using the provided user ID.
+        /// Only scripts that do not already exist are imported and saved; existing scripts are skipped.
+        /// </summary>
+        /// <param name="scriptElements">A collection of XML elements, each representing a script to import. Each element must have a <c>path</c> attribute and script content as its value.</param>
+        /// <param name="userId">The ID of the user performing the import operation.</param>
+        /// <returns>A read-only list of <see cref="IScript"/> objects that were newly imported and saved.</returns>
         public IReadOnlyList<IScript> ImportScripts(IEnumerable<XElement> scriptElements, int userId)
         {
             var result = new List<IScript>();
@@ -1583,6 +1829,12 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             return result;
         }
 
+        /// <summary>
+        /// Imports partial views from the specified XML elements, creating and saving each partial view only if it does not already exist.
+        /// </summary>
+        /// <param name="partialViewElements">A collection of <see cref="XElement"/> objects, each representing a partial view to import. Each element must have a <c>path</c> attribute and contain the partial view content as its value.</param>
+        /// <param name="userId">The identifier of the user performing the import operation.</param>
+        /// <returns>A read-only list of <see cref="IPartialView"/> instances that were newly imported and saved. Existing partial views are not modified or returned.</returns>
         public IReadOnlyList<IPartialView> ImportPartialViews(IEnumerable<XElement> partialViewElements, int userId)
         {
             var result = new List<IPartialView>();
@@ -1610,6 +1862,15 @@ namespace Umbraco.Cms.Infrastructure.Packaging
 
         #region Stylesheets
 
+        /// <summary>
+        /// Imports stylesheets from the provided XML elements, creating new stylesheets or updating existing ones, and saves them using the specified user ID.
+        /// </summary>
+        /// <param name="stylesheetElements">A collection of XML elements, each representing a stylesheet to import. Each element should contain a <c>FileName</c> and <c>Content</c>, and may contain <c>Properties</c> with <c>Alias</c>, <c>Name</c>, and <c>Value</c> sub-elements.</param>
+        /// <param name="userId">The ID of the user performing the import operation.</param>
+        /// <returns>A read-only list of the imported or updated <see cref="IFile"/> stylesheet files.</returns>
+        /// <remarks>
+        /// If a stylesheet with the specified file name already exists, its properties are updated or added as needed. If it does not exist, a new stylesheet is created. Each stylesheet and its properties are saved using the provided user ID.
+        /// </remarks>
         public IReadOnlyList<IFile> ImportStylesheets(IEnumerable<XElement> stylesheetElements, int userId)
         {
             var result = new List<IFile>();
@@ -1673,6 +1934,12 @@ namespace Umbraco.Cms.Infrastructure.Packaging
 
         #region Templates
 
+        /// <summary>
+        /// Asynchronously imports a template from the specified XML element.
+        /// </summary>
+        /// <param name="templateElement">The <see cref="XElement"/> representing the template to import.</param>
+        /// <param name="userId">The identifier of the user performing the import operation.</param>
+        /// <returns>A task representing the asynchronous operation, containing a collection of the imported <see cref="ITemplate"/> objects.</returns>
         public async Task<IEnumerable<ITemplate>> ImportTemplateAsync(XElement templateElement, int userId)
             => ImportTemplatesAsync(new[] {templateElement}, userId).GetAwaiter().GetResult();
 

@@ -11,6 +11,12 @@ namespace Umbraco.Extensions;
 /// </summary>
 public static class EnumerableExtensions
 {
+    /// <summary>
+    /// Determines whether the collection is null or empty.
+    /// </summary>
+    /// <typeparam name="T">The type of items in the collection.</typeparam>
+    /// <param name="list">The collection to check.</param>
+    /// <returns><c>true</c> if the collection is null or empty; otherwise, <c>false</c>.</returns>
     public static bool IsCollectionEmpty<T>(this IReadOnlyCollection<T>? list) => list == null || list.Count == 0;
 
     /// <summary>
@@ -25,6 +31,13 @@ public static class EnumerableExtensions
         yield return item;
     }
 
+    /// <summary>
+    /// Determines whether the enumerable contains duplicate items.
+    /// </summary>
+    /// <typeparam name="T">The type of items in the enumerable.</typeparam>
+    /// <param name="items">The items to check.</param>
+    /// <param name="includeNull">If <c>true</c>, null values are considered when checking for duplicates.</param>
+    /// <returns><c>true</c> if duplicates exist; otherwise, <c>false</c>.</returns>
     internal static bool HasDuplicates<T>(this IEnumerable<T> items, bool includeNull)
     {
         var hs = new HashSet<T>();
@@ -39,6 +52,15 @@ public static class EnumerableExtensions
         return false;
     }
 
+    /// <summary>
+    /// Splits the enumerable into groups of the specified size.
+    /// </summary>
+    /// <typeparam name="T">The type of items in the enumerable.</typeparam>
+    /// <param name="source">The source enumerable.</param>
+    /// <param name="groupSize">The size of each group.</param>
+    /// <returns>An enumerable of groups, each containing up to the specified number of items.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when source is null.</exception>
+    /// <exception cref="ArgumentException">Thrown when groupSize is less than or equal to zero.</exception>
     public static IEnumerable<IEnumerable<T>> InGroupsOf<T>(this IEnumerable<T>? source, int groupSize)
     {
         if (source == null)
@@ -79,6 +101,15 @@ public static class EnumerableExtensions
         }
     }
 
+    /// <summary>
+    /// Selects items by processing the source in groups of the specified size.
+    /// </summary>
+    /// <typeparam name="TResult">The type of the result items.</typeparam>
+    /// <typeparam name="TSource">The type of the source items.</typeparam>
+    /// <param name="source">The source enumerable.</param>
+    /// <param name="selector">The selector function to apply to each group.</param>
+    /// <param name="groupSize">The size of each group.</param>
+    /// <returns>An enumerable of results from processing each group.</returns>
     public static IEnumerable<TResult> SelectByGroups<TResult, TSource>(
         this IEnumerable<TSource> source,
         Func<IEnumerable<TSource>, IEnumerable<TResult>> selector,
@@ -193,6 +224,15 @@ public static class EnumerableExtensions
         }
     }
 
+    /// <summary>
+    /// Recursively selects items from the source using the specified selector.
+    /// </summary>
+    /// <typeparam name="TSource">The type of the source items.</typeparam>
+    /// <param name="source">The source enumerable.</param>
+    /// <param name="recursiveSelector">A function that returns child elements for each item.</param>
+    /// <param name="maxRecusionDepth">The maximum recursion depth to prevent stack overflow.</param>
+    /// <returns>A flattened enumerable of all items and their recursive children.</returns>
+    /// <exception cref="InvalidOperationException">Thrown when the maximum recursion depth is exceeded.</exception>
     public static IEnumerable<TSource> SelectRecursive<TSource>(
         this IEnumerable<TSource> source,
         Func<TSource, IEnumerable<TSource>> recursiveSelector,
@@ -245,6 +285,14 @@ public static class EnumerableExtensions
         =>
         coll.Where(x => x != null)!;
 
+    /// <summary>
+    /// Applies a projection action to all items in the sequence that are of the specified actual type.
+    /// </summary>
+    /// <typeparam name="TBase">The base type of items in the sequence.</typeparam>
+    /// <typeparam name="TActual">The actual type to filter and apply the projection to.</typeparam>
+    /// <param name="sequence">The source sequence.</param>
+    /// <param name="projection">The action to apply to each item of the actual type.</param>
+    /// <returns>The original sequence, allowing chaining.</returns>
     public static IEnumerable<TBase> ForAllThatAre<TBase, TActual>(
         this IEnumerable<TBase> sequence,
         Action<TActual> projection)
@@ -371,11 +419,25 @@ public static class EnumerableExtensions
     /// <returns></returns>
     public static IEnumerable<T> EmptyNull<T>(this IEnumerable<T>? items) => items ?? Enumerable.Empty<T>();
 
-    // the .OfType<T>() filter is nice when there's only one type
-    // this is to support filtering with multiple types
+    /// <summary>
+    /// Filters a sequence to include only items whose type is in the specified list of types.
+    /// </summary>
+    /// <typeparam name="T">The type of items in the sequence.</typeparam>
+    /// <param name="contents">The source sequence.</param>
+    /// <param name="types">The types to include.</param>
+    /// <returns>A filtered sequence containing only items of the specified types.</returns>
+    /// <remarks>
+    /// This is similar to <c>.OfType&lt;T&gt;()</c> but supports filtering with multiple types.
+    /// </remarks>
     public static IEnumerable<T> OfTypes<T>(this IEnumerable<T> contents, params Type[] types) =>
         contents.Where(x => types.Contains(x?.GetType()));
 
+    /// <summary>
+    /// Returns all elements of the sequence except the last one.
+    /// </summary>
+    /// <typeparam name="T">The type of items in the enumerable.</typeparam>
+    /// <param name="source">The source enumerable.</param>
+    /// <returns>An enumerable containing all elements except the last.</returns>
     public static IEnumerable<T> SkipLast<T>(this IEnumerable<T> source)
     {
         using (IEnumerator<T> e = source.GetEnumerator())
@@ -392,6 +454,15 @@ public static class EnumerableExtensions
         }
     }
 
+    /// <summary>
+    /// Orders the elements of a sequence according to a key and the specified sort direction.
+    /// </summary>
+    /// <typeparam name="TSource">The type of the elements of source.</typeparam>
+    /// <typeparam name="TKey">The type of the key returned by keySelector.</typeparam>
+    /// <param name="source">A sequence of values to order.</param>
+    /// <param name="keySelector">A function to extract a key from an element.</param>
+    /// <param name="sortOrder">The direction to sort (ascending or descending).</param>
+    /// <returns>An ordered enumerable.</returns>
     public static IOrderedEnumerable<TSource> OrderBy<TSource, TKey>(
         this IEnumerable<TSource> source,
         Func<TSource, TKey> keySelector,

@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Notifications;
+using Umbraco.Cms.Core.Notifications;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Notifications;
 
@@ -15,5 +15,8 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Notifications;
 /// </remarks>
 public class UmbracoPlanExecutedNotification : INotification
 {
+    /// <summary>
+    /// Gets the executed migration plan.
+    /// </summary>
     public required ExecutedMigrationPlan ExecutedPlan { get; init; }
 }

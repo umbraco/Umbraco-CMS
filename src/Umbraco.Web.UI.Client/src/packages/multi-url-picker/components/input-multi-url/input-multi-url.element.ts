@@ -1,5 +1,6 @@
 import type { UmbLinkPickerLink } from '../../link-picker-modal/types.js';
 import { UMB_LINK_PICKER_MODAL } from '../../link-picker-modal/link-picker-modal.token.js';
+import type { UmbLinkPickerDocumentLinksConfig } from '../../link-picker-modal/link-picker-modal.token.js';
 import {
 	css,
 	customElement,
@@ -23,10 +24,9 @@ import {
 import { UmbMediaItemRepository, UmbMediaUrlRepository } from '@umbraco-cms/backoffice/media';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
-import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
-import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
+import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 /**
  * @element umb-input-multi-url
@@ -35,7 +35,9 @@ import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
  * @fires focus - when the input gains focus
  */
 @customElement('umb-input-multi-url')
-export class UmbInputMultiUrlElement extends UUIFormControlMixin(UmbLitElement, '') {
+export class UmbInputMultiUrlElement extends UmbFormControlMixin<string, typeof UmbLitElement, undefined>(
+	UmbLitElement,
+) {
 	#sorter = new UmbSorterController<UmbLinkPickerLink>(this, {
 		getUniqueOfElement: (element) => {
 			return element.id;
@@ -54,24 +56,6 @@ export class UmbInputMultiUrlElement extends UUIFormControlMixin(UmbLitElement, 
 
 	protected override getFormElement() {
 		return undefined;
-	}
-
-	@property()
-	/** @deprecated will be removed in v17 */
-	public set alias(value: string | undefined) {
-		//this.#linkPickerModal.setUniquePathValue('propertyAlias', value);
-	}
-	public get alias(): string | undefined {
-		return undefined; //this.#linkPickerModal.getUniquePathValue('propertyAlias');
-	}
-
-	@property()
-	/** @deprecated will be removed in v17 */
-	public set variantId(value: string | UmbVariantId | undefined) {
-		//this.#linkPickerModal.setUniquePathValue('variantId', value?.toString());
-	}
-	public get variantId(): string | undefined {
-		return undefined; //this.#linkPickerModal.getUniquePathValue('variantId');
 	}
 
 	/**
@@ -107,7 +91,7 @@ export class UmbInputMultiUrlElement extends UUIFormControlMixin(UmbLitElement, 
 	 * @attr
 	 * @default
 	 */
-	@property({ type: String, attribute: 'min-message' })
+	@property({ type: String, attribute: 'max-message' })
 	maxMessage = 'This field exceeds the allowed amount of items';
 
 	/**
@@ -115,6 +99,9 @@ export class UmbInputMultiUrlElement extends UUIFormControlMixin(UmbLitElement, 
 	 */
 	@property({ type: Boolean, attribute: 'hide-anchor' })
 	hideAnchor?: boolean;
+
+	@property({ type: Object, attribute: false })
+	documentLinksConfig?: UmbLinkPickerDocumentLinksConfig;
 
 	/**
 	 * @type {UUIModalSidebarSize}
@@ -169,20 +156,30 @@ export class UmbInputMultiUrlElement extends UUIFormControlMixin(UmbLitElement, 
 		}
 	}
 	#readonly = false;
+	@property({ type: Boolean })
+	required = false;
+	@property({ type: String })
+	requiredMessage = UMB_VALIDATION_EMPTY_LOCALIZATION_KEY;
 
 	@state()
 	private _modalRoute?: UmbModalRouteBuilder;
 
 	@state()
-	_resolvedLinkNames: Array<{ unique: string; name: string }> = [];
+	private _resolvedLinkNames: Array<{ unique: string; name: string }> = [];
 
 	@state()
-	_resolvedLinkUrls: Array<{ unique: string; url: string }> = [];
+	private _resolvedLinkUrls: Array<{ unique: string; url: string }> = [];
 
 	#linkPickerModal;
 
 	constructor() {
 		super();
+
+		this.addValidator(
+			'valueMissing',
+			() => this.requiredMessage,
+			() => !this.readonly && this.required && this.urls.length === 0,
+		);
 
 		this.addValidator(
 			'rangeUnderflow',
@@ -222,6 +219,7 @@ export class UmbInputMultiUrlElement extends UUIFormControlMixin(UmbLitElement, 
 						isNew: index === null,
 						config: {
 							hideAnchor: this.hideAnchor,
+							documentLinksConfig: this.documentLinksConfig,
 						},
 					},
 					value: {
@@ -235,6 +233,7 @@ export class UmbInputMultiUrlElement extends UUIFormControlMixin(UmbLitElement, 
 							type: data?.type,
 							unique: data?.unique,
 							url: data?.url,
+							culture: data?.culture,
 						},
 					},
 				};
@@ -307,7 +306,8 @@ export class UmbInputMultiUrlElement extends UUIFormControlMixin(UmbLitElement, 
 
 	async #getNameForDocument(unique: string) {
 		const { data } = await this.#documentItemRepository.requestItems([unique]);
-		return data?.[0]?.name ?? '';
+		// TODO: [v17] Review usage of `item.variants[0].name` as this needs to be implemented properly! [LK]
+		return data?.[0]?.variants[0].name ?? '';
 	}
 
 	async #getNameForMedia(unique: string) {
@@ -353,6 +353,7 @@ export class UmbInputMultiUrlElement extends UUIFormControlMixin(UmbLitElement, 
 	}
 
 	#dispatchChangeEvent() {
+		super.value = this.#urls.map((x) => x.url).join(',');
 		this.requestUpdate();
 		this.dispatchEvent(new UmbChangeEvent());
 	}
@@ -362,10 +363,10 @@ export class UmbInputMultiUrlElement extends UUIFormControlMixin(UmbLitElement, 
 	}
 
 	#getResolvedItemUrl(link: UmbLinkPickerLink): string {
-		return (
-			(this._resolvedLinkUrls.find((url) => url.unique === link.unique)?.url ?? link.url ?? '') +
-			(link.queryString || '')
-		);
+		const baseUrl = link.culture
+			? (link.url ?? '')
+			: (this._resolvedLinkUrls.find((url) => url.unique === link.unique)?.url ?? link.url ?? '');
+		return baseUrl + (link.queryString || '');
 	}
 
 	override render() {
@@ -433,6 +434,11 @@ export class UmbInputMultiUrlElement extends UUIFormControlMixin(UmbLitElement, 
 		css`
 			#btn-add {
 				width: 100%;
+			}
+
+			uui-ref-list:not(:has(:nth-child(1))) {
+				margin-top: -20px;
+				padding-top: 20px;
 			}
 		`,
 	];

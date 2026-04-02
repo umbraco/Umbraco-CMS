@@ -9,7 +9,7 @@ import { UmbDeleteEntityAction } from '@umbraco-cms/backoffice/entity-action';
  * @augments {UmbEntityActionBase<MetaEntityActionDeleteWithRelationKind>}
  */
 export class UmbDeleteWithRelationEntityAction extends UmbDeleteEntityAction<MetaEntityActionDeleteWithRelationKind> {
-	override async _confirmDelete() {
+	protected override async _confirmDelete() {
 		if (!this.args.unique) throw new Error('Cannot delete an item without a unique identifier.');
 
 		await umbOpenModal(this, UMB_DELETE_WITH_RELATION_CONFIRM_MODAL, {

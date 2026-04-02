@@ -1,22 +1,25 @@
 import { UMB_MEDIA_WORKSPACE_CONTEXT } from '../../workspace/constants.js';
 import type { UmbMediaAuditLogModel } from '../types.js';
 import { UmbMediaAuditLogRepository } from '../repository/index.js';
-import { getMediaHistoryTagStyleAndText, TimeOptions } from './utils.js';
+import { getMediaHistoryTagStyleAndText } from './utils.js';
 import { css, html, customElement, state, nothing, repeat, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
+import { UmbPaginationManager, UMB_DATE_TIME_FORMAT_OPTIONS } from '@umbraco-cms/backoffice/utils';
 import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbUserItemModel } from '@umbraco-cms/backoffice/user';
 import { UmbUserItemRepository } from '@umbraco-cms/backoffice/user';
 
+/**
+ * @deprecated Scheduled for removal in Umbraco 19. Replaced by the shared 'auditLog' kind element (UmbContentAuditLogWorkspaceInfoAppElement).
+ */
 @customElement('umb-media-history-workspace-info-app')
 export class UmbMediaHistoryWorkspaceInfoAppElement extends UmbLitElement {
 	@state()
-	_currentPageNumber = 1;
+	private _currentPageNumber = 1;
 
 	@state()
-	_totalPages = 1;
+	private _totalPages = 1;
 
 	@state()
 	private _items: Array<UmbMediaAuditLogModel> = [];
@@ -42,7 +45,9 @@ export class UmbMediaHistoryWorkspaceInfoAppElement extends UmbLitElement {
 	}
 
 	async #requestAuditLogs() {
-		const unique = this.#workspaceContext?.getUnique();
+		if (!this.#workspaceContext) return;
+
+		const unique = this.#workspaceContext.getUnique();
 		if (!unique) throw new Error('Media unique is required');
 
 		const { data } = await this.#auditLogRepository.requestAuditLog({
@@ -110,7 +115,7 @@ export class UmbMediaHistoryWorkspaceInfoAppElement extends UmbLitElement {
 
 							return html`<umb-history-item
 								.name=${user?.name ?? 'Unknown'}
-								.detail=${this.localize.date(item.timestamp, TimeOptions)}>
+								.detail=${this.localize.date(item.timestamp, UMB_DATE_TIME_FORMAT_OPTIONS)}>
 								<umb-user-avatar
 									slot="avatar"
 									.name=${user?.name}
@@ -142,9 +147,9 @@ export class UmbMediaHistoryWorkspaceInfoAppElement extends UmbLitElement {
 							.current=${this._currentPageNumber}
 							.total=${this._totalPages}
 							firstlabel=${this.localize.term('general_first')}
-                            previouslabel=${this.localize.term('general_previous')}
-                            nextlabel=${this.localize.term('general_next')}
-                            lastlabel=${this.localize.term('general_last')}
+							previouslabel=${this.localize.term('general_previous')}
+							nextlabel=${this.localize.term('general_next')}
+							lastlabel=${this.localize.term('general_last')}
 							@change=${this.#onPageChange}></uui-pagination>
 					`
 				: nothing}
@@ -171,6 +176,7 @@ export class UmbMediaHistoryWorkspaceInfoAppElement extends UmbLitElement {
 			}
 
 			.log-type uui-tag {
+				justify-self: center;
 				height: fit-content;
 				margin-top: auto;
 				margin-bottom: auto;

@@ -12,13 +12,23 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Security;
 
+/// <summary>
+/// Provides functionality to send password reset emails to users who have requested a password reset.
+/// </summary>
 public class EmailUserForgotPasswordSender : IUserForgotPasswordSender
 {
     private readonly IEmailSender _emailSender;
     private readonly ILocalizedTextService _localizedTextService;
-    private GlobalSettings _globalSettings;
-    private SecuritySettings _securitySettings;
+    private readonly GlobalSettings _globalSettings;
+    private readonly SecuritySettings _securitySettings;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="EmailUserForgotPasswordSender"/> class.
+    /// </summary>
+    /// <param name="emailSender">An implementation of <see cref="IEmailSender"/> used to send emails.</param>
+    /// <param name="localizedTextService">An implementation of <see cref="ILocalizedTextService"/> for retrieving localized text resources.</param>
+    /// <param name="globalSettings">A monitor for <see cref="GlobalSettings"/> providing application-wide configuration values.</param>
+    /// <param name="securitySettings">A monitor for <see cref="SecuritySettings"/> providing security-related configuration values.</param>
     public EmailUserForgotPasswordSender(
         IEmailSender emailSender,
         ILocalizedTextService localizedTextService,
@@ -29,11 +39,13 @@ public class EmailUserForgotPasswordSender : IUserForgotPasswordSender
         _localizedTextService = localizedTextService;
         _globalSettings = globalSettings.CurrentValue;
         _securitySettings = securitySettings.CurrentValue;
-
-        globalSettings.OnChange(settings => _globalSettings = settings);
-        securitySettings.OnChange(settings => _securitySettings = settings);
     }
 
+    /// <summary>
+    /// Asynchronously sends a password reset email to the user specified in the provided message model.
+    /// </summary>
+    /// <param name="messageModel">The message model containing information about the recipient and the password reset link.</param>
+    /// <returns>A <see cref="Task"/> that represents the asynchronous send operation.</returns>
     public async Task SendForgotPassword(UserForgotPasswordMessage messageModel)
     {
         CultureInfo recipientCulture = UmbracoUserExtensions.GetUserCulture(
@@ -68,8 +80,12 @@ public class EmailUserForgotPasswordSender : IUserForgotPasswordSender
 
         var message = new EmailMessage(senderEmail, address.ToString(), emailSubject, emailBody, true);
 
-        await _emailSender.SendAsync(message, Constants.Web.EmailTypes.PasswordReset, true);
+        await _emailSender.SendAsync(message, Constants.Web.EmailTypes.PasswordReset, true, _securitySettings.PasswordResetEmailExpiry);
     }
 
+    /// <summary>
+    /// Determines whether a forgot password email can be sent, based on the current security settings and the email sender's capability to send required emails.
+    /// </summary>
+    /// <returns><c>true</c> if the forgot password email can be sent; otherwise, <c>false</c>.</returns>
     public bool CanSend() => _securitySettings.AllowPasswordReset && _emailSender.CanSendRequiredEmail();
 }

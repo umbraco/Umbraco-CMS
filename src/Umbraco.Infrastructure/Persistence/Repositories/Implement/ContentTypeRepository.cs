@@ -1,3 +1,4 @@
+using System.Xml.Linq;
 using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Cms.Core;
@@ -20,6 +21,21 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 /// </summary>
 internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContentType>, IContentTypeRepository
 {
+    private readonly IRepositoryCacheVersionService _repositoryCacheVersionService;
+    private readonly ICacheSyncService _cacheSyncService;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ContentTypeRepository"/> class.
+    /// </summary>
+    /// <param name="scopeAccessor">Provides access to the current database scope.</param>
+    /// <param name="cache">The application-level cache manager.</param>
+    /// <param name="logger">The logger used for logging repository operations.</param>
+    /// <param name="commonRepository">Repository for common content type operations.</param>
+    /// <param name="languageRepository">Repository for managing languages.</param>
+    /// <param name="shortStringHelper">Helper for generating and manipulating short strings.</param>
+    /// <param name="repositoryCacheVersionService">Service for managing repository cache versions.</param>
+    /// <param name="idKeyMap">Service for mapping between IDs and keys.</param>
+    /// <param name="cacheSyncService">Service for synchronizing cache across distributed environments.</param>
     public ContentTypeRepository(
         IScopeAccessor scopeAccessor,
         AppCaches cache,
@@ -27,9 +43,22 @@ internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContent
         IContentTypeCommonRepository commonRepository,
         ILanguageRepository languageRepository,
         IShortStringHelper shortStringHelper,
-        IIdKeyMap idKeyMap)
-        : base(scopeAccessor, cache, logger, commonRepository, languageRepository, shortStringHelper, idKeyMap)
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        IIdKeyMap idKeyMap,
+        ICacheSyncService cacheSyncService)
+        : base(
+            scopeAccessor,
+            cache,
+            logger,
+            commonRepository,
+            languageRepository,
+            shortStringHelper,
+            repositoryCacheVersionService,
+            idKeyMap,
+            cacheSyncService)
     {
+        _repositoryCacheVersionService = repositoryCacheVersionService;
+        _cacheSyncService = cacheSyncService;
     }
 
     protected override bool SupportsPublishing => ContentType.SupportsPublishingConst;
@@ -47,8 +76,14 @@ internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContent
     ///     Gets all property type aliases.
     /// </summary>
     /// <returns></returns>
-    public IEnumerable<string> GetAllPropertyTypeAliases() =>
-        Database.Fetch<string>("SELECT DISTINCT Alias FROM cmsPropertyType ORDER BY Alias");
+    public IEnumerable<string> GetAllPropertyTypeAliases()
+    {
+        Sql<ISqlContext> sql = Sql()
+            .SelectDistinct<PropertyTypeDto>(c => c.Alias)
+            .From<PropertyTypeDto>()
+            .OrderBy<PropertyTypeDto>(c => c.Alias);
+        return Database.Fetch<string>(sql);
+    }
 
     /// <summary>
     ///     Gets all content type aliases
@@ -61,7 +96,7 @@ internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContent
     public IEnumerable<string> GetAllContentTypeAliases(params Guid[] objectTypes)
     {
         Sql<ISqlContext> sql = Sql()
-            .Select("cmsContentType.alias")
+            .Select<ContentTypeDto>(c => c.Alias)
             .From<ContentTypeDto>()
             .InnerJoin<NodeDto>()
             .On<ContentTypeDto, NodeDto>(dto => dto.NodeId, dto => dto.NodeId);
@@ -74,6 +109,11 @@ internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContent
         return Database.Fetch<string>(sql);
     }
 
+    /// <summary>
+    /// Retrieves the IDs of all content types that match the specified aliases.
+    /// </summary>
+    /// <param name="aliases">An array of content type aliases for which to retrieve the corresponding IDs.</param>
+    /// <returns>An <see cref="IEnumerable{Int32}"/> containing the IDs of content types that match the provided aliases. If no aliases are specified, returns an empty collection.</returns>
     public IEnumerable<int> GetAllContentTypeIds(string[] aliases)
     {
         if (aliases.Length == 0)
@@ -86,44 +126,23 @@ internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContent
             .From<ContentTypeDto>()
             .InnerJoin<NodeDto>()
             .On<ContentTypeDto, NodeDto>(dto => dto.NodeId, dto => dto.NodeId)
-            .Where<ContentTypeDto>(dto => aliases.Contains(dto.Alias));
+            .WhereIn<ContentTypeDto>(x => x.Alias, aliases);
 
         return Database.Fetch<int>(sql);
     }
 
     protected override IRepositoryCachePolicy<IContentType, int> CreateCachePolicy() =>
-        new FullDataSetRepositoryCachePolicy<IContentType, int>(GlobalIsolatedCache, ScopeAccessor, GetEntityId, /*expires:*/ true);
+        new FullDataSetRepositoryCachePolicy<IContentType, int>(GlobalIsolatedCache, ScopeAccessor, _repositoryCacheVersionService, _cacheSyncService, GetEntityId, /*expires:*/ true);
 
-    // every GetExists method goes cachePolicy.GetSomething which in turns goes PerformGetAll,
-    // since this is a FullDataSet policy - and everything is cached
-    // so here,
-    // every PerformGet/Exists just GetMany() and then filters
-    // except PerformGetAll which is the one really doing the job
-
-    // TODO: the filtering is highly inefficient as we deep-clone everything
-    // there should be a way to GetMany(predicate) right from the cache policy!
-    // and ah, well, this all caching should be refactored + the cache refreshers
-    // should to repository.Clear() not deal with magic caches by themselves
+    // Note: PerformGet(int) is passed as a callback to the cache policy's Get(TId) method,
+    // but FullDataSetRepositoryCachePolicy.Get() never invokes it — it uses GetAllCached()
+    // internally and clones only the matched entity. This override exists only as a required
+    // implementation of the abstract base and as a fallback for non-FullDataSet policies.
     protected override IContentType? PerformGet(int id)
         => GetMany().FirstOrDefault(x => x.Id == id);
 
-    protected override IContentType? PerformGet(Guid id)
-        => GetMany().FirstOrDefault(x => x.Key == id);
-
-    protected override IContentType? PerformGet(string alias)
-        => GetMany().FirstOrDefault(x => x.Alias.InvariantEquals(alias));
-
-    protected override bool PerformExists(Guid id)
-        => GetMany().FirstOrDefault(x => x.Key == id) != null;
-
     protected override IEnumerable<IContentType>? GetAllWithFullCachePolicy() =>
         CommonRepository.GetAllTypes()?.OfType<IContentType>();
-
-    protected override IEnumerable<IContentType> PerformGetAll(params Guid[]? ids)
-    {
-        IEnumerable<IContentType> all = GetMany();
-        return ids?.Any() ?? false ? all.Where(x => ids.Contains(x.Key)) : all;
-    }
 
     protected override IEnumerable<IContentType> PerformGetByQuery(IQuery<IContentType> query)
     {
@@ -137,7 +156,7 @@ internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContent
             : Enumerable.Empty<IContentType>();
     }
 
-    protected IEnumerable<int> PerformGetByQuery(IQuery<PropertyType> query)
+    private IEnumerable<int> PerformGetByQuery(IQuery<PropertyType> query)
     {
         // used by DataTypeService to remove properties
         // from content types if they have a deleted data type - see
@@ -177,15 +196,15 @@ internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContent
         return sql;
     }
 
-    protected override string GetBaseWhereClause() => $"{Constants.DatabaseSchema.Tables.Node}.id = @id";
+    protected override string GetBaseWhereClause() => $"{QuoteTableName(NodeDto.TableName)}.id = @id";
 
     protected override IEnumerable<string> GetDeleteClauses()
     {
         var l = (List<string>)base.GetDeleteClauses(); // we know it's a list
-        l.Add("DELETE FROM umbracoContentVersionCleanupPolicy WHERE contentTypeId = @id");
-        l.Add("DELETE FROM cmsDocumentType WHERE contentTypeNodeId = @id");
-        l.Add("DELETE FROM cmsContentType WHERE nodeId = @id");
-        l.Add("DELETE FROM umbracoNode WHERE id = @id");
+        l.Add($"DELETE FROM {QuoteTableName(ContentVersionCleanupPolicyDto.TableName)} WHERE {QuoteColumnName(ContentVersionCleanupPolicyDto.PrimaryKeyColumnName)} = @id");
+        l.Add($"DELETE FROM {QuoteTableName(ContentTypeTemplateDto.TableName)} WHERE {QuoteColumnName(ContentTypeTemplateDto.ContentTypeNodeIdColumnName)} = @id");
+        l.Add($"DELETE FROM {QuoteTableName(ContentTypeDto.TableName)} WHERE {QuoteColumnName(ContentTypeDto.NodeIdColumnName)} = @id");
+        l.Add($"DELETE FROM {QuoteTableName(NodeDto.TableName)} WHERE {QuoteColumnName(NodeDto.PrimaryKeyColumnName)} = @id");
         return l;
     }
 
@@ -211,7 +230,7 @@ internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContent
         // like when we switch a document type, there is property data left over that is linked
         // to the previous document type. So we need to ensure it's removed.
         Sql<ISqlContext> sql = Sql()
-            .Select("DISTINCT " + Constants.DatabaseSchema.Tables.PropertyData + ".propertytypeid")
+            .SelectDistinct<PropertyDataDto>(c => c.PropertyTypeId)
             .From<PropertyDataDto>()
             .InnerJoin<PropertyTypeDto>()
             .On<PropertyDataDto, PropertyTypeDto>(dto => dto.PropertyTypeId, dto => dto.Id)
@@ -220,7 +239,7 @@ internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContent
             .Where<ContentTypeDto>(dto => dto.NodeId == entity.Id);
 
         // Delete all PropertyData where propertytypeid EXISTS in the subquery above
-        Database.Execute(SqlSyntax.GetDeleteSubquery(Constants.DatabaseSchema.Tables.PropertyData, "propertytypeid", sql));
+        Database.Execute(SqlSyntax.GetDeleteSubquery(PropertyDataDto.TableName, "propertyTypeId", sql));
 
         // delete all granular permissions for this content type
         Database.Delete<UserGroup2GranularPermissionDto>(Sql().Where<UserGroup2GranularPermissionDto>(dto => dto.UniqueId == entity.Key));
@@ -249,10 +268,13 @@ internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContent
         entity.ResetDirtyProperties();
     }
 
-    protected void PersistTemplates(IContentType entity, bool clearAll)
+    private void PersistTemplates(IContentType entity, bool clearAll)
     {
         // remove and insert, if required
-        Database.Delete<ContentTypeTemplateDto>("WHERE contentTypeNodeId = @Id", new { entity.Id });
+        Sql<ISqlContext> sql = Sql()
+            .Delete<ContentTypeTemplateDto>()
+            .Where<ContentTypeTemplateDto>(x => x.ContentTypeNodeId == entity.Id);
+        Database.Execute(sql);
 
         // we could do it all in foreach if we assume that the default template is an allowed template??
         var defaultTemplateId = entity.DefaultTemplateId;
@@ -260,7 +282,9 @@ internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContent
         {
             Database.Insert(new ContentTypeTemplateDto
             {
-                ContentTypeNodeId = entity.Id, TemplateNodeId = defaultTemplateId, IsDefault = true,
+                ContentTypeNodeId = entity.Id,
+                TemplateNodeId = defaultTemplateId,
+                IsDefault = true,
             });
         }
 
@@ -269,7 +293,9 @@ internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContent
         {
             Database.Insert(new ContentTypeTemplateDto
             {
-                ContentTypeNodeId = entity.Id, TemplateNodeId = template.Id, IsDefault = false,
+                ContentTypeNodeId = entity.Id,
+                TemplateNodeId = template.Id,
+                IsDefault = false,
             });
         }
     }
@@ -284,13 +310,18 @@ internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContent
         // Look up parent to get and set the correct Path if ParentId has changed
         if (entity.IsPropertyDirty("ParentId"))
         {
-            NodeDto? parent = Database.First<NodeDto>("WHERE id = @ParentId", new { entity.ParentId });
+            Sql<ISqlContext> sql = Sql()
+                .SelectAll()
+                .From<NodeDto>()
+                .Where<NodeDto>(x => x.NodeId == entity.ParentId);
+            NodeDto parent = Database.First<NodeDto>(sql);
             entity.Path = string.Concat(parent.Path, ",", entity.Id);
             entity.Level = parent.Level + 1;
-            var maxSortOrder =
-                Database.ExecuteScalar<int>(
-                    "SELECT coalesce(max(sortOrder),0) FROM umbracoNode WHERE parentid = @ParentId AND nodeObjectType = @NodeObjectType",
-                    new { entity.ParentId, NodeObjectType = NodeObjectTypeId });
+            sql = Sql()
+                .SelectMax<NodeDto>(c => c.SortOrder, 0)
+                .From<NodeDto>()
+                .Where<NodeDto>(x => x.ParentId == entity.ParentId && x.NodeObjectType == NodeObjectTypeId);
+            var maxSortOrder = Database.ExecuteScalar<int>(sql);
             entity.SortOrder = maxSortOrder + 1;
         }
 
@@ -310,7 +341,7 @@ internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContent
             var dto = new ContentVersionCleanupPolicyDto
             {
                 ContentTypeId = entity.Id,
-                Updated = DateTime.Now,
+                Updated = DateTime.UtcNow,
                 PreventCleanup = entityWithHistoryCleanup.HistoryCleanup?.PreventCleanup ?? false,
                 KeepAllVersionsNewerThanDays =
                     entityWithHistoryCleanup.HistoryCleanup?.KeepAllVersionsNewerThanDays,

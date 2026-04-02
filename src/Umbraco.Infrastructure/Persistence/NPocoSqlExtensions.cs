@@ -11,6 +11,9 @@ using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 
 namespace Umbraco.Extensions
 {
+    /// <summary>
+    /// Provides extension methods to enhance or simplify NPoco SQL operations.
+    /// </summary>
     public static partial class NPocoSqlExtensions
     {
         #region Where
@@ -27,6 +30,20 @@ namespace Umbraco.Extensions
         {
             (string s, object[] a) = sql.SqlContext.VisitDto(predicate, alias);
             return sql.Where(s, a);
+        }
+
+        /// <summary>
+        /// Adds a WHERE clause to the SQL query based on the specified predicate and optional alias,  and appends a
+        /// closing parenthesis to the query. This is used for selects within "WHERE [column] IN (SELECT ...)" statements.
+        /// </summary>
+        /// <typeparam name="TDto">The type of the data transfer object (DTO) used to define the predicate.</typeparam>
+        /// <param name="sql">The SQL query to which the WHERE clause will be added.</param>
+        /// <param name="predicate">An expression that defines the condition for the WHERE clause.</param>
+        /// <param name="alias">An optional alias to qualify the table or entity in the query. If null, no alias is used.</param>
+        /// <returns>The modified SQL query with the appended WHERE clause and closing parenthesis.</returns>
+        public static Sql<ISqlContext> WhereClosure<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, bool>> predicate, string? alias = null)
+        {
+            return sql.Where<TDto>(predicate, alias).Append(")");
         }
 
         /// <summary>
@@ -74,7 +91,31 @@ namespace Umbraco.Extensions
         public static Sql<ISqlContext> WhereIn<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object?>> field, IEnumerable? values)
         {
             var fieldName = sql.SqlContext.SqlSyntax.GetFieldName(field);
-            sql.Where(fieldName + " IN (@values)", new { values });
+            sql.Where($"{fieldName} IN (@values)", new { values });
+            return sql;
+        }
+
+        /// <summary>
+        /// Appends a OR IN clause to the Sql statement.
+        /// </summary>
+        /// <typeparam name="TDto">The type of the first Dto.</typeparam>
+        /// <typeparam name="TDto2">The type of the second Dto.</typeparam>
+        /// <param name="sql">The Sql statement.</param>
+        /// <param name="field">An expression specifying the first field.</param>
+        /// <param name="values">First values.</param>
+        /// <param name="field2">An expression specifying the second field.</param>
+        /// <param name="values2">Second values.</param>
+        /// <returns>The Sql statement.</returns>
+        public static Sql<ISqlContext> WhereInOr<TDto, TDto2>(
+            this Sql<ISqlContext> sql,
+            Expression<Func<TDto, object?>> field,
+            Expression<Func<TDto2, object?>> field2,
+            IEnumerable? values,
+            IEnumerable? values2)
+        {
+            var fieldName = sql.SqlContext.SqlSyntax.GetFieldName(field);
+            var fieldName2 = sql.SqlContext.SqlSyntax.GetFieldName(field2);
+            sql.Where($"{fieldName} IN (@values) OR {fieldName2} IN (@values2)", new { values }, new { values2 });
             return sql;
         }
 
@@ -85,7 +126,7 @@ namespace Umbraco.Extensions
         /// <param name="sql">The Sql statement.</param>
         /// <param name="field">An expression specifying the field.</param>
         /// <param name="values">The values.</param>
-        /// <param name="alias"></param>
+        /// <param name="alias">The table alias for the field.</param>
         /// <returns>The Sql statement.</returns>
         public static Sql<ISqlContext> WhereIn<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object?>> field, IEnumerable? values, string alias)
         {
@@ -107,34 +148,80 @@ namespace Umbraco.Extensions
             return WhereIn(sql, field, values, false, null);
         }
 
+        /// <summary>
+        /// Appends a WHERE IN clause to the specified <paramref name="sql"/> statement, filtering the results where the given field matches any of the provided values.
+        /// </summary>
+        /// <typeparam name="TDto">The type of the DTO (data transfer object) being queried.</typeparam>
+        /// <param name="sql">The SQL statement to which the WHERE IN clause will be appended.</param>
+        /// <param name="field">An expression specifying the field to filter on.</param>
+        /// <param name="values">The collection of values to include in the IN clause.</param>
+        /// <param name="tableAlias">The alias of the table to use when qualifying the field in the WHERE IN clause.</param>
+        /// <returns>The modified SQL statement with the appended WHERE IN clause.</returns>
         public static Sql<ISqlContext> WhereIn<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object?>> field, Sql<ISqlContext>? values, string tableAlias)
         {
             return sql.WhereIn(field, values, false, tableAlias);
         }
 
-
-        public static Sql<ISqlContext> WhereLike<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object?>> fieldSelector, Sql<ISqlContext>? valuesSql)
+        /// <summary>
+        /// This builds a WHERE clause with a LIKE statement where the value is built from a subquery.
+        /// E.g. for SQL Server: WHERE [field] LIKE CONCAT((SELECT [value] FROM ...), '%').
+        /// Or SQLite : WHERE [field] LIKE ((SELECT [value] FROM ...) || '%').
+        /// </summary>
+        /// <typeparam name="TDto">The type of the Dto.</typeparam>
+        /// <param name="sql">The Sql statement.</param>
+        /// <param name="fieldSelector">An expression specifying the field.</param>
+        /// <param name="valuesSql">The sql object to select the values.</param>
+        /// <param name="concatDefault">If ommitted or empty the specific wildcard char is used as suffix for the resulting values from valueSql query.</param>
+        /// <returns></returns>
+        public static Sql<ISqlContext> WhereLike<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object?>> fieldSelector, Sql<ISqlContext>? valuesSql, string concatDefault = "")
         {
             var fieldName = sql.SqlContext.SqlSyntax.GetFieldName(fieldSelector);
-            sql.Where(fieldName + " LIKE (" + valuesSql?.SQL + ")", valuesSql?.Arguments);
+            var concat = sql.SqlContext.SqlSyntax.GetWildcardConcat(concatDefault);
+            var likeSelect = sql.SqlContext.SqlSyntax.GetConcat($"({valuesSql?.SQL})", concat);
+            sql.Where($"{fieldName} LIKE {likeSelect}", valuesSql?.Arguments);
             return sql;
         }
 
+        /// <summary>
+        /// Returns a new SQL query that combines the results of two specified SQL queries using the UNION operator.
+        /// </summary>
+        /// <param name="sql">The first SQL query.</param>
+        /// <param name="sql2">The second SQL query to combine with the first using UNION.</param>
+        /// <returns>A <see cref="Sql{ISqlContext}"/> representing the union of the two queries.</returns>
         public static Sql<ISqlContext> Union(this Sql<ISqlContext> sql, Sql<ISqlContext> sql2)
         {
-            return sql.Append( " UNION ").Append(sql2);
+            return sql.Append(" UNION ").Append(sql2);
         }
 
+        /// <summary>
+        /// Appends an INNER JOIN clause to the current SQL query, joining with a nested SQL subquery and assigning it an alias.
+        /// </summary>
+        /// <param name="sql">The base <see cref="Sql{ISqlContext}"/> instance to which the join will be appended.</param>
+        /// <param name="nestedQuery">The nested <see cref="Sql{ISqlContext}"/> subquery to join.</param>
+        /// <param name="alias">The alias to assign to the nested subquery in the join clause. The alias will be quoted according to the SQL syntax provider.</param>
+        /// <returns>A <see cref="SqlJoinClause{ISqlContext}"/> representing the INNER JOIN with the nested subquery and alias.</returns>
         public static Sql<ISqlContext>.SqlJoinClause<ISqlContext> InnerJoinNested(this Sql<ISqlContext> sql, Sql<ISqlContext> nestedQuery, string alias)
         {
             return new Sql<ISqlContext>.SqlJoinClause<ISqlContext>(sql.Append("INNER JOIN (").Append(nestedQuery)
-                .Append($") [{alias}]"));
+                .Append($") {sql.SqlContext.SqlSyntax.GetQuotedName(alias)}"));
         }
 
+        /// <summary>
+        /// Adds a WHERE clause to the SQL query that filters results based on a LIKE comparison for the specified
+        /// field.
+        /// </summary>
+        /// <remarks>Use this method to perform pattern matching queries, such as searching for records
+        /// where a field contains, starts with, or ends with a specified substring. The method does not automatically
+        /// add wildcard characters; include them in the likeValue parameter as needed.</remarks>
+        /// <typeparam name="TDto">The type of the data transfer object representing the table or entity being queried.</typeparam>
+        /// <param name="sql">The SQL builder instance to which the WHERE clause will be appended.</param>
+        /// <param name="fieldSelector">An expression that selects the field of the entity to apply the LIKE filter to.</param>
+        /// <param name="likeValue">The value to use in the LIKE comparison. This can include SQL wildcard characters such as '%' or '_'.</param>
+        /// <returns>The updated SQL builder instance with the appended WHERE LIKE clause.</returns>
         public static Sql<ISqlContext> WhereLike<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object?>> fieldSelector, string likeValue)
         {
             var fieldName = sql.SqlContext.SqlSyntax.GetFieldName(fieldSelector);
-            sql.Where(fieldName + " LIKE ('" + likeValue + "')");
+            sql.Where($"{fieldName} LIKE @0", likeValue);
             return sql;
         }
 
@@ -162,9 +249,7 @@ namespace Umbraco.Extensions
         /// <param name="values">A subquery returning the value.</param>
         /// <returns>The Sql statement.</returns>
         public static Sql<ISqlContext> WhereNotIn<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object?>> field, Sql<ISqlContext> values)
-        {
-            return sql.WhereIn(field, values, true);
-        }
+            => sql.WhereIn(field, values, true);
 
         /// <summary>
         /// Appends multiple OR WHERE IN clauses to the Sql statement.
@@ -258,8 +343,8 @@ namespace Umbraco.Extensions
         /// <returns>The Sql statement.</returns>
         public static Sql<ISqlContext> WhereNull<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object?>> field, string? tableAlias = null, bool not = false)
         {
-            var column = sql.GetColumns(columnExpressions: new[] { field }, tableAlias: tableAlias, withAlias: false).First();
-            return sql.Where("(" + column + " IS " + (not ? "NOT " : string.Empty) + "NULL)");
+            var column = sql.GetColumns(columnExpressions: [field], tableAlias: tableAlias, withAlias: false).First();
+            return sql.Where($"({column} IS {(not ? "NOT " : string.Empty)}NULL)");
         }
 
         #endregion
@@ -275,7 +360,7 @@ namespace Umbraco.Extensions
         /// <returns>The Sql statement.</returns>
         public static Sql<ISqlContext> From<TDto>(this Sql<ISqlContext> sql, string? alias = null)
         {
-            Type type = typeof (TDto);
+            Type type = typeof(TDto);
             var tableName = type.GetTableName();
 
             var from = sql.SqlContext.SqlSyntax.GetQuotedTableName(tableName);
@@ -305,6 +390,14 @@ namespace Umbraco.Extensions
             return sql.OrderBy("(" + sql.SqlContext.SqlSyntax.GetFieldName(field) + ")");
         }
 
+        /// <summary>
+        /// Appends an ORDER BY clause to the Sql statement using the specified field and alias.
+        /// </summary>
+        /// <typeparam name="TDto">The type of the Dto.</typeparam>
+        /// <param name="sql">The Sql statement.</param>
+        /// <param name="field">An expression specifying the field.</param>
+        /// <param name="alias">The alias to use for the field.</param>
+        /// <returns>The Sql statement.</returns>
         public static Sql<ISqlContext> OrderBy<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object?>> field, string alias)
         {
             return sql.OrderBy("(" + sql.SqlContext.SqlSyntax.GetFieldName(field, alias) + ")");
@@ -394,6 +487,26 @@ namespace Umbraco.Extensions
         }
 
         /// <summary>
+        /// Appends a GROUP BY clause to the Sql statement.
+        /// </summary>
+        /// <typeparam name="TDto">The type of the Dto.</typeparam>
+        /// <param name="sql">The Sql statement.</param>
+        /// <param name="tableAlias">A table alias.</param>
+        /// <param name="fields">Expression specifying the fields.</param>
+        /// <returns>The Sql statement.</returns>
+        public static Sql<ISqlContext> GroupBy<TDto>(
+            this Sql<ISqlContext> sql,
+            string tableAlias,
+            params Expression<Func<TDto, object?>>[] fields)
+        {
+            ISqlSyntaxProvider sqlSyntax = sql.SqlContext.SqlSyntax;
+            var columns = fields.Length == 0
+                ? sql.GetColumns<TDto>(withAlias: false)
+                : fields.Select(x => sqlSyntax.GetFieldName(x, tableAlias)).ToArray();
+            return sql.GroupBy(columns);
+        }
+
+        /// <summary>
         /// Appends more ORDER BY or GROUP BY fields to the Sql statement.
         /// </summary>
         /// <typeparam name="TDto">The type of the Dto.</typeparam>
@@ -410,7 +523,17 @@ namespace Umbraco.Extensions
 
         }
 
-        public static Sql<ISqlContext> AndBy<TDto>(this Sql<ISqlContext> sql, string tableAlias,
+        /// <summary>
+        /// Appends additional fields to an existing ORDER BY or GROUP BY clause in the SQL statement, using the specified table alias.
+        /// </summary>
+        /// <typeparam name="TDto">The type of the DTO (data transfer object).</typeparam>
+        /// <param name="sql">The SQL statement to append fields to.</param>
+        /// <param name="tableAlias">The alias of the table to use for the fields.</param>
+        /// <param name="fields">Expressions specifying the fields to append.</param>
+        /// <returns>A <see cref="Sql{ISqlContext}"/> statement with the additional fields appended to the ORDER BY or GROUP BY clause.</returns>
+        public static Sql<ISqlContext> AndBy<TDto>(
+            this Sql<ISqlContext> sql,
+            string tableAlias,
             params Expression<Func<TDto, object?>>[] fields)
         {
             ISqlSyntaxProvider sqlSyntax = sql.SqlContext.SqlSyntax;
@@ -548,7 +671,8 @@ namespace Umbraco.Extensions
                 join += " " + sql.SqlContext.SqlSyntax.GetQuotedTableName(alias);
             }
 
-            return sql.LeftJoin(join);
+            sql.Append("LEFT JOIN " + join, nestedSelect.Arguments);
+            return new Sql<ISqlContext>.SqlJoinClause<ISqlContext>(sql);
         }
 
         /// <summary>
@@ -679,6 +803,64 @@ namespace Umbraco.Extensions
         }
 
         /// <summary>
+        /// Adds a SQL SELECT statement to retrieve the maximum value of the specified field from the table associated
+        /// with the specified DTO type.
+        /// </summary>
+        /// <typeparam name="TDto">The type of the Data Transfer Object (DTO) that represents the table from which the maximum value will be
+        /// selected.</typeparam>
+        /// <param name="sql">The SQL query builder to which the SELECT statement will be appended. Cannot be <see langword="null"/>.</param>
+        /// <param name="field">An expression specifying the field for which the maximum value will be calculated. Cannot be <see
+        /// langword="null"/>.</param>
+        /// <returns>A modified SQL query builder that includes the SELECT statement for the maximum value of the specified
+        /// field.</returns>
+        public static Sql<ISqlContext> SelectMax<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object?>> field)
+        {
+            ArgumentNullException.ThrowIfNull(sql);
+            ArgumentNullException.ThrowIfNull(field);
+
+            return sql.Select($"MAX ({sql.SqlContext.SqlSyntax.GetFieldName(field)})");
+        }
+
+        /// <summary>
+        /// Adds a SQL SELECT statement to retrieve the maximum value of the specified field from the table associated
+        /// with the specified DTO type.
+        /// </summary>
+        /// <typeparam name="TDto">The type of the Data Transfer Object (DTO) that represents the table from which the maximum value will be
+        /// selected.</typeparam>
+        /// <param name="sql">The SQL query builder to which the SELECT statement will be appended. Cannot be <see langword="null"/>.</param>
+        /// <param name="field">An expression specifying the field for which the maximum value will be calculated. Cannot be <see
+        /// langword="null"/>.</param>
+        /// <param name="coalesceValue">COALESCE int value.</param>
+        /// <returns>A modified SQL query builder that includes the SELECT statement for the maximum value of the specified
+        /// field or the coalesceValue.</returns>
+        public static Sql<ISqlContext> SelectMax<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object?>> field, int coalesceValue)
+        {
+            ArgumentNullException.ThrowIfNull(sql);
+            ArgumentNullException.ThrowIfNull(field);
+
+            return sql.Select($"COALESCE(MAX ({sql.SqlContext.SqlSyntax.GetFieldName(field)}), {coalesceValue})");
+        }
+
+        /// <summary>
+        /// Adds a SQL SELECT statement to retrieve the sum of the values of the specified field from the table associated
+        /// with the specified DTO type.
+        /// </summary>
+        /// <typeparam name="TDto">The type of the Data Transfer Object (DTO) that represents the table from which the maximum value will be
+        /// selected.</typeparam>
+        /// <param name="sql">The SQL query builder to which the SELECT statement will be appended. Cannot be <see langword="null"/>.</param>
+        /// <param name="field">An expression specifying the field for which the maximum value will be calculated. Cannot be <see
+        /// langword="null"/>.</param>
+        /// <returns>A modified SQL query builder that includes the SELECT statement for the maximum value of the specified
+        /// field.</returns>
+        public static Sql<ISqlContext> SelectSum<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object?>> field)
+        {
+            ArgumentNullException.ThrowIfNull(sql);
+            ArgumentNullException.ThrowIfNull(field);
+
+            return sql.Select($"SUM ({sql.SqlContext.SqlSyntax.GetFieldName(field)})");
+        }
+
+        /// <summary>
         /// Creates a SELECT COUNT(*) Sql statement.
         /// </summary>
         /// <param name="sql">The origin sql.</param>
@@ -738,7 +920,7 @@ namespace Umbraco.Extensions
             var text = "COUNT (" + string.Join(", ", columns) + ")";
             if (alias != null)
             {
-                text += " AS " + sql.SqlContext.SqlSyntax.GetQuotedColumnName(alias);
+                text += " AS " + sqlSyntax.GetQuotedColumnName(alias);
             }
 
             return sql.Select(text);
@@ -801,6 +983,38 @@ namespace Umbraco.Extensions
             return sql;
         }
 
+        /// <summary>
+        /// Creates a SELECT DISTINCT Sql statement.
+        /// </summary>
+        /// <typeparam name="TDto">The type of the DTO to select.</typeparam>
+        /// <param name="sql">The origin sql.</param>
+        /// <param name="tableAlias">A table alias.</param>
+        /// <param name="fields">Expressions indicating the columns to select.</param>
+        /// <returns>The Sql statement.</returns>
+        /// <remarks>
+        /// <para>If <paramref name="fields"/> is empty, all columns are selected.</para>
+        /// </remarks>
+        public static Sql<ISqlContext> SelectDistinct<TDto>(this Sql<ISqlContext> sql, string tableAlias, params Expression<Func<TDto, object?>>[] fields)
+        {
+            if (sql == null)
+            {
+                throw new ArgumentNullException(nameof(sql));
+            }
+
+            var columns = sql.GetColumns(tableAlias: tableAlias, columnExpressions: fields);
+            sql.Append("SELECT DISTINCT " + string.Join(", ", columns));
+            return sql;
+        }
+
+        /// <summary>
+        /// Creates a <c>SELECT DISTINCT</c> SQL statement for the specified columns.
+        /// </summary>
+        /// <param name="sql">The original SQL statement to extend.</param>
+        /// <param name="columns">The columns to select distinct values from.</param>
+        /// <returns>A new <see cref="Sql{ISqlContext}"/> statement with the <c>SELECT DISTINCT</c> clause applied.</returns>
+        /// <remarks>
+        /// If <paramref name="columns"/> is empty, all columns are selected.
+        /// </remarks>
         public static Sql<ISqlContext> SelectDistinct(this Sql<ISqlContext> sql, params object[] columns)
         {
             sql.Append("SELECT DISTINCT " + string.Join(", ", columns));
@@ -864,6 +1078,28 @@ namespace Umbraco.Extensions
             }
 
             return sql.Append(", " + string.Join(", ", sql.GetColumns(columnExpressions: fields)));
+        }
+
+        /// <summary>
+        /// Adds columns to a SELECT Sql statement, optionally including aliases for each field.
+        /// </summary>
+        /// <typeparam name="TDto">The type of the DTO to select.</typeparam>
+        /// <param name="sql">The origin sql.</param>
+        /// <param name="withAlias">Indicates whether to include aliases for the selected fields. The default value is <see langword="true"/>.</param>
+        /// <param name="fields">Expressions indicating the columns to select.</param>
+        /// <returns>The Sql statement.</returns>
+        /// <remarks>
+        /// <para>If <paramref name="fields"/> is empty, all columns are selected.</para>
+        /// </remarks>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="sql"/> is null.</exception>
+        public static Sql<ISqlContext> AndSelect<TDto>(this Sql<ISqlContext> sql, bool withAlias = true, params Expression<Func<TDto, object?>>[] fields)
+        {
+            if (sql == null)
+            {
+                throw new ArgumentNullException(nameof(sql));
+            }
+
+            return sql.Append(", " + string.Join(", ", sql.GetColumns(columnExpressions: fields, withAlias: withAlias)));
         }
 
         /// <summary>
@@ -1096,7 +1332,7 @@ namespace Umbraco.Extensions
 
             private SqlRef<TDto> Select<TRefDto>(PropertyInfo? propertyInfo, string? tableAlias, Func<SqlRef<TRefDto>, SqlRef<TRefDto>>? nested = null)
             {
-                var referenceName = propertyInfo?.Name ?? typeof (TDto).Name;
+                var referenceName = propertyInfo?.Name ?? typeof(TDto).Name;
                 if (Prefix != null)
                 {
                     referenceName = Prefix + PocoData.Separator + referenceName;
@@ -1109,6 +1345,7 @@ namespace Umbraco.Extensions
                 return this;
             }
         }
+
         /// <summary>
         /// Gets fields for a Dto.
         /// </summary>
@@ -1163,16 +1400,79 @@ namespace Umbraco.Extensions
             return string.Join(", ", sql.GetColumns(columnExpressions: fields, withAlias: false, tableAlias: alias));
         }
 
+        /// <summary>
+        /// Adds a SELECT clause to the SQL query based on the specified conversion function and optional alias, and prepends an
+        /// opening parenthesis to the query. This is typically used for subqueries within "WHERE [column] IN (SELECT ...)" statements.
+        /// </summary>
+        /// <param name="sql">The SQL query to modify by adding a SELECT clause and opening parenthesis.</param>
+        /// <param name="converts">A function that configures the columns or expressions to be selected in the subquery.</param>
+        /// <returns>The modified SQL query with the prepended SELECT clause and opening parenthesis.</returns>
+        public static Sql<ISqlContext> SelectClosure<TDto>(this Sql<ISqlContext> sql, Func<SqlConvert<TDto>, SqlConvert<TDto>> converts)
+        {
+            sql.Append($"(SELECT ");
+
+            var c = new SqlConvert<TDto>(sql.SqlContext);
+            c = converts(c);
+            var first = true;
+            foreach (string setExpression in c.SetExpressions)
+            {
+                sql.Append($"{(first ? string.Empty : ",")} {setExpression}");
+                first = false;
+            }
+
+            if (!first)
+            {
+                sql.Append(" ");
+            }
+
+            return sql;
+        }
+
+        /// <summary>
+        /// Converts the specified SQL query to a typed SQL query for the given DTO type.
+        /// This extension method enables strongly-typed access to query results.
+        /// </summary>
+        public class SqlConvert<TDto>(ISqlContext sqlContext)
+        {
+            /// <summary>
+            /// Gets the collection of SQL SET expressions generated for the current DTO type.
+            /// </summary>
+            public List<string> SetExpressions { get; } = [];
+
+            /// <summary>
+            /// Adds an expression to convert a unique identifier (GUID) field to its string representation within the SQL query for the specified DTO.
+            /// </summary>
+            /// <param name="fieldSelector">An expression that selects the unique identifier field to convert.</param>
+            /// <returns>The current <see cref="SqlConvert{TDto}"/> instance, allowing for method chaining.</returns>
+            public SqlConvert<TDto> ConvertUniqueIdentifierToString(Expression<Func<TDto, object?>> fieldSelector)
+            {
+                var fieldName = sqlContext.SqlSyntax.GetFieldNameForUpdate(fieldSelector);
+                var convertFieldName = string.Format(sqlContext.SqlSyntax.ConvertUniqueIdentifierToString, fieldName);
+                SetExpressions.Add(convertFieldName);
+                return this;
+            }
+        }
+
         #endregion
 
         #region Delete
 
+        /// <summary>
+        /// Appends a <c>DELETE</c> statement to the specified SQL query.
+        /// </summary>
+        /// <param name="sql">The <see cref="Sql{ISqlContext}"/> instance to append the <c>DELETE</c> statement to.</param>
+        /// <returns>The same <see cref="Sql{ISqlContext}"/> instance with the <c>DELETE</c> statement appended.</returns>
         public static Sql<ISqlContext> Delete(this Sql<ISqlContext> sql)
         {
             sql.Append("DELETE");
             return sql;
         }
 
+        /// <summary>
+        /// Appends a <c>DELETE</c> statement to the specified SQL query.
+        /// </summary>
+        /// <param name="sql">The <see cref="Sql{ISqlContext}"/> instance to append the <c>DELETE</c> statement to.</param>
+        /// <returns>The same <see cref="Sql{ISqlContext}"/> instance with the <c>DELETE</c> statement appended.</returns>
         public static Sql<ISqlContext> Delete<TDto>(this Sql<ISqlContext> sql)
         {
             Type type = typeof(TDto);
@@ -1183,16 +1483,40 @@ namespace Umbraco.Extensions
             return sql;
         }
 
+        /// <summary>
+        /// Deletes records from a table based on a predicate.
+        /// </summary>
+        /// <typeparam name="TDto">Table definition.</typeparam>
+        /// <param name="sql">SqlConext</param>
+        /// <param name="predicate">A predicate to transform and append to the Sql statement (WHERE clause).</param>
+        /// <returns></returns>
+        public static Sql<ISqlContext> Delete<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, bool>> predicate)
+        {
+            (string s, object[] a) = sql.SqlContext.VisitDto(predicate);
+            return sql.Delete<TDto>().Where(s, a);
+        }
+
         #endregion
 
         #region Update
 
+        /// <summary>
+        /// Appends the <c>UPDATE</c> keyword to the current SQL query.
+        /// </summary>
+        /// <param name="sql">The <see cref="Sql{ISqlContext}"/> instance to append the <c>UPDATE</c> keyword to.</param>
+        /// <returns>The same <see cref="Sql{ISqlContext}"/> instance with the <c>UPDATE</c> keyword appended.</returns>
         public static Sql<ISqlContext> Update(this Sql<ISqlContext> sql)
         {
             sql.Append("UPDATE");
             return sql;
         }
 
+        /// <summary>
+        /// Appends an <c>UPDATE</c> statement to the specified SQL query.
+        /// </summary>
+        /// <typeparam name="TDto">The type representing the data transfer object (DTO) for the update operation.</typeparam>
+        /// <param name="sql">The SQL query to which the <c>UPDATE</c> statement will be appended.</param>
+        /// <returns>The <see cref="Sql{ISqlContext}"/> instance with the appended <c>UPDATE</c> statement.</returns>
         public static Sql<ISqlContext> Update<TDto>(this Sql<ISqlContext> sql)
         {
             Type type = typeof(TDto);
@@ -1202,6 +1526,11 @@ namespace Umbraco.Extensions
             return sql;
         }
 
+        /// <summary>
+        /// Appends an UPDATE statement to the specified SQL query.
+        /// </summary>
+        /// <param name="sql">The SQL query to which the UPDATE statement will be appended.</param>
+        /// <returns>The SQL query with the appended UPDATE statement.</returns
         public static Sql<ISqlContext> Update<TDto>(this Sql<ISqlContext> sql, Func<SqlUpd<TDto>, SqlUpd<TDto>> updates)
         {
             Type type = typeof(TDto);
@@ -1238,15 +1567,28 @@ namespace Umbraco.Extensions
             return sql;
         }
 
+        /// <summary>
+        /// Creates an SQL UPDATE statement for the specified data transfer object (DTO) type.
+        /// </summary>
         public class SqlUpd<TDto>
         {
             private readonly ISqlContext _sqlContext;
 
+            /// <summary>
+            /// Initializes a new instance of the <see cref="SqlUpd{TDto}"/> class for the specified DTO type.
+            /// </summary>
+            /// <param name="sqlContext">The <see cref="ISqlContext"/> to use for SQL operations.</param>
             public SqlUpd(ISqlContext sqlContext)
             {
                 _sqlContext = sqlContext;
             }
 
+            /// <summary>
+            /// Sets the specified field to the given value for the update operation.
+            /// </summary>
+            /// <param name="fieldSelector">An expression selecting the field to update.</param>
+            /// <param name="value">The value to assign to the selected field.</param>
+            /// <returns>The current <see cref="Umbraco.Extensions.NPocoSqlExtensions.SqlUpd{TDto}"/> instance for chaining.</returns>
             public SqlUpd<TDto> Set(Expression<Func<TDto, object?>> fieldSelector, object? value)
             {
                 var fieldName = _sqlContext.SqlSyntax.GetFieldNameForUpdate(fieldSelector);
@@ -1254,6 +1596,10 @@ namespace Umbraco.Extensions
                 return this;
             }
 
+            /// <summary>
+            /// Gets the list of set expressions used in the SQL update statement.
+            /// Each tuple contains the column name and the value to set for that column.
+            /// </summary>
             public List<Tuple<string, object?>> SetExpressions { get; } = [];
         }
 
@@ -1272,6 +1618,11 @@ namespace Umbraco.Extensions
         public static Sql<ISqlContext> ForUpdate(this Sql<ISqlContext> sql)
             => sql.SqlContext.SqlSyntax.InsertForUpdateHint(sql);
 
+        /// <summary>
+        /// Appends an update hint to the specified <see cref="Sql{ISqlContext}"/> query, indicating that the query is intended for updating records.
+        /// </summary>
+        /// <param name="sql">The SQL query object to which the update hint will be appended.</param>
+        /// <returns>A new <see cref="Sql{ISqlContext}"/> instance with the update hint applied.</returns>
         public static Sql<ISqlContext> AppendForUpdateHint(this Sql<ISqlContext> sql)
             => sql.SqlContext.SqlSyntax.AppendForUpdateHint(sql);
 
@@ -1298,17 +1649,24 @@ namespace Umbraco.Extensions
 
         #region Utilities
 
+        /// <summary>
+        /// Appends a subquery as a derived table with the specified alias to the given SQL query.
+        /// </summary>
+        /// <param name="sql">The original SQL query to append to.</param>
+        /// <param name="subQuery">The subquery to append as a derived table.</param>
+        /// <param name="alias">The alias to use for the derived table.</param>
+        /// <returns>The modified SQL query with the appended subquery.</returns>
         public static Sql<ISqlContext> AppendSubQuery(this Sql<ISqlContext> sql, Sql<ISqlContext> subQuery, string alias)
         {
             // Append the subquery as a derived table with an alias
-            sql.Append("(").Append(subQuery.SQL, subQuery.Arguments).Append($") AS {alias}");
+            sql.Append("(").Append(subQuery.SQL, subQuery.Arguments).Append($") AS {sql.SqlContext.SqlSyntax.GetQuotedName(alias)}");
 
             return sql;
         }
 
         private static string[] GetColumns<TDto>(this Sql<ISqlContext> sql, string? tableAlias = null, string? referenceName = null, Expression<Func<TDto, object?>>[]? columnExpressions = null, bool withAlias = true, bool forInsert = false)
         {
-            PocoData? pd = sql.SqlContext.PocoDataFactory.ForType(typeof (TDto));
+            PocoData? pd = sql.SqlContext.PocoDataFactory.ForType(typeof(TDto));
             var tableName = tableAlias ?? pd.TableInfo.TableName;
             var queryColumns = pd.QueryColumns.ToList();
 
@@ -1351,6 +1709,11 @@ namespace Umbraco.Extensions
                 .ToArray();
         }
 
+        /// <summary>
+        /// Returns the table name specified by the <see cref="TableNameAttribute"/> on the given <see cref="Type"/>.
+        /// </summary>
+        /// <param name="type">The <see cref="Type"/> whose table name is to be retrieved.</param>
+        /// <returns>The table name as a <see cref="string"/>, or <c>string.Empty</c> if the attribute is not present or its value is null or whitespace.</returns>
         public static string GetTableName(this Type type)
         {
             // TODO: returning string.Empty for now
@@ -1366,6 +1729,11 @@ namespace Umbraco.Extensions
             return string.IsNullOrWhiteSpace(attr?.Name) ? column.Name : attr.Name;
         }
 
+        /// <summary>
+        /// Returns the SQL query string representation of the specified <see cref="Sql"/> object.
+        /// </summary>
+        /// <param name="sql">The <see cref="Sql"/> instance to convert to a SQL string.</param>
+        /// <returns>A string containing the textual SQL query.</returns>
         public static string ToText(this Sql sql)
         {
             var text = new StringBuilder();
@@ -1373,10 +1741,23 @@ namespace Umbraco.Extensions
             return text.ToString();
         }
 
+        /// <summary>
+        /// Appends the SQL query text represented by the specified <see cref="Sql"/> object to the given <see cref="StringBuilder"/> instance.
+        /// This method does not return the SQL text; instead, it appends the generated SQL to the provided <paramref name="text"/> parameter.
+        /// </summary>
+        /// <param name="sql">The <see cref="Sql"/> object containing the SQL query to convert to text.</param>
+        /// <param name="text">The <see cref="StringBuilder"/> instance to which the SQL text will be appended.</param>
         public static void ToText(this Sql sql, StringBuilder text)
         {
             ToText(sql.SQL, sql.Arguments, text);
         }
+
+        /// <summary>
+        /// Appends a textual representation of the specified SQL query and its arguments to the provided <see cref="StringBuilder"/>.
+        /// </summary>
+        /// <param name="sql">The SQL query string to be represented as text.</param>
+        /// <param name="arguments">The arguments to be included in the textual representation of the SQL query.</param>
+        /// <param name="text">The <see cref="StringBuilder"/> instance to which the textual representation will be appended.</param>
 
         public static void ToText(string? sql, object[]? arguments, StringBuilder text)
         {

@@ -17,7 +17,7 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 	items: Array<UmbExtensionElementAndApiInitializer<ManifestWorkspaceActionMenuItem>> = [];
 
 	@state()
-	_popoverOpen = false;
+	private _popoverOpen = false;
 
 	#onPopoverToggle(event: ToggleEvent) {
 		// TODO: This ignorer is just neede for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
@@ -29,7 +29,8 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 	override render() {
 		if (!this.items?.length) return nothing;
 
-		return html`<uui-button
+		return html`
+			<uui-button
 				id="popover-trigger"
 				popovertarget="workspace-action-popover"
 				look="${this.look}"
@@ -52,7 +53,8 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 						)}
 					</uui-scroll-container>
 				</umb-popover-layout>
-			</uui-popover-container>`;
+			</uui-popover-container>
+		`;
 	}
 
 	static override styles = [
@@ -73,7 +75,6 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 
 			#workspace-action-popover {
 				min-width: 200px;
-				
 			}
 
 			#popover-trigger {
@@ -82,8 +83,8 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 			}
 
 			#workspace-action-popover-layout {
-      			overflow: visible;
-    		}
+				overflow: visible;
+			}
 		`,
 	];
 }

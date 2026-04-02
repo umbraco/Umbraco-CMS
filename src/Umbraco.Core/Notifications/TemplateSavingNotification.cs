@@ -5,19 +5,36 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Notifications;
+
 /// <summary>
-///  A notification that is used to trigger the IFileService when the SaveTemplate  method is called in the API.
+///     A notification that is used to trigger the IFileService when the SaveTemplate method is called in the API.
 /// </summary>
+/// <remarks>
+///     This notification is cancelable, allowing handlers to prevent the save operation
+///     by setting <see cref="ICancelableNotification.Cancel"/> to <c>true</c>.
+/// </remarks>
 public class TemplateSavingNotification : SavingNotification<ITemplate>
 {
     private const string TemplateForContentTypeKey = "CreateTemplateForContentType";
     private const string ContentTypeAliasKey = "ContentTypeAlias";
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="TemplateSavingNotification"/> class
+    ///     with a single template.
+    /// </summary>
+    /// <param name="target">The template being saved.</param>
+    /// <param name="messages">The event messages collection.</param>
     public TemplateSavingNotification(ITemplate target, EventMessages messages)
         : base(target, messages)
     {
     }
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="TemplateSavingNotification"/> class
+    ///     with multiple templates.
+    /// </summary>
+    /// <param name="target">The templates being saved.</param>
+    /// <param name="messages">The event messages collection.</param>
     public TemplateSavingNotification(IEnumerable<ITemplate> target, EventMessages messages)
         : base(target, messages)
     {
@@ -66,6 +83,9 @@ public class TemplateSavingNotification : SavingNotification<ITemplate>
         ContentTypeAlias = contentTypeAlias;
     }
 
+    /// <summary>
+    ///     Gets or sets a value indicating whether the template is being created for a content type.
+    /// </summary>
     public bool CreateTemplateForContentType
     {
         get
@@ -92,6 +112,12 @@ public class TemplateSavingNotification : SavingNotification<ITemplate>
         }
     }
 
+    /// <summary>
+    ///     Gets or sets the alias of the content type the template is for.
+    /// </summary>
+    /// <remarks>
+    ///     This is used when creating a document type with a template. It is not recommended to change or set this value.
+    /// </remarks>
     public string? ContentTypeAlias
     {
         get

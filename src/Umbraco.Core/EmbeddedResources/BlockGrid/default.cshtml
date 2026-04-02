@@ -2,10 +2,9 @@
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridModel>
 @{
     if (Model?.Any() != true) { return; }
+    var gridColumns = Model.GridColumns?.ToString() ?? "12";
 }
 
-<div class="umb-block-grid"
-     data-grid-columns="@(Model.GridColumns?.ToString() ?? "12");"
-     style="--umb-block-grid--grid-columns: @(Model.GridColumns?.ToString() ?? "12");">
+<div class="umb-block-grid" data-grid-columns="@(gridColumns)" style="--umb-block-grid--grid-columns: @(gridColumns);">
     @await Html.GetBlockGridItemsHtmlAsync(Model)
 </div>

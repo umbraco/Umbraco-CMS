@@ -1320,6 +1320,10 @@ internal sealed class OpenApiContractTest : UmbracoTestServerTestBase
               "path": {
                 "type": "string"
               },
+              "queryString": {
+                "type": "string",
+                "nullable": true
+              },
               "startItem": {
                 "oneOf": [
                   {
@@ -1592,7 +1596,15 @@ internal sealed class OpenApiContractTest : UmbracoTestServerTestBase
             "additionalProperties": { }
           }
         }
-      }
+      },
+      "tags": [
+        {
+          "name": "Content"
+        },
+        {
+          "name": "Media"
+        }
+      ]
     }
     """;
 }

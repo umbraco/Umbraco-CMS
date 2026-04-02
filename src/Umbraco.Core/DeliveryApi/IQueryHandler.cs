@@ -2,6 +2,9 @@ using Umbraco.Cms.Core.Composing;
 
 namespace Umbraco.Cms.Core.DeliveryApi;
 
+/// <summary>
+///     Base interface for query handlers in the Delivery API.
+/// </summary>
 public interface IQueryHandler : IDiscoverable
 {
     /// <summary>

@@ -1,0 +1,24 @@
+﻿{
+  "$schema": "../../umbraco-package-schema.json",
+  "name": "My Collection View",
+  "version": "0.1.0",
+  "extensions": [
+    {
+      "type": "collectionView",
+      "alias": "My.CollectionView.Document.Table",
+      "name": "My Collection View Table",
+      "element": "/App_Plugins/my-collection-view/my-collection-view.js",
+      "meta": {
+        "label": "Table",
+        "icon": "icon-list",
+        "pathName": "table"
+      },
+      "conditions": [
+        {
+          "alias": "Umb.Condition.CollectionAlias",
+          "match": "Umb.Collection.Document"
+        }
+      ]
+    }
+  ]
+}

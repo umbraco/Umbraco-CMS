@@ -6,6 +6,7 @@ import { UmbUniqueTreeStore } from '@umbraco-cms/backoffice/tree';
  * @class UmbMediaTypeTreeStore
  * @augments {UmbStoreBase}
  * @description - Tree Data Store for Media Types
+ * @deprecated - Use `UmbMediaTypeTreeRepository` instead. This will be removed in Umbraco 18.
  */
 export class UmbMediaTypeTreeStore extends UmbUniqueTreeStore {
 	/**

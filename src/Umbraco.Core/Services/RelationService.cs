@@ -1,4 +1,6 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
@@ -11,14 +13,63 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+///     Provides functionality for managing relations and relation types between entities.
+/// </summary>
+/// <remarks>
+///     Relations allow entities like content, media, and members to be linked together
+///     through various relationship types. This service handles CRUD operations for both
+///     relations and relation types.
+/// </remarks>
 public class RelationService : RepositoryService, IRelationService
 {
-    private readonly IAuditRepository _auditRepository;
+    private readonly IAuditService _auditService;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
     private readonly IEntityService _entityService;
     private readonly IRelationRepository _relationRepository;
     private readonly IRelationTypeRepository _relationTypeRepository;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="RelationService" /> class.
+    /// </summary>
+    /// <param name="uowProvider">The scope provider for unit of work operations.</param>
+    /// <param name="loggerFactory">The logger factory for creating loggers.</param>
+    /// <param name="eventMessagesFactory">The factory for creating event messages.</param>
+    /// <param name="entityService">The entity service for entity operations.</param>
+    /// <param name="relationRepository">The repository for relation data access.</param>
+    /// <param name="relationTypeRepository">The repository for relation type data access.</param>
+    /// <param name="auditService">The audit service for recording audit entries.</param>
+    /// <param name="userIdKeyResolver">The resolver for converting user IDs to keys.</param>
+    public RelationService(
+        ICoreScopeProvider uowProvider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IEntityService entityService,
+        IRelationRepository relationRepository,
+        IRelationTypeRepository relationTypeRepository,
+        IAuditService auditService,
+        IUserIdKeyResolver userIdKeyResolver)
+        : base(uowProvider, loggerFactory, eventMessagesFactory)
+    {
+        _relationRepository = relationRepository;
+        _relationTypeRepository = relationTypeRepository;
+        _auditService = auditService;
+        _userIdKeyResolver = userIdKeyResolver;
+        _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
+    }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="RelationService" /> class.
+    /// </summary>
+    /// <param name="uowProvider">The scope provider for unit of work operations.</param>
+    /// <param name="loggerFactory">The logger factory for creating loggers.</param>
+    /// <param name="eventMessagesFactory">The factory for creating event messages.</param>
+    /// <param name="entityService">The entity service for entity operations.</param>
+    /// <param name="relationRepository">The repository for relation data access.</param>
+    /// <param name="relationTypeRepository">The repository for relation type data access.</param>
+    /// <param name="auditRepository">The audit repository (unused, kept for backward compatibility).</param>
+    /// <param name="userIdKeyResolver">The resolver for converting user IDs to keys.</param>
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
     public RelationService(
         ICoreScopeProvider uowProvider,
         ILoggerFactory loggerFactory,
@@ -28,13 +79,51 @@ public class RelationService : RepositoryService, IRelationService
         IRelationTypeRepository relationTypeRepository,
         IAuditRepository auditRepository,
         IUserIdKeyResolver userIdKeyResolver)
-        : base(uowProvider, loggerFactory, eventMessagesFactory)
+        : this(
+            uowProvider,
+            loggerFactory,
+            eventMessagesFactory,
+            entityService,
+            relationRepository,
+            relationTypeRepository,
+            StaticServiceProvider.Instance.GetRequiredService<IAuditService>(),
+            userIdKeyResolver)
     {
-        _relationRepository = relationRepository;
-        _relationTypeRepository = relationTypeRepository;
-        _auditRepository = auditRepository;
-        _userIdKeyResolver = userIdKeyResolver;
-        _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
+    }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="RelationService" /> class.
+    /// </summary>
+    /// <param name="uowProvider">The scope provider for unit of work operations.</param>
+    /// <param name="loggerFactory">The logger factory for creating loggers.</param>
+    /// <param name="eventMessagesFactory">The factory for creating event messages.</param>
+    /// <param name="entityService">The entity service for entity operations.</param>
+    /// <param name="relationRepository">The repository for relation data access.</param>
+    /// <param name="relationTypeRepository">The repository for relation type data access.</param>
+    /// <param name="auditService">The audit service for recording audit entries.</param>
+    /// <param name="auditRepository">The audit repository (unused, kept for backward compatibility).</param>
+    /// <param name="userIdKeyResolver">The resolver for converting user IDs to keys.</param>
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
+    public RelationService(
+        ICoreScopeProvider uowProvider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IEntityService entityService,
+        IRelationRepository relationRepository,
+        IRelationTypeRepository relationTypeRepository,
+        IAuditService auditService,
+        IAuditRepository auditRepository,
+        IUserIdKeyResolver userIdKeyResolver)
+        : this(
+            uowProvider,
+            loggerFactory,
+            eventMessagesFactory,
+            entityService,
+            relationRepository,
+            relationTypeRepository,
+            auditService,
+            userIdKeyResolver)
+    {
     }
 
     /// <inheritdoc />
@@ -87,10 +176,7 @@ public class RelationService : RepositoryService, IRelationService
         return _relationTypeRepository.GetMany(ids);
     }
 
-    /// <summary>
-    /// Gets the Relation types in a paged manner.
-    /// Currently implements the paging in memory on the name property because the underlying repository does not support paging yet
-    /// </summary>
+    /// <inheritdoc />
     public Task<PagedModel<IRelationType>> GetPagedRelationTypesAsync(int skip, int take, params int[] ids)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
@@ -438,11 +524,25 @@ public class RelationService : RepositoryService, IRelationService
         return _relationRepository.Get(query).Any();
     }
 
-    /// <inheritdoc />
-    public bool IsRelated(int id) => IsRelated(id, RelationDirectionFilter.Any);
+    /// <summary>
+    /// Checks whether an entity has any relations.
+    /// </summary>
+    /// <param name="id">The identifier of the entity.</param>
+    /// <returns><c>true</c> if the entity has any relations; otherwise, <c>false</c>.</returns>
+    [Obsolete("No longer used in Umbraco, please the overload taking all parameters. Scheduled for removal in Umbraco 19.")]
+    public bool IsRelated(int id) => IsRelated(id, RelationDirectionFilter.Any, null, null);
+
+    /// <summary>
+    /// Checks whether an entity has relations in the specified direction.
+    /// </summary>
+    /// <param name="id">The identifier of the entity.</param>
+    /// <param name="directionFilter">The direction filter to apply when checking relations.</param>
+    /// <returns><c>true</c> if the entity has relations matching the filter; otherwise, <c>false</c>.</returns>
+    [Obsolete("Please the overload taking all parameters. Scheduled for removal in Umbraco 18.")]
+    public bool IsRelated(int id, RelationDirectionFilter directionFilter) => IsRelated(id, directionFilter, null, null);
 
     /// <inheritdoc />
-    public bool IsRelated(int id, RelationDirectionFilter directionFilter)
+    public bool IsRelated(int id, RelationDirectionFilter directionFilter, int[]? includeRelationTypeIds = null, int[]? excludeRelationTypeIds = null)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
         IQuery<IRelation> query = Query<IRelation>();
@@ -454,6 +554,16 @@ public class RelationService : RepositoryService, IRelationService
             RelationDirectionFilter.Any => query.Where(x => x.ParentId == id || x.ChildId == id),
             _ => throw new ArgumentOutOfRangeException(nameof(directionFilter)),
         };
+
+        if (includeRelationTypeIds is not null && includeRelationTypeIds.Length > 0)
+        {
+            query = query.WhereIn(x => x.RelationTypeId, includeRelationTypeIds);
+        }
+
+        if (excludeRelationTypeIds is not null && excludeRelationTypeIds.Length > 0)
+        {
+            query = query.WhereNotIn(x => x.RelationTypeId, excludeRelationTypeIds);
+        }
 
         return _relationRepository.Get(query).Any();
     }
@@ -601,8 +711,7 @@ public class RelationService : RepositoryService, IRelationService
             }
 
             _relationTypeRepository.Save(relationType);
-            var currentUser = await _userIdKeyResolver.GetAsync(userKey);
-            Audit(auditType, currentUser, relationType.Id, auditMessage);
+            await AuditAsync(auditType, userKey, relationType.Id, auditMessage);
             scope.Complete();
             scope.Notifications.Publish(
                 new RelationTypeSavedNotification(relationType, eventMessages).WithStateFrom(savingNotification));
@@ -666,8 +775,7 @@ public class RelationService : RepositoryService, IRelationService
         }
 
         _relationTypeRepository.Delete(relationType);
-        var currentUser = await _userIdKeyResolver.GetAsync(userKey);
-        Audit(AuditType.Delete, currentUser, relationType.Id, "Deleted relation type");
+        await AuditAsync(AuditType.Delete, userKey, relationType.Id, "Deleted relation type");
         scope.Notifications.Publish(new RelationTypeDeletedNotification(relationType, eventMessages).WithStateFrom(deletingNotification));
         scope.Complete();
         return Attempt.SucceedWithStatus<IRelationType?, RelationTypeOperationStatus>(RelationTypeOperationStatus.Success, relationType);
@@ -744,7 +852,23 @@ public class RelationService : RepositoryService, IRelationService
     }
 
     private void Audit(AuditType type, int userId, int objectId, string? message = null) =>
-        _auditRepository.Save(new AuditItem(objectId, type, userId, UmbracoObjectTypes.RelationType.GetName(), message));
+        AuditAsync(type, userId, objectId, message).GetAwaiter().GetResult();
+
+    private async Task AuditAsync(AuditType type, int userId, int objectId, string? message = null, string? parameters = null)
+    {
+        Guid userKey = await _userIdKeyResolver.GetAsync(userId);
+
+        await AuditAsync(type, userKey, objectId, message, parameters);
+    }
+
+    private async Task AuditAsync(AuditType type, Guid userKey, int objectId, string? message = null, string? parameters = null) =>
+        await _auditService.AddAsync(
+            type,
+            userKey,
+            objectId,
+            UmbracoObjectTypes.RelationType.GetName(),
+            message,
+            parameters);
 
     #endregion
 }

@@ -43,7 +43,7 @@ export class UmbTemplateServerDataSource implements UmbDetailDataSource<UmbTempl
 			name: '',
 			alias: '',
 			content: scaffold,
-			masterTemplate: null,
+			masterTemplate: preset.masterTemplate ?? null,
 			...preset,
 		};
 

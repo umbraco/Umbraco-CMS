@@ -51,6 +51,8 @@ const sectionItemsByUniquesObservable = (uniques: Array<string>) =>
 const itemMapper = (manifest: ManifestSection): UmbSectionItemModel => {
 	return {
 		...manifest,
+		// TODO: introduce const
+		entityType: 'section',
 		unique: manifest.alias,
 	};
 };

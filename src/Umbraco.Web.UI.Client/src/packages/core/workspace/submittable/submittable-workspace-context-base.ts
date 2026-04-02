@@ -8,6 +8,7 @@ import type { UmbModalContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbValidationController } from '@umbraco-cms/backoffice/validation';
+import { UmbViewContext } from '@umbraco-cms/backoffice/view';
 
 export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 	extends UmbContextBase
@@ -19,6 +20,8 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 	public readonly modalContext?: UmbModalContext<{ preset: object }>;
 
 	#validationContexts: Array<UmbValidationController> = [];
+
+	public readonly view = new UmbViewContext(this, null);
 
 	/**
 	 * Appends a validation context to the workspace.
@@ -54,6 +57,13 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 		this.consumeContext(UMB_MODAL_CONTEXT, (context) => {
 			(this.modalContext as UmbModalContext | undefined) = context;
 		});
+
+		this.view.shortcuts.addOne({
+			key: 's',
+			modifier: true,
+			action: () => this.requestSubmit(),
+			label: '#general_submit',
+		});
 	}
 
 	protected resetState() {
@@ -84,7 +94,7 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 		);
 	}
 
-	protected async _validateAndLog(): Promise<void> {
+	protected _validateAndLog = async (): Promise<void> => {
 		await this.validate().catch(async () => {
 			// TODO: Implement developer-mode logging here. [NL]
 			console.warn(
@@ -93,9 +103,14 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 			);
 			return Promise.reject();
 		});
+	};
+
+	public validateAndSubmit(onValid: () => Promise<void>, onInvalid: (reason?: any) => Promise<void>): Promise<void> {
+		return this._validateByAndSubmit(this._validateAndLog, onValid, onInvalid);
 	}
 
-	public async validateAndSubmit(
+	protected async _validateByAndSubmit(
+		validationMethod: () => Promise<unknown>,
 		onValid: () => Promise<void>,
 		onInvalid: (reason?: any) => Promise<void>,
 	): Promise<void> {
@@ -106,7 +121,7 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 			this.#submitResolve = resolve;
 			this.#submitReject = reject;
 		});
-		this._validateAndLog().then(
+		validationMethod().then(
 			async () => {
 				onValid().then(this.#completeSubmit, this.#rejectSubmit);
 			},

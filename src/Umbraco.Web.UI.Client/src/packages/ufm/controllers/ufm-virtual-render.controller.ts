@@ -12,21 +12,26 @@ export class UmbUfmVirtualRenderController extends UmbControllerBase {
 
 		const items: Array<string> = [];
 
-		items.push(element.shadowRoot?.textContent ?? element.textContent ?? '');
-
-		if (element.shadowRoot !== null) {
-			Array.from(element.shadowRoot.children).forEach((element) => {
-				items.push(this.#getTextFromDescendants(element));
-			});
+		// Try get the text content from the shadow root first, otherwise get it from the light DOM. [LK]
+		if (element.shadowRoot) {
+			for (const node of element.shadowRoot.childNodes) {
+				if (node.nodeType === Node.ELEMENT_NODE) {
+					items.push(this.#getTextFromDescendants(node as Element));
+				} else if (node.nodeType === Node.TEXT_NODE) {
+					items.push(node.textContent ?? '');
+				}
+			}
+		} else {
+			for (const node of element.childNodes) {
+				if (node.nodeType === Node.ELEMENT_NODE) {
+					items.push(this.#getTextFromDescendants(node as Element));
+				} else if (node.nodeType === Node.TEXT_NODE) {
+					items.push(node.textContent ?? '');
+				}
+			}
 		}
 
-		if (element.children !== null) {
-			Array.from(element.children).forEach((element) => {
-				items.push(this.#getTextFromDescendants(element));
-			});
-		}
-
-		return items.filter((x) => x).join(' ');
+		return items.filter((x) => x).join('');
 	}
 
 	set markdown(markdown: string | undefined) {

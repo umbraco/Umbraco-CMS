@@ -12,6 +12,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		meta: {
 			label: 'Data Types',
 			searchProviderAlias: UMB_DATA_TYPE_SEARCH_PROVIDER_ALIAS,
+			sectionAlias: UMB_SETTINGS_SECTION_ALIAS,
 		},
 		conditions: [
 			{

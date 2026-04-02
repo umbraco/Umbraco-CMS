@@ -11,27 +11,101 @@ namespace Umbraco.Cms.Core.Configuration.Models;
 [UmbracoOptions(Constants.Configuration.ConfigGlobal)]
 public class GlobalSettings
 {
-    internal const string
-        StaticReservedPaths =
-            "~/app_plugins/,~/install/,~/mini-profiler-resources/,~/umbraco/,"; // must end with a comma!
+    /// <summary>
+    ///     The default value for the <see cref="ReservedPaths" /> setting.
+    /// </summary>
+    /// <remarks>Must end with a comma.</remarks>
+    internal const string StaticReservedPaths =
+        "~/app_plugins/,~/install/,~/mini-profiler-resources/,~/umbraco/,";
 
-    internal const string StaticReservedUrls = "~/.well-known,"; // must end with a comma!
+    /// <summary>
+    ///     The default value for the <see cref="ReservedUrls" /> setting.
+    /// </summary>
+    /// <remarks>Must end with a comma.</remarks>
+    internal const string StaticReservedUrls = "~/.well-known,";
+
+    /// <summary>
+    ///     The default value for the <see cref="TimeOut" /> setting.
+    /// </summary>
     internal const string StaticTimeOut = "00:20:00";
+
+    /// <summary>
+    ///     The default value for the <see cref="DefaultUILanguage" /> setting.
+    /// </summary>
     internal const string StaticDefaultUILanguage = "en-US";
+
+    /// <summary>
+    ///     The default value for the <see cref="HideTopLevelNodeFromPath" /> setting.
+    /// </summary>
     internal const bool StaticHideTopLevelNodeFromPath = true;
-    internal const bool StaticUseHttps = false;
+
+    /// <summary>
+    ///     The default value for the <see cref="UseHttps" /> setting.
+    /// </summary>
+    internal const bool StaticUseHttps = true;
+
+    /// <summary>
+    ///     The default value for the <see cref="VersionCheckPeriod" /> setting.
+    /// </summary>
     internal const int StaticVersionCheckPeriod = 7;
+
+    /// <summary>
+    ///     The default value for the <see cref="IconsPath" /> setting.
+    /// </summary>
     internal const string StaticIconsPath = "umbraco/assets/icons";
+
+    /// <summary>
+    ///     The default value for the <see cref="UmbracoCssPath" /> setting.
+    /// </summary>
     internal const string StaticUmbracoCssPath = "~/css";
+
+    /// <summary>
+    ///     The default value for the <see cref="UmbracoScriptsPath" /> setting.
+    /// </summary>
     internal const string StaticUmbracoScriptsPath = "~/scripts";
+
+    /// <summary>
+    ///     The default value for the <see cref="UmbracoMediaPath" /> setting.
+    /// </summary>
     internal const string StaticUmbracoMediaPath = "~/media";
+
+    /// <summary>
+    ///     The default value for the <see cref="DisableElectionForSingleServer" /> setting.
+    /// </summary>
     internal const bool StaticDisableElectionForSingleServer = false;
+
+    /// <summary>
+    ///     The default value for the <see cref="NoNodesViewPath" /> setting.
+    /// </summary>
     internal const string StaticNoNodesViewPath = "~/umbraco/UmbracoWebsite/NoNodes.cshtml";
+
+    /// <summary>
+    ///     The default value for the <see cref="DistributedLockingReadLockDefaultTimeout" /> setting.
+    /// </summary>
     internal const string StaticDistributedLockingReadLockDefaultTimeout = "00:01:00";
+
+    /// <summary>
+    ///     The default value for the <see cref="DistributedLockingWriteLockDefaultTimeout" /> setting.
+    /// </summary>
     internal const string StaticDistributedLockingWriteLockDefaultTimeout = "00:00:05";
+
+    /// <summary>
+    ///     The default value for the <see cref="MainDomReleaseSignalPollingInterval" /> setting.
+    /// </summary>
     internal const int StaticMainDomReleaseSignalPollingInterval = 2000;
+
+    /// <summary>
+    ///     The default value for the <see cref="MainDomAcquisitionTimeout" /> setting.
+    /// </summary>
+    internal const string StaticMainDomAcquisitionTimeout = "00:00:40";
+
     private const bool StaticForceCombineUrlPathLeftToRight = true;
     private const bool StaticShowMaintenancePageWhenInUpgradeState = true;
+
+    /// <summary>
+    ///     The default value for the <see cref="UpgradingViewPath" /> setting.
+    /// </summary>
+    internal const string StaticUpgradingViewPath = "~/umbraco/UmbracoWebsite/Upgrading.cshtml";
 
     /// <summary>
     ///     Gets or sets a value for the reserved URLs (must end with a comma).
@@ -151,6 +225,15 @@ public class GlobalSettings
     public int MainDomReleaseSignalPollingInterval { get; set; } = StaticMainDomReleaseSignalPollingInterval;
 
     /// <summary>
+    ///     Gets or sets a value representing the maximum time to wait whilst attempting to acquire MainDom status.
+    /// </summary>
+    /// <remarks>
+    ///     The default value is 40 seconds.
+    /// </remarks>
+    [DefaultValue(StaticMainDomAcquisitionTimeout)]
+    public TimeSpan MainDomAcquisitionTimeout { get; set; } = TimeSpan.Parse(StaticMainDomAcquisitionTimeout);
+
+    /// <summary>
     ///     Gets or sets the telemetry ID.
     /// </summary>
     public string Id { get; set; } = string.Empty;
@@ -180,6 +263,11 @@ public class GlobalSettings
     ///     Gets a value indicating whether SMTP is configured.
     /// </summary>
     public bool IsSmtpServerConfigured => !string.IsNullOrWhiteSpace(Smtp?.Host);
+
+    /// <summary>
+    ///     Gets a value indicating whether SMTP expiry is configured.
+    /// </summary>
+    public bool IsSmtpExpiryConfigured => Smtp?.EmailExpiration != null && Smtp?.EmailExpiration.HasValue == true;
 
     /// <summary>
     ///     Gets a value indicating whether there is a physical pickup directory configured.
@@ -229,6 +317,15 @@ public class GlobalSettings
     [DefaultValue(StaticForceCombineUrlPathLeftToRight)]
     public bool ForceCombineUrlPathLeftToRight { get; set; }  = StaticForceCombineUrlPathLeftToRight;
 
+    /// <summary>
+    ///     Gets or sets a value indicating whether to show the maintenance page when in an upgrade state.
+    /// </summary>
     [DefaultValue(StaticShowMaintenancePageWhenInUpgradeState)]
     public bool ShowMaintenancePageWhenInUpgradeState { get; set; } = StaticShowMaintenancePageWhenInUpgradeState;
+
+    /// <summary>
+    ///     Gets or sets the view path shown during an unattended background upgrade (<see cref="RuntimeLevel.Upgrading"/>).
+    /// </summary>
+    [DefaultValue(StaticUpgradingViewPath)]
+    public string UpgradingViewPath { get; set; } = StaticUpgradingViewPath;
 }

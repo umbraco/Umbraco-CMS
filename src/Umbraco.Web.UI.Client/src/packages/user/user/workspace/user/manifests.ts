@@ -1,5 +1,6 @@
 import { UMB_USER_ENTITY_TYPE } from '../../entity.js';
 import { UMB_USER_WORKSPACE_ALIAS } from './constants.js';
+import { manifests as viewManifests } from './views/manifests.js';
 import { UMB_WORKSPACE_CONDITION_ALIAS, UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 
 export const manifests: Array<UmbExtensionManifest> = [
@@ -31,4 +32,5 @@ export const manifests: Array<UmbExtensionManifest> = [
 			},
 		],
 	},
+	...viewManifests,
 ];

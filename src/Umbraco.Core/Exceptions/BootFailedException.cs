@@ -23,7 +23,7 @@ public class BootFailedException : Exception
     }
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="Exception" /> class with a specified error message.
+    ///     Initializes a new instance of the <see cref="BootFailedException" /> class with a specified error message.
     /// </summary>
     /// <param name="message">The message that describes the error.</param>
     public BootFailedException(string message)
@@ -32,7 +32,7 @@ public class BootFailedException : Exception
     }
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="Exception" /> class with a specified error message
+    ///     Initializes a new instance of the <see cref="BootFailedException" /> class with a specified error message
     ///     and a reference to the inner exception which is the cause of this exception.
     /// </summary>
     /// <param name="message">The message that describes the error.</param>
@@ -53,6 +53,7 @@ public class BootFailedException : Exception
     ///     The <see cref="T:System.Runtime.Serialization.StreamingContext" /> that contains contextual
     ///     information about the source or destination.
     /// </param>
+    [Obsolete("Constructors taking a signature of SerializationInfo info, StreamingContext context are deprecated and not used within Umbraco. Scheduled for removal in Umbraco 19.", DiagnosticId = "SYSLIB0051")]
     protected BootFailedException(SerializationInfo info, StreamingContext context)
         : base(info, context)
     {
@@ -61,9 +62,8 @@ public class BootFailedException : Exception
     /// <summary>
     ///     Rethrows a captured <see cref="BootFailedException" />.
     /// </summary>
-    /// <param name="bootFailedException">The boot failed exception.</param>
-    /// <exception cref="BootFailedException">
-    /// </exception>
+    /// <param name="bootFailedException">The boot failed exception to rethrow, or null to throw with a default message.</param>
+    /// <exception cref="BootFailedException">Always thrown with the original exception details or a default message.</exception>
     /// <remarks>
     ///     The exception can be null, in which case a default message is used.
     /// </remarks>

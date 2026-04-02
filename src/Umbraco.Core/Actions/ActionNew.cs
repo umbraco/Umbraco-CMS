@@ -21,14 +21,8 @@ public class ActionNew : IAction
     public string Alias => ActionAlias;
 
     /// <inheritdoc />
-    public string Icon => "icon-add";
-
-    /// <inheritdoc />
     public bool ShowInNotifier => true;
 
     /// <inheritdoc />
     public bool CanBePermissionAssigned => true;
-
-    /// <inheritdoc />
-    public string Category => Constants.Conventions.PermissionCategories.ContentCategory;
 }

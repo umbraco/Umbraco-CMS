@@ -9,15 +9,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- Take top-level depedendency on Azure.Identity, because Microsoft.EntityFrameworkCore.SqlServer depends on a vulnerable version -->
-    <PackageReference Include="Azure.Identity" />
-    <!-- Take top-level depedendency on System.Runtime.Caching, because Microsoft.EntityFrameworkCore.SqlServer depends on a vulnerable version -->
-    <PackageReference Include="System.Runtime.Caching" />
-    <!-- Take top-level depedendency on Microsoft.IdentityModel.JsonWebTokens, because OpenIddict.AspNetCore, NPoco.SqlServer and Microsoft.EntityFrameworkCore.SqlServer depends on a vulnerable version -->
-    <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Umbraco.Cms.Persistence.EFCore\Umbraco.Cms.Persistence.EFCore.csproj" />
   </ItemGroup>
 </Project>

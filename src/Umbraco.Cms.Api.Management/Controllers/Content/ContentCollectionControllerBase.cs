@@ -1,7 +1,10 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
+using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Content;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
@@ -11,6 +14,13 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Content;
 
+/// <summary>
+/// Serves as a base controller for managing collections of content items, providing shared functionality for handling content collections and their variants.
+/// </summary>
+/// <typeparam name="TContent">The content entity type.</typeparam>
+/// <typeparam name="TCollectionResponseModel">The response model type for the content collection.</typeparam>
+/// <typeparam name="TValueResponseModelBase">The base type for value response models within the collection.</typeparam>
+/// <typeparam name="TVariantResponseModel">The response model type for content variants.</typeparam>
 public abstract class ContentCollectionControllerBase<TContent, TCollectionResponseModel, TValueResponseModelBase, TVariantResponseModel> : ManagementApiControllerBase
     where TContent : class, IContentBase
     where TCollectionResponseModel : ContentResponseModelBase<TValueResponseModelBase, TVariantResponseModel>
@@ -18,36 +28,17 @@ public abstract class ContentCollectionControllerBase<TContent, TCollectionRespo
     where TVariantResponseModel : VariantResponseModelBase
 {
     private readonly IUmbracoMapper _mapper;
+    private readonly FlagProviderCollection _flagProviders;
 
-    protected ContentCollectionControllerBase(IUmbracoMapper mapper) => _mapper = mapper;
-
-    [Obsolete("This method is no longer used and will be removed in Umbraco 17.")]
-    protected IActionResult CollectionResult(ListViewPagedModel<TContent> result)
+    protected ContentCollectionControllerBase(IUmbracoMapper mapper, FlagProviderCollection flagProvider)
     {
-        PagedModel<TContent> collectionItemsResult = result.Items;
-        ListViewConfiguration collectionConfiguration = result.ListViewConfiguration;
-
-        var collectionPropertyAliases = collectionConfiguration
-            .IncludeProperties
-            .Select(p => p.Alias)
-            .WhereNotNull()
-            .ToArray();
-
-        List<TCollectionResponseModel> collectionResponseModels =
-            _mapper.MapEnumerable<TContent, TCollectionResponseModel>(collectionItemsResult.Items, context =>
-            {
-                context.SetIncludedProperties(collectionPropertyAliases);
-            });
-
-        var pageViewModel = new PagedViewModel<TCollectionResponseModel>
-        {
-            Items = collectionResponseModels,
-            Total = collectionItemsResult.Total,
-        };
-
-        return Ok(pageViewModel);
+        _mapper = mapper;
+        _flagProviders = flagProvider;
     }
 
+    /// <summary>
+    /// Creates a collection result from the provided collection response models and total number of items.
+    /// </summary>
     protected IActionResult CollectionResult(List<TCollectionResponseModel> collectionResponseModels, long totalNumberOfItems)
     {
         var pageViewModel = new PagedViewModel<TCollectionResponseModel>

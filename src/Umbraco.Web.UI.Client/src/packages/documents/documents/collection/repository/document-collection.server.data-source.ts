@@ -35,9 +35,6 @@ export class UmbDocumentCollectionServerDataSource implements UmbCollectionDataS
 
 		if (data) {
 			const items = data.items.map((item: DocumentCollectionResponseModel) => {
-				// TODO: remove in v17.0.0
-				const variant = item.variants[0];
-
 				const model: UmbDocumentCollectionItemModel = {
 					ancestors: item.ancestors.map((ancestor) => {
 						return {
@@ -47,19 +44,19 @@ export class UmbDocumentCollectionServerDataSource implements UmbCollectionDataS
 					}),
 					unique: item.id,
 					entityType: UMB_DOCUMENT_ENTITY_TYPE,
-					contentTypeAlias: item.documentType.alias,
-					createDate: new Date(variant.createDate),
 					creator: item.creator,
-					icon: item.documentType.icon,
 					isProtected: item.isProtected,
 					isTrashed: item.isTrashed,
-					name: variant.name,
 					sortOrder: item.sortOrder,
-					state: variant.state,
-					updateDate: new Date(variant.updateDate),
 					updater: item.updater,
+					flags: item.flags,
 					values: item.values.map((item) => {
-						return { alias: item.alias, value: item.value as string };
+						return {
+							alias: item.alias,
+							culture: item.culture ?? undefined,
+							segment: item.segment ?? undefined,
+							value: item.value as string,
+						};
 					}),
 					documentType: {
 						unique: item.documentType.id,
@@ -71,6 +68,9 @@ export class UmbDocumentCollectionServerDataSource implements UmbCollectionDataS
 							name: item.name,
 							culture: item.culture ?? null,
 							state: item.state,
+							createDate: new Date(item.createDate),
+							updateDate: new Date(item.updateDate),
+							flags: item.flags,
 						};
 					}),
 				};

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 /*
 This module is a modified copy of the original Shoelace localize package: https://github.com/shoelace-style/localize
 

@@ -29,6 +29,8 @@ export const data: Array<UmbMockDocumentBlueprintModel> = [
 				name: 'The Simplest Document Blueprint',
 				createDate: '2023-02-06T15:32:05.350038',
 				updateDate: '2023-02-06T15:32:24.957009',
+				id: 'the-simplest-document-type-id-blueprint',
+				flags: [],
 			},
 		],
 		values: [
@@ -40,6 +42,7 @@ export const data: Array<UmbMockDocumentBlueprintModel> = [
 				value: 'my blueprint value',
 			},
 		],
+		flags: [],
 	},
 	{
 		id: 'forbidden',
@@ -60,6 +63,8 @@ export const data: Array<UmbMockDocumentBlueprintModel> = [
 				name: 'A Forbidden Document Blueprint',
 				createDate: '2023-02-06T15:32:05.350038',
 				updateDate: '2023-02-06T15:32:24.957009',
+				id: 'forbidden-blueprint',
+				flags: [],
 			},
 		],
 		values: [
@@ -71,5 +76,6 @@ export const data: Array<UmbMockDocumentBlueprintModel> = [
 				value: 'my blueprint value',
 			},
 		],
+		flags: [],
 	},
 ];

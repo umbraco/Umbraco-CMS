@@ -32,14 +32,18 @@ export class UmbDictionarySearchServerDataSource implements UmbSearchDataSource<
 		const { data, error } = await tryExecute(
 			this.#host,
 			DictionaryService.getDictionary({
-				query: { filter: args.query },
+				query: {
+					filter: args.query,
+					skip: args.paging?.skip,
+					take: args.paging?.take,
+				},
 			}),
 		);
 
 		if (data) {
 			const mappedItems: Array<UmbDictionarySearchItemModel> = data.items.map((item) => {
 				return {
-					href: '/section/translation/workspace/dictionary/edit/' + item.id,
+					href: 'section/translation/workspace/dictionary/edit/' + item.id,
 					entityType: UMB_DICTIONARY_ENTITY_TYPE,
 					unique: item.id,
 					name: item.name ?? '',

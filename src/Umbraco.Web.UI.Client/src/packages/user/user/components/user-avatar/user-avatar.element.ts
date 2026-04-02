@@ -13,8 +13,7 @@ import {
 } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
-const elementName = 'umb-user-avatar';
-@customElement(elementName)
+@customElement('umb-user-avatar')
 export class UmbUserAvatarElement extends UmbLitElement {
 	@property({ type: String })
 	name?: string;
@@ -28,7 +27,7 @@ export class UmbUserAvatarElement extends UmbLitElement {
 	}
 	public set imgUrls(value: Array<string>) {
 		this.#imgUrls = value;
-		this.hasImgUrls = value.length > 0;
+		this._hasImgUrls = value.length > 0;
 		this.#setImgSrcSizes();
 	}
 	#imgUrls: Array<string> = [];
@@ -40,7 +39,7 @@ export class UmbUserAvatarElement extends UmbLitElement {
 	private _imgSrc = '';
 
 	@state()
-	private hasImgUrls = false;
+	private _hasImgUrls = false;
 
 	@query('uui-avatar')
 	avatarElement!: UUIAvatarElement;
@@ -48,6 +47,7 @@ export class UmbUserAvatarElement extends UmbLitElement {
 	#setImgSrcSizes() {
 		if (this.#imgUrls.length === 0) {
 			this._imgSrcSizes = [];
+			this._imgSrc = '';
 			return;
 		}
 
@@ -82,7 +82,7 @@ export class UmbUserAvatarElement extends UmbLitElement {
 	}
 
 	async #setImgSrc() {
-		if (!this.hasImgUrls) return;
+		if (!this._hasImgUrls) return;
 		if (!this.avatarElement) return;
 
 		setTimeout(() => {
@@ -104,7 +104,7 @@ export class UmbUserAvatarElement extends UmbLitElement {
 		const classes = {
 			default: this.kind === UmbUserKind.API,
 			api: this.kind === UmbUserKind.API,
-			'has-image': this.hasImgUrls,
+			'has-image': this._hasImgUrls,
 		};
 
 		return html`<uui-avatar
@@ -134,6 +134,6 @@ export class UmbUserAvatarElement extends UmbLitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbUserAvatarElement;
+		'umb-user-avatar': UmbUserAvatarElement;
 	}
 }

@@ -1,7 +1,6 @@
 import { defineConfig } from '@hey-api/openapi-ts';
 
 export default defineConfig({
-	debug: true,
 	input: '../../../../Umbraco.Cms.Api.Management/OpenApi.json',
 	output: {
 		path: './backend-api',
@@ -9,7 +8,6 @@ export default defineConfig({
 	plugins: [
 		{
 			name: '@hey-api/client-fetch',
-			bundle: false,
 			exportFromIndex: true,
 			throwOnError: true,
 		},

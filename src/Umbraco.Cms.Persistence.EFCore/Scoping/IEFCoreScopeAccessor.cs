@@ -1,5 +1,9 @@
 namespace Umbraco.Cms.Persistence.EFCore.Scoping;
 
+/// <summary>
+/// Provides access to the current ambient EF Core scope.
+/// </summary>
+/// <typeparam name="TDbContext">The type of DbContext.</typeparam>
 public interface IEFCoreScopeAccessor<TDbContext>
 {
     /// <summary>

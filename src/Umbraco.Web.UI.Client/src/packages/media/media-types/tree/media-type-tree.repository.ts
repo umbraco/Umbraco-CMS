@@ -1,5 +1,5 @@
 import { UMB_MEDIA_TYPE_ROOT_ENTITY_TYPE } from '../entity.js';
-import { UmbMediaTypeTreeServerDataSource } from './media-type-tree.server.data-source.js';
+import { UmbMediaTypeTreeServerDataSource } from './server-data-source/media-type.tree.server.data-source.js';
 import { UMB_MEDIA_TYPE_TREE_STORE_CONTEXT } from './media-type-tree.store.context-token.js';
 import type { UmbMediaTypeTreeItemModel, UmbMediaTypeTreeRootModel } from './types.js';
 import { UmbTreeRepositoryBase } from '@umbraco-cms/backoffice/tree';
@@ -15,7 +15,7 @@ export class UmbMediaTypeTreeRepository
 	}
 
 	async requestTreeRoot() {
-		const { data: treeRootData } = await this._treeSource.getRootItems({ skip: 0, take: 1 });
+		const { data: treeRootData } = await this._treeSource.getRootItems({ skip: 0, take: 0 });
 		const hasChildren = treeRootData ? treeRootData.total > 0 : false;
 
 		const data: UmbMediaTypeTreeRootModel = {

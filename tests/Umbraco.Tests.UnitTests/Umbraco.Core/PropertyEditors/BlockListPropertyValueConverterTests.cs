@@ -30,7 +30,7 @@ public class BlockListPropertyValueConverterTests : BlockPropertyValueConverterT
             new BlockEditorConverter(GetPublishedContentTypeCache(), Mock.Of<ICacheManager>(), publishedModelFactory, Mock.Of<IVariationContextAccessor>(), blockVarianceHandler),
             Mock.Of<IContentTypeService>(),
             new ApiElementBuilder(Mock.Of<IOutputExpansionStrategyAccessor>()),
-            new SystemTextJsonSerializer(),
+            new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory()),
             new BlockListPropertyValueConstructorCache(),
             Mock.Of<IVariationContextAccessor>(),
             blockVarianceHandler);

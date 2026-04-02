@@ -58,6 +58,7 @@ export const data: Array<UmbMockMemberTypeModel> = [
 		parent: null,
 		hasChildren: false,
 		hasListView: false,
+		flags: [],
 	},
 	{
 		name: 'A Forbidden Member Type',
@@ -65,6 +66,7 @@ export const data: Array<UmbMockMemberTypeModel> = [
 		description: 'Clicking on this results in a 403 Forbidden error.',
 		alias: 'forbidden',
 		icon: 'icon-bug',
+		flags: [],
 		properties: [
 			{
 				id: '1680d4d2-cda8-4ac2-affd-a69fc10382b1',

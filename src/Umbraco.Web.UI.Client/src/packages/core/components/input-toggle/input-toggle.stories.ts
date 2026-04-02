@@ -3,14 +3,14 @@ import './input-toggle.element.js';
 import type { UmbInputToggleElement } from './input-toggle.element.js';
 
 const meta: Meta<UmbInputToggleElement> = {
-	title: 'Components/Inputs/Toggle',
+	title: 'Generic Components/Inputs/Toggle',
 	component: 'umb-input-toggle',
 };
 
 export default meta;
 type Story = StoryObj<UmbInputToggleElement>;
 
-export const Overview: Story = {
+export const Docs: Story = {
 	args: {
 		checked: true,
 		showLabels: true,

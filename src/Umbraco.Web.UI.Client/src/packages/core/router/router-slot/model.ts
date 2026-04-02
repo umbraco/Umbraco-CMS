@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 export interface IRouterSlot<D = any, P = any> extends HTMLElement {
 	readonly route: IRoute<D> | null;
 	readonly isRoot: boolean;

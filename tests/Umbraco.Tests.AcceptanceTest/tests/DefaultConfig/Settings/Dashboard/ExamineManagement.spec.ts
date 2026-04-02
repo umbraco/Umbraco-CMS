@@ -1,5 +1,5 @@
 import {expect} from '@playwright/test';
-import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
+import {ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 
 test.beforeEach(async ({umbracoUi}) => {
   await umbracoUi.goToBackOffice();
@@ -7,7 +7,7 @@ test.beforeEach(async ({umbracoUi}) => {
   await umbracoUi.examineManagement.clickExamineManagementTab();
 });
 
-test.skip('can view indexers information', async ({umbracoApi, umbracoUi}) => {
+test('can view indexers information', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const allIndexersData = await umbracoApi.indexer.getAll();
   const indexerCount = allIndexersData.total;

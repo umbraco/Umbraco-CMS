@@ -21,12 +21,6 @@ public class ActionDelete : IAction
     public string Alias => ActionAlias;
 
     /// <inheritdoc/>
-    public string Category => Constants.Conventions.PermissionCategories.ContentCategory;
-
-    /// <inheritdoc/>
-    public string Icon => "icon-delete";
-
-    /// <inheritdoc/>
     public bool ShowInNotifier => true;
 
     /// <inheritdoc/>

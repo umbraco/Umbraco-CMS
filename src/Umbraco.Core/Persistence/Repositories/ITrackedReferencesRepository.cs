@@ -2,6 +2,9 @@ using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Persistence.Repositories;
 
+/// <summary>
+///     Represents a repository for tracking entity references and relations.
+/// </summary>
 public interface ITrackedReferencesRepository
 {
     /// <summary>

@@ -129,7 +129,7 @@ public class PropertyEditorValueEditorTests
     [Test]
     public void Value_Editor_Can_Serialize_Date_Value()
     {
-        var now = DateTime.Now;
+        var now = DateTime.UtcNow;
         var valueEditor = MockedValueEditors.CreateDataValueEditor(ValueTypes.Date);
 
         var prop = new Property(1, new PropertyType(Mock.Of<IShortStringHelper>(), "test", ValueStorageType.Date));

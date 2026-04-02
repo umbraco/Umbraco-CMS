@@ -11,11 +11,34 @@ namespace Umbraco.Cms.Core.Configuration.Models;
 [UmbracoOptions(Constants.Configuration.ConfigMemberPassword)]
 public class MemberPasswordConfigurationSettings : IPasswordConfiguration
 {
+    /// <summary>
+    ///     The default minimum required password length.
+    /// </summary>
     internal const int StaticRequiredLength = 10;
+
+    /// <summary>
+    ///     The default value for requiring non-letter or digit characters.
+    /// </summary>
     internal const bool StaticRequireNonLetterOrDigit = false;
+
+    /// <summary>
+    ///     The default value for requiring digit characters.
+    /// </summary>
     internal const bool StaticRequireDigit = false;
+
+    /// <summary>
+    ///     The default value for requiring lowercase characters.
+    /// </summary>
     internal const bool StaticRequireLowercase = false;
+
+    /// <summary>
+    ///     The default value for requiring uppercase characters.
+    /// </summary>
     internal const bool StaticRequireUppercase = false;
+
+    /// <summary>
+    ///     The default maximum failed access attempts before lockout.
+    /// </summary>
     internal const int StaticMaxFailedAccessAttemptsBeforeLockout = 5;
 
     /// <inheritdoc />

@@ -9,6 +9,6 @@ export const UMB_SORT_CHILDREN_OF_CONTENT_MODAL = new UmbModalToken<
 >(UMB_SORT_CHILDREN_OF_CONTENT_MODAL_ALIAS, {
 	modal: {
 		type: 'sidebar',
-		size: 'small',
+		size: 'medium',
 	},
 });

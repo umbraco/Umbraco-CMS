@@ -3,13 +3,23 @@ import type { UmbScriptCreateOptionsModalData } from './types.js';
 import { html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbCreateFolderEntityAction } from '@umbraco-cms/backoffice/tree';
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 
+/** @deprecated Use the `Umb.EntityAction.Script.Create` entity action with `entityCreateOptionAction` extensions instead. Scheduled for removal in Umbraco 19. */
 @customElement('umb-script-create-options-modal')
 export class UmbScriptCreateOptionsModalElement extends UmbModalBaseElement<UmbScriptCreateOptionsModalData, string> {
 	#createFolderAction?: UmbCreateFolderEntityAction;
 
 	override connectedCallback(): void {
 		super.connectedCallback();
+
+		new UmbDeprecation({
+			deprecated: 'UMB_SCRIPT_CREATE_OPTIONS_MODAL and its associated modal element are deprecated.',
+			removeInVersion: '19.0.0',
+			solution:
+				'Use the Umb.EntityAction.Script.Create entity action with entityCreateOptionAction extensions instead.',
+		}).warn();
+
 		if (!this.data?.parent) throw new Error('A parent is required to create a folder');
 
 		this.#createFolderAction = new UmbCreateFolderEntityAction(this, {
@@ -47,20 +57,21 @@ export class UmbScriptCreateOptionsModalElement extends UmbModalBaseElement<UmbS
 
 	override render() {
 		return html`
-			<umb-body-layout headline="Create Script">
-				<uui-box>
+			<uui-dialog-layout headline=${this.localize.term('general_create')}>
+				<uui-ref-list>
 					<!-- TODO: construct url -->
-					<uui-menu-item href=${this.#getCreateHref()} label="New Javascript file" @click=${this.#onNavigate}>
-						<uui-icon slot="icon" name="icon-document-js"></uui-icon>}
-					</uui-menu-item>
+					<umb-ref-item
+						name="Javascript file"
+						icon="icon-document-js"
+						href=${this.#getCreateHref()}
+						@click=${this.#onNavigate}>
+					</umb-ref-item>
 
-					<uui-menu-item @click=${this.#onCreateFolderClick} label="New Folder...">
-						<uui-icon slot="icon" name="icon-folder"></uui-icon>}
-					</uui-menu-item>
-				</uui-box>
+					<umb-ref-item name="Folder..." icon="icon-folder" @open=${this.#onCreateFolderClick}></umb-ref-item>
+				</uui-ref-list>
 
 				<uui-button slot="actions" id="cancel" label="Cancel" @click="${this._rejectModal}"></uui-button>
-			</umb-body-layout>
+			</uui-dialog-layout>
 		`;
 	}
 }

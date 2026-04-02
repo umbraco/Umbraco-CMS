@@ -10,6 +10,12 @@ namespace Umbraco.Cms.Core.Notifications;
 /// </summary>
 public class ScriptDeletedNotification : DeletedNotification<IScript>
 {
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="ScriptDeletedNotification"/> class
+    ///     with a single script.
+    /// </summary>
+    /// <param name="target">The script that was deleted.</param>
+    /// <param name="messages">The event messages collection.</param>
     public ScriptDeletedNotification(IScript target, EventMessages messages)
         : base(target, messages)
     {

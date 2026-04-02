@@ -20,20 +20,12 @@ public interface IDatabaseCacheRebuilder
     Task<bool> IsRebuildingAsync() => Task.FromResult(IsRebuilding());
 
     /// <summary>
-    /// Rebuilds the database cache.
-    /// </summary>
-    [Obsolete("Use the overload with the useBackgroundThread parameter. Scheduled for removal in Umbraco 17.")]
-    void Rebuild();
-
-    /// <summary>
     /// Rebuilds the database cache, optionally using a background thread.
     /// </summary>
     /// <param name="useBackgroundThread">Flag indicating whether to use a background thread for the operation and immediately return to the caller.</param>
     [Obsolete("Use RebuildAsync instead. Scheduled for removal in Umbraco 18.")]
     void Rebuild(bool useBackgroundThread)
-#pragma warning disable CS0618 // Type or member is obsolete
-        => Rebuild();
-#pragma warning restore CS0618 // Type or member is obsolete
+        => RebuildAsync(useBackgroundThread);
 
     /// <summary>
     /// Rebuilds the database cache, optionally using a background thread.

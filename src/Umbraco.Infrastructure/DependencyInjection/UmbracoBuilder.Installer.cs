@@ -20,6 +20,7 @@ public static partial class UmbracoBuilderExtensions
 
         // Add post migration notification handlers
         builder.AddNotificationHandler<UmbracoPlanExecutedNotification, ClearCsrfCookieHandler>();
+
         return builder;
     }
 }

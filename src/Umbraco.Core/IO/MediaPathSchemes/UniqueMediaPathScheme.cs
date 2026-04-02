@@ -11,6 +11,9 @@ public class UniqueMediaPathScheme : IMediaPathScheme
     private const int DirectoryLength = 8;
 
     /// <inheritdoc />
+    public bool SupportsGuid7 => false;
+
+    /// <inheritdoc />
     public string GetFilePath(MediaFileManager fileManager, Guid itemGuid, Guid propertyGuid, string filename)
     {
         // Shortening of the Guid to 8 chars risks collisions with GUIDs, which are expected to be very rare.
@@ -32,18 +35,22 @@ public class UniqueMediaPathScheme : IMediaPathScheme
     }
 
     /// <inheritdoc />
-    /// <remarks>
-    ///     <para>
-    ///         Returning null so that <see cref="MediaFileManager.DeleteMediaFiles(IEnumerable{string})" /> does *not*
-    ///         delete any directory. This is because the above shortening of the Guid to 8 chars
-    ///         means we're increasing the risk of collision, and we don't want to delete files
-    ///         belonging to other media items.
-    ///     </para>
-    ///     <para>
-    ///         And, at the moment, we cannot delete directory "only if it is empty" because of
-    ///         race conditions. We'd need to implement locks in <see cref="MediaFileManager" /> for
-    ///         this.
-    ///     </para>
-    /// </remarks>
-    public string? GetDeleteDirectory(MediaFileManager fileManager, string filepath) => null;
+    public string? GetDeleteDirectory(MediaFileManager fileManager, string filepath)
+    {
+        string? directory = Path.GetDirectoryName(filepath);
+
+        if (string.IsNullOrEmpty(directory))
+        {
+            return null;
+        }
+
+        IEnumerable<string> files = fileManager.FileSystem.GetFiles(directory);
+
+        if (files.Any())
+        {
+            return null;
+        }
+
+        return directory;
+    }
 }

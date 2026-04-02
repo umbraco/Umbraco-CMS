@@ -149,32 +149,29 @@ internal partial class BlockListElementLevelVariationTests
                     Guid.NewGuid(),
                     Guid.NewGuid(),
                     new BlockProperty(
-                        new List<BlockPropertyValue> {
+                        new List<BlockPropertyValue>
+                        {
                             new() { Alias = "invariantText", Value = "#1: The invariant content value" },
                             new() { Alias = "variantText", Value = "#1: The content value in English", Culture = "en-US" },
                             new() { Alias = "variantText", Value = "#1: The content value in Danish", Culture = "da-DK" }
                         },
                         [],
                         null,
-                        null
-                    )
-                ),
+                        null)),
                 (
                     Guid.NewGuid(),
                     Guid.NewGuid(),
                     new BlockProperty(
-                        new List<BlockPropertyValue> {
+                        new List<BlockPropertyValue>
+                        {
                             new() { Alias = "invariantText", Value = "#2: The invariant content value" },
                             new() { Alias = "variantText", Value = "#2: The content value in English", Culture = "en-US" },
                             new() { Alias = "variantText", Value = "#2: The content value in Danish", Culture = "da-DK" }
                         },
                         [],
                         null,
-                        null
-                    )
-                )
-            ]
-        );
+                        null))
+            ]);
 
         // only expose the first block in English and the second block in Danish (to make a difference between published and unpublished index values)
         blockListValue.Expose =
@@ -222,7 +219,7 @@ internal partial class BlockListElementLevelVariationTests
         Assert.IsNotNull(indexedValue);
         if (published)
         {
-            Assert.AreEqual("#1: The content value in English #1: The invariant content value", TrimAndStripNewlines(indexedValue));
+            Assert.AreEqual("#1: The invariant content value #1: The content value in English", TrimAndStripNewlines(indexedValue));
         }
         else
         {
@@ -391,6 +388,76 @@ internal partial class BlockListElementLevelVariationTests
             var values = indexedValue.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
             Assert.AreEqual(expectedIndexedValues.Length, values.Length);
             Assert.IsTrue(values.ContainsAll(expectedIndexedValues));
+        }
+    }
+
+    [TestCase(true)]
+    [TestCase(false)]
+    public async Task Can_Handle_Element_Property_Variance_Change(bool initialVaryByCulture)
+    {
+        var elementType = CreateElementType(ContentVariation.Culture);
+        if (initialVaryByCulture is false)
+        {
+            elementType.PropertyTypes.First(pt => pt.Alias == "variantText").Variations = ContentVariation.Nothing;
+            ContentTypeService.Save(elementType);
+        }
+
+        var blockListDataType = await CreateBlockListDataType(elementType);
+        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType);
+
+        var content = CreateContent(
+            contentType,
+            elementType,
+            new List<BlockPropertyValue>
+            {
+                new() { Alias = "invariantText", Value = "The invariant content value" },
+                new() { Alias = "variantText", Value = "The variant content value", Culture = initialVaryByCulture ? "en-US" : null },
+            },
+            [],
+            true);
+
+        // update the element type property according to the test case
+        elementType.PropertyTypes.First(pt => pt.Alias == "variantText").Variations = initialVaryByCulture ? ContentVariation.Nothing : ContentVariation.Culture;
+        ContentTypeService.Save(elementType);
+
+        var editor = blockListDataType.Editor!;
+        var indexValues = editor.PropertyIndexValueFactory.GetIndexValues(
+            content.Properties["blocks"]!,
+            culture: null,
+            segment: null,
+            published: true,
+            availableCultures: ["en-US"],
+            contentTypeDictionary: new Dictionary<Guid, IContentType>
+            {
+                { elementType.Key, elementType }, { contentType.Key, contentType }
+            })
+            .ToArray();
+
+        Assert.AreEqual(1, indexValues.Length);
+
+        // no changes have been made to the property value, so the indexer will index based on the previously stored value
+        var expectedIndexCulture = initialVaryByCulture ? "en-US" : null;
+        var indexValue = indexValues.FirstOrDefault(v => v.Culture == expectedIndexCulture);
+        Assert.IsNotNull(indexValue);
+        Assert.AreEqual(1, indexValue.Values.Count());
+
+        var indexedValue = indexValue.Values.First() as string;
+        Assert.IsNotNull(indexedValue);
+
+        var values = indexedValue.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
+
+        if (initialVaryByCulture)
+        {
+            // variant to invariant => the indexer skips the previous variant values
+            Assert.AreEqual(1, values.Length);
+            Assert.Contains("The invariant content value", values);
+        }
+        else
+        {
+            // invariant to variant => the indexer applies the previous invariant values to the available cultures
+            Assert.AreEqual(2, values.Length);
+            Assert.Contains("The variant content value", values);
+            Assert.Contains("The invariant content value", values);
         }
     }
 

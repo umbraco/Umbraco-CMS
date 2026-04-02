@@ -1,3 +1,5 @@
+export type * from './dynamic-root/types.js';
+
 export type UmbContentPickerSourceType = 'content' | 'member' | 'media';
 
 export type UmbContentPickerSource = {

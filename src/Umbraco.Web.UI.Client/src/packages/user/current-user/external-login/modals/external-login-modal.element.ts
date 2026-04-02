@@ -22,7 +22,7 @@ export class UmbCurrentUserExternalLoginModalElement extends UmbLitElement {
 	modalContext?: UmbModalContext;
 
 	@state()
-	_items: Array<UmbExternalLoginProviderOption> = [];
+	private _items: Array<UmbExternalLoginProviderOption> = [];
 
 	#currentUserRepository = new UmbCurrentUserRepository(this);
 	#notificationContext?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;

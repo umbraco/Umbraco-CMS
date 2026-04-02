@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Microsoft.Net.Http.Headers;
 using Umbraco.Cms.Api.Management.Security;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -139,15 +140,20 @@ public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAut
 
                 await securityStampValidator.ValidateAsync(ctx);
 
-                // We have to manually specify Issued and Expires,
-                // because the SecurityStampValidator refreshes the principal every 30 minutes,
-                // When the principal is refreshed the Issued is update to time of refresh, however, the Expires remains unchanged
-                // When we then try and renew, the difference of issued and expires effectively becomes the new ExpireTimeSpan
-                // meaning we effectively lose 30 minutes of our ExpireTimeSpan for EVERY principal refresh if we don't
-                // https://github.com/dotnet/aspnetcore/blob/main/src/Security/Authentication/Cookies/src/CookieAuthenticationHandler.cs#L115
-                ctx.Properties.IssuedUtc = _timeProvider.GetUtcNow();
-                ctx.Properties.ExpiresUtc = _timeProvider.GetUtcNow().Add(_globalSettings.TimeOut);
-                ctx.ShouldRenew = true;
+                // Only reset timestamps when a renewal was already triggered (by the SecurityStampValidator
+                // or by EnsureTicketRenewalIfKeepUserLoggedIn above).
+                // When the SecurityStampValidator refreshes the principal, it sets ShouldRenew but updates
+                // IssuedUtc without updating ExpiresUtc, causing the effective cookie lifetime to shrink
+                // with each validation. The manual reset here fixes that drift.
+                // IMPORTANT: Do NOT unconditionally set ShouldRenew or reset IssuedUtc - doing so prevents
+                // the SecurityStampValidator from ever exceeding its ValidationInterval during active use,
+                // which breaks AllowConcurrentLogins enforcement.
+                if (ctx.ShouldRenew)
+                {
+                    DateTimeOffset now = _timeProvider.GetUtcNow();
+                    ctx.Properties.IssuedUtc = now;
+                    ctx.Properties.ExpiresUtc = now.Add(_globalSettings.TimeOut);
+                }
             },
             OnSigningIn = ctx =>
             {
@@ -219,9 +225,43 @@ public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAut
                 }
 
                 return Task.CompletedTask;
-            }
+            },
+            // FIXME: We want to change this over to using an attribute on the backoffice controllers
+            // See this for more: https://github.com/dotnet/aspnetcore/issues/63093#issuecomment-3201530217
+            OnRedirectToLogin = context =>
+            {
+                if (IsXhr(context.Request))
+                {
+                    context.Response.Headers.Location = context.RedirectUri;
+                    context.Response.StatusCode = 401;
+                }
+                else
+                {
+                    context.Response.Redirect(context.RedirectUri);
+                }
+
+                return Task.CompletedTask;
+            },
+            OnRedirectToAccessDenied = context =>
+            {
+                if (IsXhr(context.Request))
+                {
+                    context.Response.Headers.Location = context.RedirectUri;
+                    context.Response.StatusCode = 403;
+                }
+                else
+                {
+                    context.Response.Redirect(context.RedirectUri);
+                }
+
+                return Task.CompletedTask;
+            },
         };
     }
+
+    private bool IsXhr(HttpRequest request) =>
+        string.Equals(request.Query[HeaderNames.XRequestedWith], "XMLHttpRequest", StringComparison.Ordinal) ||
+        string.Equals(request.Headers.XRequestedWith, "XMLHttpRequest", StringComparison.Ordinal);
 
     /// <summary>
     ///     Ensures the ticket is renewed if the <see cref="SecuritySettings.KeepUserLoggedIn" /> is set to true

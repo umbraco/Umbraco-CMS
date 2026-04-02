@@ -1,3 +1,4 @@
+using System.Globalization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
@@ -8,14 +9,13 @@ using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Net;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Tests.Common;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
@@ -87,7 +87,8 @@ public class MemberManagerTests
             new Mock<ILogger<UserManager<MemberIdentityUser>>>().Object,
             _mockPasswordConfiguration.Object,
             Mock.Of<IPublicAccessService>(),
-            Mock.Of<IHttpContextAccessor>());
+            Mock.Of<IHttpContextAccessor>(),
+            Mock.Of<IPublishedModelFactory>());
 
         validator.Setup(v => v.ValidateAsync(
                 userManager,
@@ -242,6 +243,36 @@ public class MemberManagerTests
 
         // assert
         Assert.IsFalse(result);
+    }
+
+    [Test]
+    public async Task GivenAUserExists_AndIncorrectCurrentPasswordIsProvided_ThenChangePasswordShouldReturnPasswordMismatchError()
+    {
+        // arrange
+        var currentPassword = "wrongPassword";
+        var newPassword = "newPassword123!";
+
+        var sut = CreateSut();
+
+        var fakeUser = CreateValidUser();
+        var fakeMember = CreateMember(fakeUser);
+
+        MockMemberServiceForCreateMember(fakeMember);
+
+        _mockMemberService.Setup(x => x.GetByUsername(It.Is<string>(y => y == fakeUser.UserName))).Returns(fakeMember);
+
+        _mockPasswordHasher
+            .Setup(x => x.VerifyHashedPassword(It.IsAny<MemberIdentityUser>(), It.IsAny<string>(), It.Is<string>(p => p == currentPassword)))
+            .Returns(PasswordVerificationResult.Failed);
+
+        // act
+        await sut.CreateAsync(fakeUser);
+        var result = await sut.ChangePasswordAsync(fakeUser, currentPassword, newPassword);
+
+        // assert
+        Assert.IsFalse(result.Succeeded);
+        var passwordMismatchError = result.Errors.FirstOrDefault(e => e.Code == nameof(IdentityErrorDescriber.PasswordMismatch));
+        Assert.IsNotNull(passwordMismatchError);
     }
 
     private static MemberIdentityUser CreateValidUser() =>

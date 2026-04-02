@@ -1,8 +1,10 @@
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Mapping.Content;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Collection;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentBlueprint;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Mapping;
@@ -11,13 +13,49 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Mapping.Document;
 
+/// <summary>
+/// Provides mapping configuration for documents in the Umbraco CMS API management layer.
+/// </summary>
 public class DocumentMapDefinition : ContentMapDefinition<IContent, DocumentValueResponseModel, DocumentVariantResponseModel>, IMapDefinition
 {
     private readonly CommonMapper _commonMapper;
 
-    public DocumentMapDefinition(PropertyEditorCollection propertyEditorCollection, CommonMapper commonMapper)
-        : base(propertyEditorCollection) => _commonMapper = commonMapper;
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DocumentMapDefinition"/> class, used for mapping document entities in the Umbraco CMS API management layer.
+    /// </summary>
+    /// <param name="propertyEditorCollection">A collection containing all available property editors used for mapping document properties.</param>
+    /// <param name="commonMapper">An instance of <see cref="CommonMapper"/> used for shared mapping logic.</param>
+    /// <param name="dataValueEditorFactory">A factory for creating data value editors required during the mapping process.</param>
+    public DocumentMapDefinition(
+        PropertyEditorCollection propertyEditorCollection,
+        CommonMapper commonMapper,
+        IDataValueEditorFactory dataValueEditorFactory)
+        : base(propertyEditorCollection, dataValueEditorFactory)
+        => _commonMapper = commonMapper;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Mapping.Document.DocumentMapDefinition"/> class.
+    /// </summary>
+    /// <param name="propertyEditorCollection">A <see cref="PropertyEditorCollection"/> containing the available property editors.</param>
+    /// <param name="commonMapper">An instance of <see cref="CommonMapper"/> used for common mapping operations.</param>
+    [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in Umbraco 18.")]
+    public DocumentMapDefinition(
+        PropertyEditorCollection propertyEditorCollection,
+        CommonMapper commonMapper)
+        : this(
+            propertyEditorCollection,
+            commonMapper,
+            StaticServiceProvider.Instance.GetRequiredService<IDataValueEditorFactory>())
+    {
+    }
+
+    /// <summary>
+    /// Configures the object mappings for document-related models in the Umbraco CMS API.
+    /// This method registers mappings between <see cref="IContent"/> and various document response models,
+    /// as well as between <see cref="ContentScheduleCollection"/> and <see cref="DocumentResponseModel"/>,
+    /// using the provided <paramref name="mapper"/>.
+    /// </summary>
+    /// <param name="mapper">The <see cref="IUmbracoMapper"/> instance used to define the mappings.</param>
     public void DefineMaps(IUmbracoMapper mapper)
     {
         mapper.Define<IContent, DocumentResponseModel>((_, _) => new DocumentResponseModel(), Map);
@@ -27,7 +65,7 @@ public class DocumentMapDefinition : ContentMapDefinition<IContent, DocumentValu
         mapper.Define<ContentScheduleCollection, DocumentResponseModel>(Map);
     }
 
-    // Umbraco.Code.MapAll -Urls -Template
+    // Umbraco.Code.MapAll -Urls -Template -Flags
     private void Map(IContent source, DocumentResponseModel target, MapperContext context)
     {
         target.Id = source.Key;
@@ -45,7 +83,7 @@ public class DocumentMapDefinition : ContentMapDefinition<IContent, DocumentValu
         target.IsTrashed = source.Trashed;
     }
 
-    // Umbraco.Code.MapAll -Urls -Template
+    // Umbraco.Code.MapAll -Urls -Template -Flags
     private void Map(IContent source, PublishedDocumentResponseModel target, MapperContext context)
     {
         target.Id = source.Key;
@@ -67,7 +105,7 @@ public class DocumentMapDefinition : ContentMapDefinition<IContent, DocumentValu
         target.IsTrashed = source.Trashed;
     }
 
-    // Umbraco.Code.MapAll -IsProtected -Ancestors
+    // Umbraco.Code.MapAll -IsProtected -Ancestors -Flags
     private void Map(IContent source, DocumentCollectionResponseModel target, MapperContext context)
     {
         target.Id = source.Key;
@@ -101,7 +139,7 @@ public class DocumentMapDefinition : ContentMapDefinition<IContent, DocumentValu
     }
 
 
-    // Umbraco.Code.MapAll
+    // Umbraco.Code.MapAll -Flags
     private void Map(IContent source, DocumentBlueprintResponseModel target, MapperContext context)
     {
         target.Id = source.Key;

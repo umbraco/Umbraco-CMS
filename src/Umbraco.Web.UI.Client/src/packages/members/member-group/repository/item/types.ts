@@ -1,7 +1,5 @@
-import type { UmbMemberGroupEntityType } from '../../entity.js';
+import type { UmbItemModel } from '@umbraco-cms/backoffice/entity-item';
 
-export interface UmbMemberGroupItemModel {
-	entityType: UmbMemberGroupEntityType;
-	unique: string;
+export interface UmbMemberGroupItemModel extends UmbItemModel {
 	name: string;
 }

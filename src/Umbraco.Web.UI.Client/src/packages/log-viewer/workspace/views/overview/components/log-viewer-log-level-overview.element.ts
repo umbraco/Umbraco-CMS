@@ -1,23 +1,26 @@
-import type { UmbLogViewerWorkspaceContext } from '../../../logviewer-workspace.context.js';
 import { UMB_APP_LOG_VIEWER_CONTEXT } from '../../../logviewer-workspace.context-token.js';
 import { html, nothing, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { LoggerResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { consumeContext } from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-log-viewer-log-level-overview')
 export class UmbLogViewerLogLevelOverviewElement extends UmbLitElement {
-	#logViewerContext?: UmbLogViewerWorkspaceContext;
-	constructor() {
-		super();
-		this.consumeContext(UMB_APP_LOG_VIEWER_CONTEXT, (instance) => {
-			this.#logViewerContext = instance;
-			this.#logViewerContext?.getSavedSearches();
-			this.#observeLogLevels();
-		});
+	#logViewerContext?: typeof UMB_APP_LOG_VIEWER_CONTEXT.TYPE;
+
+	@consumeContext({ context: UMB_APP_LOG_VIEWER_CONTEXT })
+	private set _logViewerContext(value) {
+		this.#logViewerContext = value;
+		this.#logViewerContext?.getSavedSearches();
+		this.#observeLogLevels();
+	}
+	private get _logViewerContext() {
+		return this.#logViewerContext;
 	}
 
 	@state()
 	private _loggers: LoggerResponseModel[] = [];
+
 	/**
 	 * The name of the logger to get the level for. Defaults to 'Global'.
 	 * @memberof UmbLogViewerLogLevelOverviewElement
@@ -26,8 +29,7 @@ export class UmbLogViewerLogLevelOverviewElement extends UmbLitElement {
 	loggerName = 'Global';
 
 	#observeLogLevels() {
-		if (!this.#logViewerContext) return;
-		this.observe(this.#logViewerContext.loggers, (loggers) => {
+		this.observe(this._logViewerContext?.loggers, (loggers) => {
 			this._loggers = loggers ?? [];
 		});
 	}

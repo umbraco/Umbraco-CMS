@@ -42,5 +42,8 @@ public interface IEntity : IDeepCloneable
     /// </summary>
     bool HasIdentity { get; }
 
+    /// <summary>
+    ///     Resets the entity identity by clearing the <see cref="Id" /> and <see cref="Key" /> properties.
+    /// </summary>
     void ResetIdentity();
 }

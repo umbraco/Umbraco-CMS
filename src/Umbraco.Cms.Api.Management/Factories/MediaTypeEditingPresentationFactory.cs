@@ -7,6 +7,11 @@ namespace Umbraco.Cms.Api.Management.Factories;
 
 internal sealed class MediaTypeEditingPresentationFactory : ContentTypeEditingPresentationFactory<IMediaType>, IMediaTypeEditingPresentationFactory
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Factories.MediaTypeEditingPresentationFactory"/> class,
+    /// providing the required media type service dependency.
+    /// </summary>
+    /// <param name="mediaTypeService">The service used to manage media types.</param>
     public MediaTypeEditingPresentationFactory(IMediaTypeService mediaTypeService)
         : base(mediaTypeService)
     {
@@ -33,6 +38,11 @@ internal sealed class MediaTypeEditingPresentationFactory : ContentTypeEditingPr
         return createModel;
     }
 
+    /// <summary>
+    /// Maps the given <see cref="UpdateMediaTypeRequestModel"/> to a <see cref="MediaTypeUpdateModel"/>.
+    /// </summary>
+    /// <param name="requestModel">The request model containing the media type update data.</param>
+    /// <returns>A <see cref="MediaTypeUpdateModel"/> representing the updated media type.</returns>
     public MediaTypeUpdateModel MapUpdateModel(UpdateMediaTypeRequestModel requestModel)
     {
         MediaTypeUpdateModel updateModel = MapContentTypeEditingModel<
@@ -51,6 +61,11 @@ internal sealed class MediaTypeEditingPresentationFactory : ContentTypeEditingPr
         return updateModel;
     }
 
+    /// <summary>
+    /// Maps a collection of content type available compositions to a collection of available media type composition response models.
+    /// </summary>
+    /// <param name="compositionResults">The collection of content type available compositions to map.</param>
+    /// <returns>A collection of available media type composition response models.</returns>
     public IEnumerable<AvailableMediaTypeCompositionResponseModel> MapCompositionModels(IEnumerable<ContentTypeAvailableCompositionsResult> compositionResults)
         => compositionResults.Select(MapCompositionModel<AvailableMediaTypeCompositionResponseModel>);
 

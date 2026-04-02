@@ -17,6 +17,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Template.Query;
 
+/// <summary>
+/// Controller that executes template queries in the Umbraco CMS Management API.
+/// </summary>
 [ApiVersion("1.0")]
 public class ExecuteTemplateQueryController : TemplateQueryControllerBase
 {
@@ -28,6 +31,14 @@ public class ExecuteTemplateQueryController : TemplateQueryControllerBase
 
     private static readonly string _indent = $"{Environment.NewLine}    ";
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Controllers.Template.Query.ExecuteTemplateQueryController"/> class with the specified dependencies.
+    /// </summary>
+    /// <param name="publishedContentQuery">The service used to query published content.</param>
+    /// <param name="publishedValueFallback">The service used to provide fallback values for published content properties.</param>
+    /// <param name="contentTypeService">The service used to manage content types.</param>
+    /// <param name="documentNavigationQueryService">The service used to query document navigation structures.</param>
+    /// <param name="publishedContentStatusFilteringService">The service used to filter published content by status.</param>
     [ActivatorUtilitiesConstructor]
     public ExecuteTemplateQueryController(
         IPublishedContentQuery publishedContentQuery,
@@ -43,44 +54,11 @@ public class ExecuteTemplateQueryController : TemplateQueryControllerBase
         _publishedContentStatusFilteringService = publishedContentStatusFilteringService;
     }
 
-    [Obsolete("Please use the non-obsolete constructor. Will be removed in V17.")]
-    public ExecuteTemplateQueryController(
-        IPublishedContentQuery publishedContentQuery,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedValueFallback publishedValueFallback,
-        IContentTypeService contentTypeService,
-        IPublishedContentCache contentCache,
-        IDocumentNavigationQueryService documentNavigationQueryService,
-        IPublishedContentStatusFilteringService publishedContentStatusFilteringService)
-        : this(
-            publishedContentQuery,
-            publishedValueFallback,
-            contentTypeService,
-            documentNavigationQueryService,
-            publishedContentStatusFilteringService)
-    {
-    }
-
-    [Obsolete("Please use the non-obsolete constructor. Will be removed in V17.")]
-    public ExecuteTemplateQueryController(
-        IPublishedContentQuery publishedContentQuery,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedValueFallback publishedValueFallback,
-        IContentTypeService contentTypeService,
-        IPublishedContentCache contentCache,
-        IDocumentNavigationQueryService documentNavigationQueryService)
-        : this(
-            publishedContentQuery,
-            publishedValueFallback,
-            contentTypeService,
-            documentNavigationQueryService,
-            StaticServiceProvider.Instance.GetRequiredService<IPublishedContentStatusFilteringService>())
-    {
-    }
-
     [HttpPost("execute")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(TemplateQueryResultResponseModel), StatusCodes.Status200OK)]
+    [EndpointSummary("Executes a template query.")]
+    [EndpointDescription("Executes a template query with the provided parameters and returns the matching content results with execution metrics.")]
     public Task<ActionResult<TemplateQueryResultResponseModel>> Execute(
         CancellationToken cancellationToken,
         TemplateQueryExecuteModel query)

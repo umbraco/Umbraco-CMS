@@ -28,6 +28,17 @@ internal sealed class ImportPackageBuilderExpression : MigrationExpressionBase
 
     private bool _executed;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Packaging.ImportPackageBuilderExpression"/> class.
+    /// </summary>
+    /// <param name="packagingService">The <see cref="IPackagingService"/> used for package operations.</param>
+    /// <param name="mediaService">The <see cref="IMediaService"/> used to manage media items.</param>
+    /// <param name="mediaFileManager">The <see cref="MediaFileManager"/> responsible for handling media files.</param>
+    /// <param name="mediaUrlGenerators">The <see cref="MediaUrlGeneratorCollection"/> containing media URL generators.</param>
+    /// <param name="shortStringHelper">The <see cref="IShortStringHelper"/> used for string manipulation and formatting.</param>
+    /// <param name="contentTypeBaseServiceProvider">The <see cref="IContentTypeBaseServiceProvider"/> for accessing content type services.</param>
+    /// <param name="context">The <see cref="IMigrationContext"/> representing the current migration context.</param>
+    /// <param name="packageMigrationSettings">The <see cref="IOptions{PackageMigrationSettings}"/> providing package migration settings.</param>
     public ImportPackageBuilderExpression(
         IPackagingService packagingService,
         IMediaService mediaService,
@@ -53,8 +64,19 @@ internal sealed class ImportPackageBuilderExpression : MigrationExpressionBase
     /// </summary>
     public Type? EmbeddedResourceMigrationType { get; set; }
 
+    /// <summary>
+    /// Gets or sets the XML document representing the package data manifest.
+    /// </summary>
     public XDocument? PackageDataManifest { get; set; }
 
+    /// <summary>
+    /// Executes the import package builder expression, installing package data and handling associated media files.
+    /// </summary>
+    /// <remarks>
+    /// This method installs compiled package data and, if present, extracts and saves media files from embedded resources or package manifests.
+    /// It throws an <see cref="InvalidOperationException"/> if the expression has already been executed, or if neither <c>EmbeddedResourceMigrationType</c> nor <c>PackageDataManifest</c> is set.
+    /// If schema and content migrations are disabled in the configuration, the method logs this and returns without performing installation.
+    /// </remarks>
     public override void Execute()
     {
         if (_executed)

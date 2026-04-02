@@ -1,7 +1,9 @@
 import type { UmbTreeExpansionModel } from './types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import { UmbEntityExpansionManager } from '@umbraco-cms/backoffice/utils';
+import type { Observable } from '@umbraco-cms/backoffice/observable-api';
+import type { UmbEntityExpansionEntryModel } from '@umbraco-cms/backoffice/utils';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
-import { UmbArrayState, type Observable } from '@umbraco-cms/backoffice/observable-api';
 
 /**
  * Manages the expansion state of a tree
@@ -10,8 +12,18 @@ import { UmbArrayState, type Observable } from '@umbraco-cms/backoffice/observab
  * @augments {UmbControllerBase}
  */
 export class UmbTreeExpansionManager extends UmbControllerBase {
-	#expansion = new UmbArrayState<UmbEntityModel>([], (x) => x.unique);
-	expansion = this.#expansion.asObservable();
+	#manager = new UmbEntityExpansionManager(this);
+	expansion = this.#manager.expansion;
+
+	/**
+	 * Observe the expansion entry for a specific entity
+	 * @param {UmbEntityModel} entity - The entity to observe
+	 * @returns {Observable<UmbEntityExpansionEntryModel | undefined>} - An observable of the expansion entry
+	 * @memberof UmbTreeExpansionManager
+	 */
+	entry(entity: UmbEntityModel): Observable<UmbEntityExpansionEntryModel | undefined> {
+		return this.#manager.entry(entity);
+	}
 
 	/**
 	 * Checks if an entity is expanded
@@ -22,9 +34,7 @@ export class UmbTreeExpansionManager extends UmbControllerBase {
 	 * @memberof UmbTreeExpansionManager
 	 */
 	isExpanded(entity: UmbEntityModel): Observable<boolean> {
-		return this.#expansion.asObservablePart((entries) =>
-			entries?.some((entry) => entry.entityType === entity.entityType && entry.unique === entity.unique),
-		);
+		return this.#manager.isExpanded(entity);
 	}
 
 	/**
@@ -34,7 +44,7 @@ export class UmbTreeExpansionManager extends UmbControllerBase {
 	 * @returns {void}
 	 */
 	setExpansion(expansion: UmbTreeExpansionModel): void {
-		this.#expansion.setValue(expansion);
+		this.#manager.setExpansion(expansion);
 	}
 
 	/**
@@ -43,7 +53,7 @@ export class UmbTreeExpansionManager extends UmbControllerBase {
 	 * @returns {UmbTreeExpansionModel} The expansion state
 	 */
 	getExpansion(): UmbTreeExpansionModel {
-		return this.#expansion.getValue();
+		return this.#manager.getExpansion();
 	}
 
 	/**
@@ -54,8 +64,8 @@ export class UmbTreeExpansionManager extends UmbControllerBase {
 	 * @memberof UmbTreeExpansionManager
 	 * @returns {Promise<void>}
 	 */
-	public async expandItem(entity: UmbEntityModel): Promise<void> {
-		this.#expansion.appendOne(entity);
+	public async expandItem(entity: UmbEntityExpansionEntryModel): Promise<void> {
+		this.#manager.expandItem(entity);
 	}
 
 	/**
@@ -67,7 +77,7 @@ export class UmbTreeExpansionManager extends UmbControllerBase {
 	 * @returns {Promise<void>}
 	 */
 	public async collapseItem(entity: UmbEntityModel): Promise<void> {
-		this.#expansion.filter((x) => x.entityType !== entity.entityType || x.unique !== entity.unique);
+		this.#manager.collapseItem(entity);
 	}
 
 	/**
@@ -76,6 +86,18 @@ export class UmbTreeExpansionManager extends UmbControllerBase {
 	 * @returns {Promise<void>}
 	 */
 	public async collapseAll(): Promise<void> {
-		this.#expansion.setValue([]);
+		this.#manager.collapseAll();
+	}
+
+	/**
+	 * Gets a tree item from the expansion state
+	 * @param {UmbEntityModel} entity The entity to get
+	 * @param {string} entity.entityType The entity type
+	 * @param {string} entity.unique The unique key
+	 * @returns {*}  {(Promise<UmbEntityExpansionEntryModel | undefined>)}
+	 * @memberof UmbEntityExpansionManager
+	 */
+	public async getItem(entity: UmbEntityModel): Promise<UmbEntityExpansionEntryModel | undefined> {
+		return this.#manager.getItem(entity);
 	}
 }

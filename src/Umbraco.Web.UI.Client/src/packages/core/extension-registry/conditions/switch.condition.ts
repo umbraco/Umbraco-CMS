@@ -44,6 +44,7 @@ export const manifest: ManifestCondition = {
 	api: UmbSwitchCondition,
 };
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export type SwitchConditionConfig = UmbConditionConfigBase<'Umb.Condition.Switch'> & {
 	frequency: string;
 };

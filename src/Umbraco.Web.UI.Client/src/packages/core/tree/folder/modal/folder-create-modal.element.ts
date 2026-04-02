@@ -9,7 +9,7 @@ export class UmbFolderCreateModalElement extends UmbFolderModalElementBase<
 	UmbFolderCreateModalValue
 > {
 	@state()
-	_folderScaffold?: UmbFolderModel;
+	private _folderScaffold?: UmbFolderModel;
 
 	constructor() {
 		super();

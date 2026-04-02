@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.Configuration;
 using Umbraco.Cms.Api.Common.DependencyInjection;
 using Umbraco.Cms.Api.Management.Configuration;
@@ -16,11 +16,18 @@ namespace Umbraco.Extensions;
 
 public static partial class UmbracoBuilderExtensions
 {
+    /// <summary>
+    /// Registers and configures all services, controllers, and options required for the Umbraco Management API.
+    /// This includes endpoints and features for managing Umbraco backoffice resources via HTTP APIs.
+    /// </summary>
+    /// <param name="builder">The <see cref="IUmbracoBuilder"/> to add the Management API services to.</param>
+    /// <returns>The <see cref="IUmbracoBuilder"/> instance with Management API services configured.</returns>
     public static IUmbracoBuilder AddUmbracoManagementApi(this IUmbracoBuilder builder)
     {
         IServiceCollection services = builder.Services;
         builder.Services.AddSingleton<BackOfficeAreaRoutes>();
         builder.Services.AddSingleton<BackOfficeExternalLoginProviderErrorMiddleware>();
+        builder.Services.AddSingleton<IManagementApiRouteBuilder, ManagementApiRouteBuilder>();
         builder.Services.AddUnique<IConflictingRouteService, ConflictingRouteService>();
         builder.AddUmbracoApiOpenApiUI();
 
@@ -71,7 +78,8 @@ public static partial class UmbracoBuilderExtensions
                 .AddUserData()
                 .AddSegment()
                 .AddExport()
-                .AddImport();
+                .AddImport()
+                .AddNewsDashboard();
 
             services
                 .ConfigureOptions<ConfigureApiBehaviorOptions>()
@@ -94,6 +102,8 @@ public static partial class UmbracoBuilderExtensions
                     endpoints: applicationBuilder => applicationBuilder.UseEndpoints()));
             });
         }
+
+        builder.AddCollectionBuilders();
 
         return builder;
     }

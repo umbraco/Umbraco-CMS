@@ -12,7 +12,8 @@ import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 @customElement('umb-input-content-type-collection-configuration')
 export class UmbInputContentTypeCollectionConfigurationElement extends UmbFormControlMixin<
 	string,
-	typeof UmbLitElement
+	typeof UmbLitElement,
+	undefined
 >(UmbLitElement) {
 	protected override getFormElement() {
 		return undefined;

@@ -138,4 +138,22 @@ export class UmbPaginationManager extends EventTarget {
 		const skip = Math.max(0, (this.#currentPage.getValue() - 1) * this.#pageSize.getValue());
 		this.#skip.setValue(skip);
 	}
+
+	/**
+	 * Gets the index of the first item on the current page (for display).
+	 * @returns {number}
+	 * @memberof UmbPaginationManager
+	 */
+	public getDisplayStart(): number {
+		return this.getSkip() + 1;
+	}
+
+	/**
+	 * Gets the index of the last item on the current page (for display).
+	 * @returns {number}
+	 * @memberof UmbPaginationManager
+	 */
+	public getDisplayEnd(): number {
+		return Math.min(this.getSkip() + this.getPageSize(), this.getTotalItems());
+	}
 }

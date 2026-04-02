@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Api.Management.ViewModels;
+using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.ContentType;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
@@ -6,6 +6,12 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Mapping.ContentType;
 
+/// <summary>
+/// Provides mapping configuration for a content type, including its property types and property type containers.
+/// </summary>
+/// <typeparam name="TContentType">The content type being mapped.</typeparam>
+/// <typeparam name="TPropertyTypeModel">The model type representing a property type.</typeparam>
+/// <typeparam name="TPropertyTypeContainerModel">The model type representing a property type container.</typeparam>
 public abstract class ContentTypeMapDefinition<TContentType, TPropertyTypeModel, TPropertyTypeContainerModel>
     where TContentType : IContentTypeBase
     where TPropertyTypeModel : PropertyTypeModelBase, new()

@@ -6,7 +6,10 @@ import { pagedResult } from '../utils/paged-result.js';
 import type { UmbMockMemberGroupModel } from './member-group.data.js';
 import { data } from './member-group.data.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import type { MemberGroupItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type {
+	MemberGroupItemResponseModel,
+	MemberGroupResponseModel,
+} from '@umbraco-cms/backoffice/external/backend-api';
 
 const memberGroupQueryFilter = (filterOptions: any, item: UmbMockMemberGroupModel) =>
 	queryFilter(filterOptions.filter, item.name);
@@ -39,10 +42,11 @@ const createDetailMockMapper = (request: any): UmbMockMemberGroupModel => {
 	return {
 		id: request.id ? request.id : UmbId.new(),
 		name: request.name,
+		flags: [],
 	};
 };
 
-const detailResponseMapper = (item: UmbMockMemberGroupModel): any => {
+const detailResponseMapper = (item: UmbMockMemberGroupModel): MemberGroupResponseModel => {
 	return {
 		id: item.id,
 		name: item.name,
@@ -53,6 +57,7 @@ const itemResponseMapper = (item: UmbMockMemberGroupModel): MemberGroupItemRespo
 	return {
 		id: item.id,
 		name: item.name,
+		flags: item.flags,
 	};
 };
 

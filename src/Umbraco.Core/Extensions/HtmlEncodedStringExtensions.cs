@@ -3,6 +3,9 @@ using Umbraco.Cms.Core.Strings;
 
 namespace Umbraco.Extensions;
 
+/// <summary>
+/// Provides extension methods for <see cref="IHtmlEncodedString"/>.
+/// </summary>
 public static class HtmlEncodedStringExtensions
 {
     /// <summary>

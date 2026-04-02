@@ -15,14 +15,22 @@ using Umbraco.Cms.Infrastructure.Logging.Serilog;
 
 namespace Umbraco.Extensions
 {
+    /// <summary>
+    /// Provides extension methods for configuring Serilog-based logging within Umbraco applications.
+    /// </summary>
     public static class LoggerConfigExtensions
     {
         /// <summary>
-        /// This configures Serilog with some defaults
-        /// Such as adding ProcessID, Thread, AppDomain etc
-        /// It is highly recommended that you keep/use this default in your own logging config customizations
+        /// Configures Serilog with recommended default enrichers and settings for Umbraco applications.
+        /// This includes adding enrichers such as ProcessID, Thread, AppDomain, and others.
+        /// It is highly recommended to retain or use this default configuration when customizing logging in your application.
         /// </summary>
-        [Obsolete("Please use an alternative method. This will be removed in Umbraco 13.")]
+        /// <param name="logConfig">The <see cref="LoggerConfiguration"/> instance to configure.</param>
+        /// <param name="hostingEnvironment">The current Umbraco hosting environment.</param>
+        /// <param name="loggingConfiguration">The logging configuration settings.</param>
+        /// <param name="configuration">The application configuration instance.</param>
+        /// <returns>The configured <see cref="LoggerConfiguration"/> instance with Umbraco defaults applied.</returns>
+        [Obsolete("Please use an alternative method. Scheduled for removal from Umbraco 13.")]
         public static LoggerConfiguration MinimalConfiguration(
             this LoggerConfiguration logConfig,
             Umbraco.Cms.Core.Hosting.IHostingEnvironment hostingEnvironment,
@@ -33,11 +41,16 @@ namespace Umbraco.Extensions
         }
 
         /// <summary>
-        /// This configures Serilog with some defaults
-        /// Such as adding ProcessID, Thread, AppDomain etc
-        /// It is highly recommended that you keep/use this default in your own logging config customizations
+        /// Configures Serilog with recommended default enrichers and settings, such as adding ProcessID, Thread, and AppDomain information.
+        /// It is highly recommended to retain this default configuration when customizing logging in your application.
         /// </summary>
-        [Obsolete("Please use an alternative method. This will be removed in Umbraco 13.")]
+        /// <param name="logConfig">The <see cref="LoggerConfiguration"/> instance to configure.</param>
+        /// <param name="hostingEnvironment">Provides information about the hosting environment.</param>
+        /// <param name="loggingConfiguration">The logging configuration settings.</param>
+        /// <param name="configuration">The application configuration.</param>
+        /// <param name="umbFileConfiguration">When this method returns, contains the Umbraco file configuration.</param>
+        /// <returns>The configured <see cref="LoggerConfiguration"/> instance.</returns>
+        [Obsolete("Please use an alternative method. Scheduled for removal from Umbraco 13.")]
         public static LoggerConfiguration MinimalConfiguration(
             this LoggerConfiguration logConfig,
             Umbraco.Cms.Core.Hosting.IHostingEnvironment hostingEnvironment,
@@ -68,7 +81,7 @@ namespace Umbraco.Extensions
             umbFileConfiguration = umbracoFileConfiguration;
 
             logConfig.WriteTo.UmbracoFile(
-                path : umbracoFileConfiguration.GetPath(loggingConfiguration.LogDirectory),
+                path: umbracoFileConfiguration.GetPath(loggingConfiguration.LogDirectory),
                 fileSizeLimitBytes: umbracoFileConfiguration.FileSizeLimitBytes,
                 restrictedToMinimumLevel: umbracoFileConfiguration.RestrictedToMinimumLevel,
                 rollingInterval: umbracoFileConfiguration.RollingInterval,
@@ -79,12 +92,15 @@ namespace Umbraco.Extensions
             return logConfig;
         }
 
-
         /// <summary>
-        /// This configures Serilog with some defaults
-        /// Such as adding ProcessID, Thread, AppDomain etc
-        /// It is highly recommended that you keep/use this default in your own logging config customizations
+        /// Configures Serilog with recommended default enrichers and settings, such as adding ProcessID, Thread, and AppDomain information.
+        /// It is highly recommended to retain this default configuration when customizing your own logging setup.
         /// </summary>
+        /// <param name="logConfig">The <see cref="LoggerConfiguration"/> instance to configure.</param>
+        /// <param name="hostingEnvironment">The Umbraco hosting environment.</param>
+        /// <param name="loggingConfiguration">The logging configuration settings.</param>
+        /// <param name="configuration">The application configuration.</param>
+        /// <returns>The configured <see cref="LoggerConfiguration"/> instance.</returns>
         public static LoggerConfiguration MinimalConfiguration(
             this LoggerConfiguration logConfig,
             IHostEnvironment hostEnvironment,
@@ -108,26 +124,29 @@ namespace Umbraco.Extensions
                 .Enrich.With<Log4NetLevelMapperEnricher>()
                 .Enrich.FromLogContext(); // allows us to dynamically enrich
 
-            logConfig.WriteTo.UmbracoFile(
-                path: umbracoFileConfiguration.GetPath(loggingConfiguration.LogDirectory, loggingConfiguration.LogFileNameFormat, loggingConfiguration.GetLogFileNameFormatArguments()),
-                fileSizeLimitBytes: umbracoFileConfiguration.FileSizeLimitBytes,
-                restrictedToMinimumLevel: umbracoFileConfiguration.RestrictedToMinimumLevel,
-                rollingInterval: umbracoFileConfiguration.RollingInterval,
-                flushToDiskInterval: umbracoFileConfiguration.FlushToDiskInterval,
-                rollOnFileSizeLimit: umbracoFileConfiguration.RollOnFileSizeLimit,
-                retainedFileCountLimit: umbracoFileConfiguration.RetainedFileCountLimit);
+            if (umbracoFileConfiguration.Enabled)
+            {
+                logConfig.WriteTo.UmbracoFile(
+                    path: umbracoFileConfiguration.GetPath(loggingConfiguration.LogDirectory, loggingConfiguration.LogFileNameFormat, loggingConfiguration.GetLogFileNameFormatArguments()),
+                    fileSizeLimitBytes: umbracoFileConfiguration.FileSizeLimitBytes,
+                    restrictedToMinimumLevel: umbracoFileConfiguration.RestrictedToMinimumLevel,
+                    rollingInterval: umbracoFileConfiguration.RollingInterval,
+                    flushToDiskInterval: umbracoFileConfiguration.FlushToDiskInterval,
+                    rollOnFileSizeLimit: umbracoFileConfiguration.RollOnFileSizeLimit,
+                    retainedFileCountLimit: umbracoFileConfiguration.RetainedFileCountLimit);
+            }
 
             return logConfig;
         }
 
         /// <summary>
-        /// Outputs a .txt format log at /App_Data/Logs/
+        /// Outputs a .txt format log at /App_Data/Logs/ in a format similar to the older Log4Net output.
         /// </summary>
-        /// <param name="logConfig">A Serilog LoggerConfiguration</param>
-        /// <param name="hostingEnvironment"></param>
-        /// <param name="minimumLevel">The log level you wish the JSON file to collect - default is Verbose (highest)</param>
-        ///
-        [Obsolete("Will be removed in Umbraco 13.")]
+        /// <param name="logConfig">The Serilog LoggerConfiguration to configure.</param>
+        /// <param name="hostingEnvironment">The hosting environment used to resolve the log file path.</param>
+        /// <param name="minimumLevel">The minimum log level to write to the text file; default is Verbose (logs all events).</param>
+        /// <returns>The updated LoggerConfiguration.</returns>
+        [Obsolete("Scheduled for removal from Umbraco 13.")]
         public static LoggerConfiguration OutputDefaultTextFile(
             this LoggerConfiguration logConfig,
             Umbraco.Cms.Core.Hosting.IHostingEnvironment hostingEnvironment,
@@ -136,7 +155,7 @@ namespace Umbraco.Extensions
             //Main .txt logfile - in similar format to older Log4Net output
             //Ends with ..txt as Date is inserted before file extension substring
             logConfig.WriteTo.File(
-                Path.Combine(hostingEnvironment.MapPathContentRoot(Cms.Core.Constants.SystemDirectories.LogFiles),  $"UmbracoTraceLog.{Environment.MachineName}..txt"),
+                Path.Combine(hostingEnvironment.MapPathContentRoot(Cms.Core.Constants.SystemDirectories.LogFiles), $"UmbracoTraceLog.{Environment.MachineName}..txt"),
                 shared: true,
                 rollingInterval: RollingInterval.Day,
                 restrictedToMinimumLevel: minimumLevel,
@@ -172,8 +191,23 @@ namespace Umbraco.Extensions
             return logConfig;
         }
 
+        /// <summary>
+        /// Configures a Serilog file sink for logging with Umbraco-specific defaults.
+        /// </summary>
+        /// <param name="configuration">The logger sink configuration to extend.</param>
+        /// <param name="path">The file path where log entries will be written.</param>
+        /// <param name="formatter">An optional text formatter for log entries. If not specified, a compact JSON formatter is used.</param>
+        /// <param name="restrictedToMinimumLevel">The minimum log event level required to write to the sink. Defaults to Verbose.</param>
+        /// <param name="levelSwitch">An optional level switch to dynamically control the minimum log level.</param>
+        /// <param name="fileSizeLimitBytes">The maximum size, in bytes, for a single log file before rolling. Defaults to 1 GB.</param>
+        /// <param name="flushToDiskInterval">The interval at which log entries are flushed to disk. If null, the default Serilog behavior is used.</param>
+        /// <param name="rollingInterval">The interval at which log files are rolled (e.g., daily). Defaults to daily rolling.</param>
+        /// <param name="rollOnFileSizeLimit">If true, rolls the log file when the size limit is reached.</param>
+        /// <param name="retainedFileCountLimit">The maximum number of log files to retain. Older files are deleted. Defaults to 31.</param>
+        /// <param name="encoding">The text encoding to use for the log file. If null, UTF-8 is used.</param>
+        /// <returns>The logger configuration with the file sink applied.</returns>
         /// <remarks>
-        ///    Used in config - If renamed or moved to other assembly the config file also has be updated.
+        /// Used in configuration files. If this method is renamed or moved to another assembly, the configuration file must also be updated accordingly.
         /// </remarks>
         public static LoggerConfiguration UmbracoFile(
             this LoggerSinkConfiguration configuration,
@@ -213,16 +247,16 @@ namespace Umbraco.Extensions
                         null));
         }
 
-
         /// <summary>
-        /// Outputs a CLEF format JSON log at /App_Data/Logs/
+        /// Configures the logger to output a CLEF (Compact Log Event Format) JSON log file to the <c>/App_Data/Logs/</c> directory.
         /// </summary>
-        /// <param name="logConfig">A Serilog LoggerConfiguration</param>
-        /// <param name="loggingConfiguration">The logging configuration</param>
-        /// <param name="minimumLevel">The log level you wish the JSON file to collect - default is Verbose (highest)</param>
-        /// <param name="hostingEnvironment"></param>
-        /// <param name="retainedFileCount">The number of days to keep log files. Default is set to null which means all logs are kept</param>
-        [Obsolete("Will be removed in Umbraco 13.")]
+        /// <param name="logConfig">The Serilog <see cref="LoggerConfiguration"/> to configure.</param>
+        /// <param name="hostingEnvironment">The current Umbraco hosting environment, used to resolve the log file path.</param>
+        /// <param name="loggingConfiguration">The logging configuration settings.</param>
+        /// <param name="minimumLevel">The minimum <see cref="Serilog.Events.LogEventLevel"/> to log. Defaults to <c>Verbose</c> (logs all events).</param>
+        /// <param name="retainedFileCount">The number of days to retain log files. If <c>null</c>, all log files are kept indefinitely.</param>
+        /// <returns>The configured <see cref="LoggerConfiguration"/> instance.</returns>
+        [Obsolete("Scheduled for removal from Umbraco 13.")]
         public static LoggerConfiguration OutputDefaultJsonFile(
             this LoggerConfiguration logConfig,
             Umbraco.Cms.Core.Hosting.IHostingEnvironment hostingEnvironment,
@@ -234,7 +268,7 @@ namespace Umbraco.Extensions
             // Ends with ..txt as Date is inserted before file extension substring
             logConfig.WriteTo.File(
                 new CompactJsonFormatter(),
-                Path.Combine(hostingEnvironment.MapPathContentRoot(Cms.Core.Constants.SystemDirectories.LogFiles) ,$"UmbracoTraceLog.{Environment.MachineName}..json"),
+                Path.Combine(hostingEnvironment.MapPathContentRoot(Cms.Core.Constants.SystemDirectories.LogFiles), $"UmbracoTraceLog.{Environment.MachineName}..json"),
                 shared: true,
                 rollingInterval: RollingInterval.Day, // Create a new JSON file every day
                 retainedFileCountLimit: retainedFileCount, // Setting to null means we keep all files - default is 31 days
@@ -244,13 +278,14 @@ namespace Umbraco.Extensions
         }
 
         /// <summary>
-        /// Outputs a CLEF format JSON log at /App_Data/Logs/
+        /// Configures the logger to output logs in CLEF (Compact Log Event Format) JSON format to the <c>/App_Data/Logs/</c> directory.
         /// </summary>
-        /// <param name="logConfig">A Serilog LoggerConfiguration</param>
-        /// <param name="hostEnvironment"></param>
-        /// <param name="loggingSettings">The logging configuration</param>
-        /// <param name="minimumLevel">The log level you wish the JSON file to collect - default is Verbose (highest)</param>
-        /// <param name="retainedFileCount">The number of days to keep log files. Default is set to null which means all logs are kept</param>
+        /// <param name="logConfig">The Serilog <see cref="LoggerConfiguration"/> to configure.</param>
+        /// <param name="hostEnvironment">The hosting environment used to resolve the log file path.</param>
+        /// <param name="loggingSettings">The logging configuration settings.</param>
+        /// <param name="minimumLevel">The minimum log event level to write to the JSON file. Default is <c>Verbose</c> (logs all events).</param>
+        /// <param name="retainedFileCount">The number of days to retain log files. If <c>null</c>, all log files are kept indefinitely.</param>
+        /// <returns>The configured <see cref="LoggerConfiguration"/> instance.</returns>
         public static LoggerConfiguration OutputDefaultJsonFile(
             this LoggerConfiguration logConfig,
             IHostEnvironment hostEnvironment,
@@ -270,6 +305,5 @@ namespace Umbraco.Extensions
 
             return logConfig;
         }
-
     }
 }

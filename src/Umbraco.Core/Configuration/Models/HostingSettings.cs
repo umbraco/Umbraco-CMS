@@ -11,7 +11,14 @@ namespace Umbraco.Cms.Core.Configuration.Models;
 [UmbracoOptions(Constants.Configuration.ConfigHosting)]
 public class HostingSettings
 {
+    /// <summary>
+    ///     The default local temporary storage location.
+    /// </summary>
     internal const string StaticLocalTempStorageLocation = "Default";
+
+    /// <summary>
+    ///     The default value for debug mode.
+    /// </summary>
     internal const bool StaticDebug = false;
 
     /// <summary>
@@ -24,6 +31,12 @@ public class HostingSettings
     /// </summary>
     [DefaultValue(StaticLocalTempStorageLocation)]
     public LocalTempStorage LocalTempStorageLocation { get; set; } = Enum.Parse<LocalTempStorage>(StaticLocalTempStorageLocation);
+
+    /// <summary>
+    /// Gets or sets a value for the location of temporary file uploads.
+    /// </summary>
+    /// <value>/umbraco/Data/TEMP/TemporaryFile if nothing is specified.</value>
+    public string? TemporaryFileUploadLocation { get; set; }
 
     /// <summary>
     ///     Gets or sets a value indicating whether umbraco is running in [debug mode].

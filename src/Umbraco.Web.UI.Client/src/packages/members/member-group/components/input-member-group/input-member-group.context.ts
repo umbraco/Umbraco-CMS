@@ -4,7 +4,11 @@ import { UMB_MEMBER_GROUP_PICKER_MODAL } from '../member-group-picker-modal/memb
 import { UmbPickerInputContext } from '@umbraco-cms/backoffice/picker-input';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
-export class UmbMemberGroupPickerInputContext extends UmbPickerInputContext<UmbMemberGroupItemModel> {
+export class UmbMemberGroupPickerInputContext extends UmbPickerInputContext<
+	UmbMemberGroupItemModel,
+	// TODO: Change to UmbMemberGroupCollectionItemModel when it exists
+	UmbMemberGroupItemModel
+> {
 	constructor(host: UmbControllerHostElement) {
 		super(host, UMB_MEMBER_GROUP_ITEM_REPOSITORY_ALIAS, UMB_MEMBER_GROUP_PICKER_MODAL);
 	}

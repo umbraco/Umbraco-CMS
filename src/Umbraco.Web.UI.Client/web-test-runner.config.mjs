@@ -64,19 +64,22 @@ export default {
 					window.__UMBRACO_TEST_RUN_A11Y_TEST = ${(!devMode).toString()};
 				</script>
 				<script src="/node_modules/msw/lib/iife/index.js"></script>
-				<script type="module" src="/web-test-runner.index.ts"></script>
 				<link rel="stylesheet" href="node_modules/@umbraco-ui/uui-css/dist/uui-css.css">
 				<link rel="stylesheet" href="src/css/umb-css.css">
 				<script type="module">
-					import '@umbraco-cms/backoffice/components';
+					// Initialize MSW first and wait for it to be ready before loading tests
+					await import('/web-test-runner.index.ts');
+
+					// Now load the rest of the modules
+					await import('@umbraco-cms/backoffice/components');
+					await import('element-internals-polyfill');
+					await import('@umbraco-ui/uui');
+
+					// Finally load the test framework
+					await import('${testFramework}');
 				</script>
 			</head>
       <body>
-        <script type="module" src="${testFramework}"></script>
-        <script type="module">
-					import 'element-internals-polyfill';
-					import '@umbraco-ui/uui';
-        </script>
       </body>
     </html>`,
 };

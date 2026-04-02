@@ -58,6 +58,7 @@ public static class DatabaseProviderMetadataExtensions
             Server = server ?? string.Empty,
             Login = login ?? string.Empty,
             Password = password ?? string.Empty,
-            IntegratedAuth = integratedAuth == true && databaseProviderMetadata.SupportsIntegratedAuthentication
+            IntegratedAuth = integratedAuth == true && databaseProviderMetadata.SupportsIntegratedAuthentication,
+            TrustServerCertificate = databaseProviderMetadata.SupportsTrustServerCertificate,
         });
 }

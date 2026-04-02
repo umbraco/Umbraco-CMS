@@ -8,7 +8,7 @@ namespace Umbraco.Tests.Benchmarks;
 public class LoggerAllocationBenchmark
 {
     private readonly string _rawQuery = string.Empty;
-    private readonly int _totalItemCount;
+    private readonly int _totalItemCount = 0;
 
     [Benchmark(Baseline = true)]
     public void Baseline()

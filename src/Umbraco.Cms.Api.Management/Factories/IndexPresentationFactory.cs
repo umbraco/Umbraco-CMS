@@ -1,4 +1,4 @@
-﻿using Examine;
+using Examine;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Api.Management.ViewModels.Indexer;
@@ -9,6 +9,9 @@ using Umbraco.Cms.Infrastructure.Services;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
+/// <summary>
+/// Provides methods for creating index presentation models used in the management API.
+/// </summary>
 public class IndexPresentationFactory : IIndexPresentationFactory
 {
     private readonly IIndexDiagnosticsFactory _indexDiagnosticsFactory;
@@ -16,6 +19,13 @@ public class IndexPresentationFactory : IIndexPresentationFactory
     private readonly IIndexingRebuilderService _indexingRebuilderService;
     private readonly ILogger<IndexPresentationFactory> _logger;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="IndexPresentationFactory"/> class.
+    /// </summary>
+    /// <param name="indexDiagnosticsFactory">Factory used to create index diagnostics instances.</param>
+    /// <param name="indexRebuilder">Service responsible for rebuilding search indexes.</param>
+    /// <param name="indexingRebuilderService">Service that manages indexing rebuild operations.</param>
+    /// <param name="logger">The logger used for logging diagnostic and operational information.</param>
     public IndexPresentationFactory(
         IIndexDiagnosticsFactory indexDiagnosticsFactory,
         IIndexRebuilder indexRebuilder,
@@ -28,21 +38,18 @@ public class IndexPresentationFactory : IIndexPresentationFactory
         _logger = logger;
     }
 
-    [Obsolete("Use the non obsolete method instead. Scheduled for removal in v17")]
-    public IndexPresentationFactory(IIndexDiagnosticsFactory indexDiagnosticsFactory, IIndexRebuilder indexRebuilder, IIndexingRebuilderService indexingRebuilderService)
-    :this(
-        indexDiagnosticsFactory,
-        indexRebuilder,
-        indexingRebuilderService,
-        StaticServiceProvider.Instance.GetRequiredService<ILogger<IndexPresentationFactory>>())
-    {
-    }
-
+    /// <inheritdoc />
+    [Obsolete("Use CreateAsync() instead. Scheduled for removal in Umbraco 19.")]
     public IndexResponseModel Create(IIndex index)
+        => CreateAsync(index).GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    public async Task<IndexResponseModel> CreateAsync(IIndex index)
     {
         var isCorrupt = !TryGetSearcherName(index, out var searcherName);
+        var uniqueKeyFieldName = (index as IUmbracoIndex)?.UniqueKeyFieldName;
 
-        if (_indexingRebuilderService.IsRebuilding(index.Name))
+        if (await _indexingRebuilderService.IsRebuildingAsync(index.Name))
         {
             return new IndexResponseModel
             {
@@ -54,6 +61,7 @@ public class IndexPresentationFactory : IIndexPresentationFactory
                 SearcherName = searcherName,
                 DocumentCount = 0,
                 FieldCount = 0,
+                UniqueKeyFieldName = uniqueKeyFieldName,
             };
         }
 
@@ -63,7 +71,7 @@ public class IndexPresentationFactory : IIndexPresentationFactory
 
         var properties = new Dictionary<string, object?>();
 
-        foreach (var property in indexDiag.Metadata)
+        foreach (KeyValuePair<string, object?> property in indexDiag.Metadata)
         {
             if (property.Value is null)
             {
@@ -71,7 +79,7 @@ public class IndexPresentationFactory : IIndexPresentationFactory
             }
             else
             {
-                var propertyType = property.Value.GetType();
+                Type propertyType = property.Value.GetType();
                 properties[property.Key] = propertyType.IsClass && !propertyType.IsArray ? property.Value?.ToString() : property.Value;
             }
         }
@@ -101,6 +109,7 @@ public class IndexPresentationFactory : IIndexPresentationFactory
             DocumentCount = documentCount,
             FieldCount = fieldNameCount,
             ProviderProperties = properties,
+            UniqueKeyFieldName = uniqueKeyFieldName,
         };
 
         return indexerModel;

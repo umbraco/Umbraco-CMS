@@ -85,7 +85,9 @@ public partial class BackOfficeExternalLoginServiceTests
                 ? null
                 : () =>
                 {
-                    var mock = new BackOfficeIdentityUser(Mock.Of<GlobalSettings>(), -1,
+                    var mock = new BackOfficeIdentityUser(
+                        Mock.Of<GlobalSettings>(),
+                        -1,
                         Enumerable.Empty<IReadOnlyUserGroup>());
                     mock.Key = userId.Value;
                     mock.SetLoginsCallback(new Lazy<IEnumerable<IIdentityUserLogin>?>(() =>

@@ -39,6 +39,7 @@ public class IndexInitializer
     private readonly IContentTypeService _contentTypeService;
     private readonly IDocumentUrlService _documentUrlService;
     private readonly ILanguageService _languageService;
+    private readonly IOptionsMonitor<IndexingSettings> _indexSettings;
 
     public IndexInitializer(
         IShortStringHelper shortStringHelper,
@@ -50,7 +51,8 @@ public class IndexInitializer
         ILocalizationService localizationService,
         IContentTypeService contentTypeService,
         IDocumentUrlService documentUrlService,
-        ILanguageService languageService)
+        ILanguageService languageService,
+        IOptionsMonitor<IndexingSettings> indexSettings)
     {
         _shortStringHelper = shortStringHelper;
         _propertyEditors = propertyEditors;
@@ -62,6 +64,7 @@ public class IndexInitializer
         _contentTypeService = contentTypeService;
         _documentUrlService = documentUrlService;
         _languageService = languageService;
+        _indexSettings = indexSettings;
     }
 
     public ContentValueSetBuilder GetContentValueSetBuilder(bool publishedValuesOnly)
@@ -91,7 +94,8 @@ public class IndexInitializer
             null,
             contentService,
             umbracoDatabaseFactory,
-            contentValueSetBuilder);
+            contentValueSetBuilder,
+            _indexSettings);
         return contentIndexDataSource;
     }
 
@@ -105,7 +109,7 @@ public class IndexInitializer
             _shortStringHelper,
             _contentSettings,
             StaticServiceProvider.Instance.GetRequiredService<IContentTypeService>());
-        var mediaIndexDataSource = new MediaIndexPopulator(null, mediaService, mediaValueSetBuilder);
+        var mediaIndexDataSource = new MediaIndexPopulator(null, mediaService, mediaValueSetBuilder, _indexSettings);
         return mediaIndexDataSource;
     }
 

@@ -27,38 +27,24 @@ public class AspNetCoreCookieManager : ICookieManager
             return;
         }
 
-        var cookieValue = httpContext.Request.Cookies[cookieName];
-
-        httpContext.Response.Cookies.Append(
-            cookieName,
-            cookieValue ?? string.Empty,
-            new CookieOptions
-            {
-                Expires = DateTime.Now.AddYears(-1),
-            });
+        httpContext.Response.Cookies.Delete(cookieName);
     }
 
     /// <inheritdoc/>
     public string? GetCookieValue(string cookieName) => _httpContextAccessor.HttpContext?.Request.Cookies[cookieName];
 
     /// <inheritdoc/>
-    [Obsolete("Use overload with the secure and sameSiteMode parameters instead. Scheduled for removal in V17.")]
-    public void SetCookieValue(string cookieName, string value, bool httpOnly) =>
-        SetCookieValue(cookieName, value, httpOnly, false, SameSiteMode.Unspecified.ToString());
-
-    /// <inheritdoc/>
     public void SetCookieValue(string cookieName, string value, bool httpOnly, bool secure, string sameSiteMode)
     {
         SameSiteMode sameSiteModeValue = ParseSameSiteMode(sameSiteMode);
-        _httpContextAccessor.HttpContext?.Response.Cookies.Append(
-            cookieName,
-            value,
-            new CookieOptions
-            {
-                HttpOnly = httpOnly,
-                SameSite = sameSiteModeValue,
-                Secure = secure,
-            });
+        var options = new CookieOptions
+        {
+            HttpOnly = httpOnly,
+            SameSite = sameSiteModeValue,
+            Secure = secure,
+        };
+
+        _httpContextAccessor.HttpContext?.Response.Cookies.Append(cookieName, value, options);
     }
 
     private static SameSiteMode ParseSameSiteMode(string sameSiteMode) =>

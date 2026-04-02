@@ -9,7 +9,7 @@ export const manifest: UmbExtensionManifestKind = {
 		type: 'workspaceAction',
 		kind: 'default',
 		weight: 1000,
-		element: () => import('./workspace-action-default-kind.element.js'),
+		element: () => import('./workspace-action.element.js'),
 		meta: {
 			label: '(Missing label in manifest)',
 		},

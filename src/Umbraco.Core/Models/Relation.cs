@@ -58,6 +58,7 @@ public class Relation : EntityBase, IRelation
         set => SetPropertyValueAndDetectChanges(value, ref _parentId, nameof(ParentId));
     }
 
+    /// <inheritdoc />
     [DataMember]
     public Guid ParentObjectType { get; set; }
 
@@ -71,6 +72,7 @@ public class Relation : EntityBase, IRelation
         set => SetPropertyValueAndDetectChanges(value, ref _childId, nameof(ChildId));
     }
 
+    /// <inheritdoc />
     [DataMember]
     public Guid ChildObjectType { get; set; }
 
