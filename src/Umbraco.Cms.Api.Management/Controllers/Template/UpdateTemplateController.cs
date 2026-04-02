@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.ViewModels.Template;
@@ -11,6 +11,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Template;
 
+/// <summary>
+/// API controller responsible for handling requests to update templates in the Umbraco CMS.
+/// </summary>
 [ApiVersion("1.0")]
 public class UpdateTemplateController : TemplateControllerBase
 {
@@ -18,6 +21,12 @@ public class UpdateTemplateController : TemplateControllerBase
     private readonly IUmbracoMapper _umbracoMapper;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UpdateTemplateController"/> class, which manages update operations for templates in the Umbraco CMS.
+    /// </summary>
+    /// <param name="templateService">Service used to perform operations on templates.</param>
+    /// <param name="umbracoMapper">Mapper used to convert between domain models and API models.</param>
+    /// <param name="backOfficeSecurityAccessor">Accessor for back office security context.</param>
     public UpdateTemplateController(
         ITemplateService templateService,
         IUmbracoMapper umbracoMapper,
@@ -28,6 +37,13 @@ public class UpdateTemplateController : TemplateControllerBase
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
+    /// <summary>
+    /// Updates an existing template with the specified ID using the provided request model.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="id">The unique identifier of the template to update.</param>
+    /// <param name="requestModel">The model containing the updated template details.</param>
+    /// <returns>An <see cref="IActionResult"/> representing the result of the update operation.</returns>
     [HttpPut("{id:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]

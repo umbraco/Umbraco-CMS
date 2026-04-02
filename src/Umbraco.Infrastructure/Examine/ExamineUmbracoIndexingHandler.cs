@@ -28,6 +28,19 @@ internal sealed class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
     private readonly ExamineIndexingMainDomHandler _mainDomHandler;
     private readonly IPublicAccessService _publicAccessService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Examine.ExamineUmbracoIndexingHandler"/> class.
+    /// </summary>
+    /// <param name="logger">The logger used for logging diagnostic and operational information.</param>
+    /// <param name="scopeProvider">Provides access to the core scope for database operations.</param>
+    /// <param name="examineManager">Manages Examine indexes and searchers.</param>
+    /// <param name="backgroundTaskQueue">Handles the queuing and execution of background tasks.</param>
+    /// <param name="contentValueSetBuilder">Builds value sets for content items to be indexed.</param>
+    /// <param name="publishedContentValueSetBuilder">Builds value sets for published content items to be indexed.</param>
+    /// <param name="mediaValueSetBuilder">Builds value sets for media items to be indexed.</param>
+    /// <param name="memberValueSetBuilder">Builds value sets for member items to be indexed.</param>
+    /// <param name="mainDomHandler">Handles main domain (MainDom) events for Examine indexing.</param>
+    /// <param name="publicAccessService">Provides services for managing public access to content.</param>
     public ExamineUmbracoIndexingHandler(
         ILogger<ExamineUmbracoIndexingHandler> logger,
         ICoreScopeProvider scopeProvider,
@@ -218,6 +231,13 @@ internal sealed class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
         private readonly ExamineUmbracoIndexingHandler _examineUmbracoIndexingHandler;
         private readonly bool _isPublished;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DeferredReIndexForContent"/> class.
+        /// </summary>
+        /// <param name="backgroundTaskQueue">The queue used to schedule background reindexing tasks.</param>
+        /// <param name="examineUmbracoIndexingHandler">The handler responsible for managing Examine Umbraco indexing operations.</param>
+        /// <param name="content">The content item to be re-indexed.</param>
+        /// <param name="isPublished">True if the content is published; otherwise, false.</param>
         public DeferredReIndexForContent(
             IBackgroundTaskQueue backgroundTaskQueue,
             ExamineUmbracoIndexingHandler examineUmbracoIndexingHandler,
@@ -230,9 +250,20 @@ internal sealed class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
             _isPublished = isPublished;
         }
 
+        /// <summary>
+        /// Executes the deferred re-indexing operation for the specified content item.
+        /// This method processes the queued re-indexing task, updating the search index as needed.
+        /// </summary>
         public void Execute() =>
             Execute(_backgroundTaskQueue, _examineUmbracoIndexingHandler, _content, _isPublished);
 
+        /// <summary>
+        /// Executes a deferred re-indexing operation for a specified content item, updating the search index as required.
+        /// </summary>
+        /// <param name="backgroundTaskQueue">The queue used to schedule background indexing tasks.</param>
+        /// <param name="examineUmbracoIndexingHandler">The handler responsible for managing Examine indexing operations.</param>
+        /// <param name="content">The content item to re-index.</param>
+        /// <param name="isPublished">True if the content item is published; otherwise, false.</param>
         public static void Execute(
             IBackgroundTaskQueue backgroundTaskQueue,
             ExamineUmbracoIndexingHandler examineUmbracoIndexingHandler,
@@ -281,6 +312,11 @@ internal sealed class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
         private readonly bool _isPublished;
         private readonly IMedia _media;
 
+        /// <summary>Initializes a new instance of the <see cref="DeferredReIndexForMedia"/> class.</summary>
+        /// <param name="backgroundTaskQueue">The background task queue to enqueue reindexing tasks.</param>
+        /// <param name="examineUmbracoIndexingHandler">The Examine Umbraco indexing handler instance.</param>
+        /// <param name="media">The media item to be reindexed.</param>
+        /// <param name="isPublished">Indicates whether the media item is published.</param>
         public DeferredReIndexForMedia(
             IBackgroundTaskQueue backgroundTaskQueue,
             ExamineUmbracoIndexingHandler examineUmbracoIndexingHandler,
@@ -293,9 +329,21 @@ internal sealed class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
             _isPublished = isPublished;
         }
 
+        /// <summary>
+        /// Executes the process that performs deferred re-indexing of media items in the background.
+        /// This ensures that media content is updated in the search index as needed.
+        /// </summary>
         public void Execute() =>
             Execute(_backgroundTaskQueue, _examineUmbracoIndexingHandler, _media, _isPublished);
 
+        /// <summary>
+        /// Performs deferred re-indexing of a media item by enqueuing the operation to a background task queue.
+        /// Ensures that the media item is updated in the search index as required.
+        /// </summary>
+        /// <param name="backgroundTaskQueue">The queue used to schedule background indexing tasks.</param>
+        /// <param name="examineUmbracoIndexingHandler">The handler that manages Examine search indexes.</param>
+        /// <param name="media">The media item to re-index.</param>
+        /// <param name="isPublished">True if the media item is published; otherwise, false.</param>
         public static void Execute(
             IBackgroundTaskQueue backgroundTaskQueue,
             ExamineUmbracoIndexingHandler examineUmbracoIndexingHandler,
@@ -332,6 +380,12 @@ internal sealed class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
         private readonly ExamineUmbracoIndexingHandler _examineUmbracoIndexingHandler;
         private readonly IMember _member;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DeferredReIndexForMember"/> class.
+        /// </summary>
+        /// <param name="backgroundTaskQueue">The queue used to schedule background reindexing tasks.</param>
+        /// <param name="examineUmbracoIndexingHandler">The handler responsible for Examine Umbraco indexing operations.</param>
+        /// <param name="member">The member entity to be reindexed.</param>
         public DeferredReIndexForMember(
             IBackgroundTaskQueue backgroundTaskQueue,
             ExamineUmbracoIndexingHandler examineUmbracoIndexingHandler,
@@ -342,8 +396,18 @@ internal sealed class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
             _backgroundTaskQueue = backgroundTaskQueue;
         }
 
+        /// <summary>
+        /// Executes the deferred re-indexing operation for the specified member in the background task queue.
+        /// This ensures that the member's data is updated in the search index.
+        /// </summary>
         public void Execute() => Execute(_backgroundTaskQueue, _examineUmbracoIndexingHandler, _member);
 
+        /// <summary>
+        /// Enqueues a deferred re-indexing operation for the specified member, ensuring the member's data is updated in the search index.
+        /// </summary>
+        /// <param name="backgroundTaskQueue">The queue used to schedule background tasks.</param>
+        /// <param name="examineUmbracoIndexingHandler">The handler responsible for managing Examine indexing operations.</param>
+        /// <param name="member">The member whose data should be re-indexed.</param>
         public static void Execute(
             IBackgroundTaskQueue backgroundTaskQueue,
             ExamineUmbracoIndexingHandler examineUmbracoIndexingHandler,
@@ -376,6 +440,12 @@ internal sealed class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
         private readonly IReadOnlyCollection<int>? _ids;
         private readonly bool _keepIfUnpublished;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DeferredDeleteIndex"/> class, which represents a deferred deletion operation for a specific item in the index.
+        /// </summary>
+        /// <param name="examineUmbracoIndexingHandler">The parent <see cref="ExamineUmbracoIndexingHandler"/> managing the indexing operations.</param>
+        /// <param name="id">The identifier of the item to be deleted from the index.</param>
+        /// <param name="keepIfUnpublished">If set to <c>true</c>, the item will be retained in the index if it is unpublished; otherwise, it will be deleted.</param>
         public DeferredDeleteIndex(
             ExamineUmbracoIndexingHandler examineUmbracoIndexingHandler,
             int id,
@@ -386,6 +456,12 @@ internal sealed class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
             _keepIfUnpublished = keepIfUnpublished;
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DeferredDeleteIndex"/> class, used to defer deletion of specified items from the index.
+        /// </summary>
+        /// <param name="examineUmbracoIndexingHandler">The parent <see cref="ExamineUmbracoIndexingHandler"/> managing the operation.</param>
+        /// <param name="ids">A read-only collection of item IDs to be deleted from the index.</param>
+        /// <param name="keepIfUnpublished">If <c>true</c>, items will be retained in the index if they are unpublished; otherwise, they will be deleted.</param>
         public DeferredDeleteIndex(
             ExamineUmbracoIndexingHandler examineUmbracoIndexingHandler,
             IReadOnlyCollection<int> ids,
@@ -396,6 +472,9 @@ internal sealed class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
             _keepIfUnpublished = keepIfUnpublished;
         }
 
+        /// <summary>
+        /// Executes the deferred deletion of one or more items from the index, based on the provided identifiers.
+        /// </summary>
         public void Execute()
         {
             if (_ids is null)
@@ -408,6 +487,12 @@ internal sealed class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
             }
         }
 
+        /// <summary>
+        /// Executes the deferred deletion of a single item from the index.
+        /// </summary>
+        /// <param name="examineUmbracoIndexingHandler">The <see cref="ExamineUmbracoIndexingHandler"/> instance used to perform the deletion.</param>
+        /// <param name="id">The identifier of the item to delete from the index.</param>
+        /// <param name="keepIfUnpublished">If <c>true</c>, the item will be kept in the index if it is unpublished; otherwise, it will be removed.</param>
         public static void Execute(
             ExamineUmbracoIndexingHandler examineUmbracoIndexingHandler,
             int id,
@@ -446,6 +531,12 @@ internal sealed class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
         private readonly ExamineUmbracoIndexingHandler _examineUmbracoIndexingHandler;
         private readonly IPublicAccessService _publicAccessService;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DeferredRemoveProtectedContent"/> class.
+        /// </summary>
+        /// <param name="backgroundTaskQueue">The queue used to schedule background tasks for deferred removal operations.</param>
+        /// <param name="examineUmbracoIndexingHandler">The handler responsible for Umbraco Examine indexing operations.</param>
+        /// <param name="publicAccessService">The service used to determine public access permissions for content.</param>
         public DeferredRemoveProtectedContent(IBackgroundTaskQueue backgroundTaskQueue, ExamineUmbracoIndexingHandler examineUmbracoIndexingHandler, IPublicAccessService publicAccessService)
         {
             _backgroundTaskQueue = backgroundTaskQueue;
@@ -453,8 +544,17 @@ internal sealed class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
             _publicAccessService = publicAccessService;
         }
 
+        /// <summary>
+        /// Executes the deferred removal of protected content from the index.
+        /// </summary>
         public void Execute() => Execute(_backgroundTaskQueue, _examineUmbracoIndexingHandler, _publicAccessService);
 
+        /// <summary>
+        /// Executes the deferred removal of protected content from the index.
+        /// </summary>
+        /// <param name="backgroundTaskQueue">The queue used to schedule background tasks for deferred execution.</param>
+        /// <param name="examineUmbracoIndexingHandler">The indexing handler responsible for managing Examine indexes in Umbraco.</param>
+        /// <param name="publicAccessService">The service used to determine which content is protected by public access rules.</param>
         public static void Execute(IBackgroundTaskQueue backgroundTaskQueue, ExamineUmbracoIndexingHandler examineUmbracoIndexingHandler, IPublicAccessService publicAccessService)
             => backgroundTaskQueue.QueueBackgroundWorkItem(cancellationToken =>
             {

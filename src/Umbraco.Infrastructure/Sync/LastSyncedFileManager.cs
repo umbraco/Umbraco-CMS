@@ -4,6 +4,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Sync;
 
+/// <summary>
+/// Provides functionality for tracking the most recently synchronized files in the Umbraco CMS infrastructure.
+/// </summary>
 [Obsolete("Use the LastSyncedManager class instead. Scheduled for removal in Umbraco 18.")]
 public sealed class LastSyncedFileManager
 {
@@ -13,6 +16,11 @@ public sealed class LastSyncedFileManager
     private object? _lastIdLock;
     private bool _lastIdReady;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="LastSyncedFileManager"/> class,
+    /// using the specified hosting environment to manage file synchronization state.
+    /// </summary>
+    /// <param name="hostingEnvironment">The <see cref="IHostingEnvironment"/> used to access environment-specific file paths and settings.</param>
     public LastSyncedFileManager(IHostingEnvironment hostingEnvironment)
         => _hostingEnvironment = hostingEnvironment;
 

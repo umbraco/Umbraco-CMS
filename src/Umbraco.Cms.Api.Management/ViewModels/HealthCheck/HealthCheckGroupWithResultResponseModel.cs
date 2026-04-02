@@ -1,5 +1,8 @@
 namespace Umbraco.Cms.Api.Management.ViewModels.HealthCheck;
 
+/// <summary>
+/// Represents a health check group and its associated result, as returned by the API.
+/// </summary>
 public class HealthCheckGroupWithResultResponseModel
 {
     /// <summary>

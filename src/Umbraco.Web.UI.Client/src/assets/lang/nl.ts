@@ -340,6 +340,8 @@ export default {
 		renameFolderFailed: 'Kan de map met id %0% niet hernoemen',
 		dragAndDropYourFilesIntoTheArea: 'Sleep en zet je bestand(en) neer in dit gebied',
 		uploadNotAllowed: 'Upload is niet toegelaten in deze locatie.',
+		uploadValidationFailed: (mediaTypeName: string) =>
+			`Het mediatype ${mediaTypeName} heeft een of meer vereiste eigenschappen. Het moet afzonderlijk worden geüpload via het menu 'Maken'`,
 		fileSecurityValidationFailure: 'Een of meerdere veiligheid validaties zijn gefaald voor het bestand',
 	},
 	member: {
@@ -1933,7 +1935,8 @@ export default {
 		openBackofficeSearch: 'Backoffice zoeken openen',
 		openCloseBackofficeHelp: 'Backoffice help openen/sluiten',
 		openCloseBackofficeProfileOptions: 'Jouw profiel opties openen/sluiten',
-		profileOptions: 'Profiel opties',
+		profileOptions: 'Gebruikersprofiel voor %0% (%1%)',
+		profileOptionsDefault: 'Gebruikersprofiel',
 		assignDomainDescription: 'Cultuur en Hostnamen instellen voor %0%',
 		createDescription: 'Nieuwe node aanmaken onder %0%',
 		protectDescription: 'Openbare toegang instellen op %0%',

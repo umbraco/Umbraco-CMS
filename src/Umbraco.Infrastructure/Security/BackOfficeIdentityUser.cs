@@ -42,8 +42,16 @@ public class BackOfficeIdentityUser : UmbracoIdentityUser
         SetGroups(groups);
     }
 
+    /// <summary>
+    /// Gets or sets the calculated media start node IDs for the back office identity user.
+    /// These IDs represent the root media nodes that the user has access to, typically determined by user group permissions or configuration.
+    /// </summary>
     public int[]? CalculatedMediaStartNodeIds { get; set; }
 
+    /// <summary>
+    /// Gets or sets the set of content start node IDs that have been calculated for this back office identity user, typically based on their group memberships and permissions.
+    /// These IDs determine the root content nodes the user can access in the back office.
+    /// </summary>
     public int[]? CalculatedContentStartNodeIds { get; set; }
 
     /// <summary>
@@ -100,6 +108,9 @@ public class BackOfficeIdentityUser : UmbracoIdentityUser
 
     private Guid _key;
 
+    /// <summary>
+    /// Gets or sets the unique key that identifies the back office identity user.
+    /// </summary>
     public Guid Key
     {
         get => _key;
@@ -110,6 +121,9 @@ public class BackOfficeIdentityUser : UmbracoIdentityUser
         }
     }
 
+    /// <summary>
+    /// Gets or sets the classification of the back office user, indicating the user's type or role within the system.
+    /// </summary>
     public UserKind Kind
     {
         get => _kind;
@@ -117,15 +131,16 @@ public class BackOfficeIdentityUser : UmbracoIdentityUser
     }
 
     /// <summary>
-    ///     Used to construct a new instance without an identity
+    ///     Creates a new <see cref="BackOfficeIdentityUser"/> instance without an identity, for use before the user is persisted.
     /// </summary>
-    /// <param name="globalSettings"></param>
-    /// <param name="username"></param>
-    /// <param name="email">This is allowed to be null (but would need to be filled in if trying to persist this instance)</param>
-    /// <param name="culture"></param>
-    /// <param name="name"></param>
-    /// <param name="id"></param>
-    /// <param name="kind"></param>
+    /// <param name="globalSettings">The global settings used to initialize the user instance.</param>
+    /// <param name="username">The username for the new user. Cannot be null or whitespace.</param>
+    /// <param name="email">The email address for the user. This can be null, but must be set before persisting the user.</param>
+    /// <param name="culture">The culture assigned to the user. Cannot be null or whitespace.</param>
+    /// <param name="name">The display name of the user. Optional.</param>
+    /// <param name="id">The unique identifier for the user. Optional; if not provided, a new one will be generated.</param>
+    /// <param name="kind">The kind of user. Optional; defaults to <see cref="UserKind.Default"/>.</param>
+    /// <returns>A new instance of <see cref="BackOfficeIdentityUser"/> without an identity.</returns>
     public static BackOfficeIdentityUser CreateNew(GlobalSettings globalSettings, string? username, string email, string culture, string? name = null, Guid? id = null, UserKind kind = UserKind.Default)
     {
         if (string.IsNullOrWhiteSpace(username))
@@ -158,8 +173,9 @@ public class BackOfficeIdentityUser : UmbracoIdentityUser
     }
 
     /// <summary>
-    ///     Gets or sets the user groups
+    ///     Sets the user groups for the backoffice identity user and updates related roles.
     /// </summary>
+    /// <param name="value">The collection of user groups to assign to the user.</param>
     public void SetGroups(IReadOnlyCollection<IReadOnlyUserGroup> value)
     {
         // so they recalculate

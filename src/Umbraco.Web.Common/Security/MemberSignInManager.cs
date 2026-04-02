@@ -39,6 +39,8 @@ public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMe
         _eventAggregator = eventAggregator;
     }
 
+    protected override bool AllowConcurrentLoginsEnabled => SecuritySettings.GetMemberAllowConcurrentLogins();
+
     // use default scheme for members
     protected override string AuthenticationType => IdentityConstants.ApplicationScheme;
 

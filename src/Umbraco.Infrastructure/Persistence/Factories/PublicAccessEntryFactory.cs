@@ -6,6 +6,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories;
 
 internal static class PublicAccessEntryFactory
 {
+    /// <summary>
+    /// Creates and returns a <see cref="Umbraco.Cms.Core.Models.PublicAccessEntry"/> entity populated with data from the specified <see cref="Umbraco.Cms.Infrastructure.Persistence.Dtos.AccessDto"/>.
+    /// </summary>
+    /// <param name="dto">The <see cref="Umbraco.Cms.Infrastructure.Persistence.Dtos.AccessDto"/> containing the access entry data and associated rules.</param>
+    /// <returns>A <see cref="Umbraco.Cms.Core.Models.PublicAccessEntry"/> entity initialized with values from the provided DTO.</returns>
     public static PublicAccessEntry BuildEntity(AccessDto dto)
     {
         var entity = new PublicAccessEntry(
@@ -27,6 +32,11 @@ internal static class PublicAccessEntryFactory
         return entity;
     }
 
+    /// <summary>
+    /// Builds an <see cref="AccessDto"/> from the given <see cref="PublicAccessEntry"/> entity.
+    /// </summary>
+    /// <param name="entity">The <see cref="PublicAccessEntry"/> entity to convert.</param>
+    /// <returns>An <see cref="AccessDto"/> representing the data from the entity.</returns>
     public static AccessDto BuildDto(PublicAccessEntry entity)
     {
         var dto = new AccessDto

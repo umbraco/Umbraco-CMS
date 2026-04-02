@@ -14,6 +14,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Document;
 
+/// <summary>
+/// Controller responsible for validating update operations on documents.
+/// </summary>
 [ApiVersion("1.1")]
 public class ValidateUpdateDocumentController : UpdateDocumentControllerBase
 {
@@ -21,6 +24,13 @@ public class ValidateUpdateDocumentController : UpdateDocumentControllerBase
     private readonly IDocumentEditingPresentationFactory _documentEditingPresentationFactory;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ValidateUpdateDocumentController"/> class.
+    /// </summary>
+    /// <param name="authorizationService">Service for checking user permissions.</param>
+    /// <param name="contentEditingService">Service for managing content operations.</param>
+    /// <param name="documentEditingPresentationFactory">Factory for creating document editing presentation models.</param>
+    /// <param name="backOfficeSecurityAccessor">Accessor for back office user security context.</param>
     public ValidateUpdateDocumentController(
         IAuthorizationService authorizationService,
         IContentEditingService contentEditingService,

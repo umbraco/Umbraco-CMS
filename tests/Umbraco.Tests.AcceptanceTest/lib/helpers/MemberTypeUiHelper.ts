@@ -1,4 +1,5 @@
 import {UiBaseLocators} from "./UiBaseLocators";
+import {ConstantHelper} from "./ConstantHelper";
 import {Locator, Page} from "@playwright/test";
 
 export class MemberTypeUiHelper extends UiBaseLocators {
@@ -25,7 +26,7 @@ export class MemberTypeUiHelper extends UiBaseLocators {
 
   async goToMemberType(memberTypeName: string) {
     await this.clickRootFolderCaretButton();
-    await this.click(this.page.getByLabel(memberTypeName));
+    await this.clickLabelWithName(memberTypeName);
   }
 
   async enterMemberTypeName(name: string) {
@@ -34,5 +35,9 @@ export class MemberTypeUiHelper extends UiBaseLocators {
 
   async enterDescriptionForPropertyEditorWithName(propertyEditorName: string, description: string) {
     await this.memberTypeEditPropertyWorkspace.filter({hasText: propertyEditorName}).getByLabel('description').fill(description);
+  }
+
+  async clickSaveButtonAndWaitForMemberTypeToBeUpdated() {
+    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.memberType, this.clickSaveButton(), ConstantHelper.statusCodes.ok);
   }
 }

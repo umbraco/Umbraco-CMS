@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -14,6 +14,9 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.MediaType;
 
+/// <summary>
+/// API controller responsible for handling requests to create new media types in the Umbraco CMS.
+/// </summary>
 [ApiVersion("1.0")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessMediaTypes)]
 public class CreateMediaTypeController : MediaTypeControllerBase
@@ -22,6 +25,12 @@ public class CreateMediaTypeController : MediaTypeControllerBase
     private readonly IMediaTypeEditingService _mediaTypeEditingService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CreateMediaTypeController"/> class.
+    /// </summary>
+    /// <param name="mediaTypeEditingPresentationFactory">Factory for creating media type editing presentation models.</param>
+    /// <param name="mediaTypeEditingService">Service for editing media types.</param>
+    /// <param name="backOfficeSecurityAccessor">Accessor for back office security context.</param>
     public CreateMediaTypeController(
         IMediaTypeEditingPresentationFactory mediaTypeEditingPresentationFactory,
         IMediaTypeEditingService mediaTypeEditingService,
@@ -32,6 +41,12 @@ public class CreateMediaTypeController : MediaTypeControllerBase
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
+    /// <summary>
+    /// Creates a new media type based on the provided configuration.
+    /// </summary>
+    /// <param name="cancellationToken">Token to observe while waiting for the task to complete.</param>
+    /// <param name="requestModel">The model containing the configuration for the new media type.</param>
+    /// <returns>An <see cref="IActionResult"/> indicating the result of the creation operation.</returns>
     [HttpPost]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status201Created)]

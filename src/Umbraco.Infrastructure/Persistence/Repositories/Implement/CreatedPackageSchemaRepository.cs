@@ -39,6 +39,22 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
     /// <summary>
     ///     Initializes a new instance of the <see cref="CreatedPackageSchemaRepository" /> class.
     /// </summary>
+    /// <param name="hostingEnvironment">Provides information about the web hosting environment.</param>
+    /// <param name="fileSystems">Manages access to various file systems used by the application.</param>
+    /// <param name="serializer">Serializes and deserializes entities to and from XML.</param>
+    /// <param name="dataTypeService">Service for managing data types.</param>
+    /// <param name="fileService">Service for managing files and file-related operations.</param>
+    /// <param name="mediaService">Service for managing media items.</param>
+    /// <param name="mediaTypeService">Service for managing media types.</param>
+    /// <param name="contentService">Service for managing content items.</param>
+    /// <param name="mediaFileManager">Handles media file management operations.</param>
+    /// <param name="contentTypeService">Service for managing content types.</param>
+    /// <param name="scopeAccessor">Provides access to the current database scope.</param>
+    /// <param name="templateService">Service for managing templates.</param>
+    /// <param name="dictionaryItemService">Service for managing dictionary items for localization.</param>
+    /// <param name="languageService">Service for managing languages.</param>
+    /// <param name="mediaFolderPath">The file system path to the media folder, if specified.</param>
+    /// <param name="tempFolderPath">The file system path to the temporary folder, if specified.</param>
     public CreatedPackageSchemaRepository(
         IHostingEnvironment hostingEnvironment,
         FileSystems fileSystems,
@@ -78,6 +94,10 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
 
     private IUmbracoDatabase Database => _scopeAccessor.AmbientScope?.Database ?? throw new InvalidOperationException("A scope is required to query the database");
 
+    /// <summary>
+    /// Retrieves all package definitions by loading and converting all created package schemas from the database.
+    /// </summary>
+    /// <returns>An <see cref="IEnumerable{PackageDefinition}"/> containing all package definitions found in the created package schemas.</returns>
     public IEnumerable<PackageDefinition> GetAll()
     {
         Sql<ISqlContext> query = new Sql<ISqlContext>(Database.SqlContext)
@@ -100,6 +120,11 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
         return packageDefinitions;
     }
 
+    /// <summary>
+    /// Gets a <see cref="PackageDefinition"/> by its identifier.
+    /// </summary>
+    /// <param name="id">The identifier of the package definition to retrieve.</param>
+    /// <returns>The <see cref="PackageDefinition"/> if found; otherwise, <c>null</c>.</returns>
     public PackageDefinition? GetById(int id)
     {
         Sql<ISqlContext> query = new Sql<ISqlContext>(Database.SqlContext)
@@ -117,6 +142,11 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
         return CreatePackageDefinitionFromSchema(schemaDtos.First());
     }
 
+    /// <summary>
+    /// Retrieves a package definition corresponding to the specified unique key.
+    /// </summary>
+    /// <param name="key">The unique <see cref="Guid"/> identifier of the package.</param>
+    /// <returns>The <see cref="PackageDefinition"/> if found; otherwise, <c>null</c>.</returns>
     public PackageDefinition? GetByKey(Guid key)
     {
         Sql<ISqlContext> query = new Sql<ISqlContext>(Database.SqlContext)
@@ -139,6 +169,10 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
         return CreatePackageDefinitionFromSchema(schemaDtos.First());
     }
 
+    /// <summary>
+    /// Deletes the package schema with the specified identifier, and removes the associated package file from disk if it exists.
+    /// </summary>
+    /// <param name="id">The identifier of the package schema to delete.</param>
     public void Delete(int id)
     {
         // Delete package snapshot
@@ -155,6 +189,14 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
         Database.Execute(query);
     }
 
+    /// <summary>
+    /// Saves the specified package definition to the database. If the package already exists (by name), the method returns <c>false</c> and does not overwrite it.
+    /// Throws a <see cref="NullReferenceException"/> if <paramref name="definition"/> is <c>null</c>.
+    /// </summary>
+    /// <param name="definition">The package definition to save. Must not be <c>null</c> and must have a non-empty name.</param>
+    /// <returns>
+    /// <c>true</c> if the package was saved successfully; <c>false</c> if the package name is empty, the package already exists, or the save operation could not be completed.
+    /// </returns>
     public bool SavePackage(PackageDefinition? definition)
     {
         if (definition == null)
@@ -225,6 +267,12 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
         return true;
     }
 
+    /// <summary>
+    /// Exports the specified <paramref name="definition"/> as a package file, saving it to disk and returning the full path to the created file.
+    /// The exported package will be a .zip file if media files are included, or a .xml file otherwise.
+    /// </summary>
+    /// <param name="definition">The package definition to export.</param>
+    /// <returns>The absolute file path of the exported package file.</returns>
     public string ExportPackage(PackageDefinition definition)
     {
         // Ensure it's valid

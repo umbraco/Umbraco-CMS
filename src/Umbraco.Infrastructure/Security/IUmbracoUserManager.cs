@@ -32,15 +32,17 @@ public interface IUmbracoUserManager<TUser> : IDisposable
     string? GetUserId(ClaimsPrincipal principal);
 
     /// <summary>
-    ///     Gets the external logins for the user
+    ///     Gets the external logins associated with the specified user.
     /// </summary>
-    /// <returns>A <see cref="Task{TResult}" /> representing the result of the asynchronous operation.</returns>
+    /// <param name="user">The user whose external logins are being retrieved.</param>
+    /// <returns>A <see cref="Task{IList{UserLoginInfo}}"/> that represents the asynchronous operation, containing a list of external login information for the user.</returns>
     Task<IList<UserLoginInfo>> GetLoginsAsync(TUser user);
 
     /// <summary>
-    ///     Deletes a user
+    /// Deletes the specified user asynchronously.
     /// </summary>
-    /// <returns>A <see cref="Task{TResult}" /> representing the result of the asynchronous operation.</returns>
+    /// <param name="user">The user to delete.</param>
+    /// <returns>A <see cref="Task{IdentityResult}" /> that represents the asynchronous delete operation.</returns>
     Task<IdentityResult> DeleteAsync(TUser user);
 
     /// <summary>
@@ -71,15 +73,15 @@ public interface IUmbracoUserManager<TUser> : IDisposable
     Task<string> GeneratePasswordResetTokenAsync(TUser user);
 
     /// <summary>
-    ///     This is a special method that will reset the password but will raise the Password Changed event instead of the
-    ///     reset event
+    /// Resets a user's password using a reset token, but raises the Password Changed event instead of the Password Reset event.
     /// </summary>
     /// <remarks>
-    ///     We use this because in the back office the only way an admin can change another user's password without first
-    ///     knowing their password
-    ///     is to generate a token and reset it, however, when we do this we want to track a password change, not a password
-    ///     reset
+    /// In the back office, an admin can change another user's password without knowing the current password only by generating a reset token and using it to set a new password. This method ensures that such an action is tracked as a password change, not a password reset.
     /// </remarks>
+    /// <param name="userId">The ID of the user whose password is being changed.</param>
+    /// <param name="token">The reset token generated for the password reset process.</param>
+    /// <param name="newPassword">The new password to set for the user.</param>
+    /// <returns>A task representing the asynchronous operation, containing the result of the identity operation.</returns>
     Task<IdentityResult> ChangePasswordWithResetAsync(string userId, string token, string newPassword);
 
     /// <summary>
@@ -119,13 +121,13 @@ public interface IUmbracoUserManager<TUser> : IDisposable
     Task<IdentityResult> ResetPasswordAsync(TUser user, string token, string newPassword);
 
     /// <summary>
-    ///     Override to check the user approval value as well as the user lock out date, by default this only checks the user's
-    ///     locked out date
+    ///     Checks whether the specified user is locked out, considering both the user approval value and the user lockout date. By default, only the user's lockout date is checked.
     /// </summary>
     /// <remarks>
-    ///     In the ASP.NET Identity world, there is only one value for being locked out, in Umbraco we have 2 so when checking
-    ///     this for Umbraco we need to check both values
+    ///     In the ASP.NET Identity world, there is only one value for being locked out. In Umbraco, there are two, so both must be checked when determining lockout status.
     /// </remarks>
+    /// <param name="user">The user to check for lockout status.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains <c>true</c> if the user is locked out; otherwise, <c>false</c>.</returns>
     Task<bool> IsLockedOutAsync(TUser user);
 
     /// <summary>
@@ -219,9 +221,11 @@ public interface IUmbracoUserManager<TUser> : IDisposable
     Task<IdentityResult> ChangePasswordAsync(TUser user, string currentPassword, string newPassword);
 
     /// <summary>
-    ///     Used to validate a user's session
+    /// Validates whether the specified session identifier is valid for the given user.
     /// </summary>
-    /// <returns>Returns true if the session is valid, otherwise false</returns>
+    /// <param name="userId">The unique identifier of the user whose session is being validated.</param>
+    /// <param name="sessionId">The unique identifier of the session to validate.</param>
+    /// <returns><c>true</c> if the session is valid for the specified user; otherwise, <c>false</c>.</returns>
     Task<bool> ValidateSessionIdAsync(string? userId, string? sessionId);
 
     /// <summary>
@@ -323,7 +327,7 @@ public interface IUmbracoUserManager<TUser> : IDisposable
     /// </summary>
     /// <param name="user">The user whose two factor authentication enabled status should be retrieved.</param>
     /// <returns>
-    ///     The <see cref="Task" /> that represents the asynchronous operation, true if the specified <paramref name="user " />
+    ///     The <see cref="Task" /> that represents the asynchronous operation, true if the specified <paramref name="user" />
     ///     has two factor authentication enabled, otherwise false.
     /// </returns>
     Task<bool> GetTwoFactorEnabledAsync(TUser user);
@@ -332,7 +336,7 @@ public interface IUmbracoUserManager<TUser> : IDisposable
     ///     Gets a list of valid two factor token providers for the specified <paramref name="user" />,
     ///     as an asynchronous operation.
     /// </summary>
-    /// <param name="user">The user the whose two factor authentication providers will be returned.</param>
+    /// <param name="user">The user whose two factor authentication providers will be returned.</param>
     /// <returns>
     ///     The <see cref="Task" /> that represents result of the asynchronous operation, a list of two
     ///     factor authentication providers for the specified user.
@@ -378,13 +382,16 @@ public interface IUmbracoUserManager<TUser> : IDisposable
     /// <summary>
     ///     Resets the access failed count for the user
     /// </summary>
+    /// <param name="user">The user whose access failed count will be reset.</param>
     /// <returns>A <see cref="Task{TResult}" /> representing the result of the asynchronous operation.</returns>
     Task<IdentityResult> ResetAccessFailedCountAsync(TUser user);
 
     /// <summary>
-    ///     Generates a two factor token for the user
+    ///     Generates a two-factor authentication token for the specified user using the given token provider.
     /// </summary>
-    /// <returns>A <see cref="Task{TResult}" /> representing the result of the asynchronous operation.</returns>
+    /// <param name="user">The user for whom to generate the token.</param>
+    /// <param name="tokenProvider">The token provider to use.</param>
+    /// <returns>A <see cref="Task{string}" /> that represents the asynchronous operation, containing the generated two-factor token.</returns>
     Task<string> GenerateTwoFactorTokenAsync(TUser user, string tokenProvider);
 
     /// <summary>

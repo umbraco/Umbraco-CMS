@@ -320,6 +320,11 @@ export class UmbPropertyElement extends UmbLitElement {
 	}
 
 	private async _gotEditorUI(manifest?: ManifestPropertyEditorUi | null): Promise<void> {
+		if (this._element && this._element.manifest === manifest) {
+			// If we already have an element and the manifest haven't changed, we don't need to do anything.
+			return;
+		}
+
 		this.#extensionsController?.destroy();
 		this.#propertyContext.setEditor(undefined);
 		this.#propertyContext.setEditorManifest(manifest ?? undefined);

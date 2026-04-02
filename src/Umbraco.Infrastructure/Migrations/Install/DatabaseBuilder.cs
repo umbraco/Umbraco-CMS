@@ -46,6 +46,20 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
         /// <summary>
         /// Initializes a new instance of the <see cref="DatabaseBuilder"/> class.
         /// </summary>
+        /// <param name="scopeProvider">Provides core scoping functionality for database operations.</param>
+        /// <param name="scopeAccessor">Accesses the current scope context.</param>
+        /// <param name="databaseFactory">Factory for creating Umbraco database connections.</param>
+        /// <param name="runtimeState">Provides information about the current runtime state of the application.</param>
+        /// <param name="loggerFactory">Factory for creating logger instances.</param>
+        /// <param name="keyValueService">Service for accessing key-value storage.</param>
+        /// <param name="dbProviderFactoryCreator">Creates database provider factories for different database types.</param>
+        /// <param name="configManipulator">Handles manipulation of configuration files.</param>
+        /// <param name="globalSettings">Monitors and provides global settings options.</param>
+        /// <param name="connectionStrings">Monitors and provides connection string options.</param>
+        /// <param name="migrationPlanExecutor">Executes migration plans for database schema changes.</param>
+        /// <param name="databaseSchemaCreatorFactory">Factory for creating database schema creators.</param>
+        /// <param name="databaseProviderMetadata">A collection of metadata describing available database providers.</param>
+        /// <param name="aggregator">Aggregates and dispatches events within the system.</param>
         public DatabaseBuilder(
             ICoreScopeProvider scopeProvider,
             IScopeAccessor scopeAccessor,
@@ -93,14 +107,23 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
         public bool CanConnectToDatabase => _databaseFactory.CanConnect;
 
         /// <summary>
-        /// Verifies whether a it is possible to connect to a database.
+        /// Determines whether it is possible to connect to a database using the specified connection string and provider.
         /// </summary>
+        /// <param name="connectionString">The connection string to the database.</param>
+        /// <param name="providerName">The name of the database provider.</param>
+        /// <returns>True if a connection can be established; otherwise, false.</returns>
         public bool CanConnect(string? connectionString, string providerName)
         {
             DbProviderFactory? factory = _dbProviderFactoryCreator.CreateFactory(providerName);
             return DbConnectionExtensions.IsConnectionAvailable(connectionString, factory);
         }
 
+        /// <summary>
+        /// Determines whether there is at least one user in the database other than the default super user with the default password.
+        /// </summary>
+        /// <returns>
+        /// <c>true</c> if there is at least one user who is not the default super user with the default password; otherwise, <c>false</c>.
+        /// </returns>
         public bool HasSomeNonDefaultUser()
         {
             using (ICoreScope scope = _scopeProvider.CreateCoreScope())
@@ -140,6 +163,15 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
 
         #region Configure Connection String
 
+        /// <summary>
+        /// Configures the database connection using the provided database settings.
+        /// If <paramref name="databaseSettings"/> is null, attempts a quick install with default settings.
+        /// Attempts to establish a connection and, if <paramref name="isTrialRun"/> is false, saves the connection string configuration.
+        /// Throws an <see cref="InstallException"/> if the database provider configuration cannot be determined or if the configuration update fails.
+        /// </summary>
+        /// <param name="databaseSettings">The database settings model containing connection details, or <c>null</c> to use default settings.</param>
+        /// <param name="isTrialRun">If <c>true</c>, performs a trial run without saving the connection string; otherwise, saves the configuration.</param>
+        /// <returns><c>true</c> if the connection was successfully configured and tested; otherwise, <c>false</c>.</returns>
         public bool ConfigureDatabaseConnection(DatabaseModel databaseSettings, bool isTrialRun)
         {
             IDatabaseProviderMetadata? providerMeta;
@@ -201,6 +233,13 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             return true;
         }
 
+        /// <summary>
+        /// Asynchronously validates the ability to connect to a database using the specified settings.
+        /// </summary>
+        /// <param name="databaseSettings">The database settings to use for validation.</param>
+        /// <returns>
+        /// A task that represents the asynchronous operation. The task result contains an <see cref="Attempt{InstallOperationStatus}"/> indicating the outcome of the validation, such as success, unknown provider, missing connection string, missing provider name, or connection failure.
+        /// </returns>
         public Task<Attempt<InstallOperationStatus>> ValidateDatabaseConnectionAsync(DatabaseModel databaseSettings)
         {
             IDatabaseProviderMetadata? providerMeta = _databaseProviderMetadata.FirstOrDefault(x => x.Id == databaseSettings.DatabaseProviderMetadataId);
@@ -245,15 +284,21 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
 
         #region Database Schema
 
+        /// <summary>
+        /// Creates a new database using the configured database provider and connection string.
+        /// This method delegates the creation to the underlying database provider factory.
+        /// </summary>
         public void CreateDatabase() => _dbProviderFactoryCreator.CreateDatabase(_databaseFactory.ProviderName!, _databaseFactory.ConnectionString!);
 
         /// <summary>
         /// Validates the database schema.
         /// </summary>
         /// <remarks>
-        /// <para>This assumes that the database exists and the connection string is
-        /// configured and it is possible to connect to the database.</para>
+        /// <para>This assumes that the database exists, the connection string is configured, and a connection to the database can be established.</para>
         /// </remarks>
+        /// <returns>
+        /// A <see cref="DatabaseSchemaResult"/> containing the result of the schema validation, or <c>null</c> if validation could not be performed.
+        /// </returns>
         public DatabaseSchemaResult? ValidateSchema()
         {
             using (ICoreScope scope = _scopeProvider.CreateCoreScope())
@@ -290,6 +335,10 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
         /// <para>This assumes that the database exists and the connection string is
         /// configured and it is possible to connect to the database.</para>
         /// </remarks>
+        /// <returns>
+        /// A <see cref="Result"/> object indicating whether the operation succeeded, failed, or requires an upgrade.
+        /// Returns <c>null</c> if the operation could not be completed.
+        /// </returns>
         public Result? CreateSchemaAndData()
         {
             using (ICoreScope scope = _scopeProvider.CreateCoreScope())
@@ -358,12 +407,33 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             }
         }
 
+        /// <summary>
+        /// Upgrades the database schema and data using the specified Umbraco plan.
+        /// </summary>
+        /// <param name="plan">The Umbraco plan describing the upgrade steps.</param>
+        /// <returns>A <see cref="Result"/> indicating the outcome of the upgrade, or <c>null</c> if no result is available.</returns>
+        /// <remarks>
+        /// This method is obsolete. Use <see cref="UpgradeSchemaAndDataAsync"/> instead.
+        /// </remarks>
         [Obsolete("Use UpgradeSchemaAndDataAsync instead. Scheduled for removal in Umbraco 18.")]
         public Result? UpgradeSchemaAndData(UmbracoPlan plan) => UpgradeSchemaAndData((MigrationPlan)plan);
 
+        /// <summary>
+        /// Upgrades the database schema and data according to the specified migration plan.
+        /// </summary>
+        /// <param name="plan">The migration plan to apply for upgrading the schema and data.</param>
+        /// <returns>A <see cref="Result"/> indicating the outcome of the upgrade operation, or <c>null</c> if the upgrade did not produce a result.</returns>
+        /// <remarks>
+        /// This method is obsolete. Use <see cref="UpgradeSchemaAndDataAsync"/> instead. Scheduled for removal in Umbraco 18.
+        /// </remarks>
         [Obsolete("Use UpgradeSchemaAndDataAsync instead. Scheduled for removal in Umbraco 18.")]
         public Result? UpgradeSchemaAndData(MigrationPlan plan) => UpgradeSchemaAndDataAsync(plan).GetAwaiter().GetResult();
 
+        /// <summary>
+        /// Asynchronously upgrades the database schema and data based on the specified <see cref="UmbracoPlan"/>.
+        /// </summary>
+        /// <param name="plan">The <see cref="UmbracoPlan"/> that defines the migration steps to apply.</param>
+        /// <returns>A <see cref="Task{TResult}"/> representing the asynchronous operation, containing the <see cref="Result"/> of the upgrade if successful; otherwise, <c>null</c> if no upgrade was performed.</returns>
         public async Task<Result?> UpgradeSchemaAndDataAsync(UmbracoPlan plan) => await UpgradeSchemaAndDataAsync((MigrationPlan)plan).ConfigureAwait(false);
 
         /// <summary>

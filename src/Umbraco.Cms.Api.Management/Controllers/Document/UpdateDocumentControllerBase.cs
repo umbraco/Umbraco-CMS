@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Core.Actions;
@@ -8,6 +8,10 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Document;
 
+/// <summary>
+/// Serves as the base controller for handling update operations on documents within the Umbraco CMS Management API.
+/// Provides common functionality for derived controllers that manage document updates.
+/// </summary>
 public abstract class UpdateDocumentControllerBase : DocumentControllerBase
 {
     private readonly IAuthorizationService _authorizationService;

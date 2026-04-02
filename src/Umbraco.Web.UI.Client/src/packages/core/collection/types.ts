@@ -37,7 +37,7 @@ export interface UmbCollectionColumnConfiguration {
 
 export interface UmbCollectionLayoutConfiguration {
 	icon?: string;
-	name: string;
+	name?: string;
 	collectionView: string;
 }
 

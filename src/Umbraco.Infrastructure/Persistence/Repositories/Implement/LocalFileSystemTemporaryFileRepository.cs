@@ -15,6 +15,12 @@ internal sealed class LocalFileSystemTemporaryFileRepository : ITemporaryFileRep
     private readonly ILogger<LocalFileSystemTemporaryFileRepository> _logger;
     private readonly IJsonSerializer _jsonSerializer;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="LocalFileSystemTemporaryFileRepository"/> class, which manages temporary files using the local file system.
+    /// </summary>
+    /// <param name="hostingEnvironment">The hosting environment providing information about the web application's environment and file system paths.</param>
+    /// <param name="logger">The logger instance used for logging repository operations and errors.</param>
+    /// <param name="jsonSerializer">The JSON serializer used for serializing and deserializing file metadata.</param>
     public LocalFileSystemTemporaryFileRepository(
         IHostingEnvironment hostingEnvironment,
         ILogger<LocalFileSystemTemporaryFileRepository> logger,
@@ -37,6 +43,11 @@ internal sealed class LocalFileSystemTemporaryFileRepository : ITemporaryFileRep
         return new DirectoryInfo(path);
     }
 
+    /// <summary>
+    /// Gets the temporary file model asynchronously by the specified key.
+    /// </summary>
+    /// <param name="key">The unique identifier of the temporary file.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the <see cref="TemporaryFileModel"/> if found; otherwise, null.</returns>
     public async Task<TemporaryFileModel?> GetAsync(Guid key)
     {
 
@@ -69,6 +80,12 @@ internal sealed class LocalFileSystemTemporaryFileRepository : ITemporaryFileRep
         };
     }
 
+    /// <summary>
+    /// Asynchronously saves the specified temporary file model to the local file system, overwriting any existing file with the same key.
+    /// This operation ensures that the target directory is clean before saving the new file and its metadata.
+    /// </summary>
+    /// <param name="model">The temporary file model to save.</param>
+    /// <returns>A task that represents the asynchronous save operation.</returns>
     public async Task SaveAsync(TemporaryFileModel model)
     {
         // Ensure folder does not exist
@@ -88,6 +105,11 @@ internal sealed class LocalFileSystemTemporaryFileRepository : ITemporaryFileRep
         });
     }
 
+    /// <summary>
+    /// Asynchronously deletes the temporary file directory associated with the specified key, if it exists.
+    /// </summary>
+    /// <param name="key">The unique identifier for the temporary file directory to delete.</param>
+    /// <returns>A task that represents the asynchronous delete operation.</returns>
     public Task DeleteAsync(Guid key)
     {
         DirectoryInfo rootDirectory = GetRootDirectory();
@@ -102,6 +124,11 @@ internal sealed class LocalFileSystemTemporaryFileRepository : ITemporaryFileRep
         return Task.CompletedTask;
     }
 
+    /// <summary>
+    /// Deletes temporary files whose expiration date has passed, as determined by the specified time.
+    /// </summary>
+    /// <param name="now">The current date and time used to determine which temporary files have expired.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains a collection of GUIDs representing the keys of the deleted temporary files.</returns>
     public async Task<IEnumerable<Guid>> CleanUpOldTempFiles(DateTime now)
     {
         DirectoryInfo rootDirectory = GetRootDirectory();
@@ -160,6 +187,9 @@ internal sealed class LocalFileSystemTemporaryFileRepository : ITemporaryFileRep
 
     private sealed class FileMetaData
     {
+        /// <summary>
+        /// Gets the date and time until which the temporary file remains available before it is subject to deletion.
+        /// </summary>
         public DateTime AvailableUntil { get; init; }
     }
 

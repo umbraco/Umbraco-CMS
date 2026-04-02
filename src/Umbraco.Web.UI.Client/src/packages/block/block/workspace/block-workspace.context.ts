@@ -658,7 +658,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 					this.#blockManager?.setOneContent(this.#initialContent);
 				}
 				if (this.#initialSettings) {
-					this.#blockManager?.setOneContent(this.#initialSettings);
+					this.#blockManager?.setOneSettings(this.#initialSettings);
 				}
 			}
 		}

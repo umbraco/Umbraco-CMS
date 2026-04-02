@@ -1,6 +1,7 @@
 import type UmbBlockElementManager from '../../block-element-manager.js';
 import { html, customElement, property, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
+import type { UmbDataTypeDetailModel } from '@umbraco-cms/backoffice/data-type';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbDataPathPropertyValueQuery } from '@umbraco-cms/backoffice/validation';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
@@ -19,6 +20,9 @@ export class UmbBlockWorkspaceViewEditPropertyElement extends UmbLitElement {
 
 	@state()
 	private _writeable?: boolean;
+
+	@state()
+	private _dataTypeDetail?: UmbDataTypeDetailModel;
 
 	@property({ attribute: false })
 	ownerContext?: UmbBlockElementManager;
@@ -50,6 +54,19 @@ export class UmbBlockWorkspaceViewEditPropertyElement extends UmbLitElement {
 				);
 			}
 		}
+
+		if (changedProperties.has('property') || changedProperties.has('ownerContext')) {
+			const dataTypeUnique = this.property?.dataType.unique;
+			if (dataTypeUnique && this.ownerContext) {
+				this.observe(
+					this.ownerContext.structure.contentTypeDataTypeDetailOf(dataTypeUnique),
+					(detail) => {
+						this._dataTypeDetail = detail;
+					},
+					'observeDataTypeDetail',
+				);
+			}
+		}
 	}
 
 	override render() {
@@ -58,6 +75,7 @@ export class UmbBlockWorkspaceViewEditPropertyElement extends UmbLitElement {
 		return html`<umb-property-type-based-property
 			data-path=${this._dataPath}
 			.property=${this.property}
+			.dataTypeDetail=${this._dataTypeDetail}
 			?readonly=${!this._writeable}></umb-property-type-based-property>`;
 	}
 }

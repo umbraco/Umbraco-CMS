@@ -11,9 +11,24 @@ using Umbraco.Cms.Core.Web;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_15_0_0;
 
+/// <summary>
+/// Migration responsible for converting rich text editor properties to the new format as part of the upgrade process to Umbraco version 15.0.0.
+/// </summary>
 [Obsolete("Scheduled for removal in Umbraco 18.")]
 public partial class ConvertRichTextEditorProperties : ConvertBlockEditorPropertiesBase
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ConvertRichTextEditorProperties"/> class.
+    /// </summary>
+    /// <param name="context">The migration context for the operation.</param>
+    /// <param name="logger">The logger instance for <see cref="ConvertBlockEditorPropertiesBase"/> operations.</param>
+    /// <param name="contentTypeService">Service for managing content types.</param>
+    /// <param name="dataTypeService">Service for managing data types.</param>
+    /// <param name="jsonSerializer">The serializer used for JSON operations.</param>
+    /// <param name="umbracoContextFactory">Factory for creating Umbraco context instances.</param>
+    /// <param name="languageService">Service for managing languages.</param>
+    /// <param name="options">Options for converting block editor properties.</param>
+    /// <param name="coreScopeProvider">Provider for managing core scopes.</param>
     public ConvertRichTextEditorProperties(
         IMigrationContext context,
         ILogger<ConvertBlockEditorPropertiesBase> logger,
@@ -58,6 +73,17 @@ public partial class ConvertRichTextEditorProperties : ConvertBlockEditorPropert
         return richTextEditorValue;
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ConvertRichTextEditorProperties"/> class.
+    /// </summary>
+    /// <param name="context">The <see cref="IMigrationContext"/> for the migration operation.</param>
+    /// <param name="logger">The <see cref="ILogger{ConvertBlockEditorPropertiesBase}"/> used for logging migration events.</param>
+    /// <param name="contentTypeService">The <see cref="IContentTypeService"/> used to manage content types.</param>
+    /// <param name="dataTypeService">The <see cref="IDataTypeService"/> used to manage data types.</param>
+    /// <param name="jsonSerializer">The <see cref="IJsonSerializer"/> used for serializing and deserializing JSON data.</param>
+    /// <param name="umbracoContextFactory">The <see cref="IUmbracoContextFactory"/> used to create Umbraco contexts.</param>
+    /// <param name="languageService">The <see cref="ILanguageService"/> used to manage languages.</param>
+    /// <param name="coreScopeProvider">The <see cref="ICoreScopeProvider"/> used to manage database scopes.</param>
     public ConvertRichTextEditorProperties(
         IMigrationContext context,
         ILogger<ConvertBlockEditorPropertiesBase> logger,

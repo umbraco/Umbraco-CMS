@@ -203,13 +203,13 @@ export abstract class UmbBaseExtensionInitializer<
 				// Because it took some time to create the conditions, it maybe have already gotten created by another cycle, so lets test again. [NL]
 				const existing = this.#conditionControllers.find((existing) => existing.config === emerging?.config);
 				if (!existing) {
-					this.#conditionControllers.push(emerging!);
+					this.#conditionControllers.push(emerging);
 				} else {
 					emerging?.destroy();
 				}
 			});
 
-		// If a change to amount of condition controllers, this will make sure that when new conditions are added, the callback is fired, so the extensions can be re-evaluated, starting out as bad. [NL]
+		// If a change to amount of condition controllers, this will make sure that when new conditions are added, the callback is fired, so the extensions can be re-evaluated, starting out as not permitted. [NL]
 		if (oldLength !== this.#conditionControllers.length) {
 			this.#onConditionsChangedCallback();
 		}

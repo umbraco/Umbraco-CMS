@@ -465,7 +465,7 @@ public class NotificationService : INotificationService
             }
         }
 
-        var protocol = _globalSettings.UseHttps ? "https" : "http";
+        var protocol = siteUri.Scheme;
 
         var subjectVars = new NotificationEmailSubjectParams(
             string.Concat(siteUri.Authority, _ioHelper.ResolveUrl(Constants.System.DefaultUmbracoPath)),
@@ -476,15 +476,13 @@ public class NotificationService : INotificationService
             mailingUser.Name,
             actionName,
             content.Name,
-            content.Id.ToString(CultureInfo.InvariantCulture),
+            content.Key.ToString(),
             string.Format(
-                "{2}://{0}/{1}",
-                string.Concat(siteUri.Authority),
-
-                // TODO: RE-enable this so we can have a nice URL
-                /*umbraco.library.NiceUrl(documentObject.Id))*/
-                string.Concat(content.Id, ".aspx"),
-                protocol),
+                "{0}://{1}{2}/section/content/workspace/document/edit/{3}",
+                protocol,
+                siteUri.Authority,
+                _ioHelper.ResolveUrl(Constants.System.DefaultUmbracoPath),
+                content.Key),
             performingUser.Name,
             string.Concat(siteUri.Authority, _ioHelper.ResolveUrl(Constants.System.DefaultUmbracoPath)),
             summary.ToString());
@@ -511,9 +509,9 @@ public class NotificationService : INotificationService
                     createBody((user: mailingUser, body: bodyVars, true)));
         }
 
-        // nh, issue 30724. Due to hardcoded http strings in resource files, we need to check for https replacements here
+        // Due to hardcoded http strings in resource files, we need to check for https replacements here
         // adding the server name to make sure we don't replace external links
-        if (_globalSettings.UseHttps && string.IsNullOrEmpty(body) == false)
+        if (string.Equals(siteUri.Scheme, "https", StringComparison.OrdinalIgnoreCase) && string.IsNullOrEmpty(body) == false)
         {
             var serverName = siteUri.Host;
             body = body.Replace(

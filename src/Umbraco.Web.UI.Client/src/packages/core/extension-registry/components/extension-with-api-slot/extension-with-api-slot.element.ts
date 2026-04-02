@@ -101,6 +101,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 export class UmbExtensionWithApiSlotElement extends UmbLitElement {
 	#attached = false;
 	#extensionsController?: UmbExtensionsElementAndApiInitializer;
+	#disconnectAC?: AbortController;
 
 	@state()
 	private _permitted?: Array<UmbExtensionElementAndApiInitializer>;
@@ -337,15 +338,34 @@ export class UmbExtensionWithApiSlotElement extends UmbLitElement {
 	override connectedCallback(): void {
 		super.connectedCallback();
 		this.#attached = true;
+		// Cancel any pending destruction if we're being reconnected (e.g., during a DOM move/sort)
+		if (this.#disconnectAC) {
+			this.#disconnectAC.abort();
+			this.#disconnectAC = undefined;
+			// Only skip re-initialization if the controller still exists
+			if (this.#extensionsController) {
+				return;
+			}
+		}
 		this.#observeExtensions();
 	}
-	override disconnectedCallback(): void {
-		this.#attached = false;
-		this.#extensionsController?.destroy();
-		this.#extensionsController = undefined;
-		super.disconnectedCallback();
-	}
 
+	override disconnectedCallback(): void {
+		super.disconnectedCallback();
+		this.#attached = false;
+		// Abort any previously pending disconnect before scheduling a new one
+		this.#disconnectAC?.abort();
+		// Defer destruction to allow for reconnection during DOM moves/sorting
+		// If reconnected before the microtask resolves, the AbortController cancels the callback
+		const abortController = (this.#disconnectAC = new AbortController());
+		queueMicrotask(() => {
+			if (!abortController.signal.aborted) {
+				this.#disconnectAC = undefined;
+				this.#extensionsController?.destroy();
+				this.#extensionsController = undefined;
+			}
+		});
+	}
 	#observeExtensions(): void {
 		// We want to be attached before we start observing extensions, cause first at this point we know that we got the right properties. [NL]
 		if (!this.#attached) return;

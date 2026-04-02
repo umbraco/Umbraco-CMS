@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Factories;
@@ -6,6 +6,9 @@ using Umbraco.Cms.Api.Management.ViewModels.Member;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Member;
 
+/// <summary>
+/// Provides API endpoints for managing member configuration settings in the Umbraco CMS.
+/// </summary>
 [ApiVersion("1.0")]
 public class ConfigurationMemberController : MemberControllerBase
 {
@@ -15,6 +18,11 @@ public class ConfigurationMemberController : MemberControllerBase
         IConfigurationPresentationFactory configurationPresentationFactory) =>
         _configurationPresentationFactory = configurationPresentationFactory;
 
+    /// <summary>
+    /// Retrieves the configuration settings for members.
+    /// </summary>
+    /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
+    /// <returns>An <see cref="IActionResult"/> containing a <see cref="MemberConfigurationResponseModel"/> with the member configuration settings.</returns>
     [HttpGet("configuration")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(MemberConfigurationResponseModel), StatusCodes.Status200OK)]

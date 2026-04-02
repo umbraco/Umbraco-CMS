@@ -28,6 +28,15 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
     private readonly IIdKeyMap _idKeyMap;
     private readonly FlagProviderCollection _flagProviderCollection;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Factories.DocumentPresentationFactory"/> class.
+    /// </summary>
+    /// <param name="umbracoMapper">The mapper used for mapping Umbraco objects.</param>
+    /// <param name="documentUrlFactory">Factory for creating document URLs.</param>
+    /// <param name="templateService">Service for managing templates.</param>
+    /// <param name="publicAccessService">Service for controlling public access to documents.</param>
+    /// <param name="timeProvider">Provider for time-related operations.</param>
+    /// <param name="idKeyMap">Map for managing ID keys.</param>
     [Obsolete("Please use the controller with all parameters. Scheduled for removal in Umbraco 18")]
     public DocumentPresentationFactory(
         IUmbracoMapper umbracoMapper,
@@ -47,6 +56,16 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DocumentPresentationFactory"/> class.
+    /// </summary>
+    /// <param name="umbracoMapper">The mapper used to map between Umbraco models.</param>
+    /// <param name="documentUrlFactory">Factory for generating URLs for documents.</param>
+    /// <param name="templateService">Service for managing and retrieving templates.</param>
+    /// <param name="publicAccessService">Service for handling public access and permissions.</param>
+    /// <param name="timeProvider">Provider for obtaining the current time.</param>
+    /// <param name="idKeyMap">Service for mapping between IDs and keys.</param>
+    /// <param name="flagProviderCollection">Collection of providers for document flags.</param>
     public DocumentPresentationFactory(
         IUmbracoMapper umbracoMapper,
         IDocumentUrlFactory documentUrlFactory,
@@ -65,6 +84,14 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
         _flagProviderCollection = flagProviderCollection;
     }
 
+    /// <summary>
+    /// Asynchronously creates a <see cref="PublishedDocumentResponseModel"/> from the specified <see cref="IContent"/> instance.
+    /// </summary>
+    /// <param name="content">The content item from which to generate the published document response model.</param>
+    /// <returns>
+    /// A task representing the asynchronous operation. The result contains the generated <see cref="PublishedDocumentResponseModel"/>,
+    /// including template reference information if available.
+    /// </returns>
     public async Task<PublishedDocumentResponseModel> CreatePublishedResponseModelAsync(IContent content)
     {
         PublishedDocumentResponseModel responseModel = _umbracoMapper.Map<PublishedDocumentResponseModel>(content)!;
@@ -80,6 +107,13 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
         return responseModel;
     }
 
+    /// <summary>
+    /// Asynchronously creates a <see cref="DocumentResponseModel"/> from the specified <see cref="IContent"/> and <see cref="ContentScheduleCollection"/>.
+    /// Maps the content and schedule to the response model, and if the content has an associated template, includes its reference in the result.
+    /// </summary>
+    /// <param name="content">The content item to map to the response model.</param>
+    /// <param name="schedule">The collection of content schedules to include in the response model.</param>
+    /// <returns>A task representing the asynchronous operation. The task result contains the constructed <see cref="DocumentResponseModel"/>, including template reference if applicable.</returns>
     public async Task<DocumentResponseModel> CreateResponseModelAsync(IContent content, ContentScheduleCollection schedule)
     {
         DocumentResponseModel responseModel = _umbracoMapper.Map<DocumentResponseModel>(content)!;
@@ -96,6 +130,14 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
         return responseModel;
     }
 
+    /// <summary>
+    /// Creates a <see cref="DocumentItemResponseModel"/> from the specified <see cref="IDocumentEntitySlim"/> entity.
+    /// Populates the response model with the document's key properties, including parent reference, trashed status, protection status, document type, variants, and additional flags.
+    /// </summary>
+    /// <param name="entity">The document entity to create the response model from.</param>
+    /// <returns>
+    /// A <see cref="DocumentItemResponseModel"/> representing the document entity, with populated metadata and references.
+    /// </returns>
     public DocumentItemResponseModel CreateItemResponseModel(IDocumentEntitySlim entity)
     {
         Attempt<Guid> parentKeyAttempt = _idKeyMap.GetKeyForId(entity.ParentId, UmbracoObjectTypes.Document);
@@ -132,6 +174,11 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
         return responseModel;
     }
 
+    /// <summary>
+    /// Generates a collection of <see cref="DocumentVariantItemResponseModel"/> objects representing each variant (culture) of the specified document entity.
+    /// </summary>
+    /// <param name="entity">The document entity for which to generate variant response models.</param>
+    /// <returns>An <see cref="IEnumerable{DocumentVariantItemResponseModel}"/> containing a response model for each variant of the document.</returns>
     public IEnumerable<DocumentVariantItemResponseModel> CreateVariantsItemResponseModels(IDocumentEntitySlim entity)
     {
         if (entity.Variations.VariesByCulture() is false)
@@ -162,9 +209,21 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
         }
     }
 
+    /// <summary>
+    /// Creates a <see cref="DocumentTypeReferenceResponseModel"/> from the given <see cref="IDocumentEntitySlim"/> entity.
+    /// </summary>
+    /// <param name="entity">The document entity to map.</param>
+    /// <returns>A mapped <see cref="DocumentTypeReferenceResponseModel"/> instance.</returns>
     public DocumentTypeReferenceResponseModel CreateDocumentTypeReferenceResponseModel(IDocumentEntitySlim entity)
         => _umbracoMapper.Map<DocumentTypeReferenceResponseModel>(entity)!;
 
+    /// <summary>
+    /// Creates a list of <see cref="Umbraco.Cms.Api.Management.Models.Content.CulturePublishScheduleModel"/> instances from the specified <see cref="Umbraco.Cms.Api.Management.Models.Content.PublishDocumentRequestModel"/>.
+    /// Validates the publish and unpublish times for each culture's schedule, ensuring they are in the future and that unpublish times are after publish times.
+    /// Returns an <see cref="Umbraco.Cms.Core.Models.Attempt"/> containing the resulting list and a <see cref="Umbraco.Cms.Api.Management.Models.Content.ContentPublishingOperationStatus"/> indicating the outcome of the validation.
+    /// </summary>
+    /// <param name="requestModel">The request model containing culture-specific publish schedules to process.</param>
+    /// <returns>An <see cref="Umbraco.Cms.Core.Models.Attempt"/> with a list of <see cref="Umbraco.Cms.Api.Management.Models.Content.CulturePublishScheduleModel"/> and the validation status.</returns>
     public Attempt<List<CulturePublishScheduleModel>, ContentPublishingOperationStatus> CreateCulturePublishScheduleModels(PublishDocumentRequestModel requestModel)
     {
         var model = new List<CulturePublishScheduleModel>();

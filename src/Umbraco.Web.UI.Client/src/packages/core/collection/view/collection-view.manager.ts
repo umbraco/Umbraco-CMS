@@ -1,3 +1,4 @@
+import type { UmbCollectionLayoutConfiguration } from '../types.js';
 import type { ManifestCollectionView } from './collection-view.extension.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbExtensionsManifestInitializer, createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
@@ -9,6 +10,7 @@ import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 export interface UmbCollectionViewManagerConfig {
 	defaultViewAlias?: string;
 	manifestFilter?: (manifest: ManifestCollectionView) => boolean;
+	viewsOverride?: Array<UmbCollectionLayoutConfiguration>;
 }
 
 export class UmbCollectionViewManager extends UmbControllerBase {
@@ -25,6 +27,7 @@ export class UmbCollectionViewManager extends UmbControllerBase {
 	public readonly rootPathName = this.#rootPathName.asObservable();
 
 	#defaultViewAlias?: string;
+	#viewsOverride?: Array<UmbCollectionLayoutConfiguration>;
 
 	constructor(host: UmbControllerHost) {
 		super(host);
@@ -38,6 +41,7 @@ export class UmbCollectionViewManager extends UmbControllerBase {
 
 	public setConfig(config: UmbCollectionViewManagerConfig) {
 		this.#defaultViewAlias = config.defaultViewAlias;
+		this.#viewsOverride = config.viewsOverride;
 		this.#observeViews(config.manifestFilter);
 	}
 
@@ -66,8 +70,16 @@ export class UmbCollectionViewManager extends UmbControllerBase {
 			umbExtensionsRegistry,
 			'collectionView',
 			filter ?? null,
-			(views) => {
-				const manifests = views.map((view) => view.manifest);
+			(manifestInitializer) => {
+				let manifests = manifestInitializer.map((view) => view.manifest);
+
+				// Reorder and filter to match the `viewsOverride` array order
+				if (this.#viewsOverride?.length) {
+					manifests = this.#viewsOverride
+						.map((override) => manifests.find((m) => m.alias === override.collectionView))
+						.filter((m) => m !== undefined);
+				}
+
 				this.#views.setValue(manifests);
 				this.#createRoutes(manifests);
 			},
@@ -79,7 +91,10 @@ export class UmbCollectionViewManager extends UmbControllerBase {
 
 		if (views && views.length > 0) {
 			// find the default view from the config. If it doesn't exist, use the first view
-			const defaultView = views.find((view) => view.alias === this.#defaultViewAlias);
+			const firstOverrideView = this.#viewsOverride?.length
+				? views.find((view) => view.alias === this.#viewsOverride![0].collectionView)
+				: null;
+			const defaultView = firstOverrideView ?? views.find((view) => view.alias === this.#defaultViewAlias);
 			const fallbackView = defaultView ?? views[0];
 
 			routes = views.map((view) => {

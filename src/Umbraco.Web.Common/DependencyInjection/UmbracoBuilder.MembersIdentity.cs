@@ -63,7 +63,14 @@ public static partial class UmbracoBuilderExtensions
         services.AddScoped(x => (IMemberUserStore)x.GetRequiredService<IUserStore<MemberIdentityUser>>());
         services.AddScoped<IPasswordHasher<MemberIdentityUser>, MemberPasswordHasher>();
 
+        // TODO (V18): Remove this registration. The base SecurityStampValidatorOptions it configures is not consumed by
+        // any validator — both BackOfficeSecurityStampValidator and MemberSecurityStampValidator use their own derived
+        // options types, each configured by their own IConfigureOptions (which call ConfigureSecurityStampOptions.ConfigureOptions
+        // directly).
+        // Kept for the current major in case external consumers depend on IOptions<SecurityStampValidatorOptions>.
         services.ConfigureOptions<ConfigureSecurityStampOptions>();
+
+        services.ConfigureOptions<ConfigureMemberSecurityStampValidatorOptions>();
         services.ConfigureOptions<ConfigureMemberCookieOptions>();
         services.AddScoped<MemberSecurityStampValidator>();
 

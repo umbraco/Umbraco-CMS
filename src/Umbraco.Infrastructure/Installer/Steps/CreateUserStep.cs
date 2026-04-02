@@ -21,6 +21,9 @@ using HttpResponseMessage = System.Net.Http.HttpResponseMessage;
 
 namespace Umbraco.Cms.Infrastructure.Installer.Steps;
 
+/// <summary>
+/// Represents the installer step responsible for creating the initial user during the Umbraco installation process.
+/// </summary>
 public class CreateUserStep : StepBase, IInstallStep
 {
     private readonly IUserService _userService;
@@ -35,6 +38,19 @@ public class CreateUserStep : StepBase, IInstallStep
     private readonly IJsonSerializer _jsonSerializer;
     private readonly ILogger<CreateUserStep> _logger;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CreateUserStep"/> class, which represents the installer step responsible for creating a user during the installation process.
+    /// </summary>
+    /// <param name="userService">Service for managing users.</param>
+    /// <param name="databaseBuilder">Builds and manages the database schema.</param>
+    /// <param name="httpClientFactory">Factory for creating HTTP client instances.</param>
+    /// <param name="securitySettings">The security settings configuration options.</param>
+    /// <param name="connectionStrings">Monitors the application's connection strings.</param>
+    /// <param name="cookieManager">Manages HTTP cookies.</param>
+    /// <param name="userManager">Manages back office user accounts.</param>
+    /// <param name="dbProviderFactoryCreator">Creates database provider factories.</param>
+    /// <param name="metricsConsentService">Handles user consent for metrics collection.</param>
+    /// <param name="jsonSerializer">Serializes and deserializes JSON data.</param>
     [Obsolete("Please use the constructor that takes all parameters. Scheduled for removal in Umbraco 19.")]
     public CreateUserStep(
         IUserService userService,
@@ -62,6 +78,20 @@ public class CreateUserStep : StepBase, IInstallStep
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CreateUserStep"/> class, which handles the creation of a user during the installation process.
+    /// </summary>
+    /// <param name="userService">Service for managing user accounts and operations.</param>
+    /// <param name="databaseBuilder">Responsible for building and initializing the database schema.</param>
+    /// <param name="httpClientFactory">Factory for creating <see cref="System.Net.Http.HttpClient"/> instances.</param>
+    /// <param name="securitySettings">Provides access to security-related configuration settings.</param>
+    /// <param name="connectionStrings">Monitors and provides database connection string options.</param>
+    /// <param name="cookieManager">Manages HTTP cookies for authentication and session management.</param>
+    /// <param name="userManager">Manages back office user authentication and identity operations.</param>
+    /// <param name="dbProviderFactoryCreator">Creates database provider factories for database connections.</param>
+    /// <param name="metricsConsentService">Handles user consent for metrics and telemetry collection.</param>
+    /// <param name="jsonSerializer">Serializes and deserializes objects to and from JSON format.</param>
+    /// <param name="logger">Logs diagnostic and operational information for the <see cref="CreateUserStep"/>.</param>
     public CreateUserStep(
         IUserService userService,
         DatabaseBuilder databaseBuilder,
@@ -88,6 +118,17 @@ public class CreateUserStep : StepBase, IInstallStep
         _logger = logger;
     }
 
+    /// <summary>
+    /// Asynchronously creates or updates the super user during installation using the provided installation data.
+    /// <para>
+    /// This includes setting the user's email, name, username, and password, as well as configuring telemetry consent.
+    /// If requested, the method also attempts to subscribe the user to the Umbraco newsletter. Any failures in newsletter subscription are logged but do not block installation.
+    /// </para>
+    /// </summary>
+    /// <param name="model">The installation data containing user information and telemetry preferences.</param>
+    /// <returns>
+    /// A task that represents the asynchronous operation. The task result contains an <see cref="Attempt{InstallationResult}"/> indicating whether the operation succeeded or failed, with error details if applicable.
+    /// </returns>
     public async Task<Attempt<InstallationResult>> ExecuteAsync(InstallData model)
     {
         IUser? admin = await _userService.GetAsync(Constants.Security.SuperUserKey);
@@ -168,10 +209,17 @@ public class CreateUserStep : StepBase, IInstallStep
     /// </summary>
     private class EmailModel
     {
+        /// <summary>
+        /// Gets or sets the name of the user to be included in the email model.
+        /// </summary>
         public required string Name { get; init; }
 
+        /// <summary>Gets or sets the email address of the user.</summary>
         public required string Email { get; init; }
 
+        /// <summary>
+        /// Gets or sets the collection of user group names associated with the user being created.
+        /// </summary>
         public required List<string> UserGroup { get; init; }
     }
 

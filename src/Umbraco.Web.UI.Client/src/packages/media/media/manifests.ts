@@ -3,6 +3,7 @@ import { manifests as collectionManifests } from './collection/manifests.js';
 import { manifests as entityActionsManifests } from './entity-actions/manifests.js';
 import { manifests as entityBulkActionsManifests } from './entity-bulk-actions/manifests.js';
 import { manifests as fileUploadPreviewManifests } from './components/input-upload-field/manifests.js';
+import { manifests as globalContextManifests } from './global-contexts/manifests.js';
 import { manifests as itemManifests } from './item/manifests.js';
 import { manifests as menuManifests } from './menu/manifests.js';
 import { manifests as modalManifests } from './modals/manifests.js';
@@ -23,6 +24,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 	...entityActionsManifests,
 	...entityBulkActionsManifests,
 	...fileUploadPreviewManifests,
+	...globalContextManifests,
 	...itemManifests,
 	...menuManifests,
 	...modalManifests,
