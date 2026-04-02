@@ -15,6 +15,6 @@
 	"devDependencies": {
 		"lucide-static": "^0.546.0",
 		"simple-icons": "^15.16.1",
-		"svgo": "^4.0.0"
+		"svgo": "^4.0.1"
 	}
 }
