@@ -134,7 +134,7 @@ internal sealed class RelationServiceTests : UmbracoIntegrationTest
     [Test]
     public async Task Can_Create_Relation_Type_Without_Object_Types()
     {
-        IRelationTypeWithIsDependency relationType = new RelationTypeBuilder().Build();
+        IRelationTypeWithIsDependency relationType = new RelationType("Test Relation", "testRelation", false, parentObjectType: null, childObjectType: null, false);
 
         Attempt<IRelationType, RelationTypeOperationStatus> result = await RelationService.CreateAsync(relationType, Constants.Security.SuperUserKey);
 
@@ -151,7 +151,7 @@ internal sealed class RelationServiceTests : UmbracoIntegrationTest
     [Test]
     public async Task Can_Update_Relation_Type_Without_Object_Types()
     {
-        IRelationTypeWithIsDependency relationType = new RelationTypeBuilder().Build();
+        IRelationTypeWithIsDependency relationType = new RelationType("Test Relation", "testRelation", false, parentObjectType: null, childObjectType: null, false);
         Attempt<IRelationType, RelationTypeOperationStatus> createResult = await RelationService.CreateAsync(relationType, Constants.Security.SuperUserKey);
         Assert.IsTrue(createResult.Success);
 
@@ -162,9 +162,15 @@ internal sealed class RelationServiceTests : UmbracoIntegrationTest
         {
             Assert.IsTrue(updateResult.Success);
             Assert.AreEqual(RelationTypeOperationStatus.Success, updateResult.Status);
-            Assert.AreEqual("Updated Name", updateResult.Result.Name);
-            Assert.IsNull(updateResult.Result.ParentObjectType);
-            Assert.IsNull(updateResult.Result.ChildObjectType);
+        });
+
+        IRelationType? persisted = RelationService.GetRelationTypeById(updateResult.Result.Key);
+        Assert.IsNotNull(persisted);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual("Updated Name", persisted!.Name);
+            Assert.IsNull(persisted.ParentObjectType);
+            Assert.IsNull(persisted.ChildObjectType);
         });
     }
 
