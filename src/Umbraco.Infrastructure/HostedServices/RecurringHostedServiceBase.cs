@@ -153,8 +153,11 @@ public abstract class RecurringHostedServiceBase : IHostedService, IDisposable
         {
             sw.Stop();
 
-            // Subtract elapsed time to prevent period drift; clamp to zero if execution exceeded the period.
-            TimeSpan remaining = ComputeNextDelay(_period, sw.Elapsed);
+            // If the service has been stopped, _period is set to InfiniteTimeSpan in StopAsync.
+            // Preserve it to keep the timer disabled.
+            TimeSpan remaining = _period == Timeout.InfiniteTimeSpan
+                ? Timeout.InfiniteTimeSpan
+                : ComputeNextDelay(_period, sw.Elapsed);
             _timer?.Change(remaining, _period);
         }
     }
@@ -182,6 +185,9 @@ public abstract class RecurringHostedServiceBase : IHostedService, IDisposable
     {
         TimeSpan remaining = period - elapsed;
 
+        // A negative period (e.g. Timeout.InfiniteTimeSpan = -1ms, set by StopAsync) will always produce a
+        // negative remaining value. The caller in ExecuteAsync guards against this by checking for InfiniteTimeSpan
+        // before calling this method, to avoid scheduling an extra execution after stop.
         return remaining < TimeSpan.Zero ? TimeSpan.Zero : remaining;
     }
 

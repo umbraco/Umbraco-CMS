@@ -102,4 +102,15 @@ public class RecurringHostedServiceBaseTests
 
         Assert.AreEqual(TimeSpan.Zero, result);
     }
+
+    [Test]
+    public void ComputeNextDelay_Returns_Zero_For_Negative_Period()
+    {
+        var period = TimeSpan.FromMilliseconds(-1);
+        var elapsed = TimeSpan.FromSeconds(1);
+
+        TimeSpan result = RecurringHostedServiceBase.ComputeNextDelay(period, elapsed);
+
+        Assert.AreEqual(TimeSpan.Zero, result);
+    }
 }
