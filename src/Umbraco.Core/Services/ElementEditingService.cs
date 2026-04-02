@@ -478,7 +478,7 @@ internal sealed class ElementEditingService
 
         scope.Notifications.Publish(new ElementTreeChangeNotification(copy, TreeChangeTypes.RefreshBranch, eventMessages));
         scope.Notifications.Publish(
-            new ElementCopiedNotification(element, copy, newParentId, newParentKey, relateToOriginal, eventMessages)
+            new ElementCopiedNotification(element, copy, newParentKey, relateToOriginal, eventMessages)
                 .WithStateFrom(copyingNotification));
 
         await _auditService.AddAsync(AuditType.Copy, userKey, element.Id, UmbracoObjectTypes.Element.GetName());

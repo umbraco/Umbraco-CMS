@@ -1581,7 +1581,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
                 new ContentTreeChangeNotification(copy, TreeChangeTypes.RefreshBranch, eventMessages));
             foreach (Tuple<IContent, IContent> x in CollectionsMarshal.AsSpan(copies))
             {
-                scope.Notifications.Publish(new ContentCopiedNotification(x.Item1, x.Item2, parentId, parentKey, relateToOriginal, eventMessages));
+                scope.Notifications.Publish(new ContentCopiedNotification(x.Item1, x.Item2, parentKey, relateToOriginal, eventMessages));
             }
 
             Audit(AuditType.Copy, userId, content.Id);

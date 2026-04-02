@@ -17,6 +17,22 @@ public abstract class CopiedNotification<T> : ObjectNotification<T>
     where T : class
 {
     /// <summary>
+    /// Initializes a new instance of the <see cref="CopiedNotification{T}"/> class.
+    /// </summary>
+    /// <param name="original">The original entity that was copied.</param>
+    /// <param name="copy">The copy of the entity.</param>
+    /// <param name="parentKey">The key of the new parent.</param>
+    /// <param name="relateToOriginal">A value indicating whether the copy is related to the original.</param>
+    /// <param name="messages">The event messages collection.</param>
+    protected CopiedNotification(T original, T copy, Guid? parentKey, bool relateToOriginal, EventMessages messages)
+    : base(original, messages)
+    {
+        Copy = copy;
+        ParentKey = parentKey;
+        RelateToOriginal = relateToOriginal;
+    }
+
+    /// <summary>
     ///     Initializes a new instance of the <see cref="CopiedNotification{T}"/> class.
     /// </summary>
     /// <param name="original">The original entity that was copied.</param>
@@ -25,13 +41,11 @@ public abstract class CopiedNotification<T> : ObjectNotification<T>
     /// <param name="parentKey">The key of the new parent.</param>
     /// <param name="relateToOriginal">A value indicating whether the copy is related to the original.</param>
     /// <param name="messages">The event messages collection.</param>
+    [Obsolete("Use the constructor without parentId parameter instead. Scheduled for removal in Umbraco 19.")]
     protected CopiedNotification(T original, T copy, int parentId, Guid? parentKey, bool relateToOriginal, EventMessages messages)
-        : base(original, messages)
+        : this(original, copy, parentKey, relateToOriginal, messages)
     {
-        Copy = copy;
-        ParentId = parentId;
-        ParentKey = parentKey;
-        RelateToOriginal = relateToOriginal;
+
     }
 
     /// <summary>
