@@ -1,6 +1,3 @@
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Moq;
 using NUnit.Framework;
@@ -64,7 +61,7 @@ public class MemberRoleStoreTests
         var mockMemberGroup = Mock.Of<IMemberGroup>(m =>
             m.Name == "fakeGroupName" && m.CreatorId == 77);
 
-        _mockMemberGroupService.Setup(x => x.Save(mockMemberGroup));
+        _mockMemberGroupService.Setup(x => x.CreateAsync(mockMemberGroup));
 
         // act
         var identityResult = await sut.CreateAsync(fakeRole, fakeCancellationToken);
@@ -72,7 +69,7 @@ public class MemberRoleStoreTests
         // assert
         Assert.IsTrue(identityResult.Succeeded);
         Assert.IsTrue(!identityResult.Errors.Any());
-        _mockMemberGroupService.Verify(x => x.Save(It.IsAny<MemberGroup>()));
+        _mockMemberGroupService.Verify(x => x.CreateAsync(It.IsAny<MemberGroup>()));
     }
 
     [Test]
@@ -88,7 +85,7 @@ public class MemberRoleStoreTests
             m.Name == "fakeGroupName" && m.CreatorId == 777);
 
         _mockMemberGroupService.Setup(x => x.GetById(777)).Returns(mockMemberGroup);
-        _mockMemberGroupService.Setup(x => x.Save(mockMemberGroup));
+        _mockMemberGroupService.Setup(x => x.UpdateAsync(mockMemberGroup));
 
         // act
         var identityResult = await sut.UpdateAsync(fakeRole, fakeCancellationToken);
@@ -112,7 +109,7 @@ public class MemberRoleStoreTests
             m.Name == "fakeGroupName" && m.CreatorId == 777);
 
         _mockMemberGroupService.Setup(x => x.GetById(777)).Returns(mockMemberGroup);
-        _mockMemberGroupService.Setup(x => x.Save(mockMemberGroup));
+        _mockMemberGroupService.Setup(x => x.UpdateAsync(mockMemberGroup));
 
         // act
         var identityResult = await sut.UpdateAsync(fakeRole, fakeCancellationToken);
@@ -120,7 +117,7 @@ public class MemberRoleStoreTests
         // assert
         Assert.IsTrue(identityResult.Succeeded);
         Assert.IsTrue(!identityResult.Errors.Any());
-        _mockMemberGroupService.Verify(x => x.Save(It.IsAny<IMemberGroup>()));
+        _mockMemberGroupService.Verify(x => x.UpdateAsync(It.IsAny<IMemberGroup>()));
         _mockMemberGroupService.Verify(x => x.GetById(777));
     }
 
@@ -293,7 +290,7 @@ public class MemberRoleStoreTests
         IMemberGroup fakeMemberGroup = _groupBuilder.WithName("fakeGroupName").WithCreatorId(123).WithId(777)
             .WithKey(fakeRoleGuid).Build();
 
-        _mockMemberGroupService.Setup(x => x.GetById(fakeRoleGuid)).Returns(fakeMemberGroup);
+        _mockMemberGroupService.Setup(x => x.GetAsync(fakeRoleGuid)).ReturnsAsync(fakeMemberGroup);
 
         // act
         IdentityRole actual = await sut.FindByIdAsync(fakeRoleGuid.ToString());
@@ -301,7 +298,7 @@ public class MemberRoleStoreTests
         // assert
         Assert.AreEqual(fakeRole.Name, actual.Name);
         Assert.AreEqual(fakeRole.Id, actual.Id);
-        _mockMemberGroupService.Verify(x => x.GetById(fakeRoleGuid));
+        _mockMemberGroupService.Verify(x => x.GetAsync(fakeRoleGuid));
         _mockMemberGroupService.VerifyNoOtherCalls();
     }
 

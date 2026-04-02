@@ -183,7 +183,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <inheritdoc />
         public Task<PagedModel<IDataType>> FilterAsync(string? name = null, string? editorUiAlias = null, string? editorAlias = null, int skip = 0, int take = 100)
         {
-            IEnumerable<IDataType> query = GetAll();
+            IEnumerable<IDataType> query = GetAllAsync().GetAwaiter().GetResult();
 
             if (name is not null)
             {
@@ -332,42 +332,6 @@ namespace Umbraco.Cms.Core.Services.Implement
             return Attempt.SucceedWithStatus(DataTypeOperationStatus.Success, toMove);
         }
 
-        /// <summary>
-        ///     Copies a data type to a container.
-        /// </summary>
-        /// <param name="copying">The data type to copy.</param>
-        /// <param name="containerId">The target container ID.</param>
-        /// <param name="userId">The ID of the user performing the action.</param>
-        /// <returns>An operation result containing the copied data type.</returns>
-        public Attempt<OperationResult<MoveOperationStatusType, IDataType>?> Copy(IDataType copying, int containerId, int userId = Constants.Security.SuperUserId)
-        {
-            Guid? containerKey = null;
-            if (containerId > 0)
-            {
-                // mimic obsolete Copy method behavior
-                EntityContainer? container = GetContainer(containerId);
-                if (container is null)
-                {
-                    throw new DataOperationException<MoveOperationStatusType>(MoveOperationStatusType.FailedParentNotFound);
-                }
-
-                containerKey = container.Key;
-            }
-
-            Guid currentUserKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult();
-            Attempt<IDataType, DataTypeOperationStatus> result = CopyAsync(copying, containerKey, currentUserKey).GetAwaiter().GetResult();
-
-            // mimic old service behavior
-            EventMessages evtMsgs = EventMessagesFactory.Get();
-            return result.Status switch
-            {
-                DataTypeOperationStatus.Success => OperationResult.Attempt.Succeed(MoveOperationStatusType.Success, evtMsgs, result.Result),
-                DataTypeOperationStatus.CancelledByNotification => OperationResult.Attempt.Fail(MoveOperationStatusType.FailedCancelledByEvent, evtMsgs, result.Result),
-                DataTypeOperationStatus.ParentNotFound => OperationResult.Attempt.Fail(MoveOperationStatusType.FailedParentNotFound, evtMsgs, result.Result),
-                _ => OperationResult.Attempt.Fail(MoveOperationStatusType.FailedNotAllowedByPath, evtMsgs, result.Result, new InvalidOperationException($"Invalid operation status: {result.Status}")),
-            };
-        }
-
         /// <inheritdoc />
         public async Task<Attempt<IDataType, DataTypeOperationStatus>> CopyAsync(IDataType toCopy, Guid? containerKey, Guid userKey)
         {
@@ -482,22 +446,6 @@ namespace Umbraco.Cms.Core.Services.Implement
             Audit(AuditType.Save, userId, -1);
 
             scope.Complete();
-        }
-
-        /// <summary>
-        /// Deletes an <see cref="IDataType"/>
-        /// </summary>
-        /// <remarks>
-        /// Please note that deleting a <see cref="IDataType"/> will remove
-        /// all the <see cref="IPropertyType"/> data that references this <see cref="IDataType"/>.
-        /// </remarks>
-        /// <param name="dataType"><see cref="IDataType"/> to delete</param>
-        /// <param name="userId">Optional Id of the user issuing the deletion</param>
-        /// <inheritdoc />
-        public void Delete(IDataType dataType, int userId = Constants.Security.SuperUserId)
-        {
-            Guid currentUserKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult();
-            DeleteAsync(dataType.Key, currentUserKey).GetAwaiter().GetResult();
         }
 
         /// <inheritdoc />

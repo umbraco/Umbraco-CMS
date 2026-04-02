@@ -97,10 +97,10 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
             => GetUrlSegment(content, culture, Guid.Parse(SubPage2Key), Guid.Parse(SubSubPage2Key));
     }
 
-    public override void Setup()
+    public override async Task Setup()
     {
         DocumentUrlService.InitAsync(false, CancellationToken.None).GetAwaiter().GetResult();
-        base.Setup();
+        await base.Setup();
     }
 
     //

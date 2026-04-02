@@ -70,7 +70,7 @@ public class ConvertersTests
             serializer)
         { Id = 2 };
 
-        dataTypeServiceMock.Setup(x => x.GetAll()).Returns(new[] { dataType1, dataType2 });
+        dataTypeServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(new[] { dataType1, dataType2 });
 
         var contentTypeFactory = new PublishedContentTypeFactory(factory, converters, dataTypeServiceMock.Object);
 

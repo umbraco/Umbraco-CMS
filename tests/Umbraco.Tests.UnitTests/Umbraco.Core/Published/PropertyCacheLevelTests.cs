@@ -1,10 +1,8 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Collections.Generic;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -35,7 +33,7 @@ public class PropertyCacheLevelTests
         var dataType = new DataType(
             new VoidEditor(Mock.Of<IDataValueEditorFactory>()), configurationEditorJsonSerializer)
         { Id = 1 };
-        dataTypeServiceMock.Setup(x => x.GetAll()).Returns(dataType.Yield);
+        dataTypeServiceMock.Setup(x => x.GetAllAsync()).Returns(Task.FromResult<IEnumerable<IDataType>>(dataType.Yield()));
 
         var publishedContentTypeFactory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), converters, dataTypeServiceMock.Object);
 
@@ -80,7 +78,7 @@ public class PropertyCacheLevelTests
         var dataType = new DataType(
             new VoidEditor(Mock.Of<IDataValueEditorFactory>()), new SystemTextConfigurationEditorJsonSerializer(new DefaultJsonSerializerEncoderFactory()))
         { Id = 1 };
-        dataTypeServiceMock.Setup(x => x.GetAll()).Returns(dataType.Yield);
+        dataTypeServiceMock.Setup(x => x.GetAllAsync()).Returns(Task.FromResult<IEnumerable<IDataType>>(dataType.Yield()));
 
         var publishedContentTypeFactory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), converters, dataTypeServiceMock.Object);
 
@@ -138,7 +136,7 @@ public class PropertyCacheLevelTests
         var dataType = new DataType(
             new VoidEditor(Mock.Of<IDataValueEditorFactory>()), new SystemTextConfigurationEditorJsonSerializer(new DefaultJsonSerializerEncoderFactory()))
         { Id = 1 };
-        dataTypeServiceMock.Setup(x => x.GetAll()).Returns(dataType.Yield);
+        dataTypeServiceMock.Setup(x => x.GetAllAsync()).Returns(Task.FromResult<IEnumerable<IDataType>>(dataType.Yield()));
 
         var publishedContentTypeFactory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), converters, dataTypeServiceMock.Object);
 

@@ -39,14 +39,19 @@ public class MemberRoleStore : IQueryableRoleStore<UmbracoIdentityRole>
     /// </summary>
     public IdentityErrorDescriber ErrorDescriber { get; set; }
 
+    [Obsolete("Use GetRolesAsync instead. Scheduled for removal in Umbraco 19")]
+    public IQueryable<UmbracoIdentityRole> Roles =>
+    Task.Run(() => _memberGroupService.GetAllAsync()).GetAwaiter().GetResult()
+        .Select(MapFromMemberGroup).AsQueryable();
     /// <summary>
     /// Gets a queryable collection of all member roles, represented as <see cref="UmbracoIdentityRole"/>, retrieved from the member group service.
     /// </summary>
-    public IQueryable<UmbracoIdentityRole> Roles =>
-        _memberGroupService.GetAll().Select(MapFromMemberGroup).AsQueryable();
+    /// <returns></returns>
+    public async Task<IQueryable<UmbracoIdentityRole>> GetRolesAsync()
+        => (await _memberGroupService.GetAllAsync()).Select(MapFromMemberGroup).AsQueryable();
 
     /// <inheritdoc />
-    public Task<IdentityResult> CreateAsync(UmbracoIdentityRole role, CancellationToken cancellationToken = default)
+    public async Task<IdentityResult> CreateAsync(UmbracoIdentityRole role, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
         ThrowIfDisposed();
@@ -58,15 +63,15 @@ public class MemberRoleStore : IQueryableRoleStore<UmbracoIdentityRole>
 
         var memberGroup = new MemberGroup { Name = role.Name };
 
-        _memberGroupService.Save(memberGroup);
+        await _memberGroupService.CreateAsync(memberGroup);
 
         role.Id = memberGroup.Id.ToString();
 
-        return Task.FromResult(IdentityResult.Success);
+        return IdentityResult.Success;
     }
 
     /// <inheritdoc />
-    public Task<IdentityResult> UpdateAsync(UmbracoIdentityRole role, CancellationToken cancellationToken = default)
+    public async Task<IdentityResult> UpdateAsync(UmbracoIdentityRole role, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
         ThrowIfDisposed();
@@ -78,7 +83,7 @@ public class MemberRoleStore : IQueryableRoleStore<UmbracoIdentityRole>
 
         if (!int.TryParse(role.Id, NumberStyles.Integer, CultureInfo.InvariantCulture, out var roleId))
         {
-            return Task.FromResult(IdentityResult.Failed(_intParseError));
+            return IdentityResult.Failed(_intParseError);
         }
 
         IMemberGroup? memberGroup = _memberGroupService.GetById(roleId);
@@ -86,17 +91,17 @@ public class MemberRoleStore : IQueryableRoleStore<UmbracoIdentityRole>
         {
             if (MapToMemberGroup(role, memberGroup))
             {
-                _memberGroupService.Save(memberGroup);
+                await _memberGroupService.UpdateAsync(memberGroup);
             }
 
-            return Task.FromResult(IdentityResult.Success);
+            return IdentityResult.Success;
         }
 
-        return Task.FromResult(IdentityResult.Failed(_memberGroupNotFoundError));
+        return IdentityResult.Failed(_memberGroupNotFoundError);
     }
 
     /// <inheritdoc />
-    public Task<IdentityResult> DeleteAsync(UmbracoIdentityRole role, CancellationToken cancellationToken = default)
+    public async Task<IdentityResult> DeleteAsync(UmbracoIdentityRole role, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
         ThrowIfDisposed();
@@ -114,14 +119,14 @@ public class MemberRoleStore : IQueryableRoleStore<UmbracoIdentityRole>
         IMemberGroup? memberGroup = _memberGroupService.GetById(roleId);
         if (memberGroup != null)
         {
-            _memberGroupService.Delete(memberGroup);
+            await _memberGroupService.DeleteAsync(memberGroup.Key);
         }
         else
         {
-            return Task.FromResult(IdentityResult.Failed(_memberGroupNotFoundError));
+            return IdentityResult.Failed(_memberGroupNotFoundError);
         }
 
-        return Task.FromResult(IdentityResult.Success);
+        return IdentityResult.Success;
     }
 
     /// <inheritdoc />
@@ -184,7 +189,7 @@ public class MemberRoleStore : IQueryableRoleStore<UmbracoIdentityRole>
         => SetRoleNameAsync(role, normalizedName, cancellationToken);
 
     /// <inheritdoc />
-    public Task<UmbracoIdentityRole?> FindByIdAsync(string roleId, CancellationToken cancellationToken = default)
+    public async Task<UmbracoIdentityRole?> FindByIdAsync(string roleId, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
         ThrowIfDisposed();
@@ -196,22 +201,13 @@ public class MemberRoleStore : IQueryableRoleStore<UmbracoIdentityRole>
 
         IMemberGroup? memberGroup;
 
-        // member group can be found by int or Guid, so try both
-        if (!int.TryParse(roleId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var id))
-            {
-                if (!Guid.TryParse(roleId, out Guid guid))
-                {
-                    throw new ArgumentOutOfRangeException(nameof(roleId), $"{nameof(roleId)} is not a valid Guid");
-                }
-
-                memberGroup = _memberGroupService.GetById(guid);
-        }
-        else
+        if (!Guid.TryParse(roleId, out Guid guid))
         {
-            memberGroup = _memberGroupService.GetById(id);
+            throw new ArgumentOutOfRangeException(nameof(roleId), $"{nameof(roleId)} is not a valid Guid");
         }
+        memberGroup = await _memberGroupService.GetAsync(guid);
 
-        return Task.FromResult(memberGroup == null ? null : MapFromMemberGroup(memberGroup));
+        return memberGroup == null ? null : MapFromMemberGroup(memberGroup);
     }
 
     /// <inheritdoc />

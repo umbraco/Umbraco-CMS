@@ -46,12 +46,14 @@ internal sealed class MemberGroupService : RepositoryService, IMemberGroupServic
     }
 
     /// <inheritdoc />
+    [Obsolete("Use GetAsync instead. Scheduled for removal in Umbraco 19")]
     public IMemberGroup? GetById(Guid id) => GetAsync(id).GetAwaiter().GetResult();
 
     /// <inheritdoc />
     public IMemberGroup? GetByName(string? name) => name is null ? null : GetByNameAsync(name).GetAwaiter().GetResult();
 
     /// <inheritdoc />
+    [Obsolete("Please use the respective CreateAsync/UpdateAsync for your save operations. Scheduled for removal in Umbraco 19.")]
     public void Save(IMemberGroup memberGroup)
     {
         if (string.IsNullOrWhiteSpace(memberGroup.Name))
