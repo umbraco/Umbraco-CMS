@@ -60,8 +60,8 @@ namespace Umbraco.Cms.Infrastructure.BackgroundJobs
             }
 
             // Otherwise start at scheduled time according to cron expression, unless within the default delay period.
-            DateTime firstRunOccurance = cronTabParser.GetNextOccurrence(firstRunTime, now);
-            TimeSpan delay = firstRunOccurance - now;
+            DateTime firstRunOccurrence = cronTabParser.GetNextOccurrence(firstRunTime, now);
+            TimeSpan delay = firstRunOccurrence - now;
             return delay < defaultDelay
                 ? defaultDelay
                 : delay;

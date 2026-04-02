@@ -23,9 +23,8 @@ public abstract class RecurringHostedServiceBase : BackgroundService
     private readonly ILogger? _logger;
     private readonly SemaphoreSlim _signal = new(0, 1);
     private TimeSpan _period;
-    private NextExecutionStrategy _nextExecutionStrategy;
-    private TimeSpan? _nextExecutionDelay;
-    private bool _nextExecutionSkipOnOvershoot;
+    private volatile TriggerState _triggerState = TriggerState.Default;
+    private volatile bool _nextExecutionSkipOnOvershoot;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RecurringHostedServiceBase" /> class.
@@ -41,7 +40,7 @@ public abstract class RecurringHostedServiceBase : BackgroundService
     }
 
     /// <summary>
-    /// Determines the delay before the first run of a recurring task implemented as a hosted service when an optonal configuration for the first run time is available.
+    /// Determines the delay before the first run of a recurring task implemented as a hosted service when an optional configuration for the first run time is available.
     /// </summary>
     /// <param name="firstRunTime">The configured time to first run the task in crontab format.</param>
     /// <param name="cronTabParser">An instance of <see cref="ICronTabParser" />.</param>
@@ -54,7 +53,7 @@ public abstract class RecurringHostedServiceBase : BackgroundService
         => GetDelay(firstRunTime, cronTabParser, logger, DateTime.Now, defaultDelay);
 
     /// <summary>
-    /// Determines the delay before the first run of a recurring task implemented as a hosted service when an optonal configuration for the first run time is available.
+    /// Determines the delay before the first run of a recurring task implemented as a hosted service when an optional configuration for the first run time is available.
     /// </summary>
     /// <param name="firstRunTime">The configured time to first run the task in crontab format.</param>
     /// <param name="cronTabParser">An instance of <see cref="ICronTabParser" />.</param>
@@ -84,8 +83,8 @@ public abstract class RecurringHostedServiceBase : BackgroundService
         }
 
         // Otherwise start at scheduled time according to cron expression, unless within the default delay period.
-        DateTime firstRunOccurance = cronTabParser.GetNextOccurrence(firstRunTime, now);
-        TimeSpan delay = firstRunOccurance - now;
+        DateTime firstRunOccurrence = cronTabParser.GetNextOccurrence(firstRunTime, now);
+        TimeSpan delay = firstRunOccurrence - now;
 
         return delay < defaultDelay
             ? defaultDelay
@@ -103,10 +102,8 @@ public abstract class RecurringHostedServiceBase : BackgroundService
                 bool signaled = await _signal.WaitAsync(_delay, stoppingToken);
                 if (signaled)
                 {
-                    // Trigger interrupted the initial delay — consume the strategy/delay state
-                    // so it doesn't leak into WaitForNextExecutionAsync after the first execution.
-                    _nextExecutionStrategy = default;
-                    _nextExecutionDelay = null;
+                    // Trigger interrupted the initial delay — consume the trigger state, so it doesn't leak into WaitForNextExecutionAsync after the first execution
+                    Interlocked.Exchange(ref _triggerState, TriggerState.Default);
                     _nextExecutionSkipOnOvershoot = false;
                 }
             }
@@ -191,19 +188,15 @@ public abstract class RecurringHostedServiceBase : BackgroundService
             return _period; // Normal timeout — next wait uses normal period
         }
 
-        // Triggered — determine delay basis for after the triggered execution.
-        // The semaphore provides a memory barrier, so writes from TriggerExecution are visible here.
-        if (_nextExecutionDelay.HasValue)
+        TriggerState triggerState = Interlocked.Exchange(ref _triggerState, TriggerState.Default);
+        if (triggerState.Delay.HasValue)
         {
-            TimeSpan custom = _nextExecutionDelay.Value;
-            _nextExecutionDelay = null;
-
-            return custom;
+            return triggerState.Delay.Value;
         }
 
         TimeSpan remaining = ComputeNextDelay(delay, waitSw.Elapsed);
 
-        switch (_nextExecutionStrategy)
+        switch (triggerState.Strategy)
         {
             case NextExecutionStrategy.None:
                 _nextExecutionSkipOnOvershoot = true;
@@ -284,9 +277,7 @@ public abstract class RecurringHostedServiceBase : BackgroundService
     /// <param name="strategy">Controls the delay after the triggered execution.</param>
     public void TriggerExecution(NextExecutionStrategy strategy)
     {
-        _nextExecutionStrategy = strategy;
-        _nextExecutionDelay = null;
-
+        _triggerState = new TriggerState(Strategy: strategy);
         ReleaseSignal();
     }
 
@@ -297,8 +288,7 @@ public abstract class RecurringHostedServiceBase : BackgroundService
     /// <param name="nextDelay">The delay to wait after the triggered execution completes (execution time is subtracted to prevent drift).</param>
     public void TriggerExecution(TimeSpan nextDelay)
     {
-        _nextExecutionDelay = nextDelay;
-
+        _triggerState = new TriggerState(Delay: nextDelay);
         ReleaseSignal();
     }
 
@@ -324,5 +314,13 @@ public abstract class RecurringHostedServiceBase : BackgroundService
         base.Dispose();
 
         GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
+    /// Immutable snapshot of the trigger state.
+    /// </summary>
+    private sealed record TriggerState(NextExecutionStrategy Strategy = default, TimeSpan? Delay = null)
+    {
+        public static TriggerState Default { get; } = new();
     }
 }
