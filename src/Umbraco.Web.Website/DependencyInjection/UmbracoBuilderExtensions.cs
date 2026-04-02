@@ -104,19 +104,27 @@ public static partial class UmbracoBuilderExtensions
 
     private static IUmbracoBuilder AddWebsiteOutputCache(this IUmbracoBuilder builder)
     {
+        // Always register the cache manager — it's a public API that customers may inject,
+        // and it's a no-op when the output cache store isn't registered.
+        builder.Services.AddSingleton<IWebsiteOutputCacheManager, WebsiteOutputCacheManager>();
+
         WebsiteSettings.OutputCacheSettings settings = builder.Config
             .GetSection(Constants.Configuration.ConfigWebsite)
             .Get<WebsiteSettings>()?.OutputCache
             ?? new WebsiteSettings.OutputCacheSettings();
 
-        // Always register the policy (self-disables when Enabled=false).
+        if (settings.Enabled is false)
+        {
+            return builder;
+        }
+
         // AddOutputCache() is safe to call multiple times (e.g. if the Delivery API also
         // registers output caching) — each call just adds its policies to the shared options.
         builder.Services.AddOutputCache(options =>
         {
             options.AddPolicy(
                 Constants.Website.OutputCache.ContentCachePolicy,
-                new WebsiteOutputCachePolicy(settings.ContentDuration, settings.Enabled));
+                new WebsiteOutputCachePolicy(settings.ContentDuration));
         });
 
         // Register pipeline filter only if no output cache filter exists yet.
@@ -131,14 +139,13 @@ public static partial class UmbracoBuilderExtensions
             }
         });
 
-        // Register eviction handler and providers
+        // Register eviction handlers and providers.
         builder.AddNotificationAsyncHandler<ContentCacheRefresherNotification, WebsiteOutputCacheEvictionHandler>();
         builder.AddNotificationAsyncHandler<MediaCacheRefresherNotification, MediaOutputCacheEvictionHandler>();
         builder.AddNotificationAsyncHandler<MemberCacheRefresherNotification, MemberOutputCacheEvictionHandler>();
         builder.Services.AddSingleton<IWebsiteOutputCacheTagProvider, ContentTypeOutputCacheTagProvider>();
         builder.Services.AddSingleton<IWebsiteOutputCacheEvictionProvider, RelationOutputCacheEvictionProvider>();
         builder.Services.AddSingleton<IWebsiteOutputCacheDurationProvider, DefaultWebsiteOutputCacheDurationProvider>();
-        builder.Services.AddSingleton<IWebsiteOutputCacheManager, WebsiteOutputCacheManager>();
 
         return builder;
     }

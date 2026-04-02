@@ -20,31 +20,19 @@ namespace Umbraco.Cms.Web.Website.Caching;
 internal sealed class WebsiteOutputCachePolicy : IOutputCachePolicy
 {
     private readonly TimeSpan _defaultDuration;
-    private readonly bool _enabled;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="WebsiteOutputCachePolicy"/> class.
     /// </summary>
     /// <param name="defaultDuration">The default cache duration from configuration.</param>
-    /// <param name="enabled">Whether output caching is enabled.</param>
-    public WebsiteOutputCachePolicy(TimeSpan defaultDuration, bool enabled)
-    {
-        _defaultDuration = defaultDuration;
-        _enabled = enabled;
-    }
+    public WebsiteOutputCachePolicy(TimeSpan defaultDuration)
+        => _defaultDuration = defaultDuration;
 
     /// <inheritdoc />
     ValueTask IOutputCachePolicy.CacheRequestAsync(OutputCacheContext context, CancellationToken cancellationToken)
     {
         IServiceProvider services = context.HttpContext.RequestServices;
         ILogger<WebsiteOutputCachePolicy> logger = services.GetRequiredService<ILogger<WebsiteOutputCachePolicy>>();
-
-        if (_enabled is false)
-        {
-            context.EnableOutputCaching = false;
-            logger.LogDebug("Output caching disabled by configuration.");
-            return ValueTask.CompletedTask;
-        }
 
         UmbracoRouteValues? routeValues = context.HttpContext.Features.Get<UmbracoRouteValues>();
         if (routeValues is null)
@@ -85,17 +73,18 @@ internal sealed class WebsiteOutputCachePolicy : IOutputCachePolicy
             return ValueTask.CompletedTask;
         }
 
-        // Determine duration.
+        // Determine duration. A duration provider may return TimeSpan.Zero to disable caching
+        // for specific content. A zero or negative resolved duration (from provider or config)
+        // is treated as "do not cache".
         IWebsiteOutputCacheDurationProvider durationProvider = services.GetRequiredService<IWebsiteOutputCacheDurationProvider>();
-        TimeSpan? customDuration = durationProvider.GetDuration(content);
-        if (customDuration == TimeSpan.Zero)
+        TimeSpan duration = durationProvider.GetDuration(content) ?? _defaultDuration;
+
+        if (duration <= TimeSpan.Zero)
         {
             context.EnableOutputCaching = false;
-            logger.LogDebug("Duration provider returned zero for content {ContentKey} — skipping output cache.", content.Key);
+            logger.LogDebug("Resolved duration is zero or negative for content {ContentKey} — skipping output cache.", content.Key);
             return ValueTask.CompletedTask;
         }
-
-        TimeSpan duration = customDuration ?? _defaultDuration;
 
         // Enable caching. AllowCacheLookup, AllowCacheStorage, and AllowLocking must be set
         // explicitly because they default to false on OutputCacheContext, and the ASP.NET Core

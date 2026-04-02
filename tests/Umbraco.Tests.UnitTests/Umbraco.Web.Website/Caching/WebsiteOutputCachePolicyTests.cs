@@ -49,17 +49,6 @@ public class WebsiteOutputCachePolicyTests
     }
 
     [Test]
-    public async Task CacheRequestAsync_WhenDisabled_DoesNotCache()
-    {
-        var policy = CreatePolicy(enabled: false);
-        OutputCacheContext context = CreateOutputCacheContext(withRouteValues: true);
-
-        await ((IOutputCachePolicy)policy).CacheRequestAsync(context, CancellationToken.None);
-
-        Assert.That(context.EnableOutputCaching, Is.False);
-    }
-
-    [Test]
     public async Task CacheRequestAsync_WhenNoUmbracoRouteValues_DoesNotCache()
     {
         var policy = CreatePolicy();
@@ -168,12 +157,13 @@ public class WebsiteOutputCachePolicyTests
     [Test]
     public async Task CacheRequestAsync_TagsWithContentKey()
     {
+        var key = Guid.NewGuid();
         var policy = CreatePolicy();
-        OutputCacheContext context = CreateOutputCacheContext(withRouteValues: true);
+        OutputCacheContext context = CreateOutputCacheContext(withRouteValues: true, contentKey: key);
 
         await ((IOutputCachePolicy)policy).CacheRequestAsync(context, CancellationToken.None);
 
-        Assert.That(context.Tags, Has.Some.StartsWith("umb-content-"));
+        Assert.That(context.Tags, Does.Contain($"umb-content-{key}"));
     }
 
     [Test]
@@ -269,20 +259,22 @@ public class WebsiteOutputCachePolicyTests
         Assert.That(context.AllowCacheStorage, Is.EqualTo(originalValue));
     }
 
-    private static WebsiteOutputCachePolicy CreatePolicy(bool enabled = true)
-        => new(DefaultDuration, enabled);
+    private static WebsiteOutputCachePolicy CreatePolicy()
+        => new(DefaultDuration);
 
     private OutputCacheContext CreateOutputCacheContext(
         bool withRouteValues = false,
         bool isAuthenticated = false,
         bool setNoCacheHeader = false,
         IEnumerable<IWebsiteOutputCacheTagProvider>? tagProviders = null,
-        IEnumerable<IWebsiteOutputCacheVaryByProvider>? varyByProviders = null)
+        IEnumerable<IWebsiteOutputCacheVaryByProvider>? varyByProviders = null,
+        Guid? contentKey = null)
     {
-        var contentKey = Guid.NewGuid();
+        contentKey ??= Guid.NewGuid();
+        var key = contentKey.Value;
         var contentType = Mock.Of<IPublishedContentType>(ct => ct.Alias == "testPage");
         var content = Mock.Of<IPublishedContent>(c =>
-            c.Key == contentKey &&
+            c.Key == key &&
             c.ContentType == contentType);
 
         var services = new ServiceCollection();
