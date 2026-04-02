@@ -47,7 +47,7 @@ const workspaceView: ManifestWorkspaceViewCollectionKind = {
 const workspaceAction: ManifestWorkspaceAction = {
 	type: 'workspaceAction',
 	kind: 'default',
-	alias: 'Umb.WorkspaceAction.Element.Folder.Submit',
+	alias: 'Umb.WorkspaceAction.ElementFolder.Submit',
 	name: 'Submit Element Folder Workspace Action',
 	api: UmbSubmitWorkspaceAction,
 	meta: {

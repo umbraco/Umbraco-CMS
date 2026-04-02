@@ -110,6 +110,40 @@ public class RefresherTests
         Assert.AreEqual(1234, payload[0].Id);
         Assert.AreEqual(key, payload[0].Key);
         Assert.AreEqual(changeTypes, payload[0].ChangeTypes);
+        Assert.IsNull(payload[0].PublishedCultures);
+        Assert.IsNull(payload[0].UnpublishedCultures);
+    }
+
+    [Test]
+    public void ElementCacheRefresherCanDeserializeJsonPayloadWithCultures()
+    {
+        var key = Guid.NewGuid();
+        ElementCacheRefresher.JsonPayload[] source =
+        {
+            new(1234, key, TreeChangeTypes.RefreshNode)
+            {
+                PublishedCultures = ["en-US", "da-DK"],
+                UnpublishedCultures = ["de-DE"]
+            }
+        };
+
+        var json = JsonSerializer.Serialize(source);
+        var payload = JsonSerializer.Deserialize<ElementCacheRefresher.JsonPayload[]>(json);
+
+        Assert.IsNotNull(payload[0].PublishedCultures);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(2, payload[0].PublishedCultures.Length);
+            Assert.AreEqual("en-US", payload[0].PublishedCultures.First());
+            Assert.AreEqual("da-DK", payload[0].PublishedCultures.Last());
+        });
+
+        Assert.IsNotNull(payload[0].UnpublishedCultures);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(1, payload[0].UnpublishedCultures.Length);
+            Assert.AreEqual("de-DE", payload[0].UnpublishedCultures.First());
+        });
     }
 
     [Test]

@@ -13,12 +13,12 @@ import {
 const folderDelete: UmbExtensionManifest = {
 	type: 'entityAction',
 	kind: 'folderDelete',
-	alias: 'Umb.EntityAction.Element.Folder.Delete',
+	alias: 'Umb.EntityAction.ElementFolder.Delete',
 	name: 'Delete Element Folder Entity Action',
 	forEntityTypes: [UMB_ELEMENT_FOLDER_ENTITY_TYPE],
 	meta: {
 		icon: 'icon-trash-empty',
-		folderRepositoryAlias: UMB_ELEMENT_FOLDER_REPOSITORY_ALIAS, // TODO: [LK] This needs to call the recycle-bin repository instead.
+		folderRepositoryAlias: UMB_ELEMENT_FOLDER_REPOSITORY_ALIAS,
 	},
 	conditions: [
 		{
@@ -32,7 +32,7 @@ const folderDelete: UmbExtensionManifest = {
 const folderUpdate: UmbExtensionManifest = {
 	type: 'entityAction',
 	kind: 'folderUpdate',
-	alias: 'Umb.EntityAction.Element.Folder.Rename',
+	alias: 'Umb.EntityAction.ElementFolder.Rename',
 	name: 'Rename Element Folder Entity Action',
 	forEntityTypes: [UMB_ELEMENT_FOLDER_ENTITY_TYPE],
 	meta: {
