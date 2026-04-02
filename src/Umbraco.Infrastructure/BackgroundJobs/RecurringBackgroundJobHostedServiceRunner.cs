@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Infrastructure.HostedServices;
@@ -12,7 +13,7 @@ public class RecurringBackgroundJobHostedServiceRunner : IHostedService
     private readonly ILogger<RecurringBackgroundJobHostedServiceRunner> _logger;
     private readonly List<IRecurringBackgroundJob> _jobs;
     private readonly Func<IRecurringBackgroundJob, IHostedService> _jobFactory;
-    private readonly List<TypedServiceJob> _hostedServices = new();
+    private readonly ConcurrentDictionary<Type, IHostedService> _hostedServices = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RecurringBackgroundJobHostedServiceRunner" /> class.
@@ -40,15 +41,18 @@ public class RecurringBackgroundJobHostedServiceRunner : IHostedService
             Type jobType = job.GetType();
             try
             {
-
                 _logger.LogDebug("Creating background hosted service for {job}", jobType.Name);
                 IHostedService hostedService = _jobFactory(job);
+
+                if (!_hostedServices.TryAdd(jobType, hostedService))
+                {
+                    _logger.LogWarning("A background hosted service for {job} is already registered, skipping duplicate.", jobType.Name);
+                    continue;
+                }
 
                 _logger.LogInformation("Starting a background hosted service for {job} with a delay of {delay}, running every {period}", jobType.Name, job.Delay, job.Period);
 
                 await hostedService.StartAsync(cancellationToken).ConfigureAwait(false);
-
-                _hostedServices.Add(new TypedServiceJob(jobType, hostedService));
             }
             catch (Exception exception)
             {
@@ -64,16 +68,16 @@ public class RecurringBackgroundJobHostedServiceRunner : IHostedService
     {
         _logger.LogInformation("Stopping recurring background jobs hosted services");
 
-        foreach (TypedServiceJob typedServiceJob in _hostedServices)
+        foreach ((Type jobType, IHostedService hostedService) in _hostedServices)
         {
             try
             {
-                _logger.LogInformation("Stopping background hosted service for {job}", typedServiceJob.JobType.Name);
-                await typedServiceJob.HostedService.StopAsync(stoppingToken).ConfigureAwait(false);
+                _logger.LogInformation("Stopping background hosted service for {job}", jobType.Name);
+                await hostedService.StopAsync(stoppingToken).ConfigureAwait(false);
             }
             catch (Exception exception)
             {
-                _logger.LogError(exception, "Failed to stop background hosted service for {job}", typedServiceJob.JobType.Name);
+                _logger.LogError(exception, "Failed to stop background hosted service for {job}", jobType.Name);
             }
         }
 
@@ -137,35 +141,5 @@ public class RecurringBackgroundJobHostedServiceRunner : IHostedService
 
     private RecurringHostedServiceBase? FindHostedService<TJob>()
         where TJob : IRecurringBackgroundJob
-        => _hostedServices.Find(x => x.JobType == typeof(TJob))?.HostedService as RecurringHostedServiceBase;
-
-    private sealed class TypedServiceJob
-    {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="TypedServiceJob" /> class using the specified job type and hosted service instance.
-        /// </summary>
-        /// <param name="jobType">The runtime type of the recurring background job.</param>
-        /// <param name="hostedService">The <see cref="IHostedService" /> instance to be executed as the background job.</param>
-        public TypedServiceJob(Type jobType, IHostedService hostedService)
-        {
-            JobType = jobType;
-            HostedService = hostedService;
-        }
-
-        /// <summary>
-        /// Gets the runtime type of the recurring background job.
-        /// </summary>
-        /// <value>
-        /// The job type.
-        /// </value>
-        public Type JobType { get; }
-
-        /// <summary>
-        /// Gets the hosted service instance associated with the job.
-        /// </summary>
-        /// <value>
-        /// The hosted service.
-        /// </value>
-        public IHostedService HostedService { get; }
-    }
+        => _hostedServices.TryGetValue(typeof(TJob), out IHostedService? service) ? service as RecurringHostedServiceBase : null;
 }
