@@ -159,9 +159,12 @@ public abstract class RecurringHostedServiceBase : BackgroundService
 
         // If the delay basis was from a NextExecutionStrategy.None trigger and the execution overshot the scheduled time,
         // advance to the next period tick instead of executing immediately.
-        if (delay <= TimeSpan.Zero && _nextExecutionSkipOnOvershoot)
+        // The flag is consumed unconditionally so it never leaks into later cycles.
+        bool skipOnOvershoot = _nextExecutionSkipOnOvershoot;
+        _nextExecutionSkipOnOvershoot = false;
+
+        if (delay <= TimeSpan.Zero && skipOnOvershoot)
         {
-            _nextExecutionSkipOnOvershoot = false;
             delay = ComputeNextDelay(delayBasis + _period, executionElapsed);
         }
 
