@@ -153,14 +153,19 @@ export class UmbCodeEditorController extends UmbControllerBase {
 	}
 
 	#mapOptions(options: CodeEditorConstructorOptions): monaco.editor.IStandaloneEditorConstructionOptions {
+		const { minimapSize, ...monacoPassthrough } = options;
 		const hasLineNumbers = Object.prototype.hasOwnProperty.call(options, 'lineNumbers');
 		const hasMinimap = Object.prototype.hasOwnProperty.call(options, 'minimap');
 		const hasLightbulb = Object.prototype.hasOwnProperty.call(options, 'lightbulb');
 
 		return {
-			...options,
+			...monacoPassthrough,
 			lineNumbers: hasLineNumbers ? (options.lineNumbers ? 'on' : 'off') : undefined,
-			minimap: hasMinimap ? (options.minimap ? { enabled: true } : { enabled: false }) : undefined,
+			minimap: hasMinimap
+				? options.minimap
+					? { enabled: true, ...(minimapSize ? { size: minimapSize } : {}) }
+					: { enabled: false }
+				: undefined,
 			lightbulb: hasLightbulb
 				? options.lightbulb
 					? { enabled: monaco.editor.ShowLightbulbIconMode.On }

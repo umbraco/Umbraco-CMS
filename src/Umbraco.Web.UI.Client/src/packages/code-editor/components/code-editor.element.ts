@@ -118,6 +118,13 @@ export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditor
 	disableMinimap = false;
 
 	/**
+	 * When the minimap is enabled, sets Monaco `minimap.size` (e.g. `fit` in narrow sidebars).
+	 * @memberof UmbCodeEditorElement
+	 */
+	@property({ type: String, attribute: 'minimap-size' })
+	minimapSize?: 'proportional' | 'fill' | 'fit';
+
+	/**
 	 * Whether to enable word wrap. Default is false.
 	 * @memberof UmbCodeEditorElement
 	 */
@@ -170,6 +177,7 @@ export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditor
 			_changedProperties.has('language') ||
 			_changedProperties.has('disableLineNumbers') ||
 			_changedProperties.has('disableMinimap') ||
+			_changedProperties.has('minimapSize') ||
 			_changedProperties.has('wordWrap') ||
 			_changedProperties.has('readonly') ||
 			_changedProperties.has('code') ||
@@ -187,6 +195,7 @@ export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditor
 			ariaLabel: this.label ?? this.localize.term('codeEditor_label'),
 			lineNumbers: !this.disableLineNumbers,
 			minimap: !this.disableMinimap,
+			...(this.minimapSize ? { minimapSize: this.minimapSize } : {}),
 			wordWrap: this.wordWrap ? 'on' : 'off',
 			readOnly: this.readonly,
 			folding: !this.disableFolding,
@@ -248,6 +257,7 @@ export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditor
 		css`
 			:host {
 				display: block;
+				scrollbar-gutter: stable;
 			}
 
 			#loader-container {
@@ -257,8 +267,12 @@ export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditor
 			}
 
 			#editor-container {
-				width: var(--editor-width);
+				width: var(--editor-width, 100%);
+				max-width: 100%;
+				min-width: 0;
+				box-sizing: border-box;
 				height: var(--editor-height, 100%);
+				scrollbar-gutter: stable;
 
 				--vscode-scrollbar-shadow: #dddddd;
 				--vscode-scrollbarSlider-background: var(--uui-color-disabled-contrast);

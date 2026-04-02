@@ -112,6 +112,10 @@ export interface CodeEditorConstructorOptions {
 	 */
 	minimap?: boolean;
 	/**
+	 * When the minimap is enabled, maps to Monaco `minimap.size` (e.g. `fit` in width-constrained modals).
+	 */
+	minimapSize?: 'proportional' | 'fill' | 'fit';
+	/**
 	 * Enable that the editor will install a ResizeObserver to check if its container dom node size has changed.
 	 * Defaults to false.
 	 */
