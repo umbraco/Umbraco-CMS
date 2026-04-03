@@ -202,8 +202,8 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
                 idsRemoved.Add(payload.Id);
             }
 
-            // For Remove payloads, clean up routing caches before navigation removes the node
-            // from the tree (HandleRouting needs the navigation structure to find descendants).
+            // For Remove payloads, clean up routing caches before navigation removes the node from the tree (HandleRouting needs
+            // the navigation structure to find descendants).
             if (payload.ChangeTypes.HasType(TreeChangeTypes.Remove))
             {
                 HandleRouting(payload);
@@ -215,7 +215,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
             HandleMemoryCache(payload);
 
             // For non-Remove payloads, run routing after publish status and memory cache are populated.
-            if (!payload.ChangeTypes.HasType(TreeChangeTypes.Remove))
+            if (payload.ChangeTypes.HasType(TreeChangeTypes.Remove) is false)
             {
                 HandleRouting(payload);
             }
