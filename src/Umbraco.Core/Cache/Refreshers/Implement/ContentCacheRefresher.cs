@@ -202,11 +202,23 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
                 idsRemoved.Add(payload.Id);
             }
 
+            // For Remove payloads, clean up routing caches before navigation removes the node
+            // from the tree (HandleRouting needs the navigation structure to find descendants).
+            if (payload.ChangeTypes.HasType(TreeChangeTypes.Remove))
+            {
+                HandleRouting(payload);
+            }
+
             HandleNavigation(payload);
             HandlePublishedAsync(payload, CancellationToken.None).GetAwaiter().GetResult();
 
             HandleMemoryCache(payload);
-            HandleRouting(payload);
+
+            // For non-Remove payloads, run routing after publish status and memory cache are populated.
+            if (!payload.ChangeTypes.HasType(TreeChangeTypes.Remove))
+            {
+                HandleRouting(payload);
+            }
 
             HandleIdKeyMap(payload);
         }
@@ -309,7 +321,8 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
         {
             Guid key = payload.Key ?? _idKeyMap.GetKeyForId(payload.Id, UmbracoObjectTypes.Document).Result;
 
-            // Note that we need to clear the navigation service as the last thing.
+            // Remove routing must run before HandleNavigation removes the node from the navigation tree,
+            // since we need the tree structure to resolve descendant keys.
             if (_documentNavigationQueryService.TryGetDescendantsKeysOrSelfKeys(key, out IEnumerable<Guid>? descendantsOrSelfKeys))
             {
                 _documentUrlService.DeleteUrlsFromCacheAsync(descendantsOrSelfKeys).GetAwaiter().GetResult();
