@@ -19,14 +19,14 @@ namespace Umbraco.Cms.Api.Management.Controllers.Document;
 public class PatchDocumentController : PatchDocumentControllerBase
 {
     private readonly IContentEditingService _contentEditingService;
-    private readonly DocumentPatcher _documentPatcher;
+    private readonly IDocumentPatcher _documentPatcher;
     private readonly IDocumentEditingPresentationFactory _presentationFactory;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
     public PatchDocumentController(
         IAuthorizationService authorizationService,
         IContentEditingService contentEditingService,
-        DocumentPatcher documentPatcher,
+        IDocumentPatcher documentPatcher,
         IDocumentEditingPresentationFactory presentationFactory,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
         : base(authorizationService)

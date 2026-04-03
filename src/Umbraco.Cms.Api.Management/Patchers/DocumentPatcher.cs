@@ -1,3 +1,5 @@
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.OperationStatus;
 using Umbraco.Cms.Api.Management.Patching;
@@ -13,7 +15,7 @@ namespace Umbraco.Cms.Api.Management.Patchers;
 /// <summary>
 /// Applies patch operations with Umbraco's custom path syntax to document update models.
 /// </summary>
-public class DocumentPatcher
+public class DocumentPatcher : IDocumentPatcher
 {
     private readonly IContentEditingService _contentEditingService;
     private readonly IJsonSerializer _jsonSerializer;
@@ -68,13 +70,25 @@ public class DocumentPatcher
         UpdateDocumentRequestModel unModifiedUpdateModel = await _documentEditingPresentationFactory.CreateUpdateRequestModelAsync(content);
         var currentJsonString = _jsonSerializer.Serialize(unModifiedUpdateModel);
 
+        if (string.IsNullOrWhiteSpace(currentJsonString))
+        {
+            // should not happen as the content exists.
+            throw new JsonException("Unexpected empty JSON string when building update model for patching.");
+        }
+        var currentJsonNode = JsonNode.Parse(currentJsonString);
+        if (currentJsonNode is null)
+        {
+            // should not happen as string is a result of jsonSerialization.
+            throw new JsonException("Could not parse jsont string to JsonNode when building update model for patching.");
+        }
+
         // Apply each PATCH operation to the JSON
         foreach (PatchOperationModel operation in patchModel.Operations)
         {
             try
             {
-                currentJsonString = PatchEngine.ApplyOperation(
-                    currentJsonString,
+                currentJsonNode = PatchEngine.ApplyOperation(
+                    currentJsonNode,
                     operation.Op,
                     operation.Path,
                     operation.Value);
@@ -94,6 +108,8 @@ public class DocumentPatcher
                     default(UpdateDocumentRequestModel)!);
             }
         }
+
+        currentJsonString = currentJsonNode.ToJsonString();
 
         // Deserialize the modified JSON back to UpdateDocumentRequestModel
         UpdateDocumentRequestModel? modifiedUpdateModel = _jsonSerializer.Deserialize<UpdateDocumentRequestModel>(currentJsonString);

@@ -80,23 +80,9 @@ internal sealed class DocumentEditingPresentationFactory : ContentEditingPresent
             Value = op.Value,
         }).ToArray();
 
-        var paths = operations.Select(o => o.Path).ToArray();
-
-        var affectedCultures = paths
-            .SelectMany(PatchPathParser.ExtractCultures)
-            .Distinct(StringComparer.OrdinalIgnoreCase)
-            .ToArray();
-
-        var affectedSegments = paths
-            .SelectMany(PatchPathParser.ExtractSegments)
-            .Distinct(StringComparer.OrdinalIgnoreCase)
-            .ToArray();
-
         return new ContentPatchModel
         {
             Operations = operations,
-            AffectedCultures = affectedCultures,
-            AffectedSegments = affectedSegments,
         };
     }
 

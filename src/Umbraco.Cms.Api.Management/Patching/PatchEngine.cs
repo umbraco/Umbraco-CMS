@@ -11,27 +11,21 @@ namespace Umbraco.Cms.Api.Management.Patching;
 public static class PatchEngine
 {
     /// <summary>
-    /// Applies a single patch operation to a JSON string and returns the modified JSON.
+    /// Applies a single patch operation to a JSON node and returns the modified JSON node.
     /// </summary>
-    /// <param name="json">The JSON string to modify.</param>
+    /// <param name="jsonNode">The JSON node to modify.</param>
     /// <param name="op">The operation type (Replace, Add, Remove).</param>
     /// <param name="path">The patch path expression.</param>
     /// <param name="value">The value to set (required for Replace and Add operations).</param>
-    /// <returns>The modified JSON string.</returns>
+    /// <returns>The modified JSON node.</returns>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="json"/> is null or whitespace.</exception>
     /// <exception cref="InvalidOperationException">Thrown when the operation cannot be applied.</exception>
     /// <exception cref="FormatException">Thrown when the path syntax is invalid.</exception>
-    public static string ApplyOperation(string json, PatchOperationType op, string path, object? value)
+    public static JsonNode ApplyOperation(JsonNode jsonNode, PatchOperationType op, string path, object? value)
     {
-        if (string.IsNullOrWhiteSpace(json))
-        {
-            throw new ArgumentNullException(nameof(json));
-        }
-
         PatchPathSegment[] segments = PatchPathParser.Parse(path);
 
-        JsonNode? rootNode = JsonNode.Parse(json);
-        if (rootNode is null)
+        if (jsonNode is null)
         {
             throw new InvalidOperationException("Failed to parse JSON string.");
         }
@@ -40,10 +34,10 @@ public static class PatchEngine
             ? JsonSerializer.SerializeToNode(value)
             : null;
 
-        ResolvedTarget target = PatchPathResolver.Resolve(rootNode, segments);
+        ResolvedTarget target = PatchPathResolver.Resolve(jsonNode, segments);
         ApplyMutation(target, op, valueNode);
 
-        return rootNode.ToJsonString();
+        return jsonNode;
     }
 
     private static void ApplyMutation(ResolvedTarget target, PatchOperationType op, JsonNode? valueNode)

@@ -22,7 +22,7 @@ internal static class DocumentBuilderExtensions
         builder.Services.AddTransient<IDomainPresentationFactory, DomainPresentationFactory>();
         builder.Services.AddTransient<IDocumentVersionPresentationFactory, DocumentVersionPresentationFactory>();
         builder.Services.AddTransient<IDocumentCollectionPresentationFactory, DocumentCollectionPresentationFactory>();
-        builder.Services.AddTransient<DocumentPatcher>();
+        builder.Services.AddTransient<IDocumentPatcher,DocumentPatcher>();
 
         builder.WithCollectionBuilder<MapDefinitionCollectionBuilder>()
             .Add<DocumentMapDefinition>()
