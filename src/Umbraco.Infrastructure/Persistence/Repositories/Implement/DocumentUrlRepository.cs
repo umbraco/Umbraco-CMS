@@ -68,7 +68,10 @@ public class DocumentUrlRepository : IDocumentUrlRepository
         // do the deletes, updates and inserts
         if (toDelete.Count > 0)
         {
-            Database.DeleteMany<DocumentUrlDto>().Where(x => toDelete.Contains(x.NodeId)).Execute();
+            foreach (IEnumerable<int> group in toDelete.InGroupsOf(Constants.Sql.MaxParameterCount))
+            {
+                Database.DeleteMany<DocumentUrlDto>().Where(x => group.Contains(x.NodeId)).Execute();
+            }
         }
 
         Database.InsertBulk(toInsert.Values);
