@@ -33,7 +33,7 @@ public class PropertyCacheLevelTests
         var dataType = new DataType(
             new VoidEditor(Mock.Of<IDataValueEditorFactory>()), configurationEditorJsonSerializer)
         { Id = 1 };
-        dataTypeServiceMock.Setup(x => x.GetAllAsync()).Returns(Task.FromResult<IEnumerable<IDataType>>(dataType.Yield()));
+        dataTypeServiceMock.Setup(x => x.GetAll()).Returns(dataType.Yield);
 
         var publishedContentTypeFactory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), converters, dataTypeServiceMock.Object);
 
@@ -78,7 +78,7 @@ public class PropertyCacheLevelTests
         var dataType = new DataType(
             new VoidEditor(Mock.Of<IDataValueEditorFactory>()), new SystemTextConfigurationEditorJsonSerializer(new DefaultJsonSerializerEncoderFactory()))
         { Id = 1 };
-        dataTypeServiceMock.Setup(x => x.GetAllAsync()).Returns(Task.FromResult<IEnumerable<IDataType>>(dataType.Yield()));
+        dataTypeServiceMock.Setup(x => x.GetAll()).Returns(dataType.Yield);
 
         var publishedContentTypeFactory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), converters, dataTypeServiceMock.Object);
 
@@ -136,7 +136,7 @@ public class PropertyCacheLevelTests
         var dataType = new DataType(
             new VoidEditor(Mock.Of<IDataValueEditorFactory>()), new SystemTextConfigurationEditorJsonSerializer(new DefaultJsonSerializerEncoderFactory()))
         { Id = 1 };
-        dataTypeServiceMock.Setup(x => x.GetAllAsync()).Returns(Task.FromResult<IEnumerable<IDataType>>(dataType.Yield()));
+        dataTypeServiceMock.Setup(x => x.GetAll()).Returns(dataType.Yield);
 
         var publishedContentTypeFactory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), converters, dataTypeServiceMock.Object);
 
