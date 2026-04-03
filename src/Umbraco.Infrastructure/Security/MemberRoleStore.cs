@@ -101,7 +101,7 @@ public class MemberRoleStore : IQueryableRoleStore<UmbracoIdentityRole>
     }
 
     /// <inheritdoc />
-    public async Task<IdentityResult> DeleteAsync(UmbracoIdentityRole role, CancellationToken cancellationToken = default)
+    public Task<IdentityResult> DeleteAsync(UmbracoIdentityRole role, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
         ThrowIfDisposed();
@@ -119,14 +119,14 @@ public class MemberRoleStore : IQueryableRoleStore<UmbracoIdentityRole>
         IMemberGroup? memberGroup = _memberGroupService.GetById(roleId);
         if (memberGroup != null)
         {
-            await _memberGroupService.DeleteAsync(memberGroup.Key);
+            _memberGroupService.Delete(memberGroup);
         }
         else
         {
-            return IdentityResult.Failed(_memberGroupNotFoundError);
+            return Task.FromResult(IdentityResult.Failed(_memberGroupNotFoundError));
         }
 
-        return IdentityResult.Success;
+        return Task.FromResult(IdentityResult.Success);
     }
 
     /// <inheritdoc />
@@ -189,25 +189,29 @@ public class MemberRoleStore : IQueryableRoleStore<UmbracoIdentityRole>
         => SetRoleNameAsync(role, normalizedName, cancellationToken);
 
     /// <inheritdoc />
-    public async Task<UmbracoIdentityRole?> FindByIdAsync(string roleId, CancellationToken cancellationToken = default)
+    public Task<UmbracoIdentityRole?> FindByIdAsync(string roleId, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
         ThrowIfDisposed();
 
-        if (string.IsNullOrWhiteSpace(roleId))
-        {
-            throw new ArgumentNullException(nameof(roleId));
-        }
-
         IMemberGroup? memberGroup;
 
-        if (!Guid.TryParse(roleId, out Guid guid))
+        // member group can be found by int or Guid, so try both
+        if (!int.TryParse(roleId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var id))
         {
-            throw new ArgumentOutOfRangeException(nameof(roleId), $"{nameof(roleId)} is not a valid Guid");
-        }
-        memberGroup = await _memberGroupService.GetAsync(guid);
+            if (!Guid.TryParse(roleId, out Guid guid))
+            {
+                throw new ArgumentOutOfRangeException(nameof(roleId), $"{nameof(roleId)} is not a valid Guid");
+            }
 
-        return memberGroup == null ? null : MapFromMemberGroup(memberGroup);
+            memberGroup = _memberGroupService.GetById(guid);
+        }
+        else
+        {
+            memberGroup = _memberGroupService.GetById(id);
+        }
+
+        return Task.FromResult(memberGroup == null ? null : MapFromMemberGroup(memberGroup));
     }
 
     /// <inheritdoc />

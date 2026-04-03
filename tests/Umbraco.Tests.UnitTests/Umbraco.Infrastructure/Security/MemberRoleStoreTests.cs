@@ -36,14 +36,14 @@ public class MemberRoleStoreTests
     }
 
     [Test]
-    public void GivenICreateAMemberRole_AndTheGroupIsNull_ThenIShouldGetAFailedIdentityResult()
+    public async Task GivenICreateAMemberRole_AndTheGroupIsNull_ThenIShouldGetAFailedIdentityResult()
     {
         // arrange
         var sut = CreateSut();
         var fakeCancellationToken = CancellationToken.None;
 
         // act
-        Action actual = () => sut.CreateAsync(null, fakeCancellationToken);
+        Func<Task> actual = async () => await sut.CreateAsync(null, fakeCancellationToken);
 
         // assert
         Assert.That(actual, Throws.ArgumentNullException);
@@ -165,7 +165,7 @@ public class MemberRoleStoreTests
         var fakeCancellationToken = CancellationToken.None;
 
         // act
-        Action actual = () => sut.UpdateAsync(null, fakeCancellationToken);
+        Func<Task> actual = async () => await sut.UpdateAsync(null, fakeCancellationToken);
 
         // assert
         Assert.That(actual, Throws.ArgumentNullException);
@@ -269,7 +269,7 @@ public class MemberRoleStoreTests
         var fakeCancellationToken = CancellationToken.None;
 
         // act
-        Action actual = () => sut.FindByIdAsync(fakeRole.Id, fakeCancellationToken);
+        Func<Task> actual = async () => await sut.FindByIdAsync(fakeRole.Id, fakeCancellationToken);
 
         // assert
         Assert.That(actual, Throws.TypeOf<ArgumentOutOfRangeException>());
@@ -290,7 +290,7 @@ public class MemberRoleStoreTests
         IMemberGroup fakeMemberGroup = _groupBuilder.WithName("fakeGroupName").WithCreatorId(123).WithId(777)
             .WithKey(fakeRoleGuid).Build();
 
-        _mockMemberGroupService.Setup(x => x.GetAsync(fakeRoleGuid)).ReturnsAsync(fakeMemberGroup);
+        _mockMemberGroupService.Setup(x => x.GetById(fakeRoleGuid)).Returns(fakeMemberGroup);
 
         // act
         IdentityRole actual = await sut.FindByIdAsync(fakeRoleGuid.ToString());
@@ -298,7 +298,7 @@ public class MemberRoleStoreTests
         // assert
         Assert.AreEqual(fakeRole.Name, actual.Name);
         Assert.AreEqual(fakeRole.Id, actual.Id);
-        _mockMemberGroupService.Verify(x => x.GetAsync(fakeRoleGuid));
+        _mockMemberGroupService.Verify(x => x.GetById(fakeRoleGuid));
         _mockMemberGroupService.VerifyNoOtherCalls();
     }
 
