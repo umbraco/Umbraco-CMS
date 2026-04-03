@@ -252,17 +252,19 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 									this._hasSettingsAccess ? editTemplatePath + 'edit/' + this._templateUnique : undefined,
 								)}
 								?readonly=${!this._hasSettingsAccess || this._isTrashed}
-								style=${!this.#isTemplateAllowed ? 'color: var(--uui-color-danger)' : ''}
-								title=${!this.#isTemplateAllowed ? this.localize.term('template_notAllowed') : ''}>
+								style=${ifDefined(!this.#isTemplateAllowed ? 'color: var(--uui-color-danger)' : undefined)}
+								title=${ifDefined(!this.#isTemplateAllowed ? this.localize.term('template_notAllowed') : undefined)}>
 								<uui-icon
 									slot="icon"
 									name=${!this.#isTemplateAllowed ? 'icon-alert' : 'icon-document-html'}
-									style=${!this.#isTemplateAllowed ? 'color: var(--uui-color-danger)' : ''}></uui-icon>
+									style=${ifDefined(!this.#isTemplateAllowed ? 'color: var(--uui-color-danger)' : undefined)}></uui-icon>
 								${!this._isTrashed
 									? html` <uui-action-bar slot="actions">
-											<uui-button
-												label=${this.localize.term('general_choose')}
-												@click=${this.#openTemplatePicker}></uui-button>
+											${this._allowedTemplates?.length
+												? html`<uui-button
+														label=${this.localize.term('general_choose')}
+														@click=${this.#openTemplatePicker}></uui-button>`
+												: nothing}
 											<uui-button
 												label=${this.localize.term('general_remove')}
 												@click=${this.#removeTemplate}></uui-button>
