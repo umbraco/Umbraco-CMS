@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Sync;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Testing;
@@ -722,6 +723,123 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
 
         Assert.That(segmentsAfter, Has.Count.GreaterThan(0), "Should have URL segments after change to invariant");
         Assert.That(segmentsAfter.All(s => s.NullableLanguageId == null), Is.True, "All segments should have NULL languageId after change to invariant");
+    }
+
+    #endregion
+
+    #region Parameter Count Batching Tests
+
+    [Test]
+    [Explicit("Slow test that requires LocalDb to reproduce the SQL Server 2100 parameter limit. Run manually to verify the batching fix.")]
+    public void Save_With_Many_Stale_Rows_Does_Not_Exceed_Sql_Parameter_Limit()
+    {
+        // Arrange
+        // This test simulates the upgrade scenario where invariant documents previously had
+        // URL rows stored per-language (non-null languageId). After the v17.3 optimization,
+        // invariant documents store with NULL languageId. On rebuild, all old per-language rows
+        // become deletes. If the delete is not batched with InGroupsOf, sites with many documents
+        // and languages exceed SQL Server's 2100 parameter limit (SqlException error 8003).
+        //
+        // NOTE: SQLite does not enforce a parameter limit, so this test verifies functional
+        // correctness on SQLite and will catch the SQL Server regression when run with LocalDb.
+        //
+        // Realistic scenario: 10 languages, 110 documents.
+        // 110 documents × 10 languages × 2 (draft/published) = 2200 stale rows (> 2000 limit).
+        const int languageCount = 10;
+        const int extraDocumentCount = 106; // + 4 from base class = 110 total
+
+        // Create additional content nodes so we have enough documents.
+        var documentKeys = new List<Guid> { Textpage.Key, Subpage.Key, Subpage2.Key, Subpage3.Key };
+        for (var i = 0; i < extraDocumentCount; i++)
+        {
+            var content = ContentBuilder.CreateSimpleContent(ContentType, $"Bulk Page {i}", Textpage.Id);
+            ContentService.Save(content, -1);
+            documentKeys.Add(content.Key);
+        }
+
+        using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
+        scope.WriteLock(Constants.Locks.DocumentUrls);
+
+        var database = ScopeAccessor.AmbientScope!.Database;
+
+        // Delete any existing URL rows to start clean.
+        database.Execute("DELETE FROM umbracoDocumentUrl");
+
+        // Create 10 languages.
+        var languageIds = new List<int>();
+        for (var i = 0; i < languageCount; i++)
+        {
+            var isoCode = $"x-test-{i:D2}";
+            database.Execute(
+                "INSERT INTO umbracoLanguage (languageISOCode, languageCultureName, isDefaultVariantLang, mandatory) VALUES (@0, @1, @2, @3)",
+                isoCode,
+                $"Test Language {i}",
+                false,
+                false);
+
+            var langId = database.ExecuteScalar<int>("SELECT id FROM umbracoLanguage WHERE languageISOCode = @0", isoCode);
+            languageIds.Add(langId);
+        }
+
+        // Insert stale rows: one per (document × language × draft/published).
+        // These simulate pre-v17.3 data where invariant documents had per-language rows.
+        var staleRowCount = 0;
+        foreach (var documentKey in documentKeys)
+        {
+            foreach (var languageId in languageIds)
+            {
+                foreach (var isDraft in new[] { true, false })
+                {
+                    database.Execute(
+                        "INSERT INTO umbracoDocumentUrl (uniqueId, languageId, isDraft, urlSegment, isPrimary) VALUES (@0, @1, @2, @3, @4)",
+                        documentKey,
+                        languageId,
+                        isDraft,
+                        "test-segment",
+                        true);
+                    staleRowCount++;
+                }
+            }
+        }
+
+        Assert.That(
+            staleRowCount,
+            Is.GreaterThan(Constants.Sql.MaxParameterCount),
+            $"Test setup should create more than {Constants.Sql.MaxParameterCount} stale rows to exercise the batching fix");
+
+        // Act - Save new-format data with NULL languageId (invariant).
+        // Every stale row should be deleted because the keys won't match (null vs non-null languageId).
+        var newSegments = documentKeys.SelectMany(key => new[]
+        {
+            new PublishedDocumentUrlSegment
+            {
+                DocumentKey = key,
+                NullableLanguageId = null,
+                IsDraft = true,
+                UrlSegment = "test-segment",
+                IsPrimary = true,
+            },
+            new PublishedDocumentUrlSegment
+            {
+                DocumentKey = key,
+                NullableLanguageId = null,
+                IsDraft = false,
+                UrlSegment = "test-segment",
+                IsPrimary = true,
+            },
+        }).ToList();
+
+        // This should not throw SqlException "too many parameters".
+        Assert.DoesNotThrow(() => DocumentUrlRepository.Save(newSegments));
+
+        // Verify: old rows deleted, new rows inserted.
+        var remainingRows = database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoDocumentUrl");
+        Assert.That(
+            remainingRows,
+            Is.EqualTo(newSegments.Count),
+            "Should have exactly the new invariant rows after save");
+
+        scope.Complete();
     }
 
     #endregion
