@@ -236,7 +236,7 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 	}
 
 	#renderTemplateInput() {
-		if (this._allowedTemplates?.length === 0) return nothing;
+		if (this._allowedTemplates?.length === 0 && !this._templateUnique) return nothing;
 
 		const editTemplatePath = this._routeBuilder?.({ entityType: 'template' }) ?? '';
 
@@ -251,13 +251,21 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 								href=${ifDefined(
 									this._hasSettingsAccess ? editTemplatePath + 'edit/' + this._templateUnique : undefined,
 								)}
-								?readonly=${!this._hasSettingsAccess || this._isTrashed}>
-								<uui-icon slot="icon" name="icon-document-html"></uui-icon>
+								?readonly=${!this._hasSettingsAccess || this._isTrashed}
+								style=${!this.#isTemplateAllowed ? 'color: var(--uui-color-danger)' : ''}
+								title=${!this.#isTemplateAllowed ? this.localize.term('template_notAllowed') : ''}>
+								<uui-icon
+									slot="icon"
+									name=${!this.#isTemplateAllowed ? 'icon-alert' : 'icon-document-html'}
+									style=${!this.#isTemplateAllowed ? 'color: var(--uui-color-danger)' : ''}></uui-icon>
 								${!this._isTrashed
 									? html` <uui-action-bar slot="actions">
 											<uui-button
 												label=${this.localize.term('general_choose')}
 												@click=${this.#openTemplatePicker}></uui-button>
+											<uui-button
+												label=${this.localize.term('general_remove')}
+												@click=${this.#removeTemplate}></uui-button>
 										</uui-action-bar>`
 									: nothing}
 							</uui-ref-node>
@@ -306,6 +314,16 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 				</span>
 			</div>
 		`;
+	}
+
+	get #isTemplateAllowed(): boolean {
+		if (!this._templateUnique) return true;
+		if (!this._allowedTemplates || this._allowedTemplates.length === 0) return false;
+		return this._allowedTemplates.some((t) => t.id === this._templateUnique);
+	}
+
+	#removeTemplate() {
+		this.#workspaceContext?.setTemplate(null);
 	}
 
 	async #openTemplatePicker() {
