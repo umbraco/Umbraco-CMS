@@ -112,6 +112,11 @@ internal sealed class ContentRelationsUpdate :
             .Where(x => automaticRelationTypeAliases.Contains(x.Alias))
             .ToDictionary(x => x.Alias);
 
+        if (relationTypeLookup.Count == 0)
+        {
+            return;
+        }
+
         // Lookup node IDs for all GUID based UDIs.
         IEnumerable<Guid> keys = references.Select(x => x.Udi).OfType<GuidUdi>().Select(x => x.Guid);
         var keysLookup = scope.Database.FetchByGroups<NodeIdKey, Guid>(keys, Constants.Sql.MaxParameterCount, guids =>
@@ -197,9 +202,15 @@ internal sealed class ContentRelationsUpdate :
 
     private IRelation[] GetExistingAutomaticRelations(IScope scope, int entityId, ISet<string> automaticRelationTypeAliases)
     {
-        IEnumerable<int> relationTypeIds = _relationTypeRepository.GetMany(Array.Empty<int>())
+        int[] relationTypeIds = _relationTypeRepository.GetMany(Array.Empty<int>())
             .Where(x => automaticRelationTypeAliases.Contains(x.Alias))
-            .Select(x => x.Id);
+            .Select(x => x.Id)
+            .ToArray();
+
+        if (relationTypeIds.Length == 0)
+        {
+            return [];
+        }
 
         IQuery<IRelation> query = scope.SqlContext.Query<IRelation>()
             .Where(x => x.ParentId == entityId)
