@@ -43,7 +43,7 @@ public class PatchDocumentController : PatchDocumentControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status422UnprocessableEntity)]
-    [EndpointSummary("Make partial updates to a document. For more information, see the documentation at https://docs.umbraco.com/umbraco-cms/reference/management-api/patching/document or https://docs.umbraco.com/umbraco-cms/reference/management-api/patching/document-spec")]
+    [EndpointSummary("Make partial updates to a document. For more information, see the documentation at https://docs.umbraco.com/umbraco-cms/reference/management-api/patching/document-endpoint-guide or https://docs.umbraco.com/umbraco-cms/reference/management-api/patching/document-endpoint-spec")]
     [Consumes("application/json-patch+json")]
     public async Task<IActionResult> Patch(
         CancellationToken cancellationToken,
