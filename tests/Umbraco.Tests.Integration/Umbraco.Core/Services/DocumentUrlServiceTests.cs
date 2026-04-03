@@ -731,7 +731,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
 
     [Test]
     [Explicit("Slow test that requires LocalDb to reproduce the SQL Server 2100 parameter limit. Run manually to verify the batching fix.")]
-    public void Save_With_Many_Stale_Rows_Does_Not_Exceed_Sql_Parameter_Limit()
+    public async Task Save_With_Many_Stale_Rows_Does_Not_Exceed_Sql_Parameter_Limit()
     {
         // Arrange
         // This test simulates the upgrade scenario where invariant documents previously had
@@ -742,15 +742,31 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
         //
         // NOTE: SQLite does not enforce a parameter limit, so this test verifies functional
         // correctness on SQLite and will catch the SQL Server regression when run with LocalDb.
-        //
-        // Realistic scenario: 10 languages, 110 documents.
-        // 110 documents × 10 languages × 2 (draft/published) = 2200 stale rows (> 2000 limit).
-        const int languageCount = 10;
-        const int extraDocumentCount = 106; // + 4 from base class = 110 total
 
-        // Create additional content nodes so we have enough documents.
+        // Create languages via the service (simulating a typical multi-language site).
+        string[] cultureCodes = ["da-DK", "de-DE", "fr-FR", "es-ES", "it-IT", "nl-NL", "pt-PT", "sv-SE", "nb-NO", "fi-FI"];
+        var languageIds = new List<int>();
+        foreach (var cultureCode in cultureCodes)
+        {
+            var language = new LanguageBuilder().WithCultureInfo(cultureCode).Build();
+            var result = await LanguageService.CreateAsync(language, Constants.Security.SuperUserKey);
+            Assert.IsTrue(result.Success, $"Failed to create language {cultureCode}");
+            languageIds.Add(result.Result!.Id);
+        }
+
+        // Each document produces (languageCount × 2) stale rows (draft + published per language).
+        // Compute the required document count dynamically to exceed SQL Server's hard limit of 2100
+        // parameters (not just Constants.Sql.MaxParameterCount which is 2000).
+        const int draftPublishedMultiplier = 2;
+        const int sqlServerParameterLimit = 2100;
+        var staleRowsPerDocument = languageIds.Count * draftPublishedMultiplier;
+        var requiredDocumentCount = (sqlServerParameterLimit / staleRowsPerDocument) + 1;
+
+        // Start with the documents already created by the base class.
         var documentKeys = new List<Guid> { Textpage.Key, Subpage.Key, Subpage2.Key, Subpage3.Key };
-        for (var i = 0; i < extraDocumentCount; i++)
+
+        // Create additional content nodes to reach the required count.
+        for (var i = documentKeys.Count; i < requiredDocumentCount; i++)
         {
             var content = ContentBuilder.CreateSimpleContent(ContentType, $"Bulk Page {i}", Textpage.Id);
             ContentService.Save(content, -1);
@@ -764,22 +780,6 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
 
         // Delete any existing URL rows to start clean.
         database.Execute("DELETE FROM umbracoDocumentUrl");
-
-        // Create 10 languages.
-        var languageIds = new List<int>();
-        for (var i = 0; i < languageCount; i++)
-        {
-            var isoCode = $"x-test-{i:D2}";
-            database.Execute(
-                "INSERT INTO umbracoLanguage (languageISOCode, languageCultureName, isDefaultVariantLang, mandatory) VALUES (@0, @1, @2, @3)",
-                isoCode,
-                $"Test Language {i}",
-                false,
-                false);
-
-            var langId = database.ExecuteScalar<int>("SELECT id FROM umbracoLanguage WHERE languageISOCode = @0", isoCode);
-            languageIds.Add(langId);
-        }
 
         // Insert stale rows: one per (document × language × draft/published).
         // These simulate pre-v17.3 data where invariant documents had per-language rows.
@@ -804,8 +804,8 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
 
         Assert.That(
             staleRowCount,
-            Is.GreaterThan(Constants.Sql.MaxParameterCount),
-            $"Test setup should create more than {Constants.Sql.MaxParameterCount} stale rows to exercise the batching fix");
+            Is.GreaterThan(sqlServerParameterLimit),
+            $"Test setup should create more than {sqlServerParameterLimit} stale rows to exceed SQL Server's parameter limit");
 
         // Act - Save new-format data with NULL languageId (invariant).
         // Every stale row should be deleted because the keys won't match (null vs non-null languageId).
