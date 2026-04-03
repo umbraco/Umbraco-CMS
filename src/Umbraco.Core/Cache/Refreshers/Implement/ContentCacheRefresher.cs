@@ -202,11 +202,11 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
                 idsRemoved.Add(payload.Id);
             }
 
-            HandleMemoryCache(payload);
-            HandleRouting(payload);
-
             HandleNavigation(payload);
             HandlePublishedAsync(payload, CancellationToken.None).GetAwaiter().GetResult();
+
+            HandleMemoryCache(payload);
+            HandleRouting(payload);
 
             HandleIdKeyMap(payload);
         }
