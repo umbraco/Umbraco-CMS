@@ -406,6 +406,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 				<umb-input-media
 					slot="editor"
 					.max=${1}
+					folder-filter="filesOnly"
 					.value=${this.value.link.unique && this.value.link.type === 'media' ? this.value.link.unique : ''}
 					@change=${(e: UmbInputPickerEvent) => this.#onPickerSelection(e, 'media')}></umb-input-media>
 			</umb-property-layout>
