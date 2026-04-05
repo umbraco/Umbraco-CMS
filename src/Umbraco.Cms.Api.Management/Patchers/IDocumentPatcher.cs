@@ -13,7 +13,6 @@ public interface IDocumentPatcher
     /// </summary>
     /// <param name="documentKey">The document key.</param>
     /// <param name="patchModel">The patch model containing operations and affected cultures/segments.</param>
-    /// <param name="userKey">The user performing the operation.</param>
     /// <returns>An attempt containing the update model or an error status.</returns>
     Task<Attempt<UpdateDocumentRequestModel, ContentPatchingOperationStatus>> ApplyPatchAsync(
         Guid documentKey,
