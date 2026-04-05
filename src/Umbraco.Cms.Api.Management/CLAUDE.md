@@ -26,7 +26,7 @@ RESTful API for Umbraco backoffice operations. Manages content, media, users, an
 - **Validation**: FluentValidation via base controllers
 - **Serialization**: System.Text.Json with custom converters
 - **Mapping**: Manual presentation factories (no AutoMapper)
-- **Patching**: Custom patch engine for PATCH operations (Umbraco.Core.PropertyEditors.Patching)
+- **Patching**: Custom patch engine for PATCH operations (Umbraco.Cms.Api.Management.Patching)
   - ⚠️ Legacy JsonPatch.Net support (IJsonPatchService) still available but **obsolete** - scheduled for removal in v19
 - **Real-time**: SignalR hubs (`BackofficeHub`, `ServerEventHub`)
 - **DI**: Microsoft.Extensions.DependencyInjection via `ManagementApiComposer`
