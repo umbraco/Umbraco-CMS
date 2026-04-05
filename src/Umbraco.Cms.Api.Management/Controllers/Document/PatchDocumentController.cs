@@ -57,7 +57,7 @@ public class PatchDocumentController : PatchDocumentControllerBase
             Attempt<UpdateDocumentRequestModel, ContentPatchingOperationStatus> patchResult =
                 await _documentPatcher.ApplyPatchAsync(id, patchModel);
 
-            if (!patchResult.Success)
+            if (patchResult.Success is false)
             {
                 return ContentPatchingOperationStatusResult(patchResult.Status);
             }
