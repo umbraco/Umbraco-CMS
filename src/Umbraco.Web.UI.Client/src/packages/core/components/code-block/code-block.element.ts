@@ -118,7 +118,7 @@ export class UmbCodeBlockElement extends LitElement {
 	}
 
 	// Re-highlight if language changes
-	protected updated(changed: Map<string, unknown>) {
+	protected override updated(changed: Map<string, unknown>) {
 		if (changed.has('language')) {
 			this.updateComplete.then(() => this.#highlight());
 		}
