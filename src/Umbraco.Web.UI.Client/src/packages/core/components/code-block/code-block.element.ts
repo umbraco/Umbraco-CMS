@@ -92,7 +92,7 @@ export class UmbCodeBlockElement extends LitElement {
 		el.textContent = this._rawCode;
 
 		// Apply highlighting
-		monaco.editor.colorizeElement(el, {
+		await monaco.editor.colorizeElement(el, {
 			mimeType: this.#mapToMime(this.codeLang),
 		});
 
