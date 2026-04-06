@@ -59,7 +59,7 @@ export class UmbCodeBlockElement extends LitElement {
 		setTimeout(() => (this._copyState = 'idle'), 2000);
 	}
 
-	render() {
+	override render() {
 		return html`
 			${this.#renderHeader()}
 			<pre><uui-scroll-container><code id="code" data-lang=${this.codeLang} ${ref(this._codeRef)}></code></uui-scroll-container></pre>
