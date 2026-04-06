@@ -1,13 +1,17 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { Ref } from '@umbraco-cms/backoffice/external/lit';
-import { createRef, css, customElement, html, property, ref, state, when, LitElement } from '@umbraco-cms/backoffice/external/lit';
-//import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
+import {
+	css,
+	customElement,
+	html,
+	property,
+	state,
+	when,
+	LitElement,
+	createRef,
+	ref,
+	type Ref
+} from '@umbraco-cms/backoffice/external/lit';
 import { monaco } from '@umbraco-cms/backoffice/external/monaco-editor';
-
-//import { jsonDefaults } from 'monaco-editor/esm/vs/language/json/monaco.contribution';
-//import { setupMode } from 'monaco-editor/esm/vs/language/json/jsonMode';
-
-//TODO consider adding a highlight prop to the code block, that could spin up/access monaco instance and highlight the code
 
 /**
  *  A simple styled box for showing code-based error messages or blocks od code.
@@ -24,99 +28,97 @@ export class UmbCodeBlockElement extends LitElement {
 	@state()
 	private _copyState: 'idle' | 'success' = 'idle';
 
-	private _lang = '';
+	private _codeRef: Ref<HTMLElement> = createRef();
 
-	private containerRef: Ref<HTMLElement> = createRef();
-
-	get container() {
-		if (!this.containerRef?.value) throw new Error('Container element not found');
-		return this.containerRef!.value;
-	}
+	private _rawCode = '';
 
 	get codeLang() {
-		this._lang = this.language.toLowerCase();
+		let lang = this.language.toLowerCase();
 
-		switch (this._lang) {
+		switch (lang) {
 			case 'c#':
 			case 'csharp':
-				this._lang = 'csharp';
-				break;
-			case 'ts':
-			case 'typescript':
-				monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
-					noSemanticValidation: false,
-					noSyntaxValidation: false,
-				});
-				this._lang = 'typescript';
-				break;
+				return 'csharp';
+			case 'json':
+				return 'json';
 			case 'js':
 			case 'javascript':
-				this._lang = 'javascript';
-				break;
+				return 'javascript';
+			case 'ts':
+			case 'typescript':
+				return 'typescript';
+			default:
+				return lang || 'plaintext';
 		}
-
-		return this._lang;
 	}
 
 	async copyCode() {
-		const text = this.textContent;
-		if (text) {
-			await navigator.clipboard.writeText(text);
-			this._copyState = 'success';
-			setTimeout(() => {
-				this._copyState = 'idle';
-			}, 2000);
-		}
+		if (!this._rawCode) return;
+
+		await navigator.clipboard.writeText(this._rawCode);
+
+		this._copyState = 'success';
+		setTimeout(() => (this._copyState = 'idle'), 2000);
 	}
 
 	constructor() {
 		super();
-		//setupMode(jsonDefaults);
 	}
 
-	override firstUpdated(): void {
-		
-	}
-
-	override render() {
+	render() {
 		return html`
 			${this.#renderHeader()}
-			<pre><uui-scroll-container><code id="code" ${ref(this.containerRef)} data-lang=${this.codeLang}><slot @slotchange=${this.#onSlotChanged}></slot></code></uui-scroll-container></pre>
+			<pre><uui-scroll-container><code id="code" data-lang=${this.codeLang} ${ref(this._codeRef)}></code></uui-scroll-container></pre>
+			<slot @slotchange=${this.#onSlotChanged} style="display:none;"></slot>
 		`; // Avoid breaks between elements of <pre></pre>
 	}
 
-	#syntaxHighlight() {
-		if (!this.codeLang) return;
+	async #onSlotChanged(event: Event) {
+		const slot = event.target as HTMLSlotElement;
 
-		monaco.editor.colorizeElement(this.container, {});
-		//monaco.editor.colorizeElement(this.shadowRoot!.getElementById("code")!, {});
+		const nodes = slot.assignedNodes({ flatten: true });
 
-		let mimeType = '';
+		this._rawCode = nodes.map((n) => n.textContent ?? '').join('');
 
-		if (this.codeLang === 'json') {
-			mimeType = 'application/json';
-		}
-		else if (this.codeLang === 'css') {
-			mimeType = 'text/css';
-		}
+		this.updateComplete.then(() => {
+			const el = this._codeRef.value;
+			if (el) el.textContent = this._rawCode;
 
-		monaco.editor.colorize(this.textContent, this.codeLang, {
-			mimeType: mimeType,
-		})
-		.then(html => {
-			this.container.innerHTML = html;
+			this.#highlight();
 		});
 	}
 
-	#onSlotChanged(event: Event) {
-		const slot = event.target as HTMLSlotElement;
-		const name = slot.name;
+	async #highlight() {
+		const el = this._codeRef.value;
+		if (!el || !this._rawCode) return;
 
-		console.log("onSlotChanged")
+		monaco.editor.colorizeElement(el, {
+			mimeType: this.#mapToMime(this.codeLang),
+		});
+	}
 
-		this.#syntaxHighlight();
-		
-		//this.requestUpdate();
+	#mapToMime(lang: string) {
+		switch (lang) {
+			case 'css':
+				return 'text/css';
+			case 'json':
+				return 'application/json';
+			case 'javascript':
+				return 'text/javascript';
+			case 'typescript':
+				return 'text/typescript';
+			case 'csharp':
+				return 'text/x-csharp';
+			default:
+				return 'text/plain';
+		}
+	}
+
+	// Re-highlight if language changes
+	protected updated(changed: Map<string, unknown>) {
+		if (changed.has('language')) {
+			this.updateComplete.then(() => this.#highlight());
+		}
 	}
 
 	#renderHeader() {
