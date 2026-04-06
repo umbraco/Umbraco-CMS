@@ -29,8 +29,8 @@ export class UmbCodeBlockElement extends LitElement {
 	private _copyState: 'idle' | 'success' = 'idle';
 
 	private _codeRef: Ref<HTMLElement> = createRef();
-
 	private _rawCode = '';
+	private _lastSignature = '';
 
 	get codeLang() {
 		let lang = this.language.toLowerCase();
@@ -78,21 +78,30 @@ export class UmbCodeBlockElement extends LitElement {
 
 		this._rawCode = nodes.map((n) => n.textContent ?? '').join('');
 
-		this.updateComplete.then(() => {
-			const el = this._codeRef.value;
-			if (el) el.textContent = this._rawCode;
-
-			this.#highlight();
-		});
+		await this.updateComplete;
+		this.#highlight();
 	}
 
 	async #highlight() {
 		const el = this._codeRef.value;
 		if (!el || !this._rawCode) return;
 
+		const signature = `${this.codeLang}:${this._rawCode}`;
+
+		// Skip if nothing changed
+		if (this._lastSignature === signature) {
+			return;
+		}
+
+		el.textContent = this._rawCode;
+
+		// Apply highlighting
 		monaco.editor.colorizeElement(el, {
 			mimeType: this.#mapToMime(this.codeLang),
 		});
+
+		// Store new state
+		this._lastSignature = signature;
 	}
 
 	#mapToMime(lang: string) {
