@@ -23,13 +23,6 @@ public class TemplateService : RepositoryService, ITemplateService
     private readonly ITemplateContentParserService _templateContentParserService;
     private readonly IOptions<RuntimeSettings> _runtimeSettings;
 
-    // TODO (V18): Remove obsolete constructors and the ActivatorUtilitiesConstructor attribute.
-    // Also update UmbracoBuilder where this service is registered using:
-    //   Services.AddUnique<ITemplateService>(sp => ActivatorUtilities.CreateInstance<TemplateService>(sp));
-    // We do this to allow the ActivatorUtilitiesConstructor to be used (it's otherwise ignored by AddUnique).
-    // Revert it to:
-    //   Services.AddUnique<ITemplateService, TemplateService>();
-
     /// <summary>
     ///     Initializes a new instance of the <see cref="TemplateService" /> class.
     /// </summary>
