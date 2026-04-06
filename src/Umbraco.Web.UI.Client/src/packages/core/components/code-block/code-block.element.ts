@@ -39,8 +39,6 @@ export class UmbCodeBlockElement extends LitElement {
 			case 'c#':
 			case 'csharp':
 				return 'csharp';
-			case 'json':
-				return 'json';
 			case 'js':
 			case 'javascript':
 				return 'javascript';
