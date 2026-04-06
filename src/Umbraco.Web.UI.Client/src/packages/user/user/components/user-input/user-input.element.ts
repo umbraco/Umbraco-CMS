@@ -209,7 +209,9 @@ export class UmbUserInputElement extends UmbFormControlMixin<string, typeof UmbL
 
 	#renderRemainingCount() {
 		if (!this.remainingCount) return nothing;
-		return html`<div style="padding: 0px 0px 8px 12px">and ${this.remainingCount} more</div>`;
+		return html`<div class="remaining-count">
+			${this.localize.term('user_andMore', this.remainingCount)} - <i>${this.localize.term('user_noteMessage')}</i>
+		</div>`;
 	}
 
 	#renderItem(status: UmbRepositoryItemsStatus) {
@@ -238,6 +240,9 @@ export class UmbUserInputElement extends UmbFormControlMixin<string, typeof UmbL
 		css`
 			#btn-add {
 				width: 100%;
+			}
+			.remaining-count {
+				padding: 0px 0px 8px 12px;
 			}
 		`,
 	];

@@ -2229,6 +2229,8 @@ export default {
 		'2faInvalidCode': 'Invalid code entered',
 		addUsersToGroupError: 'Could not add users to the group.',
 		removeUsersFromGroupError: 'Could not remove users from the group.',
+		andMore: 'and %0% more',
+		noteMessage: 'not manageable from this screen.',
 	},
 	validation: {
 		validation: 'Validation',
