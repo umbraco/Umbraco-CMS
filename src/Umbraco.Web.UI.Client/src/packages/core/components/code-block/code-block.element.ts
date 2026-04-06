@@ -33,7 +33,7 @@ export class UmbCodeBlockElement extends LitElement {
 	private _lastSignature = '';
 
 	get codeLang() {
-		let lang = this.language.toLowerCase();
+		const lang = this.language.toLowerCase();
 
 		switch (lang) {
 			case 'c#':
