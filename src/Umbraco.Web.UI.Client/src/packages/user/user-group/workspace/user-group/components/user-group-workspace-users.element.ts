@@ -1,11 +1,10 @@
 import { UMB_USER_GROUP_WORKSPACE_CONTEXT } from '../user-group-workspace.context-token.js';
+import { UmbUserGroupUsersRepository } from '../../../repository/users/user-group-users.repository.js';
 import type { UmbUserInputElement } from '../../../../user/components/user-input/user-input.element.js';
 import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UserGroupService, UserService } from '@umbraco-cms/backoffice/external/backend-api';
-import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 
 import '../../../../user/components/user-input/user-input.element.js';
@@ -22,6 +21,7 @@ export class UmbUserGroupWorkspaceUsersElement extends UmbLitElement {
 	#isNew = false;
 	#persistedUserUniques: string[] = [];
 	#notificationContext?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;
+	#usersRepository = new UmbUserGroupUsersRepository(this);
 	#workspaceContext?: typeof UMB_USER_GROUP_WORKSPACE_CONTEXT.TYPE;
 
 	constructor() {
@@ -65,15 +65,11 @@ export class UmbUserGroupWorkspaceUsersElement extends UmbLitElement {
 	}
 
 	async #loadUsers(unique: string) {
-		const { data } = await tryExecute(
-			this,
-			UserService.getFilterUser({ query: { userGroupIds: [unique], take: 100 } }),
-		);
-		const uniques = data?.items.map((u) => u.id) ?? [];
-		this.#persistedUserUniques = [...uniques];
-		this._userUniques = [...uniques];
+		const { data } = await this.#usersRepository.requestUsersInGroup(unique);
+		this.#persistedUserUniques = [...(data?.uniques ?? [])];
+		this._userUniques = [...(data?.uniques ?? [])];
 		const total = data?.total ?? 0;
-		this._usersRemainingCount = Math.max(0, total - uniques.length);
+		this._usersRemainingCount = Math.max(0, total - this._userUniques.length);
 	}
 
 	async #savePendingUserChanges() {
@@ -86,9 +82,9 @@ export class UmbUserGroupWorkspaceUsersElement extends UmbLitElement {
 		const toAdd = newSelection.filter((u) => !this.#persistedUserUniques.includes(u));
 		const toRemove = this.#persistedUserUniques.filter((u) => !newSelection.includes(u));
 
-		const [addError, removeError] = await Promise.all([
-			this.#addUsersToGroup(unique, toAdd),
-			this.#removeUsersFromGroup(unique, toRemove),
+		const [{ error: addError }, { error: removeError }] = await Promise.all([
+			this.#usersRepository.addUsersToGroup(unique, toAdd),
+			this.#usersRepository.removeUsersFromGroup(unique, toRemove),
 		]);
 
 		if (addError) {
@@ -115,30 +111,6 @@ export class UmbUserGroupWorkspaceUsersElement extends UmbLitElement {
 		}
 
 		return false;
-	}
-
-	async #addUsersToGroup(unique: string, userIds: string[]): Promise<boolean> {
-		if (!userIds.length) return false;
-		const { error } = await tryExecute(
-			this,
-			UserGroupService.postUserGroupByIdUsers({
-				path: { id: unique },
-				body: userIds.map((id) => ({ id })),
-			}),
-		);
-		return !!error;
-	}
-
-	async #removeUsersFromGroup(unique: string, userIds: string[]): Promise<boolean> {
-		if (!userIds.length) return false;
-		const { error } = await tryExecute(
-			this,
-			UserGroupService.deleteUserGroupByIdUsers({
-				path: { id: unique },
-				body: userIds.map((id) => ({ id })),
-			}),
-		);
-		return !!error;
 	}
 
 	async #onUsersChange(event: UmbChangeEvent) {
