@@ -59,10 +59,6 @@ export class UmbCodeBlockElement extends LitElement {
 		setTimeout(() => (this._copyState = 'idle'), 2000);
 	}
 
-	constructor() {
-		super();
-	}
-
 	render() {
 		return html`
 			${this.#renderHeader()}
