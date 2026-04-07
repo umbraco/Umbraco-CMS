@@ -162,7 +162,7 @@ export class UmbTableCollectionViewElement extends UmbCollectionViewElementBase 
 				.columns=${this._tableColumns}
 				.items=${this._tableRows}
 				.selection=${this._selection}
-				@selected="${this.#onSelected}"
+				@selected=${this.#onSelected}
 				@deselected="${this.#onDeselected}"></umb-table>
 		`;
 	}
