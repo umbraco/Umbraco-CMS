@@ -53,9 +53,7 @@ public class PublishedSnapshotServiceEventHandler :
 
     public void Handle(ContentTypeRefreshedNotification notification)
     {
-        const ContentTypeChangeTypes types // only for those that have been refreshed
-            = ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RefreshOther;
-        var contentTypeIds = notification.Changes.Where(x => x.ChangeTypes.HasTypesAny(types)).Select(x => x.Item.Id)
+        var contentTypeIds = notification.Changes.Where(x => x.ChangeTypes.IsStructuralChange()).Select(x => x.Item.Id)
             .ToArray();
         if (contentTypeIds.Any())
         {

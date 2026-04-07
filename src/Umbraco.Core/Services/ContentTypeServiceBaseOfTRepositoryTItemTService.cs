@@ -226,7 +226,10 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
             });
 
             // removed properties?
-            var hasAnyPropertyBeenRemoved = dirty.WasPropertyDirty("HasPropertyTypeBeenRemoved");
+            // check both the content type level flag (set by RemovePropertyType) and
+            // individual property group flags (set when PropertyTypes collection is replaced, e.g. by the mapper)
+            var hasAnyPropertyBeenRemoved = dirty.WasPropertyDirty("HasPropertyTypeBeenRemoved")
+                || contentType.PropertyGroups.Any(g => g.WasPropertyDirty("HasPropertyTypeBeenRemoved"));
 
             // removed compositions?
             var hasAnyCompositionBeenRemoved = dirty.WasPropertyDirty("HasCompositionTypeBeenRemoved");
