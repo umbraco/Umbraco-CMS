@@ -72,7 +72,7 @@ export class UmbTableCollectionViewElement extends UmbCollectionViewElementBase 
 
 			const manifestColumnData = this._manifestColumns.map((col) => ({
 				columnAlias: col.field,
-				value: (item as Record<string, unknown>)[col.field],
+				value: (item as unknown as Record<string, unknown>)[col.field],
 			}));
 
 			return {
