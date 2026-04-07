@@ -2065,14 +2065,13 @@ export class UiBaseLocators extends BasePage {
     await this.click(this.elementStartNode.filter({hasText: elementStartNodeName}).getByLabel('Remove'));
   }
 
-  async isSelectCheckboxVisibleForMediaName(
-    mediaName: string,
-    isVisible: boolean = true,
-  ) {
-    const selectCheckboxLocator = this.mediaCardItems
-      .filter({ hasText: mediaName })
-      .locator("#select-checkbox");
+  async isRestoreFromRecycleBinMessageVisible(restoreItem: string, targetFolderName: string) {
+    const message = 'Restore ' + restoreItem + ' to ' + targetFolderName;
+    return await this.doesModalHaveText(message);
+  }
 
+  async isSelectCheckboxVisibleForMediaName(mediaName: string, isVisible: boolean = true) {
+    const selectCheckboxLocator = this.mediaCardItems.filter({hasText: mediaName}).locator('#select-checkbox');
     await this.isVisible(selectCheckboxLocator, isVisible);
   }
 }

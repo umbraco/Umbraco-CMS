@@ -61,12 +61,3 @@ function compareName(a: VariantType, b: VariantType) {
 export function sortVariants(a: VariantType, b: VariantType) {
 	return compareDefault(a, b) || compareMandatory(a, b) || compareState(a, b) || compareName(a, b);
 }
-
-export const TimeOptions: Intl.DateTimeFormatOptions = {
-	year: 'numeric',
-	month: 'long',
-	day: 'numeric',
-	hour: 'numeric',
-	minute: 'numeric',
-	second: 'numeric',
-};
