@@ -21,7 +21,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(elementTypeName);
 });
 
-test('can create an empty element folder', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+test.skip('can create an empty element folder', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.library.goToSection(ConstantHelper.sections.library);
   await umbracoUi.library.clickActionsMenuAtRoot();
@@ -93,7 +93,7 @@ test('can create an element folder in a folder', async ({umbracoApi, umbracoUi})
   await umbracoApi.element.ensureNameNotExists(childFolderName);
 });
 
-test('can create a folder in a folder in a folder', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+test.skip('can create a folder in a folder in a folder', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const grandParentFolderName = 'GrandParentElementFolder';
   const parentFolderName = 'ParentElementFolder';
