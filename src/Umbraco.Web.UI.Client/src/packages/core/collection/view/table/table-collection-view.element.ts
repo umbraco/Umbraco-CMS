@@ -39,7 +39,7 @@ export class UmbTableCollectionViewElement extends UmbCollectionViewElementBase 
 
 	#buildTableColumns() {
 		const nameColumn: UmbTableColumn = {
-			name: 'Name',
+			name: this.localize.term('general_name'),
 			alias: 'name',
 			elementName: 'umb-entity-name-table-column-layout',
 		};
@@ -56,7 +56,7 @@ export class UmbTableCollectionViewElement extends UmbCollectionViewElementBase 
 		};
 
 		const descriptionColumn: UmbTableColumn = {
-			name: 'Description',
+			name: this.localize.term('general_description'),
 			alias: 'description',
 		};
 
