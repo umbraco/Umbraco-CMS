@@ -115,7 +115,7 @@ export class UmbCollectionViewManager extends UmbControllerBase {
 					path: '',
 					component: () => createExtensionElement(fallbackView),
 					setup: (component) => {
-						(component as any).manifest = fallbackView;
+						(component as UmbCollectionViewElementBase).manifest = fallbackView;
 						this.setCurrentView(fallbackView);
 					},
 				});

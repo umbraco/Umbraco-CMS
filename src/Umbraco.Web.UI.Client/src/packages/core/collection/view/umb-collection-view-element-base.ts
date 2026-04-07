@@ -1,6 +1,5 @@
 import { UMB_COLLECTION_CONTEXT } from '../default/index.js';
-import type { ManifestCollectionView } from './collection-view.extension.js';
-import type { UmbCollectionItemModel } from '../types.js';
+import type { ManifestCollectionView, UmbCollectionItemModel } from '../types.js';
 import { property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
@@ -10,9 +9,10 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
  */
 export abstract class UmbCollectionViewElementBase<
 	CollectionItemType extends UmbCollectionItemModel = UmbCollectionItemModel,
+	ManifestType extends Omit<ManifestCollectionView, 'meta'> = ManifestCollectionView,
 > extends UmbLitElement {
 	@property({ attribute: false })
-	manifest?: ManifestCollectionView | undefined;
+	manifest?: ManifestType | undefined;
 
 	@state()
 	protected _items: Array<CollectionItemType> = [];
