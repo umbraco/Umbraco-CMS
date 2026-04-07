@@ -26,6 +26,9 @@ interface PendingBatch {
 
 const pendingBatches = new Map<string, PendingBatch>();
 
+/** Module-level URL cache: model key → (unique → url). */
+const urlCache = new Map<string, Map<string, string>>();
+
 /**
  * Flushes a pending batch, executing the API call and resolving all waiting promises.
  * @param {string} key - The batch key identifying the batch
@@ -85,10 +88,19 @@ async function flush(key: string) {
 			allItems = data ?? [];
 		}
 
-		// Build a lookup from unique -> url
+		// Build a lookup from unique -> url and populate the cache.
 		const urlMap = new Map<string, string | undefined>();
+		let cacheForKey = urlCache.get(key);
+		if (!cacheForKey) {
+			cacheForKey = new Map();
+			urlCache.set(key, cacheForKey);
+		}
 		for (const item of allItems) {
-			urlMap.set(item.unique, item.url);
+			// Cache both present and absent URLs. A missing URL (e.g. non-image
+			// media like PDFs) is a valid result that should not trigger re-fetching.
+			const url = item.url ?? '';
+			urlMap.set(item.unique, url);
+			cacheForKey.set(item.unique, url);
 		}
 
 		// Resolve successful callers; reject those whose chunk failed.
@@ -138,6 +150,12 @@ export function batchImagingRequest(
 ): Promise<string | undefined> {
 	const key = generateImagingCacheKey(imagingModel);
 
+	// Return cached URL immediately if available.
+	const cached = urlCache.get(key)?.get(unique);
+	if (cached !== undefined) {
+		return Promise.resolve(cached);
+	}
+
 	let batch = pendingBatches.get(key);
 	if (!batch) {
 		batch = {
@@ -161,4 +179,23 @@ export function batchImagingRequest(
 		}
 		requests.push({ resolve, reject });
 	});
+}
+
+/**
+ * Clears all cached imaging URLs for the given unique identifier.
+ * Call this when a media item is saved or deleted to ensure fresh URLs are fetched.
+ * @param {string} unique - The media item unique identifier to clear from cache
+ */
+export function clearImagingCache(unique: string): void {
+	for (const cacheForKey of urlCache.values()) {
+		cacheForKey.delete(unique);
+	}
+}
+
+/**
+ * Clears the entire imaging URL cache.
+ * @internal
+ */
+export function clearAllImagingCache(): void {
+	urlCache.clear();
 }
