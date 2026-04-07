@@ -71,7 +71,7 @@ export class UmbWorkspaceBreadcrumbElement extends UmbLitElement {
 	}
 
 	#getHref(structureItem: UmbStructureItemModel) {
-		return this.#structureContext?.getItemHref(structureItem);
+		return this.#structureContext?.getItemHref?.(structureItem);
 	}
 
 	override render() {
