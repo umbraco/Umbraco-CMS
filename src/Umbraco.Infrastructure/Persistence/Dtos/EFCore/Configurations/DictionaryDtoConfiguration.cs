@@ -9,9 +9,9 @@ public class DictionaryDtoConfiguration : IEntityTypeConfiguration<DictionaryDto
     {
         builder.ToTable(DictionaryDto.TableName);
 
-        builder.HasKey(x => x.PrimaryKey);
+        builder.HasKey(x => x.Id);
 
-        builder.Property(x => x.PrimaryKey)
+        builder.Property(x => x.Id)
             .HasColumnName(DictionaryDto.PrimaryKeyColumnName)
             .ValueGeneratedOnAdd();
 
@@ -47,7 +47,7 @@ public class DictionaryDtoConfiguration : IEntityTypeConfiguration<DictionaryDto
             .OnDelete(DeleteBehavior.NoAction);
 
         // One-to-many: DictionaryEntry → LanguageTexts
-        builder.HasMany(x => x.LanguageTextDtos)
+        builder.HasMany(x => x.LanguageText)
             .WithOne(x => x.DictionaryEntry)
             .HasForeignKey(x => x.UniqueId)
             .HasPrincipalKey(x => x.UniqueId)

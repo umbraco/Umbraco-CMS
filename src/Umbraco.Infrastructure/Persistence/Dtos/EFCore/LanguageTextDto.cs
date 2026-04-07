@@ -13,7 +13,7 @@ public class LanguageTextDto
     /// <summary>
     ///     Gets or sets the primary key of the language text entry.
     /// </summary>
-    public int PrimaryKey { get; set; }
+    public int Id { get; set; }
 
     /// <summary>
     ///     Gets or sets the identifier of the associated language.

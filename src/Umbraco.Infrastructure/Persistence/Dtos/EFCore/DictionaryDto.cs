@@ -14,7 +14,7 @@ public class DictionaryDto
     /// <summary>
     ///     Gets or sets the primary key of the dictionary entry.
     /// </summary>
-    public int PrimaryKey { get; set; }
+    public int Id { get; set; }
 
     /// <summary>
     ///     Gets or sets the unique identifier for the dictionary item.
@@ -34,7 +34,7 @@ public class DictionaryDto
     /// <summary>
     ///     Gets or sets the collection of language text entries associated with this dictionary entry.
     /// </summary>
-    public List<LanguageTextDto> LanguageTextDtos { get; set; } = [];
+    public List<LanguageTextDto> LanguageText { get; set; } = [];
 
     /// <summary>
     ///     Gets or sets the parent dictionary entry navigation property.

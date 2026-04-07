@@ -59,7 +59,7 @@ internal sealed class DictionaryRepository : AsyncEntityRepositoryBase<Guid, IDi
         return await AmbientScope.ExecuteWithContextAsync(async db =>
         {
             DictionaryDto? dto = await db.DictionaryEntries
-                .Include(x => x.LanguageTextDtos)
+                .Include(x => x.LanguageText)
                 .Where(x => x.Key == key)
                 .FirstOrDefaultAsync();
 
@@ -84,7 +84,7 @@ internal sealed class DictionaryRepository : AsyncEntityRepositoryBase<Guid, IDi
         return await AmbientScope.ExecuteWithContextAsync(async db =>
         {
             List<DictionaryDto> dtos = await db.DictionaryEntries
-                .Include(x => x.LanguageTextDtos)
+                .Include(x => x.LanguageText)
                 .Where(x => keys.Contains(x.Key))
                 .ToListAsync();
 
@@ -119,7 +119,7 @@ internal sealed class DictionaryRepository : AsyncEntityRepositoryBase<Guid, IDi
             return await AmbientScope.ExecuteWithContextAsync(async db =>
             {
                 IQueryable<DictionaryDto> query = db.DictionaryEntries
-                    .Include(x => x.LanguageTextDtos);
+                    .Include(x => x.LanguageText);
 
                 query = ApplyFilter(query, filter);
 
@@ -149,7 +149,7 @@ internal sealed class DictionaryRepository : AsyncEntityRepositoryBase<Guid, IDi
                     Guid[] groupArray = group.ToArray();
 
                     IQueryable<DictionaryDto> query = db.DictionaryEntries
-                        .Include(x => x.LanguageTextDtos)
+                        .Include(x => x.LanguageText)
                         .Where(x => x.Parent != null && groupArray.Contains(x.Parent.Value));
 
                     query = ApplyFilter(query, filter);
@@ -181,7 +181,7 @@ internal sealed class DictionaryRepository : AsyncEntityRepositoryBase<Guid, IDi
         return await AmbientScope.ExecuteWithContextAsync(async db =>
         {
             DictionaryDto? dto = await db.DictionaryEntries
-                .Include(x => x.LanguageTextDtos)
+                .Include(x => x.LanguageText)
                 .Where(x => x.UniqueId == key)
                 .FirstOrDefaultAsync();
 
@@ -203,7 +203,7 @@ internal sealed class DictionaryRepository : AsyncEntityRepositoryBase<Guid, IDi
         return await AmbientScope.ExecuteWithContextAsync(async db =>
         {
             List<DictionaryDto> dtos = await db.DictionaryEntries
-                .Include(x => x.LanguageTextDtos)
+                .Include(x => x.LanguageText)
                 .OrderBy(x => x.UniqueId)
                 .ToListAsync();
 
@@ -225,7 +225,7 @@ internal sealed class DictionaryRepository : AsyncEntityRepositoryBase<Guid, IDi
         return await AmbientScope.ExecuteWithContextAsync(async db =>
         {
             List<DictionaryDto> dtos = await db.DictionaryEntries
-                .Include(x => x.LanguageTextDtos)
+                .Include(x => x.LanguageText)
                 .Where(x => keys.Contains(x.UniqueId))
                 .OrderBy(x => x.UniqueId)
                 .ToListAsync();
@@ -277,11 +277,11 @@ internal sealed class DictionaryRepository : AsyncEntityRepositoryBase<Guid, IDi
 
             await db.SaveChangesAsync();
 
-            dictionaryItem.Id = dto.PrimaryKey;
+            dictionaryItem.Id = dto.Id;
 
             foreach ((IDictionaryTranslation translation, LanguageTextDto textDto) in translationDtos)
             {
-                translation.Id = textDto.PrimaryKey;
+                translation.Id = textDto.Id;
                 translation.Key = dictionaryItem.Key;
             }
 
@@ -318,7 +318,7 @@ internal sealed class DictionaryRepository : AsyncEntityRepositoryBase<Guid, IDi
                     // Update existing translation
                     await db.UpsertAsync(textDto, () =>
                         db.Set<LanguageTextDto>()
-                            .Where(x => x.PrimaryKey == textDto.PrimaryKey)
+                            .Where(x => x.Id == textDto.Id)
                             .ExecuteUpdateAsync(setter => setter
                                 .SetProperty(x => x.LanguageId, textDto.LanguageId)
                                 .SetProperty(x => x.UniqueId, textDto.UniqueId)
@@ -329,7 +329,7 @@ internal sealed class DictionaryRepository : AsyncEntityRepositoryBase<Guid, IDi
                     // Insert new translation
                     await db.Set<LanguageTextDto>().AddAsync(textDto);
                     await db.SaveChangesAsync();
-                    translation.Id = textDto.PrimaryKey;
+                    translation.Id = textDto.Id;
                     translation.Key = entity.Key;
                 }
             }
@@ -386,7 +386,7 @@ internal sealed class DictionaryRepository : AsyncEntityRepositoryBase<Guid, IDi
     {
         IDictionaryItem entity = DictionaryItemFactory.BuildEntity(dto);
 
-        entity.Translations = dto.LanguageTextDtos
+        entity.Translations = dto.LanguageText
             .Where(x => x.LanguageId > 0)
             .Select(x => languagesById.TryGetValue(x.LanguageId, out ILanguage? language)
                 ? DictionaryTranslationFactory.BuildEntity(x, dto.UniqueId, language)
@@ -411,7 +411,7 @@ internal sealed class DictionaryRepository : AsyncEntityRepositoryBase<Guid, IDi
         {
             return query.Where(x =>
                 x.Key.StartsWith(filter) ||
-                x.LanguageTextDtos.Any(lt => lt.Value.Contains(filter)));
+                x.LanguageText.Any(lt => lt.Value.Contains(filter)));
         }
 
         // Search only in keys

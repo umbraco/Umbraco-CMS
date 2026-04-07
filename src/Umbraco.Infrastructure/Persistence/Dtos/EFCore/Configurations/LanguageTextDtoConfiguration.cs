@@ -9,9 +9,9 @@ public class LanguageTextDtoConfiguration : IEntityTypeConfiguration<LanguageTex
     {
         builder.ToTable(LanguageTextDto.TableName);
 
-        builder.HasKey(x => x.PrimaryKey);
+        builder.HasKey(x => x.Id);
 
-        builder.Property(x => x.PrimaryKey)
+        builder.Property(x => x.Id)
             .HasColumnName(LanguageTextDto.PrimaryKeyColumnName)
             .ValueGeneratedOnAdd();
 

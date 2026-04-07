@@ -21,7 +21,7 @@ internal static class DictionaryTranslationFactory
         {
             item.DisableChangeTracking();
 
-            item.Id = dto.PrimaryKey;
+            item.Id = dto.Id;
 
             item.ResetDirtyProperties(false);
             return item;
@@ -56,7 +56,7 @@ internal static class DictionaryTranslationFactory
 
         if (entity.HasIdentity)
         {
-            dto.PrimaryKey = entity.Id;
+            dto.Id = entity.Id;
         }
 
         return dto;

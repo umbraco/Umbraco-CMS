@@ -18,7 +18,7 @@ internal static class DictionaryItemFactory
         {
             item.DisableChangeTracking();
 
-            item.Id = dto.PrimaryKey;
+            item.Id = dto.Id;
             item.Key = dto.UniqueId;
 
             item.ResetDirtyProperties(false);
@@ -41,6 +41,6 @@ internal static class DictionaryItemFactory
             UniqueId = entity.Key,
             Key = entity.ItemKey,
             Parent = entity.ParentId,
-            PrimaryKey = entity.Id
+            Id = entity.Id
         };
 }
