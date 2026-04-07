@@ -1,9 +1,10 @@
-import { UmbImagingCropMode, type UmbImagingResizeModel } from './types.js';
+import { UmbImagingCropMode } from './types.js';
+import type { UmbImagingResizeModel } from './types.js';
 import { batchImagingRequest } from './imaging-request-batcher.js';
 import { UmbImagingServerDataSource } from './imaging.server.data.js';
 import { UMB_IMAGING_STORE_CONTEXT } from './imaging.store.token.js';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { consumeContext } from '@umbraco-cms/backoffice/context-api';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbMediaUrlModel } from '@umbraco-cms/backoffice/media';
 
@@ -12,19 +13,10 @@ import type { UmbMediaUrlModel } from '@umbraco-cms/backoffice/media';
  * You can use it to request (cached) thumbnail URLs or new resized images.
  */
 export class UmbImagingRepository extends UmbRepositoryBase implements UmbApi {
-	#init;
 	#itemSource = new UmbImagingServerDataSource(this);
-	#dataStore?: typeof UMB_IMAGING_STORE_CONTEXT.TYPE;
 
-	constructor(host: UmbControllerHost) {
-		super(host);
-
-		this.#init = this.consumeContext(UMB_IMAGING_STORE_CONTEXT, (instance) => {
-			if (instance) {
-				this.#dataStore = instance;
-			}
-		}).asPromise({ preventTimeout: true });
-	}
+	@consumeContext({ context: UMB_IMAGING_STORE_CONTEXT })
+	private _dataStore?: typeof UMB_IMAGING_STORE_CONTEXT.TYPE;
 
 	/**
 	 * Requests the items for the given uniques
@@ -39,18 +31,14 @@ export class UmbImagingRepository extends UmbRepositoryBase implements UmbApi {
 	): Promise<{ data: UmbMediaUrlModel[] }> {
 		if (!uniques.length) throw new Error('Uniques are missing');
 
-		await this.#init;
-
-		if (!this.#dataStore) {
-			console.warn('[UmbImagingRepository] No data store available. All thumbnails are uncached.');
-		}
-
 		const urls = new Map<string, string>();
 		const uncachedUniques: Array<string> = [];
 
 		// Serve what we can from the in-memory crop cache.
 		for (const unique of uniques) {
-			const existingCrop = this.#dataStore?.getCrop(unique, imagingModel);
+			// The store is used opportunistically.
+			// If not yet available, everything is a cache miss and we fetch.
+			const existingCrop = this._dataStore?.getCrop(unique, imagingModel);
 			if (existingCrop !== undefined) {
 				urls.set(unique, existingCrop);
 			} else {
@@ -84,7 +72,7 @@ export class UmbImagingRepository extends UmbRepositoryBase implements UmbApi {
 				const result = results[i];
 				if (result.status === 'fulfilled') {
 					const url = result.value;
-					this.#dataStore?.addCrop(uncachedUniques[i], url ?? '', imagingModel);
+					this._dataStore?.addCrop(uncachedUniques[i], url ?? '', imagingModel);
 					if (url) {
 						urls.set(uncachedUniques[i], url);
 					}
@@ -104,8 +92,7 @@ export class UmbImagingRepository extends UmbRepositoryBase implements UmbApi {
 	 */
 	// eslint-disable-next-line @typescript-eslint/naming-convention
 	async _internal_clearCropByUnique(unique: string) {
-		await this.#init;
-		this.#dataStore?.clearCropByUnique(unique);
+		this._dataStore?.clearCropByUnique(unique);
 	}
 
 	/**

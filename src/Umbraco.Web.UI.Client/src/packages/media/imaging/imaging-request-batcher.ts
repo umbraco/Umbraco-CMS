@@ -147,11 +147,9 @@ export function batchImagingRequest(
 		};
 		pendingBatches.set(key, batch);
 
-		// Use setTimeout(0) rather than queueMicrotask so the flush fires as a
-		// macrotask — after all pending microtasks (i.e. resolved awaits) have
-		// drained. This is critical because each UmbImagingRepository instance
-		// has an `await this.#init` that resolves as a separate microtask;
-		// queueMicrotask would fire between those resolutions, flushing too early.
+		// Macrotask flush: Lit renders via microtasks, so setTimeout(0) waits for
+		// a full render pass to complete before flushing. Multiple passes produce
+		// separate batches, which is fine — pipelining paints results sooner.
 		setTimeout(() => flush(key), 0);
 	}
 
