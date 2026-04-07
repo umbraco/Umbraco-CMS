@@ -62,6 +62,7 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
     /// <param name="repositoryCacheVersionService">Service for managing repository cache versions.</param>
     /// <param name="cacheSyncService">Service for synchronizing cache across servers.</param>
     /// <param name="securitySettings">Configuration settings for member passwords.</param>
+    [ActivatorUtilitiesConstructor]
     public MemberRepository(
         IScopeAccessor scopeAccessor,
         AppCaches cache,
