@@ -240,38 +240,9 @@ umbExtensionsRegistry.registerMany(manifests);
 
 ---
 
-## Registry Operations
-
-The extension registry provides alias-based operations:
-
-| Method | Description |
-|--------|-------------|
-| `register(manifest)` | Register a single extension or kind |
-| `registerMany(manifests)` | Register multiple extensions |
-| `unregister(alias)` | Remove an extension by alias |
-| `unregisterMany(aliases)` | Remove multiple extensions |
-| `exclude(alias)` | Permanently exclude an alias (survives re-registration) |
-| `isRegistered(alias)` | Check if an alias exists (extensions or kinds) |
-| `byAlias(alias)` | Observable of a single extension, merged with its kind |
-| `getByAlias(alias)` | Synchronous one-time lookup |
-| `byTypeAndAlias(type, alias)` | Observable filtered by both type and alias |
-
-### Validation Rules
-
-On registration, the registry enforces:
-
-1. **`type` is required** — missing type logs an error, registration rejected
-2. **`alias` is required** — missing alias logs an error, registration rejected
-3. **Alias must be unique** — duplicate alias logs an error, the second registration is rejected
-4. **Exclusion list** — aliases added via `exclude()` are permanently blocked
-
-All validation failures are silent from the caller's perspective (no exceptions thrown) — they produce console errors only.
-
----
-
 ## Kinds
 
-Kinds are **reusable default implementations** for an extension type. A kind provides pre-built `element`, `api`, and/or `meta` that extensions inherit — extensions only specify what differs.
+Kinds are **reusable base manifests** for an extension type. A kind provides pre-built `element`, `api`, and/or `meta` that extensions inherit — extensions only specify what differs.
 
 Kinds are documented in detail in [Architecture — Kinds](./architecture.md#kinds).
 
