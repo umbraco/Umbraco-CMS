@@ -5,7 +5,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 @customElement('umb-entity-name-table-column-layout')
 export class UmbEntityNameTableColumnLayoutElement extends UmbLitElement {
 	@property({ attribute: false })
-	value!: { name: string; href?: string };
+	value?: { name: string; href?: string };
 
 	override render() {
 		if (!this.value) return nothing;
