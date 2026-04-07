@@ -105,6 +105,9 @@ _cleanedUmbracoUrl ??= _uriUtility.UriToUmbraco(OriginalRequestUrl);
     public IPublishedMediaCache Media => _cacheManager.Media;
 
     /// <inheritdoc />
+    public IPublishedElementCache Elements => _cacheManager.Elements;
+
+    /// <inheritdoc />
     public IDomainCache Domains => _cacheManager.Domains;
 
     /// <inheritdoc />

@@ -40,6 +40,7 @@ public static class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IPublishedContentCache, DocumentCache>();
         builder.Services.AddSingleton<IPublishedMediaCache, MediaCache>();
         builder.Services.AddSingleton<IPublishedMemberCache, MemberCache>();
+        builder.Services.AddSingleton<IPublishedElementCache, ElementCache>();
         builder.Services.AddSingleton<IDomainCache, DomainCache>();
         builder.Services.AddSingleton<IElementsCache, ElementsDictionaryAppCache>();
         builder.Services.AddSingleton<IPublishedContentTypeCache, PublishedContentTypeCache>();
