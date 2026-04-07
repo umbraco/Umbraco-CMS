@@ -210,7 +210,7 @@ internal sealed class ElementCacheService : IElementCacheService
     public async Task RefreshMemoryCacheAsync(Guid key)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
-        scope.ReadLock(Constants.Locks.ContentTree);
+        scope.ReadLock(Constants.Locks.ElementTree);
 
         (ContentCacheNode? draftNode, ContentCacheNode? publishedNode) = await _databaseCacheRepository.GetElementSourceForPublishStatesAsync(key);
 
