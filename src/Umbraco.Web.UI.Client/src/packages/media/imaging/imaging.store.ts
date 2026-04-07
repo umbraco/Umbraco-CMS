@@ -7,7 +7,7 @@ import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 
 /**
  * @deprecated Imaging URL caching is now handled by the request batcher module.
- * Use {@link batchImagingRequest} for cached URL lookups and {@link clearImagingCache} for
+ * Use `batchImagingRequest` for cached URL lookups and `clearImagingCache` for
  * cache invalidation. This class will be removed in Umbraco 19.
  */
 export class UmbImagingStore extends UmbContextBase implements UmbApi {
