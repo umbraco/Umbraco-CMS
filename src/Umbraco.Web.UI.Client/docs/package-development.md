@@ -63,15 +63,9 @@ declare global {
 }
 ```
 
-### Manifest Bubbling
+### Manifest Bundling
 
-Each sub-feature exports its own `manifests` array. The package-level `manifests.ts` aggregates them:
-
-```typescript
-import { manifests as sectionManifests } from './section/manifests.js';
-import { manifests as dashboardManifests } from './dashboard/manifests.js';
-export const manifests = [...sectionManifests, ...dashboardManifests];
-```
+Each sub-feature exports its own `manifests` array, aggregated up to the package root. See [Manifests & Aliases — Manifest Bundling](./manifests.md#manifest-bundling) for the pattern.
 
 ---
 

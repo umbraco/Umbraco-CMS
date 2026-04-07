@@ -215,7 +215,15 @@ export const extensions = [
 ];
 ```
 
-The `manifests.ts` aggregates sub-feature manifests. See [Package Development — Manifest Bubbling](./package-development.md#manifest-bubbling) for the aggregation pattern.
+#### Manifest Bundling
+
+Each sub-feature exports its own `manifests` array. The package-level `manifests.ts` aggregates them:
+
+```typescript
+import { manifests as sectionManifests } from './section/manifests.js';
+import { manifests as dashboardManifests } from './dashboard/manifests.js';
+export const manifests = [...sectionManifests, ...dashboardManifests];
+```
 
 ### Static Package Manifest (External Packages)
 
