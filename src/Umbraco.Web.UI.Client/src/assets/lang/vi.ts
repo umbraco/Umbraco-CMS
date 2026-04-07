@@ -535,7 +535,10 @@ export default {
 		confirmremoveusageof: 'Bạn có chắc chắn muốn xóa việc sử dụng <strong>%0%</strong> không?',
 		confirmlogout: 'Bạn có chắc chắn muốn đăng xuất?',
 		confirmSure: 'Bạn có chắc chắn?',
+		cannotTrashWhenReferenced: (name: string) => `<strong>${name}</strong> không thể được chuyển vào Thùng rác vì nó được tham chiếu bởi các mục khác.`,
 		confirmTrash: (name: string) => `Bạn có chắc chắn muốn di chuyển <strong>${name}</strong> vào Thùng rác?`,
+		cannotBulkTrashWhenReferenced: (total: number) =>
+			`<strong>${total} ${total === 1 ? 'mục' : 'các mục'}</strong> đã chọn không thể được chuyển vào Thùng rác vì ít nhất một mục được tham chiếu bởi nội dung khác.`,
 		confirmBulkTrash: (total: number) =>
 			`Bạn có chắc chắn muốn di chuyển <strong>${total} ${total === 1 ? 'mục' : 'các mục'}</strong> vào Thùng rác?`,
 		confirmBulkDelete: (total: number) =>
@@ -2007,7 +2010,7 @@ export default {
 		},
 		changePassword: 'Đổi mật khẩu',
 		changePhoto: 'Đổi ảnh',
-		configureMfa: 'Cấu hình MFA',
+		configureMfa: 'Cấu hình 2FA',
 		emailRequired: 'Bắt buộc - nhập địa chỉ email cho người dùng này',
 		emailDescription: (usernameIsEmail: boolean) => {
 			return usernameIsEmail
@@ -2365,7 +2368,8 @@ export default {
 		openBackofficeSearch: 'Mở tìm kiếm backoffice',
 		openCloseBackofficeHelp: 'Mở/Đóng trợ giúp backoffice',
 		openCloseBackofficeProfileOptions: 'Mở/Đóng tùy chọn hồ sơ của bạn',
-		profileOptions: 'Tùy chọn hồ sơ',
+		profileOptions: 'Hồ sơ người dùng cho %0% (%1%)',
+		profileOptionsDefault: 'Hồ sơ người dùng',
 		assignDomainDescription: 'Thiết lập Ngôn ngữ và Tên miền cho %0%',
 		createDescription: 'Tạo nút mới dưới %0%',
 		protectDescription: 'Thiết lập hạn chế truy cập trên %0%',

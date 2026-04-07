@@ -14,8 +14,16 @@ using Umbraco.Cms.Infrastructure.HostedServices;
 
 namespace Umbraco.Cms.Infrastructure.BackgroundJobs;
 
+/// <summary>
+/// Hosted service responsible for scheduling and executing recurring background jobs within the application.
+/// </summary>
 public static class RecurringBackgroundJobHostedService
 {
+    /// <summary>
+    /// Creates a factory function that produces hosted services for recurring background jobs.
+    /// </summary>
+    /// <param name="serviceProvider">The service provider used to create hosted service instances.</param>
+    /// <returns>A function that takes an <see cref="IRecurringBackgroundJob"/> and returns an <see cref="IHostedService"/>.</returns>
     public static Func<IRecurringBackgroundJob, IHostedService> CreateHostedServiceFactory(IServiceProvider serviceProvider) =>
         (IRecurringBackgroundJob job) =>
         {
@@ -39,6 +47,15 @@ public class RecurringBackgroundJobHostedService<TJob> : RecurringHostedServiceB
     private readonly IEventAggregator _eventAggregator;
     private readonly IRecurringBackgroundJob _job;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="RecurringBackgroundJobHostedService{TJob}"/> class, which manages the execution of a recurring background job.
+    /// </summary>
+    /// <param name="runtimeState">Provides information about the current runtime state of the Umbraco application.</param>
+    /// <param name="logger">The logger used to record diagnostic and operational information for this hosted service.</param>
+    /// <param name="mainDom">The main domain instance responsible for coordinating single-instance operations across multiple application domains.</param>
+    /// <param name="serverRoleAccessor">Determines the current server's role in a multi-server environment.</param>
+    /// <param name="eventAggregator">Handles the publishing and subscribing of application events.</param>
+    /// <param name="job">The recurring background job instance to be managed and executed by this service.</param>
     public RecurringBackgroundJobHostedService(
         IRuntimeState runtimeState,
         ILogger<RecurringBackgroundJobHostedService<TJob>> logger,
@@ -104,6 +121,13 @@ public class RecurringBackgroundJobHostedService<TJob> : RecurringHostedServiceB
 
     }
 
+    /// <summary>
+    /// Asynchronously starts the recurring background job and publishes notifications before and after the job is started.
+    /// This method first publishes a <see cref="Notifications.RecurringBackgroundJobStartingNotification"/> prior to starting the job,
+    /// then calls the base implementation to start the job, and finally publishes a <see cref="Notifications.RecurringBackgroundJobStartedNotification"/>.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <returns>A task that represents the asynchronous start operation.</returns>
     public override async Task StartAsync(CancellationToken cancellationToken)
     {
         var startingNotification = new Notifications.RecurringBackgroundJobStartingNotification(_job, new EventMessages());
@@ -115,6 +139,11 @@ public class RecurringBackgroundJobHostedService<TJob> : RecurringHostedServiceB
 
     }
 
+    /// <summary>
+    /// Asynchronously stops the recurring background job service, publishing notifications before and after stopping.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <returns>A task that represents the asynchronous stop operation.</returns>
     public override async Task StopAsync(CancellationToken cancellationToken)
     {
         var stoppingNotification = new Notifications.RecurringBackgroundJobStoppingNotification(_job, new EventMessages());

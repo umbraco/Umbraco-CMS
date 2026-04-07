@@ -1,4 +1,5 @@
 import type { UmbLinkPickerLink } from '../link-picker-modal/types.js';
+import type { UmbLinkPickerDocumentLinksConfig } from '../link-picker-modal/link-picker-modal.token.js';
 import type { UmbInputMultiUrlElement } from '../components/input-multi-url/index.js';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -25,6 +26,9 @@ export class UmbPropertyEditorUIMultiUrlPickerElement
 		if (!config) return;
 
 		this._hideAnchor = Boolean(config.getValueByAlias('hideAnchor'));
+		this._documentLinksConfig = {
+			allowCultureSpecificLinks: Boolean(config.getValueByAlias('allowCultureSpecificDocumentLinks')),
+		};
 		this._min = this.#parseInt(config.getValueByAlias('minNumber'), 0);
 		this._max = this.#parseInt(config.getValueByAlias('maxNumber'), Infinity);
 		this._overlaySize = config.getValueByAlias<UUIModalSidebarSize>('overlaySize') ?? 'small';
@@ -53,6 +57,9 @@ export class UmbPropertyEditorUIMultiUrlPickerElement
 
 	@state()
 	private _hideAnchor?: boolean;
+
+	@state()
+	private _documentLinksConfig?: UmbLinkPickerDocumentLinksConfig;
 
 	@state()
 	private _min = 0;
@@ -103,6 +110,7 @@ export class UmbPropertyEditorUIMultiUrlPickerElement
 				.overlaySize=${this._overlaySize}
 				.urls=${this.value ?? []}
 				.variantId=${this._variantId}
+				.documentLinksConfig=${this._documentLinksConfig}
 				?hide-anchor=${this._hideAnchor}
 				?readonly=${this.readonly}
 				?required=${this.mandatory}

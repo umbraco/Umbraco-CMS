@@ -42,6 +42,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 	#eventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
 	#publishingRepository = new UmbDocumentPublishingRepository(this);
 	#publishedDocumentData?: UmbDocumentDetailModel;
+	#loadingPublishedData = false;
 	#currentUnique?: UmbEntityUnique;
 	#notificationContext?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;
 	readonly #localize = new UmbLocalizationController(this);
@@ -495,7 +496,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 				this.#currentUnique = unique;
 
 				if (isNew === false && unique) {
-					this.#loadAndProcessLastPublished();
+					this.#loadAndProcessLastPublished().catch(() => undefined);
 				}
 			},
 			'uniqueObserver',
@@ -503,13 +504,26 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 
 		this.observe(
 			this.#documentWorkspaceContext.persistedData,
-			() => this.#processPendingChanges(),
+			() => {
+				// The unique/isNew observer fires before document data is loaded,
+				// so #loadAndProcessLastPublished may return early (no variants yet).
+				// When persistedData arrives and published data hasn't been loaded,
+				// trigger the load now that variant data is available.
+				if (!this.#publishedDocumentData && this.#hasPublishedVariant()) {
+					this.#loadAndProcessLastPublished().catch(() => undefined);
+				} else {
+					this.#processPendingChanges();
+				}
+			},
 			'umbPersistedDataObserver',
 		);
 	}
 
 	#hasPublishedVariant() {
-		const variants = this.#documentWorkspaceContext?.getVariants();
+		// Use persisted data (falls back to current) because this may be called
+		// from the persistedData observer before setCurrent has run.
+		const variants = this.#documentWorkspaceContext?.getPersistedData()?.variants
+			?? this.#documentWorkspaceContext?.getVariants();
 		return (
 			variants?.some(
 				(variant) =>
@@ -532,9 +546,18 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		const hasPublishedVariant = this.#hasPublishedVariant();
 		if (!hasPublishedVariant) return;
 
-		const { data } = await this.#publishingRepository.published(unique);
-		this.#publishedDocumentData = data;
-		this.#processPendingChanges();
+		// Prevent concurrent loads (e.g. save-and-publish calls #clear then reload,
+		// which can trigger this from both the persistedData observer and explicitly).
+		if (this.#loadingPublishedData) return;
+		this.#loadingPublishedData = true;
+
+		try {
+			const { data } = await this.#publishingRepository.published(unique);
+			this.#publishedDocumentData = data;
+			this.#processPendingChanges();
+		} finally {
+			this.#loadingPublishedData = false;
+		}
 	}
 
 	#processPendingChanges() {
@@ -549,6 +572,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 
 	#clear() {
 		this.#publishedDocumentData = undefined;
+		this.#loadingPublishedData = false;
 		this.publishedPendingChanges.clear();
 	}
 }

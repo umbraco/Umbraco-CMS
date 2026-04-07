@@ -15,6 +15,9 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DocumentBlueprint.Tree;
 
+/// <summary>
+/// Serves as the base controller for handling operations related to document blueprint trees in the management API.
+/// </summary>
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Tree}/{Constants.UdiEntityType.DocumentBlueprint}")]
 [ApiExplorerSettings(GroupName = "Document Blueprint")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
@@ -22,6 +25,11 @@ public class DocumentBlueprintTreeControllerBase : FolderTreeControllerBase<Docu
 {
     private readonly IDocumentPresentationFactory _documentPresentationFactory;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DocumentBlueprintTreeControllerBase"/> class.
+    /// </summary>
+    /// <param name="entityService">Service used for entity operations within the document blueprint tree.</param>
+    /// <param name="documentPresentationFactory">Factory responsible for creating document presentation models.</param>
     [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
     public DocumentBlueprintTreeControllerBase(IEntityService entityService, IDocumentPresentationFactory documentPresentationFactory)
         : this(
@@ -31,6 +39,12 @@ public class DocumentBlueprintTreeControllerBase : FolderTreeControllerBase<Docu
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DocumentBlueprintTreeControllerBase"/> class, providing required services for managing document blueprint trees.
+    /// </summary>
+    /// <param name="entityService">The service used to interact with entities in the system.</param>
+    /// <param name="flagProviders">A collection of providers that supply flags for entities.</param>
+    /// <param name="documentPresentationFactory">The factory responsible for creating document presentation models.</param>
     [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
     public DocumentBlueprintTreeControllerBase(IEntityService entityService, FlagProviderCollection flagProviders, IDocumentPresentationFactory documentPresentationFactory)
         : this(

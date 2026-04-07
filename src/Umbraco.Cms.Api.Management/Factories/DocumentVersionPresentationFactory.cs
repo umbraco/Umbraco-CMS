@@ -12,6 +12,11 @@ internal sealed class DocumentVersionPresentationFactory : IDocumentVersionPrese
     private readonly IEntityService _entityService;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Factories.DocumentVersionPresentationFactory"/> class.
+    /// </summary>
+    /// <param name="entityService">Service used to interact with entities within the Umbraco CMS.</param>
+    /// <param name="userIdKeyResolver">Resolves user ID keys for mapping or identification purposes.</param>
     public DocumentVersionPresentationFactory(
         IEntityService entityService,
         IUserIdKeyResolver userIdKeyResolver)
@@ -20,6 +25,13 @@ internal sealed class DocumentVersionPresentationFactory : IDocumentVersionPrese
         _userIdKeyResolver = userIdKeyResolver;
     }
 
+    /// <summary>
+    /// Asynchronously creates a <see cref="Umbraco.Cms.Api.Management.Models.DocumentVersionItemResponseModel"/> instance from the specified <see cref="Umbraco.Cms.Core.Models.ContentVersionMeta"/>.
+    /// </summary>
+    /// <param name="contentVersion">The content version metadata from which to construct the response model.</param>
+    /// <returns>
+    /// A task representing the asynchronous operation. The result contains the constructed <see cref="Umbraco.Cms.Api.Management.Models.DocumentVersionItemResponseModel"/> representing the provided content version.
+    /// </returns>
     public async Task<DocumentVersionItemResponseModel> CreateAsync(ContentVersionMeta contentVersion)
     {
         ReferenceByIdModel userReference = contentVersion.UserId switch
@@ -41,6 +53,11 @@ internal sealed class DocumentVersionPresentationFactory : IDocumentVersionPrese
             contentVersion.PreventCleanup);
     }
 
+    /// <summary>
+    /// Creates multiple document version item response models asynchronously from the given content versions.
+    /// </summary>
+    /// <param name="contentVersions">The collection of content version metadata to create response models for.</param>
+    /// <returns>A task representing the asynchronous operation, containing an enumerable of document version item response models.</returns>
     public async Task<IEnumerable<DocumentVersionItemResponseModel>> CreateMultipleAsync(IEnumerable<ContentVersionMeta> contentVersions)
         => await CreateMultipleImplAsync(contentVersions).ToArrayAsync();
 

@@ -1,4 +1,4 @@
-﻿using Examine;
+using Examine;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Extensions;
@@ -10,6 +10,12 @@ internal sealed class DeliveryApiContentIndexFieldDefinitionBuilder : IDeliveryA
     private readonly ContentIndexHandlerCollection _indexHandlers;
     private readonly ILogger<DeliveryApiContentIndexFieldDefinitionBuilder> _logger;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Examine.DeliveryApiContentIndexFieldDefinitionBuilder"/> class,
+    /// which is responsible for building field definitions for the Delivery API content index.
+    /// </summary>
+    /// <param name="indexHandlers">A collection of handlers used to define how content fields are indexed for the Delivery API.</param>
+    /// <param name="logger">The logger used for logging diagnostic and operational information.</param>
     public DeliveryApiContentIndexFieldDefinitionBuilder(
         ContentIndexHandlerCollection indexHandlers,
         ILogger<DeliveryApiContentIndexFieldDefinitionBuilder> logger)
@@ -18,6 +24,12 @@ internal sealed class DeliveryApiContentIndexFieldDefinitionBuilder : IDeliveryA
         _logger = logger;
     }
 
+    /// <summary>
+    /// Builds a collection of field definitions used for the delivery API content index.
+    /// </summary>
+    /// <returns>
+    /// A <see cref="Umbraco.Cms.Infrastructure.Examine.FieldDefinitionCollection"/> containing the generated field definitions.
+    /// </returns>
     public FieldDefinitionCollection Build()
     {
         var fieldDefinitions = new List<FieldDefinition>();

@@ -63,6 +63,12 @@ public class LinkDisplay
     public string? Url { get; set; }
 
     /// <summary>
+    ///     Gets or sets the (optional) culture of the link.
+    /// </summary>
+    [DataMember(Name = "culture")]
+    public string? Culture { get; set; }
+
+    /// <summary>
     ///     Contains constants for link types.
     /// </summary>
     public static class Types

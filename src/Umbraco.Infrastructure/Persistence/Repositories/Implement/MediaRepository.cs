@@ -35,6 +35,27 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
     private readonly IJsonSerializer _serializer;
     private readonly ITagRepository _tagRepository;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.MediaRepository"/> class,
+    /// providing access to media persistence and related services in the Umbraco CMS infrastructure layer.
+    /// </summary>
+    /// <param name="scopeAccessor">Provides access to the current database scope for transactional operations.</param>
+    /// <param name="cache">The application-level caches used for optimizing data retrieval and storage.</param>
+    /// <param name="logger">The logger instance for logging repository operations and errors.</param>
+    /// <param name="loggerFactory">Factory for creating logger instances.</param>
+    /// <param name="mediaTypeRepository">Repository for accessing and managing media types.</param>
+    /// <param name="tagRepository">Repository for managing tags associated with media items.</param>
+    /// <param name="languageRepository">Repository for accessing language information.</param>
+    /// <param name="relationRepository">Repository for managing relationships between entities.</param>
+    /// <param name="relationTypeRepository">Repository for managing types of relations between entities.</param>
+    /// <param name="propertyEditorCollection">Collection of property editors used for media properties.</param>
+    /// <param name="mediaUrlGenerators">Collection of generators for producing media URLs.</param>
+    /// <param name="dataValueReferenceFactories">Collection of factories for resolving data value references.</param>
+    /// <param name="dataTypeService">Service for managing data types used by media properties.</param>
+    /// <param name="serializer">The JSON serializer for serializing and deserializing data.</param>
+    /// <param name="eventAggregator">Publishes and subscribes to domain events.</param>
+    /// <param name="repositoryCacheVersionService">Service for managing cache versioning for repositories.</param>
+    /// <param name="cacheSyncService">Service for synchronizing cache across distributed environments.</param>
     public MediaRepository(
         IScopeAccessor scopeAccessor,
         AppCaches cache,
@@ -81,6 +102,24 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
             cacheSyncService);
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MediaRepository"/> class with the specified dependencies.
+    /// </summary>
+    /// <param name="scopeAccessor">Provides access to the current database scope.</param>
+    /// <param name="cache">The application-level caches used for performance optimization.</param>
+    /// <param name="logger">The logger instance for logging repository operations.</param>
+    /// <param name="loggerFactory">Factory for creating logger instances.</param>
+    /// <param name="mediaTypeRepository">Repository for accessing media types.</param>
+    /// <param name="tagRepository">Repository for managing tags associated with media.</param>
+    /// <param name="languageRepository">Repository for managing languages.</param>
+    /// <param name="relationRepository">Repository for managing entity relations.</param>
+    /// <param name="relationTypeRepository">Repository for managing relation types.</param>
+    /// <param name="propertyEditorCollection">Collection of property editors for media properties.</param>
+    /// <param name="mediaUrlGenerators">Collection of generators for creating media URLs.</param>
+    /// <param name="dataValueReferenceFactories">Collection of factories for resolving data value references.</param>
+    /// <param name="dataTypeService">Service for managing data types.</param>
+    /// <param name="serializer">The JSON serializer for serializing and deserializing data.</param>
+    /// <param name="eventAggregator">Publishes and subscribes to domain events.</param>
     [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
     public MediaRepository(
         IScopeAccessor scopeAccessor,
@@ -388,6 +427,11 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
 
     #region Versions
 
+    /// <summary>
+    /// Retrieves all versions of a media item identified by the specified node ID, ordered by current status and version date.
+    /// </summary>
+    /// <param name="nodeId">The unique identifier of the media node whose versions are to be retrieved.</param>
+    /// <returns>An <see cref="IEnumerable{IMedia}"/> containing all versions of the specified media item.</returns>
     public override IEnumerable<IMedia> GetAllVersions(int nodeId)
     {
         Sql<ISqlContext> sql = GetBaseQuery(QueryType.Many, false)
@@ -398,6 +442,11 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
         return MapDtosToContent(Database.Fetch<ContentDto>(sql), true);
     }
 
+    /// <summary>
+    /// Retrieves a specific version of a media item by its version identifier.
+    /// </summary>
+    /// <param name="versionId">The unique identifier of the media version to retrieve.</param>
+    /// <returns>The <see cref="IMedia"/> instance representing the specified version, or <c>null</c> if no such version exists.</returns>
     public override IMedia? GetVersion(int versionId)
     {
         Sql<ISqlContext> sql = GetBaseQuery(QueryType.Single)
@@ -407,6 +456,11 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
         return dto == null ? null : MapDtoToContent(dto);
     }
 
+    /// <summary>
+    /// Retrieves a media item by its media path, normalizing the path if it refers to a resized image.
+    /// </summary>
+    /// <param name="mediaPath">The media path to search for. If the path refers to a resized image (e.g., contains dimensions like _403x328), the method will normalize it to the original file path before searching.</param>
+    /// <returns>The <see cref="IMedia"/> item if found; otherwise, <c>null</c>.</returns>
     public IMedia? GetMediaByPath(string mediaPath)
     {
         var umbracoFileValue = mediaPath;
@@ -599,8 +653,15 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
 
     #region Recycle Bin
 
+    /// <summary>
+    /// Gets the unique identifier for the media recycle bin in Umbraco.
+    /// </summary>
     public override int RecycleBinId => Constants.System.RecycleBinMedia;
 
+    /// <summary>
+    /// Determines whether the media recycle bin contains any items.
+    /// </summary>
+    /// <returns><c>true</c> if the recycle bin contains any media items; otherwise, <c>false</c>.</returns>
     public bool RecycleBinSmells()
     {
         IAppPolicyCache cache = _cache.RuntimeCache;
@@ -614,11 +675,21 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
 
     #region Read Repository implementation for Guid keys
 
+    /// <summary>
+    /// Gets a media item by its unique identifier.
+    /// </summary>
+    /// <param name="id">The unique identifier of the media item.</param>
+    /// <returns>The media item if found; otherwise, null.</returns>
     public IMedia? Get(Guid id) => _mediaByGuidReadRepository.Get(id);
 
     IEnumerable<IMedia> IReadRepository<Guid, IMedia>.GetMany(params Guid[]? ids) =>
         _mediaByGuidReadRepository.GetMany(ids);
 
+    /// <summary>
+    /// Determines whether a media item with the specified identifier exists.
+    /// </summary>
+    /// <param name="id">The unique identifier of the media item.</param>
+    /// <returns>True if the media item exists; otherwise, false.</returns>
     public bool Exists(Guid id) => _mediaByGuidReadRepository.Exists(id);
 
     /// <summary>
@@ -655,6 +726,15 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
     {
         private readonly MediaRepository _outerRepo;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MediaByGuidReadRepository"/> class.
+        /// </summary>
+        /// <param name="outerRepo">The parent <see cref="MediaRepository"/> used for delegating media operations.</param>
+        /// <param name="scopeAccessor">Provides access to the current database scope.</param>
+        /// <param name="cache">The application-level caches for storing and retrieving media data.</param>
+        /// <param name="logger">The logger used for logging repository operations and errors.</param>
+        /// <param name="repositoryCacheVersionService">Service for managing cache versioning within the repository.</param>
+        /// <param name="cacheSyncService">Service responsible for synchronizing cache across distributed environments.</param>
         public MediaByGuidReadRepository(
             MediaRepository outerRepo,
             IScopeAccessor scopeAccessor,
@@ -739,6 +819,7 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
         /// Populates the GUID-keyed cache with the given entity.
         /// This allows entities retrieved by int ID to also be cached for GUID lookups.
         /// </summary>
+        /// <param name="entity">The media entity to cache by its GUID key.</param>
         public void PopulateCacheByKey(IMedia entity)
         {
             if (entity.HasIdentity)
@@ -752,6 +833,7 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
         /// Populates the GUID-keyed cache with the given entities.
         /// This allows entities retrieved by int ID to also be cached for GUID lookups.
         /// </summary>
+        /// <param name="entities">The collection of media entities to cache by their GUID keys.</param>
         public void PopulateCacheByKey(IEnumerable<IMedia> entities)
         {
             foreach (IMedia entity in entities)

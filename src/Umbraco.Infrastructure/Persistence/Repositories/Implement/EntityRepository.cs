@@ -25,6 +25,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 /// </remarks>
 internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtended
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="EntityRepository"/> class.
+    /// </summary>
+    /// <param name="scopeAccessor">Provides access to the current database scope for repository operations.</param>
+    /// <param name="appCaches">The application-level caches used for caching entities and query results.</param>
     public EntityRepository(IScopeAccessor scopeAccessor, AppCaches appCaches)
         : base(scopeAccessor, appCaches)
     {
@@ -32,6 +37,13 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
 
     #region Repository
 
+    /// <summary>
+    /// Returns the number of entities of the specified object types that match the given query, with an optional additional filter.
+    /// </summary>
+    /// <param name="query">The main query specifying criteria for selecting entities.</param>
+    /// <param name="objectTypes">A collection of object type GUIDs to restrict the entities considered.</param>
+    /// <param name="filter">An optional query to further filter the entities returned by the main query.</param>
+    /// <returns>The number of entities matching the specified criteria.</returns>
     public int CountByQuery(IQuery<IUmbracoEntity> query, IEnumerable<Guid> objectTypes, IQuery<IUmbracoEntity>? filter)
     {
         Sql<ISqlContext> sql = Sql();
@@ -151,6 +163,11 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
         return entities;
     }
 
+    /// <summary>
+    /// Retrieves an <see cref="IEntitySlim"/> instance by its unique identifier.
+    /// </summary>
+    /// <param name="key">The unique <see cref="Guid"/> identifier of the entity.</param>
+    /// <returns>The <see cref="IEntitySlim"/> matching the specified key, or <c>null</c> if no entity is found.</returns>
     public IEntitySlim? Get(Guid key)
     {
         Sql<ISqlContext> sql = GetBaseWhere(false, false, false, false, key);
@@ -368,6 +385,15 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
     }
 
 
+    /// <summary>
+    /// Retrieves an <see cref="IEntitySlim"/> instance by its unique identifier and object type identifier.
+    /// </summary>
+    /// <param name="key">The unique <see cref="Guid"/> identifier of the entity.</param>
+    /// <param name="objectTypeId">The unique <see cref="Guid"/> identifier of the object type.</param>
+    /// <returns>
+    /// The <see cref="IEntitySlim"/> matching the specified <paramref name="key"/> and <paramref name="objectTypeId"/>,
+    /// or <c>null</c> if no entity is found.
+    /// </returns>
     public IEntitySlim? Get(Guid key, Guid objectTypeId)
     {
         var isContent = objectTypeId == Constants.ObjectTypes.Document ||
@@ -379,6 +405,11 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
         return GetEntity(sql, isContent, isMedia, isMember);
     }
 
+    /// <summary>
+    /// Gets an entity by its integer identifier.
+    /// </summary>
+    /// <param name="id">The integer identifier of the entity to retrieve.</param>
+    /// <returns>The entity matching the specified identifier, or null if not found.</returns>
     public IEntitySlim? Get(int id)
     {
         Sql<ISqlContext> sql = GetBaseWhere(false, false, false, false, id);
@@ -386,6 +417,12 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
         return dto == null ? null : BuildEntity(dto);
     }
 
+    /// <summary>
+    /// Gets an entity by its integer ID and object type identifier.
+    /// </summary>
+    /// <param name="id">The integer ID of the entity.</param>
+    /// <param name="objectTypeId">The object type identifier (GUID) of the entity.</param>
+    /// <returns>The entity matching the specified ID and object type, or null if not found.</returns>
     public IEntitySlim? Get(int id, Guid objectTypeId)
     {
         var isContent = objectTypeId == Constants.ObjectTypes.Document ||
@@ -397,11 +434,23 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
         return GetEntity(sql, isContent, isMedia, isMember);
     }
 
+    /// <summary>
+    /// Retrieves all entities of the specified object type, optionally limited to the provided entity IDs.
+    /// </summary>
+    /// <param name="objectType">The unique identifier (GUID) of the object type to retrieve entities for.</param>
+    /// <param name="ids">Optional. An array of entity IDs to filter the results; if omitted or empty, all entities of the specified type are returned.</param>
+    /// <returns>An enumerable collection of entities matching the specified criteria.</returns>
     public IEnumerable<IEntitySlim> GetAll(Guid objectType, params int[] ids) =>
         ids.Length > 0
             ? PerformGetAll(objectType, sql => sql.WhereIn<NodeDto>(x => x.NodeId, ids.Distinct()))
             : PerformGetAll(objectType);
 
+    /// <summary>
+    /// Gets all entities of the specified object type, optionally filtered by the provided integer IDs.
+    /// </summary>
+    /// <param name="objectType">The unique identifier of the object type to retrieve entities for.</param>
+    /// <param name="ids">An optional array of integer IDs to filter the entities. If not provided, all entities of the specified type are returned.</param>
+    /// <returns>An enumerable collection of entities matching the specified criteria.</returns
     public IEnumerable<IEntitySlim> GetAll(Guid objectType, params Guid[] keys) =>
         keys.Length > 0
             ? PerformGetAll(objectType, sql => sql.WhereIn<NodeDto>(x => x.UniqueId, keys.Distinct()))
@@ -453,11 +502,23 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
         return GetEntities(sql, isContent, isMedia, isMember);
     }
 
+    /// <summary>
+    /// Retrieves the paths for all entities of the specified object type, optionally limited to the provided node IDs.
+    /// </summary>
+    /// <param name="objectType">The GUID identifying the object type of the entities.</param>
+    /// <param name="ids">Optional node IDs to filter which entity paths are returned. If not specified or empty, returns paths for all entities of the given type.</param>
+    /// <returns>An <see cref="IEnumerable{TreeEntityPath}"/> containing the paths of the matching entities.</returns>
     public IEnumerable<TreeEntityPath> GetAllPaths(Guid objectType, params int[]? ids) =>
         ids?.Any() ?? false
             ? PerformGetAllPaths(objectType, sql => sql.WhereIn<NodeDto>(x => x.NodeId, ids.Distinct()))
             : PerformGetAllPaths(objectType);
 
+    /// <summary>
+    /// Gets all paths for entities of the specified object type, optionally filtered by the provided entity IDs.
+    /// </summary>
+    /// <param name="objectType">The unique identifier of the object type.</param>
+    /// <param name="ids">Optional array of entity IDs to filter the paths. If not provided, paths for all entities of the specified type are returned.</param>
+    /// <returns>An enumerable of <see cref="Umbraco.Cms.Core.Models.TreeEntityPath"/> representing the entity paths.</returns>
     public IEnumerable<TreeEntityPath> GetAllPaths(Guid objectType, params Guid[] keys) =>
         keys.Any()
             ? PerformGetAllPaths(objectType, sql => sql.WhereIn<NodeDto>(x => x.UniqueId, keys.Distinct()))
@@ -475,6 +536,11 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
         return Database.Fetch<TreeEntityPath>(sql);
     }
 
+    /// <summary>
+    /// Retrieves a collection of <see cref="IEntitySlim"/> objects that match the specified query criteria.
+    /// </summary>
+    /// <param name="query">An <see cref="IQuery{IUmbracoEntity}"/> used to filter the entities to return.</param>
+    /// <returns>An <see cref="IEnumerable{IEntitySlim}"/> containing entities that satisfy the query.</returns>
     public IEnumerable<IEntitySlim> GetByQuery(IQuery<IUmbracoEntity> query)
     {
         Sql<ISqlContext> sqlClause = GetBase(false, false, false, null);
@@ -485,6 +551,12 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
         return dtos.Select(BuildEntity).ToList();
     }
 
+    /// <summary>
+    /// Retrieves a collection of <see cref="IEntitySlim"/> objects matching the specified query and object type.
+    /// </summary>
+    /// <param name="query">The <see cref="IQuery{IUmbracoEntity}"/> used to filter the entities.</param>
+    /// <param name="objectType">The <see cref="Guid"/> representing the type of entities to retrieve.</param>
+    /// <returns>An <see cref="IEnumerable{IEntitySlim}"/> of entities that match the query and object type.</returns>
     public IEnumerable<IEntitySlim> GetByQuery(IQuery<IUmbracoEntity> query, Guid objectType)
     {
         var isContent = objectType == Constants.ObjectTypes.Document ||
@@ -501,6 +573,11 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
         return GetEntities(sql, isContent, isMedia, isMember);
     }
 
+    /// <summary>
+    /// Retrieves the <see cref="UmbracoObjectTypes"/> value that corresponds to the specified node ID.
+    /// </summary>
+    /// <param name="id">The unique identifier of the node whose object type is to be retrieved.</param>
+    /// <returns>The <see cref="UmbracoObjectTypes"/> associated with the specified node ID.</returns>
     public UmbracoObjectTypes GetObjectType(int id)
     {
         Sql<ISqlContext> sql = Sql().Select<NodeDto>(x => x.NodeObjectType).From<NodeDto>()
@@ -508,6 +585,11 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
         return ObjectTypes.GetUmbracoObjectType(Database.First<Guid>(sql));
     }
 
+    /// <summary>
+    /// Gets the Umbraco object type for the entity with the specified integer ID.
+    /// </summary>
+    /// <param name="id">The unique integer identifier (ID) of the entity.</param>
+    /// <returns>The <see cref="UmbracoObjectTypes"/> value representing the object's type.</returns>
     public UmbracoObjectTypes GetObjectType(Guid key)
     {
         Sql<ISqlContext> sql = Sql().Select<NodeDto>(x => x.NodeObjectType).From<NodeDto>()
@@ -515,6 +597,13 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
         return ObjectTypes.GetUmbracoObjectType(Database.First<Guid>(sql));
     }
 
+    /// <summary>
+    /// Reserves a node identifier for the specified unique key.
+    /// If an identifier has already been reserved for the given key, an <see cref="InvalidOperationException"/> is thrown.
+    /// </summary>
+    /// <param name="key">The unique key (GUID) for which to reserve a node ID.</param>
+    /// <returns>The reserved node ID.</returns>
+    /// <exception cref="InvalidOperationException">Thrown if an identifier has already been reserved for the specified key.</exception>
     public int ReserveId(Guid key)
     {
         NodeDto? node;
@@ -548,12 +637,24 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
         return node.NodeId;
     }
 
+    /// <summary>
+    /// Determines whether an entity with the specified unique identifier exists.
+    /// </summary>
+    /// <param name="key">The unique identifier of the entity.</param>
+    /// <returns>True if the entity exists; otherwise, false.</returns>
     public bool Exists(Guid key)
     {
         Sql<ISqlContext> sql = Sql().SelectCount().From<NodeDto>().Where<NodeDto>(x => x.UniqueId == key);
         return Database.ExecuteScalar<int>(sql) > 0;
     }
 
+    /// <summary>
+    /// Determines whether any entities with the specified unique identifiers exist.
+    /// </summary>
+    /// <param name="keys">A collection of unique identifiers to check for existence.</param>
+    /// <returns>
+    /// True if at least one of the entities exists; otherwise, false.
+    /// </returns>
     public bool Exists(IEnumerable<Guid> keys)
     {
         IEnumerable<Guid> distictKeys = keys.Distinct();
@@ -572,6 +673,12 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
         return Database.ExecuteScalar<int>(sql) > 0;
     }
 
+    /// <summary>
+    /// Determines whether an entity with the specified identifier and object type exists in the repository.
+    /// </summary>
+    /// <param name="id">The integer identifier of the entity.</param>
+    /// <param name="objectType">The <see cref="Guid"/> representing the object type of the entity.</param>
+    /// <returns><c>true</c> if an entity with the specified identifier and object type exists; otherwise, <c>false</c>.</returns>
     public bool Exists(int id, Guid objectType)
     {
         Sql<ISqlContext> sql = Sql()
@@ -582,6 +689,11 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
         return Database.ExecuteScalar<int>(sql) > 0;
     }
 
+    /// <summary>
+    /// Determines whether an entity with the specified integer identifier exists in the data store.
+    /// </summary>
+    /// <param name="id">The integer identifier of the entity to check for existence.</param>
+    /// <returns><c>true</c> if an entity with the specified identifier exists; otherwise, <c>false</c>.</returns>
     public bool Exists(int id)
     {
         Sql<ISqlContext> sql = Sql().SelectCount().From<NodeDto>().Where<NodeDto>(x => x.NodeId == id);
@@ -1028,6 +1140,9 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
     /// </summary>
     private sealed class GenericContentEntityDto : DocumentEntityDto
     {
+        /// <summary>
+        /// Gets or sets the file system path or URL to the media item associated with this content entity, if any.
+        /// </summary>
         public string? MediaPath { get; set; }
     }
 
@@ -1036,9 +1151,19 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
     /// </summary>
     private class DocumentEntityDto : BaseDto
     {
+        /// <summary>
+        /// Gets or sets the allowed content variations (such as culture or segment) for the document entity.
+        /// </summary>
         public ContentVariation Variations { get; set; }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether the document is published.
+        /// </summary>
         public bool Published { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this document entity has been modified since its last published state.
+        /// </summary>
         public bool Edited { get; set; }
     }
 
@@ -1047,6 +1172,9 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
     /// </summary>
     private sealed class MediaEntityDto : BaseDto
     {
+        /// <summary>
+        /// Gets or sets the path to the media item, such as a file system path or URL.
+        /// </summary>
         public string? MediaPath { get; set; }
     }
 
@@ -1057,48 +1185,155 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
     {
     }
 
+    /// <summary>
+    /// Internal data transfer object that encapsulates variant information (such as culture or language variants) for an entity.
+    /// </summary>
     public class VariantInfoDto
     {
+        /// <summary>
+        /// Gets or sets the unique identifier for the node.
+        /// </summary>
         public int NodeId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the ISO code representing the variant.
+        /// </summary>
         public string IsoCode { get; set; } = null!;
+
+        /// <summary>
+        /// Gets or sets the display name of this variant.
+        /// </summary>
         public string Name { get; set; } = null!;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this document is published.
+        /// </summary>
         public bool DocumentPublished { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this document variant has been edited.
+        /// </summary>
         public bool DocumentEdited { get; set; }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether this culture variant is available for the entity.
+        /// </summary>
         public bool CultureAvailable { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the culture is published.
+        /// </summary>
         public bool CulturePublished { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the culture variant of the content has been edited.
+        /// </summary>
         public bool CultureEdited { get; set; }
     }
 
-    // ReSharper disable once ClassNeverInstantiated.Local
     /// <summary>
     ///     the DTO corresponding to fields selected by GetBase
     /// </summary>
+    /// <remarks>ReSharper disable once ClassNeverInstantiated.Local</remarks>
     private class BaseDto
     {
-        // ReSharper disable UnusedAutoPropertyAccessor.Local
-        // ReSharper disable UnusedMember.Local
+        /// <summary>
+        /// Gets or sets the unique identifier for the node.
+        /// </summary>
+        /// <remarks>
+        /// ReSharper disable UnusedAutoPropertyAccessor.Local
+        /// ReSharper disable UnusedMember.Local
+        /// </remarks>
         public int NodeId { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the entity is trashed.
+        /// </summary>
         public bool Trashed { get; set; }
+
+        /// <summary>
+        /// Gets or sets the identifier of the parent entity.
+        /// </summary>
         public int ParentId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the identifier of the user associated with the entity.
+        /// </summary>
         public int? UserId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the hierarchical level (depth) of the entity within its structure.
+        /// </summary>
         public int Level { get; set; }
+
+        /// <summary>
+        /// Gets the hierarchical path of the entity, typically represented as a comma-separated list of ancestor IDs.
+        /// </summary>
         public string Path { get; } = null!;
+
+        /// <summary>
+        /// Gets or sets the sort order of the entity.
+        /// </summary>
         public int SortOrder { get; set; }
+
+        /// <summary>
+        /// Gets or sets the unique GUID identifier for this entity instance.
+        /// </summary>
         public Guid UniqueId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the textual representation or name associated with this DTO.
+        /// </summary>
         public string? Text { get; set; }
+
+        /// <summary>Gets or sets the unique identifier for the node object type.</summary>
         public Guid NodeObjectType { get; set; }
+
+        /// <summary>
+        /// Gets or sets the date and time when the entity was created.
+        /// </summary>
         public DateTime CreateDate { get; set; }
+
+        /// <summary>
+        /// Gets or sets the date and time when the entity version was created.
+        /// </summary>
         public DateTime VersionDate { get; set; }
+
+        /// <summary>
+        /// Gets or sets the number of child entities associated with this entity.
+        /// </summary>
         public int Children { get; set; }
+
+        /// <summary>Gets or sets the version identifier for concurrency control.</summary>
         public int VersionId { get; set; }
+
+        /// <summary>
+        /// Gets the unique alias identifier for the entity.
+        /// </summary>
         public string Alias { get; } = null!;
+
+        /// <summary>
+        /// Gets or sets the icon associated with the entity, typically as a string representing the icon's name or identifier.
+        /// </summary>
         public string? Icon { get; set; }
+
+        /// <summary>
+        /// Gets or sets the thumbnail image associated with the entity.
+        /// </summary>
         public string? Thumbnail { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this entity is a container, such as a folder or grouping node.
+        /// </summary>
         public bool IsContainer { get; set; }
 
+        /// <summary>Gets or sets the unique identifier for the content type.</summary>
         public Guid ContentTypeKey { get; set; }
 
+        /// <summary>
+        /// Gets or sets the unique identifier of the related list view, if any.
+        /// This value may be <c>null</c> if no list view is associated.
+        /// </summary>
         public Guid? ListView { get; set; }
 
         // ReSharper restore UnusedAutoPropertyAccessor.Local

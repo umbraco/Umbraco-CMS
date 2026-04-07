@@ -1,4 +1,4 @@
-﻿using NPoco;
+using NPoco;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
@@ -8,10 +8,17 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
+/// <summary>
+/// Represents a repository responsible for persisting and managing webhook request entities in the database.
+/// </summary>
 public class WebhookRequestRepository : IWebhookRequestRepository
 {
     private readonly IScopeAccessor _scopeAccessor;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="WebhookRequestRepository"/> class.
+    /// </summary>
+    /// <param name="scopeAccessor">An <see cref="IScopeAccessor"/> used to manage the database scope for repository operations.</param>
     public WebhookRequestRepository(IScopeAccessor scopeAccessor) => _scopeAccessor = scopeAccessor;
 
     private IUmbracoDatabase Database
@@ -27,6 +34,11 @@ public class WebhookRequestRepository : IWebhookRequestRepository
         }
     }
 
+    /// <summary>
+    /// Creates a new <see cref="WebhookRequest"/> asynchronously.
+    /// </summary>
+    /// <param name="webhookRequest">The webhook request to create.</param>
+    /// <returns>The created <see cref="WebhookRequest"/> with its new identifier.</returns>
     public async Task<WebhookRequest> CreateAsync(WebhookRequest webhookRequest)
     {
         WebhookRequestDto dto = WebhookRequestFactory.CreateDto(webhookRequest);
@@ -36,6 +48,11 @@ public class WebhookRequestRepository : IWebhookRequestRepository
         return webhookRequest;
     }
 
+    /// <summary>
+    /// Asynchronously deletes the specified <see cref="WebhookRequest"/> from the database.
+    /// </summary>
+    /// <param name="webhookRequest">The <see cref="WebhookRequest"/> instance to delete.</param>
+    /// <returns>A <see cref="Task"/> representing the asynchronous delete operation.</returns>
     public async Task DeleteAsync(WebhookRequest webhookRequest)
     {
         Sql<ISqlContext> sql = Database.SqlContext.Sql()
@@ -45,6 +62,10 @@ public class WebhookRequestRepository : IWebhookRequestRepository
         await Database.ExecuteAsync(sql);
     }
 
+    /// <summary>
+    /// Asynchronously retrieves all webhook requests from the database.
+    /// </summary>
+    /// <returns>A task that represents the asynchronous operation. The task result contains an <see cref="IEnumerable{WebhookRequest}"/> with all webhook requests.</returns>
     public async Task<IEnumerable<WebhookRequest>> GetAllAsync()
     {
         Sql<ISqlContext>? sql = Database.SqlContext.Sql()
@@ -56,6 +77,11 @@ public class WebhookRequestRepository : IWebhookRequestRepository
         return webhookDtos.Select(WebhookRequestFactory.CreateModel);
     }
 
+    /// <summary>
+    /// Updates an existing <see cref="WebhookRequest"/> asynchronously in the database.
+    /// </summary>
+    /// <param name="webhookRequest">The <see cref="WebhookRequest"/> to update.</param>
+    /// <returns>A task representing the asynchronous operation, containing the updated <see cref="WebhookRequest"/>.</returns>
     public async Task<WebhookRequest> UpdateAsync(WebhookRequest webhookRequest)
     {
         WebhookRequestDto dto = WebhookRequestFactory.CreateDto(webhookRequest);

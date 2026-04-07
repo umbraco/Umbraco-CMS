@@ -24,6 +24,7 @@ using Umbraco.Extensions;
 using IMapperCollection = Umbraco.Cms.Infrastructure.Persistence.Mappers.IMapperCollection;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
+
 /// <summary>
 /// Represents the UserRepository for doing CRUD operations for <see cref="IUser"/>
 /// </summary>
@@ -45,10 +46,7 @@ internal sealed class UserRepository : EntityRepositoryBase<Guid, IUser>, IUserR
     /// <param name="scopeAccessor">The scope accessor.</param>
     /// <param name="appCaches">The application caches.</param>
     /// <param name="logger">The logger.</param>
-    /// <param name="mapperCollection">
-    ///     A dictionary specifying the configuration for user passwords. If this is null then no
-    ///     password configuration will be persisted or read.
-    /// </param>
+    /// <param name="mapperCollection">The mapper collection.</param>
     /// <param name="globalSettings">The global settings.</param>
     /// <param name="passwordConfiguration">The password configuration.</param>
     /// <param name="jsonSerializer">The JSON serializer.</param>
@@ -141,10 +139,9 @@ internal sealed class UserRepository : EntityRepositoryBase<Guid, IUser>, IUserR
     /// <summary>
     ///     Returns a user by username
     /// </summary>
-    /// <param name="username"></param>
+    /// <param name="username">The username of the user to retrieve.</param>
     /// <param name="includeSecurityData">
     ///     Can be used for slightly faster user lookups if the result doesn't require security data (i.e. groups, apps &amp; start nodes).
-    ///     This is really only used for a shim in order to upgrade to 7.6.
     /// </param>
     /// <returns>
     ///     A non cached <see cref="IUser" /> instance
@@ -152,10 +149,25 @@ internal sealed class UserRepository : EntityRepositoryBase<Guid, IUser>, IUserR
     public IUser? GetByUsername(string username, bool includeSecurityData) =>
         GetWith(sql => sql.Where<UserDto>(x => x.Login == username), includeSecurityData);
 
+    /// <summary>
+    /// Retrieves a user entity by username specifically for upgrade operations.
+    /// </summary>
+    /// <param name="username">The username of the user to retrieve for upgrade.</param>
+    /// <returns>The <see cref="IUser"/> instance matching the specified username, or <c>null</c> if no user is found.</returns>
     public IUser? GetForUpgradeByUsername(string username) => GetUpgradeUserWith(sql => sql.Where<UserDto>(x => x.Login == username));
 
+    /// <summary>
+    /// Retrieves a user entity for upgrade operations by matching the specified email address.
+    /// </summary>
+    /// <param name="email">The email address of the user to look up.</param>
+    /// <returns>The <see cref="IUser"/> instance matching the email, or <c>null</c> if no user is found.</returns>
     public IUser? GetForUpgradeByEmail(string email) => GetUpgradeUserWith(sql => sql.Where<UserDto>(x => x.Email == email));
 
+    /// <summary>
+    /// Retrieves the user with the specified identifier for upgrade operations.
+    /// </summary>
+    /// <param name="id">The unique identifier of the user to retrieve.</param>
+    /// <returns>The <see cref="IUser"/> instance if found; otherwise, <c>null</c>.</returns>
     public IUser? GetForUpgrade(int id) => GetUpgradeUserWith(sql => sql.Where<UserDto>(x => x.Id == id));
 
     private IUser? GetUpgradeUserWith(Action<Sql<ISqlContext>> with)
@@ -198,7 +210,7 @@ internal sealed class UserRepository : EntityRepositoryBase<Guid, IUser>, IUserR
     /// <summary>
     ///     Returns a user by id
     /// </summary>
-    /// <param name="id"></param>
+    /// <param name="id">The user ID to retrieve.</param>
     /// <param name="includeSecurityData">
     ///     This is really only used for a shim in order to upgrade to 7.6 but could be used
     ///     for slightly faster user lookups if the result doesn't require security data (i.e. groups, apps &amp; start nodes)
@@ -209,18 +221,34 @@ internal sealed class UserRepository : EntityRepositoryBase<Guid, IUser>, IUserR
     public IUser? Get(int? id, bool includeSecurityData) =>
         GetWith(sql => sql.Where<UserDto>(x => x.Id == id), includeSecurityData);
 
+    /// <summary>
+    /// Retrieves the user profile associated with the specified username.
+    /// </summary>
+    /// <param name="username">The username whose profile is to be retrieved.</param>
+    /// <returns>The <see cref="IProfile"/> for the given username, or <c>null</c> if no user is found.</returns>
     public IProfile? GetProfile(string username)
     {
         UserDto? dto = GetDtoWith(sql => sql.Where<UserDto>(x => x.Login == username), false);
         return dto == null ? null : new UserProfile(dto.Id, dto.UserName);
     }
 
+    /// <summary>
+    /// Retrieves the user profile associated with the specified user ID.
+    /// </summary>
+    /// <param name="id">The ID of the user whose profile is to be retrieved.</param>
+    /// <returns>The <see cref="IProfile"/> for the given user ID, or <c>null</c> if no user is found.</returns>
     public IProfile? GetProfile(int id)
     {
         UserDto? dto = GetDtoWith(sql => sql.Where<UserDto>(x => x.Id == id), false);
         return dto == null ? null : new UserProfile(dto.Id, dto.UserName);
     }
 
+    /// <summary>
+    /// Retrieves a dictionary containing the number of users for each <see cref="Umbraco.Core.Models.Membership.UserState"/>.
+    /// </summary>
+    /// <returns>
+    /// A dictionary where each key is a <see cref="Umbraco.Core.Models.Membership.UserState"/> value representing a user state, and the corresponding value is the count of users in that state.
+    /// </returns>
     public IDictionary<UserState, int> GetUserStates()
     {
         // These keys in this query map to the `Umbraco.Core.Models.Membership.UserState` enum
@@ -247,6 +275,13 @@ SELECT 4 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName}
         return result.ToDictionary(x => (UserState)x.Key, x => x.Value);
     }
 
+    /// <summary>
+    /// Creates a new login session for a user and optionally clears stale sessions.
+    /// </summary>
+    /// <param name="userId">The ID of the user for whom to create the login session.</param>
+    /// <param name="requestingIpAddress">The IP address from which the login request originated.</param>
+    /// <param name="cleanStaleSessions">If true, removes login sessions older than 15 days.</param>
+    /// <returns>The GUID of the newly created login session.</returns>
     public Guid CreateLoginSession(int? userId, string requestingIpAddress, bool cleanStaleSessions = true)
     {
         DateTime now = DateTime.UtcNow;
@@ -269,6 +304,12 @@ SELECT 4 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName}
         return dto.SessionId;
     }
 
+    /// <summary>
+    /// Validates whether the specified session ID is valid for the given user.
+    /// </summary>
+    /// <param name="userId">The unique identifier of the user whose session is being validated.</param>
+    /// <param name="sessionId">The unique identifier of the login session to validate.</param>
+    /// <returns><c>true</c> if the session is valid for the user; otherwise, <c>false</c>.</returns>
     public bool ValidateLoginSession(int userId, Guid sessionId)
     {
         // HACK: Avoid a deadlock - BackOfficeCookieOptions OnValidatePrincipal
@@ -330,6 +371,11 @@ SELECT 4 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName}
         return true;
     }
 
+    /// <summary>
+    /// Clears all login sessions for the specified user.
+    /// </summary>
+    /// <param name="userId">The ID of the user whose login sessions will be cleared.</param>
+    /// <returns>The number of login sessions deleted.</returns>
     public int ClearLoginSessions(int userId) =>
         Database.Delete<UserLoginDto>(Sql().Where<UserLoginDto>(x => x.UserId == userId));
 
@@ -339,6 +385,10 @@ SELECT 4 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName}
         return Database.Delete<UserLoginDto>(Sql().Where<UserLoginDto>(x => x.LastValidated < fromDate));
     }
 
+    /// <summary>
+    /// Marks the specified login session as logged out by setting its logout time to the current UTC time.
+    /// </summary>
+    /// <param name="sessionId">The unique identifier of the login session to mark as logged out.</param>
     public void ClearLoginSession(Guid sessionId) =>
         // TODO: why is that one updating and not deleting?
         Database.Execute(Sql()
@@ -980,6 +1030,11 @@ SELECT 4 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName}
 
     #region Implementation of IUserRepository
 
+    /// <summary>
+    /// Returns the number of users that satisfy the specified query criteria.
+    /// </summary>
+    /// <param name="query">An <see cref="IQuery{IUser}"/> instance used to filter users; may be <c>null</c> to count all users.</param>
+    /// <returns>The total number of users matching the query.</returns>
     public int GetCountByQuery(IQuery<IUser>? query)
     {
         var userIdQuoted = SqlSyntax.GetQuotedColumn(UserDto.TableName, "id");
@@ -1003,8 +1058,18 @@ SELECT 4 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName}
         return Database.ExecuteScalar<int>(sql) > 0;
     }
 
+    /// <summary>
+    /// Determines whether a user with the specified username exists.
+    /// </summary>
+    /// <param name="username">The username to check for existence.</param>
+    /// <returns>True if the user exists; otherwise, false.</returns>
     public bool Exists(string username) => ExistsByUserName(username);
 
+    /// <summary>
+    /// Determines whether a user with the specified username exists.
+    /// </summary>
+    /// <param name="username">The username to check for existence.</param>
+    /// <returns>True if a user with the specified username exists; otherwise, false.</returns>
     public bool ExistsByUserName(string username)
     {
         Sql<ISqlContext> sql = SqlContext.Sql()
@@ -1015,10 +1080,19 @@ SELECT 4 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName}
         return Database.ExecuteScalar<int>(sql) > 0;
     }
 
-    // This is a bit hacky, as we're stealing some of the cache implementation, so we also can cache user by id
-    // We do however need this, as all content have creatorId (as int) and thus when we index content
-    // this gets called for each content item, and we need to cache the user to avoid a lot of db calls
-    // TODO: Remove this once CreatorId gets migrated to a key.
+    /// <summary>
+    /// Retrieves a non-cached <see cref="IUser"/> instance for the specified user ID, or <c>null</c> if no user is found.
+    /// </summary>
+    /// <remarks>
+    /// This is a bit hacky, as we're stealing some of the cache implementation, so we also can cache user by id
+    /// We do however need this, as all content have creatorId (as int) and thus when we index content
+    /// this gets called for each content item, and we need to cache the user to avoid a lot of db calls
+    /// TODO: Remove this once CreatorId gets migrated to a key.
+    /// </remarks>
+    /// <param name="id">The ID of the user to retrieve.</param>
+    /// <returns>
+    /// A non-cached <see cref="IUser"/> instance if a user with the specified ID exists; otherwise, <c>null</c>.
+    /// </returns>
     public IUser? Get(int id)
     {
         string cacheKey = RepositoryCacheKeys.GetKey<IUser, int>(id);
@@ -1048,6 +1122,11 @@ SELECT 4 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName}
         return user;
     }
 
+    /// <summary>
+    /// Determines whether a user with the specified login exists.
+    /// </summary>
+    /// <param name="login">The login identifier to check for existence.</param>
+    /// <returns>True if a user with the specified login exists; otherwise, false.</returns>
     public bool ExistsByLogin(string login)
     {
         Sql<ISqlContext> sql = SqlContext.Sql()
@@ -1062,12 +1141,14 @@ SELECT 4 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName}
     ///     Gets a list of <see cref="IUser" /> objects associated with a given group
     /// </summary>
     /// <param name="groupId">Id of group</param>
+    /// <returns>An enumerable collection of <see cref="IUser" /> objects in the specified group.</returns>
     public IEnumerable<IUser> GetAllInGroup(int groupId) => GetAllInOrNotInGroup(groupId, true);
 
     /// <summary>
     ///     Gets a list of <see cref="IUser" /> objects not associated with a given group
     /// </summary>
     /// <param name="groupId">Id of group</param>
+    /// <returns>An enumerable collection of <see cref="IUser" /> objects not in the specified group.</returns>
     public IEnumerable<IUser> GetAllNotInGroup(int groupId) => GetAllInOrNotInGroup(groupId, false);
 
     private IEnumerable<IUser> GetAllInOrNotInGroup(int groupId, bool include)
@@ -1102,12 +1183,12 @@ SELECT 4 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName}
     /// <summary>
     ///     Gets paged user results
     /// </summary>
-    /// <param name="query"></param>
-    /// <param name="pageIndex"></param>
-    /// <param name="pageSize"></param>
-    /// <param name="totalRecords"></param>
-    /// <param name="orderBy"></param>
-    /// <param name="orderDirection"></param>
+    /// <param name="query">The query to filter users.</param>
+    /// <param name="pageIndex">The zero-based page index.</param>
+    /// <param name="pageSize">The number of items per page.</param>
+    /// <param name="totalRecords">The total number of records matching the query.</param>
+    /// <param name="orderBy">The expression to order results by.</param>
+    /// <param name="orderDirection">The sort direction.</param>
     /// <param name="includeUserGroups">
     ///     A filter to only include user that belong to these user groups
     /// </param>
@@ -1115,8 +1196,8 @@ SELECT 4 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName}
     ///     A filter to only include users that do not belong to these user groups
     /// </param>
     /// <param name="userState">Optional parameter to filter by specified user state</param>
-    /// <param name="filter"></param>
-    /// <returns></returns>
+    /// <param name="filter">Optional filter to apply to results.</param>
+    /// <returns>A paged enumerable of users.</returns>
     /// <remarks>
     ///     The query supplied will ONLY work with data specifically on the umbracoUser table because we are using NPoco paging
     ///     (SQL paging)
@@ -1175,24 +1256,51 @@ SELECT 4 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName}
             WHERE {QuoteColumnName("umbracoUserGroup", "userGroupAlias")} IN (@userGroups)))";
     }
 
+    /// <summary>
+    /// Retrieves all unique client IDs that are associated with users in the system.
+    /// </summary>
+    /// <returns>An <see cref="IEnumerable{String}"/> containing all client ID strings.</returns>
     public IEnumerable<string> GetAllClientIds()
         => Database.Fetch<string>(SqlContext.Sql()
             .Select<User2ClientIdDto>(d => d.ClientId)
             .From<User2ClientIdDto>());
 
+    /// <summary>
+    /// Gets the client IDs associated with the specified user ID.
+    /// </summary>
+    /// <param name="id">The user ID to retrieve client IDs for.</param>
+    /// <returns>An enumerable collection of client IDs.</returns>
     public IEnumerable<string> GetClientIds(int id)
         => Database.Fetch<string>(SqlContext.Sql()
             .Select<User2ClientIdDto>(d => d.ClientId)
             .From<User2ClientIdDto>()
             .Where<User2ClientIdDto>(d => d.UserId == id));
 
+    /// <summary>
+    /// Adds a client identifier associated with the specified user ID.
+    /// </summary>
+    /// <param name="id">The user identifier.</param>
+    /// <param name="clientId">The client identifier to add.</param>
     public void AddClientId(int id, string clientId)
         => Database.Insert(new User2ClientIdDto { UserId = id, ClientId = clientId });
 
+    /// <summary>
+    /// Removes the association between the specified user and client ID.
+    /// </summary>
+    /// <param name="id">The unique identifier of the user.</param>
+    /// <param name="clientId">The client ID to remove from the user.</param>
+    /// <returns><c>true</c> if the client ID was successfully removed; otherwise, <c>false</c>.</returns>
     public bool RemoveClientId(int id, string clientId)
         => Database.Delete<User2ClientIdDto>(SqlContext.Sql()
             .Where<User2ClientIdDto>(d => d.UserId == id && d.ClientId == clientId)) > 0;
 
+    /// <summary>
+    /// Retrieves a user associated with the specified client ID.
+    /// </summary>
+    /// <param name="clientId">The client ID to look up.</param>
+    /// <returns>
+    /// The <see cref="IUser"/> associated with the given client ID, or <c>null</c> if no such user exists.
+    /// </returns>
     public IUser? GetByClientId(string clientId)
     {
         var userId = Database.ExecuteScalar<int>(

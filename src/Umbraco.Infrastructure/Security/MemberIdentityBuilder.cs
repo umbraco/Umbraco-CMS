@@ -4,6 +4,9 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Umbraco.Cms.Core.Security;
 
+/// <summary>
+/// Provides methods to construct member identity objects used in authentication and authorization processes within Umbraco.
+/// </summary>
 public class MemberIdentityBuilder : IdentityBuilder
 {
     /// <summary>
@@ -20,7 +23,14 @@ public class MemberIdentityBuilder : IdentityBuilder
         : base(typeof(MemberIdentityUser), role, services)
         => InitializeServices(services);
 
-    // override to add itself, by default identity only wants a single IdentityErrorDescriber
+    /// <summary>
+    /// Registers a custom error describer of type <typeparamref name="TDescriber"/> with the identity builder.
+    /// The specified type must inherit from <see cref="Umbraco.Cms.Core.Security.MembersErrorDescriber"/>.
+    /// If <typeparamref name="TDescriber"/> does not inherit from <see cref="MembersErrorDescriber"/>, an <see cref="InvalidOperationException"/> is thrown.
+    /// </summary>
+    /// <remarks>override to add itself, by default identity only wants a single IdentityErrorDescriber</remarks>
+    /// <typeparam name="TDescriber">The type of the custom error describer to add.</typeparam>
+    /// <returns>The current <see cref="IdentityBuilder"/> instance for method chaining.</returns>
     public override IdentityBuilder AddErrorDescriber<TDescriber>()
     {
         if (!typeof(MembersErrorDescriber).IsAssignableFrom(typeof(TDescriber)))

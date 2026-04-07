@@ -4,11 +4,20 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Infrastructure.Examine;
 
+/// <summary>
+/// Populates and maintains the member index used by the Examine search engine in Umbraco.
+/// This ensures that member data is searchable and kept up to date within the index.
+/// </summary>
 public class MemberIndexPopulator : IndexPopulator<IUmbracoMemberIndex>
 {
     private readonly IMemberService _memberService;
     private readonly IValueSetBuilder<IMember> _valueSetBuilder;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Examine.MemberIndexPopulator"/> class.
+    /// </summary>
+    /// <param name="memberService">Service for accessing and managing member data.</param>
+    /// <param name="valueSetBuilder">Builder for creating value sets from member entities.</param>
     public MemberIndexPopulator(IMemberService memberService, IValueSetBuilder<IMember> valueSetBuilder)
     {
         _memberService = memberService;

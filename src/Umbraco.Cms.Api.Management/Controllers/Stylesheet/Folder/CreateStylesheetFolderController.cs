@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Extensions;
@@ -11,12 +11,20 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Stylesheet.Folder;
 
+/// <summary>
+/// Controller for creating stylesheet folders via the Umbraco CMS Management API.
+/// </summary>
 [ApiVersion("1.0")]
 public class CreateStylesheetFolderController : StylesheetFolderControllerBase
 {
     private readonly IStylesheetFolderService _stylesheetFolderService;
     private readonly IUmbracoMapper _mapper;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CreateStylesheetFolderController"/> class, responsible for handling stylesheet folder creation requests.
+    /// </summary>
+    /// <param name="stylesheetFolderService">Service used to manage stylesheet folders.</param>
+    /// <param name="mapper">The Umbraco object mapper for mapping between models.</param>
     public CreateStylesheetFolderController(IStylesheetFolderService stylesheetFolderService, IUmbracoMapper mapper)
     {
         _stylesheetFolderService = stylesheetFolderService;
@@ -24,6 +32,17 @@ public class CreateStylesheetFolderController : StylesheetFolderControllerBase
     }
 
 
+    /// <summary>
+    /// Creates a new stylesheet folder with the specified name and parent location.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="requestModel">The model containing the details of the stylesheet folder to create.</param>
+    /// <returns>
+    /// An <see cref="IActionResult"/> that represents the result of the operation:
+    /// returns <c>201 Created</c> with the location of the new folder if successful;
+    /// <c>400 Bad Request</c> if the request is invalid;
+    /// or <c>404 Not Found</c> if the parent location does not exist.
+    /// </returns>
     [HttpPost]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status201Created)]

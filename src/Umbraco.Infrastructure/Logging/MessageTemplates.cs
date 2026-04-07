@@ -1,9 +1,12 @@
-﻿using Serilog;
+using Serilog;
 using Serilog.Events;
 using Serilog.Parsing;
 
 namespace Umbraco.Cms.Core.Logging;
 
+/// <summary>
+/// Contains a set of predefined message templates used throughout the application for consistent logging.
+/// </summary>
 public class MessageTemplates : IMessageTemplates
 {
     // Umbraco now uses Message Templates (https://messagetemplates.org/) for logging, which means
@@ -15,6 +18,15 @@ public class MessageTemplates : IMessageTemplates
     // TODO: Do we still need this, is there a non-pre release package shipped?
     private static readonly Lazy<ILogger> _minimalLogger = new(() => new LoggerConfiguration().CreateLogger());
 
+    /// <summary>
+    /// Renders a message template by formatting it with the provided arguments.
+    /// </summary>
+    /// <param name="messageTemplate">The message template containing placeholders for arguments.</param>
+    /// <param name="args">The arguments to insert into the message template placeholders.</param>
+    /// <returns>A formatted string with the arguments applied to the message template.</returns>
+    /// <exception cref="FormatException">
+    /// Thrown if the message template cannot be formatted with the provided arguments.
+    /// </exception>
     public string Render(string messageTemplate, params object[] args)
     {
         // resolve a minimal logger instance which is used to bind message templates

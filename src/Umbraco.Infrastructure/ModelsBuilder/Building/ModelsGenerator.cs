@@ -6,6 +6,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.ModelsBuilder.Building;
 
+/// <summary>
+/// Generates strongly-typed models from Umbraco content types as part of the ModelsBuilder infrastructure.
+/// </summary>
 public class ModelsGenerator : IModelsGenerator
 {
     private readonly OutOfDateModelsStatus _outOfDateModels;
@@ -33,6 +36,11 @@ public class ModelsGenerator : IModelsGenerator
         config.OnChange(x => _config = x);
     }
 
+    /// <summary>
+    /// Generates strongly-typed model class files for Umbraco content types based on the current configuration.
+    /// This method creates or updates generated model files in the configured models directory, and removes any obsolete generated files.
+    /// It ensures that the model files reflect the current state of Umbraco types, maintaining consistency between code and content definitions.
+    /// </summary>
     public void GenerateModels()
     {
         var modelsDirectory = _config.ModelsDirectoryAbsolute(_hostEnvironment);

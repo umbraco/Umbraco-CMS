@@ -9,15 +9,30 @@ using Umbraco.Cms.Api.Management.OpenApi;
 
 namespace Umbraco.Cms.Api.Management.Configuration;
 
+/// <summary>
+/// Provides configuration for Swagger generation options specific to the Umbraco Management API.
+/// This class is used to customize the Swagger documentation for the API endpoints.
+/// </summary>
 public class ConfigureUmbracoManagementApiSwaggerGenOptions : IConfigureOptions<SwaggerGenOptions>
 {
     private readonly IUmbracoJsonTypeInfoResolver _umbracoJsonTypeInfoResolver;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ConfigureUmbracoManagementApiSwaggerGenOptions"/> class.
+    /// </summary>
+    /// <param name="umbracoJsonTypeInfoResolver">An instance of <see cref="IUmbracoJsonTypeInfoResolver"/> used to resolve JSON type information for Umbraco.</param>
     public ConfigureUmbracoManagementApiSwaggerGenOptions(IUmbracoJsonTypeInfoResolver umbracoJsonTypeInfoResolver)
     {
         _umbracoJsonTypeInfoResolver = umbracoJsonTypeInfoResolver;
     }
 
+    /// <summary>
+    /// Configures the <see cref="SwaggerGenOptions"/> for the Umbraco Management API.
+    /// Sets up the Swagger documentation, including API metadata, security definitions for OAuth2 authentication,
+    /// operation filters for response headers and security requirements, and schema filters for non-nullable properties.
+    /// Also configures polymorphism handling and discriminator properties for OpenAPI schemas.
+    /// </summary>
+    /// <param name="swaggerGenOptions">The <see cref="SwaggerGenOptions"/> instance to configure for the Management API.</param>
     public void Configure(SwaggerGenOptions swaggerGenOptions)
     {
         swaggerGenOptions.SwaggerDoc(

@@ -1,7 +1,14 @@
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.Common;
 
+/// <summary>
+/// Represents a migration step that removes specified database keys and indexes during an upgrade process.
+/// </summary>
 public class DeleteKeysAndIndexes : MigrationBase
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="T:Umbraco.Cms.Infrastructure.Migrations.Upgrade.Common.DeleteKeysAndIndexes"/> class.
+    /// </summary>
+    /// <param name="context">The <see cref="T:Umbraco.Cms.Infrastructure.Migrations.IMigrationContext"/> to use for the migration.</param>
     public DeleteKeysAndIndexes(IMigrationContext context)
         : base(context)
     {

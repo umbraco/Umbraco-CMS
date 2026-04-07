@@ -1,3 +1,4 @@
+using System.Text.Json.Nodes;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
@@ -15,7 +16,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     Constants.PropertyEditors.Aliases.MemberGroupPicker,
     ValueType = ValueTypes.Text,
     ValueEditorIsReusable = true)]
-public class MemberGroupPickerPropertyEditor : DataEditor
+public class MemberGroupPickerPropertyEditor : DataEditor, IValueSchemaProvider
 {
     /// <summary>
     ///     Initializes a new instance of the <see cref="MemberGroupPickerPropertyEditor" /> class.
@@ -24,6 +25,17 @@ public class MemberGroupPickerPropertyEditor : DataEditor
     public MemberGroupPickerPropertyEditor(IDataValueEditorFactory dataValueEditorFactory)
         : base(dataValueEditorFactory)
         => SupportsReadOnly = true;
+
+    /// <inheritdoc />
+    public Type? GetValueType(object? configuration) => typeof(string);
+
+    /// <inheritdoc />
+    public JsonObject? GetValueSchema(object? configuration) => new()
+    {
+        ["$schema"] = "https://json-schema.org/draft/2020-12/schema",
+        ["type"] = new JsonArray("string", "null"),
+        ["description"] = "Comma-separated list of member group GUIDs",
+    };
 
     /// <inheritdoc />
     protected override IDataValueEditor CreateValueEditor() =>

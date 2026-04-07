@@ -29,6 +29,20 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
     private readonly IFileSystem? _viewsFileSystem;
     private readonly IViewHelper _viewHelper;
     private readonly IOptionsMonitor<RuntimeSettings> _runtimeSettings;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="TemplateRepository"/> class, which manages persistence and retrieval of template entities.
+    /// </summary>
+    /// <param name="scopeAccessor">Provides access to the current database scope for transactional operations.</param>
+    /// <param name="cache">The application-level caches used for optimizing data retrieval.</param>
+    /// <param name="logger">The logger instance for logging repository operations.</param>
+    /// <param name="loggerFactory">Factory for creating logger instances.</param>
+    /// <param name="fileSystems">Abstraction for accessing file system resources related to templates.</param>
+    /// <param name="shortStringHelper">Helper for generating and manipulating short strings, such as aliases.</param>
+    /// <param name="viewHelper">Helper for working with template views.</param>
+    /// <param name="runtimeSettings">Monitors and provides access to runtime configuration settings.</param>
+    /// <param name="repositoryCacheVersionService">Service for managing cache versioning in the repository.</param>
+    /// <param name="cacheSyncService">Service for synchronizing cache across distributed environments.</param>
     public TemplateRepository(
         IScopeAccessor scopeAccessor,
         AppCaches cache,
@@ -53,6 +67,18 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
         _runtimeSettings = runtimeSettings;
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="TemplateRepository"/> class, which manages persistence and retrieval of template entities.
+    /// </summary>
+    /// <param name="scopeAccessor">Provides access to the current database scope for transactional operations.</param>
+    /// <param name="cache">The application-level caches used for optimizing data retrieval.</param>
+    /// <param name="logger">The logger used for logging repository operations and errors.</param>
+    /// <param name="fileSystems">Abstraction for accessing file systems related to templates.</param>
+    /// <param name="shortStringHelper">Helper for generating and manipulating short strings, such as aliases.</param>
+    /// <param name="viewHelper">Helper for working with template views.</param>
+    /// <param name="runtimeSettings">Monitors runtime configuration settings relevant to templates.</param>
+    /// <param name="repositoryCacheVersionService">Service for managing cache versioning within the repository.</param>
+    /// <param name="cacheSyncService">Service for synchronizing cache across distributed environments.</param>
     [Obsolete("Use constructor with ILoggerFactory parameter. Scheduled for removal in Umbraco 18.")]
     public TemplateRepository(
         IScopeAccessor scopeAccessor,
@@ -78,7 +104,12 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
     {
     }
 
-    // GUID-based lookups delegate to GetMany() which is served from FullDataSetRepositoryCachePolicy.
+    /// <summary>
+    /// Gets the template with the specified unique identifier.
+    /// </summary>
+    /// <param name="key">The unique identifier of the template.</param>
+    /// <returns>The template if found; otherwise, null.</returns>
+    /// <remarks>GUID-based lookups delegate to GetMany() which is served from FullDataSetRepositoryCachePolicy.</remarks>
     public ITemplate? Get(Guid key) => GetMany().FirstOrDefault(x => x.Key == key);
 
     IEnumerable<ITemplate> IReadRepository<Guid, ITemplate>.GetMany(params Guid[]? keys)
@@ -87,8 +118,19 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
         return keys?.Length > 0 ? all.Where(x => keys.Contains(x.Key)).ToArray() : all;
     }
 
+    /// <summary>
+    /// Determines whether a template with the specified identifier exists.
+    /// </summary>
+    /// <param name="id">The unique identifier of the template.</param>
+    /// <returns>True if the template exists; otherwise, false.</returns>
     public bool Exists(Guid id) => GetMany().Any(x => x.Key == id);
 
+    /// <summary>
+    /// Saves the specified template entity to the repository.
+    /// After saving, this method also ensures that the full dataset cache and the GUID cache are populated
+    /// to optimize subsequent lookups and reduce database access.
+    /// </summary>
+    /// <param name="entity">The template entity to save.</param>
     public override void Save(ITemplate entity)
     {
         base.Save(entity);
@@ -99,11 +141,22 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
         GetMany();
     }
 
+    /// <summary>
+    /// Deletes the specified template entity and clears the related GUID cache to prevent stale data on subsequent lookups.
+    /// </summary>
+    /// <param name="entity">The template entity to delete.</param>
     public override void Delete(ITemplate entity)
     {
         base.Delete(entity);
     }
 
+    /// <summary>
+    /// Returns a stream for reading the content of the file at the specified path.
+    /// </summary>
+    /// <param name="filepath">The path of the file to retrieve.</param>
+    /// <returns>
+    /// A <see cref="Stream"/> for the file content, or <see cref="Stream.Null"/> if the file does not exist or cannot be opened.
+    /// </returns>
     public Stream GetFileContentStream(string filepath)
     {
         IFileSystem? fileSystem = GetFileSystem(filepath);
@@ -122,9 +175,24 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
         }
     }
 
+    /// <summary>
+    /// Writes the provided content stream to the file at the specified filepath, overwriting any existing content.
+    /// </summary>
+    /// <param name="filepath">The path of the file to which the content will be written.</param>
+    /// <param name="content">A stream containing the content to write to the file.</param>
+    /// <remarks>
+    /// If the file already exists, its content will be replaced.
+    /// </remarks>
     public void SetFileContent(string filepath, Stream content) =>
         GetFileSystem(filepath)?.AddFile(filepath, content, true);
 
+    /// <summary>
+    /// Returns the size of the specified file in bytes.
+    /// </summary>
+    /// <param name="filename">The name of the file whose size is to be retrieved.</param>
+    /// <returns>
+    /// The size of the file in bytes, or -1 if the file does not exist or an error occurs while retrieving the size.
+    /// </returns>
     public long GetFileSize(string filename)
     {
         IFileSystem? fileSystem = GetFileSystem(filename);
@@ -632,8 +700,16 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
 
     #region Implementation of ITemplateRepository
 
+    /// <summary>Retrieves a template by its alias.</summary>
+    /// <param name="alias">The alias of the template to retrieve.</param>
+    /// <returns>The template matching the specified alias, or null if not found.</returns>
     public ITemplate? Get(string? alias) => GetAll(alias).FirstOrDefault();
 
+    /// <summary>
+    /// Retrieves all templates, or filters them by the specified aliases if provided.
+    /// </summary>
+    /// <param name="aliases">An optional array of template aliases to filter the results. If no aliases are specified, all templates are returned.</param>
+    /// <returns>An enumerable collection of <see cref="Umbraco.Cms.Core.Models.ITemplate"/> instances matching the specified aliases, or all templates if no aliases are given.</returns>
     public IEnumerable<ITemplate> GetAll(params string?[] aliases)
     {
         //We must call the base (normal) GetAll method
@@ -648,6 +724,11 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
         return GetMany().Where(x => aliases.WhereNotNull().InvariantContains(x.Alias));
     }
 
+    /// <summary>
+    /// Gets the child templates of the specified master template.
+    /// </summary>
+    /// <param name="masterTemplateId">The ID of the master template to get children for. If less than or equal to zero, returns templates without a master template.</param>
+    /// <returns>An enumerable collection of child templates. If the specified master template does not exist, returns an empty collection.</returns>
     public IEnumerable<ITemplate> GetChildren(int masterTemplateId)
     {
         //return from base.GetAll, this is all cached
@@ -668,6 +749,11 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
         return children;
     }
 
+    /// <summary>
+    /// Retrieves all descendant templates of the specified master template.
+    /// </summary>
+    /// <param name="masterTemplateId">The ID of the master template whose descendants will be returned. If less than or equal to zero, all root templates and their descendants are returned.</param>
+    /// <returns>An <see cref="IEnumerable{ITemplate}"/> containing all descendant templates, ordered by their hierarchy level. Returns an empty collection if the specified master template does not exist.</returns>
     public IEnumerable<ITemplate> GetDescendants(int masterTemplateId)
     {
         //return from base.GetAll, this is all cached

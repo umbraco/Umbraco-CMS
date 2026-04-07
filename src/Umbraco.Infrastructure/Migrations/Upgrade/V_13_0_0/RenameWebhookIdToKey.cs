@@ -1,9 +1,16 @@
-﻿using Umbraco.Cms.Core;
+using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_13_0_0;
 
+/// <summary>
+/// Represents a migration that renames the <c>WebhookId</c> column to <c>Key</c> in the relevant database table as part of the upgrade to version 13.0.0.
+/// </summary>
 public class RenameWebhookIdToKey : MigrationBase
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="RenameWebhookIdToKey"/> class with the specified migration context.
+    /// </summary>
+    /// <param name="context">The <see cref="IMigrationContext"/> to use for migration operations.</param>
     public RenameWebhookIdToKey(IMigrationContext context) : base(context)
     {
     }

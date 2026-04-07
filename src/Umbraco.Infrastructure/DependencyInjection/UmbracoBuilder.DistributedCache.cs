@@ -22,11 +22,13 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection;
 public static partial class UmbracoBuilderExtensions
 {
     /// <summary>
-    ///     Adds distributed cache support
+    /// Adds distributed cache support to the specified <see cref="IUmbracoBuilder"/>.
     /// </summary>
+    /// <param name="builder">The <see cref="IUmbracoBuilder"/> to which distributed cache support will be added.</param>
+    /// <returns>The <see cref="IUmbracoBuilder"/> instance with distributed cache support enabled.</returns>
     /// <remarks>
-    ///     This is still required for websites that are not load balancing because this ensures that sites hosted
-    ///     with managed hosts like IIS/etc... work correctly when AppDomains are running in parallel.
+    /// This is still required for websites that are not load balancing because it ensures that sites hosted
+    /// with managed hosts like IIS and similar environments work correctly when AppDomains are running in parallel.
     /// </remarks>
     public static IUmbracoBuilder AddDistributedCache(this IUmbracoBuilder builder)
     {
@@ -50,10 +52,11 @@ public static partial class UmbracoBuilderExtensions
     }
 
     /// <summary>
-    ///     Sets the server registrar.
+    ///     Registers the specified <typeparamref name="T"/> as the implementation of <see cref="IServerRoleAccessor"/> in the dependency injection container.
     /// </summary>
-    /// <typeparam name="T">The type of the server registrar.</typeparam>
-    /// <param name="builder">The builder.</param>
+    /// <typeparam name="T">The type of the server registrar to register. Must implement <see cref="IServerRoleAccessor"/>.</typeparam>
+    /// <param name="builder">The Umbraco builder to configure.</param>
+    /// <returns>The same <paramref name="builder"/> instance, to allow for method chaining.</returns>
     public static IUmbracoBuilder SetServerRegistrar<T>(this IUmbracoBuilder builder)
         where T : class, IServerRoleAccessor
     {
@@ -62,10 +65,11 @@ public static partial class UmbracoBuilderExtensions
     }
 
     /// <summary>
-    ///     Sets the server registrar.
+    ///     Configures the <see cref="IServerRoleAccessor"/> implementation used by the Umbraco builder.
     /// </summary>
-    /// <param name="builder">The builder.</param>
-    /// <param name="factory">A function creating a server registrar.</param>
+    /// <param name="builder">The <see cref="IUmbracoBuilder"/> to configure.</param>
+    /// <param name="factory">A factory function that creates an <see cref="IServerRoleAccessor"/> instance using the provided <see cref="IServiceProvider"/>.</param>
+    /// <returns>The configured <see cref="IUmbracoBuilder"/> instance.</returns>
     public static IUmbracoBuilder SetServerRegistrar(
         this IUmbracoBuilder builder,
         Func<IServiceProvider, IServerRoleAccessor> factory)
@@ -79,6 +83,7 @@ public static partial class UmbracoBuilderExtensions
     /// </summary>
     /// <param name="builder">The builder.</param>
     /// <param name="registrar">A server registrar.</param>
+    /// <returns>The builder.</returns>
     public static IUmbracoBuilder SetServerRegistrar(this IUmbracoBuilder builder, IServerRoleAccessor registrar)
     {
         builder.Services.AddUnique(registrar);
@@ -98,10 +103,11 @@ public static partial class UmbracoBuilderExtensions
     }
 
     /// <summary>
-    ///     Sets the server messenger.
+    ///     Configures the <see cref="IServerMessenger"/> implementation used by the application by registering a factory method.
     /// </summary>
-    /// <param name="builder">The builder.</param>
-    /// <param name="factory">A function creating a server messenger.</param>
+    /// <param name="builder">The <see cref="IUmbracoBuilder"/> used to configure services.</param>
+    /// <param name="factory">A factory function that creates an <see cref="IServerMessenger"/> instance using the provided <see cref="IServiceProvider"/>.</param>
+    /// <returns>The <see cref="IUmbracoBuilder"/> instance for chaining.</returns>
     public static IUmbracoBuilder SetServerMessenger(
         this IUmbracoBuilder builder,
         Func<IServiceProvider, IServerMessenger> factory)
@@ -111,10 +117,11 @@ public static partial class UmbracoBuilderExtensions
     }
 
     /// <summary>
-    ///     Sets the server messenger.
+    ///     Registers the specified <see cref="IServerMessenger"/> implementation with the Umbraco builder.
     /// </summary>
-    /// <param name="builder">The builder.</param>
-    /// <param name="registrar">A server messenger.</param>
+    /// <param name="builder">The <see cref="IUmbracoBuilder"/> used to configure services.</param>
+    /// <param name="registrar">The <see cref="IServerMessenger"/> implementation to register.</param>
+    /// <returns>The <see cref="IUmbracoBuilder"/> instance for chaining.</returns>
     public static IUmbracoBuilder SetServerMessenger(this IUmbracoBuilder builder, IServerMessenger registrar)
     {
         builder.Services.AddUnique(registrar);

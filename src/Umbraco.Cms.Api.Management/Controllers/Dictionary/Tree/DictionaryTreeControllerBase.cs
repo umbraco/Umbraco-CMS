@@ -14,6 +14,10 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Dictionary.Tree;
 
+/// <summary>
+/// Serves as the base controller for operations related to dictionary tree structures in the Umbraco CMS Management API.
+/// Provides common functionality for derived controllers managing dictionary items in a hierarchical format.
+/// </summary>
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Tree}/dictionary")]
 [ApiExplorerSettings(GroupName = "Dictionary")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessDictionaryOrTemplates)]
@@ -21,6 +25,11 @@ namespace Umbraco.Cms.Api.Management.Controllers.Dictionary.Tree;
 // tree controller base. We'll keep it though, in the hope that we can mend EntityService.
 public class DictionaryTreeControllerBase : NamedEntityTreeControllerBase<NamedEntityTreeItemResponseModel>
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DictionaryTreeControllerBase"/> class.
+    /// </summary>
+    /// <param name="entityService">Service used for managing and retrieving entities within the Umbraco system.</param>
+    /// <param name="dictionaryItemService">Service used for managing and retrieving dictionary items for localization.</param>
     [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
     public DictionaryTreeControllerBase(IEntityService entityService, IDictionaryItemService dictionaryItemService)
         : this(
@@ -30,9 +39,15 @@ public class DictionaryTreeControllerBase : NamedEntityTreeControllerBase<NamedE
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DictionaryTreeControllerBase"/> class.
+    /// </summary>
+    /// <param name="entityService">Service for managing entities within the system.</param>
+    /// <param name="flagProviders">A collection of providers for entity flags.</param>
+    /// <param name="dictionaryItemService">Service for managing dictionary items.</param>
     public DictionaryTreeControllerBase(
-        IEntityService entityService,
-        FlagProviderCollection flagProviders,
+        IEntityService entityService, 
+        FlagProviderCollection flagProviders, 
         IDictionaryItemService dictionaryItemService)
         : base(entityService, flagProviders) =>
         DictionaryItemService = dictionaryItemService;

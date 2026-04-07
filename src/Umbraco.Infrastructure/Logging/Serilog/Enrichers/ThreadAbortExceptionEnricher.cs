@@ -17,6 +17,12 @@ public class ThreadAbortExceptionEnricher : ILogEventEnricher
     private readonly IMarchal _marchal;
     private CoreDebugSettings _coreDebugSettings;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ThreadAbortExceptionEnricher"/> class.
+    /// </summary>
+    /// <param name="coreDebugSettings">The monitor for core debug settings.</param>
+    /// <param name="hostingEnvironment">The current hosting environment.</param>
+    /// <param name="marchal">The marshal instance used for thread operations.</param>
     public ThreadAbortExceptionEnricher(
         IOptionsMonitor<CoreDebugSettings> coreDebugSettings,
         IHostingEnvironment hostingEnvironment,
@@ -28,6 +34,12 @@ public class ThreadAbortExceptionEnricher : ILogEventEnricher
         coreDebugSettings.OnChange(x => _coreDebugSettings = x);
     }
 
+    /// <summary>
+    /// Enriches the log event with additional information related to thread abort exceptions.
+    /// This enrichment is applied only when the log event level is Error or Fatal.
+    /// </summary>
+    /// <param name="logEvent">The log event to enrich. If the event represents a thread abort exception at Error or Fatal level, additional properties are added.</param>
+    /// <param name="propertyFactory">The factory used to create log event properties.</param>
     public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
     {
         switch (logEvent.Level)

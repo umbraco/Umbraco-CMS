@@ -10,6 +10,13 @@ internal sealed class ContentSearchService : ContentSearchServiceBase<IContent>,
 {
     private readonly IContentService _contentService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ContentSearchService"/> class.
+    /// </summary>
+    /// <param name="sqlContext">The <see cref="ISqlContext"/> used for database operations.</param>
+    /// <param name="idKeyMap">The <see cref="IIdKeyMap"/> used for mapping content identifiers.</param>
+    /// <param name="logger">The <see cref="ILogger{ContentSearchService}"/> instance used for logging.</param>
+    /// <param name="contentService">The <see cref="IContentService"/> used for content operations.</param>
     public ContentSearchService(ISqlContext sqlContext, IIdKeyMap idKeyMap, ILogger<ContentSearchService> logger, IContentService contentService)
         : base(sqlContext, idKeyMap, logger)
         => _contentService = contentService;

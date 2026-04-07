@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 [DataEditor(
     Constants.PropertyEditors.Aliases.ColorPicker,
     ValueEditorIsReusable = true)]
-public class ColorPickerPropertyEditor : DataEditor
+public class ColorPickerPropertyEditor : DataEditor, IValueSchemaProvider
 {
     private readonly IIOHelper _ioHelper;
     private readonly IConfigurationEditorJsonSerializer _configurationEditorJsonSerializer;
@@ -37,6 +37,30 @@ public class ColorPickerPropertyEditor : DataEditor
 
     /// <inheritdoc/>
     public override IPropertyIndexValueFactory PropertyIndexValueFactory { get; } = new NoopPropertyIndexValueFactory();
+
+    /// <inheritdoc />
+    public Type? GetValueType(object? configuration) => typeof(JsonObject);
+
+    /// <inheritdoc />
+    public JsonObject? GetValueSchema(object? configuration) => new()
+    {
+        ["$schema"] = "https://json-schema.org/draft/2020-12/schema",
+        ["type"] = new JsonArray("object", "null"),
+        ["properties"] = new JsonObject
+        {
+            ["value"] = new JsonObject
+            {
+                ["type"] = new JsonArray("string", "null"),
+                ["description"] = "Color value (hex format, e.g., '#ff0000')",
+            },
+            ["label"] = new JsonObject
+            {
+                ["type"] = new JsonArray("string", "null"),
+                ["description"] = "Display label for the color",
+            },
+        },
+        ["description"] = "Color picker value with hex color and optional label",
+    };
 
     /// <inheritdoc />
     protected override IDataValueEditor CreateValueEditor()
@@ -75,6 +99,7 @@ public class ColorPickerPropertyEditor : DataEditor
             /// <summary>
             /// Initializes a new instance of the <see cref="ConfiguredColorValidator"/> class.
             /// </summary>
+            /// <param name="localizedTextService">The service used for retrieving localized text resources.</param>
             public ConfiguredColorValidator(ILocalizedTextService localizedTextService) => _localizedTextService = localizedTextService;
 
             /// <inheritdoc/>

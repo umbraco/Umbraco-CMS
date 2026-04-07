@@ -226,11 +226,13 @@ export class UmbAppElement extends UmbLitElement {
 			throw new Error('[Fatal] AuthContext requested before it was initialized');
 		}
 
-		// Popup windows are used exclusively for the auth code exchange flow.
-		// Attempting a silent token refresh here would set isAuthorized=true and cause
-		// the oauth_complete handler to redirect the popup to the backoffice instead of
-		// completing the code exchange. The code exchange sets fresh cookies itself.
-		if (window.opener) return;
+		// The oauth_complete popup must not call setInitialState(): a successful silent
+		// refresh would set isAuthorized=true and cause the oauth_complete handler to
+		// redirect the popup to the backoffice instead of completing the code exchange.
+		// Other windows opened via window.open() (e.g. the preview window) DO need
+		// setInitialState() so they can restore the session from a peer tab.
+		const pathname = pathWithoutBasePath({ start: true, end: false });
+		if (window.opener && pathname === '/oauth_complete') return;
 
 		// Auth context configures umbHttpClient in its constructor, so we only need to set initial state
 		await this.#authContext.setInitialState();

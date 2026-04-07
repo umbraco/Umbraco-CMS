@@ -11,6 +11,9 @@ using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 
 namespace Umbraco.Extensions
 {
+    /// <summary>
+    /// Provides extension methods to enhance or simplify NPoco SQL operations.
+    /// </summary>
     public static partial class NPocoSqlExtensions
     {
         #region Where
@@ -123,7 +126,7 @@ namespace Umbraco.Extensions
         /// <param name="sql">The Sql statement.</param>
         /// <param name="field">An expression specifying the field.</param>
         /// <param name="values">The values.</param>
-        /// <param name="alias"></param>
+        /// <param name="alias">The table alias for the field.</param>
         /// <returns>The Sql statement.</returns>
         public static Sql<ISqlContext> WhereIn<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object?>> field, IEnumerable? values, string alias)
         {
@@ -145,6 +148,15 @@ namespace Umbraco.Extensions
             return WhereIn(sql, field, values, false, null);
         }
 
+        /// <summary>
+        /// Appends a WHERE IN clause to the specified <paramref name="sql"/> statement, filtering the results where the given field matches any of the provided values.
+        /// </summary>
+        /// <typeparam name="TDto">The type of the DTO (data transfer object) being queried.</typeparam>
+        /// <param name="sql">The SQL statement to which the WHERE IN clause will be appended.</param>
+        /// <param name="field">An expression specifying the field to filter on.</param>
+        /// <param name="values">The collection of values to include in the IN clause.</param>
+        /// <param name="tableAlias">The alias of the table to use when qualifying the field in the WHERE IN clause.</param>
+        /// <returns>The modified SQL statement with the appended WHERE IN clause.</returns>
         public static Sql<ISqlContext> WhereIn<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object?>> field, Sql<ISqlContext>? values, string tableAlias)
         {
             return sql.WhereIn(field, values, false, tableAlias);
@@ -170,11 +182,24 @@ namespace Umbraco.Extensions
             return sql;
         }
 
+        /// <summary>
+        /// Returns a new SQL query that combines the results of two specified SQL queries using the UNION operator.
+        /// </summary>
+        /// <param name="sql">The first SQL query.</param>
+        /// <param name="sql2">The second SQL query to combine with the first using UNION.</param>
+        /// <returns>A <see cref="Sql{ISqlContext}"/> representing the union of the two queries.</returns>
         public static Sql<ISqlContext> Union(this Sql<ISqlContext> sql, Sql<ISqlContext> sql2)
         {
             return sql.Append(" UNION ").Append(sql2);
         }
 
+        /// <summary>
+        /// Appends an INNER JOIN clause to the current SQL query, joining with a nested SQL subquery and assigning it an alias.
+        /// </summary>
+        /// <param name="sql">The base <see cref="Sql{ISqlContext}"/> instance to which the join will be appended.</param>
+        /// <param name="nestedQuery">The nested <see cref="Sql{ISqlContext}"/> subquery to join.</param>
+        /// <param name="alias">The alias to assign to the nested subquery in the join clause. The alias will be quoted according to the SQL syntax provider.</param>
+        /// <returns>A <see cref="SqlJoinClause{ISqlContext}"/> representing the INNER JOIN with the nested subquery and alias.</returns>
         public static Sql<ISqlContext>.SqlJoinClause<ISqlContext> InnerJoinNested(this Sql<ISqlContext> sql, Sql<ISqlContext> nestedQuery, string alias)
         {
             return new Sql<ISqlContext>.SqlJoinClause<ISqlContext>(sql.Append("INNER JOIN (").Append(nestedQuery)
@@ -365,6 +390,14 @@ namespace Umbraco.Extensions
             return sql.OrderBy("(" + sql.SqlContext.SqlSyntax.GetFieldName(field) + ")");
         }
 
+        /// <summary>
+        /// Appends an ORDER BY clause to the Sql statement using the specified field and alias.
+        /// </summary>
+        /// <typeparam name="TDto">The type of the Dto.</typeparam>
+        /// <param name="sql">The Sql statement.</param>
+        /// <param name="field">An expression specifying the field.</param>
+        /// <param name="alias">The alias to use for the field.</param>
+        /// <returns>The Sql statement.</returns>
         public static Sql<ISqlContext> OrderBy<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object?>> field, string alias)
         {
             return sql.OrderBy("(" + sql.SqlContext.SqlSyntax.GetFieldName(field, alias) + ")");
@@ -490,6 +523,14 @@ namespace Umbraco.Extensions
 
         }
 
+        /// <summary>
+        /// Appends additional fields to an existing ORDER BY or GROUP BY clause in the SQL statement, using the specified table alias.
+        /// </summary>
+        /// <typeparam name="TDto">The type of the DTO (data transfer object).</typeparam>
+        /// <param name="sql">The SQL statement to append fields to.</param>
+        /// <param name="tableAlias">The alias of the table to use for the fields.</param>
+        /// <param name="fields">Expressions specifying the fields to append.</param>
+        /// <returns>A <see cref="Sql{ISqlContext}"/> statement with the additional fields appended to the ORDER BY or GROUP BY clause.</returns>
         public static Sql<ISqlContext> AndBy<TDto>(
             this Sql<ISqlContext> sql,
             string tableAlias,
@@ -965,6 +1006,15 @@ namespace Umbraco.Extensions
             return sql;
         }
 
+        /// <summary>
+        /// Creates a <c>SELECT DISTINCT</c> SQL statement for the specified columns.
+        /// </summary>
+        /// <param name="sql">The original SQL statement to extend.</param>
+        /// <param name="columns">The columns to select distinct values from.</param>
+        /// <returns>A new <see cref="Sql{ISqlContext}"/> statement with the <c>SELECT DISTINCT</c> clause applied.</returns>
+        /// <remarks>
+        /// If <paramref name="columns"/> is empty, all columns are selected.
+        /// </remarks>
         public static Sql<ISqlContext> SelectDistinct(this Sql<ISqlContext> sql, params object[] columns)
         {
             sql.Append("SELECT DISTINCT " + string.Join(", ", columns));
@@ -1295,6 +1345,7 @@ namespace Umbraco.Extensions
                 return this;
             }
         }
+
         /// <summary>
         /// Gets fields for a Dto.
         /// </summary>
@@ -1350,9 +1401,11 @@ namespace Umbraco.Extensions
         }
 
         /// <summary>
-        /// Adds a SELECT clause to the SQL query based on the specified predicate and optional alias, and prepends an
-        /// opening parenthesis to the query. This is used for selects within "WHERE [column] IN (SELECT ...)" statements.
+        /// Adds a SELECT clause to the SQL query based on the specified conversion function and optional alias, and prepends an
+        /// opening parenthesis to the query. This is typically used for subqueries within "WHERE [column] IN (SELECT ...)" statements.
         /// </summary>
+        /// <param name="sql">The SQL query to modify by adding a SELECT clause and opening parenthesis.</param>
+        /// <param name="converts">A function that configures the columns or expressions to be selected in the subquery.</param>
         /// <returns>The modified SQL query with the prepended SELECT clause and opening parenthesis.</returns>
         public static Sql<ISqlContext> SelectClosure<TDto>(this Sql<ISqlContext> sql, Func<SqlConvert<TDto>, SqlConvert<TDto>> converts)
         {
@@ -1375,10 +1428,22 @@ namespace Umbraco.Extensions
             return sql;
         }
 
+        /// <summary>
+        /// Converts the specified SQL query to a typed SQL query for the given DTO type.
+        /// This extension method enables strongly-typed access to query results.
+        /// </summary>
         public class SqlConvert<TDto>(ISqlContext sqlContext)
         {
+            /// <summary>
+            /// Gets the collection of SQL SET expressions generated for the current DTO type.
+            /// </summary>
             public List<string> SetExpressions { get; } = [];
 
+            /// <summary>
+            /// Adds an expression to convert a unique identifier (GUID) field to its string representation within the SQL query for the specified DTO.
+            /// </summary>
+            /// <param name="fieldSelector">An expression that selects the unique identifier field to convert.</param>
+            /// <returns>The current <see cref="SqlConvert{TDto}"/> instance, allowing for method chaining.</returns>
             public SqlConvert<TDto> ConvertUniqueIdentifierToString(Expression<Func<TDto, object?>> fieldSelector)
             {
                 var fieldName = sqlContext.SqlSyntax.GetFieldNameForUpdate(fieldSelector);
@@ -1392,12 +1457,22 @@ namespace Umbraco.Extensions
 
         #region Delete
 
+        /// <summary>
+        /// Appends a <c>DELETE</c> statement to the specified SQL query.
+        /// </summary>
+        /// <param name="sql">The <see cref="Sql{ISqlContext}"/> instance to append the <c>DELETE</c> statement to.</param>
+        /// <returns>The same <see cref="Sql{ISqlContext}"/> instance with the <c>DELETE</c> statement appended.</returns>
         public static Sql<ISqlContext> Delete(this Sql<ISqlContext> sql)
         {
             sql.Append("DELETE");
             return sql;
         }
 
+        /// <summary>
+        /// Appends a <c>DELETE</c> statement to the specified SQL query.
+        /// </summary>
+        /// <param name="sql">The <see cref="Sql{ISqlContext}"/> instance to append the <c>DELETE</c> statement to.</param>
+        /// <returns>The same <see cref="Sql{ISqlContext}"/> instance with the <c>DELETE</c> statement appended.</returns>
         public static Sql<ISqlContext> Delete<TDto>(this Sql<ISqlContext> sql)
         {
             Type type = typeof(TDto);
@@ -1425,12 +1500,23 @@ namespace Umbraco.Extensions
 
         #region Update
 
+        /// <summary>
+        /// Appends the <c>UPDATE</c> keyword to the current SQL query.
+        /// </summary>
+        /// <param name="sql">The <see cref="Sql{ISqlContext}"/> instance to append the <c>UPDATE</c> keyword to.</param>
+        /// <returns>The same <see cref="Sql{ISqlContext}"/> instance with the <c>UPDATE</c> keyword appended.</returns>
         public static Sql<ISqlContext> Update(this Sql<ISqlContext> sql)
         {
             sql.Append("UPDATE");
             return sql;
         }
 
+        /// <summary>
+        /// Appends an <c>UPDATE</c> statement to the specified SQL query.
+        /// </summary>
+        /// <typeparam name="TDto">The type representing the data transfer object (DTO) for the update operation.</typeparam>
+        /// <param name="sql">The SQL query to which the <c>UPDATE</c> statement will be appended.</param>
+        /// <returns>The <see cref="Sql{ISqlContext}"/> instance with the appended <c>UPDATE</c> statement.</returns>
         public static Sql<ISqlContext> Update<TDto>(this Sql<ISqlContext> sql)
         {
             Type type = typeof(TDto);
@@ -1440,6 +1526,11 @@ namespace Umbraco.Extensions
             return sql;
         }
 
+        /// <summary>
+        /// Appends an UPDATE statement to the specified SQL query.
+        /// </summary>
+        /// <param name="sql">The SQL query to which the UPDATE statement will be appended.</param>
+        /// <returns>The SQL query with the appended UPDATE statement.</returns
         public static Sql<ISqlContext> Update<TDto>(this Sql<ISqlContext> sql, Func<SqlUpd<TDto>, SqlUpd<TDto>> updates)
         {
             Type type = typeof(TDto);
@@ -1476,15 +1567,28 @@ namespace Umbraco.Extensions
             return sql;
         }
 
+        /// <summary>
+        /// Creates an SQL UPDATE statement for the specified data transfer object (DTO) type.
+        /// </summary>
         public class SqlUpd<TDto>
         {
             private readonly ISqlContext _sqlContext;
 
+            /// <summary>
+            /// Initializes a new instance of the <see cref="SqlUpd{TDto}"/> class for the specified DTO type.
+            /// </summary>
+            /// <param name="sqlContext">The <see cref="ISqlContext"/> to use for SQL operations.</param>
             public SqlUpd(ISqlContext sqlContext)
             {
                 _sqlContext = sqlContext;
             }
 
+            /// <summary>
+            /// Sets the specified field to the given value for the update operation.
+            /// </summary>
+            /// <param name="fieldSelector">An expression selecting the field to update.</param>
+            /// <param name="value">The value to assign to the selected field.</param>
+            /// <returns>The current <see cref="Umbraco.Extensions.NPocoSqlExtensions.SqlUpd{TDto}"/> instance for chaining.</returns>
             public SqlUpd<TDto> Set(Expression<Func<TDto, object?>> fieldSelector, object? value)
             {
                 var fieldName = _sqlContext.SqlSyntax.GetFieldNameForUpdate(fieldSelector);
@@ -1492,6 +1596,10 @@ namespace Umbraco.Extensions
                 return this;
             }
 
+            /// <summary>
+            /// Gets the list of set expressions used in the SQL update statement.
+            /// Each tuple contains the column name and the value to set for that column.
+            /// </summary>
             public List<Tuple<string, object?>> SetExpressions { get; } = [];
         }
 
@@ -1510,6 +1618,11 @@ namespace Umbraco.Extensions
         public static Sql<ISqlContext> ForUpdate(this Sql<ISqlContext> sql)
             => sql.SqlContext.SqlSyntax.InsertForUpdateHint(sql);
 
+        /// <summary>
+        /// Appends an update hint to the specified <see cref="Sql{ISqlContext}"/> query, indicating that the query is intended for updating records.
+        /// </summary>
+        /// <param name="sql">The SQL query object to which the update hint will be appended.</param>
+        /// <returns>A new <see cref="Sql{ISqlContext}"/> instance with the update hint applied.</returns>
         public static Sql<ISqlContext> AppendForUpdateHint(this Sql<ISqlContext> sql)
             => sql.SqlContext.SqlSyntax.AppendForUpdateHint(sql);
 
@@ -1536,6 +1649,13 @@ namespace Umbraco.Extensions
 
         #region Utilities
 
+        /// <summary>
+        /// Appends a subquery as a derived table with the specified alias to the given SQL query.
+        /// </summary>
+        /// <param name="sql">The original SQL query to append to.</param>
+        /// <param name="subQuery">The subquery to append as a derived table.</param>
+        /// <param name="alias">The alias to use for the derived table.</param>
+        /// <returns>The modified SQL query with the appended subquery.</returns>
         public static Sql<ISqlContext> AppendSubQuery(this Sql<ISqlContext> sql, Sql<ISqlContext> subQuery, string alias)
         {
             // Append the subquery as a derived table with an alias
@@ -1589,6 +1709,11 @@ namespace Umbraco.Extensions
                 .ToArray();
         }
 
+        /// <summary>
+        /// Returns the table name specified by the <see cref="TableNameAttribute"/> on the given <see cref="Type"/>.
+        /// </summary>
+        /// <param name="type">The <see cref="Type"/> whose table name is to be retrieved.</param>
+        /// <returns>The table name as a <see cref="string"/>, or <c>string.Empty</c> if the attribute is not present or its value is null or whitespace.</returns>
         public static string GetTableName(this Type type)
         {
             // TODO: returning string.Empty for now
@@ -1604,6 +1729,11 @@ namespace Umbraco.Extensions
             return string.IsNullOrWhiteSpace(attr?.Name) ? column.Name : attr.Name;
         }
 
+        /// <summary>
+        /// Returns the SQL query string representation of the specified <see cref="Sql"/> object.
+        /// </summary>
+        /// <param name="sql">The <see cref="Sql"/> instance to convert to a SQL string.</param>
+        /// <returns>A string containing the textual SQL query.</returns>
         public static string ToText(this Sql sql)
         {
             var text = new StringBuilder();
@@ -1611,10 +1741,23 @@ namespace Umbraco.Extensions
             return text.ToString();
         }
 
+        /// <summary>
+        /// Appends the SQL query text represented by the specified <see cref="Sql"/> object to the given <see cref="StringBuilder"/> instance.
+        /// This method does not return the SQL text; instead, it appends the generated SQL to the provided <paramref name="text"/> parameter.
+        /// </summary>
+        /// <param name="sql">The <see cref="Sql"/> object containing the SQL query to convert to text.</param>
+        /// <param name="text">The <see cref="StringBuilder"/> instance to which the SQL text will be appended.</param>
         public static void ToText(this Sql sql, StringBuilder text)
         {
             ToText(sql.SQL, sql.Arguments, text);
         }
+
+        /// <summary>
+        /// Appends a textual representation of the specified SQL query and its arguments to the provided <see cref="StringBuilder"/>.
+        /// </summary>
+        /// <param name="sql">The SQL query string to be represented as text.</param>
+        /// <param name="arguments">The arguments to be included in the textual representation of the SQL query.</param>
+        /// <param name="text">The <see cref="StringBuilder"/> instance to which the textual representation will be appended.</param>
 
         public static void ToText(string? sql, object[]? arguments, StringBuilder text)
         {

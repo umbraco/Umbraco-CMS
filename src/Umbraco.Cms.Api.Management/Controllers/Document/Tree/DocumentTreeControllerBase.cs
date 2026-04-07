@@ -20,6 +20,9 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Document.Tree;
 
+/// <summary>
+/// Serves as the base controller for document tree management in the Umbraco CMS API, providing shared functionality for document tree operations.
+/// </summary>
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Tree}/{Constants.UdiEntityType.Document}")]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Document))]
 [Authorize(Policy = AuthorizationPolicies.SectionAccessForContentTree)]

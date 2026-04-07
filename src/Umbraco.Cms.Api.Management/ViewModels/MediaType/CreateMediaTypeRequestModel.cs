@@ -20,6 +20,9 @@ public class CreateMediaTypeRequestModel
 
     // TODO (V18): This is already declared on the base type, so for the next major, when we can allow a binary breaking change, we should remove it from here.
 #pragma warning disable CS0108 // Member hides inherited member; missing new keyword
+    /// <summary>
+    /// Gets or sets a reference to the collection that this media type belongs to.
+    /// </summary>
     public ReferenceByIdModel? Collection { get; set; }
 #pragma warning restore CS0108 // Member hides inherited member; missing new keyword
 }

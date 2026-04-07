@@ -15,6 +15,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Media.RecycleBin;
 
+/// <summary>
+/// Controller for deleting items from the media recycle bin.
+/// </summary>
 [ApiVersion("1.0")]
 public class DeleteMediaRecycleBinController : MediaRecycleBinControllerBase
 {
@@ -22,6 +25,14 @@ public class DeleteMediaRecycleBinController : MediaRecycleBinControllerBase
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly IMediaEditingService _mediaEditingService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DeleteMediaRecycleBinController"/> class.
+    /// </summary>
+    /// <param name="entityService">Service for managing entities within the Umbraco CMS.</param>
+    /// <param name="authorizationService">Service used to authorize user actions.</param>
+    /// <param name="backOfficeSecurityAccessor">Accessor for back office security context.</param>
+    /// <param name="mediaEditingService">Service for editing media items.</param>
+    /// <param name="mediaPresentationFactory">Factory for creating media presentation models.</param>
     public DeleteMediaRecycleBinController(
         IEntityService entityService,
         IAuthorizationService authorizationService,
@@ -35,6 +46,15 @@ public class DeleteMediaRecycleBinController : MediaRecycleBinControllerBase
         _mediaEditingService = mediaEditingService;
     }
 
+    /// <summary>
+    /// Permanently deletes a media item from the recycle bin, identified by its unique identifier.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="id">The unique identifier (GUID) of the media item to permanently delete from the recycle bin.</param>
+    /// <returns>
+    /// An <see cref="IActionResult"/> indicating the result of the operation:
+    /// returns <c>200 OK</c> if successful, <c>400 Bad Request</c> if the request is invalid, or <c>404 Not Found</c> if the media item does not exist.
+    /// </returns>
     [HttpDelete("{id:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]

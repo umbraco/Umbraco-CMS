@@ -11,6 +11,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
+/// <summary>
+/// Serves as the base class for property value editors that process block-based property values, parameterized by specific value (<typeparamref name="TValue"/>) and layout (<typeparamref name="TLayout"/>) types.
+/// </summary>
 public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataValueEditor, IDataValueReference, IDataValueTags
     where TValue : BlockValue<TLayout>, new()
     where TLayout : class, IBlockLayoutItem, new()
@@ -43,15 +46,15 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
         _languageService = languageService;
     }
 
-    /// <summary>
-    /// Caches referenced entities for all property values with supporting property editors within the specified block editor data
-    /// optimising subsequent retrieval of entities when parsing and converting property values.
-    /// </summary>
-    /// <remarks>
-    /// This method iterates through all property values associated with data editors in the provided
-    /// block editor data and invokes caching for referenced entities where supported by the property editor.
-    /// </remarks>
-    /// <param name="blockEditorData">The block editor data containing content and settings property values to analyze for referenced entities.</param>
+              /// <summary>
+              /// Caches referenced entities for all property values with supporting property editors within the specified block editor data
+              /// optimising subsequent retrieval of entities when parsing and converting property values.
+              /// </summary>
+              /// <remarks>
+              /// This method iterates through all property values associated with data editors in the provided
+              /// block editor data and invokes caching for referenced entities where supported by the property editor.
+              /// </remarks>
+              /// <param name="blockEditorData">The block editor data containing content and settings property values to analyze for referenced entities.</param>
     [Obsolete("This method is available for support of request caching retrieved entities in derived property value editors. " +
               "The intention is to supersede this with lazy loaded read locks, which will make this unnecessary. " +
               "Scheduled for removal in Umbraco 19.")]
@@ -232,8 +235,14 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
 
     private sealed class BlockStateMapping<T>
     {
+        /// <summary>
+        /// Gets or sets the edited value for the block, or <c>null</c> if no edited value is present.
+        /// </summary>
         public T? Edited { get; set; }
 
+        /// <summary>
+        /// Gets or sets the current mapped block state value of type <typeparamref name="T"/>.
+        /// </summary>
         public T? Current { get; set; }
     }
 
@@ -341,10 +350,10 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
     /// <summary>
     /// Updates the invariant data in the source with the invariant data in the value if allowed
     /// </summary>
-    /// <param name="source"></param>
-    /// <param name="target"></param>
-    /// <param name="canUpdateInvariantData"></param>
-    /// <returns></returns>
+    /// <param name="source">The source block editor data.</param>
+    /// <param name="target">The target block editor data.</param>
+    /// <param name="canUpdateInvariantData">Whether invariant data can be updated.</param>
+    /// <returns>The merged block editor data, or null.</returns>
     internal virtual BlockEditorData<TValue, TLayout>? UpdateSourceInvariantData(BlockEditorData<TValue, TLayout>? source, BlockEditorData<TValue, TLayout>? target, bool canUpdateInvariantData)
     {
         if (source is null && target is null)

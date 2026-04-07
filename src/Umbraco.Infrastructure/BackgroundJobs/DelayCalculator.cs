@@ -8,6 +8,9 @@ using Umbraco.Cms.Core.Configuration;
 
 namespace Umbraco.Cms.Infrastructure.BackgroundJobs
 {
+    /// <summary>
+    /// Provides methods to calculate delay intervals for scheduling background jobs.
+    /// </summary>
     public class DelayCalculator
     {
         /// <summary>

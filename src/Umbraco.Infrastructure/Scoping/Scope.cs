@@ -115,7 +115,27 @@ namespace Umbraco.Cms.Infrastructure.Scoping
             }
         }
 
-        // initializes a new scope
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Scope"/> class, which manages the lifetime and transactional context of operations within Umbraco.
+        /// </summary>
+        /// <remarks>initializes a new scope</remarks>
+        /// <param name="scopeProvider">The provider responsible for managing scope lifecycles.</param>
+        /// <param name="coreDebugSettings">The settings used to control core debugging behavior.</param>
+        /// <param name="mediaFileManager">The manager used for handling media file operations within the scope.</param>
+        /// <param name="distributedLockingMechanismFactory">Factory for creating distributed locking mechanisms to ensure concurrency control.</param>
+        /// <param name="loggerFactory">Factory for creating logger instances.</param>
+        /// <param name="eventAggregator">The event aggregator for publishing and subscribing to events within the scope.</param>
+        /// <param name="logger">The logger instance for logging scope-related operations.</param>
+        /// <param name="fileSystems">The collection of file system providers used by the scope.</param>
+        /// <param name="detachable">If set to <c>true</c>, the scope can be detached and re-attached to different contexts.</param>
+        /// <param name="scopeContext">The context object that holds scope-specific data, or <c>null</c> if not provided.</param>
+        /// <param name="isolationLevel">The transaction isolation level to use for this scope. Defaults to <see cref="IsolationLevel.Unspecified"/>.</param>
+        /// <param name="repositoryCacheMode">The cache mode to use for repository operations within this scope.</param>
+        /// <param name="eventDispatcher">Optional event dispatcher for handling domain events within the scope.</param>
+        /// <param name="scopedNotificationPublisher">Optional notification publisher for publishing notifications within the scope.</param>
+        /// <param name="scopeFileSystems">If set, determines whether file systems should be scoped to this instance.</param>
+        /// <param name="callContext">If <c>true</c>, uses call context for scope management; otherwise, uses async local context.</param>
+        /// <param name="autoComplete">If <c>true</c>, the scope will automatically complete when disposed.</param>
         public Scope(
             ScopeProvider scopeProvider,
             CoreDebugSettings coreDebugSettings,
@@ -156,7 +176,26 @@ namespace Umbraco.Cms.Infrastructure.Scoping
         {
         }
 
-        // initializes a new scope in a nested scopes chain, with its parent
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Scoping.Scope"/> class, representing a unit of work and transaction scope within Umbraco's infrastructure.
+        /// </summary>
+        /// <remarks>initializes a new scope in a nested scopes chain, with its parent</remarks>
+        /// <param name="scopeProvider">The provider responsible for managing scope lifecycles.</param>
+        /// <param name="coreDebugSettings">Configuration settings for core debugging features.</param>
+        /// <param name="mediaFileManager">Manages media file operations within the scope.</param>
+        /// <param name="distributedLockingMechanismFactory">Factory for creating distributed locking mechanisms to coordinate access across multiple processes or servers.</param>
+        /// <param name="loggerFactory">Factory for creating logger instances.</param>
+        /// <param name="eventAggregator">Aggregates and dispatches domain events within the scope.</param>
+        /// <param name="logger">Logger instance for logging scope-related operations.</param>
+        /// <param name="fileSystems">Provides access to the file systems used by Umbraco.</param>
+        /// <param name="parent">The parent scope, if this is a nested scope; otherwise, <c>null</c>.</param>
+        /// <param name="isolationLevel">The transaction isolation level to use for this scope.</param>
+        /// <param name="repositoryCacheMode">The caching mode for repository operations within the scope.</param>
+        /// <param name="eventDispatcher">Optional event dispatcher for handling domain events.</param>
+        /// <param name="notificationPublisher">Optional notification publisher for publishing scoped notifications.</param>
+        /// <param name="scopeFileSystems">If <c>true</c>, file systems are scoped to this instance; otherwise, they are shared.</param>
+        /// <param name="callContext">If <c>true</c>, associates the scope with the call context for ambient scope management.</param>
+        /// <param name="autoComplete">If <c>true</c>, the scope will automatically complete when disposed; otherwise, completion must be explicit.</param>
         public Scope(
             ScopeProvider scopeProvider,
             CoreDebugSettings coreDebugSettings,
@@ -196,24 +235,52 @@ namespace Umbraco.Cms.Infrastructure.Scoping
         {
         }
 
-        // a value indicating whether the scope is detachable
-        // ie whether it was created by CreateDetachedScope
+        /// <summary>
+        /// Gets a value indicating whether this scope was created by <see cref="CreateDetachedScope"/>, making it detachable.
+        /// </summary>
+        /// <remarks>
+        /// a value indicating whether the scope is detachable
+        /// ie whether it was created by CreateDetachedScope
+        /// </remarks>
         public bool Detachable { get; }
 
-        // the parent scope (in a nested scopes chain)
+        /// <summary>
+        /// Gets or sets the parent <see cref="Scope"/> in a chain of nested scopes.
+        /// Returns <c>null</c> if this scope is the root.
+        /// </summary>
+        /// <remarks>the parent scope (in a nested scopes chain)</remarks>
         public Scope? ParentScope { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this scope is currently attached to a parent or ambient scope.
+        /// </summary>
 
         public bool Attached { get; set; }
 
-        // the original scope (when attaching a detachable scope)
+        /// <summary>
+        /// Gets or sets the original <see cref="Scope"/> instance when attaching a detachable scope.
+        /// This property is used to keep track of the scope that was active before a detachable scope was attached.
+        /// </summary>
+        /// <remarks>the original scope (when attaching a detachable scope)</remarks>
         public Scope? OrigScope { get; set; }
 
-        // the original context (when attaching a detachable scope)
+        /// <summary>
+        /// Gets or sets the original <see cref="IScopeContext"/> that was present before attaching a detachable scope.
+        /// This is used to restore the previous context when the detachable scope is detached.
+        /// </summary>
+        /// <remarks>the original context (when attaching a detachable scope)</remarks>
         public IScopeContext? OrigContext { get; set; }
 
-        // the context (for attaching & detaching only)
+        /// <summary>
+        /// Gets the <see cref="IScopeContext"/> associated with this scope, which is used for attaching and detaching resources or state during the scope's lifetime.
+        /// </summary>
+        /// <remarks>the context (for attaching & detaching only)</remarks>
         public IScopeContext? Context { get; }
 
+        /// <summary>
+        /// Gets the isolation level used by this scope.
+        /// If not explicitly set, it inherits from the parent scope or defaults to the SQL context's default isolation level.
+        /// </summary>
         public IsolationLevel IsolationLevel
         {
             get
@@ -235,6 +302,10 @@ namespace Umbraco.Cms.Infrastructure.Scoping
         // true if Umbraco.CoreDebugSettings.LogUncompletedScope appSetting is set to "true"
         private bool LogUncompletedScopes => _coreDebugSettings.LogIncompletedScopes;
 
+        /// <summary>
+        /// Gets the current <see cref="ISqlContext"/> instance from the scope provider.
+        /// The SQL context provides access to SQL-related operations and metadata within the current scope.
+        /// </summary>
         public ISqlContext SqlContext
         {
             get
@@ -346,6 +417,11 @@ namespace Umbraco.Cms.Infrastructure.Scoping
             }
         }
 
+        /// <summary>
+        /// Disposes the current scope instance, performing cleanup and validation.
+        /// Throws an exception if this scope is not the ambient scope, which indicates improper scope usage such as incorrect disposal order or concurrent access.
+        /// Clears locks, manages the ambient scope stack, and handles completion and disposal logic for the scope and its parent if applicable.
+        /// </summary>
         public override void Dispose()
         {
             EnsureNotDisposed();
@@ -430,6 +506,9 @@ namespace Umbraco.Cms.Infrastructure.Scoping
             return ((LockingMechanism)Locks).GetWriteLocks();
         }
 
+        /// <summary>
+        /// Resets the scope by setting the <c>Completed</c> property to <c>null</c>, allowing the scope to be reused or re-evaluated.
+        /// </summary>
         public void Reset() => Completed = null;
 
         internal void EnsureNotDisposed()
