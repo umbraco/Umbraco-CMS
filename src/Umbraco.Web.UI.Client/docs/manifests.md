@@ -69,23 +69,31 @@ The `name` is metadata for debugging and documentation. The `alias` is the funct
 
 ### Naming Convention
 
-Aliases use **dot-separated segments** that read as a namespace path:
+Aliases are **dot-separated PascalCase segments**:
 
 ```
-{Prefix}.{Category}.{Domain}.{Subcategory}
+{Domain}.{ExtensionType}.{Subject}[.{Discriminator}]
 ```
 
-**HQ extensions** use the `Umb` prefix. Third-party packages use their own prefix (company name, product name, etc.).
+- **Domain** — `Umb` for all core extensions. Third-party packages use their own prefix (company name, product name). **Exception**: `propertyEditorSchema` aliases use `Umbraco` as the domain (e.g., `Umbraco.Plain.String`) — these mirror server-side schema aliases.
+- **ExtensionType** — the extension type in PascalCase (e.g., `Workspace`, `EntityAction`, `WorkspaceView`). For kind definitions, this becomes two segments: `Kind.{ExtensionType}` (e.g., `Kind.EntityAction`, `Kind.WorkspaceAction`).
+- **Subject** — the entity type (e.g., `Document`, `Media`, `User`) or feature name (e.g., `HealthCheck`, `WorkspaceAlias`, `Clipboard`) depending on the extension type.
+- **Discriminator** (optional) — distinguishes multiple extensions of the same type for the same subject (e.g., `Delete`, `Detail`, `Save`).
 
-| Pattern | Example | When to use |
-|---------|---------|-------------|
-| `Umb.{Type}.{Domain}` | `Umb.Workspace.Document` | Standard extensions |
-| `Umb.{Type}.{Domain}.{Feature}` | `Umb.EntityAction.Document.Delete` | Feature-specific extensions |
-| `Umb.Repository.{Domain}.{Category}` | `Umb.Repository.Document.Detail` | Repositories |
-| `Umb.Store.{Domain}.{Category}` | `Umb.Store.Document.Detail` | Stores |
-| `Umb.Kind.{Type}.{Name}` | `Umb.Kind.EntityAction.Delete` | Kind definitions |
-| `Umb.Condition.{Name}` | `Umb.Condition.WorkspaceAlias` | Conditions |
-| `Umb.Bundle.{Package}` | `Umb.Bundle.Documents` | Package bundles |
+**Examples**:
+
+| Alias | Domain | ExtensionType | Subject | Discriminator |
+|-------|--------|---------------|---------|---------------|
+| `Umb.Workspace.Document` | `Umb` | `Workspace` | `Document` | — |
+| `Umb.EntityAction.Document.Delete` | `Umb` | `EntityAction` | `Document` | `Delete` |
+| `Umb.Repository.Document.Detail` | `Umb` | `Repository` | `Document` | `Detail` |
+| `Umb.Kind.EntityAction.Delete` | `Umb` | `Kind.EntityAction` | `Delete` | — |
+| `Umb.Kind.WorkspaceAction.Default` | `Umb` | `Kind.WorkspaceAction` | `Default` | — |
+| `Umb.Condition.WorkspaceAlias` | `Umb` | `Condition` | `WorkspaceAlias` | — |
+| `Umb.Dashboard.HealthCheck` | `Umb` | `Dashboard` | `HealthCheck` | — |
+| `Umb.Modal.BlockCatalogue` | `Umb` | `Modal` | `BlockCatalogue` | — |
+| `Umb.GlobalContext.Clipboard` | `Umb` | `GlobalContext` | `Clipboard` | — |
+| `Umb.Bundle.Documents` | `Umb` | `Bundle` | `Documents` | — |
 
 ### Alias Constants
 
