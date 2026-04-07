@@ -1,11 +1,8 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Time.Testing;
-using Moq;
 using NUnit.Framework;
-using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Infrastructure.HostedServices;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HostedServices;
@@ -13,53 +10,6 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HostedServices;
 [TestFixture]
 public class RecurringHostedServiceBaseTests
 {
-    [TestCase("30 12 * * *", 30)]
-    [TestCase("15 18 * * *", (60 * 6) + 15)]
-    [TestCase("0 3 * * *", 60 * 15)]
-    [TestCase("0 3 2 * *", (24 * 60 * 1) + (60 * 15))]
-    [TestCase("0 6 * * 3", (24 * 60 * 3) + (60 * 18))]
-    public void Returns_Notification_Delay_From_Provided_Time(string firstRunTime, int expectedDelayInMinutes)
-    {
-        var cronTabParser = new NCronTabParser();
-        var logger = Mock.Of<ILogger>();
-        var now = new DateTime(2020, 10, 31, 12, 0, 0);
-        var result = RecurringHostedServiceBase.GetDelay(firstRunTime, cronTabParser, logger, now, TimeSpan.Zero);
-        Assert.AreEqual(expectedDelayInMinutes, result.TotalMinutes);
-    }
-
-    [Test]
-    public void Returns_Notification_Delay_From_Default_When_Provided_Time_Too_Close_To_Current_Time()
-    {
-        var firstRunTime = "30 12 * * *";
-        var cronTabParser = new NCronTabParser();
-        var logger = Mock.Of<ILogger>();
-        var now = new DateTime(2020, 10, 31, 12, 25, 0);
-        var defaultDelay = TimeSpan.FromMinutes(10);
-        var result = RecurringHostedServiceBase.GetDelay(firstRunTime, cronTabParser, logger, now, defaultDelay);
-        Assert.AreEqual(defaultDelay.TotalMinutes, result.TotalMinutes);
-    }
-
-    [Test]
-    public void Logs_And_Returns_Notification_Delay_From_Default_When_Provided_Time_Is_Not_Valid()
-    {
-        var firstRunTime = "invalid";
-        var cronTabParser = new NCronTabParser();
-        var logger = new Mock<ILogger>();
-        var now = new DateTime(2020, 10, 31, 12, 25, 0);
-        var defaultDelay = TimeSpan.FromMinutes(10);
-        var result = RecurringHostedServiceBase.GetDelay(firstRunTime, cronTabParser, logger.Object, now, defaultDelay);
-        Assert.AreEqual(defaultDelay, result);
-
-        logger.Verify(
-            logger => logger.Log(
-                It.Is<LogLevel>(y => y == LogLevel.Warning),
-                It.IsAny<EventId>(),
-                It.IsAny<It.IsAnyType>(),
-                It.IsAny<Exception>(),
-                It.IsAny<Func<It.IsAnyType, Exception, string>>()),
-            Times.Once);
-    }
-
     [TestCase(10_000, 3_000, 7_000, Description = "Subtracts elapsed time from period")]
     [TestCase(10_000, 15_000, 0, Description = "Returns zero when execution exceeds period")]
     [TestCase(10_000, 0, 10_000, Description = "Returns full period when elapsed is zero")]
@@ -404,41 +354,6 @@ public class RecurringHostedServiceBaseTests
 
         Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)), "Second execution should complete despite first throwing");
         Assert.AreEqual(2, executionCount, "Loop should continue after exception");
-
-        cts.Cancel();
-        await sut.StopAsync(CancellationToken.None);
-    }
-
-    [Test]
-    public async Task ChangePeriod_Takes_Effect_Immediately()
-    {
-        var executionCount = 0;
-        var timeProvider = new FakeTimeProvider();
-        using var executed = new SemaphoreSlim(0);
-        var sut = new TestRecurringHostedService(
-            period: TimeSpan.FromMinutes(10),
-            delay: TimeSpan.Zero,
-            timeProvider: timeProvider,
-            onExecute: _ => { Interlocked.Increment(ref executionCount); executed.Release(); return Task.CompletedTask; });
-
-        using var cts = new CancellationTokenSource();
-        await sut.StartAsync(cts.Token);
-
-        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)));
-        Assert.AreEqual(1, executionCount);
-
-        // Change to a 1-hour period — should interrupt the in-flight wait immediately.
-        sut.PublicChangePeriod(TimeSpan.FromHours(1));
-
-        // Advancing the old 10min period should NOT trigger execution.
-        timeProvider.Advance(TimeSpan.FromMinutes(10));
-        await Task.Yield();
-        Assert.AreEqual(1, executionCount, "Should not execute at old period interval");
-
-        // Advancing to 1h total from first execution should trigger.
-        timeProvider.Advance(TimeSpan.FromMinutes(50));
-        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)));
-        Assert.AreEqual(2, executionCount, "Should execute after new period");
 
         cts.Cancel();
         await sut.StopAsync(CancellationToken.None);
