@@ -8,7 +8,7 @@ internal static class DictionaryItemFactory
     /// <summary>
     /// Creates an <see cref="IDictionaryItem"/> entity from the specified <see cref="DictionaryDto"/>.
     /// </summary>
-    /// <param name="dto">The DTO containing the data to populate the dictionary item entity.</param>
+    /// <param name="dto">The <see cref="DictionaryDto"/> containing the data to populate the dictionary item entity.</param>
     /// <returns>An <see cref="IDictionaryItem"/> instance populated with data from the provided DTO.</returns>
     public static IDictionaryItem BuildEntity(DictionaryDto dto)
     {

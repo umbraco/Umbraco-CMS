@@ -46,42 +46,42 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
     }
 
     /// <inheritdoc />
-    public Task<IDictionaryItem?> GetAsync(Guid id)
+    public async Task<IDictionaryItem?> GetAsync(Guid key)
     {
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
-            IDictionaryItem? item = _dictionaryRepository.Get(id);
-            return Task.FromResult(item);
+            IDictionaryItem? item = await _dictionaryRepository.GetAsync(key, CancellationToken.None);
+            return item;
         }
     }
 
     /// <inheritdoc />
-    public Task<IDictionaryItem?> GetAsync(string key)
+    public async Task<IDictionaryItem?> GetAsync(string key)
     {
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
-            IDictionaryItem? item = _dictionaryRepository.Get(key);
-            return Task.FromResult(item);
+            IDictionaryItem? item = await _dictionaryRepository.GetByItemKeyAsync(key);
+            return item;
         }
     }
 
     /// <inheritdoc />
-    public Task<IEnumerable<IDictionaryItem>> GetManyAsync(params Guid[] ids)
+    public async Task<IEnumerable<IDictionaryItem>> GetManyAsync(params Guid[] ids)
     {
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
-            IEnumerable<IDictionaryItem> items = _dictionaryRepository.GetMany(ids).ToArray();
-            return Task.FromResult(items);
+            IEnumerable<IDictionaryItem> items = await _dictionaryRepository.GetManyAsync(ids, CancellationToken.None);
+            return items;
         }
     }
 
     /// <inheritdoc />
-    public Task<IEnumerable<IDictionaryItem>> GetManyAsync(params string[] keys)
+    public async Task<IEnumerable<IDictionaryItem>> GetManyAsync(params string[] keys)
     {
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
-            IEnumerable<IDictionaryItem> items = _dictionaryRepository.GetManyByKeys(keys).ToArray();
-            return Task.FromResult(items);
+            IEnumerable<IDictionaryItem> items = await _dictionaryRepository.GetManyByItemKeysAsync(keys);
+            return items;
         }
     }
 
@@ -117,7 +117,12 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
 
     /// <inheritdoc />
     public async Task<IEnumerable<IDictionaryItem>> GetChildrenAsync(Guid parentId)
-        => await GetByQueryAsync(Query<IDictionaryItem>().Where(x => x.ParentId == parentId));
+    {
+        using ICoreScope coreScope = ScopeProvider.CreateCoreScope(autoComplete: true);
+
+        IEnumerable<IDictionaryItem> all = await _dictionaryRepository.GetAllAsync(CancellationToken.None);
+        return all.Where(x => x.ParentId == parentId);
+    }
 
     /// <summary>
     /// Counts the number of child dictionary items under a specified parent.
@@ -125,36 +130,47 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
     /// <param name="parentId">The parent dictionary item ID.</param>
     /// <returns>The number of child dictionary items.</returns>
     public async Task<int> CountChildrenAsync(Guid parentId)
-        => await CountByQueryAsync(Query<IDictionaryItem>().Where(x => x.ParentId == parentId));
+    {
+        IEnumerable<IDictionaryItem> children = await GetChildrenAsync(parentId);
+        return children.Count();
+    }
 
     /// <inheritdoc />
-    public Task<IEnumerable<IDictionaryItem>> GetDescendantsAsync(Guid? parentId, string? filter = null)
+    public async Task<IEnumerable<IDictionaryItem>> GetDescendantsAsync(Guid? parentId, string? filter = null)
     {
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
-            IDictionaryItem[] items = _dictionaryRepository.GetDictionaryItemDescendants(parentId, filter).ToArray();
-            return Task.FromResult<IEnumerable<IDictionaryItem>>(items);
+            IEnumerable<IDictionaryItem> items = await _dictionaryRepository.GetDictionaryItemDescendantsAsync(parentId, filter);
+            return items;
         }
     }
 
     /// <inheritdoc/>
     public async Task<IEnumerable<IDictionaryItem>> GetAtRootAsync()
-        => await GetByQueryAsync(Query<IDictionaryItem>().Where(x => x.ParentId == null));
+    {
+        using ICoreScope coreScope = ScopeProvider.CreateCoreScope(autoComplete: true);
+
+        IEnumerable<IDictionaryItem> all = await _dictionaryRepository.GetAllAsync(CancellationToken.None);
+        return all.Where(x => x.ParentId == null);
+    }
 
     /// <summary>
     /// Counts the number of root dictionary items.
     /// </summary>
     /// <returns>The number of root dictionary items.</returns>
     public async Task<int> CountRootAsync()
-        => await CountByQueryAsync(Query<IDictionaryItem>().Where(x => x.ParentId == null));
+    {
+        IEnumerable<IDictionaryItem> items = await GetAtRootAsync();
+        return items.Count();
+    }
 
     /// <inheritdoc/>
-    public Task<bool> ExistsAsync(string key)
+    public async Task<bool> ExistsAsync(string key)
     {
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
-            IDictionaryItem? item = _dictionaryRepository.Get(key);
-            return Task.FromResult(item != null);
+            IDictionaryItem? item = await _dictionaryRepository.GetByItemKeyAsync(key);
+            return item is not null;
         }
     }
 
@@ -168,9 +184,9 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
 
         return await SaveAsync(
             dictionaryItem,
-            () =>
+            async () =>
             {
-                if (_dictionaryRepository.Get(dictionaryItem.Key) != null)
+                if (await _dictionaryRepository.GetAsync(dictionaryItem.Key, CancellationToken.None) != null)
                 {
                     return DictionaryItemOperationStatus.DuplicateKey;
                 }
@@ -207,10 +223,10 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
 
         return await SaveAsync(
             dictionaryItem,
-            () =>
+            async () =>
             {
                 // is there an item to update?
-                if (_dictionaryRepository.Exists(dictionaryItem.Id) == false)
+                if (await _dictionaryRepository.ExistsAsync(dictionaryItem.Key, CancellationToken.None) == false)
                 {
                     return DictionaryItemOperationStatus.ItemNotFound;
                 }
@@ -223,11 +239,11 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
     }
 
     /// <inheritdoc />
-    public async Task<Attempt<IDictionaryItem?, DictionaryItemOperationStatus>> DeleteAsync(Guid id, Guid userKey)
+    public async Task<Attempt<IDictionaryItem?, DictionaryItemOperationStatus>> DeleteAsync(Guid key, Guid userKey)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
-            IDictionaryItem? dictionaryItem = _dictionaryRepository.Get(id);
+            IDictionaryItem? dictionaryItem = await _dictionaryRepository.GetAsync(key, CancellationToken.None);
             if (dictionaryItem == null)
             {
                 return Attempt.FailWithStatus<IDictionaryItem?, DictionaryItemOperationStatus>(DictionaryItemOperationStatus.ItemNotFound, null);
@@ -241,7 +257,7 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
                 return Attempt.FailWithStatus<IDictionaryItem?, DictionaryItemOperationStatus>(DictionaryItemOperationStatus.CancelledByNotification, dictionaryItem);
             }
 
-            _dictionaryRepository.Delete(dictionaryItem);
+            await _dictionaryRepository.DeleteAsync(dictionaryItem, CancellationToken.None);
             scope.Notifications.Publish(
                 new DictionaryItemDeletedNotification(dictionaryItem, eventMessages)
                     .WithStateFrom(deletingNotification));
@@ -273,7 +289,7 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
-            IDictionaryItem? parent = parentId.HasValue ? _dictionaryRepository.Get(parentId.Value) : null;
+            IDictionaryItem? parent = parentId.HasValue ? await _dictionaryRepository.GetAsync(parentId.Value, CancellationToken.None) : null;
 
             // validate parent if applicable
             if (parentId.HasValue && parent == null)
@@ -284,7 +300,7 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
             // ensure we don't move a dictionary item underneath one of its own descendants
             if (parent != null)
             {
-                IEnumerable<IDictionaryItem> descendants = _dictionaryRepository.GetDictionaryItemDescendants(dictionaryItem.Key);
+                IEnumerable<IDictionaryItem> descendants = await _dictionaryRepository.GetDictionaryItemDescendantsAsync(dictionaryItem.Key);
                 if (descendants.Any(item => item.Key == parent.Key))
                 {
                     return Attempt.FailWithStatus(DictionaryItemOperationStatus.InvalidParent, dictionaryItem);
@@ -302,7 +318,7 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
                 return Attempt.FailWithStatus(DictionaryItemOperationStatus.CancelledByNotification, dictionaryItem);
             }
 
-            _dictionaryRepository.Save(dictionaryItem);
+            await _dictionaryRepository.SaveAsync(dictionaryItem, CancellationToken.None);
 
             scope.Notifications.Publish(
                 new DictionaryItemMovedNotification(moveEventInfo, eventMessages).WithStateFrom(movingNotification));
@@ -317,15 +333,13 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
     /// <summary>
     /// Counts dictionary items matching the specified query.
     /// </summary>
-    /// <param name="query">The query to execute.</param>
     /// <returns>The count of matching dictionary items.</returns>
-    private Task<int> CountByQueryAsync(IQuery<IDictionaryItem> query)
+    private async Task<int> CountByQueryAsync()
     {
-        using (ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            var items = _dictionaryRepository.Count(query);
-            return Task.FromResult(items);
-        }
+        using ICoreScope coreScope = ScopeProvider.CreateCoreScope(autoComplete: true);
+
+        IEnumerable<IDictionaryItem> items = await _dictionaryRepository.GetAllAsync(CancellationToken.None);
+        return items.Count();
     }
 
     /// <summary>
@@ -339,27 +353,27 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
     /// <returns>An attempt containing the saved dictionary item and operation status.</returns>
     private async Task<Attempt<IDictionaryItem, DictionaryItemOperationStatus>> SaveAsync(
         IDictionaryItem dictionaryItem,
-        Func<DictionaryItemOperationStatus> operationValidation,
+        Func<Task<DictionaryItemOperationStatus>> operationValidation,
         AuditType auditType,
         string auditMessage,
         Guid userKey)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
-            DictionaryItemOperationStatus status = operationValidation();
+            DictionaryItemOperationStatus status = await operationValidation();
             if (status != DictionaryItemOperationStatus.Success)
             {
                 return Attempt.FailWithStatus(status, dictionaryItem);
             }
 
             // validate the parent
-            if (HasValidParent(dictionaryItem) == false)
+            if (await HasValidParent(dictionaryItem) == false)
             {
                 return Attempt.FailWithStatus(DictionaryItemOperationStatus.ParentNotFound, dictionaryItem);
             }
 
             // do we have an item key collision (item keys must be unique)?
-            if (HasItemKeyCollision(dictionaryItem))
+            if (await HasItemKeyCollision(dictionaryItem))
             {
                 return Attempt.FailWithStatus(DictionaryItemOperationStatus.DuplicateItemKey, dictionaryItem);
             }
@@ -376,7 +390,7 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
                 return Attempt.FailWithStatus(DictionaryItemOperationStatus.CancelledByNotification, dictionaryItem);
             }
 
-            _dictionaryRepository.Save(dictionaryItem);
+            await _dictionaryRepository.SaveAsync(dictionaryItem, CancellationToken.None);
 
             scope.Notifications.Publish(
                 new DictionaryItemSavedNotification(dictionaryItem, eventMessages).WithStateFrom(savingNotification));
@@ -385,20 +399,6 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
             scope.Complete();
 
             return Attempt.SucceedWithStatus(DictionaryItemOperationStatus.Success, dictionaryItem);
-        }
-    }
-
-    /// <summary>
-    /// Gets dictionary items matching the specified query.
-    /// </summary>
-    /// <param name="query">The query to execute.</param>
-    /// <returns>A collection of dictionary items matching the query.</returns>
-    private Task<IEnumerable<IDictionaryItem>> GetByQueryAsync(IQuery<IDictionaryItem> query)
-    {
-        using (ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            IDictionaryItem[] items = _dictionaryRepository.Get(query).ToArray();
-            return Task.FromResult<IEnumerable<IDictionaryItem>>(items);
         }
     }
 
@@ -423,8 +423,8 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
     /// </summary>
     /// <param name="dictionaryItem">The dictionary item to validate.</param>
     /// <returns><c>true</c> if the parent is valid or no parent is specified; otherwise, <c>false</c>.</returns>
-    private bool HasValidParent(IDictionaryItem dictionaryItem)
-        => dictionaryItem.ParentId.HasValue == false || _dictionaryRepository.Get(dictionaryItem.ParentId.Value) != null;
+    private async Task<bool> HasValidParent(IDictionaryItem dictionaryItem)
+        => dictionaryItem.ParentId.HasValue == false || await _dictionaryRepository.GetAsync(dictionaryItem.ParentId.Value, CancellationToken.None) != null;
 
     /// <summary>
     /// Removes translations for languages that no longer exist.
@@ -448,9 +448,9 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
     /// </summary>
     /// <param name="dictionaryItem">The dictionary item to check.</param>
     /// <returns><c>true</c> if a collision exists; otherwise, <c>false</c>.</returns>
-    private bool HasItemKeyCollision(IDictionaryItem dictionaryItem)
+    private async Task<bool> HasItemKeyCollision(IDictionaryItem dictionaryItem)
     {
-        IDictionaryItem? itemKeyCollision = _dictionaryRepository.Get(dictionaryItem.ItemKey);
+        IDictionaryItem? itemKeyCollision = await _dictionaryRepository.GetByItemKeyAsync(dictionaryItem.ItemKey);
         return itemKeyCollision != null && itemKeyCollision.Key != dictionaryItem.Key;
     }
 }

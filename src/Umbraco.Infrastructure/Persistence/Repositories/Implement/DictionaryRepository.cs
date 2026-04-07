@@ -48,15 +48,10 @@ internal sealed class DictionaryRepository : AsyncEntityRepositoryBase<Guid, IDi
         _dictionarySettings = dictionarySettings;
     }
 
+    /// <inheritdoc/>
     protected override Guid GetEntityKey(IDictionaryItem entity) => entity.Key;
 
-    #region Interface methods
-
-    /// <summary>
-    /// Gets a dictionary item by its string key.
-    /// </summary>
-    /// <param name="key">The string key of the dictionary item.</param>
-    /// <returns>The dictionary item if found; otherwise, <c>null</c>.</returns>
+    /// <inheritdoc/>
     public async Task<IDictionaryItem?> GetByItemKeyAsync(string key)
     {
         IDictionary<int, ILanguage> languagesById = await GetLanguagesByIdAsync();
@@ -176,7 +171,6 @@ internal sealed class DictionaryRepository : AsyncEntityRepositoryBase<Guid, IDi
         });
     }
 
-    #endregion
 
     #region Overrides of AsyncEntityRepositoryBase
 
@@ -242,6 +236,7 @@ internal sealed class DictionaryRepository : AsyncEntityRepositoryBase<Guid, IDi
         });
     }
 
+    /// <inheritdoc/>
     protected override async Task<bool> PerformExistsAsync(Guid key) =>
         await AmbientScope.ExecuteWithContextAsync(async db =>
             await db.DictionaryEntries.AnyAsync(x => x.UniqueId == key));
@@ -250,6 +245,7 @@ internal sealed class DictionaryRepository : AsyncEntityRepositoryBase<Guid, IDi
 
     #region Unit of Work Implementation
 
+    /// <inheritdoc/>
     protected override async Task PersistNewItemAsync(IDictionaryItem entity) =>
         await AmbientScope.ExecuteWithContextAsync<DictionaryDto>(async db =>
         {
@@ -266,10 +262,9 @@ internal sealed class DictionaryRepository : AsyncEntityRepositoryBase<Guid, IDi
 
             db.DictionaryEntries.Add(dto);
 
-            dictionaryItem.Id = dto.PrimaryKey;
-
             IDictionary<string, ILanguage> languagesByIsoCode = await GetLanguagesByIsoCodeAsync();
 
+            var translationDtos = new List<(IDictionaryTranslation Translation, LanguageTextDto Dto)>();
             foreach (IDictionaryTranslation translation in dictionaryItem.Translations)
             {
                 LanguageTextDto textDto = DictionaryTranslationFactory.BuildDto(translation, dictionaryItem.Key, languagesByIsoCode);
@@ -277,11 +272,18 @@ internal sealed class DictionaryRepository : AsyncEntityRepositoryBase<Guid, IDi
                 db.Set<LanguageTextDto>()
                     .Add(textDto);
 
-                translation.Id = textDto.PrimaryKey;
-                translation.Key = dictionaryItem.Key;
+                translationDtos.Add((translation, textDto));
             }
 
             await db.SaveChangesAsync();
+
+            dictionaryItem.Id = dto.PrimaryKey;
+
+            foreach ((IDictionaryTranslation translation, LanguageTextDto textDto) in translationDtos)
+            {
+                translation.Id = textDto.PrimaryKey;
+                translation.Key = dictionaryItem.Key;
+            }
 
             dictionaryItem.ResetDirtyProperties();
         });
