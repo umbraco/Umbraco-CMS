@@ -2,9 +2,14 @@ import { UmbOEmbedRepository } from '../repository/oembed.repository.js';
 import type { UmbEmbeddedMediaModalData, UmbEmbeddedMediaModalValue } from './embedded-media-modal.token.js';
 import { css, html, unsafeHTML, when, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
+import { debounce } from '@umbraco-cms/backoffice/utils';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UUIButtonState, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import type { UmbInputDimensionsElement } from '@umbraco-cms/backoffice/components';
+
+const DEFAULT_WIDTH = 500;
+const DEFAULT_HEIGHT = Math.round(500 / (16 / 9));
 
 @customElement('umb-embedded-media-modal')
 export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
@@ -18,10 +23,13 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 	private _loading?: UUIButtonState;
 
 	@state()
-	private _width = 360;
+	private _width = DEFAULT_WIDTH;
 
 	@state()
-	private _height = 240;
+	private _height = DEFAULT_HEIGHT;
+
+	@state()
+	private _constrain = true;
 
 	@state()
 	private _url = '';
@@ -29,9 +37,11 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 	override connectedCallback() {
 		super.connectedCallback();
 
-		if (this.data?.width) this._width = this.data.width;
-		if (this.data?.height) this._height = this.data.height;
-		if (this.data?.constrain) this.value = { ...this.value, constrain: this.data.constrain };
+		if (this.data?.width) this._width = this.data.width > 0 ? this.data.width : DEFAULT_WIDTH;
+		if (this.data?.height) this._height = this.data.height > 0 ? this.data.height : DEFAULT_HEIGHT;
+		if (this.data?.constrain !== undefined) this._constrain = this.data.constrain;
+
+		this.value = { ...this.value, constrain: this._constrain, width: this._width, height: this._height };
 
 		if (this.data?.url) {
 			this._url = this.data.url;
@@ -62,24 +72,29 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 		this._url = e.target.value as string;
 	}
 
-	#onWidthChange(e: UUIInputEvent) {
-		this._width = parseInt(e.target.value as string, 10);
-		this.value = { ...this.value, width: this._width };
-		this.#getPreview();
+	#debouncedGetPreview = debounce(() => this.#getPreview(), 500);
+
+	#onDimensionsChange(e: Event) {
+		const target = e.target as UmbInputDimensionsElement;
+		this._width = target.width ?? DEFAULT_WIDTH;
+		this._height = target.height ?? DEFAULT_HEIGHT;
+		this._constrain = target.locked;
+		this.value = { ...this.value, width: this._width, height: this._height, constrain: this._constrain };
+		this.#debouncedGetPreview();
 	}
 
-	#onHeightChange(e: UUIInputEvent) {
-		this._height = parseInt(e.target.value as string, 10);
-		this.value = { ...this.value, height: this._height };
-		this.#getPreview();
-	}
-
-	#onConstrainChange() {
-		const constrain = !this.value?.constrain;
-		this.value = { ...this.value, constrain };
+	protected override updated() {
+		// Iframes don't have intrinsic aspect ratios like images, so height:auto collapses to 150px.
+		// Read the provider's width/height attributes and apply aspect-ratio to keep proportions.
+		const iframe = this.renderRoot.querySelector<HTMLIFrameElement>('#preview iframe');
+		if (iframe?.width && iframe?.height) {
+			iframe.style.aspectRatio = `${iframe.width} / ${iframe.height}`;
+			iframe.style.height = 'auto';
+		}
 	}
 
 	override render() {
+		const isDisabled = !this.#validUrl;
 		return html`
 			<umb-body-layout headline="Embed">
 				<uui-box>
@@ -96,41 +111,29 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 						</div>
 					</umb-property-layout>
 
+					<umb-property-layout
+						label=${this.localize.term('general_dimensions')}
+						description=${this.localize.term('embeddedMedia_dimensionsDescription')}
+						orientation="vertical">
+						<umb-input-dimensions
+							slot="editor"
+							.width=${this._width}
+							.height=${this._height}
+							.locked=${this._constrain}
+							?disabled=${isDisabled}
+							@change=${this.#onDimensionsChange}></umb-input-dimensions>
+					</umb-property-layout>
+
 					${when(
 						this.#validUrl !== undefined,
 						() =>
 							html` <umb-property-layout label=${this.localize.term('general_preview')} orientation="vertical">
 								<div slot="editor">
 									${when(this._loading === 'waiting', () => html`<uui-loader-circle></uui-loader-circle>`)}
-									${when(this.value?.markup, () => html`${unsafeHTML(this.value.markup)}`)}
+									${when(this.value?.markup, () => html`<div id="preview">${unsafeHTML(this.value.markup)}</div>`)}
 								</div>
 							</umb-property-layout>`,
 					)}
-
-					<umb-property-layout label=${this.localize.term('general_width')} orientation="vertical">
-						<uui-input
-							slot="editor"
-							.value=${this._width}
-							type="number"
-							@change=${this.#onWidthChange}
-							?disabled=${this.#validUrl ? false : true}></uui-input>
-					</umb-property-layout>
-
-					<umb-property-layout label=${this.localize.term('general_height')} orientation="vertical">
-						<uui-input
-							slot="editor"
-							.value=${this._height}
-							type="number"
-							@change=${this.#onHeightChange}
-							?disabled=${this.#validUrl ? false : true}></uui-input>
-					</umb-property-layout>
-
-					<umb-property-layout label=${this.localize.term('general_constrainProportions')} orientation="vertical">
-						<uui-toggle
-							slot="editor"
-							@change=${this.#onConstrainChange}
-							.checked=${this.value?.constrain ?? false}></uui-toggle>
-					</umb-property-layout>
 				</uui-box>
 
 				<uui-button
@@ -157,12 +160,17 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 				--uui-button-border-radius: 0;
 			}
 
-			umb-property-layout:first-child {
-				padding-top: 0;
+			#preview {
+				max-width: 100%;
+				overflow: hidden;
+
+				> *:first-child {
+					max-width: 100%;
+				}
 			}
 
-			umb-property-layout:last-child {
-				padding-bottom: 0;
+			umb-property-layout:first-child {
+				padding-top: 0;
 			}
 		`,
 	];

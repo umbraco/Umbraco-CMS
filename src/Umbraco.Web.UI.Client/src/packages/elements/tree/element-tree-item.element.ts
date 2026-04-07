@@ -1,6 +1,6 @@
 import type { UmbElementTreeItemModel } from './types.js';
 import type { UmbElementTreeItemContext } from './element-tree-item.context.js';
-import { css, html, customElement, state, property, classMap } from '@umbraco-cms/backoffice/external/lit';
+import { classMap, css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTreeItemElementBase } from '@umbraco-cms/backoffice/tree';
 
 @customElement('umb-element-tree-item')
@@ -18,7 +18,7 @@ export class UmbElementTreeItemElement extends UmbTreeItemElementBase<
 			this.observe(this.#api.name, (name) => (this._name = name || ''));
 			this.observe(this.#api.isDraft, (isDraft) => (this._isDraft = isDraft || false));
 			this.observe(this.#api.icon, (icon) => (this.#icon = icon || ''));
-			this.observe(this.#api.flags, (flags) => (this._flags = flags || []));
+			this.observe(this.#api.flags, (flags) => (this._flags = flags ?? []));
 		}
 
 		super.api = value;
@@ -49,9 +49,7 @@ export class UmbElementTreeItemElement extends UmbTreeItemElementBase<
 	}
 
 	override renderLabel() {
-		return html`<span id="label" slot="label" class=${classMap({ draft: this._isDraft })}>
-			${this._name}
-		</span> `;
+		return html`<span id="label" slot="label" class=${classMap({ draft: this._isDraft })}>${this._name}</span>`;
 	}
 
 	static override styles = [
