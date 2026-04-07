@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Time.Testing;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration;
@@ -78,40 +79,50 @@ public class RecurringHostedServiceBaseTests
     public async Task Loop_Executes_Periodically_And_Respects_Cancellation()
     {
         var executionCount = 0;
+        var timeProvider = new FakeTimeProvider();
+        using var executed = new SemaphoreSlim(0);
         var sut = new TestRecurringHostedService(
-            period: TimeSpan.FromMilliseconds(50),
+            period: TimeSpan.FromMinutes(5),
             delay: TimeSpan.Zero,
-            onExecute: _ => { Interlocked.Increment(ref executionCount); return Task.CompletedTask; });
+            timeProvider: timeProvider,
+            onExecute: _ => { Interlocked.Increment(ref executionCount); executed.Release(); return Task.CompletedTask; });
 
         using var cts = new CancellationTokenSource();
         await sut.StartAsync(cts.Token);
 
-        // Wait long enough for multiple executions
-        await Task.Delay(300);
+        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)), "First execution should complete");
+        Assert.AreEqual(1, executionCount);
+
+        timeProvider.Advance(TimeSpan.FromMinutes(5));
+        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)), "Second execution should complete");
+        Assert.AreEqual(2, executionCount);
+
+        timeProvider.Advance(TimeSpan.FromMinutes(5));
+        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)), "Third execution should complete");
+        Assert.AreEqual(3, executionCount);
+
         cts.Cancel();
         await sut.StopAsync(CancellationToken.None);
-
-        Assert.GreaterOrEqual(executionCount, 2, "Should have executed multiple times");
     }
 
     [Test]
     public async Task TriggerExecution_Causes_Immediate_Execution()
     {
         var executionCount = 0;
+        var timeProvider = new FakeTimeProvider();
         using var executed = new SemaphoreSlim(0);
         var sut = new TestRecurringHostedService(
-            period: TimeSpan.FromSeconds(30),
+            period: TimeSpan.FromHours(1),
             delay: TimeSpan.Zero,
+            timeProvider: timeProvider,
             onExecute: _ => { Interlocked.Increment(ref executionCount); executed.Release(); return Task.CompletedTask; });
 
         using var cts = new CancellationTokenSource();
         await sut.StartAsync(cts.Token);
 
-        // Wait for first execution
         Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)), "First execution should complete");
         Assert.AreEqual(1, executionCount, "Should have executed once initially");
 
-        // Trigger early execution (period is 30s, so without trigger we wouldn't get another)
         sut.PublicTriggerExecution();
         Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)), "Triggered execution should complete");
         Assert.AreEqual(2, executionCount, "Should have executed again after trigger");
@@ -122,58 +133,125 @@ public class RecurringHostedServiceBaseTests
 
     [Test]
     public async Task TriggerExecution_Reset_Starts_New_Full_Period()
-        => await AssertTriggerExecutionBehavior(
-            sut => sut.PublicTriggerExecutionReset(),
-            expectedCountAfterTrigger: 2,
-            afterTriggerMessage: "Should have executed again after trigger",
-            expectedCountAfterWait: 2,
-            afterWaitMessage: "Should not execute again within 30s period");
+    {
+        var executionCount = 0;
+        var timeProvider = new FakeTimeProvider();
+        using var executed = new SemaphoreSlim(0);
+        var sut = new TestRecurringHostedService(
+            period: TimeSpan.FromHours(1),
+            delay: TimeSpan.Zero,
+            timeProvider: timeProvider,
+            onExecute: _ => { Interlocked.Increment(ref executionCount); executed.Release(); return Task.CompletedTask; });
+
+        using var cts = new CancellationTokenSource();
+        await sut.StartAsync(cts.Token);
+
+        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)));
+        Assert.AreEqual(1, executionCount);
+
+        // Advance 30min into the 1h period, then trigger with Reset
+        timeProvider.Advance(TimeSpan.FromMinutes(30));
+        sut.PublicTriggerExecutionReset();
+        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)), "Triggered execution should complete");
+        Assert.AreEqual(2, executionCount);
+
+        // Reset means full period from now. Advancing 59min should not trigger.
+        timeProvider.Advance(TimeSpan.FromMinutes(59));
+        await Task.Yield();
+        Assert.AreEqual(2, executionCount, "Should not execute before full period");
+
+        // Advancing 1 more minute completes the period
+        timeProvider.Advance(TimeSpan.FromMinutes(1));
+        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)));
+        Assert.AreEqual(3, executionCount, "Should execute after full period");
+
+        cts.Cancel();
+        await sut.StopAsync(CancellationToken.None);
+    }
 
     [Test]
     public async Task TriggerExecution_None_Resumes_Original_Wait()
-        => await AssertTriggerExecutionBehavior(
-            sut => sut.PublicTriggerExecutionNone(),
-            expectedCountAfterTrigger: 2,
-            afterTriggerMessage: "Should have executed again after trigger",
-            expectedCountAfterWait: 2,
-            afterWaitMessage: "Should not execute again — remaining schedule still active");
+    {
+        var executionCount = 0;
+        var timeProvider = new FakeTimeProvider();
+        using var executed = new SemaphoreSlim(0);
+        var sut = new TestRecurringHostedService(
+            period: TimeSpan.FromHours(1),
+            delay: TimeSpan.Zero,
+            timeProvider: timeProvider,
+            onExecute: _ => { Interlocked.Increment(ref executionCount); executed.Release(); return Task.CompletedTask; });
+
+        using var cts = new CancellationTokenSource();
+        await sut.StartAsync(cts.Token);
+
+        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)));
+        Assert.AreEqual(1, executionCount);
+
+        // Advance 20min into 1h period, then trigger with None
+        timeProvider.Advance(TimeSpan.FromMinutes(20));
+        sut.PublicTriggerExecutionNone();
+        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)), "Triggered execution should complete");
+        Assert.AreEqual(2, executionCount);
+
+        // None means resume original schedule. Remaining is ~40min. Advancing 39min should not trigger.
+        timeProvider.Advance(TimeSpan.FromMinutes(39));
+        await Task.Yield();
+        Assert.AreEqual(2, executionCount, "Should not execute before original schedule");
+
+        // Advancing 1 more minute reaches the original tick
+        timeProvider.Advance(TimeSpan.FromMinutes(1));
+        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)));
+        Assert.AreEqual(3, executionCount, "Should execute at original scheduled time");
+
+        cts.Cancel();
+        await sut.StopAsync(CancellationToken.None);
+    }
 
     [Test]
     public async Task TriggerExecution_None_Skips_Overshot_Execution()
     {
         var executionCount = 0;
+        var timeProvider = new FakeTimeProvider();
+        using var executed = new SemaphoreSlim(0);
         var sut = new TestRecurringHostedService(
-            period: TimeSpan.FromMilliseconds(500),
+            period: TimeSpan.FromHours(1),
             delay: TimeSpan.Zero,
-            onExecute: async _ =>
+            timeProvider: timeProvider,
+            onExecute: _ =>
             {
                 var count = Interlocked.Increment(ref executionCount);
                 if (count == 2)
                 {
-                    // Triggered execution takes longer than the remaining time to the next tick
-                    await Task.Delay(600);
+                    // Simulate a triggered execution that takes longer than the remaining time
+                    timeProvider.Advance(TimeSpan.FromMinutes(50));
                 }
+
+                executed.Release();
+                return Task.CompletedTask;
             });
 
         using var cts = new CancellationTokenSource();
         await sut.StartAsync(cts.Token);
 
-        // Wait for first execution
-        await Task.Delay(50);
-        Assert.AreEqual(1, executionCount, "Should have executed once initially");
+        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)));
+        Assert.AreEqual(1, executionCount);
 
-        // Trigger with None. Remaining is ~450ms, but the triggered execution takes 600ms.
-        // The scheduled tick at ~500ms passes during execution. It should NOT execute immediately.
+        // Advance 20min, then trigger with None. Remaining is 40min.
+        // The triggered execution will advance time by 50min (overshooting by 10min).
+        timeProvider.Advance(TimeSpan.FromMinutes(20));
         sut.PublicTriggerExecutionNone();
+        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)));
+        Assert.AreEqual(2, executionCount);
 
-        // Triggered execution finishes at ~650ms from start. The overshoot is ~100ms.
-        // Next period tick is at ~500ms + 500ms = ~1000ms from start, so ~350ms from now.
-        // Verify no immediate execution after the triggered one finishes.
-        await Task.Delay(750);
-        Assert.AreEqual(2, executionCount, "Should not have executed again — scheduled tick was overshot and skipped");
+        // The overshoot should skip the immediate tick. Next tick is at original + period = 2h from start.
+        // We're now at ~70min. Advancing 49min (to ~119min) should not trigger.
+        timeProvider.Advance(TimeSpan.FromMinutes(49));
+        await Task.Yield();
+        Assert.AreEqual(2, executionCount, "Should not execute — overshot tick was skipped");
 
-        // Wait for the next period tick
-        await Task.Delay(400);
+        // Advancing 1 more minute reaches the next period tick
+        timeProvider.Advance(TimeSpan.FromMinutes(1));
+        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)));
         Assert.AreEqual(3, executionCount, "Should execute at next period tick");
 
         cts.Cancel();
@@ -184,32 +262,35 @@ public class RecurringHostedServiceBaseTests
     public async Task TriggerExecution_Replace_Skips_Next_Tick()
     {
         var executionCount = 0;
+        var timeProvider = new FakeTimeProvider();
         using var executed = new SemaphoreSlim(0);
         var sut = new TestRecurringHostedService(
-            period: TimeSpan.FromMilliseconds(500),
+            period: TimeSpan.FromHours(1),
             delay: TimeSpan.Zero,
+            timeProvider: timeProvider,
             onExecute: _ => { Interlocked.Increment(ref executionCount); executed.Release(); return Task.CompletedTask; });
 
         using var cts = new CancellationTokenSource();
         await sut.StartAsync(cts.Token);
 
-        // Wait for first execution
-        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)), "First execution should complete");
-        Assert.AreEqual(1, executionCount, "Should have executed once initially");
+        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)));
+        Assert.AreEqual(1, executionCount);
 
-        // Trigger with Replace — the triggered execution replaces the next tick.
-        // With a 500ms period, the next execution should be at remaining (~500ms) + period (500ms) = ~1000ms from now.
+        // Advance 20min into 1h period, then trigger with Replace.
+        // Remaining is ~40min. Next execution at remaining + period = ~40min + 1h = ~100min from now.
+        timeProvider.Advance(TimeSpan.FromMinutes(20));
         sut.PublicTriggerExecutionReplace();
         Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)), "Triggered execution should complete");
-        Assert.AreEqual(2, executionCount, "Should have executed after trigger");
+        Assert.AreEqual(2, executionCount);
 
-        // No execution should happen at the originally-scheduled tick (~500ms).
-        // Wait 600ms — well past the skipped tick but before the expected next execution (~1000ms).
-        Assert.IsFalse(await executed.WaitAsync(TimeSpan.FromMilliseconds(600)), "Should not execute — skipped scheduled tick");
+        // The original next tick at 40min should be skipped. Advance to 60min — past the skipped tick.
+        timeProvider.Advance(TimeSpan.FromMinutes(60));
+        await Task.Yield();
         Assert.AreEqual(2, executionCount, "Should not execute — skipped scheduled tick");
 
-        // Wait for the actual next execution
-        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)), "Should execute at tick after the skipped one");
+        // Advance to the tick after the skipped one (~100min from trigger, ~40min more)
+        timeProvider.Advance(TimeSpan.FromMinutes(40));
+        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)));
         Assert.AreEqual(3, executionCount, "Should execute at tick after the skipped one");
 
         cts.Cancel();
@@ -218,39 +299,74 @@ public class RecurringHostedServiceBaseTests
 
     [Test]
     public async Task TriggerExecution_CustomDelay_Uses_Specified_Delay()
-        => await AssertTriggerExecutionBehavior(
-            sut => sut.PublicTriggerExecutionWithDelay(TimeSpan.FromMilliseconds(50)),
-            expectedCountAfterTrigger: 3,
-            afterTriggerMessage: "Should have executed: initial + trigger + after custom delay",
-            expectedCountAfterWait: 3,
-            afterWaitMessage: "Should not execute again within 30s period");
+    {
+        var executionCount = 0;
+        var timeProvider = new FakeTimeProvider();
+        using var executed = new SemaphoreSlim(0);
+        var sut = new TestRecurringHostedService(
+            period: TimeSpan.FromHours(1),
+            delay: TimeSpan.Zero,
+            timeProvider: timeProvider,
+            onExecute: _ => { Interlocked.Increment(ref executionCount); executed.Release(); return Task.CompletedTask; });
+
+        using var cts = new CancellationTokenSource();
+        await sut.StartAsync(cts.Token);
+
+        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)));
+        Assert.AreEqual(1, executionCount);
+
+        // Trigger with a custom 10-minute delay
+        sut.PublicTriggerExecutionWithDelay(TimeSpan.FromMinutes(10));
+        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)), "Triggered execution should complete");
+        Assert.AreEqual(2, executionCount);
+
+        // After the triggered execution, next should come after the custom 10min delay
+        timeProvider.Advance(TimeSpan.FromMinutes(9));
+        await Task.Yield();
+        Assert.AreEqual(2, executionCount, "Should not execute before custom delay");
+
+        timeProvider.Advance(TimeSpan.FromMinutes(1));
+        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)));
+        Assert.AreEqual(3, executionCount, "Should execute after custom delay");
+
+        cts.Cancel();
+        await sut.StopAsync(CancellationToken.None);
+    }
 
     [Test]
     public async Task TriggerExecution_During_InitialDelay_Does_Not_Leak_Strategy()
     {
         var executionCount = 0;
+        var timeProvider = new FakeTimeProvider();
+        using var executed = new SemaphoreSlim(0);
         var sut = new TestRecurringHostedService(
-            period: TimeSpan.FromSeconds(30),
-            delay: TimeSpan.FromSeconds(30),
-            onExecute: _ => { Interlocked.Increment(ref executionCount); return Task.CompletedTask; });
+            period: TimeSpan.FromHours(1),
+            delay: TimeSpan.FromMinutes(30),
+            timeProvider: timeProvider,
+            onExecute: _ => { Interlocked.Increment(ref executionCount); executed.Release(); return Task.CompletedTask; });
 
         using var cts = new CancellationTokenSource();
         await sut.StartAsync(cts.Token);
 
-        // No execution yet — still in initial delay
-        await Task.Delay(50);
+        // Still in initial delay — no execution yet
+        await Task.Yield();
         Assert.AreEqual(0, executionCount, "Should not have executed during initial delay");
 
         // Trigger with a custom delay during the initial delay
-        sut.PublicTriggerExecutionWithDelay(TimeSpan.FromMilliseconds(50));
-        await Task.Delay(100);
+        sut.PublicTriggerExecutionWithDelay(TimeSpan.FromMinutes(5));
+        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)));
         Assert.AreEqual(1, executionCount, "Should have executed once after trigger interrupted delay");
 
         // The custom delay should NOT be applied after the first execution —
-        // the strategy was consumed when the initial delay was interrupted.
-        // The next wait should use the normal 30s period, so no more executions.
-        await Task.Delay(200);
+        // it was consumed when the initial delay was interrupted.
+        // Next wait should use the normal 1h period.
+        timeProvider.Advance(TimeSpan.FromMinutes(59));
+        await Task.Yield();
         Assert.AreEqual(1, executionCount, "Custom delay should not leak — next wait uses normal period");
+
+        timeProvider.Advance(TimeSpan.FromMinutes(1));
+        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)));
+        Assert.AreEqual(2, executionCount, "Should execute after normal period");
 
         cts.Cancel();
         await sut.StopAsync(CancellationToken.None);
@@ -260,14 +376,21 @@ public class RecurringHostedServiceBaseTests
     public async Task Exception_In_PerformExecuteAsync_Does_Not_Kill_Loop()
     {
         var executionCount = 0;
+        var timeProvider = new FakeTimeProvider();
+        using var executed = new SemaphoreSlim(0);
         var sut = new TestRecurringHostedService(
-            period: TimeSpan.FromMilliseconds(50),
+            period: TimeSpan.FromMinutes(5),
             delay: TimeSpan.Zero,
+            timeProvider: timeProvider,
             onExecute: _ =>
             {
-                Interlocked.Increment(ref executionCount);
-                if (executionCount == 1)
+                var count = Interlocked.Increment(ref executionCount);
+                executed.Release();
+                if (count == 1)
                 {
+                    // Advance past the period so the next execution fires immediately
+                    // after the loop catches the exception (no wait needed).
+                    timeProvider.Advance(TimeSpan.FromMinutes(5));
                     throw new InvalidOperationException("Test exception");
                 }
                 return Task.CompletedTask;
@@ -276,78 +399,46 @@ public class RecurringHostedServiceBaseTests
         using var cts = new CancellationTokenSource();
         await sut.StartAsync(cts.Token);
 
-        await Task.Delay(300);
+        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)), "First execution (throws) should complete");
+        Assert.AreEqual(1, executionCount);
+
+        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)), "Second execution should complete despite first throwing");
+        Assert.AreEqual(2, executionCount, "Loop should continue after exception");
+
         cts.Cancel();
         await sut.StopAsync(CancellationToken.None);
-
-        Assert.GreaterOrEqual(executionCount, 2, "Loop should continue after exception");
     }
 
     [Test]
-    public async Task ChangePeriod_Applies_New_Period_On_Next_Cycle()
+    public async Task ChangePeriod_Takes_Effect_Immediately()
     {
         var executionCount = 0;
-        var sut = new TestRecurringHostedService(
-            period: TimeSpan.FromMilliseconds(100),
-            delay: TimeSpan.Zero,
-            onExecute: _ => { Interlocked.Increment(ref executionCount); return Task.CompletedTask; });
-
-        using var cts = new CancellationTokenSource();
-        await sut.StartAsync(cts.Token);
-
-        // Wait for first execution + one period tick
-        await Task.Delay(250);
-        var countBeforeChange = executionCount;
-        Assert.GreaterOrEqual(countBeforeChange, 2, "Should have executed at least twice with short period");
-
-        // Change to a long period — subsequent executions should stop
-        sut.PublicChangePeriod(TimeSpan.FromSeconds(30));
-
-        // Allow one in-flight execution to complete, then snapshot
-        await Task.Delay(150);
-        var countAfterChange = executionCount;
-
-        // With a 30s period, no further executions should happen in the next 300ms
-        await Task.Delay(300);
-        Assert.AreEqual(countAfterChange, executionCount, "No additional executions should occur with long period");
-
-        cts.Cancel();
-        await sut.StopAsync(CancellationToken.None);
-    }
-
-    private async Task AssertTriggerExecutionBehavior(
-        Action<TestRecurringHostedService> trigger,
-        int expectedCountAfterTrigger,
-        string afterTriggerMessage,
-        int expectedCountAfterWait,
-        string afterWaitMessage)
-    {
-        var executionCount = 0;
+        var timeProvider = new FakeTimeProvider();
         using var executed = new SemaphoreSlim(0);
         var sut = new TestRecurringHostedService(
-            period: TimeSpan.FromSeconds(30),
+            period: TimeSpan.FromMinutes(10),
             delay: TimeSpan.Zero,
+            timeProvider: timeProvider,
             onExecute: _ => { Interlocked.Increment(ref executionCount); executed.Release(); return Task.CompletedTask; });
 
         using var cts = new CancellationTokenSource();
         await sut.StartAsync(cts.Token);
 
-        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)), "First execution should complete");
+        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)));
         Assert.AreEqual(1, executionCount);
 
-        trigger(sut);
+        // Change to a 1-hour period — should interrupt the in-flight wait immediately.
+        sut.PublicChangePeriod(TimeSpan.FromHours(1));
 
-        // Wait for all expected executions after the trigger
-        for (var i = executionCount; i < expectedCountAfterTrigger; i++)
-        {
-            Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)), afterTriggerMessage);
-        }
+        // Advancing the old 10min period should NOT trigger execution.
+        timeProvider.Advance(TimeSpan.FromMinutes(10));
+        await Task.Yield();
+        Assert.AreEqual(1, executionCount, "Should not execute at old period interval");
 
-        Assert.AreEqual(expectedCountAfterTrigger, executionCount, afterTriggerMessage);
-
-        // Verify no additional executions happen (period is 30s, so semaphore should time out)
-        Assert.IsFalse(await executed.WaitAsync(TimeSpan.FromMilliseconds(200)), afterWaitMessage);
-        Assert.AreEqual(expectedCountAfterWait, executionCount, afterWaitMessage);
+        // Advancing to 1h total from first execution should trigger.
+        timeProvider.Advance(TimeSpan.FromMinutes(50));
+        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)));
+        Assert.AreEqual(2, executionCount, "Should execute after new period");
 
         cts.Cancel();
         await sut.StopAsync(CancellationToken.None);
@@ -360,8 +451,8 @@ public class RecurringHostedServiceBaseTests
     {
         private readonly Func<CancellationToken, Task> _onExecute;
 
-        public TestRecurringHostedService(TimeSpan period, TimeSpan delay, Func<CancellationToken, Task> onExecute)
-            : base(null, period, delay)
+        public TestRecurringHostedService(TimeSpan period, TimeSpan delay, TimeProvider timeProvider, Func<CancellationToken, Task> onExecute)
+            : base(null, period, delay, timeProvider)
         {
             _onExecute = onExecute;
         }

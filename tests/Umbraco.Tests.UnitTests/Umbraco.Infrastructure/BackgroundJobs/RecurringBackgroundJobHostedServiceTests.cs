@@ -204,6 +204,7 @@ public class RecurringBackgroundJobHostedServiceTests
             mockServerRegistrar.Object,
             mockEventAggregator.Object,
             Mock.Of<IEventMessagesFactory>(),
-            mockJob.Object);
+            mockJob.Object,
+            TimeProvider.System);
     }
 }

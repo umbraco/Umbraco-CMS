@@ -59,6 +59,7 @@ public class RecurringBackgroundJobHostedService<TJob> : RecurringHostedServiceB
     /// <param name="eventAggregator">Handles the publishing and subscribing of application events.</param>
     /// <param name="eventMessagesFactory">The event messages factory.</param>
     /// <param name="job">The recurring background job instance to be managed and executed by this service.</param>
+    /// <param name="timeProvider">The time provider used for scheduling and elapsed time measurement.</param>
     public RecurringBackgroundJobHostedService(
         IRuntimeState runtimeState,
         ILogger<RecurringBackgroundJobHostedService<TJob>> logger,
@@ -66,8 +67,9 @@ public class RecurringBackgroundJobHostedService<TJob> : RecurringHostedServiceB
         IServerRoleAccessor serverRoleAccessor,
         IEventAggregator eventAggregator,
         IEventMessagesFactory eventMessagesFactory,
-        TJob job)
-        : base(logger, job.Period, job.Delay)
+        TJob job,
+        TimeProvider timeProvider)
+        : base(logger, job.Period, job.Delay, timeProvider)
     {
         _runtimeState = runtimeState;
         _logger = logger;
@@ -89,7 +91,7 @@ public class RecurringBackgroundJobHostedService<TJob> : RecurringHostedServiceB
     /// <param name="serverRoleAccessor">Determines the current server's role in a multi-server environment.</param>
     /// <param name="eventAggregator">Handles the publishing and subscribing of application events.</param>
     /// <param name="job">The recurring background job instance to be managed and executed by this service.</param>
-    [Obsolete("Use the overload accepting IEventMessagesFactory instead. This overload will be removed in Umbraco 19.")]
+    [Obsolete("Use the constructor accepting IEventMessagesFactory and TimeProvider instead. Scheduled for removal in Umbraco 19.")]
     public RecurringBackgroundJobHostedService(
        IRuntimeState runtimeState,
        ILogger<RecurringBackgroundJobHostedService<TJob>> logger,
@@ -97,7 +99,7 @@ public class RecurringBackgroundJobHostedService<TJob> : RecurringHostedServiceB
        IServerRoleAccessor serverRoleAccessor,
        IEventAggregator eventAggregator,
        TJob job)
-       : this(runtimeState, logger, mainDom, serverRoleAccessor, eventAggregator, StaticServiceProvider.Instance.GetRequiredService<IEventMessagesFactory>(), job)
+       : this(runtimeState, logger, mainDom, serverRoleAccessor, eventAggregator, StaticServiceProvider.Instance.GetRequiredService<IEventMessagesFactory>(), job, TimeProvider.System)
     { }
 
     /// <inheritdoc />

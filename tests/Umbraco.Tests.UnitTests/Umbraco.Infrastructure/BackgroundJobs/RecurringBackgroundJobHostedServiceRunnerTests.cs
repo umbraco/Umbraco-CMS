@@ -101,7 +101,7 @@ public class RecurringBackgroundJobHostedServiceRunnerTests
     {
         var logger = Mock.Of<ILogger<RecurringBackgroundJobHostedServiceRunner>>();
         Func<IRecurringBackgroundJob, IHostedService> factory = job =>
-            new TestHostedService(job.Period, job.Delay, job);
+            new TestHostedService(job.Period, job.Delay, job, TimeProvider.System);
 
         return new RecurringBackgroundJobHostedServiceRunner(logger, jobs, factory);
     }
@@ -143,8 +143,8 @@ public class RecurringBackgroundJobHostedServiceRunnerTests
     {
         private readonly IRecurringBackgroundJob _job;
 
-        public TestHostedService(TimeSpan period, TimeSpan delay, IRecurringBackgroundJob job)
-            : base(null, period, delay)
+        public TestHostedService(TimeSpan period, TimeSpan delay, IRecurringBackgroundJob job, TimeProvider timeProvider)
+            : base(null, period, delay, timeProvider)
             => _job = job;
 
         public override Task PerformExecuteAsync(CancellationToken stoppingToken)

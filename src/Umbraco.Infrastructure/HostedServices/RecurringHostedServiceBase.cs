@@ -21,7 +21,9 @@ public abstract class RecurringHostedServiceBase : BackgroundService
 
     private readonly TimeSpan _delay;
     private readonly ILogger? _logger;
+    private readonly TimeProvider _timeProvider;
     private readonly SemaphoreSlim _signal = new(0, 1);
+    private CancellationTokenSource _periodChangeCts = new();
     private TimeSpan _period;
     private volatile TriggerState _triggerState = TriggerState.Default;
     private volatile bool _nextExecutionSkipOnOvershoot;
@@ -32,12 +34,25 @@ public abstract class RecurringHostedServiceBase : BackgroundService
     /// <param name="logger">Logger.</param>
     /// <param name="period">Timespan representing how often the task should recur.</param>
     /// <param name="delay">Timespan representing the initial delay after application start-up before the first run of the task occurs.</param>
-    protected RecurringHostedServiceBase(ILogger? logger, TimeSpan period, TimeSpan delay)
+    /// <param name="timeProvider">The time provider used for scheduling and elapsed time measurement.</param>
+    protected RecurringHostedServiceBase(ILogger? logger, TimeSpan period, TimeSpan delay, TimeProvider timeProvider)
     {
         _logger = logger;
         _period = period;
         _delay = delay;
+        _timeProvider = timeProvider;
     }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="RecurringHostedServiceBase" /> class.
+    /// </summary>
+    /// <param name="logger">Logger.</param>
+    /// <param name="period">Timespan representing how often the task should recur.</param>
+    /// <param name="delay">Timespan representing the initial delay after application start-up before the first run of the task occurs.</param>
+    [Obsolete("Use the constructor accepting TimeProvider. Scheduled for removal in Umbraco 19.")]
+    protected RecurringHostedServiceBase(ILogger? logger, TimeSpan period, TimeSpan delay)
+        : this(logger, period, delay, TimeProvider.System)
+    { }
 
     /// <summary>
     /// Determines the delay before the first run of a recurring task implemented as a hosted service when an optional configuration for the first run time is available.
@@ -99,7 +114,7 @@ public abstract class RecurringHostedServiceBase : BackgroundService
         {
             try
             {
-                bool signaled = await _signal.WaitAsync(_delay, stoppingToken);
+                bool signaled = await WaitForSignalAsync(_delay, CancellationToken.None, stoppingToken);
                 if (signaled)
                 {
                     // Trigger interrupted the initial delay — consume the trigger state, so it doesn't leak into WaitForNextExecutionAsync after the first execution
@@ -114,10 +129,9 @@ public abstract class RecurringHostedServiceBase : BackgroundService
         }
 
         TimeSpan nextDelayBasis = _period;
-
         while (!stoppingToken.IsCancellationRequested)
         {
-            var sw = Stopwatch.StartNew();
+            long startTimestamp = _timeProvider.GetTimestamp();
             try
             {
                 await PerformExecuteAsync(stoppingToken);
@@ -131,12 +145,9 @@ public abstract class RecurringHostedServiceBase : BackgroundService
                 ILogger logger = _logger ?? StaticApplicationLogging.CreateLogger(GetType());
                 logger.LogError(ex, "Unhandled exception in recurring hosted service.");
             }
-            finally
-            {
-                sw.Stop();
-            }
 
-            nextDelayBasis = await WaitForNextExecutionAsync(nextDelayBasis, sw.Elapsed, stoppingToken);
+            TimeSpan executionElapsed = _timeProvider.GetElapsedTime(startTimestamp);
+            nextDelayBasis = await WaitForNextExecutionAsync(nextDelayBasis, executionElapsed, stoppingToken);
         }
     }
 
@@ -170,42 +181,59 @@ public abstract class RecurringHostedServiceBase : BackgroundService
             return _period;
         }
 
-        var waitSw = Stopwatch.StartNew();
-        bool signaled;
-        try
-        {
-            signaled = await _signal.WaitAsync(delay, stoppingToken);
-        }
-        catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
-        {
-            return _period;
-        }
+        long waitStart = _timeProvider.GetTimestamp();
 
-        waitSw.Stop();
-
-        if (!signaled)
+        while (true)
         {
-            return _period; // Normal timeout — next wait uses normal period
-        }
-
-        TriggerState triggerState = Interlocked.Exchange(ref _triggerState, TriggerState.Default);
-        if (triggerState.Delay.HasValue)
-        {
-            return triggerState.Delay.Value;
-        }
-
-        TimeSpan remaining = ComputeNextDelay(delay, waitSw.Elapsed);
-
-        switch (triggerState.Strategy)
-        {
-            case NextExecutionStrategy.None:
-                _nextExecutionSkipOnOvershoot = true;
-                return remaining;
-            case NextExecutionStrategy.Replace:
-                return remaining + _period;
-            case NextExecutionStrategy.Reset:
-            default:
+            CancellationToken periodChangeToken = _periodChangeCts.Token;
+            bool signaled;
+            try
+            {
+                signaled = await WaitForSignalAsync(delay, periodChangeToken, stoppingToken);
+            }
+            catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+            {
                 return _period;
+            }
+
+            if (!signaled && periodChangeToken.IsCancellationRequested)
+            {
+                // Period changed — recalculate remaining delay with the new period and re-wait.
+                TimeSpan totalElapsed = executionElapsed + _timeProvider.GetElapsedTime(waitStart);
+                delay = ComputeNextDelay(_period, totalElapsed);
+                if (delay <= TimeSpan.Zero)
+                {
+                    return _period;
+                }
+
+                continue;
+            }
+
+            if (!signaled)
+            {
+                return _period; // Normal timeout — next wait uses normal period
+            }
+
+            TriggerState triggerState = Interlocked.Exchange(ref _triggerState, TriggerState.Default);
+            if (triggerState.Delay.HasValue)
+            {
+                return triggerState.Delay.Value;
+            }
+
+            TimeSpan waitElapsed = _timeProvider.GetElapsedTime(waitStart);
+            TimeSpan remaining = ComputeNextDelay(delay, waitElapsed);
+
+            switch (triggerState.Strategy)
+            {
+                case NextExecutionStrategy.None:
+                    _nextExecutionSkipOnOvershoot = true;
+                    return remaining;
+                case NextExecutionStrategy.Replace:
+                    return remaining + _period;
+                case NextExecutionStrategy.Reset:
+                default:
+                    return _period;
+            }
         }
     }
 
@@ -258,10 +286,17 @@ public abstract class RecurringHostedServiceBase : BackgroundService
     }
 
     /// <summary>
-    /// Change the period between operations. The new period takes effect on the next wait cycle.
+    /// Change the period between operations. The new period takes effect immediately, interrupting the current wait if necessary.
     /// </summary>
     /// <param name="newPeriod">The new period between tasks.</param>
-    protected void ChangePeriod(TimeSpan newPeriod) => _period = newPeriod;
+    protected void ChangePeriod(TimeSpan newPeriod)
+    {
+        _period = newPeriod;
+
+        CancellationTokenSource oldCts = Interlocked.Exchange(ref _periodChangeCts, new CancellationTokenSource());
+        oldCts.Cancel();
+        oldCts.Dispose();
+    }
 
     /// <summary>
     /// Signals the background loop to execute immediately.
@@ -290,6 +325,31 @@ public abstract class RecurringHostedServiceBase : BackgroundService
     {
         _triggerState = new TriggerState(Delay: nextDelay);
         ReleaseSignal();
+    }
+
+    /// <summary>
+    /// Waits for the semaphore to be signaled or for the timeout to expire, using the injected <see cref="TimeProvider" />.
+    /// </summary>
+    /// <param name="timeout">The maximum time to wait.</param>
+    /// <param name="periodChangeToken">A cancellation token that is signaled when the period changes.</param>
+    /// <param name="stoppingToken">A cancellation token for shutdown.</param>
+    /// <returns>
+    ///   <c>true</c> if the semaphore was signaled; <c>false</c> if the timeout expired or the period changed.
+    /// </returns>
+    private async Task<bool> WaitForSignalAsync(TimeSpan timeout, CancellationToken periodChangeToken, CancellationToken stoppingToken)
+    {
+        using var timeoutCts = new CancellationTokenSource(timeout, _timeProvider);
+        using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(timeoutCts.Token, periodChangeToken, stoppingToken);
+
+        try
+        {
+            await _signal.WaitAsync(linkedCts.Token);
+            return true;
+        }
+        catch (OperationCanceledException) when (!stoppingToken.IsCancellationRequested)
+        {
+            return false; // Timeout expired or period changed
+        }
     }
 
     private void ReleaseSignal()
@@ -323,6 +383,7 @@ public abstract class RecurringHostedServiceBase : BackgroundService
         if (disposing)
         {
             _signal.Dispose();
+            _periodChangeCts.Dispose();
         }
 
         base.Dispose();
