@@ -79,19 +79,19 @@ public class RecurringBackgroundJobHostedServiceRunnerTests
     public async Task TriggerExecution_Causes_Immediate_Execution()
     {
         var executionCount = 0;
-        var job = new TestJobA(onExecute: _ => { Interlocked.Increment(ref executionCount); return Task.CompletedTask; });
+        using var executed = new SemaphoreSlim(0);
+        var job = new TestJobA(onExecute: _ => { Interlocked.Increment(ref executionCount); executed.Release(); return Task.CompletedTask; });
 
         var sut = CreateRunner(job);
         await sut.StartAsync(CancellationToken.None);
 
         // Wait for first execution (no delay on TestJobA)
-        await Task.Delay(100);
+        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)), "First execution should complete");
         Assert.AreEqual(1, executionCount, "Should have executed once initially");
 
         // Trigger — period is 30s, so without trigger we wouldn't get another
         sut.TriggerExecution<TestJobA>();
-        await Task.Delay(100);
-
+        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)), "Triggered execution should complete");
         Assert.AreEqual(2, executionCount, "Should have executed again after trigger");
 
         await StopAsync(sut);
