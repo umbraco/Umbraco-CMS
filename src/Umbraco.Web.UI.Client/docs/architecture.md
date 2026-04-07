@@ -97,7 +97,7 @@ For the full manifest shape, alias conventions, registration methods, and how al
 
 ### Kinds
 
-Kinds are **generic, reusable implementations of an extension type**. A kind provides a pre-built `element`, `api`, or both for a specific purpose. Extensions reference a kind to inherit its implementation, then customize behavior through `meta`.
+Kinds are **generic, reusable manifests of an extension type**. A kind can provide a pre-built `element`, `api`, or both for a specific purpose. Extensions reference a kind to inherit its implementation, then customize behavior through `meta`.
 
 **How it works**: The registry merges kind defaults with the extension manifest. Extension properties override kind properties; `meta` is shallow-merged (extension meta extends/overrides kind meta).
 
