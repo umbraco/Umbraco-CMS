@@ -9,6 +9,7 @@ import type {
 	UmbTableItem,
 	UmbTableColumn,
 } from '@umbraco-cms/backoffice/components';
+import type { UmbWithOptionalDescriptionModel } from '@umbraco-cms/backoffice/models';
 
 import './entity-name-table-column-layout.element.js';
 
@@ -20,7 +21,6 @@ export class UmbTableCollectionViewElement extends UmbCollectionViewElementBase 
 	public set manifest(value: ManifestCollectionViewTableKind | undefined) {
 		this.#manifest = value;
 		this._manifestColumns = value?.meta?.columns ?? [];
-		this.#buildTableColumns();
 	}
 	public get manifest() {
 		return this.#manifest;
@@ -34,6 +34,8 @@ export class UmbTableCollectionViewElement extends UmbCollectionViewElementBase 
 
 	@state()
 	private _tableRows: Array<UmbTableItem> = [];
+
+	#hasDescriptions = false;
 
 	#buildTableColumns() {
 		const nameColumn: UmbTableColumn = {
@@ -53,7 +55,17 @@ export class UmbTableCollectionViewElement extends UmbCollectionViewElementBase 
 			align: 'right',
 		};
 
-		this._tableColumns = [nameColumn, ...manifestColumns, entityActionsColumn];
+		const descriptionColumn: UmbTableColumn = {
+			name: 'Description',
+			alias: 'description',
+		};
+
+		this._tableColumns = [
+			nameColumn,
+			...(this.#hasDescriptions ? [descriptionColumn] : []),
+			...manifestColumns,
+			entityActionsColumn,
+		];
 	}
 
 	override updated(changedProperties: any) {
@@ -67,6 +79,11 @@ export class UmbTableCollectionViewElement extends UmbCollectionViewElementBase 
 	}
 
 	#createTableRows() {
+		this.#hasDescriptions = this._items.some(
+			(item) => ((item as unknown as UmbWithOptionalDescriptionModel).description ?? '').length > 0,
+		);
+		this.#buildTableColumns();
+
 		this._tableRows = this._items.map((item) => {
 			const href = item.unique ? this._itemHrefs.get(item.unique) : undefined;
 
@@ -84,6 +101,14 @@ export class UmbTableCollectionViewElement extends UmbCollectionViewElementBase 
 						columnAlias: 'name',
 						value: { name: item.name, href },
 					},
+					...(this.#hasDescriptions
+						? [
+								{
+									columnAlias: 'description',
+									value: (item as unknown as UmbWithOptionalDescriptionModel).description ?? '',
+								},
+							]
+						: []),
 					...manifestColumnData,
 					{
 						columnAlias: 'entityActions',
