@@ -16,6 +16,7 @@ public class PasswordConfigurationPresentationFactory : IPasswordConfigurationPr
     /// Initializes a new instance of the <see cref="PasswordConfigurationPresentationFactory"/> class.
     /// </summary>
     /// <param name="securitySettings">An <see cref="IOptionsSnapshot{T}"/> containing the current <see cref="SecuritySettings"/> for user password configuration.</param>
+    [ActivatorUtilitiesConstructor]
     public PasswordConfigurationPresentationFactory(IOptionsSnapshot<SecuritySettings> securitySettings)
         => _securitySettings = securitySettings.Value;
 

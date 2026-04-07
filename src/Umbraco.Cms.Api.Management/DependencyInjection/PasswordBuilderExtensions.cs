@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Factories;
 
 namespace Umbraco.Cms.Api.Management.DependencyInjection;
 
@@ -11,7 +12,7 @@ public static class PasswordBuilderExtensions
 {
     internal static IUmbracoBuilder AddPasswordConfiguration(this IUmbracoBuilder builder)
     {
-        builder.Services.AddTransient<IPasswordConfigurationPresentationFactory, PasswordConfigurationPresentationFactory>();
+        builder.Services.AddTransient<IPasswordConfigurationPresentationFactory>(sp => ActivatorUtilities.CreateInstance<PasswordConfigurationPresentationFactory>(sp));
         return builder;
     }
 }

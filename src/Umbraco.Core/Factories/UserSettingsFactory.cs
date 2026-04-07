@@ -22,6 +22,7 @@ public class UserSettingsFactory : IUserSettingsFactory
     /// </summary>
     /// <param name="securitySettings">The user password configuration settings.</param>
     /// <param name="localizedTextService">The localized text service for retrieving localized descriptions.</param>
+    [ActivatorUtilitiesConstructor]
     public UserSettingsFactory(
         IOptions<SecuritySettings> securitySettings,
         ILocalizedTextService localizedTextService)

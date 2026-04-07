@@ -10,6 +10,7 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services.Installer;
 using Umbraco.Cms.Infrastructure.Factories.Installer;
 using Umbraco.Cms.Infrastructure.Installer.Steps;
+using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
 namespace Umbraco.Cms.Api.Management.DependencyInjection;
 
@@ -22,7 +23,7 @@ public static class InstallerBuilderExtensions
     {
         IServiceCollection services = builder.Services;
 
-        services.AddTransient<IUserSettingsFactory, UserSettingsFactory>();
+        services.AddTransient<IUserSettingsFactory>(sp => ActivatorUtilities.CreateInstance<UserSettingsFactory>(sp));
         services.AddTransient<IInstallSettingsFactory, InstallSettingsFactory>();
         services.AddTransient<IDatabaseSettingsFactory, DatabaseSettingsFactory>();
 
