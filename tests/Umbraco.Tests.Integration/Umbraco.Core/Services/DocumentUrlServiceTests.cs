@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Sync;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
@@ -240,7 +241,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
             ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
         }
 
-        return DocumentUrlService.GetDocumentKeyByRoute(route, isoCode,  null, loadDraft)?.ToString()?.ToUpper();
+        return DocumentUrlService.GetDocumentKeyByRoute(route, isoCode, null, loadDraft)?.ToString()?.ToUpper();
     }
 
     [Test]
@@ -265,7 +266,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
         });
 
         // Act
-        ContentService.Unpublish(Textpage );
+        ContentService.Unpublish(Textpage);
 
         Assert.Multiple(() =>
         {
@@ -330,7 +331,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
             ContentService.PublishBranch(secondRoot, PublishBranchFilter.IncludeUnpublished, ["*"]);
         }
 
-        return DocumentUrlService.GetDocumentKeyByRoute(route, isoCode,  null, loadDraft)?.ToString()?.ToUpper();
+        return DocumentUrlService.GetDocumentKeyByRoute(route, isoCode, null, loadDraft)?.ToString()?.ToUpper();
     }
 
     [TestCase("/child-of-second-root", "en-US", true, ExpectedResult = "FF6654FB-BC68-4A65-8C6C-135567F50BD6")]
@@ -354,7 +355,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
             ContentService.PublishBranch(secondRoot, PublishBranchFilter.IncludeUnpublished, ["*"]);
         }
 
-        return DocumentUrlService.GetDocumentKeyByRoute(route, isoCode,  null, loadDraft)?.ToString()?.ToUpper();
+        return DocumentUrlService.GetDocumentKeyByRoute(route, isoCode, null, loadDraft)?.ToString()?.ToUpper();
     }
 
     [TestCase(TextpageKey, "en-US", ExpectedResult = "/")]
@@ -779,7 +780,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
         var database = ScopeAccessor.AmbientScope!.Database;
 
         // Delete any existing URL rows to start clean.
-        database.Execute("DELETE FROM umbracoDocumentUrl");
+        database.Execute(database.SqlContext.Sql().Delete<DocumentUrlDto>());
 
         // Insert stale rows: one per (document × language × draft/published).
         // These simulate pre-v17.3 data where invariant documents had per-language rows.
@@ -791,7 +792,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
                 foreach (var isDraft in new[] { true, false })
                 {
                     database.Execute(
-                        "INSERT INTO umbracoDocumentUrl (uniqueId, languageId, isDraft, urlSegment, isPrimary) VALUES (@0, @1, @2, @3, @4)",
+                        $"INSERT INTO {QTab("umbracoDocumentUrl")} ({QCol("uniqueId")}, {QCol("languageId")}, {QCol("isDraft")}, {QCol("urlSegment")}, {QCol("isPrimary")}) VALUES (@0, @1, @2, @3, @4)",
                         documentKey,
                         languageId,
                         isDraft,
@@ -833,7 +834,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
         Assert.DoesNotThrow(() => DocumentUrlRepository.Save(newSegments));
 
         // Verify: old rows deleted, new rows inserted.
-        var remainingRows = database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoDocumentUrl");
+        var remainingRows = database.ExecuteScalar<int>(database.SqlContext.Sql().SelectCount<DocumentUrlDto>());
         Assert.That(
             remainingRows,
             Is.EqualTo(newSegments.Count),
