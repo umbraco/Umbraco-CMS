@@ -118,4 +118,4 @@ For step-by-step instructions on adding localization keys and using them in elem
 7. **Declare custom manifest types** on `UmbExtensionManifestMap` so other packages can extend yours.
 8. **No hardcoded UI strings** — use the localization system. See [Localization](#localization) above and the `general-add-localization` skill.
 9. **Element naming**: `umb-` prefix for core. Package developers use their own prefix.
-10. **Extension aliases**: Dot-separated namespace (`Umb.Section.Content`, `My.Dashboard.Analytics`).
+10. **Extension aliases**: Dot-separated namespace — see [Manifests & Aliases — Naming Convention](./manifests.md#naming-convention).
