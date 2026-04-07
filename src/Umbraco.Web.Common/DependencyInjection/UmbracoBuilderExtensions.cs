@@ -275,6 +275,14 @@ public static partial class UmbracoBuilderExtensions
     /// </summary>
     public static IUmbracoBuilder AddWebComponents(this IUmbracoBuilder builder)
     {
+        // Idempotency check - safe to call multiple times.
+        if (builder.Services.Any(s => s.ServiceType == typeof(AddWebComponentsMarker)))
+        {
+            return builder;
+        }
+
+        builder.Services.AddSingleton<AddWebComponentsMarker>();
+
         // Add service session
         // This can be overwritten by the user by adding their own call to AddSession
         // since the last call of AddSession take precedence
@@ -398,6 +406,13 @@ public static partial class UmbracoBuilderExtensions
     /// Marker class to ensure AddCore is only executed once.
     /// </summary>
     private sealed class AddCoreMarker
+    {
+    }
+
+    /// <summary>
+    /// Marker class to ensure AddWebComponents is only executed once.
+    /// </summary>
+    private sealed class AddWebComponentsMarker
     {
     }
 }
