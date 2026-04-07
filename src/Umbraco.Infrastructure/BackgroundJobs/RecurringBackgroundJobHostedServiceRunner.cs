@@ -54,9 +54,10 @@ public class RecurringBackgroundJobHostedServiceRunner : IHostedService
 
                 await hostedService.StartAsync(cancellationToken).ConfigureAwait(false);
             }
-            catch (Exception exception)
+            catch (Exception ex)
             {
-                _logger.LogError(exception, "Failed to start background hosted service for {job}", jobType.Name);
+                _hostedServices.TryRemove(jobType, out _);
+                _logger.LogError(ex, "Failed to start background hosted service for {job}", jobType.Name);
             }
         }
 
