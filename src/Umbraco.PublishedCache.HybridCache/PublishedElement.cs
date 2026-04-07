@@ -174,13 +174,13 @@ internal class PublishedElement : PublishableContentBase, IPublishedElement
         if (!ContentNode.HasPublished)
         {
             // In preview mode, the ContentNode only has draft data loaded (published data
-            // is stored in a separate cache entry). Fall back to IPublishStatusQueryService
+            // is stored in a separate cache entry). Fall back to IDocumentPublishStatusQueryService
             // which is an in-memory service that tracks actual document publish status.
             if (_isPreviewing && ItemType == PublishedItemType.Content)
             {
                 culture ??= VariationContextAccessor.VariationContext?.Culture ?? string.Empty;
-                IPublishStatusQueryService publishStatusQueryService =
-                    StaticServiceProvider.Instance.GetRequiredService<IPublishStatusQueryService>();
+                IDocumentPublishStatusQueryService publishStatusQueryService =
+                    StaticServiceProvider.Instance.GetRequiredService<IDocumentPublishStatusQueryService>();
                 return publishStatusQueryService.IsDocumentPublished(Key, culture);
             }
 

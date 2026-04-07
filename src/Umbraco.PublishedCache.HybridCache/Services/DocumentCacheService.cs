@@ -31,7 +31,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService
     private readonly IEnumerable<IDocumentSeedKeyProvider> _seedKeyProviders;
     private readonly IPublishedModelFactory _publishedModelFactory;
     private readonly IPreviewService _previewService;
-    private readonly IPublishStatusQueryService _publishStatusQueryService;
+    private readonly IDocumentPublishStatusQueryService _publishStatusQueryService;
     private readonly CacheSettings _cacheSettings;
     private readonly ILogger<DocumentCacheService> _logger;
     private HashSet<Guid>? _seedKeys;
@@ -69,7 +69,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService
         IOptions<CacheSettings> cacheSettings,
         IPublishedModelFactory publishedModelFactory,
         IPreviewService previewService,
-        IPublishStatusQueryService publishStatusQueryService,
+        IDocumentPublishStatusQueryService publishStatusQueryService,
         ILogger<DocumentCacheService> logger)
     {
         _databaseCacheRepository = databaseCacheRepository;

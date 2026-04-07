@@ -36,13 +36,51 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
     private readonly IContentService _contentService;
     private readonly IDocumentCacheService _documentCacheService;
     private readonly ICacheManager _cacheManager;
-    private readonly IPublishStatusManagementService _publishStatusManagementService;
+    private readonly IDocumentPublishStatusManagementService _publishStatusManagementService;
     private readonly IIdKeyMap _idKeyMap;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ContentCacheRefresher"/> class.
     /// </summary>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
+    public ContentCacheRefresher(
+        AppCaches appCaches,
+        IJsonSerializer serializer,
+        IIdKeyMap idKeyMap,
+        IDomainService domainService,
+        IEventAggregator eventAggregator,
+        ICacheRefresherNotificationFactory factory,
+        IDocumentUrlService documentUrlService,
+        IDocumentUrlAliasService documentUrlAliasService,
+        IDomainCacheService domainCacheService,
+        IDocumentNavigationQueryService documentNavigationQueryService,
+        IDocumentNavigationManagementService documentNavigationManagementService,
+        IContentService contentService,
+        IDocumentPublishStatusManagementService publishStatusManagementService,
+        IDocumentCacheService documentCacheService,
+        ICacheManager cacheManager)
+        : base(appCaches, serializer, eventAggregator, factory)
+    {
+        _idKeyMap = idKeyMap;
+        _domainService = domainService;
+        _domainCacheService = domainCacheService;
+        _documentUrlService = documentUrlService;
+        _documentUrlAliasService = documentUrlAliasService;
+        _documentNavigationQueryService = documentNavigationQueryService;
+        _documentNavigationManagementService = documentNavigationManagementService;
+        _contentService = contentService;
+        _documentCacheService = documentCacheService;
+        _publishStatusManagementService = publishStatusManagementService;
+
+        // TODO: Ideally we should inject IElementsCache
+        // this interface is in infrastructure, and changing this is very breaking
+        // so as long as we have the cache manager, which casts the IElementsCache to a simple AppCache we might as well use that.
+        _cacheManager = cacheManager;
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ContentCacheRefresher"/> class.
+    /// </summary>
+    [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in Umbraco 19.")]
     public ContentCacheRefresher(
         AppCaches appCaches,
         IJsonSerializer serializer,
@@ -71,7 +109,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
             documentNavigationQueryService,
             documentNavigationManagementService,
             contentService,
-            publishStatusManagementService,
+            StaticServiceProvider.Instance.GetRequiredService<IDocumentPublishStatusManagementService>(),
             documentCacheService,
             cacheManager)
     {
@@ -80,6 +118,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
     /// <summary>
     /// Initializes a new instance of the <see cref="ContentCacheRefresher"/> class.
     /// </summary>
+    [Obsolete("Please use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
     public ContentCacheRefresher(
         AppCaches appCaches,
         IJsonSerializer serializer,
@@ -96,23 +135,63 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
         IPublishStatusManagementService publishStatusManagementService,
         IDocumentCacheService documentCacheService,
         ICacheManager cacheManager)
-        : base(appCaches, serializer, eventAggregator, factory)
+        : this(
+            appCaches,
+            serializer,
+            idKeyMap,
+            domainService,
+            eventAggregator,
+            factory,
+            documentUrlService,
+            documentUrlAliasService,
+            domainCacheService,
+            documentNavigationQueryService,
+            documentNavigationManagementService,
+            contentService,
+            StaticServiceProvider.Instance.GetRequiredService<IDocumentPublishStatusManagementService>(),
+            documentCacheService,
+            cacheManager)
     {
-        _idKeyMap = idKeyMap;
-        _domainService = domainService;
-        _domainCacheService = domainCacheService;
-        _documentUrlService = documentUrlService;
-        _documentUrlAliasService = documentUrlAliasService;
-        _documentNavigationQueryService = documentNavigationQueryService;
-        _documentNavigationManagementService = documentNavigationManagementService;
-        _contentService = contentService;
-        _documentCacheService = documentCacheService;
-        _publishStatusManagementService = publishStatusManagementService;
+    }
 
-        // TODO: Ideally we should inject IElementsCache
-        // this interface is in infrastructure, and changing this is very breaking
-        // so as long as we have the cache manager, which casts the IElementsCache to a simple AppCache we might as well use that.
-        _cacheManager = cacheManager;
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ContentCacheRefresher"/> class.
+    /// </summary>
+    [Obsolete("Please use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
+    public ContentCacheRefresher(
+        AppCaches appCaches,
+        IJsonSerializer serializer,
+        IIdKeyMap idKeyMap,
+        IDomainService domainService,
+        IEventAggregator eventAggregator,
+        ICacheRefresherNotificationFactory factory,
+        IDocumentUrlService documentUrlService,
+        IDocumentUrlAliasService documentUrlAliasService,
+        IDomainCacheService domainCacheService,
+        IDocumentNavigationQueryService documentNavigationQueryService,
+        IDocumentNavigationManagementService documentNavigationManagementService,
+        IContentService contentService,
+        IPublishStatusManagementService publishStatusManagementService,
+        IDocumentPublishStatusManagementService documentPublishStatusManagementService,
+        IDocumentCacheService documentCacheService,
+        ICacheManager cacheManager)
+        : this(
+            appCaches,
+            serializer,
+            idKeyMap,
+            domainService,
+            eventAggregator,
+            factory,
+            documentUrlService,
+            documentUrlAliasService,
+            domainCacheService,
+            documentNavigationQueryService,
+            documentNavigationManagementService,
+            contentService,
+            documentPublishStatusManagementService,
+            documentCacheService,
+            cacheManager)
+    {
     }
 
     #region Indirect

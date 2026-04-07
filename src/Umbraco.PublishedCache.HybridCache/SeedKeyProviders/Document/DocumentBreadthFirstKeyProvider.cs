@@ -6,13 +6,13 @@ namespace Umbraco.Cms.Infrastructure.HybridCache.SeedKeyProviders.Document;
 
 internal sealed class DocumentBreadthFirstKeyProvider : BreadthFirstKeyProvider, IDocumentSeedKeyProvider
 {
-    private readonly IPublishStatusQueryService _publishStatusService;
+    private readonly IDocumentPublishStatusQueryService _publishStatusService;
     private readonly int _seedCount;
 
     public DocumentBreadthFirstKeyProvider(
         IDocumentNavigationQueryService documentNavigationQueryService,
         IOptions<CacheSettings> cacheSettings,
-        IPublishStatusQueryService publishStatusService)
+        IDocumentPublishStatusQueryService publishStatusService)
         : base(documentNavigationQueryService, cacheSettings.Value.DocumentBreadthFirstSeedCount)
     {
         _publishStatusService = publishStatusService;

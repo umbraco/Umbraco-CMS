@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Core.Services.Navigation;
 internal sealed class PublishedContentStatusFilteringService : IPublishedContentStatusFilteringService
 {
     private readonly IVariationContextAccessor _variationContextAccessor;
-    private readonly IPublishStatusQueryService _publishStatusQueryService;
+    private readonly IDocumentPublishStatusQueryService _publishStatusQueryService;
     private readonly IPreviewService _previewService;
     private readonly IPublishedContentCache _publishedContentCache;
 
@@ -28,7 +28,7 @@ internal sealed class PublishedContentStatusFilteringService : IPublishedContent
     /// <param name="publishedContentCache">The published content cache for retrieving content items.</param>
     public PublishedContentStatusFilteringService(
         IVariationContextAccessor variationContextAccessor,
-        IPublishStatusQueryService publishStatusQueryService,
+        IDocumentPublishStatusQueryService publishStatusQueryService,
         IPreviewService previewService,
         IPublishedContentCache publishedContentCache)
     {

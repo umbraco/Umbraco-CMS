@@ -150,7 +150,7 @@ public class PropertyValueConverterTests : DeliveryApiTests
         IOptionsMonitor<RequestHandlerSettings>? requestHandlerSettingsMonitor = null,
         IPublishedContentCache? contentCache = null,
         IDocumentNavigationQueryService? navigationQueryService = null,
-        IPublishStatusQueryService? publishStatusQueryService = null,
+        IDocumentPublishStatusQueryService? publishStatusQueryService = null,
         IDocumentUrlService? documentUrlService = null)
     {
         contentCache ??= PublishedContentCacheMock.Object;

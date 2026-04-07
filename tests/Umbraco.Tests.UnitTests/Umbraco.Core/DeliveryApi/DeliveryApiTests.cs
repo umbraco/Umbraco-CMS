@@ -22,7 +22,7 @@ public class DeliveryApiTests
 
     protected IPublishedPropertyType DefaultPropertyType { get; private set; }
 
-    protected IPublishStatusQueryService PublishStatusQueryService { get; private set; }
+    protected IDocumentPublishStatusQueryService PublishStatusQueryService { get; private set; }
 
     [SetUp]
     public virtual void Setup()
@@ -62,7 +62,7 @@ public class DeliveryApiTests
 
         DefaultPropertyType = SetupPublishedPropertyType(defaultPropertyValueConverter.Object, "default", "Default.Editor");
 
-        var publishStatusQueryService = new Mock<IPublishStatusQueryService>();
+        var publishStatusQueryService = new Mock<IDocumentPublishStatusQueryService>();
         publishStatusQueryService
             .Setup(x => x.IsDocumentPublished(It.IsAny<Guid>(), It.IsAny<string>()))
             .Returns(true);
@@ -140,7 +140,7 @@ public class DeliveryApiTests
         IOptionsMonitor<RequestHandlerSettings>? requestHandlerSettingsMonitor = null,
         IPublishedContentCache? contentCache = null,
         IDocumentNavigationQueryService? navigationQueryService = null,
-        IPublishStatusQueryService? publishStatusQueryService = null,
+        IDocumentPublishStatusQueryService? publishStatusQueryService = null,
         IDocumentUrlService? documentUrlService = null)
     {
         if (requestHandlerSettingsMonitor == null)

@@ -353,12 +353,12 @@ public partial class PublishedContentStatusFilteringServiceTests
             items);
     }
 
-    private IPublishStatusQueryService SetupPublishStatusQueryService(Dictionary<Guid, IPublishedContent> items)
+    private IDocumentPublishStatusQueryService SetupPublishStatusQueryService(Dictionary<Guid, IPublishedContent> items)
         => SetupPublishStatusQueryService(items, id => id % 2 == 0);
 
-    private IPublishStatusQueryService SetupPublishStatusQueryService(Dictionary<Guid, IPublishedContent> items, Func<int, bool> idIsPublished)
+    private IDocumentPublishStatusQueryService SetupPublishStatusQueryService(Dictionary<Guid, IPublishedContent> items, Func<int, bool> idIsPublished)
     {
-        var publishStatusQueryService = new Mock<IPublishStatusQueryService>();
+        var publishStatusQueryService = new Mock<IDocumentPublishStatusQueryService>();
         publishStatusQueryService
             .Setup(p => p.IsDocumentPublished(It.IsAny<Guid>(), It.IsAny<string>()))
             .Returns((Guid key, string culture) => items

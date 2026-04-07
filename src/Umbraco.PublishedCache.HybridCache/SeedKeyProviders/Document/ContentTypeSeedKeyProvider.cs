@@ -10,14 +10,14 @@ internal sealed class ContentTypeSeedKeyProvider : IDocumentSeedKeyProvider
 {
     private readonly ICoreScopeProvider _scopeProvider;
     private readonly IDatabaseCacheRepository _databaseCacheRepository;
-    private readonly IPublishStatusQueryService _publishStatusService;
+    private readonly IDocumentPublishStatusQueryService _publishStatusService;
     private readonly CacheSettings _cacheSettings;
 
     public ContentTypeSeedKeyProvider(
         ICoreScopeProvider scopeProvider,
         IDatabaseCacheRepository databaseCacheRepository,
         IOptions<CacheSettings> cacheSettings,
-        IPublishStatusQueryService publishStatusService)
+        IDocumentPublishStatusQueryService publishStatusService)
     {
         _scopeProvider = scopeProvider;
         _databaseCacheRepository = databaseCacheRepository;

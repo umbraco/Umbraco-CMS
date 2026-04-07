@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 namespace Umbraco.Cms.Core.Models;
 
 /// <summary>
-///     Represents configuration settings for the Umbraco content and media cache.
+///     Represents configuration settings for the Umbraco content, media and element cache.
 /// </summary>
 /// <remarks>
 ///     This class configures cache seeding behavior and cache entry durations for
@@ -25,6 +25,11 @@ public class CacheSettings
     internal const int StaticMediaBreadthFirstSeedCount = 100;
 
     /// <summary>
+    ///     The default number of elements to seed using breadth-first traversal.
+    /// </summary>
+    internal const int StaticElementBreadthFirstSeedCount = 100;
+
+    /// <summary>
     ///     The default batch size for seeding documents.
     /// </summary>
     internal const int StaticDocumentSeedBatchSize = 100;
@@ -33,11 +38,6 @@ public class CacheSettings
     ///     The default batch size for seeding media items.
     /// </summary>
     internal const int StaticMediaSeedBatchSize = 100;
-
-    /// <summary>
-    ///     The default number of elements to seed.
-    /// </summary>
-    internal const int StaticElementSeedCount = 100;
 
     /// <summary>
     ///     The default batch size for seeding element items.
@@ -63,6 +63,12 @@ public class CacheSettings
     public int MediaBreadthFirstSeedCount { get; set; } = StaticDocumentBreadthFirstSeedCount;
 
     /// <summary>
+    /// Gets or sets a value for the element breadth first seed count.
+    /// </summary>
+    [DefaultValue(StaticElementBreadthFirstSeedCount)]
+    public int ElementBreadthFirstSeedCount { get; set; } = StaticElementBreadthFirstSeedCount;
+
+    /// <summary>
     /// Gets or sets a value for the document seed batch size.
     /// </summary>
     [DefaultValue(StaticDocumentSeedBatchSize)]
@@ -75,19 +81,13 @@ public class CacheSettings
     public int MediaSeedBatchSize { get; set; } = StaticMediaSeedBatchSize;
 
     /// <summary>
-    /// Gets or sets a value for the element seed count.
-    /// </summary>
-    [DefaultValue(StaticElementSeedCount)]
-    public int ElementSeedCount { get; set; } = StaticElementSeedCount;
-
-    /// <summary>
     /// Gets or sets a value for the element seed batch size.
     /// </summary>
     [DefaultValue(StaticElementSeedBatchSize)]
     public int ElementSeedBatchSize { get; set; } = StaticElementSeedBatchSize;
 
     /// <summary>
-    ///     Gets or sets the cache entry settings for documents and media.
+    ///     Gets or sets the cache entry settings for documents, media and elements.
     /// </summary>
     public CacheEntry Entry { get; set; } = new CacheEntry();
 
