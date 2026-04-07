@@ -1,7 +1,10 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Security.Cryptography;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
@@ -36,12 +39,13 @@ internal class HideBackOfficeTokensHandlerTests
         public HideBackOfficeTokensHandler Sut => field ??= new HideBackOfficeTokensHandler(
             HttpContextAccessor.Object,
             DataProtectionProvider.Object,
+            NullLogger<HideBackOfficeTokensHandler>.Instance,
             Options.Create(BackOfficeTokenCookieSettings),
             Options.Create(GlobalSettings));
 
         public Mock<IHttpContextAccessor> HttpContextAccessor { get; } = new();
 
-        private Mock<IDataProtectionProvider> DataProtectionProvider { get; } = new();
+        public Mock<IDataProtectionProvider> DataProtectionProvider { get; } = new();
 
         public Mock<IDataProtector> DataProtector { get; } = new();
 
@@ -770,6 +774,86 @@ internal class HideBackOfficeTokensHandlerTests
             Assert.IsFalse(setup.DeletedCookies.Contains($"{SecureCookiePrefix}{AccessTokenCookieName}"));
             Assert.IsFalse(setup.DeletedCookies.Contains($"{SecureCookiePrefix}{RefreshTokenCookieName}"));
         }
+    }
+
+    #endregion
+
+    #region Decryption Failure Tests
+
+    [Test]
+    public async Task HandleAsync_ProcessAuthentication_DecryptionFailure_DoesNotRestoreToken()
+    {
+        // Arrange
+        var setup = new TestSetup();
+        setup.GlobalSettings.UseHttps = false;
+        var encryptedToken = setup.EncryptValue(AccessTokenValue);
+        setup.SetupHttpContext(isHttps: false, requestCookies: new Dictionary<string, string> { { AccessTokenCookieName, encryptedToken } });
+
+        // Make the protector throw on unprotect (simulating changed data protection keys)
+        setup.DataProtector.Setup(p => p.Unprotect(It.IsAny<byte[]>()))
+            .Throws(new CryptographicException("The payload was invalid."));
+
+        var context = CreateProcessAuthenticationContext(RedactedTokenValue);
+
+        // Act
+        await setup.Sut.HandleAsync(context);
+
+        // Assert - token should remain redacted (not restored), triggering a 401
+        Assert.AreEqual(RedactedTokenValue, context.AccessToken);
+        Assert.IsTrue(setup.DeletedCookies.Contains(AccessTokenCookieName));
+    }
+
+    [Test]
+    public async Task HandleAsync_ExtractTokenRequest_DecryptionFailure_NullsPkceCodeAndRefreshToken()
+    {
+        // Arrange
+        var setup = new TestSetup();
+        setup.GlobalSettings.UseHttps = false;
+        var encryptedCode = setup.EncryptValue(PkceCodeValue);
+        var encryptedToken = setup.EncryptValue(RefreshTokenValue);
+        setup.SetupHttpContext(isHttps: false, requestCookies: new Dictionary<string, string>
+        {
+            { PkceCodeCookieName, encryptedCode },
+            { RefreshTokenCookieName, encryptedToken },
+        });
+
+        // Make the protector throw on unprotect (simulating changed data protection keys)
+        setup.DataProtector.Setup(p => p.Unprotect(It.IsAny<byte[]>()))
+            .Throws(new CryptographicException("The payload was invalid."));
+
+        var context = CreateExtractTokenRequestContext(Constants.OAuthClientIds.BackOffice, RedactedTokenValue, RedactedTokenValue);
+
+        // Act
+        await setup.Sut.HandleAsync(context);
+
+        // Assert - both should be nulled since cookies couldn't be decrypted
+        Assert.IsNull(context.Request.Code);
+        Assert.IsNull(context.Request.RefreshToken);
+        Assert.IsTrue(setup.DeletedCookies.Contains(PkceCodeCookieName));
+        Assert.IsTrue(setup.DeletedCookies.Contains(RefreshTokenCookieName));
+    }
+
+    [Test]
+    public async Task HandleAsync_ExtractRevocationRequest_DecryptionFailure_NullsToken()
+    {
+        // Arrange
+        var setup = new TestSetup();
+        setup.GlobalSettings.UseHttps = false;
+        var encryptedToken = setup.EncryptValue(AccessTokenValue);
+        setup.SetupHttpContext(isHttps: false, requestCookies: new Dictionary<string, string> { { AccessTokenCookieName, encryptedToken } });
+
+        // Make the protector throw on unprotect (simulating changed data protection keys)
+        setup.DataProtector.Setup(p => p.Unprotect(It.IsAny<byte[]>()))
+            .Throws(new CryptographicException("The payload was invalid."));
+
+        var context = CreateExtractRevocationRequestContext(Constants.OAuthClientIds.BackOffice, RedactedTokenValue, "access_token");
+
+        // Act
+        await setup.Sut.HandleAsync(context);
+
+        // Assert - token should be nulled since cookie couldn't be decrypted
+        Assert.IsNull(context.Request.Token);
+        Assert.IsTrue(setup.DeletedCookies.Contains(AccessTokenCookieName));
     }
 
     #endregion

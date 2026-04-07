@@ -578,4 +578,31 @@ public interface ISqlSyntaxProvider
     /// <param name="constraintName">unlimited name.</param>
     /// <returns>truncated name.</returns>
     string TruncateConstraintName<T>(string constraintName) => constraintName;
+
+    /// <summary>
+    /// Gets the SQL to create a temporary table with the given name and column definitions.
+    /// </summary>
+    /// <param name="tableName">The base name for the temporary table (without any provider-specific prefix).</param>
+    /// <param name="columnDefinitionSql">The SQL column definitions (e.g., "Id INT NOT NULL PRIMARY KEY").</param>
+    /// <returns>A SQL statement that creates the temporary table.</returns>
+    // TODO (V19): Remove default implementation.
+    string CreateTempTable(string tableName, string columnDefinitionSql)
+        => $"CREATE TEMP TABLE {tableName} ({columnDefinitionSql})";
+
+    /// <summary>
+    /// Gets the properly qualified name for a temporary table, applying any provider-specific prefix.
+    /// </summary>
+    /// <param name="baseName">The base name for the temporary table.</param>
+    /// <returns>The qualified temporary table name.</returns>
+    // TODO (V19): Remove default implementation.
+    string TempTableName(string baseName) => baseName;
+
+    /// <summary>
+    /// Gets the SQL to drop a temporary table if it exists.
+    /// </summary>
+    /// <param name="tableName">The base name for the temporary table (without any provider-specific prefix).</param>
+    /// <returns>A SQL statement that drops the temporary table if it exists.</returns>
+    // TODO (V19): Remove default implementation.
+    string DropTempTable(string tableName)
+        => $"DROP TABLE IF EXISTS {tableName}";
 }

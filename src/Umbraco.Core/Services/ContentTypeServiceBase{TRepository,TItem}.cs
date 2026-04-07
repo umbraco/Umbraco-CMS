@@ -1364,6 +1364,20 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
 
     #region Allowed types
 
+    /// <summary>
+    /// Gets the content types that are candidates for being allowed at root.
+    /// </summary>
+    /// <remarks>
+    /// Override this in derived classes to change the filtering behavior. For example,
+    /// member types override this to return all member types, since members are a flat list.
+    /// </remarks>
+    /// <returns>The content types allowed at root before additional filtering.</returns>
+    protected virtual IEnumerable<TItem> GetAllowedAtRootCandidates()
+    {
+        IQuery<TItem> query = ScopeProvider.CreateQuery<TItem>().Where(x => x.AllowedAsRoot);
+        return Repository.Get(query).ToArray();
+    }
+
     /// <inheritdoc />
     public async Task<PagedModel<TItem>> GetAllAllowedAsRootAsync(int skip, int take)
     {
@@ -1372,18 +1386,19 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         // that one is special because it works across content, media and member types
         scope.ReadLock(Constants.Locks.ContentTypes, Constants.Locks.MediaTypes, Constants.Locks.MemberTypes);
 
-        IQuery<TItem> query = ScopeProvider.CreateQuery<TItem>().Where(x => x.AllowedAsRoot);
-        IEnumerable<TItem> contentTypes = Repository.Get(query).ToArray();
+        IEnumerable<TItem> contentTypes = GetAllowedAtRootCandidates();
 
         foreach (IContentTypeFilter filter in _contentTypeFilters)
         {
             contentTypes = await filter.FilterAllowedAtRootAsync(contentTypes);
         }
 
+        TItem[] materialized = contentTypes.ToArray();
+
         var pagedModel = new PagedModel<TItem>
         {
-            Total = contentTypes.Count(),
-            Items = contentTypes.Skip(skip).Take(take)
+            Total = materialized.Length,
+            Items = materialized.Skip(skip).Take(take)
         };
 
         return pagedModel;

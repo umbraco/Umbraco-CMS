@@ -261,9 +261,9 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
 
     internal OpenIddictApplicationDescriptor BackofficeOpenIddictApplicationDescriptor(Uri[] backOfficeHosts)
     {
-        if (_backOfficeHost is not null)
+        if (_backOfficeHost is not null && backOfficeHosts.Contains(_backOfficeHost) is false)
         {
-            backOfficeHosts = [_backOfficeHost];
+            backOfficeHosts = backOfficeHosts.Append(_backOfficeHost).ToArray();
         }
 
         var descriptor = new OpenIddictApplicationDescriptor
