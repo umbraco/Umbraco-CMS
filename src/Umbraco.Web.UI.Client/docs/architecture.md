@@ -91,7 +91,7 @@ Packages expose subpath exports (e.g., `@umbraco-cms/backoffice/dashboard`, `@um
 
 ### Extension Registry
 
-All UI and a few other customizations is registered as **Extension Manifests** — plain objects declaring type, alias, behavior, and activation conditions. The registry is mutable at runtime — extensions can be added, removed, or replaced.
+All UI and a few other customizations are registered as **Extension Manifests** — plain objects declaring type, alias, behavior, and activation conditions. The registry is mutable at runtime — extensions can be added, removed, or replaced.
 
 For the full manifest shape, alias conventions, registration methods, and how aliases connect extensions, see **[Manifests & Aliases](./manifests.md)**.
 
