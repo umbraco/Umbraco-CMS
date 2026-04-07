@@ -335,7 +335,6 @@ public class RecurringHostedServiceBaseTests
             onExecute: _ =>
             {
                 var count = Interlocked.Increment(ref executionCount);
-                executed.Release();
                 if (count == 1)
                 {
                     // Advance past the period so the next execution fires immediately
@@ -343,15 +342,16 @@ public class RecurringHostedServiceBaseTests
                     timeProvider.Advance(TimeSpan.FromMinutes(5));
                     throw new InvalidOperationException("Test exception");
                 }
+
+                executed.Release();
                 return Task.CompletedTask;
             });
 
         using var cts = new CancellationTokenSource();
         await sut.StartAsync(cts.Token);
 
-        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)), "First execution (throws) should complete");
-        Assert.AreEqual(1, executionCount);
-
+        // The first execution throws (after advancing time), so the loop immediately retries.
+        // The second execution succeeds and signals the semaphore.
         Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)), "Second execution should complete despite first throwing");
         Assert.AreEqual(2, executionCount, "Loop should continue after exception");
 
