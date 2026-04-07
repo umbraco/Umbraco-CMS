@@ -62,8 +62,8 @@ internal sealed partial class PublishStatusServiceTests
     [Test]
     public async Task AddOrUpdateStatusWithDescendantsAsync_Updates_Document_Path_Published_Status()
     {
-        var sut = new PublishStatusService(
-            GetRequiredService<ILogger<PublishStatusService>>(),
+        var sut = new DocumentPublishStatusService(
+            GetRequiredService<ILogger<DocumentPublishStatusService>>(),
             GetRequiredService<IPublishStatusRepository>(),
             GetRequiredService<ICoreScopeProvider>(),
             GetRequiredService<ILanguageService>(),
@@ -84,8 +84,8 @@ internal sealed partial class PublishStatusServiceTests
     [Test]
     public async Task AddOrUpdateStatusAsync_Updates_Document_Published_Status()
     {
-        var sut = new PublishStatusService(
-            GetRequiredService<ILogger<PublishStatusService>>(),
+        var sut = new DocumentPublishStatusService(
+            GetRequiredService<ILogger<DocumentPublishStatusService>>(),
             GetRequiredService<IPublishStatusRepository>(),
             GetRequiredService<ICoreScopeProvider>(),
             GetRequiredService<ILanguageService>(),
@@ -127,9 +127,9 @@ internal sealed partial class PublishStatusServiceTests
             await sut.AddOrUpdateStatusAsync(nonExistentKey, CancellationToken.None));
     }
 
-    private PublishStatusService CreatePublishedStatusService()
+    private DocumentPublishStatusService CreatePublishedStatusService()
         => new(
-            GetRequiredService<ILogger<PublishStatusService>>(),
+            GetRequiredService<ILogger<DocumentPublishStatusService>>(),
             GetRequiredService<IPublishStatusRepository>(),
             GetRequiredService<ICoreScopeProvider>(),
             GetRequiredService<ILanguageService>(),
