@@ -49,7 +49,7 @@ public class PatchDocumentController : PatchDocumentControllerBase
         CancellationToken cancellationToken,
         Guid id,
         PatchDocumentRequestModel requestModel)
-        => await HandleRequest(id, requestModel, async () =>
+        => await HandleRequest(id, async () =>
         {
             ContentPatchModel patchModel = _presentationFactory.MapPatchModel(requestModel);
 
