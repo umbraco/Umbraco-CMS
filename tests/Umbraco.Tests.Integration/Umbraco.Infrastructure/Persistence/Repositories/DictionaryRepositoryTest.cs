@@ -648,6 +648,75 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
         }
     }
 
+    [Test]
+    public async Task GetDictionaryItemDescendants_Returns_Only_Descendants_Not_Parent_Or_Unrelated()
+    {
+        // Arrange
+        var provider = NewScopeProvider;
+        using (var scope = provider.CreateScope())
+        {
+            var languageService = GetRequiredService<ILanguageService>();
+            var repository = CreateRepository();
+            var language = await languageService.GetAsync("en-US");
+
+            // Hierarchy of parent, child and grandchild.
+            var parent = (IDictionaryItem)new DictionaryItem("Parent")
+            {
+                Translations = new List<IDictionaryTranslation>
+                {
+                    new DictionaryTranslation(language, "Parent value"),
+                },
+            };
+            await repository.SaveAsync(parent, CancellationToken.None);
+
+            var child = (IDictionaryItem)new DictionaryItem(parent.Key, "Child")
+            {
+                Translations = new List<IDictionaryTranslation>
+                {
+                    new DictionaryTranslation(language, "Child value"),
+                },
+            };
+            await repository.SaveAsync(child, CancellationToken.None);
+
+            var grandchild = (IDictionaryItem)new DictionaryItem(child.Key, "Grandchild")
+            {
+                Translations = new List<IDictionaryTranslation>
+                {
+                    new DictionaryTranslation(language, "Grandchild value"),
+                },
+            };
+            await repository.SaveAsync(grandchild, CancellationToken.None);
+
+            // Create an unrelated item (no parent relationship to our hierarchy)
+            var unrelated = (IDictionaryItem)new DictionaryItem("Unrelated")
+            {
+                Translations = new List<IDictionaryTranslation>
+                {
+                    new DictionaryTranslation(language, "Unrelated value"),
+                },
+            };
+            await repository.SaveAsync(unrelated, CancellationToken.None);
+
+            // Act
+            var descendants = (await repository.GetDictionaryItemDescendantsAsync(parent.Key)).ToArray();
+
+            // Assert
+            Assert.That(descendants, Has.Length.EqualTo(2), "Should return child and grandchild only");
+
+            var descendantKeys = descendants.Select(x => x.ItemKey).ToArray();
+            Assert.That(descendantKeys, Does.Contain("Child"));
+            Assert.That(descendantKeys, Does.Contain("Grandchild"));
+            Assert.That(descendantKeys, Does.Not.Contain("Parent"));
+            Assert.That(descendantKeys, Does.Not.Contain("Unrelated"));
+
+            // Also verify the test data items from SetUp are not included
+            Assert.That(descendantKeys, Does.Not.Contain("Read More"));
+            Assert.That(descendantKeys, Does.Not.Contain("Article"));
+
+            scope.Complete();
+        }
+    }
+
     public async Task CreateTestData()
     {
         using var efCoreScope = NewScopeProvider.CreateScope();
