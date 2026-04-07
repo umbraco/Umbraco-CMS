@@ -196,6 +196,16 @@ export class UmbBadElement extends LitElement {
 - `@cssprop` - CSS custom properties
 - `@csspart` - CSS parts
 
+### Third-Party Library Names
+
+Use the correct capitalization for third-party libraries:
+
+| Library | Correct | Incorrect              |
+|---------|---------|------------------------|
+| Tiptap  | Tiptap  | TipTap, tipTap, TIPTAP |
+| Lit     | Lit     | LIT, lit (in prose)    |
+| RxJS    | RxJS    | rxjs (in prose), RXJS  |
+
 ### Documentation
 
 - **Public APIs**: JSDoc comments with `@description`, `@param`, `@returns`, `@example`
