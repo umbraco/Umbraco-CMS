@@ -1,6 +1,6 @@
 import type { ManifestCollectionView, MetaCollectionView } from '../collection-view.extension.js';
 
-export interface ManifestCollectionViewTableKind extends ManifestCollectionView {
+export interface ManifestCollectionViewTableKind extends Omit<ManifestCollectionView, 'meta'> {
 	type: 'collectionView';
 	kind: 'table';
 	meta: MetaCollectionViewTableKind;
@@ -11,7 +11,7 @@ export interface MetaCollectionViewTableKindColumn {
 	label: string;
 }
 
-export interface MetaCollectionViewTableKind extends MetaCollectionView {
+export interface MetaCollectionViewTableKind extends Partial<MetaCollectionView> {
 	columns?: Array<MetaCollectionViewTableKindColumn>;
 }
 
