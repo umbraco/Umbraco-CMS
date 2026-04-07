@@ -19,39 +19,4 @@ export const manifests: Array<UmbExtensionManifest> = [
 			},
 		],
 	},
-	{
-		type: 'collectionView',
-		kind: 'table',
-		alias: 'TEST',
-		name: 'Language Table Collection View',
-		meta: {
-			label: 'Table KIND',
-			icon: 'icon-table',
-			pathName: 'table2',
-			columns: [
-				{
-					field: 'unique',
-					label: 'ISO Code',
-				},
-				{
-					field: 'isDefault',
-					label: 'Default',
-				},
-				{
-					field: 'isMandatory',
-					label: 'Mandatory',
-				},
-				{
-					field: 'fallbackIsoCode',
-					label: 'Fallback',
-				},
-			],
-		},
-		conditions: [
-			{
-				alias: UMB_COLLECTION_ALIAS_CONDITION,
-				match: 'Umb.Collection.Language',
-			},
-		],
-	},
 ];
