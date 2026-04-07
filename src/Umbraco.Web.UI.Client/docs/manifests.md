@@ -1,6 +1,6 @@
 # Manifests & Aliases
 
-Every extension in the Backoffice is described by a **manifest** — a plain object that declares what the extension is, how it behaves, and when it should be active. Manifests are the fundamental building blocks of the extension-first architecture: all UI (sections, dashboards, property editors, workspaces, trees, actions) is registered via manifests. Any default behavior can be replaced, overridden, or removed.
+Every extension in the Backoffice is described by a **manifest** — a plain object that declares what the extension is, how it behaves, and when it should be active. Manifests are the fundamental building blocks of the extension-first architecture: all UI (sections, dashboards, property editors, workspaces, trees, actions) are registered via manifests. Any default behavior can be replaced, overridden, or removed.
 
 **Prerequisites**: [Architecture](./architecture.md)
 
