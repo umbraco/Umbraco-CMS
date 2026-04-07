@@ -1,6 +1,6 @@
 import { UmbCollectionViewElementBase } from '../umb-collection-view-element-base.js';
 import type { ManifestCollectionViewTableKind, MetaCollectionViewTableKindColumn } from './types.js';
-import { css, customElement, html, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type {
 	UmbTableSelectedEvent,
@@ -15,15 +15,12 @@ import './entity-name-table-column-layout.element.js';
 
 @customElement('umb-table-collection-view')
 export class UmbTableCollectionViewElement extends UmbCollectionViewElementBase {
-	#manifest: ManifestCollectionViewTableKind | undefined;
-
-	@property({ attribute: false })
-	public set manifest(value: ManifestCollectionViewTableKind | undefined) {
-		this.#manifest = value;
+	override set manifest(value: ManifestCollectionViewTableKind | undefined) {
+		super.manifest = value;
 		this._manifestColumns = value?.meta?.columns ?? [];
 	}
-	public get manifest() {
-		return this.#manifest;
+	override get manifest(): ManifestCollectionViewTableKind | undefined {
+		return super.manifest as ManifestCollectionViewTableKind | undefined;
 	}
 
 	@state()

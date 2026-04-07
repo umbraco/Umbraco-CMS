@@ -1,5 +1,6 @@
 import type { UmbCollectionLayoutConfiguration } from '../types.js';
 import type { ManifestCollectionView } from './collection-view.extension.js';
+import type { UmbCollectionViewElementBase } from './umb-collection-view-element-base.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbExtensionsManifestInitializer, createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -102,7 +103,7 @@ export class UmbCollectionViewManager extends UmbControllerBase {
 					path: `${view.meta.pathName}`,
 					component: () => createExtensionElement(view),
 					setup: (component) => {
-						(component as any).manifest = view;
+						(component as UmbCollectionViewElementBase).manifest = view;
 						this.setCurrentView(view);
 					},
 				};
