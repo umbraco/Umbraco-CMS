@@ -215,7 +215,7 @@ export class ContentUiHelper extends UiBaseLocators {
     this.plusIconBtn = page.locator('#icon-add svg');
     this.enterTagTxt = page.getByPlaceholder('Enter tag');
     this.menuItemTree = page.locator('umb-menu-item-tree-default');
-    this.confirmToUnpublishBtn = page.locator('umb-document-unpublish-modal').getByLabel('Unpublish');
+    this.confirmToUnpublishBtn = page.locator("#confirm").getByLabel('Unpublish');
     this.dropdown = page.locator('select#native');
     this.splitView = page.locator('#splitViews');
     this.setADateTxt = page.getByLabel('Set a date…');
@@ -364,7 +364,7 @@ export class ContentUiHelper extends UiBaseLocators {
     this.publishAt = this.generalItem.filter({hasText: 'Publish at'}).locator('umb-localize-date');
     this.removeAt = this.generalItem.filter({hasText: 'Remove at'}).locator('umb-localize-date');
     this.selectAllCheckbox = this.documentScheduleModal.locator('[label="Select all"]');
-    this.confirmToPublishBtn = page.locator('umb-document-publish-modal').getByLabel('Publish');
+    this.confirmToPublishBtn = page.locator("#confirm").getByLabel('Publish');
     // Publish with descendants
     this.documentPublishWithDescendantsModal = page.locator('umb-document-publish-with-descendants-modal');
     this.publishWithDescendantsBtn = this.workspaceActionMenuItem.getByLabel('Publish with descendants', {exact: true});
@@ -1909,6 +1909,15 @@ export class ContentUiHelper extends UiBaseLocators {
     const contentLocator = this.cardContentNode.filter({hasText: contentName});
     await this.waitForVisible(contentLocator);
     await this.click(contentLocator.locator('#select-checkbox'), {force: true});
+  }
+
+  async isContentCardWithNameSelected(contentName: string, isSelected: boolean = true) {
+    const contentLocator = this.cardContentNode.filter({hasText: contentName});
+    if (isSelected) {
+      await expect(contentLocator).toHaveAttribute('selected');
+    } else {
+      await expect(contentLocator).not.toHaveAttribute('selected');
+    }
   }
 
   async addGroupBasedPublicAccessWithPrefilledPages(memberGroupName: string) {
