@@ -146,8 +146,7 @@ export class UmbTableCollectionViewElement extends UmbCollectionViewElementBase 
 		UmbTextStyles,
 		css`
 			:host {
-				display: flex;
-				flex-direction: column;
+				display: block;
 			}
 		`,
 	];
