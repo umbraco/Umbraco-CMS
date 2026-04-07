@@ -66,8 +66,6 @@ export class UmbImagingStore extends UmbContextBase implements UmbApi {
 	clearCropByConfiguration(unique: string, data?: UmbImagingResizeModel) {
 		this.#data.get(unique)?.delete(generateImagingCacheKey(data));
 	}
-
-
 }
 
 export default UmbImagingStore;
