@@ -438,12 +438,20 @@ internal sealed class DictionaryRepository : AsyncEntityRepositoryBase<Guid, IDi
     }
 
     /// <summary>
-    /// Deletes a dictionary entry by unique ID. Translations are cascade-deleted by the FK constraint.
+    /// Deletes a dictionary entry by unique ID.
     /// </summary>
-    private static async Task DeleteEntityAsync(Guid key, UmbracoDbContext db) =>
-        await db.DictionaryEntries
-            .Where(x => x.UniqueId == key)
-            .ExecuteDeleteAsync();
+    private static async Task DeleteEntityAsync(Guid key, UmbracoDbContext db)
+    {
+        DictionaryDto? dto = await db.DictionaryEntries
+            .Include(x => x.LanguageText)
+            .FirstOrDefaultAsync(x => x.UniqueId == key);
+
+        if (dto is not null)
+        {
+            db.DictionaryEntries.Remove(dto);
+            await db.SaveChangesAsync();
+        }
+    }
 
     private async Task<IDictionary<int, ILanguage>> GetLanguagesByIdAsync() =>
         (await _languageRepository.GetAllAsync(CancellationToken.None))

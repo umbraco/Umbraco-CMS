@@ -225,6 +225,12 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
             dictionaryItem,
             async () =>
             {
+                // An item without an identity has never been persisted and cannot be updated.
+                if (dictionaryItem.HasIdentity == false)
+                {
+                    return DictionaryItemOperationStatus.ItemNotFound;
+                }
+
                 // is there an item to update?
                 if (await _dictionaryRepository.ExistsAsync(dictionaryItem.Key, CancellationToken.None) == false)
                 {

@@ -26,6 +26,7 @@
 
   <ItemGroup>
     <!-- Add design/build time support for EF Core migrations -->
+    <PackageReference Include="Clean" Version="7.0.5" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" PrivateAssets="all" Version="10.0.3" />
     <!--
     Added the following direct dependency due to Microsoft.EntityFrameworkCore.Design having a dependency on an insecure version.

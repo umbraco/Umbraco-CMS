@@ -270,12 +270,12 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
 
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.DictionaryDto", b =>
                 {
-                    b.Property<int>("PrimaryKey")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasColumnName("pk");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PrimaryKey"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Key")
                         .IsRequired()
@@ -291,7 +291,7 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("id");
 
-                    b.HasKey("PrimaryKey");
+                    b.HasKey("Id");
 
                     b.HasIndex("Key")
                         .IsUnique()
@@ -382,12 +382,12 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
 
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.LanguageTextDto", b =>
                 {
-                    b.Property<int>("PrimaryKey")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasColumnName("pk");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PrimaryKey"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("LanguageId")
                         .HasColumnType("int")
@@ -403,7 +403,7 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                         .HasColumnType("nvarchar(1000)")
                         .HasColumnName("value");
 
-                    b.HasKey("PrimaryKey");
+                    b.HasKey("Id");
 
                     b.HasIndex("UniqueId");
 
@@ -578,7 +578,7 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                         .IsRequired();
 
                     b.HasOne("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.DictionaryDto", "DictionaryEntry")
-                        .WithMany("LanguageTextDtos")
+                        .WithMany("LanguageText")
                         .HasForeignKey("UniqueId")
                         .HasPrincipalKey("UniqueId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -636,7 +636,7 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
 
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.DictionaryDto", b =>
                 {
-                    b.Navigation("LanguageTextDtos");
+                    b.Navigation("LanguageText");
                 });
 
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.WebhookDto", b =>
