@@ -785,6 +785,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
         // Insert stale rows: one per (document × language × draft/published).
         // These simulate pre-v17.3 data where invariant documents had per-language rows.
         var staleRowCount = 0;
+        var syntax = database.SqlContext.SqlSyntax;
         foreach (var documentKey in documentKeys)
         {
             foreach (var languageId in languageIds)
@@ -792,7 +793,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
                 foreach (var isDraft in new[] { true, false })
                 {
                     database.Execute(
-                        $"INSERT INTO {QTab("umbracoDocumentUrl")} ({QCol("uniqueId")}, {QCol("languageId")}, {QCol("isDraft")}, {QCol("urlSegment")}, {QCol("isPrimary")}) VALUES (@0, @1, @2, @3, @4)",
+                        $"INSERT INTO {syntax.GetQuotedTableName("umbracoDocumentUrl")} ({syntax.GetQuotedColumnName("uniqueId")}, {syntax.GetQuotedColumnName("languageId")}, {syntax.GetQuotedColumnName("isDraft")}, {syntax.GetQuotedColumnName("urlSegment")}, {syntax.GetQuotedColumnName("isPrimary")}) VALUES (@0, @1, @2, @3, @4)",
                         documentKey,
                         languageId,
                         isDraft,
