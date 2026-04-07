@@ -53,8 +53,8 @@ const manifest: UmbExtensionManifest = {
 
 The **alias** is the single most important property on a manifest. It is:
 
-- **Required** — registration fails without it (console error, manifest silently dropped)
-- **Unique** — duplicate aliases are rejected; the second registration is ignored
+- **Required** — registration is rejected without it (console error, no exception thrown)
+- **Unique** — duplicate aliases are rejected; the second registration is ignored (console error, no exception thrown)
 - **The reference handle** — other manifests point to an extension by its alias (conditions, `overwrites`, `forWorkspaceActions`, repository aliases in `meta`)
 - **Stable** — changing an alias is a breaking change because external consumers may reference it
 
