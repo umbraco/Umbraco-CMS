@@ -106,7 +106,7 @@ export class UmbCollectionCreateActionButtonElement extends UmbLitElement {
 
 		return html`
 			<uui-menu-item
-				label=${label}
+				label=${option.additionalOptions ? label + '...' : label}
 				href=${ifDefined(option.href)}
 				target=${this.#getTarget(option.href)}
 				@click=${(event: Event) => this.#onClick(event, option.alias, option.href)}>

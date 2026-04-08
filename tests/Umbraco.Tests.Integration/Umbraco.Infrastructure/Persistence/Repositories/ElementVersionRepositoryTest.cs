@@ -37,7 +37,7 @@ internal sealed class ElementVersionRepositoryTest : UmbracoIntegrationTest
         using (ScopeProvider.CreateScope())
         {
             var sut = new ElementVersionRepository(ScopeAccessor);
-            var results = sut.GetContentVersionsEligibleForCleanup();
+            var results = sut.GetContentVersionsEligibleForCleanup(DateTime.UtcNow.AddDays(1), null);
 
             Assert.Multiple(() =>
             {
@@ -71,7 +71,7 @@ internal sealed class ElementVersionRepositoryTest : UmbracoIntegrationTest
             ScopeAccessor.AmbientScope.Database.Update<ContentVersionDto>("set preventCleanup = 1 where id in (1,3)");
 
             var sut = new ElementVersionRepository(ScopeAccessor);
-            var results = sut.GetContentVersionsEligibleForCleanup();
+            var results = sut.GetContentVersionsEligibleForCleanup(DateTime.UtcNow.AddDays(1), null);
 
             Assert.Multiple(() =>
             {

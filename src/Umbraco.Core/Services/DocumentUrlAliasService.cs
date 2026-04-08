@@ -340,7 +340,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
                     toSave.Add(new PublishedDocumentUrlAlias
                     {
                         DocumentKey = raw.DocumentKey,
-                        NullableLanguageId = null, // NULL for invariant content
+                        LanguageId = null, // NULL for invariant content
                         Alias = alias,
                     });
                 }
@@ -352,7 +352,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
                     toSave.Add(new PublishedDocumentUrlAlias
                     {
                         DocumentKey = raw.DocumentKey,
-                        NullableLanguageId = raw.LanguageId.Value,
+                        LanguageId = raw.LanguageId.Value,
                         Alias = alias,
                     });
                 }
@@ -405,7 +405,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
                     aliases.Add(new PublishedDocumentUrlAlias
                     {
                         DocumentKey = document.Key,
-                        NullableLanguageId = null, // NULL for invariant content
+                        LanguageId = null, // NULL for invariant content
                         Alias = alias,
                     });
                 }
@@ -430,7 +430,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
                 aliases.Add(new PublishedDocumentUrlAlias
                 {
                     DocumentKey = document.Key,
-                    NullableLanguageId = language.Id,
+                    LanguageId = language.Id,
                     Alias = alias,
                 });
             }
@@ -486,7 +486,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     /// </summary>
     private void AddToCache(PublishedDocumentUrlAlias alias)
     {
-        var cacheKey = new AliasCacheKey(alias.Alias, alias.NullableLanguageId);
+        var cacheKey = new AliasCacheKey(alias.Alias, alias.LanguageId);
 
         _aliasCache.AddOrUpdate(
             cacheKey,
@@ -526,7 +526,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     /// This ensures cache updates are rolled back if the database transaction fails.
     /// </summary>
     private void AddToCacheDeferred(IScopeContext scopeContext, PublishedDocumentUrlAlias alias) =>
-        scopeContext.Enlist($"AddAliasToCache_{alias.DocumentKey}_{alias.Alias}_{alias.NullableLanguageId}", () =>
+        scopeContext.Enlist($"AddAliasToCache_{alias.DocumentKey}_{alias.Alias}_{alias.LanguageId}", () =>
         {
             AddToCache(alias);
             return true;

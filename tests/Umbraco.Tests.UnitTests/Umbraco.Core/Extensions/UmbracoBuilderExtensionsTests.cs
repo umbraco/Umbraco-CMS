@@ -2,7 +2,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture;
-using AutoFixture.NUnit3;
+using AutoFixture.NUnit4;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;

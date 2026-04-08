@@ -397,5 +397,8 @@
     <Compile Update="Umbraco.Core\Services\ElementServiceTests.SchedulePublish.cs">
       <DependentUpon>ElementServiceTests.cs</DependentUpon>
     </Compile>
+    <Compile Update="Umbraco.Core\Services\ContentTypeEditingServiceTests.ChangeTypes.cs">
+      <DependentUpon>ContentTypeEditingServiceTests.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
 </Project>

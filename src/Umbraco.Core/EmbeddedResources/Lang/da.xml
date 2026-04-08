@@ -208,10 +208,6 @@
     <key alias="multipleNotOneOfOptions">Værdierne '%0%' er ikke tilstede i de tilgængelige valgmuligheder.</key>
     <key alias="invalidColor">"Den valgte farve '%0%' er ikke en af de tilgængelige valgmuligheder.</key>
   </area>
-  <area alias="recycleBin">
-    <key alias="contentTrashed">Slettet indhold med Id: {0} Relateret til original "parent" med id: {1}</key>
-    <key alias="mediaTrashed">Slettet medie med Id: {0} relateret til original "parent" / mappe med id: {1}</key>
-  </area>
   <area alias="permissions">
     <key alias="FolderCreation">Mappeoprettelse</key>
     <key alias="FileWritingForPackages">Filskrivning for pakker</key>

@@ -283,6 +283,8 @@ export class UmbImageCropperFocusSetterElement extends UmbLitElement {
 		#image {
 			margin: auto;
 			position: relative;
+			max-width: 100%;
+			max-height: 100%;
 		}
 		#focal-point {
 			content: '';

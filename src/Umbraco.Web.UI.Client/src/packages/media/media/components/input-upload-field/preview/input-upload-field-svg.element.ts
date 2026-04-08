@@ -16,24 +16,23 @@ export default class UmbInputUploadFieldSvgElement extends UmbLitElement impleme
 	static override readonly styles = [
 		css`
 			:host {
-				height: 100%;
-				min-height: 20px;
-				max-height: 400px;
-
 				width: fit-content;
 				min-width: 320px;
 				max-width: 100%;
 			}
 
 			img {
+				display: block;
 				object-fit: contain;
 				width: auto;
-				height: 100%;
+				height: auto;
+				min-height: 20px;
+				max-height: 400px;
+				max-width: 100%;
 				background-color: #fff;
 				background-image: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" fill-opacity=".1"><path d="M50 0h50v50H50zM0 50h50v50H0z"/></svg>');
 				background-repeat: repeat;
 				background-size: 10px 10px;
-				max-width: 100%;
 			}
 		`,
 	];

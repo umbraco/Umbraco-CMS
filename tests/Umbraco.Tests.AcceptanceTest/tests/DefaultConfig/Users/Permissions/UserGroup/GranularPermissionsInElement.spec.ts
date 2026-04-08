@@ -157,7 +157,7 @@ test.fixme('can duplicate a specific element with duplicate permission enabled',
   // Act
   await umbracoUi.library.clickEntityActionOnElementWithName(firstElementName);
   await umbracoUi.library.clickLabelWithName('Elements');
-  await umbracoUi.library.clickDuplicateButton();
+  await umbracoUi.library.clickCopyModalButton();
 
   // Assert
   await umbracoUi.library.doesSuccessNotificationHaveText(NotificationConstantHelper.success.duplicated);

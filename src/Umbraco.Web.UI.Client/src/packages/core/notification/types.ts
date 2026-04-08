@@ -6,7 +6,7 @@ export interface UmbNotificationDefaultData {
 	message: string;
 	headline?: string;
 	/**
-	 * @deprecated, do not use this. It will be removed in v.16 — Use UmbPeekError instead
+	 * @deprecated Use {@link UmbPeekErrorArgs} instead. Scheduled for removal in Umbraco 19.
 	 */
 	structuredList?: Record<string, Array<unknown>>;
 	whitespace?: 'normal' | 'pre-line' | 'pre-wrap' | 'nowrap' | 'pre';
@@ -25,8 +25,20 @@ export interface UmbNotificationOptions<UmbNotificationData = UmbNotificationDef
 
 export type UmbNotificationColor = '' | 'default' | 'positive' | 'warning' | 'danger';
 
+/**
+ * Arguments for displaying an error peek notification.
+ * @interface UmbPeekErrorArgs
+ */
 export interface UmbPeekErrorArgs extends UmbNotificationDefaultData {
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	details?: any;
+	/** A human-readable explanation of the error (from ProblemDetails.detail). */
+	detail?: string;
+	/** Validation errors keyed by field name (from ProblemDetails.errors). */
+	errors?: Record<string, string[]>;
+	/**
+	 * Validation errors keyed by field name (from ProblemDetails.errors).
+	 * @deprecated Use `errors` instead. Scheduled for removal in Umbraco 19.
+	 */
+	details?: Record<string, string[]>;
+	/** The notification color. Defaults to 'danger'. */
 	color?: UmbNotificationColor;
 }

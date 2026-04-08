@@ -42,7 +42,6 @@ export interface UmbContentTypeModel {
 	variesByCulture: boolean;
 	variesBySegment: boolean;
 	isElement: boolean;
-	allowedInLibrary: boolean;
 	properties: Array<UmbPropertyTypeModel>;
 	containers: Array<UmbPropertyTypeContainerModel>;
 	allowedContentTypes: Array<UmbContentTypeSortModel>;

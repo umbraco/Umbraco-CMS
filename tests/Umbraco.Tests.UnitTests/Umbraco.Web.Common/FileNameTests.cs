@@ -1,7 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using AutoFixture.NUnit3;
+using AutoFixture.NUnit4;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.FileProviders;
 using Moq;

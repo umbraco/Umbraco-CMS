@@ -45,10 +45,10 @@ internal sealed partial class DocumentNavigationServiceTests
 
             // Verify that nothing's changed
             Assert.AreEqual(initialParentKey, updatedParentKey);
-            CollectionAssert.AreEquivalent(initialChildrenKeys, childrenKeysAfterUpdate);
-            CollectionAssert.AreEquivalent(initialDescendantsKeys, descendantsKeysAfterUpdate);
-            CollectionAssert.AreEquivalent(initialAncestorsKeys, ancestorsKeysAfterUpdate);
-            CollectionAssert.AreEquivalent(initialSiblingsKeys, siblingsKeysAfterUpdate);
+            Assert.That(childrenKeysAfterUpdate, Is.EquivalentTo(initialChildrenKeys));
+            Assert.That(descendantsKeysAfterUpdate, Is.EquivalentTo(initialDescendantsKeys));
+            Assert.That(ancestorsKeysAfterUpdate, Is.EquivalentTo(initialAncestorsKeys));
+            Assert.That(siblingsKeysAfterUpdate, Is.EquivalentTo(initialSiblingsKeys));
         });
     }
 }

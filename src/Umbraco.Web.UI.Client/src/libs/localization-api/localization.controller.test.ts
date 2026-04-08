@@ -238,6 +238,37 @@ describe('UmbLocalizationController', () => {
 		});
 	});
 
+	describe('dateTime', () => {
+		it('should return a localized date with time', () => {
+			const date = new Date(2020, 0, 1, 13, 30, 0);
+			const expected = new Intl.DateTimeFormat('en-us', { dateStyle: 'short', timeStyle: 'medium' }).format(date);
+			expect(controller.dateTime(date)).to.equal(expected);
+		});
+
+		it('should accept a string input', () => {
+			const dateStr = '2020-06-15T10:30:00';
+			const expected = new Intl.DateTimeFormat('en-us', { dateStyle: 'short', timeStyle: 'medium' }).format(
+				new Date(dateStr),
+			);
+			expect(controller.dateTime(dateStr)).to.equal(expected);
+		});
+
+		it('should update the dateTime when the language changes', async () => {
+			const date = new Date(2020, 11, 31, 13, 30, 0);
+			const enResult = controller.dateTime(date);
+
+			// Switch browser to Danish
+			document.documentElement.lang = danishRegional.$code;
+			await aTimeout(0);
+
+			const daResult = controller.dateTime(date);
+			const expectedDa = new Intl.DateTimeFormat('da-dk', { dateStyle: 'short', timeStyle: 'medium' }).format(date);
+
+			expect(daResult).to.equal(expectedDa);
+			expect(daResult).to.not.equal(enResult);
+		});
+	});
+
 	describe('number', () => {
 		it('should return a number', () => {
 			expect(controller.number(123456.789)).to.equal('123,456.789');

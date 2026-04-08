@@ -2008,10 +2008,11 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
                 continue;
             }
 
-            // get a unique name
-            IEnumerable<SimilarNodeName> otherNames =
-                cultureNames.Select(x => new SimilarNodeName { Id = x.Id, Name = x.Name });
-            var uniqueName = SimilarNodeName.GetUniqueName(otherNames, 0, cultureInfo.Name);
+            // get a unique name (literal duplicates first, then subclass-specific checks)
+            List<SimilarNodeName> otherNames =
+                cultureNames.Select(x => new SimilarNodeName { Id = x.Id, Name = x.Name }).ToList();
+            var uniqueName = SimilarNodeName.GetUniqueName(otherNames, content.Id, cultureInfo.Name);
+            uniqueName = EnsureUniqueVariantName(uniqueName, content.Id, otherNames, cultureInfo.Culture);
 
             if (uniqueName == content.GetCultureName(cultureInfo.Culture))
             {
@@ -2029,6 +2030,13 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
             }
         }
     }
+
+    /// <summary>
+    /// Called during variant name uniqueness to allow subclasses to apply additional uniqueness checks
+    /// (e.g. URL segment collision detection). The default implementation returns the name unchanged.
+    /// </summary>
+    private protected virtual string? EnsureUniqueVariantName(
+        string? nodeName, int nodeId, List<SimilarNodeName> siblings, string culture) => nodeName;
 
     // ReSharper disable once ClassNeverInstantiated.Local
     private sealed class CultureNodeName

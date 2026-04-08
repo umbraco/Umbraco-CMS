@@ -57,7 +57,7 @@ test('can create a partial view in a folder', async ({umbracoApi, umbracoUi}) =>
   // Act
   await umbracoUi.partialView.reloadPartialViewTree();
   await umbracoUi.partialView.clickActionsMenuForPartialView(folderName);
-  await umbracoUi.partialView.clickCreateOptionsActionMenuOption();
+  await umbracoUi.partialView.clickCreateActionMenuOption();
   await umbracoUi.partialView.clickNewEmptyPartialViewButton();
   await umbracoUi.partialView.enterPartialViewName(partialViewName);
   await umbracoUi.partialView.clickSaveButtonAndWaitForPartialViewToBeCreated();
@@ -84,7 +84,7 @@ test('can create a partial view in a folder in a folder', async ({umbracoApi, um
   await umbracoUi.partialView.reloadPartialViewTree();
   await umbracoUi.partialView.openCaretButtonForName(folderName);
   await umbracoUi.partialView.clickActionsMenuForPartialView(childFolderName);
-  await umbracoUi.partialView.clickCreateOptionsActionMenuOption();
+  await umbracoUi.partialView.clickCreateActionMenuOption();
   await umbracoUi.partialView.clickNewEmptyPartialViewButton();
   await umbracoUi.partialView.enterPartialViewName(partialViewName);
   await umbracoUi.partialView.clickSaveButtonAndWaitForPartialViewToBeCreated();
