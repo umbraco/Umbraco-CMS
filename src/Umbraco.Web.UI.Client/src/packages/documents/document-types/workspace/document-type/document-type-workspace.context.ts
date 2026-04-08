@@ -32,6 +32,7 @@ export class UmbDocumentTypeWorkspaceContext
 	implements UmbContentTypeWorkspaceContext<DetailModelType>, UmbRoutableWorkspaceContext
 {
 	// Document type specific:
+	readonly allowedInLibrary;
 	readonly allowedTemplateIds;
 	readonly defaultTemplate;
 	readonly cleanup;
@@ -47,10 +48,15 @@ export class UmbDocumentTypeWorkspaceContext
 		});
 
 		// Document type specific:
+		this.allowedInLibrary = this.structure.ownerContentTypeObservablePart((data) => data?.allowedInLibrary);
 		this.allowedTemplateIds = this.structure.ownerContentTypeObservablePart((data) => data?.allowedTemplates);
 		this.defaultTemplate = this.structure.ownerContentTypeObservablePart((data) => data?.defaultTemplate);
 		this.cleanup = this.structure.ownerContentTypeObservablePart((data) => data?.cleanup);
 
+		this.#setupRoutes();
+	}
+
+	#setupRoutes() {
 		this.routes.setRoutes([
 			{
 				path: UMB_CREATE_DOCUMENT_TYPE_WORKSPACE_PATH_PATTERN.toString(),
@@ -90,6 +96,10 @@ export class UmbDocumentTypeWorkspaceContext
 
 	setAllowedAtRoot(allowedAtRoot: boolean) {
 		this.structure.updateOwnerContentType({ allowedAtRoot });
+	}
+
+	setAllowedInLibrary(allowedInLibrary: boolean) {
+		this.structure.updateOwnerContentType({ allowedInLibrary });
 	}
 
 	setVariesByCulture(variesByCulture: boolean) {
