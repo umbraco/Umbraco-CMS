@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.2")
+                .HasAnnotation("ProductVersion", "10.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -266,6 +266,41 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("umbracoCacheInstruction", (string)null);
+                });
+
+            modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.DistributedJobDto", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("IsRunning")
+                        .HasColumnType("bit")
+                        .HasColumnName("IsRunning");
+
+                    b.Property<DateTime>("LastAttemptedRun")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("lastAttemptedRun");
+
+                    b.Property<DateTime>("LastRun")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("lastRun");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("Name");
+
+                    b.Property<long>("Period")
+                        .HasColumnType("bigint")
+                        .HasColumnName("period");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("umbracoDistributedJob", (string)null);
                 });
 
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.KeyValueDto", b =>
