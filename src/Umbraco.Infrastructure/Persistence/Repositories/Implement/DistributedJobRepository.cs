@@ -26,8 +26,8 @@ internal class DistributedJobRepository : IDistributedJobRepository
 
         return await _scopeAccessor.AmbientScope.ExecuteWithContextAsync(async db =>
         {
-            DistributedJobDto? dto = db.DistributedJob
-                .FirstOrDefault(x => x.Name == jobName);
+            DistributedJobDto? dto = await db.DistributedJob
+                .FirstOrDefaultAsync(x => x.Name == jobName);
 
             return dto is null ? null : MapFromDto(dto);
         });
@@ -124,8 +124,10 @@ internal class DistributedJobRepository : IDistributedJobRepository
 
         await _scopeAccessor.AmbientScope.ExecuteWithContextAsync<DistributedJobDto>(async db =>
         {
-            await db.DistributedJob
-                .AddRangeAsync(dtos);
+            db.DistributedJob
+                .AddRange(dtos);
+
+            await db.SaveChangesAsync();
         });
     }
 
