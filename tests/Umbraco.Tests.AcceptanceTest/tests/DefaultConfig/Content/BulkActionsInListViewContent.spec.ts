@@ -46,7 +46,7 @@ test('can bulk publish multiple child content items from list view', async ({umb
   await umbracoUi.content.selectContentCardWithName(firstChildContentName);
   await umbracoUi.content.selectContentCardWithName(secondChildContentName);
   await umbracoUi.content.clickPublishSelectedListItems();
-  await umbracoUi.content.clickConfirmToPublishButton();
+  await umbracoUi.content.clickPublishModalButton();
 
   // Assert
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
@@ -74,7 +74,7 @@ test('can bulk unpublish multiple child content items from list view', async ({u
   await umbracoUi.content.selectContentCardWithName(firstChildContentName);
   await umbracoUi.content.selectContentCardWithName(secondChildContentName);
   await umbracoUi.content.clickUnpublishSelectedListItems();
-  await umbracoUi.content.clickConfirmToUnpublishButton();
+  await umbracoUi.content.clickUnpublishModalButton();
 
   // Assert
   await umbracoUi.content.isSuccessNotificationVisible();
@@ -163,7 +163,7 @@ test('can bulk publish multiple child content items when some are already publis
   await umbracoUi.content.selectContentCardWithName(firstChildContentName);
   await umbracoUi.content.selectContentCardWithName(secondChildContentName);
   await umbracoUi.content.clickPublishSelectedListItems();
-  await umbracoUi.content.clickConfirmToPublishButton();
+  await umbracoUi.content.clickPublishModalButton();
 
   // Assert
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);

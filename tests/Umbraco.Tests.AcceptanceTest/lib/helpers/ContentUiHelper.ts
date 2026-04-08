@@ -195,6 +195,8 @@ export class ContentUiHelper extends UiBaseLocators {
   private readonly containerEditBtn: Locator;
   private readonly loginPageSelectedItem: Locator;
   private readonly errorPageSelectedItem: Locator;
+  private readonly publishModalBtn: Locator;
+  private readonly unpublishModalBtn: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -215,7 +217,8 @@ export class ContentUiHelper extends UiBaseLocators {
     this.plusIconBtn = page.locator('#icon-add svg');
     this.enterTagTxt = page.getByPlaceholder('Enter tag');
     this.menuItemTree = page.locator('umb-menu-item-tree-default');
-    this.confirmToUnpublishBtn = page.locator("#confirm").getByLabel('Unpublish');
+    this.confirmToUnpublishBtn = page.locator('umb-document-unpublish-modal').getByLabel('Unpublish');
+    this.confirmToPublishBtn = page.locator('umb-document-publish-modal').getByLabel('Publish');
     this.dropdown = page.locator('select#native');
     this.splitView = page.locator('#splitViews');
     this.setADateTxt = page.getByLabel('Set a date…');
@@ -311,6 +314,9 @@ export class ContentUiHelper extends UiBaseLocators {
     this.linkToManualBtn = this.linkPickerModal.getByTestId('action:external').locator('#button');
     this.umbDocumentCollection = page.locator('umb-document-collection');
     this.documentTableColumnName = this.listView.locator('umb-document-table-column-name');
+    this.backofficeModalContainer = page.locator('umb-backoffice-modal-container');
+    this.publishModalBtn = this.backofficeModalContainer.getByLabel('Publish', {exact: true});
+    this.unpublishModalBtn = this.backofficeModalContainer.getByLabel('Unpublish', {exact: true});
     //Block Grid - Block List
     this.addBlockElementBtn = page.locator('uui-button-group > uui-button').first().filter({has: page.locator('#button')});
     this.formValidationMessage = page.locator('#splitViews umb-form-validation-message #messages');
@@ -343,7 +349,6 @@ export class ContentUiHelper extends UiBaseLocators {
     this.blockWorkspace = page.locator('umb-block-workspace-editor');
     this.tiptapInput = page.locator('umb-input-tiptap');
     this.rteBlockInline = page.locator('umb-rte-block-inline');
-    this.backofficeModalContainer = page.locator('umb-backoffice-modal-container');
     this.modalCreateBtn = this.backofficeModalContainer.getByLabel('Create', {exact: true});
     this.modalUpdateBtn = this.backofficeModalContainer.getByLabel('Update', {exact: true});
     this.rteBlock = page.locator('umb-rte-block');
@@ -364,7 +369,7 @@ export class ContentUiHelper extends UiBaseLocators {
     this.publishAt = this.generalItem.filter({hasText: 'Publish at'}).locator('umb-localize-date');
     this.removeAt = this.generalItem.filter({hasText: 'Remove at'}).locator('umb-localize-date');
     this.selectAllCheckbox = this.documentScheduleModal.locator('[label="Select all"]');
-    this.confirmToPublishBtn = page.locator("#confirm").getByLabel('Publish');
+    this.confirmToPublishBtn = page.locator('umb-document-publish-modal').getByLabel('Publish');
     // Publish with descendants
     this.documentPublishWithDescendantsModal = page.locator('umb-document-publish-with-descendants-modal');
     this.publishWithDescendantsBtn = this.workspaceActionMenuItem.getByLabel('Publish with descendants', {exact: true});
@@ -1208,6 +1213,14 @@ export class ContentUiHelper extends UiBaseLocators {
 
   async clickManualLinkRemoveButton() {
     await this.click(this.manualLinkRemoveBtn);
+  }
+
+  async clickPublishModalButton() {
+    await this.click(this.publishModalBtn);
+  }
+
+  async clickUnpublishModalButton() {
+    await this.click(this.unpublishModalBtn);
   }
 
   // Block Grid - Block List
