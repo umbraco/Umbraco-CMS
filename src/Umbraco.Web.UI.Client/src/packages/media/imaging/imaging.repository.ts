@@ -1,8 +1,8 @@
-import { UmbImagingCropMode, type UmbImagingResizeModel } from './types.js';
+import { UmbImagingCropMode } from './types.js';
+import type { UmbImagingResizeModel } from './types.js';
+import { batchImagingRequest } from './imaging-request-batcher.js';
 import { UmbImagingServerDataSource } from './imaging.server.data.js';
-import { UMB_IMAGING_STORE_CONTEXT } from './imaging.store.token.js';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbMediaUrlModel } from '@umbraco-cms/backoffice/media';
 
@@ -11,19 +11,7 @@ import type { UmbMediaUrlModel } from '@umbraco-cms/backoffice/media';
  * You can use it to request (cached) thumbnail URLs or new resized images.
  */
 export class UmbImagingRepository extends UmbRepositoryBase implements UmbApi {
-	#init;
 	#itemSource = new UmbImagingServerDataSource(this);
-	#dataStore?: typeof UMB_IMAGING_STORE_CONTEXT.TYPE;
-
-	constructor(host: UmbControllerHost) {
-		super(host);
-
-		this.#init = this.consumeContext(UMB_IMAGING_STORE_CONTEXT, (instance) => {
-			if (instance) {
-				this.#dataStore = instance;
-			}
-		}).asPromise({ preventTimeout: true });
-	}
 
 	/**
 	 * Requests the items for the given uniques
@@ -38,49 +26,25 @@ export class UmbImagingRepository extends UmbRepositoryBase implements UmbApi {
 	): Promise<{ data: UmbMediaUrlModel[] }> {
 		if (!uniques.length) throw new Error('Uniques are missing');
 
-		await this.#init;
+		const results = await Promise.allSettled(
+			uniques.map((unique) =>
+				batchImagingRequest(unique, imagingModel, (batchUniques, model) =>
+					this.#itemSource.getItems(batchUniques, model),
+				),
+			),
+		);
 
-		if (!this.#dataStore) {
-			console.warn('[UmbImagingRepository] No data store available. All thumbnails are uncached.');
-		}
-
-		const urls = new Map<string, string>();
-
-		for (const unique of uniques) {
-			const existingCrop = this.#dataStore?.getCrop(unique, imagingModel);
-			if (existingCrop !== undefined) {
-				urls.set(unique, existingCrop);
-				continue;
-			}
-
-			const { data: urlModels, error } = await this.#itemSource.getItems([unique], imagingModel);
-
-			if (error) {
-				console.error('[UmbImagingRepository] Error fetching items', error);
-				continue;
-			}
-
-			const url = urlModels?.[0]?.url;
-
-			this.#dataStore?.addCrop(unique, url ?? '', imagingModel);
-
-			if (url) {
-				urls.set(unique, url);
+		const urls: UmbMediaUrlModel[] = [];
+		for (let i = 0; i < uniques.length; i++) {
+			const result = results[i];
+			if (result.status === 'fulfilled' && result.value) {
+				urls.push({ unique: uniques[i], url: result.value });
+			} else if (result.status === 'rejected') {
+				console.error('[UmbImagingRepository] Error fetching item', result.reason);
 			}
 		}
 
-		return { data: Array.from(urls).map(([unique, url]) => ({ unique, url })) };
-	}
-
-	/**
-	 * Internal method to clear the cache for a specific image.
-	 * @param {string} unique The unique identifier for the media item
-	 * @internal
-	 */
-	// eslint-disable-next-line @typescript-eslint/naming-convention
-	async _internal_clearCropByUnique(unique: string) {
-		await this.#init;
-		this.#dataStore?.clearCropByUnique(unique);
+		return { data: urls };
 	}
 
 	/**
