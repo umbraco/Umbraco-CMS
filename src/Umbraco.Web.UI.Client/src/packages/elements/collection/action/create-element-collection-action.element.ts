@@ -155,6 +155,9 @@ export class UmbCreateElementCollectionActionElement extends UmbLitElement {
 				@toggle=${this.#onPopoverToggle}>
 				<umb-popover-layout>
 					<uui-scroll-container>
+						${map(this._createOptionControllers, (controller, index) =>
+							this.#renderCreateOptionItem(controller, index),
+						)}
 						${map(
 							this._allowedElementTypes,
 							(item) => html`
@@ -162,9 +165,6 @@ export class UmbCreateElementCollectionActionElement extends UmbLitElement {
 									<umb-icon slot="icon" name=${item.icon || 'icon-document'}></umb-icon>
 								</uui-menu-item>
 							`,
-						)}
-						${map(this._createOptionControllers, (controller, index) =>
-							this.#renderCreateOptionItem(controller, index),
 						)}
 					</uui-scroll-container>
 				</umb-popover-layout>
