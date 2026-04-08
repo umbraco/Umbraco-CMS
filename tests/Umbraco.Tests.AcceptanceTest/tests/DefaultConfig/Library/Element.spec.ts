@@ -62,7 +62,7 @@ test.skip('can save and publish empty element', {tag: '@smoke'}, async ({umbraco
   expect(elementData.variants[0].state).toBe(expectedState);
 });
 
-test.skip('can create element', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+test.skip('can create element', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoUi.goToBackOffice();
   await umbracoUi.library.goToSection(ConstantHelper.sections.library);
@@ -101,7 +101,7 @@ test('can rename element', async ({umbracoApi, umbracoUi}) => {
   expect(updatedElementData.variants[0].name).toEqual(elementName);
 });
 
-test('can update element', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+test('can update element', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const wrongElementText = 'This is wrong test element text';
   elementId = await umbracoApi.element.createElementWithTextContent(elementName, elementTypeId, wrongElementText, dataTypeName);
@@ -118,7 +118,7 @@ test('can update element', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   expect(updatedElementData.values[0].value).toBe(elementText);
 });
 
-test('can unpublish element', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+test('can unpublish element', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   elementId = await umbracoApi.element.createElementWithTextContent(elementName, elementTypeId, elementText, dataTypeName);
   await umbracoApi.element.publish(elementId);
