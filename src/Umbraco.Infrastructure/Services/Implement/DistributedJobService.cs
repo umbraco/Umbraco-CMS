@@ -47,7 +47,7 @@ public class DistributedJobService : IDistributedJobService
 
         scope.EagerWriteLock(Constants.Locks.DistributedJobs);
 
-        IEnumerable<DistributedBackgroundJobModel> jobs = _distributedJobRepository.GetAll();
+        IEnumerable<DistributedBackgroundJobModel> jobs = await _distributedJobRepository.GetAllAsync();
         DistributedBackgroundJobModel? job = jobs.FirstOrDefault(x => x.LastRun < DateTime.UtcNow - x.Period
                                                                       && (x.IsRunning is false || x.LastAttemptedRun < DateTime.UtcNow - x.Period - _settings.MaximumExecutionTime));
 
@@ -60,7 +60,7 @@ public class DistributedJobService : IDistributedJobService
 
         job.LastAttemptedRun = DateTime.UtcNow;
         job.IsRunning = true;
-        _distributedJobRepository.Update(job);
+        await _distributedJobRepository.UpdateAsync(job);
         scope.Complete();
 
         IDistributedBackgroundJob? distributedJob = _distributedBackgroundJobs.FirstOrDefault(x => x.Name == job.Name);
@@ -83,7 +83,7 @@ public class DistributedJobService : IDistributedJobService
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
 
         scope.EagerWriteLock(Constants.Locks.DistributedJobs);
-        DistributedBackgroundJobModel? job = _distributedJobRepository.GetByName(jobName);
+        DistributedBackgroundJobModel? job = await _distributedJobRepository.GetByNameAsync(jobName);
 
         if (job is null)
         {
@@ -95,7 +95,7 @@ public class DistributedJobService : IDistributedJobService
         job.LastAttemptedRun = currentDateTime;
         job.LastRun = currentDateTime;
         job.IsRunning = false;
-        _distributedJobRepository.Update(job);
+        await _distributedJobRepository.UpdateAsync(job);
 
         scope.Complete();
     }
@@ -119,7 +119,7 @@ public class DistributedJobService : IDistributedJobService
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         scope.WriteLock(Constants.Locks.DistributedJobs);
 
-        DistributedBackgroundJobModel[] existingJobs = _distributedJobRepository.GetAll().ToArray();
+        IEnumerable<DistributedBackgroundJobModel> existingJobs = await _distributedJobRepository.GetAllAsync();
         var existingJobsByName = existingJobs.ToDictionary(x => x.Name);
 
         // Collect all changes first, then execute - minimizes time spent in the critical section
@@ -134,7 +134,7 @@ public class DistributedJobService : IDistributedJobService
                 if (existingJob.Period != registeredJob.Value)
                 {
                     existingJob.Period = registeredJob.Value;
-                    _distributedJobRepository.Update(existingJob);
+                    await _distributedJobRepository.UpdateAsync(existingJob);
                 }
             }
             else
@@ -156,7 +156,7 @@ public class DistributedJobService : IDistributedJobService
         // Batch insert new jobs
         if (jobsToAdd.Count > 0)
         {
-            _distributedJobRepository.Add(jobsToAdd);
+            await _distributedJobRepository.AddAsync(jobsToAdd);
         }
 
         // Batch delete jobs that are no longer registered
@@ -166,7 +166,7 @@ public class DistributedJobService : IDistributedJobService
 
         if (jobsToRemove.Count > 0)
         {
-            _distributedJobRepository.Delete(jobsToRemove);
+            await _distributedJobRepository.DeleteAsync(jobsToRemove);
         }
 
         scope.Complete();
