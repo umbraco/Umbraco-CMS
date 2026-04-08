@@ -18,7 +18,7 @@ namespace Umbraco.Cms.Api.Management.Middleware;
 public class BackOfficeAuthorizationInitializationMiddleware : IMiddleware
 {
     private SemaphoreSlim _firstBackOfficeRequestLocker = new(1); // this only works because this is a singleton
-    private ISet<string> _knownHosts = new HashSet<string>(); // this only works because this is a singleton
+    private ISet<string> _knownHosts = new HashSet<string>(StringComparer.OrdinalIgnoreCase); // this only works because this is a singleton
 
     private readonly UmbracoRequestPaths _umbracoRequestPaths;
     private readonly IServiceProvider _serviceProvider;
@@ -88,7 +88,7 @@ public class BackOfficeAuthorizationInitializationMiddleware : IMiddleware
             }
 
             // Ensure we explicitly add UmbracoApplicationUrl if configured (https://github.com/umbraco/Umbraco-CMS/issues/16179).
-            var hostsToRegister = new HashSet<string> { host };
+            var hostsToRegister = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { host };
             if (_webRoutingSettings.UmbracoApplicationUrl.IsNullOrWhiteSpace() is false)
             {
                 hostsToRegister.Add(_webRoutingSettings.UmbracoApplicationUrl);

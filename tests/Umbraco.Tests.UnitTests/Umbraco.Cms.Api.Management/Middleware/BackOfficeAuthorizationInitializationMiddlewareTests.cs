@@ -64,14 +64,7 @@ public class BackOfficeAuthorizationInitializationMiddlewareTests
         HttpContext context = CreateBackOfficeHttpContext();
 
         // Act — first request: registration fails.
-        try
-        {
-            await _middleware.InvokeAsync(context, next);
-        }
-        catch
-        {
-            // Expected — the middleware lets the exception propagate.
-        }
+        Assert.ThrowsAsync<Exception>(async () => await _middleware.InvokeAsync(context, next));
 
         // Act — second request: should retry (host was NOT cached).
         await _middleware.InvokeAsync(context, next);
@@ -102,6 +95,7 @@ public class BackOfficeAuthorizationInitializationMiddlewareTests
     }
 
     [Test]
+    [Timeout(5000)] // Fail fast if the semaphore-release regression is reintroduced (deadlock).
     public async Task Registration_Failure_Does_Not_Leak_Semaphore()
     {
         // Arrange — always throws
@@ -115,14 +109,7 @@ public class BackOfficeAuthorizationInitializationMiddlewareTests
         for (var i = 0; i < 3; i++)
         {
             HttpContext context = CreateBackOfficeHttpContext();
-            try
-            {
-                await _middleware.InvokeAsync(context, next);
-            }
-            catch
-            {
-                // Expected
-            }
+            Assert.ThrowsAsync<Exception>(async () => await _middleware.InvokeAsync(context, next));
         }
 
         // Assert — all 3 attempts reached EnsureBackOfficeApplicationAsync (no deadlock).
