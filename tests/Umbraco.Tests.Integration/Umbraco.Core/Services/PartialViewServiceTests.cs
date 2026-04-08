@@ -17,14 +17,6 @@ internal sealed class PartialViewServiceTests : UmbracoIntegrationTest
 {
     private IPartialViewService PartialViewService => GetRequiredService<IPartialViewService>();
 
-    /// <summary>
-    /// Configures the runtime mode to Production for tests decorated with [ConfigureBuilder].
-    /// </summary>
-    public static void ConfigureProductionMode(IUmbracoBuilder builder)
-    {
-        builder.Services.Configure<RuntimeSettings>(settings => settings.Mode = RuntimeMode.Production);
-    }
-
     [SetUp]
     public void SetUp() => DeleteAllPartialViewFiles();
 
