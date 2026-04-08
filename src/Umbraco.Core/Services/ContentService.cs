@@ -2004,7 +2004,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
     /// </summary>
     /// <param name="content">The blueprint content to save.</param>
     /// <param name="userId">The optional ID of the user saving the blueprint.</param>
-    [Obsolete("Please use the method taking all parameters. Scheduled for removal in Umbraco 19.")]
+    [Obsolete("Please use the method taking all parameters. Scheduled for removal in Umbraco 20.")]
     public void SaveBlueprint(IContent content, int userId = Constants.Security.SuperUserId)
         => SaveBlueprint(content, null, userId);
 
