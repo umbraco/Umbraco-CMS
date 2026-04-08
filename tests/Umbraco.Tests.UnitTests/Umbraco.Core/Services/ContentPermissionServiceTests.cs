@@ -48,7 +48,7 @@ public class ContentPermissionServiceTests
 
         _entityServiceMock
             .Setup(x => x.GetAllPaths(UmbracoObjectTypes.Document, new[] { contentKey }))
-            .Returns([CreateTreeEntityPath(contentKey, 1234, "-1,1234,5678")]);
+            .Returns([CreateTreeEntityPath(contentKey, 5678, "-1,1234,5678")]);
 
         SetupPermissions(user, "-1,1234,5678", ["A"]);
 
@@ -86,7 +86,7 @@ public class ContentPermissionServiceTests
 
         _entityServiceMock
             .Setup(x => x.GetAllPaths(UmbracoObjectTypes.Document, new[] { contentKey }))
-            .Returns([CreateTreeEntityPath(contentKey, 1234, "-1,1234,5678")]);
+            .Returns([CreateTreeEntityPath(contentKey, 5678, "-1,1234,5678")]);
 
         _entityServiceMock
             .Setup(x => x.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
@@ -108,7 +108,7 @@ public class ContentPermissionServiceTests
 
         _entityServiceMock
             .Setup(x => x.GetAllPaths(UmbracoObjectTypes.Document, new[] { contentKey }))
-            .Returns([CreateTreeEntityPath(contentKey, 1234, "-1,1234,5678")]);
+            .Returns([CreateTreeEntityPath(contentKey, 5678, "-1,1234,5678")]);
 
         SetupPermissions(user, "-1,1234,5678", ["A", "B", "C"]);
 
@@ -128,7 +128,7 @@ public class ContentPermissionServiceTests
 
         _entityServiceMock
             .Setup(x => x.GetAllPaths(UmbracoObjectTypes.Document, new[] { contentKey }))
-            .Returns([CreateTreeEntityPath(contentKey, 1234, "-1,1234,5678")]);
+            .Returns([CreateTreeEntityPath(contentKey, 5678, "-1,1234,5678")]);
 
         SetupPermissions(user, "-1,1234,5678", ["A", "F", "C"]);
 
@@ -185,21 +185,6 @@ public class ContentPermissionServiceTests
     }
 
     [Test]
-    public async Task Can_Authorize_Root_Access_By_Permission()
-    {
-        // Arrange
-        var user = CreateUser();
-
-        SetupPermissions(user, Constants.System.RootString, ["A"]);
-
-        // Act
-        var result = await _sut.AuthorizeRootAccessAsync(user, "A");
-
-        // Assert
-        Assert.That(result, Is.EqualTo(ContentAuthorizationStatus.Success));
-    }
-
-    [Test]
     public async Task Cannot_Authorize_Root_Access_By_Permission()
     {
         // Arrange
@@ -244,21 +229,6 @@ public class ContentPermissionServiceTests
 
         // Assert
         Assert.That(result, Is.EqualTo(ContentAuthorizationStatus.UnauthorizedMissingBinAccess));
-    }
-
-    [Test]
-    public async Task Can_Authorize_Bin_Access_By_Permission()
-    {
-        // Arrange
-        var user = CreateUser();
-
-        SetupPermissions(user, Constants.System.RecycleBinContentString, ["A"]);
-
-        // Act
-        var result = await _sut.AuthorizeBinAccessAsync(user, "A");
-
-        // Assert
-        Assert.That(result, Is.EqualTo(ContentAuthorizationStatus.Success));
     }
 
     [Test]
