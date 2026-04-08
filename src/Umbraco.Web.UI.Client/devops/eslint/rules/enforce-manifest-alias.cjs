@@ -22,7 +22,7 @@ module.exports = {
 		type: 'problem',
 		docs: {
 			description:
-				'Enforce unique manifest aliases in Umb.PascalCase.PascalCase format with at least 3 dot-separated segments.',
+				'Enforce unique manifest aliases in Umb.PascalCase.PascalCase format with at least 3 dot-separated segments. propertyEditorSchema aliases use Umbraco prefix with 2–3 segments.',
 			category: 'Naming',
 			recommended: true,
 		},
@@ -31,8 +31,12 @@ module.exports = {
 			duplicateAlias:
 				'Duplicate manifest alias "{{alias}}". First defined in {{firstFile}}:{{firstLine}}.',
 			missingUmbPrefix: 'Manifest alias "{{alias}}" must start with "Umb.".',
+			missingUmbracoPrefix:
+				'propertyEditorSchema alias "{{alias}}" must start with "Umbraco.".',
 			tooFewSegments:
 				'Manifest alias "{{alias}}" must have at least 3 dot-separated segments (e.g., "Umb.Type.Name").',
+			schemaSegmentCount:
+				'propertyEditorSchema alias "{{alias}}" must have 2 or 3 dot-separated segments (e.g., "Umbraco.TextBox" or "Umbraco.ColorPicker.EyeDropper").',
 			invalidSegment: 'Alias segment "{{segment}}" in "{{alias}}" must be PascalCase (e.g., "MySegment").',
 		},
 	},
@@ -93,22 +97,49 @@ module.exports = {
 				// --- Format validation ---
 				const segments = alias.split('.');
 
-				if (segments[0] !== 'Umb') {
-					context.report({
-						node: aliasProperty.value,
-						messageId: 'missingUmbPrefix',
-						data: { alias },
-					});
-					return;
-				}
+				// Determine if this is a propertyEditorSchema manifest.
+				const typeValue =
+					typeProperty.value.type === 'Literal' ? typeProperty.value.value : undefined;
+				const isSchemaType = typeValue === 'propertyEditorSchema';
 
-				if (segments.length < 3) {
-					context.report({
-						node: aliasProperty.value,
-						messageId: 'tooFewSegments',
-						data: { alias },
-					});
-					return;
+				if (isSchemaType) {
+					// propertyEditorSchema aliases must start with "Umbraco." and have 2–3 segments.
+					if (segments[0] !== 'Umbraco') {
+						context.report({
+							node: aliasProperty.value,
+							messageId: 'missingUmbracoPrefix',
+							data: { alias },
+						});
+						return;
+					}
+
+					if (segments.length < 2 || segments.length > 3) {
+						context.report({
+							node: aliasProperty.value,
+							messageId: 'schemaSegmentCount',
+							data: { alias },
+						});
+						return;
+					}
+				} else {
+					// All other manifests must start with "Umb." and have at least 3 segments.
+					if (segments[0] !== 'Umb') {
+						context.report({
+							node: aliasProperty.value,
+							messageId: 'missingUmbPrefix',
+							data: { alias },
+						});
+						return;
+					}
+
+					if (segments.length < 3) {
+						context.report({
+							node: aliasProperty.value,
+							messageId: 'tooFewSegments',
+							data: { alias },
+						});
+						return;
+					}
 				}
 
 				// Every segment must be PascalCase.
