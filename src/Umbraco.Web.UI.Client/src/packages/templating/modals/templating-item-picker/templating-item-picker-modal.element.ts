@@ -6,7 +6,7 @@ import type {
 } from './templating-item-picker-modal.token.js';
 import { UMB_PARTIAL_VIEW_PICKER_MODAL } from '@umbraco-cms/backoffice/partial-view';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_MANAGER_CONTEXT, UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UMB_DICTIONARY_PICKER_MODAL } from '@umbraco-cms/backoffice/dictionary';
@@ -16,9 +16,8 @@ export class UmbTemplatingItemPickerModalElement extends UmbModalBaseElement<
 	UmbTemplatingItemPickerModalData,
 	UmbTemplatingItemPickerModalValue
 > {
-	private _close() {
-		this.modalContext?.reject();
-	}
+	@state()
+	private _pickedItem?: CodeSnippetType;
 
 	#modalContext?: UmbModalManagerContext;
 
@@ -27,6 +26,24 @@ export class UmbTemplatingItemPickerModalElement extends UmbModalBaseElement<
 		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
 			this.#modalContext = instance;
 		});
+	}
+
+	private _close() {
+		this.modalContext?.reject();
+	}
+
+	async #submit() {
+		switch (this._pickedItem) {
+			case CodeSnippetType.pageField:
+				await this.#openTemplatingPageFieldModal();
+				break;
+			case CodeSnippetType.partialView:
+				await this.#openPartialViewPickerModal();
+				break;
+			case CodeSnippetType.dictionaryItem:
+				await this.#openDictionaryItemPickerModal();
+				break;
+		}
 	}
 
 	async #openTemplatingPageFieldModal() {
@@ -81,19 +98,30 @@ export class UmbTemplatingItemPickerModalElement extends UmbModalBaseElement<
 		return html`
 			<umb-body-layout headline=${this.localize.term('template_insert')}>
 				<uui-box> ${this.#renderItems()} </uui-box>
-				<uui-button
-					slot="actions"
-					@click=${this._close}
-					look="secondary"
-					label=${this.localize.term('general_close')}></uui-button>
+				
+				<div slot="actions">
+					<uui-button
+						@click=${this._close}
+						look="secondary"
+						label=${this.localize.term('general_close')}></uui-button>
+					<uui-button
+						@click=${this.#submit}
+						look="primary"
+						color="positive"
+						?disabled=${this._pickedItem === undefined}
+						label=${this.localize.term('general_submit')}></uui-button>
+				</div>
 			</umb-body-layout>
 		`;
 	}
 
 	#renderItems() {
 		return html`<div id="main">
-			<uui-button
-				@click=${this.#openTemplatingPageFieldModal}
+			<uui-card
+				selectable
+				select-only
+				.selected=${this._pickedItem === CodeSnippetType.pageField}
+				@click=${() => (this._pickedItem = CodeSnippetType.pageField)}
 				look="placeholder"
 				label=${this.localize.term('template_insert')}>
 				<h3><umb-localize key="template_insertPageField">Value</umb-localize></h3>
@@ -103,10 +131,13 @@ export class UmbTemplatingItemPickerModalElement extends UmbModalBaseElement<
 						alternative values.
 					</umb-localize>
 				</p>
-			</uui-button>
+			</uui-card>
 			${!this.data?.hidePartialViews
-				? html`<uui-button
-						@click=${this.#openPartialViewPickerModal}
+				? html`<uui-card
+						selectable
+						select-only
+						.selected=${this._pickedItem === CodeSnippetType.partialView}
+						@click=${() => (this._pickedItem = CodeSnippetType.partialView)}
 						look="placeholder"
 						label=${this.localize.term('template_insert')}>
 						<h3><umb-localize key="template_insertPartialView">Partial view</umb-localize></h3>
@@ -116,10 +147,13 @@ export class UmbTemplatingItemPickerModalElement extends UmbModalBaseElement<
 								reusing markup or for separating complex templates into separate files.
 							</umb-localize>
 						</p>
-					</uui-button>`
+					</uui-card>`
 				: ''}
-			<uui-button
-				@click=${this.#openDictionaryItemPickerModal}
+			<uui-card
+				selectable
+				select-only
+				.selected=${this._pickedItem === CodeSnippetType.dictionaryItem}
+				@click=${() => (this._pickedItem = CodeSnippetType.dictionaryItem)}
 				look="placeholder"
 				label=${this.localize.term('template_insertDictionaryItem')}>
 				<h3><umb-localize key="template_insertDictionaryItem">Dictionary Item</umb-localize></h3>
@@ -129,19 +163,30 @@ export class UmbTemplatingItemPickerModalElement extends UmbModalBaseElement<
 						for multilingual websites.
 					</umb-localize>
 				</p>
-			</uui-button>
+			</uui-card>
 		</div>`;
 	}
 
 	static override styles = [
 		UmbTextStyles,
 		css`
-			#main uui-button:not(:last-of-type) {
-				display: block;
-				margin-bottom: var(--uui-size-space-5);
+			#main {
+				display: grid;
+				grid-gap: var(--uui-size-space-5);
 			}
 
-			h3,
+			uui-card {
+				text-align: left;
+				display: block;
+				padding: var(--uui-size-space-4);
+			}
+
+			uui-card h3,
+			uui-card p {
+				pointer-events: none;
+				margin-top: 0;
+			}
+
 			p {
 				text-align: left;
 			}
