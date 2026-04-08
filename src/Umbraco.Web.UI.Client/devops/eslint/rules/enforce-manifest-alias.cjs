@@ -203,6 +203,9 @@ module.exports = {
 					checker && services ? resolveManifestType(node, checker, services) : undefined;
 				const isSchemaType = manifestType === 'propertyEditorSchema';
 
+				// Theme aliases are free-form — no format rules enforced.
+				if (manifestType === 'theme') return;
+
 				if (isSchemaType) {
 					// propertyEditorSchema aliases must start with "Umbraco." and have 2–3 segments.
 					if (segments[0] !== 'Umbraco') {
