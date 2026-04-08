@@ -207,6 +207,8 @@ export class UiBaseLocators extends BasePage {
   public readonly createActionButtonCollection: Locator;
   public readonly createActionBtn: Locator;
   public readonly createOptionActionListModal: Locator;
+  public readonly clearSelectionBtn: Locator;
+  public readonly collectionSelectionActions: Locator;
 
   // Reference & Entity
   public readonly confirmActionModalEntityReferences: Locator;
@@ -550,6 +552,8 @@ export class UiBaseLocators extends BasePage {
     this.createOptionActionListModal = page.locator(
       "umb-entity-create-option-action-list-modal",
     );
+    this.clearSelectionBtn = page.locator('umb-collection-selection-actions').getByLabel('Clear selection');
+    this.collectionSelectionActions = page.locator('umb-collection-selection-actions');
 
     // Reference & Entity
     this.confirmActionModalEntityReferences = page.locator(
@@ -1699,6 +1703,14 @@ export class UiBaseLocators extends BasePage {
   }
 
   // Collection Methods
+  async clickClearSelectionButton() {
+    await this.click(this.clearSelectionBtn);
+  }
+
+  async isCollectionSelectionActionsVisible(isVisible: boolean = true) {
+    await this.isVisible(this.collectionSelectionActions, isVisible);
+  }
+
   async clickCreateActionButton() {
     await this.click(this.createActionBtn);
   }
