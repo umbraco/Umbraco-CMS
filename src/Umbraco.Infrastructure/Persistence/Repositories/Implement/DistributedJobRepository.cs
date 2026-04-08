@@ -1,108 +1,138 @@
-﻿using NPoco;
-using Umbraco.Cms.Core.Exceptions;
+﻿using Microsoft.EntityFrameworkCore;
 using Umbraco.Cms.Infrastructure.Models;
-using Umbraco.Cms.Infrastructure.Persistence.Dtos;
-using Umbraco.Cms.Infrastructure.Scoping;
-using Umbraco.Extensions;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
 /// <inheritdoc />
-internal class DistributedJobRepository(IScopeAccessor scopeAccessor) : IDistributedJobRepository
+internal class DistributedJobRepository : IDistributedJobRepository
 {
-    /// <inheritdoc/>
-    public DistributedBackgroundJobModel? GetByName(string jobName)
+    private readonly IEFCoreScopeAccessor<UmbracoDbContext> _scopeAccessor;
+
+    public DistributedJobRepository(IEFCoreScopeAccessor<UmbracoDbContext> scopeAccessor)
     {
-        if (scopeAccessor.AmbientScope is null)
+        _scopeAccessor = scopeAccessor;
+    }
+
+    /// <inheritdoc/>
+    public async Task<DistributedBackgroundJobModel?> GetByNameAsync(string jobName)
+    {
+        if (_scopeAccessor.AmbientScope is null)
         {
             throw new InvalidOperationException("No scope, could not get distributed jobs");
         }
 
-        Sql<ISqlContext> sql = scopeAccessor.AmbientScope.SqlContext.Sql()
-            .Select<DistributedJobDto>()
-            .From<DistributedJobDto>()
-            .Where<DistributedJobDto>(x => x.Name == jobName);
+        return await _scopeAccessor.AmbientScope.ExecuteWithContextAsync(async db =>
+        {
+            DistributedJobDto? dto = db.DistributedJob
+                .FirstOrDefault(x => x.Name == jobName);
 
-        DistributedJobDto? dto = scopeAccessor.AmbientScope.Database.FirstOrDefault<DistributedJobDto>(sql);
-        return dto is null ? null : MapFromDto(dto);
+            return dto is null ? null : MapFromDto(dto);
+        });
     }
 
     /// <inheritdoc/>
-    public IEnumerable<DistributedBackgroundJobModel> GetAll()
+    public async Task<IEnumerable<DistributedBackgroundJobModel>> GetAllAsync()
     {
-        if (scopeAccessor.AmbientScope is null)
+        if (_scopeAccessor.AmbientScope is null)
         {
             throw new InvalidOperationException("No scope, could not get distributed jobs");
         }
 
-        Sql<ISqlContext> sql = scopeAccessor.AmbientScope.SqlContext.Sql()
-            .Select<DistributedJobDto>()
-            .From<DistributedJobDto>();
+        return await _scopeAccessor.AmbientScope.ExecuteWithContextAsync(async db =>
+        {
+            List<DistributedJobDto> jobs = await db.DistributedJob
+                .ToListAsync();
 
-        IUmbracoDatabase database = scopeAccessor.AmbientScope.Database;
-        List<DistributedJobDto> jobs = database.Fetch<DistributedJobDto>(sql);
-        return jobs.Select(MapFromDto);
+            return jobs.Select(MapFromDto);
+        });
     }
 
     /// <inheritdoc/>
-    public void Update(DistributedBackgroundJobModel distributedBackgroundJob)
+    public async Task UpdateAsync(DistributedBackgroundJobModel distributedBackgroundJob)
     {
-        if (scopeAccessor.AmbientScope is null)
+        if (_scopeAccessor.AmbientScope is null)
         {
             return;
         }
 
         DistributedJobDto dto = MapToDto(distributedBackgroundJob);
 
-        scopeAccessor.AmbientScope.Database.Update(dto);
+        await _scopeAccessor.AmbientScope.ExecuteWithContextAsync<DistributedJobDto>(async db =>
+        {
+             db.DistributedJob
+                .Update(dto);
+
+             await db.SaveChangesAsync();
+        });
     }
 
     /// <inheritdoc/>
-    public void Add(DistributedBackgroundJobModel distributedBackgroundJob)
+    public async Task AddAsync(DistributedBackgroundJobModel distributedBackgroundJob)
     {
-        if (scopeAccessor.AmbientScope is null)
+        if (_scopeAccessor.AmbientScope is null)
         {
             throw new InvalidOperationException("No scope, could not add distributed job");
         }
 
         DistributedJobDto dto = MapToDto(distributedBackgroundJob);
 
-        scopeAccessor.AmbientScope.Database.Insert(dto);
+        await _scopeAccessor.AmbientScope.ExecuteWithContextAsync<DistributedJobDto>(async db =>
+        {
+            db.DistributedJob
+                .Add(dto);
+
+            await db.SaveChangesAsync();
+        });
     }
 
     /// <inheritdoc/>
-    public void Delete(DistributedBackgroundJobModel distributedBackgroundJob)
+    public async Task DeleteAsync(DistributedBackgroundJobModel distributedBackgroundJob)
     {
-        if (scopeAccessor.AmbientScope is null)
+        if (_scopeAccessor.AmbientScope is null)
         {
             throw new InvalidOperationException("No scope, could not delete distributed job");
         }
 
         DistributedJobDto dto = MapToDto(distributedBackgroundJob);
 
-        int rowsAffected = scopeAccessor.AmbientScope.Database.Delete(dto);
-        if (rowsAffected == 0)
+        await _scopeAccessor.AmbientScope.ExecuteWithContextAsync<DistributedJobDto>(async db =>
         {
-            throw new InvalidOperationException("Could not delete distributed job, it may have already been deleted");
-        }
+            int rowsAffected = await db.DistributedJob
+                .Where(x => x.Id == dto.Id)
+                .ExecuteDeleteAsync();
+
+            if (rowsAffected == 0)
+            {
+                throw new InvalidOperationException(
+                    "Could not delete distributed job, it may have already been deleted");
+            }
+        });
     }
 
     /// <inheritdoc/>
-    public void Add(IEnumerable<DistributedBackgroundJobModel> jobs)
+    public async Task AddAsync(IEnumerable<DistributedBackgroundJobModel> jobs)
     {
-        if (scopeAccessor.AmbientScope is null)
+        if (_scopeAccessor.AmbientScope is null)
         {
             throw new InvalidOperationException("No scope, could not add distributed jobs");
         }
 
         IEnumerable<DistributedJobDto> dtos = jobs.Select(MapToDto);
-        scopeAccessor.AmbientScope.Database.InsertBulk(dtos);
+
+        await _scopeAccessor.AmbientScope.ExecuteWithContextAsync<DistributedJobDto>(async db =>
+        {
+            await db.DistributedJob
+                .AddRangeAsync(dtos);
+        });
     }
 
     /// <inheritdoc/>
-    public void Delete(IEnumerable<DistributedBackgroundJobModel> jobs)
+    public async Task DeleteAsync(IEnumerable<DistributedBackgroundJobModel> jobs)
     {
-        if (scopeAccessor.AmbientScope is null)
+        if (_scopeAccessor.AmbientScope is null)
         {
             throw new InvalidOperationException("No scope, could not delete distributed jobs");
         }
@@ -113,12 +143,12 @@ internal class DistributedJobRepository(IScopeAccessor scopeAccessor) : IDistrib
             return;
         }
 
-        Sql<ISqlContext> sql = scopeAccessor.AmbientScope.SqlContext.Sql()
-            .Delete()
-            .From<DistributedJobDto>()
-            .WhereIn<DistributedJobDto>(x => x.Id, jobIds);
-
-        scopeAccessor.AmbientScope.Database.Execute(sql);
+        await _scopeAccessor.AmbientScope.ExecuteWithContextAsync<DistributedJobDto>(async db =>
+        {
+            await db.DistributedJob
+                .Where(x => jobIds.Contains(x.Id))
+                .ExecuteDeleteAsync();
+        });
     }
 
     private DistributedJobDto MapToDto(DistributedBackgroundJobModel model) =>
