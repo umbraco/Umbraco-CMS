@@ -37,7 +37,7 @@ public sealed class ContentCopyingNotification : CopyingNotification<IContent>
     /// <param name="parentId">The ID of the new parent.</param>
     /// <param name="parentKey">The key of the new parent.</param>
     /// <param name="messages">The event messages collection.</param>
-    [Obsolete("Please use the constructor without parentId instead. Scheduled for removal in Umbraco 19.")]
+    [Obsolete("Please use the constructor without parentId instead. Scheduled for removal in Umbraco 20.")]
     public ContentCopyingNotification(IContent original, IContent copy, int parentId, Guid? parentKey, EventMessages messages)
         : this(original, copy, parentKey, messages)
     {
