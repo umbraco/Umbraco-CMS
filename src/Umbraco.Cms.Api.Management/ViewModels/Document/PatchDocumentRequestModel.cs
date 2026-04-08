@@ -13,5 +13,5 @@ public class PatchDocumentRequestModel
     /// </summary>
     [Required]
     [MinLength(1)]
-    public PatchOperationRequestModel[] Operations { get; set; } = Array.Empty<PatchOperationRequestModel>();
+    public PatchOperationRequestModel[] Operations { get; set; } = [];
 }

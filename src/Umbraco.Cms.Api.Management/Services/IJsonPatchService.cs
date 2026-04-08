@@ -6,7 +6,7 @@ namespace Umbraco.Cms.Api.Management.Services;
 /// <summary>
 /// Represents a service that processes and applies JSON Patch operations to resources.
 /// </summary>
-[Obsolete("Use the custom patch engine (DocumentPatcher) instead. JsonPatch.Net dependency is being removed. Scheduled for removal in Umbraco 19.")]
+[Obsolete("Use the custom patch engine (IDocumentPatcher) instead. JsonPatch.Net dependency is being removed. Scheduled for removal in Umbraco 19.")]
 public interface IJsonPatchService
 {
     /// <summary>

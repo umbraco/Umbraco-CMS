@@ -18,7 +18,6 @@ public static class PatchEngine
     /// <param name="path">The patch path expression.</param>
     /// <param name="value">The value to set (required for Replace and Add operations).</param>
     /// <returns>The modified JSON node.</returns>
-    /// <exception cref="ArgumentNullException">Thrown when <paramref name="json"/> is null or whitespace.</exception>
     /// <exception cref="InvalidOperationException">Thrown when the operation cannot be applied.</exception>
     /// <exception cref="FormatException">Thrown when the path syntax is invalid.</exception>
     public static JsonNode ApplyOperation(JsonNode jsonNode, PatchOperationType op, string path, object? value)

@@ -38,7 +38,7 @@ public static class PatchPathParser
             throw new FormatException("Path cannot be null or empty.");
         }
 
-        if (!path.StartsWith('/'))
+        if (path.StartsWith('/') is false)
         {
             throw new FormatException("Path must start with '/'.");
         }
@@ -112,6 +112,7 @@ public static class PatchPathParser
     /// Validates that a path string is syntactically correct.
     /// </summary>
     /// <param name="path">The path expression to validate.</param>
+    /// <param name="parsedPath">The parsed patch path segments returned in an out parameter.</param>
     /// <returns>True if the path is valid, false otherwise.</returns>
     public static bool IsValid(string path, [NotNullWhen(true)]out PatchPathSegment[]? parsedPath)
     {
