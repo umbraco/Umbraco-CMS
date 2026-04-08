@@ -792,7 +792,13 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
                 foreach (var isDraft in new[] { true, false })
                 {
                     database.Execute(
-                        $"INSERT INTO {syntax.GetQuotedTableName(DocumentUrlDto.TableName)} ({syntax.GetQuotedColumnName(DocumentUrlDto.UniqueIdColumnName)}, {syntax.GetQuotedColumnName(DocumentUrlDto.LanguageIdColumnName)}, {syntax.GetQuotedColumnName(DocumentUrlDto.IsDraftColumnName)}, {syntax.GetQuotedColumnName(DocumentUrlDto.UrlSegmentColumnName)}, {syntax.GetQuotedColumnName(DocumentUrlDto.IsPrimaryColumnName)}) VALUES (@0, @1, @2, @3, @4)",
+                        $"INSERT INTO {syntax.GetQuotedTableName(DocumentUrlDto.TableName)}" +
+                        $" ({syntax.GetQuotedColumnName(DocumentUrlDto.UniqueIdColumnName)}" +
+                        $", {syntax.GetQuotedColumnName(DocumentUrlDto.LanguageIdColumnName)}" +
+                        $", {syntax.GetQuotedColumnName(DocumentUrlDto.IsDraftColumnName)}" +
+                        $", {syntax.GetQuotedColumnName(DocumentUrlDto.UrlSegmentColumnName)}" +
+                        $", {syntax.GetQuotedColumnName(DocumentUrlDto.IsPrimaryColumnName)})" +
+                        " VALUES (@0, @1, @2, @3, @4)",
                         documentKey,
                         languageId,
                         isDraft,
