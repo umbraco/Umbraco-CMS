@@ -39,13 +39,15 @@ public class DocumentPatcher : IDocumentPatcher
         // Validate operation structure
         foreach (PatchOperationModel operation in patchModel.Operations)
         {
-            if (PatchPathParser.IsValid(operation.Path, out _) is false)
+            if (!PatchPathParser.IsValid(operation.Path, out PatchPathSegment[]? pathSegments))
             {
                 return Attempt.FailWithStatus(ContentPatchingOperationStatus.InvalidOperation, default(UpdateDocumentRequestModel)!);
             }
 
+            operation.PathSegments = pathSegments;
+
             // Validate that replace/add operations have a value
-            if ((operation.Op == PatchOperationType.Replace || operation.Op == PatchOperationType.Add) &&
+            if (operation.Op is PatchOperationType.Replace or PatchOperationType.Add &&
                 operation.Value is null)
             {
                 return Attempt.FailWithStatus(ContentPatchingOperationStatus.InvalidOperation, default(UpdateDocumentRequestModel)!);
@@ -68,10 +70,10 @@ public class DocumentPatcher : IDocumentPatcher
             // should not happen as the content exists.
             throw new JsonException("Unexpected empty JSON string when building update model for patching.");
         }
-        
-         // Should not fail parsing as the string is a result of JSON serialization.
-        JsonNode currentJsonNode = JsonNode.Parse(currentJsonString)
-            ?? throw new JsonException("Could not parse JSON string to JsonNode when building update model for patching.");
+
+        // Should not fail parsing as the string is a result of JSON serialization.
+        JsonNode currentJsonNode = JsonNode.Parse(currentJsonString)
+                                   ?? throw new JsonException("Could not parse JSON string to JsonNode when building update model for patching.");
 
         // Apply each PATCH operation to the JSON
         foreach (PatchOperationModel operation in patchModel.Operations)
@@ -81,7 +83,7 @@ public class DocumentPatcher : IDocumentPatcher
                 currentJsonNode = PatchEngine.ApplyOperation(
                     currentJsonNode,
                     operation.Op,
-                    operation.Path,
+                    operation.PathSegments!, // can't be null because of earlier validation.
                     operation.Value);
             }
             catch (InvalidOperationException)

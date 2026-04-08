@@ -24,6 +24,22 @@ public static class PatchEngine
     {
         PatchPathSegment[] segments = PatchPathParser.Parse(path);
 
+        return ApplyOperation(jsonNode, op, segments, value);
+    }
+
+    /// <summary>
+    /// Applies a single patch operation to a JSON node and returns the modified JSON node.
+    /// </summary>
+    /// <param name="jsonNode">The JSON node to modify.</param>
+    /// <param name="op">The operation type (Replace, Add, Remove).</param>
+    /// <param name="pathSegments">The patch path segments.</param>
+    /// <param name="value">The value to set (required for Replace and Add operations).</param>
+    /// <returns>The modified JSON node.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="json"/> is null or whitespace.</exception>
+    /// <exception cref="InvalidOperationException">Thrown when the operation cannot be applied.</exception>
+    /// <exception cref="FormatException">Thrown when the path syntax is invalid.</exception>
+    public static JsonNode ApplyOperation(JsonNode jsonNode, PatchOperationType op, PatchPathSegment[] pathSegments, object? value)
+    {
         if (jsonNode is null)
         {
             throw new InvalidOperationException("Failed to parse JSON string.");
@@ -33,7 +49,7 @@ public static class PatchEngine
             ? JsonSerializer.SerializeToNode(value)
             : null;
 
-        ResolvedTarget target = PatchPathResolver.Resolve(jsonNode, segments);
+        ResolvedTarget target = PatchPathResolver.Resolve(jsonNode, pathSegments);
         ApplyMutation(target, op, valueNode);
 
         return jsonNode;

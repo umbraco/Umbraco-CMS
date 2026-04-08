@@ -42,11 +42,10 @@ public interface IDocumentEditingPresentationFactory
     /// <returns>A <see cref="ContentPatchModel"/> containing the mapped operations and affected cultures/segments.</returns>
     ContentPatchModel MapPatchModel(PatchDocumentRequestModel requestModel) => throw new NotImplementedException();
 
-    // TODO (V19): Remove the default implementation.
     /// <summary>
     /// Maps a <see cref="ValidateUpdateDocumentRequestModel"/> to a <see cref="ValidateContentUpdateModel"/> for update validation.
     /// </summary>
     /// <param name="requestModel">The validate update document request model.</param>
     /// <returns>A <see cref="ValidateContentUpdateModel"/> ready for validation.</returns>
-    ValidateContentUpdateModel MapValidateUpdateModel(ValidateUpdateDocumentRequestModel requestModel) => throw new NotImplementedException();
+    ValidateContentUpdateModel MapValidateUpdateModel(ValidateUpdateDocumentRequestModel requestModel);
 }

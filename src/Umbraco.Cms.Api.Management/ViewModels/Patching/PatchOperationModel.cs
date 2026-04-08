@@ -1,3 +1,5 @@
+using Umbraco.Cms.Api.Management.Patching;
+
 namespace Umbraco.Cms.Api.Management.ViewModels.Patching;
 
 /// <summary>
@@ -14,6 +16,11 @@ public class PatchOperationModel
     /// Gets or sets the patch path expression identifying the target location.
     /// </summary>
     public string Path { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets the PathSegments extracted from the Path expression.
+    /// </summary>
+    public PatchPathSegment[]? PathSegments { get; internal set; }
 
     /// <summary>
     /// Gets or sets the value to set. Required for Replace and Add operations, null for Remove.

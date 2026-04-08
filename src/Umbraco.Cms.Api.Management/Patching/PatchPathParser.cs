@@ -112,7 +112,7 @@ public static class PatchPathParser
     /// Validates that a path string is syntactically correct.
     /// </summary>
     /// <param name="path">The path expression to validate.</param>
-    /// <param name="parsedPath">The parsed patch path segments returned in an out parameter.</param>
+    /// <param name="parsedPath">The parsedPath extracted from the path if the path is valid.</param>
     /// <returns>True if the path is valid, false otherwise.</returns>
     public static bool IsValid(string path, [NotNullWhen(true)]out PatchPathSegment[]? parsedPath)
     {
@@ -131,94 +131,6 @@ public static class PatchPathParser
         {
             return false;
         }
-    }
-
-    /// <summary>
-    /// Extracts all culture values from filter segments in a path.
-    /// </summary>
-    public static ISet<string> ExtractCultures(string path)
-    {
-        var cultures = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-
-        if (!IsValid(path, out PatchPathSegment[]? segments))
-        {
-            return cultures;
-        }
-
-        foreach (PatchPathSegment segment in segments)
-        {
-            if (segment is FilterSegment filter)
-            {
-                foreach (FilterCondition condition in filter.Conditions)
-                {
-                    if (string.Equals(condition.Key, "culture", StringComparison.OrdinalIgnoreCase)
-                        && condition.Value is not null)
-                    {
-                        cultures.Add(condition.Value);
-                    }
-                }
-            }
-        }
-
-        return cultures;
-    }
-
-    /// <summary>
-    /// Extracts all segment values from filter segments in a path.
-    /// </summary>
-    public static ISet<string> ExtractSegments(string path)
-    {
-        var result = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-
-        if (!IsValid(path, out PatchPathSegment[]? segments))
-        {
-            return result;
-        }
-
-        foreach (PatchPathSegment segment in segments)
-        {
-            if (segment is FilterSegment filter)
-            {
-                foreach (FilterCondition condition in filter.Conditions)
-                {
-                    if (string.Equals(condition.Key, "segment", StringComparison.OrdinalIgnoreCase)
-                        && condition.Value is not null)
-                    {
-                        result.Add(condition.Value);
-                    }
-                }
-            }
-        }
-
-        return result;
-    }
-
-    /// <summary>
-    /// Checks if a path targets invariant content (culture=null filter).
-    /// </summary>
-    public static bool TargetsInvariantCulture(string path)
-    {
-        if (!IsValid(path, out PatchPathSegment[]? segments))
-        {
-            return false;
-        }
-
-        foreach (PatchPathSegment segment in segments)
-        {
-            if (segment is FilterSegment filter)
-            {
-                foreach (FilterCondition condition in filter.Conditions)
-                {
-                    if (string.Equals(condition.Key, "culture", StringComparison.OrdinalIgnoreCase)
-                        && condition.Value is null)
-                    {
-                        return true;
-                    }
-                }
-            }
-        }
-
-        return false;
     }
 
     private static PatchPathSegment ParseToken(ReadOnlySpan<char> token)
