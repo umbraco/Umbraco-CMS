@@ -62,6 +62,7 @@ export class UmbCreateCollectionActionApi extends UmbCollectionActionBase {
 						label: manifest.meta.label ?? manifest.name,
 						icon: manifest.meta.icon,
 						href: await controller.api?.getHref(),
+						additionalOptions: manifest.meta.additionalOptions,
 					});
 				}
 

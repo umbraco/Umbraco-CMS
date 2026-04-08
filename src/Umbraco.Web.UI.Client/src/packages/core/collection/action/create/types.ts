@@ -9,6 +9,7 @@ export interface UmbCollectionCreateOption {
 	label: string;
 	icon?: string;
 	href?: string;
+	additionalOptions?: boolean;
 }
 
 declare global {
