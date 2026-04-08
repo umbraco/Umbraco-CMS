@@ -11,11 +11,18 @@ const aliasRegistry = new Map();
 
 /**
  * Check if a string is PascalCase: starts with uppercase letter, only alphanumeric characters.
+ * Fully-uppercase abbreviations (e.g. "RTE") are allowed.
+ * Mixed-case segments must not end with consecutive uppercase (e.g. "PropertyEditorUI" is invalid — use "PropertyEditorUi").
  * @param {string} str
  * @returns {boolean}
  */
 function isPascalCase(str) {
-	return /^[A-Z][a-zA-Z0-9]*$/.test(str);
+	if (!/^[A-Z][a-zA-Z0-9]*$/.test(str)) return false;
+	// Fully-uppercase abbreviations like "RTE" are fine.
+	if (/^[A-Z]+$/.test(str)) return true;
+	// In mixed-case segments, disallow trailing consecutive uppercase (e.g. "PropertyEditorUI").
+	if (/[A-Z]{2,}$/.test(str)) return false;
+	return true;
 }
 
 /**
