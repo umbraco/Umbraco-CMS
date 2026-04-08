@@ -6,6 +6,7 @@ TypeScript/Lit web components library for the Umbraco CMS backoffice. Published 
 
 ### Architecture & Design
 - **[Architecture](./docs/architecture.md)** - Technology stack, design philosophy, developer roles, package system, import map pipeline, design patterns
+- **[Manifests & Aliases](./docs/manifests.md)** - Manifest shape, alias conventions, alias constants, how aliases connect extensions, registration, registry operations, kind merging
 - **[Entities](./docs/entities.md)** - Entity types, entity context, how entityType connects workspaces/trees/actions/routing
 - **[Workspaces](./docs/workspaces.md)** - Workspace types, base classes, extension points, workspace contexts, save flow, routing
 - **[Core Primitives](./docs/core-primitives.md)** - UmbLitElement, observable state (UmbArrayState, UmbObjectState, etc.), Context API, controller lifecycle
