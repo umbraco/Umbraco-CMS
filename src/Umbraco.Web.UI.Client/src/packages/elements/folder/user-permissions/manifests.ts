@@ -6,10 +6,7 @@ import {
 	UMB_USER_PERMISSION_ELEMENT_READ,
 	UMB_USER_PERMISSION_ELEMENT_UPDATE,
 } from '../../user-permissions/constants.js';
-import type {
-	ManifestEntityUserPermission,
-	ManifestGranularUserPermission,
-} from '@umbraco-cms/backoffice/user-permission';
+import type { ManifestEntityUserPermission } from '@umbraco-cms/backoffice/user-permission';
 
 const entityUserPermissions: Array<ManifestEntityUserPermission> = [
 	{
@@ -73,20 +70,19 @@ const entityUserPermissions: Array<ManifestEntityUserPermission> = [
 	},
 ];
 
-const granularPermissions: Array<ManifestGranularUserPermission> = [
-	{
-		type: 'userGranularPermission',
-		alias: 'Umb.UserGranularPermission.ElementFolder',
-		name: 'Element Folder Granular User Permission',
-		weight: 900,
-		forEntityTypes: [UMB_ELEMENT_FOLDER_ENTITY_TYPE],
-		element: () => import('./input-element-folder-granular-user-permission.element.js'),
-		meta: {
-			schemaType: 'ElementPermissionPresentationModel',
-			label: '#user_permissionsGranular',
-			description: '{#userPermissions_granular_elementFolder}',
-		},
-	},
-];
+// const granularPermissions: Array<ManifestGranularUserPermission> = [
+// 	{
+// 		type: 'userGranularPermission',
+// 		alias: 'Umb.UserGranularPermission.ElementFolder',
+// 		name: 'Element Folder Granular User Permission',
+// 		weight: 900,
+// 		forEntityTypes: [UMB_ELEMENT_FOLDER_ENTITY_TYPE],
+// 		element: () => import('./input-element-folder-granular-user-permission.element.js'),
+// 		meta: {
+// 			schemaType: 'ElementFolderPermissionPresentationModel',
+// 			label: '#user_permissionsGranular',
+// 			description: '{#userPermissions_granular_elementFolder}',
+// 		},
+// 	},
+// ];
 
-export const manifests: Array<UmbExtensionManifest> = [...entityUserPermissions, ...granularPermissions];
