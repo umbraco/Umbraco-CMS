@@ -25,10 +25,12 @@ export class UmbEntityActionsTableColumnViewElement extends UmbLitElement implem
 		return this.#value;
 	}
 	set value(newValue: UmbEntityActionsTableColumnValue) {
+		const oldValue = this.#value;
 		this.#value = newValue ?? {};
 		if ('entityType' in this.#value || 'unique' in this.#value) {
 			deprecation.warn();
 		}
+		this.requestUpdate('value', oldValue);
 	}
 	#value: UmbEntityActionsTableColumnValue = {};
 
