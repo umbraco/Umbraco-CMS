@@ -61,6 +61,7 @@ export class DataTypeUiHelper extends UiBaseLocators {
   private readonly labelOffTxt: Locator;
   private readonly labelTxt: Locator;
   private readonly chooseAcceptedTypesBtn: Locator;
+  private readonly chooseAllowedMediaTypesBtn: Locator;
   private readonly chooseWithPlusBtn: Locator;
   private readonly storageTypeDropDownBox: Locator;
   private readonly allowDecimalsToggle: Locator;
@@ -226,7 +227,8 @@ export class DataTypeUiHelper extends UiBaseLocators {
     this.amountLowValueTxt = page.getByTestId('property:validationLimit').getByLabel('Low value');
     this.amountHighValueTxt = page.getByTestId('property:validationLimit').getByLabel('High value');
     this.chooseAcceptedTypesBtn = page.getByTestId('property:filter').getByLabel('Choose');
-    this.chooseWithPlusBtn = page.locator('#btn-add').filter({hasText: 'Choose'});
+    this.chooseAllowedMediaTypesBtn = page.getByTestId('property:allowedMediaTypes').locator('#btn-add');
+    this.chooseWithPlusBtn = page.getByTestId('property:mediaParentId').locator('#btn-add');
     this.chooseStartNodeBtn = page.getByTestId('property:startNodeId').locator('#btn-add');
 
     // Rich Editor
@@ -685,6 +687,17 @@ export class DataTypeUiHelper extends UiBaseLocators {
 
   async removeAcceptedType(mediaTypeName: string) {
     await this.click(this.page.locator(`uui-ref-node-document-type[name="${mediaTypeName}"]`).getByLabel('Remove'));
+    await this.click(this.confirmToRemoveBtn);
+  }
+
+  async addAllowedMediaType(mediaTypeName: string) {
+    await this.click(this.chooseAllowedMediaTypesBtn);
+    await this.clickTextButtonWithName(mediaTypeName);
+    await this.click(this.chooseModalBtn);
+  }
+
+  async removeAllowedMediaType(mediaTypeName: string) {
+    await this.click(this.page.getByTestId('property:allowedMediaTypes').locator(`uui-ref-node-document-type[name="${mediaTypeName}"]`).getByLabel('Remove'));
     await this.click(this.confirmToRemoveBtn);
   }
 
