@@ -1,0 +1,117 @@
+name: PR Review Digest
+
+on:
+  schedule:
+    # Runs Mon-Fri at 9:00 AM UTC
+    - cron: '0 9 * * 1-5'
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  digest:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get team members and unreviewed PRs
+        uses: actions/github-script@v7
+        env:
+          SLACK_WEBHOOK: ${{ secrets.PR_DIGEST_SLACK_WEBHOOK }}
+        with:
+          github-token: ${{ secrets.ORG_READ_TOKEN }}
+          script: |
+            const org = 'umbraco';
+            const repo = 'Umbraco-CMS';
+            const teamSlug = 'product-and-engineering';
+
+            // Get team members
+            let teamMembers = [];
+            try {
+              const { data: members } = await github.rest.teams.listMembersInOrg({
+                org,
+                team_slug: teamSlug,
+                per_page: 100
+              });
+              teamMembers = members.map(m => m.login.toLowerCase());
+              console.log(`Found ${teamMembers.length} team members`);
+            } catch (error) {
+              console.log(`Could not fetch team members: ${error.message}`);
+              console.log('Falling back to all non-bot PRs');
+            }
+
+            // Get open PRs
+            const { data: prs } = await github.rest.pulls.list({
+              owner: org,
+              repo,
+              state: 'open',
+              per_page: 100
+            });
+
+            // Filter PRs
+            const unreviewedPRs = [];
+            for (const pr of prs) {
+              // Skip drafts
+              if (pr.draft) continue;
+
+              // Skip bots
+              const author = pr.user.login.toLowerCase();
+              if (author.includes('bot') || author.includes('dependabot')) continue;
+
+              // If we have team members, filter by team
+              if (teamMembers.length > 0 && !teamMembers.includes(author)) continue;
+
+              // Check for reviews
+              const { data: reviews } = await github.rest.pulls.listReviews({
+                owner: org,
+                repo,
+                pull_number: pr.number
+              });
+
+              if (reviews.length === 0) {
+                const createdAt = new Date(pr.created_at);
+                const now = new Date();
+                const daysOld = Math.floor((now - createdAt) / (1000 * 60 * 60 * 24));
+
+                unreviewedPRs.push({
+                  number: pr.number,
+                  title: pr.title,
+                  author: pr.user.login,
+                  url: pr.html_url,
+                  daysOld
+                });
+              }
+            }
+
+            if (unreviewedPRs.length === 0) {
+              console.log('No unreviewed PRs from team members');
+              return;
+            }
+
+            // Sort by age (oldest first)
+            unreviewedPRs.sort((a, b) => b.daysOld - a.daysOld);
+
+            // Build Slack message
+            const prList = unreviewedPRs.map(pr =>
+              `• <${pr.url}|#${pr.number}> ${pr.title} (by ${pr.author}, ${pr.daysOld}d old)`
+            ).join('\n');
+
+            const message = {
+              text: `*${unreviewedPRs.length} PR(s) Awaiting Review*\n\n${prList}\n\n_Open PRs with no reviews yet. React with :eyes: when you start reviewing!_`
+            };
+
+            // Post to Slack
+            const webhook = process.env.SLACK_WEBHOOK;
+            if (!webhook) {
+              console.log('No Slack webhook configured. Message would be:');
+              console.log(message.text);
+              return;
+            }
+
+            const response = await fetch(webhook, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(message)
+            });
+
+            if (!response.ok) {
+              throw new Error(`Slack webhook failed: ${response.status}`);
+            }
+
+            console.log(`Posted ${unreviewedPRs.length} PRs to Slack`);
