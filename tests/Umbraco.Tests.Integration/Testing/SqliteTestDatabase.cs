@@ -19,11 +19,13 @@ using Umbraco.Cms.Tests.Common;
 
 namespace Umbraco.Cms.Tests.Integration.Testing;
 
-public class SqliteTestDatabase : BaseTestDatabase, ITestDatabase
+public class SqliteTestDatabase : BaseTestDatabase, ITestDatabase, ISnapshotableTestDatabase
 {
     public const string DatabaseName = "UmbracoTests";
     private readonly TestUmbracoDatabaseFactoryProvider _dbFactoryProvider;
     private readonly TestDatabaseSettings _settings;
+    private readonly ConcurrentDictionary<string, string> _snapshotPaths = new();
+    private readonly string _snapshotDir;
 
     protected UmbracoDatabase.CommandInfo[] _cachedDatabaseInitCommands = new UmbracoDatabase.CommandInfo[0];
 
@@ -33,6 +35,7 @@ public class SqliteTestDatabase : BaseTestDatabase, ITestDatabase
         _dbFactoryProvider = dbFactoryProvider;
         _databaseFactory = dbFactoryProvider.Create();
         _loggerFactory = loggerFactory;
+        _snapshotDir = Path.Combine(settings.FilesPath, "snapshots");
 
         var schema = Enumerable.Range(0, _settings.SchemaDatabaseCount)
             .Select(x => CreateSqLiteMeta(false));
@@ -43,7 +46,7 @@ public class SqliteTestDatabase : BaseTestDatabase, ITestDatabase
         _testDatabases = schema.Concat(empty).ToList();
     }
 
-    public override void Detach(TestDbMeta meta)
+    public override void Detach(TestDatabaseInformation meta)
     {
         meta.Connection.Close();
         _prepareQueue.TryAdd(CreateSqLiteMeta(meta.IsEmpty));
@@ -51,9 +54,9 @@ public class SqliteTestDatabase : BaseTestDatabase, ITestDatabase
 
     protected override void Initialize()
     {
-        _prepareQueue = new BlockingCollection<TestDbMeta>();
-        _readySchemaQueue = new BlockingCollection<TestDbMeta>();
-        _readyEmptyQueue = new BlockingCollection<TestDbMeta>();
+        _prepareQueue = new BlockingCollection<TestDatabaseInformation>();
+        _readySchemaQueue = new BlockingCollection<TestDatabaseInformation>();
+        _readyEmptyQueue = new BlockingCollection<TestDatabaseInformation>();
 
         foreach (var meta in _testDatabases)
         {
@@ -67,16 +70,16 @@ public class SqliteTestDatabase : BaseTestDatabase, ITestDatabase
         }
     }
 
-    protected override void ResetTestDatabase(TestDbMeta meta)
+    protected override void ResetTestDatabase(TestDatabaseInformation meta)
     {
         // Database survives in memory until all connections closed.
         meta.Connection = GetConnection(meta);
         meta.Connection.Open();
     }
 
-    protected override DbConnection GetConnection(TestDbMeta meta) => new SqliteConnection(meta.ConnectionString);
+    protected override DbConnection GetConnection(TestDatabaseInformation meta) => new SqliteConnection(meta.ConnectionString);
 
-    protected override void RebuildSchema(IDbCommand command, TestDbMeta meta)
+    protected override void RebuildSchema(IDbCommand command, TestDatabaseInformation meta)
     {
         using var connection = GetConnection(meta);
         connection.Open();
@@ -107,7 +110,7 @@ public class SqliteTestDatabase : BaseTestDatabase, ITestDatabase
         database.CompleteTransaction();
     }
 
-    private void RebuildSchemaFirstTime(TestDbMeta meta)
+    private void RebuildSchemaFirstTime(TestDatabaseInformation meta)
     {
         var dbFactory = _dbFactoryProvider.Create();
         dbFactory.Configure(meta.ToStronglyTypedConnectionString());
@@ -137,6 +140,41 @@ public class SqliteTestDatabase : BaseTestDatabase, ITestDatabase
             .ToArray();
     }
 
+    /// <inheritdoc />
+    public bool HasSnapshot(string snapshotKey) => _snapshotPaths.ContainsKey(snapshotKey);
+
+    /// <inheritdoc />
+    public void CreateSnapshot(string snapshotKey, TestDatabaseInformation sourceMeta)
+    {
+        Directory.CreateDirectory(_snapshotDir);
+        var filePath = Path.Combine(_snapshotDir, $"{snapshotKey}.db");
+
+        using var fileConn = new SqliteConnection($"Data Source={filePath}");
+        fileConn.Open();
+        ((SqliteConnection)sourceMeta.Connection).BackupDatabase(fileConn);
+
+        _snapshotPaths[snapshotKey] = filePath;
+    }
+
+    /// <inheritdoc />
+    public TestDatabaseInformation AttachFromSnapshot(string snapshotKey)
+    {
+        if (!_snapshotPaths.TryGetValue(snapshotKey, out var filePath))
+        {
+            throw new InvalidOperationException($"No snapshot found with key '{snapshotKey}'.");
+        }
+
+        var meta = CreateSqLiteMeta(empty: false);
+        meta.Connection = GetConnection(meta);
+        meta.Connection.Open();
+
+        using var fileConn = new SqliteConnection($"Data Source={filePath}");
+        fileConn.Open();
+        ((SqliteConnection)fileConn).BackupDatabase((SqliteConnection)meta.Connection);
+
+        return meta;
+    }
+
     public override void TearDown()
     {
         if (_prepareQueue == null)
@@ -155,9 +193,22 @@ public class SqliteTestDatabase : BaseTestDatabase, ITestDatabase
         _readySchemaQueue.CompleteAdding();
         while (_readySchemaQueue.TryTake(out _))
         { }
+
+        // Clean up snapshot files
+        if (Directory.Exists(_snapshotDir))
+        {
+            try
+            {
+                Directory.Delete(_snapshotDir, recursive: true);
+            }
+            catch
+            {
+                // Best-effort cleanup
+            }
+        }
     }
 
-    private TestDbMeta CreateSqLiteMeta(bool empty)
+    private TestDatabaseInformation CreateSqLiteMeta(bool empty)
     {
         var builder = new SqliteConnectionStringBuilder
         {
@@ -168,6 +219,6 @@ public class SqliteTestDatabase : BaseTestDatabase, ITestDatabase
             Cache = SqliteCacheMode.Shared
         };
 
-        return new TestDbMeta(builder.DataSource, empty, builder.ConnectionString, Constants.ProviderName, "InMemory");
+        return new TestDatabaseInformation(builder.DataSource, empty, builder.ConnectionString, Constants.ProviderName, "InMemory");
     }
 }

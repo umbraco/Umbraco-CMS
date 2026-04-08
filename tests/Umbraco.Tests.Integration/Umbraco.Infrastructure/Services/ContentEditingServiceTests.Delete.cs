@@ -1,25 +1,23 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
-using Umbraco.Cms.Tests.Integration.Attributes;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
 public partial class ContentEditingServiceTests
 {
-    protected IRelationService RelationService => GetRequiredService<IRelationService>();
-
-    public static void ConfigureDisableDeleteWhenReferenced(IUmbracoBuilder builder)
-        => builder.Services.Configure<ContentSettings>(config =>
-            config.DisableDeleteWhenReferenced = true);
+    private void EnableDisableDeleteWhenReferenced()
+        => GetRequiredService<IOptionsMonitor<ContentSettings>>().CurrentValue.DisableDeleteWhenReferenced = true;
 
     [Test]
-    [ConfigureBuilder(ActionName = nameof(ConfigureDisableDeleteWhenReferenced))]
     public async Task Cannot_Delete_When_Content_Is_Related_As_A_Child_And_Configured_To_Disable_When_Related()
     {
+        EnableDisableDeleteWhenReferenced();
+
         var moveAttempt = await ContentEditingService.MoveToRecycleBinAsync(Subpage.Key, Constants.Security.SuperUserKey);
         Assert.IsTrue(moveAttempt.Success);
 
@@ -35,9 +33,10 @@ public partial class ContentEditingServiceTests
     }
 
     [Test]
-    [ConfigureBuilder(ActionName = nameof(ConfigureDisableDeleteWhenReferenced))]
     public async Task Can_Delete_When_Content_Is_Related_To_Parent_For_Restore_And_Configured_To_Disable_When_Related()
     {
+        EnableDisableDeleteWhenReferenced();
+
         var moveAttempt = await ContentEditingService.MoveToRecycleBinAsync(Subpage.Key, Constants.Security.SuperUserKey);
         Assert.IsTrue(moveAttempt.Success);
 
@@ -53,9 +52,10 @@ public partial class ContentEditingServiceTests
     }
 
     [Test]
-    [ConfigureBuilder(ActionName = nameof(ConfigureDisableDeleteWhenReferenced))]
     public async Task Can_Delete_When_Content_Is_Related_As_A_Parent_And_Configured_To_Disable_When_Related()
     {
+        EnableDisableDeleteWhenReferenced();
+
         var moveAttempt = await ContentEditingService.MoveToRecycleBinAsync(Subpage.Key, Constants.Security.SuperUserKey);
         Assert.IsTrue(moveAttempt.Success);
 
@@ -71,9 +71,10 @@ public partial class ContentEditingServiceTests
     }
 
     [Test]
-    [ConfigureBuilder(ActionName = nameof(ConfigureDisableDeleteWhenReferenced))]
     public async Task Cannot_EmptyRecycleBin_When_Content_Is_Related_As_A_Child_And_Configured_To_Disable_When_Related()
     {
+        EnableDisableDeleteWhenReferenced();
+
         ContentService.MoveToRecycleBin(Subpage);
 
         // Setup a relation where the trashed page is related to another page as a child (e.g. the other page has a picker and has selected this page).
@@ -87,9 +88,10 @@ public partial class ContentEditingServiceTests
     }
 
     [Test]
-    [ConfigureBuilder(ActionName = nameof(ConfigureDisableDeleteWhenReferenced))]
     public async Task Can_EmptyRecycleBin_When_Content_Is_Related_To_Parent_For_Restore_And_Configured_To_Disable_When_Related()
     {
+        EnableDisableDeleteWhenReferenced();
+
         ContentService.MoveToRecycleBin(Subpage);
 
         // Setup a relation where the trashed page is related to its parent (created as the location to restore to).
@@ -104,9 +106,10 @@ public partial class ContentEditingServiceTests
     }
 
     [Test]
-    [ConfigureBuilder(ActionName = nameof(ConfigureDisableDeleteWhenReferenced))]
     public async Task Can_EmptyRecycleBin_When_Content_Is_Related_As_A_Parent_And_Configured_To_Disable_When_Related()
     {
+        EnableDisableDeleteWhenReferenced();
+
         ContentService.MoveToRecycleBin(Subpage);
 
         // Setup a relation where the trashed page is related to another page as a parent (not a child).

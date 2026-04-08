@@ -1,12 +1,10 @@
 using System.Linq.Expressions;
 using System.Net;
 using System.Net.Http.Json;
-using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Controllers.Dictionary;
 using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.Dictionary;
-using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models.TemporaryFile;
 using Umbraco.Cms.Core.Services;
 
@@ -17,17 +15,6 @@ public class ImportDictionaryControllerTests : ManagementApiUserGroupTestBase<Im
     private ITemporaryFileService TemporaryFileService => GetRequiredService<ITemporaryFileService>();
 
     private Guid _temporaryFileKey;
-
-    // We need to override the setup to add the file extension for dictionaries
-    protected override void CustomTestSetup(IUmbracoBuilder builder)
-    {
-        base.CustomTestSetup(builder);
-
-        builder.Services.Configure<ContentSettings>(options =>
-        {
-            options.AllowedUploadedFileExtensions = new HashSet<string> { "udt" };
-        });
-    }
 
     [SetUp]
     public async Task Setup()

@@ -8,23 +8,14 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
-using Umbraco.Cms.Tests.Integration.Attributes;
 using IContent = Umbraco.Cms.Core.Models.IContent;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
 public partial class ContentBlueprintEditingServiceTests
 {
-    public static void AddScaffoldedNotificationHandler(IUmbracoBuilder builder)
-        => builder
-            .AddNotificationHandler<ContentScaffoldedNotification, ContentScaffoldedNotificationHandler>()
-            .AddNotificationHandler<ContentScaffoldedNotification, BlockListPropertyNotificationHandler>()
-            .AddNotificationHandler<ContentScaffoldedNotification, BlockGridPropertyNotificationHandler>()
-            .AddNotificationHandler<ContentScaffoldedNotification, RichTextPropertyNotificationHandler>();
-
     [TestCase(true)]
     [TestCase(false)]
-    [ConfigureBuilder(ActionName = nameof(AddScaffoldedNotificationHandler))]
     public async Task Can_Get_Scaffold(bool variant)
     {
         var blueprint = await (variant ? CreateVariantContentBlueprint() : CreateInvariantContentBlueprint());
@@ -77,7 +68,6 @@ public partial class ContentBlueprintEditingServiceTests
     [TestCase(true, Constants.PropertyEditors.Aliases.BlockList)]
     [TestCase(true, Constants.PropertyEditors.Aliases.BlockGrid)]
     [TestCase(true, Constants.PropertyEditors.Aliases.RichText)]
-    [ConfigureBuilder(ActionName = nameof(AddScaffoldedNotificationHandler))]
     public async Task Get_Scaffold_With_Blocks_Generates_New_Block_Ids(bool variant, string editorAlias)
     {
         var blueprint = await CreateBlueprintWithBlocksEditor(variant, editorAlias);

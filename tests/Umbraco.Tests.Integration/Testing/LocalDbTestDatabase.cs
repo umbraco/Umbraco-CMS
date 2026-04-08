@@ -38,10 +38,10 @@ public class LocalDbTestDatabase : SqlServerBaseTestDatabase, ITestDatabase
         var counter = 0;
 
         var schema = Enumerable.Range(0, _settings.SchemaDatabaseCount)
-            .Select(x => TestDbMeta.CreateWithoutConnectionString($"{DatabaseName}-{++counter}", false));
+            .Select(x => TestDatabaseInformation.CreateWithoutConnectionString($"{DatabaseName}-{++counter}", false));
 
         var empty = Enumerable.Range(0, _settings.EmptyDatabasesCount)
-            .Select(x => TestDbMeta.CreateWithoutConnectionString($"{DatabaseName}-{++counter}", true));
+            .Select(x => TestDatabaseInformation.CreateWithoutConnectionString($"{DatabaseName}-{++counter}", true));
 
         _testDatabases = schema.Concat(empty).ToList();
 
@@ -65,9 +65,9 @@ public class LocalDbTestDatabase : SqlServerBaseTestDatabase, ITestDatabase
         s_localDbInstance.CreateDatabase(tempName, s_filesPath);
         s_localDbInstance.DetachDatabase(tempName);
 
-        _prepareQueue = new BlockingCollection<TestDbMeta>();
-        _readySchemaQueue = new BlockingCollection<TestDbMeta>();
-        _readyEmptyQueue = new BlockingCollection<TestDbMeta>();
+        _prepareQueue = new BlockingCollection<TestDatabaseInformation>();
+        _readySchemaQueue = new BlockingCollection<TestDatabaseInformation>();
+        _readyEmptyQueue = new BlockingCollection<TestDatabaseInformation>();
 
         for (var i = 0; i < _testDatabases.Count; i++)
         {

@@ -9,6 +9,30 @@ namespace Umbraco.Cms.Tests.Integration.Testing;
 
 public static class TestDatabaseFactory
 {
+    private static readonly Lock s_lock = new();
+    private static ITestDatabase? s_instance;
+
+    /// <summary>
+    ///     Gets or creates the shared <see cref="ITestDatabase"/> singleton.
+    ///     All test infrastructure paths (UmbracoIntegrationTestBase, UmbracoIntegrationFixtureBase,
+    ///     and TestDatabaseSwapper) must share a single instance to avoid competing for the same
+    ///     physical databases.
+    /// </summary>
+    public static ITestDatabase GetOrCreate(TestDatabaseSettings settings, TestUmbracoDatabaseFactoryProvider dbFactory, ILoggerFactory loggerFactory)
+    {
+        lock (s_lock)
+        {
+            if (s_instance is not null)
+            {
+                return s_instance;
+            }
+
+            Directory.CreateDirectory(settings.FilesPath);
+            s_instance = Create(settings, dbFactory, loggerFactory);
+            return s_instance;
+        }
+    }
+
     /// <summary>
     ///     Creates a TestDatabase instance
     /// </summary>
@@ -28,7 +52,7 @@ public static class TestDatabaseFactory
     /// $ docker run -e 'ACCEPT_EULA=Y' -e "SA_PASSWORD=MySuperSecretPassword123!" -e 'MSSQL_PID=Developer' -p 1433:1433 -d mcr.microsoft.com/mssql/server:2017-latest-ubuntu
     /// </code>
     /// </example>
-    public static ITestDatabase Create(TestDatabaseSettings settings, TestUmbracoDatabaseFactoryProvider dbFactory, ILoggerFactory loggerFactory) =>
+    private static ITestDatabase Create(TestDatabaseSettings settings, TestUmbracoDatabaseFactoryProvider dbFactory, ILoggerFactory loggerFactory) =>
         settings.DatabaseType switch
         {
             TestDatabaseSettings.TestDatabaseType.Sqlite => new SqliteTestDatabase(settings, dbFactory, loggerFactory),

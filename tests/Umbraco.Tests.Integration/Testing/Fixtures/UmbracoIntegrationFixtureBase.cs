@@ -12,24 +12,27 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Implementations;
+using Umbraco.Cms.Tests.Integration.Testing;
 
-namespace Umbraco.Cms.Tests.Integration.Testing;
+namespace Umbraco.Cms.Tests.Integration.Testing.Fixtures;
 
 /// <summary>
-///     Base class for all UmbracoIntegrationTests
+///     Fixture-agnostic base class for integration tests.
+///     Unlike <see cref="UmbracoIntegrationTestBase"/>, this class does NOT use NUnit lifecycle attributes,
+///     allowing it to be used from both [TestFixture] and [SetUpFixture] contexts.
 /// </summary>
 [SingleThreaded]
 [NonParallelizable]
-public abstract class UmbracoIntegrationTestBase
+public abstract class UmbracoIntegrationFixtureBase
 {
-    private static TestDatabaseInformation _fixtureDatabaseInformation;
+    private static TestDatabaseInformation _sFixtureDatabaseInformation;
 
-    // TODO (V18): Rename to s_testCount to follow naming conventions
     protected static int TestCount = 1;
 
     private readonly List<Action> _fixtureTeardown = new();
     private readonly Queue<Action> _testTeardown = new();
-    private bool _firstTestInFixture = true;
+
+    protected bool IsFirstTestInFixture { get; set; } = true;
 
     protected Dictionary<string, string> InMemoryConfiguration { get; } = new();
 
@@ -43,29 +46,37 @@ public abstract class UmbracoIntegrationTestBase
 
     protected void AddOnFixtureTearDown(Action tearDown) => _fixtureTeardown.Add(tearDown);
 
-    [SetUp]
-    public virtual void SetUp_Logging() =>
+    /// <summary>
+    ///     Log the start of a test. Call from [SetUp] or [OneTimeSetUp] as needed.
+    /// </summary>
+    protected void OnSetUpLogging() =>
         TestContext.Out.Write($"Start test {TestCount++}: {TestContext.CurrentContext.Test.Name}");
 
-    [TearDown]
-    public void TearDown_Logging() =>
+    /// <summary>
+    ///     Log the result of a test. Call from [TearDown] or [OneTimeTearDown] as needed.
+    /// </summary>
+    protected void OnTearDownLogging() =>
         TestContext.Out.Write($"  {TestContext.CurrentContext.Result.Outcome.Status}");
 
-    [OneTimeTearDown]
-    public void FixtureTearDown()
+    /// <summary>
+    ///     Execute per-test teardown actions. Call from [TearDown] or after each test in a shared fixture.
+    /// </summary>
+    protected void OnTestTearDown()
     {
-        foreach (var a in _fixtureTeardown)
+        IsFirstTestInFixture = false;
+
+        while (_testTeardown.TryDequeue(out var a))
         {
             a();
         }
     }
 
-    [TearDown]
-    public void TearDown()
+    /// <summary>
+    ///     Execute per-fixture teardown actions. Call from [OneTimeTearDown].
+    /// </summary>
+    protected void OnFixtureTearDown()
     {
-        _firstTestInFixture = false;
-
-        while (_testTeardown.TryDequeue(out var a))
+        foreach (var a in _fixtureTeardown)
         {
             a();
         }
@@ -146,13 +157,13 @@ public abstract class UmbracoIntegrationTestBase
 
     private TestDatabaseInformation SetupPerFixtureDatabase(ITestDatabase db, bool withSchema)
     {
-        if (_firstTestInFixture)
+        if (IsFirstTestInFixture)
         {
-            _fixtureDatabaseInformation = withSchema ? db.AttachSchema() : db.AttachEmpty();
-            AddOnFixtureTearDown(() => db.Detach(_fixtureDatabaseInformation));
+            _sFixtureDatabaseInformation = withSchema ? db.AttachSchema() : db.AttachEmpty();
+            AddOnFixtureTearDown(() => db.Detach(_sFixtureDatabaseInformation));
         }
 
-        return _fixtureDatabaseInformation;
+        return _sFixtureDatabaseInformation;
     }
 
     private ITestDatabase GetOrCreateDatabase(IServiceProvider serviceProvider)
