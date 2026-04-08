@@ -19,6 +19,16 @@ function isPascalCase(str) {
 }
 
 /**
+ * Check if a string is a valid locale code: PascalCase parts joined by underscores or hyphens.
+ * Matches patterns like "EN", "EN_US", "DA-DK", "CS_CZ", "FR_CH".
+ * @param {string} str
+ * @returns {boolean}
+ */
+function isLocaleCode(str) {
+	return /^[A-Z][a-zA-Z0-9]*([_-][A-Z][a-zA-Z0-9]*)*$/.test(str);
+}
+
+/**
  * Walk a TypeScript type and its base types to check if any has the given name.
  * @param {import('typescript').Type} type
  * @param {string} name
@@ -89,7 +99,7 @@ module.exports = {
 		type: 'problem',
 		docs: {
 			description:
-				'Enforce unique manifest aliases in Umb.PascalCase.PascalCase format with at least 3 dot-separated segments. propertyEditorSchema aliases use Umbraco prefix with 2–3 segments.',
+				'Enforce unique manifest aliases in Umb.PascalCase.PascalCase format with at least 3 dot-separated segments. propertyEditorSchema aliases use Umbraco prefix with 2–3 segments. Localization aliases allow locale codes (e.g., CS_CZ, DA-DK) in the last segment.',
 			category: 'Naming',
 			recommended: true,
 		},
@@ -234,8 +244,15 @@ module.exports = {
 				}
 
 				// Every segment must be PascalCase.
-				for (const segment of segments) {
-					if (!isPascalCase(segment)) {
+				// For localization manifests, the last segment may be a locale code (e.g., "CS_CZ", "DA-DK").
+				const isLocalizationType = manifestType === 'localization';
+
+				for (let i = 0; i < segments.length; i++) {
+					const segment = segments[i];
+					const isLastSegment = i === segments.length - 1;
+					const valid = isLastSegment && isLocalizationType ? isLocaleCode(segment) : isPascalCase(segment);
+
+					if (!valid) {
 						context.report({
 							node: aliasProperty.value,
 							messageId: 'invalidSegment',
