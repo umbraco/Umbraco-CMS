@@ -179,12 +179,6 @@ export class UmbInputSliderElement extends UmbFormControlMixin<string, typeof Um
 		return undefined;
 	}
 
-	#onInput(event: UUISliderEvent) {
-		event.stopPropagation();
-		this.value = event.target.value as string;
-		this.dispatchEvent(new UmbChangeEvent());
-	}
-
 	#onChange(event: UUISliderEvent) {
 		event.stopPropagation();
 		this.value = event.target.value as string;
@@ -203,7 +197,7 @@ export class UmbInputSliderElement extends UmbFormControlMixin<string, typeof Um
 				.max=${this.max}
 				.step=${this.step}
 				.value=${undefinedFallbackToString(this.valueLow, this.min).toString()}
-				@input=${this.#onInput}
+				@input=${this.#onChange}
 				@change=${this.#onChange}
 				?readonly=${this.readonly}>
 			</uui-slider>
@@ -221,7 +215,7 @@ export class UmbInputSliderElement extends UmbFormControlMixin<string, typeof Um
 					this.valueHigh,
 					this.max,
 				).toString()}"
-				@input=${this.#onInput}
+				@input=${this.#onChange}
 				@change=${this.#onChange}
 				?readonly=${this.readonly}>
 			</uui-range-slider>
