@@ -11,6 +11,8 @@ import type {
 	UmbTableColumn,
 } from '@umbraco-cms/backoffice/components';
 import type { UmbWithOptionalDescriptionModel } from '@umbraco-cms/backoffice/models';
+import { UmbElementControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbEntityContext } from '@umbraco-cms/backoffice/entity';
 
 import './entity-name-table-column-layout.element.js';
 
@@ -31,6 +33,25 @@ export class UmbTableCollectionViewElement extends UmbCollectionViewElementBase<
 
 	#hasDescriptions = false;
 
+	#rowContexts = new Map<string, { host: UmbElementControllerHost; entityContext: UmbEntityContext }>();
+
+	#onRowRendered = (element: HTMLElement, item: UmbTableItem) => {
+		const existing = this.#rowContexts.get(item.id);
+		if (existing) {
+			existing.entityContext.setEntityType(item.entityType);
+			existing.entityContext.setUnique(item.id);
+			return;
+		}
+
+		const host = new UmbElementControllerHost(element);
+		host.hostConnected();
+		const entityContext = new UmbEntityContext(host);
+		entityContext.setEntityType(item.entityType);
+		entityContext.setUnique(item.id);
+
+		this.#rowContexts.set(item.id, { host, entityContext });
+	};
+
 	#buildTableColumns() {
 		const nameColumn: UmbTableColumn = {
 			name: this.localize.term('general_name'),
@@ -47,6 +68,7 @@ export class UmbTableCollectionViewElement extends UmbCollectionViewElementBase<
 			name: '',
 			alias: 'entityActions',
 			align: 'right',
+			elementName: 'umb-entity-actions-table-column-view',
 		};
 
 		const descriptionColumn: UmbTableColumn = {
@@ -85,6 +107,7 @@ export class UmbTableCollectionViewElement extends UmbCollectionViewElementBase<
 			return {
 				id: item.unique,
 				icon: item.icon,
+				entityType: item.entityType,
 				selectable: this._isSelectableItem(item),
 				data: [
 					{
@@ -102,16 +125,20 @@ export class UmbTableCollectionViewElement extends UmbCollectionViewElementBase<
 					...manifestColumnData,
 					{
 						columnAlias: 'entityActions',
-						value: html`<umb-entity-actions-table-column-view
-							.value=${{
-								entityType: item.entityType,
-								unique: item.unique,
-								name: item.name,
-							}}></umb-entity-actions-table-column-view>`,
+						value: { name: item.name },
 					},
 				],
 			};
 		});
+
+		// Clean up row contexts for items that no longer exist
+		const currentIds = new Set(this._tableRows.map((row) => row.id));
+		for (const [id, ctx] of this.#rowContexts) {
+			if (!currentIds.has(id)) {
+				ctx.host.destroy();
+				this.#rowContexts.delete(id);
+			}
+		}
 	}
 
 	#onSelected(event: UmbTableSelectedEvent) {
@@ -140,6 +167,14 @@ export class UmbTableCollectionViewElement extends UmbCollectionViewElementBase<
 		}
 	}
 
+	override disconnectedCallback() {
+		super.disconnectedCallback();
+		for (const [, ctx] of this.#rowContexts) {
+			ctx.host.destroy();
+		}
+		this.#rowContexts.clear();
+	}
+
 	override render() {
 		if (this._loading) return nothing;
 		return html`
@@ -152,6 +187,7 @@ export class UmbTableCollectionViewElement extends UmbCollectionViewElementBase<
 				.columns=${this._tableColumns}
 				.items=${this._tableRows}
 				.selection=${this._selection}
+				.onRowRendered=${this.#onRowRendered}
 				@selected=${this.#onSelected}
 				@deselected="${this.#onDeselected}"></umb-table>
 		`;

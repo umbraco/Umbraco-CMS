@@ -1,20 +1,22 @@
-import type { UmbEntityModel, UmbNamedEntityModel } from '@umbraco-cms/backoffice/entity';
-import { html, nothing, customElement, property } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { UmbTableColumn, UmbTableColumnLayoutElement, UmbTableItem } from '@umbraco-cms/backoffice/components';
 
 @customElement('umb-entity-actions-table-column-view')
-export class UmbEntityActionsTableColumnViewElement extends UmbLitElement {
+export class UmbEntityActionsTableColumnViewElement extends UmbLitElement implements UmbTableColumnLayoutElement {
 	@property({ attribute: false })
-	value?: UmbEntityModel | UmbNamedEntityModel;
+	column!: UmbTableColumn;
+
+	@property({ attribute: false })
+	item!: UmbTableItem;
+
+	@property({ attribute: false })
+	value: { name?: string } = {};
 
 	override render() {
-		if (!this.value) return nothing;
-
 		return html`
 			<umb-entity-actions-bundle
-				.entityType=${this.value.entityType}
-				.unique=${this.value.unique}
-				.label=${this.localize.string((this.value as any).name)}>
+				.label=${this.localize.string(this.value?.name)}>
 			</umb-entity-actions-bundle>
 		`;
 	}
