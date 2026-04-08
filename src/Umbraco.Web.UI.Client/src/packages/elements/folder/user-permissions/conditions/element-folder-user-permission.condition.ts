@@ -83,7 +83,7 @@ export class UmbElementFolderUserPermissionCondition
 			const path = [...this.#ancestors, this.#unique].filter((unique) => unique !== null);
 			// Reverse the path to find the closest element folder permission quickly
 			const reversedPath = [...path].reverse();
-			const elementFolderPermissionsMap = new Map(this.#elementFolderPermissions.map((p) => [p.element.id, p]));
+			const elementFolderPermissionsMap = new Map(this.#elementFolderPermissions.map((p) => [p.elementFolder.id, p]));
 
 			// Find the closest element folder permission in the path
 			const closestElementFolderPermission = reversedPath.find((id) => elementFolderPermissionsMap.has(id));

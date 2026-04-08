@@ -2,7 +2,7 @@ import { UmbElementFolderItemRepository } from '../repository/item/element-folde
 import { UMB_ELEMENT_PICKER_MODAL } from '../../modals/element-picker-modal.token.js';
 import type { UmbElementFolderItemModel } from '../repository/item/types.js';
 import type { UmbElementTreeItemModel } from '../../tree/types.js';
-import type { UmbElementUserPermissionModel } from '../../user-permissions/types.js';
+import type { UmbElementFolderUserPermissionModel } from './types.js';
 import { css, customElement, html, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -15,13 +15,13 @@ import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-input-element-folder-granular-user-permission')
 export class UmbInputElementFolderGranularUserPermissionElement extends UUIFormControlMixin(UmbLitElement, '') {
-	#permissions: Array<UmbElementUserPermissionModel> = [];
-	public get permissions(): Array<UmbElementUserPermissionModel> {
+	#permissions: Array<UmbElementFolderUserPermissionModel> = [];
+	public get permissions(): Array<UmbElementFolderUserPermissionModel> {
 		return this.#permissions;
 	}
-	public set permissions(value: Array<UmbElementUserPermissionModel>) {
+	public set permissions(value: Array<UmbElementFolderUserPermissionModel>) {
 		this.#permissions = value;
-		const uniques = value.map((item) => item.element.id);
+		const uniques = value.map((item) => item.elementFolder.id);
 		this.#observePickedFolders(uniques);
 	}
 
@@ -65,7 +65,7 @@ export class UmbInputElementFolderGranularUserPermissionElement extends UUIFormC
 
 		// update permission with new verbs
 		this.permissions = this.#permissions.map((permission) => {
-			if (permission.element.id === item.unique) {
+			if (permission.elementFolder.id === item.unique) {
 				return {
 					...permission,
 					verbs: result,
@@ -98,9 +98,9 @@ export class UmbInputElementFolderGranularUserPermissionElement extends UUIFormC
 				(result) => {
 					this.#folderPickerModalContext?.reject();
 
-					const permissionItem: UmbElementUserPermissionModel = {
-						$type: 'ElementPermissionPresentationModel',
-						element: { id: unique },
+					const permissionItem: UmbElementFolderUserPermissionModel = {
+						$type: 'ElementFolderPermissionPresentationModel',
+						elementFolder: { id: unique },
 						verbs: result,
 					};
 
@@ -216,7 +216,7 @@ export class UmbInputElementFolderGranularUserPermissionElement extends UUIFormC
 	}
 
 	#getPermissionForFolder(unique: string) {
-		return this.#permissions?.find((permission) => permission.element.id === unique);
+		return this.#permissions?.find((permission) => permission.elementFolder.id === unique);
 	}
 
 	#getPermissionNamesForFolder(item: UmbElementFolderItemModel) {
