@@ -1,5 +1,7 @@
 'use strict';
 
+const { ESLintUtils } = require('@typescript-eslint/utils');
+
 /**
  * Registry tracking alias occurrences across files within a single ESLint run.
  * Used for cross-file uniqueness checks.
@@ -14,6 +16,71 @@ const aliasRegistry = new Map();
  */
 function isPascalCase(str) {
 	return /^[A-Z][a-zA-Z0-9]*$/.test(str);
+}
+
+/**
+ * Walk a TypeScript type and its base types to check if any has the given name.
+ * @param {import('typescript').Type} type
+ * @param {string} name
+ * @param {import('typescript').TypeChecker} checker
+ * @param {Set<import('typescript').Type>} [visited]
+ * @returns {boolean}
+ */
+function typeExtendsName(type, name, checker, visited = new Set()) {
+	if (visited.has(type)) return false;
+	visited.add(type);
+
+	const symbol = type.getSymbol() || type.aliasSymbol;
+	if (symbol && symbol.getName() === name) return true;
+
+	const baseTypes = type.getBaseTypes?.() ?? [];
+	for (const base of baseTypes) {
+		if (typeExtendsName(base, name, checker, visited)) return true;
+	}
+
+	// Also check intersection types (Type & OtherType).
+	if (type.isIntersection?.()) {
+		for (const member of type.types) {
+			if (typeExtendsName(member, name, checker, visited)) return true;
+		}
+	}
+
+	return false;
+}
+
+/**
+ * Resolve the manifest `type` value. First tries the literal property on the node,
+ * then falls back to the TypeScript type's `type` property literal type.
+ * @param {import('@typescript-eslint/utils').TSESTree.ObjectExpression} node
+ * @param {import('typescript').TypeChecker} checker
+ * @param {import('@typescript-eslint/utils').ParserServicesWithTypeInformation} services
+ * @returns {string | undefined}
+ */
+function resolveManifestType(node, checker, services) {
+	// Try literal property first.
+	const typeProp = node.properties.find(
+		(p) =>
+			p.type === 'Property' &&
+			!p.computed &&
+			((p.key.type === 'Identifier' && p.key.name === 'type') ||
+				(p.key.type === 'Literal' && p.key.value === 'type')),
+	);
+	if (typeProp && typeProp.value.type === 'Literal' && typeof typeProp.value.value === 'string') {
+		return typeProp.value.value;
+	}
+
+	// Fall back to the TS type's `type` property.
+	const tsNode = services.esTreeNodeToTSNodeMap.get(node);
+	const objectType = checker.getTypeAtLocation(tsNode);
+	const typeMember = objectType.getProperty('type');
+	if (typeMember) {
+		const memberType = checker.getTypeOfSymbolAtLocation(typeMember, tsNode);
+		if (memberType.isStringLiteral()) {
+			return memberType.value;
+		}
+	}
+
+	return undefined;
 }
 
 /** @type {import('eslint').Rule.RuleModule} */
@@ -50,6 +117,16 @@ module.exports = {
 			}
 		}
 
+		// Try to get TypeScript services (unavailable for .js files or when project is not configured).
+		let services;
+		let checker;
+		try {
+			services = ESLintUtils.getParserServices(context);
+			checker = services.program?.getTypeChecker();
+		} catch {
+			// No type info available — fall through to structural detection only.
+		}
+
 		return {
 			ObjectExpression(node) {
 				const aliasProperty = node.properties.find(
@@ -59,19 +136,33 @@ module.exports = {
 						((p.key.type === 'Identifier' && p.key.name === 'alias') ||
 							(p.key.type === 'Literal' && p.key.value === 'alias')),
 				);
-				const typeProperty = node.properties.find(
-					(p) =>
-						p.type === 'Property' &&
-						!p.computed &&
-						((p.key.type === 'Identifier' && p.key.name === 'type') ||
-							(p.key.type === 'Literal' && p.key.value === 'type')),
-				);
 
-				// Only validate objects that look like manifest declarations (have both type and alias).
-				if (!aliasProperty || !typeProperty) return;
-
-				// Only validate string literal alias values; constant references can't be statically resolved here.
+				// Must have an alias property with a string literal value.
+				if (!aliasProperty) return;
 				if (aliasProperty.value.type !== 'Literal' || typeof aliasProperty.value.value !== 'string') return;
+
+				// Determine if this object is a manifest.
+				let isManifest = false;
+
+				if (checker && services) {
+					// Type-aware: check if the object's type extends ManifestBase.
+					const tsNode = services.esTreeNodeToTSNodeMap.get(node);
+					const objectType = checker.getTypeAtLocation(tsNode);
+					isManifest = typeExtendsName(objectType, 'ManifestBase', checker);
+				}
+
+				if (!isManifest) {
+					// Structural fallback: require both `type` and `alias` properties.
+					const typeProperty = node.properties.find(
+						(p) =>
+							p.type === 'Property' &&
+							!p.computed &&
+							((p.key.type === 'Identifier' && p.key.name === 'type') ||
+								(p.key.type === 'Literal' && p.key.value === 'type')),
+					);
+					if (!typeProperty) return;
+					isManifest = true;
+				}
 
 				const alias = aliasProperty.value.value;
 				const line = aliasProperty.value.loc?.start.line ?? 0;
@@ -97,10 +188,10 @@ module.exports = {
 				// --- Format validation ---
 				const segments = alias.split('.');
 
-				// Determine if this is a propertyEditorSchema manifest.
-				const typeValue =
-					typeProperty.value.type === 'Literal' ? typeProperty.value.value : undefined;
-				const isSchemaType = typeValue === 'propertyEditorSchema';
+				// Resolve the manifest type (literal property or TS type).
+				const manifestType =
+					checker && services ? resolveManifestType(node, checker, services) : undefined;
+				const isSchemaType = manifestType === 'propertyEditorSchema';
 
 				if (isSchemaType) {
 					// propertyEditorSchema aliases must start with "Umbraco." and have 2–3 segments.
