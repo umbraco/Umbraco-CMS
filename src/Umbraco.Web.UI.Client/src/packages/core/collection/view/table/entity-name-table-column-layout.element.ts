@@ -1,10 +1,27 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { html, LitElement, nothing, customElement, property } from '@umbraco-cms/backoffice/external/lit';
+import { html, nothing, customElement, property } from '@umbraco-cms/backoffice/external/lit';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { UmbTableColumn, UmbTableColumnLayoutElement, UmbTableItem } from '@umbraco-cms/backoffice/components';
 
+interface UmbEntityNameTableColumnValue {
+	name: string;
+	href?: string;
+}
+
+/**
+ * Table column layout element that renders an entity name, optionally as a link.
+ * @element umb-entity-name-table-column-layout
+ */
 @customElement('umb-entity-name-table-column-layout')
-export class UmbEntityNameTableColumnLayoutElement extends LitElement {
+export class UmbEntityNameTableColumnLayoutElement extends UmbLitElement implements UmbTableColumnLayoutElement {
 	@property({ attribute: false })
-	value!: { name: string; href?: string };
+	column!: UmbTableColumn;
+
+	@property({ attribute: false })
+	item!: UmbTableItem;
+
+	@property({ attribute: false })
+	value!: UmbEntityNameTableColumnValue;
 
 	override render() {
 		if (!this.value) return nothing;

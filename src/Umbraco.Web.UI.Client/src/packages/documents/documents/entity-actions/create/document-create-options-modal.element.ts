@@ -175,7 +175,7 @@ export class UmbDocumentCreateOptionsModalElement extends UmbModalBaseElement<
 					(documentType) => documentType.unique,
 					(documentType) => html`
 						<uui-ref-node-document-type
-							.name=${this.localize.string(documentType.name)}
+							.name=${this.localize.string(documentType.name) + '...'}
 							.alias=${this.localize.string(documentType.description ?? '')}
 							select-only
 							selectable

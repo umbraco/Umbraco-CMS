@@ -1,5 +1,6 @@
 import type { UmbCollectionLayoutConfiguration } from '../types.js';
 import type { ManifestCollectionView } from './collection-view.extension.js';
+import type { UmbCollectionViewElementBase } from './umb-collection-view-element-base.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbExtensionsManifestInitializer, createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -101,8 +102,8 @@ export class UmbCollectionViewManager extends UmbControllerBase {
 				return {
 					path: `${view.meta.pathName}`,
 					component: () => createExtensionElement(view),
-					setup: (component: HTMLElement) => {
-						(component as any).manifest = view;
+					setup: (component) => {
+						(component as UmbCollectionViewElementBase).manifest = view;
 						this.setCurrentView(view);
 					},
 				};
@@ -113,8 +114,8 @@ export class UmbCollectionViewManager extends UmbControllerBase {
 					unique: fallbackView.alias,
 					path: '',
 					component: () => createExtensionElement(fallbackView),
-					setup: (component: HTMLElement) => {
-						(component as any).manifest = fallbackView;
+					setup: (component) => {
+						(component as UmbCollectionViewElementBase).manifest = fallbackView;
 						this.setCurrentView(fallbackView);
 					},
 				});

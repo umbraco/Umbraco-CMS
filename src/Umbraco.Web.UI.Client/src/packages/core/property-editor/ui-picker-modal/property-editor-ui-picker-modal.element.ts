@@ -132,6 +132,7 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbModalBaseElement<
 		css`
 			:host {
 				display: block;
+				height: 100%;
 				container-type: inline-size;
 			}
 

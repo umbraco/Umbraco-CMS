@@ -7,6 +7,14 @@ export const manifests: Array<UmbExtensionManifest> = [
 		kind: 'table',
 		alias: 'Example.CollectionView.Table',
 		name: 'Example Table Collection View',
+		meta: {
+			columns: [
+				{
+					label: '#general_status',
+					field: 'status',
+				},
+			],
+		},
 		conditions: [
 			{
 				alias: UMB_COLLECTION_ALIAS_CONDITION,
