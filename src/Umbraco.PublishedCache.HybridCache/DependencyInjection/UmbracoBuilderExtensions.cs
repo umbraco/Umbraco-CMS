@@ -92,6 +92,7 @@ public static class UmbracoBuilderExtensions
 
         builder.Services.AddSingleton<IMediaSeedKeyProvider, MediaBreadthFirstKeyProvider>();
 
+        builder.Services.AddSingleton<IElementSeedKeyProvider, ElementContentTypeSeedKeyProvider>();
         builder.Services.AddSingleton<IElementSeedKeyProvider, ElementBreadthFirstKeyProvider>();
         return builder;
     }

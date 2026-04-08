@@ -47,8 +47,7 @@ public class CacheSettings
     /// <summary>
     /// Gets or sets a value for the collection of content type ids to always have in the cache.
     /// </summary>
-    public List<Guid> ContentTypeKeys { get; set; } =
-        new();
+    public List<Guid> ContentTypeKeys { get; set; } = new();
 
     /// <summary>
     /// Gets or sets a value for the document breadth first seed count.
@@ -99,16 +98,16 @@ public class CacheSettings
         /// <summary>
         ///     Gets or sets the cache entry settings for documents.
         /// </summary>
-        public CacheEntrySettings Document { get; set; } = new CacheEntrySettings();
+        public CacheEntrySettings Document { get; set; } = new();
 
         /// <summary>
         ///     Gets or sets the cache entry settings for media items.
         /// </summary>
-        public CacheEntrySettings Media { get; set; } = new CacheEntrySettings();
+        public CacheEntrySettings Media { get; set; } = new();
 
         /// <summary>
         ///     Gets or sets the cache entry settings for element items.
         /// </summary>
-        public CacheEntrySettings Element { get; set; } = new CacheEntrySettings();
+        public CacheEntrySettings Element { get; set; } = new();
     }
 }

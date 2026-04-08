@@ -365,6 +365,10 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         => GetContentSourceByDocumentTypeKey(keys, Constants.ObjectTypes.Document).Where(x => x.Published == published).Select(x => x.Key);
 
     /// <inheritdoc />
+    public IEnumerable<Guid> GetElementKeysByContentTypeKeys(IEnumerable<Guid> keys, bool published = false)
+        => GetContentSourceByDocumentTypeKey(keys, Constants.ObjectTypes.Element).Where(x => x.Published == published).Select(x => x.Key);
+
+    /// <inheritdoc />
     public IEnumerable<(Guid Key, bool IsDraft)> GetDocumentKeysWithPublishedStatus(IEnumerable<Guid> contentTypeKeys)
     {
         Guid[] keys = contentTypeKeys.ToArray();

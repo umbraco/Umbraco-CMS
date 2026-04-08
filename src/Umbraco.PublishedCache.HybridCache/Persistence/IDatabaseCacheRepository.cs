@@ -100,6 +100,14 @@ internal interface IDatabaseCacheRepository
     Task<IEnumerable<ContentCacheNode>> GetElementSourcesAsync(IEnumerable<Guid> keys, bool preview = false);
 
     /// <summary>
+    /// Gets all element keys of specific element types.
+    /// </summary>
+    /// <param name="keys">The element types to find elements using.</param>
+    /// <param name="published">A flag indicating whether to restrict to just published elements.</param>
+    /// <returns>The keys of all elements using the specified element types.</returns>
+    IEnumerable<Guid> GetElementKeysByContentTypeKeys(IEnumerable<Guid> keys, bool published = false);
+
+    /// <summary>
     /// Refreshes the cache for the given element cache node.
     /// </summary>
     Task RefreshElementAsync(ContentCacheNode contentCacheNode, PublishedState publishedState);
