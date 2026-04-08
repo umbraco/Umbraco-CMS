@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.OutputCaching;
-using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Web.Website.Caching;
@@ -15,14 +14,12 @@ public class WebsiteOutputCacheManagerTests
     [SetUp]
     public void SetUp()
     {
-        _storeMock = new Mock<IOutputCacheStore>(MockBehavior.Strict);
+        _storeMock = new Mock<IOutputCacheStore>();
         _storeMock
             .Setup(s => s.EvictByTagAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .Returns(ValueTask.CompletedTask);
 
-        var services = new ServiceCollection();
-        services.AddSingleton(_storeMock.Object);
-        _manager = new WebsiteOutputCacheManager(services.BuildServiceProvider());
+        _manager = new WebsiteOutputCacheManager(_storeMock.Object);
     }
 
     [Test]
@@ -55,15 +52,5 @@ public class WebsiteOutputCacheManagerTests
         _storeMock.Verify(
             s => s.EvictByTagAsync("custom-tag", It.IsAny<CancellationToken>()),
             Times.Once);
-    }
-
-    [Test]
-    public async Task EvictContentAsync_WhenStoreNull_NoOp()
-    {
-        var services = new ServiceCollection();
-        var manager = new WebsiteOutputCacheManager(services.BuildServiceProvider());
-
-        // Should not throw.
-        await manager.EvictContentAsync(Guid.NewGuid());
     }
 }

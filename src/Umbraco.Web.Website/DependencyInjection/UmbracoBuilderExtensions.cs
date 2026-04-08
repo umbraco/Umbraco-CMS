@@ -104,10 +104,6 @@ public static partial class UmbracoBuilderExtensions
 
     private static IUmbracoBuilder AddWebsiteOutputCache(this IUmbracoBuilder builder)
     {
-        // Always register the cache manager — it's a public API that customers may inject,
-        // and it's a no-op when the output cache store isn't registered.
-        builder.Services.AddSingleton<IWebsiteOutputCacheManager, WebsiteOutputCacheManager>();
-
         WebsiteSettings.OutputCacheSettings settings = builder.Config
             .GetSection(Constants.Configuration.ConfigWebsite)
             .Get<WebsiteSettings>()?.OutputCache
@@ -145,6 +141,7 @@ public static partial class UmbracoBuilderExtensions
         builder.AddNotificationAsyncHandler<MemberCacheRefresherNotification, MemberOutputCacheEvictionHandler>();
         builder.Services.AddSingleton<IWebsiteOutputCacheTagProvider, ContentTypeOutputCacheTagProvider>();
         builder.Services.AddSingleton<IWebsiteOutputCacheDurationProvider, DefaultWebsiteOutputCacheDurationProvider>();
+        builder.Services.AddSingleton<IWebsiteOutputCacheManager, WebsiteOutputCacheManager>();
 
         return builder;
     }
