@@ -42,7 +42,10 @@ export class MemberTypeApiHelper {
         }
         return await this.delete(child.id);
       } else if (child.hasChildren) {
-        return await this.recurseChildren(name, child.id, toDelete);
+        const result = await this.recurseChildren(name, child.id, toDelete);
+        if (result) {
+          return result;
+        }
       }
     }
     return false;
@@ -111,9 +114,9 @@ export class MemberTypeApiHelper {
     for (const memberType of jsonMemberTypes.items) {
       if (memberType.name === name) {
         if (memberType.isFolder) {
-          return this.getFolder(memberType.id);
+          return await this.getFolder(memberType.id);
         }
-        return this.get(memberType.id);
+        return await this.get(memberType.id);
       } else if (memberType.isContainer || memberType.hasChildren) {
         const result = await this.recurseChildren(name, memberType.id, false);
         if (result) {

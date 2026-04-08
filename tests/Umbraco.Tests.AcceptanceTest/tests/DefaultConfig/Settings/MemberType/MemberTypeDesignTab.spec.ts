@@ -96,7 +96,7 @@ test('can add a description to property in a member type', async ({umbracoApi, u
 
   // Assert
   await expect(umbracoUi.memberType.enterDescriptionTxt).toBeVisible();
-  expect(umbracoUi.memberType.doesDescriptionHaveValue(descriptionText)).toBeTruthy();
+  await umbracoUi.memberType.doesDescriptionHaveValue(descriptionText);
   const memberTypeData = await umbracoApi.memberType.getByName(memberTypeName);
   expect(memberTypeData.properties[0].description).toBe(descriptionText);
 });

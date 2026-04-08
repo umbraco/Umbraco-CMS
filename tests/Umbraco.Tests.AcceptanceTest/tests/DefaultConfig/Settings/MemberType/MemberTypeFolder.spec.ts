@@ -13,7 +13,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.memberType.ensureNameNotExists(memberTypeFolderName);
 });
 
-test('can create a empty member type folder', async ({umbracoApi, umbracoUi}) => {
+test('can create an empty member type folder', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.memberType.clickActionsMenuAtRoot();
   await umbracoUi.memberType.clickCreateActionMenuOption();
@@ -85,7 +85,7 @@ test('can create a member type folder in a folder', async ({umbracoApi, umbracoU
   await umbracoApi.memberType.ensureNameNotExists(childFolderName);
 });
 
-test('can not delete a member type folder with child items', async ({umbracoApi, umbracoUi}) => {
+test('cannot delete a member type folder with child items', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const childFolderName = 'ChildFolder';
   await umbracoApi.memberType.ensureNameNotExists(childFolderName);
