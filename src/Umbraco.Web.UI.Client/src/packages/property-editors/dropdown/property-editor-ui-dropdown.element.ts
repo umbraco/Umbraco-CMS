@@ -3,7 +3,7 @@ import { css, customElement, html, map, nothing, property, state, when } from '@
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
-import { UUISelectElement } from '@umbraco-cms/backoffice/external/uui';
+import { UUISelectElement, type UUISelectOption } from '@umbraco-cms/backoffice/external/uui';
 import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
@@ -27,7 +27,7 @@ export class UmbPropertyEditorUIDropdownElement
 	private _multiple: boolean = false;
 
 	@state()
-	private _options: Array<Option & { invalid?: boolean }> = [];
+	private _options: Array<UUISelectOption & { invalid?: boolean }> = [];
 
 	@property({ type: Array })
 	public override set value(value: Array<string> | string | undefined) {
