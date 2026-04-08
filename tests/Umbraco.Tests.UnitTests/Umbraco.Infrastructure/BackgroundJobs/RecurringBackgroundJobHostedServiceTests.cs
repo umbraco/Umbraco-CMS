@@ -203,7 +203,7 @@ public class RecurringBackgroundJobHostedServiceTests
             mockMainDom.Object,
             mockServerRegistrar.Object,
             mockEventAggregator.Object,
-            Mock.Of<IEventMessagesFactory>(),
+            Mock.Of<IEventMessagesFactory>(f => f.Get() == new EventMessages()),
             mockJob.Object,
             TimeProvider.System);
     }
