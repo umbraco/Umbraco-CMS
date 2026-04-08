@@ -419,6 +419,16 @@ APIs use `Asp.Versioning.Mvc`:
 - Delivery API: `/umbraco/delivery/api/v{version}/*`
 - OpenAPI/Swagger docs per version
 
+### Updating `OpenApi.json` (Management API)
+
+When a PR changes Management API controllers or models, the `OpenApi.json` file in the Management API project must be updated:
+
+1. Run the Umbraco instance locally
+2. Open Swagger UI and navigate to the swagger.json link (e.g. `https://localhost:44339/umbraco/swagger/management/swagger.json`)
+3. Copy the full JSON content and paste it into `src/Umbraco.Cms.Api.Management/OpenApi.json`
+
+**Important**: Commit only the substantive changes — not IDE-applied formatting (whitespace, reordering, etc.). Extraneous formatting diffs make PRs harder to review and merge-ups more error-prone.
+
 ### Backoffice npm Package
 
 The backoffice is published to npm as `@umbraco-cms/backoffice`. Runtime dependencies are provided via importmap; npm peerDependencies provide types only. For full details on dependency hoisting, version range logic, and plugin development, see `/src/Umbraco.Web.UI.Client/CLAUDE.md` → "npm Package Publishing".
@@ -461,6 +471,7 @@ The `Tests:Database:DatabaseType` setting controls which database is used:
 - `"LocalDb"` - Uses SQL Server LocalDB, required for SQL Server-specific tests (e.g., page-level locking, `sys.dm_tran_locks`)
 
 SQL Server-specific tests use `BaseTestDatabase.IsSqlite()` to skip when running on SQLite.
+
 ### Key Projects
 
 | Project | Type | Description |
