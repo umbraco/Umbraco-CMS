@@ -123,17 +123,8 @@ public static partial class UmbracoBuilderExtensions
                 new WebsiteOutputCachePolicy(settings.ContentDuration));
         });
 
-        // Register pipeline filter only if no output cache filter exists yet.
-        // UseOutputCache() must only appear once in the pipeline. The Delivery API may have
-        // already registered its filter ("UmbracoDeliveryApiOutputCache") — we check by
-        // convention that all output cache filters include "OutputCache" in their name.
-        builder.Services.PostConfigure<UmbracoPipelineOptions>(options =>
-        {
-            if (options.PipelineFilters.Any(f => f.Name.Contains("OutputCache")) is false)
-            {
-                options.AddFilter(new WebsiteOutputCachePipelineFilter("UmbracoWebsiteOutputCache"));
-            }
-        });
+        builder.Services.Configure<UmbracoPipelineOptions>(options =>
+            options.AddFilter(new WebsiteOutputCachePipelineFilter("UmbracoWebsiteOutputCache")));
 
         // Register eviction handlers and providers.
         builder.AddNotificationAsyncHandler<ContentCacheRefresherNotification, DocumentOutputCacheEvictionHandler>();
