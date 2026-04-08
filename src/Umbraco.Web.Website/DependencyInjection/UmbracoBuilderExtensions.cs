@@ -132,6 +132,7 @@ public static partial class UmbracoBuilderExtensions
         builder.AddNotificationAsyncHandler<MemberCacheRefresherNotification, MemberOutputCacheEvictionHandler>();
         builder.Services.AddSingleton<IWebsiteOutputCacheTagProvider, ContentTypeOutputCacheTagProvider>();
         builder.Services.AddSingleton<IWebsiteOutputCacheDurationProvider, DefaultWebsiteOutputCacheDurationProvider>();
+        builder.Services.AddSingleton<IWebsiteOutputCacheRequestFilter, DefaultWebsiteOutputCacheRequestFilter>();
         builder.Services.AddSingleton<IWebsiteOutputCacheManager, WebsiteOutputCacheManager>();
 
         return builder;

@@ -8,7 +8,6 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services.Navigation;
-using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Web.Common.Routing;
 
 namespace Umbraco.Cms.Web.Website.Caching;
@@ -42,22 +41,8 @@ internal sealed class WebsiteOutputCachePolicy : IOutputCachePolicy
             return ValueTask.CompletedTask;
         }
 
-        IUmbracoContextAccessor umbracoContextAccessor = services.GetRequiredService<IUmbracoContextAccessor>();
-        if (umbracoContextAccessor.TryGetUmbracoContext(out IUmbracoContext? umbracoContext) && umbracoContext.InPreviewMode)
-        {
-            context.EnableOutputCaching = false;
-            logger.LogDebug("Preview mode active — skipping output cache.");
-            return ValueTask.CompletedTask;
-        }
-
-        if (context.HttpContext.User.Identity?.IsAuthenticated == true)
-        {
-            context.EnableOutputCaching = false;
-            logger.LogDebug("Authenticated member request — skipping output cache.");
-            return ValueTask.CompletedTask;
-        }
-
         IPublishedRequest publishedRequest = routeValues.PublishedRequest;
+
         if (publishedRequest.SetNoCacheHeader)
         {
             context.EnableOutputCaching = false;
@@ -70,6 +55,14 @@ internal sealed class WebsiteOutputCachePolicy : IOutputCachePolicy
         {
             context.EnableOutputCaching = false;
             logger.LogDebug("No published content on request — skipping output cache.");
+            return ValueTask.CompletedTask;
+        }
+
+        IWebsiteOutputCacheRequestFilter requestFilter = services.GetRequiredService<IWebsiteOutputCacheRequestFilter>();
+        if (requestFilter.IsCacheable(context.HttpContext, content) is false)
+        {
+            context.EnableOutputCaching = false;
+            logger.LogDebug("Request filter returned not cacheable — skipping output cache.");
             return ValueTask.CompletedTask;
         }
 

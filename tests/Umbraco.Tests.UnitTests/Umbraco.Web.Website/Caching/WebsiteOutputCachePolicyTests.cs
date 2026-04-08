@@ -10,7 +10,6 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services.Navigation;
-using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Web.Common.Routing;
 using Umbraco.Cms.Web.Website.Caching;
 
@@ -19,23 +18,18 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Website.Caching;
 [TestFixture]
 public class WebsiteOutputCachePolicyTests
 {
-    private static readonly TimeSpan DefaultDuration = TimeSpan.FromSeconds(30);
+    private static readonly TimeSpan _defaultDuration = TimeSpan.FromSeconds(30);
 
-    private Mock<IUmbracoContextAccessor> _umbracoContextAccessorMock = null!;
-    private Mock<IUmbracoContext> _umbracoContextMock = null!;
+    private Mock<IWebsiteOutputCacheRequestFilter> _requestFilterMock = null!;
     private Mock<IWebsiteOutputCacheDurationProvider> _durationProviderMock = null!;
     private Mock<IDocumentNavigationQueryService> _navigationServiceMock = null!;
 
     [SetUp]
     public void SetUp()
     {
-        _umbracoContextMock = new Mock<IUmbracoContext>();
-        _umbracoContextMock.Setup(c => c.InPreviewMode).Returns(false);
-
-        _umbracoContextAccessorMock = new Mock<IUmbracoContextAccessor>();
-        IUmbracoContext? outContext = _umbracoContextMock.Object;
-        _umbracoContextAccessorMock
-            .Setup(a => a.TryGetUmbracoContext(out outContext))
+        _requestFilterMock = new Mock<IWebsiteOutputCacheRequestFilter>();
+        _requestFilterMock
+            .Setup(f => f.IsCacheable(It.IsAny<HttpContext>(), It.IsAny<IPublishedContent>()))
             .Returns(true);
 
         _durationProviderMock = new Mock<IWebsiteOutputCacheDurationProvider>();
@@ -60,22 +54,13 @@ public class WebsiteOutputCachePolicyTests
     }
 
     [Test]
-    public async Task CacheRequestAsync_WhenPreviewMode_DoesNotCache()
+    public async Task CacheRequestAsync_WhenRequestFilterReturnsNotCacheable_DoesNotCache()
     {
-        _umbracoContextMock.Setup(c => c.InPreviewMode).Returns(true);
+        _requestFilterMock
+            .Setup(f => f.IsCacheable(It.IsAny<HttpContext>(), It.IsAny<IPublishedContent>()))
+            .Returns(false);
         var policy = CreatePolicy();
         OutputCacheContext context = CreateOutputCacheContext(withRouteValues: true);
-
-        await ((IOutputCachePolicy)policy).CacheRequestAsync(context, CancellationToken.None);
-
-        Assert.That(context.EnableOutputCaching, Is.False);
-    }
-
-    [Test]
-    public async Task CacheRequestAsync_WhenMemberAuthenticated_DoesNotCache()
-    {
-        var policy = CreatePolicy();
-        OutputCacheContext context = CreateOutputCacheContext(withRouteValues: true, isAuthenticated: true);
 
         await ((IOutputCachePolicy)policy).CacheRequestAsync(context, CancellationToken.None);
 
@@ -126,7 +111,7 @@ public class WebsiteOutputCachePolicyTests
 
         await ((IOutputCachePolicy)policy).CacheRequestAsync(context, CancellationToken.None);
 
-        Assert.That(context.ResponseExpirationTimeSpan, Is.EqualTo(DefaultDuration));
+        Assert.That(context.ResponseExpirationTimeSpan, Is.EqualTo(_defaultDuration));
     }
 
     [Test]
@@ -151,7 +136,7 @@ public class WebsiteOutputCachePolicyTests
 
         await ((IOutputCachePolicy)policy).CacheRequestAsync(context, CancellationToken.None);
 
-        Assert.That(context.ResponseExpirationTimeSpan, Is.EqualTo(DefaultDuration));
+        Assert.That(context.ResponseExpirationTimeSpan, Is.EqualTo(_defaultDuration));
     }
 
     [Test]
@@ -260,11 +245,10 @@ public class WebsiteOutputCachePolicyTests
     }
 
     private static WebsiteOutputCachePolicy CreatePolicy()
-        => new(DefaultDuration);
+        => new(_defaultDuration);
 
     private OutputCacheContext CreateOutputCacheContext(
         bool withRouteValues = false,
-        bool isAuthenticated = false,
         bool setNoCacheHeader = false,
         IEnumerable<IWebsiteOutputCacheTagProvider>? tagProviders = null,
         IEnumerable<IWebsiteOutputCacheVaryByProvider>? varyByProviders = null,
@@ -279,7 +263,7 @@ public class WebsiteOutputCachePolicyTests
 
         var services = new ServiceCollection();
         services.AddSingleton<ILogger<WebsiteOutputCachePolicy>>(NullLogger<WebsiteOutputCachePolicy>.Instance);
-        services.AddSingleton(_umbracoContextAccessorMock.Object);
+        services.AddSingleton(_requestFilterMock.Object);
         services.AddSingleton(_durationProviderMock.Object);
         services.AddSingleton(_navigationServiceMock.Object);
         services.AddSingleton<IEnumerable<IWebsiteOutputCacheTagProvider>>(
@@ -288,12 +272,6 @@ public class WebsiteOutputCachePolicyTests
             (varyByProviders ?? Array.Empty<IWebsiteOutputCacheVaryByProvider>()).ToList());
 
         var httpContext = new DefaultHttpContext { RequestServices = services.BuildServiceProvider() };
-
-        if (isAuthenticated)
-        {
-            var identity = new System.Security.Claims.ClaimsIdentity("TestAuth");
-            httpContext.User = new System.Security.Claims.ClaimsPrincipal(identity);
-        }
 
         if (withRouteValues)
         {
