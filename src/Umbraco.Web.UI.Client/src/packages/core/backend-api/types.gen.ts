@@ -1087,6 +1087,12 @@ export type ElementItemResponseModel = {
     variants: Array<ElementVariantItemResponseModel>;
 };
 
+export type ElementFolderPermissionPresentationModel = {
+    $type: string;
+    elementFolder: ReferenceByIdModel;
+    verbs: Array<string>;
+};
+
 export type ElementPermissionPresentationModel = {
     $type: string;
     element: ReferenceByIdModel;

@@ -6,6 +6,7 @@ import {
 	UMB_USER_PERMISSION_ELEMENT_FOLDER_READ,
 	UMB_USER_PERMISSION_ELEMENT_FOLDER_UPDATE,
 } from './constants.js';
+import { manifests as conditions } from './conditions/manifests.js';
 import type { ManifestEntityUserPermission } from '@umbraco-cms/backoffice/user-permission';
 
 const entityUserPermissions: Array<ManifestEntityUserPermission> = [
@@ -86,3 +87,4 @@ const entityUserPermissions: Array<ManifestEntityUserPermission> = [
 // 	},
 // ];
 
+export const manifests: Array<UmbExtensionManifest> = [...conditions, ...entityUserPermissions];
