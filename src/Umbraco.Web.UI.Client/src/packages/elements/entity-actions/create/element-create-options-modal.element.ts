@@ -66,8 +66,9 @@ export class UmbElementCreateOptionsModalElement extends UmbModalBaseElement<
 	}
 
 	#onNavigate(elementType: UmbAllowedElementTypeModel) {
-		const parentEntityType = this.data?.parent.entityType as UmbElementEntityTypeUnion;
-		const parentUnique = this.data?.parent.unique ?? null;
+		if (!this.data) return;
+		const parentEntityType = this.data.parent.entityType as UmbElementEntityTypeUnion;
+		const parentUnique = this.data.parent.unique ?? null;
 		const documentTypeUnique = elementType.unique;
 		if (!documentTypeUnique) return;
 
