@@ -1,11 +1,11 @@
 import { UMB_ELEMENT_FOLDER_ENTITY_TYPE } from '../../entity.js';
 import {
-	UMB_USER_PERMISSION_ELEMENT_CREATE,
-	UMB_USER_PERMISSION_ELEMENT_DELETE,
-	UMB_USER_PERMISSION_ELEMENT_MOVE,
-	UMB_USER_PERMISSION_ELEMENT_READ,
-	UMB_USER_PERMISSION_ELEMENT_UPDATE,
-} from '../../user-permissions/constants.js';
+	UMB_USER_PERMISSION_ELEMENT_FOLDER_CREATE,
+	UMB_USER_PERMISSION_ELEMENT_FOLDER_DELETE,
+	UMB_USER_PERMISSION_ELEMENT_FOLDER_MOVE,
+	UMB_USER_PERMISSION_ELEMENT_FOLDER_READ,
+	UMB_USER_PERMISSION_ELEMENT_FOLDER_UPDATE,
+} from './constants.js';
 import type { ManifestEntityUserPermission } from '@umbraco-cms/backoffice/user-permission';
 
 const entityUserPermissions: Array<ManifestEntityUserPermission> = [
@@ -16,7 +16,7 @@ const entityUserPermissions: Array<ManifestEntityUserPermission> = [
 		weight: 90,
 		forEntityTypes: [UMB_ELEMENT_FOLDER_ENTITY_TYPE],
 		meta: {
-			verbs: [UMB_USER_PERMISSION_ELEMENT_CREATE],
+			verbs: [UMB_USER_PERMISSION_ELEMENT_FOLDER_CREATE],
 			label: '#userPermissions_create',
 			description: '#userPermissions_create_element_folder',
 		},
@@ -28,7 +28,7 @@ const entityUserPermissions: Array<ManifestEntityUserPermission> = [
 		weight: 80,
 		forEntityTypes: [UMB_ELEMENT_FOLDER_ENTITY_TYPE],
 		meta: {
-			verbs: [UMB_USER_PERMISSION_ELEMENT_DELETE],
+			verbs: [UMB_USER_PERMISSION_ELEMENT_FOLDER_DELETE],
 			label: '#userPermissions_delete',
 			description: '#userPermissions_delete_element_folder',
 		},
@@ -39,7 +39,7 @@ const entityUserPermissions: Array<ManifestEntityUserPermission> = [
 		name: 'Move Element Folder User Permission',
 		forEntityTypes: [UMB_ELEMENT_FOLDER_ENTITY_TYPE],
 		meta: {
-			verbs: [UMB_USER_PERMISSION_ELEMENT_MOVE],
+			verbs: [UMB_USER_PERMISSION_ELEMENT_FOLDER_MOVE],
 			label: '#userPermissions_move',
 			description: '#userPermissions_move_element_folder',
 			group: 'structure',
@@ -52,7 +52,7 @@ const entityUserPermissions: Array<ManifestEntityUserPermission> = [
 		weight: 100,
 		forEntityTypes: [UMB_ELEMENT_FOLDER_ENTITY_TYPE],
 		meta: {
-			verbs: [UMB_USER_PERMISSION_ELEMENT_READ],
+			verbs: [UMB_USER_PERMISSION_ELEMENT_FOLDER_READ],
 			label: '#userPermissions_read',
 			description: '#userPermissions_read_element_folder',
 		},
@@ -63,7 +63,7 @@ const entityUserPermissions: Array<ManifestEntityUserPermission> = [
 		name: 'Update Element Folder User Permission',
 		forEntityTypes: [UMB_ELEMENT_FOLDER_ENTITY_TYPE],
 		meta: {
-			verbs: [UMB_USER_PERMISSION_ELEMENT_UPDATE],
+			verbs: [UMB_USER_PERMISSION_ELEMENT_FOLDER_UPDATE],
 			label: '#userPermissions_update',
 			description: '#userPermissions_update_element_folder',
 		},
