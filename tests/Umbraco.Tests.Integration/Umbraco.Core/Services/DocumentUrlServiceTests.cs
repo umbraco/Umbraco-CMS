@@ -10,7 +10,6 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
-using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Testing;
@@ -835,7 +834,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
         Assert.DoesNotThrow(() => DocumentUrlRepository.Save(newSegments));
 
         // Verify: old rows deleted, new rows inserted.
-        var remainingRows = database.ExecuteScalar<int>(database.SqlContext.Sql().SelectCount<DocumentUrlDto>());
+        var remainingRows = database.ExecuteScalar<int>(database.SqlContext.Sql().SelectCount().From<DocumentUrlDto>());
         Assert.That(
             remainingRows,
             Is.EqualTo(newSegments.Count),
