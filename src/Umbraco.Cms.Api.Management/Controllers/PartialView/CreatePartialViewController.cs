@@ -1,9 +1,13 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Api.Management.Extensions;
 using Umbraco.Cms.Api.Management.ViewModels.PartialView;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
@@ -21,6 +25,7 @@ public class CreatePartialViewController : PartialViewControllerBase
     private readonly IPartialViewService _partialViewService;
     private readonly IUmbracoMapper _umbracoMapper;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
+    private readonly IOptions<RuntimeSettings> _runtimeSettings;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="CreatePartialViewController"/> class with the specified services.
@@ -28,14 +33,31 @@ public class CreatePartialViewController : PartialViewControllerBase
     /// <param name="partialViewService">The service used to manage partial views.</param>
     /// <param name="umbracoMapper">The mapper used for Umbraco model mapping.</param>
     /// <param name="backOfficeSecurityAccessor">Provides access to back office security information.</param>
+    /// <param name="runtimeSettings">The runtime configuration settings.</param>
+    [ActivatorUtilitiesConstructor]
     public CreatePartialViewController(
         IPartialViewService partialViewService,
         IUmbracoMapper umbracoMapper,
-        IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+        IOptions<RuntimeSettings> runtimeSettings)
     {
         _partialViewService = partialViewService;
         _umbracoMapper = umbracoMapper;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
+        _runtimeSettings = runtimeSettings;
+    }
+
+    [Obsolete("Use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
+    public CreatePartialViewController(
+        IPartialViewService partialViewService,
+        IUmbracoMapper umbracoMapper,
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
+        : this(
+            partialViewService,
+            umbracoMapper,
+            backOfficeSecurityAccessor,
+            StaticServiceProvider.Instance.GetRequiredService<IOptions<RuntimeSettings>>())
+    {
     }
 
     /// <summary>
@@ -55,6 +77,11 @@ public class CreatePartialViewController : PartialViewControllerBase
         CancellationToken cancellationToken,
         CreatePartialViewRequestModel requestModel)
     {
+        if (_runtimeSettings.Value.Mode == RuntimeMode.Production)
+        {
+            return PartialViewOperationStatusResult(PartialViewOperationStatus.NotAllowedInProductionMode);
+        }
+
         PartialViewCreateModel createModel = _umbracoMapper.Map<PartialViewCreateModel>(requestModel)!;
         Attempt<IPartialView?, PartialViewOperationStatus> createAttempt = await _partialViewService.CreateAsync(createModel, CurrentUserKey(_backOfficeSecurityAccessor));
 

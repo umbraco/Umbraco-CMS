@@ -1,15 +1,12 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Tests.Common.Testing;
-using Umbraco.Cms.Tests.Integration.Attributes;
 using Umbraco.Cms.Tests.Integration.Testing;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
@@ -116,107 +113,6 @@ internal sealed class PartialViewServiceTests : UmbracoIntegrationTest
         Assert.AreEqual(PartialViewOperationStatus.Success, result.Status);
         Assert.IsNotNull(result.Result);
         Assert.AreEqual("RenamedPartialView.cshtml", result.Result.Name);
-    }
-
-    [Test]
-    [ConfigureBuilder(ActionName = nameof(ConfigureProductionMode))]
-    public async Task Cannot_Create_PartialView_In_Production_Mode()
-    {
-        var createModel = new PartialViewCreateModel
-        {
-            Name = "TestPartialView.cshtml",
-            Content = "@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage\n<p>Test</p>"
-        };
-
-        var result = await PartialViewService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(PartialViewOperationStatus.NotAllowedInProductionMode, result.Status);
-        Assert.IsNull(result.Result);
-    }
-
-    [Test]
-    [ConfigureBuilder(ActionName = nameof(ConfigureProductionMode))]
-    public async Task Cannot_Update_PartialView_In_Production_Mode()
-    {
-        // Create file directly via filesystem since service blocks creation in production mode
-        var fileSystems = GetRequiredService<Cms.Core.IO.FileSystems>();
-        var partialViewFileSystem = fileSystems.PartialViewsFileSystem!;
-        const string fileName = "ExistingPartialView.cshtml";
-        const string originalContent = "@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage\n<p>Original</p>";
-
-        using (var stream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(originalContent)))
-        {
-            partialViewFileSystem.AddFile(fileName, stream);
-        }
-
-        var updateModel = new PartialViewUpdateModel
-        {
-            Content = "@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage\n<p>Updated</p>"
-        };
-
-        var result = await PartialViewService.UpdateAsync(fileName, updateModel, Constants.Security.SuperUserKey);
-
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(PartialViewOperationStatus.NotAllowedInProductionMode, result.Status);
-
-        // Verify the file was not changed
-        using var fileStream = partialViewFileSystem.OpenFile(fileName);
-        using var reader = new StreamReader(fileStream);
-        var content = await reader.ReadToEndAsync();
-        Assert.That(content, Does.Contain("Original"));
-        Assert.That(content, Does.Not.Contain("Updated"));
-    }
-
-    [Test]
-    [ConfigureBuilder(ActionName = nameof(ConfigureProductionMode))]
-    public async Task Cannot_Delete_PartialView_In_Production_Mode()
-    {
-        var fileSystems = GetRequiredService<Cms.Core.IO.FileSystems>();
-        var partialViewFileSystem = fileSystems.PartialViewsFileSystem!;
-        const string fileName = "PartialViewToDelete.cshtml";
-        const string content = "@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage\n<p>Test</p>";
-
-        using (var stream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(content)))
-        {
-            partialViewFileSystem.AddFile(fileName, stream);
-        }
-
-        Assert.IsTrue(partialViewFileSystem.FileExists(fileName), "File should exist before delete attempt");
-
-        var result = await PartialViewService.DeleteAsync(fileName, Constants.Security.SuperUserKey);
-
-        Assert.AreEqual(PartialViewOperationStatus.NotAllowedInProductionMode, result);
-        Assert.IsTrue(partialViewFileSystem.FileExists(fileName), "File should still exist after blocked delete");
-    }
-
-    [Test]
-    [ConfigureBuilder(ActionName = nameof(ConfigureProductionMode))]
-    public async Task Cannot_Rename_PartialView_In_Production_Mode()
-    {
-        var fileSystems = GetRequiredService<Cms.Core.IO.FileSystems>();
-        var partialViewFileSystem = fileSystems.PartialViewsFileSystem!;
-        const string originalFileName = "OriginalName.cshtml";
-        const string content = "@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage\n<p>Test</p>";
-
-        using (var stream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(content)))
-        {
-            partialViewFileSystem.AddFile(originalFileName, stream);
-        }
-
-        Assert.IsTrue(partialViewFileSystem.FileExists(originalFileName), "Original file should exist");
-
-        var renameModel = new PartialViewRenameModel
-        {
-            Name = "RenamedFile.cshtml"
-        };
-
-        var result = await PartialViewService.RenameAsync(originalFileName, renameModel, Constants.Security.SuperUserKey);
-
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(PartialViewOperationStatus.NotAllowedInProductionMode, result.Status);
-        Assert.IsTrue(partialViewFileSystem.FileExists(originalFileName), "Original file should still exist");
-        Assert.IsFalse(partialViewFileSystem.FileExists("RenamedFile.cshtml"), "Renamed file should not exist");
     }
 
     private void DeleteAllPartialViewFiles()

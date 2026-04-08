@@ -1,9 +1,13 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Api.Management.Extensions;
 using Umbraco.Cms.Api.Management.ViewModels.PartialView;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
@@ -21,6 +25,7 @@ public class UpdatePartialViewController : PartialViewControllerBase
     private readonly IPartialViewService _partialViewService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly IUmbracoMapper _mapper;
+    private readonly IOptions<RuntimeSettings> _runtimeSettings;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="UpdatePartialViewController"/> class, which handles requests for updating partial views in the Umbraco backoffice.
@@ -28,14 +33,31 @@ public class UpdatePartialViewController : PartialViewControllerBase
     /// <param name="partialViewService">Service used to manage partial view files.</param>
     /// <param name="backOfficeSecurityAccessor">Accessor for back office security context.</param>
     /// <param name="mapper">The Umbraco object mapper for mapping between models.</param>
+    /// <param name="runtimeSettings">The runtime configuration settings.</param>
+    [ActivatorUtilitiesConstructor]
     public UpdatePartialViewController(
         IPartialViewService partialViewService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-        IUmbracoMapper mapper)
+        IUmbracoMapper mapper,
+        IOptions<RuntimeSettings> runtimeSettings)
     {
         _partialViewService = partialViewService;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
         _mapper = mapper;
+        _runtimeSettings = runtimeSettings;
+    }
+
+    [Obsolete("Use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
+    public UpdatePartialViewController(
+        IPartialViewService partialViewService,
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+        IUmbracoMapper mapper)
+        : this(
+            partialViewService,
+            backOfficeSecurityAccessor,
+            mapper,
+            StaticServiceProvider.Instance.GetRequiredService<IOptions<RuntimeSettings>>())
+    {
     }
 
     /// <summary>
@@ -57,6 +79,11 @@ public class UpdatePartialViewController : PartialViewControllerBase
         string path,
         UpdatePartialViewRequestModel updateViewModel)
     {
+        if (_runtimeSettings.Value.Mode == RuntimeMode.Production)
+        {
+            return PartialViewOperationStatusResult(PartialViewOperationStatus.NotAllowedInProductionMode);
+        }
+
         path = DecodePath(path).VirtualPathToSystemPath();
         PartialViewUpdateModel updateModel = _mapper.Map<PartialViewUpdateModel>(updateViewModel)!;
 
