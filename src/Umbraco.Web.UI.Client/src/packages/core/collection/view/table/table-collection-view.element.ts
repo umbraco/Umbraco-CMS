@@ -16,6 +16,11 @@ import { UmbEntityContext } from '@umbraco-cms/backoffice/entity';
 
 import './entity-name-table-column-layout.element.js';
 
+/**
+ * A table-based collection view element provided by the `table` kind.
+ * Renders collection items as table rows with manifest-driven columns, entity context per row, and entity actions.
+ * @element umb-table-collection-view
+ */
 @customElement('umb-table-collection-view')
 export class UmbTableCollectionViewElement extends UmbCollectionViewElementBase<
 	UmbCollectionItemModel,

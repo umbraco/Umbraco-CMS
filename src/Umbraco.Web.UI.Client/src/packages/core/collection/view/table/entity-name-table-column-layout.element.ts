@@ -8,6 +8,10 @@ interface UmbEntityNameTableColumnValue {
 	href?: string;
 }
 
+/**
+ * Table column layout element that renders an entity name, optionally as a link.
+ * @element umb-entity-name-table-column-layout
+ */
 @customElement('umb-entity-name-table-column-layout')
 export class UmbEntityNameTableColumnLayoutElement extends UmbLitElement implements UmbTableColumnLayoutElement {
 	@property({ attribute: false })

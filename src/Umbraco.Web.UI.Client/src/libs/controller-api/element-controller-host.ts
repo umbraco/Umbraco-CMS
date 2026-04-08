@@ -6,7 +6,7 @@ import { UmbControllerHostMixin } from './controller-host.mixin.js';
  * @class UmbElementControllerHost
  */
 export class UmbElementControllerHost extends UmbControllerHostMixin(class {}) {
-	#element: Element;
+	#element?: Element;
 
 	constructor(element: Element) {
 		super();
@@ -14,6 +14,11 @@ export class UmbElementControllerHost extends UmbControllerHostMixin(class {}) {
 	}
 
 	getHostElement(): Element {
-		return this.#element;
+		return this.#element!;
+	}
+
+	override destroy(): void {
+		super.destroy();
+		this.#element = undefined;
 	}
 }
