@@ -140,11 +140,10 @@ public static partial class UmbracoBuilderExtensions
         });
 
         // Register eviction handlers and providers.
-        builder.AddNotificationAsyncHandler<ContentCacheRefresherNotification, WebsiteOutputCacheEvictionHandler>();
+        builder.AddNotificationAsyncHandler<ContentCacheRefresherNotification, DocumentOutputCacheEvictionHandler>();
         builder.AddNotificationAsyncHandler<MediaCacheRefresherNotification, MediaOutputCacheEvictionHandler>();
         builder.AddNotificationAsyncHandler<MemberCacheRefresherNotification, MemberOutputCacheEvictionHandler>();
         builder.Services.AddSingleton<IWebsiteOutputCacheTagProvider, ContentTypeOutputCacheTagProvider>();
-        builder.Services.AddSingleton<IWebsiteOutputCacheEvictionProvider, RelationOutputCacheEvictionProvider>();
         builder.Services.AddSingleton<IWebsiteOutputCacheDurationProvider, DefaultWebsiteOutputCacheDurationProvider>();
 
         return builder;
