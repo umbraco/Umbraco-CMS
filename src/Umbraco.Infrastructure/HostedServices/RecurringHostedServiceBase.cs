@@ -254,9 +254,10 @@ public abstract class RecurringHostedServiceBase : BackgroundService
     {
         _period = newPeriod;
 
+        // Cancel but don't dispose — the wait loop may still be registering against the token.
+        // The old CTS is small once cancelled and will be collected by the GC.
         CancellationTokenSource oldCts = Interlocked.Exchange(ref _periodChangeCts, new CancellationTokenSource());
         oldCts.Cancel();
-        oldCts.Dispose();
     }
 
     /// <summary>
