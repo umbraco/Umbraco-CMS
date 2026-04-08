@@ -36,6 +36,8 @@ public abstract class RecurringHostedServiceBase : BackgroundService
     /// <param name="timeProvider">The time provider used for scheduling and elapsed time measurement.</param>
     protected RecurringHostedServiceBase(ILogger? logger, TimeSpan period, TimeSpan delay, TimeProvider timeProvider)
     {
+        ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(period, TimeSpan.Zero);
+
         _logger = logger;
         _period = period;
         _delay = delay;
@@ -252,6 +254,8 @@ public abstract class RecurringHostedServiceBase : BackgroundService
     /// <param name="newPeriod">The new period between tasks.</param>
     protected void ChangePeriod(TimeSpan newPeriod)
     {
+        ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(newPeriod, TimeSpan.Zero);
+
         _period = newPeriod;
 
         // Cancel but don't dispose — the wait loop may still be registering against the token.

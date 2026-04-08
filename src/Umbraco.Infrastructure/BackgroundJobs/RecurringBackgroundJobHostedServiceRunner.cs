@@ -41,10 +41,16 @@ public class RecurringBackgroundJobHostedServiceRunner : IHostedService
             Type jobType = job.GetType();
             try
             {
-                _logger.LogDebug("Creating background hosted service for {job}", jobType.Name);
-                IHostedService hostedService = _jobFactory(job);
+                var added = false;
+                IHostedService hostedService = _hostedServices.GetOrAdd(jobType, _ =>
+                {
+                    _logger.LogDebug("Creating background hosted service for {job}", jobType.Name);
 
-                if (!_hostedServices.TryAdd(jobType, hostedService))
+                    added = true;
+                    return _jobFactory(job);
+                });
+
+                if (!added)
                 {
                     _logger.LogWarning("A background hosted service for {job} is already registered, skipping duplicate.", jobType.Name);
                     continue;
