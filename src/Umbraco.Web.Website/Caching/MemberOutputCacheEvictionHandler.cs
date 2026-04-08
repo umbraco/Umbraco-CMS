@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.OutputCaching;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
@@ -17,7 +16,7 @@ namespace Umbraco.Cms.Web.Website.Caching;
 /// </summary>
 internal sealed class MemberOutputCacheEvictionHandler : INotificationAsyncHandler<MemberCacheRefresherNotification>
 {
-    private readonly IServiceProvider _serviceProvider;
+    private readonly IOutputCacheStore _outputCacheStore;
     private readonly IRelationService _relationService;
     private readonly IIdKeyMap _idKeyMap;
     private readonly ILogger<MemberOutputCacheEvictionHandler> _logger;
@@ -26,12 +25,12 @@ internal sealed class MemberOutputCacheEvictionHandler : INotificationAsyncHandl
     ///     Initializes a new instance of the <see cref="MemberOutputCacheEvictionHandler"/> class.
     /// </summary>
     public MemberOutputCacheEvictionHandler(
-        IServiceProvider serviceProvider,
+        IOutputCacheStore outputCacheStore,
         IRelationService relationService,
         IIdKeyMap idKeyMap,
         ILogger<MemberOutputCacheEvictionHandler> logger)
     {
-        _serviceProvider = serviceProvider;
+        _outputCacheStore = outputCacheStore;
         _relationService = relationService;
         _idKeyMap = idKeyMap;
         _logger = logger;
@@ -40,12 +39,6 @@ internal sealed class MemberOutputCacheEvictionHandler : INotificationAsyncHandl
     /// <inheritdoc />
     public async Task HandleAsync(MemberCacheRefresherNotification notification, CancellationToken cancellationToken)
     {
-        IOutputCacheStore? store = _serviceProvider.GetService<IOutputCacheStore>();
-        if (store is null)
-        {
-            return;
-        }
-
         if (notification.MessageType != MessageType.RefreshByPayload
             || notification.MessageObject is not MemberCacheRefresher.JsonPayload[] payloads)
         {
@@ -54,11 +47,11 @@ internal sealed class MemberOutputCacheEvictionHandler : INotificationAsyncHandl
 
         foreach (MemberCacheRefresher.JsonPayload payload in payloads)
         {
-            await EvictRelatedPagesAsync(store, payload.Id, cancellationToken);
+            await EvictRelatedPagesAsync(payload.Id, cancellationToken);
         }
     }
 
-    private async Task EvictRelatedPagesAsync(IOutputCacheStore store, int memberId, CancellationToken cancellationToken)
+    private async Task EvictRelatedPagesAsync(int memberId, CancellationToken cancellationToken)
     {
         IEnumerable<IRelation> relations = _relationService.GetByChildId(memberId, Constants.Conventions.RelationTypes.RelatedMemberAlias);
         foreach (IRelation relation in relations)
@@ -70,7 +63,7 @@ internal sealed class MemberOutputCacheEvictionHandler : INotificationAsyncHandl
                     "Member {MemberId} is referenced by {ParentKey} — evicting.",
                     memberId,
                     parentKeyAttempt.Result);
-                await store.EvictByTagAsync(Constants.Website.OutputCache.ContentTagPrefix + parentKeyAttempt.Result, cancellationToken);
+                await _outputCacheStore.EvictByTagAsync(Constants.Website.OutputCache.ContentTagPrefix + parentKeyAttempt.Result, cancellationToken);
             }
         }
     }

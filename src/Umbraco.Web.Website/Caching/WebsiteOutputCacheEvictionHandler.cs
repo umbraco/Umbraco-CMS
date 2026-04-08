@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.OutputCaching;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
@@ -16,7 +15,7 @@ namespace Umbraco.Cms.Web.Website.Caching;
 /// </summary>
 internal sealed class WebsiteOutputCacheEvictionHandler : INotificationAsyncHandler<ContentCacheRefresherNotification>
 {
-    private readonly IServiceProvider _serviceProvider;
+    private readonly IOutputCacheStore _outputCacheStore;
     private readonly IEnumerable<IWebsiteOutputCacheEvictionProvider> _evictionProviders;
     private readonly ILogger<WebsiteOutputCacheEvictionHandler> _logger;
 
@@ -24,11 +23,11 @@ internal sealed class WebsiteOutputCacheEvictionHandler : INotificationAsyncHand
     ///     Initializes a new instance of the <see cref="WebsiteOutputCacheEvictionHandler"/> class.
     /// </summary>
     public WebsiteOutputCacheEvictionHandler(
-        IServiceProvider serviceProvider,
+        IOutputCacheStore outputCacheStore,
         IEnumerable<IWebsiteOutputCacheEvictionProvider> evictionProviders,
         ILogger<WebsiteOutputCacheEvictionHandler> logger)
     {
-        _serviceProvider = serviceProvider;
+        _outputCacheStore = outputCacheStore;
         _evictionProviders = evictionProviders;
         _logger = logger;
     }
@@ -36,12 +35,6 @@ internal sealed class WebsiteOutputCacheEvictionHandler : INotificationAsyncHand
     /// <inheritdoc />
     public async Task HandleAsync(ContentCacheRefresherNotification notification, CancellationToken cancellationToken)
     {
-        IOutputCacheStore? store = _serviceProvider.GetService<IOutputCacheStore>();
-        if (store is null)
-        {
-            return;
-        }
-
         if (notification.MessageType != MessageType.RefreshByPayload
             || notification.MessageObject is not ContentCacheRefresher.JsonPayload[] payloads)
         {
@@ -55,16 +48,16 @@ internal sealed class WebsiteOutputCacheEvictionHandler : INotificationAsyncHand
                 continue;
             }
 
-            await EvictForPayloadAsync(store, payload, cancellationToken);
+            await EvictForPayloadAsync(payload, cancellationToken);
         }
     }
 
-    private async Task EvictForPayloadAsync(IOutputCacheStore store, ContentCacheRefresher.JsonPayload payload, CancellationToken cancellationToken)
+    private async Task EvictForPayloadAsync(ContentCacheRefresher.JsonPayload payload, CancellationToken cancellationToken)
     {
         if (payload.ChangeTypes.HasFlag(TreeChangeTypes.RefreshAll))
         {
             _logger.LogDebug("Evicting all website output cache entries.");
-            await store.EvictByTagAsync(Constants.Website.OutputCache.AllContentTag, cancellationToken);
+            await _outputCacheStore.EvictByTagAsync(Constants.Website.OutputCache.AllContentTag, cancellationToken);
             return;
         }
 
@@ -74,13 +67,13 @@ internal sealed class WebsiteOutputCacheEvictionHandler : INotificationAsyncHand
 
             // Evict the specific content page.
             _logger.LogDebug("Evicting output cache for content {ContentKey}.", contentKey);
-            await store.EvictByTagAsync(Constants.Website.OutputCache.ContentTagPrefix + contentKey, cancellationToken);
+            await _outputCacheStore.EvictByTagAsync(Constants.Website.OutputCache.ContentTagPrefix + contentKey, cancellationToken);
 
             if (payload.ChangeTypes.HasFlag(TreeChangeTypes.RefreshBranch))
             {
                 // Evict all descendants that tagged themselves with this ancestor.
                 _logger.LogDebug("Evicting output cache for descendants of {ContentKey}.", contentKey);
-                await store.EvictByTagAsync(Constants.Website.OutputCache.AncestorTagPrefix + contentKey, cancellationToken);
+                await _outputCacheStore.EvictByTagAsync(Constants.Website.OutputCache.AncestorTagPrefix + contentKey, cancellationToken);
             }
 
             // Invoke custom eviction providers.
@@ -96,7 +89,7 @@ internal sealed class WebsiteOutputCacheEvictionHandler : INotificationAsyncHand
                 foreach (var tag in additionalTags)
                 {
                     _logger.LogDebug("Evicting output cache tag {Tag} via custom provider.", tag);
-                    await store.EvictByTagAsync(tag, cancellationToken);
+                    await _outputCacheStore.EvictByTagAsync(tag, cancellationToken);
                 }
             }
         }

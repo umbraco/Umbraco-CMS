@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.OutputCaching;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
@@ -28,11 +27,8 @@ public class WebsiteOutputCacheEvictionHandlerTests
 
         _evictionProviderMocks = new List<Mock<IWebsiteOutputCacheEvictionProvider>>();
 
-        var services = new ServiceCollection();
-        services.AddSingleton(_storeMock.Object);
-
         _handler = new WebsiteOutputCacheEvictionHandler(
-            services.BuildServiceProvider(),
+            _storeMock.Object,
             _evictionProviderMocks.Select(m => m.Object),
             NullLogger<WebsiteOutputCacheEvictionHandler>.Instance);
     }
@@ -181,25 +177,6 @@ public class WebsiteOutputCacheEvictionHandlerTests
     }
 
     [Test]
-    public async Task HandleAsync_WhenOutputCacheStoreNull_NoOp()
-    {
-        var services = new ServiceCollection();
-        var handler = new WebsiteOutputCacheEvictionHandler(
-            services.BuildServiceProvider(),
-            Enumerable.Empty<IWebsiteOutputCacheEvictionProvider>(),
-            NullLogger<WebsiteOutputCacheEvictionHandler>.Instance);
-
-        var notification = CreateNotification(new ContentCacheRefresher.JsonPayload
-        {
-            Key = Guid.NewGuid(),
-            ChangeTypes = TreeChangeTypes.RefreshNode,
-        });
-
-        // Should not throw.
-        await handler.HandleAsync(notification, CancellationToken.None);
-    }
-
-    [Test]
     public async Task HandleAsync_WhenPayloadKeyNull_SkipsEviction()
     {
         var notification = CreateNotification(new ContentCacheRefresher.JsonPayload
@@ -217,11 +194,8 @@ public class WebsiteOutputCacheEvictionHandlerTests
 
     private void RebuildHandler()
     {
-        var services = new ServiceCollection();
-        services.AddSingleton(_storeMock.Object);
-
         _handler = new WebsiteOutputCacheEvictionHandler(
-            services.BuildServiceProvider(),
+            _storeMock.Object,
             _evictionProviderMocks.Select(m => m.Object),
             NullLogger<WebsiteOutputCacheEvictionHandler>.Instance);
     }
