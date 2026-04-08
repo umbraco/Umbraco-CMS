@@ -1,13 +1,9 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using Umbraco.Cms.Api.Management.Extensions;
 using Umbraco.Cms.Api.Management.ViewModels.PartialView;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
@@ -25,7 +21,6 @@ public class RenamePartialViewController : PartialViewControllerBase
     private readonly IPartialViewService _partialViewService;
     private readonly IUmbracoMapper _umbracoMapper;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
-    private readonly IOptions<RuntimeSettings> _runtimeSettings;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RenamePartialViewController"/> class.
@@ -33,31 +28,11 @@ public class RenamePartialViewController : PartialViewControllerBase
     /// <param name="partialViewService">Service used to manage and manipulate partial views.</param>
     /// <param name="backOfficeSecurityAccessor">Accessor for back office security context and authentication.</param>
     /// <param name="umbracoMapper">Mapper used to convert between Umbraco domain models and API models.</param>
-    /// <param name="runtimeSettings">The runtime configuration settings.</param>
-    [ActivatorUtilitiesConstructor]
-    public RenamePartialViewController(
-        IPartialViewService partialViewService,
-        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-        IUmbracoMapper umbracoMapper,
-        IOptions<RuntimeSettings> runtimeSettings)
+    public RenamePartialViewController(IPartialViewService partialViewService, IBackOfficeSecurityAccessor backOfficeSecurityAccessor, IUmbracoMapper umbracoMapper)
     {
         _partialViewService = partialViewService;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
         _umbracoMapper = umbracoMapper;
-        _runtimeSettings = runtimeSettings;
-    }
-
-    [Obsolete("Use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
-    public RenamePartialViewController(
-        IPartialViewService partialViewService,
-        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-        IUmbracoMapper umbracoMapper)
-        : this(
-            partialViewService,
-            backOfficeSecurityAccessor,
-            umbracoMapper,
-            StaticServiceProvider.Instance.GetRequiredService<IOptions<RuntimeSettings>>())
-    {
     }
 
     /// <summary>
@@ -86,11 +61,6 @@ public class RenamePartialViewController : PartialViewControllerBase
         string path,
         RenamePartialViewRequestModel requestModel)
     {
-        if (_runtimeSettings.Value.Mode == RuntimeMode.Production)
-        {
-            return PartialViewOperationStatusResult(PartialViewOperationStatus.NotAllowedInProductionMode);
-        }
-
         PartialViewRenameModel renameModel = _umbracoMapper.Map<PartialViewRenameModel>(requestModel)!;
 
         path = DecodePath(path).VirtualPathToSystemPath();

@@ -1,12 +1,15 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Tests.Common.Testing;
+using Umbraco.Cms.Tests.Integration.Attributes;
 using Umbraco.Cms.Tests.Integration.Testing;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
@@ -16,6 +19,14 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 internal sealed class PartialViewServiceTests : UmbracoIntegrationTest
 {
     private IPartialViewService PartialViewService => GetRequiredService<IPartialViewService>();
+
+    /// <summary>
+    /// Configures the runtime mode to Production for tests decorated with [ConfigureBuilder].
+    /// </summary>
+    public static void ConfigureProductionMode(IUmbracoBuilder builder)
+    {
+        builder.Services.Configure<RuntimeSettings>(settings => settings.Mode = RuntimeMode.Production);
+    }
 
     [SetUp]
     public void SetUp() => DeleteAllPartialViewFiles();

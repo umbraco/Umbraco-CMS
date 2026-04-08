@@ -25,8 +25,9 @@ namespace Umbraco.Cms.Core.Services;
 public class PartialViewService : FileServiceOperationBase<IPartialViewRepository, IPartialView, PartialViewOperationStatus>, IPartialViewService
 {
     private readonly PartialViewSnippetCollection _snippetCollection;
+    private readonly IOptions<RuntimeSettings> _runtimeSettings;
 
-    // TODO (V19): Remove obsolete constructors and the ActivatorUtilitiesConstructor attribute.
+    // TODO (V18): Remove obsolete constructors and the ActivatorUtilitiesConstructor attribute.
     // Also update UmbracoBuilder where this service is registered using:
     //   Services.AddUnique<IPartialViewService>(sp => ActivatorUtilities.CreateInstance<PartialViewService>(sp));
     // We do this to allow the ActivatorUtilitiesConstructor to be used (it's otherwise ignored by AddUnique).
@@ -44,22 +45,8 @@ public class PartialViewService : FileServiceOperationBase<IPartialViewRepositor
     /// <param name="userIdKeyResolver">The resolver for converting user keys to IDs.</param>
     /// <param name="auditService">The service for audit logging.</param>
     /// <param name="snippetCollection">The collection of available partial view snippets.</param>
+    /// <param name="runtimeSettings">The runtime configuration settings.</param>
     [ActivatorUtilitiesConstructor]
-    public PartialViewService(
-        ICoreScopeProvider provider,
-        ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory,
-        IPartialViewRepository repository,
-        ILogger<StylesheetService> logger,
-        IUserIdKeyResolver userIdKeyResolver,
-        IAuditService auditService,
-        PartialViewSnippetCollection snippetCollection)
-        : base(provider, loggerFactory, eventMessagesFactory, repository, logger, userIdKeyResolver, auditService)
-    {
-        _snippetCollection = snippetCollection;
-    }
-
-    [Obsolete("Use the constructor without the runtimeSettings parameter. Scheduled for removal in Umbraco 19.")]
     public PartialViewService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -70,16 +57,10 @@ public class PartialViewService : FileServiceOperationBase<IPartialViewRepositor
         IAuditService auditService,
         PartialViewSnippetCollection snippetCollection,
         IOptions<RuntimeSettings> runtimeSettings)
-        : this(
-            provider,
-            loggerFactory,
-            eventMessagesFactory,
-            repository,
-            logger,
-            userIdKeyResolver,
-            auditService,
-            snippetCollection)
+        : base(provider, loggerFactory, eventMessagesFactory, repository, logger, userIdKeyResolver, auditService)
     {
+        _snippetCollection = snippetCollection;
+        _runtimeSettings = runtimeSettings;
     }
 
     [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 18.")]
@@ -100,7 +81,8 @@ public class PartialViewService : FileServiceOperationBase<IPartialViewRepositor
             logger,
             userIdKeyResolver,
             StaticServiceProvider.Instance.GetRequiredService<IAuditService>(),
-            snippetCollection)
+            snippetCollection,
+            StaticServiceProvider.Instance.GetRequiredService<IOptions<RuntimeSettings>>())
     {
     }
 
@@ -123,12 +105,38 @@ public class PartialViewService : FileServiceOperationBase<IPartialViewRepositor
             logger,
             userIdKeyResolver,
             auditService,
-            snippetCollection)
+            snippetCollection,
+            StaticServiceProvider.Instance.GetRequiredService<IOptions<RuntimeSettings>>())
+    {
+    }
+
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 18.")]
+    public PartialViewService(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IPartialViewRepository repository,
+        ILogger<StylesheetService> logger,
+        IUserIdKeyResolver userIdKeyResolver,
+        IAuditService auditService,
+        PartialViewSnippetCollection snippetCollection)
+        : this(
+            provider,
+            loggerFactory,
+            eventMessagesFactory,
+            repository,
+            logger,
+            userIdKeyResolver,
+            auditService,
+            snippetCollection,
+            StaticServiceProvider.Instance.GetRequiredService<IOptions<RuntimeSettings>>())
     {
     }
 
     /// <inheritdoc />
     protected override string[] AllowedFileExtensions { get; } = { ".cshtml" };
+
+    private bool IsProductionMode => _runtimeSettings.Value.Mode == RuntimeMode.Production;
 
     /// <inheritdoc />
     protected override PartialViewOperationStatus Success => PartialViewOperationStatus.Success;
@@ -201,17 +209,45 @@ public class PartialViewService : FileServiceOperationBase<IPartialViewRepositor
 
     /// <inheritdoc />
     public async Task<PartialViewOperationStatus> DeleteAsync(string path, Guid userKey)
-        => await HandleDeleteAsync(path, userKey);
+    {
+        if (IsProductionMode)
+        {
+            return PartialViewOperationStatus.NotAllowedInProductionMode;
+        }
+
+        return await HandleDeleteAsync(path, userKey);
+    }
 
     /// <inheritdoc />
     public async Task<Attempt<IPartialView?, PartialViewOperationStatus>> CreateAsync(PartialViewCreateModel createModel, Guid userKey)
-        => await HandleCreateAsync(createModel.Name, createModel.ParentPath, createModel.Content, userKey);
+    {
+        if (IsProductionMode)
+        {
+            return Attempt.FailWithStatus<IPartialView?, PartialViewOperationStatus>(PartialViewOperationStatus.NotAllowedInProductionMode, null);
+        }
+
+        return await HandleCreateAsync(createModel.Name, createModel.ParentPath, createModel.Content, userKey);
+    }
 
     /// <inheritdoc />
     public async Task<Attempt<IPartialView?, PartialViewOperationStatus>> UpdateAsync(string path, PartialViewUpdateModel updateModel, Guid userKey)
-        => await HandleUpdateAsync(path, updateModel.Content, userKey);
+    {
+        if (IsProductionMode)
+        {
+            return Attempt.FailWithStatus<IPartialView?, PartialViewOperationStatus>(PartialViewOperationStatus.NotAllowedInProductionMode, null);
+        }
+
+        return await HandleUpdateAsync(path, updateModel.Content, userKey);
+    }
 
     /// <inheritdoc />
     public async Task<Attempt<IPartialView?, PartialViewOperationStatus>> RenameAsync(string path, PartialViewRenameModel renameModel, Guid userKey)
-        => await HandleRenameAsync(path, renameModel.Name, userKey);
+    {
+        if (IsProductionMode)
+        {
+            return Attempt.FailWithStatus<IPartialView?, PartialViewOperationStatus>(PartialViewOperationStatus.NotAllowedInProductionMode, null);
+        }
+
+        return await HandleRenameAsync(path, renameModel.Name, userKey);
+    }
 }
