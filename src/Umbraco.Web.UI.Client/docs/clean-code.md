@@ -462,6 +462,23 @@ export class UmbDocumentActionButton extends LitElement {
 - Remove unused imports, functions, variables
 - Clean up console.logs before committing
 
+### Feature Parity with Core Equivalents
+
+When implementing a new component that mirrors an existing core or sibling implementation (e.g. a new collection action alongside document/media/member equivalents), do a side-by-side comparison against the core version before considering it done.
+
+**Checklist**:
+
+1. **Full API surface**: Read the reference implementation's controller/API usage line by line. Every method call, callback, and property access on controllers in the reference must have a counterpart in the new implementation — don't cherry-pick only the obvious ones.
+2. **Error handling**: Match the core's error handling pattern (e.g. `.catch(() => {})` on `execute()` calls) to prevent unhandled promise rejections.
+3. **Type hierarchy**: Before defining new interfaces, search for existing base types (e.g. `UmbNamedEntityModel` vs `UmbEntityModel`) that already declare the fields you need. Use the most specific base.
+4. **UI consistency**: Check CSS from sibling implementations (e.g. `max-height` on scroll containers, icon fallbacks like `?? 'icon-document'`).
+5. **Context-appropriate strings**: Don't reuse localization keys from another domain (e.g. `create_noDocumentTypes` in an elements context). Either create a new key or use only the inline fallback text.
+
+**Core components to compare against** (common patterns):
+- Collection create actions: `src/packages/core/collection/action/create/collection-create-action.element.ts`
+- Entity create option modals: `src/packages/core/entity-action/common/create/modal/entity-create-option-action-list-modal.element.ts`
+- Document/media/member equivalents in their respective `src/packages/` directories
+
 ### Patterns to Avoid
 
 **Don't**:

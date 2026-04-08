@@ -73,7 +73,10 @@ internal class DocumentUrlAliasRepository : IDocumentUrlAliasRepository
         // do the deletes and inserts
         if (toDelete.Count > 0)
         {
-            Database.DeleteMany<DocumentUrlAliasDto>().Where(x => toDelete.Contains(x.Id)).Execute();
+            foreach (IEnumerable<int> group in toDelete.InGroupsOf(Constants.Sql.MaxParameterCount))
+            {
+                Database.DeleteMany<DocumentUrlAliasDto>().Where(x => group.Contains(x.Id)).Execute();
+            }
         }
 
         Database.InsertBulk(toInsert.Values);

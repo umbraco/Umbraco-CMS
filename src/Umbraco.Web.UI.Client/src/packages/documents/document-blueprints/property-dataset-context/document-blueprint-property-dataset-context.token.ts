@@ -11,4 +11,4 @@ export const IsDocumentBlueprintPropertyDatasetContext = (
 export const UMB_DOCUMENT_BLUEPRINT_PROPERTY_DATASET_CONTEXT = new UmbContextToken<
 	UmbPropertyDatasetContext,
 	UmbDocumentBlueprintPropertyDatasetContext
->('UmbVariantContext', undefined, IsDocumentBlueprintPropertyDatasetContext);
+>('UmbPropertyDatasetContext', undefined, IsDocumentBlueprintPropertyDatasetContext);
