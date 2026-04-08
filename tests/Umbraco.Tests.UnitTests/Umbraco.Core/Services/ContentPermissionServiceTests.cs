@@ -18,6 +18,12 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Services;
 [TestFixture]
 public class ContentPermissionServiceTests
 {
+    private const int ContentNodeId = 5678;
+    private const string ContentNodePath = "-1,1234,5678";
+    private const int UserStartNodeId = 1234;
+    private const string UserStartNodePath = "-1,1234";
+    private const int UnrelatedStartNodeId = 9876;
+
     private Mock<IContentService> _contentServiceMock;
     private Mock<IEntityService> _entityServiceMock;
     private Mock<IUserService> _userServiceMock;
@@ -48,9 +54,9 @@ public class ContentPermissionServiceTests
 
         _entityServiceMock
             .Setup(x => x.GetAllPaths(UmbracoObjectTypes.Document, new[] { contentKey }))
-            .Returns([CreateTreeEntityPath(contentKey, 5678, "-1,1234,5678")]);
+            .Returns([CreateTreeEntityPath(contentKey, ContentNodeId, ContentNodePath)]);
 
-        SetupPermissions(user, "-1,1234,5678", ["A"]);
+        SetupPermissions(user, ContentNodePath, ["A"]);
 
         // Act
         var result = await _sut.AuthorizeAccessAsync(user, contentKey, "A");
@@ -82,15 +88,15 @@ public class ContentPermissionServiceTests
     {
         // Arrange
         var contentKey = Guid.NewGuid();
-        var user = CreateUser(startContentId: 9876);
+        var user = CreateUser(startContentId: UnrelatedStartNodeId);
 
         _entityServiceMock
             .Setup(x => x.GetAllPaths(UmbracoObjectTypes.Document, new[] { contentKey }))
-            .Returns([CreateTreeEntityPath(contentKey, 5678, "-1,1234,5678")]);
+            .Returns([CreateTreeEntityPath(contentKey, ContentNodeId, ContentNodePath)]);
 
         _entityServiceMock
             .Setup(x => x.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
-            .Returns([CreateTreeEntityPath(Guid.NewGuid(), 9876, "-1,9876")]);
+            .Returns([CreateTreeEntityPath(Guid.NewGuid(), UnrelatedStartNodeId, $"-1,{UnrelatedStartNodeId}")]);
 
         // Act
         var result = await _sut.AuthorizeAccessAsync(user, contentKey, "A");
@@ -108,9 +114,9 @@ public class ContentPermissionServiceTests
 
         _entityServiceMock
             .Setup(x => x.GetAllPaths(UmbracoObjectTypes.Document, new[] { contentKey }))
-            .Returns([CreateTreeEntityPath(contentKey, 5678, "-1,1234,5678")]);
+            .Returns([CreateTreeEntityPath(contentKey, ContentNodeId, ContentNodePath)]);
 
-        SetupPermissions(user, "-1,1234,5678", ["A", "B", "C"]);
+        SetupPermissions(user, ContentNodePath, ["A", "B", "C"]);
 
         // Act
         var result = await _sut.AuthorizeAccessAsync(user, contentKey, "F");
@@ -128,9 +134,9 @@ public class ContentPermissionServiceTests
 
         _entityServiceMock
             .Setup(x => x.GetAllPaths(UmbracoObjectTypes.Document, new[] { contentKey }))
-            .Returns([CreateTreeEntityPath(contentKey, 5678, "-1,1234,5678")]);
+            .Returns([CreateTreeEntityPath(contentKey, ContentNodeId, ContentNodePath)]);
 
-        SetupPermissions(user, "-1,1234,5678", ["A", "F", "C"]);
+        SetupPermissions(user, ContentNodePath, ["A", "F", "C"]);
 
         // Act
         var result = await _sut.AuthorizeAccessAsync(user, contentKey, "F");
@@ -171,11 +177,11 @@ public class ContentPermissionServiceTests
     public async Task Cannot_Authorize_Root_Access_By_Path()
     {
         // Arrange
-        var user = CreateUser(startContentId: 1234);
+        var user = CreateUser(startContentId: UserStartNodeId);
 
         _entityServiceMock
             .Setup(x => x.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
-            .Returns([CreateTreeEntityPath(Guid.NewGuid(), 1234, "-1,1234")]);
+            .Returns([CreateTreeEntityPath(Guid.NewGuid(), UserStartNodeId, UserStartNodePath)]);
 
         // Act
         var result = await _sut.AuthorizeRootAccessAsync(user, "A");
@@ -218,11 +224,11 @@ public class ContentPermissionServiceTests
     public async Task Cannot_Authorize_Bin_Access_By_Path()
     {
         // Arrange
-        var user = CreateUser(startContentId: 1234);
+        var user = CreateUser(startContentId: UserStartNodeId);
 
         _entityServiceMock
             .Setup(x => x.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
-            .Returns([CreateTreeEntityPath(Guid.NewGuid(), 1234, "-1,1234")]);
+            .Returns([CreateTreeEntityPath(Guid.NewGuid(), UserStartNodeId, UserStartNodePath)]);
 
         // Act
         var result = await _sut.AuthorizeBinAccessAsync(user, "A");
