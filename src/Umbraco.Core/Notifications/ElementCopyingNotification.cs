@@ -13,7 +13,7 @@ public sealed class ElementCopyingNotification : CopyingNotification<IElement>
     {
     }
 
-    [Obsolete("Please use the constructor without parentId instead. Scheduled for removal in Umbraco 19.")]
+    [Obsolete("Please use the constructor without parentId instead. Scheduled for removal in Umbraco 20.")]
     public ElementCopyingNotification(IElement original, IElement copy, int parentId, Guid? parentKey, EventMessages messages)
         : this(original, copy, parentKey, messages)
     {
