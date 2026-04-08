@@ -27,21 +27,36 @@ public class ContentNavigationRepository : INavigationRepository
 
     /// <inheritdoc />
     public IEnumerable<INavigationModel> GetContentNodesByObjectType(Guid objectTypeKey)
-        => FetchNavigationDtos(objectTypeKey, false);
+        => GetContentNodesByObjectType([objectTypeKey]);
 
     /// <inheritdoc />
     public IEnumerable<INavigationModel> GetTrashedContentNodesByObjectType(Guid objectTypeKey)
-        => FetchNavigationDtos(objectTypeKey, true);
+        => GetTrashedContentNodesByObjectType([objectTypeKey]);
 
-    private IEnumerable<INavigationModel> FetchNavigationDtos(Guid objectTypeKey, bool trashed)
+    /// <inheritdoc />
+    public IEnumerable<INavigationModel> GetContentNodesByObjectType(IEnumerable<Guid> objectTypeKeys)
+        => FetchNavigationDtos(objectTypeKeys, false);
+
+    /// <inheritdoc />
+    public IEnumerable<INavigationModel> GetTrashedContentNodesByObjectType(IEnumerable<Guid> objectTypeKeys)
+        => FetchNavigationDtos(objectTypeKeys, true);
+
+    private IEnumerable<INavigationModel> FetchNavigationDtos(IEnumerable<Guid> objectTypeKeys, bool trashed)
     {
         if (AmbientScope is null)
         {
             return Enumerable.Empty<NavigationDto>();
         }
 
+        Guid[] objectTypeKeysArray = objectTypeKeys.ToArray();
+        if (objectTypeKeysArray.Length == 0)
+        {
+            return Enumerable.Empty<NavigationDto>();
+        }
+
         ISqlSyntaxProvider syntax = AmbientScope.SqlContext.SqlSyntax;
 
+        // LEFT JOIN umbracoContent since some nodes (e.g. containers) may not have content rows
         Sql<ISqlContext> sql = AmbientScope.SqlContext.Sql()
             .Select(
                 $"n.{syntax.GetQuotedColumnName(NodeDto.IdColumnName)} as {syntax.GetQuotedColumnName(NodeDto.IdColumnName)}",
@@ -51,9 +66,10 @@ public class ContentNavigationRepository : INavigationRepository
                 $"n.{syntax.GetQuotedColumnName(NodeDto.SortOrderColumnName)}  as  {syntax.GetQuotedColumnName(NodeDto.SortOrderColumnName)}",
                 $"n.{syntax.GetQuotedColumnName(NodeDto.TrashedColumnName)}  as  {syntax.GetQuotedColumnName(NodeDto.TrashedColumnName)}")
             .From<NodeDto>("n")
-            .InnerJoin<ContentDto>("c").On<NodeDto, ContentDto>((n, c) => n.NodeId == c.NodeId, "n", "c")
-            .InnerJoin<NodeDto>("ctn").On<ContentDto, NodeDto>((c, ctn) => c.ContentTypeId == ctn.NodeId, "c", "ctn")
-            .Where<NodeDto>(n => n.NodeObjectType == objectTypeKey && n.Trashed == trashed, "n")
+            .LeftJoin<ContentDto>("c").On<NodeDto, ContentDto>((n, c) => n.NodeId == c.NodeId, "n", "c")
+            .LeftJoin<NodeDto>("ctn").On<ContentDto, NodeDto>((c, ctn) => c.ContentTypeId == ctn.NodeId, "c", "ctn")
+            .WhereIn<NodeDto>(n => n.NodeObjectType, objectTypeKeysArray, "n")
+            .Where<NodeDto>(n => n.Trashed == trashed, "n")
             .OrderBy<NodeDto>(n => n.Path, "n"); // make sure that we get the parent items first
 
         return AmbientScope.Database.Fetch<NavigationDto>(sql);

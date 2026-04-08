@@ -6,8 +6,13 @@ namespace Umbraco.Cms.Infrastructure.HybridCache.SeedKeyProviders.Element;
 
 /// <summary>
 /// Provides seed keys for the element cache by traversing the element tree breadth-first
-/// and filtering out unpublished elements.
+/// and filtering out unpublished elements and containers.
 /// </summary>
+/// <remarks>
+/// The element tree contains both containers (folders) and actual elements.
+/// Containers are always traversed for their children but are never added to the seed set.
+/// Only published elements are counted toward the seed limit.
+/// </remarks>
 internal sealed class ElementBreadthFirstKeyProvider : BreadthFirstKeyProvider, IElementSeedKeyProvider
 {
     private readonly IElementPublishStatusQueryService _publishStatusService;
@@ -30,8 +35,6 @@ internal sealed class ElementBreadthFirstKeyProvider : BreadthFirstKeyProvider, 
     }
 
     /// <inheritdoc/>
-    // Override to filter out unpublished elements during traversal, ensuring the seed count
-    // is reached even if some elements are filtered out (same approach as DocumentBreadthFirstKeyProvider).
     public new ISet<Guid> GetSeedKeys()
     {
         if (_seedCount == 0)
@@ -48,16 +51,20 @@ internal sealed class ElementBreadthFirstKeyProvider : BreadthFirstKeyProvider, 
             return new HashSet<Guid>();
         }
 
-        rootKeys = rootKeys.Where(x => _publishStatusService.IsPublishedInAnyCulture(x));
-
         foreach (Guid key in rootKeys)
         {
-            keyCount++;
-            keys.Add(key);
+            // Always enqueue for child traversal (might be a container with element children)
             keyQueue.Enqueue(key);
-            if (keyCount == _seedCount)
+
+            // Only count published elements toward the seed limit
+            if (_publishStatusService.IsPublishedInAnyCulture(key))
             {
-                return keys;
+                keys.Add(key);
+                keyCount++;
+                if (keyCount == _seedCount)
+                {
+                    return keys;
+                }
             }
         }
 
@@ -70,18 +77,21 @@ internal sealed class ElementBreadthFirstKeyProvider : BreadthFirstKeyProvider, 
                 continue;
             }
 
-            childKeys = childKeys.Where(x => _publishStatusService.IsPublishedInAnyCulture(x));
-
             foreach (Guid childKey in childKeys)
             {
-                keys.Add(childKey);
-                keyCount++;
-                if (keyCount == _seedCount)
-                {
-                    return keys;
-                }
-
+                // Always enqueue for child traversal (might be a nested container)
                 keyQueue.Enqueue(childKey);
+
+                // Only count published elements toward the seed limit
+                if (_publishStatusService.IsPublishedInAnyCulture(childKey))
+                {
+                    keys.Add(childKey);
+                    keyCount++;
+                    if (keyCount == _seedCount)
+                    {
+                        return keys;
+                    }
+                }
             }
         }
 

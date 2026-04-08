@@ -12,12 +12,20 @@ namespace Umbraco.Cms.Core.Services.Navigation;
 ///     This service extends <see cref="ContentNavigationServiceBase{TContentType, TContentTypeService}"/>
 ///     and implements both <see cref="IElementNavigationQueryService"/> and <see cref="IElementNavigationManagementService"/>
 ///     to provide a complete set of navigation operations for element content.
+///     The element tree includes both elements and element containers (folders),
+///     so the rebuild queries both object types to build the full tree hierarchy.
 /// </remarks>
 internal sealed class ElementNavigationService :
     ContentNavigationServiceBase<IContentType, IContentTypeService>,
     IElementNavigationQueryService,
     IElementNavigationManagementService
 {
+    private static readonly Guid[] ElementObjectTypes =
+    [
+        Constants.ObjectTypes.Element,
+        Constants.ObjectTypes.ElementContainer,
+    ];
+
     /// <summary>
     ///     Initializes a new instance of the <see cref="ElementNavigationService"/> class.
     /// </summary>
@@ -31,9 +39,9 @@ internal sealed class ElementNavigationService :
 
     /// <inheritdoc />
     public override async Task RebuildAsync()
-        => await HandleRebuildAsync(Constants.Locks.ElementTree, Constants.ObjectTypes.Element, false);
+        => await HandleRebuildAsync(Constants.Locks.ElementTree, ElementObjectTypes, false);
 
     /// <inheritdoc />
     public override async Task RebuildBinAsync()
-        => await HandleRebuildAsync(Constants.Locks.ElementTree, Constants.ObjectTypes.Element, true);
+        => await HandleRebuildAsync(Constants.Locks.ElementTree, ElementObjectTypes, true);
 }
