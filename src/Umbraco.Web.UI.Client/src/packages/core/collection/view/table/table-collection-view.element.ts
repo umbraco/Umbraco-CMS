@@ -60,7 +60,7 @@ export class UmbTableCollectionViewElement extends UmbCollectionViewElementBase<
 		};
 
 		const manifestColumns: Array<UmbTableColumn> = this.#manifestColumns.map((col) => ({
-			name: col.label,
+			name: this.localize.string(col.label),
 			alias: col.field,
 		}));
 

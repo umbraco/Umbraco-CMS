@@ -18,6 +18,7 @@ export class ExampleCollectionRepository
 				name: 'Example Item 1',
 				icon: 'icon-newspaper',
 				description: 'This is a description of Example Item 1',
+				status: 'Published',
 			},
 			{
 				unique: 'bc9b6e24-4b11-4dd6-8d4e-7c4f70e59f3c',
@@ -25,6 +26,7 @@ export class ExampleCollectionRepository
 				name: 'Example Item 2',
 				icon: 'icon-newspaper',
 				description: 'This is a description of Example Item 2',
+				status: 'Draft',
 			},
 			{
 				unique: '5a2f4e3a-ef7e-470e-8c3c-3d859c02ae0d',
@@ -32,6 +34,7 @@ export class ExampleCollectionRepository
 				name: 'Example Item 3',
 				icon: 'icon-newspaper',
 				description: 'This is a description of Example Item 3',
+				status: 'Published',
 			},
 			{
 				unique: 'f4c3d8b8-6d79-4c87-9aa9-56b1d8fda702',
@@ -39,6 +42,7 @@ export class ExampleCollectionRepository
 				name: 'Example Item 4',
 				icon: 'icon-newspaper',
 				description: 'This is a description of Example Item 4',
+				status: 'Draft',
 			},
 			{
 				unique: 'c9f0a8a3-1b49-4724-bde3-70e31592eb6e',
@@ -46,6 +50,7 @@ export class ExampleCollectionRepository
 				name: 'Example Item 5',
 				icon: 'icon-newspaper',
 				description: 'This is a description of Example Item 5',
+				status: 'Published',
 			},
 		];
 
