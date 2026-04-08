@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Core.Cache;
 /// </summary>
 /// <remarks>
 ///     <para>
-///         Single registration — customers replace the default implementation to vary duration
+///         Single registration — the default implementation can be replaced to vary duration
 ///         by content type, path, or content properties.
 ///     </para>
 ///     <para>
