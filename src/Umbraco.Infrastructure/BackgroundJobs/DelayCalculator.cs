@@ -37,8 +37,7 @@ namespace Umbraco.Cms.Infrastructure.BackgroundJobs
             => GetDelay(firstRunTime, cronTabParser, logger, DateTime.Now, defaultDelay);
 
         /// <summary>
-        /// Determines the delay before the first run of a recurring task implemented as a hosted service when an optonal
-        /// configuration for the first run time is available.
+        /// Determines the delay before the first run of a recurring task implemented as a hosted service when an optional configuration for the first run time is available.
         /// </summary>
         /// <param name="firstRunTime">The configured time to first run the task in crontab format.</param>
         /// <param name="cronTabParser">An instance of <see cref="ICronTabParser" />.</param>

@@ -280,9 +280,9 @@ public abstract class RecurringHostedServiceBase : BackgroundService
 
     /// <summary>
     /// Signals the background loop to execute immediately.
-    /// After the triggered execution, the loop waits for the specified delay before the next execution.
+    /// After the triggered execution, the next execution is scheduled after the specified delay (measured from execution start; execution time is subtracted to prevent drift).
     /// </summary>
-    /// <param name="nextDelay">The delay to wait after the triggered execution completes (execution time is subtracted to prevent drift).</param>
+    /// <param name="nextDelay">The target interval from execution start to the next execution. Execution time is subtracted to prevent drift.</param>
     public void TriggerExecution(TimeSpan nextDelay)
     {
         _triggerState = new TriggerState(Delay: nextDelay);

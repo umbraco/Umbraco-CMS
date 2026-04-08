@@ -359,6 +359,40 @@ public class RecurringHostedServiceBaseTests
         await sut.StopAsync(CancellationToken.None);
     }
 
+    [Test]
+    public async Task ChangePeriod_Takes_Effect_Immediately()
+    {
+        var executionCount = 0;
+        var timeProvider = new FakeTimeProvider();
+        using var executed = new SemaphoreSlim(0);
+        var sut = new TestRecurringHostedService(
+            period: TimeSpan.FromMinutes(10),
+            delay: TimeSpan.Zero,
+            timeProvider: timeProvider,
+            onExecute: _ => { Interlocked.Increment(ref executionCount); executed.Release(); return Task.CompletedTask; });
+
+        using var cts = new CancellationTokenSource();
+        await sut.StartAsync(cts.Token);
+
+        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)));
+        Assert.AreEqual(1, executionCount);
+
+        // Change to a 1-hour period — should interrupt the in-flight wait immediately.
+        sut.PublicChangePeriod(TimeSpan.FromHours(1));
+
+        // Advancing the old 10min period should NOT trigger execution.
+        timeProvider.Advance(TimeSpan.FromMinutes(10));
+        Assert.AreEqual(1, executionCount, "Should not execute at old period interval");
+
+        // Advancing to 1h total from first execution should trigger.
+        timeProvider.Advance(TimeSpan.FromMinutes(50));
+        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)));
+        Assert.AreEqual(2, executionCount, "Should execute after new period");
+
+        cts.Cancel();
+        await sut.StopAsync(CancellationToken.None);
+    }
+
     /// <summary>
     /// A concrete test subclass that overrides the new PerformExecuteAsync(CancellationToken).
     /// </summary>
