@@ -26,7 +26,26 @@ internal abstract class ContentListViewServiceBase<TContent, TContentType, TCont
 
     protected abstract Guid DefaultListViewKey { get; }
 
+    /// <summary>
+    /// Asynchronously determines whether the specified user has access to the list view item identified by the given
+    /// key.
+    /// </summary>
+    /// <param name="user">The user for whom to check access permissions.</param>
+    /// <param name="key">The unique identifier of the list view item to check access for.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains <see langword="true"/> if the user
+    /// has access to the specified list view item; otherwise, <see langword="false"/>.</returns>
+    [Obsolete("This is no longer used as we now authorize collection view items as a collection via FilterAuthorizedKeysAsync rather than one by one. Scheduled for removal in Umbraco 19.")]
     protected abstract Task<bool> HasAccessToListViewItemAsync(IUser user, Guid key);
+
+    /// <summary>
+    ///     Filters the specified content keys to only those the user has access to.
+    /// </summary>
+    /// <param name="user">The user to check access for.</param>
+    /// <param name="keys">The keys of the content items to filter.</param>
+    /// <returns>A set of keys that the user has access to.</returns>
+    // TODO (V18): Make this abstract rather than virtual (it's abstract only to avoid a breaking change).
+    protected virtual Task<ISet<Guid>> FilterAuthorizedKeysAsync(IUser user, IEnumerable<Guid> keys)
+        => Task.FromResult<ISet<Guid>>(new HashSet<Guid>());
 
     protected async Task<Attempt<ListViewPagedModel<TContent>?, ContentCollectionOperationStatus>> GetListViewResultAsync(
         IUser user,
@@ -53,7 +72,11 @@ internal abstract class ContentListViewServiceBase<TContent, TContentType, TCont
             return Attempt.FailWithStatus<ListViewPagedModel<TContent>?, ContentCollectionOperationStatus>(orderingAttempt.Status, null);
         }
 
-        PagedModel<TContent> items = await GetAllowedListViewItemsAsync(user, content?.Key, filter, orderingAttempt.Result, skip, take);
+        // Extract non-system property aliases from configuration to optimize property loading (we'll optimize and only
+        // load the properties we need to populate the collection view).
+        string[]? customPropertyAliases = ExtractCustomPropertyAliases(configurationAttempt.Result, orderingAttempt.Result);
+
+        PagedModel<TContent> items = await GetAllowedListViewItemsAsync(user, content?.Key, filter, orderingAttempt.Result, customPropertyAliases, skip, take);
 
         var result = new ListViewPagedModel<TContent>
         {
@@ -70,17 +93,16 @@ internal abstract class ContentListViewServiceBase<TContent, TContentType, TCont
         string? orderCulture,
         Direction orderDirection)
     {
-        var listViewProperties = listViewConfiguration?.IncludeProperties;
+        ListViewConfiguration.Property[]? listViewProperties = listViewConfiguration?.IncludeProperties;
 
         if (listViewProperties == null || listViewProperties.Length == 0)
         {
             return Attempt.FailWithStatus<Ordering?, ContentCollectionOperationStatus>(ContentCollectionOperationStatus.MissingPropertiesInCollectionConfiguration, null);
         }
 
-        var listViewPropertyAliases = listViewProperties
+        IEnumerable<string> listViewPropertyAliases = listViewProperties
             .Select(p => p.Alias)
             .WhereNotNull();
-
 
         if (listViewPropertyAliases.Contains(orderBy) == false && orderBy.InvariantEquals("name") == false)
         {
@@ -207,9 +229,43 @@ internal abstract class ContentListViewServiceBase<TContent, TContentType, TCont
         return await _dataTypeService.GetAsync(configuredListViewKey);
     }
 
-    private async Task<PagedModel<TContent>> GetAllowedListViewItemsAsync(IUser user, Guid? contentId, string? filter, Ordering? ordering, int skip, int take)
+    /// <summary>
+    ///     Extracts non-system property aliases from the list view configuration.
+    /// </summary>
+    /// <param name="configuration">The list view configuration.</param>
+    /// <param name="ordering">The ordering information (to ensure the order-by field is included if it's a custom property).</param>
+    /// <returns>
+    ///     An array of custom property aliases to load. Returns empty array if only system properties are configured.
+    /// </returns>
+    private static string[]? ExtractCustomPropertyAliases(ListViewConfiguration? configuration, Ordering? ordering)
     {
-        PagedModel<TContent> pagedChildren = await _contentSearchService.SearchChildrenAsync(filter, contentId, ordering, skip, take);
+        if (configuration?.IncludeProperties is null)
+        {
+            return null;
+        }
+
+        // Extract non-system property aliases.
+        var customAliases = configuration.IncludeProperties
+            .Where(p => p.IsSystem is false && p.Alias is not null)
+            .Select(p => p.Alias!)
+            .ToList();
+
+        // If ordering by a custom field, ensure it's included in the aliases
+        // (in case it's not in the configured display columns but is used for sorting).
+        if (ordering?.IsCustomField is true &&
+            string.IsNullOrEmpty(ordering.OrderBy) is false &&
+            customAliases.Contains(ordering.OrderBy, StringComparer.OrdinalIgnoreCase) is false)
+        {
+            customAliases.Add(ordering.OrderBy);
+        }
+
+        return [.. customAliases];
+    }
+
+    private async Task<PagedModel<TContent>> GetAllowedListViewItemsAsync(IUser user, Guid? contentId, string? filter, Ordering? ordering, string[]? propertyAliases, int skip, int take)
+    {
+        // Collection views don't need templates loaded, so we pass loadTemplates: false for performance
+        PagedModel<TContent> pagedChildren = await _contentSearchService.SearchChildrenAsync(filter, contentId, propertyAliases, ordering, loadTemplates: false, skip, take);
 
         // Filtering out child nodes after getting a paged result is an active choice here, even though the pagination might get off.
         // This has been the case with this functionality in Umbraco for a long time.
@@ -224,21 +280,18 @@ internal abstract class ContentListViewServiceBase<TContent, TContentType, TCont
         return pagedResult;
     }
 
-    // TODO: Optimize the way we filter out only the nodes the user is allowed to see - instead of checking one by one
     private async Task<IEnumerable<TContent>> FilterItemsBasedOnAccessAsync(IUser user, IEnumerable<TContent> items)
     {
-        var filteredItems = new List<TContent>();
-
-        foreach (TContent item in items)
+        TContent[] itemsArray = items.ToArray();
+        if (itemsArray.Length == 0)
         {
-            var hasAccess = await HasAccessToListViewItemAsync(user, item.Key);
-
-            if (hasAccess)
-            {
-                filteredItems.Add(item);
-            }
+            return itemsArray;
         }
 
-        return filteredItems;
+        // Authorize all items at once (so we execute a single database query instead of N queries).
+        ISet<Guid> authorizedKeys = await FilterAuthorizedKeysAsync(user, itemsArray.Select(i => i.Key));
+
+        // Filter items based on authorized keys.
+        return itemsArray.Where(item => authorizedKeys.Contains(item.Key));
     }
 }

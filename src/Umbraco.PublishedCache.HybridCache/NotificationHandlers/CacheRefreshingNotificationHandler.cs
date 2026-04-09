@@ -61,19 +61,37 @@ internal sealed class CacheRefreshingNotificationHandler :
 
     public Task HandleAsync(ContentTypeRefreshedNotification notification, CancellationToken cancellationToken)
     {
-        const ContentTypeChangeTypes types // only for those that have been refreshed
-            = ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RefreshOther;
-        var contentTypeIds = notification.Changes.Where(x => x.ChangeTypes.HasTypesAny(types)).Select(x => x.Item.Id)
+        // Separate structural changes (RefreshMain) from non-structural changes (RefreshOther).
+        // Structural changes require a full rebuild, while non-structural changes only need
+        // the converted content cache cleared since ContentCacheNode only stores ContentTypeId.
+        var structuralChangeIds = notification.Changes
+            .Where(x => x.ChangeTypes.IsStructuralChange())
+            .Select(x => x.Item.Id)
             .ToArray();
 
-        if (contentTypeIds.Length > 0)
-        {
-            foreach (var contentTypeId in contentTypeIds)
-            {
-                _publishedContentTypeCache.ClearContentType(contentTypeId);
-            }
+        var nonStructuralChangeIds = notification.Changes
+            .Where(x => x.ChangeTypes.IsNonStructuralChange())
+            .Select(x => x.Item.Id)
+            .ToArray();
 
-            _documentCacheService.Rebuild(contentTypeIds);
+        // Clear content type cache for all changes - content type definitions need refreshing regardless
+        foreach (var contentTypeId in structuralChangeIds.Concat(nonStructuralChangeIds))
+        {
+            _publishedContentTypeCache.ClearContentType(contentTypeId);
+        }
+
+        // Full rebuild only for structural changes (property removed, alias changed, variation changed, etc.)
+        if (structuralChangeIds.Length > 0)
+        {
+            _documentCacheService.Rebuild(structuralChangeIds);
+        }
+
+        // For non-structural changes (name, icon, description, new property added),
+        // just clear the converted content cache - HybridCache entries remain valid.
+        // Selective clearing is safe here because no model factory reset occurs in this handler.
+        if (nonStructuralChangeIds.Length > 0)
+        {
+            _documentCacheService.ClearConvertedContentCache(nonStructuralChangeIds);
         }
 
         return Task.CompletedTask;
@@ -91,20 +109,39 @@ internal sealed class CacheRefreshingNotificationHandler :
 
     public Task HandleAsync(MediaTypeRefreshedNotification notification, CancellationToken cancellationToken)
     {
-        const ContentTypeChangeTypes types // only for those that have been refreshed
-            = ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RefreshOther;
-        var mediaTypeIds = notification.Changes.Where(x => x.ChangeTypes.HasTypesAny(types)).Select(x => x.Item.Id)
+        // Separate structural changes (RefreshMain) from non-structural changes (RefreshOther).
+        // Structural changes require a full rebuild, while non-structural changes only need
+        // the converted content cache cleared since ContentCacheNode only stores ContentTypeId.
+        var structuralChangeIds = notification.Changes
+            .Where(x => x.ChangeTypes.IsStructuralChange())
+            .Select(x => x.Item.Id)
             .ToArray();
 
-        if (mediaTypeIds.Length > 0)
-        {
-            foreach (var mediaTypeId in mediaTypeIds)
-            {
-                _publishedContentTypeCache.ClearContentType(mediaTypeId);
-            }
+        var nonStructuralChangeIds = notification.Changes
+            .Where(x => x.ChangeTypes.IsNonStructuralChange())
+            .Select(x => x.Item.Id)
+            .ToArray();
 
-            _mediaCacheService.Rebuild(mediaTypeIds);
+        // Clear media type cache for all changes - media type definitions need refreshing regardless
+        foreach (var mediaTypeId in structuralChangeIds.Concat(nonStructuralChangeIds))
+        {
+            _publishedContentTypeCache.ClearContentType(mediaTypeId);
         }
+
+        // Full rebuild only for structural changes (property removed, alias changed, variation changed, etc.)
+        if (structuralChangeIds.Length > 0)
+        {
+            _mediaCacheService.Rebuild(structuralChangeIds);
+        }
+
+        // For non-structural changes (name, icon, description, new property added),
+        // just clear the converted content cache - HybridCache entries remain valid.
+        // Selective clearing is safe here because no model factory reset occurs in this handler.
+        if (nonStructuralChangeIds.Length > 0)
+        {
+            _mediaCacheService.ClearConvertedContentCache(nonStructuralChangeIds);
+        }
+
         return Task.CompletedTask;
     }
 

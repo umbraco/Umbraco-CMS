@@ -84,6 +84,9 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 
 		window.addEventListener('willchangestate', this.#onWillNavigate);
 
+		this.content.view.inheritFrom(this.view);
+		this.settings.view.inheritFrom(this.view);
+
 		this.addValidationContext(this.content.validation);
 		this.addValidationContext(this.settings.validation);
 
@@ -91,7 +94,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 			this.#modalContext = context;
 			this.#originData = context?.data.originData;
 			context?.onSubmit().catch(this.#modalRejected);
-		}).asPromise({ preventTimeout: true });
+		});
 
 		this.#retrieveBlockManager = this.consumeContext(UMB_BLOCK_MANAGER_CONTEXT, (manager) => {
 			this.#blockManager = manager;
@@ -113,8 +116,8 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 
 		this.observe(
 			observeMultiple([this.content.values, this.settings.values]),
-			async ([contentValues]) => {
-				this.#renderLabel(contentValues);
+			async ([contentValues, settingsValues]) => {
+				this.#renderLabel(contentValues, settingsValues);
 			},
 			'observeContentForLabelRender',
 		);
@@ -188,7 +191,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 				this.observe(
 					manager.hasExposeOf(contentKey, variantId),
 					(exposed) => {
-						this.#exposed.setValue(exposed);
+						this.#exposed.setValue(exposed ?? false);
 					},
 					'observeHasExpose',
 				);
@@ -209,8 +212,12 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 					};
 
 					this.readOnlyGuard?.addRule(rule);
+					this.content.propertyWriteGuard.addRule({ unique, permitted: false });
+					this.settings.propertyWriteGuard.addRule({ unique, permitted: false });
 				} else {
 					this.readOnlyGuard?.removeRule(unique);
+					this.content.propertyWriteGuard.removeRule(unique);
+					this.settings.propertyWriteGuard.removeRule(unique);
 				}
 			},
 			'observeIsReadOnly',
@@ -243,11 +250,14 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	#gotLabel(label: string | undefined) {
 		if (label) {
 			this.#labelRender.markdown = label;
-			this.#renderLabel(this.content.getValues());
+			this.#renderLabel(this.content.getValues(), this.settings.getValues());
 		}
 	}
 
-	async #renderLabel(contentValues: Array<UmbBlockDataValueModel> | undefined) {
+	async #renderLabel(
+		contentValues: Array<UmbBlockDataValueModel> | undefined,
+		settingsValues: Array<UmbBlockDataValueModel> | undefined,
+	) {
 		const valueObject = {} as Record<string, unknown>;
 		if (contentValues) {
 			for (const property of contentValues) {
@@ -255,12 +265,25 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 			}
 		}
 
+		if (settingsValues) {
+			valueObject['$settings'] = settingsValues;
+		}
+
+		// TODO: Look to add support for `$index`, requires wiring up the block-entry with the workspace. [LK]
+		//valueObject['$index'] = 0;
+
 		this.#labelRender.value = valueObject;
+
 		// Await one animation frame:
 		await new Promise((resolve) => requestAnimationFrame(() => resolve(true)));
-		const result = this.#labelRender.toString();
-		this.#name.setValue(result);
-		this.view.setTitle(result);
+		const prefix = this.getIsNew() === true ? '#general_add' : '#general_edit';
+		const label = this.#labelRender.toString();
+		const title = `${prefix} ${label}`;
+		this.#name.setValue(title);
+
+		if (this.#modalContext) {
+			this.view.setTitle(title);
+		}
 	}
 
 	#allowNavigateAway = false;
@@ -300,11 +323,14 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	/**
 	 * Check if the workspace is about to navigate away.
 	 * @protected
-	 * @param {string} newUrl The new url that the workspace is navigating to.
-	 * @returns { boolean} true if the workspace is navigating away.
+	 * @param {string | URL} newUrl The new url that the workspace is navigating to.
+	 * @returns {boolean} true if the workspace is navigating away.
 	 * @memberof UmbEntityWorkspaceContextBase
 	 */
-	protected _checkWillNavigateAway(newUrl: string): boolean {
+	protected _checkWillNavigateAway(newUrl: string | URL): boolean {
+		if (newUrl instanceof URL) {
+			newUrl = newUrl.href;
+		}
 		return !newUrl.includes(this.routes.getActiveLocalPath());
 	}
 
@@ -593,6 +619,14 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		this.settings.validation.report();
 	}
 
+	/**
+	 * Used by Inline Editing Modes as they are inline we want the validation state to be reported instantly, as well they do not have a submit action.
+	 */
+	autoReportValidation() {
+		this.content.validation.autoReport();
+		this.settings.validation.autoReport();
+	}
+
 	expose() {
 		const contentKey = this.#layout.value?.contentKey;
 		if (!contentKey) throw new Error('Failed to expose block, missing content key.');
@@ -624,7 +658,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 					this.#blockManager?.setOneContent(this.#initialContent);
 				}
 				if (this.#initialSettings) {
-					this.#blockManager?.setOneContent(this.#initialSettings);
+					this.#blockManager?.setOneSettings(this.#initialSettings);
 				}
 			}
 		}

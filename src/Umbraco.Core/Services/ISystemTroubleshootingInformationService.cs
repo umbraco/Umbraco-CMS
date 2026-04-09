@@ -1,7 +1,10 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+/// Service for retrieving system troubleshooting information.
+/// </summary>
 public interface ISystemTroubleshootingInformationService
 {
     /// <summary>

@@ -136,6 +136,18 @@ public class UriExtensionsTests
         Assert.AreEqual(expected, output.ToString());
     }
 
+    [TestCase("https://example.com/media/image.jpg", "jpg")]
+    [TestCase("/media/image.png", "png")]
+    [TestCase("/media/doc.pdf?v=123", "pdf")]
+    [TestCase("/media/someimage", "")]
+    [TestCase("/media/image.JPG", "jpg")]
+    public void GetFileExtension(string input, string expected)
+    {
+        var source = new Uri(input, UriKind.RelativeOrAbsolute);
+        var output = source.GetFileExtension();
+        Assert.AreEqual(expected, output);
+    }
+
     [TestCase("http://www.domain.com/path/to/page", "http://www.domain.com/path/to/page")]
     [TestCase("http://www.domain.com/path/to/page/", "http://www.domain.com/path/to/page/")]
     [TestCase("http://www.domain.com", "http://www.domain.com/")]

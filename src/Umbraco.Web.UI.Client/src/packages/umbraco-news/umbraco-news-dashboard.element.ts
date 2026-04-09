@@ -31,7 +31,7 @@ export class UmbUmbracoNewsDashboardElement extends UmbLitElement {
 			return this.#renderDefaultContent();
 		}
 
-		return html` <umb-news-container .items=${this._items}></umb-news-container> `;
+		return html`<umb-news-container .items=${this._items}></umb-news-container>`;
 	}
 
 	#renderDefaultContent() {

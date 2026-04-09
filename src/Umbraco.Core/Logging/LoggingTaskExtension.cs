@@ -1,5 +1,8 @@
 namespace Umbraco.Cms.Core.Logging;
 
+/// <summary>
+///     Provides extension methods for <see cref="Task"/> to handle and log exceptions.
+/// </summary>
 internal static class LoggingTaskExtension
 {
     /// <summary>
@@ -10,6 +13,9 @@ internal static class LoggingTaskExtension
     ///     be handling
     ///     errors yourself.
     /// </summary>
+    /// <param name="task">The task to attach error logging to.</param>
+    /// <param name="logMethod">The logging method to call with error message and exception.</param>
+    /// <returns>A continuation task that logs errors if the original task faults.</returns>
     public static Task LogErrors(this Task task, Action<string, Exception> logMethod) =>
         task.ContinueWith(
             t => LogErrorsInner(t, logMethod),
@@ -28,6 +34,9 @@ internal static class LoggingTaskExtension
     ///     be handling
     ///     errors yourself.
     /// </summary>
+    /// <param name="task">The task to attach error logging to.</param>
+    /// <param name="logMethod">The logging method to call with error message and exception.</param>
+    /// <returns>A continuation task that logs errors, guaranteed to run regardless of task completion state.</returns>
     public static Task LogErrorsWaitable(this Task task, Action<string, Exception> logMethod) =>
         task.ContinueWith(
             t => LogErrorsInner(t, logMethod),
@@ -35,6 +44,11 @@ internal static class LoggingTaskExtension
             // Must explicitly specify this, see https://blog.stephencleary.com/2013/10/continuewith-is-dangerous-too.html
             TaskScheduler.Default);
 
+    /// <summary>
+    ///     Logs any exceptions from the task using the provided log action.
+    /// </summary>
+    /// <param name="task">The task that may contain exceptions.</param>
+    /// <param name="logAction">The action to invoke for logging errors.</param>
     private static void LogErrorsInner(Task task, Action<string, Exception> logAction)
     {
         if (task.Exception != null)

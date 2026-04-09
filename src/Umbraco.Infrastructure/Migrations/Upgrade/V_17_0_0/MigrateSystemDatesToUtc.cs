@@ -96,6 +96,9 @@ public class MigrateSystemDatesToUtc : UnscopedMigrationBase
         using IScope scope = _scopeProvider.CreateScope();
         using IDisposable notificationSuppression = scope.Notifications.Suppress();
 
+        // Ensure we have a long command timeout as this migration can take a while on large tables within the database.
+        EnsureLongCommandTimeout(scope.Database);
+
         MigrateDateColumn(scope, "cmsMember", "emailConfirmedDate", timeZone);
         MigrateDateColumn(scope, "cmsMember", "lastLoginDate", timeZone);
         MigrateDateColumn(scope, "cmsMember", "lastLockoutDate", timeZone);

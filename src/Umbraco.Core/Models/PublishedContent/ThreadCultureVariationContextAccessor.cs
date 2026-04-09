@@ -12,6 +12,7 @@ public class ThreadCultureVariationContextAccessor : IVariationContextAccessor
 {
     private readonly ConcurrentDictionary<string, VariationContext> _contexts = new();
 
+    /// <inheritdoc />
     public VariationContext? VariationContext
     {
         get => _contexts.GetOrAdd(Thread.CurrentThread.CurrentUICulture.Name, culture => new VariationContext(culture));

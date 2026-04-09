@@ -14,6 +14,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Document;
 
+/// <summary>
+/// Controller responsible for validating update operations on documents.
+/// </summary>
 [ApiVersion("1.1")]
 public class ValidateUpdateDocumentController : UpdateDocumentControllerBase
 {
@@ -21,6 +24,13 @@ public class ValidateUpdateDocumentController : UpdateDocumentControllerBase
     private readonly IDocumentEditingPresentationFactory _documentEditingPresentationFactory;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ValidateUpdateDocumentController"/> class.
+    /// </summary>
+    /// <param name="authorizationService">Service for checking user permissions.</param>
+    /// <param name="contentEditingService">Service for managing content operations.</param>
+    /// <param name="documentEditingPresentationFactory">Factory for creating document editing presentation models.</param>
+    /// <param name="backOfficeSecurityAccessor">Accessor for back office user security context.</param>
     public ValidateUpdateDocumentController(
         IAuthorizationService authorizationService,
         IContentEditingService contentEditingService,
@@ -38,6 +48,8 @@ public class ValidateUpdateDocumentController : UpdateDocumentControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Validates updating a document.")]
+    [EndpointDescription("Validates the request model for updating a document without actually updating it.")]
     public async Task<IActionResult> ValidateV1_1(CancellationToken cancellationToken, Guid id, ValidateUpdateDocumentRequestModel requestModel)
         => await HandleRequest(id, requestModel, async () =>
         {

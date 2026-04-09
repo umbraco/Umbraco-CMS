@@ -18,11 +18,12 @@ import { UmbDocumentValidationRepository } from '../repository/validation/index.
 import { UMB_DOCUMENT_CONFIGURATION_CONTEXT } from '../index.js';
 import { UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD, UMB_DOCUMENT_WORKSPACE_ALIAS } from './constants.js';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
-import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { umbPeekError } from '@umbraco-cms/backoffice/notification';
 import { UmbContentDetailWorkspaceContextBase } from '@umbraco-cms/backoffice/content';
 import { UmbDeprecation, type UmbVariantGuardRule } from '@umbraco-cms/backoffice/utils';
 import { UmbDocumentBlueprintDetailRepository } from '@umbraco-cms/backoffice/document-blueprint';
+import { UmbEntityContentTypeEntityContext } from '@umbraco-cms/backoffice/content-type';
+import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/document-type';
 import {
 	UmbEntityRestoredFromRecycleBinEvent,
 	UmbEntityTrashedEvent,
@@ -37,7 +38,6 @@ import type { UmbContentWorkspaceContext } from '@umbraco-cms/backoffice/content
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/document-type';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
-import type { UmbVariantPropertyGuardRule } from '@umbraco-cms/backoffice/property';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import { UmbPreviewRepository } from '@umbraco-cms/backoffice/preview';
@@ -69,9 +69,12 @@ export class UmbDocumentWorkspaceContext
 	readonly templateId = this._data.createObservablePartOfCurrent((data) => data?.template?.unique || null);
 
 	#isTrashedContext = new UmbIsTrashedEntityContext(this);
+	#entityContentTypeContext = new UmbEntityContentTypeEntityContext(this);
 	#documentSegmentRepository = new UmbDocumentSegmentRepository(this);
 	#actionEventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
 	#localize = new UmbLocalizationController(this);
+	#previewWindow?: WindowProxy | null = null;
+	#previewWindowDocumentId?: string | null = null;
 
 	constructor(host: UmbControllerHost) {
 		super(host, {
@@ -91,7 +94,6 @@ export class UmbDocumentWorkspaceContext
 		this.consumeContext(UMB_DOCUMENT_CONFIGURATION_CONTEXT, async (context) => {
 			const config = await context?.getDocumentConfiguration();
 			const allowSegmentCreation = config?.allowNonExistingSegmentsCreation ?? false;
-			const allowEditInvariantFromNonDefault = config?.allowEditInvariantFromNonDefault ?? true;
 
 			// Deprecation warning for allowNonExistingSegmentsCreation (default from server is true, so we warn on false)
 			if (!allowSegmentCreation) {
@@ -112,10 +114,6 @@ export class UmbDocumentWorkspaceContext
 
 				return true;
 			};
-
-			if (allowEditInvariantFromNonDefault === false) {
-				this.#preventEditInvariantFromNonDefault();
-			}
 		});
 
 		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (actionEventContext) => {
@@ -127,6 +125,8 @@ export class UmbDocumentWorkspaceContext
 		this.observe(
 			this.contentTypeUnique,
 			(unique) => {
+				this.#entityContentTypeContext.setEntityType(unique ? UMB_DOCUMENT_TYPE_ENTITY_TYPE : undefined);
+				this.#entityContentTypeContext.setUnique(unique ?? undefined);
 				if (unique) {
 					this.structure.loadType(unique);
 				}
@@ -227,22 +227,16 @@ export class UmbDocumentWorkspaceContext
 		this.#isTrashedContext.setIsTrashed(false);
 	}
 
-	protected override async loadSegments(): Promise<void> {
-		this.observe(
-			this.unique,
-			async (unique) => {
-				if (!unique) {
-					this._segments.setValue([]);
-					return;
-				}
-				const { data } = await this.#documentSegmentRepository.getDocumentByIdSegmentOptions(unique, {
-					skip: 0,
-					take: 9999,
-				});
-				this._segments.setValue(data?.items ?? []);
-			},
-			'_loadSegmentsUnique',
-		);
+	protected override async _loadSegmentsFor(unique: string): Promise<void> {
+		if (!unique) {
+			this._segments.setValue([]);
+			return;
+		}
+		const { data } = await this.#documentSegmentRepository.getDocumentByIdSegmentOptions(unique, {
+			skip: 0,
+			take: 9999,
+		});
+		this._segments.setValue(data?.items ?? []);
 	}
 
 	async create(parent: UmbEntityModel, documentTypeUnique: string, blueprintUnique?: string) {
@@ -343,7 +337,20 @@ export class UmbDocumentWorkspaceContext
 			await this.performCreateOrUpdate(variantIds, saveData);
 		}
 
-		// Get the preview URL from the server.
+		// Check if preview window is still open and showing the same document
+		// If so, just focus it and let SignalR handle the refresh
+		try {
+			if (this.#previewWindow && !this.#previewWindow.closed && this.#previewWindowDocumentId === unique) {
+				this.#previewWindow.focus();
+				return;
+			}
+		} catch {
+			// Window reference is stale, continue to create new preview session
+			this.#previewWindow = null;
+			this.#previewWindowDocumentId = null;
+		}
+
+		// Preview not open, create new preview session and open window
 		const previewRepository = new UmbPreviewRepository(this);
 		const previewUrlData = await previewRepository.getPreviewUrl(
 			unique,
@@ -353,8 +360,12 @@ export class UmbDocumentWorkspaceContext
 		);
 
 		if (previewUrlData.url) {
-			const previewWindow = window.open(previewUrlData.url, `umbpreview-${unique}`);
-			previewWindow?.focus();
+			// Add cache-busting parameter to ensure the preview tab reloads with the new preview session
+			const previewUrl = new URL(previewUrlData.url, window.document.baseURI);
+			previewUrl.searchParams.set('rnd', Date.now().toString());
+			this.#previewWindow = window.open(previewUrl.toString(), `umbpreview-${unique}`);
+			this.#previewWindowDocumentId = unique;
+			this.#previewWindow?.focus();
 			return;
 		}
 
@@ -388,35 +399,6 @@ export class UmbDocumentWorkspaceContext
 			If the user does not have permission, we set it to true = permitted to be read-only. */
 			permitted: true,
 		});
-	}
-
-	#preventEditInvariantFromNonDefault() {
-		this.observe(
-			observeMultiple([this.structure.contentTypeProperties, this.variantOptions]),
-			([properties, variantOptions]) => {
-				if (properties.length === 0) return;
-				if (variantOptions.length === 0) return;
-
-				variantOptions.forEach((variantOption) => {
-					// Do not add a rule for the default language. It is always permitted to edit.
-					if (variantOption.language.isDefault) return;
-
-					const datasetVariantId = UmbVariantId.CreateFromPartial(variantOption);
-					const invariantVariantId = UmbVariantId.CreateInvariant();
-					const unique = `UMB_PREVENT_EDIT_INVARIANT_FROM_NON_DEFAULT_DATASET=${datasetVariantId.toString()}_PROPERTY_${invariantVariantId.toString()}`;
-
-					const rule: UmbVariantPropertyGuardRule = {
-						unique,
-						message: 'Shared properties can only be edited in the default language',
-						variantId: invariantVariantId,
-						datasetVariantId,
-						permitted: false,
-					};
-
-					this.propertyWriteGuard.addRule(rule);
-				});
-			},
-		);
 	}
 
 	#addEventListeners() {

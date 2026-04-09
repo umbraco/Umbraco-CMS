@@ -4,21 +4,31 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Persistence.EFCore.Sqlite;
 
+/// <summary>
+/// Provides SQLite-specific migration functionality for Umbraco's EF Core database context.
+/// </summary>
 public class SqliteMigrationProvider : IMigrationProvider
 {
     private readonly IDbContextFactory<UmbracoDbContext> _dbContextFactory;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SqliteMigrationProvider"/> class.
+    /// </summary>
+    /// <param name="dbContextFactory">The factory for creating database context instances.</param>
     public SqliteMigrationProvider(IDbContextFactory<UmbracoDbContext> dbContextFactory)
         => _dbContextFactory = dbContextFactory;
 
+    /// <inheritdoc />
     public string ProviderName => Constants.ProviderNames.SQLLite;
 
+    /// <inheritdoc />
     public async Task MigrateAsync(EFCoreMigration migration)
     {
         UmbracoDbContext context = await _dbContextFactory.CreateDbContextAsync();
         await context.MigrateDatabaseAsync(GetMigrationType(migration));
     }
 
+    /// <inheritdoc />
     public async Task MigrateAllAsync()
     {
         UmbracoDbContext context = await _dbContextFactory.CreateDbContextAsync();

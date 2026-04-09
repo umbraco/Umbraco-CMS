@@ -1,21 +1,31 @@
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Umbraco.Cms.Api.Management.OpenApi;
 
+/// <summary>
+/// A schema filter for OpenAPI that enforces non-nullable properties to be required in the generated schema.
+/// </summary>
 public class RequireNonNullablePropertiesSchemaFilter : ISchemaFilter
 {
     /// <summary>
     /// Add to model.Required all properties where Nullable is false.
     /// </summary>
-    public void Apply(OpenApiSchema model, SchemaFilterContext context)
+    public void Apply(IOpenApiSchema model, SchemaFilterContext context)
     {
-        var additionalRequiredProps = model.Properties
-            .Where(x => !x.Value.Nullable && !model.Required.Contains(x.Key))
-            .Select(x => x.Key);
+        if (model is not OpenApiSchema schema)
+        {
+            return;
+        }
+
+        IEnumerable<string> additionalRequiredProps = schema.Properties
+            ?.Where(x => x.Value.Type?.HasFlag(JsonSchemaType.Null) is not true && model.Required?.Contains(x.Key) is not true)
+            .Select(x => x.Key)
+            ?? [];
+        schema.Required ??= new SortedSet<string>();
         foreach (var propKey in additionalRequiredProps)
         {
-            model.Required.Add(propKey);
+            schema.Required.Add(propKey);
         }
     }
 }

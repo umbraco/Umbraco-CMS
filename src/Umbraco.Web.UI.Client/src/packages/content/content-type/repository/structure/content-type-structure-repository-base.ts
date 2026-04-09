@@ -10,11 +10,11 @@ export abstract class UmbContentTypeStructureRepositoryBase<ItemType>
 	extends UmbRepositoryBase
 	implements UmbContentTypeStructureRepository<ItemType>
 {
-	#structureSource: UmbContentTypeStructureDataSource<ItemType>;
+	protected _dataSource: UmbContentTypeStructureDataSource<ItemType>;
 
 	constructor(host: UmbControllerHost, structureSource: UmbContentTypeStructureDataSourceConstructor<ItemType>) {
 		super(host);
-		this.#structureSource = new structureSource(host);
+		this._dataSource = new structureSource(host);
 	}
 
 	/**
@@ -25,6 +25,6 @@ export abstract class UmbContentTypeStructureRepositoryBase<ItemType>
 	 * @memberof UmbContentTypeStructureRepositoryBase
 	 */
 	requestAllowedChildrenOf(unique: string | null, parentContentUnique: string | null) {
-		return this.#structureSource.getAllowedChildrenOf(unique, parentContentUnique);
+		return this._dataSource.getAllowedChildrenOf(unique, parentContentUnique);
 	}
 }

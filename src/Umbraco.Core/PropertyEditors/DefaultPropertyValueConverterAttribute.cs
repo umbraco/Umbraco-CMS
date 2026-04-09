@@ -6,8 +6,16 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 [AttributeUsage(AttributeTargets.Class, Inherited = false)]
 public class DefaultPropertyValueConverterAttribute : Attribute
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DefaultPropertyValueConverterAttribute"/> class.
+    /// </summary>
     public DefaultPropertyValueConverterAttribute() => DefaultConvertersToShadow = Array.Empty<Type>();
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DefaultPropertyValueConverterAttribute"/> class
+    /// that shadows the specified converters.
+    /// </summary>
+    /// <param name="convertersToShadow">The types of default converters that this converter should shadow.</param>
     public DefaultPropertyValueConverterAttribute(params Type[] convertersToShadow) =>
         DefaultConvertersToShadow = convertersToShadow;
 

@@ -11,22 +11,32 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Package.Created;
 
+/// <summary>
+/// Controller responsible for handling requests to download packages that have been created.
+/// </summary>
 [ApiVersion("1.0")]
 public class DownloadCreatedPackageController : CreatedPackageControllerBase
 {
     private readonly IPackagingService _packagingService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DownloadCreatedPackageController"/> class with the specified packaging service.
+    /// </summary>
+    /// <param name="packagingService">The service used to perform package-related operations.</param>
     public DownloadCreatedPackageController(IPackagingService packagingService) => _packagingService = packagingService;
 
     /// <summary>
     ///     Downloads a package XML or ZIP file.
     /// </summary>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <param name="id">The id of the package.</param>
     /// <returns>The XML or ZIP file of the package or not found result.</returns>
     [HttpGet("{id:guid}/download")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(FileContentResult), StatusCodes.Status200OK)]
+    [EndpointSummary("Downloads a created package.")]
+    [EndpointDescription("Downloads the package file for the created package identified by the provided Id.")]
     public async Task<IActionResult> Download(CancellationToken cancellationToken, Guid id)
     {
         PackageDefinition? package = await _packagingService.GetCreatedPackageByKeyAsync(id);

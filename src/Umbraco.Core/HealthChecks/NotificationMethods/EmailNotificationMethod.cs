@@ -8,6 +8,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.HealthChecks.NotificationMethods;
 
+/// <summary>
+///     A health check notification method that sends results via email.
+/// </summary>
 [HealthCheckNotificationMethod("email")]
 public class EmailNotificationMethod : NotificationMethodBase
 {
@@ -17,6 +20,15 @@ public class EmailNotificationMethod : NotificationMethodBase
     private readonly ILocalizedTextService? _textService;
     private ContentSettings? _contentSettings;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="EmailNotificationMethod" /> class.
+    /// </summary>
+    /// <param name="textService">The localized text service.</param>
+    /// <param name="hostingEnvironment">The hosting environment.</param>
+    /// <param name="emailSender">The email sender service.</param>
+    /// <param name="healthChecksSettings">The health checks settings monitor.</param>
+    /// <param name="contentSettings">The content settings monitor.</param>
+    /// <param name="markdownToHtmlConverter">The markdown to HTML converter.</param>
     public EmailNotificationMethod(
         ILocalizedTextService textService,
         IHostingEnvironment hostingEnvironment,
@@ -44,8 +56,12 @@ public class EmailNotificationMethod : NotificationMethodBase
         contentSettings.OnChange(x => _contentSettings = x);
     }
 
+    /// <summary>
+    ///     Gets the recipient email address for health check notifications.
+    /// </summary>
     public string? RecipientEmail { get; }
 
+    /// <inheritdoc />
     public override async Task SendAsync(HealthCheckResults results)
     {
         if (ShouldSend(results) == false)

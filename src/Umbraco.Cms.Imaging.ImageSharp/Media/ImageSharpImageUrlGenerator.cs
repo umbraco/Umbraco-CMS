@@ -29,7 +29,7 @@ public sealed class ImageSharpImageUrlGenerator : IImageUrlGenerator
     /// </summary>
     /// <param name="configuration">The ImageSharp configuration.</param>
     /// <param name="requestAuthorizationUtilities">Contains helpers that allow authorization of image requests.</param>
-    /// <param name="options"></param>
+    /// <param name="options">The ImageSharp middleware options.</param>
     public ImageSharpImageUrlGenerator(
         Configuration configuration,
         RequestAuthorizationUtilities? requestAuthorizationUtilities,
@@ -98,9 +98,17 @@ public sealed class ImageSharpImageUrlGenerator : IImageUrlGenerator
             queryString.Add(ResizeWebProcessor.Height, height.ToString(CultureInfo.InvariantCulture));
         }
 
-        if (furtherOptions.Remove(FormatWebProcessor.Format, out StringValues format))
+        // Determine format: explicit > furtherOptions
+        // Note: Format determination (e.g., converting PDFs to WebP) is handled by the factory layer
+        string? formatValue = options.Format;
+        if (string.IsNullOrWhiteSpace(formatValue) && furtherOptions.Remove(FormatWebProcessor.Format, out StringValues format))
         {
-            queryString.Add(FormatWebProcessor.Format, format.ToString());
+            formatValue = format.ToString();
+        }
+
+        if (!string.IsNullOrWhiteSpace(formatValue))
+        {
+            queryString.Add(FormatWebProcessor.Format, formatValue);
         }
 
         if (options.Quality is int quality)

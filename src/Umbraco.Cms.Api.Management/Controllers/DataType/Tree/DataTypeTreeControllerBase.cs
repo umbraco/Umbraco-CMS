@@ -15,6 +15,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DataType.Tree;
 
+/// <summary>
+/// Serves as the base controller for handling operations related to data type trees in the Umbraco CMS Management API.
+/// </summary>
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Tree}/{Constants.UdiEntityType.DataType}")]
 [ApiExplorerSettings(GroupName = "Data Type")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessDataTypes)]
@@ -22,6 +25,11 @@ public class DataTypeTreeControllerBase : FolderTreeControllerBase<DataTypeTreeI
 {
     private readonly IDataTypeService _dataTypeService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DataTypeTreeControllerBase"/> class.
+    /// </summary>
+    /// <param name="entityService">Service for managing Umbraco entities.</param>
+    /// <param name="dataTypeService">Service for managing data types within Umbraco.</param>
     [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
     public DataTypeTreeControllerBase(IEntityService entityService, IDataTypeService dataTypeService)
         : this(
@@ -31,8 +39,30 @@ public class DataTypeTreeControllerBase : FolderTreeControllerBase<DataTypeTreeI
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DataTypeTreeControllerBase"/> class with the specified services.
+    /// </summary>
+    /// <param name="entityService">Service used for entity operations within the data type tree.</param>
+    /// <param name="flagProviders">A collection of providers that supply flags for entities.</param>
+    /// <param name="dataTypeService">Service used for managing data types.</param>
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
     public DataTypeTreeControllerBase(IEntityService entityService, FlagProviderCollection flagProviders, IDataTypeService dataTypeService)
-        : base(entityService, flagProviders) =>
+        : this(
+            entityService,
+            flagProviders,
+            StaticServiceProvider.Instance.GetRequiredService<IEntitySearchService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>(),
+            dataTypeService)
+    {
+    }
+
+    public DataTypeTreeControllerBase(
+        IEntityService entityService,
+        FlagProviderCollection flagProviders,
+        IEntitySearchService entitySearchService,
+        IIdKeyMap idKeyMap,
+        IDataTypeService dataTypeService)
+        : base(entityService, flagProviders, entitySearchService, idKeyMap) =>
         _dataTypeService = dataTypeService;
 
     protected override UmbracoObjectTypes ItemObjectType => UmbracoObjectTypes.DataType;
@@ -43,8 +73,8 @@ public class DataTypeTreeControllerBase : FolderTreeControllerBase<DataTypeTreeI
     {
         get
         {
-            var ordering = Ordering.By(nameof(Infrastructure.Persistence.Dtos.NodeDto.NodeObjectType), Direction.Descending); // We need to override to change direction
-            ordering.Next = Ordering.By(nameof(Infrastructure.Persistence.Dtos.NodeDto.Text));
+            var ordering = Ordering.By(Infrastructure.Persistence.Dtos.NodeDto.NodeObjectTypeColumnName, Direction.Descending); // We need to override to change direction
+            ordering.Next = Ordering.By(Infrastructure.Persistence.Dtos.NodeDto.TextColumnName);
 
             return ordering;
         }

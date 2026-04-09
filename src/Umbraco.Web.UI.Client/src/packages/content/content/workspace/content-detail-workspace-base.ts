@@ -9,6 +9,7 @@ import type { UmbContentCollectionWorkspaceContext } from '../collection/content
 import type { UmbContentWorkspaceContext } from './content-workspace-context.interface.js';
 import { UmbContentDetailValidationPathTranslator } from './content-detail-validation-path-translator.js';
 import { UmbContentValidationToHintsManager } from './content-validation-to-hints.manager.js';
+import { UmbContentDetailWorkspaceTypeTransformController } from './content-detail-workspace-type-transform.controller.js';
 import {
 	appendToFrozenArray,
 	mergeObservables,
@@ -18,7 +19,7 @@ import {
 import { firstValueFrom, map } from '@umbraco-cms/backoffice/external/rxjs';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
-import { UmbDataTypeDetailRepository, UmbDataTypeItemRepositoryManager } from '@umbraco-cms/backoffice/data-type';
+import { UmbDataTypeItemRepositoryManager } from '@umbraco-cms/backoffice/data-type';
 import { UmbReadOnlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
 import { UmbEntityDetailWorkspaceContextBase, UmbWorkspaceSplitViewManager } from '@umbraco-cms/backoffice/workspace';
 import {
@@ -154,6 +155,9 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	 * @internal
 	 */
 	public readonly languages = this.#languages.asObservable();
+	getLanguages(): Array<UmbLanguageDetailModel> {
+		return this.#languages.getValue();
+	}
 
 	protected readonly _segments = new UmbArrayState<UmbSegmentModel>([], (x) => x.alias);
 
@@ -161,6 +165,10 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	// @ts-ignore
 	// TODO: fix type error
 	public readonly variantOptions;
+
+	async getVariantOptions(): Promise<Array<VariantOptionModelType>> {
+		return firstValueFrom(this.variantOptions);
+	}
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	protected _variantOptionsFilter = (variantOption: VariantOptionModelType) => true;
 
@@ -221,6 +229,8 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			this.validationContext,
 			this.view.hints,
 		);
+
+		new UmbContentDetailWorkspaceTypeTransformController(this as any);
 
 		this.variantOptions = mergeObservables(
 			[this.variesByCulture, this.variesBySegment, this.variants, this.languages, this._segments.asObservable()],
@@ -368,11 +378,6 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			(varies) => {
 				this._data.setVariesBySegment(varies);
 				this.#variesBySegment = varies;
-				if (varies) {
-					this.loadSegments();
-				} else {
-					this._segments.setValue([]);
-				}
 			},
 			null,
 		);
@@ -393,18 +398,26 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		this.#languages.setValue(data?.items ?? []);
 	}
 
+	/**
+	 * @deprecated Call `_loadSegmentsFor` instead. `loadSegments` will be removed in v.18.
+	 * (note this was introduced in v.17, and deprecated in v.17.0.1)
+	 */
 	protected async loadSegments() {
+		console.warn('Stop using loadSegments, call _loadSegmentsFor instead. loadSegments will be removed in v.18.');
+		const unique = await firstValueFrom(this.unique);
+		if (!unique) {
+			this._segments.setValue([]);
+			return;
+		}
+		this._loadSegmentsFor(unique);
+	}
+
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	protected async _loadSegmentsFor(unique: string): Promise<void> {
 		console.warn(
 			`UmbContentDetailWorkspaceContextBase: Segments are not implemented in the workspace context for "${this.getEntityType()}" types.`,
 		);
 		this._segments.setValue([]);
-	}
-
-	/**
-	 * @deprecated Call `_processIncomingData` instead. `_scaffoldProcessData` will be removed in v.18.
-	 */
-	protected override _scaffoldProcessData(data: DetailModelType): Promise<DetailModelType> {
-		return this._processIncomingData(data);
 	}
 
 	protected override async _processIncomingData(data: DetailModelType): Promise<DetailModelType> {
@@ -415,29 +428,22 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		// Load the content type structure, usually this comes from the data, but in this case we are making the data, and we need this to be able to complete the data. [NL]
 		await this.structure.loadType(contentTypeUnique);
 
-		// Set culture and segment for all values:
-		const cultures = this.#languages.getValue().map((x) => x.unique);
-
-		if (this.structure.variesBySegment) {
-			// TODO: v.17 Engage please note we have not implemented support for segments yet. [NL]
-			console.warn('Segments are not yet implemented for preset');
+		// Load segments if varying by segment, or reset to empty array:
+		if (this.#variesBySegment) {
+			await this._loadSegmentsFor(data.unique);
+		} else {
+			this._segments.setValue([]);
 		}
-		// TODO: Add Segments for Presets:
-		const segments: Array<string> | undefined = this.structure.variesBySegment ? [] : undefined;
-
-		const repo = new UmbDataTypeDetailRepository(this);
 
 		const propertyTypes = await this.structure.getContentTypeProperties();
 		const contentTypeVariesByCulture = this.structure.getVariesByCulture();
-		const contentTypeVariesBySegment = this.structure.getVariesByCulture();
+		const contentTypeVariesBySegment = this.structure.getVariesBySegment();
 		const valueDefinitions = await Promise.all(
 			propertyTypes.map(async (property) => {
-				// TODO: Implement caching for data-type requests. [NL]
-				const dataType = (await repo.requestByUnique(property.dataType.unique)).data;
-				// This means if its not loaded this will never resolve and the error below will never happen.
-				if (!dataType) {
-					throw new Error(`DataType of "${property.dataType.unique}" not found.`);
-				}
+				// Use the structure manager's bulk-loaded data type details instead of individual requests.
+				const dataType = await this.observe(
+					this.structure.contentTypeDataTypeDetailOf(property.dataType.unique),
+				).asPromise();
 				if (!dataType.editorUiAlias) {
 					throw new Error(`DataType of "${property.dataType.unique}" did not have a editorUiAlias.`);
 				}
@@ -457,10 +463,14 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		);
 
 		const controller = new UmbPropertyValuePresetVariantBuilderController(this);
-		controller.setCultures(cultures);
-		if (segments) {
-			controller.setSegments(segments);
+
+		const variantOptions = (await firstValueFrom(this.variantOptions)).map(
+			(o) => new UmbVariantId(o.culture, o.segment),
+		);
+		if (contentTypeVariesByCulture) {
+			variantOptions.push(UmbVariantId.CreateInvariant()); // Ensure invariant is included, when the contentType varies by culture, because we do not have a invariant-variant in our variant-options. [NL]
 		}
+		controller.setVariantOptions(variantOptions);
 
 		controller.setValues(data.values);
 
@@ -495,7 +505,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 	/**
 	 * Get the name of a variant
-	 * @param {UmbVariantId } [variantId] - The variant id
+	 * @param {UmbVariantId } [variantId] - The variant id. If not provided, returns the name of the first active variant.
 	 * @returns { string | undefined} - The name of the variant
 	 * @memberof UmbContentDetailWorkspaceContextBase
 	 */
@@ -504,9 +514,15 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		if (!variants) return;
 		if (variantId) {
 			return variants.find((x) => variantId.compare(x))?.name;
-		} else {
-			return variants[0]?.name;
 		}
+		// Get the first active variant's name
+		const activeVariant = this.splitView.getActiveVariants()[0];
+		if (activeVariant) {
+			const activeVariantId = UmbVariantId.Create(activeVariant);
+			return variants.find((x) => activeVariantId.compare(x))?.name;
+		}
+		// Fallback to first variant if no active variant is set
+		return variants[0]?.name;
 	}
 
 	/**
@@ -521,14 +537,23 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 	/**
 	 * Get an observable for the name of a variant
-	 * @param {UmbVariantId} [variantId] - The variant id
+	 * @param {UmbVariantId} [variantId] - The variant id. If not provided, observes the name of the first active variant.
 	 * @returns {Observable<string>} - The name of the variant
 	 * @memberof UmbContentDetailWorkspaceContextBase
 	 */
 	public name(variantId?: UmbVariantId): Observable<string> {
-		return this._data.createObservablePartOfCurrent(
-			(data) => data?.variants?.find((x) => variantId?.compare(x))?.name ?? '',
-		);
+		if (variantId) {
+			// Explicit variant requested
+			return this._data.createObservablePartOfCurrent(
+				(data) => data?.variants?.find((x) => variantId.compare(x))?.name ?? '',
+			);
+		}
+		// No variant specified - observe first active variant's name
+		return mergeObservables([this.splitView.activeVariantByIndex(0), this.variants], ([activeVariant, variants]) => {
+			if (!activeVariant || !variants) return '';
+			const activeVariantId = UmbVariantId.Create(activeVariant);
+			return variants.find((x) => activeVariantId.compare(x))?.name ?? '';
+		});
 	}
 
 	/* Variants */
@@ -668,9 +693,6 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		// Notice the order of the properties is important for our JSON String Compare function. [NL]
 		const entry: UmbElementValueModel = {
 			editorAlias,
-			// Be aware that this solution is a bit magical, and based on a naming convention.
-			// We might want to make this more flexible at some point and get the entityType from somewhere instead of constructing it here.
-			entityType: `${this.getEntityType()}-property-value`,
 			...variantId.toObject(),
 			alias,
 			value,
@@ -695,7 +717,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	async #ensureVariantsExistsForProperty(variantId: UmbVariantId, entry: UmbElementValueModel) {
 		// TODO: Implement queueing of these operations to ensure this does not execute too often. [NL]
 
-		const cultureOptions = await firstValueFrom(this.variantOptions);
+		const cultureOptions = await this.getVariantOptions();
 		let valueVariantIds: Array<UmbVariantId> = [];
 
 		// Find inner values to determine if any of this holds variants that needs to be created.
@@ -760,7 +782,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		options: VariantOptionModelType[];
 		selected: string[];
 	}> {
-		const options = (await firstValueFrom(this.variantOptions)).filter((option) => option.segment === null);
+		const options = (await this.getVariantOptions()).filter((option) => option.segment === null);
 
 		const activeVariants = this.splitView.getActiveVariants();
 		const activeVariantIds = activeVariants.map((activeVariant) => UmbVariantId.Create(activeVariant));
@@ -940,7 +962,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		await this.runMandatoryValidationForSaveData(saveData, variantIds);
 		if (this.#validateOnSubmit) {
 			await this.askServerToValidate(saveData, variantIds);
-			const valid = await this._validateAndLog().then(
+			const valid = await this._validateVariantsAndLog(variantIds).then(
 				() => true,
 				() => false,
 			);
@@ -952,6 +974,65 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		} else {
 			await this.performCreateOrUpdate(variantIds, saveData);
 		}
+	}
+
+	public validateVariantsAndSubmit(
+		variantIds: Array<UmbVariantId>,
+		onValid: () => Promise<void>,
+		onInvalid: (reason?: any) => Promise<void>,
+	): Promise<void> {
+		return this._validateByAndSubmit(() => this._validateVariantsAndLog(variantIds), onValid, onInvalid);
+	}
+
+	protected async _validateVariantsAndLog(variantIds?: Array<UmbVariantId>): Promise<void> {
+		// Make sure that each variant-id for a given culture, has gotten all the valid segment variant-ids present too. See variant-options for which are available. [NL]
+		if (variantIds && this.getVariesBySegment()) {
+			const variantOptions = await this.getVariantOptions();
+			const expandedVariantIds: Array<UmbVariantId> = [];
+
+			for (const variantId of variantIds) {
+				// If a culture variant without segment, add all segment variants for that culture:
+				if (variantId.culture !== null && variantId.segment === null) {
+					for (const option of variantOptions) {
+						if (option.culture === variantId.culture) {
+							expandedVariantIds.push(UmbVariantId.Create(option));
+						}
+					}
+				} else {
+					expandedVariantIds.push(variantId);
+				}
+			}
+
+			variantIds = expandedVariantIds;
+		}
+
+		await this.#validateByVariantIds(variantIds).catch(async () => {
+			// TODO: Implement developer-mode logging here. [NL]
+			console.warn(
+				'Validation failed because of these validation messages still begin present: ',
+				this.validationContext.messages.getMessages(),
+			);
+			return Promise.reject();
+		});
+	}
+
+	/**
+	 * If a Workspace has multiple validation contexts, then this method can be overwritten to return the correct one.
+	 * @param {Array<UmbVariantId> | undefined} variantIds Optional array of variantIds to filter which contexts to validate.
+	 * @returns {Promise<Array<void>>} Promise that resolves to void when the validation is complete.
+	 */
+	async #validateByVariantIds(variantIds?: Array<UmbVariantId>): Promise<void> {
+		// If variantIds are provided, we only validate the contexts matching those variantIds, or those without a variantId.
+		if (variantIds) {
+			if (variantIds.length === 0) {
+				console.warn(
+					'Workspace Context: validate called with an empty array of variantIds, only validation-contexts with no variantId will be validated.',
+				);
+			}
+			return await this.validationContext.validateByVariantIds(variantIds);
+		}
+
+		return await (super.validate() as unknown as Promise<void>);
 	}
 
 	/**
@@ -1033,7 +1114,9 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		const variantIdsIncludingInvariant = [...variantIds, UmbVariantId.CreateInvariant()];
 
 		// Only update the variants that was chosen to be saved:
-		const persistedData = this._data.getCurrent();
+		// Use getPersisted() as the base so non-saved variants retain the actual
+		// server state, not unsaved local edits from current data.
+		const persistedData = this._data.getPersisted();
 		const newPersistedData = await new UmbMergeContentVariantDataController(this).process(
 			persistedData,
 			data,

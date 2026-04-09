@@ -1,5 +1,9 @@
 namespace Umbraco.Cms.Core.Events;
 
+/// <summary>
+///     Represents event data for move operations.
+/// </summary>
+/// <typeparam name="TEntity">The type of the entity being moved.</typeparam>
 public class MoveEventArgs<TEntity> : CancellableObjectEventArgs<TEntity>, IEquatable<MoveEventArgs<TEntity>>
 {
     private IEnumerable<MoveEventInfo<TEntity>>? _moveInfoCollection;
@@ -109,8 +113,15 @@ public class MoveEventArgs<TEntity> : CancellableObjectEventArgs<TEntity>, IEqua
         }
     }
 
+    /// <summary>
+    ///     Determines whether two <see cref="MoveEventArgs{TEntity}" /> instances are equal.
+    /// </summary>
+    /// <param name="left">The first instance to compare.</param>
+    /// <param name="right">The second instance to compare.</param>
+    /// <returns><c>true</c> if the instances are equal; otherwise, <c>false</c>.</returns>
     public static bool operator ==(MoveEventArgs<TEntity> left, MoveEventArgs<TEntity> right) => Equals(left, right);
 
+    /// <inheritdoc />
     public bool Equals(MoveEventArgs<TEntity>? other)
     {
         if (other is null)
@@ -126,6 +137,7 @@ public class MoveEventArgs<TEntity> : CancellableObjectEventArgs<TEntity>, IEqua
         return base.Equals(other) && (MoveInfoCollection?.Equals(other.MoveInfoCollection) ?? false);
     }
 
+    /// <inheritdoc />
     public override bool Equals(object? obj)
     {
         if (obj is null)
@@ -146,6 +158,7 @@ public class MoveEventArgs<TEntity> : CancellableObjectEventArgs<TEntity>, IEqua
         return Equals((MoveEventArgs<TEntity>)obj);
     }
 
+    /// <inheritdoc />
     public override int GetHashCode()
     {
         unchecked
@@ -159,5 +172,11 @@ public class MoveEventArgs<TEntity> : CancellableObjectEventArgs<TEntity>, IEqua
         }
     }
 
+    /// <summary>
+    ///     Determines whether two <see cref="MoveEventArgs{TEntity}" /> instances are not equal.
+    /// </summary>
+    /// <param name="left">The first instance to compare.</param>
+    /// <param name="right">The second instance to compare.</param>
+    /// <returns><c>true</c> if the instances are not equal; otherwise, <c>false</c>.</returns>
     public static bool operator !=(MoveEventArgs<TEntity> left, MoveEventArgs<TEntity> right) => !Equals(left, right);
 }

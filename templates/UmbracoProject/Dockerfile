@@ -20,11 +20,34 @@ RUN dotnet publish "UmbracoProject.csproj" -c $BUILD_CONFIGURATION -o /app/publi
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-# We need to make sure that the user running the app has write access to the umbraco folder, in order to write logs and other files.
-# Since these are volumes they are created as root by the docker daemon.
+
+# Install gosu for dropping privileges and openssl for certificate generation
 USER root
-RUN mkdir umbraco
-RUN mkdir umbraco/Logs
-RUN chown $APP_UID umbraco --recursive
-USER $APP_UID
-ENTRYPOINT ["dotnet", "UmbracoProject.dll"]
+RUN apt-get update && apt-get install -y --no-install-recommends gosu openssl && rm -rf /var/lib/apt/lists/*
+
+# Generate self-signed certificate for HTTPS
+RUN mkdir -p /https && \
+    openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+      -keyout /https/aspnetcore.key \
+      -out /https/aspnetcore.crt \
+      -subj "/CN=localhost" \
+      -addext "subjectAltName=DNS:localhost" && \
+    openssl pkcs12 -export -out /https/aspnetcore.pfx \
+      -inkey /https/aspnetcore.key \
+      -in /https/aspnetcore.crt \
+      -password pass:DevOnlyPassword && \
+    chmod 644 /https/aspnetcore.pfx
+
+# Copy entrypoint script
+COPY UmbracoProject/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+# Make APP_UID available at runtime (inherits from .NET base image ARG)
+ARG APP_UID
+ENV APP_UID=${APP_UID}
+
+# Create Umbraco directories as a fallback so they exist, and can be chowned by the entrypoint, for both bind-mounted and regular volumes
+RUN mkdir -p umbraco/Logs && chown -R $APP_UID:$APP_UID umbraco
+
+# Run as root initially - entrypoint will fix permissions and drop to APP_UID
+ENTRYPOINT ["/entrypoint.sh"]

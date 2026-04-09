@@ -2,6 +2,9 @@ using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Extensions;
 
+/// <summary>
+///     Provides extension methods for <see cref="IDictionaryItem" />.
+/// </summary>
 public static class DictionaryItemExtensions
 {
     /// <summary>

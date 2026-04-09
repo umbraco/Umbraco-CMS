@@ -1,5 +1,8 @@
 namespace Umbraco.Cms.Core.Security;
 
+/// <summary>
+///     Provides password hashing functionality.
+/// </summary>
 public interface IPasswordHasher
 {
     /// <summary>

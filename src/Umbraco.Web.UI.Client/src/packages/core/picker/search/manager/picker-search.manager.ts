@@ -1,9 +1,10 @@
 import type { UmbPickerSearchManagerConfig } from './types.js';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
-import { debounce } from '@umbraco-cms/backoffice/utils';
+import { debounce, UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
 import { UmbArrayState, UmbBooleanState, UmbNumberState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbSearchProvider, UmbSearchRequestArgs, UmbSearchResultItemModel } from '@umbraco-cms/backoffice/search';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
  * A manager for searching items in a picker.
@@ -23,6 +24,9 @@ export class UmbPickerSearchManager<
 	#query = new UmbObjectState<SearchRequestArgsType | undefined>(undefined);
 	public readonly query = this.#query.asObservable();
 
+	#executedQuery = new UmbObjectState<SearchRequestArgsType | undefined>(undefined);
+	public readonly executedQuery = this.#executedQuery.asObservable();
+
 	#searching = new UmbBooleanState(false);
 	public readonly searching = this.#searching.asObservable();
 
@@ -32,8 +36,16 @@ export class UmbPickerSearchManager<
 	#resultTotalItems = new UmbNumberState(0);
 	public readonly resultTotalItems = this.#resultTotalItems.asObservable();
 
+	#pagination = new UmbPaginationManager();
+	public readonly pagination = this.#pagination;
+
 	#config?: UmbPickerSearchManagerConfig;
 	#searchProvider?: UmbSearchProvider<UmbSearchResultItemModel, SearchRequestArgsType>;
+
+	constructor(host: UmbControllerHost) {
+		super(host);
+		this.#pagination.setPageSize(100);
+	}
 
 	/**
 	 * Set the configuration for the search manager.
@@ -105,9 +117,11 @@ export class UmbPickerSearchManager<
 	 */
 	public clear() {
 		this.#query.setValue(undefined);
+		this.#executedQuery.setValue(undefined);
 		this.#resultItems.setValue([]);
 		this.#searching.setValue(false);
 		this.#resultTotalItems.setValue(0);
+		this.#pagination.clear();
 	}
 
 	/**
@@ -139,6 +153,7 @@ export class UmbPickerSearchManager<
 	 * @memberof UmbPickerSearchManager
 	 */
 	public updateQuery(query: Partial<SearchRequestArgsType>) {
+		this.#pagination.setCurrentPageNumber(1);
 		const mergedQuery = { ...this.getQuery(), ...query } as SearchRequestArgsType;
 		this.#query.setValue(mergedQuery);
 	}
@@ -179,12 +194,19 @@ export class UmbPickerSearchManager<
 			searchFrom: this.#config?.searchFrom,
 			// TODO: Move this implementation to another place. The generic picker search manager shouldn't be aware of data types.
 			dataTypeUnique: this.#config?.dataTypeUnique,
+			paging: {
+				skip: this.#pagination.getSkip(),
+				take: this.#pagination.getPageSize(),
+			},
 		};
 
 		const { data } = await this.#searchProvider.search(args);
 		const items = (data?.items as ResultItemType[]) ?? [];
 		this.#resultItems.setValue(items);
-		this.#resultTotalItems.setValue(data?.total ?? 0);
+		const total = data?.total ?? 0;
+		this.#resultTotalItems.setValue(total);
+		this.#pagination.setTotalItems(total);
+		this.#executedQuery.setValue(query);
 		this.#searching.setValue(false);
 	}
 }

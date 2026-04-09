@@ -29,8 +29,14 @@ namespace Umbraco.Extensions;
 public static partial class UmbracoBuilderExtensions
 {
     /// <summary>
-    ///     Add services for the umbraco front-end website
+    /// Add services for the umbraco front-end website.
     /// </summary>
+    /// <remarks>
+    /// This method assumes that either <c>AddBackOffice()</c> or <c>AddCore()</c> has already been called.
+    /// It registers website-specific services such as Surface controllers, view engines, and routing.
+    /// </remarks>
+    /// <param name="builder">The Umbraco builder.</param>
+    /// <returns>The Umbraco builder.</returns>
     public static IUmbracoBuilder AddWebsite(this IUmbracoBuilder builder)
     {
         builder.WithCollectionBuilder<SurfaceControllerTypeCollectionBuilder>()
@@ -79,10 +85,9 @@ public static partial class UmbracoBuilderExtensions
         // Partial view cache invalidators
         builder.Services.AddUnique<IMemberPartialViewCacheInvalidator, MemberPartialViewCacheInvalidator>();
 
-        builder
-            .AddDistributedCache()
-            .AddModelsBuilder();
+        builder.AddModelsBuilder();
 
+        // Member identity for public member login
         builder.AddMembersIdentity();
 
         return builder;

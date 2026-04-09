@@ -72,6 +72,7 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 	#generateRoutes() {
 		if (!this.#variants || this.#variants.length === 0 || !this.#appCulture) {
 			this._routes = [];
+			this.#ensureForbiddenRoute(this._routes);
 			return;
 		}
 
@@ -143,6 +144,18 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 			});
 		}
 
+		this.#ensureForbiddenRoute(routes);
+
+		this._routes = routes;
+	}
+
+	/**
+	 * Ensure that there is a route to handle forbidden access.
+	 * This route will display a forbidden message when the user does not have permission to access certain resources.
+	 * Also handles not found routes.
+	 * @param routes
+	 */
+	#ensureForbiddenRoute(routes: Array<UmbRoute> = []) {
 		routes.push({
 			path: '**',
 			component: async () => {
@@ -150,8 +163,6 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 				return this.#isForbidden ? router.UmbRouteForbiddenElement : router.UmbRouteNotFoundElement;
 			},
 		});
-
-		this._routes = routes;
 	}
 
 	private _gotWorkspaceRoute = (e: UmbRouterSlotInitEvent) => {

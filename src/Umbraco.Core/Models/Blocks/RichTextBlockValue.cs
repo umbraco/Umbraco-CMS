@@ -23,4 +23,11 @@ public class RichTextBlockValue : BlockValue<RichTextBlockLayoutItem>
     /// <inheritdoc />
     [JsonIgnore]
     public override string PropertyEditorAlias => Constants.PropertyEditors.Aliases.RichText;
+
+    /// <inheritdoc />
+#pragma warning disable CS0672 // Member overrides obsolete member
+#pragma warning disable CS0618 // Type or member is obsolete
+    public override bool SupportsBlockLayoutAlias(string alias) => base.SupportsBlockLayoutAlias(alias) || alias.Equals("Umbraco.TinyMCE");
+#pragma warning restore CS0618 // Type or member is obsolete
+#pragma warning restore CS0672 // Member overrides obsolete member
 }

@@ -86,10 +86,9 @@ export default [
 		...importPlugin.flatConfigs.typescript,
 		rules: {
 			'no-unused-vars': 'off', //Let '@typescript-eslint/no-unused-vars' catch the errors to allow unused function parameters (ex: in interfaces)
-			'@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
+			'@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
 			'@typescript-eslint/no-non-null-assertion': 'off',
 			'@typescript-eslint/no-explicit-any': 'warn',
-			'@typescript-eslint/no-unused-vars': 'error',
 			'@typescript-eslint/consistent-type-exports': 'error',
 			'@typescript-eslint/consistent-type-imports': 'error',
 			'@typescript-eslint/no-import-type-side-effects': 'warn',
@@ -154,7 +153,7 @@ export default [
 					selector: 'typeLike',
 					modifiers: ['exported'],
 					format: ['PascalCase'],
-					prefix: ['Umb', 'Ufm', 'Manifest', 'Meta', 'Example']
+					prefix: ['Umb', 'Ufm', 'Manifest', 'Meta', 'Example'],
 				},
 				// All exported string constants should be UPPER_CASE with leading 'UMB_'
 				// Example: UMB_EXAMPLE_CONSTANT
@@ -167,8 +166,8 @@ export default [
 				},
 				// Allow destructured variables to be named as they are in the object
 				{
-					selector: "variable",
-					modifiers: ["destructured"],
+					selector: 'variable',
+					modifiers: ['destructured'],
 					format: null,
 				},
 			],

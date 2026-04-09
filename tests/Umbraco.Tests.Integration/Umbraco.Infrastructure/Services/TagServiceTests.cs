@@ -29,7 +29,9 @@ internal sealed class TagServiceTests : UmbracoIntegrationTest
         FileService.SaveTemplate(template); // else, FK violation on contentType!
 
         _contentType =
-            ContentTypeBuilder.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type",
+            ContentTypeBuilder.CreateSimpleContentType(
+                "umbMandatory",
+                "Mandatory Doc Type",
                 defaultTemplateId: template.Id);
         _contentType.PropertyGroups.First().PropertyTypes.Add(
             new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "tags")
@@ -59,7 +61,11 @@ internal sealed class TagServiceTests : UmbracoIntegrationTest
     public void TagApiConsistencyTest()
     {
         IContent content1 = ContentBuilder.CreateSimpleContent(_contentType, "Tagged content 1");
-        content1.AssignTags(PropertyEditorCollection, DataTypeService, Serializer, "tags",
+        content1.AssignTags(
+            PropertyEditorCollection,
+            DataTypeService,
+            Serializer,
+            "tags",
             new[] { "cow", "pig", "goat" });
         ContentService.Save(content1);
         ContentService.Publish(content1, Array.Empty<string>());
@@ -101,7 +107,11 @@ internal sealed class TagServiceTests : UmbracoIntegrationTest
     public void TagList_Contains_NodeCount()
     {
         var content1 = ContentBuilder.CreateSimpleContent(_contentType, "Tagged content 1");
-        content1.AssignTags(PropertyEditorCollection, DataTypeService, Serializer, "tags",
+        content1.AssignTags(
+            PropertyEditorCollection,
+            DataTypeService,
+            Serializer,
+            "tags",
             new[] { "cow", "pig", "goat" });
         ContentService.Save(content1);
         ContentService.Publish(content1, Array.Empty<string>());

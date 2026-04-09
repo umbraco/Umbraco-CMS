@@ -1,10 +1,10 @@
-# Workspace Extensions Complete Example
+# Workspace Context Communication Across Extensions Example
 
-The Workspace Context serves as the central communication hub for all workspace extensions. In this example, the context manages a counter that can be manipulated and displayed by different extension types, showcasing the power of shared state management in workspace extensions.
+The Workspace Context serves as the central communication hub for all Workspace extensions. In this example, the Context manages a counter that can be manipulated and displayed by different Extension Types, showcasing the power of shared state management in Workspace extensions.
 
 ## Extension types included
 
-This complete example includes:
+This example includes:
 
 - **Workspace Context** - Manages shared counter state and provides communication between extensions
 - **Workspace Action** - Primary "Increment" button that increases the counter value
@@ -14,6 +14,6 @@ This complete example includes:
 
 ## How it works
 
-All extensions communicate through the shared workspace context. When you increment or reset the counter using the actions, the workspace view and footer app automatically update to show the new value, demonstrating reactive state management across workspace extensions.
+All extensions communicate through the shared Workspace Context. When you increment or reset the counter using the actions, the Workspace view and Footer app update to show the new value, demonstrating reactive state management across Workspace extensions.
 
-This pattern shows how workspace extensions can work together to create cohesive functionality within Umbraco workspaces.
+This pattern shows how various Workspace extensions can communicate via a Workspace Context as their mediator.

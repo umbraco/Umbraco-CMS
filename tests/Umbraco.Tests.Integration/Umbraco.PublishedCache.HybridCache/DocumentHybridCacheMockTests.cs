@@ -87,6 +87,9 @@ internal sealed class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithC
         _mockDatabaseCacheRepository.Setup(r => r.GetContentSourcesAsync(It.IsAny<IEnumerable<Guid>>(), false))
             .ReturnsAsync([publishedTestCacheNode]);
 
+        _mockDatabaseCacheRepository.Setup(r => r.GetContentSourceForPublishStatesAsync(It.IsAny<Guid>()))
+            .ReturnsAsync((draftTestCacheNode, publishedTestCacheNode));
+
         _mockDatabaseCacheRepository.Setup(r => r.GetContentByContentTypeKey(It.IsAny<IReadOnlyCollection<Guid>>(), ContentCacheDataSerializerEntityType.Document)).Returns(
             new List<ContentCacheNode>()
             {
@@ -97,6 +100,7 @@ internal sealed class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithC
 
         var mockedPublishedStatusService = new Mock<IPublishStatusQueryService>();
         mockedPublishedStatusService.Setup(x => x.IsDocumentPublishedInAnyCulture(It.IsAny<Guid>())).Returns(true);
+        mockedPublishedStatusService.Setup(x => x.HasPublishedAncestorPath(It.IsAny<Guid>())).Returns(true);
 
         _documentCacheService = new DocumentCacheService(
             _mockDatabaseCacheRepository.Object,
@@ -233,6 +237,47 @@ internal sealed class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithC
         AssertTextPage(textPage);
 
         _mockDatabaseCacheRepository.Verify(x => x.GetContentSourceAsync(It.IsAny<Guid>(), It.IsAny<bool>()), Times.Exactly(1));
+    }
+
+    [Test]
+    public async Task RefreshMemoryCache_Fetches_Draft_And_Published()
+    {
+        // Arrange
+        var hybridCache = GetRequiredService<Microsoft.Extensions.Caching.Hybrid.HybridCache>();
+
+        // Clear both draft and published cache entries.
+        await hybridCache.RemoveAsync($"{Textpage.Key}+draft");
+        await hybridCache.RemoveAsync($"{Textpage.Key}");
+
+        // Act
+        await _documentCacheService.RefreshMemoryCacheAsync(Textpage.Key);
+
+        // Assert - verify only a single call was made to the combined method for retrieving both states.
+        _mockDatabaseCacheRepository.Verify(
+            x => x.GetContentSourceForPublishStatesAsync(Textpage.Key),
+            Times.Exactly(1));
+
+        // Verify individual GetContentSourceAsync was NOT called
+        _mockDatabaseCacheRepository.Verify(
+            x => x.GetContentSourceAsync(It.IsAny<Guid>(), It.IsAny<bool>()),
+            Times.Never);
+
+        // Verify content is now cached - fetching should not hit the repository again.
+        var draftPage = await _mockedCache.GetByIdAsync(Textpage.Key, true);
+        var publishedPage = await _mockedCache.GetByIdAsync(Textpage.Key, false);
+
+        Assert.IsNotNull(draftPage);
+        Assert.IsNotNull(publishedPage);
+        Assert.AreEqual(Textpage.Name, draftPage.Name);
+        Assert.AreEqual(Textpage.Name, publishedPage.Name);
+
+        // Verify no additional repository calls were made (content served from cache).
+        _mockDatabaseCacheRepository.Verify(
+            x => x.GetContentSourceAsync(It.IsAny<Guid>(), It.IsAny<bool>()),
+            Times.Never);
+        _mockDatabaseCacheRepository.Verify(
+            x => x.GetContentSourceForPublishStatesAsync(It.IsAny<Guid>()),
+            Times.Exactly(1));
     }
 
     private void AssertTextPage(IPublishedContent textPage)

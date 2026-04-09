@@ -256,6 +256,10 @@ public class ConcurrentHashSet<T> : ICollection<T>, ISet<T>
         Array.Copy(clone.ToArray(), 0, array, index, clone.Count);
     }
 
+    /// <summary>
+    ///     Creates a thread-safe clone of the internal hash set.
+    /// </summary>
+    /// <returns>A new <see cref="HashSet{T}" /> containing a copy of the elements.</returns>
     private HashSet<T> GetThreadSafeClone()
     {
         HashSet<T>? clone = null;
@@ -275,6 +279,7 @@ public class ConcurrentHashSet<T> : ICollection<T>, ISet<T>
         return clone;
     }
 
+    /// <inheritdoc />
     public void ExceptWith(IEnumerable<T> other)
     {
         try
@@ -291,6 +296,7 @@ public class ConcurrentHashSet<T> : ICollection<T>, ISet<T>
         }
     }
 
+    /// <inheritdoc />
     public void IntersectWith(IEnumerable<T> other)
     {
         try
@@ -307,6 +313,7 @@ public class ConcurrentHashSet<T> : ICollection<T>, ISet<T>
         }
     }
 
+    /// <inheritdoc />
     public bool IsProperSubsetOf(IEnumerable<T> other)
     {
         try
@@ -323,6 +330,7 @@ public class ConcurrentHashSet<T> : ICollection<T>, ISet<T>
         }
     }
 
+    /// <inheritdoc />
     public bool IsProperSupersetOf(IEnumerable<T> other)
     {
         try
@@ -339,6 +347,7 @@ public class ConcurrentHashSet<T> : ICollection<T>, ISet<T>
         }
     }
 
+    /// <inheritdoc />
     public bool IsSubsetOf(IEnumerable<T> other)
     {
         try
@@ -355,6 +364,7 @@ public class ConcurrentHashSet<T> : ICollection<T>, ISet<T>
         }
     }
 
+    /// <inheritdoc />
     public bool IsSupersetOf(IEnumerable<T> other)
     {
         try
@@ -371,6 +381,7 @@ public class ConcurrentHashSet<T> : ICollection<T>, ISet<T>
         }
     }
 
+    /// <inheritdoc />
     public bool Overlaps(IEnumerable<T> other)
     {
         try
@@ -387,6 +398,7 @@ public class ConcurrentHashSet<T> : ICollection<T>, ISet<T>
         }
     }
 
+    /// <inheritdoc />
     public bool SetEquals(IEnumerable<T> other)
     {
         try
@@ -403,6 +415,7 @@ public class ConcurrentHashSet<T> : ICollection<T>, ISet<T>
         }
     }
 
+    /// <inheritdoc />
     public void SymmetricExceptWith(IEnumerable<T> other)
     {
         try
@@ -419,6 +432,7 @@ public class ConcurrentHashSet<T> : ICollection<T>, ISet<T>
         }
     }
 
+    /// <inheritdoc />
     public void UnionWith(IEnumerable<T> other)
     {
         try
@@ -435,6 +449,7 @@ public class ConcurrentHashSet<T> : ICollection<T>, ISet<T>
         }
     }
 
+    /// <inheritdoc />
     bool ISet<T>.Add(T item)
     {
         try

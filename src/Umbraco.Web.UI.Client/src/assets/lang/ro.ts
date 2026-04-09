@@ -60,4 +60,8 @@ export default {
 		templatingGroup: 'Modelare',
 		thirdPartyGroup: 'Terț',
 	},
+	user: {
+		confirmNewPassword: 'Confirmați parola nouă',
+		confirmPassword: 'Confirmați parola',
+	},
 } as UmbLocalizationDictionary;

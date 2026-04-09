@@ -49,5 +49,9 @@ public interface IScopeContext : IInstanceIdentifiable
     /// <returns>The enlisted object, if any, else the default value.</returns>
     T? GetEnlisted<T>(string key);
 
+    /// <summary>
+    ///     Called when the scope exits to execute enlisted actions.
+    /// </summary>
+    /// <param name="completed">A value indicating whether the scope completed successfully.</param>
     void ScopeExit(bool completed);
 }

@@ -5,38 +5,69 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 [TableName(TableName)]
-[PrimaryKey("id")]
+[PrimaryKey(PrimaryKeyColumnName)]
 [ExplicitColumns]
 internal sealed class ContentVersionCultureVariationDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.ContentVersionCultureVariation;
+    public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
+
+    private const string LanguageIdColumnName = "languageId";
+    private const string VersionIdColumnName = "versionId";
+    private const string UpdateUserIdColumnName = "availableUserId";
+    private const string UpdateDateColumnName = "date";
+    private const string NameColumnName = "name";
+
     private int? _updateUserId;
 
-    [Column("id")]
+    /// <summary>
+    /// Gets or sets the unique identifier for the content version culture variation.
+    /// </summary>
+    [Column(PrimaryKeyColumnName)]
     [PrimaryKeyColumn]
     public int Id { get; set; }
 
-    [Column("versionId")]
+    /// <summary>
+    /// Gets or sets the identifier of the associated content version.
+    /// </summary>
+    [Column(VersionIdColumnName)]
     [ForeignKey(typeof(ContentVersionDto))]
-    [Index(IndexTypes.UniqueNonClustered, Name = "IX_" + TableName + "_VersionId", ForColumns = "versionId,languageId", IncludeColumns = "id,name,date,availableUserId")]
+    [Index(IndexTypes.UniqueNonClustered, Name = "IX_" + TableName + "_VersionId", ForColumns = $"{VersionIdColumnName},{LanguageIdColumnName}", IncludeColumns = $"{PrimaryKeyColumnName},{NameColumnName},{UpdateDateColumnName},{UpdateUserIdColumnName}")]
     public int VersionId { get; set; }
 
-    [Column("languageId")]
+    /// <summary>
+    /// Gets or sets the identifier of the language associated with this content version culture variation.
+    /// </summary>
+    [Column(LanguageIdColumnName)]
     [ForeignKey(typeof(LanguageDto))]
     [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_LanguageId")]
     public int LanguageId { get; set; }
 
-    // this is convenient to carry the culture around, but has no db counterpart
+    /// <summary>
+    /// Gets or sets the culture identifier for this content version variation. This property is for convenience only and is not mapped to the database.
+    /// </summary>
+    /// <remarks>this is convenient to carry the culture around, but has no db counterpart</remarks>
     [Ignore]
     public string? Culture { get; set; }
 
-    [Column("name")]
+    /// <summary>
+    /// Gets or sets the name associated with this culture variation of the content version.
+    /// </summary>
+    [Column(NameColumnName)]
     public string? Name { get; set; }
 
-    [Column("date")] // TODO: db rename to 'updateDate'
+    /// <summary>
+    /// Gets or sets the date and time when the content version culture variation was last updated.
+    /// </summary>
+    /// <remarks>TODO: db rename to 'updateDate'</remarks>
+    [Column(UpdateDateColumnName)]
     public DateTime UpdateDate { get; set; }
 
-    [Column("availableUserId")] // TODO: db rename to 'updateDate'
+    /// <summary>
+    /// Gets or sets the identifier of the user who last updated this content version culture variation.
+    /// </summary>
+    /// <remarks>TODO: db rename to 'updateUserId'</remarks>
+    [Column(UpdateUserIdColumnName)]
     [ForeignKey(typeof(UserDto))]
     [NullSetting(NullSetting = NullSettings.Null)]
     public int? UpdateUserId

@@ -5,6 +5,10 @@ using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Notifications;
 
+/// <summary>
+///     Provides extension methods for content-related notifications to help determine
+///     culture-specific save and publish states.
+/// </summary>
 public static class ContentNotificationExtensions
 {
     /// <summary>
@@ -57,6 +61,12 @@ public static class ContentNotificationExtensions
     public static bool HasUnpublishedCulture(this ContentUnpublishedNotification notification, IContent content, string culture)
         => HasUnpublishedCulture(content, culture);
 
+    /// <summary>
+    ///     Determines whether a culture is being published for the specified content.
+    /// </summary>
+    /// <param name="content">The content item to check.</param>
+    /// <param name="culture">The culture code to check.</param>
+    /// <returns><c>true</c> if the culture is being published; otherwise, <c>false</c>.</returns>
     public static bool IsPublishingCulture(IContent content, string culture)
         => (content.PublishCultureInfos?.TryGetValue(culture, out ContentCultureInfos cultureInfo) ?? false) &&
            cultureInfo.IsDirty();
@@ -64,6 +74,12 @@ public static class ContentNotificationExtensions
     private static bool IsUnpublishingCulture(IContent content, string culture)
         => content.IsPropertyDirty(ContentBase.ChangeTrackingPrefix.UnpublishedCulture + culture);
 
+    /// <summary>
+    ///     Determines whether a culture has been unpublished for the specified content.
+    /// </summary>
+    /// <param name="content">The content item to check.</param>
+    /// <param name="culture">The culture code to check.</param>
+    /// <returns><c>true</c> if the culture has been unpublished; otherwise, <c>false</c>.</returns>
     public static bool HasUnpublishedCulture(IContent content, string culture)
         => content.WasPropertyDirty(ContentBase.ChangeTrackingPrefix.UnpublishedCulture + culture);
 }

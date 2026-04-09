@@ -1,15 +1,23 @@
-﻿using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Routing;
 
 namespace Umbraco.Cms.Core.DeliveryApi;
 
+/// <summary>
+///     Default implementation of <see cref="IApiMediaUrlProvider"/> that provides media URLs for the Delivery API.
+/// </summary>
 public sealed class ApiMediaUrlProvider : IApiMediaUrlProvider
 {
     private readonly IPublishedUrlProvider _publishedUrlProvider;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="ApiMediaUrlProvider"/> class.
+    /// </summary>
+    /// <param name="publishedUrlProvider">The published URL provider.</param>
     public ApiMediaUrlProvider(IPublishedUrlProvider publishedUrlProvider)
         => _publishedUrlProvider = publishedUrlProvider;
 
+    /// <inheritdoc />
     public string GetUrl(IPublishedContent media)
     {
         if (media.ItemType != PublishedItemType.Media)

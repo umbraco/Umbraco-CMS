@@ -10,6 +10,12 @@ namespace Umbraco.Cms.Core.Notifications;
 /// </summary>
 public class TemplateDeletedNotification : DeletedNotification<ITemplate>
 {
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="TemplateDeletedNotification"/> class
+    ///     with a single template.
+    /// </summary>
+    /// <param name="target">The template that was deleted.</param>
+    /// <param name="messages">The event messages collection.</param>
     public TemplateDeletedNotification(ITemplate target, EventMessages messages)
         : base(target, messages)
     {

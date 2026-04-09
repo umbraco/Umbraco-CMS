@@ -103,6 +103,30 @@ internal sealed partial class PublishStatusServiceTests
         Assert.IsFalse(sut.IsDocumentPublished(Subpage.Key, UnusedCulture)); // Do not exist
     }
 
+    [Test]
+    public async Task AddOrUpdateStatusWithDescendantsAsync_Does_Not_Throw_When_Content_Does_Not_Exist()
+    {
+        // Arrange - use a random key that doesn't exist
+        var sut = CreatePublishedStatusService();
+        var nonExistentKey = Guid.NewGuid();
+
+        // Act & Assert - should not throw, just return gracefully
+        Assert.DoesNotThrowAsync(async () =>
+            await sut.AddOrUpdateStatusWithDescendantsAsync(nonExistentKey, CancellationToken.None));
+    }
+
+    [Test]
+    public async Task AddOrUpdateStatusAsync_Does_Not_Throw_When_Content_Does_Not_Exist()
+    {
+        // Arrange - use a random key that doesn't exist
+        var sut = CreatePublishedStatusService();
+        var nonExistentKey = Guid.NewGuid();
+
+        // Act & Assert - should not throw, just return gracefully
+        Assert.DoesNotThrowAsync(async () =>
+            await sut.AddOrUpdateStatusAsync(nonExistentKey, CancellationToken.None));
+    }
+
     private PublishStatusService CreatePublishedStatusService()
         => new(
             GetRequiredService<ILogger<PublishStatusService>>(),

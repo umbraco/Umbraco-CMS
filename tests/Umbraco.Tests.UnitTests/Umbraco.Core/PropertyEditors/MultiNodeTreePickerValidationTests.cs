@@ -135,10 +135,11 @@ public class MultiNodeTreePickerValidationTests
     [TestCase(false, false, true, MultiNodeTreePickerPropertyEditor.MultiNodeTreePickerPropertyValueEditor.DocumentObjectType)]
     [TestCase(false, false, true, MultiNodeTreePickerPropertyEditor.MultiNodeTreePickerPropertyValueEditor.MediaObjectType)]
     [TestCase(false, false, true, MultiNodeTreePickerPropertyEditor.MultiNodeTreePickerPropertyValueEditor.MemberObjectType)]
+    [TestCase(false, true, false, null)] // Null object type should be treated as being for document.
     [TestCase(false, true, false, MultiNodeTreePickerPropertyEditor.MultiNodeTreePickerPropertyValueEditor.DocumentObjectType)]
     [TestCase(false, true, false, MultiNodeTreePickerPropertyEditor.MultiNodeTreePickerPropertyValueEditor.MediaObjectType)]
     [TestCase(false, true, false, MultiNodeTreePickerPropertyEditor.MultiNodeTreePickerPropertyValueEditor.MemberObjectType)]
-    public void Validates_Allowed_Type(bool shouldSucceed, bool hasAllowedType, bool findsContent, string objectType)
+    public void Validates_Allowed_Type(bool shouldSucceed, bool hasAllowedType, bool findsContent, string? objectType)
     {
         var (valueEditor, _, contentService, mediaService, memberService) = CreateValueEditor();
 
@@ -170,7 +171,6 @@ public class MultiNodeTreePickerValidationTests
 
         var result = valueEditor.Validate(value, false, null, PropertyValidationContext.Empty());
         TestShouldSucceed(shouldSucceed, result);
-
     }
 
     private static (MultiNodeTreePickerPropertyEditor.MultiNodeTreePickerPropertyValueEditor ValueEditor,

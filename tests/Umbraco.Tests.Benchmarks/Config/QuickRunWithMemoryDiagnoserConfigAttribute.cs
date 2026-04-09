@@ -11,5 +11,5 @@ public class QuickRunWithMemoryDiagnoserConfigAttribute : QuickRunConfigAttribut
     /// <summary>
     ///     Initializes a new instance of the <see cref="QuickRunWithMemoryDiagnoserConfigAttribute" /> class.
     /// </summary>
-    public QuickRunWithMemoryDiagnoserConfigAttribute() => Config.Add(MemoryDiagnoser.Default);
+    public QuickRunWithMemoryDiagnoserConfigAttribute() => Config.AddDiagnoser(MemoryDiagnoser.Default);
 }

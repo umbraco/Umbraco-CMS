@@ -8,6 +8,15 @@ namespace Umbraco.Extensions;
 /// </summary>
 public static class ContentRepositoryExtensions
 {
+    /// <summary>
+    ///     Sets the culture information for a specific culture on the content item.
+    /// </summary>
+    /// <param name="content">The content item to update.</param>
+    /// <param name="culture">The culture code (e.g., "en-US").</param>
+    /// <param name="name">The name of the content in the specified culture.</param>
+    /// <param name="date">The date to associate with this culture information.</param>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="name" /> or <paramref name="culture" /> is null.</exception>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="name" /> or <paramref name="culture" /> is empty or whitespace.</exception>
     public static void SetCultureInfo(this IContentBase content, string? culture, string? name, DateTime date)
     {
         if (name == null)
@@ -243,6 +252,15 @@ public static class ContentRepositoryExtensions
         }
     }
 
+    /// <summary>
+    ///     Sets the publish information for a specific culture on the content item.
+    /// </summary>
+    /// <param name="content">The content item to update.</param>
+    /// <param name="culture">The culture code (e.g., "en-US").</param>
+    /// <param name="name">The published name of the content in the specified culture.</param>
+    /// <param name="date">The publish date to associate with this culture.</param>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="name" /> or <paramref name="culture" /> is null.</exception>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="name" /> or <paramref name="culture" /> is empty or whitespace.</exception>
     public static void SetPublishInfo(this IContent content, string? culture, string? name, DateTime date)
     {
         if (name == null)
@@ -272,7 +290,11 @@ public static class ContentRepositoryExtensions
         content.PublishCultureInfos?.AddOrUpdate(culture, name, date);
     }
 
-    // sets the edited cultures on the content
+    /// <summary>
+    ///     Sets the cultures that have been edited on the content item.
+    /// </summary>
+    /// <param name="content">The content item to update.</param>
+    /// <param name="cultures">The collection of culture codes that have been edited, or null to clear.</param>
     public static void SetCultureEdited(this IContent content, IEnumerable<string?>? cultures)
     {
         if (cultures == null)
@@ -428,6 +450,10 @@ public static class ContentRepositoryExtensions
         return keepProcessing;
     }
 
+    /// <summary>
+    ///     Clears all publish culture information from the content item.
+    /// </summary>
+    /// <param name="content">The content item to clear publish information from.</param>
     public static void ClearPublishInfos(this IContent content) => content.PublishCultureInfos = null;
 
     /// <summary>

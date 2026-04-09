@@ -16,6 +16,9 @@ public interface ICoreScope : IDisposable, IInstanceIdentifiable
     /// </remarks>
     public int Depth => -1;
 
+    /// <summary>
+    ///     Gets the locking mechanism for this scope.
+    /// </summary>
     public ILockingMechanism Locks { get; }
 
     /// <summary>
@@ -66,11 +69,29 @@ public interface ICoreScope : IDisposable, IInstanceIdentifiable
     /// <param name="lockId">The lock object identifier.</param>
     void ReadLock(TimeSpan timeout, int lockId);
 
+    /// <summary>
+    ///     Eagerly acquires write locks on the specified lock objects.
+    /// </summary>
+    /// <param name="lockIds">Array of lock object identifiers.</param>
     void EagerWriteLock(params int[] lockIds);
 
+    /// <summary>
+    ///     Eagerly acquires a write lock on a lock object with a timeout.
+    /// </summary>
+    /// <param name="timeout">The database timeout.</param>
+    /// <param name="lockId">The lock object identifier.</param>
     void EagerWriteLock(TimeSpan timeout, int lockId);
 
+    /// <summary>
+    ///     Eagerly acquires a read lock on a lock object with a timeout.
+    /// </summary>
+    /// <param name="timeout">The database timeout.</param>
+    /// <param name="lockId">The lock object identifier.</param>
     void EagerReadLock(TimeSpan timeout, int lockId);
 
+    /// <summary>
+    ///     Eagerly acquires read locks on the specified lock objects.
+    /// </summary>
+    /// <param name="lockIds">Array of lock object identifiers.</param>
     void EagerReadLock(params int[] lockIds);
 }

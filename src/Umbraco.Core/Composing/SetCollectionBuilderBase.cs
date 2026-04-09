@@ -16,6 +16,9 @@ public abstract class SetCollectionBuilderBase<TBuilder, TCollection, TItem> : C
     where TBuilder : SetCollectionBuilderBase<TBuilder, TCollection, TItem>
     where TCollection : class, IBuilderCollection<TItem>
 {
+    /// <summary>
+    /// Gets the current builder instance.
+    /// </summary>
     protected abstract TBuilder This { get; }
 
     /// <summary>

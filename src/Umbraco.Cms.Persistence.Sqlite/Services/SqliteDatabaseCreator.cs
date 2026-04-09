@@ -11,6 +11,10 @@ public class SqliteDatabaseCreator : IDatabaseCreator
 {
     private readonly ILogger<SqliteDatabaseCreator> _logger;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SqliteDatabaseCreator"/> class.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
     public SqliteDatabaseCreator(ILogger<SqliteDatabaseCreator> logger) => _logger = logger;
 
     /// <inheritdoc />

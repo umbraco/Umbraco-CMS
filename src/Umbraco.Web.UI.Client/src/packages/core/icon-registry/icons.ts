@@ -1500,6 +1500,9 @@ path: () => import("./icons/icon-smiley.js"),
 name: "icon-snow",
 path: () => import("./icons/icon-snow.js"),
 },{
+name: "icon-sort",
+path: () => import("./icons/icon-sort.js"),
+},{
 name: "icon-sound-low",
 path: () => import("./icons/icon-sound-low.js"),
 },{
@@ -2208,6 +2211,9 @@ path: () => import("./icons/icon-molecular-network.js"),
 name: "icon-molecular",
 hidden: true,
 path: () => import("./icons/icon-molecular.js"),
+},{
+name: "icon-trash-empty",
+path: () => import("./icons/icon-trash-empty.js"),
 },{
 name: "icon-umbraco",
 path: () => import("./icons/icon-umbraco.js"),

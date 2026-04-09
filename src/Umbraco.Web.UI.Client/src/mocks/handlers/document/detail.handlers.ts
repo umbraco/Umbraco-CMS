@@ -1,4 +1,4 @@
-const { rest } = window.MockServiceWorker;
+const { http, HttpResponse } = window.MockServiceWorker;
 import type { UmbMockDocumentModel } from '../../data/document/document.data.js';
 import { umbDocumentMockDb } from '../../data/document/document.db.js';
 import { items as referenceData } from '../../data/tracked-reference.data.js';
@@ -14,34 +14,35 @@ import type {
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 export const detailHandlers = [
-	rest.post(umbracoPath(`${UMB_SLUG}`), async (req, res, ctx) => {
-		const requestBody = (await req.json()) as CreateDocumentRequestModel;
-		if (!requestBody) return res(ctx.status(400, 'no body found'));
+	http.post(umbracoPath(`${UMB_SLUG}`), async ({ request }) => {
+		const requestBody = (await request.json()) as CreateDocumentRequestModel;
+		if (!requestBody) return new HttpResponse(null, { status: 400, statusText: 'no body found' });
 
 		const id = umbDocumentMockDb.detail.create(requestBody);
 
-		return res(
-			ctx.status(201),
-			ctx.set({
-				Location: req.url.href + '/' + id,
+		return HttpResponse.json(null, {
+			status: 201,
+			headers: {
+				Location: request.url + '/' + id,
 				'Umb-Generated-Resource': id,
-			}),
-		);
+			},
+		});
 	}),
 
-	rest.get(umbracoPath(`${UMB_SLUG}/configuration`), (_req, res, ctx) => {
-		return res(ctx.status(200), ctx.json(umbDocumentMockDb.getConfiguration()));
+	http.get(umbracoPath(`${UMB_SLUG}/configuration`), () => {
+		return HttpResponse.json(umbDocumentMockDb.getConfiguration());
 	}),
 
-	rest.get(umbracoPath(`${UMB_SLUG}/:id/referenced-by`), (_req, res, ctx) => {
-		const id = _req.params.id as string;
+	http.get(umbracoPath(`${UMB_SLUG}/:id/referenced-by`), ({ request, params }) => {
+		const id = params.id as string;
 		if (!id) return;
 		if (id === 'forbidden') {
 			// Simulate a forbidden response
-			return res(ctx.status(403));
+			return new HttpResponse(null, { status: 403 });
 		}
 
-		const query = _req.url.searchParams;
+		const url = new URL(request.url);
+		const query = url.searchParams;
 		const skip = query.get('skip') ? parseInt(query.get('skip') as string, 10) : 0;
 		const take = query.get('take') ? parseInt(query.get('take') as string, 10) : 100;
 
@@ -56,15 +57,15 @@ export const detailHandlers = [
 			items: data.slice(skip, skip + take),
 		};
 
-		return res(ctx.status(200), ctx.json(PagedTrackedReference));
+		return HttpResponse.json(PagedTrackedReference);
 	}),
 
-	rest.get(umbracoPath(`${UMB_SLUG}/:id/referenced-descendants`), (_req, res, ctx) => {
-		const id = _req.params.id as string;
+	http.get(umbracoPath(`${UMB_SLUG}/:id/referenced-descendants`), ({ params }) => {
+		const id = params.id as string;
 		if (!id) return;
 		if (id === 'forbidden') {
 			// Simulate a forbidden response
-			return res(ctx.status(403));
+			return new HttpResponse(null, { status: 403 });
 		}
 
 		const ReferencedDescendantsResponse: GetDocumentByIdReferencedDescendantsResponse = {
@@ -72,19 +73,19 @@ export const detailHandlers = [
 			items: [],
 		};
 
-		return res(ctx.status(200), ctx.json(ReferencedDescendantsResponse));
+		return HttpResponse.json(ReferencedDescendantsResponse);
 	}),
 
-	rest.get(umbracoPath(`${UMB_SLUG}/:id/available-segment-options`), (req, res, ctx) => {
-		const id = req.params.id as string;
-		if (!id) return res(ctx.status(400));
+	http.get(umbracoPath(`${UMB_SLUG}/:id/available-segment-options`), ({ params }) => {
+		const id = params.id as string;
+		if (!id) return new HttpResponse(null, { status: 400 });
 
 		let document: UmbMockDocumentModel | null = null;
 
 		try {
 			document = umbDocumentMockDb.detail.read(id);
 		} catch {
-			return res(ctx.status(404));
+			return new HttpResponse(null, { status: 404 });
 		}
 
 		const availableSegments = document.variants.filter((v) => !!v.segment).map((v) => v.segment!) ?? [];
@@ -115,52 +116,52 @@ export const detailHandlers = [
 			}),
 		};
 
-		return res(ctx.status(200), ctx.json(response));
+		return HttpResponse.json(response);
 	}),
 
-	rest.put(umbracoPath(`${UMB_SLUG}/:id/validate`, 'v1.1'), (_req, res, ctx) => {
-		const id = _req.params.id as string;
-		if (!id) return res(ctx.status(400));
+	http.put(umbracoPath(`${UMB_SLUG}/:id/validate`, 'v1.1'), ({ params }) => {
+		const id = params.id as string;
+		if (!id) return new HttpResponse(null, { status: 400 });
 		if (id === 'forbidden') {
 			// Simulate a forbidden response
-			return res(ctx.status(403));
+			return new HttpResponse(null, { status: 403 });
 		}
 
-		return res(ctx.status(200));
+		return new HttpResponse(null, { status: 200 });
 	}),
 
-	rest.get(umbracoPath(`${UMB_SLUG}/:id`), (req, res, ctx) => {
-		const id = req.params.id as string;
-		if (!id) return res(ctx.status(400));
+	http.get(umbracoPath(`${UMB_SLUG}/:id`), ({ params }) => {
+		const id = params.id as string;
+		if (!id) return new HttpResponse(null, { status: 400 });
 		if (id === 'forbidden') {
 			// Simulate a forbidden response
-			return res(ctx.status(403));
+			return new HttpResponse(null, { status: 403 });
 		}
 		const response = umbDocumentMockDb.detail.read(id);
-		return res(ctx.status(200), ctx.json(response));
+		return HttpResponse.json(response);
 	}),
 
-	rest.put(umbracoPath(`${UMB_SLUG}/:id`), async (req, res, ctx) => {
-		const id = req.params.id as string;
-		if (!id) return res(ctx.status(400));
+	http.put(umbracoPath(`${UMB_SLUG}/:id`), async ({ request, params }) => {
+		const id = params.id as string;
+		if (!id) return new HttpResponse(null, { status: 400 });
 		if (id === 'forbidden') {
 			// Simulate a forbidden response
-			return res(ctx.status(403));
+			return new HttpResponse(null, { status: 403 });
 		}
-		const requestBody = (await req.json()) as UpdateDocumentRequestModel;
-		if (!requestBody) return res(ctx.status(400, 'no body found'));
+		const requestBody = (await request.json()) as UpdateDocumentRequestModel;
+		if (!requestBody) return new HttpResponse(null, { status: 400, statusText: 'no body found' });
 		umbDocumentMockDb.detail.update(id, requestBody);
-		return res(ctx.status(200));
+		return new HttpResponse(null, { status: 200 });
 	}),
 
-	rest.delete(umbracoPath(`${UMB_SLUG}/:id`), (req, res, ctx) => {
-		const id = req.params.id as string;
-		if (!id) return res(ctx.status(400));
+	http.delete(umbracoPath(`${UMB_SLUG}/:id`), ({ params }) => {
+		const id = params.id as string;
+		if (!id) return new HttpResponse(null, { status: 400 });
 		if (id === 'forbidden') {
 			// Simulate a forbidden response
-			return res(ctx.status(403));
+			return new HttpResponse(null, { status: 403 });
 		}
 		umbDocumentMockDb.detail.delete(id);
-		return res(ctx.status(200));
+		return new HttpResponse(null, { status: 200 });
 	}),
 ];

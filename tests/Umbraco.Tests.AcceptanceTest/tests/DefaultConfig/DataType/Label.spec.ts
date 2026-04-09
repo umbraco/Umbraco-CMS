@@ -1,5 +1,5 @@
-﻿import { ConstantHelper, test } from "@umbraco/playwright-testhelpers";
-import { expect } from "@playwright/test";
+﻿import {ConstantHelper, test} from "@umbraco/acceptance-test-helpers";
+import {expect} from "@playwright/test";
 
 const labelTypes = [
   {type: 'Label (bigint)', dataValueType: 'BIGINT'},
@@ -30,10 +30,9 @@ test('can change value type', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.dataType.changeValueType("Long String");
-  await umbracoUi.dataType.clickSaveButton();
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
-  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'umbracoDataValueType', 'TEXT')).toBeTruthy();
 });
 

@@ -21,14 +21,18 @@ public class MustBeStringValueConverter : PropertyValueConverterBase
 {
     private static readonly string[] Aliases = { Constants.PropertyEditors.Aliases.MultiNodeTreePicker };
 
+    /// <inheritdoc />
     public override bool IsConverter(IPublishedPropertyType propertyType)
         => Aliases.Contains(propertyType.EditorAlias);
 
+    /// <inheritdoc />
     public override Type GetPropertyValueType(IPublishedPropertyType propertyType)
         => typeof(string);
 
+    /// <inheritdoc />
     public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
         => PropertyCacheLevel.Element;
 
+    /// <inheritdoc />
     public override object? ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview) => source?.ToString();
 }

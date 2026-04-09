@@ -4,28 +4,47 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
+/// <summary>
+/// Data transfer object representing a specific version of a document in Umbraco CMS, typically used for persistence operations.
+/// </summary>
 [TableName(TableName)]
-[PrimaryKey("id", AutoIncrement = false)]
+[PrimaryKey(PrimaryKeyColumnName, AutoIncrement = false)]
 [ExplicitColumns]
 public class DocumentVersionDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.DocumentVersion;
+    public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
+    public const string PublishedColumnName = "published";
 
-    [Column("id")]
+    private const string TemplateIdColumnName = "templateId";
+
+    /// <summary>
+    /// Gets or sets the unique identifier for the document version.
+    /// </summary>
+    [Column(PrimaryKeyColumnName)]
     [PrimaryKeyColumn(AutoIncrement = false)]
     [ForeignKey(typeof(ContentVersionDto))]
-    [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_id_published", ForColumns = "id,published", IncludeColumns = "templateId")]
+    [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_id_published", ForColumns = $"{PrimaryKeyColumnName},{PublishedColumnName}", IncludeColumns = TemplateIdColumnName)]
     public int Id { get; set; }
 
-    [Column("templateId")]
+    /// <summary>
+    /// Gets or sets the template identifier associated with the document version.
+    /// </summary>
+    [Column(TemplateIdColumnName)]
     [NullSetting(NullSetting = NullSettings.Null)]
-    [ForeignKey(typeof(TemplateDto), Column = "nodeId")]
+    [ForeignKey(typeof(TemplateDto), Column = TemplateDto.NodeIdColumnName)]
     public int? TemplateId { get; set; }
 
-    [Column("published")]
-    [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_published", ForColumns = "published", IncludeColumns = "id,templateId")]
+    /// <summary>
+    /// Gets or sets a value indicating whether this document version is published.
+    /// </summary>
+    [Column(PublishedColumnName)]
+    [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_published", ForColumns = PublishedColumnName, IncludeColumns = $"{PrimaryKeyColumnName},{TemplateIdColumnName}")]
     public bool Published { get; set; }
 
+    /// <summary>
+    /// Gets or sets the <see cref="ContentVersionDto"/> associated with this document version.
+    /// </summary>
     [ResultColumn]
     [Reference(ReferenceType.OneToOne)]
     public ContentVersionDto ContentVersionDto { get; set; } = null!;

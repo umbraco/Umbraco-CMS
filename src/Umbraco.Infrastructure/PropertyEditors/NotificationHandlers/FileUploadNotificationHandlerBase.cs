@@ -39,7 +39,7 @@ internal abstract class FileUploadNotificationHandlerBase
     protected MediaFileManager MediaFileManager { get; }
 
     /// <summary>
-    /// Gets the <IBlockEditorElementTypeCache> used for caching block editor element types.
+    /// Gets the <see cref="IBlockEditorElementTypeCache"/> used for caching block editor element types.
     /// </summary>
     protected IBlockEditorElementTypeCache ElementTypeCache { get; }
 

@@ -1,5 +1,8 @@
-﻿namespace Umbraco.Cms.Core.DeliveryApi;
+namespace Umbraco.Cms.Core.DeliveryApi;
 
+/// <summary>
+///     Defines a service that determines whether the current request is in preview mode.
+/// </summary>
 public interface IRequestPreviewService
 {
     /// <summary>

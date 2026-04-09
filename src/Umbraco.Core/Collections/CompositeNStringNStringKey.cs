@@ -21,18 +21,33 @@ public struct CompositeNStringNStringKey : IEquatable<CompositeNStringNStringKey
         _key2 = key2?.ToLowerInvariant() ?? "NULL";
     }
 
+    /// <summary>
+    ///     Determines whether two <see cref="CompositeNStringNStringKey" /> instances are equal.
+    /// </summary>
+    /// <param name="key1">The first key to compare.</param>
+    /// <param name="key2">The second key to compare.</param>
+    /// <returns><c>true</c> if the two keys are equal; otherwise, <c>false</c>.</returns>
     public static bool operator ==(CompositeNStringNStringKey key1, CompositeNStringNStringKey key2)
         => key1._key2 == key2._key2 && key1._key1 == key2._key1;
 
+    /// <summary>
+    ///     Determines whether two <see cref="CompositeNStringNStringKey" /> instances are not equal.
+    /// </summary>
+    /// <param name="key1">The first key to compare.</param>
+    /// <param name="key2">The second key to compare.</param>
+    /// <returns><c>true</c> if the two keys are not equal; otherwise, <c>false</c>.</returns>
     public static bool operator !=(CompositeNStringNStringKey key1, CompositeNStringNStringKey key2)
         => key1._key2 != key2._key2 || key1._key1 != key2._key1;
 
+    /// <inheritdoc />
     public bool Equals(CompositeNStringNStringKey other)
         => _key2 == other._key2 && _key1 == other._key1;
 
+    /// <inheritdoc />
     public override bool Equals(object? obj)
         => obj is CompositeNStringNStringKey other && _key2 == other._key2 && _key1 == other._key1;
 
+    /// <inheritdoc />
     public override int GetHashCode()
         => (_key2.GetHashCode() * 31) + _key1.GetHashCode();
 }

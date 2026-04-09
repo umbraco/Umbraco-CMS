@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -14,6 +14,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.User;
 
+/// <summary>
+/// Controller for managing user operations by unique user key.
+/// </summary>
 [ApiVersion("1.0")]
 public class ByKeyUserController : UserControllerBase
 {
@@ -21,6 +24,12 @@ public class ByKeyUserController : UserControllerBase
     private readonly IUserService _userService;
     private readonly IUserPresentationFactory _userPresentationFactory;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ByKeyUserController"/> class, which manages user-related operations by user key.
+    /// </summary>
+    /// <param name="authorizationService">Service used to authorize user management actions.</param>
+    /// <param name="userService">Service for performing user-related operations.</param>
+    /// <param name="userPresentationFactory">Factory for creating user presentation models.</param>
     public ByKeyUserController(
         IAuthorizationService authorizationService,
         IUserService userService,
@@ -35,6 +44,8 @@ public class ByKeyUserController : UserControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(UserResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Gets a user.")]
+    [EndpointDescription("Gets a user identified by the provided Id.")]
     public async Task<IActionResult> ByKey(CancellationToken cancellationToken, Guid id)
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(

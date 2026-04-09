@@ -1,10 +1,14 @@
-﻿using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Entities;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+///     Provides functionality for sorting tree entities based on sorting models.
+/// </summary>
 public class TreeEntitySortingService : ITreeEntitySortingService
 {
+    /// <inheritdoc />
     public IEnumerable<TTreeEntity> SortEntities<TTreeEntity>(IEnumerable<TTreeEntity> entities, IEnumerable<SortingModel> sortingModels)
         where TTreeEntity : ITreeEntity
     {

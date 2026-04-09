@@ -1,5 +1,9 @@
 using System.Security.Cryptography;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Extensions;
 
@@ -32,7 +36,7 @@ namespace Umbraco.Cms.Core.Runtime
         // actions to run before releasing the main domain
         private readonly List<KeyValuePair<int, Action>> _callbacks = new();
 
-        private const int LockTimeoutMilliseconds = 40000; // 40 seconds
+        private readonly int _lockTimeoutMilliseconds;
 
         private Task? _listenTask;
         private Task? _listenCompleteTask;
@@ -41,11 +45,31 @@ namespace Umbraco.Cms.Core.Runtime
 
         #region Ctor
 
-        // initializes a new instance of MainDom
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MainDom"/> class.
+        /// </summary>
+        /// <param name="logger">The logger instance.</param>
+        /// <param name="systemLock">The distributed lock implementation.</param>
+        [Obsolete("Use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
         public MainDom(ILogger<MainDom> logger, IMainDomLock systemLock)
+            : this(logger, systemLock, StaticServiceProvider.Instance.GetRequiredService<IOptions<GlobalSettings>>())
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MainDom"/> class.
+        /// </summary>
+        /// <param name="logger">The logger instance.</param>
+        /// <param name="systemLock">The distributed lock implementation.</param>
+        /// <param name="globalSettings">The global settings.</param>
+        public MainDom(ILogger<MainDom> logger, IMainDomLock systemLock, IOptions<GlobalSettings> globalSettings)
         {
             _logger = logger;
             _mainDomLock = systemLock;
+
+            // This would have to be configured as > 24 days to overflow, so it's not going to be a problem in
+            // practice, but just to be safe we'll clamp it to int.MaxValue.
+            _lockTimeoutMilliseconds = (int)Math.Clamp(globalSettings.Value.MainDomAcquisitionTimeout.TotalMilliseconds, 0, int.MaxValue);
         }
 
         #endregion
@@ -62,15 +86,7 @@ namespace Umbraco.Cms.Core.Runtime
             })!.Value;
         }
 
-        /// <summary>
-        /// Registers a resource that requires the current AppDomain to be the main domain to function.
-        /// </summary>
-        /// <param name="install">An action to execute when registering.</param>
-        /// <param name="release">An action to execute before the AppDomain releases the main domain status.</param>
-        /// <param name="weight">An optional weight (lower goes first).</param>
-        /// <returns>A value indicating whether it was possible to register.</returns>
-        /// <remarks>If registering is successful, then the <paramref name="install"/> action
-        /// is guaranteed to execute before the AppDomain releases the main domain status.</remarks>
+        /// <inheritdoc />
         public bool Register(Action? install = null, Action? release = null, int weight = 100)
         {
             lock (_locko)
@@ -172,7 +188,7 @@ namespace Umbraco.Cms.Core.Runtime
             var acquired = false;
             try
             {
-                acquired = _mainDomLock.AcquireLockAsync(LockTimeoutMilliseconds).GetAwaiter().GetResult();
+                acquired = _mainDomLock.AcquireLockAsync(_lockTimeoutMilliseconds).GetAwaiter().GetResult();
             }
             catch (Exception ex)
             {
@@ -226,12 +242,7 @@ namespace Umbraco.Cms.Core.Runtime
             return true;
         }
 
-        /// <summary>
-        /// Gets a value indicating whether the current domain is the main domain.
-        /// </summary>
-        /// <remarks>
-        /// Acquire must be called first else this will always return false
-        /// </remarks>
+        /// <inheritdoc />
         public bool IsMainDom
         {
             get
@@ -244,7 +255,7 @@ namespace Umbraco.Cms.Core.Runtime
             }
         }
 
-        // IRegisteredObject
+        /// <inheritdoc />
         void IRegisteredObject.Stop(bool immediate)
         {
             OnSignal("environment"); // will run once
@@ -257,10 +268,12 @@ namespace Umbraco.Cms.Core.Runtime
 
         #region IDisposable Support
 
-        // This code added to correctly implement the disposable pattern.
-
         private bool _disposedValue; // To detect redundant calls
 
+        /// <summary>
+        /// Releases the unmanaged resources used by the <see cref="MainDom"/> and optionally releases the managed resources.
+        /// </summary>
+        /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
         protected virtual void Dispose(bool disposing)
         {
             if (!_disposedValue)
@@ -274,6 +287,7 @@ namespace Umbraco.Cms.Core.Runtime
             }
         }
 
+        /// <inheritdoc />
         public void Dispose()
         {
             Dispose(true);
@@ -281,6 +295,15 @@ namespace Umbraco.Cms.Core.Runtime
 
         #endregion
 
+        /// <summary>
+        /// Gets a unique identifier for the main domain based on the hosting environment.
+        /// </summary>
+        /// <param name="hostingEnvironment">The hosting environment.</param>
+        /// <returns>A SHA1 hash that uniquely identifies this application instance.</returns>
+        /// <remarks>
+        /// The ID is generated from the application ID and physical path to ensure uniqueness
+        /// across multiple sites running on the same server.
+        /// </remarks>
         public static string GetMainDomId(IHostingEnvironment hostingEnvironment)
         {
             // HostingEnvironment.ApplicationID is null in unit tests, making ReplaceNonAlphanumericChars fail

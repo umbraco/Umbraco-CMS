@@ -29,7 +29,7 @@ export class UmbPropertyEditorUIMediaPickerElement
 
 		if (!config) return;
 
-		this._allowedMediaTypes = config.getValueByAlias<string>('filter')?.split(',') ?? [];
+		this._allowedMediaTypes = config.getValueByAlias<string>('filter')?.split(',') ?? undefined;
 		this._focalPointEnabled = Boolean(config.getValueByAlias('enableLocalFocalPoint'));
 		this._multiple = Boolean(config.getValueByAlias('multiple'));
 		this._preselectedCrops = config?.getValueByAlias<Array<UmbCropModel>>('crops') ?? [];
@@ -71,7 +71,7 @@ export class UmbPropertyEditorUIMediaPickerElement
 	private _preselectedCrops: Array<UmbCropModel> = [];
 
 	@state()
-	private _allowedMediaTypes: Array<string> = [];
+	private _allowedMediaTypes?: Array<string>;
 
 	@state()
 	private _multiple: boolean = false;

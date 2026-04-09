@@ -10,12 +10,20 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.LogViewer;
 
+/// <summary>
+/// Provides API endpoints for retrieving log level counts in the log viewer.
+/// </summary>
 [ApiVersion("1.0")]
 public class LogLevelCountLogViewerController : LogViewerControllerBase
 {
     private readonly ILogViewerService _logViewerService;
     private readonly IUmbracoMapper _umbracoMapper;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="LogLevelCountLogViewerController"/> class with the specified log viewer service and Umbraco mapper.
+    /// </summary>
+    /// <param name="logViewerService">An instance of <see cref="ILogViewerService"/> used to interact with log data.</param>
+    /// <param name="umbracoMapper">An instance of <see cref="IUmbracoMapper"/> used for mapping between models.</param>
     public LogLevelCountLogViewerController(ILogViewerService logViewerService, IUmbracoMapper umbracoMapper)
     {
         _logViewerService = logViewerService;
@@ -25,6 +33,7 @@ public class LogLevelCountLogViewerController : LogViewerControllerBase
     /// <summary>
     ///     Gets the count for each log level from the logs for a specific date range.
     /// </summary>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <param name="startDate">The start date for the date range (can be null).</param>
     /// <param name="endDate">The end date for the date range (can be null).</param>
     /// <returns>The log level counts from the (filtered) logs.</returns>
@@ -32,6 +41,8 @@ public class LogLevelCountLogViewerController : LogViewerControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(LogLevelCountsReponseModel), StatusCodes.Status200OK)]
+    [EndpointSummary("Gets log level counts.")]
+    [EndpointDescription("Gets the count of log entries for each log level within the specified date range.")]
     public async Task<IActionResult> LogLevelCounts(
         CancellationToken cancellationToken,
         DateTimeOffset? startDate = null,

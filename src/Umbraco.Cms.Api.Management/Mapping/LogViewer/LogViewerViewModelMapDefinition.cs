@@ -6,8 +6,15 @@ using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Api.Management.Mapping.LogViewer;
 
+/// <summary>
+/// Provides mapping configuration between domain models and the <c>LogViewerViewModel</c> for the Log Viewer feature.
+/// </summary>
 public class LogViewerViewModelMapDefinition : IMapDefinition
 {
+    /// <summary>
+    /// Configures the object-object mappings between log viewer domain models and their corresponding response view models.
+    /// </summary>
+    /// <param name="mapper">The <see cref="IUmbracoMapper"/> instance used to register the mappings.</param>
     public void DefineMaps(IUmbracoMapper mapper)
     {
         mapper.Define<LogLevelCounts, LogLevelCountsReponseModel>((_, _) => new LogLevelCountsReponseModel(), Map);

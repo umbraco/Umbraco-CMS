@@ -1,14 +1,14 @@
-const { rest } = window.MockServiceWorker;
+const { http, HttpResponse } = window.MockServiceWorker;
 import { umbScriptMockDb } from '../../data/script/script.db.js';
 import { UMB_SLUG } from './slug.js';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 export const itemHandlers = [
-	rest.get(umbracoPath(`/item${UMB_SLUG}`), (req, res, ctx) => {
-		const paths = req.url.searchParams.getAll('path');
-		if (!paths) return res(ctx.status(400, 'no body found'));
+	http.get(umbracoPath(`/item${UMB_SLUG}`), ({ request }) => {
+		const paths = new URL(request.url).searchParams.getAll('path');
+		if (!paths) return new HttpResponse(null, { status: 400 });
 		const decodedPaths = paths.map((path) => decodeURI(path));
 		const items = umbScriptMockDb.item.getItems(decodedPaths);
-		return res(ctx.status(200), ctx.json(items));
+		return HttpResponse.json(items);
 	}),
 ];

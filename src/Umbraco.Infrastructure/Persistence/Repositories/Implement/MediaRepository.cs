@@ -14,7 +14,6 @@ using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Factories;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
@@ -36,6 +35,27 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
     private readonly IJsonSerializer _serializer;
     private readonly ITagRepository _tagRepository;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.MediaRepository"/> class,
+    /// providing access to media persistence and related services in the Umbraco CMS infrastructure layer.
+    /// </summary>
+    /// <param name="scopeAccessor">Provides access to the current database scope for transactional operations.</param>
+    /// <param name="cache">The application-level caches used for optimizing data retrieval and storage.</param>
+    /// <param name="logger">The logger instance for logging repository operations and errors.</param>
+    /// <param name="loggerFactory">Factory for creating logger instances.</param>
+    /// <param name="mediaTypeRepository">Repository for accessing and managing media types.</param>
+    /// <param name="tagRepository">Repository for managing tags associated with media items.</param>
+    /// <param name="languageRepository">Repository for accessing language information.</param>
+    /// <param name="relationRepository">Repository for managing relationships between entities.</param>
+    /// <param name="relationTypeRepository">Repository for managing types of relations between entities.</param>
+    /// <param name="propertyEditorCollection">Collection of property editors used for media properties.</param>
+    /// <param name="mediaUrlGenerators">Collection of generators for producing media URLs.</param>
+    /// <param name="dataValueReferenceFactories">Collection of factories for resolving data value references.</param>
+    /// <param name="dataTypeService">Service for managing data types used by media properties.</param>
+    /// <param name="serializer">The JSON serializer for serializing and deserializing data.</param>
+    /// <param name="eventAggregator">Publishes and subscribes to domain events.</param>
+    /// <param name="repositoryCacheVersionService">Service for managing cache versioning for repositories.</param>
+    /// <param name="cacheSyncService">Service for synchronizing cache across distributed environments.</param>
     public MediaRepository(
         IScopeAccessor scopeAccessor,
         AppCaches cache,
@@ -82,6 +102,24 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
             cacheSyncService);
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MediaRepository"/> class with the specified dependencies.
+    /// </summary>
+    /// <param name="scopeAccessor">Provides access to the current database scope.</param>
+    /// <param name="cache">The application-level caches used for performance optimization.</param>
+    /// <param name="logger">The logger instance for logging repository operations.</param>
+    /// <param name="loggerFactory">Factory for creating logger instances.</param>
+    /// <param name="mediaTypeRepository">Repository for accessing media types.</param>
+    /// <param name="tagRepository">Repository for managing tags associated with media.</param>
+    /// <param name="languageRepository">Repository for managing languages.</param>
+    /// <param name="relationRepository">Repository for managing entity relations.</param>
+    /// <param name="relationTypeRepository">Repository for managing relation types.</param>
+    /// <param name="propertyEditorCollection">Collection of property editors for media properties.</param>
+    /// <param name="mediaUrlGenerators">Collection of generators for creating media URLs.</param>
+    /// <param name="dataValueReferenceFactories">Collection of factories for resolving data value references.</param>
+    /// <param name="dataTypeService">Service for managing data types.</param>
+    /// <param name="serializer">The JSON serializer for serializing and deserializing data.</param>
+    /// <param name="eventAggregator">Publishes and subscribes to domain events.</param>
     [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
     public MediaRepository(
         IScopeAccessor scopeAccessor,
@@ -99,7 +137,8 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
         IDataTypeService dataTypeService,
         IJsonSerializer serializer,
         IEventAggregator eventAggregator)
-        : this(scopeAccessor,
+        : this(
+            scopeAccessor,
             cache,
             logger,
             loggerFactory,
@@ -115,14 +154,14 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
             serializer,
             eventAggregator,
             StaticServiceProvider.Instance.GetRequiredService<IRepositoryCacheVersionService>(),
-            StaticServiceProvider.Instance.GetRequiredService<ICacheSyncService>()
-            )
+            StaticServiceProvider.Instance.GetRequiredService<ICacheSyncService>())
     {
     }
 
     protected override MediaRepository This => this;
 
     /// <inheritdoc />
+    [Obsolete("Please use the method overload with all parameters. Scheduled for removal in Umbraco 19.")]
     public override IEnumerable<IMedia> GetPage(
         IQuery<IMedia>? query,
         long pageIndex,
@@ -130,7 +169,19 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
         out long totalRecords,
         IQuery<IMedia>? filter,
         Ordering? ordering)
+        => GetPage(query, pageIndex, pageSize, out totalRecords, propertyAliases: null, filter: filter, ordering: ordering);
+
+    /// <inheritdoc />
+    public override IEnumerable<IMedia> GetPage(
+        IQuery<IMedia>? query,
+        long pageIndex,
+        int pageSize,
+        out long totalRecords,
+        string[]? propertyAliases,
+        IQuery<IMedia>? filter,
+        Ordering? ordering)
     {
+
         Sql<ISqlContext>? filterSql = null;
 
         if (filter != null)
@@ -142,13 +193,17 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
             }
         }
 
-        return GetPage<ContentDto>(query, pageIndex, pageSize, out totalRecords,
-            x => MapDtosToContent(x),
+        return GetPage<ContentDto>(
+            query,
+            pageIndex,
+            pageSize,
+            out totalRecords,
+            x => MapDtosToContent(x, propertyAliases: propertyAliases),
             filterSql,
             ordering);
     }
 
-    private IEnumerable<IMedia> MapDtosToContent(List<ContentDto> dtos, bool withCache = false)
+    private IEnumerable<IMedia> MapDtosToContent(List<ContentDto> dtos, bool withCache = false, string[]? propertyAliases = null)
     {
         var temps = new List<TempContent<Core.Models.Media>>();
         var contentTypes = new Dictionary<int, IMediaType?>();
@@ -188,7 +243,7 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
         }
 
         // load all properties for all documents from database in 1 query - indexed by version id
-        IDictionary<int, PropertyCollection> properties = GetPropertyCollections(temps);
+        IDictionary<int, PropertyCollection> properties = GetPropertyCollections(temps, propertyAliases);
 
         // assign properties
         foreach (TempContent<Core.Models.Media> temp in temps)
@@ -226,15 +281,32 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
 
     protected override Guid NodeObjectTypeId => Constants.ObjectTypes.Media;
 
+    /// <inheritdoc />
+    public override void Save(IMedia entity)
+    {
+        base.Save(entity);
+
+        // Also populate the GUID cache so subsequent lookups by GUID don't hit the database
+        _mediaByGuidReadRepository.PopulateCacheByKey(entity);
+    }
+
     protected override IMedia? PerformGet(int id)
     {
         Sql<ISqlContext> sql = GetBaseQuery(QueryType.Single)
             .Where<NodeDto>(x => x.NodeId == id);
 
         ContentDto? dto = Database.FirstOrDefault<ContentDto>(sql);
-        return dto == null
-            ? null
-            : MapDtoToContent(dto);
+        if (dto == null)
+        {
+            return null;
+        }
+
+        IMedia media = MapDtoToContent(dto);
+
+        // Also populate the GUID cache so subsequent lookups by GUID don't hit the database
+        _mediaByGuidReadRepository.PopulateCacheByKey(media);
+
+        return media;
     }
 
     protected override IEnumerable<IMedia> PerformGetAll(params int[]? ids)
@@ -246,7 +318,13 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
             sql.WhereIn<NodeDto>(x => x.NodeId, ids);
         }
 
-        return MapDtosToContent(Database.Fetch<ContentDto>(sql));
+        // MapDtosToContent returns a materialized array, so this is safe to enumerate multiple times
+        IEnumerable<IMedia> media = MapDtosToContent(Database.Fetch<ContentDto>(sql));
+
+        // Also populate the GUID cache so subsequent lookups by GUID don't hit the database
+        _mediaByGuidReadRepository.PopulateCacheByKey(media);
+
+        return media;
     }
 
     protected override IEnumerable<IMedia> PerformGetByQuery(IQuery<IMedia> query)
@@ -336,7 +414,7 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
             $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.Document)} WHERE {nodeId} = @id",
             $@"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.MediaVersion)} WHERE id IN
                 (SELECT id FROM {QuoteTableName(Constants.DatabaseSchema.Tables.ContentVersion)} WHERE {nodeId} = @id)",
-            $@"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.PropertyData)} WHERE versionId IN
+            $@"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.PropertyData)} WHERE {QuoteColumnName("versionId")} IN
                 (SELECT id FROM {QuoteTableName(Constants.DatabaseSchema.Tables.ContentVersion)} WHERE {nodeId} = @id)",
             $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.ContentVersion)} WHERE {nodeId} = @id",
             $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.Content)} WHERE {nodeId} = @id",
@@ -349,6 +427,11 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
 
     #region Versions
 
+    /// <summary>
+    /// Retrieves all versions of a media item identified by the specified node ID, ordered by current status and version date.
+    /// </summary>
+    /// <param name="nodeId">The unique identifier of the media node whose versions are to be retrieved.</param>
+    /// <returns>An <see cref="IEnumerable{IMedia}"/> containing all versions of the specified media item.</returns>
     public override IEnumerable<IMedia> GetAllVersions(int nodeId)
     {
         Sql<ISqlContext> sql = GetBaseQuery(QueryType.Many, false)
@@ -359,6 +442,11 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
         return MapDtosToContent(Database.Fetch<ContentDto>(sql), true);
     }
 
+    /// <summary>
+    /// Retrieves a specific version of a media item by its version identifier.
+    /// </summary>
+    /// <param name="versionId">The unique identifier of the media version to retrieve.</param>
+    /// <returns>The <see cref="IMedia"/> instance representing the specified version, or <c>null</c> if no such version exists.</returns>
     public override IMedia? GetVersion(int versionId)
     {
         Sql<ISqlContext> sql = GetBaseQuery(QueryType.Single)
@@ -368,6 +456,11 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
         return dto == null ? null : MapDtoToContent(dto);
     }
 
+    /// <summary>
+    /// Retrieves a media item by its media path, normalizing the path if it refers to a resized image.
+    /// </summary>
+    /// <param name="mediaPath">The media path to search for. If the path refers to a resized image (e.g., contains dimensions like _403x328), the method will normalize it to the original file path before searching.</param>
+    /// <returns>The <see cref="IMedia"/> item if found; otherwise, <c>null</c>.</returns>
     public IMedia? GetMediaByPath(string mediaPath)
     {
         var umbracoFileValue = mediaPath;
@@ -545,7 +638,8 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
         // We need to flush the isolated cache by key explicitly here.
         // The MediaCacheRefresher does the same thing, but by the time it's invoked, custom notification handlers
         // might have already consumed the cached version (which at this point is the previous version).
-        IsolatedCache.ClearByKey(RepositoryCacheKeys.GetKey<IMedia, Guid>(entity.Key));
+        // GUID-keyed read repository uses a separate "uRepoGuid_" prefix.
+        IsolatedCache.Clear(RepositoryCacheKeys.GetGuidKey<IMedia>(entity.Key));
     }
 
     protected override void PersistDeletedItem(IMedia entity)
@@ -559,8 +653,15 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
 
     #region Recycle Bin
 
+    /// <summary>
+    /// Gets the unique identifier for the media recycle bin in Umbraco.
+    /// </summary>
     public override int RecycleBinId => Constants.System.RecycleBinMedia;
 
+    /// <summary>
+    /// Determines whether the media recycle bin contains any items.
+    /// </summary>
+    /// <returns><c>true</c> if the recycle bin contains any media items; otherwise, <c>false</c>.</returns>
     public bool RecycleBinSmells()
     {
         IAppPolicyCache cache = _cache.RuntimeCache;
@@ -574,12 +675,49 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
 
     #region Read Repository implementation for Guid keys
 
+    /// <summary>
+    /// Gets a media item by its unique identifier.
+    /// </summary>
+    /// <param name="id">The unique identifier of the media item.</param>
+    /// <returns>The media item if found; otherwise, null.</returns>
     public IMedia? Get(Guid id) => _mediaByGuidReadRepository.Get(id);
 
     IEnumerable<IMedia> IReadRepository<Guid, IMedia>.GetMany(params Guid[]? ids) =>
         _mediaByGuidReadRepository.GetMany(ids);
 
+    /// <summary>
+    /// Determines whether a media item with the specified identifier exists.
+    /// </summary>
+    /// <param name="id">The unique identifier of the media item.</param>
+    /// <returns>True if the media item exists; otherwise, false.</returns>
     public bool Exists(Guid id) => _mediaByGuidReadRepository.Exists(id);
+
+    /// <summary>
+    /// Populates the int-keyed cache with the given entity.
+    /// This allows entities retrieved by GUID to also be cached for int ID lookups.
+    /// </summary>
+    private void PopulateCacheById(IMedia entity)
+    {
+        if (entity.HasIdentity)
+        {
+            var cacheKey = GetCacheKey(entity.Id);
+            IsolatedCache.Insert(cacheKey, () => entity, RepositoryCacheConstants.DefaultCacheDuration, true);
+        }
+    }
+
+    /// <summary>
+    /// Populates the int-keyed cache with the given entities.
+    /// This allows entities retrieved by GUID to also be cached for int ID lookups.
+    /// </summary>
+    private void PopulateCacheById(IEnumerable<IMedia> entities)
+    {
+        foreach (IMedia entity in entities)
+        {
+            PopulateCacheById(entity);
+        }
+    }
+
+    private static string GetCacheKey(int id) => RepositoryCacheKeys.GetKey<IMedia>() + id;
 
     // A reading repository purely for looking up by GUID
     // TODO: This is ugly and to fix we need to decouple the IRepositoryQueryable -> IRepository -> IReadRepository which should all be separate things!
@@ -588,6 +726,15 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
     {
         private readonly MediaRepository _outerRepo;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MediaByGuidReadRepository"/> class.
+        /// </summary>
+        /// <param name="outerRepo">The parent <see cref="MediaRepository"/> used for delegating media operations.</param>
+        /// <param name="scopeAccessor">Provides access to the current database scope.</param>
+        /// <param name="cache">The application-level caches for storing and retrieving media data.</param>
+        /// <param name="logger">The logger used for logging repository operations and errors.</param>
+        /// <param name="repositoryCacheVersionService">Service for managing cache versioning within the repository.</param>
+        /// <param name="cacheSyncService">Service responsible for synchronizing cache across distributed environments.</param>
         public MediaByGuidReadRepository(
             MediaRepository outerRepo,
             IScopeAccessor scopeAccessor,
@@ -603,6 +750,16 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
                 cacheSyncService) =>
             _outerRepo = outerRepo;
 
+        // Use a GUID-specific cache policy with a distinct prefix ("uRepoGuid_IMedia_")
+        // so that GUID-keyed cache entries don't interfere with the parent int-keyed repository's
+        // prefix-based search and count validation in DefaultRepositoryCachePolicy.
+        protected override IRepositoryCachePolicy<IMedia, Guid> CreateCachePolicy()
+            => new GuidReadRepositoryCachePolicy<IMedia>(
+                GlobalIsolatedCache,
+                ScopeAccessor,
+                RepositoryCacheVersionService,
+                CacheSyncService);
+
         protected override IMedia? PerformGet(Guid id)
         {
             Sql<ISqlContext> sql = _outerRepo.GetBaseQuery(QueryType.Single)
@@ -615,9 +772,12 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
                 return null;
             }
 
-            IMedia content = _outerRepo.MapDtoToContent(dto);
+            IMedia media = _outerRepo.MapDtoToContent(dto);
 
-            return content;
+            // Also populate the int-keyed cache so subsequent lookups by int ID don't hit the database
+            _outerRepo.PopulateCacheById(media);
+
+            return media;
         }
 
         protected override IEnumerable<IMedia> PerformGetAll(params Guid[]? ids)
@@ -628,7 +788,13 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
                 sql.WhereIn<NodeDto>(x => x.UniqueId, ids);
             }
 
-            return _outerRepo.MapDtosToContent(Database.Fetch<ContentDto>(sql));
+            // MapDtosToContent returns a materialized array, so this is safe to enumerate multiple times
+            IEnumerable<IMedia> media = _outerRepo.MapDtosToContent(Database.Fetch<ContentDto>(sql));
+
+            // Also populate the int-keyed cache so subsequent lookups by int ID don't hit the database
+            _outerRepo.PopulateCacheById(media);
+
+            return media;
         }
 
         protected override IEnumerable<IMedia> PerformGetByQuery(IQuery<IMedia> query) =>
@@ -648,6 +814,35 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
 
         protected override string GetBaseWhereClause() =>
             throw new InvalidOperationException("This method won't be implemented.");
+
+        /// <summary>
+        /// Populates the GUID-keyed cache with the given entity.
+        /// This allows entities retrieved by int ID to also be cached for GUID lookups.
+        /// </summary>
+        /// <param name="entity">The media entity to cache by its GUID key.</param>
+        public void PopulateCacheByKey(IMedia entity)
+        {
+            if (entity.HasIdentity)
+            {
+                var cacheKey = GetCacheKey(entity.Key);
+                IsolatedCache.Insert(cacheKey, () => entity, RepositoryCacheConstants.DefaultCacheDuration, true);
+            }
+        }
+
+        /// <summary>
+        /// Populates the GUID-keyed cache with the given entities.
+        /// This allows entities retrieved by int ID to also be cached for GUID lookups.
+        /// </summary>
+        /// <param name="entities">The collection of media entities to cache by their GUID keys.</param>
+        public void PopulateCacheByKey(IEnumerable<IMedia> entities)
+        {
+            foreach (IMedia entity in entities)
+            {
+                PopulateCacheByKey(entity);
+            }
+        }
+
+        private static string GetCacheKey(Guid key) => GuidReadRepositoryCachePolicy<IMedia>.GetCacheKey(key);
     }
 
     #endregion

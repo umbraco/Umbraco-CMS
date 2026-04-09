@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Linq;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
@@ -25,7 +24,7 @@ internal sealed class RedirectUrlRepositoryTests : UmbracoIntegrationTest
     public void SetUp() => CreateTestData();
 
     [Test]
-    public void CanSaveAndGet()
+    public void Can_Save_And_Get()
     {
         var provider = ScopeProvider;
 
@@ -51,7 +50,7 @@ internal sealed class RedirectUrlRepositoryTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void CanSaveAndGetWithCulture()
+    public void Can_Save_And_Get_With_Culture()
     {
         var culture = "en";
         using (var scope = ScopeProvider.CreateScope())
@@ -77,7 +76,7 @@ internal sealed class RedirectUrlRepositoryTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void CanSaveAndGetMostRecent()
+    public void Can_Save_And_Get_Most_Recent()
     {
         var provider = ScopeProvider;
 
@@ -120,7 +119,7 @@ internal sealed class RedirectUrlRepositoryTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void CanSaveAndGetMostRecentForCulture()
+    public void Can_Save_And_Get_Most_Recent_For_Culture()
     {
         var cultureA = "en";
         var cultureB = "de";
@@ -165,7 +164,7 @@ internal sealed class RedirectUrlRepositoryTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void CanSaveAndGetByContent()
+    public void Can_Save_And_Get_By_Content()
     {
         var provider = ScopeProvider;
 
@@ -204,7 +203,7 @@ internal sealed class RedirectUrlRepositoryTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void CanSaveAndDelete()
+    public void Can_Save_And_Delete()
     {
         var provider = ScopeProvider;
 
@@ -233,6 +232,118 @@ internal sealed class RedirectUrlRepositoryTests : UmbracoIntegrationTest
             var rurls = repo.GetContentUrls(_textpage.Key);
 
             Assert.AreEqual(0, rurls.Count());
+        }
+    }
+
+    [Test]
+    public void Can_Get_All_Urls_Filtered_By_Root_Content_Id()
+    {
+        var provider = ScopeProvider;
+
+        // Create redirects for content at different levels of the hierarchy (_textpage is root,
+        // _subpage and _otherpage are children of _textpage).
+        using (var scope = provider.CreateScope())
+        {
+            var repo = CreateRepository(provider);
+
+            // Redirect for root page.
+            var rurlRoot = new RedirectUrl { ContentKey = _textpage.Key, Url = "root-redirect" };
+            repo.Save(rurlRoot);
+
+            // Redirect for subpage (child of textpage).
+            var rurlSub = new RedirectUrl
+            {
+                ContentKey = _subpage.Key,
+                Url = "subpage-redirect",
+                CreateDateUtc = rurlRoot.CreateDateUtc.AddSeconds(1)
+            };
+            repo.Save(rurlSub);
+
+            // Redirect for otherpage (child of textpage).
+            var rurlOther = new RedirectUrl
+            {
+                ContentKey = _otherpage.Key,
+                Url = "otherpage-redirect",
+                CreateDateUtc = rurlRoot.CreateDateUtc.AddSeconds(2)
+            };
+            repo.Save(rurlOther);
+
+            scope.Complete();
+        }
+
+        using (var scope = provider.CreateScope())
+        {
+            var repo = CreateRepository(provider);
+
+            // Get all URLs under _textpage (should include _subpage and _otherpage redirects).
+            var rurls = repo.GetAllUrls(_textpage.Id, 0, 100, out var total).ToArray();
+            scope.Complete();
+
+            // Should find redirects for descendants of _textpage.
+            // Note: The query uses path LIKE '%,{rootContentId},%' so it finds descendants, not the root itself.
+            Assert.That(rurls.Length, Is.GreaterThanOrEqualTo(2));
+            Assert.That(rurls.Any(r => r.Url == "subpage-redirect"), Is.True);
+            Assert.That(rurls.Any(r => r.Url == "otherpage-redirect"), Is.True);
+        }
+    }
+
+    [Test]
+    public void Can_Search_Urls()
+    {
+        var provider = ScopeProvider;
+
+        using (var scope = provider.CreateScope())
+        {
+            var repo = CreateRepository(provider);
+
+            var rurl1 = new RedirectUrl { ContentKey = _textpage.Key, Url = "/old-products/widget-123" };
+            repo.Save(rurl1);
+
+            var rurl2 = new RedirectUrl
+            {
+                ContentKey = _subpage.Key,
+                Url = "/old-services/consulting",
+                CreateDateUtc = rurl1.CreateDateUtc.AddSeconds(1)
+            };
+            repo.Save(rurl2);
+
+            var rurl3 = new RedirectUrl
+            {
+                ContentKey = _otherpage.Key,
+                Url = "/old-products/gadget-456",
+                CreateDateUtc = rurl1.CreateDateUtc.AddSeconds(2)
+            };
+            repo.Save(rurl3);
+
+            scope.Complete();
+        }
+
+        using (var scope = provider.CreateScope())
+        {
+            var repo = CreateRepository(provider);
+
+            // Search for URLs containing "products".
+            var rurls = repo.SearchUrls("products", 0, 100, out var total).ToArray();
+            scope.Complete();
+
+            Assert.AreEqual(2, total);
+            Assert.AreEqual(2, rurls.Length);
+            Assert.That(rurls.All(r => r.Url.Contains("products")), Is.True);
+            Assert.That(rurls.Any(r => r.Url == "/old-products/widget-123"), Is.True);
+            Assert.That(rurls.Any(r => r.Url == "/old-products/gadget-456"), Is.True);
+        }
+
+        using (var scope = provider.CreateScope())
+        {
+            var repo = CreateRepository(provider);
+
+            // Search for URLs containing "consulting" - should only find 1.
+            var rurls = repo.SearchUrls("consulting", 0, 100, out var total).ToArray();
+            scope.Complete();
+
+            Assert.AreEqual(1, total);
+            Assert.AreEqual(1, rurls.Length);
+            Assert.AreEqual("/old-services/consulting", rurls[0].Url);
         }
     }
 

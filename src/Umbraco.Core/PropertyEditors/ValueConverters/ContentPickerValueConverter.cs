@@ -9,6 +9,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
+/// <summary>
+///     Provides property value conversion for content picker properties.
+/// </summary>
 public class ContentPickerValueConverter : PropertyValueConverterBase, IDeliveryApiPropertyValueConverter
 {
     private static readonly List<string> PropertiesToExclude = new()
@@ -20,6 +23,11 @@ public class ContentPickerValueConverter : PropertyValueConverterBase, IDelivery
     private readonly IPublishedContentCache _publishedContentCache;
     private readonly IApiContentBuilder _apiContentBuilder;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="ContentPickerValueConverter" /> class.
+    /// </summary>
+    /// <param name="publishedContentCache">The published content cache.</param>
+    /// <param name="apiContentBuilder">The API content builder.</param>
     public ContentPickerValueConverter(
         IPublishedContentCache publishedContentCache,
         IApiContentBuilder apiContentBuilder)
@@ -28,15 +36,19 @@ public class ContentPickerValueConverter : PropertyValueConverterBase, IDelivery
         _apiContentBuilder = apiContentBuilder;
     }
 
+    /// <inheritdoc />
     public override bool IsConverter(IPublishedPropertyType propertyType)
         => propertyType.EditorAlias.Equals(Constants.PropertyEditors.Aliases.ContentPicker);
 
+    /// <inheritdoc />
     public override Type GetPropertyValueType(IPublishedPropertyType propertyType)
         => typeof(IPublishedContent);
 
+    /// <inheritdoc />
     public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
         => PropertyCacheLevel.Elements;
 
+    /// <inheritdoc />
     public override object? ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
     {
         if (source == null)
@@ -71,21 +83,32 @@ public class ContentPickerValueConverter : PropertyValueConverterBase, IDelivery
         return null;
     }
 
+    /// <inheritdoc />
     public override object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
     {
-        IPublishedContent? content = GetContent(propertyType, inter);
-        return content ?? inter;
+        // Built-in routing properties (umbracoInternalRedirectId, umbracoRedirect) are excluded
+        // from content resolution; return the raw intermediate value so PublishedRouter can use it.
+        if (IsExcludedProperty(propertyType))
+        {
+            return inter;
+        }
+
+        return GetContent(propertyType, inter, preview);
     }
 
+    /// <inheritdoc />
     public PropertyCacheLevel GetDeliveryApiPropertyCacheLevel(IPublishedPropertyType propertyType) => GetPropertyCacheLevel(propertyType);
 
+    /// <inheritdoc />
     public PropertyCacheLevel GetDeliveryApiPropertyCacheLevelForExpansion(IPublishedPropertyType propertyType) => PropertyCacheLevel.Snapshot;
 
+    /// <inheritdoc />
     public Type GetDeliveryApiPropertyValueType(IPublishedPropertyType propertyType) => typeof(IApiContent);
 
+    /// <inheritdoc />
     public object? ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview, bool expanding)
     {
-        IPublishedContent? content = GetContent(propertyType, inter);
+        IPublishedContent? content = GetContent(propertyType, inter, preview);
         if (content == null)
         {
             return null;
@@ -94,40 +117,28 @@ public class ContentPickerValueConverter : PropertyValueConverterBase, IDelivery
         return _apiContentBuilder.Build(content);
     }
 
-    private IPublishedContent? GetContent(IPublishedPropertyType propertyType, object? inter)
+    private static bool IsExcludedProperty(IPublishedPropertyType propertyType)
+        => propertyType.Alias is not null
+           && PropertiesToExclude.Contains(propertyType.Alias.ToLower(CultureInfo.InvariantCulture));
+
+    private IPublishedContent? GetContent(IPublishedPropertyType propertyType, object? inter, bool preview)
     {
-        if (inter == null)
+        if (inter is null || IsExcludedProperty(propertyType))
         {
             return null;
         }
 
-        if ((propertyType.Alias != null &&
-             PropertiesToExclude.Contains(propertyType.Alias.ToLower(CultureInfo.InvariantCulture))) == false)
+        if (inter is int id)
         {
-            IPublishedContent? content;
-            if (inter is int id)
-            {
-                content = _publishedContentCache.GetById(id);
-                if (content != null)
-                {
-                    return content;
-                }
-            }
-            else
-            {
-                if (inter is not GuidUdi udi)
-                {
-                    return null;
-                }
-
-                content = _publishedContentCache.GetById(udi.Guid);
-                if (content != null && content.ContentType.ItemType == PublishedItemType.Content)
-                {
-                    return content;
-                }
-            }
+            return _publishedContentCache.GetById(preview, id);
         }
 
-        return null;
+        if (inter is not GuidUdi udi)
+        {
+            return null;
+        }
+
+        IPublishedContent? content = _publishedContentCache.GetById(preview, udi.Guid);
+        return content?.ContentType.ItemType == PublishedItemType.Content ? content : null;
     }
 }

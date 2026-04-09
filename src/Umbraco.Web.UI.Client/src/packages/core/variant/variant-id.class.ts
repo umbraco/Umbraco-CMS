@@ -71,7 +71,7 @@ export class UmbVariantId {
 	}
 
 	public clone(): UmbVariantId {
-		return new UmbVariantId(null, this.segment);
+		return new UmbVariantId(this.culture, this.segment);
 	}
 
 	public toObject(): UmbObjectWithVariantProperties {

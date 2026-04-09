@@ -164,9 +164,9 @@ export class UmbInputDocumentTypeElement extends UmbFormControlMixin<string | un
 			return (x: UmbDocumentTypeTreeItemModel) => !x.isFolder && x.isElement === false;
 		}
 		if (this.elementTypesOnly) {
-			return (x: UmbDocumentTypeTreeItemModel) => x.isElement;
+			return (x: UmbDocumentTypeTreeItemModel) => !x.isFolder && x.isElement;
 		}
-		return undefined;
+		return (x: UmbDocumentTypeTreeItemModel) => !x.isFolder;
 	}
 
 	#openPicker() {

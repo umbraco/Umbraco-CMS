@@ -57,12 +57,29 @@ export class UmbLanguageTableCollectionViewElement extends UmbLitElement {
 		this.consumeContext(UMB_COLLECTION_CONTEXT, (instance) => {
 			this.#collectionContext = instance;
 			this.#observeCollectionItems();
+			this.#observeIsSelectable();
 		});
 	}
 
 	#observeCollectionItems() {
-		if (!this.#collectionContext) return;
-		this.observe(this.#collectionContext.items, (items) => this.#createTableItems(items), 'umbCollectionItemsObserver');
+		this.observe(
+			this.#collectionContext?.items,
+			(items) => this.#createTableItems(items || []),
+			'umbCollectionItemsObserver',
+		);
+	}
+
+	#observeIsSelectable() {
+		this.observe(
+			this.#collectionContext?.selection.selectable,
+			(isSelectable) => {
+				this._tableConfig = {
+					...this._tableConfig,
+					allowSelection: isSelectable ?? false,
+				};
+			},
+			'umbCollectionIsSelectableObserver',
+		);
 	}
 
 	#createTableItems(languages: Array<UmbLanguageDetailModel>) {

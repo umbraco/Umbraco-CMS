@@ -1,3 +1,5 @@
+import { UmbPartialViewFolderStore } from './partial-view-folder.store.js';
+
 export const UMB_PARTIAL_VIEW_FOLDER_REPOSITORY_ALIAS = 'Umb.Repository.PartialView.Folder';
 export const UMB_PARTIAL_VIEW_FOLDER_STORE_ALIAS = 'Umb.Store.PartialView.Folder';
 
@@ -12,6 +14,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'store',
 		alias: UMB_PARTIAL_VIEW_FOLDER_STORE_ALIAS,
 		name: 'Partial View Folder Store',
-		api: () => import('./partial-view-folder.store.js'),
+		api: UmbPartialViewFolderStore,
 	},
 ];

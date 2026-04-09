@@ -31,15 +31,11 @@ public class SmtpCheck : HealthCheck
         _globalSettings = globalSettings;
     }
 
-    /// <summary>
-    ///     Get the status for this health check
-    /// </summary>
+    /// <inheritdoc />
     public override Task<IEnumerable<HealthCheckStatus>> GetStatusAsync() =>
         Task.FromResult(CheckSmtpSettings().Yield());
 
-    /// <summary>
-    ///     Executes the action and returns it's status
-    /// </summary>
+    /// <inheritdoc />
     public override HealthCheckStatus ExecuteAction(HealthCheckAction action)
         => throw new InvalidOperationException("SmtpCheck has no executable actions");
 

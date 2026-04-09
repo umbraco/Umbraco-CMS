@@ -15,9 +15,11 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 [DefaultPropertyValueConverter]
 public class LabelValueConverter : PropertyValueConverterBase
 {
+    /// <inheritdoc />
     public override bool IsConverter(IPublishedPropertyType propertyType)
         => Constants.PropertyEditors.Aliases.Label.Equals(propertyType.EditorAlias);
 
+    /// <inheritdoc />
     public override Type GetPropertyValueType(IPublishedPropertyType propertyType)
     {
         LabelConfiguration? valueType =
@@ -40,9 +42,11 @@ public class LabelValueConverter : PropertyValueConverterBase
         }
     }
 
+    /// <inheritdoc />
     public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
         => PropertyCacheLevel.Element;
 
+    /// <inheritdoc />
     public override object? ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
     {
         LabelConfiguration? valueType =

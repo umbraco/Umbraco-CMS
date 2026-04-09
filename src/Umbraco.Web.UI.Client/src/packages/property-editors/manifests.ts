@@ -13,6 +13,7 @@ import { manifests as colorPickerManifests } from './color-picker/manifests.js';
 import { manifests as datePickerManifests } from './date-picker/manifests.js';
 import { manifests as dateTimeManifests } from './date-time/manifests.js';
 import { manifests as dropdownManifests } from './dropdown/manifests.js';
+import { manifests as entityDataPickerManifests } from './entity-data-picker/manifests.js';
 import { manifests as eyeDropperManifests } from './eye-dropper/manifests.js';
 import { manifests as iconPickerManifests } from './icon-picker/manifests.js';
 import { manifests as labelManifests } from './label/manifests.js';
@@ -33,6 +34,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 	...datePickerManifests,
 	...dateTimeManifests,
 	...dropdownManifests,
+	...entityDataPickerManifests,
 	...eyeDropperManifests,
 	...iconPickerManifests,
 	...labelManifests,

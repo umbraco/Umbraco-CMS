@@ -180,6 +180,8 @@ export class RouterSlot<D = any, P = any> extends HTMLElement implements IRouter
 		this._setParent(null);
 		this._cancelNavigation?.();
 		this.detachListeners();
+		this.clearChildren();
+		this._routeMatch = null;
 	}
 
 	/**

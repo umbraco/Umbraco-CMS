@@ -7,6 +7,9 @@ using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Umbraco.Extensions;
 
+/// <summary>
+/// Provides extension methods for Entity Framework Core DbContext operations.
+/// </summary>
 public static class DbContextExtensions
 {
     /// <summary>
@@ -52,6 +55,13 @@ public static class DbContextExtensions
         return (T?)result;
     }
 
+    /// <summary>
+    /// Migrates the database to a specific migration identified by its type.
+    /// </summary>
+    /// <param name="context">The database context.</param>
+    /// <param name="targetMigration">The type of the target migration.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    /// <exception cref="ArgumentException">Thrown when the type does not have a MigrationAttribute.</exception>
     public static async Task MigrateDatabaseAsync(this DbContext context, Type targetMigration)
     {
         MigrationAttribute? migrationAttribute = targetMigration.GetCustomAttribute<MigrationAttribute>(false);
@@ -64,6 +74,12 @@ public static class DbContextExtensions
         await context.MigrateDatabaseAsync(migrationAttribute.Id);
     }
 
+    /// <summary>
+    /// Migrates the database to a specific migration identified by its ID.
+    /// </summary>
+    /// <param name="context">The database context.</param>
+    /// <param name="targetMigrationId">The ID of the target migration.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
     public static async Task MigrateDatabaseAsync(this DbContext context, string targetMigrationId)
     {
         await context.GetService<IMigrator>().MigrateAsync(targetMigrationId);

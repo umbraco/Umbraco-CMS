@@ -76,6 +76,10 @@ internal static class ServerEventExtensions
         builder.AddNotificationAsyncHandler<ContentMovedToRecycleBinNotification, ServerEventSender>();
         builder.AddNotificationAsyncHandler<MediaMovedToRecycleBinNotification, ServerEventSender>();
 
+        builder.AddNotificationAsyncHandler<ContentTypeChangedNotification, ServerEventSender>();
+        builder.AddNotificationAsyncHandler<MediaTypeChangedNotification, ServerEventSender>();
+        builder.AddNotificationAsyncHandler<MemberTypeChangedNotification, ServerEventSender>();
+
         return builder;
     }
 

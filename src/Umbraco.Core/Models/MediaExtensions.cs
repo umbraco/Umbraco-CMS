@@ -4,6 +4,9 @@ using Umbraco.Cms.Core.PropertyEditors;
 
 namespace Umbraco.Extensions;
 
+/// <summary>
+///     Provides extension methods for <see cref="IMedia" />.
+/// </summary>
 public static class MediaExtensions
 {
     /// <summary>

@@ -11,7 +11,22 @@ export type AllowedDocumentTypeModel = {
     icon?: string | null;
 };
 
+export type AllowedMediaTypeItemResponseModel = {
+    id: string;
+    flags: Array<FlagModel>;
+    name: string;
+    icon?: string | null;
+    matchedFileExtension: boolean;
+};
+
 export type AllowedMediaTypeModel = {
+    id: string;
+    name: string;
+    description?: string | null;
+    icon?: string | null;
+};
+
+export type AllowedMemberTypeModel = {
     id: string;
     name: string;
     description?: string | null;
@@ -77,6 +92,26 @@ export type AvailableMemberTypeCompositionResponseModel = {
     isCompatible: boolean;
 };
 
+export type BatchResponseModelDataTypeResponseModel = {
+    total: number;
+    items: Array<DataTypeResponseModel>;
+};
+
+export type BatchResponseModelDocumentTypeResponseModel = {
+    total: number;
+    items: Array<DocumentTypeResponseModel>;
+};
+
+export type BatchResponseModelMediaTypeResponseModel = {
+    total: number;
+    items: Array<MediaTypeResponseModel>;
+};
+
+export type BatchResponseModelMemberTypeResponseModel = {
+    total: number;
+    items: Array<MemberTypeResponseModel>;
+};
+
 export type CalculatedUserStartNodesResponseModel = {
     id: string;
     documentStartNodeIds: Array<ReferenceByIdModel>;
@@ -119,6 +154,10 @@ export type CopyDocumentTypeRequestModel = {
 };
 
 export type CopyMediaTypeRequestModel = {
+    target?: ReferenceByIdModel | null;
+};
+
+export type CopyMemberTypeRequestModel = {
     target?: ReferenceByIdModel | null;
 };
 
@@ -203,6 +242,12 @@ export type CreateDocumentTypeRequestModel = {
     cleanup: DocumentTypeCleanupModel;
     allowedDocumentTypes: Array<DocumentTypeSortModel>;
     compositions: Array<DocumentTypeCompositionModel>;
+};
+
+export type CreateDocumentTypeTemplateRequestModel = {
+    alias: string;
+    name: string;
+    isDefault: boolean;
 };
 
 export type CreateFolderRequestModel = {
@@ -327,6 +372,7 @@ export type CreateMemberTypeRequestModel = {
     properties: Array<CreateMemberTypePropertyTypeRequestModel>;
     containers: Array<CreateMemberTypePropertyTypeContainerRequestModel>;
     id?: string | null;
+    parent?: ReferenceByIdModel | null;
     compositions: Array<MemberTypeCompositionModel>;
 };
 
@@ -403,6 +449,7 @@ export type CreateUserDataRequestModel = {
 export type CreateUserGroupRequestModel = {
     name: string;
     alias: string;
+    description?: string | null;
     icon?: string | null;
     sections: Array<string>;
     languages: Array<string>;
@@ -412,7 +459,7 @@ export type CreateUserGroupRequestModel = {
     mediaStartNode?: ReferenceByIdModel | null;
     mediaRootAccess: boolean;
     fallbackPermissions: Array<string>;
-    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | DocumentTypePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
+    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
     id?: string | null;
 };
 
@@ -471,7 +518,7 @@ export type CurrentUserResponseModel = {
     hasAccessToAllLanguages: boolean;
     hasAccessToSensitiveData: boolean;
     fallbackPermissions: Array<string>;
-    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | DocumentTypePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
+    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
     allowedSections: Array<string>;
     isAdmin: boolean;
 };
@@ -504,6 +551,22 @@ export type DataTypeResponseModel = {
     id: string;
     isDeletable: boolean;
     canIgnoreStartNodes: boolean;
+};
+
+export type DataTypeSchemaItemResponseModel = {
+    id: string;
+    valueTypeName?: string | null;
+    jsonSchema?: {
+        [key: string]: JsonNode;
+    } | null;
+    error?: string | null;
+};
+
+export type DataTypeSchemaResponseModel = {
+    valueTypeName?: string | null;
+    jsonSchema?: {
+        [key: string]: JsonNode;
+    } | null;
 };
 
 export type DataTypeTreeItemResponseModel = {
@@ -720,6 +783,10 @@ export type DocumentTreeItemResponseModel = {
     variants: Array<DocumentVariantItemResponseModel>;
 };
 
+export type DocumentTypeAllowedParentsResponseModel = {
+    allowedParentIds: Array<ReferenceByIdModel>;
+};
+
 export type DocumentTypeBlueprintItemResponseModel = {
     id: string;
     flags: Array<FlagModel>;
@@ -771,12 +838,6 @@ export type DocumentTypeItemResponseModel = {
     isElement: boolean;
     icon?: string | null;
     description?: string | null;
-};
-
-export type DocumentTypePermissionPresentationModel = {
-    $type: string;
-    verbs: Array<string>;
-    documentTypeAlias: string;
 };
 
 export type DocumentTypePropertyTypeContainerResponseModel = {
@@ -998,6 +1059,11 @@ export enum EventMessageTypeModel {
     WARNING = 'Warning'
 }
 
+export type FetchResponseModelDataTypeSchemaItemResponseModel = {
+    total: number;
+    items: Array<DataTypeSchemaItemResponseModel>;
+};
+
 export type FieldPresentationModel = {
     name: string;
     values: Array<string>;
@@ -1110,6 +1176,10 @@ export type ImportMediaTypeRequestModel = {
     file: ReferenceByIdModel;
 };
 
+export type ImportMemberTypeRequestModel = {
+    file: ReferenceByIdModel;
+};
+
 export type IndexResponseModel = {
     name: string;
     healthStatus: HealthStatusResponseModel;
@@ -1120,6 +1190,7 @@ export type IndexResponseModel = {
     providerProperties?: {
         [key: string]: unknown;
     } | null;
+    uniqueKeyFieldName?: string | null;
 };
 
 export type InstallRequestModel = {
@@ -1142,6 +1213,31 @@ export type InviteUserRequestModel = {
     message?: string | null;
 };
 
+export type ItemAncestorsResponseModelDocumentItemResponseModel = {
+    id: string;
+    ancestors: Array<DocumentItemResponseModel>;
+};
+
+export type ItemAncestorsResponseModelMediaItemResponseModel = {
+    id: string;
+    ancestors: Array<MediaItemResponseModel>;
+};
+
+export type ItemAncestorsResponseModelMemberItemResponseModel = {
+    id: string;
+    ancestors: Array<MemberItemResponseModel>;
+};
+
+export type ItemAncestorsResponseModelNamedItemResponseModel = {
+    id: string;
+    ancestors: Array<NamedItemResponseModel>;
+};
+
+export type ItemAncestorsResponseModelTemplateItemResponseModel = {
+    id: string;
+    ancestors: Array<TemplateItemResponseModel>;
+};
+
 export type ItemReferenceByIdResponseModel = {
     id: string;
 };
@@ -1149,6 +1245,16 @@ export type ItemReferenceByIdResponseModel = {
 export type ItemSortingRequestModel = {
     id: string;
     sortOrder: number;
+};
+
+export type JsonNode = {
+    options?: JsonNodeOptions | null;
+    parent?: JsonNode | null;
+    root: JsonNode;
+};
+
+export type JsonNodeOptions = {
+    propertyNameCaseInsensitive: boolean;
 };
 
 export type LanguageItemResponseModel = {
@@ -1224,6 +1330,9 @@ export type MediaCollectionResponseModel = {
 
 export type MediaConfigurationResponseModel = {
     disableDeleteWhenReferenced: boolean;
+    /**
+     * @deprecated
+     */
     disableUnpublishWhenReferenced: boolean;
 };
 
@@ -1272,6 +1381,10 @@ export type MediaTreeItemResponseModel = {
     createDate: string;
     mediaType: MediaTypeReferenceResponseModel;
     variants: Array<VariantItemResponseModel>;
+};
+
+export type MediaTypeAllowedParentsResponseModel = {
+    allowedParentIds: Array<ReferenceByIdModel>;
 };
 
 export type MediaTypeCollectionReferenceResponseModel = {
@@ -1566,6 +1679,7 @@ export type MemberTypeTreeItemResponseModel = {
     parent?: ReferenceByIdModel | null;
     flags: Array<FlagModel>;
     name: string;
+    isFolder: boolean;
     icon: string;
 };
 
@@ -1636,10 +1750,20 @@ export type MoveMediaTypeRequestModel = {
     target?: ReferenceByIdModel | null;
 };
 
+export type MoveMemberTypeRequestModel = {
+    target?: ReferenceByIdModel | null;
+};
+
 export type NamedEntityTreeItemResponseModel = {
     hasChildren: boolean;
     id: string;
     parent?: ReferenceByIdModel | null;
+    flags: Array<FlagModel>;
+    name: string;
+};
+
+export type NamedItemResponseModel = {
+    id: string;
     flags: Array<FlagModel>;
     name: string;
 };
@@ -1734,6 +1858,11 @@ export type PagedAllowedDocumentTypeModel = {
 export type PagedAllowedMediaTypeModel = {
     total: number;
     items: Array<AllowedMediaTypeModel>;
+};
+
+export type PagedAllowedMemberTypeModel = {
+    total: number;
+    items: Array<AllowedMemberTypeModel>;
 };
 
 export type PagedAuditLogResponseModel = {
@@ -1874,6 +2003,11 @@ export type PagedMemberResponseModel = {
 export type PagedMemberTypeTreeItemResponseModel = {
     total: number;
     items: Array<MemberTypeTreeItemResponseModel>;
+};
+
+export type PagedModelAllowedMediaTypeItemResponseModel = {
+    items: Array<AllowedMediaTypeItemResponseModel>;
+    total: number;
 };
 
 export type PagedModelDataTypeItemResponseModel = {
@@ -2109,6 +2243,7 @@ export type PublicAccessResponseModel = {
     errorDocument: ReferenceByIdModel;
     members: Array<MemberItemResponseModel>;
     groups: Array<MemberGroupItemResponseModel>;
+    isProtectedByAncestor: boolean;
 };
 
 export type PublishDocumentRequestModel = {
@@ -2229,6 +2364,7 @@ export enum RuntimeLevelModel {
     BOOT = 'Boot',
     INSTALL = 'Install',
     UPGRADE = 'Upgrade',
+    UPGRADING = 'Upgrading',
     RUN = 'Run',
     BOOT_FAILED = 'BootFailed'
 }
@@ -2307,6 +2443,7 @@ export type ServerConfigurationResponseModel = {
     allowPasswordReset: boolean;
     versionCheckPeriod: number;
     allowLocalLogin: boolean;
+    umbracoCssPath: string;
 };
 
 export type ServerInformationResponseModel = {
@@ -2560,6 +2697,12 @@ export type TrackedReferenceMemberTypeModel = {
     name?: string | null;
 };
 
+export enum TreeItemKindModel {
+    ITEM = 'Item',
+    FOLDER = 'Folder',
+    ALL = 'All'
+}
+
 export type UnknownTypePermissionPresentationModel = {
     $type: string;
     verbs: Array<string>;
@@ -2803,6 +2946,7 @@ export type UpdateUserDataRequestModel = {
 export type UpdateUserGroupRequestModel = {
     name: string;
     alias: string;
+    description?: string | null;
     icon?: string | null;
     sections: Array<string>;
     languages: Array<string>;
@@ -2812,7 +2956,7 @@ export type UpdateUserGroupRequestModel = {
     mediaStartNode?: ReferenceByIdModel | null;
     mediaRootAccess: boolean;
     fallbackPermissions: Array<string>;
-    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | DocumentTypePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
+    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
 };
 
 export type UpdateUserGroupsOnUserRequestModel = {
@@ -2904,6 +3048,7 @@ export type UserGroupItemResponseModel = {
 export type UserGroupResponseModel = {
     name: string;
     alias: string;
+    description?: string | null;
     icon?: string | null;
     sections: Array<string>;
     languages: Array<string>;
@@ -2913,7 +3058,7 @@ export type UserGroupResponseModel = {
     mediaStartNode?: ReferenceByIdModel | null;
     mediaRootAccess: boolean;
     fallbackPermissions: Array<string>;
-    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | DocumentTypePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
+    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
     id: string;
     isDeletable: boolean;
     aliasCanBeChanged: boolean;
@@ -2923,7 +3068,7 @@ export type UserInstallRequestModel = {
     name: string;
     email: string;
     password: string;
-    readonly subscribeToNewsletter: boolean;
+    subscribeToNewsletter: boolean;
 };
 
 export type UserItemResponseModel = {
@@ -3105,6 +3250,10 @@ export type DocumentVariantResponseModelWritable = {
     flags: Array<FlagModel>;
 };
 
+export type JsonNodeWritable = {
+    [key: string]: never;
+};
+
 export type PackageDefinitionResponseModelWritable = {
     name: string;
     contentNodeId?: string | null;
@@ -3156,12 +3305,6 @@ export type UpgradeSettingsResponseModelWritable = {
     newState: string;
     newVersion: string;
     oldVersion: string;
-};
-
-export type UserInstallRequestModelWritable = {
-    name: string;
-    email: string;
-    password: string;
 };
 
 export type GetCultureData = {
@@ -3467,6 +3610,70 @@ export type GetDataTypeByIdReferencedByResponses = {
 
 export type GetDataTypeByIdReferencedByResponse = GetDataTypeByIdReferencedByResponses[keyof GetDataTypeByIdReferencedByResponses];
 
+export type GetDataTypeByIdSchemaData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/umbraco/management/api/v1/data-type/{id}/schema';
+};
+
+export type GetDataTypeByIdSchemaErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type GetDataTypeByIdSchemaError = GetDataTypeByIdSchemaErrors[keyof GetDataTypeByIdSchemaErrors];
+
+export type GetDataTypeByIdSchemaResponses = {
+    /**
+     * OK
+     */
+    200: DataTypeSchemaResponseModel;
+};
+
+export type GetDataTypeByIdSchemaResponse = GetDataTypeByIdSchemaResponses[keyof GetDataTypeByIdSchemaResponses];
+
+export type GetDataTypeBatchData = {
+    body?: never;
+    path?: never;
+    query?: {
+        id?: Array<string>;
+    };
+    url: '/umbraco/management/api/v1/data-type/batch';
+};
+
+export type GetDataTypeBatchErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type GetDataTypeBatchResponses = {
+    /**
+     * OK
+     */
+    200: BatchResponseModelDataTypeResponseModel;
+};
+
+export type GetDataTypeBatchResponse = GetDataTypeBatchResponses[keyof GetDataTypeBatchResponses];
+
 export type GetDataTypeConfigurationData = {
     body?: never;
     path?: never;
@@ -3638,6 +3845,35 @@ export type PutDataTypeFolderByIdResponses = {
     200: unknown;
 };
 
+export type GetDataTypeSchemasBatchData = {
+    body?: never;
+    path?: never;
+    query?: {
+        id?: Array<string>;
+    };
+    url: '/umbraco/management/api/v1/data-type/schemas/batch';
+};
+
+export type GetDataTypeSchemasBatchErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type GetDataTypeSchemasBatchResponses = {
+    /**
+     * OK
+     */
+    200: FetchResponseModelDataTypeSchemaItemResponseModel;
+};
+
+export type GetDataTypeSchemasBatchResponse = GetDataTypeSchemasBatchResponses[keyof GetDataTypeSchemasBatchResponses];
+
 export type GetFilterDataTypeData = {
     body?: never;
     path?: never;
@@ -3695,6 +3931,31 @@ export type GetItemDataTypeResponses = {
 };
 
 export type GetItemDataTypeResponse = GetItemDataTypeResponses[keyof GetItemDataTypeResponses];
+
+export type GetItemDataTypeAncestorsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        id?: Array<string>;
+    };
+    url: '/umbraco/management/api/v1/item/data-type/ancestors';
+};
+
+export type GetItemDataTypeAncestorsErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+};
+
+export type GetItemDataTypeAncestorsResponses = {
+    /**
+     * OK
+     */
+    200: Array<ItemAncestorsResponseModelNamedItemResponseModel>;
+};
+
+export type GetItemDataTypeAncestorsResponse = GetItemDataTypeAncestorsResponses[keyof GetItemDataTypeAncestorsResponses];
 
 export type GetItemDataTypeSearchData = {
     body?: never;
@@ -3814,6 +4075,38 @@ export type GetTreeDataTypeRootResponses = {
 };
 
 export type GetTreeDataTypeRootResponse = GetTreeDataTypeRootResponses[keyof GetTreeDataTypeRootResponses];
+
+export type GetTreeDataTypeSearchData = {
+    body?: never;
+    path?: never;
+    query?: {
+        query?: string;
+        skip?: number;
+        take?: number;
+        itemKind?: TreeItemKindModel;
+    };
+    url: '/umbraco/management/api/v1/tree/data-type/search';
+};
+
+export type GetTreeDataTypeSearchErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type GetTreeDataTypeSearchResponses = {
+    /**
+     * OK
+     */
+    200: PagedDataTypeTreeItemResponseModel;
+};
+
+export type GetTreeDataTypeSearchResponse = GetTreeDataTypeSearchResponses[keyof GetTreeDataTypeSearchResponses];
 
 export type GetTreeDataTypeSiblingsData = {
     body?: never;
@@ -4394,6 +4687,40 @@ export type PutDocumentBlueprintByIdResponses = {
     200: unknown;
 };
 
+export type GetDocumentBlueprintByIdAuditLogData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: {
+        orderDirection?: DirectionModel;
+        sinceDate?: string;
+        skip?: number;
+        take?: number;
+    };
+    url: '/umbraco/management/api/v1/document-blueprint/{id}/audit-log';
+};
+
+export type GetDocumentBlueprintByIdAuditLogErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type GetDocumentBlueprintByIdAuditLogResponses = {
+    /**
+     * OK
+     */
+    200: PagedAuditLogResponseModel;
+};
+
+export type GetDocumentBlueprintByIdAuditLogResponse = GetDocumentBlueprintByIdAuditLogResponses[keyof GetDocumentBlueprintByIdAuditLogResponses];
+
 export type PutDocumentBlueprintByIdMoveData = {
     body?: MoveDocumentBlueprintRequestModel;
     path: {
@@ -4965,6 +5292,41 @@ export type GetDocumentTypeByIdAllowedChildrenResponses = {
 
 export type GetDocumentTypeByIdAllowedChildrenResponse = GetDocumentTypeByIdAllowedChildrenResponses[keyof GetDocumentTypeByIdAllowedChildrenResponses];
 
+export type GetDocumentTypeByIdAllowedParentsData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/umbraco/management/api/v1/document-type/{id}/allowed-parents';
+};
+
+export type GetDocumentTypeByIdAllowedParentsErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type GetDocumentTypeByIdAllowedParentsError = GetDocumentTypeByIdAllowedParentsErrors[keyof GetDocumentTypeByIdAllowedParentsErrors];
+
+export type GetDocumentTypeByIdAllowedParentsResponses = {
+    /**
+     * OK
+     */
+    200: DocumentTypeAllowedParentsResponseModel;
+};
+
+export type GetDocumentTypeByIdAllowedParentsResponse = GetDocumentTypeByIdAllowedParentsResponses[keyof GetDocumentTypeByIdAllowedParentsResponses];
+
 export type GetDocumentTypeByIdBlueprintData = {
     body?: never;
     path: {
@@ -5188,6 +5550,76 @@ export type PutDocumentTypeByIdMoveResponses = {
     200: unknown;
 };
 
+export type GetDocumentTypeByIdSchemaData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/umbraco/management/api/v1/document-type/{id}/schema';
+};
+
+export type GetDocumentTypeByIdSchemaErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type GetDocumentTypeByIdSchemaError = GetDocumentTypeByIdSchemaErrors[keyof GetDocumentTypeByIdSchemaErrors];
+
+export type GetDocumentTypeByIdSchemaResponses = {
+    /**
+     * OK
+     */
+    200: {
+        [key: string]: JsonNode;
+    };
+};
+
+export type GetDocumentTypeByIdSchemaResponse = GetDocumentTypeByIdSchemaResponses[keyof GetDocumentTypeByIdSchemaResponses];
+
+export type PostDocumentTypeByIdTemplateData = {
+    body?: CreateDocumentTypeTemplateRequestModel;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/umbraco/management/api/v1/document-type/{id}/template';
+};
+
+export type PostDocumentTypeByIdTemplateErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type PostDocumentTypeByIdTemplateError = PostDocumentTypeByIdTemplateErrors[keyof PostDocumentTypeByIdTemplateErrors];
+
+export type PostDocumentTypeByIdTemplateResponses = {
+    /**
+     * Created
+     */
+    201: unknown;
+};
+
 export type GetDocumentTypeAllowedAtRootData = {
     body?: never;
     path?: never;
@@ -5244,6 +5676,35 @@ export type PostDocumentTypeAvailableCompositionsResponses = {
 };
 
 export type PostDocumentTypeAvailableCompositionsResponse = PostDocumentTypeAvailableCompositionsResponses[keyof PostDocumentTypeAvailableCompositionsResponses];
+
+export type GetDocumentTypeBatchData = {
+    body?: never;
+    path?: never;
+    query?: {
+        id?: Array<string>;
+    };
+    url: '/umbraco/management/api/v1/document-type/batch';
+};
+
+export type GetDocumentTypeBatchErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type GetDocumentTypeBatchResponses = {
+    /**
+     * OK
+     */
+    200: BatchResponseModelDocumentTypeResponseModel;
+};
+
+export type GetDocumentTypeBatchResponse = GetDocumentTypeBatchResponses[keyof GetDocumentTypeBatchResponses];
 
 export type GetDocumentTypeConfigurationData = {
     body?: never;
@@ -5476,6 +5937,31 @@ export type GetItemDocumentTypeResponses = {
 
 export type GetItemDocumentTypeResponse = GetItemDocumentTypeResponses[keyof GetItemDocumentTypeResponses];
 
+export type GetItemDocumentTypeAncestorsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        id?: Array<string>;
+    };
+    url: '/umbraco/management/api/v1/item/document-type/ancestors';
+};
+
+export type GetItemDocumentTypeAncestorsErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+};
+
+export type GetItemDocumentTypeAncestorsResponses = {
+    /**
+     * OK
+     */
+    200: Array<ItemAncestorsResponseModelNamedItemResponseModel>;
+};
+
+export type GetItemDocumentTypeAncestorsResponse = GetItemDocumentTypeAncestorsResponses[keyof GetItemDocumentTypeAncestorsResponses];
+
 export type GetItemDocumentTypeSearchData = {
     body?: never;
     path?: never;
@@ -5595,6 +6081,38 @@ export type GetTreeDocumentTypeRootResponses = {
 };
 
 export type GetTreeDocumentTypeRootResponse = GetTreeDocumentTypeRootResponses[keyof GetTreeDocumentTypeRootResponses];
+
+export type GetTreeDocumentTypeSearchData = {
+    body?: never;
+    path?: never;
+    query?: {
+        query?: string;
+        skip?: number;
+        take?: number;
+        itemKind?: TreeItemKindModel;
+    };
+    url: '/umbraco/management/api/v1/tree/document-type/search';
+};
+
+export type GetTreeDocumentTypeSearchErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type GetTreeDocumentTypeSearchResponses = {
+    /**
+     * OK
+     */
+    200: PagedDocumentTypeTreeItemResponseModel;
+};
+
+export type GetTreeDocumentTypeSearchResponse = GetTreeDocumentTypeSearchResponses[keyof GetTreeDocumentTypeSearchResponses];
 
 export type GetTreeDocumentTypeSiblingsData = {
     body?: never;
@@ -6378,7 +6896,9 @@ export type GetDocumentByIdPublicAccessData = {
     path: {
         id: string;
     };
-    query?: never;
+    query?: {
+        includeAncestors?: boolean;
+    };
     url: '/umbraco/management/api/v1/document/{id}/public-access';
 };
 
@@ -6646,7 +7166,13 @@ export type GetDocumentByIdReferencedByErrors = {
      * The authenticated user does not have access to this resource
      */
     403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
 };
+
+export type GetDocumentByIdReferencedByError = GetDocumentByIdReferencedByErrors[keyof GetDocumentByIdReferencedByErrors];
 
 export type GetDocumentByIdReferencedByResponses = {
     /**
@@ -6678,7 +7204,13 @@ export type GetDocumentByIdReferencedDescendantsErrors = {
      * The authenticated user does not have access to this resource
      */
     403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
 };
+
+export type GetDocumentByIdReferencedDescendantsError = GetDocumentByIdReferencedDescendantsErrors[keyof GetDocumentByIdReferencedDescendantsErrors];
 
 export type GetDocumentByIdReferencedDescendantsResponses = {
     /**
@@ -6944,6 +7476,31 @@ export type GetItemDocumentResponses = {
 };
 
 export type GetItemDocumentResponse = GetItemDocumentResponses[keyof GetItemDocumentResponses];
+
+export type GetItemDocumentAncestorsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        id?: Array<string>;
+    };
+    url: '/umbraco/management/api/v1/item/document/ancestors';
+};
+
+export type GetItemDocumentAncestorsErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+};
+
+export type GetItemDocumentAncestorsResponses = {
+    /**
+     * OK
+     */
+    200: Array<ItemAncestorsResponseModelDocumentItemResponseModel>;
+};
+
+export type GetItemDocumentAncestorsResponse = GetItemDocumentAncestorsResponses[keyof GetItemDocumentAncestorsResponses];
 
 export type GetItemDocumentSearchData = {
     body?: never;
@@ -7598,6 +8155,7 @@ export type GetImagingResizeUrlsData = {
         height?: number;
         width?: number;
         mode?: ImageCropModeModel;
+        format?: string;
     };
     url: '/umbraco/management/api/v1/imaging/resize/urls';
 };
@@ -8455,10 +9013,35 @@ export type GetItemMediaTypeAllowedResponses = {
     /**
      * OK
      */
-    200: PagedModelMediaTypeItemResponseModel;
+    200: PagedModelAllowedMediaTypeItemResponseModel;
 };
 
 export type GetItemMediaTypeAllowedResponse = GetItemMediaTypeAllowedResponses[keyof GetItemMediaTypeAllowedResponses];
+
+export type GetItemMediaTypeAncestorsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        id?: Array<string>;
+    };
+    url: '/umbraco/management/api/v1/item/media-type/ancestors';
+};
+
+export type GetItemMediaTypeAncestorsErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+};
+
+export type GetItemMediaTypeAncestorsResponses = {
+    /**
+     * OK
+     */
+    200: Array<ItemAncestorsResponseModelNamedItemResponseModel>;
+};
+
+export type GetItemMediaTypeAncestorsResponse = GetItemMediaTypeAncestorsResponses[keyof GetItemMediaTypeAncestorsResponses];
 
 export type GetItemMediaTypeFoldersData = {
     body?: never;
@@ -8692,6 +9275,41 @@ export type GetMediaTypeByIdAllowedChildrenResponses = {
 
 export type GetMediaTypeByIdAllowedChildrenResponse = GetMediaTypeByIdAllowedChildrenResponses[keyof GetMediaTypeByIdAllowedChildrenResponses];
 
+export type GetMediaTypeByIdAllowedParentsData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/umbraco/management/api/v1/media-type/{id}/allowed-parents';
+};
+
+export type GetMediaTypeByIdAllowedParentsErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type GetMediaTypeByIdAllowedParentsError = GetMediaTypeByIdAllowedParentsErrors[keyof GetMediaTypeByIdAllowedParentsErrors];
+
+export type GetMediaTypeByIdAllowedParentsResponses = {
+    /**
+     * OK
+     */
+    200: MediaTypeAllowedParentsResponseModel;
+};
+
+export type GetMediaTypeByIdAllowedParentsResponse = GetMediaTypeByIdAllowedParentsResponses[keyof GetMediaTypeByIdAllowedParentsResponses];
+
 export type GetMediaTypeByIdCompositionReferencesData = {
     body?: never;
     path: {
@@ -8877,6 +9495,43 @@ export type PutMediaTypeByIdMoveResponses = {
     200: unknown;
 };
 
+export type GetMediaTypeByIdSchemaData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/umbraco/management/api/v1/media-type/{id}/schema';
+};
+
+export type GetMediaTypeByIdSchemaErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type GetMediaTypeByIdSchemaError = GetMediaTypeByIdSchemaErrors[keyof GetMediaTypeByIdSchemaErrors];
+
+export type GetMediaTypeByIdSchemaResponses = {
+    /**
+     * OK
+     */
+    200: {
+        [key: string]: JsonNode;
+    };
+};
+
+export type GetMediaTypeByIdSchemaResponse = GetMediaTypeByIdSchemaResponses[keyof GetMediaTypeByIdSchemaResponses];
+
 export type GetMediaTypeAllowedAtRootData = {
     body?: never;
     path?: never;
@@ -8933,6 +9588,35 @@ export type PostMediaTypeAvailableCompositionsResponses = {
 };
 
 export type PostMediaTypeAvailableCompositionsResponse = PostMediaTypeAvailableCompositionsResponses[keyof PostMediaTypeAvailableCompositionsResponses];
+
+export type GetMediaTypeBatchData = {
+    body?: never;
+    path?: never;
+    query?: {
+        id?: Array<string>;
+    };
+    url: '/umbraco/management/api/v1/media-type/batch';
+};
+
+export type GetMediaTypeBatchErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type GetMediaTypeBatchResponses = {
+    /**
+     * OK
+     */
+    200: BatchResponseModelMediaTypeResponseModel;
+};
+
+export type GetMediaTypeBatchResponse = GetMediaTypeBatchResponses[keyof GetMediaTypeBatchResponses];
 
 export type GetMediaTypeConfigurationData = {
     body?: never;
@@ -9334,6 +10018,31 @@ export type GetItemMediaResponses = {
 
 export type GetItemMediaResponse = GetItemMediaResponses[keyof GetItemMediaResponses];
 
+export type GetItemMediaAncestorsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        id?: Array<string>;
+    };
+    url: '/umbraco/management/api/v1/item/media/ancestors';
+};
+
+export type GetItemMediaAncestorsErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+};
+
+export type GetItemMediaAncestorsResponses = {
+    /**
+     * OK
+     */
+    200: Array<ItemAncestorsResponseModelMediaItemResponseModel>;
+};
+
+export type GetItemMediaAncestorsResponse = GetItemMediaAncestorsResponses[keyof GetItemMediaAncestorsResponses];
+
 export type GetItemMediaSearchData = {
     body?: never;
     path?: never;
@@ -9635,7 +10344,13 @@ export type GetMediaByIdReferencedByErrors = {
      * The authenticated user does not have access to this resource
      */
     403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
 };
+
+export type GetMediaByIdReferencedByError = GetMediaByIdReferencedByErrors[keyof GetMediaByIdReferencedByErrors];
 
 export type GetMediaByIdReferencedByResponses = {
     /**
@@ -9667,7 +10382,13 @@ export type GetMediaByIdReferencedDescendantsErrors = {
      * The authenticated user does not have access to this resource
      */
     403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
 };
+
+export type GetMediaByIdReferencedDescendantsError = GetMediaByIdReferencedDescendantsErrors[keyof GetMediaByIdReferencedDescendantsErrors];
 
 export type GetMediaByIdReferencedDescendantsResponses = {
     /**
@@ -10511,6 +11232,31 @@ export type GetItemMemberTypeResponses = {
 
 export type GetItemMemberTypeResponse = GetItemMemberTypeResponses[keyof GetItemMemberTypeResponses];
 
+export type GetItemMemberTypeAncestorsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        id?: Array<string>;
+    };
+    url: '/umbraco/management/api/v1/item/member-type/ancestors';
+};
+
+export type GetItemMemberTypeAncestorsErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+};
+
+export type GetItemMemberTypeAncestorsResponses = {
+    /**
+     * OK
+     */
+    200: Array<ItemAncestorsResponseModelNamedItemResponseModel>;
+};
+
+export type GetItemMemberTypeAncestorsResponse = GetItemMemberTypeAncestorsResponses[keyof GetItemMemberTypeAncestorsResponses];
+
 export type GetItemMemberTypeSearchData = {
     body?: never;
     path?: never;
@@ -10718,7 +11464,7 @@ export type GetMemberTypeByIdCompositionReferencesResponses = {
 export type GetMemberTypeByIdCompositionReferencesResponse = GetMemberTypeByIdCompositionReferencesResponses[keyof GetMemberTypeByIdCompositionReferencesResponses];
 
 export type PostMemberTypeByIdCopyData = {
-    body?: never;
+    body?: CopyMemberTypeRequestModel;
     path: {
         id: string;
     };
@@ -10754,6 +11500,182 @@ export type PostMemberTypeByIdCopyResponses = {
     201: unknown;
 };
 
+export type GetMemberTypeByIdExportData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/umbraco/management/api/v1/member-type/{id}/export';
+};
+
+export type GetMemberTypeByIdExportErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type GetMemberTypeByIdExportError = GetMemberTypeByIdExportErrors[keyof GetMemberTypeByIdExportErrors];
+
+export type GetMemberTypeByIdExportResponses = {
+    /**
+     * OK
+     */
+    200: Blob | File;
+};
+
+export type GetMemberTypeByIdExportResponse = GetMemberTypeByIdExportResponses[keyof GetMemberTypeByIdExportResponses];
+
+export type PutMemberTypeByIdImportData = {
+    body?: ImportMemberTypeRequestModel;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/umbraco/management/api/v1/member-type/{id}/import';
+};
+
+export type PutMemberTypeByIdImportErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type PutMemberTypeByIdImportError = PutMemberTypeByIdImportErrors[keyof PutMemberTypeByIdImportErrors];
+
+export type PutMemberTypeByIdImportResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
+export type PutMemberTypeByIdMoveData = {
+    body?: MoveMemberTypeRequestModel;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/umbraco/management/api/v1/member-type/{id}/move';
+};
+
+export type PutMemberTypeByIdMoveErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type PutMemberTypeByIdMoveError = PutMemberTypeByIdMoveErrors[keyof PutMemberTypeByIdMoveErrors];
+
+export type PutMemberTypeByIdMoveResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
+export type GetMemberTypeByIdSchemaData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/umbraco/management/api/v1/member-type/{id}/schema';
+};
+
+export type GetMemberTypeByIdSchemaErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type GetMemberTypeByIdSchemaError = GetMemberTypeByIdSchemaErrors[keyof GetMemberTypeByIdSchemaErrors];
+
+export type GetMemberTypeByIdSchemaResponses = {
+    /**
+     * OK
+     */
+    200: {
+        [key: string]: JsonNode;
+    };
+};
+
+export type GetMemberTypeByIdSchemaResponse = GetMemberTypeByIdSchemaResponses[keyof GetMemberTypeByIdSchemaResponses];
+
+export type GetMemberTypeAllowedAtRootData = {
+    body?: never;
+    path?: never;
+    query?: {
+        skip?: number;
+        take?: number;
+    };
+    url: '/umbraco/management/api/v1/member-type/allowed-at-root';
+};
+
+export type GetMemberTypeAllowedAtRootErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type GetMemberTypeAllowedAtRootResponses = {
+    /**
+     * OK
+     */
+    200: PagedAllowedMemberTypeModel;
+};
+
+export type GetMemberTypeAllowedAtRootResponse = GetMemberTypeAllowedAtRootResponses[keyof GetMemberTypeAllowedAtRootResponses];
+
 export type PostMemberTypeAvailableCompositionsData = {
     body?: MemberTypeCompositionRequestModel;
     path?: never;
@@ -10780,6 +11702,35 @@ export type PostMemberTypeAvailableCompositionsResponses = {
 };
 
 export type PostMemberTypeAvailableCompositionsResponse = PostMemberTypeAvailableCompositionsResponses[keyof PostMemberTypeAvailableCompositionsResponses];
+
+export type GetMemberTypeBatchData = {
+    body?: never;
+    path?: never;
+    query?: {
+        id?: Array<string>;
+    };
+    url: '/umbraco/management/api/v1/member-type/batch';
+};
+
+export type GetMemberTypeBatchErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type GetMemberTypeBatchResponses = {
+    /**
+     * OK
+     */
+    200: BatchResponseModelMemberTypeResponseModel;
+};
+
+export type GetMemberTypeBatchResponse = GetMemberTypeBatchResponses[keyof GetMemberTypeBatchResponses];
 
 export type GetMemberTypeConfigurationData = {
     body?: never;
@@ -10952,12 +11903,109 @@ export type PutMemberTypeFolderByIdResponses = {
     200: unknown;
 };
 
+export type PostMemberTypeImportData = {
+    body?: ImportMemberTypeRequestModel;
+    path?: never;
+    query?: never;
+    url: '/umbraco/management/api/v1/member-type/import';
+};
+
+export type PostMemberTypeImportErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type PostMemberTypeImportError = PostMemberTypeImportErrors[keyof PostMemberTypeImportErrors];
+
+export type PostMemberTypeImportResponses = {
+    /**
+     * Created
+     */
+    201: unknown;
+};
+
+export type GetTreeMemberTypeAncestorsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        descendantId?: string;
+    };
+    url: '/umbraco/management/api/v1/tree/member-type/ancestors';
+};
+
+export type GetTreeMemberTypeAncestorsErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type GetTreeMemberTypeAncestorsResponses = {
+    /**
+     * OK
+     */
+    200: Array<MemberTypeTreeItemResponseModel>;
+};
+
+export type GetTreeMemberTypeAncestorsResponse = GetTreeMemberTypeAncestorsResponses[keyof GetTreeMemberTypeAncestorsResponses];
+
+export type GetTreeMemberTypeChildrenData = {
+    body?: never;
+    path?: never;
+    query?: {
+        parentId?: string;
+        skip?: number;
+        take?: number;
+        foldersOnly?: boolean;
+    };
+    url: '/umbraco/management/api/v1/tree/member-type/children';
+};
+
+export type GetTreeMemberTypeChildrenErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type GetTreeMemberTypeChildrenResponses = {
+    /**
+     * OK
+     */
+    200: PagedMemberTypeTreeItemResponseModel;
+};
+
+export type GetTreeMemberTypeChildrenResponse = GetTreeMemberTypeChildrenResponses[keyof GetTreeMemberTypeChildrenResponses];
+
 export type GetTreeMemberTypeRootData = {
     body?: never;
     path?: never;
     query?: {
         skip?: number;
         take?: number;
+        foldersOnly?: boolean;
     };
     url: '/umbraco/management/api/v1/tree/member-type/root';
 };
@@ -10989,6 +12037,7 @@ export type GetTreeMemberTypeSiblingsData = {
         target?: string;
         before?: number;
         after?: number;
+        foldersOnly?: boolean;
     };
     url: '/umbraco/management/api/v1/tree/member-type/siblings';
 };
@@ -11080,6 +12129,31 @@ export type GetItemMemberResponses = {
 };
 
 export type GetItemMemberResponse = GetItemMemberResponses[keyof GetItemMemberResponses];
+
+export type GetItemMemberAncestorsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        id?: Array<string>;
+    };
+    url: '/umbraco/management/api/v1/item/member/ancestors';
+};
+
+export type GetItemMemberAncestorsErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+};
+
+export type GetItemMemberAncestorsResponses = {
+    /**
+     * OK
+     */
+    200: Array<ItemAncestorsResponseModelMemberItemResponseModel>;
+};
+
+export type GetItemMemberAncestorsResponse = GetItemMemberAncestorsResponses[keyof GetItemMemberAncestorsResponses];
 
 export type GetItemMemberSearchData = {
     body?: never;
@@ -11274,7 +12348,13 @@ export type GetMemberByIdReferencedByErrors = {
      * The authenticated user does not have access to this resource
      */
     403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
 };
+
+export type GetMemberByIdReferencedByError = GetMemberByIdReferencedByErrors[keyof GetMemberByIdReferencedByErrors];
 
 export type GetMemberByIdReferencedByResponses = {
     /**
@@ -11306,7 +12386,13 @@ export type GetMemberByIdReferencedDescendantsErrors = {
      * The authenticated user does not have access to this resource
      */
     403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
 };
+
+export type GetMemberByIdReferencedDescendantsError = GetMemberByIdReferencedDescendantsErrors[keyof GetMemberByIdReferencedDescendantsErrors];
 
 export type GetMemberByIdReferencedDescendantsResponses = {
     /**
@@ -14315,6 +15401,31 @@ export type GetItemTemplateResponses = {
 };
 
 export type GetItemTemplateResponse = GetItemTemplateResponses[keyof GetItemTemplateResponses];
+
+export type GetItemTemplateAncestorsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        id?: Array<string>;
+    };
+    url: '/umbraco/management/api/v1/item/template/ancestors';
+};
+
+export type GetItemTemplateAncestorsErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+};
+
+export type GetItemTemplateAncestorsResponses = {
+    /**
+     * OK
+     */
+    200: Array<ItemAncestorsResponseModelTemplateItemResponseModel>;
+};
+
+export type GetItemTemplateAncestorsResponse = GetItemTemplateAncestorsResponses[keyof GetItemTemplateAncestorsResponses];
 
 export type GetItemTemplateSearchData = {
     body?: never;

@@ -1,5 +1,8 @@
 namespace Umbraco.Cms.Core.Manifest;
 
+/// <summary>
+///     Specifies the bundling options for assets in a package.
+/// </summary>
 public enum BundleOptions
 {
     /// <summary>

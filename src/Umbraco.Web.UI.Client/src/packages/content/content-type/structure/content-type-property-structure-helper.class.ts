@@ -64,8 +64,35 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 	}
 
 	#observeContainer() {
+		// Handle three cases:
+		// 1. containerId === undefined → Not set yet, clear properties
+		// 2. containerId === null → Root properties (no container)
+		// 3. containerId === string → Container-based properties
+
+		if (this.#containerId === undefined) {
+			// Not set yet, clear properties
+			this.#propertyStructure.setValue([]);
+			this.removeUmbControllerByAlias('observeProperties');
+			this.removeUmbControllerByAlias('observeContainer');
+			return;
+		}
+
+		if (this.#containerId === null) {
+			// Root properties (no container)
+			this.removeUmbControllerByAlias('observeContainer');
+			this.observe(
+				this.#structure?.rootPropertyStructures(),
+				(properties) => {
+					this.#propertyStructure.setValue(properties ?? []);
+				},
+				'observeProperties',
+			);
+			return;
+		}
+
+		// Container-based properties
 		this.observe(
-			this.#containerId ? this.#structure?.mergedContainersOfId(this.#containerId) : undefined,
+			this.#structure?.mergedContainersOfId(this.#containerId),
 			(container) => {
 				this.observe(
 					container ? this.#structure?.propertyStructuresOfGroupIds(container.ids ?? []) : undefined,

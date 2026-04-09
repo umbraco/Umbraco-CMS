@@ -9,6 +9,10 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.MediaType;
 
+/// <summary>
+/// Abstract base controller providing common functionality for managing media types in the Umbraco CMS API.
+/// Intended to be inherited by specific media type management controllers.
+/// </summary>
 [VersionedApiBackOfficeRoute(Constants.UdiEntityType.MediaType)]
 [ApiExplorerSettings(GroupName = "Media Type")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessMediaOrMediaTypes)]
@@ -31,7 +35,7 @@ public abstract class MediaTypeControllerBase : ManagementApiControllerBase
                 .WithDetail("The import failed due to not being able to convert the file into proper xml.")
                 .Build()),
             MediaTypeImportOperationStatus.MediaTypeExists => BadRequest(problemDetailsBuilder
-                .WithTitle("Failed to import because media type exits")
+                .WithTitle("Failed to import because media type exists")
                 .WithDetail("The import failed because the media type that was being imported already exits.")
                 .Build()),
             MediaTypeImportOperationStatus.TypeMismatch => BadRequest(problemDetailsBuilder
@@ -42,6 +46,6 @@ public abstract class MediaTypeControllerBase : ManagementApiControllerBase
                 .WithTitle("Invalid Id")
                 .WithDetail("The import failed because the id of the media type you are trying to update did not match the id in the file.")
                 .Build()),
-            _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown media type import operation status.")
+            _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown media type import operation status."),
         });
 }

@@ -212,7 +212,6 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 				<uui-table-cell>
 					<a href="${data.originalUrl || '#'}" target="_blank">
 						<span>${data.originalUrl}</span>
-						<uui-icon name="icon-out"></uui-icon>
 					</a>
 				</uui-table-cell>
 				<uui-table-cell>
@@ -221,7 +220,6 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 				<uui-table-cell>
 					<a href="${data.destinationUrl || '#'}" target="_blank">
 						<span>${data.destinationUrl}</span>
-						<uui-icon name="icon-out"></uui-icon>
 					</a>
 				</uui-table-cell>
 				<uui-table-cell>

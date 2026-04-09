@@ -7,6 +7,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Exceptions;
 
+#pragma warning disable ASPDEPR003 // MvcRazorRuntimeCompilationOptions is obsolete - intentional use for development-mode runtime compilation
+
 namespace Umbraco.Cms.DevelopmentMode.Backoffice.InMemoryAuto;
 
 internal sealed class UmbracoViewCompilerProvider : IViewCompilerProvider

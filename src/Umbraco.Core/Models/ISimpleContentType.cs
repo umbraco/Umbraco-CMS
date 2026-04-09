@@ -5,10 +5,19 @@ namespace Umbraco.Cms.Core.Models;
 /// </summary>
 public interface ISimpleContentType
 {
+    /// <summary>
+    ///     Gets the integer identifier of the content type.
+    /// </summary>
     int Id { get; }
 
+    /// <summary>
+    ///     Gets the unique identifier of the content type.
+    /// </summary>
     Guid Key { get; }
 
+    /// <summary>
+    ///     Gets the name of the content type.
+    /// </summary>
     string? Name { get; }
 
     /// <summary>

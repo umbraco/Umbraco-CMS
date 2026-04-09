@@ -20,6 +20,9 @@ public static partial class Constants
         /// </summary>
         public const string WebhookFiring = "Umbraco:HttpClients:WebhookFiring";
 
+        /// <summary>
+        ///     Contains HTTP header constants for Umbraco HTTP clients.
+        /// </summary>
         public static class Headers
         {
             /// <summary>

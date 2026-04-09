@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.ViewModels.User.Current;
@@ -11,6 +11,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.User.Current;
 
+/// <summary>
+/// Provides an API controller for retrieving the current user's media permissions.
+/// </summary>
 [ApiVersion("1.0")]
 public class GetMediaPermissionsCurrentUserController : CurrentUserControllerBase
 {
@@ -18,6 +21,12 @@ public class GetMediaPermissionsCurrentUserController : CurrentUserControllerBas
     private readonly IUserService _userService;
     private readonly IUmbracoMapper _mapper;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="GetMediaPermissionsCurrentUserController"/> class, which handles requests for retrieving media permissions for the current user.
+    /// </summary>
+    /// <param name="backOfficeSecurityAccessor">Provides access to back office security information for the current user.</param>
+    /// <param name="userService">Service used to manage and retrieve user information.</param>
+    /// <param name="mapper">The Umbraco object mapper used for mapping between domain and API models.</param>
     public GetMediaPermissionsCurrentUserController(
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
         IUserService userService,
@@ -32,6 +41,8 @@ public class GetMediaPermissionsCurrentUserController : CurrentUserControllerBas
     [HttpGet("permissions/media")]
     [ProducesResponseType(typeof(UserPermissionsResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Gets media permissions for the current user.")]
+    [EndpointDescription("Gets the media permissions for the currently authenticated user.")]
     public async Task<IActionResult> GetPermissions(
         CancellationToken cancellationToken,
         [FromQuery(Name = "id")] HashSet<Guid> ids)

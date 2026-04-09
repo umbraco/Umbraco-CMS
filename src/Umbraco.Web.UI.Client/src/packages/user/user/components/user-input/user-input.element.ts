@@ -1,16 +1,28 @@
 import type { UmbUserItemModel } from '../../repository/index.js';
 import { UmbUserPickerInputContext } from './user-input.context.js';
-import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import {
+	css,
+	customElement,
+	html,
+	ifDefined,
+	nothing,
+	property,
+	repeat,
+	state,
+} from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
-import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import type { UmbRepositoryItemsStatus } from '@umbraco-cms/backoffice/repository';
 
 // TODO: Shall we rename to 'umb-input-user'? [LK]
 @customElement('umb-user-input')
-export class UmbUserInputElement extends UUIFormControlMixin(UmbLitElement, '') {
+export class UmbUserInputElement extends UmbFormControlMixin<string, typeof UmbLitElement, undefined>(
+	UmbLitElement,
+	undefined,
+) {
 	#sorter = new UmbSorterController<string>(this, {
 		getUniqueOfElement: (element) => {
 			return element.id;
@@ -26,6 +38,25 @@ export class UmbUserInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 			this.dispatchEvent(new UmbChangeEvent());
 		},
 	});
+
+	/**
+	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
+	 * @type {boolean}
+	 * @attr
+	 * @default false
+	 */
+	@property({ type: Boolean, reflect: true })
+	readonly = false;
+
+	/**
+	 * Sets the input to required, meaning validation will fail if the value is empty.
+	 * @type {boolean}
+	 */
+	@property({ type: Boolean })
+	required?: boolean;
+
+	@property({ type: String })
+	requiredMessage?: string;
 
 	/**
 	 * This is a minimum amount of selected items in this input.
@@ -48,7 +79,7 @@ export class UmbUserInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 	 * @default
 	 */
 	@property({ type: String, attribute: 'min-message' })
-	minMessage = 'This field need more items';
+	minMessage = 'This field needs more items';
 
 	/**
 	 * This is a maximum amount of selected items in this input.
@@ -70,7 +101,7 @@ export class UmbUserInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 	 * @attr
 	 * @default
 	 */
-	@property({ type: String, attribute: 'min-message' })
+	@property({ type: String, attribute: 'max-message' })
 	maxMessage = 'This field exceeds the allowed amount of items';
 
 	@property({ type: Array })
@@ -83,10 +114,10 @@ export class UmbUserInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 	}
 
 	@property()
-	public override set value(uniques: string) {
+	public override set value(uniques: string | undefined) {
 		this.selection = splitStringToArray(uniques);
 	}
-	public override get value(): string {
+	public override get value(): string | undefined {
 		return this.selection.join(',');
 	}
 
@@ -96,10 +127,19 @@ export class UmbUserInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 	@state()
 	private _statuses?: Array<UmbRepositoryItemsStatus>;
 
+	@state()
+	private _modalRoute?: string;
+
 	#pickerContext = new UmbUserPickerInputContext(this);
 
 	constructor() {
 		super();
+
+		this.addValidator(
+			'valueMissing',
+			() => this.requiredMessage ?? UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
+			() => !this.readonly && !!this.required && (this.value === undefined || this.value === null || this.value === ''),
+		);
 
 		this.addValidator(
 			'rangeUnderflow',
@@ -113,17 +153,21 @@ export class UmbUserInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 			() => !!this.max && this.#pickerContext.getSelection().length > this.max,
 		);
 
-		this.observe(this.#pickerContext.selection, (selection) => (this.value = selection.join(',')), '_observeSelection');
-		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems), '_observerItems');
-		this.observe(this.#pickerContext.statuses, (statuses) => (this._statuses = statuses), '_observeStatuses');
+		this.observe(this.#pickerContext.selection, (selection) => (this.value = selection.join(',')), null);
+		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems), null);
+		this.observe(this.#pickerContext.statuses, (statuses) => (this._statuses = statuses), null);
+
+		this.observe(
+			this.#pickerContext.modalRoute,
+			(modalRoute) => {
+				this._modalRoute = modalRoute;
+			},
+			null,
+		);
 	}
 
 	protected override getFormElement() {
 		return undefined;
-	}
-
-	#openPicker() {
-		this.#pickerContext.openPicker({});
 	}
 
 	#removeItem(unique: string) {
@@ -140,8 +184,9 @@ export class UmbUserInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 			<uui-button
 				id="btn-add"
 				look="placeholder"
+				href=${ifDefined(this._modalRoute)}
 				label=${this.localize.term('general_choose')}
-				@click=${this.#openPicker}></uui-button>
+				?disabled=${this.readonly}></uui-button>
 		`;
 	}
 
@@ -169,7 +214,8 @@ export class UmbUserInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 				?error=${isError}
 				.errorMessage=${status.state.error}
 				.errorDetail=${isError ? unique : undefined}
-				?standalone=${this.max === 1}>
+				?standalone=${this.max === 1}
+				?readonly=${this.readonly}>
 				<uui-action-bar slot="actions">
 					<uui-button
 						label=${this.localize.term('general_remove')}

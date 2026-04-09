@@ -11,3 +11,9 @@ export class UmbFocalPointChangeEvent extends Event {
 		this.focalPoint = focalPoint;
 	}
 }
+
+declare global {
+	interface GlobalEventHandlersEventMap {
+		[UmbFocalPointChangeEvent.TYPE]: UmbFocalPointChangeEvent;
+	}
+}

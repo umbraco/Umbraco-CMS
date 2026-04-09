@@ -18,8 +18,9 @@ export class UmbStaticFilePickerInputContext extends UmbPickerInputContext<
 		super(host, UMB_STATIC_FILE_ITEM_REPOSITORY_ALIAS, UMB_STATIC_FILE_PICKER_MODAL);
 	}
 
-	protected override getItemDisplayName(item: UmbStaticFileItemModel | undefined, unique: string): string {
+	protected override async _requestItemName(unique: string): Promise<string> {
 		// If item doesn't exist, use the file path as the name
+		const item = this.getSelectedItemByUnique(unique);
 		return item?.name ?? this.#serializer.toServerPath(unique) ?? unique;
 	}
 }

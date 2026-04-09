@@ -7,8 +7,10 @@ export interface UmbCollectionItemPickerModalData<CollectionItemType = UmbEntity
 }
 
 export interface UmbCollectionItemPickerModalCollectionConfig<FilterArgsType = Record<string, unknown>> {
-	menuAlias: string;
+	alias?: string;
+	menuAlias?: string;
 	filterArgs?: FilterArgsType;
+	views?: Array<{ alias: string }>;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type

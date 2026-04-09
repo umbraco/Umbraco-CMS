@@ -1,11 +1,14 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Api.Management.ViewModels.NewsDashboard;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Telemetry;
 using Umbraco.Extensions;
@@ -21,6 +24,7 @@ public class NewsDashboardService : INewsDashboardService
     private readonly ILogger<NewsDashboardService> _logger;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly GlobalSettings _globalSettings;
+    private readonly INewsCacheDurationProvider _newsCacheDurationProvider;
 
     private static readonly HttpClient _httpClient = new();
 
@@ -33,7 +37,8 @@ public class NewsDashboardService : INewsDashboardService
         ISiteIdentifierService siteIdentifierService,
         ILogger<NewsDashboardService> logger,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-        IOptions<GlobalSettings> globalSettings)
+        IOptions<GlobalSettings> globalSettings,
+        INewsCacheDurationProvider newsCacheDurationProvider)
     {
         _appCaches = appCaches;
         _umbracoVersion = umbracoVersion;
@@ -41,12 +46,41 @@ public class NewsDashboardService : INewsDashboardService
         _logger = logger;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
         _globalSettings = globalSettings.Value;
+        _newsCacheDurationProvider = newsCacheDurationProvider;
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="NewsDashboardService"/> class.
+    /// </summary>
+    /// <param name="appCaches">Provides access to application-level caching mechanisms.</param>
+    /// <param name="umbracoVersion">Provides information about the current Umbraco version.</param>
+    /// <param name="siteIdentifierService">Service used to retrieve or manage the unique site identifier.</param>
+    /// <param name="logger">The logger used for logging diagnostic and operational information.</param>
+    /// <param name="backOfficeSecurityAccessor">Accessor for back office security context and operations.</param>
+    /// <param name="globalSettings">The global settings configuration options for the application.</param>
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19")]
+    public NewsDashboardService(
+        AppCaches appCaches,
+        IUmbracoVersion umbracoVersion,
+        ISiteIdentifierService siteIdentifierService,
+        ILogger<NewsDashboardService> logger,
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+        IOptions<GlobalSettings> globalSettings)
+        : this(
+        appCaches,
+        umbracoVersion,
+        siteIdentifierService,
+        logger,
+        backOfficeSecurityAccessor,
+        globalSettings,
+        StaticServiceProvider.Instance.GetRequiredService<INewsCacheDurationProvider>())
+    {
     }
 
     /// <inheritdoc />
     public async Task<NewsDashboardResponseModel> GetItemsAsync()
     {
-        const string BaseUrl = "https://umbraco-dashboard-news.euwest01.umbraco.io";
+        const string BaseUrl = Constants.NewsDashboard.Url;
         const string Path = "/api/News";
 
         var version = _umbracoVersion.SemanticVersion.ToSemanticStringWithoutBuild();
@@ -69,7 +103,7 @@ public class NewsDashboardService : INewsDashboardService
 
             if (TryMapModel(json, out NewsDashboardResponseModel? model))
             {
-                _appCaches.RuntimeCache.InsertCacheItem(CacheKey, () => model, new TimeSpan(0, 30, 0));
+                _appCaches.RuntimeCache.InsertCacheItem(CacheKey, () => model, _newsCacheDurationProvider.CacheDuration);
                 content = model;
             }
         }

@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using Microsoft.Extensions.Logging;
@@ -11,6 +11,10 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// </summary>
 public class BlockListPropertyNotificationHandler : BlockEditorPropertyNotificationHandlerBase<BlockListLayoutItem>
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Core.PropertyEditors.BlockListPropertyNotificationHandler"/> class.
+    /// </summary>
+    /// <param name="logger">An <see cref="ILogger{BlockListPropertyNotificationHandler}"/> used for logging diagnostic and operational information.</param>
     public BlockListPropertyNotificationHandler(ILogger<BlockListPropertyNotificationHandler> logger)
         : base(logger)
     {

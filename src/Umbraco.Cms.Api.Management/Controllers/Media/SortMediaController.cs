@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -14,6 +14,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Media;
 
+/// <summary>
+/// Provides API endpoints for sorting media items within the Umbraco CMS.
+/// </summary>
 [ApiVersion("1.0")]
 public class SortMediaController : MediaControllerBase
 {
@@ -21,6 +24,12 @@ public class SortMediaController : MediaControllerBase
     private readonly IMediaEditingService _mediaEditingService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SortMediaController"/> class, which handles sorting operations for media items in the Umbraco backoffice.
+    /// </summary>
+    /// <param name="authorizationService">Service used to authorize user actions.</param>
+    /// <param name="mediaEditingService">Service responsible for editing and sorting media items.</param>
+    /// <param name="backOfficeSecurityAccessor">Accessor for backoffice security context.</param>
     public SortMediaController(
         IAuthorizationService authorizationService,
         IMediaEditingService mediaEditingService,
@@ -31,11 +40,19 @@ public class SortMediaController : MediaControllerBase
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
+    /// <summary>
+    /// Sorts media items within a specified parent container based on the provided sort order.
+    /// </summary>
+    /// <param name="cancellationToken">Token to observe while waiting for the task to complete.</param>
+    /// <param name="sortingRequestModel">The model containing the parent container ID and the desired sort order for its child media items.</param>
+    /// <returns>An <see cref="IActionResult"/> representing the result of the sort operation.</returns>
     [HttpPut("sort")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Sorts media items.")]
+    [EndpointDescription("Sorts media items in the specified parent container according to the provided sort order.")]
     public async Task<IActionResult> Sort(CancellationToken cancellationToken, SortingRequestModel sortingRequestModel)
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(

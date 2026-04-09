@@ -1,4 +1,4 @@
-import { css, customElement, html, property, state, unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, property, state, unsafeHTML, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 /**
@@ -21,16 +21,20 @@ export class UmbLocalizeNumberElement extends UmbLitElement {
 	 * @attr
 	 * @example options={ style: 'currency', currency: 'EUR' }
 	 */
-	@property()
+	@property({ type: Object })
 	options?: Intl.NumberFormatOptions;
 
 	@state()
-	protected get text(): string {
+	protected get text(): string | null {
 		return this.localize.number(this.number, this.options);
 	}
 
 	override render() {
-		return this.number ? html`${unsafeHTML(this.text)}` : html`<slot></slot>`;
+		return when(
+			this.text,
+			(text) => unsafeHTML(text),
+			() => html`<slot></slot>`,
+		);
 	}
 
 	static override styles = [

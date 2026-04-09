@@ -1,9 +1,10 @@
+import type { ManifestTiptapToolbarExtensionColorPickerButtonKind } from '../../extensions/tiptap-toolbar.extension.js';
 import { UmbTiptapToolbarButtonElement } from './tiptap-toolbar-button.element.js';
 import { css, customElement, html, state, when } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIColorPickerChangeEvent } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-tiptap-toolbar-color-picker-button')
-export class UmbTiptapToolbarColorPickerButtonElement extends UmbTiptapToolbarButtonElement {
+export class UmbTiptapToolbarColorPickerButtonElement extends UmbTiptapToolbarButtonElement<ManifestTiptapToolbarExtensionColorPickerButtonKind> {
 	#onChange(event: UUIColorPickerChangeEvent) {
 		this._selectedColor = event.target.value;
 		this.api?.execute(this.editor, this._selectedColor);

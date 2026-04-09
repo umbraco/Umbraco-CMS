@@ -7,9 +7,19 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events;
 
+/// <summary>
+/// Webhook event that fires when a data type is deleted.
+/// </summary>
 [WebhookEvent("Data Type Deleted")]
 public class DataTypeDeletedWebhookEvent : WebhookEventBase<DataTypeDeletedNotification>
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DataTypeDeletedWebhookEvent"/> class.
+    /// </summary>
+    /// <param name="webhookFiringService">The webhook firing service.</param>
+    /// <param name="webHookService">The webhook service.</param>
+    /// <param name="webhookSettings">The webhook settings.</param>
+    /// <param name="serverRoleAccessor">The server role accessor.</param>
     public DataTypeDeletedWebhookEvent(
         IWebhookFiringService webhookFiringService,
         IWebhookService webHookService,
@@ -19,8 +29,10 @@ public class DataTypeDeletedWebhookEvent : WebhookEventBase<DataTypeDeletedNotif
     {
     }
 
+    /// <inheritdoc />
     public override string Alias => Constants.WebhookEvents.Aliases.DataTypeDeleted;
 
+    /// <inheritdoc />
     public override object ConvertNotificationToRequestPayload(DataTypeDeletedNotification notification)
         => notification.DeletedEntities.Select(entity => new DefaultPayloadModel { Id = entity.Key });
 }

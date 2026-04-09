@@ -1,0 +1,44 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+
+namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_17_3_0;
+
+/// <summary>
+/// Migration to add a sortableValue column to the property data table.
+/// </summary>
+public class AddSortableValueToPropertyData : AsyncMigrationBase
+{
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AddSortableValueToPropertyData"/> class.
+    /// </summary>
+    /// <param name="context">The migration context.</param>
+    public AddSortableValueToPropertyData(IMigrationContext context)
+        : base(context)
+    {
+    }
+
+    /// <inheritdoc/>
+    protected override async Task MigrateAsync()
+    {
+        if (TableExists(Constants.DatabaseSchema.Tables.PropertyData) is false)
+        {
+            return;
+        }
+
+        const string columnName = "sortableValue";
+        var hasColumn = Context.SqlContext.SqlSyntax.GetColumnsInSchema(Context.Database)
+            .Any(c =>
+                c.TableName == Constants.DatabaseSchema.Tables.PropertyData &&
+                c.ColumnName == columnName);
+
+        if (hasColumn)
+        {
+            return;
+        }
+
+        AddColumn<PropertyDataDto>(Constants.DatabaseSchema.Tables.PropertyData, columnName);
+    }
+}

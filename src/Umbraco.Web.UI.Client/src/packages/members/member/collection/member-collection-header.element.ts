@@ -63,12 +63,13 @@ export class UmbMemberCollectionHeaderElement extends UmbLitElement {
 
 	#renderContentTypeFilter() {
 		return html`
-			<umb-dropdown>
+			<umb-dropdown data-mark="dropdown:filter">
 				<span slot="label">${this.#getContentTypeFilterLabel}</span>
 				<div id="dropdown-layout">
 					<uui-button
 						label=${this.localize.term('general_all')}
 						look=${!this._selectedContentTypeUnique ? 'secondary' : 'default'}
+						data-mark="action:select-all"
 						compact
 						@click=${() => this.#onContentTypeFilterChange('')}></uui-button>
 					${repeat(
@@ -78,6 +79,7 @@ export class UmbMemberCollectionHeaderElement extends UmbLitElement {
 							<uui-button
 								label=${ifDefined(memberType.name)}
 								look=${memberType.unique === this._selectedContentTypeUnique ? 'secondary' : 'default'}
+								data-mark="action:select-${memberType.unique}"
 								compact
 								@click=${() => this.#onContentTypeFilterChange(memberType.unique)}></uui-button>
 						`,

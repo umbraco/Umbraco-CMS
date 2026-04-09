@@ -18,7 +18,7 @@ public interface IMemberService : IMembershipMemberService, IContentServiceBase<
     /// <param name="totalRecords">Total number of records found (out)</param>
     /// <param name="orderBy">Field to order by</param>
     /// <param name="orderDirection">Direction to order by</param>
-    /// <param name="memberTypeAlias"></param>
+    /// <param name="memberTypeAlias">Optional alias of the MemberType to filter by.</param>
     /// <param name="filter">Search text filter</param>
     /// <returns>
     ///     <see cref="IEnumerable{T}" />
@@ -42,7 +42,7 @@ public interface IMemberService : IMembershipMemberService, IContentServiceBase<
     /// <param name="orderBy">Field to order by</param>
     /// <param name="orderDirection">Direction to order by</param>
     /// <param name="orderBySystemField">Flag to indicate when ordering by system field</param>
-    /// <param name="memberTypeAlias"></param>
+    /// <param name="memberTypeAlias">Optional alias of the MemberType to filter by.</param>
     /// <param name="filter">Search text filter</param>
     /// <returns>
     ///     <see cref="IEnumerable{T}" />
@@ -57,6 +57,15 @@ public interface IMemberService : IMembershipMemberService, IContentServiceBase<
         string? memberTypeAlias,
         string filter);
 
+    /// <summary>
+    ///     Filters members based on the specified criteria.
+    /// </summary>
+    /// <param name="memberFilter">The filter criteria to apply.</param>
+    /// <param name="orderBy">The field to order results by. Default is "username".</param>
+    /// <param name="orderDirection">The direction to order results. Default is <see cref="Direction.Ascending"/>.</param>
+    /// <param name="skip">The number of records to skip. Default is 0.</param>
+    /// <param name="take">The number of records to take. Default is 100.</param>
+    /// <returns>A <see cref="PagedModel{IMember}"/> containing the filtered members.</returns>
     public Task<PagedModel<IMember>> FilterAsync(
         MemberFilter memberFilter,
         string orderBy = "username",
@@ -188,6 +197,7 @@ public interface IMemberService : IMembershipMemberService, IContentServiceBase<
     /// <param name="member"><see cref="IMember" /> or <see cref="IUser" /> to Save</param>
     /// <param name="publishNotificationSaveOptions"> Enum for deciding which notifications to publish.</param>
     /// <param name="userId">Id of the User saving the Member</param>
+    /// <returns>An <see cref="Attempt{OperationResult}"/> indicating the result of the save operation.</returns>
     Attempt<OperationResult?> Save(IMember member, PublishNotificationSaveOptions publishNotificationSaveOptions, int userId = Constants.Security.SuperUserId) => Save(member, userId);
 
     /// <summary>
@@ -195,14 +205,19 @@ public interface IMemberService : IMembershipMemberService, IContentServiceBase<
     /// </summary>
     /// <param name="media">The <see cref="IMember" /> to save</param>
     /// <param name="userId">Id of the User saving the Member</param>
-    Attempt<OperationResult?> Save(IMember media, int userId = Constants.Security.SuperUserId);
+    /// <returns>An <see cref="Attempt{OperationResult}"/> indicating the result of the save operation.</returns>
+    Attempt<OperationResult?> Save(IMember media, int userId = Constants.Security.SuperUserId); // TODO (V18): Rename parameter 'media' to 'member'.
 
     /// <summary>
     ///     Saves a list of <see cref="IMember" /> objects
     /// </summary>
     /// <param name="members">Collection of <see cref="IMember" /> to save</param>
     /// <param name="userId">Id of the User saving the Members</param>
+    /// <returns>An <see cref="Attempt{OperationResult}"/> indicating the result of the save operation.</returns>
+    // TODO (V18): This is already declared on the base type, so for the next major, when we can allow a binary breaking change, we should remove it from here.
+#pragma warning disable CS0108 // Member hides inherited member; missing new keyword
     Attempt<OperationResult?> Save(IEnumerable<IMember> members, int userId = Constants.Security.SuperUserId);
+#pragma warning restore CS0108 // Member hides inherited member; missing new keyword
 
     /// <summary>
     ///     Gets the count of Members by an optional MemberType alias
@@ -308,6 +323,7 @@ public interface IMemberService : IMembershipMemberService, IContentServiceBase<
     /// </summary>
     /// <param name="member">The <see cref="IMember" /> to delete</param>
     /// <param name="userId">Id of the User deleting the Member</param>
+    /// <returns>An <see cref="Attempt{OperationResult}"/> indicating the result of the delete operation.</returns>
     Attempt<OperationResult?> Delete(IMember member, int userId = Constants.Security.SuperUserId);
 
     /// <summary>

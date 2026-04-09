@@ -55,5 +55,6 @@ const mapper = (item: MediaItemResponseModel): UmbMediaItemModel => {
 				name: variant.name,
 			};
 		}),
+		flags: item.flags,
 	};
 };

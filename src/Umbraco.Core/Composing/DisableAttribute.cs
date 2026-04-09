@@ -29,6 +29,11 @@ public class DisableAttribute : Attribute
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DisableAttribute" /> class.
+    /// </summary>
+    /// <param name="fullTypeName">The full type name of the composer to disable.</param>
+    /// <param name="assemblyName">The assembly name containing the composer type.</param>
     public DisableAttribute(string fullTypeName, string assemblyName) =>
         DisabledType = Assembly.Load(assemblyName)?.GetType(fullTypeName);
 

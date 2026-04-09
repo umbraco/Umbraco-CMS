@@ -1,3 +1,5 @@
+import { UmbIconEntitySignApi } from './entity-sign-icon.api.js';
+import { UmbEntitySignIconElement } from './entity-sign-icon.element.js';
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
@@ -9,8 +11,8 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 		manifest: {
 			type: 'entitySign',
 			kind: 'icon',
-			element: () => import('./entity-sign-icon.element.js'),
-			api: () => import('./entity-sign-icon.api.js'),
+			element: UmbEntitySignIconElement,
+			api: UmbIconEntitySignApi,
 		},
 	},
 ];

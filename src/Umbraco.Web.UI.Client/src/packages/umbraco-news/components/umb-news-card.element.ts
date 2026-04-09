@@ -1,6 +1,7 @@
 import { css, customElement, html, nothing, property, unsafeHTML, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { NewsDashboardItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-news-card')
 export class UmbNewsCardElement extends UmbLitElement {
@@ -11,8 +12,8 @@ export class UmbNewsCardElement extends UmbLitElement {
 	priority: number = 3;
 
 	#renderHeading(priority: number, text: string) {
-		if (priority <= 2) return html`<h2 class="card-title">${text}</h2>`;
-		return html`<h3 class="card-title">${text}</h3>`;
+		if (priority <= 2) return html`<h2 class="card-title uui-h3">${text}</h2>`;
+		return html`<h3 class="card-title uui-h4">${text}</h3>`;
 	}
 
 	override render() {
@@ -31,13 +32,13 @@ export class UmbNewsCardElement extends UmbLitElement {
 						: html`<div class="card-img placeholder" aria-hidden="true"></div>`,
 				() => nothing,
 			)}
-			<div class="card-body">
+			<div class="card-body uui-text">
 				${this.#renderHeading(this.priority, this.item.header)}
 				${this.item.body ? html`<div class="card-text">${unsafeHTML(this.item.body)}</div>` : nothing}
 				${!isLastRow && this.item.url
 					? html`<div class="card-actions">
 							<uui-button
-								look="outline"
+								look="primary"
 								href=${this.item.url}
 								target="_blank"
 								rel="noopener"
@@ -59,71 +60,98 @@ export class UmbNewsCardElement extends UmbLitElement {
 			: html` <article class="card" role="listitem">${content}</article> `;
 	}
 
-	static override styles = css`
-		:host {
-			display: block;
-			height: 100%;
-		}
+	static override styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: block;
+				height: 100%;
+			}
 
-		.card {
-			background: var(--uui-color-surface);
-			border-radius: var(--uui-border-radius, 8px);
-			box-shadow: var(
-				--uui-box-box-shadow,
-				var(--uui-shadow-depth-1, 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24))
-			);
-			overflow: hidden;
-			display: flex;
-			flex-direction: column;
-			height: 100%;
-		}
+			.card {
+				background: var(--uui-color-surface);
+				/* TODO: update with variables when UUI v.2 is available */
+				border-radius: 16px;
+				overflow: hidden;
+				display: flex;
+				flex-direction: column;
+				height: 100%;
+			}
 
-		.card-img {
-			width: 100%;
-			object-fit: cover;
-			display: block;
-		}
+			.card-img {
+				width: 100%;
+				object-fit: cover;
+				display: block;
+			}
 
-		.card-img.placeholder {
-			height: 8px;
-		}
+			.card-img.placeholder {
+				height: 8px;
+			}
 
-		.card-body {
-			display: flex;
-			flex-direction: column;
-			padding: var(--uui-size-space-5);
-			flex: 1 1 auto;
-			justify-content: space-between;
-			gap: var(--uui-size-space-3, 9px);
-		}
+			/* TODO: update with uui-styles when UUI v.2 is available */
+			.card-body.uui-text h2,
+			.card-body.uui-text h3 {
+				font-weight: 400;
+				line-height: 35px;
+			}
 
-		.card-title {
-			margin: 0;
-		}
+			.card-body.uui-text h2 {
+				margin-top: -0.2em;
+				margin-bottom: 0;
+			}
 
-		.card-text > p {
-			margin: 0;
-		}
-
-		.normal-priority {
-			display: block;
-			border: 1px solid var(--uui-color-divider);
-			border-radius: var(--uui-border-radius, 8px);
-			text-decoration: none;
-			color: inherit;
-			overflow: hidden;
+			.card-body.uui-text h3 {
+				margin-top: -0.5em;
+				margin-bottom: var(--uui-size-space-3);
+			}
 
 			.card-body {
-				gap: 0;
+				display: flex;
+				flex-direction: column;
+				padding: var(--uui-size-layout-2);
+				flex: 1 1 auto;
+				justify-content: space-between;
+				gap: var(--uui-size-space-4);
+				max-width: 60em;
 			}
-		}
-		.normal-priority:hover {
-			color: var(--uui-color-interactive-emphasis);
-		}
-		.card-actions {
-			align-self: end;
-		}
-	`;
+
+			.card-title {
+				margin: 0;
+			}
+
+			.card-text {
+				justify-self: start;
+			}
+			.card-text > p {
+				margin: 0;
+			}
+
+			.normal-priority {
+				display: block;
+				text-decoration: none;
+				color: inherit;
+				overflow: hidden;
+
+				.card-body {
+					gap: 0;
+				}
+			}
+			.normal-priority:hover {
+				color: var(--uui-color-interactive-emphasis);
+			}
+			.card-actions {
+				margin-top: auto;
+				padding-top: var(--uui-size-3);
+				align-self: start;
+				justify-self: end;
+			}
+			/* TODO: update accordingly to uui-button when UUI v.2 is available */
+			.card-actions uui-button {
+				--uui-button-background-color: #283a97;
+				--uui-button-border-radius: 16px;
+			}
+		`,
+	];
 }
 
 export default UmbNewsCardElement;

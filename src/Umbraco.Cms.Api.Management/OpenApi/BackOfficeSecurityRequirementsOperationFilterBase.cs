@@ -1,12 +1,15 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Umbraco.Cms.Api.Management.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.OpenApi;
 
+/// <summary>
+/// Serves as a base class for filters that apply back office security requirements to OpenAPI operations.
+/// </summary>
 public abstract class BackOfficeSecurityRequirementsOperationFilterBase : IOperationFilter
 {
     protected abstract string ApiName { get; }
@@ -21,27 +24,17 @@ public abstract class BackOfficeSecurityRequirementsOperationFilterBase : IOpera
         if (!context.MethodInfo.GetCustomAttributes(true).Any(x => x is AllowAnonymousAttribute) &&
             !(context.MethodInfo.DeclaringType?.GetCustomAttributes(true).Any(x => x is AllowAnonymousAttribute) ?? false))
         {
-            operation.Responses.Add(StatusCodes.Status401Unauthorized.ToString(), new OpenApiResponse
-            {
-                Description = "The resource is protected and requires an authentication token"
-            });
-
-            operation.Security = new List<OpenApiSecurityRequirement>
-            {
-                new OpenApiSecurityRequirement
+            operation.Responses ??= new OpenApiResponses();
+            operation.Responses.Add(
+                StatusCodes.Status401Unauthorized.ToString(),
+                new OpenApiResponse
                 {
-                    {
-                        new OpenApiSecurityScheme
-                        {
-                            Reference = new OpenApiReference
-                            {
-                                Type = ReferenceType.SecurityScheme,
-                                Id = ManagementApiConfiguration.ApiSecurityName
-                            }
-                        }, []
-                    }
-                }
-            };
+                    Description = "The resource is protected and requires an authentication token",
+                });
+
+            var schemaRef = new OpenApiSecuritySchemeReference(ManagementApiConfiguration.ApiSecurityName, context.Document);
+            operation.Security ??= new List<OpenApiSecurityRequirement>();
+            operation.Security.Add(new OpenApiSecurityRequirement { [schemaRef] = [] });
         }
 
         // Assuming if and endpoint have more then one AuthorizeAttribute, there is a risk the user do not have access while still being authorized.
@@ -57,10 +50,13 @@ public abstract class BackOfficeSecurityRequirementsOperationFilterBase : IOpera
 
         if (numberOfAuthorizeAttributes > 2 || hasConstructorInjectingIAuthorizationService)
         {
-            operation.Responses.Add(StatusCodes.Status403Forbidden.ToString(), new OpenApiResponse()
-            {
-                Description = "The authenticated user does not have access to this resource"
-            });
+            operation.Responses ??= new OpenApiResponses();
+            operation.Responses.Add(
+                StatusCodes.Status403Forbidden.ToString(),
+                new OpenApiResponse
+                {
+                    Description = "The authenticated user does not have access to this resource",
+                });
         }
     }
 }

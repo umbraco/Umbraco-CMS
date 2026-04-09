@@ -27,7 +27,8 @@ internal sealed class AuditEntryRepository : EntityRepositoryBase<int, IAuditEnt
     ///     Initializes a new instance of the <see cref="AuditEntryRepository" /> class.
     /// </summary>
     public AuditEntryRepository(
-        IRuntimeState runtimeState,IScopeAccessor scopeAccessor,
+        IRuntimeState runtimeState,
+        IScopeAccessor scopeAccessor,
         AppCaches cache,
         ILogger<AuditEntryRepository> logger,
         IRepositoryCacheVersionService repositoryCacheVersionService,
@@ -129,7 +130,7 @@ internal sealed class AuditEntryRepository : EntityRepositoryBase<int, IAuditEnt
         {
             Database.Insert(dto);
         }
-        catch (DbException) when (_runtimeState.Level == RuntimeLevel.Upgrade)
+        catch (DbException) when (_runtimeState.Level is RuntimeLevel.Upgrade or RuntimeLevel.Upgrading)
         {
             // This can happen when in upgrade state, before the migration to add user keys runs.
             // In this case, we will try to insert the audit entry without the user keys.

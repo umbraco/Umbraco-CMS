@@ -37,10 +37,8 @@ internal class HealthCheckNotifierJob : IDistributedBackgroundJob
     /// <param name="healthChecks">The collection of healthchecks.</param>
     /// <param name="notifications">The collection of healthcheck notification methods.</param>
     /// <param name="scopeProvider">Provides scopes for database operations.</param>
-    /// <param name="logger">The typed logger.</param>
     /// <param name="profilingLogger">The profiling logger.</param>
-    /// <param name="cronTabParser">Parser of crontab expressions.</param>
-    /// <param name="eventAggregator"></param>
+    /// <param name="eventAggregator">The event aggregator for publishing notifications.</param>
     public HealthCheckNotifierJob(
         IOptionsMonitor<HealthChecksSettings> healthChecksSettings,
         HealthCheckCollection healthChecks,

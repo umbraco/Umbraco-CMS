@@ -135,7 +135,7 @@ internal class PublishedContent : PublishedContentBase
     // Needed for publishedProperty
     internal IVariationContextAccessor VariationContextAccessor { get; }
 
-    [Obsolete("Use the INavigationQueryService instead, scheduled for removal in v17")]
+    [Obsolete("Use the INavigationQueryService instead. Scheduled for removal in Umbraco 18.")]
     public override int Level
     {
         get
@@ -163,7 +163,7 @@ internal class PublishedContent : PublishedContentBase
         }
     }
 
-    [Obsolete("Please use TryGetParentKey() on IDocumentNavigationQueryService or IMediaNavigationQueryService instead. Scheduled for removal in V16.")]
+    [Obsolete("Please use TryGetParentKey() on IDocumentNavigationQueryService or IMediaNavigationQueryService instead. Scheduled for removal in Umbraco 18.")]
     public override IPublishedContent? Parent => GetParent();
 
     /// <inheritdoc />
@@ -251,6 +251,17 @@ internal class PublishedContent : PublishedContentBase
         // if there is no 'published' published content, no culture can be published
         if (!_contentNode.HasPublished)
         {
+            // In preview mode, the ContentNode only has draft data loaded (published data
+            // is stored in a separate cache entry). Fall back to IPublishStatusQueryService
+            // which is an in-memory service that tracks actual document publish status.
+            if (IsPreviewing && ItemType == PublishedItemType.Content)
+            {
+                culture ??= VariationContextAccessor.VariationContext?.Culture ?? string.Empty;
+                IPublishStatusQueryService publishStatusQueryService =
+                    StaticServiceProvider.Instance.GetRequiredService<IPublishStatusQueryService>();
+                return publishStatusQueryService.IsDocumentPublished(Key, culture);
+            }
+
             return false;
         }
 

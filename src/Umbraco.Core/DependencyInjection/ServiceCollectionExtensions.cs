@@ -4,6 +4,12 @@ using Umbraco.Cms.Core.Composing;
 
 namespace Umbraco.Extensions;
 
+/// <summary>
+///     Provides extension methods for <see cref="IServiceCollection"/> to register services with unique semantics.
+/// </summary>
+/// <remarks>
+///     These methods ensure that only one registration exists for a given service type by removing previous registrations.
+/// </remarks>
 public static class ServiceCollectionExtensions
 {
     /// <summary>
@@ -153,6 +159,11 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
+    /// <summary>
+    ///     Adds support for resolving <see cref="Lazy{T}" /> dependencies from the service collection.
+    /// </summary>
+    /// <param name="services">The service collection.</param>
+    /// <returns>A reference to this instance after the operation has completed.</returns>
     internal static IServiceCollection AddLazySupport(this IServiceCollection services)
     {
         services.Replace(ServiceDescriptor.Transient(typeof(Lazy<>), typeof(LazyResolve<>)));

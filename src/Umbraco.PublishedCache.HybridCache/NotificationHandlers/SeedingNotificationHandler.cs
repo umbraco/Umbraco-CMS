@@ -24,7 +24,8 @@ internal sealed class SeedingNotificationHandler : INotificationAsyncHandler<Umb
         _globalSettings = globalSettings.Value;
     }
 
-    public async Task HandleAsync(UmbracoApplicationStartingNotification notification,
+    public async Task HandleAsync(
+        UmbracoApplicationStartingNotification notification,
         CancellationToken cancellationToken)
     {
 

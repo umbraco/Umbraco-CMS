@@ -1,7 +1,14 @@
-﻿using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Models.PublishedContent;
 
 namespace Umbraco.Cms.Core.PublishedCache;
 
+/// <summary>
+/// Provides caching for published content types.
+/// </summary>
+/// <remarks>
+/// This interface defines operations for caching and retrieving <see cref="IPublishedContentType"/> instances,
+/// including methods for clearing cached types when content types or data types are modified.
+/// </remarks>
 public interface IPublishedContentTypeCache
 {
     /// <summary>

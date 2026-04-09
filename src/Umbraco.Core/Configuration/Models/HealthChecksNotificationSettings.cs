@@ -10,7 +10,14 @@ namespace Umbraco.Cms.Core.Configuration.Models;
 /// </summary>
 public class HealthChecksNotificationSettings
 {
+    /// <summary>
+    ///     The default value for whether health check notifications are enabled.
+    /// </summary>
     internal const bool StaticEnabled = false;
+
+    /// <summary>
+    ///     The default period between health check notifications.
+    /// </summary>
     internal const string StaticPeriod = "1.00:00:00"; // TimeSpan.FromHours(24);
 
     /// <summary>

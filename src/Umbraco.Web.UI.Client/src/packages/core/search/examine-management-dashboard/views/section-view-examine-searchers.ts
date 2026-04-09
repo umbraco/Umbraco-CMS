@@ -5,7 +5,7 @@ import { css, html, nothing, customElement, state, query, property } from '@umbr
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
-import { SearcherService } from '@umbraco-cms/backoffice/external/backend-api';
+import { IndexerService, SearcherService } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
@@ -20,6 +20,12 @@ interface ExposedSearchResultField {
 export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 	@property()
 	searcherName!: string;
+
+	@property()
+	uniqueKeyFieldName?: string | null;
+
+	@state()
+	private _resolvedUniqueKeyFieldName: string = '__Key';
 
 	@state()
 	private _searchResults?: UmbSearchResultModel[];
@@ -73,6 +79,33 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 			});
 	}
 
+	override connectedCallback() {
+		super.connectedCallback();
+		this.#resolveUniqueKeyFieldName();
+	}
+
+	override willUpdate(changedProperties: Map<string, unknown>) {
+		super.willUpdate(changedProperties);
+		if (changedProperties.has('uniqueKeyFieldName') && this.uniqueKeyFieldName) {
+			this._resolvedUniqueKeyFieldName = this.uniqueKeyFieldName;
+		}
+	}
+
+	async #resolveUniqueKeyFieldName() {
+		if (this.uniqueKeyFieldName) {
+			this._resolvedUniqueKeyFieldName = this.uniqueKeyFieldName;
+			return;
+		}
+
+		// When rendered standalone (via route), the searcher name typically matches the index name.
+		// If the index is not found (e.g. composite searchers), we fall back to '__Key'.
+		const { data } = await tryExecute(
+			this,
+			IndexerService.getIndexerByIndexName({ path: { indexName: this.searcherName } }),
+		);
+		this._resolvedUniqueKeyFieldName = data?.uniqueKeyFieldName ?? '__Key';
+	}
+
 	private async _onSearch() {
 		if (!this._searchInput.value.length) return;
 		this._searchLoading = true;
@@ -97,7 +130,9 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 	}
 
 	private _updateFieldFilter() {
-		this._searchResults?.map((doc) => {
+		const documentFields: ExposedSearchResultField[] = [];
+
+		this._searchResults?.forEach((doc) => {
 			const document = doc.fields?.filter((field) => {
 				return field.name?.toUpperCase() !== 'NODENAME';
 			});
@@ -106,16 +141,16 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 					return field.name ?? '';
 				});
 
-				// TODO: I don't get this code, not sure what the purpose is, it seems like a mistake: [NL]
-				this._exposedFields = this._exposedFields
-					? this._exposedFields.filter((field) => {
-							return { name: field.name, exposed: field.exposed };
-						})
-					: newFieldNames?.map((name) => {
-							return { name, exposed: false };
-						});
+				newFieldNames.forEach((name) => {
+					if (!documentFields.find((field) => field.name === name)) {
+						const exposed = this._exposedFields?.find((field) => field.name === name)?.exposed ?? false;
+						documentFields.push({ name, exposed });
+					}
+				});
 			}
 		});
+
+		this._exposedFields = documentFields.sort((a, b) => a.name.localeCompare(b.name));
 	}
 
 	async #onFieldFilterClick() {
@@ -214,7 +249,7 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 						${this._searchResults?.map((rowData) => {
 							const indexType = rowData.fields?.find((field) => field.name === '__IndexType')?.values?.join(', ') ?? '';
 							this.#entityType = this.#getEntityTypeFromIndexType(indexType);
-							const unique = rowData.fields?.find((field) => field.name === '__Key')?.values?.join(', ') ?? '';
+							const unique = rowData.fields?.find((field) => field.name === this._resolvedUniqueKeyFieldName)?.values?.join(', ') ?? '';
 
 							return html`<uui-table-row>
 								<uui-table-cell> ${rowData.score} </uui-table-cell>
@@ -286,11 +321,17 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 
 	renderBodyCells(cellData: UmbSearchFieldPresentationModel[]) {
 		return html`${this._exposedFields?.map((slot) => {
-			return cellData.map((field) => {
-				return slot.exposed && field.name == slot.name
-					? html`<uui-table-cell clip-text>${field.values}</uui-table-cell>`
-					: html``;
-			});
+			if (slot.exposed) {
+				const field = cellData.find((field) => field.name === slot.name);
+				if (field) {
+					return html`<uui-table-cell clip-text>${field.values}</uui-table-cell>`;
+				}
+
+				// Exposed field not found for this record, render empty cell.
+				return html`<uui-table-cell></uui-table-cell>`;
+			}
+
+			return html``;
 		})}`;
 	}
 

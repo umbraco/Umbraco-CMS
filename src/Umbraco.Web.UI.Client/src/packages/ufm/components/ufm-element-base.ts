@@ -36,6 +36,8 @@ export abstract class UmbUfmElementBase extends UmbLitElement {
 	}
 
 	override render() {
+		if (!this.isConnected) return;
+
 		let values = Array.isArray(this.value) ? this.value : [this.value];
 
 		if (this.#filterFuncArgs) {

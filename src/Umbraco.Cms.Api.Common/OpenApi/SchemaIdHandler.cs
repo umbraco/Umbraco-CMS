@@ -3,12 +3,20 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Common.OpenApi;
 
-// NOTE: Left unsealed on purpose, so it is extendable.
+/// <summary>
+///     Default handler for generating OpenAPI schema IDs for Umbraco types.
+/// </summary>
+/// <remarks>
+///     Left unsealed on purpose, so it is extendable by consuming APIs.
+///     Adds "Model" suffix to avoid TypeScript name clashes and removes invalid characters.
+/// </remarks>
 public class SchemaIdHandler : ISchemaIdHandler
 {
+    /// <inheritdoc/>
     public virtual bool CanHandle(Type type)
         => type.Namespace?.StartsWith("Umbraco.Cms") is true;
 
+    /// <inheritdoc/>
     public virtual string Handle(Type type)
         => UmbracoSchemaId(type);
 

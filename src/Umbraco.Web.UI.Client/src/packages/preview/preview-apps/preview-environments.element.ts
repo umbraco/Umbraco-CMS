@@ -78,7 +78,10 @@ export class UmbPreviewEnvironmentsElement extends UmbLitElement {
 		);
 
 		if (previewUrlData.url) {
-			const previewWindow = window.open(previewUrlData.url, `umbpreview-${this._unique}`);
+			// Add cache-busting parameter to ensure the preview tab reloads with the new preview session
+			const previewUrl = new URL(previewUrlData.url, window.document.baseURI);
+			previewUrl.searchParams.set('rnd', Date.now().toString());
+			const previewWindow = window.open(previewUrl.toString(), `umbpreview-${this._unique}`);
 			previewWindow?.focus();
 			return;
 		}

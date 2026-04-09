@@ -18,6 +18,14 @@ public class DatabaseSchemaCreatorFactory
     private readonly ILoggerFactory _loggerFactory;
     private readonly IUmbracoVersion _umbracoVersion;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Migrations.Install.DatabaseSchemaCreatorFactory"/> class.
+        /// </summary>
+        /// <param name="logger">The logger instance for <see cref="DatabaseSchemaCreator"/> operations.</param>
+        /// <param name="loggerFactory">The factory used to create logger instances.</param>
+        /// <param name="umbracoVersion">Provides information about the current Umbraco version.</param>
+        /// <param name="eventAggregator">Handles event aggregation for install and migration events.</param>
+        /// <param name="installDefaultDataSettings">Monitors configuration settings for installing default data.</param>
         public DatabaseSchemaCreatorFactory(
             ILogger<DatabaseSchemaCreator> logger,
             ILoggerFactory loggerFactory,
@@ -32,6 +40,16 @@ public class DatabaseSchemaCreatorFactory
             _installDefaultDataSettings = installDefaultDataSettings;
         }
 
-    public DatabaseSchemaCreator Create(IUmbracoDatabase? database) => new DatabaseSchemaCreator(database, _logger,
-        _loggerFactory, _umbracoVersion, _eventAggregator, _installDefaultDataSettings);
+    /// <summary>
+    ///     Creates a new instance of <see cref="DatabaseSchemaCreator" />.
+    /// </summary>
+    /// <param name="database">The database.</param>
+    /// <returns>A new <see cref="DatabaseSchemaCreator" /> instance.</returns>
+    public DatabaseSchemaCreator Create(IUmbracoDatabase? database) => new DatabaseSchemaCreator(
+        database,
+        _logger,
+        _loggerFactory,
+        _umbracoVersion,
+        _eventAggregator,
+        _installDefaultDataSettings);
 }

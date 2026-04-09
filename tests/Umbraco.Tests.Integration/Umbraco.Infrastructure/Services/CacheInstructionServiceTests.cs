@@ -1,6 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Services;
@@ -23,8 +24,6 @@ internal sealed class CacheInstructionServiceTests : UmbracoIntegrationTest
     private CancellationToken CancellationToken => CancellationToken.None;
 
     private CacheRefresherCollection CacheRefreshers => GetRequiredService<CacheRefresherCollection>();
-
-    private IServerRoleAccessor ServerRoleAccessor => GetRequiredService<IServerRoleAccessor>();
 
     [Test]
     public void Confirms_Cold_Boot_Required_When_Instructions_Exist_And_None_Have_Been_Synced()
@@ -152,13 +151,12 @@ internal sealed class CacheInstructionServiceTests : UmbracoIntegrationTest
         // Create three instruction records, each with two instructions.  First two records are for a different identity.
         CreateAndDeliveryMultipleInstructions(sut);
 
-        var result = sut.ProcessInstructions(CacheRefreshers, CancellationToken, LocalIdentity, -1);
+        var result = sut.ProcessAllInstructions(CacheRefreshers, CancellationToken, LocalIdentity);
 
         Assert.Multiple(() =>
         {
             Assert.AreEqual(3, result.LastId); // 3 records found.
-            Assert.AreEqual(2,
-                result.NumberOfInstructionsProcessed); // 2 records processed (as one is for the same identity).
+            Assert.AreEqual(2, result.NumberOfInstructionsProcessed); // 2 records processed (as one is for the same identity).
         });
     }
 
@@ -172,7 +170,7 @@ internal sealed class CacheInstructionServiceTests : UmbracoIntegrationTest
         var cancellationTokenSource = new CancellationTokenSource();
         cancellationTokenSource.Cancel();
 
-        var result = sut.ProcessInstructions(CacheRefreshers, cancellationTokenSource.Token, LocalIdentity, -1);
+        var result = sut.ProcessAllInstructions(CacheRefreshers, cancellationTokenSource.Token, LocalIdentity);
 
         Assert.Multiple(() =>
         {
@@ -185,14 +183,14 @@ internal sealed class CacheInstructionServiceTests : UmbracoIntegrationTest
     public void Processes_Instructions_Only_Once()
     {
         // This test shows what's happening in issue #10112
-        // The DatabaseServerMessenger will run its sync operation every five seconds which calls CacheInstructionService.ProcessInstructions,
-        // which is why the CacheRefresherNotification keeps dispatching, because the cache instructions gets constantly processed.
+        // The DatabaseServerMessenger will run its sync operation every five seconds which calls
+        // ProcessAllInstructions, which is why the CacheRefresherNotification keeps dispatching,
+        // because the cache instructions gets constantly processed.
         var sut = (CacheInstructionService)GetRequiredService<ICacheInstructionService>();
         CreateAndDeliveryMultipleInstructions(sut);
 
-        var lastId = -1;
         // Run once
-        var result = sut.ProcessInstructions(CacheRefreshers, CancellationToken, LocalIdentity, lastId);
+        var result = sut.ProcessAllInstructions(CacheRefreshers, CancellationToken, LocalIdentity);
 
         Assert.Multiple(() =>
         {
@@ -200,12 +198,12 @@ internal sealed class CacheInstructionServiceTests : UmbracoIntegrationTest
             Assert.AreEqual(2, result.NumberOfInstructionsProcessed); // 2 records processed (as one is for the same identity).
         });
 
-        // DatabaseServerMessenger stores the LastID after ProcessInstructions has been run.
-        lastId = result.LastId;
+        // ProcessAllInstructions persists the last synced ID via ILastSyncedManager,
+        // so the next call picks up where we left off.
 
         // The instructions has now been processed and shouldn't be processed on the next call...
         // Run again.
-        var secondResult = sut.ProcessInstructions(CacheRefreshers, CancellationToken, LocalIdentity, lastId);
+        var secondResult = sut.ProcessAllInstructions(CacheRefreshers, CancellationToken, LocalIdentity);
         Assert.Multiple(() =>
         {
             Assert.AreEqual(
@@ -222,17 +220,15 @@ internal sealed class CacheInstructionServiceTests : UmbracoIntegrationTest
         var sut = (CacheInstructionService)GetRequiredService<ICacheInstructionService>();
         CreateAndDeliveryMultipleInstructions(sut);
 
-        var lastId = -1;
-        var result = sut.ProcessInstructions(CacheRefreshers, CancellationToken, LocalIdentity, lastId);
+        var result = sut.ProcessAllInstructions(CacheRefreshers, CancellationToken, LocalIdentity);
 
         Assert.AreEqual(3, result.LastId); // Make sure LastId is 3, the rest is tested in other test.
-        lastId = result.LastId;
 
         // Add new instruction
         var instructions = CreateInstructions();
         sut.DeliverInstructions(instructions, AlternateIdentity);
 
-        var secondResult = sut.ProcessInstructions(CacheRefreshers, CancellationToken, LocalIdentity, lastId);
+        var secondResult = sut.ProcessAllInstructions(CacheRefreshers, CancellationToken, LocalIdentity);
 
         Assert.Multiple(() =>
         {
@@ -247,23 +243,50 @@ internal sealed class CacheInstructionServiceTests : UmbracoIntegrationTest
         var sut = (CacheInstructionService)GetRequiredService<ICacheInstructionService>();
         CreateAndDeliveryMultipleInstructions(sut);
 
-        var lastId = -1;
-        var result = sut.ProcessInstructions(CacheRefreshers, CancellationToken, LocalIdentity, lastId);
+        var result = sut.ProcessAllInstructions(CacheRefreshers, CancellationToken, LocalIdentity);
 
         Assert.AreEqual(3, result.LastId); // Make sure LastId is 3, the rest is tested in other test.
-        lastId = result.LastId;
 
         // Add new instruction
         var instructions = CreateInstructions();
         sut.DeliverInstructions(instructions, LocalIdentity);
 
-        var secondResult = sut.ProcessInstructions(CacheRefreshers, CancellationToken, LocalIdentity, lastId);
+        var secondResult = sut.ProcessAllInstructions(CacheRefreshers, CancellationToken, LocalIdentity);
 
         Assert.Multiple(() =>
         {
             Assert.AreEqual(4, secondResult.LastId);
             Assert.AreEqual(0, secondResult.NumberOfInstructionsProcessed);
         });
+    }
+
+    [Test]
+    public async Task Local_Instructions_Trigger_LastId_Update()
+    {
+        var sut = GetRequiredService<ICacheInstructionService>();
+        var lastSyncedManager = GetRequiredService<ILastSyncedManager>();
+
+        var instructions = CreateInstructions();
+        sut.DeliverInstructions(instructions, LocalIdentity);
+        sut.DeliverInstructions(instructions, LocalIdentity);
+
+        var lastSynced = await lastSyncedManager.GetLastSyncedExternalAsync();
+        Assert.IsNull(lastSynced);
+
+        var result = sut.ProcessAllInstructions(CacheRefreshers, CancellationToken, LocalIdentity);
+
+        Assert.Multiple(() =>
+        {
+            // 2 records found.
+            Assert.AreEqual(2, result.LastId);
+
+            // local instructions do not count against number of processed instructions.
+            Assert.AreEqual(0, result.NumberOfInstructionsProcessed);
+        });
+
+        lastSynced = await lastSyncedManager.GetLastSyncedExternalAsync();
+        Assert.AreEqual(2, lastSynced);
+        var debug = true;
     }
 
     private void CreateAndDeliveryMultipleInstructions(CacheInstructionService sut)

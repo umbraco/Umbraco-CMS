@@ -67,7 +67,7 @@ public class SqlTemplatesBenchmark
 
     private class Config : ManualConfig
     {
-        public Config() => Add(MemoryDiagnoser.Default);
+        public Config() => AddDiagnoser(MemoryDiagnoser.Default);
     }
 
     [TableName("zbThing1")]

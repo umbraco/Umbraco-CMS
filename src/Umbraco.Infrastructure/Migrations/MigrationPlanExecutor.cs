@@ -3,7 +3,9 @@ using Microsoft.Extensions.Logging;
 using OpenIddict.Abstractions;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Migrations;
+using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
@@ -34,6 +36,9 @@ namespace Umbraco.Cms.Infrastructure.Migrations;
  * Hence the need for partial migration completions.
  */
 
+/// <summary>
+/// Executes migration plans that update the database schema and data as part of the Umbraco migration framework.
+/// </summary>
 public class MigrationPlanExecutor : IMigrationPlanExecutor
 {
     private readonly ILogger<MigrationPlanExecutor> _logger;
@@ -47,9 +52,25 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
     private readonly DistributedCache _distributedCache;
     private readonly IScopeAccessor _scopeAccessor;
     private readonly ICoreScopeProvider _scopeProvider;
+    private readonly IPublishedContentTypeFactory _publishedContentTypeFactory;
+
     private bool _rebuildCache;
     private bool _invalidateBackofficeUserAccess;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MigrationPlanExecutor"/> class, responsible for executing migration plans within the Umbraco CMS infrastructure.
+    /// </summary>
+    /// <param name="scopeProvider">Provides access to the core scope for database operations.</param>
+    /// <param name="scopeAccessor">Accesses the current scope context.</param>
+    /// <param name="loggerFactory">Factory for creating logger instances used for logging migration activities.</param>
+    /// <param name="migrationBuilder">Builds and manages migration steps and plans.</param>
+    /// <param name="databaseFactory">Factory for creating Umbraco database connections.</param>
+    /// <param name="databaseCacheRebuilder">Handles rebuilding of database-level caches after migrations.</param>
+    /// <param name="distributedCache">Manages distributed cache invalidation and synchronization.</param>
+    /// <param name="keyValueService">Service for storing and retrieving key-value pairs, often used for migration state.</param>
+    /// <param name="serviceScopeFactory">Factory for creating service scopes, enabling dependency injection within migration execution.</param>
+    /// <param name="appCaches">Provides access to application-level caches.</param>
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
     public MigrationPlanExecutor(
         ICoreScopeProvider scopeProvider,
         IScopeAccessor scopeAccessor,
@@ -61,6 +82,47 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
         IKeyValueService keyValueService,
         IServiceScopeFactory serviceScopeFactory,
         AppCaches appCaches)
+        : this(
+            scopeProvider,
+            scopeAccessor,
+            loggerFactory,
+            migrationBuilder,
+            databaseFactory,
+            databaseCacheRebuilder,
+            distributedCache,
+            keyValueService,
+            serviceScopeFactory,
+            appCaches,
+            StaticServiceProvider.Instance.GetRequiredService<IPublishedContentTypeFactory>())
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Migrations.MigrationPlanExecutor"/> class, responsible for executing migration plans within the Umbraco CMS infrastructure.
+    /// </summary>
+    /// <param name="scopeProvider">Provides access to core database transaction scopes.</param>
+    /// <param name="scopeAccessor">Accesses the current database scope for migration operations.</param>
+    /// <param name="loggerFactory">Factory for creating loggers used during migration execution.</param>
+    /// <param name="migrationBuilder">Builds and manages migration steps and plans.</param>
+    /// <param name="databaseFactory">Factory for creating Umbraco database connections.</param>
+    /// <param name="databaseCacheRebuilder">Handles rebuilding of database-level caches after migrations.</param>
+    /// <param name="distributedCache">Manages distributed cache invalidation related to migration changes.</param>
+    /// <param name="keyValueService">Service for storing and retrieving key-value pairs, often used for migration state.</param>
+    /// <param name="serviceScopeFactory">Factory for creating service scopes for dependency injection during migrations.</param>
+    /// <param name="appCaches">Provides access to application-level caches.</param>
+    /// <param name="publishedContentTypeFactory">Factory for creating published content types, used when migrations affect content models.</param>
+    public MigrationPlanExecutor(
+        ICoreScopeProvider scopeProvider,
+        IScopeAccessor scopeAccessor,
+        ILoggerFactory loggerFactory,
+        IMigrationBuilder migrationBuilder,
+        IUmbracoDatabaseFactory databaseFactory,
+        IDatabaseCacheRebuilder databaseCacheRebuilder,
+        DistributedCache distributedCache,
+        IKeyValueService keyValueService,
+        IServiceScopeFactory serviceScopeFactory,
+        AppCaches appCaches,
+        IPublishedContentTypeFactory publishedContentTypeFactory)
     {
         _scopeProvider = scopeProvider;
         _scopeAccessor = scopeAccessor;
@@ -72,6 +134,7 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
         _serviceScopeFactory = serviceScopeFactory;
         _appCaches = appCaches;
         _distributedCache = distributedCache;
+        _publishedContentTypeFactory = publishedContentTypeFactory;
         _logger = _loggerFactory.CreateLogger<MigrationPlanExecutor>();
     }
 
@@ -269,6 +332,7 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
         _appCaches.IsolatedCaches.ClearAllCaches();
         await _databaseCacheRebuilder.RebuildAsync(false);
         _distributedCache.RefreshAllPublishedSnapshot();
+        _publishedContentTypeFactory.ClearDataTypeCache();
     }
 
     private async Task RevokeBackofficeTokens()
@@ -286,7 +350,7 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
         var backOfficeClientId = await openIddictApplicationManager.GetIdAsync(backOfficeClient);
         if (backOfficeClientId is null)
         {
-            _logger.LogWarning("Could not extract the clientId from the openIddict backofficelient Application. Canceling token revocation. Users might have to manually log out to get proper access to the backoffice", Constants.OAuthClientIds.BackOffice);
+            _logger.LogWarning("Could not extract the clientId from the openIddict backoffice client Application for {BackOfficeClientId}. Canceling token revocation. Users might have to manually log out to get proper access to the backoffice", Constants.OAuthClientIds.BackOffice);
             return;
         }
 

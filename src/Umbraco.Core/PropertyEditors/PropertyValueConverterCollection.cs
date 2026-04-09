@@ -3,11 +3,18 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
+/// <summary>
+/// Represents a collection of <see cref="IPropertyValueConverter"/> instances.
+/// </summary>
 public class PropertyValueConverterCollection : BuilderCollectionBase<IPropertyValueConverter>
 {
     private readonly Lock _locker = new();
     private Dictionary<IPropertyValueConverter, Type[]>? _defaultConverters;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PropertyValueConverterCollection"/> class.
+    /// </summary>
+    /// <param name="items">A factory function that returns the collection items.</param>
     public PropertyValueConverterCollection(Func<IEnumerable<IPropertyValueConverter>> items)
         : base(items)
     {
@@ -40,9 +47,20 @@ public class PropertyValueConverterCollection : BuilderCollectionBase<IPropertyV
         }
     }
 
+    /// <summary>
+    /// Determines whether the specified converter is a default converter.
+    /// </summary>
+    /// <param name="converter">The converter to check.</param>
+    /// <returns><c>true</c> if the converter is a default converter; otherwise, <c>false</c>.</returns>
     internal bool IsDefault(IPropertyValueConverter converter)
         => DefaultConverters.ContainsKey(converter);
 
+    /// <summary>
+    /// Determines whether one converter shadows another.
+    /// </summary>
+    /// <param name="shadowing">The converter that may be shadowing.</param>
+    /// <param name="shadowed">The converter that may be shadowed.</param>
+    /// <returns><c>true</c> if the shadowing converter shadows the shadowed converter; otherwise, <c>false</c>.</returns>
     internal bool Shadows(IPropertyValueConverter shadowing, IPropertyValueConverter shadowed)
     {
         Type shadowedType = shadowed.GetType();

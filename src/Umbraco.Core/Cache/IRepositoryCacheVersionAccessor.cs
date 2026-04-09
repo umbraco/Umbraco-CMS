@@ -20,7 +20,14 @@ public interface IRepositoryCacheVersionAccessor
     /// <returns>
     /// The cache version if found, or <see langword="null"/> if the version doesn't exist or the request is a client-side request.
     /// </returns>
-    public Task<RepositoryCacheVersion?> GetAsync(string cacheKey);
+    Task<RepositoryCacheVersion?> GetAsync(string cacheKey);
+
+    /// <summary>
+    /// Notifies of a version change on a given cache key.
+    /// </summary>
+    /// <param name="cacheKey">Key of the changed version.</param>
+    void VersionChanged(string cacheKey)
+    { }
 
     /// <summary>
     /// Notifies the accessor that caches have been synchronized.
@@ -29,5 +36,5 @@ public interface IRepositoryCacheVersionAccessor
     /// This method is called after cache synchronization to temporarily bypass version checking,
     /// preventing recursive sync attempts while repositories reload data from the database.
     /// </remarks>
-    public void CachesSynced();
+    void CachesSynced();
 }

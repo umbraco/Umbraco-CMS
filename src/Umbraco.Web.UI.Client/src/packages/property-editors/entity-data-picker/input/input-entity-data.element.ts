@@ -1,5 +1,15 @@
 import { UmbEntityDataPickerInputContext } from './input-entity-data.context.js';
-import { css, html, customElement, property, state, repeat, nothing, when } from '@umbraco-cms/backoffice/external/lit';
+import {
+	css,
+	html,
+	customElement,
+	property,
+	state,
+	repeat,
+	nothing,
+	when,
+	ifDefined,
+} from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray, type UmbConfigCollectionModel } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -7,6 +17,7 @@ import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import type { UmbRepositoryItemsStatus } from '@umbraco-cms/backoffice/repository';
 import type { UmbItemModel } from '@umbraco-cms/backoffice/entity-item';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import type { UmbPickerDataSource } from '@umbraco-cms/backoffice/picker-data-source';
 
 @customElement('umb-input-entity-data')
 export class UmbInputEntityDataElement extends UmbFormControlMixin<string | undefined, typeof UmbLitElement>(
@@ -28,11 +39,11 @@ export class UmbInputEntityDataElement extends UmbFormControlMixin<string | unde
 		},
 	});
 
-	public set dataSourceAlias(value: string | undefined) {
-		this.#pickerInputContext.setDataSourceAlias(value);
+	public set dataSourceApi(api: UmbPickerDataSource | undefined) {
+		this.#pickerInputContext.setDataSourceApi(api);
 	}
-	public get dataSourceAlias(): string | undefined {
-		return this.#pickerInputContext.getDataSourceAlias();
+	public get dataSourceApi(): UmbPickerDataSource | undefined {
+		return this.#pickerInputContext.getDataSourceApi();
 	}
 
 	public set dataSourceConfig(config: UmbConfigCollectionModel | undefined) {
@@ -40,6 +51,13 @@ export class UmbInputEntityDataElement extends UmbFormControlMixin<string | unde
 	}
 	public get dataSourceConfig(): UmbConfigCollectionModel | undefined {
 		return this.#pickerInputContext.getDataSourceConfig();
+	}
+
+	public set pickerViews(value: Array<{ alias: string }> | undefined) {
+		this.#pickerInputContext.setPickerViews(value);
+	}
+	public get pickerViews(): Array<{ alias: string }> | undefined {
+		return this.#pickerInputContext.getPickerViews();
 	}
 
 	/**
@@ -133,6 +151,9 @@ export class UmbInputEntityDataElement extends UmbFormControlMixin<string | unde
 	@state()
 	private _statuses?: Array<UmbRepositoryItemsStatus>;
 
+	@state()
+	private _modalRoute?: string;
+
 	#pickerInputContext = new UmbEntityDataPickerInputContext(this);
 
 	constructor() {
@@ -163,6 +184,10 @@ export class UmbInputEntityDataElement extends UmbFormControlMixin<string | unde
 		);
 
 		this.observe(this.#pickerInputContext.statuses, (statuses) => (this._statuses = statuses), '_observerStatuses');
+
+		this.observe(this.#pickerInputContext.modalRoute, (modalRoute) => {
+			this._modalRoute = modalRoute;
+		});
 	}
 
 	protected override getFormElement() {
@@ -184,7 +209,7 @@ export class UmbInputEntityDataElement extends UmbFormControlMixin<string | unde
 			<uui-button
 				id="btn-add"
 				look="placeholder"
-				@click=${() => this.#pickerInputContext.openPicker()}
+				href=${ifDefined(this._modalRoute)}
 				label="${this.localize.term('general_choose')}"
 				?disabled=${this.readonly}></uui-button>
 		`;

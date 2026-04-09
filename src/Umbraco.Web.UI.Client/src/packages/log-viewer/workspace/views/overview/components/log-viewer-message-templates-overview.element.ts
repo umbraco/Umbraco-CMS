@@ -48,8 +48,8 @@ export class UmbLogViewerMessageTemplatesOverviewElement extends UmbLitElement {
 
 	override render() {
 		return html`
-			<uui-box headline="Common Log Messages" id="saved-searches">
-				<p style="font-style: italic;">Total Unique Message types: ${this._total}</p>
+			<uui-box headline=${this.localize.term('logViewer_commonLogMessages')} id="saved-searches">
+				<p style="font-style: italic;">${this.localize.term('logViewer_totalUniqueMessageTypes', this._total)}</p>
 
 				<uui-table>
 					${this._messageTemplates

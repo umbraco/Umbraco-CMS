@@ -5,6 +5,9 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Umbraco.Extensions;
 
+/// <summary>
+/// Provides extension methods for <see cref="int"/>.
+/// </summary>
 public static class IntExtensions
 {
     /// <summary>

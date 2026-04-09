@@ -28,11 +28,16 @@ public class LocalizedTextServiceFileSources
     private readonly Lazy<Dictionary<CultureInfo, Lazy<XDocument>>> _xmlSources;
 
     /// <summary>
+    ///     Initializes a new instance of the <see cref="LocalizedTextServiceFileSources" /> class.
     ///     This is used to configure the file sources with the main file sources shipped with Umbraco and also including
-    ///     supplemental/plugin based
-    ///     localization files. The supplemental files will be loaded in and merged in after the primary files.
+    ///     supplemental/plugin based localization files. The supplemental files will be loaded in and merged in after the primary files.
     ///     The supplemental files must be named with the 4 letter culture name with a hyphen such as : en-AU.xml
     /// </summary>
+    /// <param name="logger">The logger.</param>
+    /// <param name="appCaches">The application caches.</param>
+    /// <param name="fileSourceFolder">The directory containing the primary localization files.</param>
+    /// <param name="supplementFileSources">The supplementary file sources to merge with primary files.</param>
+    /// <param name="directoryContents">The directory contents provider.</param>
     public LocalizedTextServiceFileSources(
         ILogger<LocalizedTextServiceFileSources> logger,
         AppCaches appCaches,
@@ -144,8 +149,11 @@ public class LocalizedTextServiceFileSources
     }
 
     /// <summary>
-    ///     Constructor
+    ///     Initializes a new instance of the <see cref="LocalizedTextServiceFileSources" /> class with default settings.
     /// </summary>
+    /// <param name="logger">The logger.</param>
+    /// <param name="appCaches">The application caches.</param>
+    /// <param name="fileSourceFolder">The directory containing the localization files.</param>
     public LocalizedTextServiceFileSources(ILogger<LocalizedTextServiceFileSources> logger, AppCaches appCaches, DirectoryInfo fileSourceFolder)
         : this(logger, appCaches, fileSourceFolder, Enumerable.Empty<LocalizedTextServiceSupplementaryFileSource>(), new NotFoundDirectoryContents())
     {
@@ -186,6 +194,14 @@ public class LocalizedTextServiceFileSources
         return result;
     }
 
+    /// <summary>
+    ///     Attempts to convert a 2-letter culture code to its 4-letter equivalent.
+    /// </summary>
+    /// <param name="twoLetterCulture">The 2-letter culture code to convert.</param>
+    /// <returns>An attempt containing the 4-letter culture info if successful.</returns>
+    /// <remarks>
+    ///     This is a workaround because language files are stored with 2-letter culture names that actually contain 4-letter cultures.
+    /// </remarks>
     // TODO: See other notes in this class, this is purely a hack because we store 2 letter culture file names that contain 4 letter cultures :(
     public Attempt<CultureInfo?> TryConvert2LetterCultureTo4Letter(string twoLetterCulture)
     {
@@ -202,6 +218,14 @@ public class LocalizedTextServiceFileSources
             : Attempt<CultureInfo?>.Fail();
     }
 
+    /// <summary>
+    ///     Attempts to convert a 4-letter culture to its 2-letter equivalent.
+    /// </summary>
+    /// <param name="culture">The culture to convert.</param>
+    /// <returns>An attempt containing the 2-letter culture code if successful.</returns>
+    /// <remarks>
+    ///     This is a workaround because language files are stored with 2-letter culture names that actually contain 4-letter cultures.
+    /// </remarks>
     // TODO: See other notes in this class, this is purely a hack because we store 2 letter culture file names that contain 4 letter cultures :(
     public Attempt<string?> TryConvert4LetterCultureTo2Letter(CultureInfo culture)
     {

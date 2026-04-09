@@ -65,6 +65,9 @@ public class DataValueEditor : IDataValueEditor
     /// <seealso cref="IDataType.ConfigurationObject"/>
     public virtual object? ConfigurationObject { get; set; }
 
+    /// <summary>
+    /// Gets or sets a value indicating whether this value editor supports read-only mode.
+    /// </summary>
     public bool SupportsReadOnly { get; set; }
 
     /// <summary>
@@ -341,8 +344,14 @@ public class DataValueEditor : IDataValueEditor
         }
     }
 
-    // Adding a virtual method that wraps the default implementation allows derived classes
-    // to override the default implementation without having to explicitly inherit the interface.
+    /// <summary>
+    ///     Gets the keys of element types that are configured for this value editor.
+    /// </summary>
+    /// <returns>An enumerable of element type keys, or an empty enumerable if none are configured.</returns>
+    /// <remarks>
+    ///     Adding a virtual method that wraps the default implementation allows derived classes
+    ///     to override the default implementation without having to explicitly inherit the interface.
+    /// </remarks>
     public virtual IEnumerable<Guid> ConfiguredElementTypeKeys() => Enumerable.Empty<Guid>();
 
     /// <summary>

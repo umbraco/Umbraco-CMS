@@ -9,6 +9,9 @@ namespace Umbraco.Cms.Core.PropertyEditors.Validators;
 /// </summary>
 public class RequiredValidator : IValueRequiredValidator, IValueValidator
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="RequiredValidator"/> class.
+    /// </summary>
     public RequiredValidator()
     {
     }

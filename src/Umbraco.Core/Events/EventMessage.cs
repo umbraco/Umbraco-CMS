@@ -15,10 +15,19 @@ public sealed class EventMessage
         MessageType = messageType;
     }
 
+    /// <summary>
+    ///     Gets the category of the message.
+    /// </summary>
     public string Category { get; }
 
+    /// <summary>
+    ///     Gets the message content.
+    /// </summary>
     public string Message { get; }
 
+    /// <summary>
+    ///     Gets the type of the message.
+    /// </summary>
     public EventMessageType MessageType { get; }
 
     /// <summary>

@@ -1,7 +1,7 @@
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { RuntimeLevelModel, ServerService } from '@umbraco-cms/backoffice/external/backend-api';
-import { UmbBooleanState, UmbNumberState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbBooleanState, UmbNumberState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 export class UmbServerConnection extends UmbControllerBase {
@@ -19,6 +19,9 @@ export class UmbServerConnection extends UmbControllerBase {
 
 	#allowPasswordReset = new UmbBooleanState(false);
 	allowPasswordReset = this.#allowPasswordReset.asObservable();
+
+	#umbracoCssPath = new UmbStringState(undefined);
+	umbracoCssPath = this.#umbracoCssPath.asObservable();
 
 	constructor(host: UmbControllerHost, serverUrl: string) {
 		super(host);
@@ -86,5 +89,6 @@ export class UmbServerConnection extends UmbControllerBase {
 		this.#versionCheckPeriod.setValue(data?.versionCheckPeriod);
 		this.#allowLocalLogin.setValue(data?.allowLocalLogin ?? false);
 		this.#allowPasswordReset.setValue(data?.allowPasswordReset ?? false);
+		this.#umbracoCssPath.setValue(data?.umbracoCssPath);
 	}
 }

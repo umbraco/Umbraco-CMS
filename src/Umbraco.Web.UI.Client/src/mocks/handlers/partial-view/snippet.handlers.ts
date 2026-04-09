@@ -1,18 +1,18 @@
-const { rest } = window.MockServiceWorker;
+const { http, HttpResponse } = window.MockServiceWorker;
 import { umbPartialViewMockDB } from '../../data/partial-view/partial-view.db.js';
 import { UMB_SLUG } from './slug.js';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 export const snippetHandlers = [
-	rest.get(umbracoPath(`${UMB_SLUG}/snippet`), (req, res, ctx) => {
+	http.get(umbracoPath(`${UMB_SLUG}/snippet`), () => {
 		const response = umbPartialViewMockDB.getSnippets();
-		return res(ctx.status(200), ctx.json(response));
+		return HttpResponse.json(response);
 	}),
 
-	rest.get(umbracoPath(`${UMB_SLUG}/snippet/:fileName`), (req, res, ctx) => {
-		const fileName = req.params.fileName as string;
-		if (!fileName) return res(ctx.status(400));
+	http.get(umbracoPath(`${UMB_SLUG}/snippet/:fileName`), ({ params }) => {
+		const fileName = params.fileName as string;
+		if (!fileName) return new HttpResponse(null, { status: 400 });
 		const response = umbPartialViewMockDB.getSnippet(fileName);
-		return res(ctx.status(200), ctx.json(response));
+		return HttpResponse.json(response);
 	}),
 ];

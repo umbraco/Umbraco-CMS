@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
@@ -13,6 +13,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.User.Filter;
 
+/// <summary>
+/// API controller for managing and applying user filters within the Umbraco CMS management interface.
+/// </summary>
 [ApiVersion("1.0")]
 public class FilterUserFilterController : UserFilterControllerBase
 {
@@ -20,6 +23,12 @@ public class FilterUserFilterController : UserFilterControllerBase
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly IUserPresentationFactory _userPresentationFactory;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="FilterUserFilterController"/> class, which handles user filtering operations in the management API.
+    /// </summary>
+    /// <param name="userService">Service used to manage and retrieve user information.</param>
+    /// <param name="backOfficeSecurityAccessor">Provides access to back office security context and operations.</param>
+    /// <param name="userPresentationFactory">Factory responsible for creating user presentation models.</param>
     public FilterUserFilterController(
         IUserService userService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
@@ -33,6 +42,7 @@ public class FilterUserFilterController : UserFilterControllerBase
     /// <summary>
     /// Query users
     /// </summary>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <param name="skip">Amount to skip.</param>
     /// <param name="take">Amount to take.</param>
     /// <param name="orderBy">Property to order by.</param>
@@ -46,6 +56,8 @@ public class FilterUserFilterController : UserFilterControllerBase
     [ProducesResponseType(typeof(PagedViewModel<UserResponseModel>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Gets a filtered collection of users.")]
+    [EndpointDescription("Filters users based on the provided criteria with support for pagination.")]
     public async Task<IActionResult> Filter(
         CancellationToken cancellationToken,
         int skip = 0,

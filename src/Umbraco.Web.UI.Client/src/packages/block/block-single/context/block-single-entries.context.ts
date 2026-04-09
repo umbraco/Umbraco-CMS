@@ -55,9 +55,18 @@ export class UmbBlockSingleEntriesContext extends UmbBlockEntriesContext<
 				const config = propertyContext.getConfig();
 				const valueResolver = new UmbClipboardPastePropertyValueTranslatorValueResolver(this);
 
+				const blockTypes = this._manager.getBlockTypes() ?? [];
+
+				/*
+				modal size logic:
+				If more than 8 block types, medium modal, more than 12 large modal:
+				*/
+				const modalSize = blockTypes.length > 12 ? 'large' : blockTypes.length > 8 ? 'medium' : 'small';
+
 				return {
+					modal: { size: modalSize },
 					data: {
-						blocks: this._manager?.getBlockTypes() ?? [],
+						blocks: blockTypes,
 						blockGroups: [],
 						openClipboard: routingInfo.view === 'clipboard',
 						clipboardFilter: async (clipboardEntryDetail) => {
@@ -158,7 +167,18 @@ export class UmbBlockSingleEntriesContext extends UmbBlockEntriesContext<
 	}
 
 	getPathForCreateBlock(index: number) {
-		return this._catalogueRouteBuilderState.getValue()?.({ view: 'create', index: index });
+		const pathBuilder = this._catalogueRouteBuilderState.getValue();
+		if (!pathBuilder) return undefined;
+
+		if (!this._manager) return undefined;
+		const blockTypes = this._manager.getBlockTypes();
+		if (blockTypes.length === 1) {
+			if (this._manager.getInlineEditingMode()) {
+				return undefined;
+			}
+		}
+
+		return pathBuilder?.({ view: 'create', index: index });
 	}
 
 	getPathForClipboard(index: number) {

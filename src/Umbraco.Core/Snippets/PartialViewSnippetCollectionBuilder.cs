@@ -13,8 +13,10 @@ namespace Umbraco.Cms.Core.Snippets;
 /// </summary>
 public partial class PartialViewSnippetCollectionBuilder : LazyCollectionBuilderBase<PartialViewSnippetCollectionBuilder, PartialViewSnippetCollection, PartialViewSnippet>
 {
+    /// <inheritdoc />
     protected override PartialViewSnippetCollectionBuilder This => this;
 
+    /// <inheritdoc />
     protected override IEnumerable<PartialViewSnippet> CreateItems(IServiceProvider factory)
     {
         var embeddedSnippets = new List<PartialViewSnippet>(base.CreateItems(factory));
@@ -36,6 +38,11 @@ public partial class PartialViewSnippetCollectionBuilder : LazyCollectionBuilder
         return embeddedSnippets;
     }
 
+    /// <summary>
+    /// Cleans up snippet content by normalizing line endings and adjusting the header.
+    /// </summary>
+    /// <param name="content">The raw snippet content to clean up.</param>
+    /// <returns>The cleaned snippet content with a standard header.</returns>
     private string CleanUpSnippetContent(string content)
     {
         const string partialViewHeader = "@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage";

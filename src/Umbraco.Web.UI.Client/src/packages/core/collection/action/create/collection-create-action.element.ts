@@ -33,12 +33,12 @@ export class UmbCollectionCreateActionButtonElement extends UmbLitElement {
 	}
 
 	async #onClick(event: Event, controller: UmbExtensionApiInitializer<ManifestType>, href?: string) {
-		event.stopPropagation();
-
 		// skip if href is defined
 		if (href) {
 			return;
 		}
+
+		event.stopPropagation();
 
 		if (!controller.api) throw new Error('No API found');
 		await controller.api.execute().catch(() => {});
@@ -142,7 +142,7 @@ export class UmbCollectionCreateActionButtonElement extends UmbLitElement {
 
 		return html`
 			<uui-menu-item
-				label=${label}
+				label=${manifest.meta.additionalOptions ? label + '...' : label}
 				href=${ifDefined(href)}
 				target=${this.#getTarget(href)}
 				@click=${(event: Event) => this.#onClick(event, controller, href)}>

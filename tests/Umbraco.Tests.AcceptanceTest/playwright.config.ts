@@ -56,7 +56,7 @@ export default defineConfig({
     },
     {
       name: 'extensionRegistry',
-      testMatch: 'ExtensionRegistry/*.spec.ts',
+      testMatch: 'ExtensionRegistry/**/*.spec.ts',
       dependencies: ['setup'],
       use: {
         ...devices['Desktop Chrome'],
@@ -101,6 +101,39 @@ export default defineConfig({
       testMatch: 'UnattendedInstallConfig/**',
       use: {
         ...devices['Desktop Chrome']
+      }
+    },
+    {
+      name: 'contentSettingConfig',
+      testMatch: 'ContentSettingConfig/**',
+      dependencies: ['setup'],
+      use: {
+        ...devices['Desktop Chrome'],
+        // Use prepared auth state.
+        ignoreHTTPSErrors: true,
+        storageState: STORAGE_STATE
+      }
+    },
+    {
+      name: 'smtp',
+      testMatch: 'SMTP/*.spec.ts',
+      dependencies: ['setup'],
+      use: {
+        ...devices['Desktop Chrome'],
+        // Use prepared auth state.
+        ignoreHTTPSErrors: true,
+        storageState: STORAGE_STATE
+      }
+    },
+    {
+      name: 'imagingSettingConfig',
+      testMatch: 'ImagingSettingConfig/*.spec.ts',
+      dependencies: ['setup'],
+      use: {
+        ...devices['Desktop Chrome'],
+        // Use prepared auth state.
+        ignoreHTTPSErrors: true,
+        storageState: STORAGE_STATE
       }
     }
   ],

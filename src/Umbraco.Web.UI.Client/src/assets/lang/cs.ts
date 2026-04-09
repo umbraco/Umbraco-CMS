@@ -1082,8 +1082,8 @@ export default {
 	},
 	rollback: {
 		headline: 'Vyberte verzi, kterou chcete porovnat s aktuální verzí',
-		diffHelp:
-			'Tohle ukazuje rozdíly mezi současnou verzi a vybranou verzi<br /><del>Červený</del> text nebude ve vybrané verzi zobrazen, <ins>zelený znamená přidaný</ins>].',
+		diffHelp: '<del>Červený text</del> bude ve vybrané verzi odstraněn, <ins>zelený text</ins> bude přidán.',
+		showDiff: 'Zobrazit rozdíly mezi aktuální (koncept) verzí a vybranou verzí.',
 		documentRolledBack: 'Dokument byl vrácen na starší verzi',
 		htmlHelp:
 			'Tohle zobrazuje vybranou verzi jako html, jestliže chcete vidět rozdíly mezi 2 verzemi najednou, použijte rozdílové zobrazení',
@@ -1567,6 +1567,7 @@ export default {
 		noLockouts: 'nebyl uzamčen',
 		noPasswordChange: 'Heslo nebylo změněno',
 		confirmNewPassword: 'Potvrdit heslo',
+		confirmPassword: 'Potvrdit heslo',
 		changePasswordDescription:
 			"Můžete změnit své heslo pro přístup do administrace Umbraca vyplněním formuláře níže a kliknutím na tlačítko 'Změnit Heslo'",
 		contentChannel: 'Kanál obsahu',
@@ -1808,7 +1809,8 @@ export default {
 		openBackofficeSearch: 'Otevřít hledání v backoffice',
 		openCloseBackofficeHelp: 'Otevřít/zavřít nápovědu backoffice',
 		openCloseBackofficeProfileOptions: 'Otevřít/zavřít možnosti vašeho profilu',
-		profileOptions: 'Opcije profila',
+		profileOptions: 'Profil uživatele pro %0% (%1%)',
+		profileOptionsDefault: 'Profil uživatele',
 		openContextMenu: 'Otevřít kontextové menu pro',
 		currentLanguage: 'Aktuální jazyk',
 		switchLanguage: 'Přepnout jazyk na',
@@ -1841,13 +1843,10 @@ export default {
 		selectAllLogLevelFilters: 'Vybrat vše',
 		deselectAllLogLevelFilters: 'Odznačit vše',
 		savedSearches: 'Uložená vyhledávání',
-		totalItems: 'Celkem položek',
 		timestamp: 'Časové razítko',
 		level: 'Úroveň',
 		machine: 'Stroj',
 		message: 'Zpráva',
-		exception: 'Výjimka',
-		properties: 'Vlastnosti',
 		searchWithGoogle: 'Vyhledat na Googlu',
 		searchThisMessageWithGoogle: 'Vyhledat zprávu na Googlu',
 		searchWithBing: 'Vyhledat na Bing',
@@ -1861,10 +1860,6 @@ export default {
 		searchUmbracoIssues: 'Prohledat Umbraco Issues',
 		searchUmbracoIssuesOnGithub: 'Prohledat Umbraco Issues na Github',
 		deleteThisSearch: 'Smazat toto vyhledávání',
-		findLogsWithRequestId: 'Najít logy s ID požadavku',
-		findLogsWithNamespace: 'Najít logy se jmenným prostorem',
-		findLogsWithMachineName: 'Najít logy s názvem stroje',
-		open: 'Otevřít',
 	},
 	clipboard: {
 		labelForCopyAllEntries: 'Kopírovat %0%',

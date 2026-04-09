@@ -4,12 +4,17 @@ namespace Umbraco.Cms.Core.Services.Navigation;
 ///     Placeholder for sharing logic between the document and media navigation services
 ///     for managing the navigation structure.
 /// </summary>
+/// <remarks>
+///     This interface defines methods for managing the main navigation structure,
+///     including rebuilding, adding, moving, and managing content nodes.
+/// </remarks>
 public interface INavigationManagementService
 {
     /// <summary>
     ///     Rebuilds the entire navigation structure by refreshing the navigation tree based
     ///     on the current state of the underlying repository.
     /// </summary>
+    /// <returns>A task representing the asynchronous rebuild operation.</returns>
     Task RebuildAsync();
 
     /// <summary>

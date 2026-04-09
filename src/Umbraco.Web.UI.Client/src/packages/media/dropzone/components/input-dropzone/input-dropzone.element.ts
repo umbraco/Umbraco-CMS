@@ -210,7 +210,10 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 					${when(item.status === UmbFileDropzoneItemStatus.CANCELLED, () => html`<div class="error">Cancelled</div>`)}
 					${when(
 						item.status === UmbFileDropzoneItemStatus.NOT_ALLOWED,
-						() => html`<div class="error">File type not allowed</div>`,
+						() =>
+							html`<div class="error">
+								${item.statusMessage ?? this.localize.term('media_disallowedFileType')}.
+							</div>`,
 					)}
 				</div>
 				<div class="fileActions">

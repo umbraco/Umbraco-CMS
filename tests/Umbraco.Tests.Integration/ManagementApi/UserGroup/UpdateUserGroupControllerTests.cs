@@ -63,6 +63,7 @@ public class UpdateUserGroupControllerTests : ManagementApiUserGroupTestBase<Upd
         {
             Name = "UpdatedTestGroup",
             Alias = "testAlias",
+            Description = "Updated test group description",
             FallbackPermissions = new HashSet<string>(),
             HasAccessToAllLanguages = true,
             Languages = [],

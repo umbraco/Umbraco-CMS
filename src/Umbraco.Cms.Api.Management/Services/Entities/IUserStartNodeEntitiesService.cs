@@ -5,6 +5,9 @@ using Umbraco.Cms.Api.Management.Models.Entities;
 
 namespace Umbraco.Cms.Api.Management.Services.Entities;
 
+/// <summary>
+/// Provides methods for retrieving and managing user start node entities in the Umbraco CMS Management API.
+/// </summary>
 public interface IUserStartNodeEntitiesService
 {
     /// <summary>
@@ -54,7 +57,7 @@ public interface IUserStartNodeEntitiesService
     /// <summary>
     /// Calculates the applicable child entities from a list of candidate child entities for users without root access.
     /// </summary>
-    /// <param name="candidateChildren">The candidate child entities to filter (i.e. entities fetched with <see cref="EntityService.GetPagedChildren"/>).</param>
+    /// <param name="candidateChildren">The candidate child entities to filter (i.e. entities fetched with the EntityService's GetPagedChildren method).</param>
     /// <param name="userStartNodePaths">The calculated start node paths for the user.</param>
     /// <returns>A list of child entities applicable entities for the user.</returns>
     /// <remarks>

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Routing;
@@ -8,6 +8,9 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Stylesheet.Folder;
 
+/// <summary>
+/// Serves as the base controller for managing stylesheet folders in the Umbraco CMS Management API.
+/// </summary>
 [VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.Stylesheet}/folder")]
 [ApiExplorerSettings(GroupName = "Stylesheet")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessStylesheets)]

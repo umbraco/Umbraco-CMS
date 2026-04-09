@@ -30,6 +30,9 @@ public class MissingPropertyEditor : IDataEditor
         Alias = missingEditorAlias;
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MissingPropertyEditor"/> class.
+    /// </summary>
     [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 18.")]
     public MissingPropertyEditor()
         : this(
@@ -69,9 +72,18 @@ public class MissingPropertyEditor : IDataEditor
     /// <inheritdoc />
     public IConfigurationEditor GetConfigurationEditor() => new ConfigurationEditor();
 
-    // provides the property value editor
+    /// <summary>
+    /// Provides the property value editor for missing property editors.
+    /// </summary>
     internal sealed class MissingPropertyValueEditor : DataValueEditor
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MissingPropertyValueEditor"/> class.
+        /// </summary>
+        /// <param name="shortStringHelper">The short string helper.</param>
+        /// <param name="jsonSerializer">The JSON serializer.</param>
+        /// <param name="ioHelper">The IO helper.</param>
+        /// <param name="attribute">The data editor attribute.</param>
         public MissingPropertyValueEditor(
             IShortStringHelper shortStringHelper,
             IJsonSerializer jsonSerializer,

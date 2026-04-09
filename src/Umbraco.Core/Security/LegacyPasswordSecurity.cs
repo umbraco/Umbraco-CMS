@@ -12,17 +12,25 @@ namespace Umbraco.Cms.Core.Security;
 /// </remarks>
 public class LegacyPasswordSecurity
 {
+    /// <summary>
+    ///     Generates a cryptographically secure random salt.
+    /// </summary>
+    /// <returns>A base64-encoded salt string.</returns>
     public static string GenerateSalt()
     {
         var numArray = new byte[16];
-        using (var rng = new RNGCryptoServiceProvider())
-        {
-            rng.GetBytes(numArray);
-            return Convert.ToBase64String(numArray);
-        }
+        RandomNumberGenerator.Fill(numArray);
+        return Convert.ToBase64String(numArray);
     }
 
-    // Used for tests
+    /// <summary>
+    ///     Formats a password for storage by combining salt and hashed password.
+    /// </summary>
+    /// <param name="algorithmType">The hashing algorithm type.</param>
+    /// <param name="hashedPassword">The hashed password.</param>
+    /// <param name="salt">The salt used for hashing.</param>
+    /// <returns>The formatted password string for storage.</returns>
+    /// <remarks>Used for tests.</remarks>
     internal string FormatPasswordForStorage(string algorithmType, string hashedPassword, string salt)
     {
         if (!SupportHashAlgorithm(algorithmType))
@@ -34,12 +42,12 @@ public class LegacyPasswordSecurity
     }
 
     /// <summary>
-    ///     Verifies if the password matches the expected hash+salt of the stored password string
+    ///     Verifies if the password matches the expected hash+salt of the stored password string.
     /// </summary>
     /// <param name="algorithm">The hashing algorithm for the stored password.</param>
-    /// <param name="password">The password.</param>
+    /// <param name="password">The password to verify.</param>
     /// <param name="dbPassword">The value of the password stored in a data store.</param>
-    /// <returns></returns>
+    /// <returns><c>true</c> if the password matches; otherwise, <c>false</c>.</returns>
     public bool VerifyPassword(string algorithm, string password, string dbPassword)
     {
         if (string.IsNullOrWhiteSpace(dbPassword))
@@ -66,8 +74,11 @@ public class LegacyPasswordSecurity
     }
 
     /// <summary>
-    ///     Verify a legacy hashed password (HMACSHA1)
+    ///     Verifies a legacy hashed password that was created using HMACSHA1.
     /// </summary>
+    /// <param name="password">The password to verify.</param>
+    /// <param name="dbPassword">The stored hashed password from the database.</param>
+    /// <returns><c>true</c> if the password matches; otherwise, <c>false</c>.</returns>
     public bool VerifyLegacyHashedPassword(string password, string dbPassword)
     {
         using var hashAlgorithm = new HMACSHA1
@@ -82,8 +93,12 @@ public class LegacyPasswordSecurity
     }
 
     /// <summary>
-    ///     Create a new password hash and a new salt
+    ///     Creates a new password hash with a newly generated salt.
     /// </summary>
+    /// <param name="algorithm">The hashing algorithm to use.</param>
+    /// <param name="newPassword">The password to hash.</param>
+    /// <param name="salt">Returns the generated salt.</param>
+    /// <returns>The hashed password.</returns>
     internal string HashNewPassword(string algorithm, string newPassword, out string salt)
     {
         salt = GenerateSalt();
@@ -91,12 +106,12 @@ public class LegacyPasswordSecurity
     }
 
     /// <summary>
-    ///     Parses out the hashed password and the salt from the stored password string value
+    ///     Parses out the hashed password and the salt from the stored password string value.
     /// </summary>
     /// <param name="algorithm">The hashing algorithm for the stored password.</param>
-    /// <param name="storedString"></param>
-    /// <param name="salt">returns the salt</param>
-    /// <returns></returns>
+    /// <param name="storedString">The stored password string containing salt and hash.</param>
+    /// <param name="salt">Returns the extracted salt.</param>
+    /// <returns>The hashed password portion of the stored string.</returns>
     public string ParseStoredHashPassword(string algorithm, string storedString, out string salt)
     {
         if (string.IsNullOrWhiteSpace(storedString))
@@ -114,6 +129,11 @@ public class LegacyPasswordSecurity
         return storedString.Substring(saltLen.Length);
     }
 
+    /// <summary>
+    ///     Determines whether the specified hash algorithm is supported.
+    /// </summary>
+    /// <param name="algorithm">The algorithm name to check.</param>
+    /// <returns><c>true</c> if the algorithm is supported; otherwise, <c>false</c>.</returns>
     public bool SupportHashAlgorithm(string algorithm)
     {
         // This is for the v6-v8 hashing algorithm
@@ -132,12 +152,12 @@ public class LegacyPasswordSecurity
     }
 
     /// <summary>
-    ///     Hashes a password with a given salt
+    ///     Hashes a password with a given salt.
     /// </summary>
     /// <param name="algorithmType">The hashing algorithm for the password.</param>
-    /// <param name="pass"></param>
-    /// <param name="salt"></param>
-    /// <returns></returns>
+    /// <param name="pass">The password to hash.</param>
+    /// <param name="salt">The salt to use for hashing.</param>
+    /// <returns>The hashed password as a base64-encoded string.</returns>
     private string HashPassword(string algorithmType, string pass, string salt)
     {
         if (!SupportHashAlgorithm(algorithmType))
@@ -195,10 +215,11 @@ public class LegacyPasswordSecurity
     }
 
     /// <summary>
-    ///     Return the hash algorithm to use based on the provided <paramref name="algorithm"/>.
+    ///     Returns the hash algorithm instance based on the provided algorithm name.
     /// </summary>
-    /// <param name="algorithm">The hashing algorithm name.</param>
-    /// <returns></returns>
+    /// <param name="algorithm">The hashing algorithm name (e.g., "HMACSHA256", "SHA1", "MD5").</param>
+    /// <returns>A <see cref="HashAlgorithm"/> instance for the specified algorithm.</returns>
+    /// <exception cref="InvalidOperationException">Thrown when the algorithm is not specified or not recognized.</exception>
     private HashAlgorithm GetHashAlgorithm(string algorithm)
     {
         if (algorithm.IsNullOrWhiteSpace())
@@ -206,12 +227,16 @@ public class LegacyPasswordSecurity
             throw new InvalidOperationException("No hash algorithm type specified");
         }
 
-        var alg = HashAlgorithm.Create(algorithm);
-        if (alg == null)
+        return algorithm.ToUpperInvariant() switch
         {
-            throw new InvalidOperationException($"The hash algorithm specified {algorithm} cannot be resolved");
-        }
-
-        return alg;
+            "HMACSHA256" => new HMACSHA256(),
+            "HMACSHA1" => new HMACSHA1(),
+            "SHA1" => SHA1.Create(),
+            "SHA256" => SHA256.Create(),
+            "SHA384" => SHA384.Create(),
+            "SHA512" => SHA512.Create(),
+            "MD5" => MD5.Create(),
+            _ => throw new InvalidOperationException($"The hash algorithm specified {algorithm} cannot be resolved")
+        };
     }
 }

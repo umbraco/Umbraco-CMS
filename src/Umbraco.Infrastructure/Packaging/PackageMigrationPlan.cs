@@ -45,12 +45,6 @@ public abstract class PackageMigrationPlan : MigrationPlan, IDiscoverable
     }
 
     /// <summary>
-    /// Inform the plan executor to ignore all saved package state and
-    /// run the migration from initial state to it's end state.
-    /// </summary>
-    public override bool IgnoreCurrentState => true;
-
-    /// <summary>
     /// Gets the package identifier.
     /// </summary>
     /// <value>

@@ -32,7 +32,11 @@ export class UmbMemberTypeSearchServerDataSource implements UmbSearchDataSource<
 		const { data, error } = await tryExecute(
 			this.#host,
 			MemberTypeService.getItemMemberTypeSearch({
-				query: { query: args.query },
+				query: {
+					query: args.query,
+					skip: args.paging?.skip,
+					take: args.paging?.take,
+				},
 			}),
 		);
 

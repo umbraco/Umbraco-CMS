@@ -2,6 +2,9 @@ using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
+/// <summary>
+/// Defines options for determining whether property values should be compressed in the cache.
+/// </summary>
 public interface IPropertyCacheCompressionOptions
 {
     /// <summary>

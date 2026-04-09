@@ -30,6 +30,9 @@ public class TelemetryReportData
     [DataMember(Name = "packages")]
     public IEnumerable<PackageTelemetry>? Packages { get; set; }
 
+    /// <summary>
+    ///     Gets or sets detailed telemetry usage information.
+    /// </summary>
     [DataMember(Name = "detailed")]
     public IEnumerable<UsageInformation>? Detailed { get; set; }
 }

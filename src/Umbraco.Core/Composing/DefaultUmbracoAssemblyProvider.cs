@@ -19,6 +19,13 @@ public class DefaultUmbracoAssemblyProvider : IAssemblyProvider
     private readonly ILoggerFactory _loggerFactory;
     private List<Assembly>? _discovered;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DefaultUmbracoAssemblyProvider" /> class.
+    /// </summary>
+    /// <param name="entryPointAssembly">The entry point assembly to scan from.</param>
+    /// <param name="loggerFactory">The logger factory for creating loggers.</param>
+    /// <param name="additionalTargetAssemblies">Optional additional assembly names to include in scanning.</param>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="entryPointAssembly" /> is null.</exception>
     public DefaultUmbracoAssemblyProvider(
         Assembly? entryPointAssembly,
         ILoggerFactory loggerFactory,
@@ -34,6 +41,8 @@ public class DefaultUmbracoAssemblyProvider : IAssemblyProvider
     // that will still only resolve Assemblies that are already loaded but it would also make it possible to
     // query dynamically generated assemblies once they are added. It would also provide the ability to probe
     // assembly locations that are not in the same place as the entry point assemblies.
+
+    /// <inheritdoc />
     public IEnumerable<Assembly> Assemblies
     {
         get

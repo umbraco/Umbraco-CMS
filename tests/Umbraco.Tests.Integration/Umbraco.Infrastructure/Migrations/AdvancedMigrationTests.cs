@@ -10,6 +10,7 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Migrations;
+using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
@@ -38,6 +39,7 @@ internal sealed class AdvancedMigrationTests : UmbracoIntegrationTest
     private IServiceScopeFactory ServiceScopeFactory => GetRequiredService<IServiceScopeFactory>();
     private DistributedCache DistributedCache => GetRequiredService<DistributedCache>();
     private IDatabaseCacheRebuilder DatabaseCacheRebuilder => GetRequiredService<IDatabaseCacheRebuilder>();
+    private IPublishedContentTypeFactory PublishedContentTypeFactory => GetRequiredService<IPublishedContentTypeFactory>();
     private IMigrationPlanExecutor MigrationPlanExecutor => new MigrationPlanExecutor(
         CoreScopeProvider,
         ScopeAccessor,
@@ -48,7 +50,8 @@ internal sealed class AdvancedMigrationTests : UmbracoIntegrationTest
         DistributedCache,
         Mock.Of<IKeyValueService>(),
         ServiceScopeFactory,
-        AppCaches.NoCache);
+        AppCaches.NoCache,
+        PublishedContentTypeFactory);
 
     [Test]
     public async Task CreateTableOfTDtoAsync()

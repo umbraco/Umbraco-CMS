@@ -86,6 +86,7 @@ export class UmbCodeBlockElement extends LitElement {
 			code {
 				word-wrap: normal;
 				white-space: pre;
+				color: var(--uui-color-text);
 			}
 
 			#header {

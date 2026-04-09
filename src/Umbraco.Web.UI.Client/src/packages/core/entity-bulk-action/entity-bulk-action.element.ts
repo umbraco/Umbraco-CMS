@@ -32,7 +32,7 @@ export class UmbEntityBulkActionDefaultElement<
 
 	override render() {
 		return html`
-			<uui-button color="default" look="secondary" @click=${this.#onClick}>
+			<uui-button color="default" look="secondary" label=${this.localize.string(this.manifest?.meta.label ?? '')} @click=${this.#onClick}>
 				${when(this.manifest?.meta.icon, () => html`<uui-icon name=${this.manifest!.meta.icon}></uui-icon>`)}
 				<span>${this.localize.string(this.manifest?.meta.label ?? '')}</span>
 			</uui-button>

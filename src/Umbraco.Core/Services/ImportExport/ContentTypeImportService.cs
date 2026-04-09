@@ -6,6 +6,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services.ImportExport;
 
+/// <summary>
+///     Service implementation for importing content types (document types) from XML files.
+/// </summary>
 public class ContentTypeImportService : IContentTypeImportService
 {
     private readonly IPackageDataInstallation _packageDataInstallation;
@@ -14,6 +17,14 @@ public class ContentTypeImportService : IContentTypeImportService
     private readonly ICoreScopeProvider _coreScopeProvider;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="ContentTypeImportService"/> class.
+    /// </summary>
+    /// <param name="packageDataInstallation">The package data installation service for importing document types.</param>
+    /// <param name="entityService">The entity service for checking existence of entities.</param>
+    /// <param name="temporaryFileToXmlImportService">The service for loading XML from temporary files.</param>
+    /// <param name="coreScopeProvider">The core scope provider for creating database scopes.</param>
+    /// <param name="userIdKeyResolver">The resolver for converting user keys to user IDs.</param>
     public ContentTypeImportService(
         IPackageDataInstallation packageDataInstallation,
         IEntityService entityService,
@@ -29,12 +40,19 @@ public class ContentTypeImportService : IContentTypeImportService
     }
 
     /// <summary>
-    /// Imports the contentType
+    ///     Imports a content type from a temporary file containing XML data.
     /// </summary>
-    /// <param name="temporaryFileId"></param>
-    /// <param name="userKey"></param>
-    /// <param name="contentTypeId">the id of the contentType to overwrite, null if a new contentType should be created</param>
-    /// <returns></returns>
+    /// <param name="temporaryFileId">The unique identifier of the temporary file containing the content type XML definition.</param>
+    /// <param name="userKey">The unique key of the user performing the import operation.</param>
+    /// <param name="contentTypeId">
+    ///     Optional. The unique identifier of an existing content type to overwrite.
+    ///     When <c>null</c>, a new content type will be created.
+    /// </param>
+    /// <returns>
+    ///     A task that represents the asynchronous operation. The task result contains an <see cref="Attempt{TResult, TStatus}"/>
+    ///     with the imported <see cref="IContentType"/> on success, or <c>null</c> with an appropriate
+    ///     <see cref="ContentTypeImportOperationStatus"/> on failure.
+    /// </returns>
     public async Task<Attempt<IContentType?, ContentTypeImportOperationStatus>> Import(
         Guid temporaryFileId,
         Guid userKey,

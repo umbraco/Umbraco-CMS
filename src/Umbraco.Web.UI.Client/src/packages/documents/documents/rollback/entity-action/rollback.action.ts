@@ -4,6 +4,7 @@ import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 
+/** @deprecated Use the rollback entity action kind from `@umbraco-cms/backoffice/content` instead. Scheduled for removal in Umbraco 19. */
 export class UmbRollbackDocumentEntityAction extends UmbEntityActionBase<never> {
 	#localize = new UmbLocalizationController(this);
 

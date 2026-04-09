@@ -6,9 +6,19 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events;
 
+/// <summary>
+/// Webhook event that fires when a package is imported.
+/// </summary>
 [WebhookEvent("Package Imported")]
 public class ImportedPackageWebhookEvent : WebhookEventBase<ImportedPackageNotification>
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ImportedPackageWebhookEvent"/> class.
+    /// </summary>
+    /// <param name="webhookFiringService">The webhook firing service.</param>
+    /// <param name="webHookService">The webhook service.</param>
+    /// <param name="webhookSettings">The webhook settings.</param>
+    /// <param name="serverRoleAccessor">The server role accessor.</param>
     public ImportedPackageWebhookEvent(
         IWebhookFiringService webhookFiringService,
         IWebhookService webHookService,
@@ -18,8 +28,10 @@ public class ImportedPackageWebhookEvent : WebhookEventBase<ImportedPackageNotif
     {
     }
 
+    /// <inheritdoc />
     public override string Alias => Constants.WebhookEvents.Aliases.PackageImported;
 
+    /// <inheritdoc />
     public override object ConvertNotificationToRequestPayload(ImportedPackageNotification notification)
         => new
         {

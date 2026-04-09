@@ -1,4 +1,4 @@
-import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
+import {ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 
 test('can see the umbraco package is installed', async ({umbracoUi}) => {
   // Arrange

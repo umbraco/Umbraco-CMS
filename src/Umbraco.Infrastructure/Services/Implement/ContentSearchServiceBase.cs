@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
@@ -24,6 +24,7 @@ internal abstract class ContentSearchServiceBase<TContent> : IContentSearchServi
 
     protected abstract UmbracoObjectTypes ObjectType { get; }
 
+    [Obsolete("Please use the method overload with all parameters. Scheduled for removal in Umbraco 19.")]
     protected abstract Task<IEnumerable<TContent>> SearchChildrenAsync(
         IQuery<TContent>? query,
         int parentId,
@@ -32,10 +33,33 @@ internal abstract class ContentSearchServiceBase<TContent> : IContentSearchServi
         int pageSize,
         out long total);
 
+    protected abstract Task<IEnumerable<TContent>> SearchChildrenAsync(
+        IQuery<TContent>? query,
+        int parentId,
+        string[]? propertyAliases,
+        Ordering? ordering,
+        bool loadTemplates,
+        long pageNumber,
+        int pageSize,
+        out long total);
+
+    /// <summary>
+    /// Asynchronously searches for child content items under the specified parent, applying the given query, property filters, and ordering.
+    /// </summary>
+    /// <param name="query">An optional search query string to filter the content items.</param>
+    /// <param name="parentId">The unique identifier of the parent content item whose children will be searched.</param>
+    /// <param name="propertyAliases">An optional array of property aliases to restrict the search to specific properties.</param>
+    /// <param name="ordering">Optional ordering criteria for the search results.</param>
+    /// <param name="loadTemplates">If set to <c>true</c>, templates will be loaded for the content items.</param>
+    /// <param name="skip">The number of items to skip before returning results (used for paging).</param>
+    /// <param name="take">The maximum number of items to return (used for paging).</param>
+    /// <returns>A task representing the asynchronous operation. The result contains a <see cref="PagedModel{TContent}"/> with the found content items.</returns>
     public async Task<PagedModel<TContent>> SearchChildrenAsync(
         string? query,
         Guid? parentId,
+        string[]? propertyAliases,
         Ordering? ordering,
+        bool loadTemplates = true,
         int skip = 0,
         int take = 100)
     {
@@ -55,7 +79,7 @@ internal abstract class ContentSearchServiceBase<TContent> : IContentSearchServi
         PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
         IQuery<TContent>? contentQuery = ParseQuery(query);
 
-        IEnumerable<TContent> items = await SearchChildrenAsync(contentQuery, parentIdAsInt, ordering, pageNumber, pageSize, out var total);
+        IEnumerable<TContent> items = await SearchChildrenAsync(contentQuery, parentIdAsInt, propertyAliases, ordering, loadTemplates, pageNumber, pageSize, out var total);
         return new PagedModel<TContent>
         {
             Items = items,

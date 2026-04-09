@@ -58,5 +58,11 @@ public interface IRuntimeState
     /// </summary>
     void DetermineRuntimeLevel();
 
+    /// <summary>
+    ///     Configures the runtime state with the specified level and reason.
+    /// </summary>
+    /// <param name="level">The runtime level to set.</param>
+    /// <param name="reason">The reason for the runtime level.</param>
+    /// <param name="bootFailedException">An optional exception that caused a boot failure.</param>
     void Configure(RuntimeLevel level, RuntimeLevelReason reason, Exception? bootFailedException = null);
 }

@@ -74,7 +74,7 @@ public class HttpQueryStringModelBinderTests
     {
         var httpContext = new DefaultHttpContext();
         httpContext.Request.QueryString = new QueryString(querystring);
-        httpContext.Request.Headers.Add("X-UMB-CULTURE", new StringValues("en-gb"));
+        httpContext.Request.Headers.Append("X-UMB-CULTURE", new StringValues("en-gb"));
         var routeData = new RouteData();
         var actionContext = new ActionContext(httpContext, routeData, new ActionDescriptor());
         var metadataProvider = new EmptyModelMetadataProvider();

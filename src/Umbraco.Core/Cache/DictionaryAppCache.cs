@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Text.RegularExpressions;
 using Umbraco.Extensions;
@@ -15,6 +15,9 @@ public class DictionaryAppCache : IRequestCache
     /// </summary>
     private readonly ConcurrentDictionary<string, object?> _items = new();
 
+    /// <summary>
+    ///     Gets the number of items in the cache.
+    /// </summary>
     public int Count => _items.Count;
 
     /// <inheritdoc />
@@ -38,8 +41,10 @@ public class DictionaryAppCache : IRequestCache
         return null;
     }
 
+    /// <inheritdoc />
     public bool Set(string key, object? value) => _items.TryAdd(key, value);
 
+    /// <inheritdoc />
     public bool Remove(string key) => _items.TryRemove(key, out _);
 
     /// <inheritdoc />
@@ -109,7 +114,12 @@ public class DictionaryAppCache : IRequestCache
         _items.RemoveAll(kvp => compiled.IsMatch(kvp.Key));
     }
 
+    /// <summary>
+    ///     Returns an enumerator that iterates through the cache items.
+    /// </summary>
+    /// <returns>An enumerator for the cache items.</returns>
     public IEnumerator<KeyValuePair<string, object?>> GetEnumerator() => _items.GetEnumerator();
 
+    /// <inheritdoc />
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }

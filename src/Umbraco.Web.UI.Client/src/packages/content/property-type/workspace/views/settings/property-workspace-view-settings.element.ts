@@ -209,7 +209,7 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 						slot="editor"
 						name="description"
 						@input=${this.#onDescriptionChange}
-						.value=${this._data?.description}
+						.value=${this._data?.description ?? ''}
 						auto-height></uui-textarea>
 				</umb-property-layout>
 

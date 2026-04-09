@@ -1,4 +1,4 @@
-﻿using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Umbraco.Extensions;
 
@@ -11,8 +11,13 @@ public class MimeTypeDocumentFilter : IDocumentFilter
 {
     private readonly string _documentName;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="MimeTypeDocumentFilter"/> class.
+    /// </summary>
+    /// <param name="documentName">The name of the OpenAPI document to filter.</param>
     public MimeTypeDocumentFilter(string documentName) => _documentName = documentName;
 
+    /// <inheritdoc/>
     public void Apply(OpenApiDocument swaggerDoc, DocumentFilterContext context)
     {
         if (context.DocumentName != _documentName)
@@ -21,25 +26,32 @@ public class MimeTypeDocumentFilter : IDocumentFilter
         }
 
         OpenApiOperation[] operations = swaggerDoc.Paths
-            .SelectMany(path => path.Value.Operations.Values)
+            .SelectMany(path => path.Value.Operations?.Values ?? Enumerable.Empty<OpenApiOperation>())
             .ToArray();
 
-        void RemoveUnwantedMimeTypes(IDictionary<string, OpenApiMediaType> content)
+        static void RemoveUnwantedMimeTypes(IDictionary<string, OpenApiMediaType>? content)
         {
-            if (content.ContainsKey("application/json"))
+            if (content is null || content.ContainsKey("application/json") is false)
             {
-                content.RemoveAll(r => r.Key != "application/json");
+                return;
             }
 
+            content.RemoveAll(r => r.Key != "application/json");
         }
 
-        OpenApiRequestBody[] requestBodies = operations.Select(operation => operation.RequestBody).WhereNotNull().ToArray();
+        OpenApiRequestBody[] requestBodies = operations
+            .Select(operation => operation.RequestBody)
+            .OfType<OpenApiRequestBody>()
+            .ToArray();
         foreach (OpenApiRequestBody requestBody in requestBodies)
         {
             RemoveUnwantedMimeTypes(requestBody.Content);
         }
 
-        OpenApiResponse[] responses = operations.SelectMany(operation => operation.Responses.Values).WhereNotNull().ToArray();
+        OpenApiResponse[] responses = operations
+            .SelectMany(operation => operation.Responses?.Values ?? Enumerable.Empty<IOpenApiResponse>())
+            .OfType<OpenApiResponse>()
+            .ToArray();
         foreach (OpenApiResponse response in responses)
         {
             RemoveUnwantedMimeTypes(response.Content);

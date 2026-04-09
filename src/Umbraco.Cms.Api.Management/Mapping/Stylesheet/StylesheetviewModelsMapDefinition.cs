@@ -1,4 +1,4 @@
-﻿using Microsoft.IdentityModel.Tokens;
+using Microsoft.IdentityModel.Tokens;
 using Umbraco.Cms.Api.Management.Extensions;
 using Umbraco.Cms.Api.Management.ViewModels.Stylesheet;
 using Umbraco.Cms.Api.Management.ViewModels.Stylesheet.Folder;
@@ -10,8 +10,16 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Mapping.Stylesheet;
 
+/// <summary>
+/// Defines the mapping configuration between stylesheet domain models and their corresponding view models.
+/// </summary>
 public class StylesheetViewModelsMapDefinition : IMapDefinition
 {
+    /// <summary>
+    /// Configures the object-object mappings between stylesheet-related domain models and their corresponding API view models.
+    /// This includes mappings for stylesheets and stylesheet folders for create, update, rename, and response scenarios.
+    /// </summary>
+    /// <param name="mapper">The <see cref="IUmbracoMapper"/> instance on which to define the mappings.</param>
     public void DefineMaps(IUmbracoMapper mapper)
     {
         mapper.Define<IStylesheet, StylesheetResponseModel>((_, _) => new StylesheetResponseModel { Content = string.Empty, Name = string.Empty, Path = string.Empty }, Map);

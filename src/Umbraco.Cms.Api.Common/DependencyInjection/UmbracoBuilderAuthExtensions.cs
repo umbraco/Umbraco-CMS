@@ -9,14 +9,26 @@ using Umbraco.Cms.Api.Common.Security;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Infrastructure.BackgroundJobs;
 using Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs.DistributedJobs;
-using Umbraco.Cms.Core.Notifications;
 
 namespace Umbraco.Cms.Api.Common.DependencyInjection;
 
+/// <summary>
+///     Extension methods for <see cref="IUmbracoBuilder"/> to configure authentication services.
+/// </summary>
 public static class UmbracoBuilderAuthExtensions
 {
+    /// <summary>
+    ///     Adds OpenIddict authentication services for Umbraco APIs.
+    /// </summary>
+    /// <param name="builder">The Umbraco builder.</param>
+    /// <returns>The Umbraco builder for method chaining.</returns>
+    /// <remarks>
+    ///     Configures OpenIddict with authorization code flow (with PKCE), client credentials flow,
+    ///     reference tokens, and ASP.NET Core Data Protection for token encryption.
+    /// </remarks>
     public static IUmbracoBuilder AddUmbracoOpenIddict(this IUmbracoBuilder builder)
     {
         if (builder.Services.Any(x => !x.IsKeyedService && x.ImplementationType == typeof(OpenIddictCleanupJob)) is false)
@@ -29,11 +41,6 @@ public static class UmbracoBuilderAuthExtensions
 
     private static void ConfigureOpenIddict(IUmbracoBuilder builder)
     {
-        // Optionally hide tokens from the back-office.
-        var hideBackOfficeTokens = (builder.Config
-            .GetSection(Constants.Configuration.ConfigBackOfficeTokenCookie)
-            .Get<BackOfficeTokenCookieSettings>() ?? new BackOfficeTokenCookieSettings()).Enabled;
-
         builder.Services.AddOpenIddict()
             // Register the OpenIddict server components.
             .AddServer(options =>
@@ -120,21 +127,30 @@ public static class UmbracoBuilderAuthExtensions
                     configuration.UseSingletonHandler<ProcessRequestContextHandler>().SetOrder(OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.ResolveRequestUri.Descriptor.Order - 1);
                 });
 
-                if (hideBackOfficeTokens)
+                options.AddEventHandler<OpenIddictServerEvents.ApplyTokenResponseContext>(configuration =>
                 {
-                    options.AddEventHandler<OpenIddictServerEvents.ApplyTokenResponseContext>(configuration =>
-                    {
-                        configuration
-                            .UseSingletonHandler<HideBackOfficeTokensHandler>()
-                            .SetOrder(OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.ProcessJsonResponse<OpenIddictServerEvents.ApplyTokenResponseContext>.Descriptor.Order - 1);
-                    });
-                    options.AddEventHandler<OpenIddictServerEvents.ExtractTokenRequestContext>(configuration =>
-                    {
-                        configuration
-                            .UseSingletonHandler<HideBackOfficeTokensHandler>()
-                            .SetOrder(OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.ExtractPostRequest<OpenIddictServerEvents.ExtractTokenRequestContext>.Descriptor.Order + 1);
-                    });
-                }
+                    configuration
+                        .UseSingletonHandler<HideBackOfficeTokensHandler>()
+                        .SetOrder(OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.ProcessJsonResponse<OpenIddictServerEvents.ApplyTokenResponseContext>.Descriptor.Order - 1);
+                });
+                options.AddEventHandler<OpenIddictServerEvents.ApplyAuthorizationResponseContext>(configuration =>
+                {
+                    configuration
+                        .UseSingletonHandler<HideBackOfficeTokensHandler>()
+                        .SetOrder(OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.Authentication.ProcessQueryResponse.Descriptor.Order - 1);
+                });
+                options.AddEventHandler<OpenIddictServerEvents.ExtractTokenRequestContext>(configuration =>
+                {
+                    configuration
+                        .UseSingletonHandler<HideBackOfficeTokensHandler>()
+                        .SetOrder(OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.ExtractPostRequest<OpenIddictServerEvents.ExtractTokenRequestContext>.Descriptor.Order + 1);
+                });
+                options.AddEventHandler<OpenIddictServerEvents.ExtractRevocationRequestContext>(configuration =>
+                {
+                    configuration
+                        .UseSingletonHandler<HideBackOfficeTokensHandler>()
+                        .SetOrder(OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.ExtractPostRequest<OpenIddictServerEvents.ExtractRevocationRequestContext>.Descriptor.Order + 1);
+                });
             })
 
             // Register the OpenIddict validation components.
@@ -160,24 +176,18 @@ public static class UmbracoBuilderAuthExtensions
                     configuration.UseSingletonHandler<ProcessRequestContextHandler>().SetOrder(OpenIddict.Validation.AspNetCore.OpenIddictValidationAspNetCoreHandlers.ResolveRequestUri.Descriptor.Order - 1);
                 });
 
-                if (hideBackOfficeTokens)
+                options.AddEventHandler<OpenIddictValidationEvents.ProcessAuthenticationContext>(configuration =>
                 {
-                    options.AddEventHandler<OpenIddictValidationEvents.ProcessAuthenticationContext>(configuration =>
-                    {
-                        configuration
-                            .UseSingletonHandler<HideBackOfficeTokensHandler>()
-                            // IMPORTANT: the handler must be AFTER the built-in query string handler, because the client-side SignalR library sometimes appends access tokens to the query string.
-                            .SetOrder(OpenIddict.Validation.AspNetCore.OpenIddictValidationAspNetCoreHandlers.ExtractAccessTokenFromQueryString.Descriptor.Order + 1);
-                    });
-                }
+                    configuration
+                        .UseSingletonHandler<HideBackOfficeTokensHandler>()
+                        // IMPORTANT: the handler must be AFTER the built-in query string handler, because the client-side SignalR library sometimes appends access tokens to the query string.
+                        .SetOrder(OpenIddict.Validation.AspNetCore.OpenIddictValidationAspNetCoreHandlers.ExtractAccessTokenFromQueryString.Descriptor.Order + 1);
+                });
             });
 
         builder.Services.AddSingleton<IDistributedBackgroundJob, OpenIddictCleanupJob>();
         builder.Services.ConfigureOptions<ConfigureOpenIddict>();
 
-        if (hideBackOfficeTokens)
-        {
-            builder.AddNotificationHandler<UserLogoutSuccessNotification, HideBackOfficeTokensHandler>();
-        }
+        builder.AddNotificationHandler<UserLogoutSuccessNotification, HideBackOfficeTokensHandler>();
     }
 }

@@ -23,6 +23,8 @@ import {
 } from '@umbraco-cms/backoffice/entity-action';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 
+type ResetReason = 'error' | 'empty' | 'fallback';
+
 export class UmbTreeItemChildrenManager<
 	TreeItemType extends UmbTreeItemModel = UmbTreeItemModel,
 	TreeRootType extends UmbTreeRootModel = UmbTreeRootModel,
@@ -218,7 +220,7 @@ export class UmbTreeItemChildrenManager<
 	async #loadChildren(reload = false) {
 		if (this.#loadChildrenRetries > this.#requestMaxRetries) {
 			this.#loadChildrenRetries = 0;
-			this.#resetChildren();
+			this.#resetChildren('error');
 			return;
 		}
 
@@ -302,7 +304,7 @@ export class UmbTreeItemChildrenManager<
 					We cancel the base target and load using skip/take pagination instead.
 					This can happen if deep linked to a non existing item or all retries have failed.
 				*/
-				this.#resetChildren();
+				this.#resetChildren(this.#children.getValue().length === 0 ? 'empty' : 'fallback');
 			}
 		}
 
@@ -329,7 +331,7 @@ export class UmbTreeItemChildrenManager<
 		if (this.#loadPrevItemsRetries > this.#requestMaxRetries) {
 			// If we have exceeded the maximum number of retries, we need to reset the base target and load from the top
 			this.#loadPrevItemsRetries = 0;
-			this.#resetChildren();
+			this.#resetChildren('error');
 			return;
 		}
 
@@ -378,7 +380,7 @@ export class UmbTreeItemChildrenManager<
 					If we can't find a new end target we reload the children from the top.
 					We cancel the base target and load using skip/take pagination instead.
 				*/
-				this.#resetChildren();
+				this.#resetChildren(this.#children.getValue().length === 0 ? 'empty' : 'fallback');
 			}
 		}
 
@@ -409,7 +411,7 @@ export class UmbTreeItemChildrenManager<
 		if (this.#loadNextItemsRetries > this.#requestMaxRetries) {
 			// If we have exceeded the maximum number of retries, we need to reset the base target and load from the top
 			this.#loadNextItemsRetries = 0;
-			this.#resetChildren();
+			this.#resetChildren('error');
 			return;
 		}
 
@@ -467,7 +469,7 @@ export class UmbTreeItemChildrenManager<
 					If we can't find a new end target we reload the children from the top.
 					We cancel the base target and load using skip/take pagination instead.
 				*/
-				this.#resetChildren();
+				this.#resetChildren(this.#children.getValue().length === 0 ? 'empty' : 'fallback');
 			}
 		}
 
@@ -520,12 +522,81 @@ export class UmbTreeItemChildrenManager<
 		this.targetPagination.clear();
 	}
 
-	async #resetChildren() {
+	/**
+	 * Loads children using offset pagination only.
+	 * This is a "safe" fallback that does NOT:
+	 * - Use target pagination
+	 * - Retry with new targets
+	 * - Call #resetChildren (preventing recursion)
+	 * - Throw errors (fails gracefully)
+	 */
+	async #loadChildrenWithOffsetPagination(): Promise<void> {
+		const repository = this.#treeContext?.getRepository();
+		if (!repository) {
+			// Terminal fallback - fail silently rather than throwing
+			return;
+		}
+
+		this.#isLoading.setValue(true);
+
+		const parent = this.getStartNode() || this.getTreeItem();
+		const foldersOnly = this.getFoldersOnly();
+		const additionalArgs = this.getAdditionalRequestArgs();
+
+		const offsetPaging: UmbOffsetPaginationRequestModel = {
+			skip: 0, // Always from the start
+			take: this.offsetPagination.getPageSize(),
+		};
+
+		const { data } = parent?.unique
+			? await repository.requestTreeItemsOf({
+					parent: { unique: parent.unique, entityType: parent.entityType },
+					skip: offsetPaging.skip,
+					take: offsetPaging.take,
+					paging: offsetPaging,
+					foldersOnly,
+					...additionalArgs,
+				})
+			: await repository.requestTreeRootItems({
+					skip: offsetPaging.skip,
+					take: offsetPaging.take,
+					paging: offsetPaging,
+					foldersOnly,
+					...additionalArgs,
+				});
+
+		if (data) {
+			const items = data.items as Array<TreeItemType>;
+			this.#children.setValue(items);
+			this.setHasChildren(data.total > 0);
+			this.offsetPagination.setTotalItems(data.total);
+		}
+		// Note: On error, we simply don't update state - UI shows stale data
+		// This is the terminal fallback, no further recovery
+
+		this.#isLoading.setValue(false);
+	}
+
+	async #resetChildren(reason: ResetReason = 'error'): Promise<void> {
+		// Clear pagination state
 		this.targetPagination.clear();
 		this.offsetPagination.clear();
-		this.loadChildren();
-		const notificationManager = await this.getContext(UMB_NOTIFICATION_CONTEXT);
-		notificationManager?.peek('danger', { data: { message: 'Menu loading failed. Showing the first items again.' } });
+
+		// Reset retry counters to prevent any lingering retry state
+		this.#loadChildrenRetries = 0;
+		this.#loadPrevItemsRetries = 0;
+		this.#loadNextItemsRetries = 0;
+
+		// Load using offset pagination only - this is our terminal fallback
+		await this.#loadChildrenWithOffsetPagination();
+
+		// Only show notification for actual errors
+		if (reason === 'error') {
+			const notificationManager = await this.getContext(UMB_NOTIFICATION_CONTEXT);
+			notificationManager?.peek('danger', {
+				data: { message: 'Menu loading failed. Showing the first items again.' },
+			});
+		}
 	}
 
 	#onPageChange = () => this.loadNextChildren();

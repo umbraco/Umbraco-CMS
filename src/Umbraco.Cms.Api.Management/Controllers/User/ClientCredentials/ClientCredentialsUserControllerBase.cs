@@ -4,6 +4,9 @@ using Umbraco.Cms.Core.Security.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.User.ClientCredentials;
 
+/// <summary>
+/// Serves as the base controller for user-related operations that utilize client credentials authentication in the management API.
+/// </summary>
 [ApiExplorerSettings(GroupName = "User")]
 public abstract class ClientCredentialsUserControllerBase : UserControllerBase
 {

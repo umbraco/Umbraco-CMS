@@ -15,7 +15,7 @@ const UmbDomPurifyConfig: DOMPurifyConfig = {
 	USE_PROFILES: { html: true },
 	CUSTOM_ELEMENT_HANDLING: {
 		tagNameCheck: /^(?:ufm|umb|uui)-.*$/,
-		attributeNameCheck: /.+/,
+		attributeNameCheck: /^(?!on)/,
 		allowCustomizedBuiltInElements: false,
 	},
 };

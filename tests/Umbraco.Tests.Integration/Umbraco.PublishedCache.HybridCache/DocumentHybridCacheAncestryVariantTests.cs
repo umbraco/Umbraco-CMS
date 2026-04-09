@@ -140,8 +140,12 @@ internal sealed class DocumentHybridCacheAncestryVariantTests : UmbracoIntegrati
         await LanguageService.CreateAsync(language, Constants.Security.SuperUserKey);
 
         var contentTypeCreateModel = ContentTypeEditingBuilder.CreateContentTypeWithTwoPropertiesOneVariantAndOneInvariant(
-            "cultureVariationTest", "Culture Variation Test", _variantTitleAlias, _variantTitleName,
-            _invariantTitleAlias, _invariantTitleName);
+            "cultureVariationTest",
+            "Culture Variation Test",
+            _variantTitleAlias,
+            _variantTitleName,
+            _invariantTitleAlias,
+            _invariantTitleName);
         contentTypeCreateModel.AllowedAsRoot = true;
         var contentTypeAttempt = await ContentTypeEditingService.CreateAsync(contentTypeCreateModel, Constants.Security.SuperUserKey);
         if (contentTypeAttempt.Success is false)

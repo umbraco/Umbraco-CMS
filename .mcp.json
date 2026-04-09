@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "umbraco-cms": {
+      "command": "npx",
+      "args": ["@umbraco-cms/mcp-dev@17"]
+    },
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest"
+      ]
+    }
+  }
+}

@@ -19,12 +19,19 @@ namespace Umbraco.Cms.Core.Strings
     {
         #region Ctor, consts and vars
 
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="DefaultShortStringHelper"/> class using request handler settings.
+        /// </summary>
+        /// <param name="settings">The request handler settings containing character replacement rules.</param>
         public DefaultShortStringHelper(IOptions<RequestHandlerSettings> settings)
         {
             _config = new DefaultShortStringHelperConfig().WithDefault(settings.Value);
         }
 
-        // clones the config so it cannot be changed at runtime
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="DefaultShortStringHelper"/> class using a custom configuration.
+        /// </summary>
+        /// <param name="config">The configuration to use. The configuration is cloned to prevent runtime modification.</param>
         public DefaultShortStringHelper(DefaultShortStringHelperConfig config)
         {
             _config = config.Clone();
@@ -54,6 +61,11 @@ namespace Umbraco.Cms.Core.Strings
             .Distinct()
             .ToFrozenSet();
 
+        /// <summary>
+        ///     Determines whether a character is valid for use in a file name.
+        /// </summary>
+        /// <param name="c">The character to test.</param>
+        /// <returns><c>true</c> if the character is valid for file names; otherwise, <c>false</c>.</returns>
         public static bool IsValidFileNameChar(char c)
         {
             return InvalidFileNameChars.Contains(c) == false;
@@ -235,6 +247,14 @@ namespace Umbraco.Cms.Core.Strings
             return CleanString(text, stringType, culture, separator);
         }
 
+        /// <summary>
+        ///     Cleans a string according to the specified string type, culture, and separator.
+        /// </summary>
+        /// <param name="text">The text to clean.</param>
+        /// <param name="stringType">The type of cleaning to perform.</param>
+        /// <param name="culture">The culture to use for casing.</param>
+        /// <param name="separator">The separator character to use between terms.</param>
+        /// <returns>The cleaned string.</returns>
         protected virtual string CleanString(string text, CleanStringType stringType, string? culture, char? separator)
         {
             // be safe
@@ -329,11 +349,18 @@ namespace Umbraco.Cms.Core.Strings
             return new string(output);
         }
 
-        // here was a subtle, ascii-optimized version of the cleaning code, and I was
-        // very proud of it until benchmarking showed it was an order of magnitude slower
-        // that the utf8 version. Micro-optimizing sometimes isn't such a good idea.
-
-        // note: does NOT support surrogate pairs in text
+        /// <summary>
+        ///     Cleans a string for use as a code identifier using the specified case type, separator, culture and configuration.
+        /// </summary>
+        /// <param name="text">The text to clean.</param>
+        /// <param name="caseType">The case type to apply (camelCase, PascalCase, etc.).</param>
+        /// <param name="separator">The separator character to use between terms.</param>
+        /// <param name="culture">The culture to use for casing.</param>
+        /// <param name="config">The configuration settings for string cleaning.</param>
+        /// <returns>The cleaned code string.</returns>
+        /// <remarks>
+        ///     Does NOT support surrogate pairs in text.
+        /// </remarks>
         internal string CleanCodeString(string text, CleanStringType caseType, char separator, string culture, DefaultShortStringHelperConfig.Config config)
         {
             int opos = 0, ipos = 0;
@@ -484,7 +511,20 @@ namespace Umbraco.Cms.Core.Strings
             return new string(output.Slice(0, opos));
         }
 
-        // note: supports surrogate pairs in input string
+        /// <summary>
+        ///     Copies a term from the input string to the output buffer, applying the specified casing.
+        /// </summary>
+        /// <param name="input">The input string.</param>
+        /// <param name="ipos">The position in the input string.</param>
+        /// <param name="output">The output buffer.</param>
+        /// <param name="opos">The position in the output buffer (updated by this method).</param>
+        /// <param name="len">The length of the term to copy.</param>
+        /// <param name="caseType">The case type to apply.</param>
+        /// <param name="culture">The culture to use for casing.</param>
+        /// <param name="isAcronym">Whether the term is an acronym.</param>
+        /// <remarks>
+        ///     Supports surrogate pairs in input string.
+        /// </remarks>
         internal void CopyTerm(string input, int ipos, Span<char> output, ref int opos, int len, CleanStringType caseType, string culture, bool isAcronym)
         {
             var term = input.Substring(ipos, len);

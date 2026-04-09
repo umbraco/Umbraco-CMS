@@ -1,3 +1,5 @@
+import { UmbMemberDetailStore } from './member-detail.store.js';
+
 export const UMB_MEMBER_DETAIL_REPOSITORY_ALIAS = 'Umb.Repository.Member.Detail';
 export const UMB_MEMBER_DETAIL_STORE_ALIAS = 'Umb.Store.Member.Detail';
 
@@ -12,6 +14,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'store',
 		alias: UMB_MEMBER_DETAIL_STORE_ALIAS,
 		name: 'Member Detail Store',
-		api: () => import('./member-detail.store.js'),
+		api: UmbMemberDetailStore,
 	},
 ];

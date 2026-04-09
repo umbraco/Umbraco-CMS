@@ -8,6 +8,9 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Webhook;
 
+/// <summary>
+/// Serves as the base controller for API endpoints that manage webhooks in the Umbraco CMS.
+/// </summary>
 [VersionedApiBackOfficeRoute("webhook")]
 [ApiExplorerSettings(GroupName = "Webhook")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessWebhooks)]
@@ -20,6 +23,10 @@ public abstract class WebhookControllerBase : ManagementApiControllerBase
             WebhookOperationStatus.CancelledByNotification => BadRequest(new ProblemDetailsBuilder()
                 .WithTitle("Cancelled by notification")
                 .WithDetail("A notification handler prevented the webhook operation.")
+                .Build()),
+            WebhookOperationStatus.NoEvents => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("No events specified")
+                .WithDetail("The webhook must be configured to listen to at least one event.")
                 .Build()),
             _ => StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetailsBuilder()
                 .WithTitle("Unknown webhook operation status.")

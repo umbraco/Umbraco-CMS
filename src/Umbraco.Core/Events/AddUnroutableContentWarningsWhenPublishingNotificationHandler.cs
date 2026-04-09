@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -15,6 +15,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Events;
 
+/// <summary>
+///     Handles the <see cref="ContentPublishedNotification" /> to add warnings when published content may not be routable.
+/// </summary>
 public class AddUnroutableContentWarningsWhenPublishingNotificationHandler : INotificationAsyncHandler<ContentPublishedNotification>
 {
     private readonly IPublishedRouter _publishedRouter;
@@ -31,6 +34,22 @@ public class AddUnroutableContentWarningsWhenPublishingNotificationHandler : INo
     private readonly IEventMessagesFactory _eventMessagesFactory;
     private readonly ContentSettings _contentSettings;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="AddUnroutableContentWarningsWhenPublishingNotificationHandler" /> class.
+    /// </summary>
+    /// <param name="publishedRouter">The published router.</param>
+    /// <param name="umbracoContextAccessor">The Umbraco context accessor.</param>
+    /// <param name="languageService">The language service.</param>
+    /// <param name="localizedTextService">The localized text service.</param>
+    /// <param name="contentService">The content service.</param>
+    /// <param name="variationContextAccessor">The variation context accessor.</param>
+    /// <param name="loggerFactory">The logger factory.</param>
+    /// <param name="uriUtility">The URI utility.</param>
+    /// <param name="publishedUrlProvider">The published URL provider.</param>
+    /// <param name="navigationQueryService">The navigation query service.</param>
+    /// <param name="publishedContentStatusFilteringService">The published content status filtering service.</param>
+    /// <param name="eventMessagesFactory">The event messages factory.</param>
+    /// <param name="contentSettings">The content settings.</param>
     public AddUnroutableContentWarningsWhenPublishingNotificationHandler(
         IPublishedRouter publishedRouter,
         IUmbracoContextAccessor umbracoContextAccessor,
@@ -61,6 +80,7 @@ public class AddUnroutableContentWarningsWhenPublishingNotificationHandler : INo
         _contentSettings = contentSettings.Value;
     }
 
+    /// <inheritdoc />
     public async Task HandleAsync(ContentPublishedNotification notification, CancellationToken cancellationToken)
     {
         if (_contentSettings.ShowUnroutableContentWarnings is false)

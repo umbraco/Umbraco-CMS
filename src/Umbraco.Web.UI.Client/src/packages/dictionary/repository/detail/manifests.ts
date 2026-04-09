@@ -1,4 +1,6 @@
 import { UMB_DICTIONARY_DETAIL_REPOSITORY_ALIAS, UMB_DICTIONARY_DETAIL_STORE_ALIAS } from './constants.js';
+import { UmbDictionaryDetailStore } from './dictionary-detail.store.js';
+
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'repository',
@@ -10,6 +12,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'store',
 		alias: UMB_DICTIONARY_DETAIL_STORE_ALIAS,
 		name: 'Dictionary Detail Store',
-		api: () => import('./dictionary-detail.store.js'),
+		api: UmbDictionaryDetailStore,
 	},
 ];

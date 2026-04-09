@@ -7,9 +7,19 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events;
 
+/// <summary>
+/// Legacy webhook event that fires when media is moved, using the legacy payload format.
+/// </summary>
 [WebhookEvent("Media Moved", Constants.WebhookEvents.Types.Media)]
 public class LegacyMediaMovedWebhookEvent : WebhookEventContentBase<MediaMovedNotification, IMedia>
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="LegacyMediaMovedWebhookEvent"/> class.
+    /// </summary>
+    /// <param name="webhookFiringService">The webhook firing service.</param>
+    /// <param name="webHookService">The webhook service.</param>
+    /// <param name="webhookSettings">The webhook settings.</param>
+    /// <param name="serverRoleAccessor">The server role accessor.</param>
     public LegacyMediaMovedWebhookEvent(
         IWebhookFiringService webhookFiringService,
         IWebhookService webHookService,
@@ -23,9 +33,12 @@ public class LegacyMediaMovedWebhookEvent : WebhookEventContentBase<MediaMovedNo
     {
     }
 
+    /// <inheritdoc />
     public override string Alias => Constants.WebhookEvents.Aliases.MediaMoved;
 
+    /// <inheritdoc />
     protected override IEnumerable<IMedia> GetEntitiesFromNotification(MediaMovedNotification notification) => notification.MoveInfoCollection.Select(x => x.Entity);
 
+    /// <inheritdoc />
     protected override object ConvertEntityToRequestPayload(IMedia entity) => new DefaultPayloadModel { Id = entity.Key };
 }

@@ -1,3 +1,4 @@
+using System.Text.Json.Nodes;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
@@ -8,19 +9,43 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
+/// <summary>
+///     Represents a property editor for selecting users.
+/// </summary>
 [DataEditor(
     Constants.PropertyEditors.Aliases.UserPicker,
     ValueType = ValueTypes.Integer,
     ValueEditorIsReusable = true)]
-public class UserPickerPropertyEditor : DataEditor
+public class UserPickerPropertyEditor : DataEditor, IValueSchemaProvider
 {
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="UserPickerPropertyEditor" /> class.
+    /// </summary>
+    /// <param name="dataValueEditorFactory">The data value editor factory.</param>
     public UserPickerPropertyEditor(IDataValueEditorFactory dataValueEditorFactory)
         : base(dataValueEditorFactory)
         => SupportsReadOnly = true;
 
+    /// <inheritdoc />
+    public Type? GetValueType(object? configuration) => typeof(Guid?);
+
+    /// <inheritdoc />
+    public JsonObject? GetValueSchema(object? configuration) => new()
+    {
+        ["$schema"] = "https://json-schema.org/draft/2020-12/schema",
+        ["type"] = new JsonArray("string", "null"),
+        ["format"] = "uuid",
+        ["pattern"] = ValueSchemaPatterns.Uuid,
+        ["description"] = "GUID of the selected user",
+    };
+
+    /// <inheritdoc />
     protected override IDataValueEditor CreateValueEditor() =>
         DataValueEditorFactory.Create<UserPickerPropertyValueEditor>(Attribute!);
 
+    /// <summary>
+    ///     Provides the value editor for the user picker property editor.
+    /// </summary>
     private sealed class UserPickerPropertyValueEditor : DataValueEditor
     {
         private readonly IUserService _userService;

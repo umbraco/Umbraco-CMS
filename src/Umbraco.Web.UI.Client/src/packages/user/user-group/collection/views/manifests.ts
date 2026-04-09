@@ -9,7 +9,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		js: () => import('./user-group-table-collection-view.element.js'),
 		meta: {
 			label: 'Table',
-			icon: 'icon-list',
+			icon: 'icon-table',
 			pathName: 'table',
 		},
 		conditions: [

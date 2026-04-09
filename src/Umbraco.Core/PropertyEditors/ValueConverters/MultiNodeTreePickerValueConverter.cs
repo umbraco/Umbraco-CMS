@@ -32,6 +32,16 @@ public class MultiNodeTreePickerValueConverter : PropertyValueConverterBase, IDe
     private readonly IPublishedMediaCache _mediaCache;
     private readonly IPublishedMemberCache _memberCache;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="MultiNodeTreePickerValueConverter" /> class.
+    /// </summary>
+    /// <param name="umbracoContextAccessor">The Umbraco context accessor.</param>
+    /// <param name="memberService">The member service.</param>
+    /// <param name="apiContentBuilder">The API content builder.</param>
+    /// <param name="apiMediaBuilder">The API media builder.</param>
+    /// <param name="contentCache">The published content cache.</param>
+    /// <param name="mediaCache">The published media cache.</param>
+    /// <param name="memberCache">The published member cache.</param>
     public MultiNodeTreePickerValueConverter(
         IUmbracoContextAccessor umbracoContextAccessor,
         IMemberService memberService,
@@ -50,17 +60,21 @@ public class MultiNodeTreePickerValueConverter : PropertyValueConverterBase, IDe
         _memberCache = memberCache;
     }
 
+    /// <inheritdoc />
     public override bool IsConverter(IPublishedPropertyType propertyType) =>
         propertyType.EditorAlias.Equals(Constants.PropertyEditors.Aliases.MultiNodeTreePicker);
 
+    /// <inheritdoc />
     public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
         => PropertyCacheLevel.Snapshot;
 
+    /// <inheritdoc />
     public override Type GetPropertyValueType(IPublishedPropertyType propertyType)
         => IsSingleNodePicker(propertyType)
             ? typeof(IPublishedContent)
             : typeof(IEnumerable<IPublishedContent>);
 
+    /// <inheritdoc />
     public override object? ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
     {
         if (source == null)
@@ -80,6 +94,7 @@ public class MultiNodeTreePickerValueConverter : PropertyValueConverterBase, IDe
         return null;
     }
 
+    /// <inheritdoc />
     public override object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel cacheLevel, object? source, bool preview)
     {
         if (source == null)
@@ -170,10 +185,13 @@ public class MultiNodeTreePickerValueConverter : PropertyValueConverterBase, IDe
         return source;
     }
 
+    /// <inheritdoc />
     public PropertyCacheLevel GetDeliveryApiPropertyCacheLevel(IPublishedPropertyType propertyType) => PropertyCacheLevel.Snapshot;
 
+    /// <inheritdoc />
     public PropertyCacheLevel GetDeliveryApiPropertyCacheLevelForExpansion(IPublishedPropertyType propertyType) => PropertyCacheLevel.Snapshot;
 
+    /// <inheritdoc />
     public Type GetDeliveryApiPropertyValueType(IPublishedPropertyType propertyType)
         => GetEntityType(propertyType) switch
         {
@@ -183,6 +201,7 @@ public class MultiNodeTreePickerValueConverter : PropertyValueConverterBase, IDe
         };
 
 
+    /// <inheritdoc />
     public object? ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview, bool expanding)
     {
         IEnumerable<IApiContent> DefaultValue() => Array.Empty<IApiContent>();

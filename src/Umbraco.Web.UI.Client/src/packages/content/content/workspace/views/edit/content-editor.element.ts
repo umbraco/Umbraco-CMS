@@ -26,11 +26,9 @@ import './content-editor-tab.element.js';
 
 @customElement('umb-content-workspace-view-edit')
 export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements UmbWorkspaceViewElement {
-	/*
-	// root properties is a possible feature with Bellissima, but as it is new its not fully implemented yet [NL]
 	@state()
 	private _hasRootProperties = false;
-  */
+
 	#viewContext?: typeof UMB_VIEW_CONTEXT.TYPE;
 
 	@state()
@@ -81,7 +79,14 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 			null,
 		);
 
-		// _hasRootProperties can be gotten via _tabsStructureHelper.hasProperties. But we do not support root properties currently.
+		this.observe(
+			this._tabsStructureHelper.hasProperties,
+			(hasRootProperties) => {
+				this._hasRootProperties = hasRootProperties;
+				this.#createRoutes();
+			},
+			'observeRootProperties',
+		);
 
 		this.consumeContext(UMB_PROPERTY_STRUCTURE_WORKSPACE_CONTEXT, (workspaceContext) => {
 			this.#structureManager = workspaceContext?.structure;
@@ -114,7 +119,7 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 		if (!this._tabs || !this.#structureManager) return;
 		const routes: UmbRoute[] = [];
 
-		if (this._hasRootGroups) {
+		if (this._hasRootGroups || this._hasRootProperties) {
 			routes.push({
 				path: 'root',
 				component: () => import('./content-editor-tab.element.js'),
@@ -212,9 +217,12 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 		}
 		return html`
 			<umb-body-layout header-fit-height>
-				${this._routerPath && (this._tabs.length > 1 || (this._tabs.length === 1 && this._hasRootGroups))
+				${this._routerPath &&
+				(this._tabs.length > 1 || (this._tabs.length === 1 && (this._hasRootGroups || this._hasRootProperties)))
 					? html` <uui-tab-group slot="header">
-							${this._hasRootGroups && this._tabs.length > 0 ? this.#renderTab(null, '#general_generic') : nothing}
+							${(this._hasRootGroups || this._hasRootProperties) && this._tabs.length > 0
+								? this.#renderTab(null, '#general_generic')
+								: nothing}
 							${repeat(
 								this._tabs,
 								(tab) => tab.name,
@@ -267,6 +275,9 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 				display: block;
 				height: 100%;
 				--uui-tab-background: var(--uui-color-surface);
+			}
+			umb-badge {
+				--uui-badge-inset: 0 0 auto auto;
 			}
 		`,
 	];

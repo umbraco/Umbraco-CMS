@@ -378,6 +378,8 @@ export default {
 		renameFolderFailed: 'Das Verzeichnis mit Id %0% konnte nicht umbenannt werden',
 		dragAndDropYourFilesIntoTheArea: 'Wählen Sie Dateien aus und ziehen Sie diese in diesen Bereich',
 		uploadNotAllowed: 'Hochladen ist in diesem Bereich nicht erlaubt.',
+		uploadValidationFailed: (mediaTypeName: string) =>
+			`Der Medientyp ${mediaTypeName} hat eine oder mehrere erforderliche Eigenschaften. Er muss einzeln über das Menü 'Erstellen' hochgeladen werden`,
 	},
 	member: {
 		createNewMember: 'Neues Mitglied anlegen',
@@ -900,7 +902,6 @@ export default {
 		header: 'Kopf',
 		systemField: 'System Feld',
 		lastUpdated: 'Zuletzt geändert',
-		newVersionAvailable: 'Neue Version verfügbar',
 	},
 	colors: {
 		black: 'Schwarz',
@@ -1259,7 +1260,8 @@ export default {
 		headline: 'Wählen Sie eine Version, um diese mit der aktuellen zu vergleichen',
 		currentVersion: 'Aktuelle Version',
 		diffHelp:
-			'Zeigt die Unterschiede zwischen der aktuellen und der ausgewählten Version an.<br />Text in <del>rot</del> fehlen in der ausgewählten Version, <ins>grün</ins> markierter Text wurde hinzugefügt.',
+			'<del>Roter Text</del> wird in der ausgewählten Version entfernt, <ins>grüner Text</ins> wird hinzugefügt.',
+		showDiff: 'Unterschiede zwischen der aktuellen Version und der ausgewählten Version anzeigen.',
 		noDiff: 'Keine Unterschiede zwischen den beiden Versionen gefunden.',
 		documentRolledBack: 'Dokument wurde zurückgesetzt',
 		htmlHelp:
@@ -1297,6 +1299,7 @@ export default {
 		tab: 'Registerkarte',
 		tabname: 'Registerkartenbeschriftung',
 		tabs: 'Registerkarten',
+		changeIcon: 'Symbol ändern',
 		contentTypeEnabled: 'Masterdokumenttyp aktiviert',
 		contentTypeUses: 'Dieser Dokumenttyp verwendet',
 		noPropertiesDefinedOnTab:
@@ -1741,6 +1744,7 @@ export default {
 		noLockouts: 'wurde nicht ausgeschlossen',
 		noPasswordChange: 'Das Kennwort wurde nicht geändert',
 		confirmNewPassword: 'Neues Kennwort (Bestätigung)',
+		confirmPassword: 'Kennwort bestätigen',
 		changePasswordDescription:
 			"Sie können Ihr Kennwort für den Zugriff auf den Umbraco-Verwaltungsbereich ändern, indem Sie das nachfolgende Formular ausfüllen und auf 'Kennwort ändern' klicken",
 		contentChannel: 'Schnittstelle für externe Editoren',
@@ -1931,7 +1935,8 @@ export default {
 		emptyDictionaryTree: 'Das Wörterbuch ist leer',
 	},
 	textbox: {
-		characters_left: 'Buchstaben verbleiben',
+		characters_left: '<strong>%0%</strong> Zeichen verbleiben.',
+		characters_exceed: 'Maximal %0% Zeichen, <strong>%1%</strong> zu viele.',
 	},
 	recycleBin: {
 		contentTrashed: 'Inhalt mit Id = {0} des Oberknotens mit Id = {1} wurde verworfen',
@@ -1982,7 +1987,8 @@ export default {
 		openBackofficeSearch: 'Back-Office Suche öffnen',
 		openCloseBackofficeHelp: 'Back-Office Hilfe öffnen / schliessen',
 		openCloseBackofficeProfileOptions: 'Ihre Profil-Einstellungen öffnen / schliessen',
-		profileOptions: 'Profil-Einstellungen',
+		profileOptions: 'Benutzerprofil für %0% (%1%)',
+		profileOptionsDefault: 'Benutzerprofil',
 	},
 	logViewer: {
 		selectAllLogLevelFilters: 'Wählen Sie Alle',

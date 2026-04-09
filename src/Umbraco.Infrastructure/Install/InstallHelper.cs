@@ -8,24 +8,28 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Persistence;
-using Umbraco.Extensions;
-using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Infrastructure.Install
 {
+    /// <summary>
+    /// Provides utility methods to assist with the installation of Umbraco CMS.
+    /// </summary>
+    [Obsolete("InstallHelper is no longer used internally. Scheduled for removal in Umbraco 19.")]
     public sealed class InstallHelper
     {
-        private readonly DatabaseBuilder _databaseBuilder;
-        private readonly ILogger<InstallHelper> _logger;
-        private readonly IUmbracoVersion _umbracoVersion;
-        private readonly IOptionsMonitor<ConnectionStrings> _connectionStrings;
-        private readonly IInstallationService _installationService;
-        private readonly ICookieManager _cookieManager;
-        private readonly IUserAgentProvider _userAgentProvider;
-        private readonly IUmbracoDatabaseFactory _umbracoDatabaseFactory;
-        private readonly IFireAndForgetRunner _fireAndForgetRunner;
-        private readonly IEnumerable<IDatabaseProviderMetadata> _databaseProviderMetadata;
-
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Install.InstallHelper"/> class.
+        /// </summary>
+        /// <param name="databaseBuilder">The <see cref="DatabaseBuilder"/> used to manage database creation and upgrades.</param>
+        /// <param name="logger">The <see cref="ILogger{InstallHelper}"/> instance for logging installation events.</param>
+        /// <param name="umbracoVersion">The <see cref="IUmbracoVersion"/> providing Umbraco version information.</param>
+        /// <param name="connectionStrings">The <see cref="IOptionsMonitor{ConnectionStrings}"/> for monitoring connection string changes.</param>
+        /// <param name="installationService">The <see cref="IInstallationService"/> responsible for installation logic.</param>
+        /// <param name="cookieManager">The <see cref="ICookieManager"/> for managing cookies during installation.</param>
+        /// <param name="userAgentProvider">The <see cref="IUserAgentProvider"/> for accessing user agent information.</param>
+        /// <param name="umbracoDatabaseFactory">The <see cref="IUmbracoDatabaseFactory"/> for creating Umbraco database instances.</param>
+        /// <param name="fireAndForgetRunner">The <see cref="IFireAndForgetRunner"/> for running background tasks.</param>
+        /// <param name="databaseProviderMetadata">A collection of <see cref="IDatabaseProviderMetadata"/> describing available database providers.</param>
         public InstallHelper(
             DatabaseBuilder databaseBuilder,
             ILogger<InstallHelper> logger,
@@ -38,74 +42,15 @@ namespace Umbraco.Cms.Infrastructure.Install
             IFireAndForgetRunner fireAndForgetRunner,
             IEnumerable<IDatabaseProviderMetadata> databaseProviderMetadata)
         {
-            _logger = logger;
-            _umbracoVersion = umbracoVersion;
-            _databaseBuilder = databaseBuilder;
-            _connectionStrings = connectionStrings;
-            _installationService = installationService;
-            _cookieManager = cookieManager;
-            _userAgentProvider = userAgentProvider;
-            _umbracoDatabaseFactory = umbracoDatabaseFactory;
-            _fireAndForgetRunner = fireAndForgetRunner;
-            _databaseProviderMetadata = databaseProviderMetadata;
-        }
-
-        public Task SetInstallStatusAsync(bool isCompleted, string errorMsg)
-        {
-            try
-            {
-                var userAgent = _userAgentProvider.GetUserAgent();
-
-                // Check for current install ID
-                var installCookie = _cookieManager.GetCookieValue(Constants.Web.InstallerCookieName);
-                if (!Guid.TryParse(installCookie, out Guid installId))
-                {
-                    installId = Guid.NewGuid();
-
-                    _cookieManager.SetCookieValue(Constants.Web.InstallerCookieName, installId.ToString(), false, false, "Unspecified");
-                }
-
-                var dbProvider = string.Empty;
-                if (IsBrandNewInstall == false)
-                {
-                    // we don't have DatabaseProvider anymore... doing it differently
-                    //dbProvider = ApplicationContext.Current.DatabaseContext.DatabaseProvider.ToString();
-                    dbProvider = _umbracoDatabaseFactory.SqlContext.SqlSyntax.DbProvider;
-                }
-
-                var installLog = new InstallLog(
-                    installId: installId,
-                    isUpgrade: IsBrandNewInstall == false,
-                    installCompleted: isCompleted,
-                    timestamp: DateTime.Now,
-                    versionMajor: _umbracoVersion.Version.Major,
-                    versionMinor: _umbracoVersion.Version.Minor,
-                    versionPatch: _umbracoVersion.Version.Build,
-                    versionComment: _umbracoVersion.Comment,
-                    error: errorMsg,
-                    userAgent: userAgent,
-                    dbProvider: dbProvider);
-
-                _fireAndForgetRunner.RunFireAndForget(() => _installationService.LogInstall(installLog));
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An error occurred in InstallStatus trying to check upgrades");
-            }
-
-            return Task.CompletedTask;
         }
 
         /// <summary>
-        /// Checks if this is a brand new install, meaning that there is no configured database connection or the database is empty.
+        ///     Previously sent installer telemetry to Our.Umbraco.com, but this method is now obsolete and performs no action. Scheduled for removal in Umbraco 19.
         /// </summary>
-        /// <value>
-        ///   <c>true</c> if this is a brand new install; otherwise, <c>false</c>.
-        /// </value>
-        private bool IsBrandNewInstall =>
-            _connectionStrings.CurrentValue.IsConnectionStringConfigured() == false ||
-            _databaseBuilder.IsDatabaseConfigured == false ||
-            (_databaseBuilder.CanConnectToDatabase == false && _databaseProviderMetadata.CanForceCreateDatabase(_umbracoDatabaseFactory)) ||
-            _databaseBuilder.IsUmbracoInstalled() == false;
+        /// <param name="isCompleted">Indicates whether the installation is completed.</param>
+        /// <param name="errorMsg">The error message if the installation failed.</param>
+        /// <returns>A completed task.</returns>
+        [Obsolete("SetInstallStatusAsync no longer has any function. Scheduled for removal in Umbraco 19.")]
+        public Task SetInstallStatusAsync(bool isCompleted, string errorMsg) => Task.CompletedTask;
     }
 }

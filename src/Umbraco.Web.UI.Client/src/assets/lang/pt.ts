@@ -391,6 +391,8 @@ export default {
 		fileSecurityValidationFailure: 'Uma ou mais validações de segurança de ficheiros falharam',
 		moveToSameFolderFailed: 'As pastas pai e destino não podem ser as mesmas',
 		uploadNotAllowed: 'O carregamento não é permitido nesta localização.',
+		uploadValidationFailed: (mediaTypeName: string) =>
+			`O tipo de multimédia ${mediaTypeName} tem uma ou mais propriedades obrigatórias. Terá de ser carregado individualmente através do menu 'Criar'`,
 	},
 	member: {
 		'2fa': 'Autenticação de Dois Fatores',
@@ -525,7 +527,10 @@ export default {
 		confirmremoveusageof: 'Tem a certeza que quer remover o uso de <strong>%0%</strong>',
 		confirmlogout: 'Tem a certeza?',
 		confirmSure: 'Tem a certeza?',
+		cannotTrashWhenReferenced: (name: string) => `<strong>${name}</strong> não pode ser movido para a Reciclagem porque é referenciado por outros itens.`,
 		confirmTrash: (name: string) => `Tem a certeza que quer mover <strong>${name}</strong> para a Reciclagem?`,
+		cannotBulkTrashWhenReferenced: (total: number) =>
+			`Os <strong>${total} ${total === 1 ? 'item selecionado' : 'itens selecionados'}</strong> não podem ser movidos para a Reciclagem porque pelo menos um item é referenciado por outro conteúdo.`,
 		confirmBulkTrash: (total: number) =>
 			`Tem a certeza que quer mover <strong>${total} ${total === 1 ? 'item' : 'itens'}</strong> para a Reciclagem?`,
 		confirmBulkDelete: (total: number) =>
@@ -990,7 +995,6 @@ export default {
 		media: 'Multimédia',
 		revert: 'Reverter',
 		validate: 'Validar',
-		newVersionAvailable: 'Nova versão disponível',
 		duration: (duration: string, date: Date | string, now: Date | string) => {
 			if (new Date(date).getTime() < new Date(now).getTime()) return `${duration} atrás`;
 			return `em ${duration}`;
@@ -1379,8 +1383,9 @@ export default {
 		created: 'Criado',
 		currentVersion: 'Versão atual',
 		diffHelp:
-			'Isto mostra as diferenças entre a versão atual (rascunho) e a versão selecionada<br /><del>Texto a vermelho</del> será removido na versão selecionada, <ins>texto a verde</ins> será adicionado',
-		noDiff: 'Não existem diferenças entre a versão atual (rascunho) e a versão selecionada',
+			'<del>Texto a vermelho</del> será removido na versão selecionada, <ins>texto a verde</ins> será adicionado.',
+		showDiff: 'Mostrar diferenças entre a versão atual (rascunho) e a versão selecionada.',
+		noDiff: 'Não existem diferenças entre a versão atual (rascunho) e a versão selecionada.',
 		documentRolledBack: 'O documento foi revertido',
 		headline: 'Selecione uma versão para comparar com a versão atual',
 		htmlHelp:
@@ -1998,7 +2003,7 @@ export default {
 		},
 		changePassword: 'Altere a sua palavra-passe',
 		changePhoto: 'Alterar foto',
-		configureMfa: 'Configurar MFA',
+		configureMfa: 'Configurar 2FA',
 		emailRequired: 'Obrigatório - introduza um endereço de email para este utilizador',
 		emailDescription: (usernameIsEmail: boolean) => {
 			return usernameIsEmail
@@ -2012,6 +2017,7 @@ export default {
 		noLockouts: 'não foi bloqueado',
 		noPasswordChange: 'A palavra-passe não foi alterada',
 		confirmNewPassword: 'Confirmar nova palavra-passe',
+		confirmPassword: 'Confirmar palavra-passe',
 		changePasswordDescription:
 			"Pode alterar a sua palavra-passe para aceder ao backoffice do Umbraco preenchendo o formulário abaixo e clicando no botão 'Alterar Palavra-passe'",
 		contentChannel: 'Canal de Conteúdo',
@@ -2359,7 +2365,8 @@ export default {
 		openBackofficeSearch: 'Abrir pesquisa do backoffice',
 		openCloseBackofficeHelp: 'Abrir/Fechar ajuda do backoffice',
 		openCloseBackofficeProfileOptions: 'Abrir/Fechar as opções do seu perfil',
-		profileOptions: 'Opções perfil',
+		profileOptions: 'Perfil do usuário para %0% (%1%)',
+		profileOptionsDefault: 'Perfil do usuário',
 		assignDomainDescription: 'Configurar Cultura e Domínios para %0%',
 		createDescription: 'Criar novo nó em %0%',
 		protectDescription: 'Configurar restrições de acesso em %0%',
@@ -2437,14 +2444,10 @@ export default {
 		savedSearches: 'Pesquisas Guardadas',
 		saveSearch: 'Guardar Pesquisa',
 		saveSearchDescription: 'Introduza um nome amigável para a sua consulta de pesquisa',
-		filterSearch: 'Filtrar Pesquisa',
-		totalItems: 'Total de Itens',
 		timestamp: 'Timestamp',
 		level: 'Nível',
 		machine: 'Máquina',
 		message: 'Mensagem',
-		exception: 'Exceção',
-		properties: 'Propriedades',
 		searchWithGoogle: 'Pesquisar Com Google',
 		searchThisMessageWithGoogle: 'Pesquisar esta mensagem com Google',
 		searchWithBing: 'Pesquisar Com Bing',
@@ -2458,21 +2461,9 @@ export default {
 		searchUmbracoIssues: 'Pesquisar Problemas Umbraco',
 		searchUmbracoIssuesOnGithub: 'Pesquisar Problemas Umbraco no GitHub',
 		deleteThisSearch: 'Eliminar esta pesquisa',
-		findLogsWithRequestId: 'Encontrar Logs com ID de Pedido',
-		findLogsWithNamespace: 'Encontrar Logs com Namespace',
-		findLogsWithMachineName: 'Encontrar Logs com Nome da Máquina',
-		open: 'Abrir',
 		polling: 'Polling',
-		every2: 'A cada 2 segundos',
-		every5: 'A cada 5 segundos',
-		every10: 'A cada 10 segundos',
-		every20: 'A cada 20 segundos',
-		every30: 'A cada 30 segundos',
-		pollingEvery2: 'Polling a cada 2s',
-		pollingEvery5: 'Polling a cada 5s',
-		pollingEvery10: 'Polling a cada 10s',
-		pollingEvery20: 'Polling a cada 20s',
-		pollingEvery30: 'Polling a cada 30s',
+		pollingInterval: (seconds: number) => `A cada ${seconds} segundos`,
+		pollingActive: (seconds: number) => `Polling a cada ${seconds}s`,
 	},
 	clipboard: {
 		labelForCopyAllEntries: 'Copiar %0%',

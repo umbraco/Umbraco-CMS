@@ -64,11 +64,14 @@ public abstract class ContentBase : TreeEntityBase, IContentBase
         _properties.EnsurePropertyTypes(contentType.CompositionPropertyTypes);
     }
 
+    /// <summary>
+    ///     Gets the simple content type information for this content.
+    /// </summary>
     [IgnoreDataMember]
     public ISimpleContentType ContentType { get; private set; }
 
     /// <summary>
-    ///     Id of the user who wrote/updated this entity
+    ///     Gets or sets the identifier of the user who wrote/updated this entity.
     /// </summary>
     [DataMember]
     public int WriterId
@@ -77,6 +80,9 @@ public abstract class ContentBase : TreeEntityBase, IContentBase
         set => SetPropertyValueAndDetectChanges(value, ref _writerId, nameof(WriterId));
     }
 
+    /// <summary>
+    ///     Gets or sets the version identifier.
+    /// </summary>
     [IgnoreDataMember]
     public int VersionId { get; set; }
 
@@ -123,12 +129,21 @@ public abstract class ContentBase : TreeEntityBase, IContentBase
         }
     }
 
+    /// <summary>
+    ///     Changes the content type of this content.
+    /// </summary>
+    /// <param name="contentType">The new content type.</param>
     public void ChangeContentType(ISimpleContentType contentType)
     {
         ContentType = contentType;
         ContentTypeId = contentType.Id;
     }
 
+    /// <summary>
+    ///     Handles changes to the properties collection.
+    /// </summary>
+    /// <param name="sender">The source of the event.</param>
+    /// <param name="e">The event arguments.</param>
     protected void PropertiesChanged(object? sender, NotifyCollectionChangedEventArgs e) =>
         OnPropertyChanged(nameof(Properties));
 
@@ -183,13 +198,39 @@ public abstract class ContentBase : TreeEntityBase, IContentBase
     private (HashSet<string>? addedCultures, HashSet<string>? removedCultures, HashSet<string>? updatedCultures)
         _previousCultureChanges;
 
+    /// <summary>
+    ///     Contains prefix constants used for culture change tracking.
+    /// </summary>
     public static class ChangeTrackingPrefix
     {
+        /// <summary>
+        ///     Prefix for tracking updated cultures.
+        /// </summary>
         public const string UpdatedCulture = "_updatedCulture_";
+
+        /// <summary>
+        ///     Prefix for tracking changed cultures.
+        /// </summary>
         public const string ChangedCulture = "_changedCulture_";
+
+        /// <summary>
+        ///     Prefix for tracking published cultures.
+        /// </summary>
         public const string PublishedCulture = "_publishedCulture_";
+
+        /// <summary>
+        ///     Prefix for tracking unpublished cultures.
+        /// </summary>
         public const string UnpublishedCulture = "_unpublishedCulture_";
+
+        /// <summary>
+        ///     Prefix for tracking added cultures.
+        /// </summary>
         public const string AddedCulture = "_addedCulture_";
+
+        /// <summary>
+        ///     Prefix for tracking removed cultures.
+        /// </summary>
         public const string RemovedCulture = "_removedCulture_";
     }
 
@@ -486,6 +527,7 @@ public abstract class ContentBase : TreeEntityBase, IContentBase
 
     #region Dirty
 
+    /// <inheritdoc />
     public override void ResetWereDirtyProperties()
     {
         base.ResetWereDirtyProperties();

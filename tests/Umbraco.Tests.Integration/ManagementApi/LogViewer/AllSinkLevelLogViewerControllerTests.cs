@@ -4,7 +4,7 @@ using Umbraco.Cms.Api.Management.Controllers.LogViewer;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.LogViewer;
 
-public class AllSinkLevelLogViewerControllerTests : ManagementApiUserGroupTestBase<AllSinkLevelLogViewerController>
+public class AllSinkLevelLogViewerControllerTests : LogViewerTestBase<AllSinkLevelLogViewerController>
 {
     protected override Expression<Func<AllSinkLevelLogViewerController, object>> MethodSelector => x => x.AllLogLevels(CancellationToken.None, 0, 100);
 

@@ -5,6 +5,9 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+/// Provides services for managing cache instructions in distributed cache scenarios.
+/// </summary>
 public interface ICacheInstructionService
 {
     /// <summary>
@@ -43,6 +46,7 @@ public interface ICacheInstructionService
     /// <param name="localIdentity">Local identity of the executing AppDomain.</param>
     /// <param name="lastId">Id of the latest processed instruction.</param>
     /// <returns>The processing result.</returns>
+    [Obsolete("Please use ProcessAllInstructions instead. Scheduled for removal in Umbraco 19.")]
     ProcessInstructionsResult ProcessInstructions(
         CacheRefresherCollection cacheRefreshers,
         CancellationToken cancellationToken,
@@ -60,11 +64,13 @@ public interface ICacheInstructionService
         CacheRefresherCollection cacheRefreshers,
         CancellationToken cancellationToken,
         string localIdentity)
+#pragma warning disable CS0618 // Type or member is obsolete
         => ProcessInstructions(
             cacheRefreshers,
             cancellationToken,
             localIdentity,
             StaticServiceProvider.Instance.GetRequiredService<ILastSyncedManager>().GetLastSyncedExternalAsync().GetAwaiter().GetResult() ?? 0);
+#pragma warning restore CS0618 // Type or member is obsolete
 
 
     /// <summary>
@@ -73,15 +79,16 @@ public interface ICacheInstructionService
     /// <param name="cacheRefreshers">The collection of cache refreshers to use for processing instructions.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <param name="localIdentity">The local identity of the executing AppDomain.</param>
-    /// <param name="lastId">The ID of the latest processed instruction.</param>
     /// <returns>The result of processing the internal instructions.</returns>
     ProcessInstructionsResult ProcessInternalInstructions(
         CacheRefresherCollection cacheRefreshers,
         CancellationToken cancellationToken,
         string localIdentity)
+#pragma warning disable CS0618 // Type or member is obsolete
         => ProcessInstructions(
             cacheRefreshers,
             cancellationToken,
             localIdentity,
             StaticServiceProvider.Instance.GetRequiredService<ILastSyncedManager>().GetLastSyncedExternalAsync().GetAwaiter().GetResult() ?? 0);
+#pragma warning restore CS0618 // Type or member is obsolete
 }

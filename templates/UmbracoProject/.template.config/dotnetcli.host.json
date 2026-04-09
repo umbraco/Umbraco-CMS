@@ -1,16 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/dotnetcli.host.json",
   "symbolInfo": {
-    "Framework": {
-      "longName": "Framework",
-      "shortName": "F",
-      "isHidden": true
-    },
-    "UmbracoVersion": {
-      "longName": "version",
-      "shortName": "v",
-      "isHidden": true
-    },
     "UmbracoRelease": {
       "longName": "release",
       "shortName": "r"
@@ -22,6 +12,10 @@
     "UseDeliveryApi": {
       "longName": "use-delivery-api",
       "shortName": "da"
+    },
+    "PackageManagement": {
+      "longName": "package-management",
+      "shortName": "pm"
     },
     "Docker": {
       "longName": "add-docker",

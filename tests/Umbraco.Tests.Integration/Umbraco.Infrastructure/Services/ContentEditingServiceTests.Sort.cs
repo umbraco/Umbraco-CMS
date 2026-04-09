@@ -15,7 +15,7 @@ public partial class ContentEditingServiceTests
     {
         var root = await CreateRootContentWithTenChildren();
 
-        var originalChildren = ContentService.GetPagedChildren(root.Id, 0, 100, out _).ToArray();
+        var originalChildren = ContentService.GetPagedChildren(root.Id, 0, 100, out _, propertyAliases: null, filter: null, ordering: null).ToArray();
         Assert.AreEqual(10, originalChildren.Length);
 
         var sortingModels = originalChildren.Reverse().Select((child, index) => new SortingModel { Key = child.Key, SortOrder = index });
@@ -24,7 +24,7 @@ public partial class ContentEditingServiceTests
         Assert.AreEqual(ContentEditingOperationStatus.Success, result);
 
         var actualChildrenKeys = ContentService
-            .GetPagedChildren(root.Id, 0, 100, out _)
+            .GetPagedChildren(root.Id, 0, 100, out _, propertyAliases: null, filter: null, ordering: null)
             .OrderBy(c => c.SortOrder)
             .Select(c => c.Key)
             .ToArray();
@@ -60,7 +60,7 @@ public partial class ContentEditingServiceTests
                 Constants.Security.SuperUserKey);
         }
 
-        var originalRoots = ContentService.GetPagedChildren(Constants.System.Root, 0, 100, out _).ToArray();
+        var originalRoots = ContentService.GetPagedChildren(Constants.System.Root, 0, 100, out _, propertyAliases: null, filter: null, ordering: null).ToArray();
         Assert.AreEqual(10, originalRoots.Length);
 
         var sortingModels = originalRoots.Reverse().Select((root, index) => new SortingModel { Key = root.Key, SortOrder = index });
@@ -73,7 +73,7 @@ public partial class ContentEditingServiceTests
         Assert.AreEqual(ContentEditingOperationStatus.Success, result);
 
         var actualRootKeys = ContentService
-            .GetPagedChildren(Constants.System.Root, 0, 100, out _)
+            .GetPagedChildren(Constants.System.Root, 0, 100, out _, propertyAliases: null, filter: null, ordering: null)
             .OrderBy(c => c.SortOrder)
             .Select(c => c.Key)
             .ToArray();
@@ -90,7 +90,7 @@ public partial class ContentEditingServiceTests
     {
         var root = await CreateRootContentWithTenChildren();
 
-        var originalChildren = ContentService.GetPagedChildren(root.Id, 0, 100, out _).ToArray();
+        var originalChildren = ContentService.GetPagedChildren(root.Id, 0, 100, out _, propertyAliases: null, filter: null, ordering: null).ToArray();
         Assert.AreEqual(10, originalChildren.Length);
 
         var sortingModels = new[]
@@ -103,7 +103,7 @@ public partial class ContentEditingServiceTests
         Assert.AreEqual(ContentEditingOperationStatus.SortingInvalid, result);
 
         var actualChildrenKeys = ContentService
-            .GetPagedChildren(root.Id, 0, 100, out _)
+            .GetPagedChildren(root.Id, 0, 100, out _, propertyAliases: null, filter: null, ordering: null)
             .OrderBy(c => c.SortOrder)
             .Select(c => c.Key)
             .ToArray();

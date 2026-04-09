@@ -4,12 +4,25 @@ using Umbraco.Cms.Core.PropertyEditors;
 
 namespace Umbraco.Cms.Core.Services.ContentTypeEditing;
 
+/// <summary>
+///     Implementation of <see cref="IElementSwitchValidator"/> for validating element type switching operations.
+/// </summary>
+/// <remarks>
+///     This validator checks constraints when switching content types between document and element modes,
+///     ensuring data integrity and preventing invalid configurations.
+/// </remarks>
 public class ElementSwitchValidator : IElementSwitchValidator
 {
     private readonly IContentTypeService _contentTypeService;
     private readonly PropertyEditorCollection _propertyEditorCollection;
     private readonly IDataTypeService _dataTypeService;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="ElementSwitchValidator"/> class.
+    /// </summary>
+    /// <param name="contentTypeService">The content type service for querying content type hierarchies.</param>
+    /// <param name="propertyEditorCollection">The collection of property editors to check for block structure support.</param>
+    /// <param name="dataTypeService">The data type service for querying data type configurations.</param>
     public ElementSwitchValidator(
         IContentTypeService contentTypeService,
         PropertyEditorCollection propertyEditorCollection,
@@ -20,6 +33,7 @@ public class ElementSwitchValidator : IElementSwitchValidator
         _dataTypeService = dataTypeService;
     }
 
+    /// <inheritdoc />
     public Task<bool> AncestorsAreAlignedAsync(IContentType contentType)
     {
         // this call does not return the system roots
@@ -35,6 +49,7 @@ public class ElementSwitchValidator : IElementSwitchValidator
             .Any(ancestor => ancestor.IsElement != contentType.IsElement) is false);
     }
 
+    /// <inheritdoc />
     public Task<bool> DescendantsAreAlignedAsync(IContentType contentType)
     {
         IEnumerable<IContentType> descendants = _contentTypeService.GetDescendants(contentType.Id, false);
@@ -43,6 +58,7 @@ public class ElementSwitchValidator : IElementSwitchValidator
         return Task.FromResult(descendants.Any(descendant => descendant.IsElement != contentType.IsElement) is false);
     }
 
+    /// <inheritdoc />
     public async Task<bool> ElementToDocumentNotUsedInBlockStructuresAsync(IContentTypeBase contentType)
     {
         // get all propertyEditors that support block usage
@@ -59,6 +75,7 @@ public class ElementSwitchValidator : IElementSwitchValidator
                 .ConfiguredElementTypeKeys().Contains(contentType.Key)) is false;
     }
 
+    /// <inheritdoc />
     public Task<bool> DocumentToElementHasNoContentAsync(IContentTypeBase contentType) =>
 
         // if any content for the content type exists, the validation fails.

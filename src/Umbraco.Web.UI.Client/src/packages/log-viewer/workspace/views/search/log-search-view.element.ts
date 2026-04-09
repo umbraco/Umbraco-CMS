@@ -34,7 +34,7 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 	override render() {
 		return html`
 			<umb-body-layout header-transparent header-fit-height>
-				<div id="header" slot="header">
+				<div id="header" slot="header" role="search" aria-label="Filter logs">
 					<div id="levels-container">
 						<umb-log-viewer-log-level-filter-menu></umb-log-viewer-log-level-filter-menu>
 						<div id="dates-polling-container">

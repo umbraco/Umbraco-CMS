@@ -1,4 +1,5 @@
 import { UMB_MEDIA_TYPE_ITEM_REPOSITORY_ALIAS, UMB_MEDIA_TYPE_ITEM_STORE_ALIAS } from './constants.js';
+import { UmbMediaTypeItemStore } from './media-type-item.store.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -11,6 +12,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'itemStore',
 		alias: UMB_MEDIA_TYPE_ITEM_STORE_ALIAS,
 		name: 'Media Type Item Store',
-		api: () => import('./media-type-item.store.js'),
+		api: UmbMediaTypeItemStore,
 	},
 ];

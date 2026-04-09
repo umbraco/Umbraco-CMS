@@ -13,12 +13,20 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Segment;
 
+/// <summary>
+/// API controller responsible for managing and retrieving all content segments within the system.
+/// </summary>
 [ApiVersion("1.0")]
 public class AllSegmentController : SegmentControllerBase
 {
     private readonly ISegmentService _segmentService;
     private readonly IUmbracoMapper _umbracoMapper;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AllSegmentController"/> class with the specified segment service and Umbraco mapper.
+    /// </summary>
+    /// <param name="segmentService">An instance of <see cref="ISegmentService"/> used to manage segments.</param>
+    /// <param name="umbracoMapper">An instance of <see cref="IUmbracoMapper"/> used for mapping objects within Umbraco.</param>
     public AllSegmentController(ISegmentService segmentService, IUmbracoMapper umbracoMapper)
     {
         _segmentService = segmentService;
@@ -29,6 +37,8 @@ public class AllSegmentController : SegmentControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<SegmentResponseModel>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [EndpointSummary("Gets a paginated collection of segments.")]
+    [EndpointDescription("Gets a paginated collection of segments with support for filtering and pagination.")]
     public async Task<IActionResult> GetAll(CancellationToken cancellationToken, int skip = 0, int take = 100)
     {
         Attempt<PagedModel<Core.Models.Segment>?, SegmentOperationStatus> pagedAttempt = await _segmentService.GetPagedSegmentsAsync(skip, take);

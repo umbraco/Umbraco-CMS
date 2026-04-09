@@ -6,6 +6,10 @@ export class UmbSliderPropertyValuePreset
 	implements UmbPropertyValuePreset<UmbSliderPropertyEditorUiValue, UmbPropertyEditorConfig>
 {
 	async processValue(value: undefined | UmbSliderPropertyEditorUiValue, config: UmbPropertyEditorConfig) {
+		if (value !== undefined) {
+			return value;
+		}
+
 		const enableRange = Boolean(config.find((x) => x.alias === 'enableRange')?.value ?? false);
 
 		/*
@@ -27,7 +31,7 @@ export class UmbSliderPropertyValuePreset
 		const initialState = enableRange
 			? { from: initValueMinVerified, to: initValueMaxVerified }
 			: { from: initValueMinVerified, to: initValueMinVerified };
-		return value !== undefined ? value : initialState;
+		return initialState;
 	}
 
 	destroy(): void {}

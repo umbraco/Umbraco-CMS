@@ -7,6 +7,9 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// </summary>
 public class DecimalConfigurationEditor : ConfigurationEditor
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DecimalConfigurationEditor"/> class.
+    /// </summary>
     public DecimalConfigurationEditor()
     {
         Fields.Add(new ConfigurationField(new DecimalValidator())

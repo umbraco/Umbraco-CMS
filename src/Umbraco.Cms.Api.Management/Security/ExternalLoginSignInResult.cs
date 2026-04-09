@@ -7,5 +7,13 @@ namespace Umbraco.Cms.Api.Management.Security;
 /// </summary>
 public class ExternalLoginSignInResult : SignInResult
 {
-    public static ExternalLoginSignInResult NotAllowed { get; } = new() { Succeeded = false };
+    /// <summary>
+    ///     Gets a <see cref="ExternalLoginSignInResult" /> that represents a sign-in attempt that failed because
+    ///     the user is not allowed to sign-in.
+    /// </summary>
+    /// <value>
+    ///     A <see cref="ExternalLoginSignInResult" /> that represents a sign-in attempt that failed because
+    ///     the user is not allowed to sign-in.
+    /// </value>
+    public static new ExternalLoginSignInResult NotAllowed { get; } = new() { Succeeded = false };
 }

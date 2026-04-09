@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.DeliveryApi;
@@ -26,6 +26,12 @@ internal abstract class ApiMediaWithCropsBuilderBase<T>
         ImageFocalPoint? focalPoint,
         IEnumerable<ImageCrop>? crops);
 
+    /// <summary>
+    /// Builds an instance of <typeparamref name="T" /> from the specified <see cref="MediaWithCrops" />.
+    /// Merges crop and focal point data from both the media item and its local values, giving precedence to local values in case of conflicts.
+    /// </summary>
+    /// <param name="media">The <see cref="MediaWithCrops" /> instance containing the media content and crop information.</param>
+    /// <returns>An instance of <typeparamref name="T" /> representing the built media with merged crop and focal point data.</returns>
     public T Build(MediaWithCrops media)
     {
         IApiMedia inner = _apiMediaBuilder.Build(media.Content);
@@ -41,6 +47,11 @@ internal abstract class ApiMediaWithCropsBuilderBase<T>
         return Create(media.Content, inner, localCrops.GetImageFocalPoint(), localCrops.GetImageCrops());
     }
 
+    /// <summary>
+    /// Builds and returns an instance of <typeparamref name="T" /> from the provided <see cref="MediaWithCrops" /> object.
+    /// </summary>
+    /// <param name="media">The <see cref="MediaWithCrops" /> instance containing the media content and crop information to build from.</param>
+    /// <returns>An instance of <typeparamref name="T" /> representing the constructed media with merged crop data.</returns>
     public T Build(IPublishedContent media)
     {
         var mediaWithCrops = new MediaWithCrops(media, _publishedValueFallback, new ImageCropperValue());

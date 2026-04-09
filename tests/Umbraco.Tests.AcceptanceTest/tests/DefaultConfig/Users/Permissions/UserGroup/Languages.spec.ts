@@ -1,7 +1,6 @@
-import {AliasHelper, ConstantHelper, test} from '@umbraco/playwright-testhelpers';
+import {AliasHelper, ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 
 const testUser = ConstantHelper.testUserCredentials;
-let testUserCookieAndToken = {cookie: "", accessToken: "", refreshToken: ""};
 
 const userGroupName = 'TestUserGroup';
 let userGroupId = null;
@@ -55,20 +54,19 @@ test.beforeEach(async ({umbracoApi}) => {
 
 test.afterEach(async ({umbracoApi}) => {
   // Ensure we are logged in to admin
-  await umbracoApi.loginToAdminUser(testUserCookieAndToken.cookie, testUserCookieAndToken.accessToken, testUserCookieAndToken.refreshToken);
+  await umbracoApi.loginToAdminUser();
   await umbracoApi.userGroup.ensureNameNotExists(userGroupName);
   await umbracoApi.language.ensureIsoCodeNotExists(danishIsoCode);
   await umbracoApi.language.ensureIsoCodeNotExists(vietnameseIsoCode);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
 
-// Remove .skip when the front-end is ready. Currently the content name is read-only so cannot remane it.
-test.skip('can rename content with language set in userGroup', async ({umbracoApi, umbracoUi}) => {
+test('can rename content with language set in userGroup', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const updatedContentName = 'UpdatedContentName';
   userGroupId = await umbracoApi.userGroup.createUserGroupWithLanguageAndContentSection(userGroupName, englishIsoCode);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId, [], false, [], false, englishIsoCode);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
   await umbracoUi.userGroup.goToSection(ConstantHelper.sections.content, false);
   await umbracoUi.content.goToContentWithName(englishDocumentName);
@@ -76,11 +74,10 @@ test.skip('can rename content with language set in userGroup', async ({umbracoAp
   // Act
   await umbracoUi.content.isDocumentReadOnly(false);
   await umbracoUi.content.enterContentName(updatedContentName);
-  await umbracoUi.content.clickSaveButton();
-  await umbracoUi.content.clickSaveAndCloseButton();
+  await umbracoUi.content.clickSaveButtonForContent();
+  await umbracoUi.content.clickSaveModalButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.userGroup.isSuccessStateVisibleForSaveButton();
   await umbracoUi.content.isContentInTreeVisible(updatedContentName);
 });
 
@@ -88,7 +85,7 @@ test('can not rename content with language not set in userGroup', async ({umbrac
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithLanguageAndContentSection(userGroupName, englishIsoCode);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId, [], false, [], false, englishIsoCode);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
   await umbracoUi.userGroup.goToSection(ConstantHelper.sections.content, false);
   await umbracoUi.content.doesDocumentSectionHaveLanguageSelected(englishLanguageName);
@@ -106,7 +103,7 @@ test('can update content property with language set in userGroup', {tag: '@relea
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithLanguageAndContentSection(userGroupName, englishIsoCode);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
   await umbracoUi.userGroup.goToSection(ConstantHelper.sections.content, false);
   await umbracoUi.content.doesDocumentSectionHaveLanguageSelected(englishLanguageName);
@@ -122,7 +119,7 @@ test('can not update content property with language not set in userGroup', async
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithLanguageAndContentSection(userGroupName, englishIsoCode);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
   await umbracoUi.userGroup.goToSection(ConstantHelper.sections.content, false);
   await umbracoUi.content.doesDocumentSectionHaveLanguageSelected(englishLanguageName);

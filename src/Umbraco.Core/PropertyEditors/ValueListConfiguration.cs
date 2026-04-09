@@ -5,6 +5,9 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// </summary>
 public class ValueListConfiguration
 {
+    /// <summary>
+    ///     Gets or sets the list of selectable items.
+    /// </summary>
     [ConfigurationField("items")]
     public List<string> Items { get; set; } = new();
 }
