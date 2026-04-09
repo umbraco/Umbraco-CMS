@@ -8,7 +8,6 @@ import {
 	customElement,
 	html,
 	ifDefined,
-	map,
 	nothing,
 	property,
 	repeat,
