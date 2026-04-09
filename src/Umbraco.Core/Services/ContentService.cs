@@ -767,44 +767,6 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
         return intKeyedResults;
     }
 
-    /// <inheritdoc/>
-    public IDictionary<Guid, IEnumerable<ContentSchedule>> GetContentSchedulesByKeys(Guid[] keys)
-    {
-        if (keys.Length == 0)
-        {
-            return ImmutableDictionary<Guid, IEnumerable<ContentSchedule>>.Empty;
-        }
-
-        Dictionary<int, Guid> intToKeyMap = new(keys.Length);
-        foreach (Guid key in keys)
-        {
-            Attempt<int> contentId = _idKeyMap.GetIdForKey(key, UmbracoObjectTypes.Document);
-            if (contentId.Success is false)
-            {
-                continue;
-            }
-
-            intToKeyMap[contentId.Result] = key;
-        }
-
-        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
-        scope.ReadLock(Constants.Locks.ContentTree);
-
-        IDictionary<int, IEnumerable<ContentSchedule>> intKeyedResults =
-            _documentRepository.GetContentSchedulesByIds(intToKeyMap.Keys.ToArray());
-
-        var guidKeyedResults = new Dictionary<Guid, IEnumerable<ContentSchedule>>(intKeyedResults.Count);
-        foreach (KeyValuePair<int, IEnumerable<ContentSchedule>> entry in intKeyedResults)
-        {
-            if (intToKeyMap.TryGetValue(entry.Key, out Guid guidKey))
-            {
-                guidKeyedResults[guidKey] = entry.Value;
-            }
-        }
-
-        return guidKeyedResults;
-    }
-
     /// <summary>
     ///     Checks if the passed in <see cref="IContent" /> can be published based on the ancestors publish state.
     /// </summary>
@@ -1515,7 +1477,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
             scope.WriteLock(Constants.Locks.ContentTree);
 
             TryGetParentKey(parentId, out Guid? parentKey);
-            if (scope.Notifications.PublishCancelable(new ContentCopyingNotification(content, copy, parentId, parentKey, eventMessages)))
+            if (scope.Notifications.PublishCancelable(new ContentCopyingNotification(content, copy, parentKey, eventMessages)))
             {
                 scope.Complete();
                 return null;
@@ -1585,7 +1547,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
                         IContent descendantCopy = descendant.DeepCloneWithResetIdentities();
                         descendantCopy.ParentId = parentId;
 
-                        if (scope.Notifications.PublishCancelable(new ContentCopyingNotification(descendant, descendantCopy, parentId, parentKey, eventMessages)))
+                        if (scope.Notifications.PublishCancelable(new ContentCopyingNotification(descendant, descendantCopy, parentKey, eventMessages)))
                         {
                             continue;
                         }
@@ -1622,7 +1584,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
                 new ContentTreeChangeNotification(copy, TreeChangeTypes.RefreshBranch, eventMessages));
             foreach (Tuple<IContent, IContent> x in CollectionsMarshal.AsSpan(copies))
             {
-                scope.Notifications.Publish(new ContentCopiedNotification(x.Item1, x.Item2, parentId, parentKey, relateToOriginal, eventMessages));
+                scope.Notifications.Publish(new ContentCopiedNotification(x.Item1, x.Item2, parentKey, relateToOriginal, eventMessages));
             }
 
             Audit(AuditType.Copy, userId, content.Id);
@@ -2045,6 +2007,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
     /// </summary>
     /// <param name="content">The blueprint content to save.</param>
     /// <param name="userId">The optional ID of the user saving the blueprint.</param>
+    [Obsolete("Please use the method taking all parameters. Scheduled for removal in Umbraco 20.")]
     public void SaveBlueprint(IContent content, int userId = Constants.Security.SuperUserId)
         => SaveBlueprint(content, null, userId);
 
@@ -2076,6 +2039,33 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
             Audit(AuditType.Save, userId, content.Id, $"Saved content template: {content.Name}");
 
             scope.Notifications.Publish(new ContentSavedBlueprintNotification(content, createdFromContent, evtMsgs));
+            scope.Notifications.Publish(new ContentTreeChangeNotification(content, TreeChangeTypes.RefreshNode, evtMsgs));
+
+            scope.Complete();
+        }
+    }
+
+    /// <summary>
+    /// Moves a content blueprint to a different container.
+    /// </summary>
+    /// <param name="content">The blueprint content to move.</param>
+    /// <param name="userId">The optional ID of the user moving the blueprint.</param>
+    public void MoveBlueprint(IContent content, int userId = Constants.Security.SuperUserId)
+    {
+        EventMessages evtMsgs = EventMessagesFactory.Get();
+
+        content.Blueprint = true;
+
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        {
+            scope.WriteLock(Constants.Locks.ContentTree);
+
+            content.WriterId = userId;
+
+            _documentBlueprintRepository.Save(content);
+
+            Audit(AuditType.Move, userId, content.Id);
+
             scope.Notifications.Publish(new ContentTreeChangeNotification(content, TreeChangeTypes.RefreshNode, evtMsgs));
 
             scope.Complete();

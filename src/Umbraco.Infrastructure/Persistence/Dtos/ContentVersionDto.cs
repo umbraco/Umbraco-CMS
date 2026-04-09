@@ -45,6 +45,7 @@ public class ContentVersionDto
     /// </summary>
     /// <remarks>TODO: db rename to 'updateDate'</remarks>
     [Column(VersionDateColumnName)]
+    [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_VersionDate")]
     [Constraint(Default = SystemMethods.CurrentUTCDateTime)]
     public DateTime VersionDate { get; set; }
 

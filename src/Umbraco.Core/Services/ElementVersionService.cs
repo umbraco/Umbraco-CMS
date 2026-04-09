@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
@@ -11,7 +13,7 @@ internal sealed class ElementVersionService : ContentVersionServiceBase<IElement
 {
     public ElementVersionService(
         ILogger<ElementVersionService> logger,
-        IElementVersionRepository contentVersionRepository,
+        IElementVersionRepository elementVersionRepository,
         IContentVersionCleanupPolicy contentVersionCleanupPolicy,
         ICoreScopeProvider scopeProvider,
         IEventMessagesFactory eventMessagesFactory,
@@ -19,10 +21,11 @@ internal sealed class ElementVersionService : ContentVersionServiceBase<IElement
         ILanguageRepository languageRepository,
         IEntityService entityService,
         IElementService contentService,
-        IUserIdKeyResolver userIdKeyResolver)
+        IUserIdKeyResolver userIdKeyResolver,
+        IOptionsMonitor<ContentSettings> contentSettings)
         : base(
             logger,
-            contentVersionRepository,
+            elementVersionRepository,
             contentVersionCleanupPolicy,
             scopeProvider,
             eventMessagesFactory,
@@ -30,7 +33,8 @@ internal sealed class ElementVersionService : ContentVersionServiceBase<IElement
             languageRepository,
             entityService,
             contentService,
-            userIdKeyResolver)
+            userIdKeyResolver,
+            contentSettings)
     {
     }
 

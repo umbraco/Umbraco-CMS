@@ -1,12 +1,12 @@
-import type { UmbElementTreeItemModel } from '../../tree/types.js';
 import { UMB_EDIT_ELEMENT_FOLDER_WORKSPACE_PATH_PATTERN } from '../../folder/workspace/constants.js';
 import { UMB_EDIT_ELEMENT_WORKSPACE_PATH_PATTERN } from '../../paths.js';
-import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
+import { UMB_ELEMENT_ENTITY_TYPE, UMB_ELEMENT_FOLDER_ENTITY_TYPE } from '../../entity.js';
+import type { UmbElementItemModel } from '../../types.js';
+import type { UmbElementTreeItemModel } from '../../tree/types.js';
+import { customElement, html, nothing, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 import type { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
-import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 import type {
 	UmbTableColumn,
 	UmbTableConfig,
@@ -16,8 +16,11 @@ import type {
 	UmbTableSelectedEvent,
 } from '@umbraco-cms/backoffice/components';
 
-@customElement('umb-element-tree-item-table-collection-view')
-export class UmbElementTreeItemTableCollectionViewElement extends UmbLitElement {
+import './column-layouts/element-table-column-name.element.js';
+import './column-layouts/element-table-column-state.element.js';
+
+@customElement('umb-element-table-collection-view')
+export class UmbElementTableCollectionViewElement extends UmbLitElement {
 	@state()
 	private _items?: Array<UmbElementTreeItemModel>;
 
@@ -29,15 +32,11 @@ export class UmbElementTreeItemTableCollectionViewElement extends UmbLitElement 
 
 	#collectionContext?: UmbDefaultCollectionContext<any>;
 
-	#routeBuilder?: UmbModalRouteBuilder;
-
 	#tableConfig: UmbTableConfig = { allowSelection: true };
 
 	#tableColumns: Array<UmbTableColumn> = [
-		{
-			name: this.localize.term('general_name'),
-			alias: 'name',
-		},
+		{ name: this.localize.term('general_name'), alias: 'name' },
+		{ name: this.localize.term('content_publishStatus'), alias: 'state' },
 		{ name: '', alias: 'entityActions', align: 'right' },
 	];
 
@@ -67,54 +66,47 @@ export class UmbElementTreeItemTableCollectionViewElement extends UmbLitElement 
 			this.#collectionContext.selection.selection,
 			(selection) => {
 				if (selection) {
-					this._selection = selection as string[];
+					this._selection = selection;
 				}
 			},
 			'_observeSelection',
-		);
-
-		this.observe(
-			this.#collectionContext.workspacePathBuilder,
-			(routeBuilder) => {
-				this.#routeBuilder = routeBuilder;
-				this.#createTableItems();
-			},
-			'_observeWorkspacePathBuilder',
 		);
 	}
 
 	#createTableItems() {
 		if (!this._items) return;
-		const routeBuilder = this.#routeBuilder;
-		if (!routeBuilder) return;
 
 		this._tableItems = this._items.map((item) => {
-			const modalEditPath =
-				routeBuilder({ entityType: item.entityType }) +
-				UMB_EDIT_ELEMENT_WORKSPACE_PATH_PATTERN.generateLocal({ unique: item.unique });
+			if (!item.unique) throw new Error('Item id is missing.');
 
-			const inlineEditPath = UMB_EDIT_ELEMENT_FOLDER_WORKSPACE_PATH_PATTERN.generateAbsolute({
-				unique: item.unique,
-			});
+			const editPath = item.isFolder
+				? UMB_EDIT_ELEMENT_FOLDER_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: item.unique })
+				: UMB_EDIT_ELEMENT_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: item.unique });
+
+			const data = [
+				{
+					columnAlias: 'name',
+					value: html`<umb-element-table-column-name
+						.value=${{ item: item as UmbElementItemModel, editPath }}></umb-element-table-column-name>`,
+				},
+				{
+					columnAlias: 'state',
+					value: !item.isFolder
+						? html`<umb-element-table-column-state
+								.value=${item as UmbElementItemModel}></umb-element-table-column-state>`
+						: nothing,
+				},
+				{
+					columnAlias: 'entityActions',
+					value: html`<umb-entity-actions-table-column-view .value=${item}></umb-entity-actions-table-column-view>`,
+				},
+			];
 
 			return {
 				id: item.unique,
 				icon: item.isFolder && !item.icon ? 'icon-folder' : item.icon,
-				data: [
-					{
-						columnAlias: 'name',
-						value: html`
-							<uui-button
-								compact
-								href=${item.isFolder ? inlineEditPath : modalEditPath}
-								label=${item.name}></uui-button>
-						`,
-					},
-					{
-						columnAlias: 'entityActions',
-						value: html`<umb-entity-actions-table-column-view .value=${item}></umb-entity-actions-table-column-view>`,
-					},
-				],
+				entityType: item.isFolder ? UMB_ELEMENT_FOLDER_ENTITY_TYPE : UMB_ELEMENT_ENTITY_TYPE,
+				data,
 			};
 		});
 	}
@@ -145,22 +137,12 @@ export class UmbElementTreeItemTableCollectionViewElement extends UmbLitElement 
 			</umb-table>
 		`;
 	}
-
-	static override styles = [
-		UmbTextStyles,
-		css`
-			:host {
-				display: flex;
-				flex-direction: column;
-			}
-		`,
-	];
 }
 
-export { UmbElementTreeItemTableCollectionViewElement as element };
+export { UmbElementTableCollectionViewElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-element-tree-item-table-collection-view': UmbElementTreeItemTableCollectionViewElement;
+		'umb-element-table-collection-view': UmbElementTableCollectionViewElement;
 	}
 }

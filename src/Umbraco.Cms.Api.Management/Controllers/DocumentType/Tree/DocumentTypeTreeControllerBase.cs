@@ -55,15 +55,15 @@ public class DocumentTypeTreeControllerBase : FolderTreeControllerBase<DocumentT
 
     protected override UmbracoObjectTypes FolderObjectType => UmbracoObjectTypes.DocumentTypeContainer;
 
-    protected override DocumentTypeTreeItemResponseModel[] MapTreeItemViewModels(Guid? parentKey, IEntitySlim[] entities)
+    protected override async Task<DocumentTypeTreeItemResponseModel[]> MapTreeItemViewModelsAsync(Guid? parentKey, IEntitySlim[] entities)
     {
         var contentTypes = _contentTypeService
             .GetMany(entities.Select(entity => entity.Id).ToArray())
             .ToDictionary(contentType => contentType.Id);
 
-        return entities.Select(entity =>
+        IEnumerable<Task<DocumentTypeTreeItemResponseModel>> tasks = entities.Select(async entity =>
         {
-            DocumentTypeTreeItemResponseModel responseModel = MapTreeItemViewModel(parentKey, entity);
+            DocumentTypeTreeItemResponseModel responseModel = await MapTreeItemViewModelAsync(parentKey, entity);
             if (contentTypes.TryGetValue(entity.Id, out IContentType? contentType))
             {
                 responseModel.Icon = contentType.Icon ?? responseModel.Icon;
@@ -71,6 +71,8 @@ public class DocumentTypeTreeControllerBase : FolderTreeControllerBase<DocumentT
             }
 
             return responseModel;
-        }).ToArray();
+        });
+
+        return await Task.WhenAll(tasks);
     }
 }

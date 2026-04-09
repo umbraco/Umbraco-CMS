@@ -97,7 +97,7 @@ internal sealed class PublishedProperty : PublishedPropertyBase
     // determines whether a property has value
     public override bool HasValue(string? culture = null, string? segment = null)
     {
-        _variationContextAccessor.ContextualizeVariation(_variations, _element.Id, ref culture, ref segment);
+        _variationContextAccessor.ContextualizeVariation(_variations, _element.Id, PropertyType.Alias, ref culture, ref segment);
 
         var value = GetSourceValue(culture, segment);
         var isValue = PropertyType.IsValue(value, PropertyValueLevel.Source);
@@ -121,7 +121,7 @@ internal sealed class PublishedProperty : PublishedPropertyBase
 
     public override object? GetSourceValue(string? culture = null, string? segment = null)
     {
-        _variationContextAccessor.ContextualizeVariation(_sourceVariations, _element.Id, ref culture, ref segment);
+        _variationContextAccessor.ContextualizeVariation(_sourceVariations, _element.Id, PropertyType.Alias, ref culture, ref segment);
 
         // source values are tightly bound to the property/schema culture and segment configurations, so we need to
         // sanitize the contextualized culture/segment states before using them to access the source values.
@@ -164,7 +164,7 @@ internal sealed class PublishedProperty : PublishedPropertyBase
 
     public override object? GetValue(string? culture = null, string? segment = null)
     {
-        _variationContextAccessor.ContextualizeVariation(_variations, _element.Id, ref culture, ref segment);
+        _variationContextAccessor.ContextualizeVariation(_variations, _element.Id, PropertyType.Alias, ref culture, ref segment);
 
         object? value;
         CacheValue cacheValues = GetCacheValues(PropertyType.CacheLevel).For(culture, segment);
@@ -227,7 +227,7 @@ internal sealed class PublishedProperty : PublishedPropertyBase
 
     public override object? GetDeliveryApiValue(bool expanding, string? culture = null, string? segment = null)
     {
-        _variationContextAccessor.ContextualizeVariation(_variations, _element.Id, ref culture, ref segment);
+        _variationContextAccessor.ContextualizeVariation(_variations, _element.Id, PropertyType.Alias, ref culture, ref segment);
 
         object? value;
         CacheValue cacheValues = GetCacheValues(expanding ? PropertyType.DeliveryApiCacheLevelForExpansion : PropertyType.DeliveryApiCacheLevel).For(culture, segment);

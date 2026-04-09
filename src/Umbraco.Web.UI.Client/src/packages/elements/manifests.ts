@@ -1,10 +1,12 @@
 import { manifests as auditLogManifests } from './audit-log/manifests.js';
 import { manifests as collectionManifests } from './collection/manifests.js';
 import { manifests as entityActionManifests } from './entity-actions/manifests.js';
+import { manifests as entitySignManifests } from './entity-sign/manifests.js';
 import { manifests as entityBulkActionManifests } from './entity-bulk-actions/manifests.js';
 import { manifests as folderManifests } from './folder/manifests.js';
 import { manifests as itemManifests } from './item/manifests.js';
 import { manifests as menuManifests } from './menu/manifests.js';
+import { manifests as modalManifests } from './modals/manifests.js';
 import { manifests as propertyEditorManifests } from './property-editor/manifests.js';
 import { manifests as publishingManifests } from './publishing/manifests.js';
 import { manifests as recycleBinManifests } from './recycle-bin/manifests.js';
@@ -23,9 +25,11 @@ export const manifests: Array<UmbExtensionManifest> = [
 	...collectionManifests,
 	...entityActionManifests,
 	...entityBulkActionManifests,
+	...entitySignManifests,
 	...folderManifests,
 	...itemManifests,
 	...menuManifests,
+	...modalManifests,
 	...propertyEditorManifests,
 	...publishingManifests,
 	...recycleBinManifests,

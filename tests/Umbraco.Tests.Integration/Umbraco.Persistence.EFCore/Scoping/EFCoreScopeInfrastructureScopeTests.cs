@@ -13,26 +13,26 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Persistence.EFCore.Scoping;
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewEmptyPerTest)]
 internal sealed class EFCoreScopeInfrastructureScopeTests : UmbracoIntegrationTest
 {
-    private IEFCoreScopeProvider<TestUmbracoDbContext> EfCoreScopeProvider =>
+    private IEFCoreScopeProvider<TestUmbracoDbContext> EFCoreScopeProvider =>
         GetRequiredService<IEFCoreScopeProvider<TestUmbracoDbContext>>();
 
     private IScopeProvider InfrastructureScopeProvider =>
         GetRequiredService<IScopeProvider>();
 
-    private EFCoreScopeAccessor<TestUmbracoDbContext> EfCoreScopeAccessor => (EFCoreScopeAccessor<TestUmbracoDbContext>)GetRequiredService<IEFCoreScopeAccessor<TestUmbracoDbContext>>();
+    private EFCoreScopeAccessor<TestUmbracoDbContext> EFCoreScopeAccessor => (EFCoreScopeAccessor<TestUmbracoDbContext>)GetRequiredService<IEFCoreScopeAccessor<TestUmbracoDbContext>>();
 
     private IScopeAccessor InfrastructureScopeAccessor => GetRequiredService<IScopeAccessor>();
 
     [Test]
     public void CanCreateNestedInfrastructureScope()
     {
-        Assert.IsNull(EfCoreScopeAccessor.AmbientScope);
-        using (IEfCoreScope<TestUmbracoDbContext> scope = EfCoreScopeProvider.CreateScope())
+        Assert.IsNull(EFCoreScopeAccessor.AmbientScope);
+        using (IEFCoreScope<TestUmbracoDbContext> scope = EFCoreScopeProvider.CreateScope())
         {
             Assert.IsInstanceOf<EFCoreScope<TestUmbracoDbContext>>(scope);
-            Assert.IsNotNull(EfCoreScopeAccessor.AmbientScope);
+            Assert.IsNotNull(EFCoreScopeAccessor.AmbientScope);
             Assert.IsNotNull(InfrastructureScopeAccessor.AmbientScope);
-            Assert.AreSame(scope, EfCoreScopeAccessor.AmbientScope);
+            Assert.AreSame(scope, EFCoreScopeAccessor.AmbientScope);
             using (var infrastructureScope = InfrastructureScopeProvider.CreateScope())
             {
                 Assert.AreSame(infrastructureScope, InfrastructureScopeAccessor.AmbientScope);
@@ -41,14 +41,14 @@ internal sealed class EFCoreScopeInfrastructureScopeTests : UmbracoIntegrationTe
             Assert.IsNotNull(InfrastructureScopeAccessor.AmbientScope);
         }
 
-        Assert.IsNull(EfCoreScopeAccessor.AmbientScope);
+        Assert.IsNull(EFCoreScopeAccessor.AmbientScope);
         Assert.IsNull(InfrastructureScopeAccessor.AmbientScope);
     }
 
     [Test]
-    public async Task? TransactionWithEfCoreScopeAsParent()
+    public async Task? TransactionWithEFCoreScopeAsParent()
     {
-        using (IEfCoreScope<TestUmbracoDbContext> parentScope = EfCoreScopeProvider.CreateScope())
+        using (IEFCoreScope<TestUmbracoDbContext> parentScope = EFCoreScopeProvider.CreateScope())
         {
             await parentScope.ExecuteWithContextAsync<Task>(async database =>
             {
@@ -76,7 +76,7 @@ internal sealed class EFCoreScopeInfrastructureScopeTests : UmbracoIntegrationTe
         }
 
         // Check that its not rolled back
-        using (IEfCoreScope<TestUmbracoDbContext> scope = EfCoreScopeProvider.CreateScope())
+        using (IEFCoreScope<TestUmbracoDbContext> scope = EFCoreScopeProvider.CreateScope())
         {
             await scope.ExecuteWithContextAsync<Task>(async database =>
             {
@@ -93,7 +93,7 @@ internal sealed class EFCoreScopeInfrastructureScopeTests : UmbracoIntegrationTe
         {
             parentScope.Database.Execute("CREATE TABLE tmp3 (id INT, name NVARCHAR(64))");
 
-            using (IEfCoreScope<TestUmbracoDbContext> scope = EfCoreScopeProvider.CreateScope())
+            using (IEFCoreScope<TestUmbracoDbContext> scope = EFCoreScopeProvider.CreateScope())
             {
                 await scope.ExecuteWithContextAsync<Task>(async database =>
                 {
@@ -111,7 +111,7 @@ internal sealed class EFCoreScopeInfrastructureScopeTests : UmbracoIntegrationTe
         }
 
         // Check that its not rolled back
-        using (IEfCoreScope<TestUmbracoDbContext> scope = EfCoreScopeProvider.CreateScope())
+        using (IEFCoreScope<TestUmbracoDbContext> scope = EFCoreScopeProvider.CreateScope())
         {
             await scope.ExecuteWithContextAsync<Task>(async database =>
             {
@@ -124,7 +124,7 @@ internal sealed class EFCoreScopeInfrastructureScopeTests : UmbracoIntegrationTe
     [Test]
     public async Task EFCoreAsParent_DontCompleteWhenChildScopeDoesNotComplete()
     {
-        using (IEfCoreScope<TestUmbracoDbContext> scope = EfCoreScopeProvider.CreateScope())
+        using (IEFCoreScope<TestUmbracoDbContext> scope = EFCoreScopeProvider.CreateScope())
         {
             await scope.ExecuteWithContextAsync<Task>(async database =>
             {
@@ -133,7 +133,7 @@ internal sealed class EFCoreScopeInfrastructureScopeTests : UmbracoIntegrationTe
             scope.Complete();
         }
 
-        using (IEfCoreScope<TestUmbracoDbContext> parentScope = EfCoreScopeProvider.CreateScope())
+        using (IEFCoreScope<TestUmbracoDbContext> parentScope = EFCoreScopeProvider.CreateScope())
         {
             using (IScope scope = InfrastructureScopeProvider.CreateScope())
             {
@@ -153,7 +153,7 @@ internal sealed class EFCoreScopeInfrastructureScopeTests : UmbracoIntegrationTe
         }
 
         // Check that its rolled back
-        using (IEfCoreScope<TestUmbracoDbContext> scope = EfCoreScopeProvider.CreateScope())
+        using (IEFCoreScope<TestUmbracoDbContext> scope = EFCoreScopeProvider.CreateScope())
         {
             await scope.ExecuteWithContextAsync<Task>(async database =>
             {
@@ -167,7 +167,7 @@ internal sealed class EFCoreScopeInfrastructureScopeTests : UmbracoIntegrationTe
     [Test]
     public async Task InfrastructureScopeAsParent_DontCompleteWhenChildScopeDoesNotComplete()
     {
-        using (IEfCoreScope<TestUmbracoDbContext> scope = EfCoreScopeProvider.CreateScope())
+        using (IEFCoreScope<TestUmbracoDbContext> scope = EFCoreScopeProvider.CreateScope())
         {
             await scope.ExecuteWithContextAsync<Task>(async database =>
             {
@@ -179,7 +179,7 @@ internal sealed class EFCoreScopeInfrastructureScopeTests : UmbracoIntegrationTe
 
         using (IScope parentScope = InfrastructureScopeProvider.CreateScope())
         {
-            using (IEfCoreScope<TestUmbracoDbContext> scope = EfCoreScopeProvider.CreateScope())
+            using (IEFCoreScope<TestUmbracoDbContext> scope = EFCoreScopeProvider.CreateScope())
             {
                 await scope.ExecuteWithContextAsync<Task>(async database =>
                 {
@@ -197,7 +197,7 @@ internal sealed class EFCoreScopeInfrastructureScopeTests : UmbracoIntegrationTe
         }
 
         // Check that its rolled back
-        using (IEfCoreScope<TestUmbracoDbContext> scope = EfCoreScopeProvider.CreateScope())
+        using (IEFCoreScope<TestUmbracoDbContext> scope = EFCoreScopeProvider.CreateScope())
         {
             await scope.ExecuteWithContextAsync<Task>(async database =>
             {
@@ -222,7 +222,7 @@ internal sealed class EFCoreScopeInfrastructureScopeTests : UmbracoIntegrationTe
 
             // Simulate an EF Core repository accessing the ambient scope via the accessor.
             // Since only an NPoco scope is active, the accessor auto-creates a bridge scope.
-            var bridgedScope = EfCoreScopeAccessor.AmbientScope;
+            var bridgedScope = EFCoreScopeAccessor.AmbientScope;
             Assert.IsNotNull(bridgedScope);
             Assert.IsTrue(((EFCoreScope<TestUmbracoDbContext>)bridgedScope!).IsBridgeScope);
 
@@ -249,7 +249,7 @@ internal sealed class EFCoreScopeInfrastructureScopeTests : UmbracoIntegrationTe
         }
 
         // Both rows committed
-        using (IEfCoreScope<TestUmbracoDbContext> scope = EfCoreScopeProvider.CreateScope())
+        using (IEFCoreScope<TestUmbracoDbContext> scope = EFCoreScopeProvider.CreateScope())
         {
             await scope.ExecuteWithContextAsync<Task>(async db =>
             {
@@ -282,7 +282,7 @@ internal sealed class EFCoreScopeInfrastructureScopeTests : UmbracoIntegrationTe
         using (IScope npocoScope = InfrastructureScopeProvider.CreateScope())
         {
             // Simulate EF Core repository access — triggers bridge scope creation
-            IEfCoreScope<TestUmbracoDbContext>? bridgeScope = EfCoreScopeAccessor.AmbientScope;
+            IEFCoreScope<TestUmbracoDbContext>? bridgeScope = EFCoreScopeAccessor.AmbientScope;
             Assert.IsNotNull(bridgeScope);
 
             await bridgeScope!.ExecuteWithContextAsync<Task>(async db =>
@@ -300,7 +300,7 @@ internal sealed class EFCoreScopeInfrastructureScopeTests : UmbracoIntegrationTe
         }
 
         // Verify rolled back
-        using (IEfCoreScope<TestUmbracoDbContext> scope = EfCoreScopeProvider.CreateScope())
+        using (IEFCoreScope<TestUmbracoDbContext> scope = EFCoreScopeProvider.CreateScope())
         {
             await scope.ExecuteWithContextAsync<Task>(async db =>
             {

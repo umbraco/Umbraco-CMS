@@ -2335,16 +2335,7 @@
 	<area alias="textbox">
 		<key alias="characters_left">Buchstaben verbleiben</key>
 	</area>
-	<area alias="recycleBin">
-		<key alias="contentTrashed">Inhalt mit Id = {0} des Oberknotens mit Id = {1} wurde verworfen</key>
-		<key alias="mediaTrashed">Medienelement mit Id = {0} des Oberknotens mit Id = {1} wurde verworfen</key>
-		<key alias="itemCannotBeRestored">Dieses Element kann nicht automatisch wiederhergestellt werden</key>
-		<key alias="itemCannotBeRestoredHelpText">
-			Es gibt keine Position für das automatische Wiederherstellen dieses Elementes.
-			Sie können es manuell mit Hilfe der untenstehenden Baumstruktur verschieben.
-		</key>
-		<key alias="wasRestored">wurde wiederhergestellt unterhalb von</key>
-	</area>
+
 	<area alias="relationType">
 		<key alias="direction">Richtung</key>
 		<key alias="parentToChild">Ober- zu Unterknoten</key>
