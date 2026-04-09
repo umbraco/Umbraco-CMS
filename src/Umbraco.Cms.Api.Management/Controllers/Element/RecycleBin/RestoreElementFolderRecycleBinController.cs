@@ -64,8 +64,8 @@ public class RestoreElementFolderRecycleBinController : ElementRecycleBinControl
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,
-            ElementPermissionResource.RecycleBin(ActionElementMove.ActionLetter),
-            AuthorizationPolicies.ElementPermissionByResource);
+            ElementFolderPermissionResource.RecycleBin(ActionElementFolderMove.ActionLetter),
+            AuthorizationPolicies.ElementFolderPermissionByResource);
 
         if (!authorizationResult.Succeeded)
         {

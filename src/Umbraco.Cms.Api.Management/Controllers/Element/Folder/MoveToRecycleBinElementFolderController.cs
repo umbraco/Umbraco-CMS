@@ -57,8 +57,8 @@ public class MoveToRecycleBinElementFolderController : ElementFolderControllerBa
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,
-            ElementPermissionResource.WithKeys(ActionElementDelete.ActionLetter, id),
-            AuthorizationPolicies.ElementPermissionByResource);
+            ElementFolderPermissionResource.WithKeys(ActionElementFolderDelete.ActionLetter, id),
+            AuthorizationPolicies.ElementFolderPermissionByResource);
 
         if (!authorizationResult.Succeeded)
         {

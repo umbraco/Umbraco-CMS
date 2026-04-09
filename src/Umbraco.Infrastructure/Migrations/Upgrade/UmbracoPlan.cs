@@ -176,5 +176,6 @@ public class UmbracoPlan : MigrationPlan
         //// To<V_18_0_0.MigrateSingleBlockList>("{74332C49-B279-4945-8943-F8F00B1F5949}");
         To<V_18_0_0.AddElements>("{E51033DE-B4F9-45F3-87B3-0E774B2939C2}");
         To<V_18_0_0.AddAllowedInLibraryToContentType>("{31C0D92A-49DD-47EC-B2A7-932A58FF224E}");
+        To<V_18_0_0.AddElementFolderPermissions>("{D00BB11A-DDF8-47C4-B58E-150C123BB3BB}");
     }
 }
