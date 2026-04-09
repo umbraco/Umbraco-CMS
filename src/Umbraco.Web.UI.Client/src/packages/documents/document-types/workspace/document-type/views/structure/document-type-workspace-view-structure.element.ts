@@ -23,6 +23,9 @@ export class UmbDocumentTypeWorkspaceViewStructureElement extends UmbLitElement 
 	@state()
 	private _collection?: string | null;
 
+	@state()
+	private _isElement?: boolean;
+
 	constructor() {
 		super();
 
@@ -40,6 +43,8 @@ export class UmbDocumentTypeWorkspaceViewStructureElement extends UmbLitElement 
 			(allowedAtRoot) => (this._allowedAtRoot = allowedAtRoot),
 			'_allowedAtRootObserver',
 		);
+
+		this.observe(this.#workspaceContext.isElement, (isElement) => (this._isElement = isElement), '_isElementObserver');
 
 		this.observe(
 			this.#workspaceContext.allowedContentTypes,
@@ -63,6 +68,18 @@ export class UmbDocumentTypeWorkspaceViewStructureElement extends UmbLitElement 
 	}
 
 	override render() {
+		if (this._isElement) {
+			return html`
+				<div class="empty-state">
+					<h2>
+						<umb-localize key="contentTypeEditor_elementDoesNotSupport">
+							This is not applicable for an Element type.
+						</umb-localize>
+					</h2>
+				</div>
+			`;
+		}
+
 		return html`
 			<uui-box headline=${this.localize.term('contentTypeEditor_structure')}>
 				<umb-property-layout alias="Root" label=${this.localize.term('contentTypeEditor_allowAtRootHeading')}>
@@ -131,6 +148,16 @@ export class UmbDocumentTypeWorkspaceViewStructureElement extends UmbLitElement 
 			// TODO: is this necessary?
 			uui-toggle {
 				display: flex;
+			}
+
+			.empty-state {
+				display: flex;
+				justify-content: space-around;
+				flex-direction: column;
+				align-items: center;
+			}
+			.empty-state h2 {
+				color: var(--uui-color-border-emphasis);
 			}
 		`,
 	];
