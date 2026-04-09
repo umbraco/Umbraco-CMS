@@ -158,9 +158,7 @@ export class UmbCreateElementCollectionActionElement extends UmbLitElement {
 						${repeat(
 							this._createOptionControllers,
 							(controller) => controller.manifest?.alias,
-							(controller, index) => {
-								this.#renderCreateOptionItem(controller, index);
-							},
+							(controller, index) => this.#renderCreateOptionItem(controller, index),
 						)}
 						${repeat(
 							this._allowedElementTypes,
