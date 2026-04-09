@@ -45,7 +45,6 @@ public abstract class CopiedNotification<T> : ObjectNotification<T>
     protected CopiedNotification(T original, T copy, int parentId, Guid? parentKey, bool relateToOriginal, EventMessages messages)
         : this(original, copy, parentKey, relateToOriginal, messages)
     {
-
     }
 
     /// <summary>

@@ -39,8 +39,9 @@ public class MemberRoleStore : IQueryableRoleStore<UmbracoIdentityRole>
     /// </summary>
     public IdentityErrorDescriber ErrorDescriber { get; set; }
 
+    /// <inheritdoc/>
     public IQueryable<UmbracoIdentityRole> Roles =>
-    _memberGroupService.GetAll().Select(MapFromMemberGroup).AsQueryable();
+        _memberGroupService.GetAllAsync().GetAwaiter().GetResult().Select(MapFromMemberGroup).AsQueryable();
 
     /// <inheritdoc />
     public async Task<IdentityResult> CreateAsync(UmbracoIdentityRole role, CancellationToken cancellationToken = default)
