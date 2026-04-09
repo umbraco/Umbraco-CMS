@@ -161,7 +161,7 @@ internal sealed class ElementCacheService : IElementCacheService
 
                 var cacheKey = GetCacheKey(key, false);
 
-                var existsInCache = await _hybridCache.ExistsAsync<ContentCacheNode?>(cacheKey, CancellationToken.None).ConfigureAwait(false);
+                var existsInCache = await _hybridCache.ExistsAsync<ContentCacheNode?>(cacheKey, cancellationToken).ConfigureAwait(false);
                 if (existsInCache is false)
                 {
                     uncachedKeys.Add(key);
