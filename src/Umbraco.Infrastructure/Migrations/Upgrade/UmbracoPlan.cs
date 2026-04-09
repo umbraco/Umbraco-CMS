@@ -1,5 +1,7 @@
+using System.Text.RegularExpressions;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Semver;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade;
 
@@ -7,8 +9,11 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade;
 /// Represents the Umbraco CMS migration plan.
 /// </summary>
 /// <seealso cref="Umbraco.Cms.Infrastructure.Migrations.MigrationPlan" />
-public class UmbracoPlan : MigrationPlan
+public partial class UmbracoPlan : MigrationPlan
 {
+    [GeneratedRegex(@"V_(\d+)_(\d+)_(\d+)")]
+    internal static partial Regex MigrationStepVersionRegex();
+
     /// <summary>
     /// Initializes a new instance of the <see cref="UmbracoPlan" /> class.
     /// </summary>
@@ -174,5 +179,51 @@ public class UmbracoPlan : MigrationPlan
         // To 18.0.0
         // TODO (V18): Enable on 18 branch
         //// To<V_18_0_0.MigrateSingleBlockList>("{74332C49-B279-4945-8943-F8F00B1F5949}");
+    }
+
+    /// <summary>
+    ///     Resolves the semantic version corresponding to a migration state in this plan.
+    /// </summary>
+    /// <remarks>
+    ///     Walks the transition chain from <see cref="MigrationPlan.InitialState"/> and extracts version
+    ///     numbers from migration type namespaces (convention: <c>V_{major}_{minor}_{patch}</c>).
+    /// </remarks>
+    /// <param name="state">The migration state to resolve.</param>
+    /// <returns>The semantic version for the state, or <c>null</c> if the state is not found.</returns>
+    public SemVersion? GetVersionForState(string? state)
+    {
+        if (string.IsNullOrWhiteSpace(state))
+        {
+            return null;
+        }
+
+        SemVersion? trackedVersion = null;
+        var current = InitialState;
+
+        if (string.Equals(current, state, StringComparison.OrdinalIgnoreCase))
+        {
+            return trackedVersion;
+        }
+
+        while (Transitions.TryGetValue(current, out Transition? transition) && transition is not null)
+        {
+            Match match = MigrationStepVersionRegex().Match(transition.MigrationType.Namespace ?? string.Empty);
+            if (match.Success)
+            {
+                trackedVersion = new SemVersion(
+                    int.Parse(match.Groups[1].Value),
+                    int.Parse(match.Groups[2].Value),
+                    int.Parse(match.Groups[3].Value));
+            }
+
+            if (string.Equals(transition.TargetState, state, StringComparison.OrdinalIgnoreCase))
+            {
+                return trackedVersion;
+            }
+
+            current = transition.TargetState;
+        }
+
+        return null;
     }
 }
