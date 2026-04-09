@@ -42,6 +42,9 @@ export class UmbCreateElementCollectionActionElement extends UmbLitElement {
 	@state()
 	private _popoverOpen = false;
 
+	@state()
+	private _loaded = false;
+
 	@property({ attribute: false })
 	manifest?: ManifestCollectionAction;
 
@@ -63,6 +66,7 @@ export class UmbCreateElementCollectionActionElement extends UmbLitElement {
 		if (data?.items) {
 			this._allowedElementTypes = data.items;
 		}
+		this._loaded = true;
 	}
 
 	#initCreateOptionActions() {
@@ -125,13 +129,20 @@ export class UmbCreateElementCollectionActionElement extends UmbLitElement {
 	}
 
 	override render() {
-		if (this._allowedElementTypes.length === 0 && this._createOptionControllers.length === 0) return nothing;
+		if (this._allowedElementTypes.length === 0 && this._createOptionControllers.length === 0) {
+			return !this._loaded ? this.#renderLoadingButton() : nothing;
+		}
 
 		if (this._allowedElementTypes.length === 1 && this._createOptionControllers.length === 0) {
 			return this.#renderCreateButton();
 		}
 
 		return this.#renderDropdown();
+	}
+
+	#renderLoadingButton() {
+		const label = this.localize.string(this.manifest?.meta.label || '#general_create');
+		return html`<uui-button color="default" look="outline" label=${label} disabled>${label}</uui-button>`;
 	}
 
 	#renderCreateButton() {
