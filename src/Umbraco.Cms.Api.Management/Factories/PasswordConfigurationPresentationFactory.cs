@@ -30,6 +30,7 @@ public class PasswordConfigurationPresentationFactory : IPasswordConfigurationPr
     {
     }
 
+    // This is just here to resolve an ambiguous constructor.
     [Obsolete("Use the constructor that accepts IOptionsSnapshot<SecuritySettings> instead. Scheduled for removal in Umbraco 19.")]
     public PasswordConfigurationPresentationFactory(IOptionsSnapshot<SecuritySettings> securitySettings, IOptionsSnapshot<UserPasswordConfigurationSettings> _)
         : this(securitySettings)
