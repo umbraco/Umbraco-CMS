@@ -15,8 +15,10 @@ public class DocumentPermissionFilterServiceTests
 {
     private class DocumentPermissionFilterServiceSetup
     {
+        private DocumentPermissionFilterService? _sut;
+
         public DocumentPermissionFilterService Sut =>
-            field ??= new DocumentPermissionFilterService(
+            _sut ??= new DocumentPermissionFilterService(
                 BackOfficeSecurityAccessor.Object,
                 ContentPermissionService.Object);
 
@@ -92,7 +94,7 @@ public class DocumentPermissionFilterServiceTests
     }
 
     [Test]
-    public async Task FilterAsync_IncludesEntities_WhenNoPermissionEntryExists()
+    public async Task FilterAsync_FiltersEntities_WhenNoPermissionEntryExists()
     {
         // Arrange
         var entities = CreateEntities(3);
@@ -100,7 +102,7 @@ public class DocumentPermissionFilterServiceTests
         _setup.SetupGetDocumentPermissionsAsync(
             [
                 CreateNodePermissions(entities[0].Key, ActionBrowse.ActionLetter),
-                // entities[1] has no permission entry - should be included
+                // entities[1] has no permission entry - should be denied (fail-closed)
                 CreateNodePermissions(entities[2].Key, ActionBrowse.ActionLetter),
             ]);
 
@@ -108,8 +110,11 @@ public class DocumentPermissionFilterServiceTests
         var (filteredEntities, totalItems) = await _setup.Sut.FilterAsync(entities, 100);
 
         // Assert
-        Assert.AreEqual(3, filteredEntities.Length);
-        Assert.AreEqual(100, totalItems);
+        Assert.AreEqual(2, filteredEntities.Length);
+        Assert.AreEqual(99, totalItems);
+        Assert.IsTrue(filteredEntities.Any(e => e.Key == entities[0].Key));
+        Assert.IsFalse(filteredEntities.Any(e => e.Key == entities[1].Key));
+        Assert.IsTrue(filteredEntities.Any(e => e.Key == entities[2].Key));
     }
 
     [Test]

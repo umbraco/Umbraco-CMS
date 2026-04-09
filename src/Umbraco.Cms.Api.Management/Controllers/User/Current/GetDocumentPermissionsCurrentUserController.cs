@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.User.Current;
 
@@ -69,7 +70,8 @@ public class GetDocumentPermissionsCurrentUserController : CurrentUserController
     /// <returns>An <see cref="IActionResult"/> containing a <see cref="UserPermissionsResponseModel"/> with the permissions for each requested document.</returns>
     [MapToApiVersion("1.0")]
     [HttpGet("permissions/document")]
-    [ProducesResponseType(typeof(IEnumerable<UserPermissionsResponseModel>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(UserPermissionsResponseModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [EndpointSummary("Gets document permissions for the current user.")]
     [EndpointDescription("Gets the document permissions for the currently authenticated user.")]
     public async Task<IActionResult> GetPermissions(
@@ -77,7 +79,13 @@ public class GetDocumentPermissionsCurrentUserController : CurrentUserController
         [FromQuery(Name = "id")] HashSet<Guid> ids)
     {
         IUser currentUser = CurrentUser(_backOfficeSecurityAccessor);
-        IEnumerable<NodePermissions> permissions = await _contentPermissionService.GetPermissionsAsync(currentUser, ids);
+        NodePermissions[] permissions = (await _contentPermissionService.GetPermissionsAsync(currentUser, ids)).ToArray();
+
+        // Preserve 404 behavior: if any requested ID was not found, return ContentNodeNotFound.
+        if (ids.Count > 0 && permissions.Length < ids.Count)
+        {
+            return UserOperationStatusResult(UserOperationStatus.ContentNodeNotFound);
+        }
 
         List<UserPermissionViewModel> viewModels = _mapper.MapEnumerable<NodePermissions, UserPermissionViewModel>(permissions);
 
