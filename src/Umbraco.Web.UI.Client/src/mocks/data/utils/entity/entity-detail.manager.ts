@@ -38,7 +38,7 @@ export class UmbMockEntityDetailManager<MockType extends { id: string }> {
 					return undefined;
 				}
 			})
-			.filter((item) => item !== undefined);
+			.filter((item): item is MockType => item !== undefined);
 		return { items, total: items.length };
 	}
 
