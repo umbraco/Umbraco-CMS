@@ -200,13 +200,16 @@ internal sealed partial class PublishStatusServiceTests
         {
             readerTasks.Add(RunWithSuppressedExecutionContext(() =>
             {
-                while (!cts.IsCancellationRequested)
+                while (cts.IsCancellationRequested is false)
                 {
                     Interlocked.Increment(ref totalReads);
                     if (sut.IsDocumentPublishedInAnyCulture(Textpage.Key) is false)
                     {
                         Interlocked.Increment(ref falseCount);
                     }
+
+                    // Reduce CPU pressure in CI without yielding the thread or losing contention.
+                    Thread.SpinWait(20);
                 }
 
                 return Task.CompletedTask;

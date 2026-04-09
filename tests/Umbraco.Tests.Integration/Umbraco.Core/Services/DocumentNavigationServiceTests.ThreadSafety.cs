@@ -37,7 +37,7 @@ internal sealed partial class DocumentNavigationServiceTests
         {
             readerTasks.Add(RunWithSuppressedExecutionContext(() =>
             {
-                while (!cts.IsCancellationRequested)
+                while (cts.IsCancellationRequested is false)
                 {
                     Interlocked.Increment(ref totalReads);
                     try
@@ -54,6 +54,9 @@ internal sealed partial class DocumentNavigationServiceTests
                         // modification can throw. Count these as failures too.
                         Interlocked.Increment(ref exceptionCount);
                     }
+
+                    // Reduce CPU pressure in CI without yielding the thread or losing contention.
+                    Thread.SpinWait(20);
                 }
 
                 return Task.CompletedTask;

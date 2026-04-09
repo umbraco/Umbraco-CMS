@@ -123,7 +123,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService
             (contentCacheNode, ancestorCheckFailed) = await GetContentCacheNodeFromRepo();
 
             // Only cache the result if the ancestor check didn't fail.
-            // When content exists in DB but the ancestor check fails, this is could be a transient
+            // When content exists in DB but the ancestor check fails, this could be a transient
             // race condition during cache rebuild. Caching null would poison the distributed cache.
             if (ancestorCheckFailed is false)
             {
