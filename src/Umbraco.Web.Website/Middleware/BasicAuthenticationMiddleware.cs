@@ -42,10 +42,10 @@ public class BasicAuthenticationMiddleware : IMiddleware
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
         if (_runtimeState.Level < RuntimeLevel.Run
-            || !_basicAuthService.IsBasicAuthEnabled()
+            || _basicAuthService.IsBasicAuthEnabled() is false
             || context.Request.IsBackOfficeRequest()
             || context.Request.Path.StartsWithSegments($"{_backOfficePath}/basic-auth")
-            || AllowedClientRequest(context)
+            || IsAllowedClientRequest(context)
             || _basicAuthService.HasCorrectSharedSecret(context.Request.Headers))
         {
             await next(context);
@@ -59,65 +59,71 @@ public class BasicAuthenticationMiddleware : IMiddleware
             return;
         }
 
-        // Check if backoffice auth scheme is registered before attempting cookie authentication.
-        // When only AddCore() is used (without AddBackOfficeSignIn() or AddBackOffice()),
-        // authentication services and the UmbracoBackOffice scheme may not be registered.
-        IAuthenticationSchemeProvider? schemeProvider = context.RequestServices.GetService<IAuthenticationSchemeProvider>();
-        if (schemeProvider is not null)
+        if (await IsAuthenticatedBackOfficeRequestAsync(context))
         {
-            AuthenticationScheme? backOfficeScheme = await schemeProvider.GetSchemeAsync(Cms.Core.Constants.Security.BackOfficeAuthenticationType);
-            if (backOfficeScheme is not null)
-            {
-                AuthenticateResult authenticateResult = await context.AuthenticateBackOfficeAsync();
-                if (authenticateResult.Succeeded)
-                {
-                    await next(context);
-                    return;
-                }
-            }
+            await next(context);
+            return;
         }
 
-        if (context.TryGetBasicAuthCredentials(out var username, out var password))
+        if (context.TryGetBasicAuthCredentials(out var username, out var password) is false)
         {
-            IBackOfficeSignInManager? backOfficeSignInManager =
-                context.RequestServices.GetService<IBackOfficeSignInManager>();
+            // No authorization header.
+            HandleUnauthorized(context);
+            return;
+        }
 
-            if (backOfficeSignInManager is not null && username is not null && password is not null)
-            {
-                SignInResult signInResult =
-                    await backOfficeSignInManager.PasswordSignInAsync(username, password, false, true);
+        IBackOfficeSignInManager? backOfficeSignInManager =
+            context.RequestServices.GetService<IBackOfficeSignInManager>();
 
-                if (signInResult.Succeeded)
-                {
-                    await next.Invoke(context);
-                }
-                else if (signInResult.RequiresTwoFactor)
-                {
-                    // Always redirect to the 2FA page, even when RedirectToLoginPage is false.
-                    // The browser's Basic auth popup cannot complete a 2FA flow.
-                    var returnPath = WebUtility.UrlEncode(context.Request.GetEncodedPathAndQuery());
-                    context.Response.Redirect($"{_backOfficePath}/basic-auth/2fa?returnPath={returnPath}", false);
-                }
-                else
-                {
-                    HandleUnauthorized(context);
-                }
-            }
-            else
-            {
-                HandleUnauthorized(context);
-            }
+        if (backOfficeSignInManager is null || username is null || password is null)
+        {
+            HandleUnauthorized(context);
+            return;
+        }
+
+        SignInResult signInResult =
+            await backOfficeSignInManager.PasswordSignInAsync(username, password, false, true);
+
+        if (signInResult.Succeeded)
+        {
+            await next.Invoke(context);
+        }
+        else if (signInResult.RequiresTwoFactor)
+        {
+            // Always redirect to the 2FA page, even when RedirectToLoginPage is false.
+            // The browser's Basic auth popup cannot complete a 2FA flow.
+            var returnPath = WebUtility.UrlEncode(context.Request.GetEncodedPathAndQuery());
+            context.Response.Redirect($"{_backOfficePath}/basic-auth/2fa?returnPath={returnPath}", false);
         }
         else
         {
-            // No authorization header.
             HandleUnauthorized(context);
         }
     }
 
-    private bool AllowedClientRequest(HttpContext context)
+    private bool IsAllowedClientRequest(HttpContext context) =>
+        context.Request.IsClientSideRequest() && _basicAuthService.IsRedirectToLoginPageEnabled();
+
+    /// <summary>
+    /// Checks if the request is already authenticated via the backoffice cookie scheme.
+    /// Returns false when backoffice auth services are not registered (e.g. AddCore()-only deployments).
+    /// </summary>
+    private static async Task<bool> IsAuthenticatedBackOfficeRequestAsync(HttpContext context)
     {
-        return context.Request.IsClientSideRequest() && _basicAuthService.IsRedirectToLoginPageEnabled();
+        IAuthenticationSchemeProvider? schemeProvider = context.RequestServices.GetService<IAuthenticationSchemeProvider>();
+        if (schemeProvider is null)
+        {
+            return false;
+        }
+
+        AuthenticationScheme? backOfficeScheme = await schemeProvider.GetSchemeAsync(Cms.Core.Constants.Security.BackOfficeAuthenticationType);
+        if (backOfficeScheme is null)
+        {
+            return false;
+        }
+
+        AuthenticateResult authenticateResult = await context.AuthenticateBackOfficeAsync();
+        return authenticateResult.Succeeded;
     }
 
     private void HandleUnauthorized(HttpContext context)
