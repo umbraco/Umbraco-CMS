@@ -11,6 +11,7 @@ import {
 	map,
 	nothing,
 	property,
+	repeat,
 	state,
 } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -155,11 +156,16 @@ export class UmbCreateElementCollectionActionElement extends UmbLitElement {
 				@toggle=${this.#onPopoverToggle}>
 				<umb-popover-layout>
 					<uui-scroll-container>
-						${map(this._createOptionControllers, (controller, index) =>
-							this.#renderCreateOptionItem(controller, index),
+						${repeat(
+							this._createOptionControllers,
+							(controller) => controller.manifest?.alias,
+							(controller, index) => {
+								this.#renderCreateOptionItem(controller, index);
+							},
 						)}
-						${map(
+						${repeat(
 							this._allowedElementTypes,
+							(item) => item.unique,
 							(item) => html`
 								<uui-menu-item label="${item.name}..." href=${this.#getCreateUrl(item)}>
 									<umb-icon slot="icon" name=${item.icon || 'icon-document'}></umb-icon>
