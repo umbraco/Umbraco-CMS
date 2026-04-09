@@ -192,6 +192,58 @@ internal sealed class FullDataSetRepositoryCachePolicy<TEntity, TId> : Repositor
     public override void ClearAll() => Cache.Clear(GetEntityTypeCacheKey());
 
     /// <summary>
+    /// Gets a single entity matching a predicate from cache, cloning only the match.
+    /// If cache is empty, populates it first via <paramref name="performGetAll"/>.
+    /// </summary>
+    /// <param name="predicate">The predicate to match against cached entities.</param>
+    /// <param name="performGetAll">The repository PerformGetAll method, used to populate the cache on a miss.</param>
+    /// <returns>A deep-cloned copy of the matching entity, or null if not found.</returns>
+    internal TEntity? FindCached(Func<TEntity, bool> predicate, Func<TId[], IEnumerable<TEntity>?> performGetAll)
+    {
+        EnsureCacheIsSynced();
+
+        IEnumerable<TEntity> all = GetAllCached(performGetAll);
+        TEntity? entity = all.FirstOrDefault(predicate);
+
+        // See note in InsertEntities - what we get here is the original
+        // cached entity, not a clone, so we need to manually ensure it is deep-cloned.
+        return (TEntity?)entity?.DeepClone();
+    }
+
+    /// <summary>
+    /// Gets all entities matching a predicate from cache, cloning only the matches.
+    /// If cache is empty, populates it first via <paramref name="performGetAll"/>.
+    /// </summary>
+    /// <param name="predicate">The predicate to match against cached entities.</param>
+    /// <param name="performGetAll">The repository PerformGetAll method, used to populate the cache on a miss.</param>
+    /// <returns>An array of deep-cloned copies of matching entities.</returns>
+    internal TEntity[] FindAllCached(Func<TEntity, bool> predicate, Func<TId[], IEnumerable<TEntity>?> performGetAll)
+    {
+        EnsureCacheIsSynced();
+
+        IEnumerable<TEntity> all = GetAllCached(performGetAll);
+
+        // See note in InsertEntities - what we get here are the original
+        // cached entities, not clones, so we need to manually ensure they are deep-cloned.
+        return all.Where(predicate).Select(x => (TEntity)x.DeepClone()).ToArray();
+    }
+
+    /// <summary>
+    /// Checks whether any cached entity matches the predicate, without cloning.
+    /// If cache is empty, populates it first via <paramref name="performGetAll"/>.
+    /// </summary>
+    /// <param name="predicate">The predicate to match against cached entities.</param>
+    /// <param name="performGetAll">The repository PerformGetAll method, used to populate the cache on a miss.</param>
+    /// <returns>True if any entity matches the predicate; otherwise false.</returns>
+    internal bool ExistsCached(Func<TEntity, bool> predicate, Func<TId[], IEnumerable<TEntity>?> performGetAll)
+    {
+        EnsureCacheIsSynced();
+
+        IEnumerable<TEntity> all = GetAllCached(performGetAll);
+        return all.Any(predicate);
+    }
+
+    /// <summary>
     /// Gets all cached entities, or retrieves them from the repository if not cached.
     /// </summary>
     /// <remarks>

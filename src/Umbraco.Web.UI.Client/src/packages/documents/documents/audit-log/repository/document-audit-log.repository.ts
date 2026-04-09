@@ -2,7 +2,11 @@ import type { UmbDocumentAuditLogModel } from '../types.js';
 import type { UmbDocumentAuditLogType } from '../utils/index.js';
 import { getDocumentHistoryTagStyleAndText } from '../info-app/utils.js';
 import { UmbDocumentAuditLogServerDataSource } from './document-audit-log.server.data-source.js';
-import type { UmbAuditLogRepository, UmbAuditLogRequestArgs, UmbAuditLogTagData } from '@umbraco-cms/backoffice/audit-log';
+import type {
+	UmbAuditLogRepository,
+	UmbAuditLogRequestArgs,
+	UmbAuditLogTagData,
+} from '@umbraco-cms/backoffice/audit-log';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 

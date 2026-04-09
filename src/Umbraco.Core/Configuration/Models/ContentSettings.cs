@@ -88,11 +88,10 @@ public class ContentSettings
     /// </summary>
     internal const bool StaticShowUnroutableContentWarnings = true;
 
-    // TODO (V18): Consider enabling this by default and documenting as a behavioural breaking change.
     /// <summary>
     ///     The default value for enabling media recycle bin protection.
     /// </summary>
-    private const bool StaticEnableMediaRecycleBinProtection = false;
+    private const bool StaticEnableMediaRecycleBinProtection = true;
 
     /// <summary>
     ///     Gets or sets a value for the content notification settings.

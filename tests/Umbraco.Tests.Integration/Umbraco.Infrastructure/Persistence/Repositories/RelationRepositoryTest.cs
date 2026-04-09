@@ -25,7 +25,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
 {
     [SetUp]
-    public void SetUp() => CreateTestData();
+    public async Task SetUp() => await CreateTestDataAsync();
 
     private RelationType _relateContent;
     private RelationType _relateContentType;
@@ -49,8 +49,6 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
     private IMemberService GetMemberService() => GetRequiredService<IMemberService>();
 
     private IRelationService RelationService => GetRequiredService<IRelationService>();
-
-    private IFileService FileService => GetRequiredService<IFileService>();
 
     private RelationRepository CreateRepository(IScopeProvider provider, out RelationTypeRepository relationTypeRepository)
     {
@@ -553,7 +551,7 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
         }
     }
 
-    public void CreateTestData()
+    public async Task CreateTestDataAsync()
     {
         _relateContent = new RelationType(
             "Relate Content on Copy",
@@ -581,8 +579,9 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
             relationTypeRepository.Save(_relateContent);
             relationTypeRepository.Save(_relateContentType);
 
+            var templateService = GetRequiredService<ITemplateService>();
             var template = TemplateBuilder.CreateTextPageTemplate();
-            FileService.SaveTemplate(template);
+            await templateService.CreateAsync(template, Constants.Security.SuperUserKey);
 
             // Create and Save ContentType "umbTextpage" -> (NodeDto.NodeIdSeed)
             _contentType =

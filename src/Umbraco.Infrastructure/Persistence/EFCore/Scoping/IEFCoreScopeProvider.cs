@@ -29,7 +29,7 @@ public interface IEFCoreScopeProvider<TDbContext> : CoreEFCoreScopeProvider
     /// Attaches a detached scope to the current ambient scope stack.
     /// </summary>
     /// <param name="other">The detached scope to attach.</param>
-    void AttachScope(IEfCoreScope<TDbContext> other);
+    void AttachScope(IEFCoreScope<TDbContext> other);
 
     /// <summary>
     /// Detaches the current ambient scope from the stack.

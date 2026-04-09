@@ -1210,14 +1210,8 @@ export class ContentUiHelper extends UiBaseLocators {
     await this.sliderInput.fill(value);
   }
 
-  async isDocumentTypeNameVisible(
-    contentName: string,
-    isVisible: boolean = true,
-  ) {
-    return await this.isVisible(
-      this.sidebarModal.getByText(contentName),
-      isVisible,
-    );
+  async isDocumentTypeNameVisible(contentName: string, isVisible: boolean = true) {
+    return await this.isVisible(this.sidebarModal.getByText(contentName), isVisible);
   }
 
   // Collection tab

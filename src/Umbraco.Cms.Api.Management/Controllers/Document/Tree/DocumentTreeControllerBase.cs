@@ -81,9 +81,9 @@ public abstract class DocumentTreeControllerBase : UserStartNodeTreeControllerBa
 
     protected override Ordering ItemOrdering => Ordering.By(Infrastructure.Persistence.Dtos.NodeDto.SortOrderColumnName);
 
-    protected override DocumentTreeItemResponseModel MapTreeItemViewModel(Guid? parentId, IEntitySlim entity)
+    protected override async Task<DocumentTreeItemResponseModel> MapTreeItemViewModelAsync(Guid? parentId, IEntitySlim entity)
     {
-        DocumentTreeItemResponseModel responseModel = base.MapTreeItemViewModel(parentId, entity);
+        DocumentTreeItemResponseModel responseModel = await base.MapTreeItemViewModelAsync(parentId, entity);
 
         if (entity is IDocumentEntitySlim documentEntitySlim)
         {
@@ -94,7 +94,7 @@ public abstract class DocumentTreeControllerBase : UserStartNodeTreeControllerBa
             responseModel.Id = entity.Key;
             responseModel.CreateDate = entity.CreateDate;
 
-            responseModel.Variants = _documentPresentationFactory.CreateVariantsItemResponseModels(documentEntitySlim);
+            responseModel.Variants = await _documentPresentationFactory.CreateVariantsItemResponseModelsAsync(documentEntitySlim);
             responseModel.DocumentType = _documentPresentationFactory.CreateDocumentTypeReferenceResponseModel(documentEntitySlim);
         }
 

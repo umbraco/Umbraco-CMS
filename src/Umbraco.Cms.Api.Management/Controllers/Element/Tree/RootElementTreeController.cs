@@ -40,6 +40,7 @@ public class RootElementTreeController : ElementTreeControllerBase
     /// <param name="skip">The number of items to skip for pagination.</param>
     /// <param name="take">The number of items to return for pagination.</param>
     /// <param name="foldersOnly">Whether to return only folder items.</param>
+    /// <param name="dataTypeId">An optional identifier to filter element items by data type.</param>
     /// <returns>A paginated collection of root element tree items.</returns>
     [HttpGet("root")]
     [MapToApiVersion("1.0")]
@@ -50,9 +51,11 @@ public class RootElementTreeController : ElementTreeControllerBase
         CancellationToken cancellationToken,
         int skip = 0,
         int take = 100,
-        bool foldersOnly = false)
+        bool foldersOnly = false,
+        Guid? dataTypeId = null)
     {
         RenderFoldersOnly(foldersOnly);
+        IgnoreUserStartNodesForDataType(dataTypeId);
         return await GetRoot(skip, take);
     }
 }

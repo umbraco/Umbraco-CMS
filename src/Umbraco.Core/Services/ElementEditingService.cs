@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Core.Services.Filters;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
@@ -420,6 +421,8 @@ internal sealed class ElementEditingService
             : null;
         await _auditService.AddAsync(AuditType.Move, userKey, toMove.Id, UmbracoObjectTypes.Element.GetName(), auditMessage);
 
+        scope.Notifications.Publish(new ElementTreeChangeNotification(toMove, TreeChangeTypes.RefreshBranch, eventMessages));
+
         IStatefulNotification movedNotification = movedNotificationFactory(toMove, eventMessages);
         scope.Notifications.Publish(movedNotification.WithStateFrom(movingNotification));
 
@@ -452,7 +455,7 @@ internal sealed class ElementEditingService
         IElement copy = element.DeepCloneWithResetIdentities();
         copy.ParentId = newParentId;
 
-        var copyingNotification = new ElementCopyingNotification(element, copy, newParentId, newParentKey, eventMessages);
+        var copyingNotification = new ElementCopyingNotification(element, copy, newParentKey, eventMessages);
         if (await scope.Notifications.PublishCancelableAsync(copyingNotification))
         {
             scope.Complete();
@@ -473,8 +476,9 @@ internal sealed class ElementEditingService
             return null;
         }
 
+        scope.Notifications.Publish(new ElementTreeChangeNotification(copy, TreeChangeTypes.RefreshBranch, eventMessages));
         scope.Notifications.Publish(
-            new ElementCopiedNotification(element, copy, newParentId, newParentKey, relateToOriginal, eventMessages)
+            new ElementCopiedNotification(element, copy, newParentKey, relateToOriginal, eventMessages)
                 .WithStateFrom(copyingNotification));
 
         await _auditService.AddAsync(AuditType.Copy, userKey, element.Id, UmbracoObjectTypes.Element.GetName());
