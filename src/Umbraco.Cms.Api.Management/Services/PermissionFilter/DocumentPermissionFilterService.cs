@@ -1,10 +1,9 @@
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Services.PermissionFilter;
 
@@ -14,19 +13,19 @@ namespace Umbraco.Cms.Api.Management.Services.PermissionFilter;
 internal sealed class DocumentPermissionFilterService : IDocumentPermissionFilterService
 {
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
-    private readonly IUserService _userService;
+    private readonly IContentPermissionService _contentPermissionService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DocumentPermissionFilterService"/> class.
     /// </summary>
     /// <param name="backOfficeSecurityAccessor">Provides access to the current backoffice user's security context.</param>
-    /// <param name="userService">Service used to retrieve user and document permissions.</param>
+    /// <param name="contentPermissionService">Service used to retrieve content permissions.</param>
     public DocumentPermissionFilterService(
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-        IUserService userService)
+        IContentPermissionService contentPermissionService)
     {
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
-        _userService = userService;
+        _contentPermissionService = contentPermissionService;
     }
 
     /// <inheritdoc />
@@ -67,20 +66,18 @@ internal sealed class DocumentPermissionFilterService : IDocumentPermissionFilte
 
     private async Task<Dictionary<Guid, NodePermissions>?> GetDocumentPermissionsByNodeKeyAsync(IEntitySlim[] entities)
     {
-        Guid userKey = CurrentUserKey();
+        IUser? currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
+        if (currentUser is null)
+        {
+            return null;
+        }
+
         var entityKeys = entities.Select(e => e.Key).ToHashSet();
 
-        Attempt<IEnumerable<NodePermissions>, UserOperationStatus> permissionsAttempt =
-            await _userService.GetDocumentPermissionsAsync(userKey, entityKeys);
+        IEnumerable<NodePermissions> permissions = await _contentPermissionService.GetPermissionsAsync(currentUser, entityKeys);
 
-        return permissionsAttempt.Success
-            ? permissionsAttempt.Result.ToDictionary(p => p.NodeKey)
-            : null;
+        return permissions.ToDictionary(p => p.NodeKey);
     }
-
-    private Guid CurrentUserKey()
-        => _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Key
-           ?? throw new InvalidOperationException("No backoffice user found");
 
     private static IEntitySlim[] FilterEntitiesWithBrowsePermission(IEntitySlim[] entities, Dictionary<Guid, NodePermissions> permissionsByNodeKey)
         => entities.Where(e => HasBrowsePermission(e, permissionsByNodeKey)).ToArray();
