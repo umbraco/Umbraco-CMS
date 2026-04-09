@@ -591,7 +591,7 @@ internal sealed class EFCoreScopeTest : UmbracoIntegrationTest
     public async Task NestedScope_ChildFirstDbAccess_CanWriteViaNPoco()
     {
         // Setup: create a table to write to.
-        using (IEfCoreScope<TestUmbracoDbContext> setup = EfCoreScopeProvider.CreateScope())
+        using (IEFCoreScope<TestUmbracoDbContext> setup = EFCoreScopeProvider.CreateScope())
         {
             await setup.ExecuteWithContextAsync<Task>(async db =>
                 await db.Database.ExecuteSqlAsync($"CREATE TABLE tmp4 (id INT, name NVARCHAR(64))"));
@@ -603,10 +603,10 @@ internal sealed class EFCoreScopeTest : UmbracoIntegrationTest
         // This reproduces the scenario that caused SQLite locking errors:
         // an outer EF Core scope where the NESTED scope is the first to access
         // the database, followed by a NPoco write on the same scope hierarchy.
-        using (IEfCoreScope<TestUmbracoDbContext> scope = EfCoreScopeProvider.CreateScope())
+        using (IEFCoreScope<TestUmbracoDbContext> scope = EFCoreScopeProvider.CreateScope())
         {
             // Write via a nested EF Core scope (first DB access in this hierarchy).
-            using (IEfCoreScope<TestUmbracoDbContext> nested = EfCoreScopeProvider.CreateScope())
+            using (IEFCoreScope<TestUmbracoDbContext> nested = EFCoreScopeProvider.CreateScope())
             {
                 await nested.ExecuteWithContextAsync<Task>(async db =>
                     await db.Database.ExecuteSqlAsync($"INSERT INTO tmp4 (id, name) VALUES (1, 'efcore')"));
@@ -622,7 +622,7 @@ internal sealed class EFCoreScopeTest : UmbracoIntegrationTest
         }
 
         // Verify both writes were committed.
-        using (IEfCoreScope<TestUmbracoDbContext> verify = EfCoreScopeProvider.CreateScope())
+        using (IEFCoreScope<TestUmbracoDbContext> verify = EFCoreScopeProvider.CreateScope())
         {
             await verify.ExecuteWithContextAsync<Task>(async db =>
             {

@@ -192,7 +192,7 @@ internal class EFCoreScope<TDbContext> : CoreScope, IEFCoreScope<TDbContext>
                 // Stack was empty the push was reverted by async execution context restoration.
             }
 
-            DisposeEfCoreDatabase();
+            DisposeEFCoreDatabase();
             _disposed = true;
             return;
         }
