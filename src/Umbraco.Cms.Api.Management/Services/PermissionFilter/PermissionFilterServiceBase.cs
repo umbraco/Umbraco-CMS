@@ -23,7 +23,7 @@ internal abstract class PermissionFilterServiceBase
     /// <summary>
     /// Gets the browse action letter used to check permissions.
     /// </summary>
-    protected abstract string BrowseActionLetter { get; }
+    protected abstract string BrowseActionLetter(IEntitySlim entity);
 
     /// <summary>
     /// Filters entities based on the current user's browse permissions.
@@ -109,5 +109,5 @@ internal abstract class PermissionFilterServiceBase
 
     private bool HasBrowsePermission(IEntitySlim entity, Dictionary<Guid, NodePermissions> permissionsByNodeKey)
         => permissionsByNodeKey.TryGetValue(entity.Key, out NodePermissions? nodePermissions) is false
-           || nodePermissions.Permissions.Contains(BrowseActionLetter);
+           || nodePermissions.Permissions.Contains(BrowseActionLetter(entity));
 }

@@ -1,6 +1,7 @@
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -26,7 +27,10 @@ internal sealed class ElementPermissionFilterService : PermissionFilterServiceBa
         => _userService = userService;
 
     /// <inheritdoc/>
-    protected override string BrowseActionLetter => ActionElementBrowse.ActionLetter;
+    protected override string BrowseActionLetter(IEntitySlim entity)
+        => entity.NodeObjectType == Constants.ObjectTypes.Element
+            ? ActionElementBrowse.ActionLetter
+            : ActionElementFolderBrowse.ActionLetter;
 
     /// <inheritdoc/>
     protected override Task<Attempt<IEnumerable<NodePermissions>, UserOperationStatus>> GetPermissionsAsync(
