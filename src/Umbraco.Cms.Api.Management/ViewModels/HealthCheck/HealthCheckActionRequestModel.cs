@@ -1,5 +1,8 @@
 namespace Umbraco.Cms.Api.Management.ViewModels.HealthCheck;
 
+/// <summary>
+/// Represents the data required to perform an action on a health check.
+/// </summary>
 public class HealthCheckActionRequestModel
 {
     /// <summary>

@@ -57,9 +57,12 @@ public class DefaultUrlSegmentProvider : IUrlSegmentProvider
 
         if (string.IsNullOrWhiteSpace(source))
         {
-            // If the name of a node has been updated, but it has not been published, the url should use the published name, not the current node name
-            // If this node has never been published (GetPublishName is null), use the unpublished name
-            source = content is IContent document && document.Edited && document.GetPublishName(culture) != null
+            // When the published segment is requested and the name has been updated but not yet published,
+            // use the published name so that the current live URL is returned (not the pending draft name).
+            // When the draft segment is requested (published: false), use the current name so callers
+            // (e.g. redirect tracking) can determine what the segment *will* be after publishing.
+            // If this node has never been published (GetPublishName is null), use the unpublished name.
+            source = content is IContent document && published && document.Edited && document.GetPublishName(culture) != null
                 ? document.GetPublishName(culture)
                 : content.GetCultureName(culture);
         }

@@ -541,7 +541,10 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
                 dataValueReferences,
                 dataTypeService,
                 serializer,
-                Mock.Of<IEventAggregator>());
+                Mock.Of<IEventAggregator>(),
+                Mock.Of<IRepositoryCacheVersionService>(),
+                Mock.Of<ICacheSyncService>(),
+                ShortStringHelper);
 
             var template = TemplateBuilder.CreateTextPageTemplate();
             fileService.SaveTemplate(template); // else, FK violation on contentType!
@@ -879,6 +882,36 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
             var updatedContent = updatedReader.ReadToEnd();
             Assert.That(updatedContent, Does.Contain("original-content"));
             Assert.That(updatedContent, Does.Not.Contain("modified-content"));
+        }
+    }
+
+    [Test]
+    public void Delete_In_Production_Mode_Does_Not_Remove_File()
+    {
+        // Arrange - create template in development mode first.
+        var provider = ScopeProvider;
+
+        using (provider.CreateScope())
+        {
+            var developmentRuntimeSettings = CreateRuntimeSettingsMonitor(RuntimeMode.Development);
+            var developmentRepository = CreateRepository(provider, developmentRuntimeSettings);
+
+            var template = new Template(ShortStringHelper, "productionTestDelete", "productionTestDelete") { Content = "mock-content" };
+            developmentRepository.Save(template);
+            Assert.That(FileSystems.MvcViewsFileSystem.FileExists("productionTestDelete.cshtml"), Is.True);
+
+            // Act - try to delete in production mode.
+            var productionRuntimeSettings = CreateRuntimeSettingsMonitor(RuntimeMode.Production);
+            var productionRepository = CreateRepository(provider, productionRuntimeSettings);
+
+            var existingTemplate = productionRepository.Get("productionTestDelete");
+            Assert.IsNotNull(existingTemplate);
+
+            productionRepository.Delete(existingTemplate);
+
+            // Assert - database record should be removed but file should still exist.
+            Assert.That(productionRepository.Get("productionTestDelete"), Is.Null);
+            Assert.That(FileSystems.MvcViewsFileSystem.FileExists("productionTestDelete.cshtml"), Is.True);
         }
     }
 

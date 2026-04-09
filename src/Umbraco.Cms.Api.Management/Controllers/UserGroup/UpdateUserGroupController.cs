@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Factories;
@@ -11,6 +11,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.UserGroup;
 
+/// <summary>
+/// API controller responsible for handling requests to update user groups in the system.
+/// </summary>
 [ApiVersion("1.0")]
 public class UpdateUserGroupController : UserGroupControllerBase
 {
@@ -18,6 +21,12 @@ public class UpdateUserGroupController : UserGroupControllerBase
     private readonly IUserGroupPresentationFactory _userGroupPresentationFactory;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UpdateUserGroupController"/> class, which manages update operations for user groups.
+    /// </summary>
+    /// <param name="userGroupService">Service for managing user group data and operations.</param>
+    /// <param name="userGroupPresentationFactory">Factory for creating user group presentation models.</param>
+    /// <param name="backOfficeSecurityAccessor">Accessor for back office security context and operations.</param>
     public UpdateUserGroupController(
         IUserGroupService userGroupService,
         IUserGroupPresentationFactory userGroupPresentationFactory,
@@ -28,6 +37,13 @@ public class UpdateUserGroupController : UserGroupControllerBase
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
+    /// <summary>
+    /// Updates the specified user group with new details.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="id">The unique identifier of the user group to update.</param>
+    /// <param name="updateUserGroupRequestModel">The model containing the updated user group details.</param>
+    /// <returns>An <see cref="IActionResult"/> representing the result of the operation.</returns>
     [HttpPut("{id:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]

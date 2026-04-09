@@ -13,6 +13,13 @@ internal sealed class DeliveryApiContentIndexPopulator : IndexPopulator
     private readonly ILogger<DeliveryApiContentIndexPopulator> _logger;
     private DeliveryApiSettings _deliveryApiSettings;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DeliveryApiContentIndexPopulator"/> class.
+    /// </summary>
+    /// <param name="deliveryContentIndexValueSetBuilder">The builder used to create value sets for the delivery API content index.</param>
+    /// <param name="deliveryApiContentIndexHelper">A helper providing methods for content indexing in the delivery API.</param>
+    /// <param name="logger">The logger used for logging events related to the content index populator.</param>
+    /// <param name="deliveryApiSettings">The monitor providing access to the current delivery API settings.</param>
     public DeliveryApiContentIndexPopulator(
         IDeliveryApiContentIndexValueSetBuilder deliveryContentIndexValueSetBuilder,
         IDeliveryApiContentIndexHelper deliveryApiContentIndexHelper,

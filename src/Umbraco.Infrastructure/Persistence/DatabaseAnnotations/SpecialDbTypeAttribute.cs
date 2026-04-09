@@ -9,9 +9,17 @@ namespace Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 [AttributeUsage(AttributeTargets.Property)]
 public class SpecialDbTypeAttribute : Attribute
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SpecialDbTypeAttribute"/> class with the specified database type.
+    /// </summary>
+    /// <param name="databaseType">The special database type to use.</param>
     public SpecialDbTypeAttribute(SpecialDbTypes databaseType)
         => DatabaseType = new SpecialDbType(databaseType);
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SpecialDbTypeAttribute"/> class, associating it with the specified database type.
+    /// </summary>
+    /// <param name="databaseType">The name of the database type to associate with this attribute.</param>
     public SpecialDbTypeAttribute(string databaseType)
         => DatabaseType = new SpecialDbType(databaseType);
 

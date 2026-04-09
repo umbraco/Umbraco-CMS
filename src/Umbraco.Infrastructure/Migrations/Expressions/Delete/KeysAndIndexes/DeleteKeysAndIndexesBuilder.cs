@@ -26,16 +26,30 @@ public class DeleteKeysAndIndexesBuilder : IExecutableBuilder
     private readonly IMigrationContext _context;
     private readonly DatabaseType[] _supportedDatabaseTypes;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DeleteKeysAndIndexesBuilder"/> class with the specified migration context and supported database types.
+    /// </summary>
+    /// <param name="context">The <see cref="IMigrationContext"/> to use for the migration operation.</param>
+    /// <param name="supportedDatabaseTypes">An array of <see cref="DatabaseType"/> values indicating which database types are supported.</param>
     public DeleteKeysAndIndexesBuilder(IMigrationContext context, params DatabaseType[] supportedDatabaseTypes)
     {
         _context = context;
         _supportedDatabaseTypes = supportedDatabaseTypes;
     }
 
+    /// <summary>
+    /// Gets or sets the name of the table from which keys and indexes will be deleted.
+    /// </summary>
     public string? TableName { get; set; }
 
+    /// <summary>
+    /// Gets or sets a value indicating whether only local (non-foreign) keys and indexes should be deleted.
+    /// </summary>
     public bool DeleteLocal { get; set; }
 
+    /// <summary>
+    /// Gets or sets a value indicating whether to delete foreign keys during the operation.
+    /// </summary>
     public bool DeleteForeign { get; set; }
 
     private IDeleteBuilder Delete => new DeleteBuilder(_context);

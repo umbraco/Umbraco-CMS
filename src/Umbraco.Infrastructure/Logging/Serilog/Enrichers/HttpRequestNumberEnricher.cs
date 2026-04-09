@@ -22,6 +22,10 @@ public class HttpRequestNumberEnricher : ILogEventEnricher
     private static int _lastRequestNumber;
     private readonly IRequestCache _requestCache;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="HttpRequestNumberEnricher"/> class, which enriches log events with a unique request number for each HTTP request.
+    /// </summary>
+    /// <param name="requestCache">The <see cref="IRequestCache"/> instance used to store and retrieve the unique request number for the current HTTP request.</param>
     public HttpRequestNumberEnricher(IRequestCache requestCache) =>
         _requestCache = requestCache ?? throw new ArgumentNullException(nameof(requestCache));
 

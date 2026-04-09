@@ -15,6 +15,7 @@ export default defineConfig({
 			'block-custom-view/index': 'block-custom-view/index.ts',
 			'block-grid/index': 'block-grid/index.ts',
 			'block-list/index': 'block-list/index.ts',
+			'block-single/index': 'block-single/index.ts',
 			'block-rte/index': 'block-rte/index.ts',
 			'block-type/index': 'block-type/index.ts',
 			manifests: 'manifests.ts',

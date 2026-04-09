@@ -25,8 +25,14 @@ internal class ExamineIndexRebuilder : IIndexRebuilder
     private readonly IRuntimeState _runtimeState;
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="ExamineIndexRebuilder" /> class.
+    ///     Initializes a new instance of the <see cref="ExamineIndexRebuilder" /> class, responsible for rebuilding Examine indexes in Umbraco.
     /// </summary>
+    /// <param name="mainDom">The <see cref="IMainDom"/> instance used to ensure single execution in a distributed environment.</param>
+    /// <param name="runtimeState">The <see cref="IRuntimeState"/> providing information about the current runtime state of Umbraco.</param>
+    /// <param name="logger">The <see cref="ILogger{ExamineIndexRebuilder}"/> used for logging operations and errors.</param>
+    /// <param name="examineManager">The <see cref="IExamineManager"/> responsible for managing Examine indexes.</param>
+    /// <param name="populators">A collection of <see cref="IIndexPopulator"/> instances used to populate the indexes.</param>
+    /// <param name="longRunningOperationService">The <see cref="ILongRunningOperationService"/> used to manage and track long-running operations.</param>
     public ExamineIndexRebuilder(
         IMainDom mainDom,
         IRuntimeState runtimeState,

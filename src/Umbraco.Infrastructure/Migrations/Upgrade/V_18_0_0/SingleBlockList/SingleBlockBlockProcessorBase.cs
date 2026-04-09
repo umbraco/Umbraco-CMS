@@ -7,6 +7,10 @@ internal abstract class SingleBlockBlockProcessorBase
 {
     private readonly SingleBlockListConfigurationCache _blockListConfigurationCache;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SingleBlockBlockProcessorBase"/> class.
+    /// </summary>
+    /// <param name="blockListConfigurationCache">Cache containing block list configurations.</param>
     public SingleBlockBlockProcessorBase(
         SingleBlockListConfigurationCache blockListConfigurationCache)
     {

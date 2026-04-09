@@ -10,6 +10,10 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Insert;
 public class InsertIntoBuilder : ExpressionBuilderBase<InsertDataExpression>,
     IInsertIntoBuilder
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="InsertIntoBuilder"/> class.
+    /// </summary>
+    /// <param name="expression">An <see cref="InsertDataExpression"/> representing the data to insert.</param>
     public InsertIntoBuilder(InsertDataExpression expression)
         : base(expression)
     {

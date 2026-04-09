@@ -9,6 +9,9 @@ using Umbraco.Cms.Core.Mapping;
 
 namespace Umbraco.Cms.Api.Management.Controllers.HealthCheck;
 
+/// <summary>
+/// Controller responsible for executing specific actions as part of health checks in the management API.
+/// </summary>
 [ApiVersion("1.0")]
 public class ExecuteActionHealthCheckController : HealthCheckControllerBase
 {

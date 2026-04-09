@@ -1,4 +1,4 @@
-﻿using NPoco;
+using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
@@ -6,8 +6,15 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_13_0_0;
 
+/// <summary>
+/// Represents a migration that adds the <c>WebhookRequest</c> table to the Umbraco database schema during the upgrade to version 13.0.0.
+/// </summary>
 public class AddWebhookRequest : MigrationBase
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AddWebhookRequest"/> class.
+    /// </summary>
+    /// <param name="context">The migration context.</param>
     public AddWebhookRequest(IMigrationContext context) : base(context)
     {
     }

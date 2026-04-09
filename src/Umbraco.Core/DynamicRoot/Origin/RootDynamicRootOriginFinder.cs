@@ -10,21 +10,21 @@ namespace Umbraco.Cms.Core.DynamicRoot.Origin;
 /// </summary>
 public class RootDynamicRootOriginFinder : IDynamicRootOriginFinder
 {
-    private readonly IEntityService _entityService;
+    private readonly ISet<Guid> _allowedObjectTypes = new HashSet<Guid>(
+    [
+        Constants.ObjectTypes.Document, Constants.ObjectTypes.SystemRoot
+    ]);
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="RootDynamicRootOriginFinder"/> class.
     /// </summary>
     /// <param name="entityService">The entity service used to retrieve entities and traverse the content tree.</param>
-    public RootDynamicRootOriginFinder(IEntityService entityService)
-    {
-        _entityService = entityService;
-    }
+    public RootDynamicRootOriginFinder(IEntityService entityService) => EntityService = entityService;
 
-    private ISet<Guid> _allowedObjectTypes = new HashSet<Guid>(new[]
-    {
-        Constants.ObjectTypes.Document, Constants.ObjectTypes.SystemRoot
-    });
+    /// <summary>
+    /// Gets or sets the <see cref="IEntityService"/>.
+    /// </summary>
+    protected IEntityService EntityService { get; set; }
 
     /// <summary>
     ///     Gets or sets the origin type alias that this finder supports.
@@ -39,10 +39,9 @@ public class RootDynamicRootOriginFinder : IDynamicRootOriginFinder
             return null;
         }
 
-        // when creating new content, CurrentKey will be null - fallback to using ParentKey
+        // When creating new content, CurrentKey will be null - fallback to using ParentKey.
         Guid entityKey = query.Context.CurrentKey ?? query.Context.ParentKey;
-        var entity = _entityService.Get(entityKey);
-
+        IEntitySlim? entity = EntityService.Get(entityKey);
         if (entity is null || _allowedObjectTypes.Contains(entity.NodeObjectType) is false)
         {
             return null;
@@ -54,12 +53,10 @@ public class RootDynamicRootOriginFinder : IDynamicRootOriginFinder
             return null;
         }
 
-
         var rootId = GetRootId(path);
-        IEntitySlim? root = rootId is null ? null : _entityService.Get(rootId.Value);
+        IEntitySlim? root = rootId is null ? null : EntityService.Get(rootId.Value);
 
-        if (root is null
-            || root.NodeObjectType != Constants.ObjectTypes.Document)
+        if (root is null || root.NodeObjectType != Constants.ObjectTypes.Document)
         {
             return null;
         }

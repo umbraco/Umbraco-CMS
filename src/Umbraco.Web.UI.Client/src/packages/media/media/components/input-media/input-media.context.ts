@@ -44,9 +44,11 @@ export class UmbMediaPickerInputContext extends UmbPickerInputContext<
 			...pickerData,
 		};
 
-		// transform allowedContentTypes to a pickable filter
-		combinedPickerData.pickableFilter = (item) =>
-			this.#pickableFilter(item, args?.allowedContentTypes, args?.folderFilter);
+		// combine internal allowedContentTypes filter with user-supplied pickableFilter
+		combinedPickerData.pickableFilter = this._combinePickableFilters(
+			(item) => this.#pickableFilter(item, args?.allowedContentTypes, args?.folderFilter),
+			pickerData?.pickableFilter,
+		);
 
 		// set default search data
 		if (!pickerData?.search) {
@@ -82,7 +84,7 @@ export class UmbMediaPickerInputContext extends UmbPickerInputContext<
 	#pickableFilter = (
 		item: UmbMediaItemModel | UmbMediaTreeItemModel,
 		allowedContentTypes?: Array<{ unique: string; entityType: UmbMediaTypeEntityType }>,
-		folderFilter: UmbMediaPickerFolderFilter = UmbMediaPickerFolderFilter.FILES_ONLY,
+		folderFilter: UmbMediaPickerFolderFilter = UmbMediaPickerFolderFilter.FILES_AND_FOLDERS,
 	): boolean => {
 		// Check if the user has no access to this item (tree items only)
 		if (isMediaTreeItem(item) && item.noAccess) {

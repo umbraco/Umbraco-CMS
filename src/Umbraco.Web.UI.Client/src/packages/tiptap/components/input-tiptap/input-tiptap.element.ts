@@ -16,7 +16,7 @@ import {
 import { loadManifestApi } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { umbDestroyOnDisconnect, UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
@@ -271,7 +271,8 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 				.statusbar=${this._statusbar}
 				.editor=${this._editor}
 				.configuration=${this.configuration}
-				?readonly=${this.readonly}>
+				?readonly=${this.readonly}
+				${umbDestroyOnDisconnect()}>
 			</umb-tiptap-statusbar>
 		`;
 	}

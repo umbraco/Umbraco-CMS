@@ -94,8 +94,18 @@ public class GlobalSettings
     /// </summary>
     internal const int StaticMainDomReleaseSignalPollingInterval = 2000;
 
+    /// <summary>
+    ///     The default value for the <see cref="MainDomAcquisitionTimeout" /> setting.
+    /// </summary>
+    internal const string StaticMainDomAcquisitionTimeout = "00:00:40";
+
     private const bool StaticForceCombineUrlPathLeftToRight = true;
     private const bool StaticShowMaintenancePageWhenInUpgradeState = true;
+
+    /// <summary>
+    ///     The default value for the <see cref="UpgradingViewPath" /> setting.
+    /// </summary>
+    internal const string StaticUpgradingViewPath = "~/umbraco/UmbracoWebsite/Upgrading.cshtml";
 
     /// <summary>
     ///     Gets or sets a value for the reserved URLs (must end with a comma).
@@ -215,6 +225,15 @@ public class GlobalSettings
     public int MainDomReleaseSignalPollingInterval { get; set; } = StaticMainDomReleaseSignalPollingInterval;
 
     /// <summary>
+    ///     Gets or sets a value representing the maximum time to wait whilst attempting to acquire MainDom status.
+    /// </summary>
+    /// <remarks>
+    ///     The default value is 40 seconds.
+    /// </remarks>
+    [DefaultValue(StaticMainDomAcquisitionTimeout)]
+    public TimeSpan MainDomAcquisitionTimeout { get; set; } = TimeSpan.Parse(StaticMainDomAcquisitionTimeout);
+
+    /// <summary>
     ///     Gets or sets the telemetry ID.
     /// </summary>
     public string Id { get; set; } = string.Empty;
@@ -303,4 +322,10 @@ public class GlobalSettings
     /// </summary>
     [DefaultValue(StaticShowMaintenancePageWhenInUpgradeState)]
     public bool ShowMaintenancePageWhenInUpgradeState { get; set; } = StaticShowMaintenancePageWhenInUpgradeState;
+
+    /// <summary>
+    ///     Gets or sets the view path shown during an unattended background upgrade (<see cref="RuntimeLevel.Upgrading"/>).
+    /// </summary>
+    [DefaultValue(StaticUpgradingViewPath)]
+    public string UpgradingViewPath { get; set; } = StaticUpgradingViewPath;
 }

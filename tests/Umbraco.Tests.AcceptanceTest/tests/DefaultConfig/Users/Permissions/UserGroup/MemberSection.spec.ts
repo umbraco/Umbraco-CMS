@@ -2,7 +2,6 @@ import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/accepta
 import {expect} from "@playwright/test";
 
 const testUser = ConstantHelper.testUserCredentials;
-let testUserCookieAndToken = {cookie: "", accessToken: "", refreshToken: ""};
 
 const userGroupName = 'TestUserGroup';
 let userGroupId = null;
@@ -25,7 +24,7 @@ test.beforeEach(async ({umbracoApi}) => {
 
 test.afterEach(async ({umbracoApi}) => {
   // Ensure we are logged in to admin
-  await umbracoApi.loginToAdminUser(testUserCookieAndToken.cookie, testUserCookieAndToken.accessToken, testUserCookieAndToken.refreshToken);
+  await umbracoApi.loginToAdminUser();
   await umbracoApi.memberType.ensureNameNotExists(memberTypeName);
   await umbracoApi.member.ensureNameNotExists(memberName);
   await umbracoApi.userGroup.ensureNameNotExists(userGroupName);
@@ -35,7 +34,7 @@ test('can access members section with section enabled', {tag: '@release'}, async
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithMemberSection(userGroupName);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId, [], true, [], false, 'en-us');
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
 
   // Act
@@ -50,7 +49,7 @@ test('can create member with members section set', async ({umbracoApi, umbracoUi
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithMemberSection(userGroupName);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId, [], true, [], false, 'en-us');
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
   await umbracoUi.member.goToSection(ConstantHelper.sections.members, false);
   await umbracoUi.member.clickMembersMenu();
@@ -78,7 +77,7 @@ test('can update member with members section set', async ({umbracoApi, umbracoUi
   memberId = await umbracoApi.member.createDefaultMember(memberName, memberTypeId, email, username, password);
   const updatedUsername = 'updatedusername';
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId, [], true, [], false, 'en-us');
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
   await umbracoUi.member.goToSection(ConstantHelper.sections.members, false);
   await umbracoUi.member.clickMembersMenu();

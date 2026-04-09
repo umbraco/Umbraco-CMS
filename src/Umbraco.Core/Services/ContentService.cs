@@ -2814,9 +2814,22 @@ public class ContentService : RepositoryService, IContentService
 
             if (contents is not null)
             {
+                // When checking if an item is related, we need to exclude the "relate parent on delete" relation type,
+                // as this is automatically created when items are trashed and would prevent emptying the recycle bin.
+                int[]? relateParentOnDeleteRelationTypeIds = null;
+                if (_contentSettings.DisableDeleteWhenReferenced)
+                {
+                    IRelationType? relateParentOnDeleteRelationType = _relationService.GetRelationTypeByAlias(
+                        Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteAlias);
+                    if (relateParentOnDeleteRelationType is not null)
+                    {
+                        relateParentOnDeleteRelationTypeIds = [relateParentOnDeleteRelationType.Id];
+                    }
+                }
+
                 foreach (IContent content in contents)
                 {
-                    if (_contentSettings.DisableDeleteWhenReferenced && _relationService.IsRelated(content.Id, RelationDirectionFilter.Child))
+                    if (_contentSettings.DisableDeleteWhenReferenced && _relationService.IsRelated(content.Id, RelationDirectionFilter.Child, excludeRelationTypeIds: relateParentOnDeleteRelationTypeIds))
                     {
                         continue;
                     }
@@ -3879,6 +3892,33 @@ public class ContentService : RepositoryService, IContentService
             Audit(AuditType.Save, userId, content.Id, $"Saved content template: {content.Name}");
 
             scope.Notifications.Publish(new ContentSavedBlueprintNotification(content, createdFromContent, evtMsgs));
+            scope.Notifications.Publish(new ContentTreeChangeNotification(content, TreeChangeTypes.RefreshNode, evtMsgs));
+
+            scope.Complete();
+        }
+    }
+
+    /// <summary>
+    /// Moves a content blueprint to a different container.
+    /// </summary>
+    /// <param name="content">The blueprint content to move.</param>
+    /// <param name="userId">The optional ID of the user moving the blueprint.</param>
+    public void MoveBlueprint(IContent content, int userId = Constants.Security.SuperUserId)
+    {
+        EventMessages evtMsgs = EventMessagesFactory.Get();
+
+        content.Blueprint = true;
+
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        {
+            scope.WriteLock(Constants.Locks.ContentTree);
+
+            content.WriterId = userId;
+
+            _documentBlueprintRepository.Save(content);
+
+            Audit(AuditType.Move, userId, content.Id);
+
             scope.Notifications.Publish(new ContentTreeChangeNotification(content, TreeChangeTypes.RefreshNode, evtMsgs));
 
             scope.Complete();

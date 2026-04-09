@@ -2,6 +2,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Infrastructure.BackgroundJobs;
+
 /// <summary>
 ///     A recurring background job
 /// </summary>
@@ -21,10 +22,17 @@ public interface IRecurringBackgroundJob
     /// </summary>
     TimeSpan Delay { get => DefaultDelay; }
 
+    /// <summary>
+    /// Gets the server roles for which this recurring background job is intended.
+    /// </summary>
     ServerRole[] ServerRoles { get => DefaultServerRoles; }
 
     event EventHandler PeriodChanged;
 
+    /// <summary>
+    /// Executes the logic associated with the recurring background job asynchronously.
+    /// </summary>
+    /// <returns>A <see cref="System.Threading.Tasks.Task"/> that represents the asynchronous execution of the background job.</returns>
     Task RunJobAsync();
 }
 

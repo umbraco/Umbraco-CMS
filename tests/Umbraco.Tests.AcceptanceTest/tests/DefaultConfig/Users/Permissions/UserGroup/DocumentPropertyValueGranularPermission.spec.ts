@@ -2,7 +2,6 @@ import {expect} from '@playwright/test';
 import {AliasHelper, ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 
 const testUser = ConstantHelper.testUserCredentials;
-let testUserCookieAndToken = {cookie: "", accessToken: "", refreshToken: ""};
 
 const userGroupName = 'TestPropertyValuePermission';
 let userGroupId = null;
@@ -28,7 +27,7 @@ test.beforeEach(async ({umbracoApi}) => {
 
 test.afterEach(async ({umbracoApi}) => {
   // Ensure we are logged in to admin
-  await umbracoApi.loginToAdminUser(testUserCookieAndToken.cookie, testUserCookieAndToken.accessToken, testUserCookieAndToken.refreshToken);
+  await umbracoApi.loginToAdminUser();
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   await umbracoApi.document.ensureNameNotExists(firstDocumentName);
   await umbracoApi.document.ensureNameNotExists(secondDocumentName);
@@ -40,7 +39,7 @@ test.skip('can only see property values for specific document with read UI enabl
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithPermissionsForSpecificDocumentAndTwoPropertyValues(userGroupName, firstDocumentId, documentTypeId, firstPropertyName[0], true, false, secondPropertyName[0], true, false);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
 
   // Act
@@ -58,7 +57,7 @@ test('cannot see specific property value without UI read permission enabled', as
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithPermissionsForSpecificDocumentAndTwoPropertyValues(userGroupName, firstDocumentId, documentTypeId, firstPropertyName[0], false, false, secondPropertyName[0], false, false);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
 
   // Act
@@ -74,7 +73,7 @@ test('can see specific property values with UI read permission enabled', {tag: '
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithPermissionsForSpecificDocumentAndTwoPropertyValues(userGroupName, firstDocumentId, documentTypeId, firstPropertyName[0], true, false, secondPropertyName[0], true, false);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
 
   // Act
@@ -90,7 +89,7 @@ test('can see property with UI read enabled but not another property with UI rea
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithPermissionsForSpecificDocumentAndTwoPropertyValues(userGroupName, firstDocumentId, documentTypeId, firstPropertyName[0], true, false, secondPropertyName[0], false, false);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
 
   // Act
@@ -107,7 +106,7 @@ test('can edit specific property values with UI read and write permission enable
   const inputText = 'This is test text';
   userGroupId = await umbracoApi.userGroup.createUserGroupWithPermissionsForSpecificDocumentAndTwoPropertyValues(userGroupName, firstDocumentId, documentTypeId, firstPropertyName[0], true, true, secondPropertyName[0], true, true);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
 
   // Act
@@ -129,7 +128,7 @@ test('cannot see specific property values with UI write permission enabled and U
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithPermissionsForSpecificDocumentAndTwoPropertyValues(userGroupName, firstDocumentId, documentTypeId, firstPropertyName[0], false, true, secondPropertyName[0], false, true);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
 
   // Act

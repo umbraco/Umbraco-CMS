@@ -34,4 +34,14 @@ export abstract class UmbDetailStoreBase<T extends UmbEntityModel>
 	byUnique(unique: string) {
 		return this._data.asObservablePart((x) => x.find((y) => y.unique === unique));
 	}
+
+	/**
+	 * Retrieve multiple detail models from the store
+	 * @param {Array<string>} uniques - Array of unique identifiers
+	 * @returns {Observable<Array<T>>}
+	 * @memberof UmbDetailStoreBase
+	 */
+	byUniques(uniques: Array<string>) {
+		return this._data.asObservablePart((x) => x.filter((y) => y.unique !== null && uniques.includes(y.unique)));
+	}
 }

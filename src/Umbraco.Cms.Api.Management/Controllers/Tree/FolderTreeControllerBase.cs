@@ -13,6 +13,10 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Tree;
 
+/// <summary>
+/// Serves as a base controller for managing folder-based tree structures containing items of type <typeparamref name="TItem"/>.
+/// Provides common functionality for derived controllers handling hierarchical folder trees.
+/// </summary>
 public abstract class FolderTreeControllerBase<TItem> : NamedEntityTreeControllerBase<TItem>
     where TItem : FolderTreeItemResponseModel, new()
 {

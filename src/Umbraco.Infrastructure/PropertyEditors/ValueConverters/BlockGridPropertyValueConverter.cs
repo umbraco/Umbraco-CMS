@@ -12,6 +12,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
 {
+    /// <summary>
+    /// Converts values of the Block Grid property editor in Umbraco to their corresponding .NET types for use within the application.
+    /// </summary>
     [DefaultPropertyValueConverter(typeof(JsonValueConverter))]
     public class BlockGridPropertyValueConverter : PropertyValueConverterBase, IDeliveryApiPropertyValueConverter
     {
@@ -23,6 +26,16 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
         private readonly IVariationContextAccessor _variationContextAccessor;
         private readonly BlockEditorVarianceHandler _blockEditorVarianceHandler;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BlockGridPropertyValueConverter"/> class.
+        /// </summary>
+        /// <param name="proflog">The logger used for profiling and diagnostics.</param>
+        /// <param name="blockConverter">The converter responsible for handling block editor values.</param>
+        /// <param name="jsonSerializer">The serializer used for JSON serialization and deserialization.</param>
+        /// <param name="apiElementBuilder">The builder for creating API elements from block data.</param>
+        /// <param name="constructorCache">The cache for block grid property value constructors.</param>
+        /// <param name="variationContextAccessor">Provides access to the current variation context.</param>
+        /// <param name="blockEditorVarianceHandler">Handles variance logic for block editors.</param>
         public BlockGridPropertyValueConverter(
             IProfilingLogger proflog,
             BlockEditorConverter blockConverter,

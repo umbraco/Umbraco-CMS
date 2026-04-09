@@ -4,8 +4,15 @@ using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Api.Management.Mapping.MediaType;
 
+/// <summary>
+/// Provides mapping definitions for media type compositions in the Umbraco CMS API.
+/// </summary>
 public class MediaTypeCompositionMapDefinition : IMapDefinition
 {
+    /// <summary>
+    /// Defines the mapping configuration for media type compositions.
+    /// </summary>
+    /// <param name="mapper">The Umbraco mapper to configure mappings on.</param>
     public void DefineMaps(IUmbracoMapper mapper)
         => mapper.Define<IMediaType, MediaTypeCompositionResponseModel>(
             (_, _) => new MediaTypeCompositionResponseModel(), Map);

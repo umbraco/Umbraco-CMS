@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.Builders;
@@ -9,6 +9,9 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Document;
 
+/// <summary>
+/// Provides API endpoints for generating and retrieving preview URLs for documents.
+/// </summary>
 [ApiVersion("1.0")]
 public class DocumentPreviewUrlController : DocumentControllerBase
 {
@@ -23,6 +26,12 @@ public class DocumentPreviewUrlController : DocumentControllerBase
         _documentUrlFactory = documentUrlFactory;
     }
 
+    /// <summary>Retrieves the preview URL for a document by its unique identifier.</summary>
+    /// <param name="id">The unique identifier (GUID) of the document.</param>
+    /// <param name="providerAlias">The alias of the provider used to generate the preview URL.</param>
+    /// <param name="culture">An optional culture code for the preview URL.</param>
+    /// <param name="segment">An optional segment for the preview URL.</param>
+    /// <returns>An <see cref="IActionResult"/> containing the preview URL information if found; otherwise, a <see cref="ProblemDetails"/> response indicating the error.</returns>
     [MapToApiVersion("1.0")]
     [HttpGet("{id:guid}/preview-url")]
     [ProducesResponseType(typeof(DocumentUrlInfo), StatusCodes.Status200OK)]

@@ -13,6 +13,7 @@ import { UMB_VARIANT_CONTEXT, type UmbVariantId } from '@umbraco-cms/backoffice/
 export class UmbDocumentUrlsDataResolver extends UmbControllerBase {
 	#appCulture?: string;
 	#variantId?: UmbVariantId;
+	#displayVariantId?: UmbVariantId;
 	#data?: Array<UmbDocumentUrlModel> | undefined;
 
 	#init: Promise<unknown>;
@@ -31,6 +32,8 @@ export class UmbDocumentUrlsDataResolver extends UmbControllerBase {
 		this.#init = Promise.all([
 			this.consumeContext(UMB_VARIANT_CONTEXT, async (context) => {
 				this.#variantId = await context?.getVariantId();
+				this.#displayVariantId = await this.observe(context?.displayVariantId)?.asPromise();
+				this.#setCultureAwareValues();
 			}).asPromise(),
 		]);
 	}
@@ -80,7 +83,7 @@ export class UmbDocumentUrlsDataResolver extends UmbControllerBase {
 	}
 
 	#getCurrentCulture(): string | undefined {
-		return this.#variantId?.culture || this.#appCulture;
+		return this.#variantId?.culture || this.#displayVariantId?.culture || this.#appCulture;
 	}
 
 	#getDataForCurrentCulture(): Array<UmbDocumentUrlModel> | undefined {

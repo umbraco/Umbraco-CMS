@@ -69,6 +69,7 @@ export class UmbBackofficeElement extends UmbLitElement {
 	}
 
 	override async firstUpdated() {
+		// TODO: Move this logic into the Context? [NL]
 		await this.#extensionsAfterAuth();
 
 		// So far local packages are this simple to register, so no need for a manager to do that:

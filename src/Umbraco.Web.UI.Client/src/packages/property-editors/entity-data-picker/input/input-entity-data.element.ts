@@ -53,6 +53,13 @@ export class UmbInputEntityDataElement extends UmbFormControlMixin<string | unde
 		return this.#pickerInputContext.getDataSourceConfig();
 	}
 
+	public set pickerViews(value: Array<{ alias: string }> | undefined) {
+		this.#pickerInputContext.setPickerViews(value);
+	}
+	public get pickerViews(): Array<{ alias: string }> | undefined {
+		return this.#pickerInputContext.getPickerViews();
+	}
+
 	/**
 	 * This is a minimum amount of selected items in this input.
 	 * @type {number}

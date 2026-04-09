@@ -33,13 +33,16 @@ async function pickExampleUI(){
 		const selectedFolder = exampleFolderNames[parseInt(answer) - 1];
 		console.log(`You selected: ${selectedFolder}`);
 
+		// Close readline before starting the dev server so Ctrl+C can terminate the process.
+		rl.close();
+
 		process.env['VITE_EXAMPLE_PATH'] = `${exampleDirectory}/${selectedFolder}`;
 
 		// Start vite server:
 		try {
 			execSync('npm run dev', {stdio: 'inherit'});
 		} catch (error) {
-			// Nothing, cause this is most likely just the server begin stopped.
+			// Nothing, cause this is most likely just the server being stopped.
 			//console.log(error);
 		}
 	});

@@ -12,6 +12,10 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Security;
 
+/// <summary>
+/// Represents the definition of an identity map used to manage and track security identities within Umbraco CMS.
+/// This class helps ensure that each security identity is uniquely mapped and efficiently retrieved during authentication and authorization processes.
+/// </summary>
 public class IdentityMapDefinition : IMapDefinition
 {
     private readonly AppCaches _appCaches;
@@ -21,6 +25,15 @@ public class IdentityMapDefinition : IMapDefinition
     private readonly ILocalizedTextService _textService;
     private readonly ITwoFactorLoginService _twoFactorLoginService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Core.Security.IdentityMapDefinition"/> class.
+    /// </summary>
+    /// <param name="textService">An <see cref="ILocalizedTextService"/> used for retrieving localized text.</param>
+    /// <param name="entityService">An <see cref="IEntityService"/> for accessing Umbraco entities.</param>
+    /// <param name="globalSettings">The <see cref="IOptions{GlobalSettings}"/> providing global configuration options.</param>
+    /// <param name="securitySettings">The <see cref="IOptions{SecuritySettings}"/> providing security configuration options.</param>
+    /// <param name="appCaches">The <see cref="AppCaches"/> instance for application-level caching.</param>
+    /// <param name="twoFactorLoginService">An <see cref="ITwoFactorLoginService"/> for managing two-factor authentication.</param>
     public IdentityMapDefinition(
         ILocalizedTextService textService,
         IEntityService entityService,
@@ -37,6 +50,11 @@ public class IdentityMapDefinition : IMapDefinition
         _twoFactorLoginService = twoFactorLoginService;
     }
 
+    /// <summary>
+    /// Configures mapping definitions between core identity interfaces and their corresponding identity user implementations.
+    /// Specifically, maps <see cref="IUser"/> to <see cref="BackOfficeIdentityUser"/> and <see cref="IMember"/> to <see cref="MemberIdentityUser"/> using the provided <paramref name="mapper"/>.
+    /// </summary>
+    /// <param name="mapper">The <see cref="IUmbracoMapper"/> instance used to define the mappings.</param>
     public void DefineMaps(IUmbracoMapper mapper)
     {
         mapper.Define<IUser, BackOfficeIdentityUser>(

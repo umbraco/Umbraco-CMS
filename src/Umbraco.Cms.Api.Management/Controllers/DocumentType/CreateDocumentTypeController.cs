@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -14,6 +14,9 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DocumentType;
 
+/// <summary>
+/// API controller responsible for handling requests to create new document types in Umbraco CMS.
+/// </summary>
 [ApiVersion("1.0")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
 public class CreateDocumentTypeController : DocumentTypeControllerBase
@@ -22,6 +25,12 @@ public class CreateDocumentTypeController : DocumentTypeControllerBase
     private readonly IContentTypeEditingService _contentTypeEditingService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CreateDocumentTypeController"/> class, which is responsible for handling API requests related to creating document types in the Umbraco CMS.
+    /// </summary>
+    /// <param name="documentTypeEditingPresentationFactory">Factory used to create presentation models for editing document types.</param>
+    /// <param name="contentTypeEditingService">Service that provides operations for editing content types.</param>
+    /// <param name="backOfficeSecurityAccessor">Accessor for managing back office security context.</param>
     public CreateDocumentTypeController(
         IDocumentTypeEditingPresentationFactory documentTypeEditingPresentationFactory,
         IContentTypeEditingService contentTypeEditingService,

@@ -36,6 +36,9 @@ namespace Umbraco.Cms.Infrastructure.Migrations;
  * Hence the need for partial migration completions.
  */
 
+/// <summary>
+/// Executes migration plans that update the database schema and data as part of the Umbraco migration framework.
+/// </summary>
 public class MigrationPlanExecutor : IMigrationPlanExecutor
 {
     private readonly ILogger<MigrationPlanExecutor> _logger;
@@ -54,6 +57,19 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
     private bool _rebuildCache;
     private bool _invalidateBackofficeUserAccess;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MigrationPlanExecutor"/> class, responsible for executing migration plans within the Umbraco CMS infrastructure.
+    /// </summary>
+    /// <param name="scopeProvider">Provides access to the core scope for database operations.</param>
+    /// <param name="scopeAccessor">Accesses the current scope context.</param>
+    /// <param name="loggerFactory">Factory for creating logger instances used for logging migration activities.</param>
+    /// <param name="migrationBuilder">Builds and manages migration steps and plans.</param>
+    /// <param name="databaseFactory">Factory for creating Umbraco database connections.</param>
+    /// <param name="databaseCacheRebuilder">Handles rebuilding of database-level caches after migrations.</param>
+    /// <param name="distributedCache">Manages distributed cache invalidation and synchronization.</param>
+    /// <param name="keyValueService">Service for storing and retrieving key-value pairs, often used for migration state.</param>
+    /// <param name="serviceScopeFactory">Factory for creating service scopes, enabling dependency injection within migration execution.</param>
+    /// <param name="appCaches">Provides access to application-level caches.</param>
     [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
     public MigrationPlanExecutor(
         ICoreScopeProvider scopeProvider,
@@ -81,6 +97,20 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Migrations.MigrationPlanExecutor"/> class, responsible for executing migration plans within the Umbraco CMS infrastructure.
+    /// </summary>
+    /// <param name="scopeProvider">Provides access to core database transaction scopes.</param>
+    /// <param name="scopeAccessor">Accesses the current database scope for migration operations.</param>
+    /// <param name="loggerFactory">Factory for creating loggers used during migration execution.</param>
+    /// <param name="migrationBuilder">Builds and manages migration steps and plans.</param>
+    /// <param name="databaseFactory">Factory for creating Umbraco database connections.</param>
+    /// <param name="databaseCacheRebuilder">Handles rebuilding of database-level caches after migrations.</param>
+    /// <param name="distributedCache">Manages distributed cache invalidation related to migration changes.</param>
+    /// <param name="keyValueService">Service for storing and retrieving key-value pairs, often used for migration state.</param>
+    /// <param name="serviceScopeFactory">Factory for creating service scopes for dependency injection during migrations.</param>
+    /// <param name="appCaches">Provides access to application-level caches.</param>
+    /// <param name="publishedContentTypeFactory">Factory for creating published content types, used when migrations affect content models.</param>
     public MigrationPlanExecutor(
         ICoreScopeProvider scopeProvider,
         IScopeAccessor scopeAccessor,
