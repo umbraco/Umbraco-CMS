@@ -83,3 +83,15 @@ export function isEquivalentTimeZone(tz1: string, tz2: string): boolean {
 	const tz2Name = new Intl.DateTimeFormat(undefined, { timeZone: tz2 }).resolvedOptions().timeZone;
 	return tz1Name === tz2Name;
 }
+/**
+ * Default date and time format options for displaying dates.
+ * This can be used with Intl.DateTimeFormat to ensure consistent formatting.
+ */
+export const UMB_DATE_TIME_FORMAT_OPTIONS: Intl.DateTimeFormatOptions = {
+	year: 'numeric',
+	month: 'long',
+	day: 'numeric',
+	hour: 'numeric',
+	minute: 'numeric',
+	second: 'numeric',
+};

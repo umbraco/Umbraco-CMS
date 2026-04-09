@@ -144,7 +144,7 @@ public class SqlServerDistributedLockingMechanism : IDistributedLockingMechanism
                     "A transaction with minimum ReadCommitted isolation level is required.");
             }
 
-            const string query = "SELECT value FROM umbracoLock WITH (REPEATABLEREAD)  WHERE id=@id";
+            const string query = "SELECT value FROM umbracoLock WITH (ROWLOCK, REPEATABLEREAD) WHERE id=@id";
 
             var lockTimeoutQuery = $"SET LOCK_TIMEOUT {_timeout.TotalMilliseconds}";
 
@@ -180,7 +180,7 @@ public class SqlServerDistributedLockingMechanism : IDistributedLockingMechanism
             }
 
             const string query =
-                @"UPDATE umbracoLock WITH (REPEATABLEREAD) SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id=@id";
+                @"UPDATE umbracoLock WITH (ROWLOCK, REPEATABLEREAD) SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id=@id";
 
             var lockTimeoutQuery = $"SET LOCK_TIMEOUT {_timeout.TotalMilliseconds}";
 

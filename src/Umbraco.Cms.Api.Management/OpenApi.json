@@ -898,6 +898,66 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/data-type/{id}/schema": {
+      "get": {
+        "tags": [
+          "Data Type"
+        ],
+        "operationId": "GetDataTypeByIdSchema",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/DataTypeSchemaResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ProblemDetails"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/data-type/batch": {
       "get": {
         "tags": [
@@ -1440,6 +1500,54 @@
                 }
               }
             }
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/data-type/schemas/batch": {
+      "get": {
+        "tags": [
+          "Data Type"
+        ],
+        "operationId": "GetDataTypeSchemasBatch",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/FetchResponseModelDataTypeSchemaItemResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource"
           }
         },
         "security": [
@@ -3610,6 +3718,87 @@
                 }
               }
             }
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/document-blueprint/{id}/audit-log": {
+      "get": {
+        "tags": [
+          "Document Blueprint"
+        ],
+        "summary": "Gets the audit log for a document blueprint.",
+        "description": "Gets a paginated collection of audit log entries for the document blueprint identified by the provided Id.",
+        "operationId": "GetDocumentBlueprintByIdAuditLog",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "orderDirection",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/DirectionModel"
+            }
+          },
+          {
+            "name": "sinceDate",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/PagedAuditLogResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource"
           }
         },
         "security": [
@@ -5941,6 +6130,69 @@
                 }
               }
             }
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/document-type/{id}/schema": {
+      "get": {
+        "tags": [
+          "Document Type"
+        ],
+        "operationId": "GetDocumentTypeByIdSchema",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/JsonNode"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ProblemDetails"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource"
           }
         },
         "security": [
@@ -16320,6 +16572,69 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/media-type/{id}/schema": {
+      "get": {
+        "tags": [
+          "Media Type"
+        ],
+        "operationId": "GetMediaTypeByIdSchema",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/JsonNode"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ProblemDetails"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/media-type/allowed-at-root": {
       "get": {
         "tags": [
@@ -21949,6 +22264,126 @@
                 }
               }
             }
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/member-type/{id}/schema": {
+      "get": {
+        "tags": [
+          "Member Type"
+        ],
+        "operationId": "GetMemberTypeByIdSchema",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/JsonNode"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ProblemDetails"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/member-type/allowed-at-root": {
+      "get": {
+        "tags": [
+          "Member Type"
+        ],
+        "summary": "Gets member types allowed at root.",
+        "description": "Gets a collection of member types that are allowed to be created at the root level.",
+        "operationId": "GetMemberTypeAllowedAtRoot",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/PagedAllowedMemberTypeModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource"
           }
         },
         "security": [
@@ -38693,6 +39128,31 @@
         },
         "additionalProperties": false
       },
+      "AllowedMemberTypeModel": {
+        "required": [
+          "id",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "icon": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "AuditLogResponseModel": {
         "required": [
           "logType",
@@ -41059,6 +41519,59 @@
         },
         "additionalProperties": false
       },
+      "DataTypeSchemaItemResponseModel": {
+        "required": [
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "valueTypeName": {
+            "type": "string",
+            "nullable": true
+          },
+          "jsonSchema": {
+            "type": "object",
+            "additionalProperties": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/JsonNode"
+                }
+              ]
+            },
+            "nullable": true
+          },
+          "error": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "DataTypeSchemaResponseModel": {
+        "type": "object",
+        "properties": {
+          "valueTypeName": {
+            "type": "string",
+            "nullable": true
+          },
+          "jsonSchema": {
+            "type": "object",
+            "additionalProperties": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/JsonNode"
+                }
+              ]
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "DataTypeTreeItemResponseModel": {
         "required": [
           "flags",
@@ -43314,6 +43827,30 @@
         ],
         "type": "string"
       },
+      "FetchResponseModelDataTypeSchemaItemResponseModel": {
+        "required": [
+          "items",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DataTypeSchemaItemResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
       "FieldPresentationModel": {
         "required": [
           "name",
@@ -43758,6 +44295,10 @@
               "nullable": true
             },
             "nullable": true
+          },
+          "uniqueKeyFieldName": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -44005,6 +44546,53 @@
           "sortOrder": {
             "type": "integer",
             "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "JsonNode": {
+        "required": [
+          "root"
+        ],
+        "type": "object",
+        "properties": {
+          "options": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/JsonNodeOptions"
+              }
+            ],
+            "nullable": true,
+            "readOnly": true
+          },
+          "parent": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/JsonNode"
+              }
+            ],
+            "nullable": true,
+            "readOnly": true
+          },
+          "root": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/JsonNode"
+              }
+            ],
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "JsonNodeOptions": {
+        "required": [
+          "propertyNameCaseInsensitive"
+        ],
+        "type": "object",
+        "properties": {
+          "propertyNameCaseInsensitive": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -46563,6 +47151,30 @@
               "oneOf": [
                 {
                   "$ref": "#/components/schemas/AllowedMediaTypeModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "PagedAllowedMemberTypeModel": {
+        "required": [
+          "items",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/AllowedMemberTypeModel"
                 }
               ]
             }
