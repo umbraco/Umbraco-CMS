@@ -47,7 +47,8 @@ public class UserSettingsFactory : IUserSettingsFactory
     public UserSettingsFactory(
         IOptions<UserPasswordConfigurationSettings> securitySettings,
         ILocalizedTextService localizedTextService)
-        : this(StaticServiceProvider.Instance.GetRequiredService<IOptions<SecuritySettings>>(),
+        : this(
+              StaticServiceProvider.Instance.GetRequiredService<IOptions<SecuritySettings>>(),
               localizedTextService)
         {
     }
