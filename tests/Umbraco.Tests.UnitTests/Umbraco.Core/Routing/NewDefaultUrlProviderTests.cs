@@ -62,7 +62,7 @@ public class NewDefaultUrlProviderTests
                 .ReturnsAsync(() => DefaultCulture);
         }
 
-        public NewDefaultUrlProvider CreateProvider()
+        public DefaultUrlProvider CreateProvider()
         {
             var hostingEnv = new Mock<IHostingEnvironment>();
             hostingEnv.Setup(x => x.ApplicationVirtualPath).Returns("/");
@@ -71,9 +71,9 @@ public class NewDefaultUrlProviderTests
             var optionsMonitor = new Mock<IOptionsMonitor<RequestHandlerSettings>>();
             optionsMonitor.Setup(x => x.CurrentValue).Returns(RequestConfig);
 
-            return new NewDefaultUrlProvider(
+            return new DefaultUrlProvider(
                 optionsMonitor.Object,
-                Mock.Of<ILogger<NewDefaultUrlProvider>>(),
+                Mock.Of<ILogger<DefaultUrlProvider>>(),
                 SiteDomainMapper.Object,
                 UmbracoContextAccessor.Object,
                 uriUtility,
