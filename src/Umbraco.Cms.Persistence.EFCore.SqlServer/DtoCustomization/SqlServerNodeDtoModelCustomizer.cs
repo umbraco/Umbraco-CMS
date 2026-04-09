@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore;
 
@@ -10,7 +11,7 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.DtoCustomization;
 /// </summary>
 public class SqlServerNodeDtoModelCustomizer : IEFCoreModelCustomizer<NodeDto>
 {
-    public string? ProviderName => "Microsoft.EntityFrameworkCore.SqlServer";
+    public string? ProviderName => Constants.ProviderNames.SQLServer;
 
     public void Customize(EntityTypeBuilder<NodeDto> builder)
     {
