@@ -210,7 +210,7 @@ export class UmbUserInputElement extends UmbFormControlMixin<string, typeof UmbL
 	#renderRemainingCount() {
 		if (!this.remainingCount) return nothing;
 		return html`<div class="remaining-count">
-			${this.localize.term('user_andMore', this.remainingCount)} - <i>${this.localize.term('user_noteMessage')}</i>
+			${this.localize.term('user_andMore', this.remainingCount)} - <i>${this.localize.term('user_usersNotManagedFromGroup')}</i>
 		</div>`;
 	}
 

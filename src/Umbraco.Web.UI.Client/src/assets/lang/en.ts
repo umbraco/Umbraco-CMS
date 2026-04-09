@@ -2230,7 +2230,7 @@ export default {
 		addUsersToGroupError: 'Could not add users to the group.',
 		removeUsersFromGroupError: 'Could not remove users from the group.',
 		andMore: 'and %0% more',
-		noteMessage: 'not manageable from this screen.',
+		usersNotManagedFromGroup: 'not manageable from this screen.',
 	},
 	validation: {
 		validation: 'Validation',
