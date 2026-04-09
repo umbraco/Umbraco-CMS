@@ -98,9 +98,10 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
             => GetUrlSegment(content, culture, Guid.Parse(SubPage2Key), Guid.Parse(SubSubPage2Key));
     }
 
+    [SetUp]
     public override async Task Setup()
     {
-        DocumentUrlService.InitAsync(false, CancellationToken.None).GetAwaiter().GetResult();
+        await DocumentUrlService.InitAsync(false, CancellationToken.None);
         await base.Setup();
     }
 
@@ -821,7 +822,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
             new PublishedDocumentUrlSegment
             {
                 DocumentKey = key,
-                NullableLanguageId = null,
+                LanguageId = null,
                 IsDraft = true,
                 UrlSegment = "test-segment",
                 IsPrimary = true,
@@ -829,7 +830,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
             new PublishedDocumentUrlSegment
             {
                 DocumentKey = key,
-                NullableLanguageId = null,
+                LanguageId = null,
                 IsDraft = false,
                 UrlSegment = "test-segment",
                 IsPrimary = true,
