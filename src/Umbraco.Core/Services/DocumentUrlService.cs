@@ -210,7 +210,7 @@ public class DocumentUrlService : IDocumentUrlService
             keyValueService,
             idKeyMap,
             documentNavigationQueryService,
-            (IDocumentPublishStatusQueryService)publishStatusQueryService,
+            StaticServiceProvider.Instance.GetRequiredService<IDocumentPublishStatusQueryService>(),
             domainCacheService,
             defaultCultureAccessor)
     {

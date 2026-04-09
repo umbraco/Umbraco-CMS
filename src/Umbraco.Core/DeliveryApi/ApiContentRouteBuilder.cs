@@ -57,7 +57,7 @@ public sealed class ApiContentRouteBuilder : IApiContentRouteBuilder
             requestSettings,
             contentCache,
             navigationQueryService,
-            (IDocumentPublishStatusQueryService)publishStatusQueryService,
+            StaticServiceProvider.Instance.GetRequiredService<IDocumentPublishStatusQueryService>(),
             documentUrlService)
     {
     }
