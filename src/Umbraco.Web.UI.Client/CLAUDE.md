@@ -9,7 +9,8 @@ TypeScript/Lit web components library for the Umbraco CMS backoffice. Published 
 - **[Entities](./docs/entities.md)** - Entity types, entity context, how entityType connects workspaces/trees/actions/routing
 - **[Workspaces](./docs/workspaces.md)** - Workspace types, base classes, extension points, workspace contexts, save flow, routing
 - **[Core Primitives](./docs/core-primitives.md)** - UmbLitElement, observable state (UmbArrayState, UmbObjectState, etc.), Context API, controller lifecycle
-- **[Data Flow](./docs/data-flow.md)** - Repository pattern, data sources, tryExecute, generated API clients, stores, complete worked example
+- **[Data Flow](./docs/data-flow.md)** - Data flow chain, data sources, tryExecute, generated API clients, stores, complete worked example
+- **[Repositories](./docs/repositories.md)** - Repository categories (detail, item, tree, collection, action-specific), file structure, naming, extension registration, data source delegation
 - **[Package Development](./docs/package-development.md)** - Package & module structure, folder structure conventions, localization, organizational rules
 
 ### Development
@@ -122,7 +123,7 @@ Why: Normalizes to conventional semver format
   "peerDependencies": {
     "lit": "^3.3.1",
     "rxjs": "^7.8.2",
-    "@umbraco-ui/uui": "^1.17.0-rc.5",
+    "@umbraco-ui/uui": "^2.0.0-alpha.1",
     "monaco-editor": "^0.55.1",
     "@tiptap/core": "^3.16.0",
     "@hey-api/openapi-ts": ">=0.85.0 <1.0.0"
