@@ -123,7 +123,7 @@ Why: Normalizes to conventional semver format
   "peerDependencies": {
     "lit": "^3.3.1",
     "rxjs": "^7.8.2",
-    "@umbraco-ui/uui": "^1.17.0-rc.5",
+    "@umbraco-ui/uui": "^2.0.0-alpha.1",
     "monaco-editor": "^0.55.1",
     "@tiptap/core": "^3.16.0",
     "@hey-api/openapi-ts": ">=0.85.0 <1.0.0"

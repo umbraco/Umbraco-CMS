@@ -5,11 +5,11 @@ import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
-import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { UUIFormControlWithBasicsMixin } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbRepositoryItemsStatus } from '@umbraco-cms/backoffice/repository';
 
 @customElement('umb-input-language')
-export class UmbInputLanguageElement extends UUIFormControlMixin(UmbLitElement, '') {
+export class UmbInputLanguageElement extends UUIFormControlWithBasicsMixin(UmbLitElement, '') {
 	#sorter = new UmbSorterController<string>(this, {
 		getUniqueOfElement: (element) => {
 			return element.id;
