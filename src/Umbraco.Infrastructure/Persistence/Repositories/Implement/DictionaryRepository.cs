@@ -406,14 +406,11 @@ internal sealed class DictionaryRepository : AsyncEntityRepositoryBase<Guid, IDi
     {
         await AmbientScope.ExecuteWithContextAsync(async db =>
         {
-            var allDescendants = new List<DictionaryDto>();
-            await CollectDescendantsAsync(entity.Key, db, allDescendants);
-
-            // Remove in reverse order to not mess up foreign key constraints
-            allDescendants.Reverse();
-            db.DictionaryEntries.RemoveRange(allDescendants);
+            var keysToInvalidate = new List<string>();
+            await MarkDescendantsForDeletion(entity.Key, db, keysToInvalidate);
 
             DictionaryDto? dto = await db.DictionaryEntries
+                .Include(x => x.LanguageText)
                 .FirstOrDefaultAsync(x => x.UniqueId == entity.Key);
 
             if (dto is not null)
@@ -423,9 +420,9 @@ internal sealed class DictionaryRepository : AsyncEntityRepositoryBase<Guid, IDi
 
             await db.SaveChangesAsync();
 
-            foreach (DictionaryDto descendant in allDescendants)
+            foreach (var key in keysToInvalidate)
             {
-                await _itemKeyCachePolicy.ClearByItemKeyAsync(descendant.Key);
+                await _itemKeyCachePolicy.ClearByItemKeyAsync(key);
             }
 
             return true;
@@ -500,19 +497,20 @@ internal sealed class DictionaryRepository : AsyncEntityRepositoryBase<Guid, IDi
     }
 
     /// <summary>
-    /// Recursively collects all descendant dictionary entries of the specified parent.
+    /// Recursively loads and marks all descendants for deletion.
     /// </summary>
-    private static async Task CollectDescendantsAsync(Guid parentId, UmbracoDbContext db, List<DictionaryDto> result)
+    private static async Task MarkDescendantsForDeletion(Guid parentId, UmbracoDbContext db, List<string> keysToInvalidate)
     {
         List<DictionaryDto> children = await db.DictionaryEntries
+            .Include(x => x.LanguageText)
             .Where(x => x.Parent == parentId)
             .ToListAsync();
 
-        result.AddRange(children);
-
         foreach (DictionaryDto child in children)
         {
-            await CollectDescendantsAsync(child.UniqueId, db, result);
+            await MarkDescendantsForDeletion(child.UniqueId, db, keysToInvalidate);
+            db.DictionaryEntries.Remove(child);
+            keysToInvalidate.Add(child.Key);
         }
     }
 
