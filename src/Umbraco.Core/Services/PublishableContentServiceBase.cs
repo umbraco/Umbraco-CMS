@@ -13,17 +13,13 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
-// TODO ELEMENTS: ensure this implementation is up to date with the current state of ContentService
-// TODO ELEMENTS: everything structural (children, ancestors, descendants, branches, sort) should be omitted from this base
-// TODO ELEMENTS: replace all "document" with "content" (variables, names and comments)
-// TODO ELEMENTS: rename _documentRepository to _contentRepository
 // TODO ELEMENTS: looks like a lot of methods here are only used for the IContentService; check all (public) methods and move them accordingly
 public abstract class PublishableContentServiceBase<TContent> : RepositoryService, IPublishableContentService<TContent>
     where TContent : class, IPublishableContentBase
 {
     private readonly IAuditService _auditService;
     private readonly IContentTypeRepository _contentTypeRepository;
-    private readonly IPublishableContentRepository<TContent> _documentRepository;
+    private readonly IPublishableContentRepository<TContent> _contentRepository;
     private readonly ILanguageRepository _languageRepository;
     private readonly Lazy<IPropertyValidationService> _propertyValidationService;
     private readonly ICultureImpactFactory _cultureImpactFactory;
@@ -48,7 +44,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
     {
         _auditService = auditService;
         _contentTypeRepository = contentTypeRepository;
-        _documentRepository = contentRepository;
+        _contentRepository = contentRepository;
         _languageRepository = languageRepository;
         _propertyValidationService = propertyValidationService;
         _cultureImpactFactory = cultureImpactFactory;
@@ -67,14 +63,14 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
 
     protected abstract ILogger<PublishableContentServiceBase<TContent>> Logger { get; }
 
-    protected virtual PublishResult CommitDocumentChanges(
+    protected virtual PublishResult CommitContentChanges(
         ICoreScope scope,
         TContent content,
         EventMessages eventMessages,
         IReadOnlyCollection<ILanguage> allLangs,
         IDictionary<string, object?>? notificationState,
         int userId)
-        => CommitDocumentChangesInternal(scope, content, eventMessages, allLangs, notificationState, userId);
+        => CommitContentChangesInternal(scope, content, eventMessages, allLangs, notificationState, userId);
 
     protected abstract void DeleteLocked(ICoreScope scope, TContent content, EventMessages evtMsgs);
 
@@ -181,7 +177,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             scope.ReadLock(ReadLockIds);
-            return _documentRepository.CountPublished(contentTypeAlias);
+            return _contentRepository.CountPublished(contentTypeAlias);
         }
     }
 
@@ -195,7 +191,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             scope.ReadLock(ReadLockIds);
-            return _documentRepository.Count(contentTypeAlias);
+            return _contentRepository.Count(contentTypeAlias);
         }
     }
 
@@ -210,7 +206,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             scope.ReadLock(ReadLockIds);
-            return _documentRepository.CountChildren(parentId, contentTypeAlias);
+            return _contentRepository.CountChildren(parentId, contentTypeAlias);
         }
     }
 
@@ -225,7 +221,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             scope.ReadLock(ReadLockIds);
-            return _documentRepository.CountDescendants(parentId, contentTypeAlias);
+            return _contentRepository.CountDescendants(parentId, contentTypeAlias);
         }
     }
 
@@ -245,7 +241,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             scope.ReadLock(ReadLockIds);
-            return _documentRepository.Get(id);
+            return _contentRepository.Get(id);
         }
     }
 
@@ -267,7 +263,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             scope.ReadLock(ReadLockIds);
-            IEnumerable<TContent> items = _documentRepository.GetMany(idsA);
+            IEnumerable<TContent> items = _contentRepository.GetMany(idsA);
             var index = items.ToDictionary(x => x.Id, x => x);
             return idsA.Select(x => index.GetValueOrDefault(x)).WhereNotNull();
         }
@@ -279,7 +275,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             scope.ReadLock(ReadLockIds);
-            return _documentRepository.Get(key);
+            return _contentRepository.Get(key);
         }
     }
 
@@ -289,7 +285,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             scope.ReadLock(ReadLockIds);
-            return _documentRepository.GetContentSchedule(contentId);
+            return _contentRepository.GetContentSchedule(contentId);
         }
     }
 
@@ -329,7 +325,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         scope.ReadLock(ReadLockIds);
 
         IDictionary<int, IEnumerable<ContentSchedule>> intKeyedResults =
-            _documentRepository.GetContentSchedulesByIds(intToKeyMap.Keys.ToArray());
+            _contentRepository.GetContentSchedulesByIds(intToKeyMap.Keys.ToArray());
 
         var guidKeyedResults = new Dictionary<Guid, IEnumerable<ContentSchedule>>(intKeyedResults.Count);
         foreach (KeyValuePair<int, IEnumerable<ContentSchedule>> entry in intKeyedResults)
@@ -349,7 +345,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             scope.WriteLock(WriteLockIds);
-            _documentRepository.PersistContentSchedule(content, contentSchedule);
+            _contentRepository.PersistContentSchedule(content, contentSchedule);
             scope.Complete();
         }
     }
@@ -366,7 +362,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             scope.ReadLock(ReadLockIds);
-            IEnumerable<TContent>? items = _documentRepository.GetMany(idsA);
+            IEnumerable<TContent>? items = _contentRepository.GetMany(idsA);
 
             if (items is not null)
             {
@@ -403,7 +399,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             scope.ReadLock(ReadLockIds);
-            return _documentRepository.GetPage(
+            return _contentRepository.GetPage(
                 Query<TContent>()?.Where(x => x.ContentTypeId == contentTypeId),
                 pageIndex,
                 pageSize,
@@ -436,7 +432,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
             List<int> contentTypeIdsAsList = [.. contentTypeIds];
 
             scope.ReadLock(ReadLockIds);
-            return _documentRepository.GetPage(
+            return _contentRepository.GetPage(
                 Query<TContent>()?.Where(x => contentTypeIdsAsList.Contains(x.ContentTypeId)),
                 pageIndex,
                 pageSize,
@@ -453,7 +449,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             scope.ReadLock(ReadLockIds);
-            return _documentRepository.GetVersion(versionId);
+            return _contentRepository.GetVersion(versionId);
         }
     }
 
@@ -463,7 +459,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             scope.ReadLock(ReadLockIds);
-            return _documentRepository.GetAllVersions(id);
+            return _contentRepository.GetAllVersions(id);
         }
     }
 
@@ -473,7 +469,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             scope.ReadLock(ReadLockIds);
-            return _documentRepository.GetAllVersionsSlim(id, skip, take);
+            return _contentRepository.GetAllVersionsSlim(id, skip, take);
         }
     }
 
@@ -482,7 +478,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
     {
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
-            return _documentRepository.GetVersionIds(id, maxRows);
+            return _contentRepository.GetVersionIds(id, maxRows);
         }
     }
 
@@ -499,7 +495,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             scope.ReadLock(ReadLockIds);
-            return _documentRepository.GetContentForExpiration(date);
+            return _contentRepository.GetContentForExpiration(date);
         }
     }
 
@@ -516,14 +512,14 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             scope.ReadLock(ReadLockIds);
-            return _documentRepository.GetContentForRelease(date);
+            return _contentRepository.GetContentForRelease(date);
         }
     }
 
     /// <summary>
-    ///     Checks whether an <see cref="IContent" /> item has any children
+    ///     Checks whether an <see cref="TContent" /> item has any children
     /// </summary>
-    /// <param name="id">Id of the <see cref="IContent" /></param>
+    /// <param name="id">Id of the <see cref="TContent" /></param>
     /// <returns>True if the content has any children otherwise False</returns>
     public bool HasChildren(int id) => CountChildren(id) > 0;
 
@@ -537,7 +533,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             scope.ReadLock(ReadLockIds);
-            return _documentRepository.IsPathPublished(content);
+            return _contentRepository.IsPathPublished(content);
         }
     }
 
@@ -608,11 +604,11 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
             // tracking enabled on all values on the Property which doesn't allow us to know which variants have changed.
             // in this particular case, determining which cultures have changed works with the above with names since it will
             // have always changed if it's been saved in the back office but that's not really fail safe.
-            _documentRepository.Save(content);
+            _contentRepository.Save(content);
 
             if (contentSchedule != null)
             {
-                _documentRepository.PersistContentSchedule(content, contentSchedule);
+                _contentRepository.PersistContentSchedule(content, contentSchedule);
             }
 
             scope.Notifications.Publish(SavedNotification(content, eventMessages).WithStateFrom(savingNotification));
@@ -669,7 +665,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
 
                 content.WriterId = userId;
 
-                _documentRepository.Save(content);
+                _contentRepository.Save(content);
             }
 
             scope.Notifications.Publish(SavedNotification(contentsA, eventMessages).WithStateFrom(savingNotification));
@@ -723,7 +719,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         if (publishedState != PublishedState.Published && publishedState != PublishedState.Unpublished)
         {
             throw new InvalidOperationException(
-                $"Cannot save-and-publish (un)publishing content, use the dedicated {nameof(CommitDocumentChanges)} method.");
+                $"Cannot save-and-publish (un)publishing content, use the dedicated {nameof(CommitContentChanges)} method.");
         }
 
         // cannot accept invariant (null or empty) culture for variant content type
@@ -769,7 +765,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
             // Change state to publishing
             content.PublishedState = PublishedState.Publishing;
 
-            PublishResult result = CommitDocumentChanges(scope, content, evtMsgs, allLangs, new Dictionary<string, object?>(), userId);
+            PublishResult result = CommitContentChanges(scope, content, evtMsgs, allLangs, new Dictionary<string, object?>(), userId);
             scope.Complete();
             return result;
         }
@@ -791,7 +787,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         if (publishedState != PublishedState.Published && publishedState != PublishedState.Unpublished)
         {
             throw new InvalidOperationException(
-                $"Cannot save-and-publish (un)publishing content, use the dedicated {nameof(CommitDocumentChanges)} method.");
+                $"Cannot save-and-publish (un)publishing content, use the dedicated {nameof(CommitContentChanges)} method.");
         }
 
         // cannot accept invariant (null or empty) culture for variant content type
@@ -833,26 +829,26 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
             // all cultures = unpublish whole
             if (culture == "*" || (!content.ContentType.VariesByCulture() && culture == null))
             {
-                // Unpublish the culture, this will change the document state to Publishing! ... which is expected because this will
-                // essentially be re-publishing the document with the requested culture removed
+                // Unpublish the culture, this will change the content state to Publishing! ... which is expected because this will
+                // essentially be re-publishing the content with the requested culture removed
                 // We are however unpublishing all cultures, so we will set this to unpublishing.
                 content.UnpublishCulture(culture);
                 content.PublishedState = PublishedState.Unpublishing;
-                PublishResult result = CommitDocumentChanges(scope, content, evtMsgs, allLangs, savingNotification.State, userId);
+                PublishResult result = CommitContentChanges(scope, content, evtMsgs, allLangs, savingNotification.State, userId);
                 scope.Complete();
                 return result;
             }
             else
             {
-                // Unpublish the culture, this will change the document state to Publishing! ... which is expected because this will
-                // essentially be re-publishing the document with the requested culture removed.
-                // The call to CommitDocumentChangesInternal will perform all the checks like if this is a mandatory culture or the last culture being unpublished
-                // and will then unpublish the document accordingly.
+                // Unpublish the culture, this will change the content state to Publishing! ... which is expected because this will
+                // essentially be re-publishing the content with the requested culture removed.
+                // The call to CommitContentChangesInternal will perform all the checks like if this is a mandatory culture or the last culture being unpublished
+                // and will then unpublish the content accordingly.
                 // If the result of this is false it means there was no culture to unpublish (i.e. it was already unpublished or it did not exist)
                 var removed = content.UnpublishCulture(culture);
 
                 // Save and publish any changes
-                PublishResult result = CommitDocumentChanges(scope, content, evtMsgs, allLangs, savingNotification.State, userId);
+                PublishResult result = CommitContentChanges(scope, content, evtMsgs, allLangs, savingNotification.State, userId);
 
                 scope.Complete();
 
@@ -887,14 +883,14 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
         // do a fast read without any locks since this executes often to see if we even need to proceed
-        if (_documentRepository.HasContentForExpiration(date))
+        if (_contentRepository.HasContentForExpiration(date))
         {
             // now take a write lock since we'll be updating
             scope.WriteLock(WriteLockIds);
 
-            foreach (TContent d in _documentRepository.GetContentForExpiration(date))
+            foreach (TContent d in _contentRepository.GetContentForExpiration(date))
             {
-                ContentScheduleCollection contentSchedule = _documentRepository.GetContentSchedule(d.Id);
+                ContentScheduleCollection contentSchedule = _contentRepository.GetContentSchedule(d.Id);
                 if (d.ContentType.VariesByCulture())
                 {
                     // find which cultures have pending schedules
@@ -905,7 +901,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
 
                     if (pendingCultures.Count == 0)
                     {
-                        continue; // shouldn't happen but no point in processing this document if there's nothing there
+                        continue; // shouldn't happen but no point in processing this content if there's nothing there
                     }
 
                     SavingNotification<TContent> savingNotification = SavingNotification(d, evtMsgs);
@@ -924,11 +920,11 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
                         d.UnpublishCulture(c);
                     }
 
-                    _documentRepository.PersistContentSchedule(d, contentSchedule);
-                    PublishResult result = CommitDocumentChanges(scope, d, evtMsgs, allLangs.Value, savingNotification.State, d.WriterId);
+                    _contentRepository.PersistContentSchedule(d, contentSchedule);
+                    PublishResult result = CommitContentChanges(scope, d, evtMsgs, allLangs.Value, savingNotification.State, d.WriterId);
                     if (result.Success == false)
                     {
-                        Logger.LogError(null, "Failed to publish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
+                        Logger.LogError(null, "Failed to publish content id={ContentId}, reason={Reason}.", d.Id, result.Result);
                     }
 
                     results.Add(result);
@@ -937,18 +933,18 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
                 {
                     // Clear this schedule for this culture
                     contentSchedule.Clear(ContentScheduleAction.Expire, date);
-                    _documentRepository.PersistContentSchedule(d, contentSchedule);
+                    _contentRepository.PersistContentSchedule(d, contentSchedule);
                     PublishResult result = Unpublish(d, userId: d.WriterId);
                     if (result.Success == false)
                     {
-                        Logger.LogError(null, "Failed to unpublish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
+                        Logger.LogError(null, "Failed to unpublish content id={ContentId}, reason={Reason}.", d.Id, result.Result);
                     }
 
                     results.Add(result);
                 }
             }
 
-            _documentRepository.ClearSchedule(date, ContentScheduleAction.Expire);
+            _contentRepository.ClearSchedule(date, ContentScheduleAction.Expire);
         }
 
         scope.Complete();
@@ -959,14 +955,14 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
         // do a fast read without any locks since this executes often to see if we even need to proceed
-        if (_documentRepository.HasContentForRelease(date))
+        if (_contentRepository.HasContentForRelease(date))
         {
             // now take a write lock since we'll be updating
             scope.WriteLock(WriteLockIds);
 
-            foreach (TContent d in _documentRepository.GetContentForRelease(date))
+            foreach (TContent d in _contentRepository.GetContentForRelease(date))
             {
-                ContentScheduleCollection contentSchedule = _documentRepository.GetContentSchedule(d.Id);
+                ContentScheduleCollection contentSchedule = _contentRepository.GetContentSchedule(d.Id);
                 if (d.ContentType.VariesByCulture())
                 {
                     // find which cultures have pending schedules
@@ -977,7 +973,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
 
                     if (pendingCultures.Count == 0)
                     {
-                        continue; // shouldn't happen but no point in processing this document if there's nothing there
+                        continue; // shouldn't happen but no point in processing this content if there's nothing there
                     }
                     SavingNotification<TContent> savingNotification = SavingNotification(d, evtMsgs);
                     if (scope.Notifications.PublishCancelable(savingNotification))
@@ -1006,7 +1002,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
                         if (invalidProperties != null && invalidProperties.Length > 0)
                         {
                             Logger.LogWarning(
-                                "Scheduled publishing will fail for document {DocumentId} and culture {Culture} because of invalid properties {InvalidProperties}",
+                                "Scheduled publishing will fail for content {ContentId} and culture {Culture} because of invalid properties {InvalidProperties}",
                                 d.Id,
                                 culture,
                                 string.Join(",", invalidProperties.Select(x => x.Alias)));
@@ -1030,13 +1026,13 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
                     }
                     else
                     {
-                        _documentRepository.PersistContentSchedule(d, contentSchedule);
-                        result = CommitDocumentChanges(scope, d, evtMsgs, allLangs.Value, savingNotification.State, d.WriterId);
+                        _contentRepository.PersistContentSchedule(d, contentSchedule);
+                        result = CommitContentChanges(scope, d, evtMsgs, allLangs.Value, savingNotification.State, d.WriterId);
                     }
 
                     if (result.Success == false)
                     {
-                        Logger.LogError(null, "Failed to publish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
+                        Logger.LogError(null, "Failed to publish content id={ContentId}, reason={Reason}.", d.Id, result.Result);
                     }
 
                     results.Add(result);
@@ -1054,27 +1050,27 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
                     }
                     else
                     {
-                        _documentRepository.PersistContentSchedule(d, contentSchedule);
+                        _contentRepository.PersistContentSchedule(d, contentSchedule);
                         result = Publish(d, d.AvailableCultures.ToArray(), userId: d.WriterId);
                     }
 
                     if (result.Success == false)
                     {
-                        Logger.LogError(null, "Failed to publish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
+                        Logger.LogError(null, "Failed to publish content id={ContentId}, reason={Reason}.", d.Id, result.Result);
                     }
 
                     results.Add(result);
                 }
             }
 
-            _documentRepository.ClearSchedule(date, ContentScheduleAction.Release);
+            _contentRepository.ClearSchedule(date, ContentScheduleAction.Release);
         }
 
         scope.Complete();
     }
 
     /// <summary>
-    ///     Handles a lot of business logic cases for how the document should be persisted
+    ///     Handles a lot of business logic cases for how the content should be persisted
     /// </summary>
     /// <param name="scope"></param>
     /// <param name="content"></param>
@@ -1093,7 +1089,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
     ///         saving/publishing, branch saving/publishing, etc...
     ///     </para>
     /// </remarks>
-    protected PublishResult CommitDocumentChangesInternal(
+    protected PublishResult CommitContentChangesInternal(
         ICoreScope scope,
         TContent content,
         EventMessages eventMessages,
@@ -1146,8 +1142,8 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         TreeChangeTypes changeType = isNew || SupportsBranchPublishing is false ? TreeChangeTypes.RefreshNode : TreeChangeTypes.RefreshBranch;
         var previouslyPublished = content.HasIdentity && content.Published;
 
-        // Inline method to persist the document with the documentRepository since this logic could be called a couple times below
-        void SaveDocument(TContent c)
+        // Inline method to persist the content with the contentRepository since this logic could be called a couple times below
+        void SaveContent(TContent c)
         {
             // save, always
             if (c.HasIdentity == false)
@@ -1158,7 +1154,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
             c.WriterId = userId;
 
             // saving does NOT change the published version, unless PublishedState is Publishing or Unpublishing
-            _documentRepository.Save(c);
+            _contentRepository.Save(c);
         }
 
         if (publishing)
@@ -1169,7 +1165,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
                 ? content.PublishCultureInfos?.Values.Where(x => x.IsDirty()).Select(x => x.Culture).ToList()
                 : null;
 
-            // ensure that the document can be published, and publish handling events, business rules, etc
+            // ensure that the content can be published, and publish handling events, business rules, etc
             publishResult = StrategyCanPublish(
                 scope,
                 content, /*checkPath:*/
@@ -1186,23 +1182,23 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
                 if (scope.Notifications.PublishCancelable(
                         PublishingNotification(content, eventMessages).WithState(notificationState)))
                 {
-                    Logger.LogInformation("Document {ContentName} (id={ContentId}) cannot be published: {Reason}", content.Name, content.Id, "publishing was cancelled");
+                    Logger.LogInformation("Content {ContentName} (id={ContentId}) cannot be published: {Reason}", content.Name, content.Id, "publishing was cancelled");
                     return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, eventMessages, content);
                 }
 
                 // note: StrategyPublish flips the PublishedState to Publishing!
                 publishResult = StrategyPublish(content, culturesPublishing, culturesUnpublishing, eventMessages);
 
-                // Check if a culture has been unpublished and if there are no cultures left, and then unpublish document as a whole
+                // Check if a culture has been unpublished and if there are no cultures left, and then unpublish content as a whole
                 if (publishResult.Result == PublishResultType.SuccessUnpublishCulture &&
                     content.PublishCultureInfos?.Count == 0)
                 {
                     // This is a special case! We are unpublishing the last culture and to persist that we need to re-publish without any cultures
-                    // so the state needs to remain Publishing to do that. However, we then also need to unpublish the document and to do that
-                    // the state needs to be Unpublishing and it cannot be both. This state is used within the documentRepository to know how to
+                    // so the state needs to remain Publishing to do that. However, we then also need to unpublish the content and to do that
+                    // the state needs to be Unpublishing and it cannot be both. This state is used within the contentRepository to know how to
                     // persist certain things. So before proceeding below, we need to save the Publishing state to publish no cultures, then we can
-                    // mark the document for Unpublishing.
-                    SaveDocument(content);
+                    // mark the content for Unpublishing.
+                    SaveContent(content);
 
                     // Set the flag to unpublish and continue
                     unpublishing = content.Published; // if not published yet, nothing to do
@@ -1216,7 +1212,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
                     return publishResult;
                 }
 
-                // Check for mandatory culture missing, and then unpublish document as a whole
+                // Check for mandatory culture missing, and then unpublish content as a whole
                 if (publishResult.Result == PublishResultType.FailedPublishMandatoryCultureMissing)
                 {
                     publishing = false;
@@ -1227,7 +1223,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
                 }
 
                 // reset published state from temp values (publishing, unpublishing) to original value
-                // (published, unpublished) in order to save the document, unchanged - yes, this is odd,
+                // (published, unpublished) in order to save the content, unchanged - yes, this is odd,
                 // but: (a) it means we don't reproduce the PublishState logic here and (b) setting the
                 // PublishState to anything other than Publishing or Unpublishing - which is precisely
                 // what we want to do here - throws
@@ -1246,10 +1242,10 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
 
             if (content.Published)
             {
-                // ensure that the document can be unpublished, and unpublish
+                // ensure that the content can be unpublished, and unpublish
                 // handling events, business rules, etc
                 // note: StrategyUnpublish flips the PublishedState to Unpublishing!
-                // note: This unpublishes the entire document (not different variants)
+                // note: This unpublishes the entire content (not different variants)
                 unpublishResult = StrategyCanUnpublish(scope, content, eventMessages, notificationState);
                 if (unpublishResult.Success)
                 {
@@ -1258,7 +1254,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
                 else
                 {
                     // reset published state from temp values (publishing, unpublishing) to original value
-                    // (published, unpublished) in order to save the document, unchanged - yes, this is odd,
+                    // (published, unpublished) in order to save the content, unchanged - yes, this is odd,
                     // but: (a) it means we don't reproduce the PublishState logic here and (b) setting the
                     // PublishState to anything other than Publishing or Unpublishing - which is precisely
                     // what we want to do here - throws
@@ -1275,8 +1271,8 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
             }
         }
 
-        // Persist the document
-        SaveDocument(content);
+        // Persist the content
+        SaveContent(content);
 
         // we have tried to unpublish - won't happen in a branch
         if (unpublishing)
@@ -1307,7 +1303,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
                     switch (publishResult.Result)
                     {
                         case PublishResultType.FailedPublishMandatoryCultureMissing:
-                            // Occurs when a mandatory culture was unpublished (which means we tried publishing the document without a mandatory culture)
+                            // Occurs when a mandatory culture was unpublished (which means we tried publishing the content without a mandatory culture)
 
                             // Log that the whole content item has been unpublished due to mandatory culture unpublished
                             Audit(AuditType.Unpublish, userId, content.Id, "Unpublished (mandatory language unpublished)");
@@ -1486,7 +1482,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
                 return;
             }
 
-            _documentRepository.DeleteVersions(id, versionDate);
+            _contentRepository.DeleteVersions(id, versionDate);
 
             scope.Notifications.Publish(
                 new ContentDeletedVersionsNotification(id, evtMsgs, dateToRetain: versionDate).WithStateFrom(
@@ -1525,13 +1521,13 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
                 DeleteVersions(id, content?.UpdateDate ?? DateTime.UtcNow, userId);
             }
 
-            TContent? c = _documentRepository.Get(id);
+            TContent? c = _contentRepository.Get(id);
 
             // don't delete the current or published version
             if (c?.VersionId != versionId &&
                 c?.PublishedVersionId != versionId)
             {
-                _documentRepository.DeleteVersion(versionId);
+                _contentRepository.DeleteVersion(versionId);
             }
 
             scope.Notifications.Publish(
@@ -1561,7 +1557,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
 
         scope.WriteLock(WriteLockIds);
 
-        ContentDataIntegrityReport report = _documentRepository.CheckDataIntegrity(options);
+        ContentDataIntegrityReport report = _contentRepository.CheckDataIntegrity(options);
 
         if (report.FixedIssues.Count > 0)
         {
@@ -1582,7 +1578,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         var pathMatch = content.Path + ",";
         IQuery<TContent> query = Query<TContent>()
             .Where(x => x.Id != content.Id && x.Path.StartsWith(pathMatch) /*&& culture.Trashed == false*/);
-        IEnumerable<TContent> contents = _documentRepository.Get(query);
+        IEnumerable<TContent> contents = _contentRepository.Get(query);
 
         // beware! contents contains all published version below content
         // including those that are not directly published because below an unpublished content
@@ -1686,7 +1682,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
     #region Publishing Strategies
 
     /// <summary>
-    ///     Ensures that a document can be published
+    ///     Ensures that a content item can be published
     /// </summary>
     /// <param name="scope"></param>
     /// <param name="content"></param>
@@ -1736,7 +1732,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
             };
         }
 
-        // Check if mandatory languages fails, if this fails it will mean anything that the published flag on the document will
+        // Check if mandatory languages fails, if this fails it will mean anything that the published flag on the content will
         // be changed to Unpublished and any culture currently published will not be visible.
         if (variesByCulture)
         {
@@ -1769,24 +1765,24 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
             }
         }
 
-        // ensure that the document has published values
+        // ensure that the content has published values
         // either because it is 'publishing' or because it already has a published version
         if (content.PublishedState != PublishedState.Publishing && content.PublishedVersionId == 0)
         {
             Logger.LogInformation(
-                "Document {ContentName} (id={ContentId}) cannot be published: {Reason}",
+                "Content {ContentName} (id={ContentId}) cannot be published: {Reason}",
                 content.Name,
                 content.Id,
-                "document does not have published values");
+                "content does not have published values");
             return new PublishResult(PublishResultType.FailedPublishNothingToPublish, evtMsgs, content);
         }
 
-        ContentScheduleCollection contentSchedule = _documentRepository.GetContentSchedule(content.Id);
+        ContentScheduleCollection contentSchedule = _contentRepository.GetContentSchedule(content.Id);
 
         // loop over each culture publishing - or InvariantCulture for invariant
         foreach (var culture in culturesPublishing ?? new[] { Constants.System.InvariantCulture })
         {
-            // ensure that the document status is correct
+            // ensure that the content status is correct
             // note: culture will be string.Empty for invariant
             switch (content.GetStatus(contentSchedule, culture))
             {
@@ -1794,12 +1790,12 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
                     if (!variesByCulture)
                     {
                         Logger.LogInformation(
-                            "Document {ContentName} (id={ContentId}) cannot be published: {Reason}", content.Name, content.Id, "document has expired");
+                            "Content {ContentName} (id={ContentId}) cannot be published: {Reason}", content.Name, content.Id, "content has expired");
                     }
                     else
                     {
                         Logger.LogInformation(
-                            "Document {ContentName} (id={ContentId}) culture {Culture} cannot be published: {Reason}", content.Name, content.Id, culture, "document culture has expired");
+                            "Content {ContentName} (id={ContentId}) culture {Culture} cannot be published: {Reason}", content.Name, content.Id, culture, "content culture has expired");
                     }
 
                     return new PublishResult(
@@ -1812,19 +1808,19 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
                     if (!variesByCulture)
                     {
                         Logger.LogInformation(
-                            "Document {ContentName} (id={ContentId}) cannot be published: {Reason}",
+                            "Content {ContentName} (id={ContentId}) cannot be published: {Reason}",
                             content.Name,
                             content.Id,
-                            "document is awaiting release");
+                            "content is awaiting release");
                     }
                     else
                     {
                         Logger.LogInformation(
-                            "Document {ContentName} (id={ContentId}) culture {Culture} cannot be published: {Reason}",
+                            "Content {ContentName} (id={ContentId}) culture {Culture} cannot be published: {Reason}",
                             content.Name,
                             content.Id,
                             culture,
-                            "document has culture awaiting release");
+                            "content has culture awaiting release");
                     }
 
                     return new PublishResult(
@@ -1836,10 +1832,10 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
 
                 case ContentStatus.Trashed:
                     Logger.LogInformation(
-                        "Document {ContentName} (id={ContentId}) cannot be published: {Reason}",
+                        "Content {ContentName} (id={ContentId}) cannot be published: {Reason}",
                         content.Name,
                         content.Id,
-                        "document is trashed");
+                        "content is trashed");
                     return new PublishResult(PublishResultType.FailedPublishIsTrashed, evtMsgs, content);
             }
         }
@@ -1853,7 +1849,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
             if (!pathIsOk)
             {
                 Logger.LogInformation(
-                    "Document {ContentName} (id={ContentId}) cannot be published: {Reason}",
+                    "Content {ContentName} (id={ContentId}) cannot be published: {Reason}",
                     content.Name,
                     content.Id,
                     "parent is not published");
@@ -1871,7 +1867,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
     }
 
     /// <summary>
-    ///     Publishes a document
+    ///     Publishes a content item
     /// </summary>
     /// <param name="content"></param>
     /// <param name="culturesUnpublishing"></param>
@@ -1902,7 +1898,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
             if (culturesUnpublishing?.Count > 0)
             {
                 Logger.LogInformation(
-                    "Document {ContentName} (id={ContentId}) cultures: {Cultures} have been unpublished.",
+                    "Content {ContentName} (id={ContentId}) cultures: {Cultures} have been unpublished.",
                     content.Name,
                     content.Id,
                     string.Join(",", culturesUnpublishing));
@@ -1911,7 +1907,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
             if (culturesPublishing?.Count > 0)
             {
                 Logger.LogInformation(
-                    "Document {ContentName} (id={ContentId}) cultures: {Cultures} have been published.",
+                    "Content {ContentName} (id={ContentId}) cultures: {Cultures} have been published.",
                     content.Name,
                     content.Id,
                     string.Join(",", culturesPublishing));
@@ -1930,12 +1926,12 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
             return new PublishResult(PublishResultType.SuccessPublishCulture, evtMsgs, content);
         }
 
-        Logger.LogInformation("Document {ContentName} (id={ContentId}) has been published.", content.Name, content.Id);
+        Logger.LogInformation("Content {ContentName} (id={ContentId}) has been published.", content.Name, content.Id);
         return new PublishResult(evtMsgs, content);
     }
 
     /// <summary>
-    ///     Ensures that a document can be unpublished
+    ///     Ensures that a content item can be unpublished
     /// </summary>
     /// <param name="scope"></param>
     /// <param name="content"></param>
@@ -1955,7 +1951,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         if (notificationResult)
         {
             Logger.LogInformation(
-                "Document {ContentName} (id={ContentId}) cannot be unpublished: unpublishing was cancelled.", content.Name, content.Id);
+                "Content {ContentName} (id={ContentId}) cannot be unpublished: unpublishing was cancelled.", content.Name, content.Id);
             return new PublishResult(PublishResultType.FailedUnpublishCancelledByEvent, evtMsgs, content);
         }
 
@@ -1963,7 +1959,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
     }
 
     /// <summary>
-    ///     Unpublishes a document
+    ///     Unpublishes a content item
     /// </summary>
     /// <param name="content"></param>
     /// <param name="evtMsgs"></param>
@@ -1982,10 +1978,10 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
             return attempt;
         }
 
-        // if the document has any release dates set to before now,
+        // if the content has any release dates set to before now,
         // they should be removed so they don't interrupt an unpublish
         // otherwise it would remain released == published
-        ContentScheduleCollection contentSchedule = _documentRepository.GetContentSchedule(content.Id);
+        ContentScheduleCollection contentSchedule = _contentRepository.GetContentSchedule(content.Id);
         IReadOnlyList<ContentSchedule> pastReleases =
             contentSchedule.GetPending(ContentScheduleAction.Expire, DateTime.UtcNow);
         foreach (ContentSchedule p in pastReleases)
@@ -1996,15 +1992,15 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         if (pastReleases.Count > 0)
         {
             Logger.LogInformation(
-                "Document {ContentName} (id={ContentId}) had its release date removed, because it was unpublished.", content.Name, content.Id);
+                "Content {ContentName} (id={ContentId}) had its release date removed, because it was unpublished.", content.Name, content.Id);
         }
 
-        _documentRepository.PersistContentSchedule(content, contentSchedule);
+        _contentRepository.PersistContentSchedule(content, contentSchedule);
 
         // change state to unpublishing
         content.PublishedState = PublishedState.Unpublishing;
 
-        Logger.LogInformation("Document {ContentName} (id={ContentId}) has been unpublished.", content.Name, content.Id);
+        Logger.LogInformation("Content {ContentName} (id={ContentId}) has been unpublished.", content.Name, content.Id);
         return attempt;
     }
 

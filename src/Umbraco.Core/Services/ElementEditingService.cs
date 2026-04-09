@@ -77,7 +77,7 @@ internal sealed class ElementEditingService
     protected override string RelateParentOnDeleteAlias
         => Constants.Conventions.RelationTypes.RelateParentElementContainerOnElementDeleteAlias;
 
-    public Task<IElement?> GetAsync(Guid key)
+    public override Task<IElement?> GetAsync(Guid key)
     {
         IElement? element = ContentService.GetById(key);
         return Task.FromResult(element);
@@ -138,9 +138,7 @@ internal sealed class ElementEditingService
         ContentEditingOperationStatus validationStatus = result.Status;
         ContentValidationResult validationResult = result.Result.ValidationResult;
 
-        // TODO ELEMENTS: we need a fix for this; see ContentEditingService
-        IElement element = result.Result.Content!;
-        // IElement element = await EnsureOnlyAllowedFieldsAreUpdated(result.Result.Content!, userKey);
+        IElement element = await EnsureOnlyAllowedFieldsAreUpdated(result.Result.Content!, userKey);
 
         ContentEditingOperationStatus saveStatus = await SaveAsync(element, userKey);
         return saveStatus == ContentEditingOperationStatus.Success
@@ -172,8 +170,7 @@ internal sealed class ElementEditingService
         ContentEditingOperationStatus validationStatus = result.Status;
         ContentValidationResult validationResult = result.Result.ValidationResult;
 
-        // TODO ELEMENTS: we need a fix for this; see ContentEditingService
-        // element = await EnsureOnlyAllowedFieldsAreUpdated(element, userKey);
+        element = await EnsureOnlyAllowedFieldsAreUpdated(element, userKey);
 
         ContentEditingOperationStatus saveStatus = await SaveAsync(element, userKey);
         return saveStatus == ContentEditingOperationStatus.Success
