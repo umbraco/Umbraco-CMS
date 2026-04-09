@@ -25,7 +25,7 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
     private readonly ICoreScopeProvider _coreScopeProvider;
     private readonly INavigationRepository _navigationRepository;
     private readonly TContentTypeService _typeService;
-    private Lazy<Dictionary<string, Guid>> _contentTypeAliasToKeyMap;
+    private readonly Lazy<Dictionary<string, Guid>> _contentTypeAliasToKeyMap;
 
     /// <summary>
     ///     Bundles a navigation structure dictionary and its root keys into a single reference so that
