@@ -10,7 +10,6 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services.Installer;
 using Umbraco.Cms.Infrastructure.Factories.Installer;
 using Umbraco.Cms.Infrastructure.Installer.Steps;
-using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
 namespace Umbraco.Cms.Api.Management.DependencyInjection;
 
