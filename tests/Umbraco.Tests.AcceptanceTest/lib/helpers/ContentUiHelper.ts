@@ -381,7 +381,6 @@ export class ContentUiHelper extends UiBaseLocators {
     this.rollbackBtn = this.documentWorkspace.getByRole("button", {
       name: /^Rollback(…)?$/,
     });
-    this.backofficeModalContainer = page.locator('umb-backoffice-modal-container');
     this.publishModalBtn = this.backofficeModalContainer.getByLabel('Publish', {exact: true});
     this.unpublishModalBtn = this.backofficeModalContainer.getByLabel('Unpublish', {exact: true});
     this.rollbackContainerBtn = this.container.getByLabel("Rollback");
