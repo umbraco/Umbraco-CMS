@@ -17,11 +17,12 @@ public class CreateTemplateControllerProductionModeTests : ManagementApiTest<Cre
     public override void Setup()
     {
         InMemoryConfiguration[Constants.Configuration.ConfigRuntimeMode] = "Production";
+        InMemoryConfiguration["Umbraco:CMS:WebRouting:UmbracoApplicationUrl"] = "https://localhost";
         base.Setup();
+        Authenticate().GetAwaiter().GetResult();
     }
 
-    [SetUp]
-    public async Task Authenticate()
+    private async Task Authenticate()
         => await AuthenticateClientAsync(Client, "admin@test.com", "1234567890", true);
 
     [Test]

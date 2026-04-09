@@ -20,11 +20,12 @@ public class DeleteTemplateControllerProductionModeTests : ManagementApiTest<Del
     public override void Setup()
     {
         InMemoryConfiguration[Constants.Configuration.ConfigRuntimeMode] = "Production";
+        InMemoryConfiguration["Umbraco:CMS:WebRouting:UmbracoApplicationUrl"] = "https://localhost";
         base.Setup();
+        CreateTemplate().GetAwaiter().GetResult();
     }
 
-    [SetUp]
-    public async Task CreateTemplate()
+    private async Task CreateTemplate()
     {
         var alias = "test" + Guid.NewGuid().ToString("N");
         var result = await TemplateService.CreateAsync(alias, alias, "<h1>Test</h1>", Constants.Security.SuperUserKey);

@@ -22,11 +22,12 @@ public class UpdateTemplateControllerProductionModeTests : ManagementApiTest<Upd
     public override void Setup()
     {
         InMemoryConfiguration[Constants.Configuration.ConfigRuntimeMode] = "Production";
+        InMemoryConfiguration["Umbraco:CMS:WebRouting:UmbracoApplicationUrl"] = "https://localhost";
         base.Setup();
+        CreateTemplate().GetAwaiter().GetResult();
     }
 
-    [SetUp]
-    public async Task CreateTemplate()
+    private async Task CreateTemplate()
     {
         // Create template via the service layer (allowed in production mode).
         var alias = "test" + Guid.NewGuid().ToString("N");
