@@ -23,9 +23,10 @@ public abstract class RecurringHostedServiceBase : BackgroundService
     private readonly TimeProvider _timeProvider;
     private readonly SemaphoreSlim _signal = new(0, 1);
     private CancellationTokenSource _periodChangeCts = new();
-    private TimeSpan _period;
+    private long _periodTicks;
     private TriggerState _triggerState = TriggerState.Default;
     private volatile bool _nextExecutionSkipOnOvershoot;
+    private int _isDisposed;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RecurringHostedServiceBase" /> class.
@@ -39,7 +40,7 @@ public abstract class RecurringHostedServiceBase : BackgroundService
         ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(period, TimeSpan.Zero);
 
         _logger = logger;
-        _period = period;
+        Interlocked.Exchange(ref _periodTicks, period.Ticks);
         _delay = delay;
         _timeProvider = timeProvider;
     }
@@ -91,7 +92,7 @@ public abstract class RecurringHostedServiceBase : BackgroundService
             }
         }
 
-        TimeSpan nextDelayBasis = _period;
+        TimeSpan nextDelayBasis = ReadPeriod();
         while (!stoppingToken.IsCancellationRequested)
         {
             long startTimestamp = _timeProvider.GetTimestamp();
@@ -126,6 +127,7 @@ public abstract class RecurringHostedServiceBase : BackgroundService
     /// </returns>
     private async Task<TimeSpan> WaitForNextExecutionAsync(TimeSpan delayBasis, TimeSpan executionElapsed, CancellationToken stoppingToken)
     {
+        TimeSpan period = ReadPeriod();
         TimeSpan delay = ComputeNextDelay(delayBasis, executionElapsed);
 
         // If the delay basis was from a NextExecutionStrategy.None trigger and the execution overshot the scheduled time,
@@ -136,12 +138,12 @@ public abstract class RecurringHostedServiceBase : BackgroundService
 
         if (delay <= TimeSpan.Zero && skipOnOvershoot)
         {
-            delay = ComputeNextDelay(delayBasis + _period, executionElapsed);
+            delay = ComputeNextDelay(delayBasis + period, executionElapsed);
         }
 
         if (delay <= TimeSpan.Zero)
         {
-            return _period;
+            return period;
         }
 
         long waitStart = _timeProvider.GetTimestamp();
@@ -156,17 +158,18 @@ public abstract class RecurringHostedServiceBase : BackgroundService
             }
             catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
             {
-                return _period;
+                return ReadPeriod();
             }
 
             if (!signaled && periodChangeToken.IsCancellationRequested)
             {
-                // Period changed — recalculate remaining delay with the new period and re-wait.
+                // Period changed — re-read and recalculate remaining delay with the new period.
+                period = ReadPeriod();
                 TimeSpan totalElapsed = executionElapsed + _timeProvider.GetElapsedTime(waitStart);
-                delay = ComputeNextDelay(_period, totalElapsed);
+                delay = ComputeNextDelay(period, totalElapsed);
                 if (delay <= TimeSpan.Zero)
                 {
-                    return _period;
+                    return period;
                 }
 
                 continue;
@@ -174,7 +177,7 @@ public abstract class RecurringHostedServiceBase : BackgroundService
 
             if (!signaled)
             {
-                return _period; // Normal timeout — next wait uses normal period
+                return period; // Normal timeout — next wait uses normal period
             }
 
             TriggerState triggerState = Interlocked.Exchange(ref _triggerState, TriggerState.Default);
@@ -192,10 +195,10 @@ public abstract class RecurringHostedServiceBase : BackgroundService
                     _nextExecutionSkipOnOvershoot = true;
                     return remaining;
                 case NextExecutionStrategy.Replace:
-                    return remaining + _period;
+                    return remaining + period;
                 case NextExecutionStrategy.Reset:
                 default:
-                    return _period;
+                    return period;
             }
         }
     }
@@ -209,7 +212,7 @@ public abstract class RecurringHostedServiceBase : BackgroundService
     /// </returns>
     public virtual Task PerformExecuteAsync(CancellationToken stoppingToken)
 #pragma warning disable CS0618 // Type or member is obsolete
-        => PerformExecuteAsync((object?)null);
+        => PerformExecuteAsync(null);
 #pragma warning restore CS0618 // Type or member is obsolete
 
     /// <summary>
@@ -223,7 +226,8 @@ public abstract class RecurringHostedServiceBase : BackgroundService
     /// This overload does not receive a <see cref="CancellationToken" />, so shutdown cancellation is not propagated to the implementation.
     /// </remarks>
     [Obsolete("Override PerformExecuteAsync(CancellationToken) instead. Scheduled for removal in Umbraco 19.")]
-    public virtual Task PerformExecuteAsync(object? state) => Task.CompletedTask;
+    public virtual Task PerformExecuteAsync(object? state)
+        => Task.CompletedTask;
 
     /// <summary>
     /// Executes the task.
@@ -259,7 +263,7 @@ public abstract class RecurringHostedServiceBase : BackgroundService
     {
         ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(newPeriod, TimeSpan.Zero);
 
-        _period = newPeriod;
+        Interlocked.Exchange(ref _periodTicks, newPeriod.Ticks);
 
         // Cancel but don't dispose — the wait loop may still be registering against the token.
         // The old CTS is small once cancelled and will be collected by the GC.
@@ -298,6 +302,15 @@ public abstract class RecurringHostedServiceBase : BackgroundService
     }
 
     /// <summary>
+    /// Reads the current period in a thread-safe manner.
+    /// </summary>
+    /// <returns>
+    /// The current period between executions.
+    /// </returns>
+    private TimeSpan ReadPeriod()
+        => TimeSpan.FromTicks(Interlocked.Read(ref _periodTicks));
+
+    /// <summary>
     /// Waits for the semaphore to be signaled or for the timeout to expire, using the injected <see cref="TimeProvider" />.
     /// </summary>
     /// <param name="timeout">The maximum time to wait.</param>
@@ -306,6 +319,7 @@ public abstract class RecurringHostedServiceBase : BackgroundService
     /// <returns>
     ///   <c>true</c> if the semaphore was signaled; <c>false</c> if the timeout expired or the period changed.
     /// </returns>
+    /// <exception cref="OperationCanceledException">Thrown when <paramref name="stoppingToken" /> is cancelled.</exception>
     private async Task<bool> WaitForSignalAsync(TimeSpan timeout, CancellationToken periodChangeToken, CancellationToken stoppingToken)
     {
         using var timeoutCts = new CancellationTokenSource(timeout, _timeProvider);
@@ -322,6 +336,9 @@ public abstract class RecurringHostedServiceBase : BackgroundService
         }
     }
 
+    /// <summary>
+    /// Releases the semaphore to wake the background loop. If the semaphore is already signaled, the call is a no-op.
+    /// </summary>
     private void ReleaseSignal()
     {
         try
@@ -335,7 +352,7 @@ public abstract class RecurringHostedServiceBase : BackgroundService
     }
 
     /// <inheritdoc />
-    public override void Dispose()
+    public sealed override void Dispose()
     {
         Dispose(true);
         GC.SuppressFinalize(this);
@@ -347,6 +364,11 @@ public abstract class RecurringHostedServiceBase : BackgroundService
     /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
     protected virtual void Dispose(bool disposing)
     {
+        if (Interlocked.CompareExchange(ref _isDisposed, 1, 0) != 0)
+        {
+            return;
+        }
+
         if (disposing)
         {
             _signal.Dispose();
@@ -361,6 +383,12 @@ public abstract class RecurringHostedServiceBase : BackgroundService
     /// </summary>
     private sealed record TriggerState(NextExecutionStrategy Strategy = default, TimeSpan? Delay = null)
     {
+        /// <summary>
+        /// Gets the default trigger state with no strategy and no custom delay.
+        /// </summary>
+        /// <value>
+        /// The default trigger state.
+        /// </value>
         public static TriggerState Default { get; } = new();
     }
 }
