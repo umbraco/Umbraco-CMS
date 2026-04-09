@@ -28,7 +28,6 @@ public class PasswordConfigurationPresentationFactory : IPasswordConfigurationPr
     public PasswordConfigurationPresentationFactory(IOptionsSnapshot<UserPasswordConfigurationSettings> userPasswordConfigurationSettings)
         : this(StaticServiceProvider.Instance.GetRequiredService<IOptionsSnapshot<SecuritySettings>>())
     {
-
     }
 
     public PasswordConfigurationResponseModel CreatePasswordConfigurationResponseModel() =>
