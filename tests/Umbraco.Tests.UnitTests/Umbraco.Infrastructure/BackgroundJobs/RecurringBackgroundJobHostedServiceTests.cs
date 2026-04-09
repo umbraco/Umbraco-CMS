@@ -5,14 +5,11 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Runtime;
-using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Infrastructure.BackgroundJobs;
-using Umbraco.Cms.Infrastructure.HostedServices;
 using Umbraco.Cms.Infrastructure.Notifications;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.BackgroundJobs;
@@ -182,6 +179,9 @@ public class RecurringBackgroundJobHostedServiceTests
         bool isMainDom = true,
         Mock<IEventAggregator> mockEventAggregator = null)
     {
+        mockJob.Setup(x => x.Period).Returns(TimeSpan.FromMinutes(5));
+        mockJob.Setup(x => x.Delay).Returns(TimeSpan.Zero);
+
         var mockRunTimeState = new Mock<IRuntimeState>();
         mockRunTimeState.SetupGet(x => x.Level).Returns(runtimeLevel);
 
