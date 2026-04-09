@@ -12,6 +12,14 @@ namespace Umbraco.Cms.Api.Management.Factories;
 public class PasswordConfigurationPresentationFactory : IPasswordConfigurationPresentationFactory
 {
     private readonly SecuritySettings _securitySettings;
+    
+    // TODO (V19): Remove obsolete constructors and the ActivatorUtilitiesConstructor attribute.
+    // Also update UmbracoBuilder where this service is registered using:
+    //   builder.Services.AddTransient<IPasswordConfigurationPresentationFactory>(sp => ActivatorUtilities.CreateInstance<PasswordConfigurationPresentationFactory>(sp));
+    // We do this to allow the ActivatorUtilitiesConstructor to be used (it's otherwise ignored by AddTransient).
+    // Revert it to:
+    //   builder.Services.AddTransient<IPasswordConfigurationPresentationFactory, PasswordConfigurationPresentationFactory>()    
+
     /// <summary>
     /// Initializes a new instance of the <see cref="PasswordConfigurationPresentationFactory"/> class.
     /// </summary>
