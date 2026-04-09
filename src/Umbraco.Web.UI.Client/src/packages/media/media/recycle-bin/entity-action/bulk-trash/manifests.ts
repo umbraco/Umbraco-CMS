@@ -11,6 +11,7 @@ const bulkTrashAction: UmbExtensionManifest = {
 	kind: UMB_ENTITY_BULK_ACTION_TRASH_WITH_RELATION_KIND,
 	alias: 'Umb.EntityBulkAction.Media.Trash',
 	name: 'Trash Media Entity Bulk Action',
+	api: () => import('./media-bulk-trash-with-relation.action.js'),
 	weight: 10,
 	forEntityTypes: [UMB_MEDIA_ENTITY_TYPE],
 	meta: {

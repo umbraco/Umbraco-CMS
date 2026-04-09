@@ -12,10 +12,16 @@ internal sealed class UserLoginDto
     public const string TableName = Constants.DatabaseSchema.Tables.UserLogin;
     public const string PrimaryKeyColumnName = "sessionId";
 
+    /// <summary>
+    /// Gets or sets the unique identifier for the user session.
+    /// </summary>
     [Column(PrimaryKeyColumnName)]
     [PrimaryKeyColumn(AutoIncrement = false)]
     public Guid SessionId { get; set; }
 
+    /// <summary>
+    /// Gets or sets the identifier of the user associated with this login record.
+    /// </summary>
     [Column("userId")]
     [ForeignKey(typeof(UserDto), Name = "FK_" + TableName + "_umbracoUser_id")]
     public int? UserId { get; set; }

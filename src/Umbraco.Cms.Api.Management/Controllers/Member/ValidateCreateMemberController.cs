@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Factories;
@@ -10,12 +10,20 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Member;
 
+/// <summary>
+/// Provides API endpoints for validating member creation requests.
+/// </summary>
 [ApiVersion("1.0")]
 public class ValidateCreateMemberController : MemberControllerBase
 {
     private readonly IMemberEditingService _memberEditingService;
     private readonly IMemberEditingPresentationFactory _memberEditingPresentationFactory;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ValidateCreateMemberController"/> class, which is responsible for validating member creation requests.
+    /// </summary>
+    /// <param name="memberEditingService">Service used to perform member editing operations.</param>
+    /// <param name="memberEditingPresentationFactory">Factory used to create presentation models for member editing.</param>
     public ValidateCreateMemberController(
         IMemberEditingService memberEditingService,
         IMemberEditingPresentationFactory memberEditingPresentationFactory)

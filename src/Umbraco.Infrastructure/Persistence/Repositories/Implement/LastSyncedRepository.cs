@@ -13,6 +13,12 @@ public class LastSyncedRepository : RepositoryBase, ILastSyncedRepository
 {
     private readonly IMachineInfoFactory _machineInfoFactory;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="LastSyncedRepository"/> class.
+    /// </summary>
+    /// <param name="scopeAccessor">Provides access to the current database scope for repository operations.</param>
+    /// <param name="appCaches">The cache manager used for caching repository data.</param>
+    /// <param name="machineInfoFactory">Factory for obtaining information about the current machine instance.</param>
     public LastSyncedRepository(IScopeAccessor scopeAccessor, AppCaches appCaches, IMachineInfoFactory machineInfoFactory)
         : base(scopeAccessor, appCaches)
     {

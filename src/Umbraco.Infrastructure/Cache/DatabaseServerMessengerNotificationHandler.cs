@@ -56,7 +56,8 @@ public sealed class DatabaseServerMessengerNotificationHandler :
     }
 
     /// <summary>
-    ///     Clear the batch on end request
+    /// Handles the end of an Umbraco request by clearing the batch of distributed cache instructions.
     /// </summary>
+    /// <param name="notification">The notification instance signaling the end of an Umbraco request.</param>
     public void Handle(UmbracoRequestEndNotification notification) => _messenger?.SendMessages();
 }

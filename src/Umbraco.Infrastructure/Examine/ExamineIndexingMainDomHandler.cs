@@ -1,4 +1,4 @@
-﻿using Examine;
+using Examine;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Runtime;
@@ -13,6 +13,13 @@ internal sealed class ExamineIndexingMainDomHandler
     private readonly ILogger<ExamineIndexingMainDomHandler> _logger;
     private readonly Lazy<bool> _isMainDom;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Examine.ExamineIndexingMainDomHandler"/> class.
+    /// </summary>
+    /// <param name="mainDom">The <see cref="IMainDom"/> instance representing the main domain lock.</param>
+    /// <param name="profilingLogger">The <see cref="IProfilingLogger"/> used for profiling and logging operations.</param>
+    /// <param name="examineManager">The <see cref="IExamineManager"/> responsible for managing Examine indexes.</param>
+    /// <param name="logger">The <see cref="ILogger{ExamineIndexingMainDomHandler}"/> instance for logging.</param>
     public ExamineIndexingMainDomHandler(IMainDom mainDom, IProfilingLogger profilingLogger, IExamineManager examineManager, ILogger<ExamineIndexingMainDomHandler> logger)
     {
         _mainDom = mainDom;
@@ -22,6 +29,10 @@ internal sealed class ExamineIndexingMainDomHandler
         _isMainDom = new Lazy<bool>(DetectMainDom);
     }
 
+    /// <summary>
+    /// Determines whether this instance currently holds the MainDom (main domain lock) in the application.
+    /// </summary>
+    /// <returns><c>true</c> if this instance is the MainDom; otherwise, <c>false</c>.</returns>
     public bool IsMainDom() => _isMainDom.Value;
 
     private bool DetectMainDom()

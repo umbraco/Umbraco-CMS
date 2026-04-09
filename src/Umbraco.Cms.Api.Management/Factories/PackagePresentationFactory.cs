@@ -19,6 +19,12 @@ internal sealed class PackagePresentationFactory : IPackagePresentationFactory
     private readonly IRuntimeState _runtimeState;
     private readonly MarketplaceSettings _marketplaceSettings;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PackagePresentationFactory"/> class.
+    /// </summary>
+    /// <param name="umbracoMapper">The mapper used for mapping Umbraco objects.</param>
+    /// <param name="runtimeState">Provides information about the current runtime state of the Umbraco application.</param>
+    /// <param name="marketplaceSettings">A snapshot of the current marketplace settings options.</param>
     public PackagePresentationFactory(IUmbracoMapper umbracoMapper, IRuntimeState runtimeState, IOptionsSnapshot<MarketplaceSettings> marketplaceSettings)
     {
         _umbracoMapper = umbracoMapper;
@@ -26,6 +32,11 @@ internal sealed class PackagePresentationFactory : IPackagePresentationFactory
         _marketplaceSettings = marketplaceSettings.Value;
     }
 
+    /// <summary>
+    /// Creates a new <see cref="PackageDefinition"/> instance from the specified <see cref="CreatePackageRequestModel"/>.
+    /// </summary>
+    /// <param name="createPackageRequestModel">The request model containing the data used to initialize the package definition.</param>
+    /// <returns>A <see cref="PackageDefinition"/> populated with values from the provided request model.</returns>
     public PackageDefinition CreatePackageDefinition(CreatePackageRequestModel createPackageRequestModel)
     {
         PackageDefinition packageDefinition = _umbracoMapper.Map<PackageDefinition>(createPackageRequestModel)!;
@@ -38,6 +49,10 @@ internal sealed class PackagePresentationFactory : IPackagePresentationFactory
         return packageDefinition;
     }
 
+    /// <summary>
+    /// Creates a <see cref="Umbraco.Cms.Api.Management.Models.PackageConfigurationResponseModel" /> instance populated with package configuration data, including the marketplace URL.
+    /// </summary>
+    /// <returns>A <see cref="Umbraco.Cms.Api.Management.Models.PackageConfigurationResponseModel" /> containing the package's configuration details.</returns>
     public PackageConfigurationResponseModel CreateConfigurationResponseModel() =>
         new()
         {

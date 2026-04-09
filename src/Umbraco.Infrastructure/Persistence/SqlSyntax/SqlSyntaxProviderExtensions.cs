@@ -11,6 +11,12 @@ internal enum WhereInType
 
 internal static class SqlSyntaxProviderExtensions
 {
+    /// <summary>
+    /// Retrieves the defined index definitions from the specified SQL syntax provider and database.
+    /// </summary>
+    /// <param name="sql">The SQL syntax provider.</param>
+    /// <param name="db">The database instance.</param>
+    /// <returns>An enumerable collection of <see cref="DbIndexDefinition"/> objects representing the defined indexes.</returns>
     public static IEnumerable<DbIndexDefinition>
         GetDefinedIndexesDefinitions(this ISqlSyntaxProvider sql, IDatabase db) =>
         sql.GetDefinedIndexes(db)
@@ -19,10 +25,10 @@ internal static class SqlSyntaxProviderExtensions
     /// <summary>
     ///     Returns the quotes tableName.columnName combo
     /// </summary>
-    /// <param name="sql"></param>
-    /// <param name="tableName"></param>
-    /// <param name="columnName"></param>
-    /// <returns></returns>
+    /// <param name="sql">The SQL syntax provider.</param>
+    /// <param name="tableName">The table name.</param>
+    /// <param name="columnName">The column name.</param>
+    /// <returns>The quoted table.column string.</returns>
     public static string GetQuotedColumn(this ISqlSyntaxProvider sql, string tableName, string columnName) =>
         sql.GetQuotedTableName(tableName) + "." + sql.GetQuotedColumnName(columnName);
 

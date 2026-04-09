@@ -1,7 +1,10 @@
-﻿using System.Net;
+using System.Net;
 
 namespace Umbraco.Cms.Api.Management.Controllers;
 
+/// <summary>
+/// Serves as the base controller for file system management operations in the Umbraco CMS API.
+/// </summary>
 public abstract class FileSystemManagementControllerBase : ManagementApiControllerBase
 {
     protected string DecodePath(string path)

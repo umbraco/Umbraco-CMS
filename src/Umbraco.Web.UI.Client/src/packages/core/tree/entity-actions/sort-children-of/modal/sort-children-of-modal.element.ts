@@ -210,16 +210,16 @@ export class UmbSortChildrenOfModalElement<
 
 	override render() {
 		return html`
-			<umb-body-layout headline=${'Sort Children'}>
+			<umb-body-layout headline=${this.localize.term('actions_sort')}>
 				${this._children.length === 0 ? this.#renderEmptyState() : this.#renderTable()}
-				<uui-button slot="actions" label="Cancel" @click="${this._rejectModal}"></uui-button>
-				<uui-button slot="actions" color="positive" look="primary" label="Sort" @click=${this.#onSubmit}></uui-button>
+				<uui-button slot="actions" label=${this.localize.term('general_cancel')} @click="${this._rejectModal}"></uui-button>
+				<uui-button slot="actions" color="positive" look="primary" label=${this.localize.term('general_sort')} @click=${this.#onSubmit}></uui-button>
 			</umb-body-layout>
 		`;
 	}
 
 	#renderEmptyState() {
-		return html`<uui-label>There are no children</uui-label>`;
+		return html`<uui-label><umb-localize key="sort_sortEmptyState">This node has no child nodes to sort</umb-localize></uui-label>`;
 	}
 
 	#renderTable() {
@@ -235,7 +235,7 @@ export class UmbSortChildrenOfModalElement<
 			${this._hasMorePages()
 				? html`
 						<uui-button id="loadMoreButton" look="placeholder" @click=${this._onLoadMore}
-							>Load more (${this._currentPage}/${this._totalPages})</uui-button
+							><umb-localize key="actions_loadMore">Load more</umb-localize> (${this._currentPage}/${this._totalPages})</uui-button
 						>
 					`
 				: nothing}

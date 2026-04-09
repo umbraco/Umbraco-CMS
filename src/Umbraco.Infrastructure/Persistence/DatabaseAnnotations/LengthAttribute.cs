@@ -7,6 +7,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 [AttributeUsage(AttributeTargets.Property)]
 public class LengthAttribute : Attribute
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="LengthAttribute"/> class with the specified maximum length.
+    /// </summary>
+    /// <param name="length">The maximum length value for the attribute.</param>
     public LengthAttribute(int length) => Length = length;
 
     /// <summary>

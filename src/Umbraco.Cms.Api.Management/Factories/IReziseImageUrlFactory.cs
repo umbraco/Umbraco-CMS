@@ -3,6 +3,9 @@ using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
+/// <summary>
+/// Represents a factory responsible for generating URLs that resize images.
+/// </summary>
 public interface IReziseImageUrlFactory
 {
     /// <summary>

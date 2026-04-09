@@ -53,8 +53,9 @@ public class PropertyModel
     public string Name = string.Empty;
 
     /// <summary>
-    ///     Adds an error.
+    ///     Adds the specified error message to the list of errors for this property model.
     /// </summary>
+    /// <param name="error">The error message to add.</param>
     public void AddError(string error)
     {
         if (Errors == null)

@@ -48,9 +48,6 @@ public class OptimizeInvariantUrlRecords : AsyncMigrationBase
         // Convert existing invariant records to use NULL languageId and remove duplicates.
         ConvertInvariantDocumentUrlRecords();
         ConvertInvariantDocumentUrlAliasRecords();
-
-        // Trigger rebuild to update the in-memory cache with new structure.
-        TriggerRebuild();
     }
 
     private void MigrateSqlite()
@@ -73,7 +70,7 @@ public class OptimizeInvariantUrlRecords : AsyncMigrationBase
         Create.Table<DocumentUrlDto>().Do();
         Create.Table<DocumentUrlAliasDto>().Do();
 
-        // Trigger rebuild on startup to repopulate the tables
+        // Trigger rebuild on startup to repopulate the tables.
         TriggerRebuild();
     }
 

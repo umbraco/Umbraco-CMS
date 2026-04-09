@@ -5,6 +5,9 @@ using Umbraco.Cms.Api.Management.Models.Entities;
 
 namespace Umbraco.Cms.Api.Management.Services.Entities;
 
+/// <summary>
+/// Provides methods for retrieving and managing user start node entities in the Umbraco CMS Management API.
+/// </summary>
 public interface IUserStartNodeEntitiesService
 {
     /// <summary>

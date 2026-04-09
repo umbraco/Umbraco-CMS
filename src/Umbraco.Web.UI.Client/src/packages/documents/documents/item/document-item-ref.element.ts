@@ -79,8 +79,7 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 	#getHref() {
 		if (!this._unique) return;
 		const path = UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN.generateLocal({ unique: this._unique });
-		const culture = this.#item.getCulture();
-		return culture ? `${this._editPath}/${path}/${culture}` : `${this._editPath}/${path}`;
+		return `${this._editPath}/${path}`;
 	}
 
 	#onSelected(event: UUISelectableEvent) {

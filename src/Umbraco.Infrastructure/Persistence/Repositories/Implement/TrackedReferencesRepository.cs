@@ -21,6 +21,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         /// <summary>
         /// Initializes a new instance of the <see cref="TrackedReferencesRepository"/> class.
         /// </summary>
+        /// <param name="scopeAccessor">Provides access to the current database scope for repository operations.</param>
+        /// <param name="umbracoMapper">The mapper used to map between Umbraco entities and models.</param>
         public TrackedReferencesRepository(IScopeAccessor scopeAccessor, IUmbracoMapper umbracoMapper)
         {
             _scopeAccessor = scopeAccessor;
@@ -447,33 +449,63 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         private sealed class UnionHelperDto
         {
+            /// <summary>
+            /// Gets or sets the unique identifier for the UnionHelperDto.
+            /// </summary>
             [Column("id")]
             public int Id { get; set; }
 
+            /// <summary>
+            /// Gets or sets the identifier for the related or referenced entity in the union operation.
+            /// </summary>
             [Column("otherId")]
             public int OtherId { get; set; }
 
+            /// <summary>
+            /// Gets or sets the unique identifier key.
+            /// </summary>
             [Column("key")]
             public Guid Key { get; set; }
 
+            /// <summary>
+            /// Gets or sets a value indicating whether the item is trashed.
+            /// </summary>
             [Column("trashed")]
             public bool Trashed { get; set; }
 
+            /// <summary>
+            /// Gets or sets the node object type identifier.
+            /// </summary>
             [Column("nodeObjectType")]
             public Guid NodeObjectType { get; set; }
 
+            /// <summary>
+            /// Gets or sets the GUID of the related entity in the tracked reference.
+            /// </summary>
             [Column("otherKey")]
             public Guid OtherKey { get; set; }
 
+            /// <summary>
+            /// Gets or sets the alias associated with the referenced entity.
+            /// </summary>
             [Column("alias")]
             public string? Alias { get; set; }
 
+            /// <summary>
+            /// Gets or sets the name associated with the tracked reference in the union helper DTO.
+            /// </summary>
             [Column("name")]
             public string? Name { get; set; }
 
+            /// <summary>
+            /// Gets or sets a value indicating whether this item is marked as a dependency.
+            /// </summary>
             [Column("isDependency")]
             public bool IsDependency { get; set; }
 
+            /// <summary>
+            /// Gets or sets a value indicating whether this instance represents a dual reference.
+            /// </summary>
             [Column("dual")]
             public bool Dual { get; set; }
         }

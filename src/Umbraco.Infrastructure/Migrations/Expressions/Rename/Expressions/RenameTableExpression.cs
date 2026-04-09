@@ -5,6 +5,11 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Rename.Expressions;
 /// </summary>
 public class RenameTableExpression : MigrationExpressionBase
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Migrations.Expressions.Rename.Expressions.RenameTableExpression"/> class,
+    /// which is used to define a table rename operation within a migration.
+    /// </summary>
+    /// <param name="context">The migration context that provides information and services for the migration process.</param>
     public RenameTableExpression(IMigrationContext context)
         : base(context)
     {

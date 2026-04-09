@@ -10,6 +10,9 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DocumentBlueprint;
 
+/// <summary>
+/// Controller for managing document blueprints identified by their unique key.
+/// </summary>
 [ApiVersion("1.0")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentsOrDocumentTypes)]
 public class ByKeyDocumentBlueprintController : DocumentBlueprintControllerBase
@@ -17,6 +20,11 @@ public class ByKeyDocumentBlueprintController : DocumentBlueprintControllerBase
     private readonly IContentBlueprintEditingService _contentBlueprintEditingService;
     private readonly IUmbracoMapper _umbracoMapper;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ByKeyDocumentBlueprintController"/> class, providing services for editing document blueprints by key.
+    /// </summary>
+    /// <param name="contentBlueprintEditingService">An instance of <see cref="IContentBlueprintEditingService"/> used to manage content blueprint editing operations.</param>
+    /// <param name="umbracoMapper">An instance of <see cref="IUmbracoMapper"/> used for mapping between Umbraco models.</param>
     public ByKeyDocumentBlueprintController(IContentBlueprintEditingService contentBlueprintEditingService, IUmbracoMapper umbracoMapper)
     {
         _contentBlueprintEditingService = contentBlueprintEditingService;

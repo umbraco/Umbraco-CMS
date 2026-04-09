@@ -1,3 +1,4 @@
+import { UMB_EDIT_RELATION_TYPE_WORKSPACE_PATH_PATTERN } from '../../../paths.js';
 import type { UmbRelationTypeDetailModel } from '../../../types.js';
 import type { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
 import { UMB_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
@@ -48,7 +49,10 @@ export class UmbRelationTypeTableCollectionViewElement extends UmbLitElement {
 				data: [
 					{
 						columnAlias: 'relationTypeName',
-						value: html`<a href=${'section/settings/workspace/relation-type/edit/' + relationType.unique}
+						value: html`<a
+							href=${UMB_EDIT_RELATION_TYPE_WORKSPACE_PATH_PATTERN.generateAbsolute({
+								unique: relationType.unique,
+							})}
 							>${relationType.name}</a
 						>`,
 					},

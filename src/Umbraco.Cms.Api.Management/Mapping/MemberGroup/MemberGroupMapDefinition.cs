@@ -1,11 +1,18 @@
-﻿using Umbraco.Cms.Api.Management.ViewModels.MemberGroup;
+using Umbraco.Cms.Api.Management.ViewModels.MemberGroup;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Api.Management.Mapping.MemberGroup;
 
+/// <summary>
+/// Provides mapping configuration for converting MemberGroup entities between different representations within the API management layer.
+/// </summary>
 public class MemberGroupMapDefinition : IMapDefinition
 {
+    /// <summary>
+    /// Configures the object mappings related to member groups, including mappings between request models, response models, and the <see cref="IMemberGroup"/> entity.
+    /// </summary>
+    /// <param name="mapper">The <see cref="IUmbracoMapper"/> instance used to register the mappings.</param>
     public void DefineMaps(IUmbracoMapper mapper)
     {
         mapper.Define<CreateMemberGroupRequestModel, IMemberGroup>((_, _) => new Core.Models.MemberGroup(), Map);

@@ -16,6 +16,7 @@ using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Factories;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
@@ -38,10 +39,32 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
     private readonly IJsonSerializer _serializer;
     private readonly IRepositoryCacheVersionService _repositoryCacheVersionService;
     private readonly ICacheSyncService _cacheSyncService;
+    private readonly IShortStringHelper _shortStringHelper;
     private readonly ITagRepository _tagRepository;
     private readonly ITemplateRepository _templateRepository;
     private PermissionRepository<IContent>? _permissionRepository;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DocumentRepository"/> class with the specified dependencies.
+    /// This constructor sets up the repository for managing document entities in the persistence layer.
+    /// </summary>
+    /// <param name="scopeAccessor">Provides access to the current database scope for transactional operations.</param>
+    /// <param name="appCaches">The application-level cache helpers for performance optimization.</param>
+    /// <param name="logger">The logger instance for logging repository operations.</param>
+    /// <param name="loggerFactory">Factory for creating logger instances.</param>
+    /// <param name="contentTypeRepository">Repository for accessing content type definitions.</param>
+    /// <param name="templateRepository">Repository for accessing template entities.</param>
+    /// <param name="tagRepository">Repository for managing tags associated with documents.</param>
+    /// <param name="languageRepository">Repository for managing language entities.</param>
+    /// <param name="relationRepository">Repository for managing entity relations.</param>
+    /// <param name="relationTypeRepository">Repository for managing relation types.</param>
+    /// <param name="propertyEditors">Collection of property editors used for document properties.</param>
+    /// <param name="dataValueReferenceFactories">Collection of factories for resolving data value references.</param>
+    /// <param name="dataTypeService">Service for managing data types.</param>
+    /// <param name="serializer">JSON serializer for serializing and deserializing data.</param>
+    /// <param name="eventAggregator">Publishes and subscribes to domain events.</param>
+    /// <param name="repositoryCacheVersionService">Service for managing repository cache versions.</param>
+    /// <param name="cacheSyncService">Service for synchronizing cache across distributed environments.</param>
     public DocumentRepository(
         IScopeAccessor scopeAccessor,
         AppCaches appCaches,
@@ -59,7 +82,8 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         IJsonSerializer serializer,
         IEventAggregator eventAggregator,
         IRepositoryCacheVersionService repositoryCacheVersionService,
-        ICacheSyncService cacheSyncService)
+        ICacheSyncService cacheSyncService,
+        IShortStringHelper shortStringHelper)
         : base(
             scopeAccessor,
             appCaches,
@@ -81,6 +105,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         _serializer = serializer;
         _repositoryCacheVersionService = repositoryCacheVersionService;
         _cacheSyncService = cacheSyncService;
+        _shortStringHelper = shortStringHelper;
         _appCaches = appCaches;
         _loggerFactory = loggerFactory;
         _scopeAccessor = scopeAccessor;
@@ -93,6 +118,65 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
             cacheSyncService);
     }
 
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
+    public DocumentRepository(
+        IScopeAccessor scopeAccessor,
+        AppCaches appCaches,
+        ILogger<DocumentRepository> logger,
+        ILoggerFactory loggerFactory,
+        IContentTypeRepository contentTypeRepository,
+        ITemplateRepository templateRepository,
+        ITagRepository tagRepository,
+        ILanguageRepository languageRepository,
+        IRelationRepository relationRepository,
+        IRelationTypeRepository relationTypeRepository,
+        PropertyEditorCollection propertyEditors,
+        DataValueReferenceFactoryCollection dataValueReferenceFactories,
+        IDataTypeService dataTypeService,
+        IJsonSerializer serializer,
+        IEventAggregator eventAggregator,
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
+        : this(
+            scopeAccessor,
+            appCaches,
+            logger,
+            loggerFactory,
+            contentTypeRepository,
+            templateRepository,
+            tagRepository,
+            languageRepository,
+            relationRepository,
+            relationTypeRepository,
+            propertyEditors,
+            dataValueReferenceFactories,
+            dataTypeService,
+            serializer,
+            eventAggregator,
+            repositoryCacheVersionService,
+            cacheSyncService,
+            StaticServiceProvider.Instance.GetRequiredService<IShortStringHelper>())
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.DocumentRepository"/> class.
+    /// </summary>
+    /// <param name="scopeAccessor">Provides access to the current database scope for repository operations.</param>
+    /// <param name="appCaches">The application-level caches used for optimizing data retrieval.</param>
+    /// <param name="logger">The logger instance for logging repository events and errors.</param>
+    /// <param name="loggerFactory">Factory for creating logger instances.</param>
+    /// <param name="contentTypeRepository">Repository for accessing content type definitions.</param>
+    /// <param name="templateRepository">Repository for accessing template entities.</param>
+    /// <param name="tagRepository">Repository for managing content tags.</param>
+    /// <param name="languageRepository">Repository for accessing language information.</param>
+    /// <param name="relationRepository">Repository for managing entity relations.</param>
+    /// <param name="relationTypeRepository">Repository for managing relation types.</param>
+    /// <param name="propertyEditors">Collection of property editors used for content properties.</param>
+    /// <param name="dataValueReferenceFactories">Collection of factories for resolving data value references.</param>
+    /// <param name="dataTypeService">Service for managing data types.</param>
+    /// <param name="serializer">JSON serializer for serializing and deserializing data.</param>
+    /// <param name="eventAggregator">Publishes and subscribes to domain events.</param>
     [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
     public DocumentRepository(
         IScopeAccessor scopeAccessor,
@@ -637,14 +721,32 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
 
     private sealed class ContentVariation
     {
+        /// <summary>
+        /// Gets or sets the culture identifier (e.g., language or locale) associated with this content variation.
+        /// </summary>
         public string? Culture { get; set; }
+
+        /// <summary>
+        /// Gets or sets the display name associated with this content variation.
+        /// </summary>
         public string? Name { get; set; }
+
+        /// <summary>
+        /// Gets or sets the date and time associated with this content variation, such as its creation or last modification.
+        /// </summary>
         public DateTime Date { get; set; }
     }
 
     private sealed class DocumentVariation
     {
+        /// <summary>
+        /// Gets or sets the culture identifier (e.g., language or locale) associated with this document variation.
+        /// </summary>
         public string? Culture { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the document variation has been edited.
+        /// </summary>
         public bool Edited { get; set; }
     }
 
@@ -861,6 +963,11 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
 
     #region Versions
 
+    /// <summary>
+    /// Retrieves all versions of a content item identified by the specified node ID, ordered by current version and version date descending.
+    /// </summary>
+    /// <param name="nodeId">The unique identifier of the content node whose versions are to be retrieved.</param>
+    /// <returns>An <see cref="IEnumerable{IContent}"/> containing all versions of the specified content item.</returns>
     public override IEnumerable<IContent> GetAllVersions(int nodeId)
     {
         Sql<ISqlContext> sql = GetBaseQuery(QueryType.Many, false)
@@ -871,21 +978,31 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         return MapDtosToContent(Database.Fetch<DocumentDto>(sql), true);
     }
 
-    // TODO: This method needs to return a readonly version of IContent! The content returned
-    // from this method does not contain all of the data required to re-persist it and if that
-    // is attempted some odd things will occur.
-    // Either we create an IContentReadOnly (which ultimately we should for vNext so we can
-    // differentiate between methods that return entities that can be re-persisted or not), or
-    // in the meantime to not break API compatibility, we can add a property to IContentBase
-    // (or go further and have it on IUmbracoEntity): "IsReadOnly" and if that is true we throw
-    // an exception if that entity is passed to a Save method.
-    // Ideally we return "Slim" versions of content for all sorts of methods here and in ContentService.
-    // Perhaps another non-breaking alternative is to have new services like IContentServiceReadOnly
-    // which can return IContentReadOnly.
-    // We have the ability with `MapDtosToContent` to reduce the amount of data looked up for a
-    // content item. Ideally for paged data that populates list views, these would be ultra slim
-    // content items, there's no reason to populate those with really anything apart from property data,
-    // but until we do something like the above, we can't do that since it would be breaking and unclear.
+    /// <summary>
+    /// Retrieves a paged collection of lightweight ("slim") content versions for the specified node.
+    /// </summary>
+    /// <param name="nodeId">The unique identifier of the content node whose versions are to be retrieved.</param>
+    /// <param name="skip">The number of versions to skip before starting to collect the results (for paging).</param>
+    /// <param name="take">The maximum number of versions to return (for paging).</param>
+    /// <returns>An enumerable collection of slim <see cref="Umbraco.Cms.Core.Models.IContent"/> instances representing the versions.</returns>
+    /// <remarks>
+    /// TODO: This method needs to return a readonly version of IContent! The content returned
+    /// from this method does not contain all of the data required to re-persist it and if that
+    /// is attempted some odd things will occur.
+    /// Either we create an IContentReadOnly (which ultimately we should for vNext so we can
+    /// differentiate between methods that return entities that can be re-persisted or not), or
+    /// in the meantime to not break API compatibility, we can add a property to IContentBase
+    /// (or go further and have it on IUmbracoEntity): "IsReadOnly" and if that is true we throw
+    /// an exception if that entity is passed to a Save method.
+    /// Ideally we return "Slim" versions of content for all sorts of methods here and in ContentService.
+    /// Perhaps another non-breaking alternative is to have new services like IContentServiceReadOnly
+    /// which can return IContentReadOnly.
+    /// We have the ability with `MapDtosToContent` to reduce the amount of data looked up for a
+    /// content item. Ideally for paged data that populates list views, these would be ultra slim
+    /// content items, there's no reason to populate those with really anything apart from property data,
+    /// but until we do something like the above, we can't do that since it would be breaking and unclear.
+    /// The returned content instances are 'slim' and may not contain all data required for re-persistence. They are intended for read-only scenarios such as version listings or rollbacks, and should not be used for saving or updating content.
+    /// </remarks>
     public override IEnumerable<IContent> GetAllVersionsSlim(int nodeId, int skip, int take)
     {
         Sql<ISqlContext> sql = GetBaseQuery(QueryType.Many, false)
@@ -904,6 +1021,11 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
             loadVariants: true);
     }
 
+    /// <summary>
+    /// Gets a specific version of the content by its version ID.
+    /// </summary>
+    /// <param name="versionId">The ID of the version to retrieve.</param>
+    /// <returns>The content version matching the specified version ID, or null if not found.</returns>
     public override IContent? GetVersion(int versionId)
     {
         Sql<ISqlContext> sql = GetBaseQuery(QueryType.Single, false)
@@ -913,7 +1035,12 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         return dto == null ? null : MapDtoToContent(dto);
     }
 
-    // deletes a specific version
+    /// <summary>
+    /// Deletes a specific version of a document by its version ID.
+    /// Throws an <see cref="InvalidOperationException"/> if the specified version is the current or published version.
+    /// </summary>
+    /// <remarks>deletes a specific version</remarks>
+    /// <param name="versionId">The ID of the version to delete.</param>
     public override void DeleteVersion(int versionId)
     {
         // TODO: test object node type?
@@ -949,7 +1076,12 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         PerformDeleteVersion(versionDto.ContentVersionDto.NodeId, versionId);
     }
 
-    //  deletes all versions of an entity, older than a date.
+    /// <summary>
+    /// Deletes all unpublished and non-current versions of a document entity for the specified node that are older than the given version date.
+    /// </summary>
+    /// <remarks>deletes all versions of an entity, older than a date.</remarks>
+    /// <param name="nodeId">The ID of the node whose versions are to be deleted.</param>
+    /// <param name="versionDate">The cutoff date; versions older than this date will be deleted.</param>
     public override void DeleteVersions(int nodeId, DateTime versionDate)
     {
         // TODO: test object node type?
@@ -1499,6 +1631,11 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
 
     #region Content Repository
 
+    /// <summary>
+    /// Counts the number of published documents, optionally filtered by content type alias.
+    /// </summary>
+    /// <param name="contentTypeAlias">The alias of the content type to filter by. If null or empty, counts all published documents.</param>
+    /// <returns>The count of published documents matching the criteria.</returns>
     public int CountPublished(string? contentTypeAlias = null)
     {
         Sql<ISqlContext> sql = SqlContext.Sql();
@@ -1529,6 +1666,10 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         return Database.ExecuteScalar<int>(sql);
     }
 
+    /// <summary>
+    /// Replaces all existing content permissions with the specified permission set for the relevant entities.
+    /// </summary>
+    /// <param name="permissionSet">The permission set to apply to the entities.</param>
     public void ReplaceContentPermissions(EntityPermissionSet permissionSet) =>
         PermissionRepository.ReplaceEntityPermissions(permissionSet);
 
@@ -1541,6 +1682,11 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
     public void AssignEntityPermission(IContent entity, string permission, IEnumerable<int> groupIds) =>
         PermissionRepository.AssignEntityPermission(entity, permission, groupIds);
 
+    /// <summary>
+    /// Retrieves the collection of permissions assigned to the specified entity.
+    /// </summary>
+    /// <param name="entityId">The unique identifier of the entity for which to retrieve permissions.</param>
+    /// <returns>An <see cref="EntityPermissionCollection"/> containing the permissions associated with the entity.</returns>
     public EntityPermissionCollection GetPermissionsForEntity(int entityId) =>
         PermissionRepository.GetPermissionsForEntity(entityId);
 
@@ -1619,6 +1765,13 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
             ordering);
     }
 
+    /// <summary>
+    /// Determines whether the specified content item and all its ancestors in the content path are published.
+    /// </summary>
+    /// <param name="content">The content item to check.</param>
+    /// <returns>
+    /// True if the content item and every node in its path (from the root to itself) are published; otherwise, false.
+    /// </returns>
     public bool IsPathPublished(IContent? content)
     {
         // fail fast
@@ -1650,8 +1803,15 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
 
     #region Recycle Bin
 
+    /// <summary>
+    /// Gets the identifier for the content Recycle Bin in Umbraco.
+    /// </summary>
     public override int RecycleBinId => Constants.System.RecycleBinContent;
 
+    /// <summary>
+    /// Checks whether the content recycle bin contains any items.
+    /// </summary>
+    /// <returns><c>true</c> if the content recycle bin contains one or more items; otherwise, <c>false</c>.</returns>
     public bool RecycleBinSmells()
     {
         IAppPolicyCache cache = _appCaches.RuntimeCache;
@@ -1665,11 +1825,21 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
 
     #region Read Repository implementation for Guid keys
 
+    /// <summary>
+    /// Gets the content item with the specified unique identifier.
+    /// </summary>
+    /// <param name="id">The unique identifier of the content item.</param>
+    /// <returns>The content item if found; otherwise, null.</returns>
     public IContent? Get(Guid id) => _contentByGuidReadRepository.Get(id);
 
     IEnumerable<IContent> IReadRepository<Guid, IContent>.GetMany(params Guid[]? ids) =>
         _contentByGuidReadRepository.GetMany(ids);
 
+    /// <summary>
+    /// Determines whether a document with the specified unique identifier exists.
+    /// </summary>
+    /// <param name="id">The unique identifier of the document.</param>
+    /// <returns>True if the document exists; otherwise, false.</returns>
     public bool Exists(Guid id) => _contentByGuidReadRepository.Exists(id);
 
     /// <summary>
@@ -1706,6 +1876,15 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
     {
         private readonly DocumentRepository _outerRepo;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ContentByGuidReadRepository"/> class.
+        /// </summary>
+        /// <param name="outerRepo">The parent <see cref="DocumentRepository"/> instance used for document operations.</param>
+        /// <param name="scopeAccessor">Provides access to the current database scope.</param>
+        /// <param name="cache">The application-level caches for storing and retrieving data.</param>
+        /// <param name="logger">The logger used for logging repository operations.</param>
+        /// <param name="repositoryCacheVersionService">Service for managing repository cache versions.</param>
+        /// <param name="cacheSyncService">Service for synchronizing cache across distributed environments.</param>
         public ContentByGuidReadRepository(
             DocumentRepository outerRepo,
             IScopeAccessor scopeAccessor,
@@ -1787,9 +1966,10 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
             throw new InvalidOperationException("This method won't be implemented.");
 
         /// <summary>
-        /// Populates the GUID-keyed cache with the given entity.
-        /// This allows entities retrieved by int ID to also be cached for GUID lookups.
+        /// Populates the GUID-keyed cache with the specified content entity.
+        /// This enables entities retrieved by integer ID to also be cached and retrieved using their GUID.
         /// </summary>
+        /// <param name="entity">The content entity to cache by its GUID key.</param>
         public void PopulateCacheByKey(IContent entity)
         {
             if (entity.HasIdentity)
@@ -1800,9 +1980,10 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         }
 
         /// <summary>
-        /// Populates the GUID-keyed cache with the given entities.
-        /// This allows entities retrieved by int ID to also be cached for GUID lookups.
+        /// Populates the GUID-keyed cache with the specified content entities.
+        /// This allows entities retrieved by integer ID to also be cached for GUID lookups.
         /// </summary>
+        /// <param name="entities">The collection of <see cref="IContent"/> entities to cache by their GUID keys.</param>
         public void PopulateCacheByKey(IEnumerable<IContent> entities)
         {
             foreach (IContent entity in entities)
@@ -1848,12 +2029,22 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         return sql;
     }
 
+    /// <summary>
+    /// Determines whether there is any content scheduled for expiration on the specified date.
+    /// </summary>
+    /// <param name="date">The date to check for scheduled content expiration.</param>
+    /// <returns>True if there is content scheduled to expire on the given date; otherwise, false.</returns>
     public bool HasContentForExpiration(DateTime date)
     {
         Sql sql = GetSqlForHasScheduling(ContentScheduleAction.Expire, date);
         return Database.ExecuteScalar<int>(sql) > 0;
     }
 
+    /// <summary>
+    /// Determines whether there is any content scheduled for release on the specified date.
+    /// </summary>
+    /// <param name="date">The date to check for scheduled content releases.</param>
+    /// <returns>True if there is content scheduled for release on the given date; otherwise, false.</returns>
     public bool HasContentForRelease(DateTime date)
     {
         Sql sql = GetSqlForHasScheduling(ContentScheduleAction.Release, date);
@@ -1983,8 +2174,19 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
     private void EnsureInvariantNameIsUnique(IContent content) =>
         content.Name = EnsureUniqueNodeName(content.ParentId, content.Name, content.Id);
 
-    protected override string? EnsureUniqueNodeName(int parentId, string? nodeName, int id = 0) =>
-        EnsureUniqueNaming == false ? nodeName : base.EnsureUniqueNodeName(parentId, nodeName, id);
+    protected override string? EnsureUniqueNodeName(int parentId, string? nodeName, int id = 0)
+    {
+        if (EnsureUniqueNaming == false)
+        {
+            return nodeName;
+        }
+
+        // Call the base implementation to handle literal name duplicates (e.g. "Title" vs "Title" → "Title (1)").
+        var uniqueName = EnsureUniqueNodeName(parentId, nodeName, id, out List<SimilarNodeName>? siblings);
+
+        // Ensure the resulting URL segment is also unique among siblings (resolves https://github.com/umbraco/Umbraco-CMS/issues/22070).
+        return EnsureUniqueUrlSegment(uniqueName, id, siblings, _shortStringHelper);
+    }
 
     private SqlTemplate SqlEnsureVariantNamesAreUnique => SqlContext.Templates.Get(
         "Umbraco.Core.DomainRepository.EnsureVariantNamesAreUnique", tsql => tsql
@@ -2039,10 +2241,11 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
                 continue;
             }
 
-            // get a unique name
-            IEnumerable<SimilarNodeName> otherNames =
-                cultureNames.Select(x => new SimilarNodeName { Id = x.Id, Name = x.Name });
-            var uniqueName = SimilarNodeName.GetUniqueName(otherNames, 0, cultureInfo.Name);
+            // get a unique name (literal duplicates first, then URL segment collisions)
+            List<SimilarNodeName> otherNames =
+                cultureNames.Select(x => new SimilarNodeName { Id = x.Id, Name = x.Name }).ToList();
+            var uniqueName = SimilarNodeName.GetUniqueName(otherNames, content.Id, cultureInfo.Name);
+            uniqueName = EnsureUniqueUrlSegment(uniqueName, content.Id, otherNames, _shortStringHelper, cultureInfo.Culture);
 
             if (uniqueName == content.GetCultureName(cultureInfo.Culture))
             {
@@ -2061,11 +2264,79 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         }
     }
 
+    /// <summary>
+    /// Ensures the proposed name produces a URL segment that is unique among sibling URL segments.
+    /// If a collision is detected (e.g. "Title" and "Title." both produce segment "title"),
+    /// a numeric suffix is appended to the name until uniqueness is achieved.
+    /// </summary>
+    internal static string? EnsureUniqueUrlSegment(
+        string? nodeName,
+        int nodeId,
+        IEnumerable<SimilarNodeName> siblings,
+        IShortStringHelper shortStringHelper,
+        string? culture = null)
+    {
+        if (string.IsNullOrWhiteSpace(nodeName))
+        {
+            return nodeName;
+        }
+
+        var proposedSegment = shortStringHelper.CleanStringForUrlSegment(nodeName, culture);
+        if (string.IsNullOrEmpty(proposedSegment))
+        {
+            return nodeName;
+        }
+
+        // Build a set of URL segments from siblings, excluding the current node.
+        var siblingSegments = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (SimilarNodeName sibling in siblings)
+        {
+            if (sibling.Id == nodeId || string.IsNullOrWhiteSpace(sibling.Name))
+            {
+                continue;
+            }
+
+            var segment = shortStringHelper.CleanStringForUrlSegment(sibling.Name, culture);
+            if (string.IsNullOrEmpty(segment) is false)
+            {
+                siblingSegments.Add(segment);
+            }
+        }
+
+        // If the proposed segment doesn't collide, return the name as-is.
+        if (siblingSegments.Contains(proposedSegment) is false)
+        {
+            return nodeName;
+        }
+
+        // Increment a (N) suffix on the name until the resulting URL segment is unique.
+        for (var i = 1; ; i++)
+        {
+            var candidateName = $"{nodeName} ({i})";
+            var candidateSegment = shortStringHelper.CleanStringForUrlSegment(candidateName, culture);
+            if (string.IsNullOrEmpty(candidateSegment) || siblingSegments.Contains(candidateSegment) is false)
+            {
+                return candidateName;
+            }
+        }
+    }
+
     // ReSharper disable once ClassNeverInstantiated.Local
     private sealed class CultureNodeName
     {
+        /// <summary>
+        /// Gets or sets the unique identifier for the culture node name.
+        /// </summary>
         public int Id { get; set; }
+
+        /// <summary>
+        /// Gets or sets the localized name associated with the culture node.
+        /// </summary>
         public string? Name { get; set; }
+
+        /// <summary>
+        /// Gets or sets the language identifier for the culture node name.
+        /// </summary>
         public int LanguageId { get; set; }
     }
 

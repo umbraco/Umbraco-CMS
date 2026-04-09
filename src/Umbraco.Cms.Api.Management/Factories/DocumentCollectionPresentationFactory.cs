@@ -10,11 +10,23 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
+/// <summary>
+/// Provides methods to create presentation models for document collections.
+/// </summary>
 public class DocumentCollectionPresentationFactory : ContentCollectionPresentationFactory<IContent, DocumentCollectionResponseModel, DocumentValueResponseModel, DocumentVariantResponseModel>, IDocumentCollectionPresentationFactory
 {
     private readonly IPublicAccessService _publicAccessService;
     private readonly IEntityService _entityService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Factories.DocumentCollectionPresentationFactory"/> class,
+    /// which is responsible for creating document collection presentation models.
+    /// </summary>
+    /// <param name="mapper">The Umbraco mapper instance used for mapping entities to presentation models.</param>
+    /// <param name="flagProviders">The collection of flag providers used to supply additional document flags.</param>
+    /// <param name="publicAccessService">The service used to manage public access permissions for documents.</param>
+    /// <param name="entityService">The service used to interact with Umbraco entities.</param>
+    /// <param name="userService">The service used to manage user information and permissions.</param>
     public DocumentCollectionPresentationFactory(IUmbracoMapper mapper, FlagProviderCollection flagProviders, IPublicAccessService publicAccessService, IEntityService entityService, IUserService userService)
         : base(mapper, flagProviders, userService)
     {
@@ -22,6 +34,13 @@ public class DocumentCollectionPresentationFactory : ContentCollectionPresentati
         _entityService = entityService;
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Factories.DocumentCollectionPresentationFactory"/> class.
+    /// </summary>
+    /// <param name="mapper">The Umbraco mapper used for mapping between different object models.</param>
+    /// <param name="flagProviders">A collection of providers that supply flags for document collections.</param>
+    /// <param name="publicAccessService">Service for managing public access to documents.</param>
+    /// <param name="entityService">Service for interacting with Umbraco entities.</param>
     [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
     public DocumentCollectionPresentationFactory(IUmbracoMapper mapper, FlagProviderCollection flagProviders, IPublicAccessService publicAccessService, IEntityService entityService)
         : base(mapper, flagProviders)
@@ -30,6 +49,12 @@ public class DocumentCollectionPresentationFactory : ContentCollectionPresentati
         _entityService = entityService;
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Factories.DocumentCollectionPresentationFactory"/> class.
+    /// </summary>
+    /// <param name="mapper">The Umbraco object-to-object mapper used for mapping between models.</param>
+    /// <param name="publicAccessService">Service for managing public access permissions on content.</param>
+    /// <param name="entityService">Service for interacting with Umbraco entities.</param>
     [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
     public DocumentCollectionPresentationFactory(IUmbracoMapper mapper, IPublicAccessService publicAccessService, IEntityService entityService)
         : base(mapper)
