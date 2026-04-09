@@ -47,7 +47,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddUnique<IMediaTypeContainerRepository, MediaTypeContainerRepository>();
         builder.Services.AddUnique<IMediaTypeRepository, MediaTypeRepository>();
         builder.Services.AddUnique<IMemberGroupRepository, MemberGroupRepository>();
-        builder.Services.AddUnique<IMemberRepository, MemberRepository>();
+        builder.Services.AddUnique<IMemberRepository>(sp => ActivatorUtilities.CreateInstance<MemberRepository>(sp));
         builder.Services.AddUnique<IMemberTypeContainerRepository, MemberTypeContainerRepository>();
         builder.Services.AddUnique<IMemberTypeRepository, MemberTypeRepository>();
         builder.Services.AddUnique<INotificationsRepository, NotificationsRepository>();

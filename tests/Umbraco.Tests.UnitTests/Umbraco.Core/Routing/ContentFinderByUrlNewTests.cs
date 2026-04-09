@@ -128,13 +128,13 @@ public class ContentFinderByUrlNewTests
         return mockPublishedContentCache;
     }
 
-    private static ContentFinderByUrlNew CreateContentFinder(
+    private static ContentFinderByUrl CreateContentFinder(
         Mock<IUmbracoContextAccessor> mockUmbracoContextAccessor,
         Mock<IDocumentUrlService> mockDocumentUrlService,
         Mock<IPublishedContentCache> mockPublishedContentCache,
         WebRoutingSettings? webRoutingSettings = null)
         => new(
-            new NullLogger<ContentFinderByUrlNew>(),
+            new NullLogger<ContentFinderByUrl>(),
             mockUmbracoContextAccessor.Object,
             mockDocumentUrlService.Object,
             mockPublishedContentCache.Object,

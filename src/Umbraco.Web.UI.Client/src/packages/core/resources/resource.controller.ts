@@ -2,6 +2,7 @@ import { isApiError, isCancelablePromise, isCancelError, isProblemDetailsLike } 
 import { UmbApiError, UmbCancelError } from './umb-error.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbPeekErrorArgs } from '@umbraco-cms/backoffice/notification';
 
 export class UmbResourceController<T = unknown> extends UmbControllerBase {
 	/**
@@ -73,15 +74,27 @@ export class UmbResourceController<T = unknown> extends UmbControllerBase {
 		this.cancel();
 	}
 
-	protected async _peekError(headline: string, message: string, details: unknown) {
+	/**
+	 * Show an error peek notification to the user.
+	 * @param args - The error notification details.
+	 */
+	protected async _peekError(args: UmbPeekErrorArgs): Promise<void>;
+	/**
+	 * @deprecated Use the overload accepting {@link UmbPeekErrorArgs} instead. Scheduled for removal in Umbraco 19.
+	 */
+	protected async _peekError(headline: string, message: string, errors?: Record<string, string[]>): Promise<void>;
+	protected async _peekError(
+		headlineOrArgs: string | UmbPeekErrorArgs,
+		message?: string,
+		errors?: Record<string, string[]>,
+	): Promise<void> {
+		const args: UmbPeekErrorArgs =
+			typeof headlineOrArgs === 'object' ? headlineOrArgs : { headline: headlineOrArgs, message: message!, errors };
+
 		// Store the host for usage in the following async context
 		const host = this._host;
 
 		// This late importing is done to avoid circular reference
-		(await import('@umbraco-cms/backoffice/notification')).umbPeekError(host, {
-			headline,
-			message,
-			details,
-		});
+		(await import('@umbraco-cms/backoffice/notification')).umbPeekError(host, args);
 	}
 }

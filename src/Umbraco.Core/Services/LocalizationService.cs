@@ -54,32 +54,6 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     }
 
     /// <summary>
-    ///     Creates and saves a new dictionary item and assigns a value to all languages if defaultValue is specified.
-    /// </summary>
-    /// <param name="key"></param>
-    /// <param name="parentId"></param>
-    /// <param name="defaultValue"></param>
-    /// <returns></returns>
-    [Obsolete("Please use IDictionaryItemService for dictionary item operations. Scheduled for removal in Umbraco 18.")]
-    public IDictionaryItem CreateDictionaryItemWithIdentity(string key, Guid? parentId, string? defaultValue = null)
-    {
-        IEnumerable<IDictionaryTranslation> translations = defaultValue.IsNullOrWhiteSpace()
-            ? Array.Empty<IDictionaryTranslation>()
-            : GetAllLanguages()
-                .Select(language => new DictionaryTranslation(language, defaultValue!))
-                .ToArray();
-
-        Attempt<IDictionaryItem, DictionaryItemOperationStatus> result = _dictionaryItemService
-            .CreateAsync(new DictionaryItem(parentId, key) { Translations = translations }, Constants.Security.SuperUserKey)
-            .GetAwaiter()
-            .GetResult();
-        // mimic old service behavior
-        return result.Success || result.Status == DictionaryItemOperationStatus.CancelledByNotification
-            ? result.Result
-            : throw new ArgumentException($"Could not create a dictionary item with key: {key} under parent: {parentId}");
-    }
-
-    /// <summary>
     ///     Gets a <see cref="IDictionaryItem" /> by its <see cref="int" /> id
     /// </summary>
     /// <param name="id">Id of the <see cref="IDictionaryItem" /></param>
@@ -117,17 +91,6 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     }
 
     /// <summary>
-    ///     Gets a collection <see cref="IDictionaryItem" /> by their <see cref="Guid" /> ids
-    /// </summary>
-    /// <param name="ids">Ids of the <see cref="IDictionaryItem" /></param>
-    /// <returns>
-    ///     A collection of <see cref="IDictionaryItem" />
-    /// </returns>
-    [Obsolete("Please use IDictionaryItemService for dictionary item operations. Scheduled for removal in Umbraco 18.")]
-    public IEnumerable<IDictionaryItem> GetDictionaryItemsByIds(params Guid[] ids)
-        => _dictionaryItemService.GetManyAsync(ids).GetAwaiter().GetResult();
-
-    /// <summary>
     ///     Gets a <see cref="IDictionaryItem" /> by its key
     /// </summary>
     /// <param name="key">Key of the <see cref="IDictionaryItem" /></param>
@@ -139,17 +102,6 @@ internal class LocalizationService : RepositoryService, ILocalizationService
         => _dictionaryItemService.GetAsync(key).GetAwaiter().GetResult();
 
     /// <summary>
-    ///     Gets a collection of <see cref="IDictionaryItem" /> by their keys
-    /// </summary>
-    /// <param name="keys">Keys of the <see cref="IDictionaryItem" /></param>
-    /// <returns>
-    ///     A collection of <see cref="IDictionaryItem" />
-    /// </returns>
-    [Obsolete("Please use IDictionaryItemService for dictionary item operations. Scheduled for removal in Umbraco 18.")]
-    public IEnumerable<IDictionaryItem> GetDictionaryItemsByKeys(params string[] keys)
-        => _dictionaryItemService.GetManyAsync(keys).GetAwaiter().GetResult();
-
-    /// <summary>
     /// Gets a list of children for a <see cref="IDictionaryItem"/>
     /// </summary>
     /// <param name="parentId">Id of the parent</param>
@@ -157,32 +109,6 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     [Obsolete("Please use IDictionaryItemService for dictionary item operations. Scheduled for removal in Umbraco 18.")]
     public IEnumerable<IDictionaryItem> GetDictionaryItemChildren(Guid parentId)
         => _dictionaryItemService.GetChildrenAsync(parentId).GetAwaiter().GetResult();
-
-    /// <summary>
-    ///     Gets a list of descendants for a <see cref="IDictionaryItem" />
-    /// </summary>
-    /// <param name="parentId">Id of the parent, null will return all dictionary items</param>
-    /// <returns>An enumerable list of <see cref="IDictionaryItem" /> objects</returns>
-    [Obsolete("Please use IDictionaryItemService for dictionary item operations. Scheduled for removal in Umbraco 18.")]
-    public IEnumerable<IDictionaryItem> GetDictionaryItemDescendants(Guid? parentId)
-        => _dictionaryItemService.GetDescendantsAsync(parentId).GetAwaiter().GetResult();
-
-    /// <summary>
-    /// Gets the root/top <see cref="IDictionaryItem"/> objects
-    /// </summary>
-    /// <returns>An enumerable list of <see cref="IDictionaryItem"/> objects</returns>
-    [Obsolete("Please use IDictionaryItemService for dictionary item operations. Scheduled for removal in Umbraco 18.")]
-    public IEnumerable<IDictionaryItem> GetRootDictionaryItems()
-        => _dictionaryItemService.GetAtRootAsync().GetAwaiter().GetResult();
-
-    /// <summary>
-    ///     Checks if a <see cref="IDictionaryItem" /> with given key exists
-    /// </summary>
-    /// <param name="key">Key of the <see cref="IDictionaryItem" /></param>
-    /// <returns>True if a <see cref="IDictionaryItem" /> exists, otherwise false</returns>
-    [Obsolete("Please use IDictionaryItemService for dictionary item operations. Scheduled for removal in Umbraco 18.")]
-    public bool DictionaryItemExists(string key)
-        => _dictionaryItemService.ExistsAsync(key).GetAwaiter().GetResult();
 
     /// <summary>
     ///     Saves a <see cref="IDictionaryItem" /> object
@@ -201,19 +127,6 @@ internal class LocalizationService : RepositoryService, ILocalizationService
         {
             _dictionaryItemService.CreateAsync(dictionaryItem, currentUserKey).GetAwaiter().GetResult();
         }
-    }
-
-    /// <summary>
-    ///     Deletes a <see cref="IDictionaryItem" /> object and its related translations
-    ///     as well as its children.
-    /// </summary>
-    /// <param name="dictionaryItem"><see cref="IDictionaryItem" /> to delete</param>
-    /// <param name="userId">Optional id of the user deleting the dictionary item</param>
-    [Obsolete("Please use IDictionaryItemService for dictionary item operations. Scheduled for removal in Umbraco 18.")]
-    public void Delete(IDictionaryItem dictionaryItem, int userId = Constants.Security.SuperUserId)
-    {
-        Guid currentUserKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult();
-        _dictionaryItemService.DeleteAsync(dictionaryItem.Key, currentUserKey).GetAwaiter().GetResult();
     }
 
     /// <summary>
@@ -248,11 +161,6 @@ internal class LocalizationService : RepositoryService, ILocalizationService
 
     /// <inheritdoc />
     [Obsolete("Please use ILanguageService for language operations. Scheduled for removal in Umbraco 18.")]
-    public int? GetLanguageIdByIsoCode(string isoCode)
-        => _languageService.GetAsync(isoCode).GetAwaiter().GetResult()?.Id;
-
-    /// <inheritdoc />
-    [Obsolete("Please use ILanguageService for language operations. Scheduled for removal in Umbraco 18.")]
     public string GetDefaultLanguageIsoCode()
         => _languageService.GetDefaultIsoCodeAsync().GetAwaiter().GetResult();
 
@@ -282,17 +190,5 @@ internal class LocalizationService : RepositoryService, ILocalizationService
         {
             throw new InvalidOperationException($"Cannot save language {language.IsoCode} with fallback {language.FallbackIsoCode}.");
         }
-    }
-
-    /// <summary>
-    ///     Deletes a <see cref="ILanguage" /> by removing it (but not its usages) from the db
-    /// </summary>
-    /// <param name="language"><see cref="ILanguage" /> to delete</param>
-    /// <param name="userId">Optional id of the user deleting the language</param>
-    [Obsolete("Please use ILanguageService for language operations. Scheduled for removal in Umbraco 18.")]
-    public void Delete(ILanguage language, int userId = Constants.Security.SuperUserId)
-    {
-        Guid currentUserKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult();
-        _languageService.DeleteAsync(language.IsoCode, currentUserKey).GetAwaiter().GetResult();
     }
 }

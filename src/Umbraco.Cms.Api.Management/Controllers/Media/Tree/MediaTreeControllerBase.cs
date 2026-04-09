@@ -57,9 +57,9 @@ public class MediaTreeControllerBase : UserStartNodeTreeControllerBase<MediaTree
 
     protected override Ordering ItemOrdering => Ordering.By(Infrastructure.Persistence.Dtos.NodeDto.SortOrderColumnName);
 
-    protected override MediaTreeItemResponseModel MapTreeItemViewModel(Guid? parentKey, IEntitySlim entity)
+    protected override async Task<MediaTreeItemResponseModel> MapTreeItemViewModelAsync(Guid? parentKey, IEntitySlim entity)
     {
-        MediaTreeItemResponseModel responseModel = base.MapTreeItemViewModel(parentKey, entity);
+        MediaTreeItemResponseModel responseModel = await base.MapTreeItemViewModelAsync(parentKey, entity);
 
         if (entity is IMediaEntitySlim mediaEntitySlim)
         {

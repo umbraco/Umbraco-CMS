@@ -466,6 +466,17 @@ _sqlInspector ??= new SqlInspectionUtilities();
 
     #endregion
 
+    /// <inheritdoc />
+    public override string CreateTempTable(string tableName, string columnDefinitionSql)
+        => $"CREATE TABLE #{tableName} ({columnDefinitionSql})";
+
+    /// <inheritdoc />
+    public override string TempTableName(string baseName) => $"#{baseName}";
+
+    /// <inheritdoc />
+    public override string DropTempTable(string tableName)
+        => $"DROP TABLE IF EXISTS #{tableName}";
+
     private sealed class SqlPrimaryKey
     {
         public string Name { get; set; } = null!;

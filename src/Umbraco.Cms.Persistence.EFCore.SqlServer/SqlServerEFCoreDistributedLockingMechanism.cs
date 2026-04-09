@@ -137,7 +137,7 @@ public sealed class SqlServerEFCoreDistributedLockingMechanism<T> : IDistributed
 
         private void ObtainReadLock()
         {
-            IEfCoreScope<T>? scope = _parent._scopeAccessor.Value.AmbientScope;
+            IEFCoreScope<T>? scope = _parent._scopeAccessor.Value.AmbientScope;
 
             if (scope is null)
             {
@@ -171,7 +171,7 @@ public sealed class SqlServerEFCoreDistributedLockingMechanism<T> : IDistributed
 
         private void ObtainWriteLock()
         {
-            IEfCoreScope<T>? scope = _parent._scopeAccessor.Value.AmbientScope;
+            IEFCoreScope<T>? scope = _parent._scopeAccessor.Value.AmbientScope;
             if (scope is null)
             {
                 throw new PanicException("No ambient scope");

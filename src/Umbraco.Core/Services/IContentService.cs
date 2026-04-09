@@ -37,20 +37,17 @@ public interface IContentService : IPublishableContentService<IContent>
     ///     Saves a blueprint.
     /// </summary>
     /// <param name="content">The blueprint to save.</param>
-    /// <param name="userId">The identifier of the user performing the action.</param>
-    [Obsolete("Please use the method taking all parameters. Scheduled for removal in Umbraco 18.")]
-    void SaveBlueprint(IContent content, int userId = Constants.Security.SuperUserId);
-
-    /// <summary>
-    ///     Saves a blueprint.
-    /// </summary>
-    /// <param name="content">The blueprint to save.</param>
     /// <param name="createdFromContent">The content from which the blueprint was created.</param>
     /// <param name="userId">The identifier of the user performing the action.</param>
-    void SaveBlueprint(IContent content, IContent? createdFromContent, int userId = Constants.Security.SuperUserId)
-#pragma warning disable CS0618 // Type or member is obsolete
-        => SaveBlueprint(content, userId);
-#pragma warning restore CS0618 // Type or member is obsolete
+    void SaveBlueprint(IContent content, IContent? createdFromContent, int userId = Constants.Security.SuperUserId);
+
+    /// <summary>
+    ///     Moves a blueprint.
+    /// </summary>
+    /// <param name="content">The blueprint to move.</param>
+    /// <param name="userId">The identifier of the user performing the action.</param>
+    // TODO (V19): Remove the default implementation from this
+    void MoveBlueprint(IContent content, int userId = Constants.Security.SuperUserId) => throw new NotImplementedException();
 
     /// <summary>
     ///     Deletes a blueprint.
@@ -296,13 +293,6 @@ public interface IContentService : IPublishableContentService<IContent>
     /// <returns>A dictionary with a node Id and an IEnumerable of matching ContentSchedules.</returns>
     [Obsolete("Use GetContentSchedulesByKeys instead. Scheduled for removal in Umbraco 19.")]
     IDictionary<int, IEnumerable<ContentSchedule>> GetContentSchedulesByIds(Guid[] keys) => ImmutableDictionary<int, IEnumerable<ContentSchedule>>.Empty;
-
-    /// <summary>
-    ///     Gets a dictionary of content keys and their matching content schedules.
-    /// </summary>
-    /// <param name="keys">The content keys.</param>
-    /// <returns>A dictionary with a content key and an IEnumerable of matching ContentSchedules.</returns>
-    IDictionary<Guid, IEnumerable<ContentSchedule>> GetContentSchedulesByKeys(Guid[] keys) => ImmutableDictionary<Guid, IEnumerable<ContentSchedule>>.Empty;
 
     #endregion
 

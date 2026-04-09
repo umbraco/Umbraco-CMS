@@ -47,6 +47,7 @@ public class IndexPresentationFactory : IIndexPresentationFactory
     public async Task<IndexResponseModel> CreateAsync(IIndex index)
     {
         var isCorrupt = !TryGetSearcherName(index, out var searcherName);
+        var uniqueKeyFieldName = (index as IUmbracoIndex)?.UniqueKeyFieldName;
 
         if (await _indexingRebuilderService.IsRebuildingAsync(index.Name))
         {
@@ -60,6 +61,7 @@ public class IndexPresentationFactory : IIndexPresentationFactory
                 SearcherName = searcherName,
                 DocumentCount = 0,
                 FieldCount = 0,
+                UniqueKeyFieldName = uniqueKeyFieldName,
             };
         }
 
@@ -107,6 +109,7 @@ public class IndexPresentationFactory : IIndexPresentationFactory
             DocumentCount = documentCount,
             FieldCount = fieldNameCount,
             ProviderProperties = properties,
+            UniqueKeyFieldName = uniqueKeyFieldName,
         };
 
         return indexerModel;

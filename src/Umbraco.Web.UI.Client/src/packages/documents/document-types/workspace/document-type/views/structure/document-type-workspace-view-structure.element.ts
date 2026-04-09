@@ -1,6 +1,6 @@
 import type { UmbInputDocumentTypeElement } from '../../../../components/input-document-type/input-document-type.element.js';
 import { UMB_DOCUMENT_TYPE_WORKSPACE_CONTEXT } from '../../document-type-workspace.context-token.js';
-import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type {
@@ -18,10 +18,16 @@ export class UmbDocumentTypeWorkspaceViewStructureElement extends UmbLitElement 
 	private _allowedAtRoot?: boolean;
 
 	@state()
+	private _allowedInLibrary?: boolean;
+
+	@state()
 	private _allowedContentTypeUniques?: Array<string>;
 
 	@state()
 	private _collection?: string | null;
+
+	@state()
+	private _isElementType = false;
 
 	constructor() {
 		super();
@@ -39,6 +45,12 @@ export class UmbDocumentTypeWorkspaceViewStructureElement extends UmbLitElement 
 			this.#workspaceContext.allowedAtRoot,
 			(allowedAtRoot) => (this._allowedAtRoot = allowedAtRoot),
 			'_allowedAtRootObserver',
+		);
+
+		this.observe(
+			this.#workspaceContext.allowedInLibrary,
+			(allowedInLibrary) => (this._allowedInLibrary = allowedInLibrary),
+			'_allowedInLibraryObserver',
 		);
 
 		this.observe(
@@ -60,6 +72,12 @@ export class UmbDocumentTypeWorkspaceViewStructureElement extends UmbLitElement 
 			},
 			'_collectionObserver',
 		);
+
+		this.observe(
+			this.#workspaceContext.isElement,
+			(isElement) => (this._isElementType = isElement ?? false),
+			'_isElementTypeObserver',
+		);
 	}
 
 	override render() {
@@ -76,6 +94,22 @@ export class UmbDocumentTypeWorkspaceViewStructureElement extends UmbLitElement 
 							}}></uui-toggle>
 					</div>
 				</umb-property-layout>
+				${when(
+					this._isElementType,
+					() => html`
+						<umb-property-layout alias="library" label=${this.localize.term('contentTypeEditor_allowInLibraryHeading')}>
+							<div slot="description">${this.localize.term('contentTypeEditor_allowInLibraryDescription')}</div>
+							<div slot="editor">
+								<uui-toggle
+									label=${this.localize.term('contentTypeEditor_allowInLibraryHeading')}
+									?checked=${this._allowedInLibrary}
+									@change=${(e: CustomEvent) => {
+										this.#workspaceContext?.setAllowedInLibrary((e.target as UUIToggleElement).checked);
+									}}></uui-toggle>
+							</div>
+						</umb-property-layout>
+					`,
+				)}
 				<umb-property-layout alias="ChildNodeType" label=${this.localize.term('contentTypeEditor_childNodesHeading')}>
 					<div slot="description">${this.localize.term('contentTypeEditor_childNodesDescription')}</div>
 					<div slot="editor">

@@ -400,33 +400,84 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
             // property variation change?
             var hasAnyPropertyVariationChanged = contentType.WasPropertyTypeVariationChanged();
 
-            // main impact on properties?
+            // Detect all granular change types independently so that structural
+            // and non-structural changes can be detected in the same operation
+            // (e.g. removing a property AND adding another at the same time).
+            var hasAnyChange = false;
+
+            // --- Structural changes (each includes RefreshMain automatically) ---
+
+            if (hasAliasChanged)
+            {
+                AddChange(changes, contentType, ContentTypeChangeTypes.AliasChanged);
+                hasAnyChange = true;
+            }
+
+            if (hasAnyPropertyChangedAlias)
+            {
+                AddChange(changes, contentType, ContentTypeChangeTypes.PropertyAliasChanged);
+                hasAnyChange = true;
+            }
+
+            if (hasAnyPropertyBeenRemoved)
+            {
+                AddChange(changes, contentType, ContentTypeChangeTypes.PropertyRemoved);
+                hasAnyChange = true;
+            }
+
+            if (hasAnyCompositionBeenRemoved)
+            {
+                AddChange(changes, contentType, ContentTypeChangeTypes.CompositionRemoved);
+                hasAnyChange = true;
+            }
+
+            if (hasAnyPropertyVariationChanged)
+            {
+                AddChange(changes, contentType, ContentTypeChangeTypes.PropertyVariationChanged);
+                hasAnyChange = true;
+            }
+
+            // Add VariationChanged flag if content type variation changed.
+            // This is used by DocumentUrlService to rebuild URL cache with correct languageId.
+            if (hasContentTypeVariationChanged)
+            {
+                AddChange(changes, contentType, ContentTypeChangeTypes.VariationChanged);
+                hasAnyChange = true;
+            }
+
+            // main impact on properties? Propagate RefreshMain to composed types.
             var hasPropertyMainImpact = hasContentTypeVariationChanged || hasAnyPropertyVariationChanged
                                                                        || hasAnyCompositionBeenRemoved || hasAnyPropertyBeenRemoved || hasAnyPropertyChangedAlias;
-
-            if (hasAliasChanged || hasPropertyMainImpact)
+            if (hasPropertyMainImpact)
             {
-                // add that one, as a main change
-                AddChange(changes, contentType, ContentTypeChangeTypes.RefreshMain);
-
-                // Add VariationChanged flag if content type variation changed.
-                // This is used by DocumentUrlService to rebuild URL cache with correct languageId.
-                if (hasContentTypeVariationChanged)
+                foreach (TItem c in GetComposedOf(contentType.Id))
                 {
-                    AddChange(changes, contentType, ContentTypeChangeTypes.VariationChanged);
-                }
-
-                if (hasPropertyMainImpact)
-                {
-                    foreach (TItem c in GetComposedOf(contentType.Id))
-                    {
-                        AddChange(changes, c, ContentTypeChangeTypes.RefreshMain);
-                    }
+                    AddChange(changes, c, ContentTypeChangeTypes.RefreshMain);
                 }
             }
-            else
+
+            // --- Non-structural changes (each includes RefreshOther automatically) ---
+
+            // new properties added?
+            var hasAnyPropertyBeenAdded = contentType.PropertyTypes.Any(pt => pt.WasPropertyDirty("Id"));
+            if (hasAnyPropertyBeenAdded)
             {
-                // add that one, as an other change
+                AddChange(changes, contentType, ContentTypeChangeTypes.PropertyAdded);
+                hasAnyChange = true;
+            }
+
+            // compositions added?
+            var hasAnyCompositionBeenAdded = dirty.WasPropertyDirty("HasCompositionTypeBeenAdded");
+            if (hasAnyCompositionBeenAdded)
+            {
+                AddChange(changes, contentType, ContentTypeChangeTypes.CompositionAdded);
+                hasAnyChange = true;
+            }
+
+            // Fall back to bare RefreshOther if none of the specific checks matched
+            // (e.g. for changes we haven't categorized yet).
+            if (!hasAnyChange)
+            {
                 AddChange(changes, contentType, ContentTypeChangeTypes.RefreshOther);
             }
         }
@@ -1054,93 +1105,6 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
     #endregion
 
     #region Copy
-
-    /// <summary>
-    /// Copies the specified content type to a new content type with the specified alias and name.
-    /// </summary>
-    /// <param name="original">The original content type to copy.</param>
-    /// <param name="alias">The alias for the new content type.</param>
-    /// <param name="name">The name for the new content type.</param>
-    /// <param name="parentId">The parent identifier for the new content type. Use -1 for root.</param>
-    /// <returns>The newly created content type copy.</returns>
-    [Obsolete("Please use CopyAsync. Scheduled for removal in Umbraco 18.")]
-    public TItem Copy(TItem original, string alias, string name, int parentId = -1)
-    {
-        TItem? parent = null;
-        if (parentId > 0)
-        {
-            parent = Get(parentId);
-            if (parent == null)
-            {
-                throw new InvalidOperationException("Could not find parent with id " + parentId);
-            }
-        }
-        return Copy(original, alias, name, parent);
-    }
-
-    /// <summary>
-    /// Copies the specified content type to a new content type with the specified alias, name, and parent.
-    /// </summary>
-    /// <param name="original">The original content type to copy.</param>
-    /// <param name="alias">The alias for the new content type.</param>
-    /// <param name="name">The name for the new content type.</param>
-    /// <param name="parent">The parent content type for the new content type. Use null for root.</param>
-    /// <returns>The newly created content type copy.</returns>
-    [Obsolete("Please use CopyAsync. Scheduled for removal in Umbraco 18.")]
-    public TItem Copy(TItem original, string alias, string name, TItem? parent)
-    {
-        if (original == null)
-        {
-            throw new ArgumentNullException(nameof(original));
-        }
-
-        if (alias == null)
-        {
-            throw new ArgumentNullException(nameof(alias));
-        }
-
-        if (string.IsNullOrWhiteSpace(alias))
-        {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(alias));
-        }
-
-        if (parent != null && parent.HasIdentity == false)
-        {
-            throw new InvalidOperationException("Parent must have an identity.");
-        }
-
-        // this is illegal
-        //var originalb = (ContentTypeCompositionBase)original;
-        // but we *know* it has to be a ContentTypeCompositionBase anyways
-        var originalb = (ContentTypeCompositionBase) (object) original;
-        var clone = (TItem) (object) originalb.DeepCloneWithResetIdentities(alias);
-
-        clone.Name = name;
-
-        //remove all composition that is not it's current alias
-        var compositionAliases = clone.CompositionAliases().Except(new[] { alias }).ToList();
-        foreach (var a in CollectionsMarshal.AsSpan(compositionAliases))
-        {
-            clone.RemoveContentType(a);
-        }
-
-        //if a parent is specified set it's composition and parent
-        if (parent != null)
-        {
-            //add a new parent composition
-            clone.AddContentType(parent);
-            clone.ParentId = parent.Id;
-        }
-        else
-        {
-            //set to root
-            clone.ParentId = -1;
-        }
-
-        Save(clone);
-        return clone;
-    }
-
     /// <summary>
     /// Copies a content type to a specified container.
     /// </summary>

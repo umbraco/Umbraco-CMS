@@ -30,14 +30,28 @@ internal sealed class TemplateRenderer : ITemplateRenderer
 {
     private readonly IFileService _fileService;
     private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly ILocalizationService _languageService;
     private readonly IModelMetadataProvider _modelMetadataProvider;
     private readonly IPublishedRouter _publishedRouter;
     private readonly ITempDataDictionaryFactory _tempDataDictionaryFactory;
     private readonly IUmbracoContextAccessor _umbracoContextAccessor;
     private readonly ICompositeViewEngine _viewEngine;
     private WebRoutingSettings _webRoutingSettings;
+    private readonly ILanguageService _languageService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="TemplateRenderer"/> class.
+    /// </summary>
+    /// <param name="umbracoContextAccessor">Provides access to the current Umbraco context.</param>
+    /// <param name="publishedRouter">The published router</param>
+    /// <param name="fileService"></param>
+    /// <param name="textService"></param>
+    /// <param name="webRoutingSettings"></param>
+    /// <param name="httpContextAccessor"></param>
+    /// <param name="viewEngine"></param>
+    /// <param name="modelMetadataProvider"></param>
+    /// <param name="tempDataDictionaryFactory"></param>
+    /// <param name="languageService"></param>
+    /// <exception cref="ArgumentNullException"></exception>
     public TemplateRenderer(
         IUmbracoContextAccessor umbracoContextAccessor,
         IPublishedRouter publishedRouter,
@@ -47,13 +61,13 @@ internal sealed class TemplateRenderer : ITemplateRenderer
         IHttpContextAccessor httpContextAccessor,
         ICompositeViewEngine viewEngine,
         IModelMetadataProvider modelMetadataProvider,
-        ITempDataDictionaryFactory tempDataDictionaryFactory)
+        ITempDataDictionaryFactory tempDataDictionaryFactory,
+        ILanguageService languageService)
     {
         _umbracoContextAccessor =
             umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
         _publishedRouter = publishedRouter ?? throw new ArgumentNullException(nameof(publishedRouter));
         _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
-        _languageService = textService ?? throw new ArgumentNullException(nameof(textService));
         _webRoutingSettings = webRoutingSettings.CurrentValue ??
                               throw new ArgumentNullException(nameof(webRoutingSettings));
         _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
@@ -62,6 +76,7 @@ internal sealed class TemplateRenderer : ITemplateRenderer
         _tempDataDictionaryFactory = tempDataDictionaryFactory;
 
         webRoutingSettings.OnChange(x => _webRoutingSettings = x);
+        _languageService = languageService;
     }
 
     public async Task RenderAsync(int pageId, int? altTemplateId, StringWriter writer)
@@ -92,7 +107,7 @@ internal sealed class TemplateRenderer : ITemplateRenderer
         // set the culture to the same as is currently rendering
         if (umbracoContext.PublishedRequest == null)
         {
-            ILanguage? defaultLanguage = _languageService.GetAllLanguages().FirstOrDefault();
+            ILanguage? defaultLanguage = await _languageService.GetDefaultLanguageAsync();
 
             requestBuilder.SetCulture(defaultLanguage == null
                 ? CultureInfo.CurrentUICulture.Name

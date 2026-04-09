@@ -22,11 +22,12 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
 internal sealed class TagServiceTests : UmbracoIntegrationTest
 {
+    private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
     [SetUp]
-    public void CreateTestData()
+    public async Task CreateTestData()
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
-        FileService.SaveTemplate(template); // else, FK violation on contentType!
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey); // else, FK violation on contentType!
 
         _contentType =
             ContentTypeBuilder.CreateSimpleContentType(

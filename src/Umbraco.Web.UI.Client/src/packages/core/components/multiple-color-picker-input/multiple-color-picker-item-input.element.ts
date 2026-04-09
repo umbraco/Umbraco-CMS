@@ -12,14 +12,14 @@ import {
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { UmbChangeEvent, UmbInputEvent, UmbDeleteEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { UUIFormControlWithBasicsMixin } from '@umbraco-cms/backoffice/external/uui';
 import type { UUIColorPickerElement, UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
 /**
  * @element umb-multiple-color-picker-item-input
  */
 @customElement('umb-multiple-color-picker-item-input')
-export class UmbMultipleColorPickerItemInputElement extends UUIFormControlMixin(UmbLitElement, '') {
+export class UmbMultipleColorPickerItemInputElement extends UUIFormControlWithBasicsMixin(UmbLitElement, '') {
 	@property({ type: String })
 	public override set value(value: string) {
 		this._valueHex = this.#expandHex(value);

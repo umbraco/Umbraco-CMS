@@ -21,6 +21,17 @@ const propertyEditorUi: ManifestPropertyEditorUi = {
 					config: [{ alias: 'validationRange', value: { min: 0, max: Infinity } }],
 					weight: 100,
 				},
+				{
+					alias: 'startNodeId',
+					label: 'Start node',
+					description: '',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.ElementPicker',
+					config: [
+						{ alias: 'folderOnly', value: true },
+						{ alias: 'validationLimit', value: { min: 0, max: 1 } },
+					],
+					weight: 110,
+				},
 			],
 		},
 	},

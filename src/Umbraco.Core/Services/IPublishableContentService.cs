@@ -46,6 +46,13 @@ public interface IPublishableContentService<TContent> : IContentServiceBase<TCon
     ContentScheduleCollection GetContentScheduleByContentId(Guid contentId);
 
     /// <summary>
+    ///     Gets a dictionary of content keys and their matching content schedules.
+    /// </summary>
+    /// <param name="keys">The content keys.</param>
+    /// <returns>A dictionary with a content key and an IEnumerable of matching ContentSchedules.</returns>
+    IDictionary<Guid, IEnumerable<ContentSchedule>> GetContentSchedulesByKeys(Guid[] keys);
+
+    /// <summary>
     ///     Persists publish/unpublish schedule for a content node.
     /// </summary>
     /// <param name="content">The content to persist the schedule for.</param>
