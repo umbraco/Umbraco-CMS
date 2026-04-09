@@ -1,7 +1,7 @@
 import { UMB_MEDIA_WORKSPACE_CONTEXT } from '../../constants.js';
 import { UMB_CREATE_MEDIA_WORKSPACE_PATH_PATTERN } from '../../paths.js';
 import { UMB_MEDIA_ENTITY_TYPE, UMB_MEDIA_ROOT_ENTITY_TYPE } from '../../entity.js';
-import { html, customElement, property, state, map } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, state, map, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbMediaTypeStructureRepository } from '@umbraco-cms/backoffice/media-type';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { ManifestCollectionAction } from '@umbraco-cms/backoffice/collection';
@@ -110,8 +110,9 @@ export class UmbCreateMediaCollectionActionElement extends UmbLitElement {
 				@toggle=${this.#onPopoverToggle}>
 				<umb-popover-layout>
 					<uui-scroll-container>
-						${map(
+						${repeat(
 							this._allowedMediaTypes,
+							(item) => item.unique,
 							(item) => html`
 								<uui-menu-item label=${item.name} href=${this.#getCreateUrl(item)}>
 									<umb-icon slot="icon" name=${item.icon ?? 'icon-picture'}></umb-icon>
