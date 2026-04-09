@@ -23,6 +23,7 @@ internal sealed class DictionaryRepository : AsyncEntityRepositoryBase<Guid, IDi
 {
     private readonly ILanguageRepository _languageRepository;
     private readonly IOptionsMonitor<DictionarySettings> _dictionarySettings;
+    private readonly AsyncDictionaryItemKeyCachePolicy _itemKeyCachePolicy;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DictionaryRepository"/> class.
@@ -46,13 +47,25 @@ internal sealed class DictionaryRepository : AsyncEntityRepositoryBase<Guid, IDi
     {
         _languageRepository = languageRepository;
         _dictionarySettings = dictionarySettings;
+        _itemKeyCachePolicy = new AsyncDictionaryItemKeyCachePolicy(
+            GlobalIsolatedCache,
+            ScopeAccessor,
+            new AsyncRepositoryCachePolicyOptions { GetAllCacheAllowZeroCount = true },
+            repositoryCacheVersionService,
+            cacheSyncService);
     }
 
     /// <inheritdoc/>
     protected override Guid GetEntityKey(IDictionaryItem entity) => entity.Key;
 
     /// <inheritdoc/>
-    public async Task<IDictionaryItem?> GetByItemKeyAsync(string key)
+    public async Task<IDictionaryItem?> GetByItemKeyAsync(string key) =>
+        await _itemKeyCachePolicy.GetByItemKeyAsync(key, PerformGetByItemKeyAsync);
+
+    /// <summary>
+    /// Performs the actual database lookup for a dictionary item by its string key.
+    /// </summary>
+    private async Task<IDictionaryItem?> PerformGetByItemKeyAsync(string key)
     {
         IDictionary<int, ILanguage> languagesById = await GetLanguagesByIdAsync();
 
@@ -384,21 +397,41 @@ internal sealed class DictionaryRepository : AsyncEntityRepositoryBase<Guid, IDi
 
             entity.ResetDirtyProperties();
 
-            // Clear the cache entries that exist by item key
-            IsolatedCache.Clear(RepositoryCacheKeys.GetKey<IDictionaryItem, string>(entity.ItemKey));
+            // Clear the cache entry that exists by item key
+            await _itemKeyCachePolicy.ClearByItemKeyAsync(entity.ItemKey);
         });
 
+    /// <inheritdoc/>
     protected override async Task PersistDeletedItemAsync(IDictionaryItem entity)
     {
         await AmbientScope.ExecuteWithContextAsync(async db =>
         {
-            await RecursiveDeleteAsync(entity.Key, db);
-            await DeleteEntityAsync(entity.Key, db);
+            var allDescendants = new List<DictionaryDto>();
+            await CollectDescendantsAsync(entity.Key, db, allDescendants);
+
+            // Remove in reverse order to not mess up foreign key constraints
+            allDescendants.Reverse();
+            db.DictionaryEntries.RemoveRange(allDescendants);
+
+            DictionaryDto? dto = await db.DictionaryEntries
+                .FirstOrDefaultAsync(x => x.UniqueId == entity.Key);
+
+            if (dto is not null)
+            {
+                db.DictionaryEntries.Remove(dto);
+            }
+
+            await db.SaveChangesAsync();
+
+            foreach (DictionaryDto descendant in allDescendants)
+            {
+                await _itemKeyCachePolicy.ClearByItemKeyAsync(descendant.Key);
+            }
+
             return true;
         });
 
-        // Clear the cache entries that exist by item key
-        IsolatedCache.Clear(RepositoryCacheKeys.GetKey<IDictionaryItem, string>(entity.ItemKey));
+        await _itemKeyCachePolicy.ClearByItemKeyAsync(entity.ItemKey);
 
         entity.DeleteDate = DateTime.UtcNow;
     }
@@ -467,37 +500,19 @@ internal sealed class DictionaryRepository : AsyncEntityRepositoryBase<Guid, IDi
     }
 
     /// <summary>
-    /// Recursively deletes all children of the specified parent dictionary entry.
+    /// Recursively collects all descendant dictionary entries of the specified parent.
     /// </summary>
-    private async Task RecursiveDeleteAsync(Guid parentId, UmbracoDbContext db)
+    private static async Task CollectDescendantsAsync(Guid parentId, UmbracoDbContext db, List<DictionaryDto> result)
     {
         List<DictionaryDto> children = await db.DictionaryEntries
             .Where(x => x.Parent == parentId)
             .ToListAsync();
 
+        result.AddRange(children);
+
         foreach (DictionaryDto child in children)
         {
-            await RecursiveDeleteAsync(child.UniqueId, db);
-            await DeleteEntityAsync(child.UniqueId, db);
-
-            // Clear the cache entries that exist by item key
-            IsolatedCache.Clear(RepositoryCacheKeys.GetKey<IDictionaryItem, string>(child.Key));
-        }
-    }
-
-    /// <summary>
-    /// Deletes a dictionary entry by unique ID.
-    /// </summary>
-    private static async Task DeleteEntityAsync(Guid key, UmbracoDbContext db)
-    {
-        DictionaryDto? dto = await db.DictionaryEntries
-            .Include(x => x.LanguageText)
-            .FirstOrDefaultAsync(x => x.UniqueId == key);
-
-        if (dto is not null)
-        {
-            db.DictionaryEntries.Remove(dto);
-            await db.SaveChangesAsync();
+            await CollectDescendantsAsync(child.UniqueId, db, result);
         }
     }
 
