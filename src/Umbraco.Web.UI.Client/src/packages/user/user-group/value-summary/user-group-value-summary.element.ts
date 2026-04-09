@@ -1,14 +1,15 @@
+import type { UmbUserGroupItemModel } from '../repository/item/types.js';
 import { customElement, html, nothing, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-user-groups-value-summary')
 export class UmbUserGroupsValueSummaryElement extends UmbLitElement {
 	@property({ attribute: false })
-	value?: string;
+	value?: ReadonlyArray<UmbUserGroupItemModel>;
 
 	override render() {
-		if (this.value === undefined) return nothing;
-		return html`<span>${this.value}</span>`;
+		if (!this.value?.length) return nothing;
+		return html`<span>${this.value.map((g) => g.name).join(', ')}</span>`;
 	}
 }
 

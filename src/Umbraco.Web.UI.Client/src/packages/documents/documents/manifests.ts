@@ -1,3 +1,4 @@
+import { manifests as startNodeManifests } from './start-node/manifests.js';
 import { manifests as auditLogManifests } from './audit-log/manifests.js';
 import { manifests as collectionManifests } from './collection/manifests.js';
 import { manifests as entityActionManifests } from './entity-actions/manifests.js';
@@ -26,6 +27,7 @@ import * as entryPointModule from './entry-point.js';
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
+	...startNodeManifests,
 	...auditLogManifests,
 	...collectionManifests,
 	...entityActionManifests,
