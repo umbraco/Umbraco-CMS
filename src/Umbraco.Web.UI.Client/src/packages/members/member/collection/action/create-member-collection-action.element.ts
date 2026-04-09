@@ -1,5 +1,5 @@
 import { UMB_CREATE_MEMBER_WORKSPACE_PATH_PATTERN } from '../../paths.js';
-import { css, customElement, html, map, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, map, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbMemberTypeStructureRepository } from '@umbraco-cms/backoffice/member-type';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { ManifestCollectionAction } from '@umbraco-cms/backoffice/collection';
@@ -83,8 +83,9 @@ export class UmbCreateMemberCollectionActionElement extends UmbLitElement {
 				@toggle=${this.#onPopoverToggle}>
 				<umb-popover-layout>
 					<uui-scroll-container>
-						${map(
+						${repeat(
 							this._allowedMemberTypes,
+							(item) => item.unique,
 							(item) => html`
 								<uui-menu-item label=${this.localize.string(item.name)} href=${this.#getCreateUrl(item)}>
 									<umb-icon slot="icon" name=${item.icon ?? 'icon-user'}></umb-icon>
