@@ -1,4 +1,6 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Notifications;
 
@@ -30,10 +32,50 @@ public sealed class PublishStatusInitializationNotificationHandler : INotificati
         _elementPublishStatusManagementService = elementPublishStatusManagementService;
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PublishStatusInitializationNotificationHandler"/> class.
+    /// </summary>
+    /// <param name="runtimeState">The runtime state.</param>
+    /// <param name="publishStatusManagementService">The publish status management service.</param>
+#pragma warning disable CS0618 // Type or member is obsolete
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
+    public PublishStatusInitializationNotificationHandler(
+        IRuntimeState runtimeState,
+        IPublishStatusManagementService publishStatusManagementService)
+        : this(
+            runtimeState,
+            publishStatusManagementService,
+            StaticServiceProvider.Instance.GetRequiredService<IElementPublishStatusManagementService>())
+    {
+    }
+#pragma warning restore CS0618 // Type or member is obsolete
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PublishStatusInitializationNotificationHandler"/> class.
+    /// </summary>
+    /// <param name="runtimeState">The runtime state.</param>
+    /// <param name="publishStatusManagementService">The publish status management service.</param>
+    /// <param name="documentPublishStatusManagementService">The document publish status management service.</param>
+    /// <param name="elementPublishStatusManagementService">The element publish status management service.</param>
+#pragma warning disable CS0618 // Type or member is obsolete
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
+    public PublishStatusInitializationNotificationHandler(
+        IRuntimeState runtimeState,
+        IPublishStatusManagementService publishStatusManagementService,
+        IDocumentPublishStatusManagementService documentPublishStatusManagementService,
+        IElementPublishStatusManagementService elementPublishStatusManagementService)
+        : this(
+            runtimeState,
+            documentPublishStatusManagementService,
+            elementPublishStatusManagementService)
+    {
+    }
+#pragma warning restore CS0618 // Type or member is obsolete
+
     /// <inheritdoc />
     public async Task HandleAsync(PostRuntimePremigrationsUpgradeNotification notification, CancellationToken cancellationToken)
     {
-        if(_runtimeState.Level < RuntimeLevel.Upgrade)
+        if (_runtimeState.Level < RuntimeLevel.Upgrade)
         {
             return;
         }
