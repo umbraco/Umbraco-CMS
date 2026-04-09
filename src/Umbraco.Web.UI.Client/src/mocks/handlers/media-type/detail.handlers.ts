@@ -2,6 +2,7 @@ const { http, HttpResponse } = window.MockServiceWorker;
 import { umbMediaTypeMockDb } from '../../data/media-type/media-type.db.js';
 import { UMB_SLUG } from './slug.js';
 import type {
+	BatchResponseModelMediaTypeResponseModel,
 	CreateMediaTypeRequestModel,
 	UpdateMediaTypeRequestModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
@@ -21,6 +22,27 @@ export const detailHandlers = [
 				'Umb-Generated-Resource': id,
 			},
 		});
+	}),
+
+	http.get(umbracoPath(`${UMB_SLUG}/batch`), ({ request }) => {
+		const url = new URL(request.url);
+		const ids = url.searchParams.getAll('id');
+		const items = ids
+			.map((id) => {
+				try {
+					return umbMediaTypeMockDb.detail.read(id);
+				} catch {
+					return undefined;
+				}
+			})
+			.filter((item) => item !== undefined);
+
+		const response: BatchResponseModelMediaTypeResponseModel = {
+			total: items.length,
+			items,
+		};
+
+		return HttpResponse.json(response);
 	}),
 
 	http.get(umbracoPath(`${UMB_SLUG}/:id`), ({ params }) => {
