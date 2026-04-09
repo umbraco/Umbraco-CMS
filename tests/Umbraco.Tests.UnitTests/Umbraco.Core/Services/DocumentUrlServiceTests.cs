@@ -227,7 +227,7 @@ public class DocumentUrlServiceTests
         var keyValueServiceMock = Mock.Of<IKeyValueService>();
         var idKeyMapMock = Mock.Of<IIdKeyMap>();
         var documentNavigationQueryServiceMock = Mock.Of<IDocumentNavigationQueryService>();
-        var publishStatusQueryServiceMock = Mock.Of<IPublishStatusQueryService>();
+        var publishStatusQueryServiceMock = Mock.Of<IDocumentPublishStatusQueryService>();
         var domainCacheServiceMock = Mock.Of<IDomainCacheService>();
         var defaultCultureAccessorMock = Mock.Of<IDefaultCultureAccessor>();
 
@@ -580,7 +580,7 @@ public class DocumentUrlServiceTests
 
         var idKeyMapMock = Mock.Of<IIdKeyMap>();
         var documentNavigationQueryServiceMock = Mock.Of<IDocumentNavigationQueryService>();
-        var publishStatusQueryServiceMock = Mock.Of<IPublishStatusQueryService>();
+        var publishStatusQueryServiceMock = Mock.Of<IDocumentPublishStatusQueryService>();
         var domainCacheServiceMock = Mock.Of<IDomainCacheService>();
         var defaultCultureAccessorMock = Mock.Of<IDefaultCultureAccessor>();
 
