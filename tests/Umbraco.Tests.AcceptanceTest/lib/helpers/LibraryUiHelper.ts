@@ -231,7 +231,7 @@ export class LibraryUiHelper extends UiBaseLocators {
     this.selectAVariantBtn = page.getByRole('button', {name: 'Open version selector'});
     this.variantAddModeBtn = page.locator('.switch-button.add-mode').locator('.variant-name');
     this.saveAndCloseBtn = page.getByLabel('Save and close');
-    this.elementTreeItem = page.locator('umb-default-tree-item');
+    this.elementTreeItem = page.locator('umb-element-tree-item');
     this.elementLanguageSelect = page.locator('umb-app-language-select');
     this.elementLanguageSelectPopover = page.locator('umb-popover-layout');
     this.elementReadOnly = this.elementWorkspace.locator('#name-input').getByText('Read-only');
@@ -870,10 +870,6 @@ export class LibraryUiHelper extends UiBaseLocators {
 
   async isElementTypeNameVisible(elementName: string, isVisible: boolean = true) {
     return await this.isVisible(this.sidebarModal.getByText(elementName), isVisible); 
-  }
-
-  async doesModalHaveText(text: string) {
-    await this.containsText(this.openedModal, text);
   }
 
   // Collection tab

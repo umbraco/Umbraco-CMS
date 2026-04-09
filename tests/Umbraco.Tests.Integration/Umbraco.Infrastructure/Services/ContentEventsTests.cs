@@ -11,8 +11,8 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
-using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Cms.Infrastructure.Sync;
 using Umbraco.Cms.Tests.Common.Attributes;
@@ -26,11 +26,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     internal sealed class ContentEventsTests : UmbracoIntegrationTestWithContent
     {
-        private CacheRefresherCollection CacheRefresherCollection => GetRequiredService<CacheRefresherCollection>();
-
-        private IUmbracoContextFactory UmbracoContextFactory => GetRequiredService<IUmbracoContextFactory>();
-
         private ILogger<ContentEventsTests> Logger => GetRequiredService<ILogger<ContentEventsTests>>();
+
+        private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
 
         #region Setup
 
@@ -177,17 +175,17 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         }
 
         [SetUp]
-        public void SetUp()
+        public async Task SetUp()
         {
             _events = new List<EventInstance>();
 
             // prepare content type
             Template template = TemplateBuilder.CreateTextPageTemplate();
-            FileService.SaveTemplate(template);
+            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
 
             _contentType = ContentTypeBuilder.CreateSimpleContentType("whatever", "Whatever", defaultTemplateId: template.Id);
             _contentType.Key = Guid.NewGuid();
-            FileService.SaveTemplate(_contentType.DefaultTemplate);
+            await TemplateService.CreateAsync(_contentType.DefaultTemplate, Constants.Security.SuperUserKey);
             ContentTypeService.Save(_contentType);
         }
 

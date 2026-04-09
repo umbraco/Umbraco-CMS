@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Linq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -26,12 +25,12 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
 {
     [SetUp]
-    public void SetupTest()
+    public async Task SetupTest()
     {
         ContentRepositoryBase.ThrowOnWarning = true;
         _globalSettings = new GlobalSettings();
 
-        CreateTestData();
+        await CreateTestData();
     }
 
     [TearDown]
@@ -43,7 +42,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
 
     private ILanguageService LanguageService => GetRequiredService<ILanguageService>();
 
-    private IFileService FileService => GetRequiredService<IFileService>();
+    private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
 
     private GlobalSettings _globalSettings;
     private IContentType _contentType;
@@ -57,10 +56,10 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         .AddNotificationHandler<ContentUnpublishedNotification, ContentNotificationHandler>()
         .AddNotificationHandler<ContentTreeChangeNotification, ContentNotificationHandler>();
 
-    private void CreateTestData()
+    private async Task CreateTestData()
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
-        FileService.SaveTemplate(template); // else, FK violation on contentType!
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey); // else, FK violation on contentType!
 
         _contentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id);
         ContentTypeService.Save(_contentType);

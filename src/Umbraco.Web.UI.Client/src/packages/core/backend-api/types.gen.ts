@@ -985,12 +985,12 @@ export type DocumentVariantResponseModel = {
     name: string;
     createDate: string;
     updateDate: string;
+    readonly id: string;
+    flags: Array<FlagModel>;
     state: DocumentVariantStateModel;
     publishDate?: string | null;
     scheduledPublishDate?: string | null;
     scheduledUnpublishDate?: string | null;
-    readonly id: string;
-    flags: Array<FlagModel>;
 };
 
 export enum DocumentVariantStateModel {
@@ -1153,6 +1153,8 @@ export type ElementValueResponseModel = {
 export type ElementVariantItemResponseModel = {
     name: string;
     culture?: string | null;
+    readonly id: string;
+    flags: Array<FlagModel>;
     state: DocumentVariantStateModel;
 };
 
@@ -1168,6 +1170,8 @@ export type ElementVariantResponseModel = {
     name: string;
     createDate: string;
     updateDate: string;
+    readonly id: string;
+    flags: Array<FlagModel>;
     state: DocumentVariantStateModel;
     publishDate?: string | null;
     scheduledPublishDate?: string | null;
@@ -3477,11 +3481,31 @@ export type DocumentVariantResponseModelWritable = {
     name: string;
     createDate: string;
     updateDate: string;
+    flags: Array<FlagModel>;
     state: DocumentVariantStateModel;
     publishDate?: string | null;
     scheduledPublishDate?: string | null;
     scheduledUnpublishDate?: string | null;
+};
+
+export type ElementVariantItemResponseModelWritable = {
+    name: string;
+    culture?: string | null;
     flags: Array<FlagModel>;
+    state: DocumentVariantStateModel;
+};
+
+export type ElementVariantResponseModelWritable = {
+    culture?: string | null;
+    segment?: string | null;
+    name: string;
+    createDate: string;
+    updateDate: string;
+    flags: Array<FlagModel>;
+    state: DocumentVariantStateModel;
+    publishDate?: string | null;
+    scheduledPublishDate?: string | null;
+    scheduledUnpublishDate?: string | null;
 };
 
 export type JsonNodeWritable = {
@@ -4920,6 +4944,40 @@ export type PutDocumentBlueprintByIdResponses = {
      */
     200: unknown;
 };
+
+export type GetDocumentBlueprintByIdAuditLogData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: {
+        orderDirection?: DirectionModel;
+        sinceDate?: string;
+        skip?: number;
+        take?: number;
+    };
+    url: '/umbraco/management/api/v1/document-blueprint/{id}/audit-log';
+};
+
+export type GetDocumentBlueprintByIdAuditLogErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type GetDocumentBlueprintByIdAuditLogResponses = {
+    /**
+     * OK
+     */
+    200: PagedAuditLogResponseModel;
+};
+
+export type GetDocumentBlueprintByIdAuditLogResponse = GetDocumentBlueprintByIdAuditLogResponses[keyof GetDocumentBlueprintByIdAuditLogResponses];
 
 export type PutDocumentBlueprintByIdMoveData = {
     body?: MoveDocumentBlueprintRequestModel;
@@ -9614,6 +9672,7 @@ export type GetTreeElementChildrenData = {
         skip?: number;
         take?: number;
         foldersOnly?: boolean;
+        dataTypeId?: string;
     };
     url: '/umbraco/management/api/v1/tree/element/children';
 };
@@ -9645,6 +9704,7 @@ export type GetTreeElementRootData = {
         skip?: number;
         take?: number;
         foldersOnly?: boolean;
+        dataTypeId?: string;
     };
     url: '/umbraco/management/api/v1/tree/element/root';
 };
@@ -9677,6 +9737,7 @@ export type GetTreeElementSiblingsData = {
         before?: number;
         after?: number;
         foldersOnly?: boolean;
+        dataTypeId?: string;
     };
     url: '/umbraco/management/api/v1/tree/element/siblings';
 };

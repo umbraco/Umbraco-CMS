@@ -3,7 +3,7 @@ import type { ManifestWorkspaceInfoAppAuditLogKind } from './types.js';
 import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
+import { UmbPaginationManager, UMB_DATE_TIME_FORMAT_OPTIONS } from '@umbraco-cms/backoffice/utils';
 import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbUserItemRepository } from '@umbraco-cms/backoffice/user';
@@ -12,15 +12,6 @@ import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace'
 import type { UmbAuditLogModel, UmbAuditLogRepository } from '@umbraco-cms/backoffice/audit-log';
 import type { UmbUserItemModel } from '@umbraco-cms/backoffice/user';
 import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
-
-const TimeOptions: Intl.DateTimeFormatOptions = {
-	year: 'numeric',
-	month: 'long',
-	day: 'numeric',
-	hour: 'numeric',
-	minute: 'numeric',
-	second: 'numeric',
-};
 
 @customElement('umb-content-audit-log-workspace-info-app')
 export class UmbContentAuditLogWorkspaceInfoAppElement extends UmbLitElement {
@@ -180,7 +171,9 @@ export class UmbContentAuditLogWorkspaceInfoAppElement extends UmbLitElement {
 		const user = this.#userMap.get(item.user.unique);
 
 		return html`
-			<umb-history-item .name=${user?.name ?? 'Unknown'} .detail=${this.localize.date(item.timestamp, TimeOptions)}>
+			<umb-history-item
+				.name=${user?.name ?? 'Unknown'}
+				.detail=${this.localize.date(item.timestamp, UMB_DATE_TIME_FORMAT_OPTIONS)}>
 				<umb-user-avatar slot="avatar" .name=${user?.name} .kind=${user?.kind} .imgUrls=${user?.avatarUrls ?? []}>
 				</umb-user-avatar>
 				<div class="log-type">

@@ -23,7 +23,7 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 				this.requestUpdate('_forceShowExpand', oldValue);
 			});
 			this.observe(this.#api.icon, (icon) => (this.#icon = icon || ''));
-			this.observe(this.#api.flags, (flags) => (this._flags = flags || ''));
+			this.observe(this.#api.flags, (flags) => (this._flags = flags || []));
 			// Observe noAccess from context and update base class property (_noAccess).
 			// This enables access restriction behavior (click prevention) and styling from the base class.
 			this.observe(this.#api.noAccess, (noAccess) => (this._noAccess = noAccess));

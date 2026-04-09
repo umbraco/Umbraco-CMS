@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
+using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
 using Umbraco.Cms.Api.Management.ViewModels.Element;
 using Umbraco.Cms.Api.Management.ViewModels.Element.Item;
 using Umbraco.Cms.Core.Models;
@@ -24,14 +24,14 @@ public interface IElementPresentationFactory
     /// </summary>
     /// <param name="entity">The element entity to create the response model from.</param>
     /// <returns>An <see cref="ElementItemResponseModel"/> representing the element item.</returns>
-    ElementItemResponseModel CreateItemResponseModel(IElementEntitySlim entity);
+    Task<ElementItemResponseModel> CreateItemResponseModelAsync(IElementEntitySlim entity);
 
     /// <summary>
     /// Creates a collection of <see cref="ElementVariantItemResponseModel"/> instances representing the variants of the specified element entity.
     /// </summary>
     /// <param name="entity">The element entity to create variant response models for.</param>
     /// <returns>An enumerable of <see cref="ElementVariantItemResponseModel"/> representing the element variants.</returns>
-    IEnumerable<ElementVariantItemResponseModel> CreateVariantsItemResponseModels(IElementEntitySlim entity);
+    Task<IEnumerable<ElementVariantItemResponseModel>> CreateVariantsItemResponseModelsAsync(IElementEntitySlim entity);
 
     /// <summary>
     /// Creates a <see cref="DocumentTypeReferenceResponseModel"/> from the given <see cref="IElementEntitySlim"/> entity.
