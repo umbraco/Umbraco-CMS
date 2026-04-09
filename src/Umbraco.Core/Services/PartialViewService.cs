@@ -58,7 +58,6 @@ public class PartialViewService : FileServiceOperationBase<IPartialViewRepositor
     /// <inheritdoc />
     protected override string[] AllowedFileExtensions { get; } = { ".cshtml" };
 
-    /// <inheritdoc />
     private bool IsProductionMode => _runtimeSettings.Value.Mode == RuntimeMode.Production;
 
     /// <inheritdoc />

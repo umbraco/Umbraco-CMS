@@ -4,7 +4,7 @@ Workspaces are the primary editing surfaces in the backoffice. Each workspace ho
 
 Workspaces are registered and composed through the **extension system** — the same mechanism used for all backoffice UI. This means any workspace can be extended, overridden, or replaced by any package.
 
-**Prerequisites**: [Entities](./entities.md), [Core Primitives](./core-primitives.md), [Data Flow](./data-flow.md)
+**Prerequisites**: [Manifests & Aliases](./manifests.md), [Entities](./entities.md), [Core Primitives](./core-primitives.md), [Data Flow](./data-flow.md)
 
 ---
 
