@@ -43,6 +43,21 @@ export const detailHandlers = [
 		return HttpResponse.json(response);
 	}),
 
+	http.get(umbracoPath(`${UMB_SLUG}/batch`), ({ request }) => {
+		const ids = new URL(request.url).searchParams.getAll('id');
+		if (!ids?.length) return new HttpResponse(null, { status: 400 });
+		const items = ids
+			.map((id) => {
+				try {
+					return umbDocumentTypeMockDb.detail.read(id);
+				} catch {
+					return undefined;
+				}
+			})
+			.filter(Boolean);
+		return HttpResponse.json(items);
+	}),
+
 	http.get(umbracoPath(`${UMB_SLUG}/:id`), ({ params }) => {
 		const id = params.id as string;
 		if (!id) return new HttpResponse(null, { status: 400 });
