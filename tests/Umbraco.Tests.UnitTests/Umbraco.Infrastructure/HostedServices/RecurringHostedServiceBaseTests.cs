@@ -107,8 +107,7 @@ public class RecurringHostedServiceBaseTests
 
         // Reset means full period from now. Advancing 59min should not trigger.
         timeProvider.Advance(TimeSpan.FromMinutes(59));
-        await Task.Yield();
-        Assert.AreEqual(2, executionCount, "Should not execute before full period");
+        Assert.IsFalse(await executed.WaitAsync(TimeSpan.FromMilliseconds(50)), "Should not execute before full period");
 
         // Advancing 1 more minute completes the period
         timeProvider.Advance(TimeSpan.FromMinutes(1));
@@ -145,8 +144,7 @@ public class RecurringHostedServiceBaseTests
 
         // None means resume original schedule. Remaining is ~40min. Advancing 39min should not trigger.
         timeProvider.Advance(TimeSpan.FromMinutes(39));
-        await Task.Yield();
-        Assert.AreEqual(2, executionCount, "Should not execute before original schedule");
+        Assert.IsFalse(await executed.WaitAsync(TimeSpan.FromMilliseconds(50)), "Should not execute before original schedule");
 
         // Advancing 1 more minute reaches the original tick
         timeProvider.Advance(TimeSpan.FromMinutes(1));
@@ -196,8 +194,7 @@ public class RecurringHostedServiceBaseTests
         // The overshoot should skip the immediate tick. Next tick is at original + period = 2h from start.
         // We're now at ~70min. Advancing 49min (to ~119min) should not trigger.
         timeProvider.Advance(TimeSpan.FromMinutes(49));
-        await Task.Yield();
-        Assert.AreEqual(2, executionCount, "Should not execute — overshot tick was skipped");
+        Assert.IsFalse(await executed.WaitAsync(TimeSpan.FromMilliseconds(50)), "Should not execute — overshot tick was skipped");
 
         // Advancing 1 more minute reaches the next period tick
         timeProvider.Advance(TimeSpan.FromMinutes(1));
@@ -235,8 +232,7 @@ public class RecurringHostedServiceBaseTests
 
         // The original next tick at 40min should be skipped. Advance to 60min — past the skipped tick.
         timeProvider.Advance(TimeSpan.FromMinutes(60));
-        await Task.Yield();
-        Assert.AreEqual(2, executionCount, "Should not execute — skipped scheduled tick");
+        Assert.IsFalse(await executed.WaitAsync(TimeSpan.FromMilliseconds(50)), "Should not execute — skipped scheduled tick");
 
         // Advance to the tick after the skipped one (~100min from trigger, ~40min more)
         timeProvider.Advance(TimeSpan.FromMinutes(40));
@@ -272,8 +268,7 @@ public class RecurringHostedServiceBaseTests
 
         // After the triggered execution, next should come after the custom 10min delay
         timeProvider.Advance(TimeSpan.FromMinutes(9));
-        await Task.Yield();
-        Assert.AreEqual(2, executionCount, "Should not execute before custom delay");
+        Assert.IsFalse(await executed.WaitAsync(TimeSpan.FromMilliseconds(50)), "Should not execute before custom delay");
 
         timeProvider.Advance(TimeSpan.FromMinutes(1));
         Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)));
@@ -299,8 +294,7 @@ public class RecurringHostedServiceBaseTests
         await sut.StartAsync(cts.Token);
 
         // Still in initial delay — no execution yet
-        await Task.Yield();
-        Assert.AreEqual(0, executionCount, "Should not have executed during initial delay");
+        Assert.IsFalse(await executed.WaitAsync(TimeSpan.FromMilliseconds(50)), "Should not have executed during initial delay");
 
         // Trigger with a custom delay during the initial delay
         sut.PublicTriggerExecutionWithDelay(TimeSpan.FromMinutes(5));
@@ -311,8 +305,7 @@ public class RecurringHostedServiceBaseTests
         // it was consumed when the initial delay was interrupted.
         // Next wait should use the normal 1h period.
         timeProvider.Advance(TimeSpan.FromMinutes(59));
-        await Task.Yield();
-        Assert.AreEqual(1, executionCount, "Custom delay should not leak — next wait uses normal period");
+        Assert.IsFalse(await executed.WaitAsync(TimeSpan.FromMilliseconds(50)), "Custom delay should not leak — next wait uses normal period");
 
         timeProvider.Advance(TimeSpan.FromMinutes(1));
         Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)));
