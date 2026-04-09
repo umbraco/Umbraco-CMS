@@ -290,7 +290,7 @@ public class MemberRoleStoreTests
         IMemberGroup fakeMemberGroup = _groupBuilder.WithName("fakeGroupName").WithCreatorId(123).WithId(777)
             .WithKey(fakeRoleGuid).Build();
 
-        _mockMemberGroupService.Setup(x => x.GetById(fakeRoleGuid)).Returns(fakeMemberGroup);
+        _mockMemberGroupService.Setup(x => x.GetAsync(fakeRoleGuid)).ReturnsAsync(fakeMemberGroup);
 
         // act
         IdentityRole actual = await sut.FindByIdAsync(fakeRoleGuid.ToString());
@@ -298,7 +298,7 @@ public class MemberRoleStoreTests
         // assert
         Assert.AreEqual(fakeRole.Name, actual.Name);
         Assert.AreEqual(fakeRole.Id, actual.Id);
-        _mockMemberGroupService.Verify(x => x.GetById(fakeRoleGuid));
+        _mockMemberGroupService.Verify(x => x.GetAsync(fakeRoleGuid));
         _mockMemberGroupService.VerifyNoOtherCalls();
     }
 

@@ -181,9 +181,9 @@ namespace Umbraco.Cms.Core.Services.Implement
         }
 
         /// <inheritdoc />
-        public Task<PagedModel<IDataType>> FilterAsync(string? name = null, string? editorUiAlias = null, string? editorAlias = null, int skip = 0, int take = 100)
+        public async Task<PagedModel<IDataType>> FilterAsync(string? name = null, string? editorUiAlias = null, string? editorAlias = null, int skip = 0, int take = 100)
         {
-            IEnumerable<IDataType> query = GetAllAsync().GetAwaiter().GetResult();
+            IEnumerable<IDataType> query = await GetAllAsync();
 
             if (name is not null)
             {
@@ -202,11 +202,11 @@ namespace Umbraco.Cms.Core.Services.Implement
 
             IDataType[] result = query.ToArray();
 
-            return Task.FromResult(new PagedModel<IDataType>
+            return new PagedModel<IDataType>
             {
                 Total = result.Length,
                 Items = result.Skip(skip).Take(take),
-            });
+            };
         }
 
         /// <summary>

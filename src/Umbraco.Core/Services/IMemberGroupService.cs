@@ -9,20 +9,19 @@ namespace Umbraco.Cms.Core.Services;
 public interface IMemberGroupService : IService
 {
     /// <summary>
+    ///     Gets all member groups.
+    /// </summary>
+    /// <returns>An enumerable collection of all <see cref="IMemberGroup"/> objects.</returns>
+    [Obsolete("Please use the asynchronous counterpart. Scheduled for removal in Umbraco 18.")]
+    IEnumerable<IMemberGroup> GetAll();
+
+    /// <summary>
     ///     Gets a member group by its integer id.
     /// </summary>
     /// <param name="id">The integer id of the member group.</param>
     /// <returns>The <see cref="IMemberGroup"/> if found; otherwise, <c>null</c>.</returns>
     [Obsolete("Please use Guid instead of Int id. Scheduled for removal in Umbraco 18.")]
     IMemberGroup? GetById(int id);
-
-    /// <summary>
-    ///     Gets a member group by its <see cref="Guid"/> key.
-    /// </summary>
-    /// <param name="id">The <see cref="Guid"/> key of the member group.</param>
-    /// <returns>The <see cref="IMemberGroup"/> if found; otherwise, <c>null</c>.</returns>
-    [Obsolete("Please use the asynchronous counterpart. Scheduled for removal in Umbraco 18.")]
-    IMemberGroup? GetById(Guid id);
 
     /// <summary>
     ///     Gets multiple member groups by their integer ids.

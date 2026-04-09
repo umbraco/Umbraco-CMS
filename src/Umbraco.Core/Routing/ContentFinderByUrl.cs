@@ -16,18 +16,18 @@ namespace Umbraco.Cms.Core.Routing;
 /// <remarks>
 ///     <para>Handles <c>/foo/bar</c> where <c>/foo/bar</c> is the nice URL of a document.</para>
 /// </remarks>
-public class ContentFinderByUrlNew : IContentFinder
+public class ContentFinderByUrl : IContentFinder
 {
-    private readonly ILogger<ContentFinderByUrlNew> _logger;
+    private readonly ILogger<ContentFinderByUrl> _logger;
     private readonly IPublishedContentCache _publishedContentCache;
     private readonly IDocumentUrlService _documentUrlService;
     private WebRoutingSettings _webRoutingSettings;
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="ContentFinderByUrlNew" /> class.
+    ///     Initializes a new instance of the <see cref="ContentFinderByUrl" /> class.
     /// </summary>
-    public ContentFinderByUrlNew(
-        ILogger<ContentFinderByUrlNew> logger,
+    public ContentFinderByUrl(
+        ILogger<ContentFinderByUrl> logger,
         IUmbracoContextAccessor umbracoContextAccessor,
         IDocumentUrlService documentUrlService,
         IPublishedContentCache publishedContentCache,

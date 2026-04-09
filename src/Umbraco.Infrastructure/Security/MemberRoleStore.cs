@@ -39,16 +39,8 @@ public class MemberRoleStore : IQueryableRoleStore<UmbracoIdentityRole>
     /// </summary>
     public IdentityErrorDescriber ErrorDescriber { get; set; }
 
-    [Obsolete("Use GetRolesAsync instead. Scheduled for removal in Umbraco 19")]
     public IQueryable<UmbracoIdentityRole> Roles =>
-    Task.Run(() => _memberGroupService.GetAllAsync()).GetAwaiter().GetResult()
-        .Select(MapFromMemberGroup).AsQueryable();
-    /// <summary>
-    /// Gets a queryable collection of all member roles, represented as <see cref="UmbracoIdentityRole"/>, retrieved from the member group service.
-    /// </summary>
-    /// <returns></returns>
-    public async Task<IQueryable<UmbracoIdentityRole>> GetRolesAsync()
-        => (await _memberGroupService.GetAllAsync()).Select(MapFromMemberGroup).AsQueryable();
+    _memberGroupService.GetAll().Select(MapFromMemberGroup).AsQueryable();
 
     /// <inheritdoc />
     public async Task<IdentityResult> CreateAsync(UmbracoIdentityRole role, CancellationToken cancellationToken = default)
@@ -189,10 +181,15 @@ public class MemberRoleStore : IQueryableRoleStore<UmbracoIdentityRole>
         => SetRoleNameAsync(role, normalizedName, cancellationToken);
 
     /// <inheritdoc />
-    public Task<UmbracoIdentityRole?> FindByIdAsync(string roleId, CancellationToken cancellationToken = default)
+    public async Task<UmbracoIdentityRole?> FindByIdAsync(string roleId, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
         ThrowIfDisposed();
+
+        if (string.IsNullOrWhiteSpace(roleId))
+        {
+            throw new ArgumentNullException(nameof(roleId));
+        }
 
         IMemberGroup? memberGroup;
 
@@ -204,14 +201,14 @@ public class MemberRoleStore : IQueryableRoleStore<UmbracoIdentityRole>
                 throw new ArgumentOutOfRangeException(nameof(roleId), $"{nameof(roleId)} is not a valid Guid");
             }
 
-            memberGroup = _memberGroupService.GetById(guid);
+            memberGroup = await _memberGroupService.GetAsync(guid);
         }
         else
         {
             memberGroup = _memberGroupService.GetById(id);
         }
 
-        return Task.FromResult(memberGroup == null ? null : MapFromMemberGroup(memberGroup));
+        return memberGroup == null ? null : MapFromMemberGroup(memberGroup);
     }
 
     /// <inheritdoc />

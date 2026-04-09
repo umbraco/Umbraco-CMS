@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Core.Routing;
 /// <summary>
 ///     Provides URLs.
 /// </summary>
-public class NewDefaultUrlProvider : IUrlProvider
+public class DefaultUrlProvider : IUrlProvider
 {
     private readonly IPublishedContentCache _publishedContentCache;
     private readonly IDomainCache _domainCache;
@@ -23,7 +23,7 @@ public class NewDefaultUrlProvider : IUrlProvider
     private readonly IDocumentUrlService _documentUrlService;
     private readonly IDocumentNavigationQueryService _navigationQueryService;
     private readonly IPublishedContentStatusFilteringService _publishedContentStatusFilteringService;
-    private readonly ILogger<NewDefaultUrlProvider> _logger;
+    private readonly ILogger<DefaultUrlProvider> _logger;
     private readonly ISiteDomainMapper _siteDomainMapper;
     private readonly IUmbracoContextAccessor _umbracoContextAccessor;
     private readonly UriUtility _uriUtility;
@@ -33,11 +33,11 @@ public class NewDefaultUrlProvider : IUrlProvider
     // TODO See if we can make GetUrlFromRoute asynchronous and avoid the GetAwaiter().GetResult() in when using ILanguageService.
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="NewDefaultUrlProvider"/> class.
+    /// Initializes a new instance of the <see cref="DefaultUrlProvider"/> class.
     /// </summary>
-    public NewDefaultUrlProvider(
+    public DefaultUrlProvider(
         IOptionsMonitor<RequestHandlerSettings> requestSettings,
-        ILogger<NewDefaultUrlProvider> logger,
+        ILogger<DefaultUrlProvider> logger,
         ISiteDomainMapper siteDomainMapper,
         IUmbracoContextAccessor umbracoContextAccessor,
         UriUtility uriUtility,
