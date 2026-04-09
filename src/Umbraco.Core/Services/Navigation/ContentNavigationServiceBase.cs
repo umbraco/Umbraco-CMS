@@ -75,7 +75,19 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
     /// </param>
     /// <returns><c>true</c> if the operation succeeds; otherwise, <c>false</c>.</returns>
     public bool TryGetRootKeys(out IEnumerable<Guid> rootKeys)
-        => TryGetRootKeysFromStructure(_roots, out rootKeys);
+    {
+        // On subscriber/CD servers in a load-balanced setup, cache refresh notifications trigger a full navigation rebuild
+        // (via RebuildAsync → HandleRebuildAsync), which replaces _roots and _navigationStructure with new instances. These
+        // two swaps cannot happen truly simultaneously, so a concurrent reader that accesses the fields separately could see
+        // the new _roots with the old _navigationStructure (or vice-versa), leading to KeyNotFoundExceptions or wrong results.
+        //
+        // Copying both fields into locals here ensures this method uses a pair of collections that were built together.
+        //
+        // Verified by: DocumentNavigationServiceTests.Concurrent_Rebuild_And_Queries_Never_Transiently_Lose_Content
+        HashSet<Guid> roots = _roots;
+        ConcurrentDictionary<Guid, NavigationNode> navigationStructure = _navigationStructure;
+        return TryGetRootKeysFromStructure(roots, navigationStructure, out rootKeys);
+    }
 
     /// <summary>
     ///     Attempts to get all root-level node keys of a specific content type from the main navigation structure.
@@ -92,7 +104,10 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
     {
         if (TryGetContentTypeKey(contentTypeAlias, out Guid? contentTypeKey))
         {
-            return TryGetRootKeysFromStructure(_roots, out rootKeys, contentTypeKey);
+            // See TryGetRootKeys for why we snapshot both fields into locals.
+            HashSet<Guid> roots = _roots;
+            ConcurrentDictionary<Guid, NavigationNode> navigationStructure = _navigationStructure;
+            return TryGetRootKeysFromStructure(roots, navigationStructure, out rootKeys, contentTypeKey);
         }
 
         // Content type alias doesn't exist
@@ -549,18 +564,24 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope(autoComplete: true);
         scope.ReadLock(readLock);
 
-        // Build the corresponding navigation structure
+        // Build into new structures, then swap atomically so that concurrent readers
+        // never observe a transiently empty navigation state.
+        var newStructure = new ConcurrentDictionary<Guid, NavigationNode>();
+        var newRoots = new HashSet<Guid>();
+
         if (trashed)
         {
-            _recycleBinRoots.Clear();
             IEnumerable<INavigationModel> navigationModels = _navigationRepository.GetTrashedContentNodesByObjectType(objectTypeKey);
-            BuildNavigationDictionary(_recycleBinNavigationStructure, _recycleBinRoots,  navigationModels);
+            BuildNavigationDictionary(newStructure, newRoots, navigationModels);
+            Interlocked.Exchange(ref _recycleBinNavigationStructure, newStructure);
+            Interlocked.Exchange(ref _recycleBinRoots, newRoots);
         }
         else
         {
-            _roots.Clear();
             IEnumerable<INavigationModel> navigationModels = _navigationRepository.GetContentNodesByObjectType(objectTypeKey);
-            BuildNavigationDictionary(_navigationStructure, _roots, navigationModels);
+            BuildNavigationDictionary(newStructure, newRoots, navigationModels);
+            Interlocked.Exchange(ref _navigationStructure, newStructure);
+            Interlocked.Exchange(ref _roots, newRoots);
         }
 
         return Task.CompletedTask;
@@ -579,15 +600,19 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
         return false;
     }
 
-    private bool TryGetRootKeysFromStructure(
+    private static bool TryGetRootKeysFromStructure(
         HashSet<Guid> input,
+        ConcurrentDictionary<Guid, NavigationNode> structure,
         out IEnumerable<Guid> rootKeys,
         Guid? contentTypeKey = null)
     {
         var keysWithSortOrder = new List<(Guid Key, int SortOrder)>(input.Count);
         foreach (Guid key in input)
         {
-            NavigationNode navigationNode = _navigationStructure[key];
+            if (structure.TryGetValue(key, out NavigationNode? navigationNode) is false)
+            {
+                continue;
+            }
 
             // Apply contentTypeKey filter
             if (contentTypeKey.HasValue && navigationNode.ContentTypeKey != contentTypeKey.Value)
