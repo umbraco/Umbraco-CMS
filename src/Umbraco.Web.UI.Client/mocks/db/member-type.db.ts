@@ -5,9 +5,11 @@ import { UmbMockEntityNamedItemManager } from './utils/entity/entity-named-item.
 import { UmbMockEntityDetailManager } from './utils/entity/entity-detail.manager.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type {
+	AllowedMemberTypeModel,
 	CreateMemberTypeRequestModel,
 	MemberTypeItemResponseModel,
 	MemberTypeResponseModel,
+	PagedAllowedMemberTypeModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 
 class UmbMemberTypeMockDB extends UmbEntityMockDbBase<UmbMockMemberTypeModel> {
@@ -17,6 +19,12 @@ class UmbMemberTypeMockDB extends UmbEntityMockDbBase<UmbMockMemberTypeModel> {
 
 	constructor(data: Array<UmbMockMemberTypeModel>) {
 		super('memberType', data);
+	}
+
+	getAllowedAtRoot(): PagedAllowedMemberTypeModel {
+		const mockItems = this.data.filter((item) => item.allowedAsRoot);
+		const mappedItems = mockItems.map((item) => allowedMemberTypeMapper(item));
+		return { items: mappedItems, total: mappedItems.length };
 	}
 }
 
@@ -75,6 +83,15 @@ const itemResponseMapper = (item: UmbMockMemberTypeModel): MemberTypeItemRespons
 		name: item.name,
 		icon: item.icon,
 		flags: item.flags,
+	};
+};
+
+const allowedMemberTypeMapper = (item: UmbMockMemberTypeModel): AllowedMemberTypeModel => {
+	return {
+		id: item.id,
+		name: item.name,
+		description: item.description,
+		icon: item.icon,
 	};
 };
 
