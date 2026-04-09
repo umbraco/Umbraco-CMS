@@ -339,8 +339,8 @@ internal sealed class ElementEditingService
         return Attempt.Succeed(ContentEditingOperationStatus.Success);
     }
 
-    public async Task<Attempt<IElement?, ContentEditingOperationStatus>> CopyAsync(Guid key, Guid? parentKey, Guid userKey)
-        => await HandleCopyAsync(key, parentKey, false, false, userKey);
+    public async Task<Attempt<IElement?, ContentEditingOperationStatus>> CopyAsync(Guid key, Guid? containerKey, Guid userKey)
+        => await HandleCopyAsync(key, containerKey, false, false, userKey);
 
     internal static async Task<bool> UnpublishTrashedElementOnRestore(IElement element, Guid userKey, IElementService elementService, IUserIdKeyResolver userIdKeyResolver, ILogger logger)
     {
@@ -489,7 +489,7 @@ internal sealed class ElementEditingService
     }
 
     protected override OperationResult? MoveToRecycleBin(IElement element, int userId)
-        => throw new NotImplementedException("TODO ELEMENTS: implement recycle bin");
+        => throw new NotImplementedException("Explicitly implemented elsewhere by this service");
 
     protected override OperationResult? Delete(IElement element, int userId)
         => ContentService.Delete(element, userId);

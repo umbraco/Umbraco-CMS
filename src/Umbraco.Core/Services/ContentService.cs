@@ -1,6 +1,5 @@
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 using System.Runtime.InteropServices;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -514,17 +513,6 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
     #endregion
 
     #region Get, Has, Is
-
-    /// <summary>
-    /// <summary>
-    /// Gets the content schedule collection for the specified content key.
-    /// </summary>
-    /// <param name="contentId">The unique key of the content to retrieve the schedule for.</param>
-    /// <returns>The <see cref="ContentScheduleCollection"/> for the specified content, or an empty collection if not found.</returns>
-
-    /// <inheritdoc />
-    Attempt<OperationResult?> IContentServiceBase<IContent>.Save(IEnumerable<IContent> contents, int userId) =>
-        Attempt.Succeed(Save(contents, userId));
 
     /// <summary>
     ///     Gets a collection of <see cref="IContent" /> objects by Level
@@ -1789,31 +1777,16 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
         return OperationResult.Succeed(eventMessages);
     }
 
-    /// <summary>
-    /// Checks the data integrity of the content tree and optionally fixes issues.
-    /// </summary>
-    /// <param name="options">The options for the data integrity check.</param>
-    /// <returns>A <see cref="ContentDataIntegrityReport"/> containing the results of the integrity check.</returns>
-    public ContentDataIntegrityReport CheckDataIntegrity(ContentDataIntegrityReportOptions options)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            scope.WriteLock(Constants.Locks.ContentTree);
-
-            ContentDataIntegrityReport report = _documentRepository.CheckDataIntegrity(options);
-
-            if (report.FixedIssues.Count > 0)
+    /// <inheritdoc />
+    public override ContentDataIntegrityReport CheckDataIntegrity(ContentDataIntegrityReportOptions options)
+        => CheckDataIntegrity(
+            options,
+            scope =>
             {
                 // The event args needs a content item so we'll make a fake one with enough properties to not cause a null ref
                 var root = new Content("root", -1, new ContentType(_shortStringHelper, -1)) { Id = -1, Key = Guid.Empty };
                 scope.Notifications.Publish(new ContentTreeChangeNotification(root, TreeChangeTypes.RefreshAll, EventMessagesFactory.Get()));
-            }
-
-            scope.Complete();
-
-            return report;
-        }
-    }
+            });
 
     #endregion
 
@@ -1845,14 +1818,6 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
     /// </remarks>
     #endregion
 
-    #region Private Methods
-
-    // TODO ELEMENTS: not used? clean up!
-    private bool IsMandatoryCulture(IReadOnlyCollection<ILanguage> langs, string culture) =>
-        langs.Any(x => x.IsMandatory && x.IsoCode.InvariantEquals(culture));
-
-    #endregion
-
     #region Content Types
 
     /// <summary>
@@ -1867,7 +1832,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
     /// </remarks>
     /// <param name="contentTypeIds">Id of the <see cref="IContentType" /></param>
     /// <param name="userId">Optional Id of the user issuing the delete operation</param>
-    public void DeleteOfTypes(IEnumerable<int> contentTypeIds, int userId = Constants.Security.SuperUserId)
+    public override void DeleteOfTypes(IEnumerable<int> contentTypeIds, int userId = Constants.Security.SuperUserId)
     {
         // TODO: This currently this is called from the ContentTypeService but that needs to change,
         // if we are deleting a content type, we should just delete the data and do this operation slightly differently.
@@ -2232,12 +2197,6 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
     protected override bool SupportsBranchPublishing => true;
 
     protected override ILogger<ContentService> Logger => _logger;
-
-    protected override IContent CreateContentInstance(string name, int parentId, IContentType contentType, int userId)
-        => new Content(name, parentId, contentType, userId);
-
-    protected override IContent CreateContentInstance(string name, IContent parent, IContentType contentType, int userId)
-        => new Content(name, parent, contentType, userId);
 
     protected override void DeleteLocked(ICoreScope scope, IContent content, EventMessages evtMsgs)
     {

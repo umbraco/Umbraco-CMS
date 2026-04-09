@@ -15,12 +15,10 @@ namespace Umbraco.Cms.Core.Services;
 
 // TODO ELEMENTS: ensure this implementation is up to date with the current state of ContentService
 // TODO ELEMENTS: everything structural (children, ancestors, descendants, branches, sort) should be omitted from this base
-// TODO ELEMENTS: implement recycle bin
-// TODO ELEMENTS: implement copy and move
 // TODO ELEMENTS: replace all "document" with "content" (variables, names and comments)
-// TODO ELEMENTS: ensure all read and write locks use the abstract lock IDs (ReadLockIds, WriteLockIds)
 // TODO ELEMENTS: rename _documentRepository to _contentRepository
-public abstract class PublishableContentServiceBase<TContent> : RepositoryService
+// TODO ELEMENTS: looks like a lot of methods here are only used for the IContentService; check all (public) methods and move them accordingly
+public abstract class PublishableContentServiceBase<TContent> : RepositoryService, IPublishableContentService<TContent>
     where TContent : class, IPublishableContentBase
 {
     private readonly IAuditService _auditService;
@@ -69,10 +67,6 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
 
     protected abstract ILogger<PublishableContentServiceBase<TContent>> Logger { get; }
 
-    protected abstract TContent CreateContentInstance(string name, int parentId, IContentType contentType, int userId);
-
-    protected abstract TContent CreateContentInstance(string name, TContent parent, IContentType contentType, int userId);
-
     protected virtual PublishResult CommitDocumentChanges(
         ICoreScope scope,
         TContent content,
@@ -100,7 +94,6 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
 
     protected abstract DeletingNotification<TContent> DeletingNotification(TContent content, EventMessages eventMessages);
 
-    // TODO ELEMENTS: create a base class for publishing notifications to reuse between IContent and IElement
     protected abstract CancelableEnumerableObjectNotification<TContent> PublishingNotification(TContent content, EventMessages eventMessages);
 
     protected abstract IStatefulNotification PublishedNotification(TContent content, EventMessages eventMessages);
@@ -117,6 +110,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
 
     #region Rollback
 
+    /// <inheritdoc/>
     public OperationResult Rollback(int id, int versionId, string culture = "*", int userId = Constants.Security.SuperUserId)
     {
         EventMessages evtMsgs = EventMessagesFactory.Get();
@@ -177,6 +171,11 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
 
     #region Count
 
+    /// <summary>
+    /// Gets the count of published <see cref="IContent"/> items.
+    /// </summary>
+    /// <param name="contentTypeAlias">The optional content type alias to filter by.</param>
+    /// <returns>The count of published content items.</returns>
     public int CountPublished(string? contentTypeAlias = null)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -186,6 +185,11 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         }
     }
 
+    /// <summary>
+    /// Gets the count of all <see cref="TContent"/> items.
+    /// </summary>
+    /// <param name="contentTypeAlias">The optional content type alias to filter by.</param>
+    /// <returns>The count of content items.</returns>
     public int Count(string? contentTypeAlias = null)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -195,6 +199,12 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         }
     }
 
+    /// <summary>
+    /// Gets the count of child <see cref="TContent"/> items under a specified parent.
+    /// </summary>
+    /// <param name="parentId">The ID of the parent content.</param>
+    /// <param name="contentTypeAlias">The optional content type alias to filter by.</param>
+    /// <returns>The count of child content items.</returns>
     public int CountChildren(int parentId, string? contentTypeAlias = null)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -204,6 +214,12 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         }
     }
 
+    /// <summary>
+    /// Gets the count of descendant <see cref="TContent"/> items under a specified parent.
+    /// </summary>
+    /// <param name="parentId">The ID of the parent content.</param>
+    /// <param name="contentTypeAlias">The optional content type alias to filter by.</param>
+    /// <returns>The count of descendant content items.</returns>
     public int CountDescendants(int parentId, string? contentTypeAlias = null)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -257,13 +273,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         }
     }
 
-    /// <summary>
-    ///     Gets an <see cref="TContent" /> object by its 'UniqueId'
-    /// </summary>
-    /// <param name="key">Guid key of the Content to retrieve</param>
-    /// <returns>
-    ///     <see cref="TContent" />
-    /// </returns>
+    /// <inheritdoc/>
     public TContent? GetById(Guid key)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -283,6 +293,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         }
     }
 
+    /// <inheritdoc />
     public ContentScheduleCollection GetContentScheduleByContentId(Guid contentId)
     {
         Attempt<int> idAttempt = _idKeyMap.GetIdForKey(contentId, ContentObjectType);
@@ -343,13 +354,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         }
     }
 
-    /// <summary>
-    ///     Gets <see cref="TContent" /> objects by Ids
-    /// </summary>
-    /// <param name="ids">Ids of the Content to retrieve</param>
-    /// <returns>
-    ///     <see cref="TContent" />
-    /// </returns>
+    /// <inheritdoc/>
     public IEnumerable<TContent> GetByIds(IEnumerable<Guid> ids)
     {
         Guid[] idsA = ids.ToArray();
@@ -442,11 +447,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         }
     }
 
-    /// <summary>
-    ///     Gets a specific version of an <see cref="TContent" /> item.
-    /// </summary>
-    /// <param name="versionId">Id of the version to retrieve</param>
-    /// <returns>An <see cref="TContent" /> item</returns>
+    /// <inheritdoc/>
     public TContent? GetVersion(int versionId)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -456,11 +457,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         }
     }
 
-    /// <summary>
-    ///     Gets a collection of an <see cref="TContent" /> objects versions by Id
-    /// </summary>
-    /// <param name="id"></param>
-    /// <returns>An Enumerable list of <see cref="TContent" /> objects</returns>
+    /// <inheritdoc/>
     public IEnumerable<TContent> GetVersions(int id)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -470,10 +467,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         }
     }
 
-    /// <summary>
-    ///     Gets a collection of an <see cref="TContent" /> objects versions by Id
-    /// </summary>
-    /// <returns>An Enumerable list of <see cref="TContent" /> objects</returns>
+    /// <inheritdoc/>
     public IEnumerable<TContent> GetVersionsSlim(int id, int skip, int take)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -483,12 +477,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         }
     }
 
-    /// <summary>
-    ///     Gets a list of all version Ids for the given content item ordered so latest is first
-    /// </summary>
-    /// <param name="id"></param>
-    /// <param name="maxRows">The maximum number of rows to return</param>
-    /// <returns></returns>
+    /// <inheritdoc/>
     public IEnumerable<int> GetVersionIds(int id, int maxRows)
     {
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -497,7 +486,14 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         }
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    ///     Gets content having an expiration date before (lower than, or equal to) a specified date.
+    /// </summary>
+    /// <returns>An Enumerable list of <see cref="TContent" /> objects</returns>
+    /// <remarks>
+    ///     The content returned from this method may be culture variant, in which case you can use
+    ///     <see cref="Umbraco.Extensions.ContentExtensions.GetStatus(IPublishableContentBase, ContentScheduleCollection, string?)" /> to get the status for a specific culture.
+    /// </remarks>
     public IEnumerable<TContent> GetContentForExpiration(DateTime date)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -507,7 +503,14 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         }
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    ///     Gets content having a release date before (lower than, or equal to) a specified date.
+    /// </summary>
+    /// <returns>An Enumerable list of <see cref="TContent" /> objects.</returns>
+    /// <remarks>
+    ///     The content returned from this method may be culture variant, in which case you can use
+    ///     <see cref="Umbraco.Extensions.ContentExtensions.GetStatus(IPublishableContentBase, ContentScheduleCollection, string?)" /> to get the status for a specific culture.
+    /// </remarks>
     public IEnumerable<TContent> GetContentForRelease(DateTime date)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -524,6 +527,11 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
     /// <returns>True if the content has any children otherwise False</returns>
     public bool HasChildren(int id) => CountChildren(id) > 0;
 
+    /// <summary>
+    /// Checks if the <see cref="TContent"/> and all its ancestors are published.
+    /// </summary>
+    /// <param name="content">The content to check.</param>
+    /// <returns><c>true</c> if the content and all its ancestors are published; otherwise, <c>false</c>.</returns>
     public bool IsPathPublished(TContent? content)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -630,6 +638,10 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
 
         return OperationResult.Succeed(eventMessages);
     }
+
+    /// <inheritdoc />
+    Attempt<OperationResult?> IContentServiceBase<TContent>.Save(IEnumerable<TContent> contents, int userId) =>
+        Attempt.Succeed(Save(contents, userId));
 
     /// <inheritdoc />
     public OperationResult Save(IEnumerable<TContent> contents, int userId = Constants.Security.SuperUserId)
@@ -1540,6 +1552,27 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
     protected static bool IsDefaultCulture(IReadOnlyCollection<ILanguage>? langs, string culture) =>
         langs?.Any(x => x.IsDefault && x.IsoCode.InvariantEquals(culture)) ?? false;
 
+    /// <inheritdoc />
+    public abstract ContentDataIntegrityReport CheckDataIntegrity(ContentDataIntegrityReportOptions options);
+
+    protected ContentDataIntegrityReport CheckDataIntegrity(ContentDataIntegrityReportOptions options, Action<ICoreScope> notifyIssuesFixed)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+
+        scope.WriteLock(WriteLockIds);
+
+        ContentDataIntegrityReport report = _documentRepository.CheckDataIntegrity(options);
+
+        if (report.FixedIssues.Count > 0)
+        {
+            notifyIssuesFixed(scope);
+        }
+
+        scope.Complete();
+
+        return report;
+    }
+
     #endregion
 
     #region Internal Methods
@@ -1602,6 +1635,9 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
     #endregion
 
     #region Content Types
+
+    /// <inheritdoc />
+    public abstract void DeleteOfTypes(IEnumerable<int> contentTypeIds, int userId = Constants.Security.SuperUserId);
 
     private IContentType GetContentType(ICoreScope scope, string contentTypeAlias)
     {
