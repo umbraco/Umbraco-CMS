@@ -3,7 +3,7 @@ import { UMB_MENU_STRUCTURE_WORKSPACE_CONTEXT } from './menu-structure-workspace
 import { UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT } from './section-sidebar-menu/index.js';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { linkEntityExpansionEntries } from '@umbraco-cms/backoffice/utils';
-import { UmbArrayState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbAncestorsEntityContext, UmbParentEntityContext, type UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UMB_MODAL_CONTEXT } from '@umbraco-cms/backoffice/modal';

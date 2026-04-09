@@ -42,7 +42,7 @@ const getRootItems = async (args: UmbTreeRootItemsRequestArgs) => {
 	const { data, ...rest } = await ScriptService.getTreeScriptRoot({
 		query: { skip, take },
 	});
-	return { data: { ...data, totalBefore: 0, totalAfter: Math.max(data.total - data.items.length, 0) }, ...rest };
+	return { data: { ...data, totalBefore: skip, totalAfter: Math.max(data.total - skip - data.items.length, 0) }, ...rest };
 };
 
 const getChildrenOf = async (args: UmbTreeChildrenOfRequestArgs) => {
@@ -56,7 +56,7 @@ const getChildrenOf = async (args: UmbTreeChildrenOfRequestArgs) => {
 		const { data, ...rest } = await ScriptService.getTreeScriptChildren({
 			query: { parentPath, skip, take },
 		});
-		return { data: { ...data, totalBefore: 0, totalAfter: Math.max(data.total - data.items.length, 0) }, ...rest };
+		return { data: { ...data, totalBefore: skip, totalAfter: Math.max(data.total - skip - data.items.length, 0) }, ...rest };
 	}
 };
 

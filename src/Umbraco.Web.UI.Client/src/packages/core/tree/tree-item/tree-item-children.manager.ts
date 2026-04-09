@@ -424,11 +424,6 @@ export class UmbTreeItemChildrenManager<
 			takeAfter: this.targetPagination.getTakeSize(),
 		};
 
-		const offsetPaging: UmbOffsetPaginationRequestModel = {
-			skip: this.offsetPagination.getSkip(),
-			take: this.offsetPagination.getPageSize(),
-		};
-
 		const { data, error } = parent?.unique
 			? await repository.requestTreeItemsOf({
 					parent: {

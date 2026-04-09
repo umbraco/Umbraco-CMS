@@ -122,8 +122,8 @@ export class UmbManagementApiTreeDataRequestManager<
 			? {
 					items: data.items,
 					total: data.total,
-					totalBefore: 0,
-					totalAfter: data.total - data.items.length,
+					totalBefore: skip,
+					totalAfter: Math.max(data.total - skip - data.items.length, 0),
 				}
 			: undefined;
 
@@ -190,8 +190,8 @@ export class UmbManagementApiTreeDataRequestManager<
 			? {
 					items: data.items,
 					total: data.total,
-					totalBefore: 0,
-					totalAfter: data.total - data.items.length,
+					totalBefore: skip,
+					totalAfter: Math.max(data.total - skip - data.items.length, 0),
 				}
 			: undefined;
 
