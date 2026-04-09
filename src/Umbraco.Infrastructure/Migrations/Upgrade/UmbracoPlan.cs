@@ -197,6 +197,7 @@ public partial class UmbracoPlan : MigrationPlan
             return null;
         }
 
+        // TODO (V18): Update to the final migration state version of 17.4 when InitialState changes.
         // InitialState is the final migration state of 9.4 (lowest supported upgrade).
         var initialVersion = new SemVersion(9, 4, 0);
         SemVersion? trackedVersion = initialVersion;
