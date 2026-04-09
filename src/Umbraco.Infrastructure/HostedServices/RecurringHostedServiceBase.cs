@@ -24,7 +24,7 @@ public abstract class RecurringHostedServiceBase : BackgroundService
     private readonly SemaphoreSlim _signal = new(0, 1);
     private CancellationTokenSource _periodChangeCts = new();
     private TimeSpan _period;
-    private volatile TriggerState _triggerState = TriggerState.Default;
+    private TriggerState _triggerState = TriggerState.Default;
     private volatile bool _nextExecutionSkipOnOvershoot;
 
     /// <summary>
@@ -219,6 +219,9 @@ public abstract class RecurringHostedServiceBase : BackgroundService
     /// <returns>
     /// A task representing the asynchronous operation.
     /// </returns>
+    /// <remarks>
+    /// This overload does not receive a <see cref="CancellationToken" />, so shutdown cancellation is not propagated to the implementation.
+    /// </remarks>
     [Obsolete("Override PerformExecuteAsync(CancellationToken) instead. Scheduled for removal in Umbraco 19.")]
     public virtual Task PerformExecuteAsync(object? state) => Task.CompletedTask;
 
@@ -269,6 +272,7 @@ public abstract class RecurringHostedServiceBase : BackgroundService
     /// After the triggered execution, the original schedule is kept.
     /// If the scheduled time has already passed during the triggered execution, it is skipped and the next period tick is awaited.
     /// </summary>
+    /// <seealso cref="NextExecutionStrategy.None" />
     public void TriggerExecution()
         => TriggerExecution(NextExecutionStrategy.None);
 
@@ -278,7 +282,7 @@ public abstract class RecurringHostedServiceBase : BackgroundService
     /// <param name="strategy">Controls the delay after the triggered execution.</param>
     public void TriggerExecution(NextExecutionStrategy strategy)
     {
-        _triggerState = new TriggerState(Strategy: strategy);
+        Interlocked.Exchange(ref _triggerState, new TriggerState(Strategy: strategy));
         ReleaseSignal();
     }
 
@@ -289,7 +293,7 @@ public abstract class RecurringHostedServiceBase : BackgroundService
     /// <param name="nextDelay">The target interval from execution start to the next execution. Execution time is subtracted to prevent drift.</param>
     public void TriggerExecution(TimeSpan nextDelay)
     {
-        _triggerState = new TriggerState(Delay: nextDelay);
+        Interlocked.Exchange(ref _triggerState, new TriggerState(Delay: nextDelay));
         ReleaseSignal();
     }
 
@@ -320,16 +324,13 @@ public abstract class RecurringHostedServiceBase : BackgroundService
 
     private void ReleaseSignal()
     {
-        if (_signal.CurrentCount == 0)
+        try
         {
-            try
-            {
-                _signal.Release();
-            }
-            catch (SemaphoreFullException)
-            {
-                // Already signaled
-            }
+            _signal.Release();
+        }
+        catch (SemaphoreFullException)
+        {
+            // Already signaled
         }
     }
 

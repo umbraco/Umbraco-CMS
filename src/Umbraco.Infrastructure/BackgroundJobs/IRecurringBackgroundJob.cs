@@ -54,7 +54,7 @@ public interface IRecurringBackgroundJob
     /// <returns>
     /// A task representing the asynchronous operation.
     /// </returns>
-    [Obsolete("Use RunJobAsync(CancellationToken) instead. This method will be removed in Umbraco 19.")]
+    [Obsolete("Use RunJobAsync(CancellationToken) instead. Scheduled for removal in Umbraco 19.")]
     Task RunJobAsync();
 
     /// <summary>

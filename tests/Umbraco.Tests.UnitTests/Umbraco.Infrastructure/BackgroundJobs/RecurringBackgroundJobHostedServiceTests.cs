@@ -17,7 +17,6 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.BackgroundJobs;
 [TestFixture]
 public class RecurringBackgroundJobHostedServiceTests
 {
-
     [TestCase(RuntimeLevel.Boot)]
     [TestCase(RuntimeLevel.Install)]
     [TestCase(RuntimeLevel.Unknown)]
@@ -120,8 +119,6 @@ public class RecurringBackgroundJobHostedServiceTests
         mockEventAggregator.Verify(x => x.PublishAsync(It.IsAny<RecurringBackgroundJobIgnoredNotification>(), It.IsAny<CancellationToken>()), Times.Once);
     }
 
-
-
     [Test]
     public async Task Publishes_Executed_Notification_When_Run()
     {
@@ -152,6 +149,23 @@ public class RecurringBackgroundJobHostedServiceTests
     }
 
     [Test]
+    public async Task Publishes_Canceled_Notification_When_Canceled()
+    {
+        using var cts = new CancellationTokenSource();
+        var mockJob = new Mock<IRecurringBackgroundJob>();
+        mockJob.Setup(x => x.ServerRoles).Returns(RecurringBackgroundJobBase.DefaultServerRoles);
+        mockJob.Setup(x => x.RunJobAsync(It.IsAny<CancellationToken>()))
+            .Returns<CancellationToken>(ct => { cts.Cancel(); ct.ThrowIfCancellationRequested(); return Task.CompletedTask; });
+        var mockEventAggregator = new Mock<IEventAggregator>();
+
+        var sut = CreateRecurringBackgroundJobHostedService(mockJob, mockEventAggregator: mockEventAggregator);
+        await sut.PerformExecuteAsync(cts.Token);
+
+        mockEventAggregator.Verify(x => x.PublishAsync(It.IsAny<RecurringBackgroundJobExecutingNotification>(), It.IsAny<CancellationToken>()), Times.Once);
+        mockEventAggregator.Verify(x => x.PublishAsync(It.IsAny<RecurringBackgroundJobCanceledNotification>(), It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Test]
     public async Task Publishes_Start_And_Stop_Notifications()
     {
         var mockJob = new Mock<IRecurringBackgroundJob>();
@@ -161,16 +175,11 @@ public class RecurringBackgroundJobHostedServiceTests
         await sut.StartAsync(CancellationToken.None);
         await sut.StopAsync(CancellationToken.None);
 
-
         mockEventAggregator.Verify(x => x.PublishAsync(It.IsAny<RecurringBackgroundJobStartingNotification>(), It.IsAny<CancellationToken>()), Times.Once);
         mockEventAggregator.Verify(x => x.PublishAsync(It.IsAny<RecurringBackgroundJobStartedNotification>(), It.IsAny<CancellationToken>()), Times.Once);
-
-
         mockEventAggregator.Verify(x => x.PublishAsync(It.IsAny<RecurringBackgroundJobStoppingNotification>(), It.IsAny<CancellationToken>()), Times.Once);
         mockEventAggregator.Verify(x => x.PublishAsync(It.IsAny<RecurringBackgroundJobStoppedNotification>(), It.IsAny<CancellationToken>()), Times.Once);
-
     }
-
 
     private RecurringBackgroundJobHostedService<IRecurringBackgroundJob> CreateRecurringBackgroundJobHostedService(
         Mock<IRecurringBackgroundJob> mockJob,
