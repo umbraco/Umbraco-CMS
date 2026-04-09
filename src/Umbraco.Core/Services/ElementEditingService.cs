@@ -455,7 +455,7 @@ internal sealed class ElementEditingService
         IElement copy = element.DeepCloneWithResetIdentities();
         copy.ParentId = newParentId;
 
-        var copyingNotification = new ElementCopyingNotification(element, copy, newParentId, newParentKey, eventMessages);
+        var copyingNotification = new ElementCopyingNotification(element, copy, newParentKey, eventMessages);
         if (await scope.Notifications.PublishCancelableAsync(copyingNotification))
         {
             scope.Complete();
@@ -478,7 +478,7 @@ internal sealed class ElementEditingService
 
         scope.Notifications.Publish(new ElementTreeChangeNotification(copy, TreeChangeTypes.RefreshBranch, eventMessages));
         scope.Notifications.Publish(
-            new ElementCopiedNotification(element, copy, newParentId, newParentKey, relateToOriginal, eventMessages)
+            new ElementCopiedNotification(element, copy, newParentKey, relateToOriginal, eventMessages)
                 .WithStateFrom(copyingNotification));
 
         await _auditService.AddAsync(AuditType.Copy, userKey, element.Id, UmbracoObjectTypes.Element.GetName());

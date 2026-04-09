@@ -16,7 +16,7 @@ public class ItemMemberGroupItemControllerTests : ManagementApiUserGroupTestBase
     public async Task SetUp()
     {
         var memberGroup = new Core.Models.MemberGroup { Name = "Test Member Group" };
-        MemberGroupService.Save(memberGroup);
+        await MemberGroupService.CreateAsync(memberGroup);
         _memberGroupKey = memberGroup.Key;
     }
 
