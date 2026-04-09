@@ -120,8 +120,7 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
     {
         using ICoreScope coreScope = ScopeProvider.CreateCoreScope(autoComplete: true);
 
-        IEnumerable<IDictionaryItem> all = await _dictionaryRepository.GetAllAsync(CancellationToken.None);
-        return all.Where(x => x.ParentId == parentId);
+        return await _dictionaryRepository.GetChildrenAsync(parentId);
     }
 
     /// <summary>
@@ -131,8 +130,9 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
     /// <returns>The number of child dictionary items.</returns>
     public async Task<int> CountChildrenAsync(Guid parentId)
     {
-        IEnumerable<IDictionaryItem> children = await GetChildrenAsync(parentId);
-        return children.Count();
+        using ICoreScope coreScope = ScopeProvider.CreateCoreScope(autoComplete: true);
+
+        return await _dictionaryRepository.CountChildrenAsync(parentId);
     }
 
     /// <inheritdoc />
@@ -150,8 +150,7 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
     {
         using ICoreScope coreScope = ScopeProvider.CreateCoreScope(autoComplete: true);
 
-        IEnumerable<IDictionaryItem> all = await _dictionaryRepository.GetAllAsync(CancellationToken.None);
-        return all.Where(x => x.ParentId == null);
+        return await _dictionaryRepository.GetAtRootAsync();
     }
 
     /// <summary>
@@ -160,8 +159,9 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
     /// <returns>The number of root dictionary items.</returns>
     public async Task<int> CountRootAsync()
     {
-        IEnumerable<IDictionaryItem> items = await GetAtRootAsync();
-        return items.Count();
+        using ICoreScope coreScope = ScopeProvider.CreateCoreScope(autoComplete: true);
+
+        return await _dictionaryRepository.CountAtRootAsync();
     }
 
     /// <inheritdoc/>
@@ -334,18 +334,6 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
 
             return Attempt.SucceedWithStatus(DictionaryItemOperationStatus.Success, dictionaryItem);
         }
-    }
-
-    /// <summary>
-    /// Counts dictionary items matching the specified query.
-    /// </summary>
-    /// <returns>The count of matching dictionary items.</returns>
-    private async Task<int> CountByQueryAsync()
-    {
-        using ICoreScope coreScope = ScopeProvider.CreateCoreScope(autoComplete: true);
-
-        IEnumerable<IDictionaryItem> items = await _dictionaryRepository.GetAllAsync(CancellationToken.None);
-        return items.Count();
     }
 
     /// <summary>

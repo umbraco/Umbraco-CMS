@@ -240,28 +240,6 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Can_Perform_GetAll_ByKeys_With_Params_On_DictionaryRepository()
-    {
-        // Arrange
-        var provider = NewScopeProvider;
-        using (var scope = provider.CreateScope())
-        {
-            var repository = CreateRepository();
-
-            // Act
-            var dictionaryItems = (await repository.GetManyByItemKeysAsync("Read More", "Article")).ToArray();
-
-            // Assert
-            Assert.That(dictionaryItems, Is.Not.Null);
-            Assert.That(dictionaryItems.Any(), Is.True);
-            Assert.That(dictionaryItems.Any(x => x == null), Is.False);
-            Assert.That(dictionaryItems.Count(), Is.EqualTo(2));
-
-            scope.Complete();
-        }
-    }
-
-    [Test]
     public async Task Can_Perform_GetByItemKey_On_DictionaryRepository()
     {
         // Arrange

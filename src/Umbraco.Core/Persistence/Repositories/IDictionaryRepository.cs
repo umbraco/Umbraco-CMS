@@ -30,6 +30,32 @@ public interface IDictionaryRepository : IAsyncReadWriteRepository<Guid, IDictio
     Task<IEnumerable<IDictionaryItem>> GetDictionaryItemDescendantsAsync(Guid? parentId, string? filter = null);
 
     /// <summary>
+    ///     Gets all direct children of a parent dictionary item.
+    /// </summary>
+    /// <param name="parentId">The unique identifier of the parent item.</param>
+    /// <returns>A collection of direct child dictionary items.</returns>
+    Task<IEnumerable<IDictionaryItem>> GetChildrenAsync(Guid parentId);
+
+    /// <summary>
+    ///     Gets all root-level dictionary items (items without a parent).
+    /// </summary>
+    /// <returns>A collection of root dictionary items.</returns>
+    Task<IEnumerable<IDictionaryItem>> GetAtRootAsync();
+
+    /// <summary>
+    ///     Counts the direct children of a parent dictionary item.
+    /// </summary>
+    /// <param name="parentId">The unique identifier of the parent item.</param>
+    /// <returns>The number of direct child dictionary items.</returns>
+    Task<int> CountChildrenAsync(Guid parentId);
+
+    /// <summary>
+    ///     Counts the root-level dictionary items (items without a parent).
+    /// </summary>
+    /// <returns>The number of root dictionary items.</returns>
+    Task<int> CountAtRootAsync();
+
+    /// <summary>
     ///     Gets a mapping of dictionary item keys to their unique identifiers.
     /// </summary>
     /// <returns>A dictionary mapping keys to unique identifiers.</returns>
@@ -44,6 +70,6 @@ public interface IDictionaryRepository : IAsyncReadWriteRepository<Guid, IDictio
         // Resolve int ID to Guid Key via the full dataset
         IEnumerable<IDictionaryItem> all = GetAllAsync(CancellationToken.None).GetAwaiter().GetResult();
         IDictionaryItem? item = all.FirstOrDefault(x => x.Id == id);
-        return item is not null ? GetAsync(item.Key, CancellationToken.None).GetAwaiter().GetResult() : null;
+        return item;
     }
 }

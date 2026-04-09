@@ -102,6 +102,54 @@ internal sealed class DictionaryRepository : AsyncEntityRepositoryBase<Guid, IDi
                 .Select(x => new { x.Key, x.UniqueId })
                 .ToDictionaryAsync(x => x.Key, x => x.UniqueId));
 
+    /// <inheritdoc/>
+    public async Task<IEnumerable<IDictionaryItem>> GetChildrenAsync(Guid parentId)
+    {
+        IDictionary<int, ILanguage> languagesById = await GetLanguagesByIdAsync();
+
+        return await AmbientScope.ExecuteWithContextAsync(async db =>
+        {
+            List<DictionaryDto> dtos = await db.DictionaryEntries
+                .Include(x => x.LanguageText)
+                .Where(x => x.Parent == parentId)
+                .ToListAsync();
+
+            return dtos
+                .Select(dto => ConvertFromDto(dto, languagesById))
+                .OrderBy(x => x.ItemKey)
+                .ToList();
+        });
+    }
+
+    /// <inheritdoc/>
+    public async Task<IEnumerable<IDictionaryItem>> GetAtRootAsync()
+    {
+        IDictionary<int, ILanguage> languagesById = await GetLanguagesByIdAsync();
+
+        return await AmbientScope.ExecuteWithContextAsync(async db =>
+        {
+            List<DictionaryDto> dtos = await db.DictionaryEntries
+                .Include(x => x.LanguageText)
+                .Where(x => x.Parent == null)
+                .ToListAsync();
+
+            return dtos
+                .Select(dto => ConvertFromDto(dto, languagesById))
+                .OrderBy(x => x.ItemKey)
+                .ToList();
+        });
+    }
+
+    /// <inheritdoc/>
+    public async Task<int> CountChildrenAsync(Guid parentId) =>
+        await AmbientScope.ExecuteWithContextAsync(async db =>
+            await db.DictionaryEntries.CountAsync(x => x.Parent == parentId));
+
+    /// <inheritdoc/>
+    public async Task<int> CountAtRootAsync() =>
+        await AmbientScope.ExecuteWithContextAsync(async db =>
+            await db.DictionaryEntries.CountAsync(x => x.Parent == null));
+
     /// <summary>
     /// Retrieves all descendant dictionary items of a specified parent item, optionally filtered by a search string.
     /// </summary>
