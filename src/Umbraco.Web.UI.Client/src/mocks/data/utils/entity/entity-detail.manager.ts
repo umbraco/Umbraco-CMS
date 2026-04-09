@@ -29,6 +29,19 @@ export class UmbMockEntityDetailManager<MockType extends { id: string }> {
 		return mappedItem;
 	}
 
+	readBatch(ids: Array<string>): { items: Array<MockType>; total: number } {
+		const items = ids
+			.map((id) => {
+				try {
+					return this.read(id);
+				} catch {
+					return undefined;
+				}
+			})
+			.filter((item) => item !== undefined);
+		return { items, total: items.length };
+	}
+
 	update(id: string, item: any) {
 		const mockItem = this.#db.read(id);
 

@@ -46,16 +46,8 @@ export const detailHandlers = [
 	http.get(umbracoPath(`${UMB_SLUG}/batch`), ({ request }) => {
 		const ids = new URL(request.url).searchParams.getAll('id');
 		if (!ids?.length) return new HttpResponse(null, { status: 400 });
-		const items = ids
-			.map((id) => {
-				try {
-					return umbDocumentTypeMockDb.detail.read(id);
-				} catch {
-					return undefined;
-				}
-			})
-			.filter(Boolean);
-		return HttpResponse.json(items);
+		const response = umbDocumentTypeMockDb.detail.readBatch(ids);
+		return HttpResponse.json(response);
 	}),
 
 	http.get(umbracoPath(`${UMB_SLUG}/:id`), ({ params }) => {

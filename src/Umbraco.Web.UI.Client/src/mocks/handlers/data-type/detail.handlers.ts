@@ -4,7 +4,6 @@ import { UMB_SLUG } from './slug.js';
 import type {
 	CreateDataTypeRequestModel,
 	UpdateDataTypeRequestModel,
-	BatchResponseModelDataTypeResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
@@ -25,23 +24,8 @@ export const detailHandlers = [
 	}),
 
 	http.get(umbracoPath(`${UMB_SLUG}/batch`), ({ request }) => {
-		const url = new URL(request.url);
-		const ids = url.searchParams.getAll('id');
-		const items = ids
-			.map((id) => {
-				try {
-					return umbDataTypeMockDb.detail.read(id);
-				} catch {
-					return undefined;
-				}
-			})
-			.filter((item) => item !== undefined);
-
-		const response: BatchResponseModelDataTypeResponseModel = {
-			total: items.length,
-			items,
-		};
-
+		const ids = new URL(request.url).searchParams.getAll('id');
+		const response = umbDataTypeMockDb.detail.readBatch(ids);
 		return HttpResponse.json(response);
 	}),
 

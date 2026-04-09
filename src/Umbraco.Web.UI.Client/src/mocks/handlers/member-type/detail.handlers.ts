@@ -2,7 +2,6 @@ const { http, HttpResponse } = window.MockServiceWorker;
 import { umbMemberTypeMockDb } from '../../data/member-type/member-type.db.js';
 import { UMB_SLUG } from './slug.js';
 import type {
-	BatchResponseModelMemberTypeResponseModel,
 	CreateMemberTypeRequestModel,
 	UpdateMemberTypeRequestModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
@@ -25,23 +24,8 @@ export const detailHandlers = [
 	}),
 
 	http.get(umbracoPath(`${UMB_SLUG}/batch`), ({ request }) => {
-		const url = new URL(request.url);
-		const ids = url.searchParams.getAll('id');
-		const items = ids
-			.map((id) => {
-				try {
-					return umbMemberTypeMockDb.detail.read(id);
-				} catch {
-					return undefined;
-				}
-			})
-			.filter((item) => item !== undefined);
-
-		const response: BatchResponseModelMemberTypeResponseModel = {
-			total: items.length,
-			items,
-		};
-
+		const ids = new URL(request.url).searchParams.getAll('id');
+		const response = umbMemberTypeMockDb.detail.readBatch(ids);
 		return HttpResponse.json(response);
 	}),
 
