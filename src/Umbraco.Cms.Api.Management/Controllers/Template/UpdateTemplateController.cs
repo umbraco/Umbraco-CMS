@@ -1,8 +1,12 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Api.Management.ViewModels.Template;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
@@ -17,15 +21,32 @@ public class UpdateTemplateController : TemplateControllerBase
     private readonly ITemplateService _templateService;
     private readonly IUmbracoMapper _umbracoMapper;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
+    private readonly IOptions<RuntimeSettings> _runtimeSettings;
 
+    [ActivatorUtilitiesConstructor]
     public UpdateTemplateController(
         ITemplateService templateService,
         IUmbracoMapper umbracoMapper,
-        IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+        IOptions<RuntimeSettings> runtimeSettings)
     {
         _templateService = templateService;
         _umbracoMapper = umbracoMapper;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
+        _runtimeSettings = runtimeSettings;
+    }
+
+    [Obsolete("Use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
+    public UpdateTemplateController(
+        ITemplateService templateService,
+        IUmbracoMapper umbracoMapper,
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
+        : this(
+            templateService,
+            umbracoMapper,
+            backOfficeSecurityAccessor,
+            StaticServiceProvider.Instance.GetRequiredService<IOptions<RuntimeSettings>>())
+    {
     }
 
     [HttpPut("{id:guid}")]
@@ -46,7 +67,13 @@ public class UpdateTemplateController : TemplateControllerBase
             return TemplateNotFound();
         }
 
+        // In production mode, block updates if the content is being changed.
+        var existingContent = template.Content;
         template = _umbracoMapper.Map(requestModel, template);
+        if (_runtimeSettings.Value.Mode == RuntimeMode.Production && existingContent != template.Content)
+        {
+            return TemplateOperationStatusResult(TemplateOperationStatus.ContentChangeNotAllowedInProductionMode);
+        }
 
         Attempt<ITemplate, TemplateOperationStatus> result = await _templateService.UpdateAsync(template, CurrentUserKey(_backOfficeSecurityAccessor));
 

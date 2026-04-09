@@ -622,8 +622,12 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
             Database.Execute(delete, new { id = GetEntityId(entity) });
         }
 
-        var viewName = string.Concat(entity.Alias, ".cshtml");
-        _viewsFileSystem?.DeleteFile(viewName);
+        // Only delete file when not in production runtime mode
+        if (_runtimeSettings.CurrentValue.Mode != RuntimeMode.Production)
+        {
+            var viewName = string.Concat(entity.Alias, ".cshtml");
+            _viewsFileSystem?.DeleteFile(viewName);
+        }
 
         entity.DeleteDate = DateTime.UtcNow;
     }

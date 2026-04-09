@@ -1,7 +1,11 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
@@ -14,11 +18,28 @@ public class DeleteTemplateController : TemplateControllerBase
 {
     private readonly ITemplateService _templateService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
+    private readonly IOptions<RuntimeSettings> _runtimeSettings;
 
-    public DeleteTemplateController(ITemplateService templateService, IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
+    [ActivatorUtilitiesConstructor]
+    public DeleteTemplateController(
+        ITemplateService templateService,
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+        IOptions<RuntimeSettings> runtimeSettings)
     {
         _templateService = templateService;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
+        _runtimeSettings = runtimeSettings;
+    }
+
+    [Obsolete("Use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
+    public DeleteTemplateController(
+        ITemplateService templateService,
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
+        : this(
+            templateService,
+            backOfficeSecurityAccessor,
+            StaticServiceProvider.Instance.GetRequiredService<IOptions<RuntimeSettings>>())
+    {
     }
 
     [HttpDelete("{id:guid}")]
@@ -30,6 +51,11 @@ public class DeleteTemplateController : TemplateControllerBase
     [EndpointDescription("Deletes a template identified by the provided Id.")]
     public async Task<IActionResult> Delete(CancellationToken cancellationToken, Guid id)
     {
+        if (_runtimeSettings.Value.Mode == RuntimeMode.Production)
+        {
+            return TemplateOperationStatusResult(TemplateOperationStatus.NotAllowedInProductionMode);
+        }
+
         Attempt<ITemplate?, TemplateOperationStatus> result = await _templateService.DeleteAsync(id, CurrentUserKey(_backOfficeSecurityAccessor));
         return result.Success
             ? Ok()
