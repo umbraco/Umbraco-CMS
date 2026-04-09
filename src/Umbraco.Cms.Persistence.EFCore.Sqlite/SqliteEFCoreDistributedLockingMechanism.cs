@@ -142,7 +142,7 @@ public sealed class SqliteEFCoreDistributedLockingMechanism<T> : IDistributedLoc
         // Mostly no-op just check that we didn't end up ReadUncommitted for real.
         private void ObtainReadLock()
         {
-            IEFCoreScope<T>? efCoreScope = _parent._efCoreScopeAccessor.Value.AmbientScope
+            IEfCoreScope<T>? efCoreScope = _parent._efCoreScopeAccessor.Value.AmbientScope
                 ?? throw new PanicException("No current ambient scope");
 
             efCoreScope.ExecuteWithContextAsync<Task>(database =>
@@ -160,7 +160,7 @@ public sealed class SqliteEFCoreDistributedLockingMechanism<T> : IDistributedLoc
         // lock occurs for entire database as opposed to row/table.
         private void ObtainWriteLock()
         {
-            IEFCoreScope<T>? efCoreScope = _parent._efCoreScopeAccessor.Value.AmbientScope
+            IEfCoreScope<T>? efCoreScope = _parent._efCoreScopeAccessor.Value.AmbientScope
                 ?? throw new PanicException("No ambient scope");
 
             efCoreScope.ExecuteWithContextAsync<Task>(async database =>

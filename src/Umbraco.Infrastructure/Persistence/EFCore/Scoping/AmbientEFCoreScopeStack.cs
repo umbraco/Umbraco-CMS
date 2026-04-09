@@ -12,17 +12,16 @@ namespace Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
 public class AmbientEFCoreScopeStack<TDbContext> : IAmbientEFCoreScopeStack<TDbContext> where TDbContext : DbContext
 {
     private static Lock _lock = new();
-    private static AsyncLocal<ConcurrentStack<IEFCoreScope<TDbContext>>> _stack = new();
-    private IEFCoreScope<TDbContext>? _ambientScope;
+    private static AsyncLocal<ConcurrentStack<IEfCoreScope<TDbContext>>> _stack = new();
 
     /// <inheritdoc />
-    public IEFCoreScope<TDbContext>? AmbientScope
+    public IEfCoreScope<TDbContext>? AmbientScope
     {
         get
         {
             lock (_lock)
             {
-                if (_stack.Value?.TryPeek(out IEFCoreScope<TDbContext>? ambientScope) ?? false)
+                if (_stack.Value?.TryPeek(out IEfCoreScope<TDbContext>? ambientScope) ?? false)
                 {
                     return ambientScope;
                 }
@@ -36,11 +35,11 @@ public class AmbientEFCoreScopeStack<TDbContext> : IAmbientEFCoreScopeStack<TDbC
     ICoreScope? CoreEFCoreScopeAccessor.AmbientScope => AmbientScope;
 
     /// <inheritdoc />
-    public IEFCoreScope<TDbContext> Pop()
+    public IEfCoreScope<TDbContext> Pop()
     {
         lock (_lock)
         {
-            if (_stack.Value?.TryPop(out IEFCoreScope<TDbContext>? ambientScope) ?? false)
+            if (_stack.Value?.TryPop(out IEfCoreScope<TDbContext>? ambientScope) ?? false)
             {
                 return ambientScope;
             }
@@ -50,15 +49,13 @@ public class AmbientEFCoreScopeStack<TDbContext> : IAmbientEFCoreScopeStack<TDbC
     }
 
     /// <inheritdoc />
-    public void Push(IEFCoreScope<TDbContext> scope)
+    public void Push(IEfCoreScope<TDbContext> scope)
     {
         lock (_lock)
         {
-            _stack.Value ??= new ConcurrentStack<IEFCoreScope<TDbContext>>();
+            _stack.Value ??= new ConcurrentStack<IEfCoreScope<TDbContext>>();
 
             _stack.Value.Push(scope);
         }
     }
-
-    IEFCoreScope<TDbContext>? IEFCoreScopeAccessor<TDbContext>.AmbientScope => _ambientScope;
 }

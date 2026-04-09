@@ -1,6 +1,6 @@
 {
-  "name": "@umbraco-cms/acceptance-test-helpers",
-  "version": "18.0.0-beta",
+  "name": "@umbraco/acceptance-test-helpers",
+  "version": "18.0.0-rc",
   "description": "Test helpers and builders for making Playwright tests for Umbraco solutions",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

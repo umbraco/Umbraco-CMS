@@ -45,7 +45,7 @@ public class StaticFileTreeControllerBase : FileSystemTreeControllerBase
             ? Array.Empty<string>()
             : _fileSystemTreeService.GetFiles(path);
 
-    protected override FileSystemTreeItemPresentationModel[] GetAncestorModels(string path, bool includeSelf)
+    protected FileSystemTreeItemPresentationModel[] GetAncestorModels(string path, bool includeSelf)
         => IsAllowedPath(path)
             ? _fileSystemTreeService.GetAncestorModels(path, includeSelf)
             : Array.Empty<FileSystemTreeItemPresentationModel>();

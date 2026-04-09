@@ -12,7 +12,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'entityAction',
 		kind: 'moveTo',
-		alias: 'Umb.EntityAction.ElementFolder.MoveTo',
+		alias: 'Umb.EntityAction.Element.Folder.MoveTo',
 		name: 'Move Element Folder Entity Action',
 		forEntityTypes: [UMB_ELEMENT_FOLDER_ENTITY_TYPE],
 		meta: {

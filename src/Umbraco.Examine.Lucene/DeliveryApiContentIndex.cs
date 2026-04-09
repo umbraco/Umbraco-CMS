@@ -20,9 +20,6 @@ public class DeliveryApiContentIndex : UmbracoExamineIndex
     // The special path and icon value transformations are not needed in this case
     protected override bool ApplySpecialValueTransformations => false;
 
-    /// <inheritdoc />
-    public override string UniqueKeyFieldName => UmbracoExamineFieldNames.DeliveryApiContentIndex.ItemId;
-
     public DeliveryApiContentIndex(
         ILoggerFactory loggerFactory,
         string name,

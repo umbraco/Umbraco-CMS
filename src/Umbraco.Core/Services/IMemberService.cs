@@ -224,6 +224,20 @@ public interface IMemberService : IMembershipMemberService, IContentServiceBase<
     bool Exists(int id);
 
     /// <summary>
+    ///     Gets a Member by the unique key
+    /// </summary>
+    /// <remarks>
+    ///     The guid key corresponds to the unique id in the database
+    ///     and the user id in the membership provider.
+    /// </remarks>
+    /// <param name="id"><see cref="Guid" /> Id</param>
+    /// <returns>
+    ///     <see cref="IMember" />
+    /// </returns>
+    [Obsolete($"Use {nameof(GetById)}. Scheduled for removal in Umbraco 18.")]
+    IMember? GetByKey(Guid id) => GetById(id);
+
+    /// <summary>
     ///     Gets a Member by its integer id
     /// </summary>
     /// <param name="id"><see cref="int" /> Id</param>

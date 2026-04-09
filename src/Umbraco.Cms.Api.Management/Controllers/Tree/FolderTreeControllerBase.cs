@@ -122,9 +122,9 @@ public abstract class FolderTreeControllerBase<TItem> : NamedEntityTreeControlle
             .ToArray();
     }
 
-    protected override async Task<TItem> MapTreeItemViewModelAsync(Guid? parentKey, IEntitySlim entity)
+    protected override TItem MapTreeItemViewModel(Guid? parentKey, IEntitySlim entity)
     {
-        TItem viewModel = await base.MapTreeItemViewModelAsync(parentKey, entity);
+        TItem viewModel = base.MapTreeItemViewModel(parentKey, entity);
 
         if (entity.NodeObjectType == _folderObjectTypeId)
         {
@@ -194,7 +194,7 @@ public abstract class FolderTreeControllerBase<TItem> : NamedEntityTreeControlle
         (IEntitySlim[] entities, long totalItems) =
             await FilterTreeEntities(itemSearchResult.Items.ToArray(), itemSearchResult.Total);
 
-        TItem[] treeItemViewModels = await MapSearchTreeItemViewModelsAsync(entities);
+        TItem[] treeItemViewModels = MapSearchTreeItemViewModels(entities);
 
         await PopulateFlags(treeItemViewModels);
 
@@ -203,11 +203,8 @@ public abstract class FolderTreeControllerBase<TItem> : NamedEntityTreeControlle
         return Ok(result);
     }
 
-    protected virtual async Task<TItem[]> MapSearchTreeItemViewModelsAsync(IEntitySlim[] entities)
-    {
-        IEnumerable<Task<TItem>> tasks = entities.Select(entity => MapTreeItemViewModelAsync(GetSearchResultParentKey(entity), entity));
-        return await Task.WhenAll(tasks);
-    }
+    protected virtual TItem[] MapSearchTreeItemViewModels(IEntitySlim[] entities)
+        => entities.Select(entity => MapTreeItemViewModel(GetSearchResultParentKey(entity), entity)).ToArray();
 
     private Guid? GetSearchResultParentKey(IEntitySlim entity)
     {

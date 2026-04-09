@@ -1,7 +1,6 @@
 import { UMB_CURRENT_USER_MODAL } from './modals/current-user/current-user-modal.token.js';
 import type { UmbCurrentUserModel } from './types.js';
 import { UMB_CURRENT_USER_CONTEXT } from './constants.js';
-import { getInitials } from './utils/index.js';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UmbHeaderAppButtonElement } from '@umbraco-cms/backoffice/components';
@@ -39,16 +38,11 @@ export class UmbCurrentUserHeaderAppElement extends UmbHeaderAppButtonElement {
 	}
 
 	override render() {
-		const userInitials = this._currentUser?.name ? getInitials(this._currentUser.name) : '';
-		const accessibleLabel = this._currentUser?.name
-			? this.localize.term('visuallyHiddenTexts_profileOptions', this._currentUser.name, userInitials)
-			: this.localize.term('visuallyHiddenTexts_profileOptionsDefault');
-
 		return html`
 			<uui-button
 				@click=${this.#handleUserClick}
 				look="primary"
-				label=${accessibleLabel}
+				label=${this.localize.term('visuallyHiddenTexts_profileOptions')}
 				compact>
 				<umb-user-avatar
 					id="Avatar"

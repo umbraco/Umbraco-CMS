@@ -1987,8 +1987,7 @@ export default {
 		openBackofficeSearch: 'Back-Office Suche öffnen',
 		openCloseBackofficeHelp: 'Back-Office Hilfe öffnen / schliessen',
 		openCloseBackofficeProfileOptions: 'Ihre Profil-Einstellungen öffnen / schliessen',
-		profileOptions: 'Benutzerprofil für %0% (%1%)',
-		profileOptionsDefault: 'Benutzerprofil',
+		profileOptions: 'Profil-Einstellungen',
 	},
 	logViewer: {
 		selectAllLogLevelFilters: 'Wählen Sie Alle',

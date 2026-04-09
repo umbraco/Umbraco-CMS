@@ -1,7 +1,9 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using NUnit.Framework;
@@ -24,11 +26,11 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 internal sealed class ContentServicePerformanceTest : UmbracoIntegrationTest
 {
     [SetUp]
-    public async Task SetUpData() => await CreateTestDataAsync();
+    public void SetUpData() => CreateTestData();
 
     private DocumentRepository DocumentRepository => (DocumentRepository)GetRequiredService<IDocumentRepository>();
 
-    private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
+    private IFileService FileService => GetRequiredService<IFileService>();
 
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
@@ -47,7 +49,7 @@ internal sealed class ContentServicePerformanceTest : UmbracoIntegrationTest
 
     [Test]
     [LongRunning]
-    public async Task Retrieving_All_Content_In_Site()
+    public void Retrieving_All_Content_In_Site()
     {
         // NOTE: Doing this the old 1 by 1 way and based on the results of the ContentServicePerformanceTest.Retrieving_All_Content_In_Site
         // the old way takes 143795ms, the new above way takes:
@@ -61,7 +63,7 @@ internal sealed class ContentServicePerformanceTest : UmbracoIntegrationTest
         // ... NOPE, made even more nice changes, it is now...
         // 4452ms !!!!!!!
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        FileService.SaveTemplate(template);
 
         var contentType1 = ContentTypeBuilder.CreateTextPageContentType("test1", "test1", template.Id);
         var contentType2 = ContentTypeBuilder.CreateTextPageContentType("test2", "test2", template.Id);
@@ -266,10 +268,10 @@ internal sealed class ContentServicePerformanceTest : UmbracoIntegrationTest
         }
     }
 
-    public async Task CreateTestDataAsync()
+    public void CreateTestData()
     {
         var template = TemplateBuilder.CreateTextPageTemplate("defaultTemplate");
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        FileService.SaveTemplate(template);
 
         // Create and Save ContentType "textpage" -> ContentType.Id
         ContentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id);

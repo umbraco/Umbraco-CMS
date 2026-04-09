@@ -124,9 +124,9 @@ public class AuditEntryService : RepositoryService, IAuditEntryService
         string eventType,
         string eventDetails)
     {
-        if (performingUserKey == Guid.Empty)
+        if (performingUserId < Constants.Security.SuperUserId)
         {
-            throw new ArgumentException(nameof(performingUserKey));
+            throw new ArgumentOutOfRangeException(nameof(performingUserId));
         }
 
         if (string.IsNullOrWhiteSpace(performingDetails))

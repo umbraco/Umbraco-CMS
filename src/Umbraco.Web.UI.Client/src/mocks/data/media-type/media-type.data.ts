@@ -4,12 +4,12 @@ import type {
 	MediaTypeTreeItemResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 
-export type UmbMockMediaTypeModel = Omit<MediaTypeResponseModel, 'allowedInLibrary'> &
+export type UmbMockMediaTypeModel = MediaTypeResponseModel &
 	MediaTypeTreeItemResponseModel &
 	MediaTypeItemResponseModel;
 
 export type UmbMockMediaTypeUnionModel =
-	| Omit<MediaTypeResponseModel, 'allowedInLibrary'>
+	| MediaTypeResponseModel
 	| MediaTypeTreeItemResponseModel
 	| MediaTypeItemResponseModel;
 
@@ -105,6 +105,7 @@ export const data: Array<UmbMockMediaTypeModel> = [
 		isDeletable: false,
 		aliasCanBeChanged: false,
 		noAccess: false,
+		allowedInLibrary: false,
 	},
 	{
 		name: 'Audio',
@@ -157,6 +158,7 @@ export const data: Array<UmbMockMediaTypeModel> = [
 		isDeletable: false,
 		aliasCanBeChanged: false,
 		noAccess: false,
+		allowedInLibrary: false,
 	},
 	{
 		name: 'Vector Graphics',
@@ -209,6 +211,7 @@ export const data: Array<UmbMockMediaTypeModel> = [
 		isDeletable: false,
 		aliasCanBeChanged: false,
 		noAccess: false,
+		allowedInLibrary: false,
 	},
 	{
 		name: 'Movie',
@@ -261,6 +264,7 @@ export const data: Array<UmbMockMediaTypeModel> = [
 		isDeletable: false,
 		aliasCanBeChanged: false,
 		noAccess: false,
+		allowedInLibrary: false,
 	},
 	{
 		name: 'Media Type 5',
@@ -313,6 +317,7 @@ export const data: Array<UmbMockMediaTypeModel> = [
 		isDeletable: false,
 		aliasCanBeChanged: false,
 		noAccess: false,
+		allowedInLibrary: false,
 	},
 	{
 		name: 'A Forbidden Media Type',
@@ -365,5 +370,6 @@ export const data: Array<UmbMockMediaTypeModel> = [
 		isDeletable: true,
 		aliasCanBeChanged: false,
 		noAccess: false,
+		allowedInLibrary: false,
 	},
 ];

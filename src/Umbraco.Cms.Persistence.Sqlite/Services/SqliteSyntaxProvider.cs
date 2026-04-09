@@ -508,10 +508,6 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
     }
 
     /// <inheritdoc />
-    public override string CreateTempTable(string tableName, string columnDefinitionSql)
-        => $"CREATE TEMP TABLE {tableName} ({columnDefinitionSql})";
-
-    /// <inheritdoc />
     public override string Length => "length";
 
     /// <inheritdoc />

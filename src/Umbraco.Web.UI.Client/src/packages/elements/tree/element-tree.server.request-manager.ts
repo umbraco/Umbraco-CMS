@@ -1,6 +1,5 @@
 /* eslint-disable local-rules/no-direct-api-import */
 
-import type { UmbElementTreeChildrenOfRequestArgs, UmbElementTreeRootItemsRequestArgs } from './types.js';
 import { ElementService } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbManagementApiTreeDataRequestManager } from '@umbraco-cms/backoffice/management-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -16,29 +15,15 @@ import type {
 	UmbManagementApiTreeSiblingsFromRequestArgs,
 } from '@umbraco-cms/backoffice/management-api';
 
-interface UmbManagementApiElementTreeRootItemsRequestArgs
-	extends UmbManagementApiTreeRootItemsRequestArgs,
-		Pick<UmbElementTreeRootItemsRequestArgs, 'dataType'> {}
-
-interface UmbManagementApiElementTreeChildrenOfRequestArgs
-	extends UmbManagementApiTreeChildrenOfRequestArgs,
-		Pick<UmbElementTreeChildrenOfRequestArgs, 'dataType'> {}
-
-interface UmbManagementApiElementTreeSiblingsFromRequestArgs extends UmbManagementApiTreeSiblingsFromRequestArgs {
-	dataType?: {
-		unique: string;
-	};
-}
-
 export class UmbManagementApiElementTreeDataRequestManager extends UmbManagementApiTreeDataRequestManager<
 	ElementTreeItemResponseModel,
-	UmbManagementApiElementTreeRootItemsRequestArgs,
+	UmbManagementApiTreeRootItemsRequestArgs,
 	PagedElementTreeItemResponseModel,
-	UmbManagementApiElementTreeChildrenOfRequestArgs,
+	UmbManagementApiTreeChildrenOfRequestArgs,
 	PagedElementTreeItemResponseModel,
 	UmbManagementApiTreeAncestorsOfRequestArgs,
 	Array<ElementTreeItemResponseModel>,
-	UmbManagementApiElementTreeSiblingsFromRequestArgs,
+	UmbManagementApiTreeSiblingsFromRequestArgs,
 	SubsetElementTreeItemResponseModel
 > {
 	constructor(host: UmbControllerHost) {
@@ -46,7 +31,6 @@ export class UmbManagementApiElementTreeDataRequestManager extends UmbManagement
 			getRootItems: (args) =>
 				ElementService.getTreeElementRoot({
 					query: {
-						dataTypeId: args.dataType?.unique,
 						foldersOnly: args.foldersOnly,
 						skip: args.paging.skip,
 						take: args.paging.take,
@@ -57,7 +41,6 @@ export class UmbManagementApiElementTreeDataRequestManager extends UmbManagement
 				ElementService.getTreeElementChildren({
 					query: {
 						parentId: args.parent.unique,
-						dataTypeId: args.dataType?.unique,
 						foldersOnly: args.foldersOnly,
 						skip: args.paging.skip,
 						take: args.paging.take,
@@ -74,7 +57,6 @@ export class UmbManagementApiElementTreeDataRequestManager extends UmbManagement
 			getSiblingsFrom: (args) =>
 				ElementService.getTreeElementSiblings({
 					query: {
-						dataTypeId: args.dataType?.unique,
 						foldersOnly: args.foldersOnly,
 						target: args.paging.target.unique,
 						before: args.paging.takeBefore,

@@ -1,5 +1,7 @@
+using System.Linq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
@@ -8,6 +10,7 @@ using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
@@ -28,8 +31,6 @@ internal sealed class TrackRelationsTests : UmbracoIntegrationTestWithContent
 
     private IRelationService RelationService => GetRequiredService<IRelationService>();
 
-    private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
-
     protected override void CustomTestSetup(IUmbracoBuilder builder)
     {
         base.CustomTestSetup(builder);
@@ -39,7 +40,7 @@ internal sealed class TrackRelationsTests : UmbracoIntegrationTestWithContent
 
     [Test]
     [LongRunning]
-    public async Task Automatically_Track_Relations()
+    public void Automatically_Track_Relations()
     {
         var mt = MediaTypeBuilder.CreateSimpleMediaType("testMediaType", "Test Media Type");
         MediaTypeService.Save(mt);
@@ -54,7 +55,7 @@ internal sealed class TrackRelationsTests : UmbracoIntegrationTestWithContent
         MemberService.Save(member);
 
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        FileService.SaveTemplate(template);
 
         var ct = ContentTypeBuilder.CreateTextPageContentType("richTextTest", defaultTemplateId: template.Id);
         ct.AllowedTemplates = Enumerable.Empty<ITemplate>();

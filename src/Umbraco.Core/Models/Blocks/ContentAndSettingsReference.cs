@@ -17,7 +17,29 @@ public struct ContentAndSettingsReference : IEquatable<ContentAndSettingsReferen
     {
         ContentKey = contentKey;
         SettingsKey = settingsKey;
+        ContentUdi = new GuidUdi(Constants.UdiEntityType.Element, contentKey);
+        SettingsUdi = settingsKey.HasValue
+            ? new GuidUdi(Constants.UdiEntityType.Element, settingsKey.Value)
+            : null;
     }
+
+    /// <summary>
+    ///     Gets the content UDI.
+    /// </summary>
+    /// <value>
+    ///     The content UDI.
+    /// </value>
+    [Obsolete("Use ContentKey instead. Scheduled for removal in Umbraco 18.")]
+    public Udi ContentUdi { get; }
+
+    /// <summary>
+    ///     Gets the settings UDI.
+    /// </summary>
+    /// <value>
+    ///     The settings UDI.
+    /// </value>
+    [Obsolete("Use SettingsKey instead. Scheduled for removal in Umbraco 18.")]
+    public Udi? SettingsUdi { get; }
 
     /// <summary>
     ///     Gets or sets the content key.
@@ -51,11 +73,15 @@ public struct ContentAndSettingsReference : IEquatable<ContentAndSettingsReferen
 
     /// <inheritdoc />
     public bool Equals(ContentAndSettingsReference other) => other != null
-                                                             && ContentKey.Equals(other.ContentKey)
-                                                             && SettingsKey.Equals(other.SettingsKey);
+                                                             && EqualityComparer<Udi>.Default.Equals(
+                                                                 ContentUdi,
+                                                                 other.ContentUdi)
+                                                             && EqualityComparer<Udi>.Default.Equals(
+                                                                 SettingsUdi,
+                                                                 other.SettingsUdi);
 
     /// <inheritdoc />
-    public override int GetHashCode() => (ContentKey, SettingsKey).GetHashCode();
+    public override int GetHashCode() => (ContentUdi, SettingsUdi).GetHashCode();
 
     /// <summary>
     ///     Determines whether two <see cref="ContentAndSettingsReference" /> instances are not equal.

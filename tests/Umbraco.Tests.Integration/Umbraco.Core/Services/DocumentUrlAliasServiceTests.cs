@@ -885,7 +885,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         {
             Assert.That(singleAlias.DocumentKey, Is.EqualTo(singleAliasKey), "DocumentKey should match PageWithSingleAlias key");
             Assert.That(singleAlias.DocumentKey, Is.Not.EqualTo(Guid.Empty), "DocumentKey should not be empty GUID");
-            Assert.That(singleAlias.LanguageId, Is.Null, "Invariant content should have NULL LanguageId");
+            Assert.That(singleAlias.NullableLanguageId, Is.Null, "Invariant content should have NULL LanguageId");
             Assert.That(singleAlias.Alias, Is.EqualTo("my-single-alias"), "Alias should be normalized (lowercase, no leading slash)");
         });
 
@@ -907,7 +907,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
             Assert.Multiple(() =>
             {
                 Assert.That(alias.DocumentKey, Is.Not.EqualTo(Guid.Empty), "DocumentKey should not be empty GUID");
-                Assert.That(alias.LanguageId, Is.Null, "Invariant content should have NULL LanguageId");
+                Assert.That(alias.NullableLanguageId, Is.Null, "Invariant content should have NULL LanguageId");
             });
         }
 
@@ -921,7 +921,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         {
             Assert.That(childAlias.DocumentKey, Is.EqualTo(childPageKey), "DocumentKey should match ChildPage key");
             Assert.That(childAlias.DocumentKey, Is.Not.EqualTo(Guid.Empty), "DocumentKey should not be empty GUID");
-            Assert.That(childAlias.LanguageId, Is.Null, "Invariant content should have NULL LanguageId");
+            Assert.That(childAlias.NullableLanguageId, Is.Null, "Invariant content should have NULL LanguageId");
             Assert.That(childAlias.Alias, Is.EqualTo("child-alias"), "Alias should be 'child-alias'");
         });
 
@@ -965,7 +965,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
 
         // Assert - invariant content should have NULL languageId
         Assert.That(storedAliases, Has.Count.EqualTo(1));
-        Assert.That(storedAliases[0].LanguageId, Is.Null, "Invariant content should have NULL LanguageId");
+        Assert.That(storedAliases[0].NullableLanguageId, Is.Null, "Invariant content should have NULL LanguageId");
     }
 
     [Test]
@@ -998,7 +998,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         // Assert - variant content should have specific languageId (not NULL)
         var defaultLanguage = await LanguageService.GetDefaultLanguageAsync();
         Assert.That(storedAliases, Has.Count.EqualTo(1));
-        Assert.That(storedAliases[0].LanguageId, Is.EqualTo(defaultLanguage.Id), "Variant content should have specific LanguageId");
+        Assert.That(storedAliases[0].NullableLanguageId, Is.EqualTo(defaultLanguage.Id), "Variant content should have specific LanguageId");
     }
 
     [Test]
@@ -1020,7 +1020,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         }
 
         Assert.That(aliasesBefore, Has.Count.GreaterThan(0), "Should have aliases before change");
-        Assert.That(aliasesBefore.All(a => a.LanguageId == null), Is.True, "All aliases should have NULL languageId before change");
+        Assert.That(aliasesBefore.All(a => a.NullableLanguageId == null), Is.True, "All aliases should have NULL languageId before change");
 
         // Act - change content type from invariant to variant
         ContentType.Variations = ContentVariation.Culture;
@@ -1050,8 +1050,8 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         }
 
         Assert.That(aliasesAfter, Has.Count.GreaterThan(0), "Should have aliases after change");
-        Assert.That(aliasesAfter.All(a => a.LanguageId != null), Is.True, "All aliases should have specific languageId after change to variant");
-        Assert.That(aliasesAfter.Any(a => a.LanguageId == defaultLanguage.Id), Is.True, "Should have alias for default language");
+        Assert.That(aliasesAfter.All(a => a.NullableLanguageId != null), Is.True, "All aliases should have specific languageId after change to variant");
+        Assert.That(aliasesAfter.Any(a => a.NullableLanguageId == defaultLanguage.Id), Is.True, "Should have alias for default language");
     }
 
     [Test]
@@ -1073,7 +1073,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         }
 
         Assert.That(invariantAliases, Has.Count.GreaterThan(0), "Should have invariant aliases");
-        Assert.That(invariantAliases.All(a => a.LanguageId == null), Is.True, "Invariant aliases should have NULL languageId");
+        Assert.That(invariantAliases.All(a => a.NullableLanguageId == null), Is.True, "Invariant aliases should have NULL languageId");
 
         // Change content type to variant
         ContentType.Variations = ContentVariation.Culture;
@@ -1103,7 +1103,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         }
 
         Assert.That(variantAliases, Has.Count.GreaterThan(0), "Should have variant aliases after change to variant");
-        Assert.That(variantAliases.All(a => a.LanguageId != null), Is.True, "All aliases should have specific languageId after change to variant");
+        Assert.That(variantAliases.All(a => a.NullableLanguageId != null), Is.True, "All aliases should have specific languageId after change to variant");
 
         // Act - change content type from variant to invariant
         ContentType.Variations = ContentVariation.Nothing;
@@ -1129,7 +1129,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         }
 
         Assert.That(aliasesAfter, Has.Count.GreaterThan(0), "Should have aliases after change to invariant");
-        Assert.That(aliasesAfter.All(a => a.LanguageId == null), Is.True, "All aliases should have NULL languageId after change to invariant");
+        Assert.That(aliasesAfter.All(a => a.NullableLanguageId == null), Is.True, "All aliases should have NULL languageId after change to invariant");
     }
 
     #endregion

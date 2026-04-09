@@ -27,11 +27,11 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
 
         private ICoreScopeProvider CoreScopeProvider => Services.GetRequiredService<ICoreScopeProvider>();
 
-        private IEFCoreScopeProvider<TestUmbracoDbContext> EFCoreScopeProvider =>
+        private IEFCoreScopeProvider<TestUmbracoDbContext> EfCoreScopeProvider =>
             Services.GetRequiredService<IEFCoreScopeProvider<TestUmbracoDbContext>>();
 
         [Test]
-        public void CanNestScopes_Normal_Core_EFCore()
+        public void CanNestScopes_Normal_Core_EfCore()
         {
             using (var ambientScope = ScopeProvider.CreateScope())
             {
@@ -41,7 +41,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
                 {
                     outerScope.WriteLock(Constants.Locks.ContentTree);
 
-                    using (var innerScope = EFCoreScopeProvider.CreateScope())
+                    using (var innerScope = EfCoreScopeProvider.CreateScope())
                     {
                         innerScope.WriteLock(Constants.Locks.ContentTree);
 
@@ -54,13 +54,13 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
         }
 
         [Test]
-        public void CanNestScopes_Normal_EFCore_Core()
+        public void CanNestScopes_Normal_EfCore_Core()
         {
             using (var ambientScope = ScopeProvider.CreateScope())
             {
                 ambientScope.WriteLock(Constants.Locks.ContentTree);
 
-                using (var outerScope = EFCoreScopeProvider.CreateScope())
+                using (var outerScope = EfCoreScopeProvider.CreateScope())
                 {
                     outerScope.WriteLock(Constants.Locks.ContentTree);
 
@@ -77,7 +77,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
         }
 
         [Test]
-        public void CanNestScopes_Core_Normal_EFCore()
+        public void CanNestScopes_Core_Normal_Efcore()
         {
             using (var ambientScope = CoreScopeProvider.CreateCoreScope())
             {
@@ -87,7 +87,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
                 {
                     outerScope.WriteLock(Constants.Locks.ContentTree);
 
-                    using (var innerScope = EFCoreScopeProvider.CreateScope())
+                    using (var innerScope = EfCoreScopeProvider.CreateScope())
                     {
                         innerScope.WriteLock(Constants.Locks.ContentTree);
 
@@ -100,13 +100,13 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
         }
 
         [Test]
-        public void CanNestScopes_Core_EFCore_Normal()
+        public void CanNestScopes_Core_EfCore_Normal()
         {
             using (var ambientScope = CoreScopeProvider.CreateCoreScope())
             {
                 ambientScope.WriteLock(Constants.Locks.ContentTree);
 
-                using (var outerScope = EFCoreScopeProvider.CreateScope())
+                using (var outerScope = EfCoreScopeProvider.CreateScope())
                 {
                     outerScope.WriteLock(Constants.Locks.ContentTree);
 
@@ -123,9 +123,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
         }
 
         [Test]
-        public void CanNestScopes_EFCore_Normal_Core()
+        public void CanNestScopes_EfCore_Normal_Core()
         {
-            using (var ambientScope = EFCoreScopeProvider.CreateScope())
+            using (var ambientScope = EfCoreScopeProvider.CreateScope())
             {
                 ambientScope.WriteLock(Constants.Locks.ContentTree);
 
@@ -146,9 +146,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
         }
 
         [Test]
-        public void CanNestScopes_EFCore_Core_Normal()
+        public void CanNestScopes_EfCore_Core_Normal()
         {
-            using (var ambientScope = EFCoreScopeProvider.CreateScope())
+            using (var ambientScope = EfCoreScopeProvider.CreateScope())
             {
                 ambientScope.WriteLock(Constants.Locks.ContentTree);
 
@@ -203,13 +203,13 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
         }
 
         [Test]
-        public void CanNestScopes_EFCore_EFCore()
+        public void CanNestScopes_EfCore_EfCore()
         {
-            using (var ambientScope = EFCoreScopeProvider.CreateScope())
+            using (var ambientScope = EfCoreScopeProvider.CreateScope())
             {
                 ambientScope.WriteLock(Constants.Locks.ContentTree);
 
-                using (var inner = EFCoreScopeProvider.CreateScope())
+                using (var inner = EfCoreScopeProvider.CreateScope())
                 {
                     inner.WriteLock(Constants.Locks.ContentTree);
 

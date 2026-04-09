@@ -442,6 +442,7 @@ export abstract class UmbBlockManagerContext<
 	}
 
 	protected async _createBlockElementData(key: string, contentTypeKey: string) {
+		//
 		const appLanguage = await this.getContext(UMB_APP_LANGUAGE_CONTEXT);
 		if (!appLanguage) {
 			throw new Error('Could not retrieve app language context.');
@@ -452,21 +453,13 @@ export abstract class UmbBlockManagerContext<
 			throw new Error(`Cannot create Preset for Block, missing content structure for ${contentTypeKey}`);
 		}
 
-		// Ensure the content type and all its compositions are fully loaded before reading properties.
-		// Without this, getContentTypeProperties() may return only the owner type's properties
-		// if compositions haven't finished loading yet.
-		await contentStructure.whenLoaded();
-
-		// Use the synchronous boolean getters, not the Observable properties (which are always truthy).
-		const hostVariesByCulture = contentStructure.getVariesByCulture() ?? false;
-		const hostVariesBySegment = contentStructure.getVariesBySegment() ?? false;
-
-		const cultures = hostVariesByCulture ? await appLanguage.getCultures() : [];
-		if (hostVariesByCulture && cultures.length === 0) {
+		// Set culture and segment for all values:
+		const cutlures = contentStructure.variesByCulture ? await appLanguage.getCultures() : [];
+		if (cutlures.length === 0) {
 			throw new Error('Could not retrieve app cultures.');
 		}
 		// TODO: Receive the segments from somewhere. [NL]
-		const segments: Array<string> | undefined = hostVariesBySegment ? [] : undefined;
+		const segments: Array<string> | undefined = contentStructure.variesBySegment ? [] : undefined;
 
 		const repo = new UmbDataTypeDetailRepository(this);
 
@@ -489,19 +482,15 @@ export abstract class UmbBlockManagerContext<
 					propertyEditorSchemaAlias: dataType.editorAlias,
 					config: dataType.values,
 					typeArgs: {
-						// Normalize property variance against the host content type, mirroring the
-						// server-side logic in ContentTypeCompositionBase (propertyType.Variations &= Variations).
-						// Properties from compositions are loaded individually and carry their own variance flags,
-						// which may not match the host's effective variance (GH-22230).
-						variesByCulture: property.variesByCulture && hostVariesByCulture,
-						variesBySegment: property.variesBySegment && hostVariesBySegment,
+						variesByCulture: property.variesByCulture,
+						variesBySegment: property.variesBySegment,
 					} as UmbPropertyTypePresetModelTypeModel,
 				} as UmbPropertyTypePresetModel;
 			}),
 		);
 
 		const controller = new UmbPropertyValuePresetVariantBuilderController(this);
-		controller.setCultures(cultures);
+		controller.setCultures(cutlures);
 		if (segments) {
 			controller.setSegments(segments);
 		}
@@ -510,6 +499,8 @@ export abstract class UmbBlockManagerContext<
 			entityUnique: key,
 			entityTypeUnique: contentTypeKey,
 		});
+
+		// Set culture and segment for all values:
 
 		return {
 			key,

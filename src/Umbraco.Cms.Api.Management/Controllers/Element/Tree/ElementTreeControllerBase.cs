@@ -77,23 +77,23 @@ public class ElementTreeControllerBase : UserStartNodeFolderTreeControllerBase<E
                .GetElementStartNodePaths(EntityService, _appCaches)
            ?? [];
 
-    protected override async Task<ElementTreeItemResponseModel> MapTreeItemViewModelAsync(Guid? parentKey, IEntitySlim entity)
+    protected override ElementTreeItemResponseModel MapTreeItemViewModel(Guid? parentKey, IEntitySlim entity)
     {
-        ElementTreeItemResponseModel responseModel = await base.MapTreeItemViewModelAsync(parentKey, entity);
+        ElementTreeItemResponseModel responseModel = base.MapTreeItemViewModel(parentKey, entity);
 
         if (entity is IElementEntitySlim elementEntitySlim)
         {
             responseModel.CreateDate = elementEntitySlim.CreateDate;
             responseModel.DocumentType = _elementPresentationFactory.CreateDocumentTypeReferenceResponseModel(elementEntitySlim);
-            responseModel.Variants = await _elementPresentationFactory.CreateVariantsItemResponseModelsAsync(elementEntitySlim);
+            responseModel.Variants = _elementPresentationFactory.CreateVariantsItemResponseModels(elementEntitySlim);
         }
 
         return responseModel;
     }
 
-    protected override async Task<ElementTreeItemResponseModel> MapTreeItemViewModelAsNoAccessAsync(Guid? parentKey, IEntitySlim entity)
+    protected override ElementTreeItemResponseModel MapTreeItemViewModelAsNoAccess(Guid? parentKey, IEntitySlim entity)
     {
-        ElementTreeItemResponseModel viewModel = await MapTreeItemViewModelAsync(parentKey, entity);
+        ElementTreeItemResponseModel viewModel = MapTreeItemViewModel(parentKey, entity);
         viewModel.NoAccess = true;
         return viewModel;
     }

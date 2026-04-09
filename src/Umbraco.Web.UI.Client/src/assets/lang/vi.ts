@@ -2010,7 +2010,7 @@ export default {
 		},
 		changePassword: 'Đổi mật khẩu',
 		changePhoto: 'Đổi ảnh',
-		configureMfa: 'Cấu hình 2FA',
+		configureMfa: 'Cấu hình MFA',
 		emailRequired: 'Bắt buộc - nhập địa chỉ email cho người dùng này',
 		emailDescription: (usernameIsEmail: boolean) => {
 			return usernameIsEmail
@@ -2368,8 +2368,7 @@ export default {
 		openBackofficeSearch: 'Mở tìm kiếm backoffice',
 		openCloseBackofficeHelp: 'Mở/Đóng trợ giúp backoffice',
 		openCloseBackofficeProfileOptions: 'Mở/Đóng tùy chọn hồ sơ của bạn',
-		profileOptions: 'Hồ sơ người dùng cho %0% (%1%)',
-		profileOptionsDefault: 'Hồ sơ người dùng',
+		profileOptions: 'Tùy chọn hồ sơ',
 		assignDomainDescription: 'Thiết lập Ngôn ngữ và Tên miền cho %0%',
 		createDescription: 'Tạo nút mới dưới %0%',
 		protectDescription: 'Thiết lập hạn chế truy cập trên %0%',

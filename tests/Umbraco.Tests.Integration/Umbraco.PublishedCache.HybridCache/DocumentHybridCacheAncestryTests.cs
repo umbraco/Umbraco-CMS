@@ -32,9 +32,9 @@ internal sealed class DocumentHybridCacheAncestryTests : UmbracoIntegrationTestW
         builder.Services.AddUnique<IServerMessenger, ContentEventsTests.LocalServerMessenger>();
     }
 
-    public override async Task Setup()
+    public override void Setup()
     {
-        await base.Setup();
+        base.Setup();
         // Publish documents
         _subSubPage = ContentBuilder.CreateSimpleContent(ContentType, "_subSubPage", Subpage.Id);
         _subSubPage.Key = Guid.Parse("E4C369B5-CCCA-4981-ADAC-389824CF6B0B");

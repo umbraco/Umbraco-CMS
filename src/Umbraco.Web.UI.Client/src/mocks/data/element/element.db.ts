@@ -109,8 +109,6 @@ const createMockElementMapper = (request: CreateElementRequestModel): UmbMockEle
 				updateDate: now,
 				state: DocumentVariantStateModel.DRAFT,
 				publishDate: null,
-				id: UmbId.new(),
-				flags: [],
 			};
 		}),
 		flags: [],
@@ -165,8 +163,6 @@ const detailResponseMapper = (model: UmbMockElementModel): ElementResponseModel 
 			publishDate: null,
 			scheduledPublishDate: null,
 			scheduledUnpublishDate: null,
-			id: v.id,
-			flags: v.flags ?? [],
 		})),
 		flags: model.flags,
 	};

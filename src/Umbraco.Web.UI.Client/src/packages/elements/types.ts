@@ -20,7 +20,6 @@ export interface UmbElementDetailModel extends UmbContentDetailModel {
 	documentType: {
 		unique: string;
 		collection: null;
-		icon?: string | null;
 	};
 	entityType: UmbElementEntityType;
 	unique: string;

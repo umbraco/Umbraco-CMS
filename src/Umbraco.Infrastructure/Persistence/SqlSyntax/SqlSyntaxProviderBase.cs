@@ -1161,15 +1161,4 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
 
     /// <inheritdoc />
     public virtual string TruncateConstraintName<T>(string constraintName) => constraintName;
-
-    /// <inheritdoc />
-    public virtual string CreateTempTable(string tableName, string columnDefinitionSql)
-        => $"CREATE TEMP TABLE {tableName} ({columnDefinitionSql})";
-
-    /// <inheritdoc />
-    public virtual string TempTableName(string baseName) => baseName;
-
-    /// <inheritdoc />
-    public virtual string DropTempTable(string tableName)
-        => $"DROP TABLE IF EXISTS {tableName}";
 }

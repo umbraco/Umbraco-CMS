@@ -32,7 +32,7 @@ internal sealed class UserRepository : EntityRepositoryBase<Guid, IUser>, IUserR
 {
     private readonly IMapperCollection _mapperCollection;
     private readonly GlobalSettings _globalSettings;
-    private readonly SecuritySettings _securitySettings;
+    private readonly UserPasswordConfigurationSettings _passwordConfiguration;
     private readonly IJsonSerializer _jsonSerializer;
     private readonly IRuntimeState _runtimeState;
     private string? _passwordConfigJson;
@@ -48,7 +48,7 @@ internal sealed class UserRepository : EntityRepositoryBase<Guid, IUser>, IUserR
     /// <param name="logger">The logger.</param>
     /// <param name="mapperCollection">The mapper collection.</param>
     /// <param name="globalSettings">The global settings.</param>
-    /// <param name="securitySettings">The password configuration.</param>
+    /// <param name="passwordConfiguration">The password configuration.</param>
     /// <param name="jsonSerializer">The JSON serializer.</param>
     /// <param name="runtimeState">State of the runtime.</param>
     /// <param name="repositoryCacheVersionService">The repository cache version service.</param>
@@ -67,7 +67,7 @@ internal sealed class UserRepository : EntityRepositoryBase<Guid, IUser>, IUserR
         ILogger<UserRepository> logger,
         IMapperCollection mapperCollection,
         IOptions<GlobalSettings> globalSettings,
-        IOptions<SecuritySettings> securitySettings,
+        IOptions<UserPasswordConfigurationSettings> passwordConfiguration,
         IJsonSerializer jsonSerializer,
         IRuntimeState runtimeState,
         IRepositoryCacheVersionService repositoryCacheVersionService,
@@ -82,8 +82,8 @@ internal sealed class UserRepository : EntityRepositoryBase<Guid, IUser>, IUserR
     {
         _mapperCollection = mapperCollection ?? throw new ArgumentNullException(nameof(mapperCollection));
         _globalSettings = globalSettings.Value ?? throw new ArgumentNullException(nameof(globalSettings));
-        _securitySettings =
-            securitySettings.Value ?? throw new ArgumentNullException(nameof(securitySettings));
+        _passwordConfiguration =
+            passwordConfiguration.Value ?? throw new ArgumentNullException(nameof(passwordConfiguration));
         _jsonSerializer = jsonSerializer;
         _runtimeState = runtimeState;
         _permissionMappers = permissionMappers.ToDictionary(x => x.Context);
@@ -103,7 +103,7 @@ internal sealed class UserRepository : EntityRepositoryBase<Guid, IUser>, IUserR
 
             var passwordConfig = new PersistedPasswordSettings
             {
-                HashAlgorithm = _securitySettings.UserPassword.HashAlgorithmType
+                HashAlgorithm = _passwordConfiguration.HashAlgorithmType
             };
 
             _passwordConfigJson = passwordConfig == null ? null : _jsonSerializer.Serialize(passwordConfig);

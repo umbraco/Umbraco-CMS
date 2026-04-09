@@ -56,23 +56,21 @@ public class MemberTypeTreeControllerBase : FolderTreeControllerBase<MemberTypeT
 
     protected override UmbracoObjectTypes FolderObjectType => UmbracoObjectTypes.MemberTypeContainer;
 
-    protected override async Task<MemberTypeTreeItemResponseModel[]> MapTreeItemViewModelsAsync(Guid? parentKey, IEntitySlim[] entities)
+    protected override MemberTypeTreeItemResponseModel[] MapTreeItemViewModels(Guid? parentKey, IEntitySlim[] entities)
     {
         var memberTypes = _memberTypeService
             .GetMany(entities.Select(entity => entity.Id).ToArray())
             .ToDictionary(contentType => contentType.Id);
 
-        IEnumerable<Task<MemberTypeTreeItemResponseModel>> tasks = entities.Select(async entity =>
+        return entities.Select(entity =>
         {
-            MemberTypeTreeItemResponseModel responseModel = await MapTreeItemViewModelAsync(parentKey, entity);
+            MemberTypeTreeItemResponseModel responseModel = MapTreeItemViewModel(parentKey, entity);
             if (memberTypes.TryGetValue(entity.Id, out IMemberType? memberType))
             {
                 responseModel.Icon = memberType.Icon ?? responseModel.Icon;
             }
 
             return responseModel;
-        });
-
-        return await Task.WhenAll(tasks);
+        }).ToArray();
     }
 }

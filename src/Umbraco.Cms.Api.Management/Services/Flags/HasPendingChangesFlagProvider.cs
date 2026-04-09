@@ -1,12 +1,11 @@
-using Umbraco.Cms.Api.Management.ViewModels;
+﻿using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
-using Umbraco.Cms.Api.Management.ViewModels.Element;
 using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Api.Management.Services.Flags;
 
 /// <summary>
-/// Implements a <see cref="IFlagProvider"/> that provides flags for documents and elements that have pending changes.
+/// Implements a <see cref="IFlagProvider"/> that provides flags for documents that have pending changes.
 /// </summary>
 public class HasPendingChangesFlagProvider : IFlagProvider
 {
@@ -16,9 +15,8 @@ public class HasPendingChangesFlagProvider : IFlagProvider
     public bool CanProvideFlags<TItem>()
         where TItem : IHasFlags =>
         typeof(TItem) == typeof(DocumentVariantItemResponseModel) ||
-        typeof(TItem) == typeof(DocumentVariantResponseModel) ||
-        typeof(TItem) == typeof(ElementVariantItemResponseModel) ||
-        typeof(TItem) == typeof(ElementVariantResponseModel);
+        typeof(TItem) == typeof(DocumentVariantResponseModel);
+
 
     /// <inheritdoc/>
     public Task PopulateFlagsAsync<TItem>(IEnumerable<TItem> items)
@@ -26,16 +24,7 @@ public class HasPendingChangesFlagProvider : IFlagProvider
     {
         foreach (TItem item in items)
         {
-            DocumentVariantState? state = item switch
-            {
-                DocumentVariantItemResponseModel variant => variant.State,
-                DocumentVariantResponseModel variant => variant.State,
-                ElementVariantItemResponseModel variant => variant.State,
-                ElementVariantResponseModel variant => variant.State,
-                _ => null,
-            };
-
-            if (state == DocumentVariantState.PublishedPendingChanges)
+            if (HasPendingChanges(item))
             {
                 item.AddFlag(Alias);
             }
@@ -43,4 +32,14 @@ public class HasPendingChangesFlagProvider : IFlagProvider
 
         return Task.CompletedTask;
     }
+
+    /// <summary>
+    /// Determines if the given item has any variant that has pending changes.
+    /// </summary>
+    private static bool HasPendingChanges(object item) => item switch
+    {
+        DocumentVariantItemResponseModel variant => variant.State == DocumentVariantState.PublishedPendingChanges,
+        DocumentVariantResponseModel variant => variant.State == DocumentVariantState.PublishedPendingChanges,
+        _ => false,
+    };
 }

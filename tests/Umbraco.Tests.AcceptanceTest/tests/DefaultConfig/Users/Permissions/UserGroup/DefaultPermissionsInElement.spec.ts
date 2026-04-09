@@ -42,7 +42,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.element.emptyRecycleBin();
 });
 
-test('can read element with permission enabled', async ({umbracoApi, umbracoUi}) => {
+test('can read element with permission enabled', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithReadElementPermission(userGroupName);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
@@ -77,7 +77,7 @@ test.fixme('can not see element in tree with read permission disabled', async ({
 });
 
 // Currently user cannot choose element type to create element even with permission enabled
-test.fixme('can create element with create permission enabled', async ({umbracoApi, umbracoUi}) => {
+test.fixme('can create element with create permission enabled', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithCreateElementPermission(userGroupName);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
@@ -113,7 +113,7 @@ test('can not see create action menu with create permission disabled', async ({u
   await umbracoUi.library.isActionsMenuForNameVisible(elementName, false);
 });
 
-test('can trash element with delete permission enabled', async ({umbracoApi, umbracoUi}) => {
+test('can trash element with delete permission enabled', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithDeleteElementPermission(userGroupName);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
@@ -177,7 +177,7 @@ test('can not empty recycle bin with delete permission disabled', async ({umbrac
   await umbracoUi.library.isActionsMenuForRecycleBinVisible(false);
 });
 
-test('can publish element with publish permission enabled', async ({umbracoApi, umbracoUi}) => {
+test('can publish element with publish permission enabled', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithPublishElementPermission(userGroupName);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
@@ -208,7 +208,7 @@ test('can not publish element with publish permission disabled', async ({umbraco
   await umbracoUi.library.isActionsMenuForNameVisible(elementName, false);
 });
 
-test('can unpublish element with unpublish permission enabled', async ({umbracoApi, umbracoUi}) => {
+test('can unpublish element with unpublish permission enabled', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.element.publish(elementId);
   expect(await umbracoApi.element.isElementPublished(elementId)).toBeTruthy();
@@ -243,7 +243,7 @@ test('can not unpublish element with unpublish permission disabled', async ({umb
   await umbracoUi.library.isActionsMenuForNameVisible(elementName, false);
 });
 
-test('can update element with update permission enabled', async ({umbracoApi, umbracoUi}) => {
+test('can update element with update permission enabled', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithUpdateElementPermission(userGroupName);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
@@ -278,7 +278,7 @@ test.fixme('can not update element with update permission disabled', async ({umb
   await umbracoUi.library.isElementReadOnly(true);
 });
 
-test('can duplicate element with duplicate permission enabled', async ({umbracoApi, umbracoUi}) => {
+test('can duplicate element with duplicate permission enabled', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const duplicatedElementName = elementName + ' (1)';
   userGroupId = await umbracoApi.userGroup.createUserGroupWithDuplicateElementPermission(userGroupName);
@@ -320,7 +320,7 @@ test('can not duplicate element with duplicate permission disabled', async ({umb
   await umbracoUi.library.isActionsMenuForNameVisible(elementName, false);
 });
 
-test.skip('can move element with move to permission enabled', async ({umbracoApi, umbracoUi}) => {
+test('can move element with move to permission enabled', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const elementFolderName = 'TestElementFolder';
   const elementFolderId = await umbracoApi.element.createDefaultElementFolder(elementFolderName);
@@ -367,7 +367,7 @@ test('can not move element with move to permission disabled', async ({umbracoApi
 });
 
 // Currently the rollback functionality in elements is not working.
-test.fixme('can rollback element with rollback permission enabled', async ({umbracoApi, umbracoUi}) => {
+test.fixme('can rollback element with rollback permission enabled', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithRollbackElementPermission(userGroupName);
   await umbracoApi.element.publish(elementId);

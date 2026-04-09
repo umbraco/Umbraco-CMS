@@ -48,14 +48,11 @@ internal sealed class BlockGridPropertyValueCreator : BlockPropertyValueCreatorB
 
         BlockGridItem? EnrichBlockItem(BlockGridItem blockItem, BlockGridLayoutItem layoutItem, BlockGridConfiguration.BlockGridBlockConfiguration blockConfig, CreateBlockItemModelFromLayout createBlockItem)
         {
-            const int DefaultRowSpan = 1;
-            const int DefaultColumnSpan = 12;
-
             // enrich block item with additional configs + setup areas
             var blockConfigAreaMap = blockConfig.Areas.ToDictionary(area => area.Key);
 
-            blockItem.RowSpan = layoutItem.RowSpan ?? DefaultRowSpan;
-            blockItem.ColumnSpan = layoutItem.ColumnSpan ?? gridColumns ?? DefaultColumnSpan;
+            blockItem.RowSpan = layoutItem.RowSpan!.Value;
+            blockItem.ColumnSpan = layoutItem.ColumnSpan!.Value;
             blockItem.AreaGridColumns = blockConfig.AreaGridColumns;
             blockItem.GridColumns = gridColumns;
             blockItem.Areas = layoutItem.Areas.Select(area =>
@@ -66,7 +63,7 @@ internal sealed class BlockGridPropertyValueCreator : BlockPropertyValueCreatorB
                 }
 
                 var items = area.Items.Select(item => createBlockItem(item)).WhereNotNull().ToList();
-                return new BlockGridArea(items, areaConfig.Alias!, areaConfig.RowSpan ?? DefaultRowSpan, areaConfig.ColumnSpan ?? blockConfig.AreaGridColumns ?? gridColumns ?? DefaultColumnSpan);
+                return new BlockGridArea(items, areaConfig.Alias!, areaConfig.RowSpan!.Value, areaConfig.ColumnSpan!.Value);
             }).WhereNotNull().ToArray();
 
             return blockItem;

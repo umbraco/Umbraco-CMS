@@ -58,7 +58,6 @@ const createMockDocumentTypeFolderMapper = (request: CreateFolderRequestModel): 
 		properties: [],
 		containers: [],
 		allowedAsRoot: false,
-		allowedInLibrary: false,
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
@@ -74,6 +73,7 @@ const createMockDocumentTypeFolderMapper = (request: CreateFolderRequestModel): 
 		},
 		flags: [],
 		noAccess: false,
+		allowedInLibrary: false,
 	};
 };
 
@@ -87,7 +87,6 @@ const createMockDocumentTypeMapper = (request: CreateDocumentTypeRequestModel): 
 		properties: request.properties,
 		containers: request.containers,
 		allowedAsRoot: request.allowedAsRoot,
-		allowedInLibrary: request.allowedInLibrary,
 		variesByCulture: request.variesByCulture,
 		variesBySegment: request.variesBySegment,
 		isElement: request.isElement,
@@ -104,6 +103,7 @@ const createMockDocumentTypeMapper = (request: CreateDocumentTypeRequestModel): 
 		},
 		flags: [],
 		noAccess: false,
+		allowedInLibrary: request.allowedInLibrary,
 	};
 };
 
@@ -117,7 +117,6 @@ const documentTypeDetailMapper = (item: UmbMockDocumentTypeModel): DocumentTypeR
 		properties: item.properties,
 		containers: item.containers,
 		allowedAsRoot: item.allowedAsRoot,
-		allowedInLibrary: item.allowedInLibrary,
 		variesByCulture: item.variesByCulture,
 		variesBySegment: item.variesBySegment,
 		isElement: item.isElement,
@@ -126,6 +125,7 @@ const documentTypeDetailMapper = (item: UmbMockDocumentTypeModel): DocumentTypeR
 		allowedTemplates: item.allowedTemplates,
 		cleanup: item.cleanup,
 		collection: item.collection,
+		allowedInLibrary: item.allowedInLibrary,
 	};
 };
 

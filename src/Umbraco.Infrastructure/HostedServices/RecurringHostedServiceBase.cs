@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Diagnostics;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
@@ -132,7 +131,6 @@ public abstract class RecurringHostedServiceBase : IHostedService, IDisposable
     /// <param name="state">The task state.</param>
     public virtual async void ExecuteAsync(object? state)
     {
-        var sw = Stopwatch.StartNew();
         try
         {
             // First, stop the timer, we do not want tasks to execute in parallel
@@ -151,14 +149,9 @@ public abstract class RecurringHostedServiceBase : IHostedService, IDisposable
         }
         finally
         {
-            sw.Stop();
-
-            // If the service has been stopped, _period is set to InfiniteTimeSpan in StopAsync.
-            // Preserve it to keep the timer disabled.
-            TimeSpan remaining = _period == Timeout.InfiniteTimeSpan
-                ? Timeout.InfiniteTimeSpan
-                : ComputeNextDelay(_period, sw.Elapsed);
-            _timer?.Change(remaining, _period);
+            // Resume now that the task is complete - Note we use period in both because we don't want to execute again after the delay.
+            // So first execution is after _delay, and the we wait _period between each
+            _timer?.Change(_period, _period);
         }
     }
 
@@ -170,29 +163,7 @@ public abstract class RecurringHostedServiceBase : IHostedService, IDisposable
     public abstract Task PerformExecuteAsync(object? state);
 
     /// <summary>
-    /// Computes the delay before the next execution, subtracting the elapsed execution time from the period to prevent drift.
-    /// Clamps to <see cref="TimeSpan.Zero" /> if execution exceeded the period.
-    /// </summary>
-    /// <param name="period">The configured period between executions.</param>
-    /// <param name="elapsed">The elapsed time of the current execution.</param>
-    /// <returns>
-    /// The remaining time before the next execution should start.
-    /// </returns>
-    /// <remarks>
-    /// Internal to expose for unit tests.
-    /// </remarks>
-    internal static TimeSpan ComputeNextDelay(TimeSpan period, TimeSpan elapsed)
-    {
-        TimeSpan remaining = period - elapsed;
-
-        // A negative period (e.g. Timeout.InfiniteTimeSpan = -1ms, set by StopAsync) will always produce a
-        // negative remaining value. The caller in ExecuteAsync guards against this by checking for InfiniteTimeSpan
-        // before calling this method, to avoid scheduling an extra execution after stop.
-        return remaining < TimeSpan.Zero ? TimeSpan.Zero : remaining;
-    }
-
-    /// <summary>
-    /// Change the period between operations.
+    ///     Change the period between operations.
     /// </summary>
     /// <param name="newPeriod">The new period between tasks</param>
     protected void ChangePeriod(TimeSpan newPeriod) => _period = newPeriod;

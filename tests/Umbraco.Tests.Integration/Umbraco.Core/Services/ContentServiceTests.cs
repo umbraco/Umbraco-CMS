@@ -77,8 +77,6 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
     private IValueEditorCache ValueEditorCache => GetRequiredService<IValueEditorCache>();
 
-    private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
-
     protected override void CustomTestSetup(IUmbracoBuilder builder) => builder
         .AddNotificationHandler<ContentPublishingNotification, ContentNotificationHandler>()
         .AddNotificationHandler<ContentCopyingNotification, ContentNotificationHandler>()
@@ -86,10 +84,10 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         .AddNotificationHandler<ContentSavingNotification, ContentNotificationHandler>();
 
     [Test]
-    public async Task Create_Blueprint()
+    public void Create_Blueprint()
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        FileService.SaveTemplate(template);
 
         var contentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id);
         ContentTypeService.Save(contentType);
@@ -111,10 +109,10 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
-    public async Task Delete_Blueprint()
+    public void Delete_Blueprint()
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        FileService.SaveTemplate(template);
 
         var contentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id);
         ContentTypeService.Save(contentType);
@@ -134,12 +132,12 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
-    public async Task Create_Blueprint_From_Content()
+    public void Create_Blueprint_From_Content()
     {
         using (var scope = ScopeProvider.CreateScope(autoComplete: true))
         {
             var template = TemplateBuilder.CreateTextPageTemplate();
-            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+            FileService.SaveTemplate(template);
 
             var contentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id);
             ContentTypeService.Save(contentType);
@@ -164,16 +162,16 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
     [Test]
     [LongRunning]
-    public async Task Get_All_Blueprints()
+    public void Get_All_Blueprints()
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        FileService.SaveTemplate(template);
 
         var ct1 = ContentTypeBuilder.CreateTextPageContentType("ct1", defaultTemplateId: template.Id);
-        await TemplateService.CreateAsync(ct1.DefaultTemplate, Constants.Security.SuperUserKey);
+        FileService.SaveTemplate(ct1.DefaultTemplate);
         ContentTypeService.Save(ct1);
         var ct2 = ContentTypeBuilder.CreateTextPageContentType("ct2", defaultTemplateId: template.Id);
-        await TemplateService.CreateAsync(ct2.DefaultTemplate, Constants.Security.SuperUserKey);
+        FileService.SaveTemplate(ct2.DefaultTemplate);
         ContentTypeService.Save(ct2);
 
         for (var i = 0; i < 10; i++)
@@ -402,11 +400,11 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
-    public async Task Count_By_Content_Type()
+    public void Count_By_Content_Type()
     {
         // Arrange
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        FileService.SaveTemplate(template);
 
         var contentType =
             ContentTypeBuilder.CreateSimpleContentType("umbBlah", "test Doc Type", defaultTemplateId: template.Id);
@@ -423,11 +421,11 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
-    public async Task Count_Children()
+    public void Count_Children()
     {
         // Arrange
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        FileService.SaveTemplate(template);
 
         var contentType =
             ContentTypeBuilder.CreateSimpleContentType("umbBlah", "test Doc Type", defaultTemplateId: template.Id);
@@ -445,11 +443,11 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
-    public async Task Count_Descendants()
+    public void Count_Descendants()
     {
         // Arrange
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        FileService.SaveTemplate(template);
 
         var contentType =
             ContentTypeBuilder.CreateSimpleContentType("umbBlah", "test Doc Type", defaultTemplateId: template.Id);
@@ -1282,10 +1280,10 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
-    public async Task Can_Publish_Only_Valid_Content()
+    public void Can_Publish_Only_Valid_Content()
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        FileService.SaveTemplate(template);
 
         var contentType = ContentTypeBuilder.CreateSimpleContentType(
             "umbMandatory",
@@ -1793,10 +1791,10 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
-    public async Task Can_Update_Content_Property_Values()
+    public void Can_Update_Content_Property_Values()
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        FileService.SaveTemplate(template);
 
         IContentType contentType = ContentTypeBuilder.CreateSimpleContentType(defaultTemplateId: template.Id);
         ContentTypeService.Save(contentType);
@@ -1986,7 +1984,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         await UserGroupService.CreateAsync(userGroup, Constants.Security.SuperUserKey);
 
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        FileService.SaveTemplate(template);
 
         var contentType =
             ContentTypeBuilder.CreateSimpleContentType("umbTextpage1", "Textpage", defaultTemplateId: template.Id);
@@ -2027,7 +2025,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         await UserGroupService.CreateAsync(userGroup, Constants.Security.SuperUserKey);
 
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        FileService.SaveTemplate(template);
 
         var contentType =
             ContentTypeBuilder.CreateSimpleContentType("umbTextpage1", "Textpage", defaultTemplateId: template.Id);
@@ -2215,7 +2213,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
-    public async Task Can_Copy_And_Modify_Content_With_Events()
+    public void Can_Copy_And_Modify_Content_With_Events()
     {
         // see https://github.com/umbraco/Umbraco-CMS/issues/5513
 
@@ -2244,7 +2242,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         try
         {
             var template = TemplateBuilder.CreateTextPageTemplate();
-            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+            FileService.SaveTemplate(template);
 
             var contentType = ContentTypeBuilder.CreateSimpleContentType(defaultTemplateId: template.Id);
             ContentTypeService.Save(contentType);
@@ -2310,14 +2308,14 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
-    public async Task Can_Copy_Content_With_Tags()
+    public void Can_Copy_Content_With_Tags()
     {
         const string propAlias = "tags";
 
         // create a content type that has a 'tags' property
         // the property needs to support tags, else nothing works of course!
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        FileService.SaveTemplate(template);
         var contentType =
             ContentTypeBuilder.CreateSimpleTagsContentType(
                 "umbTagsPage",
@@ -2510,7 +2508,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         await LanguageService.CreateAsync(langDa, Constants.Security.SuperUserKey);
 
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        FileService.SaveTemplate(template);
 
         var contentType =
             ContentTypeBuilder.CreateSimpleContentType("multi", "Multi", defaultTemplateId: template.Id);
@@ -2826,14 +2824,14 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
     [Test]
     [LongRunning]
-    public async Task Can_Get_Paged_Children()
+    public void Can_Get_Paged_Children()
     {
         // Start by cleaning the "db"
         var umbTextPage = ContentService.GetById(new Guid("B58B3AD4-62C2-4E27-B1BE-837BD7C533E0"));
         ContentService.Delete(umbTextPage);
 
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        FileService.SaveTemplate(template);
 
         var contentType = ContentTypeBuilder.CreateSimpleContentType(defaultTemplateId: template.Id);
         ContentTypeService.Save(contentType);
@@ -2853,14 +2851,14 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
     [Test]
     [LongRunning]
-    public async Task Can_Get_Paged_Children_Dont_Get_Descendants()
+    public void Can_Get_Paged_Children_Dont_Get_Descendants()
     {
         // Start by cleaning the "db"
         var umbTextPage = ContentService.GetById(new Guid("B58B3AD4-62C2-4E27-B1BE-837BD7C533E0"));
         ContentService.Delete(umbTextPage);
 
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        FileService.SaveTemplate(template);
 
         var contentType = ContentTypeBuilder.CreateSimpleContentType(defaultTemplateId: template.Id);
         ContentTypeService.Save(contentType);
@@ -2898,10 +2896,10 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
-    public async Task GetPagedChildren_With_Null_PropertyAliases_Returns_All_Properties()
+    public void GetPagedChildren_With_Null_PropertyAliases_Returns_All_Properties()
     {
         // Arrange
-        var parentId = await CreateContentWithChildForGetPagedChildrenParameterTests();
+        var parentId = CreateContentWithChildForGetPagedChildrenParameterTests();
 
         // Act - null propertyAliases should load all properties
         var retrievedChild = GetSingleChildWithPropertyAliases(parentId, propertyAliases: null);
@@ -2913,10 +2911,10 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
-    public async Task GetPagedChildren_With_Empty_PropertyAliases_Returns_No_Property_Values()
+    public void GetPagedChildren_With_Empty_PropertyAliases_Returns_No_Property_Values()
     {
         // Arrange
-        var parentId = await CreateContentWithChildForGetPagedChildrenParameterTests();
+        var parentId = CreateContentWithChildForGetPagedChildrenParameterTests();
 
         // Act - empty propertyAliases should load no custom properties
         var retrievedChild = GetSingleChildWithPropertyAliases(parentId, propertyAliases: []);
@@ -2928,10 +2926,10 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
-    public async Task GetPagedChildren_With_Single_PropertyAlias_Returns_Only_That_Property()
+    public void GetPagedChildren_With_Single_PropertyAlias_Returns_Only_That_Property()
     {
         // Arrange
-        var parentId = await CreateContentWithChildForGetPagedChildrenParameterTests();
+        var parentId = CreateContentWithChildForGetPagedChildrenParameterTests();
 
         // Act - only "title" should be loaded
         var retrievedChild = GetSingleChildWithPropertyAliases(parentId, propertyAliases: ["title"]);
@@ -2943,10 +2941,10 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
-    public async Task GetPagedChildren_With_Multiple_PropertyAliases_Returns_Only_Those_Properties()
+    public void GetPagedChildren_With_Multiple_PropertyAliases_Returns_Only_Those_Properties()
     {
         // Arrange
-        var parentId = await CreateContentWithChildForGetPagedChildrenParameterTests();
+        var parentId = CreateContentWithChildForGetPagedChildrenParameterTests();
 
         // Act - "title" and "author" should be loaded, but not "bodyText"
         var retrievedChild = GetSingleChildWithPropertyAliases(parentId, propertyAliases: ["title", "author"]);
@@ -2958,10 +2956,10 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
-    public async Task GetPagedChildren_With_NonExistent_PropertyAlias_Returns_No_Properties()
+    public void GetPagedChildren_With_NonExistent_PropertyAlias_Returns_No_Properties()
     {
         // Arrange
-        var parentId = await CreateContentWithChildForGetPagedChildrenParameterTests();
+        var parentId = CreateContentWithChildForGetPagedChildrenParameterTests();
 
         // Act - non-existent property alias should result in no property values
         var retrievedChild = GetSingleChildWithPropertyAliases(parentId, propertyAliases: ["nonExistentProperty"]);
@@ -2974,10 +2972,10 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
-    public async Task GetPagedChildren_With_LoadTemplates_True_Loads_Template()
+    public void GetPagedChildren_With_LoadTemplates_True_Loads_Template()
     {
         // Arrange
-        var parentId = await CreateContentWithChildForGetPagedChildrenParameterTests();
+        var parentId = CreateContentWithChildForGetPagedChildrenParameterTests();
 
         // Act - loadTemplates: true (default) should load templates
         var retrievedChild = GetSingleChildWithLoadTemplates(parentId, loadTemplates: true);
@@ -2987,10 +2985,10 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
-    public async Task GetPagedChildren_With_LoadTemplates_False_Does_Not_Load_Template()
+    public void GetPagedChildren_With_LoadTemplates_False_Does_Not_Load_Template()
     {
         // Arrange
-        var parentId = await CreateContentWithChildForGetPagedChildrenParameterTests();
+        var parentId = CreateContentWithChildForGetPagedChildrenParameterTests();
 
         // Act - loadTemplates: false should not load templates
         var retrievedChild = GetSingleChildWithLoadTemplates(parentId, loadTemplates: false);
@@ -3000,10 +2998,10 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
-    public async Task GetPagedChildren_Default_LoadTemplates_Loads_Template()
+    public void GetPagedChildren_Default_LoadTemplates_Loads_Template()
     {
         // Arrange
-        var parentId = await CreateContentWithChildForGetPagedChildrenParameterTests();
+        var parentId = CreateContentWithChildForGetPagedChildrenParameterTests();
 
         // Act - default (no loadTemplates specified) should load templates (backwards compatible)
         var children = ContentService.GetPagedChildren(parentId, 0, 10, out var total, propertyAliases: null, filter: null, ordering: null).ToArray();
@@ -3018,10 +3016,10 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     /// Creates a content type with properties (title, bodyText, author) and a parent with one child.
     /// Returns the parent ID for use in GetPagedChildren tests.
     /// </summary>
-    private async Task<int> CreateContentWithChildForGetPagedChildrenParameterTests()
+    private int CreateContentWithChildForGetPagedChildrenParameterTests()
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        FileService.SaveTemplate(template);
 
         var contentType = ContentTypeBuilder.CreateSimpleContentType(defaultTemplateId: template.Id);
         ContentTypeService.Save(contentType);
@@ -3064,7 +3062,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
-    public async Task PublishingTest()
+    public void PublishingTest()
     {
         var contentType = new ContentType(ShortStringHelper, Constants.System.Root) { Alias = "foo", Name = "Foo" };
 
@@ -3079,7 +3077,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         contentType.PropertyGroups.Add(new PropertyGroup(properties) { Alias = "content", Name = "content" });
 
         contentType.SetDefaultTemplate(new Template(ShortStringHelper, "Textpage", "textpage"));
-        await TemplateService.CreateAsync(contentType.DefaultTemplate, Constants.Security.SuperUserKey); // else, FK violation on contentType!
+        FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
         ContentTypeService.Save(contentType);
 
         var content = ContentService.Create("foo", Constants.System.Root, "foo");
@@ -4127,7 +4125,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         await LanguageService.CreateAsync(langDa, Constants.Security.SuperUserKey);
 
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        FileService.SaveTemplate(template);
 
         var contentType = new ContentTypeBuilder()
             .WithAlias("variantContent")

@@ -110,10 +110,9 @@ public class ConvertersTests
 
         var serializer = new SystemTextConfigurationEditorJsonSerializer(new DefaultJsonSerializerEncoderFactory());
         var dataTypeServiceMock = new Mock<IDataTypeService>();
-        var dataTypeKey = Guid.NewGuid();
         var dataType = new DataType(
             new VoidEditor(Mock.Of<IDataValueEditorFactory>()), serializer)
-        { Id = 1, Key = dataTypeKey };
+        { Id = 1 };
         dataTypeServiceMock.Setup(x => x.GetAll()).Returns(dataType.Yield);
 
         var contentTypeFactory =

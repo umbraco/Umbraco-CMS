@@ -27,7 +27,7 @@ public class EFCoreScopeAccessorTests
     public void HasBridgedAmbientScope_NoScopeOnStack_ReturnsTrue()
     {
         var efScopeStack = new Mock<IAmbientEFCoreScopeStack<UmbracoDbContext>>();
-        efScopeStack.Setup(x => x.AmbientScope).Returns((IEFCoreScope<UmbracoDbContext>?)null);
+        efScopeStack.Setup(x => x.AmbientScope).Returns((IEfCoreScope<UmbracoDbContext>?)null);
 
         var accessor = CreateAccessor(efScopeStack.Object, Mock.Of<IAmbientScopeStack>());
 
@@ -37,14 +37,14 @@ public class EFCoreScopeAccessorTests
     [Test]
     public void HasBridgedAmbientScope_NonEFCoreScopeOnStack_ReturnsTrue()
     {
-        // A mock of IEFCoreScope<T> is not an EFCoreScope<T> concrete type,
+        // A mock of IEfCoreScope<T> is not an EFCoreScope<T> concrete type,
         // so the type pattern match `is EFCoreScope<T> { IsBridgeScope: false }` fails.
         // This covers the bridge-scope-on-stack case (bridge scopes are EFCoreScope<T>
         // instances with IsBridgeScope: true, but in terms of the type check they would
         // also be EFCoreScope<T> — the mock here acts as a stand-in for the "not a real
         // non-bridge scope" scenario).
         var efScopeStack = new Mock<IAmbientEFCoreScopeStack<UmbracoDbContext>>();
-        efScopeStack.Setup(x => x.AmbientScope).Returns(Mock.Of<IEFCoreScope<UmbracoDbContext>>());
+        efScopeStack.Setup(x => x.AmbientScope).Returns(Mock.Of<IEfCoreScope<UmbracoDbContext>>());
 
         var accessor = CreateAccessor(efScopeStack.Object, Mock.Of<IAmbientScopeStack>());
 
@@ -65,7 +65,7 @@ public class EFCoreScopeAccessorTests
         //   - HasBridgedAmbientScope must return true without throwing
 
         var efScopeStack = new Mock<IAmbientEFCoreScopeStack<UmbracoDbContext>>();
-        efScopeStack.Setup(x => x.AmbientScope).Returns((IEFCoreScope<UmbracoDbContext>?)null);
+        efScopeStack.Setup(x => x.AmbientScope).Returns((IEfCoreScope<UmbracoDbContext>?)null);
 
         var npocoScopeStack = new Mock<IAmbientScopeStack>();
         npocoScopeStack.Setup(x => x.AmbientScope).Returns(Mock.Of<IScope>());

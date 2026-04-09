@@ -28,10 +28,10 @@ internal sealed class DocumentUrlServiceTests_HideTopLevel_False : UmbracoIntegr
         builder.AddNotificationHandler<ContentTreeChangeNotification, ContentTreeChangeDistributedCacheNotificationHandler>();
     }
 
-    public override async Task Setup()
+    public override void Setup()
     {
         DocumentUrlService.InitAsync(false, CancellationToken.None).GetAwaiter().GetResult();
-        await base.Setup();
+        base.Setup();
     }
 
     [Test]

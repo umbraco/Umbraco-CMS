@@ -1,6 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System.Text;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
@@ -502,14 +503,14 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Can_Perform_Delete_When_Assigned_To_Doc()
+    public void Can_Perform_Delete_When_Assigned_To_Doc()
     {
         // Arrange
         var newScopeAccessor = GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>();
         var provider = ScopeProvider;
         var scopeAccessor = (IScopeAccessor)provider;
         var dataTypeService = GetRequiredService<IDataTypeService>();
-        var templateService = GetRequiredService<ITemplateService>();
+        var fileService = GetRequiredService<IFileService>();
 
         using (provider.CreateScope())
         {
@@ -548,7 +549,7 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
                 Mock.Of<ICacheSyncService>());
 
             var template = TemplateBuilder.CreateTextPageTemplate();
-            await templateService.CreateAsync(template, Constants.Security.SuperUserKey); // else, FK violation on contentType!
+            fileService.SaveTemplate(template); // else, FK violation on contentType!
 
             var contentType =
                 ContentTypeBuilder.CreateSimpleContentType("umbTextpage2", "Textpage", defaultTemplateId: template.Id);

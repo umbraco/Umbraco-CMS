@@ -42,7 +42,7 @@ public class LegacyContentCopiedWebhookEvent : WebhookEventBase<ContentCopiedNot
         {
             notification.Copy,
             notification.Original,
-            notification.ParentKey,
+            notification.ParentId,
             notification.RelateToOriginal
         };
     }

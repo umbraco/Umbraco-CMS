@@ -40,7 +40,7 @@ public static partial class UmbracoBuilderExtensions
         // devs can then modify this list on application startup
         builder.ContentFinders()
             .Append<ContentFinderByPageIdQuery>()
-            .Append<ContentFinderByUrl>()
+            .Append<ContentFinderByUrlNew>()
             .Append<ContentFinderByKeyPath>()
             .Append<ContentFinderByUrlAlias>()
             .Append<ContentFinderByRedirectUrl>();
@@ -49,7 +49,7 @@ public static partial class UmbracoBuilderExtensions
         builder.HealthCheckNotificationMethods().Add(() => builder.TypeLoader.GetTypes<IHealthCheckNotificationMethod>());
         builder.UrlProviders()
             .Append<AliasUrlProvider>()
-            .Append<DefaultUrlProvider>();
+            .Append<NewDefaultUrlProvider>();
         builder.MediaUrlProviders()
             .Append<DefaultMediaUrlProvider>();
 

@@ -93,6 +93,7 @@ const createMockMediaTypeFolderMapper = (request: CreateFolderRequestModel): Umb
 		aliasCanBeChanged: false,
 		flags: [],
 		noAccess: false,
+		allowedInLibrary: false,
 	};
 };
 
@@ -119,6 +120,7 @@ const createMockMediaTypeMapper = (request: CreateMediaTypeRequestModel): UmbMoc
 		aliasCanBeChanged: false,
 		flags: [],
 		noAccess: false,
+		allowedInLibrary: request.allowedInLibrary,
 	};
 };
 
@@ -132,7 +134,6 @@ const mediaTypeDetailMapper = (item: UmbMockMediaTypeModel): MediaTypeResponseMo
 		properties: item.properties,
 		containers: item.containers,
 		allowedAsRoot: item.allowedAsRoot,
-		allowedInLibrary: false,
 		variesByCulture: item.variesByCulture,
 		variesBySegment: item.variesBySegment,
 		isElement: item.isElement,
@@ -141,6 +142,7 @@ const mediaTypeDetailMapper = (item: UmbMockMediaTypeModel): MediaTypeResponseMo
 		collection: item.collection,
 		isDeletable: item.isDeletable,
 		aliasCanBeChanged: item.aliasCanBeChanged,
+		allowedInLibrary: item.allowedInLibrary,
 	};
 };
 

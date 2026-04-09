@@ -39,13 +39,13 @@ public class DocumentRecycleBinControllerBase : RecycleBinControllerBase<Documen
 
     protected override Guid RecycleBinRootKey => Constants.System.RecycleBinContentKey;
 
-    protected override async Task<DocumentRecycleBinItemResponseModel> MapRecycleBinViewModelAsync(Guid? parentId, IEntitySlim entity)
+    protected override DocumentRecycleBinItemResponseModel MapRecycleBinViewModel(Guid? parentId, IEntitySlim entity)
     {
-        DocumentRecycleBinItemResponseModel responseModel = await base.MapRecycleBinViewModelAsync(parentId, entity);
+        DocumentRecycleBinItemResponseModel responseModel = base.MapRecycleBinViewModel(parentId, entity);
 
         if (entity is IDocumentEntitySlim documentEntitySlim)
         {
-            responseModel.Variants = await _documentPresentationFactory.CreateVariantsItemResponseModelsAsync(documentEntitySlim);
+            responseModel.Variants = _documentPresentationFactory.CreateVariantsItemResponseModels(documentEntitySlim);
             responseModel.DocumentType = _documentPresentationFactory.CreateDocumentTypeReferenceResponseModel(documentEntitySlim);
         }
 

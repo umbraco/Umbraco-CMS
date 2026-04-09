@@ -1,10 +1,11 @@
 using System.Globalization;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Web;
@@ -13,60 +14,61 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Core.Routing;
 
 /// <summary>
-///     Provides URLs.
+///     Provides urls.
 /// </summary>
+[Obsolete("Use NewDefaultUrlProvider instead. Scheduled for removal in Umbraco 18.")]
 public class DefaultUrlProvider : IUrlProvider
 {
-    private readonly IPublishedContentCache _publishedContentCache;
-    private readonly IDomainCache _domainCache;
-    private readonly IIdKeyMap _idKeyMap;
-    private readonly IDocumentUrlService _documentUrlService;
-    private readonly IDocumentNavigationQueryService _navigationQueryService;
-    private readonly IPublishedContentStatusFilteringService _publishedContentStatusFilteringService;
+    private readonly ILocalizationService _localizationService;
     private readonly ILogger<DefaultUrlProvider> _logger;
     private readonly ISiteDomainMapper _siteDomainMapper;
     private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+    private readonly IDocumentNavigationQueryService _navigationQueryService;
+    private readonly IPublishedContentStatusFilteringService _publishedContentStatusFilteringService;
+    private readonly IPublishedUrlProvider _publishedUrlProvider;
     private readonly UriUtility _uriUtility;
     private RequestHandlerSettings _requestSettings;
-    private readonly ILanguageService _languageService;
-
-    // TODO See if we can make GetUrlFromRoute asynchronous and avoid the GetAwaiter().GetResult() in when using ILanguageService.
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="DefaultUrlProvider"/> class.
+    ///     Initializes a new instance of the <see cref="DefaultUrlProvider"/> class.
     /// </summary>
+    /// <param name="requestSettings">The request handler settings.</param>
+    /// <param name="logger">The logger.</param>
+    /// <param name="siteDomainMapper">The site domain mapper.</param>
+    /// <param name="umbracoContextAccessor">The Umbraco context accessor.</param>
+    /// <param name="uriUtility">The URI utility.</param>
+    /// <param name="localizationService">The localization service.</param>
+    /// <param name="navigationQueryService">The document navigation query service.</param>
+    /// <param name="publishedContentStatusFilteringService">The published content status filtering service.</param>
+    /// <param name="publishedUrlProvider">The published URL provider.</param>
     public DefaultUrlProvider(
         IOptionsMonitor<RequestHandlerSettings> requestSettings,
         ILogger<DefaultUrlProvider> logger,
         ISiteDomainMapper siteDomainMapper,
         IUmbracoContextAccessor umbracoContextAccessor,
         UriUtility uriUtility,
-        IPublishedContentCache publishedContentCache,
-        IDomainCache domainCache,
-        IIdKeyMap idKeyMap,
-        IDocumentUrlService documentUrlService,
+        ILocalizationService localizationService,
         IDocumentNavigationQueryService navigationQueryService,
         IPublishedContentStatusFilteringService publishedContentStatusFilteringService,
-        ILanguageService languageService)
+        IPublishedUrlProvider publishedUrlProvider)
     {
         _requestSettings = requestSettings.CurrentValue;
         _logger = logger;
         _siteDomainMapper = siteDomainMapper;
         _umbracoContextAccessor = umbracoContextAccessor;
         _uriUtility = uriUtility;
-        _publishedContentCache = publishedContentCache;
-        _domainCache = domainCache;
-        _idKeyMap = idKeyMap;
-        _documentUrlService = documentUrlService;
+        _localizationService = localizationService;
         _navigationQueryService = navigationQueryService;
         _publishedContentStatusFilteringService = publishedContentStatusFilteringService;
-        _languageService = languageService;
+        _publishedUrlProvider = publishedUrlProvider;
 
         requestSettings.OnChange(x => _requestSettings = x);
     }
 
     /// <inheritdoc />
-    public string Alias => Constants.UrlProviders.Content;
+    public string Alias => $"{Constants.UrlProviders.Content}Legacy";
+
+    #region GetOtherUrls
 
     /// <summary>
     ///     Gets the other URLs of a published content.
@@ -82,16 +84,8 @@ public class DefaultUrlProvider : IUrlProvider
     /// </remarks>
     public virtual IEnumerable<UrlInfo> GetOtherUrls(int id, Uri current)
     {
-        Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForId(id, UmbracoObjectTypes.Document);
-
-        if (keyAttempt.Success is false)
-        {
-            yield break;
-        }
-
-        Guid key = keyAttempt.Result;
-
-        IPublishedContent? node = _publishedContentCache.GetById(key);
+        IUmbracoContext umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
+        IPublishedContent? node = umbracoContext.Content?.GetById(id);
         if (node == null)
         {
             yield break;
@@ -100,7 +94,7 @@ public class DefaultUrlProvider : IUrlProvider
         // look for domains, walking up the tree
         IPublishedContent? n = node;
         IEnumerable<DomainAndUri>? domainUris =
-            DomainUtilities.DomainsForNode(_domainCache, _siteDomainMapper, n.Id, current, false);
+            DomainUtilities.DomainsForNode(umbracoContext.Domains, _siteDomainMapper, n.Id, current, false);
 
         // n is null at root
         while (domainUris == null && n != null)
@@ -108,7 +102,7 @@ public class DefaultUrlProvider : IUrlProvider
             n = n.Parent<IPublishedContent>(_navigationQueryService, _publishedContentStatusFilteringService); // move to parent node
             domainUris = n == null
                 ? null
-                : DomainUtilities.DomainsForNode(_domainCache, _siteDomainMapper, n.Id, current);
+                : DomainUtilities.DomainsForNode(umbracoContext.Domains, _siteDomainMapper, n.Id, current);
         }
 
         // no domains = exit
@@ -122,14 +116,14 @@ public class DefaultUrlProvider : IUrlProvider
             var culture = d.Culture;
 
             // although we are passing in culture here, if any node in this path is invariant, it ignores the culture anyways so this is ok
-            var route = GetLegacyRouteFormatById(key, culture);
-            if (route == null || route == "#")
+            var route = _publishedUrlProvider.GetUrl(d.Id, UrlMode.Default, culture, current);
+            if (route == null)
             {
                 continue;
             }
 
             // need to strip off the leading ID for the route if it exists (occurs if the route is for a node with a domain assigned)
-            var pos = route.IndexOf('/', StringComparison.Ordinal);
+            var pos = route.IndexOf('/');
             var path = pos == 0 ? route : route[pos..];
 
             var uri = new Uri(CombinePaths(d.Uri.GetLeftPart(UriPartial.Path), path));
@@ -138,35 +132,9 @@ public class DefaultUrlProvider : IUrlProvider
         }
     }
 
-    #region GetPreviewUrl
-
-    /// <inheritdoc />
-    public Task<UrlInfo?> GetPreviewUrlAsync(IContent content, string? culture, string? segment)
-        => Task.FromResult<UrlInfo?>(
-            UrlInfo.AsUrl(
-                $"preview?id={content.Key}&culture={culture}&segment={segment}",
-                Alias,
-                culture,
-                isExternal: false));
-
     #endregion
 
-    /// <summary>
-    /// Gets the legacy route format by id
-    /// </summary>
-    /// <param name="key"></param>
-    /// <param name="culture"></param>
-    /// <returns></returns>
-    /// <remarks>
-    /// When no domain is set the route can be something like /child/grandchild
-    /// When a domain is set, the route can be something like 1234/grandchild
-    /// </remarks>
-
-    private string GetLegacyRouteFormatById(Guid key, string? culture)
-    {
-        var isDraft = _umbracoContextAccessor.GetRequiredUmbracoContext().InPreviewMode;
-        return _documentUrlService.GetLegacyRouteFormat(key, culture, isDraft);
-    }
+    #region GetUrl
 
     /// <inheritdoc />
     public virtual UrlInfo? GetUrl(IPublishedContent content, UrlMode mode, string? culture, Uri current)
@@ -176,39 +144,35 @@ public class DefaultUrlProvider : IUrlProvider
             throw new ArgumentException("Current URL must be absolute.", nameof(current));
         }
 
-        // This might seem to be some code duplication, as we do the same check in GetLegacyRouteFormat
-        // but this is strictly neccesary, as if we're coming from a published notification
-        // this document will still not always be in the memory cache. And thus we have to hit the DB
-        // We have the published content now, so we can check if the culture is published, and thus avoid the DB hit.
-        string route;
-        var isDraft = _umbracoContextAccessor.GetRequiredUmbracoContext().InPreviewMode;
-        if (isDraft is false && string.IsNullOrWhiteSpace(culture) is false && content.Cultures.Any() && content.IsInvariantOrHasCulture(culture) is false)
-        {
-            route = "#";
-        }
-        else
-        {
-            route = GetLegacyRouteFormatById(content.Key, culture);
-        }
+        IUmbracoContext umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
 
         // will not use cache if previewing
+        var route = _publishedUrlProvider.GetUrl(content.Id, mode, culture, current);
 
-        return GetUrlFromRoute(route, content.Id, current, mode, culture);
+        return GetUrlFromRoute(route, umbracoContext, content.Id, current, mode, culture);
     }
 
     /// <summary>
-    /// Gets the URL from the provided route.
+    ///     Gets a URL info from a route string.
     /// </summary>
+    /// <param name="route">The route string.</param>
+    /// <param name="umbracoContext">The Umbraco context.</param>
+    /// <param name="id">The content ID.</param>
+    /// <param name="current">The current URI.</param>
+    /// <param name="mode">The URL mode.</param>
+    /// <param name="culture">The culture.</param>
+    /// <returns>The URL info, or null if the route could not be resolved.</returns>
     internal UrlInfo? GetUrlFromRoute(
         string? route,
+        IUmbracoContext umbracoContext,
         int id,
         Uri current,
         UrlMode mode,
         string? culture)
     {
-        if (string.IsNullOrWhiteSpace(route) || route.Equals("#"))
+        if (string.IsNullOrWhiteSpace(route))
         {
-            if (_logger.IsEnabled(LogLevel.Debug))
+            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
             {
                 _logger.LogDebug(
                 "Couldn't find any page with nodeId={NodeId}. This is most likely caused by the page not being published.",
@@ -217,31 +181,21 @@ public class DefaultUrlProvider : IUrlProvider
             return null;
         }
 
-        // A route of just "<domainRootId>" (no slash) can occur when the path is "/" and was trimmed.
-        // Normalize by appending "/" so the existing parsing logic handles it correctly.
-        var pos = route.IndexOf('/', StringComparison.Ordinal);
-        if (pos < 0)
-        {
-            route += "/";
-            pos = route.Length - 1;
-        }
-
+        // extract domainUri and path
+        // route is /<path> or <domainRootId>/<path>
+        var pos = route.IndexOf('/');
         var path = pos == 0 ? route : route[pos..];
-
-        DomainAndUri? domainUri = null;
-        if (pos > 0 && int.TryParse(route[..pos], NumberStyles.None, CultureInfo.InvariantCulture, out var nodeId))
-        {
-            domainUri = DomainUtilities.DomainForNode(
-                _domainCache,
+        DomainAndUri? domainUri = pos == 0
+            ? null
+            : DomainUtilities.DomainForNode(
+                umbracoContext.Domains,
                 _siteDomainMapper,
-                nodeId,
+                int.Parse(route[..pos], CultureInfo.InvariantCulture),
                 current,
                 culture);
-        }
 
-        var defaultCulture = _languageService.GetDefaultIsoCodeAsync().GetAwaiter().GetResult();
-        if (domainUri is not null ||
-            string.IsNullOrEmpty(culture) ||
+        var defaultCulture = _localizationService.GetDefaultLanguageIsoCode();
+        if (domainUri is not null || string.IsNullOrEmpty(culture) ||
             culture.Equals(defaultCulture, StringComparison.InvariantCultureIgnoreCase))
         {
             Uri url = AssembleUrl(domainUri, path, current, mode);
@@ -250,6 +204,18 @@ public class DefaultUrlProvider : IUrlProvider
 
         return null;
     }
+
+    #endregion
+
+    #region GetPreviewUrl
+
+    /// <inheritdoc />
+    public Task<UrlInfo?> GetPreviewUrlAsync(IContent content, string? culture, string? segment)
+        => Task.FromResult<UrlInfo?>(null);
+
+    #endregion
+
+    #region Utilities
 
     private Uri AssembleUrl(DomainAndUri? domainUri, string path, Uri current, UrlMode mode)
     {
@@ -318,4 +284,6 @@ public class DefaultUrlProvider : IUrlProvider
         var path = path1.TrimEnd(Constants.CharArrays.ForwardSlash) + path2;
         return path == "/" ? path : path.TrimEnd(Constants.CharArrays.ForwardSlash);
     }
+
+    #endregion
 }

@@ -1,7 +1,6 @@
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
@@ -17,14 +16,14 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Examine;
 [TestFixture]
 public class DeliveryApiContentIndexHelperTests : UmbracoIntegrationTestWithContent
 {
-    public override async Task CreateTestDataAsync()
+    public override void CreateTestData()
     {
-        await base.CreateTestDataAsync();
+        base.CreateTestData();
 
         // Save an extra, published content item of a different type to those created via the base class,
         // that we'll use to test filtering out disallowed content types.
         var template = TemplateBuilder.CreateTextPageTemplate("textPage2");
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        FileService.SaveTemplate(template);
 
         var contentType = ContentTypeBuilder.CreateSimpleContentType("umbTextpage2", "Textpage2", defaultTemplateId: template.Id);
         contentType.Key = Guid.NewGuid();

@@ -1776,7 +1776,7 @@ export default {
 		createDate: 'تاريخ إنشاء المستخدم',
 		changePassword: 'تغيير كلمة المرور',
 		changePhoto: 'تغيير الصورة',
-		configureMfa: 'تكوين 2FA',
+		configureMfa: 'تكوين MFA',
 		emailRequired: 'مطلوب - أدخل عنوان بريد إلكتروني لهذا المستخدم',
 		emailDescription: (usernameIsEmail) => {
 			return usernameIsEmail
@@ -2102,8 +2102,7 @@ export default {
 		openBackofficeSearch: 'فتح بحث المكتب الخلفي',
 		openCloseBackofficeHelp: 'فتح/إغلاق مساعدة المكتب الخلفي',
 		openCloseBackofficeProfileOptions: 'فتح/إغلاق خيارات ملفك الشخصي',
-		profileOptions: 'ملف المستخدم الشخصي لـ %0% (%1%)',
-		profileOptionsDefault: 'ملف المستخدم الشخصي',
+		profileOptions: 'خيارات الملف الشخصي',
 		assignDomainDescription: 'إعداد الثقافة وأسماء النطاقات لـ %0%',
 		createDescription: 'إنشاء عقدة جديدة تحت %0%',
 		protectDescription: 'إعداد قيود الوصول على %0%',

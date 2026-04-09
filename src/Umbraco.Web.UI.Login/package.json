@@ -10,7 +10,7 @@
     "generate:server-api": "openapi-ts"
   },
   "engines": {
-    "node": ">=24",
+    "node": ">=22",
     "npm": ">=10.9"
   },
   "devDependencies": {

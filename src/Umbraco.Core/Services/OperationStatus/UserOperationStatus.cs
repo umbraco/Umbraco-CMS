@@ -189,19 +189,5 @@ public enum UserOperationStatus
     ///     The operation failed because the username is invalid.
     /// </summary>
     InvalidUserName,
-
-    /// <summary>
-    ///     The operation failed because the element node could not be found.
-    /// </summary>
     ElementNodeNotFound,
-
-    /// <summary>
-    ///     The operation failed because the element start node could not be found.
-    /// </summary>
-    ElementStartNodeNotFound,
-    ///     The operation failed because the application URL is not configured.
-    ///     Set <c>Umbraco:CMS:WebRouting:UmbracoApplicationUrl</c> or change
-    ///     <c>ApplicationUrlDetection</c> to <c>FirstRequest</c> or <c>EveryRequest</c>.
-    /// </summary>
-    ApplicationUrlNotConfigured,
 }

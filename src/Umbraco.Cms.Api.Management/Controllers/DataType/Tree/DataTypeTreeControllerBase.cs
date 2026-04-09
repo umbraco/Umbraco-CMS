@@ -60,17 +60,17 @@ public class DataTypeTreeControllerBase : FolderTreeControllerBase<DataTypeTreeI
         }
     }
 
-    protected override async Task<DataTypeTreeItemResponseModel[]> MapTreeItemViewModelsAsync(Guid? parentId, IEntitySlim[] entities)
+    protected override DataTypeTreeItemResponseModel[] MapTreeItemViewModels(Guid? parentId, IEntitySlim[] entities)
     {
         Dictionary<int, IDataType> dataTypes = entities.Any()
-            ? (await _dataTypeService
-                .GetAllAsync(entities.Select(entity => entity.Key).ToArray()))
+            ? _dataTypeService
+                .GetAllAsync(entities.Select(entity => entity.Key).ToArray()).GetAwaiter().GetResult()
                 .ToDictionary(contentType => contentType.Id)
             : new Dictionary<int, IDataType>();
 
-        IEnumerable<Task<DataTypeTreeItemResponseModel>> tasks = entities.Select(async entity =>
+        return entities.Select(entity =>
         {
-            DataTypeTreeItemResponseModel responseModel = await MapTreeItemViewModelAsync(parentId, entity);
+            DataTypeTreeItemResponseModel responseModel = MapTreeItemViewModel(parentId, entity);
             if (dataTypes.TryGetValue(entity.Id, out IDataType? dataType))
             {
                 responseModel.EditorUiAlias = dataType.EditorUiAlias;
@@ -78,8 +78,6 @@ public class DataTypeTreeControllerBase : FolderTreeControllerBase<DataTypeTreeI
             }
 
             return responseModel;
-        });
-
-        return await Task.WhenAll(tasks);
+        }).ToArray();
     }
 }

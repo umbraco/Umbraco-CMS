@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
 /// Represents an EF Core scope that provides database context access and transaction management.
 /// </summary>
 /// <typeparam name="TDbContext">The type of DbContext.</typeparam>
-public interface IEFCoreScope<TDbContext> : ICoreScope
+public interface IEfCoreScope<TDbContext> : ICoreScope
 {
     /// <summary>
     /// Executes the given function on the database.

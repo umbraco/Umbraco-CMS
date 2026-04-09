@@ -8,14 +8,8 @@ namespace Umbraco.Cms.Core.Notifications;
 /// </summary>
 public sealed class ElementCopyingNotification : CopyingNotification<IElement>
 {
-    public ElementCopyingNotification(IElement original, IElement copy, Guid? parentKey, EventMessages messages)
-        : base(original, copy, parentKey, messages)
-    {
-    }
-
-    [Obsolete("Please use the constructor without parentId instead. Scheduled for removal in Umbraco 20.")]
     public ElementCopyingNotification(IElement original, IElement copy, int parentId, Guid? parentKey, EventMessages messages)
-        : this(original, copy, parentKey, messages)
+        : base(original, copy, parentId, parentKey, messages)
     {
     }
 }

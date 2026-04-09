@@ -16,7 +16,7 @@ public static partial class UmbracoBuilderExtensions
 {
     internal static IUmbracoBuilder AddDatabase(this IUmbracoBuilder builder)
     {
-        builder.Services.AddSingleton<IEFCoreMigrationExecutor, EFCoreMigrationExecutor>();
+        builder.Services.AddSingleton<IEFCoreMigrationExecutor, EfCoreMigrationExecutor>();
 
         builder.AddNotificationAsyncHandler<DatabaseSchemaAndDataCreatedNotification, EFCoreCreateTablesNotificationHandler>();
         builder.AddNotificationAsyncHandler<UnattendedInstallNotification, EFCoreCreateTablesNotificationHandler>();

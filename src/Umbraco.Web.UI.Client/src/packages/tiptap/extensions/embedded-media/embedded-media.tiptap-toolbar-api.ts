@@ -6,8 +6,10 @@ import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 
 export default class UmbTiptapToolbarEmbeddedMediaExtensionApi extends UmbTiptapToolbarElementApiBase {
 	override async execute(editor?: Editor) {
-		const data: Record<string, unknown> = {
-			constrain: true,
+		const data = {
+			constrain: false,
+			height: 240,
+			width: 360,
 			url: '',
 		};
 

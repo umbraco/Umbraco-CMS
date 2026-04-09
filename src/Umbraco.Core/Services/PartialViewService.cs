@@ -27,6 +27,13 @@ public class PartialViewService : FileServiceOperationBase<IPartialViewRepositor
     private readonly PartialViewSnippetCollection _snippetCollection;
     private readonly IOptions<RuntimeSettings> _runtimeSettings;
 
+    // TODO (V18): Remove obsolete constructors and the ActivatorUtilitiesConstructor attribute.
+    // Also update UmbracoBuilder where this service is registered using:
+    //   Services.AddUnique<IPartialViewService>(sp => ActivatorUtilities.CreateInstance<PartialViewService>(sp));
+    // We do this to allow the ActivatorUtilitiesConstructor to be used (it's otherwise ignored by AddUnique).
+    // Revert it to:
+    //   Services.AddUnique<IPartialViewService, PartialViewService>();
+
     /// <summary>
     ///     Initializes a new instance of the <see cref="PartialViewService" /> class.
     /// </summary>
@@ -39,6 +46,7 @@ public class PartialViewService : FileServiceOperationBase<IPartialViewRepositor
     /// <param name="auditService">The service for audit logging.</param>
     /// <param name="snippetCollection">The collection of available partial view snippets.</param>
     /// <param name="runtimeSettings">The runtime configuration settings.</param>
+    [ActivatorUtilitiesConstructor]
     public PartialViewService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,

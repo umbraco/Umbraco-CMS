@@ -55,9 +55,6 @@ public abstract class UmbracoExamineIndex : LuceneIndex, IUmbracoIndex, IIndexDi
 
     public bool SupportProtectedContent { get; protected set; } = true;
 
-    /// <inheritdoc />
-    public virtual string UniqueKeyFieldName => UmbracoExamineFieldNames.NodeKeyFieldName;
-
     /// <summary>
     ///     override to check if we can actually initialize.
     /// </summary>

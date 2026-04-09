@@ -18,22 +18,27 @@ internal static class DocumentVariantStateHelper
             content.EditedCultures ?? Enumerable.Empty<string>(),
             content.PublishedCultures);
 
-    internal static DocumentVariantState GetState(IPublishableContentEntitySlim entity, string? culture)
-        => GetState(
-            entity,
-            culture,
-            entity.Edited,
-            entity.Published,
-            entity.Trashed,
-            entity.CultureNames.Keys,
-            entity.EditedCultures,
-            entity.PublishedCultures);
-
     internal static DocumentVariantState GetState(IDocumentEntitySlim content, string? culture)
-        => GetState((IPublishableContentEntitySlim)content, culture);
+        => GetState(
+            content,
+            culture,
+            content.Edited,
+            content.Published,
+            content.Trashed,
+            content.CultureNames.Keys,
+            content.EditedCultures,
+            content.PublishedCultures);
 
     internal static DocumentVariantState GetState(IElementEntitySlim element, string? culture)
-        => GetState((IPublishableContentEntitySlim)element, culture);
+        => GetState(
+            element,
+            culture,
+            element.Edited,
+            element.Published,
+            element.Trashed,
+            element.CultureNames.Keys,
+            element.EditedCultures,
+            element.PublishedCultures);
 
     private static DocumentVariantState GetState(IEntity entity, string? culture, bool edited, bool published, bool trashed, IEnumerable<string> availableCultures, IEnumerable<string> editedCultures, IEnumerable<string> publishedCultures)
     {

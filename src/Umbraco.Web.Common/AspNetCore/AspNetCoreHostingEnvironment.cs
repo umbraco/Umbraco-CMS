@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.DataProtection.Infrastructure;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Collections;
 using Umbraco.Cms.Core.Configuration;
@@ -11,10 +12,6 @@ using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Cms.Web.Common.AspNetCore;
 
-/// <summary>
-/// ASP.NET Core implementation of <see cref="IHostingEnvironment" /> that provides
-/// hosting information such as the application URL, physical paths, site name, and debug mode.
-/// </summary>
 public class AspNetCoreHostingEnvironment : IHostingEnvironment
 {
     private readonly IApplicationDiscriminator? _applicationDiscriminator;
@@ -25,14 +22,9 @@ public class AspNetCoreHostingEnvironment : IHostingEnvironment
 
     private readonly UrlMode _urlProviderMode;
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="AspNetCoreHostingEnvironment" /> class
-    /// with an <see cref="IApplicationDiscriminator" /> for unique application identification.
-    /// </summary>
-    /// <param name="hostingSettings">The hosting settings monitor.</param>
-    /// <param name="webRoutingSettings">The web routing settings monitor.</param>
-    /// <param name="webHostEnvironment">The ASP.NET Core web host environment.</param>
-    /// <param name="applicationDiscriminator">The application discriminator used for generating a unique application identifier.</param>
+    private string? _applicationId;
+    private string? _localTempPath;
+
     public AspNetCoreHostingEnvironment(
         IOptionsMonitor<HostingSettings> hostingSettings,
         IOptionsMonitor<WebRoutingSettings> webRoutingSettings,
@@ -41,12 +33,6 @@ public class AspNetCoreHostingEnvironment : IHostingEnvironment
         : this(hostingSettings, webRoutingSettings, webHostEnvironment) =>
         _applicationDiscriminator = applicationDiscriminator;
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="AspNetCoreHostingEnvironment" /> class.
-    /// </summary>
-    /// <param name="hostingSettings">The hosting settings monitor.</param>
-    /// <param name="webRoutingSettings">The web routing settings monitor.</param>
-    /// <param name="webHostEnvironment">The ASP.NET Core web host environment.</param>
     public AspNetCoreHostingEnvironment(
         IOptionsMonitor<HostingSettings> hostingSettings,
         IOptionsMonitor<WebRoutingSettings> webRoutingSettings,
@@ -78,14 +64,8 @@ public class AspNetCoreHostingEnvironment : IHostingEnvironment
     /// <inheritdoc />
     public bool IsHosted { get; } = true;
 
-    private Uri? _applicationMainUrl;
-
     /// <inheritdoc />
-    public Uri ApplicationMainUrl
-    {
-        get => _applicationMainUrl!;
-        private set => _applicationMainUrl = value;
-    }
+    public Uri ApplicationMainUrl { get; private set; } = null!;
 
     /// <inheritdoc />
     public string? SiteName { get; private set; }
@@ -95,35 +75,35 @@ public class AspNetCoreHostingEnvironment : IHostingEnvironment
     {
         get
         {
-            if (field != null)
+            if (_applicationId != null)
             {
-                return field;
+                return _applicationId;
             }
 
-            field = _applicationDiscriminator?.GetApplicationId() ?? _webHostEnvironment.GetTemporaryApplicationId();
+            _applicationId = _applicationDiscriminator?.GetApplicationId() ??
+                             _webHostEnvironment.GetTemporaryApplicationId();
 
-            return field;
+            return _applicationId;
         }
     }
 
     /// <inheritdoc />
     public string ApplicationPhysicalPath { get; }
 
-    /// <inheritdoc/>
+    // TODO how to find this, This is a server thing, not application thing.
     public string ApplicationVirtualPath =>
         _hostingSettings.CurrentValue.ApplicationVirtualPath?.EnsureStartsWith('/') ?? "/";
 
     /// <inheritdoc />
     public bool IsDebugMode { get; private set; }
 
-    /// <inheritdoc/>
     public string LocalTempPath
     {
         get
         {
-            if (field != null)
+            if (_localTempPath != null)
             {
-                return field;
+                return _localTempPath;
             }
 
             switch (_hostingSettings.CurrentValue.LocalTempStorageLocation)
@@ -143,11 +123,11 @@ public class AspNetCoreHostingEnvironment : IHostingEnvironment
                     var hash = hashString.GenerateHash();
                     var siteTemp = Path.Combine(Path.GetTempPath(), "UmbracoData", hash);
 
-                    return field = siteTemp;
+                    return _localTempPath = siteTemp;
 
                 default:
 
-                    return field = MapPathContentRoot(Core.Constants.SystemDirectories.TempData);
+                    return _localTempPath = MapPathContentRoot(Core.Constants.SystemDirectories.TempData);
             }
         }
     }
@@ -183,42 +163,32 @@ public class AspNetCoreHostingEnvironment : IHostingEnvironment
         return fullPath;
     }
 
-    /// <inheritdoc/>
     public void EnsureApplicationMainUrl(Uri? currentApplicationUrl)
     {
+        // TODO: This causes problems with site swap on azure because azure pre-warms a site by calling into `localhost` and when it does that
+        // it changes the URL to `localhost:80` which actually doesn't work for pinging itself, it only works internally in Azure. The ironic part
+        // about this is that this is here specifically for the slot swap scenario https://issues.umbraco.org/issue/U4-10626
+
+        // see U4-10626 - in some cases we want to reset the application url
+        // (this is a simplified version of what was in 7.x)
+        // note: should this be optional? is it expensive?
         if (currentApplicationUrl is null)
         {
             return;
         }
 
-        // Explicit configuration always takes precedence.
         if (_webRoutingSettings.CurrentValue.UmbracoApplicationUrl is not null)
         {
             return;
         }
 
-        switch (_webRoutingSettings.CurrentValue.ApplicationUrlDetection)
+        var change = !_applicationUrls.Contains(currentApplicationUrl);
+        if (change)
         {
-            case ApplicationUrlDetection.None:
-                return;
-
-            case ApplicationUrlDetection.FirstRequest:
-                // Atomic: only the first thread to arrive sets the URL.
-                // Subsequent calls (even concurrent ones with different hosts) are no-ops.
-                Interlocked.CompareExchange(ref _applicationMainUrl, currentApplicationUrl, null);
-                break;
-
-            case ApplicationUrlDetection.EveryRequest:
-                var change = _applicationUrls.Contains(currentApplicationUrl) is false;
-                if (change)
-                {
-                    if (_applicationUrls.TryAdd(currentApplicationUrl))
-                    {
-                        ApplicationMainUrl = currentApplicationUrl;
-                    }
-                }
-
-                break;
+            if (_applicationUrls.TryAdd(currentApplicationUrl))
+            {
+                ApplicationMainUrl = currentApplicationUrl;
+            }
         }
     }
 

@@ -295,7 +295,6 @@ internal sealed class ExternalLoginServiceTests : UmbracoIntegrationTest
         UserService.Save(user);
 
         const int NumberOfConcurrentOperations = 10;
-        const int MaxDeadlockRetries = 3;
         var exceptions = new ConcurrentBag<Exception>();
         var providerKey = Guid.NewGuid().ToString("N");
 
@@ -314,24 +313,14 @@ internal sealed class ExternalLoginServiceTests : UmbracoIntegrationTest
                 tasks.Add(Task.Run(() =>
                 {
                     barrier.SignalAndWait();
-                    for (var attempt = 0; attempt <= MaxDeadlockRetries; attempt++)
+                    try
                     {
-                        try
-                        {
-                            var login = new ExternalLogin("TestProvider", providerKey);
-                            ExternalLoginService.Save(user.Key, [login]);
-                            return; // Success
-                        }
-                        catch (Exception ex) when (IsDeadlockException(ex) && attempt < MaxDeadlockRetries)
-                        {
-                            // SQL Server recommends retrying deadlocked transactions.
-                            Thread.Sleep(50 * (attempt + 1));
-                        }
-                        catch (Exception ex)
-                        {
-                            exceptions.Add(ex);
-                            return;
-                        }
+                        var login = new ExternalLogin("TestProvider", providerKey);
+                        ExternalLoginService.Save(user.Key, [login]);
+                    }
+                    catch (Exception ex)
+                    {
+                        exceptions.Add(ex);
                     }
                 }));
             }
@@ -343,13 +332,9 @@ internal sealed class ExternalLoginServiceTests : UmbracoIntegrationTest
         // Assert
         var exceptionDetails = exceptions.Select(e =>
             $"Type: {e.GetType().FullName}, Message: {e.Message}, Inner: {e.InnerException?.GetType().FullName}: {e.InnerException?.Message}");
-        Assert.IsEmpty(exceptions, $"Expected no exceptions but got {exceptions.Count}:\n{string.Join("\n", exceptionDetails)}");
+        Assert.IsEmpty(exceptions, $"Expected no duplicate key exceptions but got {exceptions.Count}:\n{string.Join("\n", exceptionDetails)}");
 
         var logins = ExternalLoginService.GetExternalLogins(user.Key).ToList();
         Assert.AreEqual(1, logins.Count, "Should have exactly one login");
     }
-
-    private static bool IsDeadlockException(Exception ex) =>
-        ex is Microsoft.Data.SqlClient.SqlException sqlEx && sqlEx.Number == 1205
-        || (ex.InnerException is Microsoft.Data.SqlClient.SqlException innerSqlEx && innerSqlEx.Number == 1205);
 }

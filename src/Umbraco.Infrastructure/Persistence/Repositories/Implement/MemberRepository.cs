@@ -1,11 +1,9 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
@@ -35,77 +33,11 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
     private readonly MemberRepositoryUsernameCachePolicy _memberByUsernameCachePolicy;
     private readonly IMemberGroupRepository _memberGroupRepository;
     private readonly IMemberTypeRepository _memberTypeRepository;
+    private readonly MemberPasswordConfigurationSettings _passwordConfiguration;
     private readonly IPasswordHasher _passwordHasher;
     private readonly ITagRepository _tagRepository;
     private bool _passwordConfigInitialized;
     private string? _passwordConfigJson;
-    private readonly SecuritySettings _securitySettings;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.MemberRepository"/> class.
-    /// </summary>
-    /// <param name="scopeAccessor">Provides access to the current database scope.</param>
-    /// <param name="cache">The application-level cache manager.</param>
-    /// <param name="logger">The logger used for diagnostic and error messages.</param>
-    /// <param name="memberTypeRepository">Repository for member types.</param>
-    /// <param name="memberGroupRepository">Repository for member groups.</param>
-    /// <param name="tagRepository">Repository for tags.</param>
-    /// <param name="languageRepository">Repository for languages.</param>
-    /// <param name="relationRepository">Repository for relations.</param>
-    /// <param name="relationTypeRepository">Repository for relation types.</param>
-    /// <param name="passwordHasher">Service for hashing passwords.</param>
-    /// <param name="propertyEditors">Collection of property editors.</param>
-    /// <param name="dataValueReferenceFactories">Collection of data value reference factories.</param>
-    /// <param name="dataTypeService">Service for managing data types.</param>
-    /// <param name="serializer">The JSON serializer instance.</param>
-    /// <param name="eventAggregator">Service for publishing and subscribing to events.</param>
-    /// <param name="repositoryCacheVersionService">Service for managing repository cache versions.</param>
-    /// <param name="cacheSyncService">Service for synchronizing cache across servers.</param>
-    /// <param name="securitySettings">Configuration settings for member passwords.</param>
-    [ActivatorUtilitiesConstructor]
-    public MemberRepository(
-        IScopeAccessor scopeAccessor,
-        AppCaches cache,
-        ILogger<MemberRepository> logger,
-        IMemberTypeRepository memberTypeRepository,
-        IMemberGroupRepository memberGroupRepository,
-        ITagRepository tagRepository,
-        ILanguageRepository languageRepository,
-        IRelationRepository relationRepository,
-        IRelationTypeRepository relationTypeRepository,
-        IPasswordHasher passwordHasher,
-        PropertyEditorCollection propertyEditors,
-        DataValueReferenceFactoryCollection dataValueReferenceFactories,
-        IDataTypeService dataTypeService,
-        IJsonSerializer serializer,
-        IEventAggregator eventAggregator,
-        IRepositoryCacheVersionService repositoryCacheVersionService,
-        ICacheSyncService cacheSyncService,
-        IOptions<SecuritySettings> securitySettings)
-        : base(
-            scopeAccessor,
-            cache,
-            logger,
-            languageRepository,
-            relationRepository,
-            relationTypeRepository,
-            propertyEditors,
-            dataValueReferenceFactories,
-            dataTypeService,
-            eventAggregator,
-            repositoryCacheVersionService,
-            cacheSyncService)
-    {
-        _memberTypeRepository =
-            memberTypeRepository ?? throw new ArgumentNullException(nameof(memberTypeRepository));
-        _tagRepository = tagRepository ?? throw new ArgumentNullException(nameof(tagRepository));
-        _passwordHasher = passwordHasher;
-        _jsonSerializer = serializer;
-        _memberGroupRepository = memberGroupRepository;
-        _securitySettings = securitySettings.Value;
-        _memberByUsernameCachePolicy =
-            new MemberRepositoryUsernameCachePolicy(GlobalIsolatedCache, ScopeAccessor, DefaultOptions, repositoryCacheVersionService, cacheSyncService);
-    }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.MemberRepository"/> class.
@@ -128,7 +60,6 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
     /// <param name="passwordConfiguration">Configuration settings for member passwords.</param>
     /// <param name="repositoryCacheVersionService">Service for managing repository cache versions.</param>
     /// <param name="cacheSyncService">Service for synchronizing cache across servers.</param>
-    [Obsolete("Please use the constructor overload with all parameters. Scheduled for removal in Umbraco 19.")]
     public MemberRepository(
         IScopeAccessor scopeAccessor,
         AppCaches cache,
@@ -148,26 +79,29 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
         IOptions<MemberPasswordConfigurationSettings> passwordConfiguration,
         IRepositoryCacheVersionService repositoryCacheVersionService,
         ICacheSyncService cacheSyncService)
-        : this (
+        : base(
             scopeAccessor,
             cache,
             logger,
-            memberTypeRepository,
-            memberGroupRepository,
-            tagRepository,
             languageRepository,
             relationRepository,
             relationTypeRepository,
-            passwordHasher,
             propertyEditors,
             dataValueReferenceFactories,
             dataTypeService,
-            serializer,
             eventAggregator,
             repositoryCacheVersionService,
-            cacheSyncService,
-            StaticServiceProvider.Instance.GetRequiredService<IOptions<SecuritySettings>>())
+            cacheSyncService)
     {
+        _memberTypeRepository =
+            memberTypeRepository ?? throw new ArgumentNullException(nameof(memberTypeRepository));
+        _tagRepository = tagRepository ?? throw new ArgumentNullException(nameof(tagRepository));
+        _passwordHasher = passwordHasher;
+        _jsonSerializer = serializer;
+        _memberGroupRepository = memberGroupRepository;
+        _passwordConfiguration = passwordConfiguration.Value;
+        _memberByUsernameCachePolicy =
+            new MemberRepositoryUsernameCachePolicy(GlobalIsolatedCache, ScopeAccessor, DefaultOptions, repositoryCacheVersionService, cacheSyncService);
     }
 
     /// <summary>
@@ -184,7 +118,7 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
 
             var passwordConfig = new PersistedPasswordSettings
             {
-                HashAlgorithm = _securitySettings.MemberPassword.HashAlgorithmType
+                HashAlgorithm = _passwordConfiguration.HashAlgorithmType
             };
 
             _passwordConfigJson = passwordConfig == null ? null : _jsonSerializer.Serialize(passwordConfig);

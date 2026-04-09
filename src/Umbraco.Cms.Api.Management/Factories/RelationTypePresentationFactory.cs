@@ -65,7 +65,7 @@ public class RelationTypePresentationFactory : IRelationTypePresentationFactory
     }
 
     /// <inheritdoc />
-    public async Task<IEnumerable<IReferenceResponseModel>> CreateReferenceResponseModelsAsync(
+    public Task<IEnumerable<IReferenceResponseModel>> CreateReferenceResponseModelsAsync(
         IEnumerable<RelationItemModel> relationItemModels)
     {
         IReadOnlyCollection<RelationItemModel> relationItemModelsCollection = relationItemModels.ToArray();
@@ -81,19 +81,17 @@ public class RelationTypePresentationFactory : IRelationTypePresentationFactory
             Constants.UdiEntityType.Element,
             Constants.ObjectTypes.Element);
 
-        IEnumerable<Task<IReferenceResponseModel?>> tasks = relationItemModelsCollection.Select<RelationItemModel, Task<IReferenceResponseModel?>>(async relationItemModel =>
+        IReferenceResponseModel[] result = relationItemModelsCollection.Select<RelationItemModel, IReferenceResponseModel?>(relationItemModel =>
             relationItemModel.NodeType switch
             {
-                Constants.ReferenceType.Document => await MapReference<DocumentReferenceResponseModel, DocumentEntitySlim>(
+                Constants.ReferenceType.Document => MapReference<DocumentReferenceResponseModel, DocumentEntitySlim>(
                     relationItemModel,
                     documentSlimEntities,
-                    async (r, e) => r.Variants
-                        = await _documentPresentationFactory.CreateVariantsItemResponseModelsAsync(e)),
-                Constants.ReferenceType.Element => await MapReference<ElementReferenceResponseModel, IElementEntitySlim>(
+                    (r, e) => r.Variants = _documentPresentationFactory.CreateVariantsItemResponseModels(e)),
+                Constants.ReferenceType.Element => MapReference<ElementReferenceResponseModel, IElementEntitySlim>(
                     relationItemModel,
                     elementSlimEntities,
-                    async (r, e) => r.Variants
-                        = await _elementPresentationFactory.CreateVariantsItemResponseModelsAsync(e)),
+                    (r, e) => r.Variants = _elementPresentationFactory.CreateVariantsItemResponseModels(e)),
                 Constants.ReferenceType.ElementContainer => _umbracoMapper.Map<ElementContainerReferenceResponseModel>(relationItemModel),
                 Constants.ReferenceType.Media => _umbracoMapper.Map<MediaReferenceResponseModel>(relationItemModel),
                 Constants.ReferenceType.Member => _umbracoMapper.Map<MemberReferenceResponseModel>(relationItemModel),
@@ -101,16 +99,15 @@ public class RelationTypePresentationFactory : IRelationTypePresentationFactory
                 Constants.ReferenceType.MediaTypePropertyType => _umbracoMapper.Map<MediaTypePropertyTypeReferenceResponseModel>(relationItemModel),
                 Constants.ReferenceType.MemberTypePropertyType => _umbracoMapper.Map<MemberTypePropertyTypeReferenceResponseModel>(relationItemModel),
                 _ => _umbracoMapper.Map<DefaultReferenceResponseModel>(relationItemModel),
-            });
-        IReferenceResponseModel?[] results = await Task.WhenAll(tasks);
+            }).WhereNotNull().ToArray();
 
-        return results.WhereNotNull().ToArray();
+        return Task.FromResult<IEnumerable<IReferenceResponseModel>>(result);
     }
 
-    private async Task<TResponse?> MapReference<TResponse, TEntity>(
+    private TResponse? MapReference<TResponse, TEntity>(
         RelationItemModel relationItemModel,
         List<IEntitySlim> slimEntities,
-        Func<TResponse, TEntity, Task> enrichResponse)
+        Action<TResponse, TEntity> enrichResponse)
         where TResponse : class
         where TEntity : class, IEntitySlim
     {
@@ -121,7 +118,7 @@ public class RelationTypePresentationFactory : IRelationTypePresentationFactory
             return responseModel;
         }
 
-        await enrichResponse(responseModel, matchingEntity);
+        enrichResponse(responseModel, matchingEntity);
         return responseModel;
     }
 

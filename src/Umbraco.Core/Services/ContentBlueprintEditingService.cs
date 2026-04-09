@@ -235,8 +235,8 @@ internal sealed class ContentBlueprintEditingService
         //       structural node data like path, level, sort orders etc.
         toMove.ParentId = parentId;
 
-        var userId = await GetUserIdAsync(userKey);
-        ContentService.MoveBlueprint(toMove, userId);
+        // Save blueprint
+        await SaveAsync(toMove, userKey);
 
         scope.Complete();
 

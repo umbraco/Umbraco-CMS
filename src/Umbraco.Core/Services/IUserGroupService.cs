@@ -130,7 +130,11 @@ public interface IUserGroupService
     /// <remarks>
     /// Non-admin users can only add groups they themselves belong to. Removing groups is always allowed.
     /// </remarks>
-    Task<Attempt<UserGroupOperationStatus>> UpdateUserGroupsOnUsersAsync(ISet<Guid> userGroupKeys, ISet<Guid> userKeys, Guid performingUserKey);
+    // TODO (V18): Remove default implementation.
+    Task<Attempt<UserGroupOperationStatus>> UpdateUserGroupsOnUsersAsync(ISet<Guid> userGroupKeys, ISet<Guid> userKeys, Guid performingUserKey)
+#pragma warning disable CS0618 // Type or member is obsolete
+        => UpdateUserGroupsOnUsersAsync(userGroupKeys, userKeys);
+#pragma warning restore CS0618 // Type or member is obsolete
 
     /// <summary>
     ///     Adds users to a user group.

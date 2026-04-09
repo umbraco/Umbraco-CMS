@@ -95,10 +95,6 @@ public abstract class UserOrCurrentUserControllerBase : ManagementApiControllerB
                 .WithTitle("Media Start Node not found")
                 .WithDetail("Some of the provided media start nodes was not found.")
                 .Build()),
-            UserOperationStatus.ElementStartNodeNotFound => BadRequest(problemDetailsBuilder
-                .WithTitle("Element Start Node not found")
-                .WithDetail("Some of the provided element start nodes was not found.")
-                .Build()),
             UserOperationStatus.UserNotFound => NotFound(problemDetailsBuilder
                 .WithTitle("The user was not found")
                 .WithDetail("The specified user was not found.")
@@ -144,10 +140,6 @@ public abstract class UserOrCurrentUserControllerBase : ManagementApiControllerB
                 .WithDetail("The target user type does not support this operation.")
                 .Build()),
             UserOperationStatus.Forbidden => Forbidden(),
-            UserOperationStatus.ApplicationUrlNotConfigured => BadRequest(problemDetailsBuilder
-                .WithTitle("Application URL not configured")
-                .WithDetail("The application URL is not configured. Set Umbraco:CMS:WebRouting:UmbracoApplicationUrl in configuration, or change Umbraco:CMS:WebRouting:ApplicationUrlDetection to 'FirstRequest' or 'EveryRequest'.")
-                .Build()),
             _ => StatusCode(StatusCodes.Status500InternalServerError, problemDetailsBuilder
                 .WithTitle("Unknown user operation status.")
                 .Build()),

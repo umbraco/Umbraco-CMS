@@ -21,7 +21,6 @@ namespace Umbraco.Cms.Infrastructure.Mail
             => _globalSettings = globalSettings.CurrentValue;
 
         /// <inheritdoc />
-        [Obsolete("Please use the overload taking all parameters. Scheduled for removal in Umbraco 20.")]
         public async Task SendAsync(EmailMessage message)
             => await SendAsync(message, null);
 

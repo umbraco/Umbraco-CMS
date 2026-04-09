@@ -11,17 +11,17 @@ internal interface IAmbientEFCoreScopeStack<TDbContext> : IEFCoreScopeAccessor<T
     /// <summary>
     /// Gets the current ambient scope at the top of the stack.
     /// </summary>
-    new IEFCoreScope<TDbContext>? AmbientScope { get; }
+    new IEfCoreScope<TDbContext>? AmbientScope { get; }
 
     /// <summary>
     /// Removes and returns the scope at the top of the stack.
     /// </summary>
     /// <returns>The scope that was removed from the top of the stack.</returns>
-    IEFCoreScope<TDbContext> Pop();
+    IEfCoreScope<TDbContext> Pop();
 
     /// <summary>
     /// Pushes a scope onto the top of the stack.
     /// </summary>
     /// <param name="scope">The scope to push onto the stack.</param>
-    void Push(IEFCoreScope<TDbContext> scope);
+    void Push(IEfCoreScope<TDbContext> scope);
 }

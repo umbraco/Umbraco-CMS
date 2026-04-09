@@ -115,17 +115,17 @@ public abstract class UserStartNodeFolderTreeControllerBase<TItem> : FolderTreeC
     }
 
     /// <inheritdoc />
-    protected override async Task<TItem[]> MapTreeItemViewModelsAsync(Guid? parentKey, IEntitySlim[] entities)
+    protected override TItem[] MapTreeItemViewModels(Guid? parentKey, IEntitySlim[] entities)
     {
         if (UserHasRootAccess() || IgnoreUserStartNodes())
         {
-            return await base.MapTreeItemViewModelsAsync(parentKey, entities);
+            return base.MapTreeItemViewModels(parentKey, entities);
         }
 
         // for users with no root access, only add items for the entities contained within the calculated access map.
         // the access map may contain entities that the user does not have direct access to, but need still to see,
         // because it has descendants that the user *does* have access to. these entities are added as "no access" items.
-        IEnumerable<Task<TItem?>> tasks = entities.Select(async entity =>
+        TItem[] treeItemViewModels = entities.Select(entity =>
             {
                 if (_accessMap.TryGetValue(entity.Key, out var hasAccess) is false)
                 {
@@ -136,10 +136,9 @@ public abstract class UserStartNodeFolderTreeControllerBase<TItem> : FolderTreeC
                 // direct access => return a regular item
                 // no direct access => return a "no access" item
                 return hasAccess
-                    ? await MapTreeItemViewModelAsync(parentKey, entity)
-                    : await MapTreeItemViewModelAsNoAccessAsync(parentKey, entity);
-            });
-        TItem[] treeItemViewModels = (await Task.WhenAll(tasks))
+                    ? MapTreeItemViewModel(parentKey, entity)
+                    : MapTreeItemViewModelAsNoAccess(parentKey, entity);
+            })
             .WhereNotNull()
             .ToArray();
 
@@ -155,8 +154,8 @@ public abstract class UserStartNodeFolderTreeControllerBase<TItem> : FolderTreeC
     /// <remarks>
     /// Subclasses should override this to set the appropriate "no access" flag on the view model.
     /// </remarks>
-    protected virtual Task<TItem> MapTreeItemViewModelAsNoAccessAsync(Guid? parentKey, IEntitySlim entity)
-        => MapTreeItemViewModelAsync(parentKey, entity);
+    protected virtual TItem MapTreeItemViewModelAsNoAccess(Guid? parentKey, IEntitySlim entity)
+        => MapTreeItemViewModel(parentKey, entity);
 
     private int[] UserStartNodeIds => field ??= GetUserStartNodeIds();
 

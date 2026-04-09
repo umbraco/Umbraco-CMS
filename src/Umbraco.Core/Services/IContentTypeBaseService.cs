@@ -306,6 +306,28 @@ public interface IContentTypeBaseService<TItem> : IContentTypeBaseService, IServ
     Attempt<OperationResult<MoveOperationStatusType, TItem>?> Copy(TItem copying, int containerId);
 
     /// <summary>
+    ///     Copies a content type with a new alias and name.
+    /// </summary>
+    /// <param name="original">The content type to copy.</param>
+    /// <param name="alias">The alias for the copy.</param>
+    /// <param name="name">The name for the copy.</param>
+    /// <param name="parentId">The identifier of the parent container.</param>
+    /// <returns>The copied content type.</returns>
+    [Obsolete("Please use CopyAsync. Scheduled for removal in Umbraco 18.")]
+    TItem Copy(TItem original, string alias, string name, int parentId = -1);
+
+    /// <summary>
+    ///     Copies a content type with a new alias and name under a parent.
+    /// </summary>
+    /// <param name="original">The content type to copy.</param>
+    /// <param name="alias">The alias for the copy.</param>
+    /// <param name="name">The name for the copy.</param>
+    /// <param name="parent">The parent content type.</param>
+    /// <returns>The copied content type.</returns>
+    [Obsolete("Please use CopyAsync. Scheduled for removal in Umbraco 18.")]
+    TItem Copy(TItem original, string alias, string name, TItem parent);
+
+    /// <summary>
     ///     Copies a content type to a container asynchronously.
     /// </summary>
     /// <param name="key">The unique identifier of the content type to copy.</param>

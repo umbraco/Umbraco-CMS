@@ -151,7 +151,7 @@ namespace Umbraco.Cms.Core.Routing
         public string GetUrlFromRoute(int id, string? route, string? culture)
         {
             IUmbracoContext umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
-            DefaultUrlProvider? provider = _urlProviders.OfType<DefaultUrlProvider>().FirstOrDefault();
+            NewDefaultUrlProvider? provider = _urlProviders.OfType<NewDefaultUrlProvider>().FirstOrDefault();
             var url = provider == null
                 ? route // what else?
                 : provider.GetUrlFromRoute(route, id, umbracoContext.CleanedUmbracoUrl, Mode, culture)?.Url?.ToString();

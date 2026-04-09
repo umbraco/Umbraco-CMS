@@ -225,8 +225,8 @@
 		"generate:ui-api-docs": "npm run generate:check-const-test && typedoc --options typedoc.config.js"
 	},
 	"engines": {
-		"node": ">=24.13",
-		"npm": ">=11"
+		"node": ">=22.17.1",
+		"npm": ">=10.9.2"
 	},
 	"dependencies": {
 		"element-internals-polyfill": "^3.0.2"

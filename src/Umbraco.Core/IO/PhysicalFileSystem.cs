@@ -578,11 +578,7 @@ public class PhysicalFileSystem : IPhysicalFileSystem, IFileProviderFactory
     /// Creates a file provider.
     /// </summary>
     /// <returns>The file provider.</returns>
-    public IFileProvider Create()
-    {
-        Directory.CreateDirectory(_rootPath);
-        return new PhysicalFileProvider(_rootPath);
-    }
+    public IFileProvider Create() => new PhysicalFileProvider(_rootPath);
 
     #endregion
 }

@@ -25,6 +25,8 @@ internal sealed class TelemetryProviderTests : UmbracoIntegrationTest
 {
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
+    private IFileService FileService => GetRequiredService<IFileService>();
+
     private IDomainService DomainService => GetRequiredService<IDomainService>();
 
     private IContentService ContentService => GetRequiredService<IContentService>();
@@ -53,8 +55,6 @@ internal sealed class TelemetryProviderTests : UmbracoIntegrationTest
     private IMediaTypeService MediaTypeService => GetRequiredService<IMediaTypeService>();
 
     private IContentBlueprintEditingService ContentBlueprintEditingService => GetRequiredService<IContentBlueprintEditingService>();
-
-    private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
 
     private readonly LanguageBuilder _languageBuilder = new();
 
@@ -105,7 +105,7 @@ internal sealed class TelemetryProviderTests : UmbracoIntegrationTest
     {
         // Arrange
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        FileService.SaveTemplate(template);
 
         var contentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id);
         ContentTypeService.Save(contentType);

@@ -28,26 +28,26 @@ public abstract class RecycleBinControllerBase<TItem> : ContentControllerBase
 
     protected abstract Guid RecycleBinRootKey { get; }
 
-    protected async Task<ActionResult<PagedViewModel<TItem>>> GetRoot(int skip, int take)
+    protected Task<ActionResult<PagedViewModel<TItem>>> GetRoot(int skip, int take)
     {
         IEntitySlim[] rootEntities = GetPagedRootEntities(skip, take, out var totalItems);
 
-        TItem[] treeItemViewModels = await MapRecycleBinViewModelsAsync(null, rootEntities);
+        TItem[] treeItemViewModels = MapRecycleBinViewModels(null, rootEntities);
 
         PagedViewModel<TItem> result = PagedViewModel(treeItemViewModels, totalItems);
 
-        return Ok(result);
+        return Task.FromResult<ActionResult<PagedViewModel<TItem>>>(Ok(result));
     }
 
-    protected async Task<ActionResult<PagedViewModel<TItem>>> GetChildren(Guid parentKey, int skip, int take)
+    protected Task<ActionResult<PagedViewModel<TItem>>> GetChildren(Guid parentKey, int skip, int take)
     {
         IEntitySlim[] children = GetPagedChildEntities(parentKey, skip, take, out var totalItems);
 
-        TItem[] treeItemViewModels = await MapRecycleBinViewModelsAsync(parentKey, children);
+        TItem[] treeItemViewModels = MapRecycleBinViewModels(parentKey, children);
 
         PagedViewModel<TItem> result = PagedViewModel(treeItemViewModels, totalItems);
 
-        return Ok(result);
+        return Task.FromResult<ActionResult<PagedViewModel<TItem>>>(Ok(result));
     }
 
     protected async Task<ActionResult<SubsetViewModel<TItem>>> GetSiblings(Guid target, int before, int after)
@@ -61,14 +61,14 @@ public abstract class RecycleBinControllerBase<TItem> : ContentControllerBase
         IEntitySlim entity = siblings.First();
         Guid? parentKey = GetParentKey(entity);
 
-        TItem[] treeItemViewModels = await MapRecycleBinViewModelsAsync(parentKey, siblings);
+        TItem[] treeItemViewModels = MapRecycleBinViewModels(parentKey, siblings);
 
         SubsetViewModel<TItem> result = SubsetViewModel(treeItemViewModels, totalBefore, totalAfter);
 
         return Ok(result);
     }
 
-    protected virtual Task<TItem> MapRecycleBinViewModelAsync(Guid? parentKey, IEntitySlim entity)
+    protected virtual TItem MapRecycleBinViewModel(Guid? parentKey, IEntitySlim entity)
     {
         if (entity == null)
         {
@@ -88,7 +88,7 @@ public abstract class RecycleBinControllerBase<TItem> : ContentControllerBase
                 : null
         };
 
-        return Task.FromResult(viewModel);
+        return viewModel;
     }
 
     protected IActionResult OperationStatusResult(OperationResult result) =>
@@ -154,11 +154,8 @@ public abstract class RecycleBinControllerBase<TItem> : ContentControllerBase
         return children;
     }
 
-    private async Task<TItem[]> MapRecycleBinViewModelsAsync(Guid? parentKey, IEntitySlim[] entities)
-    {
-        IEnumerable<Task<TItem>> tasks = entities.Select(entity => MapRecycleBinViewModelAsync(parentKey, entity));
-        return await Task.WhenAll(tasks);
-    }
+    private TItem[] MapRecycleBinViewModels(Guid? parentKey, IEntitySlim[] entities)
+        => entities.Select(entity => MapRecycleBinViewModel(parentKey, entity)).ToArray();
 
     private PagedViewModel<TItem> PagedViewModel(IEnumerable<TItem> treeItemViewModels, long totalItems)
         => new() { Total = totalItems, Items = treeItemViewModels };

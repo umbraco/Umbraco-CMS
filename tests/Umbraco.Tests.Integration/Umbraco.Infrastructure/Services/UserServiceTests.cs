@@ -31,9 +31,9 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
 
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
-    private IContentService ContentService => GetRequiredService<IContentService>();
+    private IFileService FileService => GetRequiredService<IFileService>();
 
-    private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
+    private IContentService ContentService => GetRequiredService<IContentService>();
 
     [Test]
     public async Task Get_User_Permissions_For_Unassigned_Permission_Nodes()
@@ -42,7 +42,7 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
         var (user, _) = await CreateTestUserAndGroup();
 
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        FileService.SaveTemplate(template);
         var contentType = ContentTypeBuilder.CreateSimpleContentType(defaultTemplateId: template.Id);
         await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
 
@@ -70,7 +70,7 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
         var (user, userGroup) = await CreateTestUserAndGroup();
 
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        FileService.SaveTemplate(template);
         var contentType = ContentTypeBuilder.CreateSimpleContentType(defaultTemplateId: template.Id);
         await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
 
@@ -104,7 +104,7 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
         var userGroup = await CreateTestUserGroup();
 
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey); 
+        FileService.SaveTemplate(template);
         var contentType = ContentTypeBuilder.CreateSimpleContentType(defaultTemplateId: template.Id);
         await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
 
@@ -139,7 +139,7 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
         var userGroup = await CreateTestUserGroup();
 
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        FileService.SaveTemplate(template);
         var contentType = ContentTypeBuilder.CreateSimpleContentType(defaultTemplateId: template.Id);
         await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
 
@@ -183,7 +183,7 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
         UserService.Save(user);
 
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        FileService.SaveTemplate(template);
         var contentType = ContentTypeBuilder.CreateSimpleContentType(defaultTemplateId: template.Id);
         await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
 
@@ -265,7 +265,7 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
         var userGroup = await CreateTestUserGroup();
 
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        FileService.SaveTemplate(template);
         var contentType = ContentTypeBuilder.CreateSimpleContentType(defaultTemplateId: template.Id);
         await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
 
@@ -463,7 +463,7 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
         var userGroup = await CreateTestUserGroup();
 
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        FileService.SaveTemplate(template);
         var contentType = ContentTypeBuilder.CreateSimpleContentType(defaultTemplateId: template.Id);
         await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
 
@@ -1131,7 +1131,7 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
     private async Task<Content[]> BuildContentItems(int numberToCreate)
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        FileService.SaveTemplate(template);
         var contentType = ContentTypeBuilder.CreateSimpleContentType(defaultTemplateId: template.Id);
         await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
 

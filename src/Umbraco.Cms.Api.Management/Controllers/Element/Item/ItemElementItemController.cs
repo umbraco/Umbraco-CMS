@@ -42,21 +42,20 @@ public class ItemElementItemController : ElementItemControllerBase
     [ProducesResponseType(typeof(IEnumerable<ElementItemResponseModel>), StatusCodes.Status200OK)]
     [EndpointSummary("Gets a collection of element items.")]
     [EndpointDescription("Gets a collection of element items identified by the provided Ids.")]
-    public async Task<IActionResult> Item(
+    public Task<IActionResult> Item(
         CancellationToken cancellationToken,
         [FromQuery(Name = "id")] HashSet<Guid> ids)
     {
         if (ids.Count is 0)
         {
-            return Ok(Enumerable.Empty<ElementItemResponseModel>());
+            return Task.FromResult<IActionResult>(Ok(Enumerable.Empty<ElementItemResponseModel>()));
         }
 
         IEnumerable<IElementEntitySlim> elements = _entityService
             .GetAll(UmbracoObjectTypes.Element, ids.ToArray())
             .OfType<IElementEntitySlim>();
 
-        IEnumerable<Task<ElementItemResponseModel>> tasks = elements.Select(_elementPresentationFactory.CreateItemResponseModelAsync);
-        ElementItemResponseModel[] responseModels = await Task.WhenAll(tasks);
-        return Ok(responseModels);
+        IEnumerable<ElementItemResponseModel> responseModels = elements.Select(_elementPresentationFactory.CreateItemResponseModel);
+        return Task.FromResult<IActionResult>(Ok(responseModels));
     }
 }

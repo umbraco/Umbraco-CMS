@@ -3,7 +3,6 @@ import { UMB_ELEMENT_FOLDER_REPOSITORY_ALIAS } from '../repository/constants.js'
 import {
 	UMB_ELEMENT_USER_PERMISSION_CONDITION_ALIAS,
 	UMB_USER_PERMISSION_ELEMENT_DELETE,
-	UMB_USER_PERMISSION_ELEMENT_UPDATE,
 } from '../../user-permissions/constants.js';
 import { manifests as moveManifests } from './move/manifests.js';
 import {
@@ -14,12 +13,12 @@ import {
 const folderDelete: UmbExtensionManifest = {
 	type: 'entityAction',
 	kind: 'folderDelete',
-	alias: 'Umb.EntityAction.ElementFolder.Delete',
+	alias: 'Umb.EntityAction.Element.Folder.Delete',
 	name: 'Delete Element Folder Entity Action',
 	forEntityTypes: [UMB_ELEMENT_FOLDER_ENTITY_TYPE],
 	meta: {
 		icon: 'icon-trash-empty',
-		folderRepositoryAlias: UMB_ELEMENT_FOLDER_REPOSITORY_ALIAS,
+		folderRepositoryAlias: UMB_ELEMENT_FOLDER_REPOSITORY_ALIAS, // TODO: [LK] This needs to call the recycle-bin repository instead.
 	},
 	conditions: [
 		{
@@ -33,19 +32,13 @@ const folderDelete: UmbExtensionManifest = {
 const folderUpdate: UmbExtensionManifest = {
 	type: 'entityAction',
 	kind: 'folderUpdate',
-	alias: 'Umb.EntityAction.ElementFolder.Rename',
+	alias: 'Umb.EntityAction.Element.Folder.Rename',
 	name: 'Rename Element Folder Entity Action',
 	forEntityTypes: [UMB_ELEMENT_FOLDER_ENTITY_TYPE],
 	meta: {
 		folderRepositoryAlias: UMB_ELEMENT_FOLDER_REPOSITORY_ALIAS,
 	},
-	conditions: [
-		{
-			alias: UMB_ELEMENT_USER_PERMISSION_CONDITION_ALIAS,
-			allOf: [UMB_USER_PERMISSION_ELEMENT_UPDATE],
-		},
-		{ alias: UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS },
-	],
+	conditions: [{ alias: UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS }],
 };
 
 export const manifests: Array<UmbExtensionManifest> = [folderDelete, folderUpdate, ...moveManifests];

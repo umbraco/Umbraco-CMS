@@ -33,10 +33,10 @@ internal abstract class PublishedUrlInfoProviderTestsBase : UmbracoIntegrationTe
         builder.Services.AddUnique(CreateHttpContextAccessor());
     }
 
-    public override async Task Setup()
+    public override void Setup()
     {
         DocumentUrlService.InitAsync(false, CancellationToken.None).GetAwaiter().GetResult();
-        await base.Setup();
+        base.Setup();
     }
 
     private IUmbracoContext GetUmbracoContext(IServiceProvider serviceProvider)

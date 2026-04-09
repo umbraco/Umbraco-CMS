@@ -1,5 +1,8 @@
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
@@ -13,6 +16,7 @@ namespace Umbraco.Cms.Api.Management.Security;
 /// </summary>
 public class ForgotPasswordUriProvider : IForgotPasswordUriProvider
 {
+
     private readonly ICoreBackOfficeUserManager _userManager;
     private readonly IHostingEnvironment _hostingEnvironment;
     private readonly IHttpContextAccessor _httpContextAccessor;
@@ -33,37 +37,29 @@ public class ForgotPasswordUriProvider : IForgotPasswordUriProvider
         _httpContextAccessor = httpContextAccessor;
     }
 
-    /// <inheritdoc/>
     public async Task<Attempt<Uri, UserOperationStatus>> CreateForgotPasswordUriAsync(IUser user)
     {
-        if (_httpContextAccessor.HttpContext is null)
-        {
-            throw new NotSupportedException("Needs a HttpContext");
-        }
-
-        Uri? appUrl = _hostingEnvironment.ApplicationMainUrl;
-        if (appUrl is null)
-        {
-            return Attempt.FailWithStatus<Uri, UserOperationStatus>(UserOperationStatus.ApplicationUrlNotConfigured, default!);
-        }
-
         Attempt<string, UserOperationStatus> tokenAttempt = await _userManager.GeneratePasswordResetTokenAsync(user);
 
         if (tokenAttempt.Success is false)
         {
-            return Attempt.FailWithStatus<Uri, UserOperationStatus>(tokenAttempt.Status, default!);
+            return Attempt.FailWithStatus(tokenAttempt.Status, new Uri(string.Empty));
         }
 
-        var uriBuilder = new UriBuilder(appUrl)
+        HttpRequest? request = _httpContextAccessor.HttpContext?.Request;
+        if (request is null)
         {
-            Path = BackOfficeLoginController.LoginPath,
-            Query = QueryString.Create(new KeyValuePair<string, string?>[]
-            {
-                new("flow", "reset-password"),
-                new("userId", user.Key.ToString()),
-                new("resetCode", tokenAttempt.Result.ToUrlBase64()),
-            }).ToUriComponent(),
-        };
+            throw new NotSupportedException("Needs a HttpContext");
+        }
+
+        var uriBuilder = new UriBuilder(_hostingEnvironment.ApplicationMainUrl);
+        uriBuilder.Path = BackOfficeLoginController.LoginPath;
+        uriBuilder.Query = QueryString.Create(new KeyValuePair<string, string?>[]
+        {
+            new ("flow", "reset-password"),
+            new ("userId", user.Key.ToString()),
+            new ("resetCode", tokenAttempt.Result.ToUrlBase64()),
+        }).ToUriComponent();
 
         return Attempt.SucceedWithStatus(UserOperationStatus.Success, uriBuilder.Uri);
     }

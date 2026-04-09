@@ -1,5 +1,5 @@
 import { html, customElement, property, state, query } from '@umbraco-cms/backoffice/external/lit';
-import type { UUISelectElement, UUISelectEvent, UUISelectOption } from '@umbraco-cms/backoffice/external/uui';
+import type { UUISelectElement, UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
 import type {
 	UmbPropertyEditorUiElement,
 	UmbPropertyEditorConfigCollection,
@@ -14,8 +14,10 @@ import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 @customElement('umb-property-editor-ui-value-type')
 export class UmbPropertyEditorUIValueTypeElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	private _value: string | undefined = undefined;
-
 	@property()
+	public get value(): string | undefined {
+		return this._value;
+	}
 	public set value(value: string | undefined) {
 		this._value = value;
 
@@ -27,15 +29,12 @@ export class UmbPropertyEditorUIValueTypeElement extends UmbLitElement implement
 			this._options[0].selected = true;
 		}
 	}
-	public get value(): string | undefined {
-		return this._value;
-	}
 
 	@query('uui-select')
 	selectEl?: UUISelectElement;
 
 	@state()
-	private _options: Array<UUISelectOption> = [
+	private _options: Array<Option> = [
 		{ name: 'String', value: 'STRING' },
 		{ name: 'Decimal', value: 'DECIMAL' },
 		{ name: 'Date/Time', value: 'DATETIME' },

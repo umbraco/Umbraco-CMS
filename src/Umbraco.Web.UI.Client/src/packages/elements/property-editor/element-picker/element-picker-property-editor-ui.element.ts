@@ -1,11 +1,9 @@
-﻿import { UMB_ELEMENT_FOLDER_ENTITY_TYPE } from '../../entity.js';
-import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
+﻿import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import { UmbFormControlMixin, UMB_VALIDATION_EMPTY_LOCALIZATION_KEY } from '@umbraco-cms/backoffice/validation';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbFormControlMixin, UMB_VALIDATION_EMPTY_LOCALIZATION_KEY } from '@umbraco-cms/backoffice/validation';
 import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
-import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
 
 @customElement('umb-element-picker-property-editor-ui')
 export class UmbElementPickerPropertyEditorUIElement
@@ -27,23 +25,13 @@ export class UmbElementPickerPropertyEditorUIElement
 	public set config(config: UmbPropertyEditorUiElement['config'] | undefined) {
 		if (!config) return;
 
-		this._folderOnly = Boolean(config.getValueByAlias('folderOnly'));
-
 		const minMax = config?.getValueByAlias<UmbNumberRangeValueType>('validationLimit');
 		this._min = minMax?.min ?? 0;
 		this._max = minMax?.max ?? Infinity;
 
 		this._minMessage = `${this.localize.term('validation_minCount')} ${this._min} ${this.localize.term('validation_items')}`;
 		this._maxMessage = `${this.localize.term('validation_maxCount')} ${this._max} ${this.localize.term('validation_itemsSelected')}`;
-
-		const startNodeId = config.getValueByAlias<Array<string>>('startNodeId') ?? [];
-		this._startNode = startNodeId.length
-			? { unique: startNodeId[0], entityType: UMB_ELEMENT_FOLDER_ENTITY_TYPE }
-			: undefined;
 	}
-
-	@state()
-	private _folderOnly = false;
 
 	@state()
 	private _min = 0;
@@ -56,9 +44,6 @@ export class UmbElementPickerPropertyEditorUIElement
 
 	@state()
 	private _maxMessage = '';
-
-	@state()
-	private _startNode?: UmbTreeStartNode;
 
 	override focus() {
 		return this.shadowRoot?.querySelector('umb-input-element')?.focus();
@@ -86,12 +71,10 @@ export class UmbElementPickerPropertyEditorUIElement
 		return html`
 			<umb-input-element
 				.selection=${this.value ?? []}
-				.startNode=${this._startNode}
 				.min=${this._min}
-				.minMessage=${this._minMessage}
+				.min-message=${this._minMessage}
 				.max=${this._max}
-				.maxMessage=${this._maxMessage}
-				?folderOnly=${this._folderOnly}
+				.max-message=${this._maxMessage}
 				?readonly=${this.readonly}
 				@change=${this.#onChange}>
 			</umb-input-element>

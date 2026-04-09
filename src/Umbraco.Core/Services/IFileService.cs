@@ -58,6 +58,20 @@ public interface IFileService : IService
     void SaveScript(IScript? script, int? userId = Constants.Security.SuperUserId);
 
     /// <summary>
+    ///     Gets a list of all <see cref="ITemplate" /> objects
+    /// </summary>
+    /// <returns>An enumerable list of <see cref="ITemplate" /> objects</returns>
+    [Obsolete("Please use ITemplateService for template operations. Scheduled for removal in Umbraco 18.")]
+    IEnumerable<ITemplate> GetTemplates(params string[] aliases);
+
+    /// <summary>
+    ///     Gets a list of all <see cref="ITemplate" /> objects
+    /// </summary>
+    /// <returns>An enumerable list of <see cref="ITemplate" /> objects</returns>
+    [Obsolete("Please use ITemplateService for template operations. Scheduled for removal in Umbraco 18.")]
+    IEnumerable<ITemplate> GetTemplates(int masterTemplateId);
+
+    /// <summary>
     ///     Gets a <see cref="ITemplate" /> object by its alias.
     /// </summary>
     /// <param name="alias">The alias of the template.</param>
@@ -72,4 +86,32 @@ public interface IFileService : IService
     /// <returns>The <see cref="ITemplate" /> object matching the identifier, or null.</returns>
     [Obsolete("Please use ITemplateService for template operations. Scheduled for removal in Umbraco 18.")]
     ITemplate? GetTemplate(int id);
+
+    /// <summary>
+    ///     Saves a <see cref="ITemplate" />
+    /// </summary>
+    /// <param name="template"><see cref="ITemplate" /> to save</param>
+    /// <param name="userId">Optional id of the user saving the template</param>
+    [Obsolete("Please use ITemplateService for template operations. Scheduled for removal in Umbraco 18.")]
+    void SaveTemplate(ITemplate template, int userId = Constants.Security.SuperUserId);
+
+    /// <summary>
+    ///     Creates a new template with identity, setting the content if a view exists in the filesystem.
+    /// </summary>
+    /// <param name="name">The name of the template.</param>
+    /// <param name="alias">The alias of the template.</param>
+    /// <param name="content">The content/markup of the template.</param>
+    /// <param name="masterTemplate">Optional master template.</param>
+    /// <param name="userId">Optional id of the user creating the template.</param>
+    /// <returns>The created <see cref="ITemplate" />.</returns>
+    [Obsolete("Please use ITemplateService for template operations. Scheduled for removal in Umbraco 18.")]
+    ITemplate CreateTemplateWithIdentity(string? name, string? alias, string? content, ITemplate? masterTemplate = null, int userId = Constants.Security.SuperUserId);
+
+    /// <summary>
+    ///     Deletes a template by its alias
+    /// </summary>
+    /// <param name="alias">Alias of the <see cref="ITemplate" /> to delete</param>
+    /// <param name="userId">Optional id of the user deleting the template</param>
+    [Obsolete("Please use ITemplateService for template operations. Scheduled for removal in Umbraco 18.")]
+    void DeleteTemplate(string alias, int userId = Constants.Security.SuperUserId);
 }

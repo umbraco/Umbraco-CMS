@@ -19,9 +19,9 @@ public abstract class NamedEntityTreeControllerBase<TItem> : EntityTreeControlle
     {
     }
 
-    protected override async Task<TItem> MapTreeItemViewModelAsync(Guid? parentKey, IEntitySlim entity)
+    protected override TItem MapTreeItemViewModel(Guid? parentKey, IEntitySlim entity)
     {
-        TItem item = await base.MapTreeItemViewModelAsync(parentKey, entity);
+        TItem item = base.MapTreeItemViewModel(parentKey, entity);
         item.Name = entity.Name ?? string.Empty;
         return item;
     }

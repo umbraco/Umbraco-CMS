@@ -49,7 +49,7 @@ internal sealed class EFCoreScopeAccessor<TDbContext> : IEFCoreScopeAccessor<TDb
         => _ambientEfCoreScopeStack.AmbientScope is not EFCoreScope<TDbContext> { IsBridgeScope: false };
 
     /// <inheritdoc />
-    IEFCoreScope<TDbContext>? IEFCoreScopeAccessor<TDbContext>.AmbientScope => GetOrCreateAmbientScope();
+    IEfCoreScope<TDbContext>? IEFCoreScopeAccessor<TDbContext>.AmbientScope => GetOrCreateAmbientScope();
 
     /// <inheritdoc />
     ICoreScope? CoreEFCoreScopeAccessor.AmbientScope => GetOrCreateAmbientScope();
@@ -61,9 +61,9 @@ internal sealed class EFCoreScopeAccessor<TDbContext> : IEFCoreScopeAccessor<TDb
     ///
     /// This is temporary and should be removed when all repositories are migrated to EF Core.
     /// </summary>
-    private IEFCoreScope<TDbContext>? GetOrCreateAmbientScope()
+    private IEfCoreScope<TDbContext>? GetOrCreateAmbientScope()
     {
-        IEFCoreScope<TDbContext>? scope = _ambientEfCoreScopeStack.AmbientScope;
+        IEfCoreScope<TDbContext>? scope = _ambientEfCoreScopeStack.AmbientScope;
 
         if (scope is not null)
         {

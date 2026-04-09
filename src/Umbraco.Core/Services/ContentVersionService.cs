@@ -1,6 +1,4 @@
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
@@ -19,7 +17,7 @@ internal sealed class ContentVersionService : ContentVersionServiceBase<IContent
     /// Initializes a new instance of the <see cref="ContentVersionService"/> class.
     /// </summary>
     /// <param name="logger">The logger.</param>
-    /// <param name="contentVersionRepository">The content version repository.</param>
+    /// <param name="documentVersionRepository">The document version repository.</param>
     /// <param name="contentVersionCleanupPolicy">The content version cleanup policy.</param>
     /// <param name="scopeProvider">The scope provider.</param>
     /// <param name="eventMessagesFactory">The event messages factory.</param>
@@ -28,7 +26,6 @@ internal sealed class ContentVersionService : ContentVersionServiceBase<IContent
     /// <param name="entityService">The entity service.</param>
     /// <param name="contentService">The content service.</param>
     /// <param name="userIdKeyResolver">The user ID key resolver.</param>
-    /// <param name="contentSettings">The content settings.</param>
     public ContentVersionService(
         ILogger<ContentVersionService> logger,
         IDocumentVersionRepository contentVersionRepository,
@@ -39,8 +36,7 @@ internal sealed class ContentVersionService : ContentVersionServiceBase<IContent
         ILanguageRepository languageRepository,
         IEntityService entityService,
         IContentService contentService,
-        IUserIdKeyResolver userIdKeyResolver,
-        IOptionsMonitor<ContentSettings> contentSettings)
+        IUserIdKeyResolver userIdKeyResolver)
         : base(
             logger,
             contentVersionRepository,
@@ -51,9 +47,17 @@ internal sealed class ContentVersionService : ContentVersionServiceBase<IContent
             languageRepository,
             entityService,
             contentService,
-            userIdKeyResolver,
-            contentSettings)
+            userIdKeyResolver)
     {
+    /// <summary>
+    /// Gets a content version by its ID.
+    /// </summary>
+    /// <param name="versionId">The version ID.</param>
+    /// <returns>The content version metadata, or null if not found.</returns>
+    /// <inheritdoc />
+    /// <inheritdoc />
+    /// <inheritdoc />
+    /// <inheritdoc />
     }
 
     protected override UmbracoObjectTypes ItemObjectType => UmbracoObjectTypes.Document;

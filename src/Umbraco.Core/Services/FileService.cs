@@ -288,6 +288,52 @@ public class FileService : RepositoryService, IFileService
 
     #region Templates
     /// <summary>
+    ///     Create a new template, setting the content if a view exists in the filesystem
+    /// </summary>
+    /// <param name="name"></param>
+    /// <param name="alias"></param>
+    /// <param name="content"></param>
+    /// <param name="masterTemplate"></param>
+    /// <param name="userId"></param>
+    /// <returns></returns>
+    [Obsolete("Please use ITemplateService for template operations. Scheduled for removal in Umbraco 18.")]
+    public ITemplate CreateTemplateWithIdentity(
+        string? name,
+        string? alias,
+        string? content,
+        ITemplate? masterTemplate = null,
+        int userId = Constants.Security.SuperUserId)
+    {
+        // mimic old service behavior
+        ArgumentException.ThrowIfNullOrEmpty(name);
+        ArgumentException.ThrowIfNullOrEmpty(alias);
+        if (name.Length > 255)
+        {
+            throw new ArgumentOutOfRangeException(nameof(name), "Name cannot be more than 255 characters in length.");
+        }
+
+        Guid currentUserKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult();
+        Attempt<ITemplate, TemplateOperationStatus> result = _templateService.CreateAsync(name, alias, content, currentUserKey).GetAwaiter().GetResult();
+        return result.Result;
+    }
+
+    /// <summary>
+    ///     Gets a list of all <see cref="ITemplate" /> objects
+    /// </summary>
+    /// <returns>An enumerable list of <see cref="ITemplate" /> objects</returns>
+    [Obsolete("Please use ITemplateService for template operations. Scheduled for removal in Umbraco 18.")]
+    public IEnumerable<ITemplate> GetTemplates(params string[] aliases)
+        => _templateService.GetAllAsync(aliases).GetAwaiter().GetResult();
+
+    /// <summary>
+    ///     Gets a list of all <see cref="ITemplate" /> objects
+    /// </summary>
+    /// <returns>An enumerable list of <see cref="ITemplate" /> objects</returns>
+    [Obsolete("Please use ITemplateService for template operations. Scheduled for removal in Umbraco 18.")]
+    public IEnumerable<ITemplate> GetTemplates(int masterTemplateId)
+        => _templateService.GetChildrenAsync(masterTemplateId).GetAwaiter().GetResult();
+
+    /// <summary>
     ///     Gets a <see cref="ITemplate" /> object by its alias.
     /// </summary>
     /// <param name="alias">The alias of the template.</param>
@@ -322,6 +368,49 @@ public class FileService : RepositoryService, IFileService
     [Obsolete("Please use ITemplateService for template operations. Scheduled for removal in Umbraco 18.")]
     public IEnumerable<ITemplate> GetTemplateDescendants(int masterTemplateId)
         => _templateService.GetDescendantsAsync(masterTemplateId).GetAwaiter().GetResult();
+
+    /// <summary>
+    ///     Saves a <see cref="Template" />
+    /// </summary>
+    /// <param name="template"><see cref="Template" /> to save</param>
+    /// <param name="userId"></param>
+    [Obsolete("Please use ITemplateService for template operations. Scheduled for removal in Umbraco 18.")]
+    public void SaveTemplate(ITemplate template, int userId = Constants.Security.SuperUserId)
+    {
+        // mimic old service behavior
+        if (template == null)
+        {
+            throw new ArgumentNullException(nameof(template));
+        }
+
+        if (string.IsNullOrWhiteSpace(template.Name) || template.Name.Length > 255)
+        {
+            throw new InvalidOperationException(
+                "Name cannot be null, empty, contain only white-space characters or be more than 255 characters in length.");
+        }
+
+        Guid currentUserKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult();
+        if (template.Id > 0)
+        {
+            _templateService.UpdateAsync(template, currentUserKey).GetAwaiter().GetResult();
+        }
+        else
+        {
+            _templateService.CreateAsync(template, currentUserKey).GetAwaiter().GetResult();
+        }
+    }
+
+    /// <summary>
+    ///     Deletes a template by its alias
+    /// </summary>
+    /// <param name="alias">Alias of the <see cref="ITemplate" /> to delete</param>
+    /// <param name="userId"></param>
+    [Obsolete("Please use ITemplateService for template operations. Scheduled for removal in Umbraco 18.")]
+    public void DeleteTemplate(string alias, int userId = Constants.Security.SuperUserId)
+    {
+        Guid currentUserKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult();
+        _templateService.DeleteAsync(alias, currentUserKey).GetAwaiter().GetResult();
+    }
     #endregion
 
     #region Partial Views

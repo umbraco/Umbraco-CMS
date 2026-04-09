@@ -1,4 +1,3 @@
-using Umbraco.Cms.Core.DistributedLocking;
 using CoreEFCoreScopeAccessor = Umbraco.Cms.Core.Scoping.EFCore.IScopeAccessor;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
@@ -17,7 +16,7 @@ public interface IEFCoreScopeAccessor<TDbContext> : CoreEFCoreScopeAccessor
     ///     when only an NPoco scope is active; use <see cref="HasNonBridgeAmbientScope"/> to
     ///     check for a genuine EF Core scope without side effects.
     /// </remarks>
-    new IEFCoreScope<TDbContext>? AmbientScope { get; }
+    new IEfCoreScope<TDbContext>? AmbientScope { get; }
 
     /// <summary>
     ///     Gets a value indicating whether there is no genuine (non-bridge) EF Core ambient scope on the stack.
