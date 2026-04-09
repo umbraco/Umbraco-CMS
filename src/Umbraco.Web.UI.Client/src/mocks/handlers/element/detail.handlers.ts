@@ -6,6 +6,7 @@ import type {
 	CreateElementRequestModel,
 	DefaultReferenceResponseModel,
 	PagedIReferenceResponseModel,
+	PagedReferenceByIdModel,
 	UpdateElementRequestModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
@@ -28,6 +29,15 @@ export const detailHandlers = [
 
 	http.get(umbracoPath(`${UMB_SLUG}/configuration`), () => {
 		return HttpResponse.json(umbElementMockDb.getConfiguration());
+	}),
+
+	http.get(umbracoPath(`${UMB_SLUG}/are-referenced`), () => {
+		const response: PagedReferenceByIdModel = {
+			total: 0,
+			items: [],
+		};
+
+		return HttpResponse.json(response);
 	}),
 
 	http.get(umbracoPath(`${UMB_SLUG}/:id/referenced-by`), ({ request, params }) => {

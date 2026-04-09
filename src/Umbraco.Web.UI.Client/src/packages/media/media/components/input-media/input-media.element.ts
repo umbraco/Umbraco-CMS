@@ -117,7 +117,7 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 	includeTrashed = false;
 
 	@property({ type: String, attribute: 'folder-filter' })
-	folderFilter: UmbMediaPickerFolderFilter = UmbMediaPickerFolderFilter.FILES_ONLY;
+	folderFilter: UmbMediaPickerFolderFilter = UmbMediaPickerFolderFilter.FILES_AND_FOLDERS;
 
 	@property({ type: Object, attribute: false })
 	startNode?: UmbTreeStartNode;

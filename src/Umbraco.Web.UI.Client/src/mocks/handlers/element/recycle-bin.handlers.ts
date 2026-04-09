@@ -1,6 +1,7 @@
 const { http, HttpResponse } = window.MockServiceWorker;
 import { umbElementMockDb } from '../../data/element/element.db.js';
 import { UMB_SLUG } from './slug.js';
+import type { MoveElementRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 export const recycleBinHandlers = [
@@ -71,5 +72,43 @@ export const recycleBinHandlers = [
 		if (!id) return new HttpResponse(null, { status: 400 });
 		umbElementMockDb.recycleBin.delete(id);
 		return new HttpResponse(null, { status: 200 });
+	}),
+
+	http.put<{ id: string }, MoveElementRequestModel>(
+		umbracoPath(`/recycle-bin${UMB_SLUG}/:id/restore`),
+		async ({ request, params }) => {
+			const id = params.id;
+			if (!id) return new HttpResponse(null, { status: 400 });
+			const requestBody = await request.json();
+			umbElementMockDb.recycleBin.restore(id, requestBody?.target?.id ?? null);
+			return new HttpResponse(null, { status: 200 });
+		},
+	),
+
+	http.put<{ id: string }, MoveElementRequestModel>(
+		umbracoPath(`/recycle-bin${UMB_SLUG}/folder/:id/restore`),
+		async ({ request, params }) => {
+			const id = params.id;
+			if (!id) return new HttpResponse(null, { status: 400 });
+			const requestBody = await request.json();
+			umbElementMockDb.recycleBin.restore(id, requestBody?.target?.id ?? null);
+			return new HttpResponse(null, { status: 200 });
+		},
+	),
+
+	http.get(umbracoPath(`/recycle-bin${UMB_SLUG}/:id/original-parent`), ({ params }) => {
+		const id = params.id as string;
+		if (!id) return new HttpResponse(null, { status: 400 });
+		const item = umbElementMockDb.recycleBin.read(id);
+		if (!item) return new HttpResponse(null, { status: 404 });
+		return HttpResponse.json(item.parent ? { id: item.parent.id } : null);
+	}),
+
+	http.get(umbracoPath(`/recycle-bin${UMB_SLUG}/folder/:id/original-parent`), ({ params }) => {
+		const id = params.id as string;
+		if (!id) return new HttpResponse(null, { status: 400 });
+		const item = umbElementMockDb.recycleBin.read(id);
+		if (!item) return new HttpResponse(null, { status: 404 });
+		return HttpResponse.json(item.parent ? { id: item.parent.id } : null);
 	}),
 ];
