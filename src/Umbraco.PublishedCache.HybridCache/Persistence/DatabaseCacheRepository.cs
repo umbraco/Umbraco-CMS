@@ -1473,7 +1473,6 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
 
     /// <summary>
     /// Gets element culture variation data (edited status per culture) for the specified node IDs.
-    /// Gets element culture variation data (edited status per culture) for the specified node IDs.
     /// </summary>
     private List<CacheRebuildPublishableCultureDto> GetElementCultureDataForNodes(List<int> nodeIds)
     {
