@@ -39,9 +39,8 @@ internal sealed class ElementPermissionService : IElementPermissionService
             return Task.FromResult(ElementAuthorizationStatus.NotFound);
         }
 
-        // Fetch both Elements and ElementContainers (folders)
         IEntitySlim[] entities = _entityService.GetAll(
-            new[] { UmbracoObjectTypes.Element, UmbracoObjectTypes.ElementContainer },
+            new[] { UmbracoObjectTypes.Element },
             keys).ToArray();
 
         if (entities.Length == 0)
@@ -71,9 +70,8 @@ internal sealed class ElementPermissionService : IElementPermissionService
         const int take = 500;
         var total = long.MaxValue;
 
-        UmbracoObjectTypes[] objectTypes = { UmbracoObjectTypes.Element, UmbracoObjectTypes.ElementContainer };
+        UmbracoObjectTypes[] objectTypes = { UmbracoObjectTypes.Element };
 
-        // Try to find the parent as either Element or ElementContainer
         IEntitySlim? parentEntity = _entityService.GetAll(objectTypes, parentKey).FirstOrDefault();
 
         if (parentEntity is null)
