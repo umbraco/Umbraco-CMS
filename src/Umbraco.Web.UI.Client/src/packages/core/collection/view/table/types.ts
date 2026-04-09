@@ -18,7 +18,8 @@ export interface MetaCollectionViewTableKindColumn {
 	field: string;
 	/** The column header label. Supports localization strings (e.g. `#general_status`). */
 	label: string;
-	valueMinimalDisplayAlias?: string;
+	/** Optional value type for rendering a value summary in this column. */
+	valueType?: keyof UmbValueTypeMap;
 }
 
 /**

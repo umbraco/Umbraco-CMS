@@ -106,12 +106,12 @@ export class UmbTableCollectionViewElement extends UmbCollectionViewElementBase<
 
 			const manifestColumnData = this.#manifestColumns.map((col) => {
 				const rawValue = (item as unknown as Record<string, unknown>)[col.field];
-				if (col.valueMinimalDisplayAlias) {
+				if (col.valueType) {
 					return {
 						columnAlias: col.field,
-						value: html`<umb-value-minimal-display
-							.alias=${col.valueMinimalDisplayAlias}
-							.value=${rawValue}></umb-value-minimal-display>`,
+						value: html`<umb-value-summary
+							.valueType=${col.valueType}
+							.value=${rawValue}></umb-value-summary>`,
 					};
 				}
 				return {
