@@ -70,7 +70,7 @@ export class ExampleTreeLocalDataSource extends UmbControllerBase implements Umb
 		// TODO: handle skip, take, foldersOnly.
 		console.log(args);
 		const rootItems: Array<ExampleTreeItemModel> = EXAMPLE_TREE_DATA.filter((item) => item.parent.unique === null);
-		return { data: { items: rootItems, total: rootItems.length } };
+		return { data: { items: rootItems, total: rootItems.length, totalBefore: 0, totalAfter: 0 } };
 	}
 
 	async getChildrenOf(args: UmbTreeChildrenOfRequestArgs) {
@@ -79,7 +79,7 @@ export class ExampleTreeLocalDataSource extends UmbControllerBase implements Umb
 			(item) => item.parent.unique === args.parent.unique && item.parent.entityType === args.parent.entityType,
 		);
 
-		return { data: { items: children, total: children.length } };
+		return { data: { items: children, total: children.length, totalBefore: 0, totalAfter: 0 } };
 	}
 
 	async getAncestorsOf(args: UmbTreeAncestorsOfRequestArgs) {
