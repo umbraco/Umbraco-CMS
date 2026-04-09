@@ -60,7 +60,7 @@ public class MoveElementFolderController : ElementFolderControllerBase
         // Check Move permission on source folder
         AuthorizationResult sourceAuthorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,
-            ElementFolderPermissionResource.WithKeys(ActionElementFolderMove.ActionLetter, id),
+            ElementContainerPermissionResource.WithKeys(ActionElementContainerMove.ActionLetter, id),
             AuthorizationPolicies.ElementFolderPermissionByResource);
 
         if (!sourceAuthorizationResult.Succeeded)
@@ -71,7 +71,7 @@ public class MoveElementFolderController : ElementFolderControllerBase
         // Check Create permission on target (where we're moving to)
         AuthorizationResult targetAuthorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,
-            ElementFolderPermissionResource.WithKeys(ActionElementFolderNew.ActionLetter, moveFolderRequestModel.Target?.Id),
+            ElementContainerPermissionResource.WithKeys(ActionElementContainerNew.ActionLetter, moveFolderRequestModel.Target?.Id),
             AuthorizationPolicies.ElementFolderPermissionByResource);
 
         if (!targetAuthorizationResult.Succeeded)

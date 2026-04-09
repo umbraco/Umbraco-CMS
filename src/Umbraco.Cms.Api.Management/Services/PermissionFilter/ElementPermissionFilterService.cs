@@ -30,7 +30,7 @@ internal sealed class ElementPermissionFilterService : PermissionFilterServiceBa
     protected override string BrowseActionLetter(IEntitySlim entity)
         => entity.NodeObjectType == Constants.ObjectTypes.Element
             ? ActionElementBrowse.ActionLetter
-            : ActionElementFolderBrowse.ActionLetter;
+            : ActionElementContainerBrowse.ActionLetter;
 
     /// <inheritdoc/>
     protected override Task<Attempt<IEnumerable<NodePermissions>, UserOperationStatus>> GetPermissionsAsync(

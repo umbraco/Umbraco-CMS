@@ -4,15 +4,15 @@
 namespace Umbraco.Cms.Core.Actions;
 
 /// <summary>
-///     This action is used as a security constraint that grants a user the ability to move element folders.
+///     This action is used as a security constraint that grants a user the ability to create new element containers.
 /// </summary>
-public class ActionElementFolderMove : IAction
+public class ActionElementContainerNew : IAction
 {
     /// <inheritdoc cref="IAction.ActionLetter" />
-    public const string ActionLetter = "Umb.ElementFolder.Move";
+    public const string ActionLetter = "Umb.ElementContainer.Create";
 
     /// <inheritdoc cref="IAction.ActionAlias" />
-    public const string ActionAlias = "elementfoldermove";
+    public const string ActionAlias = "elementcontainercreate";
 
     /// <inheritdoc/>
     public string Letter => ActionLetter;

@@ -243,11 +243,11 @@ internal sealed class DatabaseDataCreator
                 ActionElementUnpublish.ActionLetter,
                 ActionElementBrowse.ActionLetter,
                 ActionElementRollback.ActionLetter,
-                ActionElementFolderNew.ActionLetter,
-                ActionElementFolderUpdate.ActionLetter,
-                ActionElementFolderDelete.ActionLetter,
-                ActionElementFolderMove.ActionLetter,
-                ActionElementFolderBrowse.ActionLetter,
+                ActionElementContainerNew.ActionLetter,
+                ActionElementContainerUpdate.ActionLetter,
+                ActionElementContainerDelete.ActionLetter,
+                ActionElementContainerMove.ActionLetter,
+                ActionElementContainerBrowse.ActionLetter,
             ],
             [Constants.Security.EditorGroupKey] =
             [
@@ -278,11 +278,11 @@ internal sealed class DatabaseDataCreator
                 ActionElementUnpublish.ActionLetter,
                 ActionElementBrowse.ActionLetter,
                 ActionElementRollback.ActionLetter,
-                ActionElementFolderNew.ActionLetter,
-                ActionElementFolderUpdate.ActionLetter,
-                ActionElementFolderDelete.ActionLetter,
-                ActionElementFolderMove.ActionLetter,
-                ActionElementFolderBrowse.ActionLetter,
+                ActionElementContainerNew.ActionLetter,
+                ActionElementContainerUpdate.ActionLetter,
+                ActionElementContainerDelete.ActionLetter,
+                ActionElementContainerMove.ActionLetter,
+                ActionElementContainerBrowse.ActionLetter,
             ],
             [Constants.Security.WriterGroupKey] =
             [
@@ -296,9 +296,9 @@ internal sealed class DatabaseDataCreator
                 ActionElementNew.ActionLetter,
                 ActionElementUpdate.ActionLetter,
                 ActionElementBrowse.ActionLetter,
-                ActionElementFolderNew.ActionLetter,
-                ActionElementFolderUpdate.ActionLetter,
-                ActionElementFolderBrowse.ActionLetter,
+                ActionElementContainerNew.ActionLetter,
+                ActionElementContainerUpdate.ActionLetter,
+                ActionElementContainerBrowse.ActionLetter,
             ],
             [Constants.Security.TranslatorGroupKey] =
             [
@@ -308,8 +308,8 @@ internal sealed class DatabaseDataCreator
                 ActionDocumentPropertyWrite.ActionLetter,
                 ActionElementUpdate.ActionLetter,
                 ActionElementBrowse.ActionLetter,
-                ActionElementFolderUpdate.ActionLetter,
-                ActionElementFolderBrowse.ActionLetter,
+                ActionElementContainerUpdate.ActionLetter,
+                ActionElementContainerBrowse.ActionLetter,
             ],
         };
 

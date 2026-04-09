@@ -4,20 +4,20 @@
 namespace Umbraco.Cms.Core.Actions;
 
 /// <summary>
-///     This action is used as a security constraint that grants a user the ability to view element folders in a tree
+///     This action is used as a security constraint that grants a user the ability to view element containers in a tree
 ///     that has permissions applied to it.
 /// </summary>
 /// <remarks>
-///     This action should not be invoked. It is used as the minimum required permission to view element folders in the element tree.
-///     By granting a user this permission, the user is able to see the element folder in the tree but not edit it.
+///     This action should not be invoked. It is used as the minimum required permission to view element containers in the element tree.
+///     By granting a user this permission, the user is able to see the element container in the tree but not edit it.
 /// </remarks>
-public class ActionElementFolderBrowse : IAction
+public class ActionElementContainerBrowse : IAction
 {
     /// <inheritdoc cref="IAction.ActionLetter" />
-    public const string ActionLetter = "Umb.ElementFolder.Read";
+    public const string ActionLetter = "Umb.ElementContainer.Read";
 
     /// <inheritdoc cref="IAction.ActionAlias" />
-    public const string ActionAlias = "elementfolderbrowse";
+    public const string ActionAlias = "elementcontainerbrowse";
 
     /// <inheritdoc/>
     public string Letter => ActionLetter;

@@ -63,7 +63,7 @@ public class DeleteElementFolderRecycleBinController : ElementRecycleBinControll
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,
-            ElementFolderPermissionResource.RecycleBin(ActionElementFolderDelete.ActionLetter),
+            ElementContainerPermissionResource.RecycleBin(ActionElementContainerDelete.ActionLetter),
             AuthorizationPolicies.ElementFolderPermissionByResource);
 
         if (!authorizationResult.Succeeded)

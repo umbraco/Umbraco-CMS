@@ -228,7 +228,7 @@ public class ElementPermissionFilterServiceTests
         // Arrange
         var entities = CreateElementContainerEntities(3);
         SetupGetElementPermissionsAsync(
-            entities.Select(e => CreateNodePermissions(e.Key, ActionElementFolderBrowse.ActionLetter)));
+            entities.Select(e => CreateNodePermissions(e.Key, ActionElementContainerBrowse.ActionLetter)));
 
         // Act
         var (filteredEntities, totalItems) = await ElementPermissionFilterService
@@ -245,7 +245,7 @@ public class ElementPermissionFilterServiceTests
         // Arrange
         var entities = CreateEntities(10, i => i % 2 == 0 ? Constants.ObjectTypes.Element : Constants.ObjectTypes.ElementContainer);
         SetupGetElementPermissionsAsync(
-            entities.Select(e => CreateNodePermissions(e.Key, ActionElementBrowse.ActionLetter, ActionElementFolderBrowse.ActionLetter)));
+            entities.Select(e => CreateNodePermissions(e.Key, ActionElementBrowse.ActionLetter, ActionElementContainerBrowse.ActionLetter)));
 
         // Act
         var (filteredEntities, totalItems) = await ElementPermissionFilterService
@@ -263,7 +263,7 @@ public class ElementPermissionFilterServiceTests
         var entities = CreateEntities(10, i => i % 2 == 0 ? Constants.ObjectTypes.Element : Constants.ObjectTypes.ElementContainer);
         var count = 0;
         SetupGetElementPermissionsAsync(
-            entities.Select(e => CreateNodePermissions(e.Key, count++ % 5 == 0 ? [] : [ActionElementBrowse.ActionLetter, ActionElementFolderBrowse.ActionLetter])));
+            entities.Select(e => CreateNodePermissions(e.Key, count++ % 5 == 0 ? [] : [ActionElementBrowse.ActionLetter, ActionElementContainerBrowse.ActionLetter])));
 
         // Act
         var (filteredEntities, totalItems) = await ElementPermissionFilterService
@@ -281,7 +281,7 @@ public class ElementPermissionFilterServiceTests
         // Arrange
         var entities = CreateEntities(5, _ => isContainer ? Constants.ObjectTypes.ElementContainer : Constants.ObjectTypes.Element);
         SetupGetElementPermissionsAsync(
-            entities.Select(e => CreateNodePermissions(e.Key, isContainer ? ActionElementBrowse.ActionLetter : ActionElementFolderBrowse.ActionLetter)));
+            entities.Select(e => CreateNodePermissions(e.Key, isContainer ? ActionElementBrowse.ActionLetter : ActionElementContainerBrowse.ActionLetter)));
 
         // Act
         var (filteredEntities, totalItems) = await ElementPermissionFilterService

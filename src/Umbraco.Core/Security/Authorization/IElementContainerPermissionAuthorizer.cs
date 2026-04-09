@@ -4,28 +4,28 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Core.Security.Authorization;
 
 /// <summary>
-///     Authorizes element folder access.
+///     Authorizes element container access.
 /// </summary>
-public interface IElementFolderPermissionAuthorizer
+public interface IElementContainerPermissionAuthorizer
 {
     /// <summary>
-    ///     Authorizes whether the current user has access to the specified element folder item.
+    ///     Authorizes whether the current user has access to the specified element container item.
     /// </summary>
     /// <param name="currentUser">The current user.</param>
-    /// <param name="folderKey">The key of the element folder item to check for.</param>
+    /// <param name="containerKey">The key of the element container item to check for.</param>
     /// <param name="permissionToCheck">The permission to authorize.</param>
     /// <returns>Returns <c>true</c> if authorization is denied, otherwise <c>false</c>.</returns>
-    Task<bool> IsDeniedAsync(IUser currentUser, Guid folderKey, string permissionToCheck)
-        => IsDeniedAsync(currentUser, folderKey.Yield(), new HashSet<string> { permissionToCheck });
+    Task<bool> IsDeniedAsync(IUser currentUser, Guid containerKey, string permissionToCheck)
+        => IsDeniedAsync(currentUser, containerKey.Yield(), new HashSet<string> { permissionToCheck });
 
     /// <summary>
-    ///     Authorizes whether the current user has access to the specified element folder item(s).
+    ///     Authorizes whether the current user has access to the specified element container item(s).
     /// </summary>
     /// <param name="currentUser">The current user.</param>
-    /// <param name="folderKeys">The keys of the element folder items to check for.</param>
+    /// <param name="containerKeys">The keys of the element container items to check for.</param>
     /// <param name="permissionsToCheck">The collection of permissions to authorize.</param>
     /// <returns>Returns <c>true</c> if authorization is denied, otherwise <c>false</c>.</returns>
-    Task<bool> IsDeniedAsync(IUser currentUser, IEnumerable<Guid> folderKeys, ISet<string> permissionsToCheck);
+    Task<bool> IsDeniedAsync(IUser currentUser, IEnumerable<Guid> containerKeys, ISet<string> permissionsToCheck);
 
     /// <summary>
     ///     Authorizes whether the current user has access to the root item.

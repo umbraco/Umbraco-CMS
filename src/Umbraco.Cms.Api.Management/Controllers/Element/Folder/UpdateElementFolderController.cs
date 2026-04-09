@@ -51,7 +51,7 @@ public class UpdateElementFolderController : ElementFolderControllerBase
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,
-            ElementFolderPermissionResource.WithKeys(ActionElementFolderUpdate.ActionLetter, id),
+            ElementContainerPermissionResource.WithKeys(ActionElementContainerUpdate.ActionLetter, id),
             AuthorizationPolicies.ElementFolderPermissionByResource);
 
         if (!authorizationResult.Succeeded)

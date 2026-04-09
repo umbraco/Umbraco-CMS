@@ -50,7 +50,7 @@ public class CreateElementFolderController : ElementFolderControllerBase
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,
-            ElementFolderPermissionResource.WithKeys(ActionElementFolderNew.ActionLetter, createFolderRequestModel.Parent?.Id),
+            ElementContainerPermissionResource.WithKeys(ActionElementContainerNew.ActionLetter, createFolderRequestModel.Parent?.Id),
             AuthorizationPolicies.ElementFolderPermissionByResource);
 
         if (!authorizationResult.Succeeded)

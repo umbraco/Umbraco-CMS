@@ -26,7 +26,7 @@ internal static class BackOfficeAuthPolicyBuilderExtensions
         builder.Services.AddSingleton<IAuthorizationHandler, DenyLocalLoginHandler>();
         builder.Services.AddSingleton<IAuthorizationHandler, DictionaryPermissionHandler>();
         builder.Services.AddSingleton<IAuthorizationHandler, ElementPermissionHandler>();
-        builder.Services.AddSingleton<IAuthorizationHandler, ElementFolderPermissionHandler>();
+        builder.Services.AddSingleton<IAuthorizationHandler, ElementContainerPermissionHandler>();
         builder.Services.AddSingleton<IAuthorizationHandler, FeatureAuthorizeHandler>();
         builder.Services.AddSingleton<IAuthorizationHandler, MediaPermissionHandler>();
         builder.Services.AddSingleton<IAuthorizationHandler, UserGroupPermissionHandler>();
@@ -154,7 +154,7 @@ internal static class BackOfficeAuthPolicyBuilderExtensions
         options.AddPolicy(AuthorizationPolicies.ElementFolderPermissionByResource, policy =>
         {
             policy.AuthenticationSchemes.Add(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
-            policy.Requirements.Add(new ElementFolderPermissionRequirement());
+            policy.Requirements.Add(new ElementcontainerPermissionRequirement());
         });
 
         options.AddPolicy(AuthorizationPolicies.MediaPermissionByResource, policy =>

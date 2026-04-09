@@ -8,15 +8,15 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_18_0_0;
 
 /// <summary>
-/// Migration that adds dedicated element folder permissions to the admin user group.
+/// Migration that adds dedicated element container permissions to the admin user group.
 /// </summary>
-public class AddElementFolderPermissions : MigrationBase
+public class AddElementContainerPermissions : MigrationBase
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="AddElementFolderPermissions"/> class.
+    /// Initializes a new instance of the <see cref="AddElementContainerPermissions"/> class.
     /// </summary>
     /// <param name="context">The migration context.</param>
-    public AddElementFolderPermissions(IMigrationContext context)
+    public AddElementContainerPermissions(IMigrationContext context)
         : base(context)
     {
     }
@@ -24,30 +24,30 @@ public class AddElementFolderPermissions : MigrationBase
     /// <inheritdoc />
     protected override void Migrate()
     {
-        // Check if admin group already has any element folder permissions
+        // Check if admin group already has any element container permissions
         Sql<ISqlContext> existingPermissionsSql = Database.SqlContext.Sql()
             .Select<UserGroup2PermissionDto>()
             .From<UserGroup2PermissionDto>()
             .Where<UserGroup2PermissionDto>(x =>
                 x.UserGroupKey == Constants.Security.AdminGroupKey &&
-                x.Permission == ActionElementFolderBrowse.ActionLetter);
+                x.Permission == ActionElementContainerBrowse.ActionLetter);
 
         if (Database.Fetch<UserGroup2PermissionDto>(existingPermissionsSql).Count != 0)
         {
             return;
         }
 
-        // Add all element folder permissions for admin group
-        var elementFolderPermissions = new[]
+        // Add all element container permissions for admin group
+        var elementContainerPermissions = new[]
         {
-            ActionElementFolderNew.ActionLetter,
-            ActionElementFolderUpdate.ActionLetter,
-            ActionElementFolderDelete.ActionLetter,
-            ActionElementFolderMove.ActionLetter,
-            ActionElementFolderBrowse.ActionLetter,
+            ActionElementContainerNew.ActionLetter,
+            ActionElementContainerUpdate.ActionLetter,
+            ActionElementContainerDelete.ActionLetter,
+            ActionElementContainerMove.ActionLetter,
+            ActionElementContainerBrowse.ActionLetter,
         };
 
-        UserGroup2PermissionDto[] permissionDtos = elementFolderPermissions
+        UserGroup2PermissionDto[] permissionDtos = elementContainerPermissions
             .Select(permission => new UserGroup2PermissionDto
             {
                 UserGroupKey = Constants.Security.AdminGroupKey,

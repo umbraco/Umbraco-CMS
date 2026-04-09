@@ -59,7 +59,7 @@ public class OriginalParentElementFolderRecycleBinController : ElementRecycleBin
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,
-            ElementFolderPermissionResource.RecycleBin(ActionElementFolderBrowse.ActionLetter),
+            ElementContainerPermissionResource.RecycleBin(ActionElementContainerBrowse.ActionLetter),
             AuthorizationPolicies.ElementFolderPermissionByResource);
 
         if (!authorizationResult.Succeeded)

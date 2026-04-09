@@ -4,15 +4,15 @@
 namespace Umbraco.Cms.Core.Actions;
 
 /// <summary>
-///     This action is used as a security constraint that grants a user the ability to delete element folders.
+///     This action is used as a security constraint that grants a user the ability to update element containers.
 /// </summary>
-public class ActionElementFolderDelete : IAction
+public class ActionElementContainerUpdate : IAction
 {
     /// <inheritdoc cref="IAction.ActionLetter" />
-    public const string ActionLetter = "Umb.ElementFolder.Delete";
+    public const string ActionLetter = "Umb.ElementContainer.Update";
 
     /// <inheritdoc cref="IAction.ActionAlias" />
-    public const string ActionAlias = "elementfolderdelete";
+    public const string ActionAlias = "elementcontainerupdate";
 
     /// <inheritdoc/>
     public string Letter => ActionLetter;
