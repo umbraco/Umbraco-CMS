@@ -16,6 +16,13 @@ public class UserSettingsFactory : IUserSettingsFactory
 {
     private readonly ILocalizedTextService _localizedTextService;
     private readonly SecuritySettings _securitySettings;
+    
+    // TODO (V19): Remove obsolete constructors and the ActivatorUtilitiesConstructor attribute.
+    // Also update UmbracoBuilder where this service is registered using:
+    //   services.AddTransient<IUserSettingsFactory>(sp => ActivatorUtilities.CreateInstance<UserSettingsFactory>(sp));
+    // We do this to allow the ActivatorUtilitiesConstructor to be used (it's otherwise ignored by AddTransient).
+    // Revert it to:
+    //   services.AddTransient<IUserSettingsFactory, UserSettingsFactory>();    
 
     /// <summary>
     /// Initializes a new instance of the <see cref="UserSettingsFactory"/> class.
