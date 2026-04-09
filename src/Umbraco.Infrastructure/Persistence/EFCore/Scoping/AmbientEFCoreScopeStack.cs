@@ -13,6 +13,7 @@ public class AmbientEFCoreScopeStack<TDbContext> : IAmbientEFCoreScopeStack<TDbC
 {
     private static Lock _lock = new();
     private static AsyncLocal<ConcurrentStack<IEFCoreScope<TDbContext>>> _stack = new();
+    private IEFCoreScope<TDbContext>? _ambientScope;
 
     /// <inheritdoc />
     public IEFCoreScope<TDbContext>? AmbientScope
@@ -58,4 +59,6 @@ public class AmbientEFCoreScopeStack<TDbContext> : IAmbientEFCoreScopeStack<TDbC
             _stack.Value.Push(scope);
         }
     }
+
+    IEFCoreScope<TDbContext>? IEFCoreScopeAccessor<TDbContext>.AmbientScope => _ambientScope;
 }

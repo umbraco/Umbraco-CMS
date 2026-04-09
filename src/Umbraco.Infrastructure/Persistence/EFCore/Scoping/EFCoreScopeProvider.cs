@@ -247,10 +247,10 @@ internal sealed class EFCoreScopeProvider<TDbContext> : IEFCoreScopeProvider<TDb
     /// </summary>
     /// <param name="existingNPocoScope">The existing ambient NPoco scope.</param>
     /// <returns>The created bridge scope which is pushed onto the stack.</returns>
-    internal IEfCoreScope<TDbContext> CreateBridgeScope(IScope existingNPocoScope)
+    internal IEFCoreScope<TDbContext> CreateBridgeScope(IScope existingNPocoScope)
     {
         // Check if a bridge scope was already created for this scope context.
-        IEfCoreScope<TDbContext>? existing = _scopeProvider.Context!.GetEnlisted<IEfCoreScope<TDbContext>>(BridgeScopeContextKey);
+        IEFCoreScope<TDbContext>? existing = _scopeProvider.Context!.GetEnlisted<IEFCoreScope<TDbContext>>(BridgeScopeContextKey);
         if (existing is not null)
         {
             return existing;
@@ -270,10 +270,10 @@ internal sealed class EFCoreScopeProvider<TDbContext> : IEFCoreScopeProvider<TDb
             IsBridgeScope = true,
         };
 
-        _ambientEfCoreScopeStack.Push(bridgeScope);
+        _ambientEFCoreScopeStack.Push(bridgeScope);
         bridgeScope.Complete();
 
-        _scopeProvider.Context!.Enlist<IEfCoreScope<TDbContext>>(
+        _scopeProvider.Context!.Enlist<IEFCoreScope<TDbContext>>(
             BridgeScopeContextKey,
             () => bridgeScope,
             (_, scope) => scope?.Dispose());
@@ -299,7 +299,7 @@ internal sealed class EFCoreScopeProvider<TDbContext> : IEFCoreScopeProvider<TDb
         }
 
         _scopeContextDepth.Value++;
-        _ambientEfCoreScopeContextStack.Push(scopeContext);
+        _ambientEFCoreScopeContextStack.Push(scopeContext);
     }
 
     /// <summary>
@@ -308,7 +308,7 @@ internal sealed class EFCoreScopeProvider<TDbContext> : IEFCoreScopeProvider<TDb
     public void PopAmbientScopeContext()
     {
         _scopeContextDepth.Value--;
-        _ambientEfCoreScopeContextStack.Pop();
+        _ambientEFCoreScopeContextStack.Pop();
     }
 
     /// <inheritdoc />
@@ -322,9 +322,9 @@ internal sealed class EFCoreScopeProvider<TDbContext> : IEFCoreScopeProvider<TDb
     /// <inheritdoc />
     void CoreEFCoreScopeProvider.AttachScope(ICoreScope other)
     {
-        if (other is not IEfCoreScope<TDbContext> efCoreScope)
+        if (other is not IEFCoreScope<TDbContext> efCoreScope)
         {
-            throw new ArgumentException($"Scope must be an IEfCoreScope<{typeof(TDbContext).Name}>.", nameof(other));
+            throw new ArgumentException($"Scope must be an IEFCoreScope<{typeof(TDbContext).Name}>.", nameof(other));
         }
 
         AttachScope(efCoreScope);

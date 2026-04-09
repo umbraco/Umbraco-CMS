@@ -222,7 +222,7 @@ internal sealed class EFCoreScopeInfrastructureScopeTests : UmbracoIntegrationTe
 
             // Simulate an EF Core repository accessing the ambient scope via the accessor.
             // Since only an NPoco scope is active, the accessor auto-creates a bridge scope.
-            var bridgedScope = EfCoreScopeAccessor.AmbientScope;
+            var bridgedScope = EFCoreScopeAccessor.AmbientScope;
             Assert.IsNotNull(bridgedScope);
             Assert.IsTrue(((EFCoreScope<TestUmbracoDbContext>)bridgedScope!).IsBridgeScope);
 
@@ -249,7 +249,7 @@ internal sealed class EFCoreScopeInfrastructureScopeTests : UmbracoIntegrationTe
         }
 
         // Both rows committed
-        using (IEfCoreScope<TestUmbracoDbContext> scope = EfCoreScopeProvider.CreateScope())
+        using (IEFCoreScope<TestUmbracoDbContext> scope = EFCoreScopeProvider.CreateScope())
         {
             await scope.ExecuteWithContextAsync<Task>(async db =>
             {
@@ -282,7 +282,7 @@ internal sealed class EFCoreScopeInfrastructureScopeTests : UmbracoIntegrationTe
         using (IScope npocoScope = InfrastructureScopeProvider.CreateScope())
         {
             // Simulate EF Core repository access — triggers bridge scope creation
-            IEfCoreScope<TestUmbracoDbContext>? bridgeScope = EfCoreScopeAccessor.AmbientScope;
+            IEFCoreScope<TestUmbracoDbContext>? bridgeScope = EFCoreScopeAccessor.AmbientScope;
             Assert.IsNotNull(bridgeScope);
 
             await bridgeScope!.ExecuteWithContextAsync<Task>(async db =>
@@ -300,7 +300,7 @@ internal sealed class EFCoreScopeInfrastructureScopeTests : UmbracoIntegrationTe
         }
 
         // Verify rolled back
-        using (IEfCoreScope<TestUmbracoDbContext> scope = EfCoreScopeProvider.CreateScope())
+        using (IEFCoreScope<TestUmbracoDbContext> scope = EFCoreScopeProvider.CreateScope())
         {
             await scope.ExecuteWithContextAsync<Task>(async db =>
             {
