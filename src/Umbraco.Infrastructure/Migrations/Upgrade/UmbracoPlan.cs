@@ -197,12 +197,14 @@ public partial class UmbracoPlan : MigrationPlan
             return null;
         }
 
-        SemVersion? trackedVersion = null;
+        // InitialState is the final migration state of 9.4 (lowest supported upgrade).
+        var initialVersion = new SemVersion(9, 4, 0);
+        SemVersion? trackedVersion = initialVersion;
         var current = InitialState;
 
         if (string.Equals(current, state, StringComparison.OrdinalIgnoreCase))
         {
-            return trackedVersion;
+            return initialVersion;
         }
 
         while (Transitions.TryGetValue(current, out Transition? transition) && transition is not null)
