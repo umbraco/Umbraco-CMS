@@ -7,12 +7,16 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 export class UmbDocumentStartNodeValueSummaryElement extends UmbLitElement {
 	@property({ attribute: false })
 	set value(item: UmbDocumentItemModel | null | undefined) {
-		this.#resolver.setData(item ?? undefined);
+		this.#item = item;
+		if (item) {
+			this.#resolver.setData(item);
+		}
 	}
 
 	@state()
 	private _name?: string;
 
+	#item?: UmbDocumentItemModel | null;
 	#resolver = new UmbDocumentItemDataResolver(this);
 
 	constructor() {
@@ -21,7 +25,10 @@ export class UmbDocumentStartNodeValueSummaryElement extends UmbLitElement {
 	}
 
 	override render() {
-		return html`<span>${this._name ?? this.localize.term('content_contentRoot')}</span>`;
+		if (!this.#item) {
+			return html`<span>${this.localize.term('content_contentRoot')}</span>`;
+		}
+		return html`<span>${this._name}</span>`;
 	}
 }
 
