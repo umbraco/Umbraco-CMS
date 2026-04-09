@@ -55,6 +55,7 @@ public class SqlServerMigrationProvider : IMigrationProvider
             EFCoreMigration.AddKeyValueDto => typeof(Migrations.AddKeyValueDto),
             EFCoreMigration.SqliteCollation => null, // SQLite-only migration, no-op on SQL Server
             EFCoreMigration.AddLanguageDto => typeof(Migrations.AddLanguageDto),
+            EFCoreMigration.AddDomainDto => typeof(Migrations.AddDomainDto),
             _ => throw new ArgumentOutOfRangeException(nameof(migration), $@"Not expected migration value: {migration}")
         };
 }

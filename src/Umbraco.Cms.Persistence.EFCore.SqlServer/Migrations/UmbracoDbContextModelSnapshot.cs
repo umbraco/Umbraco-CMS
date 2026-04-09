@@ -268,43 +268,42 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                     b.ToTable("umbracoCacheInstruction", (string)null);
                 });
 
-            modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.DictionaryDto", b =>
+            modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.DomainDto", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .HasColumnName("pk");
+                        .HasColumnName("id");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Key")
+                    b.Property<int?>("DefaultLanguage")
+                        .HasColumnType("int")
+                        .HasColumnName("domainDefaultLanguage");
+
+                    b.Property<string>("DomainName")
                         .IsRequired()
-                        .HasMaxLength(450)
-                        .HasColumnType("nvarchar(450)")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("domainName");
+
+                    b.Property<Guid>("Key")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("key");
 
-                    b.Property<Guid?>("Parent")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("parent");
+                    b.Property<int?>("RootStructureId")
+                        .HasColumnType("int")
+                        .HasColumnName("domainRootStructureID");
 
-                    b.Property<Guid>("UniqueId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("id");
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("int")
+                        .HasColumnName("sortOrder");
 
                     b.HasKey("Id");
 
                     b.HasIndex("Key")
-                        .IsUnique()
-                        .HasDatabaseName("IX_cmsDictionary_key");
+                        .IsUnique();
 
-                    b.HasIndex("Parent")
-                        .HasDatabaseName("IX_cmsDictionary_Parent");
-
-                    b.HasIndex("UniqueId")
-                        .IsUnique()
-                        .HasDatabaseName("IX_cmsDictionary_id");
-
-                    b.ToTable("cmsDictionary", (string)null);
+                    b.ToTable("umbracoDomain", (string)null);
                 });
 
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.KeyValueDto", b =>
@@ -380,40 +379,6 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                     b.ToTable("umbracoLanguage", (string)null);
                 });
 
-            modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.LanguageTextDto", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("pk");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("LanguageId")
-                        .HasColumnType("int")
-                        .HasColumnName("languageId");
-
-                    b.Property<Guid>("UniqueId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("UniqueId");
-
-                    b.Property<string>("Value")
-                        .IsRequired()
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)")
-                        .HasColumnName("value");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UniqueId");
-
-                    b.HasIndex("LanguageId", "UniqueId")
-                        .IsUnique()
-                        .HasDatabaseName("IX_cmsLanguageText_languageId");
-
-                    b.ToTable("cmsLanguageText", (string)null);
-                });
-
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.LastSyncedDto", b =>
                 {
                     b.Property<string>("MachineId")
@@ -434,6 +399,96 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                     b.HasKey("MachineId");
 
                     b.ToTable("umbracoLastSynced", (string)null);
+                });
+
+            modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.NodeDto", b =>
+                {
+                    b.Property<int>("NodeId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("NodeId"));
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("createDate");
+
+                    b.Property<short>("Level")
+                        .HasColumnType("smallint")
+                        .HasColumnName("level");
+
+                    b.Property<Guid?>("NodeObjectType")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("nodeObjectType");
+
+                    b.Property<int>("ParentId")
+                        .HasColumnType("int")
+                        .HasColumnName("parentId");
+
+                    b.Property<string>("Path")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)")
+                        .HasColumnName("path");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("int")
+                        .HasColumnName("sortOrder");
+
+                    b.Property<string>("Text")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("text");
+
+                    b.Property<bool>("Trashed")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false)
+                        .HasColumnName("trashed");
+
+                    b.Property<Guid>("UniqueId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("uniqueId");
+
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int")
+                        .HasColumnName("nodeUser");
+
+                    b.HasKey("NodeId");
+
+                    b.HasIndex("Path")
+                        .HasDatabaseName("IX_umbracoNode_Path");
+
+                    b.HasIndex("Trashed")
+                        .HasDatabaseName("IX_umbracoNode_Trashed");
+
+                    b.HasIndex("UniqueId")
+                        .IsUnique()
+                        .HasDatabaseName("IX_umbracoNode_UniqueId");
+
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("UniqueId"), new[] { "ParentId", "Level", "Path", "SortOrder", "Trashed", "UserId", "Text", "CreateDate" });
+
+                    b.HasIndex("NodeObjectType", "Trashed")
+                        .HasDatabaseName("IX_umbracoNode_ObjectType");
+
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("NodeObjectType", "Trashed"), new[] { "UniqueId", "ParentId", "Level", "Path", "SortOrder", "UserId", "Text", "CreateDate" });
+
+                    b.HasIndex("ParentId", "NodeObjectType")
+                        .HasDatabaseName("IX_umbracoNode_parentId_nodeObjectType");
+
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("ParentId", "NodeObjectType"), new[] { "Trashed", "UserId", "Level", "Path", "SortOrder", "UniqueId", "Text", "CreateDate" });
+
+                    b.HasIndex("NodeObjectType", "Trashed", "SortOrder", "NodeId")
+                        .HasDatabaseName("IX_umbracoNode_ObjectType_trashed_sorted");
+
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("NodeObjectType", "Trashed", "SortOrder", "NodeId"), new[] { "UniqueId", "ParentId", "Level", "Path", "UserId", "Text", "CreateDate" });
+
+                    b.HasIndex("Level", "ParentId", "SortOrder", "NodeObjectType", "Trashed")
+                        .HasDatabaseName("IX_umbracoNode_Level");
+
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Level", "ParentId", "SortOrder", "NodeObjectType", "Trashed"), new[] { "UserId", "Path", "UniqueId", "CreateDate" });
+
+                    b.ToTable("umbracoNode", (string)null);
                 });
 
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.Webhook2ContentTypeKeysDto", b =>
@@ -548,17 +603,6 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                     b.Navigation("Authorization");
                 });
 
-            modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.DictionaryDto", b =>
-                {
-                    b.HasOne("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.DictionaryDto", "ParentEntry")
-                        .WithMany()
-                        .HasForeignKey("Parent")
-                        .HasPrincipalKey("UniqueId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.Navigation("ParentEntry");
-                });
-
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.LanguageDto", b =>
                 {
                     b.HasOne("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.LanguageDto", "FallbackLanguage")
@@ -569,24 +613,13 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                     b.Navigation("FallbackLanguage");
                 });
 
-            modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.LanguageTextDto", b =>
+            modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.NodeDto", b =>
                 {
-                    b.HasOne("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.LanguageDto", "Language")
+                    b.HasOne("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.NodeDto", null)
                         .WithMany()
-                        .HasForeignKey("LanguageId")
+                        .HasForeignKey("ParentId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
-
-                    b.HasOne("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.DictionaryDto", "DictionaryEntry")
-                        .WithMany("LanguageText")
-                        .HasForeignKey("UniqueId")
-                        .HasPrincipalKey("UniqueId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("DictionaryEntry");
-
-                    b.Navigation("Language");
                 });
 
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.Webhook2ContentTypeKeysDto", b =>
@@ -632,11 +665,6 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
             modelBuilder.Entity("OpenIddict.EntityFrameworkCore.Models.OpenIddictEntityFrameworkCoreAuthorization", b =>
                 {
                     b.Navigation("Tokens");
-                });
-
-            modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.DictionaryDto", b =>
-                {
-                    b.Navigation("LanguageText");
                 });
 
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.WebhookDto", b =>

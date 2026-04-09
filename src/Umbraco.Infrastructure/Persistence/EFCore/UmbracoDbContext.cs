@@ -56,6 +56,10 @@ public class UmbracoDbContext : DbContext
 
     public required DbSet<LanguageDto> Language { get; set; }
 
+    public required DbSet<DomainDto> Domains { get; set; }
+
+    public required DbSet<NodeDto> Nodes { get; set; }
+
     public required DbSet<DictionaryDto> DictionaryEntries { get; set; }
 
     private static DbContextOptions<UmbracoDbContext> ConfigureOptions(DbContextOptions<UmbracoDbContext> options)
