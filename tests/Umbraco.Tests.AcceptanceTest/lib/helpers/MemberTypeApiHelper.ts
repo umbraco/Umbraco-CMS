@@ -1,5 +1,6 @@
 ﻿import {ApiHelpers} from "./ApiHelpers";
 import {AliasHelper} from "./AliasHelper";
+import {ConstantHelper} from "./ConstantHelper";
 import {MemberTypeBuilder} from "../builders";
 
 export class MemberTypeApiHelper {
@@ -42,10 +43,7 @@ export class MemberTypeApiHelper {
         }
         return await this.delete(child.id);
       } else if (child.hasChildren) {
-        const result = await this.recurseChildren(name, child.id, toDelete);
-        if (result) {
-          return result;
-        }
+        return await this.recurseChildren(name, child.id, toDelete);
       }
     }
     return false;
@@ -73,7 +71,7 @@ export class MemberTypeApiHelper {
     if (memberType == null) {
       return;
     }
-    const response = await this.api.post(this.api.baseUrl + '/umbraco/management/api/v1/member-type', memberType);
+    const response = await this.api.post(this.api.baseUrl + ConstantHelper.apiEndpoints.memberType, memberType);
     return response.headers().location.split("v1/member-type/").pop();
   }
 
@@ -81,11 +79,11 @@ export class MemberTypeApiHelper {
     if (updatedMemberType == null) {
       return;
     }
-    return await this.api.put(this.api.baseUrl + '/umbraco/management/api/v1/member-type/' + id, updatedMemberType);
+    return await this.api.put(this.api.baseUrl + ConstantHelper.apiEndpoints.memberType + '/' + id, updatedMemberType);
   }
 
   async get(id: string) {
-    const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/member-type/' + id);
+    const response = await this.api.get(this.api.baseUrl + ConstantHelper.apiEndpoints.memberType + '/' + id);
     return await response.json();
   }
 
@@ -93,7 +91,7 @@ export class MemberTypeApiHelper {
     if (id == null) {
       return;
     }
-    const response = await this.api.delete(this.api.baseUrl + '/umbraco/management/api/v1/member-type/' + id);
+    const response = await this.api.delete(this.api.baseUrl + ConstantHelper.apiEndpoints.memberType + '/' + id);
     return response.status();
   }
 
@@ -114,9 +112,9 @@ export class MemberTypeApiHelper {
     for (const memberType of jsonMemberTypes.items) {
       if (memberType.name === name) {
         if (memberType.isFolder) {
-          return await this.getFolder(memberType.id);
+          return this.getFolder(memberType.id);
         }
-        return await this.get(memberType.id);
+        return this.get(memberType.id);
       } else if (memberType.isContainer || memberType.hasChildren) {
         const result = await this.recurseChildren(name, memberType.id, false);
         if (result) {
@@ -128,7 +126,7 @@ export class MemberTypeApiHelper {
   }
 
   async doesExist(id: string) {
-    const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/member-type/' + id);
+    const response = await this.api.get(this.api.baseUrl + ConstantHelper.apiEndpoints.memberType + '/' + id);
     return response.status() === 200;
   }
 
@@ -216,12 +214,12 @@ export class MemberTypeApiHelper {
 
   // Folder
   async getFolder(id: string) {
-    const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/member-type/folder/' + id);
+    const response = await this.api.get(this.api.baseUrl + ConstantHelper.apiEndpoints.memberTypeFolder + '/' + id);
     return await response.json();
   }
 
   async deleteFolder(id: string) {
-    return await this.api.delete(this.api.baseUrl + '/umbraco/management/api/v1/member-type/folder/' + id);
+    return await this.api.delete(this.api.baseUrl + ConstantHelper.apiEndpoints.memberTypeFolder + '/' + id);
   }
 
   async createFolder(name: string, parentId?: string) {
@@ -229,7 +227,7 @@ export class MemberTypeApiHelper {
       "name": name,
       "parent": parentId ? {"id": parentId} : null
     }
-    const response = await this.api.post(this.api.baseUrl + '/umbraco/management/api/v1/member-type/folder', folder);
+    const response = await this.api.post(this.api.baseUrl + ConstantHelper.apiEndpoints.memberTypeFolder, folder);
     return response.headers().location.split("/").pop();
   }
 
@@ -237,6 +235,6 @@ export class MemberTypeApiHelper {
     const folder = {
       "name": folderName
     }
-    return await this.api.put(this.api.baseUrl + '/umbraco/management/api/v1/member-type/folder/' + folderId, folder);
+    return await this.api.put(this.api.baseUrl + ConstantHelper.apiEndpoints.memberTypeFolder + '/' + folderId, folder);
   }
 }
