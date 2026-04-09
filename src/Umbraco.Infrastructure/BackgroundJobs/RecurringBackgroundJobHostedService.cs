@@ -79,7 +79,7 @@ public class RecurringBackgroundJobHostedService<TJob> : RecurringHostedServiceB
         _eventMessagesFactory = eventMessagesFactory;
         _job = job;
 
-        _job.PeriodChanged += (sender, e) => ChangePeriod(_job.Period);
+        _job.PeriodChanged += OnPeriodChanged;
     }
 
     /// <summary>
@@ -93,13 +93,13 @@ public class RecurringBackgroundJobHostedService<TJob> : RecurringHostedServiceB
     /// <param name="job">The recurring background job instance to be managed and executed by this service.</param>
     [Obsolete("Use the constructor accepting IEventMessagesFactory and TimeProvider instead. Scheduled for removal in Umbraco 19.")]
     public RecurringBackgroundJobHostedService(
-       IRuntimeState runtimeState,
-       ILogger<RecurringBackgroundJobHostedService<TJob>> logger,
-       IMainDom mainDom,
-       IServerRoleAccessor serverRoleAccessor,
-       IEventAggregator eventAggregator,
-       TJob job)
-       : this(runtimeState, logger, mainDom, serverRoleAccessor, eventAggregator, StaticServiceProvider.Instance.GetRequiredService<IEventMessagesFactory>(), job, TimeProvider.System)
+        IRuntimeState runtimeState,
+        ILogger<RecurringBackgroundJobHostedService<TJob>> logger,
+        IMainDom mainDom,
+        IServerRoleAccessor serverRoleAccessor,
+        IEventAggregator eventAggregator,
+        TJob job)
+        : this(runtimeState, logger, mainDom, serverRoleAccessor, eventAggregator, StaticServiceProvider.Instance.GetRequiredService<IEventMessagesFactory>(), job, TimeProvider.System)
     { }
 
     /// <inheritdoc />
@@ -176,4 +176,23 @@ public class RecurringBackgroundJobHostedService<TJob> : RecurringHostedServiceB
 
         await _eventAggregator.PublishAsync(new RecurringBackgroundJobStoppedNotification(_job, eventMessages).WithStateFrom(stoppingNotification), cancellationToken);
     }
+
+    /// <inheritdoc />
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            _job.PeriodChanged -= OnPeriodChanged;
+        }
+
+        base.Dispose(disposing);
+    }
+
+    /// <summary>
+    /// Handles the <see cref="IRecurringBackgroundJob.PeriodChanged" /> event by updating the base class period.
+    /// </summary>
+    /// <param name="sender">The sender.</param>
+    /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+    private void OnPeriodChanged(object? sender, EventArgs e)
+        => ChangePeriod(_job.Period);
 }
