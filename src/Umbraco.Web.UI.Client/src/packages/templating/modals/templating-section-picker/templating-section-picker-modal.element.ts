@@ -31,14 +31,13 @@ export class UmbTemplatingSectionPickerModalElement extends UmbModalBaseElement<
 		this.modalContext?.reject();
 	}
 
-	#onCardClick(type: TemplatingSectionType) {
-		this._pickedSection = this._pickedSection === type ? undefined : type;
+	#onSelected(type: TemplatingSectionType) {
+		this._pickedSection = type;
 	}
 
-	#onCardKeyDown(e: KeyboardEvent, type: TemplatingSectionType) {
-		if (e.key === 'Enter' || e.key === ' ') {
-			e.preventDefault();
-			this.#onCardClick(type);
+	#onDeselected(type: TemplatingSectionType) {
+		if (this._pickedSection === type) {
+			this._pickedSection = undefined;
 		}
 	}
 
@@ -91,8 +90,8 @@ export class UmbTemplatingSectionPickerModalElement extends UmbModalBaseElement<
 			selectOnly
 			.selected=${this._pickedSection === TemplatingSectionType.renderChildTemplate}
 			label=${this.localize.term('template_renderBody')}
-			@click=${() => this.#onCardClick(TemplatingSectionType.renderChildTemplate)}
-			@keydown=${(e: KeyboardEvent) => this.#onCardKeyDown(e, TemplatingSectionType.renderChildTemplate)}>
+			@selected=${() => this.#onSelected(TemplatingSectionType.renderChildTemplate)}
+			@deselected=${() => this.#onDeselected(TemplatingSectionType.renderChildTemplate)}>
 			<h3><umb-localize key="template_renderBody">Render Child Template</umb-localize></h3>
 			<p>
 				<umb-localize key="template_renderBodyDesc">
@@ -108,8 +107,8 @@ export class UmbTemplatingSectionPickerModalElement extends UmbModalBaseElement<
 			selectOnly
 			.selected=${this._pickedSection === TemplatingSectionType.renderANamedSection}
 			label=${this.localize.term('template_renderSection')}
-			@click=${() => this.#onCardClick(TemplatingSectionType.renderANamedSection)}
-			@keydown=${(e: KeyboardEvent) => this.#onCardKeyDown(e, TemplatingSectionType.renderANamedSection)}>
+			@selected=${() => this.#onSelected(TemplatingSectionType.renderANamedSection)}
+			@deselected=${() => this.#onDeselected(TemplatingSectionType.renderANamedSection)}>
 			<h3><umb-localize key="template_renderSection">Render a named section</umb-localize></h3>
 			<p>
 				<umb-localize key="template_renderSectionDesc">
@@ -119,7 +118,7 @@ export class UmbTemplatingSectionPickerModalElement extends UmbModalBaseElement<
 				</umb-localize>
 			</p>
 			${this._pickedSection === TemplatingSectionType.renderANamedSection
-				? html`<div class="section" @click=${(e: Event) => e.stopPropagation()} @keydown=${(e: Event) => e.stopPropagation()}>
+				? html`<div class="section">
 						<uui-label for="render-named-section-name" required>
 							<umb-localize key="template_sectionName">Section Name</umb-localize>
 						</uui-label>
@@ -144,8 +143,8 @@ export class UmbTemplatingSectionPickerModalElement extends UmbModalBaseElement<
 			selectOnly
 			.selected=${this._pickedSection === TemplatingSectionType.defineANamedSection}
 			label=${this.localize.term('template_defineSection')}
-			@click=${() => this.#onCardClick(TemplatingSectionType.defineANamedSection)}
-			@keydown=${(e: KeyboardEvent) => this.#onCardKeyDown(e, TemplatingSectionType.defineANamedSection)}>
+			@selected=${() => this.#onSelected(TemplatingSectionType.defineANamedSection)}
+			@deselected=${() => this.#onDeselected(TemplatingSectionType.defineANamedSection)}>
 			<h3><umb-localize key="template_defineSection">Define a named section</umb-localize></h3>
 			<p>
 				<umb-localize key="template_defineSectionDesc">
@@ -154,7 +153,7 @@ export class UmbTemplatingSectionPickerModalElement extends UmbModalBaseElement<
 				</umb-localize>
 			</p>
 			${this._pickedSection === TemplatingSectionType.defineANamedSection
-				? html`<div class="section" @click=${(e: Event) => e.stopPropagation()} @keydown=${(e: Event) => e.stopPropagation()}>
+				? html`<div class="section">
 						<uui-label for="define-named-section-name" required>
 							<umb-localize key="template_sectionName">Section Name</umb-localize>
 						</uui-label>
@@ -167,12 +166,6 @@ export class UmbTemplatingSectionPickerModalElement extends UmbModalBaseElement<
 	static override styles = [
 		UmbTextStyles,
 		css`
-			code {
-				background-color: var(--uui-color-surface-alt);
-				border: 1px solid var(--uui-color-border);
-				border-radius: var(--uui-border-radius);
-			}
-
 			#main {
 				display: grid;
 				grid-gap: var(--uui-size-space-5);
@@ -186,10 +179,6 @@ export class UmbTemplatingSectionPickerModalElement extends UmbModalBaseElement<
 				text-align: left;
 				display: block;
 				padding: var(--uui-size-space-4);
-			}
-
-			uui-button p {
-				margin-top: 0;
 			}
 
 			uui-input,

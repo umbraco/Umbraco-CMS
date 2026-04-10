@@ -32,14 +32,13 @@ export class UmbTemplatingItemPickerModalElement extends UmbModalBaseElement<
 		this.modalContext?.reject();
 	}
 
-	#onItemClick(type: CodeSnippetType) {
-		this._pickedItem = this._pickedItem === type ? undefined : type;
+	#onSelected(type: CodeSnippetType) {
+		this._pickedItem = type;
 	}
 
-	#onItemKeyDown(e: KeyboardEvent, type: CodeSnippetType) {
-		if (e.key === 'Enter' || e.key === ' ') {
-			e.preventDefault();
-			this.#onItemClick(type);
+	#onDeselected(type: CodeSnippetType) {
+		if (this._pickedItem === type) {
+			this._pickedItem = undefined;
 		}
 	}
 	
@@ -132,9 +131,8 @@ export class UmbTemplatingItemPickerModalElement extends UmbModalBaseElement<
 				selectable
 				selectOnly
 				.selected=${this._pickedItem === CodeSnippetType.pageField}
-				@click=${() => this.#onItemClick(CodeSnippetType.pageField)}
-				@keydown=${(e: KeyboardEvent) => this.#onItemKeyDown(e, CodeSnippetType.pageField)}
-				look="placeholder"
+				@selected=${() => this.#onSelected(CodeSnippetType.pageField)}
+				@deselected=${() => this.#onDeselected(CodeSnippetType.pageField)}
 				label=${this.localize.term('template_insert')}>
 				<h3><umb-localize key="template_insertPageField">Value</umb-localize></h3>
 				<p>
@@ -149,9 +147,8 @@ export class UmbTemplatingItemPickerModalElement extends UmbModalBaseElement<
 						selectable
 						selectOnly
 						.selected=${this._pickedItem === CodeSnippetType.partialView}
-						@click=${() => this.#onItemClick(CodeSnippetType.partialView)}
-						@keydown=${(e: KeyboardEvent) => this.#onItemKeyDown(e, CodeSnippetType.partialView)}
-						look="placeholder"
+						@selected=${() => this.#onSelected(CodeSnippetType.partialView)}
+						@deselected=${() => this.#onDeselected(CodeSnippetType.partialView)}
 						label=${this.localize.term('template_insert')}>
 						<h3><umb-localize key="template_insertPartialView">Partial view</umb-localize></h3>
 						<p>
@@ -166,9 +163,8 @@ export class UmbTemplatingItemPickerModalElement extends UmbModalBaseElement<
 				selectable
 				selectOnly
 				.selected=${this._pickedItem === CodeSnippetType.dictionaryItem}
-				@click=${() => this.#onItemClick(CodeSnippetType.dictionaryItem)}
-				@keydown=${(e: KeyboardEvent) => this.#onItemKeyDown(e, CodeSnippetType.dictionaryItem)}
-				look="placeholder"
+				@selected=${() => this.#onSelected(CodeSnippetType.dictionaryItem)}
+				@deselected=${() => this.#onDeselected(CodeSnippetType.dictionaryItem)}
 				label=${this.localize.term('template_insertDictionaryItem')}>
 				<h3><umb-localize key="template_insertDictionaryItem">Dictionary Item</umb-localize></h3>
 				<p>
@@ -192,9 +188,6 @@ export class UmbTemplatingItemPickerModalElement extends UmbModalBaseElement<
 				text-align: left;
 				display: block;
 				padding: var(--uui-size-space-4);
-			}
-			p {
-				text-align: left;
 			}
 		`,
 	];
