@@ -38,15 +38,60 @@
 		},
 		{
 			"name": "icon-application-error",
-			"file": "circle-x.svg"
+			"file": "circle-x.svg",
+			"keywords": [
+				"screen",
+				"window",
+				"404",
+				"500",
+				"page not found",
+				"server error",
+				"fault"
+			],
+			"groups": [
+				"action",
+				"window"
+			],
+			"related": [
+				"icon-application-window-alt",
+				"icon-application",
+				"icon-section"
+			]
 		},
 		{
 			"name": "icon-application-window-alt",
-			"file": "app-window.svg"
+			"file": "app-window.svg",
+			"keywords": [
+				"screen",
+				"window"
+			],
+			"groups": [
+				"action",
+				"window"
+			],
+			"related": [
+				"icon-application-window",
+				"icon-application-error",
+				"icon-section"
+			]
 		},
 		{
 			"name": "icon-application-window",
-			"file": "app-window.svg"
+			"file": "app-window.svg",
+			"keywords": [
+				"screen",
+				"window",
+				"sidebar"
+			],
+			"groups": [
+				"action",
+				"window"
+			],
+			"related": [
+				"icon-application-window-alt",
+				"icon-application-error",
+				"icon-section"
+			]
 		},
 		{
 			"name": "icon-arrivals",
@@ -58,11 +103,27 @@
 		},
 		{
 			"name": "icon-arrow-left",
-			"file": "arrow-left.svg"
+			"file": "arrow-left.svg",
+			"keywords": [
+				"arrows",
+				"back"
+			],
+			"groups": [
+				"action",
+				"arrow"
+			]
 		},
 		{
 			"name": "icon-arrow-right",
-			"file": "arrow-right.svg"
+			"file": "arrow-right.svg",
+			"keywords": [
+				"arrows",
+				"forwards"
+			],
+			"groups": [
+				"action",
+				"arrow"
+			]
 		},
 		{
 			"name": "icon-arrow-up",
@@ -70,7 +131,17 @@
 		},
 		{
 			"name": "icon-attachment",
-			"file": "paperclip.svg"
+			"file": "paperclip.svg",
+			"keywords": [
+				"paperclips",
+				"clippy",
+				"attachments",
+				"stationery"
+			],
+			"groups": [
+				"item",
+				"workplace"
+			]
 		},
 		{
 			"name": "icon-audio-lines",
@@ -78,7 +149,21 @@
 		},
 		{
 			"name": "icon-autofill",
-			"file": "text-cursor-input.svg"
+			"file": "text-cursor-input.svg",
+			"keywords": [
+				"edits",
+				"editing",
+				"editor",
+				"writes",
+				"writing",
+				"text boxes",
+				"textboxes",
+				"pencils",
+				"pens"
+			],
+			"groups": [
+				"action"
+			]
 		},
 		{
 			"name": "icon-award",
@@ -86,15 +171,58 @@
 		},
 		{
 			"name": "icon-axis-rotation-2",
-			"file": "refresh-ccw.svg"
+			"file": "refresh-ccw.svg",
+			"keywords": [
+				"refresh",
+				"recycle",
+				"sync"
+			],
+			"groups": [
+				"action",
+				"rotate"
+			],
+			"related": [
+				"icon-axis-rotation",
+				"icon-axis-rotation-3",
+				"icon-sync",
+				"icon-refresh"
+			]
 		},
 		{
 			"name": "icon-axis-rotation-3",
-			"file": "refresh-ccw.svg"
+			"file": "refresh-ccw.svg",
+			"keywords": [
+				"refresh",
+				"recycle"
+			],
+			"groups": [
+				"action",
+				"rotate"
+			],
+			"related": [
+				"icon-axis-rotation",
+				"icon-axis-rotation-2",
+				"icon-refresh"
+			]
 		},
 		{
 			"name": "icon-axis-rotation",
-			"file": "refresh-ccw.svg"
+			"file": "refresh-ccw.svg",
+			"keywords": [
+				"refresh",
+				"recycle",
+				"sync"
+			],
+			"groups": [
+				"action",
+				"rotate"
+			],
+			"related": [
+				"icon-sync",
+				"icon-axis-rotation-2",
+				"icon-axis-rotation-3",
+				"icon-refresh"
+			]
 		},
 		{
 			"name": "icon-backspace",
@@ -151,7 +279,15 @@
 		},
 		{
 			"name": "icon-bell",
-			"file": "bell.svg"
+			"file": "bell.svg",
+			"keywords": [
+				"bells",
+				"notifications",
+				"alerts"
+			],
+			"groups": [
+				"item"
+			]
 		},
 		{
 			"name": "icon-binarycode",
@@ -200,7 +336,16 @@
 		},
 		{
 			"name": "icon-book-alt-2",
-			"file": "book-open-text.svg"
+			"file": "book-open-text.svg",
+			"keywords": [
+				"books",
+				"reading",
+				"documentation",
+				"library"
+			],
+			"groups": [
+				"item"
+			]
 		},
 		{
 			"name": "icon-book-alt",
@@ -208,7 +353,20 @@
 		},
 		{
 			"name": "icon-book",
-			"file": "book-text.svg"
+			"file": "book-text.svg",
+			"keywords": [
+				"books",
+				"dictionary",
+				"dictionaries",
+				"thesaurus",
+				"thesauruses",
+				"library",
+				"authors",
+				"manuals"
+			],
+			"groups": [
+				"item"
+			]
 		},
 		{
 			"name": "icon-bookmark",
@@ -220,11 +378,32 @@
 		},
 		{
 			"name": "icon-box-alt",
-			"file": "archive.svg"
+			"file": "archive.svg",
+			"keywords": [
+				"filing",
+				"boxes",
+				"storage"
+			],
+			"groups": [
+				"item",
+				"workplace"
+			]
 		},
 		{
 			"name": "icon-box-open",
-			"file": "package-open.svg"
+			"file": "package-open.svg",
+			"keywords": [
+				"boxes",
+				"storage",
+				"dropbox",
+				"packages",
+				"parcels",
+				"packaging",
+				"opens"
+			],
+			"groups": [
+				"item"
+			]
 		},
 		{
 			"name": "icon-box",
@@ -260,11 +439,37 @@
 		},
 		{
 			"name": "icon-bug",
-			"file": "bug.svg"
+			"file": "bug.svg",
+			"keywords": [
+				"ladybugs",
+				"lady bugs",
+				"ladybirds",
+				"lady birds",
+				"bugs",
+				"insects",
+				"minibeasts",
+				"wildlife",
+				"issues"
+			],
+			"groups": [
+				"item",
+				"nature"
+			]
 		},
 		{
 			"name": "icon-bulleted-list",
-			"file": "list.svg"
+			"file": "list.svg",
+			"keywords": [
+				"bulletpoints",
+				"bullets",
+				"ul",
+				"lists"
+			],
+			"groups": [
+				"shape",
+				"box",
+				"layout"
+			]
 		},
 		{
 			"name": "icon-burn",
@@ -280,7 +485,15 @@
 		},
 		{
 			"name": "icon-calendar-alt",
-			"file": "calendar-days.svg"
+			"file": "calendar-days.svg",
+			"keywords": [
+				"dates",
+				"calendars",
+				"events"
+			],
+			"groups": [
+				"item"
+			]
 		},
 		{
 			"name": "icon-calendar",
@@ -293,7 +506,15 @@
 		},
 		{
 			"name": "icon-camera-roll",
-			"file": "videotape.svg"
+			"file": "videotape.svg",
+			"keywords": [
+				"films",
+				"cameras"
+			],
+			"groups": [
+				"item",
+				"tech"
+			]
 		},
 		{
 			"name": "icon-candy",
@@ -321,7 +542,18 @@
 		},
 		{
 			"name": "icon-chart",
-			"file": "chart-line.svg"
+			"file": "chart-line.svg",
+			"keywords": [
+				"lines",
+				"graphs",
+				"charts",
+				"stocks",
+				"finance",
+				"financial"
+			],
+			"groups": [
+				"data"
+			]
 		},
 		{
 			"name": "icon-chat-active",
@@ -437,7 +669,14 @@
 		},
 		{
 			"name": "icon-coin-dollar",
-			"file": "dollar-sign.svg"
+			"file": "dollar-sign.svg",
+			"keywords": [
+				"money",
+				"us",
+				"usa",
+				"paper",
+				"cash"
+			]
 		},
 		{
 			"name": "icon-coin-euro",
@@ -445,7 +684,12 @@
 		},
 		{
 			"name": "icon-coin-pound",
-			"file": "pound-sterling.svg"
+			"file": "pound-sterling.svg",
+			"keywords": [
+				"money",
+				"sterling",
+				"cash"
+			]
 		},
 		{
 			"name": "icon-coin-yen",
@@ -454,7 +698,11 @@
 		{
 			"name": "icon-coins-alt",
 			"file": "coins.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"money",
+				"cash"
+			]
 		},
 		{
 			"name": "icon-coins",
@@ -466,7 +714,21 @@
 		},
 		{
 			"name": "icon-colorpicker",
-			"file": "pipette.svg"
+			"file": "pipette.svg",
+			"keywords": [
+				"pipettes",
+				"eyedroppers",
+				"eye droppers",
+				"eye-droppers",
+				"color pickers",
+				"colour pickers",
+				"colorpickers",
+				"colourpickers",
+				"styles"
+			],
+			"groups": [
+				"item"
+			]
 		},
 		{
 			"name": "icon-columns",
@@ -506,11 +768,27 @@
 		},
 		{
 			"name": "icon-combination-lock-open",
-			"file": "lock-keyhole-open.svg"
+			"file": "lock-keyhole-open.svg",
+			"related": [
+				"icon-combination-lock",
+				"icon-unlocked",
+				"icon-keyhole",
+				"icon-old-key",
+				"icon-keychain",
+				"icon-key"
+			]
 		},
 		{
 			"name": "icon-combination-lock",
-			"file": "lock-keyhole.svg"
+			"file": "lock-keyhole.svg",
+			"related": [
+				"icon-combination-lock-open",
+				"icon-lock",
+				"icon-keyhole",
+				"icon-old-key",
+				"icon-keychain",
+				"icon-key"
+			]
 		},
 		{
 			"name": "icon-command",
@@ -518,7 +796,19 @@
 		},
 		{
 			"name": "icon-company",
-			"file": "building-2.svg"
+			"file": "building-2.svg",
+			"keywords": [
+				"city",
+				"cities",
+				"towns",
+				"companies",
+				"sky scrapers",
+				"buildings",
+				"offices"
+			],
+			"groups": [
+				"building"
+			]
 		},
 		{
 			"name": "icon-compress",
@@ -552,11 +842,51 @@
 		{
 			"name": "icon-credit-card-alt",
 			"file": "credit-card.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"payments",
+				"debit cards",
+				"credit cards",
+				"contactless",
+				"cashless",
+				"loyalty cards",
+				"store cards",
+				"business cards"
+			],
+			"groups": [
+				"item",
+				"money",
+				"card"
+			],
+			"related": [
+				"icon-credit-card",
+				"icon-credit-card-alt",
+				"icon-multiple-credit-cards"
+			]
 		},
 		{
 			"name": "icon-credit-card",
-			"file": "credit-card.svg"
+			"file": "credit-card.svg",
+			"keywords": [
+				"payments",
+				"debit cards",
+				"credit cards",
+				"contactless",
+				"cashless",
+				"loyalty cards",
+				"store cards",
+				"business cards"
+			],
+			"groups": [
+				"item",
+				"money",
+				"card"
+			],
+			"related": [
+				"icon-credit-card",
+				"icon-credit-card-alt",
+				"icon-multiple-credit-cards"
+			]
 		},
 		{
 			"name": "icon-crop",
@@ -623,11 +953,38 @@
 		},
 		{
 			"name": "icon-diagonal-arrow",
-			"file": "move-diagonal-2.svg"
+			"file": "move-diagonal-2.svg",
+			"keywords": [
+				"arrows",
+				"grows",
+				"expands",
+				"bigger"
+			],
+			"groups": [
+				"action",
+				"arrow"
+			],
+			"related": [
+				"icon-diagonal-arrow-alt"
+			]
 		},
 		{
 			"name": "icon-diamond",
-			"file": "gem.svg"
+			"file": "gem.svg",
+			"keywords": [
+				"diamonds",
+				"gems",
+				"special",
+				"expensive",
+				"commodities",
+				"commodity",
+				"precious",
+				"valuable"
+			],
+			"groups": [
+				"item",
+				"money"
+			]
 		},
 		{
 			"name": "icon-diamonds",
@@ -652,37 +1009,135 @@
 		},
 		{
 			"name": "icon-directions",
-			"file": "signpost-big.svg"
+			"file": "signpost-big.svg",
+			"keywords": [
+				"signs",
+				"signposts"
+			],
+			"groups": [
+				"item"
+			]
 		},
 		{
 			"name": "icon-disc",
-			"file": "disc-3.svg"
+			"file": "disc-3.svg",
+			"keywords": [
+				"cds",
+				"discs",
+				"disks",
+				"record",
+				"dvds",
+				"blurays",
+				"bluerays",
+				"blu-rays",
+				"blue rays",
+				"blue-rays",
+				"movies",
+				"films",
+				"music"
+			],
+			"groups": [
+				"item",
+				"tech"
+			]
 		},
 		{
 			"name": "icon-disk-image",
-			"file": "hard-drive.svg"
+			"file": "hard-drive.svg",
+			"keywords": [
+				"cds",
+				"dvds",
+				"disk",
+				"disc",
+				"drive"
+			],
+			"groups": [
+				"item",
+				"tech",
+				"hardware"
+			]
 		},
 		{
 			"name": "icon-display",
-			"file": "monitor.svg"
+			"file": "monitor.svg",
+			"keywords": [
+				"displays",
+				"monitors",
+				"screens",
+				"tvs",
+				"televisions",
+				"computers",
+				"pcs"
+			],
+			"groups": [
+				"item",
+				"tech",
+				"hardware"
+			]
 		},
 		{
 			"name": "icon-dna",
-			"file": "dna.svg"
+			"file": "dna.svg",
+			"keywords": [
+				"biology",
+				"id",
+				"identity"
+			],
+			"groups": [
+				"item",
+				"science"
+			]
 		},
 		{
 			"name": "icon-dock-connector",
-			"file": "cable.svg"
+			"file": "cable.svg",
+			"keywords": [
+				"usb",
+				"apple",
+				"30-pin",
+				"adaptor",
+				"cable",
+				"charges",
+				"charging"
+			],
+			"groups": [
+				"item",
+				"tech"
+			]
 		},
 		{
 			"name": "icon-document-dashed-line",
 			"file": "file.svg",
 			"missing": "TODO: Legacy until se have made a custom",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"documents",
+				"new",
+				"create",
+				"pages",
+				"papers",
+				"drafts"
+			],
+			"groups": [
+				"document"
+			]
 		},
 		{
 			"name": "icon-document",
-			"file": "file.svg"
+			"file": "file.svg",
+			"keywords": [
+				"papers",
+				"documents",
+				"pages",
+				"sheets",
+				"leaf",
+				"leaves",
+				"new",
+				"blank"
+			],
+			"groups": [
+				"item"
+			]
 		},
 		{
 			"name": "icon-documents",
@@ -700,7 +1155,19 @@
 		},
 		{
 			"name": "icon-door-open",
-			"file": "door-open.svg"
+			"file": "door-open.svg",
+			"keywords": [
+				"doors",
+				"entrances",
+				"exits",
+				"log out",
+				"logout",
+				"log in",
+				"login"
+			],
+			"groups": [
+				"item"
+			]
 		},
 		{
 			"name": "icon-download-alt",
@@ -725,7 +1192,18 @@
 		},
 		{
 			"name": "icon-edit",
-			"file": "pencil.svg"
+			"file": "pencil.svg",
+			"keywords": [
+				"pencils",
+				"pens",
+				"edits",
+				"writers",
+				"authors",
+				"writes"
+			],
+			"groups": [
+				"item"
+			]
 		},
 		{
 			"name": "icon-embed",
@@ -734,7 +1212,22 @@
 		{
 			"name": "icon-employee",
 			"file": "user.svg",
-			"legacy": true
+			"legacy": true,
+			"groups": [
+				"user",
+				"special"
+			],
+			"related": [
+				"icon-user",
+				"icon-user-female",
+				"icon-umb-users",
+				"icon-user-glasses",
+				"icon-client",
+				"icon-employee",
+				"icon-piracy",
+				"icon-theif",
+				"icon-operator"
+			]
 		},
 		{
 			"name": "icon-energy-saving-bulb",
@@ -746,11 +1239,34 @@
 		},
 		{
 			"name": "icon-equalizer",
-			"file": "sliders-horizontal.svg"
+			"file": "sliders-horizontal.svg",
+			"keywords": [
+				"equalizers",
+				"equaliser",
+				"equalisers",
+				"settings",
+				"options",
+				"configuration"
+			],
+			"groups": [
+				"item",
+				"tech",
+				"hardware"
+			]
 		},
 		{
 			"name": "icon-escape",
-			"file": "circle-arrow-out-up-left.svg"
+			"file": "circle-arrow-out-up-left.svg",
+			"keywords": [
+				"out",
+				"escapes",
+				"exits"
+			],
+			"groups": [
+				"action",
+				"arrow",
+				"circle"
+			]
 		},
 		{
 			"name": "icon-ethernet",
@@ -766,7 +1282,17 @@
 		},
 		{
 			"name": "icon-facebook-like",
-			"file": "thumbs-up.svg"
+			"file": "thumbs-up.svg",
+			"keywords": [
+				"thumbs up",
+				"likes",
+				"social media"
+			],
+			"groups": [
+				"item",
+				"hand",
+				"thumb"
+			]
 		},
 		{
 			"name": "icon-factory",
@@ -778,11 +1304,32 @@
 		},
 		{
 			"name": "icon-file-cabinet",
-			"file": "square-library.svg"
+			"file": "square-library.svg",
+			"keywords": [
+				"filing cabinets",
+				"offices",
+				"drawers",
+				"storage"
+			],
+			"groups": [
+				"item",
+				"workplace"
+			]
 		},
 		{
 			"name": "icon-files",
-			"file": "file-stack.svg"
+			"file": "file-stack.svg",
+			"keywords": [
+				"storage",
+				"filing",
+				"filing cabinets",
+				"repository",
+				"repositories"
+			],
+			"groups": [
+				"item",
+				"workplace"
+			]
 		},
 		{
 			"name": "icon-filter-arrows",
@@ -794,7 +1341,19 @@
 		},
 		{
 			"name": "icon-fingerprint",
-			"file": "fingerprint.svg"
+			"file": "fingerprint.svg",
+			"keywords": [
+				"fingerprints",
+				"crimes",
+				"criminals",
+				"id",
+				"identification",
+				"biometrics"
+			],
+			"groups": [
+				"item",
+				"security"
+			]
 		},
 		{
 			"name": "icon-fire",
@@ -827,11 +1386,32 @@
 		},
 		{
 			"name": "icon-folder",
-			"file": "folder.svg"
+			"file": "folder.svg",
+			"keywords": [
+				"folders",
+				"filing",
+				"documents",
+				"stroage"
+			],
+			"groups": [
+				"item",
+				"workplace"
+			]
 		},
 		{
 			"name": "icon-folders",
-			"file": "folders.svg"
+			"file": "folders.svg",
+			"keywords": [
+				"files",
+				"documents",
+				"storage",
+				"library",
+				"components"
+			],
+			"groups": [
+				"item",
+				"workplace"
+			]
 		},
 		{
 			"name": "icon-font",
@@ -877,7 +1457,19 @@
 		},
 		{
 			"name": "icon-gift",
-			"file": "gift.svg"
+			"file": "gift.svg",
+			"keywords": [
+				"gifts",
+				"presents",
+				"christmas",
+				"birthdays",
+				"giving",
+				"rewards",
+				"surprises"
+			],
+			"groups": [
+				"item"
+			]
 		},
 		{
 			"name": "icon-glasses",
@@ -910,7 +1502,16 @@
 		{
 			"name": "icon-globe-inverted-europe-africa",
 			"file": "globe.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"planets",
+				"earth",
+				"world"
+			],
+			"groups": [
+				"item",
+				"globe"
+			]
 		},
 		{
 			"name": "icon-globe",
@@ -918,7 +1519,20 @@
 		},
 		{
 			"name": "icon-gps",
-			"file": "satellite.svg"
+			"file": "satellite.svg",
+			"keywords": [
+				"satellites",
+				"space",
+				"satnav",
+				"sat nav",
+				"satellite navigation",
+				"gps"
+			],
+			"groups": [
+				"item",
+				"tech",
+				"hardware"
+			]
 		},
 		{
 			"name": "icon-graduate",
@@ -957,16 +1571,44 @@
 		},
 		{
 			"name": "icon-handshake",
-			"file": "heart-handshake.svg"
+			"file": "heart-handshake.svg",
+			"keywords": [
+				"meetings",
+				"handshakes",
+				"greetings",
+				"business"
+			],
+			"groups": [
+				"item",
+				"hand"
+			]
 		},
 		{
 			"name": "icon-handtool-alt",
 			"file": "hand.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"hands",
+				"grabs",
+				"cursor"
+			],
+			"groups": [
+				"item",
+				"hand"
+			]
 		},
 		{
 			"name": "icon-handtool",
-			"file": "hand.svg"
+			"file": "hand.svg",
+			"keywords": [
+				"hands",
+				"grabs",
+				"cursor"
+			],
+			"groups": [
+				"item",
+				"hand"
+			]
 		},
 		{
 			"name": "icon-hard-drive-alt",
@@ -1017,15 +1659,44 @@
 		},
 		{
 			"name": "icon-hearts",
-			"file": "heart.svg"
+			"file": "heart.svg",
+			"keywords": [
+				"love",
+				"care",
+				"caring",
+				"health"
+			],
+			"groups": [
+				"shape"
+			]
 		},
 		{
 			"name": "icon-height",
-			"file": "move-vertical.svg"
+			"file": "move-vertical.svg",
+			"keywords": [
+				"heights",
+				"distances",
+				"spaces",
+				"spacing",
+				"vertical"
+			],
+			"groups": [
+				"action",
+				"arrow",
+				"box"
+			]
 		},
 		{
 			"name": "icon-help-alt",
-			"file": "circle-help.svg"
+			"file": "circle-help.svg",
+			"keywords": [
+				"questions",
+				"question marks",
+				"assistance"
+			],
+			"groups": [
+				"misc"
+			]
 		},
 		{
 			"name": "icon-help",
@@ -1067,7 +1738,22 @@
 		},
 		{
 			"name": "icon-indent",
-			"file": "indent-increase.svg"
+			"file": "indent-increase.svg",
+			"keywords": [
+				"move",
+				"indentation",
+				"padding",
+				"spacing",
+				"margin"
+			],
+			"groups": [
+				"action",
+				"arrow",
+				"box"
+			],
+			"related": [
+				"icon-outdent"
+			]
 		},
 		{
 			"name": "icon-infinity",
@@ -1080,17 +1766,48 @@
 		{
 			"name": "icon-invoice",
 			"file": "scroll-text.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"bills",
+				"invoices",
+				"dollar",
+				"usd",
+				"currency"
+			],
+			"groups": [
+				"item",
+				"money",
+				"invoice"
+			]
 		},
 		{
 			"name": "icon-ipad",
 			"file": "tablet.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"tablet"
+			]
 		},
 		{
 			"name": "icon-iphone",
 			"file": "smartphone.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"mobiles",
+				"telephones",
+				"cellphones",
+				"cell phones"
+			],
+			"groups": [
+				"item",
+				"household",
+				"phone"
+			],
+			"related": [
+				"icon-old-phone",
+				"icon-phone",
+				"icon-phone-ring"
+			]
 		},
 		{
 			"name": "icon-italic",
@@ -1099,32 +1816,123 @@
 		{
 			"name": "icon-item-arrangement",
 			"file": "table-properties.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"rows",
+				"grid",
+				"boxes",
+				"squares",
+				"six",
+				"6"
+			],
+			"groups": [
+				"shape",
+				"box",
+				"layout"
+			],
+			"related": [
+				"icon-thumbnails",
+				"icon-grid",
+				"icon-stop",
+				"icon-thumbnail-list",
+				"icon-item-arrangement"
+			]
 		},
 		{
 			"name": "icon-junk",
-			"file": "archive-x.svg"
+			"file": "archive-x.svg",
+			"keywords": [
+				"trash",
+				"recycling bin",
+				"recycle bin",
+				"bin",
+				"reuses"
+			],
+			"groups": [
+				"item",
+				"household"
+			]
 		},
 		{
 			"name": "icon-key",
-			"file": "key-round.svg"
+			"file": "key-round.svg",
+			"keywords": [
+				"key",
+				"lock",
+				"house",
+				"home"
+			],
+			"groups": [
+				"item",
+				"security"
+			],
+			"related": [
+				"icon-lock",
+				"icon-keyhole",
+				"icon-old-key",
+				"icon-keychain",
+				"icon-key"
+			]
 		},
 		{
 			"name": "icon-keyboard",
-			"file": "keyboard.svg"
+			"file": "keyboard.svg",
+			"keywords": [
+				"type",
+				"inputs"
+			],
+			"groups": [
+				"item",
+				"tech",
+				"hardware"
+			]
 		},
 		{
 			"name": "icon-lab",
-			"file": "flask-conical.svg"
+			"file": "flask-conical.svg",
+			"keywords": [
+				"science",
+				"beaker",
+				"test tube",
+				"testtube"
+			],
+			"groups": [
+				"misc"
+			]
 		},
 		{
 			"name": "icon-laptop",
-			"file": "laptop.svg"
+			"file": "laptop.svg",
+			"keywords": [
+				"pc",
+				"computers",
+				"macbooks"
+			],
+			"groups": [
+				"item",
+				"tech",
+				"hardware"
+			]
 		},
 		{
 			"name": "icon-layers-alt",
 			"file": "layers.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"boxes",
+				"multiple",
+				"three",
+				"3",
+				"nested",
+				"restore"
+			],
+			"groups": [
+				"shape",
+				"box"
+			],
+			"related": [
+				"icon-screensharing"
+			]
 		},
 		{
 			"name": "icon-layers",
@@ -1132,80 +1940,270 @@
 		},
 		{
 			"name": "icon-layout",
-			"file": "layout-dashboard.svg"
+			"file": "layout-dashboard.svg",
+			"keywords": [
+				"media",
+				"newspaper",
+				"layouts",
+				"magazines"
+			],
+			"groups": [
+				"shape",
+				"box",
+				"layout"
+			]
 		},
 		{
 			"name": "icon-left-double-arrow",
-			"file": "chevrons-left.svg"
+			"file": "chevrons-left.svg",
+			"keywords": [
+				"chevrons",
+				"arrows",
+				"backwards"
+			],
+			"groups": [
+				"action",
+				"arrow"
+			]
 		},
 		{
 			"name": "icon-legal",
-			"file": "scale.svg"
+			"file": "scale.svg",
+			"keywords": [
+				"scales",
+				"weight",
+				"mass",
+				"compare",
+				"balance"
+			],
+			"groups": [
+				"item",
+				"household"
+			],
+			"related": [
+				"icon-weight"
+			]
 		},
 		{
 			"name": "icon-lense",
 			"file": "focus.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"circles",
+				"orbits",
+				"planets",
+				"eyeballs",
+				"target"
+			],
+			"groups": [
+				"item"
+			]
 		},
 		{
 			"name": "icon-library",
-			"file": "landmark.svg"
+			"file": "landmark.svg",
+			"keywords": [
+				"temple",
+				"institution",
+				"government"
+			],
+			"groups": [
+				"building"
+			],
+			"related": [
+				"icon-school"
+			]
 		},
 		{
 			"name": "icon-light-down",
-			"file": "sun-moon.svg"
+			"file": "sun-moon.svg",
+			"keywords": [
+				"brightness"
+			]
 		},
 		{
 			"name": "icon-light-up",
-			"file": "sun.svg"
+			"file": "sun.svg",
+			"keywords": [
+				"brightness"
+			]
 		},
 		{
 			"name": "icon-lightbulb-active",
-			"file": "lightbulb.svg"
+			"file": "lightbulb.svg",
+			"keywords": [
+				"on",
+				"switch",
+				"lamps",
+				"bulbs",
+				"lights"
+			],
+			"groups": [
+				"item",
+				"household"
+			]
 		},
 		{
 			"name": "icon-lightbulb",
 			"file": "lightbulb-off.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"off",
+				"lights",
+				"bulbs",
+				"lamps"
+			],
+			"groups": [
+				"item",
+				"household"
+			]
 		},
 		{
 			"name": "icon-lightning",
-			"file": "cloud-lightning.svg"
+			"file": "cloud-lightning.svg",
+			"keywords": [
+				"storms",
+				"electricity"
+			],
+			"groups": [
+				"weather",
+				"cloud"
+			]
 		},
 		{
 			"name": "icon-link",
-			"file": "link.svg"
+			"file": "link.svg",
+			"keywords": [
+				"chains",
+				"links",
+				"hyperlinks"
+			],
+			"groups": [
+				"item",
+				"tech"
+			]
 		},
 		{
 			"name": "icon-list",
-			"file": "align-justify.svg"
+			"file": "align-justify.svg",
+			"keywords": [
+				"menus",
+				"hamburgers",
+				"three",
+				"3",
+				"catalogue",
+				"catalog",
+				"inventory",
+				"record"
+			],
+			"groups": [
+				"shape",
+				"box",
+				"layout"
+			],
+			"related": [
+				"icon-thumbnails",
+				"icon-thumbnails-small",
+				"icon-thumbnail-list",
+				"icon-umb-contour"
+			]
 		},
 		{
 			"name": "icon-load",
 			"file": "arrow-down-to-line.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"downloads"
+			],
+			"groups": [
+				"action",
+				"arrow"
+			],
+			"related": [
+				"icon-navigation-bottom"
+			]
 		},
 		{
 			"name": "icon-loading",
 			"file": "watch.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"watches",
+				"clocks",
+				"time"
+			],
+			"groups": [
+				"item",
+				"clock"
+			]
 		},
 		{
 			"name": "icon-locate",
-			"file": "locate.svg"
+			"file": "locate.svg",
+			"keywords": [
+				"crosshairs",
+				"gps",
+				"location"
+			],
+			"groups": [
+				"space"
+			]
 		},
 		{
 			"name": "icon-location-near-me",
 			"file": "map-pinned.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"geolocation",
+				"maps",
+				"pins"
+			],
+			"groups": [
+				"misc"
+			],
+			"related": [
+				"icon-pin-location",
+				"icon-location-nearby"
+			]
 		},
 		{
 			"name": "icon-location-nearby",
-			"file": "map-pinned.svg"
+			"file": "map-pinned.svg",
+			"keywords": [
+				"geolocation",
+				"maps",
+				"pins"
+			],
+			"groups": [
+				"misc"
+			],
+			"related": [
+				"icon-pin-location",
+				"icon-location-near-me"
+			]
 		},
 		{
 			"name": "icon-lock",
-			"file": "lock.svg"
+			"file": "lock.svg",
+			"keywords": [
+				"padlocks",
+				"locks",
+				"security",
+				"secret",
+				"locked"
+			],
+			"groups": [
+				"item",
+				"security"
+			],
+			"related": [
+				"icon-lock",
+				"icon-combination-lock",
+				"icon-keyhole",
+				"icon-old-key",
+				"icon-keychain",
+				"icon-key"
+			]
 		},
 		{
 			"name": "icon-log-out",
@@ -1240,58 +2238,198 @@
 		},
 		{
 			"name": "icon-map-marker",
-			"file": "map-pin.svg"
+			"file": "map-pin.svg",
+			"keywords": [
+				"pins",
+				"maps",
+				"markers",
+				"locations",
+				"lollipop",
+				"lolly"
+			],
+			"groups": [
+				"misc"
+			]
 		},
 		{
 			"name": "icon-map",
-			"file": "map.svg"
+			"file": "map.svg",
+			"keywords": [
+				"partitions",
+				"screens",
+				"leaflets",
+				"flyers"
+			],
+			"groups": [
+				"item",
+				"globe"
+			]
 		},
 		{
 			"name": "icon-medal",
-			"file": "medal.svg"
+			"file": "medal.svg",
+			"keywords": [
+				"awards",
+				"prizes",
+				"stars",
+				"heroes"
+			],
+			"groups": [
+				"item",
+				"award"
+			],
+			"related": [
+				"icon-diploma",
+				"icon-diploma-alt",
+				"icon-trophy"
+			]
 		},
 		{
 			"name": "icon-medical-emergency",
-			"file": "heart-pulse.svg"
+			"file": "heart-pulse.svg",
+			"keywords": [
+				"medicine",
+				"hospitals",
+				"ambulances",
+				"health"
+			],
+			"groups": [
+				"logo"
+			],
+			"related": [
+				"icon-medicine"
+			]
 		},
 		{
 			"name": "icon-medicine",
-			"file": "pill.svg"
+			"file": "pill.svg",
+			"keywords": [
+				"bottles",
+				"pills",
+				"medicines"
+			],
+			"groups": [
+				"item",
+				"household"
+			],
+			"related": [
+				"icon-medical-emergency"
+			]
 		},
 		{
 			"name": "icon-meeting",
 			"file": "presentation.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"boardroom",
+				"table",
+				"dinner"
+			],
+			"groups": [
+				"user"
+			]
 		},
 		{
 			"name": "icon-megaphone",
-			"file": "megaphone.svg"
+			"file": "megaphone.svg",
+			"keywords": [
+				"announcements"
+			],
+			"groups": [
+				"item",
+				"household"
+			]
 		},
 		{
 			"name": "icon-merge",
-			"file": "merge.svg"
+			"file": "merge.svg",
+			"groups": [
+				"action",
+				"arrow"
+			]
 		},
 		{
 			"name": "icon-message-open",
-			"file": "mail-open.svg"
+			"file": "mail-open.svg",
+			"keywords": [
+				"emails",
+				"envelopes",
+				"letters",
+				"sms"
+			],
+			"groups": [
+				"item",
+				"household"
+			],
+			"related": [
+				"icon-message-unopened",
+				"icon-message"
+			]
 		},
 		{
 			"name": "icon-message-unopened",
 			"file": "mail.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"emails",
+				"envelopes",
+				"letters",
+				"sms"
+			],
+			"groups": [
+				"item",
+				"household"
+			],
+			"related": [
+				"icon-message",
+				"icon-message-open"
+			]
 		},
 		{
 			"name": "icon-message",
-			"file": "mail.svg"
+			"file": "mail.svg",
+			"keywords": [
+				"emails",
+				"envelopes",
+				"letters",
+				"sms"
+			],
+			"groups": [
+				"item",
+				"household"
+			],
+			"related": [
+				"icon-message-unopened",
+				"icon-message-open"
+			]
 		},
 		{
 			"name": "icon-microscope",
-			"file": "microscope.svg"
+			"file": "microscope.svg",
+			"keywords": [
+				"science",
+				"lab"
+			],
+			"groups": [
+				"item"
+			],
+			"related": [
+				"icon-lab"
+			]
 		},
 		{
 			"name": "icon-mindmap",
 			"file": "network.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"chart",
+				"flow chart",
+				"diagram",
+				"decision tree"
+			],
+			"groups": [
+				"data"
+			]
 		},
 		{
 			"name": "icon-mobile",
@@ -1299,11 +2437,32 @@
 		},
 		{
 			"name": "icon-mountain",
-			"file": "mountain-snow.svg"
+			"file": "mountain-snow.svg",
+			"keywords": [
+				"landscape",
+				"geography",
+				"nature",
+				"natural feature"
+			],
+			"groups": [
+				"item",
+				"nature"
+			]
 		},
 		{
 			"name": "icon-mouse-cursor",
-			"file": "mouse-pointer.svg"
+			"file": "mouse-pointer.svg",
+			"keywords": [
+				"cursors",
+				"pointers",
+				"arrows",
+				"mouse",
+				"mice"
+			],
+			"groups": [
+				"action",
+				"arrow"
+			]
 		},
 		{
 			"name": "icon-mouse",
@@ -1311,137 +2470,441 @@
 		},
 		{
 			"name": "icon-movie-alt",
-			"file": "clapperboard.svg"
+			"file": "clapperboard.svg",
+			"keywords": [
+				"movies",
+				"films",
+				"hollywood",
+				"action",
+				"clapperboards",
+				"filmmaking",
+				"directors",
+				"crew"
+			],
+			"groups": [
+				"item"
+			]
 		},
 		{
 			"name": "icon-movie",
-			"file": "film.svg"
+			"file": "film.svg",
+			"keywords": [
+				"movies",
+				"films",
+				"reels"
+			],
+			"groups": [
+				"item"
+			]
 		},
 		{
 			"name": "icon-multiple-credit-cards",
-			"file": "wallet-cards.svg"
+			"file": "wallet-cards.svg",
+			"keywords": [
+				"payments",
+				"debit cards",
+				"credit cards",
+				"contactless",
+				"cashless",
+				"loyalty cards",
+				"store cards",
+				"business cards"
+			],
+			"groups": [
+				"item",
+				"money",
+				"card"
+			],
+			"related": [
+				"icon-credit-card",
+				"icon-credit-card-alt",
+				"icon-multiple-credit-cards"
+			]
 		},
 		{
 			"name": "icon-multiple-windows",
-			"file": "book-copy.svg"
+			"file": "book-copy.svg",
+			"keywords": [
+				"stacked",
+				"minimize",
+				"restore"
+			],
+			"groups": [
+				"action",
+				"window"
+			]
 		},
 		{
 			"name": "icon-music",
-			"file": "music.svg"
+			"file": "music.svg",
+			"keywords": [
+				"notes",
+				"musical",
+				"sounds"
+			],
+			"groups": [
+				"item",
+				"media"
+			]
 		},
 		{
 			"name": "icon-name-badge",
 			"file": "contact.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"brooch",
+				"sheriff",
+				"sticker"
+			]
 		},
 		{
 			"name": "icon-navigation-bottom",
 			"file": "arrow-down-to-line.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"last",
+				"end",
+				"arrows",
+				"triangles"
+			],
+			"groups": [
+				"action",
+				"arrow"
+			],
+			"related": [
+				"icon-page-up",
+				"icon-page-down",
+				"icon-navigation-top"
+			]
 		},
 		{
 			"name": "icon-navigation-down",
 			"file": "chevron-down.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"arrows",
+				"triangles"
+			],
+			"groups": [
+				"action",
+				"arrow"
+			]
 		},
 		{
 			"name": "icon-navigation-first",
 			"file": "arrow-left-to-line.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"start",
+				"beginning"
+			],
+			"groups": [
+				"action",
+				"arrow"
+			]
 		},
 		{
 			"name": "icon-navigation-horizontal",
 			"file": "move-horizontal.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"arrows",
+				"lengths",
+				"widths",
+				"measure"
+			],
+			"groups": [
+				"action",
+				"arrow"
+			]
 		},
 		{
 			"name": "icon-navigation-last",
 			"file": "arrow-right-to-line.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"end",
+				"finish"
+			],
+			"groups": [
+				"action",
+				"arrow"
+			]
 		},
 		{
 			"name": "icon-navigation-left",
 			"file": "chevron-left.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"arrows",
+				"triangles"
+			],
+			"groups": [
+				"action",
+				"arrow"
+			]
 		},
 		{
 			"name": "icon-navigation-right",
 			"file": "chevron-right.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"arrows",
+				"triangles"
+			],
+			"groups": [
+				"action",
+				"arrow"
+			],
+			"related": [
+				"icon-navigation-up"
+			]
 		},
 		{
 			"name": "icon-navigation-road",
 			"file": "move-vertical.svg",
-			"legacy": true
+			"legacy": true,
+			"groups": [
+				"action",
+				"arrow"
+			]
 		},
 		{
 			"name": "icon-navigation-top",
 			"file": "arrow-up-to-line.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"start",
+				"top",
+				"arrows",
+				"triangles"
+			],
+			"groups": [
+				"action",
+				"arrow",
+				"box"
+			],
+			"related": [
+				"icon-page-up",
+				"icon-page-down",
+				"icon-navigation-bottom"
+			]
 		},
 		{
 			"name": "icon-navigation-up",
 			"file": "chevron-up.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"triangles",
+				"arrows"
+			],
+			"groups": [
+				"action",
+				"arrow"
+			],
+			"related": [
+				"icon-navigation-right"
+			]
 		},
 		{
 			"name": "icon-navigation-vertical",
 			"file": "move-vertical.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"up",
+				"down",
+				"scroll"
+			],
+			"groups": [
+				"action",
+				"arrow"
+			]
 		},
 		{
 			"name": "icon-navigation",
 			"file": "move.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"move",
+				"drag and drop",
+				"drag & drop",
+				"pan"
+			],
+			"groups": [
+				"action",
+				"arrow"
+			]
 		},
 		{
 			"name": "icon-navigational-arrow",
-			"file": "navigation-2.svg"
+			"file": "navigation-2.svg",
+			"keywords": [
+				"satnav",
+				"sat nav",
+				"satellite navigation",
+				"gps"
+			],
+			"groups": [
+				"action",
+				"arrow"
+			]
 		},
 		{
 			"name": "icon-network-alt",
-			"file": "network.svg"
+			"file": "network.svg",
+			"keywords": [
+				"graphs",
+				"charts",
+				"networks",
+				"trees",
+				"hierarchy",
+				"flowcharts",
+				"flow charts",
+				"branches",
+				"paths",
+				"forks"
+			],
+			"groups": [
+				"data"
+			],
+			"related": [
+				"icon-mindmap"
+			]
 		},
 		{
 			"name": "icon-newspaper-alt",
 			"file": "newspaper.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"blogs",
+				"articles",
+				"journalism",
+				"journalist",
+				"press",
+				"media",
+				"magazine"
+			],
+			"groups": [
+				"item",
+				"household"
+			]
 		},
 		{
 			"name": "icon-newspaper",
-			"file": "newspaper.svg"
+			"file": "newspaper.svg",
+			"keywords": [
+				"blogs",
+				"articles",
+				"journalism",
+				"journalist",
+				"press",
+				"media",
+				"magazine"
+			],
+			"groups": [
+				"item",
+				"household"
+			]
 		},
 		{
 			"name": "icon-next-media",
 			"file": "fast-forward.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"fast forward",
+				"skip"
+			],
+			"groups": [
+				"item",
+				"media"
+			],
+			"related": [
+				"icon-previous-media"
+			]
 		},
 		{
 			"name": "icon-next",
-			"file": "skip-forward.svg"
+			"file": "skip-forward.svg",
+			"keywords": [
+				"right",
+				"triangles",
+				"forwards"
+			],
+			"groups": [
+				"action",
+				"arrow"
+			],
+			"related": [
+				"icon-play"
+			]
 		},
 		{
 			"name": "icon-nodes",
 			"file": "waypoints.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"git",
+				"line",
+				"graph"
+			],
+			"groups": [
+				"data"
+			]
 		},
 		{
 			"name": "icon-notepad-alt",
 			"file": "file-text.svg",
-			"legacy": true
+			"legacy": true,
+			"groups": [
+				"item",
+				"workplace"
+			]
 		},
 		{
 			"name": "icon-notepad",
-			"file": "file-text.svg"
+			"file": "file-text.svg",
+			"keywords": [
+				"notebook",
+				"text",
+				"txt"
+			],
+			"groups": [
+				"item",
+				"workplace"
+			]
 		},
 		{
 			"name": "icon-old-key",
-			"file": "key.svg"
+			"file": "key.svg",
+			"groups": [
+				"item",
+				"security"
+			],
+			"related": [
+				"icon-lock",
+				"icon-keyhole",
+				"icon-old-key",
+				"icon-keychain",
+				"icon-key"
+			]
 		},
 		{
 			"name": "icon-old-phone",
 			"file": "phone.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"telephones"
+			],
+			"groups": [
+				"item",
+				"household",
+				"phone"
+			],
+			"related": [
+				"icon-iphone",
+				"icon-phone",
+				"icon-phone-ring"
+			]
 		},
 		{
 			"name": "icon-omega",
@@ -1449,11 +2912,44 @@
 		},
 		{
 			"name": "icon-operator",
-			"file": "user-cog.svg"
+			"file": "user-cog.svg",
+			"keywords": [
+				"microphones",
+				"users",
+				"people",
+				"person",
+				"support",
+				"phonecalls",
+				"call centres",
+				"call centers"
+			],
+			"groups": [
+				"user",
+				"special"
+			],
+			"related": [
+				"icon-user",
+				"icon-user-female",
+				"icon-umb-users",
+				"icon-user-glasses",
+				"icon-client",
+				"icon-employee",
+				"icon-piracy",
+				"icon-theif",
+				"icon-operator"
+			]
 		},
 		{
 			"name": "icon-ordered-list",
-			"file": "list-ordered.svg"
+			"file": "list-ordered.svg",
+			"keywords": [
+				"numbered list",
+				"numbers"
+			],
+			"groups": [
+				"action",
+				"format"
+			]
 		},
 		{
 			"name": "icon-origami",
@@ -1461,70 +2957,254 @@
 		},
 		{
 			"name": "icon-out",
-			"file": "external-link.svg"
+			"file": "external-link.svg",
+			"keywords": [
+				"export",
+				"external",
+				"arrows"
+			],
+			"groups": [
+				"action",
+				"arrow",
+				"box"
+			]
 		},
 		{
 			"name": "icon-outbox",
 			"file": "archive-restore.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"out tray",
+				"trays"
+			],
+			"groups": [
+				"item",
+				"workplace"
+			]
 		},
 		{
 			"name": "icon-outdent",
-			"file": "indent-decrease.svg"
+			"file": "indent-decrease.svg",
+			"keywords": [
+				"move",
+				"indentation",
+				"padding",
+				"spacing",
+				"margin"
+			],
+			"groups": [
+				"action",
+				"arrow",
+				"box"
+			],
+			"related": [
+				"icon-indent"
+			]
 		},
 		{
 			"name": "icon-page-add",
-			"file": "file-plus-2.svg"
+			"file": "file-plus-2.svg",
+			"keywords": [
+				"new",
+				"create",
+				"documents",
+				"pages"
+			],
+			"groups": [
+				"document"
+			]
 		},
 		{
 			"name": "icon-page-down",
-			"file": "arrow-down-to-line.svg"
+			"file": "arrow-down-to-line.svg",
+			"keywords": [
+				"bottom"
+			],
+			"groups": [
+				"action",
+				"arrow",
+				"box"
+			],
+			"related": [
+				"icon-page-up",
+				"icon-navigation-top",
+				"icon-navigation-bottom"
+			]
 		},
 		{
 			"name": "icon-page-remove",
-			"file": "file-minus-2.svg"
+			"file": "file-minus-2.svg",
+			"keywords": [
+				"delete",
+				"documents",
+				"pages"
+			],
+			"groups": [
+				"document"
+			]
 		},
 		{
 			"name": "icon-page-restricted",
-			"file": "file-x-2.svg"
+			"file": "file-x-2.svg",
+			"keywords": [
+				"documents",
+				"pages",
+				"disabled",
+				"restricted"
+			],
+			"groups": [
+				"document"
+			]
 		},
 		{
 			"name": "icon-page-up",
-			"file": "arrow-up-to-line.svg"
+			"file": "arrow-up-to-line.svg",
+			"keywords": [
+				"top"
+			],
+			"groups": [
+				"action",
+				"arrow",
+				"box"
+			],
+			"related": [
+				"icon-page-down",
+				"icon-navigation-top",
+				"icon-navigation-bottom"
+			]
 		},
 		{
 			"name": "icon-paint-roller",
 			"file": "paint-bucket.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"decorate",
+				"decoration",
+				"decorating",
+				"themes",
+				"theming",
+				"colour",
+				"color",
+				"paint"
+			],
+			"groups": [
+				"item",
+				"household"
+			]
 		},
 		{
 			"name": "icon-palette",
-			"file": "palette.svg"
+			"file": "palette.svg",
+			"keywords": [
+				"artist",
+				"painting",
+				"painter",
+				"themes",
+				"theming",
+				"colour",
+				"color",
+				"paint"
+			],
+			"groups": [
+				"item",
+				"household"
+			]
 		},
 		{
 			"name": "icon-panel-show",
-			"file": "panel-bottom-open.svg"
+			"file": "panel-bottom-open.svg",
+			"keywords": [
+				"panels",
+				"up",
+				"triangles",
+				"maximize",
+				"maximise",
+				"expand"
+			],
+			"groups": [
+				"action",
+				"window"
+			],
+			"related": [
+				"icon-pannel-close"
+			]
 		},
 		{
 			"name": "icon-pannel-close",
-			"file": "panel-bottom-close.svg"
+			"file": "panel-bottom-close.svg",
+			"keywords": [
+				"panels",
+				"down",
+				"triangles",
+				"minimize",
+				"minimise"
+			],
+			"groups": [
+				"action",
+				"window"
+			],
+			"related": [
+				"icon-panel-show"
+			]
 		},
 		{
 			"name": "icon-paper-bag",
 			"file": "shopping-basket.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"carrier",
+				"container",
+				"sack"
+			]
 		},
 		{
 			"name": "icon-paper-plane-alt",
-			"file": "send-horizontal.svg"
+			"file": "send-horizontal.svg",
+			"keywords": [
+				"paper aeroplane",
+				"paper airplane",
+				"sending",
+				"sends",
+				"sent",
+				"delivers"
+			],
+			"groups": [
+				"item",
+				"household"
+			],
+			"related": [
+				"icon-paper-plane"
+			]
 		},
 		{
 			"name": "icon-paper-plane",
-			"file": "send.svg"
+			"file": "send.svg",
+			"keywords": [
+				"paper aeroplane",
+				"paper airplane",
+				"sending",
+				"sends",
+				"sent",
+				"delivers"
+			],
+			"groups": [
+				"item",
+				"household"
+			],
+			"related": [
+				"icon-paper-plane-alt"
+			]
 		},
 		{
 			"name": "icon-partly-cloudy",
-			"file": "cloud-sun.svg"
+			"file": "cloud-sun.svg",
+			"keywords": [
+				"sunny spells"
+			],
+			"groups": [
+				"weather",
+				"cloud"
+			]
 		},
 		{
 			"name": "icon-paragraph",
@@ -1533,227 +3213,775 @@
 		{
 			"name": "icon-paste-in",
 			"file": "clipboard-paste.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"clipboard"
+			],
+			"groups": [
+				"action"
+			]
 		},
 		{
 			"name": "icon-pause",
-			"file": "pause.svg"
+			"file": "pause.svg",
+			"groups": [
+				"item",
+				"media"
+			]
 		},
 		{
 			"name": "icon-pc",
 			"file": "monitor.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"computers",
+				"servers",
+				"desktops",
+				"pcs"
+			],
+			"groups": [
+				"item",
+				"tech",
+				"hardware"
+			]
 		},
 		{
 			"name": "icon-people-alt-2",
 			"file": "person-standing.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"person",
+				"man",
+				"men",
+				"male"
+			],
+			"groups": [
+				"user"
+			]
 		},
 		{
 			"name": "icon-people-alt",
 			"file": "person-standing.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"person",
+				"man",
+				"men",
+				"male"
+			],
+			"groups": [
+				"user"
+			]
 		},
 		{
 			"name": "icon-people-female",
 			"file": "person-standing.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"person",
+				"people",
+				"woman",
+				"female",
+				"women"
+			],
+			"groups": [
+				"user"
+			]
 		},
 		{
 			"name": "icon-people",
-			"file": "person-standing.svg"
+			"file": "person-standing.svg",
+			"keywords": [
+				"person",
+				"man",
+				"men",
+				"male"
+			],
+			"groups": [
+				"user"
+			]
 		},
 		{
 			"name": "icon-phone-ring",
-			"file": "phone-call.svg"
+			"file": "phone-call.svg",
+			"keywords": [
+				"telephones",
+				"phones",
+				"calling"
+			],
+			"groups": [
+				"item",
+				"household",
+				"phone"
+			]
 		},
 		{
 			"name": "icon-phone",
-			"file": "phone.svg"
+			"file": "phone.svg",
+			"keywords": [
+				"telephones",
+				"phones",
+				"calling"
+			],
+			"groups": [
+				"item",
+				"household",
+				"phone"
+			]
 		},
 		{
 			"name": "icon-photo-album",
-			"file": "book-image.svg"
+			"file": "book-image.svg",
+			"keywords": [
+				"books",
+				"photo albums"
+			],
+			"groups": [
+				"picture"
+			]
 		},
 		{
 			"name": "icon-picture",
-			"file": "image.svg"
+			"file": "image.svg",
+			"keywords": [
+				"photograph",
+				"image",
+				"picture",
+				"mountains",
+				"scenery",
+				"landscape"
+			],
+			"groups": [
+				"picture"
+			],
+			"related": [
+				"icon-umb-media",
+				"icon-pictures",
+				"icon-pictures-alt",
+				"icon-pictures-alt-2",
+				"icon-photo-album",
+				"icon-mountain"
+			]
 		},
 		{
 			"name": "icon-pictures-alt-2",
-			"file": "gallery-thumbnails.svg"
+			"file": "gallery-thumbnails.svg",
+			"keywords": [
+				"photograph",
+				"image",
+				"picture",
+				"mountains",
+				"scenery",
+				"landscape"
+			],
+			"groups": [
+				"picture"
+			],
+			"related": [
+				"icon-picture",
+				"icon-pictures",
+				"icon-pictures-alt",
+				"icon-umb-media",
+				"icon-photo-album",
+				"icon-mountain"
+			]
 		},
 		{
 			"name": "icon-pictures-alt",
 			"file": "image.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"photograph",
+				"image",
+				"picture",
+				"mountains",
+				"scenery",
+				"landscape"
+			],
+			"groups": [
+				"picture"
+			],
+			"related": [
+				"icon-picture",
+				"icon-pictures",
+				"icon-umb-media",
+				"icon-pictures-alt-2",
+				"icon-photo-album",
+				"icon-mountain"
+			]
 		},
 		{
 			"name": "icon-pictures",
-			"file": "camera.svg"
+			"file": "camera.svg",
+			"keywords": [
+				"photograph",
+				"photography",
+				"image",
+				"picture",
+				"cameras"
+			],
+			"groups": [
+				"picture"
+			],
+			"related": [
+				"icon-picture",
+				"icon-umb-media",
+				"icon-pictures-alt",
+				"icon-pictures-alt-2",
+				"icon-photo-album"
+			]
 		},
 		{
 			"name": "icon-pie-chart",
-			"file": "chart-pie.svg"
+			"file": "chart-pie.svg",
+			"keywords": [
+				"pie graph",
+				"pie chart",
+				"piece",
+				"quarters",
+				"fourths",
+				"pizzas",
+				"cakes"
+			],
+			"groups": [
+				"data"
+			]
 		},
 		{
 			"name": "icon-piggy-bank",
-			"file": "piggy-bank.svg"
+			"file": "piggy-bank.svg",
+			"keywords": [
+				"animals",
+				"farms",
+				"pigs"
+			],
+			"groups": [
+				"item",
+				"money"
+			]
 		},
 		{
 			"name": "icon-pin-location",
-			"file": "map-pin.svg"
+			"file": "map-pin.svg",
+			"keywords": [
+				"geolocation",
+				"maps",
+				"pins"
+			],
+			"groups": [
+				"misc"
+			],
+			"related": [
+				"icon-location-nearby",
+				"icon-location-near-me"
+			]
 		},
 		{
 			"name": "icon-plane",
-			"file": "plane.svg"
+			"file": "plane.svg",
+			"keywords": [
+				"airplanes",
+				"aeroplanes",
+				"aircraft",
+				"flying",
+				"flight"
+			],
+			"groups": [
+				"transport",
+				"vehicle"
+			]
 		},
 		{
 			"name": "icon-planet",
 			"file": "orbit.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"space",
+				"saturn"
+			],
+			"groups": [
+				"item",
+				"globe"
+			]
 		},
 		{
 			"name": "icon-play",
-			"file": "play.svg"
+			"file": "play.svg",
+			"keywords": [
+				"right",
+				"arrows",
+				"triangles",
+				"continue"
+			],
+			"groups": [
+				"item",
+				"media"
+			],
+			"related": [
+				"icon-next"
+			]
 		},
 		{
 			"name": "icon-playing-cards",
 			"file": "gallery-horizontal-end.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"slideshows",
+				"carousels",
+				"poker",
+				"card games",
+				"playing cards"
+			],
+			"groups": [
+				"misc",
+				"game"
+			]
 		},
 		{
 			"name": "icon-playlist",
-			"file": "list-music.svg"
+			"file": "list-music.svg",
+			"keywords": [
+				"music",
+				"musical notes"
+			],
+			"groups": [
+				"item",
+				"media"
+			]
 		},
 		{
 			"name": "icon-plugin",
-			"file": "blocks.svg"
+			"file": "blocks.svg",
+			"keywords": [
+				"puzzle piece",
+				"jigsaws",
+				"games",
+				"kids",
+				"children",
+				"plugins",
+				"plug-ins",
+				"extensions",
+				"packages"
+			],
+			"groups": [
+				"misc",
+				"game"
+			]
 		},
 		{
 			"name": "icon-podcast",
-			"file": "podcast.svg"
+			"file": "podcast.svg",
+			"keywords": [
+				"person",
+				"users",
+				"people"
+			],
+			"groups": [
+				"user",
+				"special"
+			]
 		},
 		{
 			"name": "icon-poll",
 			"file": "vote.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"bar graphs",
+				"bar charts"
+			],
+			"groups": [
+				"data"
+			]
 		},
 		{
 			"name": "icon-post-it",
-			"file": "sticky-note.svg"
+			"file": "sticky-note.svg",
+			"keywords": [
+				"postits",
+				"post-its",
+				"post its",
+				"labels",
+				"stickers",
+				"notes",
+				"pages",
+				"sheets"
+			],
+			"groups": [
+				"document"
+			]
 		},
 		{
 			"name": "icon-power-outlet",
 			"file": "square-power.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"power sockets",
+				"power outlets",
+				"electric",
+				"electricity"
+			],
+			"groups": [
+				"item",
+				"household"
+			]
 		},
 		{
 			"name": "icon-power",
-			"file": "power.svg"
+			"file": "power.svg",
+			"keywords": [
+				"shut down",
+				"on",
+				"off"
+			],
+			"groups": [
+				"item",
+				"tech"
+			]
 		},
 		{
 			"name": "icon-presentation",
-			"file": "presentation.svg"
+			"file": "presentation.svg",
+			"keywords": [
+				"audience",
+				"talks",
+				"powerpoints",
+				"slideshows",
+				"keynotes",
+				"speakers",
+				"conference"
+			],
+			"groups": [
+				"item",
+				"workplace"
+			]
 		},
 		{
 			"name": "icon-previous-media",
-			"file": "rewind.svg"
+			"file": "rewind.svg",
+			"keywords": [
+				"rewind",
+				"skip"
+			],
+			"groups": [
+				"item",
+				"media"
+			],
+			"related": [
+				"icon-next-media"
+			]
 		},
 		{
 			"name": "icon-previous",
-			"file": "skip-back.svg"
+			"file": "skip-back.svg",
+			"keywords": [
+				"arrows",
+				"triangles"
+			],
+			"groups": [
+				"action",
+				"arrow"
+			]
 		},
 		{
 			"name": "icon-price-dollar",
 			"file": "badge-dollar-sign.svg",
-			"legacy": true
+			"legacy": true,
+			"groups": [
+				"item",
+				"money"
+			]
 		},
 		{
 			"name": "icon-price-euro",
 			"file": "badge-euro.svg",
-			"legacy": true
+			"legacy": true,
+			"groups": [
+				"item",
+				"money"
+			]
 		},
 		{
 			"name": "icon-price-pound",
 			"file": "badge-pound-sterling.svg",
-			"legacy": true
+			"legacy": true,
+			"groups": [
+				"item",
+				"money"
+			]
 		},
 		{
 			"name": "icon-price-yen",
 			"file": "badge-japanese-yen.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"buy",
+				"money"
+			],
+			"groups": [
+				"item",
+				"money"
+			]
 		},
 		{
 			"name": "icon-print",
-			"file": "printer.svg"
+			"file": "printer.svg",
+			"keywords": [
+				"printer",
+				"print"
+			],
+			"groups": [
+				"item",
+				"tech",
+				"hardware"
+			],
+			"related": [
+				"icon-printer-alt"
+			]
 		},
 		{
 			"name": "icon-printer-alt",
 			"file": "printer.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"printers",
+				"peripherals"
+			],
+			"groups": [
+				"item",
+				"tech",
+				"hardware"
+			],
+			"related": [
+				"icon-print"
+			]
 		},
 		{
 			"name": "icon-projector",
-			"file": "projector.svg"
+			"file": "projector.svg",
+			"keywords": [
+				"home cinema",
+				"slideshows",
+				"presentations"
+			],
+			"groups": [
+				"item",
+				"media"
+			]
 		},
 		{
 			"name": "icon-pulse",
-			"file": "activity.svg"
+			"file": "activity.svg",
+			"keywords": [
+				"heartbeat",
+				"health",
+				"line charts",
+				"monitors",
+				"line graphs"
+			],
+			"groups": [
+				"data"
+			]
 		},
 		{
 			"name": "icon-pushpin",
-			"file": "pin.svg"
+			"file": "pin.svg",
+			"keywords": [
+				"map pins",
+				"thumb tack",
+				"noticeboard"
+			],
+			"groups": [
+				"item",
+				"workplace"
+			]
 		},
 		{
 			"name": "icon-qr-code",
-			"file": "qr-code.svg"
+			"file": "qr-code.svg",
+			"keywords": [
+				"barcode",
+				"qr codes"
+			],
+			"groups": [
+				"item",
+				"tech"
+			]
 		},
 		{
 			"name": "icon-quote",
-			"file": "quote.svg"
+			"file": "quote.svg",
+			"keywords": [
+				"quotation marks",
+				"speech marks",
+				"speakers",
+				"talks",
+				"quotes",
+				"talking",
+				"chatting",
+				"testimonials"
+			],
+			"groups": [
+				"misc"
+			]
 		},
 		{
 			"name": "icon-radio-alt",
-			"file": "radio.svg"
+			"file": "radio.svg",
+			"keywords": [
+				"broadcast",
+				"tv",
+				"fm",
+				"television",
+				"aerials",
+				"ariels",
+				"transmitters",
+				"podcasts"
+			],
+			"groups": [
+				"item",
+				"tech",
+				"hardware"
+			],
+			"related": [
+				"icon-radio-alt",
+				"icon-radio-receiver"
+			]
 		},
 		{
 			"name": "icon-radio-receiver",
-			"file": "boom-box.svg"
+			"file": "boom-box.svg",
+			"keywords": [
+				"broadcast",
+				"tv",
+				"fm",
+				"television",
+				"receivers",
+				"podcasts",
+				"retro"
+			],
+			"groups": [
+				"item",
+				"tech",
+				"hardware"
+			],
+			"related": [
+				"icon-radio-alt",
+				"icon-radio"
+			]
 		},
 		{
 			"name": "icon-radio",
-			"file": "radio-tower.svg"
+			"file": "radio-tower.svg",
+			"keywords": [
+				"broadcast",
+				"tv",
+				"fm",
+				"television",
+				"aerials",
+				"ariels",
+				"transmitters",
+				"podcasts"
+			],
+			"groups": [
+				"item",
+				"tech",
+				"hardware"
+			],
+			"related": [
+				"icon-radio-alt",
+				"icon-radio-receiver"
+			]
 		},
 		{
 			"name": "icon-rain",
-			"file": "cloud-rain.svg"
+			"file": "cloud-rain.svg",
+			"keywords": [
+				"raining",
+				"precipitation"
+			],
+			"groups": [
+				"weather",
+				"cloud"
+			]
 		},
 		{
 			"name": "icon-rate",
 			"file": "star.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"stars"
+			],
+			"groups": [
+				"shape"
+			]
 		},
 		{
 			"name": "icon-re-post",
-			"file": "repeat.svg"
+			"file": "repeat.svg",
+			"keywords": [
+				"retweet",
+				"share",
+				"repost"
+			],
+			"groups": [
+				"action",
+				"arrow"
+			],
+			"related": [
+				"icon-axis-rotation",
+				"icon-axis-rotation-2",
+				"icon-axis-rotation-3",
+				"icon-sync",
+				"icon-refresh"
+			]
 		},
 		{
 			"name": "icon-readonly",
-			"file": "pencil-off.svg"
+			"file": "pencil-off.svg",
+			"keywords": [
+				"uneditable"
+			],
+			"groups": [
+				"action"
+			]
 		},
 		{
 			"name": "icon-receipt-alt",
-			"file": "receipt.svg"
+			"file": "receipt.svg",
+			"groups": [
+				"item",
+				"money",
+				"receipt"
+			],
+			"related": [
+				"icon-receipt-yen",
+				"icon-receipt-pound",
+				"icon-receipt-euro",
+				"icon-receipt-dollar"
+			]
 		},
 		{
 			"name": "icon-reception",
-			"file": "concierge-bell.svg"
+			"file": "concierge-bell.svg",
+			"keywords": [
+				"receptionists",
+				"desks",
+				"working"
+			],
+			"groups": [
+				"user"
+			]
 		},
 		{
 			"name": "icon-record",
 			"file": "disc-3.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"circles"
+			],
+			"groups": [
+				"shape"
+			]
 		},
 		{
 			"name": "icon-rectangle-ellipsis",
@@ -1761,181 +3989,641 @@
 		},
 		{
 			"name": "icon-redo",
-			"file": "redo-2.svg"
+			"file": "redo-2.svg",
+			"keywords": [
+				"arrow",
+				"forward"
+			],
+			"groups": [
+				"action",
+				"arrow"
+			],
+			"related": [
+				"icon-undo",
+				"icon-delete-key",
+				"icon-arrow-right",
+				"icon-navigation-right",
+				"icon-right-double-arrow"
+			]
 		},
 		{
 			"name": "icon-refresh",
-			"file": "rotate-cw.svg"
+			"file": "rotate-cw.svg",
+			"keywords": [
+				"arrow",
+				"recycle",
+				"sync",
+				"repeat"
+			],
+			"groups": [
+				"action",
+				"rotate"
+			],
+			"related": [
+				"icon-axis-rotation",
+				"icon-axis-rotation-2",
+				"icon-axis-rotation-3",
+				"icon-sync",
+				"icon-re-post"
+			]
 		},
 		{
 			"name": "icon-remote",
 			"file": "calculator.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"remote controls",
+				"buttons"
+			],
+			"groups": [
+				"item",
+				"household"
+			]
 		},
 		{
 			"name": "icon-remove",
-			"file": "trash-2.svg"
+			"file": "trash-2.svg",
+			"keywords": [
+				"minus",
+				"subtracts",
+				"lines",
+				"deletes"
+			],
+			"groups": [
+				"maths"
+			]
 		},
 		{
 			"name": "icon-repeat-one",
-			"file": "repeat-1.svg"
+			"file": "repeat-1.svg",
+			"keywords": [
+				"arrows",
+				"bi-directional",
+				"two",
+				"2",
+				"swap",
+				"loop",
+				"reverse"
+			],
+			"groups": [
+				"action",
+				"arrow"
+			],
+			"related": [
+				"icon-repeat",
+				"icon-traffic-alt",
+				"icon-tab-key",
+				"icon-shuffle",
+				"icon-traffic",
+				"icon-navigation-road"
+			]
 		},
 		{
 			"name": "icon-repeat",
-			"file": "repeat.svg"
+			"file": "repeat.svg",
+			"keywords": [
+				"arrows",
+				"bi-directional",
+				"two",
+				"2",
+				"swap",
+				"loop",
+				"reverse"
+			],
+			"groups": [
+				"action",
+				"arrow"
+			],
+			"related": [
+				"icon-repeat-one",
+				"icon-traffic-alt",
+				"icon-tab-key",
+				"icon-shuffle",
+				"icon-traffic",
+				"icon-navigation-road"
+			]
 		},
 		{
 			"name": "icon-reply-arrow",
-			"file": "reply.svg"
+			"file": "reply.svg",
+			"keywords": [
+				"arrows",
+				"back"
+			],
+			"groups": [
+				"action",
+				"arrow"
+			]
 		},
 		{
 			"name": "icon-resize",
-			"file": "scaling.svg"
+			"file": "scaling.svg",
+			"keywords": [
+				"arrows",
+				"move",
+				"resizes",
+				"scales"
+			],
+			"groups": [
+				"action",
+				"arrow"
+			]
 		},
 		{
 			"name": "icon-return-to-top",
 			"file": "arrow-up-to-line.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"loops",
+				"repeats",
+				"arrows"
+			],
+			"groups": [
+				"action",
+				"arrow"
+			]
 		},
 		{
 			"name": "icon-right-double-arrow",
 			"file": "chevrons-right.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"chevrons",
+				"two",
+				"2"
+			],
+			"groups": [
+				"action",
+				"arrow"
+			]
 		},
 		{
 			"name": "icon-roadsign",
 			"file": "milestone.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"warnings"
+			],
+			"groups": [
+				"transport"
+			]
 		},
 		{
 			"name": "icon-rocket",
-			"file": "rocket.svg"
+			"file": "rocket.svg",
+			"keywords": [
+				"space",
+				"launches"
+			],
+			"groups": [
+				"transport",
+				"vehicle"
+			]
 		},
 		{
 			"name": "icon-rss",
-			"file": "rss.svg"
+			"file": "rss.svg",
+			"keywords": [
+				"rss feed",
+				"syndication",
+				"broadcasts",
+				"waves"
+			],
+			"groups": [
+				"item",
+				"tech"
+			]
 		},
 		{
 			"name": "icon-ruler-alt",
-			"file": "pencil-ruler.svg"
+			"file": "pencil-ruler.svg",
+			"keywords": [
+				"triangles",
+				"set squares",
+				"measures",
+				"tools"
+			],
+			"groups": [
+				"item",
+				"tool"
+			]
 		},
 		{
 			"name": "icon-ruler",
-			"file": "ruler.svg"
+			"file": "ruler.svg",
+			"keywords": [
+				"measures",
+				"tools"
+			],
+			"groups": [
+				"item",
+				"tool"
+			]
 		},
 		{
 			"name": "icon-satellite-dish",
-			"file": "satellite-dish.svg"
+			"file": "satellite-dish.svg",
+			"keywords": [
+				"broadcasts",
+				"transmits",
+				"receiver"
+			],
+			"groups": [
+				"item",
+				"tech",
+				"hardware"
+			]
 		},
 		{
 			"name": "icon-save",
-			"file": "save.svg"
+			"file": "save.svg",
+			"keywords": [
+				"imports",
+				"circles",
+				"arrows"
+			],
+			"groups": [
+				"action",
+				"arrow",
+				"circle"
+			],
+			"related": [
+				"icon-umb-deploy"
+			]
 		},
 		{
 			"name": "icon-scan",
-			"file": "radar.svg"
+			"file": "radar.svg",
+			"keywords": [
+				"radar"
+			],
+			"groups": [
+				"misc"
+			]
 		},
 		{
 			"name": "icon-school",
-			"file": "school.svg"
+			"file": "school.svg",
+			"keywords": [
+				"clock tower",
+				"town hall",
+				"building",
+				"university"
+			],
+			"groups": [
+				"building"
+			]
 		},
 		{
 			"name": "icon-screensharing",
-			"file": "screen-share.svg"
+			"file": "screen-share.svg",
+			"keywords": [
+				"boxes",
+				"multiple",
+				"two",
+				"2",
+				"nested",
+				"restore"
+			],
+			"groups": [
+				"shape",
+				"box"
+			],
+			"related": [
+				"icon-layers-alt"
+			]
 		},
 		{
 			"name": "icon-script-alt",
 			"file": "scroll.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"scroll",
+				"javascript",
+				"js"
+			],
+			"groups": [
+				"file"
+			],
+			"related": [
+				"icon-script"
+			]
 		},
 		{
 			"name": "icon-script",
-			"file": "scroll-text.svg"
+			"file": "scroll-text.svg",
+			"keywords": [
+				"scroll",
+				"javascript",
+				"js"
+			],
+			"groups": [
+				"file"
+			],
+			"related": [
+				"icon-script-alt"
+			]
 		},
 		{
 			"name": "icon-scull",
-			"file": "skull.svg"
+			"file": "skull.svg",
+			"keywords": [
+				"dead",
+				"death",
+				"expired",
+				"old",
+				"skull",
+				"pirate",
+				"piracy"
+			],
+			"groups": [
+				"item"
+			],
+			"related": [
+				"icon-piracy"
+			]
 		},
 		{
 			"name": "icon-search",
-			"file": "search.svg"
+			"file": "search.svg",
+			"keywords": [
+				"magnifying glass"
+			],
+			"groups": [
+				"item",
+				"household"
+			]
 		},
 		{
 			"name": "icon-sensor",
-			"file": "scan-eye.svg"
+			"file": "scan-eye.svg",
+			"keywords": [
+				"waves",
+				"earthquake",
+				"epicentre",
+				"epicenter"
+			],
+			"groups": [
+				"misc"
+			]
 		},
 		{
 			"name": "icon-server-alt",
 			"file": "database.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"db",
+				"databases",
+				"data store"
+			],
+			"groups": [
+				"item",
+				"tech",
+				"hardware"
+			]
 		},
 		{
 			"name": "icon-server",
-			"file": "server.svg"
+			"file": "server.svg",
+			"keywords": [
+				"servers",
+				"rack",
+				"hardware"
+			],
+			"groups": [
+				"item",
+				"tech",
+				"hardware"
+			],
+			"related": [
+				"icon-stacked-disks",
+				"icon-disk-image",
+				"icon-ssd"
+			]
 		},
 		{
 			"name": "icon-settings-alt",
 			"file": "settings.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"settings",
+				"cog",
+				"wheel",
+				"preferences"
+			],
+			"groups": [
+				"settings"
+			],
+			"related": [
+				"icon-settings",
+				"icon-umb-developer",
+				"icon-settings-alt-2"
+			]
 		},
 		{
 			"name": "icon-settings",
-			"file": "settings.svg"
+			"file": "settings.svg",
+			"keywords": [
+				"settings",
+				"cog",
+				"wheel",
+				"preferences"
+			],
+			"groups": [
+				"settings"
+			],
+			"related": [
+				"icon-umb-developer",
+				"icon-settings-alt",
+				"icon-settings-alt-2"
+			]
 		},
 		{
 			"name": "icon-share-alt",
-			"file": "wifi.svg"
+			"file": "wifi.svg",
+			"keywords": [
+				"broadcasts",
+				"waves"
+			],
+			"groups": [
+				"action"
+			]
 		},
 		{
 			"name": "icon-share",
-			"file": "share-2.svg"
+			"file": "share-2.svg",
+			"keywords": [
+				"networks",
+				"social media"
+			],
+			"groups": [
+				"action"
+			]
 		},
 		{
 			"name": "icon-sharing-iphone",
-			"file": "share.svg"
+			"file": "share.svg",
+			"keywords": [
+				"share",
+				"export",
+				"arrows",
+				"boxes"
+			],
+			"groups": [
+				"action",
+				"arrow",
+				"box"
+			]
 		},
 		{
 			"name": "icon-shield",
-			"file": "shield-half.svg"
+			"file": "shield-half.svg",
+			"keywords": [
+				"security",
+				"protect",
+				"secure",
+				"badge"
+			],
+			"groups": [
+				"item",
+				"security"
+			]
 		},
 		{
 			"name": "icon-shift",
-			"file": "arrow-big-up.svg"
+			"file": "arrow-big-up.svg",
+			"keywords": [
+				"arrows",
+				"up"
+			],
+			"groups": [
+				"action",
+				"key"
+			]
 		},
 		{
 			"name": "icon-shipping-box",
-			"file": "container.svg"
+			"file": "container.svg",
+			"keywords": [
+				"grid",
+				"grill",
+				"lines"
+			],
+			"groups": [
+				"shape",
+				"box"
+			]
 		},
 		{
 			"name": "icon-shipping",
-			"file": "baggage-claim.svg"
+			"file": "baggage-claim.svg",
+			"keywords": [
+				"trailer",
+				"sack truck",
+				"boxes",
+				"lift",
+				"carry"
+			],
+			"groups": [
+				"commerce"
+			],
+			"related": [
+				"icon-truck"
+			]
 		},
 		{
 			"name": "icon-shoe",
 			"file": "footprints.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"trainers",
+				"sneakers"
+			],
+			"groups": [
+				"item",
+				"clothing"
+			]
 		},
 		{
 			"name": "icon-shopping-basket-alt-2",
 			"file": "shopping-basket.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"carts",
+				"checkouts"
+			],
+			"groups": [
+				"commerce"
+			],
+			"related": [
+				"icon-shopping-basket",
+				"item-shopping-basket-alt"
+			]
 		},
 		{
 			"name": "icon-shopping-basket-alt",
-			"file": "shopping-basket.svg"
+			"file": "shopping-basket.svg",
+			"keywords": [
+				"bag",
+				"gift"
+			],
+			"groups": [
+				"commerce"
+			],
+			"related": [
+				"icon-shopping-basket",
+				"item-shopping-basket-alt-2"
+			]
 		},
 		{
 			"name": "icon-shopping-basket",
-			"file": "shopping-cart.svg"
+			"file": "shopping-cart.svg",
+			"keywords": [
+				"trolley",
+				"trollies",
+				"supermarket"
+			],
+			"groups": [
+				"commerce"
+			],
+			"related": [
+				"icon-shopping-basket-alt",
+				"item-shopping-basket-alt-2"
+			]
 		},
 		{
 			"name": "icon-shuffle",
-			"file": "shuffle.svg"
+			"file": "shuffle.svg",
+			"keywords": [
+				"arrows",
+				"two",
+				"2",
+				"mix",
+				"random"
+			],
+			"groups": [
+				"action",
+				"arrow"
+			],
+			"related": [
+				"icon-traffic-alt",
+				"icon-tab-key",
+				"icon-traffic",
+				"icon-repeat",
+				"icon-navigation-road"
+			]
 		},
 		{
 			"name": "icon-sience",
 			"file": "atom.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"nuclear",
+				"orbit"
+			],
+			"groups": [
+				"misc"
+			]
 		},
 		{
 			"name": "icon-science",
@@ -1943,34 +4631,118 @@
 		},
 		{
 			"name": "icon-single-note",
-			"file": "music-2.svg"
+			"file": "music-2.svg",
+			"keywords": [
+				"music",
+				"sounds",
+				"audio"
+			],
+			"groups": [
+				"item",
+				"media"
+			]
 		},
 		{
 			"name": "icon-sitemap",
 			"file": "network.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"trees",
+				"family trees",
+				"hierachies",
+				"hierachy",
+				"structure",
+				"flowcharts",
+				"flow charts",
+				"flow diagrams"
+			],
+			"groups": [
+				"data"
+			]
 		},
 		{
 			"name": "icon-sleep",
-			"file": "moon-star.svg"
+			"file": "moon-star.svg",
+			"keywords": [
+				"moons",
+				"crescent",
+				"nighttime"
+			],
+			"groups": [
+				"weather"
+			]
 		},
 		{
 			"name": "icon-slideshow",
 			"file": "presentation.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"powerpoints",
+				"data",
+				"keynotes",
+				"presentations",
+				"slideshows",
+				"slide shows"
+			],
+			"groups": [
+				"item",
+				"workplace"
+			]
 		},
 		{
 			"name": "icon-smiley-inverted",
 			"file": "smile.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"emojis",
+				"emoticons",
+				"faces",
+				"people",
+				"person",
+				"user",
+				"happy",
+				"happiness"
+			],
+			"groups": [
+				"user"
+			],
+			"related": [
+				"icon-smiley"
+			]
 		},
 		{
 			"name": "icon-smiley",
-			"file": "smile.svg"
+			"file": "smile.svg",
+			"keywords": [
+				"emojis",
+				"emoticons",
+				"faces",
+				"people",
+				"person",
+				"user",
+				"happy",
+				"happiness"
+			],
+			"groups": [
+				"user"
+			],
+			"related": [
+				"icon-smiley-inverted"
+			]
 		},
 		{
 			"name": "icon-snow",
-			"file": "cloud-snow.svg"
+			"file": "cloud-snow.svg",
+			"keywords": [
+				"snowing",
+				"cold",
+				"winter",
+				"hailing"
+			],
+			"groups": [
+				"weather",
+				"cloud"
+			]
 		},
 		{
 			"name": "icon-sort",
@@ -1978,90 +4750,365 @@
 		},
 		{
 			"name": "icon-sound-low",
-			"file": "volume-1.svg"
+			"file": "volume-1.svg",
+			"keywords": [
+				"sounds",
+				"audio",
+				"music",
+				"speakers",
+				"amplifiers",
+				"amps",
+				"volume",
+				"minimum"
+			],
+			"groups": [
+				"item",
+				"media"
+			],
+			"related": [
+				"icon-sound-medium",
+				"icon-sound",
+				"icon-sound-off",
+				"icon-sound-waves",
+				"icon-speaker"
+			]
 		},
 		{
 			"name": "icon-sound-medium",
 			"file": "volume-2.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"sounds",
+				"audio",
+				"music",
+				"speakers",
+				"amplifiers",
+				"amps",
+				"volume",
+				"medium"
+			],
+			"groups": [
+				"item",
+				"media"
+			],
+			"related": [
+				"icon-sound",
+				"icon-sound-low",
+				"icon-sound-off",
+				"icon-sound-waves",
+				"icon-speaker"
+			]
 		},
 		{
 			"name": "icon-sound-off",
-			"file": "volume.svg"
+			"file": "volume.svg",
+			"keywords": [
+				"sounds",
+				"audio",
+				"music",
+				"speakers",
+				"amplifiers",
+				"amps",
+				"volume",
+				"muted"
+			],
+			"groups": [
+				"item",
+				"media"
+			],
+			"related": [
+				"icon-sound-medium",
+				"icon-sound-low",
+				"icon-sound",
+				"icon-sound-waves",
+				"icon-speaker"
+			]
 		},
 		{
 			"name": "icon-sound-waves",
-			"file": "waves.svg"
+			"file": "waves.svg",
+			"keywords": [
+				"sounds",
+				"audio",
+				"music"
+			],
+			"groups": [
+				"item",
+				"media"
+			]
 		},
 		{
 			"name": "icon-sound",
-			"file": "volume-2.svg"
+			"file": "volume-2.svg",
+			"keywords": [
+				"sounds",
+				"audio",
+				"music",
+				"speakers",
+				"amplifiers",
+				"amps",
+				"volume",
+				"maximum"
+			],
+			"groups": [
+				"item",
+				"media"
+			],
+			"related": [
+				"icon-sound-medium",
+				"icon-sound-low",
+				"icon-sound-off",
+				"icon-sound-waves",
+				"icon-speaker"
+			]
 		},
 		{
 			"name": "icon-spades",
-			"file": "spade.svg"
+			"file": "spade.svg",
+			"groups": [
+				"misc",
+				"game"
+			]
 		},
 		{
 			"name": "icon-speaker",
-			"file": "speaker.svg"
+			"file": "speaker.svg",
+			"keywords": [
+				"sounds",
+				"audio",
+				"music",
+				"speakers",
+				"amplifiers",
+				"amps"
+			],
+			"groups": [
+				"item",
+				"media"
+			],
+			"related": [
+				"icon-sound",
+				"icon-sound-waves"
+			]
 		},
 		{
 			"name": "icon-speed-gauge",
-			"file": "circle-gauge.svg"
+			"file": "circle-gauge.svg",
+			"keywords": [
+				"guage",
+				"speed",
+				"scale",
+				"fuel"
+			],
+			"groups": [
+				"measure"
+			],
+			"related": [
+				"icon-temperatrure-alt"
+			]
 		},
 		{
 			"name": "icon-split-alt",
-			"file": "square-split-horizontal.svg"
+			"file": "square-split-horizontal.svg",
+			"keywords": [
+				"arrows",
+				"fork",
+				"three",
+				"3"
+			],
+			"groups": [
+				"action",
+				"arrow"
+			],
+			"related": [
+				"icon-split"
+			]
 		},
 		{
 			"name": "icon-split",
-			"file": "split.svg"
+			"file": "split.svg",
+			"keywords": [
+				"arrows",
+				"fork",
+				"two",
+				"2"
+			],
+			"groups": [
+				"action",
+				"arrow"
+			],
+			"related": [
+				"icon-split-alt"
+			]
 		},
 		{
 			"name": "icon-sprout",
-			"file": "sprout.svg"
+			"file": "sprout.svg",
+			"keywords": [
+				"plant",
+				"sapling",
+				"spring"
+			],
+			"groups": [
+				"item",
+				"nature"
+			],
+			"related": [
+				"icon-tree"
+			]
 		},
 		{
 			"name": "icon-squiggly-line",
 			"file": "route.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"wave",
+				"random",
+				"squiggle"
+			],
+			"groups": [
+				"misc"
+			],
+			"related": [
+				"icon-stream"
+			]
 		},
 		{
 			"name": "icon-ssd",
 			"file": "hard-drive.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"disk",
+				"hdd",
+				"sata",
+				"hardware"
+			],
+			"groups": [
+				"item",
+				"tech",
+				"hardware"
+			],
+			"related": [
+				"icon-server",
+				"icon-disk-image",
+				"icon-ssd"
+			]
 		},
 		{
 			"name": "icon-stacked-disks",
 			"file": "server.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"hard drives",
+				"ssd",
+				"hdd",
+				"servers",
+				"rack",
+				"hardware"
+			],
+			"groups": [
+				"item",
+				"tech",
+				"hardware"
+			],
+			"related": [
+				"icon-server",
+				"icon-disk-image",
+				"icon-ssd"
+			]
 		},
 		{
 			"name": "icon-stamp",
 			"file": "square-asterisk.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"frame",
+				"photos",
+				"photographs",
+				"pictures",
+				"images",
+				"icon-shipping-box"
+			],
+			"groups": [
+				"item"
+			]
 		},
 		{
 			"name": "icon-stop-alt",
-			"file": "octagon-x.svg"
+			"file": "octagon-x.svg",
+			"keywords": [
+				"sign",
+				"octagon",
+				"eight",
+				"8"
+			],
+			"groups": [
+				"misc"
+			],
+			"related": [
+				"icon-stop",
+				"icon-stop-hand"
+			]
 		},
 		{
 			"name": "icon-stop-hand",
 			"file": "hand.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"palm"
+			],
+			"groups": [
+				"item",
+				"hand"
+			],
+			"related": [
+				"icon-stop-alt",
+				"icon-stop-hand"
+			]
 		},
 		{
 			"name": "icon-stop",
-			"file": "square.svg"
+			"file": "square.svg",
+			"keywords": [
+				"square"
+			],
+			"groups": [
+				"shape",
+				"box"
+			],
+			"related": [
+				"icon-thumbnails",
+				"icon-thumbnails-small",
+				"icon-record",
+				"icon-play",
+				"icon-pause"
+			]
 		},
 		{
 			"name": "icon-store",
-			"file": "store.svg"
+			"file": "store.svg",
+			"keywords": [
+				"shop",
+				"market",
+				"supermarket",
+				"superstore"
+			],
+			"groups": [
+				"building"
+			]
 		},
 		{
 			"name": "icon-stream",
 			"file": "square-activity.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"circle",
+				"wave",
+				"sine",
+				"alternating current"
+			],
+			"groups": [
+				"misc"
+			]
 		},
 		{
 			"name": "icon-strikethrough",
@@ -2077,24 +5124,93 @@
 		},
 		{
 			"name": "icon-sunny",
-			"file": "sun.svg"
+			"file": "sun.svg",
+			"keywords": [
+				"weather",
+				"summer"
+			],
+			"groups": [
+				"weather"
+			],
+			"related": [
+				"icon-snow",
+				"icon-cloudy",
+				"icon-cloud"
+			]
 		},
 		{
 			"name": "icon-sweatshirt",
 			"file": "shirt.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"jumper",
+				"pullover"
+			],
+			"groups": [
+				"item",
+				"clothing"
+			],
+			"related": [
+				"icon-top",
+				"icon-t-shirt"
+			]
 		},
 		{
 			"name": "icon-sync",
-			"file": "refresh-ccw.svg"
+			"file": "refresh-ccw.svg",
+			"keywords": [
+				"refresh",
+				"recycle",
+				"sync"
+			],
+			"groups": [
+				"action",
+				"rotate"
+			],
+			"related": [
+				"icon-axis-rotation",
+				"icon-axis-rotation-2",
+				"icon-axis-rotation-3",
+				"icon-refresh",
+				"icon-re-post"
+			]
 		},
 		{
 			"name": "icon-t-shirt",
-			"file": "shirt.svg"
+			"file": "shirt.svg",
+			"keywords": [
+				"tshirt",
+				"top"
+			],
+			"groups": [
+				"item",
+				"clothing"
+			],
+			"related": [
+				"icon-top"
+			]
 		},
 		{
 			"name": "icon-tab-key",
-			"file": "arrow-right-to-line.svg"
+			"file": "arrow-right-to-line.svg",
+			"keywords": [
+				"arrow",
+				"line",
+				"end",
+				"stop"
+			],
+			"groups": [
+				"action",
+				"key",
+				"arrow"
+			],
+			"related": [
+				"icon-traffic-alt",
+				"icon-traffic",
+				"icon-shuffle",
+				"icon-repeat",
+				"icon-navigation-road"
+			]
 		},
 		{
 			"name": "icon-table",
@@ -2102,32 +5218,122 @@
 		},
 		{
 			"name": "icon-tag",
-			"file": "tag.svg"
+			"file": "tag.svg",
+			"keywords": [
+				"prices",
+				"labels",
+				"tags"
+			],
+			"groups": [
+				"item"
+			],
+			"related": [
+				"icon-tags"
+			]
 		},
 		{
 			"name": "icon-tags",
-			"file": "tags.svg"
+			"file": "tags.svg",
+			"keywords": [
+				"two",
+				"2",
+				"prices",
+				"labels",
+				"tags"
+			],
+			"groups": [
+				"item"
+			],
+			"related": [
+				"icon-tag"
+			]
 		},
 		{
 			"name": "icon-takeaway-cup",
 			"file": "cup-soda.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"coffee",
+				"mug",
+				"tea"
+			],
+			"groups": [
+				"item",
+				"food",
+				"drink"
+			],
+			"related": [
+				"icon-coffee",
+				"icon-cocktail",
+				"icon-beer-glass",
+				"icon-wine-glass"
+			]
 		},
 		{
 			"name": "icon-target",
-			"file": "target.svg"
+			"file": "target.svg",
+			"keywords": [
+				"circles",
+				"two",
+				"2",
+				"nested",
+				"nesting",
+				"bullet point",
+				"radio buttons",
+				"radios"
+			],
+			"groups": [
+				"misc"
+			]
 		},
 		{
 			"name": "icon-temperatrure-alt",
-			"file": "thermometer-snowflake.svg"
+			"file": "thermometer-snowflake.svg",
+			"keywords": [
+				"temperature",
+				"thermometer",
+				"guage",
+				"speed",
+				"scale",
+				"fuel"
+			],
+			"groups": [
+				"measure"
+			],
+			"related": [
+				"icon-speed-gauge",
+				"icon-temperature"
+			]
 		},
 		{
 			"name": "icon-temperature",
-			"file": "thermometer-sun.svg"
+			"file": "thermometer-sun.svg",
+			"keywords": [
+				"thermometer",
+				"health"
+			],
+			"groups": [
+				"measure"
+			],
+			"related": [
+				"icon-temperatrure-alt"
+			]
 		},
 		{
 			"name": "icon-terminal",
-			"file": "square-terminal.svg"
+			"file": "square-terminal.svg",
+			"keywords": [
+				"console",
+				"commands",
+				"line",
+				"code",
+				"developers",
+				"cli"
+			],
+			"groups": [
+				"action",
+				"window"
+			]
 		},
 		{
 			"name": "icon-text-align-center",
@@ -2155,80 +5361,307 @@
 		},
 		{
 			"name": "icon-theater",
-			"file": "drama.svg"
+			"file": "drama.svg",
+			"keywords": [
+				"theatre",
+				"masks",
+				"arts",
+				"theatrical",
+				"costume"
+			],
+			"groups": [
+				"building"
+			]
 		},
 		{
 			"name": "icon-thumb-down",
-			"file": "thumbs-down.svg"
+			"file": "thumbs-down.svg",
+			"keywords": [
+				"no",
+				"thumbs down"
+			],
+			"groups": [
+				"item",
+				"hand",
+				"thumb"
+			],
+			"related": [
+				"icon-thumb-up"
+			]
 		},
 		{
 			"name": "icon-thumb-up",
-			"file": "thumbs-up.svg"
+			"file": "thumbs-up.svg",
+			"keywords": [
+				"yes",
+				"thumbs up"
+			],
+			"groups": [
+				"item",
+				"hand",
+				"thumb"
+			],
+			"related": [
+				"icon-thumb-down"
+			]
 		},
 		{
 			"name": "icon-thumbnail-list",
-			"file": "layout-list.svg"
+			"file": "layout-list.svg",
+			"keywords": [
+				"media"
+			],
+			"groups": [
+				"shape",
+				"box",
+				"layout"
+			]
 		},
 		{
 			"name": "icon-thumbnails-small",
-			"file": "grip.svg"
+			"file": "grip.svg",
+			"keywords": [
+				"grid",
+				"boxes",
+				"squares",
+				"nine",
+				"9"
+			],
+			"groups": [
+				"shape",
+				"box",
+				"layout"
+			],
+			"related": [
+				"icon-thumbnails",
+				"icon-grid",
+				"icon-stop",
+				"icon-thumbnail-list",
+				"icon-item-arrangement"
+			]
 		},
 		{
 			"name": "icon-thumbnails",
-			"file": "layout-grid.svg"
+			"file": "layout-grid.svg",
+			"keywords": [
+				"grid",
+				"boxes",
+				"squares",
+				"four",
+				"4"
+			],
+			"groups": [
+				"shape",
+				"box",
+				"layout"
+			],
+			"related": [
+				"icon-thumbnails-small",
+				"icon-grid",
+				"icon-stop",
+				"icon-thumbnail-list"
+			]
 		},
 		{
 			"name": "icon-ticket",
-			"file": "ticket.svg"
+			"file": "ticket.svg",
+			"keywords": [
+				"one",
+				"1"
+			],
+			"groups": [
+				"item",
+				"money",
+				"note",
+				"ticket"
+			],
+			"related": [
+				"icon-coins",
+				"icon-bills"
+			]
 		},
 		{
 			"name": "icon-time",
-			"file": "clock-4.svg"
+			"file": "clock-4.svg",
+			"keywords": [
+				"clock",
+				"stopwatch"
+			],
+			"groups": [
+				"item",
+				"clock"
+			]
 		},
 		{
 			"name": "icon-timer",
-			"file": "timer.svg"
+			"file": "timer.svg",
+			"keywords": [
+				"clock",
+				"stopwatch"
+			],
+			"groups": [
+				"item",
+				"clock"
+			]
 		},
 		{
 			"name": "icon-tools",
 			"file": "wrench.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"spanner",
+				"settings",
+				"wrench",
+				"screwdriver"
+			],
+			"groups": [
+				"item",
+				"tool"
+			],
+			"related": [
+				"icon-wrench",
+				"icon-tools"
+			]
 		},
 		{
 			"name": "icon-top",
 			"file": "shirt.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"vest"
+			],
+			"groups": [
+				"item",
+				"clothing"
+			],
+			"related": [
+				"icon-t-shirt"
+			]
 		},
 		{
 			"name": "icon-traffic-alt",
 			"file": "arrow-left-right.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"arrows",
+				"bi-directional",
+				"two",
+				"2",
+				"swap",
+				"navigation"
+			],
+			"groups": [
+				"action",
+				"arrow"
+			],
+			"related": [
+				"icon-traffic",
+				"icon-tab-key",
+				"icon-shuffle",
+				"icon-repeat",
+				"icon-repeat-one",
+				"icon-navigation-road"
+			]
 		},
 		{
 			"name": "icon-trafic",
-			"file": "arrow-left-right.svg"
+			"file": "arrow-left-right.svg",
+			"keywords": [
+				"arrows",
+				"bi-directional",
+				"two",
+				"2",
+				"swap"
+			],
+			"groups": [
+				"action",
+				"arrow"
+			],
+			"related": [
+				"icon-traffic-alt",
+				"icon-shuffle",
+				"icon-repeat",
+				"icon-navigation-road"
+			]
 		},
 		{
 			"name": "icon-train",
-			"file": "train-front.svg"
+			"file": "train-front.svg",
+			"keywords": [
+				"trams",
+				"railways",
+				"trains",
+				"public transport"
+			],
+			"groups": [
+				"transport",
+				"vehicle"
+			]
 		},
 		{
 			"name": "icon-trash-alt-2",
 			"file": "trash-2.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"bin",
+				"rubbish"
+			],
+			"groups": [
+				"item",
+				"household"
+			],
+			"related": [
+				"icon-trash",
+				"icon-trash-alt"
+			]
 		},
 		{
 			"name": "icon-trash-alt",
 			"file": "trash-2.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"bin",
+				"rubbish"
+			],
+			"groups": [
+				"item",
+				"household"
+			],
+			"related": [
+				"icon-trash",
+				"icon-trash-alt-2"
+			]
 		},
 		{
 			"name": "icon-trash",
-			"file": "trash-2.svg"
+			"file": "trash-2.svg",
+			"keywords": [
+				"bin",
+				"rubbish"
+			],
+			"groups": [
+				"item",
+				"household"
+			],
+			"related": [
+				"icon-trash-alt",
+				"icon-trash-alt-2"
+			]
 		},
 		{
 			"name": "icon-tree",
-			"file": "tree-deciduous.svg"
+			"file": "tree-deciduous.svg",
+			"keywords": [
+				"plants",
+				"woods",
+				"forests",
+				"nature",
+				"outdoors"
+			],
+			"groups": [
+				"item",
+				"nature"
+			]
 		},
 		{
 			"name": "icon-trending-up-down",
@@ -2236,52 +5669,209 @@
 		},
 		{
 			"name": "icon-trophy",
-			"file": "trophy.svg"
+			"file": "trophy.svg",
+			"keywords": [
+				"awards",
+				"cups",
+				"winnings",
+				"rewards"
+			],
+			"groups": [
+				"item",
+				"award"
+			],
+			"related": [
+				"icon-medal",
+				"icon-diploma",
+				"icon-diploma-alt"
+			]
 		},
 		{
 			"name": "icon-truck",
-			"file": "truck.svg"
+			"file": "truck.svg",
+			"keywords": [
+				"lorry",
+				"vehicle",
+				"van",
+				"shipping",
+				"delivery"
+			],
+			"groups": [
+				"transport",
+				"vehicle"
+			],
+			"related": [
+				"icon-shipping"
+			]
 		},
 		{
 			"name": "icon-tv-old",
-			"file": "tv.svg"
+			"file": "tv.svg",
+			"keywords": [
+				"telly",
+				"tv",
+				"retro",
+				"crt"
+			],
+			"groups": [
+				"item",
+				"tech"
+			],
+			"related": [
+				"icon-tv"
+			]
 		},
 		{
 			"name": "icon-tv",
-			"file": "monitor-play.svg"
+			"file": "monitor-play.svg",
+			"keywords": [
+				"telly",
+				"tv",
+				"monitor",
+				"display"
+			],
+			"groups": [
+				"item",
+				"tech"
+			],
+			"related": [
+				"icon-tv-old"
+			]
 		},
 		{
 			"name": "icon-umb-content",
 			"file": "file.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"pages",
+				"papers",
+				"documents"
+			],
+			"groups": [
+				"document"
+			],
+			"related": [
+				"icon-document",
+				"icon-document-dashed-line",
+				"icon-documents",
+				"icon-article",
+				"icon-diploma-alt",
+				"icon-script",
+				"icon-script-alt"
+			]
 		},
 		{
 			"name": "icon-umb-developer",
 			"file": "user-cog.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"settings",
+				"cog",
+				"wheel",
+				"preferences"
+			],
+			"groups": [
+				"settings"
+			],
+			"related": [
+				"icon-settings",
+				"icon-settings-alt",
+				"icon-settings-alt-2"
+			]
 		},
 		{
 			"name": "icon-umb-media",
 			"file": "image.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"photograph",
+				"image",
+				"picture",
+				"mountains",
+				"scenery",
+				"landscape"
+			],
+			"groups": [
+				"picture"
+			],
+			"related": [
+				"icon-picture",
+				"icon-pictures",
+				"icon-pictures-alt",
+				"icon-pictures-alt-2",
+				"icon-photo-album",
+				"icon-mountain"
+			]
 		},
 		{
 			"name": "icon-umb-settings",
 			"file": "wrench.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"spanner",
+				"wrench"
+			],
+			"groups": [
+				"item",
+				"tool"
+			],
+			"related": [
+				"icon-wrench",
+				"icon-tools"
+			]
 		},
 		{
 			"name": "icon-umb-users",
 			"file": "user.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"person",
+				"people"
+			],
+			"groups": [
+				"user"
+			],
+			"related": [
+				"icon-user",
+				"icon-user-female",
+				"icon-user-glasses",
+				"icon-client",
+				"icon-employee",
+				"icon-piracy",
+				"icon-theif",
+				"icon-operator"
+			]
 		},
 		{
 			"name": "icon-umbrella",
-			"file": "umbrella.svg"
+			"file": "umbrella.svg",
+			"keywords": [
+				"rain",
+				"shelter"
+			],
+			"groups": [
+				"item",
+				"household"
+			]
 		},
 		{
 			"name": "icon-undo",
-			"file": "undo-2.svg"
+			"file": "undo-2.svg",
+			"keywords": [
+				"arrow",
+				"back"
+			],
+			"groups": [
+				"action",
+				"arrow"
+			],
+			"related": [
+				"icon-redo",
+				"icon-backspace",
+				"icon-arrow-left",
+				"icon-navigation-left",
+				"icon-left-double-arrow"
+			]
 		},
 		{
 			"name": "icon-underline",
@@ -2293,7 +5883,24 @@
 		},
 		{
 			"name": "icon-unlocked",
-			"file": "lock-open.svg"
+			"file": "lock-open.svg",
+			"keywords": [
+				"padlock",
+				"insecure"
+			],
+			"groups": [
+				"item",
+				"security",
+				"lock"
+			],
+			"related": [
+				"icon-lock",
+				"icon-combination-lock-open",
+				"icon-keyhole",
+				"icon-old-key",
+				"icon-keychain",
+				"icon-key"
+			]
 		},
 		{
 			"name": "icon-unplug",
@@ -2307,72 +5914,325 @@
 		{
 			"name": "icon-usb-connector",
 			"file": "cable.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"plugs",
+				"peripherals",
+				"technology"
+			],
+			"groups": [
+				"item",
+				"tech"
+			],
+			"related": [
+				"icon-usb",
+				"icon-wall-plug",
+				"icon-dock-connector"
+			]
 		},
 		{
 			"name": "icon-usb",
-			"file": "usb.svg"
+			"file": "usb.svg",
+			"groups": [
+				"item",
+				"tech"
+			],
+			"related": [
+				"icon-usb-connector"
+			]
 		},
 		{
 			"name": "icon-user-female",
 			"file": "user.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"person",
+				"people",
+				"woman",
+				"women"
+			],
+			"groups": [
+				"user"
+			],
+			"related": [
+				"icon-people-female",
+				"icon-user-females",
+				"icon-user-females-alt",
+				"icon-user",
+				"icon-user-female",
+				"icon-umb-users",
+				"icon-user-glasses",
+				"icon-client",
+				"icon-employee",
+				"icon-piracy",
+				"icon-theif",
+				"icon-operator"
+			]
 		},
 		{
 			"name": "icon-user-females-alt",
 			"file": "users.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"person",
+				"people",
+				"three",
+				"3",
+				"women",
+				"woman"
+			],
+			"groups": [
+				"user",
+				"multiple"
+			],
+			"related": [
+				"icon-users-alt",
+				"icon-user-females",
+				"icon-user-females-alt",
+				"icon-user",
+				"icon-user-female",
+				"icon-umb-users"
+			]
 		},
 		{
 			"name": "icon-user-females",
 			"file": "users.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"person",
+				"people",
+				"three",
+				"3",
+				"women",
+				"woman"
+			],
+			"groups": [
+				"user",
+				"multiple"
+			],
+			"related": [
+				"icon-users-alt",
+				"icon-user-females",
+				"icon-user-females-alt",
+				"icon-user",
+				"icon-user-female",
+				"icon-umb-users"
+			]
 		},
 		{
 			"name": "icon-user-glasses",
 			"file": "user.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"person",
+				"people",
+				"man",
+				"men",
+				"male",
+				"specs",
+				"nerd"
+			],
+			"groups": [
+				"user",
+				"special"
+			],
+			"related": [
+				"icon-user",
+				"icon-user-female",
+				"icon-umb-users",
+				"icon-client",
+				"icon-employee",
+				"icon-piracy",
+				"icon-theif",
+				"icon-operator"
+			]
 		},
 		{
 			"name": "icon-user",
-			"file": "user.svg"
+			"file": "user.svg",
+			"keywords": [
+				"person",
+				"people",
+				"man",
+				"men",
+				"male"
+			],
+			"groups": [
+				"user"
+			],
+			"related": [
+				"icon-user-female",
+				"icon-people",
+				"icon-people-alt",
+				"icon-people-alt-2",
+				"icon-users",
+				"icon-users-alt",
+				"icon-user-female",
+				"icon-umb-users",
+				"icon-user-glasses",
+				"icon-client",
+				"icon-employee",
+				"icon-piracy",
+				"icon-theif",
+				"icon-operator"
+			]
 		},
 		{
 			"name": "icon-users-alt",
 			"file": "users.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"person",
+				"people",
+				"three",
+				"3",
+				"men",
+				"man",
+				"male"
+			],
+			"groups": [
+				"user",
+				"multiple"
+			],
+			"related": [
+				"icon-users-alt",
+				"icon-user-females",
+				"icon-user-females-alt",
+				"icon-user",
+				"icon-user-female",
+				"icon-umb-users"
+			]
 		},
 		{
 			"name": "icon-users",
-			"file": "users.svg"
+			"file": "users.svg",
+			"keywords": [
+				"person",
+				"people",
+				"three",
+				"3",
+				"men",
+				"man",
+				"male"
+			],
+			"groups": [
+				"user",
+				"multiple"
+			],
+			"related": [
+				"icon-users-alt",
+				"icon-user-females",
+				"icon-user-females-alt",
+				"icon-user",
+				"icon-user-female",
+				"icon-umb-users"
+			]
 		},
 		{
 			"name": "icon-utilities",
-			"file": "pocket-knife.svg"
+			"file": "pocket-knife.svg",
+			"keywords": [
+				"toolbox",
+				"tools"
+			],
+			"groups": [
+				"item",
+				"tool"
+			],
+			"related": [
+				"icon-briefcase"
+			]
 		},
 		{
 			"name": "icon-vcard",
-			"file": "contact.svg"
+			"file": "contact.svg",
+			"keywords": [
+				"business cards",
+				"id cards",
+				"profiles",
+				"personas",
+				"person",
+				"users"
+			],
+			"groups": [
+				"file"
+			],
+			"related": [
+				"icon-umb-members"
+			]
 		},
 		{
 			"name": "icon-video",
-			"file": "video.svg"
+			"file": "video.svg",
+			"keywords": [
+				"media",
+				"movie",
+				"film",
+				"camera",
+				"record"
+			],
+			"groups": [
+				"item",
+				"media"
+			]
 		},
 		{
 			"name": "icon-voice",
-			"file": "mic.svg"
+			"file": "mic.svg",
+			"keywords": [
+				"microphone",
+				"podcast",
+				"audio",
+				"record"
+			],
+			"groups": [
+				"item",
+				"media"
+			]
 		},
 		{
 			"name": "icon-wall-plug",
-			"file": "plug.svg"
+			"file": "plug.svg",
+			"keywords": [
+				"power",
+				"electricity",
+				"cable"
+			],
+			"groups": [
+				"item",
+				"tech"
+			],
+			"related": [
+				"icon-power-outlet",
+				"icon-dock-connector"
+			]
 		},
 		{
 			"name": "icon-wallet",
-			"file": "wallet.svg"
+			"file": "wallet.svg",
+			"keywords": [
+				"purse",
+				"money",
+				"cash",
+				"pay",
+				"payment",
+				"checkout"
+			],
+			"groups": [
+				"item",
+				"money"
+			]
 		},
 		{
 			"name": "icon-wand",
-			"file": "wand-sparkles.svg"
+			"file": "wand-sparkles.svg",
+			"keywords": [
+				"magic",
+				"wizard"
+			],
+			"groups": [
+				"item"
+			]
 		},
 		{
 			"name": "icon-webhook",
@@ -2380,19 +6240,63 @@
 		},
 		{
 			"name": "icon-weight",
-			"file": "weight.svg"
+			"file": "weight.svg",
+			"keywords": [
+				"kg",
+				"tonne",
+				"mass",
+				"heavy",
+				"kilo",
+				"kilogram"
+			],
+			"groups": [
+				"item"
+			],
+			"related": [
+				"icon-legal"
+			]
 		},
 		{
 			"name": "icon-width",
-			"file": "move-horizontal.svg"
+			"file": "move-horizontal.svg",
+			"keywords": [
+				"arrow",
+				"size",
+				"resize",
+				"length"
+			],
+			"groups": [
+				"action",
+				"size"
+			]
 		},
 		{
 			"name": "icon-wifi",
-			"file": "wifi.svg"
+			"file": "wifi.svg",
+			"keywords": [
+				"internet",
+				"broadcast",
+				"waves"
+			],
+			"groups": [
+				"item",
+				"tech"
+			]
 		},
 		{
 			"name": "icon-window-popin",
-			"file": "square-arrow-down-left.svg"
+			"file": "square-arrow-down-left.svg",
+			"keywords": [
+				"in",
+				"arrow",
+				"box",
+				"rectangle",
+				"square"
+			],
+			"groups": [
+				"action",
+				"window"
+			]
 		},
 		{
 			"name": "icon-window-popout",
@@ -2400,23 +6304,95 @@
 		},
 		{
 			"name": "icon-window-sizes",
-			"file": "scaling.svg"
+			"file": "scaling.svg",
+			"keywords": [
+				"square",
+				"multiple",
+				"rectangles",
+				"three",
+				"3",
+				"box"
+			],
+			"groups": [
+				"action",
+				"window"
+			]
 		},
 		{
 			"name": "icon-wine-glass",
-			"file": "wine.svg"
+			"file": "wine.svg",
+			"keywords": [
+				"goblets",
+				"wine",
+				"glasses",
+				"crockery",
+				"drinks",
+				"dinners",
+				"restaurants"
+			],
+			"groups": [
+				"item",
+				"food",
+				"drink"
+			],
+			"related": [
+				"icon-cocktail",
+				"icon-beer-glass",
+				"icon-takeaway-cup",
+				"icon-coffee"
+			]
 		},
 		{
 			"name": "icon-wrench",
-			"file": "wrench.svg"
+			"file": "wrench.svg",
+			"keywords": [
+				"spanner"
+			],
+			"groups": [
+				"item",
+				"tool"
+			],
+			"related": [
+				"icon-umb-settings",
+				"icon-tools"
+			]
 		},
 		{
 			"name": "icon-wrong",
-			"file": "circle-x.svg"
+			"file": "circle-x.svg",
+			"keywords": [
+				"cross",
+				"x",
+				"exit",
+				"quit",
+				"close",
+				"error"
+			],
+			"groups": [
+				"action",
+				"boolean"
+			],
+			"related": [
+				"icon-delete",
+				"icon-block",
+				"icon-delete-key",
+				"icon-backspace",
+				"icon-check",
+				"icon-checkbox",
+				"icon-checkbox-dotted-active",
+				"icon-circle-dotted-active",
+				"icon-application-error"
+			]
 		},
 		{
 			"name": "icon-zip",
-			"file": "file-archive.svg"
+			"file": "file-archive.svg",
+			"keywords": [
+				"zipper"
+			],
+			"groups": [
+				"file"
+			]
 		},
 		{
 			"name": "icon-zom-out",
@@ -2425,11 +6401,35 @@
 		},
 		{
 			"name": "icon-zoom-in",
-			"file": "zoom-in.svg"
+			"file": "zoom-in.svg",
+			"keywords": [
+				"magnifying glass",
+				"grow",
+				"bigger"
+			],
+			"groups": [
+				"action",
+				"zoom"
+			],
+			"related": [
+				"icon-zoom-out"
+			]
 		},
 		{
 			"name": "icon-zoom-out",
-			"file": "zoom-out.svg"
+			"file": "zoom-out.svg",
+			"keywords": [
+				"magnifying glass",
+				"shrink",
+				"smaller"
+			],
+			"groups": [
+				"action",
+				"zoom"
+			],
+			"related": [
+				"icon-zoom-in"
+			]
 		},
 		{
 			"name": "icon-star",
@@ -2632,7 +6632,17 @@
 		{
 			"name": "icon-art-easel",
 			"file": "legacy/icon-art-easel.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"artworks",
+				"painting",
+				"paints",
+				"artist",
+				"gallary"
+			],
+			"groups": [
+				"picture"
+			]
 		},
 		{
 			"name": "icon-article",
@@ -2652,17 +6662,40 @@
 		{
 			"name": "icon-band-aid",
 			"file": "legacy/icon-band-aid.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"bandaids",
+				"plasters",
+				"band aids",
+				"health",
+				"first aid",
+				"medical"
+			],
+			"groups": [
+				"item",
+				"household"
+			]
 		},
 		{
 			"name": "icon-baby-stroller",
 			"file": "legacy/icon-baby-stroller.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"pram",
+				"pushchair"
+			]
 		},
 		{
 			"name": "icon-bill-dollar",
 			"file": "legacy/icon-bill-dollar.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"money",
+				"us",
+				"usa",
+				"paper",
+				"cash"
+			]
 		},
 		{
 			"name": "icon-bill-euro",
@@ -2682,7 +6715,20 @@
 		{
 			"name": "icon-bill",
 			"file": "legacy/icon-bill.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"currency",
+				"money",
+				"notes",
+				"one",
+				"1",
+				"bills"
+			],
+			"groups": [
+				"item",
+				"money",
+				"note"
+			]
 		},
 		{
 			"name": "icon-billboard",
@@ -2692,7 +6738,14 @@
 		{
 			"name": "icon-bills-dollar",
 			"file": "legacy/icon-bills-dollar.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"money",
+				"us",
+				"usa",
+				"paper",
+				"cash"
+			]
 		},
 		{
 			"name": "icon-bills-euro",
@@ -2747,22 +6800,46 @@
 		{
 			"name": "icon-clothes-hanger",
 			"file": "legacy/icon-clothes-hanger.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"clothes",
+				"clothing",
+				"wardrobes"
+			],
+			"groups": [
+				"item",
+				"clothing"
+			]
 		},
 		{
 			"name": "icon-coin",
 			"file": "legacy/icon-coin.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"money",
+				"cash"
+			]
 		},
 		{
 			"name": "icon-coins-dollar-alt",
 			"file": "legacy/icon-coins-dollar-alt.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"money",
+				"us",
+				"usa"
+			]
 		},
 		{
 			"name": "icon-coins-dollar",
 			"file": "legacy/icon-coins-dollar.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"money",
+				"us",
+				"usa",
+				"cash"
+			]
 		},
 		{
 			"name": "icon-coins-euro-alt",
@@ -2802,17 +6879,45 @@
 		{
 			"name": "icon-desk",
 			"file": "legacy/icon-desk.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"benches",
+				"desks",
+				"horses",
+				"gymnastics",
+				"hurdles"
+			],
+			"groups": [
+				"item",
+				"household"
+			]
 		},
 		{
 			"name": "icon-dollar-bag",
 			"file": "legacy/icon-dollar-bag.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"money",
+				"us",
+				"usa",
+				"cash",
+				"sack"
+			]
 		},
 		{
 			"name": "icon-eject",
 			"file": "legacy/icon-eject.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"ejects",
+				"up",
+				"top"
+			],
+			"groups": [
+				"action",
+				"arrow",
+				"box"
+			]
 		},
 		{
 			"name": "icon-euro-bag",
@@ -2822,7 +6927,17 @@
 		{
 			"name": "icon-female-symbol",
 			"file": "legacy/icon-female-symbol.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"woman",
+				"women",
+				"females",
+				"sexes",
+				"genders"
+			],
+			"groups": [
+				"misc"
+			]
 		},
 		{
 			"name": "icon-firewall",
@@ -2832,7 +6947,15 @@
 		{
 			"name": "icon-folder-open",
 			"file": "legacy/icon-folder-open.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"filing",
+				"documents"
+			],
+			"groups": [
+				"item",
+				"workplace"
+			]
 		},
 		{
 			"name": "icon-folder-outline",
@@ -2842,7 +6965,18 @@
 		{
 			"name": "icon-handprint",
 			"file": "legacy/icon-handprint.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"hands",
+				"personalisation",
+				"personalization",
+				"ids",
+				"profiles"
+			],
+			"groups": [
+				"item",
+				"hand"
+			]
 		},
 		{
 			"name": "icon-hat",
@@ -2857,17 +6991,49 @@
 		{
 			"name": "icon-inactive-line",
 			"file": "legacy/icon-inactive-line.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"slashes",
+				"backslashes",
+				"lines",
+				"disabled",
+				"crossed"
+			],
+			"groups": [
+				"shape"
+			]
 		},
 		{
 			"name": "icon-keychain",
 			"file": "legacy/icon-keychain.svg",
-			"legacy": true
+			"legacy": true,
+			"groups": [
+				"item",
+				"security"
+			],
+			"related": [
+				"icon-lock",
+				"icon-keyhole",
+				"icon-old-key",
+				"icon-keychain",
+				"icon-key"
+			]
 		},
 		{
 			"name": "icon-keyhole",
 			"file": "legacy/icon-keyhole.svg",
-			"legacy": true
+			"legacy": true,
+			"groups": [
+				"item",
+				"security"
+			],
+			"related": [
+				"icon-lock",
+				"icon-keyhole",
+				"icon-old-key",
+				"icon-keychain",
+				"icon-key"
+			]
 		},
 		{
 			"name": "icon-linkedin",
@@ -2877,7 +7043,16 @@
 		{
 			"name": "icon-linux-tux",
 			"file": "legacy/icon-linux-tux.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"penguins"
+			],
+			"groups": [
+				"logo"
+			],
+			"related": [
+				"icon-os-x"
+			]
 		},
 		{
 			"name": "icon-male-and-female",
@@ -2892,12 +7067,37 @@
 		{
 			"name": "icon-molecular-network",
 			"file": "legacy/icon-molecular-network.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"molecule",
+				"atoms",
+				"network",
+				"hub"
+			],
+			"groups": [
+				"misc"
+			],
+			"related": [
+				"icon-molecular"
+			]
 		},
 		{
 			"name": "icon-molecular",
 			"file": "legacy/icon-molecular.svg",
-			"legacy": true
+			"legacy": true,
+			"keywords": [
+				"molecule",
+				"atoms",
+				"network",
+				"hub",
+				"virus"
+			],
+			"groups": [
+				"misc"
+			],
+			"related": [
+				"icon-molecular-network"
+			]
 		},
 		{
 			"name": "icon-trash-empty",
