@@ -12,6 +12,7 @@ permissions:
   contents: read
   pull-requests: write
   issues: write
+  id-token: write
 
 concurrency:
   group: claude-review-${{ github.event.pull_request.number || github.event.inputs.pr_number || github.run_id }}
