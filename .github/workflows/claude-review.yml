@@ -78,6 +78,21 @@ jobs:
             - If the issue is a bug report, suggest potential root causes
             - If the issue is a feature request, suggest an implementation approach
 
+            After analyzing the issue, apply labels based on its content:
+            - `area/frontend` — if the issue relates to the backoffice UI (`src/Umbraco.Web.UI.Client/`)
+            - `area/backend` — if the issue relates to backend/server-side code
+            - `area/test` — if the issue relates to testing
+            - `affected/v17` — if the issue affects v17 (current main branch)
+            - `affected/v14` through `affected/v16` — if the issue mentions or affects older versions
+            - `affected/backoffice` — if the issue affects the backoffice specifically
+            - `category/api` — if the issue involves the Management or Delivery API
+            - `category/localization` — if the issue involves localization/language
+            - `category/performance` — if the issue involves performance
+            - `category/ux` — if the issue involves user experience
+            - `category/ui` — if the issue involves the UI layer
+
+            Only apply labels you are confident about based on the issue description. Never remove existing labels.
+
             ## Tone
 
             Be friendly and constructive. This project values community contributions.
