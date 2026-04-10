@@ -1,6 +1,7 @@
 import type { UmbIconDefinition } from '../types.js';
 import { UMB_ICON_REGISTRY_CONTEXT } from '../icon-registry.context-token.js';
 import type { UmbIconPickerModalData, UmbIconPickerModalValue } from './icon-picker-modal.token.js';
+import { searchIcons } from './icon-search.function.js';
 import {
 	css,
 	customElement,
@@ -16,11 +17,13 @@ import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UUIColorSwatchesEvent } from '@umbraco-cms/backoffice/external/uui';
-import { toCamelCase } from '@umbraco-cms/backoffice/utils';
+import { debounce, toCamelCase } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-icon-picker-modal')
 export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPickerModalData, UmbIconPickerModalValue> {
 	#icons?: Array<UmbIconDefinition>;
+
+	#debouncedFilterIcons = debounce(() => this.#filterIcons(), 250);
 
 	@query('#search')
 	private _searchInput?: HTMLInputElement;
@@ -44,12 +47,21 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 		});
 	}
 
+	override disconnectedCallback() {
+		super.disconnectedCallback();
+		this.#debouncedFilterIcons.cancel();
+	}
+
+	#onSearchInput() {
+		this.#debouncedFilterIcons();
+	}
+
 	#filterIcons() {
 		if (!this.#icons) return;
-		const value = this._searchInput?.value;
-		if (value) {
-			this._isSearching = value.length > 0;
-			this._iconsFiltered = this.#icons.filter((icon) => icon.name.toLowerCase().includes(value.toLowerCase()));
+		const value = this._searchInput?.value?.trim();
+		if (value && value.length > 0) {
+			this._isSearching = true;
+			this._iconsFiltered = searchIcons(this.#icons, value);
 		} else {
 			this._isSearching = false;
 			this._iconsFiltered = this.#icons;
@@ -121,7 +133,7 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 				placeholder=${this.localize.term('placeholders_filter')}
 				label=${this.localize.term('placeholders_filter')}
 				id="search"
-				@keyup=${this.#filterIcons}
+				@input=${this.#onSearchInput}
 				${umbFocus()}>
 				<uui-icon name="search" slot="prepend" id="search_icon"></uui-icon>
 			</uui-input>
