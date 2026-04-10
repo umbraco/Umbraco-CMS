@@ -283,7 +283,12 @@ export class UmbTableElement extends UmbLitElement {
 			<uui-table class="uui-text">
 				<uui-table-column style=${ifDefined(style)}></uui-table-column>
 				<uui-table-head>
-					${this._renderHeaderCheckboxCell()} ${this.columns.map((column) => this._renderHeaderCell(column))}
+					${this._renderHeaderCheckboxCell()}
+					${repeat(
+						this.columns,
+						(column) => column.alias,
+						(column) => this._renderHeaderCell(column),
+					)}
 				</uui-table-head>
 				${repeat(this.items, (item) => item.id, this._renderRow)}
 			</uui-table>
@@ -340,7 +345,12 @@ export class UmbTableElement extends UmbLitElement {
 				?selected=${this._isSelected(item.id)}
 				@selected=${() => this._selectRow(item)}
 				@deselected=${() => this._deselectRow(item)}>
-				${this._renderRowCheckboxCell(item)} ${this.columns.map((column) => this._renderRowCell(column, item))}
+				${this._renderRowCheckboxCell(item)}
+				${repeat(
+					this.columns,
+					(column) => column.alias,
+					(column) => this._renderRowCell(column, item),
+				)}
 			</uui-table-row>
 		`;
 	};
@@ -378,12 +388,11 @@ export class UmbTableElement extends UmbLitElement {
 	private _renderRowCell(column: UmbTableColumn, item: UmbTableItem) {
 		return html`
 			<uui-table-cell
-				style="--uui-table-cell-padding: 0 var(--uui-size-5); text-align:${column.align ?? 'left'}; width: ${column.width || 'auto'};"
-				?clip-text=${column.clipText}
-				>
-					${this._renderCellContent(column, item)}
+				style="--uui-table-cell-padding: 0 var(--uui-size-5); text-align:${column.align ??
+				'left'}; width: ${column.width || 'auto'};"
+				?clip-text=${column.clipText}>
+				${this._renderCellContent(column, item)}
 			</uui-table-cell>
-		</uui-table-cell>
 		`;
 	}
 
