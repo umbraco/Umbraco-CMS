@@ -189,7 +189,7 @@ test('can duplicate a content node to root', async ({umbracoApi, umbracoUi}) => 
   // Duplicate to root
   await umbracoUi.content.clickDuplicateToActionMenuOption();
   await umbracoUi.content.clickLabelWithName('Content');
-  await umbracoUi.content.clickDuplicateButton();
+  await umbracoUi.content.clickCopyModalButton();
 
   // Assert
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.duplicated);
@@ -223,7 +223,7 @@ test('can duplicate a content node to other parent', async ({umbracoApi, umbraco
   await umbracoUi.content.clickActionsMenuForContent(contentName);
   await umbracoUi.content.clickDuplicateToActionMenuOption();
   await umbracoUi.content.clickModalMenuItemWithName(parentContentName);
-  await umbracoUi.content.clickDuplicateButton();
+  await umbracoUi.content.clickCopyModalButton();
 
   // Assert
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.duplicated);

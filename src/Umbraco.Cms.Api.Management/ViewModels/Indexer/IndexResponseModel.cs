@@ -46,4 +46,10 @@ public class IndexResponseModel
     /// The properties are represented as key-value pairs.
     /// </summary>
     public IReadOnlyDictionary<string, object?>? ProviderProperties { get; init; }
+
+    /// <summary>
+    /// Gets the name of the index field that contains the unique entity key (GUID).
+    /// Used by the backoffice Examine dashboard to construct edit links for search results.
+    /// </summary>
+    public string? UniqueKeyFieldName { get; init; }
 }
