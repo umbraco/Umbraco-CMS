@@ -36,16 +36,10 @@ public class AddContentVersionDateIndex : AsyncMigrationBase
         // CREATE INDEX (without NONCLUSTERED) is portable across SQL Server and SQLite.
         // SQL Server defaults to nonclustered; SQLite does not support the NONCLUSTERED keyword.
         var syntax = Database.SqlContext.SqlSyntax;
-        try
-        {
-            Execute.Sql($@"
-                CREATE INDEX {syntax.GetQuotedName(IndexName)}
-                ON {syntax.GetQuotedTableName(ContentVersionDto.TableName)} ({syntax.GetQuotedColumnName(ContentVersionDto.VersionDateColumnName)})
+
+        Execute.Sql($@"
+            CREATE INDEX {syntax.GetQuotedName(IndexName)}
+            ON {syntax.GetQuotedTableName(ContentVersionDto.TableName)} ({syntax.GetQuotedColumnName(ContentVersionDto.VersionDateColumnName)})
             ").Do();
-        }
-        catch (Exception ex)
-        {
-            throw;
-        }
     }
 }
