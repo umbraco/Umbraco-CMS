@@ -20,9 +20,11 @@ import {
 import { encodeFilePath, UmbReadOnlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
-import { UmbRoutePathAddendumContext } from '@umbraco-cms/backoffice/router';
+import { UmbModalRouteRegistrationController, UmbRoutePathAddendumContext } from '@umbraco-cms/backoffice/router';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbUfmVirtualRenderController } from '@umbraco-cms/backoffice/ufm';
+import { UMB_EDIT_ELEMENT_WORKSPACE_PATH_PATTERN, UMB_ELEMENT_ENTITY_TYPE } from '@umbraco-cms/backoffice/element';
+import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
 import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
@@ -172,9 +174,18 @@ export abstract class UmbBlockEntryContext<
 
 	#workspacePath = new UmbStringState(undefined);
 	public readonly workspacePath = this.#workspacePath.asObservable();
+
+	#libraryElementWorkspacePath = new UmbStringState(undefined);
+
 	public readonly workspaceEditContentPath = mergeObservables(
-		[this.contentKey, this.workspacePath],
-		([contentKey, path]) => this.#generateWorkspaceEditContentPath(path, contentKey),
+		[this.contentKey, this.workspacePath, this.isLibraryElement, this.#libraryElementWorkspacePath.asObservable()],
+		([contentKey, path, isLibrary, libraryPath]) => {
+			if (!contentKey) return '';
+			if (isLibrary && libraryPath) {
+				return libraryPath + UMB_EDIT_ELEMENT_WORKSPACE_PATH_PATTERN.generateLocal({ unique: contentKey });
+			}
+			return this.#generateWorkspaceEditContentPath(path, contentKey);
+		},
 	);
 	public readonly workspaceEditSettingsPath = mergeObservables(
 		[this.contentKey, this.workspacePath],
@@ -529,6 +540,19 @@ export abstract class UmbBlockEntryContext<
 			},
 			'observeWorkspacePath',
 		);
+
+		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
+			.addAdditionalPath('library-element')
+			.addUniquePaths(['unique'])
+			.onSetup(() => {
+				return {
+					data: { entityType: UMB_ELEMENT_ENTITY_TYPE, preset: {} },
+					modal: { size: 'large' },
+				};
+			})
+			.observeRouteBuilder((routeBuilder) => {
+				this.#libraryElementWorkspacePath.setValue(routeBuilder({ entityType: UMB_ELEMENT_ENTITY_TYPE }));
+			});
 	}
 
 	protected abstract _gotEntries(): void;
