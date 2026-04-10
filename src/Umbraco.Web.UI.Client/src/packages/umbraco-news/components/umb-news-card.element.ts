@@ -1,4 +1,5 @@
 import { css, customElement, html, nothing, property, unsafeHTML, when } from '@umbraco-cms/backoffice/external/lit';
+import { sanitizeHTML } from '@umbraco-cms/backoffice/utils';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { NewsDashboardItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
@@ -23,6 +24,8 @@ export class UmbNewsCardElement extends UmbLitElement {
 
 		const showImage = this.priority <= 2 && !!this.item.imageUrl;
 
+		const sanitizedBody = this.item.body ? sanitizeHTML(this.item.body) : '';
+
 		const content = html`
 			${when(
 				showImage,
@@ -34,7 +37,7 @@ export class UmbNewsCardElement extends UmbLitElement {
 			)}
 			<div class="card-body uui-text">
 				${this.#renderHeading(this.priority, this.item.header)}
-				${this.item.body ? html`<div class="card-text">${unsafeHTML(this.item.body)}</div>` : nothing}
+				${this.item.body ? html`<div class="card-text">${unsafeHTML(sanitizedBody)}</div>` : nothing}
 				${!isLastRow && this.item.url
 					? html`<div class="card-actions">
 							<uui-button
