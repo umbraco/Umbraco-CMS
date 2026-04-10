@@ -28,7 +28,7 @@ jobs:
           assignee_trigger: "claude"
           label_trigger: "claude"
           additional_permissions: "actions: read"
-          claude_args: "--model claude-sonnet-4-6"
+          claude_args: "--model claude-sonnet-4-6 --max-turns 25"
           prompt: |
             You are an AI assistant for the Umbraco CMS repository.
             This is an open-source project that welcomes community contributions.
