@@ -168,6 +168,8 @@ public class UmbracoPlan : MigrationPlan
         To<V_17_3_0.PopulateSortableValueForDatePropertyData>("{6748CB56-CC16-49F0-BA91-B8ECE31BF456}");
 
         // To 17.4.0
+        To<V_17_4_0.AddContentVersionDateIndex>("{D4E5F6A7-B8C9-4D0E-A1F2-3B4C5D6E7F80}");
+        To<V_17_4_0.AddDimensionsToSvg>("{72970B86-59D8-403C-B322-FFF43F9DB199}");
         To<V_17_4_0.AddExternalMemberTables>("{D7E8F9A0-B1C2-4D3E-A5F6-7890ABCDEF12}");
 
         // To 18.0.0

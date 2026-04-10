@@ -111,8 +111,7 @@ test('can edit password', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
 test('can add member group', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const memberGroupName = 'TestMemberGroup';
-  await umbracoApi.memberGroup.ensureNameNotExists(memberGroupName);
-  const memberGroupId = await umbracoApi.memberGroup.create(memberGroupName);
+  const memberGroupId = await umbracoApi.memberGroup.createDefaultMemberGroup(memberGroupName);
   memberTypeId = await umbracoApi.memberType.createDefaultMemberType(memberTypeName);
   memberId = await umbracoApi.member.createDefaultMember(memberName, memberTypeId, email, username, password);
   await umbracoUi.member.goToMembers();
@@ -133,8 +132,7 @@ test('can add member group', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) =>
 test('can remove member group', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const memberGroupName = 'TestMemberGroup';
-  await umbracoApi.memberGroup.ensureNameNotExists(memberGroupName);
-  const memberGroupId = await umbracoApi.memberGroup.create(memberGroupName);
+  const memberGroupId = await umbracoApi.memberGroup.createDefaultMemberGroup(memberGroupName);
   memberTypeId = await umbracoApi.memberType.createDefaultMemberType(memberTypeName);
   memberId = await umbracoApi.member.createMemberWithMemberGroup(memberName, memberTypeId, email, username, password, memberGroupId);
   await umbracoUi.member.goToMembers();

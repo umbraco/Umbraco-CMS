@@ -419,70 +419,67 @@ APIs use `Asp.Versioning.Mvc`:
 - Delivery API: `/umbraco/delivery/api/v{version}/*`
 - OpenAPI/Swagger docs per version
 
-### Backoffice npm Package Structure
+### Updating `OpenApi.json` (Management API)
 
-The backoffice (`Umbraco.Web.UI.Client`) is published to npm as **`@umbraco-cms/backoffice`** with a plugin architecture:
+When a PR changes Management API controllers or models, the `OpenApi.json` file in the Management API project must be updated:
 
-#### Architecture Overview
+1. Run the Umbraco instance locally
+2. Open Swagger UI and navigate to the swagger.json link (e.g. `https://localhost:44339/umbraco/swagger/management/swagger.json`)
+3. Copy the full JSON content and paste it into `src/Umbraco.Cms.Api.Management/OpenApi.json`
 
-- **Multi-workspace structure**: Subprojects in `src/libs/*`, `src/packages/*`, `src/external/*`
-- **Export model**: All exports defined in root `package.json` → `./exports` field
-- **Importmap-driven runtime**: Dependencies provided at runtime via importmap (single source of truth)
-- **Build-time types**: TypeScript types come from npm peerDependencies
-- **Plugin model**: Developers create plugins that import from `@umbraco-cms/backoffice/*` exports
+**Important**: Commit only the substantive changes — not IDE-applied formatting (whitespace, reordering, etc.). Extraneous formatting diffs make PRs harder to review and merge-ups more error-prone.
 
-#### Dependency Hoisting Strategy
+### Backoffice npm Package
 
-When building for npm (`npm pack`), the `cleanse-pkg.js` script hoists subproject dependencies to root `peerDependencies` with intelligent version range conversion:
-
-**Version Range Logic** (uses `semver` package):
-
-1. **Pre-release (0.x.y)**: Convert to explicit range
-   - Input: `^0.85.0` or `0.85.0`
-   - Output: `>=0.85.0 <1.0.0`
-   - Rationale: Pre-release caret only allows patch updates, explicit range allows minor upgrades within 0.x.x
-   - Example: Plugin can use `@hey-api/openapi-ts@0.91.1` while backoffice uses `0.85.0`
-
-2. **Stable with caret (^X.Y.Z where X ≥ 1)**: Keep as-is
-   - Input: `^3.3.1`
-   - Output: `^3.3.1` (unchanged)
-   - Rationale: Caret already implements correct semantics for stable versions
-
-3. **Stable exact versions (X.Y.Z where X ≥ 1)**: Add caret
-   - Input: `3.16.0`
-   - Output: `^3.16.0`
-   - Rationale: Normalizes to conventional semver format
-
-#### Key Dependencies
-
-**Runtime via importmap** (types available from peerDependencies):
-- `lit`, `rxjs`, `@umbraco-ui/uui` - Core framework
-- `monaco-editor`, `@tiptap/*` - Feature-specific editors
-- `@hey-api/openapi-ts` - HTTP client type generation
-
-**Build-time only** (not hoisted):
-- `vite`, `typescript`, `eslint` - Dev tooling
-
-#### Plugin Development Implications
-
-Plugin developers should:
-- **Declare explicit dependencies** in their own `package.json` (avoid relying on transitive deps)
-- **Understand the version ranges**: `>=0.85.0 <1.0.0` means they can use newer pre-release versions
-- **Know that types match npm ranges**, but runtime comes from importmap (managed by backoffice)
-- **When `@hey-api` hits 1.0.0**: Published constraint will automatically become `^1.0.0`
-
-#### Implementation Details
-
-- Script location: `src/Umbraco.Web.UI.Client/devops/publish/cleanse-pkg.js`
-- Runs as `prepack` hook before npm pack
-- Uses `semver.minVersion()` for robust version range parsing
-- Generates single source of truth for importmap versions
+The backoffice is published to npm as `@umbraco-cms/backoffice`. Runtime dependencies are provided via importmap; npm peerDependencies provide types only. For full details on dependency hoisting, version range logic, and plugin development, see `/src/Umbraco.Web.UI.Client/CLAUDE.md` → "npm Package Publishing".
 
 ### Known Limitations
 
 1. **Circular Dependencies**: Avoided via `Lazy<T>` or event notifications
 2. **Multi-Server**: Requires shared Data Protection key ring and synchronized clocks (NTP)
 3. **Database Support**: SQL Server, SQLite
+
+---
+
+## 7. CI/CD — Claude Automated PR Review
+
+Two GitHub Actions workflows provide automated code review using `anthropics/claude-code-action@v1` and the `umb-review` skill (`.claude/skills/umb-review/SKILL.md`). Reviews are advisory only — they do not block merging.
+
+### Workflows
+
+| File | Trigger | Purpose |
+|------|---------|---------|
+| `claude-review-auto.yml` | `pull_request_target` + `workflow_dispatch` | Auto-review on PR open/push; manual re-run by PR number |
+| `claude-review-on-demand.yml` | `issue_comment` (`@claude review`) | On-demand review triggered by collaborator comment |
+
+### Key Design Decisions
+
+- **`pull_request_target`** (not `pull_request`) — runs in base repo context so it has write access for fork PRs. Checkout must explicitly use `refs/pull/{n}/head` to get the PR code.
+- **`fetch-depth: 0`** — the umb-review skill uses `git diff {target}...HEAD` (triple-dot), which requires the merge base. Shallow clones break this.
+- **SHA dedup** — the auto workflow checks existing PR comments for `Based on commit \`{full-sha}\`` to skip re-reviews of the same commit. Uses `github.paginate()` to handle PRs with many comments.
+- **Permission gate** (on-demand) — `admin`, `maintain`, and `write` collaborators can trigger; others are silently ignored.
+- **Concurrency** — one review at a time per PR number; new pushes cancel in-progress reviews.
+- **Skip conditions** — draft PRs, PRs with >150 changed files.
+
+### Labels
+
+Both workflows instruct Claude to apply labels based on changed files:
+
+| Label | Condition |
+|-------|-----------|
+| `area/frontend` | Files under `src/Umbraco.Web.UI.Client/` |
+| `area/backend` | `.cs` files outside the frontend client |
+| `area/test` | Only test files changed |
+| `category/api` | Management or Delivery API files |
+| `category/breaking` | Breaking changes detected |
+| `category/localization` | Localization/language files |
+| `category/test-automation` | Only test files changed |
+| `category/refactor` | Pure refactoring, no new features |
+| `category/performance` | Performance-related changes |
+| `category/ux` | User-facing changes |
+| `category/ui` | UI layer changes |
+
+Labels are only added, never removed. Claude applies only labels it is confident about.
 
 ---
 
@@ -506,6 +503,16 @@ dotnet format
 # Pack all projects
 dotnet pack -c Release
 ```
+
+### Integration Test Database Configuration
+
+Integration tests are configured in `tests/Umbraco.Tests.Integration/appsettings.Tests.json`.
+
+The `Tests:Database:DatabaseType` setting controls which database is used:
+- `"SQLite"` (default) - No external dependencies
+- `"LocalDb"` - Uses SQL Server LocalDB, required for SQL Server-specific tests (e.g., page-level locking, `sys.dm_tran_locks`)
+
+SQL Server-specific tests use `BaseTestDatabase.IsSqlite()` to skip when running on SQLite.
 
 ### Key Projects
 
