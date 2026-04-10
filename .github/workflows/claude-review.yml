@@ -90,6 +90,7 @@ jobs:
           trigger_phrase: "@claude"
           assignee_trigger: "claude"
           label_trigger: "claude"
+          additional_permissions: "actions: read"
           claude_args: "--model claude-sonnet-4-6"
           prompt: |
             You are an AI assistant for the Umbraco CMS repository.
