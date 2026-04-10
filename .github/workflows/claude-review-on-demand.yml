@@ -16,7 +16,6 @@ concurrency:
 jobs:
   review:
     runs-on: ubuntu-latest
-    if: false # disabled — enable once auto workflow is validated
 
     steps:
       - name: Check commenter permission
